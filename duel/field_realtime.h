@@ -1,7 +1,7 @@
 #ifndef DUEL_FIELD_REALTIME_H_
 #define DUEL_FIELD_REALTIME_H_
 
-#include "field.h"
+#include "core/field.h"
 
 #include <vector>
 

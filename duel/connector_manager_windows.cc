@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "data.h"
+#include "core/data.h"
 #include "../cpu/hiroshimizuno/hikuitokoro.h"
 
 using std::istringstream;

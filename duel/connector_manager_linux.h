@@ -6,7 +6,7 @@
 
 #include "connector.h"
 #include "connector_manager_base.h"
-#include "data.h"
+#include "core/data.h"
 
 const int TIMEOUT_USEC = 1000000 / FPS;
 

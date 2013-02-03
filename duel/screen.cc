@@ -11,7 +11,7 @@
 
 #include <glog/logging.h>
 
-#include "field.h"
+#include "core/field.h"
 
 using namespace std;
 

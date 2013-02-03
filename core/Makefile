@@ -1,7 +1,7 @@
 TARGET=libpuyocore.a
 SRCS=ctrl.cc field.cc decision.cc plan.cc field_deprecated.cc
 OBJS=$(subst .cc,.o,$(SRCS))
-CXXFLAGS+=-I.. 
+CXXFLAGS+=-I..
 
 # Comment out if you have a real glib library.
 ifneq ($(HAS_GLOG), 1)
