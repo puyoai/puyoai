@@ -10,7 +10,7 @@ endif
 CXXFLAGS+=-I../core -L../core
 LIBS+=-lpuyocore
 
-SRCS=$(filter-out duel.cc, $(filter-out %linux.cc, $(filter-out %windows.cc, $(filter-out %test.cc, $(filter-out screen.cc, $(wildcard *.cc))))))
+SRCS=$(filter-out duel.cc %linux.cc %windows.cc %test.cc screen.cc, $(wildcard *.cc))
 OBJS=$(subst .cc,.o,$(SRCS))
 
 ifeq ($(USE_SDL),1)
