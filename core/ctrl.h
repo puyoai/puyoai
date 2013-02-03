@@ -7,8 +7,6 @@
 
 #include "core/field.h"
 
-class Decision;
-
 class KeyTuple {
  public:
   Key b1, b2;
@@ -27,7 +25,7 @@ class KumipuyoPos {
   int r;
   KumipuyoPos() : y(0), x(0), r(0) {}
   KumipuyoPos(int x0, int y0, int r0) : y(y0), x(x0), r(r0) {}
-  KumipuyoPos(const Decision& d);
+  KumipuyoPos(const Decision &d);
   std::string debugString() const;
   static const KumipuyoPos INIT;
 };

@@ -3,8 +3,6 @@
 #include <glog/logging.h>
 #include <string>
 
-#include "core/decision.h"
-
 using namespace std;
 
 const KumipuyoPos KumipuyoPos::INIT = KumipuyoPos(3, 12, 0);

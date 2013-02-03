@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "core/decision.h"
 #include "core/field.h"
 
 class FieldDeprecated : public Field {

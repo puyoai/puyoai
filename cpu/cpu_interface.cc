@@ -1,10 +1,8 @@
-#include "cpu/cpu_interface.h"
-
 #include <iostream>
 #include <sstream>
 #include <string>
 
-#include "core/decision.h"
+#include "cpu/cpu_interface.h"
 
 using namespace std;
 
