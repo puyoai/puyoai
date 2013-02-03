@@ -41,6 +41,14 @@ HAS_GTEST=$(shell ld -lgtest && echo "Success")
 TEST_BINARIES=field_realtime_test
 LDFLAGS=-lgtest_main
 
+test: $(TEST_BINARIES)
+
+CHECK_TEST_BINARIES=$(TEST_BINARIES:%=check_%)
+check: $(CHECK_TEST_BINARIES)
+
+check_%: %
+	./$<
+
 tests:
 	$(if $(HAS_GTEST), make tests_main)
 
@@ -48,7 +56,7 @@ tests_main: $(TEST_BINARIES)
 	./field_realtime_test
 
 field_realtime_test: $(OBJS) field_realtime_test.o
-	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) -lglog $(LIBS)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) -lglog $(LIBS) -lgtest
 
 clean:
 	rm -f *~ *.o *.d $(BINARIES) $(TEST_BINARIES)
