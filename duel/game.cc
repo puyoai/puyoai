@@ -7,14 +7,14 @@
 #include <string>
 #include <vector>
 
-#include "ctrl.h"
-#include "data.h"
-#include "decision.h"
-#include "field_realtime.h"
-#include "game_log.h"
-#include "gui.h"
-#include "ojama_controller.h"
-#include "state.h"
+#include "core/ctrl.h"
+#include "core/data.h"
+#include "core/decision.h"
+#include "core/state.h"
+#include "duel/field_realtime.h"
+#include "duel/game_log.h"
+#include "duel/gui.h"
+#include "duel/ojama_controller.h"
 
 using namespace std;
 

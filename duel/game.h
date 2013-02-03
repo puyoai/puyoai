@@ -1,13 +1,13 @@
-#ifndef __GAME_H__
-#define __GAME_H__
+#ifndef DUEL_GAME_H_
+#define DUEL_GAME_H_
 
 #include <string>
 #include <vector>
 
-#include "ctrl.h"
-#include "decision.h"
-#include "game_log.h"
-#include "ojama_controller.h"
+#include "core/ctrl.h"
+#include "core/decision.h"
+#include "duel/game_log.h"
+#include "duel/ojama_controller.h"
 
 class Data;
 class FieldRealtime;
@@ -29,4 +29,4 @@ class Game {
   void GetFieldInfo(std::string* player1, std::string* player2) const;
 };
 
-#endif  // __GAME_H__
+#endif  // DUEL_GAME_H_

@@ -1,5 +1,5 @@
-#ifndef __CONSTANT_H__
-#define __CONSTANT_H__
+#ifndef CORE_CONSTANT_H_
+#define CORE_CONSTANT_H_
 
 ////////////////////////////////////////////////////////////////////////
 // Confirmed.
@@ -57,4 +57,4 @@ static const int LONG_BONUS[] = {
   0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 10,
 };
 
-#endif
+#endif  // CORE_CONSTANT_H_

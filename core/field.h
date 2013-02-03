@@ -1,11 +1,11 @@
-#ifndef __FIELD_H__
-#define __FIELD_H__
+#ifndef CORE_FIELD_H_
+#define CORE_FIELD_H_
 
 #include <string>
 #include <vector>
 
-#include "constant.h"
-#include "decision.h"
+#include "core/constant.h"
+#include "core/decision.h"
 
 class Plan;
 
@@ -115,4 +115,4 @@ class Field {
   std::string color_sequence_;
 };
 
-#endif  // __FIELD_H__
+#endif  // CORE_FIELD_H_

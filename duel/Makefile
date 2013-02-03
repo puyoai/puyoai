@@ -1,6 +1,6 @@
 USE_SDL=0
 
-CXXFLAGS+=-O2 -g -MMD
+CXXFLAGS+=-O2 -I.. -g -MMD
 # Comment out if you have a real glib library.
 ifneq ($(HAS_GLOG), 1)
   CXXFLAGS+=-I../third_party -L../third_party
@@ -51,6 +51,6 @@ field_realtime_test: $(OBJS) field_realtime_test.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) -lglog $(LIBS)
 
 clean:
-	rm -f *~ *.o $(BINARIES) $(TEST_BINARIES)
+	rm -f *~ *.o *.d $(BINARIES) $(TEST_BINARIES)
 
 -include *.d

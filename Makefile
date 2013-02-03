@@ -14,7 +14,7 @@ tests:
 
 clean:
 	$(MAKE) -C third_party clean
+	$(MAKE) -C util clean
 	$(MAKE) -C core clean
 	$(MAKE) -C cpu clean
 	$(MAKE) -C duel clean
-

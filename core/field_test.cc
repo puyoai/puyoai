@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <string>
 
-#include "field.h"
-#include "plan.h"
+#include "core/field.h"
+#include "core/plan.h"
 
 using namespace std;
 

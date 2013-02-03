@@ -1,10 +1,11 @@
-#ifndef __CTRL_H__
-#define __CTRL_H__
+#ifndef CORE_CTRL_H_
+#define CORE_CTRL_H_
 
-#include "field.h"
 #include <string>
 #include <stdio.h>
 #include <vector>
+
+#include "core/field.h"
 
 class KeyTuple {
  public:
@@ -49,4 +50,4 @@ class Ctrl {
   static void add2(Key b1, Key b2, std::vector<KeyTuple>* ret);
 };
 
-#endif  // __CTRL_H__
+#endif  // CORE_CTRL_H_

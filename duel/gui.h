@@ -1,5 +1,5 @@
-#ifndef __GUI_H__
-#define __GUI_H__
+#ifndef DUEL_GUI_H_
+#define DUEL_GUI_H_
 
 #include <string>
 
@@ -21,4 +21,4 @@ class Gui {
   virtual Key GetKey() { return KEY_NONE; }
 };
 
-#endif  // __GUI_H__
+#endif  // DUEL_GUI_H_

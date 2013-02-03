@@ -1,5 +1,5 @@
-#ifndef __DECISION_H__
-#define __DECISION_H__
+#ifndef CORE_DECISION_H_
+#define CORE_DECISION_H_
 
 class Decision {
  public:
@@ -36,4 +36,4 @@ class Decision {
   }
 };
 
-#endif  // __DECISION_H__
+#endif  // CORE_DECISION_H_

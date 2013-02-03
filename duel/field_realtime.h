@@ -1,11 +1,11 @@
-#ifndef __FIELD_REALTIME_H__
-#define __FIELD_REALTIME_H__
+#ifndef DUEL_FIELD_REALTIME_H_
+#define DUEL_FIELD_REALTIME_H_
 
 #include "field.h"
 
 #include <vector>
 
-#include "game_log.h"
+#include "duel/game_log.h"
 
 const int ZENKESI_BONUS = 2100;
 
@@ -88,4 +88,4 @@ class FieldRealtime : public Field {
   int yokoku_delay_;
 };
 
-#endif  // __FIELD_REALTIME_H__
+#endif  // DUEL_FIELD_REALTIME_H_

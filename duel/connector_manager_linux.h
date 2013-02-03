@@ -1,5 +1,5 @@
-#ifndef __CONNECTOR_MANAGER_LINUX_H__
-#define __CONNECTOR_MANAGER_LINUX_H__
+#ifndef DUEL_CONNECTOR_MANAGER_LINUX_H_
+#define DUEL_CONNECTOR_MANAGER_LINUX_H_
 
 #include <poll.h>
 #include <vector>
@@ -29,4 +29,4 @@ class ConnectorManagerLinux : public ConnectorManagerBase {
   bool dont_wait_timeout_;
 };
 
-#endif  // __CONNECTOR_MANAGER_LINUX_H__
+#endif  // DUEL_CONNECTOR_MANAGER_LINUX_H_

@@ -6,10 +6,10 @@
 #include <sstream>
 #include <string>
 
-#include "data.h"
-#include "decision.h"
-#include "game.h"
-#include "game_log.h"
+#include "core/data.h"
+#include "core/decision.h"
+#include "duel/game.h"
+#include "duel/game_log.h"
 
 #ifdef __MINGW32__
 #include <windows.h>
