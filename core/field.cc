@@ -1,4 +1,4 @@
-#include "field.h"
+#include "core/field.h"
 
 #include <cstdlib>
 #include <glog/logging.h>
@@ -7,8 +7,8 @@
 #include <string>
 #include <cassert>
 
-#include "ctrl.h"
-#include "plan.h"
+#include "core/ctrl.h"
+#include "core/plan.h"
 
 using namespace std;
 

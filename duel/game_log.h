@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "decision.h"
-#include "field.h"
+#include "core/decision.h"
+#include "core/field.h"
 
 enum GameResult {
   PLAYING = -1,

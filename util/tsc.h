@@ -1,5 +1,5 @@
-#ifndef __TSC_H__
-#define __TSC_H__
+#ifndef UTIL_TSC_H_
+#define UTIL_TSC_H_
 
 #include <map>
 #include <string>
@@ -23,4 +23,4 @@ class Tsc {
   static unsigned long long rdtsc();
 };
 
-#endif  // __TSC_H__
+#endif  // UTIL_TSC_H_

@@ -7,9 +7,9 @@
 #include <sstream>
 #include <string>
 
-#include "ctrl.h"
-#include "ojama_controller.h"
-#include "state.h"
+#include "core/ctrl.h"
+#include "core/state.h"
+#include "duel/ojama_controller.h"
 
 using namespace std;
 

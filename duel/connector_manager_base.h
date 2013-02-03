@@ -1,5 +1,5 @@
-#ifndef __CONNECTOR_MANAGER_BASE_H__
-#define __CONNECTOR_MANAGER_BASE_H__
+#ifndef DUEL_CONNECTOR_MANAGER_BASE_H_
+#define DUEL_CONNECTOR_MANAGER_BASE_H_
 
 #include <string>
 #include <vector>
@@ -18,4 +18,4 @@ class ConnectorManagerBase {
   virtual std::string GetErrorLog() = 0;
 };
 
-#endif  // __CONNECTOR_MANAGER_BASE_H__
+#endif  // DUEL_CONNECTOR_MANAGER_BASE_H_

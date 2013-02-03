@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "field.h"
-#include "ctrl.h"
+#include "core/field.h"
+#include "core/ctrl.h"
 
 using namespace std;
 

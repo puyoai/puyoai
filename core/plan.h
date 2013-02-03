@@ -1,7 +1,7 @@
-#ifndef __PLAN_H_
-#define __PLAN_H_
+#ifndef CORE_PLAN_H_
+#define CORE_PLAN_H_
 
-#include "field.h"
+#include "core/field.h"
 
 class Plan {
  public:
@@ -19,4 +19,4 @@ class Plan {
   int ojama;
 };
 
-#endif
+#endif  // CORE_PLAN_H_

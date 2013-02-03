@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "field.h"
+#include "core/field.h"
 
 class FieldDeprecated : public Field {
  public:

@@ -1,5 +1,5 @@
-#ifndef __CONNECTOR_MANAGER_WINDOWS_H__
-#define __CONNECTOR_MANAGER_WINDOWS_H__
+#ifndef DUEL_CONNECTOR_MANAGER_WINDOWS_H_
+#define DUEL_CONNECTOR_MANAGER_WINDOWS_H_
 
 #include <string>
 #include <vector>
@@ -22,4 +22,4 @@ class ConnectorManagerWindows : public ConnectorManagerBase {
   std::string lines_[2];
 };
 
-#endif  // __CONNECTOR_MANAGER_WINDOWS_H__
+#endif  // DUEL_CONNECTOR_MANAGER_WINDOWS_H_

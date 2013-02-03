@@ -1,6 +1,7 @@
 TARGET=libpuyocore.a
 SRCS=ctrl.cc field.cc decision.cc plan.cc field_deprecated.cc
 OBJS=$(subst .cc,.o,$(SRCS))
+CXXFLAGS+=-I.. 
 
 # Comment out if you have a real glib library.
 ifneq ($(HAS_GLOG), 1)
@@ -16,8 +17,8 @@ $(TARGET): $(OBJS)
 HAS_GTEST=$(shell $(CC) -L../third_party -xc /dev/null -nostdlib -lgtest && \
 	echo "Success")
 TEST_BINARIES=ctrl_test field_test performance_test
-CXXFLAGS=-O2 -I../third_party -L../third_party -MMD -g
-LDFLAGS=-lgtest -lgtest_main -lglog -lpthread
+CXXFLAGS+=-O2 -I../third_party -L../third_party -MMD -g
+LDFLAGS+=-lgtest -lgtest_main -lglog -lpthread
 
 tests:
 	$(if $(HAS_GTEST), make tests_main)
@@ -37,6 +38,6 @@ ctrl_test: $(OBJS) ../third_party/*.a ctrl_test.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 clean:
-	rm -f *~ *.o $(TARGET) $(TEST_BINARIES)
+	rm -f *~ *.o *.d $(TARGET) $(TEST_BINARIES)
 
 -include *.d

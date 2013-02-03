@@ -1,5 +1,5 @@
-#ifndef __DATA_H__
-#define __DATA_H__
+#ifndef CORE_DATA_H_
+#define CORE_DATA_H_
 
 #include <string>
 
@@ -52,4 +52,4 @@ struct Data {
   }
 };
 
-#endif  // __DATA_H__
+#endif  // CORE_DATA_H_

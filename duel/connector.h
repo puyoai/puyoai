@@ -1,5 +1,5 @@
-#ifndef __CONNECTOR_H__
-#define __CONNECTOR_H__
+#ifndef DUEL_CONNECTOR_H_
+#define DUEL_CONNECTOR_H_
 
 #include <cstdio>
 #include <string>
@@ -23,4 +23,4 @@ class Connector {
   FILE* reader_;
 };
 
-#endif  // __CONNECTOR_H__
+#endif  // DUEL_CONNECTOR_H_

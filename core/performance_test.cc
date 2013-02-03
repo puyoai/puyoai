@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "field.h"
-#include "plan.h"
-#include "../util/tsc.h"
+#include "core/field.h"
+#include "core/plan.h"
+#include "util/tsc.h"
 
 using namespace std;
 

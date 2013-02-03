@@ -1,5 +1,5 @@
-#ifndef __STATE_H__
-#define __STATE_H__
+#ifndef CORE_STATE_H_
+#define CORE_STATE_H_
 
 enum State {
   STATE_NONE = 0,
@@ -11,4 +11,4 @@ enum State {
   STATE_OJAMA_DROPPED = 1 << 10,
 };
 
-#endif  // __STATE_H__
+#endif  // CORE_STATE_H_

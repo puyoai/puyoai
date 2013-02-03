@@ -1,5 +1,5 @@
-#ifndef __OJAMA_CONTROLLER_H__
-#define __OJAMA_CONTROLLER_H__
+#ifndef DUEL_OJAMA_CONTROLLER_H_
+#define DUEL_OJAMA_CONTROLLER_H_
 
 #include <vector>
 
@@ -22,4 +22,4 @@ class OjamaController {
   int pending_;
 };
 
-#endif  // __OJAMA_CONTROLLER_H__
+#endif  // DUEL_OJAMA_CONTROLLER_H_
