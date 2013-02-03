@@ -1,0 +1,6 @@
+*~
+*.o
+*.d
+*_test
+gmon.out
+peria

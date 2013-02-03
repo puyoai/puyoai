@@ -1,0 +1,4 @@
+urls.txt:          URL          => dat/puyo/*.mp4
+parse_movie.rb:    mp4          => data/sm*.txt
+mkdb:              data/sm*.txt => db/sm*.txt
+conv_decisions.rb: db/sm*.txt   => db.js

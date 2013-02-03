@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+<title>ぷよ譜DB</title>
+
+<script src="db.js"></script>
+<script src="puyodb.js"></script>
+
+<style>
+body {
+  background-color: #e1e1f1;
+}
+td {
+  vertical-align: top;
+}
+#error {
+  color: red;
+}
+.A {
+  color: #844;
+}
+.B {
+  color: #484;
+}
+.C {
+  color: #448;
+}
+.D {
+  color: #884;
+}
+.W {
+  color: #A30;
+}
+#control {
+  position: fixed;
+  left: 50%;
+}
+#result {
+  width: 45%;
+  min-height: 50em;
+}
+.right {
+  text-align: right;
+}
+</style>
+</head>
+
+<body onload="init()">
+<h1>ぷよ譜DB</h1>
+
+<input id="input" size=40 onkeyup="handleKey(event)">
+<span id="error">例: ABACBC</span>
+
+<div id="control"></div>
+<div id="result"></div>
+
+<hr>
+<a href="db.js">data</a> (JS)<br>
+<!-- hhmts start -->
+Last modified: Fri Jan 11 02:33:21 JST 2013
+<!-- hhmts end -->
+<br>
+count: <!--#exec cgi="/envlog.cgi"-->
+<br>
+<address class="right">
+shinichiro.hamaji _at_ gmail.com / shinichiro.h
+</address><br>
+</body> </html>

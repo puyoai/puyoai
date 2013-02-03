@@ -1,0 +1,33 @@
+This directory is only for Linux.
+
+You need following packages to make everything:
+
+- ffmpeg
+- v4l2
+- SDL
+- SDL_image
+- SDL_ttf
+- gflags
+- glog
+- gtest
+
+Note that you may need to install glog from source code as most
+distributors don't link glog with gflags. Please install it by
+
+svn checkout http://google-glog.googlecode.com/svn/trunk/ google-glog-read-only
+cd google-glog-read-only
+./configure
+make
+sudo make install
+
+
+If you are using PCA-DAV2, you need recent kernel (my kernel is 3.6.11,
+and it didn't work with 2.x) and run modprobe with card=19 option:
+
+$ sudo modprobe em28xx card=19
+
+As resolution negotiation isn't implemented yet, you need to run
+
+$ xawtv -device /dev/video0
+
+to adjust the resolution of driver.
