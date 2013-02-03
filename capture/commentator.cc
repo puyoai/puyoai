@@ -15,7 +15,7 @@
 #include <glog/stl_logging.h>
 
 #include "plan.h"
-#include "screen.h"
+#include "duel/screen.h"
 #include "util.h"
 
 using namespace std;

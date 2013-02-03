@@ -6,7 +6,7 @@
 #include "ctrl.h"
 #include "field.h"
 
-#include "connector_manager_linux.h"
+#include "duel/connector_manager_linux.h"
 
 #include <assert.h>
 #include <string.h>
