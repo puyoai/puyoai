@@ -1,5 +1,5 @@
 PROFILE=
-CXXFLAGS+=-O -g -W -Wall -Werror -MMD -Wno-deprecated-declarations $(PROFILE) `sdl-config --cflags` `pkg-config --cflags libavformat libswscale` -I../core -I../duel
+CXXFLAGS+=-O -g -W -Wall -Werror -MMD -Wno-deprecated-declarations $(PROFILE) `sdl-config --cflags` `pkg-config --cflags libavformat libswscale` -I../core -I..
 LDFLAGS+=`sdl-config --libs` -lSDL_image -lSDL_ttf `pkg-config --libs libavformat libswscale libavutil libavcodec` -L/usr/local/lib -lgflags -lglog
 
 ifeq ($(shell uname), Linux)

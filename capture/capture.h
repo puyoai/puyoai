@@ -8,7 +8,7 @@
 
 #include "state.h"
 #include "field.h"
-#include "screen.h"
+#include "duel/screen.h"
 
 using namespace std;
 
