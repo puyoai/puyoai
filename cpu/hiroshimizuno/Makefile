@@ -1,7 +1,7 @@
 include ../cpu.inc
 
 hikuitokoro: hikuitokoro.cc ../../core/field.cc ../../core/ctrl.cc
-	g++ $(CXXFLAGS) hikuitokoro.cc ../../core/field.cc ../../core/ctrl.cc -o hikuitokoro $(LDFLAGS)
+	g++ $(CXXFLAGS) hikuitokoro.cc ../../core/field.cc ../../core/field_deprecated.cc ../../core/ctrl.cc -o hikuitokoro $(LDFLAGS)
 
 clean:
 	rm -f *~ *.o hikuitokoro

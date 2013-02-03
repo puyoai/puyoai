@@ -84,8 +84,6 @@ class Field {
    * PLEASE DO NOT USE THE FOLLOWING PUBLIC FUNCTIONS!
    * They are deprecated, and will be removed at any time.
    */
-  static void GetPossibleFields(const Field& field, char c1, char c2,
-                                std::vector<std::pair<Decision, Field> >* ret);
   // depth = 1 -- think about the next pair of puyos.
   // depth = 2 -- think about the next 2 pairs of puyos.
   // depth = 3 -- think about the next 3 pairs of puyos.

@@ -5,7 +5,9 @@
 #include <string>
 
 #include "../../core/decision.h"
-#include "../../core/field.h"
+#include "../../core/field_deprecated.h"
+
+#define Field FieldDeprecated
 
 using std::istringstream;
 using std::ostringstream;
