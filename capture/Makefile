@@ -6,11 +6,11 @@ ifeq ($(shell uname), Linux)
 	LDFLAGS+=-lv4l2
 endif
 
-EXES=parse_bmp parse_movie parse_viddev parse_imgs connect capture_test commentator_test
-SRCS=capture.cc movie.cc viddev.cc images.cc source.cc commentator.cc
+EXES=parse_bmp parse_movie parse_viddev parse_imgs connect capture_test
+SRCS=capture.cc movie.cc viddev.cc images.cc source.cc
 OBJS=$(SRCS:.cc=.o)
 
-CORE_OBJS=../core/field.o ../core/ctrl.o ../core/plan.o ../util/tsc.o ../duel/connector.o ../duel/connector_manager_linux.o ../duel/screen.o
+CORE_OBJS=../core/field.o ../core/ctrl.o ../core/plan.o ../util/tsc.o ../duel/connector.o ../duel/connector_manager_linux.o ../duel/screen.o ../duel/commentator.o
 
 all: $(EXES)
 
@@ -30,9 +30,6 @@ connect: connect.o $(OBJS) $(CORE_OBJS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 capture_test: capture_test.o $(OBJS) $(CORE_OBJS)
-	$(CXX) -o $@ $^ $(LDFLAGS) -lgtest
-
-commentator_test: commentator_test.o $(OBJS) $(CORE_OBJS)
 	$(CXX) -o $@ $^ $(LDFLAGS) -lgtest
 
 clean:
