@@ -1,7 +1,6 @@
 #ifndef CORE_PLAN_H_
 #define CORE_PLAN_H_
 
-#include "core/decision.h"
 #include "core/field.h"
 
 class Plan {

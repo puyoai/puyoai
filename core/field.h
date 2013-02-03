@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "core/constant.h"
+#include "core/decision.h"
 
 class Plan;
 
@@ -79,6 +80,17 @@ class Field {
 
   char GetNextPuyo(int n) const;
 
+  /**
+   * PLEASE DO NOT USE THE FOLLOWING PUBLIC FUNCTIONS!
+   * They are deprecated, and will be removed at any time.
+   */
+  // depth = 1 -- think about the next pair of puyos.
+  // depth = 2 -- think about the next 2 pairs of puyos.
+  // depth = 3 -- think about the next 3 pairs of puyos.
+  void FindAvailablePlans(int depth, std::vector<Plan>* plans) const;
+  // == FindAvailablePlans(3, plans);
+  void FindAvailablePlans(std::vector<Plan>* plans) const;
+
  protected:
   // Clean internal states, related to Vanish and Drop.
   void Clean();
@@ -93,6 +105,9 @@ class Field {
 
  private:
   void FillFieldInfo(std::stringstream& ss) const;
+  void FindAvailablePlansInternal(const Field& field, const Plan* parent,
+                                  int depth, int max_depth,
+                                  std::vector<Plan>* plans) const;
   void Drop(int* frames);
 
   unsigned char field_[MAP_WIDTH][MAP_HEIGHT];
