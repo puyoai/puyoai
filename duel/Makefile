@@ -7,7 +7,6 @@ ifneq ($(HAS_GLOG), 1)
 else
   CXXFLAGS+=`pkg-config --cflags --libs libgflags libglog`
 endif
-CXXFLAGS+=-I../core -I../util
 LIBS+=-L../core -lpuyocore
 
 SRCS=$(filter-out duel.cc %linux.cc %windows.cc %test.cc screen.cc commentator.cc, $(wildcard *.cc))

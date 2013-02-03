@@ -14,7 +14,7 @@
 
 #include "connector.h"
 #include "connector_manager_base.h"
-#include "data.h"
+#include "core/data.h"
 #include "game_log.h"
 
 using namespace std;
