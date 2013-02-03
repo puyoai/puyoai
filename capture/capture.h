@@ -6,9 +6,9 @@
 
 #include <SDL.h>
 
-#include "state.h"
-#include "field.h"
-#include "duel/screen.h"
+#include <core/state.h>
+#include <core/field.h>
+#include <duel/screen.h>
 
 using namespace std;
 

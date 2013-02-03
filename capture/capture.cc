@@ -10,8 +10,8 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "commentator.h"
-#include "util.h"
+#include <duel/commentator.h>
+#include <util/util.h>
 
 #define VERBOSE 0
 

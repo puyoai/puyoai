@@ -3,10 +3,10 @@
 #include "images.h"
 #include "viddev.h"
 
-#include "ctrl.h"
-#include "field.h"
+#include <core/ctrl.h>
+#include <core/field.h>
 
-#include "duel/connector_manager_linux.h"
+#include <duel/connector_manager_linux.h>
 
 #include <assert.h>
 #include <string.h>
