@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include <constant.h>
-#include <state.h>
+#include <core/constant.h>
+#include <core/state.h>
 #include "field_realtime.h"
 #include "ojama_controller.h"
 
