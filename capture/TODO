@@ -1,0 +1,8 @@
+- It seems we should have different frames_after_next_disappeared
+  for some situations (e.g., the first puyo, after ojama, etc.)
+- Remember 13 danme
+-- Maybe OK for my color puyos
+-- Ojama puyo isn't handled
+-- Opponent's isn't either
+- We need to handle decision change nicely
+-- It seems to be working

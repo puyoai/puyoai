@@ -1,0 +1,20 @@
+<P1> TAIOU : Check opposite's field can start rensa.
+ - Count frames which the opposite needs to start maxium rensa.
+ - Compute posibility to start my rensa to go over the opposite's.
+
+<P1> Template check on controls.
+ - Template the states after 3 Tsumos.
+<code>
+   n = 1000; // it should be large
+   string tsumos[n]; // generate random tsumos
+   set<Field> fields; // unique field sets after 3 tsumos
+   for_each(field in fields):
+     for_each(tsumo in tsumos):
+       scores.push(field.Simulate(tsumo));  // evaluate (how?)
+   sort(fields, Compare(max_score, avg_score));
+</code>
+
+<P2>
+ - Tempai checker
+ -- if a puyo can connect with >=3 puyos, check if it starts rensa
+   assuming another puyo around it.

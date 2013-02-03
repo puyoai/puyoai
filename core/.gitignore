@@ -1,0 +1,4 @@
+*.o
+libpuyocore.a
+duel
+
