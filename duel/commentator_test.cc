@@ -11,7 +11,7 @@
 #include "commentator.h"
 #undef private
 
-#include "util.h"
+#include "util/util.h"
 
 using namespace std;
 
