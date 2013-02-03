@@ -7,17 +7,19 @@ ifneq ($(HAS_GLOG), 1)
 else
   CXXFLAGS+=`pkg-config --cflags --libs libgflags libglog`
 endif
-CXXFLAGS+=-I../core -L../core
-LIBS+=-lpuyocore
+CXXFLAGS+=-I../core -I../util
+LIBS+=-L../core -lpuyocore
 
-SRCS=$(filter-out duel.cc %linux.cc %windows.cc %test.cc screen.cc, $(wildcard *.cc))
-OBJS=$(subst .cc,.o,$(SRCS))
+SRCS=$(filter-out duel.cc %linux.cc %windows.cc %test.cc screen.cc commentator.cc, $(wildcard *.cc))
+OBJS=$(subst .c,.o,$(subst .cc,.o,$(SRCS)))
 
 ifeq ($(USE_SDL),1)
   CXXFLAGS+=-DUSE_SDL `sdl-config --cflags`
+  CFLAGS+=-DUSE_SDL `sdl-config --cflags`
   SRCS+=SDL_kanji.c
-  SRCS+=screen.cc
+  SRCS+=screen.cc commentator.cc
   LIBS+=`sdl-config --libs` -lSDL_ttf
+  TEST_BINARIES+=commentator_test
 endif
 
 ifeq ($(MSYSTEM), MINGW32)
@@ -38,7 +40,7 @@ windows.exe: $(OBJS) duel.o connector_manager_windows.o
 # Test section.
 ################################################################################
 HAS_GTEST=$(shell ld -lgtest && echo "Success")
-TEST_BINARIES=field_realtime_test
+TEST_BINARIES+=field_realtime_test
 LDFLAGS=-lgtest_main
 
 test: $(TEST_BINARIES)
@@ -57,6 +59,9 @@ tests_main: $(TEST_BINARIES)
 
 field_realtime_test: $(OBJS) field_realtime_test.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS) -lglog $(LIBS) -lgtest
+
+commentator_test: commentator_test.o $(OBJS) commentator.o screen.o
+	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS) $(LDFLAGS) -lgtest
 
 clean:
 	rm -f *~ *.o *.d $(BINARIES) $(TEST_BINARIES)
