@@ -1,4 +1,4 @@
-ifdef NO_GLOG
+ifneq ($(HAS_GLOG), 1)
   CXXFLAGS+=-I../../third_party -I../..
   LDFLAGS+=-L../../third_party ../../third_party/gflags/gflags.o ../../third_party/glog/logging.o
 else
