@@ -14,6 +14,7 @@
 
 #include "SDL_kanji.h"
 #include "field_realtime.h"
+#include "screen.h"
 
 using namespace std;
 
@@ -25,7 +26,23 @@ class GuiSdl : public Gui {
 public:
   GuiSdl() {
     SDL_Init(SDL_INIT_VIDEO);
-    scr_ = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE);
+    bool use_commentator =
+      !getenv("PUYO_COMMENTATOR") || strcmp(getenv("PUYO_COMMENTATOR"), "0");
+    if (use_commentator) {
+      SDL_Surface* scr = SDL_SetVideoMode(800, 600, 32,
+                                          SDL_SWSURFACE | SDL_DOUBLEBUF);
+      Screen::Box b;
+      b.sx = 144;
+      b.dx = 656;
+      b.sy = 40;
+      b.dy = 424;
+      scr_ = new Screen(scr);
+      scr_->setMainBox(512, 384, b);
+    } else {
+      SDL_Surface* scr = SDL_SetVideoMode(512, 384, 32,
+                                          SDL_SWSURFACE | SDL_DOUBLEBUF);
+      scr_ = new Screen(scr);
+    }
 
     font_ = Kanji_OpenFont(kJapaneseBdfName, kBdfSize);
     Kanji_AddFont(font_, kEnglishBdfName);
@@ -47,7 +64,7 @@ public:
     char c1, c2;
     field.GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
 
-    int pos_x = 1 + 15 * field.player_id();
+    int pos_x = 1 + 13 * field.player_id();
     int pos_y = 1;
     for (int y = 0; y < Field::MAP_HEIGHT; y++) {
       for (int x = 0; x < Field::MAP_WIDTH; x++) {
@@ -68,7 +85,7 @@ public:
         }
 
         Uint32 c = GetPuyoColor(color);
-        SDL_FillRect(scr_, &r, c);
+        SDL_FillRect(scr_->off(), &r, c);
       }
     }
 
@@ -79,7 +96,8 @@ public:
       r.y = (pos_y + 4) * 20;
       r.w = 20 * 8;
       r.h = 1;
-      SDL_FillRect(scr_, &r, SDL_MapRGB(scr_->format, 255, 255, 255));
+      SDL_FillRect(scr_->off(), &r,
+                   SDL_MapRGB(scr_->off()->format, 255, 255, 255));
     }
 
     // Next puyo info
@@ -90,7 +108,7 @@ public:
       r.w = 20;
       r.h = 20;
       Uint32 c = GetPuyoColor(field.GetNextPuyo(i));
-      SDL_FillRect(scr_, &r, c);
+      SDL_FillRect(scr_->off(), &r, c);
     }
 
 
@@ -102,37 +120,40 @@ public:
       ostringstream ss;
       ss << setw(10) << field.GetScore();
       Kanji_PutText(font_, pos_x * 20, (pos_y + Field::MAP_HEIGHT + 1) * 20,
-                    scr_, ss.str().c_str(), white);
+                    scr_->off(), ss.str().c_str(), white);
     }
 
+#if 0
     // Debug message
     {
       ostringstream ss;
       ss << setw(10) << field.GetScore();
       Kanji_PutText(font_, pos_x * 20, (pos_y + Field::MAP_HEIGHT + 1) * 20,
-                    scr_, ss.str().c_str(), white);
+                    scr_->off(), ss.str().c_str(), white);
     }
+#endif
 
     // Ojama
     {
       ostringstream ss;
       ss << field.GetFixedOjama() << '(' << field.GetPendingOjama() << ')';
       Kanji_PutText(font_, pos_x * 20, pos_y * 20,
-                    scr_, ss.str().c_str(), white);
+                    scr_->off(), ss.str().c_str(), white);
     }
 
     {
       int y = pos_y + Field::MAP_HEIGHT + 3 + field.player_id();
-      Kanji_PutText(font_, 20, y * 20, scr_, debug_message.c_str(), white);
+      Kanji_PutText(font_, 20, y * 20, scr_->off(), debug_message.c_str(), white);
     }
 
 #endif
-
   }
 
   virtual void Flip() {
-    SDL_Flip(scr_);
-    SDL_FillRect(scr_, NULL, SDL_MapRGB(scr_->format, 0, 0, 0));
+    scr_->syncOffscreen();
+    scr_->flip();
+    SDL_FillRect(scr_->off(), NULL, SDL_MapRGB(scr_->off()->format, 0, 0, 0));
+    scr_->clear();
   }
 
   virtual Key GetKey() {
@@ -194,25 +215,25 @@ private:
     Uint32 c = 0;
     switch (color) {
     case EMPTY:
-      c = SDL_MapRGB(scr_->format, 0, 0, 0);
+      c = SDL_MapRGB(scr_->off()->format, 0, 0, 0);
       break;
     case OJAMA:
-      c = SDL_MapRGB(scr_->format, 127, 127, 127);
+      c = SDL_MapRGB(scr_->off()->format, 127, 127, 127);
       break;
     case WALL:
-      c = SDL_MapRGB(scr_->format, 255, 255, 255);
+      c = SDL_MapRGB(scr_->off()->format, 255, 255, 255);
       break;
     case RED:
-      c = SDL_MapRGB(scr_->format, 255, 0, 0);
+      c = SDL_MapRGB(scr_->off()->format, 255, 0, 0);
       break;
     case BLUE:
-      c = SDL_MapRGB(scr_->format, 0, 0, 255);
+      c = SDL_MapRGB(scr_->off()->format, 0, 0, 255);
       break;
     case YELLOW:
-      c = SDL_MapRGB(scr_->format, 255, 255, 0);
+      c = SDL_MapRGB(scr_->off()->format, 255, 255, 0);
       break;
     case GREEN:
-      c = SDL_MapRGB(scr_->format, 0, 255, 0);
+      c = SDL_MapRGB(scr_->off()->format, 0, 255, 0);
       break;
     default:
       break;
@@ -220,7 +241,7 @@ private:
     return c;
   }
 
-  SDL_Surface* scr_;
+  Screen* scr_;
   Kanji_Font* font_;
   int key_state_[SDLK_LAST];
 };
