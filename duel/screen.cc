@@ -12,6 +12,7 @@
 #include <glog/logging.h>
 
 #include "core/field.h"
+#include "util/util.h"
 
 using namespace std;
 
@@ -76,7 +77,9 @@ SDL_Color Screen::bg_color_;
 Screen::Screen(SDL_Surface* scr)
   : scr_(scr),
     off_(NULL),
-    is_synced_(false) {
+    is_synced_(false),
+    frames_(0) {
+  CLEAR_ARRAY(ticks_);
   init();
 }
 
@@ -287,6 +290,24 @@ void Screen::clear() {
 
 void Screen::syncOffscreen() {
   if (off_) {
+    Uint32 prev_ticks = ticks_[frames_ % 30];
+    Uint32 ticks = SDL_GetTicks();
+    Uint32 elapsed = ticks - prev_ticks;
+    if (elapsed) {
+      int fps = 30 * 1000 / elapsed;
+      char buf[256];
+      sprintf(buf, "%d fps", fps);
+      SDL_Color c;
+      c.r = c.g = c.b = 0;
+      SDL_Surface* surf = TTF_RenderUTF8_Blended(font_, buf, c);
+      if (surf) {
+        SDL_Rect dr = { scr_->w / 2 - surf->w / 2, surf->h / 2, 0, 0 };
+        SDL_BlitSurface(surf, NULL, scr_, &dr);
+        SDL_FreeSurface(surf);
+      }
+    }
+    ticks_[frames_++ % 30] = ticks;;
+
     // Maybe better to use libswscale.
     SDL_Rect sr = { 0, 0, width_, height_ };
     SDL_Rect dr = { main_.sx, main_.sy, main_.w(), main_.h() };
