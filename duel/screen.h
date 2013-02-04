@@ -74,6 +74,8 @@ private:
   int width_, height_;
   map<pair<string, Uint32>, SDL_Surface*> font_cache_;
   bool is_synced_;
+  size_t frames_;
+  Uint32 ticks_[30];
 
   static TTF_Font* font_;
   static SDL_Color bg_color_;
