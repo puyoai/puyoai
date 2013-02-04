@@ -130,11 +130,6 @@ void Screen::init() {
   getcwd(buf, PATH_MAX);
   char* p = buf;
   while (true) {
-    p = dirname(p);
-    if (!p[1]) {
-      LOG(FATAL) << "Font not found";
-    }
-
     string font_filename = string(p) + "/data/mikachan-p.ttf";
     if (access(font_filename.c_str(), R_OK) == 0) {
       font_ = TTF_OpenFont(font_filename.c_str(), 16);
@@ -142,6 +137,11 @@ void Screen::init() {
         LOG(FATAL) << TTF_GetError();
       }
       break;
+    }
+
+    p = dirname(p);
+    if (!p[1]) {
+      LOG(FATAL) << "Font not found";
     }
   }
 }
