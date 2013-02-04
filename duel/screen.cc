@@ -290,7 +290,11 @@ void Screen::syncOffscreen() {
     // Maybe better to use libswscale.
     SDL_Rect sr = { 0, 0, width_, height_ };
     SDL_Rect dr = { main_.sx, main_.sy, main_.w(), main_.h() };
-    SDL_SoftStretch(off_, &sr, scr_, &dr);
+    if (dr.w == sr.w && dr.h == sr.h) {
+      SDL_BlitSurface(off_, &sr, scr_, &dr);
+    } else {
+      SDL_SoftStretch(off_, &sr, scr_, &dr);
+    }
   }
   is_synced_ = true;
 }

@@ -175,7 +175,7 @@ private:
 
 SDL_Surface* createCommentSurface() {
   SDL_Surface* s =
-    SDL_CreateRGBSurface(SDL_SWSURFACE, 400, 600, 24, 0, 0, 0, 0);
+    SDL_CreateRGBSurface(SDL_SWSURFACE, 400, 600, 32, 0, 0, 0, 0);
   SDL_Color bg = Screen::bg_color();
   SDL_FillRect(s, NULL,
                SDL_MapRGB(s->format, bg.r, bg.g, bg.b));
