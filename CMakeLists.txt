@@ -1,0 +1,47 @@
+project(puyoai)
+
+cmake_minimum_required(VERSION 2.8)
+
+enable_testing()
+
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+find_package(Threads)
+
+find_path(GFLAGS_PATH gflags/gflags.h)
+find_library(GFLAGS_LIBRARY gflags)
+find_path(GLOG_PATH glog/logging.h)
+find_library(GLOG_LIBRARY glog)
+
+if(GFLAGS_PATH AND GFLAGS_LIBRARY AND GLOG_PATH AND GLOG_LIBRARY)
+  include_directories(${GFLAGS_PATH})
+  include_directories(${GLOG_PATH})
+else()
+  include_directories(third_party)
+  add_subdirectory(third_party)
+  set(GFLAGS_LIBRARY gflags)
+  set(GLOG_LIBRARY glog)
+endif()
+
+function(puyoai_target_link_libraries target)
+  target_link_libraries(${target} ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(${target} ${GFLAGS_LIBRARY})
+  target_link_libraries(${target} ${GLOG_LIBRARY})
+  if(USE_SDL)
+    target_link_libraries(${target} ${SDL_LIBRARY} ${SDLTTF_LIBRARY})
+  endif()
+endfunction()
+
+find_package(GTest)
+
+find_package(SDL)
+find_package(SDL_image)
+find_package(SDL_ttf)
+if(SDL_FOUND AND SDLTTF_FOUND)
+  set(USE_SDL 1)
+endif()
+
+add_subdirectory(core)
+add_subdirectory(cpu)
+add_subdirectory(duel)
+add_subdirectory(util)
