@@ -14,6 +14,7 @@ find_path(GLOG_PATH glog/logging.h)
 find_library(GLOG_LIBRARY glog)
 
 if(GFLAGS_PATH AND GFLAGS_LIBRARY AND GLOG_PATH AND GLOG_LIBRARY)
+  set(USE_GFLAGS_AND_GLOG 1)
   include_directories(${GFLAGS_PATH})
   include_directories(${GLOG_PATH})
 else()
@@ -45,3 +46,25 @@ add_subdirectory(core)
 add_subdirectory(cpu)
 add_subdirectory(duel)
 add_subdirectory(util)
+
+function(puyoai_message msg)
+  message(STATUS "puyoai: ${msg}")
+endfunction()
+
+message(STATUS "")
+message(STATUS "*************** puyoai configuration note ***************")
+
+if(USE_GFLAGS_AND_GLOG)
+  puyoai_message("Use gflags and glog installed")
+else()
+  puyoai_message("Use dummy gflags and glog")
+endif()
+
+if(USE_SDL)
+  puyoai_message("SDL and SDL_ttf found - GUI will be ENABLED")
+else()
+  puyoai_message("SDL and SDL_ttf not found - GUI will be DISABLED")
+endif()
+
+message(STATUS "*********************************************************")
+message(STATUS "")
