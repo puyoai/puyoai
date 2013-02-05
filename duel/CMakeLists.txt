@@ -30,6 +30,9 @@ endfunction()
 if(GTEST_FOUND)
   include_directories(${GTEST_INCLUDE_DIRS})
 
-  puyoai_duel_add_test(commentator)
   puyoai_duel_add_test(field_realtime)
+
+  if (USE_SDL)
+    puyoai_duel_add_test(commentator)
+  endif()
 endif()
