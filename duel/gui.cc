@@ -94,7 +94,7 @@ public:
     if (commentator_.get()) {
       if (!debug_message.empty())
         commentator_->setAIMessage(field.player_id(), debug_message);
-      if ((field.GetStateInfo() & STATE_YOU_GROUNDED) != 0) {
+      if ((field.GetStateInfo() & ~STATE_YOU_CAN_PLAY) != 0) {
         Field f(field.GetFieldInfo());
         commentator_->setField(field.player_id(), f, true);
       }
