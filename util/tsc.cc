@@ -4,6 +4,8 @@
 #include <map>
 #include <cmath>
 
+#include "util/Config.h"
+
 using namespace std;
 
 Tsc::Tsc(const string& key) {
