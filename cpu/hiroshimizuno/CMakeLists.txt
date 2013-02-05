@@ -2,16 +2,17 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("hiroshimizuno")
 
-set(CMAKE_CXX_FLAGS "-march=native -masm=intel")
-
 function(hiroshimizuno_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
   cpu_target_link_common_libraries(${exe})
 endfunction()
 
 hiroshimizuno_add_executable(hikuitokoro hikuitokoro.cc)
-hiroshimizuno_add_executable(f f.cc)
-hiroshimizuno_add_executable(t test.cc sse.cc)
+
+# TODO(hamaji): Followings cannot be built by clang.
+set(CMAKE_CXX_FLAGS "-march=native -masm=intel")
+hiroshimizuno_add_executable(f EXCLUDE_FROM_ALL f.cc)
+hiroshimizuno_add_executable(t EXCLUDE_FROM_ALL test.cc sse.cc)
 
 # TODO(hamaji): Following targets don't have corresponding files.
 #
