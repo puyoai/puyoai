@@ -14,6 +14,9 @@ add_library(puyoai_duel
             game.cc game_log.cc gui.cc ojama_controller.cc ${GUI_SRCS})
 
 add_executable(duel duel.cc)
+if(USE_SDL)
+  target_link_libraries(duel ${SDL_LIBRARY} ${SDLTTF_LIBRARY})
+endif()
 puyoai_target_link_libraries(duel)
 target_link_libraries(duel puyoai_duel)
 target_link_libraries(duel puyoai_core)
@@ -34,5 +37,6 @@ if(GTEST_FOUND)
 
   if (USE_SDL)
     puyoai_duel_add_test(commentator)
+    target_link_libraries(commentator_test ${SDL_LIBRARY} ${SDLTTF_LIBRARY})
   endif()
 endif()
