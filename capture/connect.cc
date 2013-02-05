@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
     source = new Movie(argv[1]);
     bpp = 24;
   }
-#ifdef __linux__
+#ifdef USE_V4L2
   else {
     source = new VidDev(argv[1]);
     bpp = 16;
