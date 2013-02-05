@@ -96,6 +96,22 @@ public:
         commentator_->setAIMessage(field.player_id(), debug_message);
       if ((field.GetStateInfo() & ~STATE_YOU_CAN_PLAY) != 0) {
         Field f(field.GetFieldInfo());
+        for (int x = 1; x <= 6; x++) {
+          for (int y = 2; y <= 13; y++) {
+            char c = f.Get(x, y);
+            if (c != EMPTY && f.Get(x, y - 1) == EMPTY) {
+              int ny = y - 1;
+              while (true) {
+                if (f.Get(x, ny - 1) != EMPTY)
+                  break;
+                ny--;
+                CHECK_GT(ny, 0);
+              }
+              f.Set(x, ny, c);
+              f.Set(x, y, EMPTY);
+            }
+          }
+        }
         bool grounded = (field.GetStateInfo() & STATE_YOU_GROUNDED) != 0;
         commentator_->setField(field.player_id(), f, grounded);
       }
