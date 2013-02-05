@@ -683,6 +683,22 @@ void Commentator::run() {
 void Commentator::setField(int pi, const Field& f, bool grounded) {
   MutexLock lock(mu_);
   fields_[pi] = f;
+  for (int x = 1; x <= 6; x++) {
+    for (int y = 2; y <= 13; y++) {
+      char c = fields_[pi].Get(x, y);
+      if (c != EMPTY && fields_[pi].Get(x, y - 1) == EMPTY) {
+        int ny = y - 1;
+        while (true) {
+          if (fields_[pi].Get(x, ny - 1) != EMPTY)
+            break;
+          ny--;
+          CHECK_GT(ny, 0);
+        }
+        fields_[pi].Set(x, ny, c);
+        fields_[pi].Set(x, y, EMPTY);
+      }
+    }
+  }
   fields_[pi].SetColorSequence(f.GetColorSequence());
   need_update_[pi] = true;
   if (grounded) {
