@@ -11,7 +11,6 @@ puyoai
 * gflags と glog が cmake に発見されなかった場合、それらのライブラリはダミーのものが使われます。
 * gtest が無い場合、 unittest は作られません。
 * SDL と SDL_ttf が無い場合、 GUI がつきません。
-* util/tsc.cc のコンパイルに失敗するときは、[cmake -DTSC_ALT_IMPL=ON .] を試してみてください。
 * capture/ ディレクトリについては、 capture/README を参照ください。
 
 ### 実行

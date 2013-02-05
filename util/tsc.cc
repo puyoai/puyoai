@@ -4,8 +4,6 @@
 #include <map>
 #include <cmath>
 
-#include "util/Config.h"
-
 using namespace std;
 
 Tsc::Tsc(const string& key) {
@@ -51,14 +49,14 @@ void Tsc::GetStatistics(const string& key, double* average, double* rmsd) {
 
 unsigned long long Tsc::rdtsc() {
   unsigned long long tsc = 0;
-#ifdef TSC_ALT_IMPL
+#if defined(__i386__)
   asm volatile("rdtsc" : "=A" (tsc));
+#elif defined(__x86_64__)
+  unsigned int tscl, tsch;
+  asm volatile("rdtsc":"=a"(tscl),"=d"(tsch));
+  tsc = ((unsigned long long)tsch << 32)| tscl;
 #else
-  // On 64bit built program and other environment where you see an error at
-  // this line, run:
-  //   $ CXXFLAGS='-DTSC_ALT_IMPL' make
-  // to use the alternative implementation above.
-  asm volatile("rdtsc; shlq $32,%%rdx; orq %%rdx,%%rax" : "=A" (tsc) :: "%rdx");
+# warning "Tsc::rdtsc() isn't implemented for thie architecture."
 #endif
   return tsc;
 }
