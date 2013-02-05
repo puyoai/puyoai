@@ -1,5 +1,6 @@
 #include "field.h"
 
+#include <algorithm>
 #include <gtest/gtest.h>
 #include <string>
 
