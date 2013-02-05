@@ -3,16 +3,20 @@ This directory is only for Linux.
 You need following packages to make everything:
 
 - ffmpeg
-- v4l2
 - SDL
 - SDL_image
 - SDL_ttf
 - gflags
 - glog
-- gtest
 
-Note that you may need to install glog from source code as most
-distributors don't link glog with gflags. Please install it by
+And the following two libraries are optional:
+
+- v4l2 (for video capture)
+- gtest (for unittest)
+
+If your glog version is <0.3.3, you may need to install glog from
+source code as most distributors don't link glog with gflags. Please
+install it by
 
 svn checkout http://google-glog.googlecode.com/svn/trunk/ google-glog-read-only
 cd google-glog-read-only

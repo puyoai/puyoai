@@ -1,4 +1,4 @@
-#ifdef __linux__
+#ifdef USE_V4L2
 
 #include "viddev.h"
 
