@@ -134,7 +134,7 @@ private:
     void findPossibleRensasInternal(std::vector<PossibleRensaInfo>& result, PuyoSet addedSet, int leftX, int restAdd) const;
 
     template<typename AfterSimulationCallback, typename T>
-    void findRensasInternal(std::vector<T>& result, int additionalChains, const PuyoSet& additionalPuyoSet, AfterSimulationCallback callback) const;
+    void findRensasInternal(typename std::vector<T>& result, int additionalChains, const PuyoSet& additionalPuyoSet, AfterSimulationCallback callback) const;
 
 private:
     Puyo m_field[MAP_WIDTH][MAP_HEIGHT];
