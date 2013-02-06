@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include <cstring>
+#include <glog/logging.h>
 #include <sstream>
 #include <string>
 
@@ -30,15 +31,12 @@ void Player::CopyFrom(const Player& player) {
   r = player.r;
 }
 
-Game::Game(const std::string& name)
-  : name_(name) {
+Game::Game(const std::string& name) : name_(name) {
   player_.reset(new Player());
   enemy_.reset(new Player());
-  log_.open((name + ".log").c_str());
 }
 
 Game::~Game() {
-  log_.close();
 }
 
 bool Game::Input(const string& input) {
@@ -52,7 +50,7 @@ bool Game::Input(const string& input) {
     const string value(key_val.substr(pos + 1));
 
     if (key.size() > 5) {
-      log_ << "Unknown parameter : " << key_val << endl;
+      LOG(WARNING) << "Unknown parameter : " << key_val << endl;
       continue;
     }
 
@@ -70,7 +68,7 @@ bool Game::Input(const string& input) {
       } else if (key == "END") {
         return false;
       } else {
-	log_ << "Unknown field : " << key_val << endl;
+	LOG(WARNING) << "Unknown field : " << key_val << endl;
       }
       continue;
     }
