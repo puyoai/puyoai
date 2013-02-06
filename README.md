@@ -26,3 +26,7 @@ http://d.hatena.ne.jp/shinichiro_h/20130203
 AI のプロトコル仕様について、とても雑で不完全なドキュメントはここにあります。
 
 https://docs.google.com/document/d/1cTIJgRHCBhmxXVtBb45Jm3yAQVaogfVN3oayi-FrA74/edit
+
+適当な情報を wiki に足していく予定です…
+
+https://github.com/puyoai/puyoai/wiki

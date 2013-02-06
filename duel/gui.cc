@@ -310,6 +310,9 @@ private:
 
 Gui* Gui::Create() {
 #ifdef USE_SDL
+  char* gui = getenv("PUYO_GUI");
+  if (gui && !strcmp(gui, "0"))
+    return new Gui;
   return new GuiSdl;
 #else
   return new Gui;
