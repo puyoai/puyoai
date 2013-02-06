@@ -13,8 +13,7 @@ Game::Game(const std::string& name) : name_(name) {
   enemy_.reset(new Player());
 }
 
-Game::~Game() {
-}
+Game::~Game() {}
 
 bool Game::Input(const string& input) {
   Player players[2];

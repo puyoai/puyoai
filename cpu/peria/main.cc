@@ -1,4 +1,5 @@
 #include <gflags/gflags.h>
+#include <glog/logging.h>
 #include <iostream>
 #include <string>
 
@@ -16,6 +17,7 @@ void Echo() {
 // argv[1] will have "Player1" for player 1, and "Player2" for player 2.
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
+  google::InitGoogleLogging(argv[0]);
 
   // Make sure the CPU is connected to the duel server.
   // Echo back what we receive.
