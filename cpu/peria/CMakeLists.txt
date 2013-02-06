@@ -23,6 +23,6 @@ peria_add_executable(peria main.cc)
 if(GTEST_FOUND)
   include_directories(${GTEST_INCLUDE_DIRS})
 
-  # TODO(hamaji): Cannot build.
-  # peria_add_test(field_test EXCLUDE_FROM_ALL field_test.cc)
+  # TODO(peria): add tests if needed
+  #peria_add_test(field_test EXCLUDE_FROM_ALL field_test.cc)
 endif()
