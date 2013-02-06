@@ -4,7 +4,7 @@ cpu_setup("peria")
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 
-add_library(peria_lib decision.cc field.cc game.cc)
+add_library(peria_lib decision.cc field.cc game.cc player.cc)
 
 function(peria_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
