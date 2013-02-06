@@ -36,7 +36,7 @@ bool Protocol::readCurrentStatus(Game* game, std::ofstream& log) {
         const char* key = term.c_str();
         const char* value = term.c_str() + term.find('=') + 1;
         if (std::strncmp(key, "STATE", 5) == 0) {
-            game->state = std::strtoull(value, NULL, 10);
+            game->state = strtoull(value, NULL, 10);
             continue;
         } else if (std::strncmp(key, "ID", 2) == 0) {
             game->id = std::atoi(value);
