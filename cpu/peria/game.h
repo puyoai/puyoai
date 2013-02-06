@@ -1,8 +1,6 @@
 #ifndef CPU_PERIA_GAME_H_
 #define CPU_PERIA_GAME_H_
 
-#include <fstream>
-
 #include "base.h"
 #include "field.h"
 
@@ -36,7 +34,6 @@ class Game {
  private:
   bool CheckDiff(const Player& prev, Player* player);
 
-  ofstream log_;
   std::string name_;
   scoped_ptr<Player> player_;
   scoped_ptr<Player> enemy_;
