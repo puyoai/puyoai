@@ -129,6 +129,10 @@ char Field::Get(int x, int y) const {
   return field_[x][y] & (kMaskChecked - 1);
 }
 
+bool Field::IsEmpty(int x, int y) const {
+  return Get(x, y) == kEmpty;
+}
+
 int getLongBonus(int length) {
   if (length >= 11) {
     length = 11;
