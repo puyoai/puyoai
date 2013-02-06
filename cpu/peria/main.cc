@@ -5,8 +5,6 @@
 #include "base.h"
 #include "game.h"
 
-using namespace std;
-
 namespace {
 void Echo() {
   string str;
