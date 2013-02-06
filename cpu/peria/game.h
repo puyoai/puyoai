@@ -1,28 +1,14 @@
 #ifndef CPU_PERIA_GAME_H_
 #define CPU_PERIA_GAME_H_
 
+#include <string>
+
 #include "base.h"
-#include "field.h"
-
-struct Player {
- public:
-  void CopyFrom(const Player& player);
-  
-  int state;
-  Field field;
-  int score;
-  int x;  // x-axis of Jiku puyo
-  int y;  // y-axis of Jiku puyo
-  int r;  // round number of controlling puyo.
-  int ojama;
-};
-
-bool operator==(const Player& a, const Player& b);
-bool operator!=(const Player& a, const Player& b);
+#include "player.h"
 
 class Game {
  public:
-  Game(const std::string& name);
+  Game(const string& name);
   ~Game();
 
   // Input game status from the server.
