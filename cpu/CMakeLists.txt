@@ -6,10 +6,10 @@ function(cpu_setup namespace)
 endfunction()
 
 function(cpu_target_link_common_libraries target)
-  puyoai_target_link_libraries(${target}_${CPU_NAMESPACE})
   target_link_libraries(${target}_${CPU_NAMESPACE} cpu_lib)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_util)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core)
+  puyoai_target_link_libraries(${target}_${CPU_NAMESPACE})
 endfunction()
 
 function(cpu_target_link_libraries target)
