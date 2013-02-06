@@ -35,8 +35,8 @@ bool Game::Input(const string& input) {
 	id_ = atoi(value.c_str());
       } else if (key == "STATE") {
         int state = atoi(value.c_str());
-	players[0].state = (state & Player::kAll);
-	players[1].state = ((state >> 1) & Player::kAll);
+	players[0].set_state(state & Player::kAll);
+	players[1].set_state((state >> 1) & Player::kAll);
       } else if (key == "ACK") {
 	// Do nothing
       } else if (key == "NACK") {
@@ -52,25 +52,25 @@ bool Game::Input(const string& input) {
     Player& player = players[(key[0] == 'Y') ? 0 : 1];
     switch (key[1]) {
     case 'F':  // Field
-      player.field.SetField(value);
+      player.mutable_field()->SetField(value);
       break;
     case 'P':  // Tsumo
-      player.field.SetColorSequence(value);
+      player.mutable_field()->SetColorSequence(value);
       break;
     case 'S':  // Score
-      player.score = atoi(value.c_str());
+      player.set_score(atoi(value.c_str()));
       break;
     case 'X':  // X-position of pivot puyo
-      player.x = atoi(value.c_str());
+      player.set_x(atoi(value.c_str()));
       break;
     case 'Y':  // Y-position of pivot puyo
-      player.y = atoi(value.c_str());
+      player.set_y(atoi(value.c_str()));
       break;
     case 'R':  // Rotation of controled puyo
-      player.r = atoi(value.c_str());
+      player.set_r(atoi(value.c_str()));
       break;
     case 'O':  // The number of OjamaPuyo in stack
-      player.ojama = atoi(value.c_str());
+      player.set_ojama(atoi(value.c_str()));
       break;
     }
   }
@@ -91,8 +91,8 @@ string Game::Play() {
   ostringstream oss;
   oss << "ID=" << id_;
   if (enemy_update_) {
-    oss << " X=" << enemy_->x << " R=" << enemy_->r
-	<< " MSG=" <<  enemy_->x << "," << enemy_->r;
+    oss << " X=" << enemy_->get_x() << " R=" << enemy_->get_r()
+	<< " MSG=" <<  enemy_->get_x() << "," << enemy_->get_r();
   }
 
   return oss.str();

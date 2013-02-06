@@ -50,6 +50,7 @@ class Field {
 
   // Get a color of puyo at a specified position.
   char Get(int x, int y) const;
+  bool IsEmpty(int x, int y) const;
 
   // Vanish puyos, and adds score. The argument "chains" is used to calculate
   // score.
