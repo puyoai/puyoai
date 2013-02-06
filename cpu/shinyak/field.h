@@ -68,7 +68,7 @@ public:
     // Drop kumipuyo with decision.
     void dropKumiPuyo(const Decision&, const KumiPuyo&);
     void dropKumiPuyoSafely(const Decision&, const KumiPuyo&);
-    // Returns #frame to drop the next Haipuyo with decision. This function do not drop the puyo.
+    // Returns #frame to drop the next KumiPuyo with decision. This function do not drop the puyo.
     int framesToDropNext(const Decision&) const;
 
     void dropPuyoOn(int x, PuyoColor);
@@ -77,11 +77,13 @@ public:
             m_field[x][m_heights[x]--] = EMPTY;
     }
 
+    void forceDrop();
     void simulate(BasicRensaInfo& rensaInfo, int additionalChain = 0);
     void simulateAndTrack(BasicRensaInfo& rensaInfo, TrackResult& trackResult);
     
     // Normal print for debugging purpose.
     std::string getDebugOutput() const;
+    void showDebugOutput() const;
 
     bool hasSameField(const Field&) const;
 
@@ -90,12 +92,13 @@ public:
 
     // 現在のフィールドから発火可能な連鎖を列挙する。
     void findRensas(std::vector<PossibleRensaInfo>& result, const PuyoSet& additionalPuyoSet = PuyoSet()) const;
-
     // Before calling findRensa, adding some puyos (numMaxAddedPuyo) is allowed. 
     void findPossibleRensas(std::vector<PossibleRensaInfo>& result, int numMaxAddedPuyo) const;
-
     // 与えられた組ぷよだけを使って発火可能な連鎖を求める
     void findFeasibleRensas(std::vector<FeasibleRensaInfo>& result, int numKumiPuyo, const std::vector<KumiPuyo>& kumiPuyos) const;
+    // 連鎖を再帰的に打つことで可能な連鎖を求める。不可能な連鎖も列挙されてしまうはず。
+    // TODO: 不可能な連鎖を列挙させない方法を考える。
+    void findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result, int maxIteration, int additionalChain = 0, PuyoSet additionalPuyoSet = PuyoSet()) const;
 
 private:
     // Crears every data this class has.
@@ -129,6 +132,9 @@ private:
 
     void findAvailablePlansInternal(const Plan* previousPlan, int restDepth, int nth, const std::vector<KumiPuyo>& kumiPuyos, std::vector<Plan>& plans) const;
     void findPossibleRensasInternal(std::vector<PossibleRensaInfo>& result, PuyoSet addedSet, int leftX, int restAdd) const;
+
+    template<typename AfterSimulationCallback, typename T>
+    void findRensasInternal(std::vector<T>& result, int additionalChains, const PuyoSet& additionalPuyoSet, AfterSimulationCallback callback) const;
 
 private:
     Puyo m_field[MAP_WIDTH][MAP_HEIGHT];

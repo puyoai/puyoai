@@ -33,6 +33,7 @@ if(GTEST_FOUND)
   shinyak_add_test(field_column_bit_field_test)
   shinyak_add_test(field_evaluator_test)
   shinyak_add_test(field_test)
+  shinyak_add_test(player_info_test)
   shinyak_add_test(puyo_set_test)
   shinyak_add_test(puyo_test)
   # TODO(hamaji): Slow!

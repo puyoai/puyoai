@@ -54,6 +54,10 @@ struct FeasibleRensaInfo {
 struct PossibleRensaInfo {
     BasicRensaInfo rensaInfo;
     PuyoSet necessaryPuyoSet;
+
+    std::string toString() const {
+        return rensaInfo.toString() + necessaryPuyoSet.toString();
+    }
 };
 
 #endif
