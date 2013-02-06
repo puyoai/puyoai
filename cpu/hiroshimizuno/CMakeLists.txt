@@ -10,7 +10,7 @@ endfunction()
 hiroshimizuno_add_executable(hikuitokoro hikuitokoro.cc)
 
 # TODO(hamaji): Followings cannot be built by clang.
-set(CMAKE_CXX_FLAGS "-march=native -masm=intel")
+puyoai_add_cxx_flags("-march=native -masm=intel")
 hiroshimizuno_add_executable(f EXCLUDE_FROM_ALL f.cc)
 hiroshimizuno_add_executable(t EXCLUDE_FROM_ALL test.cc sse.cc)
 

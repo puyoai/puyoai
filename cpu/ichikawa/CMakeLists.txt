@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("ichikawa")
 
-set(CMAKE_CXX_FLAGS "-Wall")
+puyoai_add_cxx_flags("-Wall")
 
 function(ichikawa_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
