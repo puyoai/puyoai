@@ -1,5 +1,8 @@
 #include "puyo_possibility.h"
 
+#include <algorithm>
+
+using namespace std;
 
 bool TsumoPossibility::s_initialized = false;
 double TsumoPossibility::s_possibility[TsumoPossibility::N][TsumoPossibility::N][TsumoPossibility::N][TsumoPossibility::N][TsumoPossibility::N];
@@ -52,6 +55,20 @@ struct TsumoPossibilityCalc {
         }
     }
 
+    void set(int t, int k, int a, int b, int c, int d)
+    {
+        int idx[] = { 0, 1, 2, 3 };
+        int val[] = { a, b, c, d };
+        do {
+            int i0 = val[idx[0]];
+            int i1 = val[idx[1]];
+            int i2 = val[idx[2]];
+            int i3 = val[idx[3]];
+
+            q[t][k][i0][i1][i2][i3] = p[a][b][c][d];
+        } while (next_permutation(idx, idx + 4));
+    }
+
     // k 個使って、a, b, c, d のうち最初の t 個は strictly equal で、残りが equal or more
     // を許すような場合の確率
     // (a↑, b↑, c↑, d↑) = (a+1↑, b↑, c↑, d↑) + (a, b↑, c↑, d↑)
@@ -65,9 +82,10 @@ struct TsumoPossibilityCalc {
             return q[t][k][a][b][c][d];
 
         if (t == 0) {
-            if (k == s)
-                return q[t][k][a][b][c][d] = p[a][b][c][d];
-            else
+            if (k == s) {
+                set(t, k, a, b, c, d);
+                return p[a][b][c][d];
+            } else
                 return q[t][k][a][b][c][d] = 0;
         }
 
