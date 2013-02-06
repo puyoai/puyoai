@@ -1,4 +1,8 @@
 *.cmake
 *.a
-*/CmakeCache.txt
-*/Makefile
+*_test
+CMakeCache.txt
+CMakeFiles
+Testing
+Makefile
+
