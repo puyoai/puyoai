@@ -6,7 +6,7 @@ if (USE_SDL)
   set(GUI_SRCS SDL_kanji.c screen.cc commentator.cc)
   include_directories(${SDL_INCLUDE_DIR})
   include_directories(${SDLTTF_INCLUDE_DIR})
-  set(CMAKE_CXX_FLAGS "-DUSE_SDL")
+  puyoai_add_cxx_flags("-DUSE_SDL")
 endif()
 
 add_library(puyoai_duel
