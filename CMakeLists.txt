@@ -4,7 +4,9 @@ cmake_minimum_required(VERSION 2.8)
 
 enable_testing()
 
-set(CMAKE_BUILD_TYPE RelWithDebInfo)
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE RelWithDebInfo)
+endif()
 
 find_package(Threads)
 
