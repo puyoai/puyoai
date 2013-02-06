@@ -8,9 +8,9 @@ add_library(puyoai_core STATIC
 
 function(puyoai_core_add_test target)
   add_executable(${target}_test ${target}_test.cc)
-  puyoai_target_link_libraries(${target}_test)
   target_link_libraries(${target}_test ${GTEST_BOTH_LIBRARIES})
   target_link_libraries(${target}_test puyoai_core)
+  puyoai_target_link_libraries(${target}_test)
   add_test(check-${target}_test ${target}_test)
 endfunction()
 
