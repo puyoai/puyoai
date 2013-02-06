@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("peria")
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 
 add_library(peria_lib decision.cc field.cc game.cc)
 
