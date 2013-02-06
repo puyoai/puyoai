@@ -1,6 +1,5 @@
 #include "field.h"
 
-#include <algorithm>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -10,6 +9,52 @@
 #include "rensainfo.h" 
 
 using namespace std;
+
+TEST(FieldTest, Color)
+{
+    Field f("444000");
+
+    EXPECT_EQ(f.color(0, 1), WALL);
+    EXPECT_EQ(f.color(1, 1), RED);
+    EXPECT_EQ(f.color(2, 1), RED);
+    EXPECT_EQ(f.color(3, 1), RED);
+    EXPECT_EQ(f.color(4, 1), EMPTY);
+    EXPECT_EQ(f.color(5, 1), EMPTY);
+    EXPECT_EQ(f.color(6, 1), EMPTY);
+    EXPECT_EQ(f.color(7, 1), WALL);
+}
+
+TEST(FieldTest, IsZenkeshi)
+{
+    Field f1;
+    Field f2("400000");
+    Field f3("100000"); // When there is an ojama, it should not be zenkeshi.
+
+    EXPECT_TRUE(f1.isZenkeshi());
+    EXPECT_FALSE(f2.isZenkeshi());
+    EXPECT_FALSE(f3.isZenkeshi());
+}
+
+TEST(FieldTest, ForceDrop)
+{
+    Field f("544555"
+            "000000"
+            "464646"
+            "000000");
+
+    f.forceDrop();
+
+    EXPECT_EQ(f.height(1), 2);
+    EXPECT_EQ(f.height(2), 2);
+    EXPECT_EQ(f.height(3), 2);
+    EXPECT_EQ(f.height(4), 2);
+    EXPECT_EQ(f.height(5), 2);
+    EXPECT_EQ(f.height(6), 2);
+
+    EXPECT_EQ(f.color(1, 1), RED);
+    EXPECT_EQ(f.color(1, 2), BLUE);
+    EXPECT_EQ(f.color(1, 3), EMPTY);    
+}
 
 void testUrl(string url, int expected_chains, int expected_score)
 {
@@ -96,7 +141,7 @@ TEST(FieldTest, FramesTest) {
     }
 }
 
-TEST(FieldTest, ConnectedPuyoNumsTest)
+TEST(FieldTest, ConnectedPuyoNums)
 {
     Field f("004455"
             "045465");
@@ -152,8 +197,25 @@ TEST(FieldTest, HeightAfterSimulate)
     EXPECT_EQ(f.height(2), 0);
     EXPECT_EQ(f.height(3), 0);
     EXPECT_EQ(f.height(4), 2);
-    EXPECT_EQ(f.height(5), 3);
-    EXPECT_EQ(f.height(6), 4);
+    EXPECT_EQ(f.height(5), 1);
+    EXPECT_EQ(f.height(6), 2);
+}
+
+TEST(FieldTest, HeightAfterSimulate2)
+{
+    Field f("450005"
+            "445665"
+            "556455");
+
+    BasicRensaInfo info;
+    f.simulate(info);
+
+    EXPECT_EQ(f.height(1), 3);
+    EXPECT_EQ(f.height(2), 3);
+    EXPECT_EQ(f.height(3), 2);
+    EXPECT_EQ(f.height(4), 2);
+    EXPECT_EQ(f.height(5), 1);
+    EXPECT_EQ(f.height(6), 0);
 }
 
 TEST(FieldTest, DropPuyoOn)
@@ -190,6 +252,15 @@ TEST(FieldTest, CountPuyos)
             "445644");
 
     EXPECT_EQ(f.countPuyos(), 18);
+}
+
+TEST(FieldTest, CountColorPuyos)
+{
+    Field f("050015"
+            "050055"
+            "445644"
+            "445644");
+
     EXPECT_EQ(f.countColorPuyos(), 17);
 }
 
@@ -286,4 +357,18 @@ TEST(FieldTest, FindPossibleRensas)
     EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(2, PuyoSet(1, 0, 0, 0))));
     EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(3, PuyoSet(1, 0, 3, 0))));
 }
+
+TEST(FieldTest, FindPossibleRensasUsingIteration1)
+{    
+    Field f("450000"
+            "445660"
+            "556455");
+
+    vector<PossibleRensaInfo> result;
+    f.findPossibleRensasUsingIteration(result, 3);
+
+    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(4, PuyoSet(1, 2, 1, 0))));
+}
+
+
 

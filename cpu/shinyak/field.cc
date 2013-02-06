@@ -202,7 +202,7 @@ int Field::countColorPuyos() const
 {
     int cnt = 0;
     for (int x = 1; x <= WIDTH; ++x) {
-        for (int y = 1; color(x, y) != EMPTY; ++y) {
+        for (int y = 1; y <= height(x); ++y) {
             if (isColorPuyo(color(x, y)))
                 ++cnt;
         }
@@ -270,9 +270,9 @@ bool Field::vanish(int nthChain, int* score, int minHeights[], Strategy& strateg
     int longBonusCoef = 0;
 
     for (int x = 1; x <= WIDTH; ++x) {
-        for (int y = minHeights[x]; y <= HEIGHT; ++y) {
-            if (color(x, y) == EMPTY)
-                break;
+        int maxHeight = height(x);
+        for (int y = minHeights[x]; y <= maxHeight; ++y) {
+            DCHECK(color(x, y) != EMPTY);
 
             if (checked(x, y) || color(x, y) == OJAMA)
                 continue;
@@ -363,10 +363,10 @@ int Field::drop(int minHeights[], Strategy& strategy)
             if (color(x, y) == EMPTY)
                 continue;
 
-            m_heights[x] = y;
             maxDrops = max(maxDrops, y - writeAt);
             m_field[x][writeAt] = m_field[x][y];
             m_field[x][y] = EMPTY;
+            m_heights[x] = writeAt;
             strategy.puyoIsDropped(x, y, writeAt++);
         }
     }
@@ -385,6 +385,18 @@ bool Field::isZenkeshi() const
     }
 
     return true;
+}
+
+void Field::forceDrop()
+{
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        int writeYAt = 1;
+        for (int y = 1; y <= 13; ++y) {
+            if (color(x, y) != EMPTY)
+                m_field[x][writeYAt++] = color(x, y);
+        }
+        m_heights[x] = writeYAt - 1;
+    }
 }
 
 void Field::simulate(BasicRensaInfo& rensaInfo, int additionalChain)
@@ -435,6 +447,11 @@ std::string Field::getDebugOutput() const
         s << setw(2) << height(x);
     s << std::endl;
     return s.str();
+}
+
+void Field::showDebugOutput() const
+{
+    cerr << getDebugOutput() << endl;
 }
 
 bool Field::hasSameField(const Field& field) const
@@ -501,6 +518,37 @@ void Field::findAvailablePlansInternal(const Plan* previousPlan, int restDepth, 
 
 void Field::findRensas(vector<PossibleRensaInfo>& result, const PuyoSet& puyoSet) const
 {
+    struct AfterSimulationCallback {
+        void operator()(vector<PossibleRensaInfo>& result, const Field&, const PossibleRensaInfo& info) const {
+            result.push_back(info);
+        }
+    };
+
+    findRensasInternal(result, 0, puyoSet, AfterSimulationCallback());
+}
+
+void Field::findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result, int maxIteration, int additionalChains, PuyoSet puyoSet) const
+{
+    if (maxIteration <= 0)
+        return;
+
+    struct AfterSimulationCallback {
+        explicit AfterSimulationCallback(int restIteration) : restIteration(restIteration) {}
+
+        void operator()(vector<PossibleRensaInfo>& result, const Field& f, const PossibleRensaInfo& info) const {
+            result.push_back(info);
+            f.findPossibleRensasUsingIteration(result, restIteration, info.rensaInfo.chains, info.necessaryPuyoSet);
+        }
+
+        int restIteration;
+    };
+
+    findRensasInternal(result, additionalChains, puyoSet, AfterSimulationCallback(maxIteration - 1));
+}
+
+template<typename AfterSimulationCallback, typename T>
+void Field::findRensasInternal(vector<T>& result, int additionalChains, const PuyoSet& puyoSet, AfterSimulationCallback callback) const
+{
     for (int x = 1; x <= Field::WIDTH; ++x) {
         for (int y = height(x); y >= 1; --y) {
             PuyoColor c = color(x, y);
@@ -534,9 +582,9 @@ void Field::findRensas(vector<PossibleRensaInfo>& result, const PuyoSet& puyoSet
                 PossibleRensaInfo info;
                 info.necessaryPuyoSet.add(puyoSet);
                 info.necessaryPuyoSet.add(c, necessaryPuyos);
-                f.simulate(info.rensaInfo);
+                f.simulate(info.rensaInfo, additionalChains);
 
-                result.push_back(info);
+                callback(result, f, info);
             }            
         }
     }

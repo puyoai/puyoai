@@ -29,6 +29,7 @@ void AI::initialize(const Game& game)
 {
     m_enemyInfo.initializeWith(game.id);
     m_myPlayerInfo.initialize();
+    m_myPlayerInfo.forceEstimatedField(game.myPlayerState().field);
 }
 
 void AI::think(Decision& decision, const Game& game, std::ofstream& log)
@@ -65,6 +66,7 @@ void AI::enemyGrounded(const Game& game)
 
     // --- Check if Rensa starts.
     Field field(game.enemyPlayerState().field);
+    field.forceDrop();
 
     BasicRensaInfo rensaInfo;
     field.simulate(rensaInfo);
@@ -96,39 +98,27 @@ void AI::decide(const Game& game, Decision* decision, std::ofstream& log)
     }
 }
 
-// 評価関数の案
-// 1. 各セルに空間効率を定義し、その効率の和を最大化する？　効率の和で飽和連鎖量を定義できそう
-//    空きマスは 0.8 ぐらいの効率？
-//    連結しているぷよの方が効率が高い
-//    呼吸点から遠いぷよは効率が悪い
-//    　呼吸点には連鎖前呼吸点と連鎖後呼吸点が存在
-//　　このあたりを使って
-// 2. くぼみを作らないようにする
-//    適当にくぼみを作ると評価値を下げるとかよりも
-//    あるマスから上に向かってスポットライト的に上３マスほどを見た場合に、空間が多いほど効率が良いことになる
-//    　端に窪みが出来るのはこの種類の評価で結構防げるはず
-//    結局空きマスの効率をうまく定義しようとする試みに近い
-
-// eval() should return [-1, 1]
 double AI::eval(int currentFrameId, const Plan& plan, std::ofstream& log) const
 {
     for (int i = 0; i < plan.numDecisions(); ++i)
         log << plan.decision(i).toString();
     log << ' ';
 
-    if (m_enemyInfo.rensaIsOngoing() && m_enemyInfo.ongoingRensaInfo().rensaInfo.score > 100) {
+    if (m_enemyInfo.rensaIsOngoing() && m_enemyInfo.ongoingRensaInfo().rensaInfo.score > scoreForOjama(6)) {
         // If we have a firable plan before the enemy Rensa has been finished, we would like to
         // use it for parry (TAIOH).
 
-        // 受ける場合と受けない場合を考えたい
-        // 割とどうしようもない場合に高く積むというルーチンとかどうするべきか
+        // TODO: 受けるか受けないかを判定する。受ける場合を実装したら if 文から > 100 を消す。
 
+        // TODO: 対応が適当すぎる
         if (m_enemyInfo.ongoingRensaInfo().rensaInfo.score >= scoreForOjama(6) &&
             plan.totalScore() >= m_enemyInfo.ongoingRensaInfo().rensaInfo.score &&
             plan.initiatingFrames() <= m_enemyInfo.ongoingRensaInfo().finishingRensaFrame) {
             log << "TAIOU" << endl;
             return 70.0 + plan.totalScore() / 1000000.0;
         }
+
+        // TODO: 割とどうしようもない場合に高く積むというルーチンを持つべき
     }
 
     if (plan.isRensaPlan()) {
@@ -151,35 +141,36 @@ double AI::eval(int currentFrameId, const Plan& plan, std::ofstream& log) const
         int estimatedMaxScore = m_enemyInfo.estimateMaxScore(rensaEndingFrameId);
         log << "ESTIMATED MAX SCORE = " << estimatedMaxScore << " BY " << rensaEndingFrameId << endl;
 
-        // --- 1.1. 十分でかい / TODO: 十分でかいとは？ / とりあえず致死量ということにする
-        if (plan.totalScore() >= estimatedMaxScore + scoreForOjama(72)) {
+        // --- 1.1. 十分でかい場合は打って良い。
+        // / TODO: 十分でかいとは？ / とりあえず致死量ということにする
+        if (plan.totalScore() >= estimatedMaxScore + scoreForOjama(60)) {
             log << "large enough: score = 100" << endl;
             return 100.0;
         }
         
         // --- 1.2. 対応手なく潰せる
+        // TODO: 実装があやしい。
         if (plan.totalScore() >= scoreForOjama(18)) {
             if (estimatedMaxScore <= scoreForOjama(6)) {
-                // TODO: これはちょっと怪しい……
                 log << "TSUBUSHI: score = 70; enemy score = " << estimatedMaxScore << endl;
                 return 70.0;
             }
         }
         
         // --- 1.3. 飽和したので打つしかなくなった
-        // ちょっとわからんので放置
         // TODO: これは EnemyRensaInfo だけじゃなくて MyRensaInfo も必要なのでは……。
+        // TODO: 60 個超えたら打つとかなんか間違ってるだろう。
         if (plan.field().countPuyos() >= 60)
             return 60.0 + plan.totalScore() / 1000000.0;
         
-        // --- 2.1. 有利に立てそう
-        // これはどう数値化するべきか……
+        // --- 1.4. 打つと有利になる
+        // TODO: そもそも数値化の仕方が分からない。
         
         // 基本的に先打ちすると負けるので、打たないようにする
         log << "SAKIUCHI will lose : score = " << plan.totalScore()
             << " EMEMY score = " << estimatedMaxScore << endl;
 
-        return -0.6;
+        return -1.0;
     }
     
     // 打たない場合、こちらの手を伸ばすことになるが、どのように伸ばすかが難しい。
@@ -206,17 +197,20 @@ double AI::eval(int currentFrameId, const Plan& plan, std::ofstream& log) const
     if (plan.totalFrames() >= 55)
         frameScore = 0;
 
-    double finalScore = emptyFieldAvailability / (78 - colorPuyoNum)
+    double finalScore = 
+        + emptyFieldAvailability / (78 - colorPuyoNum)
         + maxChains
-        + fieldScore / 10
+        + fieldScore / 30
         + fieldHeightScore
         + frameScore;
     
     char buf[80];
-    sprintf(buf, "eval-score: %d %f %d %f",
-            plan.totalFrames(),
+    sprintf(buf, "eval-score: %f %d %f %f %f : = %f",
             emptyFieldAvailability / (78 - colorPuyoNum),
             maxChains,
+            fieldScore / 30,
+            fieldHeightScore,
+            frameScore,
             finalScore);
     log << buf << endl;
     

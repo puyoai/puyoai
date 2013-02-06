@@ -20,6 +20,8 @@ public:
     void ojamaDropped(const Field&);
     void rensaFinished(const Field&);
 
+    void forceEstimatedField(const Field& field) { m_estimatedField = field; }
+
 private:
     Field m_estimatedField;
 };

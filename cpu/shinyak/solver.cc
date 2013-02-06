@@ -127,8 +127,8 @@ int main(int argc, char* argv[])
     game.playerStates[0].kumiPuyos.clear();
     game.playerStates[1].kumiPuyos.clear();
     for (int i = 0; i < 3; ++i) {
-        game.playerStates[0].kumiPuyos.push_back(kumiPuyos[0][i]);
-        game.playerStates[1].kumiPuyos.push_back(kumiPuyos[1][i]);
+        game.playerStates[0].kumiPuyos.push_back(kumiPuyos[0][i + 1]);
+        game.playerStates[1].kumiPuyos.push_back(kumiPuyos[1][i + 1]);
     }
 
     ai.enemyGrounded(game);
