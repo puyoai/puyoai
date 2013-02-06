@@ -31,7 +31,6 @@ if(GTEST_FOUND)
   include_directories(${GTEST_INCLUDE_DIRS})
 
   hamaji_add_test(db_test)
-  hamaji_add_test(eval_test)
   # TODO(hamaji): Slow!
   hamaji_add_test(field_perf_test 1)
   hamaji_add_test(field_test)
