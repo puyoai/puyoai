@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("pascal")
 
-set(CMAKE_CXX_FLAGS "-Wall")
+puyoai_add_cxx_flags("-Wall")
 
 add_library(pascal_lib ctrl.cc)
 

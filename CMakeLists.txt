@@ -1,5 +1,7 @@
 project(puyoai)
 
+message(STATUS ${CMAKE_GENERATOR})
+
 cmake_minimum_required(VERSION 2.8)
 
 enable_testing()
@@ -30,6 +32,13 @@ function(puyoai_target_link_libraries target)
   target_link_libraries(${target} ${CMAKE_THREAD_LIBS_INIT})
   target_link_libraries(${target} ${GFLAGS_LIBRARY})
   target_link_libraries(${target} ${GLOG_LIBRARY})
+endfunction()
+
+function(puyoai_add_cxx_flags flags)
+  if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flags}" PARENT_SCOPE)
+  endif()
 endfunction()
 
 find_package(GTest)

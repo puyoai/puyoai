@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("hamaji")
 
-set(CMAKE_CXX_FLAGS "-W -Wall")
+puyoai_add_cxx_flags("-W -Wall -Wno-deprecated-declarations")
 
 add_library(hamaji_lib
             core.cc ctrl.cc db.cc eval.cc field.cc game.cc mt19937int.cc
