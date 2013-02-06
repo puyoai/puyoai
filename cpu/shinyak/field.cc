@@ -516,34 +516,34 @@ void Field::findAvailablePlansInternal(const Plan* previousPlan, int restDepth, 
     }
 }
 
+struct AfterSimulationCallback_findRensas {
+    void operator()(vector<PossibleRensaInfo>& result, const Field&, const PossibleRensaInfo& info) const {
+        result.push_back(info);
+    }
+};
+
 void Field::findRensas(vector<PossibleRensaInfo>& result, const PuyoSet& puyoSet) const
 {
-    struct AfterSimulationCallback {
-        void operator()(vector<PossibleRensaInfo>& result, const Field&, const PossibleRensaInfo& info) const {
-            result.push_back(info);
-        }
-    };
-
-    findRensasInternal(result, 0, puyoSet, AfterSimulationCallback());
+    findRensasInternal(result, 0, puyoSet, AfterSimulationCallback_findRensas());
 }
+
+struct AfterSimulationCallback_findPossibleRensasUsingIteration {
+    explicit AfterSimulationCallback_findPossibleRensasUsingIteration(int restIteration) : restIteration(restIteration) {}
+
+    void operator()(vector<PossibleRensaInfo>& result, const Field& f, const PossibleRensaInfo& info) const {
+        result.push_back(info);
+        f.findPossibleRensasUsingIteration(result, restIteration, info.rensaInfo.chains, info.necessaryPuyoSet);
+    }
+
+    int restIteration;
+};
 
 void Field::findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result, int maxIteration, int additionalChains, PuyoSet puyoSet) const
 {
     if (maxIteration <= 0)
         return;
 
-    struct AfterSimulationCallback {
-        explicit AfterSimulationCallback(int restIteration) : restIteration(restIteration) {}
-
-        void operator()(vector<PossibleRensaInfo>& result, const Field& f, const PossibleRensaInfo& info) const {
-            result.push_back(info);
-            f.findPossibleRensasUsingIteration(result, restIteration, info.rensaInfo.chains, info.necessaryPuyoSet);
-        }
-
-        int restIteration;
-    };
-
-    findRensasInternal(result, additionalChains, puyoSet, AfterSimulationCallback(maxIteration - 1));
+    findRensasInternal(result, additionalChains, puyoSet, AfterSimulationCallback_findPossibleRensasUsingIteration(maxIteration - 1));
 }
 
 template<typename AfterSimulationCallback, typename T>
