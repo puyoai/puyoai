@@ -1,7 +1,7 @@
-all: Makefile
-	$(MAKE) -f Makefile
+ifeq ($(realpath Makefile),)
+$(info "Now puyoai requires cmake to build!")
+$(info "Please run cmake to generate Makefile.")
+$(error "")
+endif
 
-Makefile: CMakeLists.txt
-	@echo "Now puyoai requires cmake to build!"
-	@echo "Running cmake to generate Makefile..."
-	cmake .
+include Makefile
