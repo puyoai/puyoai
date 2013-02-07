@@ -106,8 +106,32 @@ void Player::SearchControls(
         Insert(x, y, 0);
     }
     case 2: {
+      if (field().IsEmpty(x + 1, y) && field().IsEmpty(x + 1, y - 1))
+        Insert(x + 1, y, 2);  // Right
+      if (field().IsEmpty(x - 1, y) && field().IsEmpty(x - 1, y - 1))
+        Insert(x - 1, y, 2);  // Left
+      if (field().IsEmpty(x - 1, y))  // Turn Right
+        Insert(x, y, 3);
+      else if (field().IsEmpty(x + 1, y))
+        Insert(x + 1, y, 3);
+      else
+        Insert(x, y - 1, 0);
+      if (field().IsEmpty(x + 1, y))  // Turn Left
+        Insert(x, y, 3);
+      else if (field().IsEmpty(x - 1, y))
+        Insert(x - 1, y, 3);
     }
     case 3: {
+      if (field().IsEmpty(x + 1, y))
+        Insert(x + 1, y, 3);  // Right
+      if (field().IsEmpty(x - 2, y))
+        Insert(x - 1, y, 3);  // Left
+      if (field().IsEmpty(x, y + 1))  // Turn Right
+        Insert(x, y, 0);
+      if (field().IsEmpty(x, y - 1))  // Turn Left
+        Insert(x, y, 2);
+      else if (field().IsEmpty(x + 1, y) && y < Field::kHeight + 2)
+        Insert(x, y + 1, 2);
     }
     }
   }
