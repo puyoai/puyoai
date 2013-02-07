@@ -5,48 +5,81 @@
 using namespace std;
 
 bool TsumoPossibility::s_initialized = false;
-double TsumoPossibility::s_possibility[TsumoPossibility::N][TsumoPossibility::N][TsumoPossibility::N][TsumoPossibility::N][TsumoPossibility::N];
+TsumoPossibility::PossibilityArrayPtr TsumoPossibility::s_possibility;
 
-struct TsumoPossibilityCalc {
-    static const int N = TsumoPossibility::N;
+const int MAX_K = TsumoPossibility::MAX_K;
+const int MAX_N = TsumoPossibility::MAX_N;
 
-    TsumoPossibilityCalc() {
-        for (int a = 0; a < N; ++a) {
-            for (int b = 0; b < N; ++b) {
-                for (int c = 0; c < N; ++c) {
-                    for (int d = 0; d < N; ++d) {
-                        p[a][b][c][d] = 0;
-                    }
+static void zeroClear(TsumoPossibility::PossibilityArrayPtr p)
+{
+    for (int k = 0; k < MAX_K; ++k) {
+        for (int a = 0; a < MAX_N; ++a) {
+            for (int b = 0; b < MAX_N; ++b) {
+                for (int c = 0; c < MAX_N; ++c) {
+                    for (int d = 0; d < MAX_N; ++d)
+                        p[k][a][b][c][d] = 0;
                 }
             }
         }
+    }
+}
 
-        p[0][0][0][0] = 1;
+static TsumoPossibility::PossibilityArrayPtr make() {
+    TsumoPossibility::PossibilityArrayPtr p = new double[MAX_K][MAX_N][MAX_N][MAX_N][MAX_N];
+    TsumoPossibility::PossibilityArrayPtr q = new double[MAX_K][MAX_N][MAX_N][MAX_N][MAX_N];
 
-        for (int a = 0; a < N; ++a) {
-            for (int b = 0; b < N; ++b) {
-                for (int c = 0; c < N; ++c) {
-                    for (int d = 0; d < N; ++d) {
-                        if (a + 1 < N)
-                            p[a+1][b][c][d] += p[a][b][c][d] / 4;
-                        if (b + 1 < N)
-                            p[a][b+1][c][d] += p[a][b][c][d] / 4;
-                        if (c + 1 < N)
-                            p[a][b][c+1][d] += p[a][b][c][d] / 4;
-                        if (d + 1 < N)
-                            p[a][b][c][d+1] += p[a][b][c][d] / 4;
-                    }
+    zeroClear(p);
+
+    p[0][0][0][0][0] = 1;
+    for (int a = 0; a + 1 < MAX_N; ++a) {
+        for (int b = 0; b + 1 < MAX_N && a + b + 1 < MAX_K; ++b) {
+            for (int c = 0; c + 1 < MAX_N && a + b + c + 1 < MAX_K; ++c) {
+                for (int d = 0; b + 1 < MAX_N && a + b + c + d + 1 < MAX_K; ++d) {
+                    int k = a + b + c + d;
+                    p[k+1][a+1][b][c][d] += p[k][a][b][c][d] / 4;
+                    p[k+1][a][b+1][c][d] += p[k][a][b][c][d] / 4;
+                    p[k+1][a][b][c+1][d] += p[k][a][b][c][d] / 4;
+                    p[k+1][a][b][c][d+1] += p[k][a][b][c][d] / 4;
                 }
             }
         }
-        
-        for (int t = 0; t < 5; ++t) {
-            for (int k = 0; k < N; ++k) {
-                for (int a = 0; a < N; ++a) {
-                    for (int b = 0; b < N; ++b) {
-                        for (int c = 0; c < N; ++c) {
-                            for (int d = 0; d < N; ++d) {
-                                q[t][k][a][b][c][d] = -1;
+    }
+
+    for (int t = 1; t <= 4; ++t) {
+        swap(p, q);
+        zeroClear(p);
+        for (int k = 0; k < MAX_K; ++k) {
+            for (int a = MAX_N - 1; a >= 0; --a) {
+                for (int b = MAX_N - 1; b >= 0; --b) {
+                    for (int c = MAX_N - 1; c >= 0; --c) {
+                        for (int d = MAX_N - 1; d >= 0; --d) {
+                            switch (t) {
+                            case 1:
+                                if (d + 1 < MAX_N)
+                                    p[k][a][b][c][d] = p[k][a][b][c][d+1] + q[k][a][b][c][d];
+                                else
+                                    p[k][a][b][c][d] = q[k][a][b][c][d];
+                                break;
+                            case 2:
+                                if (c + 1 < MAX_N)
+                                    p[k][a][b][c][d] = p[k][a][b][c+1][d] + q[k][a][b][c][d];
+                                else
+                                    p[k][a][b][c][d] = q[k][a][b][c][d];
+                                break;
+                            case 3:
+                                if (b + 1 < MAX_N)
+                                    p[k][a][b][c][d] = p[k][a][b+1][c][d] + q[k][a][b][c][d];
+                                else
+                                    p[k][a][b][c][d] = q[k][a][b][c][d];
+                                break;
+                            case 4:
+                                if (a + 1 < MAX_N)
+                                    p[k][a][b][c][d] = p[k][a+1][b][c][d] + q[k][a][b][c][d];
+                                else
+                                    p[k][a][b][c][d] = q[k][a][b][c][d];
+                                break;
+                            default:
+                                DCHECK(false);
                             }
                         }
                     }
@@ -55,79 +88,15 @@ struct TsumoPossibilityCalc {
         }
     }
 
-    void set(int t, int k, int a, int b, int c, int d)
-    {
-        int idx[] = { 0, 1, 2, 3 };
-        int val[] = { a, b, c, d };
-        do {
-            int i0 = val[idx[0]];
-            int i1 = val[idx[1]];
-            int i2 = val[idx[2]];
-            int i3 = val[idx[3]];
-
-            q[t][k][i0][i1][i2][i3] = p[a][b][c][d];
-        } while (next_permutation(idx, idx + 4));
-    }
-
-    // k 個使って、a, b, c, d のうち最初の t 個は strictly equal で、残りが equal or more
-    // を許すような場合の確率
-    // (a↑, b↑, c↑, d↑) = (a+1↑, b↑, c↑, d↑) + (a, b↑, c↑, d↑)
-    double calc(int t, int k, int a, int b, int c, int d)
-    {
-        int s = a + b + c + d;
-        if (k < s)
-            return 0;
-
-        if (q[t][k][a][b][c][d] >= 0)
-            return q[t][k][a][b][c][d];
-
-        if (t == 0) {
-            if (k == s) {
-                set(t, k, a, b, c, d);
-                return p[a][b][c][d];
-            } else
-                return q[t][k][a][b][c][d] = 0;
-        }
-
-        if (t == 1)
-            return q[t][k][a][b][c][d] = calc(0, k, a, b, c, d) + calc(1, k, a, b, c, d + 1);
-
-        if (t == 2)
-            return q[t][k][a][b][c][d] = calc(1, k, a, b, c, d) + calc(2, k, a, b, c + 1, d);
-
-        if (t == 3)
-            return q[t][k][a][b][c][d] = calc(2, k, a, b, c, d) + calc(3, k, a, b + 1, c, d);
-
-        if (t == 4)
-            return q[t][k][a][b][c][d] = calc(3, k, a, b, c, d) + calc(4, k, a + 1, b, c, d);
-
-        DCHECK(false);
-        return -1;
-    }
-
-    double p[N][N][N][N];
-    double q[5][N][N][N][N][N];
-};
+    delete[] q;
+    return p;
+}
 
 void TsumoPossibility::initialize()
 {
     if (s_initialized)
         return;
 
-    TsumoPossibilityCalc* p = new TsumoPossibilityCalc();
-
-    for (int k = 0; k < N; ++k) {
-        for (int a = 0; a < N; ++a) {
-            for (int b = 0; b < N; ++b) {
-                for (int c = 0; c < N; ++c) {
-                    for (int d = 0; d < N; ++d) {
-                        s_possibility[k][a][b][c][d] = p->calc(4, k, a, b, c, d);
-                    }
-                }
-            }
-        }
-    }
-
-    delete p;
+    s_possibility = make();
     s_initialized = true;
 }
