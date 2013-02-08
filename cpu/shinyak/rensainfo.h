@@ -60,4 +60,13 @@ struct PossibleRensaInfo {
     }
 };
 
+struct OngoingRensaInfo {
+    OngoingRensaInfo() {}
+    OngoingRensaInfo(BasicRensaInfo rensaInfo, int finishingRensaFrame)
+        : rensaInfo(rensaInfo), finishingRensaFrame(finishingRensaFrame) {}
+
+    BasicRensaInfo rensaInfo;
+    int finishingRensaFrame;
+};
+
 #endif

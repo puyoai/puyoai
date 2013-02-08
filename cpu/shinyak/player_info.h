@@ -7,7 +7,6 @@
 
 #include "rensainfo.h"
 
-class Field;
 class KumiPuyo;
 
 class MyPlayerInfo {
@@ -16,23 +15,14 @@ public:
 
     void initialize();
 
+    // For field estimation
     void puyoDropped(const Decision&, const KumiPuyo&);
     void ojamaDropped(const Field&);
     void rensaFinished(const Field&);
-
     void forceEstimatedField(const Field& field) { m_estimatedField = field; }
 
 private:
     Field m_estimatedField;
-};
-
-struct OngoingRensaInfo {
-    OngoingRensaInfo() {}
-    OngoingRensaInfo(BasicRensaInfo rensaInfo, int finishingRensaFrame)
-        : rensaInfo(rensaInfo), finishingRensaFrame(finishingRensaFrame) {}
-
-    BasicRensaInfo rensaInfo;
-    int finishingRensaFrame;
 };
 
 class EnemyInfo {
