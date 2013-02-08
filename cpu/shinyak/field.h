@@ -103,15 +103,6 @@ public:
 private:
     // Crears every data this class has.
     void initialize();
-
-    int calculateRensaBonusCoef(int chainBonusCoef, int longBonusCoef, int colorBonusCoef) const {
-        int coef = chainBonusCoef + longBonusCoef + colorBonusCoef;
-        if (coef == 0)
-            return 1;
-        if (coef > 999)
-            return 999;
-        return coef;
-    }
     
     // Simulate chains until the end, and returns chains, score, and frames
     // before finishing the chain.
