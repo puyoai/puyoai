@@ -1,7 +1,5 @@
 project(puyoai)
 
-message(STATUS ${CMAKE_GENERATOR})
-
 cmake_minimum_required(VERSION 2.8)
 
 enable_testing()
