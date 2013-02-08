@@ -17,11 +17,6 @@ static const int ACCUMULATED_RENSA_SCORE[] = {
     117480, 135400, 154600, 175080, 
 };
 
-static const int ESTIMATED_INITIATING_FRAMES[] = {
-    0,
-    
-};
-
 struct SortByFrames {
     bool operator()(const BasicRensaInfo& lhs, const BasicRensaInfo& rhs) const {
         if (lhs.frames != rhs.frames)
