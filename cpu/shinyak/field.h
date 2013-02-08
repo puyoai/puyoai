@@ -18,14 +18,7 @@ class TrackingStrategy;
 struct BasicRensaInfo;
 struct FeasibleRensaInfo;
 struct PossibleRensaInfo;
-
-struct Position {
-    Position() {}
-    Position(int x, int y) : x(x), y(y) {}
-
-    int x;
-    int y;
-};
+struct Position;
 
 class Field {
 public:
@@ -42,6 +35,8 @@ public:
 
     // Get a color of puyo at a specified position.
     PuyoColor color(int x, int y) const { return m_field[x][y].color(); }
+    // Returns the height of the specified column.
+    int height(int x) const { return m_heights[x]; }
 
     // Do not use not in PlayerInfo.
     void setColor(int x, int y, PuyoColor c) { m_field[x][y] = c; }
@@ -50,9 +45,6 @@ public:
         for (int y = 1; color(x, y) != EMPTY; ++y)
             m_heights[x] = y;
     }
-
-    // Returns the height of the specified column.
-    int height(int x) const { return m_heights[x]; }
 
     // Check if the field is in Zenkeshi
     bool isZenkeshi() const;
@@ -85,8 +77,6 @@ public:
     std::string getDebugOutput() const;
     void showDebugOutput() const;
 
-    bool hasSameField(const Field&) const;
-
 public:
     void findAvailablePlans(int depth, const std::vector<KumiPuyo>& kumiPuyos, std::vector<Plan>& plans) const;
 
@@ -113,9 +103,9 @@ private:
     template<typename Strategy>
     bool vanish(int nthChain, int* score, int minHeights[], Strategy&);
     template<typename Strategy>
-    void erase(int nthChain, Position* eraseQueue, Position* eraseQueueHead, int minHeights[], Strategy&);
+    void eraseQueuedPuyos(int nthChain, Position* eraseQueue, Position* eraseQueueHead, int minHeights[], Strategy&);
     template<typename Strategy>
-    int drop(int minHeights[], Strategy&);
+    int dropAfterVanish(int minHeights[], Strategy&);
 
     Position* checkCell(PuyoColor, FieldBitField& checked, Position* writeHead, int x, int y) const;
 
