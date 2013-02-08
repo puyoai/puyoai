@@ -2,7 +2,7 @@
 #define __PROTOCOL_H
 
 class Game;
-class Decision;
+class DropDecision;
 
 class Protocol {
 public:
@@ -10,7 +10,8 @@ public:
     bool readCurrentStatus(Game* game);
 
     // Sends KEY input.
-    void sendInput(const int id, const Decision* decision);    
+    void sendInputWithoutDecision(int id);
+    void sendInputWithDecision(int id, const DropDecision&);
 };
 
 #endif

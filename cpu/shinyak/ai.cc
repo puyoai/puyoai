@@ -20,6 +20,16 @@
 
 using namespace std;
 
+EvalResult::EvalResult(double evaluation, const string& message)
+    : evaluationScore(evaluation)
+    , message(message)
+{
+    for (string::size_type i = 0; i < this->message.size(); ++i) {
+        if (this->message[i] == ' ')
+            this->message[i] = '_';
+    }
+}
+
 std::string AI::getName() const
 {
     return "shinyak";
@@ -38,11 +48,11 @@ void AI::initialize(const Game& game)
     m_myPlayerInfo.forceEstimatedField(game.myPlayerState().field);
 }
 
-void AI::think(Decision& decision, const Game& game)
+void AI::think(DropDecision& dropDecision, const Game& game)
 {
-    decide(game, &decision);
-    if (decision.isValid())
-        m_myPlayerInfo.puyoDropped(decision, game.myPlayerState().kumiPuyos[0]);
+    decide(dropDecision, game);
+    if (dropDecision.decision().isValid())
+        m_myPlayerInfo.puyoDropped(dropDecision.decision(), game.myPlayerState().kumiPuyos[0]);
 }
 
 void AI::myRensaFinished(const Game& game)
@@ -83,7 +93,7 @@ void AI::enemyGrounded(const Game& game)
         m_enemyInfo.setRensaIsOngoing(false);
 }
 
-void AI::decide(const Game& game, Decision* decision)
+void AI::decide(DropDecision& dropDecision, const Game& game)
 {
     log << "AI::decide is called" << endl;
     log << m_myPlayerInfo.estimatedField().getDebugOutput() << endl;
@@ -94,17 +104,17 @@ void AI::decide(const Game& game, Decision* decision)
 
     log << "FindAvailablePlans: OK" << endl;
     
-    double currentMaxPlanScore = -100.0;
+    double currentBestScore = -100.0;
     for (std::vector<Plan>::iterator it = plans.begin(); it != plans.end(); ++it) {
-        double planScore = eval(game.id, *it);
-        if (currentMaxPlanScore < planScore) {
-            currentMaxPlanScore = planScore;
-            *decision = it->firstHandDecision();
+        EvalResult result = eval(game.id, *it);
+        if (currentBestScore < result.evaluationScore) {
+            currentBestScore = result.evaluationScore;
+            dropDecision = DropDecision(it->firstHandDecision(), result.message);
         }
     }
 }
 
-double AI::eval(int currentFrameId, const Plan& plan) const
+EvalResult AI::eval(int currentFrameId, const Plan& plan) const
 {
     for (int i = 0; i < plan.numDecisions(); ++i)
         log << plan.decision(i).toString();
@@ -120,8 +130,7 @@ double AI::eval(int currentFrameId, const Plan& plan) const
         if (m_enemyInfo.ongoingRensaInfo().rensaInfo.score >= scoreForOjama(6) &&
             plan.totalScore() >= m_enemyInfo.ongoingRensaInfo().rensaInfo.score &&
             plan.initiatingFrames() <= m_enemyInfo.ongoingRensaInfo().finishingRensaFrame) {
-            log << "TAIOU" << endl;
-            return 70.0 + plan.totalScore() / 1000000.0;
+            return EvalResult(70.0 + plan.totalScore() / 1000000.0, "TAIOU");
         }
 
         // TODO: 割とどうしようもない場合に高く積むというルーチンを持つべき
@@ -140,8 +149,7 @@ double AI::eval(int currentFrameId, const Plan& plan) const
         
         // --- 1.0. 全消しは、とりあえず取る(TODO: よくない)
         if (plan.field().isZenkeshi()) {
-            log << "ZENKESHI: frame = " << plan.totalFrames() << endl;
-            return 90.0 + 1.0 / plan.totalFrames();
+            return EvalResult(90.0 + 1.0 / plan.totalFrames(), "ZENKESHI");
         }
         
         int estimatedMaxScore = m_enemyInfo.estimateMaxScore(rensaEndingFrameId);
@@ -150,16 +158,18 @@ double AI::eval(int currentFrameId, const Plan& plan) const
         // --- 1.1. 十分でかい場合は打って良い。
         // / TODO: 十分でかいとは？ / とりあえず致死量ということにする
         if (plan.totalScore() >= estimatedMaxScore + scoreForOjama(60)) {
-            log << "large enough: score = 100" << endl;
-            return 100.0;
+            ostringstream ss;
+            ss << "LARGE ENOUGH : " << plan.totalScore() << " " << estimatedMaxScore;
+            return EvalResult(100.0 + 1.0 / plan.totalFrames(), ss.str());
         }
         
         // --- 1.2. 対応手なく潰せる
         // TODO: 実装があやしい。
         if (plan.totalScore() >= scoreForOjama(18)) {
             if (estimatedMaxScore <= scoreForOjama(6)) {
-                log << "TSUBUSHI: score = 70; enemy score = " << estimatedMaxScore << endl;
-                return 70.0;
+                ostringstream ss;
+                ss << "TSUBUSHI " << plan.totalScore() << " " << estimatedMaxScore << endl;
+                return EvalResult(70.0 + 1.0 / plan.totalFrames(), ss.str());
             }
         }
         
@@ -167,7 +177,7 @@ double AI::eval(int currentFrameId, const Plan& plan) const
         // TODO: これは EnemyRensaInfo だけじゃなくて MyRensaInfo も必要なのでは……。
         // TODO: 60 個超えたら打つとかなんか間違ってるだろう。
         if (plan.field().countPuyos() >= 60)
-            return 60.0 + plan.totalScore() / 1000000.0;
+            return EvalResult(60.0 + plan.totalScore() / 1000000.0, "HOUWA");
         
         // --- 1.4. 打つと有利になる
         // TODO: そもそも数値化の仕方が分からない。
@@ -176,7 +186,7 @@ double AI::eval(int currentFrameId, const Plan& plan) const
         log << "SAKIUCHI will lose : score = " << plan.totalScore()
             << " EMEMY score = " << estimatedMaxScore << endl;
 
-        return -1.0;
+        return EvalResult(-1.0, "SAKIUCHI will lose");
     }
     
     // 打たない場合、こちらの手を伸ばすことになるが、どのように伸ばすかが難しい。
@@ -220,7 +230,7 @@ double AI::eval(int currentFrameId, const Plan& plan) const
             finalScore);
     log << buf << endl;
     
-    return finalScore / 10;
+    return EvalResult(finalScore, "extending HONSEN");
 }
 
 

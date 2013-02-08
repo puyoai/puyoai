@@ -9,9 +9,17 @@
 
 class Game;
 class Decision;
+class DropDecision;
 class Field;
 class KumiPuyo;
 class Plan;
+
+struct EvalResult {
+    EvalResult(double evaluation, const std::string& message);
+
+    double evaluationScore;
+    std::string message;
+};
 
 class AI {
 public:
@@ -21,7 +29,7 @@ public:
 
     void initialize(const Game&);
 
-    void think(Decision& result, const Game&);
+    void think(DropDecision& result, const Game&);
     void myRensaFinished(const Game&);
     void myOjamaDropped(const Game&);
 
@@ -29,8 +37,8 @@ public:
     void enemyGrounded(const Game&);
 
 private:
-    void decide(const Game&, Decision*);
-    double eval(int currentFrameId, const Plan&) const;
+    void decide(DropDecision&, const Game&);
+    EvalResult eval(int currentFrameId, const Plan&) const;
 
 private:
     std::string m_name;
