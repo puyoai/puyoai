@@ -19,6 +19,14 @@
 
 using namespace std;
 
+struct Position {
+    Position() {}
+    Position(int x, int y) : x(x), y(y) {}
+
+    int x;
+    int y;
+};
+
 static inline int calculateRensaBonusCoef(int chainBonusCoef, int longBonusCoef, int colorBonusCoef)
 {
     int coef = chainBonusCoef + longBonusCoef + colorBonusCoef;
@@ -308,7 +316,7 @@ bool Field::vanish(int nthChain, int* score, int minHeights[], Strategy& strateg
         return false;
 
     // --- Actually erase the Puyos to be vanished.
-    erase(nthChain, eraseQueue, eraseQueueHead, minHeights, strategy);
+    eraseQueuedPuyos(nthChain, eraseQueue, eraseQueueHead, minHeights, strategy);
 
     int rensaBonusCoef = calculateRensaBonusCoef(chainBonus(nthChain), longBonusCoef, colorBonus(numUsedColors));
     *score += 10 * numErasedPuyos * rensaBonusCoef;
@@ -316,7 +324,7 @@ bool Field::vanish(int nthChain, int* score, int minHeights[], Strategy& strateg
 }
 
 template<typename Strategy>
-void Field::erase(int nthChain, Position* eraseQueue, Position* eraseQueueHead, int minHeights[], Strategy& strategy)
+void Field::eraseQueuedPuyos(int nthChain, Position* eraseQueue, Position* eraseQueueHead, int minHeights[], Strategy& strategy)
 {
     for (int i = 1; i <= WIDTH; i++)
         minHeights[i] = 100;
@@ -357,7 +365,7 @@ void Field::erase(int nthChain, Position* eraseQueue, Position* eraseQueueHead, 
 }
 
 template<typename Strategy>
-int Field::drop(int minHeights[], Strategy& strategy)
+int Field::dropAfterVanish(int minHeights[], Strategy& strategy)
 {
     int maxDrops = 0;
     for (int x = 1; x <= WIDTH; x++) {
@@ -435,7 +443,7 @@ void Field::simulateWithStrategy(BasicRensaInfo& rensaInfo, Strategy& strategy)
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
 
     while (vanish(rensaInfo.chains, &rensaInfo.score, minHeights, strategy)) {
-        rensaInfo.frames += drop(minHeights, strategy);
+        rensaInfo.frames += dropAfterVanish(minHeights, strategy);
         rensaInfo.frames += FRAMES_AFTER_VANISH;
         rensaInfo.chains += 1;
     }
@@ -462,18 +470,6 @@ std::string Field::getDebugOutput() const
 void Field::showDebugOutput() const
 {
     cerr << getDebugOutput() << endl;
-}
-
-bool Field::hasSameField(const Field& field) const
-{
-    for (int x = 1; x <= WIDTH; ++x) {
-        for (int y = 1; y < MAP_HEIGHT; ++y) {
-            if (color(x, y) != field.color(x, y))
-                return false;
-        }
-    }
-
-    return true;
 }
 
 void Field::findAvailablePlans(int depth, const vector<KumiPuyo>& kumiPuyos, vector<Plan>& plans) const
