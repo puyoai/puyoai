@@ -118,11 +118,11 @@ int main(int argc, char* argv[])
 
     ai.initialize(game);
 
-    Decision firstDecision;
+    DropDecision firstDecision;
     ai.think(firstDecision, game);
-    cerr << "your decision (1): " << firstDecision.x << ' ' << firstDecision.r << endl;
+    cerr << "your decision (1): " << firstDecision.decision().x << ' ' << firstDecision.decision().r << endl;
 
-    game.playerStates[0].field.dropKumiPuyo(firstDecision, game.playerStates[0].kumiPuyos[0]);
+    game.playerStates[0].field.dropKumiPuyo(firstDecision.decision(), game.playerStates[0].kumiPuyos[0]);
     game.playerStates[1].field.dropKumiPuyo(enemyFirstDecision, game.playerStates[1].kumiPuyos[0]);
     game.playerStates[0].kumiPuyos.clear();
     game.playerStates[1].kumiPuyos.clear();
@@ -134,14 +134,14 @@ int main(int argc, char* argv[])
     ai.enemyGrounded(game);
     ai.enemyWNextAppeared(game);
 
-    Decision secondDecision;
+    DropDecision secondDecision;
     ai.think(secondDecision, game);
-    cerr << "your decision (2): " << secondDecision.x << ' ' << secondDecision.r << endl;
+    cerr << "your decision (2): " << secondDecision.decision().x << ' ' << secondDecision.decision().r << endl;
 
-    game.playerStates[0].field.dropKumiPuyo(secondDecision, game.playerStates[0].kumiPuyos[0]);
+    game.playerStates[0].field.dropKumiPuyo(secondDecision.decision(), game.playerStates[0].kumiPuyos[0]);
     cerr << game.playerStates[0].field.getDebugOutput() << endl;
 
-    map<pair<Decision, Decision>, int>::iterator it = score.find(make_pair(firstDecision, secondDecision));
+    map<pair<Decision, Decision>, int>::iterator it = score.find(make_pair(firstDecision.decision(), secondDecision.decision()));
 
     if (it == score.end())
         cout << "score = " << 0 << endl;

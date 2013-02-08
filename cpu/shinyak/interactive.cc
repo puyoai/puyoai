@@ -31,7 +31,7 @@ int main(void)
         );
     AI ai("interactive");
 
-    Decision decision;
+    DropDecision dropDecision;
     
     string nextPuyos;
     for (int i = 0; i < 4; ++i) {
@@ -74,16 +74,16 @@ int main(void)
         cout << "enter? ";
         getline(cin, str);
 
-        ai.think(decision, game);
-        cout << decision.x << ' ' << decision.r << endl;
+        ai.think(dropDecision, game);
+        cout << dropDecision.decision().x << ' ' << dropDecision.decision().r << endl;
 
-        myField.dropKumiPuyo(decision, game.myPlayerState().kumiPuyos[0]);
+        myField.dropKumiPuyo(dropDecision.decision(), game.myPlayerState().kumiPuyos[0]);
 
         BasicRensaInfo rensaInfo;
         myField.simulate(rensaInfo);
 
         cout << rensaInfo.chains << ' ' << rensaInfo.score << ' ' << rensaInfo.frames << endl;
-        cout << (myField.color(decision.x, 12) + '0') << endl;
+        cout << (myField.color(dropDecision.decision().x, 12) + '0') << endl;
 
         nextPuyos = nextPuyos.substr(2);
     }

@@ -20,7 +20,7 @@ int AIManager::runLoop()
         Game game;
 
         if (!m_protocol.readCurrentStatus(&game)) {
-            m_protocol.sendInput(game.id, NULL);
+            m_protocol.sendInputWithoutDecision(game.id);
             continue;
         }
 
@@ -44,14 +44,14 @@ int AIManager::runLoop()
             needsThink = true;
 
         if (needsThink && game.canPlay()) {
-            Decision decision;
-            m_ai.think(decision, game);
+            DropDecision dropDecision;
+            m_ai.think(dropDecision, game);
             needsThink = false;
-            m_protocol.sendInput(game.id, &decision);
+            m_protocol.sendInputWithDecision(game.id, dropDecision);
             continue;
         }
     
-        m_protocol.sendInput(game.id, NULL);
+        m_protocol.sendInputWithoutDecision(game.id);
     }
 
     return 0;

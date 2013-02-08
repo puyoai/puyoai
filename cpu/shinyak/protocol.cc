@@ -11,14 +11,17 @@
 
 using namespace std;
 
-void Protocol::sendInput(const int id, const Decision* decision) {
-    if (decision) {
-        std::cout << "ID=" << id
-                  << " X=" << decision->x
-                  << " R=" << decision->r << std::endl;
-    } else {
-        std::cout << "ID=" << id << std::endl;
-    }
+void Protocol::sendInputWithoutDecision(int id)
+{
+    std::cout << "ID=" << id << std::endl;
+}
+
+void Protocol::sendInputWithDecision(int id, const DropDecision& dropDecision)
+{
+    std::cout << "ID=" << id
+              << " X=" << dropDecision.decision().x
+              << " R=" << dropDecision.decision().r
+              << " MSG=" << dropDecision.message() << endl;
 }
 
 bool Protocol::readCurrentStatus(Game* game) {
