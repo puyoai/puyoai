@@ -6,7 +6,7 @@ puyoai_add_cxx_flags("-Wall -Wextra")
 
 add_library(shinyak_lib
             ai.cc ai_manager.cc ctrl.cc field.cc field_evaluator.cc
-            game.cc player_info.cc protocol.cc puyo_possibility.cc)
+            game.cc plan.cc player_info.cc protocol.cc puyo_possibility.cc)
 
 function(shinyak_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})

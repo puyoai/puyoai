@@ -42,8 +42,6 @@ private:
 
 private:
     std::string m_name;
-    mutable std::ofstream log;
-
     MyPlayerInfo m_myPlayerInfo;
     EnemyInfo m_enemyInfo;
 };
