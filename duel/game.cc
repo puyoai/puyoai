@@ -15,6 +15,7 @@
 #include "duel/game_log.h"
 #include "duel/gui.h"
 #include "duel/ojama_controller.h"
+#include "duel/puyofu.h"
 
 using namespace std;
 
@@ -23,6 +24,8 @@ static Gui* g_gui;
 Game::Game() {
   if (!g_gui)
     g_gui = Gui::Create();
+
+  puyo_fu_.reset(new PuyoFu());
 
   std::string sequence(256, EMPTY);
   char colors[] = {RED, BLUE, GREEN, YELLOW};
@@ -50,6 +53,18 @@ Game::Game() {
 }
 
 Game::~Game() {
+  if (getenv("PUYO_PUYOFU")) {
+    FILE* fp;
+    fp = fopen("/tmp/puyoai_1p.txt", "a");
+    puyo_fu_->emitFieldTransitionLog(fp, 0);
+    fprintf(fp, "=== end ===\n");
+    fclose(fp);
+    fp = fopen("/tmp/puyoai_2p.txt", "a");
+    puyo_fu_->emitFieldTransitionLog(fp, 1);
+    fprintf(fp, "=== end ===\n");
+    fclose(fp);
+  }
+
   for (int i = 0; i < 2; i++) {
     delete field[i];
   }
@@ -163,6 +178,13 @@ void Game::Play(
     // Clear current key input if the move is done.
     if ((me->GetStateInfo() & STATE_YOU_GROUNDED)) {
       latest_decision_[i] = Decision::NO_INPUT;
+    }
+
+    if ((me->GetStateInfo() & ~STATE_YOU_CAN_PLAY) != 0) {
+      puyo_fu_->setField(me->player_id(),
+                         *me,
+                         me->GetStateInfo(),
+                         0  /* TODO(hamaji): send timestamp? */);
     }
 
     g_gui->Draw(*me, accepted_message);

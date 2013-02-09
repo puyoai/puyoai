@@ -1,6 +1,7 @@
 #ifndef DUEL_GAME_H_
 #define DUEL_GAME_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -11,6 +12,7 @@
 
 class Data;
 class FieldRealtime;
+class PuyoFu;
 
 class Game {
  private:
@@ -18,6 +20,7 @@ class Game {
   Decision latest_decision_[2];
   OjamaController ojama_ctrl_[2];
   std::vector<int> ack_info_[2];
+  std::auto_ptr<PuyoFu> puyo_fu_;
 
  public:
   Game();
