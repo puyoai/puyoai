@@ -11,7 +11,8 @@ endif()
 
 add_library(puyoai_duel
             connector.cc connector_manager_linux.cc field_realtime.cc
-            game.cc game_log.cc gui.cc ojama_controller.cc ${GUI_SRCS})
+            game.cc game_log.cc gui.cc ojama_controller.cc puyofu.cc
+            ${GUI_SRCS})
 
 add_executable(duel duel.cc)
 target_link_libraries(duel puyoai_duel)
