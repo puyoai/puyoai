@@ -11,6 +11,7 @@
 #include <glog/logging.h>
 
 #include <duel/commentator.h>
+#include <duel/puyofu.h>
 #include <util/util.h>
 
 #define VERBOSE 0
@@ -20,6 +21,7 @@ DEFINE_bool(show_states, false, "");
 DEFINE_bool(commentator, true, "");
 DEFINE_bool(draw_color_detection, false, "");
 DEFINE_bool(fullscreen, false, "");
+DEFINE_string(puyofu_field_transition_log, "", "");
 
 using namespace std;
 
@@ -171,6 +173,7 @@ void Capture::init() {
   chain_finished_[0] = chain_finished_[1] = true;
   game_state_ = GAME_INIT;
 
+  puyo_fu_.reset(new PuyoFu());
   if (FLAGS_commentator) {
     commentator_.reset(new Commentator());
   }
@@ -345,9 +348,7 @@ void Capture::addFrame(SDL_Surface* surf) {
             GAME_STATE_NAMES[prev_game_state], GAME_STATE_NAMES[game_state_],
             capture_frames_);
 
-  if (commentator_.get()) {
-    maybeUpdateComment();
-  }
+  maybeUpdateComment();
 
   if (FLAGS_show_states) {
     dumpStateInfo();
@@ -390,7 +391,13 @@ void Capture::maybeUpdateComment() {
 
     f.SetColorSequence(seq);
 
-    commentator_->setField(pi, f, (state_[pi] & STATE_YOU_GROUNDED) != 0);
+    if (puyo_fu_.get()) {
+      puyo_fu_->setField(pi, f, state_[pi], capture_frames_);
+    }
+
+    if (commentator_.get()) {
+      commentator_->setField(pi, f, (state_[pi] & STATE_YOU_GROUNDED) != 0);
+    }
   }
 }
 
@@ -486,6 +493,20 @@ void Capture::calcState() {
     if (commentator_.get()) {
       commentator_->reset();
     }
+
+    if (!FLAGS_puyofu_field_transition_log.empty()) {
+      for (int pi = 0; pi < 2; pi++) {
+        string out = FLAGS_puyofu_field_transition_log;
+        if (pi)
+          out += "_2p";
+        out += ".txt";
+        FILE* fp = fopen(out.c_str(), "a");
+        puyo_fu_->emitFieldTransitionLog(fp, pi);
+        fprintf(fp, "=== end ===\n");
+        fclose(fp);
+      }
+    }
+    puyo_fu_.reset(new PuyoFu());
 
     game_state_ = GAME_FINISHED;
     updateWinner();
