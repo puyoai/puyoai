@@ -1,6 +1,8 @@
 #ifndef __PLAN_H_
 #define __PLAN_H_
 
+#include <string>
+
 #include "decision.h"
 #include "field.h"
 

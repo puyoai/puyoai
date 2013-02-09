@@ -21,11 +21,11 @@ void Protocol::sendInput(const int id, const Decision* decision) {
     }
 }
 
-bool Protocol::readCurrentStatus(Game* game, std::ofstream& log) {
+bool Protocol::readCurrentStatus(Game* game) {
     std::string line, term;
     std::getline(std::cin, line);
 
-    log << line << endl;
+    LOG(INFO) << line;
 
     bool valid = false;
     for (std::istringstream iss(line); iss >> term;) {
