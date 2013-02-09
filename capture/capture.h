@@ -13,6 +13,7 @@
 using namespace std;
 
 class Commentator;
+class PuyoFu;
 
 class Capture {
  public:
@@ -178,6 +179,7 @@ class Capture {
   string frame_info_;
 
   auto_ptr<Commentator> commentator_;
+  auto_ptr<PuyoFu> puyo_fu_;
 };
 
 #endif  // CAPTURE_CAPTURE_H_
