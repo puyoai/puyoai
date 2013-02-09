@@ -215,6 +215,7 @@ string normalizeSeq(const string& seq, bool* swapped) {
 }
 
 static void parseField(char* p, LF* field) {
+#if OLD_PARSE_MOVIE
   for (int y = 12; y >= 1; y--) {
     for (int x = 1; x <= 6; x++) {
       int c = *p - '0';
@@ -224,9 +225,13 @@ static void parseField(char* p, LF* field) {
       p++;
     }
   }
+#else
+  *field = LF(p);
+#endif
 }
 
 static void parseNext(const char* p, string* next) {
+#if OLD_PARSE_MOVIE
   next->resize(6);
   for (int i = 0; i < 6; i++) {
     int c = p[i] - '0';
@@ -234,6 +239,13 @@ static void parseNext(const char* p, string* next) {
     CHECK_LE(c, 5) << i;
     (*next)[i] = "045671"[c] - '0';
   }
+#else
+  next->resize(6);
+  for (int i = 0; i < 6; i++) {
+    if (p[i])
+      (*next)[i] = p[i] - '0';
+  }
+#endif
 }
 
 const char* Match::kEofReasonStrs[] = {
@@ -276,7 +288,12 @@ void parseMatches(const char* filename,
     if (!should_read) {
       continue;
     }
-    if (strchr(buf, '5') && !(noeof_reason_mask & Match::OJAMA_PUYO_MASK)) {
+#ifdef OLD_PARSE_MOVIE
+    if (strchr(buf, '5') && !(noeof_reason_mask & Match::OJAMA_PUYO_MASK))
+#else
+    if (strchr(buf, '1') && !(noeof_reason_mask & Match::OJAMA_PUYO_MASK))
+#endif
+    {
       should_read = false;
       match.eof_reason = Match::OJAMA_PUYO;
       continue;
