@@ -1,11 +1,16 @@
-#ifndef FIELD_UTIL_H_
-#define FIELD_UTIL_H_
-
-#include <glog/logging.h>
-
+// A few template functions for manipulation of Field like classes.
+//
 // Requirements:
 // - Field::Set() and Field::Get() are defined.
 // - EMPTY must be zero.
+
+#ifndef FIELD_UTIL_H_
+#define FIELD_UTIL_H_
+
+#include <string>
+#include <glog/logging.h>
+
+using namespace std;
 
 template <class Field>
 void DropFlyingPuyos(Field* f) {
@@ -23,6 +28,22 @@ void DropFlyingPuyos(Field* f) {
         }
         f->Set(x, ny, c);
         f->Set(x, y, EMPTY);
+      }
+    }
+  }
+}
+
+template <class Field>
+void GetRensimQueryString(const Field& f, string* out) {
+  bool started = false;
+  for (int y = 13; y >= 1; y--) {
+    for (int x = 1; x <= 6; x++) {
+      char c = f.Get(x, y);
+      if (c) {
+        started = true;
+      }
+      if (started) {
+        out->push_back(c + '0');
       }
     }
   }

@@ -32,3 +32,14 @@ TEST(FieldUtilTest, DropFlyingPuyos) {
   EXPECT_EQ(0, f.Get(5, 3));
   EXPECT_EQ(0, f.Get(6, 3));
 }
+
+TEST(FieldUtilTest, GetRensimQueryString) {
+  Field f("000000"
+          "456756"
+          "000000"
+          "654765"
+          "000000");
+  string qs;
+  GetRensimQueryString(f, &qs);
+  EXPECT_EQ("456756000000654765000000", qs);
+}
