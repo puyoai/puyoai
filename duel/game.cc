@@ -18,7 +18,7 @@
 
 using namespace std;
 
-Gui* g_gui;
+static Gui* g_gui;
 
 Game::Game() {
   if (!g_gui)
