@@ -8,22 +8,18 @@
 
 AIManager::AIManager(const std::string& name)
     : m_name(name)
+    , m_ai(name)
 {
 }
 
 int AIManager::runLoop()
 {
-    std::string log_file_name = m_name + ".txt";
-    std::ofstream log(log_file_name.c_str());
-
-    log << "CPU TYPE : " << m_ai.getName() << std::endl;
-
     bool needsThink = true;
 
     while (true) {
         Game game;
 
-        if (!m_protocol.readCurrentStatus(&game, log)) {
+        if (!m_protocol.readCurrentStatus(&game)) {
             m_protocol.sendInput(game.id, NULL);
             continue;
         }
@@ -49,7 +45,7 @@ int AIManager::runLoop()
 
         if (needsThink && game.canPlay()) {
             Decision decision;
-            m_ai.think(decision, game, log);
+            m_ai.think(decision, game);
             needsThink = false;
             m_protocol.sendInput(game.id, &decision);
             continue;

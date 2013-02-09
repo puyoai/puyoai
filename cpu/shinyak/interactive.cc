@@ -29,8 +29,8 @@ int main(void)
         "456456"
         "456456"
         );
-    AI ai;
-    ofstream log("hoge.txt");
+    AI ai("interactive");
+
     Decision decision;
     
     string nextPuyos;
@@ -74,7 +74,7 @@ int main(void)
         cout << "enter? ";
         getline(cin, str);
 
-        ai.think(decision, game, log);
+        ai.think(decision, game);
         cout << decision.x << ' ' << decision.r << endl;
 
         myField.dropKumiPuyo(decision, game.myPlayerState().kumiPuyos[0]);
