@@ -174,6 +174,8 @@ int main(int argc, char* argv[]) {
       case P2_WIN_WITH_CONNECTION_ERROR:
         result = "P2_WIN_WITH_CONNECTION_ERROR";
         break;
+      case PLAYING:
+        LOG(FATAL) << "Game is still running?";
     }
 
     map<string, string> results;
@@ -213,4 +215,6 @@ int main(int argc, char* argv[]) {
     }
     num_match++;
   }
+
+  return 0;
 }
