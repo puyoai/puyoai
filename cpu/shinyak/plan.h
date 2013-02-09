@@ -25,6 +25,8 @@ public:
 
     bool isRensaPlan() const { return m_isRensaPlan; }
 
+    std::string decisionText() const;
+
     const Field& field() const { return m_field; }
     
 private:

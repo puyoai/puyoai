@@ -32,11 +32,6 @@ bool Game::canPlay() const
     return state & STATE_YOU_CAN_PLAY;
 }
 
-bool Game::enemyWNextAppeared() const
-{
-    return (state >> 1) & STATE_WNEXT_APPEARED;
-}
-
 bool Game::enemyHasPutPuyo() const
 {
     return (state >> 1) & STATE_YOU_GROUNDED;

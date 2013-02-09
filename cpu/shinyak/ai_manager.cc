@@ -30,7 +30,7 @@ int AIManager::runLoop()
         // Update enemy info if necessary.
         if (game.enemyHasPutPuyo())
             m_ai.enemyGrounded(game);
-        if (game.enemyWNextAppeared())
+        if (game.state & (STATE_WNEXT_APPEARED << 1))
             m_ai.enemyWNextAppeared(game);
 
         // Update my info if necessary.
