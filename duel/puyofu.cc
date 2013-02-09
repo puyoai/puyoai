@@ -17,8 +17,6 @@ void PuyoFu::setField(int pi, const Field& f, int state, int time) {
   Move* move = new Move();
   move->pi = pi;
   move->f.reset(new Field(f));
-  const string& n = f.GetColorSequence();
-  CHECK(!n.empty());
   move->next[6] = 0;
   for (int i = 0; i < 6; i++) {
     move->next[i] = f.GetNextPuyo(i) + '0';

@@ -391,12 +391,12 @@ void Capture::maybeUpdateComment() {
 
     f.SetColorSequence(seq);
 
-    if (puyo_fu_.get()) {
-      puyo_fu_->setField(pi, f, state_[pi], capture_frames_);
-    }
-
     if (commentator_.get()) {
       commentator_->setField(pi, f, (state_[pi] & STATE_YOU_GROUNDED) != 0);
+    }
+
+    if (puyo_fu_.get() && (seq.size() == 4 || seq.size() == 6)) {
+      puyo_fu_->setField(pi, f, state_[pi], capture_frames_);
     }
   }
 }
