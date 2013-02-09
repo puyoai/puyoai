@@ -15,11 +15,13 @@ class Plan;
 
 class AI {
 public:
+    AI(const std::string& name);
+
     std::string getName() const;
 
     void initialize(const Game&);
 
-    void think(Decision& result, const Game&, std::ofstream& log);
+    void think(Decision& result, const Game&);
     void myRensaFinished(const Game&);
     void myOjamaDropped(const Game&);
 
@@ -27,10 +29,13 @@ public:
     void enemyGrounded(const Game&);
 
 private:
-    void decide(const Game&, Decision*, std::ofstream& log);
-    double eval(int currentFrameId, const Plan&, std::ofstream& log) const;
+    void decide(const Game&, Decision*);
+    double eval(int currentFrameId, const Plan&) const;
 
 private:
+    std::string m_name;
+    mutable std::ofstream log;
+
     MyPlayerInfo m_myPlayerInfo;
     EnemyInfo m_enemyInfo;
 };

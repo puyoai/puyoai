@@ -96,12 +96,12 @@ int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
+    google::InstallFailureSignalHandler();
     TsumoPossibility::initialize();
 
-    std::string log_file_name = "solver-log.txt";
-    std::ofstream log(log_file_name.c_str());
+    LOG(INFO) << "initialized" << endl;
 
-    AI ai;
+    AI ai("server-log");
 
     Game game;
     Decision enemyFirstDecision;
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
     ai.initialize(game);
 
     Decision firstDecision;
-    ai.think(firstDecision, game, log);
+    ai.think(firstDecision, game);
     cerr << "your decision (1): " << firstDecision.x << ' ' << firstDecision.r << endl;
 
     game.playerStates[0].field.dropKumiPuyo(firstDecision, game.playerStates[0].kumiPuyos[0]);
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
     ai.enemyWNextAppeared(game);
 
     Decision secondDecision;
-    ai.think(secondDecision, game, log);
+    ai.think(secondDecision, game);
     cerr << "your decision (2): " << secondDecision.x << ' ' << secondDecision.r << endl;
 
     game.playerStates[0].field.dropKumiPuyo(secondDecision, game.playerStates[0].kumiPuyos[0]);

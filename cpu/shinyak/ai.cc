@@ -25,6 +25,12 @@ std::string AI::getName() const
     return "shinyak";
 }
 
+AI::AI(const string& name)
+    : m_name(name)
+    , log((name + ".txt").c_str())
+{
+}
+
 void AI::initialize(const Game& game)
 {
     m_enemyInfo.initializeWith(game.id);
@@ -32,9 +38,9 @@ void AI::initialize(const Game& game)
     m_myPlayerInfo.forceEstimatedField(game.myPlayerState().field);
 }
 
-void AI::think(Decision& decision, const Game& game, std::ofstream& log)
+void AI::think(Decision& decision, const Game& game)
 {
-    decide(game, &decision, log);
+    decide(game, &decision);
     if (decision.isValid())
         m_myPlayerInfo.puyoDropped(decision, game.myPlayerState().kumiPuyos[0]);
 }
@@ -77,7 +83,7 @@ void AI::enemyGrounded(const Game& game)
         m_enemyInfo.setRensaIsOngoing(false);
 }
 
-void AI::decide(const Game& game, Decision* decision, std::ofstream& log)
+void AI::decide(const Game& game, Decision* decision)
 {
     log << "AI::decide is called" << endl;
     log << m_myPlayerInfo.estimatedField().getDebugOutput() << endl;
@@ -90,7 +96,7 @@ void AI::decide(const Game& game, Decision* decision, std::ofstream& log)
     
     double currentMaxPlanScore = -100.0;
     for (std::vector<Plan>::iterator it = plans.begin(); it != plans.end(); ++it) {
-        double planScore = eval(game.id, *it, log);
+        double planScore = eval(game.id, *it);
         if (currentMaxPlanScore < planScore) {
             currentMaxPlanScore = planScore;
             *decision = it->firstHandDecision();
@@ -98,7 +104,7 @@ void AI::decide(const Game& game, Decision* decision, std::ofstream& log)
     }
 }
 
-double AI::eval(int currentFrameId, const Plan& plan, std::ofstream& log) const
+double AI::eval(int currentFrameId, const Plan& plan) const
 {
     for (int i = 0; i < plan.numDecisions(); ++i)
         log << plan.decision(i).toString();
