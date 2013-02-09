@@ -48,7 +48,7 @@ Movie::Movie(const char* filename)
   }
 
   frame_ = avcodec_alloc_frame();
-  if (frame_rgb_ == NULL) {
+  if (frame_ == NULL) {
     fprintf(stderr, "Couldn't allocate frame memory\n");
     return;
   }
