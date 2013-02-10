@@ -1048,7 +1048,7 @@ bool Capture::detectMode() {
 
         if (x == 9) {
           bb->sx = px + 6;
-          bb->dx = px + 14;
+          bb->dx = px + 12;
           bb->dy -= 5;
         } else if (x == 10) {
           bb->sx = px + 13;
