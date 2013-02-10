@@ -34,9 +34,12 @@ void PuyoFu::emitFieldTransitionLog(FILE* fp, int pi) const {
 
     string before, after;
     GetRensimQueryString(f, &before);
-    if (before.empty())
-      before.push_back('0');
     GetRensimQueryString(*m->f, &after);
+    if (before.empty()) {
+      if (after.empty())
+        continue;
+      before.push_back('0');
+    }
     if (after.empty())
       after.push_back('0');
     fprintf(fp, "%s %s %s\n", before.c_str(), m->next, after.c_str());
