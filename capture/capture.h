@@ -123,7 +123,7 @@ class Capture {
 
   bool detectMode();
   void calcState();
-  Colors getAIColor(RealColor rc);
+  Colors getAIColor(RealColor rc, bool will_allocate = true);
   void setAIColor(RealColor rc, Colors c);
   bool isTitle() const;
   bool isModeSelect() const;
