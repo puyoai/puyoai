@@ -4,7 +4,7 @@ include_directories(..)
 
 add_library(puyoai_core STATIC
             ctrl.cc decision.cc field.cc
-            field_deprecated.cc plan.cc)
+            field_deprecated.cc plan.cc state.cc)
 
 function(puyoai_core_add_test target)
   add_executable(${target}_test ${target}_test.cc)

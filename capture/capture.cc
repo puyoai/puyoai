@@ -1208,7 +1208,7 @@ void Capture::dumpStateInfo() const {
     oss << frame_info_ << '\n';
   for (int i = 0; i < 2; i++) {
     oss << (i+1) << "P state:"
-        << " state=" << state_[i]
+        << " state=" << GetStateString(state_[i])
         << " has_next=" << has_next_[i]
         << " has_wnext=" << has_wnext_[i]
         << " fand=" << frames_after_next_disappeared_[i]
