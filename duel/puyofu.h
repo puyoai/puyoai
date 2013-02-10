@@ -17,6 +17,8 @@ class PuyoFu {
 
   void emitFieldTransitionLog(FILE* fp, int pi) const;
 
+  bool empty() const { return moves_.empty(); }
+
  private:
   struct Move {
     int pi;
