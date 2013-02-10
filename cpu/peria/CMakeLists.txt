@@ -26,6 +26,6 @@ if(GTEST_FOUND)
   include_directories(${GTEST_INCLUDE_DIRS})
 
   # TODO(peria): add tests if needed
-  #peria_add_test(field_test EXCLUDE_FROM_ALL field_test.cc)
+  peria_add_test(field_test)
   peria_add_test(player_test)
 endif()

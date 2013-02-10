@@ -9,7 +9,10 @@
 namespace std {}
 using namespace std;
 
-// scoped_ptr copied from https://code.google.com/searchframe#OAMlx_jo-ck/src/googleurl/base/scoped_ptr.h
+#define ARRAYSIZE(array) static_cast<int>(sizeof(array) / sizeof(*array))
+
+// scoped_ptr copied from
+// https://code.google.com/searchframe#OAMlx_jo-ck/src/googleurl/base/scoped_ptr.h
 template <typename T>
 class scoped_ptr {
  private:
