@@ -791,11 +791,14 @@ void Capture::setAIColor(RealColor rc, Colors c) {
   }
 }
 
-Colors Capture::getAIColor(RealColor rc) {
+Colors Capture::getAIColor(RealColor rc, bool will_allocate) {
   if (rc < RC_RED)
     return (Colors)rc;
   int i = rc - RC_RED;
   if (color_map_[i] == -1) {
+    if (!will_allocate)
+      return EMPTY;
+
     if (rc != RC_PURPLE) {
       bool is_used = false;
       for (int j = 0; j < 5; j++) {
@@ -859,7 +862,10 @@ void Capture::updateAINext(int i) {
   int pi = player_index(i);
   for (int j = 0; j < 4; j++) {
     RealColor rc = puyo_[pi][j][12];
-    Colors c = getAIColor(rc);
+    bool will_allocate = true;
+    if (j >= 3 && mode_ == NICO)
+      will_allocate = false;
+    Colors c = getAIColor(rc, will_allocate);
     ai_next_[i][j+2] = c;
   }
 }
