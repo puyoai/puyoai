@@ -278,6 +278,9 @@ void parseMatches(const char* filename,
     if (buf[0] == '=') {
       if (match.eof_reason == Match::NONE)
         match.eof_reason = Match::END_MATCH;
+      VLOG(2) << "New match: reason="
+              << Match::kEofReasonStrs[match.eof_reason]
+              << " num_decisions=" << match.decisions.size();
       should_read = true;
       turn = 0;
       prev_puyo_cnt = 0;
@@ -325,6 +328,11 @@ void parseMatches(const char* filename,
     if ((problem.countPuyo() != prev_puyo_cnt ||
          answer.countPuyo() != prev_puyo_cnt + 2) &&
         !(noeof_reason_mask & Match::VANISH_PUYO_MASK)) {
+#if 1
+      LOG(INFO) << problem.countPuyo();
+      LOG(INFO) << prev_puyo_cnt;
+      LOG(INFO) << answer.countPuyo();
+#endif
       should_read = false;
       match.eof_reason = Match::VANISH_PUYO;
       continue;
