@@ -71,9 +71,6 @@ class Field {
   // Normal print for debugging purpose.
   string GetDebugOutput() const;
 
-  // Find available controls.
-  void FindAvailableControls(bool same, vector<Decision>* decisions);
-
   // Returns n-th puyo in the queue.
   char GetNextPuyo(int n) const;
 
