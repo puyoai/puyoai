@@ -114,6 +114,22 @@ void Field::Set(int x, int y, char color) {
     min_heights[x] = y;
 }
 
+void Field::Put(int x, int y_pivot, int r) {
+  const int dx[] = {0, 1, 0, -1};
+  const int dy[] = {1, 0, 1, 0};
+
+  for (int y = 1; y <= y_pivot; ++y) {
+    if (field_[x][y] != kEmpty)
+      continue;
+    Set(x, y, GetNextPuyo((r == 2) ? 1 : 0));
+    x += dx[r];
+    y += dy[r];
+    Set(x, y, GetNextPuyo((r == 2) ? 0 : 1));
+    break;
+  }
+  Drop();
+}
+
 char Field::Get(int x, int y) const {
   return field_[x][y] & (kMaskChecked - 1);
 }

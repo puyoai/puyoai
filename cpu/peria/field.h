@@ -48,6 +48,9 @@ class Field {
   // Put a puyo at a specified position.
   void Set(int x, int y, char color);
 
+  // Put a pair of puyos.
+  void Put(int x, int y, int r);
+
   // Get a color of puyo at a specified position.
   char Get(int x, int y) const;
   bool IsEmpty(int x, int y) const;

@@ -43,9 +43,19 @@ bool operator!=(const Player& a, const Player& b) {
   return !(a == b);
 }
 
-void Player::Search(vector<Player>* /*children*/) const {
+void Player::Search(vector<Player>* children) const {
   vector<Control> controls;
   SearchControls(x_, y_, r_, &controls);
+  for (size_t i = 0; i < controls.size(); ++i) {
+    Player player;
+    player.CopyFrom(*this);
+    Field* field = player.mutable_field();
+    field->Put(controls[i].first, y_, controls[i].second);
+    int chains = 1, score = player.score(), frame = 0;
+    field->Simulate(&chains, &score, &frame);
+    player.set_score(score);
+    children->push_back(player);
+  }
 }
 
 namespace {
