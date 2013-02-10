@@ -26,21 +26,22 @@ class Player {
   void SearchControls(int x, int y, int r, vector<Control>* controls) const;
 
   void set_parent(Player* parent) { parent_ = parent; }
-  Player* parent() { return parent_; }
   void set_state(int state) { state_ = state; }
-  int state() const { return state_; }
   void set_field(const Field& field) { field_ = field; }
+  void set_score(int score) { score_ = score; }
+  void set_ojama(int ojama) { ojama_ = ojama; }
+  void set_x(int x) { x_ = x; }
+  void set_y(int y) { y_ = y; }
+  void set_r(int r) { r_ = r; }
+
+  Player* parent() { return parent_; }
+  int state() const { return state_; }
   const Field& field() const { return field_; }
   Field* mutable_field() { return &field_; }
-  void set_score(int score) { score_ = score; }
   int score() const { return score_; }
-  void set_ojama(int ojama) { ojama_ = ojama; }
   int ojama() const { return ojama_; }
-  void set_x(int x) { x_ = x; }
   int get_x() const { return x_; }
-  void set_y(int y) { y_ = y; }
   int get_y() const { return y_;}
-  void set_r(int r) { r_ = r; }
   int get_r() const { return r_; }
 
  private:
