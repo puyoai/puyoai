@@ -395,7 +395,7 @@ void Capture::maybeUpdateComment() {
       commentator_->setField(pi, f, (state_[pi] & STATE_YOU_GROUNDED) != 0);
     }
 
-    if (puyo_fu_.get() && (seq.size() == 4 || seq.size() == 6)) {
+    if (puyo_fu_.get() && seq.size() >= 4) {
       puyo_fu_->setField(pi, f, state_[pi], capture_frames_);
     }
   }
