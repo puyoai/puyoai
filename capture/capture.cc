@@ -494,7 +494,7 @@ void Capture::calcState() {
       commentator_->reset();
     }
 
-    if (!FLAGS_puyofu_field_transition_log.empty()) {
+    if (!FLAGS_puyofu_field_transition_log.empty() && !puyo_fu_->empty()) {
       for (int pi = 0; pi < 2; pi++) {
         string out = FLAGS_puyofu_field_transition_log;
         if (pi)
