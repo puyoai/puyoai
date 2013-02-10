@@ -24,9 +24,6 @@ FieldRealtime::FieldRealtime(int player_id, const string& color_sequence,
 
 void FieldRealtime::Init() {
   PrepareNextPuyo();
-  yokoku_delay_ = 0;
-
-  delay_double_next_ = getenv("PUYO_DELAY_DOUBLE_NEXT") != NULL;
 
   next_puyo_ = 0;
   simulate_real_state_ = STATE_USER;
@@ -42,7 +39,10 @@ void FieldRealtime::Init() {
   quickturn_ = 0;
   is_zenkesi_ = false;
   dropped_rows_ = 0;
+
+  delay_double_next_ = getenv("PUYO_DELAY_DOUBLE_NEXT") != NULL;
   yokoku_delay_ = 0;
+  sent_wnext_appeared_ = false;
 }
 
 bool FieldRealtime::TryChigiri() {
@@ -191,6 +191,11 @@ bool FieldRealtime::Play(Key key, PlayerLog* player_log) {
 
   if (yokoku_delay_ > 0) {
     yokoku_delay_--;
+  }
+
+  if (yokoku_delay_ == 0 && !sent_wnext_appeared_) {
+    field_state_ |= STATE_WNEXT_APPEARED;
+    sent_wnext_appeared_ = true;
   }
 
   // Loop until some functionality consumes this frame.
@@ -486,6 +491,7 @@ void FieldRealtime::PrepareNextPuyo() {
   if (delay_double_next_) {
     yokoku_delay_ = FRAMES_YOKOKU_DELAY;
   }
+  sent_wnext_appeared_ = false;
   simulate_real_state_ = STATE_USER;
 }
 

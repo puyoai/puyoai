@@ -86,6 +86,7 @@ class FieldRealtime : public Field {
 
   bool delay_double_next_;
   int yokoku_delay_;
+  bool sent_wnext_appeared_;
 };
 
 #endif  // DUEL_FIELD_REALTIME_H_
