@@ -5,7 +5,6 @@
 
 #include "../../core/constant.h"
 #include "decision.h"
-#include "field_column_bit_field.h"
 #include "rensa_info.h" 
 
 using namespace std;
