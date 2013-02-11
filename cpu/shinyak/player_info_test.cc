@@ -26,6 +26,34 @@ TEST(EnemyInfoTest, UpdatePossibleRensasTest)
     info.updatePossibleRensas(f, kumiPuyos);
 
     EXPECT_EQ(info.possibleRensaInfos().size(), 3U);
-    EXPECT_EQ(info.possibleRensaInfos().back().chains, 5);
+    EXPECT_EQ(info.possibleRensaInfos().back().chains, 4);
 }
 
+TEST(EnemyInfoTest, UpdatePossibleRensasTest2)
+{
+    // Should not crash in this test case.
+
+    TsumoPossibility::initialize();
+    
+    EnemyInfo info;
+    info.initializeWith(100);
+
+    Field f(" O    "
+            " O O  " // 12
+            "OO OOO"
+            "OOOOOO"
+            "OGOOOO"
+            "OYOOOO" // 8
+            "OOOOOO"
+            "OOOOOO"
+            "OOOOOO"
+            "OOOOOO" // 4
+            "OOOOOO"
+            "OBOYOO"
+            "BBOBBR"); 
+
+    vector<KumiPuyo> kumiPuyos;
+    setKumiPuyo("BBRBYB", kumiPuyos);
+
+    info.updatePossibleRensas(f, kumiPuyos);
+}
