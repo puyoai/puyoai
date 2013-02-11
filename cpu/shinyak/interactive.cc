@@ -9,7 +9,7 @@
 #include "game.h"
 #include "player_info.h"
 #include "rensa_detector.h"
-#include "rensainfo.h"
+#include "rensa_info.h"
 
 using namespace std;
 

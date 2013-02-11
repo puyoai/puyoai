@@ -4,8 +4,8 @@
 #include <glog/logging.h>
 #include <iostream>
 #include "../../core/constant.h"
-#include "rensainfo.h"
 #include "rensa_detector.h"
+#include "rensa_info.h"
 #include "puyo_possibility.h"
 
 using namespace std;
