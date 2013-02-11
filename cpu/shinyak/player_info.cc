@@ -10,7 +10,7 @@
 using namespace std;
 
 static const int ACCUMULATED_RENSA_SCORE[] = {
-    0,
+    1,
     40, 360, 1000, 2280, 4840, 
     8680, 13800, 20200, 27880, 36840,
     47080, 58600, 71400, 85480, 100840,
@@ -181,7 +181,7 @@ int EnemyInfo::estimateMaxScore(int frameId) const
         int restFrames = frameId - it->frames - m_id;
         int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_AFTER_NO_CHIGIRI));
         int newChains = min((numPossiblePuyos / 4) + it->chains, 19);
-        double ratio = static_cast<double>(newChains) / it->chains;
+        double ratio = static_cast<double>(ACCUMULATED_RENSA_SCORE[newChains]) / ACCUMULATED_RENSA_SCORE[it->chains];
         int score = it->score * ratio - ACCUMULATED_RENSA_SCORE[it->chains];
         maxScore = std::max(maxScore, score);
     }
