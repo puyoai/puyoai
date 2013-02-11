@@ -80,16 +80,6 @@ public:
 public:
     void findAvailablePlans(int depth, const std::vector<KumiPuyo>& kumiPuyos, std::vector<Plan>& plans) const;
 
-    // 現在のフィールドから発火可能な連鎖を列挙する。
-    void findRensas(std::vector<PossibleRensaInfo>& result, const PuyoSet& additionalPuyoSet = PuyoSet()) const;
-    // Before calling findRensa, adding some puyos (numMaxAddedPuyo) is allowed. 
-    void findPossibleRensas(std::vector<PossibleRensaInfo>& result, int numMaxAddedPuyo) const;
-    // 与えられた組ぷよだけを使って発火可能な連鎖を求める
-    void findFeasibleRensas(std::vector<FeasibleRensaInfo>& result, int numKumiPuyo, const std::vector<KumiPuyo>& kumiPuyos) const;
-    // 連鎖を再帰的に打つことで可能な連鎖を求める。不可能な連鎖も列挙されてしまうはず。
-    // TODO: 不可能な連鎖を列挙させない方法を考える。
-    void findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result, int maxIteration, int additionalChain = 0, PuyoSet additionalPuyoSet = PuyoSet()) const;
-
 private:
     // Crears every data this class has.
     void initialize();
@@ -112,10 +102,6 @@ private:
     Position* fillSameColorPosition(int x, int y, PuyoColor, Position* positionQueueHead, FieldBitField& checked) const;
 
     void findAvailablePlansInternal(const Plan* previousPlan, int restDepth, int nth, const std::vector<KumiPuyo>& kumiPuyos, std::vector<Plan>& plans) const;
-    void findPossibleRensasInternal(std::vector<PossibleRensaInfo>& result, PuyoSet addedSet, int leftX, int restAdd) const;
-
-    template<typename AfterSimulationCallback, typename T>
-    void findRensasInternal(typename std::vector<T>& result, int additionalChains, const PuyoSet& additionalPuyoSet, AfterSimulationCallback callback) const;
 
 private:
     Puyo m_field[MAP_WIDTH][MAP_HEIGHT];

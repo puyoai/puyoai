@@ -8,6 +8,7 @@
 #include "field_evaluator.h"
 #include "game.h"
 #include "player_info.h"
+#include "rensa_detector.h"
 #include "rensainfo.h"
 
 using namespace std;
@@ -62,7 +63,8 @@ int main(void)
         setKumiPuyo("666666", game.playerStates[1].kumiPuyos);        
 
         vector<FeasibleRensaInfo> feasibleRensaInfos;
-        enemyField.findFeasibleRensas(feasibleRensaInfos, 3, game.enemyPlayerState().kumiPuyos);
+        RensaDetector::findFeasibleRensas(feasibleRensaInfos, enemyField, 3, game.enemyPlayerState().kumiPuyos);
+
         for (vector<FeasibleRensaInfo>::iterator it = feasibleRensaInfos.begin(); it != feasibleRensaInfos.end(); ++it) {
             cout << "score  = " << it->rensaInfo.score
                  << "chains = " << it->rensaInfo.chains

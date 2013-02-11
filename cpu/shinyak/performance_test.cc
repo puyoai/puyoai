@@ -1,10 +1,11 @@
 #include <gtest/gtest.h>
 #include <vector>
 
+#include "../../util/tsc.h"
 #include "field.h"
 #include "plan.h"
+#include "rensa_detector.h"
 #include "rensainfo.h"
-#include "../../util/tsc.h"
 
 using namespace std;
 
@@ -55,7 +56,7 @@ TEST(PerformanceTest, FindPossibleRensas1)
         Tsc tsc("FindPossibleRensas1");
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
         vector<PossibleRensaInfo> result;
-        f.findPossibleRensas(result, 1);
+        RensaDetector::findPossibleRensas(result, f, 1);
     }
 
     double average, variance;
@@ -70,7 +71,7 @@ TEST(PerformanceTest, FindPossibleRensas2)
         Tsc tsc("FindPossibleRensas2");
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
         vector<PossibleRensaInfo> result;
-        f.findPossibleRensas(result, 2);
+        RensaDetector::findPossibleRensas(result, f, 2);
     }
 
     double average, variance;
@@ -85,7 +86,7 @@ TEST(PerformanceTest, FindPossibleRensas3)
         Tsc tsc("FindPossibleRensas3");
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
         vector<PossibleRensaInfo> result;
-        f.findPossibleRensas(result, 3);
+        RensaDetector::findPossibleRensas(result, f, 3);
     }
 
     double average, variance;
@@ -100,7 +101,7 @@ TEST(PerformanceTest, FindPossibleRensas4)
         Tsc tsc("FindPossibleRensas4");
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
         vector<PossibleRensaInfo> result;
-        f.findPossibleRensas(result, 4);
+        RensaDetector::findPossibleRensas(result, f, 4);
     }
 
     double average, variance;

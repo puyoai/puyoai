@@ -1,7 +1,6 @@
 #include "field.h"
 
 #include <gtest/gtest.h>
-#include <algorithm>
 #include <string>
 
 #include "../../core/constant.h"
@@ -320,56 +319,7 @@ TEST(FieldTest, FramesToDropNextWithChigiri)
     EXPECT_EQ(f.framesToDropNext(Decision(3, 1)), (Field::HEIGHT - 4) * FRAMES_DROP_1_LINE + FRAMES_AFTER_CHIGIRI + FRAMES_CHIGIRI_1_LINE_1 + FRAMES_CHIGIRI_1_LINE_2 + 2 * FRAMES_CHIGIRI_1_LINE_3);    
 }
 
-struct ContainsRensa {
-    ContainsRensa(int chains, PuyoSet set) : chains(chains), set(set) {}
-    
-    bool operator()(const PossibleRensaInfo& info) const {
-        return chains == info.rensaInfo.chains && info.necessaryPuyoSet == set;
-    }
-    
-    int chains;
-    PuyoSet set;
-};
 
-TEST(FieldTest, FindRensaTest)
-{
-    Field f("054400"
-            "045400"
-            "556660");
-
-    vector<PossibleRensaInfo> result;
-    f.findRensas(result, PuyoSet());
-
-    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(1, PuyoSet(1, 0, 0, 0))));
-    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(2, PuyoSet(3, 0, 0, 0))));
-    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(3, PuyoSet(0, 0, 1, 0))));
-}
-
-TEST(FieldTest, FindPossibleRensas)
-{
-    Field f("450000"
-            "445000"
-            "556000");
-
-    vector<PossibleRensaInfo> result;
-    f.findPossibleRensas(result, 3);
-
-    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(1, PuyoSet(0, 2, 0, 0))));
-    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(2, PuyoSet(1, 0, 0, 0))));
-    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(3, PuyoSet(1, 0, 3, 0))));
-}
-
-TEST(FieldTest, FindPossibleRensasUsingIteration1)
-{    
-    Field f("450000"
-            "445660"
-            "556455");
-
-    vector<PossibleRensaInfo> result;
-    f.findPossibleRensasUsingIteration(result, 3);
-
-    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(4, PuyoSet(1, 2, 1, 0))));
-}
 
 
 

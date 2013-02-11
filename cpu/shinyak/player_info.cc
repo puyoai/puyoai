@@ -5,6 +5,7 @@
 #include <iostream>
 #include "../../core/constant.h"
 #include "rensainfo.h"
+#include "rensa_detector.h"
 #include "puyo_possibility.h"
 
 using namespace std;
@@ -83,7 +84,7 @@ void EnemyInfo::updateFeasibleRensas(const Field& field, const vector<KumiPuyo>&
     m_feasibleRensaInfos.clear();
 
     vector<FeasibleRensaInfo> result;
-    field.findFeasibleRensas(result, 3, kumiPuyos); // TODO: What is 3?
+    RensaDetector::findFeasibleRensas(result, field, 3, kumiPuyos); // TODO: What is 3?
 
     if (result.empty())
         return;
@@ -123,7 +124,7 @@ void EnemyInfo::updatePossibleRensas(const Field& field, const vector<KumiPuyo>&
 
     vector<PossibleRensaInfo> result;
     result.reserve(100000);
-    field.findPossibleRensas(result, 4);
+    RensaDetector::findPossibleRensas(result, field, 3);
 
     vector<BasicRensaInfo> results;
     for (vector<PossibleRensaInfo>::iterator it = result.begin(); it != result.end(); ++it) {
