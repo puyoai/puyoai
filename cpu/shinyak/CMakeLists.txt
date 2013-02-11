@@ -6,7 +6,7 @@ puyoai_add_cxx_flags("-Wall -Wextra")
 
 add_library(shinyak_lib
             ai.cc ai_manager.cc ctrl.cc field.cc field_evaluator.cc
-            game.cc plan.cc player_info.cc protocol.cc puyo_possibility.cc)
+            game.cc plan.cc player_info.cc protocol.cc puyo_possibility.cc rensa_detector.cc)
 
 function(shinyak_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
@@ -36,6 +36,7 @@ if(GTEST_FOUND)
   shinyak_add_test(player_info_test)
   shinyak_add_test(puyo_set_test)
   shinyak_add_test(puyo_test)
+  shinyak_add_test(rensa_detector_test)
   # TODO(hamaji): Slow!
   shinyak_add_test(performance_test 1)
   shinyak_add_test(puyo_possibility_test 1)
