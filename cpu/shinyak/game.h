@@ -23,7 +23,6 @@ public:
     bool shouldThink() const;
     bool canPlay() const;
 
-
     bool enemyHasPutPuyo() const;
 
     const PlayerState& myPlayerState() const { return playerStates[0]; }

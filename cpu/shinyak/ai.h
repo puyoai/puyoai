@@ -38,7 +38,7 @@ public:
 
 private:
     void decide(DropDecision&, const Game&);
-    EvalResult eval(int currentFrameId, const Plan&) const;
+    EvalResult eval(int currentFrameId, const Plan&, const Field& currentField) const;
 
 private:
     std::string m_name;

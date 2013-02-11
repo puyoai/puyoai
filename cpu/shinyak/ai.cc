@@ -113,7 +113,7 @@ void AI::decide(DropDecision& dropDecision, const Game& game)
     
     double currentBestScore = -100.0;
     for (std::vector<Plan>::iterator it = plans.begin(); it != plans.end(); ++it) {
-        EvalResult result = eval(game.id, *it);
+        EvalResult result = eval(game.id, *it, game.myPlayerState().field);
         if (currentBestScore < result.evaluationScore) {
             currentBestScore = result.evaluationScore;
             dropDecision = DropDecision(it->firstHandDecision(), result.message);
@@ -121,7 +121,7 @@ void AI::decide(DropDecision& dropDecision, const Game& game)
     }
 }
 
-EvalResult AI::eval(int currentFrameId, const Plan& plan) const
+EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentField) const
 {
     if (m_enemyInfo.rensaIsOngoing() && m_enemyInfo.ongoingRensaInfo().rensaInfo.score > scoreForOjama(6)) {
         // If we have a firable plan before the enemy Rensa has been finished, we would like to
@@ -183,9 +183,11 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan) const
         // --- 1.3. 飽和したので打つしかなくなった
         // TODO: これは EnemyRensaInfo だけじゃなくて MyRensaInfo も必要なのでは……。
         // TODO: 60 個超えたら打つとかなんか間違ってるだろう。
-        if (plan.field().countPuyos() >= 60) {
-            LOG(INFO) << plan.decisionText() << " HOUWA";
-            return EvalResult(60.0 + plan.totalScore() / 1000000.0, "HOUWA");
+        if (currentField.countPuyos() >= 60) {
+            ostringstream ss;
+            ss << "HOUWA " << plan.totalScore();
+            LOG(INFO) << plan.decisionText() << ss.str();
+            return EvalResult(60.0 + plan.totalScore() / 1000000.0, ss.str());
         }
         
         // --- 1.4. 打つと有利になる
@@ -229,14 +231,17 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan) const
         + fieldHeightScore
         + frameScore;
     
-    char buf[80];
-    sprintf(buf, "eval-score: %f %d %f %f %f : = %f",
+    char buf[160];
+    sprintf(buf, "eval-score: %f %d %f %f %f : = %f : %d : %d : %d",
             emptyFieldAvailability / (78 - colorPuyoNum),
             maxChains,
             fieldScore / 30,
             fieldHeightScore,
             frameScore,
-            finalScore);
+            finalScore,
+            m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames()),
+            m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames() + 50),
+            m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames() + 100));
 
     LOG(INFO) << plan.decisionText() << " Extending HONSEN : " << buf;    
     return EvalResult(finalScore, buf);
