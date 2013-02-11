@@ -74,7 +74,13 @@ void AI::enemyWNextAppeared(const Game& game)
     m_enemyInfo.updateFeasibleRensas(game.enemyPlayerState().field, game.enemyPlayerState().kumiPuyos);
     m_enemyInfo.updatePossibleRensas(game.enemyPlayerState().field, game.enemyPlayerState().kumiPuyos);
 
-    LOG(INFO) << "enemy rensa score updated.";
+    LOG(INFO) << "Possible rensa infos : ";
+    for (std::vector<BasicRensaInfo>::const_iterator it = m_enemyInfo.possibleRensaInfos().begin(); it != m_enemyInfo.possibleRensaInfos().end(); ++it)
+        LOG(INFO) << it->toString();
+    LOG(INFO) << "Feasible rensa infos : ";
+    for (std::vector<BasicRensaInfo>::const_iterator it = m_enemyInfo.feasibleRensaInfos().begin(); it != m_enemyInfo.feasibleRensaInfos().end(); ++it)
+        LOG(INFO) << it->toString();
+
 }
 
 void AI::enemyGrounded(const Game& game)
@@ -158,7 +164,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan) const
         // / TODO: 十分でかいとは？ / とりあえず致死量ということにする
         if (plan.totalScore() >= estimatedMaxScore + scoreForOjama(60)) {
             ostringstream ss;
-            ss << "LARGE ENOUGH : " << plan.totalScore() << " " << estimatedMaxScore;
+            ss << "LARGE ENOUGH : my score=" << plan.totalScore() << " enemy score=" << estimatedMaxScore << " rensa ends=" << rensaEndingFrameId;
             LOG(INFO) << plan.decisionText() << " " << ss.str();
             return EvalResult(100.0 + 1.0 / plan.totalFrames(), ss.str());
         }
