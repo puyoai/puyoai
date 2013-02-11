@@ -40,6 +40,15 @@ struct BasicRensaInfo {
     int frames;
 };
 
+struct TrackedRensaInfo {
+    TrackedRensaInfo() {}
+    TrackedRensaInfo(const BasicRensaInfo& rensaInfo, const TrackResult& trackResult)
+        : rensaInfo(rensaInfo), trackResult(trackResult) {}
+
+    BasicRensaInfo rensaInfo;
+    TrackResult trackResult;
+};
+
 // CURRENT/NEXT/NEXTNEXT から実際に発火可能な連鎖 (For PlayerInfo)
 struct FeasibleRensaInfo {
     FeasibleRensaInfo() {}

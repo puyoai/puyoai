@@ -13,11 +13,9 @@ class FieldBitField;
 class FieldColumnBitField;
 class NonTrackingStrategy;
 class Plan;
-class TrackResult;
 class TrackingStrategy;
 struct BasicRensaInfo;
-struct FeasibleRensaInfo;
-struct PossibleRensaInfo;
+struct TrackedRensaInfo;
 struct Position;
 
 class Field {
@@ -71,7 +69,7 @@ public:
 
     void forceDrop();
     void simulate(BasicRensaInfo& rensaInfo, int additionalChain = 0);
-    void simulateAndTrack(BasicRensaInfo& rensaInfo, TrackResult& trackResult);
+    void simulate(TrackedRensaInfo& trackedRensaInfo, int additionalChain = 0);
     
     // Normal print for debugging purpose.
     std::string getDebugOutput() const;
