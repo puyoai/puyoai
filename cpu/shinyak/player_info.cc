@@ -150,7 +150,10 @@ void EnemyInfo::updatePossibleRensas(const Field& field, const vector<KumiPuyo>&
         results.push_back(BasicRensaInfo(chains, score, frames));
     }
 
-    sort(results.begin(), results.end(), SortByFrames());
+    if (results.empty())
+        return;
+
+    sort(results.begin(), results.end(), SortByFrames());    
     m_possibleRensaInfos.push_back(results.front());
 
     for (vector<BasicRensaInfo>::iterator it = results.begin(); it != results.end(); ++it) {

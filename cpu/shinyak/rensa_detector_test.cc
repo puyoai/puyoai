@@ -30,7 +30,7 @@ TEST(RensaDetectorTest, FindRensaTest)
     EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(3, PuyoSet(0, 0, 1, 0))));
 }
 
-TEST(RensaDetectorTest, FindPossibleRensas)
+TEST(RensaDetectorTest, FindPossibleRensas1)
 {
     Field f("450000"
             "445000"

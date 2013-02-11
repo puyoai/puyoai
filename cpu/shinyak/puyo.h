@@ -23,8 +23,10 @@ inline PuyoColor puyoColorOf(char c)
 {
     switch (c) {
     case '0':
+    case ' ':
         return EMPTY;
     case '1':
+    case 'O': // not zero
         return OJAMA;
     case '2':
         return WALL;
