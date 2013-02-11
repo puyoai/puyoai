@@ -270,17 +270,16 @@ TEST(FieldTest, TrackedFieldSimulation)
             "445667"
             "556774");
 
-    
-    BasicRensaInfo rensaInfo;
-    TrackResult trackResult;
-    f.simulateAndTrack(rensaInfo, trackResult);
 
-    EXPECT_EQ(rensaInfo.chains, 5);
-    EXPECT_EQ(trackResult.erasedAt(1, 2), 1);
-    EXPECT_EQ(trackResult.erasedAt(1, 1), 2);
-    EXPECT_EQ(trackResult.erasedAt(3, 3), 3);
-    EXPECT_EQ(trackResult.erasedAt(5, 3), 4);
-    EXPECT_EQ(trackResult.erasedAt(5, 4), 5);
+    TrackedRensaInfo trackedRensaInfo;
+    f.simulate(trackedRensaInfo);
+
+    EXPECT_EQ(trackedRensaInfo.rensaInfo.chains, 5);
+    EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(1, 2), 1);
+    EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(1, 1), 2);
+    EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(3, 3), 3);
+    EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(5, 3), 4);
+    EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(5, 4), 5);
 }
 
 TEST(FieldTest, DropKumiPuyoExtreme)

@@ -74,6 +74,8 @@ private:
     TrackResult& m_result;
 };
 
+
+
 void Field::initialize()
 {
     // Initialize field information.
@@ -427,14 +429,14 @@ void Field::simulate(BasicRensaInfo& rensaInfo, int additionalChain)
     simulateWithStrategy(rensaInfo, strategy);
 }
 
-void Field::simulateAndTrack(BasicRensaInfo& rensaInfo, TrackResult& trackResult)
+void Field::simulate(TrackedRensaInfo& trackedRensaInfo, int additionalChain)
 {
-    rensaInfo.score = 0;
-    rensaInfo.chains = 1;
-    rensaInfo.frames = 0;
+    trackedRensaInfo.rensaInfo.score = 0;
+    trackedRensaInfo.rensaInfo.chains = 1 + additionalChain;
+    trackedRensaInfo.rensaInfo.frames = 0;
 
-    RensaTrackingStrategy strategy(trackResult);
-    simulateWithStrategy(rensaInfo, strategy);
+    RensaTrackingStrategy strategy(trackedRensaInfo.trackResult);
+    simulateWithStrategy(trackedRensaInfo.rensaInfo, strategy);
 }
 
 template<typename Strategy>
