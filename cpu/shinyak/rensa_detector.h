@@ -10,18 +10,33 @@ class Field;
 
 class RensaDetector {
 public:
-    // 現在のフィールドから発火可能な連鎖を列挙する。
-    static void findRensas(std::vector<PossibleRensaInfo>& result, const Field&, const PuyoSet& additionalPuyoSet = PuyoSet());
-
-    // Before calling findRensa, adding some puyos (numMaxAddedPuyo) is allowed. 
-    static void findPossibleRensas(std::vector<PossibleRensaInfo>& result, const Field&, int numMaxAddedPuyo);
-
-    // 与えられた組ぷよだけを使って発火可能な連鎖を求める
-    static void findFeasibleRensas(std::vector<FeasibleRensaInfo>& result, const Field&, int numKumiPuyo, const std::vector<KumiPuyo>& kumiPuyos);
+    // Finds possible rensas from the specified field.
+    // We might add extra puyos before finding rensas.
+    static void findPossibleRensas(std::vector<PossibleRensaInfo>& result,
+                                   const Field&, 
+                                   int numExtraAddedPuyos = 0,
+                                   const PuyoSet& additionalPuyoSet = PuyoSet());
+    static void findPossibleRensas(std::vector<TrackedPossibleRensaInfo>& result,
+                                   const Field&,
+                                   int numExtraAddedPuyos = 0,
+                                   const PuyoSet& additionalPuyoSet = PuyoSet());
 
     // 連鎖を再帰的に打つことで可能な連鎖を求める。不可能な連鎖も列挙されてしまうはず。
     // TODO: 不可能な連鎖を列挙させない方法を考える。
-    static void findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result, const Field&, int maxIteration, int additionalChain = 0, PuyoSet additionalPuyoSet = PuyoSet());
+    // We don't have a tracked-version for this method.
+    static void findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result,
+                                                 const Field&,
+                                                 int maxIteration,
+                                                 int additionalChain = 0,
+                                                 PuyoSet additionalPuyoSet = PuyoSet());
+
+    // Finds feasible rensas.
+    // Feasible rensa means a rensa which can be fired using the specified Kumipuyos.
+    // We don't have a tracked-version for this method.
+    static void findFeasibleRensas(std::vector<FeasibleRensaInfo>& result,
+                                   const Field&,
+                                   int numKumiPuyo,
+                                   const std::vector<KumiPuyo>& kumiPuyos);
 };
 
 #endif 

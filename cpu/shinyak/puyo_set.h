@@ -90,6 +90,11 @@ public:
         return lhs.toInt() == rhs.toInt();
     }
 
+    friend bool operator!=(PuyoSet lhs, PuyoSet rhs)
+    {
+        return lhs.toInt() != rhs.toInt();
+    }
+
 private:
     int toInt() const
     {
