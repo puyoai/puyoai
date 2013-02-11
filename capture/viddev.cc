@@ -45,7 +45,8 @@ void showCurrentInput(int fd) {
     exit(EXIT_FAILURE);
   }
 
-  fprintf(stderr, "Current input: %s @%d\n", input.name, input_index);
+  fprintf(stderr, "Current input: %s @%d type=%u audioset=%u\n",
+          input.name, input_index, input.type, input.audioset);
 }
 
 void adjustStandard(int fd) {
@@ -87,6 +88,18 @@ void adjustStandard(int fd) {
   }
 }
 
+void showCurrentAudio(int fd) {
+  struct v4l2_audio audio;
+  if (v4l2_ioctl(fd, VIDIOC_G_AUDIO, &audio) < 0) {
+    perror("v4l2_ioctl VIDIOC_G_AUDIO");
+    exit(EXIT_FAILURE);
+  }
+
+  fprintf(stderr, "Current audio: %s @%u capability=%u mode=%u\n",
+          audio.name, audio.index, audio.capability, audio.mode);
+}
+
+
 }  // anonymous namespace
 
 VidDev::VidDev(const char* dev) {
@@ -125,6 +138,8 @@ VidDev::VidDev(const char* dev) {
   showCurrentInput(fd_);
 
   adjustStandard(fd_);
+
+  showCurrentAudio(fd_);
 
   initBuffers();
 
