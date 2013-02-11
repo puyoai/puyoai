@@ -5,6 +5,23 @@
 #include "field.h"
 #include "puyo_set.h"
 
+struct BasicRensaInfo {
+    BasicRensaInfo() 
+        : chains(0), score(0), frames(0) {}
+    BasicRensaInfo(int chains, int score, int frames)
+        : chains(chains), score(score), frames(frames) {}
+
+    std::string toString() const {
+        char buf[80];
+        sprintf(buf, "chains, score, frames = %d, %d, %d", chains, score, frames);
+        return buf;
+    }
+
+    int chains;
+    int score;
+    int frames;
+};
+
 class TrackResult {
     friend class TrackingStrategy;
 public:
@@ -21,23 +38,6 @@ public:
     }
 
     byte m_erasedAt[Field::MAP_WIDTH][Field::MAP_HEIGHT];
-};
-
-struct BasicRensaInfo {
-    BasicRensaInfo() 
-        : chains(0), score(0), frames(0) {}
-    BasicRensaInfo(int chains, int score, int frames)
-        : chains(chains), score(score), frames(frames) {}
-
-    std::string toString() const {
-        char buf[80];
-        sprintf(buf, "chains, score, frames = %d, %d, %d", chains, score, frames);
-        return buf;
-    }
-
-    int chains;
-    int score;
-    int frames;
 };
 
 struct TrackedRensaInfo {
@@ -61,7 +61,8 @@ struct FeasibleRensaInfoBase {
 };
 
 typedef FeasibleRensaInfoBase<BasicRensaInfo> FeasibleRensaInfo;
-typedef FeasibleRensaInfoBase<TrackedRensaInfo> TrackedFeasibleRensaInfo;
+// Currently we don't use TrackedFeasibleRensaInfo.
+// typedef FeasibleRensaInfoBase<TrackedRensaInfo> TrackedFeasibleRensaInfo;
 
 // ある状態のフィールドから、いくつかのぷよを追加することで発火することが可能な連鎖
 template<typename RensaInfo>

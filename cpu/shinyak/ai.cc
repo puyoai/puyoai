@@ -214,7 +214,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
 
     int maxChains = 0;
     vector<PossibleRensaInfo> rensaInfos;
-    RensaDetector::findRensas(rensaInfos, plan.field());
+    RensaDetector::findPossibleRensas(rensaInfos, plan.field());
     for (vector<PossibleRensaInfo>::iterator it = rensaInfos.begin(); it != rensaInfos.end(); ++it)
         maxChains = std::max(it->rensaInfo.chains, maxChains);
 
