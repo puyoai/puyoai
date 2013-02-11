@@ -26,9 +26,9 @@ sudo make install
 
 
 If you are using PCA-DAV2, you need recent kernel (my kernel is 3.6.11,
-and it didn't work with 2.x) and run modprobe with card=19 option:
+and it didn't work with 2.x) and run modprobe with card=29 option:
 
-$ sudo modprobe em28xx card=19
+$ sudo modprobe em28xx card=29
 
 As resolution negotiation isn't implemented yet, you need to run
 
