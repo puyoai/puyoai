@@ -1,6 +1,5 @@
-peria_cpu
-kaeru_cpu
 shinyak_cpu
+shinyak_cpu.*
 *.d
 *_test
 Player1.txt
