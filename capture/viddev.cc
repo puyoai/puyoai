@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -231,8 +232,28 @@ void VidDev::initBuffers() {
 }
 
 SDL_Surface* VidDev::getNextFrame() {
+  int r;
+  do {
+    fd_set fds;
+    FD_ZERO(&fds);
+    FD_SET(fd_, &fds);
+    struct timeval tv;
+    tv.tv_sec = 2;
+    tv.tv_usec = 0;
+    //tv.tv_usec = 5000;
+    r = select(fd_ + 1, &fds, NULL, NULL, &tv);
+  } while (r < 0 && errno == EINTR);
+  if (r == 0) {
+    perror("select timeout");
+    exit(EXIT_FAILURE);
+  }
+  if (r < 0) {
+    perror("select");
+    exit(EXIT_FAILURE);
+  }
+
   struct v4l2_buffer buffer;
-  memset(&buffer, 0, sizeof (buffer));
+  memset(&buffer, 0, sizeof(buffer));
   buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   buffer.memory = V4L2_MEMORY_MMAP;
 
@@ -242,6 +263,10 @@ SDL_Surface* VidDev::getNextFrame() {
   }
 
   const Buffer& buf = buffers_[buffer.index];
+#if 0
+  static int cnt = 0;
+  fprintf(stderr, "%d %d\n", cnt++, buffer.index);
+#endif
 
   if (v4l2_ioctl(fd_, VIDIOC_QBUF, &buffer) < 0) {
     perror("VIDIOC_QBUF");
