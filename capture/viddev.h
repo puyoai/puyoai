@@ -19,10 +19,15 @@ class VidDev : public Source {
     SDL_Surface* surface;
   };
 
+  void init();
   void initBuffers();
 
+  void quit();
+
+  const char* dev_;
   int fd_;
   Buffer* buffers_;
+  size_t buf_cnt_;
 };
 
 #endif  // CAPTURE_VIDDEV_H_
