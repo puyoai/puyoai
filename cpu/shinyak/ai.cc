@@ -15,8 +15,8 @@
 #include "field_evaluator.h"
 #include "game.h"
 #include "puyo.h"
-#include "rensainfo.h"
 #include "rensa_detector.h"
+#include "rensa_info.h"
 #include "score.h"
 
 using namespace std;

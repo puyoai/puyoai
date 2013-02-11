@@ -5,7 +5,7 @@
 #include "field.h"
 #include "plan.h"
 #include "rensa_detector.h"
-#include "rensainfo.h"
+#include "rensa_info.h"
 
 using namespace std;
 

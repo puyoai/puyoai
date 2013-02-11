@@ -5,7 +5,7 @@
 
 #include "../../core/constant.h"
 #include "plan.h"
-#include "rensainfo.h"
+#include "rensa_info.h"
 
 using namespace std;
 

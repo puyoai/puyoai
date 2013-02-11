@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "rensainfo.h"
+#include "rensa_info.h"
 
 class KumiPuyo;
 

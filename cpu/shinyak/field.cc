@@ -15,7 +15,7 @@
 #include "field_column_bit_field.h"
 #include "score.h"
 #include "plan.h"
-#include "rensainfo.h"
+#include "rensa_info.h"
 
 using namespace std;
 
