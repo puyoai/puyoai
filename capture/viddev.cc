@@ -103,8 +103,13 @@ void showCurrentAudio(int fd) {
 
 }  // anonymous namespace
 
-VidDev::VidDev(const char* dev) {
-  fd_ = v4l2_open(dev, O_RDWR);
+VidDev::VidDev(const char* dev)
+  : dev_(dev) {
+  init();
+}
+
+void VidDev::init() {
+  fd_ = v4l2_open(dev_, O_RDWR);
   if (fd_ < 0) {
     perror("v4l2_open");
     exit(EXIT_FAILURE);
@@ -148,7 +153,20 @@ VidDev::VidDev(const char* dev) {
 }
 
 VidDev::~VidDev() {
-  // TODO(hamaji): Free resource.
+  quit();
+}
+
+void VidDev::quit() {
+  int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  if (v4l2_ioctl(fd_, VIDIOC_STREAMOFF, &type) < 0) {
+    perror("v4l2_ioctl VIDIOC_STREAMOFF");
+    exit(EXIT_FAILURE);
+  }
+  v4l2_close(fd_);
+  for (size_t i = 0; i < buf_cnt_; i++) {
+    munmap(buffers_[i].start, buffers_[i].length);
+  }
+  free(buffers_);
 }
 
 void VidDev::initBuffers() {
@@ -174,6 +192,7 @@ void VidDev::initBuffers() {
     exit(EXIT_FAILURE);
   }
 
+  buf_cnt_ = reqbuf.count;
   buffers_ = (Buffer*)calloc(reqbuf.count, sizeof(*buffers_));
   assert(buffers_ != NULL);
 
@@ -238,15 +257,20 @@ SDL_Surface* VidDev::getNextFrame() {
     FD_ZERO(&fds);
     FD_SET(fd_, &fds);
     struct timeval tv;
-    tv.tv_sec = 2;
-    tv.tv_usec = 0;
-    //tv.tv_usec = 5000;
+    //tv.tv_sec = 2;
+    //tv.tv_usec = 0;
+    tv.tv_sec = 0;
+    tv.tv_usec = 100000;
     r = select(fd_ + 1, &fds, NULL, NULL, &tv);
+
+    if (r == 0) {
+      perror("select timeout");
+      errno = 0;
+      quit();
+      init();
+      continue;
+    }
   } while (r < 0 && errno == EINTR);
-  if (r == 0) {
-    perror("select timeout");
-    exit(EXIT_FAILURE);
-  }
   if (r < 0) {
     perror("select");
     exit(EXIT_FAILURE);
