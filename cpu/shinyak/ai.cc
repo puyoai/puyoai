@@ -15,6 +15,7 @@
 #include "field_evaluator.h"
 #include "game.h"
 #include "puyo.h"
+#include "puyo_possibility.h"
 #include "rensa_detector.h"
 #include "rensa_info.h"
 #include "score.h"
@@ -184,7 +185,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         // --- 1.3. 飽和したので打つしかなくなった
         // TODO: これは EnemyRensaInfo だけじゃなくて MyRensaInfo も必要なのでは……。
         // TODO: 60 個超えたら打つとかなんか間違ってるだろう。
-        if (currentField.countPuyos() >= 60) {
+        if (currentField.countPuyos() >= 56) {
             ostringstream ss;
             ss << "HOUWA " << plan.totalScore();
             LOG(INFO) << plan.decisionText() << ss.str();
@@ -213,15 +214,24 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     double emptyFieldAvailability = FieldEvaluator::calculateEmptyFieldAvailability(plan.field());
 
     int maxChains = 0;
+    double maxPossibility = 0;
     vector<PossibleRensaInfo> rensaInfos;
     RensaDetector::findPossibleRensas(rensaInfos, plan.field());
-    for (vector<PossibleRensaInfo>::iterator it = rensaInfos.begin(); it != rensaInfos.end(); ++it)
-        maxChains = std::max(it->rensaInfo.chains, maxChains);
+    for (vector<PossibleRensaInfo>::iterator it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
+        if (maxChains < it->rensaInfo.chains) {
+            maxChains = it->rensaInfo.chains;
+            maxPossibility = TsumoPossibility::possibility(3, it->necessaryPuyoSet);
+        } else if (maxChains == it->rensaInfo.chains) {
+            double possibility = TsumoPossibility::possibility(3, it->necessaryPuyoSet);
+            maxPossibility = max(possibility, maxPossibility);
+        }
+    }
 
     int colorPuyoNum = plan.field().countColorPuyos();
     double fieldScore = FieldEvaluator::calculateConnectionScore(plan.field());
     double fieldHeightScore = FieldEvaluator::calculateFieldHeightScore(plan.field());
     double frameScore = 1.0 / plan.totalFrames();
+    double possibilityScore = maxPossibility * 2;
     if (plan.totalFrames() >= 55)
         frameScore = 0;
 
@@ -230,15 +240,17 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         + maxChains
         + fieldScore / 30
         + fieldHeightScore
-        + frameScore;
+        + frameScore
+        + possibilityScore;
     
     char buf[160];
-    sprintf(buf, "eval-score: %f %d %f %f %f : = %f : %d : %d : %d",
+    sprintf(buf, "eval-score: %f %d %f %f %f %f : = %f : %d : %d : %d",
             emptyFieldAvailability / (78 - colorPuyoNum),
             maxChains,
             fieldScore / 30,
             fieldHeightScore,
             frameScore,
+            possibilityScore,
             finalScore,
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames()),
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames() + 50),
