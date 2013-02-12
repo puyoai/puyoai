@@ -50,6 +50,20 @@ TEST(PerformanceTest, Simulate_Filled)
     cout << "variance: " << variance << endl;
 }
 
+TEST(PerformanceTest, Simulate_Filled_Track)
+{
+    for (int i = 0; i < 100000; i++) {
+        Tsc tsc("Simulate_Filled_Track");
+        Field f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
+        TrackedRensaInfo rensaInfo;
+        f.simulate(rensaInfo);
+    }
+    double average, variance;
+    Tsc::GetStatistics("Simulate_Filled_Track", &average, &variance);
+    cout << "average: " << average << endl;
+    cout << "variance: " << variance << endl;
+}
+
 TEST(PerformanceTest, FindPossibleRensas1)
 {
     for (int i = 0; i < 10000; i++) {
