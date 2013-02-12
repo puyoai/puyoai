@@ -13,6 +13,7 @@
 #include "core/decision.h"
 #include "ctrl.h"
 #include "drop_decision.h"
+#include "evaluation_feature.h"
 #include "field_evaluator.h"
 #include "game.h"
 #include "puyo.h"
@@ -221,37 +222,34 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         LOG(INFO) << plan.decisionText() << " " << ss.str();
         return EvalResult(-1.0, ss.str());
     }
-    
-    // 打たない場合、こちらの手を伸ばすことになるが、どのように伸ばすかが難しい。
-    // というか、自分もどう伸ばしているのか、うまく言語化できない。
-    // - 相手の本線よりもこちらが劣っていれば、本線を優先する
-    // - 相手の副砲
-    
-    // とりあえず最初は適当な評価関数でいいか……。
-    // emptyAvailability , fieldAvailability, 連鎖スコアを
-    // 最も長い連鎖をうったときに残った形の連結の具合を評価関数にしてみるか……
+
+    EvaluationFeature feature;
 
     double emptyFieldAvailability = FieldEvaluator::calculateEmptyFieldAvailability(plan.field());
 
-    int maxChains = 0;
-    double maxPossibility = 0;
-    vector<PossibleRensaInfo> rensaInfos;
-    RensaDetector::findPossibleRensas(rensaInfos, plan.field());
-    for (vector<PossibleRensaInfo>::iterator it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (maxChains < it->rensaInfo.chains) {
-            maxChains = it->rensaInfo.chains;
-            maxPossibility = TsumoPossibility::possibility(3, it->necessaryPuyoSet);
-        } else if (maxChains == it->rensaInfo.chains) {
-            double possibility = TsumoPossibility::possibility(3, it->necessaryPuyoSet);
-            maxPossibility = max(possibility, maxPossibility);
+    {
+        int maxChains = 0;
+        int numNecessaryPuyos = 0;
+
+        vector<PossibleRensaInfo> rensaInfos;
+        RensaDetector::findPossibleRensas(rensaInfos, plan.field());
+        for (vector<PossibleRensaInfo>::iterator it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
+            if (maxChains < it->rensaInfo.chains) {
+                maxChains = it->rensaInfo.chains;
+                numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, it->necessaryPuyoSet);
+            } else if (maxChains == it->rensaInfo.chains) {
+                numNecessaryPuyos = min(numNecessaryPuyos, TsumoPossibility::necessaryPuyos(0.5, it->necessaryPuyoSet));
+            }
         }
+
+        feature.set(MAX_CHAINS, maxChains);
+        feature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
     }
 
     int colorPuyoNum = plan.field().countColorPuyos();
     double fieldScore = FieldEvaluator::calculateConnectionScore(plan.field());
     double fieldHeightScore = FieldEvaluator::calculateFieldHeightScore(plan.field());
     double frameScore = 1.0 / plan.totalFrames();
-    double possibilityScore = maxPossibility * 2;
     if (plan.totalFrames() >= 55)
         frameScore = 0;
     double handWidth = 3 * m_myPlayerInfo.mainRensaHandWidth();
@@ -275,23 +273,20 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
 
     double finalScore = 
         + emptyFieldAvailability / (78 - colorPuyoNum)
-        + maxChains
         + fieldScore / 30
         + fieldScore2 / 15
         + fieldHeightScore
         + frameScore
-        + possibilityScore
-        + handWidth;
+        + handWidth
+        + feature.calculateScore();
     
     char buf[256];
-    sprintf(buf, "eval-score: %.3f %d %.3f %.3f %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
+    sprintf(buf, "eval-score: %.3f %.3f %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
             emptyFieldAvailability / (78 - colorPuyoNum),
-            maxChains,
             fieldScore / 30,
             fieldScore2 / 15,
             fieldHeightScore,
             frameScore,
-            possibilityScore,
             handWidth,
             finalScore,
             m_myPlayerInfo.mainRensaChains(),
