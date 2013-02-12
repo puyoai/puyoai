@@ -29,6 +29,16 @@ public:
         return possibility(k, set.red(), set.blue(), set.yellow(), set.green());
     }
 
+    static int necessaryPuyos(double threshold, PuyoSet set) {
+        DCHECK(0 <= threshold && threshold < 1.0);
+        for (unsigned int k = 0; k < MAX_K; ++k) {
+            if (possibility(k, set) >= threshold)
+                return k;
+        }
+
+        return MAX_K;
+    }
+
     static void initialize();
 
 private:

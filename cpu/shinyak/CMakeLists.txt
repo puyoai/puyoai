@@ -5,7 +5,7 @@ cpu_setup("shinyak")
 puyoai_add_cxx_flags("-Wall -Wextra -std=c++0x")
 
 add_library(shinyak_lib
-            ai.cc ai_manager.cc enemy_info.cc field.cc field_evaluator.cc
+            ai.cc ai_manager.cc enemy_info.cc evaluation_feature.cc field.cc field_evaluator.cc
             game.cc plan.cc player_info.cc protocol.cc puyo_possibility.cc
              rensa_detector.cc rensa_result.cc)
 
