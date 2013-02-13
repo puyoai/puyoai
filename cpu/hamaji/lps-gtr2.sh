@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd $(dirname $0)
-./lps --use_template_array=gtr2.ta
+./lps --template_array=gtr2.ta
