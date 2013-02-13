@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "enemy_info.h"
 #include "player_info.h"
 
 class Game;
