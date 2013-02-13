@@ -7,8 +7,8 @@
 
 class TsumoPossibility {
 public:
-    static const int MAX_K = 32;
-    static const int MAX_N = 16;
+    static const unsigned int MAX_K = 32;
+    static const unsigned int MAX_N = 16;
     typedef double (*PossibilityArrayPtr)[MAX_N][MAX_N][MAX_N][MAX_N];
 
     // RED, BLUE, YELLOW, GREEN をそれぞれ少なくとも a, b, c, d 個欲しい場合に、
