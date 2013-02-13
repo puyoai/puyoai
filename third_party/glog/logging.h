@@ -13,8 +13,10 @@
 #define DCHECK(x) if ((x)) google::null_stream << ""
 #define CHECK_EQ(x, y) if((x) == (y)) google::null_stream << ""
 #define CHECK_NE(x, y) if((x) != (y)) google::null_stream << ""
-#define CHECK_GE(x, y) if((x) > (y)) google::null_stream << ""
-#define CHECK_LE(x, y) if((x) < (y)) google::null_stream << ""
+#define CHECK_GE(x, y) if((x) >= (y)) google::null_stream << ""
+#define CHECK_LE(x, y) if((x) <= (y)) google::null_stream << ""
+#define CHECK_GT(x, y) if((x) > (y)) google::null_stream << ""
+#define CHECK_LT(x, y) if((x) < (y)) google::null_stream << ""
 
 namespace google {
   void InitGoogleLogging(const char* arg0);

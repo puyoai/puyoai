@@ -1,6 +1,7 @@
 #include "rater.h"
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
