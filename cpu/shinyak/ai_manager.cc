@@ -28,7 +28,7 @@ int AIManager::runLoop()
             m_ai.initialize(game);
 
         // Update enemy info if necessary.
-        if (game.enemyHasPutPuyo())
+        if (game.state & (STATE_YOU_GROUNDED << 1))
             m_ai.enemyGrounded(game);
         if (game.state & (STATE_WNEXT_APPEARED << 1))
             m_ai.enemyWNextAppeared(game);
@@ -43,7 +43,7 @@ int AIManager::runLoop()
         if (game.shouldThink())
             needsThink = true;
 
-        if (needsThink && game.canPlay()) {
+        if (needsThink && (game.state & STATE_YOU_CAN_PLAY)) {
             DropDecision dropDecision;
             m_ai.think(dropDecision, game);
             needsThink = false;
