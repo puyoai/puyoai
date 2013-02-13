@@ -21,9 +21,6 @@ public:
     bool shouldInitialize() const;
 
     bool shouldThink() const;
-    bool canPlay() const;
-
-    bool enemyHasPutPuyo() const;
 
     const PlayerState& myPlayerState() const { return playerStates[0]; }
     const PlayerState& enemyPlayerState() const { return playerStates[1]; }
