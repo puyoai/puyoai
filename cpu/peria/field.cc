@@ -135,6 +135,8 @@ char Field::Get(int x, int y) const {
 }
 
 bool Field::IsEmpty(int x, int y) const {
+  if (x < 0 || x >= kMapWidth) return false;
+  if (y < 0 || y >= kMapHeight) return false;
   return Get(x, y) == kEmpty;
 }
 

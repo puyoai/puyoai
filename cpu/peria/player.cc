@@ -11,11 +11,12 @@
 #include "base.h"
 
 void Player::CopyFrom(const Player& player) {
-  for (int i = 1; i <= Field::kWidth; ++i) {
-    for (int j = 1; j <= Field::kHeight; ++j) {
+  for (int i = 0; i <= Field::kWidth; ++i) {
+    for (int j = 0; j <= Field::kHeight; ++j) {
       field_.Set(i, j, player.field().Get(i, j));
     }
   }
+  field_.SetColorSequence(player.field().GetColorSequence());
   state_ = player.state();
   score_ = player.score();
   ojama_ = player.ojama();
@@ -44,6 +45,20 @@ bool operator!=(const Player& a, const Player& b) {
 }
 
 void Player::Search(vector<Player>* children) const {
+  Player player;
+  player.set_score(1);
+  player.set_r(0);
+  if (field_.IsEmpty(1, Field::kHeight)) {
+    player.set_x(1);
+  } else if (field_.IsEmpty(6, Field::kHeight)) {
+    player.set_x(5);
+  } else {
+    player.set_x(3);
+  }
+  children->push_back(player);
+  return;
+
+
   vector<Control> controls;
   SearchControls(x_, y_, r_, &controls);
   for (size_t i = 0; i < controls.size(); ++i) {
