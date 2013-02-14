@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("shinyak")
 
-puyoai_add_cxx_flags("-Wall -Wextra")
+puyoai_add_cxx_flags("-Wall -Wextra -std=c++0x")
 
 add_library(shinyak_lib
             ai.cc ai_manager.cc ctrl.cc enemy_info.cc field.cc field_evaluator.cc
