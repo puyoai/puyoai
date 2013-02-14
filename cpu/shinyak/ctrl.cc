@@ -4,6 +4,7 @@
 #include <string>
 
 #include "decision.h"
+#include "field.h"
 
 using namespace std;
 

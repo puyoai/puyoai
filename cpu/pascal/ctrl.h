@@ -1,16 +1,12 @@
 #ifndef __CTRL_H__
 #define __CTRL_H__
 
-#include "core/field.h"
 #include <string>
 #include <stdio.h>
 #include <vector>
 
-/*
-enum Key {
-  KEY_NONE = 0, KEY_UP = 1, KEY_RIGHT = 2, KEY_DOWN = 3, KEY_LEFT = 4, KEY_RIGHT_TURN = 5, KEY_LEFT_TURN = 6
-};
-*/
+#include "core/field.h"
+#include "core/key.h"
 
 class KeyTuple {
  public:
