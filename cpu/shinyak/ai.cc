@@ -125,6 +125,8 @@ void AI::decide(DropDecision& dropDecision, const Game& game)
 
 EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentField) const
 {
+    // TODO: AI は全消しを理解するべき
+
     if (m_enemyInfo.rensaIsOngoing() && m_enemyInfo.ongoingRensaInfo().rensaInfo.score > scoreForOjama(6)) {
         // If we have a firable plan before the enemy Rensa has been finished, we would like to
         // use it for parry (TAIOH).
@@ -138,6 +140,8 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
             LOG(INFO) << plan.decisionText() << " TAIOU";
             return EvalResult(70.0 + plan.totalScore() / 1000000.0, "TAIOU");
         }
+
+        // TODO: ちょっとぐらい負けていても、食らうぐらいなら対応を打ったほうが良い場合がある
 
         // TODO: 割とどうしようもない場合に高く積むというルーチンを持つべき
     }
@@ -244,7 +248,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         + possibilityScore;
     
     char buf[160];
-    sprintf(buf, "eval-score: %f %d %f %f %f %f : = %f : %d : %d : %d",
+    sprintf(buf, "eval-score: %.3f %d %.3f %.3f %.3f %.3f : = %.3f : %d : %d : %d",
             emptyFieldAvailability / (78 - colorPuyoNum),
             maxChains,
             fieldScore / 30,

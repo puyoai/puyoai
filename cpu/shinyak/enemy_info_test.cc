@@ -1,4 +1,4 @@
-#include "player_info.h"
+#include "enemy_info.h"
 
 #include <gtest/gtest.h>
 #include "puyo.h"
