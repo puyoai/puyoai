@@ -4,8 +4,8 @@
 // - Field::Set() and Field::Get() are defined.
 // - EMPTY must be zero.
 
-#ifndef FIELD_UTIL_H_
-#define FIELD_UTIL_H_
+#ifndef UTIL_FIELD_UTIL_H_
+#define UTIL_FIELD_UTIL_H_
 
 #include <string>
 #include <glog/logging.h>
@@ -49,4 +49,4 @@ void GetRensimQueryString(const Field& f, string* out) {
   }
 }
 
-#endif  // FIELD_UTIL_H_
+#endif  // UTIL_FIELD_UTIL_H_
