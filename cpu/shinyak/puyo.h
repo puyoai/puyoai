@@ -4,17 +4,8 @@
 #include <glog/logging.h>
 #include <string>
 #include <vector>
+#include "core/puyo.h"
 #include "util.h"
-
-enum PuyoColor {
-    EMPTY = 0,
-    OJAMA = 1,
-    WALL = 2,
-    RED = 4,
-    BLUE = 5,
-    YELLOW = 6,
-    GREEN = 7,
-};
 
 const int NUM_NORMAL_PUYO_COLORS = 4;
 inline PuyoColor normalPuyoColorOf(int index) { return static_cast<PuyoColor>(index + 4); }

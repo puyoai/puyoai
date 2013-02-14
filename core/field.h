@@ -6,22 +6,13 @@
 
 #include "core/constant.h"
 #include "core/decision.h"
+#include "core/puyo.h"
 
 class Plan;
 
-enum Colors {
-  EMPTY = 0,
-  OJAMA = 1,
-  WALL = 2,
-  RED = 4,
-  BLUE = 5,
-  YELLOW = 6,
-  GREEN = 7,
-
-  // If this flag is turned on, we don't need to check the cell for vanishment
-  // anymore.
-  MASK_CHECKED = 0x80,
-};
+// If this flag is turned on, we don't need to check the cell for vanishment
+// anymore.
+const int MASK_CHECKED = 0x80;
 
 class Field {
  public:
@@ -50,6 +41,7 @@ class Field {
   void Set(int x, int y, char color);
 
   // Get a color of puyo at a specified position.
+  // TODO: Returning char seems weird. PuyoColor should be returned instead.
   char Get(int x, int y) const;
 
   // Vanish puyos, and adds score. The argument "chains" is used to calculate
