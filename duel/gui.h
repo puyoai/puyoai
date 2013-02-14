@@ -2,8 +2,7 @@
 #define DUEL_GUI_H_
 
 #include <string>
-
-#include "core/field.h"
+#include "core/key.h"
 
 class FieldRealtime;
 

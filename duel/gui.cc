@@ -19,6 +19,7 @@
 
 #include "SDL_kanji.h"
 #include "commentator.h"
+#include "core/key.h"
 #include "field_realtime.h"
 #include "screen.h"
 

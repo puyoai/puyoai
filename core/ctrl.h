@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <vector>
 
-#include "core/field.h"
+#include "core/key.h"
+class Decision;
+class Field;
 
 class KeyTuple {
  public:

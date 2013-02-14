@@ -6,6 +6,7 @@
 
 #include "core/decision.h"
 #include "core/field.h"
+#include "core/key.h"
 
 enum GameResult {
   PLAYING = -1,

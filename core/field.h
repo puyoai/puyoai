@@ -23,16 +23,6 @@ enum Colors {
   MASK_CHECKED = 0x80,
 };
 
-enum Key {
-  KEY_NONE,
-  KEY_UP,
-  KEY_RIGHT,
-  KEY_DOWN,
-  KEY_LEFT,
-  KEY_RIGHT_TURN,
-  KEY_LEFT_TURN,
-};
-
 class Field {
  public:
   static const int WIDTH = 6;
