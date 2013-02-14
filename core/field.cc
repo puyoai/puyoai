@@ -8,6 +8,7 @@
 #include <cassert>
 
 #include "core/ctrl.h"
+#include "core/decision.h"
 #include "core/plan.h"
 
 using namespace std;

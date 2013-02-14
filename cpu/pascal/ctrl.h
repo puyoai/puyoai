@@ -7,6 +7,7 @@
 
 #include "core/field.h"
 #include "core/key.h"
+class Decision;
 
 class KeyTuple {
  public:

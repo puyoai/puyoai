@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 
+#include "core/decision.h"
 #include "core/field.h"
 #include "core/ctrl.h"
 
