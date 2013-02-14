@@ -56,7 +56,7 @@ public:
         m_green = m_green < set.m_green ? 0 : m_green - set.m_green;
     }
 
-    void add(PuyoColor c, int n)
+    void add(PuyoColor c, int n = 1)
     {
         switch (c) {
         case RED:
