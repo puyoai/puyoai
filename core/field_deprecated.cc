@@ -1,6 +1,7 @@
 #include "core/field_deprecated.h"
 
 #include <vector>
+#include "core/decision.h"
 
 using namespace std;
 

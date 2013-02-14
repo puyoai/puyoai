@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "core/constant.h"
-#include "core/decision.h"
 #include "core/puyo.h"
 
 class Plan;
