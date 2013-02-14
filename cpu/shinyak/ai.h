@@ -31,6 +31,7 @@ public:
     void initialize(const Game&);
 
     void think(DropDecision& result, const Game&);
+    void wnextAppeared(const Game&);
     void myRensaFinished(const Game&);
     void myOjamaDropped(const Game&);
 

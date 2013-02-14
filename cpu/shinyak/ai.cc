@@ -57,14 +57,30 @@ void AI::think(DropDecision& dropDecision, const Game& game)
         m_myPlayerInfo.puyoDropped(dropDecision.decision(), game.myPlayerState().kumiPuyos[0]);
 }
 
+void AI::wnextAppeared(const Game& game)
+{
+    // Since the current puyo is moving
+    vector<KumiPuyo> kumiPuyos(game.myPlayerState().kumiPuyos.begin() + 1,
+                               game.myPlayerState().kumiPuyos.end());
+    m_myPlayerInfo.updateMainRensa(kumiPuyos);
+}
+
 void AI::myRensaFinished(const Game& game)
 {
     m_myPlayerInfo.rensaFinished(game.myPlayerState().field);
+
+    vector<KumiPuyo> kumiPuyos(game.myPlayerState().kumiPuyos.begin(),
+                               game.myPlayerState().kumiPuyos.begin() + 2);
+    m_myPlayerInfo.updateMainRensa(kumiPuyos);
 }
 
 void AI::myOjamaDropped(const Game& game)
 {
     m_myPlayerInfo.ojamaDropped(game.myPlayerState().field);
+
+    vector<KumiPuyo> kumiPuyos(game.myPlayerState().kumiPuyos.begin(),
+                               game.myPlayerState().kumiPuyos.begin() + 2);
+    m_myPlayerInfo.updateMainRensa(kumiPuyos);
 }
 
 void AI::enemyWNextAppeared(const Game& game)
@@ -248,8 +264,8 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         + frameScore
         + possibilityScore;
     
-    char buf[160];
-    sprintf(buf, "eval-score: %.3f %d %.3f %.3f %.3f %.3f : = %.3f : %d : %d : %d",
+    char buf[256];
+    sprintf(buf, "eval-score: %.3f %d %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
             emptyFieldAvailability / (78 - colorPuyoNum),
             maxChains,
             fieldScore / 30,
@@ -257,6 +273,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
             frameScore,
             possibilityScore,
             finalScore,
+            m_myPlayerInfo.mainRensaChains(),
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames()),
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames() + 50),
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames() + 100));

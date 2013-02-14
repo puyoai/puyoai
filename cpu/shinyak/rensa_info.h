@@ -2,8 +2,12 @@
 #define __RENSA_INFO_H_
 
 #include <string>
+#include <sstream>
+#include <iomanip>
 #include "field.h"
 #include "puyo_set.h"
+
+// TODO(mayah): These RensaInfo is difficult to use sometimes. Refactoring is desired.
 
 struct BasicRensaInfo {
     BasicRensaInfo() 
@@ -35,6 +39,17 @@ public:
         }
 
         return *this;
+    }
+
+    std::string toString() {
+        std::ostringstream ss;
+        for (int y = Field::HEIGHT; y >= 1; --y) {
+            for (int x = 1; x <= Field::WIDTH; ++x)
+                ss << std::setw(3) << static_cast<int>(m_erasedAt[x][y]);
+            ss << '\n';
+        }
+
+        return ss.str();
     }
 
     byte m_erasedAt[Field::MAP_WIDTH][Field::MAP_HEIGHT];
