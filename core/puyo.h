@@ -1,7 +1,7 @@
 #ifndef CORE_PUYO_H_
 #define CORE_PUYO_H_
 
-enum Colors {
+enum PuyoColor {
   EMPTY = 0,
   OJAMA = 1,
   WALL = 2,
@@ -11,6 +11,9 @@ enum Colors {
   GREEN = 7,
 };
 
-typedef Colors PuyoColor;
+typedef unsigned char Puyo;
+
+// For backward compatibility
+typedef PuyoColor Colors;
 
 #endif

@@ -62,16 +62,6 @@ inline bool isColorPuyo(PuyoColor color)
     return RED <= color && color <= GREEN;
 }
 
-class Puyo {
-public:
-    Puyo(PuyoColor color = EMPTY) : m_color(static_cast<byte>(color)) {}
-
-    PuyoColor color() const { return static_cast<PuyoColor>(m_color); }
-
-private:
-    byte m_color;
-};
-
 class KumiPuyo {
 public:
     KumiPuyo() : axis(EMPTY), child(EMPTY) {}
