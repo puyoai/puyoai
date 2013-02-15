@@ -105,15 +105,15 @@ TEST(CtrlTest, climbStairsLeft) {
 TEST(CtrlTest, simpleMove) {
   Field f;
   vector<KeyTuple> ret;
-  Ctrl::getControlOnline(f, KumipuyoPos(3, 1, 0), KumipuyoPos::INIT, &ret);
+  Ctrl::getControlOnline(f, KumipuyoPos(3, 1, 0), KumipuyoPos::InitialPos(), &ret);
   EXPECT_EQ("v", Ctrl::buttonsDebugString(ret));
-  Ctrl::getControlOnline(f, KumipuyoPos(2, 1, 0), KumipuyoPos::INIT, &ret);
+  Ctrl::getControlOnline(f, KumipuyoPos(2, 1, 0), KumipuyoPos::InitialPos(), &ret);
   EXPECT_EQ("<,v", Ctrl::buttonsDebugString(ret));
-  Ctrl::getControlOnline(f, KumipuyoPos(5, 1, 0), KumipuyoPos::INIT, &ret);
+  Ctrl::getControlOnline(f, KumipuyoPos(5, 1, 0), KumipuyoPos::InitialPos(), &ret);
   EXPECT_EQ(">,>,v", Ctrl::buttonsDebugString(ret));
-  Ctrl::getControlOnline(f, KumipuyoPos(6, 1, 2), KumipuyoPos::INIT, &ret);
+  Ctrl::getControlOnline(f, KumipuyoPos(6, 1, 2), KumipuyoPos::InitialPos(), &ret);
   EXPECT_EQ(">,>,>,B,B,v", Ctrl::buttonsDebugString(ret));
-  Ctrl::getControlOnline(f, KumipuyoPos(1, 1, 2), KumipuyoPos::INIT, &ret);
+  Ctrl::getControlOnline(f, KumipuyoPos(1, 1, 2), KumipuyoPos::InitialPos(), &ret);
   EXPECT_EQ("<,<,A,A,v", Ctrl::buttonsDebugString(ret));
   Ctrl::getControlOnline(f, KumipuyoPos(6, 1, 0), KumipuyoPos(1, 1, 2), &ret);
   EXPECT_EQ("B,B,>,>,>,>,>,v", Ctrl::buttonsDebugString(ret));
@@ -146,8 +146,8 @@ TEST(CtrlTest, wallAboveScreen) {
           "000000"
           "000000"
           "000000");
-  EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(1, 1, 0), KumipuyoPos::INIT));
-  EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(5, 1, 0), KumipuyoPos::INIT));
+  EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(1, 1, 0), KumipuyoPos::InitialPos()));
+  EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(5, 1, 0), KumipuyoPos::InitialPos()));
 }
 
 TEST(CtrlTest, foobar) {
@@ -184,8 +184,8 @@ TEST(CtrlTest, pivotCannotClimbUpTo14) {
           "000000"
           "000000"
           "000000");
-  EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(1, 1, 0), KumipuyoPos::INIT));
-  EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(5, 1, 0), KumipuyoPos::INIT));
+  EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(1, 1, 0), KumipuyoPos::InitialPos()));
+  EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(5, 1, 0), KumipuyoPos::InitialPos()));
 }
 
 TEST(CtrlTest, isReachable) {
