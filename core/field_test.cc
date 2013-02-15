@@ -81,6 +81,7 @@ TEST(FieldTest, FramesTest) {
   }
 }
 
+#if 0
 TEST(FieldTest, FindAvailablePlansTest) {
   {
     Field f;
@@ -123,3 +124,4 @@ TEST(FieldTest, FindAvailablePlansTest) {
     EXPECT_EQ(22 + 22*22 + 22*22*11, plans.size());
   }
 }
+#endif

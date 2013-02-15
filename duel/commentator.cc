@@ -487,7 +487,7 @@ void Commentator::run() {
     vector<Plan> plans;
     int depth = (f->GetColorSequence().size() - 1) / 2;
     if (depth > 0)
-      f->FindAvailablePlans(depth, &plans);
+      FindAvailablePlans(*f, depth, &plans);
 
     float best_score = 200;
     Plan* best_plan = NULL;
