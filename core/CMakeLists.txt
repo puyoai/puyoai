@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 include_directories(..)
 
 add_library(puyoai_core STATIC
-            ctrl.cc decision.cc field.cc
+            ctrl.cc field.cc
             field_deprecated.cc plan.cc state.cc)
 
 function(puyoai_core_add_test target)
