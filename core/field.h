@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "core/basic_field.h"
 #include "core/constant.h"
 #include "core/puyo.h"
 
@@ -13,12 +14,8 @@ class Plan;
 // anymore.
 const int MASK_CHECKED = 0x80;
 
-class Field {
+class Field : public BasicField {
  public:
-  static const int WIDTH = 6;
-  static const int HEIGHT = 12;
-  static const int MAP_WIDTH = 1 + WIDTH + 1;
-  static const int MAP_HEIGHT = 1 + HEIGHT + 3;
   static const int ERASE_NUM = 4;
   static const int COLORS = 8;
 
@@ -91,7 +88,6 @@ class Field {
                                   std::vector<Plan>* plans) const;
   void Drop(int* frames);
 
-  unsigned char field_[MAP_WIDTH][MAP_HEIGHT];
   bool erased_;
   std::string color_sequence_;
 };

@@ -32,7 +32,7 @@ public:
     Field(const Field&);
 
     // Get a color of puyo at a specified position.
-    PuyoColor color(int x, int y) const { return m_field[x][y].color(); }
+    PuyoColor color(int x, int y) const { return static_cast<PuyoColor>(m_field[x][y]); }
     // Returns the height of the specified column.
     int height(int x) const { return m_heights[x]; }
 
