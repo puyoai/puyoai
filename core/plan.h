@@ -20,4 +20,14 @@ class Plan {
   int ojama;
 };
 
+inline int Plan::numTurns() const {
+  const Plan* p = this;
+  int n = 0;
+  while (p) {
+    p = p->parent;
+    n++;
+  }
+  return n;
+}
+
 #endif  // CORE_PLAN_H_
