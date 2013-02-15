@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "../../core/decision.h"
-#include "../../core/field.h"
+#include "core/decision.h"
+#include "core/puyo.h"
 
 #include "base.h"
 

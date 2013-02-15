@@ -13,6 +13,10 @@
 
 using namespace std;
 
+// If this flag is turned on, we don't need to check the cell for vanishment
+// anymore.
+static const int MASK_CHECKED = 0x80;
+
 char Field::GetNextPuyo(int n) const {
   assert(!color_sequence_.empty());
   int len = color_sequence_.length();

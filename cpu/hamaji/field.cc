@@ -10,10 +10,14 @@
 #include <sstream>
 #include <string>
 
-
 #include <glog/logging.h>
 
+#include "core/constant.h"
 #include "ctrl.h"
+
+// If this flag is turned on, we don't need to check the cell for vanishment
+// anymore.
+static const int MASK_CHECKED = 0x80;
 
 using namespace std;
 
