@@ -8,9 +8,9 @@
 #include <string>
 #include <cassert>
 
-#include "../../core/constant.h"
+#include "core/constant.h"
+#include "core/decision.h"
 #include "ctrl.h"
-#include "decision.h"
 #include "field_bit_field.h"
 #include "field_column_bit_field.h"
 #include "score.h"

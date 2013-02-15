@@ -1,6 +1,6 @@
 #include "protocol.h"
 
-#include "decision.h"
+#include "drop_decision.h"
 #include "game.h"
 
 #include <iostream>

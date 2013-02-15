@@ -9,9 +9,10 @@
 #include <string>
 #include <vector>
 
-#include "../../core/constant.h"
+#include "core/constant.h"
+#include "core/decision.h"
 #include "ctrl.h"
-#include "decision.h"
+#include "drop_decision.h"
 #include "field_evaluator.h"
 #include "game.h"
 #include "puyo.h"
@@ -52,7 +53,7 @@ void AI::initialize(const Game& game)
 void AI::think(DropDecision& dropDecision, const Game& game)
 {
     decide(dropDecision, game);
-    if (dropDecision.decision().isValid())
+    if (dropDecision.decision().IsValid())
         m_myPlayerInfo.puyoDropped(dropDecision.decision(), game.myPlayerState().kumiPuyos[0]);
 }
 

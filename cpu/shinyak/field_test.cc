@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 #include <string>
 
-#include "../../core/constant.h"
-#include "decision.h"
+#include "core/constant.h"
+#include "core/decision.h"
 #include "rensa_info.h" 
 
 using namespace std;
