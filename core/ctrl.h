@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "core/key.h"
-class BasicField;
 class Decision;
+class Field;
 
 class KeyTuple {
  public:
@@ -37,13 +37,13 @@ class Ctrl {
   Ctrl();
   ~Ctrl();
 
-  static bool isReachable(const BasicField& field, const Decision& decision);
-  static bool isReachableOnline(const BasicField& field, const KumipuyoPos &goal,
+  static bool isReachable(const Field& field, const Decision& decision);
+  static bool isReachableOnline(const Field& field, const KumipuyoPos &goal,
                                 KumipuyoPos start);
-  static bool isQuickturn(const BasicField& field, const KumipuyoPos& k);
-  static bool getControl(const BasicField& field, const Decision& decision,
+  static bool isQuickturn(const Field& field, const KumipuyoPos& k);
+  static bool getControl(const Field& field, const Decision& decision,
                          std::vector<KeyTuple>* ret);
-  static bool getControlOnline(const BasicField& field, KumipuyoPos goal, KumipuyoPos start, std::vector<KeyTuple>* ret);
+  static bool getControlOnline(const Field& field, KumipuyoPos goal, KumipuyoPos start, std::vector<KeyTuple>* ret);
   static std::string buttonsDebugString(const std::vector<KeyTuple>& ret);
 
  private:

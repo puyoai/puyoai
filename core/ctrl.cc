@@ -3,8 +3,8 @@
 #include <glog/logging.h>
 #include <string>
 
-#include "core/basic_field.h"
 #include "core/decision.h"
+#include "core/field.h"
 
 using namespace std;
 
@@ -32,7 +32,7 @@ Ctrl::Ctrl() {
 Ctrl::~Ctrl() {
 }
 
-bool Ctrl::getControl(const BasicField& field, const Decision& decision,
+bool Ctrl::getControl(const Field& field, const Decision& decision,
                       vector<KeyTuple>* ret) {
   ret->clear();
 
@@ -111,12 +111,12 @@ void Ctrl::moveHorizontally(int x, vector<KeyTuple>* ret) {
   }
 }
 
-bool Ctrl::isReachable(const BasicField& field, const Decision& decision) {
+bool Ctrl::isReachable(const Field& field, const Decision& decision) {
   return isReachableOnline(field, KumipuyoPos(decision.x, 1, decision.r),
                            KumipuyoPos::INIT);
 }
 
-bool Ctrl::isQuickturn(const BasicField& field, const KumipuyoPos& k) {
+bool Ctrl::isQuickturn(const Field& field, const KumipuyoPos& k) {
   // assume that k.r == 0 or 2
   return (field.Get(k.x - 1, k.y) && field.Get(k.x + 1, k.y));
 }
@@ -126,13 +126,13 @@ bool Ctrl::isQuickturn(const BasicField& field, const KumipuyoPos& k) {
  * goal.y is ignored. Always tries to place puyo on top of existing puyos.
  * (because it is not needed for normal game, not nazopuyo)
  */
-bool Ctrl::isReachableOnline(const BasicField& field, const KumipuyoPos& goal, KumipuyoPos start) {
+bool Ctrl::isReachableOnline(const Field& field, const KumipuyoPos& goal, KumipuyoPos start) {
   vector<KeyTuple> ret;
   return getControlOnline(field, goal, start, &ret);
 }
 
 // returns null if not reachable
-bool Ctrl::getControlOnline(const BasicField& field, KumipuyoPos goal, KumipuyoPos start, vector<KeyTuple>* ret) {
+bool Ctrl::getControlOnline(const Field& field, KumipuyoPos goal, KumipuyoPos start, vector<KeyTuple>* ret) {
   ret->clear();
   while(1) {
     if (goal.x == start.x && goal.r == start.r) {
