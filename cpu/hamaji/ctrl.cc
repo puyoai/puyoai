@@ -92,7 +92,7 @@ void LC::moveHorizontally(int x, vector<KeyTuple>* ret) {
 
 bool LC::isReachable(const LF& field, const Decision& decision) {
   return isReachableOnline(field, KumipuyoPos(decision.x, 1, decision.r),
-                           KumipuyoPos::INIT);
+                           KumipuyoPos::InitialPos());
 }
 
 bool LC::isQuickturn(const LF& field, const KumipuyoPos& k) {
