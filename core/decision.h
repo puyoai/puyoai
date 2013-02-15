@@ -29,6 +29,12 @@ class Decision {
     return x != d.x || r != d.r;
   }
 
+  friend bool operator<(const Decision& lhs, const Decision& rhs) {
+    if (lhs.x != rhs.x)
+      return lhs.x < rhs.x;
+    return lhs.r < rhs.r;
+  }
+
  public:
   // X of the JIKU-PUYO. (1<=x<=6)
   int x;
