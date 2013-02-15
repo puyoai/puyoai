@@ -1,8 +1,8 @@
 #include "ai_manager.h"
 
-#include "../../core/state.h"
+#include "core/state.h"
 #include "ai.h"
-#include "decision.h"
+#include "drop_decision.h"
 #include "game.h"
 #include "protocol.h"
 

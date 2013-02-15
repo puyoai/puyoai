@@ -1,6 +1,9 @@
 #ifndef CORE_DECISION_H_
 #define CORE_DECISION_H_
 
+#include <stdio.h>
+#include <string>
+
 class Decision {
  public:
   static const Decision& NoInputDecision() {
@@ -20,6 +23,12 @@ class Decision {
       return false;
     }
     return (1 <= x && x <= 6 && 0 <= r && r <= 3);
+  }
+
+  std::string toString() const {
+    char buf[80];
+    sprintf(buf, "(%d, %d)", x, r);
+    return buf;
   }
 
   bool operator==(Decision d) const {
