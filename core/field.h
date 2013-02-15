@@ -10,10 +10,6 @@
 
 class Plan;
 
-// If this flag is turned on, we don't need to check the cell for vanishment
-// anymore.
-const int MASK_CHECKED = 0x80;
-
 class Field : public BasicField {
  public:
   static const int ERASE_NUM = 4;

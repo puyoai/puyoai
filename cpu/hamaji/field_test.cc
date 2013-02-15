@@ -1,3 +1,4 @@
+#include "core/constant.h"
 #include "eval.h"
 #include "field.h"
 #include "util.h"
