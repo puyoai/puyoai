@@ -7,7 +7,7 @@ function(hiroshimizuno_add_executable exe)
   cpu_target_link_common_libraries(${exe})
 endfunction()
 
-hiroshimizuno_add_executable(hikuitokoro hikuitokoro.cc)
+hiroshimizuno_add_executable(hikuitokoro field_deprecated.cc hikuitokoro.cc )
 
 # TODO(hamaji): Followings cannot be built by clang.
 puyoai_add_cxx_flags("-march=native -masm=intel")

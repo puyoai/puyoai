@@ -4,8 +4,8 @@
 #include <sstream>
 #include <string>
 
-#include "../../core/decision.h"
-#include "../../core/field_deprecated.h"
+#include "core/decision.h"
+#include "field_deprecated.h"
 
 #define Field FieldDeprecated
 
