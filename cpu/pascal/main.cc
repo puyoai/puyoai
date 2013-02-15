@@ -113,7 +113,7 @@ void PascalCpu::GetDecision(
   ofs << data.player[0].field.GetDebugOutput() << endl << flush;
 
   vector<Plan> plans;
-  data.player[0].field.FindAvailablePlans(3, &plans);
+  FindAvailablePlans(data.player[0].field, 3, &plans);
   ofs << "Plans = " << plans.size() << endl << flush;
 
   // emergency.
