@@ -48,7 +48,7 @@ Game::Game() {
   for (int i = 0; i < 2; i++) {
     ojama_ctrl_[i].SetOpponent(&ojama_ctrl_[1 - i]);
     field[i] = new FieldRealtime(i, sequence, &ojama_ctrl_[i]);
-    latest_decision_[i] = Decision::NO_INPUT;
+    latest_decision_[i] = Decision::NoInputDecision();
   }
 }
 
@@ -177,7 +177,7 @@ void Game::Play(
 
     // Clear current key input if the move is done.
     if ((me->GetStateInfo() & STATE_YOU_GROUNDED)) {
-      latest_decision_[i] = Decision::NO_INPUT;
+      latest_decision_[i] = Decision::NoInputDecision();
     }
 
     if ((me->GetStateInfo() & ~STATE_YOU_CAN_PLAY) != 0) {
