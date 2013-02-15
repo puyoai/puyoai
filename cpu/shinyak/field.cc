@@ -9,8 +9,8 @@
 #include <cassert>
 
 #include "core/constant.h"
+#include "core/ctrl.h"
 #include "core/decision.h"
-#include "ctrl.h"
 #include "field_bit_field.h"
 #include "field_column_bit_field.h"
 #include "score.h"

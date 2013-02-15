@@ -78,6 +78,10 @@ public:
 public:
     void findAvailablePlans(int depth, const std::vector<KumiPuyo>& kumiPuyos, std::vector<Plan>& plans) const;
 
+public:
+    // Compatibility interface for Ctrl
+    PuyoColor Get(int x, int y) const { return color(x, y); }
+
 private:
     // Crears every data this class has.
     void initialize();
