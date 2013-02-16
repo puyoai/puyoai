@@ -8,7 +8,9 @@
 #include "base.h"
 
 class Eval;
+class Eval2;
 class Game;
+class LP;
 
 class Core {
 public:
@@ -24,7 +26,10 @@ public:
   const string& msg() const { return msg_; }
 
 private:
+  string getEvalString(const LP& plan) const;
+
   Eval* eval_;
+  Eval2* eval2_;
   bool is_solo_;
 
   int best_chain_;

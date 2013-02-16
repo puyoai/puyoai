@@ -13,6 +13,7 @@
 
 DEFINE_int32(immediate_fire_score, 40000, "");
 DEFINE_bool(use_next_next, true, "");
+DEFINE_bool(eval2, false, "");
 
 Core::Core(bool is_solo)
   : is_solo_(is_solo),
@@ -221,7 +222,12 @@ Decision Core::decide(Game* game) {
         }
       }
     }
-    double value = eval_->eval(p);
+    double value;
+    if (FLAGS_eval2) {
+      value = 0.0;
+    } else {
+      value = eval_->eval(p);
+    }
     if (best_value < value) {
       best_value = value;
       best_plan = &plans[i];
@@ -239,15 +245,23 @@ Decision Core::decide(Game* game) {
   }
 
   if (is_solo_) {
-    msg_ = eval_->getEvalString(*best_plan);
+    msg_ = getEvalString(*best_plan);
   }
 
   LOG(INFO) << "best_value=" << best_value
             << " score=" << (best_plan ? best_plan->score : -1)
             << " ojama=" << ojama
             << " ojama_height=" << ojama_height
-            << ' ' << eval_->getEvalString(*best_plan)
+            << ' ' << getEvalString(*best_plan)
             << '\n' << best_plan->field.GetDebugOutput();
 
   return best_plan->getFirstDecision();
+}
+
+string Core::getEvalString(const LP& plan) const {
+  if (FLAGS_eval2) {
+    return "";
+  } else {
+    return eval_->getEvalString(plan);
+  }
 }
