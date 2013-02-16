@@ -1,5 +1,5 @@
-#ifndef MUTEX_H_
-#define MUTEX_H_
+#ifndef HAMAJI_MUTEX_H_
+#define HAMAJI_MUTEX_H_
 
 #include <pthread.h>
 
@@ -39,4 +39,4 @@ private:
   Mutex* mu_;
 };
 
-#endif  // MUTEX_H_
+#endif  // HAMAJI_MUTEX_H_

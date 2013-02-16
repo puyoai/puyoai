@@ -1,5 +1,5 @@
-#ifndef FIELD_H_
-#define FIELD_H_
+#ifndef HAMAJI_FIELD_H_
+#define HAMAJI_FIELD_H_
 
 #include <string>
 #include <vector>
@@ -150,4 +150,4 @@ class LP {
   vector<double> evals;
 };
 
-#endif  // FIELD_H_
+#endif  // HAMAJI_FIELD_H_

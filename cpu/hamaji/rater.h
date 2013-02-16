@@ -1,5 +1,5 @@
-#ifndef RATER_H_
-#define RATER_H_
+#ifndef HAMAJI_RATER_H_
+#define HAMAJI_RATER_H_
 
 #include <vector>
 
@@ -47,4 +47,4 @@ private:
 #endif // OS_LINUX
 };
 
-#endif  // RATER_H_
+#endif  // HAMAJI_RATER_H_

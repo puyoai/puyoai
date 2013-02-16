@@ -1,9 +1,9 @@
-#ifndef BASE_H_
-#define BASE_H_
+#ifndef HAMAJI_BASE_H_
+#define HAMAJI_BASE_H_
 
 namespace std {}
 using namespace std;
 namespace google {}
 using namespace google;
 
-#endif
+#endif  // HAMAJI_BASE_H_

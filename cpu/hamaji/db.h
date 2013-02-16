@@ -1,5 +1,5 @@
-#ifndef DB_H_
-#define DB_H_
+#ifndef HAMAJI_DB_H_
+#define HAMAJI_DB_H_
 
 #include <string>
 #include <vector>
@@ -36,4 +36,4 @@ void parseMatches(const char* filename,
                   int noeof_reason_mask,
                   vector<Match>* matches);
 
-#endif  // DB_H_
+#endif  // HAMAJI_DB_H_

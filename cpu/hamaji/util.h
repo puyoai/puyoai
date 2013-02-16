@@ -1,5 +1,5 @@
-#ifndef UTIL_H_
-#define UTIL_H_
+#ifndef HAMAJI_UTIL_H_
+#define HAMAJI_UTIL_H_
 
 #include <string>
 #include <vector>
@@ -19,4 +19,4 @@ void delete_clear(vector<T*>* v) {
   v->clear();
 }
 
-#endif
+#endif  // HAMAJI_UTIL_H_
