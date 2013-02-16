@@ -1,5 +1,5 @@
-#ifndef MT19937INT_H
-#define MT19937INT_H
+#ifndef HAMAJI_MT19937INT_H_
+#define HAMAJI_MT19937INT_H_
 
 #define MT19937_N 624
 
@@ -17,4 +17,4 @@ class MT {
 
 };
 
-#endif
+#endif  // HAMAJI_MT19937INT_H_

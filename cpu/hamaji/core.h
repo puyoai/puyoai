@@ -1,5 +1,5 @@
-#ifndef CORE_H_
-#define CORE_H_
+#ifndef HAMAJI_CORE_H_
+#define HAMAJI_CORE_H_
 
 #include <string>
 
@@ -38,4 +38,4 @@ private:
   string msg_;
 };
 
-#endif  // CORE_H_
+#endif  // HAMAJI_CORE_H_

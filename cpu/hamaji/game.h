@@ -1,5 +1,5 @@
-#ifndef GAME_H_
-#define GAME_H_
+#ifndef HAMAJI_GAME_H_
+#define HAMAJI_GAME_H_
 
 #include <string>
 
@@ -39,4 +39,4 @@ public:
   static LF prev_you_can_play_field[2];
 };
 
-#endif  // GAME_H_
+#endif  // HAMAJI_GAME_H_

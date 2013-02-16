@@ -1,5 +1,5 @@
-#ifndef EVAL_H_
-#define EVAL_H_
+#ifndef HAMAJI_EVAL_H_
+#define HAMAJI_EVAL_H_
 
 #include "../../core/decision.h"
 
@@ -46,4 +46,4 @@ private:
   vector<int> param_index_offsets_;
 };
 
-#endif  // EVAL_H_
+#endif  // HAMAJI_EVAL_H_

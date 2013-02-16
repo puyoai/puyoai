@@ -1,5 +1,5 @@
-#ifndef RATINGSTATS_H_
-#define RATINGSTATS_H_
+#ifndef HAMAJI_RATINGSTATS_H_
+#define HAMAJI_RATINGSTATS_H_
 
 #include <map>
 #include <string>
@@ -43,4 +43,4 @@ class RatingStats {
   double max_score;
 };
 
-#endif  // RATINGSTATS_H_
+#endif  // HAMAJI_RATINGSTATS_H_
