@@ -8,6 +8,7 @@
 #include "../../core/field.h"
 
 #include "eval.h"
+#include "eval2.h"
 #include "game.h"
 #include "util.h"
 
@@ -20,6 +21,7 @@ Core::Core(bool is_solo)
     best_chain_(0),
     best_score_(0) {
   eval_ = new Eval();
+  eval2_ = new Eval2();
 }
 
 Core::~Core() {
