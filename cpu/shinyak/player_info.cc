@@ -146,6 +146,7 @@ void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos)
 
     LOG(INFO) << "main rensa = " << maxRensaIter->trackResult.toString();
 
+    m_mainRensaHandWidth = maxHandWidth;
     m_mainRensaChains = maxRensaIter->rensaInfo.chains;
     m_mainRensaTrackResult = maxRensaIter->trackResult;
 }

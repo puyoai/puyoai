@@ -254,6 +254,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     double possibilityScore = maxPossibility * 2;
     if (plan.totalFrames() >= 55)
         frameScore = 0;
+    double handWidth = 3 * m_myPlayerInfo.mainRensaHandWidth();
 
     double finalScore = 
         + emptyFieldAvailability / (78 - colorPuyoNum)
@@ -261,16 +262,18 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         + fieldScore / 30
         + fieldHeightScore
         + frameScore
-        + possibilityScore;
+        + possibilityScore
+        + handWidth;
     
     char buf[256];
-    sprintf(buf, "eval-score: %.3f %d %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
+    sprintf(buf, "eval-score: %.3f %d %.3f %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
             emptyFieldAvailability / (78 - colorPuyoNum),
             maxChains,
             fieldScore / 30,
             fieldHeightScore,
             frameScore,
             possibilityScore,
+            handWidth,
             finalScore,
             m_myPlayerInfo.mainRensaChains(),
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames()),
