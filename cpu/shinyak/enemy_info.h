@@ -7,6 +7,22 @@
 
 #include "rensa_info.h"
 
+struct EstimatedRensaInfo {
+    EstimatedRensaInfo() {}
+    EstimatedRensaInfo(int chains, int score, int initiatingFrames)
+        : chains(chains), score(score), initiatingFrames(initiatingFrames) {}
+
+    std::string toString() const {
+        char buf[80];
+        sprintf(buf, "frames, chains, score = %d, %d, %d", initiatingFrames, chains, score);
+        return buf;        
+    }
+        
+    int chains;
+    int score;
+    int initiatingFrames;
+};
+
 class EnemyInfo {
 public:
     void initializeWith(int id) {
@@ -36,11 +52,11 @@ public:
     int estimateMaxScoreFromFeasibleRensas(int frameId) const;
     int estimateMaxScoreFromPossibleRensas(int frameId) const;
 
-    const std::vector<BasicRensaInfo>& possibleRensaInfos() const { return m_possibleRensaInfos; }
-    const std::vector<BasicRensaInfo>& feasibleRensaInfos() const { return m_feasibleRensaInfos; }
+    const std::vector<EstimatedRensaInfo>& possibleRensaInfos() const { return m_possibleRensaInfos; }
+    const std::vector<EstimatedRensaInfo>& feasibleRensaInfos() const { return m_feasibleRensaInfos; }
 
 private:
-    int estimateMaxScoreFrom(int frameId, const std::vector<BasicRensaInfo>& rensaInfos) const;
+    int estimateMaxScoreFrom(int frameId, const std::vector<EstimatedRensaInfo>& rensaInfos) const;
 
     int m_id;
 
@@ -51,9 +67,9 @@ private:
 
     // --- For these rensaInfos, frames means the initiatingFrames.
     // Fiesible Rensa is the Rensa the enemy can really fire in current/next/nextnext tsumo.
-    std::vector<BasicRensaInfo> m_feasibleRensaInfos;
+    std::vector<EstimatedRensaInfo> m_feasibleRensaInfos;
     // Possible Rensa is the Rensa the enemy will build in future.
-    std::vector<BasicRensaInfo> m_possibleRensaInfos;
+    std::vector<EstimatedRensaInfo> m_possibleRensaInfos;
 };
 
 inline void EnemyInfo::setOngoingRensa(const OngoingRensaInfo& info)

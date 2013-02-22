@@ -6,7 +6,8 @@ puyoai_add_cxx_flags("-Wall -Wextra -std=c++0x")
 
 add_library(shinyak_lib
             ai.cc ai_manager.cc enemy_info.cc field.cc field_evaluator.cc
-            game.cc plan.cc player_info.cc protocol.cc puyo_possibility.cc rensa_detector.cc)
+            game.cc plan.cc player_info.cc protocol.cc puyo_possibility.cc
+             rensa_detector.cc rensa_result.cc)
 
 function(shinyak_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})

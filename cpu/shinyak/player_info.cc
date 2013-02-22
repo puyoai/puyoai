@@ -108,8 +108,8 @@ void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos)
 
     int maxChains = 0;
     for (auto it = results.begin(); it != results.end(); ++it) {
-        if (maxChains < it->rensaInfo.rensaInfo.chains)
-            maxChains = it->rensaInfo.rensaInfo.chains;
+        if (maxChains < it->rensaInfo.chains)
+            maxChains = it->rensaInfo.chains;
     }
 
     m_mainRensaChains = maxChains;
@@ -125,13 +125,13 @@ void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos)
     double maxPossibility = 0;
     auto maxRensaIter = results.begin();
     for (auto it = results.begin(); it != results.end(); ++it) {
-        int chains = it->rensaInfo.rensaInfo.chains;
+        int chains = it->rensaInfo.chains;
         if (chains + 1 < maxChains)
             continue;
 
         PuyoSet necessarySet(it->necessaryPuyoSet);
         necessarySet.sub(kumiPuyoSet);
-        double handWidth = calculateHandWidth(it->rensaInfo.trackResult, estimatedField());
+        double handWidth = calculateHandWidth(it->trackResult, estimatedField());
         double possibility = TsumoPossibility::possibility(4, necessarySet);
 
         if (maxHandWidth < handWidth) {
@@ -144,8 +144,8 @@ void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos)
         }        
     }
 
-    LOG(INFO) << "main rensa = " << maxRensaIter->rensaInfo.trackResult.toString();
+    LOG(INFO) << "main rensa = " << maxRensaIter->trackResult.toString();
 
-    m_mainRensaChains = maxRensaIter->rensaInfo.rensaInfo.chains;
-    m_mainRensaTrackResult = maxRensaIter->rensaInfo.trackResult;
+    m_mainRensaChains = maxRensaIter->rensaInfo.chains;
+    m_mainRensaTrackResult = maxRensaIter->trackResult;
 }

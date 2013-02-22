@@ -2,87 +2,25 @@
 #define __RENSA_INFO_H_
 
 #include <string>
-#include <sstream>
-#include <iomanip>
 #include "field.h"
 #include "puyo_set.h"
+#include "rensa_result.h"
 
 // TODO(mayah): These RensaInfo is difficult to use sometimes. Refactoring is desired.
 
-struct BasicRensaInfo {
-    BasicRensaInfo() 
-        : chains(0), score(0), frames(0) {}
-    BasicRensaInfo(int chains, int score, int frames)
-        : chains(chains), score(score), frames(frames) {}
-
-    std::string toString() const {
-        char buf[80];
-        sprintf(buf, "chains, score, frames = %d, %d, %d", chains, score, frames);
-        return buf;
-    }
-
-    int chains;
-    int score;
-    int frames;
-};
-
-class TrackResult {
-    friend class TrackingStrategy;
-public:
-    // Nth Rensa where (x, y) is erased. 0 if not erased.
-    int erasedAt(int x, int y) const { return m_erasedAt[x][y]; }
-
-    TrackResult& operator=(const TrackResult& result) {
-        for (int x = 0; x < Field::MAP_WIDTH; ++x) {
-            for (int y = 0; y < Field::MAP_HEIGHT; ++y)
-                m_erasedAt[x][y] = result.m_erasedAt[x][y];
-        }
-
-        return *this;
-    }
-
-    std::string toString() {
-        std::ostringstream ss;
-        for (int y = Field::HEIGHT; y >= 1; --y) {
-            for (int x = 1; x <= Field::WIDTH; ++x)
-                ss << std::setw(3) << static_cast<int>(m_erasedAt[x][y]);
-            ss << '\n';
-        }
-
-        return ss.str();
-    }
-
-    byte m_erasedAt[Field::MAP_WIDTH][Field::MAP_HEIGHT];
-};
-
-struct TrackedRensaInfo {
-    TrackedRensaInfo() {}
-    TrackedRensaInfo(const BasicRensaInfo& rensaInfo, const TrackResult& trackResult)
-        : rensaInfo(rensaInfo), trackResult(trackResult) {}
-
-    BasicRensaInfo rensaInfo;
-    TrackResult trackResult;
-};
-
 // CURRENT/NEXT/NEXTNEXT から実際に発火可能な連鎖 (For PlayerInfo)
-template<typename RensaInfo>
-struct FeasibleRensaInfoBase {
-    FeasibleRensaInfoBase() {}
-    FeasibleRensaInfoBase(const RensaInfo& rensaInfo, int initiatingFrames)
+struct FeasibleRensaInfo {
+    FeasibleRensaInfo() {}
+    FeasibleRensaInfo(const BasicRensaInfo& rensaInfo, int initiatingFrames)
         : rensaInfo(rensaInfo), initiatingFrames(initiatingFrames) {}
 
-    RensaInfo rensaInfo;
+    BasicRensaInfo rensaInfo;
     int initiatingFrames;
 };
 
-typedef FeasibleRensaInfoBase<BasicRensaInfo> FeasibleRensaInfo;
-// Currently we don't use TrackedFeasibleRensaInfo.
-// typedef FeasibleRensaInfoBase<TrackedRensaInfo> TrackedFeasibleRensaInfo;
-
 // ある状態のフィールドから、いくつかのぷよを追加することで発火することが可能な連鎖
-template<typename RensaInfo>
-struct PossibleRensaInfoBase {
-    RensaInfo rensaInfo;
+struct PossibleRensaInfo {
+    BasicRensaInfo rensaInfo;
     PuyoSet necessaryPuyoSet;
 
     std::string toString() const {
@@ -90,8 +28,11 @@ struct PossibleRensaInfoBase {
     }
 };
 
-typedef PossibleRensaInfoBase<BasicRensaInfo> PossibleRensaInfo;
-typedef PossibleRensaInfoBase<TrackedRensaInfo> TrackedPossibleRensaInfo;
+struct TrackedPossibleRensaInfo {
+    BasicRensaInfo rensaInfo;
+    PuyoSet necessaryPuyoSet;
+    TrackResult trackResult;
+};
 
 struct OngoingRensaInfo {
     OngoingRensaInfo() {}

@@ -272,7 +272,7 @@ TEST(FieldTest, TrackedFieldSimulation)
 
 
     TrackedRensaInfo trackedRensaInfo;
-    f.simulate(trackedRensaInfo);
+    f.simulateAndTrack(trackedRensaInfo.rensaInfo, trackedRensaInfo.trackResult);
 
     EXPECT_EQ(trackedRensaInfo.rensaInfo.chains, 5);
     EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(1, 2), 1);
