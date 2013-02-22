@@ -32,7 +32,8 @@ static double calculateHandWidth(const TrackResult& trackResult, const Field& fi
             for (int y = 1; y <= Field::HEIGHT; ++y) {
                 if (field.color(x, y) != EMPTY || distance[x][y] > 0)
                     continue;
-                int d1 = d - 1;
+                //int d1 = d - 1;
+                int d1 = d;
                 if (distance[x][y-1] == d1 || distance[x][y+1] == d1 || distance[x-1][y] == d1 || distance[x+1][y] == d1) {
                     distance[x][y] = d;
                     ++distanceCount[d];
@@ -41,6 +42,8 @@ static double calculateHandWidth(const TrackResult& trackResult, const Field& fi
         }
     }
 
+    // TODO(mayah): Maybe we should move to this to RensaDetector.
+
     // これはどうするのが正解？
     if (distanceCount[2] == 0 || distanceCount[3] == 0)
         return 0;
@@ -48,7 +51,10 @@ static double calculateHandWidth(const TrackResult& trackResult, const Field& fi
     double ratio3 = static_cast<double>(distanceCount[4]) / distanceCount[3];
     double ratio2 = static_cast<double>(distanceCount[3]) / distanceCount[2];
 
-    return (ratio3 - 1.5) * (ratio3 - 1.5) + (ratio2 - 1.5) * (ratio2 - 1.5);
+    double r2 = (ratio2 - 1.5) * (ratio2 - 1.5) * (ratio2 - 1.5 >- 0 ? 1 : -1);
+    double r3 = (ratio3 - 1.5) * (ratio3 - 1.5) * (ratio3 - 1.5 >- 0 ? 1 : -1);
+
+    return r2 + r3;
 }
 
 void MyPlayerInfo::initialize()
