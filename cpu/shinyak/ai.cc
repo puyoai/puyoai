@@ -255,21 +255,40 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     if (plan.totalFrames() >= 55)
         frameScore = 0;
     double handWidth = 3 * m_myPlayerInfo.mainRensaHandWidth();
+    if (handWidth <= 0)
+        handWidth = -2;
+
+    double fieldScore2;
+    {
+        const TrackResult& tr = m_myPlayerInfo.mainRensaTrackResult();
+        Field f(plan.field());
+        for (int x = 1; x <= Field::WIDTH; ++x) {
+            for (int y = 1; y <= 13; ++y) { // TODO: 13?
+                if (tr.erasedAt(x, y) != 0)
+                    f.setColor(x, y, EMPTY);
+            }
+            f.recalcHeightOn(x);
+        }
+        f.forceDrop();
+        fieldScore2 = FieldEvaluator::calculateConnectionScore(f);
+    }
 
     double finalScore = 
         + emptyFieldAvailability / (78 - colorPuyoNum)
         + maxChains
         + fieldScore / 30
+        + fieldScore2 / 15
         + fieldHeightScore
         + frameScore
         + possibilityScore
         + handWidth;
     
     char buf[256];
-    sprintf(buf, "eval-score: %.3f %d %.3f %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
+    sprintf(buf, "eval-score: %.3f %d %.3f %.3f %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
             emptyFieldAvailability / (78 - colorPuyoNum),
             maxChains,
             fieldScore / 30,
+            fieldScore2 / 15,
             fieldHeightScore,
             frameScore,
             possibilityScore,

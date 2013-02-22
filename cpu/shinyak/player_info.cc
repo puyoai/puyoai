@@ -48,7 +48,7 @@ static double calculateHandWidth(const TrackResult& trackResult, const Field& fi
     double ratio3 = static_cast<double>(distanceCount[4]) / distanceCount[3];
     double ratio2 = static_cast<double>(distanceCount[3]) / distanceCount[2];
 
-    return (ratio3 - 1.5) * (ratio3 - 1.5) - (ratio2 - 1.5) * (ratio2 - 1.5);
+    return (ratio3 - 1.5) * (ratio3 - 1.5) + (ratio2 - 1.5) * (ratio2 - 1.5);
 }
 
 void MyPlayerInfo::initialize()
