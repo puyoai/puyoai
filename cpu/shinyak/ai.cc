@@ -256,7 +256,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         frameScore = 0;
     double handWidth = 3 * m_myPlayerInfo.mainRensaHandWidth();
     if (handWidth <= 0)
-        handWidth = -2;
+        handWidth = -3;
 
     double fieldScore2;
     {

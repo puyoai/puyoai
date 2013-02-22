@@ -1,6 +1,7 @@
 #include "field_evaluator.h"
 
 #include <algorithm>
+#include <cmath>
 #include <glog/logging.h>
 
 #include "../../core/constant.h"
@@ -61,8 +62,12 @@ double FieldEvaluator::calculateFieldHeightScore(const Field& field)
     double averageHeight = sumHeight / 6.0;
     double demotion = 0;
 
-    for (int x = 1; x <= Field::WIDTH; ++x)
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        if (abs(field.height(x) - averageHeight) <= 2.5)
+            continue;
+
         demotion -= 0.1 * (field.height(x) - averageHeight) * (field.height(x) - averageHeight);
+    }
 
     if (field.height(3) >= 9)
         demotion -= 0.5;
