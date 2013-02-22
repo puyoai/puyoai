@@ -24,14 +24,14 @@ struct ContainsTrackedRensa {
         , height(height) {}
 
     bool operator()(const TrackedPossibleRensaInfo& info) const {
-        if (chains != info.rensaInfo.rensaInfo.chains)
+        if (chains != info.rensaInfo.chains)
             return false;
         if (info.necessaryPuyoSet != set)
             return false;
 
         for (int y = 1; y <= height; ++y) {
             for (int x = 1; x <= Field::WIDTH; ++x) {
-                if (info.rensaInfo.trackResult.erasedAt(x, y) != tracked[y-1][x-1])
+                if (info.trackResult.erasedAt(x, y) != tracked[y-1][x-1])
                     return false;
             }
         }

@@ -56,7 +56,7 @@ TEST(PerformanceTest, Simulate_Filled_Track)
         Tsc tsc("Simulate_Filled_Track");
         Field f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
         TrackedRensaInfo rensaInfo;
-        f.simulate(rensaInfo);
+        f.simulateAndTrack(rensaInfo.rensaInfo, rensaInfo.trackResult);
     }
     double average, variance;
     Tsc::GetStatistics("Simulate_Filled_Track", &average, &variance);

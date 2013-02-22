@@ -15,7 +15,7 @@
 #include "field_column_bit_field.h"
 #include "score.h"
 #include "plan.h"
-#include "rensa_info.h"
+#include "rensa_result.h"
 
 using namespace std;
 
@@ -52,17 +52,17 @@ public:
         for (int x = 0; x < Field::MAP_WIDTH; ++x) {
             for (int y = 0; y < Field::MAP_HEIGHT; ++y) {
                 m_originalY[x][y] = y;
-                m_result.m_erasedAt[x][y] = 0;
+                m_result.setErasedAt(x, y, 0);
             }
         }
     }
 
     void colorPuyoIsVanished(int x, int y, int nthChain) {
-        m_result.m_erasedAt[x][m_originalY[x][y]] = nthChain;
+        m_result.setErasedAt(x, m_originalY[x][y], nthChain);
     }
 
     void ojamaPuyoIsVanished(int x, int y, int nthChain) {
-        m_result.m_erasedAt[x][m_originalY[x][y]] = nthChain;
+        m_result.setErasedAt(x, m_originalY[x][y], nthChain);
     }
 
     void puyoIsDropped(int x, int fromY, int toY) {
@@ -73,8 +73,6 @@ private:
     int m_originalY[Field::MAP_WIDTH][Field::MAP_HEIGHT];
     TrackResult& m_result;
 };
-
-
 
 void Field::initialize()
 {
@@ -421,26 +419,26 @@ void Field::forceDrop()
 
 void Field::simulate(BasicRensaInfo& rensaInfo, int additionalChain)
 {
-    rensaInfo.score = 0;
     rensaInfo.chains = 1 + additionalChain;
+    rensaInfo.score = 0;
     rensaInfo.frames = 0;
 
     NonTrackingStrategy strategy;
     simulateWithStrategy(rensaInfo, strategy);
 }
 
-void Field::simulate(TrackedRensaInfo& trackedRensaInfo, int additionalChain)
+void Field::simulateAndTrack(BasicRensaInfo& rensaInfo, TrackResult& trackResult, int additionalChain)
 {
-    trackedRensaInfo.rensaInfo.score = 0;
-    trackedRensaInfo.rensaInfo.chains = 1 + additionalChain;
-    trackedRensaInfo.rensaInfo.frames = 0;
+    rensaInfo.chains = 1 + additionalChain;
+    rensaInfo.score = 0;
+    rensaInfo.frames = 0;
 
-    RensaTrackingStrategy strategy(trackedRensaInfo.trackResult);
-    simulateWithStrategy(trackedRensaInfo.rensaInfo, strategy);
+    RensaTrackingStrategy strategy(trackResult);
+    simulateWithStrategy(rensaInfo, strategy);
 }
 
 template<typename Strategy>
-void Field::simulateWithStrategy(BasicRensaInfo& rensaInfo, Strategy& strategy)
+inline void Field::simulateWithStrategy(BasicRensaInfo& rensaInfo, Strategy& strategy)
 {
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
 

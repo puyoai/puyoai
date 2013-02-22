@@ -94,12 +94,11 @@ void AI::enemyWNextAppeared(const Game& game)
     m_enemyInfo.updatePossibleRensas(game.enemyPlayerState().field, game.enemyPlayerState().kumiPuyos);
 
     LOG(INFO) << "Possible rensa infos : ";
-    for (std::vector<BasicRensaInfo>::const_iterator it = m_enemyInfo.possibleRensaInfos().begin(); it != m_enemyInfo.possibleRensaInfos().end(); ++it)
+    for (auto it = m_enemyInfo.possibleRensaInfos().begin(); it != m_enemyInfo.possibleRensaInfos().end(); ++it)
         LOG(INFO) << it->toString();
     LOG(INFO) << "Feasible rensa infos : ";
-    for (std::vector<BasicRensaInfo>::const_iterator it = m_enemyInfo.feasibleRensaInfos().begin(); it != m_enemyInfo.feasibleRensaInfos().end(); ++it)
+    for (auto it = m_enemyInfo.feasibleRensaInfos().begin(); it != m_enemyInfo.feasibleRensaInfos().end(); ++it)
         LOG(INFO) << it->toString();
-
 }
 
 void AI::enemyGrounded(const Game& game)

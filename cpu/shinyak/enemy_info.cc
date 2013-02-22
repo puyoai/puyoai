@@ -19,12 +19,14 @@ static const int ACCUMULATED_RENSA_SCORE[] = {
 };
 
 struct SortByFrames {
-    bool operator()(const BasicRensaInfo& lhs, const BasicRensaInfo& rhs) const {
-        if (lhs.frames != rhs.frames)
-            return lhs.frames < rhs.frames;
+    bool operator()(const EstimatedRensaInfo& lhs, const EstimatedRensaInfo& rhs) const {
+        if (lhs.initiatingFrames != rhs.initiatingFrames)
+            return lhs.initiatingFrames < rhs.initiatingFrames;
+
         if (lhs.score != rhs.score)
             return lhs.score > rhs.score; // This '>' is intentional.
-        return lhs.chains < rhs.chains;
+
+        return lhs.chains > rhs.chains; // This '>' is intentional.
     }
 };
 
@@ -55,20 +57,24 @@ void EnemyInfo::updateFeasibleRensas(const Field& field, const vector<KumiPuyo>&
         return;
 
     sort(result.begin(), result.end(), SortByInitiatingFrames());
-    m_feasibleRensaInfos.push_back(BasicRensaInfo(
+    m_feasibleRensaInfos.push_back(EstimatedRensaInfo(
                                        result.front().rensaInfo.chains,
                                        result.front().rensaInfo.score,
-                                       result.front().initiatingFrames));
+                                       result.front().rensaInfo.frames));
 
     for (vector<FeasibleRensaInfo>::iterator it = result.begin(); it != result.end(); ++it) {
         if (m_feasibleRensaInfos.back().score < it->rensaInfo.score) {
-            DCHECK(m_feasibleRensaInfos.back().frames < it->initiatingFrames)
-                << "feasible frames = " << m_feasibleRensaInfos.back().frames 
+            DCHECK(m_feasibleRensaInfos.back().initiatingFrames < it->initiatingFrames)
+                << "feasible frames = " << m_feasibleRensaInfos.back().initiatingFrames
                 << " initiating frames = " << it->initiatingFrames 
                 << " score(1) = " << m_feasibleRensaInfos.back().score
                 << " score(2) = " << it->rensaInfo.score << endl;
                 
-            m_feasibleRensaInfos.push_back(BasicRensaInfo(it->rensaInfo.chains, it->rensaInfo.score, it->initiatingFrames));
+            m_feasibleRensaInfos.push_back(EstimatedRensaInfo(
+                                               it->rensaInfo.chains,
+                                               it->rensaInfo.score,
+                                               it->initiatingFrames));
+
         }
     }    
 }
@@ -91,7 +97,7 @@ void EnemyInfo::updatePossibleRensas(const Field& field, const vector<KumiPuyo>&
     result.reserve(100000);
     RensaDetector::findPossibleRensas(result, field, 3);
 
-    vector<BasicRensaInfo> results;
+    vector<EstimatedRensaInfo> results;
     for (vector<PossibleRensaInfo>::iterator it = result.begin(); it != result.end(); ++it) {
         // おじゃまがあまり発生しそうにないのは無視
         if (it->rensaInfo.score < 70)
@@ -112,7 +118,7 @@ void EnemyInfo::updatePossibleRensas(const Field& field, const vector<KumiPuyo>&
         int frames = ((Field::HEIGHT - averageHeight) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI) * (3 + k);
         int score = it->rensaInfo.score;
         int chains = it->rensaInfo.chains;
-        results.push_back(BasicRensaInfo(chains, score, frames));
+        results.push_back(EstimatedRensaInfo(chains, score, frames));
     }
 
     if (results.empty())
@@ -121,9 +127,9 @@ void EnemyInfo::updatePossibleRensas(const Field& field, const vector<KumiPuyo>&
     sort(results.begin(), results.end(), SortByFrames());    
     m_possibleRensaInfos.push_back(results.front());
 
-    for (vector<BasicRensaInfo>::iterator it = results.begin(); it != results.end(); ++it) {
+    for (auto it = results.begin(); it != results.end(); ++it) {
         if (m_possibleRensaInfos.back().score < it->score) {
-            DCHECK(m_possibleRensaInfos.back().frames < it->frames);
+            DCHECK(m_possibleRensaInfos.back().initiatingFrames < it->initiatingFrames);
             m_possibleRensaInfos.push_back(*it);
         }
     }
@@ -146,8 +152,8 @@ int EnemyInfo::estimateMaxScore(int frameId) const
     // (9 連鎖で得られる得点)/(7 連鎖で得られる得点) を掛け算する。
     // TODO: Field の空きぐあいをどこかで見るべき
     int maxScore = -1;
-    for (vector<BasicRensaInfo>::const_iterator it = possibleRensaInfos().begin(); it != possibleRensaInfos().end(); ++it) {
-        int restFrames = frameId - it->frames - m_id;
+    for (auto it = possibleRensaInfos().begin(); it != possibleRensaInfos().end(); ++it) {
+        int restFrames = frameId - (it->initiatingFrames + m_id);
         int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_AFTER_NO_CHIGIRI));
         int newChains = min((numPossiblePuyos / 4) + it->chains, 19);
         double ratio = static_cast<double>(ACCUMULATED_RENSA_SCORE[newChains]) / ACCUMULATED_RENSA_SCORE[it->chains];
@@ -174,16 +180,16 @@ int EnemyInfo::estimateMaxScoreFromPossibleRensas(int frameId) const
     return estimateMaxScoreFrom(frameId, m_possibleRensaInfos);
 }
 
-int EnemyInfo::estimateMaxScoreFrom(int frameId, const vector<BasicRensaInfo>& rensaInfos) const
+int EnemyInfo::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInfo>& rensaInfos) const
 {
     if (rensaInfos.empty())
         return -1;
 
-    if (rensaInfos.back().frames + m_id < frameId)
+    if (rensaInfos.back().initiatingFrames + m_id < frameId)
         return -1;
 
-    for (vector<BasicRensaInfo>::const_iterator it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (it->frames + m_id <= frameId)
+    for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
+        if (it->initiatingFrames + m_id <= frameId)
             return it->score;
     }
 

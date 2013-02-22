@@ -2,8 +2,19 @@
 
 #include "field.h"
 #include "plan.h"
+#include "rensa_info.h"
 
 using namespace std;
+
+static inline void simulateInternal(Field& f, PossibleRensaInfo& info, int additionalChains)
+{
+    f.simulate(info.rensaInfo, additionalChains);
+}
+
+static inline void simulateInternal(Field& f, TrackedPossibleRensaInfo& info, int additionalChains)
+{
+    f.simulateAndTrack(info.rensaInfo, info.trackResult, additionalChains);
+}
 
 template<typename T>
 struct AfterSimulationCallback_findRensas {
@@ -48,7 +59,7 @@ static void findRensasInternal(vector<T>& result, const Field& field, int additi
                 T info;
                 info.necessaryPuyoSet.add(puyoSet);
                 info.necessaryPuyoSet.add(c, necessaryPuyos);
-                f.simulate(info.rensaInfo, additionalChains);
+                simulateInternal(f, info, additionalChains);
 
                 callback(result, f, info);
             }            
