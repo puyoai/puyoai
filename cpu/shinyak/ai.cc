@@ -125,7 +125,7 @@ void AI::decide(DropDecision& dropDecision, const Game& game)
 
     const int depth = 2;
     std::vector<Plan> plans;
-    m_myPlayerInfo.estimatedField().findAvailablePlans(depth, game.myPlayerState().kumiPuyos, plans);
+    findAvailablePlans(m_myPlayerInfo.estimatedField(), depth, game.myPlayerState().kumiPuyos, plans);
 
     LOG(INFO) << "FindAvailablePlans: OK";
     
