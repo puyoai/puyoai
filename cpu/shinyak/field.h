@@ -12,7 +12,6 @@ class Decision;
 class FieldBitField;
 class FieldColumnBitField;
 class NonTrackingStrategy;
-class Plan;
 class TrackingStrategy;
 class TrackResult;
 struct BasicRensaInfo;
@@ -78,9 +77,6 @@ public:
     void showDebugOutput() const;
 
 public:
-    void findAvailablePlans(int depth, const std::vector<KumiPuyo>& kumiPuyos, std::vector<Plan>& plans) const;
-
-public:
     // Compatibility interface for Ctrl
     PuyoColor Get(int x, int y) const { return color(x, y); }
 
@@ -104,8 +100,6 @@ private:
     Position* checkCell(PuyoColor, FieldBitField& checked, Position* writeHead, int x, int y) const;
 
     Position* fillSameColorPosition(int x, int y, PuyoColor, Position* positionQueueHead, FieldBitField& checked) const;
-
-    void findAvailablePlansInternal(const Plan* previousPlan, int restDepth, int nth, const std::vector<KumiPuyo>& kumiPuyos, std::vector<Plan>& plans) const;
 
 private:
     Puyo m_field[MAP_WIDTH][MAP_HEIGHT];

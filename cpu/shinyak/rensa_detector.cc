@@ -136,7 +136,7 @@ void RensaDetector::findFeasibleRensas(vector<FeasibleRensaInfo>& result, const 
 {
     vector<Plan> plans;
     plans.reserve(22 + 22*22 + 22*22*22);
-    field.findAvailablePlans(numKumiPuyo, kumiPuyos, plans);
+    findAvailablePlans(field, numKumiPuyo, kumiPuyos, plans);
 
     for (vector<Plan>::iterator it = plans.begin(); it != plans.end(); ++it) {
         if (!it->isRensaPlan())

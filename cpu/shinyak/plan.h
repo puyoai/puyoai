@@ -64,4 +64,10 @@ inline Plan::Plan(const Plan& plan, const Decision& decision, const Field& field
     m_decisions.push_back(decision);
 }
 
+
+void findAvailablePlans(const Field& field, 
+                        int depth,
+                        const std::vector<KumiPuyo>& kumiPuyos,
+                        std::vector<Plan>& plans);
+
 #endif
