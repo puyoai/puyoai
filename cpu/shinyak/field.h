@@ -37,7 +37,7 @@ public:
     int height(int x) const { return m_heights[x]; }
 
     // Do not use not in PlayerInfo.
-    void setColor(int x, int y, PuyoColor c) { m_field[x][y] = c; }
+    void setColor(int x, int y, PuyoColor c) { set(x, y, c); }
     void recalcHeightOn(int x) {
         m_heights[x] = 0;
         for (int y = 1; color(x, y) != EMPTY; ++y)
