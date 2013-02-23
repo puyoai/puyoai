@@ -60,7 +60,7 @@ void EnemyInfo::updateFeasibleRensas(const Field& field, const vector<KumiPuyo>&
     m_feasibleRensaInfos.push_back(EstimatedRensaInfo(
                                        result.front().rensaInfo.chains,
                                        result.front().rensaInfo.score,
-                                       result.front().rensaInfo.frames));
+                                       result.front().initiatingFrames));
 
     for (vector<FeasibleRensaInfo>::iterator it = result.begin(); it != result.end(); ++it) {
         if (m_feasibleRensaInfos.back().score < it->rensaInfo.score) {
