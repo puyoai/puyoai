@@ -159,7 +159,7 @@ TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump1)
     EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(1, 1), make_pair(5, 1));
     EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(3, 1), make_pair(6, 2));
     EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(1, 3), make_pair(3, 1));
-    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(3, 3), make_pair(3, 1));
+    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(3, 3), make_pair(4, 2));
 }
 
 TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump2)
