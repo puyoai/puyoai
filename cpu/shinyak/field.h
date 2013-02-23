@@ -86,6 +86,10 @@ public:
 private:
     // Crears every data this class has.
     void initialize();
+
+    void set(int x, int y, PuyoColor c) {
+        m_field[x][y] = static_cast<Puyo>(c);
+    }
     
     // Simulate chains until the end, and returns chains, score, and frames
     // before finishing the chain.
