@@ -24,14 +24,14 @@ TEST(FieldTest, Color)
 {
     Field f("444000");
 
-    EXPECT_EQ(f.color(0, 1), WALL);
-    EXPECT_EQ(f.color(1, 1), RED);
-    EXPECT_EQ(f.color(2, 1), RED);
-    EXPECT_EQ(f.color(3, 1), RED);
-    EXPECT_EQ(f.color(4, 1), EMPTY);
-    EXPECT_EQ(f.color(5, 1), EMPTY);
-    EXPECT_EQ(f.color(6, 1), EMPTY);
-    EXPECT_EQ(f.color(7, 1), WALL);
+    EXPECT_EQ(WALL, f.color(0, 1));
+    EXPECT_EQ(RED, f.color(1, 1));
+    EXPECT_EQ(RED, f.color(2, 1));
+    EXPECT_EQ(RED, f.color(3, 1));
+    EXPECT_EQ(EMPTY, f.color(4, 1));
+    EXPECT_EQ(EMPTY, f.color(5, 1));
+    EXPECT_EQ(EMPTY, f.color(6, 1));
+    EXPECT_EQ(WALL, f.color(7, 1));
 }
 
 TEST(FieldTest, SetAndGet)
@@ -48,18 +48,18 @@ TEST(FieldTest, SetAndGet)
     EXPECT_EQ(GREEN, f.color(1, 4));
 
     f.setColor(1, 4, EMPTY);
-    EXPECT_EQ(f.color(1, 1), RED);
-    EXPECT_EQ(f.color(1, 2), BLUE);
-    EXPECT_EQ(f.color(1, 3), YELLOW);
-    EXPECT_EQ(f.color(1, 4), EMPTY);
+    EXPECT_EQ(RED, f.color(1, 1));
+    EXPECT_EQ(BLUE, f.color(1, 2));
+    EXPECT_EQ(YELLOW, f.color(1, 3));
+    EXPECT_EQ(EMPTY, f.color(1, 4));
 
     f.setColor(1, 1, EMPTY);
     f.setColor(1, 2, EMPTY);
     f.setColor(1, 3, EMPTY);
-    EXPECT_EQ(f.color(1, 1), EMPTY);
-    EXPECT_EQ(f.color(1, 2), EMPTY);
-    EXPECT_EQ(f.color(1, 3), EMPTY);
-    EXPECT_EQ(f.color(1, 4), EMPTY);
+    EXPECT_EQ(EMPTY, f.color(1, 1));
+    EXPECT_EQ(EMPTY, f.color(1, 2));
+    EXPECT_EQ(EMPTY, f.color(1, 3));
+    EXPECT_EQ(EMPTY, f.color(1, 4));
 }
 
 TEST(FieldTest, IsZenkeshi)
@@ -82,12 +82,12 @@ TEST(FieldTest, ForceDrop)
 
     f.forceDrop();
 
-    EXPECT_EQ(f.height(1), 2);
-    EXPECT_EQ(f.height(2), 2);
-    EXPECT_EQ(f.height(3), 2);
-    EXPECT_EQ(f.height(4), 2);
-    EXPECT_EQ(f.height(5), 2);
-    EXPECT_EQ(f.height(6), 2);
+    EXPECT_EQ(2, f.height(1));
+    EXPECT_EQ(2, f.height(2));
+    EXPECT_EQ(2, f.height(3));
+    EXPECT_EQ(2, f.height(4));
+    EXPECT_EQ(2, f.height(5));
+    EXPECT_EQ(2, f.height(6));
 
     EXPECT_EQ(RED, f.color(1, 1));
     EXPECT_EQ(BLUE, f.color(1, 2));
@@ -185,9 +185,9 @@ TEST(FieldTest, ConnectedPuyoNums)
     Field f("004455"
             "045465");
 
-    EXPECT_EQ(f.connectedPuyoNums(3, 2), 3);
-    EXPECT_EQ(f.connectedPuyoNums(5, 2), 3);
-    EXPECT_EQ(f.connectedPuyoNums(5, 1), 1);
+    EXPECT_EQ(3, f.connectedPuyoNums(3, 2));
+    EXPECT_EQ(3, f.connectedPuyoNums(5, 2));
+    EXPECT_EQ(1, f.connectedPuyoNums(5, 1));
 }
 
 TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump1)
@@ -196,10 +196,10 @@ TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump1)
             "404404"
             "404555");
 
-    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(1, 1), make_pair(5, 1));
-    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(3, 1), make_pair(6, 2));
-    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(1, 3), make_pair(3, 1));
-    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(3, 3), make_pair(4, 2));
+    EXPECT_EQ(make_pair(5, 1), f.connectedPuyoNumsWithAllowingOnePointJump(1, 1));
+    EXPECT_EQ(make_pair(6, 2), f.connectedPuyoNumsWithAllowingOnePointJump(3, 1));
+    EXPECT_EQ(make_pair(3, 1), f.connectedPuyoNumsWithAllowingOnePointJump(1, 3));
+    EXPECT_EQ(make_pair(4, 2), f.connectedPuyoNumsWithAllowingOnePointJump(3, 3));
 }
 
 TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump2)
@@ -218,12 +218,12 @@ TEST(FieldTest, Height)
             "004707"
             "014040");
 
-    EXPECT_EQ(f.height(1), 0);
-    EXPECT_EQ(f.height(2), 1);
-    EXPECT_EQ(f.height(3), 4);
-    EXPECT_EQ(f.height(4), 4);
-    EXPECT_EQ(f.height(5), 3);
-    EXPECT_EQ(f.height(6), 2);
+    EXPECT_EQ(0, f.height(1));
+    EXPECT_EQ(1, f.height(2));
+    EXPECT_EQ(4, f.height(3));
+    EXPECT_EQ(4, f.height(4));
+    EXPECT_EQ(3, f.height(5));
+    EXPECT_EQ(2, f.height(6));
 }
 
 TEST(FieldTest, HeightShouldBeCopied)
@@ -235,12 +235,12 @@ TEST(FieldTest, HeightShouldBeCopied)
 
     Field g(f);
 
-    EXPECT_EQ(g.height(1), 0);
-    EXPECT_EQ(g.height(2), 1);
-    EXPECT_EQ(g.height(3), 4);
-    EXPECT_EQ(g.height(4), 4);
-    EXPECT_EQ(g.height(5), 3);
-    EXPECT_EQ(g.height(6), 2);
+    EXPECT_EQ(0, g.height(1));
+    EXPECT_EQ(1, g.height(2));
+    EXPECT_EQ(4, g.height(3));
+    EXPECT_EQ(4, g.height(4));
+    EXPECT_EQ(3, g.height(5));
+    EXPECT_EQ(2, g.height(6));
 }
 
 TEST(FieldTest, HeightAfterSimulate)
@@ -253,12 +253,12 @@ TEST(FieldTest, HeightAfterSimulate)
     BasicRensaInfo info;
     f.simulate(info);
 
-    EXPECT_EQ(f.height(1), 0);
-    EXPECT_EQ(f.height(2), 0);
-    EXPECT_EQ(f.height(3), 0);
-    EXPECT_EQ(f.height(4), 2);
-    EXPECT_EQ(f.height(5), 1);
-    EXPECT_EQ(f.height(6), 2);
+    EXPECT_EQ(0, f.height(1));
+    EXPECT_EQ(0, f.height(2));
+    EXPECT_EQ(0, f.height(3));
+    EXPECT_EQ(2, f.height(4));
+    EXPECT_EQ(1, f.height(5));
+    EXPECT_EQ(2, f.height(6));
 }
 
 TEST(FieldTest, HeightAfterSimulate2)
@@ -270,12 +270,12 @@ TEST(FieldTest, HeightAfterSimulate2)
     BasicRensaInfo info;
     f.simulate(info);
 
-    EXPECT_EQ(f.height(1), 3);
-    EXPECT_EQ(f.height(2), 3);
-    EXPECT_EQ(f.height(3), 2);
-    EXPECT_EQ(f.height(4), 2);
-    EXPECT_EQ(f.height(5), 1);
-    EXPECT_EQ(f.height(6), 0);
+    EXPECT_EQ(3, f.height(1));
+    EXPECT_EQ(3, f.height(2));
+    EXPECT_EQ(2, f.height(3));
+    EXPECT_EQ(2, f.height(4));
+    EXPECT_EQ(1, f.height(5));
+    EXPECT_EQ(0, f.height(6));
 }
 
 TEST(FieldTest, DropPuyoOn)
@@ -287,8 +287,8 @@ TEST(FieldTest, DropPuyoOn)
 
     f.dropPuyoOn(1, RED);
 
-    EXPECT_EQ(f.color(1, 3), RED);
-    EXPECT_EQ(f.height(1), 3);
+    EXPECT_EQ(RED, f.color(1, 3));
+    EXPECT_EQ(3, f.height(1));
 }
 
 TEST(FieldTest, RemoveTopPuyoFrom)
@@ -296,12 +296,12 @@ TEST(FieldTest, RemoveTopPuyoFrom)
     Field f("456756");
 
     f.removeTopPuyoFrom(1);
-    EXPECT_EQ(f.color(1, 1), EMPTY);
-    EXPECT_EQ(f.height(1), 0);
+    EXPECT_EQ(EMPTY, f.color(1, 1));
+    EXPECT_EQ(0, f.height(1));
 
     f.removeTopPuyoFrom(1);
-    EXPECT_EQ(f.color(1, 1), EMPTY);
-    EXPECT_EQ(f.height(1), 0);
+    EXPECT_EQ(EMPTY, f.color(1, 1));
+    EXPECT_EQ(0, f.height(1));
 }
 
 TEST(FieldTest, CountPuyos)
@@ -311,7 +311,7 @@ TEST(FieldTest, CountPuyos)
             "445644"
             "445644");
 
-    EXPECT_EQ(f.countPuyos(), 18);
+    EXPECT_EQ(18, f.countPuyos());
 }
 
 TEST(FieldTest, CountColorPuyos)
@@ -321,7 +321,7 @@ TEST(FieldTest, CountColorPuyos)
             "445644"
             "445644");
 
-    EXPECT_EQ(f.countColorPuyos(), 17);
+    EXPECT_EQ(17, f.countColorPuyos());
 }
 
 TEST(FieldTest, TrackedFieldSimulation)
@@ -335,12 +335,12 @@ TEST(FieldTest, TrackedFieldSimulation)
     TrackedRensaInfo trackedRensaInfo;
     f.simulateAndTrack(trackedRensaInfo.rensaInfo, trackedRensaInfo.trackResult);
 
-    EXPECT_EQ(trackedRensaInfo.rensaInfo.chains, 5);
-    EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(1, 2), 1);
-    EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(1, 1), 2);
-    EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(3, 3), 3);
-    EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(5, 3), 4);
-    EXPECT_EQ(trackedRensaInfo.trackResult.erasedAt(5, 4), 5);
+    EXPECT_EQ(5, trackedRensaInfo.rensaInfo.chains);
+    EXPECT_EQ(1, trackedRensaInfo.trackResult.erasedAt(1, 2));
+    EXPECT_EQ(2, trackedRensaInfo.trackResult.erasedAt(1, 1));
+    EXPECT_EQ(3, trackedRensaInfo.trackResult.erasedAt(3, 3));
+    EXPECT_EQ(4, trackedRensaInfo.trackResult.erasedAt(5, 3));
+    EXPECT_EQ(5, trackedRensaInfo.trackResult.erasedAt(5, 4));
 }
 
 TEST(FieldTest, DropKumiPuyoExtreme)
@@ -360,12 +360,16 @@ TEST(FieldTest, FramesToDropNextWithoutChigiri)
     // TODO(mayah): We have to confirm this.
     Field f;
 
-    EXPECT_EQ(f.framesToDropNext(Decision(3, 0)), Field::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI);
-    EXPECT_EQ(f.framesToDropNext(Decision(3, 1)), Field::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI);
-    EXPECT_EQ(f.framesToDropNext(Decision(3, 2)), (Field::HEIGHT - 1) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI);
-    EXPECT_EQ(f.framesToDropNext(Decision(3, 3)), Field::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI);
-
-    EXPECT_EQ(f.framesToDropNext(Decision(1, 0)), Field::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_HORIZONTAL_MOVE * 2 + FRAMES_AFTER_NO_CHIGIRI);
+    EXPECT_EQ(Field::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI,
+              f.framesToDropNext(Decision(3, 0)));
+    EXPECT_EQ(Field::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI,
+              f.framesToDropNext(Decision(3, 1)));
+    EXPECT_EQ((Field::HEIGHT - 1) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI,
+              f.framesToDropNext(Decision(3, 2)));
+    EXPECT_EQ(Field::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI,
+              f.framesToDropNext(Decision(3, 3)));
+    EXPECT_EQ(Field::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_HORIZONTAL_MOVE * 2 + FRAMES_AFTER_NO_CHIGIRI,
+              f.framesToDropNext(Decision(1, 0)));
 }
 
 TEST(FieldTest, FramesToDropNextWithChigiri)
@@ -375,7 +379,8 @@ TEST(FieldTest, FramesToDropNextWithChigiri)
             "006000"
             "007000");
 
-    EXPECT_EQ(f.framesToDropNext(Decision(3, 1)), (Field::HEIGHT - 4) * FRAMES_DROP_1_LINE + FRAMES_AFTER_CHIGIRI + FRAMES_CHIGIRI_1_LINE_1 + FRAMES_CHIGIRI_1_LINE_2 + 2 * FRAMES_CHIGIRI_1_LINE_3);    
+    EXPECT_EQ((Field::HEIGHT - 4) * FRAMES_DROP_1_LINE + FRAMES_AFTER_CHIGIRI + FRAMES_CHIGIRI_1_LINE_1 + FRAMES_CHIGIRI_1_LINE_2 + 2 * FRAMES_CHIGIRI_1_LINE_3,
+              f.framesToDropNext(Decision(3, 1)));
 }
 
 
