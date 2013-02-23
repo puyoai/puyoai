@@ -78,14 +78,18 @@ void Field::initialize()
     // Initialize field information.
     for (int x = 0; x < MAP_WIDTH; ++x) {
         for (int y = 0; y < MAP_HEIGHT; ++y)
-            m_field[x][y] = EMPTY;
+            set(x, y, EMPTY);
     }
 
-    for (int x = 0; x < MAP_WIDTH; ++x)
-        m_field[x][0] = m_field[x][MAP_HEIGHT - 1] = WALL;
+    for (int x = 0; x < MAP_WIDTH; ++x) {
+        set(x, 0, WALL);
+        set(x, MAP_HEIGHT - 1, WALL);
+    }
 
-    for (int y = 0; y < MAP_HEIGHT; ++y)
-        m_field[0][y] = m_field[MAP_WIDTH - 1][y] = WALL;
+    for (int y = 0; y < MAP_HEIGHT; ++y) {
+        set(0, y, WALL);
+        set(MAP_WIDTH - 1, y, WALL);
+    }
 
     for (int x = 0; x < MAP_WIDTH; ++x)
         m_heights[x] = 0;
@@ -107,8 +111,8 @@ Field::Field(const std::string& url)
     for (int i = url.length() - 1; i >= data_starts_at; --i) {
         int x = 6 - (counter % 6);
         int y = counter / 6 + 1;
-        PuyoColor c = puyoColorOf(url[i]);        
-        m_field[x][y] = c;
+        PuyoColor c = puyoColorOf(url[i]);
+        set(x, y, c);
         if (c != EMPTY)
             m_heights[x] = y;
         counter++;
@@ -120,7 +124,7 @@ Field::Field(const Field& f)
     for (int x = 0; x < MAP_WIDTH; x++) {
         m_heights[x] = f.m_heights[x];
         for (int y = 0; y < MAP_HEIGHT; y++) {
-            m_field[x][y] = f.m_field[x][y];
+            set(x, y, f.color(x, y));
         }
     }
 }
@@ -201,7 +205,7 @@ void Field::dropPuyoOn(int x, PuyoColor c)
     DCHECK(height(x) < 14);
     DCHECK(color(x, height(x) + 1) == EMPTY) << " (x, height, color) = " << x << " : " << height(x) << " : " << color(x, height(x + 1));
 
-    m_field[x][++m_heights[x]] = c;
+    set(x, ++m_heights[x], c);
 }
 
 int Field::connectedPuyoNums(int x, int y) const
@@ -373,31 +377,31 @@ void Field::eraseQueuedPuyos(int nthChain, Position* eraseQueue, Position* erase
         int x = head->x;
         int y = head->y;
 
-        m_field[x][y] = EMPTY;
+        set(x, y, EMPTY);
         strategy.colorPuyoIsVanished(x, y, nthChain);
         minHeights[x] = std::min(minHeights[x], y);
 
         // Check OJAMA puyos erased
         if (color(x + 1, y) == OJAMA) {
-            m_field[x + 1][y] = EMPTY;
+            set(x + 1, y, EMPTY);
             strategy.ojamaPuyoIsVanished(x + 1, y, nthChain);
             minHeights[x + 1] = std::min(minHeights[x + 1], y);
         }
 
         if (color(x - 1, y) == OJAMA) {
-            m_field[x - 1][y] = EMPTY;
+            set(x - 1, y, EMPTY);
             strategy.ojamaPuyoIsVanished(x - 1, y, nthChain);
             minHeights[x - 1] = std::min(minHeights[x - 1], y);
         }
 
         // We don't need to update minHeights here.
         if (color(x, y + 1) == OJAMA && y + 1 <= HEIGHT) {
-            m_field[x][y + 1] = EMPTY;
+            set(x, y + 1, EMPTY);
             strategy.ojamaPuyoIsVanished(x, y + 1, nthChain);
         }
 
         if (color(x, y - 1) == OJAMA) {
-            m_field[x][y - 1] = EMPTY;
+            set(x, y - 1, EMPTY);
             strategy.ojamaPuyoIsVanished(x, y - 1, nthChain);
             minHeights[x] = std::min(minHeights[x], y - 1);
         }
@@ -422,8 +426,8 @@ int Field::dropAfterVanish(int minHeights[], Strategy& strategy)
                 continue;
 
             maxDrops = max(maxDrops, y - writeAt);
-            m_field[x][writeAt] = m_field[x][y];
-            m_field[x][y] = EMPTY;
+            set(x, writeAt, color(x, y));
+            set(x, y, EMPTY);
             m_heights[x] = writeAt;
             strategy.puyoIsDropped(x, y, writeAt++);
         }
@@ -451,7 +455,7 @@ void Field::forceDrop()
         int writeYAt = 1;
         for (int y = 1; y <= 13; ++y) {
             if (color(x, y) != EMPTY)
-                m_field[x][writeYAt++] = color(x, y);
+                set(x, writeYAt++, color(x, y));
         }
         m_heights[x] = writeYAt - 1;
     }
