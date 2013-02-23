@@ -206,13 +206,54 @@ void Field::dropPuyoOn(int x, PuyoColor c)
 
 int Field::connectedPuyoNums(int x, int y) const
 {
+    FieldBitField checked;
+    return connectedPuyoNums(x, y, checked);
+}
+
+int Field::connectedPuyoNums(int x, int y, FieldBitField& checked) const
+{
     DCHECK(isColorPuyo(color(x, y)));
 
     Position positions[WIDTH * HEIGHT];
-    FieldBitField checked;
 
     Position* filledHead = fillSameColorPosition(x, y, color(x, y), positions, checked);
-    return filledHead - positions;
+    return filledHead - positions;    
+}
+
+pair<int, int> Field::connectedPuyoNumsWithAllowingOnePointJump(int x, int y) const
+{
+    FieldBitField checked;
+    return connectedPuyoNumsWithAllowingOnePointJump(x, y, checked);
+}
+
+pair<int, int> Field::connectedPuyoNumsWithAllowingOnePointJump(int x, int y, FieldBitField& checked) const
+{
+    DCHECK(isColorPuyo(color(x, y)));
+    Position positions[WIDTH * HEIGHT];
+    int additional = 0;
+
+    PuyoColor c = color(x, y);
+    Position* end = fillSameColorPosition(x, y, c, positions, checked);
+    Position* current = end;
+
+    for (Position* p = positions; p != end; ++p) {
+        if (1 <= p->x - 2 && color(p->x - 1, p->y) == EMPTY && color(p->x - 2, p->y) == c && !checked(p->x - 2, p->y)) {
+            Position* newCurrent = fillSameColorPosition(p->x - 2, p->y, c, current, checked);
+            if (newCurrent != current) {
+                additional += 1;
+                current = newCurrent;
+            }
+        }
+        if (p->x + 2 <= Field::WIDTH && color(p->x + 1, p->y) == EMPTY && color(p->x + 2, p->y) == c && !checked(p->x + 2, p->y)) {
+            Position* newCurrent = fillSameColorPosition(p->x + 2, p->y, c, current, checked);
+            if (newCurrent != current) {
+                additional += 1;
+                current = newCurrent;
+            }
+        }
+    }
+
+    return make_pair(current - positions, additional);
 }
 
 int Field::countColorPuyos() const

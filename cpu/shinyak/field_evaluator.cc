@@ -5,6 +5,7 @@
 #include <glog/logging.h>
 
 #include "../../core/constant.h"
+#include "field_bit_field.h"
 #include "plan.h"
 #include "rensa_info.h"
 
@@ -42,11 +43,18 @@ double FieldEvaluator::calculateConnectionScore(const Field& field)
 {
     static double connectionScore[] = { 0, 0, 0.9, 1.2 };
 
+    FieldBitField checked;
     double result = 0;
     for (int x = 1; x <= Field::WIDTH; ++x) {
         for (int y = 1; field.color(x, y) != EMPTY; ++y) {
-            if (isColorPuyo(field.color(x, y)))
-                result += connectionScore[field.connectedPuyoNums(x, y)];
+            if (!isColorPuyo(field.color(x, y)) || checked(x, y))
+                continue;
+
+            pair<int, int> connection = field.connectedPuyoNumsWithAllowingOnePointJump(x, y, checked);
+            if (connection.first + connection.second >= 4)
+                result -= 0.5;
+            else if (connection.first < 4)
+                result += connectionScore[connection.first];
         }
     }
 
