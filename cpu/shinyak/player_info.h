@@ -26,7 +26,7 @@ public:
     double mainRensaHandWidth() const { return m_mainRensaHandWidth; }
 
 private:
-    Field m_estimatedField;
+    ArbitrarilyModifiableField m_estimatedField;
 
     TrackResult m_mainRensaTrackResult;
     int m_mainRensaChains;
