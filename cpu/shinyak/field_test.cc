@@ -36,7 +36,7 @@ TEST(FieldTest, Color)
 
 TEST(FieldTest, SetAndGet)
 {
-    Field f;
+    ArbitrarilyModifiableField f;
 
     f.setColor(1, 1, RED);
     f.setColor(1, 2, BLUE);
@@ -196,10 +196,17 @@ TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump1)
             "404404"
             "404555");
 
-    EXPECT_EQ(make_pair(5, 1), f.connectedPuyoNumsWithAllowingOnePointJump(1, 1));
-    EXPECT_EQ(make_pair(6, 2), f.connectedPuyoNumsWithAllowingOnePointJump(3, 1));
-    EXPECT_EQ(make_pair(3, 1), f.connectedPuyoNumsWithAllowingOnePointJump(1, 3));
-    EXPECT_EQ(make_pair(4, 2), f.connectedPuyoNumsWithAllowingOnePointJump(3, 3));
+    EXPECT_EQ(5, f.connectedPuyoNumsWithAllowingOnePointJump(1, 1).first);
+    EXPECT_EQ(1, f.connectedPuyoNumsWithAllowingOnePointJump(1, 1).second);
+
+    EXPECT_EQ(6, f.connectedPuyoNumsWithAllowingOnePointJump(3, 1).first);
+    EXPECT_EQ(2, f.connectedPuyoNumsWithAllowingOnePointJump(3, 1).second);
+
+    EXPECT_EQ(3, f.connectedPuyoNumsWithAllowingOnePointJump(1, 3).first);
+    EXPECT_EQ(1, f.connectedPuyoNumsWithAllowingOnePointJump(1, 3).second);
+
+    EXPECT_EQ(4, f.connectedPuyoNumsWithAllowingOnePointJump(3, 3).first);
+    EXPECT_EQ(2, f.connectedPuyoNumsWithAllowingOnePointJump(3, 3).second);
 }
 
 TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump2)
@@ -208,7 +215,8 @@ TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump2)
             "004500"
             "445505");
 
-    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(1, 1), make_pair(2, 0));
+    EXPECT_EQ(2, f.connectedPuyoNumsWithAllowingOnePointJump(1, 1).first);
+    EXPECT_EQ(0, f.connectedPuyoNumsWithAllowingOnePointJump(1, 1).second);
 }
 
 TEST(FieldTest, Height)

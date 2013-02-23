@@ -261,7 +261,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     double fieldScore2;
     {
         const TrackResult& tr = m_myPlayerInfo.mainRensaTrackResult();
-        Field f(plan.field());
+        ArbitrarilyModifiableField f(plan.field());
         for (int x = 1; x <= Field::WIDTH; ++x) {
             for (int y = 1; y <= 13; ++y) { // TODO: 13?
                 if (tr.erasedAt(x, y) != 0)

@@ -36,14 +36,6 @@ public:
     // Returns the height of the specified column.
     int height(int x) const { return m_heights[x]; }
 
-    // Do not use not in PlayerInfo.
-    void setColor(int x, int y, PuyoColor c) { set(x, y, c); }
-    void recalcHeightOn(int x) {
-        m_heights[x] = 0;
-        for (int y = 1; color(x, y) != EMPTY; ++y)
-            m_heights[x] = y;
-    }
-
     // Check if the field is in Zenkeshi
     bool isZenkeshi() const;
     int countColorPuyos() const;
@@ -83,13 +75,14 @@ public:
     // Compatibility interface for Ctrl
     PuyoColor Get(int x, int y) const { return color(x, y); }
 
-private:
-    // Crears every data this class has.
-    void initialize();
-
+protected:
     void set(int x, int y, PuyoColor c) {
         m_field[x][y] = static_cast<Puyo>(c);
     }
+
+private:
+    // Crears every data this class has.
+    void initialize();
     
     // Simulate chains until the end, and returns chains, score, and frames
     // before finishing the chain.
@@ -108,9 +101,24 @@ private:
 
     Position* fillSameColorPosition(int x, int y, PuyoColor, Position* positionQueueHead, FieldBitField& checked) const;
 
-private:
+protected:
     Puyo m_field[MAP_WIDTH][MAP_HEIGHT];
     byte m_heights[MAP_WIDTH];
+};
+
+class ArbitrarilyModifiableField : public Field {
+public:
+    ArbitrarilyModifiableField() {}
+    ArbitrarilyModifiableField(const Field& field) :
+        Field(field) {}
+
+    // Do not use not in PlayerInfo.
+    void setColor(int x, int y, PuyoColor c) { set(x, y, c); }
+    void recalcHeightOn(int x) {
+        m_heights[x] = 0;
+        for (int y = 1; color(x, y) != EMPTY; ++y)
+            m_heights[x] = y;
+    }    
 };
 
 #endif  // __FIELD_H__
