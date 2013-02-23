@@ -457,6 +457,8 @@ void Field::forceDrop()
             if (color(x, y) != EMPTY)
                 set(x, writeYAt++, color(x, y));
         }
+        for (int y = writeYAt; y <= 13; ++y)
+            set(x, y, EMPTY);
         m_heights[x] = writeYAt - 1;
     }
 }

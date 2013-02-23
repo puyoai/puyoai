@@ -9,6 +9,17 @@
 
 using namespace std;
 
+TEST(FieldTest, Initial)
+{
+    Field f;
+
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        for (int y = 1; y <= Field::HEIGHT; ++y) {
+            EXPECT_EQ(EMPTY, f.color(x, y)) << x << ' ' << y;
+        }
+    }
+}
+
 TEST(FieldTest, Color)
 {
     Field f("444000");
@@ -21,6 +32,34 @@ TEST(FieldTest, Color)
     EXPECT_EQ(f.color(5, 1), EMPTY);
     EXPECT_EQ(f.color(6, 1), EMPTY);
     EXPECT_EQ(f.color(7, 1), WALL);
+}
+
+TEST(FieldTest, SetAndGet)
+{
+    Field f;
+
+    f.setColor(1, 1, RED);
+    f.setColor(1, 2, BLUE);
+    f.setColor(1, 3, YELLOW);
+    f.setColor(1, 4, GREEN);
+    EXPECT_EQ(RED, f.color(1, 1));
+    EXPECT_EQ(BLUE, f.color(1, 2));
+    EXPECT_EQ(YELLOW, f.color(1, 3));
+    EXPECT_EQ(GREEN, f.color(1, 4));
+
+    f.setColor(1, 4, EMPTY);
+    EXPECT_EQ(f.color(1, 1), RED);
+    EXPECT_EQ(f.color(1, 2), BLUE);
+    EXPECT_EQ(f.color(1, 3), YELLOW);
+    EXPECT_EQ(f.color(1, 4), EMPTY);
+
+    f.setColor(1, 1, EMPTY);
+    f.setColor(1, 2, EMPTY);
+    f.setColor(1, 3, EMPTY);
+    EXPECT_EQ(f.color(1, 1), EMPTY);
+    EXPECT_EQ(f.color(1, 2), EMPTY);
+    EXPECT_EQ(f.color(1, 3), EMPTY);
+    EXPECT_EQ(f.color(1, 4), EMPTY);
 }
 
 TEST(FieldTest, IsZenkeshi)
@@ -50,9 +89,10 @@ TEST(FieldTest, ForceDrop)
     EXPECT_EQ(f.height(5), 2);
     EXPECT_EQ(f.height(6), 2);
 
-    EXPECT_EQ(f.color(1, 1), RED);
-    EXPECT_EQ(f.color(1, 2), BLUE);
-    EXPECT_EQ(f.color(1, 3), EMPTY);    
+    EXPECT_EQ(RED, f.color(1, 1));
+    EXPECT_EQ(BLUE, f.color(1, 2));
+    EXPECT_EQ(EMPTY, f.color(1, 3));
+    EXPECT_EQ(EMPTY, f.color(1, 4));
 }
 
 void testUrl(string url, int expected_chains, int expected_score)
