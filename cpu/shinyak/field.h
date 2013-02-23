@@ -49,6 +49,9 @@ public:
     int countColorPuyos() const;
     int countPuyos() const;
     int connectedPuyoNums(int x, int y) const;
+    int connectedPuyoNums(int x, int y, FieldBitField& checked) const;
+    std::pair<int, int> connectedPuyoNumsWithAllowingOnePointJump(int x, int y) const;
+    std::pair<int, int> connectedPuyoNumsWithAllowingOnePointJump(int x, int y, FieldBitField& checked) const;
 
     // True if EMPTY exists around (x, y)
     bool hasEmptyAround(int x, int y) const {

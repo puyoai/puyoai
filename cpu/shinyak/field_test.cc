@@ -150,6 +150,27 @@ TEST(FieldTest, ConnectedPuyoNums)
     EXPECT_EQ(f.connectedPuyoNums(5, 1), 1);
 }
 
+TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump1)
+{
+    Field f("707707"
+            "404404"
+            "404555");
+
+    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(1, 1), make_pair(5, 1));
+    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(3, 1), make_pair(6, 2));
+    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(1, 3), make_pair(3, 1));
+    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(3, 3), make_pair(3, 1));
+}
+
+TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump2)
+{
+    Field f("000000"
+            "004500"
+            "445505");
+
+    EXPECT_EQ(f.connectedPuyoNumsWithAllowingOnePointJump(1, 1), make_pair(2, 0));
+}
+
 TEST(FieldTest, Height)
 {
     Field f("004100"
