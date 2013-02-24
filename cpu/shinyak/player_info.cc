@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <glog/logging.h>
 #include <iostream>
+#include "evaluation_feature.h"
 #include "puyo_possibility.h"
 #include "rensa_detector.h"
 
@@ -11,8 +12,11 @@ using namespace std;
 // TODO(mayah): Maybe this function should be moved to an appropriate file.
 // I'm not sure where it is though...
 // Maybe FieldEvaluator?
-static double calculateHandWidth(const TrackResult& trackResult, const Field& field)
+static double calculateHandWidth(int distanceCountResult[5], const TrackResult& trackResult, const Field& field)
 {
+    for (int i = 0; i < 5; ++i)
+        distanceCountResult[i] = 0;
+
     // 1 連鎖の部分を距離 1 とし、距離 4 までを求める。
     // 距離 2, 3, 4 の数を数え、その広がり具合により、手の広さを求めることができる。
     int distance[Field::MAP_WIDTH][Field::MAP_HEIGHT];
@@ -25,42 +29,28 @@ static double calculateHandWidth(const TrackResult& trackResult, const Field& fi
         }
     }
 
-    int distanceCount[5] = { 0, 0, 0, 0, 0 };
-    
     for (int d = 2; d <= 4; ++d) {
         for (int x = 1; x <= Field::WIDTH; ++x) {
             for (int y = 1; y <= Field::HEIGHT; ++y) {
                 if (field.color(x, y) != EMPTY || distance[x][y] > 0)
                     continue;
-                //int d1 = d - 1;
                 int d1 = d;
                 if (distance[x][y-1] == d1 || distance[x][y+1] == d1 || distance[x-1][y] == d1 || distance[x+1][y] == d1) {
                     distance[x][y] = d;
-                    ++distanceCount[d];
+                    ++distanceCountResult[d];
                 }
             }
         }
     }
 
-    // TODO(mayah): Maybe we should move to this to RensaDetector.
-
-    // これはどうするのが正解？
-    if (distanceCount[2] == 0 || distanceCount[3] == 0)
-        return 0;
-
-    double ratio3 = static_cast<double>(distanceCount[4]) / distanceCount[3];
-    double ratio2 = static_cast<double>(distanceCount[3]) / distanceCount[2];
-
-    double r2 = (ratio2 - 1.5) * (ratio2 - 1.5) * (ratio2 - 1.5 >- 0 ? 1 : -1);
-    double r3 = (ratio3 - 1.5) * (ratio3 - 1.5) * (ratio3 - 1.5 >- 0 ? 1 : -1);
-
-    return r2 + r3;
+    return EvaluationFeature::calculateHandWidthScore(distanceCountResult[1], distanceCountResult[2], distanceCountResult[3], distanceCountResult[4]);
 }
 
 void MyPlayerInfo::initialize()
 {
     m_estimatedField = Field();
     m_mainRensaChains = 0;
+    memset(m_mainRensaDistanceCount, 0, sizeof(m_mainRensaDistanceCount));
 }
 
 void MyPlayerInfo::puyoDropped(const Decision& decision, const KumiPuyo& kumiPuyo)
@@ -129,6 +119,7 @@ void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos)
 
     double maxHandWidth = 0;
     double maxPossibility = 0;
+    int maxDistanceCountResult[5] = { 0, 0, 0, 0, 0 };
     auto maxRensaIter = results.begin();
     for (auto it = results.begin(); it != results.end(); ++it) {
         int chains = it->rensaInfo.chains;
@@ -137,16 +128,19 @@ void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos)
 
         PuyoSet necessarySet(it->necessaryPuyoSet);
         necessarySet.sub(kumiPuyoSet);
-        double handWidth = calculateHandWidth(it->trackResult, estimatedField());
+        int distanceCountResult[5];
+        double handWidth = calculateHandWidth(distanceCountResult, it->trackResult, estimatedField());
         double possibility = TsumoPossibility::possibility(4, necessarySet);
 
         if (maxHandWidth < handWidth) {
             maxHandWidth = handWidth;
             maxPossibility = possibility;
             maxRensaIter = it;
+            memmove(maxDistanceCountResult, distanceCountResult, sizeof(distanceCountResult));
         } else if (maxHandWidth == handWidth && maxPossibility < possibility) {
             maxPossibility = possibility;
             maxRensaIter = it;            
+            memmove(maxDistanceCountResult, distanceCountResult, sizeof(distanceCountResult));
         }        
     }
 
@@ -155,4 +149,5 @@ void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos)
     m_mainRensaHandWidth = maxHandWidth;
     m_mainRensaChains = maxRensaIter->rensaInfo.chains;
     m_mainRensaTrackResult = maxRensaIter->trackResult;
+    memmove(m_mainRensaDistanceCount, maxDistanceCountResult, sizeof(maxDistanceCountResult));
 }

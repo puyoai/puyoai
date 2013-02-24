@@ -8,6 +8,7 @@
 #include "evaluation_feature.h"
 #include "field_bit_field.h"
 #include "plan.h"
+#include "player_info.h"
 #include "puyo_possibility.h"
 #include "rensa_detector.h"
 #include "rensa_info.h"
@@ -129,3 +130,12 @@ void EvaluationFeatureCollector::collectFieldHeightFeature(EvaluationFeature& fe
     feature.set(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSum);
     feature.set(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
 }
+
+void EvaluationFeatureCollector::collectMainRensaHandWidth(EvaluationFeature& feature, const MyPlayerInfo& playerInfo)
+{
+    feature.set(HAND_WIDTH_1, playerInfo.mainRensaDistanceCount(1));
+    feature.set(HAND_WIDTH_2, playerInfo.mainRensaDistanceCount(2));
+    feature.set(HAND_WIDTH_3, playerInfo.mainRensaDistanceCount(3));
+    feature.set(HAND_WIDTH_4, playerInfo.mainRensaDistanceCount(4));
+}
+

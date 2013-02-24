@@ -223,31 +223,23 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     }
 
     EvaluationFeature feature;
-
     EvaluationFeatureCollector::collectEmptyAvailabilityFeature(feature, plan.field());
     EvaluationFeatureCollector::collectMaxRensaFeature(feature, plan.field());
     EvaluationFeatureCollector::collectConnectionFeature(feature, plan.field(), m_myPlayerInfo.mainRensaTrackResult());
     EvaluationFeatureCollector::collectFieldHeightFeature(feature, plan.field());
+    EvaluationFeatureCollector::collectMainRensaHandWidth(feature, m_myPlayerInfo);
     feature.set(TOTAL_FRAMES, plan.totalFrames());
-    double handWidth = 3 * m_myPlayerInfo.mainRensaHandWidth();
-    if (handWidth <= 0)
-        handWidth = -3;
 
-    double finalScore = 
-        + handWidth
-        + feature.calculateScore();
-    
+    double finalScore = feature.calculateScore();
     char buf[256];
-    sprintf(buf, "eval-score: %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
-            handWidth,
-            finalScore,
+    sprintf(buf, "maxChain = %d : enemy = %d : %d : %d",
             m_myPlayerInfo.mainRensaChains(),
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames()),
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames() + 50),
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames() + 100));
 
     LOG(INFO) << plan.decisionText() << " Extending HONSEN : " << buf;    
-    return EvalResult(finalScore, buf);
+    return EvalResult(finalScore, feature.toString() + " : " + buf);
 }
 
 

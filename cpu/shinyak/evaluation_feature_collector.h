@@ -3,6 +3,7 @@
 
 class EvaluationFeature;
 class Field;
+class MyPlayerInfo;
 class TrackResult;
 
 class EvaluationFeatureCollector {
@@ -11,6 +12,7 @@ public:
     static void collectConnectionFeature(EvaluationFeature&, const Field&, const TrackResult&);
     static void collectEmptyAvailabilityFeature(EvaluationFeature&, const Field&);
     static void collectFieldHeightFeature(EvaluationFeature&, const Field&);
+    static void collectMainRensaHandWidth(EvaluationFeature&, const MyPlayerInfo&);
 };
 
 #endif
