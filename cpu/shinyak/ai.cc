@@ -245,7 +245,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         feature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
     }
 
-    double fieldScore = FieldEvaluator::calculateConnectionScore(plan.field());
+    FieldEvaluator::calculateConnectionScore(plan.field(), m_myPlayerInfo.mainRensaTrackResult(), feature);
     FieldEvaluator::calculateFieldHeightScore(plan.field(), feature);
     double frameScore = 1.0 / plan.totalFrames();
     if (plan.totalFrames() >= 55)
@@ -254,32 +254,13 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     if (handWidth <= 0)
         handWidth = -3;
 
-    double fieldScore2;
-    {
-        const TrackResult& tr = m_myPlayerInfo.mainRensaTrackResult();
-        ArbitrarilyModifiableField f(plan.field());
-        for (int x = 1; x <= Field::WIDTH; ++x) {
-            for (int y = 1; y <= 13; ++y) { // TODO: 13?
-                if (tr.erasedAt(x, y) != 0)
-                    f.setColor(x, y, EMPTY);
-            }
-            f.recalcHeightOn(x);
-        }
-        f.forceDrop();
-        fieldScore2 = FieldEvaluator::calculateConnectionScore(f);
-    }
-
     double finalScore = 
-        + fieldScore / 30
-        + fieldScore2 / 15
         + frameScore
         + handWidth
         + feature.calculateScore();
     
     char buf[256];
-    sprintf(buf, "eval-score: %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
-            fieldScore / 30,
-            fieldScore2 / 15,
+    sprintf(buf, "eval-score: %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
             frameScore,
             handWidth,
             finalScore,

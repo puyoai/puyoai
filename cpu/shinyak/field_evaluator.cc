@@ -9,6 +9,7 @@
 #include "field_bit_field.h"
 #include "plan.h"
 #include "rensa_info.h"
+#include "rensa_result.h"
 
 using namespace std;
 
@@ -40,12 +41,9 @@ void FieldEvaluator::calculateEmptyFieldAvailability(const Field& field, Evaluat
     }
 }
 
-double FieldEvaluator::calculateConnectionScore(const Field& field)
+static void calculateConnection(const Field& field, const IntegerFeatureParam params[], EvaluationFeature& feature)
 {
-    static double connectionScore[] = { 0, 0, 0.9, 1.2 };
-
     FieldBitField checked;
-    double result = 0;
     for (int x = 1; x <= Field::WIDTH; ++x) {
         for (int y = 1; field.color(x, y) != EMPTY; ++y) {
             if (!isColorPuyo(field.color(x, y)) || checked(x, y))
@@ -53,13 +51,41 @@ double FieldEvaluator::calculateConnectionScore(const Field& field)
 
             pair<int, int> connection = field.connectedPuyoNumsWithAllowingOnePointJump(x, y, checked);
             if (connection.first + connection.second >= 4)
-                result -= 0.5;
+                feature.add(params[3], 1);
             else if (connection.first < 4)
-                result += connectionScore[connection.first];
+                feature.add(params[connection.first - 1], 1);
         }
     }
+}
 
-    return result;
+void FieldEvaluator::calculateConnectionScore(const Field& field, const TrackResult& trackResult, EvaluationFeature& feature)
+{
+    static const IntegerFeatureParam params[] = {
+        CONNECTION_1,
+        CONNECTION_2,
+        CONNECTION_3,
+        CONNECTION_4, 
+    };
+
+    static const IntegerFeatureParam paramsAfter[] = {
+        CONNECTION_AFTER_VANISH_1,
+        CONNECTION_AFTER_VANISH_2,
+        CONNECTION_AFTER_VANISH_3,
+        CONNECTION_AFTER_VANISH_4,
+    };
+
+    ArbitrarilyModifiableField f(field);
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        for (int y = 1; y <= 13; ++y) { // TODO: 13?
+            if (trackResult.erasedAt(x, y) != 0)
+                f.setColor(x, y, EMPTY);
+        }
+        f.recalcHeightOn(x);
+    }
+    f.forceDrop();
+
+    calculateConnection(field, params, feature);
+    calculateConnection(f, paramsAfter, feature);
 }
 
 void FieldEvaluator::calculateFieldHeightScore(const Field& field, EvaluationFeature& feature)

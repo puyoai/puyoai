@@ -10,6 +10,16 @@ enum IntegerFeatureParam {
 
     THIRD_COLUMN_HEIGHT,
 
+    CONNECTION_1,
+    CONNECTION_2,
+    CONNECTION_3,
+    CONNECTION_4,
+
+    CONNECTION_AFTER_VANISH_1,
+    CONNECTION_AFTER_VANISH_2,
+    CONNECTION_AFTER_VANISH_3,
+    CONNECTION_AFTER_VANISH_4,
+
     SIZE_OF_INTEGER_FEATURE_PARAM
 };
 
@@ -37,9 +47,11 @@ public:
 
 public:
     void set(IntegerFeatureParam param, int value) { m_integerFeatures[param] = value; }
+    void add(IntegerFeatureParam param, int value) { m_integerFeatures[param] += value; }
     int get(IntegerFeatureParam param) const { return m_integerFeatures[param]; }
 
     void set(DoubleFeatureParam param, double value) { m_doubleFeatures[param] = value; }
+    void add(DoubleFeatureParam param, double value) { m_doubleFeatures[param] += value; }
     double get(DoubleFeatureParam param) const { return m_doubleFeatures[param]; }
 
 public:
