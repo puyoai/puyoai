@@ -45,11 +45,6 @@ public:
     std::pair<int, int> connectedPuyoNumsWithAllowingOnePointJump(int x, int y) const;
     std::pair<int, int> connectedPuyoNumsWithAllowingOnePointJump(int x, int y, FieldBitField& checked) const;
 
-    // True if EMPTY exists around (x, y)
-    bool hasEmptyAround(int x, int y) const {
-        return color(x - 1, y) == EMPTY || color(x + 1, y) == EMPTY || color(x, y + 1) == EMPTY;
-    }
-
     // Drop kumipuyo with decision.
     void dropKumiPuyo(const Decision&, const KumiPuyo&);
     void dropKumiPuyoSafely(const Decision&, const KumiPuyo&);

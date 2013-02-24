@@ -5,6 +5,7 @@
 #include <glog/logging.h>
 
 #include "../../core/constant.h"
+#include "evaluation_feature.h"
 #include "field_bit_field.h"
 #include "plan.h"
 #include "rensa_info.h"
@@ -61,26 +62,22 @@ double FieldEvaluator::calculateConnectionScore(const Field& field)
     return result;
 }
 
-double FieldEvaluator::calculateFieldHeightScore(const Field& field)
+void FieldEvaluator::calculateFieldHeightScore(const Field& field, EvaluationFeature& feature)
 {
     double sumHeight = 0;
     for (int x = 1; x < Field::WIDTH; ++x)
         sumHeight += field.height(x);
-
     double averageHeight = sumHeight / 6.0;
-    double demotion = 0;
 
+    double heightSum = 0.0;
+    double heightSquareSum = 0.0;
     for (int x = 1; x <= Field::WIDTH; ++x) {
-        if (abs(field.height(x) - averageHeight) <= 2.5)
-            continue;
-
-        demotion -= 0.1 * (field.height(x) - averageHeight) * (field.height(x) - averageHeight);
+        double diff = abs(field.height(x) - averageHeight);
+        heightSum += diff;
+        heightSquareSum += diff * diff;
     }
 
-    if (field.height(3) >= 9)
-        demotion -= 0.5;
-    if (field.height(3) >= 10)
-        demotion -= 1.5;
-
-    return demotion;
+    feature.set(THIRD_COLUMN_HEIGHT, field.height(3));
+    feature.set(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSum);
+    feature.set(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
 }

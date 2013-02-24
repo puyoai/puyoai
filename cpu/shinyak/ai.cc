@@ -248,7 +248,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
 
     int colorPuyoNum = plan.field().countColorPuyos();
     double fieldScore = FieldEvaluator::calculateConnectionScore(plan.field());
-    double fieldHeightScore = FieldEvaluator::calculateFieldHeightScore(plan.field());
+    FieldEvaluator::calculateFieldHeightScore(plan.field(), feature);
     double frameScore = 1.0 / plan.totalFrames();
     if (plan.totalFrames() >= 55)
         frameScore = 0;
@@ -275,17 +275,15 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         + emptyFieldAvailability / (78 - colorPuyoNum)
         + fieldScore / 30
         + fieldScore2 / 15
-        + fieldHeightScore
         + frameScore
         + handWidth
         + feature.calculateScore();
     
     char buf[256];
-    sprintf(buf, "eval-score: %.3f %.3f %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
+    sprintf(buf, "eval-score: %.3f %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
             emptyFieldAvailability / (78 - colorPuyoNum),
             fieldScore / 30,
             fieldScore2 / 15,
-            fieldHeightScore,
             frameScore,
             handWidth,
             finalScore,
