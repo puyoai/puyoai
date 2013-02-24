@@ -8,10 +8,32 @@
 #include "evaluation_feature.h"
 #include "field_bit_field.h"
 #include "plan.h"
+#include "puyo_possibility.h"
+#include "rensa_detector.h"
 #include "rensa_info.h"
 #include "rensa_result.h"
 
 using namespace std;
+
+void EvaluationFeatureCollector::collectMaxRensaFeature(EvaluationFeature& feature, const Field& field)
+{
+    int maxChains = 0;
+    int numNecessaryPuyos = 0;
+
+    vector<PossibleRensaInfo> rensaInfos;
+    RensaDetector::findPossibleRensas(rensaInfos, field);
+    for (vector<PossibleRensaInfo>::iterator it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
+        if (maxChains < it->rensaInfo.chains) {
+            maxChains = it->rensaInfo.chains;
+            numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, it->necessaryPuyoSet);
+        } else if (maxChains == it->rensaInfo.chains) {
+            numNecessaryPuyos = min(numNecessaryPuyos, TsumoPossibility::necessaryPuyos(0.5, it->necessaryPuyoSet));
+        }
+    }
+    
+    feature.set(MAX_CHAINS, maxChains);
+    feature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
+}
 
 void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeature& feature, const Field& field)
 {

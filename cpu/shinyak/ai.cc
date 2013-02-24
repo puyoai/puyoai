@@ -225,26 +225,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     EvaluationFeature feature;
 
     EvaluationFeatureCollector::collectEmptyAvailabilityFeature(feature, plan.field());
-
-    {
-        int maxChains = 0;
-        int numNecessaryPuyos = 0;
-
-        vector<PossibleRensaInfo> rensaInfos;
-        RensaDetector::findPossibleRensas(rensaInfos, plan.field());
-        for (vector<PossibleRensaInfo>::iterator it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-            if (maxChains < it->rensaInfo.chains) {
-                maxChains = it->rensaInfo.chains;
-                numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, it->necessaryPuyoSet);
-            } else if (maxChains == it->rensaInfo.chains) {
-                numNecessaryPuyos = min(numNecessaryPuyos, TsumoPossibility::necessaryPuyos(0.5, it->necessaryPuyoSet));
-            }
-        }
-
-        feature.set(MAX_CHAINS, maxChains);
-        feature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
-    }
-
+    EvaluationFeatureCollector::collectMaxRensaFeature(feature, plan.field());
     EvaluationFeatureCollector::collectConnectionFeature(feature, plan.field(), m_myPlayerInfo.mainRensaTrackResult());
     EvaluationFeatureCollector::collectFieldHeightFeature(feature, plan.field());
     feature.set(TOTAL_FRAMES, plan.totalFrames());
