@@ -4,53 +4,33 @@
 #include <string>
 #include <vector>
 
-enum IntegerFeatureParam {
-    MAX_CHAINS, // Max chains
-    MAX_RENSA_NECESSARY_PUYOS, // Necessary puyos to fire max chains
-
-    THIRD_COLUMN_HEIGHT,
-
-    CONNECTION_1,
-    CONNECTION_2,
-    CONNECTION_3,
-    CONNECTION_4,
-
-    CONNECTION_AFTER_VANISH_1,
-    CONNECTION_AFTER_VANISH_2,
-    CONNECTION_AFTER_VANISH_3,
-    CONNECTION_AFTER_VANISH_4,
-
-    HAND_WIDTH_1,
-    HAND_WIDTH_2,
-    HAND_WIDTH_3,
-    HAND_WIDTH_4,
-
-    TOTAL_FRAMES,
-
-    SIZE_OF_INTEGER_FEATURE_PARAM
-};
+class EvaluationFeature {
+public:
+    enum IntegerFeatureParam {
+#define DEFINE_INT_RANGE_PARAM(NAME, minValue, maxValue, asc) NAME,
+#define DEFINE_INT_SINGLE_PARAM(NAME, asc) NAME,
+#include "evaluation_feature_int.tab"
+#undef DEFINE_INT_SINGLE_PARAM
+#undef DEFINE_INT_RANGE_PARAM
+        SIZE_OF_INTEGER_FEATURE_PARAM
+    };
 
 enum DoubleFeatureParam {
-    SUM_OF_HEIGHT_DIFF_FROM_AVERAGE,
-    SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE,
-
-    EMPTY_AVAILABILITY_00,
-    EMPTY_AVAILABILITY_01,
-    EMPTY_AVAILABILITY_02,
-    EMPTY_AVAILABILITY_11,
-    EMPTY_AVAILABILITY_12,
-    EMPTY_AVAILABILITY_22,
-
+#define DEFINE_DOUBLE_PARAM(NAME) NAME,
+#include "evaluation_feature_double.tab"
+#undef DEFINE_DOUBLE_PARAMS
     SIZE_OF_DOUBLE_FEATURE_PARAM
 };
 
-class EvaluationFeature {
 public:
     EvaluationFeature() :
         m_integerFeatures(SIZE_OF_INTEGER_FEATURE_PARAM),
         m_doubleFeatures(SIZE_OF_DOUBLE_FEATURE_PARAM)
     {
     }
+
+public:
+        // DEFINE_INT_PARAM(MAX_CHAINS, 0, 20, ASC);
 
 public:
     void set(IntegerFeatureParam param, int value) { m_integerFeatures[param] = value; }
@@ -68,7 +48,6 @@ public:
 
 private:
     double chainScore() const;
-    
 
 private:
     std::vector<int> m_integerFeatures;
