@@ -1,10 +1,10 @@
-#include "field_evaluator.h"
+#include "evaluation_feature_collector.h"
 
 #include <algorithm>
 #include <cmath>
 #include <glog/logging.h>
 
-#include "../../core/constant.h"
+#include "core/constant.h"
 #include "evaluation_feature.h"
 #include "field_bit_field.h"
 #include "plan.h"
@@ -13,7 +13,7 @@
 
 using namespace std;
 
-void FieldEvaluator::calculateEmptyFieldAvailability(const Field& field, EvaluationFeature& feature)
+void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeature& feature, const Field& field)
 {
     int emptyCells = 72 - field.countPuyos();
     if (emptyCells <= 0)
@@ -58,7 +58,7 @@ static void calculateConnection(const Field& field, const IntegerFeatureParam pa
     }
 }
 
-void FieldEvaluator::calculateConnectionScore(const Field& field, const TrackResult& trackResult, EvaluationFeature& feature)
+void EvaluationFeatureCollector::collectConnectionFeature(EvaluationFeature& feature, const Field& field, const TrackResult& trackResult)
 {
     static const IntegerFeatureParam params[] = {
         CONNECTION_1,
@@ -88,7 +88,7 @@ void FieldEvaluator::calculateConnectionScore(const Field& field, const TrackRes
     calculateConnection(f, paramsAfter, feature);
 }
 
-void FieldEvaluator::calculateFieldHeightScore(const Field& field, EvaluationFeature& feature)
+void EvaluationFeatureCollector::collectFieldHeightFeature(EvaluationFeature& feature, const Field& field)
 {
     double sumHeight = 0;
     for (int x = 1; x < Field::WIDTH; ++x)

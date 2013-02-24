@@ -2,10 +2,10 @@
 #include <fstream>
 #include <stdlib.h>
 
-#include "../../core/state.h"
+#include "core/state.h"
 #include "ai.h"
+#include "evaluation_feature_collector.h"
 #include "field.h"
-#include "field_evaluator.h"
 #include "game.h"
 #include "player_info.h"
 #include "rensa_detector.h"

@@ -14,7 +14,7 @@
 #include "ctrl.h"
 #include "drop_decision.h"
 #include "evaluation_feature.h"
-#include "field_evaluator.h"
+#include "evaluation_feature_collector.h"
 #include "game.h"
 #include "puyo.h"
 #include "puyo_possibility.h"
@@ -224,7 +224,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
 
     EvaluationFeature feature;
 
-    FieldEvaluator::calculateEmptyFieldAvailability(plan.field(), feature);
+    EvaluationFeatureCollector::collectEmptyAvailabilityFeature(feature, plan.field());
 
     {
         int maxChains = 0;
@@ -245,8 +245,9 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         feature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
     }
 
-    FieldEvaluator::calculateConnectionScore(plan.field(), m_myPlayerInfo.mainRensaTrackResult(), feature);
-    FieldEvaluator::calculateFieldHeightScore(plan.field(), feature);
+    EvaluationFeatureCollector::collectConnectionFeature(feature, plan.field(), m_myPlayerInfo.mainRensaTrackResult());
+    EvaluationFeatureCollector::collectFieldHeightFeature(feature, plan.field());
+
     double frameScore = 1.0 / plan.totalFrames();
     if (plan.totalFrames() >= 55)
         frameScore = 0;
