@@ -24,6 +24,7 @@ public:
     const TrackResult& mainRensaTrackResult() const { return m_mainRensaTrackResult; }
     int mainRensaChains() const { return m_mainRensaChains; }
     double mainRensaHandWidth() const { return m_mainRensaHandWidth; }
+    int mainRensaDistanceCount(int nth) const { return m_mainRensaDistanceCount[nth]; }
 
 private:
     ArbitrarilyModifiableField m_estimatedField;
@@ -31,6 +32,7 @@ private:
     TrackResult m_mainRensaTrackResult;
     int m_mainRensaChains;
     double m_mainRensaHandWidth;
+    int m_mainRensaDistanceCount[5];
 };
 
 #endif

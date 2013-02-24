@@ -20,6 +20,13 @@ enum IntegerFeatureParam {
     CONNECTION_AFTER_VANISH_3,
     CONNECTION_AFTER_VANISH_4,
 
+    HAND_WIDTH_1,
+    HAND_WIDTH_2,
+    HAND_WIDTH_3,
+    HAND_WIDTH_4,
+
+    TOTAL_FRAMES,
+
     SIZE_OF_INTEGER_FEATURE_PARAM
 };
 
@@ -33,8 +40,6 @@ enum DoubleFeatureParam {
     EMPTY_AVAILABILITY_11,
     EMPTY_AVAILABILITY_12,
     EMPTY_AVAILABILITY_22,
-
-    TOTAL_FRAMES,
 
     SIZE_OF_DOUBLE_FEATURE_PARAM
 };
@@ -57,8 +62,13 @@ public:
     double get(DoubleFeatureParam param) const { return m_doubleFeatures[param]; }
 
 public:
-    std::string toString() const;
+    static double calculateHandWidthScore(int numFirstCells, int numSecondCells, int numThirdCells, int numFourthCells);
     double calculateScore() const;
+    std::string toString() const;
+
+private:
+    double chainScore() const;
+    
 
 private:
     std::vector<int> m_integerFeatures;
