@@ -3,11 +3,11 @@
 
 class EvaluationFeature;
 class Field;
+class TrackResult;
 
 class FieldEvaluator {
 public:
-    static double calculateConnectionScore(const Field&);
-
+    static void calculateConnectionScore(const Field&, const TrackResult&, EvaluationFeature&);
     static void calculateEmptyFieldAvailability(const Field&, EvaluationFeature&);
     static void calculateFieldHeightScore(const Field&, EvaluationFeature&);
 };
