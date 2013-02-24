@@ -247,22 +247,17 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
 
     EvaluationFeatureCollector::collectConnectionFeature(feature, plan.field(), m_myPlayerInfo.mainRensaTrackResult());
     EvaluationFeatureCollector::collectFieldHeightFeature(feature, plan.field());
-
-    double frameScore = 1.0 / plan.totalFrames();
-    if (plan.totalFrames() >= 55)
-        frameScore = 0;
+    feature.set(TOTAL_FRAMES, plan.totalFrames());
     double handWidth = 3 * m_myPlayerInfo.mainRensaHandWidth();
     if (handWidth <= 0)
         handWidth = -3;
 
     double finalScore = 
-        + frameScore
         + handWidth
         + feature.calculateScore();
     
     char buf[256];
-    sprintf(buf, "eval-score: %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
-            frameScore,
+    sprintf(buf, "eval-score: %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
             handWidth,
             finalScore,
             m_myPlayerInfo.mainRensaChains(),

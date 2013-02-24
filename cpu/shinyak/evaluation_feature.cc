@@ -28,6 +28,9 @@ double EvaluationFeature::calculateScore() const
     result +=  1.2 * get(CONNECTION_AFTER_VANISH_3) / 15.0;
     result +=  0.5 * get(CONNECTION_AFTER_VANISH_4) / 15.0; // plus
 
+    if (get(TOTAL_FRAMES) < 55)
+        result += 1.0 / get(TOTAL_FRAMES);
+
     result -= 0 * get(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE);
     result -= 0.1 * get(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE);
 
