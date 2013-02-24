@@ -22,5 +22,12 @@ double EvaluationFeature::calculateScore() const
     result -= 0 * get(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE);
     result -= 0.1 * get(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE);
 
+    result += get(EMPTY_AVAILABILITY_00) * 0.95;
+    result += get(EMPTY_AVAILABILITY_01) * 0.90;
+    result += get(EMPTY_AVAILABILITY_02) * 0.85;
+    result += get(EMPTY_AVAILABILITY_11) * 0.80;
+    result += get(EMPTY_AVAILABILITY_12) * 0.75;
+    result += get(EMPTY_AVAILABILITY_22) * 0.30;
+    
     return result;
 }

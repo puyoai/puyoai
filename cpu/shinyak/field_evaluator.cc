@@ -12,16 +12,18 @@
 
 using namespace std;
 
-double FieldEvaluator::calculateEmptyFieldAvailability(const Field& field)
+void FieldEvaluator::calculateEmptyFieldAvailability(const Field& field, EvaluationFeature& feature)
 {
-    // --- 1. Calculate the availability of field.
-    static const double availabilityMap[3][3] = {
-        { 0.95, 0.90, 0.85 },
-        { 0.90, 0.80, 0.75 },
-        { 0.85, 0.75, 0.30 },
+    int emptyCells = 72 - field.countPuyos();
+    if (emptyCells <= 0)
+        return;
+
+    DoubleFeatureParam map[3][3] = {
+        { EMPTY_AVAILABILITY_00, EMPTY_AVAILABILITY_01, EMPTY_AVAILABILITY_02, },
+        { EMPTY_AVAILABILITY_01, EMPTY_AVAILABILITY_11, EMPTY_AVAILABILITY_12, },
+        { EMPTY_AVAILABILITY_02, EMPTY_AVAILABILITY_12, EMPTY_AVAILABILITY_22, },
     };
 
-    double emptyAvailability = 0;
     for (int x = Field::WIDTH; x >= 1; --x) {
         for (int y = Field::HEIGHT; y >= 1; --y) {
             if (field.color(x, y) != EMPTY)
@@ -32,12 +34,10 @@ double FieldEvaluator::calculateEmptyFieldAvailability(const Field& field)
             if (field.color(x - 1, y + 1) == EMPTY) --left;
             if (field.color(x + 1, y) == EMPTY) --right;
             if (field.color(x + 1, y + 1) == EMPTY) --right;
-            
-            emptyAvailability += availabilityMap[left][right];
+
+            feature.set(map[left][right], feature.get(map[left][right]) + 1.0 / emptyCells);
         }
     }
-
-    return emptyAvailability;
 }
 
 double FieldEvaluator::calculateConnectionScore(const Field& field)

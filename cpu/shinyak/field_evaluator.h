@@ -6,9 +6,9 @@ class Field;
 
 class FieldEvaluator {
 public:
-    static double calculateEmptyFieldAvailability(const Field&);
     static double calculateConnectionScore(const Field&);
 
+    static void calculateEmptyFieldAvailability(const Field&, EvaluationFeature&);
     static void calculateFieldHeightScore(const Field&, EvaluationFeature&);
 };
 
