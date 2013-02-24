@@ -28,7 +28,6 @@ public:
     void initializeWith(int id) {
         setId(id);
         setRensaIsOngoing(false);
-        m_emptyFieldAvailability = 0;
         m_feasibleRensaInfos.clear();
         m_possibleRensaInfos.clear();
     }
@@ -40,9 +39,6 @@ public:
     void setOngoingRensa(const OngoingRensaInfo&);
     bool rensaIsOngoing() const { return m_rensaIsOngoing; }
     const OngoingRensaInfo& ongoingRensaInfo() const { return m_ongoingRensaInfo; }
-
-    void setEmptyFieldAvailability(double availability) { m_emptyFieldAvailability = availability; }
-    double emptyFieldAvailability() const { return m_emptyFieldAvailability; }
 
     void updateFeasibleRensas(const Field&, const std::vector<KumiPuyo>& kumiPuyos);
     void updatePossibleRensas(const Field&, const std::vector<KumiPuyo>& kumiPuyos);
@@ -59,9 +55,6 @@ private:
     int estimateMaxScoreFrom(int frameId, const std::vector<EstimatedRensaInfo>& rensaInfos) const;
 
     int m_id;
-
-    double m_emptyFieldAvailability;
-
     bool m_rensaIsOngoing;
     OngoingRensaInfo m_ongoingRensaInfo;
 

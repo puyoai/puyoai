@@ -89,7 +89,6 @@ void AI::enemyWNextAppeared(const Game& game)
     int currentFrameId = game.id;
 
     m_enemyInfo.setId(currentFrameId);
-    m_enemyInfo.setEmptyFieldAvailability(FieldEvaluator::calculateEmptyFieldAvailability(game.enemyPlayerState().field));
 
     m_enemyInfo.updateFeasibleRensas(game.enemyPlayerState().field, game.enemyPlayerState().kumiPuyos);
     m_enemyInfo.updatePossibleRensas(game.enemyPlayerState().field, game.enemyPlayerState().kumiPuyos);
@@ -225,7 +224,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
 
     EvaluationFeature feature;
 
-    double emptyFieldAvailability = FieldEvaluator::calculateEmptyFieldAvailability(plan.field());
+    FieldEvaluator::calculateEmptyFieldAvailability(plan.field(), feature);
 
     {
         int maxChains = 0;
@@ -246,7 +245,6 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         feature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
     }
 
-    int colorPuyoNum = plan.field().countColorPuyos();
     double fieldScore = FieldEvaluator::calculateConnectionScore(plan.field());
     FieldEvaluator::calculateFieldHeightScore(plan.field(), feature);
     double frameScore = 1.0 / plan.totalFrames();
@@ -272,7 +270,6 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     }
 
     double finalScore = 
-        + emptyFieldAvailability / (78 - colorPuyoNum)
         + fieldScore / 30
         + fieldScore2 / 15
         + frameScore
@@ -280,8 +277,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
         + feature.calculateScore();
     
     char buf[256];
-    sprintf(buf, "eval-score: %.3f %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
-            emptyFieldAvailability / (78 - colorPuyoNum),
+    sprintf(buf, "eval-score: %.3f %.3f %.3f %.3f : = %.3f : maxChain = %d : enemy = %d : %d : %d ",
             fieldScore / 30,
             fieldScore2 / 15,
             frameScore,
