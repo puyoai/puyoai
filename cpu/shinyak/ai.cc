@@ -228,7 +228,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     EvaluationFeatureCollector::collectConnectionFeature(feature, plan.field(), m_myPlayerInfo.mainRensaTrackResult());
     EvaluationFeatureCollector::collectFieldHeightFeature(feature, plan.field());
     EvaluationFeatureCollector::collectMainRensaHandWidth(feature, m_myPlayerInfo);
-    feature.set(TOTAL_FRAMES, plan.totalFrames());
+    feature.set(EvaluationFeature::TOTAL_FRAMES, plan.totalFrames());
 
     double finalScore = feature.calculateScore();
     char buf[256];

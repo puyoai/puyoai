@@ -32,8 +32,8 @@ void EvaluationFeatureCollector::collectMaxRensaFeature(EvaluationFeature& featu
         }
     }
     
-    feature.set(MAX_CHAINS, maxChains);
-    feature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
+    feature.set(EvaluationFeature::MAX_CHAINS, maxChains);
+    feature.set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
 }
 
 void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeature& feature, const Field& field)
@@ -42,10 +42,10 @@ void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeatu
     if (emptyCells <= 0)
         return;
 
-    DoubleFeatureParam map[3][3] = {
-        { EMPTY_AVAILABILITY_00, EMPTY_AVAILABILITY_01, EMPTY_AVAILABILITY_02, },
-        { EMPTY_AVAILABILITY_01, EMPTY_AVAILABILITY_11, EMPTY_AVAILABILITY_12, },
-        { EMPTY_AVAILABILITY_02, EMPTY_AVAILABILITY_12, EMPTY_AVAILABILITY_22, },
+    EvaluationFeature::DoubleFeatureParam map[3][3] = {
+        { EvaluationFeature::EMPTY_AVAILABILITY_00, EvaluationFeature::EMPTY_AVAILABILITY_01, EvaluationFeature::EMPTY_AVAILABILITY_02, },
+        { EvaluationFeature::EMPTY_AVAILABILITY_01, EvaluationFeature::EMPTY_AVAILABILITY_11, EvaluationFeature::EMPTY_AVAILABILITY_12, },
+        { EvaluationFeature::EMPTY_AVAILABILITY_02, EvaluationFeature::EMPTY_AVAILABILITY_12, EvaluationFeature::EMPTY_AVAILABILITY_22, },
     };
 
     for (int x = Field::WIDTH; x >= 1; --x) {
@@ -64,7 +64,7 @@ void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeatu
     }
 }
 
-static void calculateConnection(const Field& field, const IntegerFeatureParam params[], EvaluationFeature& feature)
+static void calculateConnection(const Field& field, const EvaluationFeature::IntegerFeatureParam params[], EvaluationFeature& feature)
 {
     FieldBitField checked;
     for (int x = 1; x <= Field::WIDTH; ++x) {
@@ -83,18 +83,18 @@ static void calculateConnection(const Field& field, const IntegerFeatureParam pa
 
 void EvaluationFeatureCollector::collectConnectionFeature(EvaluationFeature& feature, const Field& field, const TrackResult& trackResult)
 {
-    static const IntegerFeatureParam params[] = {
-        CONNECTION_1,
-        CONNECTION_2,
-        CONNECTION_3,
-        CONNECTION_4, 
+    static const EvaluationFeature::IntegerFeatureParam params[] = {
+        EvaluationFeature::CONNECTION_1,
+        EvaluationFeature::CONNECTION_2,
+        EvaluationFeature::CONNECTION_3,
+        EvaluationFeature::CONNECTION_4, 
     };
 
-    static const IntegerFeatureParam paramsAfter[] = {
-        CONNECTION_AFTER_VANISH_1,
-        CONNECTION_AFTER_VANISH_2,
-        CONNECTION_AFTER_VANISH_3,
-        CONNECTION_AFTER_VANISH_4,
+    static const EvaluationFeature::IntegerFeatureParam paramsAfter[] = {
+        EvaluationFeature::CONNECTION_AFTER_VANISH_1,
+        EvaluationFeature::CONNECTION_AFTER_VANISH_2,
+        EvaluationFeature::CONNECTION_AFTER_VANISH_3,
+        EvaluationFeature::CONNECTION_AFTER_VANISH_4,
     };
 
     ArbitrarilyModifiableField f(field);
@@ -126,16 +126,16 @@ void EvaluationFeatureCollector::collectFieldHeightFeature(EvaluationFeature& fe
         heightSquareSum += diff * diff;
     }
 
-    feature.set(THIRD_COLUMN_HEIGHT, field.height(3));
-    feature.set(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSum);
-    feature.set(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
+    feature.set(EvaluationFeature::THIRD_COLUMN_HEIGHT, field.height(3));
+    feature.set(EvaluationFeature::SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSum);
+    feature.set(EvaluationFeature::SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
 }
 
 void EvaluationFeatureCollector::collectMainRensaHandWidth(EvaluationFeature& feature, const MyPlayerInfo& playerInfo)
 {
-    feature.set(HAND_WIDTH_1, playerInfo.mainRensaDistanceCount(1));
-    feature.set(HAND_WIDTH_2, playerInfo.mainRensaDistanceCount(2));
-    feature.set(HAND_WIDTH_3, playerInfo.mainRensaDistanceCount(3));
-    feature.set(HAND_WIDTH_4, playerInfo.mainRensaDistanceCount(4));
+    feature.set(EvaluationFeature::HAND_WIDTH_1, playerInfo.mainRensaDistanceCount(1));
+    feature.set(EvaluationFeature::HAND_WIDTH_2, playerInfo.mainRensaDistanceCount(2));
+    feature.set(EvaluationFeature::HAND_WIDTH_3, playerInfo.mainRensaDistanceCount(3));
+    feature.set(EvaluationFeature::HAND_WIDTH_4, playerInfo.mainRensaDistanceCount(4));
 }
 
