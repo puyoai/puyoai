@@ -30,9 +30,6 @@ public:
     }
 
 public:
-        // DEFINE_INT_PARAM(MAX_CHAINS, 0, 20, ASC);
-
-public:
     void set(IntegerFeatureParam param, int value) { m_integerFeatures[param] = value; }
     void add(IntegerFeatureParam param, int value) { m_integerFeatures[param] += value; }
     int get(IntegerFeatureParam param) const { return m_integerFeatures[param]; }
