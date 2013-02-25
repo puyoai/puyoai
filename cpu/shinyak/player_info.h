@@ -5,6 +5,7 @@
 #include "rensa_info.h"
 
 class Decision;
+class EvaluationParams;
 class KumiPuyo;
 
 class MyPlayerInfo {
@@ -19,7 +20,7 @@ public:
     void rensaFinished(const Field&);
     void forceEstimatedField(const Field& field) { m_estimatedField = field; }
 
-    void updateMainRensa(const std::vector<KumiPuyo>&);
+    void updateMainRensa(const std::vector<KumiPuyo>&, const EvaluationParams&);
 
     const TrackResult& mainRensaTrackResult() const { return m_mainRensaTrackResult; }
     int mainRensaChains() const { return m_mainRensaChains; }

@@ -34,6 +34,7 @@ void EvaluationFeatureCollector::collectMaxRensaFeature(EvaluationFeature& featu
     
     feature.set(EvaluationFeature::MAX_CHAINS, maxChains);
     feature.set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
+    feature.set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
 }
 
 void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeature& feature, const Field& field)
@@ -42,7 +43,7 @@ void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeatu
     if (emptyCells <= 0)
         return;
 
-    EvaluationFeature::DoubleFeatureParam map[3][3] = {
+    EvaluationFeature::FeatureParam map[3][3] = {
         { EvaluationFeature::EMPTY_AVAILABILITY_00, EvaluationFeature::EMPTY_AVAILABILITY_01, EvaluationFeature::EMPTY_AVAILABILITY_02, },
         { EvaluationFeature::EMPTY_AVAILABILITY_01, EvaluationFeature::EMPTY_AVAILABILITY_11, EvaluationFeature::EMPTY_AVAILABILITY_12, },
         { EvaluationFeature::EMPTY_AVAILABILITY_02, EvaluationFeature::EMPTY_AVAILABILITY_12, EvaluationFeature::EMPTY_AVAILABILITY_22, },
@@ -64,7 +65,7 @@ void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeatu
     }
 }
 
-static void calculateConnection(const Field& field, const EvaluationFeature::IntegerFeatureParam params[], EvaluationFeature& feature)
+static void calculateConnection(const Field& field, const EvaluationFeature::FeatureParam params[], EvaluationFeature& feature)
 {
     FieldBitField checked;
     for (int x = 1; x <= Field::WIDTH; ++x) {
@@ -83,14 +84,14 @@ static void calculateConnection(const Field& field, const EvaluationFeature::Int
 
 void EvaluationFeatureCollector::collectConnectionFeature(EvaluationFeature& feature, const Field& field, const TrackResult& trackResult)
 {
-    static const EvaluationFeature::IntegerFeatureParam params[] = {
+    static const EvaluationFeature::FeatureParam params[] = {
         EvaluationFeature::CONNECTION_1,
         EvaluationFeature::CONNECTION_2,
         EvaluationFeature::CONNECTION_3,
         EvaluationFeature::CONNECTION_4, 
     };
 
-    static const EvaluationFeature::IntegerFeatureParam paramsAfter[] = {
+    static const EvaluationFeature::FeatureParam paramsAfter[] = {
         EvaluationFeature::CONNECTION_AFTER_VANISH_1,
         EvaluationFeature::CONNECTION_AFTER_VANISH_2,
         EvaluationFeature::CONNECTION_AFTER_VANISH_3,
@@ -133,9 +134,24 @@ void EvaluationFeatureCollector::collectFieldHeightFeature(EvaluationFeature& fe
 
 void EvaluationFeatureCollector::collectMainRensaHandWidth(EvaluationFeature& feature, const MyPlayerInfo& playerInfo)
 {
-    feature.set(EvaluationFeature::HAND_WIDTH_1, playerInfo.mainRensaDistanceCount(1));
-    feature.set(EvaluationFeature::HAND_WIDTH_2, playerInfo.mainRensaDistanceCount(2));
-    feature.set(EvaluationFeature::HAND_WIDTH_3, playerInfo.mainRensaDistanceCount(3));
-    feature.set(EvaluationFeature::HAND_WIDTH_4, playerInfo.mainRensaDistanceCount(4));
+    double d1 = playerInfo.mainRensaDistanceCount(1);
+    double d2 = playerInfo.mainRensaDistanceCount(2);
+    double d3 = playerInfo.mainRensaDistanceCount(3);
+    double d4 = playerInfo.mainRensaDistanceCount(4);
+
+    double r21 = d1 != 0 ? d2 / d1 : 0;
+    double r32 = d2 != 0 ? d3 / d2 : 0;
+    double r43 = d3 != 0 ? d4 / d3 : 0;
+
+    feature.set(EvaluationFeature::HAND_WIDTH_1, d1);
+    feature.set(EvaluationFeature::HAND_WIDTH_2, d2);
+    feature.set(EvaluationFeature::HAND_WIDTH_3, d3);
+    feature.set(EvaluationFeature::HAND_WIDTH_4, d4);
+    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_21, r21);
+    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_32, r32);
+    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_43, r43);
+    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_21_SQUARED, r21 * r21);
+    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
+    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
 }
 

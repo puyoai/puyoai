@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "enemy_info.h"
+#include "evaluation_params.h"
 #include "player_info.h"
 
 class Game;
@@ -46,6 +47,8 @@ private:
     std::string m_name;
     MyPlayerInfo m_myPlayerInfo;
     EnemyInfo m_enemyInfo;
+
+    EvaluationParams m_evaluationParams;
 };
 
 #endif
