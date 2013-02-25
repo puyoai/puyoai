@@ -63,7 +63,7 @@ void AI::wnextAppeared(const Game& game)
     // Since the current puyo is moving
     vector<KumiPuyo> kumiPuyos(game.myPlayerState().kumiPuyos.begin() + 1,
                                game.myPlayerState().kumiPuyos.end());
-    m_myPlayerInfo.updateMainRensa(kumiPuyos);
+    m_myPlayerInfo.updateMainRensa(kumiPuyos, m_evaluationParams);
 }
 
 void AI::myRensaFinished(const Game& game)
@@ -72,7 +72,7 @@ void AI::myRensaFinished(const Game& game)
 
     vector<KumiPuyo> kumiPuyos(game.myPlayerState().kumiPuyos.begin(),
                                game.myPlayerState().kumiPuyos.begin() + 2);
-    m_myPlayerInfo.updateMainRensa(kumiPuyos);
+    m_myPlayerInfo.updateMainRensa(kumiPuyos, m_evaluationParams);
 }
 
 void AI::myOjamaDropped(const Game& game)
@@ -81,7 +81,7 @@ void AI::myOjamaDropped(const Game& game)
 
     vector<KumiPuyo> kumiPuyos(game.myPlayerState().kumiPuyos.begin(),
                                game.myPlayerState().kumiPuyos.begin() + 2);
-    m_myPlayerInfo.updateMainRensa(kumiPuyos);
+    m_myPlayerInfo.updateMainRensa(kumiPuyos, m_evaluationParams);
 }
 
 void AI::enemyWNextAppeared(const Game& game)
@@ -229,8 +229,10 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     EvaluationFeatureCollector::collectFieldHeightFeature(feature, plan.field());
     EvaluationFeatureCollector::collectMainRensaHandWidth(feature, m_myPlayerInfo);
     feature.set(EvaluationFeature::TOTAL_FRAMES, plan.totalFrames());
+    feature.set(EvaluationFeature::TOTAL_FRAMES_INVERSE, 1.0 / plan.totalFrames());
 
-    double finalScore = feature.calculateScore();
+    double finalScore = m_evaluationParams.calculateScore(feature);
+
     char buf[256];
     sprintf(buf, "maxChain = %d : enemy = %d : %d : %d",
             m_myPlayerInfo.mainRensaChains(),

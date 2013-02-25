@@ -4,6 +4,7 @@
 #include <glog/logging.h>
 #include <iostream>
 #include "evaluation_feature.h"
+#include "evaluation_params.h"
 #include "puyo_possibility.h"
 #include "rensa_detector.h"
 
@@ -12,7 +13,7 @@ using namespace std;
 // TODO(mayah): Maybe this function should be moved to an appropriate file.
 // I'm not sure where it is though...
 // Maybe FieldEvaluator?
-static double calculateHandWidth(int distanceCountResult[5], const TrackResult& trackResult, const Field& field)
+static double calculateHandWidth(int distanceCountResult[5], const TrackResult& trackResult, const Field& field, const EvaluationParams& params)
 {
     for (int i = 0; i < 5; ++i)
         distanceCountResult[i] = 0;
@@ -34,8 +35,7 @@ static double calculateHandWidth(int distanceCountResult[5], const TrackResult& 
             for (int y = 1; y <= Field::HEIGHT; ++y) {
                 if (field.color(x, y) != EMPTY || distance[x][y] > 0)
                     continue;
-                int d1 = d;
-                if (distance[x][y-1] == d1 || distance[x][y+1] == d1 || distance[x-1][y] == d1 || distance[x+1][y] == d1) {
+                if (distance[x][y-1] == d - 1 || distance[x][y+1] == d - 1 || distance[x-1][y] == d - 1 || distance[x+1][y] == d - 1) {
                     distance[x][y] = d;
                     ++distanceCountResult[d];
                 }
@@ -43,7 +43,7 @@ static double calculateHandWidth(int distanceCountResult[5], const TrackResult& 
         }
     }
 
-    return EvaluationFeature::calculateHandWidthScore(distanceCountResult[1], distanceCountResult[2], distanceCountResult[3], distanceCountResult[4]);
+    return params.calculateHandWidthScore(distanceCountResult[1], distanceCountResult[2], distanceCountResult[3], distanceCountResult[4]);
 }
 
 void MyPlayerInfo::initialize()
@@ -83,7 +83,7 @@ void MyPlayerInfo::rensaFinished(const Field& field)
     ojamaDropped(field);
 }
 
-void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos)
+void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos, const EvaluationParams& params)
 {
     DCHECK(kumiPuyos.size() == 2);
 
@@ -123,13 +123,13 @@ void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos)
     auto maxRensaIter = results.begin();
     for (auto it = results.begin(); it != results.end(); ++it) {
         int chains = it->rensaInfo.chains;
-        if (chains + 1 < maxChains)
+        if (chains < maxChains)
             continue;
 
         PuyoSet necessarySet(it->necessaryPuyoSet);
         necessarySet.sub(kumiPuyoSet);
         int distanceCountResult[5];
-        double handWidth = calculateHandWidth(distanceCountResult, it->trackResult, estimatedField());
+        double handWidth = calculateHandWidth(distanceCountResult, it->trackResult, estimatedField(), params);
         double possibility = TsumoPossibility::possibility(4, necessarySet);
 
         if (maxHandWidth < handWidth) {
@@ -143,8 +143,6 @@ void MyPlayerInfo::updateMainRensa(const vector<KumiPuyo>& kumiPuyos)
             memmove(maxDistanceCountResult, distanceCountResult, sizeof(distanceCountResult));
         }        
     }
-
-    LOG(INFO) << "main rensa = " << maxRensaIter->trackResult.toString();
 
     m_mainRensaHandWidth = maxHandWidth;
     m_mainRensaChains = maxRensaIter->rensaInfo.chains;
