@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "enemy_info.h"
-#include "evaluation_params.h"
+#include "evaluation_feature.h"
 #include "player_info.h"
 
 class Game;
