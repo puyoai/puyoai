@@ -42,6 +42,7 @@ std::string AI::getName() const
 AI::AI(const string& name)
     : m_name(name)
 {
+    // m_evaluationParams.load("feature.bin");
 }
 
 void AI::initialize(const Game& game)
@@ -223,14 +224,7 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     }
 
     EvaluationFeature feature;
-    EvaluationFeatureCollector::collectEmptyAvailabilityFeature(feature, plan.field());
-    EvaluationFeatureCollector::collectMaxRensaFeature(feature, plan.field());
-    EvaluationFeatureCollector::collectConnectionFeature(feature, plan.field(), m_myPlayerInfo.mainRensaTrackResult());
-    EvaluationFeatureCollector::collectFieldHeightFeature(feature, plan.field());
-    EvaluationFeatureCollector::collectMainRensaHandWidth(feature, m_myPlayerInfo);
-    feature.set(EvaluationFeature::TOTAL_FRAMES, plan.totalFrames());
-    feature.set(EvaluationFeature::TOTAL_FRAMES_INVERSE, 1.0 / plan.totalFrames());
-
+    EvaluationFeatureCollector::collectFeatures(feature, plan, m_myPlayerInfo);
     double finalScore = m_evaluationParams.calculateScore(feature);
 
     char buf[256];
@@ -243,5 +237,3 @@ EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentFi
     LOG(INFO) << plan.decisionText() << " Extending HONSEN : " << buf;    
     return EvalResult(finalScore, feature.toString() + " : " + buf);
 }
-
-

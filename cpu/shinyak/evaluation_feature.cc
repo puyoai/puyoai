@@ -2,6 +2,7 @@
 
 #include <glog/logging.h>
 #include <sstream>
+#include <stdio.h>
 #include "field.h"
 
 using namespace std;
@@ -31,8 +32,14 @@ EvaluationParams::EvaluationParams() :
 
 void EvaluationParams::initialize()
 {
+    // これはわりと適当に決めた値
+
+    set(EvaluationFeature::TOTAL_FRAMES, 0.0);
+    set(EvaluationFeature::TOTAL_FRAMES_INVERSE, 1.0);
+
     set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS, 0);
     set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0);
+
     set(EvaluationFeature::CONNECTION_1, -0.1 / 30.0);
     set(EvaluationFeature::CONNECTION_2,  0.9 / 30.0);
     set(EvaluationFeature::CONNECTION_3,  1.2 / 30.0);
@@ -42,8 +49,17 @@ void EvaluationParams::initialize()
     set(EvaluationFeature::CONNECTION_AFTER_VANISH_3,  1.6 / 15.0);
     set(EvaluationFeature::CONNECTION_AFTER_VANISH_4,  0.5 / 15.0); // plus
 
-    set(EvaluationFeature::TOTAL_FRAMES, 0.0);
-    set(EvaluationFeature::TOTAL_FRAMES_INVERSE, 1.0);
+    set(EvaluationFeature::HAND_WIDTH_1, 0.1);
+    set(EvaluationFeature::HAND_WIDTH_2, 0.1);
+    set(EvaluationFeature::HAND_WIDTH_3, 0.1);
+    set(EvaluationFeature::HAND_WIDTH_4, 0.1);
+
+    set(EvaluationFeature::HAND_WIDTH_RATIO_21, 0.1);
+    set(EvaluationFeature::HAND_WIDTH_RATIO_32, 0.1);
+    set(EvaluationFeature::HAND_WIDTH_RATIO_43, 0.1);
+    set(EvaluationFeature::HAND_WIDTH_RATIO_21_SQUARED, 0.1);
+    set(EvaluationFeature::HAND_WIDTH_RATIO_32_SQUARED, 0.1);
+    set(EvaluationFeature::HAND_WIDTH_RATIO_43_SQUARED, 0.1);
 
     set(EvaluationFeature::SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, 0.0);
     set(EvaluationFeature::SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, -0.1);
@@ -55,18 +71,6 @@ void EvaluationParams::initialize()
     set(EvaluationFeature::EMPTY_AVAILABILITY_12, 0.75);
     set(EvaluationFeature::EMPTY_AVAILABILITY_22, 0.30);
 
-    set(EvaluationFeature::HAND_WIDTH_1, 0);
-    set(EvaluationFeature::HAND_WIDTH_2, 0);
-    set(EvaluationFeature::HAND_WIDTH_3, 0);
-    set(EvaluationFeature::HAND_WIDTH_4, 0);
-
-    set(EvaluationFeature::HAND_WIDTH_RATIO_21, 0);
-    set(EvaluationFeature::HAND_WIDTH_RATIO_32, 0);
-    set(EvaluationFeature::HAND_WIDTH_RATIO_43, 0);
-    set(EvaluationFeature::HAND_WIDTH_RATIO_21_SQUARED, 0);
-    set(EvaluationFeature::HAND_WIDTH_RATIO_32_SQUARED, 0);
-    set(EvaluationFeature::HAND_WIDTH_RATIO_43_SQUARED, 0);
-
     for (int i = 0; i < 20; ++i)
         set(EvaluationFeature::MAX_CHAINS, i, i);
     set(EvaluationFeature::THIRD_COLUMN_HEIGHT,  9, -0.5);
@@ -76,6 +80,41 @@ void EvaluationParams::initialize()
     set(EvaluationFeature::THIRD_COLUMN_HEIGHT, 13, -2.0);
     set(EvaluationFeature::THIRD_COLUMN_HEIGHT, 14, -2.0);
     set(EvaluationFeature::THIRD_COLUMN_HEIGHT, 15, -2.0);
+}
+
+bool EvaluationParams::save(const char* filename)
+{
+    FILE* fp = fopen(filename, "w");
+    if (!fp) {
+        perror("save");
+        return false;
+    }
+
+    // TODO(mayah): We assume vector memory is continuously allocated.
+    fwrite(&m_featuresCoef[0], sizeof(double), m_featuresCoef.size(), fp);
+    for (int i = 0; i < EvaluationFeature::SIZE_OF_RANGE_FEATURE_PARAM; ++i)
+        fwrite(&m_rangeFeaturesCoef[i][0], sizeof(double), m_rangeFeaturesCoef[i].size(), fp);
+
+    fclose(fp);
+
+    return true;
+}
+
+bool EvaluationParams::load(const char* filename)
+{
+    FILE* fp = fopen(filename, "r");
+    if (!fp) {
+        perror("load");
+        return false;
+    }
+
+    // TODO(mayah): We assume vector memory is continuously allocated.
+    fread(&m_featuresCoef[0], sizeof(double), m_featuresCoef.size(), fp);
+    for (int i = 0; i < EvaluationFeature::SIZE_OF_RANGE_FEATURE_PARAM; ++i)
+        fread(&m_rangeFeaturesCoef[i][0], sizeof(double), m_rangeFeaturesCoef[i].size(), fp);
+
+    fclose(fp);
+    return true;
 }
 
 double EvaluationParams::calculateHandWidthScore(int numFirstCells, int numSecondCells, int numThirdCells, int numFourthCells) const
@@ -118,4 +157,22 @@ double EvaluationParams::calculateScore(const EvaluationFeature& feature) const
     LOG(INFO) << "score = " << result;
 
     return result;
+}
+
+string EvaluationParams::toString() const
+{
+    ostringstream ss;
+
+    // TODO(mayah): We should not use this kind of hack. Use for-loop.
+#define DEFINE_PARAM(name) ss << (#name) << " = " << get(EvaluationFeature::name) << endl;
+#define DEFINE_RANGE_PARAM(name, maxValue, asc) ss << (#name) << " = "; \
+    for (int i = 0; i < (maxValue); ++i) {                              \
+        ss << get(EvaluationFeature::name, i) << ' ';                   \
+    }                                                                   \
+    ss << endl;
+#include "evaluation_feature.tab"
+#undef DEFINE_PARAM
+#undef DEFINE_RANGE_PARAM
+
+    return ss.str();
 }

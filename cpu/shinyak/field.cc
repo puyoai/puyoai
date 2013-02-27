@@ -518,3 +518,17 @@ void Field::showDebugOutput() const
     cerr << getDebugOutput() << endl;
 }
 
+bool operator==(const Field& lhs, const Field& rhs)
+{
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        if (lhs.height(x) != rhs.height(x))
+            return false;
+
+        for (int y = 1; y <= lhs.height(x); ++y) {
+            if (lhs.color(x, y) != rhs.color(x, y))
+                return false;
+        }
+    }
+
+    return true;
+}

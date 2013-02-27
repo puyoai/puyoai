@@ -16,6 +16,19 @@
 
 using namespace std;
 
+void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, const Plan& plan, const MyPlayerInfo& myPlayerInfo)
+{
+    EvaluationFeatureCollector::collectEmptyAvailabilityFeature(feature, plan.field());
+    EvaluationFeatureCollector::collectMaxRensaFeature(feature, plan.field());
+    EvaluationFeatureCollector::collectConnectionFeature(feature, plan.field(), myPlayerInfo.mainRensaTrackResult());
+    EvaluationFeatureCollector::collectFieldHeightFeature(feature, plan.field());
+    EvaluationFeatureCollector::collectMainRensaHandWidth(feature, myPlayerInfo);
+    feature.set(EvaluationFeature::TOTAL_FRAMES, plan.totalFrames());
+    // TODO(mayah): Why totalFrames is 0?
+    if (plan.totalFrames() != 0)
+        feature.set(EvaluationFeature::TOTAL_FRAMES_INVERSE, 1.0 / plan.totalFrames());    
+}
+
 void EvaluationFeatureCollector::collectMaxRensaFeature(EvaluationFeature& feature, const Field& field)
 {
     int maxChains = 0;
@@ -34,7 +47,8 @@ void EvaluationFeatureCollector::collectMaxRensaFeature(EvaluationFeature& featu
     
     feature.set(EvaluationFeature::MAX_CHAINS, maxChains);
     feature.set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
-    feature.set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
+    if (numNecessaryPuyos != 0)
+        feature.set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
 }
 
 void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeature& feature, const Field& field)
