@@ -9,6 +9,8 @@ Makefile
 run.err
 solver
 solo
+solo.*.log.*
+solo.INFO
 interactive
 
 
