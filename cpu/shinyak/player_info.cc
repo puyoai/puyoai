@@ -4,7 +4,6 @@
 #include <glog/logging.h>
 #include <iostream>
 #include "evaluation_feature.h"
-#include "evaluation_params.h"
 #include "puyo_possibility.h"
 #include "rensa_detector.h"
 
