@@ -66,6 +66,8 @@ public:
     std::string getDebugOutput() const;
     void showDebugOutput() const;
 
+    friend bool operator==(const Field&, const Field&);
+
 public:
     // Compatibility interface for Ctrl
     PuyoColor Get(int x, int y) const { return color(x, y); }

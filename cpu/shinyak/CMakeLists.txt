@@ -24,6 +24,7 @@ endfunction()
 
 shinyak_add_executable(shinyak_cpu main.cc)
 shinyak_add_executable(interactive interactive.cc)
+shinyak_add_executable(learn learn.cc)
 shinyak_add_executable(solver solver.cc)
 shinyak_add_executable(solo solo.cc)
 

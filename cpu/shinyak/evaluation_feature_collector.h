@@ -5,8 +5,13 @@ class EvaluationFeature;
 class Field;
 class MyPlayerInfo;
 class TrackResult;
+class Plan;
 
 class EvaluationFeatureCollector {
+public:
+    // Collects all features.
+    static void collectFeatures(EvaluationFeature&, const Plan&, const MyPlayerInfo&);
+
 public:
     static void collectMaxRensaFeature(EvaluationFeature&, const Field&);
     static void collectConnectionFeature(EvaluationFeature&, const Field&, const TrackResult&);

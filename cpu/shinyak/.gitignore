@@ -12,5 +12,6 @@ solo
 solo.*.log.*
 solo.INFO
 interactive
+learn
 
 
