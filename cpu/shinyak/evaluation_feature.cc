@@ -22,7 +22,7 @@ EvaluationParams::EvaluationParams() :
     m_rangeFeaturesCoef(EvaluationFeature::SIZE_OF_RANGE_FEATURE_PARAM)
 {
 #define DEFINE_PARAM(name) /* ignored */
-#define DEFINE_RANGE_PARAM(name, maxValue, asc) m_rangeFeaturesCoef[EvaluationFeature::name].resize(maxValue);
+#define DEFINE_RANGE_PARAM(name, maxValue) m_rangeFeaturesCoef[EvaluationFeature::name].resize(maxValue);
 #include "evaluation_feature.tab"
 #undef DEFINE_RANGE_PARAM
 #undef DEFINE_PARAM
@@ -149,7 +149,7 @@ double EvaluationParams::calculateScore(const EvaluationFeature& feature) const
     double result = 0;
 
 #define DEFINE_PARAM(name) result += get(EvaluationFeature::name) * feature.get(EvaluationFeature::name);
-#define DEFINE_RANGE_PARAM(name, maxValue, asc) result += get(EvaluationFeature::name, feature.get(EvaluationFeature::name));
+#define DEFINE_RANGE_PARAM(name, maxValue) result += get(EvaluationFeature::name, feature.get(EvaluationFeature::name));
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_RANGE_PARAM
@@ -165,7 +165,7 @@ string EvaluationParams::toString() const
 
     // TODO(mayah): We should not use this kind of hack. Use for-loop.
 #define DEFINE_PARAM(name) ss << (#name) << " = " << get(EvaluationFeature::name) << endl;
-#define DEFINE_RANGE_PARAM(name, maxValue, asc) ss << (#name) << " = "; \
+#define DEFINE_RANGE_PARAM(name, maxValue) ss << (#name) << " = "; \
     for (int i = 0; i < (maxValue); ++i) {                              \
         ss << get(EvaluationFeature::name, i) << ' ';                   \
     }                                                                   \

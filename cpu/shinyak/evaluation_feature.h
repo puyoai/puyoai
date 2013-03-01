@@ -10,7 +10,7 @@ class EvaluationFeature {
 public:
     enum FeatureParam {
 #define DEFINE_PARAM(NAME) NAME,
-#define DEFINE_RANGE_PARAM(NAME, maxValue, asc) /* ignored */
+#define DEFINE_RANGE_PARAM(NAME, maxValue) /* ignored */
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_RANGE_PARAM
@@ -19,7 +19,7 @@ public:
     
     enum RangeFeatureParam {
 #define DEFINE_PARAM(NAME) /* ignored */
-#define DEFINE_RANGE_PARAM(NAME, maxValue, asc) NAME,
+#define DEFINE_RANGE_PARAM(NAME, maxValue) NAME,
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_RANGE_PARAM
