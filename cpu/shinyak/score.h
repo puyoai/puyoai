@@ -3,7 +3,7 @@
 
 #include <glog/logging.h>
 
-#include "../../core/constant.h"
+#include "core/constant.h"
 
 inline int scoreForOjama(int num)
 {

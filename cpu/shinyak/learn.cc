@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string>
 
+#include "enemy_info.h"
 #include "evaluation_feature.h"
 #include "evaluation_feature_collector.h"
 #include "field.h"
@@ -14,6 +15,16 @@
 #include "puyo_possibility.h"
 
 using namespace std;
+
+struct FrameInput {
+    FrameInput() {}
+    FrameInput(const Field& left, const vector<KumiPuyo>& kumiPuyos, const Field& right) :
+        myField(left), kumiPuyos(kumiPuyos), enemyField(right) {}
+
+    Field myField;
+    vector<KumiPuyo> kumiPuyos;
+    Field enemyField;
+};
 
 void convert(string& str)
 {
@@ -30,20 +41,8 @@ void convert(string& str)
     }
 }
 
-double dsigmoid(double x)
-{
-    const double delta = 256.0 / 7.0;
-
-    if (x <= -256 || 256.0 <= x)
-        return 0.0F;
-
-    double dn = exp(-x / delta);
-    double dd = delta * (dn + 1.0) * (dn * 1.0);
-    return dn / dd;
-}
-
 void learn(EvaluationParams& params, 
-           const MyPlayerInfo& myPlayerInfo, 
+           const MyPlayerInfo& myPlayerInfo, const EnemyInfo& enemyInfo,
            const Field& currentField, const vector<KumiPuyo>& kumiPuyos,
            const Field& teacherField)
 {
@@ -59,7 +58,7 @@ void learn(EvaluationParams& params,
     vector<pair<float, size_t> > scores(plans.size());
     vector<EvaluationFeature> features(plans.size());
     for (size_t i = 0; i < plans.size(); ++i) {
-        EvaluationFeatureCollector::collectFeatures(features[i], plans[i], myPlayerInfo);
+        EvaluationFeatureCollector::collectFeatures(features[i], 0, plans[i], currentField, myPlayerInfo, enemyInfo);
 
         if (plans[i].isRensaPlan()) {
             scores[i] = make_pair(-1000000, i);
@@ -132,11 +131,13 @@ int main(void)
     
     EvaluationParams params;
 
-    pair<Field, vector<KumiPuyo>> fieldAndKumiPuyos[3];
+    FrameInput frameInputs[3];
     bool shouldSkip = false;
     int fieldNum = 0;
     string left, sequence, right;
+
     MyPlayerInfo myPlayerInfo;
+    EnemyInfo enemyInfo;
 
     while (cin >> left >> sequence >> right) {
         if (left == "===") {
@@ -151,15 +152,16 @@ int main(void)
 
         convert(left);
         convert(sequence);
+        convert(right);
 
         vector<KumiPuyo> kumiPuyos;
         setKumiPuyo(sequence, kumiPuyos);
         kumiPuyos.resize(2);
-        fieldAndKumiPuyos[fieldNum % 3] = make_pair(Field(left), kumiPuyos);
+        frameInputs[fieldNum % 3] = FrameInput(Field(left), kumiPuyos, Field(right));
 
         if (fieldNum >= 2) {
-            const Field& current = fieldAndKumiPuyos[fieldNum % 3].first;
-            const Field& previous = fieldAndKumiPuyos[(fieldNum + 2) % 3].first;
+            const Field& current = frameInputs[fieldNum % 3].myField;
+            const Field& previous = frameInputs[(fieldNum + 2) % 3].myField;
             // When we have an OJAMA puyo, skip this battle.
             if (current.countColorPuyos() != current.countPuyos()) 
                 shouldSkip = true;
@@ -169,13 +171,15 @@ int main(void)
                 shouldSkip = true;
 
             if (!shouldSkip) {
-                const Field& previous2 = fieldAndKumiPuyos[(fieldNum + 1) % 3].first;
-                const vector<KumiPuyo>& kumiPuyos = fieldAndKumiPuyos[(fieldNum + 1) % 3].second;
+                const Field& previous2 = frameInputs[(fieldNum + 1) % 3].myField;
+                const vector<KumiPuyo>& kumiPuyos = frameInputs[(fieldNum + 1) % 3].kumiPuyos;
 
                 myPlayerInfo.forceEstimatedField(previous2);
                 myPlayerInfo.updateMainRensa(kumiPuyos, params);
+                enemyInfo.initializeWith(1);
+                enemyInfo.updatePossibleRensas(frameInputs[(fieldNum + 1) % 3].enemyField, vector<KumiPuyo>());
 
-                learn(params, myPlayerInfo, previous2, kumiPuyos, current);
+                learn(params, myPlayerInfo, enemyInfo, previous2, kumiPuyos, current);
             }
         }
 
