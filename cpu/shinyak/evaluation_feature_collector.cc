@@ -3,8 +3,10 @@
 #include <algorithm>
 #include <cmath>
 #include <glog/logging.h>
+#include <sstream>
 
 #include "core/constant.h"
+#include "enemy_info.h"
 #include "evaluation_feature.h"
 #include "field_bit_field.h"
 #include "plan.h"
@@ -13,16 +15,18 @@
 #include "rensa_detector.h"
 #include "rensa_info.h"
 #include "rensa_result.h"
+#include "score.h"
 
 using namespace std;
 
-void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, const Plan& plan, const MyPlayerInfo& myPlayerInfo)
+void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, int currentFrameId, const Plan& plan, const Field& fieldBeforePlan, const MyPlayerInfo& myPlayerInfo, const EnemyInfo& enemyInfo)
 {
     EvaluationFeatureCollector::collectEmptyAvailabilityFeature(feature, plan.field());
     EvaluationFeatureCollector::collectMaxRensaFeature(feature, plan.field());
     EvaluationFeatureCollector::collectConnectionFeature(feature, plan.field(), myPlayerInfo.mainRensaTrackResult());
     EvaluationFeatureCollector::collectFieldHeightFeature(feature, plan.field());
     EvaluationFeatureCollector::collectMainRensaHandWidth(feature, myPlayerInfo);
+    EvaluationFeatureCollector::collectOngoingRensaFeature(feature, currentFrameId, plan, fieldBeforePlan, myPlayerInfo, enemyInfo);
     feature.set(EvaluationFeature::TOTAL_FRAMES, plan.totalFrames());
     // TODO(mayah): Why totalFrames is 0?
     if (plan.totalFrames() != 0)
@@ -169,3 +173,61 @@ void EvaluationFeatureCollector::collectMainRensaHandWidth(EvaluationFeature& fe
     feature.set(EvaluationFeature::HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
 }
 
+void EvaluationFeatureCollector::collectOngoingRensaFeature(
+    EvaluationFeature& feature, int currentFrameId, const Plan& plan, const Field& fieldBeforePlan,
+    const MyPlayerInfo& playerInfo, const EnemyInfo& enemyInfo)
+{
+    if (enemyInfo.rensaIsOngoing() && enemyInfo.ongoingRensaInfo().rensaInfo.score > scoreForOjama(6)) {
+        // TODO: 対応が適当すぎる
+        if (enemyInfo.ongoingRensaInfo().rensaInfo.score >= scoreForOjama(6) &&
+            plan.totalScore() >= enemyInfo.ongoingRensaInfo().rensaInfo.score &&
+            plan.initiatingFrames() <= enemyInfo.ongoingRensaInfo().finishingRensaFrame) {
+            LOG(INFO) << plan.decisionText() << " TAIOU";
+            feature.set(EvaluationFeature::STRATEGY_TAIOU, 1.0);
+            return;
+        }
+    }
+
+    if (!plan.isRensaPlan())
+        return;
+
+    if (plan.field().isZenkeshi()) {
+        feature.set(EvaluationFeature::STRATEGY_ZENKESHI, 1);
+        return;
+    }
+
+    int rensaEndingFrameId = currentFrameId + plan.totalFrames();
+    int estimatedMaxScore = enemyInfo.estimateMaxScore(rensaEndingFrameId);
+    // log << "ESTIMATED MAX SCORE = " << estimatedMaxScore << " BY " << rensaEndingFrameId << endl;
+
+    // --- 1.1. 十分でかい場合は打って良い。
+    // / TODO: 十分でかいとは？ / とりあえず致死量ということにする
+    if (plan.totalScore() >= estimatedMaxScore + scoreForOjama(60)) {
+        feature.set(EvaluationFeature::STRATEGY_LARGE_ENOUGH, 1);
+        return;
+    }
+        
+    // --- 1.2. 対応手なく潰せる
+    // TODO: 実装があやしい。
+    if (plan.totalScore() >= scoreForOjama(18) && estimatedMaxScore <= scoreForOjama(6)) {
+        feature.set(EvaluationFeature::STRATEGY_TSUBUSHI, 1);
+        return;
+    }
+        
+    // --- 1.3. 飽和したので打つしかなくなった
+    // TODO: これは EnemyRensaInfo だけじゃなくて MyRensaInfo も必要なのでは……。
+    // TODO: 60 個超えたら打つとかなんか間違ってるだろう。
+    if (fieldBeforePlan.countPuyos() >= 56) {
+        feature.set(EvaluationFeature::STRATEGY_HOUWA, 1.0);
+        return;
+    }
+    
+    // --- 1.4. 打つと有利になる
+    // TODO: そもそも数値化の仕方が分からない。
+    
+    // 基本的に先打ちすると負けるので、打たないようにする
+    ostringstream ss;
+    ss << "SAKIUCHI will lose : score = " << plan.totalScore() << " EMEMY score = " << estimatedMaxScore << endl;
+    LOG(INFO) << plan.decisionText() << " " << ss.str();
+    feature.set(EvaluationFeature::STRATEGY_SAKIUCHI, 1.0);
+}

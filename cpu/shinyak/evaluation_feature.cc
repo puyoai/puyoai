@@ -32,8 +32,6 @@ EvaluationParams::EvaluationParams() :
 
 void EvaluationParams::initialize()
 {
-    // これはわりと適当に決めた値
-
     set(EvaluationFeature::TOTAL_FRAMES, 0.0);
     set(EvaluationFeature::TOTAL_FRAMES_INVERSE, 1.0);
 
@@ -70,6 +68,13 @@ void EvaluationParams::initialize()
     set(EvaluationFeature::EMPTY_AVAILABILITY_11, 0.80);
     set(EvaluationFeature::EMPTY_AVAILABILITY_12, 0.75);
     set(EvaluationFeature::EMPTY_AVAILABILITY_22, 0.30);
+
+    set(EvaluationFeature::STRATEGY_LARGE_ENOUGH, 100.0);
+    set(EvaluationFeature::STRATEGY_ZENKESHI, 80.0);
+    set(EvaluationFeature::STRATEGY_TAIOU, 90.0);
+    set(EvaluationFeature::STRATEGY_TSUBUSHI, 70.0);
+    set(EvaluationFeature::STRATEGY_HOUWA, 60.0);
+    set(EvaluationFeature::STRATEGY_SAKIUCHI, -20.0);
 
     for (int i = 0; i < 20; ++i)
         set(EvaluationFeature::MAX_CHAINS, i, i);

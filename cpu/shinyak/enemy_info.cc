@@ -82,9 +82,9 @@ void EnemyInfo::updateFeasibleRensas(const Field& field, const vector<KumiPuyo>&
 void EnemyInfo::updatePossibleRensas(const Field& field, const vector<KumiPuyo>& kumiPuyos)
 {
     PuyoSet kumipuyoSet;
-    for (int i = 0; i < 3; ++i) {
-        kumipuyoSet.add(kumiPuyos[i].axis, 1);
-        kumipuyoSet.add(kumiPuyos[i].child, 1);
+    for (auto it = kumiPuyos.begin(); it != kumiPuyos.end(); ++it) {
+        kumipuyoSet.add(it->axis);
+        kumipuyoSet.add(it->child);
     }
 
     double averageHeight = 0;
@@ -167,6 +167,7 @@ int EnemyInfo::estimateMaxScore(int frameId) const
     int restFrames = frameId - m_id;
     int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_AFTER_NO_CHIGIRI));
     int newChains = min((numPossiblePuyos / 4), 19);
+
     return ACCUMULATED_RENSA_SCORE[newChains];
 }
 
