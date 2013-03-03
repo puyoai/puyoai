@@ -39,7 +39,7 @@ void EvaluationFeatureCollector::collectMaxRensaFeature(EvaluationFeature& featu
     int numNecessaryPuyos = 0;
 
     vector<PossibleRensaInfo> rensaInfos;
-    RensaDetector::findPossibleRensas(rensaInfos, field);
+    RensaDetector::findPossibleRensas(rensaInfos, field, 1);
     for (vector<PossibleRensaInfo>::iterator it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
         if (maxChains < it->rensaInfo.chains) {
             maxChains = it->rensaInfo.chains;
