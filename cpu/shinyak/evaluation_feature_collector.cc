@@ -8,6 +8,7 @@
 #include "core/constant.h"
 #include "enemy_info.h"
 #include "evaluation_feature.h"
+#include "field.h"
 #include "field_bit_field.h"
 #include "plan.h"
 #include "player_info.h"
@@ -19,52 +20,167 @@
 
 using namespace std;
 
-void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, int currentFrameId, const Plan& plan, const Field& fieldBeforePlan, const MyPlayerInfo& myPlayerInfo, const EnemyInfo& enemyInfo)
+void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, int currentFrameId, const Plan& plan, const EnemyInfo& enemyInfo)
 {
-    EvaluationFeatureCollector::collectEmptyAvailabilityFeature(feature, plan.field());
-    EvaluationFeatureCollector::collectMaxRensaFeature(feature, plan.field());
-    EvaluationFeatureCollector::collectConnectionFeature(feature, plan.field(), myPlayerInfo.mainRensaTrackResult());
-    EvaluationFeatureCollector::collectFieldHeightFeature(feature, plan.field());
-    EvaluationFeatureCollector::collectMainRensaHandWidth(feature, myPlayerInfo);
-    EvaluationFeatureCollector::collectOngoingRensaFeature(feature, currentFrameId, plan, fieldBeforePlan, myPlayerInfo, enemyInfo);
-    feature.set(EvaluationFeature::TOTAL_FRAMES, plan.totalFrames());
-    // TODO(mayah): Why totalFrames is 0?
-    if (plan.totalFrames() != 0)
-        feature.set(EvaluationFeature::TOTAL_FRAMES_INVERSE, 1.0 / plan.totalFrames());    
+    {
+        PlanEvaluationFeature planFeature;
+        collectFrameFeature(planFeature, plan);
+        collectEmptyAvailabilityFeature(planFeature, plan);
+        collectConnectionFeature(planFeature, plan);
+        collectFieldHeightFeature(planFeature, plan);
+        collectOngoingRensaFeature(planFeature, currentFrameId, plan, enemyInfo);
+
+        feature.setPlanFeature(planFeature);
+    }
+
+
+    collectRensaFeature(feature, plan);
 }
 
-void EvaluationFeatureCollector::collectMaxRensaFeature(EvaluationFeature& feature, const Field& field)
+void EvaluationFeatureCollector::collectRensaFeature(EvaluationFeature& feature, const Plan& plan)
 {
-    int maxChains = 0;
-    int numNecessaryPuyos = 0;
+    const Field& field = plan.field();
 
-    vector<PossibleRensaInfo> rensaInfos;
+    vector<TrackedPossibleRensaInfo> rensaInfos;
     RensaDetector::findPossibleRensas(rensaInfos, field, 1);
-    for (vector<PossibleRensaInfo>::iterator it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (maxChains < it->rensaInfo.chains) {
-            maxChains = it->rensaInfo.chains;
-            numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, it->necessaryPuyoSet);
-        } else if (maxChains == it->rensaInfo.chains) {
-            numNecessaryPuyos = min(numNecessaryPuyos, TsumoPossibility::necessaryPuyos(0.5, it->necessaryPuyoSet));
+
+    if (rensaInfos.empty())
+        return;
+
+    // Collects only chains having the maxChains.
+    // TODO(mayah): Is it desired? How about performance if we collect all rensas?
+    int maxChains = 0;
+    for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it)
+        maxChains = std::max(maxChains, it->rensaInfo.chains);
+
+    for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
+        if (it->rensaInfo.chains < maxChains)
+            continue;
+
+        RensaEvaluationFeature rensaFeature;
+        collectRensaEvaluationFeature(rensaFeature, plan, *it);
+
+        feature.add(rensaFeature);
+    }
+}
+
+void EvaluationFeatureCollector::collectFrameFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
+{
+    // TODO(mayah): Why totalFrames is 0?
+    planFeature.set(TOTAL_FRAMES, plan.totalFrames());
+    if (plan.totalFrames() != 0)
+        planFeature.set(TOTAL_FRAMES_INVERSE, 1.0 / plan.totalFrames());    
+}
+
+template<typename Feature, typename T>
+static void calculateConnection(Feature& feature, const Field& field, const T params[])
+{
+    FieldBitField checked;
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        for (int y = 1; field.color(x, y) != EMPTY; ++y) {
+            if (!isColorPuyo(field.color(x, y)) || checked(x, y))
+                continue;
+
+            pair<int, int> connection = field.connectedPuyoNumsWithAllowingOnePointJump(x, y, checked);
+            if (connection.first + connection.second >= 4)
+                feature.add(params[3], 1);
+            else if (connection.first < 4)
+                feature.add(params[connection.first - 1], 1);
         }
     }
-    
-    feature.set(EvaluationFeature::MAX_CHAINS, maxChains);
-    feature.set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
-    if (numNecessaryPuyos != 0)
-        feature.set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
 }
 
-void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeature& feature, const Field& field)
+void EvaluationFeatureCollector::collectRensaEvaluationFeature(
+    RensaEvaluationFeature& rensaFeature,
+    const Plan& plan,
+    const TrackedPossibleRensaInfo& info)
 {
+    int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, info.necessaryPuyoSet);
+    
+    rensaFeature.set(MAX_CHAINS, info.rensaInfo.chains);
+    rensaFeature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
+    if (numNecessaryPuyos != 0)
+        rensaFeature.set(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
+
+    // -----
+    int distanceCountResult[5] = { 0, 0, 0, 0, 0 };
+
+    // 1 連鎖の部分を距離 1 とし、距離 4 までを求める。
+    // 距離 2, 3, 4 の数を数え、その広がり具合により、手の広さを求めることができる。
+    int distance[Field::MAP_WIDTH][Field::MAP_HEIGHT];
+    for (int x = 0; x < Field::MAP_WIDTH; ++x) {
+        for (int y = 0; y < Field::MAP_HEIGHT; ++y) {
+            if (info.trackResult.erasedAt(x, y) == 1)
+                distance[x][y] = 1;
+            else
+                distance[x][y] = 0;
+        }
+    }
+
+    const Field& field = plan.field();
+    for (int d = 2; d <= 4; ++d) {
+        for (int x = 1; x <= Field::WIDTH; ++x) {
+            for (int y = 1; y <= Field::HEIGHT; ++y) {
+                if (field.color(x, y) != EMPTY || distance[x][y] > 0)
+                    continue;
+                if (distance[x][y-1] == d - 1 || distance[x][y+1] == d - 1 || distance[x-1][y] == d - 1 || distance[x+1][y] == d - 1) {
+                    distance[x][y] = d;
+                    ++distanceCountResult[d];
+                }
+            }
+        }
+    }
+
+    double d1 = distanceCountResult[1];
+    double d2 = distanceCountResult[2];
+    double d3 = distanceCountResult[3];
+    double d4 = distanceCountResult[4];
+
+    double r21 = d1 != 0 ? d2 / d1 : 0;
+    double r32 = d2 != 0 ? d3 / d2 : 0;
+    double r43 = d3 != 0 ? d4 / d3 : 0;
+
+    rensaFeature.set(HAND_WIDTH_1, d1);
+    rensaFeature.set(HAND_WIDTH_2, d2);
+    rensaFeature.set(HAND_WIDTH_3, d3);
+    rensaFeature.set(HAND_WIDTH_4, d4);
+    rensaFeature.set(HAND_WIDTH_RATIO_21, r21);
+    rensaFeature.set(HAND_WIDTH_RATIO_32, r32);
+    rensaFeature.set(HAND_WIDTH_RATIO_43, r43);
+    rensaFeature.set(HAND_WIDTH_RATIO_21_SQUARED, r21 * r21);
+    rensaFeature.set(HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
+    rensaFeature.set(HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
+
+
+    static const RensaFeatureParam paramsAfter[] = {
+        CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3, CONNECTION_AFTER_VANISH_4,
+    };
+
+    ArbitrarilyModifiableField f(plan.field());
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        for (int y = 1; y <= 13; ++y) { // TODO: 13?
+            if (info.trackResult.erasedAt(x, y) != 0)
+                f.setColor(x, y, EMPTY);
+        }
+        f.recalcHeightOn(x);
+    }
+    f.forceDrop();
+
+    calculateConnection(rensaFeature, f, paramsAfter);
+}
+
+void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(PlanEvaluationFeature& feature, const Plan& plan)
+{
+    const Field& field = plan.field();
+
     int emptyCells = 72 - field.countPuyos();
     if (emptyCells <= 0)
         return;
 
-    EvaluationFeature::FeatureParam map[3][3] = {
-        { EvaluationFeature::EMPTY_AVAILABILITY_00, EvaluationFeature::EMPTY_AVAILABILITY_01, EvaluationFeature::EMPTY_AVAILABILITY_02, },
-        { EvaluationFeature::EMPTY_AVAILABILITY_01, EvaluationFeature::EMPTY_AVAILABILITY_11, EvaluationFeature::EMPTY_AVAILABILITY_12, },
-        { EvaluationFeature::EMPTY_AVAILABILITY_02, EvaluationFeature::EMPTY_AVAILABILITY_12, EvaluationFeature::EMPTY_AVAILABILITY_22, },
+    PlanFeatureParam map[3][3] = {
+        { EMPTY_AVAILABILITY_00, EMPTY_AVAILABILITY_01, EMPTY_AVAILABILITY_02, },
+        { EMPTY_AVAILABILITY_01, EMPTY_AVAILABILITY_11, EMPTY_AVAILABILITY_12, },
+        { EMPTY_AVAILABILITY_02, EMPTY_AVAILABILITY_12, EMPTY_AVAILABILITY_22, },
     };
 
     for (int x = Field::WIDTH; x >= 1; --x) {
@@ -83,55 +199,19 @@ void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(EvaluationFeatu
     }
 }
 
-static void calculateConnection(const Field& field, const EvaluationFeature::FeatureParam params[], EvaluationFeature& feature)
+void EvaluationFeatureCollector::collectConnectionFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
 {
-    FieldBitField checked;
-    for (int x = 1; x <= Field::WIDTH; ++x) {
-        for (int y = 1; field.color(x, y) != EMPTY; ++y) {
-            if (!isColorPuyo(field.color(x, y)) || checked(x, y))
-                continue;
-
-            pair<int, int> connection = field.connectedPuyoNumsWithAllowingOnePointJump(x, y, checked);
-            if (connection.first + connection.second >= 4)
-                feature.add(params[3], 1);
-            else if (connection.first < 4)
-                feature.add(params[connection.first - 1], 1);
-        }
-    }
-}
-
-void EvaluationFeatureCollector::collectConnectionFeature(EvaluationFeature& feature, const Field& field, const TrackResult& trackResult)
-{
-    static const EvaluationFeature::FeatureParam params[] = {
-        EvaluationFeature::CONNECTION_1,
-        EvaluationFeature::CONNECTION_2,
-        EvaluationFeature::CONNECTION_3,
-        EvaluationFeature::CONNECTION_4, 
+    static const PlanFeatureParam params[] = {
+        CONNECTION_1, CONNECTION_2, CONNECTION_3, CONNECTION_4,
     };
 
-    static const EvaluationFeature::FeatureParam paramsAfter[] = {
-        EvaluationFeature::CONNECTION_AFTER_VANISH_1,
-        EvaluationFeature::CONNECTION_AFTER_VANISH_2,
-        EvaluationFeature::CONNECTION_AFTER_VANISH_3,
-        EvaluationFeature::CONNECTION_AFTER_VANISH_4,
-    };
-
-    ArbitrarilyModifiableField f(field);
-    for (int x = 1; x <= Field::WIDTH; ++x) {
-        for (int y = 1; y <= 13; ++y) { // TODO: 13?
-            if (trackResult.erasedAt(x, y) != 0)
-                f.setColor(x, y, EMPTY);
-        }
-        f.recalcHeightOn(x);
-    }
-    f.forceDrop();
-
-    calculateConnection(field, params, feature);
-    calculateConnection(f, paramsAfter, feature);
+    calculateConnection(planFeature, plan.field(), params);
 }
 
-void EvaluationFeatureCollector::collectFieldHeightFeature(EvaluationFeature& feature, const Field& field)
+void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
 {
+    const Field& field = plan.field();
+    
     double sumHeight = 0;
     for (int x = 1; x < Field::WIDTH; ++x)
         sumHeight += field.height(x);
@@ -145,37 +225,14 @@ void EvaluationFeatureCollector::collectFieldHeightFeature(EvaluationFeature& fe
         heightSquareSum += diff * diff;
     }
 
-    feature.set(EvaluationFeature::THIRD_COLUMN_HEIGHT, field.height(3));
-    feature.set(EvaluationFeature::SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSum);
-    feature.set(EvaluationFeature::SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
-}
-
-void EvaluationFeatureCollector::collectMainRensaHandWidth(EvaluationFeature& feature, const MyPlayerInfo& playerInfo)
-{
-    double d1 = playerInfo.mainRensaDistanceCount(1);
-    double d2 = playerInfo.mainRensaDistanceCount(2);
-    double d3 = playerInfo.mainRensaDistanceCount(3);
-    double d4 = playerInfo.mainRensaDistanceCount(4);
-
-    double r21 = d1 != 0 ? d2 / d1 : 0;
-    double r32 = d2 != 0 ? d3 / d2 : 0;
-    double r43 = d3 != 0 ? d4 / d3 : 0;
-
-    feature.set(EvaluationFeature::HAND_WIDTH_1, d1);
-    feature.set(EvaluationFeature::HAND_WIDTH_2, d2);
-    feature.set(EvaluationFeature::HAND_WIDTH_3, d3);
-    feature.set(EvaluationFeature::HAND_WIDTH_4, d4);
-    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_21, r21);
-    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_32, r32);
-    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_43, r43);
-    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_21_SQUARED, r21 * r21);
-    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
-    feature.set(EvaluationFeature::HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
+    planFeature.set(THIRD_COLUMN_HEIGHT, field.height(3));
+    planFeature.set(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSum);
+    planFeature.set(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
 }
 
 void EvaluationFeatureCollector::collectOngoingRensaFeature(
-    EvaluationFeature& feature, int currentFrameId, const Plan& plan, const Field& fieldBeforePlan,
-    const MyPlayerInfo& playerInfo, const EnemyInfo& enemyInfo)
+    PlanEvaluationFeature& planFeature, int currentFrameId, const Plan& plan,
+    const EnemyInfo& enemyInfo)
 {
     if (enemyInfo.rensaIsOngoing() && enemyInfo.ongoingRensaInfo().rensaInfo.score > scoreForOjama(6)) {
         // TODO: 対応が適当すぎる
@@ -183,7 +240,7 @@ void EvaluationFeatureCollector::collectOngoingRensaFeature(
             plan.totalScore() >= enemyInfo.ongoingRensaInfo().rensaInfo.score &&
             plan.initiatingFrames() <= enemyInfo.ongoingRensaInfo().finishingRensaFrame) {
             LOG(INFO) << plan.decisionText() << " TAIOU";
-            feature.set(EvaluationFeature::STRATEGY_TAIOU, 1.0);
+            planFeature.set(STRATEGY_TAIOU, 1.0);
             return;
         }
     }
@@ -192,7 +249,7 @@ void EvaluationFeatureCollector::collectOngoingRensaFeature(
         return;
 
     if (plan.field().isZenkeshi()) {
-        feature.set(EvaluationFeature::STRATEGY_ZENKESHI, 1);
+        planFeature.set(STRATEGY_ZENKESHI, 1);
         return;
     }
 
@@ -203,23 +260,22 @@ void EvaluationFeatureCollector::collectOngoingRensaFeature(
     // --- 1.1. 十分でかい場合は打って良い。
     // / TODO: 十分でかいとは？ / とりあえず致死量ということにする
     if (plan.totalScore() >= estimatedMaxScore + scoreForOjama(60)) {
-        feature.set(EvaluationFeature::STRATEGY_LARGE_ENOUGH, 1);
+        planFeature.set(STRATEGY_LARGE_ENOUGH, 1);
         return;
     }
         
     // --- 1.2. 対応手なく潰せる
     // TODO: 実装があやしい。
     if (plan.totalScore() >= scoreForOjama(18) && estimatedMaxScore <= scoreForOjama(6)) {
-        feature.set(EvaluationFeature::STRATEGY_TSUBUSHI, 1);
+        planFeature.set(STRATEGY_TSUBUSHI, 1);
         return;
     }
         
     // --- 1.3. 飽和したので打つしかなくなった
     // TODO: これは EnemyRensaInfo だけじゃなくて MyRensaInfo も必要なのでは……。
     // TODO: 60 個超えたら打つとかなんか間違ってるだろう。
-    if (fieldBeforePlan.countPuyos() >= 56) {
-        feature.set(EvaluationFeature::STRATEGY_HOUWA, 1.0);
-        return;
+    if (plan.field().countPuyos() >= 60) {
+        planFeature.set(STRATEGY_HOUWA, 1);
     }
     
     // --- 1.4. 打つと有利になる
@@ -229,5 +285,6 @@ void EvaluationFeatureCollector::collectOngoingRensaFeature(
     ostringstream ss;
     ss << "SAKIUCHI will lose : score = " << plan.totalScore() << " EMEMY score = " << estimatedMaxScore << endl;
     LOG(INFO) << plan.decisionText() << " " << ss.str();
-    feature.set(EvaluationFeature::STRATEGY_SAKIUCHI, 1.0);
+    planFeature.set(STRATEGY_SCORE, plan.totalScore());
+    planFeature.set(STRATEGY_SAKIUCHI, 1.0);
 }

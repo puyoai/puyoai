@@ -64,7 +64,6 @@ void AI::wnextAppeared(const Game& game)
     // Since the current puyo is moving
     vector<KumiPuyo> kumiPuyos(game.myPlayerState().kumiPuyos.begin() + 1,
                                game.myPlayerState().kumiPuyos.end());
-    m_myPlayerInfo.updateMainRensa(kumiPuyos, m_evaluationParams);
 }
 
 void AI::myRensaFinished(const Game& game)
@@ -73,7 +72,6 @@ void AI::myRensaFinished(const Game& game)
 
     vector<KumiPuyo> kumiPuyos(game.myPlayerState().kumiPuyos.begin(),
                                game.myPlayerState().kumiPuyos.begin() + 2);
-    m_myPlayerInfo.updateMainRensa(kumiPuyos, m_evaluationParams);
 }
 
 void AI::myOjamaDropped(const Game& game)
@@ -82,7 +80,6 @@ void AI::myOjamaDropped(const Game& game)
 
     vector<KumiPuyo> kumiPuyos(game.myPlayerState().kumiPuyos.begin(),
                                game.myPlayerState().kumiPuyos.begin() + 2);
-    m_myPlayerInfo.updateMainRensa(kumiPuyos, m_evaluationParams);
 }
 
 void AI::enemyWNextAppeared(const Game& game)
@@ -132,27 +129,32 @@ void AI::decide(DropDecision& dropDecision, const Game& game)
     
     double currentBestScore = -100.0;
     for (std::vector<Plan>::iterator it = plans.begin(); it != plans.end(); ++it) {
-        EvalResult result = eval(game.id, *it, game.myPlayerState().field);
+        EvalResult result = eval(game.id, *it);
         if (currentBestScore < result.evaluationScore) {
             currentBestScore = result.evaluationScore;
             dropDecision = DropDecision(it->firstHandDecision(), result.message);
         }
     }
+
+    LOG(INFO) << "Decided : " << dropDecision.decision().toString();
 }
 
-EvalResult AI::eval(int currentFrameId, const Plan& plan, const Field& currentField) const
+EvalResult AI::eval(int currentFrameId, const Plan& plan) const
 {
     EvaluationFeature feature;
-    EvaluationFeatureCollector::collectFeatures(feature, currentFrameId, plan, currentField, m_myPlayerInfo, m_enemyInfo);
-    double finalScore = m_evaluationParams.calculateScore(feature);
+    EvaluationFeatureCollector::collectFeatures(feature, currentFrameId, plan, m_enemyInfo);
+
+    const RensaEvaluationFeature& bestRensaFeature = feature.findBestRensaFeature(m_evaluationParams);
+    double finalScore = feature.calculateScoreWith(m_evaluationParams, bestRensaFeature);
 
     char buf[256];
-    sprintf(buf, "maxChain = %d : enemy = %d : %d : %d",
-            m_myPlayerInfo.mainRensaChains(),
+    sprintf(buf, "max rensa = %d : eval score = %f : enemy = %d : %d : %d",
+            bestRensaFeature.get(MAX_CHAINS),
+            finalScore,
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames()),
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames() + 50),
             m_enemyInfo.estimateMaxScore(currentFrameId + plan.totalFrames() + 100));
 
-    LOG(INFO) << plan.decisionText() << " Extending HONSEN : " << buf;    
+    LOG(INFO) << plan.decisionText() << " : " << buf;    
     return EvalResult(finalScore, feature.toString() + " : " + buf);
 }

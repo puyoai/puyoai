@@ -1,17 +1,17 @@
 #include "field.h"
 
+#include <cassert>
 #include <cstdlib>
-#include <glog/logging.h>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <string>
-#include <cassert>
+
+#include <glog/logging.h>
 
 #include "core/constant.h"
 #include "core/decision.h"
 #include "field_bit_field.h"
-#include "field_column_bit_field.h"
 #include "score.h"
 #include "plan.h"
 #include "rensa_result.h"
