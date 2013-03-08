@@ -41,8 +41,67 @@ void convert(string& str)
     }
 }
 
-void learn(EvaluationParams& params, 
-           const MyPlayerInfo& myPlayerInfo, const EnemyInfo& enemyInfo,
+void updatePlanParam(EvaluationParams& params, const PlanEvaluationFeature& currentFeature, const PlanEvaluationFeature& teacherFeature)
+{
+    for (int i = 0; i < SIZE_OF_PLAN_FEATURE_PARAM; ++i) {
+        PlanFeatureParam paramName = toPlanFeatureParam(i);
+        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName));
+        cout << "learning: " << paramName << ' '
+             << params.get(paramName) << ' '
+             << currentFeature.get(paramName) << ' ' 
+             << teacherFeature.get(paramName) << ' '
+             << dT << endl;
+        params.add(paramName, -dT / 100.0);
+    }
+
+    for (int i = 0; i < SIZE_OF_PLAN_RANGE_FEATURE_PARAM; ++i) {
+        PlanRangeFeatureParam paramName = toPlanRangeFeatureParam(i);
+        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) / 1000.0;
+        cout << "learning: " << paramName << ' '
+             << params.get(paramName, currentFeature.get(paramName)) << ' '
+             << params.get(paramName, teacherFeature.get(paramName)) << ' '
+             << currentFeature.get(paramName) << ' ' 
+             << teacherFeature.get(paramName) << ' '
+             << dT << endl;
+        params.add(paramName, currentFeature.get(paramName), -dT);
+        params.add(paramName, teacherFeature.get(paramName), dT);
+    }
+}
+
+void updateRensaParam(EvaluationParams& params, const RensaEvaluationFeature& currentFeature, const RensaEvaluationFeature& teacherFeature)
+{
+    for (int i = 0; i < SIZE_OF_RENSA_FEATURE_PARAM; ++i) {
+        RensaFeatureParam paramName = toRensaFeatureParam(i);
+        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName));
+        cout << "learning: " << paramName << ' '
+             << params.get(paramName) << ' '
+             << currentFeature.get(paramName) << ' ' 
+             << teacherFeature.get(paramName) << ' '
+             << dT << endl;
+        params.add(paramName, -dT / 100.0);
+    }
+
+    for (int i = 0; i < SIZE_OF_RENSA_RANGE_FEATURE_PARAM; ++i) {
+        RensaRangeFeatureParam paramName = toRensaRangeFeatureParam(i);
+        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) / 1000.0;
+        cout << "learning: " << paramName << ' '
+             << params.get(paramName, currentFeature.get(paramName)) << ' '
+             << params.get(paramName, teacherFeature.get(paramName)) << ' '
+             << currentFeature.get(paramName) << ' ' 
+             << teacherFeature.get(paramName) << ' '
+             << dT << endl;
+        params.add(paramName, currentFeature.get(paramName), -dT);
+        params.add(paramName, teacherFeature.get(paramName), dT);
+    }
+}
+
+void updateParam(EvaluationParams& params, const EvaluationFeature& currentFeature, const EvaluationFeature& teacherFeature)
+{
+    updateRensaParam(params, currentFeature.findBestRensaFeature(params), teacherFeature.findBestRensaFeature(params));
+    updatePlanParam(params, currentFeature.planFeature(), teacherFeature.planFeature());
+}
+
+void learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
            const Field& currentField, const vector<KumiPuyo>& kumiPuyos,
            const Field& teacherField)
 {
@@ -58,12 +117,12 @@ void learn(EvaluationParams& params,
     vector<pair<float, size_t> > scores(plans.size());
     vector<EvaluationFeature> features(plans.size());
     for (size_t i = 0; i < plans.size(); ++i) {
-        EvaluationFeatureCollector::collectFeatures(features[i], 0, plans[i], currentField, myPlayerInfo, enemyInfo);
+        EvaluationFeatureCollector::collectFeatures(features[i], 0, plans[i], enemyInfo);
 
         if (plans[i].isRensaPlan()) {
             scores[i] = make_pair(-1000000, i);
         } else {
-            double score = params.calculateScore(features[i]);
+            double score = features[i].calculateScore(params);
             scores[i] = make_pair(score, i);
         }
     }
@@ -91,38 +150,9 @@ void learn(EvaluationParams& params,
         return;
 
     // --- そうでなければ、スコア付けに問題があったということで、スコアを更新する。
-    // 教師のスコアより高い得点が与えられている特徴値に対して、
-    // - 教師の特徴値が大きければ、係数を増やす
-    // - 
-    // ただし、定数倍の別解を除去する必要があるので、２連鎖の得点を固定する。
-    const EvaluationFeature& teacherFeature = features[scores[teacherIndex].second];
     const EvaluationFeature& currentFeature = features[scores[0].second];
-
-    for (int i = 0; i < EvaluationFeature::SIZE_OF_FEATURE_PARAM; ++i) {
-        EvaluationFeature::FeatureParam name = EvaluationFeature::param(i);
-        double dT = (currentFeature.get(name) - teacherFeature.get(name));
-        cout << "learning: " << name << ' '
-             << params.get(name) << ' '
-             << currentFeature.get(name) << ' ' 
-             << teacherFeature.get(name) << ' '
-             << dT << endl;
-        params.add(name, -dT / 100.0);
-    }
-
-    for (int i = 0; i < EvaluationFeature::SIZE_OF_RANGE_FEATURE_PARAM; ++i) {
-        EvaluationFeature::RangeFeatureParam name = EvaluationFeature::rangeParam(i);
-        if (currentFeature.get(name) == teacherFeature.get(name))
-            continue;
-        double dT = (currentFeature.get(name) - teacherFeature.get(name)) / 1000.0;
-        cout << "learning (2): " << name << ' '
-             << params.get(name, currentFeature.get(name)) << ' '
-             << params.get(name, teacherFeature.get(name)) << ' '
-             << currentFeature.get(name) << ' ' 
-             << teacherFeature.get(name) << ' '
-             << dT << endl;
-        params.add(name, currentFeature.get(name), -dT);
-        params.add(name, teacherFeature.get(name), dT);
-    }
+    const EvaluationFeature& teacherFeature = features[scores[teacherIndex].second];
+    updateParam(params, currentFeature, teacherFeature);
 }
 
 int main(void)
@@ -175,11 +205,10 @@ int main(void)
                 const vector<KumiPuyo>& kumiPuyos = frameInputs[(fieldNum + 1) % 3].kumiPuyos;
 
                 myPlayerInfo.forceEstimatedField(previous2);
-                myPlayerInfo.updateMainRensa(kumiPuyos, params);
                 enemyInfo.initializeWith(1);
                 enemyInfo.updatePossibleRensas(frameInputs[(fieldNum + 1) % 3].enemyField, vector<KumiPuyo>());
 
-                learn(params, myPlayerInfo, enemyInfo, previous2, kumiPuyos, current);
+                learn(params, enemyInfo, previous2, kumiPuyos, current);
             }
         }
 

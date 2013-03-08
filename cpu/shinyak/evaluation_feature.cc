@@ -7,84 +7,144 @@
 
 using namespace std;
 
+double PlanEvaluationFeature::calculateScore(const EvaluationParams& params) const
+{
+    double result = 0;
+#define DEFINE_PARAM(name) result += get(name) * params.get(name);
+#define DEFINE_RANGE_PARAM(name, maxValue) result += params.get(name, get(name));
+#include "plan_evaluation_feature.tab"
+#undef DEFINE_PARAM
+#undef DEFINE_RANGE_PARAM
+
+    return result;
+}
+
+double RensaEvaluationFeature::calculateScore(const EvaluationParams& params) const
+{
+    double result = 0;
+#define DEFINE_PARAM(name) result += get(name) * params.get(name);
+#define DEFINE_RANGE_PARAM(name, maxValue) result += params.get(name, get(name));
+#include "rensa_evaluation_feature.tab"
+#undef DEFINE_PARAM
+#undef DEFINE_RANGE_PARAM
+
+    return result;
+}
+
+const RensaEvaluationFeature EvaluationFeature::s_emptyRensaFeature;
+
 string EvaluationFeature::toString() const
 {
-    ostringstream ss;
-    ss << get(MAX_CHAINS) << " ";
-    ss << (1.0 / get(MAX_RENSA_NECESSARY_PUYOS)) << " ";
     // TODO(mayah): We have to implement this.
+    return "NOT_IMPLEMENTED_YET";
+}
 
-    return ss.str();
+const RensaEvaluationFeature& EvaluationFeature::findBestRensaFeature(const EvaluationParams& params) const
+{
+    if (m_rensaFeatures.empty())
+        return s_emptyRensaFeature;
+
+    auto result = m_rensaFeatures.begin();
+    double resultScore = result->calculateScore(params);
+    for (auto it = m_rensaFeatures.begin(); it != m_rensaFeatures.end(); ++it) {
+        double score = it->calculateScore(params);
+        if (resultScore < score) {
+            result = it;
+            resultScore = score;
+        }
+    }
+
+    return *result;
+}
+
+double EvaluationFeature::calculateScoreWith(const EvaluationParams& params, const RensaEvaluationFeature& rensaFeature) const
+{
+    double planScore = m_planFeature.calculateScore(params);
+    double rensaScore = rensaFeature.calculateScore(params);
+
+    return planScore + rensaScore;
 }
 
 EvaluationParams::EvaluationParams() :
-    m_featuresCoef(EvaluationFeature::SIZE_OF_FEATURE_PARAM),
-    m_rangeFeaturesCoef(EvaluationFeature::SIZE_OF_RANGE_FEATURE_PARAM)
+    m_planFeaturesCoef(SIZE_OF_PLAN_FEATURE_PARAM),
+    m_planRangeFeaturesCoef(SIZE_OF_PLAN_RANGE_FEATURE_PARAM),
+    m_rensaFeaturesCoef(SIZE_OF_RENSA_FEATURE_PARAM),
+    m_rensaRangeFeaturesCoef(SIZE_OF_RENSA_RANGE_FEATURE_PARAM)
 {
 #define DEFINE_PARAM(name) /* ignored */
-#define DEFINE_RANGE_PARAM(name, maxValue) m_rangeFeaturesCoef[EvaluationFeature::name].resize(maxValue);
-#include "evaluation_feature.tab"
-#undef DEFINE_RANGE_PARAM
+#define DEFINE_RANGE_PARAM(name, maxValue) m_planRangeFeaturesCoef[name].resize(maxValue);
+#include "plan_evaluation_feature.tab"
 #undef DEFINE_PARAM
+#undef DEFINE_RANGE_PARAM
+
+#define DEFINE_PARAM(name) /* ignored */
+#define DEFINE_RANGE_PARAM(name, maxValue) m_rensaRangeFeaturesCoef[name].resize(maxValue);
+#include "rensa_evaluation_feature.tab"
+#undef DEFINE_PARAM
+#undef DEFINE_RANGE_PARAM
 
     initialize();
 }
 
 void EvaluationParams::initialize()
 {
-    set(EvaluationFeature::TOTAL_FRAMES, 0.0);
-    set(EvaluationFeature::TOTAL_FRAMES_INVERSE, 1.0);
+    // TODO(mayah): Sort this.
 
-    set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS, 0);
-    set(EvaluationFeature::MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0);
+    set(TOTAL_FRAMES, 0.0);
+    set(TOTAL_FRAMES_INVERSE, 1.0);
 
-    set(EvaluationFeature::CONNECTION_1, -0.1 / 30.0);
-    set(EvaluationFeature::CONNECTION_2,  0.9 / 30.0);
-    set(EvaluationFeature::CONNECTION_3,  1.2 / 30.0);
-    set(EvaluationFeature::CONNECTION_4, -0.5 / 30.0); // minus
-    set(EvaluationFeature::CONNECTION_AFTER_VANISH_1, -0.1 / 15.0);
-    set(EvaluationFeature::CONNECTION_AFTER_VANISH_2,  0.9 / 15.0);
-    set(EvaluationFeature::CONNECTION_AFTER_VANISH_3,  1.6 / 15.0);
-    set(EvaluationFeature::CONNECTION_AFTER_VANISH_4,  0.5 / 15.0); // plus
+    set(MAX_RENSA_NECESSARY_PUYOS, 0);
+    set(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0);
 
-    set(EvaluationFeature::HAND_WIDTH_1, 0.1);
-    set(EvaluationFeature::HAND_WIDTH_2, 0.1);
-    set(EvaluationFeature::HAND_WIDTH_3, 0.1);
-    set(EvaluationFeature::HAND_WIDTH_4, 0.1);
+    set(CONNECTION_1, -0.1 / 30.0);
+    set(CONNECTION_2,  0.9 / 30.0);
+    set(CONNECTION_3,  1.2 / 30.0);
+    set(CONNECTION_4, -0.5 / 30.0);
 
-    set(EvaluationFeature::HAND_WIDTH_RATIO_21, 0.1);
-    set(EvaluationFeature::HAND_WIDTH_RATIO_32, 0.1);
-    set(EvaluationFeature::HAND_WIDTH_RATIO_43, 0.1);
-    set(EvaluationFeature::HAND_WIDTH_RATIO_21_SQUARED, 0.1);
-    set(EvaluationFeature::HAND_WIDTH_RATIO_32_SQUARED, 0.1);
-    set(EvaluationFeature::HAND_WIDTH_RATIO_43_SQUARED, 0.1);
+    set(CONNECTION_AFTER_VANISH_1, -0.1 / 15.0);
+    set(CONNECTION_AFTER_VANISH_2,  0.9 / 15.0);
+    set(CONNECTION_AFTER_VANISH_3,  1.6 / 15.0);
+    set(CONNECTION_AFTER_VANISH_4,  0.5 / 15.0);
 
-    set(EvaluationFeature::SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, 0.0);
-    set(EvaluationFeature::SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, -0.1);
+    set(HAND_WIDTH_1, 0.1);
+    set(HAND_WIDTH_2, 0.1);
+    set(HAND_WIDTH_3, 0.1);
+    set(HAND_WIDTH_4, 0.1);
 
-    set(EvaluationFeature::EMPTY_AVAILABILITY_00, 0.95);
-    set(EvaluationFeature::EMPTY_AVAILABILITY_01, 0.90);
-    set(EvaluationFeature::EMPTY_AVAILABILITY_02, 0.85);
-    set(EvaluationFeature::EMPTY_AVAILABILITY_11, 0.80);
-    set(EvaluationFeature::EMPTY_AVAILABILITY_12, 0.75);
-    set(EvaluationFeature::EMPTY_AVAILABILITY_22, 0.30);
+    set(HAND_WIDTH_RATIO_21, 0.1);
+    set(HAND_WIDTH_RATIO_32, 0.1);
+    set(HAND_WIDTH_RATIO_43, 0.1);
+    set(HAND_WIDTH_RATIO_21_SQUARED, 0.1);
+    set(HAND_WIDTH_RATIO_32_SQUARED, 0.1);
+    set(HAND_WIDTH_RATIO_43_SQUARED, 0.1);
 
-    set(EvaluationFeature::STRATEGY_LARGE_ENOUGH, 100.0);
-    set(EvaluationFeature::STRATEGY_ZENKESHI, 80.0);
-    set(EvaluationFeature::STRATEGY_TAIOU, 90.0);
-    set(EvaluationFeature::STRATEGY_TSUBUSHI, 70.0);
-    set(EvaluationFeature::STRATEGY_HOUWA, 60.0);
-    set(EvaluationFeature::STRATEGY_SAKIUCHI, -20.0);
+    set(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, 0.0);
+    set(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, -0.1);
+
+    set(EMPTY_AVAILABILITY_00, 0.95);
+    set(EMPTY_AVAILABILITY_01, 0.90);
+    set(EMPTY_AVAILABILITY_02, 0.85);
+    set(EMPTY_AVAILABILITY_11, 0.80);
+    set(EMPTY_AVAILABILITY_12, 0.75);
+    set(EMPTY_AVAILABILITY_22, 0.30);
+
+    set(STRATEGY_LARGE_ENOUGH, 100.0);
+    set(STRATEGY_ZENKESHI, 80.0);
+    set(STRATEGY_TAIOU, 90.0);
+    set(STRATEGY_TSUBUSHI, 70.0);
+    set(STRATEGY_HOUWA, -60.0);
+    set(STRATEGY_SAKIUCHI, -20.0);
+    set(STRATEGY_SCORE, 0.001);
 
     for (int i = 0; i < 20; ++i)
-        set(EvaluationFeature::MAX_CHAINS, i, i);
-    set(EvaluationFeature::THIRD_COLUMN_HEIGHT,  9, -0.5);
-    set(EvaluationFeature::THIRD_COLUMN_HEIGHT, 10, -2.0);
-    set(EvaluationFeature::THIRD_COLUMN_HEIGHT, 11, -2.0);
-    set(EvaluationFeature::THIRD_COLUMN_HEIGHT, 12, -2.0);
-    set(EvaluationFeature::THIRD_COLUMN_HEIGHT, 13, -2.0);
-    set(EvaluationFeature::THIRD_COLUMN_HEIGHT, 14, -2.0);
-    set(EvaluationFeature::THIRD_COLUMN_HEIGHT, 15, -2.0);
+        set(MAX_CHAINS, i, i);
+    set(THIRD_COLUMN_HEIGHT,  9, -0.5);
+    set(THIRD_COLUMN_HEIGHT, 10, -2.0);
+    set(THIRD_COLUMN_HEIGHT, 11, -2.0);
+    set(THIRD_COLUMN_HEIGHT, 12, -2.0);
+    set(THIRD_COLUMN_HEIGHT, 13, -2.0);
+    set(THIRD_COLUMN_HEIGHT, 14, -2.0);
+    set(THIRD_COLUMN_HEIGHT, 15, -2.0);
 }
 
 bool EvaluationParams::save(const char* filename)
@@ -96,12 +156,15 @@ bool EvaluationParams::save(const char* filename)
     }
 
     // TODO(mayah): We assume vector memory is continuously allocated.
-    fwrite(&m_featuresCoef[0], sizeof(double), m_featuresCoef.size(), fp);
-    for (int i = 0; i < EvaluationFeature::SIZE_OF_RANGE_FEATURE_PARAM; ++i)
-        fwrite(&m_rangeFeaturesCoef[i][0], sizeof(double), m_rangeFeaturesCoef[i].size(), fp);
+    fwrite(&m_planFeaturesCoef[0], sizeof(double), m_planFeaturesCoef.size(), fp);
+    for (int i = 0; i < SIZE_OF_PLAN_RANGE_FEATURE_PARAM; ++i)
+        fwrite(&m_planRangeFeaturesCoef[i][0], sizeof(double), m_planRangeFeaturesCoef.size(), fp);
+
+    fwrite(&m_rensaFeaturesCoef[0], sizeof(double), m_rensaRangeFeaturesCoef.size(), fp);
+    for (int i = 0; i < SIZE_OF_RENSA_RANGE_FEATURE_PARAM; ++i)
+        fwrite(&m_rensaRangeFeaturesCoef[i][0], sizeof(double), m_rensaRangeFeaturesCoef.size(), fp);
 
     fclose(fp);
-
     return true;
 }
 
@@ -114,54 +177,16 @@ bool EvaluationParams::load(const char* filename)
     }
 
     // TODO(mayah): We assume vector memory is continuously allocated.
-    fread(&m_featuresCoef[0], sizeof(double), m_featuresCoef.size(), fp);
-    for (int i = 0; i < EvaluationFeature::SIZE_OF_RANGE_FEATURE_PARAM; ++i)
-        fread(&m_rangeFeaturesCoef[i][0], sizeof(double), m_rangeFeaturesCoef[i].size(), fp);
+    fread(&m_planFeaturesCoef[0], sizeof(double), m_planFeaturesCoef.size(), fp);
+    for (int i = 0; i < SIZE_OF_PLAN_RANGE_FEATURE_PARAM; ++i)
+        fread(&m_planRangeFeaturesCoef[i][0], sizeof(double), m_planRangeFeaturesCoef[i].size(), fp);
+
+    fread(&m_rensaFeaturesCoef[0], sizeof(double), m_rensaFeaturesCoef.size(), fp);
+    for (int i = 0; i < SIZE_OF_RENSA_RANGE_FEATURE_PARAM; ++i)
+        fread(&m_rensaRangeFeaturesCoef[i][0], sizeof(double), m_rensaRangeFeaturesCoef[i].size(), fp);
 
     fclose(fp);
     return true;
-}
-
-double EvaluationParams::calculateHandWidthScore(int numFirstCells, int numSecondCells, int numThirdCells, int numFourthCells) const
-{
-    double d1 = numFirstCells;
-    double d2 = numSecondCells;
-    double d3 = numThirdCells;
-    double d4 = numFourthCells;
-
-    double r21 = d2 / d1;
-    double r32 = d3 / d2;
-    double r43 = d4 / d3;
-
-    double result = 0;
-    result += get(EvaluationFeature::HAND_WIDTH_1) * d1;
-    result += get(EvaluationFeature::HAND_WIDTH_2) * d2;
-    result += get(EvaluationFeature::HAND_WIDTH_3) * d3;
-    result += get(EvaluationFeature::HAND_WIDTH_4) * d4;
-
-    result += get(EvaluationFeature::HAND_WIDTH_RATIO_21) * r21;
-    result += get(EvaluationFeature::HAND_WIDTH_RATIO_32) * r32;
-    result += get(EvaluationFeature::HAND_WIDTH_RATIO_43) * r43;
-
-    result += get(EvaluationFeature::HAND_WIDTH_RATIO_21_SQUARED) * r21 * r21;
-    result += get(EvaluationFeature::HAND_WIDTH_RATIO_32_SQUARED) * r32 * r32;
-    result += get(EvaluationFeature::HAND_WIDTH_RATIO_43_SQUARED) * r43 * r43;
-    return result;
-}
-
-double EvaluationParams::calculateScore(const EvaluationFeature& feature) const
-{
-    double result = 0;
-
-#define DEFINE_PARAM(name) result += get(EvaluationFeature::name) * feature.get(EvaluationFeature::name);
-#define DEFINE_RANGE_PARAM(name, maxValue) result += get(EvaluationFeature::name, feature.get(EvaluationFeature::name));
-#include "evaluation_feature.tab"
-#undef DEFINE_PARAM
-#undef DEFINE_RANGE_PARAM
-
-    LOG(INFO) << "score = " << result;
-
-    return result;
 }
 
 string EvaluationParams::toString() const
@@ -169,13 +194,14 @@ string EvaluationParams::toString() const
     ostringstream ss;
 
     // TODO(mayah): We should not use this kind of hack. Use for-loop.
-#define DEFINE_PARAM(name) ss << (#name) << " = " << get(EvaluationFeature::name) << endl;
+#define DEFINE_PARAM(name) ss << (#name) << " = " << get(name) << endl;
 #define DEFINE_RANGE_PARAM(name, maxValue) ss << (#name) << " = "; \
     for (int i = 0; i < (maxValue); ++i) {                              \
-        ss << get(EvaluationFeature::name, i) << ' ';                   \
+        ss << get(name, i) << ' ';                   \
     }                                                                   \
     ss << endl;
-#include "evaluation_feature.tab"
+#include "plan_evaluation_feature.tab"
+#include "rensa_evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_RANGE_PARAM
 

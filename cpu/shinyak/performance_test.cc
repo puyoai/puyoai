@@ -64,6 +64,21 @@ TEST(PerformanceTest, Simulate_Filled_Track)
     cout << "variance: " << variance << endl;
 }
 
+TEST(PerformanceTest, FindPossibleRensas0)
+{
+    for (int i = 0; i < 100000; i++) {
+        Tsc tsc("FindPossibleRensas0");
+        Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
+        vector<PossibleRensaInfo> result;
+        RensaDetector::findPossibleRensas(result, f, 0);
+    }
+
+    double average, variance;
+    Tsc::GetStatistics("FindPossibleRensas0", &average, &variance);
+    cout << "average: " << average << endl;
+    cout << "variance: " << variance << endl;
+}
+
 TEST(PerformanceTest, FindPossibleRensas1)
 {
     for (int i = 0; i < 10000; i++) {
@@ -111,7 +126,7 @@ TEST(PerformanceTest, FindPossibleRensas3)
 
 TEST(PerformanceTest, FindPossibleRensas4)
 {
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10; i++) {
         Tsc tsc("FindPossibleRensas4");
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
         vector<PossibleRensaInfo> result;
