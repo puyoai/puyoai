@@ -20,21 +20,23 @@
 
 using namespace std;
 
-void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, int currentFrameId, const Plan& plan, const EnemyInfo& enemyInfo)
+void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, const Plan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
 {
-    {
-        PlanEvaluationFeature planFeature;
-        collectFrameFeature(planFeature, plan);
-        collectEmptyAvailabilityFeature(planFeature, plan);
-        collectConnectionFeature(planFeature, plan);
-        collectFieldHeightFeature(planFeature, plan);
-        collectOngoingRensaFeature(planFeature, currentFrameId, plan, enemyInfo);
-
-        feature.setPlanFeature(planFeature);
-    }
-
-
+    collectPlanFeature(feature, plan, currentFrameId, enemyInfo);
     collectRensaFeature(feature, plan);
+}
+
+void EvaluationFeatureCollector::collectPlanFeature(EvaluationFeature& feature, const Plan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
+{
+    PlanEvaluationFeature planFeature;
+    collectFrameFeature(planFeature, plan);
+    collectEmptyAvailabilityFeature(planFeature, plan);
+    collectConnectionFeature(planFeature, plan);
+    collectDensityFeature(planFeature, plan);
+    collectFieldHeightFeature(planFeature, plan);
+    collectOngoingRensaFeature(planFeature, plan, currentFrameId, enemyInfo);
+    
+    feature.setPlanFeature(planFeature);
 }
 
 void EvaluationFeatureCollector::collectRensaFeature(EvaluationFeature& feature, const Plan& plan)
@@ -86,6 +88,30 @@ static void calculateConnection(Feature& feature, const Field& field, const T pa
                 feature.add(params[3], 1);
             else if (connection.first < 4)
                 feature.add(params[connection.first - 1], 1);
+        }
+    }
+}
+
+// Takes 2x3 field, and counts each color puyo number.
+template<typename Feature, typename T>
+static void calculateDensity(Feature& feature, const Field& field, const T params[])
+{
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        for (int y = 1; y <= Field::HEIGHT + 1; ++y) {
+            int numColors[8] = { 0 };
+
+            for (int dx = -1; dx <= 1; ++dx) {
+                for (int dy = -1; dy <= 1; ++dy) {
+                    numColors[field.color(x + dx, y + dy)] += 1;
+                }
+            }
+
+            for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
+                PuyoColor c = normalPuyoColorOf(i);
+                if (numColors[c] > 4)
+                    numColors[c] = 4;
+                feature.add(params[numColors[c]], 1);
+            }
         }
     }
 }
@@ -151,7 +177,6 @@ void EvaluationFeatureCollector::collectRensaEvaluationFeature(
     rensaFeature.set(HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
     rensaFeature.set(HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
 
-
     static const RensaFeatureParam paramsAfter[] = {
         CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3, CONNECTION_AFTER_VANISH_4,
     };
@@ -208,6 +233,15 @@ void EvaluationFeatureCollector::collectConnectionFeature(PlanEvaluationFeature&
     calculateConnection(planFeature, plan.field(), params);
 }
 
+void EvaluationFeatureCollector::collectDensityFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
+{
+    static const PlanFeatureParam params[] = {
+        DENSITY_0, DENSITY_1, DENSITY_2, DENSITY_3, DENSITY_4, 
+    };
+
+    calculateDensity(planFeature, plan.field(), params);
+}
+
 void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
 {
     const Field& field = plan.field();
@@ -230,9 +264,7 @@ void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature
     planFeature.set(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
 }
 
-void EvaluationFeatureCollector::collectOngoingRensaFeature(
-    PlanEvaluationFeature& planFeature, int currentFrameId, const Plan& plan,
-    const EnemyInfo& enemyInfo)
+void EvaluationFeatureCollector::collectOngoingRensaFeature(PlanEvaluationFeature& planFeature, const Plan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
 {
     if (enemyInfo.rensaIsOngoing() && enemyInfo.ongoingRensaInfo().rensaInfo.score > scoreForOjama(6)) {
         // TODO: 対応が適当すぎる
