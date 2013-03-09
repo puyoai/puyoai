@@ -142,7 +142,7 @@ void AI::decide(DropDecision& dropDecision, const Game& game)
 EvalResult AI::eval(int currentFrameId, const Plan& plan) const
 {
     EvaluationFeature feature;
-    EvaluationFeatureCollector::collectFeatures(feature, currentFrameId, plan, m_enemyInfo);
+    EvaluationFeatureCollector::collectFeatures(feature, plan, currentFrameId, m_enemyInfo);
 
     const RensaEvaluationFeature& bestRensaFeature = feature.findBestRensaFeature(m_evaluationParams);
     double finalScore = feature.calculateScoreWith(m_evaluationParams, bestRensaFeature);

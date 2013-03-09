@@ -101,6 +101,12 @@ void EvaluationParams::initialize()
     set(CONNECTION_3,  1.2 / 30.0);
     set(CONNECTION_4, -0.5 / 30.0);
 
+    set(DENSITY_0,  0.02);
+    set(DENSITY_1, -0.024);
+    set(DENSITY_2,  0.003);
+    set(DENSITY_3,  0.003);
+    set(DENSITY_4,  0.004);
+
     set(CONNECTION_AFTER_VANISH_1, -0.1 / 15.0);
     set(CONNECTION_AFTER_VANISH_2,  0.9 / 15.0);
     set(CONNECTION_AFTER_VANISH_3,  1.6 / 15.0);

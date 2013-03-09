@@ -16,6 +16,8 @@
 
 using namespace std;
 
+const double LEARNING_COEF = 1 / 1000.0;
+
 struct FrameInput {
     FrameInput() {}
     FrameInput(const Field& left, const vector<KumiPuyo>& kumiPuyos, const Field& right) :
@@ -45,18 +47,18 @@ void updatePlanParam(EvaluationParams& params, const PlanEvaluationFeature& curr
 {
     for (int i = 0; i < SIZE_OF_PLAN_FEATURE_PARAM; ++i) {
         PlanFeatureParam paramName = toPlanFeatureParam(i);
-        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName));
+        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
         cout << "learning: " << paramName << ' '
              << params.get(paramName) << ' '
              << currentFeature.get(paramName) << ' ' 
              << teacherFeature.get(paramName) << ' '
              << dT << endl;
-        params.add(paramName, -dT / 100.0);
+        params.add(paramName, -dT);
     }
 
     for (int i = 0; i < SIZE_OF_PLAN_RANGE_FEATURE_PARAM; ++i) {
         PlanRangeFeatureParam paramName = toPlanRangeFeatureParam(i);
-        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) / 1000.0;
+        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
         cout << "learning: " << paramName << ' '
              << params.get(paramName, currentFeature.get(paramName)) << ' '
              << params.get(paramName, teacherFeature.get(paramName)) << ' '
@@ -72,18 +74,18 @@ void updateRensaParam(EvaluationParams& params, const RensaEvaluationFeature& cu
 {
     for (int i = 0; i < SIZE_OF_RENSA_FEATURE_PARAM; ++i) {
         RensaFeatureParam paramName = toRensaFeatureParam(i);
-        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName));
+        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
         cout << "learning: " << paramName << ' '
              << params.get(paramName) << ' '
              << currentFeature.get(paramName) << ' ' 
              << teacherFeature.get(paramName) << ' '
              << dT << endl;
-        params.add(paramName, -dT / 100.0);
+        params.add(paramName, -dT);
     }
 
     for (int i = 0; i < SIZE_OF_RENSA_RANGE_FEATURE_PARAM; ++i) {
         RensaRangeFeatureParam paramName = toRensaRangeFeatureParam(i);
-        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) / 1000.0;
+        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
         cout << "learning: " << paramName << ' '
              << params.get(paramName, currentFeature.get(paramName)) << ' '
              << params.get(paramName, teacherFeature.get(paramName)) << ' '
@@ -117,7 +119,7 @@ void learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
     vector<pair<float, size_t> > scores(plans.size());
     vector<EvaluationFeature> features(plans.size());
     for (size_t i = 0; i < plans.size(); ++i) {
-        EvaluationFeatureCollector::collectFeatures(features[i], 0, plans[i], enemyInfo);
+        EvaluationFeatureCollector::collectFeatures(features[i], plans[i], 0, enemyInfo);
 
         if (plans[i].isRensaPlan()) {
             scores[i] = make_pair(-1000000, i);
