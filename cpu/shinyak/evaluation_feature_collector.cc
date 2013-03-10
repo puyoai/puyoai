@@ -77,13 +77,27 @@ void EvaluationFeatureCollector::collectFrameFeature(PlanEvaluationFeature& plan
 template<typename Feature, typename T>
 static void calculateConnection(Feature& feature, const Field& field, const T params[])
 {
-    FieldBitField checked;
     for (int x = 1; x <= Field::WIDTH; ++x) {
         for (int y = 1; field.color(x, y) != EMPTY; ++y) {
-            if (!isColorPuyo(field.color(x, y)) || checked(x, y))
+            if (!isColorPuyo(field.color(x, y)))
                 continue;
 
-            pair<int, int> connection = field.connectedPuyoNumsWithAllowingOnePointJump(x, y, checked);
+            int numConnected = field.connectedPuyoNums(x, y);
+            DCHECK(1 <= numConnected && numConnected <= 3);
+            feature.add(params[numConnected - 1], 1);
+        }
+    }
+}
+
+template<typename Feature, typename T>
+static void calculateConnectionWithAllowingOnePointJump(Feature& feature, const Field& field, const T params[])
+{
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        for (int y = 1; field.color(x, y) != EMPTY; ++y) {
+            if (!isColorPuyo(field.color(x, y)))
+                continue;
+
+            pair<int, int> connection = field.connectedPuyoNumsWithAllowingOnePointJump(x, y);
             if (connection.first + connection.second >= 4)
                 feature.add(params[3], 1);
             else if (connection.first < 4)
@@ -157,29 +171,20 @@ void EvaluationFeatureCollector::collectRensaEvaluationFeature(
         }
     }
 
-    double d1 = distanceCountResult[1];
     double d2 = distanceCountResult[2];
     double d3 = distanceCountResult[3];
     double d4 = distanceCountResult[4];
 
-    double r21 = d1 != 0 ? d2 / d1 : 0;
     double r32 = d2 != 0 ? d3 / d2 : 0;
     double r43 = d3 != 0 ? d4 / d3 : 0;
 
-    rensaFeature.set(HAND_WIDTH_1, d1);
     rensaFeature.set(HAND_WIDTH_2, d2);
     rensaFeature.set(HAND_WIDTH_3, d3);
     rensaFeature.set(HAND_WIDTH_4, d4);
-    rensaFeature.set(HAND_WIDTH_RATIO_21, r21);
     rensaFeature.set(HAND_WIDTH_RATIO_32, r32);
     rensaFeature.set(HAND_WIDTH_RATIO_43, r43);
-    rensaFeature.set(HAND_WIDTH_RATIO_21_SQUARED, r21 * r21);
     rensaFeature.set(HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
     rensaFeature.set(HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
-
-    static const RensaFeatureParam paramsAfter[] = {
-        CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3, CONNECTION_AFTER_VANISH_4,
-    };
 
     ArbitrarilyModifiableField f(plan.field());
     for (int x = 1; x <= Field::WIDTH; ++x) {
@@ -191,7 +196,15 @@ void EvaluationFeatureCollector::collectRensaEvaluationFeature(
     }
     f.forceDrop();
 
+    static const RensaFeatureParam paramsAfter[] = {
+        CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3,
+    };
+    static const RensaFeatureParam paramsJumpAfter[] = {
+        CONNECTION_ALLOWING_JUMP_AFTER_VANISH_1, CONNECTION_ALLOWING_JUMP_AFTER_VANISH_2,
+        CONNECTION_ALLOWING_JUMP_AFTER_VANISH_3, CONNECTION_ALLOWING_JUMP_AFTER_VANISH_4,
+    };
     calculateConnection(rensaFeature, f, paramsAfter);
+    calculateConnectionWithAllowingOnePointJump(rensaFeature, f, paramsJumpAfter);
 }
 
 void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(PlanEvaluationFeature& feature, const Plan& plan)
@@ -227,10 +240,14 @@ void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(PlanEvaluationF
 void EvaluationFeatureCollector::collectConnectionFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
 {
     static const PlanFeatureParam params[] = {
-        CONNECTION_1, CONNECTION_2, CONNECTION_3, CONNECTION_4,
+        CONNECTION_1, CONNECTION_2, CONNECTION_3,
+    };
+    static const PlanFeatureParam jumpParams[] = {
+        CONNECTION_ALLOWING_JUMP_1, CONNECTION_ALLOWING_JUMP_2, CONNECTION_ALLOWING_JUMP_3, CONNECTION_ALLOWING_JUMP_4,
     };
 
     calculateConnection(planFeature, plan.field(), params);
+    calculateConnectionWithAllowingOnePointJump(planFeature, plan.field(), jumpParams);
 }
 
 void EvaluationFeatureCollector::collectDensityFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
