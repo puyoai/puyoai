@@ -32,6 +32,7 @@ if(GTEST_FOUND)
   include_directories(${GTEST_INCLUDE_DIRS})
 
   shinyak_add_test(enemy_info_test)
+  shinyak_add_test(evaluation_feature_test)
   shinyak_add_test(field_bit_field_test)
   shinyak_add_test(field_column_bit_field_test)
   shinyak_add_test(field_evaluator_test)

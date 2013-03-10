@@ -41,8 +41,9 @@ std::string AI::getName() const
 
 AI::AI(const string& name)
     : m_name(name)
+    , m_evaluationParams("feature.txt")
 {
-    // m_evaluationParams.load("feature.bin");
+    LOG(INFO) << m_evaluationParams.toString();
 }
 
 void AI::initialize(const Game& game)

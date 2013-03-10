@@ -1,8 +1,10 @@
 #include "evaluation_feature.h"
 
-#include <glog/logging.h>
+#include <fstream>
+#include <map>
 #include <sstream>
-#include <stdio.h>
+#include <vector>
+
 #include "field.h"
 
 using namespace std;
@@ -65,7 +67,7 @@ double EvaluationFeature::calculateScoreWith(const EvaluationParams& params, con
     return planScore + rensaScore;
 }
 
-EvaluationParams::EvaluationParams() :
+EvaluationParams::EvaluationParams(const char* filename) :
     m_planFeaturesCoef(SIZE_OF_PLAN_FEATURE_PARAM),
     m_planRangeFeaturesCoef(SIZE_OF_PLAN_RANGE_FEATURE_PARAM),
     m_rensaFeaturesCoef(SIZE_OF_RENSA_FEATURE_PARAM),
@@ -83,116 +85,81 @@ EvaluationParams::EvaluationParams() :
 #undef DEFINE_PARAM
 #undef DEFINE_RANGE_PARAM
 
-    initialize();
-}
-
-void EvaluationParams::initialize()
-{
-    // TODO(mayah): Sort this.
-
-    set(TOTAL_FRAMES, 0.0);
-    set(TOTAL_FRAMES_INVERSE, 1.0);
-
-    set(MAX_RENSA_NECESSARY_PUYOS, 0);
-    set(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0);
-
-    set(CONNECTION_1, -0.1 / 30.0);
-    set(CONNECTION_2,  0.9 / 30.0);
-    set(CONNECTION_3,  1.2 / 30.0);
-    set(CONNECTION_4, -0.5 / 30.0);
-
-    set(DENSITY_0,  0.02);
-    set(DENSITY_1, -0.024);
-    set(DENSITY_2,  0.003);
-    set(DENSITY_3,  0.003);
-    set(DENSITY_4,  0.004);
-
-    set(CONNECTION_AFTER_VANISH_1, -0.1 / 15.0);
-    set(CONNECTION_AFTER_VANISH_2,  0.9 / 15.0);
-    set(CONNECTION_AFTER_VANISH_3,  1.6 / 15.0);
-    set(CONNECTION_AFTER_VANISH_4,  0.5 / 15.0);
-
-    set(HAND_WIDTH_1, 0.1);
-    set(HAND_WIDTH_2, 0.1);
-    set(HAND_WIDTH_3, 0.1);
-    set(HAND_WIDTH_4, 0.1);
-
-    set(HAND_WIDTH_RATIO_21, 0.1);
-    set(HAND_WIDTH_RATIO_32, 0.1);
-    set(HAND_WIDTH_RATIO_43, 0.1);
-    set(HAND_WIDTH_RATIO_21_SQUARED, 0.1);
-    set(HAND_WIDTH_RATIO_32_SQUARED, 0.1);
-    set(HAND_WIDTH_RATIO_43_SQUARED, 0.1);
-
-    set(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, 0.0);
-    set(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, -0.1);
-
-    set(EMPTY_AVAILABILITY_00, 0.95);
-    set(EMPTY_AVAILABILITY_01, 0.90);
-    set(EMPTY_AVAILABILITY_02, 0.85);
-    set(EMPTY_AVAILABILITY_11, 0.80);
-    set(EMPTY_AVAILABILITY_12, 0.75);
-    set(EMPTY_AVAILABILITY_22, 0.30);
-
-    set(STRATEGY_LARGE_ENOUGH, 100.0);
-    set(STRATEGY_ZENKESHI, 80.0);
-    set(STRATEGY_TAIOU, 90.0);
-    set(STRATEGY_TSUBUSHI, 70.0);
-    set(STRATEGY_HOUWA, -60.0);
-    set(STRATEGY_SAKIUCHI, -20.0);
-    set(STRATEGY_SCORE, 0.001);
-
-    for (int i = 0; i < 20; ++i)
-        set(MAX_CHAINS, i, i);
-    set(THIRD_COLUMN_HEIGHT,  9, -0.5);
-    set(THIRD_COLUMN_HEIGHT, 10, -2.0);
-    set(THIRD_COLUMN_HEIGHT, 11, -2.0);
-    set(THIRD_COLUMN_HEIGHT, 12, -2.0);
-    set(THIRD_COLUMN_HEIGHT, 13, -2.0);
-    set(THIRD_COLUMN_HEIGHT, 14, -2.0);
-    set(THIRD_COLUMN_HEIGHT, 15, -2.0);
+    if (filename != nullptr)
+        load(filename);
 }
 
 bool EvaluationParams::save(const char* filename)
 {
-    FILE* fp = fopen(filename, "w");
-    if (!fp) {
-        perror("save");
+    try {
+        ofstream ofs(filename, ios::out | ios::trunc);
+
+#define DEFINE_PARAM(name) ofs << (#name) << " = " << get(name) << endl;
+#define DEFINE_RANGE_PARAM(name, maxValue) ofs << (#name) << " =";     \
+            for (int i = 0; i < (maxValue); ++i) {                     \
+                ofs << " " << get(name, i);                            \
+            }                                                          \
+        ofs << endl;
+#include "plan_evaluation_feature.tab"
+#include "rensa_evaluation_feature.tab"
+#undef DEFINE_PARAM
+#undef DEFINE_RANGE_PARAM
+
+        return true;
+    } catch (std::exception& e) {
+        LOG(WARNING) << "EvaluationParams::save failed: " << e.what();
         return false;
     }
-
-    // TODO(mayah): We assume vector memory is continuously allocated.
-    fwrite(&m_planFeaturesCoef[0], sizeof(double), m_planFeaturesCoef.size(), fp);
-    for (int i = 0; i < SIZE_OF_PLAN_RANGE_FEATURE_PARAM; ++i)
-        fwrite(&m_planRangeFeaturesCoef[i][0], sizeof(double), m_planRangeFeaturesCoef.size(), fp);
-
-    fwrite(&m_rensaFeaturesCoef[0], sizeof(double), m_rensaRangeFeaturesCoef.size(), fp);
-    for (int i = 0; i < SIZE_OF_RENSA_RANGE_FEATURE_PARAM; ++i)
-        fwrite(&m_rensaRangeFeaturesCoef[i][0], sizeof(double), m_rensaRangeFeaturesCoef.size(), fp);
-
-    fclose(fp);
-    return true;
 }
 
 bool EvaluationParams::load(const char* filename)
 {
-    FILE* fp = fopen(filename, "r");
-    if (!fp) {
-        perror("load");
+    map<string, vector<double>> keyValues;
+
+    try {
+        ifstream ifs(filename, ios::in);
+
+        string str;
+        while (getline(ifs, str)) {
+            istringstream ss(str);
+            string name; 
+            if (!(ss >> name))
+                continue;
+
+            char c;
+            if (!((ss >> c) && c == '=')) {
+                LOG(WARNING) << "Invalid EvaluationFeatureFormat: " << str;
+                return false;
+            }
+
+            vector<double> values;
+            double v;
+            while (ss >> v)
+                values.push_back(v);
+
+            keyValues.insert(make_pair(name, values));
+        }
+
+#define DEFINE_PARAM(name) if (keyValues.count(#name)) {                \
+            set(name, keyValues[#name].front());                        \
+        }
+#define DEFINE_RANGE_PARAM(name, maxValue) if (keyValues.count(#name)) { \
+            if (maxValue != keyValues[#name].size()) {                  \
+                LOG(WARNING) << "Invalid EvaluationFeatureFormat: Length mismatch."; \
+                return false;                                           \
+            }                                                           \
+            set(name, keyValues[#name]);                                \
+        }
+#include "plan_evaluation_feature.tab"
+#include "rensa_evaluation_feature.tab"
+#undef DEFINE_PARAM
+#undef DEFINE_RANGE_PARAM
+
+        return true;
+    } catch (std::exception& e) {
+        LOG(WARNING) << "EvaluationParams::load failed: " << e.what();
         return false;
     }
-
-    // TODO(mayah): We assume vector memory is continuously allocated.
-    fread(&m_planFeaturesCoef[0], sizeof(double), m_planFeaturesCoef.size(), fp);
-    for (int i = 0; i < SIZE_OF_PLAN_RANGE_FEATURE_PARAM; ++i)
-        fread(&m_planRangeFeaturesCoef[i][0], sizeof(double), m_planRangeFeaturesCoef[i].size(), fp);
-
-    fread(&m_rensaFeaturesCoef[0], sizeof(double), m_rensaFeaturesCoef.size(), fp);
-    for (int i = 0; i < SIZE_OF_RENSA_RANGE_FEATURE_PARAM; ++i)
-        fread(&m_rensaRangeFeaturesCoef[i][0], sizeof(double), m_rensaRangeFeaturesCoef[i].size(), fp);
-
-    fclose(fp);
-    return true;
 }
 
 string EvaluationParams::toString() const
@@ -212,4 +179,12 @@ string EvaluationParams::toString() const
 #undef DEFINE_RANGE_PARAM
 
     return ss.str();
+}
+
+bool operator==(const EvaluationParams& lhs, const EvaluationParams& rhs)
+{
+    return lhs.m_planFeaturesCoef == rhs.m_planFeaturesCoef &&
+        lhs.m_planRangeFeaturesCoef == rhs.m_planRangeFeaturesCoef &&
+        lhs.m_rensaFeaturesCoef == rhs.m_rensaFeaturesCoef &&
+        lhs.m_rensaRangeFeaturesCoef == rhs.m_rensaRangeFeaturesCoef;
 }
