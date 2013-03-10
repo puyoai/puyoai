@@ -143,7 +143,8 @@ private:
 
 class EvaluationParams {
 public:
-    EvaluationParams();
+    // If filename is NULL, all the parameters will be 0.
+    explicit EvaluationParams(const char* filename);
 
     double get(PlanFeatureParam param) const { return m_planFeaturesCoef[param]; }
     void set(PlanFeatureParam param, double value) { m_planFeaturesCoef[param] = value; }
@@ -169,9 +170,9 @@ public:
     bool save(const char* filename);
     bool load(const char* filename);
 
+    friend bool operator==(const EvaluationParams&, const EvaluationParams&);
+
 private:
-    void initialize();
-    
     std::vector<double> m_planFeaturesCoef;
     std::vector<std::vector<double> > m_planRangeFeaturesCoef;
     std::vector<double> m_rensaFeaturesCoef;

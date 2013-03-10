@@ -160,8 +160,9 @@ void learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
 int main(void)
 {
     TsumoPossibility::initialize();
-    
-    EvaluationParams params;
+
+    // TODO(mayah): Maybe we have to use constant variable name here.
+    EvaluationParams params("feature.txt");
 
     FrameInput frameInputs[3];
     bool shouldSkip = false;
@@ -219,8 +220,8 @@ int main(void)
     }
 
     cout << params.toString() << endl;
-    if (params.save("feature.bin")) {
-        cout << "Saved as feature.bin" << endl;
+    if (params.save("feature_learned.txt")) {
+        cout << "Saved as feature_learned.txt" << endl;
     } else {
         cout << "Save faild..." << endl;
     }
