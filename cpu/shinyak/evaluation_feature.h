@@ -121,13 +121,13 @@ private:
 class EvaluationFeature {
 public:
     const PlanEvaluationFeature& planFeature() const { return m_planFeature; }
-    void setPlanFeature(const PlanEvaluationFeature& planFeature) { m_planFeature = planFeature; }
+    PlanEvaluationFeature& modifiablePlanFeature() { return m_planFeature; }
 
     const RensaEvaluationFeature& findBestRensaFeature(const EvaluationParams&) const;
+    size_t numRensaFeatures() const { return m_rensaFeatures.size(); }    
+    void addRensaFeature(const RensaEvaluationFeature& rensaEvaluationFeature) { m_rensaFeatures.push_back(rensaEvaluationFeature); }
 
-    
-    void add(const RensaEvaluationFeature& rensaEvaluationFeature) { m_rensaFeatures.push_back(rensaEvaluationFeature); }
-
+public:
     double calculateScore(const EvaluationParams& params) const { return calculateScoreWith(params, findBestRensaFeature(params)); }
     // Calculates score with the specified RensaEvaluationFeature.
     double calculateScoreWith(const EvaluationParams&, const RensaEvaluationFeature&) const;
