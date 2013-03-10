@@ -304,7 +304,6 @@ void EvaluationFeatureCollector::collectOngoingRensaFeature(PlanEvaluationFeatur
 
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
     int estimatedMaxScore = enemyInfo.estimateMaxScore(rensaEndingFrameId);
-    // log << "ESTIMATED MAX SCORE = " << estimatedMaxScore << " BY " << rensaEndingFrameId << endl;
 
     // --- 1.1. 十分でかい場合は打って良い。
     // / TODO: 十分でかいとは？ / とりあえず致死量ということにする
