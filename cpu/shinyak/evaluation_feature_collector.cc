@@ -22,25 +22,10 @@ using namespace std;
 
 void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, const Plan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
 {
-    collectPlanFeature(feature, plan, currentFrameId, enemyInfo);
-    collectRensaFeature(feature, plan);
-}
+    collectPlanFeatures(feature.modifiablePlanFeature(), plan, currentFrameId, enemyInfo);
 
-void EvaluationFeatureCollector::collectPlanFeature(EvaluationFeature& feature, const Plan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
-{
-    PlanEvaluationFeature planFeature;
-    collectFrameFeature(planFeature, plan);
-    collectEmptyAvailabilityFeature(planFeature, plan);
-    collectConnectionFeature(planFeature, plan);
-    collectDensityFeature(planFeature, plan);
-    collectFieldHeightFeature(planFeature, plan);
-    collectOngoingRensaFeature(planFeature, plan, currentFrameId, enemyInfo);
-    
-    feature.setPlanFeature(planFeature);
-}
+    // Collect rensa features.
 
-void EvaluationFeatureCollector::collectRensaFeature(EvaluationFeature& feature, const Plan& plan)
-{
     const Field& field = plan.field();
 
     vector<TrackedPossibleRensaInfo> rensaInfos;
@@ -60,10 +45,24 @@ void EvaluationFeatureCollector::collectRensaFeature(EvaluationFeature& feature,
             continue;
 
         RensaEvaluationFeature rensaFeature;
-        collectRensaEvaluationFeature(rensaFeature, plan, *it);
+        collectRensaFeatures(rensaFeature, plan, *it);
 
-        feature.add(rensaFeature);
+        feature.addRensaFeature(rensaFeature);
+        // TODO(mayah): If we have a lot of rensa features, it's too slow.
+        // So we limit the number of rensa features.
+        if (feature.numRensaFeatures() > 100)
+            break;
     }
+}
+
+void EvaluationFeatureCollector::collectPlanFeatures(PlanEvaluationFeature& planFeature, const Plan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
+{
+    collectFrameFeature(planFeature, plan);
+    collectEmptyAvailabilityFeature(planFeature, plan);
+    collectConnectionFeature(planFeature, plan);
+    collectDensityFeature(planFeature, plan);
+    collectFieldHeightFeature(planFeature, plan);
+    collectOngoingRensaFeature(planFeature, plan, currentFrameId, enemyInfo);
 }
 
 void EvaluationFeatureCollector::collectFrameFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
@@ -128,83 +127,6 @@ static void calculateDensity(Feature& feature, const Field& field, const T param
             }
         }
     }
-}
-
-void EvaluationFeatureCollector::collectRensaEvaluationFeature(
-    RensaEvaluationFeature& rensaFeature,
-    const Plan& plan,
-    const TrackedPossibleRensaInfo& info)
-{
-    int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, info.necessaryPuyoSet);
-    
-    rensaFeature.set(MAX_CHAINS, info.rensaInfo.chains);
-    rensaFeature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
-    if (numNecessaryPuyos != 0)
-        rensaFeature.set(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
-
-    // -----
-    int distanceCountResult[5] = { 0, 0, 0, 0, 0 };
-
-    // 1 連鎖の部分を距離 1 とし、距離 4 までを求める。
-    // 距離 2, 3, 4 の数を数え、その広がり具合により、手の広さを求めることができる。
-    int distance[Field::MAP_WIDTH][Field::MAP_HEIGHT];
-    for (int x = 0; x < Field::MAP_WIDTH; ++x) {
-        for (int y = 0; y < Field::MAP_HEIGHT; ++y) {
-            if (info.trackResult.erasedAt(x, y) == 1)
-                distance[x][y] = 1;
-            else
-                distance[x][y] = 0;
-        }
-    }
-
-    const Field& field = plan.field();
-    for (int d = 2; d <= 4; ++d) {
-        for (int x = 1; x <= Field::WIDTH; ++x) {
-            for (int y = 1; y <= Field::HEIGHT; ++y) {
-                if (field.color(x, y) != EMPTY || distance[x][y] > 0)
-                    continue;
-                if (distance[x][y-1] == d - 1 || distance[x][y+1] == d - 1 || distance[x-1][y] == d - 1 || distance[x+1][y] == d - 1) {
-                    distance[x][y] = d;
-                    ++distanceCountResult[d];
-                }
-            }
-        }
-    }
-
-    double d2 = distanceCountResult[2];
-    double d3 = distanceCountResult[3];
-    double d4 = distanceCountResult[4];
-
-    double r32 = d2 != 0 ? d3 / d2 : 0;
-    double r43 = d3 != 0 ? d4 / d3 : 0;
-
-    rensaFeature.set(HAND_WIDTH_2, d2);
-    rensaFeature.set(HAND_WIDTH_3, d3);
-    rensaFeature.set(HAND_WIDTH_4, d4);
-    rensaFeature.set(HAND_WIDTH_RATIO_32, r32);
-    rensaFeature.set(HAND_WIDTH_RATIO_43, r43);
-    rensaFeature.set(HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
-    rensaFeature.set(HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
-
-    ArbitrarilyModifiableField f(plan.field());
-    for (int x = 1; x <= Field::WIDTH; ++x) {
-        for (int y = 1; y <= 13; ++y) { // TODO: 13?
-            if (info.trackResult.erasedAt(x, y) != 0)
-                f.setColor(x, y, EMPTY);
-        }
-        f.recalcHeightOn(x);
-    }
-    f.forceDrop();
-
-    static const RensaFeatureParam paramsAfter[] = {
-        CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3,
-    };
-    static const RensaFeatureParam paramsJumpAfter[] = {
-        CONNECTION_ALLOWING_JUMP_AFTER_VANISH_1, CONNECTION_ALLOWING_JUMP_AFTER_VANISH_2,
-        CONNECTION_ALLOWING_JUMP_AFTER_VANISH_3, CONNECTION_ALLOWING_JUMP_AFTER_VANISH_4,
-    };
-    calculateConnection(rensaFeature, f, paramsAfter);
-    calculateConnectionWithAllowingOnePointJump(rensaFeature, f, paramsJumpAfter);
 }
 
 void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(PlanEvaluationFeature& feature, const Plan& plan)
@@ -335,4 +257,91 @@ void EvaluationFeatureCollector::collectOngoingRensaFeature(PlanEvaluationFeatur
     LOG(INFO) << plan.decisionText() << " " << ss.str();
     planFeature.set(STRATEGY_SCORE, plan.totalScore());
     planFeature.set(STRATEGY_SAKIUCHI, 1.0);
+}
+
+void EvaluationFeatureCollector::collectRensaFeatures(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)    
+{
+    collectRensaChainFeature(rensaFeature, plan, info);
+    collectRensaHandWidthFeature(rensaFeature, plan, info);
+    collectRensaConnectionFeature(rensaFeature, plan, info);
+}
+
+void EvaluationFeatureCollector::collectRensaChainFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)
+{
+    int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, info.necessaryPuyoSet);
+    
+    rensaFeature.set(MAX_CHAINS, info.rensaInfo.chains);
+    rensaFeature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
+    if (numNecessaryPuyos != 0)
+        rensaFeature.set(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
+}
+
+void EvaluationFeatureCollector::collectRensaHandWidthFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)
+{
+    // -----
+    int distanceCountResult[5] = { 0, 0, 0, 0, 0 };
+
+    // 1 連鎖の部分を距離 1 とし、距離 4 までを求める。
+    // 距離 2, 3, 4 の数を数え、その広がり具合により、手の広さを求めることができる。
+    int distance[Field::MAP_WIDTH][Field::MAP_HEIGHT];
+    for (int x = 0; x < Field::MAP_WIDTH; ++x) {
+        for (int y = 0; y < Field::MAP_HEIGHT; ++y) {
+            if (info.trackResult.erasedAt(x, y) == 1)
+                distance[x][y] = 1;
+            else
+                distance[x][y] = 0;
+        }
+    }
+
+    const Field& field = plan.field();
+    for (int d = 2; d <= 4; ++d) {
+        for (int x = 1; x <= Field::WIDTH; ++x) {
+            for (int y = 1; y <= Field::HEIGHT; ++y) {
+                if (field.color(x, y) != EMPTY || distance[x][y] > 0)
+                    continue;
+                if (distance[x][y-1] == d - 1 || distance[x][y+1] == d - 1 || distance[x-1][y] == d - 1 || distance[x+1][y] == d - 1) {
+                    distance[x][y] = d;
+                    ++distanceCountResult[d];
+                }
+            }
+        }
+    }
+
+    double d2 = distanceCountResult[2];
+    double d3 = distanceCountResult[3];
+    double d4 = distanceCountResult[4];
+
+    double r32 = d2 != 0 ? d3 / d2 : 0;
+    double r43 = d3 != 0 ? d4 / d3 : 0;
+
+    rensaFeature.set(HAND_WIDTH_2, d2);
+    rensaFeature.set(HAND_WIDTH_3, d3);
+    rensaFeature.set(HAND_WIDTH_4, d4);
+    rensaFeature.set(HAND_WIDTH_RATIO_32, r32);
+    rensaFeature.set(HAND_WIDTH_RATIO_43, r43);
+    rensaFeature.set(HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
+    rensaFeature.set(HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
+}
+
+void EvaluationFeatureCollector::collectRensaConnectionFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)
+{
+    ArbitrarilyModifiableField f(plan.field());
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        for (int y = 1; y <= 13; ++y) { // TODO: 13?
+            if (info.trackResult.erasedAt(x, y) != 0)
+                f.setColor(x, y, EMPTY);
+        }
+        f.recalcHeightOn(x);
+    }
+    f.forceDrop();
+
+    static const RensaFeatureParam paramsAfter[] = {
+        CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3,
+    };
+    static const RensaFeatureParam paramsJumpAfter[] = {
+        CONNECTION_ALLOWING_JUMP_AFTER_VANISH_1, CONNECTION_ALLOWING_JUMP_AFTER_VANISH_2,
+        CONNECTION_ALLOWING_JUMP_AFTER_VANISH_3, CONNECTION_ALLOWING_JUMP_AFTER_VANISH_4,
+    };
+    calculateConnection(rensaFeature, f, paramsAfter);
+    calculateConnectionWithAllowingOnePointJump(rensaFeature, f, paramsJumpAfter);
 }

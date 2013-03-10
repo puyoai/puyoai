@@ -16,10 +16,9 @@ public:
     // Collects all features.
     static void collectFeatures(EvaluationFeature&, const Plan&, int currentFrameId, const EnemyInfo&);
 
-    static void collectPlanFeature(EvaluationFeature&, const Plan&, int currentFrameId, const EnemyInfo&);
-    static void collectRensaFeature(EvaluationFeature&, const Plan&);
-
 private:
+    static void collectPlanFeatures(PlanEvaluationFeature&, const Plan&, int currentFrameId, const EnemyInfo&);
+
     // Methods to collect plan features.
     static void collectFrameFeature(PlanEvaluationFeature&, const Plan&);
     static void collectConnectionFeature(PlanEvaluationFeature&, const Plan&);
@@ -29,8 +28,12 @@ private:
     static void collectOngoingRensaFeature(PlanEvaluationFeature&, const Plan&, int currentFrameId, const EnemyInfo&);
 
 private:
+    static void collectRensaFeatures(RensaEvaluationFeature&, const Plan&, const TrackedPossibleRensaInfo&);
+
     // Methods to collect rensa features.
-    static void collectRensaEvaluationFeature(RensaEvaluationFeature&, const Plan&, const TrackedPossibleRensaInfo&);
+    static void collectRensaChainFeature(RensaEvaluationFeature&, const Plan&, const TrackedPossibleRensaInfo&);
+    static void collectRensaHandWidthFeature(RensaEvaluationFeature&, const Plan&, const TrackedPossibleRensaInfo&);
+    static void collectRensaConnectionFeature(RensaEvaluationFeature&, const Plan&, const TrackedPossibleRensaInfo&);
 };
 
 #endif
