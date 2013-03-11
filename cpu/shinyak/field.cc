@@ -216,8 +216,6 @@ int Field::connectedPuyoNums(int x, int y) const
 
 int Field::connectedPuyoNums(int x, int y, FieldBitField& checked) const
 {
-    DCHECK(isColorPuyo(color(x, y)));
-
     Position positions[WIDTH * HEIGHT];
 
     Position* filledHead = fillSameColorPosition(x, y, color(x, y), positions, checked);
