@@ -25,9 +25,9 @@ TEST(PerformanceTest, Copy)
 TEST(PerformanceTest, Simulate_Empty)
 {
     for (int i = 0; i < 1000000; i++) {
-        Tsc tsc("Simulate_Empty");
         Field f;
         BasicRensaInfo rensaInfo;
+        Tsc tsc("Simulate_Empty");
         f.simulate(rensaInfo);
     }
     double average, variance;
@@ -39,8 +39,8 @@ TEST(PerformanceTest, Simulate_Empty)
 TEST(PerformanceTest, Simulate_Filled)
 {
     for (int i = 0; i < 100000; i++) {
-        Tsc tsc("Simulate_Filled");
         Field f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
+        Tsc tsc("Simulate_Filled");
         BasicRensaInfo rensaInfo;
         f.simulate(rensaInfo);
     }
@@ -53,8 +53,8 @@ TEST(PerformanceTest, Simulate_Filled)
 TEST(PerformanceTest, Simulate_Filled_Track)
 {
     for (int i = 0; i < 100000; i++) {
-        Tsc tsc("Simulate_Filled_Track");
         Field f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
+        Tsc tsc("Simulate_Filled_Track");
         TrackedRensaInfo rensaInfo;
         f.simulateAndTrack(rensaInfo.rensaInfo, rensaInfo.trackResult);
     }
@@ -67,8 +67,8 @@ TEST(PerformanceTest, Simulate_Filled_Track)
 TEST(PerformanceTest, FindPossibleRensas0)
 {
     for (int i = 0; i < 100000; i++) {
-        Tsc tsc("FindPossibleRensas0");
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
+        Tsc tsc("FindPossibleRensas0");
         vector<PossibleRensaInfo> result;
         RensaDetector::findPossibleRensas(result, f, 0);
     }
@@ -82,8 +82,8 @@ TEST(PerformanceTest, FindPossibleRensas0)
 TEST(PerformanceTest, FindPossibleRensas1)
 {
     for (int i = 0; i < 10000; i++) {
-        Tsc tsc("FindPossibleRensas1");
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
+        Tsc tsc("FindPossibleRensas1");
         vector<PossibleRensaInfo> result;
         RensaDetector::findPossibleRensas(result, f, 1);
     }
@@ -97,8 +97,8 @@ TEST(PerformanceTest, FindPossibleRensas1)
 TEST(PerformanceTest, FindPossibleRensas2)
 {
     for (int i = 0; i < 1000; i++) {
-        Tsc tsc("FindPossibleRensas2");
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
+        Tsc tsc("FindPossibleRensas2");
         vector<PossibleRensaInfo> result;
         RensaDetector::findPossibleRensas(result, f, 2);
     }
@@ -112,8 +112,8 @@ TEST(PerformanceTest, FindPossibleRensas2)
 TEST(PerformanceTest, FindPossibleRensas3)
 {
     for (int i = 0; i < 100; i++) {
-        Tsc tsc("FindPossibleRensas3");
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
+        Tsc tsc("FindPossibleRensas3");
         vector<PossibleRensaInfo> result;
         RensaDetector::findPossibleRensas(result, f, 3);
     }
@@ -127,8 +127,8 @@ TEST(PerformanceTest, FindPossibleRensas3)
 TEST(PerformanceTest, FindPossibleRensas4)
 {
     for (int i = 0; i < 10; i++) {
-        Tsc tsc("FindPossibleRensas4");
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
+        Tsc tsc("FindPossibleRensas4");
         vector<PossibleRensaInfo> result;
         RensaDetector::findPossibleRensas(result, f, 4);
     }
@@ -144,10 +144,27 @@ TEST(PerformanceTest, FindPossibleRensasUsingIteration3)
     const char* name = "FindPossibleRensasUsingIteration3";
 
     for (int i = 0; i < 1000; i++) {
-        Tsc tsc(name);
         Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
-        vector<PossibleRensaInfo> result;
+        Tsc tsc(name);
+        vector<vector<TrackedPossibleRensaInfo>> result;
         RensaDetector::findPossibleRensasUsingIteration(result, f, 3);
+    }
+
+    double average, variance;
+    Tsc::GetStatistics(name, &average, &variance);
+    cout << "average: " << average << endl;
+    cout << "variance: " << variance << endl;
+}
+
+TEST(PerformanceTest, FindPossibleRensasUsingIteration4)
+{
+    const char* name = "FindPossibleRensasUsingIteration4";
+
+    for (int i = 0; i < 100; i++) {
+        Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
+        Tsc tsc(name);
+        vector<vector<TrackedPossibleRensaInfo>> result;
+        RensaDetector::findPossibleRensasUsingIteration(result, f, 4);
     }
 
     double average, variance;

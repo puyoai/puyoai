@@ -219,6 +219,36 @@ TEST(FieldTest, ConnectedPuyoNumsWithAllowingOnePointJump2)
     EXPECT_EQ(0, f.connectedPuyoNumsWithAllowingOnePointJump(1, 1).second);
 }
 
+TEST(FieldTest, FindBestBreathingSpace1)
+{
+    Field f("546700"
+            "554677"
+            "446675");
+
+    int breathingX, breathingY;
+    EXPECT_TRUE(f.findBestBreathingSpace(breathingX, breathingY, 1, 2));
+    EXPECT_EQ(1, breathingX);
+    EXPECT_EQ(4, breathingY);
+
+    EXPECT_FALSE(f.findBestBreathingSpace(breathingX, breathingY, 1, 1));
+}
+
+TEST(FieldTest, FindBestBreathingSpace2)
+{
+    Field f("406060"
+            "455055"
+            "454045");
+
+    int breathingX, breathingY;
+    EXPECT_TRUE(f.findBestBreathingSpace(breathingX, breathingY, 2, 1));
+    EXPECT_EQ(2, breathingX);
+    EXPECT_EQ(3, breathingY);
+
+    EXPECT_TRUE(f.findBestBreathingSpace(breathingX, breathingY, 6, 1));
+    EXPECT_EQ(6, breathingX);
+    EXPECT_EQ(3, breathingY);
+}
+
 TEST(FieldTest, Height)
 {
     Field f("004100"

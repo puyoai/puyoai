@@ -7,9 +7,12 @@
 
 class PuyoSet {
 public:
-    PuyoSet()
+    PuyoSet() :
+        m_red(0),
+        m_blue(0),
+        m_yellow(0),
+        m_green(0)
     {
-        m_red = m_blue = m_yellow = m_green = 0;
     }
 
     PuyoSet(unsigned int red, unsigned int blue, unsigned int yellow, unsigned int green)

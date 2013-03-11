@@ -45,6 +45,8 @@ public:
     std::pair<int, int> connectedPuyoNumsWithAllowingOnePointJump(int x, int y) const;
     std::pair<int, int> connectedPuyoNumsWithAllowingOnePointJump(int x, int y, FieldBitField& checked) const;
 
+    bool findBestBreathingSpace(int& breathingX, int& breathingY, int x, int y) const;
+    
     // Drop kumipuyo with decision.
     void dropKumiPuyo(const Decision&, const KumiPuyo&);
     void dropKumiPuyoSafely(const Decision&, const KumiPuyo&);

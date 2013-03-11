@@ -21,14 +21,9 @@ public:
                                    int numExtraAddedPuyos = 0,
                                    const PuyoSet& additionalPuyoSet = PuyoSet());
 
-    // 連鎖を再帰的に打つことで可能な連鎖を求める。不可能な連鎖も列挙されてしまうはず。
-    // TODO: 不可能な連鎖を列挙させない方法を考える。
-    // We don't have a tracked-version for this method.
-    static void findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result,
+    static void findPossibleRensasUsingIteration(std::vector<std::vector<TrackedPossibleRensaInfo>>& result,
                                                  const Field&,
-                                                 int maxIteration,
-                                                 int additionalChain = 0,
-                                                 PuyoSet additionalPuyoSet = PuyoSet());
+                                                 int maxIteration);
 
     // Finds feasible rensas.
     // Feasible rensa means a rensa which can be fired using the specified Kumipuyos.
