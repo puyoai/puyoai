@@ -11,6 +11,10 @@ struct ContainsRensa {
     bool operator()(const PossibleRensaInfo& info) const {
         return chains == info.rensaInfo.chains && info.necessaryPuyoSet == set;
     }
+
+    bool operator()(const TrackedPossibleRensaInfo& info) const {
+        return chains == info.rensaInfo.chains && info.necessaryPuyoSet == set;
+    }
     
     int chains;
     PuyoSet set;
@@ -91,14 +95,14 @@ TEST(RensaDetectorTest, FindPossibleRensaTestWithTracking)
                               ContainsTrackedRensa(3, PuyoSet(0, 0, 1, 0), tracked, 3)));
 }
 
-TEST(RensaDetectorTest, FindPossibleRensasUsingIteration1)
+TEST(RensaDetectorTest, FindPossibleRensasUsingIteration3)
 {    
     Field f("450000"
             "445660"
             "556455");
 
-    vector<PossibleRensaInfo> result;
+    vector<vector<TrackedPossibleRensaInfo>> result;
     RensaDetector::findPossibleRensasUsingIteration(result, f, 3);
 
-    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsRensa(4, PuyoSet(1, 2, 1, 0))));
+    EXPECT_TRUE(std::count_if(result[3].begin(), result[3].end(), ContainsRensa(4, PuyoSet(1, 2, 1, 0))));
 }

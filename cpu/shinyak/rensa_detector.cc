@@ -1,30 +1,46 @@
 #include "rensa_detector.h"
 
+#include <iostream>
+#include <set>
+#include <vector>
+
 #include "field.h"
 #include "plan.h"
 #include "rensa_info.h"
 
 using namespace std;
 
+// TODO(mayah): 到達できないところから発火できてしまう
+
 // TODO(mayah): findPossibleRensas が現状遅すぎ、使いものにならない。
-// numExtraAddedPuyos が 3 程度で、現状の 1 と同程度の速度を出せるようにする必要がある。
-// 枝刈り？
+// numExtraAddedPuyos が 3 で、現状の 1 と同程度の速度を出せるようにする必要がある。
+
+// TODO(mayah): numExtraAddedPuyos ごとに連鎖情報を得るようにしたい
 
 struct NecessaryRensaPuyo {
-    NecessaryRensaPuyo(int x, PuyoColor c, int numNecessaryPuyos) :
-        x(x), c(c), numNecessaryPuyos(numNecessaryPuyos) {}
+    NecessaryRensaPuyo(int x, PuyoColor c, int n) :
+        x(x), c(c), n(n) {}
+
+    friend bool operator<(const NecessaryRensaPuyo& lhs, const NecessaryRensaPuyo& rhs) {
+        if (lhs.x != rhs.x)
+            return lhs.x < rhs.x;
+        if (lhs.c != rhs.c)
+            return static_cast<int>(lhs.c) < static_cast<int>(rhs.c);
+
+        return lhs.n < rhs.n;
+    }
 
     static PuyoSet toPuyoSet(const vector<NecessaryRensaPuyo>& necessaryRensaPuyos) {
         PuyoSet puyoSet;
         for (auto it = necessaryRensaPuyos.begin(); it != necessaryRensaPuyos.end(); ++it)
-            puyoSet.add(it->c, it->numNecessaryPuyos);
+            puyoSet.add(it->c, it->n);
 
         return puyoSet;
     }
 
-    const int x;
-    const PuyoColor c;
-    const int numNecessaryPuyos;
+    int x;
+    PuyoColor c;
+    int n;
 };
 
 static inline void simulateInternal(Field& f, PossibleRensaInfo& info, int additionalChains)
@@ -37,8 +53,8 @@ static inline void simulateInternal(Field& f, TrackedPossibleRensaInfo& info, in
     f.simulateAndTrack(info.rensaInfo, info.trackResult, additionalChains);
 }
 
-template<typename AfterSimulationCallback, typename T>
-static void findRensasInternal(vector<T>& result, const Field& field, int additionalChains, AfterSimulationCallback callback)
+template<typename T, typename AfterSimulationCallback>
+static void findRensasInternal(const Field& field, int additionalChains, AfterSimulationCallback callback)
 {
     for (int x = 1; x <= Field::WIDTH; ++x) {
         for (int y = field.height(x); y >= 1; --y) {
@@ -75,7 +91,7 @@ static void findRensasInternal(vector<T>& result, const Field& field, int additi
                 T info;
                 simulateInternal(f, info, additionalChains);
 
-                callback(result, f, info, necessaryRensaPuyo);
+                callback(f, info, necessaryRensaPuyo);
             }            
         }
     }
@@ -84,9 +100,9 @@ static void findRensasInternal(vector<T>& result, const Field& field, int additi
 template<typename T>
 static void findPossibleRensasInternal(std::vector<T>& result, const Field& field, PuyoSet addedSet, int leftX, int restAdded)
 {
-    findRensasInternal(result, field, 0, [addedSet](vector<T>& result, const Field&, T& info, const NecessaryRensaPuyo& necessaryRensaPuyo) {
+    findRensasInternal<T>(field, 0, [&result, addedSet](const Field&, T& info, const NecessaryRensaPuyo& necessaryRensaPuyo) {
             info.necessaryPuyoSet.add(addedSet);
-            info.necessaryPuyoSet.add(necessaryRensaPuyo.c, necessaryRensaPuyo.numNecessaryPuyos);
+            info.necessaryPuyoSet.add(necessaryRensaPuyo.c, necessaryRensaPuyo.n);
             result.push_back(info);
     });
 
@@ -129,18 +145,105 @@ void RensaDetector::findPossibleRensas(std::vector<TrackedPossibleRensaInfo>& re
     findPossibleRensasInternal(result, field, additionalPuyoSet, 1, numExtraAddedPuyos);
 }
 
-void RensaDetector::findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result, const Field& field, int maxIteration, int additionalChains, PuyoSet addedSet)
+static void findPossibleRensasUsingIterationInternal(vector<vector<NecessaryRensaPuyo>>& results, 
+                                                     const Field& field,
+                                                     const vector<NecessaryRensaPuyo>& alreadyAddedPuyos,
+                                                     int restIteration)
+{
+    if (restIteration <= 0)
+        return;
+
+    findRensasInternal<PossibleRensaInfo>(field, 0, [&results, &alreadyAddedPuyos, restIteration](const Field& f, PossibleRensaInfo& /*info*/, const NecessaryRensaPuyo& necessaryRensaPuyo) {
+            vector<NecessaryRensaPuyo> newNecessaryRensaPuyos(alreadyAddedPuyos);
+            newNecessaryRensaPuyos.push_back(necessaryRensaPuyo);
+            results.push_back(newNecessaryRensaPuyos);
+
+            findPossibleRensasUsingIterationInternal(results, f, newNecessaryRensaPuyos, restIteration - 1);
+        });
+}
+
+void RensaDetector::findPossibleRensasUsingIteration(vector<std::vector<TrackedPossibleRensaInfo>>& result, const Field& field, int maxIteration)
 {
     if (maxIteration <= 0)
         return;
 
-    findRensasInternal(result, field, additionalChains,
-                       [addedSet, maxIteration](vector<PossibleRensaInfo>& result, const Field& f, PossibleRensaInfo& info, const NecessaryRensaPuyo& necessaryRensaPuyo) {
-            info.necessaryPuyoSet.add(addedSet);
-            info.necessaryPuyoSet.add(necessaryRensaPuyo.c, necessaryRensaPuyo.numNecessaryPuyos);
-            result.push_back(info);
-            RensaDetector::findPossibleRensasUsingIteration(result, f, maxIteration - 1, info.rensaInfo.chains, info.necessaryPuyoSet);
-    });
+    vector<vector<NecessaryRensaPuyo>> necessaryRensaPuyoss;
+    findPossibleRensasUsingIterationInternal(necessaryRensaPuyoss, field, vector<NecessaryRensaPuyo>(), maxIteration);
+
+    result.resize(maxIteration + 1);
+    for (const vector<NecessaryRensaPuyo>& necessaryRensaPuyos : necessaryRensaPuyoss) {
+        DCHECK(!necessaryRensaPuyos.empty());
+
+        // Find initial puyo
+        int initialX = -1;
+        int initialY = -1;
+        PuyoColor initialColor = necessaryRensaPuyos[0].c;
+        {
+            int x = necessaryRensaPuyos[0].x;
+            PuyoColor c = necessaryRensaPuyos[0].c;
+            if (field.color(x, field.height(x)) == c) {
+                initialX = x;
+                initialY = field.height(x);
+            } else if (field.color(x - 1, field.height(x) + 1) == c) {
+                initialX = x - 1;
+                initialY = field.height(x) + 1;
+            } else {
+                initialX = x + 1;
+                initialY = field.height(x) + 1;
+                DCHECK(field.color(x + 1, initialY) == c) << c << ' ' << x + 1 << ' ' << initialY << ' ' << field.getDebugOutput();
+            }
+        }
+
+        Field f(field);
+
+        // 必要なぷよを落としてみる。ここで、消えてしまったり、おけなかったりしたら、これ以上考慮しなくて良い。
+        // ここで、j == 0 のときは、必要数 - 1 だけ落とす。
+        PuyoSet puyoSet;
+        bool ok = true;
+        for (size_t j = 0; j < necessaryRensaPuyos.size(); ++j) {
+            int x = necessaryRensaPuyos[j].x;
+            PuyoColor c = necessaryRensaPuyos[j].c;
+            int n = necessaryRensaPuyos[j].n;
+            if (j == 0 && n > 0)
+                n -= 1;
+
+            if (f.height(x) + n >= 14) {
+                ok = false;
+                break;
+            }
+
+            // TODO(mayah): n can be 3 at most, so we would like to do loop inlining?
+            for (int k = 0; k < n; ++k) {
+                f.dropPuyoOn(x, c);
+                puyoSet.add(c, 1);
+            }
+
+            if (n >= 0 && f.connectedPuyoNums(x, f.height(x)) >= 4) {
+                ok = false;
+                break;
+            }
+        }
+
+        if (!ok)
+            continue;
+
+        // 空気に触れているけど空中に浮いているのはどうするべきか？　上乗せすれば打てるはずだが……？
+        // 考えなくてもいいのかもしれない。
+        int breathingX, breathingY;
+        if (f.findBestBreathingSpace(breathingX, breathingY, initialX, initialY)) {
+            if (f.color(breathingX, breathingY - 1) == EMPTY)
+                continue;
+
+            f.dropPuyoOn(breathingX, initialColor);
+
+            TrackedPossibleRensaInfo info;
+            info.necessaryPuyoSet.add(puyoSet);
+            info.necessaryPuyoSet.add(initialColor, 1);
+            f.simulateAndTrack(info.rensaInfo, info.trackResult);
+
+            result[necessaryRensaPuyos.size()].push_back(info);
+        }
+    }
 }
 
 void RensaDetector::findFeasibleRensas(vector<FeasibleRensaInfo>& result, const Field& field, int numKumiPuyo, const vector<KumiPuyo>& kumiPuyos)
@@ -159,4 +262,3 @@ void RensaDetector::findFeasibleRensas(vector<FeasibleRensaInfo>& result, const 
                                            it->initiatingFrames()));
     }
 }
-

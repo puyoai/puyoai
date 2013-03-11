@@ -258,6 +258,47 @@ pair<int, int> Field::connectedPuyoNumsWithAllowingOnePointJump(int x, int y, Fi
     return make_pair(current - positions, additional);
 }
 
+bool Field::findBestBreathingSpace(int& breathingX, int& breathingY, int x, int y) const
+{
+    DCHECK(color(x, y) != EMPTY);
+
+    FieldBitField checked;
+    Position positions[WIDTH * HEIGHT];
+
+    Position* filledHead = fillSameColorPosition(x, y, color(x, y), positions, checked);
+
+    Position result;
+    int resultHeight = 100;
+    for (Position* p = positions; p != filledHead; ++p) {
+        if (color(p->x, p->y + 1) == EMPTY) {
+            result = Position(p->x, p->y + 1);
+            resultHeight = 0;
+            break;
+        }
+
+        if (color(p->x - 1, p->y) == EMPTY && p->y - height(p->x - 1) < resultHeight) {
+            result = Position(p->x - 1, p->y);
+            resultHeight = p->y - height(p->x - 1);
+            if (resultHeight == 0)
+                break;
+        }
+
+        if (color(p->x + 1, p->y) == EMPTY && p->y - height(p->x + 1) < resultHeight) {
+            result = Position(p->x + 1, p->y);
+            resultHeight = p->y - height(p->x + 1);
+            if (resultHeight == 0)
+                break;
+        }
+    }
+
+    if (resultHeight >= 100)
+        return false;
+
+    breathingX = result.x;
+    breathingY = result.y;
+    return true;
+}
+
 int Field::countColorPuyos() const
 {
     int cnt = 0;
