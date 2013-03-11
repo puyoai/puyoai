@@ -33,7 +33,8 @@ private:
     // Methods to collect rensa features.
     static void collectRensaChainFeature(RensaEvaluationFeature&, const Plan&, const TrackedPossibleRensaInfo&);
     static void collectRensaHandWidthFeature(RensaEvaluationFeature&, const Plan&, const TrackedPossibleRensaInfo&);
-    static void collectRensaConnectionFeature(RensaEvaluationFeature&, const Plan&, const TrackedPossibleRensaInfo&);
+    static void collectRensaConnectionFeature(RensaEvaluationFeature&, const Field& fieldAfterRensa, const Field& fieldAfterDrop);
+    static void collectRensaGarbageFeature(RensaEvaluationFeature&, const Plan&, const Field& fieldAfterDrop);
 };
 
 #endif

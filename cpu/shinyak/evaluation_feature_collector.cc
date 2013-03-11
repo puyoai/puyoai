@@ -261,12 +261,25 @@ void EvaluationFeatureCollector::collectOngoingRensaFeature(PlanEvaluationFeatur
 
 void EvaluationFeatureCollector::collectRensaFeatures(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)    
 {
+    ArbitrarilyModifiableField fieldAfterRensa(plan.field());
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        for (int y = 1; y <= 13; ++y) { // TODO: 13?
+            if (info.trackResult.erasedAt(x, y) != 0)
+                fieldAfterRensa.setColor(x, y, EMPTY);
+        }
+        fieldAfterRensa.recalcHeightOn(x);
+    }
+
+    ArbitrarilyModifiableField fieldAfterDrop(fieldAfterRensa);
+    fieldAfterDrop.forceDrop();
+
     collectRensaChainFeature(rensaFeature, plan, info);
     collectRensaHandWidthFeature(rensaFeature, plan, info);
-    collectRensaConnectionFeature(rensaFeature, plan, info);
+    collectRensaConnectionFeature(rensaFeature, fieldAfterRensa, fieldAfterDrop);
+    collectRensaGarbageFeature(rensaFeature, plan, fieldAfterDrop);
 }
 
-void EvaluationFeatureCollector::collectRensaChainFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)
+void EvaluationFeatureCollector::collectRensaChainFeature(RensaEvaluationFeature& rensaFeature, const Plan& /*plan*/, const TrackedPossibleRensaInfo& info)
 {
     int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, info.necessaryPuyoSet);
     
@@ -323,18 +336,8 @@ void EvaluationFeatureCollector::collectRensaHandWidthFeature(RensaEvaluationFea
     rensaFeature.set(HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
 }
 
-void EvaluationFeatureCollector::collectRensaConnectionFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)
+void EvaluationFeatureCollector::collectRensaConnectionFeature(RensaEvaluationFeature& rensaFeature, const Field& /*fieldAfterRensa*/, const Field& fieldAfterDrop)
 {
-    ArbitrarilyModifiableField f(plan.field());
-    for (int x = 1; x <= Field::WIDTH; ++x) {
-        for (int y = 1; y <= 13; ++y) { // TODO: 13?
-            if (info.trackResult.erasedAt(x, y) != 0)
-                f.setColor(x, y, EMPTY);
-        }
-        f.recalcHeightOn(x);
-    }
-    f.forceDrop();
-
     static const RensaFeatureParam paramsAfter[] = {
         CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3,
     };
@@ -342,6 +345,12 @@ void EvaluationFeatureCollector::collectRensaConnectionFeature(RensaEvaluationFe
         CONNECTION_ALLOWING_JUMP_AFTER_VANISH_1, CONNECTION_ALLOWING_JUMP_AFTER_VANISH_2,
         CONNECTION_ALLOWING_JUMP_AFTER_VANISH_3, CONNECTION_ALLOWING_JUMP_AFTER_VANISH_4,
     };
-    calculateConnection(rensaFeature, f, paramsAfter);
-    calculateConnectionWithAllowingOnePointJump(rensaFeature, f, paramsJumpAfter);
+
+    calculateConnection(rensaFeature, fieldAfterDrop, paramsAfter);
+    calculateConnectionWithAllowingOnePointJump(rensaFeature, fieldAfterDrop, paramsJumpAfter);
+}
+
+void EvaluationFeatureCollector::collectRensaGarbageFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const Field& fieldAfterDrop)
+{
+    rensaFeature.set(NUM_GARBAGE_PUYOS, plan.field().countPuyos() - fieldAfterDrop.countPuyos());
 }
