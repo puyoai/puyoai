@@ -6,6 +6,11 @@
 
 using namespace std;
 
+// TODO(mayah): findPossibleRensas が現状遅すぎ、使いものにならない。
+// numExtraAddedPuyos が 3 程度で、現状の 1 と同程度の速度を出せるようにする必要がある。
+// 枝刈り？
+
+
 static inline void simulateInternal(Field& f, PossibleRensaInfo& info, int additionalChains)
 {
     f.simulate(info.rensaInfo, additionalChains);
@@ -15,13 +20,6 @@ static inline void simulateInternal(Field& f, TrackedPossibleRensaInfo& info, in
 {
     f.simulateAndTrack(info.rensaInfo, info.trackResult, additionalChains);
 }
-
-template<typename T>
-struct AfterSimulationCallback_findRensas {
-    void operator()(vector<T>& result, const Field&, const T& info) const {
-        result.push_back(info);
-    }
-};
 
 template<typename AfterSimulationCallback, typename T>
 static void findRensasInternal(vector<T>& result, const Field& field, int additionalChains, const PuyoSet& puyoSet, AfterSimulationCallback callback)
@@ -70,7 +68,9 @@ static void findRensasInternal(vector<T>& result, const Field& field, int additi
 template<typename T>
 static void findPossibleRensasInternal(std::vector<T>& result, const Field& field, PuyoSet addedSet, int leftX, int restAdded)
 {
-    findRensasInternal(result, field, 0, addedSet, AfterSimulationCallback_findRensas<T>());
+    findRensasInternal(result, field, 0, addedSet, [](vector<T>& result, const Field&, const T& info) {
+        result.push_back(info);
+    });
 
     if (restAdded <= 0)
         return;
@@ -111,25 +111,15 @@ void RensaDetector::findPossibleRensas(std::vector<TrackedPossibleRensaInfo>& re
     findPossibleRensasInternal(result, field, additionalPuyoSet, 1, numExtraAddedPuyos);
 }
 
-
-struct AfterSimulationCallback_findPossibleRensasUsingIteration {
-    explicit AfterSimulationCallback_findPossibleRensasUsingIteration(int restIteration)
-        : restIteration(restIteration) {}
-
-    void operator()(vector<PossibleRensaInfo>& result, const Field& f, const PossibleRensaInfo& info) const {
-        result.push_back(info);
-        RensaDetector::findPossibleRensasUsingIteration(result, f, restIteration, info.rensaInfo.chains, info.necessaryPuyoSet);
-    }
-
-    int restIteration;
-};
-
 void RensaDetector::findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result, const Field& field, int maxIteration, int additionalChains, PuyoSet puyoSet)
 {
     if (maxIteration <= 0)
         return;
 
-    findRensasInternal(result, field, additionalChains, puyoSet, AfterSimulationCallback_findPossibleRensasUsingIteration(maxIteration - 1));
+    findRensasInternal(result, field, additionalChains, puyoSet, [maxIteration](vector<PossibleRensaInfo>& result, const Field& f, const PossibleRensaInfo& info) {
+        result.push_back(info);
+        RensaDetector::findPossibleRensasUsingIteration(result, f, maxIteration - 1, info.rensaInfo.chains, info.necessaryPuyoSet);
+    });
 }
 
 void RensaDetector::findFeasibleRensas(vector<FeasibleRensaInfo>& result, const Field& field, int numKumiPuyo, const vector<KumiPuyo>& kumiPuyos)
