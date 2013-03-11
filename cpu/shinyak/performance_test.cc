@@ -138,3 +138,20 @@ TEST(PerformanceTest, FindPossibleRensas4)
     cout << "average: " << average << endl;
     cout << "variance: " << variance << endl;
 }
+
+TEST(PerformanceTest, FindPossibleRensasUsingIteration3)
+{
+    const char* name = "FindPossibleRensasUsingIteration3";
+
+    for (int i = 0; i < 1000; i++) {
+        Tsc tsc(name);
+        Field f("http://www.inosendo.com/puyo/rensim/??400000456700567400456740456740");
+        vector<PossibleRensaInfo> result;
+        RensaDetector::findPossibleRensasUsingIteration(result, f, 3);
+    }
+
+    double average, variance;
+    Tsc::GetStatistics(name, &average, &variance);
+    cout << "average: " << average << endl;
+    cout << "variance: " << variance << endl;
+}
