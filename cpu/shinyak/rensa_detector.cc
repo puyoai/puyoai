@@ -10,6 +10,22 @@ using namespace std;
 // numExtraAddedPuyos が 3 程度で、現状の 1 と同程度の速度を出せるようにする必要がある。
 // 枝刈り？
 
+struct NecessaryRensaPuyo {
+    NecessaryRensaPuyo(int x, PuyoColor c, int numNecessaryPuyos) :
+        x(x), c(c), numNecessaryPuyos(numNecessaryPuyos) {}
+
+    static PuyoSet toPuyoSet(const vector<NecessaryRensaPuyo>& necessaryRensaPuyos) {
+        PuyoSet puyoSet;
+        for (auto it = necessaryRensaPuyos.begin(); it != necessaryRensaPuyos.end(); ++it)
+            puyoSet.add(it->c, it->numNecessaryPuyos);
+
+        return puyoSet;
+    }
+
+    const int x;
+    const PuyoColor c;
+    const int numNecessaryPuyos;
+};
 
 static inline void simulateInternal(Field& f, PossibleRensaInfo& info, int additionalChains)
 {
@@ -22,7 +38,7 @@ static inline void simulateInternal(Field& f, TrackedPossibleRensaInfo& info, in
 }
 
 template<typename AfterSimulationCallback, typename T>
-static void findRensasInternal(vector<T>& result, const Field& field, int additionalChains, const PuyoSet& puyoSet, AfterSimulationCallback callback)
+static void findRensasInternal(vector<T>& result, const Field& field, int additionalChains, AfterSimulationCallback callback)
 {
     for (int x = 1; x <= Field::WIDTH; ++x) {
         for (int y = field.height(x); y >= 1; --y) {
@@ -54,12 +70,12 @@ static void findRensasInternal(vector<T>& result, const Field& field, int additi
                 if (necessaryPuyos > 4)
                     continue;
 
+                NecessaryRensaPuyo necessaryRensaPuyo(x + d, c, necessaryPuyos);
+
                 T info;
-                info.necessaryPuyoSet.add(puyoSet);
-                info.necessaryPuyoSet.add(c, necessaryPuyos);
                 simulateInternal(f, info, additionalChains);
 
-                callback(result, f, info);
+                callback(result, f, info, necessaryRensaPuyo);
             }            
         }
     }
@@ -68,8 +84,10 @@ static void findRensasInternal(vector<T>& result, const Field& field, int additi
 template<typename T>
 static void findPossibleRensasInternal(std::vector<T>& result, const Field& field, PuyoSet addedSet, int leftX, int restAdded)
 {
-    findRensasInternal(result, field, 0, addedSet, [](vector<T>& result, const Field&, const T& info) {
-        result.push_back(info);
+    findRensasInternal(result, field, 0, [addedSet](vector<T>& result, const Field&, T& info, const NecessaryRensaPuyo& necessaryRensaPuyo) {
+            info.necessaryPuyoSet.add(addedSet);
+            info.necessaryPuyoSet.add(necessaryRensaPuyo.c, necessaryRensaPuyo.numNecessaryPuyos);
+            result.push_back(info);
     });
 
     if (restAdded <= 0)
@@ -111,14 +129,17 @@ void RensaDetector::findPossibleRensas(std::vector<TrackedPossibleRensaInfo>& re
     findPossibleRensasInternal(result, field, additionalPuyoSet, 1, numExtraAddedPuyos);
 }
 
-void RensaDetector::findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result, const Field& field, int maxIteration, int additionalChains, PuyoSet puyoSet)
+void RensaDetector::findPossibleRensasUsingIteration(std::vector<PossibleRensaInfo>& result, const Field& field, int maxIteration, int additionalChains, PuyoSet addedSet)
 {
     if (maxIteration <= 0)
         return;
 
-    findRensasInternal(result, field, additionalChains, puyoSet, [maxIteration](vector<PossibleRensaInfo>& result, const Field& f, const PossibleRensaInfo& info) {
-        result.push_back(info);
-        RensaDetector::findPossibleRensasUsingIteration(result, f, maxIteration - 1, info.rensaInfo.chains, info.necessaryPuyoSet);
+    findRensasInternal(result, field, additionalChains,
+                       [addedSet, maxIteration](vector<PossibleRensaInfo>& result, const Field& f, PossibleRensaInfo& info, const NecessaryRensaPuyo& necessaryRensaPuyo) {
+            info.necessaryPuyoSet.add(addedSet);
+            info.necessaryPuyoSet.add(necessaryRensaPuyo.c, necessaryRensaPuyo.numNecessaryPuyos);
+            result.push_back(info);
+            RensaDetector::findPossibleRensasUsingIteration(result, f, maxIteration - 1, info.rensaInfo.chains, info.necessaryPuyoSet);
     });
 }
 
