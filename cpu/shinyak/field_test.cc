@@ -5,7 +5,7 @@
 
 #include "core/constant.h"
 #include "core/decision.h"
-#include "rensa_info.h" 
+#include "rensa_info.h"
 
 using namespace std;
 
@@ -390,8 +390,3 @@ TEST(FieldTest, FramesToDropNextWithChigiri)
     EXPECT_EQ((Field::HEIGHT - 4) * FRAMES_DROP_1_LINE + FRAMES_AFTER_CHIGIRI + FRAMES_CHIGIRI_1_LINE_1 + FRAMES_CHIGIRI_1_LINE_2 + 2 * FRAMES_CHIGIRI_1_LINE_3,
               f.framesToDropNext(Decision(3, 1)));
 }
-
-
-
-
-

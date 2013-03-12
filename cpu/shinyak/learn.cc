@@ -1,4 +1,5 @@
 #include <glog/logging.h>
+#include <algorithm>
 #include <iostream>
 #include <math.h>
 #include <set>
