@@ -34,7 +34,7 @@ bool operator==(const Player& a, const Player& b) {
   if (a.get_r() != b.get_r()) return false;
 
   // Compare visible field
-  if (!a.field().EqualTo(b.field(), true))
+  if (!a.field().EqualTo(b.field(), true /*visible*/))
     return false;
 
   return true;
@@ -47,7 +47,7 @@ bool operator!=(const Player& a, const Player& b) {
 void Player::Search(vector<Player>* children) const {
   Player player;
   player.set_score(1);
-  player.set_r(0);
+  player.set_r(1);
   if (field_.IsEmpty(1, Field::kHeight)) {
     player.set_x(1);
   } else if (field_.IsEmpty(6, Field::kHeight)) {

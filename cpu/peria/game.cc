@@ -77,8 +77,9 @@ bool Game::Input(const string& input) {
 
   // Copy if the status differs
   player_update_ = (players[0] != *player_);
-  if (player_update_)
+  if (player_update_) {
     player_->CopyFrom(players[0]);
+  }
   enemy_update_ = (players[1] != *enemy_);
   if (enemy_update_) {
     enemy_->CopyFrom(players[1]);
@@ -90,6 +91,7 @@ bool Game::Input(const string& input) {
 string Game::Play() {
   ostringstream oss;
   oss << "ID=" << id_;
+
   if (!enemy_update_) {
     int max_score = 0;
     int x = 0, r = 0;
@@ -97,19 +99,17 @@ string Game::Play() {
     player_->Search(&children);
     for (size_t i = 0; i < children.size(); ++i) {
       if (max_score < children[i].score()) {
-        max_score = children[i].score();
-        x = children[i].get_x();
-        r = children[i].get_r();
+	max_score = children[i].score();
+	x = children[i].get_x();
+	r = children[i].get_r();
       }
     }
-    if (x > 0) {
-      oss << " X=" << x << " R=" << r
-          << " MSG=MyControl";
-    }
+
+    oss << " X=" << x << " R=" << r
+	<< " MSG=MyControl";
   } else {
     oss << " X=" << enemy_->get_x() << " R=" << enemy_->get_r()
 	<< " MSG=" <<  enemy_->get_x() << "," << enemy_->get_r();
   }
-
   return oss.str();
 }

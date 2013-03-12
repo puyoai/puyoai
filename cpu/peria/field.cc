@@ -51,7 +51,7 @@ char Field::GetNextPuyo(int n) const {
 void Field::SetField(const string& field) {
   for (size_t i = 0; i < field.size(); ++i) {
     int x = i % 6 + 1;
-    int y = i / 6 + 1;
+    int y = (field.size() - 1 - i) / 6 + 1;
     char color = kEmpty;
     switch(field[i]) {
       case '0': color = kEmpty; break;
