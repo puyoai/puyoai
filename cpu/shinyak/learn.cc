@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string>
 
+#include "ai.h"
 #include "enemy_info.h"
 #include "evaluation_feature.h"
 #include "evaluation_feature_collector.h"
@@ -120,7 +121,7 @@ void learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
     vector<pair<float, size_t> > scores(plans.size());
     vector<EvaluationFeature> features(plans.size());
     for (size_t i = 0; i < plans.size(); ++i) {
-        EvaluationFeatureCollector::collectFeatures(features[i], plans[i], 0, enemyInfo);
+        EvaluationFeatureCollector::collectFeatures(features[i], plans[i], AI::NUM_KEY_PUYOS, 0, enemyInfo);
 
         if (plans[i].isRensaPlan()) {
             scores[i] = make_pair(-1000000, i);

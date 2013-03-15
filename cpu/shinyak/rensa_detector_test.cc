@@ -102,7 +102,16 @@ TEST(RensaDetectorTest, FindPossibleRensasUsingIteration3)
             "556455");
 
     vector<vector<TrackedPossibleRensaInfo>> result;
-    RensaDetector::findPossibleRensasUsingIteration(result, f, 3);
+    RensaDetector::findPossibleRensasUsingIteration(result, f, 2);
 
-    EXPECT_TRUE(std::count_if(result[3].begin(), result[3].end(), ContainsRensa(4, PuyoSet(1, 2, 1, 0))));
+    EXPECT_TRUE(std::count_if(result[2].begin(), result[2].end(), ContainsRensa(4, PuyoSet(1, 2, 1, 0))));
+    EXPECT_FALSE(std::count_if(result[1].begin(), result[1].end(), ContainsRensa(4, PuyoSet(1, 2, 1, 0))));
+}
+
+TEST(RensaDetectorTest, FindPossibleRensasUsingIteration)
+{    
+    Field f;
+
+    vector<vector<TrackedPossibleRensaInfo>> result;
+    RensaDetector::findPossibleRensasUsingIteration(result, f, 3);
 }

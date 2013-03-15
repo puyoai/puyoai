@@ -23,7 +23,7 @@ public:
 
     static void findPossibleRensasUsingIteration(std::vector<std::vector<TrackedPossibleRensaInfo>>& result,
                                                  const Field&,
-                                                 int maxIteration);
+                                                 int numKeyPuyos);
 
     // Finds feasible rensas.
     // Feasible rensa means a rensa which can be fired using the specified Kumipuyos.
