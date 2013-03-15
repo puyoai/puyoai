@@ -14,7 +14,7 @@ struct TrackedPossibleRensaInfo;
 class EvaluationFeatureCollector {
 public:
     // Collects all features.
-    static void collectFeatures(EvaluationFeature&, const Plan&, int currentFrameId, const EnemyInfo&);
+    static void collectFeatures(EvaluationFeature&, const Plan&, int numKeyPuyos, int currentFrameId, const EnemyInfo&);
 
 private:
     static void collectPlanFeatures(PlanEvaluationFeature&, const Plan&, int currentFrameId, const EnemyInfo&);

@@ -20,38 +20,39 @@
 
 using namespace std;
 
-void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, const Plan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
+void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, const Plan& plan,
+                                                 int numKeyPuyos, int currentFrameId, const EnemyInfo& enemyInfo)
 {
     collectPlanFeatures(feature.modifiablePlanFeature(), plan, currentFrameId, enemyInfo);
 
-    // Collect rensa features.
-
     const Field& field = plan.field();
 
-    vector<TrackedPossibleRensaInfo> rensaInfos;
-    RensaDetector::findPossibleRensas(rensaInfos, field, 1);
-
+    vector<vector<TrackedPossibleRensaInfo>> rensaInfos;
+    RensaDetector::findPossibleRensasUsingIteration(rensaInfos, field, numKeyPuyos);
+    
     if (rensaInfos.empty())
         return;
 
-    // Collects only chains having the maxChains.
-    // TODO(mayah): Is it desired? How about performance if we collect all rensas?
-    int maxChains = 0;
-    for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it)
-        maxChains = std::max(maxChains, it->rensaInfo.chains);
+    for (int i = 0; i <= numKeyPuyos; ++i) {
+        // Collects only chains having the maxChains.
+        // TODO(mayah): Is it desired? How about performance if we collect all rensas?
+        int maxChains = 0;
+        for (auto it = rensaInfos[i].begin(); it != rensaInfos[i].end(); ++it)
+            maxChains = std::max(maxChains, it->rensaInfo.chains);
 
-    for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (it->rensaInfo.chains < maxChains)
-            continue;
+        for (auto it = rensaInfos[i].begin(); it != rensaInfos[i].end(); ++it) {
+            if (it->rensaInfo.chains < maxChains)
+                continue;
 
-        RensaEvaluationFeature rensaFeature;
-        collectRensaFeatures(rensaFeature, plan, *it);
+            RensaEvaluationFeature rensaFeature;
+            collectRensaFeatures(rensaFeature, plan, *it);
 
-        feature.addRensaFeature(rensaFeature);
-        // TODO(mayah): If we have a lot of rensa features, it's too slow.
-        // So we limit the number of rensa features.
-        if (feature.numRensaFeatures() > 100)
-            break;
+            feature.addRensaFeature(rensaFeature);
+            // TODO(mayah): If we have a lot of rensa features, it's too slow.
+            // So we limit the number of rensa features.
+            if (feature.numRensaFeatures() > 100)
+                break;
+        }
     }
 }
 

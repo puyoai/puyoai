@@ -162,37 +162,23 @@ static void findPossibleRensasUsingIterationInternal(vector<vector<NecessaryRens
         });
 }
 
-void RensaDetector::findPossibleRensasUsingIteration(vector<std::vector<TrackedPossibleRensaInfo>>& result, const Field& field, int maxIteration)
+void RensaDetector::findPossibleRensasUsingIteration(vector<vector<TrackedPossibleRensaInfo>>& result, const Field& field, int numKeyPuyos)
 {
-    if (maxIteration <= 0)
+    if (numKeyPuyos < 0)
         return;
 
     vector<vector<NecessaryRensaPuyo>> necessaryRensaPuyoss;
-    findPossibleRensasUsingIterationInternal(necessaryRensaPuyoss, field, vector<NecessaryRensaPuyo>(), maxIteration);
+    findPossibleRensasUsingIterationInternal(necessaryRensaPuyoss, field, vector<NecessaryRensaPuyo>(), numKeyPuyos + 1);
 
-    result.resize(maxIteration + 1);
+    result.resize(numKeyPuyos + 1);
     for (const vector<NecessaryRensaPuyo>& necessaryRensaPuyos : necessaryRensaPuyoss) {
         DCHECK(!necessaryRensaPuyos.empty());
+        DCHECK(static_cast<int>(necessaryRensaPuyos.size()) <= numKeyPuyos + 1) << ' ' << necessaryRensaPuyos.size() << ' ' << numKeyPuyos;
 
         // Find initial puyo
         int initialX = -1;
         int initialY = -1;
         PuyoColor initialColor = necessaryRensaPuyos[0].c;
-        {
-            int x = necessaryRensaPuyos[0].x;
-            PuyoColor c = necessaryRensaPuyos[0].c;
-            if (field.color(x, field.height(x)) == c) {
-                initialX = x;
-                initialY = field.height(x);
-            } else if (field.color(x - 1, field.height(x) + 1) == c) {
-                initialX = x - 1;
-                initialY = field.height(x) + 1;
-            } else {
-                initialX = x + 1;
-                initialY = field.height(x) + 1;
-                DCHECK(field.color(x + 1, initialY) == c) << c << ' ' << x + 1 << ' ' << initialY << ' ' << field.getDebugOutput();
-            }
-        }
 
         Field f(field);
 
@@ -204,8 +190,26 @@ void RensaDetector::findPossibleRensasUsingIteration(vector<std::vector<TrackedP
             int x = necessaryRensaPuyos[j].x;
             PuyoColor c = necessaryRensaPuyos[j].c;
             int n = necessaryRensaPuyos[j].n;
-            if (j == 0 && n > 0)
-                n -= 1;
+
+            if (j == 0) {
+                if (n > 0)
+                    n -= 1;
+
+                if (f.color(x, field.height(x)) == c) {
+                    initialX = x;
+                    initialY = field.height(x);
+                } else if (f.color(x - 1, field.height(x) + 1) == c) {
+                    initialX = x - 1;
+                    initialY = field.height(x) + 1;
+                } else if (f.color(x + 1, field.height(x) + 1) == c) {
+                    initialX = x + 1;
+                    initialY = field.height(x) + 1;
+                } else {
+                    DCHECK(n > 0) << ' ' << n << ' ' << c << ' ' << x << ' ' << f.getDebugOutput();
+                    initialX = x;
+                    initialY = field.height(x) + 1;
+                }
+            }
 
             if (f.height(x) + n >= 14) {
                 ok = false;
@@ -218,7 +222,7 @@ void RensaDetector::findPossibleRensasUsingIteration(vector<std::vector<TrackedP
                 puyoSet.add(c, 1);
             }
 
-            if (n >= 0 && f.connectedPuyoNums(x, f.height(x)) >= 4) {
+            if (n > 0 && f.connectedPuyoNums(x, f.height(x)) >= 4) {
                 ok = false;
                 break;
             }
@@ -227,8 +231,8 @@ void RensaDetector::findPossibleRensasUsingIteration(vector<std::vector<TrackedP
         if (!ok)
             continue;
 
-        // 空気に触れているけど空中に浮いているのはどうするべきか？　上乗せすれば打てるはずだが……？
-        // 考えなくてもいいのかもしれない。
+        // TODO(mayah): 空気に触れているけど空中に浮いているのはどうするべきか？
+        // 上乗せすれば打てるはずだが、とりあえずは考えないことにする。
         int breathingX, breathingY;
         if (f.findBestBreathingSpace(breathingX, breathingY, initialX, initialY)) {
             if (f.color(breathingX, breathingY - 1) == EMPTY)
@@ -241,7 +245,8 @@ void RensaDetector::findPossibleRensasUsingIteration(vector<std::vector<TrackedP
             info.necessaryPuyoSet.add(initialColor, 1);
             f.simulateAndTrack(info.rensaInfo, info.trackResult);
 
-            result[necessaryRensaPuyos.size()].push_back(info);
+            DCHECK(necessaryRensaPuyos.size() >= 1);
+            result[necessaryRensaPuyos.size() - 1].push_back(info);
         }
     }
 }
