@@ -23,6 +23,7 @@ private:
     static void collectFrameFeature(PlanEvaluationFeature&, const Plan&);
     static void collectConnectionFeature(PlanEvaluationFeature&, const Plan&);
     static void collectDensityFeature(PlanEvaluationFeature&, const Plan&);
+    static void collectPuyoPattern33Feature(PlanEvaluationFeature&, const Plan&);
     static void collectFieldHeightFeature(PlanEvaluationFeature&, const Plan&);
     static void collectEmptyAvailabilityFeature(PlanEvaluationFeature&, const Plan&);
     static void collectOngoingRensaFeature(PlanEvaluationFeature&, const Plan&, int currentFrameId, const EnemyInfo&);

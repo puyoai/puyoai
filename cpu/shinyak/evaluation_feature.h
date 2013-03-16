@@ -10,9 +10,11 @@ class EvaluationParams;
 enum PlanFeatureParam {
 #define DEFINE_PARAM(NAME) NAME,
 #define DEFINE_RANGE_PARAM(NAME, maxValue) /* ignored */
+#define DEFINE_SPARSE_PARAM(NAME, numValue) /* ignore */
 #include "plan_evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_RANGE_PARAM
+#undef DEFINE_SPARSE_PARAM
     SIZE_OF_PLAN_FEATURE_PARAM
 };
 
@@ -25,9 +27,11 @@ inline PlanFeatureParam toPlanFeatureParam(int ith)
 enum PlanRangeFeatureParam {
 #define DEFINE_PARAM(NAME) /* ignored */
 #define DEFINE_RANGE_PARAM(NAME, maxValue) NAME,
+#define DEFINE_SPARSE_PARAM(NAME, numValue) /* ignored */
 #include "plan_evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_RANGE_PARAM
+#undef DEFINE_SPARSE_PARAM
     SIZE_OF_PLAN_RANGE_FEATURE_PARAM
 };
 
@@ -35,6 +39,23 @@ inline PlanRangeFeatureParam toPlanRangeFeatureParam(int ith)
 {
     DCHECK(0 <= ith && ith < SIZE_OF_PLAN_RANGE_FEATURE_PARAM);
     return static_cast<PlanRangeFeatureParam>(ith);
+}
+
+enum PlanSparseFeatureParam {
+#define DEFINE_PARAM(NAME) /* ignored */
+#define DEFINE_RANGE_PARAM(NAME, maxValue) /* ignored */
+#define DEFINE_SPARSE_PARAM(NAME, numValue) NAME,
+#include "plan_evaluation_feature.tab"
+#undef DEFINE_PARAM
+#undef DEFINE_RANGE_PARAM
+#undef DEFINE_SPARSE_PARAM
+    SIZE_OF_PLAN_SPARSE_FEATURE_PARAM    
+};
+
+inline PlanSparseFeatureParam toPlanSparseFeatureParam(int ith)
+{
+    DCHECK(0 <= ith && ith < SIZE_OF_PLAN_SPARSE_FEATURE_PARAM);
+    return static_cast<PlanSparseFeatureParam>(ith);
 }
 
 enum RensaFeatureParam {
@@ -105,6 +126,8 @@ public:
     void set(PlanRangeFeatureParam param, int value) { m_rangeFeatures[param] = value; }
     int get(PlanRangeFeatureParam param) const { return m_rangeFeatures[param]; }
 
+    void add(PlanSparseFeatureParam param, int value) { m_sparseFeatures.push_back(std::make_pair(param, value)); }
+    const std::vector<std::pair<PlanSparseFeatureParam, int>>& sparseFeatures() const { return m_sparseFeatures; }    
 public:
     std::string toString() const;
 
@@ -115,6 +138,7 @@ private:
     // TODO(mayah): We would like to use std::array instead.
     std::vector<double> m_features;
     std::vector<int> m_rangeFeatures;
+    std::vector<std::pair<PlanSparseFeatureParam, int>> m_sparseFeatures;
 };
 
 // TODO: Maybe we have to have bestEvaluationFeature in this class.
@@ -155,6 +179,11 @@ public:
     void set(PlanRangeFeatureParam param, const std::vector<double>& values) { m_planRangeFeaturesCoef[param] = values; }
     void add(PlanRangeFeatureParam param, int i, double value) { m_planRangeFeaturesCoef[param][i] += value; }
 
+    double get(PlanSparseFeatureParam param, int index) const { return m_planSparseFeaturesCoef[param][index]; }
+    void set(PlanSparseFeatureParam param, int i, double value) { m_planSparseFeaturesCoef[param][i] = value; }
+    void set(PlanSparseFeatureParam param, const std::vector<double>& values) { m_planSparseFeaturesCoef[param] = values; }
+    void add(PlanSparseFeatureParam param, int i, double value) { m_planSparseFeaturesCoef[param][i] += value; }
+
     double get(RensaFeatureParam param) const { return m_rensaFeaturesCoef[param]; }
     void set(RensaFeatureParam param, double value) { m_rensaFeaturesCoef[param] = value; }
     void add(RensaFeatureParam param, double value) { m_rensaFeaturesCoef[param] += value; }
@@ -175,6 +204,7 @@ public:
 private:
     std::vector<double> m_planFeaturesCoef;
     std::vector<std::vector<double> > m_planRangeFeaturesCoef;
+    std::vector<std::vector<double> > m_planSparseFeaturesCoef;
     std::vector<double> m_rensaFeaturesCoef;
     std::vector<std::vector<double> > m_rensaRangeFeaturesCoef;
 };

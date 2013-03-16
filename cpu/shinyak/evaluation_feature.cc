@@ -14,9 +14,14 @@ double PlanEvaluationFeature::calculateScore(const EvaluationParams& params) con
     double result = 0;
 #define DEFINE_PARAM(name) result += get(name) * params.get(name);
 #define DEFINE_RANGE_PARAM(name, maxValue) result += params.get(name, get(name));
+#define DEFINE_SPARSE_PARAM(name, numValue) /* ignored */
 #include "plan_evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_RANGE_PARAM
+#undef DEFINE_SPARSE_PARAM
+
+    for (std::pair<PlanSparseFeatureParam, int> p : m_sparseFeatures)
+        result += params.get(p.first, p.second);
 
     return result;
 }
@@ -70,14 +75,17 @@ double EvaluationFeature::calculateScoreWith(const EvaluationParams& params, con
 EvaluationParams::EvaluationParams(const char* filename) :
     m_planFeaturesCoef(SIZE_OF_PLAN_FEATURE_PARAM),
     m_planRangeFeaturesCoef(SIZE_OF_PLAN_RANGE_FEATURE_PARAM),
+    m_planSparseFeaturesCoef(SIZE_OF_PLAN_SPARSE_FEATURE_PARAM),
     m_rensaFeaturesCoef(SIZE_OF_RENSA_FEATURE_PARAM),
     m_rensaRangeFeaturesCoef(SIZE_OF_RENSA_RANGE_FEATURE_PARAM)
 {
 #define DEFINE_PARAM(name) /* ignored */
 #define DEFINE_RANGE_PARAM(name, maxValue) m_planRangeFeaturesCoef[name].resize(maxValue);
+#define DEFINE_SPARSE_PARAM(name, numValue) m_planSparseFeaturesCoef[name].resize(numValue);
 #include "plan_evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_RANGE_PARAM
+#undef DEFINE_SPARSE_PARAM
 
 #define DEFINE_PARAM(name) /* ignored */
 #define DEFINE_RANGE_PARAM(name, maxValue) m_rensaRangeFeaturesCoef[name].resize(maxValue);
@@ -100,10 +108,12 @@ bool EvaluationParams::save(const char* filename)
                 ofs << " " << get(name, i);                            \
             }                                                          \
         ofs << endl;
+#define DEFINE_SPARSE_PARAM(name, numValue) DEFINE_RANGE_PARAM(name, numValue)
 #include "plan_evaluation_feature.tab"
 #include "rensa_evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_RANGE_PARAM
+#undef DEFINE_SPARSE_PARAM
 
         return true;
     } catch (std::exception& e) {
@@ -150,6 +160,7 @@ bool EvaluationParams::load(const char* filename)
             }                                                           \
             set(name, keyValues[#name]);                                \
         }
+#define DEFINE_SPARSE_PARAM(name, numValue) DEFINE_RANGE_PARAM(name, numValue)
 #include "plan_evaluation_feature.tab"
 #include "rensa_evaluation_feature.tab"
 #undef DEFINE_PARAM
@@ -173,6 +184,7 @@ string EvaluationParams::toString() const
         ss << get(name, i) << ' ';                   \
     }                                                                   \
     ss << endl;
+#define DEFINE_SPARSE_PARAM(name, numValue) DEFINE_RANGE_PARAM(name, numValue)
 #include "plan_evaluation_feature.tab"
 #include "rensa_evaluation_feature.tab"
 #undef DEFINE_PARAM
