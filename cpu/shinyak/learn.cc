@@ -70,6 +70,21 @@ void updatePlanParam(EvaluationParams& params, const PlanEvaluationFeature& curr
         params.add(paramName, currentFeature.get(paramName), -dT);
         params.add(paramName, teacherFeature.get(paramName), dT);
     }
+
+    {
+        map<pair<PlanSparseFeatureParam, int>, int> diff;
+        for (auto it = currentFeature.sparseFeatures().begin(); it != currentFeature.sparseFeatures().end(); ++it)
+            diff[*it] += 1;
+        for (auto it = teacherFeature.sparseFeatures().begin(); it != teacherFeature.sparseFeatures().end(); ++it)
+            diff[*it] -= 1;
+
+        cout << "*** " << diff.size() << endl;
+
+        for (auto it = diff.begin(); it != diff.end(); ++it) {
+            double dT = it->second * LEARNING_COEF;
+            params.add(it->first.first, it->first.second, -dT);
+        }
+    }    
 }
 
 void updateRensaParam(EvaluationParams& params, const RensaEvaluationFeature& currentFeature, const RensaEvaluationFeature& teacherFeature)

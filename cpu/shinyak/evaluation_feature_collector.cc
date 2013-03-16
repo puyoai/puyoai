@@ -62,6 +62,7 @@ void EvaluationFeatureCollector::collectPlanFeatures(PlanEvaluationFeature& plan
     collectEmptyAvailabilityFeature(planFeature, plan);
     collectConnectionFeature(planFeature, plan);
     collectDensityFeature(planFeature, plan);
+    collectPuyoPattern33Feature(planFeature, plan);
     collectFieldHeightFeature(planFeature, plan);
     collectOngoingRensaFeature(planFeature, plan, currentFrameId, enemyInfo);
 }
@@ -180,6 +181,34 @@ void EvaluationFeatureCollector::collectDensityFeature(PlanEvaluationFeature& pl
     };
 
     calculateDensity(planFeature, plan.field(), params);
+}
+
+void EvaluationFeatureCollector::collectPuyoPattern33Feature(PlanEvaluationFeature& planFeature, const Plan& plan)
+{
+    const Field& field = plan.field();
+
+    for (int x = 1; x <= Field::WIDTH; ++x) {
+        for (int y = 1; y <= Field::HEIGHT; ++y) {
+            int patterns[8] = { 0 };
+
+            patterns[field.color(x - 1, y - 1)] |= 1 << 0;
+            patterns[field.color(x    , y - 1)] |= 1 << 1;
+            patterns[field.color(x + 1, y - 1)] |= 1 << 2;
+
+            patterns[field.color(x - 1, y    )] |= 1 << 3;
+            patterns[field.color(x    , y    )] |= 1 << 4;
+            patterns[field.color(x + 1, y    )] |= 1 << 5;
+
+            patterns[field.color(x - 1, y + 1)] |= 1 << 6;
+            patterns[field.color(x    , y + 1)] |= 1 << 7;
+            patterns[field.color(x + 1, y + 1)] |= 1 << 8;
+
+            planFeature.add(PUYO_PATTERN_33, patterns[RED]);
+            planFeature.add(PUYO_PATTERN_33, patterns[GREEN]);
+            planFeature.add(PUYO_PATTERN_33, patterns[YELLOW]);
+            planFeature.add(PUYO_PATTERN_33, patterns[BLUE]);
+        }
+    }
 }
 
 void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
