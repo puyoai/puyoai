@@ -187,28 +187,52 @@ void EvaluationFeatureCollector::collectPuyoPattern33Feature(PlanEvaluationFeatu
 {
     const Field& field = plan.field();
 
-    for (int x = 1; x <= Field::WIDTH; ++x) {
-        for (int y = 1; y <= Field::HEIGHT; ++y) {
-            int patterns[8] = { 0 };
+    {
+        int x = 2;
+        int y = 2;
+        int patterns[8] = { 0 };
 
-            patterns[field.color(x - 1, y - 1)] |= 1 << 0;
-            patterns[field.color(x    , y - 1)] |= 1 << 1;
-            patterns[field.color(x + 1, y - 1)] |= 1 << 2;
+        patterns[field.color(x - 1, y - 1)] |= 1 << 0;
+        patterns[field.color(x    , y - 1)] |= 1 << 1;
+        patterns[field.color(x + 1, y - 1)] |= 1 << 2;
+        
+        patterns[field.color(x - 1, y    )] |= 1 << 3;
+        patterns[field.color(x    , y    )] |= 1 << 4;
+        patterns[field.color(x + 1, y    )] |= 1 << 5;
 
-            patterns[field.color(x - 1, y    )] |= 1 << 3;
-            patterns[field.color(x    , y    )] |= 1 << 4;
-            patterns[field.color(x + 1, y    )] |= 1 << 5;
+        patterns[field.color(x - 1, y + 1)] |= 1 << 6;
+        patterns[field.color(x    , y + 1)] |= 1 << 7;
+        patterns[field.color(x + 1, y + 1)] |= 1 << 8;
 
-            patterns[field.color(x - 1, y + 1)] |= 1 << 6;
-            patterns[field.color(x    , y + 1)] |= 1 << 7;
-            patterns[field.color(x + 1, y + 1)] |= 1 << 8;
-
-            planFeature.add(PUYO_PATTERN_33, patterns[RED]);
-            planFeature.add(PUYO_PATTERN_33, patterns[GREEN]);
-            planFeature.add(PUYO_PATTERN_33, patterns[YELLOW]);
-            planFeature.add(PUYO_PATTERN_33, patterns[BLUE]);
-        }
+        planFeature.add(PUYO_PATTERN_33, patterns[RED]);
+        planFeature.add(PUYO_PATTERN_33, patterns[GREEN]);
+        planFeature.add(PUYO_PATTERN_33, patterns[YELLOW]);
+        planFeature.add(PUYO_PATTERN_33, patterns[BLUE]);
     }
+
+    {
+        int x = 5;
+        int y = 2;
+        int patterns[8] = { 0 };
+
+        patterns[field.color(x + 1, y - 1)] |= 1 << 0;
+        patterns[field.color(x    , y - 1)] |= 1 << 1;
+        patterns[field.color(x - 1, y - 1)] |= 1 << 2;
+        
+        patterns[field.color(x + 1, y    )] |= 1 << 3;
+        patterns[field.color(x    , y    )] |= 1 << 4;
+        patterns[field.color(x - 1, y    )] |= 1 << 5;
+
+        patterns[field.color(x + 1, y + 1)] |= 1 << 6;
+        patterns[field.color(x    , y + 1)] |= 1 << 7;
+        patterns[field.color(x - 1, y + 1)] |= 1 << 8;
+
+        planFeature.add(PUYO_PATTERN_33, patterns[RED]);
+        planFeature.add(PUYO_PATTERN_33, patterns[GREEN]);
+        planFeature.add(PUYO_PATTERN_33, patterns[YELLOW]);
+        planFeature.add(PUYO_PATTERN_33, patterns[BLUE]);
+    }
+
 }
 
 void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature& planFeature, const Plan& plan)

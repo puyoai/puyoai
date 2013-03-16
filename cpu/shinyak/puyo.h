@@ -67,6 +67,14 @@ public:
     KumiPuyo() : axis(EMPTY), child(EMPTY) {}
     KumiPuyo(PuyoColor axis, PuyoColor child) : axis(axis), child(child) {}
 
+    std::string toString() const {
+        char tmp[] = "  ";
+        tmp[0] = toChar(axis);
+        tmp[1] = toChar(child);
+
+        return tmp;
+    }
+
 public:
     PuyoColor axis;
     PuyoColor child;

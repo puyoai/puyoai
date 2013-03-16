@@ -120,12 +120,33 @@ void updateParam(EvaluationParams& params, const EvaluationFeature& currentFeatu
     updatePlanParam(params, currentFeature.planFeature(), teacherFeature.planFeature());
 }
 
-void learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
-           const Field& currentField, const vector<KumiPuyo>& kumiPuyos,
-           const Field& teacherField)
+class Learner {
+public:
+    Learner() : m_numLearn(0), m_numMatchedTeacher(0) {}
+
+    void learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
+               const Field& currentField, const vector<KumiPuyo>& kumiPuyos,
+               const Field& teacherField);
+
+    int numLearn() const { return m_numLearn; }
+    int numMatchedTeacher() const { return m_numMatchedTeacher; }
+    double ratioMatchedTeacher() const { return 100 * numMatchedTeacher() / numLearn(); }
+private:
+    int m_numLearn;
+    int m_numMatchedTeacher;
+};
+
+void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
+                    const Field& currentField, const vector<KumiPuyo>& kumiPuyos,
+                    const Field& teacherField)
 {
+    ++m_numLearn;
     cout << "learn" << endl;
     cout << currentField.getDebugOutput() << endl;
+    for (const KumiPuyo& kumiPuyo : kumiPuyos) {
+        cout << kumiPuyo.toString();
+    }
+    cout << endl;
 
     vector<Plan> plans;
     findAvailablePlans(currentField, 2, kumiPuyos, plans);
@@ -133,7 +154,7 @@ void learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
         return;
 
     // --- スコアを付ける
-    vector<pair<float, size_t> > scores(plans.size());
+    vector<pair<double, size_t> > scores(plans.size());
     vector<EvaluationFeature> features(plans.size());
     for (size_t i = 0; i < plans.size(); ++i) {
         EvaluationFeatureCollector::collectFeatures(features[i], plans[i], AI::NUM_KEY_PUYOS, 0, enemyInfo);
@@ -146,7 +167,7 @@ void learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
         }
     }
 
-    sort(scores.begin(), scores.end(), greater<pair<float, size_t> >());
+    sort(scores.begin(), scores.end(), greater<pair<double, size_t> >());
 
     // --- 教師の盤面と、そのスコアを求める。
     size_t teacherIndex = scores.size();
@@ -165,12 +186,21 @@ void learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
     }
 
     // --- 教師の盤面と最もスコアが高い盤面が一緒であれば、何も更新する必要はない。
-    if (teacherIndex == 0)
+    if (teacherIndex == 0) {
+        ++m_numMatchedTeacher;
         return;
+    }
 
     // --- そうでなければ、スコア付けに問題があったということで、スコアを更新する。
     const EvaluationFeature& currentFeature = features[scores[0].second];
     const EvaluationFeature& teacherFeature = features[scores[teacherIndex].second];
+
+    cout << "teacher decision = " << plans[scores[teacherIndex].second].decisionText() << " : " << scores[teacherIndex].first << endl;
+    cout << teacherFeature.toString() << endl;
+    cout << "our decision = " << plans[scores[0].second].decisionText() << " : " << scores[0].first << endl;
+    cout << currentFeature.toString() << endl;
+
+
     updateParam(params, currentFeature, teacherFeature);
 }
 
@@ -188,6 +218,8 @@ int main(void)
 
     MyPlayerInfo myPlayerInfo;
     EnemyInfo enemyInfo;
+
+    Learner learner;
 
     while (cin >> left >> sequence >> right) {
         if (left == "===") {
@@ -228,7 +260,7 @@ int main(void)
                 enemyInfo.initializeWith(1);
                 enemyInfo.updatePossibleRensas(frameInputs[(fieldNum + 1) % 3].enemyField, vector<KumiPuyo>());
 
-                learn(params, enemyInfo, previous2, kumiPuyos, current);
+                learner.learn(params, enemyInfo, previous2, kumiPuyos, current);
             }
         }
 
@@ -237,6 +269,11 @@ int main(void)
     }
 
     cout << params.toString() << endl;
+
+    cout << "# learn = " << learner.numLearn() << endl;
+    cout << "# match = " << learner.numMatchedTeacher() << endl;
+    cout << "# ratio = " << learner.ratioMatchedTeacher() << endl;
+
     if (params.save("feature_learned.txt")) {
         cout << "Saved as feature_learned.txt" << endl;
     } else {
