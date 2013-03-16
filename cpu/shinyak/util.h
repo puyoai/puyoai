@@ -3,4 +3,6 @@
 
 typedef unsigned char byte;
 
+#define UNUSED_VARIABLE(x) (void)(x)
+
 #endif

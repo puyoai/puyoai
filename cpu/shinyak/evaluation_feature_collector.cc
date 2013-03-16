@@ -133,6 +133,7 @@ static void calculateDensity(Feature& feature, const Field& field, const T param
 
 void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(PlanEvaluationFeature& feature, const Plan& plan)
 {
+#if USE_EMPTY_AVAILABILITY_FEATURE
     const Field& field = plan.field();
 
     int emptyCells = 72 - field.countPuyos();
@@ -159,10 +160,15 @@ void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(PlanEvaluationF
             feature.set(map[left][right], feature.get(map[left][right]) + 1.0 / emptyCells);
         }
     }
+#else
+    UNUSED_VARIABLE(feature);
+    UNUSED_VARIABLE(plan);
+#endif
 }
 
 void EvaluationFeatureCollector::collectConnectionFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
 {
+#if USE_CONNECTION_FEATURE
     static const PlanFeatureParam params[] = {
         CONNECTION_1, CONNECTION_2, CONNECTION_3,
     };
@@ -172,6 +178,10 @@ void EvaluationFeatureCollector::collectConnectionFeature(PlanEvaluationFeature&
 
     calculateConnection(planFeature, plan.field(), params);
     calculateConnectionWithAllowingOnePointJump(planFeature, plan.field(), jumpParams);
+#else
+    UNUSED_VARIABLE(planFeature);
+    UNUSED_VARIABLE(plan);
+#endif
 }
 
 void EvaluationFeatureCollector::collectDensityFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
@@ -252,7 +262,9 @@ void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature
         heightSquareSum += diff * diff;
     }
 
+#if USE_THIRD_COLUMN_HEIGHT_FEATURE
     planFeature.set(THIRD_COLUMN_HEIGHT, field.height(3));
+#endif
     planFeature.set(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSum);
     planFeature.set(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
 }
@@ -345,6 +357,7 @@ void EvaluationFeatureCollector::collectRensaChainFeature(RensaEvaluationFeature
 
 void EvaluationFeatureCollector::collectRensaHandWidthFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)
 {
+#if USE_HAND_WIDTH_FEATURE
     // -----
     int distanceCountResult[5] = { 0, 0, 0, 0, 0 };
 
@@ -388,10 +401,16 @@ void EvaluationFeatureCollector::collectRensaHandWidthFeature(RensaEvaluationFea
     rensaFeature.set(HAND_WIDTH_RATIO_43, r43);
     rensaFeature.set(HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
     rensaFeature.set(HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
+#else
+    UNUSED_VARIABLE(rensaFeature);
+    UNUSED_VARIABLE(plan);
+    UNUSED_VARIABLE(info);
+#endif
 }
 
 void EvaluationFeatureCollector::collectRensaConnectionFeature(RensaEvaluationFeature& rensaFeature, const Field& /*fieldAfterRensa*/, const Field& fieldAfterDrop)
 {
+#if USE_CONNECTION_FEATURE
     static const RensaFeatureParam paramsAfter[] = {
         CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3,
     };
@@ -402,6 +421,10 @@ void EvaluationFeatureCollector::collectRensaConnectionFeature(RensaEvaluationFe
 
     calculateConnection(rensaFeature, fieldAfterDrop, paramsAfter);
     calculateConnectionWithAllowingOnePointJump(rensaFeature, fieldAfterDrop, paramsJumpAfter);
+#else
+    UNUSED_VARIABLE(rensaFeature);
+    UNUSED_VARIABLE(fieldAfterDrop);
+#endif
 }
 
 void EvaluationFeatureCollector::collectRensaGarbageFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const Field& fieldAfterDrop)

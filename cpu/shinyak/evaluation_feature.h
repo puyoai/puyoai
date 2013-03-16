@@ -7,6 +7,11 @@
 
 class EvaluationParams;
 
+#define USE_CONNECTION_FEATURE 0
+#define USE_EMPTY_AVAILABILITY_FEATURE 0
+#define USE_HAND_WIDTH_FEATURE 0
+#define USE_THIRD_COLUMN_HEIGHT_FEATURE 0
+
 enum PlanFeatureParam {
 #define DEFINE_PARAM(NAME) NAME,
 #define DEFINE_RANGE_PARAM(NAME, maxValue) /* ignored */
