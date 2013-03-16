@@ -26,6 +26,17 @@ double PlanEvaluationFeature::calculateScore(const EvaluationParams& params) con
     return result;
 }
 
+string PlanEvaluationFeature::toString() const
+{
+    // TODO(mayah): Not implemented yet.
+
+    ostringstream ss;
+    for (double d : m_features)
+        ss << d << ' ';
+
+    return ss.str();
+}
+
 double RensaEvaluationFeature::calculateScore(const EvaluationParams& params) const
 {
     double result = 0;
@@ -42,8 +53,9 @@ const RensaEvaluationFeature EvaluationFeature::s_emptyRensaFeature;
 
 string EvaluationFeature::toString() const
 {
-    // TODO(mayah): We have to implement this.
-    return "NOT_IMPLEMENTED_YET";
+    // return "NOT_IMPLEMENTED_YET";
+
+    return m_planFeature.toString();
 }
 
 const RensaEvaluationFeature& EvaluationFeature::findBestRensaFeature(const EvaluationParams& params) const
