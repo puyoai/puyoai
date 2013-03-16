@@ -1,3 +1,5 @@
+0. On mac with clang and libc++, I have to recompile gtest for libc++?
+
 1. 特に床付近に関して、定積のようなパターンのスコアを導入する
   3x4 の 12bit 分ぐらい用意するのが良いような気がする
 

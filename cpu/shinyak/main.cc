@@ -4,7 +4,7 @@
 #include "ai_manager.h"
 #include "puyo_possibility.h"
 
-DEFINE_int32(thread, 1, "Limit the maximum number of threads");
+// DEFINE_int32(thread, 1, "Limit the maximum number of threads");
 
 int main(int argc, char* argv[])
 {
@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    LOG(INFO) << "initializede";
+    // LOG(INFO) << "initializede";
 
     return AIManager(argv[1]).runLoop();
 }

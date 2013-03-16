@@ -69,6 +69,8 @@ if(PKG_CONFIG_FOUND)
   find_library(V4L2_LIBRARY v4l2)
 endif()
 
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_LIBS   ON)
 find_Package(Boost)
 if(Boost_FOUND)
   INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
