@@ -25,7 +25,7 @@ struct EvalResult {
 
 class AI {
 public:
-    static const int NUM_KEY_PUYOS = 2;
+    static const int NUM_KEY_PUYOS = 1;
 
     AI(const std::string& name);
 

@@ -1,10 +1,13 @@
-#include <glog/logging.h>
 #include <algorithm>
 #include <iostream>
 #include <math.h>
 #include <set>
 #include <stdio.h>
 #include <string>
+
+#include <boost/thread.hpp>
+#include <boost/thread/future.hpp>
+#include <glog/logging.h>
 
 #include "ai.h"
 #include "enemy_info.h"
@@ -154,17 +157,25 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
         return;
 
     // --- スコアを付ける
-    vector<pair<double, size_t> > scores(plans.size());
     vector<EvaluationFeature> features(plans.size());
+    vector<boost::shared_future<bool>> futures;
+    //futures.reserve(plans.size());
     for (size_t i = 0; i < plans.size(); ++i) {
-        EvaluationFeatureCollector::collectFeatures(features[i], plans[i], AI::NUM_KEY_PUYOS, 0, enemyInfo);
+        futures.push_back(boost::async(boost::launch::async, [&features, &plans, &enemyInfo, i]() {
+            EvaluationFeatureCollector::collectFeatures(features[i], plans[i], AI::NUM_KEY_PUYOS, 0, enemyInfo);
+            return true;
+        }));
+    }
 
+    vector<pair<double, size_t> > scores(plans.size());
+    for (size_t i = 0; i < plans.size(); ++i) {
         if (plans[i].isRensaPlan()) {
             scores[i] = make_pair(-1000000, i);
         } else {
+            futures[i].wait();
             double score = features[i].calculateScore(params);
             scores[i] = make_pair(score, i);
-        }
+        }        
     }
 
     sort(scores.begin(), scores.end(), greater<pair<double, size_t> >());
@@ -200,12 +211,15 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
     cout << "our decision = " << plans[scores[0].second].decisionText() << " : " << scores[0].first << endl;
     cout << currentFeature.toString() << endl;
 
-
     updateParam(params, currentFeature, teacherFeature);
 }
 
-int main(void)
+int main(int argc, char* argv[])
 {
+    google::ParseCommandLineFlags(&argc, &argv, true);
+    google::InitGoogleLogging(argv[0]);
+    google::InstallFailureSignalHandler();
+
     TsumoPossibility::initialize();
 
     // TODO(mayah): Maybe we have to use constant variable name here.

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 cpu_setup("shinyak")
 
 puyoai_add_cxx_flags("-Wall -Wextra -std=c++0x")
+add_definitions("-DBOOST_THREAD_PROVIDES_FUTURE")
 
 add_library(shinyak_lib
             ai.cc ai_manager.cc enemy_info.cc evaluation_feature.cc evaluation_feature_collector.cc field.cc 
@@ -10,7 +11,7 @@ add_library(shinyak_lib
 
 function(shinyak_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
-  cpu_target_link_libraries(${exe} shinyak_lib)
+  cpu_target_link_libraries(${exe} shinyak_lib boost_thread-mt boost_system-mt)
   cpu_target_link_common_libraries(${exe})
 endfunction()
 
