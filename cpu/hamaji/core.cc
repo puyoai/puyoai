@@ -226,7 +226,7 @@ Decision Core::decide(Game* game) {
     }
     double value;
     if (FLAGS_eval2) {
-      value = 0.0;
+      value = eval2_->eval(p);
     } else {
       value = eval_->eval(p);
     }
