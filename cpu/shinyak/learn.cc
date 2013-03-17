@@ -186,7 +186,7 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
                 enemyInfo));
 
         futures.push_back(pt.get_future());
-        boost::thread th(std::move(pt));
+        boost::thread th(boost::move(pt));
     }
 #endif
 
