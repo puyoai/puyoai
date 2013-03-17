@@ -21,7 +21,12 @@ add_library(shinyak_lib
 
 function(shinyak_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
-  cpu_target_link_libraries(${exe} shinyak_lib ${Boost_LIBRARIES} -lrt)
+  # TODO(mayah): Needs -lrt on gcc?
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    cpu_target_link_libraries(${exe} shinyak_lib ${Boost_LIBRARIES})
+  else()
+    cpu_target_link_libraries(${exe} shinyak_lib ${Boost_LIBRARIES} -lrt)
+  endif()
   cpu_target_link_common_libraries(${exe})
 endfunction()
 
