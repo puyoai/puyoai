@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("shinyak")
 
-find_package(Boost COMPONENTS thread system REQUIRED)
+find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS thread system)
 
 puyoai_add_cxx_flags("-Wall -Wextra -std=c++0x")
 add_definitions("-DBOOST_THREAD_PROVIDES_FUTURE")
@@ -13,7 +13,7 @@ add_library(shinyak_lib
 
 function(shinyak_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
-  cpu_target_link_libraries(${exe} shinyak_lib ${Boost_LIBRARIES})
+  cpu_target_link_libraries(${exe} shinyak_lib ${Boost_LIBRARIES} -lrt)
   cpu_target_link_common_libraries(${exe})
 endfunction()
 

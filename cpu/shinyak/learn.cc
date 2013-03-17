@@ -160,12 +160,11 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
     vector<EvaluationFeature> features(plans.size());
     // TODO(mayah): We would like to use future instead of shared_future, however mac requires libc++ to do so.
     // If we use libc++, we have to recompile gtest as well...
-    vector<boost::shared_future<bool>> futures;
+    vector<boost::shared_future<void>> futures;
     //futures.reserve(plans.size());
     for (size_t i = 0; i < plans.size(); ++i) {
         futures.push_back(boost::async(boost::launch::async, [&features, &plans, &enemyInfo, i]() {
             EvaluationFeatureCollector::collectFeatures(features[i], plans[i], AI::NUM_KEY_PUYOS, 0, enemyInfo);
-            return true;
         }));
     }
 
