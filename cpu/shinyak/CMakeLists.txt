@@ -2,10 +2,18 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("shinyak")
 
-find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS thread system)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_LIBS   ON)
+set(BOOST_MIN_VERSION "1.52.0")
+find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS thread system)
+if(Boost_FOUND)
+  INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+  ADD_DEFINITIONS("-DHAS_BOOST -DBOOST_THREAD_PROVIDES_FUTURE")
+else()
+  puyoai_message("boost not found - Some programs won't be built.")
+endif()
 
 puyoai_add_cxx_flags("-Wall -Wextra -std=c++0x")
-add_definitions("-DBOOST_THREAD_PROVIDES_FUTURE")
 
 add_library(shinyak_lib
             ai.cc ai_manager.cc enemy_info.cc evaluation_feature.cc evaluation_feature_collector.cc field.cc 
@@ -28,7 +36,9 @@ endfunction()
 shinyak_add_executable(shinyak_cpu main.cc)
 shinyak_add_executable(interactive interactive.cc)
 shinyak_add_executable(learn learn.cc)
+if(Boost_FOUND)
 shinyak_add_executable(solver solver.cc)
+endif()
 shinyak_add_executable(solo solo.cc)
 
 if(GTEST_FOUND)

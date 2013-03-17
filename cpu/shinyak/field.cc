@@ -373,7 +373,9 @@ bool Field::vanish(int nthChain, int* score, int minHeights[], Strategy& strateg
     for (int x = 1; x <= WIDTH; ++x) {
         int maxHeight = height(x);
         for (int y = minHeights[x]; y <= maxHeight; ++y) {
-            DCHECK(color(x, y) != EMPTY) << x << ' ' << y << ' ' << color(x, y);
+            DCHECK(color(x, y) != EMPTY)
+                << x << ' ' << y << ' ' << color(x, y) << '\n'
+                << getDebugOutput();
 
             if (checked(x, y) || color(x, y) == OJAMA)
                 continue;
