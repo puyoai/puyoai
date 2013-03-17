@@ -159,17 +159,38 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
     // --- スコアを付ける
     vector<EvaluationFeature> features(plans.size());
 
-#if 0
     // TODO(mayah): We would like to use future instead of shared_future, however mac requires libc++ to do so.
     // If we use libc++, we have to recompile gtest as well...
     vector<boost::shared_future<void>> futures;
-    //futures.reserve(plans.size());
+    futures.reserve(plans.size());
+
+#if 0
+    // TODO(mayah): I would like to do this, but this causes SEGV after several hundred of executions.
+    // I'm not sure why. This code has some problem?
     for (size_t i = 0; i < plans.size(); ++i) {
         futures.push_back(boost::async(boost::launch::async, [&features, &plans, &enemyInfo, i]() {
-            EvaluationFeatureCollector::collectFeatures(features[i], plans[i], AI::NUM_KEY_PUYOS, 0, enemyInfo);
+                EvaluationFeatureCollector::collectFeatures(features[i], plans[i], AI::NUM_KEY_PUYOS, 0, enemyInfo);
         }));
     }
+    // TODO(mayah): If clang++ on mac regularly uses libc++, I would like to use std::async
+    // instead of boost::async.
+#else
+    // TODO(mayah): Instead of the previous for-loop, this seems working. Werid...
+    for (size_t i = 0; i < plans.size(); ++i) {
+        boost::packaged_task<void> pt(boost::bind(
+                EvaluationFeatureCollector::collectFeatures,
+                features[i],
+                plans[i],
+                AI::NUM_KEY_PUYOS,
+                0,
+                enemyInfo));
 
+        futures.push_back(pt.get_future());
+        boost::thread th(std::move(pt));
+    }
+#endif
+
+    vector<pair<double, size_t> > scores(plans.size());
     for (size_t i = 0; i < plans.size(); ++i) {
         if (plans[i].isRensaPlan()) {
             scores[i] = make_pair(-1000000, i);
@@ -179,19 +200,6 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
             scores[i] = make_pair(score, i);
         }        
     }
-#else
-    vector<pair<double, size_t> > scores(plans.size());
-    for (size_t i = 0; i < plans.size(); ++i) {
-        EvaluationFeature feature;
-        EvaluationFeatureCollector::collectFeatures(feature, plans[i], AI::NUM_KEY_PUYOS, 0, enemyInfo);
-        if (plans[i].isRensaPlan()) {
-            scores[i] = make_pair(-1000000, i);
-        } else {
-            double score = features[i].calculateScore(params);
-            scores[i] = make_pair(score, i);
-        }
-    }
-#endif
     sort(scores.begin(), scores.end(), greater<pair<double, size_t> >());
 
     // --- 教師の盤面と、そのスコアを求める。
