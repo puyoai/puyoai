@@ -32,11 +32,8 @@ add_subdirectory(ichikawa)
 add_subdirectory(pascal)
 add_subdirectory(peria)
 add_subdirectory(sample)
-add_subdirectory(yhayashi)
-
-if(Boost_FOUND)
 add_subdirectory(shinyak)
-endif()
+add_subdirectory(yhayashi)
 
 include_directories(..)
 add_library(cpu_lib cpu_interface.cc)

@@ -158,6 +158,8 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
 
     // --- スコアを付ける
     vector<EvaluationFeature> features(plans.size());
+
+#if 0
     // TODO(mayah): We would like to use future instead of shared_future, however mac requires libc++ to do so.
     // If we use libc++, we have to recompile gtest as well...
     vector<boost::shared_future<void>> futures;
@@ -168,7 +170,6 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
         }));
     }
 
-    vector<pair<double, size_t> > scores(plans.size());
     for (size_t i = 0; i < plans.size(); ++i) {
         if (plans[i].isRensaPlan()) {
             scores[i] = make_pair(-1000000, i);
@@ -178,7 +179,19 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
             scores[i] = make_pair(score, i);
         }        
     }
-
+#else
+    vector<pair<double, size_t> > scores(plans.size());
+    for (size_t i = 0; i < plans.size(); ++i) {
+        EvaluationFeature feature;
+        EvaluationFeatureCollector::collectFeatures(feature, plans[i], AI::NUM_KEY_PUYOS, 0, enemyInfo);
+        if (plans[i].isRensaPlan()) {
+            scores[i] = make_pair(-1000000, i);
+        } else {
+            double score = features[i].calculateScore(params);
+            scores[i] = make_pair(score, i);
+        }
+    }
+#endif
     sort(scores.begin(), scores.end(), greater<pair<double, size_t> >());
 
     // --- 教師の盤面と、そのスコアを求める。
