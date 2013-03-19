@@ -17,9 +17,9 @@ class FieldTest : public ::testing::Test {
 
 TEST_F(FieldTest, Construct_Url) {
   struct {
-    const char* url;
-    int x, y;
-    char color;
+    const char* url;  // input
+    int x, y;         // input
+    char color;       // expected output
   } data[] = {
     {"444444", 1, 1, kRed},
     {"444444", 6, 1, kRed},
@@ -39,9 +39,9 @@ TEST_F(FieldTest, Construct_Url) {
 
 TEST_F(FieldTest, Vanishable) {
   struct {
-    const char* field;
-    int x, y;
-    bool able;
+    const char* field;  // input
+    int x, y;           // input
+    bool able;          // expected output
   } data[] = {
     {"444000", 1, 1, false},
     {"444400", 1, 1, true},
@@ -54,5 +54,26 @@ TEST_F(FieldTest, Vanishable) {
     LOG_IF(INFO, data[i].able != field.Vanishable(data[i].x, data[i].y))
         << "for i = " << i;
 
+  }
+}
+
+TEST_F(FieldTest, Simulate) {
+  struct {
+    const char* field;  // input
+    int chains;         // input
+    int ex_chains;      // expected output
+    int ex_score;       // expected output
+  } data[] = {
+    {"444", 1, 0, 0},
+    {"4444", 1, 1, 40},
+  };
+  for (int i = 0; i < ARRAYSIZE(data); ++i) {
+    Field field(data[i].field);
+    int chains = data[i].chains;
+    int score = 0;
+    int frames = 0;
+    field.Simulate(&chains, &score, &frames);
+    EXPECT_EQ(data[i].ex_score, score);
+    EXPECT_EQ(data[i].ex_chains, chains);
   }
 }
