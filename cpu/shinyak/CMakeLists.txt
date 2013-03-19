@@ -10,7 +10,7 @@ if(Boost_FOUND)
   INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
   ADD_DEFINITIONS("-DHAS_BOOST -DBOOST_THREAD_PROVIDES_FUTURE")
 else()
-  puyoai_message("boost not found - Some programs won't be built.")
+  message("boost not found - Some programs won't be built.")
 endif()
 
 puyoai_add_cxx_flags("-Wall -Wextra -std=c++0x")
