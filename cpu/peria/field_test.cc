@@ -26,11 +26,14 @@ TEST_F(FieldTest, Construct_Url) {
     {"444444", 1, 2, kEmpty},
     {"444444", 0, 1, kWall},
     {"444444", 1, 0, kWall},
-    {"4444445", 1, 2, kBlue},
+    {"500000444444", 1, 2, kBlue},
+    {"5444444", 6, 2, kBlue}, // 2nd : |     B|, bottom : |RRRRRR|
   };
   for (int i = 0; i < ARRAYSIZE(data); ++i) {
     Field field(data[i].url);
     EXPECT_EQ(data[i].color, field.Get(data[i].x, data[i].y));
+    LOG_IF(INFO, data[i].color != field.Get(data[i].x, data[i].y))
+        << field.GetDebugOutput();
   }
 }
 
@@ -40,12 +43,16 @@ TEST_F(FieldTest, Vanishable) {
     int x, y;
     bool able;
   } data[] = {
-    {"444", 1, 1, false},
-    {"4444", 1, 1, true},
-    {"44000044", 1, 1, true},
+    {"444000", 1, 1, false},
+    {"444400", 1, 1, true},
+    {"4444", 1, 1, false},  // (1,1) is empty
+    {"440000440000", 1, 1, true},
   };
   for (int i = 0; i < ARRAYSIZE(data); ++i) {
     Field field(data[i].field);
     EXPECT_EQ(data[i].able, field.Vanishable(data[i].x, data[i].y));
+    LOG_IF(INFO, data[i].able != field.Vanishable(data[i].x, data[i].y))
+        << "for i = " << i;
+
   }
 }
