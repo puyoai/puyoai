@@ -49,11 +49,11 @@ char Field::GetNextPuyo(int n) const {
 }
 
 void Field::SetField(const string& field) {
-  for (size_t i = 0; i < field.size(); ++i) {
-    int x = i % 6 + 1;
-    int y = (field.size() - 1 - i) / 6 + 1;
+  for (int i = field.size() - 1, p = 0; i >= 0; --i, ++p) {
+    int x = (p + 6 - field.size() % 6) % 6 + 1;
+    int y = i / 6 + 1;
     char color = kEmpty;
-    switch(field[i]) {
+    switch(field[p]) {
       case '0': color = kEmpty; break;
       case '1': color = kOjama; break;
       case '2': color = kWall; break;
@@ -277,7 +277,7 @@ bool Field::Vanishable(int x, int y) {
     const int x = head[0], y = head[1];
     field_[x][y] &= (kMaskChecked - 1);
   }
-  
+
   return (read_head - erase_field >= kEraseNum * 2);
 }
 
