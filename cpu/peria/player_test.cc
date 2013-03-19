@@ -18,6 +18,6 @@ class PlayerTest : public testing::Test {
 };
 
 TEST_F(PlayerTest, Get) {
-  player_->set_field(Field("4444"));
+  player_->set_field(Field("444400"));
   EXPECT_EQ(kRed, player_->field().Get(1, 1));
 }
