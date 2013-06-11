@@ -29,9 +29,9 @@ DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 //  v                 |
 // STATE_OJAMA ------ +
 
-FieldRealtime::FieldRealtime(int playerId, const string& color_sequence) :
+FieldRealtime::FieldRealtime(int playerId, const KumipuyoSeq& seq) :
     playerId_(playerId),
-    kumipuyoSeq_(color_sequence)
+    kumipuyoSeq_(seq)
 {
     Init();
 }

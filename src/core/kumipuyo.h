@@ -52,6 +52,7 @@ class KumipuyoSeq {
 public:
     KumipuyoSeq() {}
     KumipuyoSeq(const std::string&);
+    KumipuyoSeq(const std::vector<Kumipuyo>&);
     KumipuyoSeq(std::initializer_list<Kumipuyo>);
 
     const Kumipuyo& get(int n) const { return seq_[n]; }
