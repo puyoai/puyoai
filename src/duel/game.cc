@@ -16,6 +16,7 @@
 #include "duel/field_realtime.h"
 #include "duel/frame_context.h"
 #include "duel/game_state.h"
+#include "duel/sequence_generator.h"
 #include "duel/user_input.h"
 
 using namespace std;
@@ -24,26 +25,11 @@ Game::Game(DuelServer* duelServer, UserInput* userInput) :
     duelServer_(duelServer),
     userInput_(userInput)
 {
-    std::string sequence(256, EMPTY);
-    PuyoColor colors[] = {RED, BLUE, GREEN, YELLOW};
-    for (int i = 0; i < 256; i++) {
-        sequence[i] = colors[std::rand() % 4] + '0';
-    }
-    const char* puyo_seq = getenv("PUYO_SEQ");
-    if (puyo_seq) {
-        for (int i = 0; i < 256 && puyo_seq[i]; i++) {
-            char c = puyo_seq[i];
-            if (c < '4' || c > '7') {
-                cerr << "Broken PUYO_SEQ=" << puyo_seq << endl;
-                abort();
-            }
-            sequence[i] = puyo_seq[i];
-        }
-    }
-    LOG(INFO) << "Puyo sequence=" << sequence;
+    KumipuyoSeq seq = generateSequence();
+    LOG(INFO) << "Puyo sequence=" << seq.toString();
 
     for (int i = 0; i < 2; i++) {
-        field[i].reset(new FieldRealtime(i, sequence));
+        field[i].reset(new FieldRealtime(i, seq));
         latest_decision_[i] = Decision::NoInputDecision();
     }
 }

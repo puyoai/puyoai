@@ -5,9 +5,9 @@ if(USE_HTTPD)
 endif()
 
 add_library(puyoai_duel
-            duel_server.cc field_realtime.cc
+            cui.cc duel_server.cc field_realtime.cc
             frame_context.cc game.cc game_state.cc
-            puyofu_recorder.cc cui.cc
+            puyofu_recorder.cc sequence_generator.cc
             ${HTTPD_SOURCE})
 
 add_executable(duel main.cc)
@@ -44,6 +44,7 @@ function(puyoai_duel_add_test target)
 endfunction()
 
 puyoai_duel_add_test(field_realtime)
+puyoai_duel_add_test(sequence_generator)
 
 # ----------------------------------------------------------------------
 

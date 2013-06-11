@@ -14,8 +14,7 @@ class FrameContext;
 
 class FieldRealtime {
 public:
-    // TODO(mayah): Instead of string, we should pass KumipuyoSeq.
-    FieldRealtime(int playerId, const std::string& color_sequence);
+    FieldRealtime(int playerId, const KumipuyoSeq&);
 
     // Gives a key input to the field, and control puyo. Returns true if a key
     // input is accepted.

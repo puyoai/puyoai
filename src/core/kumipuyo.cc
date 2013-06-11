@@ -31,7 +31,11 @@ KumipuyoSeq::KumipuyoSeq(const string& str)
     }
 }
 
-KumipuyoSeq::KumipuyoSeq(initializer_list<Kumipuyo> lst) : seq_(lst)
+KumipuyoSeq::KumipuyoSeq(const vector<Kumipuyo>& seq) : seq_(seq)
+{
+}
+
+KumipuyoSeq::KumipuyoSeq(initializer_list<Kumipuyo> seq) : seq_(seq)
 {
 }
 
