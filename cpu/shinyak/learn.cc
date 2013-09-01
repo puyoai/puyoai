@@ -7,6 +7,7 @@
 
 #include <boost/thread.hpp>
 #include <boost/thread/future.hpp>
+#include <gflags/gflags.h>
 #include <glog/logging.h>
 
 #include "ai.h"
