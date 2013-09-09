@@ -40,10 +40,10 @@ endfunction()
 
 shinyak_add_executable(shinyak_cpu main.cc)
 shinyak_add_executable(interactive interactive.cc)
-shinyak_add_executable(learn learn.cc)
 if(Boost_FOUND)
-shinyak_add_executable(solver solver.cc)
+shinyak_add_executable(learn learn.cc)
 endif()
+shinyak_add_executable(solver solver.cc)
 shinyak_add_executable(solo solo.cc)
 
 if(GTEST_FOUND)
