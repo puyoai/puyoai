@@ -5,7 +5,7 @@ cpu_setup("hamaji")
 puyoai_add_cxx_flags("-W -Wall -Wno-deprecated-declarations")
 
 add_library(hamaji_lib
-            core.cc ctrl.cc db.cc eval.cc eval2.cc
+            core.cc ctrl.cc db.cc eval_base.cc eval.cc eval2.cc
             field.cc game.cc mt19937int.cc
             rater.cc ratingstats.cc solo.cc util.cc)
 
