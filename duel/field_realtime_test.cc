@@ -15,11 +15,18 @@ class FieldRealtimeTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     string sequence = "11223344";
-    f_ = new FieldRealtime(0, sequence, new OjamaController());
+    ojama_controller_ = new OjamaController();
+    f_ = new FieldRealtime(0, sequence, ojama_controller_);
+  }
+
+  virtual void TearDown() {
+    delete ojama_controller_;
+    delete f_;
   }
 
   FieldRealtime* f_;
   PlayerLog player_log_;
+  OjamaController* ojama_controller_;
 };
 
 TEST_F(FieldRealtimeTest, TimingAfterKeyInput) {
@@ -57,7 +64,7 @@ TEST_F(FieldRealtimeTest, TimingFreeFall) {
   states.push_back(FieldRealtime::STATE_USER);
 
   for (int i = 0; i < states.size(); i++) {
-    EXPECT_EQ(states[i], f_->GetSimulationState());
+    EXPECT_EQ(states[i], f_->GetSimulationState()) << "index=" << i;
     f_->Play(KEY_NONE, &player_log_);
   }
 }
