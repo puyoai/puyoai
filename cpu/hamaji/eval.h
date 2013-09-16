@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "base.h"
+#include "eval_base.h"
 #include "mutex.h"
 
 class LF;
