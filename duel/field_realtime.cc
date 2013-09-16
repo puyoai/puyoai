@@ -23,6 +23,8 @@ FieldRealtime::FieldRealtime(int player_id, const string& color_sequence,
 }
 
 void FieldRealtime::Init() {
+  delay_double_next_ = getenv("PUYO_DELAY_DOUBLE_NEXT") != NULL;
+
   PrepareNextPuyo();
 
   next_puyo_ = 0;
@@ -39,10 +41,9 @@ void FieldRealtime::Init() {
   quickturn_ = 0;
   is_zenkesi_ = false;
   dropped_rows_ = 0;
-
-  delay_double_next_ = getenv("PUYO_DELAY_DOUBLE_NEXT") != NULL;
   yokoku_delay_ = 0;
   sent_wnext_appeared_ = false;
+  drop_animation_ = false;
 }
 
 bool FieldRealtime::TryChigiri() {
