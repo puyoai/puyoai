@@ -700,7 +700,7 @@ int FieldRealtime::GetPendingOjama() const {
 }
 
 // Testing only.
-int FieldRealtime::GetSimulationState() const {
+FieldRealtime::SimulationState FieldRealtime::GetSimulationState() const {
   if (sleep_for_) {
     return STATE_SLEEP;
   } else {

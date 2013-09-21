@@ -39,7 +39,7 @@ class FieldRealtime : public Field {
   int GetFixedOjama() const;
   int GetPendingOjama() const;
 
-  enum {
+  enum SimulationState {
     STATE_USER,
     STATE_CHIGIRI,
     STATE_VANISH,
@@ -49,7 +49,7 @@ class FieldRealtime : public Field {
   };
 
   // Testing only.
-  int GetSimulationState() const;
+  SimulationState GetSimulationState() const;
 
  private:
   bool Chigiri();
@@ -71,7 +71,7 @@ class FieldRealtime : public Field {
   int r_;
   int sleep_for_;
   bool drop_animation_;
-  int simulate_real_state_;
+  SimulationState simulate_real_state_;
   int chigiri_x_;
   int chigiri_y_;
   bool is_dead_;
