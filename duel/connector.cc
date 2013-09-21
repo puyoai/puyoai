@@ -35,9 +35,13 @@ bool Connector::Read(Data* data) {
   char* ptr = fgets(buf, 999, reader_);
   if (ptr) {
     size_t len = strlen(ptr);
+    if (len == 0)
+      return false;
     if (ptr[len-1] == '\n') {
       ptr[--len] = '\0';
     }
+    if (len == 0)
+      return false;
     if (ptr[len-1] == '\r') {
       ptr[--len] = '\0';
     }
