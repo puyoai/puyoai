@@ -11,6 +11,7 @@
 
 #include "core/constant.h"
 #include "core/decision.h"
+#include "core/score.h"
 #include "ctrl.h"
 #include "drop_decision.h"
 #include "evaluation_feature.h"
@@ -20,7 +21,6 @@
 #include "puyo_possibility.h"
 #include "rensa_detector.h"
 #include "rensa_info.h"
-#include "score.h"
 
 using namespace std;
 

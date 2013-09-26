@@ -1,9 +1,9 @@
-#ifndef __SCORE_H_
-#define __SCORE_H_
+#ifndef __CORE_SCORE_H_
+#define __CORE_SCORE_H_
 
 #include <glog/logging.h>
 
-#include "core/constant.h"
+#include "constant.h"
 
 inline int scoreForOjama(int num)
 {
@@ -31,4 +31,5 @@ inline int longBonus(int numPuyos)
     return LONG_BONUS[numPuyos];
 }
 
-#endif
+#endif  // __CORE_SCORE_H_
+
