@@ -11,8 +11,8 @@
 
 #include "core/constant.h"
 #include "core/decision.h"
+#include "core/score.h"
 #include "field_bit_field.h"
-#include "score.h"
 #include "plan.h"
 #include "rensa_result.h"
 

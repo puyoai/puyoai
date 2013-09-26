@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "core/constant.h"
+#include "core/score.h"
 #include "enemy_info.h"
 #include "evaluation_feature.h"
 #include "field.h"
@@ -16,7 +17,6 @@
 #include "rensa_detector.h"
 #include "rensa_info.h"
 #include "rensa_result.h"
-#include "score.h"
 
 using namespace std;
 
