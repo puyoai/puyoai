@@ -48,7 +48,7 @@ int main(void)
         }
 
         cout << "NextPuyo = " << nextPuyos << endl;
-        cout << myField.getDebugOutput() << endl;
+        cout << myField.debugOutput() << endl;
 
         Game game;
         game.id = currentFrameId;
@@ -66,9 +66,9 @@ int main(void)
         RensaDetector::findFeasibleRensas(feasibleRensaInfos, enemyField, 3, game.enemyPlayerState().kumiPuyos);
 
         for (vector<FeasibleRensaInfo>::iterator it = feasibleRensaInfos.begin(); it != feasibleRensaInfos.end(); ++it) {
-            cout << "score  = " << it->rensaInfo.score
-                 << "chains = " << it->rensaInfo.chains
-                 << "frames = " << it->rensaInfo.frames
+            cout << "score  = " << it->basicRensaResult.score
+                 << "chains = " << it->basicRensaResult.chains
+                 << "frames = " << it->basicRensaResult.frames
                  << "initi  = " << it->initiatingFrames << endl;
         }
 
@@ -81,7 +81,7 @@ int main(void)
 
         myField.dropKumiPuyo(dropDecision.decision(), game.myPlayerState().kumiPuyos[0]);
 
-        BasicRensaInfo rensaInfo;
+        BasicRensaResult rensaInfo;
         myField.simulate(rensaInfo);
 
         cout << rensaInfo.chains << ' ' << rensaInfo.score << ' ' << rensaInfo.frames << endl;

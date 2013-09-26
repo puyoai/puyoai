@@ -44,7 +44,7 @@ static void findAvailablePlansInternal(const Field& field,
         int dropFrames = nextField.framesToDropNext(decision);
         nextField.dropKumiPuyo(decision, kumiPuyos[nth]);
 
-        BasicRensaInfo rensaInfo;
+        BasicRensaResult rensaInfo;
         nextField.simulate(rensaInfo);
         if (nextField.color(3, 12) != EMPTY)
             continue;

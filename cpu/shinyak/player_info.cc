@@ -25,10 +25,10 @@ void MyPlayerInfo::ojamaDropped(const Field& field)
     
     for (int x = 1; x <= Field::WIDTH; ++x) {
         for (int y = 1; y <= Field::HEIGHT; ++y)
-            m_estimatedField.setColor(x, y, field.color(x, y));
+            m_estimatedField.setPuyo(x, y, field.color(x, y));
 
         for (int y = Field::HEIGHT + 1; y <= 14; ++y)
-            m_estimatedField.setColor(x, y, EMPTY);
+            m_estimatedField.setPuyo(x, y, EMPTY);
 
         m_estimatedField.recalcHeightOn(x);
         if (m_estimatedField.color(x, Field::HEIGHT) != EMPTY) {

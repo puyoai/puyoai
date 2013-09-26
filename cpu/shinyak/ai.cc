@@ -108,7 +108,7 @@ void AI::enemyGrounded(const Game& game)
     Field field(game.enemyPlayerState().field);
     field.forceDrop();
 
-    BasicRensaInfo rensaInfo;
+    BasicRensaResult rensaInfo;
     field.simulate(rensaInfo);
     
     if (rensaInfo.chains > 0)
@@ -120,7 +120,7 @@ void AI::enemyGrounded(const Game& game)
 void AI::decide(DropDecision& dropDecision, const Game& game)
 {
     LOG(INFO) << "AI::decide is called";
-    LOG(INFO) << m_myPlayerInfo.estimatedField().getDebugOutput();
+    LOG(INFO) << m_myPlayerInfo.estimatedField().debugOutput();
 
     const int depth = 2;
     std::vector<Plan> plans;

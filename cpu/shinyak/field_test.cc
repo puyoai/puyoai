@@ -38,24 +38,24 @@ TEST(FieldTest, SetAndGet)
 {
     ArbitrarilyModifiableField f;
 
-    f.setColor(1, 1, RED);
-    f.setColor(1, 2, BLUE);
-    f.setColor(1, 3, YELLOW);
-    f.setColor(1, 4, GREEN);
+    f.setPuyo(1, 1, RED);
+    f.setPuyo(1, 2, BLUE);
+    f.setPuyo(1, 3, YELLOW);
+    f.setPuyo(1, 4, GREEN);
     EXPECT_EQ(RED, f.color(1, 1));
     EXPECT_EQ(BLUE, f.color(1, 2));
     EXPECT_EQ(YELLOW, f.color(1, 3));
     EXPECT_EQ(GREEN, f.color(1, 4));
 
-    f.setColor(1, 4, EMPTY);
+    f.setPuyo(1, 4, EMPTY);
     EXPECT_EQ(RED, f.color(1, 1));
     EXPECT_EQ(BLUE, f.color(1, 2));
     EXPECT_EQ(YELLOW, f.color(1, 3));
     EXPECT_EQ(EMPTY, f.color(1, 4));
 
-    f.setColor(1, 1, EMPTY);
-    f.setColor(1, 2, EMPTY);
-    f.setColor(1, 3, EMPTY);
+    f.setPuyo(1, 1, EMPTY);
+    f.setPuyo(1, 2, EMPTY);
+    f.setPuyo(1, 3, EMPTY);
     EXPECT_EQ(EMPTY, f.color(1, 1));
     EXPECT_EQ(EMPTY, f.color(1, 2));
     EXPECT_EQ(EMPTY, f.color(1, 3));
@@ -98,7 +98,7 @@ TEST(FieldTest, ForceDrop)
 void testUrl(string url, int expected_chains, int expected_score)
 {
     Field f(url);
-    BasicRensaInfo rensaInfo;
+    BasicRensaResult rensaInfo;
     f.simulate(rensaInfo);
     EXPECT_EQ(expected_chains, rensaInfo.chains);
     EXPECT_EQ(expected_score, rensaInfo.score);
@@ -131,7 +131,7 @@ TEST(FieldTest, ChainAndScoreTest3)
 }
 
 TEST(FieldTest, FramesTest) {
-    BasicRensaInfo info;
+    BasicRensaResult info;
     {
         // 1 Rensa, no drop.
         Field f("444400");
@@ -288,7 +288,7 @@ TEST(FieldTest, HeightAfterSimulate)
             "445644"
             "445644");
 
-    BasicRensaInfo info;
+    BasicRensaResult info;
     f.simulate(info);
 
     EXPECT_EQ(0, f.height(1));
@@ -305,7 +305,7 @@ TEST(FieldTest, HeightAfterSimulate2)
             "445665"
             "556455");
 
-    BasicRensaInfo info;
+    BasicRensaResult info;
     f.simulate(info);
 
     EXPECT_EQ(3, f.height(1));
@@ -370,15 +370,16 @@ TEST(FieldTest, TrackedFieldSimulation)
             "556774");
 
 
-    TrackedRensaInfo trackedRensaInfo;
-    f.simulateAndTrack(trackedRensaInfo.rensaInfo, trackedRensaInfo.trackResult);
+    BasicRensaResult basicRensaResult;
+    RensaTrackResult trackResult;
+    f.simulateAndTrack(basicRensaResult, trackResult);
 
-    EXPECT_EQ(5, trackedRensaInfo.rensaInfo.chains);
-    EXPECT_EQ(1, trackedRensaInfo.trackResult.erasedAt(1, 2));
-    EXPECT_EQ(2, trackedRensaInfo.trackResult.erasedAt(1, 1));
-    EXPECT_EQ(3, trackedRensaInfo.trackResult.erasedAt(3, 3));
-    EXPECT_EQ(4, trackedRensaInfo.trackResult.erasedAt(5, 3));
-    EXPECT_EQ(5, trackedRensaInfo.trackResult.erasedAt(5, 4));
+    EXPECT_EQ(5, basicRensaResult.chains);
+    EXPECT_EQ(1, trackResult.erasedAt(1, 2));
+    EXPECT_EQ(2, trackResult.erasedAt(1, 1));
+    EXPECT_EQ(3, trackResult.erasedAt(3, 3));
+    EXPECT_EQ(4, trackResult.erasedAt(5, 3));
+    EXPECT_EQ(5, trackResult.erasedAt(5, 4));
 }
 
 TEST(FieldTest, DropKumiPuyoExtreme)

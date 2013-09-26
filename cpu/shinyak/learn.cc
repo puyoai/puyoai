@@ -146,7 +146,7 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
 {
     ++m_numLearn;
     cout << "learn" << endl;
-    cout << currentField.getDebugOutput() << endl;
+    cout << currentField.debugOutput() << endl;
     for (const KumiPuyo& kumiPuyo : kumiPuyos) {
         cout << kumiPuyo.toString();
     }

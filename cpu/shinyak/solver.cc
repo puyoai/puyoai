@@ -89,7 +89,7 @@ void readProblem(Game& game, Decision& enemyFirstDecision,
             readAnswer(score);
     }
 
-    cerr << game.playerStates[0].field.getDebugOutput() << endl;
+    cerr << game.playerStates[0].field.debugOutput() << endl;
 }
 
 int main(int argc, char* argv[])
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
     cerr << "your decision (2): " << secondDecision.decision().x << ' ' << secondDecision.decision().r << endl;
 
     game.playerStates[0].field.dropKumiPuyo(secondDecision.decision(), game.playerStates[0].kumiPuyos[0]);
-    cerr << game.playerStates[0].field.getDebugOutput() << endl;
+    cerr << game.playerStates[0].field.debugOutput() << endl;
 
     map<pair<Decision, Decision>, int>::iterator it = score.find(make_pair(firstDecision.decision(), secondDecision.decision()));
 

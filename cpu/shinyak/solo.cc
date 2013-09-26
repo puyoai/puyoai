@@ -67,16 +67,16 @@ int main(int argc, char* argv[])
         ai.wnextAppeared(game);
 
         game.playerStates[0].field.dropKumiPuyo(decision.decision(), game.playerStates[0].kumiPuyos.front());
-        BasicRensaInfo info;
+        BasicRensaResult info;
         game.playerStates[0].field.simulate(info);
         if (info.chains > 0) {
             cout << info.toString() << endl;
-            cout << game.playerStates[0].field.getDebugOutput() << endl;
+            cout << game.playerStates[0].field.debugOutput() << endl;
             break;
         }
 
         ai.myRensaFinished(game);
-        cout << game.playerStates[0].field.getDebugOutput() << endl;
+        cout << game.playerStates[0].field.debugOutput() << endl;
 
 #if 0
         string s;

@@ -5,7 +5,7 @@ class EnemyInfo;
 class EvaluationFeature;
 class Field;
 class MyPlayerInfo;
-class TrackResult;
+class RensaTrackResult;
 class Plan;
 class PlanEvaluationFeature;
 class RensaEvaluationFeature;

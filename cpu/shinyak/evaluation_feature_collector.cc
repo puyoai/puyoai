@@ -331,7 +331,7 @@ void EvaluationFeatureCollector::collectRensaFeatures(RensaEvaluationFeature& re
     for (int x = 1; x <= Field::WIDTH; ++x) {
         for (int y = 1; y <= 13; ++y) { // TODO: 13?
             if (info.trackResult.erasedAt(x, y) != 0)
-                fieldAfterRensa.setColor(x, y, EMPTY);
+                fieldAfterRensa.setPuyo(x, y, EMPTY);
         }
         fieldAfterRensa.recalcHeightOn(x);
     }

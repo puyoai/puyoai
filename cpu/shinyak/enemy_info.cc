@@ -37,10 +37,10 @@ struct SortByInitiatingFrames {
 
         // If initiatingFrames is the same, preferrable Rensa should come first.
         // High score is more preferrable, faster rensa is more preferrable.
-        if (lhs.rensaInfo.score != rhs.rensaInfo.score)
-            return lhs.rensaInfo.score > rhs.rensaInfo.score; 
-        if (lhs.rensaInfo.frames != rhs.rensaInfo.frames)
-            return lhs.rensaInfo.frames < rhs.rensaInfo.frames;
+        if (lhs.basicRensaResult.score != rhs.basicRensaResult.score)
+            return lhs.basicRensaResult.score > rhs.basicRensaResult.score; 
+        if (lhs.basicRensaResult.frames != rhs.basicRensaResult.frames)
+            return lhs.basicRensaResult.frames < rhs.basicRensaResult.frames;
 
         return false;
     }
@@ -58,21 +58,21 @@ void EnemyInfo::updateFeasibleRensas(const Field& field, const vector<KumiPuyo>&
 
     sort(result.begin(), result.end(), SortByInitiatingFrames());
     m_feasibleRensaInfos.push_back(EstimatedRensaInfo(
-                                       result.front().rensaInfo.chains,
-                                       result.front().rensaInfo.score,
+                                       result.front().basicRensaResult.chains,
+                                       result.front().basicRensaResult.score,
                                        result.front().initiatingFrames));
 
     for (vector<FeasibleRensaInfo>::iterator it = result.begin(); it != result.end(); ++it) {
-        if (m_feasibleRensaInfos.back().score < it->rensaInfo.score) {
+        if (m_feasibleRensaInfos.back().score < it->basicRensaResult.score) {
             DCHECK(m_feasibleRensaInfos.back().initiatingFrames < it->initiatingFrames)
                 << "feasible frames = " << m_feasibleRensaInfos.back().initiatingFrames
                 << " initiating frames = " << it->initiatingFrames 
                 << " score(1) = " << m_feasibleRensaInfos.back().score
-                << " score(2) = " << it->rensaInfo.score << endl;
+                << " score(2) = " << it->basicRensaResult.score << endl;
                 
             m_feasibleRensaInfos.push_back(EstimatedRensaInfo(
-                                               it->rensaInfo.chains,
-                                               it->rensaInfo.score,
+                                               it->basicRensaResult.chains,
+                                               it->basicRensaResult.score,
                                                it->initiatingFrames));
 
         }
