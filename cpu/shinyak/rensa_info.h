@@ -11,16 +11,16 @@
 // CURRENT/NEXT/NEXTNEXT から実際に発火可能な連鎖 (For PlayerInfo)
 struct FeasibleRensaInfo {
     FeasibleRensaInfo() {}
-    FeasibleRensaInfo(const BasicRensaInfo& rensaInfo, int initiatingFrames)
-        : rensaInfo(rensaInfo), initiatingFrames(initiatingFrames) {}
+    FeasibleRensaInfo(const BasicRensaResult& rensaInfo, int initiatingFrames)
+        : basicRensaResult(rensaInfo), initiatingFrames(initiatingFrames) {}
 
-    BasicRensaInfo rensaInfo;
+    BasicRensaResult basicRensaResult;
     int initiatingFrames;
 };
 
 // ある状態のフィールドから、いくつかのぷよを追加することで発火することが可能な連鎖
 struct PossibleRensaInfo {
-    BasicRensaInfo rensaInfo;
+    BasicRensaResult rensaInfo;
     PuyoSet necessaryPuyoSet;
 
     std::string toString() const {
@@ -29,17 +29,17 @@ struct PossibleRensaInfo {
 };
 
 struct TrackedPossibleRensaInfo {
-    BasicRensaInfo rensaInfo;
+    BasicRensaResult rensaInfo;
     PuyoSet necessaryPuyoSet;
-    TrackResult trackResult;
+    RensaTrackResult trackResult;
 };
 
 struct OngoingRensaInfo {
     OngoingRensaInfo() {}
-    OngoingRensaInfo(BasicRensaInfo rensaInfo, int finishingRensaFrame)
+    OngoingRensaInfo(const BasicRensaResult& rensaInfo, int finishingRensaFrame)
         : rensaInfo(rensaInfo), finishingRensaFrame(finishingRensaFrame) {}
 
-    BasicRensaInfo rensaInfo;
+    BasicRensaResult rensaInfo;
     int finishingRensaFrame;
 };
 

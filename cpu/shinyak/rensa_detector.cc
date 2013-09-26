@@ -205,7 +205,7 @@ void RensaDetector::findPossibleRensasUsingIteration(vector<vector<TrackedPossib
                     initialX = x + 1;
                     initialY = field.height(x) + 1;
                 } else {
-                    DCHECK(n > 0) << ' ' << n << ' ' << c << ' ' << x << ' ' << f.getDebugOutput();
+                    DCHECK(n > 0) << ' ' << n << ' ' << c << ' ' << x << ' ' << f.debugOutput();
                     initialX = x;
                     initialY = field.height(x) + 1;
                 }
@@ -261,9 +261,10 @@ void RensaDetector::findFeasibleRensas(vector<FeasibleRensaInfo>& result, const 
         if (!it->isRensaPlan())
             continue;
 
-        result.push_back(FeasibleRensaInfo(BasicRensaInfo(it->totalChains(),
-                                                          it->totalScore(),
-                                                          it->totalFrames() - it->initiatingFrames()),
-                                           it->initiatingFrames()));
+        result.push_back(FeasibleRensaInfo(
+                             BasicRensaResult(it->totalChains(),
+                                              it->totalScore(),
+                                              it->totalFrames() - it->initiatingFrames()),
+                             it->initiatingFrames()));
     }
 }

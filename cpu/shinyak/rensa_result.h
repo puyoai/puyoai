@@ -5,10 +5,10 @@
 #include "field.h"
 #include "util.h"
 
-struct BasicRensaInfo {
-    BasicRensaInfo() 
+struct BasicRensaResult {
+    BasicRensaResult() 
         : chains(0), score(0), frames(0) {}
-    BasicRensaInfo(int chains, int score, int frames)
+    BasicRensaResult(int chains, int score, int frames)
         : chains(chains), score(score), frames(frames) {}
 
     std::string toString() const;
@@ -18,9 +18,9 @@ struct BasicRensaInfo {
     int frames;
 };
 
-class TrackResult {
+class RensaTrackResult {
 public:
-    TrackResult& operator=(const TrackResult& result);
+    RensaTrackResult& operator=(const RensaTrackResult& result);
 
     // Nth Rensa where (x, y) is erased. 0 if not erased.
     int erasedAt(int x, int y) const { return m_erasedAt[x][y]; }
@@ -30,15 +30,6 @@ public:
 
 private:
     byte m_erasedAt[Field::MAP_WIDTH][Field::MAP_HEIGHT];
-};
-
-struct TrackedRensaInfo {
-    TrackedRensaInfo() {}
-    TrackedRensaInfo(const BasicRensaInfo& rensaInfo, const TrackResult& trackResult)
-        : rensaInfo(rensaInfo), trackResult(trackResult) {}
-
-    BasicRensaInfo rensaInfo;
-    TrackResult trackResult;
 };
 
 #endif

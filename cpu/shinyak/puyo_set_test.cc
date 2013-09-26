@@ -7,10 +7,10 @@ TEST(PuyoSetTest, AddPuyoColor)
     PuyoSet set;
     set.add(RED, 1);
 
-    EXPECT_EQ(set.red(), 1);
-    EXPECT_EQ(set.blue(), 0);
-    EXPECT_EQ(set.yellow(), 0);
-    EXPECT_EQ(set.green(), 0);
+    EXPECT_EQ(set.red(), 1U);
+    EXPECT_EQ(set.blue(), 0U);
+    EXPECT_EQ(set.yellow(), 0U);
+    EXPECT_EQ(set.green(), 0U);
 }
 
 TEST(PuyoSetTest, AddPuyoSet)
@@ -24,8 +24,8 @@ TEST(PuyoSetTest, AddPuyoSet)
     PuyoSet set;
     set.add(set1);
     set.add(set2);
-    EXPECT_EQ(set.red(), 2);
-    EXPECT_EQ(set.blue(), 1);
-    EXPECT_EQ(set.yellow(), 0);
-    EXPECT_EQ(set.green(), 1);
+    EXPECT_EQ(set.red(), 2U);
+    EXPECT_EQ(set.blue(), 1U);
+    EXPECT_EQ(set.yellow(), 0U);
+    EXPECT_EQ(set.green(), 1U);
 }
