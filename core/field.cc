@@ -148,7 +148,7 @@ inline void check_cell(unsigned char color, unsigned char field_[][16], int[] /*
 }
 
 bool Field::Vanish(int chains, int* score) {
-  static int erase_field[WIDTH * HEIGHT * 2];
+  int erase_field[WIDTH * HEIGHT * 2];
   int* read_head = erase_field;
   int* write_head = erase_field;
   int* prev_head = erase_field;
