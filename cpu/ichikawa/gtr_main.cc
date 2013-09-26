@@ -611,7 +611,7 @@ void GetDecision(const Input& input, Decision* decision, ostream& log) {
   if (input.state.other_grounded) {
     Field work_field = input.other_field;
     int chains, score, frames;
-    work_field.Drop();
+    work_field.ForceDrop();
     work_field.Simulate(&chains, &score, &frames);
     //log << work_field.GetDebugOutput() << endl << flush;
     log << "other_chains: " << chains << endl << flush;
@@ -722,7 +722,7 @@ int main(int argc, char* argv[]) {
   } else if (arg == "exp") {
     Field field("400000000000");
     cout << field.GetDebugOutput() << endl;
-    field.Drop();
+    field.ForceDrop();
     cout << field.GetDebugOutput() << endl;
     
   } else {
