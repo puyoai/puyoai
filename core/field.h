@@ -19,15 +19,11 @@ class Field : public BasicField {
   Field(const std::string& url);
   Field(const Field& f);
 
-  // Crears every data this class has.
-  void Init();
-
-
   // Sets Haipuyo.
   void SetColorSequence(const std::string& sequence);
-
   // Gets Haipuyo.
   std::string GetColorSequence() const;
+  char GetNextPuyo(int n) const;
 
   // Put a puyo at a specified position.
   void Set(int x, int y, char color);
@@ -36,6 +32,24 @@ class Field : public BasicField {
   // TODO: Returning char seems weird. PuyoColor should be returned instead.
   char Get(int x, int y) const;
 
+  // Simulate chains until the end, and returns chains, score, and frames before
+  // finishing the chain.
+  void Simulate();
+  void Simulate(int* chains, int* score, int* frames);
+
+  // When some puyos are located in the air, drop them.
+  void ForceDrop() { Drop(); } 
+
+  // Normal print for debugging purpose.
+  std::string GetDebugOutput() const;
+
+ protected:
+  // Crears every data this class has.
+  void Init();
+
+  // Clean internal states, related to Vanish and Drop.
+  void Clean();
+
   // Vanish puyos, and adds score. The argument "chains" is used to calculate
   // score.
   bool Vanish(int chains, int* score);
@@ -43,20 +57,6 @@ class Field : public BasicField {
   // After vanishing, drop puyos. You should not Set puyos between vanish and
   // drop.
   void Drop();
-
-  // Simulate chains until the end, and returns chains, score, and frames before
-  // finishing the chain.
-  void Simulate();
-  void Simulate(int* chains, int* score, int* frames);
-
-  // Normal print for debugging purpose.
-  std::string GetDebugOutput() const;
-
-  char GetNextPuyo(int n) const;
-
- protected:
-  // Clean internal states, related to Vanish and Drop.
-  void Clean();
 
   // Puyo at field[x][y] will not fall or will not be vanished iff
   // y>min_heights[x].
