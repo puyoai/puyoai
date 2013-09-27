@@ -5,7 +5,10 @@ puyoai
 
 ### ビルド方法
 
-* トップレベルで cmake するより、適当なディレクトリを掘ってから build することをオススメします。
+    $ cmake .
+    $ make
+
+* 適当なディレクトリを掘ってから build することもできます。ただし、現状実行スクリプトがコピーされません。
 
     $ mkdir build
     $ cd build
@@ -13,7 +16,6 @@ puyoai
     $ make
 
 * gflags と glog が cmake に発見されなかった場合、それらのライブラリはダミーのものが使われます。
-* gtest が無い場合、 unittest は作られません。
 * SDL と SDL_ttf が無い場合、 GUI がつきません。
 * capture/ ディレクトリについては、 capture/README を参照ください。
 
