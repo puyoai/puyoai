@@ -15,6 +15,7 @@ using namespace std;
 
 FieldRealtime::FieldRealtime(int player_id, const string& color_sequence,
                              OjamaController* ojama_ctrl) {
+  Init();
   player_id_ = player_id;
   field_.SetColorSequence(color_sequence);
   ojama_ctrl_ = ojama_ctrl;
