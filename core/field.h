@@ -72,6 +72,8 @@ class Field : public BasicField {
 
   bool erased_;
   std::string color_sequence_;
+
+  friend class FieldRealtime;
 };
 
 #endif  // CORE_FIELD_H_
