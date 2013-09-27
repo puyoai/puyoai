@@ -17,7 +17,7 @@ endfunction()
 
 function(hamaji_add_test exe)
   hamaji_add_executable(${exe} ${exe}.cc)
-  cpu_target_link_libraries(${exe} ${GTEST_BOTH_LIBRARIES})
+  cpu_target_link_libraries(${exe} gtest gtest_main)
   if(NOT ARGV1)
     cpu_add_test(${exe})
   endif()
@@ -28,14 +28,13 @@ hamaji_add_executable(study study.cc)
 hamaji_add_executable(mkdb mkdb.cc)
 hamaji_add_executable(matchstat matchstat.cc)
 
-if(GTEST_FOUND)
-  include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(${gtest_SOURCE_DIR}/include
+                    ${gtest_SOURCE_DIR})
+hamaji_add_test(db_test)
+# TODO(hamaji): Slow!
+hamaji_add_test(field_perf_test 1)
+hamaji_add_test(field_test)
 
-  hamaji_add_test(db_test)
-  # TODO(hamaji): Slow!
-  hamaji_add_test(field_perf_test 1)
-  hamaji_add_test(field_test)
-endif()
 
 # TODO(hamaji): Build?
 # parse_movie.cc

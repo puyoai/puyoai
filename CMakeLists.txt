@@ -2,8 +2,6 @@ project(puyoai)
 
 cmake_minimum_required(VERSION 2.8)
 
-enable_testing()
-
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
@@ -40,6 +38,9 @@ else()
   set(GFLAGS_LIBRARY gflags)
   set(GLOG_LIBRARY glog)
 endif()
+
+enable_testing()
+add_subdirectory(third_party/gtest-1.7.0)
 
 function(puyoai_target_link_libraries target)
   target_link_libraries(${target} ${CMAKE_THREAD_LIBS_INIT})
@@ -96,12 +97,6 @@ if(USE_SDL)
   puyoai_message("SDL and SDL_ttf found - GUI will be ENABLED")
 else()
   puyoai_message("SDL and SDL_ttf not found - GUI will be DISABLED")
-endif()
-
-if(GTEST_FOUND)
-  puyoai_message("gtest found - Tests will be ENABLED")
-else()
-  puyoai_message("gtest not found - Tests will be DISABLED")
 endif()
 
 if(BUILD_CAPTURE)
