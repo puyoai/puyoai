@@ -11,7 +11,7 @@ const int ZENKESI_BONUS = 2100;
 
 class OjamaController;
 
-class FieldRealtime : public Field {
+class FieldRealtime {
  public:
   FieldRealtime(int player_id, const std::string& color_sequence,
                 OjamaController* ojama_ctrl);
@@ -39,6 +39,8 @@ class FieldRealtime : public Field {
   int GetFixedOjama() const;
   int GetPendingOjama() const;
 
+  const Field& field() const { return field_; }
+
   enum SimulationState {
     STATE_USER,
     STATE_CHIGIRI,
@@ -62,6 +64,7 @@ class FieldRealtime : public Field {
   bool TryDrop();
   bool TryOjama(PlayerLog* player_log);
 
+  Field field_;
   OjamaController* ojama_ctrl_;
   bool ojama_dropping_;
   std::vector<int> ojama_position_;
