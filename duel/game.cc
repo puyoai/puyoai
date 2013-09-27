@@ -182,7 +182,7 @@ void Game::Play(
 
     if ((me->GetStateInfo() & ~STATE_YOU_CAN_PLAY) != 0) {
       puyo_fu_->setField(me->player_id(),
-                         *me,
+                         me->field(),
                          me->GetStateInfo(),
                          0  /* TODO(hamaji): send timestamp? */);
     }
