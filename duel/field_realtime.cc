@@ -14,11 +14,9 @@
 using namespace std;
 
 FieldRealtime::FieldRealtime(int player_id, const string& color_sequence,
-                             OjamaController* ojama_ctrl)
-    : Field() {
-  Init();
+                             OjamaController* ojama_ctrl) {
   player_id_ = player_id;
-  SetColorSequence(color_sequence);
+  field_.SetColorSequence(color_sequence);
   ojama_ctrl_ = ojama_ctrl;
 }
 
@@ -27,7 +25,7 @@ void FieldRealtime::Init() {
 
   PrepareNextPuyo();
 
-  next_puyo_ = 0;
+  field_.next_puyo_ = 0;
   simulate_real_state_ = STATE_USER;
   sleep_for_ = 0;
   is_dead_ = false;
@@ -71,7 +69,7 @@ bool FieldRealtime::TryChigiri() {
 
 bool FieldRealtime::TryVanish() {
   int score = 0;
-  if (Vanish(current_chains_, &score)) {
+  if (field_.Vanish(current_chains_, &score)) {
     current_chains_++;
     score_ += score;
     if (is_zenkesi_) {
@@ -96,11 +94,11 @@ bool FieldRealtime::TryVanish() {
 }
 
 void FieldRealtime::FinishChain() {
-  is_dead_ = (Get(3, 12) != EMPTY);
+  is_dead_ = (field_.Get(3, 12) != EMPTY);
   if (!is_zenkesi_) {
     is_zenkesi_ = true;
     for (int i = 1; i <= 6; i++) {
-      if (Get(i, 1) != EMPTY) {
+      if (field_.Get(i, 1) != EMPTY) {
         is_zenkesi_ = false;
       }
     }
@@ -113,7 +111,7 @@ void FieldRealtime::FinishChain() {
     PrepareNextPuyo();
   }
   current_chains_ = 1;
-  Clean();
+  field_.Clean();
   field_state_ |= STATE_CHAIN_DONE;
 }
 
@@ -123,7 +121,7 @@ bool FieldRealtime::TryDrop() {
     drop_animation_ = true;
     return true;
   } else {
-    Clean();
+    field_.Clean();
     if (drop_animation_) {
       sleep_for_ = FRAMES_AFTER_DROP;
       drop_animation_ = false;
@@ -153,8 +151,8 @@ bool FieldRealtime::TryOjama(PlayerLog* player_log) {
   if (ojama_dropping_) {
     for (int i = 0; i < 6; i++) {
       if (ojama_position_[i] > 0) {
-        if (Get(i + 1, 13) == EMPTY) {
-          Set(i + 1, 13, OJAMA);
+        if (field_.Get(i + 1, 13) == EMPTY) {
+          field_.Set(i + 1, 13, OJAMA);
         }
         ojama_position_[i]--;
       }
@@ -171,7 +169,7 @@ bool FieldRealtime::TryOjama(PlayerLog* player_log) {
   } else {
     dropped_rows_ = 0;
     ojama_dropping_ = false;
-    is_dead_ = (Get(3, 12) != EMPTY);
+    is_dead_ = (field_.Get(3, 12) != EMPTY);
     sleep_for_ = FRAMES_AFTER_DROP;
     field_state_ |= STATE_OJAMA_DROPPED;
     PrepareNextPuyo();
@@ -280,10 +278,10 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted) {
     case KEY_RIGHT_TURN:
       switch (r_) {
         case 0:
-          if (Get(x_ + 1, y_) == EMPTY) {
+          if (field_.Get(x_ + 1, y_) == EMPTY) {
             r_ = (r_ + 1) % 4;
             *accepted = true;
-          } else if (Get(x_ - 1, y_) == EMPTY) {
+          } else if (field_.Get(x_ - 1, y_) == EMPTY) {
             r_ = (r_ + 1) % 4;
             x_--;
             *accepted = true;
@@ -300,7 +298,7 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted) {
           }
           break;
         case 1:
-          if (Get(x_, y_ - 1) == EMPTY) {
+          if (field_.Get(x_, y_ - 1) == EMPTY) {
             r_ = (r_ + 1) % 4;
             *accepted = true;
           } else {
@@ -310,10 +308,10 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted) {
           }
           break;
         case 2:
-          if (Get(x_ - 1, y_) == EMPTY) {
+          if (field_.Get(x_ - 1, y_) == EMPTY) {
             r_ = (r_ + 1) % 4;
             *accepted = true;
-          } else if (Get(x_ + 1, y_) == EMPTY) {
+          } else if (field_.Get(x_ + 1, y_) == EMPTY) {
             r_ = (r_ + 1) % 4;
             x_++;
             *accepted = true;
@@ -339,10 +337,10 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted) {
     case KEY_LEFT_TURN:
       switch (r_) {
         case 0:
-          if (Get(x_ - 1, y_) == EMPTY) {
+          if (field_.Get(x_ - 1, y_) == EMPTY) {
             r_ = (r_ + 3) % 4;
             *accepted = true;
-          } else if (Get(x_ + 1, y_) == EMPTY) {
+          } else if (field_.Get(x_ + 1, y_) == EMPTY) {
             r_ = (r_ + 3) % 4;
             x_++;
             *accepted = true;
@@ -363,10 +361,10 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted) {
           *accepted = true;
           break;
         case 2:
-          if (Get(x_ + 1, y_) == EMPTY) {
+          if (field_.Get(x_ + 1, y_) == EMPTY) {
             r_ = (r_ + 3) % 4;
             *accepted = true;
-          } else if (Get(x_ - 1, y_) == EMPTY) {
+          } else if (field_.Get(x_ - 1, y_) == EMPTY) {
             r_ = (r_ + 3) % 4;
             x_--;
             *accepted = true;
@@ -383,7 +381,7 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted) {
           }
           break;
         case 3:
-          if (Get(x_, y_ - 1) == EMPTY) {
+          if (field_.Get(x_, y_ - 1) == EMPTY) {
             r_ = (r_ + 3) % 4;
             *accepted = true;
           } else {
@@ -395,8 +393,8 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted) {
       }
       return false;
     case KEY_RIGHT:
-      if (Get(x1 + 1, y1) == EMPTY &&
-          Get(x2 + 1, y2) == EMPTY) {
+      if (field_.Get(x1 + 1, y1) == EMPTY &&
+          field_.Get(x2 + 1, y2) == EMPTY) {
         x_++;
         *accepted = true;
       } else {
@@ -404,8 +402,8 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted) {
       }
       break;
     case KEY_LEFT:
-      if (Get(x1 - 1, y1) == EMPTY &&
-          Get(x2 - 1, y2) == EMPTY) {
+      if (field_.Get(x1 - 1, y1) == EMPTY &&
+          field_.Get(x2 - 1, y2) == EMPTY) {
         x_--;
         *accepted = true;
       } else {
@@ -414,14 +412,14 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted) {
       break;
     case KEY_DOWN:
       frames_for_free_fall_ = 0;
-      if (Get(x1, y1 - 1) == EMPTY &&
-          Get(x2, y2 - 1) == EMPTY) {
+      if (field_.Get(x1, y1 - 1) == EMPTY &&
+          field_.Get(x2, y2 - 1) == EMPTY) {
         y_--;
         *accepted = true;
       } else {
         // Ground.
-        Set(x1, y1, GetNextPuyo(0));
-        Set(x2, y2, GetNextPuyo(1));
+        field_.Set(x1, y1, field_.GetNextPuyo(0));
+        field_.Set(x2, y2, field_.GetNextPuyo(1));
         *accepted = false;
         ground = true;
       }
@@ -440,11 +438,11 @@ bool FieldRealtime::Chigiri() {
     char c1, c2;
     int r;
     GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
-    if (Get(x1, y1 - 1) == EMPTY) {
+    if (field_.Get(x1, y1 - 1) == EMPTY) {
       chigiri_x_ = x1;
       chigiri_y_ = y1;
     }
-    if (Get(x2, y2 - 1) == EMPTY) {
+    if (field_.Get(x2, y2 - 1) == EMPTY) {
       chigiri_x_ = x2;
       chigiri_y_ = y2;
     }
@@ -454,9 +452,9 @@ bool FieldRealtime::Chigiri() {
   } else {
     int x = chigiri_x_;
     int y = chigiri_y_;
-    if (Get(x, y - 1) == EMPTY) {
-      Set(x, y - 1, Get(x, y));
-      Set(x, y, EMPTY);
+    if (field_.Get(x, y - 1) == EMPTY) {
+      field_.Set(x, y - 1, field_.Get(x, y));
+      field_.Set(x, y, EMPTY);
       chigiri_y_--;
       return true;
     } else {
@@ -467,14 +465,14 @@ bool FieldRealtime::Chigiri() {
 
 bool FieldRealtime::Drop1line() {
   bool ret = false;
-  for (int x = 1; x <= WIDTH; x++) {
+  for (int x = 1; x <= Field::WIDTH; x++) {
     // Puyo in 14th row will not drop to 13th row. If there is a puyo on
     // 14th row, it'll stay there forever. This behavior is a famous bug in
     // Puyo2.
-    for (int y = 1; y < MAP_HEIGHT - 3; y++) {
-      if (Get(x, y) == EMPTY && Get(x, y + 1) != EMPTY) {
-        Set(x, y, Get(x, y + 1));
-        Set(x, y + 1, EMPTY);
+    for (int y = 1; y < Field::MAP_HEIGHT - 3; y++) {
+      if (field_.Get(x, y) == EMPTY && field_.Get(x, y + 1) != EMPTY) {
+        field_.Set(x, y, field_.Get(x, y + 1));
+        field_.Set(x, y + 1, EMPTY);
 
         ret = true;
       }
@@ -488,7 +486,7 @@ void FieldRealtime::PrepareNextPuyo() {
   y_ = 12;
   r_ = 0;
 
-  next_puyo_ += 2;
+  field_.next_puyo_ += 2;
   if (delay_double_next_) {
     yokoku_delay_ = FRAMES_YOKOKU_DELAY;
   }
@@ -500,10 +498,10 @@ void FieldRealtime::GetCurrentPuyo(int* x1, int* y1, char* c1,
                                    int* x2, int* y2, char* c2, int* r) const {
   *x1 = x_;
   *y1 = y_;
-  *c1 = GetNextPuyo(0);
+  *c1 = field_.GetNextPuyo(0);
   *x2 = x_ + (r_ == 1) - (r_ == 3);
   *y2 = y_ + (r_ == 0) - (r_ == 2);
-  *c2 = GetNextPuyo(1);
+  *c2 = field_.GetNextPuyo(1);
   *r = r_;
 }
 
@@ -555,11 +553,11 @@ void FieldRealtime::Print(const string& debug_message) const {
 
   int pos_x = 1 + 30 * player_id_;
   int pos_y = 1;
-  for (int y = 0; y < MAP_HEIGHT; y++) {
-    for (int x = 0; x < MAP_WIDTH; x++) {
-      cout << Locate(pos_x + x * 2, pos_y + MAP_HEIGHT - y);
+  for (int y = 0; y < Field::MAP_HEIGHT; y++) {
+    for (int x = 0; x < Field::MAP_WIDTH; x++) {
+      cout << Locate(pos_x + x * 2, pos_y + Field::MAP_HEIGHT - y);
 
-      char color = Get(x, y);
+      char color = field_.Get(x, y);
       if (simulate_real_state_ == STATE_USER) {
         if (x == x1 && y == y1) {
           color = c1;
@@ -583,18 +581,18 @@ void FieldRealtime::Print(const string& debug_message) const {
     if (yokoku_delay_ > 0 && i >= 4) {
       cout << location << "  ";
     } else {
-      cout << location << GetPuyoText(GetNextPuyo(i));
+      cout << location << GetPuyoText(field_.GetNextPuyo(i));
     }
   }
 
   // Score
-  cout << Locate(pos_x, pos_y + MAP_HEIGHT + 1) << setw(10) << score_;
+  cout << Locate(pos_x, pos_y + Field::MAP_HEIGHT + 1) << setw(10) << score_;
   // Debug message ("\x1B[0K" clears the line)
   if (!debug_message.empty()) {
-    cout << Locate(1, pos_y + MAP_HEIGHT + 3 + player_id_)
+    cout << Locate(1, pos_y + Field::MAP_HEIGHT + 3 + player_id_)
 	 << "\x1B[0K" << debug_message << flush;
   }
-  cout << Locate(1, pos_y + MAP_HEIGHT + 5) << flush;
+  cout << Locate(1, pos_y + Field::MAP_HEIGHT + 5) << flush;
 }
 
 bool FieldRealtime::IsDead() const {
@@ -605,7 +603,7 @@ string FieldRealtime::GetFieldInfo() const {
   stringstream ss;
   for (int y = 12; y >= 1; y--) {
     for (int x = 1; x <= 6; x++) {
-      switch (Get(x, y)) {
+      switch (field_.Get(x, y)) {
         case EMPTY: ss << '0'; break;
         case OJAMA: ss << '1'; break;
         case WALL: ss << '2'; break;
@@ -626,7 +624,7 @@ string FieldRealtime::GetYokokuInfo() const {
     if (yokoku_delay_ > 0 && i >= 4) {
       ss << '0';
     } else {
-      switch (GetNextPuyo(i)) {
+      switch (field_.GetNextPuyo(i)) {
         case EMPTY: ss << '0'; break;
         case OJAMA: ss << '1'; break;
         case WALL: ss << '2'; break;
@@ -664,7 +662,7 @@ Key FieldRealtime::GetKey(const Decision& decision) {
   vector<KeyTuple> keys;
   KeyTuple next_key;
   if (Ctrl::getControlOnline(
-          *this, KumipuyoPos(decision.x, 1, decision.r),
+          field_, KumipuyoPos(decision.x, 1, decision.r),
           KumipuyoPos(x1, y1, r), &keys)) {
     LOG(INFO) << Ctrl::buttonsDebugString(keys);
 
