@@ -39,7 +39,7 @@ class FieldRealtime {
   int GetFixedOjama() const;
   int GetPendingOjama() const;
 
-  const Field& field() const { return field_; }
+  const FieldWithColorSequence& field() const { return field_; }
 
   enum SimulationState {
     STATE_USER,
@@ -64,7 +64,7 @@ class FieldRealtime {
   bool TryDrop();
   bool TryOjama(PlayerLog* player_log);
 
-  Field field_;
+  FieldWithColorSequence field_;
   OjamaController* ojama_ctrl_;
   bool ojama_dropping_;
   std::vector<int> ojama_position_;

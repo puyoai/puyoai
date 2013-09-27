@@ -6,7 +6,7 @@
 #include <core/state.h>
 #include <util/field_util.h>
 
-void PuyoFu::setField(int pi, const Field& f, int state, int time) {
+void PuyoFu::setField(int pi, const FieldWithColorSequence& f, int state, int time) {
   state &= ~STATE_YOU_CAN_PLAY;
   if (!state)
     return;
@@ -16,7 +16,7 @@ void PuyoFu::setField(int pi, const Field& f, int state, int time) {
 
   Move* move = new Move();
   move->pi = pi;
-  move->f.reset(new Field(f));
+  move->f.reset(new FieldWithColorSequence(f));
   move->next[6] = 0;
   for (int i = 0; i < 6; i++) {
     move->next[i] = f.GetNextPuyo(i) + '0';
@@ -26,7 +26,7 @@ void PuyoFu::setField(int pi, const Field& f, int state, int time) {
 }
 
 void PuyoFu::emitFieldTransitionLog(FILE* fp, int pi) const {
-  Field f;
+  FieldWithColorSequence f;
   for (size_t i = 0; i < moves_.size(); i++) {
     Move* m = moves_[i];
     if (m->pi != pi)

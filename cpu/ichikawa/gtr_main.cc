@@ -55,8 +55,8 @@ struct State {
 
 struct Input {
   int id;
-  Field my_field;
-  Field other_field;
+  FieldWithColorSequence my_field;
+  FieldWithColorSequence other_field;
   Point my_current_point;
   int num_my_ojamas;
   State state;
@@ -74,7 +74,7 @@ struct Input {
 
 class Chunk {
  public:
-  explicit Chunk(Field* f) : field_(f), fill_color_(EMPTY) { }
+  explicit Chunk(FieldWithColorSequence* f) : field_(f), fill_color_(EMPTY) { }
   Chunk& Add(const Point& point);
   Chunk& Add(int x, int y);
   void Clear();
@@ -83,7 +83,7 @@ class Chunk {
   const vector<Point>& points() const { return points_; }
   
  private:
-  Field* field_;
+  FieldWithColorSequence* field_;
   vector<Point> points_;
   char fill_color_;
 };
@@ -128,12 +128,12 @@ void GetInput(Input* input, ofstream& log) {
       input->state = *reinterpret_cast<State*>(&val);
     }
   }
-  input->my_field = Field(my_field_str);
+  input->my_field = FieldWithColorSequence(my_field_str);
   input->my_field.SetColorSequence(my_puyos_str);
-  input->other_field = Field(other_field_str);
+  input->other_field = FieldWithColorSequence(other_field_str);
 }
 
-bool CanPut(const Field& field, int x) {
+bool CanPut(const FieldWithColorSequence& field, int x) {
   int path_left = 0;
   int path_right = 0;
   if (x >= 3) {
@@ -152,7 +152,7 @@ bool CanPut(const Field& field, int x) {
   return true;
 }
 
-bool CanPut(const Field& field, const Point& current_point, const Decision& decision) {
+bool CanPut(const FieldWithColorSequence& field, const Point& current_point, const Decision& decision) {
   // This should be current_point.y when this is the first action for the puyo.
   // Not sure this is OK for the puyo already falling.
   int active_y = current_point.y;
@@ -165,7 +165,7 @@ bool CanPut(const Field& field, const Point& current_point, const Decision& deci
   return true;
 }
 
-bool Put(Field* field, int x, char color, int* result_x = NULL, int* result_y = NULL) {
+bool Put(FieldWithColorSequence* field, int x, char color, int* result_x = NULL, int* result_y = NULL) {
   if (x < 1 || x > Field::WIDTH) return false;
   for (int y = 1; y <= Field::HEIGHT; ++y) {
     if (field->Get(x, y) == EMPTY) {
@@ -179,7 +179,7 @@ bool Put(Field* field, int x, char color, int* result_x = NULL, int* result_y = 
 }
 
 bool Put(
-    Field* field, const Decision& decision, const pair<char, char>& puyos,
+    FieldWithColorSequence* field, const Decision& decision, const pair<char, char>& puyos,
     int* first_x = NULL, int* first_y = NULL, int* second_x = NULL, int* second_y = NULL) {
   if (!CanPut(*field, decision.x)) return false;
   switch (decision.r) {
@@ -206,7 +206,7 @@ bool Put(
   return true;
 }
 
-bool Dream(Field* field, int x, int y, char color) {
+bool Dream(FieldWithColorSequence* field, int x, int y, char color) {
   if (field->Get(x, y) == EMPTY && CanPut(*field, x)) {
     field->Set(x, y, color);
     return true;
@@ -215,7 +215,7 @@ bool Dream(Field* field, int x, int y, char color) {
   }
 }
 
-bool Dream(Field* field, const Point& point, char color) {
+bool Dream(FieldWithColorSequence* field, const Point& point, char color) {
   return Dream(field, point.x, point.y, color);
 }
 
@@ -259,7 +259,7 @@ void Chunk::Dream(char* next_color) {
   }
 }
 
-string FieldToStr(const Field& field) {
+string FieldToStr(const FieldWithColorSequence& field) {
   string str;
   for (int y = Field::HEIGHT; y >= 1; --y) {
     for (int x = 1; x <= Field::WIDTH; ++x) {
@@ -282,7 +282,7 @@ bool IsNormalColor(char color) {
 }
 
 bool CreateKagiChunk(
-    const Field& field,
+    const FieldWithColorSequence& field,
     const Point& bottom,
     const Point& prev_remain,
     bool force_second_remain,
@@ -326,7 +326,7 @@ bool CreateKagiChunk(
 }
 
 void Dream(
-    Field* field, Point* fire_point, char* fire_color, vector<Chunk>* chunks, bool debug = false) {
+    FieldWithColorSequence* field, Point* fire_point, char* fire_color, vector<Chunk>* chunks, bool debug = false) {
   chunks->clear();
   
   Point prev_remain(6, 5);
@@ -401,8 +401,8 @@ void Dream(
   
 }
 
-int GetMaxChainLen(const Field& work_field, int* num_valuable_puyos, bool debug = false) {
-  Field dream_field = work_field;
+int GetMaxChainLen(const FieldWithColorSequence& work_field, int* num_valuable_puyos, bool debug = false) {
+  FieldWithColorSequence dream_field = work_field;
   Point fire_point;
   char fire_color = 0;
   vector<Chunk> chunks;
@@ -432,7 +432,7 @@ int GetMaxChainLen(const Field& work_field, int* num_valuable_puyos, bool debug 
   return chains;
 }
 
-int GarbagePenalty(const Field& field) {
+int GarbagePenalty(const FieldWithColorSequence& field) {
   int penalty = 0;
   for (int x = 1; x <= 6; ++x) {
     for (int y = 5; y <= Field::HEIGHT; ++y) {
@@ -444,7 +444,7 @@ int GarbagePenalty(const Field& field) {
   return penalty;
 }
 
-void DropOjamas(Field* field, int num_ojamas) {
+void DropOjamas(FieldWithColorSequence* field, int num_ojamas) {
   int lines = (num_ojamas + 3) / 6;
   for (int x = 1; x <= Field::WIDTH; ++x) {
     int bottom = 1;
@@ -459,7 +459,7 @@ void DropOjamas(Field* field, int num_ojamas) {
 }
 
 
-int GetDreamHappiness(const Field& field, bool debug = false) {
+int GetDreamHappiness(const FieldWithColorSequence& field, bool debug = false) {
   int num_valuable_puyos = 0;
   int max_chain_len = GetMaxChainLen(field, &num_valuable_puyos, debug);
   return max_chain_len * 1000000 +
@@ -468,7 +468,7 @@ int GetDreamHappiness(const Field& field, bool debug = false) {
 }
 
 int GetHappiness(
-    const Field& field,
+    const FieldWithColorSequence& field,
     const vector<pair<char, char> >& puyos_list,
     const vector<Decision>& decisions,
     const vector<int>& num_ojamas_list,
@@ -478,7 +478,7 @@ int GetHappiness(
   assert(num_ojamas_list.size() >= decisions.size());
   
   int max_chains = 0;
-  Field work_field = field;
+  FieldWithColorSequence work_field = field;
   int step = 0;
   for (; step < int(decisions.size()); ++step) {
     if (!Put(&work_field, decisions[step], puyos_list[step])) break;
@@ -538,7 +538,7 @@ void EvaluateDecisions(
 void Act(
     const Input& input, int pending_ojamas, int ready_ojamas,
     Decision* decision, ostream& log) {
-  const Field& field = input.my_field;
+  const FieldWithColorSequence& field = input.my_field;
   vector<pair<char, char> > puyos_list;
   for (int i = 0; i < 3; ++i) {
     puyos_list.push_back(make_pair(field.GetNextPuyo(2 * i), field.GetNextPuyo(2 * i + 1)));
@@ -572,7 +572,7 @@ void Act(
   if (!max_decisions.empty()) {
     assert(max_decisions.size() >= 1);
     assert(puyos_list.size() >= max_decisions.size());
-    Field new_field = field;
+    FieldWithColorSequence new_field = field;
     for (int i = 0; i < int(max_decisions.size()); ++i) {
       Put(&new_field, max_decisions[i], puyos_list[i]);
     }
@@ -609,7 +609,7 @@ int ready_ojamas = 0;
 
 void GetDecision(const Input& input, Decision* decision, ostream& log) {
   if (input.state.other_grounded) {
-    Field work_field = input.other_field;
+    FieldWithColorSequence work_field = input.other_field;
     int chains, score, frames;
     work_field.ForceDrop();
     work_field.Simulate(&chains, &score, &frames);
@@ -677,7 +677,7 @@ void GetDecision(const Input& input, Decision* decision, ostream& log) {
 }
 
 void TestHappiness(const string& field_str) {
-  Field field(field_str);
+  FieldWithColorSequence field(field_str);
   GetDreamHappiness(field, true);
   cout << "------------------" << endl;
 }
@@ -699,7 +699,7 @@ int main(int argc, char* argv[]) {
     TestHappiness("7000007000065047045");
     TestHappiness("5047665");
     TestHappiness("100000100000100000100000100000100000100000100000600000400000600000650");
-    Field field("50000050000040000040000040");
+    FieldWithColorSequence field("50000050000040000040000040");
     
     assert(CanPut(field, Point(3, 5), Decision(1, 0)));
     assert(CanPut(field, Point(3, 5), Decision(3, 0)));
@@ -714,13 +714,13 @@ int main(int argc, char* argv[]) {
     FLAGS_goal_chain_len = 9;
     FLAGS_hate_small_chain = false;
     int happiness1 = GetDreamHappiness(
-        Field("400000700000600005760504760505746745456774445645556745"), true);
+        FieldWithColorSequence("400000700000600005760504760505746745456774445645556745"), true);
     int happiness2 = GetDreamHappiness(
-        Field("400000700000650000765000765400746745456774445645556745"), true);
+        FieldWithColorSequence("400000700000650000765000765400746745456774445645556745"), true);
     assert(happiness2 > happiness1);
     
   } else if (arg == "exp") {
-    Field field("400000000000");
+    FieldWithColorSequence field("400000000000");
     cout << field.GetDebugOutput() << endl;
     field.ForceDrop();
     cout << field.GetDebugOutput() << endl;

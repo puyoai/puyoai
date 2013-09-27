@@ -19,12 +19,6 @@ class Field : public BasicField {
   Field(const std::string& url);
   Field(const Field& f);
 
-  // Sets Haipuyo.
-  void SetColorSequence(const std::string& sequence);
-  // Gets Haipuyo.
-  std::string GetColorSequence() const;
-  char GetNextPuyo(int n) const;
-
   // Put a puyo at a specified position.
   void Set(int x, int y, char color);
 
@@ -64,14 +58,38 @@ class Field : public BasicField {
   // After Vanish(): Lowest position a puyo vanished.
   // After Drop(): Lowest position where we should start vanishment-check.
   int min_heights[MAP_WIDTH];
-  int next_puyo_;
 
  private:
   void FillFieldInfo(std::stringstream& ss) const;
   void Drop(int* frames);
 
   bool erased_;
+  friend class FieldRealtime;
+};
+
+class FieldWithColorSequence : public Field {
+public:
+  FieldWithColorSequence() : Field(), next_puyo_(0) {}
+  FieldWithColorSequence(const std::string& s) : Field(s), next_puyo_(0) {}
+  FieldWithColorSequence(const FieldWithColorSequence& f) :
+      Field(f),
+      next_puyo_(0) {
+    color_sequence_ = f.color_sequence_;
+  }
+
+  // Sets Haipuyo.
+  void SetColorSequence(const std::string& sequence);
+  // Gets Haipuyo.
+  std::string GetColorSequence() const;
+  // TODO: It's weird to return char.
+  char GetNextPuyo(int n) const;
+
+  // Normal print for debugging purpose.
+  std::string GetDebugOutput() const;
+
+private:
   std::string color_sequence_;
+  int next_puyo_;
 
   friend class FieldRealtime;
 };

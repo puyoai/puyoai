@@ -16,7 +16,7 @@ public:
     int y;
     int r;
     // Field information.
-    Field field;
+    FieldWithColorSequence field;
     // block of flags. Use some functions defined below. The flags are defined
     // in core/state.h.
     int state;
