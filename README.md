@@ -5,7 +5,11 @@ puyoai
 
 ### ビルド方法
 
-    $ cmake .
+* トップレベルで cmake するより、適当なディレクトリを掘ってから build することをオススメします。
+
+    $ mkdir build
+    $ cd build
+    $ cmake .. 
     $ make
 
 * gflags と glog が cmake に発見されなかった場合、それらのライブラリはダミーのものが使われます。
