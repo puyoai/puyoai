@@ -31,7 +31,7 @@ endfunction()
 
 function(capture_add_test exe)
   capture_add_executable(${exe})
-  target_link_libraries(${exe} ${GTEST_LIBRARIES})
+  target_link_libraries(${exe} gtest gtest_main)
   add_test(check-${exe} ${exe})
 endfunction()
 
@@ -43,7 +43,7 @@ if(V4L2_LIBRARY)
   capture_add_executable(parse_viddev)
 endif()
 
-if(GTEST_FOUND)
-  include_directories(${GTEST_INCLUDE_DIRS})
-  capture_add_test(capture_test)
-endif()
+include_directories(${gtest_SOURCE_DIR}/include
+                    ${gtest_SOURCE_DIR})
+capture_add_test(capture_test)
+

@@ -14,7 +14,7 @@ endfunction()
 
 function(peria_add_test exe)
   peria_add_executable(${exe} ${exe}.cc)
-  cpu_target_link_libraries(${exe} ${GTEST_BOTH_LIBRARIES})
+  cpu_target_link_libraries(${exe} gtest gtest_main)
   if(NOT ARGV1)
     cpu_add_test(${exe})
   endif()
@@ -22,10 +22,9 @@ endfunction()
 
 peria_add_executable(peria main.cc)
 
-if(GTEST_FOUND)
-  include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(${gtest_SOURCE_DIR}/include
+                    ${gtest_SOURCE_DIR})
+# TODO(peria): add tests if needed
+peria_add_test(field_test)
+peria_add_test(player_test)
 
-  # TODO(peria): add tests if needed
-  peria_add_test(field_test)
-  peria_add_test(player_test)
-endif()

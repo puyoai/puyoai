@@ -24,20 +24,19 @@ endif()
 
 function(puyoai_duel_add_test target)
   add_executable(${target}_test ${target}_test.cc)
-  target_link_libraries(${target}_test ${GTEST_BOTH_LIBRARIES})
+  target_link_libraries(${target}_test gtest gtest_main)
   target_link_libraries(${target}_test puyoai_duel)
   target_link_libraries(${target}_test puyoai_core)
   puyoai_target_link_libraries(${target}_test)
   add_test(check-${target}_test ${target}_test)
 endfunction()
 
-if(GTEST_FOUND)
-  include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(${gtest_SOURCE_DIR}/include
+                    ${gtest_SOURCE_DIR})
+puyoai_duel_add_test(field_realtime)
 
-  puyoai_duel_add_test(field_realtime)
-
-  if (USE_SDL)
-    puyoai_duel_add_test(commentator)
-    target_link_libraries(commentator_test ${SDL_LIBRARY} ${SDLTTF_LIBRARY})
-  endif()
+if (USE_SDL)
+  puyoai_duel_add_test(commentator)
+  target_link_libraries(commentator_test ${SDL_LIBRARY} ${SDLTTF_LIBRARY})
 endif()
+
