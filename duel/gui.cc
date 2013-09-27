@@ -118,7 +118,7 @@ public:
         r.w = PUYO_W;
         r.h = PUYO_H;
 
-        char color = field.Get(x, y);
+        char color = field.field().Get(x, y);
         if (field.IsInUserState()) {
           if (x == x1 && y == y1) {
             color = c1;
@@ -151,7 +151,7 @@ public:
       r.y = (pos_y + + 3 + (i - 2) + ((i - 2) / 2)) * PUYO_H;
       r.w = PUYO_W;
       r.h = PUYO_H;
-      Uint32 c = GetPuyoColor(field.GetNextPuyo(i));
+      Uint32 c = GetPuyoColor(field.field().GetNextPuyo(i));
       SDL_FillRect(scr_->off(), &r, c);
     }
 
