@@ -17,16 +17,6 @@ using namespace std;
 // anymore.
 static const int MASK_CHECKED = 0x80;
 
-char Field::GetNextPuyo(int n) const {
-  assert(!color_sequence_.empty());
-  int len = color_sequence_.length();
-  if (len == 0) {
-    LOG(FATAL) << "You must call Field::SetColorSequence() before calling"
-               << "Field::FindAvailablePlansInternal()";
-  }
-  return color_sequence_[(next_puyo_ + n) % len];
-}
-
 void Field::Init() {
   // Initialize state.
   erased_ = false;
@@ -93,24 +83,7 @@ Field::Field(const Field& f) {
   for (int i = 0; i < MAP_WIDTH; i++) {
     min_heights[i] = f.min_heights[i];
   }
-  color_sequence_ = f.color_sequence_;
   erased_ = f.erased_;
-}
-
-void Field::SetColorSequence(const string& sequence) {
-  color_sequence_ = sequence;
-  for (int i = 0; i < int(color_sequence_.size()); i++) {
-    color_sequence_[i] -= '0';
-  }
-  next_puyo_ = 0;
-}
-
-std::string Field::GetColorSequence() const {
-  string sequence = color_sequence_;
-  for (int i = 0; i < int(sequence.size()); i++) {
-    sequence[i] += '0';
-  }
-  return sequence;
 }
 
 void Field::Set(int x, int y, char color) {
@@ -356,10 +329,43 @@ std::string Field::GetDebugOutput() const {
     s << min_heights[x] << " ";
   }
   s << std::endl;
+  return s.str();
+}
+
+void FieldWithColorSequence::SetColorSequence(const string& sequence) {
+  color_sequence_ = sequence;
+  for (int i = 0; i < int(color_sequence_.size()); i++) {
+    color_sequence_[i] -= '0';
+  }
+  next_puyo_ = 0;
+}
+
+std::string FieldWithColorSequence::GetColorSequence() const {
+  string sequence = color_sequence_;
+  for (int i = 0; i < int(sequence.size()); i++) {
+    sequence[i] += '0';
+  }
+  return sequence;
+}
+
+char FieldWithColorSequence::GetNextPuyo(int n) const {
+  assert(!color_sequence_.empty());
+  int len = color_sequence_.length();
+  if (len == 0) {
+    LOG(FATAL) << "You must call Field::SetColorSequence() before calling"
+               << "Field::FindAvailablePlansInternal()";
+  }
+  return color_sequence_[(next_puyo_ + n) % len];
+}
+
+string FieldWithColorSequence::GetDebugOutput() const {
+  std::ostringstream s;
+
   s << "YOKOKU=";
   for (int i = 0; i < (int)color_sequence_.size(); i++) {
     s << (char)('0' + color_sequence_[i]);
   }
   s << std::endl;
-  return s.str();
+
+  return Field::GetDebugOutput() + s.str();
 }

@@ -16,7 +16,7 @@ class Plan {
   // Decision made for this plan.
   Decision decision;
   // Future field state (apply the state to the previous state).
-  Field field;
+  FieldWithColorSequence field;
   // Score we get with the future field.
   int score;
   // The number of Ojama puyos in Yokoku puyo.
@@ -34,7 +34,7 @@ inline int Plan::numTurns() const {
 }
 
 inline void FindAvailablePlansInternal(
-    const Field& field, const Plan* parent, int depth, int max_depth,
+    const FieldWithColorSequence& field, const Plan* parent, int depth, int max_depth,
     std::vector<Plan>* plans) {
 
   static const Decision decisions[] = {
@@ -85,7 +85,7 @@ inline void FindAvailablePlansInternal(
       continue;
     }
 
-    Field next_field(field);
+    FieldWithColorSequence next_field(field);
 
     int x1 = decision.x;
     int x2 = decision.x + (decision.r == 1) - (decision.r == 3);
@@ -123,13 +123,13 @@ inline void FindAvailablePlansInternal(
   }
 }
 
-inline void FindAvailablePlans(const Field& field, int depth, std::vector<Plan>* plans) {
+inline void FindAvailablePlans(const FieldWithColorSequence& field, int depth, std::vector<Plan>* plans) {
   plans->clear();
   plans->reserve(22 + 22*22 + 22*22*22);
   FindAvailablePlansInternal(field, NULL, 0, depth, plans);
 }
 
-inline void FindAvailablePlans(const Field& field, std::vector<Plan>* plans) {
+inline void FindAvailablePlans(const FieldWithColorSequence& field, std::vector<Plan>* plans) {
   FindAvailablePlans(field, 3, plans);
 }
 

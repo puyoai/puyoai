@@ -69,14 +69,14 @@ void Cpu::ReceiveCurrentStatus(Data* data) const {
       string yf;
       istr >> yf;
       string yokoku = data->player[0].field.GetColorSequence();
-      data->player[0].field = Field(yf);
+      data->player[0].field = FieldWithColorSequence(yf);
       data->player[0].field.SetColorSequence(yokoku);
     } else if (tmp.substr(0, 3) == "OF=") {
       istringstream istr(tmp.c_str() + 3);
       string of;
       istr >> of;
       string yokoku = data->player[1].field.GetColorSequence();
-      data->player[1].field = Field(of);
+      data->player[1].field = FieldWithColorSequence(of);
       data->player[1].field.SetColorSequence(yokoku);
     } else if (tmp.substr(0, 6) == "STATE=") {
       istringstream istr(tmp.c_str() + 6);

@@ -7,13 +7,13 @@
 #include <utility>
 #include <vector>
 
-class Field;
+class FieldWithColorSequence;
 
 using namespace std;
 
 class PuyoFu {
  public:
-  void setField(int pi, const Field& f, int state, int time);
+  void setField(int pi, const FieldWithColorSequence& f, int state, int time);
 
   void emitFieldTransitionLog(FILE* fp, int pi) const;
 
@@ -22,7 +22,7 @@ class PuyoFu {
  private:
   struct Move {
     int pi;
-    auto_ptr<Field> f;
+    auto_ptr<FieldWithColorSequence> f;
     char next[7];
     int time;
   };
