@@ -367,7 +367,7 @@ void Capture::maybeUpdateComment() {
       continue;
     }
 
-    Field f;
+    FieldWithColorSequence f;
     for (int x = 0; x < 6; x++) {
       for (int y = 11; y >= 0; y--) {
         char c = ai_puyo_[pi][x][y];

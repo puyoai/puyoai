@@ -254,7 +254,7 @@ void constructChainSearchPattern(vector<vector<vector<char> > >* csp_out) {
 
 class Commentator::Chain {
 public:
-  Chain(const Field& f, const Plan* p)
+  Chain(const FieldWithColorSequence& f, const Plan* p)
     : orig_field_(f),
       num_chains_(0),
       score_(p->score),
@@ -459,10 +459,10 @@ void Commentator::run() {
 
     Uint32 comment_start_ticks = SDL_GetTicks();
 
-    auto_ptr<Field> f;
+    auto_ptr<FieldWithColorSequence> f;
     {
       MutexLock lock(mu_);
-      f.reset(new Field(fields_[pi]));
+      f.reset(new FieldWithColorSequence(fields_[pi]));
       f->SetColorSequence(fields_[pi].GetColorSequence());
     }
 
@@ -680,7 +680,7 @@ void Commentator::run() {
   }
 }
 
-void Commentator::setField(int pi, const Field& f, bool grounded) {
+void Commentator::setField(int pi, const FieldWithColorSequence& f, bool grounded) {
   MutexLock lock(mu_);
   fields_[pi] = f;
   fields_[pi].SetColorSequence(f.GetColorSequence());
@@ -756,14 +756,14 @@ void Commentator::setAIMessage(int pi, const string& msg) {
   ai_msg_[pi] = msg;
 }
 
-void Commentator::getPotentialMaxChain(const Field& orig_field,
+void Commentator::getPotentialMaxChain(const FieldWithColorSequence& orig_field,
                                        int d,
                                        int depth,
                                        vector<vector<char> >* csp,
                                        int* heights,
                                        float* best_score,
                                        vector<vector<char> >* best_csp) {
-  auto_ptr<Field> f(new Field(orig_field));
+  auto_ptr<FieldWithColorSequence> f(new FieldWithColorSequence(orig_field));
   for (int i = 0; i < 30; i++) {
     // 5 because we considers arbitrary puyo.
     char c = i % 5;
@@ -783,7 +783,7 @@ void Commentator::getPotentialMaxChain(const Field& orig_field,
         *best_score = score;
         *best_csp = *csp;
       }
-      f.reset(new Field(orig_field));
+      f.reset(new FieldWithColorSequence(orig_field));
     } else if (d + 1 < depth) {
       heights[x]++;
       getPotentialMaxChain(*f, d + 1, depth, csp, heights,

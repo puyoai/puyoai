@@ -18,7 +18,7 @@ public:
   ~Commentator();
 
   void run();
-  void setField(int pi, const Field& f, bool grounded);
+  void setField(int pi, const FieldWithColorSequence& f, bool grounded);
   void setAIMessage(int pi, const string& msg);
 
   void draw(Screen* scr) const;
@@ -33,7 +33,7 @@ public:
 private:
   class Chain;
 
-  static void getPotentialMaxChain(const Field& orig_field,
+  static void getPotentialMaxChain(const FieldWithColorSequence& orig_field,
                                    int d,
                                    int depth,
                                    vector<vector<char> >* csp,
@@ -41,7 +41,7 @@ private:
                                    float* best_score,
                                    vector<vector<char> >* best_csp);
 
-  Field fields_[2];
+  FieldWithColorSequence fields_[2];
   string ai_msg_[2];
   SDL_Thread* th_;
   mutable SDL_mutex* mu_;
