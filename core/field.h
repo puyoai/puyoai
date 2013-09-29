@@ -13,7 +13,6 @@ class Plan;
 class Field : public BasicField {
  public:
   static const int ERASE_NUM = 4;
-  static const int COLORS = 8;
 
   Field();
   Field(const std::string& url);
