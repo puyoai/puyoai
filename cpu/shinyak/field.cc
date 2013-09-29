@@ -366,7 +366,7 @@ bool Field::vanish(int nthChain, int* score, int minHeights[], Strategy& strateg
     Position eraseQueue[WIDTH * HEIGHT]; // All the positions of erased puyos will be stored here.
     Position* eraseQueueHead = eraseQueue;
 
-    bool usedColors[COLORS + 1] = { 0 };
+    bool usedColors[PUYO_COLORS + 1] = { 0 };
     int numUsedColors = 0;
     int longBonusCoef = 0;
 
@@ -384,7 +384,7 @@ bool Field::vanish(int nthChain, int* score, int minHeights[], Strategy& strateg
             Position* head = fillSameColorPosition(x, y, c, eraseQueueHead, checked);
 
             int connectedPuyoNum = head - eraseQueueHead;
-            if (connectedPuyoNum < ERASE_NUM)
+            if (connectedPuyoNum < PUYO_ERASE_NUM)
                 continue;
 
             eraseQueueHead = head;
