@@ -126,7 +126,7 @@ bool Field::Vanish(int chains, int* score) {
   int* write_head = erase_field;
   int* prev_head = erase_field;
 
-  int used_colors[COLORS + 1] = {0};
+  int used_colors[PUYO_COLORS + 1] = {0};
   int num_colors = 0;
   int bonus = 0;
 
@@ -165,7 +165,7 @@ bool Field::Vanish(int chains, int* score) {
         bonus += getLongBonus((read_head - prev_head) >> 1);
         // Some AI uses colors >=COLORS for simulation.
         // Such colors are ignored in used_colors.
-        if (color < COLORS && !used_colors[(int)color]) {
+        if (color < PUYO_COLORS && !used_colors[(int)color]) {
           num_colors++;
           used_colors[(int)color] = 1;
         }

@@ -13,6 +13,8 @@ enum PuyoColor {
   GREEN = 7,
 };
 
+const int PUYO_COLORS = 8;
+
 typedef unsigned char Puyo;
 
 // For backward compatibility
