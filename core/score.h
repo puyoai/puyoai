@@ -31,5 +31,15 @@ inline int longBonus(int numPuyos)
     return LONG_BONUS[numPuyos];
 }
 
+inline int calculateRensaBonusCoef(int chainBonusCoef, int longBonusCoef, int colorBonusCoef)
+{
+    int coef = chainBonusCoef + longBonusCoef + colorBonusCoef;
+    if (coef == 0)
+        return 1;
+    if (coef > 999)
+        return 999;
+    return coef;
+}
+
 #endif  // __CORE_SCORE_H_
 
