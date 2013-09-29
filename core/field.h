@@ -52,16 +52,16 @@ class Field : public BasicField {
   // drop.
   void Drop();
 
+ private:
+  void FillFieldInfo(std::stringstream& ss) const;
+  void Drop(int* frames);
+
   // Puyo at field[x][y] will not fall or will not be vanished iff
   // y>min_heights[x].
   //
   // After Vanish(): Lowest position a puyo vanished.
   // After Drop(): Lowest position where we should start vanishment-check.
   int min_heights[MAP_WIDTH];
-
- private:
-  void FillFieldInfo(std::stringstream& ss) const;
-  void Drop(int* frames);
 
   bool erased_;
   friend class FieldRealtime;
