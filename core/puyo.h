@@ -14,6 +14,7 @@ enum PuyoColor {
 };
 
 const int PUYO_COLORS = 8;
+const int PUYO_ERASE_NUM = 4;
 
 typedef unsigned char Puyo;
 
