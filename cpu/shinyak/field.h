@@ -24,8 +24,6 @@ public:
     static const int HEIGHT = 12;
     static const int MAP_WIDTH = 1 + WIDTH + 1;
     static const int MAP_HEIGHT = 1 + HEIGHT + 3;
-    static const int ERASE_NUM = 4;
-    static const int COLORS = 8;
 
     Field();
     Field(const std::string& url);    
