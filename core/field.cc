@@ -159,7 +159,7 @@ bool Field::Vanish(int chains, int* score) {
         check_cell(color, field_, min_heights, &write_head, x, y + 1);
         check_cell(color, field_, min_heights, &write_head, x, y - 1);
       }
-      if (read_head - prev_head < ERASE_NUM * 2) {
+      if (read_head - prev_head < PUYO_ERASE_NUM * 2) {
         read_head = write_head = prev_head;
       } else {
         bonus += getLongBonus((read_head - prev_head) >> 1);
