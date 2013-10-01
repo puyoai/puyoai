@@ -21,7 +21,6 @@ typedef unsigned char Puyo;
 // For backward compatibility
 typedef PuyoColor Colors;
 
-
 const int NUM_NORMAL_PUYO_COLORS = 4;
 
 inline PuyoColor normalPuyoColorOf(int index)
