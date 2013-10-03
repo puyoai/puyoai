@@ -346,36 +346,29 @@ int BasicField::dropAfterVanish(int minHeights[], Tracker& tracker)
 
 void BasicField::simulate(BasicRensaResult& rensaResult, int additionalChain)
 {
-    rensaResult.chains = 1 + additionalChain;
-    rensaResult.score = 0;
-    rensaResult.frames = 0;
-
     RensaNonTracker tracker;
-    simulateWithTracker(rensaResult, tracker);
+    rensaResult = simulateWithTracker(1 + additionalChain, tracker);
 }
 
 void BasicField::simulateAndTrack(BasicRensaResult& rensaResult, RensaTrackResult& trackResult, int additionalChain)
 {
-    rensaResult.chains = 1 + additionalChain;
-    rensaResult.score = 0;
-    rensaResult.frames = 0;
-
     RensaTracker tracker(&trackResult);
-    simulateWithTracker(rensaResult, tracker);
+    rensaResult = simulateWithTracker(1 + additionalChain, tracker);
 }
 
 template<typename Tracker>
-inline void BasicField::simulateWithTracker(BasicRensaResult& rensaResult, Tracker& tracker)
+inline BasicRensaResult BasicField::simulateWithTracker(int initialChains, Tracker& tracker)
 {
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
+    int chains = initialChains, score = 0, frames = 0;
 
-    while (vanish(rensaResult.chains, &rensaResult.score, minHeights, tracker)) {
-        rensaResult.frames += dropAfterVanish(minHeights, tracker);
-        rensaResult.frames += FRAMES_AFTER_VANISH;
-        rensaResult.chains += 1;
+    while (vanish(chains, &score, minHeights, tracker)) {
+        frames += dropAfterVanish(minHeights, tracker);
+        frames += FRAMES_AFTER_VANISH;
+        chains += 1;
     }
 
-    rensaResult.chains -= 1;
+    return BasicRensaResult(chains - 1, score, frames);
 }
 
 std::string BasicField::debugOutput() const

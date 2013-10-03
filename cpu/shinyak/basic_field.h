@@ -65,9 +65,9 @@ protected:
             m_heights[x] = y;
     }    
 
-    // Simulates chains. Returns chains, score, and frames before finishing the chain.
+    // Simulates chains. Returns BasicRensaResult.
     template<typename Tracker>
-    void simulateWithTracker(BasicRensaResult&, Tracker&);
+    BasicRensaResult simulateWithTracker(int initialChains, Tracker&);
 
     // Vanishes puyos., and adds score. The argument "chains" is used to calculate score.
     template<typename Tracker>
