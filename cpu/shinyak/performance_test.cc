@@ -55,7 +55,7 @@ TEST(PerformanceTest, Simulate_Filled_Track)
         Tsc tsc("Simulate_Filled_Track");
 
         RensaTrackResult trackResult;
-        f.simulateAndTrack(trackResult);
+        f.simulateAndTrack(&trackResult);
     }
     double average, variance;
     Tsc::GetStatistics("Simulate_Filled_Track", &average, &variance);

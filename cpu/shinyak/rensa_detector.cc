@@ -50,7 +50,7 @@ static inline void simulateInternal(Field& f, PossibleRensaInfo& info, int addit
 
 static inline void simulateInternal(Field& f, TrackedPossibleRensaInfo& info, int additionalChains)
 {
-    info.rensaInfo = f.simulateAndTrack(info.trackResult, 1 + additionalChains);
+    info.rensaInfo = f.simulateAndTrack(&info.trackResult, 1 + additionalChains);
 }
 
 template<typename T, typename AfterSimulationCallback>
@@ -243,7 +243,7 @@ void RensaDetector::findPossibleRensasUsingIteration(vector<vector<TrackedPossib
             TrackedPossibleRensaInfo info;
             info.necessaryPuyoSet.add(puyoSet);
             info.necessaryPuyoSet.add(initialColor, 1);
-            info.rensaInfo = f.simulateAndTrack(info.trackResult);
+            info.rensaInfo = f.simulateAndTrack(&info.trackResult);
 
             DCHECK(necessaryRensaPuyos.size() >= 1);
             result[necessaryRensaPuyos.size() - 1].push_back(info);

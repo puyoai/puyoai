@@ -350,9 +350,10 @@ BasicRensaResult BasicField::simulate(int initialChain)
     return simulateWithTracker(initialChain, tracker);
 }
 
-BasicRensaResult BasicField::simulateAndTrack(RensaTrackResult& trackResult, int initialChain)
+BasicRensaResult BasicField::simulateAndTrack(RensaTrackResult* trackResult, int initialChain)
 {
-    RensaTracker tracker(&trackResult);
+    DCHECK(trackResult);
+    RensaTracker tracker(trackResult);
     return simulateWithTracker(initialChain, tracker);
 }
 
