@@ -15,10 +15,6 @@ public:
         return m_field[x] & (1 << y);
     }
 
-    bool operator()(int x, int y) const {
-        return get(x, y);
-    }
-
     void set(int x, int y) {
         m_field[x] |= (1 << y);
     }

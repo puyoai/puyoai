@@ -44,8 +44,8 @@ public:
     // Drops all puyos if some puyos are in the air.
     void forceDrop();
 
-    BasicRensaResult simulate(int initialChains = 1);
-    BasicRensaResult simulateAndTrack(RensaTrackResult& trackResult, int initialChains = 1);
+    BasicRensaResult simulate(int initialChain = 1);
+    BasicRensaResult simulateAndTrack(RensaTrackResult& trackResult, int initialChain = 1);
     
     // Normal print for debugging purpose.
     std::string debugOutput() const;
@@ -67,7 +67,7 @@ protected:
 
     // Simulates chains. Returns BasicRensaResult.
     template<typename Tracker>
-    BasicRensaResult simulateWithTracker(int initialChains, Tracker&);
+    BasicRensaResult simulateWithTracker(int initialChain, Tracker&);
 
     // Vanishes puyos., and adds score. The argument "chains" is used to calculate score.
     template<typename Tracker>
@@ -79,7 +79,7 @@ protected:
 
     Position* checkCell(PuyoColor, FieldBitField& checked, Position* writeHead, int x, int y) const;
 
-    Position* fillSameColorPosition(int x, int y, PuyoColor, Position* positionQueueHead, FieldBitField& checked) const;
+    Position* fillSameColorPosition(int x, int y, PuyoColor, Position* positionQueueHead, FieldBitField* checked) const;
 
     Puyo m_field[MAP_WIDTH][MAP_HEIGHT];
     byte m_heights[MAP_WIDTH];

@@ -187,7 +187,7 @@ void BasicField::dropPuyoOn(int x, PuyoColor c)
 
 inline Position* BasicField::checkCell(PuyoColor c, FieldBitField& checked, Position* writeHead, int x, int y) const
 {
-    if (checked(x, y))
+    if (checked.get(x, y))
         return writeHead;
 
     if (y <= HEIGHT && c == color(x, y)) {
@@ -201,23 +201,23 @@ inline Position* BasicField::checkCell(PuyoColor c, FieldBitField& checked, Posi
     return writeHead;
 }
 
-Position* BasicField::fillSameColorPosition(int x, int y, PuyoColor color, Position* positionQueueHead, FieldBitField& checked) const
+Position* BasicField::fillSameColorPosition(int x, int y, PuyoColor color, Position* positionQueueHead, FieldBitField* checked) const
 {
-    DCHECK(!checked(x, y));
+    DCHECK(!checked->get(x, y));
 
     Position* writeHead = positionQueueHead;
     Position* readHead = positionQueueHead;
 
     *writeHead++ = Position(x, y);
-    checked.set(x, y);
+    checked->set(x, y);
     
     while (readHead != writeHead) {
         Position p = *readHead++;
         
-        writeHead = checkCell(color, checked, writeHead, p.x + 1, p.y);
-        writeHead = checkCell(color, checked, writeHead, p.x - 1, p.y);
-        writeHead = checkCell(color, checked, writeHead, p.x, p.y + 1);
-        writeHead = checkCell(color, checked, writeHead, p.x, p.y - 1);
+        writeHead = checkCell(color, *checked, writeHead, p.x + 1, p.y);
+        writeHead = checkCell(color, *checked, writeHead, p.x - 1, p.y);
+        writeHead = checkCell(color, *checked, writeHead, p.x, p.y + 1);
+        writeHead = checkCell(color, *checked, writeHead, p.x, p.y - 1);
     }
 
     return writeHead;
@@ -241,11 +241,11 @@ bool BasicField::vanish(int nthChain, int* score, int minHeights[], Tracker& tra
                 << x << ' ' << y << ' ' << color(x, y) << '\n'
                 << debugOutput();
 
-            if (checked(x, y) || color(x, y) == OJAMA)
+            if (checked.get(x, y) || color(x, y) == OJAMA)
                 continue;
 
             PuyoColor c = color(x, y);
-            Position* head = fillSameColorPosition(x, y, c, eraseQueueHead, checked);
+            Position* head = fillSameColorPosition(x, y, c, eraseQueueHead, &checked);
 
             int connectedPuyoNum = head - eraseQueueHead;
             if (connectedPuyoNum < PUYO_ERASE_NUM)
@@ -344,23 +344,23 @@ int BasicField::dropAfterVanish(int minHeights[], Tracker& tracker)
         return FRAMES_DROP_1_LINE * maxDrops + FRAMES_AFTER_DROP;
 }
 
-BasicRensaResult BasicField::simulate(int initialChains)
+BasicRensaResult BasicField::simulate(int initialChain)
 {
     RensaNonTracker tracker;
-    return simulateWithTracker(initialChains, tracker);
+    return simulateWithTracker(initialChain, tracker);
 }
 
-BasicRensaResult BasicField::simulateAndTrack(RensaTrackResult& trackResult, int initialChains)
+BasicRensaResult BasicField::simulateAndTrack(RensaTrackResult& trackResult, int initialChain)
 {
     RensaTracker tracker(&trackResult);
-    return simulateWithTracker(initialChains, tracker);
+    return simulateWithTracker(initialChain, tracker);
 }
 
 template<typename Tracker>
-inline BasicRensaResult BasicField::simulateWithTracker(int initialChains, Tracker& tracker)
+inline BasicRensaResult BasicField::simulateWithTracker(int initialChain, Tracker& tracker)
 {
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
-    int chains = initialChains, score = 0, frames = 0;
+    int chains = initialChain, score = 0, frames = 0;
 
     while (vanish(chains, &score, minHeights, tracker)) {
         frames += dropAfterVanish(minHeights, tracker);

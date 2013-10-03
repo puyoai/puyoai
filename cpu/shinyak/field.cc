@@ -34,7 +34,7 @@ int Field::connectedPuyoNums(int x, int y, FieldBitField& checked) const
 {
     Position positions[WIDTH * HEIGHT];
 
-    Position* filledHead = fillSameColorPosition(x, y, color(x, y), positions, checked);
+    Position* filledHead = fillSameColorPosition(x, y, color(x, y), positions, &checked);
     return filledHead - positions;    
 }
 
@@ -51,19 +51,19 @@ pair<int, int> Field::connectedPuyoNumsWithAllowingOnePointJump(int x, int y, Fi
     int additional = 0;
 
     PuyoColor c = color(x, y);
-    Position* end = fillSameColorPosition(x, y, c, positions, checked);
+    Position* end = fillSameColorPosition(x, y, c, positions, &checked);
     Position* current = end;
 
     for (Position* p = positions; p != end; ++p) {
-        if (1 <= p->x - 2 && color(p->x - 1, p->y) == EMPTY && color(p->x - 2, p->y) == c && !checked(p->x - 2, p->y)) {
-            Position* newCurrent = fillSameColorPosition(p->x - 2, p->y, c, current, checked);
+        if (1 <= p->x - 2 && color(p->x - 1, p->y) == EMPTY && color(p->x - 2, p->y) == c && !checked.get(p->x - 2, p->y)) {
+            Position* newCurrent = fillSameColorPosition(p->x - 2, p->y, c, current, &checked);
             if (newCurrent != current) {
                 additional += 1;
                 current = newCurrent;
             }
         }
-        if (p->x + 2 <= Field::WIDTH && color(p->x + 1, p->y) == EMPTY && color(p->x + 2, p->y) == c && !checked(p->x + 2, p->y)) {
-            Position* newCurrent = fillSameColorPosition(p->x + 2, p->y, c, current, checked);
+        if (p->x + 2 <= Field::WIDTH && color(p->x + 1, p->y) == EMPTY && color(p->x + 2, p->y) == c && !checked.get(p->x + 2, p->y)) {
+            Position* newCurrent = fillSameColorPosition(p->x + 2, p->y, c, current, &checked);
             if (newCurrent != current) {
                 additional += 1;
                 current = newCurrent;
@@ -81,7 +81,7 @@ bool Field::findBestBreathingSpace(int& breathingX, int& breathingY, int x, int 
     FieldBitField checked;
     Position positions[WIDTH * HEIGHT];
 
-    Position* filledHead = fillSameColorPosition(x, y, color(x, y), positions, checked);
+    Position* filledHead = fillSameColorPosition(x, y, color(x, y), positions, &checked);
 
     Position result;
     int resultHeight = 100;
