@@ -81,8 +81,7 @@ int main(void)
 
         myField.dropKumiPuyo(dropDecision.decision(), game.myPlayerState().kumiPuyos[0]);
 
-        BasicRensaResult rensaInfo;
-        myField.simulate(rensaInfo);
+        BasicRensaResult rensaInfo = myField.simulate();
 
         cout << rensaInfo.chains << ' ' << rensaInfo.score << ' ' << rensaInfo.frames << endl;
         cout << (myField.color(dropDecision.decision().x, 12) + '0') << endl;

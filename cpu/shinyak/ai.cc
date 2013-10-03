@@ -108,8 +108,7 @@ void AI::enemyGrounded(const Game& game)
     Field field(game.enemyPlayerState().field);
     field.forceDrop();
 
-    BasicRensaResult rensaInfo;
-    field.simulate(rensaInfo);
+    BasicRensaResult rensaInfo = field.simulate();
     
     if (rensaInfo.chains > 0)
         m_enemyInfo.setOngoingRensa(OngoingRensaInfo(rensaInfo, game.id + rensaInfo.frames));
