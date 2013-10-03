@@ -12,7 +12,6 @@ TEST(FieldBitFieldTest, Initialize)
     for (int x = 0; x < Field::MAP_WIDTH; ++x) {
         for (int y = 0; y < Field::MAP_HEIGHT; ++y) {
             EXPECT_EQ(bitField.get(x, y), 0);
-            EXPECT_EQ(bitField(x, y), 0);
         }
     }
 }
