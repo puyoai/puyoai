@@ -98,8 +98,7 @@ TEST(FieldTest, ForceDrop)
 void testUrl(string url, int expected_chains, int expected_score)
 {
     Field f(url);
-    BasicRensaResult rensaInfo;
-    f.simulate(rensaInfo);
+    BasicRensaResult rensaInfo = f.simulate();
     EXPECT_EQ(expected_chains, rensaInfo.chains);
     EXPECT_EQ(expected_score, rensaInfo.score);
 }
@@ -131,24 +130,23 @@ TEST(FieldTest, ChainAndScoreTest3)
 }
 
 TEST(FieldTest, FramesTest) {
-    BasicRensaResult info;
     {
         // 1 Rensa, no drop.
         Field f("444400");
-        f.simulate(info);
+        BasicRensaResult info = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_AFTER_NO_DROP, info.frames);
     }
     {
         Field f("500000"
                 "444400");
-        f.simulate(info);
+        BasicRensaResult info = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP, info.frames);
     }
     {
         Field f("500000"
                 "400000"
                 "444000");
-        f.simulate(info);
+        BasicRensaResult info = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP,
                   info.frames);
     }
@@ -156,7 +154,7 @@ TEST(FieldTest, FramesTest) {
         Field f("500000"
                 "450000"
                 "444000");
-        f.simulate(info);
+        BasicRensaResult info = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP,
                   info.frames);
     }
@@ -164,7 +162,7 @@ TEST(FieldTest, FramesTest) {
         Field f("500000"
                 "455000"
                 "444500");
-        f.simulate(info);
+        BasicRensaResult info = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP +
                   FRAMES_AFTER_VANISH + FRAMES_AFTER_NO_DROP,
                   info.frames);
@@ -173,7 +171,7 @@ TEST(FieldTest, FramesTest) {
         Field f("560000"
                 "455000"
                 "444500");
-        f.simulate(info);
+        BasicRensaResult info = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP +
                   FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP,
                   info.frames);
@@ -288,8 +286,7 @@ TEST(FieldTest, HeightAfterSimulate)
             "445644"
             "445644");
 
-    BasicRensaResult info;
-    f.simulate(info);
+    f.simulate();
 
     EXPECT_EQ(0, f.height(1));
     EXPECT_EQ(0, f.height(2));
@@ -305,8 +302,7 @@ TEST(FieldTest, HeightAfterSimulate2)
             "445665"
             "556455");
 
-    BasicRensaResult info;
-    f.simulate(info);
+    f.simulate();
 
     EXPECT_EQ(3, f.height(1));
     EXPECT_EQ(3, f.height(2));
@@ -370,9 +366,8 @@ TEST(FieldTest, TrackedFieldSimulation)
             "556774");
 
 
-    BasicRensaResult basicRensaResult;
     RensaTrackResult trackResult;
-    f.simulateAndTrack(basicRensaResult, trackResult);
+    BasicRensaResult basicRensaResult = f.simulateAndTrack(trackResult);
 
     EXPECT_EQ(5, basicRensaResult.chains);
     EXPECT_EQ(1, trackResult.erasedAt(1, 2));

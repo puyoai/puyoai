@@ -44,8 +44,8 @@ public:
     // Drops all puyos if some puyos are in the air.
     void forceDrop();
 
-    void simulate(BasicRensaResult& rensaResult, int additionalChains = 0);
-    void simulateAndTrack(BasicRensaResult& rensaResult, RensaTrackResult& trackResult, int additionalChains = 0);
+    BasicRensaResult simulate(int initialChains = 1);
+    BasicRensaResult simulateAndTrack(RensaTrackResult& trackResult, int initialChains = 1);
     
     // Normal print for debugging purpose.
     std::string debugOutput() const;

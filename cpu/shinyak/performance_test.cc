@@ -26,9 +26,8 @@ TEST(PerformanceTest, Simulate_Empty)
 {
     for (int i = 0; i < 1000000; i++) {
         Field f;
-        BasicRensaResult rensaInfo;
         Tsc tsc("Simulate_Empty");
-        f.simulate(rensaInfo);
+        f.simulate();
     }
     double average, variance;
     Tsc::GetStatistics("Simulate_Empty", &average, &variance);
@@ -41,8 +40,7 @@ TEST(PerformanceTest, Simulate_Filled)
     for (int i = 0; i < 100000; i++) {
         Field f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
         Tsc tsc("Simulate_Filled");
-        BasicRensaResult rensaInfo;
-        f.simulate(rensaInfo);
+        f.simulate();
     }
     double average, variance;
     Tsc::GetStatistics("Simulate_Filled", &average, &variance);
@@ -56,9 +54,8 @@ TEST(PerformanceTest, Simulate_Filled_Track)
         Field f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
         Tsc tsc("Simulate_Filled_Track");
 
-        BasicRensaResult basicRensaResult;
         RensaTrackResult trackResult;
-        f.simulateAndTrack(basicRensaResult, trackResult);
+        f.simulateAndTrack(trackResult);
     }
     double average, variance;
     Tsc::GetStatistics("Simulate_Filled_Track", &average, &variance);

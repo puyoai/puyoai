@@ -344,16 +344,16 @@ int BasicField::dropAfterVanish(int minHeights[], Tracker& tracker)
         return FRAMES_DROP_1_LINE * maxDrops + FRAMES_AFTER_DROP;
 }
 
-void BasicField::simulate(BasicRensaResult& rensaResult, int additionalChain)
+BasicRensaResult BasicField::simulate(int initialChains)
 {
     RensaNonTracker tracker;
-    rensaResult = simulateWithTracker(1 + additionalChain, tracker);
+    return simulateWithTracker(initialChains, tracker);
 }
 
-void BasicField::simulateAndTrack(BasicRensaResult& rensaResult, RensaTrackResult& trackResult, int additionalChain)
+BasicRensaResult BasicField::simulateAndTrack(RensaTrackResult& trackResult, int initialChains)
 {
     RensaTracker tracker(&trackResult);
-    rensaResult = simulateWithTracker(1 + additionalChain, tracker);
+    return simulateWithTracker(initialChains, tracker);
 }
 
 template<typename Tracker>
