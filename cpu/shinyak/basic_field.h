@@ -45,7 +45,7 @@ public:
     void forceDrop();
 
     BasicRensaResult simulate(int initialChain = 1);
-    BasicRensaResult simulateAndTrack(RensaTrackResult& trackResult, int initialChain = 1);
+    BasicRensaResult simulateAndTrack(RensaTrackResult* trackResult, int initialChain = 1);
     
     // Normal print for debugging purpose.
     std::string debugOutput() const;
