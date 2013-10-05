@@ -274,6 +274,30 @@ TEST_F(CaptureTest, wnext_vca_r2) {
   EXPECT_EQ(Capture::RC_BLUE, cap->getRealColor(1, 3, 12));
 }
 
+TEST_F(CaptureTest, wnext_vca_empty_1p) {
+  auto_ptr<Capture> cap(createCapture("test/wnext_vca_empty_1p.gif"));
+  EXPECT_EQ(Capture::RC_EMPTY, cap->getRealColor(0, 2, 12));
+  EXPECT_EQ(Capture::RC_EMPTY, cap->getRealColor(0, 3, 12));
+}
+
+TEST_F(CaptureTest, wnext_vca_empty_2p) {
+  auto_ptr<Capture> cap(createCapture("test/wnext_vca_empty_2p.bmp"));
+  EXPECT_EQ(Capture::RC_EMPTY, cap->getRealColor(1, 2, 12));
+  EXPECT_EQ(Capture::RC_EMPTY, cap->getRealColor(1, 3, 12));
+}
+
+TEST_F(CaptureTest, wnext_vca_y2u) {
+  auto_ptr<Capture> cap(createCapture("test/wnext_vca_y2u.gif"));
+  EXPECT_EQ(Capture::RC_YELLOW, cap->getRealColor(1, 2, 12));
+  EXPECT_EQ(Capture::RC_PURPLE, cap->getRealColor(1, 3, 12));
+}
+
+TEST_F(CaptureTest, wnext_vca_y2d) {
+  auto_ptr<Capture> cap(createCapture("test/wnext_vca_y2d.gif"));
+  EXPECT_EQ(Capture::RC_PURPLE, cap->getRealColor(1, 2, 12));
+  EXPECT_EQ(Capture::RC_YELLOW, cap->getRealColor(1, 3, 12));
+}
+
 TEST_F(CaptureTest, wnext_nico_p1) {
   auto_ptr<Capture> cap(createCapture("test/wnext_nico_p1.gif"));
   EXPECT_EQ(Capture::RC_PURPLE, cap->getRealColor(0, 2, 12));
