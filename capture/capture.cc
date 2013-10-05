@@ -1133,7 +1133,11 @@ void Capture::show() {
           if (is_vanishing_[pi][x][y]) {
             ucol = colors[RC_VANISHING];
           }
-          Uint32 dcol = colors[ai_puyo_[i][x][y]];
+          Colors dpuyo = ai_puyo_[i][x][y];
+          if (y == 12 && x < 4) {
+            dpuyo = ai_next_[i][x+2];
+          }
+          Uint32 dcol = colors[dpuyo];
 
           for (int j = b.sx; j <= b.dx; j++) {
             scr_->putPixel(j, b.sy, ucol);
