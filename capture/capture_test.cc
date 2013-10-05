@@ -383,11 +383,11 @@ TEST_F(CaptureTest, gameover_vca) {
 
 TEST_F(CaptureTest, ojama_dropped_vca) {
   auto_ptr<Capture> cap(createCapture("test/ojama_dropped_vca.gif"));
-  ASSERT_EQ(0, cap->getState(0));
+  ASSERT_EQ(0U, cap->getState(0));
   cap->setState(0, STATE_YOU_CAN_PLAY);
   addFrame(cap.get(), "test/ojama_dropped_vca.gif");
   EXPECT_EQ(STATE_YOU_GROUNDED, cap->getState(0) & STATE_YOU_GROUNDED);
-  EXPECT_EQ(0, cap->getState(0) & STATE_YOU_CAN_PLAY);
+  EXPECT_EQ(0U, cap->getState(0) & STATE_YOU_CAN_PLAY);
 }
 
 TEST_F(CaptureTest, ojama_puyos_nico) {
