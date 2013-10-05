@@ -97,12 +97,15 @@ Capture::RealColor Capture::toPuyo(RGB rgb, HSV hsv, int x, int y) {
   int h_lb_for_ojama = mode_ == NICO ? 40 : 90;
   int h_ub_for_ojama = mode_ == NICO ? 90 : 150;
 
-  if (hsv.h > 170 && hsv.h < 232.1) {
+  bool s_color_check = hsv.s > 0.2 && hsv.s < 0.85;
+
+  if (hsv.h > 170 && hsv.h < 232.1 && hsv.v > 55 &&
+      (mode_ == NICO || s_color_check)) {
     o = RC_BLUE;
   } else if (hsv.s < 0.27 && rgb.b > 30 &&
              hsv.h > h_lb_for_ojama && hsv.h < h_ub_for_ojama) {
     o = RC_OJAMA;
-  } else if (hsv.s > 0.2 && hsv.s < 0.85) {
+  } else if (s_color_check) {
     // TODO(hamaji): Improve the distinguish method for RED-PURPLE in nico.
 #if 0
     int b_limit_for_r =
@@ -302,7 +305,8 @@ void Capture::addFrame(SDL_Surface* surf) {
 
           is_vanishing_[pi][x][y] = 0;
 
-          RealColor rc = toPuyo(rgb_[pi][x][y], x, y);
+          //fprintf(stderr, "valid cnt=%d\n", cnt);
+          RealColor rc = cnt > 20 ? toPuyo(rgb_[pi][x][y], x, y) : RC_EMPTY;
           puyo_[pi][x][y] = rc;
         }
       }
@@ -974,13 +978,13 @@ bool Capture::detectMode() {
       bb_[i][1][12].sy = 32.0 + 19.0 * 3;
       bb_[i][1][12].dy = 32.0 + 19.0 * 3 + 12.0;
 
-      bb_[i][2][12].sx = 41.0 + 17.0 * (8 + i) + i * 6.0;
-      bb_[i][2][12].dx = 41.0 + 17.0 * (8 + i) + i * 6.0 + 5.0;
+      bb_[i][2][12].sx = 41.0 + 17.0 * (8 + i) + i * 7.0;
+      bb_[i][2][12].dx = 41.0 + 17.0 * (8 + i) + i * 7.0 + 5.0;
       bb_[i][2][12].sy = 32.0 + 19.0 * 3;
       bb_[i][2][12].dy = 32.0 + 19.0 * 3 + 9.0;
 
-      bb_[i][3][12].sx = 41.0 + 17.0 * (8 + i) + i * 6.0;
-      bb_[i][3][12].dx = 41.0 + 17.0 * (8 + i) + i * 6.0 + 5.0;
+      bb_[i][3][12].sx = 41.0 + 17.0 * (8 + i) + i * 7.0;
+      bb_[i][3][12].dx = 41.0 + 17.0 * (8 + i) + i * 7.0 + 5.0;
       bb_[i][3][12].sy = 32.0 + 19.0 * 4;
       bb_[i][3][12].dy = 32.0 + 19.0 * 4 + 9.0;
     }
