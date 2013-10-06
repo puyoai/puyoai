@@ -5,6 +5,7 @@
 #include <SDL_image.h>
 
 DEFINE_bool(save_parsed, false, "");
+DEFINE_string(save_img_dir, "/tmp", "");
 
 Source::Source()
   : ok_(false),
@@ -15,7 +16,8 @@ Source::Source()
 
 static void saveImg(SDL_Surface* surf, const char* prefix, int ss_num) {
   char buf[256];
-  sprintf(buf, "/tmp/%s-puyo%05d.bmp", prefix, ss_num);
+  sprintf(buf, "%s/%s-puyo%05d.bmp",
+          FLAGS_save_img_dir.c_str(), prefix, ss_num);
   SDL_SaveBMP(surf, buf);
 }
 
