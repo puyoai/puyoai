@@ -247,6 +247,7 @@ int main(int argc, char* argv[]) {
 
   Uint32 start_ticks = SDL_GetTicks();
 
+  bool save_all_frames = false;
   int current_id = 0;
   Capture::GameState prev_game_state = Capture::GAME_INIT;
   while (!source->done()) {
@@ -268,6 +269,11 @@ int main(int argc, char* argv[]) {
         } else if (ev.key.keysym.sym == SDLK_m) {
           fprintf(stderr, "%s\n", cap.getMessageFor(0).c_str());
           continue;
+        } else if (ev.key.keysym.sym == SDLK_m) {
+          fprintf(stderr, "%s\n", cap.getMessageFor(0).c_str());
+          continue;
+        } else if (ev.key.keysym.sym == SDLK_t) {
+          save_all_frames = !save_all_frames;
         } else if (ev.key.keysym.sym == SDLK_ESCAPE) {
           source->end();
           continue;
@@ -283,6 +289,10 @@ int main(int argc, char* argv[]) {
         SDL_Delay(10);
         continue;
       }
+    }
+
+    if (save_all_frames) {
+      Source::saveScreenShot(surf, scr);
     }
 
     cap.addFrame(surf);
