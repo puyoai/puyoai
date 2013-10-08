@@ -67,19 +67,23 @@ protected:
 
     // Simulates chains. Returns BasicRensaResult.
     template<typename Tracker>
-    BasicRensaResult simulateWithTracker(int initialChain, Tracker&);
+    BasicRensaResult simulateWithTracker(int initialChain, Tracker*);
 
-    // Vanishes puyos., and adds score. The argument "chains" is used to calculate score.
+    // Vanishes connected puyos and returns score. If score is 0, no puyos are vanished.
     template<typename Tracker>
-    bool vanish(int nthChain, int* score, int minHeights[], Tracker&);
-    template<typename Tracker>
-    void eraseQueuedPuyos(int nthChain, Position* eraseQueue, Position* eraseQueueHead, int minHeights[], Tracker&);
-    template<typename Tracker>
-    int dropAfterVanish(int minHeights[], Tracker&);
+    int vanish(int nthChain, int minHeights[], Tracker*);
 
-    Position* checkCell(PuyoColor, FieldBitField& checked, Position* writeHead, int x, int y) const;
+    // Erases puyos in queue. 
+    template<typename Tracker>
+    void eraseQueuedPuyos(int nthChain, Position* eraseQueue, Position* eraseQueueHead, int minHeights[], Tracker*);
 
-    Position* fillSameColorPosition(int x, int y, PuyoColor, Position* positionQueueHead, FieldBitField* checked) const;
+    // Drops puyos in the air after vanishment.
+    template<typename Tracker>
+    int dropAfterVanish(int minHeights[], Tracker*);
+                                                                        
+    // Inserts positions whose puyo color is the same as |c|, and connected to (x, y).
+    // The checked cells will be marked in |checked|.
+    Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBitField* checked) const;
 
     Puyo m_field[MAP_WIDTH][MAP_HEIGHT];
     byte m_heights[MAP_WIDTH];
