@@ -185,12 +185,13 @@ void BasicField::dropPuyoOn(int x, PuyoColor c)
     setPuyo(x, ++m_heights[x], c);
 }
 
-inline Position* BasicField::checkCell(PuyoColor c, FieldBitField& checked, Position* writeHead, int x, int y) const
+inline static
+Position* checkCell(const BasicField& field, PuyoColor c, FieldBitField& checked, Position* writeHead, int x, int y)
 {
     if (checked.get(x, y))
         return writeHead;
 
-    if (y <= HEIGHT && c == color(x, y)) {
+    if (y <= BasicField::HEIGHT && c == field.color(x, y)) {
         writeHead->x = x;
         writeHead->y = y;
         checked.set(x, y);
@@ -214,18 +215,20 @@ Position* BasicField::fillSameColorPosition(int x, int y, PuyoColor color, Posit
     while (readHead != writeHead) {
         Position p = *readHead++;
         
-        writeHead = checkCell(color, *checked, writeHead, p.x + 1, p.y);
-        writeHead = checkCell(color, *checked, writeHead, p.x - 1, p.y);
-        writeHead = checkCell(color, *checked, writeHead, p.x, p.y + 1);
-        writeHead = checkCell(color, *checked, writeHead, p.x, p.y - 1);
+        writeHead = checkCell(*this, color, *checked, writeHead, p.x + 1, p.y);
+        writeHead = checkCell(*this, color, *checked, writeHead, p.x - 1, p.y);
+        writeHead = checkCell(*this, color, *checked, writeHead, p.x, p.y + 1);
+        writeHead = checkCell(*this, color, *checked, writeHead, p.x, p.y - 1);
     }
 
     return writeHead;
 }
 
 template<typename Tracker>
-bool BasicField::vanish(int nthChain, int* score, int minHeights[], Tracker& tracker)
+int BasicField::vanish(int nthChain, int minHeights[], Tracker* tracker)
 {
+    DCHECK(tracker);
+
     FieldBitField checked;
     Position eraseQueue[WIDTH * HEIGHT]; // All the positions of erased puyos will be stored here.
     Position* eraseQueueHead = eraseQueue;
@@ -262,19 +265,20 @@ bool BasicField::vanish(int nthChain, int* score, int minHeights[], Tracker& tra
 
     int numErasedPuyos = eraseQueueHead - eraseQueue;
     if (numErasedPuyos == 0)
-        return false;
+        return 0;
 
     // --- Actually erase the Puyos to be vanished.
     eraseQueuedPuyos(nthChain, eraseQueue, eraseQueueHead, minHeights, tracker);
 
     int rensaBonusCoef = calculateRensaBonusCoef(chainBonus(nthChain), longBonusCoef, colorBonus(numUsedColors));
-    *score += 10 * numErasedPuyos * rensaBonusCoef;
-    return true;
+    return 10 * numErasedPuyos * rensaBonusCoef;
 }
 
 template<typename Tracker>
-void BasicField::eraseQueuedPuyos(int nthChain, Position* eraseQueue, Position* eraseQueueHead, int minHeights[], Tracker& tracker)
+void BasicField::eraseQueuedPuyos(int nthChain, Position* eraseQueue, Position* eraseQueueHead, int minHeights[], Tracker* tracker)
 {
+    DCHECK(tracker);
+
     for (int i = 1; i <= WIDTH; i++)
         minHeights[i] = 100;
 
@@ -283,39 +287,41 @@ void BasicField::eraseQueuedPuyos(int nthChain, Position* eraseQueue, Position* 
         int y = head->y;
 
         setPuyo(x, y, EMPTY);
-        tracker.colorPuyoIsVanished(x, y, nthChain);
+        tracker->colorPuyoIsVanished(x, y, nthChain);
         minHeights[x] = std::min(minHeights[x], y);
 
         // Check OJAMA puyos erased
         if (color(x + 1, y) == OJAMA) {
             setPuyo(x + 1, y, EMPTY);
-            tracker.ojamaPuyoIsVanished(x + 1, y, nthChain);
+            tracker->ojamaPuyoIsVanished(x + 1, y, nthChain);
             minHeights[x + 1] = std::min(minHeights[x + 1], y);
         }
 
         if (color(x - 1, y) == OJAMA) {
             setPuyo(x - 1, y, EMPTY);
-            tracker.ojamaPuyoIsVanished(x - 1, y, nthChain);
+            tracker->ojamaPuyoIsVanished(x - 1, y, nthChain);
             minHeights[x - 1] = std::min(minHeights[x - 1], y);
         }
 
         // We don't need to update minHeights here.
         if (color(x, y + 1) == OJAMA && y + 1 <= HEIGHT) {
             setPuyo(x, y + 1, EMPTY);
-            tracker.ojamaPuyoIsVanished(x, y + 1, nthChain);
+            tracker->ojamaPuyoIsVanished(x, y + 1, nthChain);
         }
 
         if (color(x, y - 1) == OJAMA) {
             setPuyo(x, y - 1, EMPTY);
-            tracker.ojamaPuyoIsVanished(x, y - 1, nthChain);
+            tracker->ojamaPuyoIsVanished(x, y - 1, nthChain);
             minHeights[x] = std::min(minHeights[x], y - 1);
         }
     }
 }
 
 template<typename Tracker>
-int BasicField::dropAfterVanish(int minHeights[], Tracker& tracker)
+int BasicField::dropAfterVanish(int minHeights[], Tracker* tracker)
 {
+    DCHECK(tracker);
+
     int maxDrops = 0;
     for (int x = 1; x <= WIDTH; x++) {
         if (minHeights[x] >= MAP_HEIGHT)
@@ -334,7 +340,7 @@ int BasicField::dropAfterVanish(int minHeights[], Tracker& tracker)
             setPuyo(x, writeAt, color(x, y));
             setPuyo(x, y, EMPTY);
             m_heights[x] = writeAt;
-            tracker.puyoIsDropped(x, y, writeAt++);
+            tracker->puyoIsDropped(x, y, writeAt++);
         }
     }
 
@@ -347,26 +353,27 @@ int BasicField::dropAfterVanish(int minHeights[], Tracker& tracker)
 BasicRensaResult BasicField::simulate(int initialChain)
 {
     RensaNonTracker tracker;
-    return simulateWithTracker(initialChain, tracker);
+    return simulateWithTracker(initialChain, &tracker);
 }
 
 BasicRensaResult BasicField::simulateAndTrack(RensaTrackResult* trackResult, int initialChain)
 {
     DCHECK(trackResult);
     RensaTracker tracker(trackResult);
-    return simulateWithTracker(initialChain, tracker);
+    return simulateWithTracker(initialChain, &tracker);
 }
 
 template<typename Tracker>
-inline BasicRensaResult BasicField::simulateWithTracker(int initialChain, Tracker& tracker)
+inline BasicRensaResult BasicField::simulateWithTracker(int initialChain, Tracker* tracker)
 {
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
     int chains = initialChain, score = 0, frames = 0;
 
-    while (vanish(chains, &score, minHeights, tracker)) {
-        frames += dropAfterVanish(minHeights, tracker);
-        frames += FRAMES_AFTER_VANISH;
+    int nthChainScore;
+    while ((nthChainScore = vanish(chains, minHeights, tracker)) > 0) {
         chains += 1;
+        score += nthChainScore;
+        frames += dropAfterVanish(minHeights, tracker) + FRAMES_AFTER_VANISH;
     }
 
     return BasicRensaResult(chains - 1, score, frames);
