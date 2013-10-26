@@ -438,6 +438,7 @@ void Capture::finishGame() {
   CLEAR_ARRAY(has_next_);
   CLEAR_ARRAY(has_wnext_);
   CLEAR_ARRAY(state_);
+  grounded_[0] = grounded_[1] = true;
 }
 
 bool Capture::isTitle() const {
