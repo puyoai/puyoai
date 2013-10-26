@@ -18,6 +18,7 @@
 
 DEFINE_bool(show_colors, false, "");
 DEFINE_bool(show_states, false, "");
+DEFINE_bool(show_messages, false, "");
 DEFINE_bool(commentator, true, "");
 DEFINE_bool(draw_color_detection, false, "");
 DEFINE_bool(fullscreen, false, "");
@@ -358,6 +359,11 @@ void Capture::addFrame(SDL_Surface* surf) {
 
   if (FLAGS_show_states) {
     dumpStateInfo();
+  }
+  if (FLAGS_show_messages) {
+    for (int i = 0; i < 2; i++) {
+      fprintf(stderr, "%dP %s\n", i + 1, getMessageFor(i).c_str());
+    }
   }
 
   Uint32 elapsed = SDL_GetTicks() - start_ticks;
