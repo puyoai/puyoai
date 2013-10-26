@@ -805,6 +805,8 @@ void Capture::setAIColor(RealColor rc, Colors c) {
 }
 
 Colors Capture::getAIColor(RealColor rc, bool will_allocate) {
+  bool retried = false;
+  retry:
   if (rc < RC_RED)
     return (Colors)rc;
   int i = rc - RC_RED;
@@ -842,7 +844,16 @@ Colors Capture::getAIColor(RealColor rc, bool will_allocate) {
       }
 
       if (color_map_[i] == -1) {
-        setAIColor(rc, EMPTY);
+        fprintf(stderr, "TERRIBLE: 5th color appeared!\n");
+        if (retried) {
+          fprintf(stderr, "Giving up...\n");
+          setAIColor(rc, EMPTY);
+        } else {
+          fprintf(stderr, "Resetting color map...\n");
+          memset(color_map_, -1, sizeof(color_map_));
+          retried = true;
+          goto retry;
+        }
       }
     }
 
