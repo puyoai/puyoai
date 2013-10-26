@@ -163,6 +163,7 @@ class Capture {
   bool grounded_[2];
   bool chain_finished_[2];
   GameState game_state_;
+  int start_animation_frames_;
   int winner_;
 
   // Translation table from RealColor to Colors.

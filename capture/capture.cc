@@ -167,6 +167,7 @@ void Capture::init() {
   mode_ = NONE;
   capture_ticks_ = 0;
   capture_frames_ = 0;
+  start_animation_frames_ = 0;
 
   CLEAR_ARRAY(puyo_);
   finishGame();
@@ -203,6 +204,7 @@ Capture::Capture(int w, int h, int bpp) {
 
 void Capture::addFrame(SDL_Surface* surf) {
   capture_frames_++;
+  start_animation_frames_--;
 
   surf_ = surf;
 
@@ -520,6 +522,7 @@ void Capture::calcState() {
 
   if (game_state_ == GAME_MODE_SELECT) {
     game_state_ = GAME_RUNNING;
+    start_animation_frames_ = 20;
     for (int i = 0; i < 2; i++) {
       updateAINext(i);
       has_next_[i] = true;
@@ -844,6 +847,10 @@ Colors Capture::getAIColor(RealColor rc, bool will_allocate) {
 
 void Capture::updateAIField(int i) {
   game_state_ = GAME_RUNNING;
+
+  // Do not update AI field while start animation is moving.
+  if (start_animation_frames_ > 0)
+    return;
 
   memset(ai_puyo_[i], 0, sizeof(ai_puyo_[i]));
   ai_num_ojama_[i] = 0;
@@ -1220,6 +1227,9 @@ void Capture::dumpStateInfo() const {
   ostringstream oss;
   if (!frame_info_.empty())
     oss << frame_info_ << '\n';
+  oss << "game_state=" << game_state_
+      << " start_animation_frames=" << start_animation_frames_
+      << '\n';
   for (int i = 0; i < 2; i++) {
     oss << (i+1) << "P state:"
         << " state=" << GetStateString(state_[i])
