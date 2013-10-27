@@ -18,6 +18,7 @@
 
 DEFINE_bool(show_colors, false, "");
 DEFINE_bool(show_states, false, "");
+DEFINE_bool(show_messages, false, "");
 DEFINE_bool(commentator, true, "");
 DEFINE_bool(draw_color_detection, false, "");
 DEFINE_bool(fullscreen, false, "");
@@ -167,6 +168,7 @@ void Capture::init() {
   mode_ = NONE;
   capture_ticks_ = 0;
   capture_frames_ = 0;
+  start_animation_frames_ = 0;
 
   CLEAR_ARRAY(puyo_);
   finishGame();
@@ -203,6 +205,7 @@ Capture::Capture(int w, int h, int bpp) {
 
 void Capture::addFrame(SDL_Surface* surf) {
   capture_frames_++;
+  start_animation_frames_--;
 
   surf_ = surf;
 
@@ -357,6 +360,11 @@ void Capture::addFrame(SDL_Surface* surf) {
   if (FLAGS_show_states) {
     dumpStateInfo();
   }
+  if (FLAGS_show_messages) {
+    for (int i = 0; i < 2; i++) {
+      fprintf(stderr, "%dP %s\n", i + 1, getMessageFor(i).c_str());
+    }
+  }
 
   Uint32 elapsed = SDL_GetTicks() - start_ticks;
   capture_ticks_ += elapsed;
@@ -430,6 +438,7 @@ void Capture::finishGame() {
   CLEAR_ARRAY(has_next_);
   CLEAR_ARRAY(has_wnext_);
   CLEAR_ARRAY(state_);
+  grounded_[0] = grounded_[1] = true;
 }
 
 bool Capture::isTitle() const {
@@ -520,6 +529,7 @@ void Capture::calcState() {
 
   if (game_state_ == GAME_MODE_SELECT) {
     game_state_ = GAME_RUNNING;
+    start_animation_frames_ = 20;
     for (int i = 0; i < 2; i++) {
       updateAINext(i);
       has_next_[i] = true;
@@ -796,6 +806,8 @@ void Capture::setAIColor(RealColor rc, Colors c) {
 }
 
 Colors Capture::getAIColor(RealColor rc, bool will_allocate) {
+  bool retried = false;
+  retry:
   if (rc < RC_RED)
     return (Colors)rc;
   int i = rc - RC_RED;
@@ -833,7 +845,16 @@ Colors Capture::getAIColor(RealColor rc, bool will_allocate) {
       }
 
       if (color_map_[i] == -1) {
-        setAIColor(rc, EMPTY);
+        fprintf(stderr, "TERRIBLE: 5th color appeared!\n");
+        if (retried) {
+          fprintf(stderr, "Giving up...\n");
+          setAIColor(rc, EMPTY);
+        } else {
+          fprintf(stderr, "Resetting color map...\n");
+          memset(color_map_, -1, sizeof(color_map_));
+          retried = true;
+          goto retry;
+        }
       }
     }
 
@@ -844,6 +865,10 @@ Colors Capture::getAIColor(RealColor rc, bool will_allocate) {
 
 void Capture::updateAIField(int i) {
   game_state_ = GAME_RUNNING;
+
+  // Do not update AI field while start animation is moving.
+  if (start_animation_frames_ > 0)
+    return;
 
   memset(ai_puyo_[i], 0, sizeof(ai_puyo_[i]));
   ai_num_ojama_[i] = 0;
@@ -1220,6 +1245,9 @@ void Capture::dumpStateInfo() const {
   ostringstream oss;
   if (!frame_info_.empty())
     oss << frame_info_ << '\n';
+  oss << "game_state=" << game_state_
+      << " start_animation_frames=" << start_animation_frames_
+      << '\n';
   for (int i = 0; i < 2; i++) {
     oss << (i+1) << "P state:"
         << " state=" << GetStateString(state_[i])

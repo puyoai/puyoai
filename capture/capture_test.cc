@@ -488,6 +488,18 @@ TEST_F(CaptureTest, start_effect_nico) {
   EXPECT_EQ(Capture::RC_EMPTY, cap->getRealColor(1, 4, 11));
 }
 
+TEST_F(CaptureTest, start_animation_vca) {
+  auto_ptr<Capture> cap(createCapture("test/start_animation_vca_1.gif"));
+  addFrame(cap.get(), "test/start_animation_vca_2.gif");
+  addFrame(cap.get(), "test/start_animation_vca_2.gif");
+  // TODO(hamaji): We are allowing this misrecognition for start
+  // animations.
+  // EXPECT_EQ(Capture::RC_EMPTY, cap->getRealColor(0, 3, 10));
+  // EXPECT_EQ(Capture::RC_EMPTY, cap->getRealColor(0, 3, 11));
+  EXPECT_EQ(EMPTY, cap->getColor(0, 3, 10));
+  EXPECT_EQ(EMPTY, cap->getColor(0, 3, 11));
+}
+
 int main(int argc, char **argv) {
   FLAGS_commentator = false;
   SDL_Init(SDL_INIT_VIDEO);
