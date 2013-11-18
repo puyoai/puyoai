@@ -57,6 +57,6 @@ class scoped_ptr {
   }
 };
 
-string StringPrintf(const char* format, ...);
+std::string StringPrintf(const char* format, ...);
 
 #endif  // CPU_PERIA_BASE_H_
