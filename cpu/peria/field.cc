@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "../../core/constant.h"
 #include "base.h"
 #include "decision.h"
 
@@ -153,11 +154,21 @@ inline void CheckCell(unsigned char color,
   }
 }
 
-int getLongBonus(int length) {
-  if (length >= 11) {
-    length = 11;
-  }
-  return LONG_BONUS[length];
+const int kLongBonus[] = {
+  0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 10,
+};
+static const int kChainBonus[] = {
+  0,   0,   8,  16,  32,  64,  96, 128, 160, 192,
+  224, 256, 288, 320, 352, 384, 416, 448, 480, 512,
+};
+static const int kColorBonus[] = {
+  0, 0, 3, 6, 12, 24,
+};
+
+int GetLongBonus(int length) {
+  if (length >= ARRAYSIZE(kLongBonus))
+    length = ARRAYSIZE(kLongBonus);
+  return kLongBonus[length];
 }
 }  // namespace
 
@@ -196,7 +207,7 @@ bool Field::Vanish(int chains, int* score) {
       if (num_checked_puyo < kEraseNum) {
         read_head = write_head = prev_head;
       } else {
-        bonus += getLongBonus(num_checked_puyo);
+        bonus += GetLongBonus(num_checked_puyo);
         if (color < kColors && !used_colors[color]) {
           ++num_colors;
           used_colors[color] = 1;
@@ -206,17 +217,21 @@ bool Field::Vanish(int chains, int* score) {
     }
   }
 
-  bonus += COLOR_BONUS[num_colors];
-  bonus += CHAIN_BONUS[chains];
+  bonus += kColorBonus[num_colors];
+  bonus += kChainBonus[chains];
   bonus = (bonus == 0) ? 1 : ((bonus > 999) ? 999 : bonus);
   int erased_puyos = (read_head - erase_field) / 2;
+  erased_ = (erased_puyos > 0);
   *score += 10 * erased_puyos * bonus;
+  if (zenkeshi_ && erased_) {
+    *score += ZENKESHI_BONUS;
+    zenkeshi_ = false;
+  }
 
   // Actually erase the Puyos to be vanished.
   for (int i = 1; i <= kWidth; ++i)
     min_heights[i] = 100;
 
-  erased_ = (erased_puyos > 0);
   for (int* head = erase_field; head < read_head; head += 2) {
     int x = head[0];
     int y = head[1];
@@ -287,9 +302,8 @@ void Field::Drop() {
 }
 
 void Field::Drop(int* frames) {
-  if (!erased_) {
+  if (!erased_)
     return;
-  }
 
   int max_drops = 0;
   for (int x = 1; x <= kWidth; ++x) {

@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "base.h"
-#include "constant.h"
 #include "decision.h"
 
 enum Colors {
