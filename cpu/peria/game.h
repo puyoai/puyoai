@@ -20,11 +20,8 @@ class Game {
  private:
   bool CheckDiff(const Player& prev, Player* player);
 
-  std::string name_;
-  scoped_ptr<Player> player_;
-  scoped_ptr<Player> enemy_;
-  bool player_update_;
-  bool enemy_update_;
+  string name_;
+  scoped_ptr<Player> players_[2];
   int id_;  // Time frame
 };
 
