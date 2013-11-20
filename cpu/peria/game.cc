@@ -85,20 +85,10 @@ string Game::Play() {
   //     Plan plan;
   //     players_[0]->Search(&plan);
   //     oss << plan.x << " " << plan.r << " " << plan.message;
-  int max_score = 0;
-  int x = 0, r = 0;
-  vector<Player> children;
-  players_[0]->Search(&children);
-  for (size_t i = 0; i < children.size(); ++i) {
-    if (max_score < children[i].score()) {
-      max_score = children[i].score();
-      x = children[i].get_x();
-      r = children[i].get_r();
-    }
-  }
-
+  int x = 1;
+  int r = 0;
   oss << " X=" << x << " R=" << r
-      << " MSG=MyControl";
+      << " MSG=refactoring";
 
   return oss.str();
 }
