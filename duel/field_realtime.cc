@@ -495,6 +495,13 @@ void FieldRealtime::PrepareNextPuyo() {
   simulate_real_state_ = STATE_USER;
 }
 
+char FieldRealtime::GetNextPuyo(int n) const {
+  if (delay_double_next_ > 0 && n >= 4) {
+    return EMPTY;
+  }
+  return field_.GetNextPuyo(n);
+}
+
 void FieldRealtime::GetCurrentPuyo(int* x1, int* y1, char* c1,
                                    int* x2, int* y2, char* c2, int* r) const {
   *x1 = x_;
@@ -504,96 +511,6 @@ void FieldRealtime::GetCurrentPuyo(int* x1, int* y1, char* c1,
   *y2 = y_ + (r_ == 0) - (r_ == 2);
   *c2 = field_.GetNextPuyo(1);
   *r = r_;
-}
-
-string Locate(int x, int y) {
-  stringstream ss;
-  ss << "\x1b[" << y << ";" << x << "H";
-  return ss.str();
-}
-
-void FieldRealtime::Print() const {
-  Print("");
-}
-
-string GetPuyoText(char color, int y = 0) {
-  const string C_RED = "\x1b[41m";
-  const string C_BLUE = "\x1b[44m";
-  const string C_GREEN = "\x1b[42m";
-  const string C_YELLOW = "\x1b[43m";
-  const string C_BLACK = "\x1b[49m";
-
-  string text;
-  if (color == OJAMA) {
-    text = "@@";
-  } else if (color == WALL) {
-    text = "##";
-  } else {
-    if (y == 13)
-      text = "__";
-    else
-      text = "  ";
-  }
-
-  string color_code;
-  switch (color) {
-    case RED: color_code = C_RED; break;
-    case BLUE: color_code = C_BLUE; break;
-    case GREEN: color_code = C_GREEN; break;
-    case YELLOW: color_code = C_YELLOW; break;
-    default: color_code = C_BLACK; break;
-  }
-
-  return color_code + text + C_BLACK;
-}
-
-void FieldRealtime::Print(const string& debug_message) const {
-  int x1, y1, x2, y2, r;
-  char c1, c2;
-  GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
-
-  int pos_x = 1 + 30 * player_id_;
-  int pos_y = 1;
-  for (int y = 0; y < Field::MAP_HEIGHT; y++) {
-    for (int x = 0; x < Field::MAP_WIDTH; x++) {
-      cout << Locate(pos_x + x * 2, pos_y + Field::MAP_HEIGHT - y);
-
-      char color = field_.Get(x, y);
-      if (simulate_real_state_ == STATE_USER) {
-        if (x == x1 && y == y1) {
-          color = c1;
-        }
-        if (x == x2 && y == y2) {
-          color = c2;
-        }
-      }
-
-      cout << GetPuyoText(color, y);
-    }
-  }
-
-  // Ojama puyo info
-  cout << Locate(pos_x, pos_y) << ojama_ctrl_->GetFixedOjama()
-       << "(" << ojama_ctrl_->GetPendingOjama() << ")          ";
-  // Next puyo info
-  for (int i = 2; i < 6; i++) {
-    const string location =
-        Locate(pos_x + 9 * 2, pos_y + 3 + (i - 2) + ((i - 2) / 2));
-    if (yokoku_delay_ > 0 && i >= 4) {
-      cout << location << "  ";
-    } else {
-      cout << location << GetPuyoText(field_.GetNextPuyo(i));
-    }
-  }
-
-  // Score
-  cout << Locate(pos_x, pos_y + Field::MAP_HEIGHT + 1) << setw(10) << score_;
-  // Debug message ("\x1B[0K" clears the line)
-  if (!debug_message.empty()) {
-    cout << Locate(1, pos_y + Field::MAP_HEIGHT + 3 + player_id_)
-	 << "\x1B[0K" << debug_message << flush;
-  }
-  cout << Locate(1, pos_y + Field::MAP_HEIGHT + 5) << flush;
 }
 
 bool FieldRealtime::IsDead() const {
