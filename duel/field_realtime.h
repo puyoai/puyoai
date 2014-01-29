@@ -24,6 +24,7 @@ class FieldRealtime {
   void Print(const std::string& debug_message) const;
   // Checks if a player is dead.
   bool IsDead() const;
+  char GetNextPuyo(int n) const;
   void GetCurrentPuyo(int* x1, int* y1, char* c1,
                       int* x2, int* y2, char* c2, int* r) const;
 

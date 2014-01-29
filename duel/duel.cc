@@ -8,6 +8,7 @@
 
 #include "core/data.h"
 #include "core/decision.h"
+#include "duel/cui.h"
 #include "duel/game.h"
 #include "duel/game_log.h"
 
@@ -96,9 +97,7 @@ int main(int argc, char* argv[]) {
   std::cout << "seed=" << seed << std::endl;
   LOG(INFO) << "seed=" << seed;
 
-  // Clear the screen.
-  const string CLEAR = "\x1b[2J";
-  std::cout << CLEAR;
+  Cui::Clear();
 
   // Start the game.
   vector<string> program_names;

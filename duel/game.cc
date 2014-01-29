@@ -11,6 +11,7 @@
 #include "core/data.h"
 #include "core/decision.h"
 #include "core/state.h"
+#include "duel/cui.h"
 #include "duel/field_realtime.h"
 #include "duel/game_log.h"
 #include "duel/gui.h"
@@ -189,7 +190,7 @@ void Game::Play(
 
     g_gui->Draw(*me, accepted_message);
     if (!me->IsDead()) {
-      me->Print(accepted_message);
+      Cui::Print(i, *me, accepted_message);
     }
   }
   g_gui->Flip();
