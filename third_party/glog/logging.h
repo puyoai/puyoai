@@ -9,6 +9,7 @@
 
 #define LOG(type) if(0) google::null_stream << ""
 #define VLOG(x) if(x) google::null_stream << ""
+#define LOG_IF(type, cond) if(0) google::null_stream << ""
 #define CHECK(x) if (!(x)) google::null_stream << ""
 #define DCHECK(x) if ((x)) google::null_stream << ""
 #define CHECK_EQ(x, y) if((x) == (y)) google::null_stream << ""
