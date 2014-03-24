@@ -49,6 +49,15 @@ char Field::GetNextPuyo(int n) const {
   return color_sequence_[(next_puyo_ + n) % len];
 }
 
+void Field::CopyFrom(const Field& field) {
+  for (int x = 1; x <= kWidth; ++x)
+    for (int y = 1; y <= kHeight + 2; ++y)
+      field_[x][y] = field.field_[x][y];
+  erased_ = field.erased_;
+  zenkeshi_ = field.zenkeshi_;
+  color_sequence_ = field.color_sequence_;
+}
+
 void Field::SetField(const string& field) {
   for (int i = field.size() - 1, p = 0; i >= 0; --i, ++p) {
     int x = (p + 6 - field.size() % 6) % 6 + 1;

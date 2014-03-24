@@ -38,6 +38,9 @@ class Field {
   // Crears every data this class has.
   void Init();
 
+  // Copy
+  void CopyFrom(const Field& field);
+
   // Sets Haipuyo.
   void SetColorSequence(const string& sequence);
 
@@ -102,6 +105,7 @@ class Field {
   bool erased_;
   bool zenkeshi_;
 
+  // TODO: Migrate color_sequence_ to Player class.
   string color_sequence_;
 };
 
