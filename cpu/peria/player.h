@@ -15,13 +15,14 @@ class Player {
     kSet = 1 << 4,
     kWin = 1 << 6,
     kChainEnd = 1 << 8,
-    kAll = 0x55555555u,
+    kAll = 0x55555555,
   };
-  typedef pair<int, int> Control;
-  typedef pair<Control, int> Position;
+  typedef pair<int, int> Control;       // (x, r)
+  typedef pair<Control, int> Position;  // ((x, r), y)
 
   void CopyFrom(const Player& player);
   void Search(vector<Player>* children) const;
+  void SetOpposite(Player* opposite);
 
   void SearchControls(int x, int y, int r, vector<Control>* controls) const;
 
@@ -53,6 +54,7 @@ class Player {
   int y_;  // y-axis of Jiku puyo
   int r_;  // round number of controlling puyo.
   int ojama_;
+  Player* opposite_;
 };
 
 bool operator==(const Player& a, const Player& b);

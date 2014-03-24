@@ -11,12 +11,7 @@
 #include "base.h"
 
 void Player::CopyFrom(const Player& player) {
-  for (int i = 0; i <= Field::kWidth; ++i) {
-    for (int j = 0; j <= Field::kHeight; ++j) {
-      field_.Set(i, j, player.field().Get(i, j));
-    }
-  }
-  field_.SetColorSequence(player.field().GetColorSequence());
+  field_.CopyFrom(player.field());
   state_ = player.state();
   score_ = player.score();
   ojama_ = player.ojama();
@@ -42,6 +37,10 @@ bool operator==(const Player& a, const Player& b) {
 
 bool operator!=(const Player& a, const Player& b) {
   return !(a == b);
+}
+
+void Player::SetOpposite(Player* opposite) {
+  opposite_ = opposite;
 }
 
 void Player::Search(vector<Player>* children) const {

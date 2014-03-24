@@ -11,8 +11,10 @@
 Game::Game(const std::string& name) : name_(name) {
   players_.resize(2, NULL);
   players_[0] = new Player();
-  if (name != "HITOPUYO")
+  if (name != "HITOPUYO") {
     players_[1] = new Player();
+    players_[0]->SetOpposite(players_[1]);
+  }
 }
 
 Game::~Game() {
@@ -23,7 +25,7 @@ Game::~Game() {
 bool Game::Input(const string& input) {
   istringstream iss(input);
   string key_val;
-  while(getline(iss, key_val, ' ')) {
+  while (getline(iss, key_val, ' ')) {
     size_t pos = key_val.find('=');
     const string key(key_val.substr(0, pos));
     const string value(key_val.substr(pos + 1));
@@ -39,7 +41,8 @@ bool Game::Input(const string& input) {
       } else if (key == "STATE") {
         int state = atoi(value.c_str());
 	players_[0]->set_state(state & Player::kAll);
-	players_[1]->set_state((state >> 1) & Player::kAll);
+        if (players_[1])
+          players_[1]->set_state((state >> 1) & Player::kAll);
       } else if (key == "ACK") {
 	// Do nothing
       } else if (key == "NACK") {
@@ -86,13 +89,17 @@ string Game::Play() {
   oss << "ID=" << id_;
 
   // TODO: Migrate control routine into Player class.
-  //     Plan plan;
-  //     players_[0]->Search(&plan);
-  //     oss << plan.x << " " << plan.r << " " << plan.message;
+#if 0
+  Player::Control control;
+  string message;
+  players_[0]->GetControl(&control, &message);
+  oss << control.first << " " << control.second << " " << message;
+#else
   int x = 1;
   int r = 0;
   oss << " X=" << x << " R=" << r
       << " MSG=refactoring";
+#endif
 
   return oss.str();
 }
