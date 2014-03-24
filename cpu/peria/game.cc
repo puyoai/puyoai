@@ -61,7 +61,7 @@ bool Game::Input(const string& input) {
       player->mutable_field()->SetField(value);
       break;
     case 'P':  // Tsumo
-      player->mutable_field()->SetColorSequence(value);
+      player->SetColorSequence(value);
       break;
     case 'S':  // Score
       player->set_score(atoi(value.c_str()));

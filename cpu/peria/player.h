@@ -21,11 +21,14 @@ class Player {
   typedef pair<Control, int> Position;  // ((x, r), y)
 
   void CopyFrom(const Player& player);
+  void SetColorSequence(const string& colors);
+
   void Search(vector<Player>* children) const;
   void SetOpposite(Player* opposite);
 
   void SearchControls(int x, int y, int r, vector<Control>* controls) const;
 
+  // Accessors ------------------------------------------------------------
   void set_parent(Player* parent) { parent_ = parent; }
   void set_state(int state) { state_ = state; }
   void set_field(const Field& field) { field_ = field; }
@@ -49,6 +52,7 @@ class Player {
   Player* parent_;
   int state_;
   Field field_;
+  string sequence_;
   int score_;
   int x_;  // x-axis of Jiku puyo
   int y_;  // y-axis of Jiku puyo
