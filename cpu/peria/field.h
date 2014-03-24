@@ -41,17 +41,12 @@ class Field {
   // Copy
   void CopyFrom(const Field& field);
 
-  // Sets Haipuyo.
-  void SetColorSequence(const string& sequence);
-
-  // Gets Haipuyo.
-  string GetColorSequence() const;
-
   // Put a puyo at a specified position.
   void Set(int x, int y, char color);
 
+  // TODO: Introduce StringPiece for performance.
   // Put a pair of puyos.
-  void Put(int x, int y, int r);
+  void Put(int x, int y, int r, const string& puyos);
 
   // Get a color of puyo at a specified position.
   char Get(int x, int y) const;
@@ -94,7 +89,6 @@ class Field {
   // After Vanish(): Lowest position a puyo vanished.
   // After Drop(): Lowest position where we should start vanishment-check.
   int min_heights[kMapWidth];
-  int next_puyo_;
 
  private:
   void FillFieldInfo(stringstream& ss) const;
@@ -104,9 +98,6 @@ class Field {
   unsigned char field_[kMapWidth][kMapHeight];
   bool erased_;
   bool zenkeshi_;
-
-  // TODO: Migrate color_sequence_ to Player class.
-  string color_sequence_;
 };
 
 #endif  // CPU_PERIA_FIELD_H_

@@ -20,6 +20,12 @@ void Player::CopyFrom(const Player& player) {
   r_ = player.get_r();
 }
 
+void Player::SetColorSequence(const string& colors) {
+  sequence_.resize(colors.size());
+  for (size_t i = 0; i < colors.size(); ++i)
+    sequence_[i] = colors[i] - '0';
+}
+
 bool operator==(const Player& a, const Player& b) {
   if (a.state() != b.state()) return false;
   if (a.score() != b.score()) return false;
@@ -64,7 +70,8 @@ void Player::Search(vector<Player>* children) const {
     Player player;
     player.CopyFrom(*this);
     Field* field = player.mutable_field();
-    field->Put(controls[i].first, y_, controls[i].second);
+    field->Put(controls[i].first, y_, controls[i].second,
+               sequence_.substr(0, 2));
     int chains = 1, score = player.score(), frame = 0;
     field->Simulate(&chains, &score, &frame);
     player.set_score(score);

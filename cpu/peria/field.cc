@@ -40,22 +40,12 @@ Field::Field(const Field& f) {
   zenkeshi_ = f.zenkeshi_;
 }
 
-char Field::GetNextPuyo(int n) const {
-  assert(!color_sequence_.empty());
-  int len = color_sequence_.length();
-  if (len == 0)
-    LOG(FATAL) << "You must call Field::SetColorSequence() before calling"
-               << "Field::FindAvailablePlansInternal()";
-  return color_sequence_[(next_puyo_ + n) % len];
-}
-
 void Field::CopyFrom(const Field& field) {
   for (int x = 1; x <= kWidth; ++x)
     for (int y = 1; y <= kHeight + 2; ++y)
       field_[x][y] = field.field_[x][y];
   erased_ = field.erased_;
   zenkeshi_ = field.zenkeshi_;
-  color_sequence_ = field.color_sequence_;
 }
 
 void Field::SetField(const string& field) {
@@ -96,20 +86,6 @@ void Field::Init() {
     min_heights[i] = 100;
 }
 
-void Field::SetColorSequence(const string& sequence) {
-  color_sequence_ = sequence;
-  for (int i = 0; i < int(color_sequence_.size()); ++i)
-    color_sequence_[i] -= '0';
-  next_puyo_ = 0;
-}
-
-string Field::GetColorSequence() const {
-  string sequence = color_sequence_;
-  for (int i = 0; i < int(sequence.size()); ++i)
-    sequence[i] += '0';
-  return sequence;
-}
-
 void Field::Set(int x, int y, char color) {
   if (y > kMapHeight)
     return;
@@ -124,17 +100,17 @@ void Field::Set(int x, int y, char color) {
     min_heights[x] = y;
 }
 
-void Field::Put(int x, int y_pivot, int r) {
+void Field::Put(int x, int y_pivot, int r, const string& puyos) {
   const int dx[] = {0, 1, 0, -1};
   const int dy[] = {1, 0, 1, 0};
 
   for (int y = 1; y <= y_pivot; ++y) {
     if (field_[x][y] != kEmpty)
       continue;
-    Set(x, y, GetNextPuyo((r == 2) ? 1 : 0));
+    Set(x, y, puyos[(r == 2) ? 1 : 0]);
     x += dx[r];
     y += dy[r];
-    Set(x, y, GetNextPuyo((r == 2) ? 0 : 1));
+    Set(x, y, puyos[(r == 2) ? 0 : 1]);
     break;
   }
   Drop();
@@ -370,27 +346,23 @@ string Field::GetDebugOutput() const {
   static char char_map[256] = {};
   for (int i = 0; i < 256; ++i)
     char_map[i] = '?';
-  char_map[kWall] = char_map[kWall | kMaskChecked] = '#';
-  char_map[kOjama] = char_map[kOjama | kMaskChecked] = '@';
-  char_map[kRed] = char_map[kRed | kMaskChecked] = 'R';
-  char_map[kGreen] = char_map[kGreen | kMaskChecked] = 'G';
-  char_map[kBlue] = char_map[kBlue | kMaskChecked] = 'B';
+  char_map[kWall]   = char_map[kWall   | kMaskChecked] = '#';
+  char_map[kOjama]  = char_map[kOjama  | kMaskChecked] = '@';
+  char_map[kRed]    = char_map[kRed    | kMaskChecked] = 'R';
+  char_map[kGreen]  = char_map[kGreen  | kMaskChecked] = 'G';
+  char_map[kBlue]   = char_map[kBlue   | kMaskChecked] = 'B';
   char_map[kYellow] = char_map[kYellow | kMaskChecked] = 'Y';
-  char_map[kEmpty] = char_map[kEmpty | kMaskChecked] = ' ';
+  char_map[kEmpty]  = char_map[kEmpty  | kMaskChecked] = ' ';
 
   for (int y = kMapHeight - 1; y >= 0; y--) {
     for (int x = 0; x < kMapWidth; ++x)
       s << char_map[field_[x][y]] << " ";
-    s << endl;
+    s << "\n";
   }
   s << "  ";
   for (int x = 1; x <= kWidth; ++x)
     s << min_heights[x] << " ";
-  s << endl;
-  s << "YOKOKU=";
-  for (int i = 0; i < 6; ++i)
-    s << (char)('0' + color_sequence_[i]);
-  s << endl;
+  s << "\n";
   return s.str();
 }
 
