@@ -25,9 +25,9 @@ int main(int argc, char* argv[]) {
 
   while (!cin.eof()) {
     string input;
-    scoped_ptr<Game> game(new Game(argv[1]));
-    while (getline(cin, input) && game->Input(input))
-      cout << game->Play() << endl;
+    Game game(argv[1]);
+    while (getline(cin, input) && game.Input(input))
+      cout << game.Play() << endl;
   }
 
   return 0;

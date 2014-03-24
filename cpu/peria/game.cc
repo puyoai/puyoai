@@ -9,12 +9,16 @@
 #include "player.h"
 
 Game::Game(const std::string& name) : name_(name) {
-  players_[0].reset(new Player());
+  players_.resize(2, NULL);
+  players_[0] = new Player();
   if (name != "HITOPUYO")
-    players_[1].reset(new Player());
+    players_[1] = new Player();
 }
 
-Game::~Game() {}
+Game::~Game() {
+  delete(players_[0]);
+  delete(players_[1]);
+}
 
 bool Game::Input(const string& input) {
   istringstream iss(input);
@@ -48,7 +52,7 @@ bool Game::Input(const string& input) {
       continue;
     }
 
-    Player* player = players_[(key[0] == 'Y') ? 0 : 1].get();
+    Player* player = players_[(key[0] == 'Y') ? 0 : 1];
     switch (key[1]) {
     case 'F':  // Field
       player->mutable_field()->SetField(value);

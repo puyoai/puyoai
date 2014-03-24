@@ -21,7 +21,7 @@ class Game {
   bool CheckDiff(const Player& prev, Player* player);
 
   string name_;
-  scoped_ptr<Player> players_[2];
+  std::vector<Player*> players_;
   int id_;  // Time frame
 };
 
