@@ -5,19 +5,10 @@
 #include "base.h"
 
 class PlayerTest : public testing::Test {
- protected:
-  virtual void SetUp() {
-    player_.reset(new Player());
-  }
-  virtual void TearDown() {
-    player_.reset();
-  }
-
- public:
-  scoped_ptr<Player> player_;
 };
 
 TEST_F(PlayerTest, Get) {
-  player_->set_field(Field("444400"));
-  EXPECT_EQ(kRed, player_->field().Get(1, 1));
+  Player player;
+  player.set_field(Field("444400"));
+  EXPECT_EQ(kRed, player.field().Get(1, 1));
 }
