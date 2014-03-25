@@ -13,7 +13,7 @@ Game::Game(const std::string& name) : name_(name) {
   players_[0] = new Player();
   if (name != "HITOPUYO") {
     players_[1] = new Player();
-    players_[0]->SetOpposite(players_[1]);
+    players_[0]->set_opposite(players_[1]);
   }
 }
 

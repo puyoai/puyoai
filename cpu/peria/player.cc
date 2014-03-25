@@ -45,8 +45,28 @@ bool operator!=(const Player& a, const Player& b) {
   return !(a == b);
 }
 
-void Player::SetOpposite(Player* opposite) {
-  opposite_ = opposite;
+void Player::GetControl(Control* control) {
+  vector<Control> controls;
+  SearchControls(x_, y_, r_, &controls);
+
+  vector<Player> children;
+  double value = 0;
+  for (size_t i = 0; i < controls.size(); ++i) {
+    Player child(*this);
+    child.ApplyControl(controls[i]);
+    double val = child.Evaluate();
+    if (val > value) {
+      value = val;
+      *control = controls[i];
+    }
+  }
+}
+
+void Player::ApplyControl(const Control& control) {
+}
+
+double Player::Evaluate() {
+  return 0;
 }
 
 void Player::Search(vector<Player>* children) const {
