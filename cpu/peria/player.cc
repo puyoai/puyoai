@@ -47,7 +47,7 @@ bool operator!=(const Player& a, const Player& b) {
 
 void Player::GetControl(Control* control) {
   vector<Control> controls;
-  SearchControls(&controls);
+  GetControls(&controls);
 
   vector<Player> children;
   double value = 0;
@@ -75,27 +75,24 @@ double Player::Evaluate() {
 }
 
 namespace {
-set<Player::Position>* g_stack = NULL;
-set<Player::Position>* g_queue = NULL;
-
-void Insert(int x, int y, int r) {
+void Insert(int x, int y, int r, set<Player::Position>* stack,
+            set<Player::Position>* queue) {
   Player::Position pos(Player::Control(x, r), y);
-  if (g_stack->find(pos) != g_stack->end())
+  if (stack->find(pos) != stack->end())
     return;
-  g_stack->insert(pos);
-  g_queue->insert(pos);
+  stack->insert(pos);
+  queue->insert(pos);
 }
 }  // namespace
 
-void Player::SearchControls(vector<Control>* controls) {
-  set<Position> positions;
+void Player::GetControls(vector<Control>* controls) {
+  typedef set<Position>::iterator Iterator;
+  set<Position> stack;
   set<Position> queue;
-  g_stack = &positions;
-  g_queue = &queue;
 
   queue.insert(Position(Control(x_, r_), y_));
   while (!queue.empty()) {
-    set<Position>::iterator itr = queue.begin();
+    Iterator itr = queue.begin();
     int x = itr->first.first;
     int r = itr->first.second;
     int y = itr->second;
@@ -103,66 +100,66 @@ void Player::SearchControls(vector<Control>* controls) {
 
     switch (r) {
     case 0: {
-      if (field().IsEmpty(x + 1, y) && field().IsEmpty(x + 1, y + 1))
-        Insert(x + 1, y, 0);  // Right
-      if (field().IsEmpty(x - 1, y) && field().IsEmpty(x - 1, y + 1))
-        Insert(x - 1, y, 0);  // Left
-      if (field().IsEmpty(x + 1, y))  // Turn Right
-        Insert(x, y, 1);
-      else if (field().IsEmpty(x - 1, y))
-        Insert(x - 1, y, 1);
+      if (field_.IsEmpty(x + 1, y) && field_.IsEmpty(x + 1, y + 1))  // Right
+        Insert(x + 1, y, 0, &stack, &queue);
+      if (field_.IsEmpty(x - 1, y) && field_.IsEmpty(x - 1, y + 1))  // Left
+        Insert(x - 1, y, 0, &stack, &queue);
+      if (field_.IsEmpty(x + 1, y))  // Turn Right
+        Insert(x, y, 1, &stack, &queue);
+      else if (field_.IsEmpty(x - 1, y))
+        Insert(x - 1, y, 1, &stack, &queue);
       else
-        Insert(x, y + 1, 2);
-      if (field().IsEmpty(x - 1, y))  // Turn Left
-        Insert(x, y, 3);
-      else if (field().IsEmpty(x + 1, y))
-        Insert(x + 1, y, 3);
+        Insert(x, y + 1, 2, &stack, &queue);
+      if (field_.IsEmpty(x - 1, y))  // Turn Left
+        Insert(x, y, 3, &stack, &queue);
+      else if (field_.IsEmpty(x + 1, y))
+        Insert(x + 1, y, 3, &stack, &queue);
     }
     case 1: {
-      if (field().IsEmpty(x + 2, y))
-        Insert(x + 1, y, 1);  // Right
-      if (field().IsEmpty(x - 1, y))
-        Insert(x - 1, y, 1);  // Left
-      if (field().IsEmpty(x, y - 1))  // Turn Right
-        Insert(x, y, 2);
-      else if (field().IsEmpty(x, y + 1) && y < Field::kHeight + 2)
-        Insert(x - 1, y, 2);
-      if (field().IsEmpty(x, y + 1))  // Turn Left
-        Insert(x, y, 0);
+      if (field_.IsEmpty(x + 2, y))  // Right
+        Insert(x + 1, y, 1, &stack, &queue);
+      if (field_.IsEmpty(x - 1, y))  // Left
+        Insert(x - 1, y, 1, &stack, &queue);
+      if (field_.IsEmpty(x, y - 1))  // Turn Right
+        Insert(x, y, 2, &stack, &queue);
+      else if (field_.IsEmpty(x, y + 1) && y < Field::kHeight + 2)
+        Insert(x - 1, y, 2, &stack, &queue);
+      if (field_.IsEmpty(x, y + 1))  // Turn Left
+        Insert(x, y, 0, &stack, &queue);
     }
     case 2: {
-      if (field().IsEmpty(x + 1, y) && field().IsEmpty(x + 1, y - 1))
-        Insert(x + 1, y, 2);  // Right
-      if (field().IsEmpty(x - 1, y) && field().IsEmpty(x - 1, y - 1))
-        Insert(x - 1, y, 2);  // Left
-      if (field().IsEmpty(x - 1, y))  // Turn Right
-        Insert(x, y, 3);
-      else if (field().IsEmpty(x + 1, y))
-        Insert(x + 1, y, 3);
+      if (field_.IsEmpty(x + 1, y) && field_.IsEmpty(x + 1, y - 1))  // Right
+        Insert(x + 1, y, 2, &stack, &queue);
+      if (field_.IsEmpty(x - 1, y) && field_.IsEmpty(x - 1, y - 1))  // Left
+        Insert(x - 1, y, 2, &stack, &queue);
+      if (field_.IsEmpty(x - 1, y))  // Turn Right
+        Insert(x, y, 3, &stack, &queue);
+      else if (field_.IsEmpty(x + 1, y))
+        Insert(x + 1, y, 3, &stack, &queue);
       else
-        Insert(x, y - 1, 0);
-      if (field().IsEmpty(x + 1, y))  // Turn Left
-        Insert(x, y, 3);
-      else if (field().IsEmpty(x - 1, y))
-        Insert(x - 1, y, 3);
+        Insert(x, y - 1, 0, &stack, &queue);
+      if (field_.IsEmpty(x + 1, y))  // Turn Left
+        Insert(x, y, 3, &stack, &queue);
+      else if (field_.IsEmpty(x - 1, y))
+        Insert(x - 1, y, 3, &stack, &queue);
     }
     case 3: {
-      if (field().IsEmpty(x + 1, y))
-        Insert(x + 1, y, 3);  // Right
-      if (field().IsEmpty(x - 2, y))
-        Insert(x - 1, y, 3);  // Left
-      if (field().IsEmpty(x, y + 1))  // Turn Right
-        Insert(x, y, 0);
-      if (field().IsEmpty(x, y - 1))  // Turn Left
-        Insert(x, y, 2);
-      else if (field().IsEmpty(x + 1, y) && y < Field::kHeight + 2)
-        Insert(x, y + 1, 2);
+      if (field_.IsEmpty(x + 1, y))  // Right
+        Insert(x + 1, y, 3, &stack, &queue);
+      if (field_.IsEmpty(x - 2, y))  // Left
+        Insert(x - 1, y, 3, &stack, &queue);
+      if (field_.IsEmpty(x, y + 1))  // Turn Right
+        Insert(x, y, 0, &stack, &queue);
+      if (field_.IsEmpty(x, y - 1))  // Turn Left
+        Insert(x, y, 2, &stack, &queue);
+      else if (field_.IsEmpty(x + 1, y) && y < Field::kHeight + 2)
+        Insert(x, y + 1, 2, &stack, &queue);
     }
     }
   }
 
-  for (set<Position>::iterator itr = positions.begin();
-       itr != positions.end(); ++itr)
+  controls->clear();
+  for (Iterator itr = stack.begin(); itr != stack.end(); ++itr)
     controls->push_back(itr->first);
   sort(controls->begin(), controls->end());
   vector<Control>::iterator itr = unique(controls->begin(), controls->end());
