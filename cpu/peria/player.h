@@ -57,8 +57,7 @@ class Player {
   int get_r() const { return r_; }
 
  private:
-  void Search(vector<Player>* children) const;
-  void SearchControls(int x, int y, int r, vector<Control>* controls) const;
+  void SearchControls(vector<Control>* controls);
 
   Player* opposite_;
   int state_;
