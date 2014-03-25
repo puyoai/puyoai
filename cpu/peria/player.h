@@ -9,27 +9,35 @@
 class Player {
  public:
   enum State {
-    kNone = 0,
-    kPlay = 1 << 0,
-    kNext2 = 1 << 2,
-    kSet = 1 << 4,
-    kWin = 1 << 6,
+    kNone     = 0,
+    kPlay     = 1 << 0,
+    kNext2    = 1 << 2,
+    kSet      = 1 << 4,
+    kWin      = 1 << 6,
     kChainEnd = 1 << 8,
-    kAll = 0x55555555,
+    kAll      = 0x55555555,
   };
   typedef pair<int, int> Control;       // (x, r)
   typedef pair<Control, int> Position;  // ((x, r), y)
 
+  // Copy.
   void CopyFrom(const Player& player);
+
+  // Set puyos to control. [0] and [1] are being on control.
   void SetColorSequence(const string& colors);
 
-  void Search(vector<Player>* children) const;
-  void SetOpposite(Player* opposite);
+  // Returns value of current state.
+  double Evaluate();
 
-  void SearchControls(int x, int y, int r, vector<Control>* controls) const;
+  // Returns the best control.
+  void GetControl(Control* control);
+
+  // Controls puyos and simulates.
+  void ApplyControl(const Control& control);
+
 
   // Accessors ------------------------------------------------------------
-  void set_parent(Player* parent) { parent_ = parent; }
+  void set_opposite(Player* opposite) { opposite_ = opposite; }
   void set_state(int state) { state_ = state; }
   void set_field(const Field& field) { field_ = field; }
   void set_score(int score) { score_ = score; }
@@ -38,7 +46,7 @@ class Player {
   void set_y(int y) { y_ = y; }
   void set_r(int r) { r_ = r; }
 
-  Player* parent() { return parent_; }
+  Player* opposite() { return opposite_; }
   int state() const { return state_; }
   const Field& field() const { return field_; }
   Field* mutable_field() { return &field_; }
@@ -49,7 +57,10 @@ class Player {
   int get_r() const { return r_; }
 
  private:
-  Player* parent_;
+  void Search(vector<Player>* children) const;
+  void SearchControls(int x, int y, int r, vector<Control>* controls) const;
+
+  Player* opposite_;
   int state_;
   Field field_;
   string sequence_;
@@ -58,7 +69,6 @@ class Player {
   int y_;  // y-axis of Jiku puyo
   int r_;  // round number of controlling puyo.
   int ojama_;
-  Player* opposite_;
 };
 
 bool operator==(const Player& a, const Player& b);
