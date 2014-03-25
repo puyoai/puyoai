@@ -1,6 +1,7 @@
 #ifndef CPU_PERIA_PLAYER_H_
 #define CPU_PERIA_PLAYER_H_
 
+#include <set>
 #include <vector>
 
 #include "base.h"
@@ -57,7 +58,7 @@ class Player {
   int get_r() const { return r_; }
 
  private:
-  void SearchControls(vector<Control>* controls);
+  void GetControls(vector<Control>* controls);
 
   Player* opposite_;
   int state_;
