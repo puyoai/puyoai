@@ -47,7 +47,7 @@ bool operator!=(const Player& a, const Player& b) {
 
 void Player::GetControl(Control* control) {
   vector<Control> controls;
-  SearchControls(x_, y_, r_, &controls);
+  SearchControls(&controls);
 
   vector<Player> children;
   double value = 0;
@@ -63,40 +63,15 @@ void Player::GetControl(Control* control) {
 }
 
 void Player::ApplyControl(const Control& control) {
+  field_.Put(control.first, y_, control.second, sequence_.substr(0, 2));
+  int chains = 1, score = 0, frame = 0;
+  field_.Simulate(&chains, &score, &frame);
+  // Remove controlling puyos.
+  sequence_ = sequence_.substr(2);
 }
 
 double Player::Evaluate() {
   return 0;
-}
-
-void Player::Search(vector<Player>* children) const {
-  Player player;
-  player.set_score(1);
-  player.set_r(1);
-  if (field_.IsEmpty(1, Field::kHeight)) {
-    player.set_x(1);
-  } else if (field_.IsEmpty(6, Field::kHeight)) {
-    player.set_x(5);
-  } else {
-    player.set_x(3);
-  }
-  children->push_back(player);
-  return;
-
-
-  vector<Control> controls;
-  SearchControls(x_, y_, r_, &controls);
-  for (size_t i = 0; i < controls.size(); ++i) {
-    Player player;
-    player.CopyFrom(*this);
-    Field* field = player.mutable_field();
-    field->Put(controls[i].first, y_, controls[i].second,
-               sequence_.substr(0, 2));
-    int chains = 1, score = player.score(), frame = 0;
-    field->Simulate(&chains, &score, &frame);
-    player.set_score(score);
-    children->push_back(player);
-  }
 }
 
 namespace {
@@ -112,14 +87,13 @@ void Insert(int x, int y, int r) {
 }
 }  // namespace
 
-void Player::SearchControls(
-    int x, int y, int r, vector<Control>* controls) const {
+void Player::SearchControls(vector<Control>* controls) {
   set<Position> positions;
   set<Position> queue;
   g_stack = &positions;
   g_queue = &queue;
 
-  queue.insert(Position(Control(x, r), y));
+  queue.insert(Position(Control(x_, r_), y_));
   while (!queue.empty()) {
     set<Position>::iterator itr = queue.begin();
     int x = itr->first.first;
