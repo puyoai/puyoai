@@ -53,8 +53,10 @@ void Player::GetControl(Control* control) {
   double value = 0;
   for (size_t i = 0; i < controls.size(); ++i) {
     Player child(*this);
-    child.ApplyControl(controls[i]);
-    double val = child.Evaluate();
+    int score = 0;
+    int frame = 0;
+    child.ApplyControl(controls[i], &score, &frame);
+    double val = child.Evaluate(score, frame);
     if (val > value) {
       value = val;
       *control = controls[i];
@@ -62,16 +64,17 @@ void Player::GetControl(Control* control) {
   }
 }
 
-void Player::ApplyControl(const Control& control) {
+void Player::ApplyControl(const Control& control, int* score, int* frame) {
   field_.Put(control.first, y_, control.second, sequence_.substr(0, 2));
-  int chains = 1, score = 0, frame = 0;
-  field_.Simulate(&chains, &score, &frame);
+  int chains = 1;
+  field_.Simulate(&chains, score, frame);
+
   // Remove controlling puyos.
   sequence_ = sequence_.substr(2);
 }
 
-double Player::Evaluate() {
-  return 0;
+double Player::Evaluate(int score, int frame) {
+  return static_cast<double>(score) / (frame + 1.0);
 }
 
 namespace {

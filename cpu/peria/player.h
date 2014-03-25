@@ -28,13 +28,13 @@ class Player {
   void SetColorSequence(const string& colors);
 
   // Returns value of current state.
-  double Evaluate();
+  double Evaluate(int score, int frame);
 
   // Returns the best control.
   void GetControl(Control* control);
 
   // Controls puyos and simulates.
-  void ApplyControl(const Control& control);
+  void ApplyControl(const Control& control, int* score, int* frame);
 
 
   // Accessors ------------------------------------------------------------
