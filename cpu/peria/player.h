@@ -28,7 +28,7 @@ class Player {
   void SetColorSequence(const string& colors);
 
   // Returns the value of the best control.
-  double GetControl(Control* control, string* message);
+  double GetBestControl(Control* control, string* message);
 
   // Controls puyos, simulates field, and return the value.
   double ApplyControl(const Control& control, string* message);
@@ -57,7 +57,7 @@ class Player {
   int get_y() const { return y_;}
   int get_r() const { return r_; }
 
- private:
+ protected:
   void GetControls(vector<Control>* controls);
 
   Player* opposite_;
@@ -70,8 +70,5 @@ class Player {
   int r_;  // round number of controlling puyo.
   int ojama_;
 };
-
-bool operator==(const Player& a, const Player& b);
-bool operator!=(const Player& a, const Player& b);
 
 #endif  // CPU_PERIA_PLAYER_H_

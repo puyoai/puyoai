@@ -27,7 +27,7 @@ void Player::SetColorSequence(const string& colors) {
     sequence_[i] = colors[i] - '0';
 }
 
-double Player::GetControl(Control* control, string* message) {
+double Player::GetBestControl(Control* control, string* message) {
   vector<Control> controls;
   GetControls(&controls);
 
@@ -46,27 +46,20 @@ double Player::GetControl(Control* control, string* message) {
     }
   }
 
-  if (message) {
-    ostringstream oss;
-    oss << sequence_.size();
-    *message = oss.str();
-  }
-
   return value;
 }
 
 double Player::ApplyControl(const Control& control, string* message) {
   field_.Put(control.first, y_, control.second, sequence_.substr(0, 2));
+  // Remove controlling puyos.
   sequence_ = sequence_.substr(2);
   int chains = 1;
   int score = 0;
   int frame = 0;
   field_.Simulate(&chains, &score, &frame);
 
-  // Remove controlling puyos.
-  if (sequence_.size() > 1) {
-    return GetControl(NULL, NULL);
-  }
+  if (sequence_.size() > 1 && score == 0)
+    return GetBestControl(NULL, NULL);
   return Evaluate(score, frame, message);
 }
 

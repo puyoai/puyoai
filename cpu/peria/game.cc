@@ -90,7 +90,7 @@ string Game::Play() {
 
   Player::Control control;
   string message;
-  players_[0]->GetControl(&control, &message);
+  players_[0]->GetBestControl(&control, &message);
   oss << " X=" << control.first
       << " R=" << control.second
       << " MSG=" << message;
