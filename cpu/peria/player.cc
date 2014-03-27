@@ -132,9 +132,9 @@ void Player::GetControls(vector<Control>* controls) {
       else
         Insert(x, y - 1, 0, &stack, &queue);
       if (field_.IsEmpty(x + 1, y))  // Turn Left
-        Insert(x, y, 3, &stack, &queue);
+        Insert(x, y, 1, &stack, &queue);
       else if (field_.IsEmpty(x - 1, y))
-        Insert(x - 1, y, 3, &stack, &queue);
+        Insert(x - 1, y, 1, &stack, &queue);
     }
     case 3: {
       if (field_.IsEmpty(x + 1, y))  // Right
