@@ -27,14 +27,14 @@ class Player {
   // Set puyos to control. [0] and [1] are being on control.
   void SetColorSequence(const string& colors);
 
+  // Returns the value of the best control.
+  double GetControl(Control* control, string* message);
+
+  // Controls puyos, simulates field, and return the value.
+  double ApplyControl(const Control& control, string* message);
+
   // Returns value of current state.
-  double Evaluate(int score, int frame);
-
-  // Returns the best control.
-  void GetControl(Control* control);
-
-  // Controls puyos and simulates.
-  void ApplyControl(const Control& control, int* score, int* frame);
+  double Evaluate(int score, int frame, string* message);
 
 
   // Accessors ------------------------------------------------------------

@@ -12,12 +12,13 @@
 
 void Player::CopyFrom(const Player& player) {
   field_.CopyFrom(player.field());
+  sequence_ = player.sequence_;
   state_ = player.state();
   score_ = player.score();
-  ojama_ = player.ojama();
   x_ = player.get_x();
   y_ = player.get_y();
   r_ = player.get_r();
+  ojama_ = player.ojama();
 }
 
 void Player::SetColorSequence(const string& colors) {
@@ -26,55 +27,51 @@ void Player::SetColorSequence(const string& colors) {
     sequence_[i] = colors[i] - '0';
 }
 
-bool operator==(const Player& a, const Player& b) {
-  if (a.state() != b.state()) return false;
-  if (a.score() != b.score()) return false;
-  if (a.ojama() != b.ojama()) return false;
-  if (a.get_x() != b.get_x()) return false;
-  if (a.get_y() != b.get_y()) return false;
-  if (a.get_r() != b.get_r()) return false;
-
-  // Compare visible field
-  if (!a.field().EqualTo(b.field(), true /*visible*/))
-    return false;
-
-  return true;
-}
-
-bool operator!=(const Player& a, const Player& b) {
-  return !(a == b);
-}
-
-void Player::GetControl(Control* control) {
+double Player::GetControl(Control* control, string* message) {
   vector<Control> controls;
   GetControls(&controls);
 
   vector<Player> children;
   double value = 0;
   for (size_t i = 0; i < controls.size(); ++i) {
+    string msg;
     Player child(*this);
-    int score = 0;
-    int frame = 0;
-    child.ApplyControl(controls[i], &score, &frame);
-    double val = child.Evaluate(score, frame);
+    double val = child.ApplyControl(controls[i], &msg);
     if (val > value) {
       value = val;
-      *control = controls[i];
+      if (control)
+        *control = controls[i];
+      if (message)
+        *message = msg;
     }
   }
+
+  if (message) {
+    ostringstream oss;
+    oss << sequence_.size();
+    *message = oss.str();
+  }
+
+  return value;
 }
 
-void Player::ApplyControl(const Control& control, int* score, int* frame) {
+double Player::ApplyControl(const Control& control, string* message) {
   field_.Put(control.first, y_, control.second, sequence_.substr(0, 2));
+  sequence_ = sequence_.substr(2);
   int chains = 1;
-  field_.Simulate(&chains, score, frame);
+  int score = 0;
+  int frame = 0;
+  field_.Simulate(&chains, &score, &frame);
 
   // Remove controlling puyos.
-  sequence_ = sequence_.substr(2);
+  if (sequence_.size() > 1) {
+    return GetControl(NULL, NULL);
+  }
+  return Evaluate(score, frame, message);
 }
 
-double Player::Evaluate(int score, int frame) {
-  return static_cast<double>(score) / (frame + 1.0);
+double Player::Evaluate(int score, int frame, string* message) {
+  return static_cast<double>(score);
 }
 
 namespace {
