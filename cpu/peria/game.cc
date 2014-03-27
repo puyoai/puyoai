@@ -88,18 +88,12 @@ string Game::Play() {
   ostringstream oss;
   oss << "ID=" << id_;
 
-  // TODO: Migrate control routine into Player class.
-#if 0
   Player::Control control;
   string message;
   players_[0]->GetControl(&control, &message);
-  oss << control.first << " " << control.second << " " << message;
-#else
-  int x = 1;
-  int r = 0;
-  oss << " X=" << x << " R=" << r
-      << " MSG=refactoring";
-#endif
+  oss << " X=" << control.first
+      << " R=" << control.second
+      << " MSG=" << message;
 
   return oss.str();
 }
