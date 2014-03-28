@@ -31,8 +31,12 @@ double Player::GetBestControl(Control* control, string* message) {
   vector<Control> controls;
   GetControls(&controls);
 
-  vector<Player> children;
-  double value = 0;
+  if (control) {
+    *control = controls[0];
+    return 0;
+  }
+
+  double value = -1;
   for (size_t i = 0; i < controls.size(); ++i) {
     string msg;
     Player child(*this);
@@ -58,7 +62,7 @@ double Player::ApplyControl(const Control& control, string* message) {
   int frame = 0;
   field_.Simulate(&chains, &score, &frame);
 
-  if (sequence_.size() > 1 && score == 0)
+  if (sequence_.size() >= 2 && score == 0)
     return GetBestControl(NULL, NULL);
   return Evaluate(score, frame, message);
 }
