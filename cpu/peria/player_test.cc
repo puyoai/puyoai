@@ -1,6 +1,7 @@
 #include "player.h"
 
 #include <gtest/gtest.h>
+#include <string>
 #include <vector>
 
 #include "base.h"
@@ -24,7 +25,7 @@ TEST_F(PlayerTest, GetControls) {
   for (int i = 0; i < ARRAYSIZE(datas); ++i) {
     vector<Player::Control> controls;
     TestablePlayer player;
-    player.set_field(Field(string(datas[i].field)));
+    player.set_field(Field(datas[i].field));
     player.GetControls(&controls);
     EXPECT_EQ(datas[i].ex_number, controls.size());
   }
