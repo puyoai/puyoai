@@ -88,12 +88,14 @@ string Game::Play() {
   ostringstream oss;
   oss << "ID=" << id_;
 
+  LOG(INFO) << "Play()";
   Player::Control control;
   string message;
   players_[0]->GetBestControl(&control, &message);
   oss << " X=" << control.first
       << " R=" << control.second
       << " MSG=" << message;
+  LOG(INFO) << "~Play(): " << oss.str();
 
   return oss.str();
 }
