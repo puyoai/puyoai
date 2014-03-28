@@ -31,11 +31,6 @@ double Player::GetBestControl(Control* control, string* message) {
   vector<Control> controls;
   GetControls(&controls);
 
-  if (control) {
-    *control = controls[0];
-    return 0;
-  }
-
   double value = -1;
   for (size_t i = 0; i < controls.size(); ++i) {
     string msg;
@@ -111,6 +106,7 @@ void Player::GetControls(vector<Control>* controls) {
         Insert(x, y, 3, &stack, &queue);
       else if (field_.IsEmpty(x + 1, y))
         Insert(x + 1, y, 3, &stack, &queue);
+      break;
     }
     case 1: {
       if (field_.IsEmpty(x + 2, y))  // Right
@@ -123,6 +119,7 @@ void Player::GetControls(vector<Control>* controls) {
         Insert(x - 1, y, 2, &stack, &queue);
       if (field_.IsEmpty(x, y + 1))  // Turn Left
         Insert(x, y, 0, &stack, &queue);
+      break;
     }
     case 2: {
       if (field_.IsEmpty(x + 1, y) && field_.IsEmpty(x + 1, y - 1))  // Right
@@ -139,6 +136,7 @@ void Player::GetControls(vector<Control>* controls) {
         Insert(x, y, 1, &stack, &queue);
       else if (field_.IsEmpty(x - 1, y))
         Insert(x - 1, y, 1, &stack, &queue);
+      break;
     }
     case 3: {
       if (field_.IsEmpty(x + 1, y))  // Right
@@ -151,6 +149,7 @@ void Player::GetControls(vector<Control>* controls) {
         Insert(x, y, 2, &stack, &queue);
       else if (field_.IsEmpty(x + 1, y) && y < Field::kHeight + 2)
         Insert(x, y + 1, 2, &stack, &queue);
+      break;
     }
     }
   }
