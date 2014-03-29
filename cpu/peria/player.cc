@@ -10,6 +10,28 @@
 
 #include "base.h"
 
+Player::Player()
+  : opposite_(NULL),
+    state_(0),
+    score_(0),
+    x_(Field::kWidth / 2),
+    y_(Field::kHeight),
+    r_(0),
+    ojama_(0) {}
+
+Player::Player(const Player& player)
+  : opposite_(player.opposite_),
+    field_(player.field_),
+    state_(player.state_),
+    sequence_(player.sequence_),
+    score_(player.score_),
+    x_(player.x_),
+    y_(player.y_),
+    r_(player.r_),
+    ojama_(player.ojama_) {}
+
+Player::~Player() {}
+
 void Player::CopyFrom(const Player& player) {
   field_.CopyFrom(player.field());
   sequence_ = player.sequence_;
