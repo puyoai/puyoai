@@ -21,6 +21,10 @@ class Player {
   typedef pair<int, int> Control;       // (x, r)
   typedef pair<Control, int> Position;  // ((x, r), y)
 
+  Player();
+  Player(const Player& player);
+  ~Player();
+
   // Copy.
   void CopyFrom(const Player& player);
 
@@ -61,8 +65,8 @@ class Player {
   void GetControls(vector<Control>* controls);
 
   Player* opposite_;
-  int state_;
   Field field_;
+  int state_;
   string sequence_;
   int score_;
   int x_;  // x-axis of Jiku puyo
