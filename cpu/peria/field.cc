@@ -14,7 +14,6 @@
 
 #include "../../core/constant.h"
 #include "base.h"
-#include "decision.h"
 
 Field::Field() {
   Init();
