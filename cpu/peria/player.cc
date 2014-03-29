@@ -32,17 +32,6 @@ Player::Player(const Player& player)
 
 Player::~Player() {}
 
-void Player::CopyFrom(const Player& player) {
-  field_.CopyFrom(player.field());
-  sequence_ = player.sequence_;
-  state_ = player.state();
-  score_ = player.score();
-  x_ = player.get_x();
-  y_ = player.get_y();
-  r_ = player.get_r();
-  ojama_ = player.ojama();
-}
-
 void Player::SetColorSequence(const string& colors) {
   sequence_.resize(colors.size());
   for (size_t i = 0; i < colors.size(); ++i)

@@ -25,9 +25,6 @@ class Player {
   Player(const Player& player);
   ~Player();
 
-  // Copy.
-  void CopyFrom(const Player& player);
-
   // Set puyos to control. [0] and [1] are being on control.
   void SetColorSequence(const string& colors);
 
