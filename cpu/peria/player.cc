@@ -126,8 +126,8 @@ void Player::GetControls(vector<Control>* controls) {
         Insert(x - 1, y, 1, &stack, &queue);
       if (field_.IsEmpty(x, y - 1))  // Turn Right
         Insert(x, y, 2, &stack, &queue);
-      else if (field_.IsEmpty(x, y + 1) && y < Field::kHeight + 2)
-        Insert(x - 1, y, 2, &stack, &queue);
+      else if (field_.IsEmpty(x, y + 1) && y <= Field::kHeight)
+        Insert(x, y + 1, 2, &stack, &queue);
       if (field_.IsEmpty(x, y + 1))  // Turn Left
         Insert(x, y, 0, &stack, &queue);
       break;
@@ -158,7 +158,7 @@ void Player::GetControls(vector<Control>* controls) {
         Insert(x, y, 0, &stack, &queue);
       if (field_.IsEmpty(x, y - 1))  // Turn Left
         Insert(x, y, 2, &stack, &queue);
-      else if (field_.IsEmpty(x + 1, y) && y < Field::kHeight + 2)
+      else if (field_.IsEmpty(x, y + 1) && y <= Field::kHeight)
         Insert(x, y + 1, 2, &stack, &queue);
       break;
     }
