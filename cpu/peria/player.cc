@@ -74,7 +74,7 @@ double Player::ApplyControl(const Control& control, string* message) {
 }
 
 double Player::Evaluate(int score, int frame, string* message) {
-  return static_cast<double>(score);
+  return score - field_.Evaluate();
 }
 
 namespace {

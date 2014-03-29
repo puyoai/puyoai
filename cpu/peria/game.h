@@ -22,6 +22,7 @@ class Game {
 
   string name_;
   std::vector<Player*> players_;
+  Player::Control prev_control_;
   int id_;  // Time frame
 };
 

@@ -8,7 +8,9 @@
 #include "base.h"
 #include "player.h"
 
-Game::Game(const std::string& name) : name_(name) {
+Game::Game(const std::string& name)
+  : name_(name),
+    prev_control_(0, 0) {
   players_.resize(2, NULL);
   players_[0] = new Player();
   if (name != "HITOPUYO") {
@@ -92,6 +94,12 @@ string Game::Play() {
   Player::Control control;
   string message;
   players_[0]->GetBestControl(&control, &message);
+  if (control == prev_control_) {
+    control = Player::Control(0, 0);
+  } else {
+    prev_control_ = control;
+  }
+
   oss << " X=" << control.first
       << " R=" << control.second
       << " MSG=" << message;
