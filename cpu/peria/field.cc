@@ -127,6 +127,7 @@ bool Field::IsEmpty(int x, int y) const {
 }
 
 namespace {
+
 inline void CheckCell(unsigned char color,
 		      unsigned char field_[][Field::kMapHeight],
 		      int** writer, int x, int y) {
@@ -155,6 +156,7 @@ int GetLongBonus(int length) {
     length = ARRAYSIZE(kLongBonus);
   return kLongBonus[length];
 }
+
 }  // namespace
 
 bool Field::Vanish(int chains, int* score) {
@@ -322,11 +324,6 @@ void Field::Clean_() {
       field_[x][y] &= (kMaskChecked - 1);
     }
   }
-}
-
-void Field::Simulate() {
-  int score = 0, chain = 1, frames = 0;
-  Simulate(&score, &chain, &frames);
 }
 
 void Field::Simulate(int* chains, int* score, int* frames) {

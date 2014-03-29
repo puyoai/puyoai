@@ -64,7 +64,6 @@ class Field {
 
   // Simulate chains until the end, and returns chains, score, and frames
   // before finishing the chain.
-  void Simulate();
   void Simulate(int* chains, int* score, int* frames);
 
   // Normal print for debugging purpose.
@@ -73,12 +72,13 @@ class Field {
   // Returns n-th puyo in the queue.
   char GetNextPuyo(int n) const;
 
-  bool zenkeshi();
-
   // Returns true if |field| is same
   bool EqualTo(const Field& field, bool visible = true) const;
 
   double Evaluate();
+
+  // --- Accessor -------------------------------
+  bool zenkeshi() { return zenkeshi_; }
 
  protected:
   // Clean internal states, related to Vanish and Drop.

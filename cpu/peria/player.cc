@@ -56,6 +56,11 @@ double Player::GetBestControl(Control* control, string* message) {
     }
   }
 
+  if (message) {
+    ostringstream oss;
+    oss << control->first << "-" << control->second << "-" << value;
+    *message = oss.str();
+  }
   return value;
 }
 
@@ -74,7 +79,7 @@ double Player::ApplyControl(const Control& control, string* message) {
 }
 
 double Player::Evaluate(int score, int frame, string* message) {
-  return score - field_.Evaluate();
+  return score + field_.Evaluate() + (field_.zenkeshi() ? 70 * 30 : 0);
 }
 
 namespace {
