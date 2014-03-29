@@ -79,6 +79,8 @@ class Field {
   // Returns true if |field| is same
   bool EqualTo(const Field& field, bool visible = true) const;
 
+  double Evaluate();
+
  protected:
   // Clean internal states, related to Vanish and Drop.
   void Clean_();

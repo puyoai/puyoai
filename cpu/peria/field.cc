@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <glog/logging.h>
 #include <iostream>
@@ -375,4 +376,8 @@ bool Field::EqualTo(const Field& field, bool visible) const {
     }
   }
   return true;
+}
+
+double Field::Evaluate() {
+  return 0;
 }
