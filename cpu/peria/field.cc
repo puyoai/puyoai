@@ -15,6 +15,34 @@
 #include "../../core/constant.h"
 #include "base.h"
 
+char Field::CharToColor(char ch) {
+  switch (ch) {
+  case '0':
+  case ' ':
+    return kEmpty;
+  case '1':
+  case '@':
+    return kOjama;
+  case '2':
+  case '#':
+    return kWall;
+  case '4':
+  case 'R':
+    return kRed;
+  case '5':
+  case 'B':
+    return kBlue;
+  case '6':
+  case 'Y':
+    return kYellow;
+  case '7':
+  case 'G':
+    return kGreen;
+  }
+  // No reach
+  return kEmpty;
+}
+
 Field::Field() {
   Init();
 }
@@ -52,18 +80,7 @@ void Field::SetField(const string& field) {
   for (int i = field.size() - 1, p = 0; i >= 0; --i, ++p) {
     int x = (p + 6 - field.size() % 6) % 6 + 1;
     int y = i / 6 + 1;
-    char color = kEmpty;
-    switch(field[p]) {
-      case '0': color = kEmpty; break;
-      case '1': color = kOjama; break;
-      case '2': color = kWall; break;
-      case '4': color = kRed; break;
-      case '5': color = kBlue; break;
-      case '6': color = kYellow; break;
-      case '7': color = kGreen; break;
-      default: break;
-    }
-    Set(x, y, color);
+    Set(x, y, CharToColor(field[p]));
   }
 }
 

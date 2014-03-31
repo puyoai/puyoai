@@ -37,3 +37,24 @@ TEST_F(PlayerTest, GetControls) {
     EXPECT_EQ(datas[i].ex_number, controls.size());
   }
 }
+
+TEST_F(PlayerTest, ApplyControl) {
+  struct TestData {
+    char* field;       // Input
+    char* sequence;    // Input
+    int x;             // Input
+    int r;             // Input
+    double ex_score;   // Expected least score (depends on scoring function)
+  } datas[] = {
+    {"RR", "RR", 1, 0, 0},
+    {"RR", "RR", 6, 0, 40},
+  };
+
+  for (int i = 0; i < ARRAYSIZE(datas); ++i) {
+    Player player;
+    player.set_field(Field(datas[i].field));
+    player.SetColorSequence(datas[i].sequence);
+    Player::Control control(datas[i].x, datas[i].r);
+    EXPECT_LE(datas[i].ex_score, player.ApplyControl(control, NULL));
+  }
+}

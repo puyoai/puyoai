@@ -27,6 +27,8 @@ class Field {
   static const int kEraseNum = 4;
   static const int kColors = 8;
 
+  static char CharToColor(char a);
+
   Field();
   Field(const string& url);
   Field(const Field& f);
