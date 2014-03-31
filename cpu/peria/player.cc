@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "base.h"
+#include "field.h"
 
 Player::Player()
   : opposite_(NULL),
@@ -35,7 +36,7 @@ Player::~Player() {}
 void Player::SetColorSequence(const string& colors) {
   sequence_.resize(colors.size());
   for (size_t i = 0; i < colors.size(); ++i)
-    sequence_[i] = colors[i] - '0';
+    sequence_[i] = Field::CharToColor(colors[i]);
 }
 
 double Player::GetBestControl(Control* control, string* message) {
@@ -56,7 +57,7 @@ double Player::GetBestControl(Control* control, string* message) {
     }
   }
 
-  if (message) {
+  if (message && control) {
     ostringstream oss;
     oss << control->first << "-" << control->second << "-" << value;
     *message = oss.str();
@@ -73,9 +74,8 @@ double Player::ApplyControl(const Control& control, string* message) {
   int frame = 0;
   field_.Simulate(&chains, &score, &frame);
 
-  if (sequence_.size() >= 2 && score == 0)
-    return GetBestControl(NULL, NULL);
-  return Evaluate(score, frame, message);
+  return (sequence_.size() >= 4) ? GetBestControl(NULL, message) :
+                                   Evaluate(score, frame, message);
 }
 
 double Player::Evaluate(int score, int frame, string* message) {
@@ -95,9 +95,9 @@ void Insert(int x, int y, int r, set<Player::Position>* stack,
 
 void Player::GetControls(vector<Control>* controls) {
   typedef set<Position>::iterator Iterator;
+
   set<Position> stack;
   set<Position> queue;
-
   queue.insert(Position(Control(x_, r_), y_));
   while (!queue.empty()) {
     Iterator itr = queue.begin();
