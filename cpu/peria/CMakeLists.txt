@@ -22,6 +22,8 @@ endfunction()
 
 peria_add_executable(peria main.cc)
 
+cpu_add_runner(run.sh)
+
 include_directories(${gtest_SOURCE_DIR}/include
                     ${gtest_SOURCE_DIR})
 # TODO(peria): add tests if needed

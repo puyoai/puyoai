@@ -9,6 +9,8 @@ endfunction()
 
 hiroshimizuno_add_executable(hikuitokoro field_deprecated.cc hikuitokoro.cc )
 
+cpu_add_runner(run.sh)
+
 # TODO(hamaji): Followings cannot be built by clang.
 puyoai_add_cxx_flags("-march=native -masm=intel")
 hiroshimizuno_add_executable(f EXCLUDE_FROM_ALL f.cc)

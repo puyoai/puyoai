@@ -25,6 +25,11 @@ function(cpu_add_test exe)
   add_test(check-${exe}_${CPU_NAMESPACE} ${exe})
 endfunction()
 
+function(cpu_add_runner runner)
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${runner}
+       DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
+endfunction()
+
 add_subdirectory(hamaji)
 add_subdirectory(hidehiko)
 add_subdirectory(hiroshimizuno)
