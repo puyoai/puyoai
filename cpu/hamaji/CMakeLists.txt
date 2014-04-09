@@ -28,6 +28,13 @@ hamaji_add_executable(study study.cc)
 hamaji_add_executable(mkdb mkdb.cc)
 hamaji_add_executable(matchstat matchstat.cc)
 
+cpu_add_runner(lps-fast.sh)
+cpu_add_runner(lps-gtr.sh)
+cpu_add_runner(lps-gtr2.sh)
+cpu_add_runner(lps.sh)
+cpu_add_runner(lps2.sh)
+cpu_add_runner(run.sh)
+
 include_directories(${gtest_SOURCE_DIR}/include
                     ${gtest_SOURCE_DIR})
 hamaji_add_test(db_test)

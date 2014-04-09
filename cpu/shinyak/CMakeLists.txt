@@ -51,6 +51,9 @@ shinyak_add_executable(solo solo.cc)
 include_directories(${gtest_SOURCE_DIR}/include
                     ${gtest_SOURCE_DIR})
 
+cpu_add_runner(run.sh)
+cpu_add_runner(feature.txt)
+
 shinyak_add_test(enemy_info_test)
 shinyak_add_test(evaluation_feature_test)
 shinyak_add_test(field_bit_field_test)

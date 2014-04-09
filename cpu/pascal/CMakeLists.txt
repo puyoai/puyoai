@@ -13,5 +13,6 @@ function(pascal_add_executable exe)
 endfunction()
 
 pascal_add_executable(cpu main.cc)
+cpu_add_runner(run.sh)
 # TODO(hamaji): Cannot link due to missing field.cc
 pascal_add_executable(cpu2 EXCLUDE_FROM_ALL cpu2.cc)
