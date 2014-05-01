@@ -6,7 +6,6 @@ function(cpu_setup namespace)
 endfunction()
 
 function(cpu_target_link_common_libraries target)
-  target_link_libraries(${target}_${CPU_NAMESPACE} cpu_lib)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_util)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core)
   puyoai_target_link_libraries(${target}_${CPU_NAMESPACE})
@@ -40,5 +39,3 @@ add_subdirectory(peria)
 add_subdirectory(sample)
 add_subdirectory(yhayashi)
 
-include_directories(..)
-add_library(cpu_lib cpu_interface.cc)
