@@ -1,4 +1,4 @@
-#include "cpu/cpu_interface.h"
+#include "cpu_interface.h"
 
 class Decision;
 

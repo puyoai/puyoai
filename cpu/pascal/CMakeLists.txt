@@ -4,7 +4,7 @@ cpu_setup("pascal")
 
 puyoai_add_cxx_flags("-Wall")
 
-add_library(pascal_lib ctrl.cc)
+add_library(pascal_lib ctrl.cc cpu_interface.cc)
 
 function(pascal_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
