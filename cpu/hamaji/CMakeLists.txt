@@ -34,6 +34,7 @@ cpu_add_runner(lps-gtr2.sh)
 cpu_add_runner(lps.sh)
 cpu_add_runner(lps2.sh)
 cpu_add_runner(run.sh)
+cpu_add_runner(params.txt)
 
 include_directories(${gtest_SOURCE_DIR}/include
                     ${gtest_SOURCE_DIR})
