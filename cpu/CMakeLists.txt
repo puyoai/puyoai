@@ -32,7 +32,7 @@ endfunction()
 
 add_subdirectory(hamaji)
 add_subdirectory(hidehiko)
-add_subdirectory(hiroshimizuno)
+#add_subdirectory(hiroshimizuno)
 add_subdirectory(ichikawa)
 add_subdirectory(pascal)
 add_subdirectory(peria)
