@@ -21,11 +21,6 @@ struct Position;
 
 class Field : public BasicField {
 public:
-    static const int WIDTH = 6;
-    static const int HEIGHT = 12;
-    static const int MAP_WIDTH = 1 + WIDTH + 1;
-    static const int MAP_HEIGHT = 1 + HEIGHT + 3;
-
     Field() : BasicField() {}
     Field(const std::string& url) : BasicField(url) {}
     Field(const Field& field) : BasicField(field) {}
