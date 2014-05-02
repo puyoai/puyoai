@@ -55,8 +55,6 @@ function(puyoai_add_cxx_flags flags)
   endif()
 endfunction()
 
-find_package(GTest)
-
 find_package(SDL)
 find_package(SDL_image)
 find_package(SDL_ttf)

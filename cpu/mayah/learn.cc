@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <string>
 
-#include <boost/thread.hpp>
-#include <boost/thread/future.hpp>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
