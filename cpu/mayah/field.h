@@ -11,13 +11,6 @@
 
 class Decision;
 class FieldBitField;
-class FieldColumnBitField;
-class NonTrackingStrategy;
-class RensaTrackResult;
-class TrackingStrategy;
-struct BasicRensaInfo;
-struct TrackedRensaInfo;
-struct Position;
 
 class Field : public BasicField {
 public:
