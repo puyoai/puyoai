@@ -4,6 +4,7 @@
 #include <string.h>
 #include "field.h"
 
+// FieldBitField is a bitset whose size if the same as field.
 class FieldBitField
 {
 public:
