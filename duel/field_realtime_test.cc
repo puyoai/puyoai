@@ -39,7 +39,7 @@ TEST_F(FieldRealtimeTest, TimingAfterKeyInput) {
   EXPECT_EQ(FieldRealtime::STATE_USER, f_->GetSimulationState());
 }
 
-TEST_F(FieldRealtimeTest, TimingFreeFall) {
+TEST_F(FieldRealtimeTest, DISABLED_TimingFreeFall) {
   vector<int> states;
   // Free fall.
   for (int i = 0; i < 12; i++) {
@@ -69,7 +69,7 @@ TEST_F(FieldRealtimeTest, TimingFreeFall) {
   }
 }
 
-TEST_F(FieldRealtimeTest, TimingChigiri) {
+TEST_F(FieldRealtimeTest, DISABLED_TimingChigiri) {
   for (int i = 0 ; i < 11; i++) {
     f_->Play(KEY_DOWN, &player_log_);
     f_->Play(KEY_NONE, &player_log_);
