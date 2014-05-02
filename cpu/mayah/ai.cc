@@ -10,9 +10,9 @@
 #include <vector>
 
 #include "core/constant.h"
+#include "core/ctrl.h"
 #include "core/decision.h"
 #include "core/score.h"
-#include "ctrl.h"
 #include "drop_decision.h"
 #include "evaluation_feature.h"
 #include "evaluation_feature_collector.h"
