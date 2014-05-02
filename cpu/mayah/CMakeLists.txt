@@ -2,17 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("mayah")
 
-set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_LIBS   ON)
-set(BOOST_MIN_VERSION "1.52.0")
-find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS thread system)
-if(Boost_FOUND)
-  INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
-  ADD_DEFINITIONS("-DHAS_BOOST -DBOOST_THREAD_PROVIDES_FUTURE")
-else()
-  message("boost not found - Some programs won't be built.")
-endif()
-
 puyoai_add_cxx_flags("-Wall -Wextra -std=c++0x")
 
 add_library(mayah_lib
@@ -23,12 +12,7 @@ add_library(mayah_lib
 
 function(mayah_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
-  # TODO(mayah): Needs -lrt on gcc?
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    cpu_target_link_libraries(${exe} mayah_lib ${Boost_LIBRARIES})
-  else()
-    cpu_target_link_libraries(${exe} mayah_lib ${Boost_LIBRARIES} -lrt)
-  endif()
+  cpu_target_link_libraries(${exe} mayah_lib)
   cpu_target_link_common_libraries(${exe})
 endfunction()
 
@@ -42,9 +26,7 @@ endfunction()
 
 mayah_add_executable(mayah_cpu main.cc)
 mayah_add_executable(interactive interactive.cc)
-if(Boost_FOUND)
-mayah_add_executable(learn learn.cc)
-endif()
+#mayah_add_executable(learn learn.cc)
 mayah_add_executable(solver solver.cc)
 mayah_add_executable(solo solo.cc)
 
