@@ -26,12 +26,15 @@
 
 using namespace std;
 
-DEFINE_bool(use_cui, false, "use CUI version drawer");
 DEFINE_bool(record, false, "use Puyofu Recorder");
 
 #ifdef USE_SDL2
 DEFINE_bool(use_gui, true, "use GUI version drawer");
 DEFINE_bool(use_commentator, true, "use commentator");
+DEFINE_bool(use_cui, false, "use CUI version drawer");
+#else
+// When SDL2 is not defined, CUI should be enabled by default.
+DEFINE_bool(use_cui, true, "use CUI version drawer");
 #endif
 
 class GameStateHandler : public HttpHandler, public GameStateObserver {
