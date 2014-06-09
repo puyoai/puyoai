@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PUYO</title>
+    <link rel="stylesheet" href="/puyo.css" type="text/css">
+    <script src="/puyo.js"></script>
+</head>
+<body onload="init()">
+
+<h1>PUYO</h1>
+
+<div id="player-fields">
+    <img src="/background.png" class="background-image">
+</div>
+
+<div id="score-fields">
+    <div>Player1 score: <span id="score-1">0</span></div>
+    <div>Player2 score: <span id="score-2">0</span></div>
+</div>
+
+<div id="message-fields">
+    <h3>Player1</h3>
+    <div id="player1-message"></div>
+    <h3>Player2</h3>
+    <div id="player2-message"></div>
+</div>
+
+<button onclick="loadData()">Load Data</button>
+
+</body>
+</html>

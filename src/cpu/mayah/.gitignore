@@ -1,0 +1,17 @@
+shinyak_cpu
+shinyak_cpu.*
+*.d
+*_test
+Player1.txt
+Player2.txt
+solver-log.txt
+Makefile
+run.err
+solver
+solo
+solo.*.log.*
+solo.INFO
+interactive
+learn
+
+

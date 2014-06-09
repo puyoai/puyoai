@@ -1,0 +1,14 @@
+0. On mac with clang and libc++, I have to recompile gtest for libc++?
+
+1. 特に床付近に関して、定積のようなパターンのスコアを導入する
+  3x4 の 12bit 分ぐらい用意するのが良いような気がする
+
+2. IGNITED_RENSA
+   MAX_RENSA_WITH_1_EXTRA
+   MAX_RENSA_WITH_2_EXTRA
+   MAX_RENSA_WITH_3_EXTRA
+あたりのフィーチャーを用意
+
+3. 潰しあいとかができるようにする
+
+4. 2x3 は色の数じゃなくてパターンを学習するようにするべきな気がする

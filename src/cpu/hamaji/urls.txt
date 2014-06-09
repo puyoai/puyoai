@@ -1,0 +1,133 @@
+// document.body.innerHTML.match(/http:\/\/www.nicovideo.jp\/watch\/sm\d+/g).sort().uniq().join("\n")
+
+// document.body.innerHTML.match(/http:\/\/smile-.*?\?m=\d+\.\d+/g).sort().reverse().join("\n")
+
+Tom - momoken 2011-11-03
+http://www.nicovideo.jp/watch/sm16068117
+http://www.nicovideo.jp/watch/sm16068475
+http://www.nicovideo.jp/watch/sm16068841
+http://www.nicovideo.jp/watch/sm16069336
+http://www.nicovideo.jp/watch/sm16070772
+http://www.nicovideo.jp/watch/sm16072980
+
+ALF - momoken 2011-10-29
+http://www.nicovideo.jp/watch/sm16022812
+http://www.nicovideo.jp/watch/sm16025300
+http://www.nicovideo.jp/watch/sm16025473
+http://www.nicovideo.jp/watch/sm16025575
+http://www.nicovideo.jp/watch/sm16028921
+http://www.nicovideo.jp/watch/sm16029238
+
+かめ - ALF 2011-10-23
+http://www.nicovideo.jp/watch/sm15970156
+http://www.nicovideo.jp/watch/sm15975947
+http://www.nicovideo.jp/watch/sm16026775
+http://www.nicovideo.jp/watch/sm16026918
+http://www.nicovideo.jp/watch/sm16027039
+http://www.nicovideo.jp/watch/sm16027888
+
+Tom - ALF 2011-10-16
+http://www.nicovideo.jp/watch/sm15904659
+http://www.nicovideo.jp/watch/sm15905089
+http://www.nicovideo.jp/watch/sm15905421
+http://www.nicovideo.jp/watch/sm15905958
+http://www.nicovideo.jp/watch/sm15906469
+http://www.nicovideo.jp/watch/sm15906858
+
+Squika - かめ 2011-09-19
+http://www.nicovideo.jp/watch/sm15738098
+http://www.nicovideo.jp/watch/sm15738263
+http://www.nicovideo.jp/watch/sm15738473
+http://www.nicovideo.jp/watch/sm15776195
+http://www.nicovideo.jp/watch/sm15776447
+http://www.nicovideo.jp/watch/sm15776913
+http://www.nicovideo.jp/watch/sm15777375
+http://www.nicovideo.jp/watch/sm15777557
+http://www.nicovideo.jp/watch/sm15874391
+http://www.nicovideo.jp/watch/sm15874571
+http://www.nicovideo.jp/watch/sm15874976
+
+ALF - Squika 2011-09-05
+http://www.nicovideo.jp/watch/sm15524828
+http://www.nicovideo.jp/watch/sm15525465
+http://www.nicovideo.jp/watch/sm15525959
+http://www.nicovideo.jp/watch/sm15532136
+http://www.nicovideo.jp/watch/sm15532363
+http://www.nicovideo.jp/watch/sm15532598
+
+Squika - momoken 2011-08-23
+http://www.nicovideo.jp/watch/sm15444888
+http://www.nicovideo.jp/watch/sm15445130
+http://www.nicovideo.jp/watch/sm15445388
+http://www.nicovideo.jp/watch/sm15445638
+http://www.nicovideo.jp/watch/sm15446017
+http://www.nicovideo.jp/watch/sm15446454
+
+Squika - Tom 2011-08-25
+http://www.nicovideo.jp/watch/sm15413482
+http://www.nicovideo.jp/watch/sm15413583
+http://www.nicovideo.jp/watch/sm15413734
+http://www.nicovideo.jp/watch/sm15413874
+http://www.nicovideo.jp/watch/sm15414003
+http://www.nicovideo.jp/watch/sm15414209
+
+momoken - ようかん 2011-08-22
+http://www.nicovideo.jp/watch/sm15387140
+http://www.nicovideo.jp/watch/sm15389537
+http://www.nicovideo.jp/watch/sm15392083
+http://www.nicovideo.jp/watch/sm15392186
+
+かめ - momoken 2011-05-04
+http://www.nicovideo.jp/watch/sm14354402
+http://www.nicovideo.jp/watch/sm14354630
+http://www.nicovideo.jp/watch/sm14354781
+http://www.nicovideo.jp/watch/sm14355080
+http://www.nicovideo.jp/watch/sm14355292
+http://www.nicovideo.jp/watch/sm14355512
+
+momoken - くまちょむ 2011-04-29
+http://www.nicovideo.jp/watch/sm14299035
+http://www.nicovideo.jp/watch/sm14299252
+http://www.nicovideo.jp/watch/sm14299596
+http://www.nicovideo.jp/watch/sm14299953
+http://www.nicovideo.jp/watch/sm14300288
+http://www.nicovideo.jp/watch/sm14300612
+
+ALF - くまちょむ 2011-04-24
+http://www.nicovideo.jp/watch/sm14252614
+http://www.nicovideo.jp/watch/sm14253268
+http://www.nicovideo.jp/watch/sm14253646
+http://www.nicovideo.jp/watch/sm14253962
+http://www.nicovideo.jp/watch/sm14254621
+http://www.nicovideo.jp/watch/sm14254997
+
+Tom - くまちょむ 2011-02-27
+http://www.nicovideo.jp/watch/sm13729024
+http://www.nicovideo.jp/watch/sm13729502
+http://www.nicovideo.jp/watch/sm13732709
+http://www.nicovideo.jp/watch/sm13732890
+http://www.nicovideo.jp/watch/sm13733040
+http://www.nicovideo.jp/watch/sm13733226
+
+Tom - かめ 2011-02-20
+http://www.nicovideo.jp/watch/sm13660863
+http://www.nicovideo.jp/watch/sm13661294
+http://www.nicovideo.jp/watch/sm13661723
+http://www.nicovideo.jp/watch/sm13661986
+http://www.nicovideo.jp/watch/sm13662198
+http://www.nicovideo.jp/watch/sm13663942
+
+ミスケン - くまちょむ 2004-05-??
+/home/i/dat/puyo/Misuken vs Hattori_1.avi
+/home/i/dat/puyo/Misuken vs Hattori_2.avi
+/home/i/dat/puyo/Misuken vs Hattori_3.avi
+/home/i/dat/puyo/Misuken vs Hattori_4.avi
+/home/i/dat/puyo/Misuken vs Hattori_5.avi
+/home/i/dat/puyo/Misuken vs Hattori_6.avi
+/home/i/dat/puyo/Misuken vs Hattori_7.avi
+/home/i/dat/puyo/Misuken vs Hattori_8.avi
+/home/i/dat/puyo/Misuken vs Hattori_9.avi
+/home/i/dat/puyo/Misuken vs Hattori_10.avi
+/home/i/dat/puyo/Misuken vs Hattori_11.avi
+/home/i/dat/puyo/Misuken vs Hattori_12.avi
+/home/i/dat/puyo/Misuken vs Hattori_13.avi

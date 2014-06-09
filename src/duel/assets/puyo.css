@@ -1,0 +1,51 @@
+#player-fields {
+    position: relative;
+    width: 640px;
+    height: 490px;
+}
+
+.background-image {
+    position: absolute;
+    width: 640px;
+    height: 490px;
+}
+
+.puyo {
+    background: url(/puyo.png) no-repeat;
+}
+
+.ojama-field {
+    height: 35px;
+    width: 400px;
+}
+
+.ojama {
+    background: url(/yokoku.png) no-repeat;
+    height: 35px;
+    float: left;
+}
+
+.ojama-400 {
+    width: 32px;
+    background-position: 0px 0px;
+}
+.ojama-300 {
+    width: 32px;
+    background-position: -32px 0px;
+}
+.ojama-200 {
+    width: 32px;
+    background-position: -64px 0px;
+}
+.ojama-30 {
+    width: 32px;
+    background-position: -96px 0px;
+}
+.ojama-6 {
+    width: 28px;
+    background-position: -128px 0px;
+}
+.ojama-1 {
+    width: 20px;
+    background-position: -156px 0px;
+}
