@@ -1,9 +1,4 @@
-*.cmake
-*.a
-*_test
-CMakeCache.txt
-CMakeFiles
-Testing
-Makefile
 build
+.DS_Store
+
 
