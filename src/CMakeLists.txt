@@ -67,6 +67,7 @@ if(PKG_CONFIG_FOUND)
   find_library(V4L2_LIBRARY v4l2)
 endif()
 
+# TODO(mayah): Why not use pkg_search_module?
 find_library(LIB_USB NAMES usb-1.0)
 find_library(LIB_GCRYPT NAMES gcrypt)
 
