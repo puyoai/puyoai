@@ -19,10 +19,16 @@ public:
 
     virtual UniqueSDLSurface getNextFrame();
 
+    void setFPS(int fps) { fps_ = fps; }
+
     static void init();
 
 private:
     const char* filename_;
+
+    int fps_ = 30;
+    Uint32 lastTaken_ = 0;
+
     AVFormatContext* format_;
     AVCodecContext* codec_;
     AVFrame* frame_;

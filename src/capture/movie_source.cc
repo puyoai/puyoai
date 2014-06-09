@@ -119,6 +119,17 @@ UniqueSDLSurface MovieSource::getNextFrame() {
         av_free_packet(&packet_);
     }
 
+    // Wait until next frame.
+    Uint32 currentTime = SDL_GetTicks();
+    Uint32 elapsed = currentTime - lastTaken_;
+    if (elapsed < 1000 / fps_) {
+        int d = 1000 / fps_ - elapsed;
+        SDL_Delay(d);
+        Uint32 hoge = SDL_GetTicks();
+        fprintf(stderr, "waiting... %dms ... %d\n", d, hoge - currentTime);
+    }
+    lastTaken_ = SDL_GetTicks();
+
     return makeUniqueSDLSurface(SDL_ConvertSurface(surf_.get(), surf_->format, 0));
 }
 
