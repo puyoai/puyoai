@@ -56,13 +56,13 @@ sample は、消せるところがあれば消し、そうでなければ左に�
 
 * src/base Mutex とか、noncopyable とか。
 * src/core 定数や、ぷよの色の定義など、全員が利用するべきもの。
-** src/core/algorithm AI を実装するときにあると便利なアルゴリズムたち。サーバー実装でも利用。
-** src/core/client クライアントが利用すると便利なもの。
-** src/core/client/ai AIのベース。ここにあるクラスを継承してthink()だけ実装すれば、とりあえず動く。
-*** src/core/client/connector サーバーと接続するときに使うと便利なクラス。
-** src/core/field フィールドの実装。gui とかはこれを使っている。
-** src/core/server サーバー実装に必要なもの
-** src/core/srever/connector クライアントとの通信に使うと便利なクラス。
+ * src/core/algorithm AI を実装するときにあると便利なアルゴリズムたち。サーバー実装でも利用。
+ * src/core/client クライアントが利用すると便利なもの。
+  * src/core/client/ai AIのベース。ここにあるクラスを継承してthink()だけ実装すれば、とりあえず動く。
+  * src/core/client/connector サーバーと接続するときに使うと便利なクラス。
+ * src/core/field フィールドの実装。gui とかはこれを使っている。
+ * src/core/server サーバー実装に必要なもの
+  * src/core/srever/connector クライアントとの通信に使うと便利なクラス。
 * src/capture キャプチャー関連。画面解析など。
 * src/cpu みんなの AI 実装
 * src/duel ローカルでの対戦サーバー
