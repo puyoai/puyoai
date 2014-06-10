@@ -10,6 +10,14 @@
 
 using namespace std;
 
+namespace {
+const char* C_RED = "\x1b[41m";
+const char* C_BLUE = "\x1b[44m";
+const char* C_GREEN = "\x1b[42m";
+const char* C_YELLOW = "\x1b[43m";
+const char* C_BLACK = "\x1b[49m";
+}
+
 string Locate(int player_id, int x, int y) {
   int pos_x = 1 + 30 * player_id;
   int pos_y = 1;
@@ -25,13 +33,8 @@ string Locate(int x, int y) {
   return ss.str();
 }
 
+// TODO(mayah): Why char? Why not PuyoColor?
 string GetPuyoText(char color, int y = 0) {
-  const char C_RED[] = "\x1b[41m";
-  const char C_BLUE[] = "\x1b[44m";
-  const char C_GREEN[] = "\x1b[42m";
-  const char C_YELLOW[] = "\x1b[43m";
-  const char C_BLACK[] = "\x1b[49m";
-
   string text;
   if (color == OJAMA) {
     text = "@@";
