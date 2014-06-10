@@ -108,15 +108,15 @@ std::unique_ptr<AnalyzerResult> Analyzer::analyze(const SDL_Surface* surface, co
         auto player2Result = analyzePlayerFieldOnLevelSelect(*player2FieldResult, makePlayerOnlyResults(1, previousResults));
         return std::unique_ptr<AnalyzerResult>(new AnalyzerResult(gameState, move(player1Result), move(player2Result)));
     }
+    case CaptureGameState::PLAYING: {
+        auto player1Result = analyzePlayerField(*player1FieldResult, makePlayerOnlyResults(0, previousResults));
+        auto player2Result = analyzePlayerField(*player2FieldResult, makePlayerOnlyResults(1, previousResults));
+        return std::unique_ptr<AnalyzerResult>(new AnalyzerResult(gameState, move(player1Result), move(player2Result)));
+    }
     case CaptureGameState::FINISHED: {
         // After finished, we don't need to check each player gamestate.
         auto player1Result = unique_ptr<PlayerAnalyzerResult>();
         auto player2Result = unique_ptr<PlayerAnalyzerResult>();
-        return std::unique_ptr<AnalyzerResult>(new AnalyzerResult(gameState, move(player1Result), move(player2Result)));
-    }
-    case CaptureGameState::PLAYING: {
-        auto player1Result = analyzePlayerField(*player1FieldResult, makePlayerOnlyResults(0, previousResults));
-        auto player2Result = analyzePlayerField(*player2FieldResult, makePlayerOnlyResults(1, previousResults));
         return std::unique_ptr<AnalyzerResult>(new AnalyzerResult(gameState, move(player1Result), move(player2Result)));
     }
     }
@@ -214,24 +214,32 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
     // This is because sometimes we miss-detect the next field.
 
     // Check NEXT1
-    {
+    if (!result->next1IsValid()) {
         RealColor axisColor = detectedField.realColor(NextPuyoPosition::NEXT1_AXIS);
         RealColor childColor = detectedField.realColor(NextPuyoPosition::NEXT1_CHILD);
 
         if (isNormalColor(axisColor) && isNormalColor(childColor)) {
-            result->setRealColor(NextPuyoPosition::NEXT1_AXIS, axisColor);
-            result->setRealColor(NextPuyoPosition::NEXT1_CHILD, childColor);
+            int k = ++result->next1Puyos[make_pair(axisColor, childColor)];
+            if (k >= 5) {
+                result->setRealColor(NextPuyoPosition::NEXT1_AXIS, axisColor);
+                result->setRealColor(NextPuyoPosition::NEXT1_CHILD, childColor);
+                result->next1Puyos.clear();
+            }
         }
     }
 
     // Check NEXT2
-    {
+    if (!result->next2IsValid()) {
         RealColor axisColor = detectedField.realColor(NextPuyoPosition::NEXT2_AXIS);
         RealColor childColor = detectedField.realColor(NextPuyoPosition::NEXT2_CHILD);
 
         if (isNormalColor(axisColor) && isNormalColor(childColor)) {
-            result->setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
-            result->setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
+            int k = ++result->next2Puyos[make_pair(axisColor, childColor)];
+            if (k >= 5) {
+                result->setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
+                result->setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
+                result->next2Puyos.clear();
+            }
         }
     }
 }

@@ -64,6 +64,18 @@ struct PlayerAnalyzerResult {
 
     void setVanishing(int x, int y, bool flag) { adjustedField.vanishing[x-1][y-1] = flag; }
 
+    bool next1IsValid() const
+    {
+        return isNormalColor(realColor(NextPuyoPosition::NEXT1_AXIS)) &&
+            isNormalColor(realColor(NextPuyoPosition::NEXT1_CHILD));
+    }
+
+    bool next2IsValid() const
+    {
+        return isNormalColor(realColor(NextPuyoPosition::NEXT2_AXIS)) &&
+            isNormalColor(realColor(NextPuyoPosition::NEXT2_CHILD));
+    }
+
     void initializeCurrentPuyoState() {
         hasDetectedOjamaDrop_ = true;
         hasDetectedRensaStart_ = true;
@@ -85,6 +97,7 @@ public: // Make this private?
     NextPuyoState nextPuyoState = NextPuyoState::STABLE;
     int framesWhileNext1Disappearing = 0;
     int framesWhileNext2Disappearing = 0;
+    std::map<std::pair<RealColor, RealColor>, int> next1Puyos;
     std::map<std::pair<RealColor, RealColor>, int> next2Puyos;
 
     // Make these false when a current puyo has appeared.
