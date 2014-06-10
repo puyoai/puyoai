@@ -20,8 +20,6 @@ public:
 
     void addDrawer(Drawer*);
 
-    bool usesCommentator() const { return usesCommentator_; }
-
 private:
     Screen* screen() { return screen_.get(); }
 
@@ -37,7 +35,6 @@ private:
 
     std::vector<Drawer*> drawers_;
 
-    bool usesCommentator_;
     int width_;
     int height_;
 };
