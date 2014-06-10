@@ -22,7 +22,7 @@ vector<const PlayerAnalyzerResult*> makePlayerOnlyResults(int pi, const deque<un
 }
 }
 
-const char* stringOf(CaptureGameState cgs)
+string toString(CaptureGameState cgs)
 {
     switch (cgs) {
     case CaptureGameState::UNKNOWN:      return "unknown";
@@ -70,7 +70,7 @@ AnalyzerResult::AnalyzerResult(CaptureGameState cgs,
 string AnalyzerResult::toString() const
 {
     ostringstream oss;
-    oss << "State: " << stringOf(gameState_) << endl;
+    oss << "State: " << ::toString(gameState_) << endl;
 
     for (int pi = 0; pi < 2; ++pi) {
         const PlayerAnalyzerResult* par = playerResult(pi);
