@@ -41,6 +41,9 @@ void MainWindow::runMainLoop()
             default:
                 break;
             }
+
+            for (auto listener : listeners_)
+                listener->handleEvent(ev);
         }
 
         draw();
@@ -51,6 +54,11 @@ void MainWindow::addDrawer(Drawer* drawer)
 {
     drawers_.push_back(drawer);
     drawer->onInit(screen());
+}
+
+void MainWindow::addEventListener(EventListener* listener)
+{
+    listeners_.push_back(listener);
 }
 
 void MainWindow::draw()
