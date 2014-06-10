@@ -40,11 +40,4 @@ inline bool isNormalColor(PuyoColor color)
     return static_cast<int>(PuyoColor::RED) <= static_cast<int>(color) && static_cast<int>(color) <= static_cast<int>(PuyoColor::GREEN);
 }
 
-bool isColorPuyo(PuyoColor) DEPRECATED_MSG("Use isNormalColor");
-inline bool isColorPuyo(PuyoColor color)
-{
-    return isNormalColor(color);
-}
-
-
 #endif

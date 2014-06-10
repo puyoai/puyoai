@@ -4,12 +4,12 @@
 
 TEST(PuyoTest, IsColorPuyoTest)
 {
-    EXPECT_FALSE(isColorPuyo(PuyoColor::EMPTY));
-    EXPECT_FALSE(isColorPuyo(PuyoColor::OJAMA));
-    EXPECT_FALSE(isColorPuyo(PuyoColor::WALL));
+    EXPECT_FALSE(isNormalColor(PuyoColor::EMPTY));
+    EXPECT_FALSE(isNormalColor(PuyoColor::OJAMA));
+    EXPECT_FALSE(isNormalColor(PuyoColor::WALL));
 
-    EXPECT_TRUE(isColorPuyo(PuyoColor::RED));
-    EXPECT_TRUE(isColorPuyo(PuyoColor::BLUE));
-    EXPECT_TRUE(isColorPuyo(PuyoColor::YELLOW));
-    EXPECT_TRUE(isColorPuyo(PuyoColor::GREEN));
+    EXPECT_TRUE(isNormalColor(PuyoColor::RED));
+    EXPECT_TRUE(isNormalColor(PuyoColor::BLUE));
+    EXPECT_TRUE(isNormalColor(PuyoColor::YELLOW));
+    EXPECT_TRUE(isNormalColor(PuyoColor::GREEN));
 }
