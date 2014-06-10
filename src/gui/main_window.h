@@ -13,12 +13,19 @@ class Screen;
 
 class MainWindow {
 public:
+    class EventListener {
+    public:
+        virtual ~EventListener() {}
+        virtual void handleEvent(const SDL_Event&) = 0;
+    };
+
     MainWindow(int width, int height, const Box& mainBox);
     ~MainWindow();
 
     void runMainLoop();
 
     void addDrawer(Drawer*);
+    void addEventListener(EventListener*);
 
 private:
     Screen* screen() { return screen_.get(); }
@@ -34,6 +41,7 @@ private:
     std::unique_ptr<Screen> screen_;
 
     std::vector<Drawer*> drawers_;
+    std::vector<EventListener*> listeners_;
 
     int width_;
     int height_;
