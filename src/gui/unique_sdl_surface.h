@@ -1,5 +1,5 @@
-#ifndef DUEL_UNIQUE_SURFACE_H_
-#define DUEL_UNIQUE_SURFACE_H_
+#ifndef GUI_UNIQUE_SURFACE_H_
+#define GUI_UNIQUE_SURFACE_H_
 
 #include <memory>
 #include <SDL.h>
