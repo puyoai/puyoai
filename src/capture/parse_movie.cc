@@ -16,6 +16,7 @@
 
 DEFINE_bool(save_screenshot, false, "save screenshot");
 DEFINE_bool(draw_result, true, "draw analyzer result");
+DEFINE_int32(fps, 30, "FPS");
 
 int main(int argc, char* argv[])
 {
@@ -36,6 +37,7 @@ int main(int argc, char* argv[])
             fprintf(stderr, "Failed to load %s\n", argv[1]);
             exit(EXIT_FAILURE);
         }
+        source.setFPS(FLAGS_fps);
 
         SomagicAnalyzer analyzer;
         Capture capture(&source, &analyzer);
