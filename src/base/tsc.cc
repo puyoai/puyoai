@@ -8,7 +8,6 @@ using namespace std;
 
 Tsc::Tsc(const string& key) {
   key_ = key;
-  data.insert(make_pair(key, vector<unsigned long long>()));
   st_ = rdtsc();
 }
 
@@ -27,24 +26,14 @@ void Tsc::GetStatistics(const string& key, double* average, double* rmsd) {
   vector<unsigned long long>& list = data[key];
   int n = list.size();
   double sum = 0.0;
-  int ignored = 0;
-  for (int i = 0; i < n; i++) {
-    if (list[i] < 0) {
-      ignored++;
-      continue;
-    }
+  for (int i = 0; i < n; i++)
     sum += list[i];
-  }
-  *average = sum / (n - ignored);
+  *average = sum / n;
 
   double diff_square_sum = 0.0;
-  for (int i = 0; i < n; i++) {
-    if (list[i] < 0) {
-      continue;
-    }
+  for (int i = 0; i < n; i++)
     diff_square_sum += (list[i] - *average) * (list[i] - *average);
-  }
-  *rmsd = pow(diff_square_sum / (n - ignored), 0.5);
+  *rmsd = pow(diff_square_sum / n, 0.5);
 }
 
 unsigned long long Tsc::rdtsc() {
