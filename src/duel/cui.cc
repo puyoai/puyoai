@@ -26,11 +26,11 @@ string Locate(int x, int y) {
 }
 
 string GetPuyoText(char color, int y = 0) {
-  const string C_RED = "\x1b[41m";
-  const string C_BLUE = "\x1b[44m";
-  const string C_GREEN = "\x1b[42m";
-  const string C_YELLOW = "\x1b[43m";
-  const string C_BLACK = "\x1b[49m";
+  const char C_RED[] = "\x1b[41m";
+  const char C_BLUE[] = "\x1b[44m";
+  const char C_GREEN[] = "\x1b[42m";
+  const char C_YELLOW[] = "\x1b[43m";
+  const char C_BLACK[] = "\x1b[49m";
 
   string text;
   if (color == OJAMA) {
