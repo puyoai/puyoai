@@ -6,12 +6,13 @@ cmake_opts+=("-DCMAKE_C_COMPILER=clang")
 cmake_opts+=("-DCMAKE_CXX_COMPILER=clang++")
 
 declare -a cmake_cxx_flags
-declare -xT CMAKE_CXX_FLAGS cmake_cxx_flags " "
 cmake_cxx_flags+=("-std=gnu++11" "-Werror" "-Wall" "-Wextra")
 # cmake_cxx_flags+=("-Wno-sign-compare")
+
+cmake_opts+=("-DCMAKE_CXX_FLAGS=${cmake_cxx_flags[*]}")
 
 cd "$(dirname "$0")/.."
 mkdir -p build
 cd build
 cmake "${cmake_opts[@]}" "../src"
-ninja
+ninja "$@"
