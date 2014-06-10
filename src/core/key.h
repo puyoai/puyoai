@@ -3,6 +3,7 @@
 
 #include <string>
 
+// TODO(mayah): Make this enum class.
 enum Key {
     KEY_NONE,
     KEY_UP,
