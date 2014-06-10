@@ -33,8 +33,7 @@ string Locate(int x, int y) {
   return ss.str();
 }
 
-// TODO(mayah): Why char? Why not PuyoColor?
-string GetPuyoText(char color, int y = 0) {
+string GetPuyoText(PuyoColor color, int y = 0) {
   string text;
   if (color == OJAMA) {
     text = "@@";
@@ -49,11 +48,11 @@ string GetPuyoText(char color, int y = 0) {
 
   string color_code;
   switch (color) {
-    case RED: color_code = C_RED; break;
-    case BLUE: color_code = C_BLUE; break;
-    case GREEN: color_code = C_GREEN; break;
-    case YELLOW: color_code = C_YELLOW; break;
-    default: color_code = C_BLACK; break;
+  case PuyoColor::RED: color_code = C_RED; break;
+  case PuyoColor::BLUE: color_code = C_BLUE; break;
+  case PuyoColor::GREEN: color_code = C_GREEN; break;
+  case PuyoColor::YELLOW: color_code = C_YELLOW; break;
+  default: color_code = C_BLACK; break;
   }
 
   return color_code + text + C_BLACK;
