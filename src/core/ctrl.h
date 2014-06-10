@@ -16,7 +16,7 @@ class PlainField;
 class KeyTuple {
 public:
     KeyTuple(Key bb1, Key bb2) : b1(bb1), b2(bb2) {}
-    KeyTuple() : b1(KEY_NONE), b2(KEY_NONE) {}
+    KeyTuple() : b1(Key::KEY_NONE), b2(Key::KEY_NONE) {}
 
     bool hasSameKey(KeyTuple k) const
     {
