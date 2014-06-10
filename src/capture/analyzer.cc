@@ -249,35 +249,43 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     RealColor axisColor = detectedField.realColor(NextPuyoPosition::NEXT1_AXIS);
     RealColor childColor = detectedField.realColor(NextPuyoPosition::NEXT1_CHILD);
 
-    if (axisColor == RC_EMPTY || childColor == RC_EMPTY) {
-        RealColor next2AxisColor = result->realColor(NextPuyoPosition::NEXT2_AXIS);
-        RealColor next2ChildColor = result->realColor(NextPuyoPosition::NEXT2_CHILD);
-
-        result->framesWhileNext1Disappearing += 1;
-        if (result->framesWhileNext1Disappearing >= 2 && isNormalColor(next2AxisColor) && isNormalColor(next2ChildColor)) {
-            // Detected Next1 disappeared
-            result->restFramesUserCanPlay = 2;
-            result->nextPuyoState = NextPuyoState::NEXT2_WILL_DISAPPEAR;
-            result->userState.playable = false;
-            result->setRealColor(NextPuyoPosition::CURRENT_AXIS, result->realColor(NextPuyoPosition::NEXT1_AXIS));
-            result->setRealColor(NextPuyoPosition::CURRENT_CHILD, result->realColor(NextPuyoPosition::NEXT1_CHILD));
-            result->setRealColor(NextPuyoPosition::NEXT1_AXIS, result->realColor(NextPuyoPosition::NEXT2_AXIS));
-            result->setRealColor(NextPuyoPosition::NEXT1_CHILD, result->realColor(NextPuyoPosition::NEXT2_CHILD));
-            result->setRealColor(NextPuyoPosition::NEXT2_AXIS, RC_EMPTY);
-            result->setRealColor(NextPuyoPosition::NEXT2_CHILD, RC_EMPTY);
-
-            if (result->hasDetectedOjamaDrop_ && !result->hasSentOjamaDropped_) {
-                result->userState.ojamaDropped = true;
-                result->hasSentOjamaDropped_ = true;
-            }
-            if (result->hasDetectedRensaStart_ && !result->hasSentChainFinished_) {
-                result->userState.chainFinished = true;
-                result->hasSentChainFinished_ = true;
-            }
-            return;
-        }
-    } else {
+    // NEXT1 has not disappeared yet.
+    if (axisColor != RC_EMPTY && childColor != RC_EMPTY) {
         result->framesWhileNext1Disappearing = 0;
+        return;
+    }
+
+    // Detected NEXT1 has disappeard.
+    result->framesWhileNext1Disappearing += 1;
+
+    // When NEXT2 is not stabilized, we cannot proceed the current state.
+    RealColor next2AxisColor = result->realColor(NextPuyoPosition::NEXT2_AXIS);
+    RealColor next2ChildColor = result->realColor(NextPuyoPosition::NEXT2_CHILD);
+    if (!isNormalColor(next2AxisColor) || !isNormalColor(next2ChildColor))
+        return;
+
+    // We want to see NEXT1 is absent in 2 frames for stability.
+    if (result->framesWhileNext1Disappearing < 2)
+        return;
+
+    // Detected Next1 disappeared
+    result->restFramesUserCanPlay = 2;
+    result->nextPuyoState = NextPuyoState::NEXT2_WILL_DISAPPEAR;
+    result->userState.playable = false;
+    result->setRealColor(NextPuyoPosition::CURRENT_AXIS, result->realColor(NextPuyoPosition::NEXT1_AXIS));
+    result->setRealColor(NextPuyoPosition::CURRENT_CHILD, result->realColor(NextPuyoPosition::NEXT1_CHILD));
+    result->setRealColor(NextPuyoPosition::NEXT1_AXIS, result->realColor(NextPuyoPosition::NEXT2_AXIS));
+    result->setRealColor(NextPuyoPosition::NEXT1_CHILD, result->realColor(NextPuyoPosition::NEXT2_CHILD));
+    result->setRealColor(NextPuyoPosition::NEXT2_AXIS, RC_EMPTY);
+    result->setRealColor(NextPuyoPosition::NEXT2_CHILD, RC_EMPTY);
+
+    if (result->hasDetectedOjamaDrop_ && !result->hasSentOjamaDropped_) {
+        result->userState.ojamaDropped = true;
+        result->hasSentOjamaDropped_ = true;
+    }
+    if (result->hasDetectedRensaStart_ && !result->hasSentChainFinished_) {
+        result->userState.chainFinished = true;
+        result->hasSentChainFinished_ = true;
     }
 }
 
