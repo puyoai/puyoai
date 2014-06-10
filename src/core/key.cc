@@ -5,14 +5,14 @@ using namespace std;
 string toString(Key key)
 {
     switch (key) {
-    case KEY_NONE:        return "<NONE>";
-    case KEY_UP:          return "↑";
-    case KEY_RIGHT:       return "→";
-    case KEY_DOWN:        return "↓";
-    case KEY_LEFT:        return "←";
-    case KEY_RIGHT_TURN:  return "A";
-    case KEY_LEFT_TURN:   return "B";
-    case KEY_START:       return "Start";
+    case Key::KEY_NONE:        return "<NONE>";
+    case Key::KEY_UP:          return "↑";
+    case Key::KEY_RIGHT:       return "→";
+    case Key::KEY_DOWN:        return "↓";
+    case Key::KEY_LEFT:        return "←";
+    case Key::KEY_RIGHT_TURN:  return "A";
+    case Key::KEY_LEFT_TURN:   return "B";
+    case Key::KEY_START:       return "Start";
     }
 
     return "";
