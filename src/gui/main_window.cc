@@ -8,7 +8,6 @@ MainWindow::MainWindow(int width, int height, const Box& mainBox) :
     window_(nullptr, SDL_DestroyWindow),
     renderer_(nullptr, SDL_DestroyRenderer),
     texture_(nullptr, SDL_DestroyTexture),
-    usesCommentator_(false),
     width_(width),
     height_(height)
 {
