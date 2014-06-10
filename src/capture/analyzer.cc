@@ -250,8 +250,8 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     RealColor childColor = detectedField.realColor(NextPuyoPosition::NEXT1_CHILD);
 
     if (axisColor == RC_EMPTY || childColor == RC_EMPTY) {
-        RealColor next2AxisColor = detectedField.realColor(NextPuyoPosition::NEXT2_AXIS);
-        RealColor next2ChildColor = detectedField.realColor(NextPuyoPosition::NEXT2_CHILD);
+        RealColor next2AxisColor = result->realColor(NextPuyoPosition::NEXT2_AXIS);
+        RealColor next2ChildColor = result->realColor(NextPuyoPosition::NEXT2_CHILD);
 
         result->framesWhileNext1Disappearing += 1;
         if (result->framesWhileNext1Disappearing >= 2 && isNormalColor(next2AxisColor) && isNormalColor(next2ChildColor)) {
