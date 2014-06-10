@@ -82,6 +82,10 @@ function(puyoai_add_cxx_flags flags)
 endfunction()
 
 puyoai_add_cxx_flags("-Wall -Wextra -std=c++11")
+puyoai_add_cxx_flags("-Wno-error=deprecated-declarations")
+puyoai_add_cxx_flags("-Wno-error=missing-field-initializers")
+puyoai_add_cxx_flags("-Wno-error=sign-compare")
+
 puyoai_add_cxx_flags("-DTESTDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../testdata\\\"")
 puyoai_add_cxx_flags("-DDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../data\\\"")
 
