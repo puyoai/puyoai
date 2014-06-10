@@ -29,7 +29,7 @@ enum class NextPuyoState {
     NEXT2_WILL_APPEAR,
 };
 
-const char* stringOf(CaptureGameState);
+std::string toString(CaptureGameState);
 
 // DetectedField contains the detected field as-is.
 struct DetectedField {
