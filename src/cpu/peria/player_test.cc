@@ -17,8 +17,8 @@ class PlayerTest : public testing::Test {
 
 TEST_F(PlayerTest, GetControls) {
   struct TestData {
-    char* field;       // input
-    size_t ex_number;  // expected number of controls
+    const char* field;  // input
+    size_t ex_number;   // expected number of controls
   } datas[] = {
     {"", 22},
     {"100000" "100000" "100000" "100000" "100000" "100000"
@@ -40,11 +40,11 @@ TEST_F(PlayerTest, GetControls) {
 
 TEST_F(PlayerTest, ApplyControl) {
   struct TestData {
-    char* field;       // Input
-    char* sequence;    // Input
-    int x;             // Input
-    int r;             // Input
-    double ex_score;   // Expected least score (depends on scoring function)
+    const char* field;     // Input
+    const char* sequence;  // Input
+    int x;                 // Input
+    int r;                 // Input
+    double ex_score;       // Expected least score (depends on scoring function)
   } datas[] = {
     {"RR", "RR", 1, 0, 0},
     {"RR", "RR", 6, 0, 40},
