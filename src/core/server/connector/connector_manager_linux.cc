@@ -1,17 +1,20 @@
 #include "core/server/connector/connector_manager_linux.h"
 
-#include <cerrno>
-#include <cstdlib>
 #include <fcntl.h>
-#include <gflags/gflags.h>
-#include <glog/logging.h>
-#include <iomanip>
-#include <string>
+#include <errno.h>
+#include <poll.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <cstring>
+
+#include <iomanip>
+#include <string>
 #include <vector>
+
+#include <gflags/gflags.h>
+#include <glog/logging.h>
 
 #include "core/constant.h"
 
@@ -21,26 +24,15 @@ DEFINE_bool(realtime, true, "use realtime");
 
 const int TIMEOUT_USEC = 1000000 / FPS;
 
-ConnectorManagerLinux::ConnectorManagerLinux(vector<string> program_names) :
-    waitTimeout_(true)
+static unique_ptr<Connector> createConnector(int playerId, const string& programName)
 {
-    for (int i = 0; i < program_names.size(); i++) {
-        if (program_names[i] == "-") {
-            connectors_.push_back(Connector());
-            connector_is_alive_.push_back(true);
-        } else {
-            connectors_.push_back(CreateConnector(program_names[i], i));
-            connector_is_alive_.push_back(true);
-        }
-    }
-}
+    if (programName == "-")
+        return unique_ptr<Connector>(new HumanConnector);
 
-Connector ConnectorManagerLinux::CreateConnector(string program_name, int id)
-{
-    if (program_name.find("fifo:") == 0) {
-        string::size_type colon = program_name.find(":", 5);
-        string uplink_fifo = program_name.substr(5, colon - 5);
-        string downlink_fifo = program_name.substr(colon + 1);
+    if (programName.find("fifo:") == 0) {
+        string::size_type colon = programName.find(":", 5);
+        string uplink_fifo = programName.substr(5, colon - 5);
+        string downlink_fifo = programName.substr(colon + 1);
         CHECK(mkfifo(uplink_fifo.c_str(), 0777) == 0);
         CHECK(chmod(uplink_fifo.c_str(), 0777) == 0);
         CHECK(mkfifo(downlink_fifo.c_str(), 0777) == 0);
@@ -50,10 +42,9 @@ Connector ConnectorManagerLinux::CreateConnector(string program_name, int id)
         int downlink_fd = open(downlink_fifo.c_str(), O_WRONLY);
         CHECK(downlink_fd >= 0);
 
-        Connector connector(downlink_fd, uplink_fd);
-        connector.Write("PingMessage");
-
-        (void)connector.Read();
+        unique_ptr<Connector> connector(new PipeConnector(downlink_fd, uplink_fd));
+        connector->write("PingMessage");
+        (void)connector->read();
 
         return connector;
     }
@@ -82,13 +73,13 @@ Connector ConnectorManagerLinux::CreateConnector(string program_name, int id)
         // Server.
         LOG(INFO) << "Created a child process (pid = " << pid << ")";
 
-        Connector connector(fd_field_status[1], fd_command[0]);
+        unique_ptr<Connector> connector(new PipeConnector(fd_field_status[1], fd_command[0]));
         close(fd_field_status[0]);
         close(fd_command[1]);
         close(fd_cpu_error[1]);
 
-        connector.Write("PingMessage");
-        (void)connector.Read();
+        connector->write("PingMessage");
+        (void)connector->read();
 
         return connector;
     }
@@ -112,31 +103,39 @@ Connector ConnectorManagerLinux::CreateConnector(string program_name, int id)
     close(fd_cpu_error[1]);
 
     char filename[] = "Player1";
-    filename[6] += id;
+    filename[6] += playerId; // TODO(mayah): What's this !!
 
-    char* const args[] = {&program_name[0], filename, NULL};
-    if (execvp(program_name.c_str(), args) < 0)
+    if (execlp(programName.c_str(), filename) < 0)
         PLOG(FATAL) << "Failed to start a child process. ";
 
     LOG(FATAL) << "should not be reached.";
-    return Connector();
+    return unique_ptr<Connector>();
 }
 
-void ConnectorManagerLinux::Write(int id, const string& message) {
-    connectors_[id].Write(message);
-}
-
-int GetUsecFromStart(const struct timeval& start)
+static int GetUsecFromStart(const struct timeval& start)
 {
     struct timeval now;
     gettimeofday(&now, NULL);
     return (now.tv_sec - start.tv_sec) * 1000000 + (now.tv_usec - start.tv_usec);
 }
 
-int GetRemainingMilliSeconds(const struct timeval& start)
+static int GetRemainingMilliSeconds(const struct timeval& start)
 {
     int usec = GetUsecFromStart(start);
     return (TIMEOUT_USEC - usec + 999) / 1000;
+}
+
+ConnectorManagerLinux::ConnectorManagerLinux(vector<string> program_names) :
+    waitTimeout_(true)
+{
+    for (int i = 0; i < program_names.size(); i++) {
+        connectors_.push_back(createConnector(i, program_names[i]));
+    }
+}
+
+void ConnectorManagerLinux::Write(int id, const string& message) {
+    if (connectors_[id].get())
+        connectors_[id]->write(message);
 }
 
 void Log(int frame_id, const vector<ReceivedData>* all_data, vector<PlayerLog>* log)
@@ -170,18 +169,26 @@ void Log(int frame_id, const vector<ReceivedData>* all_data, vector<PlayerLog>* 
 bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
 {
     log->clear();
-    for (int i = 0; i < connectors_.size(); i++) {
-        pollfds_[i].fd = connectors_[i].GetReaderFd();
-        pollfds_[i].events = POLLIN;
-    }
-
     // Initialize logging.
     log->assign(connectors_.size(), PlayerLog());
     for (int i = 0; i < connectors_.size(); i++) {
         (*log)[i].frame_id = frame_id;
         (*log)[i].player_id = i;
-        (*log)[i].is_human = connectors_[i].GetReaderFd() == 0;
+        (*log)[i].is_human = connectors_[i]->isHuman();
     }
+
+    pollfd pollfds[2];
+    int playerIds[2];
+    int numPollfds = 0;
+    for (int i = 0; i < connectors_.size(); i++) {
+        if (connector(i)->pollable()) {
+            pollfds[numPollfds].fd = connector(i)->readerFd();
+            pollfds[numPollfds].events = POLLIN;
+            playerIds[numPollfds] = i;
+            numPollfds++;
+        }
+    }
+    DCHECK(numPollfds <= 2) << numPollfds;
 
     vector<ReceivedData> received_data[2];
     bool received_data_for_this_frame[2] = {false, false};
@@ -202,7 +209,7 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
         }
 
         // Wait for user input.
-        int actions = poll(pollfds_, connectors_.size(), timeout_ms);
+        int actions = poll(pollfds, numPollfds, timeout_ms);
 
         if (actions < 0) {
             LOG(ERROR) << strerror(errno);
@@ -213,21 +220,21 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
             continue;
         }
 
-        for (int i = 0; i < connectors_.size(); i++) {
-            if (pollfds_[i].revents & POLLIN) {
-                ReceivedData data = connectors_[i].Read();
+        for (int i = 0; i < numPollfds; i++) {
+            if (pollfds[i].revents & POLLIN) {
+                ReceivedData data = connector(playerIds[i])->read();
                 if (data.received) {
                     data.usec = GetUsecFromStart(tv_start);
                     received_data[i].push_back(data);
                     if (data.frameId == frame_id)
-                        received_data_for_this_frame[i] = true;
+                        received_data_for_this_frame[playerIds[i]] = true;
                 }
-            } else if ((pollfds_[i].revents & POLLERR) ||
-                       (pollfds_[i].revents & POLLHUP) ||
-                       (pollfds_[i].revents & POLLNVAL)) {
+            } else if ((pollfds[i].revents & POLLERR) ||
+                       (pollfds[i].revents & POLLHUP) ||
+                       (pollfds[i].revents & POLLNVAL)) {
                 LOG(ERROR) << "[P" << i << "] Closed the connection.";
                 died = true;
-                connector_is_alive_[i] = false;
+                connector(playerIds[i])->setAlive(false);
             }
         }
 
@@ -245,14 +252,10 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
             }
         }
     }
+
     Log(frame_id, received_data, log);
 
     return !died;
-}
-
-bool ConnectorManagerLinux::IsConnectorAlive(int id)
-{
-    return connector_is_alive_[id];
 }
 
 string ConnectorManagerLinux::GetErrorLog()
