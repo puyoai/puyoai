@@ -27,51 +27,6 @@ void ReceivedData::SerializeToString(string* output) const {
   output->append(ss.str());
 }
 
-void ExecutionData::SerializeToString(string* output) const {
-  stringstream ss;
-  ss << "{";
-  ss << "'keys':";
-  ss << "[";
-  for (size_t i = 0; i < keys.size(); i++) {
-    if (i > 0) {
-      ss << ",";
-    }
-    ss << keys[i];
-  }
-  ss << "],";
-  ss << "moving:{";
-  ss << "'x':" << kumipuyoPos.x << ",";
-  ss << "'y':" << kumipuyoPos.y << ",";
-  ss << "'r':" << kumipuyoPos.r << ",";
-  ss << "'c1':" << kumipuyo.axis << ",";
-  ss << "'c2':" << kumipuyo.child;
-  ss << "}";
-
-  bool has_ojama = false;
-  for (int i = 0; i < 6; i++) {
-    if (ojama[i] != 0) {
-      has_ojama = true;
-    }
-  }
-  if (has_ojama) {
-    ss << ",";
-    ss << "'ojama':[";
-    for (int i = 0; i < 6; i++) {
-      if (i != 0) {
-        ss << ",";
-      }
-      ss << ojama[i];
-    }
-    ss << "]";
-  }
-  if (landed) {
-    ss << ",";
-    ss << "'landed':1";
-  }
-  ss << "}";
-  output->append(ss.str());
-}
-
 void PlayerLog::SerializeToString(string* output) const {
   stringstream ss;
   ss << "\n";
@@ -92,13 +47,6 @@ void PlayerLog::SerializeToString(string* output) const {
     ss << tmp;
   }
   ss << "]";
-  ss << ",";
-  ss << "'execution_data':";
-  {
-    string tmp;
-    execution_data.SerializeToString(&tmp);
-    ss << tmp;
-  }
   ss << "}";
   output->append(ss.str());
 }

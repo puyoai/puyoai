@@ -29,27 +29,11 @@ public:
     void SerializeToString(std::string* output) const;
 };
 
-class ExecutionData {
-public:
-    std::vector<Key> keys;
-    KumipuyoPos kumipuyoPos;
-    Kumipuyo kumipuyo;
-    std::vector<int> ojama;
-    bool landed;
-
-    ExecutionData() {
-        ojama = std::vector<int>(6, 0);
-    }
-
-    void SerializeToString(std::string* output) const;
-};
-
 class PlayerLog {
 public:
     int frame_id;
     int player_id;
     std::vector<ReceivedData> received_data;
-    ExecutionData execution_data;
     bool is_human;
 
     void SerializeToString(std::string* output) const;

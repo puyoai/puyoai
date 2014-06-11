@@ -161,10 +161,6 @@ bool FieldRealtime::TryOjama(PlayerLog* player_log)
                 ojama_dropping_ = true;
             }
         }
-        // When Ojama puyo starts to fall.
-        if (ojama_dropping_) {
-            player_log->execution_data.ojama = ojama_position_;
-        }
     }
 
     if (ojama_dropping_) {
