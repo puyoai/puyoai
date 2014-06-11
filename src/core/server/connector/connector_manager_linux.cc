@@ -235,7 +235,7 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
 
         // If a realtime game flag is not set, do not wait for timeout, and
         // continue the game as soon as possible.
-        if (FLAGS_realtime) {
+        if (!FLAGS_realtime) {
             bool all_data_is_read = true;
             for (int i = 0; i < 2; i++) {
                 if (!received_data_for_this_frame[i]) {
