@@ -25,7 +25,7 @@ DEFINE_bool(realtime, true, "use realtime");
 const int TIMEOUT_USEC = 1000000 / FPS;
 
 ConnectorManagerLinux::ConnectorManagerLinux(vector<string> program_names) :
-    wait_timeout_(true)
+    waitTimeout_(true)
 {
     for (int i = 0; i < program_names.size(); i++) {
         if (program_names[i] == "-") {
@@ -207,7 +207,7 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
     gettimeofday(&tv_start, NULL);
     while (true) {
         int timeout_ms = 0;
-        if (wait_timeout_) {
+        if (waitTimeout_) {
             // Check timeout.
             // The timeout delays for 50us in avarage (on pascal's machine)
             // Worst case is still in order of 100us, so it's OK to use gettimeofday.
@@ -224,7 +224,7 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
             LOG(ERROR) << strerror(errno);
             break;
         } else if (actions == 0) {
-            if (!wait_timeout_)
+            if (!waitTimeout_)
                 break;
             continue;
         }
@@ -276,9 +276,4 @@ string ConnectorManagerLinux::GetErrorLog()
 {
     // TODO(mayah): Implement this or remove this function at all.
     return "";
-}
-
-void ConnectorManagerLinux::setWaitTimeout(bool flag)
-{
-    wait_timeout_ = flag;
 }
