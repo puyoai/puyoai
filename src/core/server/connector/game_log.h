@@ -19,12 +19,16 @@ enum GameResult {
 
 class ReceivedData {
 public:
-    std::string original;
-    std::string msg;
-    std::string mawashi_area;
-    int timestamp;
-    int frame_id;
+    bool isValid() const;
+
+    bool received = false;
+    int frameId = -1;
     Decision decision;
+    std::string msg;
+
+    std::string mawashi_area;
+    std::string original;
+    int usec = 0;
 
     void SerializeToString(std::string* output) const;
 };

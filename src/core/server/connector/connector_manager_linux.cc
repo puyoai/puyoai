@@ -15,7 +15,6 @@
 
 #include "core/constant.h"
 #include "core/server/connector/connector.h"
-#include "core/server/connector/data.h"
 #include "core/server/connector/game_log.h"
 
 using namespace std;
@@ -55,8 +54,9 @@ Connector ConnectorManagerLinux::CreateConnector(string program_name, int id)
 
         Connector connector(downlink_fd, uplink_fd);
         connector.Write("PingMessage");
-        Data data;
-        connector.Read(&data);
+
+        (void)connector.Read();
+
         return connector;
     }
 
@@ -90,37 +90,38 @@ Connector ConnectorManagerLinux::CreateConnector(string program_name, int id)
         close(fd_cpu_error[1]);
 
         connector.Write("PingMessage");
-        Data data;
-        connector.Read(&data);
+        (void)connector.Read();
 
         return connector;
-    } else {
-        // Client.
-        if (dup2(fd_field_status[0], STDIN_FILENO) == -1) {
-            LOG(FATAL) << "Failed to dup2. " << strerror(errno);
-        }
-        if (dup2(fd_command[1], STDOUT_FILENO) == -1) {
-            LOG(FATAL) << "Failed to dup2. " << strerror(errno);
-        }
-        if (dup2(fd_cpu_error[1], STDERR_FILENO) == -1) {
-            LOG(FATAL) << "Failed to dup2. " << strerror(errno);
-        }
-
-        close(fd_field_status[0]);
-        close(fd_field_status[1]);
-        close(fd_command[0]);
-        close(fd_command[1]);
-        close(fd_cpu_error[0]);
-        close(fd_cpu_error[1]);
-
-        char filename[] = "Player1";
-        filename[6] += id;
-
-        char* const args[] = {&program_name[0], filename, NULL};
-        execvp(program_name.c_str(), args);
-
-        LOG(FATAL) << "Failed to start a child process. " << strerror(errno);
     }
+
+    // Client.
+    if (dup2(fd_field_status[0], STDIN_FILENO) == -1) {
+        LOG(FATAL) << "Failed to dup2. " << strerror(errno);
+    }
+    if (dup2(fd_command[1], STDOUT_FILENO) == -1) {
+        LOG(FATAL) << "Failed to dup2. " << strerror(errno);
+    }
+    if (dup2(fd_cpu_error[1], STDERR_FILENO) == -1) {
+        LOG(FATAL) << "Failed to dup2. " << strerror(errno);
+    }
+
+    close(fd_field_status[0]);
+    close(fd_field_status[1]);
+    close(fd_command[0]);
+    close(fd_command[1]);
+    close(fd_cpu_error[0]);
+    close(fd_cpu_error[1]);
+
+    char filename[] = "Player1";
+    filename[6] += id;
+
+    char* const args[] = {&program_name[0], filename, NULL};
+    if (execvp(program_name.c_str(), args) < 0)
+        PLOG(FATAL) << "Failed to start a child process. ";
+
+    LOG(FATAL) << "should not be reached.";
+    return Connector();
 }
 
 void ConnectorManagerLinux::Write(int id, string message) {
@@ -140,7 +141,7 @@ int GetRemainingMilliSeconds(const struct timeval& start)
     return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
-void Log(int frame_id, const vector<Data>* all_data, vector<PlayerLog>* log)
+void Log(int frame_id, const vector<ReceivedData>* all_data, vector<PlayerLog>* log)
 {
     // Print debug info.
     LOG(INFO) << "########## FRAME " << frame_id << " ##########";
@@ -149,36 +150,21 @@ void Log(int frame_id, const vector<Data>* all_data, vector<PlayerLog>* log)
             LOG(INFO) << "[P" << i << "] [NODATA]";
         }
         for (int j = 0; j < all_data[i].size(); j++) {
-            const Data& data = all_data[i][j];
+            const ReceivedData& data = all_data[i][j];
             LOG(INFO) << "[P" << i << "] "
                       << "[" << setfill(' ') << setw(5) << right << data.usec << "us] "
                       << "[" << data.original << "]";
 
-            if (!data.IsValid()) {
-                LOG(WARNING) << "Ignoring the invalid command.";
-            } else if (data.id > frame_id) {
-                LOG(WARNING) << "Received a command for future frame.";
-            } else {
-                // There is no problem.
-            }
+            LOG_IF(WARNING, !data.isValid()) << "Ignoring the invalid command.";
+            LOG_IF(WARNING, data.frameId > frame_id) << "Received a command for future frame.";
         }
     }
 
     // Fill game log.
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < all_data[i].size(); j++) {
-            const Data& data = all_data[i][j];
-            ReceivedData received_data;
-            received_data.timestamp = data.usec;
-            received_data.original = data.original;
-            received_data.msg = data.msg;
-            received_data.mawashi_area = data.mawashi_area;
-            received_data.frame_id = data.id;
-            Decision decision;
-            decision.x = data.x;
-            decision.r = data.r;
-            received_data.decision = decision;
-            (*log)[i].received_data.push_back(received_data);
+            const ReceivedData& data = all_data[i][j];
+            (*log)[i].received_data.push_back(data);
         }
     }
 }
@@ -199,7 +185,7 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
         (*log)[i].is_human = connectors_[i].GetReaderFd() == 0;
     }
 
-    vector<Data> received_data[2];
+    vector<ReceivedData> received_data[2];
     bool received_data_for_this_frame[2] = {false, false};
     bool died = false;
 
@@ -230,14 +216,13 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
         }
 
         for (int i = 0; i < connectors_.size(); i++) {
-            Data data;
             if (pollfds_[i].revents & POLLIN) {
-                if (connectors_[i].Read(&data)) {
+                ReceivedData data = connectors_[i].Read();
+                if (data.received) {
                     data.usec = GetUsecFromStart(tv_start);
                     received_data[i].push_back(data);
-                    if (data.id == frame_id) {
+                    if (data.frameId == frame_id)
                         received_data_for_this_frame[i] = true;
-                    }
                 }
             } else if ((pollfds_[i].revents & POLLERR) ||
                        (pollfds_[i].revents & POLLHUP) ||

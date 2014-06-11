@@ -9,7 +9,6 @@
 
 #include "core/decision.h"
 #include "core/kumipuyo.h"
-#include "core/server/connector/data.h"
 #include "core/server/connector/game_log.h"
 #include "core/state.h"
 #include "duel/duel_server.h"
@@ -98,9 +97,9 @@ void Game::Play(const vector<PlayerLog>& data, GameLog* log)
                     continue;
                 }
                 if (j == accepted_index) {
-                    ack_info_[i][j] = d.frame_id;
+                    ack_info_[i][j] = d.frameId;
                 } else {
-                    ack_info_[i][j] = -d.frame_id;
+                    ack_info_[i][j] = -d.frameId; // TODO(mayah): Negative means NACK. Weird.
                 }
             }
 
