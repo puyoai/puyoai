@@ -6,6 +6,8 @@
 #include <sstream>
 #include <string>
 
+#include <gflags/gflags.h>
+
 #include "core/constant.h"
 #include "core/decision.h"
 #include "core/server/connector/connector_manager.h"
@@ -21,7 +23,11 @@
 
 using namespace std;
 
-static void SendInfo(ConnectorManager* manager, int id, string status[2]) {
+DEFINE_int32(num_duel, -1, "After num_duel times of duel, the server will stop. negative is infinity.");
+DEFINE_int32(num_win, -1, "After num_win times of 1p or 2p win, the server will stop. negative is infinity");
+
+static void SendInfo(ConnectorManager* manager, int id, string status[2])
+{
   for (int i = 0; i < 2; i++) {
     stringstream ss;
     ss << "ID=" << id << " " << status[i].c_str();
@@ -95,11 +101,6 @@ void DuelServer::runDuelLoop()
     srand(seed);
     std::cout << "seed=" << seed << std::endl;
     LOG(INFO) << "seed=" << seed;
-
-    const char* num_duel_str = getenv("PUYO_NUM_DUEL");
-    int num_duel = num_duel_str ? atoi(num_duel_str) : -1;
-    const char* num_win_str = getenv("PUYO_NUM_WIN");
-    int num_win = num_win_str ? atoi(num_win_str) : -1;
 
     LOG(INFO) << "Starting duel server.";
     ConnectorManagerLinux manager(programNames_);
@@ -196,8 +197,8 @@ void DuelServer::runDuelLoop()
 
         if (log.result == P1_WIN_WITH_CONNECTION_ERROR ||
             log.result == P2_WIN_WITH_CONNECTION_ERROR ||
-            p1_win == num_win || p1_lose == num_win ||
-            p1_win + p1_draw + p1_lose == num_duel) {
+            p1_win == FLAGS_num_win || p1_lose == FLAGS_num_win ||
+            p1_win + p1_draw + p1_lose == FLAGS_num_duel) {
             break;
         }
         num_match++;
