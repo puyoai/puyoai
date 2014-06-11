@@ -152,7 +152,7 @@ bool FieldRealtime::TryDrop(FrameContext* context)
     }
 }
 
-bool FieldRealtime::TryOjama(PlayerLog* player_log)
+bool FieldRealtime::TryOjama()
 {
     if (!ojama_dropping_) {
         ojama_position_ = determineColumnOjamaAmount();
@@ -193,7 +193,7 @@ bool FieldRealtime::TryOjama(PlayerLog* player_log)
 }
 
 // Returns true if a key input is accepted.
-bool FieldRealtime::PlayOneFrame(Key key, PlayerLog* player_log, FrameContext* context)
+bool FieldRealtime::PlayOneFrame(Key key, FrameContext* context)
 {
     userState_.clear();
 
@@ -247,7 +247,7 @@ bool FieldRealtime::PlayOneFrame(Key key, PlayerLog* player_log, FrameContext* c
             }
         }
         if (simulationState_ == STATE_OJAMA) {
-            if (TryOjama(player_log)) {
+            if (TryOjama()) {
                 return false;
             } else {
                 continue;

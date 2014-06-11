@@ -7,8 +7,8 @@
 
 // TODO(mayah): Depending server connector looks wrong.
 #include "core/decision.h"
-#include "core/server/connector/game_log.h"
 #include "duel/game_state.h"
+#include "duel/game_result.h"
 
 struct Data;
 class DuelServer;
@@ -23,8 +23,8 @@ public:
     Game(DuelServer*, UserInput*);
     ~Game();
 
-    void Play(const std::vector<PlayerLog>& all_data, GameLog* log);
-    GameResult GetWinner(int* scores) const;
+    void Play(const std::vector<PlayerLog>& all_data);
+    GameResult::Result GetWinner(int* scores) const;
     void GetFieldInfo(std::string* player1, std::string* player2) const;
 
 private:

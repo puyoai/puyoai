@@ -6,10 +6,9 @@
 #include <vector>
 #include <pthread.h>
 
-#include "core/server/connector/game_log.h"
+#include "duel/game_result.h"
 
 class ConnectorManager;
-class Cui;
 class GameState;
 class GameStateObserver;
 class UserInput;
@@ -33,7 +32,7 @@ private:
     static void* runDuelLoopCallback(void*);
     void runDuelLoop();
 
-    GameLog duel(ConnectorManager* manager, int* scores);
+    GameResult duel(ConnectorManager* manager, int* scores);
 
 private:
     pthread_t th_;

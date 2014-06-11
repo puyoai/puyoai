@@ -1,4 +1,4 @@
-#include "game_log.h"
+#include "core/server/connector/received_data.h"
 
 #include <sstream>
 #include <string>
@@ -50,25 +50,6 @@ void PlayerLog::SerializeToString(string* output) const {
         }
         string tmp;
         received_data[i].SerializeToString(&tmp);
-        ss << tmp;
-    }
-    ss << "]";
-    ss << "}";
-    output->append(ss.str());
-}
-
-void GameLog::SerializeToString(string* output) const {
-    stringstream ss;
-    ss << "{";
-    ss << "'GameResult':" << result << ",";
-    ss << "'error_log':'" << error_log << "',";
-    ss << "'log':[";
-    for (size_t i = 0; i < log.size(); i++) {
-        if (i > 0) {
-            ss << ",";
-        }
-        string tmp;
-        log[i].SerializeToString(&tmp);
         ss << tmp;
     }
     ss << "]";

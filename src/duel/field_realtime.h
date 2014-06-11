@@ -6,7 +6,7 @@
 #include "core/field/core_field.h"
 #include "core/frame_data.h"
 #include "core/kumipuyo.h"
-#include "core/server/connector/game_log.h"
+#include "core/server/connector/received_data.h"
 #include "core/state.h"
 
 // TODO(mayah): We need to do refactoring this. This class is really messy.
@@ -18,7 +18,7 @@ public:
 
     // Gives a key input to the field, and control puyo. Returns true if a key
     // input is accepted.
-    bool PlayOneFrame(Key key, PlayerLog* player_log, FrameContext*);
+    bool PlayOneFrame(Key key, FrameContext*);
 
     // Pretty print of the field.
     void Print() const;
@@ -78,7 +78,7 @@ private:
     bool TryChigiri();
     bool TryVanish(FrameContext*);
     bool TryDrop(FrameContext*);
-    bool TryOjama(PlayerLog* player_log);
+    bool TryOjama();
 
     int playerId_;
     SimulationState simulationState_ = STATE_USER;
