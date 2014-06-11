@@ -181,7 +181,7 @@ GameResult DuelServer::duel(ConnectorManager* manager, int* scores)
         // It takes up to 16ms to finish this section.
         vector<PlayerLog> all_data;
         if (!manager->GetActions(current_id, &all_data)) {
-            if (manager->IsConnectorAlive(0)) {
+            if (manager->connector(0)->alive()) {
                 gameResult.result = GameResult::P1_WIN_WITH_CONNECTION_ERROR;
                 gameResult.errorLog = manager->GetErrorLog();
                 break;

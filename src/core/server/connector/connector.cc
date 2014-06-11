@@ -8,58 +8,6 @@
 
 #include <glog/logging.h>
 
-Connector::Connector() :
-    writer_fd_(0),
-    reader_fd_(0),
-    writer_(NULL),
-    reader_(NULL)
-{
-}
-
-Connector::Connector(int writer_fd, int reader_fd)
-{
-    writer_fd_ = writer_fd;
-    reader_fd_ = reader_fd;
-    writer_ = fdopen(writer_fd, "w");
-    reader_ = fdopen(reader_fd, "r");
-}
-
-void Connector::Write(const std::string& message)
-{
-    if (!writer_)
-        return;
-
-    std::fprintf(writer_, "%s\n", message.c_str());
-    std::fflush(writer_);
-
-    LOG(INFO) << message;
-}
-
-ReceivedData Connector::Read()
-{
-    if (!reader_)
-        return ReceivedData();
-
-    char buf[1000];
-    char* ptr = fgets(buf, 999, reader_);
-    if (!ptr)
-        return ReceivedData();
-
-    size_t len = strlen(ptr);
-    if (len == 0)
-        return ReceivedData();
-    if (ptr[len-1] == '\n') {
-        ptr[--len] = '\0';
-    }
-    if (len == 0)
-        return ReceivedData();
-    if (ptr[len-1] == '\r') {
-        ptr[--len] = '\0';
-    }
-
-    return parse(buf);
-}
-
 ReceivedData Connector::parse(const char* str)
 {
     std::istringstream iss(str);
@@ -90,4 +38,72 @@ ReceivedData Connector::parse(const char* str)
     //data->status = OK;
 
     return data;
+}
+
+PipeConnector::PipeConnector(int writerFd, int readerFd)
+{
+    writerFd_ = writerFd;
+    readerFd_ = readerFd;
+    writer_ = fdopen(writerFd, "w");
+    reader_ = fdopen(readerFd, "r");
+
+    CHECK(writer_);
+    CHECK(reader_);
+}
+
+PipeConnector::~PipeConnector()
+{
+    fclose(writer_);
+    fclose(reader_);
+}
+
+void PipeConnector::write(const std::string& message)
+{
+    fprintf(writer_, "%s\n", message.c_str());
+    fflush(writer_);
+
+    LOG(INFO) << message;
+}
+
+ReceivedData PipeConnector::read()
+{
+    char buf[1000];
+    char* ptr = fgets(buf, 999, reader_);
+    if (!ptr)
+        return ReceivedData();
+
+    size_t len = strlen(ptr);
+    if (len == 0)
+        return ReceivedData();
+    if (ptr[len-1] == '\n') {
+        ptr[--len] = '\0';
+    }
+    if (len == 0)
+        return ReceivedData();
+    if (ptr[len-1] == '\r') {
+        ptr[--len] = '\0';
+    }
+
+    return parse(buf);
+}
+
+void HumanConnector::write(const std::string& message)
+{
+    LOG(INFO) << message;
+}
+
+ReceivedData HumanConnector::read()
+{
+    return ReceivedData();
+}
+
+void HumanConnector::setAlive(bool)
+{
+    CHECK(false) << "HumanConnector does not have alive flag.";
+}
+
+int HumanConnector::readerFd() const
+{
+    CHECK(false) << "HumanConnector does not have reader file descriptor.";
+    return -1;
 }
