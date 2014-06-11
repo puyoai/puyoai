@@ -9,6 +9,8 @@
 
 class Connector : noncopyable {
 public:
+    static std::unique_ptr<Connector> create(int playerId, const std::string& program);
+
     virtual ~Connector() {}
 
     virtual void write(const std::string& message) = 0;
