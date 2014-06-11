@@ -128,13 +128,6 @@ void Game::Play(const vector<PlayerLog>& data, GameLog* log)
                 me->GetCurrentPuyo(&moving_x, &moving_y, &c1,
                                    &x2, &y2, &c2, &moving_r);
             }
-            player_log.execution_data.keys.push_back(key);
-            player_log.execution_data.kumipuyoPos.x = moving_x;
-            player_log.execution_data.kumipuyoPos.y = moving_y;
-            player_log.execution_data.kumipuyoPos.r = moving_r;
-            player_log.execution_data.kumipuyo.axis = c1;
-            player_log.execution_data.kumipuyo.child = c2;
-            player_log.execution_data.landed = me->userState().grounded;
             log->log.push_back(player_log);
         }
 
