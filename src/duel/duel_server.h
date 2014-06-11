@@ -12,7 +12,6 @@ class ConnectorManager;
 class Cui;
 class GameState;
 class GameStateObserver;
-class Gui;
 class UserInput;
 
 class DuelServer {
