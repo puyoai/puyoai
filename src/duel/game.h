@@ -13,7 +13,6 @@
 struct Data;
 class DuelServer;
 class FieldRealtime;
-class Gui;
 class PuyoFu;
 class UserInput;
 
