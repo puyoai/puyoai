@@ -98,12 +98,14 @@ void* DuelServer::runDuelLoopCallback(void* p)
 
 void DuelServer::runDuelLoop()
 {
+#if 0
     // Initialize Randomization.
     const char* seed_str = getenv("PUYO_SEED");
     unsigned int seed = seed_str ? atoi(seed_str) : time(NULL);
     srand(seed);
     std::cout << "seed=" << seed << std::endl;
     LOG(INFO) << "seed=" << seed;
+#endif
 
     LOG(INFO) << "Starting duel server.";
     ConnectorManagerLinux manager(programNames_);
@@ -112,6 +114,7 @@ void DuelServer::runDuelLoop()
     int p1_draw = 0;
     int p1_lose = 0;
 
+#if 0
     bool log_result = false;
     string log_dir_str;
     const char* log_dir = getenv("PUYO_LOG_DIRECTORY");
@@ -122,12 +125,14 @@ void DuelServer::runDuelLoop()
             log_dir_str += "/";
         }
     }
+#endif
 
     int num_match = 0;
     while (!shouldStop_) {
         int scores[2];
         GameLog log = duel(&manager, scores);
 
+#if 0
         if (log_result) {
             stringstream filename;
             filename << log_dir_str << num_match;
@@ -144,6 +149,7 @@ void DuelServer::runDuelLoop()
             ss << log_dir_str << num_match;
             filename = ss.str();
         }
+#endif
 
         string result = "";
         switch (log.result) {
@@ -169,6 +175,7 @@ void DuelServer::runDuelLoop()
             LOG(FATAL) << "Game is still running?";
         }
 
+#if 0
         map<string, string> results;
         results["result"] = result;
         results["logfile"] = filename;
@@ -190,13 +197,16 @@ void DuelServer::runDuelLoop()
 
         LOG(INFO) << result;
         cout << result << endl;
+#endif
 
         cout << p1_win << " / " << p1_draw << " / " << p1_lose
              << " " << scores[0] << " vs " << scores[1] << endl;
 
+#if 0
         seed = rand();
         srand(seed);
         LOG(INFO) << "seed=" << seed;
+#endif
 
         if (log.result == P1_WIN_WITH_CONNECTION_ERROR ||
             log.result == P2_WIN_WITH_CONNECTION_ERROR ||
