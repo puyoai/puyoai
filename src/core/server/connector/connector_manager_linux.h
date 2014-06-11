@@ -1,6 +1,7 @@
 #ifndef CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_LINUX_H_
 #define CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_LINUX_H_
 
+#include <memory>
 #include <vector>
 
 #include "base/base.h"
