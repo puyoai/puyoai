@@ -166,6 +166,8 @@ void Log(int frame_id, const vector<ReceivedData>* all_data, vector<PlayerLog>* 
     }
 }
 
+// TODO(mayah): Without polling, each connector should make thread?
+// If we do so, Human connector can use MainWindow::addEventListener(), maybe.
 bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
 {
     log->clear();
