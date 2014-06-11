@@ -162,7 +162,7 @@ GameLog DuelServer::duel(ConnectorManager* manager, int* scores)
         // Timeout is 120s, and the game is 30fps.
         if (current_id >= FPS * 120) {
             game_log.result = GameResult::DRAW;
-            return game_log;
+            break;
         }
         // GO TO THE NEXT FRAME.
         current_id++;
@@ -174,7 +174,7 @@ GameLog DuelServer::duel(ConnectorManager* manager, int* scores)
         GameResult result = game.GetWinner(scores);
         if (result != PLAYING) {
             game_log.result = result;
-            return game_log;
+            break;
         }
 
         // READ INFO.
@@ -184,11 +184,11 @@ GameLog DuelServer::duel(ConnectorManager* manager, int* scores)
             if (manager->IsConnectorAlive(0)) {
                 game_log.result = P1_WIN_WITH_CONNECTION_ERROR;
                 game_log.error_log = manager->GetErrorLog();
-                return game_log;
+                break;
             } else {
                 game_log.result = P2_WIN_WITH_CONNECTION_ERROR;
                 game_log.error_log = manager->GetErrorLog();
-                return game_log;
+                break;
             }
         }
 
