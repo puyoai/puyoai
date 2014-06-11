@@ -39,10 +39,6 @@ ConnectorManagerLinux::ConnectorManagerLinux(vector<string> program_names) :
 }
 
 Connector ConnectorManagerLinux::CreateConnector(string program_name, int id) {
-  const int STDIN = 0;
-  const int STDOUT = 1;
-  const int STDERR = 2;
-
   if (program_name.find("fifo:") == 0) {
     string::size_type colon = program_name.find(":", 5);
     string uplink_fifo = program_name.substr(5, colon - 5);
@@ -99,13 +95,13 @@ Connector ConnectorManagerLinux::CreateConnector(string program_name, int id) {
     return connector;
   } else {
     // Client.
-    if (dup2(fd_field_status[0], STDIN) == -1) {
+    if (dup2(fd_field_status[0], STDIN_FILENO) == -1) {
       LOG(FATAL) << "Failed to dup2. " << strerror(errno);
     }
-    if (dup2(fd_command[1], STDOUT) == -1) {
+    if (dup2(fd_command[1], STDOUT_FILENO) == -1) {
       LOG(FATAL) << "Failed to dup2. " << strerror(errno);
     }
-    if (dup2(fd_cpu_error[1], STDERR) == -1) {
+    if (dup2(fd_cpu_error[1], STDERR_FILENO) == -1) {
       LOG(FATAL) << "Failed to dup2. " << strerror(errno);
     }
 
