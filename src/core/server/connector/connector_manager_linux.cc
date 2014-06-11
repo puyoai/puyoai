@@ -3,6 +3,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include <fcntl.h>
+#include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <iomanip>
 #include <string>
