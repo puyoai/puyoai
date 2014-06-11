@@ -19,6 +19,8 @@
 
 using namespace std;
 
+DEFINE_bool(realtime, true, "use realtime");
+
 const int TIMEOUT_USEC = 1000000 / FPS;
 
 ConnectorManagerLinux::ConnectorManagerLinux(vector<string> program_names) :
@@ -247,17 +249,16 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
 
     // If a realtime game flag is not set, do not wait for timeout, and
     // continue the game as soon as possible.
-    const char* realtime_str = getenv("PUYO_REALTIME");
-    if (realtime_str == NULL) {
-      bool all_data_is_read = true;
-      for (int i = 0; i < 2; i++) {
-        if (!received_data_for_this_frame[i]) {
-          all_data_is_read = false;
+    if (FLAGS_realtime) {
+        bool all_data_is_read = true;
+        for (int i = 0; i < 2; i++) {
+            if (!received_data_for_this_frame[i]) {
+                all_data_is_read = false;
+            }
         }
-      }
-      if (all_data_is_read) {
-        break;
-      }
+        if (all_data_is_read) {
+            break;
+        }
     }
   }
   Log(frame_id, received_data, log);
