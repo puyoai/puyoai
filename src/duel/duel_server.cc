@@ -98,58 +98,16 @@ void* DuelServer::runDuelLoopCallback(void* p)
 
 void DuelServer::runDuelLoop()
 {
-#if 0
-    // Initialize Randomization.
-    const char* seed_str = getenv("PUYO_SEED");
-    unsigned int seed = seed_str ? atoi(seed_str) : time(NULL);
-    srand(seed);
-    std::cout << "seed=" << seed << std::endl;
-    LOG(INFO) << "seed=" << seed;
-#endif
-
-    LOG(INFO) << "Starting duel server.";
     ConnectorManagerLinux manager(programNames_);
 
     int p1_win = 0;
     int p1_draw = 0;
     int p1_lose = 0;
-
-#if 0
-    bool log_result = false;
-    string log_dir_str;
-    const char* log_dir = getenv("PUYO_LOG_DIRECTORY");
-    if (log_dir) {
-        log_result = true;
-        log_dir_str = string(log_dir);
-        if (log_dir_str.substr(log_dir_str.size() - 1, 1) != "/") {
-            log_dir_str += "/";
-        }
-    }
-#endif
-
     int num_match = 0;
+
     while (!shouldStop_) {
         int scores[2];
         GameLog log = duel(&manager, scores);
-
-#if 0
-        if (log_result) {
-            stringstream filename;
-            filename << log_dir_str << num_match;
-            ofstream ofs(filename.str().c_str(), ios::out);
-            string output;
-            log.SerializeToString(&output);
-            ofs << "var data = " << output;
-            ofs.close();
-        }
-
-        string filename;
-        if (log_result) {
-            stringstream ss;
-            ss << log_dir_str << num_match;
-            filename = ss.str();
-        }
-#endif
 
         string result = "";
         switch (log.result) {
@@ -175,38 +133,8 @@ void DuelServer::runDuelLoop()
             LOG(FATAL) << "Game is still running?";
         }
 
-#if 0
-        map<string, string> results;
-        results["result"] = result;
-        results["logfile"] = filename;
-        const char* user1 = getenv("PUYO_USER1");
-        const char* user2 = getenv("PUYO_USER2");
-        if (user1) results["user1"] = string(user1);
-        if (user2) results["user2"] = string(user2);
-
-        int is_first = true;
-        cerr << "{";
-        for (map<string, string>::iterator i = results.begin(); i != results.end(); i++) {
-            if (!is_first) {
-                cerr << ", ";
-            }
-            is_first = false;
-            cerr << "\"" << i->first << "\": \"" << i->second << "\"";
-        }
-        cerr << "}" << endl;
-
-        LOG(INFO) << result;
-        cout << result << endl;
-#endif
-
         cout << p1_win << " / " << p1_draw << " / " << p1_lose
              << " " << scores[0] << " vs " << scores[1] << endl;
-
-#if 0
-        seed = rand();
-        srand(seed);
-        LOG(INFO) << "seed=" << seed;
-#endif
 
         if (log.result == P1_WIN_WITH_CONNECTION_ERROR ||
             log.result == P2_WIN_WITH_CONNECTION_ERROR ||
@@ -214,6 +142,7 @@ void DuelServer::runDuelLoop()
             p1_win + p1_draw + p1_lose == FLAGS_num_duel) {
             break;
         }
+
         num_match++;
     }
 }
@@ -223,11 +152,11 @@ GameLog DuelServer::duel(ConnectorManager* manager, int* scores)
     for (auto observer : observers_)
         observer->newGameWillStart();
 
-    LOG(INFO) << "Cpu managers started.";
     Game game(this, userInput_.get());
-    LOG(INFO) << "Game started.";
-    int current_id = 0;
 
+    LOG(INFO) << "Game has started.";
+
+    int current_id = 0;
     GameLog game_log;
     while (!shouldStop_) {
         // Timeout is 120s, and the game is 30fps.
