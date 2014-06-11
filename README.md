@@ -46,7 +46,7 @@ build ディレクトリを掘って、そこで build するのがオススメ�
 ## 実行
 
     $ cd build
-    $ PUYO_REALTIME=1 ./duel/duel ./cpu/sample/sample ./cpu/sample/sample
+    $ ./duel/duel ./cpu/sample/sample ./cpu/sample/sample
 
 sample は、消せるところがあれば消し、そうでなければ左に積むだけのアルゴリズムで動いています。
 
