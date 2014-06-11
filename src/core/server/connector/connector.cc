@@ -35,56 +35,59 @@ void Connector::Write(const std::string& message)
     LOG(INFO) << message;
 }
 
-bool Connector::Read(Data* data)
+ReceivedData Connector::Read()
 {
     if (!reader_)
-        return false;
+        return ReceivedData();
 
     char buf[1000];
     char* ptr = fgets(buf, 999, reader_);
-    if (ptr) {
-        size_t len = strlen(ptr);
-        if (len == 0)
-            return false;
-        if (ptr[len-1] == '\n') {
-            ptr[--len] = '\0';
-        }
-        if (len == 0)
-            return false;
-        if (ptr[len-1] == '\r') {
-            ptr[--len] = '\0';
-        }
-        Split(buf, data);
-        return true;
-    } else {
-        return false;
+    if (!ptr)
+        return ReceivedData();
+
+    size_t len = strlen(ptr);
+    if (len == 0)
+        return ReceivedData();
+    if (ptr[len-1] == '\n') {
+        ptr[--len] = '\0';
     }
+    if (len == 0)
+        return ReceivedData();
+    if (ptr[len-1] == '\r') {
+        ptr[--len] = '\0';
+    }
+
+    return parse(buf);
 }
 
-void Connector::Split(const char* str, Data* data)
+ReceivedData Connector::parse(const char* str)
 {
     std::istringstream iss(str);
     std::string tmp;
 
-    data->original = std::string(str);
-    data->original = data->original.substr(0, data->original.size() - 1);
-    data->x = 0;
-    data->r = 0;
+    ReceivedData data;
+
+    data.received = true;
+    data.original = std::string(str);
+    data.original = data.original.substr(0, data.original.size() - 1);  // What's this? chomp?
+
     while (getline(iss, tmp, ' ')) {
         if (tmp.substr(0, 3) == "ID=") {
             std::istringstream istr(tmp.c_str() + 3);
-            istr >> data->id;
+            istr >> data.frameId;
         } else if (tmp.substr(0, 2) == "X=") {
             std::istringstream istr(tmp.c_str() + 2);
-            istr >> data->x;
+            istr >> data.decision.x;
         } else if (tmp.substr(0, 2) == "R=") {
             std::istringstream istr(tmp.c_str() + 2);
-            istr >> data->r;
+            istr >> data.decision.r;
         } else if (tmp.substr(0, 4) == "MSG=") {
-            data->msg = tmp.c_str() + 4;
+            data.msg = tmp.c_str() + 4;
         } else if (tmp.substr(0, 3) == "MA=") {
-            data->mawashi_area = tmp.c_str() + 3;
+            data.mawashi_area = tmp.c_str() + 3;
         }
     }
-    data->status = OK;
+    //data->status = OK;
+
+    return data;
 }

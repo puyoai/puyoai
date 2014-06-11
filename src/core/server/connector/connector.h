@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <string>
 
-#include "core/server/connector/data.h"
+#include "core/server/connector/game_log.h"
 
 class Connector {
 public:
@@ -12,11 +12,11 @@ public:
     Connector(int writer_fd, int reader_fd);
 
     void Write(const std::string& message);
-    bool Read(Data* data);
+    ReceivedData Read();
     int GetReaderFd() const { return reader_fd_; }
 
 private:
-    void Split(const char* str, Data* data);
+    ReceivedData parse(const char* str);
 
     int writer_fd_;
     int reader_fd_;
