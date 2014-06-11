@@ -18,7 +18,7 @@ public:
 
     virtual Connector* connector(int i) OVERRIDE { return &connectors_[i]; }
 
-    virtual void setWaitTimeout(bool) OVERRIDE;
+    virtual void setWaitTimeout(bool flag) OVERRIDE { waitTimeout_ = flag; }
 
 private:
     Connector CreateConnector(std::string program_name, int id);
@@ -26,7 +26,7 @@ private:
     std::vector<Connector> connectors_;
     pollfd pollfds_[2];
     std::vector<bool> connector_is_alive_;
-    bool wait_timeout_;
+    bool waitTimeout_;
 };
 
 #endif
