@@ -122,7 +122,7 @@ Connector ConnectorManagerLinux::CreateConnector(string program_name, int id)
     return Connector();
 }
 
-void ConnectorManagerLinux::Write(int id, string message) {
+void ConnectorManagerLinux::Write(int id, const string& message) {
     connectors_[id].Write(message);
 }
 
