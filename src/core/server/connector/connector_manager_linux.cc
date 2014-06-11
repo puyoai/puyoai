@@ -225,14 +225,14 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
                 ReceivedData data = connector(playerIds[i])->read();
                 if (data.received) {
                     data.usec = GetUsecFromStart(tv_start);
-                    received_data[i].push_back(data);
+                    received_data[playerIds[i]].push_back(data);
                     if (data.frameId == frame_id)
                         received_data_for_this_frame[playerIds[i]] = true;
                 }
             } else if ((pollfds[i].revents & POLLERR) ||
                        (pollfds[i].revents & POLLHUP) ||
                        (pollfds[i].revents & POLLNVAL)) {
-                LOG(ERROR) << "[P" << i << "] Closed the connection.";
+                LOG(ERROR) << "[P" << playerIds[i] << "] Closed the connection.";
                 died = true;
                 connector(playerIds[i])->setAlive(false);
             }
