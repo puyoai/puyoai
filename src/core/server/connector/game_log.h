@@ -6,6 +6,7 @@
 
 #include "core/decision.h"
 #include "core/key.h"
+#include "core/kumipuyo.h"
 
 enum GameResult {
     PLAYING = -1,
@@ -28,19 +29,11 @@ public:
     void SerializeToString(std::string* output) const;
 };
 
-// Information about Jiku-puyo.
-struct MovingPosition {
-    int x;
-    int y;
-    int r;
-    // TODO(mayah): Why char[2]? Kumipuyo should be used.
-    char color[2];
-};
-
 class ExecutionData {
 public:
     std::vector<Key> keys;
-    MovingPosition moving;
+    KumipuyoPos kumipuyoPos;
+    Kumipuyo kumipuyo;
     std::vector<int> ojama;
     bool landed;
 

@@ -2,19 +2,6 @@
 
 using namespace std;
 
-#if 0
-KumipuyoPos::KumipuyoPos(const Decision& d)
-{
-    if (d.r == 3) {
-        this->x = d.x + 1;
-    } else {
-        this->x = d.x;
-    }
-    this->r = d.r;
-    this->y = 2;
-}
-#endif
-
 std::string KumipuyoPos::debugString() const
 {
     char buf[256];

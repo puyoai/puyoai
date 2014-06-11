@@ -40,11 +40,11 @@ void ExecutionData::SerializeToString(string* output) const {
   }
   ss << "],";
   ss << "moving:{";
-  ss << "'x':" << moving.x << ",";
-  ss << "'y':" << moving.y << ",";
-  ss << "'r':" << moving.r << ",";
-  ss << "'c1':" << moving.color[0] << ",";
-  ss << "'c2':" << moving.color[1];
+  ss << "'x':" << kumipuyoPos.x << ",";
+  ss << "'y':" << kumipuyoPos.y << ",";
+  ss << "'r':" << kumipuyoPos.r << ",";
+  ss << "'c1':" << kumipuyo.axis << ",";
+  ss << "'c2':" << kumipuyo.child;
   ss << "}";
 
   bool has_ojama = false;
