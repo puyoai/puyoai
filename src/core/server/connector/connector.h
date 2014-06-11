@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <string>
 
-#include "core/server/connector/game_log.h"
+#include "core/server/connector/received_data.h"
 
 class Connector {
 public:

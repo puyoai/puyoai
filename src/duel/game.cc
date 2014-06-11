@@ -9,7 +9,6 @@
 
 #include "core/decision.h"
 #include "core/kumipuyo.h"
-#include "core/server/connector/game_log.h"
 #include "core/state.h"
 #include "duel/duel_server.h"
 #include "duel/field_realtime.h"
@@ -74,7 +73,7 @@ int UpdateDecision(const PlayerLog& data, FieldRealtime* field, Decision* decisi
     return -1;
 }
 
-void Game::Play(const vector<PlayerLog>& data, GameLog* log)
+void Game::Play(const vector<PlayerLog>& data)
 {
     for (int i = 0; i < data.size(); i++) {
         FieldRealtime* me = field[i].get();
@@ -110,25 +109,11 @@ void Game::Play(const vector<PlayerLog>& data, GameLog* log)
             key = me->GetKey(latest_decision_[i]);
         }
 
-        PlayerLog player_log = data[i];
         FrameContext context;
-        me->PlayOneFrame(key, &player_log, &context);
+        me->PlayOneFrame(key, &context);
 
         FieldRealtime* opponent = field[0].get() == me ? field[1].get() : field[0].get();
         context.apply(me, opponent);
-
-        {
-            int moving_x;
-            int moving_y;
-            int moving_r;
-            PuyoColor c1, c2;
-            {
-                int x2, y2;
-                me->GetCurrentPuyo(&moving_x, &moving_y, &c1,
-                                   &x2, &y2, &c2, &moving_r);
-            }
-            log->log.push_back(player_log);
-        }
 
         // Clear current key input if the move is done.
         if (me->userState().grounded) {
@@ -144,25 +129,26 @@ void Game::Play(const vector<PlayerLog>& data, GameLog* log)
                                            last_accepted_messages_[0], last_accepted_messages_[1]));
 }
 
-GameResult Game::GetWinner(int* scores) const
+GameResult::Result Game::GetWinner(int* scores) const
 {
     scores[0] = field[0]->score();
     scores[1] = field[1]->score();
     bool p1_dead = field[0]->isDead();
     bool p2_dead = field[1]->isDead();
     if (!p1_dead && !p2_dead) {
-        return PLAYING;
+        return GameResult::PLAYING;
     }
     if (p1_dead && p2_dead) {
-        return DRAW;
+        return GameResult::DRAW;
     }
     if (p1_dead) {
-        return P2_WIN;
+        return GameResult::P2_WIN;
     }
     if (p2_dead) {
-        return P1_WIN;
+        return GameResult::P1_WIN;
     }
-    return PLAYING;
+
+    return GameResult::PLAYING;
 }
 
 std::string FormatAckInfo(const vector<int>& ack_info)

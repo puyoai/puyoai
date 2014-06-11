@@ -107,37 +107,37 @@ void DuelServer::runDuelLoop()
 
     while (!shouldStop_) {
         int scores[2];
-        GameLog log = duel(&manager, scores);
+        GameResult gameResult = duel(&manager, scores);
 
         string result = "";
-        switch (log.result) {
-        case P1_WIN:
+        switch (gameResult.result) {
+        case GameResult::P1_WIN:
             p1_win++;
             result = "P1_WIN";
             break;
-        case P2_WIN:
+        case GameResult::P2_WIN:
             p1_lose++;
             result = "P2_WIN";
             break;
-        case DRAW:
+        case GameResult::DRAW:
             p1_draw++;
             result = "DRAW";
             break;
-        case P1_WIN_WITH_CONNECTION_ERROR:
+        case GameResult::P1_WIN_WITH_CONNECTION_ERROR:
             result = "P1_WIN_WITH_CONNECTION_ERROR";
             break;
-        case P2_WIN_WITH_CONNECTION_ERROR:
+        case GameResult::P2_WIN_WITH_CONNECTION_ERROR:
             result = "P2_WIN_WITH_CONNECTION_ERROR";
             break;
-        case PLAYING:
+        case GameResult::PLAYING:
             LOG(FATAL) << "Game is still running?";
         }
 
         cout << p1_win << " / " << p1_draw << " / " << p1_lose
              << " " << scores[0] << " vs " << scores[1] << endl;
 
-        if (log.result == P1_WIN_WITH_CONNECTION_ERROR ||
-            log.result == P2_WIN_WITH_CONNECTION_ERROR ||
+        if (gameResult.result == GameResult::P1_WIN_WITH_CONNECTION_ERROR ||
+            gameResult.result == GameResult::P2_WIN_WITH_CONNECTION_ERROR ||
             p1_win == FLAGS_num_win || p1_lose == FLAGS_num_win ||
             p1_win + p1_draw + p1_lose == FLAGS_num_duel) {
             break;
@@ -147,7 +147,7 @@ void DuelServer::runDuelLoop()
     }
 }
 
-GameLog DuelServer::duel(ConnectorManager* manager, int* scores)
+GameResult DuelServer::duel(ConnectorManager* manager, int* scores)
 {
     for (auto observer : observers_)
         observer->newGameWillStart();
@@ -157,11 +157,11 @@ GameLog DuelServer::duel(ConnectorManager* manager, int* scores)
     LOG(INFO) << "Game has started.";
 
     int current_id = 0;
-    GameLog game_log;
+    GameResult gameResult;
     while (!shouldStop_) {
         // Timeout is 120s, and the game is 30fps.
         if (current_id >= FPS * 120) {
-            game_log.result = GameResult::DRAW;
+            gameResult.result = GameResult::DRAW;
             break;
         }
         // GO TO THE NEXT FRAME.
@@ -171,9 +171,9 @@ GameLog DuelServer::duel(ConnectorManager* manager, int* scores)
         SendInfo(manager, current_id, player_info);
 
         // CHECK IF THE GAME IS OVER.
-        GameResult result = game.GetWinner(scores);
-        if (result != PLAYING) {
-            game_log.result = result;
+        GameResult::Result result = game.GetWinner(scores);
+        if (result != GameResult::PLAYING) {
+            gameResult.result = result;
             break;
         }
 
@@ -182,22 +182,22 @@ GameLog DuelServer::duel(ConnectorManager* manager, int* scores)
         vector<PlayerLog> all_data;
         if (!manager->GetActions(current_id, &all_data)) {
             if (manager->IsConnectorAlive(0)) {
-                game_log.result = P1_WIN_WITH_CONNECTION_ERROR;
-                game_log.error_log = manager->GetErrorLog();
+                gameResult.result = GameResult::P1_WIN_WITH_CONNECTION_ERROR;
+                gameResult.errorLog = manager->GetErrorLog();
                 break;
             } else {
-                game_log.result = P2_WIN_WITH_CONNECTION_ERROR;
-                game_log.error_log = manager->GetErrorLog();
+                gameResult.result = GameResult::P2_WIN_WITH_CONNECTION_ERROR;
+                gameResult.errorLog = manager->GetErrorLog();
                 break;
             }
         }
 
         // PLAY.
-        game.Play(all_data, &game_log);
+        game.Play(all_data);
     }
 
     for (auto observer : observers_)
         observer->gameHasDone();
 
-    return game_log;
+    return gameResult;
 }

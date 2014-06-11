@@ -14,8 +14,6 @@
 #include <vector>
 
 #include "core/constant.h"
-#include "core/server/connector/connector.h"
-#include "core/server/connector/game_log.h"
 
 using namespace std;
 
