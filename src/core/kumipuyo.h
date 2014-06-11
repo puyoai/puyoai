@@ -32,7 +32,6 @@ public:
 
     KumipuyoPos() : x(0), y(0), r(0) {}
     KumipuyoPos(int x, int y, int r) : x(x), y(y), r(r) {}
-    //KumipuyoPos(const Decision& d);
 
     std::string debugString() const;
 

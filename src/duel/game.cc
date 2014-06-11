@@ -129,11 +129,11 @@ void Game::Play(const vector<PlayerLog>& data, GameLog* log)
                                    &x2, &y2, &c2, &moving_r);
             }
             player_log.execution_data.keys.push_back(key);
-            player_log.execution_data.moving.x = moving_x;
-            player_log.execution_data.moving.y = moving_y;
-            player_log.execution_data.moving.r = moving_r;
-            player_log.execution_data.moving.color[0] = c1 + '0';
-            player_log.execution_data.moving.color[1] = c2 + '0';
+            player_log.execution_data.kumipuyoPos.x = moving_x;
+            player_log.execution_data.kumipuyoPos.y = moving_y;
+            player_log.execution_data.kumipuyoPos.r = moving_r;
+            player_log.execution_data.kumipuyo.axis = c1;
+            player_log.execution_data.kumipuyo.child = c2;
             player_log.execution_data.landed = me->userState().grounded;
             log->log.push_back(player_log);
         }
