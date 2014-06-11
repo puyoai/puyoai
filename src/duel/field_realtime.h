@@ -5,6 +5,7 @@
 
 #include "core/field/core_field.h"
 #include "core/frame_data.h"
+#include "core/key.h"
 #include "core/kumipuyo.h"
 #include "core/server/connector/received_data.h"
 #include "core/state.h"

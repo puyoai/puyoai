@@ -5,8 +5,6 @@
 #include <vector>
 
 #include "core/decision.h"
-#include "core/key.h"
-#include "core/kumipuyo.h"
 
 class ReceivedData {
 public:
