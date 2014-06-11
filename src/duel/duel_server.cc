@@ -26,6 +26,10 @@ using namespace std;
 DEFINE_int32(num_duel, -1, "After num_duel times of duel, the server will stop. negative is infinity.");
 DEFINE_int32(num_win, -1, "After num_win times of 1p or 2p win, the server will stop. negative is infinity");
 
+#ifdef USE_SDL2
+DECLARE_bool(use_gui);
+#endif
+
 static void SendInfo(ConnectorManager* manager, int id, string status[2])
 {
   for (int i = 0; i < 2; i++) {
@@ -38,8 +42,7 @@ static void SendInfo(ConnectorManager* manager, int id, string status[2])
 static unique_ptr<UserInput> createUserInputIfNecessary()
 {
 #ifdef USE_SDL2
-    char* gui = getenv("PUYO_GUI");
-    if (gui && !strcmp(gui, "0"))
+    if (FLAGS_use_gui)
         return unique_ptr<SDLUserInput>(new SDLUserInput);
 #endif
 
