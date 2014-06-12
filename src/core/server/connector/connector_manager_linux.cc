@@ -36,12 +36,10 @@ static int GetRemainingMilliSeconds(const struct timeval& start)
     return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
-ConnectorManagerLinux::ConnectorManagerLinux(vector<string> program_names) :
+ConnectorManagerLinux::ConnectorManagerLinux(unique_ptr<Connector> p1, unique_ptr<Connector> p2) :
+    connectors_ { move(p1), move(p2) },
     waitTimeout_(true)
 {
-    for (int i = 0; i < program_names.size(); i++) {
-        connectors_.push_back(Connector::create(i, program_names[i]));
-    }
 }
 
 void Log(int frame_id, const vector<ReceivedData>* all_data, vector<PlayerLog>* log)
@@ -78,17 +76,17 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
 {
     log->clear();
     // Initialize logging.
-    log->assign(connectors_.size(), PlayerLog());
-    for (int i = 0; i < connectors_.size(); i++) {
+    log->assign(NUM_PLAYERS, PlayerLog());
+    for (int i = 0; i < NUM_PLAYERS; i++) {
         (*log)[i].frame_id = frame_id;
         (*log)[i].player_id = i;
         (*log)[i].is_human = connectors_[i]->isHuman();
     }
 
-    pollfd pollfds[2];
-    int playerIds[2];
+    pollfd pollfds[NUM_PLAYERS];
+    int playerIds[NUM_PLAYERS];
     int numPollfds = 0;
-    for (int i = 0; i < connectors_.size(); i++) {
+    for (int i = 0; i < NUM_PLAYERS; i++) {
         if (connector(i)->pollable()) {
             pollfds[numPollfds].fd = connector(i)->readerFd();
             pollfds[numPollfds].events = POLLIN;
@@ -96,10 +94,10 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
             numPollfds++;
         }
     }
-    DCHECK(numPollfds <= 2) << numPollfds;
+    DCHECK(numPollfds <= NUM_PLAYERS) << numPollfds;
 
-    vector<ReceivedData> received_data[2];
-    bool received_data_for_this_frame[2] = {false, false};
+    vector<ReceivedData> received_data[NUM_PLAYERS];
+    bool received_data_for_this_frame[NUM_PLAYERS] {};
     bool died = false;
 
     struct timeval tv_start;

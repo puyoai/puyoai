@@ -22,15 +22,13 @@ WiiConnectServer::WiiConnectServer(Source* source, Analyzer* analyzer, KeySender
     analyzer_(analyzer),
     keySender_(keySender)
 {
-    vector<string> programs {
-        p1Program,
-        p2Program,
-    };
-
     isAi_[0] = (p1Program != "-");
     isAi_[1] = (p2Program != "-");
 
-    connector_.reset(new ConnectorManagerLinux(programs));
+    connector_.reset(new ConnectorManagerLinux {
+        Connector::create(0, p1Program),
+        Connector::create(1, p2Program),
+    });
     connector_->setWaitTimeout(false);
 }
 

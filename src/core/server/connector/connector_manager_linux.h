@@ -10,7 +10,7 @@
 
 class ConnectorManagerLinux : public ConnectorManager {
 public:
-    ConnectorManagerLinux(std::vector<std::string> program_names);
+    ConnectorManagerLinux(std::unique_ptr<Connector> p1, std::unique_ptr<Connector> p2);
     virtual bool GetActions(int frame_id, std::vector<PlayerLog>* all_data) OVERRIDE;
 
     virtual Connector* connector(int i) OVERRIDE { return connectors_[i].get(); }
@@ -18,7 +18,8 @@ public:
     virtual void setWaitTimeout(bool flag) OVERRIDE { waitTimeout_ = flag; }
 
 private:
-    std::vector<std::unique_ptr<Connector>> connectors_;
+    static const int NUM_PLAYERS = 2;
+    std::unique_ptr<Connector> connectors_[NUM_PLAYERS];
     bool waitTimeout_;
 };
 
