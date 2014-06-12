@@ -44,7 +44,8 @@ ConnectorManagerLinux::ConnectorManagerLinux(vector<string> program_names) :
     }
 }
 
-void ConnectorManagerLinux::Write(int id, const string& message) {
+void ConnectorManagerLinux::Write(int id, const string& message)
+{
     if (connectors_[id].get())
         connectors_[id]->write(message);
 }
@@ -169,10 +170,4 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
     Log(frame_id, received_data, log);
 
     return !died;
-}
-
-string ConnectorManagerLinux::GetErrorLog()
-{
-    // TODO(mayah): Implement this or remove this function at all.
-    return "";
 }

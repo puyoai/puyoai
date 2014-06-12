@@ -24,7 +24,7 @@ public:
     ~Game();
 
     void Play(const std::vector<PlayerLog>& all_data);
-    GameResult::Result GetWinner(int* scores) const;
+    GameResult GetWinner() const;
     void GetFieldInfo(std::string* player1, std::string* player2) const;
 
 private:

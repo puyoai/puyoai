@@ -32,7 +32,7 @@ private:
     static void* runDuelLoopCallback(void*);
     void runDuelLoop();
 
-    GameResult duel(ConnectorManager* manager, int* scores);
+    GameResult duel(ConnectorManager* manager);
 
 private:
     pthread_t th_;
