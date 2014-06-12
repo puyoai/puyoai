@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 #include "core/algorithm/puyo_possibility.h"
 #include "core/kumipuyo.h"
-#include "field.h"
 
 using namespace std;
 
@@ -14,12 +13,12 @@ TEST(EnemyInfoTest, UpdatePossibleRensasTest)
     EnemyInfo info;
     info.initializeWith(100);
 
-    Field f("000000"
-            "000000"
-            "000000"
-            "456000"
-            "445664"
-            "557774");
+    CoreField f("000000"
+                "000000"
+                "000000"
+                "456000"
+                "445664"
+                "557774");
 
     KumipuyoSeq kumipuyos("777777");
     info.updatePossibleRensas(f, kumipuyos);
@@ -37,19 +36,19 @@ TEST(EnemyInfoTest, UpdatePossibleRensasTest2)
     EnemyInfo info;
     info.initializeWith(100);
 
-    Field f(" O    "
-            " O O  " // 12
-            "OO OOO"
-            "OOOOOO"
-            "OGOOOO"
-            "OYOOOO" // 8
-            "OOOOOO"
-            "OOOOOO"
-            "OOOOOO"
-            "OOOOOO" // 4
-            "OOOOOO"
-            "OBOYOO"
-            "BBOBBR");
+    CoreField f(" O    "
+                " O O  " // 12
+                "OO OOO"
+                "OOOOOO"
+                "OGOOOO"
+                "OYOOOO" // 8
+                "OOOOOO"
+                "OOOOOO"
+                "OOOOOO"
+                "OOOOOO" // 4
+                "OOOOOO"
+                "OBOYOO"
+                "BBOBBR");
 
     KumipuyoSeq kumipuyos("BBRBYB");
     info.updatePossibleRensas(f, kumipuyos);
