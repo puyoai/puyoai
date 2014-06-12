@@ -5,11 +5,11 @@
 #include <deque>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
-#include <pthread.h>
+#include <thread>
 
 #include "base/base.h"
-#include "base/lock.h"
 #include "capture/analyzer_result_drawer.h"
 #include "core/decision.h"
 #include "core/field/core_field.h"
@@ -38,8 +38,6 @@ public:
     virtual std::unique_ptr<AnalyzerResult> analyzerResult() const OVERRIDE;
 
 private:
-    static void* runLoopCallback(void*);
-
     void reset();
     void runLoop();
 
@@ -54,12 +52,12 @@ private:
 
     PuyoColor toPuyoColor(RealColor, bool allowAllocation = false);
 
-    pthread_t th_;
+    std::thread th_;
     volatile bool shouldStop_;
     std::unique_ptr<ConnectorManager> connector_;
 
     // These 3 field should be used for only drawing.
-    mutable Mutex mu_;
+    mutable std::mutex mu_;
     UniqueSDLSurface surface_;
     std::deque<std::unique_ptr<AnalyzerResult>> analyzerResults_;
 

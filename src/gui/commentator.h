@@ -2,14 +2,14 @@
 #define GUI_COMMENTATOR_H_
 
 #include <memory>
+#include <mutex>
 #include <queue>
+#include <thread>
 
-#include <pthread.h>
 #include <SDL.h>
 #include <gtest/gtest.h>
 
 #include "base/base.h"
-#include "base/lock.h"
 #include "core/algorithm/rensa_info.h"
 #include "core/field/core_field.h"
 #include "core/kumipuyo.h"
@@ -44,11 +44,11 @@ private:
     void drawMainChain(Screen*) const;
     void drawCommentSurface(Screen*, int playerId) const;
 
-    pthread_t th_;
+    std::thread th_;
     volatile bool shouldStop_;
     volatile bool needsUpdate_[2];
 
-    mutable Mutex mu_;
+    mutable std::mutex mu_;
     CoreField field_[2];
     KumipuyoSeq kumipuyoSeq_[2];
     std::string message_[2];

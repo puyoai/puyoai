@@ -17,21 +17,18 @@ Capture::Capture(Source* source, Analyzer* analyzer) :
 
 bool Capture::start()
 {
-    CHECK(pthread_create(&th_, nullptr, runLoopCallback, this) == 0);
-    CHECK(pthread_detach(th_) == 0);
+    th_ = thread([this](){
+        this->runLoop();
+    });
+    th_.detach();
     return true;
 }
 
 void Capture::stop()
 {
     shouldStop_ = true;
-}
-
-// static
-void* Capture::runLoopCallback(void* p)
-{
-    reinterpret_cast<Capture*>(p)->runLoop();
-    return nullptr;
+    if (th_.joinable())
+        th_.join();
 }
 
 void Capture::runLoop()
@@ -45,7 +42,7 @@ void Capture::runLoop()
         // We set frameId to surface's userdata. This will be useful for saving screen shot.
         surface->userdata = reinterpret_cast<void*>(static_cast<uintptr_t>(++frameId));
 
-        ScopedLock lock(&mu_);
+        lock_guard<mutex> lock(mu_);
         unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), results_);
         surface_ = move(surface);
         results_.push_front(move(r));
@@ -58,13 +55,13 @@ void Capture::draw(Screen* screen)
 {
     SDL_Surface* surface = screen->surface();
 
-    ScopedLock lock(&mu_);
+    lock_guard<mutex> lock(mu_);
     SDL_BlitSurface(surface_.get(), nullptr, surface, nullptr);
 }
 
 unique_ptr<AnalyzerResult> Capture::analyzerResult() const
 {
-    ScopedLock lock(&mu_);
+    lock_guard<mutex> lock(mu_);
 
     if (results_.empty())
         return unique_ptr<AnalyzerResult>();

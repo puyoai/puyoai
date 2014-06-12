@@ -3,8 +3,8 @@
 
 #include <memory>
 #include <string>
+#include <thread>
 #include <vector>
-#include <pthread.h>
 
 #include "duel/game_result.h"
 
@@ -28,13 +28,12 @@ public:
     void join();
 
 private:
-    static void* runDuelLoopCallback(void*);
     void runDuelLoop();
 
     GameResult duel(ConnectorManager* manager);
 
 private:
-    pthread_t th_;
+    std::thread th_;
     volatile bool shouldStop_;
 
     std::vector<std::string> programNames_;

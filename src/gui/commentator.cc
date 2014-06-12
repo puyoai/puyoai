@@ -121,12 +121,6 @@ static void drawTrace(Screen* screen, int pi, const RensaTrackResult& result)
 
 }  // anonymous namespace
 
-static void* runCommentatorLoop(void* d)
-{
-    reinterpret_cast<Commentator*>(d)->runLoop();
-    return nullptr;
-}
-
 Commentator::Commentator() :
     shouldStop_(false)
 {
@@ -137,7 +131,8 @@ Commentator::~Commentator()
 {
     // TODO(mayah): Why don't we have stop() instead of calling pthread_join() here?
     shouldStop_ = true;
-    pthread_join(th_, nullptr);
+    if (th_.joinable())
+        th_.join();
 }
 
 void Commentator::newGameWillStart()
@@ -147,7 +142,7 @@ void Commentator::newGameWillStart()
 
 void Commentator::onUpdate(const GameState& gameState)
 {
-    ScopedLock lock(&mu_);
+    lock_guard<mutex> lock(mu_);
 
     for (int i = 0; i < 2; ++i) {
         const FieldRealtime& rf = gameState.field(i);
@@ -167,12 +162,18 @@ void Commentator::onUpdate(const GameState& gameState)
 
 bool Commentator::start()
 {
-    return pthread_create(&th_, nullptr, runCommentatorLoop, this) == 0;
+    th_ = thread([this]() {
+        this->runLoop();
+    });
+
+    return true;
 }
 
 void Commentator::stop()
 {
     shouldStop_ = true;
+    if (th_.joinable())
+        th_.join();
 }
 
 void Commentator::runLoop()
@@ -184,7 +185,7 @@ void Commentator::runLoop()
              CoreField field;
              KumipuyoSeq kumipuyoSeq;
              {
-                 ScopedLock lock(&mu_);
+                 lock_guard<mutex> lock(mu_);
                  if (!needsUpdate_[pi])
                      continue;
 
@@ -206,7 +207,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
         unique_ptr<TrackedPossibleRensaInfo> track(new TrackedPossibleRensaInfo);
         track->rensaInfo = f.simulateAndTrack(&track->trackResult);
         if (track->rensaInfo.score > 0) {
-            ScopedLock lock(&mu_);
+            lock_guard<mutex> lock(mu_);
             string msg = std::to_string(track->rensaInfo.chains) + "連鎖発火: " + std::to_string(track->rensaInfo.score) + "点";
             events_[pi].push_back(msg);
             firingChain_[pi] = move(track);
@@ -215,7 +216,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
             return;
         }
 
-        ScopedLock lock(&mu_);
+        lock_guard<mutex> lock(mu_);
         firingChain_[pi].reset();
     }
 
@@ -244,7 +245,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
         }
 
         if (bestTsubushiPlan != nullptr) {
-            ScopedLock lock(&mu_);
+            lock_guard<mutex> lock(mu_);
             fireableTsubushiChain_[pi].reset(new Plan(*bestTsubushiPlan));
         }
     }
@@ -262,7 +263,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
         }
 
         if (bestRensa != nullptr) {
-            ScopedLock lock(&mu_);
+            lock_guard<mutex> lock(mu_);
             fireableMainChain_[pi].reset(new TrackedPossibleRensaInfo(*bestRensa));
         }
     }
@@ -270,7 +271,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
 
 void Commentator::reset()
 {
-    ScopedLock lock(&mu_);
+    lock_guard<mutex> lock(mu_);
     needsUpdate_[0] = needsUpdate_[1] = false;
     for (int i = 0; i < 2; i++) {
         fireableMainChain_[i].reset();
@@ -283,7 +284,7 @@ void Commentator::reset()
 
 void Commentator::draw(Screen* screen)
 {
-    ScopedLock lock(&mu_);
+    lock_guard<mutex> lock(mu_);
     drawCommentSurface(screen, 0);
     drawCommentSurface(screen, 1);
     drawMainChain(screen);

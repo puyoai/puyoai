@@ -1,10 +1,10 @@
 #ifndef GUI_COLOR_MAP_H_
 #define GUI_COLOR_MAP_H_
 
+#include <mutex>
 #include <SDL.h>
 
 #include "base/base.h"
-#include "base/lock.h"
 #include "core/puyo_color.h"
 #include "core/real_color.h"
 
@@ -24,7 +24,7 @@ private:
     ColorMap();
     ~ColorMap();
 
-    Mutex mu_;
+    std::mutex mu_;
     RealColor realColors_[10];
     PuyoColor puyoColors_[10];
 

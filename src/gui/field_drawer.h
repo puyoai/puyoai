@@ -2,9 +2,9 @@
 #define DUEL_FIELD_DRAWER_H_
 
 #include <memory>
+#include <mutex>
 
 #include "base/base.h"
-#include "base/lock.h"
 #include "duel/game_state_observer.h"
 #include "gui/box.h"
 #include "gui/drawer.h"
@@ -32,7 +32,7 @@ private:
     // TODO(mayah): Why char? Why not PuyoColor?
     Uint32 GetPuyoColor(SDL_Surface*, char color) const;
 
-    mutable Mutex mu_;
+    mutable std::mutex mu_;
     std::unique_ptr<GameState> gameState_;
 
     Kanji_Font* font_;

@@ -1,11 +1,12 @@
 #ifndef CAPTURE_SOMAGIC_H_
 #define CAPTURE_SOMAGIC_H_
 
+#include <condition_variable>
 #include <memory>
-#include <pthread.h>
+#include <mutex>
+#include <thread>
 
 #include "base/base.h"
-#include "base/lock.h"
 #include "gui/unique_sdl_surface.h"
 #include "capture/source.h"
 
@@ -27,10 +28,11 @@ public:
     void setBuffer(const unsigned char* buf, int size);
 
 private:
-    pthread_t pt_;
+    std::thread th_;
 
-    Mutex mu_;
-    ConditionVariable cond_;
+    std::mutex mu_;
+    std::condition_variable cond_;
+
     std::unique_ptr<int[]> currentPixelData_;
 };
 
