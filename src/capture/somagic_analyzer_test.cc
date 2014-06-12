@@ -313,9 +313,9 @@ TEST_F(SomagicAnalyzerTest, GameStart)
         const char* player1;
         const char* player2;
     } expectations[] = {
-        {  0, "  BBPP", "  BBPP" },  // Frame 0-2 are level select. On level select, current puyo should be empty.
-        {  1, "  BBPP", "  BBPP" },
-        {  2, "  BBPP", "  BBPP" },
+        {  0, "  ----", "  ----" },  // Frame 0-2 are level select. On level select, current puyo should be empty.
+        {  1, "  ----", "  ----" },  // Also, we will use several frames to make NEXT stabilize.
+        {  2, "  ----", "  ----" },
         {  3, "  BBPP", "  BBPP" },
         {  4, "  BBPP", "  BBPP" },
         {  5, "  BBPP", "  BBPP" },

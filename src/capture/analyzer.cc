@@ -220,7 +220,7 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
 
         if (isNormalColor(axisColor) && isNormalColor(childColor)) {
             int k = ++result->next1Puyos[make_pair(axisColor, childColor)];
-            if (k >= 5) {
+            if (k >= 3) {
                 result->setRealColor(NextPuyoPosition::NEXT1_AXIS, axisColor);
                 result->setRealColor(NextPuyoPosition::NEXT1_CHILD, childColor);
                 result->next1Puyos.clear();
@@ -235,7 +235,7 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
 
         if (isNormalColor(axisColor) && isNormalColor(childColor)) {
             int k = ++result->next2Puyos[make_pair(axisColor, childColor)];
-            if (k >= 5) {
+            if (k >= 3) {
                 result->setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
                 result->setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
                 result->next2Puyos.clear();
