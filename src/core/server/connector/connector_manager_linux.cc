@@ -80,7 +80,6 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
     for (int i = 0; i < NUM_PLAYERS; i++) {
         (*log)[i].frame_id = frame_id;
         (*log)[i].player_id = i;
-        (*log)[i].is_human = connectors_[i]->isHuman();
     }
 
     pollfd pollfds[NUM_PLAYERS];

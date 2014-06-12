@@ -14,13 +14,12 @@ struct Data;
 class DuelServer;
 class FieldRealtime;
 class PuyoFu;
-class UserInput;
 
 class Game {
 public:
     // Don't take the ownership of DuelServer and/or UserInput.
     // UserInput can be nullptr.
-    Game(DuelServer*, UserInput*);
+    explicit Game(DuelServer*);
     ~Game();
 
     void Play(const std::vector<PlayerLog>& all_data);
@@ -29,7 +28,6 @@ public:
 
 private:
     DuelServer* duelServer_;
-    UserInput* userInput_;
 
     std::unique_ptr<FieldRealtime> field[2];
     std::string last_accepted_messages_[2];
