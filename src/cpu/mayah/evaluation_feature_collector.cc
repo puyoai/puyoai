@@ -17,7 +17,6 @@
 #include "enemy_info.h"
 #include "evaluation_feature.h"
 #include "field.h"
-#include "player_info.h"
 
 using namespace std;
 
