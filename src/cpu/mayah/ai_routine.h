@@ -26,7 +26,7 @@ public:
 
     AIRoutine();
 
-private:
+protected:
     virtual void gameWillBegin(const FrameData&) OVERRIDE;
     virtual void gameHasEnd(const FrameData&) OVERRIDE;
     virtual DropDecision think(int frameId, const PlainField&, const Kumipuyo& next1, const Kumipuyo& next2) OVERRIDE;

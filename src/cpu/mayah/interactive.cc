@@ -2,92 +2,91 @@
 #include <fstream>
 #include <stdlib.h>
 
+#include <gflags/gflags.h>
+#include <glog/logging.h>
+
+#include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/rensa_info.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/client/connector/drop_decision.h"
+#include "core/field/core_field.h"
 #include "core/frame_data.h"
 #include "core/kumipuyo.h"
 #include "core/state.h"
+#include "duel/sequence_generator.h"
 #include "evaluation_feature_collector.h"
-#include "field.h"
-#include "player_info.h"
+
+#include "ai_routine.h"
 
 using namespace std;
 
-int main(void)
+class InteractiveAI : public AIRoutine {
+public:
+    using AIRoutine::gameWillBegin;
+    using AIRoutine::think;
+    using AIRoutine::enemyNext2Appeared;
+};
+
+// TODO(mayah): Implement with GUI!
+int main(int argc, char* argv[])
 {
-    srand(2);
+    google::ParseCommandLineFlags(&argc, &argv, true);
+    google::InitGoogleLogging(argv[0]);
+    google::InstallFailureSignalHandler();
 
-    Field myField;
-    Field enemyField(
-        "500065"
-        "400066"
-        "545645"
-        "456455"
-        "545646"
-        "545646"
-        "564564"
-        "456456"
-        "456456"
-        "456456");
+    TsumoPossibility::initialize();
 
-    AI ai("interactive");
+    InteractiveAI ai;
 
-    string nextPuyos;
-    for (int i = 0; i < 4; ++i) {
-        char r = (rand() % 4) + '4';
-        nextPuyos += r;
+    {
+        FrameData fd;
+        fd.id = 1;
+        fd.valid = true;
+
     }
 
-    int currentFrameId = 1;
-    while (true) {
-        for (int i = 0; i < 2; ++i) {
-            char r = (rand() % 4) + '4';
-            nextPuyos += r;
-        }
+    CoreField field;
+    KumipuyoSeq seq = generateSequence();
 
-        cout << "NextPuyo = " << nextPuyos << endl;
-        cout << myField.debugOutput() << endl;
+    for (int i = 0; i + 1 < seq.size(); ++i) {
+        int frameId = 2 + i; // frameId 1 will be used for initializing now. Let's avoid it.
 
-        FrameData frameData;
-        frameData.id = currentFrameId;
-        frameData.state = STATE_YOU_CAN_PLAY | (STATE_YOU_CAN_PLAY << 1);
-        frameData.playerFrameData[0].score = 0;
-        frameData.playerFrameData[0].ojama = 0;
-        frameData.playerFrameData[0].field = myField;
-        frameData.playerFrameData[0].kumipuyoSeq = KumipuyoSeq(nextPuyos);
-        frameData.playerFrameData[1].score = 0;
-        frameData.playerFrameData[1].ojama = 0;
-        frameData.playerFrameData[1].field = enemyField;
-        frameData.playerFrameData[1].kumipuyoSeq = KumipuyoSeq("666666");
+        FrameData fd;
+        fd.id = frameId;
+        fd.valid = true;
 
-        vector<FeasibleRensaInfo> feasibleRensaInfos =
-            RensaDetector::findFeasibleRensas(enemyField, frameData.enemyPlayerFrameData().kumipuyoSeq);
+        // Set up enemy field.
+        // Make enemy will fire his large rensa.
+        fd.playerFrameData[1].field = CoreField(
+            "500065"
+            "400066"
+            "545645"
+            "456455"
+            "545646"
+            "545646"
+            "564564"
+            "456456"
+            "456456"
+            "456456");
+        fd.playerFrameData[1].kumipuyoSeq = KumipuyoSeq("666666");
 
-        for (vector<FeasibleRensaInfo>::iterator it = feasibleRensaInfos.begin(); it != feasibleRensaInfos.end(); ++it) {
-            cout << "score  = " << it->basicRensaResult.score
-                 << "chains = " << it->basicRensaResult.chains
-                 << "frames = " << it->basicRensaResult.frames
-                 << "initi  = " << it->initiatingFrames << endl;
-        }
+        // Invoke Gazer.
+        ai.enemyNext2Appeared(fd);
 
+        cout << field.debugOutput() << endl;
+        cout << seq.get(i).toString() << " " << seq.get(i + 1).toString() << endl;
+
+        // Waits for user enter.
         string str;
         cout << "enter? ";
         getline(cin, str);
 
-        DropDecision dropDecision = ai.think(frameData);
+        DropDecision dropDecision = ai.think(frameId, field, seq.get(i), seq.get(i + 1));
         cout << dropDecision.decision().x << ' ' << dropDecision.decision().r << endl;
 
-        myField.dropKumipuyo(dropDecision.decision(), frameData.myPlayerFrameData().kumipuyoSeq.front());
-
-        BasicRensaResult rensaInfo = myField.simulate();
-
-        cout << rensaInfo.chains << ' ' << rensaInfo.score << ' ' << rensaInfo.frames << endl;
-        cout << (myField.color(dropDecision.decision().x, 12) + '0') << endl;
-
-        nextPuyos = nextPuyos.substr(2);
+        field.dropKumipuyo(dropDecision.decision(), seq.get(i));
+        field.simulate();
     }
-
 
     return 0;
 }
