@@ -11,12 +11,12 @@
 #include "core/algorithm/rensa_detector.h"
 #include "core/constant.h"
 #include "core/decision.h"
+#include "core/field/core_field.h"
 #include "core/field/field_bit_field.h"
 #include "core/field/rensa_result.h"
 #include "core/score.h"
 #include "enemy_info.h"
 #include "evaluation_feature.h"
-#include "field.h"
 
 using namespace std;
 
@@ -25,7 +25,7 @@ void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, con
 {
     collectPlanFeatures(feature.modifiablePlanFeature(), plan, currentFrameId, enemyInfo);
 
-    const Field& field = toField(plan.field());
+    const CoreField& field = plan.field();
 
     vector<TrackedPossibleRensaInfo> rensaInfos = RensaDetector::findPossibleRensasWithTracking(field, numKeyPuyos);
 
@@ -71,9 +71,9 @@ void EvaluationFeatureCollector::collectFrameFeature(PlanEvaluationFeature& plan
 }
 
 template<typename Feature, typename T>
-static void calculateConnection(Feature& feature, const Field& field, const T params[])
+static void calculateConnection(Feature& feature, const CoreField& field, const T params[])
 {
-    for (int x = 1; x <= Field::WIDTH; ++x) {
+    for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = 1; field.color(x, y) != EMPTY; ++y) {
             if (!isNormalColor(field.color(x, y)))
                 continue;
@@ -85,29 +85,12 @@ static void calculateConnection(Feature& feature, const Field& field, const T pa
     }
 }
 
-template<typename Feature, typename T>
-static void calculateConnectionWithAllowingOnePointJump(Feature& feature, const Field& field, const T params[])
-{
-    for (int x = 1; x <= Field::WIDTH; ++x) {
-        for (int y = 1; field.color(x, y) != EMPTY; ++y) {
-            if (!isNormalColor(field.color(x, y)))
-                continue;
-
-            pair<int, int> connection = field.connectedPuyoNumsWithAllowingOnePointJump(x, y);
-            if (connection.first + connection.second >= 4)
-                feature.add(params[3], 1);
-            else if (connection.first < 4)
-                feature.add(params[connection.first - 1], 1);
-        }
-    }
-}
-
 // Takes 2x3 field, and counts each color puyo number.
 template<typename Feature, typename T>
 static void calculateDensity(Feature& feature, const CoreField& field, const T params[])
 {
-    for (int x = 1; x <= Field::WIDTH; ++x) {
-        for (int y = 1; y <= Field::HEIGHT + 1; ++y) {
+    for (int x = 1; x <= CoreField::WIDTH; ++x) {
+        for (int y = 1; y <= CoreField::HEIGHT + 1; ++y) {
             int numColors[8] = { 0 };
 
             for (int dx = -1; dx <= 1; ++dx) {
@@ -141,8 +124,8 @@ void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(PlanEvaluationF
         { EMPTY_AVAILABILITY_02, EMPTY_AVAILABILITY_12, EMPTY_AVAILABILITY_22, },
     };
 
-    for (int x = Field::WIDTH; x >= 1; --x) {
-        for (int y = Field::HEIGHT; y >= 1; --y) {
+    for (int x = CoreField::WIDTH; x >= 1; --x) {
+        for (int y = CoreField::HEIGHT; y >= 1; --y) {
             if (field.color(x, y) != EMPTY)
                 continue;
 
@@ -172,7 +155,6 @@ void EvaluationFeatureCollector::collectConnectionFeature(PlanEvaluationFeature&
     };
 
     calculateConnection(planFeature, plan.field(), params);
-    calculateConnectionWithAllowingOnePointJump(planFeature, plan.field(), jumpParams);
 #else
     UNUSED_VARIABLE(planFeature);
     UNUSED_VARIABLE(plan);
@@ -245,13 +227,13 @@ void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature
     const CoreField& field = plan.field();
 
     double sumHeight = 0;
-    for (int x = 1; x < Field::WIDTH; ++x)
+    for (int x = 1; x < CoreField::WIDTH; ++x)
         sumHeight += field.height(x);
     double averageHeight = sumHeight / 6.0;
 
     double heightSum = 0.0;
     double heightSquareSum = 0.0;
-    for (int x = 1; x <= Field::WIDTH; ++x) {
+    for (int x = 1; x <= CoreField::WIDTH; ++x) {
         double diff = abs(field.height(x) - averageHeight);
         heightSum += diff;
         heightSquareSum += diff * diff;
@@ -322,16 +304,16 @@ void EvaluationFeatureCollector::collectOngoingRensaFeature(PlanEvaluationFeatur
 
 void EvaluationFeatureCollector::collectRensaFeatures(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)
 {
-    ArbitrarilyModifiableField fieldAfterRensa(toField(plan.field()));
-    for (int x = 1; x <= Field::WIDTH; ++x) {
+    CoreField fieldAfterRensa(plan.field());
+    for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = 1; y <= 13; ++y) { // TODO: 13?
             if (info.trackResult.erasedAt(x, y) != 0)
-                fieldAfterRensa.setPuyo(x, y, EMPTY);
+                fieldAfterRensa.unsafeSet(x, y, EMPTY);
         }
         fieldAfterRensa.recalcHeightOn(x);
     }
 
-    ArbitrarilyModifiableField fieldAfterDrop(fieldAfterRensa);
+    CoreField fieldAfterDrop(fieldAfterRensa);
     fieldAfterDrop.forceDrop();
 
     collectRensaChainFeature(rensaFeature, plan, info);
@@ -358,9 +340,9 @@ void EvaluationFeatureCollector::collectRensaHandWidthFeature(RensaEvaluationFea
 
     // 1 連鎖の部分を距離 1 とし、距離 4 までを求める。
     // 距離 2, 3, 4 の数を数え、その広がり具合により、手の広さを求めることができる。
-    int distance[Field::MAP_WIDTH][Field::MAP_HEIGHT];
-    for (int x = 0; x < Field::MAP_WIDTH; ++x) {
-        for (int y = 0; y < Field::MAP_HEIGHT; ++y) {
+    int distance[CoreField::MAP_WIDTH][CoreField::MAP_HEIGHT];
+    for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
+        for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
             if (info.trackResult.erasedAt(x, y) == 1)
                 distance[x][y] = 1;
             else
@@ -403,26 +385,23 @@ void EvaluationFeatureCollector::collectRensaHandWidthFeature(RensaEvaluationFea
 #endif
 }
 
-void EvaluationFeatureCollector::collectRensaConnectionFeature(RensaEvaluationFeature& rensaFeature, const Field& /*fieldAfterRensa*/, const Field& fieldAfterDrop)
+void EvaluationFeatureCollector::collectRensaConnectionFeature(RensaEvaluationFeature& rensaFeature, const CoreField& fieldAfterRensa, const CoreField& fieldAfterDrop)
 {
+    UNUSED_VARIABLE(fieldAfterRensa);
+
 #if USE_CONNECTION_FEATURE
     static const RensaFeatureParam paramsAfter[] = {
         CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3,
     };
-    static const RensaFeatureParam paramsJumpAfter[] = {
-        CONNECTION_ALLOWING_JUMP_AFTER_VANISH_1, CONNECTION_ALLOWING_JUMP_AFTER_VANISH_2,
-        CONNECTION_ALLOWING_JUMP_AFTER_VANISH_3, CONNECTION_ALLOWING_JUMP_AFTER_VANISH_4,
-    };
 
     calculateConnection(rensaFeature, fieldAfterDrop, paramsAfter);
-    calculateConnectionWithAllowingOnePointJump(rensaFeature, fieldAfterDrop, paramsJumpAfter);
 #else
     UNUSED_VARIABLE(rensaFeature);
     UNUSED_VARIABLE(fieldAfterDrop);
 #endif
 }
 
-void EvaluationFeatureCollector::collectRensaGarbageFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const Field& fieldAfterDrop)
+void EvaluationFeatureCollector::collectRensaGarbageFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const CoreField& fieldAfterDrop)
 {
     rensaFeature.set(NUM_GARBAGE_PUYOS, plan.field().countPuyos() - fieldAfterDrop.countPuyos());
 }

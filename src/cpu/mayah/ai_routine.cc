@@ -7,7 +7,6 @@
 #include "cpu/mayah/evaluation_feature.h"
 #include "cpu/mayah/evaluation_feature_collector.h"
 #include "enemy_info.h"
-#include "field.h"
 
 using namespace std;
 
@@ -39,7 +38,7 @@ void AIRoutine::gameHasEnd(const FrameData&)
 
 DropDecision AIRoutine::think(int frameId, const PlainField& plainField, const Kumipuyo& next1, const Kumipuyo& next2)
 {
-    Field field(plainField);
+    CoreField field(plainField);
     KumipuyoSeq kumipuyoSeq { next1, next2 };
 
     LOG(INFO) << "\n" << field.debugOutput();
@@ -66,7 +65,7 @@ void AIRoutine::enemyGrounded(const FrameData& frameData)
     enemyInfo_.setId(frameData.id);
 
     // --- Check if Rensa starts.
-    Field field(frameData.enemyPlayerFrameData().field);
+    CoreField field(frameData.enemyPlayerFrameData().field);
     field.forceDrop();
 
     BasicRensaResult rensaInfo = field.simulate();

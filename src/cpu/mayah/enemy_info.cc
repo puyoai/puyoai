@@ -9,7 +9,6 @@
 #include "core/kumipuyo.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/algorithm/puyo_possibility.h"
-#include "field.h"
 
 using namespace std;
 
@@ -49,7 +48,7 @@ struct SortByInitiatingFrames {
     }
 };
 
-void EnemyInfo::updateFeasibleRensas(const Field& field, const KumipuyoSeq& kumipuyoSeq)
+void EnemyInfo::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
 {
     m_feasibleRensaInfos.clear();
 
@@ -81,7 +80,7 @@ void EnemyInfo::updateFeasibleRensas(const Field& field, const KumipuyoSeq& kumi
     }
 }
 
-void EnemyInfo::updatePossibleRensas(const Field& field, const KumipuyoSeq& kumipuyoSeq)
+void EnemyInfo::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
 {
     PuyoSet kumipuyoSet;
     for (const auto& x : kumipuyoSeq.underlyingData()) {
@@ -90,7 +89,7 @@ void EnemyInfo::updatePossibleRensas(const Field& field, const KumipuyoSeq& kumi
     }
 
     double averageHeight = 0;
-    for (int x = 1; x <= Field::WIDTH; ++x)
+    for (int x = 1; x <= CoreField::WIDTH; ++x)
         averageHeight += field.height(x) / 6.0;
 
     m_possibleRensaInfos.clear();
@@ -115,7 +114,7 @@ void EnemyInfo::updatePossibleRensas(const Field& field, const KumipuyoSeq& kumi
         }
 
         // 3 + k 回ほどぷよを引く必要があり、そのときに必要そうなフレーム数
-        int frames = ((Field::HEIGHT - averageHeight) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI) * (3 + k);
+        int frames = ((CoreField::HEIGHT - averageHeight) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI) * (3 + k);
         int score = it->rensaInfo.score;
         int chains = it->rensaInfo.chains;
         results.push_back(EstimatedRensaInfo(chains, score, frames));

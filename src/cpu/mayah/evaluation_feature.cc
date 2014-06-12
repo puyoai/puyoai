@@ -5,8 +5,6 @@
 #include <sstream>
 #include <vector>
 
-#include "field.h"
-
 using namespace std;
 
 double PlanEvaluationFeature::calculateScore(const EvaluationParams& params) const

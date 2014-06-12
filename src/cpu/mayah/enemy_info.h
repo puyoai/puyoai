@@ -7,7 +7,6 @@
 
 #include "core/algorithm/rensa_info.h"
 
-class Field;
 class KumipuyoSeq;
 
 struct EstimatedRensaInfo {
@@ -46,8 +45,8 @@ public:
     bool rensaIsOngoing() const { return m_rensaIsOngoing; }
     const OngoingRensaInfo& ongoingRensaInfo() const { return m_ongoingRensaInfo; }
 
-    void updateFeasibleRensas(const Field&, const KumipuyoSeq&);
-    void updatePossibleRensas(const Field&, const KumipuyoSeq&);
+    void updateFeasibleRensas(const CoreField&, const KumipuyoSeq&);
+    void updatePossibleRensas(const CoreField&, const KumipuyoSeq&);
 
     // Returns the (expecting) possible max score by this frame.
     int estimateMaxScore(int frameId) const;

@@ -1,10 +1,9 @@
 #ifndef __EVALUATION_FEATURE_COLLECTOR_H_
 #define __EVALUATION_FEATURE_COLLECTOR_H_
 
+class CoreField;
 class EnemyInfo;
 class EvaluationFeature;
-class Field;
-class MyPlayerInfo;
 class RensaTrackResult;
 class Plan;
 class PlanEvaluationFeature;
@@ -34,8 +33,8 @@ private:
     // Methods to collect rensa features.
     static void collectRensaChainFeature(RensaEvaluationFeature&, const Plan&, const TrackedPossibleRensaInfo&);
     static void collectRensaHandWidthFeature(RensaEvaluationFeature&, const Plan&, const TrackedPossibleRensaInfo&);
-    static void collectRensaConnectionFeature(RensaEvaluationFeature&, const Field& fieldAfterRensa, const Field& fieldAfterDrop);
-    static void collectRensaGarbageFeature(RensaEvaluationFeature&, const Plan&, const Field& fieldAfterDrop);
+    static void collectRensaConnectionFeature(RensaEvaluationFeature&, const CoreField& fieldAfterRensa, const CoreField& fieldAfterDrop);
+    static void collectRensaGarbageFeature(RensaEvaluationFeature&, const Plan&, const CoreField& fieldAfterDrop);
 };
 
 #endif
