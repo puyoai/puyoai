@@ -247,8 +247,21 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
 void Analyzer::analyzeNextWhenPreviousResultDoesNotExist(const DetectedField& detectedField, PlayerAnalyzerResult* result)
 {
     // We cannot do much thing. Let's consider that the current next state is STABLE.
-    // TODO(mayah): Currently we do the same thing as LevelSelect.
-    analyzeNextForLevelSelect(detectedField, result);
+
+    result->nextPuyoState = NextPuyoState::STABLE;
+    result->userState.playable = false;
+    result->restFramesUserCanPlay = 0;
+    result->initializeCurrentPuyoState();
+
+    // We cannot detect moving puyos correctly. So, make them empty.
+    result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RC_EMPTY);
+    result->setRealColor(NextPuyoPosition::CURRENT_CHILD, RC_EMPTY);
+
+    // Just copy the detected field.
+    result->setRealColor(NextPuyoPosition::NEXT1_AXIS, detectedField.realColor(NextPuyoPosition::NEXT1_AXIS));
+    result->setRealColor(NextPuyoPosition::NEXT1_CHILD, detectedField.realColor(NextPuyoPosition::NEXT1_CHILD));
+    result->setRealColor(NextPuyoPosition::NEXT2_AXIS, detectedField.realColor(NextPuyoPosition::NEXT2_AXIS));
+    result->setRealColor(NextPuyoPosition::NEXT2_CHILD, detectedField.realColor(NextPuyoPosition::NEXT2_CHILD));
 }
 
 void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, PlayerAnalyzerResult* result)
