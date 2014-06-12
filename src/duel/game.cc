@@ -129,10 +129,8 @@ void Game::Play(const vector<PlayerLog>& data)
                                            last_accepted_messages_[0], last_accepted_messages_[1]));
 }
 
-GameResult::Result Game::GetWinner(int* scores) const
+GameResult Game::GetWinner() const
 {
-    scores[0] = field[0]->score();
-    scores[1] = field[1]->score();
     bool p1_dead = field[0]->isDead();
     bool p2_dead = field[1]->isDead();
     if (!p1_dead && !p2_dead) {
@@ -202,24 +200,24 @@ void Game::GetFieldInfo(std::string* player1, std::string* player2) const
     field[1]->GetCurrentPuyo(&pos_x_1, &pos_y_1, &c1, &dummy1, &dummy2, &dummy3, &r1);
 
     string win0, win1;
-    int scores[2];
-    int winner = GetWinner(scores);
+    GameResult winner = GetWinner();
     switch (winner) {
-    case -1:
+    case GameResult::PLAYING:
         break;
-    case 0:
+    case GameResult::DRAW:
         win0 = "END=1 ";
         win1 = "END=-1 ";
         break;
-    case 1:
+    case GameResult::P1_WIN:
         win0 = "END=-1 ";
         win1 = "END=1 ";
         break;
-    case 2:
+    case GameResult::P2_WIN:
         win0 = win1 = "END=0 ";
         break;
     default:
-        abort();
+        win0 = win1 = "END=0 ";
+        break;
     }
 
     {
