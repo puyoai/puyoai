@@ -34,23 +34,23 @@ WiiConnectServer::WiiConnectServer(Source* source, Analyzer* analyzer, KeySender
 
 WiiConnectServer::~WiiConnectServer()
 {
+    if (th_.joinable())
+        th_.join();
 }
 
 bool WiiConnectServer::start()
 {
-    return pthread_create(&th_, nullptr, runLoopCallback, this) == 0;
+    th_ = thread([this]() {
+        this->runLoop();
+    });
+    return true;
 }
 
 void WiiConnectServer::stop()
 {
     shouldStop_ = true;
-}
-
-// static
-void* WiiConnectServer::runLoopCallback(void* p)
-{
-    reinterpret_cast<WiiConnectServer*>(p)->runLoop();
-    return nullptr;
+    if (th_.joinable())
+        th_.join();
 }
 
 void WiiConnectServer::reset()
@@ -91,7 +91,7 @@ void WiiConnectServer::runLoop()
             // Client should implement an initialization logic
             {
                 // TODO(mayah): initialization should be done after NEXT1/NEXT2 are stabilized?
-                ScopedLock lock(&mu_);
+                lock_guard<mutex> lock(mu_);
                 if (!analyzerResults_.empty() && analyzerResults_.front()->state() != CaptureGameState::LEVEL_SELECT) {
                     frameId = 1;
                     reset();
@@ -114,7 +114,7 @@ void WiiConnectServer::runLoop()
         surface->userdata = reinterpret_cast<void*>(static_cast<uintptr_t>(frameId));
 
         {
-            ScopedLock lock(&mu_);
+            lock_guard<mutex> lock(mu_);
             surface_ = move(surface);
             analyzerResults_.push_front(move(r));
             while (analyzerResults_.size() > 10)
@@ -368,7 +368,7 @@ void WiiConnectServer::draw(Screen* screen)
     if (!surface)
         return;
 
-    ScopedLock lock(&mu_);
+    lock_guard<mutex> lock(mu_);
 
     if (!surface_.get())
         return;
@@ -379,7 +379,7 @@ void WiiConnectServer::draw(Screen* screen)
 
 unique_ptr<AnalyzerResult> WiiConnectServer::analyzerResult() const
 {
-    ScopedLock lock(&mu_);
+    lock_guard<mutex> lock(mu_);
 
     if (analyzerResults_.empty())
         return unique_ptr<AnalyzerResult>();

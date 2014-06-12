@@ -1124,12 +1124,6 @@ static int somagic_init()
 
 // ----------------------------------------------------------------------
 
-static void* runLoop(void* p) {
-    SomagicSource* somagicSource = reinterpret_cast<SomagicSource*>(p);
-	CHECK(somagic_capture(somagicSource) != 0);
-    return nullptr;
-}
-
 SomagicSource::SomagicSource(const char* name)
 {
     width_ = 720;
@@ -1153,9 +1147,10 @@ SomagicSource::~SomagicSource()
 
 bool SomagicSource::start()
 {
-    CHECK(pthread_create(&pt_, nullptr, runLoop, this) == 0);
-    CHECK(pthread_detach(pt_) == 0);
-
+    th_ = thread([this]() {
+        CHECK(somagic_capture(this) != 0);
+    });
+    th_.detach();
     return true;
 }
 
@@ -1199,11 +1194,11 @@ void SomagicSource::setBuffer(const unsigned char* buf, int size)
         size -= 1440;
     }
 
-    ScopedLock lock(&mu_);
+    lock_guard<mutex> lock(mu_);
 
     if (!currentPixelData_.get()) {
         currentPixelData_ = std::move(data);
-        cond_.signal();
+        cond_.notify_one();
         return;
     }
 
@@ -1219,7 +1214,7 @@ void SomagicSource::setBuffer(const unsigned char* buf, int size)
 
     if (!isSame) {
         currentPixelData_ = std::move(data);
-        cond_.signal();
+        cond_.notify_one();
     }
 }
 
@@ -1229,9 +1224,9 @@ UniqueSDLSurface SomagicSource::getNextFrame()
         return makeUniqueSDLSurface(nullptr);
 
     SDL_Surface* surface = SDL_CreateRGBSurface(0, width(), height(), 32, 0, 0, 0, 0);
-    ScopedLock lock(&mu_);
+    unique_lock<mutex> lock(mu_);
 
-    cond_.wait(&mu_);
+    cond_.wait(lock);
 
     CHECK(SDL_LockSurface(surface) == 0);
     memmove(surface->pixels, currentPixelData_.get(), width() * height() * sizeof(int));

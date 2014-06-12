@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -8,7 +9,6 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "base/lock.h"
 #include "duel/cui.h"
 #include "duel/duel_server.h"
 #include "duel/http_server.h"
@@ -43,7 +43,7 @@ public:
     virtual ~GameStateHandler() {}
 
     virtual void handle(HttpRequest* req, HttpResponse* resp) OVERRIDE {
-        ScopedLock lock(&mu_);
+        lock_guard<mutex> lock(mu_);
         UNUSED_VARIABLE(req);
         if (!gameState_)
             return;
@@ -51,12 +51,12 @@ public:
     }
 
     virtual void onUpdate(const GameState& gameState) OVERRIDE {
-        ScopedLock lock(&mu_);
+        lock_guard<mutex> lock(mu_);
         gameState_.reset(new GameState(gameState));
     }
 
 private:
-    Mutex mu_;
+    mutex mu_;
     unique_ptr<GameState> gameState_;
 };
 

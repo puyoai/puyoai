@@ -54,7 +54,7 @@ void FieldDrawer::onInit(Screen* screen)
 
 void FieldDrawer::onUpdate(const GameState& gameState)
 {
-    ScopedLock lock(&mu_);
+    lock_guard<mutex> lock(mu_);
     gameState_.reset(new GameState(gameState));
 }
 
@@ -63,8 +63,7 @@ void FieldDrawer::draw(Screen* screen)
     if (!gameState_)
         return;
 
-    ScopedLock lock(&mu_);
-
+    lock_guard<mutex> lock(mu_);
     drawField(screen, gameState_->field(0));
     drawField(screen, gameState_->field(1));
 }
@@ -175,4 +174,3 @@ Uint32 FieldDrawer::GetPuyoColor(SDL_Surface* surface, char color) const
 
     return c;
 }
-

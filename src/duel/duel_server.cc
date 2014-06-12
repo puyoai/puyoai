@@ -58,26 +58,23 @@ void DuelServer::updateGameState(const GameState& state)
 
 bool DuelServer::start()
 {
-    CHECK(pthread_create(&th_, nullptr, runDuelLoopCallback, this) == 0);
+    th_ = thread([this](){
+        this->runDuelLoop();
+    });
     return true;
 }
 
 void DuelServer::stop()
 {
     shouldStop_ = true;
+    if (th_.joinable())
+        th_.join();
 }
+
 void DuelServer::join()
 {
-    CHECK(pthread_join(th_, nullptr) == 0);
-}
-
-// static
-void* DuelServer::runDuelLoopCallback(void* p)
-{
-    DuelServer* server = reinterpret_cast<DuelServer*>(p);
-    server->runDuelLoop();
-
-    return nullptr;
+    if (th_.joinable())
+        th_.join();
 }
 
 void DuelServer::runDuelLoop()

@@ -2,10 +2,10 @@
 #define CAPTURE_CAPTURE_H_
 
 #include <memory>
-#include <pthread.h>
+#include <mutex>
+#include <thread>
 
 #include "base/base.h"
-#include "base/lock.h"
 #include "capture/analyzer.h"
 #include "capture/analyzer_result_drawer.h"
 #include "gui/drawer.h"
@@ -28,16 +28,15 @@ public:
     virtual std::unique_ptr<AnalyzerResult> analyzerResult() const OVERRIDE;
 
 private:
-    static void* runLoopCallback(void*);
     void runLoop();
 
     Source* source_;
     Analyzer* analyzer_;
 
-    pthread_t th_;
+    std::thread th_;
     volatile bool shouldStop_;
 
-    mutable Mutex mu_;
+    mutable std::mutex mu_;
     UniqueSDLSurface surface_;
     std::deque<std::unique_ptr<AnalyzerResult>> results_;
 };
