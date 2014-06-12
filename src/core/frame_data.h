@@ -8,26 +8,26 @@
 #include "core/state.h"
 
 struct PlayerFrameData {
-    PlayerFrameData();
+    PlayerFrameData() {}
     PlayerFrameData(const PlainField&, const KumipuyoSeq&, const KumipuyoPos&, const UserState&, int score, int ojama);
 
     PlainField field;
     KumipuyoSeq kumipuyoSeq;
     KumipuyoPos kumipuyoPos;
     UserState userState;
-    int score;
-    int ojama;
+    int score = 0;
+    int ojama = 0;
 };
 
 struct FrameData {
-    FrameData();
+    FrameData() {}
 
     const PlayerFrameData& myPlayerFrameData() const { return playerFrameData[0]; }
     const PlayerFrameData& enemyPlayerFrameData() const { return playerFrameData[1]; }
 
-    bool connectionLost;
-    bool valid;
-    int id;
+    bool connectionLost = false;
+    bool valid = false;
+    int id = -1;
     PlayerFrameData playerFrameData[2];  // 0 = me, 1 = opponent
 };
 
