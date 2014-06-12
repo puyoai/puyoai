@@ -15,13 +15,11 @@
 #include "duel/frame_context.h"
 #include "duel/game_state.h"
 #include "duel/sequence_generator.h"
-#include "duel/user_input.h"
 
 using namespace std;
 
-Game::Game(DuelServer* duelServer, UserInput* userInput) :
-    duelServer_(duelServer),
-    userInput_(userInput)
+Game::Game(DuelServer* duelServer) :
+    duelServer_(duelServer)
 {
     KumipuyoSeq seq = generateSequence();
     LOG(INFO) << "Puyo sequence=" << seq.toString();
@@ -80,34 +78,28 @@ void Game::Play(const vector<PlayerLog>& data)
         string accepted_message;
         Key key = KEY_NONE;
 
-        if (data[i].is_human) {
-            if (userInput_) {
-                key = userInput_->getKey();
-            }
-        } else {
-            int accepted_index = UpdateDecision(data[i], field[i].get(), &latest_decision_[i]);
+        int accepted_index = UpdateDecision(data[i], field[i].get(), &latest_decision_[i]);
 
-            // Take care of ack_info.
-            ack_info_[i] = vector<int>(data[i].received_data.size(), 0);
-            for (int j = 0; j < data[i].received_data.size(); j++) {
-                const ReceivedData& d = data[i].received_data[j];
-                // This case does not require ack.
-                if (d.decision.x == 0 && d.decision.r == 0) {
-                    continue;
-                }
-                if (j == accepted_index) {
-                    ack_info_[i][j] = d.frameId;
-                } else {
-                    ack_info_[i][j] = -d.frameId; // TODO(mayah): Negative means NACK. Weird.
-                }
+        // Take care of ack_info.
+        ack_info_[i] = vector<int>(data[i].received_data.size(), 0);
+        for (int j = 0; j < data[i].received_data.size(); j++) {
+            const ReceivedData& d = data[i].received_data[j];
+            // This case does not require ack.
+            if (d.decision.x == 0 && d.decision.r == 0) {
+                continue;
             }
-
-            if (accepted_index != -1) {
-                accepted_message = data[i].received_data[accepted_index].msg;
+            if (j == accepted_index) {
+                ack_info_[i][j] = d.frameId;
+            } else {
+                ack_info_[i][j] = -d.frameId; // TODO(mayah): Negative means NACK. Weird.
             }
-
-            key = me->GetKey(latest_decision_[i]);
         }
+
+        if (accepted_index != -1) {
+            accepted_message = data[i].received_data[accepted_index].msg;
+        }
+
+        key = me->GetKey(latest_decision_[i]);
 
         FrameContext context;
         me->PlayOneFrame(key, &context);

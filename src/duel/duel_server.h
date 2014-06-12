@@ -11,7 +11,6 @@
 class ConnectorManager;
 class GameState;
 class GameStateObserver;
-class UserInput;
 
 class DuelServer {
 public:
@@ -40,7 +39,6 @@ private:
 
     std::vector<std::string> programNames_;
     std::vector<GameStateObserver*> observers_;
-    std::unique_ptr<UserInput> userInput_;
 };
 
 #endif

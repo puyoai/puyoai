@@ -15,11 +15,6 @@
 #include "duel/game.h"
 #include "duel/game_state.h"
 #include "duel/game_state_observer.h"
-#include "duel/user_input.h"
-
-#ifdef USE_SDL2
-#include "gui/sdl_user_input.h"
-#endif
 
 using namespace std;
 
@@ -39,20 +34,9 @@ static void SendInfo(ConnectorManager* manager, int id, string status[2])
     }
 }
 
-static unique_ptr<UserInput> createUserInputIfNecessary()
-{
-#ifdef USE_SDL2
-    if (FLAGS_use_gui)
-        return unique_ptr<SDLUserInput>(new SDLUserInput);
-#endif
-
-    return unique_ptr<UserInput>(nullptr);
-}
-
 DuelServer::DuelServer(const vector<string>& programNames) :
     shouldStop_(false),
-    programNames_(programNames),
-    userInput_(createUserInputIfNecessary())
+    programNames_(programNames)
 {
 }
 
@@ -153,7 +137,7 @@ GameResult DuelServer::duel(ConnectorManager* manager)
     for (auto observer : observers_)
         observer->newGameWillStart();
 
-    Game game(this, userInput_.get());
+    Game game(this);
 
     LOG(INFO) << "Game has started.";
 

@@ -28,7 +28,6 @@ public:
     int frame_id;
     int player_id;
     std::vector<ReceivedData> received_data;
-    bool is_human;
 
     void SerializeToString(std::string* output) const;
 };
