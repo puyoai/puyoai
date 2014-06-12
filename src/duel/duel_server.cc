@@ -32,11 +32,11 @@ DECLARE_bool(use_gui);
 
 static void SendInfo(ConnectorManager* manager, int id, string status[2])
 {
-  for (int i = 0; i < 2; i++) {
-    stringstream ss;
-    ss << "ID=" << id << " " << status[i].c_str();
-    manager->Write(i, ss.str());
-  }
+    for (int i = 0; i < 2; i++) {
+        stringstream ss;
+        ss << "ID=" << id << " " << status[i].c_str();
+        manager->connector(i)->write(ss.str());
+    }
 }
 
 static unique_ptr<UserInput> createUserInputIfNecessary()

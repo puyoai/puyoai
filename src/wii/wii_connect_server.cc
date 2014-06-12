@@ -152,7 +152,7 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
         }
 
         if (isAi_[pi])
-            connector_->Write(pi, makeMessageFor(pi, frameId, analyzerResult));
+            connector_->connector(pi)->write(makeMessageFor(pi, frameId, analyzerResult));
     }
 
     return true;
@@ -167,7 +167,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
         }
 
         if (isAi_[pi])
-            connector_->Write(pi, makeMessageFor(pi, frameId, analyzerResult));
+            connector_->connector(pi)->write(makeMessageFor(pi, frameId, analyzerResult));
     }
 
     vector<PlayerLog> all_data;

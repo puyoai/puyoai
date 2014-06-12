@@ -44,12 +44,6 @@ ConnectorManagerLinux::ConnectorManagerLinux(vector<string> program_names) :
     }
 }
 
-void ConnectorManagerLinux::Write(int id, const string& message)
-{
-    if (connectors_[id].get())
-        connectors_[id]->write(message);
-}
-
 void Log(int frame_id, const vector<ReceivedData>* all_data, vector<PlayerLog>* log)
 {
     // Print debug info.
