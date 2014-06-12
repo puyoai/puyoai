@@ -26,31 +26,27 @@ protected:
         return analyzer.analyze(surf.get(), deque<unique_ptr<AnalyzerResult>>());
     }
 
-    deque<unique_ptr<AnalyzerResult>> analyzeMultipleFrames(
-        const vector<string>& imgFilenames,
-        CaptureGameState gameState,
-        bool userPlayable[2])
+    deque<unique_ptr<AnalyzerResult>> analyzeMultipleFrames(const vector<string>& imgFilenames,
+                                                            bool userPlayable[2])
     {
         deque<unique_ptr<AnalyzerResult>> results;
 
         SomagicAnalyzer analyzer;
-        unique_ptr<PlayerAnalyzerResult> p1(new PlayerAnalyzerResult);
-        p1->userState.playable = userPlayable[0];
-        unique_ptr<PlayerAnalyzerResult> p2(new PlayerAnalyzerResult);
-        p2->userState.playable = userPlayable[1];
-        unique_ptr<AnalyzerResult> initialResult(new AnalyzerResult(gameState, move(p1), move(p2)));
-
-        results.push_front(move(initialResult));
+        bool firstResult = true;
 
         for (const auto& imgFilename : imgFilenames) {
             string filename = FLAGS_testdata_dir + imgFilename;
             auto surface = makeUniqueSDLSurface(IMG_Load(filename.c_str()));
             CHECK(surface.get()) << "Failed to load "<< filename;
             auto r = analyzer.analyze(surface.get(), results);
+            if (firstResult) {
+                r->mutablePlayerResult(0)->userState.playable = userPlayable[0];
+                r->mutablePlayerResult(1)->userState.playable = userPlayable[1];
+                firstResult = false;
+            }
             results.push_front(move(r));
         }
 
-        results.pop_back(); // remove the initial result.
         reverse(results.begin(), results.end());
         return results;
     }
@@ -221,7 +217,7 @@ TEST_F(SomagicAnalyzerTest, NextArrival)
     }
 
     bool pgs[2] = { true, true };
-    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, CaptureGameState::PLAYING, pgs);
+    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
     EXPECT_TRUE(rs[0]->playerResult(0)->userState.playable);
     // Next disappears here.
@@ -234,7 +230,7 @@ TEST_F(SomagicAnalyzerTest, NextArrival)
 TEST_F(SomagicAnalyzerTest, Vanishing)
 {
     vector<string> images;
-    for (int i = 0; i <= 13; ++i) {
+    for (int i = 0; i <= 15; ++i) {
         char buf[80];
         sprintf(buf, "/somagic/vanishing/frame%02d.png", i);
         string s = buf;
@@ -242,7 +238,7 @@ TEST_F(SomagicAnalyzerTest, Vanishing)
     }
 
     bool pgs[2] = { true, true };
-    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, CaptureGameState::PLAYING, pgs);
+    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
     for (const auto& r : rs) {
         EXPECT_EQ(CaptureGameState::PLAYING, r->state());
@@ -269,7 +265,7 @@ TEST_F(SomagicAnalyzerTest, OjamaDrop)
     }
 
     bool pgs[2] = { true, true };
-    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, CaptureGameState::PLAYING, pgs);
+    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
     for (const auto& r : rs) {
         EXPECT_EQ(CaptureGameState::PLAYING, r->state());
@@ -299,7 +295,7 @@ TEST_F(SomagicAnalyzerTest, GameStart)
     }
 
     bool pgs[2] = { false, false };
-    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, CaptureGameState::LEVEL_SELECT, pgs);
+    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
     // Frame 0-2 should be considered as LEVEL_SELECT.
     for (int i = 0; i <= 2; ++i)

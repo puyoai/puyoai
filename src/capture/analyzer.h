@@ -76,12 +76,15 @@ struct PlayerAnalyzerResult {
             isNormalColor(realColor(NextPuyoPosition::NEXT2_CHILD));
     }
 
-    void initializeCurrentPuyoState() {
-        hasDetectedOjamaDrop_ = true;
-        hasDetectedRensaStart_ = true;
-        hasSentGrounded_ = true;
-        hasSentOjamaDropped_ = true;
-        hasSentChainFinished_ = true;
+    // Basically state == true. When the previous result does not exist, it will be for testing.
+    // In that case, use state == false.
+    void resetCurrentPuyoState(bool state = true)
+    {
+        hasDetectedOjamaDrop_ = state;
+        hasDetectedRensaStart_ = state;
+        hasSentGrounded_ = state;
+        hasSentOjamaDropped_ = state;
+        hasSentChainFinished_ = state;
     }
 
     std::string toString() const;
@@ -115,6 +118,7 @@ public:
 
     CaptureGameState state() const { return gameState_; }
     const PlayerAnalyzerResult* playerResult(int pi) const { return playerResults_[pi].get(); }
+    PlayerAnalyzerResult* mutablePlayerResult(int pi) { return playerResults_[pi].get(); }
 
     std::unique_ptr<AnalyzerResult> copy() const;
 

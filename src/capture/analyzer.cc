@@ -139,7 +139,7 @@ Analyzer::analyzePlayerFieldOnLevelSelect(const DetectedField& detectedField, co
     analyzeNext(detectedField, previousResults, result.get(), FOR_LEVEL_SELECT);
     analyzeField(detectedField, previousResults, result.get(), FOR_LEVEL_SELECT);
 
-    result->initializeCurrentPuyoState();
+    result->resetCurrentPuyoState();
 
     return result;
 }
@@ -148,10 +148,13 @@ unique_ptr<PlayerAnalyzerResult>
 Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<const PlayerAnalyzerResult*>& previousResults)
 {
     unique_ptr<PlayerAnalyzerResult> result(new PlayerAnalyzerResult);
-    // Copy the previous state, however, clear event states.
     if (!previousResults.empty()) {
+        // Copy the previous state, however, clear event states.
         *result = *previousResults.front();
         result->userState.clearEventStates();
+    } else {
+        // When previous result does not exist, we reset the puyo state for testing.
+        result->resetCurrentPuyoState(false);
     }
 
     // Note that Next should be analyzed before Field, since we use the result of the analysis.
@@ -204,7 +207,7 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
     result->nextPuyoState = NextPuyoState::STABLE;
     result->userState.playable = false;
     result->restFramesUserCanPlay = 0;
-    result->initializeCurrentPuyoState();
+    result->resetCurrentPuyoState();
 
     // There should not exist moving puyos. So, CURRENT_AXIS and CURRENT_CHILD should be empty.
     result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RC_EMPTY);
@@ -247,11 +250,10 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
 void Analyzer::analyzeNextWhenPreviousResultDoesNotExist(const DetectedField& detectedField, PlayerAnalyzerResult* result)
 {
     // We cannot do much thing. Let's consider that the current next state is STABLE.
-
     result->nextPuyoState = NextPuyoState::STABLE;
     result->userState.playable = false;
     result->restFramesUserCanPlay = 0;
-    result->initializeCurrentPuyoState();
+    result->resetCurrentPuyoState(false);
 
     // We cannot detect moving puyos correctly. So, make them empty.
     result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RC_EMPTY);
