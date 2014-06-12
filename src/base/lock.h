@@ -5,6 +5,8 @@
 #include <glog/logging.h>
 #include "base/base.h"
 
+// TODO(mayah): Now that we're using C++11, should we use <thread> library?
+
 // Enable thread safety attributes only with clang.
 // The attributes can be safely erased when compiling with other compilers.
 #if defined(__clang__) && (!defined(SWIG))
