@@ -5,7 +5,7 @@ cpu_setup("mayah")
 add_library(mayah_lib
             ai_routine.cc enemy_info.cc
             evaluation_feature.cc evaluation_feature_collector.cc
-            field.cc player_info.cc)
+            field.cc)
 
 function(mayah_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
