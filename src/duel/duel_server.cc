@@ -98,7 +98,10 @@ void* DuelServer::runDuelLoopCallback(void* p)
 
 void DuelServer::runDuelLoop()
 {
-    ConnectorManagerLinux manager(programNames_);
+    ConnectorManagerLinux manager {
+        Connector::create(0, programNames_[0]),
+        Connector::create(1, programNames_[1])
+    };
 
     int p1_win = 0;
     int p1_draw = 0;
