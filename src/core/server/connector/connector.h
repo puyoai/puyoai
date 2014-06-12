@@ -2,6 +2,7 @@
 #define CORE_SERVER_CONNECTOR_CONNECTOR_H_
 
 #include <cstdio>
+#include <memory>
 #include <string>
 
 #include "base/base.h"
