@@ -17,8 +17,7 @@ class PuyoFu;
 
 class Game {
 public:
-    // Don't take the ownership of DuelServer and/or UserInput.
-    // UserInput can be nullptr.
+    // Don't take the ownership of DuelServer.
     explicit Game(DuelServer*);
     ~Game();
 
