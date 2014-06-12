@@ -164,8 +164,8 @@ GameResult DuelServer::duel(ConnectorManager* manager)
 
         // READ INFO.
         // It takes up to 16ms to finish this section.
-        vector<PlayerLog> all_data;
-        if (!manager->GetActions(current_id, &all_data)) {
+        vector<ReceivedData> data[2];
+        if (!manager->receive(current_id, data)) {
             if (manager->connector(0)->alive()) {
                 gameResult = GameResult::P1_WIN_WITH_CONNECTION_ERROR;
                 break;
@@ -176,7 +176,7 @@ GameResult DuelServer::duel(ConnectorManager* manager)
         }
 
         // PLAY.
-        game.Play(all_data);
+        game.Play(data);
     }
 
     for (auto observer : observers_)

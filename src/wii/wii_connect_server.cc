@@ -168,8 +168,8 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
             connector_->connector(pi)->write(makeMessageFor(pi, frameId, analyzerResult));
     }
 
-    vector<PlayerLog> all_data;
-    connector_->GetActions(frameId, &all_data);
+    vector<ReceivedData> data[2];
+    connector_->receive(frameId, data);
 
     for (int pi = 0; pi < 2; pi++) {
         if (!isAi_[pi])
@@ -180,8 +180,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
             keySender_->sendKey(KEY_NONE);
         }
 
-        const PlayerLog& data = all_data[pi];
-        outputKeys(pi, analyzerResult, data);
+        outputKeys(pi, analyzerResult, data[pi]);
     }
 
     return true;
@@ -305,14 +304,14 @@ PuyoColor WiiConnectServer::toPuyoColor(RealColor rc, bool allowAllocation)
     return PuyoColor::EMPTY;
 }
 
-void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, const PlayerLog& data)
+void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, const vector<ReceivedData>& data)
 {
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.
-    for (unsigned int i = data.received_data.size(); i > 0; ) {
+    for (unsigned int i = data.size(); i > 0; ) {
         i--;
 
-        const Decision& d = data.received_data[i].decision;
+        const Decision& d = data[i].decision;
 
         // We don't need ACK/NACK for ID only messages.
         if (!d.isValid() || d == lastDecision_[pi])
