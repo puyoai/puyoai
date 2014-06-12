@@ -11,7 +11,6 @@
 class ConnectorManagerLinux : public ConnectorManager {
 public:
     ConnectorManagerLinux(std::vector<std::string> program_names);
-    virtual void Write(int id, const std::string& message) OVERRIDE;
     virtual bool GetActions(int frame_id, std::vector<PlayerLog>* all_data) OVERRIDE;
 
     virtual Connector* connector(int i) OVERRIDE { return connectors_[i].get(); }
