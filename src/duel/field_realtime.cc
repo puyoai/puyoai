@@ -587,11 +587,10 @@ string FieldRealtime::GetYokokuInfo() const
     return ss.str();
 }
 
-Key FieldRealtime::GetKey(const Decision& decision)
+Key FieldRealtime::GetKey(const Decision& decision) const
 {
-    if (!decision.isValid()) {
+    if (!decision.isValid())
         return KEY_NONE;
-    }
 
     int x1, y1, x2, y2, r;
     PuyoColor c1, c2;

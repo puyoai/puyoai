@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-// TODO(mayah): Depending server connector looks wrong.
 #include "core/decision.h"
+#include "core/server/connector/received_data.h"
 #include "duel/game_state.h"
 #include "duel/game_result.h"
 
@@ -21,7 +21,7 @@ public:
     explicit Game(DuelServer*);
     ~Game();
 
-    void Play(const std::vector<PlayerLog>& all_data);
+    void Play(const std::vector<ReceivedData> data[2]);
     GameResult GetWinner() const;
     void GetFieldInfo(std::string* player1, std::string* player2) const;
 

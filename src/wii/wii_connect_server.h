@@ -23,7 +23,6 @@
 class Analyzer;
 class AnalyzerResult;
 class KeySender;
-class PlayerLog;
 class Source;
 
 class WiiConnectServer : public Drawer, public AnalyzerResultRetriever {
@@ -51,7 +50,7 @@ private:
 
     std::string makeMessageFor(int playerId, int frameId, const AnalyzerResult&);
     std::string makeStateString(int playerId, const AnalyzerResult&);
-    void outputKeys(int playerId, const AnalyzerResult&, const PlayerLog&);
+    void outputKeys(int playerId, const AnalyzerResult&, const std::vector<ReceivedData>&);
 
     PuyoColor toPuyoColor(RealColor, bool allowAllocation = false);
 

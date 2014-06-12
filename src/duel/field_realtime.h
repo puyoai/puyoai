@@ -36,7 +36,7 @@ public:
     std::string GetFieldInfo() const;
     std::string GetYokokuInfo() const;
     UserState userState() const { return userState_; }
-    Key GetKey(const Decision&);
+    Key GetKey(const Decision&) const;
 
     int score() const { return score_; }
     int ojama() const { return numFixedOjama_ + numPendingOjama_; }

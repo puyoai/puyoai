@@ -42,64 +42,59 @@ Game::~Game()
  *   else:
  *     -1
  */
-int UpdateDecision(const PlayerLog& data, FieldRealtime* field, Decision* decision)
+int UpdateDecision(const vector<ReceivedData>& data, const FieldRealtime& field, Decision* decision)
 {
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.
-    for (unsigned int i = data.received_data.size(); i > 0; ) {
+    for (unsigned int i = data.size(); i > 0; ) {
         i--;
 
-        // We don't need ACK/NACK for ID only messages.
-        if (data.received_data[i].decision.x == 0 &&
-            data.received_data[i].decision.r == 0) {
+        Decision d = data[i].decision;
+
+        // We don't send ACK/NACK for invalid decision.
+        if (!d.isValid())
             continue;
-        }
 
-        Decision d = Decision(data.received_data[i].decision.x, data.received_data[i].decision.r);
-
-        if (d.isValid()) {
-            Key key = field->GetKey(d);
-            if (key != KEY_NONE) {
-                *decision = d;
-                return i;
-            }
-        } else if (d.x == -1 && d.r == -1) {
+        Key key = field.GetKey(d);
+        if (key != KEY_NONE) {
             *decision = d;
             return i;
         }
     }
+
     return -1;
 }
 
-void Game::Play(const vector<PlayerLog>& data)
+void Game::Play(const vector<ReceivedData> data[2])
 {
-    for (int i = 0; i < data.size(); i++) {
-        FieldRealtime* me = field[i].get();
+    for (int pi = 0; pi < 2; pi++) {
+        FieldRealtime* me = field[pi].get();
         string accepted_message;
         Key key = KEY_NONE;
 
-        int accepted_index = UpdateDecision(data[i], field[i].get(), &latest_decision_[i]);
+        int accepted_index = UpdateDecision(data[pi], *field[pi], &latest_decision_[pi]);
 
         // Take care of ack_info.
-        ack_info_[i] = vector<int>(data[i].received_data.size(), 0);
-        for (int j = 0; j < data[i].received_data.size(); j++) {
-            const ReceivedData& d = data[i].received_data[j];
+        ack_info_[pi] = vector<int>(data[pi].size(), 0);
+        for (int j = 0; j < data[pi].size(); j++) {
+            const ReceivedData& d = data[pi][j];
+
             // This case does not require ack.
-            if (d.decision.x == 0 && d.decision.r == 0) {
+            if (!d.isValid())
                 continue;
-            }
+
             if (j == accepted_index) {
-                ack_info_[i][j] = d.frameId;
+                ack_info_[pi][j] = d.frameId;
             } else {
-                ack_info_[i][j] = -d.frameId; // TODO(mayah): Negative means NACK. Weird.
+                ack_info_[pi][j] = -d.frameId; // TODO(mayah): Negative means NACK. Weird.
             }
         }
 
         if (accepted_index != -1) {
-            accepted_message = data[i].received_data[accepted_index].msg;
+            accepted_message = data[pi][accepted_index].msg;
         }
 
-        key = me->GetKey(latest_decision_[i]);
+        key = me->GetKey(latest_decision_[pi]);
 
         FrameContext context;
         me->PlayOneFrame(key, &context);
@@ -109,11 +104,11 @@ void Game::Play(const vector<PlayerLog>& data)
 
         // Clear current key input if the move is done.
         if (me->userState().grounded) {
-            latest_decision_[i] = Decision::NoInputDecision();
+            latest_decision_[pi] = Decision::NoInputDecision();
         }
 
         if (accepted_message != "") {
-            last_accepted_messages_[me->playerId()] = accepted_message;
+            last_accepted_messages_[pi] = accepted_message;
         }
     }
 

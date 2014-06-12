@@ -22,14 +22,4 @@ public:
     void SerializeToString(std::string* output) const;
 };
 
-// TODO(mayah): Why does this class have player_id and is_human?
-class PlayerLog {
-public:
-    int frame_id;
-    int player_id;
-    std::vector<ReceivedData> received_data;
-
-    void SerializeToString(std::string* output) const;
-};
-
 #endif

@@ -10,7 +10,7 @@ class Connector;
 
 class ConnectorManager {
 public:
-    virtual bool GetActions(int frame_id, std::vector<PlayerLog>* all_data) = 0;
+    virtual bool receive(int frameId, std::vector<ReceivedData> data[2]) = 0;
 
     virtual Connector* connector(int i) = 0;
 

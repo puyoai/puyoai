@@ -32,27 +32,3 @@ bool ReceivedData::isValid() const
 
     return decision.isValid();
 }
-
-void PlayerLog::SerializeToString(string* output) const {
-    stringstream ss;
-    ss << "\n";
-    ss << "{";
-    ss << "'frame_id':";
-    ss << frame_id;
-    ss << ",";
-    ss << "'player_id':";
-    ss << player_id;
-    ss << ",";
-    ss << "'received_data':[";
-    for (size_t i = 0; i < received_data.size(); i++) {
-        if (i > 0) {
-            ss << ",";
-        }
-        string tmp;
-        received_data[i].SerializeToString(&tmp);
-        ss << tmp;
-    }
-    ss << "]";
-    ss << "}";
-    output->append(ss.str());
-}

@@ -36,22 +36,16 @@ static int GetRemainingMilliSeconds(const struct timeval& start)
     return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
-ConnectorManagerLinux::ConnectorManagerLinux(unique_ptr<Connector> p1, unique_ptr<Connector> p2) :
-    connectors_ { move(p1), move(p2) },
-    waitTimeout_(true)
-{
-}
-
-void Log(int frame_id, const vector<ReceivedData>* all_data, vector<PlayerLog>* log)
+static void Log(int frame_id, const vector<ReceivedData> alldata[2])
 {
     // Print debug info.
     LOG(INFO) << "########## FRAME " << frame_id << " ##########";
     for (int i = 0; i < 2; i++) {
-        if (all_data[i].size() == 0) {
+        if (alldata[i].size() == 0) {
             LOG(INFO) << "[P" << i << "] [NODATA]";
         }
-        for (int j = 0; j < all_data[i].size(); j++) {
-            const ReceivedData& data = all_data[i][j];
+        for (int j = 0; j < alldata[i].size(); j++) {
+            const ReceivedData& data = alldata[i][j];
             LOG(INFO) << "[P" << i << "] "
                       << "[" << setfill(' ') << setw(5) << right << data.usec << "us] "
                       << "[" << data.original << "]";
@@ -60,27 +54,20 @@ void Log(int frame_id, const vector<ReceivedData>* all_data, vector<PlayerLog>* 
             LOG_IF(WARNING, data.frameId > frame_id) << "Received a command for future frame.";
         }
     }
+}
 
-    // Fill game log.
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < all_data[i].size(); j++) {
-            const ReceivedData& data = all_data[i][j];
-            (*log)[i].received_data.push_back(data);
-        }
-    }
+ConnectorManagerLinux::ConnectorManagerLinux(unique_ptr<Connector> p1, unique_ptr<Connector> p2) :
+    connectors_ { move(p1), move(p2) },
+    waitTimeout_(true)
+{
 }
 
 // TODO(mayah): Without polling, each connector should make thread?
 // If we do so, Human connector can use MainWindow::addEventListener(), maybe.
-bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
+bool ConnectorManagerLinux::receive(int frame_id, vector<ReceivedData> receivedData[2])
 {
-    log->clear();
-    // Initialize logging.
-    log->assign(NUM_PLAYERS, PlayerLog());
-    for (int i = 0; i < NUM_PLAYERS; i++) {
-        (*log)[i].frame_id = frame_id;
-        (*log)[i].player_id = i;
-    }
+    for (int i = 0; i < 2; i++)
+        receivedData[i].clear();
 
     pollfd pollfds[NUM_PLAYERS];
     int playerIds[NUM_PLAYERS];
@@ -95,7 +82,6 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
     }
     DCHECK(numPollfds <= NUM_PLAYERS) << numPollfds;
 
-    vector<ReceivedData> received_data[NUM_PLAYERS];
     bool received_data_for_this_frame[NUM_PLAYERS] {};
     bool died = false;
 
@@ -130,7 +116,7 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
                 ReceivedData data = connector(playerIds[i])->read();
                 if (data.received) {
                     data.usec = GetUsecFromStart(tv_start);
-                    received_data[playerIds[i]].push_back(data);
+                    receivedData[playerIds[i]].push_back(data);
                     if (data.frameId == frame_id)
                         received_data_for_this_frame[playerIds[i]] = true;
                 }
@@ -158,7 +144,7 @@ bool ConnectorManagerLinux::GetActions(int frame_id, vector<PlayerLog>* log)
         }
     }
 
-    Log(frame_id, received_data, log);
+    Log(frame_id, receivedData);
 
     return !died;
 }
