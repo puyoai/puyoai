@@ -44,17 +44,16 @@ DropDecision AIRoutine::think(int frameId, const PlainField& plainField, const K
     LOG(INFO) << "\n" << field.debugOutput();
     LOG(INFO) << next1.toString() << " " << next2.toString();
 
-    std::vector<Plan> plans = Plan::findAvailablePlans(field, kumipuyoSeq);
-
-    double currentBestScore = -100.0;
+    double bestScore = -100.0;
     DropDecision dropDecision;
-    for (auto it = plans.cbegin(); it != plans.cend(); ++it) {
-        EvalResult result = eval(frameId, *it);
-        if (currentBestScore < result.evaluationScore) {
-            currentBestScore = result.evaluationScore;
-            dropDecision = DropDecision(it->firstDecision(), result.message);
-        }
-    }
+    Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
+                                [this, frameId, &bestScore, &dropDecision](const RefPlan& plan) {
+            EvalResult result = this->eval(frameId, plan);
+            if (bestScore < result.evaluationScore) {
+                bestScore = result.evaluationScore;
+                dropDecision = DropDecision(plan.decisions().front(), result.message);
+            }
+    });
 
     LOG(INFO) << "Decided : " << dropDecision.decision().toString();
     return dropDecision;
@@ -93,7 +92,7 @@ void AIRoutine::enemyNext2Appeared(const FrameData& frameData)
         LOG(INFO) << it->toString();
 }
 
-EvalResult AIRoutine::eval(int currentFrameId, const Plan& plan) const
+EvalResult AIRoutine::eval(int currentFrameId, const RefPlan& plan) const
 {
     EvaluationFeature feature;
     EvaluationFeatureCollector::collectFeatures(feature, plan, NUM_KEY_PUYOS, currentFrameId, enemyInfo_);

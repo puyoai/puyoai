@@ -11,7 +11,7 @@
 class CoreField;
 class DropDecision;
 class KumipuyoSeq;
-class Plan;
+class RefPlan;
 
 struct EvalResult {
     EvalResult(double evaluation, const std::string& message);
@@ -33,7 +33,7 @@ protected:
     virtual void enemyGrounded(const FrameData&) OVERRIDE;
     virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
 
-    EvalResult eval(int currentFrameId, const Plan&) const;
+    EvalResult eval(int currentFrameId, const RefPlan&) const;
     DropDecision decide(int frameId, const CoreField&, const KumipuyoSeq&, const EnemyInfo&);
 
     EvaluationParams evaluationParams_;

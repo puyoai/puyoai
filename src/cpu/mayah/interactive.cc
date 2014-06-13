@@ -4,8 +4,10 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+#include <sys/time.h>
 
 #include "core/algorithm/puyo_possibility.h"
+#include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_info.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/client/connector/drop_decision.h"
@@ -27,6 +29,12 @@ public:
     using AIRoutine::enemyNext2Appeared;
 };
 
+double now() {
+    struct timeval tv;
+    gettimeofday(&tv, nullptr);
+    return tv.tv_sec + tv.tv_usec / 1000000.0;
+}
+
 // TODO(mayah): Implement with GUI!
 int main(int argc, char* argv[])
 {
@@ -36,14 +44,18 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    InteractiveAI ai;
-
     {
-        FrameData fd;
-        fd.id = 1;
-        fd.valid = true;
-
+        double t1 = now();
+        CoreField f;
+        KumipuyoSeq seq("RRBB");
+        Plan::iterateAvailablePlans(f, seq, 4, [](const RefPlan&) {
+            return;
+        });
+        double t2 = now();
+        cout << (t2 - t1) << endl;
     }
+
+    InteractiveAI ai;
 
     CoreField field;
     KumipuyoSeq seq = generateSequence();
@@ -71,7 +83,12 @@ int main(int argc, char* argv[])
         fd.playerFrameData[1].kumipuyoSeq = KumipuyoSeq("666666");
 
         // Invoke Gazer.
-        ai.enemyNext2Appeared(fd);
+        {
+            double t1 = now();
+            ai.enemyNext2Appeared(fd);
+            double t2 = now();
+            cout << "gazer time = " << (t2 - t1) << endl;
+        }
 
         cout << field.debugOutput() << endl;
         cout << seq.get(i).toString() << " " << seq.get(i + 1).toString() << endl;
@@ -81,8 +98,11 @@ int main(int argc, char* argv[])
         cout << "enter? ";
         getline(cin, str);
 
+        double t1 = now();
         DropDecision dropDecision = ai.think(frameId, field, seq.get(i), seq.get(i + 1));
+        double t2 = now();
         cout << dropDecision.decision().x << ' ' << dropDecision.decision().r << endl;
+        cout << "time = " << (t2 - t1) << endl;
 
         field.dropKumipuyo(dropDecision.decision(), seq.get(i));
         field.simulate();

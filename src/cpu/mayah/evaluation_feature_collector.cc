@@ -20,7 +20,7 @@
 
 using namespace std;
 
-void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, const Plan& plan,
+void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, const RefPlan& plan,
                                                  int numKeyPuyos, int currentFrameId, const EnemyInfo& enemyInfo)
 {
     collectPlanFeatures(feature.modifiablePlanFeature(), plan, currentFrameId, enemyInfo);
@@ -51,7 +51,7 @@ void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, con
     }
 }
 
-void EvaluationFeatureCollector::collectPlanFeatures(PlanEvaluationFeature& planFeature, const Plan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
+void EvaluationFeatureCollector::collectPlanFeatures(PlanEvaluationFeature& planFeature, const RefPlan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
 {
     collectFrameFeature(planFeature, plan);
     collectEmptyAvailabilityFeature(planFeature, plan);
@@ -62,7 +62,7 @@ void EvaluationFeatureCollector::collectPlanFeatures(PlanEvaluationFeature& plan
     collectOngoingRensaFeature(planFeature, plan, currentFrameId, enemyInfo);
 }
 
-void EvaluationFeatureCollector::collectFrameFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
+void EvaluationFeatureCollector::collectFrameFeature(PlanEvaluationFeature& planFeature, const RefPlan& plan)
 {
     // TODO(mayah): Why totalFrames is 0?
     planFeature.set(TOTAL_FRAMES, plan.totalFrames());
@@ -109,7 +109,7 @@ static void calculateDensity(Feature& feature, const CoreField& field, const T p
     }
 }
 
-void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(PlanEvaluationFeature& feature, const Plan& plan)
+void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(PlanEvaluationFeature& feature, const RefPlan& plan)
 {
 #if USE_EMPTY_AVAILABILITY_FEATURE
     const CoreField& field = plan.field();
@@ -144,7 +144,7 @@ void EvaluationFeatureCollector::collectEmptyAvailabilityFeature(PlanEvaluationF
 #endif
 }
 
-void EvaluationFeatureCollector::collectConnectionFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
+void EvaluationFeatureCollector::collectConnectionFeature(PlanEvaluationFeature& planFeature, const RefPlan& plan)
 {
 #if USE_CONNECTION_FEATURE
     static const PlanFeatureParam params[] = {
@@ -161,7 +161,7 @@ void EvaluationFeatureCollector::collectConnectionFeature(PlanEvaluationFeature&
 #endif
 }
 
-void EvaluationFeatureCollector::collectDensityFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
+void EvaluationFeatureCollector::collectDensityFeature(PlanEvaluationFeature& planFeature, const RefPlan& plan)
 {
     static const PlanFeatureParam params[] = {
         DENSITY_0, DENSITY_1, DENSITY_2, DENSITY_3, DENSITY_4,
@@ -170,7 +170,7 @@ void EvaluationFeatureCollector::collectDensityFeature(PlanEvaluationFeature& pl
     calculateDensity(planFeature, plan.field(), params);
 }
 
-void EvaluationFeatureCollector::collectPuyoPattern33Feature(PlanEvaluationFeature& planFeature, const Plan& plan)
+void EvaluationFeatureCollector::collectPuyoPattern33Feature(PlanEvaluationFeature& planFeature, const RefPlan& plan)
 {
     const CoreField& field = plan.field();
 
@@ -222,7 +222,7 @@ void EvaluationFeatureCollector::collectPuyoPattern33Feature(PlanEvaluationFeatu
 
 }
 
-void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature& planFeature, const Plan& plan)
+void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature& planFeature, const RefPlan& plan)
 {
     const CoreField& field = plan.field();
 
@@ -246,7 +246,7 @@ void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature
     planFeature.set(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
 }
 
-void EvaluationFeatureCollector::collectOngoingRensaFeature(PlanEvaluationFeature& planFeature, const Plan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
+void EvaluationFeatureCollector::collectOngoingRensaFeature(PlanEvaluationFeature& planFeature, const RefPlan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
 {
     if (enemyInfo.rensaIsOngoing() && enemyInfo.ongoingRensaInfo().rensaInfo.score > scoreForOjama(6)) {
         // TODO: 対応が適当すぎる
@@ -302,7 +302,8 @@ void EvaluationFeatureCollector::collectOngoingRensaFeature(PlanEvaluationFeatur
     planFeature.set(STRATEGY_SAKIUCHI, 1.0);
 }
 
-void EvaluationFeatureCollector::collectRensaFeatures(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)
+void EvaluationFeatureCollector::collectRensaFeatures(RensaEvaluationFeature& rensaFeature,
+                                                      const RefPlan& plan, const TrackedPossibleRensaInfo& info)
 {
     CoreField fieldAfterRensa(plan.field());
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
@@ -322,7 +323,7 @@ void EvaluationFeatureCollector::collectRensaFeatures(RensaEvaluationFeature& re
     collectRensaGarbageFeature(rensaFeature, plan, fieldAfterDrop);
 }
 
-void EvaluationFeatureCollector::collectRensaChainFeature(RensaEvaluationFeature& rensaFeature, const Plan& /*plan*/, const TrackedPossibleRensaInfo& info)
+void EvaluationFeatureCollector::collectRensaChainFeature(RensaEvaluationFeature& rensaFeature, const RefPlan& /*plan*/, const TrackedPossibleRensaInfo& info)
 {
     int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, info.necessaryPuyoSet.toPuyoSet());
 
@@ -332,7 +333,7 @@ void EvaluationFeatureCollector::collectRensaChainFeature(RensaEvaluationFeature
         rensaFeature.set(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
 }
 
-void EvaluationFeatureCollector::collectRensaHandWidthFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const TrackedPossibleRensaInfo& info)
+void EvaluationFeatureCollector::collectRensaHandWidthFeature(RensaEvaluationFeature& rensaFeature, const RefPlan& plan, const TrackedPossibleRensaInfo& info)
 {
 #if USE_HAND_WIDTH_FEATURE
     // -----
@@ -401,7 +402,7 @@ void EvaluationFeatureCollector::collectRensaConnectionFeature(RensaEvaluationFe
 #endif
 }
 
-void EvaluationFeatureCollector::collectRensaGarbageFeature(RensaEvaluationFeature& rensaFeature, const Plan& plan, const CoreField& fieldAfterDrop)
+void EvaluationFeatureCollector::collectRensaGarbageFeature(RensaEvaluationFeature& rensaFeature, const RefPlan& plan, const CoreField& fieldAfterDrop)
 {
     rensaFeature.set(NUM_GARBAGE_PUYOS, plan.field().countPuyos() - fieldAfterDrop.countPuyos());
 }

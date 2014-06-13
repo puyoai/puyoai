@@ -66,12 +66,19 @@ public:
     const CoreField& field() const { return field_; }
     const std::vector<Decision>& decisions() const { return decisions_; }
     const BasicRensaResult& rensaResult() const { return rensaResult_; }
+
+    int chains() const { return rensaResult_.chains; }
+    int score() const { return rensaResult_.score; }
+
     // initiatingFrames returns how many frames are required just before the last hand.
     int initiatingFrames() const { return initiatingFrames_; }
+    int totalFrames() const { return initiatingFrames_ + rensaResult_.frames; }
 
     bool isRensaPlan() const { return rensaResult_.chains > 0; }
 
     Plan toPlan() const { return Plan(field_, decisions_, rensaResult_, initiatingFrames_); }
+
+    std::string decisionText() const;
 
 private:
     const CoreField& field_;
