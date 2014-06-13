@@ -49,11 +49,14 @@ public:
     // Drop kumipuyo with decision.
     bool dropKumipuyo(const Decision&, const Kumipuyo&);
 
+    // Remove puyos.
+    void undoKumipuyo(const Decision&);
+
     // Returns #frame to drop the next KumiPuyo with decision. This function does not drop the puyo.
     int framesToDropNext(const Decision&) const;
 
     // Places a puyo on the top of column |x|.
-    // Returns true if succeeded.
+    // Returns true if succeeded. False if failed. When false is returned, field will not change.
     bool dropPuyoOn(int x, PuyoColor, bool isAxis = false);
 
     // Removes the puyo from top of column |x|. If there is no puyo on column |x|, nothing will happen.

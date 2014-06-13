@@ -6,6 +6,35 @@
 
 bool Ctrl::isReachable(const PlainField& field, const Decision& decision)
 {
+    // fastpath
+    switch (decision.x) {
+    case 1:
+        if (field.get(2, 12) == PuyoColor::EMPTY && field.get(1, 12) == PuyoColor::EMPTY)
+            return true;
+        break;
+    case 2:
+        if (field.get(2, 12) == PuyoColor::EMPTY)
+            return true;
+        break;
+    case 3:
+        return true;
+    case 4:
+        if (field.get(4, 12) == PuyoColor::EMPTY)
+            return true;
+        break;
+    case 5:
+        if (field.get(4, 12) == PuyoColor::EMPTY && field.get(5, 12) == PuyoColor::EMPTY)
+            return true;
+        break;
+    case 6:
+        if (field.get(4, 12) == PuyoColor::EMPTY && field.get(5, 12) == PuyoColor::EMPTY && field.get(6, 12) == PuyoColor::EMPTY)
+            return true;
+        break;
+    default:
+        return false;
+    }
+
+    // slowpath
     return isReachableOnline(field, KumipuyoPos(decision.x, 1, decision.r), KumipuyoPos::InitialPos());
 }
 
