@@ -155,10 +155,30 @@ bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
 
     PuyoColor c1 = kumiPuyo.axis;
     PuyoColor c2 = kumiPuyo.child;
-    if (decision.r != 2)
-        return dropPuyoOn(x1, c1, true) && dropPuyoOn(x2, c2, false);
 
-    return dropPuyoOn(x2, c2, false) && dropPuyoOn(x1, c1, true);
+    if (decision.r == 2) {
+        if (!dropPuyoOn(x2, c2, false))
+            return false;
+        if (!dropPuyoOn(x1, c1, true)) {
+            removeTopPuyoFrom(x2);
+            return false;
+        }
+        return true;
+    }
+
+    if (!dropPuyoOn(x1, c1, true))
+        return false;
+    if (!dropPuyoOn(x2, c2, false)) {
+        removeTopPuyoFrom(x1);
+        return false;
+    }
+    return true;
+}
+
+void CoreField::undoKumipuyo(const Decision& decision)
+{
+    removeTopPuyoFrom(decision.x);
+    removeTopPuyoFrom(decision.childX());
 }
 
 int CoreField::framesToDropNext(const Decision& decision) const

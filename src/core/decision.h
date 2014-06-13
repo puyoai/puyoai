@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string>
 
+#include <glog/logging.h>
+
 #include "base/base.h"
 
 class Decision {
@@ -16,6 +18,23 @@ public:
 public:
     Decision() : x(0), r(0) {}
     Decision(int x0, int r0) : x(x0), r(r0) {}
+
+    int childX() const
+    {
+        switch (r) {
+        case 0:
+            return x;
+        case 1:
+            return x + 1;
+        case 2:
+            return x;
+        case 3:
+            return x - 1;
+        default:
+            CHECK(false) << r;
+            return x;
+        }
+    }
 
     bool isValid() const
     {
