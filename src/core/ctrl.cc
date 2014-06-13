@@ -6,36 +6,41 @@
 
 bool Ctrl::isReachable(const PlainField& field, const Decision& decision)
 {
-    // fastpath
-    switch (decision.x) {
-    case 1:
-        if (field.get(2, 12) == PuyoColor::EMPTY && field.get(1, 12) == PuyoColor::EMPTY)
-            return true;
-        break;
-    case 2:
-        if (field.get(2, 12) == PuyoColor::EMPTY)
-            return true;
-        break;
-    case 3:
+    if (isReachableFastpath(field, decision))
         return true;
-    case 4:
-        if (field.get(4, 12) == PuyoColor::EMPTY)
-            return true;
-        break;
-    case 5:
-        if (field.get(4, 12) == PuyoColor::EMPTY && field.get(5, 12) == PuyoColor::EMPTY)
-            return true;
-        break;
-    case 6:
-        if (field.get(4, 12) == PuyoColor::EMPTY && field.get(5, 12) == PuyoColor::EMPTY && field.get(6, 12) == PuyoColor::EMPTY)
-            return true;
-        break;
-    default:
-        return false;
-    }
 
     // slowpath
     return isReachableOnline(field, KumipuyoPos(decision.x, 1, decision.r), KumipuyoPos::InitialPos());
+}
+
+bool Ctrl::isReachableFastpath(const PlainField& field, const Decision& decision)
+{
+    DCHECK(decision.isValid()) << decision.toString();
+
+    static const int checker[6][4] = {
+        { 2, 1, 0 },
+        { 2, 0 },
+        { 0 },
+        { 4, 0 },
+        { 4, 5, 0 },
+        { 4, 5, 6, 0 },
+    };
+
+    int checkerIdx = decision.x - 1;
+    if (decision.r == 1 && 3 <= decision.x)
+        checkerIdx += 1;
+    else if (decision.r == 3 && decision.x <= 3)
+        checkerIdx -= 1;
+
+    // When decision is valid, this should hold.
+    DCHECK(0 <= checkerIdx && checkerIdx < 6) << checkerIdx;
+
+    for (int i = 0; checker[checkerIdx][i] != 0; ++i) {
+        if (field.get(checker[checkerIdx][i], 12) != PuyoColor::EMPTY)
+            return false;
+    }
+
+    return true;
 }
 
 bool Ctrl::isReachableOnline(const PlainField& field, const KumipuyoPos& goal, const KumipuyoPos& start)

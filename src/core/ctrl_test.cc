@@ -9,6 +9,64 @@
 
 using namespace std;
 
+TEST(CtrlTest, isReachable1)
+{
+    PlainField f(
+        "      "
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r <= 3; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+
+            EXPECT_TRUE(Ctrl::isReachable(f, d));
+        }
+    }
+}
+
+TEST(CtrlTest, isReachable2)
+{
+    PlainField f(
+        " O O  "
+        " O O  "
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r <= 3; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+
+            if (x == 3 && (r == 0 || r == 2))
+                EXPECT_TRUE(Ctrl::isReachable(f, d)) << d.toString();
+            else
+                EXPECT_FALSE(Ctrl::isReachable(f, d)) << d.toString();
+        }
+    }
+}
+
 TEST(CtrlTest, isReachableOnline) {
   // need quick turn to go over a wall
   PlainField f("040400"
