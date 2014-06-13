@@ -42,6 +42,18 @@ std::string Plan::decisionText() const
     return ss.str();
 }
 
+std::string RefPlan::decisionText() const
+{
+    std::ostringstream ss;
+    for (size_t i = 0; i < decisions().size(); ++i) {
+        if (i)
+            ss << '-';
+        ss << decisions()[i].toString();
+    }
+
+    return ss.str();
+}
+
 // static
 std::vector<Plan> Plan::findAvailablePlans(const CoreField& field,
                                            const KumipuyoSeq& kumipuyoSeq)

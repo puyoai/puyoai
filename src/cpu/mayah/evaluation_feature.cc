@@ -51,8 +51,6 @@ const RensaEvaluationFeature EvaluationFeature::s_emptyRensaFeature;
 
 string EvaluationFeature::toString() const
 {
-    // return "NOT_IMPLEMENTED_YET";
-
     return m_planFeature.toString();
 }
 
