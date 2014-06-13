@@ -33,9 +33,9 @@ std::string toString(CaptureGameState);
 
 // DetectedField contains the detected field as-is.
 struct DetectedField {
-    void setRealColor(int x, int y, RealColor prc) { puyos[x-1][y-1] = prc; }
+    void setRealColor(int x, int y, RealColor prc) { puyos[x - 1][y - 1] = prc; }
     void setRealColor(NextPuyoPosition npp, RealColor prc) { nextPuyos[static_cast<int>(npp)] = prc; }
-    RealColor realColor(int x, int y) const { return puyos[x-1][y-1]; }
+    RealColor realColor(int x, int y) const { return puyos[x - 1][y - 1]; }
     RealColor realColor(NextPuyoPosition npp) const { return nextPuyos[static_cast<int>(npp)]; }
 
     bool isVanishing(int x, int y) const { return vanishing[x-1][y-1]; }

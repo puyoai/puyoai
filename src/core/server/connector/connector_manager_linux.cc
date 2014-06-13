@@ -44,7 +44,7 @@ static void Log(int frame_id, const vector<ReceivedData> alldata[2])
         if (alldata[i].size() == 0) {
             LOG(INFO) << "[P" << i << "] [NODATA]";
         }
-        for (int j = 0; j < alldata[i].size(); j++) {
+        for (size_t j = 0; j < alldata[i].size(); j++) {
             const ReceivedData& data = alldata[i][j];
             LOG(INFO) << "[P" << i << "] "
                       << "[" << setfill(' ') << setw(5) << right << data.usec << "us] "

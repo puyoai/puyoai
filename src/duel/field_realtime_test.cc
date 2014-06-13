@@ -69,7 +69,7 @@ TEST_F(FieldRealtimeTest, DISABLED_TimingFreeFall)
     // Started free fall of next puyo.
     states.push_back(make_pair(FieldRealtime::STATE_USER, false));
 
-    for (int i = 0; i < states.size(); i++) {
+    for (size_t i = 0; i < states.size(); i++) {
         EXPECT_EQ(states[i].first, f_->simulationState()) << "index=" << i;
         EXPECT_EQ(states[i].second, f_->isSleeping()) << "index=" << i;
         f_->PlayOneFrame(KEY_NONE, nullptr);

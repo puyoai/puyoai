@@ -7,6 +7,9 @@
 using namespace std;
 
 namespace {
+
+const int NUM_FRAMES_TO_SEE_FOR_FIELD = 5;
+
 // The pointer will be alive while previousResults are alive.
 vector<const PlayerAnalyzerResult*> makePlayerOnlyResults(int pi, const deque<unique_ptr<AnalyzerResult>>& previousResults)
 {
@@ -444,7 +447,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField, const vector<con
 
             map<RealColor, int> cnt;
             cnt[detectedField.realColor(x, y)]++;
-            for (int i = 0; i < 5 && i < previousResults.size(); ++i) {
+            for (size_t i = 0; i < NUM_FRAMES_TO_SEE_FOR_FIELD && i < previousResults.size(); ++i) {
                 cnt[previousResults[i]->detectedField.realColor(x, y)]++;
             }
 
