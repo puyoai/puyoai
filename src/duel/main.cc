@@ -163,7 +163,8 @@ int main(int argc, char* argv[])
         duelServer.stop();
     }
 
-    commentator->stop();
+    if (commentator.get())
+        commentator->stop();
 #endif
 
     duelServer.join();
