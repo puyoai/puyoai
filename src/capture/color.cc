@@ -33,20 +33,6 @@ HSV RGB::toHSV() const
     return hsv;
 }
 
-// static
-double HSV::diff2(const HSV& hsv1, const HSV& hsv2)
-{
-    double x1 = hsv1.s * cos(hsv1.h);
-    double y1 = hsv1.s * sin(hsv1.h);
-    double z1 = hsv1.v;
-
-    double x2 = hsv2.s * cos(hsv2.h);
-    double y2 = hsv2.s * sin(hsv2.h);
-    double z2 = hsv2.v;
-
-    return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2);
-}
-
 RGB HSV::toRGB() const
 {
     if (v < 1e-9)
