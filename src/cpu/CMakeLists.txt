@@ -38,4 +38,6 @@ add_subdirectory(mayah)
 #add_subdirectory(pascal)
 add_subdirectory(peria)
 add_subdirectory(tzik)
+
 add_subdirectory(sample)
+add_subdirectory(sample_rensa)
