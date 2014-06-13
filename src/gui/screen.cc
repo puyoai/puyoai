@@ -35,7 +35,9 @@ void Screen::init()
     }
 
     char buf[PATH_MAX+1];
-    getcwd(buf, PATH_MAX);
+    if (!getcwd(buf, PATH_MAX))
+        PLOG(FATAL) << "buffer is too small for getcwd";
+
     char* p = buf;
     while (true) {
         string font_filename = string(p) + "/data/mikachan-p.ttf";
@@ -63,4 +65,3 @@ void Screen::clear()
 {
     SDL_FillRect(surface(), NULL, SDL_MapRGB(surface()->format, bgColor_.r, bgColor_.g, bgColor_.b));
 }
-

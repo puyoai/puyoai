@@ -114,6 +114,10 @@ void DuelServer::runDuelLoop()
             break;
         case GameResult::PLAYING:
             LOG(FATAL) << "Game is still running?";
+            break;
+        case GameResult::GAME_HAS_STOPPED:
+            LOG(FATAL) << "Game has already stopped?";
+            break;
         }
 
         cout << p1_win << " / " << p1_draw << " / " << p1_lose << endl;
@@ -139,7 +143,7 @@ GameResult DuelServer::duel(ConnectorManager* manager)
     LOG(INFO) << "Game has started.";
 
     int current_id = 0;
-    GameResult gameResult;
+    GameResult gameResult = GameResult::GAME_HAS_STOPPED;
     while (!shouldStop_) {
         // Timeout is 120s, and the game is 30fps.
         if (current_id >= FPS * 120) {

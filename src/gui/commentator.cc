@@ -12,7 +12,6 @@
 #include <vector>
 
 #include <glog/logging.h>
-#include <glog/stl_logging.h>
 
 #include "base/base.h"
 #include "core/algorithm/plan.h"
@@ -28,37 +27,6 @@
 using namespace std;
 
 namespace {
-
-static void drawDiamond(Screen* screen, const Box& b, PuyoColor c)
-{
-    Uint32 col = ColorMap::instance().getColor(c);
-    SDL_Surface* surface = screen->surface();
-
-    int w = (b.dx - b.sx - 2) / 2;
-    int cx = (b.sx + b.dx) / 2;
-    int cy = (b.sy + b.dy) / 2;
-    for (int i = 0; i < w; i++) {
-        putpixel(surface, cx + i, cy - w + i, col);
-        putpixel(surface, cx + w - i, cy + i, col);
-        putpixel(surface, cx - i, cy + w - i, col);
-        putpixel(surface, cx - w + i, cy - i, col);
-    }
-}
-
-static void drawTriangle(Screen* screen, const Box& b, PuyoColor c)
-{
-    Uint32 col = ColorMap::instance().getColor(c);
-    SDL_Surface* surface = screen->surface();
-
-    int w = (b.dx - b.sx - 2);
-    int cx = (b.sx + b.dx) / 2;
-    int cy = (b.sy + b.dy) / 2;
-    for (int i = 0; i < w; i++) {
-        putpixel(surface, cx - w / 2 + i, cy + w / sqrt(3) / 2, col);
-        putpixel(surface, cx + i / 2, cy - w / sqrt(3) + i * sqrt(3) / 2, col);
-        putpixel(surface, cx - i / 2, cy - w / sqrt(3) + i * sqrt(3) / 2, col);
-    }
-}
 
 static void drawNumber(Screen* screen, const Box& b, int n)
 {

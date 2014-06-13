@@ -158,7 +158,7 @@ TEST_F(SomagicAnalyzerTest, WnextDetection)
         int maxFrame;
     };
 
-    Testcase testcases[] = {
+    vector<Testcase> testcases = {
         { 0, RealColor::RC_BLUE,   "blue",   8 },
         { 0, RealColor::RC_GREEN,  "green",  8 },
         { 0, RealColor::RC_PURPLE, "purple", 6 },
@@ -171,7 +171,7 @@ TEST_F(SomagicAnalyzerTest, WnextDetection)
         { 1, RealColor::RC_YELLOW, "yellow", 8 },
     };
 
-    for (int i = 0; i < sizeof(testcases) / sizeof(testcases[0]); ++i) {
+    for (size_t i = 0; i < testcases.size(); ++i) {
         for (int id = 1; id <= testcases[i].maxFrame; ++id) {
             char buf[80];
             sprintf(buf, "/somagic/wnext/%s-%dp-case%d.png", testcases[i].name, testcases[i].playerId + 1, id);

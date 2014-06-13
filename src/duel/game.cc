@@ -76,7 +76,7 @@ void Game::Play(const vector<ReceivedData> data[2])
 
         // Take care of ack_info.
         ack_info_[pi] = vector<int>(data[pi].size(), 0);
-        for (int j = 0; j < data[pi].size(); j++) {
+        for (size_t j = 0; j < data[pi].size(); j++) {
             const ReceivedData& d = data[pi][j];
 
             // This case does not require ack.
@@ -141,7 +141,7 @@ std::string FormatAckInfo(const vector<int>& ack_info)
     stringstream ss;
     int accepted_id = -1;
     bool has_nack = false;
-    for (int i = 0; i < ack_info.size(); i++) {
+    for (size_t i = 0; i < ack_info.size(); i++) {
         if (ack_info[i] > 0) {
             accepted_id = ack_info[i];
         } else if (ack_info[i] < 0) {
