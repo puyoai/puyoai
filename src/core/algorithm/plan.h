@@ -52,6 +52,8 @@ private:
     int initiatingFrames_;
 };
 
+// RefPlan is almost same as plan, but holding references so that field copy will not occur.
+// You can convert this to Plan with calling toPlan().
 class RefPlan : noncopyable {
 public:
     RefPlan(const CoreField& field, const std::vector<Decision>& decisions,
