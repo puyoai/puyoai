@@ -25,8 +25,6 @@ public:
     RensaTracker(RensaTrackResult* trackResult) :
         m_result(trackResult)
     {
-        DCHECK(trackResult);
-
         for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
             for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
                 m_originalY[x][y] = y;
@@ -290,8 +288,6 @@ int CoreField::vanishOnly(int currentNthChain)
 template<typename Tracker>
 int CoreField::vanish(int nthChain, int minHeights[], Tracker* tracker)
 {
-    DCHECK(tracker);
-
     FieldBitField checked;
     Position eraseQueue[WIDTH * HEIGHT]; // All the positions of erased puyos will be stored here.
     Position* eraseQueueHead = eraseQueue;

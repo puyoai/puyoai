@@ -43,6 +43,40 @@ TEST(PlanPerformanceTest, Filled44)
     cout << "variance: " << variance << endl;
 }
 
+TEST(PlanPerformanceTest, Empty23)
+{
+    CoreField f;
+    KumipuyoSeq seq("RRGG");
+
+    // Since seq has 2 kumipuyo, this will try all kumipuyo color possibilities.
+    for (int i = 0; i < 10; i++) {
+        Tsc tsc("PlanEmpty23");
+        Plan::iterateAvailablePlans(f, seq, 3, [](const RefPlan&){});
+    }
+
+    double average, variance;
+    Tsc::GetStatistics("PlanEmpty23", &average, &variance);
+    cout << "average: " << average << endl;
+    cout << "variance: " << variance << endl;
+}
+
+TEST(PlanPerformanceTest, Filled23)
+{
+    CoreField f("http://www.inosendo.com/puyo/rensim/??500000400000500000400000540000540000564560456456456456456456");
+    KumipuyoSeq seq("BBGG");
+
+    // Since seq has 2 kumipuyo, this won't test all kumipuyo possibilities.
+    for (int i = 0; i < 10; i++) {
+        Tsc tsc("PlanFilled24");
+        Plan::iterateAvailablePlans(f, seq, 3, [](const RefPlan&){});
+    }
+
+    double average, variance;
+    Tsc::GetStatistics("PlanFilled23", &average, &variance);
+    cout << "average: " << average << endl;
+    cout << "variance: " << variance << endl;
+}
+
 TEST(PlanPerformanceTest, Empty24)
 {
     CoreField f;

@@ -19,6 +19,7 @@ public:
         Decision best;
         int score = -100000;
 
+        // We might be able to 4 in the current Plan::iterateAvailablePlans() performance.
         Plan::iterateAvailablePlans(CoreField(f), seq, 3, [&best, &score](const RefPlan& plan) {
             if (!plan.isRensaPlan())
                 return;
