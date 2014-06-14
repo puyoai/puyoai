@@ -97,7 +97,7 @@ static void iterateAvailablePlansInternal(const CoreField& field,
                 continue;
 
             int dropFrames = nextField.framesToDropNext(decision);
-            BasicRensaResult rensaResult = nextField.simulate();
+            RensaResult rensaResult = nextField.simulate();
             if (rensaResult.chains > 0)
                 needsNextFieldRefresh = true;
             if (nextField.color(3, 12) != PuyoColor::EMPTY) {

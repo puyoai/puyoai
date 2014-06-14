@@ -16,7 +16,7 @@ class RefPlan;
 class Plan {
 public:
     Plan(const CoreField& field, const std::vector<Decision>& decisions,
-         const BasicRensaResult& rensaResult, int initiatingFrames) :
+         const RensaResult& rensaResult, int initiatingFrames) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
         initiatingFrames_(initiatingFrames)
     {
@@ -32,7 +32,7 @@ public:
     const Decision& decision(int nth) const { return decisions_[nth]; }
     const std::vector<Decision>& decisions() const { return decisions_; }
 
-    const BasicRensaResult& rensaResult() const { return rensaResult_; }
+    const RensaResult& rensaResult() const { return rensaResult_; }
     int initiatingFrames() const { return initiatingFrames_; }
 
     int score() const { return rensaResult_.score; }
@@ -47,7 +47,7 @@ public:
 private:
     CoreField field_;      // Future field (after the rensa has been finished).
     std::vector<Decision> decisions_;
-    BasicRensaResult rensaResult_;
+    RensaResult rensaResult_;
     int initiatingFrames_;
 };
 
@@ -56,7 +56,7 @@ private:
 class RefPlan : noncopyable {
 public:
     RefPlan(const CoreField& field, const std::vector<Decision>& decisions,
-            const BasicRensaResult& rensaResult, int initiatingFrames) :
+            const RensaResult& rensaResult, int initiatingFrames) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
         initiatingFrames_(initiatingFrames)
     {
@@ -64,7 +64,7 @@ public:
 
     const CoreField& field() const { return field_; }
     const std::vector<Decision>& decisions() const { return decisions_; }
-    const BasicRensaResult& rensaResult() const { return rensaResult_; }
+    const RensaResult& rensaResult() const { return rensaResult_; }
 
     int chains() const { return rensaResult_.chains; }
     int score() const { return rensaResult_.score; }
@@ -82,7 +82,7 @@ public:
 private:
     const CoreField& field_;
     const std::vector<Decision>& decisions_;
-    const BasicRensaResult& rensaResult_;
+    const RensaResult& rensaResult_;
     int initiatingFrames_;
 };
 
