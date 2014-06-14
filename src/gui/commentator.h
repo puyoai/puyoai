@@ -16,7 +16,6 @@
 #include "duel/game_state_observer.h"
 #include "gui/drawer.h"
 
-class Plan;
 class Screen;
 
 class Commentator : public GameStateObserver, public Drawer {

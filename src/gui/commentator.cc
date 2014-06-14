@@ -194,27 +194,29 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
         if (3 < kp.size())
             kp.resize(3);
 
-        vector<Plan> plans = Plan::findAvailablePlans(field, kp);
-        double bestTsubushiScore = 0.0;
-        const Plan* bestTsubushiPlan = nullptr;
-        for (const auto& plan : plans) {
-            if (!plan.isRensaPlan())
-                continue;
-            if (3 < plan.chains())
-                continue;
-            if (plan.score() < 200)
-                continue;
+        pair<int, double> bestTsubushiScore = make_pair(100, 0.0); // # of hand & score. Smaller is better.
+        FeasibleRensaInfo feasibleRensaInfo;
+        Plan::iterateAvailablePlans(field, kp, kp.size(), [&bestTsubushiScore, &feasibleRensaInfo](const RefPlan& plan) {
+            if (plan.chains() != 2 && plan.chains() != 3)
+                return;
 
-            double tsubushiScore = static_cast<double>(plan.score()) / plan.totalFrames();
-            if (bestTsubushiScore < tsubushiScore) {
+            // Considers only >= 2rensa double.
+            // 2rensa double = 40 + 80 * (8 + 3) = 40 + 880 = 920
+            // 3rensa = 40 + 40 * 8 + 40 * 16 = 1000
+            if (plan.score() < 920)
+                return;
+
+            pair<int, double> tsubushiScore = make_pair(plan.decisions().size(),
+                                                        -static_cast<double>(plan.score()) / plan.totalFrames());
+            if (tsubushiScore < bestTsubushiScore) {
                 bestTsubushiScore = tsubushiScore;
-                bestTsubushiPlan = &plan;
+                feasibleRensaInfo = FeasibleRensaInfo(plan.rensaResult(), plan.initiatingFrames());
             }
-        }
+        });
 
-        if (bestTsubushiPlan != nullptr) {
+        if (bestTsubushiScore.first < 100) {
             lock_guard<mutex> lock(mu_);
-            fireableTsubushiChain_[pi].reset(new FeasibleRensaInfo(bestTsubushiPlan->rensaResult(), bestTsubushiPlan->initiatingFrames()));
+            fireableTsubushiChain_[pi].reset(new FeasibleRensaInfo(feasibleRensaInfo));
         }
     }
 
