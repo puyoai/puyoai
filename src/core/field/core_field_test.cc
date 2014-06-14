@@ -233,9 +233,9 @@ TEST(CoreFieldTest, RemoveTopPuyoFrom)
 TEST(CoreFieldTest, TrackedCoreFieldSimulation)
 {
     CoreField f("400040"
-            "456474"
-            "445667"
-            "556774");
+                "456474"
+                "445667"
+                "556774");
 
 
     RensaTrackResult trackResult;
@@ -275,4 +275,15 @@ TEST(CoreFieldTest, FramesToDropNextWithChigiri)
 
     EXPECT_EQ((CoreField::HEIGHT - 4) * FRAMES_DROP_1_LINE + FRAMES_AFTER_CHIGIRI + FRAMES_CHIGIRI_1_LINE_1 + FRAMES_CHIGIRI_1_LINE_2 + 2 * FRAMES_CHIGIRI_1_LINE_3,
               f.framesToDropNext(Decision(3, 1)));
+}
+
+TEST(CoreFieldTest, SimulateWithOjama)
+{
+    CoreField f(
+        "ORRRRO"
+        "OOOOOO");
+
+    RensaResult rensaResult = f.simulate();
+    EXPECT_EQ(40, rensaResult.score);
+    EXPECT_EQ(1, rensaResult.chains);
 }
