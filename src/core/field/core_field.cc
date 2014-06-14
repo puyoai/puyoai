@@ -330,7 +330,7 @@ int CoreField::vanish(int nthChain, int minHeights[], Tracker* tracker)
     if (numErasedPuyos == 0)
         return 0;
 
-    // --- Actually erase the Puyos to be vanished.
+    // --- Actually erase the Puyos to be vanished. We erase ojama here also.
     eraseQueuedPuyos(nthChain, eraseQueue, eraseQueueHead, minHeights, tracker);
 
     int rensaBonusCoef = calculateRensaBonusCoef(chainBonus(nthChain), longBonusCoef, colorBonus(numUsedColors));
