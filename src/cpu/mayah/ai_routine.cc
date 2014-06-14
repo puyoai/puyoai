@@ -67,10 +67,10 @@ void AIRoutine::enemyGrounded(const FrameData& frameData)
     CoreField field(frameData.enemyPlayerFrameData().field);
     field.forceDrop();
 
-    BasicRensaResult rensaInfo = field.simulate();
+    RensaResult rensaResult = field.simulate();
 
-    if (rensaInfo.chains > 0)
-        enemyInfo_.setOngoingRensa(OngoingRensaInfo(rensaInfo, frameData.id + rensaInfo.frames));
+    if (rensaResult.chains > 0)
+        enemyInfo_.setOngoingRensa(OngoingRensaInfo(rensaResult, frameData.id + rensaResult.frames));
     else
         enemyInfo_.setRensaIsOngoing(false);
 }

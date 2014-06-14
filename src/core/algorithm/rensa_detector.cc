@@ -27,12 +27,12 @@ RensaDetector::findFeasibleRensas(const CoreField& field, const KumipuyoSeq& kum
 
 static inline void simulateInternal(CoreField* f, PossibleRensaInfo* info, int initialChain)
 {
-    info->rensaInfo = f->simulate(initialChain);
+    info->rensaResult = f->simulate(initialChain);
 }
 
 static inline void simulateInternal(CoreField* f, TrackedPossibleRensaInfo* info, int initialChain)
 {
-    info->rensaInfo = f->simulateAndTrack(&info->trackResult, initialChain);
+    info->rensaResult = f->simulateAndTrack(&info->trackResult, initialChain);
 }
 
 template<typename T>

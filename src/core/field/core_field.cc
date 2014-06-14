@@ -411,13 +411,13 @@ int CoreField::dropAfterVanish(int minHeights[], Tracker* tracker)
         return FRAMES_DROP_1_LINE * maxDrops + FRAMES_AFTER_DROP;
 }
 
-BasicRensaResult CoreField::simulate(int initialChain)
+RensaResult CoreField::simulate(int initialChain)
 {
     RensaNonTracker tracker;
     return simulateWithTracker(initialChain, &tracker);
 }
 
-BasicRensaResult CoreField::simulateAndTrack(RensaTrackResult* trackResult, int initialChain)
+RensaResult CoreField::simulateAndTrack(RensaTrackResult* trackResult, int initialChain)
 {
     DCHECK(trackResult);
     RensaTracker tracker(trackResult);
@@ -425,7 +425,7 @@ BasicRensaResult CoreField::simulateAndTrack(RensaTrackResult* trackResult, int 
 }
 
 template<typename Tracker>
-inline BasicRensaResult CoreField::simulateWithTracker(int initialChain, Tracker* tracker)
+inline RensaResult CoreField::simulateWithTracker(int initialChain, Tracker* tracker)
 {
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
     int chains = initialChain, score = 0, frames = 0;
@@ -437,7 +437,7 @@ inline BasicRensaResult CoreField::simulateWithTracker(int initialChain, Tracker
         frames += dropAfterVanish(minHeights, tracker) + FRAMES_AFTER_VANISH;
     }
 
-    return BasicRensaResult(chains - 1, score, frames);
+    return RensaResult(chains - 1, score, frames);
 }
 
 std::string CoreField::toString() const

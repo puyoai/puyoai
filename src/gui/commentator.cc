@@ -173,10 +173,10 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
     {
         CoreField f(field);
         unique_ptr<TrackedPossibleRensaInfo> track(new TrackedPossibleRensaInfo);
-        track->rensaInfo = f.simulateAndTrack(&track->trackResult);
-        if (track->rensaInfo.score > 0) {
+        track->rensaResult = f.simulateAndTrack(&track->trackResult);
+        if (track->rensaResult.score > 0) {
             lock_guard<mutex> lock(mu_);
-            string msg = std::to_string(track->rensaInfo.chains) + "連鎖発火: " + std::to_string(track->rensaInfo.score) + "点";
+            string msg = std::to_string(track->rensaResult.chains) + "連鎖発火: " + std::to_string(track->rensaResult.score) + "点";
             events_[pi].push_back(msg);
             firingChain_[pi] = move(track);
             fireableMainChain_[pi].reset();
@@ -226,8 +226,8 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
         const TrackedPossibleRensaInfo* bestRensa = nullptr;
         int maxScore = 0;
         for (const auto& r : rs) {
-            if (maxScore < r.rensaInfo.score) {
-                maxScore = r.rensaInfo.score;
+            if (maxScore < r.rensaResult.score) {
+                maxScore = r.rensaResult.score;
                 bestRensa = &r;
             }
         }
@@ -289,7 +289,7 @@ void Commentator::drawCommentSurface(Screen* screen, int pi) const
     drawText(screen, "本線", LX, LH * 2);
     if (fireableMainChain_[pi].get()) {
         drawText(screen,
-                 to_string(fireableMainChain_[pi]->rensaInfo.chains) + "連鎖" + to_string(fireableMainChain_[pi]->rensaInfo.score) + "点",
+                 to_string(fireableMainChain_[pi]->rensaResult.chains) + "連鎖" + to_string(fireableMainChain_[pi]->rensaResult.score) + "点",
                  LX2, LH * 3);
     }
     drawText(screen, "発火可能潰し", LX, LH * 5);
@@ -306,8 +306,8 @@ void Commentator::drawCommentSurface(Screen* screen, int pi) const
     drawText(screen, "発火中/最終発火", LX, LH * 9);
     if (firingChain_[pi].get()) {
         drawText(screen,
-                 to_string(firingChain_[pi]->rensaInfo.chains) + "連鎖" +
-                 to_string(firingChain_[pi]->rensaInfo.score) + "点",
+                 to_string(firingChain_[pi]->rensaResult.chains) + "連鎖" +
+                 to_string(firingChain_[pi]->rensaResult.score) + "点",
                  LX2, LH * 10);
     }
     if (!message_[pi].empty())

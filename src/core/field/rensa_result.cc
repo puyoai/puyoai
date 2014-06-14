@@ -5,7 +5,7 @@
 
 using namespace std;
 
-string BasicRensaResult::toString() const
+string RensaResult::toString() const
 {
     char buf[80];
     sprintf(buf, "chains, score, frames = %d, %d, %d", chains, score, frames);
