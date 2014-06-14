@@ -54,23 +54,6 @@ std::string RefPlan::decisionText() const
     return ss.str();
 }
 
-// static
-std::vector<Plan> Plan::findAvailablePlans(const CoreField& field,
-                                           const KumipuyoSeq& kumipuyoSeq)
-{
-    DCHECK(1 <= kumipuyoSeq.size() && kumipuyoSeq.size() <= 3);
-
-    std::vector<Plan> plans;
-    plans.reserve(22 + 22 * 22 + 22 * 22 * 22);
-
-    iterateAvailablePlans(field, kumipuyoSeq, kumipuyoSeq.size(), [&plans](const RefPlan& ref) {
-        plans.push_back(ref.toPlan());
-    });
-
-    return plans;
-}
-
-
 static void iterateAvailablePlansInternal(const CoreField& field,
                                           const KumipuyoSeq& kumipuyoSeq,
                                           std::vector<Decision>& decisions,

@@ -23,7 +23,6 @@ public:
     }
 
     typedef std::function<void (const RefPlan&)> IterationCallback;
-    static std::vector<Plan> findAvailablePlans(const CoreField&, const KumipuyoSeq&) DEPRECATED_MSG("use iterateAvailablePlans instead.");
     // if |kumipuyos.size()| < |depth|, we will add extra kumipuyo.
     static void iterateAvailablePlans(const CoreField&, const KumipuyoSeq&, int depth, IterationCallback);
 
