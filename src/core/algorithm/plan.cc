@@ -99,7 +99,10 @@ static void iterateAvailablePlansInternal(const CoreField& field,
             int dropFrames = nextField.framesToDropNext(decision);
             // CoreField::simulate is slow. So, if the last decision does not invoke any rensa,
             // we'd like to skip simulate.
-            RensaResult rensaResult = nextField.rensaWillOccurWhenLastDecisionIs(decision) ? nextField.simulate() : RensaResult();
+            // Even using simulateWhenLastDecisionIs, it looks checking rensaWillOccurWhenLastDecisionIs
+            // is 7~8 % faster.
+            RensaResult rensaResult = nextField.rensaWillOccurWhenLastDecisionIs(decision) ?
+                nextField.simulateWhenLastDecisionIs(decision) : RensaResult();
             if (rensaResult.chains > 0)
                 needsNextFieldRefresh = true;
             if (nextField.color(3, 12) != PuyoColor::EMPTY) {

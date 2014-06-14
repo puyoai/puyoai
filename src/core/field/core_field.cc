@@ -445,20 +445,30 @@ bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
 RensaResult CoreField::simulate(int initialChain)
 {
     RensaNonTracker tracker;
-    return simulateWithTracker(initialChain, &tracker);
+    int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
+    return simulateWithTracker(initialChain, minHeights, &tracker);
+}
+
+RensaResult CoreField::simulateWhenLastDecisionIs(const Decision& decision)
+{
+    RensaNonTracker tracker;
+    int minHeights[MAP_WIDTH] = { 100, height(1) + 1, height(2) + 1, height(3) + 1, height(4) + 1, height(5) + 1, height(6) + 1, 100 };
+    minHeights[decision.x]--;
+    minHeights[decision.childX()]--;
+    return simulateWithTracker(1, minHeights, &tracker);
 }
 
 RensaResult CoreField::simulateAndTrack(RensaTrackResult* trackResult, int initialChain)
 {
     DCHECK(trackResult);
     RensaTracker tracker(trackResult);
-    return simulateWithTracker(initialChain, &tracker);
+    int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
+    return simulateWithTracker(initialChain, minHeights, &tracker);
 }
 
 template<typename Tracker>
-inline RensaResult CoreField::simulateWithTracker(int initialChain, Tracker* tracker)
+inline RensaResult CoreField::simulateWithTracker(int initialChain, int minHeights[], Tracker* tracker)
 {
-    int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
     int chains = initialChain, score = 0, frames = 0;
 
     int nthChainScore;
