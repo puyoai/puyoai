@@ -97,7 +97,9 @@ static void iterateAvailablePlansInternal(const CoreField& field,
                 continue;
 
             int dropFrames = nextField.framesToDropNext(decision);
-            RensaResult rensaResult = nextField.simulate();
+            // CoreField::simulate is slow. So, if the last decision does not invoke any rensa,
+            // we'd like to skip simulate.
+            RensaResult rensaResult = nextField.rensaWillOccurWhenLastDecisionIs(decision) ? nextField.simulate() : RensaResult();
             if (rensaResult.chains > 0)
                 needsNextFieldRefresh = true;
             if (nextField.color(3, 12) != PuyoColor::EMPTY) {
