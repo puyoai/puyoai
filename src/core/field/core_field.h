@@ -76,6 +76,9 @@ public:
     // Simulates rensa.
     RensaResult simulate(int initialChain = 1);
 
+    // Simulates rensa, but the last decision is specified. This will be faster then simulate().
+    RensaResult simulateWhenLastDecisionIs(const Decision&);
+
     // Simulates rensa with tracking.
     RensaResult simulateAndTrack(RensaTrackResult* trackResult, int initialChain = 1);
 
@@ -114,7 +117,7 @@ public:
 protected:
     // Simulates chains. Returns RensaResult.
     template<typename Tracker>
-    RensaResult simulateWithTracker(int initialChain, Tracker*);
+    RensaResult simulateWithTracker(int initialChain, int minHeights[], Tracker*);
 
     // Vanishes connected puyos and returns score. If score is 0, no puyos are vanished.
     template<typename Tracker>
