@@ -214,7 +214,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
 
         if (bestTsubushiPlan != nullptr) {
             lock_guard<mutex> lock(mu_);
-            fireableTsubushiChain_[pi].reset(new Plan(*bestTsubushiPlan));
+            fireableTsubushiChain_[pi].reset(new FeasibleRensaInfo(bestTsubushiPlan->rensaResult(), bestTsubushiPlan->initiatingFrames()));
         }
     }
 

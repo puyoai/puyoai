@@ -10,6 +10,12 @@ struct FeasibleRensaInfo {
     FeasibleRensaInfo(const BasicRensaResult& rensaInfo, int initiatingFrames)
         : basicRensaResult(rensaInfo), initiatingFrames(initiatingFrames) {}
 
+    const BasicRensaResult& rensaResult() const { return basicRensaResult; }
+
+    int score() const { return basicRensaResult.score; }
+    int chains() const { return basicRensaResult.chains; }
+    int totalFrames() const { return basicRensaResult.frames + initiatingFrames; }
+
     BasicRensaResult basicRensaResult;
     int initiatingFrames;
 };
