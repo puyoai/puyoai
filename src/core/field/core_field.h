@@ -71,6 +71,8 @@ public:
     // ----------------------------------------------------------------------
     // simulation
 
+    bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;
+
     // Simulates rensa.
     RensaResult simulate(int initialChain = 1);
 

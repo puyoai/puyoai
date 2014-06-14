@@ -411,6 +411,35 @@ int CoreField::dropAfterVanish(int minHeights[], Tracker* tracker)
         return FRAMES_DROP_1_LINE * maxDrops + FRAMES_AFTER_DROP;
 }
 
+bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
+{
+    Position p1 = Position(decision.x, height(decision.x));
+    if (connectedPuyoNums(p1.x, p1.y) >= 4)
+        return true;
+
+    Position p2;
+    switch (decision.r) {
+    case 0:
+    case 2:
+        p2 = Position(decision.x, height(decision.x) - 1);
+        break;
+    case 1:
+        p2 = Position(decision.x + 1, height(decision.x + 1));
+        break;
+    case 3:
+        p2 = Position(decision.x - 1, height(decision.x - 1));
+        break;
+    default:
+        DCHECK(false) << decision.toString();
+        return false;
+    }
+
+    if (connectedPuyoNums(p2.x, p2.y) >= 4)
+        return true;
+
+    return false;
+}
+
 RensaResult CoreField::simulate(int initialChain)
 {
     RensaNonTracker tracker;
