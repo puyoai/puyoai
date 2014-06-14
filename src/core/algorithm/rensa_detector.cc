@@ -16,15 +16,11 @@ using namespace std;
 std::vector<FeasibleRensaInfo>
 RensaDetector::findFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
 {
-    vector<Plan> plans = Plan::findAvailablePlans(field, kumipuyoSeq);
-
     std::vector<FeasibleRensaInfo> result;
-    for (auto it = plans.cbegin(); it != plans.cend(); ++it) {
-        if (!it->isRensaPlan())
-            continue;
-
-        result.push_back(FeasibleRensaInfo(it->rensaResult(), it->initiatingFrames()));
-    }
+    Plan::iterateAvailablePlans(field, kumipuyoSeq, kumipuyoSeq.size(), [&result](const RefPlan& plan) {
+        if (plan.isRensaPlan())
+            result.emplace_back(plan.rensaResult(), plan.initiatingFrames());
+    });
 
     return result;
 }
