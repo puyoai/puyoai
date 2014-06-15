@@ -50,7 +50,7 @@ void AI::runLoop()
                 }
 
                 if (frameData.myPlayerFrameData().kumipuyoSeq.front().isValid()) {
-                    decision = make_pair(think(frameData.id, field_, next[0], next[1]), next[0]);
+                    decision = make_pair(thinkFast(frameData.id, field_, next[0], next[1]), next[0]);
                     needsSendDecision = true;
 
                     if (decision.first.decision().isValid() && decision.second.isValid()) {
@@ -58,7 +58,7 @@ void AI::runLoop()
                         field_.simulate();
                     }
 
-                    decisionNext = make_pair(think(frameData.id, field_, next[1], next[2]), next[1]);
+                    decisionNext = make_pair(thinkFast(frameData.id, field_, next[1], next[2]), next[1]);
                     needsSendDecisionNext = true;
                 } else {
                     decision = make_pair(think(frameData.id, field_, next[0], next[1]), next[0]);
@@ -87,7 +87,7 @@ void AI::runLoop()
             LOG(INFO) << "STATE_OJAMA_DROPPED";
             resetCurrentField(frameData.myPlayerFrameData().field);
             const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
-            decision = make_pair(think(frameData.id, field_, kumipuyoSeq.get(0), kumipuyoSeq.get(1)), kumipuyoSeq.get(0));
+            decision = make_pair(thinkFast(frameData.id, field_, kumipuyoSeq.get(0), kumipuyoSeq.get(1)), kumipuyoSeq.get(0));
             if (decision.first.decision().isValid() && decision.second.isValid()) {
                 field_.dropKumipuyo(decision.first.decision(), decision.second);
                 field_.simulate();

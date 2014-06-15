@@ -59,9 +59,9 @@ TEST(CoreFieldTest, ForceDrop)
 void testUrl(string url, int expected_chains, int expected_score)
 {
     CoreField f(url);
-    BasicRensaResult rensaInfo = f.simulate();
-    EXPECT_EQ(expected_chains, rensaInfo.chains);
-    EXPECT_EQ(expected_score, rensaInfo.score);
+    RensaResult rensaResult = f.simulate();
+    EXPECT_EQ(expected_chains, rensaResult.chains);
+    EXPECT_EQ(expected_score, rensaResult.score);
 }
 
 TEST(CoreFieldTest, ChainAndScoreTest1)
@@ -94,48 +94,48 @@ TEST(CoreFieldTest, FramesTest) {
     {
         // 1 Rensa, no drop.
         CoreField f("444400");
-        BasicRensaResult info = f.simulate();
-        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_AFTER_NO_DROP, info.frames);
+        RensaResult rensaResult = f.simulate();
+        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_AFTER_NO_DROP, rensaResult.frames);
     }
     {
         CoreField f("500000"
                 "444400");
-        BasicRensaResult info = f.simulate();
-        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP, info.frames);
+        RensaResult rensaResult = f.simulate();
+        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP, rensaResult.frames);
     }
     {
         CoreField f("500000"
                 "400000"
                 "444000");
-        BasicRensaResult info = f.simulate();
+        RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP,
-                  info.frames);
+                  rensaResult.frames);
     }
     {
         CoreField f("500000"
                 "450000"
                 "444000");
-        BasicRensaResult info = f.simulate();
+        RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP,
-                  info.frames);
+                  rensaResult.frames);
     }
     {
         CoreField f("500000"
                 "455000"
                 "444500");
-        BasicRensaResult info = f.simulate();
+        RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP +
                   FRAMES_AFTER_VANISH + FRAMES_AFTER_NO_DROP,
-                  info.frames);
+                  rensaResult.frames);
     }
     {
         CoreField f("560000"
                 "455000"
                 "444500");
-        BasicRensaResult info = f.simulate();
+        RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP +
                   FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP,
-                  info.frames);
+                  rensaResult.frames);
     }
 }
 
@@ -233,13 +233,13 @@ TEST(CoreFieldTest, RemoveTopPuyoFrom)
 TEST(CoreFieldTest, TrackedCoreFieldSimulation)
 {
     CoreField f("400040"
-            "456474"
-            "445667"
-            "556774");
+                "456474"
+                "445667"
+                "556774");
 
 
     RensaTrackResult trackResult;
-    BasicRensaResult basicRensaResult = f.simulateAndTrack(&trackResult);
+    RensaResult basicRensaResult = f.simulateAndTrack(&trackResult);
 
     EXPECT_EQ(5, basicRensaResult.chains);
     EXPECT_EQ(1, trackResult.erasedAt(1, 2));
@@ -275,4 +275,15 @@ TEST(CoreFieldTest, FramesToDropNextWithChigiri)
 
     EXPECT_EQ((CoreField::HEIGHT - 4) * FRAMES_DROP_1_LINE + FRAMES_AFTER_CHIGIRI + FRAMES_CHIGIRI_1_LINE_1 + FRAMES_CHIGIRI_1_LINE_2 + 2 * FRAMES_CHIGIRI_1_LINE_3,
               f.framesToDropNext(Decision(3, 1)));
+}
+
+TEST(CoreFieldTest, SimulateWithOjama)
+{
+    CoreField f(
+        "ORRRRO"
+        "OOOOOO");
+
+    RensaResult rensaResult = f.simulate();
+    EXPECT_EQ(40, rensaResult.score);
+    EXPECT_EQ(1, rensaResult.chains);
 }

@@ -54,23 +54,6 @@ std::string RefPlan::decisionText() const
     return ss.str();
 }
 
-// static
-std::vector<Plan> Plan::findAvailablePlans(const CoreField& field,
-                                           const KumipuyoSeq& kumipuyoSeq)
-{
-    DCHECK(1 <= kumipuyoSeq.size() && kumipuyoSeq.size() <= 3);
-
-    std::vector<Plan> plans;
-    plans.reserve(22 + 22 * 22 + 22 * 22 * 22);
-
-    iterateAvailablePlans(field, kumipuyoSeq, kumipuyoSeq.size(), [&plans](const RefPlan& ref) {
-        plans.push_back(ref.toPlan());
-    });
-
-    return plans;
-}
-
-
 static void iterateAvailablePlansInternal(const CoreField& field,
                                           const KumipuyoSeq& kumipuyoSeq,
                                           std::vector<Decision>& decisions,
@@ -114,7 +97,12 @@ static void iterateAvailablePlansInternal(const CoreField& field,
                 continue;
 
             int dropFrames = nextField.framesToDropNext(decision);
-            BasicRensaResult rensaResult = nextField.simulate();
+            // CoreField::simulate is slow. So, if the last decision does not invoke any rensa,
+            // we'd like to skip simulate.
+            // Even using simulateWhenLastDecisionIs, it looks checking rensaWillOccurWhenLastDecisionIs
+            // is 7~8 % faster.
+            RensaResult rensaResult = nextField.rensaWillOccurWhenLastDecisionIs(decision) ?
+                nextField.simulateWhenLastDecisionIs(decision) : RensaResult();
             if (rensaResult.chains > 0)
                 needsNextFieldRefresh = true;
             if (nextField.color(3, 12) != PuyoColor::EMPTY) {

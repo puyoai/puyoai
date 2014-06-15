@@ -34,15 +34,15 @@ struct SortByFrames {
 
 struct SortByInitiatingFrames {
     bool operator()(const FeasibleRensaInfo& lhs, const FeasibleRensaInfo& rhs) const {
-        if (lhs.initiatingFrames != rhs.initiatingFrames)
-            return lhs.initiatingFrames < rhs.initiatingFrames;
+        if (lhs.initiatingFrames() != rhs.initiatingFrames())
+            return lhs.initiatingFrames() < rhs.initiatingFrames();
 
         // If initiatingFrames is the same, preferrable Rensa should come first.
         // High score is more preferrable, faster rensa is more preferrable.
-        if (lhs.basicRensaResult.score != rhs.basicRensaResult.score)
-            return lhs.basicRensaResult.score > rhs.basicRensaResult.score;
-        if (lhs.basicRensaResult.frames != rhs.basicRensaResult.frames)
-            return lhs.basicRensaResult.frames < rhs.basicRensaResult.frames;
+        if (lhs.score() != rhs.score())
+            return lhs.score() > rhs.score();
+        if (lhs.totalFrames() != rhs.totalFrames())
+            return lhs.totalFrames() < rhs.totalFrames();
 
         return false;
     }
@@ -59,22 +59,22 @@ void EnemyInfo::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& 
 
     sort(result.begin(), result.end(), SortByInitiatingFrames());
     m_feasibleRensaInfos.push_back(EstimatedRensaInfo(
-                                       result.front().basicRensaResult.chains,
-                                       result.front().basicRensaResult.score,
-                                       result.front().initiatingFrames));
+                                       result.front().chains(),
+                                       result.front().score(),
+                                       result.front().initiatingFrames()));
 
     for (vector<FeasibleRensaInfo>::iterator it = result.begin(); it != result.end(); ++it) {
-        if (m_feasibleRensaInfos.back().score < it->basicRensaResult.score) {
-            DCHECK(m_feasibleRensaInfos.back().initiatingFrames < it->initiatingFrames)
+        if (m_feasibleRensaInfos.back().score < it->score()) {
+            DCHECK(m_feasibleRensaInfos.back().initiatingFrames < it->initiatingFrames())
                 << "feasible frames = " << m_feasibleRensaInfos.back().initiatingFrames
-                << " initiating frames = " << it->initiatingFrames
+                << " initiating frames = " << it->initiatingFrames()
                 << " score(1) = " << m_feasibleRensaInfos.back().score
-                << " score(2) = " << it->basicRensaResult.score << endl;
+                << " score(2) = " << it->score() << endl;
 
             m_feasibleRensaInfos.push_back(EstimatedRensaInfo(
-                                               it->basicRensaResult.chains,
-                                               it->basicRensaResult.score,
-                                               it->initiatingFrames));
+                                               it->chains(),
+                                               it->score(),
+                                               it->initiatingFrames()));
 
         }
     }
@@ -99,7 +99,7 @@ void EnemyInfo::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& 
     vector<EstimatedRensaInfo> results;
     for (vector<PossibleRensaInfo>::iterator it = result.begin(); it != result.end(); ++it) {
         // おじゃまがあまり発生しそうにないのは無視
-        if (it->rensaInfo.score < 70)
+        if (it->rensaResult.score < 70)
             continue;
 
         PuyoSet puyoSet(it->necessaryPuyoSet.toPuyoSet());
@@ -115,8 +115,8 @@ void EnemyInfo::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& 
 
         // 3 + k 回ほどぷよを引く必要があり、そのときに必要そうなフレーム数
         int frames = ((CoreField::HEIGHT - averageHeight) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI) * (3 + k);
-        int score = it->rensaInfo.score;
-        int chains = it->rensaInfo.chains;
+        int score = it->rensaResult.score;
+        int chains = it->rensaResult.chains;
         results.push_back(EstimatedRensaInfo(chains, score, frames));
     }
 

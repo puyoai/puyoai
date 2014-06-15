@@ -19,7 +19,7 @@ struct ContainsResult {
             return false;
 
         auto result = s.simulate();
-        return result == info.rensaInfo;
+        return result == info.rensaResult;
     }
 
     const CoreField& f;

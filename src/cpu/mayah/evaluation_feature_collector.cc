@@ -34,10 +34,10 @@ void EvaluationFeatureCollector::collectFeatures(EvaluationFeature& feature, con
 
     int maxChains = 0;
     for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it)
-        maxChains = std::max(maxChains, it->rensaInfo.chains);
+        maxChains = std::max(maxChains, it->rensaResult.chains);
 
     for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (it->rensaInfo.chains < maxChains)
+        if (it->rensaResult.chains < maxChains)
             continue;
 
         RensaEvaluationFeature rensaFeature;
@@ -248,10 +248,10 @@ void EvaluationFeatureCollector::collectFieldHeightFeature(PlanEvaluationFeature
 
 void EvaluationFeatureCollector::collectOngoingRensaFeature(PlanEvaluationFeature& planFeature, const RefPlan& plan, int currentFrameId, const EnemyInfo& enemyInfo)
 {
-    if (enemyInfo.rensaIsOngoing() && enemyInfo.ongoingRensaInfo().rensaInfo.score > scoreForOjama(6)) {
+    if (enemyInfo.rensaIsOngoing() && enemyInfo.ongoingRensaInfo().rensaResult.score > scoreForOjama(6)) {
         // TODO: 対応が適当すぎる
-        if (enemyInfo.ongoingRensaInfo().rensaInfo.score >= scoreForOjama(6) &&
-            plan.score() >= enemyInfo.ongoingRensaInfo().rensaInfo.score &&
+        if (enemyInfo.ongoingRensaInfo().rensaResult.score >= scoreForOjama(6) &&
+            plan.score() >= enemyInfo.ongoingRensaInfo().rensaResult.score &&
             plan.initiatingFrames() <= enemyInfo.ongoingRensaInfo().finishingRensaFrame) {
             LOG(INFO) << plan.decisionText() << " TAIOU";
             planFeature.set(STRATEGY_TAIOU, 1.0);
@@ -327,7 +327,7 @@ void EvaluationFeatureCollector::collectRensaChainFeature(RensaEvaluationFeature
 {
     int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, info.necessaryPuyoSet.toPuyoSet());
 
-    rensaFeature.set(MAX_CHAINS, info.rensaInfo.chains);
+    rensaFeature.set(MAX_CHAINS, info.rensaResult.chains);
     rensaFeature.set(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
     if (numNecessaryPuyos != 0)
         rensaFeature.set(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);

@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
         DropDecision decision = ai.think(frameData);
 
         frameData.playerFrameData[0].field.dropKumipuyo(decision.decision(), frameData.playerFrameData[0].kumipuyoSeq.front());
-        BasicRensaResult info = frameData.playerFrameData[0].field.simulate();
+        RensaResult info = frameData.playerFrameData[0].field.simulate();
         if (info.chains > 0) {
             cout << info.toString() << endl;
             cout << frameData.playerFrameData[0].field.debugOutput() << endl;

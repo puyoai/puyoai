@@ -6,20 +6,20 @@
 #include "base/base.h"
 #include "core/field/core_field.h"
 
-struct BasicRensaResult {
-    BasicRensaResult() : chains(0), score(0), frames(0) {}
+struct RensaResult {
+    RensaResult() : chains(0), score(0), frames(0) {}
 
-    BasicRensaResult(int chains, int score, int frames) : chains(chains), score(score), frames(frames) {}
+    RensaResult(int chains, int score, int frames) : chains(chains), score(score), frames(frames) {}
 
     std::string toString() const;
 
-    friend bool operator==(const BasicRensaResult& lhs, const BasicRensaResult& rhs) {
+    friend bool operator==(const RensaResult& lhs, const RensaResult& rhs) {
         return lhs.chains == rhs.chains &&
             lhs.score == rhs.score &&
             lhs.frames == rhs.frames;
     }
 
-    friend bool operator!=(const BasicRensaResult& lhs, const BasicRensaResult& rhs) {
+    friend bool operator!=(const RensaResult& lhs, const RensaResult& rhs) {
         return !(lhs == rhs);
     }
 

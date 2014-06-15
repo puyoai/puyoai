@@ -116,8 +116,8 @@ void DuelServer::runDuelLoop()
             LOG(FATAL) << "Game is still running?";
             break;
         case GameResult::GAME_HAS_STOPPED:
-            LOG(FATAL) << "Game has already stopped?";
-            break;
+            // Game has stopped.
+            return;
         }
 
         cout << p1_win << " / " << p1_draw << " / " << p1_lose << endl;
