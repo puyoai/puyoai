@@ -173,10 +173,10 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
     {
         CoreField f(field);
         unique_ptr<TrackedPossibleRensaInfo> track(new TrackedPossibleRensaInfo);
-        track->rensaInfo = f.simulateAndTrack(&track->trackResult);
-        if (track->rensaInfo.score > 0) {
+        track->rensaResult = f.simulateAndTrack(&track->trackResult);
+        if (track->rensaResult.score > 0) {
             lock_guard<mutex> lock(mu_);
-            string msg = std::to_string(track->rensaInfo.chains) + "連鎖発火: " + std::to_string(track->rensaInfo.score) + "点";
+            string msg = std::to_string(track->rensaResult.chains) + "連鎖発火: " + std::to_string(track->rensaResult.score) + "点";
             events_[pi].push_back(msg);
             firingChain_[pi] = move(track);
             fireableMainChain_[pi].reset();
@@ -194,27 +194,29 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
         if (3 < kp.size())
             kp.resize(3);
 
-        vector<Plan> plans = Plan::findAvailablePlans(field, kp);
-        double bestTsubushiScore = 0.0;
-        const Plan* bestTsubushiPlan = nullptr;
-        for (const auto& plan : plans) {
-            if (!plan.isRensaPlan())
-                continue;
-            if (3 < plan.chains())
-                continue;
-            if (plan.score() < 200)
-                continue;
+        pair<int, double> bestTsubushiScore = make_pair(100, 0.0); // # of hand & score. Smaller is better.
+        FeasibleRensaInfo feasibleRensaInfo;
+        Plan::iterateAvailablePlans(field, kp, kp.size(), [&bestTsubushiScore, &feasibleRensaInfo](const RefPlan& plan) {
+            if (plan.chains() != 2 && plan.chains() != 3)
+                return;
 
-            double tsubushiScore = static_cast<double>(plan.score()) / plan.totalFrames();
-            if (bestTsubushiScore < tsubushiScore) {
+            // Considers only >= 2rensa double.
+            // 2rensa double = 40 + 80 * (8 + 3) = 40 + 880 = 920
+            // 3rensa = 40 + 40 * 8 + 40 * 16 = 1000
+            if (plan.score() < 920)
+                return;
+
+            pair<int, double> tsubushiScore = make_pair(plan.decisions().size(),
+                                                        -static_cast<double>(plan.score()) / plan.totalFrames());
+            if (tsubushiScore < bestTsubushiScore) {
                 bestTsubushiScore = tsubushiScore;
-                bestTsubushiPlan = &plan;
+                feasibleRensaInfo = FeasibleRensaInfo(plan.rensaResult(), plan.initiatingFrames());
             }
-        }
+        });
 
-        if (bestTsubushiPlan != nullptr) {
+        if (bestTsubushiScore.first < 100) {
             lock_guard<mutex> lock(mu_);
-            fireableTsubushiChain_[pi].reset(new Plan(*bestTsubushiPlan));
+            fireableTsubushiChain_[pi].reset(new FeasibleRensaInfo(feasibleRensaInfo));
         }
     }
 
@@ -224,8 +226,8 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
         const TrackedPossibleRensaInfo* bestRensa = nullptr;
         int maxScore = 0;
         for (const auto& r : rs) {
-            if (maxScore < r.rensaInfo.score) {
-                maxScore = r.rensaInfo.score;
+            if (maxScore < r.rensaResult.score) {
+                maxScore = r.rensaResult.score;
                 bestRensa = &r;
             }
         }
@@ -287,7 +289,7 @@ void Commentator::drawCommentSurface(Screen* screen, int pi) const
     drawText(screen, "本線", LX, LH * 2);
     if (fireableMainChain_[pi].get()) {
         drawText(screen,
-                 to_string(fireableMainChain_[pi]->rensaInfo.chains) + "連鎖" + to_string(fireableMainChain_[pi]->rensaInfo.score) + "点",
+                 to_string(fireableMainChain_[pi]->rensaResult.chains) + "連鎖" + to_string(fireableMainChain_[pi]->rensaResult.score) + "点",
                  LX2, LH * 3);
     }
     drawText(screen, "発火可能潰し", LX, LH * 5);
@@ -304,8 +306,8 @@ void Commentator::drawCommentSurface(Screen* screen, int pi) const
     drawText(screen, "発火中/最終発火", LX, LH * 9);
     if (firingChain_[pi].get()) {
         drawText(screen,
-                 to_string(firingChain_[pi]->rensaInfo.chains) + "連鎖" +
-                 to_string(firingChain_[pi]->rensaInfo.score) + "点",
+                 to_string(firingChain_[pi]->rensaResult.chains) + "連鎖" +
+                 to_string(firingChain_[pi]->rensaResult.score) + "点",
                  LX2, LH * 10);
     }
     if (!message_[pi].empty())

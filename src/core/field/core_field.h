@@ -8,9 +8,9 @@
 class Decision;
 class FieldBitField;
 class Kumipuyo;
-class RensaTrackResult;
-struct BasicRensaResult;
 struct Position;
+class RensaTrackResult;
+struct RensaResult;
 
 class CoreField : public PlainField {
 public:
@@ -71,11 +71,16 @@ public:
     // ----------------------------------------------------------------------
     // simulation
 
+    bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;
+
     // Simulates rensa.
-    BasicRensaResult simulate(int initialChain = 1);
+    RensaResult simulate(int initialChain = 1);
+
+    // Simulates rensa, but the last decision is specified. This will be faster then simulate().
+    RensaResult simulateWhenLastDecisionIs(const Decision&);
 
     // Simulates rensa with tracking.
-    BasicRensaResult simulateAndTrack(RensaTrackResult* trackResult, int initialChain = 1);
+    RensaResult simulateAndTrack(RensaTrackResult* trackResult, int initialChain = 1);
 
     // Vanish the connected puyos. Score will be returned.
     int vanishOnly(int currentChain);
@@ -110,9 +115,9 @@ public:
     }
 
 protected:
-    // Simulates chains. Returns BasicRensaResult.
+    // Simulates chains. Returns RensaResult.
     template<typename Tracker>
-    BasicRensaResult simulateWithTracker(int initialChain, Tracker*);
+    RensaResult simulateWithTracker(int initialChain, int minHeights[], Tracker*);
 
     // Vanishes connected puyos and returns score. If score is 0, no puyos are vanished.
     template<typename Tracker>

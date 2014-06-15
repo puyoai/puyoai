@@ -16,7 +16,6 @@
 #include "duel/game_state_observer.h"
 #include "gui/drawer.h"
 
-class Plan;
 class Screen;
 
 class Commentator : public GameStateObserver, public Drawer {
@@ -54,7 +53,7 @@ private:
     std::string message_[2];
 
     std::unique_ptr<TrackedPossibleRensaInfo> fireableMainChain_[2];
-    std::unique_ptr<Plan> fireableTsubushiChain_[2];
+    std::unique_ptr<FeasibleRensaInfo> fireableTsubushiChain_[2];
     std::unique_ptr<TrackedPossibleRensaInfo> firingChain_[2];
 
     std::deque<std::string> events_[2];

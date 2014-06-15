@@ -5,36 +5,47 @@
 #include "core/field/rensa_result.h"
 #include "core/algorithm/column_puyo_list.h"
 
-struct FeasibleRensaInfo {
+class FeasibleRensaInfo {
+public:
     FeasibleRensaInfo() {}
-    FeasibleRensaInfo(const BasicRensaResult& rensaInfo, int initiatingFrames)
-        : basicRensaResult(rensaInfo), initiatingFrames(initiatingFrames) {}
+    FeasibleRensaInfo(const RensaResult& rensaResult, int initiatingFrames) :
+        rensaResult_(rensaResult), initiatingFrames_(initiatingFrames)
+    {
+    }
 
-    BasicRensaResult basicRensaResult;
-    int initiatingFrames;
+    const RensaResult& rensaResult() const { return rensaResult_; }
+
+    int score() const { return rensaResult_.score; }
+    int chains() const { return rensaResult_.chains; }
+    int totalFrames() const { return rensaResult_.frames + initiatingFrames_; }
+    int initiatingFrames() const { return initiatingFrames_; }
+
+private:
+    RensaResult rensaResult_;
+    int initiatingFrames_;
 };
 
 struct PossibleRensaInfo {
-    BasicRensaResult rensaInfo;
+    RensaResult rensaResult;
     ColumnPuyoList necessaryPuyoSet;
 
     std::string toString() const {
-        return rensaInfo.toString() + necessaryPuyoSet.toString();
+        return rensaResult.toString() + necessaryPuyoSet.toString();
     }
 };
 
 struct TrackedPossibleRensaInfo {
-    BasicRensaResult rensaInfo;
+    RensaResult rensaResult;
     ColumnPuyoList necessaryPuyoSet;
     RensaTrackResult trackResult;
 };
 
 struct OngoingRensaInfo {
     OngoingRensaInfo() {}
-    OngoingRensaInfo(const BasicRensaResult& rensaInfo, int finishingRensaFrame) :
-        rensaInfo(rensaInfo), finishingRensaFrame(finishingRensaFrame) {}
+    OngoingRensaInfo(const RensaResult& rensaResult, int finishingRensaFrame) :
+        rensaResult(rensaResult), finishingRensaFrame(finishingRensaFrame) {}
 
-    BasicRensaResult rensaInfo;
+    RensaResult rensaResult;
     int finishingRensaFrame;
 };
 

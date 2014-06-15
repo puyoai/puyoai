@@ -10,16 +10,31 @@ public:
     SampleRensaAI() : AI("sample_rensa") {}
     virtual ~SampleRensaAI() {}
 
-    virtual DropDecision think(int frameId, const PlainField& f, const Kumipuyo& next1, const Kumipuyo& next2) OVERRIDE {
+    virtual DropDecision thinkFast(int frameId, const PlainField& f, const Kumipuyo& next1, const Kumipuyo& next2) OVERRIDE
+    {
         UNUSED_VARIABLE(frameId);
         KumipuyoSeq seq { next1, next2 };
 
-        LOG(INFO) << CoreField(f).debugOutput() << seq.toString();
+        return eval(f, seq, 2);
+    }
 
-        Decision best;
+    virtual DropDecision think(int frameId, const PlainField& f, const Kumipuyo& next1, const Kumipuyo& next2) OVERRIDE
+    {
+        UNUSED_VARIABLE(frameId);
+        KumipuyoSeq seq { next1, next2 };
+
+        return eval(f, seq, 4);
+    }
+
+private:
+    DropDecision eval(const PlainField& f, const KumipuyoSeq& nexts, int depth)
+    {
+        LOG(INFO) << CoreField(f).debugOutput() << nexts.toString();
+
+        Decision best = Decision(3, 0);
         int score = -100000;
 
-        Plan::iterateAvailablePlans(CoreField(f), seq, 3, [&best, &score](const RefPlan& plan) {
+        Plan::iterateAvailablePlans(CoreField(f), nexts, depth, [&best, &score](const RefPlan& plan) {
             if (!plan.isRensaPlan())
                 return;
 

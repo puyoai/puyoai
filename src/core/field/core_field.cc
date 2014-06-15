@@ -25,8 +25,6 @@ public:
     RensaTracker(RensaTrackResult* trackResult) :
         m_result(trackResult)
     {
-        DCHECK(trackResult);
-
         for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
             for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
                 m_originalY[x][y] = y;
@@ -240,15 +238,17 @@ bool CoreField::dropPuyoOn(int x, PuyoColor c, bool isAxis)
 }
 
 inline static
-Position* checkCell(const CoreField& field, PuyoColor c, FieldBitField& checked, Position* writeHead, int x, int y)
+Position* checkCell(const CoreField& field, PuyoColor c, FieldBitField* checked, Position* writeHead, int x, int y)
 {
-    if (checked.get(x, y))
+    if (c != field.color(x, y))
         return writeHead;
 
-    if (y <= CoreField::HEIGHT && c == field.color(x, y)) {
-        writeHead->x = x;
-        writeHead->y = y;
-        checked.set(x, y);
+    if (checked->get(x, y))
+        return writeHead;
+
+    if (y <= CoreField::HEIGHT) {
+        *writeHead = Position(x, y);
+        checked->set(x, y);
 
         return writeHead + 1;
     }
@@ -269,10 +269,10 @@ Position* CoreField::fillSameColorPosition(int x, int y, PuyoColor color, Positi
     while (readHead != writeHead) {
         Position p = *readHead++;
 
-        writeHead = checkCell(*this, color, *checked, writeHead, p.x + 1, p.y);
-        writeHead = checkCell(*this, color, *checked, writeHead, p.x - 1, p.y);
-        writeHead = checkCell(*this, color, *checked, writeHead, p.x, p.y + 1);
-        writeHead = checkCell(*this, color, *checked, writeHead, p.x, p.y - 1);
+        writeHead = checkCell(*this, color, checked, writeHead, p.x + 1, p.y);
+        writeHead = checkCell(*this, color, checked, writeHead, p.x - 1, p.y);
+        writeHead = checkCell(*this, color, checked, writeHead, p.x, p.y + 1);
+        writeHead = checkCell(*this, color, checked, writeHead, p.x, p.y - 1);
     }
 
     return writeHead;
@@ -288,8 +288,6 @@ int CoreField::vanishOnly(int currentNthChain)
 template<typename Tracker>
 int CoreField::vanish(int nthChain, int minHeights[], Tracker* tracker)
 {
-    DCHECK(tracker);
-
     FieldBitField checked;
     Position eraseQueue[WIDTH * HEIGHT]; // All the positions of erased puyos will be stored here.
     Position* eraseQueueHead = eraseQueue;
@@ -328,7 +326,7 @@ int CoreField::vanish(int nthChain, int minHeights[], Tracker* tracker)
     if (numErasedPuyos == 0)
         return 0;
 
-    // --- Actually erase the Puyos to be vanished.
+    // --- Actually erase the Puyos to be vanished. We erase ojama here also.
     eraseQueuedPuyos(nthChain, eraseQueue, eraseQueueHead, minHeights, tracker);
 
     int rensaBonusCoef = calculateRensaBonusCoef(chainBonus(nthChain), longBonusCoef, colorBonus(numUsedColors));
@@ -411,23 +409,62 @@ int CoreField::dropAfterVanish(int minHeights[], Tracker* tracker)
         return FRAMES_DROP_1_LINE * maxDrops + FRAMES_AFTER_DROP;
 }
 
-BasicRensaResult CoreField::simulate(int initialChain)
+bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
 {
-    RensaNonTracker tracker;
-    return simulateWithTracker(initialChain, &tracker);
+    Position p1 = Position(decision.x, height(decision.x));
+    if (connectedPuyoNums(p1.x, p1.y) >= 4)
+        return true;
+
+    Position p2;
+    switch (decision.r) {
+    case 0:
+    case 2:
+        p2 = Position(decision.x, height(decision.x) - 1);
+        break;
+    case 1:
+        p2 = Position(decision.x + 1, height(decision.x + 1));
+        break;
+    case 3:
+        p2 = Position(decision.x - 1, height(decision.x - 1));
+        break;
+    default:
+        DCHECK(false) << decision.toString();
+        return false;
+    }
+
+    if (connectedPuyoNums(p2.x, p2.y) >= 4)
+        return true;
+
+    return false;
 }
 
-BasicRensaResult CoreField::simulateAndTrack(RensaTrackResult* trackResult, int initialChain)
+RensaResult CoreField::simulate(int initialChain)
+{
+    RensaNonTracker tracker;
+    int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
+    return simulateWithTracker(initialChain, minHeights, &tracker);
+}
+
+RensaResult CoreField::simulateWhenLastDecisionIs(const Decision& decision)
+{
+    RensaNonTracker tracker;
+    int minHeights[MAP_WIDTH] = { 100, height(1) + 1, height(2) + 1, height(3) + 1, height(4) + 1, height(5) + 1, height(6) + 1, 100 };
+    minHeights[decision.x]--;
+    minHeights[decision.childX()]--;
+    return simulateWithTracker(1, minHeights, &tracker);
+}
+
+RensaResult CoreField::simulateAndTrack(RensaTrackResult* trackResult, int initialChain)
 {
     DCHECK(trackResult);
     RensaTracker tracker(trackResult);
-    return simulateWithTracker(initialChain, &tracker);
+    int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
+    return simulateWithTracker(initialChain, minHeights, &tracker);
 }
 
 template<typename Tracker>
-inline BasicRensaResult CoreField::simulateWithTracker(int initialChain, Tracker* tracker)
+inline RensaResult CoreField::simulateWithTracker(int initialChain, int minHeights[], Tracker* tracker)
 {
-    int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
     int chains = initialChain, score = 0, frames = 0;
 
     int nthChainScore;
@@ -437,7 +474,7 @@ inline BasicRensaResult CoreField::simulateWithTracker(int initialChain, Tracker
         frames += dropAfterVanish(minHeights, tracker) + FRAMES_AFTER_VANISH;
     }
 
-    return BasicRensaResult(chains - 1, score, frames);
+    return RensaResult(chains - 1, score, frames);
 }
 
 std::string CoreField::toString() const
