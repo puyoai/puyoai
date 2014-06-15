@@ -1,30 +1,25 @@
 #ifndef CLIENT_CPU_AI_ROUTINE_H_
 #define CLIENT_CPU_AI_ROUTINE_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "core/client/ai/ai.h"
-#include "enemy_info.h"
+
 #include "evaluation_feature.h"
+#include "gazer.h"
 
 class CoreField;
 class DropDecision;
+class Evaluator;
 class KumipuyoSeq;
 class RefPlan;
 
-struct EvalResult {
-    EvalResult(double evaluation, const std::string& message);
-
-    double evaluationScore;
-    std::string message;
-};
-
 class AIRoutine : public AI {
 public:
-    static const int NUM_KEY_PUYOS = 1;
-
     AIRoutine();
+    ~AIRoutine();
 
 protected:
     virtual void gameWillBegin(const FrameData&) OVERRIDE;
@@ -33,11 +28,8 @@ protected:
     virtual void enemyGrounded(const FrameData&) OVERRIDE;
     virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
 
-    EvalResult eval(int currentFrameId, const RefPlan&) const;
-    DropDecision decide(int frameId, const CoreField&, const KumipuyoSeq&, const EnemyInfo&);
-
-    EvaluationParams evaluationParams_;
-    EnemyInfo enemyInfo_;
+    std::unique_ptr<Evaluator> evaluator_;
+    Gazer gazer_;
 };
 
 #endif

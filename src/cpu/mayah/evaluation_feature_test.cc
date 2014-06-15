@@ -4,19 +4,19 @@
 
 using namespace std;
 
-TEST(EvaluationParamsTest, SaveAndLoad)
+TEST(EvaluationFeatureTest, SaveAndLoad)
 {
-    EvaluationParams original(nullptr);
-    original.set(DENSITY_0, 100);
-    original.set(MAX_CHAINS, 0, 10);
+    EvaluationFeature original(nullptr);
+    original.setValue(DENSITY_0, 100);
+    original.setValue(MAX_CHAINS, 0, 10);
 
     original.save("evaluation_feature_test.txt");
 
-    EvaluationParams loaded("evaluation_feature_test.txt");
+    EvaluationFeature loaded("evaluation_feature_test.txt");
 
     // TODO(mayah): We should use EXPECT_EQ here.
     // TODO(mayah): Might fail due to float error.
-    EXPECT_TRUE(original == loaded)
+    EXPECT_EQ(original, loaded)
         << original.toString() << ' ' << loaded.toString();
 }
 
