@@ -8,27 +8,28 @@
 #include "duel/cui.h"
 #include "duel/game_state.h"
 
-using namespace std;
+using std::string;
+using std::cout;
 
 namespace {
+
 const char* C_RED = "\x1b[41m";
 const char* C_BLUE = "\x1b[44m";
 const char* C_GREEN = "\x1b[42m";
 const char* C_YELLOW = "\x1b[43m";
 const char* C_BLACK = "\x1b[49m";
-}
 
 string Locate(int player_id, int x, int y) {
   int pos_x = 1 + 30 * player_id;
   int pos_y = 1;
 
-  stringstream ss;
+  std::stringstream ss;
   ss << "\x1b[" << (pos_y + y) << ";" << (pos_x + x) << "H";
   return ss.str();
 }
 
 string Locate(int x, int y) {
-  stringstream ss;
+  std::stringstream ss;
   ss << "\x1b[" << y << ";" << x << "H";
   return ss.str();
 }
@@ -58,19 +59,18 @@ string GetPuyoText(PuyoColor color, int y = 0) {
   return color_code + text + C_BLACK;
 }
 
-void Cui::clear()
-{
-    cout << "\x1b[2J";
+}  // namespace
+
+void Cui::clear() {
+  cout << "\x1b[2J";
 }
 
-void Cui::onUpdate(const GameState& gameState)
-{
-    Print(0, gameState.field(0), gameState.message(0));
-    Print(1, gameState.field(1), gameState.message(1));
+void Cui::onUpdate(const GameState& gameState) {
+  Print(0, gameState.field(0), gameState.message(0));
+  Print(1, gameState.field(1), gameState.message(1));
 }
 
-void Cui::PrintField(int player_id, const FieldRealtime& field)
-{
+void Cui::PrintField(int player_id, const FieldRealtime& field) {
   int x1, y1, x2, y2, r;
   PuyoColor c1, c2;
   field.GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
@@ -93,8 +93,7 @@ void Cui::PrintField(int player_id, const FieldRealtime& field)
   }
 }
 
-void Cui::PrintNextPuyo(int player_id, const FieldRealtime& field)
-{
+void Cui::PrintNextPuyo(int player_id, const FieldRealtime& field) {
   // Next puyo info
   for (int i = 2; i < 6; i++) {
     const string location =
@@ -103,29 +102,31 @@ void Cui::PrintNextPuyo(int player_id, const FieldRealtime& field)
   }
 }
 
-void Cui::PrintDebugMessage(int player_id, const string& debug_message)
-{
+void Cui::PrintDebugMessage(int player_id, const string& debug_message) {
   // "\x1B[0K" clears the line
   if (!debug_message.empty()) {
     cout << Locate(1, 1 + CoreField::MAP_HEIGHT + 3 + player_id)
-	 << "\x1B[0K" << debug_message << flush;
+	      << "\x1B[0K" << debug_message << std::flush;
   }
-  cout << Locate(1, 1 + CoreField::MAP_HEIGHT + 5) << flush;
+  cout << Locate(1, 1 + CoreField::MAP_HEIGHT + 5) << std::flush;
 }
 
-void Cui::Print(int player_id, const FieldRealtime& field, const string& debug_message)
-{
-    PrintField(player_id, field);
-    PrintOjamaPuyo(player_id, field);
-    PrintNextPuyo(player_id, field);
-    PrintDebugMessage(player_id, debug_message);
+void Cui::Print(int player_id, const FieldRealtime& field,
+		const string& debug_message) {
+  PrintField(player_id, field);
+  PrintOjamaPuyo(player_id, field);
+  PrintNextPuyo(player_id, field);
+  PrintDebugMessage(player_id, debug_message);
 
-    // Score
-    cout << Locate(player_id, 0, CoreField::MAP_HEIGHT + 1) << setw(10) << field.score();
+  // Score
+  cout << Locate(player_id, 0, CoreField::MAP_HEIGHT + 1)
+       << std::setw(10) << field.score();
+
+  // Set cursor
+  cout << Locate(0, CoreField::MAP_HEIGHT + 3);
 }
 
-void Cui::PrintOjamaPuyo(int player_id, const FieldRealtime& field)
-{
-    cout << Locate(player_id, 0, 0) << field.numFixedOjama()
-         << "(" << field.numPendingOjama() << ")          ";
+void Cui::PrintOjamaPuyo(int player_id, const FieldRealtime& field) {
+  cout << Locate(player_id, 0, 0) << field.numFixedOjama()
+       << "(" << field.numPendingOjama() << ")          ";
 }
