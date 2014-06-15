@@ -1,5 +1,5 @@
-#ifndef ENEMY_INFO_H_
-#define ENEMY_INFO_H_
+#ifndef GAZER_H_
+#define GAZER_H_
 
 #include <map>
 #include <string>
@@ -28,7 +28,7 @@ struct EstimatedRensaInfo {
     int initiatingFrames;
 };
 
-class EnemyInfo {
+class Gazer {
 public:
     void initializeWith(int id) {
         setId(id);
@@ -70,7 +70,7 @@ private:
     std::vector<EstimatedRensaInfo> m_possibleRensaInfos;
 };
 
-inline void EnemyInfo::setOngoingRensa(const OngoingRensaInfo& info)
+inline void Gazer::setOngoingRensa(const OngoingRensaInfo& info)
 {
      m_rensaIsOngoing = true;
      m_ongoingRensaInfo = info;

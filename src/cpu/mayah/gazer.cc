@@ -1,4 +1,4 @@
-#include "enemy_info.h"
+#include "gazer.h"
 
 #include <algorithm>
 #include <iostream>
@@ -48,7 +48,7 @@ struct SortByInitiatingFrames {
     }
 };
 
-void EnemyInfo::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
+void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
 {
     m_feasibleRensaInfos.clear();
 
@@ -80,7 +80,7 @@ void EnemyInfo::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& 
     }
 }
 
-void EnemyInfo::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
+void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
 {
     PuyoSet kumipuyoSet;
     for (const auto& x : kumipuyoSeq.underlyingData()) {
@@ -134,7 +134,7 @@ void EnemyInfo::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& 
     }
 }
 
-int EnemyInfo::estimateMaxScore(int frameId) const
+int Gazer::estimateMaxScore(int frameId) const
 {
     int scoreByFeasibleRensas = estimateMaxScoreFromFeasibleRensas(frameId);
     if (scoreByFeasibleRensas >= 0)
@@ -170,17 +170,17 @@ int EnemyInfo::estimateMaxScore(int frameId) const
     return ACCUMULATED_RENSA_SCORE[newChains];
 }
 
-int EnemyInfo::estimateMaxScoreFromFeasibleRensas(int frameId) const
+int Gazer::estimateMaxScoreFromFeasibleRensas(int frameId) const
 {
     return estimateMaxScoreFrom(frameId, m_feasibleRensaInfos);
 }
 
-int EnemyInfo::estimateMaxScoreFromPossibleRensas(int frameId) const
+int Gazer::estimateMaxScoreFromPossibleRensas(int frameId) const
 {
     return estimateMaxScoreFrom(frameId, m_possibleRensaInfos);
 }
 
-int EnemyInfo::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInfo>& rensaInfos) const
+int Gazer::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInfo>& rensaInfos) const
 {
     if (rensaInfos.empty())
         return -1;

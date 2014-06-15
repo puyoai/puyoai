@@ -16,7 +16,6 @@
 #include "core/kumipuyo.h"
 #include "core/state.h"
 #include "duel/sequence_generator.h"
-#include "evaluation_feature_collector.h"
 
 #include "ai_routine.h"
 

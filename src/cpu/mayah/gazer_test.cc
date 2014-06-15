@@ -1,4 +1,4 @@
-#include "enemy_info.h"
+#include "gazer.h"
 
 #include <gtest/gtest.h>
 #include "core/algorithm/puyo_possibility.h"
@@ -6,12 +6,12 @@
 
 using namespace std;
 
-TEST(EnemyInfoTest, UpdatePossibleRensasTest)
+TEST(GazerTest, UpdatePossibleRensasTest)
 {
     TsumoPossibility::initialize();
 
-    EnemyInfo info;
-    info.initializeWith(100);
+    Gazer gazer;
+    gazer.initializeWith(100);
 
     CoreField f("000000"
                 "000000"
@@ -21,20 +21,20 @@ TEST(EnemyInfoTest, UpdatePossibleRensasTest)
                 "557774");
 
     KumipuyoSeq kumipuyos("777777");
-    info.updatePossibleRensas(f, kumipuyos);
+    gazer.updatePossibleRensas(f, kumipuyos);
 
-    EXPECT_EQ(info.possibleRensaInfos().size(), 3U);
-    EXPECT_EQ(info.possibleRensaInfos().back().chains, 4);
+    EXPECT_EQ(gazer.possibleRensaInfos().size(), 3U);
+    EXPECT_EQ(gazer.possibleRensaInfos().back().chains, 4);
 }
 
-TEST(EnemyInfoTest, UpdatePossibleRensasTest2)
+TEST(GazerTest, UpdatePossibleRensasTest2)
 {
     // Should not crash in this test case.
 
     TsumoPossibility::initialize();
 
-    EnemyInfo info;
-    info.initializeWith(100);
+    Gazer gazer;
+    gazer.initializeWith(100);
 
     CoreField f(" O    "
                 " O O  " // 12
@@ -51,5 +51,5 @@ TEST(EnemyInfoTest, UpdatePossibleRensasTest2)
                 "BBOBBR");
 
     KumipuyoSeq kumipuyos("BBRBYB");
-    info.updatePossibleRensas(f, kumipuyos);
+    gazer.updatePossibleRensas(f, kumipuyos);
 }
