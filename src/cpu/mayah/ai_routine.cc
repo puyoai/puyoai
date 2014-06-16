@@ -29,7 +29,7 @@ void AIRoutine::gameWillBegin(const FrameData& frameData)
     gazer_.initializeWith(frameData.id);
 }
 
-void AIRoutine::gameHasEnd(const FrameData&)
+void AIRoutine::gameHasEnded(const FrameData&)
 {
 }
 
@@ -77,7 +77,6 @@ void AIRoutine::enemyNext2Appeared(const FrameData& frameData)
     int currentFrameId = frameData.id;
 
     gazer_.setId(currentFrameId);
-
     gazer_.updateFeasibleRensas(frameData.enemyPlayerFrameData().field, frameData.enemyPlayerFrameData().kumipuyoSeq);
     gazer_.updatePossibleRensas(frameData.enemyPlayerFrameData().field, frameData.enemyPlayerFrameData().kumipuyoSeq);
 

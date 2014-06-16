@@ -28,7 +28,7 @@ protected:
     virtual void gameWillBegin(const FrameData&) {}
 
     // When a game has finished, gameHasEnd will be called.
-    virtual void gameHasEnd(const FrameData&) {}
+    virtual void gameHasEnded(const FrameData&) {}
 
     // think will be called when ai should decide the next hand.
     // Basically, this will be called when NEXT2 has appeared.
