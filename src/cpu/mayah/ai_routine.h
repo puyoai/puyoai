@@ -29,6 +29,7 @@ protected:
     virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
 
     std::unique_ptr<Evaluator> evaluator_;
+    std::unique_ptr<EvaluationFeature> feature_;
     Gazer gazer_;
 };
 
