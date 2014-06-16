@@ -7,7 +7,7 @@
 
 #include "core/client/ai/ai.h"
 
-#include "evaluation_feature.h"
+#include "feature_parameter.h"
 #include "gazer.h"
 
 class CoreField;
@@ -28,8 +28,7 @@ protected:
     virtual void enemyGrounded(const FrameData&) OVERRIDE;
     virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
 
-    std::unique_ptr<Evaluator> evaluator_;
-    std::unique_ptr<EvaluationFeature> feature_;
+    std::unique_ptr<FeatureParameter> featureParameter_;
     Gazer gazer_;
 };
 

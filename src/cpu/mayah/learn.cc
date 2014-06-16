@@ -8,65 +8,42 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "ai.h"
-#include "enemy_info.h"
+#include "core/algorithm/plan.h"
+#include "core/algorithm/puyo_possibility.h"
+#include "core/field/core_field.h"
+#include "core/puyo_color.h"
+
+#include "evaluator.h"
 #include "evaluation_feature.h"
-#include "evaluation_feature_collector.h"
-#include "field.h"
-#include "plan.h"
-#include "player_info.h"
-#include "puyo.h"
-#include "puyo_possibility.h"
+#include "gazer.h"
+#include "learning_evaluation_feature.h"
 
 using namespace std;
 
 const double LEARNING_COEF = 1 / 1000.0;
 
-struct FrameInput {
-    FrameInput() {}
-    FrameInput(const Field& left, const vector<KumiPuyo>& kumiPuyos, const Field& right) :
-        myField(left), kumiPuyos(kumiPuyos), enemyField(right) {}
-
-    Field myField;
-    vector<KumiPuyo> kumiPuyos;
-    Field enemyField;
-};
-
-void convert(string& str)
-{
-    for (string::size_type i = 0; i < str.size(); ++i) {
-        switch (str[i]) {
-        case '0': str[i] = '0' + EMPTY; break;
-        case '1': str[i] = '0' + RED; break;
-        case '2': str[i] = '0' + BLUE; break;
-        case '3': str[i] = '0' + YELLOW; break;
-        case '4': str[i] = '0' + GREEN; break;
-        case '5': str[i] = '0' + OJAMA; break;
-        default: DCHECK(false);
-        }
-    }
-}
-
-void updatePlanParam(EvaluationParams& params, const PlanEvaluationFeature& currentFeature, const PlanEvaluationFeature& teacherFeature)
+void updateFeature(EvaluationParams& params,
+                   const EvaluationFeature& currentFeature,
+                   const EvaluationFeature& teacherFeature)
 {
     for (int i = 0; i < SIZE_OF_PLAN_FEATURE_PARAM; ++i) {
-        PlanFeatureParam paramName = toPlanFeatureParam(i);
-        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
+        EvaluationFeatureKey key = toEvaluationFeature(i);
+        double dT = (currentFeature.getValue(key) - teacherFeature.getValue(key)) * LEARNING_COEF;
         cout << "learning: " << paramName << ' '
              << params.get(paramName) << ' '
-             << currentFeature.get(paramName) << ' ' 
-             << teacherFeature.get(paramName) << ' '
+             << currentFeature.getValue(paramName) << ' '
+             << teacherFeature.getValue(paramName) << ' '
              << dT << endl;
         params.add(paramName, -dT);
     }
 
     for (int i = 0; i < SIZE_OF_PLAN_RANGE_FEATURE_PARAM; ++i) {
-        PlanRangeFeatureParam paramName = toPlanRangeFeatureParam(i);
+        SparseEvaluationFeatureKey key = toSparseEvaluationFeatureKey(i);
         double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
         cout << "learning: " << paramName << ' '
              << params.get(paramName, currentFeature.get(paramName)) << ' '
              << params.get(paramName, teacherFeature.get(paramName)) << ' '
-             << currentFeature.get(paramName) << ' ' 
+             << currentFeature.get(paramName) << ' '
              << teacherFeature.get(paramName) << ' '
              << dT << endl;
         params.add(paramName, currentFeature.get(paramName), -dT);
@@ -86,47 +63,14 @@ void updatePlanParam(EvaluationParams& params, const PlanEvaluationFeature& curr
             double dT = it->second * LEARNING_COEF;
             params.add(it->first.first, it->first.second, -dT);
         }
-    }    
-}
-
-void updateRensaParam(EvaluationParams& params, const RensaEvaluationFeature& currentFeature, const RensaEvaluationFeature& teacherFeature)
-{
-    for (int i = 0; i < SIZE_OF_RENSA_FEATURE_PARAM; ++i) {
-        RensaFeatureParam paramName = toRensaFeatureParam(i);
-        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
-        cout << "learning: " << paramName << ' '
-             << params.get(paramName) << ' '
-             << currentFeature.get(paramName) << ' ' 
-             << teacherFeature.get(paramName) << ' '
-             << dT << endl;
-        params.add(paramName, -dT);
     }
-
-    for (int i = 0; i < SIZE_OF_RENSA_RANGE_FEATURE_PARAM; ++i) {
-        RensaRangeFeatureParam paramName = toRensaRangeFeatureParam(i);
-        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
-        cout << "learning: " << paramName << ' '
-             << params.get(paramName, currentFeature.get(paramName)) << ' '
-             << params.get(paramName, teacherFeature.get(paramName)) << ' '
-             << currentFeature.get(paramName) << ' ' 
-             << teacherFeature.get(paramName) << ' '
-             << dT << endl;
-        params.add(paramName, currentFeature.get(paramName), -dT);
-        params.add(paramName, teacherFeature.get(paramName), dT);
-    }
-}
-
-void updateParam(EvaluationParams& params, const EvaluationFeature& currentFeature, const EvaluationFeature& teacherFeature)
-{
-    updateRensaParam(params, currentFeature.findBestRensaFeature(params), teacherFeature.findBestRensaFeature(params));
-    updatePlanParam(params, currentFeature.planFeature(), teacherFeature.planFeature());
 }
 
 class Learner {
 public:
     Learner() : m_numLearn(0), m_numMatchedTeacher(0) {}
 
-    void learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
+    void learn(EvaluationParams& params, const Gazer& gazer,
                const Field& currentField, const vector<KumiPuyo>& kumiPuyos,
                const Field& teacherField);
 
@@ -138,9 +82,10 @@ private:
     int m_numMatchedTeacher;
 };
 
-void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
-                    const Field& currentField, const vector<KumiPuyo>& kumiPuyos,
-                    const Field& teacherField)
+void Learner::learn(LearningEvaluationFeature* feature,
+                    const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
+                    const Gazer& gazer, const Decision& teacherDecision)
+
 {
     ++m_numLearn;
     cout << "learn" << endl;
@@ -163,18 +108,6 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
     vector<boost::shared_future<void>> futures;
     futures.reserve(plans.size());
 
-#if 0
-    // TODO(mayah): I would like to do this, but this causes SEGV after several hundred of executions.
-    // I'm not sure why. This code has some problem?
-    for (size_t i = 0; i < plans.size(); ++i) {
-        futures.push_back(boost::async(boost::launch::async, [&features, &plans, &enemyInfo, i]() {
-                EvaluationFeatureCollector::collectFeatures(features[i], plans[i], AI::NUM_KEY_PUYOS, 0, enemyInfo);
-        }));
-    }
-    // TODO(mayah): If clang++ on mac regularly uses libc++, I would like to use std::async
-    // instead of boost::async.
-#else
-    // TODO(mayah): Instead of the previous for-loop, this seems working. Werid...
     for (size_t i = 0; i < plans.size(); ++i) {
         boost::packaged_task<void> pt(boost::bind(
                 EvaluationFeatureCollector::collectFeatures,
@@ -182,12 +115,11 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
                 plans[i],
                 AI::NUM_KEY_PUYOS,
                 0,
-                enemyInfo));
+                gazer));
 
         futures.push_back(pt.get_future());
         boost::thread th(boost::move(pt));
     }
-#endif
 
     vector<pair<double, size_t> > scores(plans.size());
     for (size_t i = 0; i < plans.size(); ++i) {
@@ -197,7 +129,7 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
             futures[i].wait();
             double score = features[i].calculateScore(params);
             scores[i] = make_pair(score, i);
-        }        
+        }
     }
     sort(scores.begin(), scores.end(), greater<pair<double, size_t> >());
 
@@ -243,76 +175,43 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    // TODO(mayah): Maybe we have to use constant variable name here.
-    EvaluationParams params("feature.txt");
-
-    FrameInput frameInputs[3];
-    bool shouldSkip = false;
-    int fieldNum = 0;
-    string left, sequence, right;
-
-    MyPlayerInfo myPlayerInfo;
-    EnemyInfo enemyInfo;
-
+    LearningEvaluationFeature feature("feature.txt");
     Learner learner;
+    Gazer gazer;
 
-    while (cin >> left >> sequence >> right) {
-        if (left == "===") {
-            fieldNum = 0;
-            shouldSkip = false;
-            cout << "end" << endl;
-            continue;
+    CoreField field;
+    KumipuyoSeq kumipuyoSeq = generateSequence();
+
+    for (size_t i = 0; i + 2 < seq.size(); ++i) {
+        KumipuyoSeq seq = kumipuyo.subsequence(i, 2);
+        map<Decision, EvaluationFeature> m;
+        Plan::iterateAvaiablePlans(field, seq, 2, [](const RefPlan& plan) {
+            double score = Evaluator().eval(feature, plan, 1, gazer);
+            if (score > maxScore)
+                score = maxScore;
+        });
+
+        Decision teacherDecision;
+        while (!teacherDecision.isValid()) {
+            cout << "Decision ? " << endl;
+            string str;
+            getilne(cin, str);
+            if (str == "q" || str = "quit" || str == "exit")
+                break;
+
+            int x, r;
+            if (sscanf(str.c_str(), "%d %d", &x, &r) != 2)
+                continue;
+
+            teacherDecision = Decision(x, r);
         }
 
-        if (shouldSkip)
-            continue;
+        if (!teacherDecision.isValid())
+            break;
 
-        convert(left);
-        convert(sequence);
-        convert(right);
-
-        vector<KumiPuyo> kumiPuyos;
-        setKumiPuyo(sequence, &kumiPuyos);
-        kumiPuyos.resize(2);
-        frameInputs[fieldNum % 3] = FrameInput(Field(left), kumiPuyos, Field(right));
-
-        if (fieldNum >= 2) {
-            const Field& current = frameInputs[fieldNum % 3].myField;
-            const Field& previous = frameInputs[(fieldNum + 2) % 3].myField;
-            // When we have an OJAMA puyo, skip this battle.
-            if (current.countColorPuyos() != current.countPuyos()) 
-                shouldSkip = true;
-            // When puyo is vanished, we also skip this battle.
-            // TODO(mayah): we have to consider this later.
-            if (current.countColorPuyos() != previous.countColorPuyos() + 2)
-                shouldSkip = true;
-
-            if (!shouldSkip) {
-                const Field& previous2 = frameInputs[(fieldNum + 1) % 3].myField;
-                const vector<KumiPuyo>& kumiPuyos = frameInputs[(fieldNum + 1) % 3].kumiPuyos;
-
-                myPlayerInfo.forceEstimatedField(previous2);
-                enemyInfo.initializeWith(1);
-                enemyInfo.updatePossibleRensas(frameInputs[(fieldNum + 1) % 3].enemyField, vector<KumiPuyo>());
-
-                learner.learn(params, enemyInfo, previous2, kumiPuyos, current);
-            }
-        }
-
-        ++fieldNum;
-        cout << params.toString() << endl;
+        learner.learn(field, seq, teacherDecision);
     }
 
-    cout << params.toString() << endl;
-
-    cout << "# learn = " << learner.numLearn() << endl;
-    cout << "# match = " << learner.numMatchedTeacher() << endl;
-    cout << "# ratio = " << learner.ratioMatchedTeacher() << endl;
-
-    if (params.save("feature_learned.txt")) {
-        cout << "Saved as feature_learned.txt" << endl;
-    } else {
-        cout << "Save faild..." << endl;
-    }
+    CHECK(feature.save("feature_learned.txt"));
     return 0;
 }

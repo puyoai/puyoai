@@ -1,4 +1,4 @@
-#include "evaluation_feature.h"
+#include "feature_parameter.h"
 
 #include <fstream>
 #include <map>
@@ -9,21 +9,15 @@
 
 using namespace std;
 
-EvaluationFeature::EvaluationFeature(const char* filename) :
-    featuresCoef_(SIZE_OF_EVALUATION_FEATURE_KEY),
-    sparseFeaturesCoef_(SIZE_OF_EVALUATION_SPARSE_FEATURE_KEY)
+FeatureParameter::FeatureParameter(const char* filename) :
+    coef_(SIZE_OF_EVALUATION_FEATURE_KEY),
+    sparseCoef_(SIZE_OF_EVALUATION_SPARSE_FEATURE_KEY)
 {
-#define DEFINE_PARAM(key) /* ignored */
-#define DEFINE_SPARSE_PARAM(key, numValue) sparseFeaturesCoef_[key].resize(numValue);
-#include "evaluation_feature.tab"
-#undef DEFINE_PARAM
-#undef DEFINE_SPARSE_PARAM
-
-    if (filename != nullptr)
-        CHECK(load(filename));
+    DCHECK(filename) << "filename should not be null.";
+    CHECK(load(filename));
 }
 
-bool EvaluationFeature::save(const char* filename)
+bool FeatureParameter::save(const char* filename)
 {
     try {
         ofstream ofs(filename, ios::out | ios::trunc);
@@ -40,13 +34,19 @@ bool EvaluationFeature::save(const char* filename)
 
         return true;
     } catch (std::exception& e) {
-        LOG(WARNING) << "EvaluationFeature::save failed: " << e.what();
+        LOG(WARNING) << "FeatureParameter::save failed: " << e.what();
         return false;
     }
 }
 
-bool EvaluationFeature::load(const char* filename)
+bool FeatureParameter::load(const char* filename)
 {
+#define DEFINE_PARAM(key) /* ignored */
+#define DEFINE_SPARSE_PARAM(key, numValue) sparseCoef_[key].resize(numValue);
+#include "evaluation_feature.tab"
+#undef DEFINE_PARAM
+#undef DEFINE_SPARSE_PARAM
+
     map<string, vector<double>> keyValues;
 
     try {
@@ -61,7 +61,7 @@ bool EvaluationFeature::load(const char* filename)
 
             char c;
             if (!((ss >> c) && c == '=')) {
-                LOG(WARNING) << "Invalid EvaluationFeatureFormat: " << str;
+                LOG(WARNING) << "Invalid FeatureParameterFormat: " << str;
                 return false;
             }
 
@@ -74,14 +74,14 @@ bool EvaluationFeature::load(const char* filename)
         }
 
 #define DEFINE_PARAM(key) if (keyValues.count(#key)) {                \
-            setValue(key, keyValues[#key].front());                   \
+            coef_[key] = keyValues[#key].front();                     \
         }
 #define DEFINE_SPARSE_PARAM(key, maxValue) if (keyValues.count(#key)) { \
             if (maxValue != keyValues[#key].size()) {                   \
-                LOG(WARNING) << "Invalid EvaluationFeatureFormat: Length mismatch."; \
+                LOG(WARNING) << "Invalid FeatureParameterFormat: Length mismatch."; \
                 return false;                                           \
             }                                                           \
-            setValue(key, keyValues[#key]);                             \
+            sparseCoef_[key] = keyValues[#key];                         \
         }
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
@@ -89,20 +89,20 @@ bool EvaluationFeature::load(const char* filename)
 
         return true;
     } catch (std::exception& e) {
-        LOG(WARNING) << "EvaluationFeature::load failed: " << e.what();
+        LOG(WARNING) << "FeatureParameter::load failed: " << e.what();
         return false;
     }
 }
 
-string EvaluationFeature::toString() const
+string FeatureParameter::toString() const
 {
     ostringstream ss;
 
     // TODO(mayah): We should not use this kind of hack. Use for-loop.
-#define DEFINE_PARAM(key) ss << (#key) << " = " << getValue(key) << endl;
+#define DEFINE_PARAM(key) ss << (#key) << " = " << coef_[key] << endl;
 #define DEFINE_SPARSE_PARAM(key, maxValue) ss << (#key) << " = ";       \
     for (int i = 0; i < (maxValue); ++i) {                              \
-        ss << getValue(key, i) << ' ';                                  \
+        ss << sparseCoef_[key][i] << ' ';                               \
     }                                                                   \
     ss << endl;
 #include "evaluation_feature.tab"
@@ -112,8 +112,7 @@ string EvaluationFeature::toString() const
     return ss.str();
 }
 
-bool operator==(const EvaluationFeature& lhs, const EvaluationFeature& rhs)
+bool operator==(const FeatureParameter& lhs, const FeatureParameter& rhs)
 {
-    return lhs.featuresCoef_ == rhs.featuresCoef_ &&
-        lhs.sparseFeaturesCoef_ == rhs.sparseFeaturesCoef_;
+    return lhs.coef_ == rhs.coef_ && lhs.sparseCoef_ == rhs.sparseCoef_;
 }

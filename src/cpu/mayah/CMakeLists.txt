@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 cpu_setup("mayah")
 
 add_library(mayah_lib
-            ai_routine.cc evaluation_feature.cc evaluator.cc gazer.cc)
+            ai_routine.cc feature_parameter.cc evaluator.cc gazer.cc)
 
 function(mayah_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
@@ -29,6 +29,5 @@ cpu_target_link_libraries(interactive puyoai_duel)
 cpu_add_runner(run.sh)
 cpu_add_runner(feature.txt)
 
-mayah_add_test(evaluation_feature_test)
 mayah_add_test(gazer_test)
 
