@@ -5,7 +5,7 @@
 #include "core/client/connector/drop_decision.h"
 #include "core/frame_data.h"
 
-#include "evaluation_feature.h"
+#include "feature_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
 
@@ -14,9 +14,8 @@ using namespace std;
 AIRoutine::AIRoutine() :
     AI("mayah")
 {
-    feature_.reset(new EvaluationFeature("feature.txt"));
-    LOG(INFO) << feature_->toString();
-    evaluator_.reset(new Evaluator);
+    featureParameter_.reset(new FeatureParameter("feature.txt"));
+    LOG(INFO) << featureParameter_->toString();
 }
 
 AIRoutine::~AIRoutine()
@@ -44,10 +43,10 @@ DropDecision AIRoutine::think(int frameId, const PlainField& plainField, const K
     DropDecision dropDecision;
     Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
                                 [this, frameId, &bestScore, &dropDecision](const RefPlan& plan) {
-            EvalResult result = evaluator_->eval(*feature_, plan, frameId, gazer_);
-            if (bestScore < result.evaluationScore) {
-                bestScore = result.evaluationScore;
-                dropDecision = DropDecision(plan.decisions().front(), result.message);
+            double score = Evaluator(*featureParameter_).eval(plan, frameId, gazer_);
+            if (bestScore < score) {
+                bestScore = score;
+                dropDecision = DropDecision(plan.decisions().front(), "");
             }
     });
 
