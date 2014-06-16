@@ -32,23 +32,23 @@ EvalResult::EvalResult(double score, const string& message) :
     }
 }
 
-EvalResult Evaluator::eval(const RefPlan& plan, int currentFrameId, const Gazer& gazer)
+EvalResult Evaluator::eval(const EvaluationFeature& feature, const RefPlan& plan, int currentFrameId, const Gazer& gazer)
 {
     double score = 0.0;
-    score += evalFrameFeature(plan);
+    score += evalFrameFeature(feature, plan);
 #if USE_EMPTY_AVAILABILITY_FEATURE
-    score += evalEmptyAvailabilityFeature(plan);
+    score += evalEmptyAvailabilityFeature(feature, plan);
 #endif
 #if USE_CONNECTION_FEATURE
-    score += evalConnectionFeature(plan);
+    score += evalConnectionFeature(feature, plan);
 #endif
-    score += evalDensityFeature(plan);
-    score += evalPuyoPattern33Feature(plan);
-    score += evalFieldHeightFeature(plan);
+    score += evalDensityFeature(feature, plan);
+    score += evalPuyoPattern33Feature(feature, plan);
+    score += evalFieldHeightFeature(feature, plan);
 #if USE_THIRD_COLUMN_HEIGHT_FEATURE
-    score += evalThirdColumnHeightFeature(plan);
+    score += evalThirdColumnHeightFeature(feature, plan);
 #endif
-    score += evalOngoingRensaFeature(plan, currentFrameId, gazer);
+    score += evalOngoingRensaFeature(feature, plan, currentFrameId, gazer);
 
     vector<TrackedPossibleRensaInfo> rensaInfos =
         RensaDetector::findPossibleRensasWithTracking(plan.field(), NUM_KEY_PUYOS);
@@ -68,14 +68,14 @@ EvalResult Evaluator::eval(const RefPlan& plan, int currentFrameId, const Gazer&
         fieldAfterDrop.forceDrop();
 
         double s = 0;
-        s += evalRensaChainFeature(plan, rensaInfo);
+        s += evalRensaChainFeature(feature, plan, rensaInfo);
 #if USE_HAND_WIDTH_FEATURE
-        s += evalRensaHandWidthFeature(plan, rensaInfo);
+        s += evalRensaHandWidthFeature(feature, plan, rensaInfo);
 #endif
 #if USE_CONNECTION_FEATURE
-        s += evalRensaConnectionFeature(plan, fieldAfterDrop);
+        s += evalRensaConnectionFeature(feature, plan, fieldAfterDrop);
 #endif
-        s += evalRensaGarbageFeature(plan, fieldAfterDrop);
+        s += evalRensaGarbageFeature(feature, plan, fieldAfterDrop);
 
         if (s > maxRensaScore)
             maxRensaScore = s;
@@ -85,17 +85,17 @@ EvalResult Evaluator::eval(const RefPlan& plan, int currentFrameId, const Gazer&
     return EvalResult(score, "");
 }
 
-double Evaluator::evalFrameFeature(const RefPlan& plan)
+double Evaluator::evalFrameFeature(const EvaluationFeature& feature, const RefPlan& plan)
 {
     double s = 0;
-    s += feature_.score(TOTAL_FRAMES, plan.totalFrames());
+    s += feature.score(TOTAL_FRAMES, plan.totalFrames());
     // TODO(mayah): Why totalFrames is 0?
     if (plan.totalFrames() != 0)
-        s += feature_.score(TOTAL_FRAMES_INVERSE, 1.0 / plan.totalFrames());
+        s += feature.score(TOTAL_FRAMES_INVERSE, 1.0 / plan.totalFrames());
     return s;
 }
 
-double Evaluator::evalEmptyAvailabilityFeature(const RefPlan& plan)
+double Evaluator::evalEmptyAvailabilityFeature(const EvaluationFeature& feature, const RefPlan& plan)
 {
     const CoreField& field = plan.field();
 
@@ -121,7 +121,7 @@ double Evaluator::evalEmptyAvailabilityFeature(const RefPlan& plan)
             if (field.color(x + 1, y) == EMPTY) --right;
             if (field.color(x + 1, y + 1) == EMPTY) --right;
 
-            s += feature_.score(k[left][right], 1);
+            s += feature.score(k[left][right], 1);
         }
     }
 
@@ -150,13 +150,13 @@ static double calculateConnection(Feature& feature, const CoreField& field, cons
     return s;
 }
 
-double Evaluator::evalConnectionFeature(const RefPlan& plan)
+double Evaluator::evalConnectionFeature(const EvaluationFeature& feature, const RefPlan& plan)
 {
     static const EvaluationFeatureKey keys[] = {
         CONNECTION_1, CONNECTION_2, CONNECTION_3,
     };
 
-    return calculateConnection(feature_, plan.field(), keys);
+    return calculateConnection(feature, plan.field(), keys);
 }
 
 // Takes 2x3 field, and counts each color puyo number.
@@ -185,16 +185,16 @@ static double calculateDensity(Feature& feature, const CoreField& field, const T
     return s;
 }
 
-double Evaluator::evalDensityFeature(const RefPlan& plan)
+double Evaluator::evalDensityFeature(const EvaluationFeature& feature, const RefPlan& plan)
 {
     static const EvaluationFeatureKey keys[] = {
         DENSITY_0, DENSITY_1, DENSITY_2, DENSITY_3, DENSITY_4,
     };
 
-    return calculateDensity(feature_, plan.field(), keys);
+    return calculateDensity(feature, plan.field(), keys);
 }
 
-double Evaluator::evalPuyoPattern33Feature(const RefPlan& plan)
+double Evaluator::evalPuyoPattern33Feature(const EvaluationFeature& feature, const RefPlan& plan)
 {
     const CoreField& field = plan.field();
 
@@ -216,10 +216,10 @@ double Evaluator::evalPuyoPattern33Feature(const RefPlan& plan)
         patterns[field.color(x    , y + 1)] |= 1 << 7;
         patterns[field.color(x + 1, y + 1)] |= 1 << 8;
 
-        s += feature_.score(PUYO_PATTERN_33, patterns[RED]);
-        s += feature_.score(PUYO_PATTERN_33, patterns[GREEN]);
-        s += feature_.score(PUYO_PATTERN_33, patterns[YELLOW]);
-        s += feature_.score(PUYO_PATTERN_33, patterns[BLUE]);
+        s += feature.score(PUYO_PATTERN_33, patterns[RED]);
+        s += feature.score(PUYO_PATTERN_33, patterns[GREEN]);
+        s += feature.score(PUYO_PATTERN_33, patterns[YELLOW]);
+        s += feature.score(PUYO_PATTERN_33, patterns[BLUE]);
     }
 
     {
@@ -239,16 +239,16 @@ double Evaluator::evalPuyoPattern33Feature(const RefPlan& plan)
         patterns[field.color(x    , y + 1)] |= 1 << 7;
         patterns[field.color(x - 1, y + 1)] |= 1 << 8;
 
-        s += feature_.score(PUYO_PATTERN_33, patterns[RED]);
-        s += feature_.score(PUYO_PATTERN_33, patterns[GREEN]);
-        s += feature_.score(PUYO_PATTERN_33, patterns[YELLOW]);
-        s += feature_.score(PUYO_PATTERN_33, patterns[BLUE]);
+        s += feature.score(PUYO_PATTERN_33, patterns[RED]);
+        s += feature.score(PUYO_PATTERN_33, patterns[GREEN]);
+        s += feature.score(PUYO_PATTERN_33, patterns[YELLOW]);
+        s += feature.score(PUYO_PATTERN_33, patterns[BLUE]);
     }
 
     return s;
 }
 
-double Evaluator::evalFieldHeightFeature(const RefPlan& plan)
+double Evaluator::evalFieldHeightFeature(const EvaluationFeature& feature, const RefPlan& plan)
 {
     double s = 0;
 
@@ -267,17 +267,17 @@ double Evaluator::evalFieldHeightFeature(const RefPlan& plan)
         heightSquareSum += diff * diff;
     }
 
-    s += feature_.score(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSum);
-    s += feature_.score(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
+    s += feature.score(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSum);
+    s += feature.score(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
     return s;
 }
 
-double Evaluator::evalThirdColumnHeightFeature(const RefPlan& plan)
+double Evaluator::evalThirdColumnHeightFeature(const EvaluationFeature& feature, const RefPlan& plan)
 {
-    return feature_.score(THIRD_COLUMN_HEIGHT, plan.field().height(3));
+    return feature.score(THIRD_COLUMN_HEIGHT, plan.field().height(3));
 }
 
-double Evaluator::evalOngoingRensaFeature(const RefPlan& plan, int currentFrameId, const Gazer& gazer)
+double Evaluator::evalOngoingRensaFeature(const EvaluationFeature& feature, const RefPlan& plan, int currentFrameId, const Gazer& gazer)
 {
     if (gazer.rensaIsOngoing() && gazer.ongoingRensaInfo().rensaResult.score > scoreForOjama(6)) {
         // TODO: 対応が適当すぎる
@@ -285,7 +285,7 @@ double Evaluator::evalOngoingRensaFeature(const RefPlan& plan, int currentFrameI
             plan.score() >= gazer.ongoingRensaInfo().rensaResult.score &&
             plan.initiatingFrames() <= gazer.ongoingRensaInfo().finishingRensaFrame) {
             LOG(INFO) << plan.decisionText() << " TAIOU";
-            return feature_.score(STRATEGY_TAIOU, 1.0);
+            return feature.score(STRATEGY_TAIOU, 1.0);
         }
     }
 
@@ -293,7 +293,7 @@ double Evaluator::evalOngoingRensaFeature(const RefPlan& plan, int currentFrameI
         return 0;
 
     if (plan.field().isZenkeshi()) {
-        return feature_.score(STRATEGY_ZENKESHI, 1);
+        return feature.score(STRATEGY_ZENKESHI, 1);
     }
 
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
@@ -302,20 +302,20 @@ double Evaluator::evalOngoingRensaFeature(const RefPlan& plan, int currentFrameI
     // --- 1.1. 十分でかい場合は打って良い。
     // / TODO: 十分でかいとは？ / とりあえず致死量ということにする
     if (plan.score() >= estimatedMaxScore + scoreForOjama(60)) {
-        return feature_.score(STRATEGY_LARGE_ENOUGH, 1);
+        return feature.score(STRATEGY_LARGE_ENOUGH, 1);
     }
 
     // --- 1.2. 対応手なく潰せる
     // TODO: 実装があやしい。
     if (plan.score() >= scoreForOjama(18) && estimatedMaxScore <= scoreForOjama(6)) {
-        return feature_.score(STRATEGY_TSUBUSHI, 1);
+        return feature.score(STRATEGY_TSUBUSHI, 1);
     }
 
     // --- 1.3. 飽和したので打つしかなくなった
     // TODO: これは EnemyRensaInfo だけじゃなくて MyRensaInfo も必要なのでは……。
     // TODO: 60 個超えたら打つとかなんか間違ってるだろう。
     if (plan.field().countPuyos() >= 60) {
-        return feature_.score(STRATEGY_HOUWA, 1);
+        return feature.score(STRATEGY_HOUWA, 1);
     }
 
     // --- 1.4. 打つと有利になる
@@ -326,24 +326,24 @@ double Evaluator::evalOngoingRensaFeature(const RefPlan& plan, int currentFrameI
     //ss << "SAKIUCHI will lose : score = " << plan.score() << " EMEMY score = " << estimatedMaxScore << endl;
     // LOG(INFO) << plan.decisionText() << " " << ss.str();
     double s = 0;
-    s += feature_.score(STRATEGY_SCORE, plan.score());
-    s += feature_.score(STRATEGY_SAKIUCHI, 1.0);
+    s += feature.score(STRATEGY_SCORE, plan.score());
+    s += feature.score(STRATEGY_SAKIUCHI, 1.0);
     return s;
 }
 
-double Evaluator::evalRensaChainFeature(const RefPlan& /*plan*/, const TrackedPossibleRensaInfo& info)
+double Evaluator::evalRensaChainFeature(const EvaluationFeature& feature, const RefPlan& /*plan*/, const TrackedPossibleRensaInfo& info)
 {
     int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, info.necessaryPuyoSet.toPuyoSet());
 
     double s = 0;
-    s += feature_.score(MAX_CHAINS, info.rensaResult.chains);
-    s += feature_.score(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
+    s += feature.score(MAX_CHAINS, info.rensaResult.chains);
+    s += feature.score(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
     if (numNecessaryPuyos != 0)
-        s += feature_.score(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
+        s += feature.score(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
     return s;
 }
 
-double Evaluator::evalRensaHandWidthFeature(const RefPlan& plan, const TrackedPossibleRensaInfo& info)
+double Evaluator::evalRensaHandWidthFeature(const EvaluationFeature& feature, const RefPlan& plan, const TrackedPossibleRensaInfo& info)
 {
     // -----
     int distanceCountResult[5] = { 0, 0, 0, 0, 0 };
@@ -383,17 +383,17 @@ double Evaluator::evalRensaHandWidthFeature(const RefPlan& plan, const TrackedPo
     double r43 = d3 != 0 ? d4 / d3 : 0;
 
     double s = 0;
-    s += feature_.score(HAND_WIDTH_2, d2);
-    s += feature_.score(HAND_WIDTH_3, d3);
-    s += feature_.score(HAND_WIDTH_4, d4);
-    s += feature_.score(HAND_WIDTH_RATIO_32, r32);
-    s += feature_.score(HAND_WIDTH_RATIO_43, r43);
-    s += feature_.score(HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
-    s += feature_.score(HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
+    s += feature.score(HAND_WIDTH_2, d2);
+    s += feature.score(HAND_WIDTH_3, d3);
+    s += feature.score(HAND_WIDTH_4, d4);
+    s += feature.score(HAND_WIDTH_RATIO_32, r32);
+    s += feature.score(HAND_WIDTH_RATIO_43, r43);
+    s += feature.score(HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
+    s += feature.score(HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
     return s;
 }
 
-double Evaluator::evalRensaConnectionFeature(const RefPlan& plan, const CoreField& fieldAfterDrop)
+double Evaluator::evalRensaConnectionFeature(const EvaluationFeature& feature, const RefPlan& plan, const CoreField& fieldAfterDrop)
 {
     UNUSED_VARIABLE(plan);
 
@@ -401,10 +401,10 @@ double Evaluator::evalRensaConnectionFeature(const RefPlan& plan, const CoreFiel
         CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3,
     };
 
-    return calculateConnection(feature_, fieldAfterDrop, keys);
+    return calculateConnection(feature, fieldAfterDrop, keys);
 }
 
-double Evaluator::evalRensaGarbageFeature(const RefPlan& plan, const CoreField& fieldAfterDrop)
+double Evaluator::evalRensaGarbageFeature(const EvaluationFeature& feature, const RefPlan& plan, const CoreField& fieldAfterDrop)
 {
-    return feature_.score(NUM_GARBAGE_PUYOS, plan.field().countPuyos() - fieldAfterDrop.countPuyos());
+    return feature.score(NUM_GARBAGE_PUYOS, plan.field().countPuyos() - fieldAfterDrop.countPuyos());
 }
