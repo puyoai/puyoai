@@ -5,7 +5,7 @@
 #include "capture/capture.h"
 #include "core/real_color.h"
 #include "gui/bounding_box.h"
-#include "gui/color_map.h"
+#include "gui/pixel_color.h"
 #include "gui/screen.h"
 #include "gui/SDL_prims.h"
 
@@ -35,7 +35,7 @@ void AnalyzerResultDrawer::draw(Screen* screen)
             for (int y = 1; y <= 12; ++y) {
                 Box b = BoundingBox::instance().get(pi, x, y);
                 RealColor rc = par->realColor(x, y);
-                Uint32 color = ColorMap::instance().getColor(rc);
+                Uint32 color = toPixelColor(surface, rc);
                 SDL_DrawLine(surface, b.sx + 1, b.sy + 1, b.dx - 1, b.sy + 1, color);
                 SDL_DrawLine(surface, b.sx + 1, b.sy + 1, b.sx + 1, b.dy - 1, color);
                 SDL_DrawLine(surface, b.dx - 1, b.sy + 1, b.dx - 1, b.dy - 1, color);
@@ -59,7 +59,7 @@ void AnalyzerResultDrawer::draw(Screen* screen)
         for (int i = 0; i < 4; ++i) {
             Box b = BoundingBox::instance().get(pi, npp[i]);
             RealColor rc = par->realColor(npp[i]);
-            Uint32 color = ColorMap::instance().getColor(rc);
+            Uint32 color = toPixelColor(surface, rc);
             SDL_DrawLine(surface, b.sx + 1, b.sy + 1, b.dx - 1, b.sy + 1, color);
             SDL_DrawLine(surface, b.sx + 1, b.sy + 1, b.sx + 1, b.dy - 1, color);
             SDL_DrawLine(surface, b.dx - 1, b.sy + 1, b.dx - 1, b.dy - 1, color);

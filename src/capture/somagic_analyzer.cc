@@ -6,7 +6,7 @@
 #include <sstream>
 
 #include "capture/color.h"
-#include "gui/color_map.h"
+#include "gui/pixel_color.h"
 #include "gui/util.h"
 
 using namespace std;
@@ -249,7 +249,7 @@ void SomagicAnalyzer::drawBoxWithAnalysisResult(SDL_Surface* surface, const Box&
             HSV hsv = rgb.toHSV();
 
             RealColor rc = toRealColor(hsv);
-            putpixel(surface, bx, by, ColorMap::instance().getColor(rc));
+            putpixel(surface, bx, by, toPixelColor(surface, rc));
         }
     }
 }

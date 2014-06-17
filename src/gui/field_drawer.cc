@@ -18,6 +18,7 @@
 #include "duel/field_realtime.h"
 #include "duel/game_state.h"
 #include "gui/main_window.h"
+#include "gui/pixel_color.h"
 
 DECLARE_string(data_dir);
 
@@ -89,7 +90,7 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
                     c = puyoColorOf(c2);
             }
 
-            SDL_FillRect(surface, &r, GetPuyoColor(surface, c));
+            SDL_FillRect(surface, &r, toPixelColor(surface, c));
         }
     }
 
@@ -115,7 +116,7 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
     };
     for (int i = 0; i < 4; ++i) {
         SDL_Rect r { bs[i].sx, bs[i].sy, bs[i].w(), bs[i].h() };
-        Uint32 c = GetPuyoColor(surface, field.GetNextPuyo(i + 2));
+        Uint32 c = toPixelColor(surface, field.GetNextPuyo(i + 2));
         SDL_FillRect(surface, &r, c);
     }
 
@@ -141,36 +142,4 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
                       b.sx, b.sy,
                       surface, ss.str().c_str(), white);
     }
-}
-
-Uint32 FieldDrawer::GetPuyoColor(SDL_Surface* surface, char color) const
-{
-    Uint32 c = 0;
-    switch (color) {
-    case EMPTY:
-        c = SDL_MapRGB(surface->format, 0, 0, 0);
-        break;
-    case OJAMA:
-        c = SDL_MapRGB(surface->format, 127, 127, 127);
-        break;
-    case WALL:
-        c = SDL_MapRGB(surface->format, 255, 255, 255);
-        break;
-    case RED:
-        c = SDL_MapRGB(surface->format, 255, 0, 0);
-        break;
-    case BLUE:
-        c = SDL_MapRGB(surface->format, 0, 0, 255);
-        break;
-    case YELLOW:
-        c = SDL_MapRGB(surface->format, 255, 255, 0);
-        break;
-    case GREEN:
-        c = SDL_MapRGB(surface->format, 0, 255, 0);
-        break;
-    default:
-        break;
-    }
-
-    return c;
 }

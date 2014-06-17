@@ -17,21 +17,13 @@ public:
     PuyoColor toPuyoColor(RealColor) const;
     RealColor toRealColor(PuyoColor) const;
 
-    Uint32 getColor(PuyoColor c) const;
-    Uint32 getColor(RealColor rc) const;
-
 private:
     ColorMap();
     ~ColorMap();
 
     std::mutex mu_;
-    RealColor realColors_[10];
-    PuyoColor puyoColors_[10];
-
-    SDL_Color sdl_colors_[10];
-    Uint32 colors_[10];
-
-    Uint32 realPuyoColors_[NUM_PUYO_REAL_COLOR];
+    RealColor realColors_[NUM_PUYO_COLORS];
+    PuyoColor puyoColors_[NUM_REAL_COLORS];
 };
 
 #endif

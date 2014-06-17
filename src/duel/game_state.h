@@ -17,17 +17,25 @@ public:
 
     const FieldRealtime& field(int i) const {
         switch (i) {
-        case 0: return p1Field_;
-        case 1: return p2Field_;
-        default: CHECK(false);
+        case 0:
+            return p1Field_;
+        case 1:
+            return p2Field_;
+        default:
+            CHECK(false);
+            return p1Field_;
         }
     }
 
     const std::string& message(int i) const {
         switch (i) {
-        case 0: return p1Message_;
-        case 1: return p2Message_;
-        default: CHECK(false);
+        case 0:
+            return p1Message_;
+        case 1:
+            return p2Message_;
+        default:
+            CHECK(false);
+            return p1Message_;
         }
     }
 
