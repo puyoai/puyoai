@@ -29,8 +29,6 @@ public:
 
 private:
     void drawField(Screen*, const FieldRealtime&);
-    // TODO(mayah): Why char? Why not PuyoColor?
-    Uint32 GetPuyoColor(SDL_Surface*, char color) const;
 
     mutable std::mutex mu_;
     std::unique_ptr<GameState> gameState_;
