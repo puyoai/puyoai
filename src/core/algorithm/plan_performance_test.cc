@@ -67,7 +67,7 @@ TEST(PlanPerformanceTest, Filled23)
 
     // Since seq has 2 kumipuyo, this won't test all kumipuyo possibilities.
     for (int i = 0; i < 10; i++) {
-        Tsc tsc("PlanFilled24");
+        Tsc tsc("PlanFilled23");
         Plan::iterateAvailablePlans(f, seq, 3, [](const RefPlan&){});
     }
 
