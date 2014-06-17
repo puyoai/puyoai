@@ -95,7 +95,7 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
     char filename[] = "Player1";
     filename[6] += playerId; // TODO(mayah): What's this !!
 
-    if (execlp(programName.c_str(), filename) < 0)
+    if (execl(programName.c_str(), filename, nullptr) < 0)
         PLOG(FATAL) << "Failed to start a child process. ";
 
     LOG(FATAL) << "should not be reached.";
