@@ -14,52 +14,58 @@
 #include "core/puyo_color.h"
 
 #include "evaluator.h"
-#include "evaluation_feature.h"
+#include "feature_parameter.h"
 #include "gazer.h"
-#include "learning_evaluation_feature.h"
 
 using namespace std;
 
 const double LEARNING_COEF = 1 / 1000.0;
 
-void updateFeature(EvaluationParams& params,
-                   const EvaluationFeature& currentFeature,
-                   const EvaluationFeature& teacherFeature)
+void updateFeature(FeatureParameter* parameter,
+                   const CollectedFeature& currentFeature,
+                   const CollectedFeature& teacherFeature)
 {
-    for (int i = 0; i < SIZE_OF_PLAN_FEATURE_PARAM; ++i) {
-        EvaluationFeatureKey key = toEvaluationFeature(i);
-        double dT = (currentFeature.getValue(key) - teacherFeature.getValue(key)) * LEARNING_COEF;
-        cout << "learning: " << paramName << ' '
-             << params.get(paramName) << ' '
-             << currentFeature.getValue(paramName) << ' '
-             << teacherFeature.getValue(paramName) << ' '
+    for (int i = 0; i < SIZE_OF_EVALUATION_FEATURE_KEY; ++i) {
+        EvaluationFeatureKey key = toEvaluationFeatureKey(i);
+
+        // Constraint. We don't change TOTAL_FRAMES parameter.
+        if (key == TOTAL_FRAMES)
+            continue;
+
+        double curVal = currentFeature.collectedFeatures.count(key) ? currentFeature.collectedFeatures.find(key)->second : 0;
+        double teaVal = teacherFeature.collectedFeatures.count(key) ? teacherFeature.collectedFeatures.find(key)->second : 0;
+        double dT = LEARNING_COEF * (curVal - teaVal); // TODO(mayah): correct?
+        cout << "learning: " << toString(key) << ' '
+             << "current: val=" << curVal << " score=" << curScore << "  "
+             << "teacher: val=" << curVal << " score=" << teaScore << "  "
              << dT << endl;
-        params.add(paramName, -dT);
+        parameter->addValue(key, -dT);
     }
 
-    for (int i = 0; i < SIZE_OF_PLAN_RANGE_FEATURE_PARAM; ++i) {
-        SparseEvaluationFeatureKey key = toSparseEvaluationFeatureKey(i);
-        double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
-        cout << "learning: " << paramName << ' '
-             << params.get(paramName, currentFeature.get(paramName)) << ' '
-             << params.get(paramName, teacherFeature.get(paramName)) << ' '
-             << currentFeature.get(paramName) << ' '
-             << teacherFeature.get(paramName) << ' '
+    for (int i = 0; i < SIZE_OF_EVALUATION_SPARSE_FEATURE_KEY; ++i) {
+        EvaluationSparseFeatureKey key = toEvaluationSparseFeatureKey(i);
+        map<pair<EvaluationSparseFeatureKey, int>, int> diff;
+        for (const auto& entry : currentFeature.collectedSparseFeatures) {
+            for (int v : entry.second)
+                diff[make_pair(entry.first, v)] += 1;
+        }
+        for (const auto& entry : teacherFeature.collectedSparseFeatures) {
+            for (int v : entry.second)
+                diff[make_pair(entry.first, v)] -= 1;
+        }
+
+        double dT = LEARNING_COEF * (curScore - teaScore) / max(curScore, teaScore); // TODO(mayah): correct?
+        cout << "learning: " << toString(key) << ' '
+             << "current: score=" << curScore << "  "
+             << "teacher: score=" << teaScore << "  "
              << dT << endl;
+        parameter->addValue(key, -dT);
+
         params.add(paramName, currentFeature.get(paramName), -dT);
         params.add(paramName, teacherFeature.get(paramName), dT);
     }
 
     {
-        map<pair<PlanSparseFeatureParam, int>, int> diff;
-        for (auto it = currentFeature.sparseFeatures().begin(); it != currentFeature.sparseFeatures().end(); ++it)
-            diff[*it] += 1;
-        for (auto it = teacherFeature.sparseFeatures().begin(); it != teacherFeature.sparseFeatures().end(); ++it)
-            diff[*it] -= 1;
-
-        cout << "*** " << diff.size() << endl;
-
-        for (auto it = diff.begin(); it != diff.end(); ++it) {
             double dT = it->second * LEARNING_COEF;
             params.add(it->first.first, it->first.second, -dT);
         }
@@ -74,12 +80,13 @@ public:
                const Field& currentField, const vector<KumiPuyo>& kumiPuyos,
                const Field& teacherField);
 
-    int numLearn() const { return m_numLearn; }
-    int numMatchedTeacher() const { return m_numMatchedTeacher; }
-    double ratioMatchedTeacher() const { return 100 * numMatchedTeacher() / numLearn(); }
+    int numLearned() const { return numLearn_; }
+    int numMatched() const { return numMatched_; }
+    double ratioMatched() const { return 100 * numMatched() / numLearned(); }
+
 private:
-    int m_numLearn;
-    int m_numMatchedTeacher;
+    int numLearned_;
+    int numMatched_;
 };
 
 void Learner::learn(LearningEvaluationFeature* feature,
