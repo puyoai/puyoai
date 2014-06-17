@@ -20,7 +20,7 @@ ColorMap::ColorMap()
     memset(colors_, 0, sizeof(colors_));
 
     UniqueSDLSurface s(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, 1, 1, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000)));
-    static int COLORS[][3] = {
+    static int COLORS[10][3] = {
         { 0, 0, 0 },
         { 0, 255, 255 },
         { 0, 0, 0 },
@@ -30,6 +30,7 @@ ColorMap::ColorMap()
         { 255, 255, 0 },
         { 0, 255, 255 },
         { 255, 0, 255 },
+        { 0, 0, 0 }
     };
 
     for (int i = 0; i < 10; i++) {
