@@ -82,7 +82,7 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
             SDL_Rect r = b.toSDLRect();
 
             PuyoColor c = field.field().color(x, y);
-            if (field.IsInUserState()) {
+            if (field.userPlayable()) {
                 if (x == kumipuyoPos.axisX() && y == kumipuyoPos.axisY())
                     c = puyoColorOf(kumipuyo.axis);
                 if (x == kumipuyoPos.childX() && y == kumipuyoPos.childY())

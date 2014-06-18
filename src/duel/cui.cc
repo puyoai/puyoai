@@ -93,7 +93,7 @@ void Cui::PrintField(int player_id, const FieldRealtime& field)
     for (int y = 0; y < CoreField::MAP_HEIGHT; y++) {
         for (int x = 0; x < CoreField::MAP_WIDTH; x++) {
             PuyoColor color = field.field().color(x, y);
-            if (field.IsInUserState()) {
+            if (field.userPlayable()) {
                 if (x == kumipuyoPos.axisX() && y == kumipuyoPos.axisY())
                     color = kumipuyo.axis;
                 if (x == kumipuyoPos.childX() && y == kumipuyoPos.childY())
