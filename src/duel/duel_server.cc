@@ -157,7 +157,7 @@ GameResult DuelServer::duel(ConnectorManager* manager)
         SendInfo(manager, current_id, player_info);
 
         // CHECK IF THE GAME IS OVER.
-        GameResult result = game.GetWinner();
+        GameResult result = game.gameResult();
         if (result != GameResult::PLAYING) {
             gameResult = result;
             break;
