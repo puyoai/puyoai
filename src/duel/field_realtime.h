@@ -50,6 +50,7 @@ public:
 
     const CoreField& field() const { return field_; }
     const KumipuyoSeq& kumipuyoSeq() const { return kumipuyoSeq_; }
+    const Kumipuyo& kumipuyo(int nth = 0) const { return kumipuyoSeq_.get(nth); }
     const KumipuyoPos& kumipuyoPos() const { return kumipuyoPos_; }
 
     enum SimulationState {

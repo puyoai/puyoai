@@ -73,9 +73,8 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
 {
     SDL_Surface* surface = screen->surface();
 
-    int x1, y1, x2, y2, r;
-    PuyoColor c1, c2;
-    field.GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
+    Kumipuyo kumipuyo = field.kumipuyo();
+    KumipuyoPos kumipuyoPos = field.kumipuyoPos();
 
     for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
         for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
@@ -84,10 +83,10 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
 
             PuyoColor c = field.field().color(x, y);
             if (field.IsInUserState()) {
-                if (x == x1 && y == y1)
-                    c = puyoColorOf(c1);
-                else if (x == x2 && y == y2)
-                    c = puyoColorOf(c2);
+                if (x == kumipuyoPos.axisX() && y == kumipuyoPos.axisY())
+                    c = puyoColorOf(kumipuyo.axis);
+                if (x == kumipuyoPos.childX() && y == kumipuyoPos.childY())
+                    c = puyoColorOf(kumipuyo.child);
             }
 
             SDL_FillRect(surface, &r, toPixelColor(surface, c));
