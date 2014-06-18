@@ -21,10 +21,6 @@ public:
     // input is accepted.
     bool PlayOneFrame(Key key, FrameContext*);
 
-    // Pretty print of the field.
-    void Print() const;
-    void Print(const std::string& debug_message) const;
-
     // Checks if a player is dead.
     bool isDead() const { return isDead_; }
 
