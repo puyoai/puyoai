@@ -18,20 +18,6 @@
 
 using namespace std;
 
-Game::Game(DuelServer* duelServer) :
-    duelServer_(duelServer)
-{
-    KumipuyoSeq seq = generateSequence();
-    LOG(INFO) << "Puyo sequence=" << seq.toString();
-
-    for (int i = 0; i < 2; i++) {
-        field[i].reset(new FieldRealtime(i, seq));
-        latest_decision_[i] = Decision::NoInputDecision();
-    }
-}
-
-Game::~Game() {}
-
 namespace {
 
 /**
@@ -67,6 +53,20 @@ int UpdateDecision(const vector<ReceivedData>& data, const FieldRealtime& field,
 }
 
 } // namespace
+
+Game::Game(DuelServer* duelServer) :
+    duelServer_(duelServer)
+{
+    KumipuyoSeq seq = generateSequence();
+    LOG(INFO) << "Puyo sequence=" << seq.toString();
+
+    for (int i = 0; i < 2; i++) {
+        field[i].reset(new FieldRealtime(i, seq));
+        latest_decision_[i] = Decision::NoInputDecision();
+    }
+}
+
+Game::~Game() {}
 
 void Game::Play(const vector<ReceivedData> data[2])
 {
