@@ -64,6 +64,7 @@ public:
 
     const CoreField& field() const { return field_; }
     const std::vector<Decision>& decisions() const { return decisions_; }
+    const Decision& decision(int nth) const { return decisions_[nth]; }
     const RensaResult& rensaResult() const { return rensaResult_; }
 
     int chains() const { return rensaResult_.chains; }
