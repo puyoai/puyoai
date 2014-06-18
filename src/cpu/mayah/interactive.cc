@@ -14,8 +14,8 @@
 #include "core/field/core_field.h"
 #include "core/frame_data.h"
 #include "core/kumipuyo.h"
+#include "core/sequence_generator.h"
 #include "core/state.h"
-#include "duel/sequence_generator.h"
 
 #include "ai_routine.h"
 

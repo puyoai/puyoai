@@ -10,7 +10,7 @@ add_subdirectory(server)
 
 add_library(puyoai_core STATIC
             ctrl.cc frame_data.cc key.cc kumipuyo.cc
-            plain_field.cc puyo_color.cc real_color.cc)
+            plain_field.cc puyo_color.cc real_color.cc sequence_generator.cc)
 
 # ----------------------------------------------------------------------
 # tests
@@ -25,3 +25,4 @@ endfunction()
 
 puyoai_core_add_test(ctrl)
 puyoai_core_add_test(puyo_color)
+puyoai_core_add_test(sequence_generator)
