@@ -113,6 +113,8 @@ void Game::Play(const vector<ReceivedData> data[2]) {
     }
   }
 
+  // TODO(mayah): Play should return GameState, and DuelServer updates its state
+  // in runLoop(). If we do so, Game does not need duelServer anymore.
   duelServer_->updateGameState(
       GameState(*field[0], *field[1],
 		last_accepted_messages_[0], last_accepted_messages_[1]));
