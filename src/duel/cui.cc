@@ -71,20 +71,17 @@ void Cui::onUpdate(const GameState& gameState) {
 }
 
 void Cui::PrintField(int player_id, const FieldRealtime& field) {
-  int x1, y1, x2, y2, r;
-  PuyoColor c1, c2;
-  field.GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
+  Kumipuyo kumipuyo = field.kumipuyo();
+  KumipuyoPos kumipuyoPos = field.kumipuyoPos();
 
   for (int y = 0; y < CoreField::MAP_HEIGHT; y++) {
     for (int x = 0; x < CoreField::MAP_WIDTH; x++) {
       PuyoColor color = field.field().color(x, y);
       if (field.IsInUserState()) {
-        if (x == x1 && y == y1) {
-          color = c1;
-        }
-        if (x == x2 && y == y2) {
-          color = c2;
-        }
+        if (x == kumipuyoPos.axisX() && y == kumipuyoPos.axisY())
+          color = kumipuyo.axis;
+        if (x == kumipuyoPos.childX() && y == kumipuyoPos.childY())
+          color = kumipuyo.child;
       }
 
       cout << Locate(player_id, x * 2, CoreField::MAP_HEIGHT - y);
