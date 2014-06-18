@@ -676,3 +676,30 @@ vector<int> FieldRealtime::determineColumnOjamaAmount()
 
     return ret;
 }
+
+PuyoColor FieldRealtime::puyoColor(NextPuyoPosition npp) const
+{
+    switch (npp) {
+    case NextPuyoPosition::CURRENT_AXIS:
+        return kumipuyo(0).axis;
+    case NextPuyoPosition::CURRENT_CHILD:
+        return kumipuyo(0).child;
+    case NextPuyoPosition::NEXT1_AXIS:
+        return kumipuyo(1).axis;
+    case NextPuyoPosition::NEXT1_CHILD:
+        return kumipuyo(1).child;
+    case NextPuyoPosition::NEXT2_AXIS:
+        if (delayFramesWNextAppear_ > 0)
+            return PuyoColor::EMPTY;
+        return kumipuyo(2).axis;
+    case NextPuyoPosition::NEXT2_CHILD:
+        if (delayFramesWNextAppear_ > 0)
+            return PuyoColor::EMPTY;
+        return kumipuyo(2).child;
+    default:
+        break;
+    }
+
+    DCHECK(false) << static_cast<int>(npp);
+    return PuyoColor::INVALID;
+}

@@ -7,6 +7,7 @@
 #include "core/frame_data.h"
 #include "core/key.h"
 #include "core/kumipuyo.h"
+#include "core/next_puyo.h"
 #include "core/server/connector/received_data.h"
 #include "core/state.h"
 
@@ -52,6 +53,7 @@ public:
     const KumipuyoSeq& kumipuyoSeq() const { return kumipuyoSeq_; }
     const Kumipuyo& kumipuyo(int nth = 0) const { return kumipuyoSeq_.get(nth); }
     const KumipuyoPos& kumipuyoPos() const { return kumipuyoPos_; }
+    PuyoColor puyoColor(NextPuyoPosition) const;
 
     enum SimulationState {
         STATE_USER,     // A user is moving puyo
