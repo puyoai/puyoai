@@ -22,7 +22,7 @@ public:
     ~Game();
 
     void Play(const std::vector<ReceivedData> data[2]);
-    GameResult GetWinner() const;
+    GameResult gameResult() const;
     void GetFieldInfo(std::string* player1, std::string* player2) const;
 
 private:

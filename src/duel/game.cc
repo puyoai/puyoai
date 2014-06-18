@@ -122,23 +122,19 @@ void Game::Play(const vector<ReceivedData> data[2])
                   last_accepted_messages_[0], last_accepted_messages_[1]));
 }
 
-GameResult Game::GetWinner() const
+GameResult Game::gameResult() const
 {
     bool p1_dead = field[0]->isDead();
     bool p2_dead = field[1]->isDead();
-    if (!p1_dead && !p2_dead) {
-        return GameResult::PLAYING;
-    }
-    if (p1_dead && p2_dead) {
-        return GameResult::DRAW;
-    }
-    if (p1_dead) {
-        return GameResult::P2_WIN;
-    }
-    if (p2_dead) {
-        return GameResult::P1_WIN;
-    }
 
+    if (!p1_dead && !p2_dead)
+        return GameResult::PLAYING;
+    if (p1_dead && p2_dead)
+        return GameResult::DRAW;
+    if (p1_dead)
+        return GameResult::P2_WIN;
+    if (p2_dead)
+        return GameResult::P1_WIN;
     return GameResult::PLAYING;
 }
 
@@ -193,8 +189,8 @@ void Game::GetFieldInfo(std::string* player1, std::string* player2) const
     field[1]->GetCurrentPuyo(&pos_x_1, &pos_y_1, &c1, &dummy1, &dummy2, &dummy3, &r1);
 
     string win0, win1;
-    GameResult winner = GetWinner();
-    switch (winner) {
+    GameResult result = gameResult();
+    switch (result) {
     case GameResult::PLAYING:
         break;
     case GameResult::DRAW:
