@@ -108,10 +108,17 @@ void Cui::PrintField(int player_id, const FieldRealtime& field)
 
 void Cui::PrintNextPuyo(int player_id, const FieldRealtime& field)
 {
+    NextPuyoPosition npp[] = {
+        NextPuyoPosition::NEXT1_CHILD,
+        NextPuyoPosition::NEXT1_AXIS,
+        NextPuyoPosition::NEXT2_CHILD,
+        NextPuyoPosition::NEXT2_AXIS,
+    };
+
     // Next puyo info
-    for (int i = 2; i < 6; i++) {
-        const string location = Locate(player_id, 9 * 2, 3 + (i - 2) + ((i - 2) / 2));
-        cout << location << GetPuyoText(field.GetNextPuyo(i));
+    for (int i = 0; i < 4; ++i) {
+        const string location = Locate(player_id, 9 * 2, 3 + i + (i / 2));
+        cout << location << GetPuyoText(field.puyoColor(npp[i]));
     }
 }
 
