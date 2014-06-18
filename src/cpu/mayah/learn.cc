@@ -12,7 +12,7 @@
 #include "core/algorithm/puyo_possibility.h"
 #include "core/field/core_field.h"
 #include "core/puyo_color.h"
-#include "duel/sequence_generator.h"
+#include "core/sequence_generator.h"
 
 #include "evaluator.h"
 #include "feature_parameter.h"
@@ -116,6 +116,8 @@ int main(int argc, char* argv[])
         // Lists teacher decision.
         pair<Decision, Decision> teacherDecision;
         while (!teacherDecision.first.isValid()) {
+            cout << field.debugOutput() << endl
+                 << seq.toString() << endl;
             cout << "Decision x1 r1 x2 r2 ? " << flush;
             string str;
             getline(cin, str);
@@ -136,7 +138,7 @@ int main(int argc, char* argv[])
         if (!teacherDecision.first.isValid())
             break;
 
-
+        field.dropKumipuyo(teacherDecision.first, seq.get(0));
     }
 
     CHECK(parameter.save("learned.txt"));
