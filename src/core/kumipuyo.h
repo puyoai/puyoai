@@ -33,9 +33,14 @@ public:
     KumipuyoPos() : x(0), y(0), r(0) {}
     KumipuyoPos(int x, int y, int r) : x(x), y(y), r(r) {}
 
+    int axisX() const { return x; }
+    int axisY() const { return y; }
+    int childX() const { return x + (r == 1) - (r == 3); }
+    int childY() const { return y + (r == 0) - (r == 2); }
+
     std::string debugString() const;
 
-public:
+    // TODO(mayah): Make these private?
     int x;
     int y;
     int r;
