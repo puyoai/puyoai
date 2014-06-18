@@ -25,6 +25,7 @@ public:
     // Checks if a player is dead.
     bool isDead() const { return isDead_; }
 
+    // TODO(mayah): Deprecates these 2 methods. These methods are not intuitive.
     PuyoColor GetNextPuyo(int n) const;
     void GetCurrentPuyo(int* x1, int* y1, PuyoColor* c1, int* x2, int* y2, PuyoColor* c2, int* r) const;
 
