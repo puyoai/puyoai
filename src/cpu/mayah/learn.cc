@@ -43,6 +43,7 @@ void updateFeature(FeatureParameter* parameter,
                    const CollectedFeature& teacherFeature)
 {
     const double D = dsigmoid(currentFeature.score - teacherFeature.score);
+    cout << "learning: D = " << D << endl;
 
     for (int i = 0; i < SIZE_OF_EVALUATION_FEATURE_KEY; ++i) {
         EvaluationFeatureKey key = toEvaluationFeatureKey(i);
@@ -55,7 +56,7 @@ void updateFeature(FeatureParameter* parameter,
         double teaV = teacherFeature.collectedFeatures.count(key) ? teacherFeature.collectedFeatures.find(key)->second : 0;
         double curScore = parameter->score(key, curV);
         double teaScore = parameter->score(key, teaV);
-        double dT = D * (curScore - teaScore);
+        double dT = D * (curV - teaV);
         cout << "learning: " << toString(key) << ' '
              << "current: val=" << curV << " score=" << curScore << "  "
              << "teacher: val=" << teaV << " score=" << teaScore << "  "
@@ -78,9 +79,7 @@ void updateFeature(FeatureParameter* parameter,
         for (const auto& entry : scores) {
             double curV = entry.second.first;
             double teaV = entry.second.second;
-            double curScore = parameter->score(key, entry.first) * curV;
-            double teaScore = parameter->score(key, entry.first) * teaV;
-            double dT = D * (curScore - teaScore);
+            double dT = D * (curV - teaV);
             parameter->addValue(key, entry.first, -dT);
         }
     }
@@ -105,13 +104,28 @@ int main(int argc, char* argv[])
 
         // Collects features of our decision
         map<pair<Decision, Decision>, CollectedFeature> collectedFeatures;
-        Plan::iterateAvailablePlans(field, seq, 2, [&parameter, &gazer, &collectedFeatures](const RefPlan& plan) {
+        double currentScore = -1000000;
+        pair<Decision, Decision> currentDecision;
+        Plan::iterateAvailablePlans(field, seq, 2, [&](const RefPlan& plan) {
             CollectedFeature f = Evaluator(parameter).evalWithCollectingFeature(plan, 1, gazer);
+            pair<Decision, Decision> pd;
             if (plan.decisions().size() == 1)
-                collectedFeatures[make_pair(plan.decision(0), Decision())] = f;
-            else if (plan.decisions().size() >= 2)
-                collectedFeatures[make_pair(plan.decision(0), plan.decision(1))] = f;
+                pd = make_pair(plan.decision(0), Decision());
+            else
+                pd = make_pair(plan.decision(0), plan.decision(1));
+            collectedFeatures[pd] = f;
+            if (currentScore < f.score) {
+                currentScore = f.score;
+                currentDecision = pd;
+            }
         });
+
+        cout << "our decision : "
+             << currentDecision.first.x << ' '
+             << currentDecision.first.r << ' '
+             << currentDecision.second.x << ' '
+             << currentDecision.second.r << ' '
+             << "score=" << currentScore << endl;
 
         // Lists teacher decision.
         pair<Decision, Decision> teacherDecision;
@@ -138,7 +152,32 @@ int main(int argc, char* argv[])
         if (!teacherDecision.first.isValid())
             break;
 
+        const CollectedFeature* currentFeature = nullptr;
+        const CollectedFeature* teacherFeature = nullptr;
+        for (const auto& entry : collectedFeatures) {
+            if (!currentFeature)
+                currentFeature = &entry.second;
+            else if (currentFeature->score < entry.second.score)
+                currentFeature = &entry.second;
+
+            if (entry.first == teacherDecision)
+                teacherFeature = &entry.second;
+        }
+
         field.dropKumipuyo(teacherDecision.first, seq.get(0));
+
+        if (currentFeature == nullptr) {
+            cout << "currentFeature is null.";
+            continue;
+        }
+
+        if (teacherFeature == nullptr) {
+            cout << "teacherFeature is null.";
+            continue;
+        }
+
+        if (currentFeature != teacherFeature)
+            updateFeature(&parameter, *currentFeature, *teacherFeature);
     }
 
     CHECK(parameter.save("learned.txt"));
