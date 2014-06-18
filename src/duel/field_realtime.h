@@ -42,7 +42,7 @@ public:
     int numPendingOjama() const { return numPendingOjama_; }
 
     int playerId() const { return playerId_; }
-    bool IsInUserState() const { return simulationState_ == STATE_USER; }
+    bool userPlayable() const { return simulationState_ == STATE_USER; }
 
     void addPendingOjama(int num) { numPendingOjama_ += num; }
     int reduceOjama(int num);

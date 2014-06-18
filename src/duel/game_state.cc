@@ -29,14 +29,14 @@ string GameState::toJson() const
     // Set the current field data to GameState.
     CoreField cf0(f0.field());
     CoreField cf1(f1.field());
-    if (f0.IsInUserState()) {
+    if (f0.userPlayable()) {
         int x1, y1, x2, y2, r;
         PuyoColor c1, c2;
         f0.GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
         cf0.unsafeSet(x1, y1, puyoColorOf(c1 + '0'));
         cf0.unsafeSet(x2, y2, puyoColorOf(c2 + '0'));
     }
-    if (f1.IsInUserState()) {
+    if (f1.userPlayable()) {
         int x1, y1, x2, y2, r;
         PuyoColor c1, c2;
         f1.GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
