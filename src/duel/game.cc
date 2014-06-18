@@ -9,12 +9,12 @@
 
 #include "core/decision.h"
 #include "core/kumipuyo.h"
+#include "core/sequence_generator.h"
 #include "core/state.h"
 #include "duel/duel_server.h"
 #include "duel/field_realtime.h"
 #include "duel/frame_context.h"
 #include "duel/game_state.h"
-#include "duel/sequence_generator.h"
 
 using namespace std;
 

@@ -1,4 +1,4 @@
-#include "duel/sequence_generator.h"
+#include "core/sequence_generator.h"
 
 #include <algorithm>
 #include <random>

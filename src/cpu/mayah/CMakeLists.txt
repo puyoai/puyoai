@@ -21,7 +21,6 @@ endfunction()
 
 mayah_add_executable(mayah_cpu main.cc)
 mayah_add_executable(interactive interactive.cc)
-cpu_target_link_libraries(interactive puyoai_duel)
 #mayah_add_executable(learn learn.cc)
 #mayah_add_executable(solver solver.cc)
 #mayah_add_executable(solo solo.cc)
