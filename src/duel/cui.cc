@@ -108,7 +108,7 @@ void Cui::PrintField(int player_id, const FieldRealtime& field)
 
 void Cui::PrintNextPuyo(int player_id, const FieldRealtime& field)
 {
-    NextPuyoPosition npp[] = {
+    static const NextPuyoPosition npp[] = {
         NextPuyoPosition::NEXT1_CHILD,
         NextPuyoPosition::NEXT1_AXIS,
         NextPuyoPosition::NEXT2_CHILD,

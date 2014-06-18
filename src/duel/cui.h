@@ -19,10 +19,10 @@ public:
     virtual void onUpdate(const GameState&) OVERRIDE;
 
 private:
-    void Print(int player_id, const FieldRealtime& field, const std::string& debug_message);
-    void PrintField(int player_id, const FieldRealtime& field);
-    void PrintNextPuyo(int player_id, const FieldRealtime& field);
-    void PrintOjamaPuyo(int player_id, const FieldRealtime& field);
+    void Print(int player_id, const FieldRealtime&, const std::string& debug_message);
+    void PrintField(int player_id, const FieldRealtime&);
+    void PrintNextPuyo(int player_id, const FieldRealtime&);
+    void PrintOjamaPuyo(int player_id, const FieldRealtime&);
     void PrintDebugMessage(int player_id, const std::string& debug_message);
 };
 
