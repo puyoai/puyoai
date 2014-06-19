@@ -22,7 +22,7 @@ typedef unsigned char byte;
 
 #if __has_extension(attribute_deprecated_with_message)
 #  define DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
-#  define DEPRECATED __attribute__((deprecated("This function is deprecated")))
+#  define DEPRECATED __attribute__((deprecated()))
 #else
 #  define DEPRECATED_MSG(msg)
 #  define DEPRECATED
