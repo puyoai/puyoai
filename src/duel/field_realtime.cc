@@ -290,10 +290,7 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted)
 {
     bool ground = false;
 
-    int x1, x2, y1, y2;
-    PuyoColor c1, c2;
-    int r;
-    GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
+    KumipuyoPos pos = kumipuyoPos();
 
     switch (key) {
     case KEY_RIGHT_TURN:
@@ -414,8 +411,8 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted)
         }
         return false;
     case KEY_RIGHT:
-        if (field_.color(x1 + 1, y1) == PuyoColor::EMPTY &&
-            field_.color(x2 + 1, y2) == PuyoColor::EMPTY) {
+        if (field_.color(pos.axisX() + 1, pos.axisY()) == PuyoColor::EMPTY &&
+            field_.color(pos.childX() + 1, pos.childY()) == PuyoColor::EMPTY) {
             kumipuyoPos_.x++;
             *accepted = true;
         } else {
@@ -423,8 +420,8 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted)
         }
         break;
     case KEY_LEFT:
-        if (field_.color(x1 - 1, y1) == PuyoColor::EMPTY &&
-            field_.color(x2 - 1, y2) == PuyoColor::EMPTY) {
+        if (field_.color(pos.axisX() - 1, pos.axisY()) == PuyoColor::EMPTY &&
+            field_.color(pos.childX() - 1, pos.childY()) == PuyoColor::EMPTY) {
             kumipuyoPos_.x--;
             *accepted = true;
         } else {
@@ -433,14 +430,14 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted)
         break;
     case KEY_DOWN:
         frames_for_free_fall_ = 0;
-        if (field_.color(x1, y1 - 1) == PuyoColor::EMPTY &&
-            field_.color(x2, y2 - 1) == PuyoColor::EMPTY) {
+        if (field_.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
+            field_.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
             kumipuyoPos_.y--;
             *accepted = true;
         } else {
             // Ground.
-            field_.setPuyoAndHeight(x1, y1, kumipuyoSeq_.axis(0));
-            field_.setPuyoAndHeight(x2, y2, kumipuyoSeq_.child(0));
+            field_.setPuyoAndHeight(pos.axisX(), pos.axisY(), kumipuyoSeq_.axis(0));
+            field_.setPuyoAndHeight(pos.childX(), pos.childY(), kumipuyoSeq_.child(0));
             *accepted = false;
             ground = true;
         }
