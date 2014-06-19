@@ -67,12 +67,12 @@ void updateFeature(FeatureParameter* parameter,
     for (int i = 0; i < SIZE_OF_EVALUATION_SPARSE_FEATURE_KEY; ++i) {
         EvaluationSparseFeatureKey key = toEvaluationSparseFeatureKey(i);
         map<int, pair<int, int>> scores;
-        for (const auto& entry : currentFeature.collectedSparseFeatures) {
-            for (int v : entry.second)
+        if (currentFeature.collectedSparseFeatures.count(key)) {
+            for (int v : currentFeature.collectedSparseFeatures.find(key)->second)
                 scores[v].first += 1;
         }
-        for (const auto& entry : teacherFeature.collectedSparseFeatures) {
-            for (int v : entry.second)
+        if (teacherFeature.collectedSparseFeatures.count(key)) {
+            for (int v : teacherFeature.collectedSparseFeatures.find(key)->second)
                 scores[v].second += 1;
         }
 
