@@ -30,18 +30,16 @@ string GameState::toJson() const
     CoreField cf0(f0.field());
     CoreField cf1(f1.field());
     if (f0.userPlayable()) {
-        int x1, y1, x2, y2, r;
-        PuyoColor c1, c2;
-        f0.GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
-        cf0.unsafeSet(x1, y1, puyoColorOf(c1 + '0'));
-        cf0.unsafeSet(x2, y2, puyoColorOf(c2 + '0'));
+        KumipuyoPos pos = f0.kumipuyoPos();
+        Kumipuyo kp = f0.kumipuyo();
+        cf0.unsafeSet(pos.axisX(), pos.axisY(), puyoColorOf(kp.axis + '0'));
+        cf0.unsafeSet(pos.childX(), pos.childY(), puyoColorOf(kp.child + '0'));
     }
     if (f1.userPlayable()) {
-        int x1, y1, x2, y2, r;
-        PuyoColor c1, c2;
-        f1.GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
-        cf1.unsafeSet(x1, y1, puyoColorOf(c1 + '0'));
-        cf1.unsafeSet(x2, y2, puyoColorOf(c2 + '0'));
+        KumipuyoPos pos = f1.kumipuyoPos();
+        Kumipuyo kp = f1.kumipuyo();
+        cf1.unsafeSet(pos.axisX(), pos.axisY(), puyoColorOf(kp.axis + '0'));
+        cf1.unsafeSet(pos.childX(), pos.childY(), puyoColorOf(kp.child + '0'));
     }
 
     ostringstream ss;
@@ -62,5 +60,3 @@ string GameState::toJson() const
 
     return ss.str();
 }
-
-
