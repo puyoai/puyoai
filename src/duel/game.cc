@@ -181,12 +181,8 @@ void Game::GetFieldInfo(std::string* player1, std::string* player2) const
     std::string ack0 = FormatAckInfo(ack_info_[0]);
     std::string ack1 = FormatAckInfo(ack_info_[1]);
 
-    int pos_x_0, pos_y_0, r0;
-    int pos_x_1, pos_y_1, r1;
-    int dummy1, dummy2;
-    PuyoColor c0, c1, dummy3;
-    field[0]->GetCurrentPuyo(&pos_x_0, &pos_y_0, &c0, &dummy1, &dummy2, &dummy3, &r0);
-    field[1]->GetCurrentPuyo(&pos_x_1, &pos_y_1, &c1, &dummy1, &dummy2, &dummy3, &r1);
+    KumipuyoPos pos0 = field[0]->kumipuyoPos();
+    KumipuyoPos pos1 = field[1]->kumipuyoPos();
 
     string win0, win1;
     GameResult result = gameResult();
@@ -216,12 +212,12 @@ void Game::GetFieldInfo(std::string* player1, std::string* player2) const
            << "OF=" << f1 << " "
            << "YP=" << y0 << " "
            << "OP=" << y1 << " "
-           << "YX=" << pos_x_0 << " "
-           << "YY=" << pos_y_0 << " "
-           << "YR=" << r0 << " "
-           << "OX=" << pos_x_1 << " "
-           << "OY=" << pos_y_1 << " "
-           << "OR=" << r1 << " "
+           << "YX=" << pos0.axisX() << " "
+           << "YY=" << pos0.axisY() << " "
+           << "YR=" << pos0.r << " "
+           << "OX=" << pos1.axisX() << " "
+           << "OY=" << pos1.axisY() << " "
+           << "OR=" << pos1.r << " "
            << "YO=" << ojama0 << " "
            << "OO=" << ojama1 << " "
            << "YS=" << score0 << " "
@@ -238,12 +234,12 @@ void Game::GetFieldInfo(std::string* player1, std::string* player2) const
            << "OF=" << f0 << " "
            << "YP=" << y1 << " "
            << "OP=" << y0 << " "
-           << "YX=" << pos_x_1 << " "
-           << "YY=" << pos_y_1 << " "
-           << "YR=" << r1 << " "
-           << "OX=" << pos_x_0 << " "
-           << "OY=" << pos_y_0 << " "
-           << "OR=" << r0 << " "
+           << "YX=" << pos1.axisX() << " "
+           << "YY=" << pos1.axisY() << " "
+           << "YR=" << pos1.r << " "
+           << "OX=" << pos0.axisX() << " "
+           << "OY=" << pos0.axisY() << " "
+           << "OR=" << pos0.r << " "
            << "YO=" << ojama1 << " "
            << "OO=" << ojama0 << " "
            << "YS=" << score1 << " "
