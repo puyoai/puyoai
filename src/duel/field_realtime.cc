@@ -565,19 +565,14 @@ string FieldRealtime::GetFieldInfo() const {
 
 string FieldRealtime::GetYokokuInfo() const
 {
+    //  TODO(mayah): Implement toCompatibleChar(PuyoColor) or something.
     stringstream ss;
-    for (int i = 0; i < 6; i++) {
-        switch (GetNextPuyo(i)) {
-        case PuyoColor::EMPTY: ss << '0'; break;
-        case PuyoColor::OJAMA: ss << '1'; break;
-        case PuyoColor::WALL: ss << '2'; break;
-        case PuyoColor::RED: ss << '4'; break;
-        case PuyoColor::BLUE: ss << '5'; break;
-        case PuyoColor::YELLOW: ss << '6'; break;
-        case PuyoColor::GREEN: ss << '7'; break;
-        default: ss << '?'; break;
-        }
-    }
+    ss << char(puyoColor(NextPuyoPosition::CURRENT_AXIS) + '0');
+    ss << char(puyoColor(NextPuyoPosition::CURRENT_CHILD) + '0');
+    ss << char(puyoColor(NextPuyoPosition::NEXT1_AXIS) + '0');
+    ss << char(puyoColor(NextPuyoPosition::NEXT1_CHILD) + '0');
+    ss << char(puyoColor(NextPuyoPosition::NEXT2_AXIS) + '0');
+    ss << char(puyoColor(NextPuyoPosition::NEXT2_CHILD) + '0');
     return ss.str();
 }
 
