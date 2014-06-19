@@ -30,9 +30,6 @@ template<typename ScoreCollector>
 void evalFrameFeature(ScoreCollector* sc, const RefPlan& plan)
 {
     sc->addScore(TOTAL_FRAMES, plan.totalFrames());
-    // TODO(mayah): Why totalFrames is 0?
-    if (plan.totalFrames() != 0)
-        sc->addScore(TOTAL_FRAMES_INVERSE, 1.0 / plan.totalFrames());
 }
 
 template<typename ScoreCollector>
@@ -210,6 +207,20 @@ void evalThirdColumnHeightFeature(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
+void evalValleyDepth(ScoreCollector* sc, const RefPlan& plan)
+{
+    for (int x = 1; x <= 6; ++x) {
+        int currentHeight = plan.field().height(x);
+        int leftHeight = (x == 1) ? 12 : plan.field().height(x - 1);
+        int rightHeight = (x == 6) ? 12 : plan.field().height(x + 1);
+
+        int leftDepth = max(leftHeight - currentHeight, 0);
+        int rightDepth = max(rightHeight - currentHeight, 0);
+        sc->addScore(VALLEY_DEPTH, min(leftDepth, rightDepth));
+    }
+}
+
+template<typename ScoreCollector>
 void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gazer& gazer)
 {
     if (gazer.rensaIsOngoing() && gazer.ongoingRensaInfo().rensaResult.score > scoreForOjama(6)) {
@@ -358,6 +369,7 @@ void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gaz
     evalFieldHeightFeature(sc, plan);
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(sc, plan);
+    evalValleyDepth(sc, plan);
     evalOngoingRensaFeature(sc, plan, currentFrameId, gazer);
 
     vector<TrackedPossibleRensaInfo> rensaInfos =
