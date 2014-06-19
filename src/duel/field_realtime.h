@@ -27,8 +27,8 @@ public:
     bool isDead() const { return isDead_; }
 
     // TODO(mayah): Deprecate these 2 methods. Use kumipuyo(), puyoColor(), kumipuyoPos(), etc.
-    PuyoColor GetNextPuyo(int n) const;
-    void GetCurrentPuyo(int* x1, int* y1, PuyoColor* c1, int* x2, int* y2, PuyoColor* c2, int* r) const;
+    PuyoColor GetNextPuyo(int n) const DEPRECATED;
+    void GetCurrentPuyo(int* x1, int* y1, PuyoColor* c1, int* x2, int* y2, PuyoColor* c2, int* r) const DEPRECATED;
 
     // Utility functions to be used by duel server.
     // TODO(mayah): Deprecate GetFieldInfo() and GetYokokuInfo().
@@ -54,7 +54,7 @@ public:
 
     const CoreField& field() const { return field_; }
     const KumipuyoSeq& kumipuyoSeq() const { return kumipuyoSeq_; }
-    const Kumipuyo& kumipuyo(int nth = 0) const { return kumipuyoSeq_.get(nth); }
+    Kumipuyo kumipuyo(int nth = 0) const;
     const KumipuyoPos& kumipuyoPos() const { return kumipuyoPos_; }
     PuyoColor puyoColor(NextPuyoPosition) const;
 

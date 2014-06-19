@@ -677,6 +677,13 @@ vector<int> FieldRealtime::determineColumnOjamaAmount()
     return ret;
 }
 
+Kumipuyo FieldRealtime::kumipuyo(int nth) const
+{
+    if (nth >= 2 && delayFramesWNextAppear_ > 0)
+        return Kumipuyo(PuyoColor::EMPTY, PuyoColor::EMPTY);
+    return kumipuyoSeq_.get(nth);
+}
+
 PuyoColor FieldRealtime::puyoColor(NextPuyoPosition npp) const
 {
     switch (npp) {
@@ -689,12 +696,8 @@ PuyoColor FieldRealtime::puyoColor(NextPuyoPosition npp) const
     case NextPuyoPosition::NEXT1_CHILD:
         return kumipuyo(1).child;
     case NextPuyoPosition::NEXT2_AXIS:
-        if (delayFramesWNextAppear_ > 0)
-            return PuyoColor::EMPTY;
         return kumipuyo(2).axis;
     case NextPuyoPosition::NEXT2_CHILD:
-        if (delayFramesWNextAppear_ > 0)
-            return PuyoColor::EMPTY;
         return kumipuyo(2).child;
     default:
         break;
