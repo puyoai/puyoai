@@ -463,17 +463,14 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted)
 bool FieldRealtime::Chigiri()
 {
     if (chigiri_x_ < 0) {
-        int x1, x2, y1, y2;
-        PuyoColor c1, c2;
-        int r;
-        GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
-        if (field_.color(x1, y1 - 1) == PuyoColor::EMPTY) {
-            chigiri_x_ = x1;
-            chigiri_y_ = y1;
+        KumipuyoPos pos = kumipuyoPos();
+        if (field_.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY) {
+            chigiri_x_ = pos.axisX();
+            chigiri_y_ = pos.axisY();
         }
-        if (field_.color(x2, y2 - 1) == PuyoColor::EMPTY) {
-            chigiri_x_ = x2;
-            chigiri_y_ = y2;
+        if (field_.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
+            chigiri_x_ = pos.childX();
+            chigiri_y_ = pos.childY();
         }
     }
 
@@ -592,23 +589,20 @@ Key FieldRealtime::GetKey(const Decision& decision) const
     if (!decision.isValid())
         return KEY_NONE;
 
-    int x1, y1, x2, y2, r;
-    PuyoColor c1, c2;
-    GetCurrentPuyo(&x1, &y1, &c1, &x2, &y2, &c2, &r);
+    KumipuyoPos pos = kumipuyoPos();
 
-    LOG(INFO) << "[" << x1 << ", " << y1 << "(" << r << ")] -> ["
+    LOG(INFO) << "[" << pos.axisX() << ", " << pos.axisY() << "(" << pos.r << ")] -> ["
               << decision.x << "(" << decision.r << ")]";
 
     vector<KeyTuple> keys;
     KeyTuple next_key;
-    if (Ctrl::getControlOnline(field_, KumipuyoPos(decision.x, 1, decision.r),
-                               KumipuyoPos(x1, y1, r), &keys)) {
+    if (Ctrl::getControlOnline(field_, KumipuyoPos(decision.x, 1, decision.r), pos, &keys)) {
         LOG(INFO) << Ctrl::buttonsDebugString(keys);
 
         // Remove redundant key stroke.
-        if (r == 3 && keys[0].b1 == KEY_RIGHT_TURN && keys[1].b1 == KEY_LEFT_TURN) {
+        if (pos.r == 3 && keys[0].b1 == KEY_RIGHT_TURN && keys[1].b1 == KEY_LEFT_TURN) {
             next_key = keys[2];
-        } else if (r == 1 && keys[0].b1 == KEY_LEFT_TURN &&
+        } else if (pos.r == 1 && keys[0].b1 == KEY_LEFT_TURN &&
                    keys[1].b1 == KEY_RIGHT_TURN) {
             next_key = keys[2];
         } else {
