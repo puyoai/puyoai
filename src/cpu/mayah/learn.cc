@@ -54,6 +54,9 @@ void updateFeature(FeatureParameter* parameter,
 
         double curV = currentFeature.collectedFeatures.count(key) ? currentFeature.collectedFeatures.find(key)->second : 0;
         double teaV = teacherFeature.collectedFeatures.count(key) ? teacherFeature.collectedFeatures.find(key)->second : 0;
+        if (curV == teaV)
+            continue;
+
         double curScore = parameter->score(key, curV);
         double teaScore = parameter->score(key, teaV);
         double dT = D * (curV - teaV);
@@ -77,9 +80,17 @@ void updateFeature(FeatureParameter* parameter,
         }
 
         for (const auto& entry : scores) {
-            double curV = entry.second.first;
-            double teaV = entry.second.second;
+            int curV = entry.second.first;
+            int teaV = entry.second.second;
+            if (curV == teaV)
+                continue;
+            double curScore = parameter->score(key, curV);
+            double teaScore = parameter->score(key, teaV);
             double dT = D * (curV - teaV);
+            cout << "learning: " << toString(key) << ' ' << entry.first << " "
+                 << "current: val=" << curV << " score=" << curScore << "  "
+                 << "teacher: val=" << teaV << " score=" << teaScore << "  "
+                 << dT << endl;
             parameter->addValue(key, entry.first, -dT);
         }
     }
@@ -94,6 +105,7 @@ int main(int argc, char* argv[])
     TsumoPossibility::initialize();
 
     FeatureParameter parameter("feature.txt");
+    cout << parameter.toString() << endl;
     Gazer gazer;
 
     CoreField field;
@@ -165,6 +177,7 @@ int main(int argc, char* argv[])
         }
 
         field.dropKumipuyo(teacherDecision.first, seq.get(0));
+        field.simulate();
 
         if (currentFeature == nullptr) {
             cout << "currentFeature is null.";
