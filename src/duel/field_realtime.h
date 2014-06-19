@@ -19,17 +19,19 @@ public:
     FieldRealtime(int playerId, const KumipuyoSeq&);
 
     // Gives a key input to the field, and control puyo. Returns true if a key
-    // input is accepted.
+    // input is accepted. FrameContext will collect events when playing frames.
+    // Currently, only ojama related events will be collected.
     bool PlayOneFrame(Key key, FrameContext*);
 
     // Checks if a player is dead.
     bool isDead() const { return isDead_; }
 
-    // TODO(mayah): Deprecates these 2 methods. These methods are not intuitive.
+    // TODO(mayah): Deprecate these 2 methods. Use kumipuyo(), puyoColor(), kumipuyoPos(), etc.
     PuyoColor GetNextPuyo(int n) const;
     void GetCurrentPuyo(int* x1, int* y1, PuyoColor* c1, int* x2, int* y2, PuyoColor* c2, int* r) const;
 
     // Utility functions to be used by duel server.
+    // TODO(mayah): Deprecate GetFieldInfo() and GetYokokuInfo().
     PlayerFrameData playerFrameData() const;
     std::string GetFieldInfo() const;
     std::string GetYokokuInfo() const;

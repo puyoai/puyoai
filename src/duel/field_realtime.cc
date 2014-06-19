@@ -439,8 +439,8 @@ bool FieldRealtime::PlayInternal(Key key, bool* accepted)
             *accepted = true;
         } else {
             // Ground.
-            field_.setPuyoAndHeight(x1, y1, GetNextPuyo(0));
-            field_.setPuyoAndHeight(x2, y2, GetNextPuyo(1));
+            field_.setPuyoAndHeight(x1, y1, kumipuyoSeq_.axis(0));
+            field_.setPuyoAndHeight(x2, y2, kumipuyoSeq_.child(0));
             *accepted = false;
             ground = true;
         }
@@ -538,10 +538,10 @@ void FieldRealtime::GetCurrentPuyo(int* x1, int* y1, PuyoColor* c1,
                                    int* x2, int* y2, PuyoColor* c2, int* r) const {
     *x1 = kumipuyoPos_.x;
     *y1 = kumipuyoPos_.y;
-    *c1 = GetNextPuyo(0);
+    *c1 = kumipuyoSeq_.axis(0);
     *x2 = kumipuyoPos_.x + (kumipuyoPos_.r == 1) - (kumipuyoPos_.r == 3);
     *y2 = kumipuyoPos_.y + (kumipuyoPos_.r == 0) - (kumipuyoPos_.r == 2);
-    *c2 = GetNextPuyo(1);
+    *c2 = kumipuyoSeq_.child(0);
     *r = kumipuyoPos_.r;
 }
 
