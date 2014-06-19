@@ -13,11 +13,11 @@ using std::cout;
 
 namespace {
 
-const char* C_RED = "\x1b[41m";
-const char* C_BLUE = "\x1b[44m";
-const char* C_GREEN = "\x1b[42m";
-const char* C_YELLOW = "\x1b[43m";
-const char* C_BLACK = "\x1b[49m";
+const char* const C_RED = "\x1b[41m";
+const char* const C_BLUE = "\x1b[44m";
+const char* const C_GREEN = "\x1b[42m";
+const char* const C_YELLOW = "\x1b[43m";
+const char* const C_BLACK = "\x1b[49m";
 
 string Locate(int player_id, int x, int y)
 {

@@ -107,15 +107,15 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
     }
 
     // Next puyo info
-    Box bs[4] = {
-        BoundingBox::instance().get(field.playerId(), NextPuyoPosition::NEXT1_AXIS),
-        BoundingBox::instance().get(field.playerId(), NextPuyoPosition::NEXT1_CHILD),
-        BoundingBox::instance().get(field.playerId(), NextPuyoPosition::NEXT2_AXIS),
-        BoundingBox::instance().get(field.playerId(), NextPuyoPosition::NEXT2_CHILD),
+    const NextPuyoPosition positions[] = {
+        NextPuyoPosition::NEXT1_AXIS,
+        NextPuyoPosition::NEXT1_CHILD,
+        NextPuyoPosition::NEXT2_AXIS,
+        NextPuyoPosition::NEXT2_CHILD,
     };
     for (int i = 0; i < 4; ++i) {
-        SDL_Rect r { bs[i].sx, bs[i].sy, bs[i].w(), bs[i].h() };
-        Uint32 c = toPixelColor(surface, field.GetNextPuyo(i + 2));
+        SDL_Rect r = BoundingBox::instance().get(field.playerId(), positions[i]).toSDLRect();
+        Uint32 c = toPixelColor(surface, field.puyoColor(positions[i]));
         SDL_FillRect(surface, &r, c);
     }
 
