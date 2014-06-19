@@ -216,7 +216,9 @@ void evalValleyDepth(ScoreCollector* sc, const RefPlan& plan)
 
         int leftDepth = max(leftHeight - currentHeight, 0);
         int rightDepth = max(rightHeight - currentHeight, 0);
-        sc->addScore(VALLEY_DEPTH, min(leftDepth, rightDepth));
+        int depth = min(leftDepth, rightDepth);
+        CHECK(0 <= depth && depth < 13) << depth;
+        sc->addScore(VALLEY_DEPTH, depth);
     }
 }
 
