@@ -10,8 +10,8 @@
 
 #include "core/constant.h"
 #include "core/decision.h"
+#include "core/server/connector/connector.h"
 #include "core/server/connector/connector_manager.h"
-#include "core/server/connector/connector_manager_linux.h"
 #include "duel/game.h"
 #include "duel/game_state.h"
 #include "duel/game_state_observer.h"
@@ -34,9 +34,9 @@ static void SendInfo(ConnectorManager* manager, int id, string status[2])
     }
 }
 
-DuelServer::DuelServer(const vector<string>& programNames) :
+DuelServer::DuelServer(ConnectorManager* manager) :
     shouldStop_(false),
-    programNames_(programNames)
+    manager_(manager)
 {
 }
 
@@ -79,18 +79,13 @@ void DuelServer::join()
 
 void DuelServer::runDuelLoop()
 {
-    ConnectorManagerLinux manager {
-        Connector::create(0, programNames_[0]),
-        Connector::create(1, programNames_[1])
-    };
-
     int p1_win = 0;
     int p1_draw = 0;
     int p1_lose = 0;
     int num_match = 0;
 
     while (!shouldStop_) {
-        GameResult gameResult = duel(&manager);
+        GameResult gameResult = duel(manager_);
 
         string result = "";
         switch (gameResult) {

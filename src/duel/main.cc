@@ -9,6 +9,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "core/server/connector/connector_manager_linux.h"
 #include "duel/cui.h"
 #include "duel/duel_server.h"
 #include "duel/http_server.h"
@@ -88,9 +89,10 @@ int main(int argc, char* argv[])
 #endif
 
     string dir = getExecDirName(argv[0]);
-    vector<string> programNames;
-    programNames.push_back(string(argv[1]));
-    programNames.push_back(string(argv[2]));
+    ConnectorManagerLinux manager {
+        Connector::create(0, string(argv[1])),
+        Connector::create(1, string(argv[2])),
+    };
 
 #if USE_HTTPD
     GameStateHandler gameStateHandler;
@@ -132,7 +134,7 @@ int main(int argc, char* argv[])
     }
 #endif
 
-    DuelServer duelServer(programNames);
+    DuelServer duelServer(&manager);
 
     // --- Add necessary obesrvers here.
 #if USE_HTTPD

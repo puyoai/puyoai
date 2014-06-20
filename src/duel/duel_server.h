@@ -14,8 +14,7 @@ class GameStateObserver;
 
 class DuelServer {
 public:
-    // |dir| is the directory where the duel server program exsits.
-    explicit DuelServer(const std::vector<std::string>& programNames);
+    explicit DuelServer(ConnectorManager*);
     ~DuelServer();
 
     // Don't take ownership.
@@ -36,7 +35,7 @@ private:
     std::thread th_;
     volatile bool shouldStop_;
 
-    std::vector<std::string> programNames_;
+    ConnectorManager* manager_;
     std::vector<GameStateObserver*> observers_;
 };
 
