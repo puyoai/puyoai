@@ -26,10 +26,6 @@ public:
     // Checks if a player is dead.
     bool isDead() const { return isDead_; }
 
-    // TODO(mayah): Deprecate these 2 methods. Use kumipuyo(), puyoColor(), kumipuyoPos(), etc.
-    PuyoColor GetNextPuyo(int n) const DEPRECATED;
-    void GetCurrentPuyo(int* x1, int* y1, PuyoColor* c1, int* x2, int* y2, PuyoColor* c2, int* r) const DEPRECATED;
-
     // Utility functions to be used by duel server.
     // TODO(mayah): Deprecate GetFieldInfo() and GetYokokuInfo().
     PlayerFrameData playerFrameData() const;

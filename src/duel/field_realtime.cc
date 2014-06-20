@@ -517,28 +517,6 @@ void FieldRealtime::PrepareNextPuyo()
     simulationState_ = STATE_USER;
 }
 
-PuyoColor FieldRealtime::GetNextPuyo(int n) const
-{
-    if (delayFramesWNextAppear_ > 0 && n >= 4)
-        return PuyoColor::EMPTY;
-
-    if (n % 2 == 0)
-        return kumipuyoSeq_.axis(n / 2);
-    else
-        return kumipuyoSeq_.child(n / 2);
-}
-
-void FieldRealtime::GetCurrentPuyo(int* x1, int* y1, PuyoColor* c1,
-                                   int* x2, int* y2, PuyoColor* c2, int* r) const {
-    *x1 = kumipuyoPos_.x;
-    *y1 = kumipuyoPos_.y;
-    *c1 = kumipuyoSeq_.axis(0);
-    *x2 = kumipuyoPos_.x + (kumipuyoPos_.r == 1) - (kumipuyoPos_.r == 3);
-    *y2 = kumipuyoPos_.y + (kumipuyoPos_.r == 0) - (kumipuyoPos_.r == 2);
-    *c2 = kumipuyoSeq_.child(0);
-    *r = kumipuyoPos_.r;
-}
-
 PlayerFrameData FieldRealtime::playerFrameData() const
 {
     return PlayerFrameData(field(), kumipuyoSeq().subsequence(0, 3), kumipuyoPos(), userState(), score(), ojama());
