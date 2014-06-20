@@ -9,6 +9,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "core/server/connector/human_connector.h"
 #include "core/server/connector/connector_manager_linux.h"
 #include "duel/cui.h"
 #include "duel/duel_server.h"
@@ -22,6 +23,7 @@
 #include "gui/commentator.h"
 #include "gui/field_drawer.h"
 #include "gui/fps_drawer.h"
+#include "gui/human_connector_key_listener.h"
 #include "gui/main_window.h"
 #endif
 
@@ -111,6 +113,7 @@ int main(int argc, char* argv[])
         puyofuRecorder.reset(new PuyofuRecorder);
 
 #if USE_SDL2
+    vector<unique_ptr<MainWindow::EventListener>> eventListeners;
     unique_ptr<MainWindow> mainWindow;
     unique_ptr<FieldDrawer> fieldDrawer;
     unique_ptr<Commentator> commentator;
@@ -131,6 +134,19 @@ int main(int argc, char* argv[])
 
         fpsDrawer.reset(new FPSDrawer);
         mainWindow->addDrawer(fpsDrawer.get());
+
+        for (int i = 0; i < 2; ++i) {
+            Connector* c = manager.connector(i);
+            if (c->isHuman()) {
+                HumanConnector* hc = static_cast<HumanConnector*>(c);
+                unique_ptr<MainWindow::EventListener> listener(new HumanConnectorKeyListener(hc));
+                eventListeners.push_back(move(listener));
+            }
+        }
+
+        for (auto& p : eventListeners) {
+            mainWindow->addEventListener(p.get());
+        }
     }
 #endif
 

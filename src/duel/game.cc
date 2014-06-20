@@ -28,13 +28,17 @@ namespace {
  *   else:
  *     -1
  */
-int UpdateDecision(const vector<ReceivedData>& data, const FieldRealtime& field,
-                   Decision* decision)
+int UpdateDecision(const vector<ReceivedData>& data, const FieldRealtime& field, Decision* decision)
 {
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.
     for (unsigned int i = data.size(); i > 0;) {
         i--;
+
+        // When data contains key, it should be from HumanConnector.
+        // In that case we accept it.
+        if (data[i].key != Key::KEY_NONE)
+            return i;
 
         Decision d = data[i].decision;
 
@@ -66,16 +70,20 @@ Game::Game(DuelServer* duelServer) :
     }
 }
 
-Game::~Game() {}
+Game::~Game()
+{
+}
 
 void Game::Play(const vector<ReceivedData> data[2])
 {
     for (int pi = 0; pi < 2; pi++) {
         FieldRealtime* me = field[pi].get();
-        string accepted_message;
-        Key key = KEY_NONE;
 
         int accepted_index = UpdateDecision(data[pi], *field[pi], &latest_decision_[pi]);
+
+        // TODO(mayah): RecievedData from HumanConnector does not have any decision.
+        // So, all data will be marked as NACK. Since the HumanConnector does not see ACK/NACK,
+        // it's OK for now. However, this might cause future issues. Consider better way.
 
         // Take care of ack_info.
         ack_info_[pi] = vector<int>(data[pi].size(), 0);
@@ -93,11 +101,14 @@ void Game::Play(const vector<ReceivedData> data[2])
             }
         }
 
-        if (accepted_index != -1) {
+        string accepted_message;
+        if (accepted_index != -1)
             accepted_message = data[pi][accepted_index].msg;
-        }
 
-        key = me->GetKey(latest_decision_[pi]);
+        Key key = me->GetKey(latest_decision_[pi]);
+        if (accepted_index != -1 && data[pi][accepted_index].key != Key::KEY_NONE) {
+            key = data[pi][accepted_index].key;
+        }
 
         FrameContext context;
         me->PlayOneFrame(key, &context);

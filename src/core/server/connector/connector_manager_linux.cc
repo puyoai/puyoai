@@ -73,12 +73,20 @@ bool ConnectorManagerLinux::receive(int frame_id, vector<ReceivedData> receivedD
     int playerIds[NUM_PLAYERS];
     int numPollfds = 0;
     for (int i = 0; i < NUM_PLAYERS; i++) {
+        if (connector(i)->isHuman()) {
+            receivedData[i].push_back(connector(i)->read());
+            continue;
+        }
+
         if (connector(i)->pollable()) {
             pollfds[numPollfds].fd = connector(i)->readerFd();
             pollfds[numPollfds].events = POLLIN;
             playerIds[numPollfds] = i;
             numPollfds++;
+            continue;
         }
+
+        DCHECK(false) << "connector is not pollable or human. Then what's connector?";
     }
     DCHECK(numPollfds <= NUM_PLAYERS) << numPollfds;
 

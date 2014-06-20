@@ -1,4 +1,4 @@
-#include "connector.h"
+#include "core/server/connector/connector.h"
 
 #include <fcntl.h>
 #include <string.h>
@@ -10,6 +10,8 @@
 #include <string>
 
 #include <glog/logging.h>
+
+#include "core/server/connector/human_connector.h"
 
 using namespace std;
 
@@ -179,25 +181,4 @@ ReceivedData PipeConnector::read()
     }
 
     return parse(buf);
-}
-
-void HumanConnector::write(const std::string& message)
-{
-    LOG(INFO) << message;
-}
-
-ReceivedData HumanConnector::read()
-{
-    return ReceivedData();
-}
-
-void HumanConnector::setAlive(bool)
-{
-    CHECK(false) << "HumanConnector does not have alive flag.";
-}
-
-int HumanConnector::readerFd() const
-{
-    CHECK(false) << "HumanConnector does not have reader file descriptor.";
-    return -1;
 }
