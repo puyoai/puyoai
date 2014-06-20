@@ -11,7 +11,6 @@
 #include "core/kumipuyo.h"
 #include "core/sequence_generator.h"
 #include "core/state.h"
-#include "duel/duel_server.h"
 #include "duel/field_realtime.h"
 #include "duel/frame_context.h"
 #include "duel/game_state.h"
@@ -58,8 +57,7 @@ int UpdateDecision(const vector<ReceivedData>& data, const FieldRealtime& field,
 
 } // namespace
 
-Game::Game(DuelServer* duelServer) :
-    duelServer_(duelServer)
+Game::Game()
 {
     KumipuyoSeq seq = generateSequence();
     LOG(INFO) << "Puyo sequence=" << seq.toString();
@@ -74,7 +72,7 @@ Game::~Game()
 {
 }
 
-void Game::Play(const vector<ReceivedData> data[2])
+GameState Game::play(const vector<ReceivedData> data[2])
 {
     for (int pi = 0; pi < 2; pi++) {
         FieldRealtime* me = field[pi].get();
@@ -126,11 +124,7 @@ void Game::Play(const vector<ReceivedData> data[2])
         }
     }
 
-    // TODO(mayah): Play should return GameState, and DuelServer updates its state
-    // in runLoop(). If we do so, Game does not need duelServer anymore.
-    duelServer_->updateGameState(
-        GameState(*field[0], *field[1],
-                  last_accepted_messages_[0], last_accepted_messages_[1]));
+    return GameState(*field[0], *field[1], last_accepted_messages_[0], last_accepted_messages_[1]);
 }
 
 GameResult Game::gameResult() const
