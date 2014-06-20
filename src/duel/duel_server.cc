@@ -133,7 +133,7 @@ GameResult DuelServer::duel(ConnectorManager* manager)
     for (auto observer : observers_)
         observer->newGameWillStart();
 
-    Game game(this);
+    Game game;
 
     LOG(INFO) << "Game has started.";
 
@@ -172,7 +172,8 @@ GameResult DuelServer::duel(ConnectorManager* manager)
         }
 
         // PLAY.
-        game.Play(data);
+        GameState gameState = game.play(data);
+        updateGameState(gameState);
     }
 
     for (auto observer : observers_)
