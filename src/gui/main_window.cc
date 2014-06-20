@@ -46,6 +46,9 @@ void MainWindow::runMainLoop()
                 listener->handleEvent(ev);
         }
 
+        for (auto listener : listeners_)
+            listener->handleAfterPollEvent();
+
         draw();
     }
 }

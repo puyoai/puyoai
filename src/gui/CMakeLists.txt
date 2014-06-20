@@ -3,7 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 add_library(puyoai_gui
             bounding_box.cc bounding_box_drawer.cc
             color_map.cc commentator.cc
-            field_drawer.cc fps_drawer.cc main_window.cc screen.cc
+            field_drawer.cc fps_drawer.cc
+            human_connector_key_listener.cc
+            main_window.cc screen.cc
             util.cc pixel_color.cc SDL_kanji.c SDL_prims.c)
 
 function(puyoai_gui_add_test target)
