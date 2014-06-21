@@ -4,25 +4,38 @@
 #include <string>
 #include <glog/logging.h>
 
+#include "base/base.h"
 #include "duel/field_realtime.h"
+#include "duel/game_result.h"
 
 class GameState {
 public:
-    GameState(const FieldRealtime& p1Field, const FieldRealtime& p2Field,
-              const std::string& p1Message, const std::string& p2Message) :
-        field_ { p1Field, p2Field },
-        message_ { p1Message, p2Message }
-    {
-    }
+    explicit GameState(const KumipuyoSeq& seq);
 
-    const FieldRealtime& field(int i) const { return field_[i]; }
-    const std::string& message(int i) const { return message_[i]; }
-
+    GameResult gameResult() const;
     std::string toJson() const;
+
+    const FieldRealtime& field(int pi) const { return field_[pi]; }
+    FieldRealtime* mutableField(int pi) { return &field_[pi]; }
+
+    const Decision& decision(int pi) const { return decision_[pi]; }
+    void setDecision(int pi, const Decision& decision) { decision_[pi] = decision; }
+    Decision* mutableDecision(int pi) { return &decision_[pi]; }
+
+    const std::string& message(int pi) const { return message_[pi]; }
+    void setMessage(int pi, const std::string& message) { message_[pi] = message; }
+
+    int ackFrameId(int pi) const { return ackFrameId_[pi]; }
+    const std::vector<int>& nackFrameIds(int pi) const { return nackFrameIds_[pi]; }
+
 
 private:
     FieldRealtime field_[2];
+    Decision decision_[2];
     std::string message_[2];
+    int ackFrameId_[2];
+    std::vector<int> nackFrameIds_[2];
+
 };
 
 #endif

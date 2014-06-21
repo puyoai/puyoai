@@ -6,7 +6,7 @@ endif()
 
 add_library(puyoai_duel
             cui.cc duel_server.cc field_realtime.cc
-            frame_context.cc game.cc game_state.cc
+            frame_context.cc game_state.cc
             puyofu_recorder.cc
             ${HTTPD_SOURCE})
 
