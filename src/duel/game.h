@@ -25,10 +25,10 @@ public:
     void GetFieldInfo(std::string* player1, std::string* player2) const;
 
 private:
-    std::unique_ptr<FieldRealtime> field[2];
-    std::string last_accepted_messages_[2];
-    Decision latest_decision_[2];
-    std::vector<int> ack_info_[2];
+    std::unique_ptr<FieldRealtime> field_[2];
+    std::string lastAcceptedMessage_[2];
+    Decision latestDecision_[2];
+    std::vector<int> ackInfo_[2];
 };
 
 #endif  // DUEL_GAME_H_
