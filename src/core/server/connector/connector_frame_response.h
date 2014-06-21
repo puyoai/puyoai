@@ -12,6 +12,8 @@
 // ConnectorFrameResponse is a response that a cpu sends to the server.
 class ConnectorFrameResponse {
 public:
+    static ConnectorFrameResponse parse(const char* str);
+
     bool isValid() const;
 
     // TODO(mayah): Rename toString() and returns std::string instead.
