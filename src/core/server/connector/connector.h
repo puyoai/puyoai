@@ -25,9 +25,6 @@ public:
     virtual bool pollable() const = 0;
     // Returns reader file descriptor. Valid only when pollable() == true.
     virtual int readerFd() const = 0;
-
-protected:
-    ConnectorFrameResponse parse(const char* str);
 };
 
 class PipeConnector : public Connector {
