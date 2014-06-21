@@ -17,7 +17,7 @@ public:
     virtual ~HumanConnector() {}
 
     virtual void write(const std::string& message) OVERRIDE;
-    virtual ReceivedData read() OVERRIDE;
+    virtual ConnectorFrameResponse read() OVERRIDE;
     virtual bool isHuman() const OVERRIDE { return true; }
     // HumanConnector is always alive.
     virtual bool alive() const OVERRIDE { return true; }

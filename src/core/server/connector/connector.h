@@ -6,7 +6,7 @@
 #include <string>
 
 #include "base/base.h"
-#include "core/server/connector/received_data.h"
+#include "core/server/connector/connector_frame_response.h"
 
 class Connector : noncopyable {
 public:
@@ -15,7 +15,7 @@ public:
     virtual ~Connector() {}
 
     virtual void write(const std::string& message) = 0;
-    virtual ReceivedData read() = 0;
+    virtual ConnectorFrameResponse read() = 0;
     virtual bool isHuman() const = 0;
 
     virtual bool alive() const = 0;
@@ -27,7 +27,7 @@ public:
     virtual int readerFd() const = 0;
 
 protected:
-    ReceivedData parse(const char* str);
+    ConnectorFrameResponse parse(const char* str);
 };
 
 class PipeConnector : public Connector {
@@ -36,7 +36,7 @@ public:
     virtual ~PipeConnector();
 
     virtual void write(const std::string& message) OVERRIDE;
-    virtual ReceivedData read() OVERRIDE;
+    virtual ConnectorFrameResponse read() OVERRIDE;
     virtual bool isHuman() const OVERRIDE { return false; }
     virtual bool alive() const OVERRIDE { return alive_; }
     virtual void setAlive(bool flag) OVERRIDE { alive_ = flag; }

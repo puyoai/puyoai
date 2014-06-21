@@ -1,11 +1,11 @@
-#include "core/server/connector/received_data.h"
+#include "core/server/connector/connector_frame_response.h"
 
 #include <sstream>
 #include <string>
 
 using namespace std;
 
-void ReceivedData::SerializeToString(string* output) const
+void ConnectorFrameResponse::SerializeToString(string* output) const
 {
     stringstream ss;
     ss << "{";
@@ -25,7 +25,7 @@ void ReceivedData::SerializeToString(string* output) const
     output->append(ss.str());
 }
 
-bool ReceivedData::isValid() const
+bool ConnectorFrameResponse::isValid() const
 {
     if (!received)
         return false;

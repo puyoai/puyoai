@@ -36,7 +36,7 @@ static int GetRemainingMilliSeconds(const struct timeval& start)
     return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
-static void Log(int frame_id, const vector<ReceivedData> alldata[2])
+static void Log(int frame_id, const vector<ConnectorFrameResponse> alldata[2])
 {
     // Print debug info.
     LOG(INFO) << "########## FRAME " << frame_id << " ##########";
@@ -45,7 +45,7 @@ static void Log(int frame_id, const vector<ReceivedData> alldata[2])
             LOG(INFO) << "[P" << i << "] [NODATA]";
         }
         for (size_t j = 0; j < alldata[i].size(); j++) {
-            const ReceivedData& data = alldata[i][j];
+            const ConnectorFrameResponse& data = alldata[i][j];
             LOG(INFO) << "[P" << i << "] "
                       << "[" << setfill(' ') << setw(5) << right << data.usec << "us] "
                       << "[" << data.original << "]";
@@ -64,17 +64,17 @@ ConnectorManagerLinux::ConnectorManagerLinux(unique_ptr<Connector> p1, unique_pt
 
 // TODO(mayah): Without polling, each connector should make thread?
 // If we do so, Human connector can use MainWindow::addEventListener(), maybe.
-bool ConnectorManagerLinux::receive(int frame_id, vector<ReceivedData> receivedData[2])
+bool ConnectorManagerLinux::receive(int frame_id, vector<ConnectorFrameResponse> cfr[2])
 {
     for (int i = 0; i < 2; i++)
-        receivedData[i].clear();
+        cfr[i].clear();
 
     pollfd pollfds[NUM_PLAYERS];
     int playerIds[NUM_PLAYERS];
     int numPollfds = 0;
     for (int i = 0; i < NUM_PLAYERS; i++) {
         if (connector(i)->isHuman()) {
-            receivedData[i].push_back(connector(i)->read());
+            cfr[i].push_back(connector(i)->read());
             continue;
         }
 
@@ -121,10 +121,10 @@ bool ConnectorManagerLinux::receive(int frame_id, vector<ReceivedData> receivedD
 
         for (int i = 0; i < numPollfds; i++) {
             if (pollfds[i].revents & POLLIN) {
-                ReceivedData data = connector(playerIds[i])->read();
+                ConnectorFrameResponse data = connector(playerIds[i])->read();
                 if (data.received) {
                     data.usec = GetUsecFromStart(tv_start);
-                    receivedData[playerIds[i]].push_back(data);
+                    cfr[playerIds[i]].push_back(data);
                     if (data.frameId == frame_id)
                         received_data_for_this_frame[playerIds[i]] = true;
                 }
@@ -152,7 +152,7 @@ bool ConnectorManagerLinux::receive(int frame_id, vector<ReceivedData> receivedD
         }
     }
 
-    Log(frame_id, receivedData);
+    Log(frame_id, cfr);
 
     return !died;
 }

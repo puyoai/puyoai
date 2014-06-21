@@ -1,5 +1,5 @@
-#ifndef CORE_SERVER_CONNECTOR_RECEIVED_DATA_H_
-#define CORE_SERVER_CONNECTOR_RECEIVED_DATA_H_
+#ifndef CORE_SERVER_CONNECTOR_CONNECTOR_FRAME_RESPONSE_H_
+#define CORE_SERVER_CONNECTOR_CONNECTOR_FRAME_RESPONSE_H_
 
 #include <string>
 #include <vector>
@@ -7,10 +7,10 @@
 #include "core/decision.h"
 #include "core/key.h"
 
-
-// TODO(mayah): Should we split this to PipeConnectorReceivedData and
-// HumanConnectorReceivedData? Or, split using Decision or Key?
-class ReceivedData {
+// TODO(mayah): Should we split this to PipeConnectorFrameResponse and
+// HumanConnectorFrameResponse? Or, split using Decision or Key?
+// ConnectorFrameResponse is a response that a cpu sends to the server.
+class ConnectorFrameResponse {
 public:
     bool isValid() const;
 

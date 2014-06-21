@@ -104,12 +104,12 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
     return unique_ptr<Connector>();
 }
 
-ReceivedData Connector::parse(const char* str)
+ConnectorFrameResponse Connector::parse(const char* str)
 {
     std::istringstream iss(str);
     std::string tmp;
 
-    ReceivedData data;
+    ConnectorFrameResponse data;
 
     data.received = true;
     data.original = std::string(str);
@@ -161,21 +161,21 @@ void PipeConnector::write(const std::string& message)
     LOG(INFO) << message;
 }
 
-ReceivedData PipeConnector::read()
+ConnectorFrameResponse PipeConnector::read()
 {
     char buf[1000];
     char* ptr = fgets(buf, 999, reader_);
     if (!ptr)
-        return ReceivedData();
+        return ConnectorFrameResponse();
 
     size_t len = strlen(ptr);
     if (len == 0)
-        return ReceivedData();
+        return ConnectorFrameResponse();
     if (ptr[len-1] == '\n') {
         ptr[--len] = '\0';
     }
     if (len == 0)
-        return ReceivedData();
+        return ConnectorFrameResponse();
     if (ptr[len-1] == '\r') {
         ptr[--len] = '\0';
     }

@@ -11,7 +11,7 @@
 class ConnectorManagerLinux : public ConnectorManager {
 public:
     ConnectorManagerLinux(std::unique_ptr<Connector> p1, std::unique_ptr<Connector> p2);
-    virtual bool receive(int frameId, std::vector<ReceivedData> receivedData[2]) OVERRIDE;
+    virtual bool receive(int frameId, std::vector<ConnectorFrameResponse> cfr[2]) OVERRIDE;
 
     virtual Connector* connector(int i) OVERRIDE { return connectors_[i].get(); }
 
