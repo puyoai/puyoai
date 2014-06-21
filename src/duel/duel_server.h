@@ -6,6 +6,7 @@
 #include <thread>
 #include <vector>
 
+#include "core/server/connector/received_data.h"
 #include "duel/game_result.h"
 
 class ConnectorManager;
@@ -19,8 +20,6 @@ public:
 
     // Don't take ownership.
     void addObserver(GameStateObserver*);
-    // TODO(mayah): Why public?
-    void updateGameState(const GameState&);
 
     bool start();
     void stop();
@@ -28,8 +27,9 @@ public:
 
 private:
     void runDuelLoop();
+    void play(GameState*, const std::vector<ReceivedData> data[2]);
 
-    GameResult duel(ConnectorManager* manager);
+    GameResult runGame(ConnectorManager* manager);
 
 private:
     std::thread th_;

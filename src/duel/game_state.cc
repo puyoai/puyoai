@@ -21,6 +21,28 @@ static string escapeMessage(const string& s)
     return ss.str();
 }
 
+GameState::GameState(const KumipuyoSeq& seq) :
+    field_ { FieldRealtime(0, seq), FieldRealtime(1, seq) },
+    ackFrameId_ { -1, -1 }
+{
+}
+
+GameResult GameState::gameResult() const
+{
+    bool p1_dead = field(0).isDead();
+    bool p2_dead = field(1).isDead();
+
+    if (!p1_dead && !p2_dead)
+        return GameResult::PLAYING;
+    if (p1_dead && p2_dead)
+        return GameResult::DRAW;
+    if (p1_dead)
+        return GameResult::P2_WIN;
+    if (p2_dead)
+        return GameResult::P1_WIN;
+    return GameResult::PLAYING;
+}
+
 string GameState::toJson() const
 {
     const FieldRealtime& f0 = field(0);

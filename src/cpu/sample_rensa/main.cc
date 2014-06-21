@@ -23,7 +23,7 @@ public:
         UNUSED_VARIABLE(frameId);
         KumipuyoSeq seq { next1, next2 };
 
-        return eval(f, seq, 4);
+        return eval(f, seq, 3);
     }
 
 private:
