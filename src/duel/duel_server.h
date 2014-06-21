@@ -6,7 +6,7 @@
 #include <thread>
 #include <vector>
 
-#include "core/server/connector/received_data.h"
+#include "core/server/connector/connector_frame_response.h"
 #include "duel/game_result.h"
 
 class ConnectorManager;
@@ -27,7 +27,7 @@ public:
 
 private:
     void runDuelLoop();
-    void play(GameState*, const std::vector<ReceivedData> data[2]);
+    void play(GameState*, const std::vector<ConnectorFrameResponse> data[2]);
 
     GameResult runGame(ConnectorManager* manager);
 

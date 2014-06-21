@@ -12,7 +12,6 @@
 #include "core/decision.h"
 #include "core/server/connector/connector.h"
 #include "core/server/connector/connector_manager.h"
-#include "core/server/connector/received_data.h"
 #include "core/sequence_generator.h"
 #include "duel/frame_context.h"
 #include "duel/game_state.h"
@@ -35,7 +34,7 @@ DECLARE_bool(use_gui);
  *   else:
  *     -1
  */
-static int updateDecision(const vector<ReceivedData>& data, const FieldRealtime& field, Decision* decision)
+static int updateDecision(const vector<ConnectorFrameResponse>& data, const FieldRealtime& field, Decision* decision)
 {
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.
@@ -310,7 +309,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
 
         // READ INFO.
         // It takes up to 16ms to finish this section.
-        vector<ReceivedData> data[2];
+        vector<ConnectorFrameResponse> data[2];
         if (!manager->receive(current_id, data)) {
             if (manager->connector(0)->alive()) {
                 gameResult = GameResult::P1_WIN_WITH_CONNECTION_ERROR;
@@ -333,7 +332,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
     return gameResult;
 }
 
-void DuelServer::play(GameState* gameState, const vector<ReceivedData> data[2])
+void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse> data[2])
 {
     int ackFrameId[2];
     vector<int> nackFrameIds[2];
@@ -350,7 +349,7 @@ void DuelServer::play(GameState* gameState, const vector<ReceivedData> data[2])
 
         // Take care of ack_info.
         for (size_t j = 0; j < data[pi].size(); j++) {
-            const ReceivedData& d = data[pi][j];
+            const ConnectorFrameResponse& d = data[pi][j];
 
             // This case does not require ack.
             if (!d.isValid())

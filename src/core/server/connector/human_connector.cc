@@ -9,24 +9,24 @@ void HumanConnector::write(const std::string& message)
     LOG(INFO) << message;
 }
 
-ReceivedData HumanConnector::read()
+ConnectorFrameResponse HumanConnector::read()
 {
-    ReceivedData rd;
-    rd.received = true;
+    ConnectorFrameResponse cfr;
+    cfr.received = true;
 
     // leftTurnKey or rightTurnKey should be prioritized.
     lock_guard<mutex> lock(mu_);
     if (currentKeySet_.downKey)
-        rd.key = Key::KEY_DOWN;
+        cfr.key = Key::KEY_DOWN;
     if (currentKeySet_.leftKey)
-        rd.key = Key::KEY_LEFT;
+        cfr.key = Key::KEY_LEFT;
     if (currentKeySet_.rightKey)
-        rd.key = Key::KEY_RIGHT;
+        cfr.key = Key::KEY_RIGHT;
     if (currentKeySet_.leftTurnKey)
-        rd.key = Key::KEY_LEFT_TURN;
+        cfr.key = Key::KEY_LEFT_TURN;
     if (currentKeySet_.rightTurnKey)
-        rd.key = Key::KEY_RIGHT_TURN;
-    return rd;
+        cfr.key = Key::KEY_RIGHT_TURN;
+    return cfr;
 }
 
 void HumanConnector::setAlive(bool)

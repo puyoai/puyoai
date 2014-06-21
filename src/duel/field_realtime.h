@@ -8,7 +8,7 @@
 #include "core/key.h"
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"
-#include "core/server/connector/received_data.h"
+#include "core/server/connector/connector_frame_response.h"
 #include "core/state.h"
 
 // TODO(mayah): We need to do refactoring this. This class is really messy.

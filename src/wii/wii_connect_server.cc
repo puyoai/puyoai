@@ -168,7 +168,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
             connector_->connector(pi)->write(makeMessageFor(pi, frameId, analyzerResult));
     }
 
-    vector<ReceivedData> data[2];
+    vector<ConnectorFrameResponse> data[2];
     connector_->receive(frameId, data);
 
     for (int pi = 0; pi < 2; pi++) {
@@ -304,7 +304,7 @@ PuyoColor WiiConnectServer::toPuyoColor(RealColor rc, bool allowAllocation)
     return PuyoColor::EMPTY;
 }
 
-void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, const vector<ReceivedData>& data)
+void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, const vector<ConnectorFrameResponse>& data)
 {
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.

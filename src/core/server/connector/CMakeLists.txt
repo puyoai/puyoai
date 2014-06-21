@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_core_server_connector
-            connector.cc human_connector.cc
-            connector_manager_linux.cc received_data.cc)
+            connector.cc
+            connector_frame_response.cc
+            connector_manager_linux.cc
+            human_connector.cc)
