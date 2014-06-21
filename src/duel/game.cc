@@ -63,8 +63,8 @@ Game::Game()
     LOG(INFO) << "Puyo sequence=" << seq.toString();
 
     for (int i = 0; i < 2; i++) {
-        field[i].reset(new FieldRealtime(i, seq));
-        latest_decision_[i] = Decision::NoInputDecision();
+        field_[i].reset(new FieldRealtime(i, seq));
+        latestDecision_[i] = Decision::NoInputDecision();
     }
 }
 
@@ -75,16 +75,16 @@ Game::~Game()
 GameState Game::play(const vector<ReceivedData> data[2])
 {
     for (int pi = 0; pi < 2; pi++) {
-        FieldRealtime* me = field[pi].get();
+        FieldRealtime* me = field_[pi].get();
 
-        int accepted_index = UpdateDecision(data[pi], *field[pi], &latest_decision_[pi]);
+        int accepted_index = UpdateDecision(data[pi], *field_[pi], &latestDecision_[pi]);
 
         // TODO(mayah): RecievedData from HumanConnector does not have any decision.
         // So, all data will be marked as NACK. Since the HumanConnector does not see ACK/NACK,
         // it's OK for now. However, this might cause future issues. Consider better way.
 
         // Take care of ack_info.
-        ack_info_[pi] = vector<int>(data[pi].size(), 0);
+        ackInfo_[pi] = vector<int>(data[pi].size(), 0);
         for (size_t j = 0; j < data[pi].size(); j++) {
             const ReceivedData& d = data[pi][j];
 
@@ -93,9 +93,9 @@ GameState Game::play(const vector<ReceivedData> data[2])
                 continue;
 
             if (static_cast<int>(j) == accepted_index) {
-                ack_info_[pi][j] = d.frameId;
+                ackInfo_[pi][j] = d.frameId;
             } else {
-                ack_info_[pi][j] = -d.frameId; // TODO(mayah): Negative means NACK. Weird.
+                ackInfo_[pi][j] = -d.frameId; // TODO(mayah): Negative means NACK. Weird.
             }
         }
 
@@ -103,7 +103,7 @@ GameState Game::play(const vector<ReceivedData> data[2])
         if (accepted_index != -1)
             accepted_message = data[pi][accepted_index].msg;
 
-        Key key = me->GetKey(latest_decision_[pi]);
+        Key key = me->GetKey(latestDecision_[pi]);
         if (accepted_index != -1 && data[pi][accepted_index].key != Key::KEY_NONE) {
             key = data[pi][accepted_index].key;
         }
@@ -111,26 +111,26 @@ GameState Game::play(const vector<ReceivedData> data[2])
         FrameContext context;
         me->PlayOneFrame(key, &context);
 
-        FieldRealtime* opponent = field[0].get() == me ? field[1].get() : field[0].get();
+        FieldRealtime* opponent = field_[0].get() == me ? field_[1].get() : field_[0].get();
         context.apply(me, opponent);
 
         // Clear current key input if the move is done.
         if (me->userState().grounded) {
-            latest_decision_[pi] = Decision::NoInputDecision();
+            latestDecision_[pi] = Decision::NoInputDecision();
         }
 
         if (accepted_message != "") {
-            last_accepted_messages_[pi] = accepted_message;
+            lastAcceptedMessage_[pi] = accepted_message;
         }
     }
 
-    return GameState(*field[0], *field[1], last_accepted_messages_[0], last_accepted_messages_[1]);
+    return GameState(*field_[0], *field_[1], lastAcceptedMessage_[0], lastAcceptedMessage_[1]);
 }
 
 GameResult Game::gameResult() const
 {
-    bool p1_dead = field[0]->isDead();
-    bool p2_dead = field[1]->isDead();
+    bool p1_dead = field_[0]->isDead();
+    bool p2_dead = field_[1]->isDead();
 
     if (!p1_dead && !p2_dead)
         return GameResult::PLAYING;
@@ -173,21 +173,21 @@ std::string FormatAckInfo(const vector<int>& ack_info)
 // We must create FrameData, and pass it to connector.
 void Game::GetFieldInfo(std::string* player1, std::string* player2) const
 {
-    std::string f0 = field[0]->GetFieldInfo();
-    std::string f1 = field[1]->GetFieldInfo();
-    std::string y0 = field[0]->GetYokokuInfo();
-    std::string y1 = field[1]->GetYokokuInfo();
-    int state0 = field[0]->userState().toDeprecatedState();
-    int state1 = field[1]->userState().toDeprecatedState();
-    int score0 = field[0]->score();
-    int score1 = field[1]->score();
-    int ojama0 = field[0]->ojama();
-    int ojama1 = field[1]->ojama();
-    std::string ack0 = FormatAckInfo(ack_info_[0]);
-    std::string ack1 = FormatAckInfo(ack_info_[1]);
+    std::string f0 = field_[0]->GetFieldInfo();
+    std::string f1 = field_[1]->GetFieldInfo();
+    std::string y0 = field_[0]->GetYokokuInfo();
+    std::string y1 = field_[1]->GetYokokuInfo();
+    int state0 = field_[0]->userState().toDeprecatedState();
+    int state1 = field_[1]->userState().toDeprecatedState();
+    int score0 = field_[0]->score();
+    int score1 = field_[1]->score();
+    int ojama0 = field_[0]->ojama();
+    int ojama1 = field_[1]->ojama();
+    std::string ack0 = FormatAckInfo(ackInfo_[0]);
+    std::string ack1 = FormatAckInfo(ackInfo_[1]);
 
-    KumipuyoPos pos0 = field[0]->kumipuyoPos();
-    KumipuyoPos pos1 = field[1]->kumipuyoPos();
+    KumipuyoPos pos0 = field_[0]->kumipuyoPos();
+    KumipuyoPos pos1 = field_[1]->kumipuyoPos();
 
     string win0, win1;
     GameResult result = gameResult();
