@@ -43,10 +43,10 @@ PuyoColor puyoColorOf(char c)
     return PuyoColor::EMPTY;
 }
 
-char charOfPuyoColor(PuyoColor c)
+char charOfPuyoColor(PuyoColor c, char charIfEmpty)
 {
     switch (c) {
-    case PuyoColor::EMPTY: return ' ';
+    case PuyoColor::EMPTY: return charIfEmpty;
     case PuyoColor::OJAMA: return '@';
     case PuyoColor::WALL: return '#';
     case PuyoColor::RED: return 'R';

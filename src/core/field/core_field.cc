@@ -477,18 +477,6 @@ inline RensaResult CoreField::simulateWithTracker(int initialChain, int minHeigh
     return RensaResult(chains - 1, score, frames);
 }
 
-std::string CoreField::toString() const
-{
-    std::ostringstream s;
-    for (int y = 1; y <= 13; ++y) {
-        for (int x = 1; x <= WIDTH; ++x) {
-            s << charOfPuyoColor(color(x, y));
-        }
-    }
-
-    return s.str();
-}
-
 std::string CoreField::debugOutput() const
 {
     std::ostringstream s;
