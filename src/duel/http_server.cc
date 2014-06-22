@@ -1,12 +1,16 @@
 #include "duel/http_server.h"
 
-#include <glog/logging.h>
-#include <microhttpd.h>
-#include <signal.h>
 #include <string>
 #include <fstream>
 
+#include <gflags/gflags.h>
+#include <glog/logging.h>
+#include <microhttpd.h>
+#include <signal.h>
+
 #include "base/base.h"
+
+DECLARE_string(data_dir);
 
 using namespace std;
 
@@ -22,7 +26,7 @@ static string joinPath(const string& lhs, const string& rhs)
 static bool readContent(const string& filename, string* s)
 {
     ifstream ifs(filename);
-    if (!ifs) 
+    if (!ifs)
         return false;
 
     s->assign((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
@@ -82,17 +86,17 @@ int HttpServer::accessHandler(void* cls, struct MHD_Connection* connection,
 
     // TODO(mayah): Need to write Handler instead of these.
     if (strcmp(url, "/") == 0)
-        return assetsHandler(connection, joinPath(server->basedir(), "assets/index.html"));
+        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/index.html"));
     if (strcmp(url, "/puyo.js") == 0)
-        return assetsHandler(connection, joinPath(server->basedir(), "assets/puyo.js"));
+        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/puyo.js"));
     if (strcmp(url, "/puyo.css") == 0)
-        return assetsHandler(connection, joinPath(server->basedir(), "assets/puyo.css"));
+        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/puyo.css"));
     if (strcmp(url, "/puyo.png") == 0)
-        return assetsHandler(connection, joinPath(server->basedir(), "assets/puyo.png"));
+        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/puyo.png"));
     if (strcmp(url, "/yokoku.png") == 0)
-        return assetsHandler(connection, joinPath(server->basedir(), "assets/yokoku.png"));
+        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/yokoku.png"));
     if (strcmp(url, "/background.png") == 0)
-        return assetsHandler(connection, joinPath(server->basedir(), "assets/background.png"));
+        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/background.png"));
 
     return notFoundHandler(connection);
 }
@@ -108,9 +112,8 @@ static void ignoreSIGPIPE()
     CHECK(sigaction(SIGPIPE, &act, 0) == 0);
 }
 
-HttpServer::HttpServer(const string& basedir) :
-    httpd_(nullptr),
-    basedir_(basedir)
+HttpServer::HttpServer() :
+    httpd_(nullptr)
 {
 }
 

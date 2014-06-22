@@ -45,16 +45,3 @@ endfunction()
 
 puyoai_duel_add_test(field_realtime)
 
-# ----------------------------------------------------------------------
-
-function(add_assets asset)
-  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${asset}
-       DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
-endfunction()
-
-add_assets(assets/index.html)
-add_assets(assets/puyo.js)
-add_assets(assets/puyo.css)
-add_assets(assets/background.png)
-add_assets(assets/puyo.png)
-add_assets(assets/yokoku.png)

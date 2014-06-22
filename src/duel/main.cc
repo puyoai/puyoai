@@ -63,15 +63,6 @@ private:
     unique_ptr<GameState> gameState_;
 };
 
-static string getExecDirName(const char* argv0)
-{
-    unique_ptr<char, void (*)(void*)> x(strdup(argv0), std::free);
-    if (!x)
-        return string(".");
-
-    return string(dirname(x.get()));
-}
-
 int main(int argc, char* argv[])
 {
     google::InitGoogleLogging(argv[0]);
@@ -90,16 +81,18 @@ int main(int argc, char* argv[])
     }
 #endif
 
-    string dir = getExecDirName(argv[0]);
     ConnectorManagerLinux manager {
         Connector::create(0, string(argv[1])),
         Connector::create(1, string(argv[2])),
     };
 
 #if USE_HTTPD
+    cout << "HTTPD" << endl;
     GameStateHandler gameStateHandler;
-    HttpServer httpServer(dir);
+    HttpServer httpServer;
     httpServer.installHandler("/data", &gameStateHandler);
+#else
+    cout << "not HTTPD" << endl;
 #endif
 
     unique_ptr<Cui> cui;
