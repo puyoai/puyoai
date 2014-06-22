@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include <SDL.h>
+#include <SDL_image.h>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -26,10 +27,13 @@ static const string kJapaneseBdfName = "/jiskan24.bdf";
 static const string kEnglishBdfName = "/12x24.bdf";
 static const int kBdfSize = 24;
 
-static const int PUYO_W = 20;
-static const int PUYO_H = 20;
+static const int PUYO_W = 32;
+static const int PUYO_H = 35;
 
 FieldDrawer::FieldDrawer() :
+    backgroundSurface_(makeUniqueSDLSurface(IMG_Load((FLAGS_data_dir + "/assets/background.png").c_str()))),
+    puyoSurface_(makeUniqueSDLSurface(IMG_Load((FLAGS_data_dir + "/assets/puyo.png").c_str()))),
+    ojamaSurface_(makeUniqueSDLSurface(IMG_Load((FLAGS_data_dir + "/assets/yokoku.png").c_str()))),
     font_(nullptr)
 {
     font_ = Kanji_OpenFont((FLAGS_data_dir + kJapaneseBdfName).c_str(), kBdfSize);
@@ -43,7 +47,7 @@ FieldDrawer::~FieldDrawer()
 
 void FieldDrawer::onInit(Screen* screen)
 {
-    BoundingBox::instance().setGenerator(screen->mainBox().sx + 50, screen->mainBox().sy + 100, PUYO_W, PUYO_H);
+    BoundingBox::instance().setGenerator(screen->mainBox().sx + PUYO_W, screen->mainBox().sy + 2 * PUYO_H, PUYO_W, PUYO_H);
 }
 
 void FieldDrawer::onUpdate(const GameState& gameState)
@@ -57,12 +61,30 @@ void FieldDrawer::draw(Screen* screen)
     if (!gameState_)
         return;
 
+    SDL_Rect bgRect = screen->mainBox().toSDLRect();
+    SDL_BlitSurface(backgroundSurface_.get(), nullptr, screen->surface(), &bgRect);
+
     lock_guard<mutex> lock(mu_);
-    drawField(screen, gameState_->field(0));
-    drawField(screen, gameState_->field(1));
+    drawField(screen, 0, gameState_->field(0));
+    drawField(screen, 1, gameState_->field(1));
 }
 
-void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
+SDL_Rect FieldDrawer::toRect(PuyoColor pc)
+{
+    switch (pc) {
+    case PuyoColor::RED:    return SDL_Rect { 0 * 32, 0, PUYO_W, PUYO_H };
+    case PuyoColor::BLUE:   return SDL_Rect { 1 * 32, 0, PUYO_W, PUYO_H };
+    case PuyoColor::YELLOW: return SDL_Rect { 2 * 32, 0, PUYO_W, PUYO_H };
+    case PuyoColor::GREEN:  return SDL_Rect { 3 * 32, 0, PUYO_W, PUYO_H };
+    case PuyoColor::OJAMA:  return SDL_Rect { 5 * 32, 0, PUYO_W, PUYO_H };
+    default:
+        break;
+    }
+
+    return SDL_Rect { 0, 0, 0, 0 };
+}
+
+void FieldDrawer::drawField(Screen* screen, int playerId, const FieldRealtime& field)
 {
     SDL_Surface* surface = screen->surface();
 
@@ -71,9 +93,6 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
 
     for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
         for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
-            Box b = BoundingBox::instance().get(field.playerId(), x, y);
-            SDL_Rect r = b.toSDLRect();
-
             PuyoColor c = field.field().color(x, y);
             if (field.userPlayable()) {
                 if (x == kumipuyoPos.axisX() && y == kumipuyoPos.axisY())
@@ -82,21 +101,12 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
                     c = puyoColorOf(kumipuyo.child);
             }
 
-            SDL_FillRect(surface, &r, toPixelColor(surface, c));
+            SDL_Rect r = BoundingBox::instance().get(field.playerId(), x, y).toSDLRect();
+            if (isNormalColor(c) || c == PuyoColor::OJAMA) {
+                SDL_Rect sourceRect = toRect(c);
+                SDL_BlitSurface(puyoSurface_.get(), &sourceRect, surface, &r);
+            }
         }
-    }
-
-    // Death line
-    {
-        Box b1 = BoundingBox::instance().get(field.playerId(), 0, 12);
-        Box b2 = BoundingBox::instance().get(field.playerId(), 7, 12);
-
-        SDL_Rect r;
-        r.x = b1.sx;
-        r.y = b1.sy;
-        r.w = b2.dx - b1.sx;
-        r.h = 1;
-        SDL_FillRect(surface, &r, SDL_MapRGB(surface->format, 255, 255, 255));
     }
 
     // Next puyo info
@@ -108,8 +118,80 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
     };
     for (int i = 0; i < 4; ++i) {
         SDL_Rect r = BoundingBox::instance().get(field.playerId(), positions[i]).toSDLRect();
-        Uint32 c = toPixelColor(surface, field.puyoColor(positions[i]));
-        SDL_FillRect(surface, &r, c);
+        PuyoColor c = field.puyoColor(positions[i]);
+        if (isNormalColor(c) || c == PuyoColor::OJAMA) {
+            SDL_Rect sourceRect = toRect(c);
+            sourceRect.w = r.w;
+            sourceRect.h = r.h;
+            if (playerId == 1 && (i == 2 || i == 3)) {
+                sourceRect.x += sourceRect.w;
+            }
+
+            SDL_BlitSurface(puyoSurface_.get(), &sourceRect, surface, &r);
+        }
+    }
+
+    // Ojama
+    int ojama = field.ojama();
+    Box offsetBox = BoundingBox::instance().get(field.playerId(), 1, 13);
+    int offsetX = offsetBox.sx;
+    int offsetY = offsetBox.sy;
+    while (ojama > 0) {
+        if (ojama >= 400) {
+            SDL_Rect sourceRect { 0, 0, 32, 35 };
+            SDL_Rect destRect { offsetX, offsetY, 32, 35 };
+            SDL_BlitSurface(ojamaSurface_.get(), &sourceRect, surface, &destRect);
+            offsetX += 32;
+            ojama -= 400;
+            continue;
+        }
+
+        if (ojama >= 300) {
+            SDL_Rect sourceRect { 32, 0, 32, 35 };
+            SDL_Rect destRect { offsetX, offsetY, 32, 35 };
+            SDL_BlitSurface(ojamaSurface_.get(), &sourceRect, surface, &destRect);
+            offsetX += 32;
+            ojama -= 300;
+            continue;
+        }
+
+        if (ojama >= 200) {
+            SDL_Rect sourceRect { 64, 0, 32, 35 };
+            SDL_Rect destRect { offsetX, offsetY, 32, 35 };
+            SDL_BlitSurface(ojamaSurface_.get(), &sourceRect, surface, &destRect);
+            offsetX += 32;
+            ojama -= 200;
+            continue;
+        }
+
+        if (ojama >= 30) {
+            SDL_Rect sourceRect { 96, 0, 32, 35 };
+            SDL_Rect destRect { offsetX, offsetY, 32, 35 };
+            SDL_BlitSurface(ojamaSurface_.get(), &sourceRect, surface, &destRect);
+            offsetX += 32;
+            ojama -= 30;
+            continue;
+        }
+
+        if (ojama >= 6) {
+            SDL_Rect sourceRect { 128, 0, 28, 35 };
+            SDL_Rect destRect { offsetX, offsetY, 28, 35 };
+            SDL_BlitSurface(ojamaSurface_.get(), &sourceRect, surface, &destRect);
+            offsetX += 28;
+            ojama -= 6;
+            continue;
+        }
+
+        if (ojama >= 1) {
+            SDL_Rect sourceRect { 156, 0, 20, 35 };
+            SDL_Rect destRect { offsetX, offsetY, 20, 35 };
+            SDL_BlitSurface(ojamaSurface_.get(), &sourceRect, surface, &destRect);
+            offsetX += 20;
+            ojama -= 1;
+            continue;
+        }
+
+        DCHECK(false) << "ojama = " << ojama;
     }
 
     SDL_Color white;
@@ -120,16 +202,6 @@ void FieldDrawer::drawField(Screen* screen, const FieldRealtime& field)
         ostringstream ss;
         ss << setw(10) << field.score();
         Box b = BoundingBox::instance().get(field.playerId(), 0, -1);
-        Kanji_PutText(font_,
-                      b.sx, b.sy,
-                      surface, ss.str().c_str(), white);
-    }
-
-    // Ojama
-    {
-        ostringstream ss;
-        ss << field.numFixedOjama() << '(' << field.numPendingOjama() << ')';
-        Box b = BoundingBox::instance().get(field.playerId(), 0, 16);
         Kanji_PutText(font_,
                       b.sx, b.sy,
                       surface, ss.str().c_str(), white);

@@ -281,9 +281,9 @@ void Commentator::drawCommentSurface(Screen* screen, int pi) const
     if (!font)
         return;
 
-    // What is 7? 656? (656 = right side of main window)
-    int LX = 7 + 656 * pi;
-    int LX2 = 20 + 656 * pi;
+    // What is 7?
+    int LX = 7 + screen->mainBox().dx * pi;
+    int LX2 = 20 + screen->mainBox().dx * pi;
     int LH = 20;
 
     drawText(screen, "本線", LX, LH * 2);
@@ -310,12 +310,13 @@ void Commentator::drawCommentSurface(Screen* screen, int pi) const
                  to_string(firingChain_[pi]->rensaResult.score) + "点",
                  LX2, LH * 10);
     }
-    if (!message_[pi].empty())
-        drawText(screen, ("AI: " + message_[pi]).c_str(), LX, LH * 22);
 
-    int y = 25;
+    int offsetY = screen->mainBox().dy + 40;
+    int y = 0;
+    if (!message_[pi].empty())
+        drawText(screen, ("AI: " + message_[pi]).c_str(), LX, offsetY + LH * y++);
+
     for (deque<string>::const_iterator iter = events_[pi].begin(); iter != events_[pi].end(); ++iter) {
-        drawText(screen, iter->c_str(), LX, LH * y);
-        y++;
+        drawText(screen, iter->c_str(), LX, offsetY + LH * y++);
     }
 }
