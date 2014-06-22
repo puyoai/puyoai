@@ -19,6 +19,9 @@ using namespace std;
 
 DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 
+// TODO(mayah): Why STATE_CHIGIRI is necessary? Can we use STATE_DROP instead?
+// Maybe dropping puyo in CHIGIRI state is slower than in DROP?
+
 // STATE_USER <-------+
 //  v                 |
 // STATE_CHIGIRI      |
