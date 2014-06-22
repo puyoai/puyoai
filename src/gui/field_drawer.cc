@@ -44,13 +44,6 @@ FieldDrawer::~FieldDrawer()
 void FieldDrawer::onInit(Screen* screen)
 {
     BoundingBox::instance().setGenerator(screen->mainBox().sx + 50, screen->mainBox().sy + 100, PUYO_W, PUYO_H);
-
-    ColorMap::instance().setColorMap(EMPTY,  RC_EMPTY);
-    ColorMap::instance().setColorMap(OJAMA,  RC_OJAMA);
-    ColorMap::instance().setColorMap(RED,    RC_RED);
-    ColorMap::instance().setColorMap(BLUE,   RC_BLUE);
-    ColorMap::instance().setColorMap(YELLOW, RC_YELLOW);
-    ColorMap::instance().setColorMap(GREEN,  RC_GREEN);
 }
 
 void FieldDrawer::onUpdate(const GameState& gameState)
