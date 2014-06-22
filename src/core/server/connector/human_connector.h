@@ -14,9 +14,11 @@ struct KeySet {
 
 class HumanConnector : public Connector {
 public:
+    explicit HumanConnector(int playerId) : Connector(playerId) {}
     virtual ~HumanConnector() {}
 
-    virtual void write(const std::string& message) OVERRIDE;
+    virtual void write(const ConnectorFrameRequest&) OVERRIDE;
+    virtual void writeString(const std::string&) OVERRIDE;
     virtual ConnectorFrameResponse read() OVERRIDE;
     virtual bool isHuman() const OVERRIDE { return true; }
     // HumanConnector is always alive.
@@ -29,6 +31,7 @@ public:
 
 private:
     std::mutex mu_;
+    bool nextIsPlayable_ = false;
     KeySet currentKeySet_;
 };
 

@@ -1,10 +1,19 @@
 #include "core/server/connector/human_connector.h"
 
 #include "core/key.h"
+#include "core/server/connector/connector_frame_request.h"
 
 using namespace std;
 
-void HumanConnector::write(const std::string& message)
+void HumanConnector::write(const ConnectorFrameRequest& req)
+{
+    writeString(req.toRequestString(playerId_));
+
+    lock_guard<mutex> lock(mu_);
+    nextIsPlayable_ = req.userState[playerId_].playable;
+}
+
+void HumanConnector::writeString(const string& message)
 {
     LOG(INFO) << message;
 }
@@ -26,6 +35,11 @@ ConnectorFrameResponse HumanConnector::read()
         cfr.key = Key::KEY_LEFT_TURN;
     if (currentKeySet_.rightTurnKey)
         cfr.key = Key::KEY_RIGHT_TURN;
+
+    if (!nextIsPlayable_) {
+        currentKeySet_.leftTurnKey = false;
+        currentKeySet_.rightTurnKey = false;
+    }
     return cfr;
 }
 
@@ -43,5 +57,12 @@ int HumanConnector::readerFd() const
 void HumanConnector::setKeySet(const KeySet& keySet)
 {
     lock_guard<mutex> lock(mu_);
-    currentKeySet_ = keySet;
+
+    currentKeySet_.downKey = keySet.downKey;
+    currentKeySet_.leftKey = keySet.leftKey;
+    currentKeySet_.rightKey = keySet.rightKey;
+
+    // These key are bit-or.
+    currentKeySet_.leftTurnKey |= keySet.leftTurnKey;
+    currentKeySet_.rightTurnKey |= keySet.rightTurnKey;
 }

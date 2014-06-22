@@ -8,13 +8,17 @@
 #include "base/base.h"
 #include "core/server/connector/connector_frame_response.h"
 
+struct ConnectorFrameRequest;
+
 class Connector : noncopyable {
 public:
     static std::unique_ptr<Connector> create(int playerId, const std::string& program);
 
+    explicit Connector(int playerId) : playerId_(playerId) {}
     virtual ~Connector() {}
 
-    virtual void write(const std::string& message) = 0;
+    virtual void write(const ConnectorFrameRequest&) = 0;
+    virtual void writeString(const std::string&) = 0;
     virtual ConnectorFrameResponse read() = 0;
     virtual bool isHuman() const = 0;
 
@@ -25,14 +29,18 @@ public:
     virtual bool pollable() const = 0;
     // Returns reader file descriptor. Valid only when pollable() == true.
     virtual int readerFd() const = 0;
+
+protected:
+    int playerId_;
 };
 
 class PipeConnector : public Connector {
 public:
-    PipeConnector(int writerFd, int readerFd);
+    PipeConnector(int playerId, int writerFd, int readerFd);
     virtual ~PipeConnector();
 
-    virtual void write(const std::string& message) OVERRIDE;
+    virtual void write(const ConnectorFrameRequest&) OVERRIDE;
+    virtual void writeString(const std::string&) OVERRIDE;
     virtual ConnectorFrameResponse read() OVERRIDE;
     virtual bool isHuman() const OVERRIDE { return false; }
     virtual bool alive() const OVERRIDE { return alive_; }

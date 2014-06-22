@@ -66,7 +66,7 @@ ConnectorManagerLinux::ConnectorManagerLinux(unique_ptr<Connector> p1, unique_pt
 void ConnectorManagerLinux::send(const ConnectorFrameRequest& req)
 {
     for (int pi = 0; pi < 2; ++pi) {
-        connector(pi)->write(req.toRequestString(pi));
+        connector(pi)->write(req);
     }
 }
 
