@@ -62,7 +62,8 @@ void HumanConnector::setKeySet(const KeySet& keySet)
     currentKeySet_.leftKey = keySet.leftKey;
     currentKeySet_.rightKey = keySet.rightKey;
 
-    // These key are bit-or.
+    // These key are bit-or. We will consume this only when playable state.
+    // Otherwise, we often miss the key or uses too much.
     currentKeySet_.leftTurnKey |= keySet.leftTurnKey;
     currentKeySet_.rightTurnKey |= keySet.rightTurnKey;
 }
