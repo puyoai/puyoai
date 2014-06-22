@@ -150,7 +150,7 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
         }
 
         if (isAi_[pi])
-            connector_->connector(pi)->write(makeMessageFor(pi, frameId, analyzerResult));
+            connector_->connector(pi)->writeString(makeMessageFor(pi, frameId, analyzerResult));
     }
 
     return true;
@@ -165,7 +165,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
         }
 
         if (isAi_[pi])
-            connector_->connector(pi)->write(makeMessageFor(pi, frameId, analyzerResult));
+            connector_->connector(pi)->writeString(makeMessageFor(pi, frameId, analyzerResult));
     }
 
     vector<ConnectorFrameResponse> data[2];
@@ -219,6 +219,7 @@ string WiiConnectServer::makeStateString(int playerId, const AnalyzerResult& re)
     return to_string(s);
 }
 
+// TODO(mayah): Create FrameConnectorRequest instead of string.
 string WiiConnectServer::makeMessageFor(int playerId, int frameId, const AnalyzerResult& re)
 {
     CoreField field[2];

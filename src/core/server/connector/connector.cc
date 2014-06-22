@@ -11,6 +11,7 @@
 
 #include <glog/logging.h>
 
+#include "core/server/connector/connector_frame_request.h"
 #include "core/server/connector/human_connector.h"
 
 using namespace std;
@@ -19,7 +20,7 @@ using namespace std;
 unique_ptr<Connector> Connector::create(int playerId, const string& programName)
 {
     if (programName == "-")
-        return unique_ptr<Connector>(new HumanConnector);
+        return unique_ptr<Connector>(new HumanConnector(playerId));
 
     if (programName.find("fifo:") == 0) {
         string::size_type colon = programName.find(":", 5);
@@ -34,8 +35,8 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
         int downlink_fd = open(downlink_fifo.c_str(), O_WRONLY);
         CHECK(downlink_fd >= 0);
 
-        unique_ptr<Connector> connector(new PipeConnector(downlink_fd, uplink_fd));
-        connector->write("PingMessage");
+        unique_ptr<Connector> connector(new PipeConnector(playerId, downlink_fd, uplink_fd));
+        connector->writeString("PingMessage");
         (void)connector->read();
 
         return connector;
@@ -65,12 +66,12 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
         // Server.
         LOG(INFO) << "Created a child process (pid = " << pid << ")";
 
-        unique_ptr<Connector> connector(new PipeConnector(fd_field_status[1], fd_command[0]));
+        unique_ptr<Connector> connector(new PipeConnector(playerId, fd_field_status[1], fd_command[0]));
         close(fd_field_status[0]);
         close(fd_command[1]);
         close(fd_cpu_error[1]);
 
-        connector->write("PingMessage");
+        connector->writeString("PingMessage");
         (void)connector->read();
 
         return connector;
@@ -104,12 +105,13 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
     return unique_ptr<Connector>();
 }
 
-PipeConnector::PipeConnector(int writerFd, int readerFd)
+PipeConnector::PipeConnector(int playerId, int writerFd, int readerFd) :
+    Connector(playerId),
+    writerFd_(writerFd),
+    readerFd_(readerFd)
 {
-    writerFd_ = writerFd;
-    readerFd_ = readerFd;
-    writer_ = fdopen(writerFd, "w");
-    reader_ = fdopen(readerFd, "r");
+    writer_ = fdopen(writerFd_, "w");
+    reader_ = fdopen(readerFd_, "r");
 
     CHECK(writer_);
     CHECK(reader_);
@@ -121,11 +123,15 @@ PipeConnector::~PipeConnector()
     fclose(reader_);
 }
 
-void PipeConnector::write(const std::string& message)
+void PipeConnector::write(const ConnectorFrameRequest& req)
+{
+    writeString(req.toRequestString(playerId_));
+}
+
+void PipeConnector::writeString(const string& message)
 {
     fprintf(writer_, "%s\n", message.c_str());
     fflush(writer_);
-
     LOG(INFO) << message;
 }
 

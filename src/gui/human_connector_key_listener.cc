@@ -1,6 +1,6 @@
 #include "gui/human_connector_key_listener.h"
 
-#include "core/server/connector/human_connector.h"
+#include <iostream>
 
 using namespace std;
 
@@ -13,18 +13,30 @@ HumanConnectorKeyListener::~HumanConnectorKeyListener()
 {
 }
 
+void HumanConnectorKeyListener::handleEvent(const SDL_Event& event)
+{
+    if (event.type == SDL_KEYDOWN) {
+        if (event.key.keysym.sym == SDLK_x) {
+            keySet_.rightTurnKey = true;
+            cout << "right turn" << endl;
+        }
+        if (event.key.keysym.sym == SDLK_z) {
+            keySet_.leftTurnKey = true;
+            cout << "left turn" << endl;
+        }
+    }
+}
+
 void HumanConnectorKeyListener::handleAfterPollEvent()
 {
     const Uint8* state = SDL_GetKeyboardState(NULL);
 
-    KeySet keySet;
-    keySet.downKey = state[SDL_SCANCODE_DOWN];
-    keySet.leftKey = state[SDL_SCANCODE_LEFT];
-    keySet.rightKey = state[SDL_SCANCODE_RIGHT];
-    keySet.rightTurnKey = state[SDL_SCANCODE_X];
-    keySet.leftTurnKey = state[SDL_SCANCODE_Z];
+    keySet_.downKey = state[SDL_SCANCODE_DOWN];
+    keySet_.leftKey = state[SDL_SCANCODE_LEFT];
+    keySet_.rightKey = state[SDL_SCANCODE_RIGHT];
+    connector_->setKeySet(keySet_);
 
-    connector_->setKeySet(keySet);
+    keySet_ = KeySet();
 }
 
 
