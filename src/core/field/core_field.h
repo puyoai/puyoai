@@ -88,8 +88,6 @@ public:
     // ----------------------------------------------------------------------
     // utility methods
 
-    std::string toString() const;
-
     // For debugging purpose.
     std::string debugOutput() const;
 

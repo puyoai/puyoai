@@ -47,3 +47,15 @@ void PlainField::initialize()
         unsafeSet(MAP_WIDTH - 1, y, PuyoColor::WALL);
     }
 }
+
+string PlainField::toString(char charIfEmpty) const
+{
+    std::ostringstream s;
+    for (int y = 13; y >= 1; --y) {
+        for (int x = 1; x <= WIDTH; ++x) {
+            s << charOfPuyoColor(get(x, y), charIfEmpty);
+        }
+    }
+
+    return s.str();
+}

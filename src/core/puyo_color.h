@@ -31,7 +31,7 @@ inline PuyoColor normalPuyoColorOf(int index)
 PuyoColor puyoColorOf(char);
 
 // Converts PuyoColor to character.
-char charOfPuyoColor(PuyoColor);
+char charOfPuyoColor(PuyoColor, char charIfEmpty = ' ');
 
 const char* toString(PuyoColor);
 

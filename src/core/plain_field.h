@@ -18,6 +18,8 @@ public:
     PuyoColor get(int x, int y) const { return field_[x][y]; }
     void unsafeSet(int x, int y, PuyoColor c) { field_[x][y] = c; }
 
+    std::string toString(char charIfEmpty = ' ') const;
+
 private:
     void initialize();
 
