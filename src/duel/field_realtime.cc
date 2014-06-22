@@ -41,7 +41,7 @@ FieldRealtime::FieldRealtime(int playerId, const KumipuyoSeq& seq) :
     vector<Kumipuyo> kps;
     kps.push_back(Kumipuyo(PuyoColor::EMPTY, PuyoColor::EMPTY));
     kps.insert(kps.end(), seq.underlyingData().begin(), seq.underlyingData().end());
-    kumipuyoSeq_ = seq;
+    kumipuyoSeq_ = KumipuyoSeq(kps);
 
     Init();
 }
