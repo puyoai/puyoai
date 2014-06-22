@@ -52,14 +52,16 @@ public:
     PuyoColor puyoColor(NextPuyoPosition) const;
 
     enum SimulationState {
-        STATE_USER,     // A user is moving puyo
-        STATE_CHIGIRI,  // on chigiri
-        STATE_VANISH,   // on vanishing
-        STATE_DROP,     // on dropping
-        STATE_OJAMA,    // on ojama dropping
+        STATE_LEVEL_SELECT, // initial state
+        STATE_USER,         // A user is moving puyo
+        STATE_CHIGIRI,      // on chigiri
+        STATE_VANISH,       // on vanishing
+        STATE_DROP,         // on dropping
+        STATE_OJAMA,        // on ojama dropping
     };
 
     // Testing only.
+    void skipLevelSelect();
     SimulationState simulationState() const { return simulationState_; }
     bool isSleeping() const { return sleepFor_ > 0; }
 
@@ -77,7 +79,7 @@ private:
     bool TryOjama();
 
     int playerId_;
-    SimulationState simulationState_ = STATE_USER;
+    SimulationState simulationState_ = STATE_LEVEL_SELECT;
 
     CoreField field_;
     KumipuyoSeq kumipuyoSeq_;
