@@ -163,17 +163,12 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
     int current_id = 0;
     GameResult gameResult = GameResult::GAME_HAS_STOPPED;
     while (!shouldStop_) {
-        // Timeout is 120s, and the game is 30fps.
-        if (current_id >= FPS * 120) {
-            gameResult = GameResult::DRAW;
-            break;
-        }
-
-        // GO TO THE NEXT FRAME.
         current_id++;
+
+        // --- Sends the current frame information.
         manager->send(gameState.toConnectorFrameRequest(current_id));
 
-        // READ INFO.
+        // --- Reads the response of the current frame information.
         // It takes up to 16ms to finish this section.
         vector<ConnectorFrameResponse> data[2];
         if (!manager->receive(current_id, data)) {
@@ -186,18 +181,22 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
             }
         }
 
-        // PLAY.
+        // --- Play with input.
         play(&gameState, data);
         for (GameStateObserver* observer : observers_)
             observer->onUpdate(gameState);
 
-        // CHECK IF THE GAME IS OVER.
-        GameResult result = gameState.gameResult();
-        if (result != GameResult::PLAYING) {
-            gameResult = result;
+        // --- Check the result
+        // Timeout is 120s, and the game is 30fps.
+        gameResult = gameState.gameResult();
+        if (current_id >= FPS * 120) {
+            gameResult = GameResult::DRAW;
             break;
         }
     }
+
+    if (shouldStop_)
+        gameResult = GameResult::GAME_HAS_STOPPED;
 
     for (auto observer : observers_)
         observer->gameHasDone();
