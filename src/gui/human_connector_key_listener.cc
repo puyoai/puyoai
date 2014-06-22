@@ -1,7 +1,5 @@
 #include "gui/human_connector_key_listener.h"
 
-#include <iostream>
-
 using namespace std;
 
 HumanConnectorKeyListener::HumanConnectorKeyListener(HumanConnector* c) :
@@ -16,14 +14,10 @@ HumanConnectorKeyListener::~HumanConnectorKeyListener()
 void HumanConnectorKeyListener::handleEvent(const SDL_Event& event)
 {
     if (event.type == SDL_KEYDOWN) {
-        if (event.key.keysym.sym == SDLK_x) {
+        if (event.key.keysym.sym == SDLK_x)
             keySet_.rightTurnKey = true;
-            cout << "right turn" << endl;
-        }
-        if (event.key.keysym.sym == SDLK_z) {
+        if (event.key.keysym.sym == SDLK_z)
             keySet_.leftTurnKey = true;
-            cout << "left turn" << endl;
-        }
     }
 }
 
