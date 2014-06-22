@@ -189,6 +189,8 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         // --- Check the result
         // Timeout is 120s, and the game is 30fps.
         gameResult = gameState.gameResult();
+        if (gameResult != GameResult::PLAYING)
+            break;
         if (current_id >= FPS * 120) {
             gameResult = GameResult::DRAW;
             break;
