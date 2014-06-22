@@ -30,6 +30,9 @@
 using namespace std;
 
 DEFINE_bool(record, false, "use Puyofu Recorder");
+#ifdef USE_HTTPD
+DEFINE_bool(httpd, false, "use httpd");
+#endif
 
 #ifdef USE_SDL2
 DEFINE_bool(use_gui, true, "use GUI version drawer");
@@ -86,13 +89,14 @@ int main(int argc, char* argv[])
         Connector::create(1, string(argv[2])),
     };
 
-#if USE_HTTPD
-    cout << "HTTPD" << endl;
-    GameStateHandler gameStateHandler;
-    HttpServer httpServer;
-    httpServer.installHandler("/data", &gameStateHandler);
-#else
-    cout << "not HTTPD" << endl;
+#ifdef USE_HTTPD
+    unique_ptr<GameStateHandler> gameStateHandler;
+    unique_ptr<HttpServer> httpServer;
+    if (FLAGS_httpd) {
+        gameStateHandler.reset(new GameStateHandler);
+        httpServer.reset(new HttpServer);
+        httpServer->installHandler("/data", gameStateHandler.get());
+    }
 #endif
 
     unique_ptr<Cui> cui;
@@ -147,7 +151,8 @@ int main(int argc, char* argv[])
 
     // --- Add necessary obesrvers here.
 #if USE_HTTPD
-    duelServer.addObserver(&gameStateHandler);
+    if (gameStateHandler.get())
+        duelServer.addObserver(gameStateHandler.get());
 #endif
     if (cui.get())
         duelServer.addObserver(cui.get());
@@ -161,7 +166,8 @@ int main(int argc, char* argv[])
 #endif
 
 #if USE_HTTPD
-    CHECK(httpServer.start());
+    if (httpServer.get())
+        CHECK(httpServer->start());
 #endif
     CHECK(duelServer.start());
 
@@ -180,7 +186,8 @@ int main(int argc, char* argv[])
 
     duelServer.join();
 #if USE_HTTPD
-    httpServer.stop();
+    if (httpServer.get())
+        httpServer->stop();
 #endif
 
     return 0;
