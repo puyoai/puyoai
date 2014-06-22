@@ -109,7 +109,7 @@ bool ConnectorManagerLinux::receive(int frame_id, vector<ConnectorFrameResponse>
             // Check timeout.
             // The timeout delays for 50us in avarage (on pascal's machine)
             // Worst case is still in order of 100us, so it's OK to use gettimeofday.
-            int timeout_ms = GetRemainingMilliSeconds(tv_start);
+            timeout_ms = GetRemainingMilliSeconds(tv_start);
             if (timeout_ms <= 0) {
                 break;
             }
