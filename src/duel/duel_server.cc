@@ -52,7 +52,7 @@ static int updateDecision(const vector<ConnectorFrameResponse>& data, const Fiel
         if (!d.isValid())
             continue;
 
-        Key key = field.GetKey(d);
+        Key key = field.getKey(d);
         if (key != KEY_NONE) {
             *decision = d;
             return i;
@@ -60,132 +60,6 @@ static int updateDecision(const vector<ConnectorFrameResponse>& data, const Fiel
     }
 
     return -1;
-}
-
-static std::string FormatAckInfo(int ackFrameId, const vector<int>& nackFrameIds)
-{
-    stringstream nack;
-    bool hasNack = false;
-    for (size_t i = 0; i < nackFrameIds.size(); i++) {
-        if (i != 0)
-            nack << ",";
-        nack << nackFrameIds[i];
-        hasNack = true;
-    }
-
-    stringstream ret;
-    if (ackFrameId > 0)
-        ret << "ACK=" << ackFrameId << " ";
-    if (hasNack)
-        ret << "NACK=" << nack.str();
-    return ret.str();
-}
-
-// TODO(mayah): This should not exist here.
-// We must create FrameData, and pass it to connector.
-void GetFieldInfo(const GameState& gameState, std::string* player1, std::string* player2)
-{
-    std::string f0 = gameState.field(0).GetFieldInfo();
-    std::string f1 = gameState.field(1).GetFieldInfo();
-    std::string y0 = gameState.field(0).GetYokokuInfo();
-    std::string y1 = gameState.field(1).GetYokokuInfo();
-    int state0 = gameState.field(0).userState().toDeprecatedState();
-    int state1 = gameState.field(1).userState().toDeprecatedState();
-    int score0 = gameState.field(0).score();
-    int score1 = gameState.field(1).score();
-    int ojama0 = gameState.field(0).ojama();
-    int ojama1 = gameState.field(1).ojama();
-    std::string ack0 = FormatAckInfo(gameState.ackFrameId(0), gameState.nackFrameIds(0));
-    std::string ack1 = FormatAckInfo(gameState.ackFrameId(1), gameState.nackFrameIds(1));
-
-    KumipuyoPos pos0 = gameState.field(0).kumipuyoPos();
-    KumipuyoPos pos1 = gameState.field(1).kumipuyoPos();
-
-    string win0, win1;
-    GameResult result = gameState.gameResult();
-    switch (result) {
-    case GameResult::PLAYING:
-        break;
-    case GameResult::DRAW:
-        win0 = "END=1 ";
-        win1 = "END=-1 ";
-        break;
-    case GameResult::P1_WIN:
-        win0 = "END=-1 ";
-        win1 = "END=1 ";
-        break;
-    case GameResult::P2_WIN:
-        win0 = win1 = "END=0 ";
-        break;
-    default:
-        win0 = win1 = "END=0 ";
-        break;
-    }
-
-    {
-        std::stringstream ss;
-        ss << "STATE=" << (state0 + (state1 << 1)) << " "
-           << "YF=" << f0 << " "
-           << "OF=" << f1 << " "
-           << "YP=" << y0 << " "
-           << "OP=" << y1 << " "
-           << "YX=" << pos0.axisX() << " "
-           << "YY=" << pos0.axisY() << " "
-           << "YR=" << pos0.r << " "
-           << "OX=" << pos1.axisX() << " "
-           << "OY=" << pos1.axisY() << " "
-           << "OR=" << pos1.r << " "
-           << "YO=" << ojama0 << " "
-           << "OO=" << ojama1 << " "
-           << "YS=" << score0 << " "
-           << "OS=" << score1 << " "
-           << win0
-           << ack0;
-        *player1 = ss.str();
-    }
-
-    {
-        std::stringstream ss;
-        ss << "STATE=" << (state1 + (state0 << 1)) << " "
-           << "YF=" << f1 << " "
-           << "OF=" << f0 << " "
-           << "YP=" << y1 << " "
-           << "OP=" << y0 << " "
-           << "YX=" << pos1.axisX() << " "
-           << "YY=" << pos1.axisY() << " "
-           << "YR=" << pos1.r << " "
-           << "OX=" << pos0.axisX() << " "
-           << "OY=" << pos0.axisY() << " "
-           << "OR=" << pos0.r << " "
-           << "YO=" << ojama1 << " "
-           << "OO=" << ojama0 << " "
-           << "YS=" << score1 << " "
-           << "OS=" << score0 << " "
-           << win1
-           << ack1;
-        *player2 = ss.str();
-    }
-
-    if (state0 & STATE_YOU_CAN_PLAY) {
-        LOG(INFO) << "Player 0 can play.";
-    }
-    if (state1 & STATE_YOU_CAN_PLAY) {
-        LOG(INFO) << "Player 1 can play.";
-    }
-
-    // TODO(koichi): Add ACK.
-}
-
-static void SendInfo(ConnectorManager* manager, int id, const GameState& gameState)
-{
-    string s[2];
-    GetFieldInfo(gameState, &s[0], &s[1]);
-
-    for (int i = 0; i < 2; i++) {
-        stringstream ss;
-        ss << "ID=" << id << " " << s[i];
-        manager->connector(i)->write(ss.str());
-    }
 }
 
 DuelServer::DuelServer(ConnectorManager* manager) :
@@ -294,18 +168,10 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
             gameResult = GameResult::DRAW;
             break;
         }
+
         // GO TO THE NEXT FRAME.
         current_id++;
-        //string player_info[2];
-        //game.GetFieldInfo(gameState, &player_info[0], &player_info[1]);
-        SendInfo(manager, current_id, gameState);
-
-        // CHECK IF THE GAME IS OVER.
-        GameResult result = gameState.gameResult();
-        if (result != GameResult::PLAYING) {
-            gameResult = result;
-            break;
-        }
+        manager->send(gameState.toConnectorFrameRequest(current_id));
 
         // READ INFO.
         // It takes up to 16ms to finish this section.
@@ -324,6 +190,13 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         play(&gameState, data);
         for (GameStateObserver* observer : observers_)
             observer->onUpdate(gameState);
+
+        // CHECK IF THE GAME IS OVER.
+        GameResult result = gameState.gameResult();
+        if (result != GameResult::PLAYING) {
+            gameResult = result;
+            break;
+        }
     }
 
     for (auto observer : observers_)
@@ -366,12 +239,12 @@ void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse>
         if (accepted_index != -1)
             accepted_message = data[pi][accepted_index].msg;
 
-        Key key = me->GetKey(gameState->decision(pi));
+        Key key = me->getKey(gameState->decision(pi));
         if (accepted_index != -1 && data[pi][accepted_index].key != Key::KEY_NONE)
             key = data[pi][accepted_index].key;
 
         FrameContext context;
-        me->PlayOneFrame(key, &context);
+        me->playOneFrame(key, &context);
         context.apply(me, opponent);
 
         // Clear current key input if the move is done.

@@ -5,8 +5,9 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
+#include "core/game_result.h"
+#include "core/server/connector/connector_frame_request.h"
 #include "duel/field_realtime.h"
-#include "duel/game_result.h"
 
 class GameState {
 public:
@@ -14,6 +15,8 @@ public:
 
     GameResult gameResult() const;
     std::string toJson() const;
+
+    ConnectorFrameRequest toConnectorFrameRequest(int frameId) const;
 
     const FieldRealtime& field(int pi) const { return field_[pi]; }
     FieldRealtime* mutableField(int pi) { return &field_[pi]; }
@@ -26,8 +29,8 @@ public:
     void setMessage(int pi, const std::string& message) { message_[pi] = message; }
 
     int ackFrameId(int pi) const { return ackFrameId_[pi]; }
-    const std::vector<int>& nackFrameIds(int pi) const { return nackFrameIds_[pi]; }
 
+    const std::vector<int>& nackFrameIds(int pi) const { return nackFrameIds_[pi]; }
 
 private:
     FieldRealtime field_[2];

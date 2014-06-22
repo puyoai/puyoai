@@ -82,3 +82,25 @@ string GameState::toJson() const
 
     return ss.str();
 }
+
+ConnectorFrameRequest GameState::toConnectorFrameRequest(int frameId) const
+{
+    ConnectorFrameRequest req;
+    req.frameId = frameId;
+    req.gameResult = gameResult();
+    for (int pi = 0; pi < 2; ++pi) {
+        const FieldRealtime& f = field(pi);
+        req.field[pi] = f.field();
+        req.kumipuyo[pi][0] = f.kumipuyo(0);
+        req.kumipuyo[pi][1] = f.kumipuyo(1);
+        req.kumipuyo[pi][2] = f.kumipuyo(2);
+        req.kumipuyoPos[pi] = f.kumipuyoPos();
+        req.userState[pi] = f.userState();
+        req.score[pi] = f.score();
+        req.ojama[pi] = f.ojama();
+        req.ackFrameId[pi] = ackFrameId(pi);
+        req.nackFrameIds[pi] = nackFrameIds(pi);
+    }
+
+    return req;
+}

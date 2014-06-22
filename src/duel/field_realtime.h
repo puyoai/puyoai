@@ -21,18 +21,15 @@ public:
     // Gives a key input to the field, and control puyo. Returns true if a key
     // input is accepted. FrameContext will collect events when playing frames.
     // Currently, only ojama related events will be collected.
-    bool PlayOneFrame(Key key, FrameContext*);
+    bool playOneFrame(Key key, FrameContext*);
 
     // Checks if a player is dead.
     bool isDead() const { return isDead_; }
 
     // Utility functions to be used by duel server.
-    // TODO(mayah): Deprecate GetFieldInfo() and GetYokokuInfo().
     PlayerFrameData playerFrameData() const;
-    std::string GetFieldInfo() const;
-    std::string GetYokokuInfo() const;
     UserState userState() const { return userState_; }
-    Key GetKey(const Decision&) const;
+    Key getKey(const Decision&) const;
 
     int score() const { return score_; }
     int ojama() const { return numFixedOjama_ + numPendingOjama_; }
