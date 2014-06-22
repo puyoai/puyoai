@@ -9,6 +9,7 @@
 #include "gui/box.h"
 #include "gui/drawer.h"
 #include "gui/screen.h"
+#include "gui/unique_sdl_surface.h"
 #include "gui/SDL_kanji.h"
 
 class FieldRealtime;
@@ -28,10 +29,15 @@ public:
     virtual void draw(Screen*) OVERRIDE;
 
 private:
-    void drawField(Screen*, const FieldRealtime&);
+    void drawField(Screen*, int playerId, const FieldRealtime&);
+    SDL_Rect toRect(PuyoColor);
 
     mutable std::mutex mu_;
     std::unique_ptr<GameState> gameState_;
+
+    UniqueSDLSurface backgroundSurface_;
+    UniqueSDLSurface puyoSurface_;
+    UniqueSDLSurface ojamaSurface_;
 
     Kanji_Font* font_;
 };

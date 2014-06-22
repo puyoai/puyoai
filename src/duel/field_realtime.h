@@ -8,7 +8,7 @@
 #include "core/key.h"
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"
-#include "core/server/connector/received_data.h"
+#include "core/server/connector/connector_frame_response.h"
 #include "core/state.h"
 
 // TODO(mayah): We need to do refactoring this. This class is really messy.
@@ -21,22 +21,15 @@ public:
     // Gives a key input to the field, and control puyo. Returns true if a key
     // input is accepted. FrameContext will collect events when playing frames.
     // Currently, only ojama related events will be collected.
-    bool PlayOneFrame(Key key, FrameContext*);
+    bool playOneFrame(Key key, FrameContext*);
 
     // Checks if a player is dead.
     bool isDead() const { return isDead_; }
 
-    // TODO(mayah): Deprecate these 2 methods. Use kumipuyo(), puyoColor(), kumipuyoPos(), etc.
-    PuyoColor GetNextPuyo(int n) const DEPRECATED;
-    void GetCurrentPuyo(int* x1, int* y1, PuyoColor* c1, int* x2, int* y2, PuyoColor* c2, int* r) const DEPRECATED;
-
     // Utility functions to be used by duel server.
-    // TODO(mayah): Deprecate GetFieldInfo() and GetYokokuInfo().
     PlayerFrameData playerFrameData() const;
-    std::string GetFieldInfo() const;
-    std::string GetYokokuInfo() const;
     UserState userState() const { return userState_; }
-    Key GetKey(const Decision&) const;
+    Key getKey(const Decision&) const;
 
     int score() const { return score_; }
     int ojama() const { return numFixedOjama_ + numPendingOjama_; }

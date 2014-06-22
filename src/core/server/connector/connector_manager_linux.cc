@@ -16,6 +16,7 @@
 #include <glog/logging.h>
 
 #include "core/constant.h"
+#include "core/server/connector/connector_frame_request.h"
 
 using namespace std;
 
@@ -36,7 +37,7 @@ static int GetRemainingMilliSeconds(const struct timeval& start)
     return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
-static void Log(int frame_id, const vector<ReceivedData> alldata[2])
+static void Log(int frame_id, const vector<ConnectorFrameResponse> alldata[2])
 {
     // Print debug info.
     LOG(INFO) << "########## FRAME " << frame_id << " ##########";
@@ -45,7 +46,7 @@ static void Log(int frame_id, const vector<ReceivedData> alldata[2])
             LOG(INFO) << "[P" << i << "] [NODATA]";
         }
         for (size_t j = 0; j < alldata[i].size(); j++) {
-            const ReceivedData& data = alldata[i][j];
+            const ConnectorFrameResponse& data = alldata[i][j];
             LOG(INFO) << "[P" << i << "] "
                       << "[" << setfill(' ') << setw(5) << right << data.usec << "us] "
                       << "[" << data.original << "]";
@@ -62,23 +63,38 @@ ConnectorManagerLinux::ConnectorManagerLinux(unique_ptr<Connector> p1, unique_pt
 {
 }
 
+void ConnectorManagerLinux::send(const ConnectorFrameRequest& req)
+{
+    for (int pi = 0; pi < 2; ++pi) {
+        connector(pi)->write(req.toRequestString(pi));
+    }
+}
+
 // TODO(mayah): Without polling, each connector should make thread?
 // If we do so, Human connector can use MainWindow::addEventListener(), maybe.
-bool ConnectorManagerLinux::receive(int frame_id, vector<ReceivedData> receivedData[2])
+bool ConnectorManagerLinux::receive(int frame_id, vector<ConnectorFrameResponse> cfr[2])
 {
     for (int i = 0; i < 2; i++)
-        receivedData[i].clear();
+        cfr[i].clear();
 
     pollfd pollfds[NUM_PLAYERS];
     int playerIds[NUM_PLAYERS];
     int numPollfds = 0;
     for (int i = 0; i < NUM_PLAYERS; i++) {
+        if (connector(i)->isHuman()) {
+            cfr[i].push_back(connector(i)->read());
+            continue;
+        }
+
         if (connector(i)->pollable()) {
             pollfds[numPollfds].fd = connector(i)->readerFd();
             pollfds[numPollfds].events = POLLIN;
             playerIds[numPollfds] = i;
             numPollfds++;
+            continue;
         }
+
+        DCHECK(false) << "connector is not pollable or human. Then what's connector?";
     }
     DCHECK(numPollfds <= NUM_PLAYERS) << numPollfds;
 
@@ -93,7 +109,7 @@ bool ConnectorManagerLinux::receive(int frame_id, vector<ReceivedData> receivedD
             // Check timeout.
             // The timeout delays for 50us in avarage (on pascal's machine)
             // Worst case is still in order of 100us, so it's OK to use gettimeofday.
-            int timeout_ms = GetRemainingMilliSeconds(tv_start);
+            timeout_ms = GetRemainingMilliSeconds(tv_start);
             if (timeout_ms <= 0) {
                 break;
             }
@@ -113,10 +129,10 @@ bool ConnectorManagerLinux::receive(int frame_id, vector<ReceivedData> receivedD
 
         for (int i = 0; i < numPollfds; i++) {
             if (pollfds[i].revents & POLLIN) {
-                ReceivedData data = connector(playerIds[i])->read();
+                ConnectorFrameResponse data = connector(playerIds[i])->read();
                 if (data.received) {
                     data.usec = GetUsecFromStart(tv_start);
-                    receivedData[playerIds[i]].push_back(data);
+                    cfr[playerIds[i]].push_back(data);
                     if (data.frameId == frame_id)
                         received_data_for_this_frame[playerIds[i]] = true;
                 }
@@ -144,7 +160,7 @@ bool ConnectorManagerLinux::receive(int frame_id, vector<ReceivedData> receivedD
         }
     }
 
-    Log(frame_id, receivedData);
+    Log(frame_id, cfr);
 
     return !died;
 }

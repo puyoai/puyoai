@@ -9,6 +9,8 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "core/server/connector/human_connector.h"
+#include "core/server/connector/connector_manager_linux.h"
 #include "duel/cui.h"
 #include "duel/duel_server.h"
 #include "duel/http_server.h"
@@ -21,12 +23,16 @@
 #include "gui/commentator.h"
 #include "gui/field_drawer.h"
 #include "gui/fps_drawer.h"
+#include "gui/human_connector_key_listener.h"
 #include "gui/main_window.h"
 #endif
 
 using namespace std;
 
 DEFINE_bool(record, false, "use Puyofu Recorder");
+#ifdef USE_HTTPD
+DEFINE_bool(httpd, false, "use httpd");
+#endif
 
 #ifdef USE_SDL2
 DEFINE_bool(use_gui, true, "use GUI version drawer");
@@ -60,15 +66,6 @@ private:
     unique_ptr<GameState> gameState_;
 };
 
-static string getExecDirName(const char* argv0)
-{
-    unique_ptr<char, void (*)(void*)> x(strdup(argv0), std::free);
-    if (!x)
-        return string(".");
-
-    return string(dirname(x.get()));
-}
-
 int main(int argc, char* argv[])
 {
     google::InitGoogleLogging(argv[0]);
@@ -87,15 +84,19 @@ int main(int argc, char* argv[])
     }
 #endif
 
-    string dir = getExecDirName(argv[0]);
-    vector<string> programNames;
-    programNames.push_back(string(argv[1]));
-    programNames.push_back(string(argv[2]));
+    ConnectorManagerLinux manager {
+        Connector::create(0, string(argv[1])),
+        Connector::create(1, string(argv[2])),
+    };
 
-#if USE_HTTPD
-    GameStateHandler gameStateHandler;
-    HttpServer httpServer(dir);
-    httpServer.installHandler("/data", &gameStateHandler);
+#ifdef USE_HTTPD
+    unique_ptr<GameStateHandler> gameStateHandler;
+    unique_ptr<HttpServer> httpServer;
+    if (FLAGS_httpd) {
+        gameStateHandler.reset(new GameStateHandler);
+        httpServer.reset(new HttpServer);
+        httpServer->installHandler("/data", gameStateHandler.get());
+    }
 #endif
 
     unique_ptr<Cui> cui;
@@ -109,15 +110,16 @@ int main(int argc, char* argv[])
         puyofuRecorder.reset(new PuyofuRecorder);
 
 #if USE_SDL2
+    vector<unique_ptr<MainWindow::EventListener>> eventListeners;
     unique_ptr<MainWindow> mainWindow;
     unique_ptr<FieldDrawer> fieldDrawer;
     unique_ptr<Commentator> commentator;
     unique_ptr<FPSDrawer> fpsDrawer;
     if (FLAGS_use_gui) {
         if (FLAGS_use_commentator)
-            mainWindow.reset(new MainWindow(800, 600, Box(144, 40, 656, 424)));
+            mainWindow.reset(new MainWindow(640 + 2 * 144, 490 + 176, Box(144, 40, 144 + 640, 40 + 490)));
         else
-            mainWindow.reset(new MainWindow(512, 384, Box(0, 0, 512, 384)));
+            mainWindow.reset(new MainWindow(640, 490, Box(0, 0, 640, 490)));
 
         fieldDrawer.reset(new FieldDrawer);
         mainWindow->addDrawer(fieldDrawer.get());
@@ -129,14 +131,28 @@ int main(int argc, char* argv[])
 
         fpsDrawer.reset(new FPSDrawer);
         mainWindow->addDrawer(fpsDrawer.get());
+
+        for (int i = 0; i < 2; ++i) {
+            Connector* c = manager.connector(i);
+            if (c->isHuman()) {
+                HumanConnector* hc = static_cast<HumanConnector*>(c);
+                unique_ptr<MainWindow::EventListener> listener(new HumanConnectorKeyListener(hc));
+                eventListeners.push_back(move(listener));
+            }
+        }
+
+        for (auto& p : eventListeners) {
+            mainWindow->addEventListener(p.get());
+        }
     }
 #endif
 
-    DuelServer duelServer(programNames);
+    DuelServer duelServer(&manager);
 
     // --- Add necessary obesrvers here.
 #if USE_HTTPD
-    duelServer.addObserver(&gameStateHandler);
+    if (gameStateHandler.get())
+        duelServer.addObserver(gameStateHandler.get());
 #endif
     if (cui.get())
         duelServer.addObserver(cui.get());
@@ -150,7 +166,8 @@ int main(int argc, char* argv[])
 #endif
 
 #if USE_HTTPD
-    CHECK(httpServer.start());
+    if (httpServer.get())
+        CHECK(httpServer->start());
 #endif
     CHECK(duelServer.start());
 
@@ -169,7 +186,8 @@ int main(int argc, char* argv[])
 
     duelServer.join();
 #if USE_HTTPD
-    httpServer.stop();
+    if (httpServer.get())
+        httpServer->stop();
 #endif
 
     return 0;

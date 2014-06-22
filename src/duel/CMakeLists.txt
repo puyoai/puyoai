@@ -6,7 +6,7 @@ endif()
 
 add_library(puyoai_duel
             cui.cc duel_server.cc field_realtime.cc
-            frame_context.cc game.cc game_state.cc
+            frame_context.cc game_state.cc
             puyofu_recorder.cc
             ${HTTPD_SOURCE})
 
@@ -24,6 +24,7 @@ target_link_libraries(duel puyoai_base)
 if(USE_SDL2)
   target_link_libraries(duel puyoai_gui)
   target_link_libraries(duel ${SDL2_LIBRARIES})
+  target_link_libraries(duel ${SDL2_IMAGE_LIBRARIES})
   target_link_libraries(duel ${SDL2_TTF_LIBRARIES})
 endif()
 if(USE_HTTPD)
@@ -45,16 +46,3 @@ endfunction()
 
 puyoai_duel_add_test(field_realtime)
 
-# ----------------------------------------------------------------------
-
-function(add_assets asset)
-  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/${asset}
-       DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/assets)
-endfunction()
-
-add_assets(assets/index.html)
-add_assets(assets/puyo.js)
-add_assets(assets/puyo.css)
-add_assets(assets/background.png)
-add_assets(assets/puyo.png)
-add_assets(assets/yokoku.png)

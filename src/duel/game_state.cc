@@ -21,6 +21,28 @@ static string escapeMessage(const string& s)
     return ss.str();
 }
 
+GameState::GameState(const KumipuyoSeq& seq) :
+    field_ { FieldRealtime(0, seq), FieldRealtime(1, seq) },
+    ackFrameId_ { -1, -1 }
+{
+}
+
+GameResult GameState::gameResult() const
+{
+    bool p1_dead = field(0).isDead();
+    bool p2_dead = field(1).isDead();
+
+    if (!p1_dead && !p2_dead)
+        return GameResult::PLAYING;
+    if (p1_dead && p2_dead)
+        return GameResult::DRAW;
+    if (p1_dead)
+        return GameResult::P2_WIN;
+    if (p2_dead)
+        return GameResult::P1_WIN;
+    return GameResult::PLAYING;
+}
+
 string GameState::toJson() const
 {
     const FieldRealtime& f0 = field(0);
@@ -59,4 +81,26 @@ string GameState::toJson() const
     ss << "}";
 
     return ss.str();
+}
+
+ConnectorFrameRequest GameState::toConnectorFrameRequest(int frameId) const
+{
+    ConnectorFrameRequest req;
+    req.frameId = frameId;
+    req.gameResult = gameResult();
+    for (int pi = 0; pi < 2; ++pi) {
+        const FieldRealtime& f = field(pi);
+        req.field[pi] = f.field();
+        req.kumipuyo[pi][0] = f.kumipuyo(0);
+        req.kumipuyo[pi][1] = f.kumipuyo(1);
+        req.kumipuyo[pi][2] = f.kumipuyo(2);
+        req.kumipuyoPos[pi] = f.kumipuyoPos();
+        req.userState[pi] = f.userState();
+        req.score[pi] = f.score();
+        req.ojama[pi] = f.ojama();
+        req.ackFrameId[pi] = ackFrameId(pi);
+        req.nackFrameIds[pi] = nackFrameIds(pi);
+    }
+
+    return req;
 }
