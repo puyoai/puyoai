@@ -117,9 +117,9 @@ int main(int argc, char* argv[])
     unique_ptr<FPSDrawer> fpsDrawer;
     if (FLAGS_use_gui) {
         if (FLAGS_use_commentator)
-            mainWindow.reset(new MainWindow(800, 600, Box(144, 40, 656, 424)));
+            mainWindow.reset(new MainWindow(640 + 2 * 144, 490 + 176, Box(144, 40, 144 + 640, 40 + 490)));
         else
-            mainWindow.reset(new MainWindow(512, 384, Box(0, 0, 512, 384)));
+            mainWindow.reset(new MainWindow(640, 490, Box(0, 0, 640, 490)));
 
         fieldDrawer.reset(new FieldDrawer);
         mainWindow->addDrawer(fieldDrawer.get());
