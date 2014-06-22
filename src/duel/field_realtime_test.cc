@@ -30,6 +30,7 @@ protected:
 TEST_F(FieldRealtimeTest, TimingAfterKeyInput)
 {
     Key key = KEY_RIGHT;
+    f_->skipLevelSelect();
 
     EXPECT_EQ(FieldRealtime::STATE_USER, f_->simulationState());
     EXPECT_FALSE(f_->isSleeping());

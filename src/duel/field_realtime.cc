@@ -22,6 +22,8 @@ DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 // TODO(mayah): Why STATE_CHIGIRI is necessary? Can we use STATE_DROP instead?
 // Maybe dropping puyo in CHIGIRI state is slower than in DROP?
 
+// STATE_LEVEL_SELECT
+//  v
 // STATE_USER <-------+
 //  v                 |
 // STATE_CHIGIRI      |
@@ -33,17 +35,21 @@ DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 // STATE_OJAMA ------ +
 
 FieldRealtime::FieldRealtime(int playerId, const KumipuyoSeq& seq) :
-    playerId_(playerId),
-    kumipuyoSeq_(seq)
+    playerId_(playerId)
 {
+    // Since we don't use the first kumipuyo, we need to put EMPTY/EMPTY.
+    vector<Kumipuyo> kps;
+    kps.push_back(Kumipuyo(PuyoColor::EMPTY, PuyoColor::EMPTY));
+    kps.insert(kps.end(), seq.underlyingData().begin(), seq.underlyingData().end());
+    kumipuyoSeq_ = seq;
+
     Init();
 }
 
 void FieldRealtime::Init()
 {
-    PrepareNextPuyo();
-
-    userState_.playable = true;
+    userState_.playable = false;
+    sleepFor_ = 30;
 
     frames_for_free_fall_ = 0;
     ojama_position_ = vector<int>(6, 0);
@@ -228,36 +234,29 @@ bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
             return false;
         }
 
-        if (simulationState_ == STATE_CHIGIRI) {
-            if (TryChigiri()) {
+        switch (simulationState_) {
+        case STATE_LEVEL_SELECT:
+            simulationState_ = STATE_USER;
+            PrepareNextPuyo();
+            userState_.playable = true;
+            continue;
+        case STATE_CHIGIRI:
+            if (TryChigiri())
                 return false;
-            } else {
-                continue;
-            }
-        }
-        if (simulationState_ == STATE_VANISH) {
-            if (TryVanish(context)) {
+            continue;
+        case STATE_VANISH:
+            if (TryVanish(context))
                 return false;
-            } else {
-                continue;
-            }
-        }
-        if (simulationState_ == STATE_DROP) {
-            if (TryDrop(context)) {
+            continue;
+        case STATE_DROP:
+            if (TryDrop(context))
                 return false;
-            } else {
-                continue;
-            }
-        }
-        if (simulationState_ == STATE_OJAMA) {
-            if (TryOjama()) {
+            continue;
+        case STATE_OJAMA:
+            if (TryOjama())
                 return false;
-            } else {
-                continue;
-            }
-        }
-
-        if (simulationState_ == STATE_USER) {
+            continue;
+        case STATE_USER: {
             bool accepted = true;
             bool grounded = PlayInternal(key, &accepted);
             if (!grounded) {
@@ -281,6 +280,7 @@ bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
                 score_++;
             }
             return accepted;
+        }
         }
     }  // end while
 
@@ -640,4 +640,14 @@ PuyoColor FieldRealtime::puyoColor(NextPuyoPosition npp) const
 
     DCHECK(false) << static_cast<int>(npp);
     return PuyoColor::INVALID;
+}
+
+void FieldRealtime::skipLevelSelect()
+{
+    if (simulationState_ == STATE_LEVEL_SELECT) {
+        simulationState_ = STATE_USER;
+        sleepFor_ = 0;
+        PrepareNextPuyo();
+        userState_.playable = true;
+    }
 }
