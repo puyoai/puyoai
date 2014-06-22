@@ -24,8 +24,11 @@ void PuyofuRecorder::onUpdate(const GameState& gameState)
 
         // TODO(mayah): Why not passing usec here instead of passing 0?
         // Or, do we really need usec?
-        if (field.userState().grounded)
-            addMove(pi, field.field(), seq, 0);
+        if (field.userState().grounded) {
+            CoreField f(field.field());
+            f.forceDrop();
+            addMove(pi, f, seq, 0);
+        }
     }
 }
 
