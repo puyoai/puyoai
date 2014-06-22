@@ -101,6 +101,9 @@ if(USE_SDL2)
   include_directories(${FFMPEG_INCLUDE_DIR})
   puyoai_add_cxx_flags("-DUSE_SDL2")
 endif()
+if(USE_HTTPD)
+  puyoai_add_cxx_flags("-DUSE_HTTPD")
+endif()
 
 # ----------------------------------------------------------------------
 # Add subdirectories
@@ -150,6 +153,10 @@ if(USE_SDL2)
   puyoai_message("SDL2, SDL2_image and SDL2_ttf found - GUI will be ENABLED")
 else()
   puyoai_message("SDL2, SDL2_image and/or SDL2_ttf not found - GUI will be DISABLED")
+endif()
+
+if(USE_HTTPD)
+  puyoai_message("HTTPD is enabled")
 endif()
 
 if(BUILD_CAPTURE)

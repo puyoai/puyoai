@@ -34,7 +34,7 @@ class HttpServer {
 public:
     static const int kPort = 8000;
 
-    explicit HttpServer(const std::string& basedir);
+    HttpServer();
     ~HttpServer();
 
     bool start();
@@ -43,15 +43,12 @@ public:
     // Don't take ownership of HttpHandler. HttpHandler should be alive during HttpServer is alive.
     void installHandler(const std::string& path, HttpHandler*);
 
-    const std::string& basedir() const { return basedir_; }
-
 private:
     static int accessHandler(void* cls, struct MHD_Connection* connection,
                              const char* url, const char* method, const char* version,
                              const char* upload_data, size_t* upload_data_size, void** con_cls);
 
     struct MHD_Daemon* httpd_;
-    const std::string basedir_;
     std::unordered_map<std::string, HttpHandler*> handlers_;
 };
 

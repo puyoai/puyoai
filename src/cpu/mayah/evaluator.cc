@@ -443,10 +443,11 @@ public:
     void merge(const LearningScoreCollector& sc)
     {
         collector_.merge(sc.collector_);
-        for (const auto& entry : collectedFeatures_) {
+
+        for (const auto& entry : sc.collectedFeatures_) {
             collectedFeatures_[entry.first] = entry.second;
         }
-        for (const auto& entry : collectedSparseFeatures_) {
+        for (const auto& entry : sc.collectedSparseFeatures_) {
             collectedSparseFeatures_[entry.first].insert(
                 collectedSparseFeatures_[entry.first].end(),
                 entry.second.begin(),

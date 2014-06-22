@@ -16,7 +16,8 @@ public:
     class EventListener {
     public:
         virtual ~EventListener() {}
-        virtual void handleEvent(const SDL_Event&) = 0;
+        virtual void handleEvent(const SDL_Event&) {}
+        virtual void handleAfterPollEvent() {}
     };
 
     MainWindow(int width, int height, const Box& mainBox);

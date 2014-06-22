@@ -4,48 +4,41 @@
 #include <string>
 #include <glog/logging.h>
 
+#include "base/base.h"
+#include "core/game_result.h"
+#include "core/server/connector/connector_frame_request.h"
 #include "duel/field_realtime.h"
 
 class GameState {
 public:
-    GameState(const FieldRealtime& p1Field, const FieldRealtime& p2Field,
-              const std::string& p1Message, const std::string& p2Message) :
-        p1Field_(p1Field), p2Field_(p2Field),
-        p1Message_(p1Message), p2Message_(p2Message)
-    {
-    }
+    explicit GameState(const KumipuyoSeq& seq);
 
-    const FieldRealtime& field(int i) const {
-        switch (i) {
-        case 0:
-            return p1Field_;
-        case 1:
-            return p2Field_;
-        default:
-            CHECK(false);
-            return p1Field_;
-        }
-    }
-
-    const std::string& message(int i) const {
-        switch (i) {
-        case 0:
-            return p1Message_;
-        case 1:
-            return p2Message_;
-        default:
-            CHECK(false);
-            return p1Message_;
-        }
-    }
-
+    GameResult gameResult() const;
     std::string toJson() const;
 
+    ConnectorFrameRequest toConnectorFrameRequest(int frameId) const;
+
+    const FieldRealtime& field(int pi) const { return field_[pi]; }
+    FieldRealtime* mutableField(int pi) { return &field_[pi]; }
+
+    const Decision& decision(int pi) const { return decision_[pi]; }
+    void setDecision(int pi, const Decision& decision) { decision_[pi] = decision; }
+    Decision* mutableDecision(int pi) { return &decision_[pi]; }
+
+    const std::string& message(int pi) const { return message_[pi]; }
+    void setMessage(int pi, const std::string& message) { message_[pi] = message; }
+
+    int ackFrameId(int pi) const { return ackFrameId_[pi]; }
+
+    const std::vector<int>& nackFrameIds(int pi) const { return nackFrameIds_[pi]; }
+
 private:
-    const FieldRealtime p1Field_;
-    const FieldRealtime p2Field_;
-    const std::string p1Message_;
-    const std::string p2Message_;
+    FieldRealtime field_[2];
+    Decision decision_[2];
+    std::string message_[2];
+    int ackFrameId_[2];
+    std::vector<int> nackFrameIds_[2];
+
 };
 
 #endif

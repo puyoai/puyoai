@@ -6,7 +6,8 @@
 #include <thread>
 #include <vector>
 
-#include "duel/game_result.h"
+#include "core/game_result.h"
+#include "core/server/connector/connector_frame_response.h"
 
 class ConnectorManager;
 class GameState;
@@ -14,14 +15,11 @@ class GameStateObserver;
 
 class DuelServer {
 public:
-    // |dir| is the directory where the duel server program exsits.
-    explicit DuelServer(const std::vector<std::string>& programNames);
+    explicit DuelServer(ConnectorManager*);
     ~DuelServer();
 
     // Don't take ownership.
     void addObserver(GameStateObserver*);
-    // TODO(mayah): Why public?
-    void updateGameState(const GameState&);
 
     bool start();
     void stop();
@@ -29,14 +27,15 @@ public:
 
 private:
     void runDuelLoop();
+    void play(GameState*, const std::vector<ConnectorFrameResponse> data[2]);
 
-    GameResult duel(ConnectorManager* manager);
+    GameResult runGame(ConnectorManager* manager);
 
 private:
     std::thread th_;
     volatile bool shouldStop_;
 
-    std::vector<std::string> programNames_;
+    ConnectorManager* manager_;
     std::vector<GameStateObserver*> observers_;
 };
 

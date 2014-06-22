@@ -4,16 +4,18 @@
 #include <string>
 #include <vector>
 
-#include "core/server/connector/received_data.h"
-
+struct ConnectorFrameRequest;
+class ConnectorFrameResponse;
 class Connector;
 
 class ConnectorManager {
 public:
-    virtual bool receive(int frameId, std::vector<ReceivedData> data[2]) = 0;
+    virtual void send(const ConnectorFrameRequest&) = 0;
+    // Receives decision and messages from clients.
+    // Returns false when disconnected.
+    virtual bool receive(int frameId, std::vector<ConnectorFrameResponse> data[2]) = 0;
 
     virtual Connector* connector(int i) = 0;
-
     virtual void setWaitTimeout(bool) = 0;
 };
 

@@ -19,6 +19,9 @@ using namespace std;
 
 DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 
+// TODO(mayah): Why STATE_CHIGIRI is necessary? Can we use STATE_DROP instead?
+// Maybe dropping puyo in CHIGIRI state is slower than in DROP?
+
 // STATE_USER <-------+
 //  v                 |
 // STATE_CHIGIRI      |
@@ -193,7 +196,7 @@ bool FieldRealtime::TryOjama()
 }
 
 // Returns true if a key input is accepted.
-bool FieldRealtime::PlayOneFrame(Key key, FrameContext* context)
+bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
 {
     userState_.clear();
 
@@ -517,66 +520,12 @@ void FieldRealtime::PrepareNextPuyo()
     simulationState_ = STATE_USER;
 }
 
-PuyoColor FieldRealtime::GetNextPuyo(int n) const
-{
-    if (delayFramesWNextAppear_ > 0 && n >= 4)
-        return PuyoColor::EMPTY;
-
-    if (n % 2 == 0)
-        return kumipuyoSeq_.axis(n / 2);
-    else
-        return kumipuyoSeq_.child(n / 2);
-}
-
-void FieldRealtime::GetCurrentPuyo(int* x1, int* y1, PuyoColor* c1,
-                                   int* x2, int* y2, PuyoColor* c2, int* r) const {
-    *x1 = kumipuyoPos_.x;
-    *y1 = kumipuyoPos_.y;
-    *c1 = kumipuyoSeq_.axis(0);
-    *x2 = kumipuyoPos_.x + (kumipuyoPos_.r == 1) - (kumipuyoPos_.r == 3);
-    *y2 = kumipuyoPos_.y + (kumipuyoPos_.r == 0) - (kumipuyoPos_.r == 2);
-    *c2 = kumipuyoSeq_.child(0);
-    *r = kumipuyoPos_.r;
-}
-
 PlayerFrameData FieldRealtime::playerFrameData() const
 {
     return PlayerFrameData(field(), kumipuyoSeq().subsequence(0, 3), kumipuyoPos(), userState(), score(), ojama());
 }
 
-string FieldRealtime::GetFieldInfo() const {
-    stringstream ss;
-    for (int y = 12; y >= 1; y--) {
-        for (int x = 1; x <= 6; x++) {
-            switch (field_.color(x, y)) {
-            case PuyoColor::EMPTY: ss << '0'; break;
-            case PuyoColor::OJAMA: ss << '1'; break;
-            case PuyoColor::WALL: ss << '2'; break;
-            case PuyoColor::RED: ss << '4'; break;
-            case PuyoColor::BLUE: ss << '5'; break;
-            case PuyoColor::YELLOW: ss << '6'; break;
-            case PuyoColor::GREEN: ss << '7'; break;
-            default: ss << '?'; break;
-            }
-        }
-    }
-    return ss.str();
-}
-
-string FieldRealtime::GetYokokuInfo() const
-{
-    //  TODO(mayah): Implement toCompatibleChar(PuyoColor) or something.
-    stringstream ss;
-    ss << char(puyoColor(NextPuyoPosition::CURRENT_AXIS) + '0');
-    ss << char(puyoColor(NextPuyoPosition::CURRENT_CHILD) + '0');
-    ss << char(puyoColor(NextPuyoPosition::NEXT1_AXIS) + '0');
-    ss << char(puyoColor(NextPuyoPosition::NEXT1_CHILD) + '0');
-    ss << char(puyoColor(NextPuyoPosition::NEXT2_AXIS) + '0');
-    ss << char(puyoColor(NextPuyoPosition::NEXT2_CHILD) + '0');
-    return ss.str();
-}
-
-Key FieldRealtime::GetKey(const Decision& decision) const
+Key FieldRealtime::getKey(const Decision& decision) const
 {
     if (!decision.isValid())
         return KEY_NONE;
