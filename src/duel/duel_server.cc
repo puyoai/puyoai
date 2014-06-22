@@ -21,6 +21,7 @@ using namespace std;
 
 DEFINE_int32(num_duel, -1, "After num_duel times of duel, the server will stop. negative is infinity.");
 DEFINE_int32(num_win, -1, "After num_win times of 1p or 2p win, the server will stop. negative is infinity");
+DEFINE_bool(use_even, true, "the match gets even after 2 minutes.");
 
 #ifdef USE_SDL2
 DECLARE_bool(use_gui);
@@ -160,18 +161,18 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
 
     GameState gameState(kumipuyoSeq);
 
-    int current_id = 0;
+    int frameId = 0;
     GameResult gameResult = GameResult::GAME_HAS_STOPPED;
     while (!shouldStop_) {
-        current_id++;
+        frameId++;
 
         // --- Sends the current frame information.
-        manager->send(gameState.toConnectorFrameRequest(current_id));
+        manager->send(gameState.toConnectorFrameRequest(frameId));
 
         // --- Reads the response of the current frame information.
         // It takes up to 16ms to finish this section.
         vector<ConnectorFrameResponse> data[2];
-        if (!manager->receive(current_id, data)) {
+        if (!manager->receive(frameId, data)) {
             if (manager->connector(0)->alive()) {
                 gameResult = GameResult::P1_WIN_WITH_CONNECTION_ERROR;
                 break;
@@ -191,7 +192,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         gameResult = gameState.gameResult();
         if (gameResult != GameResult::PLAYING)
             break;
-        if (current_id >= FPS * 120) {
+        if (FLAGS_use_even && frameId >= FPS * 120) {
             gameResult = GameResult::DRAW;
             break;
         }
