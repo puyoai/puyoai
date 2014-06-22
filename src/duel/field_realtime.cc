@@ -193,7 +193,7 @@ bool FieldRealtime::TryOjama()
 }
 
 // Returns true if a key input is accepted.
-bool FieldRealtime::PlayOneFrame(Key key, FrameContext* context)
+bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
 {
     userState_.clear();
 
@@ -522,39 +522,7 @@ PlayerFrameData FieldRealtime::playerFrameData() const
     return PlayerFrameData(field(), kumipuyoSeq().subsequence(0, 3), kumipuyoPos(), userState(), score(), ojama());
 }
 
-string FieldRealtime::GetFieldInfo() const {
-    stringstream ss;
-    for (int y = 12; y >= 1; y--) {
-        for (int x = 1; x <= 6; x++) {
-            switch (field_.color(x, y)) {
-            case PuyoColor::EMPTY: ss << '0'; break;
-            case PuyoColor::OJAMA: ss << '1'; break;
-            case PuyoColor::WALL: ss << '2'; break;
-            case PuyoColor::RED: ss << '4'; break;
-            case PuyoColor::BLUE: ss << '5'; break;
-            case PuyoColor::YELLOW: ss << '6'; break;
-            case PuyoColor::GREEN: ss << '7'; break;
-            default: ss << '?'; break;
-            }
-        }
-    }
-    return ss.str();
-}
-
-string FieldRealtime::GetYokokuInfo() const
-{
-    //  TODO(mayah): Implement toCompatibleChar(PuyoColor) or something.
-    stringstream ss;
-    ss << char(puyoColor(NextPuyoPosition::CURRENT_AXIS) + '0');
-    ss << char(puyoColor(NextPuyoPosition::CURRENT_CHILD) + '0');
-    ss << char(puyoColor(NextPuyoPosition::NEXT1_AXIS) + '0');
-    ss << char(puyoColor(NextPuyoPosition::NEXT1_CHILD) + '0');
-    ss << char(puyoColor(NextPuyoPosition::NEXT2_AXIS) + '0');
-    ss << char(puyoColor(NextPuyoPosition::NEXT2_CHILD) + '0');
-    return ss.str();
-}
-
-Key FieldRealtime::GetKey(const Decision& decision) const
+Key FieldRealtime::getKey(const Decision& decision) const
 {
     if (!decision.isValid())
         return KEY_NONE;

@@ -16,6 +16,7 @@
 #include <glog/logging.h>
 
 #include "core/constant.h"
+#include "core/server/connector/connector_frame_request.h"
 
 using namespace std;
 
@@ -60,6 +61,13 @@ ConnectorManagerLinux::ConnectorManagerLinux(unique_ptr<Connector> p1, unique_pt
     connectors_ { move(p1), move(p2) },
     waitTimeout_(true)
 {
+}
+
+void ConnectorManagerLinux::send(const ConnectorFrameRequest& req)
+{
+    for (int pi = 0; pi < 2; ++pi) {
+        connector(pi)->write(req.toRequestString(pi));
+    }
 }
 
 // TODO(mayah): Without polling, each connector should make thread?

@@ -6,8 +6,8 @@
 #include <thread>
 #include <vector>
 
+#include "core/game_result.h"
 #include "core/server/connector/connector_frame_response.h"
-#include "duel/game_result.h"
 
 class ConnectorManager;
 class GameState;
