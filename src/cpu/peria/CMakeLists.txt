@@ -4,7 +4,7 @@ cpu_setup("peria")
 
 puyoai_add_cxx_flags("-Wall -Wextra -Wno-error=unused-parameter")
 
-add_library(peria_lib field.cc game.cc player.cc)
+add_library(peria_lib field.cc)
 
 function(peria_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
@@ -27,6 +27,6 @@ cpu_add_runner(run.sh)
 include_directories(${gtest_SOURCE_DIR}/include
                     ${gtest_SOURCE_DIR})
 # TODO(peria): add tests if needed
-peria_add_test(field_test)
-peria_add_test(player_test)
+#peria_add_test(field_test)
+#peria_add_test(player_test)
 
