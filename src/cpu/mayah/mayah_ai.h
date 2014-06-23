@@ -1,5 +1,5 @@
-#ifndef CLIENT_CPU_AI_ROUTINE_H_
-#define CLIENT_CPU_AI_ROUTINE_H_
+#ifndef CLIENT_CPU_MAYAH_MAYAH_AI_H_
+#define CLIENT_CPU_MAYAH_MAYAH_AI_H_
 
 #include <memory>
 #include <string>
@@ -16,10 +16,10 @@ class Evaluator;
 class KumipuyoSeq;
 class RefPlan;
 
-class AIRoutine : public AI {
+class MayahAI : public AI {
 public:
-    AIRoutine();
-    ~AIRoutine();
+    MayahAI();
+    ~MayahAI();
 
 protected:
     virtual void gameWillBegin(const FrameData&) OVERRIDE;
