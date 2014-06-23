@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "cpu/peria/player.h"
+#include "cpu/peria/connector.h"
 
 namespace peria {
 
@@ -16,6 +16,7 @@ class Ai {
 
  private:
   std::string name_;
+  Connector connector_;
 };
 
 }  // namespace peria
