@@ -11,6 +11,7 @@ TEST(PerformanceTest, Copy) {
   for (int i = 0; i < 10000000; i++) {
     Tsc tsc("Copy");
     LF f2(f);
+    UNUSED_VARIABLE(f2);
   }
   double average, variance;
   Tsc::GetStatistics("Copy", &average, &variance);
