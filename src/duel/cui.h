@@ -16,6 +16,8 @@ public:
     virtual ~Cui() {}
 
     void clear();
+
+    virtual void newGameWillStart() OVERRIDE;
     virtual void onUpdate(const GameState&) OVERRIDE;
 
 private:

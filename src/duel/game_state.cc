@@ -23,7 +23,6 @@ static string escapeMessage(const string& s)
 
 GameState::GameState(const KumipuyoSeq& seq) :
     field_ { FieldRealtime(0, seq), FieldRealtime(1, seq) },
-    message_ { " ", " " },
     ackFrameId_ { -1, -1 }
 {
 }

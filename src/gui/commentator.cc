@@ -243,10 +243,12 @@ void Commentator::reset()
 {
     lock_guard<mutex> lock(mu_);
     needsUpdate_[0] = needsUpdate_[1] = false;
+    message_[0] = message_[1] = "";
     for (int i = 0; i < 2; i++) {
         fireableMainChain_[i].reset();
         fireableTsubushiChain_[i].reset();
         firingChain_[i].reset();
+        events_[i].clear();
     }
 }
 
