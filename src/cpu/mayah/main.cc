@@ -2,7 +2,7 @@
 #include <glog/logging.h>
 
 #include "core/algorithm/puyo_possibility.h"
-#include "ai_routine.h"
+#include "mayah_ai.h"
 
 int main(int argc, char* argv[])
 {
@@ -12,8 +12,7 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    AIRoutine ai;
-    ai.runLoop();
+    MayahAI().runLoop();
 
     return 0;
 }
