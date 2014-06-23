@@ -10,16 +10,17 @@ class DropDecision {
 public:
     explicit DropDecision(const Decision& decision = Decision(),
                           const std::string& message = std::string()) :
-        m_decision(decision), m_message(message)
+        decision_(decision),
+        message_(message)
     {
     }
 
-    const Decision& decision() const { return m_decision; }
-    const std::string message() const { return m_message; }
+    const Decision& decision() const { return decision_; }
+    const std::string message() const { return message_; }
 
 private:
-    Decision m_decision;
-    std::string m_message;
+    Decision decision_;
+    std::string message_;
 };
 
 #endif
