@@ -61,7 +61,9 @@ bool FeatureParameter::load(const char* filename)
 
             char c;
             if (!((ss >> c) && c == '=')) {
-                LOG(WARNING) << "Invalid FeatureParameterFormat: " << str;
+                LOG(WARNING) << "Invalid FeatureParameterFormat: "
+                             << key << " : "
+                             << str;
                 return false;
             }
 
@@ -78,7 +80,8 @@ bool FeatureParameter::load(const char* filename)
         }
 #define DEFINE_SPARSE_PARAM(key, maxValue) if (keyValues.count(#key)) { \
             if (maxValue != keyValues[#key].size()) {                   \
-                LOG(WARNING) << "Invalid FeatureParameterFormat: Length mismatch."; \
+                LOG(WARNING) << "Invalid FeatureParameterFormat: "      \
+                             << #key << " : Length mismatch.";          \
                 return false;                                           \
             }                                                           \
             sparseCoef_[key] = keyValues[#key];                         \
