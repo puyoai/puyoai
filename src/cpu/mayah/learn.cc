@@ -96,14 +96,8 @@ void updateFeature(FeatureParameter* parameter,
     }
 }
 
-int main(int argc, char* argv[])
+void learnWithInteractive()
 {
-    google::ParseCommandLineFlags(&argc, &argv, true);
-    google::InitGoogleLogging(argv[0]);
-    google::InstallFailureSignalHandler();
-
-    TsumoPossibility::initialize();
-
     FeatureParameter parameter("feature.txt");
     cout << parameter.toString() << endl;
     Gazer gazer;
@@ -194,5 +188,17 @@ int main(int argc, char* argv[])
     }
 
     CHECK(parameter.save("learned.txt"));
+}
+
+int main(int argc, char* argv[])
+{
+    google::ParseCommandLineFlags(&argc, &argv, true);
+    google::InitGoogleLogging(argv[0]);
+    google::InstallFailureSignalHandler();
+
+    TsumoPossibility::initialize();
+
+    learnWithInteractive();
+
     return 0;
 }
