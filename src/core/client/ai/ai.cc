@@ -34,45 +34,21 @@ void AI::runLoop()
         // TODO(mayah): Maybe game server should send some information that we should initialize.
         if (frameData.id == 1) {
             gameWillBegin(frameData);
-
             field_.clear();
+
+            const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
             // TODO(mayah): duel should have several frames before showing the first hand.
             // This workaround code should be removed after duel is changed.
-            {
-                Kumipuyo next[3];
-                int pos = 0;
-                for (const auto& kp : frameData.myPlayerFrameData().kumipuyoSeq.underlyingData()) {
-                    if (pos >= 3)
-                        break;
-                    if (!kp.isValid())
-                        continue;
-                    next[pos++] = kp;
-                }
+            decision = make_pair(think(frameData.id, field_, kumipuyoSeq.get(1), kumipuyoSeq.get(2)), kumipuyoSeq.get(1));
+            needsSendDecision = true;
 
-                if (frameData.myPlayerFrameData().kumipuyoSeq.front().isValid()) {
-                    decision = make_pair(thinkFast(frameData.id, field_, next[0], next[1]), next[0]);
-                    needsSendDecision = true;
-
-                    if (decision.first.decision().isValid() && decision.second.isValid()) {
-                        field_.dropKumipuyo(decision.first.decision(), decision.second);
-                        field_.simulate();
-                    }
-
-                    decisionNext = make_pair(thinkFast(frameData.id, field_, next[1], next[2]), next[1]);
-                    needsSendDecisionNext = true;
-                } else {
-                    decision = make_pair(think(frameData.id, field_, next[0], next[1]), next[0]);
-                    needsSendDecision = true;
-
-                    if (decision.first.decision().isValid() && decision.second.isValid()) {
-                        field_.dropKumipuyo(decision.first.decision(), decision.second);
-                        field_.simulate();
-                    }
-
-                    decisionNext = make_pair(DropDecision(), Kumipuyo());
-                    needsSendDecisionNext = false;
-                }
+            if (decision.first.decision().isValid() && decision.second.isValid()) {
+                field_.dropKumipuyo(decision.first.decision(), decision.second);
+                field_.simulate();
             }
+
+            decisionNext = make_pair(DropDecision(), Kumipuyo());
+            needsSendDecisionNext = false;
         }
 
         // Update enemy info if necessary.
