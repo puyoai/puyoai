@@ -6,8 +6,8 @@ cmake_opts+=("-DCMAKE_C_COMPILER=clang")
 cmake_opts+=("-DCMAKE_CXX_COMPILER=clang++")
 
 declare -a cmake_cxx_flags
-cmake_cxx_flags+=("-std=c++11" "-Werror" "-Wall" "-Wextra")
-#cmake_cxx_flags+=("-fsanitize=address")
+cmake_cxx_flags+=("-std=gnu++11" "-Werror" "-Wall" "-Wextra")
+cmake_cxx_flags+=("-fsanitize=address")
 
 cmake_opts+=("-DCMAKE_CXX_FLAGS=${cmake_cxx_flags[*]}")
 
