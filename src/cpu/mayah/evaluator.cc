@@ -19,10 +19,12 @@
 #include "feature_parameter.h"
 #include "gazer.h"
 
-const bool USE_CONNECTION_FEATURE = false;
-const bool USE_EMPTY_AVAILABILITY_FEATURE = false;
-const bool USE_HAND_WIDTH_FEATURE = false;
-const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = false;
+const bool USE_CONNECTION_FEATURE = true;
+const bool USE_HAND_WIDTH_FEATURE = true;
+const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
+const bool USE_DENSITY_FEATURE = false;
+const bool USE_PATTERN33_FEATURE = false;
+const bool USE_PATTERN34_FEATURE = true;
 
 using namespace std;
 
@@ -30,37 +32,6 @@ template<typename ScoreCollector>
 void evalFrameFeature(ScoreCollector* sc, const RefPlan& plan)
 {
     sc->addScore(TOTAL_FRAMES, plan.totalFrames());
-}
-
-template<typename ScoreCollector>
-void evalEmptyAvailabilityFeature(ScoreCollector* sc, const RefPlan& plan)
-{
-    const CoreField& field = plan.field();
-
-    int emptyCells = 72 - field.countPuyos();
-    if (emptyCells <= 0)
-        return;
-
-    EvaluationFeatureKey k[3][3] = {
-        { EMPTY_AVAILABILITY_00, EMPTY_AVAILABILITY_01, EMPTY_AVAILABILITY_02, },
-        { EMPTY_AVAILABILITY_01, EMPTY_AVAILABILITY_11, EMPTY_AVAILABILITY_12, },
-        { EMPTY_AVAILABILITY_02, EMPTY_AVAILABILITY_12, EMPTY_AVAILABILITY_22, },
-    };
-
-    for (int x = CoreField::WIDTH; x >= 1; --x) {
-        for (int y = CoreField::HEIGHT; y >= 1; --y) {
-            if (field.color(x, y) != EMPTY)
-                continue;
-
-            int left = 2, right = 2;
-            if (field.color(x - 1, y) == EMPTY) --left;
-            if (field.color(x - 1, y + 1) == EMPTY) --left;
-            if (field.color(x + 1, y) == EMPTY) --right;
-            if (field.color(x + 1, y + 1) == EMPTY) --right;
-
-            sc->addScore(k[left][right], 1);
-        }
-    }
 }
 
 template<typename ScoreCollector>
@@ -176,6 +147,31 @@ void evalPuyoPattern33Feature(ScoreCollector* sc, const RefPlan& plan)
         sc->addScore(PUYO_PATTERN_33, patterns[YELLOW]);
         sc->addScore(PUYO_PATTERN_33, patterns[BLUE]);
     }
+}
+
+template<typename ScoreCollector>
+void evalPuyoPattern34Feature(ScoreCollector* sc, const RefPlan& plan)
+{
+    const CoreField& field = plan.field();
+
+    int patternsLeft[PUYO_COLORS] = { 0 };
+    int patternsRight[PUYO_COLORS] = { 0 };
+    for (int y = 1; y <= 3; ++y) {
+        for (int x = 1; x <= 4; ++x) {
+            patternsLeft[field.color(x, y)] |= 1 << ((y - 1) * 4 + (x - 1));
+            patternsRight[field.color(7 - x, y)] |= 1 << ((y - 1) * 4 + (x - 1));
+        }
+    }
+
+    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[RED]);
+    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[GREEN]);
+    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[YELLOW]);
+    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[BLUE]);
+
+    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[RED]);
+    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[GREEN]);
+    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[YELLOW]);
+    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[BLUE]);
 }
 
 template<typename ScoreCollector>
@@ -324,20 +320,9 @@ void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const Tr
         }
     }
 
-    double d2 = distanceCountResult[2];
-    double d3 = distanceCountResult[3];
-    double d4 = distanceCountResult[4];
-
-    double r32 = d2 != 0 ? d3 / d2 : 0;
-    double r43 = d3 != 0 ? d4 / d3 : 0;
-
-    sc->addScore(HAND_WIDTH_2, d2);
-    sc->addScore(HAND_WIDTH_3, d3);
-    sc->addScore(HAND_WIDTH_4, d4);
-    sc->addScore(HAND_WIDTH_RATIO_32, r32);
-    sc->addScore(HAND_WIDTH_RATIO_43, r43);
-    sc->addScore(HAND_WIDTH_RATIO_32_SQUARED, r32 * r32);
-    sc->addScore(HAND_WIDTH_RATIO_43_SQUARED, r43 * r43);
+    sc->addScore(HAND_WIDTH_2, distanceCountResult[2] > 10 ? 10 : distanceCountResult[2]);
+    sc->addScore(HAND_WIDTH_3, distanceCountResult[3] > 10 ? 10 : distanceCountResult[3]);
+    sc->addScore(HAND_WIDTH_4, distanceCountResult[4] > 10 ? 10 : distanceCountResult[4]);
 }
 
 template<typename ScoreCollector>
@@ -359,15 +344,24 @@ void evalRensaGarbageFeature(ScoreCollector* sc, const RefPlan& plan, const Core
 }
 
 template<typename ScoreCollector>
+void evalCountPuyoFeature(ScoreCollector* sc, const RefPlan& plan)
+{
+    sc->addScore(NUM_COUNT_PUYOS, plan.field().countColorPuyos());
+}
+
+template<typename ScoreCollector>
 void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gazer& gazer)
 {
     evalFrameFeature(sc, plan);
-    if (USE_EMPTY_AVAILABILITY_FEATURE)
-        evalEmptyAvailabilityFeature(sc, plan);
+    evalCountPuyoFeature(sc, plan);
     if (USE_CONNECTION_FEATURE)
         evalConnectionFeature(sc, plan);
-    evalDensityFeature(sc, plan);
-    evalPuyoPattern33Feature(sc, plan);
+    if (USE_DENSITY_FEATURE)
+        evalDensityFeature(sc, plan);
+    if (USE_PATTERN33_FEATURE)
+        evalPuyoPattern33Feature(sc, plan);
+    if (USE_PATTERN34_FEATURE)
+        evalPuyoPattern34Feature(sc, plan);
     evalFieldHeightFeature(sc, plan);
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(sc, plan);
