@@ -1,4 +1,4 @@
-#include "ai_routine.h"
+#include "mayah_ai.h"
 
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
@@ -11,27 +11,27 @@
 
 using namespace std;
 
-AIRoutine::AIRoutine() :
+MayahAI::MayahAI() :
     AI("mayah")
 {
     featureParameter_.reset(new FeatureParameter("feature.txt"));
     LOG(INFO) << featureParameter_->toString();
 }
 
-AIRoutine::~AIRoutine()
+MayahAI::~MayahAI()
 {
 }
 
-void AIRoutine::gameWillBegin(const FrameData& frameData)
+void MayahAI::gameWillBegin(const FrameData& frameData)
 {
     gazer_.initializeWith(frameData.id);
 }
 
-void AIRoutine::gameHasEnded(const FrameData&)
+void MayahAI::gameHasEnded(const FrameData&)
 {
 }
 
-DropDecision AIRoutine::think(int frameId, const PlainField& plainField, const Kumipuyo& next1, const Kumipuyo& next2)
+DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kumipuyo& next1, const Kumipuyo& next2)
 {
     CoreField field(plainField);
     KumipuyoSeq kumipuyoSeq { next1, next2 };
@@ -54,7 +54,7 @@ DropDecision AIRoutine::think(int frameId, const PlainField& plainField, const K
     return dropDecision;
 }
 
-void AIRoutine::enemyGrounded(const FrameData& frameData)
+void MayahAI::enemyGrounded(const FrameData& frameData)
 {
     gazer_.setId(frameData.id);
 
@@ -70,7 +70,7 @@ void AIRoutine::enemyGrounded(const FrameData& frameData)
         gazer_.setRensaIsOngoing(false);
 }
 
-void AIRoutine::enemyNext2Appeared(const FrameData& frameData)
+void MayahAI::enemyNext2Appeared(const FrameData& frameData)
 {
     int currentFrameId = frameData.id;
 

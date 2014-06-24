@@ -1,5 +1,7 @@
 #include "core/plain_field.h"
 
+#include <sstream>
+
 using namespace std;
 
 PlainField::PlainField()
@@ -11,11 +13,11 @@ PlainField::PlainField(const string& url)
 {
     initialize();
 
-    std::string prefix = "http://www.inosendo.com/puyo/rensim/??";
-    int data_starts_at = url.find(prefix) == 0 ? prefix.length() : 0;
+    string prefix = "http://www.inosendo.com/puyo/rensim/??";
+    int dataStartsAt = url.find(prefix) == 0 ? prefix.length() : 0;
 
     int counter = 0;
-    for (int i = url.length() - 1; i >= data_starts_at; --i) {
+    for (int i = url.length() - 1; i >= dataStartsAt; --i) {
         int x = 6 - (counter % 6);
         int y = counter / 6 + 1;
         PuyoColor c = puyoColorOf(url[i]);
@@ -50,12 +52,12 @@ void PlainField::initialize()
 
 string PlainField::toString(char charIfEmpty) const
 {
-    std::ostringstream s;
+    ostringstream ss;
     for (int y = 13; y >= 1; --y) {
         for (int x = 1; x <= WIDTH; ++x) {
-            s << charOfPuyoColor(get(x, y), charIfEmpty);
+            ss << charOfPuyoColor(get(x, y), charIfEmpty);
         }
     }
 
-    return s.str();
+    return ss.str();
 }

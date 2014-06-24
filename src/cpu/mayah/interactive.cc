@@ -17,15 +17,15 @@
 #include "core/sequence_generator.h"
 #include "core/state.h"
 
-#include "ai_routine.h"
+#include "mayah_ai.h"
 
 using namespace std;
 
-class InteractiveAI : public AIRoutine {
+class InteractiveAI : public MayahAI {
 public:
-    using AIRoutine::gameWillBegin;
-    using AIRoutine::think;
-    using AIRoutine::enemyNext2Appeared;
+    using MayahAI::gameWillBegin;
+    using MayahAI::think;
+    using MayahAI::enemyNext2Appeared;
 };
 
 double now() {
