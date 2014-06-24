@@ -10,8 +10,16 @@ class Ai : public ::AI {
   Ai();
   virtual ~Ai();
 
-  DropDecision think(int frame_id, const PlainField& field,
-		     const Kumipuyo& next1, const Kumipuyo& next2) override;
+ protected:
+  virtual DropDecision think(int frame_id,
+                             const PlainField& field,
+                             const Kumipuyo& next1,
+                             const Kumipuyo& next2) override;
+  virtual void gameWillBegin(const FrameData& frame_data) override;
+  virtual void enemyGrounded(const FrameData& frame_data) override;
+
+ private:
+  bool zenkeshi_[2];
 };
  
 }  // namespace peria
