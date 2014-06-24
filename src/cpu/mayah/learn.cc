@@ -21,6 +21,7 @@
 using namespace std;
 
 // const double LEARNING_COEF = 1 / 1000.0;
+// TODO(mayah): Add L2-normalization.
 const double WINDOW_SIZE = 65536;
 const double PROGRESSION = 7 * 256;
 
