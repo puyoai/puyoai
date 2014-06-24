@@ -25,7 +25,7 @@ TEST(SequenceGeneratorTest, CheckRestriction)
         count[seq.child(i)]++;
     }
 
-    EXPECT_EQ(4, count.size());
+    EXPECT_EQ(4U, count.size());
     EXPECT_EQ(64, count[PuyoColor::RED]);
     EXPECT_EQ(64, count[PuyoColor::BLUE]);
     EXPECT_EQ(64, count[PuyoColor::YELLOW]);
