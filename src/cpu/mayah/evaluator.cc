@@ -46,6 +46,8 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field, cons
                 continue;
 
             int numConnected = field.connectedPuyoNums(x, y, &checked);
+            if (numConnected >= 4)
+                continue;
             DCHECK(1 <= numConnected && numConnected <= 3);
             sc->addScore(keys[numConnected - 1], 1);
         }

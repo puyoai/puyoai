@@ -22,8 +22,8 @@ using namespace std;
 
 // const double LEARNING_COEF = 1 / 1000.0;
 // TODO(mayah): Add L2-normalization.
-const double WINDOW_SIZE = 65536;
-const double PROGRESSION = 7 * 256;
+const double WINDOW_SIZE = 1024;
+const double PROGRESSION =  128;
 
 // The derivation of sigmoid
 static double dsigmoid(double x)
@@ -44,7 +44,10 @@ void updateFeature(FeatureParameter* parameter,
                    const CollectedFeature& teacherFeature)
 {
     const double D = dsigmoid(currentFeature.score - teacherFeature.score);
-    cout << "learning: D = " << D << endl;
+    cout << "learning: D = " << D
+         << " current = " << currentFeature.score
+         << " teacher = " << teacherFeature.score
+         << endl;
 
     for (int i = 0; i < SIZE_OF_EVALUATION_FEATURE_KEY; ++i) {
         EvaluationFeatureKey key = toEvaluationFeatureKey(i);
@@ -85,8 +88,8 @@ void updateFeature(FeatureParameter* parameter,
             int teaV = entry.second.second;
             if (curV == teaV)
                 continue;
-            double curScore = parameter->score(key, curV);
-            double teaScore = parameter->score(key, teaV);
+            double curScore = parameter->score(key, entry.first) * curV;
+            double teaScore = parameter->score(key, entry.first) * teaV;
             double dT = D * (curV - teaV);
             cout << "learning: " << toString(key) << ' ' << entry.first << " "
                  << "current: val=" << curV << " score=" << curScore << "  "
@@ -191,79 +194,87 @@ void learnWithInteractive()
     CHECK(parameter.save("learned.txt"));
 }
 
-#if 0
+struct FrameInput {
+    FrameInput(const CoreField& f0, const KumipuyoSeq& s, const CoreField& f1) :
+        field(f0),
+        seq(s),
+        fieldAfter(f1)
+    {
+    }
+
+    CoreField field;
+    KumipuyoSeq seq;
+    CoreField fieldAfter;
+};
+
+vector<FrameInput> readUntilGameEnd()
+{
+    vector<FrameInput> inputs;
+    string left, sequence, right;
+    while (cin >> left >> sequence >> right) {
+        if (left == "===")
+            break;
+
+        cout << left << "\n"
+             << sequence << "\n"
+             << right << endl;
+
+        CoreField f1(left);
+        KumipuyoSeq seq(sequence);
+        CoreField f2(right);
+
+        cout << seq.toString() << endl;
+
+        inputs.emplace_back(left, seq, right);
+    }
+
+    return inputs;
+}
+
 void learnFromPuyofu()
 {
     FeatureParameter parameter("feature.txt");
+    Gazer gazer;
 
-    FrameInput frameInputs[3];
-    bool shouldSkip = false;
-    int fieldNum = 0;
-    string left, sequence, right;
+    gazer.initializeWith(1);
 
-    MyPlayerInfo myPlayerInfo;
-    EnemyInfo enemyInfo;
+    while (true) {
+        vector<FrameInput> inputs = readUntilGameEnd();
+        if (inputs.empty())
+            break;
 
-    while (cin >> left >> sequence >> right) {
-        if (left == "===") {
-            fieldNum = 0;
-            shouldSkip = false;
-            cout << "end" << endl;
-            continue;
-        }
+        for (size_t i = 0; i + 1 < inputs.size(); ++i) {
+            Evaluator evaluator(parameter);
+            map<vector<Decision>, CollectedFeature> featureMap;
+            CollectedFeature teacherFeature;
+            bool teacherFound = false;
 
-        if (shouldSkip)
-            continue;
+            cout << inputs[i].field.debugOutput() << endl
+                 << inputs[i].seq.toString() << endl;
 
-        convert(left);
-        convert(sequence);
-        convert(right);
+            Plan::iterateAvailablePlans(inputs[i].field, inputs[i].seq, 2, [&](const RefPlan& plan) {
+                    CollectedFeature f = evaluator.evalWithCollectingFeature(plan, 1, gazer);
+                    featureMap[plan.decisions()] = f;
+                    if (plan.field() == inputs[i + 1].fieldAfter) {
+                        teacherFound = true;
+                        teacherFeature = f;
+                    }
+            });
 
-        vector<KumiPuyo> kumiPuyos;
-        setKumiPuyo(sequence, kumiPuyos);
-        kumiPuyos.resize(2);
-        frameInputs[fieldNum % 3] = FrameInput(Field(left), kumiPuyos, Field(right));
-
-        if (fieldNum >= 2) {
-            const Field& current = frameInputs[fieldNum % 3].myField;
-            const Field& previous = frameInputs[(fieldNum + 2) % 3].myField;
-            // When we have an OJAMA puyo, skip this battle.
-            if (current.countColorPuyos() != current.countPuyos())
-                shouldSkip = true;
-            // When puyo is vanished, we also skip this battle.
-            // TODO(mayah): we have to consider this later.
-            if (current.countColorPuyos() != previous.countColorPuyos() + 2)
-                shouldSkip = true;
-
-            if (!shouldSkip) {
-                const Field& previous2 = frameInputs[(fieldNum + 1) % 3].myField;
-                const vector<KumiPuyo>& kumiPuyos = frameInputs[(fieldNum + 1) % 3].kumiPuyos;
-
-                myPlayerInfo.forceEstimatedField(previous2);
-                enemyInfo.initializeWith(1);
-                enemyInfo.updatePossibleRensas(frameInputs[(fieldNum + 1) % 3].enemyField, vector<KumiPuyo>());
-
-                learner.learn(params, enemyInfo, previous2, kumiPuyos, current);
+            if (!teacherFound) {
+                cout << "teacher didn't found" << endl;
+                continue;
+            }
+            for (const auto& entry : featureMap) {
+                updateFeature(&parameter, entry.second, teacherFeature);
             }
         }
-
-        ++fieldNum;
-        cout << params.toString() << endl;
     }
 
-    cout << params.toString() << endl;
+    cout << parameter.toString() << endl;
 
-    cout << "# learn = " << learner.numLearn() << endl;
-    cout << "# match = " << learner.numMatchedTeacher() << endl;
-    cout << "# ratio = " << learner.ratioMatchedTeacher() << endl;
-
-    if (params.save("feature_learned.txt")) {
-        cout << "Saved as feature_learned.txt" << endl;
-    } else {
-        cout << "Save faild..." << endl;
-    }
+    CHECK(parameter.save("learned.txt"));
 }
-#endif
 
 int main(int argc, char* argv[])
 {
@@ -273,7 +284,8 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    learnWithInteractive();
+    learnFromPuyofu();
+    // learnWithInteractive();
 
     return 0;
 }
