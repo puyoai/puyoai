@@ -190,6 +190,80 @@ void learnWithInteractive()
     CHECK(parameter.save("learned.txt"));
 }
 
+#if 0
+void learnFromPuyofu()
+{
+    FeatureParameter parameter("feature.txt");
+
+    FrameInput frameInputs[3];
+    bool shouldSkip = false;
+    int fieldNum = 0;
+    string left, sequence, right;
+
+    MyPlayerInfo myPlayerInfo;
+    EnemyInfo enemyInfo;
+
+    while (cin >> left >> sequence >> right) {
+        if (left == "===") {
+            fieldNum = 0;
+            shouldSkip = false;
+            cout << "end" << endl;
+            continue;
+        }
+
+        if (shouldSkip)
+            continue;
+
+        convert(left);
+        convert(sequence);
+        convert(right);
+
+        vector<KumiPuyo> kumiPuyos;
+        setKumiPuyo(sequence, kumiPuyos);
+        kumiPuyos.resize(2);
+        frameInputs[fieldNum % 3] = FrameInput(Field(left), kumiPuyos, Field(right));
+
+        if (fieldNum >= 2) {
+            const Field& current = frameInputs[fieldNum % 3].myField;
+            const Field& previous = frameInputs[(fieldNum + 2) % 3].myField;
+            // When we have an OJAMA puyo, skip this battle.
+            if (current.countColorPuyos() != current.countPuyos())
+                shouldSkip = true;
+            // When puyo is vanished, we also skip this battle.
+            // TODO(mayah): we have to consider this later.
+            if (current.countColorPuyos() != previous.countColorPuyos() + 2)
+                shouldSkip = true;
+
+            if (!shouldSkip) {
+                const Field& previous2 = frameInputs[(fieldNum + 1) % 3].myField;
+                const vector<KumiPuyo>& kumiPuyos = frameInputs[(fieldNum + 1) % 3].kumiPuyos;
+
+                myPlayerInfo.forceEstimatedField(previous2);
+                enemyInfo.initializeWith(1);
+                enemyInfo.updatePossibleRensas(frameInputs[(fieldNum + 1) % 3].enemyField, vector<KumiPuyo>());
+
+                learner.learn(params, enemyInfo, previous2, kumiPuyos, current);
+            }
+        }
+
+        ++fieldNum;
+        cout << params.toString() << endl;
+    }
+
+    cout << params.toString() << endl;
+
+    cout << "# learn = " << learner.numLearn() << endl;
+    cout << "# match = " << learner.numMatchedTeacher() << endl;
+    cout << "# ratio = " << learner.ratioMatchedTeacher() << endl;
+
+    if (params.save("feature_learned.txt")) {
+        cout << "Saved as feature_learned.txt" << endl;
+    } else {
+        cout << "Save faild..." << endl;
+    }
+}
+#endif
+
 int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
