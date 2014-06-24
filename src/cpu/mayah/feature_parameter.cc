@@ -61,7 +61,9 @@ bool FeatureParameter::load(const char* filename)
 
             char c;
             if (!((ss >> c) && c == '=')) {
-                LOG(WARNING) << "Invalid FeatureParameterFormat: " << str;
+                LOG(WARNING) << "Invalid FeatureParameterFormat: "
+                             << key << " : "
+                             << str;
                 return false;
             }
 
@@ -73,12 +75,15 @@ bool FeatureParameter::load(const char* filename)
             keyValues.insert(make_pair(key, values));
         }
 
-#define DEFINE_PARAM(key) if (keyValues.count(#key)) {                \
-            coef_[key] = keyValues[#key].front();                     \
+#define DEFINE_PARAM(key)                                               \
+        if (keyValues.count(#key)) {                                    \
+            coef_[key] = keyValues[#key].front();                       \
         }
-#define DEFINE_SPARSE_PARAM(key, maxValue) if (keyValues.count(#key)) { \
+#define DEFINE_SPARSE_PARAM(key, maxValue)                              \
+        if (keyValues.count(#key)) {                                    \
             if (maxValue != keyValues[#key].size()) {                   \
-                LOG(WARNING) << "Invalid FeatureParameterFormat: Length mismatch."; \
+                LOG(ERROR) << "Invalid FeatureParameterFormat: "        \
+                           << #key << " : Length mismatch.";            \
                 return false;                                           \
             }                                                           \
             sparseCoef_[key] = keyValues[#key];                         \

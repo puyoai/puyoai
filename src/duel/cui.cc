@@ -79,6 +79,14 @@ void Cui::clear()
     cout << "\x1b[2J";
 }
 
+void Cui::newGameWillStart()
+{
+    cout << Locate(1, 1 + CoreField::MAP_HEIGHT + 3)
+         << "\x1B[0K" << std::flush;
+    cout << Locate(1, 1 + CoreField::MAP_HEIGHT + 4)
+         << "\x1B[0K" << std::flush;
+}
+
 void Cui::onUpdate(const GameState& gameState)
 {
     Print(0, gameState.field(0), gameState.message(0));

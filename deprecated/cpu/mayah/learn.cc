@@ -54,7 +54,7 @@ void updatePlanParam(EvaluationParams& params, const PlanEvaluationFeature& curr
         double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
         cout << "learning: " << paramName << ' '
              << params.get(paramName) << ' '
-             << currentFeature.get(paramName) << ' ' 
+             << currentFeature.get(paramName) << ' '
              << teacherFeature.get(paramName) << ' '
              << dT << endl;
         params.add(paramName, -dT);
@@ -66,7 +66,7 @@ void updatePlanParam(EvaluationParams& params, const PlanEvaluationFeature& curr
         cout << "learning: " << paramName << ' '
              << params.get(paramName, currentFeature.get(paramName)) << ' '
              << params.get(paramName, teacherFeature.get(paramName)) << ' '
-             << currentFeature.get(paramName) << ' ' 
+             << currentFeature.get(paramName) << ' '
              << teacherFeature.get(paramName) << ' '
              << dT << endl;
         params.add(paramName, currentFeature.get(paramName), -dT);
@@ -86,7 +86,7 @@ void updatePlanParam(EvaluationParams& params, const PlanEvaluationFeature& curr
             double dT = it->second * LEARNING_COEF;
             params.add(it->first.first, it->first.second, -dT);
         }
-    }    
+    }
 }
 
 void updateRensaParam(EvaluationParams& params, const RensaEvaluationFeature& currentFeature, const RensaEvaluationFeature& teacherFeature)
@@ -96,7 +96,7 @@ void updateRensaParam(EvaluationParams& params, const RensaEvaluationFeature& cu
         double dT = (currentFeature.get(paramName) - teacherFeature.get(paramName)) * LEARNING_COEF;
         cout << "learning: " << paramName << ' '
              << params.get(paramName) << ' '
-             << currentFeature.get(paramName) << ' ' 
+             << currentFeature.get(paramName) << ' '
              << teacherFeature.get(paramName) << ' '
              << dT << endl;
         params.add(paramName, -dT);
@@ -108,7 +108,7 @@ void updateRensaParam(EvaluationParams& params, const RensaEvaluationFeature& cu
         cout << "learning: " << paramName << ' '
              << params.get(paramName, currentFeature.get(paramName)) << ' '
              << params.get(paramName, teacherFeature.get(paramName)) << ' '
-             << currentFeature.get(paramName) << ' ' 
+             << currentFeature.get(paramName) << ' '
              << teacherFeature.get(paramName) << ' '
              << dT << endl;
         params.add(paramName, currentFeature.get(paramName), -dT);
@@ -197,7 +197,7 @@ void Learner::learn(EvaluationParams& params, const EnemyInfo& enemyInfo,
             futures[i].wait();
             double score = features[i].calculateScore(params);
             scores[i] = make_pair(score, i);
-        }        
+        }
     }
     sort(scores.begin(), scores.end(), greater<pair<double, size_t> >());
 
@@ -280,7 +280,7 @@ int main(int argc, char* argv[])
             const Field& current = frameInputs[fieldNum % 3].myField;
             const Field& previous = frameInputs[(fieldNum + 2) % 3].myField;
             // When we have an OJAMA puyo, skip this battle.
-            if (current.countColorPuyos() != current.countPuyos()) 
+            if (current.countColorPuyos() != current.countPuyos())
                 shouldSkip = true;
             // When puyo is vanished, we also skip this battle.
             // TODO(mayah): we have to consider this later.
