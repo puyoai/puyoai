@@ -1,24 +1,19 @@
-#ifndef PERIA_AI_H_
-#define PERIA_AI_H_
+#ifndef CPU_PERIA_H_
+#define CPU_PERIA_H_
 
-#include <string>
-
-#include "cpu/peria/connector.h"
+#include "core/client/ai/ai.h"
 
 namespace peria {
 
-class Ai {
+class Ai : public ::AI {
  public:
   Ai();
-  ~Ai();
+  virtual ~Ai();
 
-  void RunLoop();
-
- private:
-  std::string name_;
-  Connector connector_;
+  DropDecision think(int frame_id, const PlainField& field,
+		     const Kumipuyo& next1, const Kumipuyo& next2) override;
 };
-
+ 
 }  // namespace peria
 
-#endif
+#endif // CPU_PERIA_H_

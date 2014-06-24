@@ -1,16 +1,16 @@
 #include "cpu/peria/ai.h"
 
-#include "cpu/peria/game.h"
-
 namespace peria {
 
-Ai::Ai() : name_("peria") {}
+Ai::Ai(): ::AI("peria") {}
 
 Ai::~Ai() {}
 
-void Ai::RunLoop() {
-  Game game;
-  while (connector_.Receive(&game)) {}
+DropDecision Ai::think(int /*frame_id*/,
+		       const PlainField& /*field*/,
+		       const Kumipuyo& /*next1*/,
+		       const Kumipuyo& /*next2*/) {
+  return DropDecision();
 }
 
 }  // namespace peria
