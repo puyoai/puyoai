@@ -71,9 +71,6 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
         close(fd_command[1]);
         close(fd_cpu_error[1]);
 
-        connector->writeString("PingMessage");
-        (void)connector->read();
-
         return connector;
     }
 
