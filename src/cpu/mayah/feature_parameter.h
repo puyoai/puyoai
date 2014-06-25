@@ -9,7 +9,7 @@
 
 class FeatureParameter {
 public:
-    explicit FeatureParameter(const char* filename);
+    explicit FeatureParameter(const std::string& filename);
 
     double score(EvaluationFeatureKey key, double value) const { return coef_[key] * value; }
     double score(EvaluationSparseFeatureKey key, int idx, int n) const { return sparseCoef_[key][idx] * n; }
@@ -31,8 +31,8 @@ public:
 
     std::string toString() const;
 
-    bool save(const char* filename);
-    bool load(const char* filename);
+    bool save(const std::string& filename);
+    bool load(const std::string& filename);
 
     friend bool operator==(const FeatureParameter&, const FeatureParameter&);
 

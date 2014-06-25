@@ -21,6 +21,7 @@
 using namespace std;
 
 DEFINE_bool(interactive, false, "use interactive learning");
+DECLARE_string(feature);
 
 // const double LEARNING_COEF = 1 / 1000.0;
 // TODO(mayah): Add L2-normalization.
@@ -104,7 +105,7 @@ void updateFeature(FeatureParameter* parameter,
 
 void learnWithInteractive()
 {
-    FeatureParameter parameter("feature.txt");
+    FeatureParameter parameter(FLAGS_feature);
     cout << parameter.toString() << endl;
     Gazer gazer;
 
@@ -235,7 +236,7 @@ vector<FrameInput> readUntilGameEnd()
 
 void learnFromPuyofu()
 {
-    FeatureParameter parameter("feature.txt");
+    FeatureParameter parameter(FLAGS_feature);
     Gazer gazer;
 
     gazer.initializeWith(1);

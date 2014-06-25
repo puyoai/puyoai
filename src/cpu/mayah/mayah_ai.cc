@@ -9,12 +9,14 @@
 #include "evaluator.h"
 #include "gazer.h"
 
+DECLARE_string(feature);
+
 using namespace std;
 
 MayahAI::MayahAI() :
     AI("mayah")
 {
-    featureParameter_.reset(new FeatureParameter("feature.txt"));
+    featureParameter_.reset(new FeatureParameter(FLAGS_feature));
     LOG(INFO) << featureParameter_->toString();
 }
 
