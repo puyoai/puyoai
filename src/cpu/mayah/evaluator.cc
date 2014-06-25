@@ -21,6 +21,7 @@
 
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
+const bool USE_HEIGHT_DIFF_FEATURE = false;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_DENSITY_FEATURE = false;
 const bool USE_PATTERN33_FEATURE = false;
@@ -121,10 +122,10 @@ void evalPuyoPattern33Feature(ScoreCollector* sc, const RefPlan& plan)
         patterns[field.color(x    , y + 1)] |= 1 << 7;
         patterns[field.color(x + 1, y + 1)] |= 1 << 8;
 
-        sc->addScore(PUYO_PATTERN_33, patterns[RED]);
-        sc->addScore(PUYO_PATTERN_33, patterns[GREEN]);
-        sc->addScore(PUYO_PATTERN_33, patterns[YELLOW]);
-        sc->addScore(PUYO_PATTERN_33, patterns[BLUE]);
+        sc->addScore(PUYO_PATTERN_33, patterns[RED], 1);
+        sc->addScore(PUYO_PATTERN_33, patterns[GREEN], 1);
+        sc->addScore(PUYO_PATTERN_33, patterns[YELLOW], 1);
+        sc->addScore(PUYO_PATTERN_33, patterns[BLUE], 1);
     }
 
     {
@@ -144,10 +145,10 @@ void evalPuyoPattern33Feature(ScoreCollector* sc, const RefPlan& plan)
         patterns[field.color(x    , y + 1)] |= 1 << 7;
         patterns[field.color(x - 1, y + 1)] |= 1 << 8;
 
-        sc->addScore(PUYO_PATTERN_33, patterns[RED]);
-        sc->addScore(PUYO_PATTERN_33, patterns[GREEN]);
-        sc->addScore(PUYO_PATTERN_33, patterns[YELLOW]);
-        sc->addScore(PUYO_PATTERN_33, patterns[BLUE]);
+        sc->addScore(PUYO_PATTERN_33, patterns[RED], 1);
+        sc->addScore(PUYO_PATTERN_33, patterns[GREEN], 1);
+        sc->addScore(PUYO_PATTERN_33, patterns[YELLOW], 1);
+        sc->addScore(PUYO_PATTERN_33, patterns[BLUE], 1);
     }
 }
 
@@ -165,15 +166,15 @@ void evalPuyoPattern34Feature(ScoreCollector* sc, const RefPlan& plan)
         }
     }
 
-    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[RED]);
-    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[GREEN]);
-    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[YELLOW]);
-    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[BLUE]);
+    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[RED], 1);
+    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[GREEN], 1);
+    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[YELLOW], 1);
+    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[BLUE], 1);
 
-    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[RED]);
-    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[GREEN]);
-    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[YELLOW]);
-    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[BLUE]);
+    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[RED], 1);
+    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[GREEN], 1);
+    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[YELLOW], 1);
+    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[BLUE], 1);
 }
 
 template<typename ScoreCollector>
@@ -201,7 +202,7 @@ void evalFieldHeightFeature(ScoreCollector* sc, const RefPlan& plan)
 template<typename ScoreCollector>
 void evalThirdColumnHeightFeature(ScoreCollector* sc, const RefPlan& plan)
 {
-    sc->addScore(THIRD_COLUMN_HEIGHT, plan.field().height(3));
+    sc->addScore(THIRD_COLUMN_HEIGHT, plan.field().height(3), 1);
 }
 
 template<typename ScoreCollector>
@@ -216,7 +217,7 @@ void evalValleyDepth(ScoreCollector* sc, const RefPlan& plan)
         int rightDepth = max(rightHeight - currentHeight, 0);
         int depth = min(leftDepth, rightDepth);
         CHECK(0 <= depth && depth < 13) << depth;
-        sc->addScore(VALLEY_DEPTH, depth);
+        sc->addScore(VALLEY_DEPTH, depth, 1);
     }
 }
 
@@ -283,7 +284,7 @@ void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& /*plan*/, const Tr
 {
     int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, info.necessaryPuyoSet.toPuyoSet());
 
-    sc->addScore(MAX_CHAINS, info.rensaResult.chains);
+    sc->addScore(MAX_CHAINS, info.rensaResult.chains, 1);
     sc->addScore(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
     if (numNecessaryPuyos != 0)
         sc->addScore(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
@@ -322,9 +323,9 @@ void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const Tr
         }
     }
 
-    sc->addScore(HAND_WIDTH_2, distanceCountResult[2] > 10 ? 10 : distanceCountResult[2]);
-    sc->addScore(HAND_WIDTH_3, distanceCountResult[3] > 10 ? 10 : distanceCountResult[3]);
-    sc->addScore(HAND_WIDTH_4, distanceCountResult[4] > 10 ? 10 : distanceCountResult[4]);
+    sc->addScore(HAND_WIDTH_2, distanceCountResult[2] > 10 ? 10 : distanceCountResult[2], 1);
+    sc->addScore(HAND_WIDTH_3, distanceCountResult[3] > 10 ? 10 : distanceCountResult[3], 1);
+    sc->addScore(HAND_WIDTH_4, distanceCountResult[4] > 10 ? 10 : distanceCountResult[4], 1);
 }
 
 template<typename ScoreCollector>
@@ -348,7 +349,7 @@ void evalRensaGarbageFeature(ScoreCollector* sc, const RefPlan& plan, const Core
 template<typename ScoreCollector>
 void evalCountPuyoFeature(ScoreCollector* sc, const RefPlan& plan)
 {
-    sc->addScore(NUM_COUNT_PUYOS, plan.field().countColorPuyos());
+    sc->addScore(NUM_COUNT_PUYOS, plan.field().countColorPuyos(), 1);
 }
 
 template<typename ScoreCollector>
@@ -364,7 +365,8 @@ void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gaz
         evalPuyoPattern33Feature(sc, plan);
     if (USE_PATTERN34_FEATURE)
         evalPuyoPattern34Feature(sc, plan);
-    evalFieldHeightFeature(sc, plan);
+    if (USE_HEIGHT_DIFF_FEATURE)
+        evalFieldHeightFeature(sc, plan);
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(sc, plan);
     evalValleyDepth(sc, plan);
@@ -409,7 +411,7 @@ public:
     explicit UsualScoreCollector(const FeatureParameter& param) : param_(param) {}
 
     void addScore(EvaluationFeatureKey key, double v) { score_ += param_.score(key, v); }
-    void addScore(EvaluationSparseFeatureKey key, int i) { score_ += param_.score(key, i); }
+    void addScore(EvaluationSparseFeatureKey key, int idx, int n) { score_ += param_.score(key, idx, n); }
     void merge(const UsualScoreCollector& sc) { score_ += sc.score(); }
 
     double score() const { return score_; }
@@ -430,10 +432,11 @@ public:
         collectedFeatures_[key] = v;
     }
 
-    void addScore(EvaluationSparseFeatureKey key, int i)
+    void addScore(EvaluationSparseFeatureKey key, int idx, int n)
     {
-        collector_.addScore(key, i);
-        collectedSparseFeatures_[key].push_back(i);
+        collector_.addScore(key, idx, n);
+        for (int i = 0; i < n; ++i)
+            collectedSparseFeatures_[key].push_back(idx);
     }
 
     void merge(const LearningScoreCollector& sc)

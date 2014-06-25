@@ -12,14 +12,13 @@ public:
     explicit FeatureParameter(const char* filename);
 
     double score(EvaluationFeatureKey key, double value) const { return coef_[key] * value; }
-    double score(EvaluationSparseFeatureKey key, int idx) const { return sparseCoef_[key][idx]; }
+    double score(EvaluationSparseFeatureKey key, int idx, int n) const { return sparseCoef_[key][idx] * n; }
 
     double getValue(EvaluationFeatureKey key) const { return coef_[key]; }
     void setValue(EvaluationFeatureKey key, double value) { coef_[key] = value; }
     void addValue(EvaluationFeatureKey key, double value) { coef_[key] += value; }
 
     double getValue(EvaluationSparseFeatureKey key, int idx) const { return sparseCoef_[key][idx]; }
-    void setValue(EvaluationSparseFeatureKey key, int idx, double value) { sparseCoef_[key][idx] = value; }
     void setValue(EvaluationSparseFeatureKey key, const std::vector<double>& values) { sparseCoef_[key] = values; }
     void addValue(EvaluationSparseFeatureKey key, int idx, double value)
     {

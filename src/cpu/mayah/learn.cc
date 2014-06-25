@@ -22,8 +22,8 @@ using namespace std;
 
 // const double LEARNING_COEF = 1 / 1000.0;
 // TODO(mayah): Add L2-normalization.
-const double WINDOW_SIZE = 1024;
-const double PROGRESSION =  128;
+const double WINDOW_SIZE = 256;
+const double PROGRESSION =  32;
 
 // The derivation of sigmoid
 static double dsigmoid(double x)
@@ -88,8 +88,8 @@ void updateFeature(FeatureParameter* parameter,
             int teaV = entry.second.second;
             if (curV == teaV)
                 continue;
-            double curScore = parameter->score(key, entry.first) * curV;
-            double teaScore = parameter->score(key, entry.first) * teaV;
+            double curScore = parameter->score(key, entry.first, curV);
+            double teaScore = parameter->score(key, entry.first, teaV);
             double dT = D * (curV - teaV);
             cout << "learning: " << toString(key) << ' ' << entry.first << " "
                  << "current: val=" << curV << " score=" << curScore << "  "
