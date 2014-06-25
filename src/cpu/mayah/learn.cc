@@ -20,6 +20,8 @@
 
 using namespace std;
 
+DEFINE_bool(interactive, false, "use interactive learning");
+
 // const double LEARNING_COEF = 1 / 1000.0;
 // TODO(mayah): Add L2-normalization.
 const double WINDOW_SIZE = 256;
@@ -130,18 +132,18 @@ void learnWithInteractive()
             }
         });
 
-        cout << "our decision : "
-             << currentDecision.first.x << ' '
-             << currentDecision.first.r << ' '
-             << currentDecision.second.x << ' '
-             << currentDecision.second.r << ' '
-             << "score=" << currentScore << endl;
-
         // Lists teacher decision.
         pair<Decision, Decision> teacherDecision;
         while (!teacherDecision.first.isValid()) {
             cout << field.debugOutput() << endl
                  << seq.toString() << endl;
+            cout << "our decision : "
+                 << currentDecision.first.x << ' '
+                 << currentDecision.first.r << ' '
+                 << currentDecision.second.x << ' '
+                 << currentDecision.second.r << ' '
+                 << "score=" << currentScore << endl;
+
             cout << "Decision x1 r1 x2 r2 ? " << flush;
             string str;
             getline(cin, str);
@@ -284,8 +286,10 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    learnFromPuyofu();
-    // learnWithInteractive();
+    if (FLAGS_interactive)
+        learnWithInteractive();
+    else
+        learnFromPuyofu();
 
     return 0;
 }
