@@ -374,7 +374,9 @@ void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gaz
 
     vector<TrackedPossibleRensaInfo> rensaInfos =
         RensaDetector::findPossibleRensasWithTracking(plan.field(), Evaluator::NUM_KEY_PUYOS);
+
     double maxRensaScore = 0;
+    unique_ptr<ScoreCollector> maxRensaScoreCollector;
     for (size_t i = 0; i < 100 && i < rensaInfos.size(); ++i) {
         const auto& rensaInfo = rensaInfos[i];
         CoreField fieldAfterRensa(plan.field());
@@ -389,19 +391,21 @@ void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gaz
         CoreField fieldAfterDrop(fieldAfterRensa);
         fieldAfterDrop.forceDrop();
 
-        ScoreCollector rensaScoreCollector(sc->featureParameter());
-        evalRensaChainFeature(&rensaScoreCollector, plan, rensaInfo);
-        evalRensaGarbageFeature(&rensaScoreCollector, plan, fieldAfterDrop);
+        unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc->featureParameter()));
+        evalRensaChainFeature(rensaScoreCollector.get(), plan, rensaInfo);
+        evalRensaGarbageFeature(rensaScoreCollector.get(), plan, fieldAfterDrop);
         if (USE_HAND_WIDTH_FEATURE)
-            evalRensaHandWidthFeature(&rensaScoreCollector, plan, rensaInfo);
+            evalRensaHandWidthFeature(rensaScoreCollector.get(), plan, rensaInfo);
         if (USE_CONNECTION_FEATURE)
-            evalRensaConnectionFeature(&rensaScoreCollector, plan, fieldAfterDrop);
-
-        if (rensaScoreCollector.score() > maxRensaScore) {
-            maxRensaScore = rensaScoreCollector.score();
-            sc->merge(rensaScoreCollector);
+            evalRensaConnectionFeature(rensaScoreCollector.get(), plan, fieldAfterDrop);
+        if (rensaScoreCollector->score() > maxRensaScore) {
+            maxRensaScore = rensaScoreCollector->score();
+            maxRensaScoreCollector = move(rensaScoreCollector);
         }
     }
+
+    if (maxRensaScoreCollector.get())
+        sc->merge(*maxRensaScoreCollector);
 }
 
 // ----------------------------------------------------------------------
