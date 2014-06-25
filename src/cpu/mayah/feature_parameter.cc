@@ -5,19 +5,22 @@
 #include <sstream>
 #include <vector>
 
+#include <gflags/gflags.h>
+
 #include "core/field/core_field.h"
+
+DEFINE_string(feature, "feature.txt", "the path to feature parameter");
 
 using namespace std;
 
-FeatureParameter::FeatureParameter(const char* filename) :
+FeatureParameter::FeatureParameter(const string& filename) :
     coef_(SIZE_OF_EVALUATION_FEATURE_KEY),
     sparseCoef_(SIZE_OF_EVALUATION_SPARSE_FEATURE_KEY)
 {
-    DCHECK(filename) << "filename should not be null.";
     CHECK(load(filename));
 }
 
-bool FeatureParameter::save(const char* filename)
+bool FeatureParameter::save(const string& filename)
 {
     try {
         ofstream ofs(filename, ios::out | ios::trunc);
@@ -39,7 +42,7 @@ bool FeatureParameter::save(const char* filename)
     }
 }
 
-bool FeatureParameter::load(const char* filename)
+bool FeatureParameter::load(const string& filename)
 {
 #define DEFINE_PARAM(key) /* ignored */
 #define DEFINE_SPARSE_PARAM(key, numValue) sparseCoef_[key].resize(numValue);
