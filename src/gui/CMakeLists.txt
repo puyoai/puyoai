@@ -23,3 +23,4 @@ function(puyoai_gui_add_test target)
 endfunction()
 
 puyoai_gui_add_test(commentator)
+puyoai_gui_add_test(box)

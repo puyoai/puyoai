@@ -11,12 +11,7 @@ struct Box {
     int h() const { return dy - sy; }
 
     SDL_Rect toSDLRect() const {
-        SDL_Rect r;
-        r.x = sx;
-        r.y = sy;
-        r.w = w();
-        r.h = h();
-        return r;
+        return SDL_Rect { sx, sy, w(), h() };
     }
 
     int sx, sy, dx, dy;

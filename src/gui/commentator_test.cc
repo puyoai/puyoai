@@ -1,3 +1,5 @@
+#include "gui/commentator.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -6,10 +8,6 @@
 
 #include <gflags/gflags.h>
 #include <gtest/gtest.h>
-
-#define private public
-#include "commentator.h"
-#undef private
 
 #include "base/base.h"
 
@@ -58,4 +56,3 @@ TEST_F(CommentatorTest, getPotentialMaxChain)
     EXPECT_EQ(BLUE, RED + best_csp[5][0]);
 }
 #endif
-
