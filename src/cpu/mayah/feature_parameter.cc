@@ -13,6 +13,17 @@ DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.txt", "the path to feature pa
 
 using namespace std;
 
+FeatureParameter::FeatureParameter() :
+    coef_(SIZE_OF_EVALUATION_FEATURE_KEY),
+    sparseCoef_(SIZE_OF_EVALUATION_SPARSE_FEATURE_KEY)
+{
+#define DEFINE_PARAM(key)
+#define DEFINE_SPARSE_PARAM(key, maxValue) sparseCoef_[key].resize(maxValue);
+#include "evaluation_feature.tab"
+#undef DEFINE_PARAM
+#undef DEFINE_SPARSE_PARAM
+}
+
 FeatureParameter::FeatureParameter(const string& filename) :
     coef_(SIZE_OF_EVALUATION_FEATURE_KEY),
     sparseCoef_(SIZE_OF_EVALUATION_SPARSE_FEATURE_KEY)

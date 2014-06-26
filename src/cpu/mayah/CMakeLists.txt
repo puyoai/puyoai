@@ -28,5 +28,6 @@ mayah_add_executable(learn learn.cc)
 cpu_add_runner(run.sh)
 cpu_add_runner(feature.txt)
 
+mayah_add_test(evaluator_test)
 mayah_add_test(gazer_test)
 
