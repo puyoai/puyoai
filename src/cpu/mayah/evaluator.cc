@@ -21,6 +21,7 @@
 #include "gazer.h"
 
 const bool USE_CONNECTION_FEATURE = true;
+const bool USE_CONNECTION_HORIZONTAL_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
 const bool USE_HEIGHT_DIFF_FEATURE = true;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
@@ -42,6 +43,7 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field, Eval
 {
     FieldBitField checked;
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
+        // TODO(mayah): Why checking EMPTY? Why not height?
         for (int y = 1; field.color(x, y) != EMPTY; ++y) {
             if (!isNormalColor(field.color(x, y)))
                 continue;
@@ -60,6 +62,24 @@ template<typename ScoreCollector>
 void evalConnectionFeature(ScoreCollector* sc, const RefPlan& plan)
 {
     calculateConnection(sc, plan.field(), CONNECTION);
+}
+
+template<typename ScoreCollector>
+void evalConnectionHozirontalFeature(ScoreCollector* sc, const RefPlan& plan)
+{
+    const CoreField& f = plan.field();
+    for (int y = 1; y <= CoreField::HEIGHT; ++y) {
+        for (int x = 1; x <= CoreField::WIDTH; ++x) {
+            if (f.color(x, y) == PuyoColor::EMPTY)
+                continue;
+
+            int len = 1;
+            while (f.color(x, y) == f.color(x + len, y))
+                ++len;
+            sc->addScore(CONNECTION_HORIZONTAL, len, 1);
+            x += len - 1;
+        }
+    }
 }
 
 // Takes 2x3 field, and counts each color puyo number.
@@ -367,6 +387,8 @@ void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gaz
     evalCountPuyoFeature(sc, plan);
     if (USE_CONNECTION_FEATURE)
         evalConnectionFeature(sc, plan);
+    if (USE_CONNECTION_HORIZONTAL_FEATURE)
+        evalConnectionHozirontalFeature(sc, plan);
     if (USE_DENSITY_FEATURE)
         evalDensityFeature(sc, plan);
     if (USE_PATTERN33_FEATURE)

@@ -9,6 +9,7 @@
 
 class FeatureParameter {
 public:
+    FeatureParameter();
     explicit FeatureParameter(const std::string& filename);
 
     double score(EvaluationFeatureKey key, double value) const { return coef_[key] * value; }
