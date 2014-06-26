@@ -22,7 +22,7 @@
 
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
-const bool USE_HEIGHT_DIFF_FEATURE = false;
+const bool USE_HEIGHT_DIFF_FEATURE = true;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_DENSITY_FEATURE = false;
 const bool USE_PATTERN33_FEATURE = false;
@@ -190,18 +190,30 @@ void evalThirdColumnHeightFeature(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-void evalValleyDepth(ScoreCollector* sc, const RefPlan& plan)
+void evalValleyDepthRidgeHeight(ScoreCollector* sc, const RefPlan& plan)
 {
     for (int x = 1; x <= 6; ++x) {
         int currentHeight = plan.field().height(x);
-        int leftHeight = (x == 1) ? 12 : plan.field().height(x - 1);
-        int rightHeight = (x == 6) ? 12 : plan.field().height(x + 1);
+        int leftHeight = (x == 1) ? 14 : plan.field().height(x - 1);
+        int rightHeight = (x == 6) ? 14 : plan.field().height(x + 1);
 
-        int leftDepth = max(leftHeight - currentHeight, 0);
-        int rightDepth = max(rightHeight - currentHeight, 0);
-        int depth = min(leftDepth, rightDepth);
-        CHECK(0 <= depth && depth < 13) << depth;
-        sc->addScore(VALLEY_DEPTH, depth, 1);
+        // --- valley
+        {
+            int left = max(leftHeight - currentHeight, 0);
+            int right = max(rightHeight - currentHeight, 0);
+            int depth = min(left, right);
+            DCHECK(0 <= depth && depth <= 14) << depth;
+            sc->addScore(VALLEY_DEPTH, depth, 1);
+        }
+
+        // --- ridge
+        {
+            int left = max(currentHeight - leftHeight, 0);
+            int right = max(currentHeight - rightHeight, 0);
+            int height = min(left, right);
+            DCHECK(0 <= height && height <= 14) << height;
+            sc->addScore(RIDGE_HEIGHT, height, 1);
+        }
     }
 }
 
@@ -365,7 +377,7 @@ void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gaz
         evalFieldHeightFeature(sc, plan);
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(sc, plan);
-    evalValleyDepth(sc, plan);
+    evalValleyDepthRidgeHeight(sc, plan);
     evalOngoingRensaFeature(sc, plan, currentFrameId, gazer);
 
     vector<TrackedPossibleRensaInfo> rensaInfos =
