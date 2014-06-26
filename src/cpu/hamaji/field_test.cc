@@ -142,7 +142,7 @@ TEST(FieldTest, FindAvailablePlansTest) {
 
     vector<LP> plans;
     f.FindAvailablePlans(next, &plans);
-    EXPECT_EQ(11 + 11*11 + 11*11*11, plans.size());
+    EXPECT_EQ(11U + 11*11 + 11*11*11, plans.size());
   }
   {
     LF f;
@@ -150,7 +150,7 @@ TEST(FieldTest, FindAvailablePlansTest) {
 
     vector<LP> plans;
     f.FindAvailablePlans(next, &plans);
-    EXPECT_EQ(11 + 11*11 + 11*11*11, plans.size());
+    EXPECT_EQ(11U + 11*11 + 11*11*11, plans.size());
   }
   {
     LF f;
@@ -158,7 +158,7 @@ TEST(FieldTest, FindAvailablePlansTest) {
 
     vector<LP> plans;
     f.FindAvailablePlans(next, &plans);
-    EXPECT_EQ(22 + 22*22 + 22*22*22, plans.size());
+    EXPECT_EQ(22U + 22*22 + 22*22*22, plans.size());
   }
   {
     LF f;
@@ -166,7 +166,7 @@ TEST(FieldTest, FindAvailablePlansTest) {
 
     vector<LP> plans;
     f.FindAvailablePlans(next, &plans);
-    EXPECT_EQ(11 + 11*22 + 11*22*22, plans.size());
+    EXPECT_EQ(11U + 11*22 + 11*22*22, plans.size());
   }
   {
     LF f;
@@ -174,7 +174,7 @@ TEST(FieldTest, FindAvailablePlansTest) {
 
     vector<LP> plans;
     f.FindAvailablePlans(next, &plans);
-    EXPECT_EQ(22 + 22*22 + 22*22*11, plans.size());
+    EXPECT_EQ(22U + 22*22 + 22*22*11, plans.size());
   }
 }
 
