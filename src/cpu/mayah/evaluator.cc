@@ -27,6 +27,7 @@ const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_DENSITY_FEATURE = false;
 const bool USE_PATTERN33_FEATURE = false;
 const bool USE_PATTERN34_FEATURE = true;
+const bool USE_IGNITION_HEIGHT_FEATURE = false;
 
 using namespace std;
 
@@ -312,6 +313,23 @@ void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const Tr
 }
 
 template<typename ScoreCollector>
+void evalRensaIgnitionHeightFeature(ScoreCollector* sc, const RefPlan& plan, const TrackedPossibleRensaInfo& info)
+{
+    for (int y = CoreField::HEIGHT; y >= 1; --y) {
+        for (int x = 1; x <= CoreField::WIDTH; ++x) {
+            if (!isNormalColor(plan.field().color(x, y)))
+                continue;
+            if (info.trackResult.erasedAt(x, y) == 1) {
+                sc->addScore(IGNITION_HEIGHT, y, 1);
+                return;
+            }
+        }
+    }
+
+    sc->addScore(IGNITION_HEIGHT, 0, 1);
+}
+
+template<typename ScoreCollector>
 void evalRensaConnectionFeature(ScoreCollector* sc, const RefPlan& plan, const CoreField& fieldAfterDrop)
 {
     UNUSED_VARIABLE(plan);
@@ -374,6 +392,8 @@ void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gaz
         evalRensaGarbageFeature(rensaScoreCollector.get(), plan, fieldAfterDrop);
         if (USE_HAND_WIDTH_FEATURE)
             evalRensaHandWidthFeature(rensaScoreCollector.get(), plan, rensaInfo);
+        if (USE_IGNITION_HEIGHT_FEATURE)
+            evalRensaIgnitionHeightFeature(rensaScoreCollector.get(), plan, rensaInfo);
         if (USE_CONNECTION_FEATURE)
             evalRensaConnectionFeature(rensaScoreCollector.get(), plan, fieldAfterDrop);
         if (rensaScoreCollector->score() > maxRensaScore) {
