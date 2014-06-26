@@ -37,7 +37,7 @@ void evalFrameFeature(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-static void calculateConnection(ScoreCollector* sc, const CoreField& field, const EvaluationFeatureKey keys[])
+static void calculateConnection(ScoreCollector* sc, const CoreField& field, EvaluationSparseFeatureKey key)
 {
     FieldBitField checked;
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
@@ -49,9 +49,8 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field, cons
 
             int numConnected = field.connectedPuyoNums(x, y, &checked);
             if (numConnected >= 4)
-                continue;
-            DCHECK(1 <= numConnected && numConnected <= 3);
-            sc->addScore(keys[numConnected - 1], 1);
+                numConnected = 3;
+            sc->addScore(key, numConnected, 1);
         }
     }
 }
@@ -59,16 +58,12 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field, cons
 template<typename ScoreCollector>
 void evalConnectionFeature(ScoreCollector* sc, const RefPlan& plan)
 {
-    static const EvaluationFeatureKey keys[] = {
-        CONNECTION_1, CONNECTION_2, CONNECTION_3,
-    };
-
-    calculateConnection(sc, plan.field(), keys);
+    calculateConnection(sc, plan.field(), CONNECTION);
 }
 
 // Takes 2x3 field, and counts each color puyo number.
 template<typename ScoreCollector>
-static void calculateDensity(ScoreCollector* sc, const CoreField& field, const EvaluationFeatureKey keys[])
+void evalDensityFeature(ScoreCollector* sc, const RefPlan& plan)
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = 1; y <= CoreField::HEIGHT + 1; ++y) {
@@ -76,29 +71,16 @@ static void calculateDensity(ScoreCollector* sc, const CoreField& field, const E
 
             for (int dx = -1; dx <= 1; ++dx) {
                 for (int dy = -1; dy <= 1; ++dy) {
-                    numColors[field.color(x + dx, y + dy)] += 1;
+                    numColors[plan.field().color(x + dx, y + dy)] += 1;
                 }
             }
 
             for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
                 PuyoColor c = normalPuyoColorOf(i);
-                if (numColors[c] > 4)
-                    numColors[c] = 4;
-                sc->addScore(keys[numColors[c]], 1);
+                sc->addScore(DENSITY, c, 1);
             }
         }
     }
-
-}
-
-template<typename ScoreCollector>
-void evalDensityFeature(ScoreCollector* sc, const RefPlan& plan)
-{
-    static const EvaluationFeatureKey keys[] = {
-        DENSITY_0, DENSITY_1, DENSITY_2, DENSITY_3, DENSITY_4,
-    };
-
-    calculateDensity(sc, plan.field(), keys);
 }
 
 template<typename ScoreCollector>
@@ -333,12 +315,7 @@ template<typename ScoreCollector>
 void evalRensaConnectionFeature(ScoreCollector* sc, const RefPlan& plan, const CoreField& fieldAfterDrop)
 {
     UNUSED_VARIABLE(plan);
-
-    static const EvaluationFeatureKey keys[] = {
-        CONNECTION_AFTER_VANISH_1, CONNECTION_AFTER_VANISH_2, CONNECTION_AFTER_VANISH_3,
-    };
-
-    calculateConnection(sc, fieldAfterDrop, keys);
+    calculateConnection(sc, fieldAfterDrop, CONNECTION_AFTER_VANISH);
 }
 
 template<typename ScoreCollector>
