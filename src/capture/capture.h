@@ -17,6 +17,8 @@ class Screen;
 
 class Capture : public Drawer, public AnalyzerResultRetriever {
 public:
+    // Does not take the ownership of |source| and |analyzer|.
+    // They should be alive during Capture is alive.
     explicit Capture(Source* source, Analyzer* analyzer);
     virtual ~Capture() {}
 
