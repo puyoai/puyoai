@@ -32,6 +32,48 @@ protected:
     }
 };
 
+TEST_F(EvaluatorTest, RidgeHeight1)
+{
+    CoreField f(
+        "  O   "
+        "  O   "
+        "  O   "
+        "  O  O"
+        "OOOOOO");
+
+    CollectedFeature cf = eval(f);
+    const vector<int>& vs = cf.collectedSparseFeatures[RIDGE_HEIGHT];
+    EXPECT_TRUE(find(vs.begin(), vs.end(), 4) != vs.end());
+}
+
+TEST_F(EvaluatorTest, RidgeHeight2)
+{
+    CoreField f(
+        "  O   "
+        "  O   "
+        "  OO  "
+        " OOO O"
+        "OOOOOO");
+
+    CollectedFeature cf = eval(f);
+    const vector<int>& vs = cf.collectedSparseFeatures[RIDGE_HEIGHT];
+    EXPECT_TRUE(find(vs.begin(), vs.end(), 2) != vs.end());
+}
+
+TEST_F(EvaluatorTest, RidgeHeight3)
+{
+    CoreField f(
+        "  O   "
+        " OO   "
+        " OO   "
+        " OOO O"
+        "OOOOOO");
+
+    CollectedFeature cf = eval(f);
+    const vector<int>& vs = cf.collectedSparseFeatures[RIDGE_HEIGHT];
+    EXPECT_TRUE(find(vs.begin(), vs.end(), 1) != vs.end());
+}
+
 TEST_F(EvaluatorTest, ConnectionHorizontal1)
 {
     CoreField f(
