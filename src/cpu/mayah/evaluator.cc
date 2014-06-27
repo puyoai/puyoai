@@ -71,7 +71,7 @@ void evalConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
     const CoreField& f = plan.field();
     for (int y = 1; y <= CoreField::HEIGHT; ++y) {
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
-            if (f.color(x, y) == PuyoColor::EMPTY)
+            if (!isNormalColor(f.color(x, y)))
                 continue;
 
             int len = 1;
@@ -79,8 +79,6 @@ void evalConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
                 ++len;
 
             DCHECK(0 <= len && len < 4) << len;
-            if (len >= 4)
-                len = 3;
             sc->addScore(CONNECTION_HORIZONTAL, len, 1);
             x += len - 1;
         }
