@@ -68,7 +68,7 @@ static void findPossibleRensasInternal(const CoreField& field,
             f.dropPuyoOn(x, c);
             puyoList.addPuyo(x, c);
 
-            if (f.connectedPuyoNums(x, f.height(x)) < 4)
+            if (f.countConnectedPuyos(x, f.height(x)) < 4)
                 findPossibleRensasInternal(f, puyoList, x, restAdded - 1, result);
 
             f.removeTopPuyoFrom(x);

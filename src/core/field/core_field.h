@@ -39,9 +39,9 @@ public:
     int countPuyos() const;
     // Returns the number of puyos connected to (x, y).
     // Valid only if color(x, y) is normal.
-    int connectedPuyoNums(int x, int y) const;
+    int countConnectedPuyos(int x, int y) const;
     // Same as connectedPuyoNums, but with checking using |checked|
-    int connectedPuyoNums(int x, int y, FieldBitField* checked) const;
+    int countConnectedPuyos(int x, int y, FieldBitField* checked) const;
 
     // ----------------------------------------------------------------------
     // field manipulation

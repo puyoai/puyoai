@@ -26,7 +26,7 @@ void RensaDetector::findRensas(const CoreField& field, SimulationCallback callba
 
                 CoreField f(field);
                 int necessaryPuyos = 0;
-                while (necessaryPuyos <= 4 && f.connectedPuyoNums(x, y) < 4 && f.height(x + d) <= 13) {
+                while (necessaryPuyos <= 4 && f.countConnectedPuyos(x, y) < 4 && f.height(x + d) <= 13) {
                     f.dropPuyoOn(x + d, c);
                     ++necessaryPuyos;
                 }
