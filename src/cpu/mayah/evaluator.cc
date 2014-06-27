@@ -66,7 +66,7 @@ void evalConnectionFeature(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-void evalConnectionHozirontalFeature(ScoreCollector* sc, const RefPlan& plan)
+void evalConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
 {
     const CoreField& f = plan.field();
     for (int y = 1; y <= CoreField::HEIGHT; ++y) {
@@ -77,6 +77,10 @@ void evalConnectionHozirontalFeature(ScoreCollector* sc, const RefPlan& plan)
             int len = 1;
             while (f.color(x, y) == f.color(x + len, y))
                 ++len;
+
+            DCHECK(0 <= len && len < 4) << len;
+            if (len >= 4)
+                len = 3;
             sc->addScore(CONNECTION_HORIZONTAL, len, 1);
             x += len - 1;
         }
@@ -409,7 +413,7 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
     if (USE_CONNECTION_FEATURE)
         evalConnectionFeature(sc, plan);
     if (USE_CONNECTION_HORIZONTAL_FEATURE)
-        evalConnectionHozirontalFeature(sc, plan);
+        evalConnectionHorizontalFeature(sc, plan);
     if (USE_DENSITY_FEATURE)
         evalDensityFeature(sc, plan);
     if (USE_PATTERN33_FEATURE)
