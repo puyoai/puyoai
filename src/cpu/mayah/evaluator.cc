@@ -29,6 +29,7 @@ const bool USE_DENSITY_FEATURE = false;
 const bool USE_PATTERN33_FEATURE = false;
 const bool USE_PATTERN34_FEATURE = true;
 const bool USE_IGNITION_HEIGHT_FEATURE = false;
+const bool USE_FIELD_USHAPE_FEATURE = false;
 
 using namespace std;
 
@@ -238,6 +239,25 @@ void evalValleyDepthRidgeHeight(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
+void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
+{
+    const CoreField& f = plan.field();
+    int sumHeight = 0;
+    for (int x = 1; x <= 6; ++x)
+        sumHeight += f.height(x);
+
+    int s = 0;
+    s += abs((f.height(1) - 3) * 6 - sumHeight);
+    s += abs((f.height(2) - 0) * 6 - sumHeight);
+    s += abs((f.height(3) + 1) * 6 - sumHeight);
+    s += abs((f.height(4) + 1) * 6 - sumHeight);
+    s += abs((f.height(5) - 0) * 6 - sumHeight);
+    s += abs((f.height(6) - 3) * 6 - sumHeight);
+
+    sc->addScore(FIELD_USHAPE, s);
+}
+
+template<typename ScoreCollector>
 void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gazer& gazer)
 {
     if (gazer.rensaIsOngoing() && gazer.ongoingRensaInfo().rensaResult.score > scoreForOjama(6)) {
@@ -256,6 +276,7 @@ void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, int curren
 
     if (plan.field().isZenkeshi()) {
         sc->addScore(STRATEGY_ZENKESHI, 1);
+        sc->addScore(STRATEGY_SCORE, plan.score());
         return;
     }
 
@@ -266,6 +287,7 @@ void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, int curren
     // / TODO: 十分でかいとは？ / とりあえず致死量ということにする
     if (plan.score() >= estimatedMaxScore + scoreForOjama(60)) {
         sc->addScore(STRATEGY_LARGE_ENOUGH, 1);
+        sc->addScore(STRATEGY_SCORE, plan.score());
         return;
     }
 
@@ -281,6 +303,7 @@ void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, int curren
     // TODO: 60 個超えたら打つとかなんか間違ってるだろう。
     if (plan.field().countPuyos() >= 60) {
         sc->addScore(STRATEGY_HOUWA, 1);
+        sc->addScore(STRATEGY_SCORE, plan.score());
         return;
     }
 
@@ -400,6 +423,8 @@ void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gaz
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(sc, plan);
     evalValleyDepthRidgeHeight(sc, plan);
+    if (USE_FIELD_USHAPE_FEATURE)
+        evalFieldUShape(sc, plan);
     evalOngoingRensaFeature(sc, plan, currentFrameId, gazer);
 
     vector<TrackedPossibleRensaInfo> rensaInfos =
