@@ -68,8 +68,9 @@ void evalConnectionFeature(ScoreCollector* sc, const RefPlan& plan)
 template<typename ScoreCollector>
 void evalConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
 {
+    const int MAX_HEIGHT = 5; // instead of CoreField::HEIGHT
     const CoreField& f = plan.field();
-    for (int y = 1; y <= CoreField::HEIGHT; ++y) {
+    for (int y = 1; y <= MAX_HEIGHT; ++y) {
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
             if (!isNormalColor(f.color(x, y)))
                 continue;
