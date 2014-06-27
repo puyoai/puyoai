@@ -1,5 +1,7 @@
 #include "mayah_ai.h"
 
+#include <gflags/gflags.h>
+
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/client/connector/drop_decision.h"
