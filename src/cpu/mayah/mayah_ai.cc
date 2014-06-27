@@ -44,8 +44,8 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
     double bestScore = -100.0;
     DropDecision dropDecision;
     Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
-                                [this, frameId, &bestScore, &dropDecision](const RefPlan& plan) {
-            double score = Evaluator(*featureParameter_).eval(plan, frameId, gazer_);
+                                [this, frameId, &field, &bestScore, &dropDecision](const RefPlan& plan) {
+            double score = Evaluator(*featureParameter_).eval(plan, field, frameId, gazer_);
             if (bestScore < score) {
                 bestScore = score;
                 dropDecision = DropDecision(plan.decisions().front(), "");

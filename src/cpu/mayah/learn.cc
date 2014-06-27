@@ -120,7 +120,7 @@ void learnWithInteractive()
         double currentScore = -1000000;
         pair<Decision, Decision> currentDecision;
         Plan::iterateAvailablePlans(field, seq, 2, [&](const RefPlan& plan) {
-            CollectedFeature f = Evaluator(parameter).evalWithCollectingFeature(plan, 1, gazer);
+            CollectedFeature f = Evaluator(parameter).evalWithCollectingFeature(plan, field, 1, gazer);
             pair<Decision, Decision> pd;
             if (plan.decisions().size() == 1)
                 pd = make_pair(plan.decision(0), Decision());
@@ -256,7 +256,7 @@ void learnFromPuyofu()
                  << inputs[i].seq.toString() << endl;
 
             Plan::iterateAvailablePlans(inputs[i].field, inputs[i].seq, 2, [&](const RefPlan& plan) {
-                    CollectedFeature f = evaluator.evalWithCollectingFeature(plan, 1, gazer);
+                    CollectedFeature f = evaluator.evalWithCollectingFeature(plan, inputs[i].field, 1, gazer);
                     featureMap[plan.decisions()] = f;
                     if (plan.field() == inputs[i + 1].fieldAfter) {
                         teacherFound = true;
