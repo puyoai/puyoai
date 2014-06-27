@@ -51,7 +51,7 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field, Eval
             if (checked.get(x, y))
                 continue;
 
-            int numConnected = field.connectedPuyoNums(x, y, &checked);
+            int numConnected = field.countConnectedPuyos(x, y, &checked);
             if (numConnected >= 4)
                 numConnected = 3;
             sc->addScore(key, numConnected, 1);

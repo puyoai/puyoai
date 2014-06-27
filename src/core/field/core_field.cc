@@ -118,13 +118,13 @@ int CoreField::countColorPuyos() const
     return cnt;
 }
 
-int CoreField::connectedPuyoNums(int x, int y) const
+int CoreField::countConnectedPuyos(int x, int y) const
 {
     FieldBitField checked;
-    return connectedPuyoNums(x, y, &checked);
+    return countConnectedPuyos(x, y, &checked);
 }
 
-int CoreField::connectedPuyoNums(int x, int y, FieldBitField* checked) const
+int CoreField::countConnectedPuyos(int x, int y, FieldBitField* checked) const
 {
     Position positions[WIDTH * HEIGHT];
 
@@ -412,7 +412,7 @@ int CoreField::dropAfterVanish(int minHeights[], Tracker* tracker)
 bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
 {
     Position p1 = Position(decision.x, height(decision.x));
-    if (connectedPuyoNums(p1.x, p1.y) >= 4)
+    if (countConnectedPuyos(p1.x, p1.y) >= 4)
         return true;
 
     Position p2;
@@ -432,7 +432,7 @@ bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
         return false;
     }
 
-    if (connectedPuyoNums(p2.x, p2.y) >= 4)
+    if (countConnectedPuyos(p2.x, p2.y) >= 4)
         return true;
 
     return false;
