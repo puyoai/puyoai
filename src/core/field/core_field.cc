@@ -181,7 +181,9 @@ void CoreField::undoKumipuyo(const Decision& decision)
 
 int CoreField::framesToDropNext(const Decision& decision) const
 {
-    // TODO: This calculation should be more accurate.
+    // TODO(mayah): This calculation should be more accurate. We need to compare this with
+    // actual AC puyo2 and duel server algorithm. These must be much the same.
+
     int x1 = decision.x;
     int x2 = decision.x + (decision.r == 1) - (decision.r == 3);
 
