@@ -91,3 +91,14 @@ TEST_F(EvaluatorTest, ConnectionHorizontal1)
     EXPECT_EQ(3, m[1]);
     EXPECT_EQ(0, m[0]);
 }
+
+TEST_F(EvaluatorTest, ConnectionHorizontal2)
+{
+    CoreField f(
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+    CollectedFeature cf = eval(f);
+
+    EXPECT_TRUE(cf.collectedSparseFeatures[CONNECTION_HORIZONTAL].empty());
+}
