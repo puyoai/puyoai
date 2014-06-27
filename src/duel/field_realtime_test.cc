@@ -27,7 +27,7 @@ protected:
     FieldRealtime* f_;
 };
 
-TEST_F(FieldRealtimeTest, TimingAfterKeyInput)
+TEST_F(FieldRealtimeTest, DISABLED_TimingAfterKeyInput)
 {
     Key key = KEY_RIGHT;
     f_->skipLevelSelect();

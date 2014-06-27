@@ -260,9 +260,6 @@ bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
             bool accepted = true;
             bool grounded = PlayInternal(key, &accepted);
             if (!grounded) {
-                if (accepted) {
-                    sleepFor_ = FRAMES_AFTER_USER_INTERACTION;
-                }
                 if (frames_for_free_fall_ >= FRAMES_FREE_FALL) {
                     bool dummy;
                     grounded = PlayInternal(KEY_DOWN, &dummy);
