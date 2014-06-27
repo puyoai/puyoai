@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("peria")
 
-puyoai_add_cxx_flags("-Wall -Wextra -Wno-error=unused-parameter")
+puyoai_add_cxx_flags("-Wall -Wextra")
+puyoai_add_cxx_flags("-Wno-error=unused-parameter -Wno-error=unused-variable")
 
 add_library(peria_lib ai.cc)
 
