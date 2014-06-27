@@ -258,8 +258,12 @@ void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gazer& gazer)
+void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField,
+                             int currentFrameId, const Gazer& gazer)
 {
+    if (!plan.isRensaPlan())
+        return;
+
     if (gazer.rensaIsOngoing() && gazer.ongoingRensaInfo().rensaResult.score > scoreForOjama(6)) {
         // TODO: 対応が適当すぎる
         if (gazer.ongoingRensaInfo().rensaResult.score >= scoreForOjama(6) &&
@@ -271,12 +275,11 @@ void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, int curren
         }
     }
 
-    if (!plan.isRensaPlan())
-        return;
+    sc->addScore(STRATEGY_SCORE, plan.score());
+
 
     if (plan.field().isZenkeshi()) {
         sc->addScore(STRATEGY_ZENKESHI, 1);
-        sc->addScore(STRATEGY_SCORE, plan.score());
         return;
     }
 
@@ -287,7 +290,6 @@ void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, int curren
     // / TODO: 十分でかいとは？ / とりあえず致死量ということにする
     if (plan.score() >= estimatedMaxScore + scoreForOjama(60)) {
         sc->addScore(STRATEGY_LARGE_ENOUGH, 1);
-        sc->addScore(STRATEGY_SCORE, plan.score());
         return;
     }
 
@@ -301,9 +303,8 @@ void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, int curren
     // --- 1.3. 飽和したので打つしかなくなった
     // TODO: これは EnemyRensaInfo だけじゃなくて MyRensaInfo も必要なのでは……。
     // TODO: 60 個超えたら打つとかなんか間違ってるだろう。
-    if (plan.field().countPuyos() >= 60) {
+    if (currentField.countPuyos() >= 60) {
         sc->addScore(STRATEGY_HOUWA, 1);
-        sc->addScore(STRATEGY_SCORE, plan.score());
         return;
     }
 
@@ -314,7 +315,6 @@ void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, int curren
     //ostringstream ss;
     //ss << "SAKIUCHI will lose : score = " << plan.score() << " EMEMY score = " << estimatedMaxScore << endl;
     // LOG(INFO) << plan.decisionText() << " " << ss.str();
-    sc->addScore(STRATEGY_SCORE, plan.score());
     sc->addScore(STRATEGY_SAKIUCHI, 1.0);
 }
 
@@ -325,8 +325,6 @@ void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& /*plan*/, const Tr
 
     sc->addScore(MAX_CHAINS, info.rensaResult.chains, 1);
     sc->addScore(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
-    if (numNecessaryPuyos != 0)
-        sc->addScore(MAX_RENSA_NECESSARY_PUYOS_INVERSE, 1.0 / numNecessaryPuyos);
 }
 
 template<typename ScoreCollector>
@@ -404,7 +402,7 @@ void evalCountPuyoFeature(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gazer& gazer)
+void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField, int currentFrameId, const Gazer& gazer)
 {
     evalFrameFeature(sc, plan);
     evalCountPuyoFeature(sc, plan);
@@ -425,7 +423,7 @@ void eval(ScoreCollector* sc, const RefPlan& plan, int currentFrameId, const Gaz
     evalValleyDepthRidgeHeight(sc, plan);
     if (USE_FIELD_USHAPE_FEATURE)
         evalFieldUShape(sc, plan);
-    evalOngoingRensaFeature(sc, plan, currentFrameId, gazer);
+    evalOngoingRensaFeature(sc, plan, currentField, currentFrameId, gazer);
 
     vector<TrackedPossibleRensaInfo> rensaInfos =
         RensaDetector::findPossibleRensasWithTracking(plan.field(), Evaluator::NUM_KEY_PUYOS);
@@ -532,16 +530,17 @@ private:
     map<EvaluationSparseFeatureKey, vector<int>> collectedSparseFeatures_;
 };
 
-double Evaluator::eval(const RefPlan& plan, int currentFrameId, const Gazer& gazer)
+double Evaluator::eval(const RefPlan& plan, const CoreField& currentField, int currentFrameId, const Gazer& gazer)
 {
     UsualScoreCollector sc(param_);
-    ::eval(&sc, plan, currentFrameId, gazer);
+    ::eval(&sc, plan, currentField, currentFrameId, gazer);
     return sc.score();
 }
 
-CollectedFeature Evaluator::evalWithCollectingFeature(const RefPlan& plan, int currentFrameId, const Gazer& gazer)
+CollectedFeature Evaluator::evalWithCollectingFeature(const RefPlan& plan, const CoreField& currentField,
+                                                      int currentFrameId, const Gazer& gazer)
 {
     LearningScoreCollector sc(param_);
-    ::eval(&sc, plan, currentFrameId, gazer);
+    ::eval(&sc, plan, currentField, currentFrameId, gazer);
     return sc.toCollectedFeature();
 }
