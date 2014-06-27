@@ -10,11 +10,9 @@ enum RealColor {
     RC_YELLOW,
     RC_GREEN,
     RC_PURPLE,
-    RC_INVALID
 };
 
 const int NUM_REAL_COLORS = 8;
-const int NUM_PUYO_REAL_COLOR = NUM_REAL_COLORS; // For backward compatibility
 
 RealColor realColorOf(char c);
 const char* toString(RealColor);

@@ -13,11 +13,9 @@ enum PuyoColor : byte {
     BLUE = 5,
     YELLOW = 6,
     GREEN = 7,
-    INVALID = 9,
 };
 
-const int NUM_PUYO_COLORS = 10;
-const int PUYO_COLORS = NUM_PUYO_COLORS; // For backward compatibility.
+const int NUM_PUYO_COLORS = 8;
 const int PUYO_ERASE_NUM = 4;
 const int NUM_NORMAL_PUYO_COLORS = 4;
 

@@ -53,7 +53,6 @@ char charOfPuyoColor(PuyoColor c, char charIfEmpty)
     case PuyoColor::BLUE: return 'B';
     case PuyoColor::YELLOW: return 'Y';
     case PuyoColor::GREEN: return 'G';
-    case PuyoColor::INVALID: return '?';
     }
 
     return '?';
@@ -69,7 +68,6 @@ const char* toString(PuyoColor c)
     case PuyoColor::BLUE: return "青";
     case PuyoColor::YELLOW: return "黄";
     case PuyoColor::GREEN: return "緑";
-    case PuyoColor::INVALID: return "";
     }
 
     return "";

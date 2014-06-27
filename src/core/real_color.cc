@@ -1,5 +1,7 @@
 #include "core/real_color.h"
 
+#include <glog/logging.h>
+
 RealColor realColorOf(char c)
 {
     switch (c) {
@@ -12,7 +14,8 @@ RealColor realColorOf(char c)
     case 'P': return RealColor::RC_PURPLE;
     }
 
-    return RC_INVALID;
+    DCHECK(false) << "Unknown char: " << c;
+    return RC_EMPTY;
 }
 
 const char* toString(RealColor rc)
@@ -32,8 +35,6 @@ const char* toString(RealColor rc)
         return "緑";
     case RealColor::RC_PURPLE:
         return "紫";
-    case RealColor::RC_INVALID:
-        return "不";
     }
 
     return "不";
