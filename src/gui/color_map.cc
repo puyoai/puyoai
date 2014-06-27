@@ -12,9 +12,9 @@ ColorMap& ColorMap::instance()
 ColorMap::ColorMap()
 {
     for (int i = 0; i < NUM_PUYO_COLORS; ++i)
-        realColors_[i] = RealColor::RC_INVALID;
+        realColors_[i] = RealColor::RC_EMPTY;
     for (int i = 0; i < NUM_REAL_COLORS; ++i)
-        puyoColors_[i] = PuyoColor::INVALID;
+        puyoColors_[i] = PuyoColor::EMPTY;
 }
 
 ColorMap::~ColorMap()
@@ -23,10 +23,8 @@ ColorMap::~ColorMap()
 
 void ColorMap::setColorMap(PuyoColor pc, RealColor rc)
 {
-    DCHECK(pc != INVALID);
-    DCHECK(rc != RealColor::RC_INVALID);
-    DCHECK(realColors_[static_cast<int>(pc)] == RealColor::RC_INVALID);
-    DCHECK(puyoColors_[static_cast<int>(rc)] == INVALID);
+    DCHECK_EQ(realColors_[static_cast<int>(pc)], RealColor::RC_EMPTY);
+    DCHECK_EQ(puyoColors_[static_cast<int>(rc)], PuyoColor::EMPTY);
 
     realColors_[static_cast<int>(pc)] = rc;
     puyoColors_[static_cast<int>(rc)] = pc;

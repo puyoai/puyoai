@@ -639,7 +639,7 @@ PuyoColor FieldRealtime::puyoColor(NextPuyoPosition npp) const
     }
 
     DCHECK(false) << static_cast<int>(npp);
-    return PuyoColor::INVALID;
+    return PuyoColor::EMPTY;
 }
 
 void FieldRealtime::skipLevelSelect()

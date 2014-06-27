@@ -17,8 +17,6 @@ Uint32 toPixelColor(SDL_Surface* surface, PuyoColor pc)
         return SDL_MapRGB(surface->format, 255, 255,   0);
     case PuyoColor::GREEN:
         return SDL_MapRGB(surface->format,   0, 255,   0);
-    case PuyoColor::INVALID:
-        break;
     }
 
     DCHECK(false) << "Invalid PuyoColor: " << static_cast<int>(pc);
@@ -42,8 +40,6 @@ Uint32 toPixelColor(SDL_Surface* surface, RealColor rc)
         return SDL_MapRGB(surface->format,   0, 255,   0);
     case RealColor::RC_PURPLE:
         return SDL_MapRGB(surface->format, 255,   0, 255);
-    case RealColor::RC_INVALID:
-        break;
     }
 
     DCHECK(false) << "Invalid PuyoColor " << static_cast<int>(rc);

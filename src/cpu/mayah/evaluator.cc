@@ -89,7 +89,7 @@ void evalDensityFeature(ScoreCollector* sc, const RefPlan& plan)
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = 1; y <= CoreField::HEIGHT + 1; ++y) {
-            int numColors[PUYO_COLORS] = { 0 };
+            int numColors[NUM_PUYO_COLORS] = { 0 };
 
             for (int dx = -1; dx <= 1; ++dx) {
                 for (int dy = -1; dy <= 1; ++dy) {
@@ -113,7 +113,7 @@ void evalPuyoPattern33Feature(ScoreCollector* sc, const RefPlan& plan)
     {
         int x = 2;
         int y = 2;
-        int patterns[PUYO_COLORS] = { 0 };
+        int patterns[NUM_PUYO_COLORS] = { 0 };
 
         patterns[field.color(x - 1, y - 1)] |= 1 << 0;
         patterns[field.color(x    , y - 1)] |= 1 << 1;
@@ -162,8 +162,8 @@ void evalPuyoPattern34Feature(ScoreCollector* sc, const RefPlan& plan)
 {
     const CoreField& field = plan.field();
 
-    int patternsLeft[PUYO_COLORS] = { 0 };
-    int patternsRight[PUYO_COLORS] = { 0 };
+    int patternsLeft[NUM_PUYO_COLORS] = { 0 };
+    int patternsRight[NUM_PUYO_COLORS] = { 0 };
     for (int y = 1; y <= 3; ++y) {
         for (int x = 1; x <= 4; ++x) {
             patternsLeft[field.color(x, y)] |= 1 << ((y - 1) * 4 + (x - 1));

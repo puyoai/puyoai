@@ -38,7 +38,7 @@ static RealColor toRealColor(const HSV& hsv)
     return RC_EMPTY;
 }
 
-static RealColor estimateRealColorFromColorCount(int colorCount[NUM_PUYO_REAL_COLOR], int threshold)
+static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS], int threshold)
 {
     static const RealColor colors[] = { RC_RED, RC_PURPLE, RC_BLUE, RC_YELLOW, RC_GREEN };
 
@@ -75,7 +75,7 @@ SomagicAnalyzer::~SomagicAnalyzer()
 
 BoxAnalyzeResult SomagicAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b, bool showsColor) const
 {
-    int colorCount[3][NUM_PUYO_REAL_COLOR] = { { 0 } };
+    int colorCount[3][NUM_REAL_COLORS] = { { 0 } };
 
     // We'd like to take padding 1 pixel.
     for (int by = b.sy + 1; by <= b.dy - 1; ++by) {
