@@ -29,7 +29,7 @@
 
 using namespace std;
 
-DEFINE_bool(record, false, "use Puyofu Recorder");
+DEFINE_string(record, "", "use Puyofu Recorder. 'transition' for transition log, 'field' for field log");
 #ifdef USE_HTTPD
 DEFINE_bool(httpd, false, "use httpd");
 #endif
@@ -106,8 +106,15 @@ int main(int argc, char* argv[])
     }
 
     unique_ptr<PuyofuRecorder> puyofuRecorder;
-    if (FLAGS_record)
+    if (FLAGS_record == "transition") {
         puyofuRecorder.reset(new PuyofuRecorder);
+        puyofuRecorder->setMode(PuyofuRecorder::Mode::TRANSITION_LOG);
+    } else if (FLAGS_record == "field") {
+        puyofuRecorder.reset(new PuyofuRecorder);
+        puyofuRecorder->setMode(PuyofuRecorder::Mode::FIELD_LOG);
+    } else if (FLAGS_record != "") {
+        CHECK(false) << "Unknown --record value: " << FLAGS_record;
+    }
 
 #if USE_SDL2
     vector<unique_ptr<MainWindow::EventListener>> eventListeners;

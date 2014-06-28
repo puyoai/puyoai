@@ -15,16 +15,25 @@ class CoreField;
 
 class PuyofuRecorder : public GameStateObserver {
 public:
+    enum class Mode {
+        TRANSITION_LOG,
+        FIELD_LOG
+    };
+
     virtual ~PuyofuRecorder() {}
 
     virtual void newGameWillStart() OVERRIDE;
     virtual void onUpdate(const GameState&) OVERRIDE;
     virtual void gameHasDone() OVERRIDE;
 
+    void setMode(Mode mode) { mode_ = mode; }
+
 private:
     void addMove(int pi, const CoreField&, const KumipuyoSeq&, int time);
 
-    void emitFieldTransitionLog(FILE* fp, int pi) const;
+    void emitLog(FILE* fp, int pi) const;
+    void emitTransitionLog(FILE* fp, int pi) const;
+    void emitFieldLog(FILE* fp, int pi) const;
 
     bool clear() const { return moves_.empty(); }
 
@@ -40,6 +49,7 @@ private:
         int time;
     };
 
+    Mode mode_ = Mode::TRANSITION_LOG;
     std::vector<std::unique_ptr<Move>> moves_;
 };
 
