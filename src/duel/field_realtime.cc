@@ -78,11 +78,11 @@ bool FieldRealtime::tryVanish(FrameContext* context)
         sleepFor_ = FRAMES_VANISH_ANIMATION;
 
         // Set Yokoku Ojama.
-        if ((score_ - consumed_score_ >= SCORE_FOR_OJAMA) && (current_chains_ > 1)) {
-            int attack_ojama = (score_ - consumed_score_) / SCORE_FOR_OJAMA;
+        if ((score_ - scoreConsumed_ >= SCORE_FOR_OJAMA) && (current_chains_ > 1)) {
+            int attack_ojama = (score_ - scoreConsumed_) / SCORE_FOR_OJAMA;
             if (context)
                 context->sendOjama(attack_ojama);
-            consumed_score_ = score_ / SCORE_FOR_OJAMA * SCORE_FOR_OJAMA;
+            scoreConsumed_ = score_ / SCORE_FOR_OJAMA * SCORE_FOR_OJAMA;
         }
         return true;
     } else {

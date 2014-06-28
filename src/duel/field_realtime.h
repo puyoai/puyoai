@@ -95,6 +95,7 @@ private:
     bool isDead_ = false;
 
     int score_ = 0;
+    int scoreConsumed_ = 0;
     int numFixedOjama_ = 0;
     int numPendingOjama_ = 0;
 
@@ -105,7 +106,6 @@ private:
     std::vector<int> ojama_position_;
     bool drop_animation_;
     int frames_for_free_fall_;
-    int consumed_score_ = 0;
     int current_chains_;
     int restFramesToAcceptQuickTurn_;
     bool is_zenkesi_ = false;
