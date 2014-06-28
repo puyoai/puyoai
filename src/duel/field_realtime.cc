@@ -109,6 +109,9 @@ void FieldRealtime::finishChain(FrameContext* context)
     if (numFixedOjama() > 0) {
         simulationState_ = STATE_OJAMA;
     } else {
+        // TODO(mayah): After finishChain(), sleepFor_ won't be 0.
+        // This means, we consume several frames before playable state.
+        // This causes moving puyos difficult.
         prepareNextPuyo();
     }
     current_chains_ = 1;
@@ -485,8 +488,7 @@ Key FieldRealtime::getKey(const Decision& decision) const
         // Remove redundant key stroke.
         if (pos.r == 3 && keys[0].b1 == KEY_RIGHT_TURN && keys[1].b1 == KEY_LEFT_TURN) {
             next_key = keys[2];
-        } else if (pos.r == 1 && keys[0].b1 == KEY_LEFT_TURN &&
-                   keys[1].b1 == KEY_RIGHT_TURN) {
+        } else if (pos.r == 1 && keys[0].b1 == KEY_LEFT_TURN && keys[1].b1 == KEY_RIGHT_TURN) {
             next_key = keys[2];
         } else {
             next_key = keys[0];
