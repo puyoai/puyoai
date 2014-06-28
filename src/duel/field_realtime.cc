@@ -171,14 +171,14 @@ bool FieldRealtime::tryOjama()
     return false;
 }
 
-bool FieldRealtime::tryUserState(Key key)
+bool FieldRealtime::tryUserState(const KeySet& keySet)
 {
     bool accepted = true;
-    bool grounded = playInternal(key, &accepted);
+    bool grounded = playInternal(keySet, &accepted);
     if (!grounded) {
         if (frames_for_free_fall_ >= FRAMES_FREE_FALL) {
             bool dummy;
-            grounded = playInternal(KEY_DOWN, &dummy);
+            grounded = playInternal(KeySet(KEY_DOWN), &dummy);
         }
     }
 
@@ -190,15 +190,14 @@ bool FieldRealtime::tryUserState(Key key)
         simulationState_ = STATE_DROP;
     }
 
-    if (key == KEY_DOWN && accepted) {
-        score_++;
-    }
+    if (keySet.downKey && accepted)
+        ++score_;
 
     return accepted;
 }
 
 // Returns true if a key input is accepted.
-bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
+bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
 {
     userState_.clear();
 
@@ -245,7 +244,7 @@ bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
                 return false;
             continue;
         case STATE_USER:
-            return tryUserState(key);
+            return tryUserState(keySet);
         }
     }  // end while
 
@@ -254,14 +253,14 @@ bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
 }
 
 // returns true if the puyo grounded.
-bool FieldRealtime::playInternal(Key key, bool* accepted)
+bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
 {
     bool ground = false;
-
     KumipuyoPos pos = kumipuyoPos();
 
-    switch (key) {
-    case KEY_RIGHT_TURN:
+    // We consume right/left turn first. Then, left/right/down.
+
+    if (keySet.rightTurnKey) {
         switch (kumipuyoPos_.r) {
         case 0:
             if (field_.color(kumipuyoPos_.x + 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
@@ -319,8 +318,7 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
             *accepted = true;
             break;
         }
-        return false;
-    case KEY_LEFT_TURN:
+    } else if (keySet.leftTurnKey) {
         switch (kumipuyoPos_.r) {
         case 0:
             if (field_.color(kumipuyoPos_.x - 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
@@ -377,8 +375,9 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
             }
             break;
         }
-        return false;
-    case KEY_RIGHT:
+    }
+
+    if (keySet.rightKey) {
         if (field_.color(pos.axisX() + 1, pos.axisY()) == PuyoColor::EMPTY &&
             field_.color(pos.childX() + 1, pos.childY()) == PuyoColor::EMPTY) {
             kumipuyoPos_.x++;
@@ -386,8 +385,7 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
         } else {
             *accepted = false;
         }
-        break;
-    case KEY_LEFT:
+    } else if (keySet.leftKey) {
         if (field_.color(pos.axisX() - 1, pos.axisY()) == PuyoColor::EMPTY &&
             field_.color(pos.childX() - 1, pos.childY()) == PuyoColor::EMPTY) {
             kumipuyoPos_.x--;
@@ -395,8 +393,7 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
         } else {
             *accepted = false;
         }
-        break;
-    case KEY_DOWN:
+    } else if (keySet.downKey) {
         frames_for_free_fall_ = 0;
         if (field_.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
             field_.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
@@ -409,17 +406,6 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
             *accepted = false;
             ground = true;
         }
-        break;
-    case KEY_UP:
-        // When KEY_UP is pressed, nothing happens.
-        *accepted = false;
-        break;
-    case KEY_START:
-        *accepted = false;
-        break;
-    case KEY_NONE:
-        *accepted = false;
-        break;
     }
 
     return ground;

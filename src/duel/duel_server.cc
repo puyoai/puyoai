@@ -241,12 +241,13 @@ void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse>
         if (accepted_index != -1)
             accepted_message = data[pi][accepted_index].msg;
 
+        // TODO(mayah): Instead of using key, we need to use KeySet.
         Key key = me->getKey(gameState->decision(pi));
         if (accepted_index != -1 && data[pi][accepted_index].key != Key::KEY_NONE)
             key = data[pi][accepted_index].key;
 
         FrameContext context;
-        me->playOneFrame(key, &context);
+        me->playOneFrame(KeySet(key), &context);
         context.apply(me, opponent);
 
         // Clear current key input if the move is done.

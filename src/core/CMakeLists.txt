@@ -9,7 +9,7 @@ add_subdirectory(server)
 # library
 
 add_library(puyoai_core STATIC
-            ctrl.cc frame_data.cc key.cc kumipuyo.cc
+            ctrl.cc frame_data.cc key.cc key_set.cc kumipuyo.cc
             plain_field.cc puyo_color.cc real_color.cc sequence_generator.cc)
 
 # ----------------------------------------------------------------------
