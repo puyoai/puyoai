@@ -2,7 +2,7 @@
 
 #include <glog/logging.h>
 
-RealColor realColorOf(char c)
+RealColor toRealColor(char c)
 {
     switch (c) {
     case ' ': return RealColor::RC_EMPTY;
