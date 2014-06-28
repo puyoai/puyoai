@@ -58,7 +58,7 @@ char charOfPuyoColor(PuyoColor c, char charIfEmpty)
     return '?';
 }
 
-const char* toString(PuyoColor c)
+std::string toString(PuyoColor c)
 {
     switch (c) {
     case PuyoColor::EMPTY: return "";

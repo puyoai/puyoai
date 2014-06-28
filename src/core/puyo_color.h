@@ -1,6 +1,7 @@
 #ifndef CORE_PUYO_COLOR_H_
 #define CORE_PUYO_COLOR_H_
 
+#include <string>
 #include <glog/logging.h>
 #include "base/base.h"
 
@@ -31,7 +32,7 @@ PuyoColor puyoColorOf(char);
 // Converts PuyoColor to character.
 char charOfPuyoColor(PuyoColor, char charIfEmpty = ' ');
 
-const char* toString(PuyoColor);
+std::string toString(PuyoColor);
 
 // Returns true if puyo is normal color puyo.
 inline bool isNormalColor(PuyoColor color)
