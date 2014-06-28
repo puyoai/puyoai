@@ -223,8 +223,12 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
         if (sleepFor_ > 0) {
             sleepFor_--;
             // Player can send a command in the next frame.
-            if (simulationState_ == STATE_USER && sleepFor_ == 0)
+            if (simulationState_ == STATE_USER && sleepFor_ == 0) {
                 userState_.playable = true;
+                // TODO(mayah): This is a work around frames_for_free_fall_ is not 0 after chain finish
+                // or ojama drop. We need to make this event loop more understandable.
+                frames_for_free_fall_ = 0;
+            }
             return false;
         }
 
