@@ -8,7 +8,7 @@ string ColumnPuyoList::toString() const
 {
     ostringstream oss;
     for (auto p : puyo_) {
-        oss << '(' << get<0>(p) << ',' << charOfPuyoColor(get<1>(p)) << ')';
+        oss << '(' << get<0>(p) << ',' << toChar(get<1>(p)) << ')';
     }
 
     return oss.str();

@@ -30,8 +30,8 @@ string KumipuyoSeq::toString() const
 {
     std::string s;
     for (const auto& kumipuyo : seq_) {
-        s += charOfPuyoColor(kumipuyo.axis);
-        s += charOfPuyoColor(kumipuyo.child);
+        s += toChar(kumipuyo.axis);
+        s += toChar(kumipuyo.child);
     }
 
     return s;
