@@ -15,7 +15,7 @@ RealColor toRealColor(char c)
     }
 
     DCHECK(false) << "Unknown char: " << c;
-    return RC_EMPTY;
+    return RealColor::RC_EMPTY;
 }
 
 const char* toString(RealColor rc)
@@ -38,4 +38,9 @@ const char* toString(RealColor rc)
     }
 
     return "不";
+}
+
+std::ostream& operator<<(std::ostream& os, RealColor rc)
+{
+    return os << static_cast<int>(rc);
 }

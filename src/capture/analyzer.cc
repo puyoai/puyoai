@@ -172,7 +172,7 @@ Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<co
 
         // Even if restFramesUserCanPlay_[pi] > 0, a puyo might appear on (3, 12).
         // In that case, we skip the rest of waiting frame.
-        if (result->realColor(3, 12) != RC_EMPTY) {
+        if (result->realColor(3, 12) != RealColor::RC_EMPTY) {
             result->restFramesUserCanPlay = 0;
             result->userState.playable = true;
         }
@@ -213,8 +213,8 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
     result->resetCurrentPuyoState();
 
     // There should not exist moving puyos. So, CURRENT_AXIS and CURRENT_CHILD should be empty.
-    result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RC_EMPTY);
-    result->setRealColor(NextPuyoPosition::CURRENT_CHILD, RC_EMPTY);
+    result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RealColor::RC_EMPTY);
+    result->setRealColor(NextPuyoPosition::CURRENT_CHILD, RealColor::RC_EMPTY);
 
     // NOTE: When axisColor or childColor is not normal, we skip this analysis.
     // This is because sometimes we miss-detect the next field.
@@ -259,8 +259,8 @@ void Analyzer::analyzeNextWhenPreviousResultDoesNotExist(const DetectedField& de
     result->resetCurrentPuyoState(false);
 
     // We cannot detect moving puyos correctly. So, make them empty.
-    result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RC_EMPTY);
-    result->setRealColor(NextPuyoPosition::CURRENT_CHILD, RC_EMPTY);
+    result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RealColor::RC_EMPTY);
+    result->setRealColor(NextPuyoPosition::CURRENT_CHILD, RealColor::RC_EMPTY);
 
     // Just copy the detected field.
     result->setRealColor(NextPuyoPosition::NEXT1_AXIS, detectedField.realColor(NextPuyoPosition::NEXT1_AXIS));
@@ -276,7 +276,7 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     RealColor childColor = detectedField.realColor(NextPuyoPosition::NEXT1_CHILD);
 
     // NEXT1 has not disappeared yet.
-    if (axisColor != RC_EMPTY && childColor != RC_EMPTY) {
+    if (axisColor != RealColor::RC_EMPTY && childColor != RealColor::RC_EMPTY) {
         result->framesWhileNext1Disappearing = 0;
         return;
     }
@@ -302,8 +302,8 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     result->setRealColor(NextPuyoPosition::CURRENT_CHILD, result->realColor(NextPuyoPosition::NEXT1_CHILD));
     result->setRealColor(NextPuyoPosition::NEXT1_AXIS, result->realColor(NextPuyoPosition::NEXT2_AXIS));
     result->setRealColor(NextPuyoPosition::NEXT1_CHILD, result->realColor(NextPuyoPosition::NEXT2_CHILD));
-    result->setRealColor(NextPuyoPosition::NEXT2_AXIS, RC_EMPTY);
-    result->setRealColor(NextPuyoPosition::NEXT2_CHILD, RC_EMPTY);
+    result->setRealColor(NextPuyoPosition::NEXT2_AXIS, RealColor::RC_EMPTY);
+    result->setRealColor(NextPuyoPosition::NEXT2_CHILD, RealColor::RC_EMPTY);
 
     if (result->hasDetectedOjamaDrop_ && !result->hasSentOjamaDropped_) {
         result->userState.ojamaDropped = true;
@@ -321,7 +321,7 @@ void Analyzer::analyzeNextForStateNext2WillDisappear(const DetectedField& detect
     RealColor axisColor = detectedField.realColor(NextPuyoPosition::NEXT2_AXIS);
     RealColor childColor = detectedField.realColor(NextPuyoPosition::NEXT2_CHILD);
 
-    if (axisColor == RC_EMPTY || childColor == RC_EMPTY) {
+    if (axisColor == RealColor::RC_EMPTY || childColor == RealColor::RC_EMPTY) {
         result->framesWhileNext2Disappearing += 1;
         if (result->framesWhileNext2Disappearing >= 2) {
             result->nextPuyoState = NextPuyoState::NEXT2_WILL_APPEAR;
@@ -452,7 +452,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField, const vector<con
             }
 
             // --- Finds the largest one;
-            RealColor rc = RC_EMPTY;
+            RealColor rc = RealColor::RC_EMPTY;
             int maxCount = 0;
             for (const auto& entry : cnt) {
                 if (maxCount < entry.second) {
@@ -473,7 +473,7 @@ int Analyzer::countOjama(RealColor puyos[6][12])
     int cnt = 0;
     for (int x = 0; x < 6; ++x) {
         for (int y = 0; y < 12; ++y) {
-            if (puyos[x][y] == RC_OJAMA)
+            if (puyos[x][y] == RealColor::RC_OJAMA)
                 ++cnt;
         }
     }

@@ -1,8 +1,9 @@
 #ifndef CORE_REAL_COLOR_H_
 #define CORE_REAL_COLOR_H_
 
-// TODO(mayah): Consider use enum class.
-enum RealColor {
+#include <ostream>
+
+enum class RealColor {
     RC_EMPTY,
     RC_OJAMA,
     RC_RED,
@@ -16,6 +17,7 @@ const int NUM_REAL_COLORS = 8;
 
 RealColor toRealColor(char c);
 const char* toString(RealColor);
+std::ostream& operator<<(std::ostream&, RealColor);
 
 inline bool isNormalColor(RealColor rc)
 {
