@@ -1,6 +1,13 @@
 #ifndef CORE_CONSTANT_H_
 #define CORE_CONSTANT_H_
 
+// Actually, the internal FPS looks 60. However, we can take only 30 fps images
+// when using video capture. We might be able to decompose 1 image to 2 frames
+// if the video is interlace, though.
+// For simplicity, we adopt 30 fps for now. However, we might want to have
+// a room to adopt 60fps later.
+const int FPS = 30;
+
 ////////////////////////////////////////////////////////////////////////
 // Confirmed.
 const int FRAMES_AFTER_GROUND = 2;
@@ -23,7 +30,7 @@ const int FRAMES_VANISH_ANIMATION = 25;
 const int FRAMES_HORIZONTAL_MOVE = FRAMES_AFTER_USER_INTERACTION;
 
 // Updated, but not accurate.
-const int FRAMES_CHIGIRI_1_LINE_1 = 4;
+const int FRAMES_CHIGIRI_1_LINE_1 = 5;
 const int FRAMES_CHIGIRI_1_LINE_2 = 3;
 const int FRAMES_CHIGIRI_1_LINE_3 = 2;
 
@@ -35,15 +42,12 @@ const int FRAMES_USER_CAN_PLAY_AFTER_NEXT1AXIS_DISAPPEARED = 4;
 // 2 frames are simply waiting. 4 frames are waiting for next puyos to appear.
 const int FRAMES_AFTER_VANISH = 6;
 const int FRAMES_AFTER_NO_DROP = 6;
-// TODO: s/20/8/ once mugen mawashi issue has fixed.
-const int FRAMES_FREE_FALL = 20;
+const int FRAMES_FREE_FALL = 8;
 const int FRAMES_QUICKTURN = 10;
 
 
 ////////////////////////////////////////////////////////////////////////
 // Fixed.
-
-const int FPS = 30;
 
 // TODO(mayah): We should consider that margin time has been expired.
 const int SCORE_FOR_OJAMA = 70;

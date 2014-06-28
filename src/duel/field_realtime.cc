@@ -19,14 +19,9 @@ using namespace std;
 
 DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 
-// TODO(mayah): Why STATE_CHIGIRI is necessary? Can we use STATE_DROP instead?
-// Maybe dropping puyo in CHIGIRI state is slower than in DROP?
-
 // STATE_LEVEL_SELECT
 //  v
 // STATE_USER <-------+
-//  v                 |
-// STATE_CHIGIRI      |
 //  v                 |
 // STATE_DROP <----+  |
 //  v              |  |
@@ -55,35 +50,10 @@ void FieldRealtime::init()
     ojama_position_ = vector<int>(6, 0);
     ojama_dropping_ = false;
     current_chains_ = 1;
-    quickturn_ = 0;
-    dropped_rows_ = 0;
+    restFramesToAcceptQuickTurn_ = 0;
     delayFramesWNextAppear_ = 0;
     sent_wnext_appeared_ = false;
     drop_animation_ = false;
-}
-
-bool FieldRealtime::tryChigiri()
-{
-    if (chigiri()) {
-        dropped_rows_++;
-        sleepFor_ =
-            (dropped_rows_ == 1) ? FRAMES_CHIGIRI_1_LINE_1 :
-            (dropped_rows_ == 2) ? FRAMES_CHIGIRI_1_LINE_2 :
-            FRAMES_CHIGIRI_1_LINE_3;
-
-        drop_animation_ = true;
-        return true;
-    } else {
-        dropped_rows_ = 0;
-        simulationState_ = STATE_VANISH;
-        if (drop_animation_) {
-            sleepFor_ = FRAMES_AFTER_CHIGIRI;
-            drop_animation_ = false;
-        } else {
-            sleepFor_ = FRAMES_AFTER_NO_CHIGIRI;
-        }
-        return false;
-    }
 }
 
 bool FieldRealtime::tryVanish(FrameContext* context)
@@ -101,15 +71,18 @@ bool FieldRealtime::tryVanish(FrameContext* context)
             score_ += ZENKESHI_BONUS;
             is_zenkesi_ = false;
         }
+
         simulationState_ = STATE_DROP;
+        dropVelocity_ = MAX_DROP_VELOCITY;
+        dropAmount_ = 0.0;
         sleepFor_ = FRAMES_VANISH_ANIMATION;
 
         // Set Yokoku Ojama.
-        if ((score_ - consumed_score_ >= SCORE_FOR_OJAMA) && (current_chains_ > 1)) {
-            int attack_ojama = (score_ - consumed_score_) / SCORE_FOR_OJAMA;
+        if ((score_ - scoreConsumed_ >= SCORE_FOR_OJAMA) && (current_chains_ > 1)) {
+            int attack_ojama = (score_ - scoreConsumed_) / SCORE_FOR_OJAMA;
             if (context)
                 context->sendOjama(attack_ojama);
-            consumed_score_ = score_ / SCORE_FOR_OJAMA * SCORE_FOR_OJAMA;
+            scoreConsumed_ = score_ / SCORE_FOR_OJAMA * SCORE_FOR_OJAMA;
         }
         return true;
     } else {
@@ -144,21 +117,20 @@ void FieldRealtime::finishChain(FrameContext* context)
 
 bool FieldRealtime::tryDrop(FrameContext* context)
 {
-    if (drop1line()) {
-        sleepFor_ = FRAMES_DROP_1_LINE;
+    if (drop1Frame()) {
         drop_animation_ = true;
         return true;
-    } else {
-        if (drop_animation_) {
-            sleepFor_ = FRAMES_AFTER_DROP;
-            drop_animation_ = false;
-            simulationState_ = STATE_VANISH;
-        } else {
-            finishChain(context);
-            sleepFor_ = FRAMES_AFTER_NO_DROP;
-        }
-        return false;
     }
+
+    if (drop_animation_) {
+        sleepFor_ = FRAMES_AFTER_DROP;
+        drop_animation_ = false;
+        simulationState_ = STATE_VANISH;
+    } else {
+        finishChain(context);
+        sleepFor_ = FRAMES_AFTER_NO_DROP;
+    }
+    return false;
 }
 
 bool FieldRealtime::tryOjama()
@@ -166,10 +138,14 @@ bool FieldRealtime::tryOjama()
     if (!ojama_dropping_) {
         ojama_position_ = determineColumnOjamaAmount();
         for (int i = 0; i < 6; i++) {
-            if (ojama_position_[i]) {
+            if (ojama_position_[i] > 0) {
                 ojama_dropping_ = true;
+                break;
             }
         }
+
+        dropVelocity_ = INITIAL_DROP_VELOCITY;
+        dropAmount_ = 0.0;
     }
 
     if (ojama_dropping_) {
@@ -177,46 +153,62 @@ bool FieldRealtime::tryOjama()
             if (ojama_position_[i] > 0) {
                 if (field_.color(i + 1, 13) == PuyoColor::EMPTY) {
                     field_.setPuyoAndHeight(i + 1, 13, PuyoColor::OJAMA);
+                    ojama_position_[i]--;
                 }
-                ojama_position_[i]--;
             }
         }
     }
-    if (drop1line()) {
-        dropped_rows_++;
-        sleepFor_ =
-            (dropped_rows_ == 1) ? FRAMES_CHIGIRI_1_LINE_1 :
-            (dropped_rows_ == 2) ? FRAMES_CHIGIRI_1_LINE_2 :
-            FRAMES_CHIGIRI_1_LINE_3;
 
+    if (drop1Frame())
         return true;
-    } else {
-        dropped_rows_ = 0;
-        ojama_dropping_ = false;
-        isDead_ = (field_.color(3, 12) != PuyoColor::EMPTY);
-        sleepFor_ = FRAMES_AFTER_DROP;
-        userState_.ojamaDropped = true;
-        prepareNextPuyo();
-        return false;
+
+    ojama_dropping_ = false;
+    isDead_ = (field_.color(3, 12) != PuyoColor::EMPTY);
+     // TODO(mayah): We need to sleep more. 1 ojama -> +4 frames, 30 ojama -> 16frames, etc.
+    sleepFor_ = FRAMES_AFTER_DROP;
+    userState_.ojamaDropped = true;
+    prepareNextPuyo();
+    return false;
+}
+
+bool FieldRealtime::tryUserState(const KeySet& keySet)
+{
+    bool accepted = true;
+    bool grounded = playInternal(keySet, &accepted);
+    if (!grounded) {
+        if (frames_for_free_fall_ >= FRAMES_FREE_FALL) {
+            bool dummy;
+            grounded = playInternal(KeySet(KEY_DOWN), &dummy);
+        }
     }
+
+    if (grounded) {
+        userState_.grounded = true;
+        dropVelocity_ = INITIAL_DROP_VELOCITY;
+        dropAmount_ = 0.0;
+        drop_animation_ = true;
+        simulationState_ = STATE_DROP;
+    }
+
+    if (keySet.downKey && accepted)
+        ++score_;
+
+    return accepted;
 }
 
 // Returns true if a key input is accepted.
-bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
+bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
 {
     userState_.clear();
 
-    if (quickturn_ > 0) {
-        quickturn_--;
-    }
+    if (restFramesToAcceptQuickTurn_ > 0)
+        restFramesToAcceptQuickTurn_--;
 
-    if (simulationState_ == STATE_USER) {
+    if (simulationState_ == STATE_USER)
         frames_for_free_fall_++;
-    }
 
-    if (delayFramesWNextAppear_ > 0) {
+    if (delayFramesWNextAppear_ > 0)
         --delayFramesWNextAppear_;
-    }
 
     if (delayFramesWNextAppear_ == 0 && !sent_wnext_appeared_) {
         userState_.wnextAppeared = true;
@@ -228,9 +220,8 @@ bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
         if (sleepFor_ > 0) {
             sleepFor_--;
             // Player can send a command in the next frame.
-            if (simulationState_ == STATE_USER && sleepFor_ == 0) {
+            if (simulationState_ == STATE_USER && sleepFor_ == 0)
                 userState_.playable = true;
-            }
             return false;
         }
 
@@ -239,10 +230,6 @@ bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
             simulationState_ = STATE_USER;
             prepareNextPuyo();
             userState_.playable = true;
-            continue;
-        case STATE_CHIGIRI:
-            if (tryChigiri())
-                return false;
             continue;
         case STATE_VANISH:
             if (tryVanish(context))
@@ -256,28 +243,8 @@ bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
             if (tryOjama())
                 return false;
             continue;
-        case STATE_USER: {
-            bool accepted = true;
-            bool grounded = playInternal(key, &accepted);
-            if (!grounded) {
-                if (frames_for_free_fall_ >= FRAMES_FREE_FALL) {
-                    bool dummy;
-                    grounded = playInternal(KEY_DOWN, &dummy);
-                }
-            }
-
-            if (grounded) {
-                chigiri_x_ = -1;
-                chigiri_y_ = -1;
-                simulationState_ = STATE_CHIGIRI;
-                userState_.grounded = true;
-            }
-
-            if (key == KEY_DOWN && accepted) {
-                score_++;
-            }
-            return accepted;
-        }
+        case STATE_USER:
+            return tryUserState(keySet);
         }
     }  // end while
 
@@ -286,14 +253,14 @@ bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
 }
 
 // returns true if the puyo grounded.
-bool FieldRealtime::playInternal(Key key, bool* accepted)
+bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
 {
     bool ground = false;
-
     KumipuyoPos pos = kumipuyoPos();
 
-    switch (key) {
-    case KEY_RIGHT_TURN:
+    // We consume right/left turn first. Then, left/right/down.
+
+    if (keySet.rightTurnKey) {
         switch (kumipuyoPos_.r) {
         case 0:
             if (field_.color(kumipuyoPos_.x + 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
@@ -304,13 +271,13 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
                 kumipuyoPos_.x--;
                 *accepted = true;
             } else {
-                if (quickturn_ > 0) {
+                if (restFramesToAcceptQuickTurn_ > 0) {
                     kumipuyoPos_.r = 2;
                     kumipuyoPos_.y++;
                     *accepted = true;
-                    quickturn_ = 0;
+                    restFramesToAcceptQuickTurn_ = 0;
                 } else {
-                    quickturn_ = FRAMES_QUICKTURN;
+                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
                     *accepted = true;
                 }
             }
@@ -334,14 +301,14 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
                 kumipuyoPos_.x++;
                 *accepted = true;
             } else {
-                if (quickturn_ > 0) {
+                if (restFramesToAcceptQuickTurn_ > 0) {
                     kumipuyoPos_.r = 0;
                     kumipuyoPos_.y--;
                     *accepted = true;
-                    quickturn_ = 0;
+                    restFramesToAcceptQuickTurn_ = 0;
                     *accepted = true;
                 } else {
-                    quickturn_ = FRAMES_QUICKTURN;
+                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
                     *accepted = true;
                 }
             }
@@ -351,8 +318,7 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
             *accepted = true;
             break;
         }
-        return false;
-    case KEY_LEFT_TURN:
+    } else if (keySet.leftTurnKey) {
         switch (kumipuyoPos_.r) {
         case 0:
             if (field_.color(kumipuyoPos_.x - 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
@@ -363,13 +329,13 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
                 kumipuyoPos_.x++;
                 *accepted = true;
             } else {
-                if (quickturn_ > 0) {
+                if (restFramesToAcceptQuickTurn_ > 0) {
                     kumipuyoPos_.r = 2;
                     kumipuyoPos_.y++;
                     *accepted = true;
-                    quickturn_ = 0;
+                    restFramesToAcceptQuickTurn_ = 0;
                 } else {
-                    quickturn_ = FRAMES_QUICKTURN;
+                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
                     *accepted = true;
                 }
             }
@@ -387,13 +353,13 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
                 kumipuyoPos_.x--;
                 *accepted = true;
             } else {
-                if (quickturn_ > 0) {
+                if (restFramesToAcceptQuickTurn_ > 0) {
                     kumipuyoPos_.r = 0;
                     kumipuyoPos_.y--;
                     *accepted = true;
-                    quickturn_ = 0;
+                    restFramesToAcceptQuickTurn_ = 0;
                 } else {
-                    quickturn_ = FRAMES_QUICKTURN;
+                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
                     *accepted = true;
                 }
             }
@@ -409,8 +375,9 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
             }
             break;
         }
-        return false;
-    case KEY_RIGHT:
+    }
+
+    if (keySet.rightKey) {
         if (field_.color(pos.axisX() + 1, pos.axisY()) == PuyoColor::EMPTY &&
             field_.color(pos.childX() + 1, pos.childY()) == PuyoColor::EMPTY) {
             kumipuyoPos_.x++;
@@ -418,8 +385,7 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
         } else {
             *accepted = false;
         }
-        break;
-    case KEY_LEFT:
+    } else if (keySet.leftKey) {
         if (field_.color(pos.axisX() - 1, pos.axisY()) == PuyoColor::EMPTY &&
             field_.color(pos.childX() - 1, pos.childY()) == PuyoColor::EMPTY) {
             kumipuyoPos_.x--;
@@ -427,8 +393,7 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
         } else {
             *accepted = false;
         }
-        break;
-    case KEY_DOWN:
+    } else if (keySet.downKey) {
         frames_for_free_fall_ = 0;
         if (field_.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
             field_.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
@@ -441,68 +406,43 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
             *accepted = false;
             ground = true;
         }
-        break;
-    case KEY_UP:
-        // When KEY_UP is pressed, nothing happens.
-        *accepted = false;
-        break;
-    case KEY_START:
-        *accepted = false;
-        break;
-    case KEY_NONE:
-        *accepted = false;
-        break;
     }
 
     return ground;
 }
 
-bool FieldRealtime::chigiri()
+bool FieldRealtime::drop1Frame()
 {
-    if (chigiri_x_ < 0) {
-        KumipuyoPos pos = kumipuyoPos();
-        if (field_.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY) {
-            chigiri_x_ = pos.axisX();
-            chigiri_y_ = pos.axisY();
-        }
-        if (field_.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
-            chigiri_x_ = pos.childX();
-            chigiri_y_ = pos.childY();
-        }
+    double velocity = dropVelocity_;
+    dropVelocity_ = min(dropVelocity_ + DROP_ACCELARATION_PER_FRAME, MAX_DROP_VELOCITY);
+
+    bool needToDrop = false;
+    dropAmount_ += velocity;
+    if (dropAmount_ >= DROP_1BLOCK_THRESHOLD) {
+        dropAmount_ -= DROP_1BLOCK_THRESHOLD;
+        needToDrop = true;
     }
 
-    if (chigiri_x_ < 0) {
-        return false;
-    }
-
-    int x = chigiri_x_;
-    int y = chigiri_y_;
-    if (field_.color(x, y - 1) == PuyoColor::EMPTY) {
-        field_.setPuyoAndHeight(x, y - 1, field_.color(x, y));
-        field_.setPuyoAndHeight(x, y, PuyoColor::EMPTY);
-        chigiri_y_--;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-bool FieldRealtime::drop1line()
-{
-    bool ret = false;
+    bool stillDropping = false;
+    // Puyo in 14th row will not drop to 13th row. If there is a puyo on
+    // 14th row, it'll stay there forever. This behavior is a famous bug in
+    // Puyo2.
     for (int x = 1; x <= CoreField::WIDTH; x++) {
-        // Puyo in 14th row will not drop to 13th row. If there is a puyo on
-        // 14th row, it'll stay there forever. This behavior is a famous bug in
-        // Puyo2.
-        for (int y = 1; y < CoreField::MAP_HEIGHT - 3; y++) {
-            if (field_.color(x, y) == PuyoColor::EMPTY && field_.color(x, y + 1) != PuyoColor::EMPTY) {
-                field_.setPuyoAndHeight(x, y, field_.color(x, y + 1));
-                field_.setPuyoAndHeight(x, y + 1, PuyoColor::EMPTY);
-                ret = true;
+        for (int y = 1; y < 13; y++) {
+            if (field_.color(x, y) != PuyoColor::EMPTY)
+                continue;
+
+            if (field_.color(x, y + 1) != PuyoColor::EMPTY) {
+                stillDropping = true;
+                if (needToDrop) {
+                    field_.setPuyoAndHeight(x, y, field_.color(x, y + 1));
+                    field_.setPuyoAndHeight(x, y + 1, PuyoColor::EMPTY);
+                }
             }
         }
     }
-    return ret;
+
+    return stillDropping;
 }
 
 void FieldRealtime::prepareNextPuyo()
