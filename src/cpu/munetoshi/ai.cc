@@ -1,6 +1,7 @@
 #include "ai.h"
 
 #include <algorithm>
+#include <tuple>
 #include <vector>
 
 #include "core/algorithm/plan.h"
@@ -66,11 +67,15 @@ void munetoshi::AI::enemyGrounded(const FrameData& frame) {
 
 int munetoshi::AI::evaluate(const PlainField& field) {
   int grade = -1;
+  int sum;
+  auto adder = [&](std::tuple<int, PuyoColor> t) { sum += std::get<0>(t); };
   std::vector<TrackedPossibleRensaInfo> rensa_info_vect =
       RensaDetector::findPossibleRensasWithTracking(field, 1);
   for (auto i = rensa_info_vect.begin(); i != rensa_info_vect.end(); ++i) {
-    grade = std::max(grade, i->rensaResult.score * 5 -
-                                (int)i->necessaryPuyoSet.list().size());
+    sum = 0;
+    auto required_puyos = i->necessaryPuyoSet.list();
+    std::for_each(required_puyos.rbegin(), required_puyos.rend(), adder);
+    grade = std::max(grade, std::max(i->rensaResult.chains * 10 - sum * 5, 0));
   }
   return grade;
 }
