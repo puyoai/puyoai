@@ -32,7 +32,6 @@ ConnectorFrameResponse ConnectorFrameResponse::parse(const char* str)
             data.mawashi_area = tmp.c_str() + 3;
         }
     }
-    //data->status = OK;
 
     return data;
 }
