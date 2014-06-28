@@ -261,6 +261,27 @@ void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
+void evalUnreachableSpace(ScoreCollector* sc, const RefPlan& plan)
+{
+    const CoreField& f = plan.field();
+    FieldBitField checked;
+    f.countConnectedPuyos(3, 12, &checked);
+
+    int countUnreachable = 0;
+    for (int x = 1; x <= CoreField::WIDTH; ++x) {
+        for (int y = f.height(x) + 1; y <= CoreField::HEIGHT; ++y) {
+            if (f.color(x, y) != EMPTY)
+                continue;
+            if (checked.get(x, y))
+                continue;
+            countUnreachable++;
+        }
+    }
+
+    sc->addScore(NUM_UNREACHABLE_SPACE, countUnreachable);
+}
+
+template<typename ScoreCollector>
 void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField,
                              int currentFrameId, const Gazer& gazer)
 {
@@ -426,6 +447,7 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
     evalValleyDepthRidgeHeight(sc, plan);
     if (USE_FIELD_USHAPE_FEATURE)
         evalFieldUShape(sc, plan);
+    evalUnreachableSpace(sc, plan);
     evalOngoingRensaFeature(sc, plan, currentField, currentFrameId, gazer);
 
     vector<TrackedPossibleRensaInfo> rensaInfos =
