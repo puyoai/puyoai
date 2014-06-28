@@ -302,11 +302,6 @@ void Ctrl::add(Key b, std::vector<KeyTuple>* ret)
     ret->push_back(KeyTuple(b, Key::KEY_NONE));
 }
 
-void Ctrl::add2(Key b1, Key b2, std::vector<KeyTuple>* ret)
-{
-    ret->push_back(KeyTuple(b1, b2));
-}
-
 void Ctrl::moveHorizontally(int x, std::vector<KeyTuple>* ret)
 {
     if (x < 0) {
