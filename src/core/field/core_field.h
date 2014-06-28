@@ -38,9 +38,9 @@ public:
     // Counts the all puyos (including ojama).
     int countPuyos() const;
     // Returns the number of puyos connected to (x, y).
-    // Valid only if color(x, y) is normal.
+    // Actually you can use this if color(x, y) is EMPTY or OJAMA.
     int countConnectedPuyos(int x, int y) const;
-    // Same as connectedPuyoNums, but with checking using |checked|
+    // Same as connectedPuyoNums, but with checking using |checked|.
     int countConnectedPuyos(int x, int y, FieldBitField* checked) const;
 
     // ----------------------------------------------------------------------

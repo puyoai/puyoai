@@ -287,3 +287,42 @@ TEST(CoreFieldTest, SimulateWithOjama)
     EXPECT_EQ(40, rensaResult.score);
     EXPECT_EQ(1, rensaResult.chains);
 }
+
+TEST(CoreFieldTest, countConnectedPuyos)
+{
+    CoreField f(
+        " YYY Y"
+        "BBBOYO"
+        "RRRGGG");
+
+    EXPECT_EQ(3, f.countConnectedPuyos(1, 1));
+    EXPECT_EQ(3, f.countConnectedPuyos(4, 1));
+    EXPECT_EQ(3, f.countConnectedPuyos(1, 2));
+    EXPECT_EQ(1, f.countConnectedPuyos(5, 2));
+}
+
+TEST(CoreFieldTest, countConnectedPuyosEmptyCase1)
+{
+    CoreField f;
+
+    EXPECT_EQ(72, f.countConnectedPuyos(3, 12));
+}
+
+TEST(CoreFieldTest, countConnectedPuyosEmptyCase2)
+{
+    CoreField f(
+        "    O " // 12
+        "    O "
+        "    O "
+        "    O "
+        "    O " // 8
+        "    O "
+        "    O "
+        "    O "
+        "    O " // 4
+        "    O "
+        "    O "
+        "    O ");
+
+    EXPECT_EQ(48, f.countConnectedPuyos(3, 12));
+}
