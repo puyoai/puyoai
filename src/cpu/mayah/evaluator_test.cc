@@ -102,3 +102,34 @@ TEST_F(EvaluatorTest, ConnectionHorizontal2)
 
     EXPECT_TRUE(cf.collectedSparseFeatures[CONNECTION_HORIZONTAL].empty());
 }
+
+TEST_F(EvaluatorTest, NumUnreachableSpace1)
+{
+    CoreField f(
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+    CollectedFeature cf = eval(f);
+
+    EXPECT_EQ(0, cf.collectedFeatures[NUM_UNREACHABLE_SPACE]);
+}
+
+TEST_F(EvaluatorTest, NumUnreachableSpace2)
+{
+    CoreField f(
+        "    O " // 12
+        "    O "
+        "    O "
+        "    O "
+        "    O " // 8
+        "    O "
+        "    O "
+        "    O "
+        "    O " // 4
+        "    O "
+        "    O "
+        "    O ");
+    CollectedFeature cf = eval(f);
+
+    EXPECT_EQ(12, cf.collectedFeatures[NUM_UNREACHABLE_SPACE]);
+}
