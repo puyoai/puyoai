@@ -253,12 +253,16 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
 }
 
 // returns true if the puyo grounded.
+// TODO(mayah): When we put more than one key, it is hard to define |accepted|, since
+// there will be a case that some of keys are accepted but the rest are not.
+// Do we need to reconsider "accpeted"?
 bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
 {
     bool ground = false;
     KumipuyoPos pos = kumipuyoPos();
 
     // We consume right/left turn first. Then, left/right/down.
+    // TODO(mayah): Move this to core/
 
     if (keySet.rightTurnKey) {
         switch (kumipuyoPos_.r) {
