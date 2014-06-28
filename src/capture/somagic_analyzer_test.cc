@@ -379,19 +379,19 @@ TEST_F(SomagicAnalyzerTest, GameStart)
         const char* c1 = expectations[i].player1;
         const char* c2 = expectations[i].player2;
 
-        if (c1[0] != '-') EXPECT_EQ(realColorOf(c1[0]), p1->realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[1] != '-') EXPECT_EQ(realColorOf(c1[1]), p1->realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[2] != '-') EXPECT_EQ(realColorOf(c1[2]), p1->realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[3] != '-') EXPECT_EQ(realColorOf(c1[3]), p1->realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[4] != '-') EXPECT_EQ(realColorOf(c1[4]), p1->realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[5] != '-') EXPECT_EQ(realColorOf(c1[5]), p1->realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[0] != '-') EXPECT_EQ(toRealColor(c1[0]), p1->realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[1] != '-') EXPECT_EQ(toRealColor(c1[1]), p1->realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[2] != '-') EXPECT_EQ(toRealColor(c1[2]), p1->realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[3] != '-') EXPECT_EQ(toRealColor(c1[3]), p1->realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[4] != '-') EXPECT_EQ(toRealColor(c1[4]), p1->realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[5] != '-') EXPECT_EQ(toRealColor(c1[5]), p1->realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player1 : Frame " << expectations[i].frame;
 
-        if (c2[0] != '-') EXPECT_EQ(realColorOf(c2[0]), p2->realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[1] != '-') EXPECT_EQ(realColorOf(c2[1]), p2->realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[2] != '-') EXPECT_EQ(realColorOf(c2[2]), p2->realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[3] != '-') EXPECT_EQ(realColorOf(c2[3]), p2->realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[4] != '-') EXPECT_EQ(realColorOf(c2[4]), p2->realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[5] != '-') EXPECT_EQ(realColorOf(c2[5]), p2->realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[0] != '-') EXPECT_EQ(toRealColor(c2[0]), p2->realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[1] != '-') EXPECT_EQ(toRealColor(c2[1]), p2->realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[2] != '-') EXPECT_EQ(toRealColor(c2[2]), p2->realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[3] != '-') EXPECT_EQ(toRealColor(c2[3]), p2->realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[4] != '-') EXPECT_EQ(toRealColor(c2[4]), p2->realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[5] != '-') EXPECT_EQ(toRealColor(c2[5]), p2->realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player2 : Frame " << expectations[i].frame;
     }
 
     // ----------------------------------------------------------------------

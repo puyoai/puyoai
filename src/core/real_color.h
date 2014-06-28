@@ -14,7 +14,7 @@ enum RealColor {
 
 const int NUM_REAL_COLORS = 8;
 
-RealColor realColorOf(char c);
+RealColor toRealColor(char c);
 const char* toString(RealColor);
 
 inline bool isNormalColor(RealColor rc)
