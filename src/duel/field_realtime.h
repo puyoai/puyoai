@@ -5,7 +5,7 @@
 
 #include "core/field/core_field.h"
 #include "core/frame_data.h"
-#include "core/key.h"
+#include "core/key_set.h"
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"
 #include "core/server/connector/connector_frame_response.h"
@@ -26,7 +26,7 @@ public:
     // Gives a key input to the field, and control puyo. Returns true if a key
     // input is accepted. FrameContext will collect events when playing frames.
     // Currently, only ojama related events will be collected.
-    bool playOneFrame(Key key, FrameContext*);
+    bool playOneFrame(const KeySet&, FrameContext*);
 
     // Checks if a player is dead.
     bool isDead() const { return isDead_; }
@@ -75,13 +75,13 @@ private:
     // Returns true if we need to drop more.
     bool drop1Frame();
 
-    bool playInternal(Key key, bool* ground);
+    bool playInternal(const KeySet&, bool* ground);
     void prepareNextPuyo();
     void finishChain(FrameContext*);
     bool tryVanish(FrameContext*);
     bool tryDrop(FrameContext*);
     bool tryOjama();
-    bool tryUserState(Key key);
+    bool tryUserState(const KeySet&);
 
     int playerId_;
 
