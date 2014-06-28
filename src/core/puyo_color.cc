@@ -43,7 +43,7 @@ PuyoColor toPuyoColor(char c)
     return PuyoColor::EMPTY;
 }
 
-char charOfPuyoColor(PuyoColor c, char charIfEmpty)
+char toChar(PuyoColor c, char charIfEmpty)
 {
     switch (c) {
     case PuyoColor::EMPTY: return charIfEmpty;

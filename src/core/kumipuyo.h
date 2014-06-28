@@ -11,8 +11,8 @@ public:
 
     std::string toString() const {
         char tmp[] = "  ";
-        tmp[0] = charOfPuyoColor(axis);
-        tmp[1] = charOfPuyoColor(child);
+        tmp[0] = toChar(axis);
+        tmp[1] = toChar(child);
 
         return tmp;
     }

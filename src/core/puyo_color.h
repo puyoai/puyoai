@@ -30,7 +30,7 @@ inline PuyoColor normalPuyoColorOf(int index)
 PuyoColor toPuyoColor(char);
 
 // Converts PuyoColor to character.
-char charOfPuyoColor(PuyoColor, char charIfEmpty = ' ');
+char toChar(PuyoColor, char charIfEmpty = ' ');
 
 std::string toString(PuyoColor);
 

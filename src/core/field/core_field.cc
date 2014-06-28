@@ -302,7 +302,7 @@ int CoreField::vanish(int nthChain, int minHeights[], Tracker* tracker)
         int maxHeight = height(x);
         for (int y = minHeights[x]; y <= maxHeight; ++y) {
             DCHECK(color(x, y) != PuyoColor::EMPTY)
-                << x << ' ' << y << ' ' << charOfPuyoColor(color(x, y)) << '\n'
+                << x << ' ' << y << ' ' << toChar(color(x, y)) << '\n'
                 << debugOutput();
 
             if (checked.get(x, y) || color(x, y) == PuyoColor::OJAMA)
@@ -392,7 +392,7 @@ int CoreField::dropAfterVanish(int minHeights[], Tracker* tracker)
         int writeAt = minHeights[x];
         heights_[x] = writeAt - 1;
 
-        DCHECK(color(x, writeAt) == PuyoColor::EMPTY) << writeAt << ' ' << charOfPuyoColor(color(x, writeAt));
+        DCHECK(color(x, writeAt) == PuyoColor::EMPTY) << writeAt << ' ' << toChar(color(x, writeAt));
         for (int y = writeAt + 1; y <= maxHeight; ++y) {
             if (color(x, y) == PuyoColor::EMPTY)
                 continue;
@@ -484,7 +484,7 @@ std::string CoreField::debugOutput() const
     std::ostringstream s;
     for (int y = MAP_HEIGHT - 1; y >= 0; y--) {
         for (int x = 0; x < MAP_WIDTH; x++) {
-            s << charOfPuyoColor(color(x, y)) << ' ';
+            s << toChar(color(x, y)) << ' ';
         }
         s << std::endl;
     }

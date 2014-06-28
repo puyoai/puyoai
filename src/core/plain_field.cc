@@ -55,7 +55,7 @@ string PlainField::toString(char charIfEmpty) const
     ostringstream ss;
     for (int y = 13; y >= 1; --y) {
         for (int x = 1; x <= WIDTH; ++x) {
-            ss << charOfPuyoColor(get(x, y), charIfEmpty);
+            ss << toChar(get(x, y), charIfEmpty);
         }
     }
 
