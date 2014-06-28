@@ -3,14 +3,7 @@
 
 #include <mutex>
 #include "core/server/connector/connector.h"
-
-struct KeySet {
-    bool downKey = false;
-    bool leftKey = false;
-    bool rightKey = false;
-    bool rightTurnKey = false;
-    bool leftTurnKey = false;
-};
+#include "core/key_set.h"
 
 class HumanConnector : public Connector {
 public:
