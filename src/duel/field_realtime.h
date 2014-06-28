@@ -21,6 +21,14 @@ public:
     const double DROP_ACCELARATION_PER_FRAME = 1.2;
     const double DROP_1BLOCK_THRESHOLD = 32.0;
 
+    enum SimulationState {
+        STATE_LEVEL_SELECT, // initial state
+        STATE_USER,         // A user is moving puyo
+        STATE_VANISH,       // on vanishing
+        STATE_DROP,         // on dropping
+        STATE_OJAMA,        // on ojama dropping
+    };
+
     FieldRealtime(int playerId, const KumipuyoSeq&);
 
     // Gives a key input to the field, and control puyo. Returns true if a key
@@ -56,18 +64,11 @@ public:
     const KumipuyoPos& kumipuyoPos() const { return kumipuyoPos_; }
     PuyoColor puyoColor(NextPuyoPosition) const;
 
-    enum SimulationState {
-        STATE_LEVEL_SELECT, // initial state
-        STATE_USER,         // A user is moving puyo
-        STATE_VANISH,       // on vanishing
-        STATE_DROP,         // on dropping
-        STATE_OJAMA,        // on ojama dropping
-    };
-
     // Testing only.
     void skipLevelSelect();
     SimulationState simulationState() const { return simulationState_; }
     bool isSleeping() const { return sleepFor_ > 0; }
+    void forceSetField(const CoreField& cf) { field_ = cf; }
 
 private:
     void init();
