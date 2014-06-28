@@ -96,9 +96,9 @@ void FieldDrawer::drawField(Screen* screen, int playerId, const FieldRealtime& f
             PuyoColor c = field.field().color(x, y);
             if (field.userPlayable()) {
                 if (x == kumipuyoPos.axisX() && y == kumipuyoPos.axisY())
-                    c = toPuyoColor(kumipuyo.axis);
+                    c = kumipuyo.axis;
                 if (x == kumipuyoPos.childX() && y == kumipuyoPos.childY())
-                    c = toPuyoColor(kumipuyo.child);
+                    c = kumipuyo.child;
             }
 
             SDL_Rect r = BoundingBox::instance().get(field.playerId(), x, y).toSDLRect();
