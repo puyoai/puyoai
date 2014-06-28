@@ -49,7 +49,6 @@ private:
     static bool isReachableFastpath(const PlainField&, const Decision&);
     static void moveHorizontally(int x, std::vector<KeyTuple>* ret);
     static void add(Key b, std::vector<KeyTuple>* ret);
-    static void add2(Key b1, Key b2, std::vector<KeyTuple>* ret);
 };
 
 #endif  // CORE_CTRL_H_
