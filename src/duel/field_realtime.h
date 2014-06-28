@@ -97,7 +97,7 @@ private:
     int score_ = 0;
     int consumed_score_ = 0;
     int current_chains_;
-    int quickturn_;
+    int restFramesToAcceptQuickTurn_;
     bool is_zenkesi_ = false;
     int dropped_rows_;
 

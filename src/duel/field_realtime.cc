@@ -55,7 +55,7 @@ void FieldRealtime::init()
     ojama_position_ = vector<int>(6, 0);
     ojama_dropping_ = false;
     current_chains_ = 1;
-    quickturn_ = 0;
+    restFramesToAcceptQuickTurn_ = 0;
     dropped_rows_ = 0;
     delayFramesWNextAppear_ = 0;
     sent_wnext_appeared_ = false;
@@ -206,8 +206,8 @@ bool FieldRealtime::playOneFrame(Key key, FrameContext* context)
 {
     userState_.clear();
 
-    if (quickturn_ > 0) {
-        quickturn_--;
+    if (restFramesToAcceptQuickTurn_ > 0) {
+        restFramesToAcceptQuickTurn_--;
     }
 
     if (simulationState_ == STATE_USER) {
@@ -304,13 +304,13 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
                 kumipuyoPos_.x--;
                 *accepted = true;
             } else {
-                if (quickturn_ > 0) {
+                if (restFramesToAcceptQuickTurn_ > 0) {
                     kumipuyoPos_.r = 2;
                     kumipuyoPos_.y++;
                     *accepted = true;
-                    quickturn_ = 0;
+                    restFramesToAcceptQuickTurn_ = 0;
                 } else {
-                    quickturn_ = FRAMES_QUICKTURN;
+                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
                     *accepted = true;
                 }
             }
@@ -334,14 +334,14 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
                 kumipuyoPos_.x++;
                 *accepted = true;
             } else {
-                if (quickturn_ > 0) {
+                if (restFramesToAcceptQuickTurn_ > 0) {
                     kumipuyoPos_.r = 0;
                     kumipuyoPos_.y--;
                     *accepted = true;
-                    quickturn_ = 0;
+                    restFramesToAcceptQuickTurn_ = 0;
                     *accepted = true;
                 } else {
-                    quickturn_ = FRAMES_QUICKTURN;
+                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
                     *accepted = true;
                 }
             }
@@ -363,13 +363,13 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
                 kumipuyoPos_.x++;
                 *accepted = true;
             } else {
-                if (quickturn_ > 0) {
+                if (restFramesToAcceptQuickTurn_ > 0) {
                     kumipuyoPos_.r = 2;
                     kumipuyoPos_.y++;
                     *accepted = true;
-                    quickturn_ = 0;
+                    restFramesToAcceptQuickTurn_ = 0;
                 } else {
-                    quickturn_ = FRAMES_QUICKTURN;
+                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
                     *accepted = true;
                 }
             }
@@ -387,13 +387,13 @@ bool FieldRealtime::playInternal(Key key, bool* accepted)
                 kumipuyoPos_.x--;
                 *accepted = true;
             } else {
-                if (quickturn_ > 0) {
+                if (restFramesToAcceptQuickTurn_ > 0) {
                     kumipuyoPos_.r = 0;
                     kumipuyoPos_.y--;
                     *accepted = true;
-                    quickturn_ = 0;
+                    restFramesToAcceptQuickTurn_ = 0;
                 } else {
-                    quickturn_ = FRAMES_QUICKTURN;
+                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
                     *accepted = true;
                 }
             }
