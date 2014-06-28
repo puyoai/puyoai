@@ -14,49 +14,56 @@ using namespace std;
 static RealColor toRealColor(const HSV& hsv)
 {
     if (hsv.v < 38)
-        return RC_EMPTY;
+        return RealColor::RC_EMPTY;
 
     if (130 < hsv.v && hsv.s < 30)
-        return RC_OJAMA;
+        return RealColor::RC_OJAMA;
 
     // Detecting purple is really hard. We'd like to have relaxed margin for purple.
     if (13 <= hsv.h && hsv.h < 75 && 65 < hsv.v)
-        return RC_PURPLE;
+        return RealColor::RC_PURPLE;
 
     // Detecting blue is relatively hard. Let's have a relaxed margin.
     if (130 < hsv.h && hsv.h < 190 && 60 < hsv.v)
-        return RC_BLUE;
+        return RealColor::RC_BLUE;
 
     // The other colors are relatively easier. A bit tight range for now.
     if ((hsv.h < 10 || 340 < hsv.h) && 70 < hsv.v)
-        return RC_RED;
+        return RealColor::RC_RED;
     if (240 < hsv.h && hsv.h < 270 && 90 < hsv.v)
-        return RC_GREEN;
+        return RealColor::RC_GREEN;
     if (310 < hsv.h && hsv.h < 320 && 95 < hsv.v)
-        return RC_YELLOW;
+        return RealColor::RC_YELLOW;
 
-    return RC_EMPTY;
+    return RealColor::RC_EMPTY;
 }
 
 static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS], int threshold)
 {
-    static const RealColor colors[] = { RC_RED, RC_PURPLE, RC_BLUE, RC_YELLOW, RC_GREEN };
+    static const RealColor colors[] = {
+        RealColor::RC_RED,
+        RealColor::RC_PURPLE,
+        RealColor::RC_BLUE,
+        RealColor::RC_YELLOW,
+        RealColor::RC_GREEN
+    };
 
-    int cnt = 0;
-    RealColor result = RC_EMPTY;
+    int maxCount = 0;
+    RealColor result = RealColor::RC_EMPTY;
 
     for (int i = 0; i < 5; ++i) {
-        if (colorCount[colors[i]] > threshold && colorCount[colors[i]] > cnt) {
+        int cnt = colorCount[static_cast<int>(colors[i])];
+        if (cnt > threshold && cnt > maxCount) {
             result = colors[i];
-            cnt = colorCount[colors[i]];
+            maxCount = cnt;
         }
     }
 
     // Since Ojama often makes their form smaller. So, it's a bit difficult to detect.
     // Let's relax a bit.
-    if (colorCount[RC_OJAMA] > threshold * 2 / 3 && colorCount[RC_OJAMA] > cnt * 2 / 3) {
-        return RC_OJAMA;
-    }
+    int ojamaCount = colorCount[static_cast<int>(RealColor::RC_OJAMA)] * 3 / 2;
+    if (ojamaCount > threshold && ojamaCount > maxCount)
+        return RealColor::RC_OJAMA;
 
     return result;
 }
@@ -97,8 +104,8 @@ BoxAnalyzeResult SomagicAnalyzer::analyzeBox(const SDL_Surface* surface, const B
                 cout << buf << endl;
             }
 
-            colorCount[0][rc]++;
-            colorCount[(by % 2) + 1][rc]++;
+            colorCount[0][static_cast<int>(rc)]++;
+            colorCount[(by % 2) + 1][static_cast<int>(rc)]++;
         }
     }
 
@@ -115,8 +122,8 @@ BoxAnalyzeResult SomagicAnalyzer::analyzeBox(const SDL_Surface* surface, const B
         estimateRealColorFromColorCount(colorCount[2], halfThreshold),
     };
 
-    bool vanishing = rc[1] != rc[2] && (rc[1] == RC_EMPTY || rc[2] == RC_EMPTY);
-    RealColor prc = vanishing ? (rc[1] != RC_EMPTY ? rc[1] : rc[2]) : rc[0];
+    bool vanishing = rc[1] != rc[2] && (rc[1] == RealColor::RC_EMPTY || rc[2] == RealColor::RC_EMPTY);
+    RealColor prc = vanishing ? (rc[1] != RealColor::RC_EMPTY ? rc[1] : rc[2]) : rc[0];
 
     return BoxAnalyzeResult(prc, vanishing);
 }
@@ -179,7 +186,7 @@ bool SomagicAnalyzer::isLevelSelect(const SDL_Surface* surface)
             HSV hsv = rgb.toHSV();
             RealColor rc = toRealColor(hsv);
 
-            if (rc == RC_OJAMA)
+            if (rc == RealColor::RC_OJAMA)
                 ++whiteCount;
         }
     }
@@ -202,7 +209,7 @@ bool SomagicAnalyzer::isGameFinished(const SDL_Surface* surface)
             HSV hsv = rgb.toHSV();
             RealColor rc = toRealColor(hsv);
 
-            if (rc == RC_OJAMA)
+            if (rc == RealColor::RC_OJAMA)
                 ++whiteCount;
         }
     }
