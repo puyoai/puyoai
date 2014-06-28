@@ -38,14 +38,14 @@ void PuyofuRecorder::gameHasDone()
 
     fp = fopen("/tmp/puyoai_1p.txt", "a");
     if (fp) {
-        emitFieldTransitionLog(fp, 0);
+        emitLog(fp, 0);
         fprintf(fp, "=== end ===\n");
         fclose(fp);
     }
 
     fp = fopen("/tmp/puyoai_2p.txt", "a");
     if (fp) {
-        emitFieldTransitionLog(fp, 1);
+        emitLog(fp, 1);
         fprintf(fp, "=== end ===\n");
         fclose(fp);
     }
@@ -58,7 +58,21 @@ void PuyofuRecorder::addMove(int pi, const CoreField& field, const KumipuyoSeq& 
     moves_.push_back(unique_ptr<Move>(new Move(pi, field, kumipuyoSeq, time)));
 }
 
-void PuyofuRecorder::emitFieldTransitionLog(FILE* fp, int pi) const
+void PuyofuRecorder::emitLog(FILE* fp, int pi) const
+{
+    switch (mode_) {
+    case Mode::TRANSITION_LOG:
+        emitTransitionLog(fp, pi);
+        break;
+    case Mode::FIELD_LOG:
+        emitFieldLog(fp, pi);
+        break;
+    default:
+        CHECK(false) << "Unknown mode: " << static_cast<int>(mode_) << endl;
+    }
+}
+
+void PuyofuRecorder::emitTransitionLog(FILE* fp, int pi) const
 {
     PlainField field;
     for (const auto& m : moves_) {
@@ -77,5 +91,16 @@ void PuyofuRecorder::emitFieldTransitionLog(FILE* fp, int pi) const
             after.push_back('0');
         fprintf(fp, "%s %s %s\n", before.c_str(), m->kumipuyoSeq.toString().c_str(), after.c_str());
         field = m->field;
+    }
+}
+
+void PuyofuRecorder::emitFieldLog(FILE* fp, int pi) const
+{
+    for (const auto& m : moves_) {
+        if (m->pi != pi)
+            continue;
+
+        CoreField cf(m->field);
+        fprintf(fp, "%s\n%s\n", cf.debugOutput().c_str(), m->kumipuyoSeq.toString().c_str());
     }
 }
