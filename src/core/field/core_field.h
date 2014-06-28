@@ -134,9 +134,6 @@ protected:
     Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBitField* checked) const;
 
     byte heights_[MAP_WIDTH];
-
-    // TODO(mayah): Consider removing this.
-    friend class FieldRealtime;
 };
 
 #endif
