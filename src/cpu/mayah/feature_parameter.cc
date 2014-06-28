@@ -92,6 +92,7 @@ bool FeatureParameter::load(const string& filename)
 #define DEFINE_PARAM(key)                                               \
         if (keyValues.count(#key)) {                                    \
             coef_[key] = keyValues[#key].front();                       \
+            keyValues.erase(#key);                                      \
         }
 #define DEFINE_SPARSE_PARAM(key, maxValue)                              \
         if (keyValues.count(#key)) {                                    \
@@ -101,10 +102,25 @@ bool FeatureParameter::load(const string& filename)
                 return false;                                           \
             }                                                           \
             sparseCoef_[key] = keyValues[#key];                         \
+            keyValues.erase(#key);                                      \
         }
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_SPARSE_PARAM
+
+        if (!keyValues.empty()) {
+            stringstream ss;
+            bool first = true;
+            for (const auto& entry : keyValues) {
+                if (first) {
+                    first = false;
+                } else {
+                    ss << ",";
+                }
+                ss << entry.first;
+            }
+            CHECK(false) << "Unknown feature key is specified" << ss.str();
+        }
 
         return true;
     } catch (std::exception& e) {
