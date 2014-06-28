@@ -15,7 +15,6 @@ ConnectorFrameResponse ConnectorFrameResponse::parse(const char* str)
 
     data.received = true;
     data.original = std::string(str);
-    data.original = data.original.substr(0, data.original.size() - 1);  // What's this? chomp?
 
     while (getline(iss, tmp, ' ')) {
         if (tmp.substr(0, 3) == "ID=") {
