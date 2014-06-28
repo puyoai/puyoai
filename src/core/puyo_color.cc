@@ -2,7 +2,7 @@
 
 static_assert(sizeof(PuyoColor) == 1, "PuyoColor should be 1 byte");
 
-PuyoColor puyoColorOf(char c)
+PuyoColor toPuyoColor(char c)
 {
     switch (c) {
     case '0':

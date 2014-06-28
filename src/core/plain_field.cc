@@ -20,7 +20,7 @@ PlainField::PlainField(const string& url)
     for (int i = url.length() - 1; i >= dataStartsAt; --i) {
         int x = 6 - (counter % 6);
         int y = counter / 6 + 1;
-        PuyoColor c = puyoColorOf(url[i]);
+        PuyoColor c = toPuyoColor(url[i]);
         unsafeSet(x, y, c);
         counter++;
     }

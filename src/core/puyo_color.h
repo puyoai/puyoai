@@ -27,7 +27,7 @@ inline PuyoColor normalPuyoColorOf(int index)
 }
 
 // Returns puyo color from character.
-PuyoColor puyoColorOf(char);
+PuyoColor toPuyoColor(char);
 
 // Converts PuyoColor to character.
 char charOfPuyoColor(PuyoColor, char charIfEmpty = ' ');

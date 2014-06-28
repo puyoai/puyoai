@@ -12,8 +12,8 @@ std::string KumipuyoPos::debugString() const
 KumipuyoSeq::KumipuyoSeq(const string& str)
 {
     for (string::size_type i = 0; i * 2 + 1 < str.size(); ++i) {
-        PuyoColor axis = puyoColorOf(str[i * 2]);
-        PuyoColor child = puyoColorOf(str[i * 2 + 1]);
+        PuyoColor axis = toPuyoColor(str[i * 2]);
+        PuyoColor child = toPuyoColor(str[i * 2 + 1]);
         seq_.push_back(Kumipuyo(axis, child));
     }
 }

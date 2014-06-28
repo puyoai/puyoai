@@ -54,14 +54,14 @@ string GameState::toJson() const
     if (f0.userPlayable()) {
         KumipuyoPos pos = f0.kumipuyoPos();
         Kumipuyo kp = f0.kumipuyo();
-        cf0.unsafeSet(pos.axisX(), pos.axisY(), puyoColorOf(kp.axis + '0'));
-        cf0.unsafeSet(pos.childX(), pos.childY(), puyoColorOf(kp.child + '0'));
+        cf0.unsafeSet(pos.axisX(), pos.axisY(), toPuyoColor(kp.axis + '0'));
+        cf0.unsafeSet(pos.childX(), pos.childY(), toPuyoColor(kp.child + '0'));
     }
     if (f1.userPlayable()) {
         KumipuyoPos pos = f1.kumipuyoPos();
         Kumipuyo kp = f1.kumipuyo();
-        cf1.unsafeSet(pos.axisX(), pos.axisY(), puyoColorOf(kp.axis + '0'));
-        cf1.unsafeSet(pos.childX(), pos.childY(), puyoColorOf(kp.child + '0'));
+        cf1.unsafeSet(pos.axisX(), pos.axisY(), toPuyoColor(kp.axis + '0'));
+        cf1.unsafeSet(pos.childX(), pos.childY(), toPuyoColor(kp.child + '0'));
     }
 
     ostringstream ss;
