@@ -458,6 +458,7 @@ void FieldRealtime::prepareNextPuyo()
     if (FLAGS_delay_wnext)
         delayFramesWNextAppear_ = FRAMES_YOKOKU_DELAY;
     sent_wnext_appeared_ = false;
+    frames_for_free_fall_ = 0;
     simulationState_ = STATE_USER;
 }
 
