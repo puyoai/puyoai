@@ -66,17 +66,17 @@ public:
     bool isSleeping() const { return sleepFor_ > 0; }
 
 private:
-    void Init();
+    void init();
 
-    bool Chigiri();
-    bool Drop1line();
-    bool PlayInternal(Key key, bool* ground);
-    void PrepareNextPuyo();
-    void FinishChain(FrameContext*);
-    bool TryChigiri();
-    bool TryVanish(FrameContext*);
-    bool TryDrop(FrameContext*);
-    bool TryOjama();
+    bool chigiri();
+    bool drop1line();
+    bool playInternal(Key key, bool* ground);
+    void prepareNextPuyo();
+    void finishChain(FrameContext*);
+    bool tryChigiri();
+    bool tryVanish(FrameContext*);
+    bool tryDrop(FrameContext*);
+    bool tryOjama();
 
     int playerId_;
     SimulationState simulationState_ = STATE_LEVEL_SELECT;
