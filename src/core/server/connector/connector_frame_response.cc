@@ -36,7 +36,7 @@ ConnectorFrameResponse ConnectorFrameResponse::parse(const char* str)
     return data;
 }
 
-void ConnectorFrameResponse::SerializeToString(string* output) const
+std::string ConnectorFrameResponse::toString() const
 {
     stringstream ss;
     ss << "{";
@@ -53,7 +53,8 @@ void ConnectorFrameResponse::SerializeToString(string* output) const
     ss << "'frame_id':";
     ss << frameId;
     ss << "}";
-    output->append(ss.str());
+
+    return ss.str();
 }
 
 bool ConnectorFrameResponse::isValid() const
