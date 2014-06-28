@@ -73,17 +73,17 @@ bool FieldRealtime::tryChigiri()
 
         drop_animation_ = true;
         return true;
-    } else {
-        dropped_rows_ = 0;
-        simulationState_ = STATE_VANISH;
-        if (drop_animation_) {
-            sleepFor_ = FRAMES_AFTER_CHIGIRI;
-            drop_animation_ = false;
-        } else {
-            sleepFor_ = FRAMES_AFTER_NO_CHIGIRI;
-        }
-        return false;
     }
+
+    dropped_rows_ = 0;
+    simulationState_ = STATE_VANISH;
+    if (drop_animation_) {
+        sleepFor_ = FRAMES_AFTER_CHIGIRI;
+        drop_animation_ = false;
+    } else {
+        sleepFor_ = FRAMES_AFTER_NO_CHIGIRI;
+    }
+    return false;
 }
 
 bool FieldRealtime::tryVanish(FrameContext* context)
@@ -148,17 +148,17 @@ bool FieldRealtime::tryDrop(FrameContext* context)
         sleepFor_ = FRAMES_DROP_1_LINE;
         drop_animation_ = true;
         return true;
-    } else {
-        if (drop_animation_) {
-            sleepFor_ = FRAMES_AFTER_DROP;
-            drop_animation_ = false;
-            simulationState_ = STATE_VANISH;
-        } else {
-            finishChain(context);
-            sleepFor_ = FRAMES_AFTER_NO_DROP;
-        }
-        return false;
     }
+
+    if (drop_animation_) {
+        sleepFor_ = FRAMES_AFTER_DROP;
+        drop_animation_ = false;
+        simulationState_ = STATE_VANISH;
+    } else {
+        finishChain(context);
+        sleepFor_ = FRAMES_AFTER_NO_DROP;
+    }
+    return false;
 }
 
 bool FieldRealtime::tryOjama()
