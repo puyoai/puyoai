@@ -73,21 +73,26 @@ string GetPuyoText(PuyoColor color, int y = 0)
 
 void Cui::clear()
 {
-    cout << "\x1b[2J";
+    cout << "\x1b[2J" << std::flush;
+    print_puyo_cache_.clear();
+    print_text_cache_.clear();
 }
 
 void Cui::newGameWillStart()
 {
     cout << Locate(1, 1 + CoreField::MAP_HEIGHT + 3)
+         << "\x1B[0K"
+         << Locate(1, 1 + CoreField::MAP_HEIGHT + 4)
          << "\x1B[0K" << std::flush;
-    cout << Locate(1, 1 + CoreField::MAP_HEIGHT + 4)
-         << "\x1B[0K" << std::flush;
+    print_puyo_cache_.clear();
+    print_text_cache_.clear();
 }
 
 void Cui::onUpdate(const GameState& gameState)
 {
     Print(0, gameState.field(0), gameState.message(0));
     Print(1, gameState.field(1), gameState.message(1));
+    std::cout << std::flush;
 }
 
 void Cui::PrintField(int player_id, const FieldRealtime& field)
@@ -105,8 +110,8 @@ void Cui::PrintField(int player_id, const FieldRealtime& field)
                     color = kumipuyo.child;
             }
 
-            cout << Locate(player_id, x * 2, CoreField::MAP_HEIGHT - y);
-            cout << GetPuyoText(color, y);
+            PrintPuyo(Locate(player_id, x * 2, CoreField::MAP_HEIGHT - y),
+                      GetPuyoText(color, y));
         }
     }
 }
@@ -122,19 +127,17 @@ void Cui::PrintNextPuyo(int player_id, const FieldRealtime& field)
 
     // Next puyo info
     for (int i = 0; i < 4; ++i) {
-        const string location = Locate(player_id, 9 * 2, 3 + i + (i / 2));
-        cout << location << GetPuyoText(field.puyoColor(npp[i]));
+        PrintPuyo(Locate(player_id, 9 * 2, 3 + i + (i / 2)),
+                  GetPuyoText(field.puyoColor(npp[i])));
     }
 }
 
 void Cui::PrintDebugMessage(int player_id, const string& debug_message)
 {
-    // "\x1B[0K" clears the line
     if (!debug_message.empty()) {
-        cout << Locate(1, 1 + CoreField::MAP_HEIGHT + 3 + player_id)
-             << "\x1B[0K" << debug_message << std::flush;
+        PrintText(Locate(1, 1 + CoreField::MAP_HEIGHT + 3 + player_id),
+                  debug_message);
     }
-    cout << Locate(1, 1 + CoreField::MAP_HEIGHT + 5) << std::flush;
 }
 
 void Cui::Print(int player_id, const FieldRealtime& field,
@@ -144,17 +147,45 @@ void Cui::Print(int player_id, const FieldRealtime& field,
     PrintOjamaPuyo(player_id, field);
     PrintNextPuyo(player_id, field);
     PrintDebugMessage(player_id, debug_message);
-
-    // Score
-    cout << Locate(player_id, 0, CoreField::MAP_HEIGHT + 1)
-         << std::setw(10) << field.score();
+    PrintScore(player_id, field.score());
 
     // Set cursor
     cout << Locate(0, CoreField::MAP_HEIGHT + 3);
 }
 
+void Cui::PrintScore(int player_id, int score)
+{
+    std::ostringstream ss;
+    ss << std::setw(10) << score;
+    PrintText(Locate(player_id, 0, CoreField::MAP_HEIGHT + 1),
+              ss.str());
+}
+
 void Cui::PrintOjamaPuyo(int player_id, const FieldRealtime& field)
 {
-    cout << Locate(player_id, 0, 0) << field.numFixedOjama()
-         << "(" << field.numPendingOjama() << ")          ";
+    std::ostringstream ss;
+    ss << field.numFixedOjama()
+       << "(" << field.numPendingOjama() << ")";
+    PrintText(Locate(player_id, 0, 0), ss.str());
+}
+
+void Cui::PrintPuyo(const string& location, const string& text)
+{
+    auto& prev = print_puyo_cache_[location];
+    if (prev == text)
+        return;
+    cout << location << text;
+    prev = text;
+}
+
+void Cui::PrintText(const string& location, const string& text)
+{
+    auto& prev = print_text_cache_[location];
+    if (prev == text)
+        return;
+
+    cout << location << text;
+    for (size_t i = prev.size(); i < text.size(); ++i)
+        cout << ' ';
+    prev = text;
 }

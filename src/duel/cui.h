@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 
 #include "base/base.h"
 #include "duel/game_state_observer.h"
@@ -24,8 +25,15 @@ private:
     void Print(int player_id, const FieldRealtime&, const std::string& debug_message);
     void PrintField(int player_id, const FieldRealtime&);
     void PrintNextPuyo(int player_id, const FieldRealtime&);
+    void PrintScore(int player_id, int score);
     void PrintOjamaPuyo(int player_id, const FieldRealtime&);
     void PrintDebugMessage(int player_id, const std::string& debug_message);
+
+    void PrintPuyo(const std::string& location, const std::string& text);
+    void PrintText(const std::string& location, const std::string& text);
+
+    std::unordered_map<std::string, std::string> print_puyo_cache_;
+    std::unordered_map<std::string, std::string> print_text_cache_;
 };
 
 #endif  // DUEL_CUI_H_
