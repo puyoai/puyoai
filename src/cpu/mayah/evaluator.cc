@@ -22,8 +22,8 @@
 
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_CONNECTION_HORIZONTAL_FEATURE = true;
-const bool USE_HAND_WIDTH_FEATURE = true;
-const bool USE_HEIGHT_DIFF_FEATURE = true;
+const bool USE_HAND_WIDTH_FEATURE = false;
+const bool USE_HEIGHT_DIFF_FEATURE = false;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_DENSITY_FEATURE = false;
 const bool USE_PATTERN33_FEATURE = false;
@@ -449,11 +449,10 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
     evalUnreachableSpace(sc, plan);
     evalOngoingRensaFeature(sc, plan, currentField, currentFrameId, gazer);
 
-    if (fast)
-        return;
+    int keyPuyos = fast ? 0 : Evaluator::NUM_KEY_PUYOS;
 
     vector<TrackedPossibleRensaInfo> rensaInfos =
-        RensaDetector::findPossibleRensasWithTracking(plan.field(), Evaluator::NUM_KEY_PUYOS);
+        RensaDetector::findPossibleRensasWithTracking(plan.field(), keyPuyos);
 
     double maxRensaScore = 0;
     unique_ptr<ScoreCollector> maxRensaScoreCollector;
