@@ -78,6 +78,9 @@ int munetoshi::AI::evaluate(const CoreField& field) {
     std::for_each(required_puyos.rbegin(), required_puyos.rend(), adder);
     grade = std::max(grade, i->rensaResult.chains * 10 - sum * 3
         - std::max(field.height(2) - field.height(1) - 2, 0) * 3
+        - std::max(field.height(3) - field.height(2) - 2, 0) * 3
+        - std::max(field.height(4) - field.height(3) - 2, 0) * 3
+        - std::max(field.height(4) - field.height(5) - 2, 0) * 3
         - std::max(field.height(5) - field.height(6) - 2, 0) * 3);
 
   }
