@@ -40,9 +40,11 @@ static void findPossibleRensasInternal(const CoreField& field,
                                        const ColumnPuyoList& addedPuyos,
                                        int leftX,
                                        int restAdded,
+                                       RensaDetector::Mode mode,
                                        std::vector<T>* result)
 {
-    RensaDetector::findRensas(field, [result, addedPuyos](CoreField* f, int x, PuyoColor c, int n) {
+    RensaDetector::findRensas(field, mode, [result, addedPuyos](
+        CoreField* f, int x, PuyoColor c, int n) {
             T info;
             simulateInternal(f, &info, 1);
             ColumnPuyoList puyos(addedPuyos);
@@ -69,7 +71,7 @@ static void findPossibleRensasInternal(const CoreField& field,
             puyoList.addPuyo(x, c);
 
             if (f.countConnectedPuyos(x, f.height(x)) < 4)
-                findPossibleRensasInternal(f, puyoList, x, restAdded - 1, result);
+                findPossibleRensasInternal(f, puyoList, x, restAdded - 1, mode, result);
 
             f.removeTopPuyoFrom(x);
             puyoList.removeLastAddedPuyo();
@@ -78,23 +80,23 @@ static void findPossibleRensasInternal(const CoreField& field,
 }
 
 std::vector<PossibleRensaInfo>
-RensaDetector::findPossibleRensas(const CoreField& field, int maxKeyPuyos)
+RensaDetector::findPossibleRensas(const CoreField& field, int maxKeyPuyos, Mode mode)
 {
     std::vector<PossibleRensaInfo> result;
     result.reserve(100000);
 
     ColumnPuyoList puyoList;
-    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, &result);
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, mode, &result);
     return result;
 }
 
 std::vector<TrackedPossibleRensaInfo>
-RensaDetector::findPossibleRensasWithTracking(const CoreField& field, int maxKeyPuyos)
+RensaDetector::findPossibleRensasWithTracking(const CoreField& field, int maxKeyPuyos, Mode mode)
 {
     std::vector<TrackedPossibleRensaInfo> result;
     result.reserve(100000);
 
     ColumnPuyoList puyoList;
-    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, &result);
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, mode, &result);
     return result;
 }

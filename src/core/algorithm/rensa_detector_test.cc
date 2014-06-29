@@ -55,3 +55,30 @@ TEST(RensaDetectorTest, FindPossibleRensasWithKeyPuyo)
     EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsResult(f, g)));
 }
 
+TEST(RensaDetectorTest, FindPossibleRensasFloat) {
+
+  CoreField f("y     "
+              "b     "
+              "r     "
+              "b     "
+              "b     "
+              "b     "
+              "y     "
+              "y     "
+              "y     ");
+
+  CoreField g("y     "
+              "b     "
+              "rr    "
+              "br    "
+              "br    "
+              "bO    "
+              "yO    "
+              "yO    "
+              "yO    ");
+
+  auto expected = g.simulate();
+  vector<PossibleRensaInfo> results = RensaDetector::findPossibleRensas(f, 0, RensaDetector::FLOAT);
+  EXPECT_TRUE(std::count_if(results.begin(), results.end(), [&](PossibleRensaInfo result) {
+      return result.rensaResult == expected;}));
+}
