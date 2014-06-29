@@ -23,10 +23,10 @@ public:
 
     Evaluator(const FeatureParameter& param) : param_(param) {}
 
-    double eval(const RefPlan&, const CoreField& currentField, int currentFrameId, const Gazer&);
+    double eval(const RefPlan&, const CoreField& currentField, int currentFrameId, bool fast, const Gazer&);
 
     // Same as eval(), but returns CollectedFeature.
-    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, const Gazer&);
+    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, bool fast, const Gazer&);
 
 private:
     const FeatureParameter& param_;
