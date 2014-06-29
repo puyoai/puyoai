@@ -20,11 +20,11 @@ void munetoshi::AI::gameWillBegin(const FrameData& frame) {
 DropDecision munetoshi::AI::think(int frame_id, const PlainField& field,
                                   const Kumipuyo& next1,
                                   const Kumipuyo& next2) {
-  return think_internal(frame_id, field, next1, next2);
+  return think_internal(frame_id, CoreField(field), next1, next2);
 }
 
 DropDecision munetoshi::AI::think_internal(int frame_id,
-                                           const PlainField& field,
+                                           const CoreField& field,
                                            const Kumipuyo& next1,
                                            const Kumipuyo& next2) {
   UNUSED_VARIABLE(frame_id);
@@ -50,7 +50,7 @@ DropDecision munetoshi::AI::think_internal(int frame_id,
     }
   };
 
-  Plan::iterateAvailablePlans(CoreField(field), seq, 2, dicisionMaker);
+  Plan::iterateAvailablePlans(field, seq, 2, dicisionMaker);
   return best_chain_grade < previous_chain_grade
     || (strategy == FIRE && best_fire_grade > 1000)
              ? DropDecision(best_fire_decision)
@@ -66,7 +66,7 @@ void munetoshi::AI::enemyGrounded(const FrameData& frame) {
   }
 }
 
-int munetoshi::AI::evaluate(const PlainField& field) {
+int munetoshi::AI::evaluate(const CoreField& field) {
   int grade = -1;
   int sum;
   auto adder = [&](std::tuple<int, PuyoColor> t) { sum += std::get<0>(t); };
@@ -76,7 +76,10 @@ int munetoshi::AI::evaluate(const PlainField& field) {
     sum = 0;
     auto required_puyos = i->necessaryPuyoSet.list();
     std::for_each(required_puyos.rbegin(), required_puyos.rend(), adder);
-    grade = std::max(grade, std::max(i->rensaResult.chains * 10 - sum * 3, 0));
+    grade = std::max(grade, i->rensaResult.chains * 10 - sum * 3
+        - std::max(field.height(2) - field.height(1) - 2, 0) * 3
+        - std::max(field.height(5) - field.height(6) - 2, 0) * 3);
+
   }
-  return grade;
+  return std::max(grade, 0);
 }
