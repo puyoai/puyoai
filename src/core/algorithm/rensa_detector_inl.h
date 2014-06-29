@@ -93,7 +93,7 @@ static inline void tryFloatFire(
 
     // Check over y
     for (int dy = y + 1;
-        restPuyos > 0 && dy <= 13 && field.color(dx ,dy) == PuyoColor::EMPTY; ++dy) {
+        restPuyos > 0 && dy <= 12 && field.color(dx ,dy) == PuyoColor::EMPTY; ++dy) {
       f.unsafeSet(dx, dy, c);
       --restPuyos;
     }
