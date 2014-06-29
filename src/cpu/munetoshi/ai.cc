@@ -51,7 +51,8 @@ DropDecision munetoshi::AI::think_internal(int frame_id,
   };
 
   Plan::iterateAvailablePlans(CoreField(field), seq, 2, dicisionMaker);
-  return best_chain_grade < previous_chain_grade || strategy == FIRE
+  return best_chain_grade < previous_chain_grade
+    || (strategy == FIRE && best_fire_grade > 1000)
              ? DropDecision(best_fire_decision)
              : DropDecision(best_chain_decision);
 }
