@@ -1,6 +1,8 @@
 #ifndef CORE_CORE_FIELD_H_
 #define CORE_CORE_FIELD_H_
 
+#include <stdint.h>
+
 #include "base/base.h"
 #include "core/puyo_color.h"
 #include "core/plain_field.h"
@@ -133,7 +135,7 @@ protected:
     // The checked cells will be marked in |checked|.
     Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBitField* checked) const;
 
-    byte heights_[MAP_WIDTH];
+    uint8_t heights_[MAP_WIDTH];
 };
 
 #endif
