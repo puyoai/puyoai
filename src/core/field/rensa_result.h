@@ -1,6 +1,7 @@
 #ifndef CORE_RENSA_RESULT_H_
 #define CORE_RENSA_RESULT_H_
 
+#include <stdint.h>
 #include <string>
 
 #include "base/base.h"
@@ -40,7 +41,7 @@ public:
     std::string toString() const;
 
 private:
-    byte m_erasedAt[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
+    uint8_t m_erasedAt[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
 };
 
 #endif

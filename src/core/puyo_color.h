@@ -2,11 +2,12 @@
 #define CORE_PUYO_COLOR_H_
 
 #include <string>
+#include <stdint.h>
 #include <glog/logging.h>
 #include "base/base.h"
 
 // TODO(mayah): Consider use enum class.
-enum PuyoColor : byte {
+enum PuyoColor : uint8_t {
     EMPTY = 0,
     OJAMA = 1,
     WALL = 2,
