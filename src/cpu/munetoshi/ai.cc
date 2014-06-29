@@ -71,7 +71,7 @@ int munetoshi::AI::evaluate(const CoreField& field) {
   int sum;
   auto adder = [&](std::tuple<int, PuyoColor> t) { sum += std::get<0>(t); };
   std::vector<TrackedPossibleRensaInfo> rensa_info_vect =
-      RensaDetector::findPossibleRensasWithTracking(field, 1, RensaDetector::FLOAT);
+      RensaDetector::findPossibleRensasWithTracking(field, 1, RensaDetector::Mode::FLOAT);
   for (auto i = rensa_info_vect.begin(); i != rensa_info_vect.end(); ++i) {
     sum = 0;
     auto required_puyos = i->necessaryPuyoSet.list();
