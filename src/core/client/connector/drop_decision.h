@@ -9,9 +9,9 @@
 class DropDecision {
 public:
     explicit DropDecision(const Decision& decision = Decision(),
-                          const std::string& message = std::string()) :
+                          std::string message = std::string()) :
         decision_(decision),
-        message_(message)
+        message_(std::move(message))
     {
     }
 
