@@ -28,4 +28,4 @@ private:
     void PrintDebugMessage(int player_id, const std::string& debug_message);
 };
 
-#endif  // DUEL_CUI_H
+#endif  // DUEL_CUI_H_
