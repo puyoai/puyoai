@@ -35,13 +35,13 @@ public:
     RensaTrackResult& operator=(const RensaTrackResult& result);
 
     // Nth Rensa where (x, y) is erased. 0 if not erased.
-    int erasedAt(int x, int y) const { return m_erasedAt[x][y]; }
-    void setErasedAt(int x, int y, int nthChain) { m_erasedAt[x][y] = nthChain; }
+    int erasedAt(int x, int y) const { return erasedAt_[x][y]; }
+    void setErasedAt(int x, int y, int nthChain) { erasedAt_[x][y] = nthChain; }
 
     std::string toString() const;
 
 private:
-    uint8_t m_erasedAt[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
+    uint8_t erasedAt_[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
 };
 
 #endif
