@@ -3,7 +3,6 @@
 
 #define CLEAR_ARRAY(a) memset(a, 0, sizeof(a))
 
-typedef unsigned char byte;
 #define UNUSED_VARIABLE(x) (void)(x)
 
 #ifndef __has_feature
