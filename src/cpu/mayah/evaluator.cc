@@ -29,7 +29,7 @@ const bool USE_DENSITY_FEATURE = false;
 const bool USE_PATTERN33_FEATURE = false;
 const bool USE_PATTERN34_FEATURE = true;
 const bool USE_IGNITION_HEIGHT_FEATURE = false;
-const bool USE_FIELD_USHAPE_FEATURE = false;
+const bool USE_FIELD_USHAPE_FEATURE = true;
 
 using namespace std;
 
