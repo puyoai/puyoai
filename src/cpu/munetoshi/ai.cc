@@ -75,7 +75,7 @@ int munetoshi::AI::evaluate(const PlainField& field) {
     sum = 0;
     auto required_puyos = i->necessaryPuyoSet.list();
     std::for_each(required_puyos.rbegin(), required_puyos.rend(), adder);
-    grade = std::max(grade, std::max(i->rensaResult.chains * 10 - sum * 5, 0));
+    grade = std::max(grade, std::max(i->rensaResult.chains * 10 - sum * 3, 0));
   }
   return grade;
 }
