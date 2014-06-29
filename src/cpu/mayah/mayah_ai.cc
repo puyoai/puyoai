@@ -37,21 +37,31 @@ void MayahAI::gameHasEnded(const FrameData&)
 
 DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kumipuyo& next1, const Kumipuyo& next2)
 {
-    CoreField field(plainField);
+    CoreField f(plainField);
     KumipuyoSeq kumipuyoSeq { next1, next2 };
+    return thinkInternal(frameId, f, kumipuyoSeq, false);
+}
 
-    LOG(INFO) << "\n" << field.debugOutput();
-    LOG(INFO) << next1.toString() << " " << next2.toString();
+DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const Kumipuyo& next1, const Kumipuyo& next2)
+{
+    CoreField f(plainField);
+    KumipuyoSeq kumipuyoSeq { next1, next2 };
+    return thinkInternal(frameId, f, kumipuyoSeq, true);
+}
 
-    double bestScore = -100.0;
+DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, bool fast)
+{
+    LOG(INFO) << "\n" << field.debugOutput() << "\n" << kumipuyoSeq.toString();
+
+    double bestScore = -100000000.0;
     DropDecision dropDecision;
     Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
-                                [this, frameId, &field, &bestScore, &dropDecision](const RefPlan& plan) {
-            double score = Evaluator(*featureParameter_).eval(plan, field, frameId, gazer_);
-            if (bestScore < score) {
-                bestScore = score;
-                dropDecision = DropDecision(plan.decisions().front(), "");
-            }
+                                [this, frameId, fast, &field, &bestScore, &dropDecision](const RefPlan& plan) {
+        double score = Evaluator(*featureParameter_).eval(plan, field, frameId, fast, gazer_);
+        if (bestScore < score) {
+            bestScore = score;
+            dropDecision = DropDecision(plan.decisions().front(), "");
+        }
     });
 
     LOG(INFO) << "Decided : " << dropDecision.decision().toString();

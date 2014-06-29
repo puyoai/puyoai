@@ -301,7 +301,6 @@ void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, const Core
 
     sc->addScore(STRATEGY_SCORE, plan.score());
 
-
     if (plan.field().isZenkeshi()) {
         sc->addScore(STRATEGY_ZENKESHI, 1);
         return;
@@ -426,7 +425,7 @@ void evalCountPuyoFeature(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField, int currentFrameId, const Gazer& gazer)
+void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField, int currentFrameId, bool fast, const Gazer& gazer)
 {
     evalFrameFeature(sc, plan);
     evalCountPuyoFeature(sc, plan);
@@ -449,6 +448,9 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
         evalFieldUShape(sc, plan);
     evalUnreachableSpace(sc, plan);
     evalOngoingRensaFeature(sc, plan, currentField, currentFrameId, gazer);
+
+    if (fast)
+        return;
 
     vector<TrackedPossibleRensaInfo> rensaInfos =
         RensaDetector::findPossibleRensasWithTracking(plan.field(), Evaluator::NUM_KEY_PUYOS);
@@ -555,17 +557,17 @@ private:
     map<EvaluationSparseFeatureKey, vector<int>> collectedSparseFeatures_;
 };
 
-double Evaluator::eval(const RefPlan& plan, const CoreField& currentField, int currentFrameId, const Gazer& gazer)
+double Evaluator::eval(const RefPlan& plan, const CoreField& currentField, int currentFrameId, bool fast, const Gazer& gazer)
 {
     UsualScoreCollector sc(param_);
-    ::eval(&sc, plan, currentField, currentFrameId, gazer);
+    ::eval(&sc, plan, currentField, currentFrameId, fast, gazer);
     return sc.score();
 }
 
 CollectedFeature Evaluator::evalWithCollectingFeature(const RefPlan& plan, const CoreField& currentField,
-                                                      int currentFrameId, const Gazer& gazer)
+                                                      int currentFrameId, bool fast, const Gazer& gazer)
 {
     LearningScoreCollector sc(param_);
-    ::eval(&sc, plan, currentField, currentFrameId, gazer);
+    ::eval(&sc, plan, currentField, currentFrameId, fast, gazer);
     return sc.toCollectedFeature();
 }

@@ -25,8 +25,11 @@ protected:
     virtual void gameWillBegin(const FrameData&) OVERRIDE;
     virtual void gameHasEnded(const FrameData&) OVERRIDE;
     virtual DropDecision think(int frameId, const PlainField&, const Kumipuyo& next1, const Kumipuyo& next2) OVERRIDE;
+    virtual DropDecision thinkFast(int frameId, const PlainField&, const Kumipuyo& next1, const Kumipuyo& next2) OVERRIDE;
     virtual void enemyGrounded(const FrameData&) OVERRIDE;
     virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
+
+    DropDecision thinkInternal(int frameId, const CoreField&, const KumipuyoSeq&, bool fast);
 
     std::unique_ptr<FeatureParameter> featureParameter_;
     Gazer gazer_;

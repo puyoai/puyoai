@@ -29,7 +29,7 @@ protected:
 
         RefPlan plan(f, decisions, rensaResult, initiatingFrames);
 
-        return evaluator.evalWithCollectingFeature(plan, f, 1, gazer);
+        return evaluator.evalWithCollectingFeature(plan, f, 1, false, gazer);
     }
 };
 
