@@ -1,5 +1,6 @@
 #include "evaluator.h"
 
+#include <algorithm>
 #include <gtest/gtest.h>
 
 #include "core/algorithm/plan.h"
