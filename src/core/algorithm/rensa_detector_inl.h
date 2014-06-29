@@ -2,23 +2,23 @@
 #define CORE_ALGORITHM_RENSA_DETECTOR_INL_H_
 
 template<typename SimulationCallback>
-void RensaDetector::findRensas(const CoreField& field, Mode mode, SimulationCallback callback)
+void RensaDetector::findRensas(const CoreField& field, RensaDetector::Mode mode, SimulationCallback callback)
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = field.height(x); y >= 1; --y) {
-          switch (mode) {
-            case DROP:
-              tryDropFire(x, y, field, callback);
-            case FLOAT:
-              tryFloatFire(x, y, field, callback);
-          }
+            switch (mode) {
+            case Mode::DROP:
+                tryDropFire(x, y, field, callback);
+            case Mode::FLOAT:
+                tryFloatFire(x, y, field, callback);
+            }
         }
     }
 }
 
 template<typename SimulationCallback>
-static inline void tryDropFire(
-    int x, int y, const CoreField& field, const SimulationCallback& callback) {
+static inline void tryDropFire(int x, int y, const CoreField& field, const SimulationCallback& callback)
+{
     PuyoColor c = field.color(x, y);
 
     DCHECK(c != PuyoColor::EMPTY);

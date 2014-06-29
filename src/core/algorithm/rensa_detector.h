@@ -11,22 +11,22 @@ class KumipuyoSeq;
 
 class RensaDetector {
 public:
-    enum Mode {
-      DROP,
-      FLOAT,
+    enum class Mode {
+        DROP,
+        FLOAT,
     };
 
-    // Finds rensa using |kumiPuyos|.
+    // Finds rensa using |kumipuyos|.
     static std::vector<FeasibleRensaInfo> findFeasibleRensas(const CoreField&, const KumipuyoSeq&);
 
     // Finds possible rensas from the specified field.
     // Before firing a rensa, we will put key puyos (maxKeyPuyo at max).
     static std::vector<PossibleRensaInfo> findPossibleRensas(
-        const CoreField&, int maxKeyPuyo = 0, Mode mode = DROP);
+        const CoreField&, int maxKeyPuyo = 0, Mode mode = Mode::DROP);
 
     // Same as findPossibleRensas. However, we return tracking info also.
     static std::vector<TrackedPossibleRensaInfo> findPossibleRensasWithTracking(
-        const CoreField&, int maxKeyPuyo = 0, Mode mode = DROP);
+        const CoreField&, int maxKeyPuyo = 0, Mode mode = Mode::DROP);
 
     template<typename SimulationCallback>
     static void findRensas(const CoreField&, Mode mode, SimulationCallback callback);
