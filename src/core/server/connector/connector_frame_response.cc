@@ -5,6 +5,16 @@
 
 using namespace std;
 
+static string unescapeMessage(string str)
+{
+    for (size_t i = 0; i < str.size(); ++i) {
+        if (str[i] == '_')
+            str[i] = ' ';
+    }
+
+    return str;
+}
+
 // static
 ConnectorFrameResponse ConnectorFrameResponse::parse(const char* str)
 {
@@ -27,7 +37,7 @@ ConnectorFrameResponse ConnectorFrameResponse::parse(const char* str)
             std::istringstream istr(tmp.c_str() + 2);
             istr >> data.decision.r;
         } else if (tmp.substr(0, 4) == "MSG=") {
-            data.msg = tmp.c_str() + 4;
+            data.msg = unescapeMessage(tmp.c_str() + 4);
         } else if (tmp.substr(0, 3) == "MA=") {
             data.mawashi_area = tmp.c_str() + 3;
         }
