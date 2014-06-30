@@ -6,6 +6,16 @@
 
 using namespace std;
 
+static string escapeMessage(string str)
+{
+    for (size_t i = 0; i < str.size(); ++i) {
+        if (str[i] == ' ')
+            str[i] = '_';
+    }
+
+    return str;
+}
+
 void ClientConnector::sendWithoutDecision(int frameId)
 {
     cout << "ID=" << frameId << endl;
@@ -17,7 +27,7 @@ void ClientConnector::send(int frameId, const DropDecision& dropDecision)
     ss << "ID=" << frameId
        << " X=" << dropDecision.decision().x
        << " R=" << dropDecision.decision().r
-       << " MSG=" << dropDecision.message();
+       << " MSG=" << escapeMessage(dropDecision.message());
 
     string s = ss.str();
     cout << s << endl;

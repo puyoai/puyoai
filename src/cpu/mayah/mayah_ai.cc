@@ -52,18 +52,40 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
     LOG(INFO) << "\n" << field.debugOutput() << "\n" << kumipuyoSeq.toString();
 
     double bestScore = -100000000.0;
-    DropDecision dropDecision;
+    Plan bestPlan;
     Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
-                                [this, frameId, fast, &field, &bestScore, &dropDecision](const RefPlan& plan) {
+                                [this, frameId, fast, &field, &bestScore, &bestPlan](const RefPlan& plan) {
         double score = Evaluator(*featureParameter_).eval(plan, field, frameId, fast, gazer_);
         if (bestScore < score) {
             bestScore = score;
-            dropDecision = DropDecision(plan.decisions().front(), "");
+            bestPlan = plan.toPlan();
         }
     });
 
-    LOG(INFO) << "Decided : " << dropDecision.decision().toString();
-    return dropDecision;
+    RefPlan refPlan(bestPlan.field(), bestPlan.decisions(), bestPlan.rensaResult(), bestPlan.initiatingFrames());
+    CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
+
+    stringstream ss;
+    if (cf.collectedFeatures[STRATEGY_ZENKESHI] > 0)
+        ss << "ZENKESHI / ";
+    if (cf.collectedFeatures[STRATEGY_TAIOU] > 0)
+        ss << "TAIOU / ";
+    if (cf.collectedFeatures[STRATEGY_LARGE_ENOUGH] > 0)
+        ss << "LARGE_ENOUGH / ";
+    if (cf.collectedFeatures[STRATEGY_TSUBUSHI] > 0)
+        ss << "TSUBUSHI / ";
+    if (cf.collectedFeatures[STRATEGY_SAKIUCHI] > 0)
+        ss << "SAKIUCHI / ";
+    if (cf.collectedFeatures[STRATEGY_HOUWA] > 0)
+        ss << "HOUWA / ";
+
+    if (cf.collectedSparseFeatures.count(MAX_CHAINS)) {
+        const vector<int>& vs = cf.collectedSparseFeatures[MAX_CHAINS];
+        for (size_t i = 0; i < vs.size(); ++i)
+            ss << "MAX CHAIN = " << vs[i];
+    }
+
+    return DropDecision(bestPlan.decisions().front(), ss.str());
 }
 
 void MayahAI::enemyGrounded(const FrameData& frameData)
