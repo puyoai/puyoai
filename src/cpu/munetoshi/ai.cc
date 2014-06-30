@@ -18,18 +18,15 @@ void munetoshi::AI::gameWillBegin(const FrameData& frame) {
 }
 
 DropDecision munetoshi::AI::think(int frame_id, const PlainField& field,
-                                  const Kumipuyo& next1,
-                                  const Kumipuyo& next2) {
-  return think_internal(frame_id, CoreField(field), next1, next2);
+                                  const KumipuyoSeq& seq) {
+  return think_internal(frame_id, CoreField(field), seq);
 }
 
 DropDecision munetoshi::AI::think_internal(int frame_id,
                                            const CoreField& field,
-                                           const Kumipuyo& next1,
-                                           const Kumipuyo& next2) {
+                                           const KumipuyoSeq& seq) {
   UNUSED_VARIABLE(frame_id);
 
-  KumipuyoSeq seq{next1, next2};
   Decision best_chain_decision;
   Decision best_fire_decision;
   int best_chain_grade = -1;

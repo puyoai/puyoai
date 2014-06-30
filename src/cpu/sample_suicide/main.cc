@@ -10,10 +10,10 @@ public:
     SampleSuicideAI() : AI("sample-suicide") {}
     virtual ~SampleSuicideAI() {}
 
-    virtual DropDecision think(int frameId, const PlainField& f, const Kumipuyo& next1, const Kumipuyo& next2) OVERRIDE {
+    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) override
+    {
         UNUSED_VARIABLE(frameId);
-        UNUSED_VARIABLE(next1);
-        UNUSED_VARIABLE(next2);
+        UNUSED_VARIABLE(seq);
 
         CoreField cf(f);
         Decision d = cf.height(3) > 6 ? Decision(3, 0) : Decision(3, 2);

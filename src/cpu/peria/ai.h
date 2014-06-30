@@ -13,15 +13,14 @@ class Ai : public ::AI {
  protected:
   virtual DropDecision think(int frame_id,
                              const PlainField& field,
-                             const Kumipuyo& next1,
-                             const Kumipuyo& next2) override;
+                             const KumipuyoSeq& seq) override;
   virtual void gameWillBegin(const FrameData& frame_data) override;
   virtual void enemyGrounded(const FrameData& frame_data) override;
 
  private:
   bool zenkeshi_[2];
 };
- 
+
 }  // namespace peria
 
 #endif // CPU_PERIA_H_

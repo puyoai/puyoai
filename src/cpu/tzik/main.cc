@@ -13,17 +13,14 @@ AI::AI() : ::AI("tzik") {}
 
 DropDecision AI::think(int frame_id,
                        const PlainField& field,
-                       const Kumipuyo& next1,
-                       const Kumipuyo& next2) {
-  return think_sample(frame_id, field, next1, next2);
+                       const KumipuyoSeq& seq) {
+  return think_sample(frame_id, field, seq);
 }
 
 DropDecision AI::think_sample(int frame_id,
                               const PlainField& field,
-                              const Kumipuyo& next1,
-                              const Kumipuyo& next2) {
+                              const KumipuyoSeq& seq) {
   UNUSED_VARIABLE(frame_id);
-  KumipuyoSeq seq { next1, next2 };
 
   Decision best;
   int score = -1;

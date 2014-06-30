@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
         getline(cin, str);
 
         double t1 = now();
-        DropDecision dropDecision = ai.think(frameId, field, seq.get(i), seq.get(i + 1));
+        DropDecision dropDecision = ai.think(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) });
         double t2 = now();
         cout << dropDecision.decision().x << ' ' << dropDecision.decision().r << endl;
         cout << "time = " << (t2 - t1) << endl;

@@ -39,7 +39,8 @@ void AI::runLoop()
             const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
             // TODO(mayah): duel should have several frames before showing the first hand.
             // This workaround code should be removed after duel is changed.
-            decision = make_pair(think(frameData.id, field_, kumipuyoSeq.get(1), kumipuyoSeq.get(2)), kumipuyoSeq.get(1));
+            decision = make_pair(think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) }),
+                                 kumipuyoSeq.get(1));
             needsSendDecision = true;
 
             if (decision.first.decision().isValid() && decision.second.isValid()) {
@@ -63,7 +64,8 @@ void AI::runLoop()
             LOG(INFO) << "STATE_OJAMA_DROPPED";
             resetCurrentField(frameData.myPlayerFrameData().field);
             const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
-            decision = make_pair(thinkFast(frameData.id, field_, kumipuyoSeq.get(0), kumipuyoSeq.get(1)), kumipuyoSeq.get(0));
+            decision = make_pair(thinkFast(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) }),
+                                 kumipuyoSeq.get(0));
             if (decision.first.decision().isValid() && decision.second.isValid()) {
                 field_.dropKumipuyo(decision.first.decision(), decision.second);
                 field_.simulate();
@@ -74,7 +76,8 @@ void AI::runLoop()
         if (frameData.myPlayerFrameData().userState.wnextAppeared) {
             const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
             LOG(INFO) << "STATE_WNEXT_APPEARED";
-            decisionNext = make_pair(think(frameData.id, field_, kumipuyoSeq.get(1), kumipuyoSeq.get(2)), kumipuyoSeq.get(1));
+            decisionNext = make_pair(think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) } ),
+                                     kumipuyoSeq.get(1));
             needsSendDecisionNext = true;
         }
         if (frameData.myPlayerFrameData().userState.grounded) {
