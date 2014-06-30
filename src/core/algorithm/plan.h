@@ -15,6 +15,7 @@ class RefPlan;
 
 class Plan {
 public:
+    Plan() {}
     Plan(const CoreField& field, const std::vector<Decision>& decisions,
          const RensaResult& rensaResult, int initiatingFrames) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
