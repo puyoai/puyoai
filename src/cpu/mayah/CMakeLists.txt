@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 cpu_setup("mayah")
 
 add_library(mayah_lib
-            evaluator.cc feature_parameter.cc gazer.cc mayah_ai.cc)
+            evaluator.cc feature_parameter.cc gazer.cc mayah_ai.cc util.cc)
 
 function(mayah_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})

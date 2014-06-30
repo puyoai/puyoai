@@ -4,7 +4,6 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <sys/time.h>
 
 #include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/plan.h"
@@ -18,6 +17,7 @@
 #include "core/state.h"
 
 #include "mayah_ai.h"
+#include "util.h"
 
 using namespace std;
 
@@ -27,12 +27,6 @@ public:
     using MayahAI::think;
     using MayahAI::enemyNext2Appeared;
 };
-
-double now() {
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    return tv.tv_sec + tv.tv_usec / 1000000.0;
-}
 
 // TODO(mayah): Implement with GUI!
 int main(int argc, char* argv[])
