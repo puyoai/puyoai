@@ -281,12 +281,13 @@ void evalUnreachableSpace(ScoreCollector* sc, const RefPlan& plan)
     sc->addScore(NUM_UNREACHABLE_SPACE, countUnreachable);
 }
 
+// Returns true If we don't need to evaluate other features.
 template<typename ScoreCollector>
-void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField,
-                             int currentFrameId, const Gazer& gazer)
+bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField,
+                  int currentFrameId, const Gazer& gazer)
 {
     if (!plan.isRensaPlan())
-        return;
+        return false;
 
     if (gazer.rensaIsOngoing() && gazer.ongoingRensaInfo().rensaResult.score > scoreForOjama(6)) {
         // TODO: 対応が適当すぎる
@@ -294,8 +295,9 @@ void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, const Core
             plan.score() >= gazer.ongoingRensaInfo().rensaResult.score &&
             plan.initiatingFrames() <= gazer.ongoingRensaInfo().finishingRensaFrame) {
             LOG(INFO) << plan.decisionText() << " TAIOU";
+
             sc->addScore(STRATEGY_TAIOU, 1.0);
-            return;
+            return false;
         }
     }
 
@@ -303,42 +305,33 @@ void evalOngoingRensaFeature(ScoreCollector* sc, const RefPlan& plan, const Core
 
     if (plan.field().isZenkeshi()) {
         sc->addScore(STRATEGY_ZENKESHI, 1);
-        return;
+        return true;
     }
 
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
     int estimatedMaxScore = gazer.estimateMaxScore(rensaEndingFrameId);
 
-    // --- 1.1. 十分でかい場合は打って良い。
-    // / TODO: 十分でかいとは？ / とりあえず致死量ということにする
+    // --- If the rensa is large enough, fire it.
     if (plan.score() >= estimatedMaxScore + scoreForOjama(60)) {
         sc->addScore(STRATEGY_LARGE_ENOUGH, 1);
-        return;
+        return true;
     }
 
-    // --- 1.2. 対応手なく潰せる
-    // TODO: 実装があやしい。
+    // --- If we can send 18>= ojamas, and opponent does not have any hand to cope with it,
+    // we can fire it.
+    // TODO(mayah): We need to check if the enemy cannot fire his rensa after ojama is dropped.
     if (plan.score() >= scoreForOjama(18) && estimatedMaxScore <= scoreForOjama(6)) {
         sc->addScore(STRATEGY_TSUBUSHI, 1);
-        return;
+        return true;
     }
 
-    // --- 1.3. 飽和したので打つしかなくなった
-    // TODO: これは EnemyRensaInfo だけじゃなくて MyRensaInfo も必要なのでは……。
-    // TODO: 60 個超えたら打つとかなんか間違ってるだろう。
     if (currentField.countPuyos() >= 60) {
         sc->addScore(STRATEGY_HOUWA, 1);
-        return;
+        return false;
     }
 
-    // --- 1.4. 打つと有利になる
-    // TODO: そもそも数値化の仕方が分からない。
-
-    // 基本的に先打ちすると負けるので、打たないようにする
-    //ostringstream ss;
-    //ss << "SAKIUCHI will lose : score = " << plan.score() << " EMEMY score = " << estimatedMaxScore << endl;
-    // LOG(INFO) << plan.decisionText() << " " << ss.str();
     sc->addScore(STRATEGY_SAKIUCHI, 1.0);
+    return false;
 }
 
 template<typename ScoreCollector>
@@ -427,6 +420,9 @@ void evalCountPuyoFeature(ScoreCollector* sc, const RefPlan& plan)
 template<typename ScoreCollector>
 void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField, int currentFrameId, bool fast, const Gazer& gazer)
 {
+    if (evalStrategy(sc, plan, currentField, currentFrameId, gazer))
+        return;
+
     evalFrameFeature(sc, plan);
     evalCountPuyoFeature(sc, plan);
     if (USE_CONNECTION_FEATURE)
@@ -447,7 +443,6 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
     if (USE_FIELD_USHAPE_FEATURE)
         evalFieldUShape(sc, plan);
     evalUnreachableSpace(sc, plan);
-    evalOngoingRensaFeature(sc, plan, currentField, currentFrameId, gazer);
 
     int keyPuyos = fast ? 0 : Evaluator::NUM_KEY_PUYOS;
 
