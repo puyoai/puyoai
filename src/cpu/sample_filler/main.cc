@@ -1,6 +1,8 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include <algorithm>
+
 #include "core/algorithm/plan.h"
 #include "core/client/ai/ai.h"
 #include "core/field/core_field.h"
