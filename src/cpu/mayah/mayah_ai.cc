@@ -82,8 +82,10 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
     if (cf.collectedSparseFeatures.count(MAX_CHAINS)) {
         const vector<int>& vs = cf.collectedSparseFeatures[MAX_CHAINS];
         for (size_t i = 0; i < vs.size(); ++i)
-            ss << "MAX CHAIN = " << vs[i];
+            ss << "MAX CHAIN = " << vs[i] << " / ";
     }
+
+    ss << "Gazed max score = " << gazer_.estimateMaxScore(frameId + refPlan.totalFrames());
 
     return DropDecision(bestPlan.decisions().front(), ss.str());
 }
