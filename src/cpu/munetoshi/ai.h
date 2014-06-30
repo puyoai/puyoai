@@ -12,7 +12,7 @@ class AI : public ::AI {
   virtual ~AI() = default;
 
   DropDecision think(int frame_id, const PlainField& field,
-                     const Kumipuyo& next1, const Kumipuyo& next2) override;
+                     const KumipuyoSeq& seq) override;
 
  protected:
   enum Strategy {
@@ -23,8 +23,7 @@ class AI : public ::AI {
   virtual void gameWillBegin(const FrameData&) override;
 
   virtual DropDecision think_internal(int frame_id, const CoreField& field,
-                                      const Kumipuyo& next1,
-                                      const Kumipuyo& next2);
+                                      const KumipuyoSeq& seq);
 
   virtual void enemyGrounded(const FrameData&) override;
 

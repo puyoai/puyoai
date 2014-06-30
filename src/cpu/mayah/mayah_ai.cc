@@ -35,17 +35,15 @@ void MayahAI::gameHasEnded(const FrameData&)
 {
 }
 
-DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kumipuyo& next1, const Kumipuyo& next2)
+DropDecision MayahAI::think(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq)
 {
     CoreField f(plainField);
-    KumipuyoSeq kumipuyoSeq { next1, next2 };
     return thinkInternal(frameId, f, kumipuyoSeq, false);
 }
 
-DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const Kumipuyo& next1, const Kumipuyo& next2)
+DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq)
 {
     CoreField f(plainField);
-    KumipuyoSeq kumipuyoSeq { next1, next2 };
     return thinkInternal(frameId, f, kumipuyoSeq, true);
 }
 

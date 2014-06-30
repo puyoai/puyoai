@@ -8,7 +8,7 @@
 #include "core/field/core_field.h"
 
 struct FrameData;
-class Kumipuyo;
+class KumipuyoSeq;
 class PlainField;
 
 // AI is a utility class of AI.
@@ -33,14 +33,14 @@ protected:
     // think will be called when ai should decide the next hand.
     // Basically, this will be called when NEXT2 has appeared.
     // You will have around 300 ms to decide your hand.
-    virtual DropDecision think(int frameId, const PlainField&, const Kumipuyo& next1, const Kumipuyo& next2) = 0;
+    virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&) = 0;
 
     // thinkFast will be called when ai should decide the next hand immediately.
     // Basically this will be called when ojamas are dropped.
     // You will have around 30 ms to decide your hand.
-    virtual DropDecision thinkFast(int frameId, const PlainField& field, const Kumipuyo& next1, const Kumipuyo& next2)
+    virtual DropDecision thinkFast(int frameId, const PlainField& field, const KumipuyoSeq& next)
     {
-        return think(frameId, field, next1, next2);
+        return think(frameId, field, next);
     }
 
     // When enemy's puyo is grounded, this callback will be called.

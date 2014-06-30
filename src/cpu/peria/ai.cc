@@ -24,8 +24,7 @@ Ai::~Ai() {}
 
 DropDecision Ai::think(int /*frame_id*/,
 		       const PlainField& /*field*/,
-		       const Kumipuyo& /*next1*/,
-		       const Kumipuyo& /*next2*/) {
+		       const KumipuyoSeq& /*seq*/) {
   return DropDecision();
 }
 

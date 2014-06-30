@@ -12,15 +12,12 @@ class AI final : public ::AI {
 
   DropDecision think(int frame_id,
                      const PlainField& field,
-                     const Kumipuyo& next1,
-                     const Kumipuyo& next2) override;
+                     const KumipuyoSeq& seq) override;
 
  private:
   DropDecision think_sample(int frame_id,
-                              const PlainField& field,
-                              const Kumipuyo& next1,
-                              const Kumipuyo& next2);
-
+                            const PlainField& field,
+                            const KumipuyoSeq& seq);
 
   AI(const AI&) = delete;
   AI(AI&&) = delete;
