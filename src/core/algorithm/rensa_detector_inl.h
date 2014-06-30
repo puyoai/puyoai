@@ -9,8 +9,10 @@ void RensaDetector::findRensas(const CoreField& field, RensaDetector::Mode mode,
             switch (mode) {
             case Mode::DROP:
                 tryDropFire(x, y, field, callback);
+                break;
             case Mode::FLOAT:
                 tryFloatFire(x, y, field, callback);
+                break;
             }
         }
     }
@@ -112,4 +114,3 @@ static inline void tryFloatFire(
 }
 
 #endif
-
