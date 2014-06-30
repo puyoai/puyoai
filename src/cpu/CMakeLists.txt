@@ -41,5 +41,6 @@ add_subdirectory(peria)
 add_subdirectory(tzik)
 
 add_subdirectory(sample)
+add_subdirectory(sample_filler)
 add_subdirectory(sample_suicide)
 add_subdirectory(sample_rensa)
