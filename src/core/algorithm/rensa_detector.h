@@ -1,6 +1,7 @@
 #ifndef CORE_ALGORITHM_RENSA_DETECTOR_H_
 #define CORE_ALGORITHM_RENSA_DETECTOR_H_
 
+#include <functional>
 #include <vector>
 
 #include "core/field/core_field.h"
@@ -28,10 +29,9 @@ public:
     static std::vector<TrackedPossibleRensaInfo> findPossibleRensasWithTracking(
         const CoreField&, int maxKeyPuyo = 0, Mode mode = Mode::DROP);
 
-    template<typename SimulationCallback>
+    typedef std::function<void (CoreField*, int, PuyoColor, int)> SimulationCallback;
+
     static void findRensas(const CoreField&, Mode mode, SimulationCallback callback);
 };
-
-#include "rensa_detector_inl.h"
 
 #endif
