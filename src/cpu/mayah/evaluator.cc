@@ -22,7 +22,7 @@
 
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_CONNECTION_HORIZONTAL_FEATURE = true;
-const bool USE_HAND_WIDTH_FEATURE = false;
+const bool USE_HAND_WIDTH_FEATURE = true;
 const bool USE_HEIGHT_DIFF_FEATURE = false;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_DENSITY_FEATURE = false;
