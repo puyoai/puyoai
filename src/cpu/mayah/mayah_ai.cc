@@ -10,6 +10,7 @@
 #include "feature_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
+#include "util.h"
 
 DECLARE_string(feature);
 
@@ -51,6 +52,8 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
 {
     LOG(INFO) << "\n" << field.debugOutput() << "\n" << kumipuyoSeq.toString();
 
+    double startTime = now();
+
     double bestScore = -100000000.0;
     Plan bestPlan;
     Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
@@ -61,6 +64,8 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
             bestPlan = plan.toPlan();
         }
     });
+
+    double endTime = now();
 
     RefPlan refPlan(bestPlan.field(), bestPlan.decisions(), bestPlan.rensaResult(), bestPlan.initiatingFrames());
     CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
@@ -85,7 +90,8 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
 
-    ss << "Gazed max score = " << gazer_.estimateMaxScore(frameId + refPlan.totalFrames());
+    ss << "Gazed max score = " << gazer_.estimateMaxScore(frameId + refPlan.totalFrames()) << " / ";
+    ss << ((endTime - startTime) * 1000) << " [ms]";
 
     return DropDecision(bestPlan.decisions().front(), ss.str());
 }
