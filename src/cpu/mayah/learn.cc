@@ -46,10 +46,10 @@ void updateFeature(FeatureParameter* parameter,
                    const CollectedFeature& currentFeature,
                    const CollectedFeature& teacherFeature)
 {
-    const double D = dsigmoid(currentFeature.score - teacherFeature.score);
+    const double D = dsigmoid(currentFeature.score() - teacherFeature.score());
     cout << "learning: D = " << D
-         << " current = " << currentFeature.score
-         << " teacher = " << teacherFeature.score
+         << " current = " << currentFeature.score()
+         << " teacher = " << teacherFeature.score()
          << endl;
 
     for (int i = 0; i < SIZE_OF_EVALUATION_FEATURE_KEY; ++i) {
@@ -59,8 +59,8 @@ void updateFeature(FeatureParameter* parameter,
         if (key == TOTAL_FRAMES)
             continue;
 
-        double curV = currentFeature.collectedFeatures.count(key) ? currentFeature.collectedFeatures.find(key)->second : 0;
-        double teaV = teacherFeature.collectedFeatures.count(key) ? teacherFeature.collectedFeatures.find(key)->second : 0;
+        double curV = currentFeature.feature(key);
+        double teaV = teacherFeature.feature(key);
         if (curV == teaV)
             continue;
 
@@ -77,13 +77,11 @@ void updateFeature(FeatureParameter* parameter,
     for (int i = 0; i < SIZE_OF_EVALUATION_SPARSE_FEATURE_KEY; ++i) {
         EvaluationSparseFeatureKey key = toEvaluationSparseFeatureKey(i);
         map<int, pair<int, int>> scores;
-        if (currentFeature.collectedSparseFeatures.count(key)) {
-            for (int v : currentFeature.collectedSparseFeatures.find(key)->second)
-                scores[v].first += 1;
+        for (int v : currentFeature.feature(key)) {
+            scores[v].first += 1;
         }
-        if (teacherFeature.collectedSparseFeatures.count(key)) {
-            for (int v : teacherFeature.collectedSparseFeatures.find(key)->second)
-                scores[v].second += 1;
+        for (int v : teacherFeature.feature(key)) {
+            scores[v].second += 1;
         }
 
         for (const auto& entry : scores) {
@@ -127,8 +125,8 @@ void learnWithInteractive()
             else
                 pd = make_pair(plan.decision(0), plan.decision(1));
             collectedFeatures[pd] = f;
-            if (currentScore < f.score) {
-                currentScore = f.score;
+            if (currentScore < f.score()) {
+                currentScore = f.score();
                 currentDecision = pd;
             }
         });
@@ -170,7 +168,7 @@ void learnWithInteractive()
         for (const auto& entry : collectedFeatures) {
             if (!currentFeature)
                 currentFeature = &entry.second;
-            else if (currentFeature->score < entry.second.score)
+            else if (currentFeature->score() < entry.second.score())
                 currentFeature = &entry.second;
 
             if (entry.first == teacherDecision)

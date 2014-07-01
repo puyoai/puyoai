@@ -71,23 +71,23 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
     CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
 
     stringstream ss;
-    if (cf.collectedFeatures[STRATEGY_ZENKESHI] > 0)
+    if (cf.feature(STRATEGY_ZENKESHI) > 0)
         ss << "ZENKESHI / ";
-    if (cf.collectedFeatures[STRATEGY_TAIOU] > 0)
+    if (cf.feature(STRATEGY_TAIOU) > 0)
         ss << "TAIOU / ";
-    if (cf.collectedFeatures[STRATEGY_LARGE_ENOUGH] > 0)
+    if (cf.feature(STRATEGY_LARGE_ENOUGH) > 0)
         ss << "LARGE_ENOUGH / ";
-    if (cf.collectedFeatures[STRATEGY_TSUBUSHI] > 0)
+    if (cf.feature(STRATEGY_TSUBUSHI) > 0)
         ss << "TSUBUSHI / ";
-    if (cf.collectedFeatures[STRATEGY_SAKIUCHI] > 0)
+    if (cf.feature(STRATEGY_SAKIUCHI) > 0)
         ss << "SAKIUCHI / ";
-    if (cf.collectedFeatures[STRATEGY_HOUWA] > 0)
+    if (cf.feature(STRATEGY_HOUWA) > 0)
         ss << "HOUWA / ";
 
     ss << "SCORE = " << bestScore << " / ";
 
-    if (cf.collectedSparseFeatures.count(MAX_CHAINS)) {
-        const vector<int>& vs = cf.collectedSparseFeatures[MAX_CHAINS];
+    if (!cf.feature(MAX_CHAINS).empty()) {
+        const vector<int>& vs = cf.feature(MAX_CHAINS);
         for (size_t i = 0; i < vs.size(); ++i)
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
