@@ -21,7 +21,6 @@ public:
     MayahAI();
     ~MayahAI();
 
-protected:
     virtual void gameWillBegin(const FrameData&) OVERRIDE;
     virtual void gameHasEnded(const FrameData&) OVERRIDE;
     virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&) OVERRIDE;
@@ -29,6 +28,7 @@ protected:
     virtual void enemyGrounded(const FrameData&) OVERRIDE;
     virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
 
+protected:
     DropDecision thinkInternal(int frameId, const CoreField&, const KumipuyoSeq&, bool fast);
 
     std::unique_ptr<FeatureParameter> featureParameter_;

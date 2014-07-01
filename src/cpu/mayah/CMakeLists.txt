@@ -30,4 +30,4 @@ cpu_add_runner(feature.txt)
 
 mayah_add_test(evaluator_test)
 mayah_add_test(gazer_test)
-
+mayah_add_test(mayah_ai_test)

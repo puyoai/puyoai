@@ -134,3 +134,28 @@ TEST_F(EvaluatorTest, NumUnreachableSpace2)
 
     EXPECT_EQ(12, cf.feature(NUM_UNREACHABLE_SPACE));
 }
+
+TEST_F(EvaluatorTest, DontCrash1)
+{
+    CoreField f(
+        "@@  @@"
+        "@@  @@"
+        "@@@@@@"
+        "@@@@@@"
+        "@@@@@@"
+        "@@@@YG"
+        "@@@@@@"
+        "@@@@@@"
+        "BG@@@@"
+        "YY@@@@"
+        "BG@@@@"
+        "GG@@RY"
+        "BBBRRB");
+    (void)eval(f);
+}
+
+TEST_F(EvaluatorTest, DontCrash2)
+{
+    CoreField f;
+    (void)eval(f);
+}

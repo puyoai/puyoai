@@ -106,6 +106,9 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
 
     ss << ((endTime - startTime) * 1000) << " [ms]";
 
+    if (bestPlan.decisions().empty())
+        return DropDecision(Decision(3, 0), "give up :-(");
+
     return DropDecision(bestPlan.decisions().front(), ss.str());
 }
 
