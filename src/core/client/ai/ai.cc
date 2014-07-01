@@ -22,7 +22,7 @@ void AI::runLoop()
         FrameData frameData = connector_.receive();
         if (frameData.connectionLost) {
             LOG(INFO) << "connection lost";
-            return;
+            break;
         }
 
         if (!frameData.valid) {
@@ -108,6 +108,8 @@ void AI::runLoop()
         connector_.sendWithoutDecision(frameData.id);
         google::FlushLogFiles(google::INFO);
     }
+
+    LOG(INFO) << "will exit run loop";
 }
 
 void AI::resetCurrentField(const CoreField& field)
