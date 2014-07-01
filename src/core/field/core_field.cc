@@ -486,7 +486,7 @@ inline RensaResult CoreField::simulateWithTracker(int initialChain, int minHeigh
     while ((nthChainScore = vanish(chains, minHeights, tracker)) > 0) {
         chains += 1;
         score += nthChainScore;
-        frames += dropAfterVanish(minHeights, tracker) + FRAMES_AFTER_VANISH;
+        frames += dropAfterVanish(minHeights, tracker) + FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION;
     }
 
     return RensaResult(chains - 1, score, frames);

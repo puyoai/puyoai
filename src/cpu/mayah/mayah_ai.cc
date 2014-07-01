@@ -100,7 +100,10 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
 
-    ss << "Gazed max score = " << gazer_.estimateMaxScore(frameId + refPlan.totalFrames()) << " / ";
+    ss << "Gazed max score = "
+       << gazer_.estimateMaxScore(frameId + refPlan.totalFrames())
+       << " in " << refPlan.totalFrames() << " / ";
+
     ss << ((endTime - startTime) * 1000) << " [ms]";
 
     return DropDecision(bestPlan.decisions().front(), ss.str());
