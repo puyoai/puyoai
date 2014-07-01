@@ -43,7 +43,7 @@ TEST_F(EvaluatorTest, RidgeHeight1)
         "OOOOOO");
 
     CollectedFeature cf = eval(f);
-    const vector<int>& vs = cf.collectedSparseFeatures[RIDGE_HEIGHT];
+    const vector<int>& vs = cf.feature(RIDGE_HEIGHT);
     EXPECT_TRUE(find(vs.begin(), vs.end(), 4) != vs.end());
 }
 
@@ -57,7 +57,7 @@ TEST_F(EvaluatorTest, RidgeHeight2)
         "OOOOOO");
 
     CollectedFeature cf = eval(f);
-    const vector<int>& vs = cf.collectedSparseFeatures[RIDGE_HEIGHT];
+    const vector<int>& vs = cf.feature(RIDGE_HEIGHT);
     EXPECT_TRUE(find(vs.begin(), vs.end(), 2) != vs.end());
 }
 
@@ -71,7 +71,7 @@ TEST_F(EvaluatorTest, RidgeHeight3)
         "OOOOOO");
 
     CollectedFeature cf = eval(f);
-    const vector<int>& vs = cf.collectedSparseFeatures[RIDGE_HEIGHT];
+    const vector<int>& vs = cf.feature(RIDGE_HEIGHT);
     EXPECT_TRUE(find(vs.begin(), vs.end(), 1) != vs.end());
 }
 
@@ -84,7 +84,7 @@ TEST_F(EvaluatorTest, ConnectionHorizontal1)
     CollectedFeature cf = eval(f);
 
     map<int, int> m;
-    for (auto v : cf.collectedSparseFeatures[CONNECTION_HORIZONTAL])
+    for (auto v : cf.feature(CONNECTION_HORIZONTAL))
         m[v]++;
 
     EXPECT_EQ(2, m[3]);
@@ -101,7 +101,7 @@ TEST_F(EvaluatorTest, ConnectionHorizontal2)
         "OOOOOO");
     CollectedFeature cf = eval(f);
 
-    EXPECT_TRUE(cf.collectedSparseFeatures[CONNECTION_HORIZONTAL].empty());
+    EXPECT_TRUE(cf.feature(CONNECTION_HORIZONTAL).empty());
 }
 
 TEST_F(EvaluatorTest, NumUnreachableSpace1)
@@ -112,7 +112,7 @@ TEST_F(EvaluatorTest, NumUnreachableSpace1)
         "OOOOOO");
     CollectedFeature cf = eval(f);
 
-    EXPECT_EQ(0, cf.collectedFeatures[NUM_UNREACHABLE_SPACE]);
+    EXPECT_EQ(0, cf.feature(NUM_UNREACHABLE_SPACE));
 }
 
 TEST_F(EvaluatorTest, NumUnreachableSpace2)
@@ -132,5 +132,5 @@ TEST_F(EvaluatorTest, NumUnreachableSpace2)
         "    O ");
     CollectedFeature cf = eval(f);
 
-    EXPECT_EQ(12, cf.collectedFeatures[NUM_UNREACHABLE_SPACE]);
+    EXPECT_EQ(12, cf.feature(NUM_UNREACHABLE_SPACE));
 }
