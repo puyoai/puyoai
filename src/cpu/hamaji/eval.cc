@@ -325,6 +325,8 @@ double Eval::eval(LP* plan) {
     }
     if (p->score > 0 && p->score < 200)
       r -= 1;
+    if (p->score > 0 && puyo_cnt < 20)
+      r -= 10;
   }
 
   r -= 0.00001 * plan->chigiri_frames;
