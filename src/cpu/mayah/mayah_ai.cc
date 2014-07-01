@@ -84,6 +84,8 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
     if (cf.collectedFeatures[STRATEGY_HOUWA] > 0)
         ss << "HOUWA / ";
 
+    ss << "SCORE = " << bestScore << " / ";
+
     if (cf.collectedSparseFeatures.count(MAX_CHAINS)) {
         const vector<int>& vs = cf.collectedSparseFeatures[MAX_CHAINS];
         for (size_t i = 0; i < vs.size(); ++i)
