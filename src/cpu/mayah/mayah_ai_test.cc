@@ -6,7 +6,7 @@
 
 using namespace std;
 
-TEST(MayahAITest, DontCrash)
+TEST(MayahAITest, DontCrash1)
 {
     TsumoPossibility::initialize();
 
@@ -26,9 +26,34 @@ TEST(MayahAITest, DontCrash)
         "BBBRRB");
     KumipuyoSeq seq("GGRG");
 
-    Gazer gazer;
-    gazer.initializeWith(1);
+    MayahAI ai;
+    ai.initializeGazerForTest(1);
+    (void)ai.think(1, f, seq);
+}
 
-    (void)MayahAI().think(1, f, seq);
+TEST(MayahAITest, DontCrash2)
+{
+    TsumoPossibility::initialize();
+
+    CoreField f(
+        "G     "
+        "RR    "
+        "BG    "
+        "RRGR  "
+        "BRYB  "
+        "BBYY  "
+        "GRBBG "
+        "GRRBGB"
+        "GYYGRB"
+        "RBBGGR"
+        "BYBYYR"
+        "YYGGBR"
+        "RRGYYB"
+        "YRYGYB");
+    KumipuyoSeq seq("YYRG");
+
+    MayahAI ai;
+    ai.initializeGazerForTest(1);
+    (void)ai.think(1, f, seq);
 }
 
