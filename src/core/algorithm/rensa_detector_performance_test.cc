@@ -19,7 +19,7 @@ TEST(RensaDetectorPerformanceTest, findPossibleRensas)
         "RBGRBG");
 
     size_t size = 0;
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 10000; ++i) {
         Tsc tsc("findPossibleRensas");
         vector<PossibleRensaInfo> pris = RensaDetector::findPossibleRensas(f, 1);
         size = pris.size();

@@ -456,12 +456,25 @@ RensaResult CoreField::simulateWhenLastDecisionIs(const Decision& decision)
     return simulateWithTracker(1, minHeights, &tracker);
 }
 
+RensaResult CoreField::simulateWithMinHeights(int minHeights[MAP_WIDTH])
+{
+    RensaNonTracker tracker;
+    return simulateWithTracker(1, minHeights, &tracker);
+}
+
 RensaResult CoreField::simulateAndTrack(RensaTrackResult* trackResult, int initialChain)
 {
     DCHECK(trackResult);
     RensaTracker tracker(trackResult);
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
     return simulateWithTracker(initialChain, minHeights, &tracker);
+}
+
+RensaResult CoreField::simulateAndTrackWithMinHeights(RensaTrackResult* trackResult, int minHeights[MAP_WIDTH])
+{
+    DCHECK(trackResult);
+    RensaTracker tracker(trackResult);
+    return simulateWithTracker(1, minHeights, &tracker);
 }
 
 template<typename Tracker>
