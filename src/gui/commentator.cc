@@ -177,7 +177,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
         if (track->rensaResult.score > 0) {
             lock_guard<mutex> lock(mu_);
             string msg = std::to_string(track->rensaResult.chains) + "連鎖発火: " + std::to_string(track->rensaResult.score) + "点";
-            events_[pi].push_back(msg);
+            addEventMessage(pi, msg);
             firingChain_[pi] = move(track);
             fireableMainChain_[pi].reset();
             fireableTsubushiChain_[pi].reset();
@@ -321,4 +321,12 @@ void Commentator::drawCommentSurface(Screen* screen, int pi) const
     for (deque<string>::const_iterator iter = events_[pi].begin(); iter != events_[pi].end(); ++iter) {
         drawText(screen, iter->c_str(), LX, offsetY + LH * y++);
     }
+}
+
+void Commentator::addEventMessage(int pi, const string& msg)
+{
+    // TODO(mayah): Assert locked.
+    events_[pi].push_front(msg);
+    while (events_[pi].size() > 3)
+        events_[pi].pop_back();
 }
