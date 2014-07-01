@@ -95,20 +95,22 @@ TEST(CoreFieldTest, FramesTest) {
         // 1 Rensa, no drop.
         CoreField f("444400");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_AFTER_NO_DROP, rensaResult.frames);
+        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_AFTER_NO_DROP + FRAMES_VANISH_ANIMATION,
+                  rensaResult.frames);
     }
     {
         CoreField f("500000"
                 "444400");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP, rensaResult.frames);
+        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION,
+                  rensaResult.frames);
     }
     {
         CoreField f("500000"
                 "400000"
                 "444000");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP,
+        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION,
                   rensaResult.frames);
     }
     {
@@ -116,7 +118,7 @@ TEST(CoreFieldTest, FramesTest) {
                 "450000"
                 "444000");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP,
+        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION,
                   rensaResult.frames);
     }
     {
@@ -124,8 +126,8 @@ TEST(CoreFieldTest, FramesTest) {
                 "455000"
                 "444500");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP +
-                  FRAMES_AFTER_VANISH + FRAMES_AFTER_NO_DROP,
+        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION +
+                  FRAMES_AFTER_VANISH + FRAMES_AFTER_NO_DROP + FRAMES_VANISH_ANIMATION,
                   rensaResult.frames);
     }
     {
@@ -133,8 +135,8 @@ TEST(CoreFieldTest, FramesTest) {
                 "455000"
                 "444500");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP +
-                  FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP,
+        EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION +
+                  FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION,
                   rensaResult.frames);
     }
 }
