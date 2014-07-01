@@ -91,7 +91,12 @@ SoloGame::~SoloGame() {
 
 int SoloGame::pickNextPuyo() {
   if (puyo_sequence_index_ < static_cast<int>(FLAGS_puyo_sequence.size())) {
-    return FLAGS_puyo_sequence[puyo_sequence_index_++] - '0';
+    char c = FLAGS_puyo_sequence[puyo_sequence_index_++];
+    static const string color = "RBYG";
+    size_t found = color.find(c);
+    if (found != string::npos)
+      return found + 4;
+    return c - '0';
   }
   return mt.genrand_int32() % 4 + 4;
 }
