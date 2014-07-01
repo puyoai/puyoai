@@ -40,13 +40,4 @@ struct TrackedPossibleRensaInfo {
     RensaTrackResult trackResult;
 };
 
-struct OngoingRensaInfo {
-    OngoingRensaInfo() {}
-    OngoingRensaInfo(const RensaResult& rensaResult, int finishingRensaFrame) :
-        rensaResult(rensaResult), finishingRensaFrame(finishingRensaFrame) {}
-
-    RensaResult rensaResult;
-    int finishingRensaFrame;
-};
-
 #endif

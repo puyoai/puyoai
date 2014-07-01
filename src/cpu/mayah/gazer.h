@@ -9,6 +9,15 @@
 
 class KumipuyoSeq;
 
+struct OngoingRensaInfo {
+    OngoingRensaInfo() {}
+    OngoingRensaInfo(const RensaResult& rensaResult, int finishingRensaFrame) :
+        rensaResult(rensaResult), finishingRensaFrame(finishingRensaFrame) {}
+
+    RensaResult rensaResult;
+    int finishingRensaFrame;
+};
+
 struct EstimatedRensaInfo {
     EstimatedRensaInfo() {}
     EstimatedRensaInfo(int chains, int score, int initiatingFrames) :
