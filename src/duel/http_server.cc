@@ -6,7 +6,6 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <microhttpd.h>
-#include <signal.h>
 
 #include "base/base.h"
 
@@ -101,17 +100,6 @@ int HttpServer::accessHandler(void* cls, struct MHD_Connection* connection,
     return notFoundHandler(connection);
 }
 
-static void ignoreSIGPIPE()
-{
-    struct sigaction act;
-    memset(&act, 0, sizeof(act));
-
-    act.sa_handler = SIG_IGN;
-    sigemptyset(&act.sa_mask);
-
-    CHECK(sigaction(SIGPIPE, &act, 0) == 0);
-}
-
 HttpServer::HttpServer() :
     httpd_(nullptr)
 {
@@ -125,7 +113,6 @@ bool HttpServer::start()
 {
     DCHECK(!httpd_);
 
-    ignoreSIGPIPE();
     httpd_ = MHD_start_daemon(
         MHD_USE_THREAD_PER_CONNECTION,
         kPort, NULL, NULL, &HttpServer::accessHandler, (void*)this, MHD_OPTION_END);
