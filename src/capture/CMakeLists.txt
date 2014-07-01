@@ -44,10 +44,12 @@ endfunction()
 
 capture_add_executable(parse_bmp)
 capture_add_executable(parse_box)
+# Disabled.
 #capture_add_executable(parse_imgs)
 capture_add_executable(parse_movie)
 if(V4L2_LIBRARY)
-  capture_add_executable(parse_viddev)
+# Disabled.
+#  capture_add_executable(parse_viddev)
 endif()
 if(LIB_USB AND LIB_GCRYPT)
   capture_add_executable(parse_somagic)
