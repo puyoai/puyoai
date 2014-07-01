@@ -53,12 +53,14 @@ static void findPossibleRensasInternal(const CoreField& field,
 {
     RensaDetector::findRensas(field, mode,
                               [result, addedPuyos](CoreField* f, const CoreField& originalField, int x, PuyoColor c, int n) {
-            T info;
+            // Making T info is a bit heavy. So, we make directly in vector, and use its instance.
+            // This improves performance much.
+            result->emplace_back();
+            T& info = result->back();
             simulateInternal(f, originalField, &info);
             info.necessaryPuyoSet = addedPuyos;
             for (int i = 0; i < n; ++i)
                 info.necessaryPuyoSet.addPuyo(x, c);
-            result->push_back(info);
     });
 
     if (restAdded <= 0)
