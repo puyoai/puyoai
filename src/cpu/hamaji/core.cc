@@ -126,6 +126,7 @@ Decision Core::decide(Game* game) {
       if (best_score > max_score + game->p[1].expected_ojama * 70) {
         msg_ = ssprintf("KILL_%d", best_score);
         LOG(INFO) << "Kill move! score=" << best_score
+                  << " vs " << max_score
                   << '\n' << best_plan->field.GetDebugOutput();
         return best_plan->getFirstDecision();
       }
