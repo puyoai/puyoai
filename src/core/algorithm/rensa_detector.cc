@@ -55,10 +55,9 @@ static void findPossibleRensasInternal(const CoreField& field,
                               [result, addedPuyos](CoreField* f, const CoreField& originalField, int x, PuyoColor c, int n) {
             T info;
             simulateInternal(f, originalField, &info);
-            ColumnPuyoList puyos(addedPuyos);
+            info.necessaryPuyoSet = addedPuyos;
             for (int i = 0; i < n; ++i)
-                puyos.addPuyo(x, c);
-            info.necessaryPuyoSet = puyos;
+                info.necessaryPuyoSet.addPuyo(x, c);
             result->push_back(info);
     });
 
