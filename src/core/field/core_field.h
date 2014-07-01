@@ -81,8 +81,14 @@ public:
     // Simulates rensa, but the last decision is specified. This will be faster then simulate().
     RensaResult simulateWhenLastDecisionIs(const Decision&);
 
+    // Simulates rensa with specifying the original heights.
+    // Note that minHeights will be modified after function return.
+    RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH]);
+
     // Simulates rensa with tracking.
     RensaResult simulateAndTrack(RensaTrackResult* trackResult, int initialChain = 1);
+
+    RensaResult simulateAndTrackWithMinHeights(RensaTrackResult* trackResult, int minHeights[MAP_WIDTH]);
 
     // Vanish the connected puyos. Score will be returned.
     int vanishOnly(int currentChain);

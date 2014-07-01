@@ -29,7 +29,7 @@ public:
     static std::vector<TrackedPossibleRensaInfo> findPossibleRensasWithTracking(
         const CoreField&, int maxKeyPuyo = 0, Mode mode = Mode::DROP);
 
-    typedef std::function<void (CoreField*, int, PuyoColor, int)> SimulationCallback;
+    typedef std::function<void (CoreField*, const CoreField&, int, PuyoColor, int)> SimulationCallback;
 
     static void findRensas(const CoreField&, Mode mode, SimulationCallback callback);
 };

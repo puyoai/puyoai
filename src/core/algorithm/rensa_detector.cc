@@ -25,14 +25,22 @@ RensaDetector::findFeasibleRensas(const CoreField& field, const KumipuyoSeq& kum
     return result;
 }
 
-static inline void simulateInternal(CoreField* f, PossibleRensaInfo* info, int initialChain)
+static inline void simulateInternal(CoreField* f, const CoreField& original, PossibleRensaInfo* info)
 {
-    info->rensaResult = f->simulate(initialChain);
+    int minHeights[CoreField::MAP_WIDTH] {
+        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
+        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
+    };
+    info->rensaResult = f->simulateWithMinHeights(minHeights);
 }
 
-static inline void simulateInternal(CoreField* f, TrackedPossibleRensaInfo* info, int initialChain)
+static inline void simulateInternal(CoreField* f, const CoreField& original, TrackedPossibleRensaInfo* info)
 {
-    info->rensaResult = f->simulateAndTrack(&info->trackResult, initialChain);
+    int minHeights[CoreField::MAP_WIDTH] {
+        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
+        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
+    };
+    info->rensaResult = f->simulateAndTrackWithMinHeights(&info->trackResult, minHeights);
 }
 
 template<typename T>
@@ -43,10 +51,10 @@ static void findPossibleRensasInternal(const CoreField& field,
                                        RensaDetector::Mode mode,
                                        std::vector<T>* result)
 {
-    RensaDetector::findRensas(field, mode, [result, addedPuyos](
-        CoreField* f, int x, PuyoColor c, int n) {
+    RensaDetector::findRensas(field, mode,
+                              [result, addedPuyos](CoreField* f, const CoreField& originalField, int x, PuyoColor c, int n) {
             T info;
-            simulateInternal(f, &info, 1);
+            simulateInternal(f, originalField, &info);
             ColumnPuyoList puyos(addedPuyos);
             for (int i = 0; i < n; ++i)
                 puyos.addPuyo(x, c);
@@ -101,13 +109,13 @@ RensaDetector::findPossibleRensasWithTracking(const CoreField& field, int maxKey
     return result;
 }
 
-static inline void tryDropFire(const CoreField& field, RensaDetector::SimulationCallback callback)
+static inline void tryDropFire(const CoreField& originalField, RensaDetector::SimulationCallback callback)
 {
     bool visited[CoreField::WIDTH][NUM_PUYO_COLORS] {};
 
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        for (int y = field.height(x); y >= 1; --y) {
-            PuyoColor c = field.color(x, y);
+        for (int y = originalField.height(x); y >= 1; --y) {
+            PuyoColor c = originalField.color(x, y);
 
             if (!isNormalColor(c))
                 continue;
@@ -122,14 +130,14 @@ static inline void tryDropFire(const CoreField& field, RensaDetector::Simulation
                 if (x + d <= 0 || CoreField::WIDTH < x + d)
                     continue;
                 if (d == 0) {
-                    if (field.color(x, y + 1) != PuyoColor::EMPTY)
+                    if (originalField.color(x, y + 1) != PuyoColor::EMPTY)
                         continue;
                 } else {
-                    if (field.color(x + d, y) != PuyoColor::EMPTY)
+                    if (originalField.color(x + d, y) != PuyoColor::EMPTY)
                         continue;
                 }
 
-                CoreField f(field);
+                CoreField f(originalField);
                 int necessaryPuyos = 0;
                 while (necessaryPuyos <= 4 && f.countConnectedPuyos(x, y) < 4 && f.height(x + d) <= 13) {
                     f.dropPuyoOn(x + d, c);
@@ -139,25 +147,25 @@ static inline void tryDropFire(const CoreField& field, RensaDetector::Simulation
                 if (necessaryPuyos > 4)
                     continue;
 
-                callback(&f, x + d, c, necessaryPuyos);
+                callback(&f, originalField, x + d, c, necessaryPuyos);
             }
         }
     }
 }
 
-static inline void tryFloatFire(const CoreField& field, RensaDetector::SimulationCallback callback)
+static inline void tryFloatFire(const CoreField& originalField, RensaDetector::SimulationCallback callback)
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        for (int y = field.height(x); y >= 1; --y) {
-            PuyoColor c = field.color(x, y);
+        for (int y = originalField.height(x); y >= 1; --y) {
+            PuyoColor c = originalField.color(x, y);
 
             DCHECK(c != PuyoColor::EMPTY);
             if (c == PuyoColor::OJAMA)
                 continue;
 
-            int necessaryPuyos = 4 - field.countConnectedPuyos(x, y);
+            int necessaryPuyos = 4 - originalField.countConnectedPuyos(x, y);
             int restPuyos = necessaryPuyos;
-            CoreField f(field);
+            CoreField f(originalField);
 
             int dx = x - 1;
             // float puyo col dx
@@ -169,7 +177,7 @@ static inline void tryFloatFire(const CoreField& field, RensaDetector::Simulatio
 
                 // Check y
                 if (dx != x) {
-                    if (field.color(dx, y) != PuyoColor::EMPTY) {
+                    if (originalField.color(dx, y) != PuyoColor::EMPTY) {
                         continue;
                     } else { // restPuyos must be more than 0
                         f.unsafeSet(dx, y, c);
@@ -179,7 +187,7 @@ static inline void tryFloatFire(const CoreField& field, RensaDetector::Simulatio
 
                 int dy_min = y - 1;
                 // Check under y
-                for (; restPuyos > 0 && dy_min > 0 && field.color(dx ,dy_min) == PuyoColor::EMPTY;
+                for (; restPuyos > 0 && dy_min > 0 && originalField.color(dx ,dy_min) == PuyoColor::EMPTY;
                      --dy_min) {
                     f.unsafeSet(dx, dy_min, c);
                     --restPuyos;
@@ -187,13 +195,13 @@ static inline void tryFloatFire(const CoreField& field, RensaDetector::Simulatio
 
                 // Check over y
                 for (int dy = y + 1;
-                     restPuyos > 0 && dy <= 12 && field.color(dx ,dy) == PuyoColor::EMPTY; ++dy) {
+                     restPuyos > 0 && dy <= 12 && originalField.color(dx ,dy) == PuyoColor::EMPTY; ++dy) {
                     f.unsafeSet(dx, dy, c);
                     --restPuyos;
                 }
 
                 // Fill ojama
-                for(; dy_min > 0 && field.color(dx, dy_min) == PuyoColor::EMPTY; --dy_min) {
+                for(; dy_min > 0 && originalField.color(dx, dy_min) == PuyoColor::EMPTY; --dy_min) {
                     f.unsafeSet(dx, dy_min, PuyoColor::OJAMA);
                 }
 
@@ -201,7 +209,7 @@ static inline void tryFloatFire(const CoreField& field, RensaDetector::Simulatio
             }
 
             if (restPuyos <= 0) {
-                callback(&f, dx, c, necessaryPuyos);
+                callback(&f, originalField, dx, c, necessaryPuyos);
             }
         }
     }

@@ -52,6 +52,14 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
 {
     LOG(INFO) << "\n" << field.debugOutput() << "\n" << kumipuyoSeq.toString();
 
+#if 0
+    int currentMaxRensa = 0;
+    {
+        RefPlan refPlan(field, vector<Decision>(), RensaResult(), 0);
+        CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
+    }
+#endif
+
     double startTime = now();
 
     double bestScore = -100000000.0;
