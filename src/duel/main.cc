@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include <signal.h>
 #include <libgen.h>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -66,11 +67,24 @@ private:
     unique_ptr<GameState> gameState_;
 };
 
+static void ignoreSIGPIPE()
+{
+    struct sigaction act;
+    memset(&act, 0, sizeof(act));
+
+    act.sa_handler = SIG_IGN;
+    sigemptyset(&act.sa_mask);
+
+    CHECK(sigaction(SIGPIPE, &act, 0) == 0);
+}
+
 int main(int argc, char* argv[])
 {
     google::InitGoogleLogging(argv[0]);
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InstallFailureSignalHandler();
+
+    ignoreSIGPIPE();
 
     if (argc != 3) {
         LOG(ERROR) << "There must be 2 arguments." << endl;
