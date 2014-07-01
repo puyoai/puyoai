@@ -28,6 +28,8 @@ public:
     virtual void enemyGrounded(const FrameData&) OVERRIDE;
     virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
 
+    void initializeGazerForTest(int frameId) { gazer_.initializeWith(frameId); }
+
 protected:
     DropDecision thinkInternal(int frameId, const CoreField&, const KumipuyoSeq&, bool fast);
 

@@ -37,7 +37,7 @@ struct EstimatedRensaInfo {
     int initiatingFrames;
 };
 
-class Gazer {
+class Gazer : noncopyable {
 public:
     void initializeWith(int id) {
         setId(id);
