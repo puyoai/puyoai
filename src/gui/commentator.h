@@ -4,6 +4,7 @@
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <string>
 #include <thread>
 
 #include <SDL.h>
@@ -42,6 +43,8 @@ private:
 
     void drawMainChain(Screen*) const;
     void drawCommentSurface(Screen*, int playerId) const;
+
+    void addEventMessage(int pi, const std::string&);
 
     std::thread th_;
     volatile bool shouldStop_;

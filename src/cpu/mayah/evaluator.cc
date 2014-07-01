@@ -329,7 +329,7 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
 
     if (currentField.countPuyos() >= 60) {
         sc->addScore(STRATEGY_HOUWA, 1);
-        return false;
+        return true;
     }
 
     sc->addScore(STRATEGY_SAKIUCHI, 1.0);
