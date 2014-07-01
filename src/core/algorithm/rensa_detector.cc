@@ -101,111 +101,122 @@ RensaDetector::findPossibleRensasWithTracking(const CoreField& field, int maxKey
     return result;
 }
 
-static inline void tryDropFire(int x, int y, const CoreField& field, RensaDetector::SimulationCallback callback)
+static inline void tryDropFire(const CoreField& field, RensaDetector::SimulationCallback callback)
 {
-    PuyoColor c = field.color(x, y);
+    bool visited[CoreField::WIDTH][NUM_PUYO_COLORS] {};
 
-    DCHECK(c != PuyoColor::EMPTY);
-    if (c == PuyoColor::OJAMA)
-        return;
+    for (int x = 1; x <= CoreField::WIDTH; ++x) {
+        for (int y = field.height(x); y >= 1; --y) {
+            PuyoColor c = field.color(x, y);
 
-    // Drop puyo on
-    for (int d = -1; d <= 1; ++d) {
-        if (x + d <= 0 || CoreField::WIDTH < x + d)
-            continue;
-        if (d == 0) {
-            if (field.color(x, y + 1) != PuyoColor::EMPTY)
+            if (!isNormalColor(c))
                 continue;
-        } else {
-            if (field.color(x + d, y) != PuyoColor::EMPTY)
-                continue;
+
+            // Drop puyo on
+            for (int d = -1; d <= 1; ++d) {
+
+                if (visited[x + d][c])
+                    continue;
+                visited[x + d][c] = true;
+
+                if (x + d <= 0 || CoreField::WIDTH < x + d)
+                    continue;
+                if (d == 0) {
+                    if (field.color(x, y + 1) != PuyoColor::EMPTY)
+                        continue;
+                } else {
+                    if (field.color(x + d, y) != PuyoColor::EMPTY)
+                        continue;
+                }
+
+                CoreField f(field);
+                int necessaryPuyos = 0;
+                while (necessaryPuyos <= 4 && f.countConnectedPuyos(x, y) < 4 && f.height(x + d) <= 13) {
+                    f.dropPuyoOn(x + d, c);
+                    ++necessaryPuyos;
+                }
+
+                if (necessaryPuyos > 4)
+                    continue;
+
+                callback(&f, x + d, c, necessaryPuyos);
+            }
         }
-
-        CoreField f(field);
-        int necessaryPuyos = 0;
-        while (necessaryPuyos <= 4 && f.countConnectedPuyos(x, y) < 4 && f.height(x + d) <= 13) {
-            f.dropPuyoOn(x + d, c);
-            ++necessaryPuyos;
-        }
-
-        if (necessaryPuyos > 4)
-            continue;
-
-        callback(&f, x + d, c, necessaryPuyos);
     }
-
 }
 
-static inline void tryFloatFire(
-    int x, int y, const CoreField& field, RensaDetector::SimulationCallback callback) {
-  PuyoColor c = field.color(x, y);
+static inline void tryFloatFire(const CoreField& field, RensaDetector::SimulationCallback callback)
+{
+    for (int x = 1; x <= CoreField::WIDTH; ++x) {
+        for (int y = field.height(x); y >= 1; --y) {
+            PuyoColor c = field.color(x, y);
 
-  DCHECK(c != PuyoColor::EMPTY);
-  if (c == PuyoColor::OJAMA)
-    return;
+            DCHECK(c != PuyoColor::EMPTY);
+            if (c == PuyoColor::OJAMA)
+                continue;
 
-  int necessaryPuyos = 4 - field.countConnectedPuyos(x, y);
-  int restPuyos = necessaryPuyos;
-  CoreField f(field);
+            int necessaryPuyos = 4 - field.countConnectedPuyos(x, y);
+            int restPuyos = necessaryPuyos;
+            CoreField f(field);
 
-  int dx = x - 1;
-  // float puyo col dx
-  for (; dx <= x + 1 && restPuyos > 0; ++dx) {
-    if (dx <= 0 || CoreField::WIDTH < dx) {
-     continue;
+            int dx = x - 1;
+            // float puyo col dx
+            for (; dx <= x + 1 && restPuyos > 0; ++dx) {
+                if (dx <= 0 || CoreField::WIDTH < dx) {
+                    continue;
+                }
+
+
+                // Check y
+                if (dx != x) {
+                    if (field.color(dx, y) != PuyoColor::EMPTY) {
+                        continue;
+                    } else { // restPuyos must be more than 0
+                        f.unsafeSet(dx, y, c);
+                        --restPuyos;
+                    }
+                }
+
+                int dy_min = y - 1;
+                // Check under y
+                for (; restPuyos > 0 && dy_min > 0 && field.color(dx ,dy_min) == PuyoColor::EMPTY;
+                     --dy_min) {
+                    f.unsafeSet(dx, dy_min, c);
+                    --restPuyos;
+                }
+
+                // Check over y
+                for (int dy = y + 1;
+                     restPuyos > 0 && dy <= 12 && field.color(dx ,dy) == PuyoColor::EMPTY; ++dy) {
+                    f.unsafeSet(dx, dy, c);
+                    --restPuyos;
+                }
+
+                // Fill ojama
+                for(; dy_min > 0 && field.color(dx, dy_min) == PuyoColor::EMPTY; --dy_min) {
+                    f.unsafeSet(dx, dy_min, PuyoColor::OJAMA);
+                }
+
+                f.recalcHeightOn(dx);
+            }
+
+            if (restPuyos <= 0) {
+                callback(&f, dx, c, necessaryPuyos);
+            }
+        }
     }
-
-
-    // Check y
-    if (dx != x) {
-      if (field.color(dx, y) != PuyoColor::EMPTY) {
-        continue;
-      } else { // restPuyos must be more than 0
-        f.unsafeSet(dx, y, c);
-        --restPuyos;
-      }
-    }
-
-    int dy_min = y - 1;
-    // Check under y
-    for (; restPuyos > 0 && dy_min > 0 && field.color(dx ,dy_min) == PuyoColor::EMPTY;
-        --dy_min) {
-      f.unsafeSet(dx, dy_min, c);
-      --restPuyos;
-    }
-
-    // Check over y
-    for (int dy = y + 1;
-        restPuyos > 0 && dy <= 12 && field.color(dx ,dy) == PuyoColor::EMPTY; ++dy) {
-      f.unsafeSet(dx, dy, c);
-      --restPuyos;
-    }
-
-    // Fill ojama
-    for(; dy_min > 0 && field.color(dx, dy_min) == PuyoColor::EMPTY; --dy_min) {
-      f.unsafeSet(dx, dy_min, PuyoColor::OJAMA);
-    }
-
-    f.recalcHeightOn(dx);
-  }
-
-  if (restPuyos <= 0) {
-    callback(&f, dx, c, necessaryPuyos);
-  }
 }
 
 void RensaDetector::findRensas(const CoreField& field, RensaDetector::Mode mode, RensaDetector::SimulationCallback callback)
 {
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        for (int y = field.height(x); y >= 1; --y) {
-            switch (mode) {
-            case Mode::DROP:
-                tryDropFire(x, y, field, callback);
-                break;
-            case Mode::FLOAT:
-                tryFloatFire(x, y, field, callback);
-                break;
-            }
-        }
+    switch (mode) {
+    case Mode::DROP:
+        tryDropFire(field, callback);
+        break;
+    case Mode::FLOAT:
+        tryFloatFire(field, callback);
+        break;
+    default:
+        CHECK(false) << "Unknown mode : " << static_cast<int>(mode);
     }
 }
