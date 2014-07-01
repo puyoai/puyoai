@@ -91,6 +91,8 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
         ss << "SAKIUCHI / ";
     if (cf.feature(STRATEGY_HOUWA) > 0)
         ss << "HOUWA / ";
+    if (cf.feature(STRATEGY_SAISOKU) > 0)
+        ss << "SAISOKU / ";
 
     ss << "SCORE = " << bestScore << " / ";
 
