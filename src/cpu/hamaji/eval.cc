@@ -301,6 +301,9 @@ double Eval::eval(LP* plan) {
 
   int puyo_cnt = plan->field.countPuyo();
 
+  if (puyo_cnt < 20 && plan->chain_cnt)
+    r -= 1000;
+
 #if 0
   int color_puyo_cnt = plan->field.countColorPuyo();
   r += (colorPuyoCnt - puyoCnt) * 0.5;
