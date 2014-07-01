@@ -1,4 +1,4 @@
-#include "viddev.h"
+#include "viddev_source.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -248,7 +248,7 @@ void VidDev::initBuffers() {
   }
 }
 
-SDL_Surface* VidDev::getNextFrame() {
+UniqueSDLSurface VidDev::getNextFrame() {
   int r;
   do {
     fd_set fds;
@@ -295,5 +295,5 @@ SDL_Surface* VidDev::getNextFrame() {
     exit(EXIT_FAILURE);
   }
 
-  return buf.surface;
+  return makeUniqueSDLSurface(buf.surface);
 }
