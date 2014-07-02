@@ -39,6 +39,7 @@ template<typename ScoreCollector>
 void evalFrameFeature(ScoreCollector* sc, const RefPlan& plan)
 {
     sc->addScore(TOTAL_FRAMES, plan.totalFrames());
+    sc->addScore(NUM_CHIGIRI, plan.numChigiri());
 }
 
 template<typename ScoreCollector>
