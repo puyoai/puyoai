@@ -112,7 +112,7 @@ RensaDetector::findPossibleRensasWithTracking(const CoreField& field, int maxKey
 
 static inline void tryDropFire(const CoreField& originalField, RensaDetector::SimulationCallback callback)
 {
-    bool visited[CoreField::WIDTH][NUM_PUYO_COLORS] {};
+    bool visited[CoreField::MAP_WIDTH][NUM_PUYO_COLORS] {};
 
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = originalField.height(x); y >= 1; --y) {
