@@ -39,16 +39,28 @@ void MayahAI::gameHasEnded(const FrameData&)
 DropDecision MayahAI::think(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq)
 {
     CoreField f(plainField);
-    return thinkInternal(frameId, f, kumipuyoSeq, false);
+    double beginTime = now();
+    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, false);
+    double endTime = now();
+    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, false, plan, endTime - beginTime);
+    if (plan.decisions().empty())
+        return DropDecision(Decision(3, 0), message);
+    return DropDecision(plan.decisions().front(), message);
 }
 
 DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq)
 {
     CoreField f(plainField);
-    return thinkInternal(frameId, f, kumipuyoSeq, true);
+    double beginTime = now();
+    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, true);
+    double endTime = now();
+    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, true, plan, endTime - beginTime);
+    if (plan.decisions().empty())
+        return DropDecision(Decision(3, 0), message);
+    return DropDecision(plan.decisions().front(), message);
 }
 
-DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, bool fast)
+Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, bool fast) const
 {
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
 
@@ -61,8 +73,6 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
     }
 #endif
 
-    double startTime = now();
-
     double bestScore = -100000000.0;
     Plan bestPlan;
     Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
@@ -74,9 +84,18 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
         }
     });
 
-    double endTime = now();
+    return bestPlan;
+}
 
-    RefPlan refPlan(bestPlan.field(), bestPlan.decisions(), bestPlan.rensaResult(), bestPlan.numChigiri(), bestPlan.initiatingFrames());
+std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, bool fast,
+                                     const Plan& plan, double thoughtTimeInSeconds) const
+{
+    UNUSED_VARIABLE(kumipuyoSeq);
+
+    if (plan.decisions().empty())
+        return string("give up :-(");
+
+    RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.initiatingFrames());
     CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
 
     stringstream ss;
@@ -95,7 +114,7 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
     if (cf.feature(STRATEGY_SAISOKU) > 0)
         ss << "SAISOKU / ";
 
-    ss << "SCORE = " << bestScore << " / ";
+    ss << "SCORE = " << cf.score() << " / ";
 
     if (!cf.feature(MAX_CHAINS).empty()) {
         const vector<int>& vs = cf.feature(MAX_CHAINS);
@@ -107,12 +126,9 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
        << gazer_.estimateMaxScore(frameId + refPlan.totalFrames())
        << " in " << refPlan.totalFrames() << " / ";
 
-    ss << ((endTime - startTime) * 1000) << " [ms]";
+    ss << (thoughtTimeInSeconds * 1000) << " [ms]";
 
-    if (bestPlan.decisions().empty())
-        return DropDecision(Decision(3, 0), "give up :-(");
-
-    return DropDecision(bestPlan.decisions().front(), ss.str());
+    return ss.str();
 }
 
 void MayahAI::enemyGrounded(const FrameData& frameData)
