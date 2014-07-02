@@ -23,7 +23,6 @@ public:
     {
     }
 
-
     double score() const { return score_; }
     double feature(EvaluationFeatureKey key) const
     {
@@ -41,6 +40,8 @@ public:
 
         return emptyVector();
     }
+
+    std::string toString() const;
 
     static const std::vector<int>& emptyVector()
     {

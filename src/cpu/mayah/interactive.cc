@@ -26,6 +26,7 @@ public:
     using MayahAI::gameWillBegin;
     using MayahAI::think;
     using MayahAI::enemyNext2Appeared;
+    using MayahAI::collectFeatureString;
 };
 
 // TODO(mayah): Implement with GUI!
@@ -96,9 +97,22 @@ int main(int argc, char* argv[])
         cout << " time = " << ((t2 - t1) * 1000) << " [ms]" << endl;
 
         // Waits for user enter.
-        string str;
-        cout << "enter? ";
-        getline(cin, str);
+        while (true) {
+            string str;
+            cout << "command? ";
+            getline(cin, str);
+
+            if (str == "")
+                break;
+            if (str == "s") {
+                double beginTime = now();
+                Plan plan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false);
+                double endTime = now();
+                string str = ai.collectFeatureString(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false,
+                                                     plan, endTime - beginTime);
+                cout << str << endl;
+            }
+        }
 
         field.dropKumipuyo(plan.decisions().front(), seq.get(i));
         field.simulate();
