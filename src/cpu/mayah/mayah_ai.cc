@@ -133,6 +133,12 @@ void MayahAI::enemyGrounded(const FrameData& frameData)
 
 void MayahAI::enemyNext2Appeared(const FrameData& frameData)
 {
+    // At the beginning of the game, kumipuyoSeq might contain EMPTY/EMPTY.
+    // In that case, we need to skip.
+    const KumipuyoSeq& seq = frameData.enemyPlayerFrameData().kumipuyoSeq;
+    if (!isNormalColor(seq.axis(0)) || !isNormalColor(seq.child(0)))
+        return;
+
     int currentFrameId = frameData.id;
 
     gazer_.setId(currentFrameId);
