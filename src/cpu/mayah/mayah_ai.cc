@@ -50,7 +50,7 @@ DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const
 
 DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, bool fast)
 {
-    LOG(INFO) << "\n" << field.debugOutput() << "\n" << kumipuyoSeq.toString();
+    LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
 
 #if 0
     int currentMaxRensa = 0;
