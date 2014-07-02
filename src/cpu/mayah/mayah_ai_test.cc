@@ -57,3 +57,28 @@ TEST(MayahAITest, DontCrash2)
     (void)ai.think(1, f, seq);
 }
 
+TEST(MayahAITest, DontCrash3)
+{
+    TsumoPossibility::initialize();
+
+    CoreField f(
+        "OO OOO"
+        "OO OOO"
+        "OO OOO"
+        "OBOOOO"
+        "RYOOOY"
+        "BGOOBR"
+        "GROBBG"
+        "YGORGR"
+        "YYGGRR"
+        "GGBYGG"
+        "GYYBBG"
+        "RRRYYB"
+        "BGYGBB");
+
+    KumipuyoSeq seq("RYRR");
+
+    MayahAI ai;
+    ai.initializeGazerForTest(1);
+    (void)ai.think(1, f, seq);
+}
