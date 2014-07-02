@@ -441,8 +441,6 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
     if (evalStrategy(sc, plan, currentField, currentFrameId, gazer))
         return;
 
-    double beginTime = now();
-
     evalFrameFeature(sc, plan);
     evalCountPuyoFeature(sc, plan);
     if (USE_CONNECTION_FEATURE)
@@ -464,14 +462,10 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
         evalFieldUShape(sc, plan);
     evalUnreachableSpace(sc, plan);
 
-    double mid1Time = now();
-
     int keyPuyos = fast ? 0 : Evaluator::NUM_KEY_PUYOS;
 
     vector<TrackedPossibleRensaInfo> rensaInfos =
         RensaDetector::findPossibleRensasWithTracking(plan.field(), keyPuyos);
-
-    double mid2Time = now();
 
     double maxRensaScore = 0;
     unique_ptr<ScoreCollector> maxRensaScoreCollector;
@@ -505,15 +499,8 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
         }
     }
 
-    double endTime = now();
-
     if (maxRensaScoreCollector.get())
         sc->merge(*maxRensaScoreCollector);
-
-    double t1 = (mid1Time - beginTime) * 1000;
-    double t2 = (mid2Time - mid1Time) * 1000;
-    double t3 = (endTime - mid2Time) * 1000;
-    cerr << "time = " << t1 << " " << t2 << " " << t3 << " " << endl;
 }
 
 // ----------------------------------------------------------------------
