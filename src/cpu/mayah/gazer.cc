@@ -155,6 +155,11 @@ int Gazer::estimateMaxScore(int frameId) const
         int restFrames = frameId - (it->initiatingFrames + m_id);
         int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_AFTER_NO_CHIGIRI));
         int newChains = min((numPossiblePuyos / 4) + it->chains, 19);
+
+        // TODO(mayah): newChains should not be negative. restFrames is negative?
+        if (newChains < 0)
+            newChains = 0;
+
         double ratio = static_cast<double>(ACCUMULATED_RENSA_SCORE[newChains]) / ACCUMULATED_RENSA_SCORE[it->chains];
         int score = it->score * ratio - ACCUMULATED_RENSA_SCORE[it->chains];
         maxScore = std::max(maxScore, score);
@@ -166,7 +171,9 @@ int Gazer::estimateMaxScore(int frameId) const
     int restFrames = frameId - m_id;
     int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_AFTER_NO_CHIGIRI));
     int newChains = min((numPossiblePuyos / 4), 19);
-
+    // TODO(mayah): newChains should not be negative. restFrames is negative?
+    if (newChains < 0)
+        newChains = 0;
     return ACCUMULATED_RENSA_SCORE[newChains];
 }
 
