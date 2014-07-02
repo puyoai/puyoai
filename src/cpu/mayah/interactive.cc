@@ -86,18 +86,21 @@ int main(int argc, char* argv[])
         cout << field.toDebugString() << endl;
         cout << seq.get(i).toString() << " " << seq.get(i + 1).toString() << endl;
 
+        double t1 = now();
+        Plan plan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false);
+        double t2 = now();
+        if (plan.decisions().empty())
+            cout << "No decision";
+        else
+            cout << plan.decision(0).toString() << "-" << plan.decision(1).toString();
+        cout << " time = " << ((t2 - t1) * 1000) << " [ms]" << endl;
+
         // Waits for user enter.
         string str;
         cout << "enter? ";
         getline(cin, str);
 
-        double t1 = now();
-        DropDecision dropDecision = ai.think(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) });
-        double t2 = now();
-        cout << dropDecision.decision().x << ' ' << dropDecision.decision().r << endl;
-        cout << "time = " << (t2 - t1) << endl;
-
-        field.dropKumipuyo(dropDecision.decision(), seq.get(i));
+        field.dropKumipuyo(plan.decisions().front(), seq.get(i));
         field.simulate();
     }
 

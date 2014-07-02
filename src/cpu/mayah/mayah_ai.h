@@ -14,6 +14,7 @@ class CoreField;
 class DropDecision;
 class Evaluator;
 class KumipuyoSeq;
+class Plan;
 class RefPlan;
 
 class MayahAI : public AI {
@@ -28,10 +29,14 @@ public:
     virtual void enemyGrounded(const FrameData&) OVERRIDE;
     virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
 
+    // Use this directly in test. Otherwise, use via think/thinkFast.
+    Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, bool fast) const;
+
     void initializeGazerForTest(int frameId) { gazer_.initializeWith(frameId); }
 
 protected:
-    DropDecision thinkInternal(int frameId, const CoreField&, const KumipuyoSeq&, bool fast);
+    std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, bool fast,
+                                const Plan&, double thoughtTimeInSeconds) const;
 
     std::unique_ptr<FeatureParameter> featureParameter_;
     Gazer gazer_;
