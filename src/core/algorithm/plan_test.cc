@@ -30,3 +30,20 @@ TEST(Plan, IteratorAvailablePlans)
 
     EXPECT_TRUE(found);
 }
+
+TEST(Plan, numChigiri)
+{
+    CoreField cf("  O   ");
+    KumipuyoSeq seq("RRRR");
+
+    bool found;
+    Plan::iterateAvailablePlans(cf, seq, 2, [&](const RefPlan& plan) {
+            if (plan.decision(0) == Decision(3, 1) && plan.decision(1) == Decision(3, 1)) {
+                EXPECT_EQ(2, plan.numChigiri());
+                found = true;
+            }
+    });
+
+    EXPECT_TRUE(found);
+}
+

@@ -55,8 +55,9 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
 #if 0
     int currentMaxRensa = 0;
     {
-        RefPlan refPlan(field, vector<Decision>(), RensaResult(), 0);
+        RefPlan refPlan(field, vector<Decision>(), RensaResult(), 0, 0);
         CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
+        currentMaxRensa = cf.feature(MAX_CHAINS).empty() ? 0 : cf.feature(MAX_CHAINS).front();
     }
 #endif
 
@@ -75,7 +76,7 @@ DropDecision MayahAI::thinkInternal(int frameId, const CoreField& field, const K
 
     double endTime = now();
 
-    RefPlan refPlan(bestPlan.field(), bestPlan.decisions(), bestPlan.rensaResult(), bestPlan.initiatingFrames());
+    RefPlan refPlan(bestPlan.field(), bestPlan.decisions(), bestPlan.rensaResult(), bestPlan.numChigiri(), bestPlan.initiatingFrames());
     CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
 
     stringstream ss;

@@ -59,6 +59,7 @@ static void iterateAvailablePlansInternal(const CoreField& field,
                                           std::vector<Decision>& decisions,
                                           int currentDepth,
                                           int maxDepth,
+                                          int currentNumChigiri,
                                           int totalFrames,
                                           Plan::IterationCallback callback)
 {
@@ -93,10 +94,12 @@ static void iterateAvailablePlansInternal(const CoreField& field,
             if (!Ctrl::isReachable(field, decision))
                 continue;
 
+            bool isChigiri = nextField.isChigiriDecision(decision);
+            int dropFrames = nextField.framesToDropNext(decision);
+
             if (!nextField.dropKumipuyo(decision, kumipuyo))
                 continue;
 
-            int dropFrames = nextField.framesToDropNext(decision);
             // CoreField::simulate is slow. So, if the last decision does not invoke any rensa,
             // we'd like to skip simulate.
             // Even using simulateWhenLastDecisionIs, it looks checking rensaWillOccurWhenLastDecisionIs
@@ -113,10 +116,10 @@ static void iterateAvailablePlansInternal(const CoreField& field,
 
             decisions.push_back(decision);
             if (currentDepth + 1 == maxDepth || rensaResult.chains > 0) {
-                callback(RefPlan(nextField, decisions, rensaResult, totalFrames));
+                callback(RefPlan(nextField, decisions, rensaResult, currentNumChigiri + isChigiri, totalFrames));
             } else {
                 iterateAvailablePlansInternal(nextField, kumipuyoSeq, decisions, currentDepth + 1, maxDepth,
-                                              totalFrames + dropFrames, callback);
+                                              currentNumChigiri + isChigiri, totalFrames + dropFrames, callback);
             }
             decisions.pop_back();
 
@@ -134,5 +137,5 @@ void Plan::iterateAvailablePlans(const CoreField& field,
 {
     std::vector<Decision> decisions;
     decisions.reserve(maxDepth);
-    iterateAvailablePlansInternal(field, kumipuyoSeq, decisions, 0, maxDepth, 0, callback);
+    iterateAvailablePlansInternal(field, kumipuyoSeq, decisions, 0, maxDepth, 0, 0, callback);
 }

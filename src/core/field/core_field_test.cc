@@ -328,3 +328,21 @@ TEST(CoreFieldTest, countConnectedPuyosEmptyCase2)
 
     EXPECT_EQ(48, f.countConnectedPuyos(3, 12));
 }
+
+TEST(CoreFieldTest, isChigiriDecision1)
+{
+    CoreField cf;
+    EXPECT_FALSE(cf.isChigiriDecision(Decision(3, 0)));
+    EXPECT_FALSE(cf.isChigiriDecision(Decision(3, 1)));
+    EXPECT_FALSE(cf.isChigiriDecision(Decision(3, 2)));
+    EXPECT_FALSE(cf.isChigiriDecision(Decision(3, 3)));
+}
+
+TEST(CoreFieldTest, isChigiriDecision2)
+{
+    CoreField cf("  O   ");
+    EXPECT_FALSE(cf.isChigiriDecision(Decision(3, 0)));
+    EXPECT_TRUE(cf.isChigiriDecision(Decision(3, 1)));
+    EXPECT_FALSE(cf.isChigiriDecision(Decision(3, 2)));
+    EXPECT_TRUE(cf.isChigiriDecision(Decision(3, 3)));
+}
