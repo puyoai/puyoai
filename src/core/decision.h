@@ -19,6 +19,8 @@ public:
     Decision() : x(0), r(0) {}
     Decision(int x0, int r0) : x(x0), r(r0) {}
 
+    int axisX() const { return x; }
+
     int childX() const
     {
         switch (r) {

@@ -17,9 +17,9 @@ class Plan {
 public:
     Plan() {}
     Plan(const CoreField& field, const std::vector<Decision>& decisions,
-         const RensaResult& rensaResult, int initiatingFrames) :
+         const RensaResult& rensaResult, int numChigiri, int initiatingFrames) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
-        initiatingFrames_(initiatingFrames)
+        numChigiri_(numChigiri), initiatingFrames_(initiatingFrames)
     {
     }
 
@@ -39,6 +39,7 @@ public:
     int score() const { return rensaResult_.score; }
     int chains() const { return rensaResult_.chains; }
 
+    int numChigiri() const { return numChigiri_; }
     int totalFrames() const { return initiatingFrames_ + rensaResult_.frames; }
 
     bool isRensaPlan() const { return rensaResult_.chains > 0; }
@@ -49,6 +50,7 @@ private:
     CoreField field_;      // Future field (after the rensa has been finished).
     std::vector<Decision> decisions_;
     RensaResult rensaResult_;
+    int numChigiri_;
     int initiatingFrames_;
 };
 
@@ -57,9 +59,9 @@ private:
 class RefPlan : noncopyable {
 public:
     RefPlan(const CoreField& field, const std::vector<Decision>& decisions,
-            const RensaResult& rensaResult, int initiatingFrames) :
+            const RensaResult& rensaResult, int numChigiri, int initiatingFrames) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
-        initiatingFrames_(initiatingFrames)
+        numChigiri_(numChigiri), initiatingFrames_(initiatingFrames)
     {
     }
 
@@ -74,10 +76,11 @@ public:
     // initiatingFrames returns how many frames are required just before the last hand.
     int initiatingFrames() const { return initiatingFrames_; }
     int totalFrames() const { return initiatingFrames_ + rensaResult_.frames; }
+    int numChigiri() const { return numChigiri_; }
 
     bool isRensaPlan() const { return rensaResult_.chains > 0; }
 
-    Plan toPlan() const { return Plan(field_, decisions_, rensaResult_, initiatingFrames_); }
+    Plan toPlan() const { return Plan(field_, decisions_, rensaResult_, numChigiri_, initiatingFrames_); }
 
     std::string decisionText() const;
 
@@ -85,6 +88,7 @@ private:
     const CoreField& field_;
     const std::vector<Decision>& decisions_;
     const RensaResult& rensaResult_;
+    int numChigiri_;
     int initiatingFrames_;
 };
 

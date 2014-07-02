@@ -27,7 +27,7 @@ protected:
         RensaResult rensaResult;
         int initiatingFrames = 10;
 
-        RefPlan plan(f, decisions, rensaResult, initiatingFrames);
+        RefPlan plan(f, decisions, rensaResult, 0, initiatingFrames);
 
         return evaluator.evalWithCollectingFeature(plan, f, 1, false, gazer);
     }

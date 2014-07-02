@@ -221,6 +221,16 @@ int CoreField::framesToDropNext(const Decision& decision) const
     return dropFrames;
 }
 
+bool CoreField::isChigiriDecision(const Decision& decision) const
+{
+    DCHECK(decision.isValid()) << "decision " << decision.toString() << " should be valid.";
+
+    if (decision.axisX() == decision.childX())
+        return false;
+
+    return height(decision.axisX()) != height(decision.childX());
+}
+
 bool CoreField::dropPuyoOn(int x, PuyoColor c, bool isAxis)
 {
     DCHECK(c != PuyoColor::EMPTY);

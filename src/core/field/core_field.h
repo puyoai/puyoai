@@ -42,7 +42,7 @@ public:
     // Returns the number of puyos connected to (x, y).
     // Actually you can use this if color(x, y) is EMPTY or OJAMA.
     int countConnectedPuyos(int x, int y) const;
-    // Same as connectedPuyoNums, but with checking using |checked|.
+    // Same as countConnectedPuyos(x, y), but with checking using |checked|.
     int countConnectedPuyos(int x, int y, FieldBitField* checked) const;
 
     // ----------------------------------------------------------------------
@@ -56,6 +56,9 @@ public:
 
     // Returns #frame to drop the next KumiPuyo with decision. This function does not drop the puyo.
     int framesToDropNext(const Decision&) const;
+
+    // Returns true if |decision| will cause chigiri.
+    bool isChigiriDecision(const Decision&) const;
 
     // Places a puyo on the top of column |x|.
     // Returns true if succeeded. False if failed. When false is returned, field will not change.

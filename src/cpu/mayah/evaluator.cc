@@ -344,12 +344,6 @@ void evalRensaStrategy(ScoreCollector* sc, const RefPlan& plan,
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
     int estimatedEnemyMaxScore = gazer.estimateMaxScore(rensaEndingFrameId);
 
-#if 0
-    if (plan.score() >= scoreForOjama(15) && info.rensaResult.chains >= 4) {
-        cerr << info.rensaResult.chains << ' ' << estimatedEnemyMaxScore << endl;
-    }
-#endif
-
     // TODO(mayah): Ah, maybe sakiuchi etc. wins this value?
     if (plan.score() >= scoreForOjama(15) && plan.score() <= scoreForOjama(30) && plan.field().countPuyos() >= 40) {
         if (!gazer.rensaIsOngoing())
@@ -480,7 +474,7 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
 
     double maxRensaScore = 0;
     unique_ptr<ScoreCollector> maxRensaScoreCollector;
-    for (size_t i = 0; i < 100 && i < rensaInfos.size(); ++i) {
+    for (size_t i = 0; i < rensaInfos.size(); ++i) {
         const auto& rensaInfo = rensaInfos[i];
         CoreField fieldAfterRensa(plan.field());
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
