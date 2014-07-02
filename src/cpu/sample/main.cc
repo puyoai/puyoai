@@ -13,7 +13,7 @@ public:
     virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) OVERRIDE {
         UNUSED_VARIABLE(frameId);
 
-        LOG(INFO) << CoreField(f).debugOutput() << seq.toString();
+        LOG(INFO) << CoreField(f).toDebugString() << seq.toString();
 
         Decision best;
         int score = -1;

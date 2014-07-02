@@ -134,7 +134,7 @@ void learnWithInteractive()
         // Lists teacher decision.
         pair<Decision, Decision> teacherDecision;
         while (!teacherDecision.first.isValid()) {
-            cout << field.debugOutput() << endl
+            cout << field.toDebugString() << endl
                  << seq.toString() << endl;
             cout << "our decision : "
                  << currentDecision.first.x << ' '
@@ -250,7 +250,7 @@ void learnFromPuyofu()
             CollectedFeature teacherFeature;
             bool teacherFound = false;
 
-            cout << inputs[i].field.debugOutput() << endl
+            cout << inputs[i].field.toDebugString() << endl
                  << inputs[i].seq.toString() << endl;
 
             Plan::iterateAvailablePlans(inputs[i].field, inputs[i].seq, 2, [&](const RefPlan& plan) {

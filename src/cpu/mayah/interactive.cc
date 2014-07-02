@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
             cout << "gazer time = " << (t2 - t1) << endl;
         }
 
-        cout << field.debugOutput() << endl;
+        cout << field.toDebugString() << endl;
         cout << seq.get(i).toString() << " " << seq.get(i + 1).toString() << endl;
 
         // Waits for user enter.

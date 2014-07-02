@@ -99,8 +99,7 @@ public:
     // ----------------------------------------------------------------------
     // utility methods
 
-    // For debugging purpose.
-    std::string debugOutput() const;
+    std::string toDebugString() const;
 
     friend bool operator==(const CoreField&, const CoreField&);
     friend bool operator!=(const CoreField&, const CoreField&);

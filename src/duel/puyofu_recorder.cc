@@ -101,6 +101,6 @@ void PuyofuRecorder::emitFieldLog(FILE* fp, int pi) const
             continue;
 
         CoreField cf(m->field);
-        fprintf(fp, "%s\n%s\n", cf.debugOutput().c_str(), m->kumipuyoSeq.toString().c_str());
+        fprintf(fp, "%s\n%s\n", cf.toDebugString().c_str(), m->kumipuyoSeq.toString().c_str());
     }
 }

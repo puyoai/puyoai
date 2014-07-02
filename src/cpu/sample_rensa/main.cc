@@ -25,7 +25,7 @@ public:
 private:
     DropDecision eval(const PlainField& f, const KumipuyoSeq& nexts, int depth)
     {
-        LOG(INFO) << CoreField(f).debugOutput() << nexts.toString();
+        LOG(INFO) << CoreField(f).toDebugString() << nexts.toString();
 
         Decision best = Decision(3, 0);
         int score = -100000;

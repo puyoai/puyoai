@@ -233,7 +233,7 @@ bool CoreField::isChigiriDecision(const Decision& decision) const
 
 bool CoreField::dropPuyoOn(int x, PuyoColor c, bool isAxis)
 {
-    DCHECK(c != PuyoColor::EMPTY);
+    DCHECK(c != PuyoColor::EMPTY) << toDebugString();
     if (height(x) < 13) {
         DCHECK(color(x, height(x) + 1) == PuyoColor::EMPTY);
         unsafeSet(x, ++heights_[x], c);
@@ -313,7 +313,7 @@ int CoreField::vanish(int nthChain, int minHeights[], Tracker* tracker)
         for (int y = minHeights[x]; y <= maxHeight; ++y) {
             DCHECK(color(x, y) != PuyoColor::EMPTY)
                 << x << ' ' << y << ' ' << toChar(color(x, y)) << '\n'
-                << debugOutput();
+                << toDebugString();
 
             if (checked.get(x, y) || color(x, y) == PuyoColor::OJAMA)
                 continue;
@@ -502,7 +502,7 @@ inline RensaResult CoreField::simulateWithTracker(int initialChain, int minHeigh
     return RensaResult(chains - 1, score, frames);
 }
 
-std::string CoreField::debugOutput() const
+std::string CoreField::toDebugString() const
 {
     std::ostringstream s;
     for (int y = MAP_HEIGHT - 1; y >= 0; y--) {
