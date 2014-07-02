@@ -35,6 +35,23 @@ const bool USE_FIELD_USHAPE_FEATURE = true;
 
 using namespace std;
 
+string CollectedFeature::toString() const
+{
+    stringstream ss;
+    ss << "score = " << score_ << endl;
+    for (const auto& entry : collectedFeatures_) {
+        ss << ::toString(entry.first) << "=" << to_string(entry.second) << endl;
+    }
+    for (const auto& entry : collectedSparseFeatures_) {
+        ss << ::toString(entry.first) << "=";
+        for (int v : entry.second)
+            ss << v << ' ';
+        ss << endl;
+    }
+
+    return ss.str();
+}
+
 template<typename ScoreCollector>
 void evalFrameFeature(ScoreCollector* sc, const RefPlan& plan)
 {
@@ -342,8 +359,13 @@ void evalRensaStrategy(ScoreCollector* sc, const RefPlan& plan,
                        const TrackedPossibleRensaInfo& info,
                        int currentFrameId, const Gazer& gazer)
 {
+    UNUSED_VARIABLE(info);
+    UNUSED_VARIABLE(currentFrameId);
+
+#if 0
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
     int estimatedEnemyMaxScore = gazer.estimateMaxScore(rensaEndingFrameId);
+#endif
 
     // TODO(mayah): Ah, maybe sakiuchi etc. wins this value?
     if (plan.score() >= scoreForOjama(15) && plan.score() <= scoreForOjama(30) && plan.field().countPuyos() >= 40) {
