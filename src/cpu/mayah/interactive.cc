@@ -16,6 +16,7 @@
 #include "core/sequence_generator.h"
 #include "core/state.h"
 
+#include "evaluator.h"
 #include "mayah_ai.h"
 #include "util.h"
 
@@ -27,6 +28,20 @@ public:
     using MayahAI::think;
     using MayahAI::enemyNext2Appeared;
     using MayahAI::collectFeatureString;
+
+    string evalStringDecision(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
+                              const vector<Decision>& decisions) const
+    {
+        string result;
+        Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
+                                    [this, frameId, field, kumipuyoSeq, decisions, &result](const RefPlan& plan) {
+            if (plan.decisions() != decisions)
+                return;
+            result = collectFeatureString(frameId, field, kumipuyoSeq, false, plan.toPlan(), 0);
+        });
+
+        return result;
+    }
 };
 
 // TODO(mayah): Implement with GUI!
@@ -110,6 +125,16 @@ int main(int argc, char* argv[])
                 double endTime = now();
                 string str = ai.collectFeatureString(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false,
                                                      plan, endTime - beginTime);
+                cout << str << endl;
+            }
+
+            int x1, r1, x2, r2;
+            if (sscanf(str.c_str(), "%d %d %d %d", &x1, &r1, &x2, &r2) == 4) {
+                vector<Decision> decisions {
+                    Decision(x1, r1),
+                    Decision(x2, r2)
+                };
+                string str = ai.evalStringDecision(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, decisions);
                 cout << str << endl;
             }
         }
