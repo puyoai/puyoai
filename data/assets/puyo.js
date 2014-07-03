@@ -102,7 +102,7 @@ function init() {
     function puyoOffsetX(player, x) {
         return kFieldOffsetX[player - 1] + x * kPW;
     }
-    
+
     function puyoOffsetY(player, y) {
         return kFieldOffsetY[player - 1] - y * kPH;
     }
@@ -110,7 +110,7 @@ function init() {
     function createElem(id, offsetX, offsetY) {
         var span = document.createElement('span');
         span.className = 'puyo';
-        
+
         span.id = id;
         span.style.position = 'absolute';
         span.style.width = kPW + 'px';
@@ -191,7 +191,7 @@ function displayGameState(json) {
     // p1
     for (var i = 0; i < json.p1.length; ++i) {
         var x = i % 6 + 1;
-        var y = (i - x + 1) / 6 + 1;
+        var y = 14 - (i - x + 1) / 6;
         var id = "puyo-1-" + y + "-" + x;
         setPuyoColor(document.getElementById(id), json.p1[i]);
     }
@@ -210,7 +210,7 @@ function displayGameState(json) {
     // p2
     for (var i = 0; i < json.p2.length; ++i) {
         var x = i % 6 + 1;
-        var y = (i - x + 1) / 6 + 1;
+        var y = 14 - (i - x + 1) / 6;
         var id = "puyo-2-" + y + "-" + x;
         setPuyoColor(document.getElementById(id), json.p2[i]);
     }
