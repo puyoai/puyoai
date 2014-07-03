@@ -11,6 +11,7 @@
 #include "core/algorithm/rensa_detector.h"
 #include "core/client/connector/drop_decision.h"
 #include "core/field/core_field.h"
+#include "core/field/field_pretty_printer.h"
 #include "core/frame_data.h"
 #include "core/kumipuyo.h"
 #include "core/sequence_generator.h"
@@ -99,8 +100,7 @@ int main(int argc, char* argv[])
             cout << "gazer time = " << (t2 - t1) << endl;
         }
 
-        cout << field.toDebugString() << endl;
-        cout << seq.get(i).toString() << " " << seq.get(i + 1).toString() << endl;
+        FieldPrettyPrinter::print(field, seq);
 
         double t1 = now();
         Plan plan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false);
