@@ -599,7 +599,7 @@ int LF::getBestChainCount(int* ignition_puyo_cnt,
     *vanished_puyo_cnt = 0;
   }
 
-  bool has_checked[7][13];
+  bool has_checked[7][16];
   memset(has_checked, 0, sizeof(has_checked));
 
   for (int x = 1; x <= 6; x++) {

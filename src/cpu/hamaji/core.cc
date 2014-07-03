@@ -111,7 +111,8 @@ Decision Core::decide(Game* game) {
 
     if (best_plan && best_score > 1000) {
       int puyo_cnt = game->p[1].f.countColorPuyo();
-      int max_chain_cnt = (puyo_cnt + best_plan->chain_cnt * 2 + 3) / 4;
+      int max_chain_cnt =
+          min((puyo_cnt + best_plan->chain_cnt * 2 + 3) / 4, 19);
       int max_score = 0;
       for (int i = 2; i <= max_chain_cnt; i++) {
         max_score += CHAIN_BONUS[i];
