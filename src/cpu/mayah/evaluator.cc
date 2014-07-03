@@ -252,18 +252,21 @@ void evalValleyDepthRidgeHeight(ScoreCollector* sc, const RefPlan& plan)
 template<typename ScoreCollector>
 void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
 {
+    static int DIFF[CoreField::MAP_WIDTH] = {
+        0, -3, 0, 1, 1, 0, -3, 0,
+    };
+
     const CoreField& f = plan.field();
     int sumHeight = 0;
     for (int x = 1; x <= 6; ++x)
         sumHeight += f.height(x);
 
     int s = 0;
-    s += abs((f.height(1) - 3) * 6 - sumHeight);
-    s += abs((f.height(2) - 0) * 6 - sumHeight);
-    s += abs((f.height(3) + 1) * 6 - sumHeight);
-    s += abs((f.height(4) + 1) * 6 - sumHeight);
-    s += abs((f.height(5) - 0) * 6 - sumHeight);
-    s += abs((f.height(6) - 3) * 6 - sumHeight);
+    for (int x = 1; x <= CoreField::WIDTH; ++x) {
+        if (f.height(x) <= 3)
+            continue;
+        s += abs((f.height(x) + DIFF[x]) * 6 - sumHeight);
+    }
 
     sc->addScore(FIELD_USHAPE, s);
 }
