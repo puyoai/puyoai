@@ -76,6 +76,9 @@ public:
         return seq;
     }
 
+    void setAxis(int n, PuyoColor c) { seq_[n].axis = c; }
+    void setChild(int n, PuyoColor c) { seq_[n].axis = c; }
+
     std::string toString() const;
 
     const std::vector<Kumipuyo>& underlyingData() const { return seq_; }

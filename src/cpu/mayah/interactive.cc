@@ -21,6 +21,8 @@
 #include "mayah_ai.h"
 #include "util.h"
 
+DEFINE_string(seq, "", "initial puyo sequence");
+
 using namespace std;
 
 class InteractiveAI : public MayahAI {
@@ -69,6 +71,17 @@ int main(int argc, char* argv[])
 
     CoreField field;
     KumipuyoSeq seq = generateSequence();
+
+    if (FLAGS_seq != "") {
+        for (size_t i = 0; i < FLAGS_seq.size(); ++i) {
+            PuyoColor c = toPuyoColor(FLAGS_seq[i]);
+            CHECK(isNormalColor(c));
+            if (i % 2 == 0)
+                seq.setAxis(i / 2, c);
+            else
+                seq.setChild(i / 2, c);
+        }
+    }
 
     for (int i = 0; i + 1 < seq.size(); ++i) {
         int frameId = 2 + i; // frameId 1 will be used for initializing now. Let's avoid it.
