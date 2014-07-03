@@ -16,9 +16,6 @@ class Ai : public ::AI {
                              const KumipuyoSeq& seq) override;
   virtual void gameWillBegin(const FrameData& frame_data) override;
   virtual void enemyGrounded(const FrameData& frame_data) override;
-
- private:
-  bool zenkeshi_[2];
 };
 
 }  // namespace peria
