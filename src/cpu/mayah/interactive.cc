@@ -56,17 +56,6 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    {
-        double t1 = now();
-        CoreField f;
-        KumipuyoSeq seq("RRBB");
-        Plan::iterateAvailablePlans(f, seq, 4, [](const RefPlan&) {
-            return;
-        });
-        double t2 = now();
-        cout << (t2 - t1) << endl;
-    }
-
     InteractiveAI ai;
 
     CoreField field;
