@@ -1,0 +1,13 @@
+#!/bin/zsh
+set -e
+target="$1"
+inject="$(dirname "$0")/libsandbox_inject.so"
+shift
+
+if ! readelf -d "${target}" | cut -d' ' -f3 | grep 'NEEDED' > /dev/null; then
+  exit 255
+fi
+
+declare -Tx LD_PRELOAD ld_preload ':'
+ld_preload=("${inject}" "${ld_preload[@]}")
+exec "${target}" "$@"

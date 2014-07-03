@@ -9,3 +9,5 @@ endfunction()
 
 tzik_add_executable(tzik main.h main.cc)
 
+cpu_add_runner(sandbox)
+add_library(sandbox_inject SHARED sandbox_inject.cc)
