@@ -77,7 +77,7 @@ public:
     }
 
     void setAxis(int n, PuyoColor c) { seq_[n].axis = c; }
-    void setChild(int n, PuyoColor c) { seq_[n].axis = c; }
+    void setChild(int n, PuyoColor c) { seq_[n].child = c; }
 
     std::string toString() const;
 
