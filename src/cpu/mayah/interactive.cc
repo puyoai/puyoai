@@ -31,15 +31,10 @@ public:
     using MayahAI::think;
     using MayahAI::enemyNext2Appeared;
 
-    std::string collectFeatureString(int frameId, const CoreField& field, const KumipuyoSeq& seq, bool fast,
-                                     const Plan& plan, double thoughtTimeInSeconds) const
+    CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, bool fast, const Plan& plan) const
     {
-        UNUSED_VARIABLE(seq);
-
         RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.initiatingFrames());
-        CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
-
-        return cf.toString() + "time = " + to_string(thoughtTimeInSeconds * 1000) + " [ms]";
+        return Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
     }
 
     Plan thinkPlanOnly(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
@@ -123,6 +118,8 @@ int main(int argc, char* argv[])
             cout << plan.decision(0).toString() << "-" << plan.decision(1).toString();
         cout << " time = " << ((t2 - t1) * 1000) << " [ms]" << endl;
 
+        Plan aiPlan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false);
+
         // Waits for user enter.
         while (true) {
             string str;
@@ -132,12 +129,9 @@ int main(int argc, char* argv[])
             if (str == "")
                 break;
             if (str == "s") {
-                double beginTime = now();
-                Plan plan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false);
-                double endTime = now();
-                string str = ai.collectFeatureString(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false,
-                                                     plan, endTime - beginTime);
-                cout << str << endl;
+                CollectedFeature cf = ai.makeCollectedFeature(frameId, field, false, aiPlan);
+                cout << cf.toString() << endl;
+                continue;
             }
 
             int x1, r1, x2, r2;
@@ -147,12 +141,14 @@ int main(int argc, char* argv[])
                     Decision(x2, r2)
                 };
                 Plan plan = ai.thinkPlanOnly(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, decisions);
-                cout << ai.collectFeatureString(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false, plan, 0.0)
-                     << endl;
+
+                CollectedFeature mycf = ai.makeCollectedFeature(frameId, field, false, plan);
+                CollectedFeature aicf = ai.makeCollectedFeature(frameId, field, false, aiPlan);
+                cout << mycf.toStringComparingWith(aicf) << endl;
             }
         }
 
-        field.dropKumipuyo(plan.decisions().front(), seq.get(i));
+        field.dropKumipuyo(aiPlan.decisions().front(), seq.get(i));
         field.simulate();
     }
 
