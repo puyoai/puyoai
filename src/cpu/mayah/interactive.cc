@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
             cout << "gazer time = " << (t2 - t1) << endl;
         }
 
-        FieldPrettyPrinter::print(field, seq);
+        FieldPrettyPrinter::print(field, seq.subsequence(i, 2));
 
         double t1 = now();
         Plan plan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false);
