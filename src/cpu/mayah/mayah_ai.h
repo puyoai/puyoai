@@ -37,8 +37,6 @@ public:
 protected:
     std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, bool fast,
                                 const Plan&, double thoughtTimeInSeconds) const;
-    std::string collectFeatureString(int frameId, const CoreField&, const KumipuyoSeq&, bool fast,
-                                     const Plan&, double thoughtTimeInSeconds) const;
 
     std::unique_ptr<FeatureParameter> featureParameter_;
     Gazer gazer_;

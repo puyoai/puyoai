@@ -30,17 +30,27 @@ public:
     using MayahAI::gameWillBegin;
     using MayahAI::think;
     using MayahAI::enemyNext2Appeared;
-    using MayahAI::collectFeatureString;
 
-    string evalStringDecision(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
-                              const vector<Decision>& decisions) const
+    std::string collectFeatureString(int frameId, const CoreField& field, const KumipuyoSeq& seq, bool fast,
+                                     const Plan& plan, double thoughtTimeInSeconds) const
     {
-        string result;
+        UNUSED_VARIABLE(seq);
+
+        RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.initiatingFrames());
+        CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
+
+        return cf.toString() + "time = " + to_string(thoughtTimeInSeconds * 1000) + " [ms]";
+    }
+
+    Plan thinkPlanOnly(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
+                       const vector<Decision>& decisions) const
+    {
+        Plan result;
         Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
-                                    [this, frameId, field, kumipuyoSeq, decisions, &result](const RefPlan& plan) {
+                                    [this, frameId, &field, &decisions, &result](const RefPlan& plan) {
             if (plan.decisions() != decisions)
                 return;
-            result = collectFeatureString(frameId, field, kumipuyoSeq, false, plan.toPlan(), 0);
+            result = plan.toPlan();
         });
 
         return result;
@@ -136,8 +146,9 @@ int main(int argc, char* argv[])
                     Decision(x1, r1),
                     Decision(x2, r2)
                 };
-                string str = ai.evalStringDecision(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, decisions);
-                cout << str << endl;
+                Plan plan = ai.thinkPlanOnly(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, decisions);
+                cout << ai.collectFeatureString(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false, plan, 0.0)
+                     << endl;
             }
         }
 

@@ -131,17 +131,6 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     return ss.str();
 }
 
-std::string MayahAI::collectFeatureString(int frameId, const CoreField& field, const KumipuyoSeq& seq, bool fast,
-                                          const Plan& plan, double thoughtTimeInSeconds) const
-{
-    UNUSED_VARIABLE(seq);
-
-    RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.initiatingFrames());
-    CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
-
-    return cf.toString() + "time = " + to_string(thoughtTimeInSeconds * 1000) + " [ms]";
-}
-
 void MayahAI::enemyGrounded(const FrameData& frameData)
 {
     gazer_.setId(frameData.id);
