@@ -28,7 +28,6 @@ const bool USE_HAND_WIDTH_FEATURE = true;
 const bool USE_HEIGHT_DIFF_FEATURE = false;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_DENSITY_FEATURE = false;
-const bool USE_PATTERN33_FEATURE = false;
 const bool USE_PATTERN34_FEATURE = true;
 const bool USE_IGNITION_HEIGHT_FEATURE = false;
 const bool USE_FIELD_USHAPE_FEATURE = true;
@@ -125,58 +124,6 @@ void evalDensityFeature(ScoreCollector* sc, const RefPlan& plan)
                 sc->addScore(DENSITY, c, 1);
             }
         }
-    }
-}
-
-template<typename ScoreCollector>
-void evalPuyoPattern33Feature(ScoreCollector* sc, const RefPlan& plan)
-{
-    const CoreField& field = plan.field();
-
-    {
-        int x = 2;
-        int y = 2;
-        int patterns[NUM_PUYO_COLORS] = { 0 };
-
-        patterns[field.color(x - 1, y - 1)] |= 1 << 0;
-        patterns[field.color(x    , y - 1)] |= 1 << 1;
-        patterns[field.color(x + 1, y - 1)] |= 1 << 2;
-
-        patterns[field.color(x - 1, y    )] |= 1 << 3;
-        patterns[field.color(x    , y    )] |= 1 << 4;
-        patterns[field.color(x + 1, y    )] |= 1 << 5;
-
-        patterns[field.color(x - 1, y + 1)] |= 1 << 6;
-        patterns[field.color(x    , y + 1)] |= 1 << 7;
-        patterns[field.color(x + 1, y + 1)] |= 1 << 8;
-
-        sc->addScore(PUYO_PATTERN_33, patterns[RED], 1);
-        sc->addScore(PUYO_PATTERN_33, patterns[GREEN], 1);
-        sc->addScore(PUYO_PATTERN_33, patterns[YELLOW], 1);
-        sc->addScore(PUYO_PATTERN_33, patterns[BLUE], 1);
-    }
-
-    {
-        int x = 5;
-        int y = 2;
-        int patterns[8] = { 0 };
-
-        patterns[field.color(x + 1, y - 1)] |= 1 << 0;
-        patterns[field.color(x    , y - 1)] |= 1 << 1;
-        patterns[field.color(x - 1, y - 1)] |= 1 << 2;
-
-        patterns[field.color(x + 1, y    )] |= 1 << 3;
-        patterns[field.color(x    , y    )] |= 1 << 4;
-        patterns[field.color(x - 1, y    )] |= 1 << 5;
-
-        patterns[field.color(x + 1, y + 1)] |= 1 << 6;
-        patterns[field.color(x    , y + 1)] |= 1 << 7;
-        patterns[field.color(x - 1, y + 1)] |= 1 << 8;
-
-        sc->addScore(PUYO_PATTERN_33, patterns[RED], 1);
-        sc->addScore(PUYO_PATTERN_33, patterns[GREEN], 1);
-        sc->addScore(PUYO_PATTERN_33, patterns[YELLOW], 1);
-        sc->addScore(PUYO_PATTERN_33, patterns[BLUE], 1);
     }
 }
 
@@ -471,8 +418,6 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
         evalConnectionHorizontalFeature(sc, plan);
     if (USE_DENSITY_FEATURE)
         evalDensityFeature(sc, plan);
-    if (USE_PATTERN33_FEATURE)
-        evalPuyoPattern33Feature(sc, plan);
     if (USE_PATTERN34_FEATURE)
         evalPuyoPattern34Feature(sc, plan);
     if (USE_HEIGHT_DIFF_FEATURE)
