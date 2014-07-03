@@ -10,4 +10,7 @@ endfunction()
 tzik_add_executable(tzik main.h main.cc)
 
 cpu_add_runner(sandbox)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 add_library(sandbox_inject SHARED sandbox_inject.cc)
+endif()
