@@ -1,7 +1,8 @@
 #include "mayah_ai.h"
 
-#include <gflags/gflags.h>
 #include <sstream>
+
+#include <gflags/gflags.h>
 
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
