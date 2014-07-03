@@ -29,8 +29,7 @@ DropDecision Ai::think(int frame_id,
       [&best, &score](const RefPlan& plan) {
         int s = 0;
         if (plan.isRensaPlan()) {
-          s += plan.rensaResult().chains * 10;
-          s -= plan.decisions().size();
+          s = plan.rensaResult().score;
         }
 
         if (score < s) {
