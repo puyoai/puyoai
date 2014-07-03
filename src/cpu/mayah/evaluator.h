@@ -42,6 +42,7 @@ public:
     }
 
     std::string toString() const;
+    std::string toStringComparingWith(const CollectedFeature&) const;
 
     static const std::vector<int>& emptyVector()
     {
