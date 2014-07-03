@@ -116,7 +116,7 @@ static void iterateAvailablePlansInternal(const CoreField& field,
 
             decisions.push_back(decision);
             if (currentDepth + 1 == maxDepth || rensaResult.chains > 0) {
-                callback(RefPlan(nextField, decisions, rensaResult, currentNumChigiri + isChigiri, totalFrames));
+                callback(RefPlan(nextField, decisions, rensaResult, currentNumChigiri + isChigiri, totalFrames + dropFrames));
             } else {
                 iterateAvailablePlansInternal(nextField, kumipuyoSeq, decisions, currentDepth + 1, maxDepth,
                                               currentNumChigiri + isChigiri, totalFrames + dropFrames, callback);
