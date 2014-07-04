@@ -19,6 +19,10 @@ class RefPlan;
 
 class MayahAI : public AI {
 public:
+    static const int DEFAULT_DEPTH = 2;
+    static const int DEFAULT_NUM_KEY_PUYOS = 1;
+    static const int FAST_NUM_KEY_PUYOS = 0;
+
     MayahAI();
     ~MayahAI();
 
@@ -30,12 +34,12 @@ public:
     virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
 
     // Use this directly in test. Otherwise, use via think/thinkFast.
-    Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, bool fast) const;
+    Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, int depth, int numKeyPuyos) const;
 
     void initializeGazerForTest(int frameId) { gazer_.initializeWith(frameId); }
 
 protected:
-    std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, bool fast,
+    std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int numKeyPuyos,
                                 const Plan&, double thoughtTimeInSeconds) const;
 
     std::unique_ptr<FeatureParameter> featureParameter_;

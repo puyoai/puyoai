@@ -17,6 +17,7 @@
 #include "evaluator.h"
 #include "feature_parameter.h"
 #include "gazer.h"
+#include "mayah_ai.h"
 
 using namespace std;
 
@@ -237,7 +238,8 @@ void learnFromPuyofu()
     FeatureParameter parameter(FLAGS_feature);
     Gazer gazer;
 
-    gazer.initializeWith(1);
+    const int frameId = 1;
+    gazer.initializeWith(frameId);
 
     while (true) {
         vector<FrameInput> inputs = readUntilGameEnd();
@@ -253,8 +255,9 @@ void learnFromPuyofu()
             cout << inputs[i].field.toDebugString() << endl
                  << inputs[i].seq.toString() << endl;
 
-            Plan::iterateAvailablePlans(inputs[i].field, inputs[i].seq, 2, [&](const RefPlan& plan) {
-                    CollectedFeature f = evaluator.evalWithCollectingFeature(plan, inputs[i].field, 1, false, gazer);
+            Plan::iterateAvailablePlans(inputs[i].field, inputs[i].seq, MayahAI::DEFAULT_DEPTH, [&](const RefPlan& plan) {
+                    CollectedFeature f = evaluator.evalWithCollectingFeature(plan, inputs[i].field,
+                                                                             frameId, MayahAI::DEFAULT_NUM_KEY_PUYOS, gazer);
                     featureMap[plan.decisions()] = f;
                     if (plan.field() == inputs[i + 1].fieldAfter) {
                         teacherFound = true;
