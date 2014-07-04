@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_core_algorithm
-            column_puyo_list.cc plan.cc rensa_detector.cc puyo_possibility.cc)
+            column_puyo_list.cc plan.cc rensa_detector.cc puyo_set.cc puyo_possibility.cc)
 
 # ----------------------------------------------------------------------
 # test

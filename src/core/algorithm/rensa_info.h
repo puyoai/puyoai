@@ -26,17 +26,29 @@ private:
 };
 
 struct PossibleRensaInfo {
+    PossibleRensaInfo() {}
+    PossibleRensaInfo(const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos,
+                      const ColumnPuyoList& firePuyos) :
+        rensaResult(rensaResult), keyPuyos(keyPuyos), firePuyos(firePuyos) {}
+
     RensaResult rensaResult;
-    ColumnPuyoList necessaryPuyoSet;
+    ColumnPuyoList keyPuyos;
+    ColumnPuyoList firePuyos;
 
     std::string toString() const {
-        return rensaResult.toString() + necessaryPuyoSet.toString();
+        return rensaResult.toString() + keyPuyos.toString() + firePuyos.toString();
     }
 };
 
 struct TrackedPossibleRensaInfo {
+    TrackedPossibleRensaInfo() {}
+    TrackedPossibleRensaInfo(const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos,
+                             const ColumnPuyoList& firePuyos, const RensaTrackResult& trackResult) :
+        rensaResult(rensaResult), keyPuyos(keyPuyos), firePuyos(firePuyos), trackResult(trackResult) {}
+
     RensaResult rensaResult;
-    ColumnPuyoList necessaryPuyoSet;
+    ColumnPuyoList keyPuyos;
+    ColumnPuyoList firePuyos;
     RensaTrackResult trackResult;
 };
 

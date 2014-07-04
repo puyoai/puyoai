@@ -3,7 +3,10 @@
 
 #include <stdio.h>
 #include <string>
+
 #include "core/puyo_color.h"
+
+class ColumnPuyoList;
 
 class PuyoSet {
 public:
@@ -42,6 +45,8 @@ public:
     unsigned int blue() const { return m_blue; }
     unsigned int yellow() const { return m_yellow; }
     unsigned int green() const { return m_green; }
+
+    void add(const ColumnPuyoList&);
 
     void add(PuyoSet set)
     {

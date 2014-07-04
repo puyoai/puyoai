@@ -6,28 +6,7 @@
 
 using namespace std;
 
-TEST(GazerTest, UpdatePossibleRensasTest)
-{
-    TsumoPossibility::initialize();
-
-    Gazer gazer;
-    gazer.initializeWith(100);
-
-    CoreField f("000000"
-                "000000"
-                "000000"
-                "456000"
-                "445664"
-                "557774");
-
-    KumipuyoSeq kumipuyos("777777");
-    gazer.updatePossibleRensas(f, kumipuyos);
-
-    EXPECT_EQ(gazer.possibleRensaInfos().size(), 3U);
-    EXPECT_EQ(gazer.possibleRensaInfos().back().chains, 4);
-}
-
-TEST(GazerTest, UpdatePossibleRensasTest2)
+TEST(GazerTest, dontCrash)
 {
     // Should not crash in this test case.
 

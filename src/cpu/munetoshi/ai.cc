@@ -71,8 +71,10 @@ int munetoshi::AI::evaluate(const CoreField& field) {
       RensaDetector::findPossibleRensasWithTracking(field, 1, RensaDetector::Mode::FLOAT);
   for (auto i = rensa_info_vect.begin(); i != rensa_info_vect.end(); ++i) {
     sum = 0;
-    auto required_puyos = i->necessaryPuyoSet.list();
-    std::for_each(required_puyos.rbegin(), required_puyos.rend(), adder);
+    auto key_puyos = i->keyPuyos.list();
+    auto fire_puyos = i->firePuyos.list();
+    std::for_each(key_puyos.rbegin(), key_puyos.rend(), adder);
+    std::for_each(fire_puyos.rbegin(), fire_puyos.rend(), adder);
     grade = std::max(grade, i->rensaResult.chains * 10 - sum * 3
         - std::max(field.height(2) - field.height(1) - 2, 0) * 3
         - std::max(field.height(3) - field.height(2) - 2, 0) * 3
