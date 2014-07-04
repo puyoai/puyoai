@@ -6,6 +6,7 @@
 #include <memory>
 #include <set>
 #include <sstream>
+
 #include <glog/logging.h>
 
 #include "core/algorithm/plan.h"
@@ -14,6 +15,7 @@
 #include "core/algorithm/rensa_detector.h"
 #include "core/constant.h"
 #include "core/decision.h"
+#include "core/position.h"
 #include "core/field/core_field.h"
 #include "core/field/field_bit_field.h"
 #include "core/field/rensa_result.h"
@@ -380,39 +382,64 @@ void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& /*plan*/,
 template<typename ScoreCollector>
 void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const RensaTrackResult& trackResult)
 {
-    // -----
-    int distanceCountResult[5] = { 0, 0, 0, 0, 0 };
-
-    // 1 連鎖の部分を距離 1 とし、距離 4 までを求める。
-    // 距離 2, 3, 4 の数を数え、その広がり具合により、手の広さを求めることができる。
-    int distance[CoreField::MAP_WIDTH][CoreField::MAP_HEIGHT];
-    for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
-        for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
-            if (trackResult.erasedAt(x, y) == 1)
-                distance[x][y] = 1;
-            else
-                distance[x][y] = 0;
-        }
-    }
-
-    // TODO(mayah): Why O(HWD)? Why not writing O(HW)?
     const CoreField& field = plan.field();
-    for (int d = 2; d <= 4; ++d) {
-        for (int x = 1; x <= CoreField::WIDTH; ++x) {
-            for (int y = 1; y <= CoreField::HEIGHT; ++y) {
-                if (field.color(x, y) != EMPTY || distance[x][y] > 0)
-                    continue;
-                if (distance[x][y-1] == d - 1 || distance[x][y+1] == d - 1 || distance[x-1][y] == d - 1 || distance[x+1][y] == d - 1) {
-                    distance[x][y] = d;
-                    ++distanceCountResult[d];
-                }
+
+    int distanceCount[5] = { 0, 0, 0, 0, 0 };
+    int distance[CoreField::MAP_WIDTH][CoreField::MAP_HEIGHT] {};
+
+    // TODO(mayah): Using std::queue is 2x slower here.
+    Position q[CoreField::MAP_WIDTH * CoreField::MAP_HEIGHT];
+    Position* qHead = q;
+    Position* qTail = q;
+
+    for (int x = 1; x <= CoreField::WIDTH; ++x) {
+        for (int y = 1; y <= CoreField::HEIGHT; ++y) {
+            if (trackResult.erasedAt(x, y) == 1) {
+                distanceCount[1]++;
+                distance[x][y] = 1;
+                *qTail++ = Position(x, y);
             }
         }
     }
 
-    sc->addScore(HAND_WIDTH_2, distanceCountResult[2] > 10 ? 10 : distanceCountResult[2], 1);
-    sc->addScore(HAND_WIDTH_3, distanceCountResult[3] > 10 ? 10 : distanceCountResult[3], 1);
-    sc->addScore(HAND_WIDTH_4, distanceCountResult[4] > 10 ? 10 : distanceCountResult[4], 1);
+    while (qHead != qTail) {
+        int x = qHead->x;
+        int y = qHead->y;
+        qHead++;
+
+        if (!isNormalColor(field.color(x, y)))
+            continue;
+
+        if (distance[x][y] > 4)
+            continue;
+
+        int d = distance[x][y] + 1;
+
+        if (distance[x + 1][y] == 0 && isNormalColor(field.color(x + 1, y))) {
+            distance[x + 1][y] = d;
+            distanceCount[d]++;
+            *qTail++ = Position(x + 1, y);
+        }
+        if (distance[x - 1][y] == 0 && isNormalColor(field.color(x - 1, y))) {
+            distance[x - 1][y] = d;
+            distanceCount[d]++;
+            *qTail++ = Position(x - 1, y);
+        }
+        if (distance[x][y + 1] == 0 && isNormalColor(field.color(x, y + 1))) {
+            distance[x][y + 1] = d;
+            distanceCount[d]++;
+            *qTail++ = Position(x, y + 1);
+        }
+        if (distance[x][y - 1] == 0 && isNormalColor(field.color(x, y - 1))) {
+            distance[x][y - 1] = d;
+            distanceCount[d]++;
+            *qTail++ = Position(x, y - 1);
+        }
+    }
+
+    sc->addScore(HAND_WIDTH_2, distanceCount[2] > 10 ? 10 : distanceCount[2], 1);
+    sc->addScore(HAND_WIDTH_3, distanceCount[3] > 10 ? 10 : distanceCount[3], 1);
+    sc->addScore(HAND_WIDTH_4, distanceCount[4] > 10 ? 10 : distanceCount[4], 1);
 }
 
 template<typename ScoreCollector>
