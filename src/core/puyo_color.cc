@@ -10,8 +10,10 @@ PuyoColor toPuyoColor(char c)
         return PuyoColor::EMPTY;
     case '1':
     case 'O': // not zero but Oh
+    case '@':
         return PuyoColor::OJAMA;
     case '2':
+    case '#':
         return PuyoColor::WALL;
     case '4':
     case 'R':
@@ -72,4 +74,3 @@ std::string toString(PuyoColor c)
 
     return "";
 }
-
