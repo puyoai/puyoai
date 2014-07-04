@@ -3,6 +3,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <sstream>
+#include <functional>
 
 #include "core/algorithm/plan.h"
 #include "core/field/core_field.h"
@@ -11,6 +12,26 @@
 
 namespace peria {
 
+namespace {
+
+void Evaluate(const int threshold, Decision* best, int* score,
+              const RefPlan& plan) {
+  if (*score > threshold)
+    return;
+
+  int s = 0;
+  if (plan.isRensaPlan()) {
+    s = plan.rensaResult().score;
+  }
+            
+  if (*score < s) {
+    *score = s;
+    *best = plan.decisions().front();
+  }
+}
+
+}  // namespace
+
 Ai::Ai(): ::AI("peria") {}
 
 Ai::~Ai() {}
@@ -18,6 +39,7 @@ Ai::~Ai() {}
 DropDecision Ai::think(int frame_id,
 		       const PlainField& field,
 		       const KumipuyoSeq& seq) {
+  using namespace std::placeholders;
   UNUSED_VARIABLE(frame_id);
 
   LOG(INFO) << CoreField(field).toDebugString() << seq.toString();
@@ -25,22 +47,6 @@ DropDecision Ai::think(int frame_id,
 
   Decision best;
   int score = -1;
-  Plan::iterateAvailablePlans(CoreField(field), seq, 2,
-      [&best, &score](const RefPlan& plan) {
-        if (score > 70 * 5 * 12)
-          return;
-
-        int s = 0;
-        if (plan.isRensaPlan()) {
-          s = plan.rensaResult().score;
-        }
-            
-        if (score < s) {
-          score = s;
-          best = plan.decisions().front();
-        }
-      });
-
 
   int depth = seq.size();
   KumipuyoSeq seq2(seq);
@@ -49,23 +55,14 @@ DropDecision Ai::think(int frame_id,
     seq2.setAxis(depth, static_cast<PuyoColor>(i));
     for (uint8_t j = RED; j <= GREEN; ++j) {
       seq2.setChild(depth, static_cast<PuyoColor>(j));
-  Plan::iterateAvailablePlans(CoreField(field), seq2, depth + 1,
-      [&best, &score](const RefPlan& plan) {
-        if (score > 70 * 5 * 12)
-          return;
-
-        int s = 0;
-        if (plan.isRensaPlan()) {
-          s = plan.rensaResult().score;
-        }
-            
-        if (score < s) {
-          score = s;
-          best = plan.decisions().front();
-        }
-      });
+      Plan::iterateAvailablePlans(CoreField(field), seq2, depth + 1,
+          std::bind(Evaluate, 70 * 6 * 10, &best, &score, _1));
     }
   }
+
+  Plan::iterateAvailablePlans(CoreField(field), seq, 2,
+      std::bind(Evaluate, 70 * 6 * 5, &best, &score, _1));
+
   message << "X-R:" << best.x << "-" << best.r
           << "_SCORE:" << score << "   ";
 
