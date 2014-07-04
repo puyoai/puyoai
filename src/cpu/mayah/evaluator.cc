@@ -347,10 +347,8 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
 
 template<typename ScoreCollector>
 void evalRensaStrategy(ScoreCollector* sc, const RefPlan& plan,
-                       const TrackedPossibleRensaInfo& info,
                        int currentFrameId, const Gazer& gazer)
 {
-    UNUSED_VARIABLE(info);
     UNUSED_VARIABLE(currentFrameId);
 
 #if 0
@@ -366,16 +364,21 @@ void evalRensaStrategy(ScoreCollector* sc, const RefPlan& plan,
 }
 
 template<typename ScoreCollector>
-void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& /*plan*/, const TrackedPossibleRensaInfo& info)
+void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& /*plan*/,
+                           const RensaResult& rensaResult,
+                           const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
 {
-    int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, info.necessaryPuyoSet.toPuyoSet());
+    PuyoSet puyoSet;
+    puyoSet.add(keyPuyos);
+    puyoSet.add(firePuyos);
 
-    sc->addScore(MAX_CHAINS, info.rensaResult.chains, 1);
+    int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, puyoSet);
+    sc->addScore(MAX_CHAINS, rensaResult.chains, 1);
     sc->addScore(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
 }
 
 template<typename ScoreCollector>
-void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const TrackedPossibleRensaInfo& info)
+void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const RensaTrackResult& trackResult)
 {
     // -----
     int distanceCountResult[5] = { 0, 0, 0, 0, 0 };
@@ -385,7 +388,7 @@ void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const Tr
     int distance[CoreField::MAP_WIDTH][CoreField::MAP_HEIGHT];
     for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
         for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
-            if (info.trackResult.erasedAt(x, y) == 1)
+            if (trackResult.erasedAt(x, y) == 1)
                 distance[x][y] = 1;
             else
                 distance[x][y] = 0;
@@ -413,13 +416,13 @@ void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const Tr
 }
 
 template<typename ScoreCollector>
-void evalRensaIgnitionHeightFeature(ScoreCollector* sc, const RefPlan& plan, const TrackedPossibleRensaInfo& info)
+void evalRensaIgnitionHeightFeature(ScoreCollector* sc, const RefPlan& plan, const RensaTrackResult& trackResult)
 {
     for (int y = CoreField::HEIGHT; y >= 1; --y) {
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
             if (!isNormalColor(plan.field().color(x, y)))
                 continue;
-            if (info.trackResult.erasedAt(x, y) == 1) {
+            if (trackResult.erasedAt(x, y) == 1) {
                 sc->addScore(IGNITION_HEIGHT, y, 1);
                 return;
             }
@@ -474,17 +477,15 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
         evalFieldUShape(sc, plan);
     evalUnreachableSpace(sc, plan);
 
-    vector<TrackedPossibleRensaInfo> rensaInfos =
-        RensaDetector::findPossibleRensasWithTracking(plan.field(), numKeyPuyos);
-
     double maxRensaScore = 0;
     unique_ptr<ScoreCollector> maxRensaScoreCollector;
-    for (size_t i = 0; i < rensaInfos.size(); ++i) {
-        const auto& rensaInfo = rensaInfos[i];
+    auto callback = [&](const RensaResult& rensaResult,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult& trackResult) {
         CoreField fieldAfterRensa(plan.field());
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
             for (int y = 1; y <= 13; ++y) { // TODO: 13?
-                if (rensaInfo.trackResult.erasedAt(x, y) != 0)
+                if (trackResult.erasedAt(x, y) != 0)
                     fieldAfterRensa.unsafeSet(x, y, EMPTY);
             }
             fieldAfterRensa.recalcHeightOn(x);
@@ -494,20 +495,24 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
         fieldAfterDrop.forceDrop();
 
         unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc->featureParameter()));
-        evalRensaChainFeature(rensaScoreCollector.get(), plan, rensaInfo);
+        evalRensaChainFeature(rensaScoreCollector.get(), plan, rensaResult, keyPuyos, firePuyos);
         evalRensaGarbageFeature(rensaScoreCollector.get(), plan, fieldAfterDrop);
         if (USE_HAND_WIDTH_FEATURE)
-            evalRensaHandWidthFeature(rensaScoreCollector.get(), plan, rensaInfo);
+            evalRensaHandWidthFeature(rensaScoreCollector.get(), plan, trackResult);
         if (USE_IGNITION_HEIGHT_FEATURE)
-            evalRensaIgnitionHeightFeature(rensaScoreCollector.get(), plan, rensaInfo);
+            evalRensaIgnitionHeightFeature(rensaScoreCollector.get(), plan, trackResult);
         if (USE_CONNECTION_FEATURE)
             evalRensaConnectionFeature(rensaScoreCollector.get(), plan, fieldAfterDrop);
-        evalRensaStrategy(rensaScoreCollector.get(), plan, rensaInfo, currentFrameId, gazer);
+        evalRensaStrategy(rensaScoreCollector.get(), plan, currentFrameId, gazer);
+
         if (rensaScoreCollector->score() > maxRensaScore) {
             maxRensaScore = rensaScoreCollector->score();
             maxRensaScoreCollector = move(rensaScoreCollector);
         }
-    }
+    };
+
+
+    RensaDetector::iteratePossibleRensasWithTracking(plan.field(), numKeyPuyos, callback);
 
     if (maxRensaScoreCollector.get())
         sc->merge(*maxRensaScoreCollector);

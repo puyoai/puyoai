@@ -102,7 +102,9 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         if (it->rensaResult.score < 70)
             continue;
 
-        PuyoSet puyoSet(it->necessaryPuyoSet.toPuyoSet());
+        PuyoSet puyoSet;
+        puyoSet.add(it->keyPuyos);
+        puyoSet.add(it->firePuyos);
         puyoSet.sub(kumipuyoSet);
 
         // 見えているツモに加えて、さらに k ツモぐらい引くと 20% ぐらいの確率で引ける。

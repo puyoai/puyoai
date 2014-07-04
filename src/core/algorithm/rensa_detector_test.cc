@@ -11,7 +11,10 @@ struct ContainsResult {
     bool operator()(const PossibleRensaInfo& info) const {
         CoreField s(f);
 
-        for (const auto& p : info.necessaryPuyoSet.list()) {
+        for (const auto& p : info.keyPuyos.list()) {
+            s.dropPuyoOn(get<0>(p), get<1>(p));
+        }
+        for (const auto& p : info.firePuyos.list()) {
             s.dropPuyoOn(get<0>(p), get<1>(p));
         }
 
@@ -53,6 +56,36 @@ TEST(RensaDetectorTest, FindPossibleRensasWithKeyPuyo)
 
     vector<PossibleRensaInfo> result = RensaDetector::findPossibleRensas(f, 3);
     EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsResult(f, g)));
+}
+
+TEST(RensaDetectorTest, iteratePossibleRensas)
+{
+    CoreField f("450000"
+                "445000"
+                "556000");
+
+    bool found = false;
+    auto callback = [&found](const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+        found |= (rensaResult.chains == 3);
+    };
+
+    RensaDetector::iteratePossibleRensas(f, 3, callback);
+    EXPECT_TRUE(found);
+}
+
+TEST(RensaDetectorTest, iteratePossibleRensasWithTracking)
+{
+    CoreField f("450000"
+                "445000"
+                "556000");
+
+    bool found = false;
+    auto callback = [&found](const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+        found |= (rensaResult.chains == 3);
+    };
+
+    RensaDetector::iteratePossibleRensas(f, 3, callback);
+    EXPECT_TRUE(found);
 }
 
 TEST(RensaDetectorTest, FindPossibleRensasFloat) {

@@ -13,104 +13,13 @@
 
 using namespace std;
 
-std::vector<FeasibleRensaInfo>
-RensaDetector::findFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
-{
-    std::vector<FeasibleRensaInfo> result;
-    Plan::iterateAvailablePlans(field, kumipuyoSeq, kumipuyoSeq.size(), [&result](const RefPlan& plan) {
-        if (plan.isRensaPlan())
-            result.emplace_back(plan.rensaResult(), plan.initiatingFrames());
-    });
+namespace {
 
-    return result;
-}
+typedef std::function<void (CoreField*, const CoreField&, int, PuyoColor, int)> SimulationCallback;
 
-static inline void simulateInternal(CoreField* f, const CoreField& original, PossibleRensaInfo* info)
-{
-    int minHeights[CoreField::MAP_WIDTH] {
-        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
-        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
-    };
-    info->rensaResult = f->simulateWithMinHeights(minHeights);
-}
+};
 
-static inline void simulateInternal(CoreField* f, const CoreField& original, TrackedPossibleRensaInfo* info)
-{
-    int minHeights[CoreField::MAP_WIDTH] {
-        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
-        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
-    };
-    info->rensaResult = f->simulateAndTrackWithMinHeights(&info->trackResult, minHeights);
-}
-
-template<typename T>
-static void findPossibleRensasInternal(const CoreField& field,
-                                       const ColumnPuyoList& addedPuyos,
-                                       int leftX,
-                                       int restAdded,
-                                       RensaDetector::Mode mode,
-                                       std::vector<T>* result)
-{
-    RensaDetector::findRensas(field, mode,
-                              [result, addedPuyos](CoreField* f, const CoreField& originalField, int x, PuyoColor c, int n) {
-            // Making T info is a bit heavy. So, we make directly in vector, and use its instance.
-            // This improves performance much.
-            result->emplace_back();
-            T& info = result->back();
-            simulateInternal(f, originalField, &info);
-            info.necessaryPuyoSet = addedPuyos;
-            for (int i = 0; i < n; ++i)
-                info.necessaryPuyoSet.addPuyo(x, c);
-    });
-
-    if (restAdded <= 0)
-        return;
-
-    CoreField f(field);
-    ColumnPuyoList puyoList(addedPuyos);
-
-    for (int x = leftX; x <= CoreField::WIDTH; ++x) {
-        if (f.height(x) >= 13)
-            continue;
-
-        for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
-            PuyoColor c = normalPuyoColorOf(i);
-
-            f.dropPuyoOn(x, c);
-            puyoList.addPuyo(x, c);
-
-            if (f.countConnectedPuyos(x, f.height(x)) < 4)
-                findPossibleRensasInternal(f, puyoList, x, restAdded - 1, mode, result);
-
-            f.removeTopPuyoFrom(x);
-            puyoList.removeLastAddedPuyo();
-        }
-    }
-}
-
-std::vector<PossibleRensaInfo>
-RensaDetector::findPossibleRensas(const CoreField& field, int maxKeyPuyos, Mode mode)
-{
-    std::vector<PossibleRensaInfo> result;
-    result.reserve(100000);
-
-    ColumnPuyoList puyoList;
-    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, mode, &result);
-    return result;
-}
-
-std::vector<TrackedPossibleRensaInfo>
-RensaDetector::findPossibleRensasWithTracking(const CoreField& field, int maxKeyPuyos, Mode mode)
-{
-    std::vector<TrackedPossibleRensaInfo> result;
-    result.reserve(100000);
-
-    ColumnPuyoList puyoList;
-    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, mode, &result);
-    return result;
-}
-
-static inline void tryDropFire(const CoreField& originalField, RensaDetector::SimulationCallback callback)
+static inline void tryDropFire(const CoreField& originalField, SimulationCallback callback)
 {
     bool visited[CoreField::MAP_WIDTH][NUM_PUYO_COLORS] {};
 
@@ -154,7 +63,7 @@ static inline void tryDropFire(const CoreField& originalField, RensaDetector::Si
     }
 }
 
-static inline void tryFloatFire(const CoreField& originalField, RensaDetector::SimulationCallback callback)
+static inline void tryFloatFire(const CoreField& originalField, SimulationCallback callback)
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = originalField.height(x); y >= 1; --y) {
@@ -216,16 +125,145 @@ static inline void tryFloatFire(const CoreField& originalField, RensaDetector::S
     }
 }
 
-void RensaDetector::findRensas(const CoreField& field, RensaDetector::Mode mode, RensaDetector::SimulationCallback callback)
+void findRensas(const CoreField& field, RensaDetector::Mode mode, SimulationCallback callback)
 {
     switch (mode) {
-    case Mode::DROP:
+    case RensaDetector::Mode::DROP:
         tryDropFire(field, callback);
         break;
-    case Mode::FLOAT:
+    case RensaDetector::Mode::FLOAT:
         tryFloatFire(field, callback);
         break;
     default:
         CHECK(false) << "Unknown mode : " << static_cast<int>(mode);
     }
+}
+
+
+std::vector<FeasibleRensaInfo>
+RensaDetector::findFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
+{
+    std::vector<FeasibleRensaInfo> result;
+    Plan::iterateAvailablePlans(field, kumipuyoSeq, kumipuyoSeq.size(), [&result](const RefPlan& plan) {
+        if (plan.isRensaPlan())
+            result.emplace_back(plan.rensaResult(), plan.initiatingFrames());
+    });
+
+    return result;
+}
+
+static inline void simulateInternal(CoreField* f, const CoreField& original,
+                                    const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                                    RensaDetector::PossibleRensaCallback callback)
+{
+    int minHeights[CoreField::MAP_WIDTH] {
+        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
+        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
+    };
+
+    RensaResult rensaResult = f->simulateWithMinHeights(minHeights);
+    callback(rensaResult, keyPuyos, firePuyos);
+}
+
+static inline void simulateInternal(CoreField* f, const CoreField& original,
+                                    const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                                    RensaDetector::TrackedPossibleRensaCallback callback)
+{
+    int minHeights[CoreField::MAP_WIDTH] {
+        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
+        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
+    };
+
+    RensaTrackResult rensaTrackResult;
+    RensaResult rensaResult = f->simulateAndTrackWithMinHeights(&rensaTrackResult, minHeights);
+    callback(rensaResult, keyPuyos, firePuyos, rensaTrackResult);
+}
+
+template<typename Callback>
+static void findPossibleRensasInternal(const CoreField& field,
+                                       const ColumnPuyoList& keyPuyos,
+                                       int leftX,
+                                       int restAdded,
+                                       RensaDetector::Mode mode,
+                                       Callback callback)
+{
+    auto findRensaCallback = [keyPuyos, &callback](CoreField* f, const CoreField& originalField, int x, PuyoColor c, int n) {
+        ColumnPuyoList firePuyos;
+        for (int i = 0; i < n; ++i)
+            firePuyos.addPuyo(x, c);
+        simulateInternal(f, originalField, keyPuyos, firePuyos, callback);
+    };
+
+    findRensas(field, mode, findRensaCallback);
+
+    if (restAdded <= 0)
+        return;
+
+    CoreField f(field);
+    ColumnPuyoList puyoList(keyPuyos);
+
+    for (int x = leftX; x <= CoreField::WIDTH; ++x) {
+        if (f.height(x) >= 13)
+            continue;
+
+        for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
+            PuyoColor c = normalPuyoColorOf(i);
+
+            f.dropPuyoOn(x, c);
+            puyoList.addPuyo(x, c);
+
+            if (f.countConnectedPuyos(x, f.height(x)) < 4)
+                findPossibleRensasInternal(f, puyoList, x, restAdded - 1, mode, callback);
+
+            f.removeTopPuyoFrom(x);
+            puyoList.removeLastAddedPuyo();
+        }
+    }
+}
+
+std::vector<PossibleRensaInfo>
+RensaDetector::findPossibleRensas(const CoreField& field, int maxKeyPuyos, Mode mode)
+{
+    std::vector<PossibleRensaInfo> result;
+    result.reserve(100000);
+
+    auto callback = [&result](const RensaResult& rensaResult,
+                              const ColumnPuyoList& keyPuyos,
+                              const ColumnPuyoList& firePuyos) {
+        result.emplace_back(rensaResult, keyPuyos, firePuyos);
+    };
+
+    ColumnPuyoList puyoList;
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, mode, callback);
+    return result;
+}
+
+std::vector<TrackedPossibleRensaInfo>
+RensaDetector::findPossibleRensasWithTracking(const CoreField& field, int maxKeyPuyos, Mode mode)
+{
+    std::vector<TrackedPossibleRensaInfo> result;
+    result.reserve(100000);
+
+    auto callback = [&result](const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos,
+                              const ColumnPuyoList& firePuyos, const RensaTrackResult& rensaTrackResult) {
+        result.emplace_back(rensaResult, keyPuyos, firePuyos, rensaTrackResult);
+    };
+
+    ColumnPuyoList puyoList;
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, mode, callback);
+    return result;
+}
+
+void RensaDetector::iteratePossibleRensas(const CoreField& field, int maxKeyPuyos,
+                                          RensaDetector::PossibleRensaCallback callback, RensaDetector::Mode mode)
+{
+    ColumnPuyoList puyoList;
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos,mode, callback);
+}
+
+void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& field, int maxKeyPuyos,
+                                                      RensaDetector::TrackedPossibleRensaCallback callback, RensaDetector::Mode mode)
+{
+    ColumnPuyoList puyoList;
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, mode, callback);
 }
