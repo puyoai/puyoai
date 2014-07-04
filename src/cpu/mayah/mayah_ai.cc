@@ -42,9 +42,9 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
 {
     CoreField f(plainField);
     double beginTime = now();
-    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, false);
+    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_KEY_PUYOS);
     double endTime = now();
-    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, false, plan, endTime - beginTime);
+    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_NUM_KEY_PUYOS, plan, endTime - beginTime);
     if (plan.decisions().empty())
         return DropDecision(Decision(3, 0), message);
     return DropDecision(plan.decisions().front(), message);
@@ -54,15 +54,15 @@ DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const
 {
     CoreField f(plainField);
     double beginTime = now();
-    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, true);
+    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_DEPTH, MayahAI::FAST_NUM_KEY_PUYOS);
     double endTime = now();
-    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, true, plan, endTime - beginTime);
+    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::FAST_NUM_KEY_PUYOS, plan, endTime - beginTime);
     if (plan.decisions().empty())
         return DropDecision(Decision(3, 0), message);
     return DropDecision(plan.decisions().front(), message);
 }
 
-Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, bool fast) const
+Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int depth, int numKeyPuyos) const
 {
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
 
@@ -70,16 +70,16 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
     int currentMaxRensa = 0;
     {
         RefPlan refPlan(field, vector<Decision>(), RensaResult(), 0, 0);
-        CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
+        CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, numKeyPuyos, gazer_);
         currentMaxRensa = cf.feature(MAX_CHAINS).empty() ? 0 : cf.feature(MAX_CHAINS).front();
     }
 #endif
 
     double bestScore = -100000000.0;
     Plan bestPlan;
-    Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
-                                [this, frameId, fast, &field, &bestScore, &bestPlan](const RefPlan& plan) {
-        double score = Evaluator(*featureParameter_).eval(plan, field, frameId, fast, gazer_);
+    Plan::iterateAvailablePlans(field, kumipuyoSeq, depth,
+                                [this, frameId, numKeyPuyos, &field, &bestScore, &bestPlan](const RefPlan& plan) {
+        double score = Evaluator(*featureParameter_).eval(plan, field, frameId, numKeyPuyos, gazer_);
         if (bestScore < score) {
             bestScore = score;
             bestPlan = plan.toPlan();
@@ -89,7 +89,7 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
     return bestPlan;
 }
 
-std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, bool fast,
+std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int numKeyPuyos,
                                      const Plan& plan, double thoughtTimeInSeconds) const
 {
     UNUSED_VARIABLE(kumipuyoSeq);
@@ -98,7 +98,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
         return string("give up :-(");
 
     RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.initiatingFrames());
-    CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
+    CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, numKeyPuyos, gazer_);
 
     stringstream ss;
     if (cf.feature(STRATEGY_ZENKESHI) > 0)

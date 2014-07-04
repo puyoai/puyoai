@@ -31,17 +31,17 @@ public:
     using MayahAI::think;
     using MayahAI::enemyNext2Appeared;
 
-    CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, bool fast, const Plan& plan) const
+    CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, int numKeyPuyos, const Plan& plan) const
     {
         RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.initiatingFrames());
-        return Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, fast, gazer_);
+        return Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, numKeyPuyos, gazer_);
     }
 
     Plan thinkPlanOnly(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
-                       const vector<Decision>& decisions) const
+                       int depth, const vector<Decision>& decisions) const
     {
         Plan result;
-        Plan::iterateAvailablePlans(field, kumipuyoSeq, 2,
+        Plan::iterateAvailablePlans(field, kumipuyoSeq, depth,
                                     [this, frameId, &field, &decisions, &result](const RefPlan& plan) {
             if (plan.decisions() != decisions)
                 return;
@@ -110,7 +110,8 @@ int main(int argc, char* argv[])
         FieldPrettyPrinter::print(field, seq.subsequence(i, 2));
 
         double t1 = now();
-        Plan plan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false);
+        Plan plan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
+                                 MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_KEY_PUYOS);
         double t2 = now();
         if (plan.decisions().empty())
             cout << "No decision";
@@ -118,7 +119,8 @@ int main(int argc, char* argv[])
             cout << plan.decision(0).toString() << "-" << plan.decision(1).toString();
         cout << " time = " << ((t2 - t1) * 1000) << " [ms]" << endl;
 
-        Plan aiPlan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, false);
+        Plan aiPlan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
+                                   MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_KEY_PUYOS);
 
         // Waits for user enter.
         while (true) {
@@ -129,7 +131,7 @@ int main(int argc, char* argv[])
             if (str == "")
                 break;
             if (str == "s") {
-                CollectedFeature cf = ai.makeCollectedFeature(frameId, field, false, aiPlan);
+                CollectedFeature cf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_KEY_PUYOS, aiPlan);
                 cout << cf.toString() << endl;
                 continue;
             }
@@ -140,10 +142,11 @@ int main(int argc, char* argv[])
                     Decision(x1, r1),
                     Decision(x2, r2)
                 };
-                Plan plan = ai.thinkPlanOnly(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) }, decisions);
+                Plan plan = ai.thinkPlanOnly(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
+                                             MayahAI::DEFAULT_DEPTH, decisions);
 
-                CollectedFeature mycf = ai.makeCollectedFeature(frameId, field, false, plan);
-                CollectedFeature aicf = ai.makeCollectedFeature(frameId, field, false, aiPlan);
+                CollectedFeature mycf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_KEY_PUYOS, plan);
+                CollectedFeature aicf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_KEY_PUYOS, aiPlan);
                 cout << mycf.toStringComparingWith(aicf) << endl;
             }
         }

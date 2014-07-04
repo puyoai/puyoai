@@ -58,14 +58,12 @@ private:
 
 class Evaluator {
 public:
-    static const int NUM_KEY_PUYOS = 1;
-
     Evaluator(const FeatureParameter& param) : param_(param) {}
 
-    double eval(const RefPlan&, const CoreField& currentField, int currentFrameId, bool fast, const Gazer&);
+    double eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int numKeyPuyos, const Gazer&);
 
     // Same as eval(), but returns CollectedFeature.
-    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, bool fast, const Gazer&);
+    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int numKeyPuyos, const Gazer&);
 
 private:
     const FeatureParameter& param_;
