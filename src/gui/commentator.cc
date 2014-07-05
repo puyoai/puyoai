@@ -222,19 +222,22 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
 
     // 3. Check Main chain
     {
-        vector<TrackedPossibleRensaInfo> rs = RensaDetector::findPossibleRensasWithTracking(field, 3);
-        const TrackedPossibleRensaInfo* bestRensa = nullptr;
-        int maxScore = 0;
-        for (const auto& r : rs) {
-            if (maxScore < r.rensaResult.score) {
-                maxScore = r.rensaResult.score;
-                bestRensa = &r;
+        int bestScore = 0;
+        unique_ptr<TrackedPossibleRensaInfo> bestRensa;
+        auto callback = [&](const CoreField&, const RensaResult& rensaResult,
+                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                            const RensaTrackResult& trackResult) {
+            if (bestScore < rensaResult.score) {
+                bestScore = rensaResult.score;
+                bestRensa.reset(new TrackedPossibleRensaInfo(rensaResult, keyPuyos, firePuyos, trackResult));
             }
-        }
+        };
+
+        RensaDetector::iteratePossibleRensasWithTracking(field, 3, callback, RensaDetector::Mode::FLOAT);
 
         if (bestRensa != nullptr) {
             lock_guard<mutex> lock(mu_);
-            fireableMainChain_[pi].reset(new TrackedPossibleRensaInfo(*bestRensa));
+            fireableMainChain_[pi] = move(bestRensa);
         }
     }
 }
