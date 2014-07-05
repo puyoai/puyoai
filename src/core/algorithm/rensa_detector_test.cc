@@ -7,11 +7,11 @@ using namespace std;
 
 static void dropKeyAndFirePuyos(CoreField* f, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
 {
-    for (const auto& p : keyPuyos.list()) {
-        f->dropPuyoOn(get<0>(p), get<1>(p));
+    for (const auto& p : keyPuyos) {
+        f->dropPuyoOn(p.x, p.color);
     }
-    for (const auto& p : firePuyos.list()) {
-        f->dropPuyoOn(get<0>(p), get<1>(p));
+    for (const auto& p : firePuyos) {
+        f->dropPuyoOn(p.x, p.color);
     }
 }
 

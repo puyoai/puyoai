@@ -7,8 +7,8 @@ using namespace std;
 string ColumnPuyoList::toString() const
 {
     ostringstream oss;
-    for (auto p : puyo_) {
-        oss << '(' << get<0>(p) << ',' << toChar(get<1>(p)) << ')';
+    for (const auto& p : puyos_) {
+        oss << '(' << p.x << ',' << p.color << ')';
     }
 
     return oss.str();
@@ -17,8 +17,8 @@ string ColumnPuyoList::toString() const
 PuyoSet ColumnPuyoList::toPuyoSet() const
 {
     PuyoSet puyoSet;
-    for (const auto& p : list()) {
-        puyoSet.add(get<1>(p));
+    for (const auto& p : puyos_) {
+        puyoSet.add(p.color);
     }
 
     return puyoSet;
