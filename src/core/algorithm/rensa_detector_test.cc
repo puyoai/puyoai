@@ -39,7 +39,7 @@ static void dropKeyAndFirePuyos(CoreField* f, const ColumnPuyoList& keyPuyos, co
     }
 }
 
-TEST(RensaDetectorTest, FindPossibleRensaTest)
+TEST(RensaDetectorTest, iteratePossibleRensa)
 {
     CoreField f(" BRR  "
                 " RBR  "
@@ -57,6 +57,8 @@ TEST(RensaDetectorTest, FindPossibleRensaTest)
     bool found2 = false;
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+        UNUSED_VARIABLE(fieldAfterRensa);
+        UNUSED_VARIABLE(rensaResult);
         CoreField actual(f);
         dropKeyAndFirePuyos(&actual, keyPuyos, firePuyos);
         if (actual == expected1)
@@ -70,7 +72,7 @@ TEST(RensaDetectorTest, FindPossibleRensaTest)
     EXPECT_TRUE(found2);
 }
 
-TEST(RensaDetectorTest, FindPossibleRensasWithKeyPuyo)
+TEST(RensaDetectorTest, iteratePossibleRensaWithKeyPuyos)
 {
     CoreField f("RB    "
                 "RRB   "
@@ -98,6 +100,8 @@ TEST(RensaDetectorTest, FindPossibleRensasWithKeyPuyo)
     bool found[4] {};
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+        UNUSED_VARIABLE(fieldAfterRensa);
+        UNUSED_VARIABLE(rensaResult);
         CoreField actual(f);
         dropKeyAndFirePuyos(&actual, keyPuyos, firePuyos);
         for (int i = 0; i < 4; ++i) {
@@ -116,64 +120,40 @@ TEST(RensaDetectorTest, FindPossibleRensasWithKeyPuyo)
     EXPECT_TRUE(found[3]);
 }
 
-TEST(RensaDetectorTest, iteratePossibleRensas)
+TEST(RensaDetectorTest, iteratePossibleRensasFloat)
 {
-    CoreField f("450000"
-                "445000"
-                "556000");
+    CoreField f("y     "
+                "b     "
+                "r     "
+                "b     "
+                "b     "
+                "b     "
+                "y     "
+                "y     "
+                "y     ");
+
+    CoreField g("y     "
+                "b     "
+                "rr    "
+                "br    "
+                "br    "
+                "bO    "
+                "yO    "
+                "yO    "
+                "yO    ");
+
+    auto expected = g.simulate();
 
     bool found = false;
-    auto callback = [&found](const CoreField& coreField, const RensaResult& rensaResult,
-                             const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
-        found |= (rensaResult.chains == 3);
-    };
-
-    RensaDetector::iteratePossibleRensas(f, 3, callback);
-    EXPECT_TRUE(found);
-}
-
-TEST(RensaDetectorTest, iteratePossibleRensasWithTracking)
-{
-    CoreField f("450000"
-                "445000"
-                "556000");
-
-    bool found = false;
-    auto callback = [&found](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
-                             const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
         UNUSED_VARIABLE(fieldAfterRensa);
         UNUSED_VARIABLE(keyPuyos);
         UNUSED_VARIABLE(firePuyos);
-        found |= (rensaResult.chains == 3);
+        if (rensaResult == expected)
+            found = true;
     };
 
-    RensaDetector::iteratePossibleRensas(f, 3, callback);
+    RensaDetector::iteratePossibleRensas(f, 0, callback, RensaDetector::Mode::FLOAT);
     EXPECT_TRUE(found);
-}
-
-TEST(RensaDetectorTest, FindPossibleRensasFloat) {
-  CoreField f("y     "
-              "b     "
-              "r     "
-              "b     "
-              "b     "
-              "b     "
-              "y     "
-              "y     "
-              "y     ");
-
-  CoreField g("y     "
-              "b     "
-              "rr    "
-              "br    "
-              "br    "
-              "bO    "
-              "yO    "
-              "yO    "
-              "yO    ");
-
-  auto expected = g.simulate();
-  vector<PossibleRensaInfo> results = RensaDetector::findPossibleRensas(f, 0, RensaDetector::Mode::FLOAT);
-  EXPECT_TRUE(std::count_if(results.begin(), results.end(), [&](PossibleRensaInfo result) {
-      return result.rensaResult == expected;}));
 }
