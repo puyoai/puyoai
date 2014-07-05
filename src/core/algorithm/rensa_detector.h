@@ -20,10 +20,6 @@ public:
     // Finds rensa using |kumipuyos|.
     static std::vector<FeasibleRensaInfo> findFeasibleRensas(const CoreField&, const KumipuyoSeq&);
 
-    // Same as findPossibleRensas. However, we return tracking info also.
-    static std::vector<TrackedPossibleRensaInfo> findPossibleRensasWithTracking(
-        const CoreField&, int maxKeyPuyos = 0, Mode mode = Mode::DROP) DEPRECATED;
-
     typedef std::function<void (const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&)> PossibleRensaCallback;
     typedef std::function<void (const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&,
                                 const RensaTrackResult&)> TrackedPossibleRensaCallback;

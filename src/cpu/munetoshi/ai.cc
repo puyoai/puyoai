@@ -67,21 +67,20 @@ int munetoshi::AI::evaluate(const CoreField& field) {
   int grade = -1;
   int sum;
   auto adder = [&](std::tuple<int, PuyoColor> t) { sum += std::get<0>(t); };
-  std::vector<TrackedPossibleRensaInfo> rensa_info_vect =
-      RensaDetector::findPossibleRensasWithTracking(field, 1, RensaDetector::Mode::FLOAT);
-  for (auto i = rensa_info_vect.begin(); i != rensa_info_vect.end(); ++i) {
+  auto callback = [&](const CoreField&, const RensaResult& rensa_result,
+                      const ColumnPuyoList& key_puyos, const ColumnPuyoList& fire_puyos,
+                      const RensaTrackResult&) {
     sum = 0;
-    auto key_puyos = i->keyPuyos.list();
-    auto fire_puyos = i->firePuyos.list();
-    std::for_each(key_puyos.rbegin(), key_puyos.rend(), adder);
-    std::for_each(fire_puyos.rbegin(), fire_puyos.rend(), adder);
-    grade = std::max(grade, i->rensaResult.chains * 10 - sum * 3
+    std::for_each(key_puyos.list().rbegin(), key_puyos.list().rend(), adder);
+    std::for_each(fire_puyos.list().rbegin(), fire_puyos.list().rend(), adder);
+    grade = std::max(grade, rensa_result.chains * 10 - sum * 3
         - std::max(field.height(2) - field.height(1) - 2, 0) * 3
         - std::max(field.height(3) - field.height(2) - 2, 0) * 3
         - std::max(field.height(4) - field.height(3) - 2, 0) * 3
         - std::max(field.height(4) - field.height(5) - 2, 0) * 3
         - std::max(field.height(5) - field.height(6) - 2, 0) * 3);
+  };
 
-  }
+  RensaDetector::iteratePossibleRensasWithTracking(field, 1, callback, RensaDetector::Mode::FLOAT);
   return std::max(grade, 0);
 }
