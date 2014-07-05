@@ -29,8 +29,8 @@ public:
     static std::vector<TrackedPossibleRensaInfo> findPossibleRensasWithTracking(
         const CoreField&, int maxKeyPuyos = 0, Mode mode = Mode::DROP) DEPRECATED;
 
-    typedef std::function<void (const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&)> PossibleRensaCallback;
-    typedef std::function<void (const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&,
+    typedef std::function<void (const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&)> PossibleRensaCallback;
+    typedef std::function<void (const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&,
                                 const RensaTrackResult&)> TrackedPossibleRensaCallback;
     static void iteratePossibleRensas(const CoreField&, int maxKeyPuyo, PossibleRensaCallback, Mode mode = Mode::DROP);
     static void iteratePossibleRensasWithTracking(const CoreField&, int maxKeyPuyos, TrackedPossibleRensaCallback, Mode mode = Mode::DROP);

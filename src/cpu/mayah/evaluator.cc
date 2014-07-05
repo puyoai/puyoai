@@ -303,7 +303,6 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
         return false;
 
     if (gazer.rensaIsOngoing() && gazer.ongoingRensaInfo().rensaResult.score > scoreForOjama(6)) {
-        // TODO: 対応が適当すぎる
         if (gazer.ongoingRensaInfo().rensaResult.score >= scoreForOjama(6) &&
             plan.score() >= gazer.ongoingRensaInfo().rensaResult.score &&
             plan.initiatingFrames() <= gazer.ongoingRensaInfo().finishingRensaFrame) {
@@ -370,13 +369,18 @@ void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& /*plan*/,
                            const RensaResult& rensaResult,
                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
 {
+    sc->addScore(MAX_CHAINS, rensaResult.chains, 1);
+
+#if 1
     PuyoSet puyoSet;
     puyoSet.add(keyPuyos);
     puyoSet.add(firePuyos);
 
     int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, puyoSet);
-    sc->addScore(MAX_CHAINS, rensaResult.chains, 1);
     sc->addScore(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
+#else
+    sc->addScore(MAX_RENSA_NECESSARY_PUYOS, keyPuyos.list().size() + firePuyos.list().size());
+#endif
 }
 
 template<typename ScoreCollector>
@@ -506,30 +510,18 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
 
     double maxRensaScore = 0;
     unique_ptr<ScoreCollector> maxRensaScoreCollector;
-    auto callback = [&](const RensaResult& rensaResult,
+    auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                         const RensaTrackResult& trackResult) {
-        CoreField fieldAfterRensa(plan.field());
-        for (int x = 1; x <= CoreField::WIDTH; ++x) {
-            for (int y = 1; y <= 13; ++y) { // TODO: 13?
-                if (trackResult.erasedAt(x, y) != 0)
-                    fieldAfterRensa.unsafeSet(x, y, EMPTY);
-            }
-            fieldAfterRensa.recalcHeightOn(x);
-        }
-
-        CoreField fieldAfterDrop(fieldAfterRensa);
-        fieldAfterDrop.forceDrop();
-
         unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc->featureParameter()));
         evalRensaChainFeature(rensaScoreCollector.get(), plan, rensaResult, keyPuyos, firePuyos);
-        evalRensaGarbageFeature(rensaScoreCollector.get(), plan, fieldAfterDrop);
+        evalRensaGarbageFeature(rensaScoreCollector.get(), plan, fieldAfterRensa);
         if (USE_HAND_WIDTH_FEATURE)
             evalRensaHandWidthFeature(rensaScoreCollector.get(), plan, trackResult);
         if (USE_IGNITION_HEIGHT_FEATURE)
             evalRensaIgnitionHeightFeature(rensaScoreCollector.get(), plan, trackResult);
         if (USE_CONNECTION_FEATURE)
-            evalRensaConnectionFeature(rensaScoreCollector.get(), plan, fieldAfterDrop);
+            evalRensaConnectionFeature(rensaScoreCollector.get(), plan, fieldAfterRensa);
         evalRensaStrategy(rensaScoreCollector.get(), plan, currentFrameId, gazer);
 
         if (rensaScoreCollector->score() > maxRensaScore) {
