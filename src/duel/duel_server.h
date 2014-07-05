@@ -25,6 +25,12 @@ public:
     void stop();
     void join();
 
+    // This callback should be alive during duel server is alive.
+    void setCallbackDuelServerWillExit(std::function<void ()> callback)
+    {
+        callbackDuelServerWillExit_ = callback;
+    }
+
 private:
     void runDuelLoop();
     void play(GameState*, const std::vector<ConnectorFrameResponse> data[2]);
@@ -37,6 +43,7 @@ private:
 
     ConnectorManager* manager_;
     std::vector<GameStateObserver*> observers_;
+    std::function<void ()> callbackDuelServerWillExit_;
 };
 
 #endif
