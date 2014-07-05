@@ -31,12 +31,24 @@ public:
 
     static int necessaryPuyos(double threshold, const PuyoSet& set) {
         DCHECK(0 <= threshold && threshold < 1.0);
-        for (unsigned int k = 0; k < MAX_K; ++k) {
-            if (possibility(k, set) >= threshold)
-                return k;
+
+        if (possibility(MAX_K - 1, set) < threshold)
+            return MAX_K;
+
+        DCHECK(possibility(0, set) < threshold);
+        DCHECK(possibility(MAX_K - 1, set) >= threshold);
+
+        int left = 0, right = MAX_K - 1;
+        while (right - left > 1) {
+            int mid = (left + right) / 2;
+            if (possibility(mid, set) >= threshold) {
+                right = mid;
+            } else {
+                left = mid;
+            }
         }
 
-        return MAX_K;
+        return right;
     }
 
     static void initialize();
