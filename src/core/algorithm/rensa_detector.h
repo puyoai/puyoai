@@ -32,7 +32,9 @@ public:
     typedef std::function<void (const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&)> PossibleRensaCallback;
     typedef std::function<void (const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&,
                                 const RensaTrackResult&)> TrackedPossibleRensaCallback;
+    // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
     static void iteratePossibleRensas(const CoreField&, int maxKeyPuyo, PossibleRensaCallback, Mode mode = Mode::DROP);
+    // Same as iteratePossibleRensas with checking trackResult.
     static void iteratePossibleRensasWithTracking(const CoreField&, int maxKeyPuyos, TrackedPossibleRensaCallback, Mode mode = Mode::DROP);
 };
 

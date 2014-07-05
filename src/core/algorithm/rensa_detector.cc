@@ -32,10 +32,8 @@ static inline void tryDropFire(const CoreField& originalField, SimulationCallbac
 
             // Drop puyo on
             for (int d = -1; d <= 1; ++d) {
-
                 if (visited[x + d][c])
                     continue;
-                visited[x + d][c] = true;
 
                 if (x + d <= 0 || CoreField::WIDTH < x + d)
                     continue;
@@ -46,6 +44,8 @@ static inline void tryDropFire(const CoreField& originalField, SimulationCallbac
                     if (originalField.color(x + d, y) != PuyoColor::EMPTY)
                         continue;
                 }
+
+                visited[x + d][c] = true;
 
                 CoreField f(originalField);
                 int necessaryPuyos = 0;

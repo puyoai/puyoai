@@ -29,18 +29,45 @@ struct ContainsResult {
     const CoreField& g;
 };
 
+static void dropKeyAndFirePuyos(CoreField* f, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
+{
+    for (const auto& p : keyPuyos.list()) {
+        f->dropPuyoOn(get<0>(p), get<1>(p));
+    }
+    for (const auto& p : firePuyos.list()) {
+        f->dropPuyoOn(get<0>(p), get<1>(p));
+    }
+}
+
 TEST(RensaDetectorTest, FindPossibleRensaTest)
 {
-    CoreField f("054400"
-                "045400"
-                "556660");
+    CoreField f(" BRR  "
+                " RBR  "
+                "BBYYY ");
 
-    CoreField g("054400"
-                "045400"
-                "556666");
+    CoreField expected1(" BRR  "
+                        " RBR  "
+                        "BBYYYY");
 
-    vector<PossibleRensaInfo> result = RensaDetector::findPossibleRensas(f);
-    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsResult(f, g)));
+    CoreField expected2(" BRR  "
+                        " RBRY "
+                        "BBYYY ");
+
+    bool found1 = false;
+    bool found2 = false;
+    auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+        CoreField actual(f);
+        dropKeyAndFirePuyos(&actual, keyPuyos, firePuyos);
+        if (actual == expected1)
+            found1 = true;
+        if (actual == expected2)
+            found2 = true;
+    };
+
+    RensaDetector::iteratePossibleRensas(f, 0, callback);
+    EXPECT_TRUE(found1);
+    EXPECT_TRUE(found2);
 }
 
 TEST(RensaDetectorTest, FindPossibleRensasWithKeyPuyo)
