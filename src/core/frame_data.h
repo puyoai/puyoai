@@ -20,15 +20,21 @@ struct PlayerFrameData {
 };
 
 struct FrameData {
+    const int GAME_END_UNDEFINED = -255;
+
     FrameData() {}
 
     const PlayerFrameData& myPlayerFrameData() const { return playerFrameData[0]; }
     const PlayerFrameData& enemyPlayerFrameData() const { return playerFrameData[1]; }
 
+    bool hasGameEnd() {
+        return gameEnd != GAME_END_UNDEFINED;
+    };
+
     bool connectionLost = false;
     bool valid = false;
     int id = -1;
-    int gameEnd = 0;
+    int gameEnd = GAME_END_UNDEFINED;
     PlayerFrameData playerFrameData[2];  // 0 = me, 1 = opponent
 };
 

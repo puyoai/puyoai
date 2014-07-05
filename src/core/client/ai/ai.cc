@@ -30,7 +30,7 @@ void AI::runLoop()
             continue;
         }
 
-        if (frameData.gameEnd != 0) {
+        if (frameData.hasGameEnd()) {
             gameHasEnded(frameData);
         }
 
