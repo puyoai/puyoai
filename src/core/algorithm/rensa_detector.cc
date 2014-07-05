@@ -162,7 +162,7 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
     };
 
     RensaResult rensaResult = f->simulateWithMinHeights(minHeights);
-    callback(rensaResult, keyPuyos, firePuyos);
+    callback(*f, rensaResult, keyPuyos, firePuyos);
 }
 
 static inline void simulateInternal(CoreField* f, const CoreField& original,
@@ -176,7 +176,7 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
 
     RensaTrackResult rensaTrackResult;
     RensaResult rensaResult = f->simulateAndTrackWithMinHeights(&rensaTrackResult, minHeights);
-    callback(rensaResult, keyPuyos, firePuyos, rensaTrackResult);
+    callback(*f, rensaResult, keyPuyos, firePuyos, rensaTrackResult);
 }
 
 template<typename Callback>
@@ -227,9 +227,11 @@ RensaDetector::findPossibleRensas(const CoreField& field, int maxKeyPuyos, Mode 
     std::vector<PossibleRensaInfo> result;
     result.reserve(100000);
 
-    auto callback = [&result](const RensaResult& rensaResult,
+    auto callback = [&result](const CoreField& fieldAfterRensa,
+                              const RensaResult& rensaResult,
                               const ColumnPuyoList& keyPuyos,
                               const ColumnPuyoList& firePuyos) {
+        UNUSED_VARIABLE(fieldAfterRensa);
         result.emplace_back(rensaResult, keyPuyos, firePuyos);
     };
 
@@ -244,8 +246,9 @@ RensaDetector::findPossibleRensasWithTracking(const CoreField& field, int maxKey
     std::vector<TrackedPossibleRensaInfo> result;
     result.reserve(100000);
 
-    auto callback = [&result](const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos,
+    auto callback = [&result](const CoreField& fieldAfterRensa, const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos,
                               const ColumnPuyoList& firePuyos, const RensaTrackResult& rensaTrackResult) {
+        UNUSED_VARIABLE(fieldAfterRensa);
         result.emplace_back(rensaResult, keyPuyos, firePuyos, rensaTrackResult);
     };
 

@@ -65,7 +65,8 @@ TEST(RensaDetectorTest, iteratePossibleRensas)
                 "556000");
 
     bool found = false;
-    auto callback = [&found](const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+    auto callback = [&found](const CoreField& coreField, const RensaResult& rensaResult,
+                             const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
         found |= (rensaResult.chains == 3);
     };
 
@@ -80,7 +81,11 @@ TEST(RensaDetectorTest, iteratePossibleRensasWithTracking)
                 "556000");
 
     bool found = false;
-    auto callback = [&found](const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+    auto callback = [&found](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
+                             const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+        UNUSED_VARIABLE(fieldAfterRensa);
+        UNUSED_VARIABLE(keyPuyos);
+        UNUSED_VARIABLE(firePuyos);
         found |= (rensaResult.chains == 3);
     };
 
