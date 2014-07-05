@@ -2,18 +2,18 @@
 
 #include <gtest/gtest.h>
 
-TEST(PuyoSetTest, AddPuyoColor)
+TEST(PuyoSetTest, addPuyoColor)
 {
     PuyoSet set;
     set.add(PuyoColor::RED, 1);
 
-    EXPECT_EQ(set.red(), 1U);
-    EXPECT_EQ(set.blue(), 0U);
-    EXPECT_EQ(set.yellow(), 0U);
-    EXPECT_EQ(set.green(), 0U);
+    EXPECT_EQ(1, set.red());
+    EXPECT_EQ(0, set.blue());
+    EXPECT_EQ(0, set.yellow());
+    EXPECT_EQ(0, set.green());
 }
 
-TEST(PuyoSetTest, AddPuyoSet)
+TEST(PuyoSetTest, addPuyoSet)
 {
     PuyoSet set1, set2;
     set1.add(PuyoColor::RED, 1);
@@ -24,8 +24,8 @@ TEST(PuyoSetTest, AddPuyoSet)
     PuyoSet set;
     set.add(set1);
     set.add(set2);
-    EXPECT_EQ(set.red(), 2U);
-    EXPECT_EQ(set.blue(), 1U);
-    EXPECT_EQ(set.yellow(), 0U);
-    EXPECT_EQ(set.green(), 1U);
+    EXPECT_EQ(2, set.red());
+    EXPECT_EQ(1, set.blue());
+    EXPECT_EQ(0, set.yellow());
+    EXPECT_EQ(1, set.green());
 }
