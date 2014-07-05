@@ -187,7 +187,7 @@ static void findPossibleRensasInternal(const CoreField& field,
                                        RensaDetector::Mode mode,
                                        Callback callback)
 {
-    auto findRensaCallback = [keyPuyos, &callback](CoreField* f, const CoreField& originalField, int x, PuyoColor c, int n) {
+    auto findRensaCallback = [&keyPuyos, &callback](CoreField* f, const CoreField& originalField, int x, PuyoColor c, int n) {
         ColumnPuyoList firePuyos;
         for (int i = 0; i < n; ++i)
             firePuyos.addPuyo(x, c);
