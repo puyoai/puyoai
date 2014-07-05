@@ -371,7 +371,7 @@ void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& /*plan*/,
 {
     sc->addScore(MAX_CHAINS, rensaResult.chains, 1);
 
-#if 1
+#if 0
     PuyoSet puyoSet;
     puyoSet.add(keyPuyos);
     puyoSet.add(firePuyos);
@@ -379,7 +379,8 @@ void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& /*plan*/,
     int numNecessaryPuyos = TsumoPossibility::necessaryPuyos(0.5, puyoSet);
     sc->addScore(MAX_RENSA_NECESSARY_PUYOS, numNecessaryPuyos);
 #else
-    sc->addScore(MAX_RENSA_NECESSARY_PUYOS, keyPuyos.list().size() + firePuyos.list().size());
+    sc->addScore(MAX_RENSA_KEY_PUYOS, keyPuyos.size());
+    sc->addScore(MAX_RENSA_FIRE_PUYOS, firePuyos.size());
 #endif
 }
 
