@@ -72,17 +72,48 @@ TEST(RensaDetectorTest, FindPossibleRensaTest)
 
 TEST(RensaDetectorTest, FindPossibleRensasWithKeyPuyo)
 {
-    CoreField f("450000"
-                "445000"
-                "556000");
+    CoreField f("RB    "
+                "RRB   "
+                "BBY   ");
 
-    CoreField g("400000"
-                "456000"
-                "445600"
-                "556600");
+    CoreField expected[] {
+        CoreField("R     "
+                  "RBY   "
+                  "RRBY  "
+                  "BBYY  "),
+        CoreField("R     "
+                  "RBY   "
+                  "RRB   "
+                  "BBYYY "),
+        CoreField("RY    "
+                  "RBY   "
+                  "RRB   "
+                  "BBYY  "),
+        CoreField("RY    "
+                  "RB    "
+                  "RRB   "
+                  "BBYYY ")
+    };
 
-    vector<PossibleRensaInfo> result = RensaDetector::findPossibleRensas(f, 3);
-    EXPECT_TRUE(std::count_if(result.begin(), result.end(), ContainsResult(f, g)));
+    bool found[4] {};
+    auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+        CoreField actual(f);
+        dropKeyAndFirePuyos(&actual, keyPuyos, firePuyos);
+        for (int i = 0; i < 4; ++i) {
+            if (actual == expected[i]) {
+                found[i] = true;
+                break;
+            }
+        }
+    };
+
+    RensaDetector::iteratePossibleRensas(f, 3, callback);
+
+    EXPECT_TRUE(found[0]);
+    EXPECT_TRUE(found[1]);
+    EXPECT_TRUE(found[2]);
+    EXPECT_TRUE(found[3]);
 }
 
 TEST(RensaDetectorTest, iteratePossibleRensas)
