@@ -28,6 +28,7 @@ struct FrameData {
     bool connectionLost = false;
     bool valid = false;
     int id = -1;
+    int gameEnd = 0;
     PlayerFrameData playerFrameData[2];  // 0 = me, 1 = opponent
 };
 

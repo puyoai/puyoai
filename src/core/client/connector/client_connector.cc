@@ -61,6 +61,8 @@ FrameData ClientConnector::receive()
             frameData.valid = true;
             frameData.id = std::atoi(value);
             continue;
+        } else if (strncmp(key, "END", 3) == 0) {
+            frameData.gameEnd = std::atoi(value);
         }
 
         PlayerFrameData& playerFrameData = frameData.playerFrameData[(key[0] == 'Y') ? 0 : 1];
