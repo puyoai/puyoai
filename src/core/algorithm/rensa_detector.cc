@@ -221,25 +221,6 @@ static void findPossibleRensasInternal(const CoreField& field,
     }
 }
 
-std::vector<PossibleRensaInfo>
-RensaDetector::findPossibleRensas(const CoreField& field, int maxKeyPuyos, Mode mode)
-{
-    std::vector<PossibleRensaInfo> result;
-    result.reserve(100000);
-
-    auto callback = [&result](const CoreField& fieldAfterRensa,
-                              const RensaResult& rensaResult,
-                              const ColumnPuyoList& keyPuyos,
-                              const ColumnPuyoList& firePuyos) {
-        UNUSED_VARIABLE(fieldAfterRensa);
-        result.emplace_back(rensaResult, keyPuyos, firePuyos);
-    };
-
-    ColumnPuyoList puyoList;
-    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, mode, callback);
-    return result;
-}
-
 std::vector<TrackedPossibleRensaInfo>
 RensaDetector::findPossibleRensasWithTracking(const CoreField& field, int maxKeyPuyos, Mode mode)
 {

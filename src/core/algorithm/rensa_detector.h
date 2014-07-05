@@ -20,11 +20,6 @@ public:
     // Finds rensa using |kumipuyos|.
     static std::vector<FeasibleRensaInfo> findFeasibleRensas(const CoreField&, const KumipuyoSeq&);
 
-    // Finds possible rensas from the specified field.
-    // Before firing a rensa, we will put key puyos (maxKeyPuyo at max).
-    static std::vector<PossibleRensaInfo> findPossibleRensas(
-        const CoreField&, int maxKeyPuyos = 0, Mode mode = Mode::DROP) DEPRECATED;
-
     // Same as findPossibleRensas. However, we return tracking info also.
     static std::vector<TrackedPossibleRensaInfo> findPossibleRensasWithTracking(
         const CoreField&, int maxKeyPuyos = 0, Mode mode = Mode::DROP) DEPRECATED;

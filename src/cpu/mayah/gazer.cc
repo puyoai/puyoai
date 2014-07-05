@@ -94,17 +94,17 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
 
     m_possibleRensaInfos.clear();
 
-    vector<PossibleRensaInfo> result = RensaDetector::findPossibleRensas(field, 3);
-
     vector<EstimatedRensaInfo> results;
-    for (vector<PossibleRensaInfo>::iterator it = result.begin(); it != result.end(); ++it) {
+    results.reserve(1000);
+    auto callback = [&](const CoreField&, const RensaResult& rensaResult,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
         // おじゃまがあまり発生しそうにないのは無視
-        if (it->rensaResult.score < 70)
-            continue;
+        if (rensaResult.score < 70)
+            return;
 
         PuyoSet puyoSet;
-        puyoSet.add(it->keyPuyos);
-        puyoSet.add(it->firePuyos);
+        puyoSet.add(keyPuyos);
+        puyoSet.add(firePuyos);
         puyoSet.sub(kumipuyoSet);
 
         // 見えているツモに加えて、さらに k ツモぐらい引くと 20% ぐらいの確率で引ける。
@@ -117,11 +117,12 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
 
         // 3 + k 回ほどぷよを引く必要があり、そのときに必要そうなフレーム数
         int frames = ((CoreField::HEIGHT - averageHeight) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI) * (3 + k);
-        int score = it->rensaResult.score;
-        int chains = it->rensaResult.chains;
+        int score = rensaResult.score;
+        int chains = rensaResult.chains;
         results.push_back(EstimatedRensaInfo(chains, score, frames));
-    }
+    };
 
+    RensaDetector::iteratePossibleRensas(field, 3, callback);
     if (results.empty())
         return;
 
