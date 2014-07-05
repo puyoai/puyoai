@@ -5,30 +5,6 @@
 
 using namespace std;
 
-struct ContainsResult {
-    ContainsResult(const CoreField& f, const CoreField& g) : f(f), g(g) {}
-
-    bool operator()(const PossibleRensaInfo& info) const {
-        CoreField s(f);
-
-        for (const auto& p : info.keyPuyos.list()) {
-            s.dropPuyoOn(get<0>(p), get<1>(p));
-        }
-        for (const auto& p : info.firePuyos.list()) {
-            s.dropPuyoOn(get<0>(p), get<1>(p));
-        }
-
-        if (s != g)
-            return false;
-
-        auto result = s.simulate();
-        return result == info.rensaResult;
-    }
-
-    const CoreField& f;
-    const CoreField& g;
-};
-
 static void dropKeyAndFirePuyos(CoreField* f, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
 {
     for (const auto& p : keyPuyos.list()) {
