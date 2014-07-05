@@ -18,12 +18,12 @@ public:
     {
     }
 
-    PuyoSet(unsigned int red, unsigned int blue, unsigned int yellow, unsigned int green)
+    PuyoSet(int red, int blue, int yellow, int green)
     {
-        DCHECK(red < 16);
-        DCHECK(blue < 16);
-        DCHECK(yellow < 16);
-        DCHECK(green < 16);
+        DCHECK(0 <= red && red < 16);
+        DCHECK(0 <= blue && blue < 16);
+        DCHECK(0 <= yellow && yellow < 16);
+        DCHECK(0 <= green && green < 16);
 
         m_red = red;
         m_blue = blue;
@@ -39,12 +39,12 @@ public:
         return buf;
     }
 
-    unsigned int count() const { return m_red + m_blue + m_yellow + m_green; }
+    int count() const { return m_red + m_blue + m_yellow + m_green; }
 
-    unsigned int red() const { return m_red; }
-    unsigned int blue() const { return m_blue; }
-    unsigned int yellow() const { return m_yellow; }
-    unsigned int green() const { return m_green; }
+    int red() const { return m_red; }
+    int blue() const { return m_blue; }
+    int yellow() const { return m_yellow; }
+    int green() const { return m_green; }
 
     void add(const ColumnPuyoList&);
 
@@ -88,17 +88,17 @@ public:
         }
     }
 
-    friend bool operator<(PuyoSet lhs, PuyoSet rhs)
+    friend bool operator<(const PuyoSet& lhs, const PuyoSet& rhs)
     {
         return lhs.toInt() < rhs.toInt();
     }
 
-    friend bool operator==(PuyoSet lhs, PuyoSet rhs)
+    friend bool operator==(const PuyoSet& lhs, const PuyoSet& rhs)
     {
         return lhs.toInt() == rhs.toInt();
     }
 
-    friend bool operator!=(PuyoSet lhs, PuyoSet rhs)
+    friend bool operator!=(const PuyoSet& lhs, const PuyoSet& rhs)
     {
         return lhs.toInt() != rhs.toInt();
     }
@@ -109,10 +109,10 @@ private:
         return m_red | (m_blue << 4) | (m_yellow << 8) | (m_green << 12);
     }
 
-    unsigned int m_red: 4;
-    unsigned int m_blue: 4;
-    unsigned int m_yellow: 4;
-    unsigned int m_green: 4;
+    int m_red;
+    int m_blue;
+    int m_yellow;
+    int m_green;
 };
 
 #endif
