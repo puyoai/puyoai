@@ -39,7 +39,6 @@ private:
     std::string message_[2];
     int ackFrameId_[2];
     std::vector<int> nackFrameIds_[2];
-
 };
 
 #endif
