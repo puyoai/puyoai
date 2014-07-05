@@ -30,6 +30,10 @@ void AI::runLoop()
             continue;
         }
 
+        if (frameData.gameEnd != 0) {
+            gameHasEnded(frameData);
+        }
+
         // Before starting a new game, we need to consider the first hand.
         // TODO(mayah): Maybe game server should send some information that we should initialize.
         if (frameData.id == 1) {
