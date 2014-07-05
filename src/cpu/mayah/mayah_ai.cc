@@ -1,5 +1,6 @@
 #include "mayah_ai.h"
 
+#include <iostream>
 #include <sstream>
 
 #include <gflags/gflags.h>
@@ -15,6 +16,7 @@
 #include "util.h"
 
 DECLARE_string(feature);
+DEFINE_bool(log_max_score, false, "log max score to stderr");
 
 using namespace std;
 
@@ -31,11 +33,17 @@ MayahAI::~MayahAI()
 
 void MayahAI::gameWillBegin(const FrameData& frameData)
 {
+    thoughtMaxRensa_ = 0;
+    thoughtMaxScore_ = 0;
     gazer_.initializeWith(frameData.id);
 }
 
 void MayahAI::gameHasEnded(const FrameData&)
 {
+    if (FLAGS_log_max_score) {
+        cerr << "max rensa = " << thoughtMaxRensa_ << endl;
+        cerr << "max score = " << thoughtMaxScore_ << endl;
+    }
 }
 
 DropDecision MayahAI::think(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq)
@@ -62,18 +70,9 @@ DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const
     return DropDecision(plan.decisions().front(), message);
 }
 
-Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int depth, int numKeyPuyos) const
+Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int depth, int numKeyPuyos)
 {
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
-
-#if 0
-    int currentMaxRensa = 0;
-    {
-        RefPlan refPlan(field, vector<Decision>(), RensaResult(), 0, 0);
-        CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, numKeyPuyos, gazer_);
-        currentMaxRensa = cf.feature(MAX_CHAINS).empty() ? 0 : cf.feature(MAX_CHAINS).front();
-    }
-#endif
 
     double bestScore = -100000000.0;
     Plan bestPlan;
@@ -84,6 +83,9 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
             bestScore = score;
             bestPlan = plan.toPlan();
         }
+
+        thoughtMaxScore_ = max(thoughtMaxScore_, plan.score());
+        thoughtMaxRensa_ = max(thoughtMaxRensa_, plan.chains());
     });
 
     return bestPlan;

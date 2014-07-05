@@ -26,6 +26,7 @@ mayah_add_executable(learn learn.cc)
 #mayah_add_executable(solo solo.cc)
 
 cpu_add_runner(run.sh)
+cpu_add_runner(run_with_log_maxscore.sh)
 cpu_add_runner(feature.txt)
 
 mayah_add_test(evaluator_test)
