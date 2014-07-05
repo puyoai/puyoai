@@ -190,6 +190,15 @@ int main(int argc, char* argv[])
     if (httpServer.get())
         CHECK(httpServer->start());
 #endif
+
+#if USE_SDL2
+    auto duelSeverWillStopCallback = []() {
+        SDL_Event event;
+        event.type = SDL_QUIT;
+        SDL_PushEvent(&event);
+    };
+    duelServer.setCallbackDuelServerWillExit(duelSeverWillStopCallback);
+#endif
     CHECK(duelServer.start());
 
 #if USE_SDL2

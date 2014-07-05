@@ -149,6 +149,10 @@ void DuelServer::runDuelLoop()
 
         num_match++;
     }
+
+    if (callbackDuelServerWillExit_) {
+        callbackDuelServerWillExit_();
+    }
 }
 
 GameResult DuelServer::runGame(ConnectorManager* manager)
