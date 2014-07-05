@@ -17,6 +17,7 @@ public:
     std::string toJson() const;
 
     ConnectorFrameRequest toConnectorFrameRequest(int frameId) const;
+    ConnectorFrameRequest toConnectorFrameRequest(int frameId, GameResult forceSetGameResult) const;
 
     const FieldRealtime& field(int pi) const { return field_[pi]; }
     FieldRealtime* mutableField(int pi) { return &field_[pi]; }
