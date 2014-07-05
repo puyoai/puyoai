@@ -202,7 +202,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         if (FLAGS_use_even && frameId >= FPS * 120) {
             gameResult = GameResult::DRAW;
             frameId++;
-            manager->send(gameState.toConnectorFrameRequest(frameId));
+            manager->send(gameState.toConnectorFrameRequest(frameId, gameResult));
             break;
         }
     }

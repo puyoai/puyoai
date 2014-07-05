@@ -85,9 +85,14 @@ string GameState::toJson() const
 
 ConnectorFrameRequest GameState::toConnectorFrameRequest(int frameId) const
 {
+    return toConnectorFrameRequest(frameId, gameResult());
+}
+
+ConnectorFrameRequest GameState::toConnectorFrameRequest(int frameId, GameResult forceSetGameResult) const
+{
     ConnectorFrameRequest req;
     req.frameId = frameId;
-    req.gameResult = gameResult();
+    req.gameResult = forceSetGameResult;
     for (int pi = 0; pi < 2; ++pi) {
         const FieldRealtime& f = field(pi);
         req.field[pi] = f.field();
