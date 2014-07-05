@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 #include <iomanip>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -35,7 +36,7 @@ static int GetUsecFromStart(const struct timeval& start)
 static int GetRemainingMilliSeconds(const struct timeval& start)
 {
     if (FLAGS_no_timeout)
-        return INT_MAX;
+        return numeric_limits<int>::max();
 
     int usec = GetUsecFromStart(start);
     return (TIMEOUT_USEC - usec + 999) / 1000;
