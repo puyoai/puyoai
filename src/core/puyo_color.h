@@ -21,11 +21,9 @@ const int NUM_PUYO_COLORS = 8;
 const int PUYO_ERASE_NUM = 4;
 const int NUM_NORMAL_PUYO_COLORS = 4;
 
-inline PuyoColor normalPuyoColorOf(int index)
-{
-    DCHECK(0 <= index && index < NUM_NORMAL_PUYO_COLORS);
-    return static_cast<PuyoColor>(index + 4);
-}
+constexpr PuyoColor NORMAL_PUYO_COLORS[] {
+    PuyoColor::RED, PuyoColor::BLUE, PuyoColor::YELLOW, PuyoColor::GREEN
+};
 
 // Returns puyo color from character.
 PuyoColor toPuyoColor(char);

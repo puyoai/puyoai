@@ -163,7 +163,7 @@ void evalDensityFeature(ScoreCollector* sc, const RefPlan& plan)
             }
 
             for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
-                PuyoColor c = normalPuyoColorOf(i);
+                PuyoColor c = NORMAL_PUYO_COLORS[i];
                 sc->addScore(DENSITY, c, 1);
             }
         }

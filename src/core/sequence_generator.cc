@@ -16,7 +16,7 @@ KumipuyoSeq generateSequence()
     // first, we shuffle [0, 64*3), then, shuffle [6, 64*4).
     vector<PuyoColor> colors(256);
     for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
-        PuyoColor c = normalPuyoColorOf(i);
+        PuyoColor c = NORMAL_PUYO_COLORS[i];
         for (int j = 0; j < 64; ++j) {
             colors[i * 64 + j] = c;
         }

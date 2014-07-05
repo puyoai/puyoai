@@ -207,7 +207,7 @@ static void findPossibleRensasInternal(const CoreField& field,
             continue;
 
         for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
-            PuyoColor c = normalPuyoColorOf(i);
+            PuyoColor c = NORMAL_PUYO_COLORS[i];
 
             f.dropPuyoOn(x, c);
             puyoList.addPuyo(x, c);
