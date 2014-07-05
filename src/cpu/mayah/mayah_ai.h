@@ -34,7 +34,7 @@ public:
     virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
 
     // Use this directly in test. Otherwise, use via think/thinkFast.
-    Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, int depth, int numKeyPuyos) const;
+    Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, int depth, int numKeyPuyos);
 
     void initializeGazerForTest(int frameId) { gazer_.initializeWith(frameId); }
 
@@ -44,6 +44,8 @@ protected:
 
     std::unique_ptr<FeatureParameter> featureParameter_;
     Gazer gazer_;
+    int thoughtMaxRensa_ = 0;
+    int thoughtMaxScore_ = 0;
 };
 
 #endif

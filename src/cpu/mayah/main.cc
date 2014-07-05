@@ -1,8 +1,13 @@
+#include "mayah_ai.h"
+
+#include <iostream>
+
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
 #include "core/algorithm/puyo_possibility.h"
-#include "mayah_ai.h"
+
+using namespace std;
 
 int main(int argc, char* argv[])
 {
