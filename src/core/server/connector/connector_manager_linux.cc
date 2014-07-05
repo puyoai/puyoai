@@ -21,6 +21,7 @@
 using namespace std;
 
 DEFINE_bool(realtime, true, "use realtime");
+DEFINE_bool(no_timeout, false, "if true, wait ai's thought without timeout");
 
 const int TIMEOUT_USEC = 1000000 / FPS;
 
@@ -33,6 +34,9 @@ static int GetUsecFromStart(const struct timeval& start)
 
 static int GetRemainingMilliSeconds(const struct timeval& start)
 {
+    if (FLAGS_no_timeout)
+        return INT_MAX;
+
     int usec = GetUsecFromStart(start);
     return (TIMEOUT_USEC - usec + 999) / 1000;
 }
