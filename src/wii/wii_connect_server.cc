@@ -293,7 +293,7 @@ PuyoColor WiiConnectServer::toPuyoColor(RealColor rc, bool allowAllocation)
             continue;
 
         colorsUsed_[i] = true;
-        PuyoColor pc = normalPuyoColorOf(i);
+        PuyoColor pc = NORMAL_PUYO_COLORS[i];
         colorMap_.insert(make_pair(rc, pc));
 
         LOG(INFO) << "Detected a new color: " << toString(rc) << "->" << toString(pc);
