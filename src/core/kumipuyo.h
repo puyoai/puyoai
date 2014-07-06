@@ -9,7 +9,8 @@ public:
     Kumipuyo() : axis(PuyoColor::EMPTY), child(PuyoColor::EMPTY) {}
     Kumipuyo(PuyoColor axis, PuyoColor child) : axis(axis), child(child) {}
 
-    std::string toString() const {
+    std::string toString() const
+    {
         char tmp[] = "  ";
         tmp[0] = toChar(axis);
         tmp[1] = toChar(child);
@@ -17,9 +18,16 @@ public:
         return tmp;
     }
 
-    bool isValid() const {
+    bool isValid() const
+    {
         return isNormalColor(axis) && isNormalColor(child);
     }
+
+    friend bool operator==(const Kumipuyo& lhs, const Kumipuyo& rhs)
+    {
+        return lhs.axis == rhs.axis && lhs.child == rhs.child;
+    }
+    friend bool operator!=(const Kumipuyo& lhs, const Kumipuyo& rhs) { return !(lhs == rhs); }
 
 public:
     PuyoColor axis;
@@ -82,6 +90,8 @@ public:
     std::string toString() const;
 
     const std::vector<Kumipuyo>& underlyingData() const { return seq_; }
+    friend bool operator==(const KumipuyoSeq& lhs, const KumipuyoSeq& rhs) { return lhs.seq_ == rhs.seq_; }
+    friend bool operator!=(const KumipuyoSeq& lhs, const KumipuyoSeq& rhs) { return !(lhs == rhs); }
 
 private:
     std::vector<Kumipuyo> seq_;

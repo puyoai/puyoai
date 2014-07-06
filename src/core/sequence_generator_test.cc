@@ -7,7 +7,7 @@
 
 using namespace std;
 
-TEST(SequenceGeneratorTest, CheckRestriction)
+TEST(SequenceGeneratorTest, checkRestriction)
 {
     KumipuyoSeq seq = generateSequence();
 
@@ -30,4 +30,14 @@ TEST(SequenceGeneratorTest, CheckRestriction)
     EXPECT_EQ(64, count[PuyoColor::BLUE]);
     EXPECT_EQ(64, count[PuyoColor::YELLOW]);
     EXPECT_EQ(64, count[PuyoColor::GREEN]);
+}
+
+TEST(SequenceGeneratorTest, withSeed)
+{
+    KumipuyoSeq seq0a = generateSequenceWithSeed(0);
+    KumipuyoSeq seq0b = generateSequenceWithSeed(0);
+    KumipuyoSeq seq1 = generateSequenceWithSeed(1);
+
+    EXPECT_EQ(seq0a, seq0b);
+    EXPECT_NE(seq0a, seq1);
 }

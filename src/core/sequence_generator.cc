@@ -8,6 +8,20 @@ using namespace std;
 
 KumipuyoSeq generateSequence()
 {
+    random_device rd;
+    mt19937 mt(rd());
+
+    return generateSequenceWithMt19937(mt);
+}
+
+KumipuyoSeq generateSequenceWithSeed(int seed)
+{
+    mt19937 mt(seed);
+    return generateSequenceWithMt19937(mt);
+}
+
+KumipuyoSeq generateSequenceWithMt19937(mt19937 mt)
+{
     // AC puyo2 algorithm
     // make 64 x 4 sequece -> shuffle
     // if the first 3 hands contains 4 colors, make them 3 colors.
@@ -23,8 +37,6 @@ KumipuyoSeq generateSequence()
     }
 
     // TODO(mayah): Maybe srand() is used somewhere? We need to deprecate it.
-    random_device rd;
-    mt19937 mt(rd());
     shuffle(colors.begin(), colors.begin() + 64 * 3, mt);
     shuffle(colors.begin() + 6, colors.end(), mt);
 
