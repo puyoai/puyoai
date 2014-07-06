@@ -260,6 +260,8 @@ void evalValleyDepthRidgeHeight(ScoreCollector* sc, const RefPlan& plan)
             int left = max(leftHeight - currentHeight, 0);
             int right = max(rightHeight - currentHeight, 0);
             int depth = min(left, right);
+            if (x == 1 || x == 6)
+                depth /= 2;
             DCHECK(0 <= depth && depth <= 14) << depth;
             sc->addScore(VALLEY_DEPTH, depth, 1);
         }
