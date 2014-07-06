@@ -21,7 +21,13 @@ void Evaluate(const int threshold, Decision* best, int* score,
 
   int s = 0;
   if (plan.isRensaPlan()) {
-    s = plan.rensaResult().score;
+    const RensaResult& result = plan.rensaResult();
+    if (result.chains == 1 && result.quick && result.score > 70 * 6 * 2) {
+      // Quick attack
+      s = 99999;
+    } else {
+      s = result.score;
+    }
   }
             
   if (*score < s) {
