@@ -37,9 +37,9 @@ TEST(CoreFieldTest, Color)
 TEST(CoreFieldTest, ForceDrop)
 {
     CoreField f("544555"
-            "000000"
-            "464646"
-            "000000");
+                "000000"
+                "464646"
+                "000000");
 
     f.forceDrop();
 
@@ -100,31 +100,31 @@ TEST(CoreFieldTest, FramesTest) {
     }
     {
         CoreField f("500000"
-                "444400");
+                    "444400");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION,
                   rensaResult.frames);
     }
     {
         CoreField f("500000"
-                "400000"
-                "444000");
+                    "400000"
+                    "444000");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION,
                   rensaResult.frames);
     }
     {
         CoreField f("500000"
-                "450000"
-                "444000");
+                    "450000"
+                    "444000");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION,
                   rensaResult.frames);
     }
     {
         CoreField f("500000"
-                "455000"
-                "444500");
+                    "455000"
+                    "444500");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION +
                   FRAMES_AFTER_VANISH + FRAMES_AFTER_NO_DROP + FRAMES_VANISH_ANIMATION,
@@ -132,8 +132,8 @@ TEST(CoreFieldTest, FramesTest) {
     }
     {
         CoreField f("560000"
-                "455000"
-                "444500");
+                    "455000"
+                    "444500");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION +
                   FRAMES_AFTER_VANISH + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP + FRAMES_VANISH_ANIMATION,
@@ -159,9 +159,9 @@ TEST(CoreFieldTest, Height)
 TEST(CoreFieldTest, HeightShouldBeCopied)
 {
     CoreField f("004100"
-            "004040"
-            "004707"
-            "014040");
+                "004040"
+                "004707"
+                "014040");
 
     CoreField g(f);
 
@@ -176,9 +176,9 @@ TEST(CoreFieldTest, HeightShouldBeCopied)
 TEST(CoreFieldTest, HeightAfterSimulate)
 {
     CoreField f("050005"
-            "050055"
-            "445644"
-            "445644");
+                "050055"
+                "445644"
+                "445644");
 
     f.simulate();
 
@@ -193,8 +193,8 @@ TEST(CoreFieldTest, HeightAfterSimulate)
 TEST(CoreFieldTest, HeightAfterSimulate2)
 {
     CoreField f("450005"
-            "445665"
-            "556455");
+                "445665"
+                "556455");
 
     f.simulate();
 
@@ -228,9 +228,9 @@ TEST(CoreFieldTest, notQuick)
 TEST(CoreFieldTest, DropPuyoOn)
 {
     CoreField f("050005"
-            "050055"
-            "445644"
-            "445644");
+                "050055"
+                "445644"
+                "445644");
 
     f.dropPuyoOn(1, PuyoColor::RED);
 
@@ -290,9 +290,9 @@ TEST(CoreFieldTest, FramesToDropNextWithoutChigiri)
 TEST(CoreFieldTest, FramesToDropNextWithChigiri)
 {
     CoreField f("004000"
-            "005000"
-            "006000"
-            "007000");
+                "005000"
+                "006000"
+                "007000");
 
     EXPECT_EQ((CoreField::HEIGHT - 4) * FRAMES_DROP_1_LINE + FRAMES_AFTER_CHIGIRI + FRAMES_CHIGIRI_1_LINE_1 + FRAMES_CHIGIRI_1_LINE_2 + 2 * FRAMES_CHIGIRI_1_LINE_3,
               f.framesToDropNext(Decision(3, 1)));
@@ -300,9 +300,8 @@ TEST(CoreFieldTest, FramesToDropNextWithChigiri)
 
 TEST(CoreFieldTest, SimulateWithOjama)
 {
-    CoreField f(
-        "ORRRRO"
-        "OOOOOO");
+    CoreField f("ORRRRO"
+                "OOOOOO");
 
     RensaResult rensaResult = f.simulate();
     EXPECT_EQ(40, rensaResult.score);
@@ -311,10 +310,9 @@ TEST(CoreFieldTest, SimulateWithOjama)
 
 TEST(CoreFieldTest, countConnectedPuyos)
 {
-    CoreField f(
-        " YYY Y"
-        "BBBOYO"
-        "RRRGGG");
+    CoreField f(" YYY Y"
+                "BBBOYO"
+                "RRRGGG");
 
     EXPECT_EQ(3, f.countConnectedPuyos(1, 1));
     EXPECT_EQ(3, f.countConnectedPuyos(4, 1));
