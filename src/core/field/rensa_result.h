@@ -8,25 +8,27 @@
 #include "core/field/core_field.h"
 
 struct RensaResult {
-    RensaResult() : chains(0), score(0), frames(0) {}
+  RensaResult() : chains(0), score(0), frames(0), quick(false) {}
 
-    RensaResult(int chains, int score, int frames) : chains(chains), score(score), frames(frames) {}
+  RensaResult(int chains, int score, int frames, bool quick)
+    : chains(chains), score(score), frames(frames), quick(quick) {}
 
-    std::string toString() const;
+  std::string toString() const;
 
-    friend bool operator==(const RensaResult& lhs, const RensaResult& rhs) {
-        return lhs.chains == rhs.chains &&
-            lhs.score == rhs.score &&
-            lhs.frames == rhs.frames;
-    }
+  friend bool operator==(const RensaResult& lhs, const RensaResult& rhs) {
+    return lhs.chains == rhs.chains &&
+      lhs.score == rhs.score &&
+      lhs.frames == rhs.frames;
+  }
 
-    friend bool operator!=(const RensaResult& lhs, const RensaResult& rhs) {
-        return !(lhs == rhs);
-    }
+  friend bool operator!=(const RensaResult& lhs, const RensaResult& rhs) {
+    return !(lhs == rhs);
+  }
 
-    int chains;
-    int score;
-    int frames;
+  int chains;
+  int score;
+  int frames;
+  bool quick;  // Last vanishment does not drop any puyos.
 };
 
 // RensaTrackResult represents in what-th chain puyo is erased.
