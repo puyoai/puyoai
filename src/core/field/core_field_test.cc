@@ -206,6 +206,25 @@ TEST(CoreFieldTest, HeightAfterSimulate2)
     EXPECT_EQ(0, f.height(6));
 }
 
+TEST(CoreFieldTest, quick)
+{
+    CoreField f("GGGG  "
+                "RRRR  ");
+
+    RensaResult r = f.simulate();
+    EXPECT_TRUE(r.quick);
+}
+
+TEST(CoreFieldTest, notQuick)
+{
+    CoreField f("  YY  "
+                "GGGG  "
+                "RRRR  ");
+
+    RensaResult r = f.simulate();
+    EXPECT_FALSE(r.quick);
+}
+
 TEST(CoreFieldTest, DropPuyoOn)
 {
     CoreField f("050005"
