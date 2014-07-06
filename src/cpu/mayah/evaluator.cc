@@ -26,7 +26,8 @@
 #include "util.h"
 
 const bool USE_CONNECTION_FEATURE = true;
-const bool USE_CONNECTION_HORIZONTAL_FEATURE = true;
+const bool USE_CONNECTION_HORIZONTAL_FEATURE = false;
+const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
 const bool USE_HEIGHT_DIFF_FEATURE = false;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
@@ -142,6 +143,29 @@ void evalConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
                 ++len;
 
             DCHECK(0 <= len && len < 4) << len;
+            sc->addScore(CONNECTION_HORIZONTAL, len, 1);
+            x += len - 1;
+        }
+    }
+}
+
+template<typename ScoreCollector>
+void evalRestrictedConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
+{
+    int MAX_LEN[] = { 0, 3, 2, 1, 3, 2, 1, 0 };
+
+    const int MAX_HEIGHT = 5; // instead of CoreField::HEIGHT
+    const CoreField& f = plan.field();
+    for (int y = 1; y <= MAX_HEIGHT; ++y) {
+        for (int x = 1; x <= CoreField::WIDTH; ++x) {
+            if (!isNormalColor(f.color(x, y)))
+                continue;
+
+            int len = 1;
+            while (f.color(x, y) == f.color(x + len, y))
+                ++len;
+
+            len = std::min(MAX_LEN[x], len);
             sc->addScore(CONNECTION_HORIZONTAL, len, 1);
             x += len - 1;
         }
@@ -496,6 +520,8 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
         evalConnectionFeature(sc, plan);
     if (USE_CONNECTION_HORIZONTAL_FEATURE)
         evalConnectionHorizontalFeature(sc, plan);
+    if (USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE)
+        evalRestrictedConnectionHorizontalFeature(sc, plan);
     if (USE_DENSITY_FEATURE)
         evalDensityFeature(sc, plan);
     if (USE_PATTERN34_FEATURE)
