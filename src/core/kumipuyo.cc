@@ -2,7 +2,7 @@
 
 using namespace std;
 
-std::string KumipuyoPos::debugString() const
+std::string KumipuyoPos::toDebugString() const
 {
     char buf[256];
     snprintf(buf, 256, "<y=%d,x=%d,r=%d>", y, x, r);
