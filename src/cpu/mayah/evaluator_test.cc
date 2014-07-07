@@ -33,6 +33,22 @@ protected:
     }
 };
 
+TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
+{
+    CoreField f("R    R"
+                "R    R"
+                "YYYGGG");
+
+    FeatureParameter param;
+    FeatureScoreCollector sc(param);
+
+    collectScoreForRensaGarbage(&sc, f);
+    CollectedFeature cf = sc.toCollectedFeature();
+
+    EXPECT_EQ(10, cf.feature(NUM_GARBAGE_PUYOS));
+    EXPECT_EQ(6, cf.feature(NUM_SIDE_GARBAGE_PUYOS));
+}
+
 TEST_F(EvaluatorTest, RidgeHeight1)
 {
     CoreField f(

@@ -56,6 +56,71 @@ private:
     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures_;
 };
 
+class NormalScoreCollector {
+public:
+    explicit NormalScoreCollector(const FeatureParameter& param) : param_(param) {}
+
+    void addScore(EvaluationFeatureKey key, double v) { score_ += param_.score(key, v); }
+    void addScore(EvaluationSparseFeatureKey key, int idx, int n) { score_ += param_.score(key, idx, n); }
+    void merge(const NormalScoreCollector& sc) { score_ += sc.score(); }
+
+    double score() const { return score_; }
+    const FeatureParameter& featureParameter() const { return param_; }
+
+private:
+    const FeatureParameter& param_;
+    double score_ = 0.0;
+};
+
+class FeatureScoreCollector {
+public:
+    FeatureScoreCollector(const FeatureParameter& param) : collector_(param) {}
+
+    void addScore(EvaluationFeatureKey key, double v)
+    {
+        collector_.addScore(key, v);
+        collectedFeatures_[key] = v;
+    }
+
+    void addScore(EvaluationSparseFeatureKey key, int idx, int n)
+    {
+        collector_.addScore(key, idx, n);
+        for (int i = 0; i < n; ++i)
+            collectedSparseFeatures_[key].push_back(idx);
+    }
+
+    void merge(const FeatureScoreCollector& sc)
+    {
+        collector_.merge(sc.collector_);
+
+        for (const auto& entry : sc.collectedFeatures_) {
+            collectedFeatures_[entry.first] = entry.second;
+        }
+        for (const auto& entry : sc.collectedSparseFeatures_) {
+            collectedSparseFeatures_[entry.first].insert(
+                collectedSparseFeatures_[entry.first].end(),
+                entry.second.begin(),
+                entry.second.end());
+        }
+    }
+
+    double score() const { return collector_.score(); }
+    const FeatureParameter& featureParameter() const { return collector_.featureParameter(); }
+
+    CollectedFeature toCollectedFeature() const {
+        return CollectedFeature {
+            score(),
+            collectedFeatures_,
+            collectedSparseFeatures_
+        };
+    }
+
+private:
+    NormalScoreCollector collector_;
+    std::map<EvaluationFeatureKey, double> collectedFeatures_;
+    std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures_;
+};
+
 class Evaluator {
 public:
     Evaluator(const FeatureParameter& param) : param_(param) {}
@@ -67,5 +132,7 @@ public:
 private:
     const FeatureParameter& param_;
 };
+
+#include "evaluator_inl.h"
 
 #endif
