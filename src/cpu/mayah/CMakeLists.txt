@@ -22,12 +22,16 @@ endfunction()
 mayah_add_executable(mayah_cpu main.cc)
 mayah_add_executable(interactive interactive.cc)
 mayah_add_executable(learn learn.cc)
+mayah_add_executable(tweaker tweaker.cc)
 #mayah_add_executable(solver solver.cc)
 #mayah_add_executable(solo solo.cc)
 
 cpu_add_runner(run.sh)
-cpu_add_runner(run_with_log_maxscore.sh)
+
 cpu_add_runner(feature.txt)
+cpu_add_runner(run_for_tweaker_1p.sh)
+cpu_add_runner(run_for_tweaker_2p.sh)
+cpu_add_runner(tweaker_loop.sh)
 
 mayah_add_test(evaluator_test)
 mayah_add_test(gazer_test)
