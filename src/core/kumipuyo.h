@@ -46,7 +46,7 @@ public:
     int childX() const { return x + (r == 1) - (r == 3); }
     int childY() const { return y + (r == 0) - (r == 2); }
 
-    std::string debugString() const;
+    std::string toDebugString() const;
 
     // TODO(mayah): Make these private?
     int x;
