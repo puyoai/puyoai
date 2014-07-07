@@ -498,9 +498,10 @@ void evalRensaConnectionFeature(ScoreCollector* sc, const RefPlan& plan, const C
 }
 
 template<typename ScoreCollector>
-void evalRensaGarbageFeature(ScoreCollector* sc, const RefPlan& plan, const CoreField& fieldAfterDrop)
+void evalRensaGarbageFeature(ScoreCollector* sc, const CoreField& fieldAfterDrop)
 {
-    sc->addScore(NUM_GARBAGE_PUYOS, plan.field().countPuyos() - fieldAfterDrop.countPuyos());
+    sc->addScore(NUM_GARBAGE_PUYOS, fieldAfterDrop.countPuyos());
+    sc->addScore(NUM_SIDE_GARBAGE_PUYOS, fieldAfterDrop.height(1) + fieldAfterDrop.height(6));
 }
 
 template<typename ScoreCollector>
@@ -537,14 +538,14 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
         evalFieldUShape(sc, plan);
     evalUnreachableSpace(sc, plan);
 
-    double maxRensaScore = 0;
+    double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
     unique_ptr<ScoreCollector> maxRensaScoreCollector;
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                         const RensaTrackResult& trackResult) {
         unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc->featureParameter()));
         evalRensaChainFeature(rensaScoreCollector.get(), plan, rensaResult, keyPuyos, firePuyos);
-        evalRensaGarbageFeature(rensaScoreCollector.get(), plan, fieldAfterRensa);
+        evalRensaGarbageFeature(rensaScoreCollector.get(), fieldAfterRensa);
         if (USE_HAND_WIDTH_FEATURE)
             evalRensaHandWidthFeature(rensaScoreCollector.get(), plan, trackResult);
         if (USE_IGNITION_HEIGHT_FEATURE)
@@ -558,7 +559,6 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
             maxRensaScoreCollector = move(rensaScoreCollector);
         }
     };
-
 
     RensaDetector::iteratePossibleRensasWithTracking(plan.field(), numKeyPuyos, callback);
 
