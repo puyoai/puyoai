@@ -481,9 +481,8 @@ void evalRensaIgnitionHeightFeature(ScoreCollector* sc, const RefPlan& plan, con
 }
 
 template<typename ScoreCollector>
-void evalRensaConnectionFeature(ScoreCollector* sc, const RefPlan& plan, const CoreField& fieldAfterDrop)
+void evalRensaConnectionFeature(ScoreCollector* sc, const CoreField& fieldAfterDrop)
 {
-    UNUSED_VARIABLE(plan);
     calculateConnection(sc, fieldAfterDrop, CONNECTION_AFTER_VANISH);
 }
 
@@ -541,7 +540,7 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
         if (USE_IGNITION_HEIGHT_FEATURE)
             evalRensaIgnitionHeightFeature(rensaScoreCollector.get(), plan, trackResult);
         if (USE_CONNECTION_FEATURE)
-            evalRensaConnectionFeature(rensaScoreCollector.get(), plan, fieldAfterRensa);
+            evalRensaConnectionFeature(rensaScoreCollector.get(), fieldAfterRensa);
         evalRensaStrategy(rensaScoreCollector.get(), plan, currentFrameId, gazer);
 
         if (rensaScoreCollector->score() > maxRensaScore) {
