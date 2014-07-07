@@ -557,13 +557,13 @@ void eval(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField
 
 // ----------------------------------------------------------------------
 
-class UsualScoreCollector {
+class NormalScoreCollector {
 public:
-    explicit UsualScoreCollector(const FeatureParameter& param) : param_(param) {}
+    explicit NormalScoreCollector(const FeatureParameter& param) : param_(param) {}
 
     void addScore(EvaluationFeatureKey key, double v) { score_ += param_.score(key, v); }
     void addScore(EvaluationSparseFeatureKey key, int idx, int n) { score_ += param_.score(key, idx, n); }
-    void merge(const UsualScoreCollector& sc) { score_ += sc.score(); }
+    void merge(const NormalScoreCollector& sc) { score_ += sc.score(); }
 
     double score() const { return score_; }
     const FeatureParameter& featureParameter() const { return param_; }
@@ -573,9 +573,9 @@ private:
     double score_ = 0.0;
 };
 
-class LearningScoreCollector {
+class FeatureScoreCollector {
 public:
-    LearningScoreCollector(const FeatureParameter& param) : collector_(param) {}
+    FeatureScoreCollector(const FeatureParameter& param) : collector_(param) {}
 
     void addScore(EvaluationFeatureKey key, double v)
     {
@@ -590,7 +590,7 @@ public:
             collectedSparseFeatures_[key].push_back(idx);
     }
 
-    void merge(const LearningScoreCollector& sc)
+    void merge(const FeatureScoreCollector& sc)
     {
         collector_.merge(sc.collector_);
 
@@ -617,7 +617,7 @@ public:
     }
 
 private:
-    UsualScoreCollector collector_;
+    NormalScoreCollector collector_;
     map<EvaluationFeatureKey, double> collectedFeatures_;
     map<EvaluationSparseFeatureKey, vector<int>> collectedSparseFeatures_;
 };
@@ -625,7 +625,7 @@ private:
 double Evaluator::eval(const RefPlan& plan, const CoreField& currentField,
                        int currentFrameId, int numKeyPuyos, const Gazer& gazer)
 {
-    UsualScoreCollector sc(param_);
+    NormalScoreCollector sc(param_);
     ::eval(&sc, plan, currentField, currentFrameId, numKeyPuyos, gazer);
     return sc.score();
 }
@@ -633,7 +633,7 @@ double Evaluator::eval(const RefPlan& plan, const CoreField& currentField,
 CollectedFeature Evaluator::evalWithCollectingFeature(const RefPlan& plan, const CoreField& currentField,
                                                       int currentFrameId, int numKeyPuyos, const Gazer& gazer)
 {
-    LearningScoreCollector sc(param_);
+    FeatureScoreCollector sc(param_);
     ::eval(&sc, plan, currentField, currentFrameId, numKeyPuyos, gazer);
     return sc.toCollectedFeature();
 }
