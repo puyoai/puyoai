@@ -61,7 +61,6 @@ public:
     Evaluator(const FeatureParameter& param) : param_(param) {}
 
     double eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int numKeyPuyos, const Gazer&);
-
     // Same as eval(), but returns CollectedFeature.
     CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int numKeyPuyos, const Gazer&);
 

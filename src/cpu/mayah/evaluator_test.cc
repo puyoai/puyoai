@@ -13,7 +13,7 @@ using namespace std;
 
 class EvaluatorTest : public testing::Test {
 protected:
-    CollectedFeature eval(const CoreField& f)
+    CollectedFeature eval(const CoreField& f, int numKeyPuyos = 0)
     {
         TsumoPossibility::initialize();
 
@@ -29,7 +29,7 @@ protected:
 
         RefPlan plan(f, decisions, rensaResult, 0, initiatingFrames);
 
-        return evaluator.evalWithCollectingFeature(plan, f, 1, false, gazer);
+        return evaluator.evalWithCollectingFeature(plan, f, 1, numKeyPuyos, gazer);
     }
 };
 
