@@ -19,8 +19,9 @@ public:
     void setValue(EvaluationFeatureKey key, double value) { coef_[key] = value; }
     void addValue(EvaluationFeatureKey key, double value) { coef_[key] += value; }
 
+    std::vector<double> getValues(EvaluationSparseFeatureKey key) const { return sparseCoef_[key]; }
+    void setValues(EvaluationSparseFeatureKey key, const std::vector<double>& values) { sparseCoef_[key] = values; }
     double getValue(EvaluationSparseFeatureKey key, int idx) const { return sparseCoef_[key][idx]; }
-    void setValue(EvaluationSparseFeatureKey key, const std::vector<double>& values) { sparseCoef_[key] = values; }
     void addValue(EvaluationSparseFeatureKey key, int idx, double value)
     {
         CHECK(0 <= idx && static_cast<size_t>(idx) < sparseCoef_[key].size())
