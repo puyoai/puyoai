@@ -74,7 +74,7 @@ void collectScoreForConnection(ScoreCollector* sc, const CoreField& field)
 template<typename ScoreCollector>
 void evalConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
 {
-    const int MAX_HEIGHT = 5; // instead of CoreField::HEIGHT
+    const int MAX_HEIGHT = 3; // instead of CoreField::HEIGHT
     const CoreField& f = plan.field();
     for (int y = 1; y <= MAX_HEIGHT; ++y) {
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
@@ -97,7 +97,7 @@ void evalRestrictedConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan
 {
     int MAX_LEN[] = { 0, 3, 2, 1, 3, 2, 1, 0 };
 
-    const int MAX_HEIGHT = 5; // instead of CoreField::HEIGHT
+    const int MAX_HEIGHT = 3; // instead of CoreField::HEIGHT
     const CoreField& f = plan.field();
     for (int y = 1; y <= MAX_HEIGHT; ++y) {
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
