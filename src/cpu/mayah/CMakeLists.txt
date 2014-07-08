@@ -23,8 +23,6 @@ mayah_add_executable(mayah_cpu main.cc)
 mayah_add_executable(interactive interactive.cc)
 mayah_add_executable(learn learn.cc)
 mayah_add_executable(tweaker tweaker.cc)
-#mayah_add_executable(solver solver.cc)
-#mayah_add_executable(solo solo.cc)
 
 cpu_add_runner(run.sh)
 
