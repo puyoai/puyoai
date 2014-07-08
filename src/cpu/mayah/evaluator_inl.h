@@ -50,7 +50,8 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field, Eval
     FieldBitField checked;
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         // TODO(mayah): Why checking EMPTY? Why not height?
-        for (int y = 1; field.color(x, y) != EMPTY; ++y) {
+        int height = field.height(x);
+        for (int y = 1; y <= height; ++y) {
             if (!isNormalColor(field.color(x, y)))
                 continue;
             if (checked.get(x, y))
@@ -65,9 +66,9 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field, Eval
 }
 
 template<typename ScoreCollector>
-void evalConnectionFeature(ScoreCollector* sc, const RefPlan& plan)
+void collectScoreForConnection(ScoreCollector* sc, const CoreField& field)
 {
-    calculateConnection(sc, plan.field(), CONNECTION);
+    calculateConnection(sc, field, CONNECTION);
 }
 
 template<typename ScoreCollector>
@@ -451,7 +452,7 @@ void collectScore(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
     evalFrameFeature(sc, plan);
     evalCountPuyoFeature(sc, plan);
     if (USE_CONNECTION_FEATURE)
-        evalConnectionFeature(sc, plan);
+        collectScoreForConnection(sc, plan.field());
     if (USE_CONNECTION_HORIZONTAL_FEATURE)
         evalConnectionHorizontalFeature(sc, plan);
     if (USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE)
