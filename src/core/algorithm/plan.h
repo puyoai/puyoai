@@ -17,9 +17,9 @@ class Plan {
 public:
     Plan() {}
     Plan(const CoreField& field, const std::vector<Decision>& decisions,
-         const RensaResult& rensaResult, int numChigiri, int initiatingFrames) :
+         const RensaResult& rensaResult, int numChigiri, int initiatingFrames, int lastDropFrames) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
-        numChigiri_(numChigiri), initiatingFrames_(initiatingFrames)
+        numChigiri_(numChigiri), initiatingFrames_(initiatingFrames), lastDropFrames_(lastDropFrames)
     {
     }
 
@@ -35,12 +35,13 @@ public:
 
     const RensaResult& rensaResult() const { return rensaResult_; }
     int initiatingFrames() const { return initiatingFrames_; }
+    int lastDropFrames() const { return lastDropFrames_; }
 
     int score() const { return rensaResult_.score; }
     int chains() const { return rensaResult_.chains; }
 
     int numChigiri() const { return numChigiri_; }
-    int totalFrames() const { return initiatingFrames_ + rensaResult_.frames; }
+    int totalFrames() const { return initiatingFrames_ + lastDropFrames_ + rensaResult_.frames; }
 
     bool isRensaPlan() const { return rensaResult_.chains > 0; }
 
@@ -52,6 +53,7 @@ private:
     RensaResult rensaResult_;
     int numChigiri_;
     int initiatingFrames_;
+    int lastDropFrames_;
 };
 
 // RefPlan is almost same as plan, but holding references so that field copy will not occur.
@@ -59,9 +61,9 @@ private:
 class RefPlan : noncopyable {
 public:
     RefPlan(const CoreField& field, const std::vector<Decision>& decisions,
-            const RensaResult& rensaResult, int numChigiri, int initiatingFrames) :
+            const RensaResult& rensaResult, int numChigiri, int initiatingFrames, int lastDropFrames) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
-        numChigiri_(numChigiri), initiatingFrames_(initiatingFrames)
+        numChigiri_(numChigiri), initiatingFrames_(initiatingFrames), lastDropFrames_(lastDropFrames)
     {
     }
 
@@ -75,12 +77,13 @@ public:
 
     // initiatingFrames returns how many frames are required just before the last hand.
     int initiatingFrames() const { return initiatingFrames_; }
-    int totalFrames() const { return initiatingFrames_ + rensaResult_.frames; }
+    int lastDropFrames() const { return lastDropFrames_; }
+    int totalFrames() const { return initiatingFrames_ + lastDropFrames_ + rensaResult_.frames; }
     int numChigiri() const { return numChigiri_; }
 
     bool isRensaPlan() const { return rensaResult_.chains > 0; }
 
-    Plan toPlan() const { return Plan(field_, decisions_, rensaResult_, numChigiri_, initiatingFrames_); }
+    Plan toPlan() const { return Plan(field_, decisions_, rensaResult_, numChigiri_, initiatingFrames_, lastDropFrames_); }
 
     std::string decisionText() const;
 
@@ -90,6 +93,7 @@ private:
     const RensaResult& rensaResult_;
     int numChigiri_;
     int initiatingFrames_;
+    int lastDropFrames_;
 };
 
 #endif
