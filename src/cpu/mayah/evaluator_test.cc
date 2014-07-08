@@ -91,6 +91,28 @@ TEST_F(EvaluatorTest, RidgeHeight3)
     EXPECT_TRUE(find(vs.begin(), vs.end(), 1) != vs.end());
 }
 
+TEST_F(EvaluatorTest, connection)
+{
+    CoreField f("BBBYYY"
+                "OOOOOO"
+                "BBYYGO");
+
+    FeatureParameter param;
+    FeatureScoreCollector sc(param);
+
+    collectScoreForConnection(&sc, f);
+    CollectedFeature cf = sc.toCollectedFeature();
+
+    map<int, int> vs;
+    for (int v : cf.feature(CONNECTION)) {
+        vs[v]++;
+    }
+    EXPECT_EQ(3U, vs.size());
+    EXPECT_EQ(2, vs[3]);
+    EXPECT_EQ(2, vs[2]);
+    EXPECT_EQ(1, vs[1]);
+}
+
 TEST_F(EvaluatorTest, ConnectionHorizontal1)
 {
     CoreField f(
