@@ -99,7 +99,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     if (plan.decisions().empty())
         return string("give up :-(");
 
-    RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.initiatingFrames());
+    RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.initiatingFrames(), plan.lastDropFrames());
     CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, numKeyPuyos, gazer_);
 
     stringstream ss;

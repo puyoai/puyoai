@@ -116,10 +116,10 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         }
 
         // 3 + k 回ほどぷよを引く必要があり、そのときに必要そうなフレーム数
-        int frames = ((CoreField::HEIGHT - averageHeight) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI) * (3 + k);
+        int initiatingFrames = ((CoreField::HEIGHT - averageHeight) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI) * (3 + k);
         int score = rensaResult.score;
         int chains = rensaResult.chains;
-        results.push_back(EstimatedRensaInfo(chains, score, frames));
+        results.push_back(EstimatedRensaInfo(chains, score, initiatingFrames));
     };
 
     RensaDetector::iteratePossibleRensas(field, 3, callback);
@@ -199,7 +199,7 @@ int Gazer::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInfo>& r
         return -1;
 
     for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (it->initiatingFrames + m_id <= frameId)
+        if (frameId <= it->initiatingFrames + m_id)
             return it->score;
     }
 

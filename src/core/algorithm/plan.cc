@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "core/constant.h"
 #include "core/ctrl.h"
 #include "core/kumipuyo.h"
 
@@ -116,7 +117,7 @@ static void iterateAvailablePlansInternal(const CoreField& field,
 
             decisions.push_back(decision);
             if (currentDepth + 1 == maxDepth || rensaResult.chains > 0) {
-                callback(RefPlan(nextField, decisions, rensaResult, currentNumChigiri + isChigiri, totalFrames + dropFrames));
+                callback(RefPlan(nextField, decisions, rensaResult, currentNumChigiri + isChigiri, totalFrames, dropFrames));
             } else {
                 iterateAvailablePlansInternal(nextField, kumipuyoSeq, decisions, currentDepth + 1, maxDepth,
                                               currentNumChigiri + isChigiri, totalFrames + dropFrames, callback);

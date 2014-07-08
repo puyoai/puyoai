@@ -26,8 +26,9 @@ protected:
         vector<Decision> decisions { Decision(3, 0) };
         RensaResult rensaResult;
         int initiatingFrames = 10;
+        int lastDropFrames = 10;
 
-        RefPlan plan(f, decisions, rensaResult, 0, initiatingFrames);
+        RefPlan plan(f, decisions, rensaResult, 0, initiatingFrames, lastDropFrames);
 
         return evaluator.evalWithCollectingFeature(plan, f, 1, numKeyPuyos, gazer);
     }
