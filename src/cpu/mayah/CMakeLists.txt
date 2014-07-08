@@ -29,7 +29,7 @@ cpu_add_runner(run.sh)
 cpu_add_runner(feature.txt)
 cpu_add_runner(run_for_tweaker_1p.sh)
 cpu_add_runner(run_for_tweaker_2p.sh)
-cpu_add_runner(tweaker_loop.sh)
+cpu_add_runner(auto_tweaker.go)
 
 mayah_add_test(evaluator_test)
 mayah_add_test(gazer_test)
