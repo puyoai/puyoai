@@ -71,24 +71,23 @@ void apply_seccomp_filter() {
     .filter = filter
   };
 
-  struct sigaction action = {
-    .sa_sigaction = [](int, siginfo_t* siginfo, void*) {
-      int16_t syscall_number = -static_cast<int16_t>(siginfo->si_errno);
-      const char msg[] = "Disallowed syscall: ";
-      write(2, msg, sizeof(msg));
-      print_syscall_name(syscall_number);
+  struct sigaction action = {};
+  action.sa_sigaction = [](int, siginfo_t* siginfo, void*) {
+    int16_t syscall_number = -static_cast<int16_t>(siginfo->si_errno);
+    const char msg[] = "Disallowed syscall: ";
+    write(2, msg, sizeof(msg));
+    print_syscall_name(syscall_number);
 
-      write(2, " (", 2);
-      char buf[] = "     )\n";
-      int i = 5;
-      while (syscall_number) {
-        buf[--i] = '0' + (syscall_number % 10);
-        syscall_number /= 10;
-      }
-      write(2, buf + i, 5 - i + 2);
-    },
-    .sa_flags = SA_SIGINFO,
+    write(2, " (", 2);
+    char buf[] = "     )\n";
+    int i = 5;
+    while (syscall_number) {
+      buf[--i] = '0' + (syscall_number % 10);
+      syscall_number /= 10;
+    }
+    write(2, buf + i, 5 - i + 2);
   };
+  action.sa_flags = SA_SIGINFO;
   sigaction(SIGSYS, &action, nullptr);
 
   if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0 ||
