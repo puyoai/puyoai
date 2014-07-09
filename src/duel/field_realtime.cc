@@ -19,15 +19,25 @@ using namespace std;
 
 DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 
+// (n) means frames to transit to the next state.
+//
 // STATE_LEVEL_SELECT
+//  v (6)
+// STATE_PREPARING_NEXT <--------+
+//  v (0)                        |
+// STATE_PLAYABLE (?)            |
+//  v (0)                        |
+// STATE_DROPPING (?) <--+       |
+//  v (10)               |       |
+// STATE_GROUNDING       |       |
+//  v (0)                | (25)  |
+// STATE_VANISHING ------+       |
+//  v (0)                        |
+// STATE_OJAMA_DROPPING          |
+//  v (10)                       | (6)
+// STATE_OJAMA_GROUNDING --------+
 //  v
-// STATE_PLAYABLE <---+
-//  v                 |
-// STATE_DROP <----+  |
-//  v              |  |
-// STATE_VANISH ---+  |
-//  v                 |
-// STATE_OJAMA ------ +
+// STATE_DEAD
 
 FieldRealtime::FieldRealtime(int playerId, const KumipuyoSeq& seq) :
     playerId_(playerId)
@@ -46,7 +56,7 @@ void FieldRealtime::init()
     userState_.playable = false;
     sleepFor_ = 30;
 
-    frames_for_free_fall_ = 0;
+    restFramesForFreeFall_ = FRAMES_FREE_FALL;
     ojama_position_ = vector<int>(6, 0);
     ojama_dropping_ = false;
     current_chains_ = 1;
@@ -56,7 +66,91 @@ void FieldRealtime::init()
     drop_animation_ = false;
 }
 
-bool FieldRealtime::tryVanish(FrameContext* context)
+bool FieldRealtime::onStateLevelSelect()
+{
+    transitToStatePreparingNext();
+    return false;
+}
+
+void FieldRealtime::transitToStatePreparingNext()
+{
+    simulationState_ = SimulationState::STATE_PREPARING_NEXT;
+    sleepFor_ = 6;
+    userState_.playable = false;
+
+    kumipuyoPos_ = KumipuyoPos(3, 12, 0);
+
+    if (!kumipuyoSeq_.isEmpty())
+        kumipuyoSeq_.dropFront();
+    if (FLAGS_delay_wnext)
+        delayFramesWNextAppear_ = FRAMES_YOKOKU_DELAY + 6;
+    sent_wnext_appeared_ = false;
+}
+
+bool FieldRealtime::onStatePreparingNext()
+{
+    restFramesForFreeFall_ = FRAMES_FREE_FALL;
+    simulationState_ = SimulationState::STATE_PLAYABLE;
+    userState_.playable = true;
+    return false;
+}
+
+bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
+{
+    userState_.playable = true;
+
+    if (restFramesToAcceptQuickTurn_ > 0)
+        --restFramesToAcceptQuickTurn_;
+    if (restFramesForFreeFall_ > 0)
+        --restFramesForFreeFall_;
+
+    current_chains_ = 1;
+
+    *accepted = true;
+    bool grounded = playInternal(keySet, accepted);
+    if (!grounded && restFramesForFreeFall_ <= 0 && !keySet.downKey)
+        grounded = doFreeFall();
+    if (keySet.downKey && *accepted)
+        ++score_;
+
+    if (grounded) {
+        userState_.grounded = true;
+        dropVelocity_ = INITIAL_DROP_VELOCITY;
+        dropAmount_ = 0.0;
+        drop_animation_ = false;
+        userState_.playable = false;
+        sleepFor_ = 0;
+        simulationState_ = SimulationState::STATE_DROPPING;
+    }
+
+    return true;
+}
+
+bool FieldRealtime::onStateDropping()
+{
+    if (drop1Frame()) {
+        drop_animation_ = true;
+        return true;
+    }
+
+    bool wasDropping = drop_animation_;
+    drop_animation_ = false;
+    if (wasDropping) {
+        sleepFor_ = FRAMES_GROUNDING;
+    } else {
+        sleepFor_ = FRAMES_GROUNDING - 1; // Consumed 1 frame in this state.
+    }
+    simulationState_ = SimulationState::STATE_GROUNDING;
+    return false;
+}
+
+bool FieldRealtime::onStateGrounding()
+{
+    simulationState_ = SimulationState::STATE_VANISHING;
+    return false;
+}
+
+bool FieldRealtime::onStateVanishing(FrameContext* context)
 {
     // TODO(mayah): field_ looks inconsistent in some reason.
     // Let's recalculate the height.
@@ -64,36 +158,23 @@ bool FieldRealtime::tryVanish(FrameContext* context)
         field_.recalcHeightOn(x);
 
     int score = field_.vanishOnly(current_chains_);
-    if (score > 0) {
-        current_chains_++;
-        score_ += score;
-        if (is_zenkesi_) {
-            score_ += ZENKESHI_BONUS;
-            is_zenkesi_ = false;
-        }
-
-        simulationState_ = SimulationState::STATE_DROP;
-        dropVelocity_ = MAX_DROP_VELOCITY;
-        dropAmount_ = 0.0;
-        sleepFor_ = FRAMES_VANISH_ANIMATION;
-
-        // Set Yokoku Ojama.
-        if ((score_ - scoreConsumed_ >= SCORE_FOR_OJAMA) && (current_chains_ > 1)) {
-            int attack_ojama = (score_ - scoreConsumed_) / SCORE_FOR_OJAMA;
-            if (context)
-                context->sendOjama(attack_ojama);
-            scoreConsumed_ = score_ / SCORE_FOR_OJAMA * SCORE_FOR_OJAMA;
-        }
-        return true;
-    } else {
-        sleepFor_ = FRAMES_AFTER_VANISH;
-        finishChain(context);
+    if (score == 0) {
+        if (context)
+            context->commitOjama();
+        sleepFor_ = 0;
+        drop_animation_ = false;
+        simulationState_ = SimulationState::STATE_OJAMA_DROPPING;
+        userState_.chainFinished = true;
         return false;
     }
-}
 
-void FieldRealtime::finishChain(FrameContext* context)
-{
+    current_chains_++;
+    score_ += score;
+    if (is_zenkesi_) {
+        score_ += ZENKESHI_BONUS;
+        is_zenkesi_ = false;
+    }
+
     isDead_ = (field_.color(3, 12) != PuyoColor::EMPTY);
     if (!is_zenkesi_) {
         is_zenkesi_ = true;
@@ -104,39 +185,22 @@ void FieldRealtime::finishChain(FrameContext* context)
         }
     }
 
-    if (context)
-        context->commitOjama();
-    if (numFixedOjama() > 0) {
-        simulationState_ = SimulationState::STATE_OJAMA;
-    } else {
-        // TODO(mayah): After finishChain(), sleepFor_ won't be 0.
-        // This means, we consume several frames before playable state.
-        // This causes moving puyos difficult.
-        prepareNextPuyo();
+    simulationState_ = SimulationState::STATE_DROPPING;
+    dropVelocity_ = MAX_DROP_VELOCITY;
+    dropAmount_ = 0.0;
+    sleepFor_ = FRAMES_VANISH_ANIMATION;
+
+    // Set Yokoku Ojama.
+    if ((score_ - scoreConsumed_ >= SCORE_FOR_OJAMA) && (current_chains_ > 1)) {
+        int attack_ojama = (score_ - scoreConsumed_) / SCORE_FOR_OJAMA;
+        if (context)
+            context->sendOjama(attack_ojama);
+        scoreConsumed_ = score_ / SCORE_FOR_OJAMA * SCORE_FOR_OJAMA;
     }
-    current_chains_ = 1;
-    userState_.chainFinished = true;
+    return true;
 }
 
-bool FieldRealtime::tryDrop(FrameContext* context)
-{
-    if (drop1Frame()) {
-        drop_animation_ = true;
-        return true;
-    }
-
-    if (drop_animation_) {
-        sleepFor_ = FRAMES_AFTER_DROP;
-        drop_animation_ = false;
-        simulationState_ = SimulationState::STATE_VANISH;
-    } else {
-        finishChain(context);
-        sleepFor_ = FRAMES_AFTER_NO_DROP;
-    }
-    return false;
-}
-
-bool FieldRealtime::tryOjama()
+bool FieldRealtime::onStateOjamaDropping()
 {
     if (!ojama_dropping_) {
         ojama_position_ = determineColumnOjamaAmount();
@@ -151,6 +215,7 @@ bool FieldRealtime::tryOjama()
         dropAmount_ = 0.0;
     }
 
+    bool ojamaWasDropping = ojama_dropping_;
     if (ojama_dropping_) {
         for (int i = 0; i < 6; i++) {
             if (ojama_position_[i] > 0) {
@@ -160,55 +225,45 @@ bool FieldRealtime::tryOjama()
                 }
             }
         }
+
+        if (drop1Frame())
+            return true;
     }
 
-    if (drop1Frame())
-        return true;
+    if (!ojamaWasDropping) {
+        sleepFor_ = 0;
+        simulationState_ = SimulationState::STATE_OJAMA_GROUNDING;
+        return false;
+    }
 
     ojama_dropping_ = false;
-    isDead_ = (field_.color(3, 12) != PuyoColor::EMPTY);
-     // TODO(mayah): We need to sleep more. 1 ojama -> +4 frames, 30 ojama -> 16frames, etc.
-    sleepFor_ = FRAMES_AFTER_DROP;
-    userState_.ojamaDropped = true;
-    prepareNextPuyo();
+    // TODO(mayah): We need to sleep more. 1 ojama -> +4 frames, 30 ojama -> 16frames, etc.
+    sleepFor_ = FRAMES_GROUNDING;
+    simulationState_ = SimulationState::STATE_OJAMA_GROUNDING;
     return false;
 }
 
-bool FieldRealtime::tryUserState(const KeySet& keySet)
+bool FieldRealtime::onStateOjamaGrounding()
 {
-    bool accepted = true;
-    bool grounded = playInternal(keySet, &accepted);
-    if (!grounded) {
-        if (frames_for_free_fall_ >= FRAMES_FREE_FALL) {
-            bool dummy;
-            grounded = playInternal(KeySet(KEY_DOWN), &dummy);
-        }
+    isDead_ = (field_.color(3, 12) != PuyoColor::EMPTY);
+    if (isDead_) {
+        simulationState_ = SimulationState::STATE_DEAD;
+        return false;
     }
+    transitToStatePreparingNext();
+    userState_.ojamaDropped = true;
+    return false;
+}
 
-    if (grounded) {
-        userState_.grounded = true;
-        dropVelocity_ = INITIAL_DROP_VELOCITY;
-        dropAmount_ = 0.0;
-        drop_animation_ = true;
-        simulationState_ = SimulationState::STATE_DROP;
-    }
-
-    if (keySet.downKey && accepted)
-        ++score_;
-
-    return accepted;
+bool FieldRealtime::onStateDead()
+{
+    return true;
 }
 
 // Returns true if a key input is accepted.
 bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
 {
     userState_.clear();
-
-    if (restFramesToAcceptQuickTurn_ > 0)
-        restFramesToAcceptQuickTurn_--;
-
-    if (simulationState_ == SimulationState::STATE_PLAYABLE)
-        frames_for_free_fall_++;
 
     if (delayFramesWNextAppear_ > 0)
         --delayFramesWNextAppear_;
@@ -222,37 +277,52 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
     while (true) {
         if (sleepFor_ > 0) {
             sleepFor_--;
-            // Player can send a command in the next frame.
-            if (simulationState_ == SimulationState::STATE_PLAYABLE && sleepFor_ == 0) {
-                userState_.playable = true;
-                // TODO(mayah): This is a work around frames_for_free_fall_ is not 0 after chain finish
-                // or ojama drop. We need to make this event loop more understandable.
-                frames_for_free_fall_ = 0;
-            }
             return false;
         }
 
         switch (simulationState_) {
         case SimulationState::STATE_LEVEL_SELECT:
-            simulationState_ = SimulationState::STATE_PLAYABLE;
-            prepareNextPuyo();
-            userState_.playable = true;
-            continue;
-        case SimulationState::STATE_VANISH:
-            if (tryVanish(context))
+            if (onStateLevelSelect())
                 return false;
             continue;
-        case SimulationState::STATE_DROP:
-            if (tryDrop(context))
+        case SimulationState::STATE_PREPARING_NEXT:
+            if (onStatePreparingNext()) {
                 return false;
+            }
             continue;
-        case SimulationState::STATE_OJAMA:
-            if (tryOjama())
-                return false;
+        case SimulationState::STATE_PLAYABLE: {
+            bool accepted = false;
+            if (onStatePlayable(keySet, &accepted))
+                return accepted;
             continue;
-        case SimulationState::STATE_PLAYABLE:
-            return tryUserState(keySet);
         }
+        case SimulationState::STATE_DROPPING:
+            if (onStateDropping())
+                return false;
+            continue;
+        case SimulationState::STATE_GROUNDING:
+            if (onStateGrounding())
+                return false;
+            continue;
+        case SimulationState::STATE_VANISHING:
+            if (onStateVanishing(context))
+                return false;
+            continue;
+        case SimulationState::STATE_OJAMA_DROPPING:
+            if (onStateOjamaDropping())
+                return false;
+            continue;
+        case SimulationState::STATE_OJAMA_GROUNDING:
+            if (onStateOjamaGrounding())
+                return false;
+            continue;
+        case SimulationState::STATE_DEAD:
+            if (onStateDead())
+                return false;
+            continue;
+        }
+
+        CHECK(false) << "Unknown state?";
     }  // end while
 
     DCHECK(false) << "should not reached here.";
@@ -405,21 +475,43 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
             *accepted = false;
         }
     } else if (keySet.downKey) {
-        frames_for_free_fall_ = 0;
-        if (field_.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
-            field_.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
-            kumipuyoPos_.y--;
-            *accepted = true;
+        if (restFramesForFreeFall_ > 0) {
+            restFramesForFreeFall_ = 0;
         } else {
-            // Ground.
-            field_.setPuyoAndHeight(pos.axisX(), pos.axisY(), kumipuyoSeq_.axis(0));
-            field_.setPuyoAndHeight(pos.childX(), pos.childY(), kumipuyoSeq_.child(0));
-            *accepted = false;
-            ground = true;
+            restFramesForFreeFall_ = 0;
+            if (field_.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
+                field_.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
+                kumipuyoPos_.y--;
+                *accepted = true;
+            } else {
+                // Ground.
+                field_.setPuyoAndHeight(pos.axisX(), pos.axisY(), kumipuyoSeq_.axis(0));
+                field_.setPuyoAndHeight(pos.childX(), pos.childY(), kumipuyoSeq_.child(0));
+                *accepted = true;
+                ground = true;
+            }
         }
     }
 
     return ground;
+}
+
+bool FieldRealtime::doFreeFall()
+{
+    KumipuyoPos pos = kumipuyoPos();
+    bool grounded = false;
+    restFramesForFreeFall_ = FRAMES_FREE_FALL;
+    if (field_.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
+        field_.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
+        kumipuyoPos_.y--;
+    } else {
+        // Ground.
+        field_.setPuyoAndHeight(pos.axisX(), pos.axisY(), kumipuyoSeq_.axis(0));
+        field_.setPuyoAndHeight(pos.childX(), pos.childY(), kumipuyoSeq_.child(0));
+        grounded = true;
+    }
+
+    return grounded;
 }
 
 bool FieldRealtime::drop1Frame()
@@ -454,19 +546,6 @@ bool FieldRealtime::drop1Frame()
     }
 
     return stillDropping;
-}
-
-void FieldRealtime::prepareNextPuyo()
-{
-    kumipuyoPos_ = KumipuyoPos(3, 12, 0);
-
-    if (!kumipuyoSeq_.isEmpty())
-        kumipuyoSeq_.dropFront();
-    if (FLAGS_delay_wnext)
-        delayFramesWNextAppear_ = FRAMES_YOKOKU_DELAY;
-    sent_wnext_appeared_ = false;
-    frames_for_free_fall_ = 0;
-    simulationState_ = SimulationState::STATE_PLAYABLE;
 }
 
 PlayerFrameData FieldRealtime::playerFrameData() const
@@ -592,10 +671,13 @@ PuyoColor FieldRealtime::puyoColor(NextPuyoPosition npp) const
 
 void FieldRealtime::skipLevelSelect()
 {
-    if (simulationState_ == SimulationState::STATE_LEVEL_SELECT) {
-        simulationState_ = SimulationState::STATE_PLAYABLE;
-        sleepFor_ = 0;
-        prepareNextPuyo();
-        userState_.playable = true;
-    }
+    CHECK(simulationState_ == SimulationState::STATE_LEVEL_SELECT);
+    transitToStatePreparingNext();
+}
+
+void FieldRealtime::skipPreparingNext()
+{
+    CHECK(simulationState_ == SimulationState::STATE_PREPARING_NEXT);
+    simulationState_ = SimulationState::STATE_PLAYABLE;
+    sleepFor_ = 0;
 }

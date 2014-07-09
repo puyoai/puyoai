@@ -16,6 +16,8 @@ const int FRAMES_DROP_1_LINE = 1;
 const int FRAMES_AFTER_DROP = 12;
 const int FRAMES_YOKOKU_DELAY = 8;
 
+const int FRAMES_GROUNDING = 10;
+
 // 9 frames of ground animation + 2 frames of connected puyos.
 // 6 is FRAMES_AFTER_VANISH.
 const int FRAMES_AFTER_CHIGIRI = 11 - 6;
