@@ -21,9 +21,9 @@ public:
     const double DROP_ACCELARATION_PER_FRAME = 1.2;
     const double DROP_1BLOCK_THRESHOLD = 32.0;
 
-    enum SimulationState {
+    enum class SimulationState {
         STATE_LEVEL_SELECT, // initial state
-        STATE_USER,         // A user is moving puyo
+        STATE_PLAYABLE,     // A user is moving puyo
         STATE_VANISH,       // on vanishing
         STATE_DROP,         // on dropping
         STATE_OJAMA,        // on ojama dropping
@@ -50,7 +50,7 @@ public:
     int numPendingOjama() const { return numPendingOjama_; }
 
     int playerId() const { return playerId_; }
-    bool userPlayable() const { return simulationState_ == STATE_USER; }
+    bool userPlayable() const { return simulationState_ == SimulationState::STATE_PLAYABLE; }
 
     void addPendingOjama(int num) { numPendingOjama_ += num; }
     int reduceOjama(int num);
@@ -86,7 +86,7 @@ private:
 
     int playerId_;
 
-    SimulationState simulationState_ = STATE_LEVEL_SELECT;
+    SimulationState simulationState_ = SimulationState::STATE_LEVEL_SELECT;
     int sleepFor_ = 0;
 
     CoreField field_;
