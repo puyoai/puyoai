@@ -23,6 +23,7 @@ DEFINE_int32(num_duel, -1, "After num_duel times of duel, the server will stop. 
 DEFINE_int32(num_win, -1, "After num_win times of 1p or 2p win, the server will stop. negative is infinity");
 DEFINE_bool(use_even, true, "the match gets even after 2 minutes.");
 DEFINE_int32(seed, -1, "sets the random seed. When negative, seed will be chosen at random.");
+DEFINE_string(seq, "", "initial puyo sequence");
 
 #ifdef USE_SDL2
 DECLARE_bool(use_gui);
@@ -163,6 +164,17 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
 
     KumipuyoSeq kumipuyoSeq = FLAGS_seed < 0 ? generateSequence(): generateSequenceWithSeed(FLAGS_seed);
     LOG(INFO) << "Puyo sequence=" << kumipuyoSeq.toString();
+
+    if (FLAGS_seq != "") {
+        for (size_t i = 0; i < FLAGS_seq.size(); ++i) {
+            PuyoColor c = toPuyoColor(FLAGS_seq[i]);
+            CHECK(isNormalColor(c));
+            if (i % 2 == 0)
+                kumipuyoSeq.setAxis(i / 2, c);
+            else
+                kumipuyoSeq.setChild(i / 2, c);
+        }
+    }
 
     GameState gameState(kumipuyoSeq);
 

@@ -22,11 +22,15 @@ public:
     const double DROP_1BLOCK_THRESHOLD = 32.0;
 
     enum class SimulationState {
-        STATE_LEVEL_SELECT, // initial state
-        STATE_PLAYABLE,     // A user is moving puyo
-        STATE_VANISH,       // on vanishing
-        STATE_DROP,         // on dropping
-        STATE_OJAMA,        // on ojama dropping
+        STATE_LEVEL_SELECT,   // initial state
+        STATE_PREPARING_NEXT,
+        STATE_PLAYABLE,       // A user is moving puyo
+        STATE_DROPPING,       // on dropping
+        STATE_GROUNDING,
+        STATE_VANISHING,      // on vanishing
+        STATE_OJAMA_DROPPING, // on ojama dropping
+        STATE_OJAMA_GROUNDING,
+        STATE_DEAD,
     };
 
     FieldRealtime(int playerId, const KumipuyoSeq&);
@@ -35,6 +39,8 @@ public:
     // input is accepted. FrameContext will collect events when playing frames.
     // Currently, only ojama related events will be collected.
     bool playOneFrame(const KeySet&, FrameContext*);
+
+    bool doFreeFall();
 
     // Checks if a player is dead.
     bool isDead() const { return isDead_; }
@@ -66,6 +72,7 @@ public:
 
     // Testing only.
     void skipLevelSelect();
+    void skipPreparingNext();
     SimulationState simulationState() const { return simulationState_; }
     bool isSleeping() const { return sleepFor_ > 0; }
     void forceSetField(const CoreField& cf) { field_ = cf; }
@@ -77,12 +84,18 @@ private:
     bool drop1Frame();
 
     bool playInternal(const KeySet&, bool* ground);
-    void prepareNextPuyo();
-    void finishChain(FrameContext*);
-    bool tryVanish(FrameContext*);
-    bool tryDrop(FrameContext*);
-    bool tryOjama();
-    bool tryUserState(const KeySet&);
+
+    void transitToStatePreparingNext();
+
+    bool onStateLevelSelect();
+    bool onStatePreparingNext();
+    bool onStatePlayable(const KeySet&, bool* accepted);
+    bool onStateDropping();
+    bool onStateGrounding();
+    bool onStateVanishing(FrameContext*);
+    bool onStateOjamaDropping();
+    bool onStateOjamaGrounding();
+    bool onStateDead();
 
     int playerId_;
 
@@ -103,10 +116,11 @@ private:
     double dropVelocity_ = 0.0;
     double dropAmount_ = 0.0;
 
+    int restFramesForFreeFall_ = 0;
+
     bool ojama_dropping_;
     std::vector<int> ojama_position_;
     bool drop_animation_;
-    int frames_for_free_fall_;
     int current_chains_;
     int restFramesToAcceptQuickTurn_;
     bool is_zenkesi_ = false;
