@@ -175,7 +175,7 @@ void evalFieldHeightFeature(ScoreCollector* sc, const RefPlan& plan)
     double heightSum = 0.0;
     double heightSquareSum = 0.0;
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        double diff = abs(field.height(x) - averageHeight);
+        double diff = std::abs(field.height(x) - averageHeight);
         heightSum += diff;
         heightSquareSum += diff * diff;
     }
@@ -236,7 +236,7 @@ void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         if (f.height(x) <= 3)
             continue;
-        s += abs((f.height(x) + DIFF[x]) * 6 - sumHeight);
+        s += std::abs((f.height(x) + DIFF[x]) * 6 - sumHeight);
     }
 
     sc->addScore(FIELD_USHAPE, s);
