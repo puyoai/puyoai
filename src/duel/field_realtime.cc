@@ -21,7 +21,7 @@ DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 
 // STATE_LEVEL_SELECT
 //  v
-// STATE_USER <-------+
+// STATE_PLAYABLE <---+
 //  v                 |
 // STATE_DROP <----+  |
 //  v              |  |
@@ -72,7 +72,7 @@ bool FieldRealtime::tryVanish(FrameContext* context)
             is_zenkesi_ = false;
         }
 
-        simulationState_ = STATE_DROP;
+        simulationState_ = SimulationState::STATE_DROP;
         dropVelocity_ = MAX_DROP_VELOCITY;
         dropAmount_ = 0.0;
         sleepFor_ = FRAMES_VANISH_ANIMATION;
@@ -107,7 +107,7 @@ void FieldRealtime::finishChain(FrameContext* context)
     if (context)
         context->commitOjama();
     if (numFixedOjama() > 0) {
-        simulationState_ = STATE_OJAMA;
+        simulationState_ = SimulationState::STATE_OJAMA;
     } else {
         // TODO(mayah): After finishChain(), sleepFor_ won't be 0.
         // This means, we consume several frames before playable state.
@@ -128,7 +128,7 @@ bool FieldRealtime::tryDrop(FrameContext* context)
     if (drop_animation_) {
         sleepFor_ = FRAMES_AFTER_DROP;
         drop_animation_ = false;
-        simulationState_ = STATE_VANISH;
+        simulationState_ = SimulationState::STATE_VANISH;
     } else {
         finishChain(context);
         sleepFor_ = FRAMES_AFTER_NO_DROP;
@@ -190,7 +190,7 @@ bool FieldRealtime::tryUserState(const KeySet& keySet)
         dropVelocity_ = INITIAL_DROP_VELOCITY;
         dropAmount_ = 0.0;
         drop_animation_ = true;
-        simulationState_ = STATE_DROP;
+        simulationState_ = SimulationState::STATE_DROP;
     }
 
     if (keySet.downKey && accepted)
@@ -207,7 +207,7 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
     if (restFramesToAcceptQuickTurn_ > 0)
         restFramesToAcceptQuickTurn_--;
 
-    if (simulationState_ == STATE_USER)
+    if (simulationState_ == SimulationState::STATE_PLAYABLE)
         frames_for_free_fall_++;
 
     if (delayFramesWNextAppear_ > 0)
@@ -223,7 +223,7 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
         if (sleepFor_ > 0) {
             sleepFor_--;
             // Player can send a command in the next frame.
-            if (simulationState_ == STATE_USER && sleepFor_ == 0) {
+            if (simulationState_ == SimulationState::STATE_PLAYABLE && sleepFor_ == 0) {
                 userState_.playable = true;
                 // TODO(mayah): This is a work around frames_for_free_fall_ is not 0 after chain finish
                 // or ojama drop. We need to make this event loop more understandable.
@@ -233,24 +233,24 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
         }
 
         switch (simulationState_) {
-        case STATE_LEVEL_SELECT:
-            simulationState_ = STATE_USER;
+        case SimulationState::STATE_LEVEL_SELECT:
+            simulationState_ = SimulationState::STATE_PLAYABLE;
             prepareNextPuyo();
             userState_.playable = true;
             continue;
-        case STATE_VANISH:
+        case SimulationState::STATE_VANISH:
             if (tryVanish(context))
                 return false;
             continue;
-        case STATE_DROP:
+        case SimulationState::STATE_DROP:
             if (tryDrop(context))
                 return false;
             continue;
-        case STATE_OJAMA:
+        case SimulationState::STATE_OJAMA:
             if (tryOjama())
                 return false;
             continue;
-        case STATE_USER:
+        case SimulationState::STATE_PLAYABLE:
             return tryUserState(keySet);
         }
     }  // end while
@@ -466,7 +466,7 @@ void FieldRealtime::prepareNextPuyo()
         delayFramesWNextAppear_ = FRAMES_YOKOKU_DELAY;
     sent_wnext_appeared_ = false;
     frames_for_free_fall_ = 0;
-    simulationState_ = STATE_USER;
+    simulationState_ = SimulationState::STATE_PLAYABLE;
 }
 
 PlayerFrameData FieldRealtime::playerFrameData() const
@@ -592,8 +592,8 @@ PuyoColor FieldRealtime::puyoColor(NextPuyoPosition npp) const
 
 void FieldRealtime::skipLevelSelect()
 {
-    if (simulationState_ == STATE_LEVEL_SELECT) {
-        simulationState_ = STATE_USER;
+    if (simulationState_ == SimulationState::STATE_LEVEL_SELECT) {
+        simulationState_ = SimulationState::STATE_PLAYABLE;
         sleepFor_ = 0;
         prepareNextPuyo();
         userState_.playable = true;
