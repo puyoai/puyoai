@@ -29,7 +29,7 @@ DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 // STATE_PLAYABLE (?)            |
 //  v (0)                        |
 // STATE_DROPPING (?) <--+       |
-//  v (0 if quick or 10) |       |
+//  v (10 or 0 if quick) |       |
 // STATE_GROUNDING       |       |
 //  v (0)                |       |
 // STATE_VANISH          |       |
@@ -254,8 +254,7 @@ bool FieldRealtime::onStateOjamaGrounding()
         userState_.ojamaDropped = true;
     ojama_dropping_ = false;
 
-    isDead_ = (field_.color(3, 12) != PuyoColor::EMPTY);
-    if (isDead_) {
+    if (field_.color(3, 12) != PuyoColor::EMPTY) {
         simulationState_ = SimulationState::STATE_DEAD;
         return false;
     }

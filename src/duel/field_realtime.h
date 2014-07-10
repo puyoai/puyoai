@@ -44,7 +44,7 @@ public:
     bool doFreeFall();
 
     // Checks if a player is dead.
-    bool isDead() const { return isDead_; }
+    bool isDead() const { return simulationState_ == SimulationState::STATE_DEAD; }
 
     // Utility functions to be used by duel server.
     PlayerFrameData playerFrameData() const;
@@ -110,7 +110,6 @@ private:
     KumipuyoSeq kumipuyoSeq_;
     KumipuyoPos kumipuyoPos_;
     UserState userState_;
-    bool isDead_ = false;
 
     int score_ = 0;
     int scoreConsumed_ = 0;
