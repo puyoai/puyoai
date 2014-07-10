@@ -75,7 +75,7 @@ bool FieldRealtime::onStateLevelSelect()
 void FieldRealtime::transitToStatePreparingNext()
 {
     simulationState_ = SimulationState::STATE_PREPARING_NEXT;
-    sleepFor_ = 6; // TODO(mayah): magic number.
+    sleepFor_ = FRAMES_PREPARING_NEXT;
     userState_.playable = false;
 
     kumipuyoPos_ = KumipuyoPos(3, 12, 0);
@@ -83,7 +83,7 @@ void FieldRealtime::transitToStatePreparingNext()
     if (!kumipuyoSeq_.isEmpty())
         kumipuyoSeq_.dropFront();
     if (FLAGS_delay_wnext)
-        delayFramesWNextAppear_ = FRAMES_YOKOKU_DELAY + 6; // TODO(mayah): magic number.
+        delayFramesWNextAppear_ = FRAMES_NEXT2_DELAY + FRAMES_PREPARING_NEXT;
     sent_wnext_appeared_ = false;
 }
 

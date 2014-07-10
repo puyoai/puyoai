@@ -103,10 +103,10 @@ void AI::runLoop()
 
         if (frameData.myPlayerFrameData().userState.grounded) {
             LOG(INFO) << "STATE_YOU_GROUNDED";
-
             current.hasGrounded = true;
         }
 
+        // When the current puyo is grounded and the next hand is considered, we will move to the next hand.
         if (current.hasGrounded && next.needsSend) {
             CHECK(!current.needsSend);
             current = next;
