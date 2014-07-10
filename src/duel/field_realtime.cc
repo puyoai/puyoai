@@ -20,6 +20,7 @@ using namespace std;
 DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 
 // (n) means frames to transit to the next state.
+// TODO(mayah): quick?
 //
 // STATE_LEVEL_SELECT
 //  v (6)
@@ -28,10 +29,12 @@ DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 // STATE_PLAYABLE (?)            |
 //  v (0)                        |
 // STATE_DROPPING (?) <--+       |
-//  v (10)               |       |
+//  v (0 if quick or 10) |       |
 // STATE_GROUNDING       |       |
-//  v (0)                | (25)  |
-// STATE_VANISHING ------+       |
+//  v (0)                |       |
+// STATE_VANISH          |       |
+//  v  v (25)            | (0)   |
+//  v  STATE_VANISHING --+       |
 //  v (0)                        |
 // STATE_OJAMA_DROPPING          |
 //  v (10)                       | (6)
@@ -85,6 +88,7 @@ void FieldRealtime::transitToStatePreparingNext()
     if (FLAGS_delay_wnext)
         delayFramesWNextAppear_ = FRAMES_NEXT2_DELAY + FRAMES_PREPARING_NEXT;
     sent_wnext_appeared_ = false;
+    allowsQuick_ = false;
 }
 
 bool FieldRealtime::onStatePreparingNext()
@@ -137,6 +141,8 @@ bool FieldRealtime::onStateDropping()
     drop_animation_ = false;
     if (wasDropping) {
         sleepFor_ = FRAMES_GROUNDING;
+    } else if (allowsQuick_) {
+        sleepFor_ = 0;
     } else {
         sleepFor_ = FRAMES_GROUNDING - 1; // Consumed 1 frame in this state.
     }
@@ -146,18 +152,18 @@ bool FieldRealtime::onStateDropping()
 
 bool FieldRealtime::onStateGrounding()
 {
-    simulationState_ = SimulationState::STATE_VANISHING;
+    simulationState_ = SimulationState::STATE_VANISH;
     return false;
 }
 
-bool FieldRealtime::onStateVanishing(FrameContext* context)
+bool FieldRealtime::onStateVanish(FrameContext* context)
 {
     // TODO(mayah): field_ looks inconsistent in some reason.
     // Let's recalculate the height.
     for (int x = 1; x <= CoreField::WIDTH; ++x)
         field_.recalcHeightOn(x);
 
-    int score = field_.vanishOnly(current_chains_);
+    int score = field_.vanishOnly(current_chains_++);
     if (score == 0) {
         if (context)
             context->commitOjama();
@@ -168,35 +174,37 @@ bool FieldRealtime::onStateVanishing(FrameContext* context)
         return false;
     }
 
-    current_chains_++;
+    // Here, something has been vanished.
     score_ += score;
-    if (is_zenkesi_) {
-        score_ += ZENKESHI_BONUS;
-        is_zenkesi_ = false;
-    }
-
-    if (!is_zenkesi_) {
-        is_zenkesi_ = true;
-        for (int i = 1; i <= 6; i++) {
-            if (field_.color(i, 1) != PuyoColor::EMPTY) {
-                is_zenkesi_ = false;
-            }
-        }
-    }
-
-    simulationState_ = SimulationState::STATE_DROPPING;
-    dropVelocity_ = MAX_DROP_VELOCITY;
-    dropAmount_ = 0.0;
-    sleepFor_ = FRAMES_VANISH_ANIMATION;
 
     // Set Yokoku Ojama.
-    if ((score_ - scoreConsumed_ >= SCORE_FOR_OJAMA) && (current_chains_ > 1)) {
+    if (score_ - scoreConsumed_ >= SCORE_FOR_OJAMA) {
         int attack_ojama = (score_ - scoreConsumed_) / SCORE_FOR_OJAMA;
         if (context)
             context->sendOjama(attack_ojama);
         scoreConsumed_ = score_ / SCORE_FOR_OJAMA * SCORE_FOR_OJAMA;
     }
-    return true;
+
+    // After ojama is calculated, we add ZENKESHI score,
+    // because score for ZENKESHI is added, but not used for ojama calculation.
+    hasZenkeshi_ = false;
+    if (field_.isZenkeshi()) {
+        score_ += ZENKESHI_BONUS;
+        hasZenkeshi_ = true;
+    }
+
+    simulationState_ = SimulationState::STATE_VANISHING;
+    dropVelocity_ = MAX_DROP_VELOCITY;
+    dropAmount_ = 0.0;
+    sleepFor_ = FRAMES_VANISH_ANIMATION;
+    allowsQuick_ = true;
+    return false;
+}
+
+bool FieldRealtime::onStateVanishing()
+{
+    simulationState_ = SimulationState::STATE_DROPPING;
+    return false;
 }
 
 bool FieldRealtime::onStateOjamaDropping()
@@ -305,8 +313,12 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
             if (onStateGrounding())
                 return false;
             continue;
+        case SimulationState::STATE_VANISH:
+            if (onStateVanish(context))
+                return false;
+            continue;
         case SimulationState::STATE_VANISHING:
-            if (onStateVanishing(context))
+            if (onStateVanishing())
                 return false;
             continue;
         case SimulationState::STATE_OJAMA_DROPPING:

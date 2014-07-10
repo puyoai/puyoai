@@ -27,7 +27,8 @@ public:
         STATE_PLAYABLE,       // A user is moving puyo
         STATE_DROPPING,       // on dropping
         STATE_GROUNDING,
-        STATE_VANISHING,      // on vanishing
+        STATE_VANISH,         // on vanishing
+        STATE_VANISHING,
         STATE_OJAMA_DROPPING, // on ojama dropping
         STATE_OJAMA_GROUNDING,
         STATE_DEAD,
@@ -49,6 +50,8 @@ public:
     PlayerFrameData playerFrameData() const;
     UserState userState() const { return userState_; }
     Key getKey(const Decision&) const;
+
+    bool hasZenkeshi() const { return hasZenkeshi_; }
 
     int score() const { return score_; }
     int ojama() const { return numFixedOjama_ + numPendingOjama_; }
@@ -92,7 +95,8 @@ private:
     bool onStatePlayable(const KeySet&, bool* accepted);
     bool onStateDropping();
     bool onStateGrounding();
-    bool onStateVanishing(FrameContext*);
+    bool onStateVanish(FrameContext*);
+    bool onStateVanishing();
     bool onStateOjamaDropping();
     bool onStateOjamaGrounding();
     bool onStateDead();
@@ -116,14 +120,17 @@ private:
     double dropVelocity_ = 0.0;
     double dropAmount_ = 0.0;
 
+    bool allowsQuick_ = false;
     int restFramesForFreeFall_ = 0;
+
+    bool hasZenkeshi_ = false;
+    // bool is_zenkesi_ = false;
 
     bool ojama_dropping_;
     std::vector<int> ojama_position_;
     bool drop_animation_;
     int current_chains_;
     int restFramesToAcceptQuickTurn_;
-    bool is_zenkesi_ = false;
 
     int delayFramesWNextAppear_;
     bool sent_wnext_appeared_;
