@@ -306,7 +306,7 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
         return true;
     }
 
-    if (currentField.countPuyos() >= 60) {
+    if (currentField.countPuyos() >= 55) {
         sc->addScore(STRATEGY_HOUWA, 1);
         return false;
     }
@@ -316,20 +316,14 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
 }
 
 template<typename ScoreCollector>
-void evalRensaStrategy(ScoreCollector* sc, const RefPlan& plan,
+void evalRensaStrategy(ScoreCollector* sc, const RefPlan& plan, const RensaResult& rensaResult,
                        int currentFrameId, const Gazer& gazer)
 {
     UNUSED_VARIABLE(currentFrameId);
 
-#if 0
-    int rensaEndingFrameId = currentFrameId + plan.totalFrames();
-    int estimatedEnemyMaxScore = gazer.estimateMaxScore(rensaEndingFrameId);
-#endif
-
     // TODO(mayah): Ah, maybe sakiuchi etc. wins this value?
-    if (plan.score() >= scoreForOjama(15) && plan.score() <= scoreForOjama(30) && plan.field().countPuyos() >= 40) {
-        if (!gazer.rensaIsOngoing())
-            sc->addScore(STRATEGY_SAISOKU, 1);
+    if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) && rensaResult.chains >= 7 && !gazer.rensaIsOngoing()) {
+        sc->addScore(STRATEGY_SAISOKU, 1);
     }
 }
 
@@ -484,7 +478,7 @@ void collectScore(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
             evalRensaIgnitionHeightFeature(rensaScoreCollector.get(), plan, trackResult);
         if (USE_CONNECTION_FEATURE)
             evalRensaConnectionFeature(rensaScoreCollector.get(), fieldAfterRensa);
-        evalRensaStrategy(rensaScoreCollector.get(), plan, currentFrameId, gazer);
+        evalRensaStrategy(rensaScoreCollector.get(), plan, rensaResult, currentFrameId, gazer);
 
         if (rensaScoreCollector->score() > maxRensaScore) {
             maxRensaScore = rensaScoreCollector->score();
