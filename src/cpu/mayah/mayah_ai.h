@@ -42,6 +42,9 @@ protected:
     std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int numKeyPuyos,
                                 const Plan&, double thoughtTimeInSeconds) const;
 
+    // For debugging purpose.
+    void reloadParameter();
+
     std::unique_ptr<FeatureParameter> featureParameter_;
     Gazer gazer_;
     int thoughtMaxRensa_ = 0;

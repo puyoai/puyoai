@@ -34,7 +34,7 @@ const bool USE_HEIGHT_DIFF_FEATURE = false;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_DENSITY_FEATURE = false;
 const bool USE_PATTERN34_FEATURE = true;
-const bool USE_IGNITION_HEIGHT_FEATURE = false;
+const bool USE_IGNITION_HEIGHT_FEATURE = true;
 const bool USE_FIELD_USHAPE_FEATURE = true;
 
 template<typename ScoreCollector>
@@ -95,12 +95,19 @@ void evalConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
 template<typename ScoreCollector>
 void evalRestrictedConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
 {
-    int MAX_LEN[] = { 0, 3, 2, 1, 3, 2, 1, 0 };
+    EvaluationSparseFeatureKey keys[] = {
+        SPARSE_INVALID,
+        CONNECTION_HORIZONTAL_FROM_1,
+        CONNECTION_HORIZONTAL_FROM_2,
+        CONNECTION_HORIZONTAL_FROM_3,
+        CONNECTION_HORIZONTAL_FROM_4,
+        CONNECTION_HORIZONTAL_FROM_5,
+    };
 
     const int MAX_HEIGHT = 3; // instead of CoreField::HEIGHT
     const CoreField& f = plan.field();
     for (int y = 1; y <= MAX_HEIGHT; ++y) {
-        for (int x = 1; x <= CoreField::WIDTH; ++x) {
+        for (int x = 1; x < CoreField::WIDTH; ++x) {
             if (!isNormalColor(f.color(x, y)))
                 continue;
 
@@ -108,8 +115,7 @@ void evalRestrictedConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan
             while (f.color(x, y) == f.color(x + len, y))
                 ++len;
 
-            len = std::min(MAX_LEN[x], len);
-            sc->addScore(CONNECTION_HORIZONTAL, len, 1);
+            sc->addScore(keys[x], len, 1);
             x += len - 1;
         }
     }
@@ -203,8 +209,10 @@ void evalValleyDepthRidgeHeight(ScoreCollector* sc, const RefPlan& plan)
             int left = std::max(leftHeight - currentHeight, 0);
             int right = std::max(rightHeight - currentHeight, 0);
             int depth = std::min(left, right);
-            if (x == 1 || x == 6)
-                depth /= 2;
+            if (x == 1 || x == 6) {
+                if (depth > 0)
+                    depth -= 1;
+            }
             DCHECK(0 <= depth && depth <= 14) << depth;
             sc->addScore(VALLEY_DEPTH, depth, 1);
         }
@@ -328,13 +336,21 @@ void evalRensaStrategy(ScoreCollector* sc, const RefPlan& plan, const RensaResul
 }
 
 template<typename ScoreCollector>
-void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& /*plan*/,
+void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& plan,
                            const RensaResult& rensaResult,
                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
 {
     sc->addScore(MAX_CHAINS, rensaResult.chains, 1);
-    sc->addScore(MAX_RENSA_KEY_PUYOS, keyPuyos.size());
-    sc->addScore(MAX_RENSA_FIRE_PUYOS, firePuyos.size());
+    if (plan.field().countPuyos() <= 24) {
+        sc->addScore(MAX_RENSA_KEY_PUYOS_EARLY, keyPuyos.size());
+        sc->addScore(MAX_RENSA_FIRE_PUYOS_EARLY, firePuyos.size());
+    } else if (plan.field().countPuyos() <= 42) {
+        sc->addScore(MAX_RENSA_KEY_PUYOS_MIDDLE, keyPuyos.size());
+        sc->addScore(MAX_RENSA_FIRE_PUYOS_MIDDLE, firePuyos.size());
+    } else {
+        sc->addScore(MAX_RENSA_KEY_PUYOS_LATE, keyPuyos.size());
+        sc->addScore(MAX_RENSA_FIRE_PUYOS_LATE, firePuyos.size());
+    }
 }
 
 template<typename ScoreCollector>

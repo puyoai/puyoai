@@ -30,6 +30,7 @@ public:
     using MayahAI::gameWillBegin;
     using MayahAI::think;
     using MayahAI::enemyNext2Appeared;
+    using MayahAI::reloadParameter;
 
     CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, int numKeyPuyos, const Plan& plan) const
     {
@@ -45,6 +46,7 @@ public:
                                     [this, frameId, &field, &decisions, &result](const RefPlan& plan) {
             if (plan.decisions() != decisions)
                 return;
+
             result = plan.toPlan();
         });
 
@@ -130,6 +132,10 @@ int main(int argc, char* argv[])
 
             if (str == "")
                 break;
+            if (str == "reload") {
+                ai.reloadParameter();
+                continue;
+            }
             if (str == "s") {
                 CollectedFeature cf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_KEY_PUYOS, aiPlan);
                 cout << cf.toString() << endl;
