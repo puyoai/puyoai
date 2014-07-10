@@ -175,7 +175,6 @@ bool FieldRealtime::onStateVanishing(FrameContext* context)
         is_zenkesi_ = false;
     }
 
-    isDead_ = (field_.color(3, 12) != PuyoColor::EMPTY);
     if (!is_zenkesi_) {
         is_zenkesi_ = true;
         for (int i = 1; i <= 6; i++) {
@@ -232,26 +231,28 @@ bool FieldRealtime::onStateOjamaDropping()
 
     if (!ojamaWasDropping) {
         sleepFor_ = 0;
-        simulationState_ = SimulationState::STATE_OJAMA_GROUNDING;
-        return false;
+    } else {
+        // TODO(mayah): We need to sleep more. 1 ojama -> +4 frames, 30 ojama -> 16frames, etc.
+        sleepFor_ = FRAMES_GROUNDING;
     }
 
-    ojama_dropping_ = false;
-    // TODO(mayah): We need to sleep more. 1 ojama -> +4 frames, 30 ojama -> 16frames, etc.
-    sleepFor_ = FRAMES_GROUNDING;
     simulationState_ = SimulationState::STATE_OJAMA_GROUNDING;
     return false;
 }
 
 bool FieldRealtime::onStateOjamaGrounding()
 {
+    if (ojama_dropping_)
+        userState_.ojamaDropped = true;
+    ojama_dropping_ = false;
+
     isDead_ = (field_.color(3, 12) != PuyoColor::EMPTY);
     if (isDead_) {
         simulationState_ = SimulationState::STATE_DEAD;
         return false;
     }
+
     transitToStatePreparingNext();
-    userState_.ojamaDropped = true;
     return false;
 }
 
