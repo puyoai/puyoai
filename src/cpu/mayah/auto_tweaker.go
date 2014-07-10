@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -8,6 +9,10 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+)
+
+var (
+	featureScoreOnly = flag.Bool("score_only", false, "true if checking the current feature score")
 )
 
 func fileExists(filename string) bool {
@@ -67,9 +72,12 @@ func runTweakAndDuel() error {
 		return err
 	}
 
-	cmd := exec.Command("cpu/mayah/tweaker", "--feature=./cpu/mayah/feature.txt")
-	if err := cmd.Run(); err != nil {
-		return err
+	if !*featureScoreOnly {
+		// Don't tweak if featureScoreOnly.
+		cmd := exec.Command("cpu/mayah/tweaker", "--feature=./cpu/mayah/feature.txt")
+		if err := cmd.Run(); err != nil {
+			return err
+		}
 	}
 
 	for i := 0; i < 20; i++ {
@@ -89,7 +97,7 @@ func runTweakAndDuel() error {
 
 func runOnce() error {
 	bestScore := 0
-	if fileExists("cpu/mayah/best_score.txt") && fileExists("cpu/mayah/best_feature.txt") {
+	if !*featureScoreOnly && fileExists("cpu/mayah/best_score.txt") && fileExists("cpu/mayah/best_feature.txt") {
 		bestScoreBytes, err := ioutil.ReadFile("cpu/mayah/best_score.txt")
 		if err != nil {
 			return err
@@ -110,27 +118,29 @@ func runOnce() error {
 
 	err := runTweakAndDuel()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	score, err := sumMaxScore("cpu/mayah/run2.err")
 	if err != nil {
-		return nil
+		return err
 	}
 
 	fmt.Println("score =", score)
 
-	if bestScore < score {
-		fmt.Println("beated the previous score. update the feature.")
-		if err := ioutil.WriteFile("cpu/mayah/best_score.txt", []byte(fmt.Sprintf("%d", score)), 0600); err != nil {
-			return err
-		}
-		if err := copyFile("cpu/mayah/feature.txt", "cpu/mayah/best_feature.txt"); err != nil {
-			return err
-		}
-	} else {
-		if err := copyFile("cpu/mayah/best_feature.txt", "cpu/mayah/feature.txt"); err != nil {
-			return err
+	if !*featureScoreOnly {
+		if bestScore < score {
+			fmt.Println("beated the previous score. update the feature.")
+			if err := ioutil.WriteFile("cpu/mayah/best_score.txt", []byte(fmt.Sprintf("%d", score)), 0600); err != nil {
+				return err
+			}
+			if err := copyFile("cpu/mayah/feature.txt", "cpu/mayah/best_feature.txt"); err != nil {
+				return err
+			}
+		} else {
+			if err := copyFile("cpu/mayah/best_feature.txt", "cpu/mayah/feature.txt"); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -138,9 +148,18 @@ func runOnce() error {
 }
 
 func main() {
+	flag.Parse()
+
+	fmt.Println("score only :", *featureScoreOnly)
+
 	for {
 		if err := runOnce(); err != nil {
 			panic(err)
+		}
+
+		// Run only once if featureScoreOnly
+		if *featureScoreOnly {
+			break
 		}
 	}
 }
