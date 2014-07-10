@@ -75,7 +75,7 @@ bool FieldRealtime::onStateLevelSelect()
 void FieldRealtime::transitToStatePreparingNext()
 {
     simulationState_ = SimulationState::STATE_PREPARING_NEXT;
-    sleepFor_ = 6;
+    sleepFor_ = 6; // TODO(mayah): magic number.
     userState_.playable = false;
 
     kumipuyoPos_ = KumipuyoPos(3, 12, 0);
@@ -83,7 +83,7 @@ void FieldRealtime::transitToStatePreparingNext()
     if (!kumipuyoSeq_.isEmpty())
         kumipuyoSeq_.dropFront();
     if (FLAGS_delay_wnext)
-        delayFramesWNextAppear_ = FRAMES_YOKOKU_DELAY + 6;
+        delayFramesWNextAppear_ = FRAMES_YOKOKU_DELAY + 6; // TODO(mayah): magic number.
     sent_wnext_appeared_ = false;
 }
 
@@ -114,11 +114,11 @@ bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
         ++score_;
 
     if (grounded) {
+        userState_.playable = false;
         userState_.grounded = true;
         dropVelocity_ = INITIAL_DROP_VELOCITY;
         dropAmount_ = 0.0;
         drop_animation_ = false;
-        userState_.playable = false;
         sleepFor_ = 0;
         simulationState_ = SimulationState::STATE_DROPPING;
     }
