@@ -31,6 +31,11 @@ MayahAI::~MayahAI()
 {
 }
 
+void MayahAI::reloadParameter()
+{
+    featureParameter_.reset(new FeatureParameter(FLAGS_feature));
+}
+
 void MayahAI::gameWillBegin(const FrameData& frameData)
 {
     thoughtMaxRensa_ = 0;
