@@ -43,7 +43,6 @@ public:
 
     bool doFreeFall();
 
-    // Checks if a player is dead.
     bool isDead() const { return simulationState_ == SimulationState::STATE_DEAD; }
 
     // Utility functions to be used by duel server.
@@ -123,7 +122,6 @@ private:
     int restFramesForFreeFall_ = 0;
 
     bool hasZenkeshi_ = false;
-    // bool is_zenkesi_ = false;
 
     bool ojama_dropping_;
     std::vector<int> ojama_position_;

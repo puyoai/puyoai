@@ -33,11 +33,8 @@ static const int LONG_BONUS[] = {
 // ----------------------------------------------------------------------
 // Remove the following constants. They are not valid values now.
 
-const int FRAMES_AFTER_GROUND = 2; // TODO(mayah): Remove this
-const int FRAMES_AFTER_USER_INTERACTION = 1; // TODO(mayah): Remove this
 const int FRAMES_DROP_1_LINE = 1; // TODO(mayah): Remove this
 const int FRAMES_AFTER_DROP = 12; // TODO(mayah): Remove this
-
 
 // 9 frames of ground animation + 2 frames of connected puyos.
 // 6 is FRAMES_AFTER_VANISH.
@@ -47,9 +44,8 @@ const int FRAMES_AFTER_CHIGIRI = 11 - 6; // TODO(mayah): Remove this
 // 6 is FRAMES_AFTER_VANISH.
 const int FRAMES_AFTER_NO_CHIGIRI = 15 - 6; // TODO(mayah): Remove this
 
-
 // Deprecated. Used by shinyak.
-const int FRAMES_HORIZONTAL_MOVE = FRAMES_AFTER_USER_INTERACTION; // TODO(mayah): Remove this
+const int FRAMES_HORIZONTAL_MOVE = 1; // TODO(mayah): Remove this
 
 // Updated, but not accurate.
 const int FRAMES_CHIGIRI_1_LINE_1 = 5; // TODO(mayah): Remove this
