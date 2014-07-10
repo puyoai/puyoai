@@ -10,6 +10,8 @@ public:
 
     void apply(FieldRealtime* me, FieldRealtime* opponent);
 
+    int numSentOjama() const { return numSentOjama_; }
+
 private:
     int numSentOjama_ = 0;
     bool ojamaCommitted_ = false;

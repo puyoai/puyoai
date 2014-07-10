@@ -29,7 +29,7 @@ protected:
     unique_ptr<FieldRealtime> f_;
 };
 
-TEST_F(FieldRealtimeTest, state)
+TEST_F(FieldRealtimeTest, stateWithoutOjama)
 {
     f_->skipLevelSelect();
 
@@ -67,6 +67,37 @@ TEST_F(FieldRealtimeTest, state)
 
     // Here, score must be 13. 12 frames dropping + 1 frame grounding.
     EXPECT_EQ(13, f_->score());
+}
+
+TEST_F(FieldRealtimeTest, zenkeshi)
+{
+    f_->forceSetField(CoreField("  RR  "));
+    f_->skipLevelSelect();
+
+    // Waiting next (6) + reaching bottom (11) + grounding (10)
+    for (int i = 0; i < 6 + 11 + 10; ++i) {
+        FrameContext context;
+        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        EXPECT_FALSE(f_->hasZenkeshi());
+    }
+
+    FrameContext context;
+    f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+    EXPECT_TRUE(f_->hasZenkeshi());
+    EXPECT_EQ(0, context.numSentOjama());
+
+    for (int i = 0; i < 24; ++i) {
+        FrameContext context;
+        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        EXPECT_EQ(FieldRealtime::SimulationState::STATE_VANISHING, f_->simulationState());
+    }
+
+    // Since this should be quick, the current state must be PREPARING_NEXT.
+    {
+        FrameContext context;
+        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        EXPECT_EQ(FieldRealtime::SimulationState::STATE_PREPARING_NEXT, f_->simulationState());
+    }
 }
 
 TEST_F(FieldRealtimeTest, Move1)
