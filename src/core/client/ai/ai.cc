@@ -5,6 +5,18 @@
 
 using namespace std;
 
+struct DecisionSending {
+    void clear()
+    {
+        *this = DecisionSending();
+    }
+
+    DropDecision dropDecision = DropDecision();
+    Kumipuyo kumipuyo = Kumipuyo();
+    bool needsSend = false;
+    bool hasGrounded = false;
+};
+
 AI::AI(const string& name) :
     name_(name)
 {
@@ -12,11 +24,8 @@ AI::AI(const string& name) :
 
 void AI::runLoop()
 {
-    bool needsSendDecision = false;
-    bool needsSendDecisionNext = false;
-
-    pair<DropDecision, Kumipuyo> decision;
-    pair<DropDecision, Kumipuyo> decisionNext;
+    DecisionSending current;
+    DecisionSending next;
 
     while (true) {
         FrameData frameData = connector_.receive();
@@ -41,19 +50,19 @@ void AI::runLoop()
             field_.clear();
 
             const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
+
             // TODO(mayah): duel should have several frames before showing the first hand.
             // This workaround code should be removed after duel is changed.
-            decision = make_pair(think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) }),
-                                 kumipuyoSeq.get(1));
-            needsSendDecision = true;
+            current.dropDecision = think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) });
+            current.kumipuyo = kumipuyoSeq.get(1);
+            current.needsSend = true;
+            current.hasGrounded = false;
+            next.clear();
 
-            if (decision.first.decision().isValid() && decision.second.isValid()) {
-                field_.dropKumipuyo(decision.first.decision(), decision.second);
+            if (current.dropDecision.decision().isValid() && current.kumipuyo.isValid()) {
+                field_.dropKumipuyo(current.dropDecision.decision(), current.kumipuyo);
                 field_.simulate();
             }
-
-            decisionNext = make_pair(DropDecision(), Kumipuyo());
-            needsSendDecisionNext = false;
         }
 
         // Update enemy info if necessary.
@@ -68,44 +77,50 @@ void AI::runLoop()
             LOG(INFO) << "STATE_OJAMA_DROPPED";
             resetCurrentField(frameData.myPlayerFrameData().field);
             const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
-            decision = make_pair(thinkFast(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) }),
-                                 kumipuyoSeq.get(0));
-            if (decision.first.decision().isValid() && decision.second.isValid()) {
-                field_.dropKumipuyo(decision.first.decision(), decision.second);
+
+            current.dropDecision = thinkFast(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) });
+            current.kumipuyo = kumipuyoSeq.get(0);
+            current.needsSend = true;
+            current.hasGrounded = false;
+
+            if (current.dropDecision.decision().isValid() && current.kumipuyo.isValid()) {
+                field_.dropKumipuyo(current.dropDecision.decision(), current.kumipuyo);
                 field_.simulate();
             }
-            needsSendDecision = true;
         }
+
+        // STATE_YOU_GROUNDED and STATE_WNEXT_APPEARED might come out-of-order.
 
         if (frameData.myPlayerFrameData().userState.wnextAppeared) {
             const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
             LOG(INFO) << "STATE_WNEXT_APPEARED";
-            decisionNext = make_pair(think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) } ),
-                                     kumipuyoSeq.get(1));
-            needsSendDecisionNext = true;
+
+            next.dropDecision = think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) } );
+            next.kumipuyo = kumipuyoSeq.get(1);
+            next.needsSend = true;
+            next.hasGrounded = false;
         }
+
         if (frameData.myPlayerFrameData().userState.grounded) {
             LOG(INFO) << "STATE_YOU_GROUNDED";
 
-            // TODO(mayah): When the game has started, STATE_YOU_GROUNDED comes several times.
-            // This is a bug of Analyzer. After it is fixed, this if-condition should be removed.
-            if (!needsSendDecision) {
-                // TODO(mayah): If our AI is slow, this might cause some bug?
-                needsSendDecision = needsSendDecisionNext;
-                needsSendDecisionNext = false;
+            current.hasGrounded = true;
+        }
 
-                decision = decisionNext;
-                decisionNext = make_pair(DropDecision(), Kumipuyo());
-                if (decision.first.decision().isValid() && decision.second.isValid()) {
-                    field_.dropKumipuyo(decision.first.decision(), decision.second);
-                    field_.simulate();
-                }
+        if (current.hasGrounded && next.needsSend) {
+            CHECK(!current.needsSend);
+            current = next;
+            next.clear();
+
+            if (current.dropDecision.decision().isValid() && current.kumipuyo.isValid()) {
+                field_.dropKumipuyo(current.dropDecision.decision(), current.kumipuyo);
+                field_.simulate();
             }
         }
 
-        if (needsSendDecision && frameData.myPlayerFrameData().userState.playable) {
-            needsSendDecision = false;
-            connector_.send(frameData.id, decision.first);
+        if (current.needsSend && frameData.myPlayerFrameData().userState.playable) {
+            connector_.send(frameData.id, current.dropDecision);
+            current.needsSend = false;
             continue;
         }
 
