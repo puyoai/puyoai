@@ -122,14 +122,37 @@ TEST_F(EvaluatorTest, ConnectionHorizontal1)
         "RRRGGG");
     CollectedFeature cf = eval(f);
 
-    map<int, int> m;
-    for (auto v : cf.feature(CONNECTION_HORIZONTAL))
-        m[v]++;
+    map<int, int> m[7];
+    for (auto v : cf.feature(CONNECTION_HORIZONTAL_FROM_1))
+        m[1][v]++;
+    for (auto v : cf.feature(CONNECTION_HORIZONTAL_FROM_2))
+        m[2][v]++;
+    for (auto v : cf.feature(CONNECTION_HORIZONTAL_FROM_3))
+        m[3][v]++;
+    for (auto v : cf.feature(CONNECTION_HORIZONTAL_FROM_4))
+        m[4][v]++;
+    for (auto v : cf.feature(CONNECTION_HORIZONTAL_FROM_5))
+        m[5][v]++;
 
-    EXPECT_EQ(2, m[3]);
-    EXPECT_EQ(2, m[2]);
-    EXPECT_EQ(3, m[1]);
-    EXPECT_EQ(0, m[0]);
+    EXPECT_EQ(1, m[1][1]);
+    EXPECT_EQ(1, m[1][2]);
+    EXPECT_EQ(1, m[1][3]);
+
+    EXPECT_EQ(0, m[2][1]);
+    EXPECT_EQ(0, m[2][2]);
+    EXPECT_EQ(0, m[2][3]);
+
+    EXPECT_EQ(1, m[3][1]);
+    EXPECT_EQ(0, m[3][2]);
+    EXPECT_EQ(0, m[3][3]);
+
+    EXPECT_EQ(0, m[4][1]);
+    EXPECT_EQ(1, m[4][2]);
+    EXPECT_EQ(1, m[4][3]);
+
+    EXPECT_EQ(1, m[5][1]);
+    EXPECT_EQ(0, m[5][2]);
+    EXPECT_EQ(0, m[5][3]);
 }
 
 TEST_F(EvaluatorTest, ConnectionHorizontal2)
