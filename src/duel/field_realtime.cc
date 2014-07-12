@@ -139,13 +139,11 @@ bool FieldRealtime::onStateDropping()
 
     bool wasDropping = drop_animation_;
     drop_animation_ = false;
-    if (wasDropping) {
-        sleepFor_ = FRAMES_GROUNDING;
-    } else if (allowsQuick_) {
+    if (!wasDropping && allowsQuick_)
         sleepFor_ = 0;
-    } else {
-        sleepFor_ = FRAMES_GROUNDING - 1; // Consumed 1 frame in this state.
-    }
+    else
+        sleepFor_ = FRAMES_GROUNDING;
+
     simulationState_ = SimulationState::STATE_GROUNDING;
     return false;
 }
@@ -294,9 +292,8 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
                 return false;
             continue;
         case SimulationState::STATE_PREPARING_NEXT:
-            if (onStatePreparingNext()) {
+            if (onStatePreparingNext())
                 return false;
-            }
             continue;
         case SimulationState::STATE_PLAYABLE: {
             bool accepted = false;
