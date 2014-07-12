@@ -71,6 +71,10 @@ endif()
 find_library(LIB_USB NAMES usb-1.0)
 find_library(LIB_GCRYPT NAMES gcrypt)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    find_library(COCOA_LIBRARY Cocoa)
+endif()
+
 # ----------------------------------------------------------------------
 # Set include directories, c++ options, etc.
 
@@ -106,6 +110,11 @@ if(USE_HTTPD)
   puyoai_add_cxx_flags("-DUSE_HTTPD")
 endif()
 
+if(EXISTS ${CMAKE_SOURCE_DIR}/internal AND IS_DIRECTORY ${CMAKE_SOURCE_DIR}/internal)
+    set(USE_INTERNAL 1)
+    puyoai_add_cxx_flags("-DUSE_INTERNAL=1")
+endif()
+
 # ----------------------------------------------------------------------
 # Add subdirectories
 
@@ -121,12 +130,14 @@ add_subdirectory(cpu)
 add_subdirectory(duel)
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/internal AND IS_DIRECTORY ${CMAKE_SOURCE_DIR}/internal)
-  add_subdirectory(internal)
+    add_subdirectory(internal)
 endif()
 
 if(USE_SDL2)
   add_subdirectory(gui)
 endif()
+
+add_subdirectory(audio)
 
 if(USE_GFLAGS_AND_GLOG AND USE_SDL2 AND FFMPEG_FOUND)
   set(BUILD_CAPTURE 1)
