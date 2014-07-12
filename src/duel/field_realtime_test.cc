@@ -47,17 +47,19 @@ TEST_F(FieldRealtimeTest, stateWithoutOjama)
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_PLAYABLE, f_->simulationState());
     }
 
+    // Then, 1 frame dropping. (Even without dropping, AC puyo 2 has 1 frame here.
+    // Actually it might have to be counted as PLAYABLE, though.
+    {
+        FrameContext context;
+        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        EXPECT_EQ(FieldRealtime::SimulationState::STATE_DROPPING, f_->simulationState());
+    }
+
     // Then, 10 frames ground animation.
     for (int i = 0; i < 10; ++i) {
         FrameContext context;
         f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
-        if (i == 0) {
-            // state might be STATE_DROPPING just after STATE_PLAYABLE. It is OK.
-            EXPECT_TRUE(f_->simulationState() == FieldRealtime::SimulationState::STATE_GROUNDING ||
-                        f_->simulationState() == FieldRealtime::SimulationState::STATE_DROPPING);
-        } else {
-            EXPECT_EQ(FieldRealtime::SimulationState::STATE_GROUNDING, f_->simulationState());
-        }
+        EXPECT_EQ(FieldRealtime::SimulationState::STATE_GROUNDING, f_->simulationState());
     }
 
     // Then, preparing next.
@@ -74,10 +76,11 @@ TEST_F(FieldRealtimeTest, zenkeshi)
     f_->forceSetField(CoreField("  RR  "));
     f_->skipLevelSelect();
 
-    // Waiting next (6) + reaching bottom (11) + grounding (10)
-    for (int i = 0; i < 6 + 11 + 10; ++i) {
+    // Waiting next (6) + reaching bottom (11) + dropping (1) + grounding (10)
+    for (int i = 0; i < 6 + 11 + 1 + 10; ++i) {
         FrameContext context;
         f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        cout << (int)f_->simulationState() << endl;
         EXPECT_FALSE(f_->hasZenkeshi());
     }
 
