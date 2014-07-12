@@ -28,6 +28,11 @@
 #include "gui/main_window.h"
 #endif
 
+#ifdef USE_INTERNAL
+#include "audio/audio_commentator.h"
+#include "internal/audio/internal_speaker.h"
+#endif
+
 using namespace std;
 
 DEFINE_string(record, "", "use Puyofu Recorder. 'transition' for transition log, 'field' for field log");
@@ -168,6 +173,11 @@ int main(int argc, char* argv[])
     }
 #endif
 
+#if USE_INTERNAL
+    InternalSpeaker internalSpeaker;
+    AudioCommentator audioCommentator(&internalSpeaker);
+#endif
+
     DuelServer duelServer(&manager);
 
     // --- Add necessary obesrvers here.
@@ -185,10 +195,13 @@ int main(int argc, char* argv[])
     if (commentator.get())
         duelServer.addObserver(commentator.get());
 #endif
-
 #if USE_HTTPD
     if (httpServer.get())
         CHECK(httpServer->start());
+#endif
+#if USE_INTERNAL
+    duelServer.addObserver(&audioCommentator);
+    audioCommentator.start();
 #endif
 
 #if USE_SDL2
@@ -218,6 +231,9 @@ int main(int argc, char* argv[])
 #if USE_HTTPD
     if (httpServer.get())
         httpServer->stop();
+#endif
+#if USE_INTERNAL
+    audioCommentator.stop();
 #endif
 
     return 0;
