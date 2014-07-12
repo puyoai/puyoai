@@ -1,0 +1,223 @@
+# ----------------------------------------------------------------------
+# GTR
+
+TYPE: GTR-HEAD
+WITH: GTR-TAIL
+B.....
+DDD...
+BAC...
+BBA...
+AAC...
+
+TYPE: GTR-HEAD
+WITH: GTR-TAIL
+BD....
+DD....
+BAC...
+BBA...
+AAC...
+
+TYPE: GTR-HEAD
+WITH: GTR-TAIL
+B.....
+D.....
+DD....
+BAC...
+BBA...
+AAC...
+
+TYPE: GTR-TAIL
+....YY
+BACYXY
+BBACCC
+AACXXX
+
+TYPE: GTR-TAIL
+.....Y
+BACXXY
+BBACCX
+AACYYX
+
+# ----------------------------------------------------------------------
+# GTR (2)
+
+TYPE: GTR2-HEAD
+WITH: GTR2-TAIL
+B.....
+DDD...
+BAC...
+BBA...
+AAD...
+
+TYPE: GTR2-HEAD
+WITH: GTR2-TAIL
+BD....
+DD....
+BAC...
+BBA...
+AAD...
+
+TYPE: GTR2-HEAD
+WITH: GTR2-TAIL
+B.....
+D.....
+DD....
+BAC...
+BBA...
+AAD...
+
+TYPE: GTR2-TAIL
+.....D
+BACXXX
+BBACCC
+AADDDX
+
+TYPE: GTR2-TAIL
+....X.
+BACXDX
+BBACCC
+AADDDX
+
+# ----------------------------------------------------------------------
+#
+
+TYPE: NEWGTR-HEAD
+WITH: NEWGTR-TAIL
+DB....
+DDAC..
+BBBA..
+AAAC..
+
+TYPE: NEWGTR-HEAD
+WITH: NEWGTR-TAIL
+B.....
+D.....
+DDAC..
+BBBA..
+AAAC..
+
+TYPE: NEWGTR-HEAD
+WITH: NEWGTR-TAIL
+B.....
+D.....
+D.....
+D.AC..
+BBBA..
+AAAC..
+
+TYPE: NEWGTR-TAIL
+.....D
+..AC.D
+BBBACC
+AAACDD
+
+TYPE: NEWGTR-TAIL
+.....D
+..ACDD
+BBBACC
+AAACCD
+
+# ----------------------------------------------------------------------
+# フキゲンGTR
+
+TYPE: FUKIGENGTR-HEAD
+WITH: NEWGTR-TAIL
+DDAC..
+DBBA..
+BAAC..
+
+TYPE: FUKIGENGTR-HEAD
+WITH: NEWGTR-TAIL
+D.....
+D.AC..
+DBBA..
+BAAC..
+
+# ----------------------------------------------------------------------
+# 座布団L字
+
+TYPE: ZABUTONL-HEAD
+WITH: ZABUTONL-TAIL
+B.....
+DDD...
+BAC...
+BBD...
+AAA...
+
+TYPE: ZABUTONL-HEAD
+WITH: ZABUTONL-TAIL
+BD....
+DD....
+BAC...
+BBD...
+AAA...
+
+TYPE: ZABUTONL-HEAD
+WITH: ZABUTONL-TAIL
+B.....
+D.....
+DD....
+BAC...
+BBD...
+AAA...
+
+TYPE: ZABUTONL-TAIL
+BAC...
+BBDCC.
+AAADC.
+
+TYPE: ZABUTONL-TAIL
+BACXX.
+BBDCCC
+AAADXX
+
+TYPE: ZABUTONL-TAIL
+BACXX.
+BBDCCC
+AAADXX
+
+# ----------------------------------------------------------------------
+# だぁ積み
+
+TYPE: DAAZUMI
+EE
+EBC.D.
+AABCCD
+ABBCDD
+
+TYPE: DAAZUMI
+EE
+EBCD..
+AABCCD
+ABBCDD
+
+# ----------------------------------------------------------------------
+# LLR
+
+TYPE: LLR
+ACBD..
+AACB.D
+BBCCDD
+
+TYPE: LLR
+ACBD..
+AACC.D
+BBCBDD
+
+TYPE: LLR
+ACBB..
+AACD.D
+BBCCDD
+
+# ----------------------------------------------------------------------
+# なめくじ
+
+TYPE: NAMEKUJI
+B.....
+A.....
+DD....
+DBC...
+ABBC..
+AACC..
+
+
