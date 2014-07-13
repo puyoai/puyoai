@@ -1,10 +1,10 @@
 #include "audio/audio_server.h"
 
+#include <glog/logging.h>
+
 #include "audio/audio_server.h"
 #include "audio/speaker.h"
 #include "audio/speak_requester.h"
-
-#include <iostream>
 
 using namespace std;
 
@@ -43,8 +43,6 @@ void AudioServer::addText(const std::string& text)
 
 void AudioServer::runLoop()
 {
-    cout << "runLoop" << endl;
-
     while (!shouldStop_) {
         for (SpeakRequester* requester : speakRequesters_) {
             SpeakRequest req = requester->requestSpeak();
@@ -56,24 +54,18 @@ void AudioServer::runLoop()
         string textToSpeak;
         {
             unique_lock<mutex> lock(mu_);
-            cout << "runLoop 1" << endl;
             if (texts_.empty()) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(16));
             }
-            cout << "runLoop 2" << endl;
 
             if (!texts_.empty()) {
-                cout << "runLoop 3" << endl;
                 textToSpeak = texts_.back();
                 texts_.pop_back();
                 texts_.clear();
-                cout << "runLoop 4" << endl;
             }
         }
 
-        if (!textToSpeak.empty())
-            cout << textToSpeak << endl;
-
+        LOG(INFO) << "Speak: " << textToSpeak;
         if (speaker_)
             speaker_->speak(textToSpeak);
     }
