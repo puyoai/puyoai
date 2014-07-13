@@ -22,6 +22,7 @@
 #ifdef USE_SDL2
 #include <SDL.h>
 #include "gui/commentator.h"
+#include "gui/commentator_drawer.h"
 #include "gui/field_drawer.h"
 #include "gui/fps_drawer.h"
 #include "gui/human_connector_key_listener.h"
