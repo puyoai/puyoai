@@ -9,6 +9,8 @@
 #include <vector>
 
 #include "base/base.h"
+#include "core/field/core_field.h"
+#include "core/kumipuyo.h"
 #include "duel/game_state_observer.h"
 
 class Speaker;
@@ -32,13 +34,20 @@ public:
 private:
     void runLoop();
 
+    void updateFieldIfNecessary();
+    void speakIfNecessary();
+
     std::atomic<bool> shouldStop_;
     std::thread th_;
     std::mutex mu_;
     std::condition_variable cond_;
-    std::vector<std::string> texts_;
+
+    CoreField field_[2];
+    KumipuyoSeq kumipuyoSeq_[2];
+    bool needsUpdate_[2];
 
     Speaker* speaker_ = nullptr;
+    std::vector<std::string> texts_;
 };
 
 #endif
