@@ -10,7 +10,6 @@
 #include <SDL.h>
 #include <gtest/gtest.h>
 
-#include "base/base.h"
 #include "core/algorithm/rensa_info.h"
 #include "core/field/core_field.h"
 #include "core/kumipuyo.h"
@@ -19,17 +18,25 @@
 
 class Screen;
 
-class Commentator : public GameStateObserver, public Drawer {
+struct CommentatorResult {
+    TrackedPossibleRensaInfo fireableMainChain[2];
+    FeasibleRensaInfo fireableTsubushiChain[2];
+    TrackedPossibleRensaInfo firingChain[2];
+    std::string message[2];
+
+    std::deque<std::string> events[2];
+};
+
+class Commentator : public GameStateObserver {
 public:
     Commentator();
     virtual ~Commentator();
 
     // For GameStateObserver
-    virtual void newGameWillStart() OVERRIDE;
-    virtual void onUpdate(const GameState&) OVERRIDE;
+    virtual void newGameWillStart() override;
+    virtual void onUpdate(const GameState&) override;
 
-    // For Drawer
-    virtual void draw(Screen*) OVERRIDE;
+    CommentatorResult result() const;
 
     bool start();
     void stop();
@@ -40,9 +47,6 @@ private:
     void reset();
 
     void update(int pi, const CoreField&, const KumipuyoSeq&);
-
-    void drawMainChain(Screen*) const;
-    void drawCommentSurface(Screen*, int playerId) const;
 
     void addEventMessage(int pi, const std::string&);
 
@@ -62,6 +66,20 @@ private:
     std::deque<std::string> events_[2];
 
     FRIEND_TEST(CommentatorTest, getPotentialMaxChain);
+};
+
+class CommentatorDrawer : public Drawer {
+public:
+    explicit CommentatorDrawer(const Commentator*);
+    virtual ~CommentatorDrawer();
+
+    virtual void draw(Screen*) override;
+
+private:
+    void drawMainChain(Screen*, const CommentatorResult&) const;
+    void drawCommentSurface(Screen*, const CommentatorResult&, int playerId) const;
+
+    const Commentator* commentator_;
 };
 
 #endif  // CAPTURE_COMMENTATOR_H_

@@ -8,45 +8,31 @@
 #include <thread>
 #include <vector>
 
+#include "audio/speak_requester.h"
 #include "base/base.h"
 #include "core/field/core_field.h"
 #include "core/kumipuyo.h"
 #include "duel/game_state_observer.h"
 
-class Speaker;
+class Commentator;
 
-class AudioCommentator : public GameStateObserver, noncopyable {
+class AudioCommentator : public GameStateObserver, public SpeakRequester, noncopyable {
 public:
     // Does not take the ownership. |speaker| should be alive
     // AudioCommentator is alive.
-    explicit AudioCommentator(Speaker* speaker);
+    AudioCommentator(const Commentator* commentator);
     virtual ~AudioCommentator();
 
     virtual void newGameWillStart() override;
     virtual void onUpdate(const GameState&) override;
     virtual void gameHasDone() override;
 
-    void start();
-    void stop();
-
-    void addText(const std::string&);
+    virtual SpeakRequest requestSpeak();
 
 private:
-    void runLoop();
-
-    void updateFieldIfNecessary();
-    void speakIfNecessary();
-
-    std::atomic<bool> shouldStop_;
-    std::thread th_;
     std::mutex mu_;
-    std::condition_variable cond_;
 
-    CoreField field_[2];
-    KumipuyoSeq kumipuyoSeq_[2];
-    bool needsUpdate_[2];
-
-    Speaker* speaker_ = nullptr;
+    const Commentator* commentator_ = nullptr;
     std::vector<std::string> texts_;
 };
 

@@ -1,4 +1,4 @@
-#include "audio/audio_commentator.h"
+#include "audio/audio_server.h"
 
 #include <iostream>
 #include <string>
@@ -10,7 +10,8 @@ using namespace std;
 int main(void)
 {
     InternalSpeaker speaker;
-    AudioCommentator ac(&speaker);
+    AudioServer ac(&speaker);
+
     ac.addText("進捗どうですか");
     ac.addText("進捗だめです");
 
