@@ -16,6 +16,9 @@ public:
     GameResult gameResult() const;
     std::string toJson() const;
 
+    int frameId() const { return frameId_; }
+    void setFrameId(int frameId) { frameId_ = frameId; }
+
     ConnectorFrameRequest toConnectorFrameRequest(int frameId) const;
     ConnectorFrameRequest toConnectorFrameRequest(int frameId, GameResult forceSetGameResult) const;
 
@@ -34,6 +37,7 @@ public:
     const std::vector<int>& nackFrameIds(int pi) const { return nackFrameIds_[pi]; }
 
 private:
+    int frameId_ = 0;
     FieldRealtime field_[2];
     Decision decision_[2];
     std::string message_[2];
