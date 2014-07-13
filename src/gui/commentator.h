@@ -19,6 +19,7 @@
 class Screen;
 
 struct CommentatorResult {
+    int frameId[2];
     TrackedPossibleRensaInfo fireableMainChain[2];
     FeasibleRensaInfo fireableTsubushiChain[2];
     TrackedPossibleRensaInfo firingChain[2];
@@ -59,6 +60,7 @@ private:
     KumipuyoSeq kumipuyoSeq_[2];
     std::string message_[2];
 
+    int frameId_[2];
     std::unique_ptr<TrackedPossibleRensaInfo> fireableMainChain_[2];
     std::unique_ptr<FeasibleRensaInfo> fireableTsubushiChain_[2];
     std::unique_ptr<TrackedPossibleRensaInfo> firingChain_[2];

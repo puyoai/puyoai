@@ -183,6 +183,8 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
     while (!shouldStop_) {
         frameId++;
 
+        gameState.setFrameId(frameId);
+
         // --- Sends the current frame information.
         manager->send(gameState.toConnectorFrameRequest(frameId));
 

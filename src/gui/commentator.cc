@@ -115,6 +115,7 @@ void Commentator::onUpdate(const GameState& gameState)
     for (int i = 0; i < 2; ++i) {
         const FieldRealtime& rf = gameState.field(i);
         if (rf.userState().grounded) {
+            frameId_[i] = gameState.frameId();
             field_[i] = rf.field();
             // When chigiri is used, some puyo exists in the air. So we need to drop.
             field_[i].forceDrop();
@@ -133,6 +134,7 @@ CommentatorResult Commentator::result() const
     lock_guard<mutex> lock(mu_);
     CommentatorResult r;
     for (int pi = 0; pi < 2; ++pi) {
+        r.frameId[pi] = frameId_[pi];
         if (fireableMainChain_[pi].get()) {
             r.fireableMainChain[pi] = *fireableMainChain_[pi];
         }

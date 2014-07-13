@@ -45,12 +45,12 @@ SpeakRequest AudioCommentator::requestSpeak()
     for (int pi = 0; pi < 2; ++pi) {
         if (result.firingChain[pi].chains() > 0) {
             int chain = result.firingChain[pi].chains();
-            return SpeakRequest { to_string(chain) + "連鎖を発火" };
+            return SpeakRequest { to_string(chain) + "連鎖を発火。" };
         }
 
         if (result.fireableMainChain[pi].chains() > 0) {
             int chain = result.fireableMainChain[pi].chains();
-            return SpeakRequest { to_string(chain) + "連鎖を保持中" };
+            return SpeakRequest { to_string(chain) + "連鎖を保持中。" };
         }
     }
 
