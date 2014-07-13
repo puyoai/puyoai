@@ -67,11 +67,11 @@ SpeakRequest AudioCommentator::requestSpeak()
                     if (firing_[1 - pi]) {
                         int opponentScore = result.firingChain[1 - pi].score();
                         if (score > opponentScore + 70 * 30) {
-                            s += "十分な大きさがある。";
+                            s += "十分な大きさ。";
                         } else if (score > opponentScore - 70 * 12) {
                             s += "なんとか対応。";
                         } else {
-                            s += "これでは小さいか。";
+                            s += "これでは小さい。";
                         }
                     }
                     candidates.emplace_back(score, pi, s);
@@ -86,15 +86,47 @@ SpeakRequest AudioCommentator::requestSpeak()
         if (result.fireableMainChain[pi].chains() > 0) {
             int chain = result.fireableMainChain[pi].chains();
             int priority = chain - penalty_[pi];
-            candidates.emplace_back(priority, pi, playerNames[pi] + to_string(chain) + "連鎖を保持中。");
+            if (lastMaxRensa_[pi] < chain) {
+                candidates.emplace_back(priority, pi, playerNames[pi] + to_string(chain) + "連鎖を構築。");
+                lastMaxRensa_[pi] = chain;
+            }
         }
+
+        lastMaxRensa_[pi] = result.fireableMainChain[pi].chains();
+    }
+
+    if (!firing_[0] && !firing_[1]) {
+        int score0 = result.fireableMainChain[0].score();
+        int score1 = result.fireableMainChain[1].score();
+        if (score0 > score1 - 30 && score0 > score1 * 2) {
+            candidates.emplace_back(12 - penalty_[2], 2,
+                                    playerNames[0] + "のほうが" + playerNames[1] + "をリード。");
+        }
+
+        if (score1 > score0 - 30 && score1 > score0 * 2) {
+            candidates.emplace_back(12 - penalty_[2], 2,
+                                    playerNames[1] + "のほうが" + playerNames[0] + "をリード。");
+        }
+
     }
 
     if (candidates.empty())
         return SpeakRequest();
 
     const auto& st = *max_element(candidates.begin(), candidates.end());
-    penalty_[1 - get<1>(st)] = 0;
-    penalty_[get<1>(st)]++;
+    switch (get<1>(st)) {
+    case 0:
+        penalty_[1] = penalty_[2] = 0;
+        penalty_[0]--;
+        break;
+    case 1:
+        penalty_[0] = penalty_[2] = 0;
+        penalty_[1]--;
+        break;
+    case 2:
+        penalty_[0] = penalty_[1] = 0;
+        penalty_[2] = 12;
+        break;
+    }
     return SpeakRequest(get<2>(st));
 }
