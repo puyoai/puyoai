@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_audio
-            audio_commentator.cc)
+            audio_commentator.cc audio_server.cc)
 
 function(audio_add_executable exe)
     add_executable(${exe} ${ARGN})

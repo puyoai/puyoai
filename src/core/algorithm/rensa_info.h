@@ -31,6 +31,10 @@ struct TrackedPossibleRensaInfo {
                              const ColumnPuyoList& firePuyos, const RensaTrackResult& trackResult) :
         rensaResult(rensaResult), keyPuyos(keyPuyos), firePuyos(firePuyos), trackResult(trackResult) {}
 
+    int chains() const { return rensaResult.chains; }
+    int score() const { return rensaResult.score; }
+    int frames() const { return rensaResult.frames; }
+
     RensaResult rensaResult;
     ColumnPuyoList keyPuyos;
     ColumnPuyoList firePuyos;

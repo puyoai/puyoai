@@ -128,6 +128,26 @@ void Commentator::onUpdate(const GameState& gameState)
     }
 }
 
+CommentatorResult Commentator::result() const
+{
+    lock_guard<mutex> lock(mu_);
+    CommentatorResult r;
+    for (int pi = 0; pi < 2; ++pi) {
+        if (fireableMainChain_[pi].get()) {
+            r.fireableMainChain[pi] = *fireableMainChain_[pi];
+        }
+        if (fireableTsubushiChain_[pi].get()) {
+            r.fireableTsubushiChain[pi] = *fireableTsubushiChain_[pi];
+        }
+        if (firingChain_[pi].get()) {
+            r.firingChain[pi] = *firingChain_[pi];
+        }
+        r.message[pi] = message_[pi];
+        r.events[pi] = events_[pi];
+    }
+    return r;
+}
+
 bool Commentator::start()
 {
     th_ = thread([this]() {
@@ -255,30 +275,49 @@ void Commentator::reset()
     }
 }
 
-// ----------------------------------------------------------------------
-
-void Commentator::draw(Screen* screen)
+void Commentator::addEventMessage(int pi, const string& msg)
 {
-    lock_guard<mutex> lock(mu_);
-    drawCommentSurface(screen, 0);
-    drawCommentSurface(screen, 1);
-    drawMainChain(screen);
+    // TODO(mayah): Assert locked.
+    events_[pi].push_front(msg);
+    while (events_[pi].size() > 3)
+        events_[pi].pop_back();
 }
 
-void Commentator::drawMainChain(Screen* screen) const
-{
-    // TODO(mayah): assert lock is acquired.
+// ----------------------------------------------------------------------
 
+CommentatorDrawer::CommentatorDrawer(const Commentator* commentator) :
+    commentator_(commentator)
+{
+}
+
+CommentatorDrawer::~CommentatorDrawer()
+{
+}
+
+void CommentatorDrawer::draw(Screen* screen)
+{
+    CommentatorResult result = commentator_->result();
+    drawCommentSurface(screen, result, 0);
+    drawCommentSurface(screen, result, 1);
+    drawMainChain(screen, result);
+}
+
+void CommentatorDrawer::drawMainChain(Screen* screen, const CommentatorResult& result) const
+{
     for (int pi = 0; pi < 2; pi++) {
-        if (firingChain_[pi] != nullptr) {
-            drawTrace(screen, pi, firingChain_[pi]->trackResult);
-        } else if (fireableMainChain_[pi] != nullptr) {
-            drawTrace(screen, pi, fireableMainChain_[pi]->trackResult);
+        if (result.firingChain[pi].chains() > 0) {
+            drawTrace(screen, pi, result.firingChain[pi].trackResult);
+            continue;
+        }
+
+        if (result.fireableMainChain[pi].chains() > 0) {
+            drawTrace(screen, pi, result.fireableMainChain[pi].trackResult);
+            continue;
         }
     }
 }
 
-void Commentator::drawCommentSurface(Screen* screen, int pi) const
+void CommentatorDrawer::drawCommentSurface(Screen* screen, const CommentatorResult& result, int pi) const
 {
     // TODO(mayah): assert lock is acquired.
 
@@ -292,44 +331,40 @@ void Commentator::drawCommentSurface(Screen* screen, int pi) const
     int LH = 20;
 
     drawText(screen, "本線", LX, LH * 2);
-    if (fireableMainChain_[pi].get()) {
+    if (result.fireableMainChain[pi].chains() > 0) {
+        int chains = result.fireableMainChain[pi].chains();
+        int score = result.fireableMainChain[pi].score();
         drawText(screen,
-                 to_string(fireableMainChain_[pi]->rensaResult.chains) + "連鎖" + to_string(fireableMainChain_[pi]->rensaResult.score) + "点",
+                 to_string(chains) + "連鎖" + to_string(score) + "点",
                  LX2, LH * 3);
     }
     drawText(screen, "発火可能潰し", LX, LH * 5);
-    if (fireableTsubushiChain_[pi].get()) {
+    if (result.fireableTsubushiChain[pi].chains() > 0) {
+        int chains = result.fireableTsubushiChain[pi].chains();
+        int score = result.fireableTsubushiChain[pi].score();
+        int frames = result.fireableTsubushiChain[pi].totalFrames();
         drawText(screen,
-                 to_string(fireableTsubushiChain_[pi]->chains()) + "連鎖" +
-                 to_string(fireableTsubushiChain_[pi]->score()) + "点",
+                 to_string(chains) + "連鎖" + to_string(score) + "点",
                  LX2, LH * 6);
         drawText(screen,
-                 to_string(fireableTsubushiChain_[pi]->score() / 70) + "個" +
-                 to_string(fireableTsubushiChain_[pi]->totalFrames()) + "フレーム",
+                 to_string(score / 70) + "個" + to_string(frames) + "フレーム",
                  LX2, LH * 7);
     }
     drawText(screen, "発火中/最終発火", LX, LH * 9);
-    if (firingChain_[pi].get()) {
+    if (result.firingChain[pi].chains() > 0) {
+        int chains = result.firingChain[pi].chains();
+        int score = result.firingChain[pi].score();
         drawText(screen,
-                 to_string(firingChain_[pi]->rensaResult.chains) + "連鎖" +
-                 to_string(firingChain_[pi]->rensaResult.score) + "点",
+                 to_string(chains) + "連鎖" + to_string(score) + "点",
                  LX2, LH * 10);
     }
 
     int offsetY = screen->mainBox().dy + 40;
     int y = 0;
-    if (!message_[pi].empty())
-        drawText(screen, ("AI: " + message_[pi]).c_str(), LX, offsetY + LH * y++);
+    if (!result.message[pi].empty())
+        drawText(screen, ("AI: " + result.message[pi]).c_str(), LX, offsetY + LH * y++);
 
-    for (deque<string>::const_iterator iter = events_[pi].begin(); iter != events_[pi].end(); ++iter) {
-        drawText(screen, iter->c_str(), LX, offsetY + LH * y++);
+    for (const auto& msg : result.events[pi]) {
+        drawText(screen, msg.c_str(), LX, offsetY + LH * y++);
     }
-}
-
-void Commentator::addEventMessage(int pi, const string& msg)
-{
-    // TODO(mayah): Assert locked.
-    events_[pi].push_front(msg);
-    while (events_[pi].size() > 3)
-        events_[pi].pop_back();
 }

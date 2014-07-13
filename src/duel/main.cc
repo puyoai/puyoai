@@ -30,6 +30,7 @@
 
 #ifdef USE_INTERNAL
 #include "audio/audio_commentator.h"
+#include "audio/audio_server.h"
 #include "internal/audio/internal_speaker.h"
 #endif
 
@@ -140,6 +141,7 @@ int main(int argc, char* argv[])
     unique_ptr<MainWindow> mainWindow;
     unique_ptr<FieldDrawer> fieldDrawer;
     unique_ptr<Commentator> commentator;
+    unique_ptr<CommentatorDrawer> commentatorDrawer;
     unique_ptr<FPSDrawer> fpsDrawer;
     if (FLAGS_use_gui) {
         if (FLAGS_use_commentator)
@@ -152,7 +154,8 @@ int main(int argc, char* argv[])
 
         if (FLAGS_use_commentator) {
             commentator.reset(new Commentator);
-            mainWindow->addDrawer(commentator.get());
+            commentatorDrawer.reset(new CommentatorDrawer(commentator.get()));
+            mainWindow->addDrawer(commentatorDrawer.get());
         }
 
         fpsDrawer.reset(new FPSDrawer);
@@ -175,7 +178,9 @@ int main(int argc, char* argv[])
 
 #if USE_INTERNAL
     InternalSpeaker internalSpeaker;
-    AudioCommentator audioCommentator(&internalSpeaker);
+    AudioServer audioServer(&internalSpeaker);
+    AudioCommentator audioCommentator(commentator.get());
+    audioServer.addSpeakRequester(&audioCommentator);
 #endif
 
     DuelServer duelServer(&manager);
@@ -201,7 +206,10 @@ int main(int argc, char* argv[])
 #endif
 #if USE_INTERNAL
     duelServer.addObserver(&audioCommentator);
-    audioCommentator.start();
+#endif
+
+#if USE_INTERNAL
+    audioServer.start();
 #endif
 
 #if USE_SDL2
@@ -233,7 +241,7 @@ int main(int argc, char* argv[])
         httpServer->stop();
 #endif
 #if USE_INTERNAL
-    audioCommentator.stop();
+    audioServer.stop();
 #endif
 
     return 0;
