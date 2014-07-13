@@ -4,6 +4,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
+#include <random>
 #include <string>
 #include <thread>
 #include <vector>
@@ -31,9 +32,11 @@ public:
 
 private:
     std::mutex mu_;
+    std::vector<std::string> texts_;
+
+    std::default_random_engine rnd_;
 
     const Commentator* commentator_ = nullptr;
-    std::vector<std::string> texts_;
     int penalty_[3] {};
     bool firing_[2] {};
     int lastMaxRensa_[2] {};

@@ -10,6 +10,7 @@
 using namespace std;
 
 AudioCommentator::AudioCommentator(const Commentator* commentator) :
+    rnd_(random_device()()),
     commentator_(commentator)
 {
 }
@@ -20,8 +21,20 @@ AudioCommentator::~AudioCommentator()
 
 void AudioCommentator::newGameWillStart()
 {
+    std::uniform_int_distribution<int> uid(0, 2);
+
     lock_guard<mutex> lock(mu_);
-    texts_.push_back("さあ、ゲームの始まりです。");
+    switch (uid(rnd_)) {
+    case 0:
+        texts_.push_back("さあ、ゲームの始まりです。");
+        break;
+    case 1:
+        texts_.push_back("始まりましたよ、おくさん。");
+        break;
+    case 2:
+        texts_.push_back("はじまりました。");
+        break;
+    }
 }
 
 void AudioCommentator::onUpdate(const GameState&)
@@ -98,12 +111,12 @@ SpeakRequest AudioCommentator::requestSpeak()
     if (!firing_[0] && !firing_[1]) {
         int score0 = result.fireableMainChain[0].score();
         int score1 = result.fireableMainChain[1].score();
-        if (score0 > score1 - 30 && score0 > score1 * 2) {
+        if (score0 > score1 - 30 * 70 && score0 > score1 * 2) {
             candidates.emplace_back(12 - penalty_[2], 2,
                                     playerNames[0] + "のほうが" + playerNames[1] + "をリード。");
         }
 
-        if (score1 > score0 - 30 && score1 > score0 * 2) {
+        if (score1 > score0 - 30 * 70 && score1 > score0 * 2) {
             candidates.emplace_back(12 - penalty_[2], 2,
                                     playerNames[1] + "のほうが" + playerNames[0] + "をリード。");
         }
