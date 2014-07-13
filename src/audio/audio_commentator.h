@@ -34,6 +34,7 @@ private:
 
     const Commentator* commentator_ = nullptr;
     std::vector<std::string> texts_;
+    bool firing_[2] {};
 };
 
 #endif
