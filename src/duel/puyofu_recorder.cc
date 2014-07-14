@@ -32,7 +32,7 @@ void PuyofuRecorder::onUpdate(const GameState& gameState)
     }
 }
 
-void PuyofuRecorder::gameHasDone()
+void PuyofuRecorder::gameHasDone(GameResult)
 {
     FILE* fp;
 

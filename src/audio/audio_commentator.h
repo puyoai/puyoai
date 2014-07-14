@@ -26,7 +26,7 @@ public:
 
     virtual void newGameWillStart() override;
     virtual void onUpdate(const GameState&) override;
-    virtual void gameHasDone() override;
+    virtual void gameHasDone(GameResult) override;
 
     virtual SpeakRequest requestSpeak();
 

@@ -22,9 +22,9 @@ public:
 
     virtual ~PuyofuRecorder() {}
 
-    virtual void newGameWillStart() OVERRIDE;
-    virtual void onUpdate(const GameState&) OVERRIDE;
-    virtual void gameHasDone() OVERRIDE;
+    virtual void newGameWillStart() override;
+    virtual void onUpdate(const GameState&) override;
+    virtual void gameHasDone(GameResult) override;
 
     void setMode(Mode mode) { mode_ = mode; }
 

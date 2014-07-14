@@ -226,7 +226,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         gameResult = GameResult::GAME_HAS_STOPPED;
 
     for (auto observer : observers_)
-        observer->gameHasDone();
+        observer->gameHasDone(gameResult);
 
     return gameResult;
 }
