@@ -41,8 +41,19 @@ void AudioCommentator::onUpdate(const GameState&)
 {
 }
 
-void AudioCommentator::gameHasDone()
+void AudioCommentator::gameHasDone(GameResult gameResult)
 {
+    lock_guard<mutex> lock(mu_);
+    switch (gameResult) {
+    case GameResult::P1_WIN:
+        texts_.push_back("ワンピーの勝ち");
+        break;
+    case GameResult::P2_WIN:
+        texts_.push_back("ツーピーの勝ち");
+        break;
+    default:
+        break;
+    }
 }
 
 SpeakRequest AudioCommentator::requestSpeak()
