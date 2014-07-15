@@ -1,5 +1,6 @@
 #include "audio/audio_commentator.h"
 
+#include <algorithm>
 #include <iostream>
 #include "glog/logging.h"
 

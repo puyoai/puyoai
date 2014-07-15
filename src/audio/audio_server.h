@@ -1,6 +1,7 @@
 #ifndef AUDIO_AUDIO_SERVER_H_
 #define AUDIO_AUDIO_SERVER_H_
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <string>

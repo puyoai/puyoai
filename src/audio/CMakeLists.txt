@@ -16,5 +16,4 @@ function(audio_add_executable exe)
     puyoai_target_link_libraries(${exe})
 endfunction()
 
-audio_add_executable(audio_tester audio_tester.cc)
-
+# audio_add_executable(audio_tester audio_tester.cc)
