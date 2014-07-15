@@ -29,7 +29,7 @@
 #include "gui/main_window.h"
 #endif
 
-#ifdef USE_INTERNAL
+#if USE_AUDIO_COMMENTATOR
 #include "audio/audio_commentator.h"
 #include "audio/audio_server.h"
 #include "internal/audio/internal_speaker.h"
@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
     }
 #endif
 
-#if USE_INTERNAL
+#if USE_AUDIO_COMMENTATOR
     InternalSpeaker internalSpeaker;
     AudioServer audioServer(&internalSpeaker);
     AudioCommentator audioCommentator(commentator.get());
@@ -205,11 +205,8 @@ int main(int argc, char* argv[])
     if (httpServer.get())
         CHECK(httpServer->start());
 #endif
-#if USE_INTERNAL
+#if USE_AUDIO_COMMENTATOR
     duelServer.addObserver(&audioCommentator);
-#endif
-
-#if USE_INTERNAL
     audioServer.start();
 #endif
 
@@ -241,7 +238,7 @@ int main(int argc, char* argv[])
     if (httpServer.get())
         httpServer->stop();
 #endif
-#if USE_INTERNAL
+#if USE_AUDIO_COMMENTATOR
     audioServer.stop();
 #endif
 

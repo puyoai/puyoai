@@ -114,6 +114,10 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/internal AND IS_DIRECTORY ${CMAKE_SOURCE_DIR}/inte
     set(USE_INTERNAL 1)
     puyoai_add_cxx_flags("-DUSE_INTERNAL=1")
 endif()
+if(USE_INTERNAL AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(USE_AUDIO_COMMENTATOR 1)
+    puyoai_add_cxx_flags("-DUSE_AUDIO_COMMENTATOR=1")
+endif()
 
 # ----------------------------------------------------------------------
 # Add subdirectories
