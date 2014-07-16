@@ -1,5 +1,6 @@
 #include "book_field.h"
 
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include "core/puyo_color.h"
@@ -60,6 +61,18 @@ void BookField::merge(const BookField& bf)
                 field_[x][y] = bf.field_[x][y];
         }
     }
+}
+
+BookField BookField::mirror() const
+{
+    BookField bf(*this);
+    for (int x = 1; x <= 3; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            swap(bf.field_[x][y], bf.field_[7-x][y]);
+        }
+    }
+
+    return bf;
 }
 
 bool BookField::matches(const PlainField& f) const
