@@ -4,6 +4,24 @@
 
 using namespace std;
 
+TEST(BookFieldTest, matchEasy)
+{
+    BookField bf("test",
+                 vector<string> {
+                     "AAA...",
+                 });
+
+    PlainField pf0;
+    PlainField pf1("RRR   ");
+    PlainField pf2("R     ");
+    PlainField pf3("R R   ");
+
+    EXPECT_TRUE(bf.matches(pf0));
+    EXPECT_TRUE(bf.matches(pf1));
+    EXPECT_TRUE(bf.matches(pf2));
+    EXPECT_TRUE(bf.matches(pf3));
+}
+
 TEST(BookFieldTest, match)
 {
     BookField bf("test",
@@ -30,7 +48,7 @@ TEST(BookFieldTest, match)
     EXPECT_TRUE(bf.matches(pf2));
 }
 
-TEST(BookFieldTest, unmatch)
+TEST(BookFieldTest, unmatch1)
 {
     BookField bf("test",
                  vector<string> {
@@ -65,6 +83,18 @@ TEST(BookFieldTest, unmatch)
     EXPECT_FALSE(bf.matches(pf2));
     EXPECT_FALSE(bf.matches(pf3));
     EXPECT_FALSE(bf.matches(pf4));
+}
+
+TEST(BookFieldTest, unmatch2)
+{
+    BookField bf("test",
+                 vector<string> {
+                     "..AAA.",
+                 });
+
+    PlainField pf1(" B B  ");
+
+    EXPECT_FALSE(bf.matches(pf1));
 }
 
 TEST(BookFieldTest, merge)

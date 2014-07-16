@@ -6,6 +6,33 @@
 
 using namespace std;
 
+static inline
+bool check(char currentVar, char neighborVar, PuyoColor neighborColor,
+           const map<char, PuyoColor>& env)
+{
+    DCHECK(currentVar != '.');
+
+    if (!isNormalColor(neighborColor))
+        return true;
+
+    // This case should be already processed.
+    if (currentVar == neighborVar)
+        return true;
+
+    if (neighborVar == '.') {
+        auto it = env.find(currentVar);
+        if (it != env.end() && it->second == neighborColor)
+            return false;
+    } else {
+        auto it = env.find(currentVar);
+        auto jt = env.find(neighborVar);
+        if (it != env.end() && jt != env.end() && it->second == jt->second)
+            return false;
+    }
+
+    return true;
+}
+
 BookField::BookField(const string& name, const vector<string>& field, bool partial) :
     name_(name),
     partial_(partial)
@@ -64,48 +91,16 @@ bool BookField::matches(const PlainField& f) const
 
     // Check the neighbors (Only up and right.)
     for (int x = 1; x <= 6; ++x) {
-        for (int y = 1; f.get(x, y) != PuyoColor::EMPTY; ++y) {
+        for (int y = 1; f.get(x, y) != PuyoColor::EMPTY || field_[x][y] != '.'; ++y) {
             if (field_[x][y] == '.')
                 continue;
 
-            // up
-            if (isNormalColor(f.get(x, y + 1))) {
-                if (field_[x][y + 1] == '.') {
-                    if (f.get(x, y) == f.get(x, y + 1))
-                        return false;
-                } else {
-                    if (field_[x][y] == field_[x][y + 1])
-                        continue;
-                    if (f.get(x, y) == f.get(x, y + 1))
-                        return false;
-                }
-            }
-
-            // right
-            if (f.get(x + 1, y) != PuyoColor::EMPTY) {
-                if (field_[x + 1][y] == '.') {
-                    if (f.get(x + 1, y) == f.get(x, y))
-                        return false;
-                } else {
-                    if (field_[x][y] == field_[x + 1][y])
-                        continue;
-                    if (f.get(x, y) == f.get(x + 1, y))
-                        return false;
-                }
-            }
-
-            // right
-            if (f.get(x - 1, y) != PuyoColor::EMPTY) {
-                if (field_[x - 1][y] == '.') {
-                    if (f.get(x - 1, y) == f.get(x, y))
-                        return false;
-                } else {
-                    if (field_[x][y] == field_[x - 1][y])
-                        continue;
-                    if (f.get(x, y) == f.get(x - 1, y))
-                        return false;
-                }
-            }
+            if (!check(field_[x][y], field_[x][y + 1], f.get(x, y + 1), env))
+                return false;
+            if (!check(field_[x][y], field_[x + 1][y], f.get(x + 1, y), env))
+                return false;
+            if (!check(field_[x][y], field_[x - 1][y], f.get(x - 1, y), env))
+                return false;
         }
     }
 
