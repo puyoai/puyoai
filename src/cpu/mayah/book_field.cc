@@ -91,7 +91,7 @@ bool BookField::matches(const PlainField& f) const
 
     // Check the neighbors (Only up and right.)
     for (int x = 1; x <= 6; ++x) {
-        for (int y = 1; f.get(x, y) != PuyoColor::EMPTY || field_[x][y] != '.'; ++y) {
+        for (int y = 1; y <= 12 && (f.get(x, y) != PuyoColor::EMPTY || field_[x][y] != '.'); ++y) {
             if (field_[x][y] == '.')
                 continue;
 
