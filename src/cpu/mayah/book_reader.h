@@ -2,19 +2,14 @@
 #define CPU_MAYAH_BOOK_READER_H_
 
 #include <string>
+#include <vector>
 
 #include "core/plain_field.h"
-
-typedef char Variable;
-
-struct BookHandField {
-    std::string name;
-    Variable vars[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
-};
+#include "book_field.h"
 
 class BookReader {
 public:
-    void parse(const std::string& filename);
+    static std::vector<BookField> parse(const std::string& filename);
 };
 
 #endif

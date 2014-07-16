@@ -18,7 +18,8 @@ protected:
         TsumoPossibility::initialize();
 
         FeatureParameter parameter;
-        Evaluator evaluator(parameter);
+        vector<BookField> books;
+        Evaluator evaluator(parameter, books);
         Gazer gazer;
 
         gazer.initializeWith(1);

@@ -10,12 +10,15 @@
 #include "core/client/connector/drop_decision.h"
 #include "core/frame_data.h"
 
-#include "feature_parameter.h"
+#include "book_field.h"
+#include "book_reader.h"
 #include "evaluator.h"
+#include "feature_parameter.h"
 #include "gazer.h"
 #include "util.h"
 
-DECLARE_string(feature);
+DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.txt", "the path to feature parameter");
+DEFINE_string(book, SRC_DIR "/cpu/mayah/book.txt", "the path to book");
 DEFINE_bool(log_max_score, false, "log max score to stderr");
 
 using namespace std;
@@ -24,6 +27,7 @@ MayahAI::MayahAI() :
     AI("mayah")
 {
     featureParameter_.reset(new FeatureParameter(FLAGS_feature));
+    books_ = BookReader::parse(FLAGS_book);
     LOG(INFO) << featureParameter_->toString();
 }
 
@@ -83,7 +87,7 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
     Plan bestPlan;
     Plan::iterateAvailablePlans(field, kumipuyoSeq, depth,
                                 [this, frameId, numKeyPuyos, &field, &bestScore, &bestPlan](const RefPlan& plan) {
-        double score = Evaluator(*featureParameter_).eval(plan, field, frameId, numKeyPuyos, gazer_);
+        double score = Evaluator(*featureParameter_, books_).eval(plan, field, frameId, numKeyPuyos, gazer_);
         if (bestScore < score) {
             bestScore = score;
             bestPlan = plan.toPlan();
@@ -105,7 +109,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
         return string("give up :-(");
 
     RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.initiatingFrames(), plan.lastDropFrames());
-    CollectedFeature cf = Evaluator(*featureParameter_).evalWithCollectingFeature(refPlan, field, frameId, numKeyPuyos, gazer_);
+    CollectedFeature cf = Evaluator(*featureParameter_, books_).evalWithCollectingFeature(refPlan, field, frameId, numKeyPuyos, gazer_);
 
     stringstream ss;
     if (cf.feature(STRATEGY_ZENKESHI) > 0)

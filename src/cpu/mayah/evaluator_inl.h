@@ -22,6 +22,7 @@
 #include "core/field/rensa_result.h"
 #include "core/score.h"
 
+#include "book_field.h"
 #include "feature_parameter.h"
 #include "gazer.h"
 #include "util.h"
@@ -36,6 +37,17 @@ const bool USE_DENSITY_FEATURE = false;
 const bool USE_PATTERN34_FEATURE = true;
 const bool USE_IGNITION_HEIGHT_FEATURE = true;
 const bool USE_FIELD_USHAPE_FEATURE = true;
+
+template<typename ScoreCollector>
+void evalBook(ScoreCollector* sc, const std::vector<BookField>& books, const RefPlan& plan)
+{
+    for (const auto& bf : books) {
+        if (bf.matches(plan.field())) {
+            sc->addScore(BOOK, 1);
+            return;
+        }
+    }
+}
 
 template<typename ScoreCollector>
 void evalFrameFeature(ScoreCollector* sc, const RefPlan& plan)
@@ -453,12 +465,13 @@ void evalCountPuyoFeature(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-void collectScore(ScoreCollector* sc, const RefPlan& plan, const CoreField& currentField,
+void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const RefPlan& plan, const CoreField& currentField,
                   int currentFrameId, int numKeyPuyos, const Gazer& gazer)
 {
     if (evalStrategy(sc, plan, currentField, currentFrameId, gazer))
         return;
 
+    evalBook(sc, books, plan);
     evalFrameFeature(sc, plan);
     evalCountPuyoFeature(sc, plan);
     if (USE_CONNECTION_FEATURE)
