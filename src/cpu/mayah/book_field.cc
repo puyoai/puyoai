@@ -6,8 +6,9 @@
 
 using namespace std;
 
-BookField::BookField(const string& name, const vector<string>& field) :
-    name_(name)
+BookField::BookField(const string& name, const vector<string>& field, bool partial) :
+    name_(name),
+    partial_(partial)
 {
     for (int x = 0; x < PlainField::MAP_WIDTH; ++x) {
         for (int y = 0; y < PlainField::MAP_HEIGHT; ++y) {
@@ -20,6 +21,16 @@ BookField::BookField(const string& name, const vector<string>& field) :
         int y = static_cast<int>(field.size()) - i;
         for (int x = 1; x <= 6; ++x) {
             field_[x][y] = field[i][x - 1];
+        }
+    }
+}
+
+void BookField::merge(const BookField& bf)
+{
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            if (field_[x][y] == '.')
+                field_[x][y] = bf.field_[x][y];
         }
     }
 }
@@ -51,7 +62,7 @@ bool BookField::matches(const PlainField& f) const
         }
     }
 
-    // Then, check the neighbors (Only up and right.)
+    // Check the neighbors (Only up and right.)
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; f.get(x, y) != PuyoColor::EMPTY; ++y) {
             if (field_[x][y] == '.')
@@ -79,6 +90,19 @@ bool BookField::matches(const PlainField& f) const
                     if (field_[x][y] == field_[x + 1][y])
                         continue;
                     if (f.get(x, y) == f.get(x + 1, y))
+                        return false;
+                }
+            }
+
+            // right
+            if (f.get(x - 1, y) != PuyoColor::EMPTY) {
+                if (field_[x - 1][y] == '.') {
+                    if (f.get(x - 1, y) == f.get(x, y))
+                        return false;
+                } else {
+                    if (field_[x][y] == field_[x - 1][y])
+                        continue;
+                    if (f.get(x, y) == f.get(x - 1, y))
                         return false;
                 }
             }

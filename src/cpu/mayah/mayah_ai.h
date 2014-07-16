@@ -7,6 +7,7 @@
 
 #include "core/client/ai/ai.h"
 
+#include "book_field.h"
 #include "feature_parameter.h"
 #include "gazer.h"
 
@@ -46,6 +47,7 @@ protected:
     void reloadParameter();
 
     std::unique_ptr<FeatureParameter> featureParameter_;
+    std::vector<BookField> books_;
     Gazer gazer_;
     int thoughtMaxRensa_ = 0;
     int thoughtMaxScore_ = 0;

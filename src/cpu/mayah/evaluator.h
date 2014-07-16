@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 
+#include "book_field.h"
 #include "feature_parameter.h"
 
 class CoreField;
@@ -123,7 +124,7 @@ private:
 
 class Evaluator {
 public:
-    Evaluator(const FeatureParameter& param) : param_(param) {}
+    Evaluator(const FeatureParameter& param, const std::vector<BookField>& books) : param_(param), books_(books) {}
 
     double eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int numKeyPuyos, const Gazer&);
     // Same as eval(), but returns CollectedFeature.
@@ -131,6 +132,7 @@ public:
 
 private:
     const FeatureParameter& param_;
+    const std::vector<BookField>& books_;
 };
 
 #include "evaluator_inl.h"

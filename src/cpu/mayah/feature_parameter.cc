@@ -9,8 +9,6 @@
 
 #include "core/field/core_field.h"
 
-DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.txt", "the path to feature parameter");
-
 using namespace std;
 
 FeatureParameter::FeatureParameter() :

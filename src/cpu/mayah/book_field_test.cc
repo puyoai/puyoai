@@ -66,3 +66,41 @@ TEST(BookFieldTest, unmatch)
     EXPECT_FALSE(bf.matches(pf3));
     EXPECT_FALSE(bf.matches(pf4));
 }
+
+TEST(BookFieldTest, merge)
+{
+    BookField bf("test",
+                 vector<string> {
+                     "BAD.C.",
+                     "BBADDD",
+                     "AACCC.",
+                 });
+
+    BookField bf2("test2",
+                  vector<string> {
+                      "....E.",
+                      "BADECE",
+                      "BBADDD",
+                      "AACCCE",
+                  });
+
+    bf.merge(bf2);
+
+    PlainField pf0;
+
+    PlainField pf1(
+        "    B "
+        "BYGBRB"
+        "BBYGGG"
+        "YYRRRB");
+
+    PlainField pf2(
+        "    GG"
+        "BYBGRG"
+        "BBYBBB"
+        "YYRRRG");
+
+    EXPECT_TRUE(bf.matches(pf0));
+    EXPECT_TRUE(bf.matches(pf1));
+    EXPECT_FALSE(bf.matches(pf2));
+}

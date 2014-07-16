@@ -88,7 +88,7 @@ double Evaluator::eval(const RefPlan& plan, const CoreField& currentField,
                        int currentFrameId, int numKeyPuyos, const Gazer& gazer)
 {
     NormalScoreCollector sc(param_);
-    collectScore(&sc, plan, currentField, currentFrameId, numKeyPuyos, gazer);
+    collectScore(&sc, books_, plan, currentField, currentFrameId, numKeyPuyos, gazer);
     return sc.score();
 }
 
@@ -96,7 +96,6 @@ CollectedFeature Evaluator::evalWithCollectingFeature(const RefPlan& plan, const
                                                       int currentFrameId, int numKeyPuyos, const Gazer& gazer)
 {
     FeatureScoreCollector sc(param_);
-    collectScore(&sc, plan, currentField, currentFrameId, numKeyPuyos, gazer);
+    collectScore(&sc, books_, plan, currentField, currentFrameId, numKeyPuyos, gazer);
     return sc.toCollectedFeature();
 }
-

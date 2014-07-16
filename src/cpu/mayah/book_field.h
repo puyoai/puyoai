@@ -8,12 +8,16 @@
 
 class BookField {
 public:
-    BookField(const std::string& name, const std::vector<std::string>& field);
+    BookField(const std::string& name, const std::vector<std::string>& field, bool partial = false);
 
     bool matches(const PlainField&) const;
 
+    void merge(const BookField&);
+
+    bool isPartial() const { return partial_; }
 private:
     std::string name_;
+    bool partial_;
     char field_[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
 };
 

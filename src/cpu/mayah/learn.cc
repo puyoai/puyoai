@@ -14,6 +14,7 @@
 #include "core/puyo_color.h"
 #include "core/sequence_generator.h"
 
+#include "book_reader.h"
 #include "evaluator.h"
 #include "feature_parameter.h"
 #include "gazer.h"
@@ -22,6 +23,7 @@
 using namespace std;
 
 DEFINE_bool(interactive, false, "use interactive learning");
+DECLARE_string(book);
 DECLARE_string(feature);
 
 // const double LEARNING_COEF = 1 / 1000.0;
@@ -105,6 +107,7 @@ void updateFeature(FeatureParameter* parameter,
 void learnWithInteractive()
 {
     FeatureParameter parameter(FLAGS_feature);
+    vector<BookField> books = BookReader::parse(FLAGS_book);
     cout << parameter.toString() << endl;
     Gazer gazer;
 
@@ -119,7 +122,7 @@ void learnWithInteractive()
         double currentScore = -1000000;
         pair<Decision, Decision> currentDecision;
         Plan::iterateAvailablePlans(field, seq, 2, [&](const RefPlan& plan) {
-            CollectedFeature f = Evaluator(parameter).evalWithCollectingFeature(plan, field, 1, false, gazer);
+            CollectedFeature f = Evaluator(parameter, books).evalWithCollectingFeature(plan, field, 1, false, gazer);
             pair<Decision, Decision> pd;
             if (plan.decisions().size() == 1)
                 pd = make_pair(plan.decision(0), Decision());
@@ -236,6 +239,7 @@ vector<FrameInput> readUntilGameEnd()
 void learnFromPuyofu()
 {
     FeatureParameter parameter(FLAGS_feature);
+    vector<BookField> books = BookReader::parse(FLAGS_book);
     Gazer gazer;
 
     const int frameId = 1;
@@ -247,7 +251,7 @@ void learnFromPuyofu()
             break;
 
         for (size_t i = 0; i + 1 < inputs.size(); ++i) {
-            Evaluator evaluator(parameter);
+            Evaluator evaluator(parameter, books);
             map<vector<Decision>, CollectedFeature> featureMap;
             CollectedFeature teacherFeature;
             bool teacherFound = false;
