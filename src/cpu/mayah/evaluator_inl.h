@@ -41,12 +41,21 @@ const bool USE_FIELD_USHAPE_FEATURE = true;
 template<typename ScoreCollector>
 void evalBook(ScoreCollector* sc, const std::vector<BookField>& books, const RefPlan& plan)
 {
+    int maxScore = 0;
+    const BookField* bestBf = nullptr;
+
+    double totalPuyoCount = plan.field().countPuyos();
     for (const auto& bf : books) {
-        if (bf.matches(plan.field())) {
-            sc->addScore(BOOK, 1);
-            return;
+        double ratio = bf.matchCount(plan.field()) / totalPuyoCount;
+        int score = bf.score() * ratio;
+        if (maxScore < score) {
+            bestBf = &bf;
+            maxScore = score;
         }
     }
+
+    if (bestBf)
+        sc->addScore(BOOK, maxScore);
 }
 
 template<typename ScoreCollector>
@@ -221,10 +230,12 @@ void evalValleyDepthRidgeHeight(ScoreCollector* sc, const RefPlan& plan)
             int left = std::max(leftHeight - currentHeight, 0);
             int right = std::max(rightHeight - currentHeight, 0);
             int depth = std::min(left, right);
+#if 0
             if (x == 1 || x == 6) {
                 if (depth > 0)
                     depth -= 1;
             }
+#endif
             DCHECK(0 <= depth && depth <= 14) << depth;
             sc->addScore(VALLEY_DEPTH, depth, 1);
         }
@@ -254,7 +265,7 @@ void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
 
     int s = 0;
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        if (f.height(x) <= 3)
+        if (f.height(x) <= 4)
             continue;
         s += std::abs((f.height(x) + DIFF[x]) * 6 - sumHeight);
     }

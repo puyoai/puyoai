@@ -16,10 +16,11 @@ static string trim(const string& str)
     return str.substr(left, right - left + 1);
 }
 
-static void addBookField(const string& name, const string& with, const vector<string>& f, bool partial, multimap<string, BookField>* mm)
+static void addBookField(const string& name, const string& with, const vector<string>& f,
+                         bool partial, double score, multimap<string, BookField>* mm)
 {
     if (with.empty()) {
-        mm->emplace(name, BookField(name, f, partial));
+        mm->emplace(name, BookField(name, f, score, partial));
         return;
     }
 
@@ -29,7 +30,7 @@ static void addBookField(const string& name, const string& with, const vector<st
     auto range = mm->equal_range(with);
     for (auto it = range.first; it != range.second; ++it) {
         // Do not modify mm in this loop.
-        BookField bf(name, f, partial);
+        BookField bf(name, f, min(score, it->second.score()), partial);
         bf.merge(it->second);
         bfs.push_back(bf);
     }
@@ -49,6 +50,7 @@ vector<BookField> BookReader::parse(const string& filename)
     string currentWithName;
     vector<string> currentField;
     bool partial = false;
+    double score = 1.0;
 
     string str;
     while (getline(ifs, str)) {
@@ -58,12 +60,13 @@ vector<BookField> BookReader::parse(const string& filename)
             continue;
         if (str.find("TYPE:") == 0) {
             if (!currentTypeName.empty())
-                addBookField(currentTypeName, currentWithName, currentField, partial, &m);
+                addBookField(currentTypeName, currentWithName, currentField, partial, score, &m);
 
             currentTypeName = trim(str.substr(5));
             currentWithName = "";
             currentField.clear();
             partial = false;
+            score = 1.0;
             continue;
         }
         if (str.find("WITH:") == 0) {
@@ -72,6 +75,10 @@ vector<BookField> BookReader::parse(const string& filename)
         }
         if (str.find("PARTIAL:") == 0) {
             partial = true;
+            continue;
+        }
+        if (str.find("SCORE:") == 0) {
+            score = stoi(str.substr(6));
             continue;
         }
         if (str.size() == 6) {
@@ -85,7 +92,7 @@ vector<BookField> BookReader::parse(const string& filename)
     LOG(INFO) << "ghoe" << endl;
 
     if (!currentTypeName.empty())
-        addBookField(currentTypeName, currentWithName, currentField, partial, &m);
+        addBookField(currentTypeName, currentWithName, currentField, partial, score, &m);
 
     vector<BookField> result;
     for (const auto& entry : m) {
