@@ -56,6 +56,7 @@ DropDecision Ai::think(int frame_id,
 
   int depth = seq.size();
   KumipuyoSeq seq2(seq);
+  // TODO(peria): Loop undetected TSUMO in callback function.
   seq2.resize(depth + 1);
   for (uint8_t i = RED; i <= GREEN; ++i) {
     seq2.setAxis(depth, static_cast<PuyoColor>(i));
@@ -70,7 +71,7 @@ DropDecision Ai::think(int frame_id,
       std::bind(Evaluate, 70 * 6 * 5, &best, &score, _1));
 
   message << "X-R:" << best.x << "-" << best.r
-          << "_SCORE:" << score << "   ";
+          << "_SCORE:" << score;
 
   return DropDecision(best, message.str());
 }
