@@ -4,6 +4,24 @@
 
 using namespace std;
 
+TEST(BookFieldTest, varCount)
+{
+    BookField bf1("test",
+                  vector<string> {
+                      "AAA...",
+                  });
+
+    BookField bf2("test",
+                  vector<string> {
+                      "BAD.C.",
+                      "BBADDD",
+                      "AACCC.",
+                  });
+
+    EXPECT_EQ(3, bf1.totalVariableCount());
+    EXPECT_EQ(15, bf2.totalVariableCount());
+}
+
 TEST(BookFieldTest, matchEasy)
 {
     BookField bf("test",
@@ -16,10 +34,10 @@ TEST(BookFieldTest, matchEasy)
     PlainField pf2("R     ");
     PlainField pf3("R R   ");
 
-    EXPECT_TRUE(bf.matches(pf0));
-    EXPECT_TRUE(bf.matches(pf1));
-    EXPECT_TRUE(bf.matches(pf2));
-    EXPECT_TRUE(bf.matches(pf3));
+    EXPECT_EQ(0, bf.matchCount(pf0));
+    EXPECT_EQ(3, bf.matchCount(pf1));
+    EXPECT_EQ(1, bf.matchCount(pf2));
+    EXPECT_EQ(2, bf.matchCount(pf3));
 }
 
 TEST(BookFieldTest, match)
@@ -43,9 +61,9 @@ TEST(BookFieldTest, match)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_TRUE(bf.matches(pf0));
-    EXPECT_TRUE(bf.matches(pf1));
-    EXPECT_TRUE(bf.matches(pf2));
+    EXPECT_EQ(0,  bf.matchCount(pf0));
+    EXPECT_EQ(15, bf.matchCount(pf1));
+    EXPECT_EQ(15, bf.matchCount(pf2));
 }
 
 TEST(BookFieldTest, unmatch1)
@@ -79,10 +97,10 @@ TEST(BookFieldTest, unmatch1)
         "BBRBBB"
         "RRRRRY");
 
-    EXPECT_FALSE(bf.matches(pf1));
-    EXPECT_FALSE(bf.matches(pf2));
-    EXPECT_FALSE(bf.matches(pf3));
-    EXPECT_FALSE(bf.matches(pf4));
+    EXPECT_EQ(0, bf.matchCount(pf1));
+    EXPECT_EQ(0, bf.matchCount(pf2));
+    EXPECT_EQ(0, bf.matchCount(pf3));
+    EXPECT_EQ(0, bf.matchCount(pf4));
 }
 
 TEST(BookFieldTest, unmatch2)
@@ -94,7 +112,7 @@ TEST(BookFieldTest, unmatch2)
 
     PlainField pf1(" B B  ");
 
-    EXPECT_FALSE(bf.matches(pf1));
+    EXPECT_EQ(0, bf.matchCount(pf1));
 }
 
 TEST(BookFieldTest, merge)
@@ -130,7 +148,7 @@ TEST(BookFieldTest, merge)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_TRUE(bf.matches(pf0));
-    EXPECT_TRUE(bf.matches(pf1));
-    EXPECT_FALSE(bf.matches(pf2));
+    EXPECT_EQ(0, bf.matchCount(pf0));
+    EXPECT_EQ(19, bf.matchCount(pf1));
+    EXPECT_EQ(0, bf.matchCount(pf2));
 }
