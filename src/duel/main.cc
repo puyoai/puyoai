@@ -178,10 +178,16 @@ int main(int argc, char* argv[])
 #endif
 
 #if USE_AUDIO_COMMENTATOR
-    InternalSpeaker internalSpeaker;
-    AudioServer audioServer(&internalSpeaker);
-    AudioCommentator audioCommentator(commentator.get());
-    audioServer.addSpeakRequester(&audioCommentator);
+    unique_ptr<InternalSpeaker> internalSpeaker;
+    unique_ptr<AudioServer> audioServer;
+    unique_ptr<AudioCommentator> audioCommentator;
+
+    if (FLAGS_use_commentator && FLAGS_use_gui) {
+        internalSpeaker.reset(new InternalSpeaker);
+        audioServer.reset(new AudioServer(internalSpeaker.get()));
+        audioCommentator.reset(new AudioCommentator(commentator.get()));
+        audioServer->addSpeakRequester(audioCommentator.get());
+    }
 #endif
 
     DuelServer duelServer(&manager);
@@ -206,8 +212,10 @@ int main(int argc, char* argv[])
         CHECK(httpServer->start());
 #endif
 #if USE_AUDIO_COMMENTATOR
-    duelServer.addObserver(&audioCommentator);
-    audioServer.start();
+    if (audioCommentator.get())
+        duelServer.addObserver(audioCommentator.get());
+    if (audioServer.get())
+        audioServer->start();
 #endif
 
 #if USE_SDL2
@@ -239,7 +247,8 @@ int main(int argc, char* argv[])
         httpServer->stop();
 #endif
 #if USE_AUDIO_COMMENTATOR
-    audioServer.stop();
+    if (audioServer.get())
+        audioServer->stop();
 #endif
 
     return 0;

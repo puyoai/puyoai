@@ -89,8 +89,10 @@ vector<BookField> BookReader::parse(const string& filename)
 
     vector<BookField> result;
     for (const auto& entry : m) {
-        if (!entry.second.isPartial())
+        if (!entry.second.isPartial()) {
             result.push_back(entry.second);
+            result.push_back(entry.second.mirror());
+        }
     }
 
     return result;

@@ -13,6 +13,7 @@ public:
     bool matches(const PlainField&) const;
 
     void merge(const BookField&);
+    BookField mirror() const;
 
     bool isPartial() const { return partial_; }
 private:
