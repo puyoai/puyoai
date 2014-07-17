@@ -34,7 +34,6 @@ const bool USE_HAND_WIDTH_FEATURE = true;
 const bool USE_HEIGHT_DIFF_FEATURE = false;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_DENSITY_FEATURE = false;
-const bool USE_PATTERN34_FEATURE = true;
 const bool USE_IGNITION_HEIGHT_FEATURE = true;
 const bool USE_FIELD_USHAPE_FEATURE = true;
 
@@ -162,31 +161,6 @@ void evalDensityFeature(ScoreCollector* sc, const RefPlan& plan)
             }
         }
     }
-}
-
-template<typename ScoreCollector>
-void evalPuyoPattern34Feature(ScoreCollector* sc, const RefPlan& plan)
-{
-    const CoreField& field = plan.field();
-
-    int patternsLeft[NUM_PUYO_COLORS] = { 0 };
-    int patternsRight[NUM_PUYO_COLORS] = { 0 };
-    for (int y = 1; y <= 3; ++y) {
-        for (int x = 1; x <= 4; ++x) {
-            patternsLeft[field.color(x, y)] |= 1 << ((y - 1) * 4 + (x - 1));
-            patternsRight[field.color(7 - x, y)] |= 1 << ((y - 1) * 4 + (x - 1));
-        }
-    }
-
-    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[RED], 1);
-    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[GREEN], 1);
-    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[YELLOW], 1);
-    sc->addScore(PUYO_PATTERN_34_LEFT, patternsLeft[BLUE], 1);
-
-    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[RED], 1);
-    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[GREEN], 1);
-    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[YELLOW], 1);
-    sc->addScore(PUYO_PATTERN_34_RIGHT, patternsRight[BLUE], 1);
 }
 
 template<typename ScoreCollector>
@@ -493,8 +467,6 @@ void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const
         evalRestrictedConnectionHorizontalFeature(sc, plan);
     if (USE_DENSITY_FEATURE)
         evalDensityFeature(sc, plan);
-    if (USE_PATTERN34_FEATURE)
-        evalPuyoPattern34Feature(sc, plan);
     if (USE_HEIGHT_DIFF_FEATURE)
         evalFieldHeightFeature(sc, plan);
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
