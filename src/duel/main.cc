@@ -50,6 +50,9 @@ DEFINE_bool(use_cui, false, "use CUI version drawer");
 // When SDL2 is not defined, CUI should be enabled by default.
 DEFINE_bool(use_cui, true, "use CUI version drawer");
 #endif
+#if USE_AUDIO_COMMENTATOR
+DEFINE_bool(use_audio, true, "use audio commentator");
+#endif
 
 class GameStateHandler : public HttpHandler, public GameStateObserver {
 public:
@@ -182,7 +185,7 @@ int main(int argc, char* argv[])
     unique_ptr<AudioServer> audioServer;
     unique_ptr<AudioCommentator> audioCommentator;
 
-    if (FLAGS_use_commentator && FLAGS_use_gui) {
+    if (FLAGS_use_commentator && FLAGS_use_gui && FLAGS_use_audio) {
         internalSpeaker.reset(new InternalSpeaker);
         audioServer.reset(new AudioServer(internalSpeaker.get()));
         audioCommentator.reset(new AudioCommentator(commentator.get()));
