@@ -4,24 +4,6 @@
 
 using namespace std;
 
-TEST(BookFieldTest, varCount)
-{
-    BookField bf1("test",
-                  vector<string> {
-                      "AAA...",
-                  });
-
-    BookField bf2("test",
-                  vector<string> {
-                      "BAD.C.",
-                      "BBADDD",
-                      "AACCC.",
-                  });
-
-    EXPECT_EQ(3, bf1.totalVariableCount());
-    EXPECT_EQ(15, bf2.totalVariableCount());
-}
-
 TEST(BookFieldTest, matchEasy)
 {
     BookField bf("test",
