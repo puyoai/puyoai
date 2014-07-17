@@ -131,6 +131,9 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     if (cf.feature(STRATEGY_SAISOKU) > 0)
         ss << "SAISOKU / ";
 
+    if (!cf.bookName().empty())
+        ss << cf.bookName() << " / ";
+
     ss << "SCORE = " << cf.score() << " / ";
 
     if (!cf.feature(MAX_CHAINS).empty()) {

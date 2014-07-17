@@ -16,9 +16,11 @@ class CollectedFeature {
 public:
     CollectedFeature() {}
     CollectedFeature(double score,
+                     std::string bookName,
                      std::map<EvaluationFeatureKey, double> collectedFeatures,
                      std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures) :
         score_(score),
+        bookName_(bookName),
         collectedFeatures_(std::move(collectedFeatures)),
         collectedSparseFeatures_(std::move(collectedSparseFeatures))
     {
@@ -42,6 +44,8 @@ public:
         return emptyVector();
     }
 
+    const std::string& bookName() const { return bookName_; }
+
     std::string toString() const;
     std::string toStringComparingWith(const CollectedFeature&) const;
 
@@ -53,6 +57,7 @@ public:
 
 private:
     double score_ = 0.0;
+    std::string bookName_;
     std::map<EvaluationFeatureKey, double> collectedFeatures_;
     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures_;
 };
@@ -65,12 +70,16 @@ public:
     void addScore(EvaluationSparseFeatureKey key, int idx, int n) { score_ += param_.score(key, idx, n); }
     void merge(const NormalScoreCollector& sc) { score_ += sc.score(); }
 
+    void setBookName(const std::string& bookName) { bookName_ = bookName; }
+    std::string bookName() const { return bookName_; }
+
     double score() const { return score_; }
     const FeatureParameter& featureParameter() const { return param_; }
 
 private:
     const FeatureParameter& param_;
     double score_ = 0.0;
+    std::string bookName_;
 };
 
 class FeatureScoreCollector {
@@ -105,12 +114,16 @@ public:
         }
     }
 
+    void setBookName(const std::string& bookName) { collector_.setBookName(bookName); }
+    std::string bookName() const { return collector_.bookName(); }
+
     double score() const { return collector_.score(); }
     const FeatureParameter& featureParameter() const { return collector_.featureParameter(); }
 
     CollectedFeature toCollectedFeature() const {
         return CollectedFeature {
             score(),
+            bookName(),
             collectedFeatures_,
             collectedSparseFeatures_
         };

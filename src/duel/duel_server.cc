@@ -162,7 +162,9 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
     for (auto observer : observers_)
         observer->newGameWillStart();
 
-    KumipuyoSeq kumipuyoSeq = FLAGS_seed < 0 ? generateSequence(): generateSequenceWithSeed(FLAGS_seed);
+    int seed = FLAGS_seed < 0 ? random_device()() : FLAGS_seed;
+    KumipuyoSeq kumipuyoSeq = generateSequenceWithSeed(seed);
+    LOG(INFO) << "sequence seed=" << seed;
     LOG(INFO) << "Puyo sequence=" << kumipuyoSeq.toString();
 
     if (FLAGS_seq != "") {
