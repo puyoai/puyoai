@@ -337,16 +337,19 @@ void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& plan,
                            const RensaResult& rensaResult,
                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
 {
+    int numKeyPuyos = std::min(3, static_cast<int>(keyPuyos.size()));
+    int numFirePuyos = std::min(3, static_cast<int>(firePuyos.size()));
+
     sc->addScore(MAX_CHAINS, rensaResult.chains, 1);
     if (plan.field().countPuyos() <= 24) {
-        sc->addScore(MAX_RENSA_KEY_PUYOS_EARLY, keyPuyos.size());
-        sc->addScore(MAX_RENSA_FIRE_PUYOS_EARLY, firePuyos.size());
+        sc->addScore(MAX_RENSA_KEY_PUYOS_EARLY, numKeyPuyos, 1);
+        sc->addScore(MAX_RENSA_FIRE_PUYOS_EARLY, numFirePuyos, 1);
     } else if (plan.field().countPuyos() <= 42) {
-        sc->addScore(MAX_RENSA_KEY_PUYOS_MIDDLE, keyPuyos.size());
-        sc->addScore(MAX_RENSA_FIRE_PUYOS_MIDDLE, firePuyos.size());
+        sc->addScore(MAX_RENSA_KEY_PUYOS_MIDDLE, numKeyPuyos, 1);
+        sc->addScore(MAX_RENSA_FIRE_PUYOS_MIDDLE, numFirePuyos, 1);
     } else {
-        sc->addScore(MAX_RENSA_KEY_PUYOS_LATE, keyPuyos.size());
-        sc->addScore(MAX_RENSA_FIRE_PUYOS_LATE, firePuyos.size());
+        sc->addScore(MAX_RENSA_KEY_PUYOS_LATE, numKeyPuyos, 1);
+        sc->addScore(MAX_RENSA_FIRE_PUYOS_LATE, numFirePuyos, 1);
     }
 }
 
