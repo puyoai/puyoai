@@ -49,10 +49,7 @@ BookField::BookField(const string& name, const vector<string>& field, double sco
         CHECK_EQ(field[i].size(), 6U);
         int y = static_cast<int>(field.size()) - i;
         for (int x = 1; x <= 6; ++x) {
-            char var = field[i][x - 1];
-            if (var != '.')
-                ++varCount_;
-            field_[x][y] = var;
+            field_[x][y] = field[i][x - 1];
         }
     }
 }
@@ -61,10 +58,8 @@ void BookField::merge(const BookField& bf)
 {
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            if (field_[x][y] == '.' && bf.field_[x][y] != '.') {
+            if (field_[x][y] == '.' && bf.field_[x][y] != '.')
                 field_[x][y] = bf.field_[x][y];
-                ++varCount_;
-            }
         }
     }
 }
