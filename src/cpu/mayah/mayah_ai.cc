@@ -29,6 +29,10 @@ MayahAI::MayahAI() :
     featureParameter_.reset(new FeatureParameter(FLAGS_feature));
     books_ = BookReader::parse(FLAGS_book);
     LOG(INFO) << featureParameter_->toString();
+    for (const auto& bf : books_) {
+        LOG(INFO) << bf.toDebugString();
+    }
+    google::FlushLogFiles(google::INFO);
 }
 
 MayahAI::~MayahAI()

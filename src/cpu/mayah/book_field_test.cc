@@ -16,10 +16,10 @@ TEST(BookFieldTest, matchEasy)
     PlainField pf2("R     ");
     PlainField pf3("R R   ");
 
-    EXPECT_EQ(0, bf.matchCount(pf0));
-    EXPECT_EQ(3, bf.matchCount(pf1));
-    EXPECT_EQ(1, bf.matchCount(pf2));
-    EXPECT_EQ(2, bf.matchCount(pf3));
+    EXPECT_EQ(0, bf.match(pf0));
+    EXPECT_EQ(3, bf.match(pf1));
+    EXPECT_EQ(1, bf.match(pf2));
+    EXPECT_EQ(2, bf.match(pf3));
 }
 
 TEST(BookFieldTest, match)
@@ -43,9 +43,9 @@ TEST(BookFieldTest, match)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(0,  bf.matchCount(pf0));
-    EXPECT_EQ(15, bf.matchCount(pf1));
-    EXPECT_EQ(15, bf.matchCount(pf2));
+    EXPECT_EQ(0,  bf.match(pf0));
+    EXPECT_EQ(15, bf.match(pf1));
+    EXPECT_EQ(15, bf.match(pf2));
 }
 
 TEST(BookFieldTest, unmatch1)
@@ -79,10 +79,10 @@ TEST(BookFieldTest, unmatch1)
         "BBRBBB"
         "RRRRRY");
 
-    EXPECT_EQ(0, bf.matchCount(pf1));
-    EXPECT_EQ(0, bf.matchCount(pf2));
-    EXPECT_EQ(0, bf.matchCount(pf3));
-    EXPECT_EQ(0, bf.matchCount(pf4));
+    EXPECT_EQ(0, bf.match(pf1));
+    EXPECT_EQ(0, bf.match(pf2));
+    EXPECT_EQ(0, bf.match(pf3));
+    EXPECT_EQ(0, bf.match(pf4));
 }
 
 TEST(BookFieldTest, unmatch2)
@@ -94,17 +94,19 @@ TEST(BookFieldTest, unmatch2)
 
     PlainField pf1(" B B  ");
 
-    EXPECT_EQ(0, bf.matchCount(pf1));
+    EXPECT_EQ(0, bf.match(pf1));
 }
 
 TEST(BookFieldTest, merge)
 {
     BookField bf("test",
                  vector<string> {
+                     "BX....",
+                     "XX....",
                      "BAD.C.",
                      "BBADDD",
                      "AACCC.",
-                 });
+                 }, 1);
 
     BookField bf2("test2",
                   vector<string> {
@@ -112,9 +114,15 @@ TEST(BookFieldTest, merge)
                       "BADECE",
                       "BBADDD",
                       "AACCCE",
-                  });
+                 }, 2);
 
     bf.merge(bf2);
+
+    EXPECT_EQ(0, bf.score(6, 6));
+    EXPECT_EQ(1, bf.score(1, 4));
+    EXPECT_EQ(1, bf.score(1, 5));
+    EXPECT_EQ(2, bf.score(1, 1));
+    EXPECT_EQ(2, bf.score(6, 1));
 
     PlainField pf0;
 
@@ -130,7 +138,7 @@ TEST(BookFieldTest, merge)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(0, bf.matchCount(pf0));
-    EXPECT_EQ(19, bf.matchCount(pf1));
-    EXPECT_EQ(0, bf.matchCount(pf2));
+    EXPECT_EQ(0, bf.match(pf0));
+    EXPECT_EQ(38, bf.match(pf1));
+    EXPECT_EQ(0, bf.match(pf2));
 }
