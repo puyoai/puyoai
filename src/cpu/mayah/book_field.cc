@@ -72,7 +72,8 @@ void BookField::merge(const BookField& bf)
                 field_[x][y] = bf.field_[x][y];
                 scoreField_[x][y] = bf.scoreField_[x][y];
             } else {
-                CHECK_EQ(field_[x][y], bf.field_[x][y]) << name() << " vs " << bf.name();
+                CHECK_EQ(field_[x][y], bf.field_[x][y]) << name() << " : " << bf.name()
+                                                        << "x=" << x << " y=" << y;
                 scoreField_[x][y] = bf.scoreField_[x][y];
             }
         }
@@ -132,6 +133,8 @@ double BookField::match(const PlainField& f) const
                 continue;
 
             if (!check(field_[x][y], field_[x][y + 1], f.get(x, y + 1), env))
+                return 0;
+            if (!check(field_[x][y], field_[x][y - 1], f.get(x, y - 1), env))
                 return 0;
             if (!check(field_[x][y], field_[x + 1][y], f.get(x + 1, y), env))
                 return 0;

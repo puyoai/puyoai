@@ -1,8 +1,8 @@
 # ----------------------------------------------------------------------
 # GTR
 
-NAME: GTR-BASE
-SCORE: 10
+NAME: GTR
+SCORE: 10.2
 BA....
 BBA...
 AA....
@@ -33,23 +33,38 @@ BBA...
 AAC...
 
 NAME: GTR-TAIL
-SCORE: 10
+SCORE: 9.8
 ....YY
 baCYXY
 bbACCC
 aaCXXX
 
 NAME: GTR-TAIL
-SCORE: 10
+SCORE: 9.9
 .....Y
 baCXXY
 bbACCX
 aaCYYX
 
-COMBINE: GTR-HEAD GTR-TAIL
+NAME: GTR-TAIL
+SCORE: 10.1
+.....Y
+baCXXY
+bbAYYX
+aaCCCX
+
+COMBINE: GTR GTR-HEAD GTR-TAIL
 
 # ----------------------------------------------------------------------
 # GTR (2)
+
+NAME: GTR2-HEAD
+SCORE: 10
+B.....
+EEE...
+BAC...
+BBA...
+AAD...
 
 NAME: GTR2-HEAD
 SCORE: 10
@@ -90,10 +105,23 @@ baCXDX
 bbaCCC
 aaDDDX
 
-COMBINE: GTR2-HEAD GTR2-TAIL
+NAME: GTR2-TAIL
+SCORE: 10
+baC.X.
+bbaCCC
+aaDXXX
+
+COMBINE: GTR GTR2-HEAD GTR2-TAIL
 
 # ----------------------------------------------------------------------
 #
+
+NAME: NEWGTR
+SCORE: 10.3
+......
+..A...
+BBBA..
+AAA...
 
 NAME: NEWGTR-HEAD
 SCORE: 10.1
@@ -123,15 +151,15 @@ NAME: NEWGTR-TAIL
 SCORE: 10
 .....X
 ..aC.X
-bbbACC
+bbbaCC
 aaaCXX
 
 NAME: NEWGTR-TAIL
 SCORE: 10
 .....X
 ..aCXX
-bbbACC
-aaaC.X
+bbbaCC
+aaaCYX
 
 NAME: NEWGTR-TAIL
 SCORE: 10
@@ -140,7 +168,7 @@ SCORE: 10
 bbbACC
 aaaCXC
 
-COMBINE: NEWGTR-HEAD NEWGTR-TAIL
+COMBINE: NEWGTR NEWGTR-HEAD NEWGTR-TAIL
 
 # ----------------------------------------------------------------------
 # New GTR(2)
@@ -164,7 +192,7 @@ NAME: NEWGTR2-TAIL
 SCORE: 10
 ..AC..
 BBBACC
-AAAEC.
+AAAECX
 
 NAME: NEWGTR2-TAIL
 SCORE: 10
@@ -172,7 +200,7 @@ SCORE: 10
 BBBACC
 AAAECE
 
-COMBINE: NEWGTR2-HEAD NEWGTR2-TAIL
+COMBINE: NEWGTR NEWGTR2-HEAD NEWGTR2-TAIL
 
 # ----------------------------------------------------------------------
 # VARIANT-GTR
@@ -191,6 +219,17 @@ D.....
 D.....
 T.....
 T.....
+DBAC..
+DBBA..
+AAAC..
+
+NAME: VARIANTGTR-HEAD
+SCORE: 10
+B.....
+D.....
+T.....
+T.....
+TD....
 DBAC..
 DBBA..
 AAAC..
@@ -243,23 +282,32 @@ BAC...
 BBE...
 AAA...
 
+NAME: ZABUTONL-HEAD
+SCORE: 8.9
+B.....
+DD....
+DF....
+BAC...
+BBE...
+AAA...
+
 NAME: ZABUTONL-TAIL
 SCORE: 9
 BAC...
 BBECC.
-AAAEC.
+AAAFC.
 
 NAME: ZABUTONL-TAIL
 SCORE: 9
 BACXX.
 BBECCC
-AAAEXX
+AAAFXX
 
 NAME: ZABUTONL-TAIL
 SCORE: 9
 BACXX.
 BBECCC
-AAAEXX
+AAAFXX
 
 NAME: ZABUTONL-TAIL
 SCORE: 9
@@ -273,14 +321,14 @@ COMBINE: ZABUTONL-HEAD ZABUTONL-TAIL
 # だぁ積み
 
 NAME: DAAZUMI
-SCORE: 9.2
+SCORE: 9.8
 E.....
 EBC.D.
 AABCCD
 ABBCDD
 
 NAME: DAAZUMI
-SCORE: 9.2
+SCORE: 9.8
 E.....
 EBCD..
 AABCCD

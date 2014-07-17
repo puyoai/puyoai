@@ -52,8 +52,10 @@ void evalBook(ScoreCollector* sc, const std::vector<BookField>& books, const Ref
         }
     }
 
-    if (bestBf)
+    if (bestBf) {
         sc->addScore(BOOK, maxScore);
+        sc->setBookName(bestBf->name());
+    }
 }
 
 template<typename ScoreCollector>
@@ -236,11 +238,13 @@ void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
     for (int x = 1; x <= 6; ++x)
         sumHeight += f.height(x);
 
-    int s = 0;
+    double s = 0;
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        if (f.height(x) <= 4)
-            continue;
-        s += std::abs((f.height(x) + DIFF[x]) * 6 - sumHeight);
+        if (f.height(x) <= 4) {
+            s += 0.06 * std::abs((f.height(x) + DIFF[x]) * 6 - sumHeight);
+        } else {
+            s += std::abs((f.height(x) + DIFF[x]) * 6 - sumHeight);
+        }
     }
 
     sc->addScore(FIELD_USHAPE, s);
