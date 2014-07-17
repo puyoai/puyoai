@@ -40,13 +40,12 @@ const bool USE_FIELD_USHAPE_FEATURE = true;
 template<typename ScoreCollector>
 void evalBook(ScoreCollector* sc, const std::vector<BookField>& books, const RefPlan& plan)
 {
-    int maxScore = 0;
+    double maxScore = 0;
     const BookField* bestBf = nullptr;
 
     double totalPuyoCount = plan.field().countPuyos();
     for (const auto& bf : books) {
-        double ratio = bf.matchCount(plan.field()) / totalPuyoCount;
-        int score = bf.score() * ratio;
+        double score = bf.match(plan.field()) / totalPuyoCount;
         if (maxScore < score) {
             bestBf = &bf;
             maxScore = score;

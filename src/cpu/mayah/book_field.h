@@ -8,20 +8,25 @@
 
 class BookField {
 public:
-    BookField(const std::string& name, const std::vector<std::string>& field, double score = 1, bool partial = false);
+    BookField(const std::string& name, const std::vector<std::string>& field, double defaultScore = 1);
 
-    int matchCount(const PlainField&) const;
+    // match returns the matched score. If not matched, 0 will be returned.
+    double match(const PlainField&) const;
 
     void merge(const BookField&);
     BookField mirror() const;
 
-    double score() const { return score_; }
-    bool isPartial() const { return partial_; }
+    std::string name() const { return name_; }
+    double defaultScore() const { return defaultScore_; }
+    double score(int x, int y) const { return scoreField_[x][y]; }
+
+    std::string toDebugString() const;
+
 private:
     std::string name_;
-    double score_;
-    bool partial_;
+    double defaultScore_;
     char field_[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
+    double scoreField_[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
 };
 
 #endif
