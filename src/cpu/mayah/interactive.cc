@@ -154,7 +154,6 @@ int main(int argc, char* argv[])
                 CollectedFeature mycf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, plan);
                 CollectedFeature aicf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
                 cout << mycf.toStringComparingWith(aicf) << endl;
-
             }
         }
 
