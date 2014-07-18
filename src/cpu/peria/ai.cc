@@ -55,17 +55,8 @@ DropDecision Ai::think(int frame_id,
   int score = -1;
 
   int depth = seq.size();
-  KumipuyoSeq seq2(seq);
-  // TODO(peria): Loop undetected TSUMO in callback function.
-  seq2.resize(depth + 1);
-  for (uint8_t i = RED; i <= GREEN; ++i) {
-    seq2.setAxis(depth, static_cast<PuyoColor>(i));
-    for (uint8_t j = RED; j <= GREEN; ++j) {
-      seq2.setChild(depth, static_cast<PuyoColor>(j));
-      Plan::iterateAvailablePlans(CoreField(field), seq2, depth + 1,
-          std::bind(Evaluate, 70 * 6 * 10, &best, &score, _1));
-    }
-  }
+  Plan::iterateAvailablePlans(CoreField(field), seq, depth + 1,
+      std::bind(Evaluate, 70 * 6 * 10, &best, &score, _1));
 
   Plan::iterateAvailablePlans(CoreField(field), seq, 2,
       std::bind(Evaluate, 70 * 6 * 5, &best, &score, _1));
