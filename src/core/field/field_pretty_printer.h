@@ -7,6 +7,8 @@ class KumipuyoSeq;
 class FieldPrettyPrinter {
 public:
     static void print(const PlainField&, const KumipuyoSeq&);
+    static void printMultipleFields(const PlainField&, const KumipuyoSeq&,
+                                    const PlainField&, const KumipuyoSeq&);
 };
 
 #endif

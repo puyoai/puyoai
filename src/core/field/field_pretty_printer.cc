@@ -46,31 +46,51 @@ string toPuyoColorString(PuyoColor c)
     return ss.str();
 }
 
+void printLine(const PlainField& f, int y, const KumipuyoSeq& seq)
+{
+    for (int x = 0; x < PlainField::MAP_WIDTH; ++x) {
+        PuyoColor c = f.get(x, y);
+        cout << toPuyoColorString(c);
+    }
+
+    if (y == 11) {
+        cout << toPuyoColorString(PuyoColor::EMPTY);
+        cout << toPuyoColorString(seq.child(0));
+    } else if (y == 10) {
+        cout << toPuyoColorString(PuyoColor::EMPTY);
+        cout << toPuyoColorString(seq.axis(0));
+    } else if (y == 8) {
+        cout << toPuyoColorString(PuyoColor::EMPTY);
+        cout << toPuyoColorString(seq.child(1));
+    } else if (y == 7) {
+        cout << toPuyoColorString(PuyoColor::EMPTY);
+        cout << toPuyoColorString(seq.axis(1));
+    } else {
+        cout << toPuyoColorString(PuyoColor::EMPTY);
+        cout << toPuyoColorString(PuyoColor::EMPTY);
+    }
+}
+
 }
 
 // static
 void FieldPrettyPrinter::print(const PlainField& f, const KumipuyoSeq& seq)
 {
     for (int y = PlainField::MAP_HEIGHT - 1; y >= 0; --y) {
-        for (int x = 0; x < PlainField::MAP_WIDTH; ++x) {
-            PuyoColor c = f.get(x, y);
-            cout << toPuyoColorString(c);
-        }
+        printLine(f, y, seq);
+        cout << endl;
+    }
+}
 
-        if (y == 11) {
-            cout << toPuyoColorString(PuyoColor::EMPTY);
-            cout << toPuyoColorString(seq.child(0));
-        } if (y == 10) {
-            cout << toPuyoColorString(PuyoColor::EMPTY);
-            cout << toPuyoColorString(seq.axis(0));
-        } if (y == 8) {
-            cout << toPuyoColorString(PuyoColor::EMPTY);
-            cout << toPuyoColorString(seq.child(1));
-        } if (y == 7) {
-            cout << toPuyoColorString(PuyoColor::EMPTY);
-            cout << toPuyoColorString(seq.axis(1));
-        }
-
+// static
+void FieldPrettyPrinter::printMultipleFields(
+    const PlainField& f1, const KumipuyoSeq& seq1,
+    const PlainField& f2, const KumipuyoSeq& seq2)
+{
+    for (int y = PlainField::MAP_HEIGHT - 1; y >= 0; --y) {
+        printLine(f1, y, seq1);
+        cout << toPuyoColorString(PuyoColor::EMPTY);
+        printLine(f2, y, seq2);
         cout << endl;
     }
 }
