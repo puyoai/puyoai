@@ -41,17 +41,25 @@ public:
         }
     }
 
+    void append(const ColumnPuyoList& cpl)
+    {
+        for (const auto& cp : cpl)
+            addPuyo(cp.x, cp.color);
+    }
+
     void removeLastAddedPuyo()
     {
         DCHECK(0 < size_);
         --size_;
     }
 
-    std::array<ColumnPuyo, MAX_SIZE>::const_iterator begin() const {
+    std::array<ColumnPuyo, MAX_SIZE>::const_iterator begin() const
+    {
         return std::begin(puyos_);
     }
 
-    std::array<ColumnPuyo, MAX_SIZE>::const_iterator end() const {
+    std::array<ColumnPuyo, MAX_SIZE>::const_iterator end() const
+    {
         return std::begin(puyos_) + size_;
     }
 

@@ -1,5 +1,7 @@
 #include "core/algorithm/rensa_detector.h"
 
+#include "core/algorithm/rensa_ref_sequence.h"
+
 #include <gtest/gtest.h>
 #include <algorithm>
 
@@ -132,4 +134,53 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat)
 
     RensaDetector::iteratePossibleRensas(f, 0, callback, RensaDetector::Mode::FLOAT);
     EXPECT_TRUE(found);
+}
+
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively)
+{
+    CoreField f(
+        "B     "
+        "B     "
+        "RGG   "
+        "RBB   ");
+
+    CoreField expected1(
+        "BR    "
+        "BR    "
+        "RGGG  "
+        "RBBG  ");
+
+    CoreField expected2(
+        "BRG   "
+        "BRG   "
+        "RGG   "
+        "RBB   ");
+
+    bool foundExpected1 = false;
+    bool foundExpected2 = false;
+
+    auto callback = [&](const RensaRefSequence& seq) {
+        CoreField g(f);
+        for (const auto& p : seq.combinedRensa().keyPuyos)
+            g.dropPuyoOn(p.x, p.color);
+        for (const auto& p : seq.combinedRensa().firePuyos)
+            g.dropPuyoOn(p.x, p.color);
+
+        if (g == expected1)
+            foundExpected1 = true;
+        else if (g == expected2)
+            foundExpected2 = true;
+    };
+
+    RensaDetector::iteratePossibleRensasIteratively(f, 2, callback);
+
+    EXPECT_TRUE(foundExpected1);
+    EXPECT_TRUE(foundExpected1);
+}
+
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively_DontCrash)
+{
+    CoreField f;
+    auto callback = [&](const RensaRefSequence&) { };
+    RensaDetector::iteratePossibleRensasIteratively(f, 2, callback);
 }
