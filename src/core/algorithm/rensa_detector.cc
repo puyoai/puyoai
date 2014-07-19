@@ -236,7 +236,7 @@ void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& field, in
 
 static
 void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, const CoreField& initialField, int restIterations,
-                                              const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                                              const ColumnPuyoList& accumulatedKeyPuyos, const ColumnPuyoList& firstRensaFirePuyos,
                                               RensaRefSequence* rensaSequence,
                                               const RensaDetector::IterativePossibleRensaCallback& callback,
                                               RensaDetector::Mode mode)
@@ -246,20 +246,21 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
 
     auto findRensaCallback = [&](CoreField* f, const ColumnPuyoList& currentFirePuyos) {
         auto simulationCallback = [&](const CoreField& fieldAfterSimulation, const RensaResult& rensaResult,
-                                      const ColumnPuyoList& keyPuyos, const ColumnPuyoList& currentFirePuyos,
+                                      const ColumnPuyoList& currentKeyPuyos, const ColumnPuyoList& currentFirePuyos,
                                       const RensaTrackResult& trackResult) {
-            ColumnPuyoList newKeyPuyos(keyPuyos);
-            newKeyPuyos.append(currentFirePuyos);
+            ColumnPuyoList combinedKeyPuyos(accumulatedKeyPuyos);
+            combinedKeyPuyos.append(currentFirePuyos);
 
             // Here, try to fire the combined rensa.
             {
                 CoreField f(initialField);
-                for (const ColumnPuyo& cp : newKeyPuyos) {
+                for (const ColumnPuyo& cp : combinedKeyPuyos) {
                     // When we cannot put a puyo, that rensa is broken.
                     if (!f.dropPuyoOn(cp.x, cp.color))
                         return;
                 }
 
+                // Check putting key puyo does not fire a rensa.
                 {
                     int minHeights[CoreField::MAP_WIDTH] {
                         100, initialField.height(1) + 1, initialField.height(2) + 1, initialField.height(3) + 1,
@@ -271,14 +272,16 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
                     }
                 }
 
-                for (const ColumnPuyo& cp : firePuyos) {
+                // Since key puyo does not fire a rensa, we can safely include the key puyos in minHeights.
+                int minHeights[CoreField::MAP_WIDTH] {
+                    100, f.height(1) + 1, f.height(2) + 1, f.height(3) + 1,
+                    f.height(4) + 1, f.height(5) + 1, f.height(6) + 1, 100 };
+
+                // Then, fire a rensa.
+                for (const ColumnPuyo& cp : firstRensaFirePuyos) {
                     if (!f.dropPuyoOn(cp.x, cp.color))
                         return;
                 }
-
-                int minHeights[CoreField::MAP_WIDTH] {
-                    100, initialField.height(1) + 1, initialField.height(2) + 1, initialField.height(3) + 1,
-                    initialField.height(4) + 1, initialField.height(5) + 1, initialField.height(6) + 1, 100 };
 
                 RensaTrackResult combinedTrackResult;
                 RensaResult combinedRensaResult = f.simulateAndTrackWithMinHeights(&combinedTrackResult, minHeights);
@@ -289,16 +292,12 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
                 }
 
                 // OK.
-                RensaRef combinedRef { initialField, f, newKeyPuyos, firePuyos, combinedRensaResult, combinedTrackResult };
-                RensaRef rensaRef { originalField, fieldAfterSimulation, keyPuyos, currentFirePuyos, rensaResult, trackResult };
-                rensaSequence->push(rensaRef);
+                RensaRef rensaRef { originalField, fieldAfterSimulation, currentKeyPuyos, currentFirePuyos, rensaResult, trackResult };
+                rensaSequence->push(&rensaRef);
 
-                rensaSequence->setCombinedRensa(combinedRef);
-                callback(*rensaSequence);
-                rensaSequence->invalidateCombinedRensa();
-
+                callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult, *rensaSequence);
                 iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, initialField, restIterations - 1,
-                                                         newKeyPuyos, firePuyos, rensaSequence, callback, mode);
+                                                         combinedKeyPuyos, firstRensaFirePuyos, rensaSequence, callback, mode);
 
                 rensaSequence->pop();
             }
@@ -323,11 +322,9 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
                                       const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                                       const RensaTrackResult& trackResult) {
             RensaRef ref { originalField, fieldAfterSimulation, keyPuyos, firePuyos, rensaResult, trackResult };
-            rensaSequence.push(ref);
+            rensaSequence.push(&ref);
 
-            rensaSequence.setCombinedRensa(ref);
-            callback(rensaSequence);
-            rensaSequence.invalidateCombinedRensa();
+            callback(fieldAfterSimulation, rensaResult, keyPuyos, firePuyos, trackResult, rensaSequence);
 
             iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, originalField, maxIteration - 1,
                                                      ColumnPuyoList(), firePuyos, &rensaSequence, callback, mode);

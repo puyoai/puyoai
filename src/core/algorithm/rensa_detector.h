@@ -23,17 +23,20 @@ public:
 
     // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
     typedef std::function<void (const CoreField&, const RensaResult&,
-                                const ColumnPuyoList&, const ColumnPuyoList&)> PossibleRensaCallback;
+                                const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)> PossibleRensaCallback;
     static void iteratePossibleRensas(const CoreField&, int maxKeyPuyo, PossibleRensaCallback, Mode mode = Mode::DROP);
 
     // Same as iteratePossibleRensas with checking trackResult.
-    typedef std::function<void (const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&,
+    typedef std::function<void (const CoreField&, const RensaResult&,
+                                const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                                 const RensaTrackResult&)> TrackedPossibleRensaCallback;
     static void iteratePossibleRensasWithTracking(const CoreField&, int maxKeyPuyos,
                                                   TrackedPossibleRensaCallback, Mode mode = Mode::DROP);
 
     // Without adding key puyos, we find rensas iteratively.
-    typedef std::function<void (const RensaRefSequence&)> IterativePossibleRensaCallback;
+    typedef std::function<void (const CoreField&, const RensaResult&,
+                                const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                                const RensaTrackResult&, const RensaRefSequence&)> IterativePossibleRensaCallback;
     static void iteratePossibleRensasIteratively(const CoreField&, int maxIteration,
                                                  IterativePossibleRensaCallback, Mode mode = Mode::DROP);
 };

@@ -159,12 +159,14 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively)
     bool foundExpected1 = false;
     bool foundExpected2 = false;
 
-    auto callback = [&](const RensaRefSequence& seq) {
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&, const RensaRefSequence&) {
         CoreField g(f);
-        for (const auto& p : seq.combinedRensa().keyPuyos)
-            g.dropPuyoOn(p.x, p.color);
-        for (const auto& p : seq.combinedRensa().firePuyos)
-            g.dropPuyoOn(p.x, p.color);
+        for (const auto& cp : keyPuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+        for (const auto& cp : firePuyos)
+            g.dropPuyoOn(cp.x, cp.color);
 
         if (g == expected1)
             foundExpected1 = true;
@@ -181,6 +183,9 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively)
 TEST(RensaDetectorTest, iteratePossibleRensasIteratively_DontCrash)
 {
     CoreField f;
-    auto callback = [&](const RensaRefSequence&) { };
+    auto callback = [](const CoreField&, const RensaResult&,
+                       const ColumnPuyoList&, const ColumnPuyoList&,
+                       const RensaTrackResult&, const RensaRefSequence&) {
+    };
     RensaDetector::iteratePossibleRensasIteratively(f, 2, callback);
 }
