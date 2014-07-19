@@ -384,35 +384,42 @@ void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const Re
         int y = qHead->y;
         qHead++;
 
-        if (!isNormalColor(field.color(x, y)))
-            continue;
-
         if (distance[x][y] > 4)
             continue;
 
         int d = distance[x][y] + 1;
 
-        if (distance[x + 1][y] == 0 && isNormalColor(field.color(x + 1, y))) {
+        if (distance[x + 1][y] == 0 && field.color(x + 1, y) == PuyoColor::EMPTY) {
             distance[x + 1][y] = d;
             distanceCount[d]++;
             *qTail++ = Position(x + 1, y);
         }
-        if (distance[x - 1][y] == 0 && isNormalColor(field.color(x - 1, y))) {
+        if (distance[x - 1][y] == 0 && field.color(x - 1, y) == PuyoColor::EMPTY) {
             distance[x - 1][y] = d;
             distanceCount[d]++;
             *qTail++ = Position(x - 1, y);
         }
-        if (distance[x][y + 1] == 0 && isNormalColor(field.color(x, y + 1))) {
+        if (distance[x][y + 1] == 0 && field.color(x, y + 1) == PuyoColor::EMPTY) {
             distance[x][y + 1] = d;
             distanceCount[d]++;
             *qTail++ = Position(x, y + 1);
         }
-        if (distance[x][y - 1] == 0 && isNormalColor(field.color(x, y - 1))) {
+        if (distance[x][y - 1] == 0 && field.color(x, y - 1) == PuyoColor::EMPTY) {
             distance[x][y - 1] = d;
             distanceCount[d]++;
             *qTail++ = Position(x, y - 1);
         }
     }
+
+#if 0
+    std::cout << plan.field().toDebugString() << std::endl;
+    for (int y = 12; y >= 1; --y) {
+        for (int x = 1; x <= 6; ++x) {
+            std::cout << distance[x][y] << ' ';
+        }
+        std::cout << std::endl;
+    }
+#endif
 
     sc->addScore(HAND_WIDTH_2, distanceCount[2] > 10 ? 10 : distanceCount[2], 1);
     sc->addScore(HAND_WIDTH_3, distanceCount[3] > 10 ? 10 : distanceCount[3], 1);
