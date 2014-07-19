@@ -138,9 +138,9 @@ class Evaluator {
 public:
     Evaluator(const FeatureParameter& param, const std::vector<BookField>& books) : param_(param), books_(books) {}
 
-    double eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int numKeyPuyos, const Gazer&);
+    double eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration, const Gazer&);
     // Same as eval(), but returns CollectedFeature.
-    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int numKeyPuyos, const Gazer&);
+    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration, const Gazer&);
 
 private:
     const FeatureParameter& param_;

@@ -261,7 +261,7 @@ void learnFromPuyofu()
 
             Plan::iterateAvailablePlans(inputs[i].field, inputs[i].seq, MayahAI::DEFAULT_DEPTH, [&](const RefPlan& plan) {
                     CollectedFeature f = evaluator.evalWithCollectingFeature(plan, inputs[i].field,
-                                                                             frameId, MayahAI::DEFAULT_NUM_KEY_PUYOS, gazer);
+                                                                             frameId, MayahAI::DEFAULT_NUM_ITERATION, gazer);
                     featureMap[plan.decisions()] = f;
                     if (plan.field() == inputs[i + 1].fieldAfter) {
                         teacherFound = true;

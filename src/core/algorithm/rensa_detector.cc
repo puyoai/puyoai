@@ -313,8 +313,6 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
 void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalField, int maxIteration,
                                                      IterativePossibleRensaCallback callback, Mode mode)
 {
-    DCHECK(maxIteration >= 2) << "should use iteratePossibleRensasa() with maxKeyPuyos = 0 if maxIteration < 2.";
-
     RensaRefSequence rensaSequence;
 
     auto findRensaCallback = [&](CoreField* f, const ColumnPuyoList& firePuyos) {
