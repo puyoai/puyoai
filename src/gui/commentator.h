@@ -16,6 +16,22 @@
 #include "duel/game_state_observer.h"
 #include "gui/drawer.h"
 
+struct TrackedPossibleRensaInfo {
+    TrackedPossibleRensaInfo() {}
+    TrackedPossibleRensaInfo(const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos,
+                             const ColumnPuyoList& firePuyos, const RensaTrackResult& trackResult) :
+        rensaResult(rensaResult), keyPuyos(keyPuyos), firePuyos(firePuyos), trackResult(trackResult) {}
+
+    int chains() const { return rensaResult.chains; }
+    int score() const { return rensaResult.score; }
+    int frames() const { return rensaResult.frames; }
+
+    RensaResult rensaResult;
+    ColumnPuyoList keyPuyos;
+    ColumnPuyoList firePuyos;
+    RensaTrackResult trackResult;
+};
+
 struct CommentatorResult {
     int frameId[2];
     TrackedPossibleRensaInfo fireableMainChain[2];

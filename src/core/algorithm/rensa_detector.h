@@ -9,6 +9,7 @@
 #include "core/algorithm/rensa_info.h"
 
 class KumipuyoSeq;
+class RensaRefSequence;
 
 class RensaDetector {
 public:
@@ -30,6 +31,11 @@ public:
                                 const RensaTrackResult&)> TrackedPossibleRensaCallback;
     static void iteratePossibleRensasWithTracking(const CoreField&, int maxKeyPuyos,
                                                   TrackedPossibleRensaCallback, Mode mode = Mode::DROP);
+
+    // Without adding key puyos, we find rensas iteratively.
+    typedef std::function<void (const RensaRefSequence&)> IterativePossibleRensaCallback;
+    static void iteratePossibleRensasIteratively(const CoreField&, int maxIteration,
+                                                 IterativePossibleRensaCallback, Mode mode = Mode::DROP);
 };
 
 #endif

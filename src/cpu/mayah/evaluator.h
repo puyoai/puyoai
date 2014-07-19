@@ -10,7 +10,6 @@
 class CoreField;
 class Gazer;
 class RefPlan;
-struct TrackedPossibleRensaInfo;
 
 class CollectedFeature {
 public:
