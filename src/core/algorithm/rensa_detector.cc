@@ -15,7 +15,7 @@ using namespace std;
 
 namespace {
 
-typedef std::function<void (CoreField*, const CoreField&, int, PuyoColor, int)> SimulationCallback;
+typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
 
 };
 
@@ -57,7 +57,7 @@ static inline void tryDropFire(const CoreField& originalField, SimulationCallbac
                 if (necessaryPuyos > 4)
                     continue;
 
-                callback(&f, originalField, x + d, c, necessaryPuyos);
+                callback(&f, ColumnPuyoList(x + d, c, necessaryPuyos));
             }
         }
     }
@@ -119,12 +119,13 @@ static inline void tryFloatFire(const CoreField& originalField, SimulationCallba
             }
 
             if (restPuyos <= 0) {
-                callback(&f, originalField, dx, c, necessaryPuyos);
+                callback(&f, ColumnPuyoList(dx, c, necessaryPuyos));
             }
         }
     }
 }
 
+static
 void findRensas(const CoreField& field, RensaDetector::Mode mode, SimulationCallback callback)
 {
     switch (mode) {
@@ -180,26 +181,23 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
 }
 
 template<typename Callback>
-static void findPossibleRensasInternal(const CoreField& field,
+static void findPossibleRensasInternal(const CoreField& originalField,
                                        const ColumnPuyoList& keyPuyos,
                                        int leftX,
                                        int restAdded,
                                        RensaDetector::Mode mode,
                                        Callback callback)
 {
-    auto findRensaCallback = [&keyPuyos, &callback](CoreField* f, const CoreField& originalField, int x, PuyoColor c, int n) {
-        ColumnPuyoList firePuyos;
-        for (int i = 0; i < n; ++i)
-            firePuyos.addPuyo(x, c);
+    auto findRensaCallback = [&originalField, &keyPuyos, &callback](CoreField* f, const ColumnPuyoList& firePuyos) {
         simulateInternal(f, originalField, keyPuyos, firePuyos, callback);
     };
 
-    findRensas(field, mode, findRensaCallback);
+    findRensas(originalField, mode, findRensaCallback);
 
     if (restAdded <= 0)
         return;
 
-    CoreField f(field);
+    CoreField f(originalField);
     ColumnPuyoList puyoList(keyPuyos);
 
     for (int x = leftX; x <= CoreField::WIDTH; ++x) {

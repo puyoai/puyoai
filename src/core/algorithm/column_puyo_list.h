@@ -19,12 +19,26 @@ class ColumnPuyoList {
 public:
     static const int MAX_SIZE = 8;
 
+    ColumnPuyoList() {}
+
+    ColumnPuyoList(int x, PuyoColor c, int n)
+    {
+        addPuyo(x, c, n);
+    }
+
     int size() const { return size_; }
 
     void addPuyo(int x, PuyoColor c)
     {
         DCHECK(size_ < MAX_SIZE);
         puyos_[size_++] = ColumnPuyo { x, c };
+    }
+
+    void addPuyo(int x, PuyoColor c, int n)
+    {
+        for (int i = 0; i < n; ++i) {
+            addPuyo(x, c);
+        }
     }
 
     void removeLastAddedPuyo()
