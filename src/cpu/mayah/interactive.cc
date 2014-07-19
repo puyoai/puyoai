@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
 
             double t1 = now();
             Plan aiPlan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
-                                       MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_KEY_PUYOS);
+                                       MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
             double t2 = now();
             if (aiPlan.decisions().empty())
                 cout << "No decision";
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
                 continue;
             }
             if (str == "s") {
-                CollectedFeature cf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_KEY_PUYOS, aiPlan);
+                CollectedFeature cf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
                 cout << cf.toString() << endl;
                 continue;
             }
@@ -151,15 +151,15 @@ int main(int argc, char* argv[])
                 FieldPrettyPrinter::printMultipleFields(plan.field(), KumipuyoSeq { seq.get(i + 2), seq.get(i + 3) },
                                                         aiPlan.field(), KumipuyoSeq { seq.get(i + 2), seq.get(i + 3) });
 
-                CollectedFeature mycf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_KEY_PUYOS, plan);
-                CollectedFeature aicf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_KEY_PUYOS, aiPlan);
+                CollectedFeature mycf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, plan);
+                CollectedFeature aicf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
                 cout << mycf.toStringComparingWith(aicf) << endl;
 
             }
         }
 
         Plan aiPlan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
-                                   MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_KEY_PUYOS);
+                                   MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
         field.dropKumipuyo(aiPlan.decisions().front(), seq.get(i));
         field.simulate();
     }

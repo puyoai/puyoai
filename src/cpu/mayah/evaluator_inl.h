@@ -457,13 +457,15 @@ void evalCountPuyoFeature(ScoreCollector* sc, const RefPlan& plan)
 
 template<typename ScoreCollector>
 void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const RefPlan& plan, const CoreField& currentField,
-                  int currentFrameId, int numKeyPuyos, const Gazer& gazer)
+                  int currentFrameId, int maxIteration, const Gazer& gazer)
 {
+    // We'd like to evaluate frame feature always.
+    evalFrameFeature(sc, plan);
+
     if (evalStrategy(sc, plan, currentField, currentFrameId, gazer))
         return;
 
     evalBook(sc, books, plan);
-    evalFrameFeature(sc, plan);
     evalCountPuyoFeature(sc, plan);
     if (USE_CONNECTION_FEATURE)
         collectScoreForConnection(sc, plan.field());
@@ -486,7 +488,7 @@ void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const
     std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult& trackResult) {
+                        const RensaTrackResult& trackResult, const RensaRefSequence&) {
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc->featureParameter()));
         evalRensaChainFeature(rensaScoreCollector.get(), plan, rensaResult, keyPuyos, firePuyos);
         collectScoreForRensaGarbage(rensaScoreCollector.get(), fieldAfterRensa);
@@ -504,7 +506,7 @@ void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const
         }
     };
 
-    RensaDetector::iteratePossibleRensasWithTracking(plan.field(), numKeyPuyos, callback);
+    RensaDetector::iteratePossibleRensasIteratively(plan.field(), maxIteration, callback);
 
     if (maxRensaScoreCollector.get())
         sc->merge(*maxRensaScoreCollector);
