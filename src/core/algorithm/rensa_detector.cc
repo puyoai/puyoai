@@ -311,6 +311,13 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
     findRensas(originalField, mode, findRensaCallback);
 }
 
+// iteratePossibleRensasIteratively finds rensa with the following algorithm.
+// 1. First, iterate all rensas (first rensa) from the current field.
+// 2. For each field after the rensa, we find another rensa (second rensa).
+// 3. We think the necessary puyos to fire the second rensa is the key puyos for the first rensa.
+//    Add the key puyos to the original field, and try to fire a rensa. If the first rensa and the second
+//    rensa can be combined, we think the combined rensa as the whole rensa.
+//    Otherwise, we think it is broken.
 void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalField, int maxIteration,
                                                      IterativePossibleRensaCallback callback, Mode mode)
 {
