@@ -46,6 +46,7 @@ void evalBook(ScoreCollector* sc, const std::vector<BookField>& books, const Ref
     double totalPuyoCount = plan.field().countPuyos();
     for (const auto& bf : books) {
         double score = bf.match(plan.field()) / totalPuyoCount;
+        // double score = bf.match(plan.field());
         if (maxScore < score) {
             bestBf = &bf;
             maxScore = score;
@@ -340,8 +341,8 @@ void evalRensaChainFeature(ScoreCollector* sc, const RefPlan& plan,
                            const RensaResult& rensaResult,
                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
 {
-    int numKeyPuyos = std::min(3, static_cast<int>(keyPuyos.size()));
-    int numFirePuyos = std::min(3, static_cast<int>(firePuyos.size()));
+    int numKeyPuyos = std::min(7, static_cast<int>(keyPuyos.size()));
+    int numFirePuyos = std::min(7, static_cast<int>(firePuyos.size()));
 
     sc->addScore(MAX_CHAINS, rensaResult.chains, 1);
     if (plan.field().countPuyos() <= 24) {
