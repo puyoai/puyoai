@@ -21,7 +21,7 @@ class RefPlan;
 class MayahAI : public AI {
 public:
     static const int DEFAULT_DEPTH = 2;
-    static const int DEFAULT_NUM_ITERATION = 2;
+    static const int DEFAULT_NUM_ITERATION = 3;
     static const int FAST_NUM_ITERATION = 1;
 
     MayahAI();

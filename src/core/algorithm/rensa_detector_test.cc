@@ -177,7 +177,70 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively)
     RensaDetector::iteratePossibleRensasIteratively(f, 2, callback);
 
     EXPECT_TRUE(foundExpected1);
-    EXPECT_TRUE(foundExpected1);
+    EXPECT_TRUE(foundExpected2);
+}
+
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively2)
+{
+    CoreField f(
+        "  G   "
+        "RBBBR ");
+
+    CoreField expected(
+        " G R  "
+        " GBR  "
+        " GGR  "
+        "RBBBR ");
+
+    bool foundExpected = false;
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&, const RensaRefSequence&) {
+        CoreField g(f);
+        for (const auto& cp : keyPuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+        for (const auto& cp : firePuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+
+        if (g == expected)
+            foundExpected = true;
+    };
+
+    RensaDetector::iteratePossibleRensasIteratively(f, 3, callback);
+
+    EXPECT_TRUE(foundExpected);
+}
+
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively3)
+{
+    CoreField f(
+        "  R   "
+        "GBB   ");
+
+    CoreField expected(
+        " GB   "
+        " GBR  "
+        " GRR  "
+        "GBBR  ");
+
+    bool foundExpected = false;
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&, const RensaRefSequence&) {
+
+        CoreField g(f);
+        for (const auto& cp : keyPuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+        for (const auto& cp : firePuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+
+        if (g == expected)
+            foundExpected = true;
+    };
+
+    RensaDetector::iteratePossibleRensasIteratively(f, 3, callback);
+
+    EXPECT_TRUE(foundExpected);
 }
 
 TEST(RensaDetectorTest, iteratePossibleRensasIteratively_DontCrash)
