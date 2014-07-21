@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <sstream>
 #include "core/puyo_color.h"
 
 using namespace std;
