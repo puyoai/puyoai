@@ -9,11 +9,12 @@
 const int FPS = 30;
 
 const int FRAMES_PREPARING_NEXT = 6;
-const int FRAMES_NEXT2_DELAY = 8;
 const int FRAMES_GROUNDING = 10;
+const int FRAMES_VANISH_ANIMATION = 25;
+
+const int FRAMES_NEXT2_DELAY = 8;
 const int FRAMES_FREE_FALL = 8;
 const int FRAMES_QUICKTURN = 10;
-const int FRAMES_VANISH_ANIMATION = 25;
 
 // TODO(mayah): We should consider that margin time has been expired.
 const int SCORE_FOR_OJAMA = 70;
