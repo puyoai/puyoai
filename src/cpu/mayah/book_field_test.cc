@@ -4,7 +4,7 @@
 
 using namespace std;
 
-TEST(BookFieldTest, matchEasy)
+TEST(BookFieldTest, match1)
 {
     BookField bf("test",
                  vector<string> {
@@ -22,13 +22,13 @@ TEST(BookFieldTest, matchEasy)
     EXPECT_EQ(2, bf.match(pf3));
 }
 
-TEST(BookFieldTest, match)
+TEST(BookFieldTest, match2)
 {
     BookField bf("test",
                  vector<string> {
                      "BAD.C.",
                      "BBADDD",
-                     "AACCC.",
+                     "AACCCX",
                  });
 
     PlainField pf0;
@@ -44,8 +44,8 @@ TEST(BookFieldTest, match)
         "YYRRRG");
 
     EXPECT_EQ(0,  bf.match(pf0));
-    EXPECT_EQ(15, bf.match(pf1));
-    EXPECT_EQ(15, bf.match(pf2));
+    EXPECT_EQ(16, bf.match(pf1));
+    EXPECT_EQ(16, bf.match(pf2));
 }
 
 TEST(BookFieldTest, unmatch1)
@@ -54,7 +54,7 @@ TEST(BookFieldTest, unmatch1)
                  vector<string> {
                      "BAD.C.",
                      "BBADDD",
-                     "AACCC.",
+                     "AACCCX",
                  });
 
     PlainField pf1(
@@ -97,6 +97,18 @@ TEST(BookFieldTest, unmatch2)
     EXPECT_EQ(0, bf.match(pf1));
 }
 
+TEST(BookFieldTest, unmatch3)
+{
+    BookField bf("test",
+                 vector<string> {
+                     "AAABBB",
+                 });
+
+    PlainField pf("Y    Y");
+
+    EXPECT_EQ(0, bf.match(pf));
+}
+
 TEST(BookFieldTest, merge)
 {
     BookField bf("test",
@@ -105,7 +117,7 @@ TEST(BookFieldTest, merge)
                      "XX....",
                      "BAD.C.",
                      "BBADDD",
-                     "AACCC.",
+                     "AACCCE",
                  }, 1);
 
     BookField bf2("test2",

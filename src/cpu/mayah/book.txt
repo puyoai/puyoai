@@ -57,11 +57,39 @@ bbACCX
 aaCYYX
 
 NAME: GTR-TAIL
-SCORE: 10.1
+SCORE: 9.9
 .....Y
 baCXXY
 bbAYYX
 aaCCCX
+
+NAME: GTR-TAIL
+SCORE: 9.8
+....YY
+baCXXZ
+bbaYYX
+aaCCCX
+
+NAME: GTR-TAIL
+SCORE: 9.9
+.....Y
+baCXYY
+bbaCXX
+aaCCXY
+
+NAME: GTR-TAIL
+SCORE: 9.7
+...XY.
+baCXY.
+bbaCXY
+aaCCXY
+
+NAME: GTR-TAIL
+SCORE: 9.8
+...XYZ
+baCXZY
+bbaCXY
+aaCCXY
 
 COMBINE: GTR GTR-HEAD GTR-TAIL
 
@@ -73,6 +101,16 @@ SCORE: 9.7
 A.....
 B.....
 DD....
+BDC...
+BAA...
+BAC...
+
+NAME: LR-HEAD
+SCORE: 9.5
+A.....
+B.....
+A.....
+AA....
 BDC...
 BAA...
 BAC...
@@ -125,21 +163,21 @@ BBA...
 AAD...
 
 NAME: GTR2-TAIL
-SCORE: 10
+SCORE: 9.5
 .....D
 baCXXX
 bbaCCC
 aaDDDX
 
 NAME: GTR2-TAIL
-SCORE: 10
+SCORE: 9.5
 ....X.
 baCXDX
 bbaCCC
 aaDDDX
 
 NAME: GTR2-TAIL
-SCORE: 10
+SCORE: 9.5
 baC.X.
 bbaCCC
 aaDXXX
@@ -243,7 +281,7 @@ BBBA..
 AAAE..
 
 NAME: NEWGTR2-TAIL
-SCORE: 10
+SCORE: 9.5
 ..aC..
 bbbaCC
 aaaECX

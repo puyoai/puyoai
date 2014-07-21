@@ -1,4 +1,5 @@
 #include "core/constant.h"
+#include "core/deprecated_constant.h"
 #include "eval.h"
 #include "field.h"
 #include "util.h"

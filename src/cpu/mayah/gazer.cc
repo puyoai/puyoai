@@ -1,6 +1,7 @@
 #include "gazer.h"
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 #include <glog/logging.h>
@@ -116,7 +117,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         }
 
         // 3 + k 回ほどぷよを引く必要があり、そのときに必要そうなフレーム数
-        int initiatingFrames = ((CoreField::HEIGHT - averageHeight) * FRAMES_DROP_1_LINE +
+        int initiatingFrames = (FRAMES_TO_DROP_FAST[static_cast<int>(std::ceil(CoreField::HEIGHT - averageHeight))] +
                                 FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * (3 + k);
         int score = rensaResult.score;
         int chains = rensaResult.chains;
@@ -157,7 +158,7 @@ int Gazer::estimateMaxScore(int frameId) const
     int maxScore = -1;
     for (auto it = possibleRensaInfos().begin(); it != possibleRensaInfos().end(); ++it) {
         int restFrames = frameId - (it->initiatingFrames + m_id);
-        int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT));
+        int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT));
         int newAdditionalChains = min(numPossiblePuyos / 4, 19);
 
         // TODO(mayah): newChains should not be negative. restFrames is negative?
@@ -175,7 +176,7 @@ int Gazer::estimateMaxScore(int frameId) const
 
     // When there is not possible rensa.
     int restFrames = frameId - m_id;
-    int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_GROUNDING));
+    int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING));
     int newChains = min((numPossiblePuyos / 4), 19);
     // TODO(mayah): newChains should not be negative. restFrames is negative?
     if (newChains < 0)

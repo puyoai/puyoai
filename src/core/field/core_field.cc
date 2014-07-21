@@ -189,37 +189,36 @@ int CoreField::framesToDropNext(const Decision& decision) const
     int x1 = decision.x;
     int x2 = decision.x + (decision.r == 1) - (decision.r == 3);
 
-    int dropFrames = abs(3 - x1) * FRAMES_HORIZONTAL_MOVE;
+    int dropFrames = FRAMES_TO_MOVE_HORIZONTALLY[abs(3 - x1)];
 
-    if (decision.r == 0)
-        dropFrames += (HEIGHT - height(x1)) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI;
-    else if (decision.r == 2) {
+    if (decision.r == 0) {
+        dropFrames += FRAMES_TO_DROP_FAST[HEIGHT - height(x1)] + FRAMES_GROUNDING;
+    } else if (decision.r == 2) {
+        int dropHeight = HEIGHT - height(x1);
         // TODO: If puyo lines are high enough, rotation might take time. We should measure this later.
-        if (height(x1) > 6)
-            dropFrames += (HEIGHT - height(x1) + 1) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI;
-        else
-            dropFrames += (HEIGHT - height(x1) - 1) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI;
+        // It looks we need 3 frames to waiting that each rotation has completed.
+        if (dropHeight < 6)
+            dropHeight = 6;
+
+        dropFrames += FRAMES_TO_DROP_FAST[dropHeight] + FRAMES_GROUNDING;
     } else {
-        if (height(x1) == height(x2))
-            dropFrames += (HEIGHT - height(x1)) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI;
-        else {
+        if (height(x1) == height(x2)) {
+            int dropHeight = HEIGHT - height(x1);
+            if (dropHeight < 3)
+                dropHeight = 3;
+            dropFrames += FRAMES_TO_DROP_FAST[dropHeight] + FRAMES_GROUNDING;
+        } else {
             int minHeight = min(height(x1), height(x2));
-            int maxHeight = max(height(x1), height(x2));
-            int diff = maxHeight - minHeight;
-            dropFrames += (HEIGHT - maxHeight) * FRAMES_DROP_1_LINE;
-            dropFrames += FRAMES_AFTER_CHIGIRI;
-            if (diff == 1)
-                dropFrames += FRAMES_CHIGIRI_1_LINE_1;
-            else if (diff == 2)
-                dropFrames += FRAMES_CHIGIRI_1_LINE_1 + FRAMES_CHIGIRI_1_LINE_2;
-            else
-                dropFrames += FRAMES_CHIGIRI_1_LINE_1 + FRAMES_CHIGIRI_1_LINE_2 + (diff - 2) * FRAMES_CHIGIRI_1_LINE_3;
+            int maxHeight = max(max(height(x1), height(x2)), 3);
+            int diffHeight = maxHeight - minHeight;
+            dropFrames += FRAMES_TO_DROP_FAST[maxHeight];
+            dropFrames += FRAMES_GROUNDING;
+            dropFrames += FRAMES_TO_DROP[diffHeight];
+            dropFrames += FRAMES_GROUNDING;
         }
     }
 
-    if (dropFrames < 0)
-        dropFrames = 0;
-
+    CHECK(dropFrames >= 0);
     return dropFrames;
 }
 
@@ -499,7 +498,8 @@ inline RensaResult CoreField::simulateWithTracker(int initialChain, int minHeigh
         frames += FRAMES_VANISH_ANIMATION;
         int maxDrops = dropAfterVanish(minHeights, tracker);
         if (maxDrops > 0) {
-            frames += maxDrops + FRAMES_GROUNDING;
+            DCHECK(maxDrops < 14);
+            frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
         } else {
             quick = true;
         }
