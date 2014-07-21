@@ -142,13 +142,18 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
 
-    ss << "Gazed max score = "
-       << gazer_.estimateMaxScore(frameId + refPlan.totalFrames())
-       << " in " << refPlan.totalFrames() << " / "
-       << gazer_.estimateMaxScore(frameId + refPlan.totalFrames() + 50)
-       << " in " << (refPlan.totalFrames() + 50) << " / "
-       << gazer_.estimateMaxScore(frameId + refPlan.totalFrames() + 100)
-       << " in " << (refPlan.totalFrames() + 100) << " / ";
+    if (gazer_.rensaIsOngoing()) {
+        ss << "Gazed ongoing rensa : " << gazer_.ongoingRensaInfo().rensaResult.score
+           << " in " << (gazer_.ongoingRensaInfo().finishingRensaFrame - frameId) << " / ";
+    } else {
+        ss << "Gazed max score = "
+           << gazer_.estimateMaxScore(frameId + refPlan.totalFrames())
+           << " in " << refPlan.totalFrames() << " / "
+           << gazer_.estimateMaxScore(frameId + refPlan.totalFrames() + 50)
+           << " in " << (refPlan.totalFrames() + 50) << " / "
+           << gazer_.estimateMaxScore(frameId + refPlan.totalFrames() + 100)
+           << " in " << (refPlan.totalFrames() + 100) << " / ";
+    }
 
     ss << (thoughtTimeInSeconds * 1000) << " [ms]";
 
