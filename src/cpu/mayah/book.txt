@@ -266,6 +266,21 @@ SCORE: 9.8
 bbbaCC
 aaaEEC
 
+NAME: NEWGTR2-TAIL
+SCORE: 9.8
+....XE
+..aCEX
+bbbaCC
+aaaEEC
+
+NAME: NEWGTR2-TAIL
+SCORE: 9.7
+.....E
+....XE
+..aCEX
+bbbaCC
+aaaEEC
+
 COMBINE: NEWGTR NEWGTR2-HEAD NEWGTR2-TAIL
 
 # ----------------------------------------------------------------------

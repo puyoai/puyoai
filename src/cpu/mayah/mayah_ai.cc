@@ -144,7 +144,11 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
 
     ss << "Gazed max score = "
        << gazer_.estimateMaxScore(frameId + refPlan.totalFrames())
-       << " in " << refPlan.totalFrames() << " / ";
+       << " in " << refPlan.totalFrames() << " / "
+       << gazer_.estimateMaxScore(frameId + refPlan.totalFrames() + 50)
+       << " in " << (refPlan.totalFrames() + 50) << " / "
+       << gazer_.estimateMaxScore(frameId + refPlan.totalFrames() + 100)
+       << " in " << (refPlan.totalFrames() + 100) << " / ";
 
     ss << (thoughtTimeInSeconds * 1000) << " [ms]";
 

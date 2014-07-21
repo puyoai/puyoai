@@ -116,7 +116,8 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         }
 
         // 3 + k 回ほどぷよを引く必要があり、そのときに必要そうなフレーム数
-        int initiatingFrames = ((CoreField::HEIGHT - averageHeight) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI) * (3 + k);
+        int initiatingFrames = ((CoreField::HEIGHT - averageHeight) * FRAMES_DROP_1_LINE +
+                                FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * (3 + k);
         int score = rensaResult.score;
         int chains = rensaResult.chains;
         results.push_back(EstimatedRensaInfo(chains, score, initiatingFrames));
@@ -156,23 +157,25 @@ int Gazer::estimateMaxScore(int frameId) const
     int maxScore = -1;
     for (auto it = possibleRensaInfos().begin(); it != possibleRensaInfos().end(); ++it) {
         int restFrames = frameId - (it->initiatingFrames + m_id);
-        int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_AFTER_NO_CHIGIRI));
-        int newChains = min((numPossiblePuyos / 4) + it->chains, 19);
+        int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT));
+        int newAdditionalChains = min(numPossiblePuyos / 4, 19);
 
         // TODO(mayah): newChains should not be negative. restFrames is negative?
-        if (newChains < 0)
-            newChains = 0;
+        if (newAdditionalChains < 0)
+            newAdditionalChains = 0;
 
-        double ratio = static_cast<double>(ACCUMULATED_RENSA_SCORE[newChains]) / ACCUMULATED_RENSA_SCORE[it->chains];
-        int score = it->score * ratio - ACCUMULATED_RENSA_SCORE[it->chains];
+        int newTotalChains = it->chains + newAdditionalChains;
+        double ratio = static_cast<double>(ACCUMULATED_RENSA_SCORE[newTotalChains]) / ACCUMULATED_RENSA_SCORE[it->chains];
+        int score = it->score * ratio - ACCUMULATED_RENSA_SCORE[newAdditionalChains];
         maxScore = std::max(maxScore, score);
     }
 
     if (maxScore >= 0)
         return maxScore;
 
+    // When there is not possible rensa.
     int restFrames = frameId - m_id;
-    int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_AFTER_NO_CHIGIRI));
+    int numPossiblePuyos = 2 * (restFrames / (FRAMES_DROP_1_LINE * 10 + FRAMES_HORIZONTAL_MOVE + FRAMES_GROUNDING));
     int newChains = min((numPossiblePuyos / 4), 19);
     // TODO(mayah): newChains should not be negative. restFrames is negative?
     if (newChains < 0)
