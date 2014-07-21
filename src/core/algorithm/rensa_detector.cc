@@ -50,8 +50,8 @@ static inline void tryDropFire(const CoreField& originalField, SimulationCallbac
 
                 CoreField f(originalField);
                 int necessaryPuyos = 0;
-                while (necessaryPuyos <= 4 && f.countConnectedPuyos(x, y) < 4 && f.height(x + d) <= 13) {
-                    f.dropPuyoOn(x + d, c);
+                while (necessaryPuyos <= 4 && f.countConnectedPuyos(x, y) < 4 && f.height(x + d) <= 12) {
+                    f.dropPuyoOn(x + d, c, true);
                     ++necessaryPuyos;
                 }
 
@@ -202,13 +202,14 @@ static void findPossibleRensasInternal(const CoreField& originalField,
     ColumnPuyoList puyoList(keyPuyos);
 
     for (int x = leftX; x <= CoreField::WIDTH; ++x) {
-        if (f.height(x) >= 13)
+        if (f.height(x) >= 12)
             continue;
 
         for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
             PuyoColor c = NORMAL_PUYO_COLORS[i];
 
-            f.dropPuyoOn(x, c);
+            if (!f.dropPuyoOn(x, c, true))
+                continue;
             puyoList.addPuyo(x, c);
 
             if (f.countConnectedPuyos(x, f.height(x)) < 4)
@@ -256,7 +257,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
                 CoreField f(initialField);
                 for (const ColumnPuyo& cp : combinedKeyPuyos) {
                     // When we cannot put a puyo, that rensa is broken.
-                    if (!f.dropPuyoOn(cp.x, cp.color))
+                    if (!f.dropPuyoOn(cp.x, cp.color, true))
                         return;
                 }
 
@@ -279,7 +280,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
 
                 // Then, fire a rensa.
                 for (const ColumnPuyo& cp : firstRensaFirePuyos) {
-                    if (!f.dropPuyoOn(cp.x, cp.color))
+                    if (!f.dropPuyoOn(cp.x, cp.color, true))
                         return;
                 }
 
