@@ -326,12 +326,14 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
 
 template<typename ScoreCollector>
 void evalRensaStrategy(ScoreCollector* sc, const RefPlan& plan, const RensaResult& rensaResult,
+                       const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                        int currentFrameId, const Gazer& gazer)
 {
     UNUSED_VARIABLE(currentFrameId);
 
     // TODO(mayah): Ah, maybe sakiuchi etc. wins this value?
-    if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) && rensaResult.chains >= 7 && !gazer.rensaIsOngoing()) {
+    if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) && rensaResult.chains >= 7 &&
+        keyPuyos.size() + firePuyos.size() <= 3 && !gazer.rensaIsOngoing()) {
         sc->addScore(STRATEGY_SAISOKU, 1);
     }
 }
@@ -506,7 +508,8 @@ void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const
             evalRensaIgnitionHeightFeature(rensaScoreCollector.get(), plan, trackResult);
         if (USE_CONNECTION_FEATURE)
             evalRensaConnectionFeature(rensaScoreCollector.get(), fieldAfterRensa);
-        evalRensaStrategy(rensaScoreCollector.get(), plan, rensaResult, currentFrameId, gazer);
+
+        evalRensaStrategy(rensaScoreCollector.get(), plan, rensaResult, keyPuyos, firePuyos, currentFrameId, gazer);
 
         if (rensaScoreCollector->score() > maxRensaScore) {
             maxRensaScore = rensaScoreCollector->score();
