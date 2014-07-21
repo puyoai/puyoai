@@ -101,28 +101,28 @@ TEST(CoreFieldTest, FramesTest) {
         CoreField f("500000"
                     "444400");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_VANISH_ANIMATION + 1 + FRAMES_GROUNDING, rensaResult.frames);
+        EXPECT_EQ(FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[1] + FRAMES_GROUNDING, rensaResult.frames);
     }
     {
         CoreField f("500000"
                     "400000"
                     "444000");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_VANISH_ANIMATION + 2 + FRAMES_GROUNDING, rensaResult.frames);
+        EXPECT_EQ(FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[2] + FRAMES_GROUNDING, rensaResult.frames);
     }
     {
         CoreField f("500000"
                     "450000"
                     "444000");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_VANISH_ANIMATION + 2 + FRAMES_GROUNDING, rensaResult.frames);
+        EXPECT_EQ(FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[2] + FRAMES_GROUNDING, rensaResult.frames);
     }
     {
         CoreField f("500000"
                     "455000"
                     "444500");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_VANISH_ANIMATION + 2 + FRAMES_GROUNDING +
+        EXPECT_EQ(FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[2] + FRAMES_GROUNDING +
                   FRAMES_VANISH_ANIMATION,
                   rensaResult.frames);
     }
@@ -131,8 +131,8 @@ TEST(CoreFieldTest, FramesTest) {
                     "455000"
                     "444500");
         RensaResult rensaResult = f.simulate();
-        EXPECT_EQ(FRAMES_VANISH_ANIMATION + 2 + FRAMES_GROUNDING +
-                  FRAMES_VANISH_ANIMATION + 1 + FRAMES_GROUNDING,
+        EXPECT_EQ(FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[2] + FRAMES_GROUNDING +
+                  FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[1] + FRAMES_GROUNDING,
                   rensaResult.frames);
     }
 }
@@ -271,15 +271,15 @@ TEST(CoreFieldTest, FramesToDropNextWithoutChigiri)
     // TODO(mayah): We have to confirm this.
     CoreField f;
 
-    EXPECT_EQ(CoreField::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI,
+    EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(3, 0)));
-    EXPECT_EQ(CoreField::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI,
+    EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(3, 1)));
-    EXPECT_EQ((CoreField::HEIGHT - 1) * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI,
+    EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT - 1] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(3, 2)));
-    EXPECT_EQ(CoreField::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_AFTER_NO_CHIGIRI,
+    EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(3, 3)));
-    EXPECT_EQ(CoreField::HEIGHT * FRAMES_DROP_1_LINE + FRAMES_HORIZONTAL_MOVE * 2 + FRAMES_AFTER_NO_CHIGIRI,
+    EXPECT_EQ(FRAMES_TO_MOVE_HORIZONTALLY[2] + FRAMES_TO_DROP_FAST[CoreField::HEIGHT] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(1, 0)));
 }
 
@@ -290,7 +290,8 @@ TEST(CoreFieldTest, FramesToDropNextWithChigiri)
                 "006000"
                 "007000");
 
-    EXPECT_EQ((CoreField::HEIGHT - 4) * FRAMES_DROP_1_LINE + FRAMES_AFTER_CHIGIRI + FRAMES_CHIGIRI_1_LINE_1 + FRAMES_CHIGIRI_1_LINE_2 + 2 * FRAMES_CHIGIRI_1_LINE_3,
+    EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT - 4] + FRAMES_GROUNDING +
+              FRAMES_TO_DROP[4] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(3, 1)));
 }
 

@@ -13,7 +13,7 @@ bool check(char currentVar, char neighborVar, PuyoColor neighborColor,
 {
     DCHECK(currentVar != '.');
 
-    if (!isNormalColor(neighborColor))
+    if (neighborColor == PuyoColor::OJAMA || neighborColor == PuyoColor::WALL)
         return true;
 
     // This case should be already processed.
@@ -27,6 +27,7 @@ bool check(char currentVar, char neighborVar, PuyoColor neighborColor,
     } else {
         auto it = env.find(currentVar);
         auto jt = env.find(neighborVar);
+
         if (it != env.end() && jt != env.end() && it->second == jt->second)
             return false;
     }
@@ -128,10 +129,7 @@ double BookField::match(const PlainField& f) const
 
     // Check the neighbors.
     for (int x = 1; x <= 6; ++x) {
-        for (int y = 1; y <= 12 && (f.get(x, y) != PuyoColor::EMPTY || field_[x][y] != '.'); ++y) {
-            if (field_[x][y] == '.')
-                continue;
-
+        for (int y = 1; y <= 12 && field_[x][y] != '.'; ++y) {
             if (!check(field_[x][y], field_[x][y + 1], f.get(x, y + 1), env))
                 return 0;
             if (!check(field_[x][y], field_[x][y - 1], f.get(x, y - 1), env))

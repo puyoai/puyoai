@@ -31,6 +31,7 @@ public:
     using MayahAI::think;
     using MayahAI::enemyNext2Appeared;
     using MayahAI::reloadParameter;
+    using MayahAI::makeMessageFrom;
 
     CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, int numKeyPuyos, const Plan& plan) const
     {
@@ -51,6 +52,15 @@ public:
         });
 
         return result;
+    }
+
+    void showMatchedBooks(const CoreField& field)
+    {
+        for (const auto& book : books_ ) {
+            if (book.match(field)) {
+                cout << book.toDebugString() << endl;
+            }
+        }
     }
 };
 
@@ -136,6 +146,12 @@ int main(int argc, char* argv[])
             if (str == "s") {
                 CollectedFeature cf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
                 cout << cf.toString() << endl;
+                cout << ai.makeMessageFrom(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
+                                           MayahAI::DEFAULT_NUM_ITERATION, aiPlan, (t2 - t1) * 1000);
+                continue;
+            }
+            if (str == "book") {
+                ai.showMatchedBooks(field);
                 continue;
             }
 
