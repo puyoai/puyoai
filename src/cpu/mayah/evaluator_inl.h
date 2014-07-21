@@ -307,6 +307,12 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
         return true;
     }
 
+    // If the rensa score is larger than 80,000, usually it's really large enough.
+    if (plan.score() >= 80000) {
+        sc->addScore(STRATEGY_LARGE_ENOUGH, 1);
+        return true;
+    }
+
     // --- If we can send 18>= ojamas, and opponent does not have any hand to cope with it,
     // we can fire it.
     // TODO(mayah): We need to check if the enemy cannot fire his rensa after ojama is dropped.
