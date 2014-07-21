@@ -417,10 +417,7 @@ int CoreField::dropAfterVanish(int minHeights[], Tracker* tracker)
         }
     }
 
-    if (maxDrops == 0)
-        return FRAMES_AFTER_NO_DROP;
-    else
-        return FRAMES_DROP_1_LINE * maxDrops + FRAMES_AFTER_DROP;
+    return maxDrops;
 }
 
 bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
@@ -499,9 +496,13 @@ inline RensaResult CoreField::simulateWithTracker(int initialChain, int minHeigh
     while ((nthChainScore = vanish(chains, minHeights, tracker)) > 0) {
         chains += 1;
         score += nthChainScore;
-        int drop_after_vanish = dropAfterVanish(minHeights, tracker);
-        frames += drop_after_vanish + FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION;
-        quick = (drop_after_vanish == FRAMES_AFTER_NO_DROP);
+        frames += FRAMES_VANISH_ANIMATION;
+        int maxDrops = dropAfterVanish(minHeights, tracker);
+        if (maxDrops > 0) {
+            frames += maxDrops + FRAMES_GROUNDING;
+        } else {
+            quick = true;
+        }
     }
 
     return RensaResult(chains - 1, score, frames, quick);

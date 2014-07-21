@@ -136,6 +136,7 @@ protected:
     void eraseQueuedPuyos(int nthChain, Position* eraseQueue, Position* eraseQueueHead, int minHeights[], Tracker*);
 
     // Drops puyos in the air after vanishment.
+    // Returns the max drop height.
     template<typename Tracker>
     int dropAfterVanish(int minHeights[], Tracker*);
 
