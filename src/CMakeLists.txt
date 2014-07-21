@@ -139,9 +139,8 @@ endif()
 
 if(USE_SDL2)
   add_subdirectory(gui)
+  add_subdirectory(audio)
 endif()
-
-add_subdirectory(audio)
 
 if(USE_GFLAGS_AND_GLOG AND USE_SDL2 AND FFMPEG_FOUND)
   set(BUILD_CAPTURE 1)
