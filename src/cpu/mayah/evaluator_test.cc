@@ -13,7 +13,7 @@ using namespace std;
 
 class EvaluatorTest : public testing::Test {
 protected:
-    CollectedFeature eval(const CoreField& f, int numKeyPuyos = 0)
+    CollectedFeature eval(const CoreField& f, int numIteration = 1)
     {
         TsumoPossibility::initialize();
 
@@ -31,7 +31,7 @@ protected:
 
         RefPlan plan(f, decisions, rensaResult, 0, initiatingFrames, lastDropFrames);
 
-        return evaluator.evalWithCollectingFeature(plan, f, 1, numKeyPuyos, gazer);
+        return evaluator.evalWithCollectingFeature(plan, f, 1, numIteration, gazer);
     }
 };
 
@@ -211,6 +211,20 @@ TEST_F(EvaluatorTest, HandWidth)
     EXPECT_EQ(1, cf.feature(HAND_WIDTH_2).front());
     EXPECT_EQ(1, cf.feature(HAND_WIDTH_3).front());
     EXPECT_EQ(2, cf.feature(HAND_WIDTH_4).front());
+}
+
+TEST_F(EvaluatorTest, numKeyPuyos)
+{
+    CoreField f(
+        " G    "
+        " BR   "
+        " GYR  "
+        " GGY  "
+        "YYYRR ");
+
+    CollectedFeature cf = eval(f);
+    EXPECT_EQ(4, cf.feature(MAX_CHAINS).front());
+    EXPECT_EQ(3, cf.feature(MAX_RENSA_FIRE_PUYOS_EARLY).front());
 }
 
 TEST_F(EvaluatorTest, DontCrash1)
