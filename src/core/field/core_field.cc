@@ -194,7 +194,7 @@ int CoreField::framesToDropNext(const Decision& decision) const
     if (decision.r == 0) {
         dropFrames += FRAMES_TO_DROP_FAST[HEIGHT - height(x1)] + FRAMES_GROUNDING;
     } else if (decision.r == 2) {
-        int dropHeight = HEIGHT - height(x1);
+        int dropHeight = HEIGHT - height(x1) - 1;
         // TODO: If puyo lines are high enough, rotation might take time. We should measure this later.
         // It looks we need 3 frames to waiting that each rotation has completed.
         if (dropHeight < 6)
@@ -209,9 +209,10 @@ int CoreField::framesToDropNext(const Decision& decision) const
             dropFrames += FRAMES_TO_DROP_FAST[dropHeight] + FRAMES_GROUNDING;
         } else {
             int minHeight = min(height(x1), height(x2));
-            int maxHeight = max(max(height(x1), height(x2)), 3);
+            int maxHeight = max(height(x1), height(x2));
             int diffHeight = maxHeight - minHeight;
-            dropFrames += FRAMES_TO_DROP_FAST[maxHeight];
+            int dropHeight = max(HEIGHT - maxHeight, 3);
+            dropFrames += FRAMES_TO_DROP_FAST[dropHeight];
             dropFrames += FRAMES_GROUNDING;
             dropFrames += FRAMES_TO_DROP[diffHeight];
             dropFrames += FRAMES_GROUNDING;
