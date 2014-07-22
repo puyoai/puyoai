@@ -14,6 +14,8 @@ namespace peria {
 
 namespace {
 
+const int kDefaultThreshold = 70 * 6 * 8;
+
 void Evaluate(const int threshold, Decision* best, int* score,
               const RefPlan& plan) {
   if (*score > threshold)
@@ -38,6 +40,11 @@ void Evaluate(const int threshold, Decision* best, int* score,
 
 }  // namespace
 
+struct Ai::Attack {
+  int score;
+  int end_frame_id;
+};
+
 // TODO: (want to implement)
 // - Compute enemy's attack information on his settings.
 // - Search decisions for all known |seq|
@@ -53,31 +60,46 @@ DropDecision Ai::think(int frame_id,
 		       const PlainField& field,
 		       const KumipuyoSeq& seq) {
   using namespace std::placeholders;
-  UNUSED_VARIABLE(frame_id);
 
-  LOG(INFO) << CoreField(field).toDebugString() << seq.toString();
   std::ostringstream message;
 
   Decision best;
   int score = -1;
 
+  bool counter = (attack_ && (frame_id < attack_->end_frame_id));
+  int threashold = (counter) ? (attack_->score + 1) : kDefaultThreshold;
+
   int depth = seq.size();
-  Plan::iterateAvailablePlans(CoreField(field), seq, depth + 1,
-      std::bind(Evaluate, 70 * 6 * 10, &best, &score, _1));
+  Plan::iterateAvailablePlans(CoreField(field), seq, depth,
+      std::bind(Evaluate, threashold, &best, &score, _1));
 
-  Plan::iterateAvailablePlans(CoreField(field), seq, 2,
-      std::bind(Evaluate, 70 * 6 * 5, &best, &score, _1));
-
-  message << "X-R:" << best.x << "-" << best.r
-          << "_SCORE:" << score;
+  message << "SCORE:" << score;
+  if (counter)
+    message << "_COUNTER:" << attack_->score << "_IN_"
+            << (attack_->end_frame_id - frame_id);
 
   return DropDecision(best, message.str());
 }
 
 void Ai::gameWillBegin(const FrameData& /*frame_data*/) {
+  attack_.reset();
 }
 
-void Ai::enemyGrounded(const FrameData& /*frame_data*/) {
+void Ai::enemyGrounded(const FrameData& frame_data) {
+  const PlainField& enemy = frame_data.enemyPlayerFrameData().field;
+  CoreField field(enemy);
+  // NOTE: Fail with assert error in core_filed.cc while this simulte()
+  RensaResult result = field.simulate();
+
+  if (result.chains == 0) {
+    // TODO: Check required puyos to start RENSA.
+    attack_.reset();
+    return;
+  }
+
+  attack_.reset(new Attack);
+  attack_->score = result.score;
+  attack_->end_frame_id = frame_data.id + result.frames;
 }
 
 }  // namespace peria
