@@ -38,6 +38,13 @@ void Evaluate(const int threshold, Decision* best, int* score,
 
 }  // namespace
 
+// TODO: (want to implement)
+// - Compute enemy's attack information on his settings.
+// - Search decisions for all known |seq|
+// --- Count the number of HAKKA-able KumiPuyos
+// - Make patterns for JOSEKI.
+// --- May be good to score all JOSEKI patterns and evaluate with $\sum score^2$
+
 Ai::Ai(): ::AI("peria") {}
 
 Ai::~Ai() {}
