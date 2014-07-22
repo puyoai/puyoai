@@ -66,15 +66,17 @@ DropDecision Ai::think(int frame_id,
   Decision best;
   int score = -1;
 
-  bool counter = (attack_ && (frame_id < attack_->end_frame_id));
-  int threashold = (counter) ? (attack_->score + 1) : kDefaultThreshold;
+  if (attack_ && attack_->end_frame_id < frame_id)
+    attack_.reset();
+
+  int threashold = (attack_) ? (attack_->score + 1) : kDefaultThreshold;
 
   int depth = seq.size();
   Plan::iterateAvailablePlans(CoreField(field), seq, depth,
       std::bind(Evaluate, threashold, &best, &score, _1));
 
   message << "SCORE:" << score;
-  if (counter)
+  if (attack_)
     message << "_COUNTER:" << attack_->score << "_IN_"
             << (attack_->end_frame_id - frame_id);
 
