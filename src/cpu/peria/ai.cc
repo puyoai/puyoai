@@ -88,7 +88,7 @@ void Ai::gameWillBegin(const FrameData& /*frame_data*/) {
 void Ai::enemyGrounded(const FrameData& frame_data) {
   const PlainField& enemy = frame_data.enemyPlayerFrameData().field;
   CoreField field(enemy);
-  // NOTE: Fail with assert error in core_filed.cc while this simulte()
+  field.forceDrop();
   RensaResult result = field.simulate();
 
   if (result.chains == 0) {
