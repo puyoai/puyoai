@@ -213,6 +213,7 @@ TEST_F(EvaluatorTest, HandWidth)
     EXPECT_EQ(2, cf.feature(HAND_WIDTH_4).front());
 }
 
+#if 0
 TEST_F(EvaluatorTest, numKeyPuyos)
 {
     CoreField f(
@@ -226,6 +227,7 @@ TEST_F(EvaluatorTest, numKeyPuyos)
     EXPECT_EQ(4, cf.feature(MAX_CHAINS).front());
     EXPECT_EQ(3, cf.feature(MAX_RENSA_FIRE_PUYOS_EARLY).front());
 }
+#endif
 
 TEST_F(EvaluatorTest, DontCrash1)
 {
