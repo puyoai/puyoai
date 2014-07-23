@@ -9,31 +9,37 @@
 #include "core/field/core_field.h"
 #include "core/field/rensa_result.h"
 #include "core/puyo_color.h"
+#include "pattern.h"
 
 namespace peria {
 
 namespace {
 
-const int kDefaultThreshold = 70 * 6 * 8;
+// Score current field situation.
+int PatternMatch(const RefPlan& plan) {
+  int sum = 0;
+  for (const Pattern& pattern : Pattern::GetAllPattern()) {
+    sum += pattern.Match(plan.field());
+  }
+  return sum;
+}
 
-void Evaluate(const int threshold, Decision* best, int* score,
-              const RefPlan& plan) {
-  if (*score > threshold)
-    return;
-
-  int s = 0;
+void EvaluateUsual(Decision* best, int* best_score, const RefPlan& plan) {
+  int score = 0;
   if (plan.isRensaPlan()) {
     const RensaResult& result = plan.rensaResult();
     if (result.chains == 1 && result.quick && result.score > 70 * 6 * 2) {
       // Quick attack
-      s = 99999;
+      score = 99999;
     } else {
-      s = result.score;
+      score = result.score;
     }
+  } else {
+    score = PatternMatch(plan);
   }
             
-  if (*score < s) {
-    *score = s;
+  if (*best_score < score) {
+    *best_score = score;
     *best = plan.decisions().front();
   }
 }
@@ -46,7 +52,6 @@ struct Ai::Attack {
 };
 
 // TODO: (want to implement)
-// - Compute enemy's attack information on his settings.
 // - Search decisions for all known |seq|
 // --- Count the number of HAKKA-able KumiPuyos
 // - Make patterns for JOSEKI.
@@ -60,20 +65,16 @@ DropDecision Ai::think(int frame_id,
 		       const PlainField& field,
 		       const KumipuyoSeq& seq) {
   using namespace std::placeholders;
-
   std::ostringstream message;
-
+  
   Decision best;
   int score = -1;
 
   if (attack_ && attack_->end_frame_id < frame_id)
     attack_.reset();
 
-  int threashold = (attack_) ? (attack_->score + 1) : kDefaultThreshold;
-
-  int depth = seq.size();
-  Plan::iterateAvailablePlans(CoreField(field), seq, depth,
-      std::bind(Evaluate, threashold, &best, &score, _1));
+  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size(),
+      std::bind(EvaluateUsual, &best, &score, _1));
 
   message << "SCORE:" << score;
   if (attack_)
