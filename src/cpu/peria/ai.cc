@@ -76,11 +76,20 @@ DropDecision Ai::think(int frame_id,
   Plan::iterateAvailablePlans(CoreField(field), seq, seq.size(),
       std::bind(EvaluateUsual, &best, &score, _1));
 
-  message << "SCORE:" << score;
-  if (attack_)
-    message << "_COUNTER:" << attack_->score << "_IN_"
-            << (attack_->end_frame_id - frame_id);
+  // Counter if OJAMA puyos return certainly.
+  // TODO: Judge if AI should accept few OJAMA puyos. (受けるべきか?)
+  if (attack_ && attack_->score < score) {
+    message << "SCORE:" << score
+            << "_TO_COUNTER:" << attack_->score;
+    return DropDecision(best, message.str());
+  }
 
+  // Search best control.
+  // TODO: Compute the possibility to get the best score.
+  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size() + 1,
+      std::bind(EvaluateUsual, &best, &score, _1));
+
+  message << "SCORE:" << score;
   return DropDecision(best, message.str());
 }
 
