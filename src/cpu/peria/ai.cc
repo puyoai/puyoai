@@ -2,10 +2,15 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+
+#include <algorithm>
+#include <functional>  // C++11
 #include <sstream>
-#include <functional>
+#include <tuple>  // C++11
+#include <vector>
 
 #include "core/algorithm/plan.h"
+#include "core/constant.h"
 #include "core/field/core_field.h"
 #include "core/field/rensa_result.h"
 #include "core/puyo_color.h"
@@ -24,7 +29,9 @@ int PatternMatch(const RefPlan& plan) {
   return sum;
 }
 
-void EvaluateUsual(Decision* best, int* best_score, const RefPlan& plan) {
+typedef std::tuple<int, bool, Decision> Candidate;
+
+void EvaluateUsual(const RefPlan& plan, std::vector<Candidate>* candidates) {
   int score = 0;
   if (plan.isRensaPlan()) {
     const RensaResult& result = plan.rensaResult();
@@ -37,11 +44,8 @@ void EvaluateUsual(Decision* best, int* best_score, const RefPlan& plan) {
   } else {
     score = PatternMatch(plan);
   }
-            
-  if (*best_score < score) {
-    *best_score = score;
-    *best = plan.decisions().front();
-  }
+
+  candidates->push_back(std::make_tuple(score, plan.isRensaPlan(), plan.decisions().front()));
 }
 
 }  // namespace
@@ -67,30 +71,42 @@ DropDecision Ai::think(int frame_id,
   using namespace std::placeholders;
   std::ostringstream message;
   
-  Decision best;
-  int score = -1;
-
   if (attack_ && attack_->end_frame_id < frame_id)
     attack_.reset();
 
-  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size(),
-      std::bind(EvaluateUsual, &best, &score, _1));
+  std::vector<Candidate> candidates;
+  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size() + 1,
+                              std::bind(EvaluateUsual, _1, &candidates));
+  std::sort(candidates.begin(), candidates.end());
+  LOG(INFO) << "Candidates: " << candidates.size();
 
-  // Counter if OJAMA puyos return certainly.
-  // TODO: Judge if AI should accept few OJAMA puyos. (受けるべきか?)
-  if (attack_ && attack_->score < score) {
-    message << "SCORE:" << score
-            << "_TO_COUNTER:" << attack_->score;
-    return DropDecision(best, message.str());
+  // 3 個以上おじゃまが来てたらカウンターしてみる
+  if (attack_ && attack_->score >= SCORE_FOR_OJAMA * 3) {
+    // TODO: Adjust |kAcceptablePuyo|.
+    // TODO: 受けられるかチェックする。
+    const int kAcceptablePuyo = 3;
+    int threshold = attack_->score - SCORE_FOR_OJAMA * kAcceptablePuyo;
+    for (const auto& candidate : candidates) {
+      int score = std::get<0>(candidate);
+      if (score < threshold)
+        continue;
+
+      if (std::get<1>(candidate)) {
+        const Decision& decision = std::get<2>(candidate);
+        message << "SCORE:" << score
+                << "_TO_COUNTER:" << attack_->score;
+        return DropDecision(decision, message.str());
+      }
+    }
   }
 
-  // Search best control.
-  // TODO: Compute the possibility to get the best score.
-  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size() + 1,
-      std::bind(EvaluateUsual, &best, &score, _1));
-
+  // TODO: Introduce Random class.
+  const Candidate& cand = candidates[candidates.size() * 2 / 3];
+  int score = std::get<0>(cand);
   message << "SCORE:" << score;
-  return DropDecision(best, message.str());
+  if (std::get<1>(cand))
+    message << "_FIRE";
+  return DropDecision(std::get<2>(cand), message.str());
 }
 
 void Ai::gameWillBegin(const FrameData& /*frame_data*/) {
