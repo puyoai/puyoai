@@ -1,0 +1,10 @@
+# Template book
+
+# NAME: name of template
+# SCORE: (int) score for the template
+# LIMIT: Upper bound of # of Puyos to apply the template.
+# ......  # Upper most line of the filed.  This shows all empty cells.
+# ABC...  #
+# AABC..  #
+# BBC...  # Bottom line is followed by an empty line.
+
