@@ -1,5 +1,6 @@
 #pragma once
 
+#include <istream>
 #include <string>
 #include <vector>
 
@@ -9,6 +10,7 @@ namespace peria {
 
 class Pattern {
  public:
+  static void ReadBook(std::istream& is);
   static const std::vector<Pattern>& GetAllPattern();
 
   Pattern(const std::string& pattern);
