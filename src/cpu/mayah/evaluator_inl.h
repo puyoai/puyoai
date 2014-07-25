@@ -370,7 +370,7 @@ void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const Re
 {
     const CoreField& field = plan.field();
 
-    int distanceCount[5] = { 0, 0, 0, 0, 0 };
+    int distanceCount[5] {};
     int distance[CoreField::MAP_WIDTH][CoreField::MAP_HEIGHT] {};
 
     // TODO(mayah): Using std::queue is 2x slower here.
@@ -393,7 +393,7 @@ void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const Re
         int y = qHead->y;
         qHead++;
 
-        if (distance[x][y] > 4)
+        if (distance[x][y] > 3)
             continue;
 
         int d = distance[x][y] + 1;
