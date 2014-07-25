@@ -295,6 +295,30 @@ TEST(CoreFieldTest, FramesToDropNextWithChigiri)
               f.framesToDropNext(Decision(3, 1)));
 }
 
+TEST(CoreFieldTest, framesToDropNextOn13thRow)
+{
+    CoreField f(
+        "OO OOO" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    // We cannot put with Decision(4, 2).
+
+    EXPECT_EQ(6 + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING, f.framesToDropNext(Decision(4, 0)));
+    EXPECT_EQ(6 + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING, f.framesToDropNext(Decision(4, 1)));
+    EXPECT_EQ(6 + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING + FRAMES_TO_DROP[1] + FRAMES_GROUNDING,
+              f.framesToDropNext(Decision(4, 3)));
+}
+
 TEST(CoreFieldTest, SimulateWithOjama)
 {
     CoreField f("ORRRRO"

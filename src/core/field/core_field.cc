@@ -184,6 +184,9 @@ int CoreField::framesToDropNext(const Decision& decision) const
     // TODO(mayah): This calculation should be more accurate. We need to compare this with
     // actual AC puyo2 and duel server algorithm. These must be much the same.
 
+    // TODO(mayah): When "kabegoe" happens, we need more frames.
+    const int KABEGOE_PENALTY = 6;
+
     // TODO(mayah): It looks drop animation is too short.
 
     int x1 = decision.x;
@@ -192,7 +195,13 @@ int CoreField::framesToDropNext(const Decision& decision) const
     int dropFrames = FRAMES_TO_MOVE_HORIZONTALLY[abs(3 - x1)];
 
     if (decision.r == 0) {
-        dropFrames += FRAMES_TO_DROP_FAST[HEIGHT - height(x1)] + FRAMES_GROUNDING;
+        int dropHeight = HEIGHT - height(x1);
+        if (dropHeight <= 0) {
+            // TODO(mayah): We need to add penalty here. How much penalty is necessary?
+            dropFrames += KABEGOE_PENALTY + FRAMES_GROUNDING;
+        } else {
+            dropFrames += FRAMES_TO_DROP_FAST[dropHeight] + FRAMES_GROUNDING;
+        }
     } else if (decision.r == 2) {
         int dropHeight = HEIGHT - height(x1) - 1;
         // TODO: If puyo lines are high enough, rotation might take time. We should measure this later.
@@ -204,15 +213,25 @@ int CoreField::framesToDropNext(const Decision& decision) const
     } else {
         if (height(x1) == height(x2)) {
             int dropHeight = HEIGHT - height(x1);
-            if (dropHeight < 3)
-                dropHeight = 3;
-            dropFrames += FRAMES_TO_DROP_FAST[dropHeight] + FRAMES_GROUNDING;
+            if (dropHeight <= 0) {
+                dropFrames += KABEGOE_PENALTY + FRAMES_GROUNDING;
+            } else if (dropHeight < 3) {
+                dropFrames += FRAMES_TO_DROP_FAST[3] + FRAMES_GROUNDING;
+            } else {
+                dropFrames += FRAMES_TO_DROP_FAST[dropHeight] + FRAMES_GROUNDING;
+            }
         } else {
             int minHeight = min(height(x1), height(x2));
             int maxHeight = max(height(x1), height(x2));
             int diffHeight = maxHeight - minHeight;
-            int dropHeight = max(HEIGHT - maxHeight, 3);
-            dropFrames += FRAMES_TO_DROP_FAST[dropHeight];
+            int dropHeight = HEIGHT - maxHeight;
+            if (dropHeight <= 0) {
+                dropFrames += KABEGOE_PENALTY;
+            } else if (dropHeight < 3) {
+                dropFrames += FRAMES_TO_DROP_FAST[3];
+            } else {
+                dropFrames += FRAMES_TO_DROP_FAST[dropHeight];
+            }
             dropFrames += FRAMES_GROUNDING;
             dropFrames += FRAMES_TO_DROP[diffHeight];
             dropFrames += FRAMES_GROUNDING;
