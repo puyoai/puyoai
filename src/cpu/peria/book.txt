@@ -7,4 +7,5 @@
 # ABC...  #
 # AABC..  #
 # BBC...  # Bottom line is followed by an empty line.
+# END:
 
