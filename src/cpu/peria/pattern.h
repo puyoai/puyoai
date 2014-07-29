@@ -13,12 +13,14 @@ class Pattern {
   static void ReadBook(std::istream& is);
   static const std::vector<Pattern>& GetAllPattern();
 
-  Pattern(const std::string& pattern);
-  
   int Match(const CoreField& field) const;
 
  private:
-  std::string pattern_;
+  std::string name_;
+  std::vector<std::string> pattern_;
+  int score_;
+  // Maxium number of Puyos to apply the pattern.
+  int max_puyos_;
 };
 
 }  // namespace peria

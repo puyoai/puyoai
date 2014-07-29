@@ -1,6 +1,8 @@
 #include "pattern.h"
 
 #include <istream>
+#include <memory>
+#include <sstream>
 #include <string>
 
 namespace peria {
@@ -27,18 +29,31 @@ std::string Trim(std::string line) {
 
 void Pattern::ReadBook(std::istream& is) {
   g_pattern.clear();
+
+  std::unique_ptr<Pattern> pattern(new Pattern);
   for (std::string line; std::getline(is, line);) {
     line = Trim(line);
     if (line.empty())
       continue;
+    std::istringstream iss(line);
+    std::string first_segment;
+    iss >> first_segment;
+    if (first_segment.find(':') == std::string::npos) {
+      //pattern->AppendField(first_segment);
+      continue;
+    }
+
+    if (first_segment == "NAME:") {
+      iss >> pattern->name_;
+    } else if (first_segment == "END:") {
+      g_pattern.push_back(*pattern);
+      pattern.reset(new Pattern);
+    }
   }
 }
 
 const std::vector<Pattern>& Pattern::GetAllPattern() {
   return g_pattern;
-}
-
-Pattern::Pattern(const std::string& pattern) : pattern_(pattern) {
 }
 
 int Pattern::Match(const CoreField& field) const {
