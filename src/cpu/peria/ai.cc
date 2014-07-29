@@ -5,8 +5,8 @@
 
 #include <algorithm>
 #include <functional>  // C++11
+#include <map>
 #include <sstream>
-#include <tuple>  // C++11
 #include <vector>
 
 #include "core/algorithm/plan.h"
@@ -29,9 +29,9 @@ int PatternMatch(const RefPlan& plan) {
   return sum;
 }
 
-typedef std::tuple<int, bool, Decision> Candidate;
+typedef std::map<Decision, std::vector<int> > CandidateMap;
 
-void EvaluateUsual(const RefPlan& plan, std::vector<Candidate>* candidates) {
+void EvaluateUsual(const RefPlan& plan, CandidateMap* candidates) {
   int score = 0;
   if (plan.isRensaPlan()) {
     const RensaResult& result = plan.rensaResult();
@@ -45,7 +45,10 @@ void EvaluateUsual(const RefPlan& plan, std::vector<Candidate>* candidates) {
     score = PatternMatch(plan);
   }
 
-  candidates->push_back(std::make_tuple(score, plan.isRensaPlan(), plan.decisions().front()));
+  const Decision& decision = plan.decisions().front();
+  if (candidates->find(decision) == candidates->end())
+    candidates->insert(std::make_pair(decision, std::vector<int>()));
+  (*candidates)[decision].push_back(score);
 }
 
 }  // namespace
@@ -74,10 +77,10 @@ DropDecision Ai::think(int frame_id,
   if (attack_ && attack_->end_frame_id < frame_id)
     attack_.reset();
 
-  std::vector<Candidate> candidates;
+  CandidateMap candidates;
   Plan::iterateAvailablePlans(CoreField(field), seq, seq.size() + 1,
                               std::bind(EvaluateUsual, _1, &candidates));
-  std::sort(candidates.begin(), candidates.end());
+
   LOG(INFO) << "Candidates: " << candidates.size();
 
   // 3 個以上おじゃまが来てたらカウンターしてみる
@@ -87,26 +90,41 @@ DropDecision Ai::think(int frame_id,
     const int kAcceptablePuyo = 3;
     int threshold = attack_->score - SCORE_FOR_OJAMA * kAcceptablePuyo;
     for (const auto& candidate : candidates) {
-      int score = std::get<0>(candidate);
+      const Decision decision = candidate.first;
+      const auto& scores = candidate.second;
+      int score = *std::max_element(scores.begin(), scores.end());
+
       if (score < threshold)
         continue;
 
-      if (std::get<1>(candidate)) {
-        const Decision& decision = std::get<2>(candidate);
-        message << "SCORE:" << score
-                << "_TO_COUNTER:" << attack_->score;
-        return DropDecision(decision, message.str());
-      }
+      return DropDecision(decision, message.str());
     }
   }
 
-  // TODO: Introduce Random class.
-  const Candidate& cand = candidates[candidates.size() * 2 / 3];
-  int score = std::get<0>(cand);
-  message << "SCORE:" << score;
-  if (std::get<1>(cand))
-    message << "_FIRE";
-  return DropDecision(std::get<2>(cand), message.str());
+  auto best_candidate = candidates.begin();
+  int best_avg = -1;
+  bool rand_hand = false;
+  for (auto itr = candidates.begin(); itr != candidates.end(); ++itr) {
+    if (itr->second.empty())
+      continue;
+    int sum = 0;
+    for (int score : itr->second) {
+      sum += std::max(0, score - 20);
+    }
+
+    int avg = sum / itr->second.size();
+    if (avg >= best_avg) {
+      best_avg = avg;
+      best_candidate = itr;
+      rand_hand = false;
+    } else if (best_avg == avg && rand() % 2 == 0) {
+      best_avg = avg;
+      best_candidate = itr;
+      rand_hand = true;
+    }
+  }
+
+  return DropDecision(best_candidate->first, rand_hand ? "Randomize" : "Normal");
 }
 
 void Ai::gameWillBegin(const FrameData& /*frame_data*/) {
