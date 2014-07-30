@@ -1,9 +1,12 @@
 #include "pattern.h"
 
+#include <cctype>
+#include <deque>
 #include <istream>
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace peria {
 
@@ -39,17 +42,28 @@ void Pattern::ReadBook(std::istream& is) {
     std::string first_segment;
     iss >> first_segment;
     if (first_segment.find(':') == std::string::npos) {
-      //pattern->AppendField(first_segment);
+      pattern->AppendField(first_segment);
       continue;
     }
 
     if (first_segment == "NAME:") {
-      iss >> pattern->name_;
-    } else if (first_segment == "END:") {
-      g_pattern.push_back(*pattern);
+      if (pattern)
+        g_pattern.push_back(*pattern);
       pattern.reset(new Pattern);
+      iss >> pattern->name_;
+    } else if (first_segment == "SCORE:") {
+      int score;
+      iss >> score;
+      pattern->set_score(score);
+    } else if (first_segment == "MAX:") {
+      int max_puyos;
+      iss >> max_puyos;
+      pattern->set_max_puyos(max_puyos);
     }
   }
+
+  if (pattern)
+    g_pattern.push_back(*pattern);
 }
 
 const std::vector<Pattern>& Pattern::GetAllPattern() {
@@ -58,7 +72,16 @@ const std::vector<Pattern>& Pattern::GetAllPattern() {
 
 int Pattern::Match(const CoreField& field) const {
   UNUSED_VARIABLE(field);
+  // TODO: Check also 左右反転 version.
   return 0;
+}
+
+void Pattern::AppendField(std::string line) {
+  for (auto& c : line) {
+    if (std::islower(c))
+      c = '.';
+  }
+  pattern_.push_front(line);
 }
 
 }  // namespace peria

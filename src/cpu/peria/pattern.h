@@ -2,7 +2,7 @@
 
 #include <istream>
 #include <string>
-#include <vector>
+#include <deque>
 
 #include "core/field/core_field.h"
 
@@ -16,8 +16,12 @@ class Pattern {
   int Match(const CoreField& field) const;
 
  private:
+  void AppendField(std::string line);
+  void set_score(int score) { score_ = score; }
+  void set_max_puyos(int max_puyos) { max_puyos_ = max_puyos; }
+
   std::string name_;
-  std::vector<std::string> pattern_;
+  std::deque<std::string> pattern_;
   int score_;
   // Maxium number of Puyos to apply the pattern.
   int max_puyos_;
