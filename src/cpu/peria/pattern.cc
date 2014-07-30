@@ -3,6 +3,7 @@
 #include <cctype>
 #include <deque>
 #include <istream>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -54,11 +55,11 @@ void Pattern::ReadBook(std::istream& is) {
     } else if (first_segment == "SCORE:") {
       int score;
       iss >> score;
-      pattern->set_score(score);
+      pattern->score_ = score;
     } else if (first_segment == "MAX:") {
       int max_puyos;
       iss >> max_puyos;
-      pattern->set_max_puyos(max_puyos);
+      pattern->max_puyos_ = max_puyos;
     }
   }
 
@@ -71,17 +72,55 @@ const std::vector<Pattern>& Pattern::GetAllPattern() {
 }
 
 int Pattern::Match(const CoreField& field) const {
-  UNUSED_VARIABLE(field);
-  // TODO: Check also 左右反転 version.
-  return 0;
+  if (field.countPuyos() > max_puyos_)
+    return 0;
+
+  std::map<char, std::map<PuyoColor, int> > matching0;
+  std::map<char, std::map<PuyoColor, int> > matching1;  // Mirroring
+  for (int x = 1; x <= PlainField::WIDTH; ++x) {
+    for (size_t y = 1; y <= pattern_.size(); ++y) {
+      const char c0 = pattern_[y - 1][x - 1];
+      const char c1 = pattern_[y - 1][PlainField::WIDTH - x];
+      if (c0 != '.')
+        ++matching0[c0][field.get(x, y)];
+      if (c1 != '.')
+        ++matching1[c1][field.get(x, y)];
+    }
+  }
+  
+  return std::max(GetScore(matching0), GetScore(matching1));
 }
 
 void Pattern::AppendField(std::string line) {
+  DCHECK(line.size() == PlainField::WIDTH);
+  
   for (auto& c : line) {
     if (std::islower(c))
       c = '.';
+    else  // std::isupper(c) || c == '_'
+      ++num_puyos_;
   }
   pattern_.push_front(line);
+}
+
+int Pattern::GetScore(
+    const std::map<char, std::map<PuyoColor, int> >& matching) const {
+  int sum = 0;
+  for (const auto& itr : matching) {
+    const std::map<PuyoColor, int>& count = itr.second;
+    if (itr.first == '_') {
+      auto i = count.find(EMPTY);
+      if (i != count.end())
+        sum += i->second;
+    } else {
+      int mx = 0;
+      for (const auto& itr2 : count)
+        if (itr2.first != EMPTY)
+          mx = std::max(mx, itr2.second);
+      sum += mx;
+    }
+  }
+  return score_ * sum / num_puyos_;
 }
 
 }  // namespace peria
