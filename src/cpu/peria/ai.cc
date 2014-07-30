@@ -41,9 +41,8 @@ void EvaluateUsual(const RefPlan& plan, CandidateMap* candidates) {
     } else {
       score = result.score;
     }
-  } else {
-    score = PatternMatch(plan);
   }
+  score = std::max(score, PatternMatch(plan) * 10);
 
   const Decision& decision = plan.decisions().front();
   if (candidates->find(decision) == candidates->end())
@@ -97,34 +96,23 @@ DropDecision Ai::think(int frame_id,
       if (score < threshold)
         continue;
 
-      return DropDecision(decision, message.str());
+      return DropDecision(decision, "Counter");
     }
   }
 
   auto best_candidate = candidates.begin();
   int best_avg = -1;
-  bool rand_hand = false;
   for (auto itr = candidates.begin(); itr != candidates.end(); ++itr) {
     if (itr->second.empty())
       continue;
-    int sum = 0;
-    for (int score : itr->second) {
-      sum += std::max(0, score - 20);
-    }
-
-    int avg = sum / itr->second.size();
-    if (avg >= best_avg) {
-      best_avg = avg;
+    int score = *std::max_element(itr->second.begin(), itr->second.end());
+    if (score >= best_avg) {
+      best_avg = score;
       best_candidate = itr;
-      rand_hand = false;
-    } else if (best_avg == avg && rand() % 2 == 0) {
-      best_avg = avg;
-      best_candidate = itr;
-      rand_hand = true;
     }
   }
 
-  return DropDecision(best_candidate->first, rand_hand ? "Randomize" : "Normal");
+  return DropDecision(best_candidate->first, "Normal");
 }
 
 void Ai::gameWillBegin(const FrameData& /*frame_data*/) {

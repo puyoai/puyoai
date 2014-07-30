@@ -1,6 +1,7 @@
 #pragma once
 
 #include <istream>
+#include <map>
 #include <string>
 #include <deque>
 
@@ -17,14 +18,15 @@ class Pattern {
 
  private:
   void AppendField(std::string line);
-  void set_score(int score) { score_ = score; }
-  void set_max_puyos(int max_puyos) { max_puyos_ = max_puyos; }
+  int GetScore(const std::map<char, std::map<PuyoColor, int> >& matching) const;
 
   std::string name_;
   std::deque<std::string> pattern_;
   int score_;
   // Maxium number of Puyos to apply the pattern.
   int max_puyos_;
+  // The number of Puyos to check in the pattern.
+  int num_puyos_ = 0;
 };
 
 }  // namespace peria

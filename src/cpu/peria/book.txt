@@ -37,3 +37,8 @@ abACBC
 aabAAA
 bbABBB
 
+
+NAME: Zenkeshi
+SCORE: 9999
+MAX: 1
+______
