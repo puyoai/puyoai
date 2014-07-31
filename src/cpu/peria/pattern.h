@@ -15,10 +15,11 @@ class Pattern {
   static const std::vector<Pattern>& GetAllPattern();
 
   int Match(const CoreField& field) const;
+  const std::string& name() const { return name_; }
 
  private:
   void AppendField(std::string line);
-  int GetScore(const std::map<char, std::map<PuyoColor, int> >& matching) const;
+  int GetScore(std::map<char, std::map<PuyoColor, int> >& matching) const;
 
   std::string name_;
   std::deque<std::string> pattern_;

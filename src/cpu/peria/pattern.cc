@@ -77,14 +77,15 @@ int Pattern::Match(const CoreField& field) const {
 
   std::map<char, std::map<PuyoColor, int> > matching0;
   std::map<char, std::map<PuyoColor, int> > matching1;  // Mirroring
-  for (int x = 1; x <= PlainField::WIDTH; ++x) {
-    for (size_t y = 1; y <= pattern_.size(); ++y) {
+  for (size_t y = 1; y <= pattern_.size(); ++y) {
+    for (int x = 1; x <= PlainField::WIDTH; ++x) {
       const char c0 = pattern_[y - 1][x - 1];
       const char c1 = pattern_[y - 1][PlainField::WIDTH - x];
-      if (c0 != '.')
-        ++matching0[c0][field.get(x, y)];
-      if (c1 != '.')
-        ++matching1[c1][field.get(x, y)];
+      PuyoColor color = field.get(x, y);
+      if (c0 != '.' && color != OJAMA)
+        ++matching0[c0][color];
+      if (c1 != '.' && color != OJAMA)
+        ++matching1[c1][color];
     }
   }
   
@@ -101,24 +102,24 @@ void Pattern::AppendField(std::string line) {
       ++num_puyos_;
   }
   pattern_.push_front(line);
+  LOG(INFO) << line;
 }
 
 int Pattern::GetScore(
-    const std::map<char, std::map<PuyoColor, int> >& matching) const {
+    std::map<char, std::map<PuyoColor, int> >& matching) const {
   int sum = 0;
-  for (const auto& itr : matching) {
-    const std::map<PuyoColor, int>& count = itr.second;
-    if (itr.first == '_') {
-      auto i = count.find(EMPTY);
-      if (i != count.end())
-        sum += i->second;
-    } else {
-      int mx = 0;
-      for (const auto& itr2 : count)
-        if (itr2.first != EMPTY)
-          mx = std::max(mx, itr2.second);
-      sum += mx;
-    }
+  matching['_'][EMPTY] += 0;
+  if (matching['_'].size() == 1)
+    sum = matching['_'][EMPTY];
+  matching.erase('_');
+
+  for (auto& matching_itr : matching) {
+    DCHECK(std::isupper(matching_itr.first));
+    auto& char_base = matching_itr.second;
+    char_base.erase(EMPTY);
+    if (char_base.size() > 1 || char_base.begin()->first == OJAMA)
+      continue;
+    sum += char_base.begin()->second;
   }
   return score_ * sum / num_puyos_;
 }
