@@ -77,7 +77,7 @@ DropDecision Ai::think(int frame_id,
     attack_.reset();
 
   CandidateMap candidates;
-  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size() + 1,
+  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size(),
                               std::bind(EvaluateUsual, _1, &candidates));
 
   LOG(INFO) << "Candidates: " << candidates.size();
