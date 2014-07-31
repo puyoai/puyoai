@@ -16,6 +16,7 @@ class Pattern {
 
   int Match(const CoreField& field) const;
   const std::string& name() const { return name_; }
+  int score() const { return score_; }
 
  private:
   void AppendField(std::string line);

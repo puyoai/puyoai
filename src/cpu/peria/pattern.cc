@@ -5,6 +5,7 @@
 #include <istream>
 #include <map>
 #include <memory>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -85,7 +86,7 @@ int Pattern::Match(const CoreField& field) const {
       if (c0 != '.' && color != OJAMA)
         ++matching0[c0][color];
       if (c1 != '.' && color != OJAMA)
-        ++matching1[c1][color];
+      ++matching1[c1][color];
     }
   }
   
@@ -113,13 +114,18 @@ int Pattern::GetScore(
     sum = matching['_'][EMPTY];
   matching.erase('_');
 
+  std::set<PuyoColor> used;
   for (auto& matching_itr : matching) {
     DCHECK(std::isupper(matching_itr.first));
     auto& char_base = matching_itr.second;
     char_base.erase(EMPTY);
-    if (char_base.size() > 1 || char_base.begin()->first == OJAMA)
-      continue;
-    sum += char_base.begin()->second;
+    if (char_base.size() > 1)
+      return 0;
+    auto itr = char_base.begin();
+    // Do not allow duplicates.
+    if (!used.insert(itr->first).second)
+      return 0;
+    sum += itr->second;
   }
   return score_ * sum / num_puyos_;
 }
