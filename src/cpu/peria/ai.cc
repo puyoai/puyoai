@@ -28,8 +28,10 @@ int PatternMatch(const RefPlan& plan, std::string* name) {
     int score = pattern.Match(plan.field());
     sum += score;
     if (score > best) {
+      std::ostringstream oss;
       best = score;
-      *name = pattern.name();
+      oss << pattern.name() << " " << score << "/" << pattern.score();
+      *name = oss.str();
     }
   }
   return sum;
@@ -99,23 +101,26 @@ DropDecision Ai::think(int frame_id,
   if (attack_ && attack_->end_frame_id < frame_id)
     attack_.reset();
 
-  int score = 0;
+
+  // Check templates first with visible puyos.
+  int temp_score = 0;
   std::string name;
   int frames = 1e+8;
-  Decision decision;
-  for (int n = 1; n <= seq.size(); ++n) {
-    // Check templates first with visible puyos.
-    Plan::iterateAvailablePlans(CoreField(field), seq, n,
-                                std::bind(EvaluatePatterns, _1,
-                                          &score, &name, &frames, &decision));
-    if (score > 0 && !name.empty())
-      return DropDecision(decision, "Template: " + name);
-  }
+  Decision temp_decision;
+  Plan::iterateAvailablePlans(CoreField(field), seq, 2,
+                              std::bind(EvaluatePatterns, _1,
+                                        &temp_score, &name,
+                                        &frames, &temp_decision));
 
+  int score = 0;
+  Decision decision;
   Plan::iterateAvailablePlans(CoreField(field), seq, seq.size() + 1,
                               std::bind(EvaluateUsual, _1, &score, &decision));
 
-  // NOTE: 今は名前が違うだけ
+  if (score < temp_score && !name.empty())
+    return DropDecision(temp_decision, "Template: " + name);
+
+  // NOTE: 今は message が違うだけ
   // 3 個以上おじゃまが来てたらカウンターしてみる
   if (attack_ && attack_->score >= SCORE_FOR_OJAMA * 3) {
     // TODO: Adjust |kAcceptablePuyo|.

@@ -2,23 +2,57 @@
 # '#' 以降はコメント
 
 NAME: GTR    # テンプレ名. テンプレ内の最初の行にすること.
-SCORE: 1000  # テンプレのスコア
-MAX: 10      # この個数以下の時しか評価対象にならない
-ABc...       # ':' がない行がフィールド.
-AABc..       # 大文字が評価対象ぷよ.
-BBcc..       # '.' や小文字は任意. '_'は強制空白.
+SCORE: 1300  # テンプレのスコア
+MAX: 15      # この個数以下の時しか評価対象にならない
+THRESH: 4    # この個数以上合わないと評価しない
+....BA       # ':' がない行がフィールド.
+...BAA       # 大文字が評価対象ぷよ.
+...CBB       # '.' や小文字は任意. '_'は強制空白.
 
-NAME: GTR-Begin1
-SCORE: 1500
+NAME: GTR-2
+SCORE: 1300
+MAX: 15
+THRESH: 4
+....BA
+...BAA
+...ABB
+
+NAME: Begin1
+SCORE: 1000
 MAX: 4
+THREASH: 4
 .AA...
 .BB...
 
-NAME: GTR-Begin2
-SCORE: 1500
+NAME: Begin2
+SCORE: 1000
 MAX: 4
+THREASH: 4
 ..C...
 ABB...
+
+NAME: Begin3
+SCORE: 1500
+MAX: 6
+THREASH: 6
+CAA...
+CBB...
+
+NAME: Begin4
+SCORE: 1000
+MAX: 4
+THREASH: 4
+CA....
+CB....
+
+NAME: GTR-Head
+SCORE: 1700
+MAX: 17
+.....A
+....DD
+....BA
+...BAA
+...CBB
 
 NAME: Shin-GTR
 SCORE: 1000
@@ -28,26 +62,12 @@ AAAB..
 BBB...
 
 NAME: GTR-Tail
-SCORE: 500
-MAX: 17
-abA...
-aabA..
-bbAA..
-
-NAME: GTR-Tail3
-SCORE: 800
-MAX: 19
-abA.B.
-aabAAA
-bbABBB
-
-NAME: GTR-Tail4
 SCORE: 1000
-MAX: 17
-....CC
-abACBC
-aabAAA
-bbABBB
+MAX: 19
+.CC...
+CBCA..
+AAA...
+BBBA..
 
 
 NAME: Zenkeshi
