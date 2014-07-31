@@ -21,17 +21,25 @@ namespace peria {
 namespace {
 
 // Score current field situation.
-int PatternMatch(const RefPlan& plan) {
+int PatternMatch(const RefPlan& plan, std::string* name) {
   int sum = 0;
+  int best = 0;
   for (const Pattern& pattern : Pattern::GetAllPattern()) {
-    sum += pattern.Match(plan.field());
+    int score = pattern.Match(plan.field());
+    sum += score;
+    if (score > best) {
+      best = score;
+      *name = pattern.name();
+    }
   }
   return sum;
 }
 
 typedef std::map<Decision, std::vector<int> > CandidateMap;
 
-void EvaluateUsual(const RefPlan& plan, CandidateMap* candidates) {
+void EvaluateUsual(const RefPlan& plan,
+                   int* best_score,
+                   Decision* decision) {
   int score = 0;
   if (plan.isRensaPlan()) {
     const RensaResult& result = plan.rensaResult();
@@ -42,12 +50,27 @@ void EvaluateUsual(const RefPlan& plan, CandidateMap* candidates) {
       score = result.score;
     }
   }
-  score = std::max(score, PatternMatch(plan) * 10);
 
-  const Decision& decision = plan.decisions().front();
-  if (candidates->find(decision) == candidates->end())
-    candidates->insert(std::make_pair(decision, std::vector<int>()));
-  (*candidates)[decision].push_back(score);
+  if (score > *best_score) {
+    *best_score = score;
+    *decision = plan.decisions().front();
+  }
+}
+
+void EvaluatePatterns(const RefPlan& plan,
+                      int* best_score,
+                      std::string* best_name,
+                      int* frames,
+                      Decision* decision) {
+  std::string name;
+  int score = PatternMatch(plan, &name);
+  if (score > *best_score ||
+      (score == *best_score && plan.rensaResult().frames < *frames)) {
+    *best_score = score;
+    *best_name = name;
+    *frames = plan.rensaResult().frames;
+    *decision = plan.decisions().front();
+  }
 }
 
 }  // namespace
@@ -76,43 +99,34 @@ DropDecision Ai::think(int frame_id,
   if (attack_ && attack_->end_frame_id < frame_id)
     attack_.reset();
 
-  CandidateMap candidates;
-  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size(),
-                              std::bind(EvaluateUsual, _1, &candidates));
+  int score = 0;
+  std::string name;
+  int frames = 1e+8;
+  Decision decision;
+  for (int n = 1; n <= seq.size(); ++n) {
+    // Check templates first with visible puyos.
+    Plan::iterateAvailablePlans(CoreField(field), seq, n,
+                                std::bind(EvaluatePatterns, _1,
+                                          &score, &name, &frames, &decision));
+    if (score > 0 && !name.empty())
+      return DropDecision(decision, "Template: " + name);
+  }
 
-  LOG(INFO) << "Candidates: " << candidates.size();
+  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size() + 1,
+                              std::bind(EvaluateUsual, _1, &score, &decision));
 
+  // NOTE: 今は名前が違うだけ
   // 3 個以上おじゃまが来てたらカウンターしてみる
   if (attack_ && attack_->score >= SCORE_FOR_OJAMA * 3) {
     // TODO: Adjust |kAcceptablePuyo|.
     // TODO: 受けられるかチェックする。
     const int kAcceptablePuyo = 3;
     int threshold = attack_->score - SCORE_FOR_OJAMA * kAcceptablePuyo;
-    for (const auto& candidate : candidates) {
-      const Decision decision = candidate.first;
-      const auto& scores = candidate.second;
-      int score = *std::max_element(scores.begin(), scores.end());
-
-      if (score < threshold)
-        continue;
-
+    if (threshold < score)
       return DropDecision(decision, "Counter");
-    }
   }
 
-  auto best_candidate = candidates.begin();
-  int best_avg = -1;
-  for (auto itr = candidates.begin(); itr != candidates.end(); ++itr) {
-    if (itr->second.empty())
-      continue;
-    int score = *std::max_element(itr->second.begin(), itr->second.end());
-    if (score >= best_avg) {
-      best_avg = score;
-      best_candidate = itr;
-    }
-  }
-
-  return DropDecision(best_candidate->first, "Normal");
+  return DropDecision(decision, "Normal");
 }
 
 void Ai::gameWillBegin(const FrameData& /*frame_data*/) {
