@@ -117,7 +117,7 @@ void evalConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
 template<typename ScoreCollector>
 void evalRestrictedConnectionHorizontalFeature(ScoreCollector* sc, const RefPlan& plan)
 {
-    EvaluationSparseFeatureKey keys[] = {
+    const EvaluationSparseFeatureKey keys[] = {
         SPARSE_INVALID,
         CONNECTION_HORIZONTAL_FROM_1,
         CONNECTION_HORIZONTAL_FROM_2,
