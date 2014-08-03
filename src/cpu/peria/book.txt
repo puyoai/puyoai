@@ -1,10 +1,76 @@
 # Template book
+# '#' 以降はコメント
 
-# NAME: name of template
-# SCORE: (int) score for the template
-# LIMIT: Upper bound of # of Puyos to apply the template.
-# ......  # Upper most line of the filed.  This shows all empty cells.
-# ABC...  #
-# AABC..  #
-# BBC...  # Bottom line is followed by an empty line.
+NAME: GTR    # テンプレ名. テンプレ内の最初の行にすること.
+SCORE: 1300  # テンプレのスコア
+MAX: 15      # この個数以下の時しか評価対象にならない
+THRESH: 4    # この個数以上合わないと評価しない
+....BA       # ':' がない行がフィールド.
+...BAA       # 大文字が評価対象ぷよ.
+...CBB       # '.' や小文字は任意. '_'は強制空白.
 
+NAME: GTR-2
+SCORE: 1300
+MAX: 15
+THRESH: 4
+....BA
+...BAA
+...ABB
+
+NAME: Begin1
+SCORE: 1000
+MAX: 4
+THREASH: 4
+.AA...
+.BB...
+
+NAME: Begin2
+SCORE: 1000
+MAX: 4
+THREASH: 4
+..C...
+ABB...
+
+NAME: Begin3
+SCORE: 1500
+MAX: 6
+THREASH: 6
+CAA...
+CBB...
+
+NAME: Begin4
+SCORE: 1000
+MAX: 4
+THREASH: 4
+CA....
+CB....
+
+NAME: GTR-Head
+SCORE: 1700
+MAX: 17
+.....A
+....DD
+....BA
+...BAA
+...CBB
+
+NAME: Shin-GTR
+SCORE: 1000
+MAX: 10
+..B...
+AAAB..
+BBB...
+
+NAME: GTR-Tail
+SCORE: 1000
+MAX: 19
+.CC...
+CBCA..
+AAA...
+BBBA..
+
+
+NAME: Zenkeshi
+SCORE: 99999
+MAX: 1
+______
