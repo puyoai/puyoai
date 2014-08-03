@@ -5,8 +5,8 @@
 
 #include <algorithm>
 #include <functional>  // C++11
+#include <map>
 #include <sstream>
-#include <tuple>  // C++11
 #include <vector>
 
 #include "core/algorithm/plan.h"
@@ -21,17 +21,27 @@ namespace peria {
 namespace {
 
 // Score current field situation.
-int PatternMatch(const RefPlan& plan) {
+int PatternMatch(const RefPlan& plan, std::string* name) {
   int sum = 0;
+  int best = 0;
   for (const Pattern& pattern : Pattern::GetAllPattern()) {
-    sum += pattern.Match(plan.field());
+    int score = pattern.Match(plan.field());
+    sum += score;
+    if (score > best) {
+      std::ostringstream oss;
+      best = score;
+      oss << pattern.name() << " " << score << "/" << pattern.score();
+      *name = oss.str();
+    }
   }
   return sum;
 }
 
-typedef std::tuple<int, bool, Decision> Candidate;
+typedef std::map<Decision, std::vector<int> > CandidateMap;
 
-void EvaluateUsual(const RefPlan& plan, std::vector<Candidate>* candidates) {
+void EvaluateUsual(const RefPlan& plan,
+                   int* best_score,
+                   Decision* decision) {
   int score = 0;
   if (plan.isRensaPlan()) {
     const RensaResult& result = plan.rensaResult();
@@ -41,11 +51,28 @@ void EvaluateUsual(const RefPlan& plan, std::vector<Candidate>* candidates) {
     } else {
       score = result.score;
     }
-  } else {
-    score = PatternMatch(plan);
   }
 
-  candidates->push_back(std::make_tuple(score, plan.isRensaPlan(), plan.decisions().front()));
+  if (score > *best_score) {
+    *best_score = score;
+    *decision = plan.decisions().front();
+  }
+}
+
+void EvaluatePatterns(const RefPlan& plan,
+                      int* best_score,
+                      std::string* best_name,
+                      int* frames,
+                      Decision* decision) {
+  std::string name;
+  int score = PatternMatch(plan, &name);
+  if (score > *best_score ||
+      (score == *best_score && plan.rensaResult().frames < *frames)) {
+    *best_score = score;
+    *best_name = name;
+    *frames = plan.rensaResult().frames;
+    *decision = plan.decisions().front();
+  }
 }
 
 }  // namespace
@@ -74,39 +101,37 @@ DropDecision Ai::think(int frame_id,
   if (attack_ && attack_->end_frame_id < frame_id)
     attack_.reset();
 
-  std::vector<Candidate> candidates;
-  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size() + 1,
-                              std::bind(EvaluateUsual, _1, &candidates));
-  std::sort(candidates.begin(), candidates.end());
-  LOG(INFO) << "Candidates: " << candidates.size();
 
+  // Check templates first with visible puyos.
+  int temp_score = 0;
+  std::string name;
+  int frames = 1e+8;
+  Decision temp_decision;
+  Plan::iterateAvailablePlans(CoreField(field), seq, 2,
+                              std::bind(EvaluatePatterns, _1,
+                                        &temp_score, &name,
+                                        &frames, &temp_decision));
+
+  int score = 0;
+  Decision decision;
+  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size() + 1,
+                              std::bind(EvaluateUsual, _1, &score, &decision));
+
+  if (score < temp_score && !name.empty())
+    return DropDecision(temp_decision, "Template: " + name);
+
+  // NOTE: 今は message が違うだけ
   // 3 個以上おじゃまが来てたらカウンターしてみる
   if (attack_ && attack_->score >= SCORE_FOR_OJAMA * 3) {
     // TODO: Adjust |kAcceptablePuyo|.
     // TODO: 受けられるかチェックする。
     const int kAcceptablePuyo = 3;
     int threshold = attack_->score - SCORE_FOR_OJAMA * kAcceptablePuyo;
-    for (const auto& candidate : candidates) {
-      int score = std::get<0>(candidate);
-      if (score < threshold)
-        continue;
-
-      if (std::get<1>(candidate)) {
-        const Decision& decision = std::get<2>(candidate);
-        message << "SCORE:" << score
-                << "_TO_COUNTER:" << attack_->score;
-        return DropDecision(decision, message.str());
-      }
-    }
+    if (threshold < score)
+      return DropDecision(decision, "Counter");
   }
 
-  // TODO: Introduce Random class.
-  const Candidate& cand = candidates[candidates.size() * 2 / 3];
-  int score = std::get<0>(cand);
-  message << "SCORE:" << score;
-  if (std::get<1>(cand))
-    message << "_FIRE";
-  return DropDecision(std::get<2>(cand), message.str());
+  return DropDecision(decision, "Normal");
 }
 
 void Ai::gameWillBegin(const FrameData& /*frame_data*/) {
