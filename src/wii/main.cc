@@ -33,15 +33,15 @@ int main(int argc, char* argv[])
     signal(SIGPIPE, SIG_IGN);
 
     if (argc < 4) {
-        fprintf(stderr, "Usage: %s <serial> <1p> <2p>\n", argv[0]);
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "Usage: %s [option] <serial> <1p> <2p>\n", argv[0]);
+        return EXIT_FAILURE;
     }
 
     SDL_Init(SDL_INIT_VIDEO);
     atexit(SDL_Quit);
 
-    SomagicSource source("connect");
-    SomagicAnalyzer analyzer;
+    unique_ptr<SomagicSource> source(new SomagicSource("connect"));
+    unique_ptr<SomagicAnalyzer> analyzer(new SomagicAnalyzer);
 
     unique_ptr<KeySender> keySender;
     if (string(argv[1]) == "stdout") {
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     } else {
         keySender.reset(new SerialKeySender(argv[1]));
     }
-    CHECK(source.ok());
+    CHECK(source->ok());
 
     unique_ptr<ScreenShotSaver> saver;
     if (FLAGS_save_screenshot) {
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         saver->setDrawsFrameId(true);
     }
 
-    WiiConnectServer server(&source, &analyzer, keySender.get(), argv[2], argv[3]);
+    WiiConnectServer server(source.get(), analyzer.get(), keySender.get(), argv[2], argv[3]);
 
     unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;
     if (FLAGS_draw_result)
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
     if (analyzerResultDrawer.get())
         mainWindow.addDrawer(analyzerResultDrawer.get());
 
-    source.start();
+    source->start();
     server.start();
 
     mainWindow.runMainLoop();
