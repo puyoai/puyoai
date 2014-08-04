@@ -13,6 +13,7 @@
 #include "capture/screen_shot_saver.h"
 #include "capture/somagic_analyzer.h"
 #include "capture/somagic_source.h"
+#include "capture/movie_source.h"
 #include "core/server/connector/connector_manager_linux.h"
 #include "gui/main_window.h"
 #include "wii/serial_key_sender.h"
@@ -23,6 +24,25 @@ using namespace std;
 
 DEFINE_bool(save_screenshot, false, "save screenshot");
 DEFINE_bool(draw_result, true, "draw analyzer result");
+DEFINE_string(source, "somagic",
+              "set image source. 'somagic' when using somagic video capture."
+              " filename if you'd like to use movie.");
+
+static unique_ptr<Source> makeVideoSource()
+{
+    if (FLAGS_source == "somagic")
+        return unique_ptr<Source>(new SomagicSource("connect"));
+
+    unique_ptr<Source> source(new MovieSource(FLAGS_source));
+    CHECK(source->ok());
+
+    return source;
+}
+
+static unique_ptr<Analyzer> makeVideoAnalyzer()
+{
+    return unique_ptr<Analyzer>(new SomagicAnalyzer);
+}
 
 int main(int argc, char* argv[])
 {
@@ -40,8 +60,8 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO);
     atexit(SDL_Quit);
 
-    unique_ptr<SomagicSource> source(new SomagicSource("connect"));
-    unique_ptr<SomagicAnalyzer> analyzer(new SomagicAnalyzer);
+    unique_ptr<Source> source = makeVideoSource();
+    unique_ptr<Analyzer> analyzer = makeVideoAnalyzer();
 
     unique_ptr<KeySender> keySender;
     if (string(argv[1]) == "stdout") {

@@ -21,7 +21,7 @@ public:
 
     virtual UniqueSDLSurface getNextFrame() OVERRIDE;
 
-    bool start();
+    virtual bool start() override;
 
     // Sets the current image. This is YUV422 format.
     // each line has 1440 bytes. Maybe 480 lines. (interlace)
