@@ -2,6 +2,9 @@
 #define CAPTURE_MOVIE_SOURCE_H_
 
 #include <stdint.h>
+
+#include <string>
+
 #include <SDL.h>
 
 extern "C" {
@@ -15,6 +18,9 @@ extern "C" {
 class MovieSource : public Source {
 public:
     explicit MovieSource(const char* filename);
+    explicit MovieSource(const std::string& filename) :
+        MovieSource(filename.c_str()) {}
+
     virtual ~MovieSource();
 
     virtual UniqueSDLSurface getNextFrame();

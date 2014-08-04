@@ -17,6 +17,7 @@ public:
 
     bool ok() const { return ok_; }
 
+    virtual bool start() { return true; }
     bool done() const { return done_; }
     void end() { done_ = true; }
 
