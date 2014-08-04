@@ -38,48 +38,45 @@ int main(int argc, char* argv[])
     }
 
     SDL_Init(SDL_INIT_VIDEO);
+    atexit(SDL_Quit);
 
-    {
-        SomagicSource source("connect");
-        SomagicAnalyzer analyzer;
+    SomagicSource source("connect");
+    SomagicAnalyzer analyzer;
 
-        unique_ptr<KeySender> keySender;
-        if (string(argv[1]) == "stdout") {
-            keySender.reset(new StdoutKeySender);
-        } else {
-            keySender.reset(new SerialKeySender(argv[1]));
-        }
-        CHECK(source.ok());
+    unique_ptr<KeySender> keySender;
+    if (string(argv[1]) == "stdout") {
+        keySender.reset(new StdoutKeySender);
+    } else {
+        keySender.reset(new SerialKeySender(argv[1]));
+    }
+    CHECK(source.ok());
 
-        unique_ptr<ScreenShotSaver> saver;
-        if (FLAGS_save_screenshot) {
-            cout << "save screenshot: on" << endl;
-            saver.reset(new ScreenShotSaver);
-            saver->setDrawsFrameId(true);
-        }
-
-        WiiConnectServer server(&source, &analyzer, keySender.get(), argv[2], argv[3]);
-
-        unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;
-        if (FLAGS_draw_result)
-            analyzerResultDrawer.reset(new AnalyzerResultDrawer(&server));
-
-        MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
-        mainWindow.addDrawer(&server);
-        if (saver.get())
-            mainWindow.addDrawer(saver.get());
-        if (analyzerResultDrawer.get())
-            mainWindow.addDrawer(analyzerResultDrawer.get());
-
-        source.start();
-        server.start();
-
-        mainWindow.runMainLoop();
-
-        server.stop();
+    unique_ptr<ScreenShotSaver> saver;
+    if (FLAGS_save_screenshot) {
+        cout << "save screenshot: on" << endl;
+        saver.reset(new ScreenShotSaver);
+        saver->setDrawsFrameId(true);
     }
 
-    SDL_Quit();
+    WiiConnectServer server(&source, &analyzer, keySender.get(), argv[2], argv[3]);
+
+    unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;
+    if (FLAGS_draw_result)
+        analyzerResultDrawer.reset(new AnalyzerResultDrawer(&server));
+
+    MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
+    mainWindow.addDrawer(&server);
+    if (saver.get())
+        mainWindow.addDrawer(saver.get());
+    if (analyzerResultDrawer.get())
+        mainWindow.addDrawer(analyzerResultDrawer.get());
+
+    source.start();
+    server.start();
+
+    mainWindow.runMainLoop();
+
+    server.stop();
 
     return 0;
 }
