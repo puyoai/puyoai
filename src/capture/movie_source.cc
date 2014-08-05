@@ -122,7 +122,7 @@ UniqueSDLSurface MovieSource::getNextFrame() {
     // Wait until next frame.
     Uint32 currentTime = SDL_GetTicks();
     Uint32 elapsed = currentTime - lastTaken_;
-    if (elapsed < 1000 / fps_) {
+    if (static_cast<int>(elapsed) < 1000 / fps_) {
         int d = 1000 / fps_ - elapsed;
         SDL_Delay(d);
         Uint32 hoge = SDL_GetTicks();
