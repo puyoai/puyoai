@@ -11,24 +11,19 @@ class ColumnPuyoList;
 class PuyoSet {
 public:
     PuyoSet() :
-        m_red(0),
-        m_blue(0),
-        m_yellow(0),
-        m_green(0)
+        red_(0),
+        blue_(0),
+        yellow_(0),
+        green_(0)
     {
     }
 
     PuyoSet(int red, int blue, int yellow, int green)
     {
-        DCHECK(0 <= red && red < 16);
-        DCHECK(0 <= blue && blue < 16);
-        DCHECK(0 <= yellow && yellow < 16);
-        DCHECK(0 <= green && green < 16);
-
-        m_red = red;
-        m_blue = blue;
-        m_yellow = yellow;
-        m_green = green;
+        red_ = red;
+        blue_ = blue;
+        yellow_ = yellow;
+        green_ = green;
     }
 
     std::string toString() const
@@ -39,49 +34,45 @@ public:
         return buf;
     }
 
-    int count() const { return m_red + m_blue + m_yellow + m_green; }
+    int count() const { return red_ + blue_ + yellow_ + green_; }
 
-    int red() const { return m_red; }
-    int blue() const { return m_blue; }
-    int yellow() const { return m_yellow; }
-    int green() const { return m_green; }
+    int red() const { return red_; }
+    int blue() const { return blue_; }
+    int yellow() const { return yellow_; }
+    int green() const { return green_; }
 
     void add(const ColumnPuyoList&);
 
     void add(PuyoSet set)
     {
-        m_red += set.m_red;
-        m_blue += set.m_blue;
-        m_yellow += set.m_yellow;
-        m_green += set.m_green;
+        red_ += set.red_;
+        blue_ += set.blue_;
+        yellow_ += set.yellow_;
+        green_ += set.green_;
     }
 
     void sub(PuyoSet set)
     {
-        m_red = m_red < set.m_red ? 0 : m_red - set.m_red;
-        m_blue = m_blue < set.m_blue ? 0 : m_blue - set.m_blue;
-        m_yellow = m_yellow < set.m_yellow ? 0 : m_yellow - set.m_yellow;
-        m_green = m_green < set.m_green ? 0 : m_green - set.m_green;
+        red_ = red_ < set.red_ ? 0 : red_ - set.red_;
+        blue_ = blue_ < set.blue_ ? 0 : blue_ - set.blue_;
+        yellow_ = yellow_ < set.yellow_ ? 0 : yellow_ - set.yellow_;
+        green_ = green_ < set.green_ ? 0 : green_ - set.green_;
     }
 
     void add(PuyoColor c, int n = 1)
     {
         switch (c) {
         case PuyoColor::RED:
-            DCHECK(m_red + n < 16);
-            m_red += n;
+            red_ += n;
             break;
         case PuyoColor::BLUE:
-            DCHECK(m_blue + n < 16);
-            m_blue += n;
+            blue_ += n;
             break;
         case PuyoColor::YELLOW:
-            DCHECK(m_yellow + n < 16);
-            m_yellow += n;
+            yellow_ += n;
             break;
         case PuyoColor::GREEN:
-            DCHECK(m_green + n < 16);
-            m_green += n;
+            green_ += n;
             break;
         default:
             DCHECK(false);
@@ -106,13 +97,13 @@ public:
 private:
     int toInt() const
     {
-        return m_red | (m_blue << 4) | (m_yellow << 8) | (m_green << 12);
+        return red_ | (blue_ << 4) | (yellow_ << 8) | (green_ << 12);
     }
 
-    int m_red;
-    int m_blue;
-    int m_yellow;
-    int m_green;
+    int red_;
+    int blue_;
+    int yellow_;
+    int green_;
 };
 
 #endif

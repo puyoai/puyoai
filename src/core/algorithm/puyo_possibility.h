@@ -16,11 +16,12 @@ public:
     static double possibility(int k, int a, int b, int c, int d)
     {
         DCHECK(s_initialized) << "TsumoPossibility is not initialized.";
-        DCHECK(0 <= k && k < MAX_K);
-        DCHECK(0 <= a && a < MAX_N);
-        DCHECK(0 <= b && b < MAX_N);
-        DCHECK(0 <= c && c < MAX_N);
-        DCHECK(0 <= d && d < MAX_N);
+        DCHECK(0 <= k && k < MAX_K) << k;
+
+        a = std::min(a, MAX_N - 1);
+        b = std::min(b, MAX_N - 1);
+        c = std::min(c, MAX_N - 1);
+        d = std::min(d, MAX_N - 1);
 
         return s_possibility[k][a][b][c][d];
     }
