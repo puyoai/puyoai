@@ -10,20 +10,16 @@ class ColumnPuyoList;
 
 class PuyoSet {
 public:
-    PuyoSet() :
-        red_(0),
-        blue_(0),
-        yellow_(0),
-        green_(0)
+    PuyoSet() : PuyoSet(0, 0, 0, 0)
     {
     }
 
-    PuyoSet(int red, int blue, int yellow, int green)
+    PuyoSet(int red, int blue, int yellow, int green) :
+        red_(red),
+        blue_(blue),
+        yellow_(yellow),
+        green_(green)
     {
-        red_ = red;
-        blue_ = blue;
-        yellow_ = yellow;
-        green_ = green;
     }
 
     std::string toString() const
@@ -43,7 +39,7 @@ public:
 
     void add(const ColumnPuyoList&);
 
-    void add(PuyoSet set)
+    void add(const PuyoSet& set)
     {
         red_ += set.red_;
         blue_ += set.blue_;
@@ -51,7 +47,7 @@ public:
         green_ += set.green_;
     }
 
-    void sub(PuyoSet set)
+    void sub(const PuyoSet& set)
     {
         red_ = red_ < set.red_ ? 0 : red_ - set.red_;
         blue_ = blue_ < set.blue_ ? 0 : blue_ - set.blue_;
@@ -81,29 +77,33 @@ public:
 
     friend bool operator<(const PuyoSet& lhs, const PuyoSet& rhs)
     {
-        return lhs.toInt() < rhs.toInt();
+        if (lhs.red_ != rhs.red_)
+            return lhs.red_ < rhs.red_;
+        if (lhs.blue_ != rhs.blue_)
+            return lhs.blue_ < rhs.blue_;
+        if (lhs.yellow_ != rhs.yellow_)
+            return lhs.yellow_ < rhs.yellow_;
+        return lhs.green_ < rhs.green_;
     }
 
     friend bool operator==(const PuyoSet& lhs, const PuyoSet& rhs)
     {
-        return lhs.toInt() == rhs.toInt();
+        return lhs.red_ == rhs.red_ &&
+            lhs.blue_ == rhs.blue_ &&
+            lhs.yellow_ == rhs.yellow_ &&
+            lhs.green_ == rhs.green_;
     }
 
     friend bool operator!=(const PuyoSet& lhs, const PuyoSet& rhs)
     {
-        return lhs.toInt() != rhs.toInt();
+        return !(lhs == rhs);
     }
 
 private:
-    int toInt() const
-    {
-        return red_ | (blue_ << 4) | (yellow_ << 8) | (green_ << 12);
-    }
-
-    int red_;
-    int blue_;
-    int yellow_;
-    int green_;
+    int red_ = 0;
+    int blue_ = 0;
+    int yellow_ = 0;
+    int green_ = 0;
 };
 
 #endif
