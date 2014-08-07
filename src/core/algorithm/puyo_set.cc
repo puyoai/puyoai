@@ -7,6 +7,6 @@ using namespace std;
 void PuyoSet::add(const ColumnPuyoList& list)
 {
     for (const auto& p : list) {
-        add(p.color, p.x);
+        add(p.color);
     }
 }
