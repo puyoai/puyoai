@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "core/algorithm/column_puyo_list.h"
+
 TEST(PuyoSetTest, ctor)
 {
     PuyoSet set1;
@@ -76,3 +78,19 @@ TEST(PuyoSetTest, subPuyoSet)
     EXPECT_EQ(2, set1.green());
 }
 
+TEST(PuyoSetTest, addColumnPuyoList)
+{
+    ColumnPuyoList cpl;
+    cpl.addPuyo(1, PuyoColor::RED);
+    cpl.addPuyo(1, PuyoColor::YELLOW);
+    cpl.addPuyo(2, PuyoColor::RED);
+    cpl.addPuyo(3, PuyoColor::RED);
+
+    PuyoSet set;
+    set.add(cpl);
+
+    EXPECT_EQ(3, set.red());
+    EXPECT_EQ(0, set.blue());
+    EXPECT_EQ(1, set.yellow());
+    EXPECT_EQ(0, set.green());
+}
