@@ -17,9 +17,11 @@ struct DecisionSending {
     bool hasGrounded = false;
 };
 
-AI::AI(const string& name) :
+AI::AI(int argc, char* argv[], const string& name) :
     name_(name)
 {
+    UNUSED_VARIABLE(argc);
+    UNUSED_VARIABLE(argv);
 }
 
 void AI::runLoop()

@@ -24,7 +24,7 @@ public:
     static const int DEFAULT_NUM_ITERATION = 3;
     static const int FAST_NUM_ITERATION = 1;
 
-    MayahAI();
+    MayahAI(int argc, char* argv[]);
     ~MayahAI();
 
     virtual void gameWillBegin(const FrameData&) OVERRIDE;

@@ -12,11 +12,19 @@
 
 using namespace std;
 
+unique_ptr<MayahAI> makeAI()
+{
+    int argc = 1;
+    char arg[] = "mayah";
+    char* argv[] = {arg};
+    return unique_ptr<MayahAI>(new MayahAI(argc, argv));
+}
+
 TEST(MayahAIPerformanceTest, depth3_iter1)
 {
     TsumoPossibility::initialize();
 
-    MayahAI ai;
+    unique_ptr<MayahAI> ai(makeAI());
     int frameId = 1;
     CoreField cf;
     KumipuyoSeq kumipuyoSeq("RRGG");
@@ -25,7 +33,7 @@ TEST(MayahAIPerformanceTest, depth3_iter1)
 
     for (int i = 0; i < 3; ++i) {
         Tsc tsc("depth3_iter1");
-        (void)ai.thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
+        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
     }
 
     double average, variance;
@@ -38,7 +46,7 @@ TEST(MayahAIPerformanceTest, depth2_iter2)
 {
     TsumoPossibility::initialize();
 
-    MayahAI ai;
+    unique_ptr<MayahAI> ai(makeAI());
     int frameId = 1;
     CoreField cf;
     KumipuyoSeq kumipuyoSeq("RRGG");
@@ -47,7 +55,7 @@ TEST(MayahAIPerformanceTest, depth2_iter2)
 
     for (int i = 0; i < 3; ++i) {
         Tsc tsc("depth2_iter2");
-        (void)ai.thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
+        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
     }
 
     double average, variance;
@@ -60,7 +68,7 @@ TEST(MayahAIPerformanceTest, depth2_iter3)
 {
     TsumoPossibility::initialize();
 
-    MayahAI ai;
+    unique_ptr<MayahAI> ai(makeAI());
     int frameId = 1;
     CoreField cf;
     KumipuyoSeq kumipuyoSeq("RRGG");
@@ -69,7 +77,7 @@ TEST(MayahAIPerformanceTest, depth2_iter3)
 
     for (int i = 0; i < 3; ++i) {
         Tsc tsc("depth2_iter3");
-        (void)ai.thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
+        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
     }
 
     double average, variance;

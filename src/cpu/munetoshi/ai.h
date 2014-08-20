@@ -8,7 +8,7 @@ namespace munetoshi {
 
 class AI : public ::AI {
  public:
-  AI();
+  AI(int argc, char* argv[]);
   virtual ~AI() = default;
 
   DropDecision think(int frame_id, const PlainField& field,
