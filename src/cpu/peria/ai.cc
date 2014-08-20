@@ -88,7 +88,7 @@ struct Ai::Attack {
 // - Make patterns for JOSEKI.
 // --- May be good to score all JOSEKI patterns and evaluate with $\sum score^2$
 
-Ai::Ai(): ::AI("peria") {}
+Ai::Ai(int argc, char* argv[]): ::AI(argc, argv, "peria") {}
 
 Ai::~Ai() {}
 
@@ -97,7 +97,7 @@ DropDecision Ai::think(int frame_id,
 		       const KumipuyoSeq& seq) {
   using namespace std::placeholders;
   std::ostringstream message;
-  
+
   if (attack_ && attack_->end_frame_id < frame_id)
     attack_.reset();
 

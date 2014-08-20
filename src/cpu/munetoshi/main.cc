@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   google::InstallFailureSignalHandler();
 
-  munetoshi::AI().runLoop();
+  munetoshi::AI(argc, argv).runLoop();
 
   return 0;
 }

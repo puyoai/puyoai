@@ -7,7 +7,7 @@
 
 class SampleSuicideAI : public AI {
 public:
-    SampleSuicideAI() : AI("sample-suicide") {}
+    SampleSuicideAI(int argc, char* argv[]) : AI(argc, argv, "sample-suicide") {}
     virtual ~SampleSuicideAI() {}
 
     virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) override
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    SampleSuicideAI().runLoop();
+    SampleSuicideAI(argc, argv).runLoop();
 
     return 0;
 }

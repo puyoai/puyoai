@@ -6,6 +6,14 @@
 
 using namespace std;
 
+unique_ptr<MayahAI> makeAI()
+{
+    int argc = 1;
+    char arg[] = "mayah";
+    char* argv[] = {arg};
+    return unique_ptr<MayahAI>(new MayahAI(argc, argv));
+}
+
 TEST(MayahAITest, DontCrash1)
 {
     TsumoPossibility::initialize();
@@ -26,9 +34,9 @@ TEST(MayahAITest, DontCrash1)
         "BBBRRB");
     KumipuyoSeq seq("GGRG");
 
-    MayahAI ai;
-    ai.initializeGazerForTest(1);
-    (void)ai.think(1, f, seq);
+    auto ai = makeAI();
+    ai->initializeGazerForTest(1);
+    (void)ai->think(1, f, seq);
 }
 
 TEST(MayahAITest, DontCrash2)
@@ -52,9 +60,9 @@ TEST(MayahAITest, DontCrash2)
         "YRYGYB");
     KumipuyoSeq seq("YYRG");
 
-    MayahAI ai;
-    ai.initializeGazerForTest(1);
-    (void)ai.think(1, f, seq);
+    auto ai = makeAI();
+    ai->initializeGazerForTest(1);
+    (void)ai->think(1, f, seq);
 }
 
 TEST(MayahAITest, DontCrash3)
@@ -78,7 +86,7 @@ TEST(MayahAITest, DontCrash3)
 
     KumipuyoSeq seq("RYRR");
 
-    MayahAI ai;
-    ai.initializeGazerForTest(1);
-    (void)ai.think(1, f, seq);
+    auto ai = makeAI();
+    ai->initializeGazerForTest(1);
+    (void)ai->think(1, f, seq);
 }

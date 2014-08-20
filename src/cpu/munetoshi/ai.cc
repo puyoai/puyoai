@@ -10,7 +10,9 @@
 #include "core/field/core_field.h"
 #include "core/field/rensa_result.h"
 
-munetoshi::AI::AI() : ::AI("munetoshi") { strategy = GROW; }
+munetoshi::AI::AI(int argc, char* argv[]) : ::AI(argc, argv, "munetoshi") {
+  strategy = GROW;
+}
 
 void munetoshi::AI::gameWillBegin(const FrameData& frame) {
   UNUSED_VARIABLE(frame);

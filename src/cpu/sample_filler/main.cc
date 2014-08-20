@@ -11,7 +11,7 @@ using namespace std;
 
 class SampleFillerAI : public AI {
 public:
-    SampleFillerAI() : AI("sample-filler") {}
+    SampleFillerAI(int argc, char* argv[]) : AI(argc, argv, "sample-filler") {}
     virtual ~SampleFillerAI() {}
 
     virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) override
@@ -50,7 +50,6 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    SampleFillerAI().runLoop();
-
+    SampleFillerAI(argc, argv).runLoop();
     return 0;
 }

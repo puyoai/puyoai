@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
     LOG(INFO) << "Failed in loading " << FLAGS_pattern;
   }
 
-  peria::Ai().runLoop();
+  peria::Ai(argc, argv).runLoop();
 
   return 0;
 }

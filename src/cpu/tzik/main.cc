@@ -9,7 +9,7 @@
 
 namespace tzik {
 
-AI::AI() : ::AI("tzik") {}
+AI::AI(int argc, char** argv) : ::AI(argc, argv, "tzik") {}
 
 DropDecision AI::think(int frame_id,
                        const PlainField& field,
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    tzik::AI().runLoop();
+    tzik::AI(argc, argv).runLoop();
 
     return 0;
 }

@@ -7,7 +7,7 @@
 
 class AIRoutine : public AI {
 public:
-    AIRoutine() : AI("sample") {}
+    AIRoutine(int argc, char* argv[]) : AI(argc, argv, "sample") {}
     virtual ~AIRoutine() {}
 
     virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) OVERRIDE {
@@ -41,8 +41,6 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    AIRoutine ai;
-    ai.runLoop();
-
+    AIRoutine(argc, argv).runLoop();
     return 0;
 }

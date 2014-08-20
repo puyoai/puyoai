@@ -2,7 +2,7 @@
 # GTR
 
 NAME: GTR
-SCORE: 10.2
+SCORE: 10.15
 BA....
 BBA...
 AA....
@@ -188,7 +188,7 @@ COMBINE: GTR GTR2-HEAD GTR2-TAIL
 #
 
 NAME: NEWGTR
-SCORE: 10.3
+SCORE: 10.15
 ......
 ..A...
 BBBA..

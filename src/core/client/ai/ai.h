@@ -20,7 +20,7 @@ public:
     void runLoop();
 
 protected:
-    explicit AI(const std::string& name);
+    explicit AI(int argc, char* argv[], const std::string& name);
 
     // gameWillBegin will be called just before a new game will begin.
     // FrameData will contain NEXT and NEXT2 puyos.

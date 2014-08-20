@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    MayahAI().runLoop();
+    MayahAI(argc, argv).runLoop();
 
     return 0;
 }

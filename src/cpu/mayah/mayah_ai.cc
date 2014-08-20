@@ -23,8 +23,8 @@ DEFINE_bool(log_max_score, false, "log max score to stderr");
 
 using namespace std;
 
-MayahAI::MayahAI() :
-    AI("mayah")
+MayahAI::MayahAI(int argc, char* argv[]) :
+    AI(argc, argv, "mayah")
 {
     featureParameter_.reset(new FeatureParameter(FLAGS_feature));
     books_ = BookReader::parse(FLAGS_book);

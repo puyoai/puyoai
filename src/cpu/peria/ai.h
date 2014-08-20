@@ -10,7 +10,7 @@ namespace peria {
 
 class Ai : public ::AI {
  public:
-  Ai();
+  Ai(int argc, char* argv[]);
   virtual ~Ai();
 
  protected:

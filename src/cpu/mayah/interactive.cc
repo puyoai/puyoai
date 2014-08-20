@@ -27,6 +27,8 @@ using namespace std;
 
 class InteractiveAI : public MayahAI {
 public:
+    InteractiveAI(int argc, char* argv[]) : MayahAI(argc, argv) {}
+
     using MayahAI::gameWillBegin;
     using MayahAI::think;
     using MayahAI::enemyNext2Appeared;
@@ -73,7 +75,7 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    InteractiveAI ai;
+    InteractiveAI ai(argc, argv);
 
     CoreField field;
     KumipuyoSeq seq = generateSequence();

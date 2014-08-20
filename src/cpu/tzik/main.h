@@ -7,7 +7,7 @@ namespace tzik {
 
 class AI final : public ::AI {
  public:
-  AI();
+  AI(int argc, char** argv);
   virtual ~AI() = default;
 
   DropDecision think(int frame_id,

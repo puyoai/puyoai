@@ -7,7 +7,7 @@
 
 class SampleRensaAI : public AI {
 public:
-    SampleRensaAI() : AI("sample_rensa") {}
+    SampleRensaAI(int argc, char* argv[]) : AI(argc, argv, "sample_rensa") {}
     virtual ~SampleRensaAI() {}
 
     virtual DropDecision thinkFast(int frameId, const PlainField& f, const KumipuyoSeq& seq) OVERRIDE
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    SampleRensaAI().runLoop();
+    SampleRensaAI(argc, argv).runLoop();
 
     return 0;
 }
