@@ -168,7 +168,7 @@ function init() {
     document.getElementById('player-fields').appendChild(ojama1);
     document.getElementById('player-fields').appendChild(ojama2);
 
-    setTimeout(function() {
+    setInterval(function() {
         loadData();
     }, 10);
 }
@@ -225,8 +225,4 @@ function displayGameState(json) {
     setOjama(document.getElementById('ojama-2'), json.o2);
     // p2 set message
     setMessage(document.getElementById('player2-message'), json.m2);
-
-    setTimeout(function() {
-        loadData();
-    }, 10);
 }
