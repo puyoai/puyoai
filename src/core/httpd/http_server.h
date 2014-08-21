@@ -41,6 +41,9 @@ public:
     // Don't take ownership of HttpHandler. HttpHandler should be alive during HttpServer is alive.
     void installHandler(const std::string& path, HttpHandler*);
 
+    // When no handler is matched, we get the content of this path.
+    void setAssetDirectory(const std::string& path);
+
 private:
     static int accessHandler(void* cls, struct MHD_Connection* connection,
                              const char* url, const char* method, const char* version,
@@ -49,6 +52,7 @@ private:
     int port_;
     struct MHD_Daemon* httpd_;
     std::unordered_map<std::string, HttpHandler*> handlers_;
+    std::string assetDirPath_;
 };
 
 #endif

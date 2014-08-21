@@ -10,6 +10,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "base/path.h"
 #include "core/httpd/http_server.h"
 #include "core/server/connector/human_connector.h"
 #include "core/server/connector/connector_manager_linux.h"
@@ -41,6 +42,7 @@ DEFINE_string(record, "", "use Puyofu Recorder. 'transition' for transition log,
 #ifdef USE_HTTPD
 DEFINE_bool(httpd, false, "use httpd");
 DEFINE_int32(port, 8000, "httpd port");
+DECLARE_string(data_dir);
 #endif
 
 #ifdef USE_SDL2
@@ -120,7 +122,9 @@ int main(int argc, char* argv[])
     if (FLAGS_httpd) {
         gameStateHandler.reset(new GameStateHandler);
         httpServer.reset(new HttpServer(FLAGS_port));
+
         httpServer->installHandler("/data", gameStateHandler.get());
+        httpServer->setAssetDirectory(joinPath(FLAGS_data_dir, "assets"));
     }
 #endif
 
