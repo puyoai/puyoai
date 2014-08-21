@@ -8,19 +8,9 @@
 #include <microhttpd.h>
 
 #include "base/base.h"
-
-DECLARE_string(data_dir);
+#include "base/path.h"
 
 using namespace std;
-
-static string joinPath(const string& lhs, const string& rhs)
-{
-    string s = lhs + "/" + rhs;
-    char* x = realpath(s.c_str(), nullptr);
-    string result(x);
-    free(x);
-    return result;
-}
 
 static bool readContent(const string& filename, string* s)
 {
@@ -79,23 +69,20 @@ int HttpServer::accessHandler(void* cls, struct MHD_Connection* connection,
 
     LOG(INFO) << "access: " << url;
 
+    // Check normal handlers.
     auto it = server->handlers_.find(url);
     if (it != server->handlers_.end())
         return handleHandler(connection, it->second);
 
-    // TODO(mayah): Need to write Handler instead of these.
-    if (strcmp(url, "/") == 0)
-        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/index.html"));
-    if (strcmp(url, "/puyo.js") == 0)
-        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/puyo.js"));
-    if (strcmp(url, "/puyo.css") == 0)
-        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/puyo.css"));
-    if (strcmp(url, "/puyo.png") == 0)
-        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/puyo.png"));
-    if (strcmp(url, "/yokoku.png") == 0)
-        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/yokoku.png"));
-    if (strcmp(url, "/background.png") == 0)
-        return assetsHandler(connection, joinPath(FLAGS_data_dir, "assets/background.png"));
+    // Check assets handlers.
+    string path = joinPath(server->assetDirPath_, url);
+    // Check path has the prefix |server->assetDirPath_| not to allow directory listing attack.
+    if (isPrefix(path, server->assetDirPath_)) {
+        // When directory, we try to access index.html instead.
+        if (isDirectory(path))
+            return assetsHandler(connection, joinPath(path, "index.html"));
+        return assetsHandler(connection, path);
+    }
 
     return notFoundHandler(connection);
 }
@@ -126,6 +113,19 @@ void HttpServer::stop()
     MHD_stop_daemon(httpd_);
 }
 
+void HttpServer::setAssetDirectory(const string& path)
+{
+    // Needs to check with realpath.
+    char* x = realpath(path.c_str(), nullptr);
+    if (!x) {
+        assetDirPath_ = "";
+        return;
+    }
+
+    assetDirPath_ = x;
+    free(x);
+}
+
 void HttpServer::installHandler(const string& path, HttpHandler* handler)
 {
     DCHECK(handlers_[path] == nullptr);
@@ -133,4 +133,3 @@ void HttpServer::installHandler(const string& path, HttpHandler* handler)
 
     handlers_[path] = handler;
 }
-
