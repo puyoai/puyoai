@@ -32,9 +32,7 @@ public:
 
 class HttpServer {
 public:
-    static const int kPort = 8000;
-
-    HttpServer();
+    explicit HttpServer(int port);
     ~HttpServer();
 
     bool start();
@@ -48,6 +46,7 @@ private:
                              const char* url, const char* method, const char* version,
                              const char* upload_data, size_t* upload_data_size, void** con_cls);
 
+    int port_;
     struct MHD_Daemon* httpd_;
     std::unordered_map<std::string, HttpHandler*> handlers_;
 };

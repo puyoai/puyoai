@@ -100,7 +100,8 @@ int HttpServer::accessHandler(void* cls, struct MHD_Connection* connection,
     return notFoundHandler(connection);
 }
 
-HttpServer::HttpServer() :
+HttpServer::HttpServer(int port) :
+    port_(port),
     httpd_(nullptr)
 {
 }
@@ -115,7 +116,7 @@ bool HttpServer::start()
 
     httpd_ = MHD_start_daemon(
         MHD_USE_THREAD_PER_CONNECTION,
-        kPort, NULL, NULL, &HttpServer::accessHandler, (void*)this, MHD_OPTION_END);
+        port_, NULL, NULL, &HttpServer::accessHandler, (void*)this, MHD_OPTION_END);
 
     return httpd_ != nullptr;
 }
