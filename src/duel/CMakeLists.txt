@@ -1,14 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
-if(USE_HTTPD)
-  set(HTTPD_SOURCE http_server.cc)
-endif()
-
 add_library(puyoai_duel
             cui.cc duel_server.cc field_realtime.cc
             frame_context.cc game_state.cc
-            puyofu_recorder.cc
-            ${HTTPD_SOURCE})
+            puyofu_recorder.cc)
 
 add_executable(duel main.cc)
 
@@ -16,6 +11,9 @@ if(USE_SDL2)
     target_link_libraries(duel puyoai_gui)
 endif()
 target_link_libraries(duel puyoai_duel)
+if(USE_HTTPD)
+    target_link_libraries(duel puyoai_core_httpd)
+endif()
 target_link_libraries(duel puyoai_core_algorithm)
 target_link_libraries(duel puyoai_core_server_connector)
 target_link_libraries(duel puyoai_core_field)

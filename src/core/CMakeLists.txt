@@ -5,6 +5,10 @@ add_subdirectory(client)
 add_subdirectory(field)
 add_subdirectory(server)
 
+if(USE_HTTPD)
+  add_subdirectory(httpd)
+endif()
+
 # ----------------------------------------------------------------------
 # library
 
