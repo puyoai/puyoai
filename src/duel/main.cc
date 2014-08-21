@@ -40,6 +40,7 @@ using namespace std;
 DEFINE_string(record, "", "use Puyofu Recorder. 'transition' for transition log, 'field' for field log");
 #ifdef USE_HTTPD
 DEFINE_bool(httpd, false, "use httpd");
+DEFINE_int32(port, 8000, "httpd port");
 #endif
 
 #ifdef USE_SDL2
@@ -118,7 +119,7 @@ int main(int argc, char* argv[])
     unique_ptr<HttpServer> httpServer;
     if (FLAGS_httpd) {
         gameStateHandler.reset(new GameStateHandler);
-        httpServer.reset(new HttpServer);
+        httpServer.reset(new HttpServer(FLAGS_port));
         httpServer->installHandler("/data", gameStateHandler.get());
     }
 #endif
