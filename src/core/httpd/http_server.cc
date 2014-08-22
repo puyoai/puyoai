@@ -9,6 +9,7 @@
 
 #include "base/base.h"
 #include "base/path.h"
+#include "base/strings.h"
 
 using namespace std;
 
