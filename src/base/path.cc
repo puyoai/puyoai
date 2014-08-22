@@ -9,14 +9,6 @@
 
 using namespace std;
 
-bool isPrefix(const std::string& s, const std::string& prefix)
-{
-    if (s.size() < prefix.size())
-        return false;
-
-    return s.substr(0, prefix.size()) == prefix;
-}
-
 std::string joinPath(const std::string& lhs, const std::string& rhs)
 {
     string s = lhs + "/" + rhs;
