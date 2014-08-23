@@ -57,12 +57,12 @@ DEFINE_bool(use_cui, true, "use CUI version drawer");
 DEFINE_bool(use_audio, true, "use audio commentator");
 #endif
 
-class GameStateHandler : public HttpHandler, public GameStateObserver {
+class GameStateHandler : public GameStateObserver {
 public:
     GameStateHandler() {}
     virtual ~GameStateHandler() {}
 
-    virtual void handle(HttpRequest* req, HttpResponse* resp) OVERRIDE {
+    void handle(const HttpRequest* req, HttpResponse* resp) {
         lock_guard<mutex> lock(mu_);
         UNUSED_VARIABLE(req);
         if (!gameState_)
@@ -70,7 +70,7 @@ public:
         resp->setContent(gameState_->toJson());
     }
 
-    virtual void onUpdate(const GameState& gameState) OVERRIDE {
+    virtual void onUpdate(const GameState& gameState) override {
         lock_guard<mutex> lock(mu_);
         gameState_.reset(new GameState(gameState));
     }
@@ -122,8 +122,9 @@ int main(int argc, char* argv[])
     if (FLAGS_httpd) {
         gameStateHandler.reset(new GameStateHandler);
         httpServer.reset(new HttpServer(FLAGS_port));
-
-        httpServer->installHandler("/data", gameStateHandler.get());
+        httpServer->installHandler("/data", [&](const HttpRequest* req, HttpResponse* res){
+            gameStateHandler->handle(req, res);
+        });
         httpServer->setAssetDirectory(joinPath(FLAGS_data_dir, "assets"));
     }
 #endif

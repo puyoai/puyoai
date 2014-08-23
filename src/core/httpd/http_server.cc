@@ -47,11 +47,12 @@ static int assetsHandler(struct MHD_Connection* connection, const std::string& f
     return ret;
 }
 
-static int handleHandler(struct MHD_Connection* connection, HttpHandler* handler)
+static int handleHandler(struct MHD_Connection* connection, const HttpHandler& handler)
 {
     HttpRequest req;
     HttpResponse resp;
-    handler->handle(&req, &resp);
+
+    handler(&req, &resp);
 
     struct MHD_Response* response = MHD_create_response_from_buffer(
         resp.contentSize(), resp.content(), MHD_RESPMEM_MUST_COPY);
@@ -127,10 +128,10 @@ void HttpServer::setAssetDirectory(const string& path)
     free(x);
 }
 
-void HttpServer::installHandler(const string& path, HttpHandler* handler)
+void HttpServer::installHandler(const string& path, HttpHandler handler)
 {
+    DCHECK(handler);
     DCHECK(handlers_[path] == nullptr);
-    DCHECK(handler != nullptr);
 
     handlers_[path] = handler;
 }
