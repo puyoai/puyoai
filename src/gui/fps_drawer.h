@@ -10,7 +10,7 @@ class FPSDrawer : public Drawer {
 public:
     FPSDrawer();
     virtual ~FPSDrawer();
-    virtual void draw(Screen*) OVERRIDE;
+    virtual void draw(Screen*) override;
 
 private:
     size_t frames_;

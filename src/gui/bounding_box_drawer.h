@@ -8,7 +8,7 @@ class BoundingBoxDrawer : public Drawer {
 public:
     virtual ~BoundingBoxDrawer() {}
 
-    virtual void draw(Screen*) OVERRIDE;
+    virtual void draw(Screen*) override;
 };
 
 #endif

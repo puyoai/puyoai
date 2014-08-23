@@ -10,8 +10,8 @@ public:
     explicit HumanConnectorKeyListener(HumanConnector*);
     virtual ~HumanConnectorKeyListener();
 
-    virtual void handleEvent(const SDL_Event&);
-    virtual void handleAfterPollEvent() OVERRIDE;
+    virtual void handleEvent(const SDL_Event&) override;
+    virtual void handleAfterPollEvent() override;
 
 private:
     HumanConnector* connector_;
