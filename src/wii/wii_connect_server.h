@@ -30,12 +30,12 @@ public:
     WiiConnectServer(Source*, Analyzer*, KeySender*, const std::string& p1, const std::string& p2);
     ~WiiConnectServer();
 
-    virtual void draw(Screen*) OVERRIDE;
+    virtual void draw(Screen*) override;
 
     bool start();
     void stop();
 
-    virtual std::unique_ptr<AnalyzerResult> analyzerResult() const OVERRIDE;
+    virtual std::unique_ptr<AnalyzerResult> analyzerResult() const override;
 
 private:
     void reset();

@@ -18,8 +18,8 @@ public:
 
     void clear();
 
-    virtual void newGameWillStart() OVERRIDE;
-    virtual void onUpdate(const GameState&) OVERRIDE;
+    virtual void newGameWillStart() override;
+    virtual void onUpdate(const GameState&) override;
 
 private:
     void Print(int player_id, const FieldRealtime&, const std::string& debug_message);

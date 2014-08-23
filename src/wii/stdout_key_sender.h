@@ -9,8 +9,8 @@ class StdoutKeySender : public KeySender {
 public:
     virtual ~StdoutKeySender() {}
 
-    virtual void sendKey(Key) OVERRIDE;
-    virtual void sendKey(Key, Key) OVERRIDE;
+    virtual void sendKey(Key) override;
+    virtual void sendKey(Key, Key) override;
 };
 
 #endif

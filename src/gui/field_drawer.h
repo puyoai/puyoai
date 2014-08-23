@@ -24,9 +24,9 @@ public:
     FieldDrawer();
     virtual ~FieldDrawer();
 
-    virtual void onInit(Screen*) OVERRIDE;
-    virtual void onUpdate(const GameState&) OVERRIDE;
-    virtual void draw(Screen*) OVERRIDE;
+    virtual void onInit(Screen*) override;
+    virtual void onUpdate(const GameState&) override;
+    virtual void draw(Screen*) override;
 
 private:
     void drawField(Screen*, int playerId, const FieldRealtime&);
