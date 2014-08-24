@@ -48,7 +48,7 @@ public:
     // Utility functions to be used by duel server.
     PlayerFrameData playerFrameData() const;
     UserState userState() const { return userState_; }
-    Key getKey(const Decision&) const;
+    KeySet getKeySet(const Decision&) const;
 
     bool hasZenkeshi() const { return hasZenkeshi_; }
 

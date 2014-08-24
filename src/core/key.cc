@@ -5,7 +5,6 @@ using namespace std;
 string toString(Key key)
 {
     switch (key) {
-    case Key::KEY_NONE:        return "<NONE>";
     case Key::KEY_UP:          return "↑";
     case Key::KEY_RIGHT:       return "→";
     case Key::KEY_DOWN:        return "↓";

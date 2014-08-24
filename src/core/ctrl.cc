@@ -45,7 +45,7 @@ bool Ctrl::isReachableFastpath(const PlainField& field, const Decision& decision
 
 bool Ctrl::isReachableOnline(const PlainField& field, const KumipuyoPos& goal, const KumipuyoPos& start)
 {
-    std::vector<KeyTuple> ret;
+    std::vector<KeySet> ret;
     return getControlOnline(field, goal, start, &ret);
 }
 
@@ -55,7 +55,7 @@ bool Ctrl::isQuickturn(const PlainField& field, const KumipuyoPos& k)
     return (field.get(k.x - 1, k.y) != PuyoColor::EMPTY && field.get(k.x + 1, k.y) != PuyoColor::EMPTY);
 }
 
-bool Ctrl::getControl(const PlainField& field, const Decision& decision, std::vector<KeyTuple>* ret)
+bool Ctrl::getControl(const PlainField& field, const Decision& decision, std::vector<KeySet>* ret)
 {
     ret->clear();
 
@@ -115,7 +115,7 @@ bool Ctrl::getControl(const PlainField& field, const Decision& decision, std::ve
 }
 
 // returns null if not reachable
-bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, const KumipuyoPos& start, std::vector<KeyTuple>* ret)
+bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, const KumipuyoPos& start, std::vector<KeySet>* ret)
 {
     KumipuyoPos current = start;
 
@@ -277,32 +277,12 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
     return true;
 }
 
-std::string Ctrl::buttonsDebugString(const std::vector<KeyTuple>& ret)
+void Ctrl::add(Key b, std::vector<KeySet>* ret)
 {
-    static char cmds[] = " ^>v<AB";
-
-    // caution: this string is used by test cases.
-    std::string out;
-    for (size_t i = 0; i < ret.size(); ++i) {
-        if (i != 0) {
-            out += ',';
-        }
-        if (ret[i].b1 != Key::KEY_NONE) {
-            out += cmds[ret[i].b1];
-        }
-        if (ret[i].b2 != Key::KEY_NONE) {
-            out += cmds[ret[i].b2];
-        }
-    }
-    return out;
+    ret->push_back(KeySet(b));
 }
 
-void Ctrl::add(Key b, std::vector<KeyTuple>* ret)
-{
-    ret->push_back(KeyTuple(b, Key::KEY_NONE));
-}
-
-void Ctrl::moveHorizontally(int x, std::vector<KeyTuple>* ret)
+void Ctrl::moveHorizontally(int x, std::vector<KeySet>* ret)
 {
     if (x < 0) {
         for (int i = 0; i < -x; i++) {

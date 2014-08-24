@@ -3,18 +3,18 @@
 
 #include <string>
 
-// TODO(mayah): Make this enum class.
-enum Key {
-    KEY_NONE,
+enum class Key {
     KEY_UP,
     KEY_RIGHT,
     KEY_DOWN,
     KEY_LEFT,
     KEY_RIGHT_TURN,
     KEY_LEFT_TURN,
-    KEY_START
+    KEY_START,
 };
+const int NUM_KEYS = 7;
 
 std::string toString(Key);
+inline int ordinal(Key key) { return static_cast<int>(key); }
 
 #endif

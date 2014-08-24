@@ -58,27 +58,12 @@ SerialKeySender::~SerialKeySender()
     }
 }
 
-void SerialKeySender::sendKey(Key k)
+void SerialKeySender::sendKey(const KeySet& keySet)
 {
-    sendKey(k, KEY_NONE);
-}
-
-void SerialKeySender::sendKey(Key k1, Key k2)
-{
-    unsigned char c = 0;
-
-    if (k1 != KEY_NONE) {
-        int kk = static_cast<int>(k1);
-        CHECK(1 <= kk && kk <= 8) << k1;
-        c |= 1 << (kk - 1);
-    }
-    if (k2 != KEY_NONE) {
-        int kk = static_cast<int>(k2);
-        CHECK(1 <= kk && kk <= 8) << k2;
-        c |= 1 << (kk - 1);
-    }
+    int k = keySet.toInt();
+    unsigned char c = static_cast<unsigned char>(k >> 1);
 
     CHECK_EQ(write(fd_, &c, sizeof(unsigned char)), 1);
 
-    cout << toString(k1) << " " << toString(k2) << " " << int(c) << endl;
+    cout << keySet.toString() << " " << keySet.toInt() << endl;
 }

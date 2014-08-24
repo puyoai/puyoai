@@ -127,11 +127,11 @@ TEST(CtrlTest, climbStairsRight)
     for (int x = 1; x <= 6; x++) {
         KumipuyoPos goal(x, x, 0);
         EXPECT_TRUE(Ctrl::isReachableOnline(f, goal, k0));
-        vector<KeyTuple> ret;
+        vector<KeySet> ret;
         Ctrl::getControlOnline(f, goal, k0, &ret);
         if (x == 4) {
             // TODO(yamaguchi): update this test when getControlOnline is updated.
-            EXPECT_EQ("B,B,A,A,B,B,A,>,A,B,B,A,>,A,v", Ctrl::buttonsDebugString(ret));
+            EXPECT_EQ("B,B,A,A,B,B,A,>,A,B,B,A,>,A,v", KeySet::toDebugString(ret));
         }
     }
 }
@@ -156,11 +156,11 @@ TEST(CtrlTest, climbStairsLeft)
     for (int x = 1; x <= 6; x++) {
         KumipuyoPos goal(x, 8 - x, 0);
         EXPECT_TRUE(Ctrl::isReachableOnline(f, goal, k0));
-        vector<KeyTuple> ret;
+        vector<KeySet> ret;
         Ctrl::getControlOnline(f, goal, k0, &ret);
         if (x == 4) {
             // TODO(yamaguchi): update this test when getControlOnline is updated.
-            EXPECT_EQ("A,A,B,B,A,A,B,<,B,v", Ctrl::buttonsDebugString(ret));
+            EXPECT_EQ("A,A,B,B,A,A,B,<,B,v", KeySet::toDebugString(ret));
         }
     }
 }
@@ -168,27 +168,27 @@ TEST(CtrlTest, climbStairsLeft)
 TEST(CtrlTest, simpleMove)
 {
     PlainField f;
-    vector<KeyTuple> ret;
+    vector<KeySet> ret;
     Ctrl::getControlOnline(f, KumipuyoPos(3, 1, 0), KumipuyoPos::InitialPos(), &ret);
-    EXPECT_EQ("v", Ctrl::buttonsDebugString(ret));
+    EXPECT_EQ("v", KeySet::toDebugString(ret));
     Ctrl::getControlOnline(f, KumipuyoPos(2, 1, 0), KumipuyoPos::InitialPos(), &ret);
-    EXPECT_EQ("<,v", Ctrl::buttonsDebugString(ret));
+    EXPECT_EQ("<,v", KeySet::toDebugString(ret));
     Ctrl::getControlOnline(f, KumipuyoPos(5, 1, 0), KumipuyoPos::InitialPos(), &ret);
-    EXPECT_EQ(">,>,v", Ctrl::buttonsDebugString(ret));
+    EXPECT_EQ(">,>,v", KeySet::toDebugString(ret));
     Ctrl::getControlOnline(f, KumipuyoPos(6, 1, 2), KumipuyoPos::InitialPos(), &ret);
-    EXPECT_EQ(">,>,>,B,B,v", Ctrl::buttonsDebugString(ret));
+    EXPECT_EQ(">,>,>,B,B,v", KeySet::toDebugString(ret));
     Ctrl::getControlOnline(f, KumipuyoPos(1, 1, 2), KumipuyoPos::InitialPos(), &ret);
-    EXPECT_EQ("<,<,A,A,v", Ctrl::buttonsDebugString(ret));
+    EXPECT_EQ("<,<,A,A,v", KeySet::toDebugString(ret));
     Ctrl::getControlOnline(f, KumipuyoPos(6, 1, 0), KumipuyoPos(1, 1, 2), &ret);
-    EXPECT_EQ("B,B,>,>,>,>,>,v", Ctrl::buttonsDebugString(ret));
+    EXPECT_EQ("B,B,>,>,>,>,>,v", KeySet::toDebugString(ret));
 }
 
 TEST(CtrlTest, subpuyoIsHigher)
 {
     PlainField f("000040");
-    vector<KeyTuple> ret;
+    vector<KeySet> ret;
     Ctrl::getControlOnline(f, KumipuyoPos(4, 2, 1), KumipuyoPos(3, 1, 0), &ret);
-    EXPECT_EQ(">,B,B,B,v", Ctrl::buttonsDebugString(ret));
+    EXPECT_EQ(">,B,B,B,v", KeySet::toDebugString(ret));
 }
 
 TEST(CtrlTest, wallAboveScreen)
@@ -225,9 +225,9 @@ TEST(CtrlTest, foobar)
       11 .@@@..
     */
     PlainField f;
-    vector<KeyTuple> ret;
+    vector<KeySet> ret;
     Ctrl::getControlOnline(f, KumipuyoPos(3, 8, 2), KumipuyoPos(3, 8, 3), &ret);
-    EXPECT_EQ("A,B,B,v", Ctrl::buttonsDebugString(ret));
+    EXPECT_EQ("A,B,B,v", KeySet::toDebugString(ret));
 }
 
 TEST(CtrlTest, pivotCannotClimbUpTo14)

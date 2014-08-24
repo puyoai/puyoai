@@ -112,9 +112,9 @@ bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
 
     *accepted = true;
     bool grounded = playInternal(keySet, accepted);
-    if (!grounded && restFramesForFreeFall_ <= 0 && !keySet.downKey)
+    if (!grounded && restFramesForFreeFall_ <= 0 && !keySet.hasKey(Key::KEY_DOWN))
         grounded = doFreeFall();
-    if (keySet.downKey && *accepted)
+    if (keySet.hasKey(Key::KEY_DOWN) && *accepted)
         ++score_;
 
     if (grounded) {
@@ -350,7 +350,7 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
     // We consume right/left turn first. Then, left/right/down.
     // TODO(mayah): Move this to core/
 
-    if (keySet.rightTurnKey) {
+    if (keySet.hasKey(Key::KEY_RIGHT_TURN)) {
         switch (kumipuyoPos_.r) {
         case 0:
             if (field_.color(kumipuyoPos_.x + 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
@@ -408,7 +408,7 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
             *accepted = true;
             break;
         }
-    } else if (keySet.leftTurnKey) {
+    } else if (keySet.hasKey(Key::KEY_LEFT_TURN)) {
         switch (kumipuyoPos_.r) {
         case 0:
             if (field_.color(kumipuyoPos_.x - 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
@@ -467,7 +467,7 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
         }
     }
 
-    if (keySet.rightKey) {
+    if (keySet.hasKey(Key::KEY_RIGHT)) {
         if (field_.color(pos.axisX() + 1, pos.axisY()) == PuyoColor::EMPTY &&
             field_.color(pos.childX() + 1, pos.childY()) == PuyoColor::EMPTY) {
             kumipuyoPos_.x++;
@@ -475,7 +475,7 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
         } else {
             *accepted = false;
         }
-    } else if (keySet.leftKey) {
+    } else if (keySet.hasKey(Key::KEY_LEFT)) {
         if (field_.color(pos.axisX() - 1, pos.axisY()) == PuyoColor::EMPTY &&
             field_.color(pos.childX() - 1, pos.childY()) == PuyoColor::EMPTY) {
             kumipuyoPos_.x--;
@@ -483,7 +483,7 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
         } else {
             *accepted = false;
         }
-    } else if (keySet.downKey) {
+    } else if (keySet.hasKey(Key::KEY_DOWN)) {
         if (restFramesForFreeFall_ > 0) {
             restFramesForFreeFall_ = 0;
         } else {
@@ -562,41 +562,37 @@ PlayerFrameData FieldRealtime::playerFrameData() const
     return PlayerFrameData(field(), kumipuyoSeq().subsequence(0, 3), kumipuyoPos(), userState(), score(), ojama());
 }
 
-Key FieldRealtime::getKey(const Decision& decision) const
+// TODO(mayah): Remove this from FieldRealtime, and use Ctrl directly.
+KeySet FieldRealtime::getKeySet(const Decision& decision) const
 {
     if (!decision.isValid())
-        return KEY_NONE;
+        return KeySet();
 
     KumipuyoPos pos = kumipuyoPos();
 
     LOG(INFO) << "[" << pos.axisX() << ", " << pos.axisY() << "(" << pos.r << ")] -> ["
               << decision.x << "(" << decision.r << ")]";
 
-    vector<KeyTuple> keys;
-    KeyTuple next_key;
-    if (Ctrl::getControlOnline(field_, KumipuyoPos(decision.x, 1, decision.r), pos, &keys)) {
-        LOG(INFO) << Ctrl::buttonsDebugString(keys);
-
-        // Remove redundant key stroke.
-        if (pos.r == 3 && keys[0].b1 == KEY_RIGHT_TURN && keys[1].b1 == KEY_LEFT_TURN) {
-            next_key = keys[2];
-        } else if (pos.r == 1 && keys[0].b1 == KEY_LEFT_TURN && keys[1].b1 == KEY_RIGHT_TURN) {
-            next_key = keys[2];
-        } else {
-            next_key = keys[0];
-        }
-    } else {
+    vector<KeySet> keys;
+    if (!Ctrl::getControlOnline(field_, KumipuyoPos(decision.x, 1, decision.r), pos, &keys)) {
         LOG(INFO) << "No way...";
-        return KEY_NONE;
+        return KeySet();
     }
 
-    if (next_key.b1 != KEY_NONE) {
-        return next_key.b1;
-    } else if (next_key.b2 != KEY_NONE) {
-        return next_key.b2;
+    LOG(INFO) << KeySet::toDebugString(keys);
+    KeySet nextKey;
+
+    // TODO(mayah): This looks a layer violation. Why don't we remove this in getControlOnline?
+    // Remove redundant key stroke.
+    if (pos.r == 3 && keys[0] == KeySet(Key::KEY_RIGHT_TURN) && keys[1] == KeySet(Key::KEY_LEFT_TURN)) {
+        nextKey = keys[2];
+    } else if (pos.r == 1 && keys[0] == KeySet(Key::KEY_LEFT_TURN) && keys[1] == KeySet(Key::KEY_RIGHT_TURN)) {
+        nextKey = keys[2];
     } else {
-        return KEY_NONE;
+        nextKey = keys[0];
     }
+
+    return nextKey;
 }
 
 int FieldRealtime::reduceOjama(int n)
