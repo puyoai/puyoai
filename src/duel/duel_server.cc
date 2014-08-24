@@ -46,7 +46,7 @@ static int updateDecision(const vector<ConnectorFrameResponse>& data, const Fiel
 
         // When data contains key, it should be from HumanConnector.
         // In that case we accept it.
-        if (data[i].key != Key::KEY_NONE)
+        if (data[i].keySet.hasSomeKey())
             return i;
 
         Decision d = data[i].decision;
@@ -55,8 +55,8 @@ static int updateDecision(const vector<ConnectorFrameResponse>& data, const Fiel
         if (!d.isValid())
             continue;
 
-        Key key = field.getKey(d);
-        if (key != KEY_NONE) {
+        KeySet keySet = field.getKeySet(d);
+        if (keySet.hasSomeKey()) {
             *decision = d;
             return i;
         }
@@ -267,13 +267,13 @@ void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse>
         if (accepted_index != -1)
             accepted_message = data[pi][accepted_index].msg;
 
-        // TODO(mayah): Instead of using key, we need to use KeySet.
-        Key key = me->getKey(gameState->decision(pi));
-        if (accepted_index != -1 && data[pi][accepted_index].key != Key::KEY_NONE)
-            key = data[pi][accepted_index].key;
+        KeySet keySet = me->getKeySet(gameState->decision(pi));
+        // For human connector. The recieved data from HumanConnector might have some key.
+        if (accepted_index != -1 && data[pi][accepted_index].keySet.hasSomeKey())
+            keySet = data[pi][accepted_index].keySet;
 
         FrameContext context;
-        me->playOneFrame(KeySet(key), &context);
+        me->playOneFrame(keySet, &context);
         context.apply(me, opponent);
 
         // Clear current key input if the move is done.

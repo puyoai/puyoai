@@ -25,20 +25,11 @@ ConnectorFrameResponse HumanConnector::read()
 
     // leftTurnKey or rightTurnKey should be prioritized.
     lock_guard<mutex> lock(mu_);
-    if (currentKeySet_.downKey)
-        cfr.key = Key::KEY_DOWN;
-    if (currentKeySet_.leftKey)
-        cfr.key = Key::KEY_LEFT;
-    if (currentKeySet_.rightKey)
-        cfr.key = Key::KEY_RIGHT;
-    if (currentKeySet_.leftTurnKey)
-        cfr.key = Key::KEY_LEFT_TURN;
-    if (currentKeySet_.rightTurnKey)
-        cfr.key = Key::KEY_RIGHT_TURN;
+    cfr.keySet = currentKeySet_;
 
     if (!nextIsPlayable_) {
-        currentKeySet_.leftTurnKey = false;
-        currentKeySet_.rightTurnKey = false;
+        currentKeySet_.setKey(Key::KEY_LEFT_TURN, false);
+        currentKeySet_.setKey(Key::KEY_RIGHT_TURN, false);
     }
     return cfr;
 }
@@ -58,12 +49,14 @@ void HumanConnector::setKeySet(const KeySet& keySet)
 {
     lock_guard<mutex> lock(mu_);
 
-    currentKeySet_.downKey = keySet.downKey;
-    currentKeySet_.leftKey = keySet.leftKey;
-    currentKeySet_.rightKey = keySet.rightKey;
+    currentKeySet_.setKey(Key::KEY_DOWN, keySet.hasKey(Key::KEY_DOWN));
+    currentKeySet_.setKey(Key::KEY_LEFT, keySet.hasKey(Key::KEY_LEFT));
+    currentKeySet_.setKey(Key::KEY_RIGHT, keySet.hasKey(Key::KEY_RIGHT));
 
     // These key are bit-or. We will consume this only when playable state.
     // Otherwise, we often miss the key or uses too much.
-    currentKeySet_.leftTurnKey |= keySet.leftTurnKey;
-    currentKeySet_.rightTurnKey |= keySet.rightTurnKey;
+    if (keySet.hasKey(Key::KEY_LEFT_TURN))
+        currentKeySet_.setKey(Key::KEY_LEFT_TURN);
+    if (keySet.hasKey(Key::KEY_RIGHT_TURN))
+        currentKeySet_.setKey(Key::KEY_RIGHT_TURN);
 }

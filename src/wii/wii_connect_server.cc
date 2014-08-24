@@ -128,7 +128,7 @@ void WiiConnectServer::runLoop()
 bool WiiConnectServer::playForUnknown(int frameId)
 {
     if (frameId % 10 == 0)
-        keySender_->sendKey(KEY_NONE);
+        keySender_->sendKey(KeySet());
 
     reset();
     return true;
@@ -137,9 +137,9 @@ bool WiiConnectServer::playForUnknown(int frameId)
 bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& analyzerResult)
 {
     if (frameId % 10 == 0) {
-        keySender_->sendKey(KEY_NONE);
-        keySender_->sendKey(KEY_RIGHT_TURN);
-        keySender_->sendKey(KEY_NONE);
+        keySender_->sendKey(KeySet());
+        keySender_->sendKey(Key::KEY_RIGHT_TURN);
+        keySender_->sendKey(KeySet());
     }
 
     // Sends an initialization message.
@@ -177,7 +177,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 
         if (analyzerResult.playerResult(pi)->userState.grounded) {
             lastDecision_[pi] = Decision();
-            keySender_->sendKey(KEY_NONE);
+            keySender_->sendKey(KeySet());
         }
 
         outputKeys(pi, analyzerResult, data[pi]);
@@ -189,9 +189,9 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 bool WiiConnectServer::playForFinished(int frameId)
 {
     if (frameId % 10 == 0) {
-        keySender_->sendKey(KEY_NONE);
-        keySender_->sendKey(KEY_START);
-        keySender_->sendKey(KEY_NONE);
+        keySender_->sendKey(KeySet());
+        keySender_->sendKey(Key::KEY_START);
+        keySender_->sendKey(KeySet());
     }
 
     reset();
@@ -326,7 +326,7 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
         // ----------
         // Set's the current area.
         // This is for checking the destination is reachable, it is ok to set ojama if the cell is occupied.
-        vector<KeyTuple> keys;
+        vector<KeySet> keySets;
         {
             CoreField field;
             const AdjustedField& af = analyzerResult.playerResult(pi)->adjustedField;
@@ -341,21 +341,17 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
             }
 
             // Not controllable?
-            if (!Ctrl::getControlOnline(field, goal, start, &keys))
+            if (!Ctrl::getControlOnline(field, goal, start, &keySets))
                 continue;
         }
 
         lastDecision_[pi] = d;
-        for (size_t j = 0; j < keys.size(); j++) {
-            KeyTuple k = keys[j];
-            if (k.b2 != KEY_NONE) {
-                keySender_->sendKey(k.b1, k.b2);
-            } else {
-                keySender_->sendKey(k.b1);
-            }
+        for (size_t j = 0; j < keySets.size(); j++) {
+            KeySet k = keySets[j];
+            keySender_->sendKey(k);
 
-            if (j + 1 < keys.size() && k.hasSameKey(keys[j+1])) {
-                keySender_->sendKey(KEY_NONE);
+            if (j + 1 < keySets.size() && k.hasIntersection(keySets[j+1])) {
+                keySender_->sendKey(KeySet());
             }
         }
 

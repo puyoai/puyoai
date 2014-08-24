@@ -125,8 +125,8 @@ TEST_F(FieldRealtimeTest, Move1)
 
     while (true) {
         FrameContext context;
-        Key key = f_->getKey(Decision(5, 1));
-        if (!f_->playOneFrame(KeySet(key), &context))
+        KeySet keySet = f_->getKeySet(Decision(5, 1));
+        if (!f_->playOneFrame(keySet, &context))
             break;
     }
 
@@ -169,8 +169,8 @@ TEST_F(FieldRealtimeTest, Move2)
 
     while (true) {
         FrameContext context;
-        Key key = f_->getKey(Decision(6, 2));
-        if (!f_->playOneFrame(KeySet(key), &context))
+        KeySet keySet = f_->getKeySet(Decision(6, 2));
+        if (!f_->playOneFrame(keySet, &context))
             break;
     }
 
@@ -214,8 +214,8 @@ TEST_F(FieldRealtimeTest, Move3)
 
     while (true) {
         FrameContext context;
-        Key key = f_->getKey(Decision(1, 2));
-        if (!f_->playOneFrame(KeySet(key), &context))
+        KeySet keySet = f_->getKeySet(Decision(1, 2));
+        if (!f_->playOneFrame(keySet, &context))
             break;
     }
 
@@ -259,8 +259,8 @@ TEST_F(FieldRealtimeTest, Move4)
 
     while (true) {
         FrameContext context;
-        Key key = f_->getKey(Decision(6, 3));
-        if (!f_->playOneFrame(KeySet(key), &context))
+        KeySet keySet = f_->getKeySet(Decision(6, 3));
+        if (!f_->playOneFrame(keySet, &context))
             break;
     }
 

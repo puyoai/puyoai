@@ -28,6 +28,7 @@ function(puyoai_core_add_test target)
 endfunction()
 
 puyoai_core_add_test(ctrl)
+puyoai_core_add_test(key_set)
 puyoai_core_add_test(kumipuyo)
 puyoai_core_add_test(puyo_color)
 puyoai_core_add_test(sequence_generator)
