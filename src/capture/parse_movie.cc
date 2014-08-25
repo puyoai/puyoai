@@ -31,37 +31,36 @@ int main(int argc, char* argv[])
     MovieSource::init();
 
     SDL_Init(SDL_INIT_VIDEO);
-    {
-        MovieSource source(argv[1]);
-        if (!source.ok()) {
-            fprintf(stderr, "Failed to load %s\n", argv[1]);
-            exit(EXIT_FAILURE);
-        }
-        source.setFPS(FLAGS_fps);
+    atexit(SDL_Quit);
 
-        SomagicAnalyzer analyzer;
-        Capture capture(&source, &analyzer);
-
-        unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;
-        if (FLAGS_draw_result)
-            analyzerResultDrawer.reset(new AnalyzerResultDrawer(&capture));
-
-        unique_ptr<ScreenShotSaver> saver;
-        if (FLAGS_save_screenshot)
-            saver.reset(new ScreenShotSaver);
-
-        MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
-        mainWindow.addDrawer(&capture);
-        if (saver.get())
-            mainWindow.addDrawer(saver.get());
-        if (analyzerResultDrawer.get())
-            mainWindow.addDrawer(analyzerResultDrawer.get());
-
-        capture.start();
-
-        mainWindow.runMainLoop();
+    MovieSource source(argv[1]);
+    if (!source.ok()) {
+        fprintf(stderr, "Failed to load %s\n", argv[1]);
+        exit(EXIT_FAILURE);
     }
+    source.setFPS(FLAGS_fps);
 
-    SDL_Quit();
+    SomagicAnalyzer analyzer;
+    Capture capture(&source, &analyzer);
+
+    unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;
+    if (FLAGS_draw_result)
+        analyzerResultDrawer.reset(new AnalyzerResultDrawer(&capture));
+
+    unique_ptr<ScreenShotSaver> saver;
+    if (FLAGS_save_screenshot)
+        saver.reset(new ScreenShotSaver);
+
+    MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
+    mainWindow.addDrawer(&capture);
+    if (saver.get())
+        mainWindow.addDrawer(saver.get());
+    if (analyzerResultDrawer.get())
+        mainWindow.addDrawer(analyzerResultDrawer.get());
+
+    capture.start();
+
+    mainWindow.runMainLoop();
+
     return 0;
 }
