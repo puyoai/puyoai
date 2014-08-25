@@ -71,7 +71,10 @@ void WiiConnectServer::reset()
 
 void WiiConnectServer::runLoop()
 {
+    reset();
+
     int frameId = 0;
+
     while (!shouldStop_) {
         UniqueSDLSurface surface(source_->getNextFrame());
         if (!surface.get())
@@ -95,6 +98,11 @@ void WiiConnectServer::runLoop()
                 if (!analyzerResults_.empty() && analyzerResults_.front()->state() != CaptureGameState::LEVEL_SELECT) {
                     frameId = 1;
                     reset();
+                    // The result might contain the previous game's result. We don't want to stabilize the result
+                    // with using the previous game's results.
+                    // So, remove all the results.
+                    analyzerResults_.clear();
+                    r->clear();
                 }
             }
             if (!playForLevelSelect(frameId, *r))
