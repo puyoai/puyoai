@@ -33,6 +33,8 @@ std::string toString(CaptureGameState);
 
 // DetectedField contains the detected field as-is.
 struct DetectedField {
+    DetectedField();
+
     void setRealColor(int x, int y, RealColor prc) { puyos[x - 1][y - 1] = prc; }
     void setRealColor(NextPuyoPosition npp, RealColor prc) { nextPuyos[static_cast<int>(npp)] = prc; }
     RealColor realColor(int x, int y) const { return puyos[x - 1][y - 1]; }
@@ -59,6 +61,10 @@ struct PlayerAnalyzerResult {
     void setRealColor(NextPuyoPosition npp, RealColor prc) { adjustedField.nextPuyos[static_cast<int>(npp)] = prc; }
     RealColor realColor(int x, int y) const { return adjustedField.puyos[x-1][y-1]; }
     RealColor realColor(NextPuyoPosition npp) const { return adjustedField.nextPuyos[static_cast<int>(npp)]; }
+
+    void clear() {
+        *this = PlayerAnalyzerResult();
+    }
 
     void copyRealColorFrom(NextPuyoPosition npp, const PlayerAnalyzerResult& par) { setRealColor(npp, par.realColor(npp)); }
 
@@ -121,6 +127,14 @@ public:
     PlayerAnalyzerResult* mutablePlayerResult(int pi) { return playerResults_[pi].get(); }
 
     std::unique_ptr<AnalyzerResult> copy() const;
+
+    void clear()
+    {
+        if (playerResults_[0].get())
+            playerResults_[0]->clear();
+        if (playerResults_[1].get())
+            playerResults_[1]->clear();
+    }
 
     std::string toString() const;
 

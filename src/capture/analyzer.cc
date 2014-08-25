@@ -38,6 +38,20 @@ string toString(CaptureGameState cgs)
     return "";
 }
 
+DetectedField::DetectedField()
+{
+    for (int x = 0; x < 6; ++x) {
+        for (int y = 0; y < 12; ++y) {
+            puyos[x][y] = RealColor::RC_EMPTY;
+            vanishing[x][y] = false;
+        }
+    }
+
+    for (int i = 0; i < NUM_NEXT_PUYO_POSITION; ++i) {
+        nextPuyos[i] = RealColor::RC_EMPTY;
+    }
+}
+
 AdjustedField::AdjustedField()
 {
     for (int x = 0; x < 6; ++x) {
