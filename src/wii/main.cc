@@ -27,16 +27,18 @@ DEFINE_bool(draw_result, true, "draw analyzer result");
 DEFINE_string(source, "somagic",
               "set image source. 'somagic' when using somagic video capture."
               " filename if you'd like to use movie.");
+DEFINE_int32(fps, 30, "FPS");
 
 static unique_ptr<Source> makeVideoSource()
 {
     if (FLAGS_source == "somagic")
         return unique_ptr<Source>(new SomagicSource("connect"));
 
-    unique_ptr<Source> source(new MovieSource(FLAGS_source));
+    MovieSource* source = new MovieSource(FLAGS_source);
     CHECK(source->ok());
+    source->setFPS(FLAGS_fps);
 
-    return source;
+    return unique_ptr<Source>(source);
 }
 
 static unique_ptr<Analyzer> makeVideoAnalyzer()
