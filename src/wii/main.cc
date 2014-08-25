@@ -60,6 +60,8 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO);
     atexit(SDL_Quit);
 
+    MovieSource::init();
+
     unique_ptr<Source> source = makeVideoSource();
     unique_ptr<Analyzer> analyzer = makeVideoAnalyzer();
 

@@ -282,6 +282,10 @@ PuyoColor WiiConnectServer::toPuyoColor(RealColor rc, bool allowAllocation)
     if (it != colorMap_.end())
         return it->second;
 
+    // RC_EMPTY is always mapped to EMPTY.
+    if (rc == RealColor::RC_EMPTY)
+        return PuyoColor::EMPTY;
+
     if (!allowAllocation) {
         LOG(WARNING) << toString(rc) << " cannot mapped to be a puyo color. EMPTY is returned instead.";
         return PuyoColor::EMPTY;
@@ -296,6 +300,7 @@ PuyoColor WiiConnectServer::toPuyoColor(RealColor rc, bool allowAllocation)
         PuyoColor pc = NORMAL_PUYO_COLORS[i];
         colorMap_.insert(make_pair(rc, pc));
 
+        cout << "Detected a new color: " << toString(rc) << "->" << toString(pc) << endl;
         LOG(INFO) << "Detected a new color: " << toString(rc) << "->" << toString(pc);
         return pc;
     }
