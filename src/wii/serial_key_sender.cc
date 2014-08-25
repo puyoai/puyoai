@@ -60,10 +60,7 @@ SerialKeySender::~SerialKeySender()
 
 void SerialKeySender::sendKey(const KeySet& keySet)
 {
-    int k = keySet.toInt();
-    unsigned char c = static_cast<unsigned char>(k >> 1);
-
+    unsigned char c = static_cast<unsigned int>(keySet.toInt());
     CHECK_EQ(write(fd_, &c, sizeof(unsigned char)), 1);
-
-    cout << keySet.toString() << " " << keySet.toInt() << endl;
+    cout << keySet.toString() << " " << static_cast<int>(c) << endl;
 }
