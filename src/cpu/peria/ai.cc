@@ -77,6 +77,10 @@ void EvaluatePatterns(const RefPlan& plan,
                       std::string* best_name,
                       int* frames,
                       Decision* decision) {
+  // Do not check patterns if puyos vanish.
+  if (plan.isRensaPlan())
+    return;
+
   std::string name;
   int score = PatternMatch(plan, &name);
   if (score > *best_score ||
