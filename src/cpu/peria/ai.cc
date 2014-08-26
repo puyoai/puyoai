@@ -39,6 +39,14 @@ int PatternMatch(const RefPlan& plan, std::string* name) {
 
 typedef std::map<Decision, std::vector<int> > CandidateMap;
 
+void EvaluateFuture(const RefPlan& plan, int* best_score) {
+  int score = 0;
+  if (plan.isRensaPlan())
+    score = plan.rensaResult().score;
+  if (score > *best_score)
+    *best_score = score;
+}
+
 void EvaluateUsual(const RefPlan& plan,
                    int* best_score,
                    Decision* decision) {
@@ -51,6 +59,11 @@ void EvaluateUsual(const RefPlan& plan,
     } else {
       score = result.score;
     }
+  } else {
+    KumipuyoSeq seq;
+    Plan::iterateAvailablePlans(plan.field(), seq, 1,
+                                std::bind(EvaluateFuture, std::placeholders::_1, &score));
+    score /= 2;
   }
 
   if (score > *best_score) {
@@ -96,29 +109,30 @@ DropDecision Ai::think(int frame_id,
 		       const PlainField& field,
 		       const KumipuyoSeq& seq) {
   using namespace std::placeholders;
-  std::ostringstream message;
 
   if (attack_ && attack_->end_frame_id < frame_id)
     attack_.reset();
 
 
   // Check templates first with visible puyos.
-  int temp_score = 0;
-  std::string name;
-  int frames = 1e+8;
-  Decision temp_decision;
-  Plan::iterateAvailablePlans(CoreField(field), seq, 2,
-                              std::bind(EvaluatePatterns, _1,
-                                        &temp_score, &name,
-                                        &frames, &temp_decision));
+  {
+    int score = 0;
+    std::string name;
+    int frames = 1e+8;
+    Decision temp_decision;
+    Plan::iterateAvailablePlans(CoreField(field), seq, 2,
+                                std::bind(EvaluatePatterns, _1,
+                                          &score, &name,
+                                          &frames, &temp_decision));
+    if (!name.empty())
+      return DropDecision(temp_decision, "Template: " + name);
+  }
 
   int score = 0;
   Decision decision;
-  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size() + 1,
+  std::string message("Normal");
+  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size(),
                               std::bind(EvaluateUsual, _1, &score, &decision));
-
-  if (score < temp_score && !name.empty())
-    return DropDecision(temp_decision, "Template: " + name);
 
   // NOTE: 今は message が違うだけ
   // 3 個以上おじゃまが来てたらカウンターしてみる
@@ -131,7 +145,7 @@ DropDecision Ai::think(int frame_id,
       return DropDecision(decision, "Counter");
   }
 
-  return DropDecision(decision, "Normal");
+  return DropDecision(decision, message);
 }
 
 void Ai::gameWillBegin(const FrameData& /*frame_data*/) {
