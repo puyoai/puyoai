@@ -51,20 +51,10 @@ void AI::runLoop()
             gameWillBegin(frameData);
             field_.clear();
 
-            const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
-
-            // TODO(mayah): duel should have several frames before showing the first hand.
-            // This workaround code should be removed after duel is changed.
-            current.dropDecision = think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) });
-            current.kumipuyo = kumipuyoSeq.get(1);
-            current.needsSend = true;
-            current.hasGrounded = false;
+            // Consider the current (EMPTY/EMPTY) puyo has grounded.
+            current.clear();
             next.clear();
-
-            if (current.dropDecision.decision().isValid() && current.kumipuyo.isValid()) {
-                field_.dropKumipuyo(current.dropDecision.decision(), current.kumipuyo);
-                field_.simulate();
-            }
+            current.hasGrounded = true;
         }
 
         // Update enemy info if necessary.
