@@ -103,6 +103,77 @@ TEST_F(FieldRealtimeTest, zenkeshi)
     }
 }
 
+TEST_F(FieldRealtimeTest, playOneFrameWithMultipleKey1)
+{
+    f_->skipLevelSelect();
+    f_->skipPreparingNext();
+
+    ASSERT_EQ(KumipuyoPos(3, 12, 0), f_->kumipuyoPos());
+
+    FrameContext context;
+    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::KEY_RIGHT, Key::KEY_RIGHT_TURN), &context));
+
+    EXPECT_EQ(KumipuyoPos(4, 12, 1), f_->kumipuyoPos());
+}
+
+TEST_F(FieldRealtimeTest, playOneFrameWithMultipleKey2)
+{
+    f_->skipLevelSelect();
+    f_->skipPreparingNext();
+
+    ASSERT_EQ(KumipuyoPos(3, 12, 0), f_->kumipuyoPos());
+
+    FrameContext context;
+    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::KEY_LEFT, Key::KEY_LEFT_TURN), &context));
+
+    EXPECT_EQ(KumipuyoPos(2, 12, 3), f_->kumipuyoPos());
+}
+
+TEST_F(FieldRealtimeTest, playOneFrameWithMultipleKey3)
+{
+    f_->skipLevelSelect();
+    f_->skipPreparingNext();
+
+    ASSERT_EQ(KumipuyoPos(3, 12, 0), f_->kumipuyoPos());
+
+    FrameContext context;
+    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::KEY_DOWN, Key::KEY_RIGHT_TURN), &context));
+
+    // Since Y = 12, you might think KEY_DOWN is ignored. This is not true.
+    // After 1 frame, puyo should drop 1 cell.
+    EXPECT_EQ(KumipuyoPos(3, 12, 1), f_->kumipuyoPos());
+    EXPECT_TRUE(f_->playOneFrame(KeySet(), &context));
+    EXPECT_EQ(KumipuyoPos(3, 11, 1), f_->kumipuyoPos());
+}
+
+TEST_F(FieldRealtimeTest, playOneFrameWithMultipleArrowKey1)
+{
+    f_->skipLevelSelect();
+    f_->skipPreparingNext();
+
+    ASSERT_EQ(KumipuyoPos(3, 12, 0), f_->kumipuyoPos());
+
+    FrameContext context;
+    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::KEY_DOWN, Key::KEY_RIGHT), &context));
+
+    // KEY_DOWN should be ignored.
+    EXPECT_EQ(KumipuyoPos(4, 12, 0), f_->kumipuyoPos());
+}
+
+TEST_F(FieldRealtimeTest, playOneFrameWithMultipleArrowKey2)
+{
+    f_->skipLevelSelect();
+    f_->skipPreparingNext();
+
+    ASSERT_EQ(KumipuyoPos(3, 12, 0), f_->kumipuyoPos());
+
+    FrameContext context;
+    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::KEY_DOWN, Key::KEY_LEFT), &context));
+
+    // KEY_DOWN should be ignored.
+    EXPECT_EQ(KumipuyoPos(2, 12, 0), f_->kumipuyoPos());
+}
+
 TEST_F(FieldRealtimeTest, Move1)
 {
     CoreField cf(

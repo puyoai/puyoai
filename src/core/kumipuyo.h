@@ -48,6 +48,12 @@ public:
 
     std::string toDebugString() const;
 
+    friend bool operator==(const KumipuyoPos& lhs, const KumipuyoPos& rhs)
+    {
+        return lhs.x == rhs.x && lhs.y == rhs.y && lhs.r == rhs.r;
+    }
+    friend bool operator!=(const KumipuyoPos& lhs, const KumipuyoPos& rhs) { return !(lhs == rhs); }
+
     // TODO(mayah): Make these private?
     int x;
     int y;
