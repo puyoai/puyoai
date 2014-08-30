@@ -45,8 +45,8 @@ bool Ctrl::isReachableFastpath(const PlainField& field, const Decision& decision
 
 bool Ctrl::isReachableOnline(const PlainField& field, const KumipuyoPos& goal, const KumipuyoPos& start)
 {
-    std::vector<KeySet> ret;
-    return getControlOnline(field, goal, start, &ret);
+    KeySetSeq keySetSeq;
+    return getControlOnline(field, goal, start, &keySetSeq);
 }
 
 bool Ctrl::isQuickturn(const PlainField& field, const KumipuyoPos& k)
@@ -55,7 +55,7 @@ bool Ctrl::isQuickturn(const PlainField& field, const KumipuyoPos& k)
     return (field.get(k.x - 1, k.y) != PuyoColor::EMPTY && field.get(k.x + 1, k.y) != PuyoColor::EMPTY);
 }
 
-bool Ctrl::getControl(const PlainField& field, const Decision& decision, std::vector<KeySet>* ret)
+bool Ctrl::getControl(const PlainField& field, const Decision& decision, KeySetSeq* ret)
 {
     ret->clear();
 
@@ -115,7 +115,7 @@ bool Ctrl::getControl(const PlainField& field, const Decision& decision, std::ve
 }
 
 // returns null if not reachable
-bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, const KumipuyoPos& start, std::vector<KeySet>* ret)
+bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, const KumipuyoPos& start, KeySetSeq* ret)
 {
     KumipuyoPos current = start;
 
@@ -277,12 +277,12 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
     return true;
 }
 
-void Ctrl::add(Key b, std::vector<KeySet>* ret)
+void Ctrl::add(Key b, KeySetSeq* ret)
 {
-    ret->push_back(KeySet(b));
+    ret->add(KeySet(b));
 }
 
-void Ctrl::moveHorizontally(int x, std::vector<KeySet>* ret)
+void Ctrl::moveHorizontally(int x, KeySetSeq* ret)
 {
     if (x < 0) {
         for (int i = 0; i < -x; i++) {

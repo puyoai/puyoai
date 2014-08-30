@@ -26,14 +26,14 @@ public:
 
     static bool isQuickturn(const PlainField&, const KumipuyoPos&);
 
-    static bool getControl(const PlainField&, const Decision&, std::vector<KeySet>* ret);
+    static bool getControl(const PlainField&, const Decision&, KeySetSeq* ret);
 
-    static bool getControlOnline(const PlainField&, const KumipuyoPos& goal, const KumipuyoPos& start, std::vector<KeySet>* ret);
+    static bool getControlOnline(const PlainField&, const KumipuyoPos& goal, const KumipuyoPos& start, KeySetSeq* ret);
 
 private:
     static bool isReachableFastpath(const PlainField&, const Decision&);
-    static void moveHorizontally(int x, std::vector<KeySet>* ret);
-    static void add(Key b, std::vector<KeySet>* ret);
+    static void moveHorizontally(int x, KeySetSeq* ret);
+    static void add(Key b, KeySetSeq* ret);
 };
 
 #endif  // CORE_CTRL_H_
