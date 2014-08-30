@@ -27,34 +27,33 @@ bool KeySet::hasKey(Key key) const
     return keys_.test(ordinal(key));
 }
 
-// static
-std::string KeySet::toDebugString(const std::vector<KeySet>& keySets)
+string KeySet::toString() const
 {
-    // caution: this string is used by test cases.
     stringstream ss;
-
-    for (size_t i = 0; i < keySets.size(); ++i) {
-        if (i != 0)
-            ss << ',';
-
-        if (keySets[i].hasKey(Key::KEY_LEFT))
-            ss << "<";
-        if (keySets[i].hasKey(Key::KEY_RIGHT))
-            ss << ">";
-        if (keySets[i].hasKey(Key::KEY_DOWN))
-            ss << "v";
-        if (keySets[i].hasKey(Key::KEY_LEFT_TURN))
-            ss << "B";
-        if (keySets[i].hasKey(Key::KEY_RIGHT_TURN))
-            ss << "A";
-    }
+    if (hasKey(Key::KEY_LEFT))
+        ss << "<";
+    if (hasKey(Key::KEY_RIGHT))
+        ss << ">";
+    if (hasKey(Key::KEY_DOWN))
+        ss << "v";
+    if (hasKey(Key::KEY_LEFT_TURN))
+        ss << "B";
+    if (hasKey(Key::KEY_RIGHT_TURN))
+        ss << "A";
 
     return ss.str();
 }
 
-string KeySet::toString() const
+std::string KeySetSeq::toString() const
 {
-    // TODO(mayah): Implement this with better solution.
-    vector<KeySet> kss { *this };
-    return toDebugString(kss);
+    // caution: this string is used by test cases.
+    stringstream ss;
+
+    for (size_t i = 0; i < seq_.size(); ++i) {
+        if (i != 0)
+            ss << ',';
+        ss << seq_[i].toString();
+    }
+
+    return ss.str();
 }

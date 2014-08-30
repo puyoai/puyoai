@@ -339,7 +339,7 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
         // ----------
         // Set's the current area.
         // This is for checking the destination is reachable, it is ok to set ojama if the cell is occupied.
-        vector<KeySet> keySets;
+        KeySetSeq keySetSeq;
         {
             CoreField field;
             const AdjustedField& af = analyzerResult.playerResult(pi)->adjustedField;
@@ -354,16 +354,16 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
             }
 
             // Not controllable?
-            if (!Ctrl::getControlOnline(field, goal, start, &keySets))
+            if (!Ctrl::getControlOnline(field, goal, start, &keySetSeq))
                 continue;
         }
 
         lastDecision_[pi] = d;
-        for (size_t j = 0; j < keySets.size(); j++) {
-            KeySet k = keySets[j];
+        for (size_t j = 0; j < keySetSeq.size(); j++) {
+            KeySet k = keySetSeq[j];
             keySender_->sendKey(k);
 
-            if (j + 1 < keySets.size() && k.hasIntersection(keySets[j+1])) {
+            if (j + 1 < keySetSeq.size() && k.hasIntersection(keySetSeq[j+1])) {
                 keySender_->sendKey(KeySet());
             }
         }

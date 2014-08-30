@@ -45,6 +45,7 @@ public:
     int axisY() const { return y; }
     int childX() const { return x + (r == 1) - (r == 3); }
     int childY() const { return y + (r == 0) - (r == 2); }
+    int rot() const { return r; }
 
     std::string toDebugString() const;
 
@@ -54,6 +55,7 @@ public:
     }
     friend bool operator!=(const KumipuyoPos& lhs, const KumipuyoPos& rhs) { return !(lhs == rhs); }
 
+public:
     // TODO(mayah): Make these private?
     int x;
     int y;

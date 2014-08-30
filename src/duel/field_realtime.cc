@@ -573,23 +573,23 @@ KeySet FieldRealtime::getKeySet(const Decision& decision) const
     LOG(INFO) << "[" << pos.axisX() << ", " << pos.axisY() << "(" << pos.r << ")] -> ["
               << decision.x << "(" << decision.r << ")]";
 
-    vector<KeySet> keys;
-    if (!Ctrl::getControlOnline(field_, KumipuyoPos(decision.x, 1, decision.r), pos, &keys)) {
+    KeySetSeq keySetSeq;
+    if (!Ctrl::getControlOnline(field_, KumipuyoPos(decision.x, 1, decision.r), pos, &keySetSeq)) {
         LOG(INFO) << "No way...";
         return KeySet();
     }
 
-    LOG(INFO) << KeySet::toDebugString(keys);
+    LOG(INFO) << keySetSeq.toString();
     KeySet nextKey;
 
     // TODO(mayah): This looks a layer violation. Why don't we remove this in getControlOnline?
     // Remove redundant key stroke.
-    if (pos.r == 3 && keys[0] == KeySet(Key::KEY_RIGHT_TURN) && keys[1] == KeySet(Key::KEY_LEFT_TURN)) {
-        nextKey = keys[2];
-    } else if (pos.r == 1 && keys[0] == KeySet(Key::KEY_LEFT_TURN) && keys[1] == KeySet(Key::KEY_RIGHT_TURN)) {
-        nextKey = keys[2];
+    if (pos.r == 3 && keySetSeq[0] == KeySet(Key::KEY_RIGHT_TURN) && keySetSeq[1] == KeySet(Key::KEY_LEFT_TURN)) {
+        nextKey = keySetSeq[2];
+    } else if (pos.r == 1 && keySetSeq[0] == KeySet(Key::KEY_LEFT_TURN) && keySetSeq[1] == KeySet(Key::KEY_RIGHT_TURN)) {
+        nextKey = keySetSeq[2];
     } else {
-        nextKey = keys[0];
+        nextKey = keySetSeq[0];
     }
 
     return nextKey;
