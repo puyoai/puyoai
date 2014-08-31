@@ -37,6 +37,193 @@ void removeRedundantKeySeq(const KumipuyoPos& pos, KeySetSeq* seq)
 
 }
 
+bool Ctrl::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet, MovingKumipuyo* mkp)
+{
+    DCHECK(mkp);
+    DCHECK(!mkp->grounded) << "Grounded puyo cannot be moved.";
+
+    // Only one key will be accepted.
+    // When DOWN + RIGHT or DOWN + LEFT are simultaneously input, DOWN should be ignored.
+
+    if (keySet.hasKey(Key::KEY_RIGHT)) {
+        if (field.get(mkp->pos.axisX() + 1, mkp->pos.axisY()) == PuyoColor::EMPTY &&
+            field.get(mkp->pos.childX() + 1, mkp->pos.childY()) == PuyoColor::EMPTY) {
+            mkp->pos.x++;
+        }
+        return false;
+    }
+
+    if (keySet.hasKey(Key::KEY_LEFT)) {
+        if (field.get(mkp->pos.axisX() - 1, mkp->pos.axisY()) == PuyoColor::EMPTY &&
+            field.get(mkp->pos.childX() - 1, mkp->pos.childY()) == PuyoColor::EMPTY) {
+            mkp->pos.x--;
+        }
+        return false;
+    }
+
+    if (keySet.hasKey(Key::KEY_DOWN)) {
+        if (mkp->restFramesForFreefall > 0) {
+            mkp->restFramesForFreefall = 0;
+            return true;
+        }
+
+        mkp->restFramesForFreefall = 0;
+        if (field.get(mkp->pos.axisX(), mkp->pos.axisY() - 1) == PuyoColor::EMPTY &&
+            field.get(mkp->pos.childX(), mkp->pos.childY() - 1) == PuyoColor::EMPTY) {
+            mkp->pos.y--;
+            return true;
+        }
+
+        // Grounded.
+        mkp->grounded = true;
+        return true;
+    }
+
+    return false;
+}
+
+void Ctrl::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, MovingKumipuyo* mkp)
+{
+    if (keySet.hasKey(Key::KEY_RIGHT_TURN)) {
+        switch (mkp->pos.r) {
+        case 0:
+            if (field.get(mkp->pos.x + 1, mkp->pos.y) == PuyoColor::EMPTY) {
+                mkp->pos.r = (mkp->pos.r + 1) % 4;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+            if (field.get(mkp->pos.x - 1, mkp->pos.y) == PuyoColor::EMPTY) {
+                mkp->pos.r = (mkp->pos.r + 1) % 4;
+                mkp->pos.x--;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            if (mkp->restFramesToAcceptQuickTurn > 0) {
+                mkp->pos.r = 2;
+                mkp->pos.y++;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            mkp->restFramesToAcceptQuickTurn = FRAMES_QUICKTURN;
+            return;
+        case 1:
+            if (field.get(mkp->pos.x, mkp->pos.y - 1) == PuyoColor::EMPTY) {
+                mkp->pos.r = (mkp->pos.r + 1) % 4;
+                return;
+            }
+
+            mkp->pos.r = (mkp->pos.r + 1) % 4;
+            mkp->pos.y++;
+            return;
+        case 2:
+            if (field.get(mkp->pos.x - 1, mkp->pos.y) == PuyoColor::EMPTY) {
+                mkp->pos.r = (mkp->pos.r + 1) % 4;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            if (field.get(mkp->pos.x + 1, mkp->pos.y) == PuyoColor::EMPTY) {
+                mkp->pos.r = (mkp->pos.r + 1) % 4;
+                mkp->pos.x++;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            if (mkp->restFramesToAcceptQuickTurn > 0) {
+                mkp->pos.r = 0;
+                mkp->pos.y--;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            mkp->restFramesToAcceptQuickTurn = FRAMES_QUICKTURN;
+            return;
+        case 3:
+            mkp->pos.r = (mkp->pos.r + 1) % 4;
+            return;
+        default:
+            CHECK(false) << mkp->pos.r;
+            return;
+        }
+    }
+
+    if (keySet.hasKey(Key::KEY_LEFT_TURN)) {
+        switch (mkp->pos.r) {
+        case 0:
+            if (field.get(mkp->pos.x - 1, mkp->pos.y) == PuyoColor::EMPTY) {
+                mkp->pos.r = (mkp->pos.r + 3) % 4;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            if (field.get(mkp->pos.x + 1, mkp->pos.y) == PuyoColor::EMPTY) {
+                mkp->pos.r = (mkp->pos.r + 3) % 4;
+                mkp->pos.x++;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            if (mkp->restFramesToAcceptQuickTurn > 0) {
+                mkp->pos.r = 2;
+                mkp->pos.y++;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            mkp->restFramesToAcceptQuickTurn = FRAMES_QUICKTURN;
+            return;
+        case 1:
+            mkp->pos.r = (mkp->pos.r + 3) % 4;
+            return;
+        case 2:
+            if (field.get(mkp->pos.x + 1, mkp->pos.y) == PuyoColor::EMPTY) {
+                mkp->pos.r = (mkp->pos.r + 3) % 4;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            if (field.get(mkp->pos.x - 1, mkp->pos.y) == PuyoColor::EMPTY) {
+                mkp->pos.r = (mkp->pos.r + 3) % 4;
+                mkp->pos.x--;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            if (mkp->restFramesToAcceptQuickTurn > 0) {
+                mkp->pos.r = 0;
+                mkp->pos.y--;
+                mkp->restFramesToAcceptQuickTurn = 0;
+                return;
+            }
+
+            mkp->restFramesToAcceptQuickTurn = FRAMES_QUICKTURN;
+            return;
+        case 3:
+            if (field.get(mkp->pos.x, mkp->pos.y - 1) == PuyoColor::EMPTY) {
+                mkp->pos.r = (mkp->pos.r + 3) % 4;
+                return;
+            }
+
+            mkp->pos.r = (mkp->pos.r + 3) % 4;
+            mkp->pos.y++;
+            return;
+        default:
+            CHECK(false) << mkp->pos.r;
+            return;
+        }
+    }
+}
+
+bool Ctrl::moveKumipuyo(const PlainField& field, const KeySet& keySet, MovingKumipuyo* mkp)
+{
+    // TODO(mayah): Which key is consumed first? turn? arrow?
+    bool downMoved = moveKumipuyoByArrowKey(field, keySet, mkp);
+    moveKumipuyoByTurnKey(field, keySet, mkp);
+    return downMoved;
+}
+
 bool Ctrl::isReachable(const PlainField& field, const Decision& decision)
 {
     if (isReachableFastpath(field, decision))
