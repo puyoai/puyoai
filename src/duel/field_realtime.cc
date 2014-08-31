@@ -579,20 +579,8 @@ KeySet FieldRealtime::getKeySet(const Decision& decision) const
         return KeySet();
     }
 
-    LOG(INFO) << keySetSeq.toString();
-    KeySet nextKey;
-
-    // TODO(mayah): This looks a layer violation. Why don't we remove this in getControlOnline?
-    // Remove redundant key stroke.
-    if (pos.r == 3 && keySetSeq[0] == KeySet(Key::KEY_RIGHT_TURN) && keySetSeq[1] == KeySet(Key::KEY_LEFT_TURN)) {
-        nextKey = keySetSeq[2];
-    } else if (pos.r == 1 && keySetSeq[0] == KeySet(Key::KEY_LEFT_TURN) && keySetSeq[1] == KeySet(Key::KEY_RIGHT_TURN)) {
-        nextKey = keySetSeq[2];
-    } else {
-        nextKey = keySetSeq[0];
-    }
-
-    return nextKey;
+    CHECK_GT(keySetSeq.size(), 0U) << keySetSeq.size() << " " << keySetSeq.toString();
+    return keySetSeq[0];
 }
 
 int FieldRealtime::reduceOjama(int n)
