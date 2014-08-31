@@ -24,13 +24,12 @@ public:
      */
     static bool isReachableOnline(const PlainField&, const KumipuyoPos& goal, const KumipuyoPos& start);
 
-    static bool isQuickturn(const PlainField&, const KumipuyoPos&);
-
     static bool getControl(const PlainField&, const Decision&, KeySetSeq* ret);
 
     static bool getControlOnline(const PlainField&, const KumipuyoPos& goal, const KumipuyoPos& start, KeySetSeq* ret);
 
 private:
+    static bool isQuickturn(const PlainField&, const KumipuyoPos&);
     static bool isReachableFastpath(const PlainField&, const Decision&);
     static void moveHorizontally(int x, KeySetSeq* ret);
     static void add(Key b, KeySetSeq* ret);
