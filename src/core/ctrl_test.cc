@@ -216,20 +216,6 @@ TEST(CtrlTest, wallAboveScreen)
     EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(5, 1, 0), KumipuyoPos::InitialPos()));
 }
 
-TEST(CtrlTest, foobar)
-{
-    /*
-      14 ......
-      13 .@B@..
-      12 .@A@..
-      11 .@@@..
-    */
-    PlainField f;
-    KeySetSeq ret;
-    Ctrl::getControlOnline(f, KumipuyoPos(3, 8, 2), KumipuyoPos(3, 8, 3), &ret);
-    EXPECT_EQ("A,B,B,v", ret.toString());
-}
-
 TEST(CtrlTest, pivotCannotClimbUpTo14)
 {
     /*

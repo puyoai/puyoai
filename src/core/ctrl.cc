@@ -1,8 +1,41 @@
 #include "core/ctrl.h"
 
+#include <glog/logging.h>
+
 #include "core/decision.h"
 #include "core/kumipuyo.h"
 #include "core/plain_field.h"
+
+namespace {
+
+// Remove redundant key stroke.
+void removeRedundantKeySeq(const KumipuyoPos& pos, KeySetSeq* seq)
+{
+    switch (pos.r) {
+    case 0:
+        return;
+    case 1:
+        if (seq->size() >= 2 && (*seq)[0] == KeySet(Key::KEY_LEFT_TURN) && (*seq)[1] == KeySet(Key::KEY_RIGHT_TURN)) {
+            // Remove 2 key strokes.
+            seq->removeFront();
+            seq->removeFront();
+        }
+        return;
+    case 2:
+        return;
+    case 3:
+        if (seq->size() >= 2 && (*seq)[0] == KeySet(Key::KEY_RIGHT_TURN) && (*seq)[1] == KeySet(Key::KEY_LEFT_TURN)) {
+            seq->removeFront();
+            seq->removeFront();
+        }
+        return;
+    default:
+        CHECK(false) << "Unknown r: " << pos.r;
+        return;
+    }
+}
+
+}
 
 bool Ctrl::isReachable(const PlainField& field, const Decision& decision)
 {
@@ -110,6 +143,8 @@ bool Ctrl::getControl(const PlainField& field, const Decision& decision, KeySetS
     }
 
     add(Key::KEY_DOWN, ret);
+
+    removeRedundantKeySeq(KumipuyoPos::InitialPos(), ret);
 
     return true;
 }
@@ -272,8 +307,10 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
             }
         }
     }
+
     add(Key::KEY_DOWN, ret);
-    //LOG(INFO) << buttonsDebugString();
+    removeRedundantKeySeq(start, ret);
+    // LOG(INFO) << buttonsDebugString();
     return true;
 }
 

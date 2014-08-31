@@ -44,6 +44,9 @@ public:
     const KeySet& operator[](int idx) const { return seq_[idx]; }
 
     void add(const KeySet& ks) { seq_.push_back(ks); }
+    // TODO(mayah): This is not O(1) but O(N). However, this method won't be called much.
+    // So it would be acceptable.
+    void removeFront() { seq_.erase(seq_.begin()); }
 
     void clear() { seq_.clear(); }
 
