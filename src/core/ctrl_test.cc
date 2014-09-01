@@ -101,6 +101,21 @@ TEST(CtrlTest, moveKumipuyoFreefall)
     EXPECT_FALSE(downAccepted);
 }
 
+TEST(CtrlTest, moveKumipuyoMultipleKeys)
+{
+    PlainField f;
+    MovingKumipuyo mkp(KumipuyoPos(1, 12, 0));
+    mkp.restFramesForFreefall = FRAMES_FREE_FALL;
+    bool downAccepted = false;
+
+    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_RIGHT, Key::KEY_LEFT_TURN), &mkp, &downAccepted);
+    EXPECT_EQ(KumipuyoPos(2, 12, 3), mkp.pos);
+    EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
+    EXPECT_EQ(FRAMES_FREE_FALL - 1, mkp.restFramesForFreefall);
+    EXPECT_FALSE(mkp.grounded);
+    EXPECT_FALSE(downAccepted);
+}
+
 TEST(CtrlTest, isReachable1)
 {
     PlainField f(
