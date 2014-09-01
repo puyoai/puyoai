@@ -27,7 +27,7 @@ struct MovingKumipuyo {
 
 class Ctrl {
 public:
-    static bool moveKumipuyo(const PlainField&, const KeySet&, MovingKumipuyo*);
+    static void moveKumipuyo(const PlainField&, const KeySet&, MovingKumipuyo*, bool* downAccepted);
 
     static bool isReachable(const PlainField&, const Decision&);
     /**
@@ -43,7 +43,7 @@ public:
 
 private:
     // Move kumipuyo using only arrow key. True is returned only when DOWN is accepted.
-    static bool moveKumipuyoByArrowKey(const PlainField&, const KeySet&, MovingKumipuyo*);
+    static void moveKumipuyoByArrowKey(const PlainField&, const KeySet&, MovingKumipuyo*, bool* downAccepted);
     static void moveKumipuyoByTurnKey(const PlainField&, const KeySet&, MovingKumipuyo*);
     static void moveKumipuyoByFreefall(const PlainField&, MovingKumipuyo*);
 
