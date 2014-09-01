@@ -216,11 +216,34 @@ void Ctrl::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, 
     }
 }
 
+void Ctrl::moveKumipuyoByFreefall(const PlainField& field, MovingKumipuyo* mkp)
+{
+    DCHECK(!mkp->grounded);
+
+    if (mkp->restFramesForFreefall > 1) {
+        mkp->restFramesForFreefall--;
+        return;
+    }
+
+    mkp->restFramesForFreefall = FRAMES_FREE_FALL;
+    if (field.get(mkp->pos.axisX(), mkp->pos.axisY() - 1) == PuyoColor::EMPTY &&
+        field.get(mkp->pos.childX(), mkp->pos.childY() - 1) == PuyoColor::EMPTY) {
+        mkp->pos.y--;
+        return;
+    }
+
+    mkp->grounded = true;
+    return;
+}
+
 bool Ctrl::moveKumipuyo(const PlainField& field, const KeySet& keySet, MovingKumipuyo* mkp)
 {
     // TODO(mayah): Which key is consumed first? turn? arrow?
     bool downMoved = moveKumipuyoByArrowKey(field, keySet, mkp);
     moveKumipuyoByTurnKey(field, keySet, mkp);
+    if (!keySet.hasKey(Key::KEY_DOWN)) {
+        moveKumipuyoByFreefall(field, mkp);
+    }
     return downMoved;
 }
 
