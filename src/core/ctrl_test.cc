@@ -9,7 +9,7 @@
 
 using namespace std;
 
-TEST(CtrlTest, moveKumipuyo)
+TEST(CtrlTest, moveKumipuyoWithOnlyArrowKey)
 {
     PlainField f;
     MovingKumipuyo mkp(KumipuyoPos(3, 12, 0));
@@ -38,19 +38,53 @@ TEST(CtrlTest, moveKumipuyo)
     EXPECT_EQ(0, mkp.restFramesForFreefall);
     EXPECT_FALSE(mkp.grounded);
 
-    mkp.pos = KumipuyoPos(3, 0, 0);
+    mkp.pos = KumipuyoPos(3, 1, 0);
     mkp.restFramesForFreefall = FRAMES_FREE_FALL;
 
     Ctrl::moveKumipuyo(f, KeySet(Key::KEY_DOWN), &mkp);
-    EXPECT_EQ(KumipuyoPos(3, 0, 0), mkp.pos);
+    EXPECT_EQ(KumipuyoPos(3, 1, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(0, mkp.restFramesForFreefall);
     EXPECT_FALSE(mkp.grounded);
 
     Ctrl::moveKumipuyo(f, KeySet(Key::KEY_DOWN), &mkp);
-    EXPECT_EQ(KumipuyoPos(3, 0, 0), mkp.pos);
+    EXPECT_EQ(KumipuyoPos(3, 1, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(0, mkp.restFramesForFreefall);
+    EXPECT_TRUE(mkp.grounded);
+}
+
+TEST(CtrlTest, moveKumipuyoFreefall)
+{
+    PlainField f;
+    MovingKumipuyo mkp(KumipuyoPos(3, 12, 0));
+    mkp.restFramesForFreefall = 2;
+
+    Ctrl::moveKumipuyo(f, KeySet(), &mkp);
+    EXPECT_EQ(KumipuyoPos(3, 12, 0), mkp.pos);
+    EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
+    EXPECT_EQ(1, mkp.restFramesForFreefall);
+    EXPECT_FALSE(mkp.grounded);
+
+    Ctrl::moveKumipuyo(f, KeySet(), &mkp);
+    EXPECT_EQ(KumipuyoPos(3, 11, 0), mkp.pos);
+    EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
+    EXPECT_EQ(FRAMES_FREE_FALL, mkp.restFramesForFreefall);
+    EXPECT_FALSE(mkp.grounded);
+
+    mkp.pos = KumipuyoPos(3, 1, 0);
+    mkp.restFramesForFreefall = 2;
+
+    Ctrl::moveKumipuyo(f, KeySet(), &mkp);
+    EXPECT_EQ(KumipuyoPos(3, 1, 0), mkp.pos);
+    EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
+    EXPECT_EQ(1, mkp.restFramesForFreefall);
+    EXPECT_FALSE(mkp.grounded);
+
+    Ctrl::moveKumipuyo(f, KeySet(), &mkp);
+    EXPECT_EQ(KumipuyoPos(3, 1, 0), mkp.pos);
+    EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
+    EXPECT_EQ(FRAMES_FREE_FALL, mkp.restFramesForFreefall);
     EXPECT_TRUE(mkp.grounded);
 }
 

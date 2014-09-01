@@ -45,6 +45,7 @@ private:
     // Move kumipuyo using only arrow key. True is returned only when DOWN is accepted.
     static bool moveKumipuyoByArrowKey(const PlainField&, const KeySet&, MovingKumipuyo*);
     static void moveKumipuyoByTurnKey(const PlainField&, const KeySet&, MovingKumipuyo*);
+    static void moveKumipuyoByFreefall(const PlainField&, MovingKumipuyo*);
 
     static bool isQuickturn(const PlainField&, const KumipuyoPos&);
     static bool isReachableFastpath(const PlainField&, const Decision&);
