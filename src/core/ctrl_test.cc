@@ -119,15 +119,15 @@ TEST(CtrlTest, moveKumipuyoMultipleKeys)
 TEST(CtrlTest, isReachable1)
 {
     PlainField f(
-        "      "
+        "      " // 12
         "OOOOOO"
         "OOOOOO"
         "OOOOOO"
+        "OOOOOO" // 8
         "OOOOOO"
         "OOOOOO"
         "OOOOOO"
-        "OOOOOO"
-        "OOOOOO"
+        "OOOOOO" // 4
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
@@ -147,15 +147,15 @@ TEST(CtrlTest, isReachable2)
 {
     PlainField f(
         " O O  "
-        " O O  "
+        " O O  " // 12
         "OOOOOO"
         "OOOOOO"
         "OOOOOO"
+        "OOOOOO" // 8
         "OOOOOO"
         "OOOOOO"
         "OOOOOO"
-        "OOOOOO"
-        "OOOOOO"
+        "OOOOOO" // 4
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
@@ -177,32 +177,34 @@ TEST(CtrlTest, isReachable2)
 TEST(CtrlTest, isReachableOnline)
 {
     // need quick turn to go over a wall
-    PlainField f("040400"
-                 "040400"
-                 "040400"
-                 "040400"
-                 "040400"
-                 "040400"
-                 "040400"
-                 "040400"
-                 "040400"
-                 "040400"
-                 "040400"
-                 "040400");
+    PlainField f(" O O  " // 12
+                 " O O  "
+                 " O O  "
+                 " O O  "
+                 " O O  " // 8
+                 " O O  "
+                 " O O  "
+                 " O O  "
+                 " O O  " // 4
+                 " O O  "
+                 " O O  "
+                 " O O  ");
+
     KumipuyoPos k0(3, 12, 0);  // initial position
-    KumipuyoPos k1(3, 11, 0);
     for (int x = 1; x <= 6; x++) {
         KumipuyoPos goal(x, 1, 0);
         EXPECT_TRUE(Ctrl::isReachableOnline(f, goal, k0));
     }
+
+    KumipuyoPos k1(3, 11, 0);
     EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(1, 1, 2), k1));
     EXPECT_FALSE(Ctrl::isReachableOnline(f, KumipuyoPos(5, 1, 0), k1));
 }
 
 TEST(CtrlTest, isReachableCannotClimbTwoBlocks)
 {
-    PlainField f("040040"
-                 "050050");
+    PlainField f(" O  O "
+                 " O  O ");
     /*
       3  ......
       2  .@A.@.
@@ -217,11 +219,11 @@ TEST(CtrlTest, isReachableCannotClimbTwoBlocks)
 
 TEST(CtrlTest, climbStairsRight)
 {
-    PlainField f("000004"
-                 "000040"
-                 "000400"
-                 "004000"
-                 "040000");
+    PlainField f("     O"
+                 "    OO" // 4
+                 "   OOO"
+                 "  OOOO"
+                 " OOOOO");
     /*
       6  ......
       5  .....@
