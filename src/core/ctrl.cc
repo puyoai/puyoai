@@ -37,7 +37,7 @@ void removeRedundantKeySeq(const KumipuyoPos& pos, KeySetSeq* seq)
 
 }
 
-bool Ctrl::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet, MovingKumipuyo* mkp)
+void Ctrl::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet, MovingKumipuyo* mkp, bool* downAccepted)
 {
     DCHECK(mkp);
     DCHECK(!mkp->grounded) << "Grounded puyo cannot be moved.";
@@ -50,7 +50,7 @@ bool Ctrl::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet,
             field.get(mkp->pos.childX() + 1, mkp->pos.childY()) == PuyoColor::EMPTY) {
             mkp->pos.x++;
         }
-        return false;
+        return;
     }
 
     if (keySet.hasKey(Key::KEY_LEFT)) {
@@ -58,28 +58,27 @@ bool Ctrl::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet,
             field.get(mkp->pos.childX() - 1, mkp->pos.childY()) == PuyoColor::EMPTY) {
             mkp->pos.x--;
         }
-        return false;
+        return;
     }
 
     if (keySet.hasKey(Key::KEY_DOWN)) {
+        *downAccepted = true;
         if (mkp->restFramesForFreefall > 0) {
             mkp->restFramesForFreefall = 0;
-            return true;
+            return;
         }
 
         mkp->restFramesForFreefall = 0;
         if (field.get(mkp->pos.axisX(), mkp->pos.axisY() - 1) == PuyoColor::EMPTY &&
             field.get(mkp->pos.childX(), mkp->pos.childY() - 1) == PuyoColor::EMPTY) {
             mkp->pos.y--;
-            return true;
+            return;
         }
 
         // Grounded.
         mkp->grounded = true;
-        return true;
+        return;
     }
-
-    return false;
 }
 
 void Ctrl::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, MovingKumipuyo* mkp)
@@ -236,15 +235,13 @@ void Ctrl::moveKumipuyoByFreefall(const PlainField& field, MovingKumipuyo* mkp)
     return;
 }
 
-bool Ctrl::moveKumipuyo(const PlainField& field, const KeySet& keySet, MovingKumipuyo* mkp)
+void Ctrl::moveKumipuyo(const PlainField& field, const KeySet& keySet, MovingKumipuyo* mkp, bool* downAccepted)
 {
     // TODO(mayah): Which key is consumed first? turn? arrow?
-    bool downMoved = moveKumipuyoByArrowKey(field, keySet, mkp);
+    moveKumipuyoByArrowKey(field, keySet, mkp, downAccepted);
     moveKumipuyoByTurnKey(field, keySet, mkp);
-    if (!keySet.hasKey(Key::KEY_DOWN)) {
+    if (!keySet.hasKey(Key::KEY_DOWN))
         moveKumipuyoByFreefall(field, mkp);
-    }
-    return downMoved;
 }
 
 bool Ctrl::isReachable(const PlainField& field, const Decision& decision)

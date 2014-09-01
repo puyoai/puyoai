@@ -13,45 +13,53 @@ TEST(CtrlTest, moveKumipuyoWithOnlyArrowKey)
 {
     PlainField f;
     MovingKumipuyo mkp(KumipuyoPos(3, 12, 0));
+    bool downAccepted = false;
 
-    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_RIGHT), &mkp);
+    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_RIGHT), &mkp, &downAccepted);
     EXPECT_EQ(KumipuyoPos(4, 12, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(FRAMES_FREE_FALL - 1, mkp.restFramesForFreefall);
     EXPECT_FALSE(mkp.grounded);
 
-    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_LEFT), &mkp);
+    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_LEFT), &mkp, &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 12, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(FRAMES_FREE_FALL - 2, mkp.restFramesForFreefall);
     EXPECT_FALSE(mkp.grounded);
 
-    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_DOWN), &mkp);
+    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_DOWN), &mkp, &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 12, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(0, mkp.restFramesForFreefall);
     EXPECT_FALSE(mkp.grounded);
+    EXPECT_TRUE(downAccepted);
 
-    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_DOWN), &mkp);
+    downAccepted = false;
+    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_DOWN), &mkp, &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 11, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(0, mkp.restFramesForFreefall);
     EXPECT_FALSE(mkp.grounded);
+    EXPECT_TRUE(downAccepted);
 
     mkp.pos = KumipuyoPos(3, 1, 0);
     mkp.restFramesForFreefall = FRAMES_FREE_FALL;
 
-    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_DOWN), &mkp);
+    downAccepted = false;
+    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_DOWN), &mkp, &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 1, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(0, mkp.restFramesForFreefall);
     EXPECT_FALSE(mkp.grounded);
+    EXPECT_TRUE(downAccepted);
 
-    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_DOWN), &mkp);
+    downAccepted = false;
+    Ctrl::moveKumipuyo(f, KeySet(Key::KEY_DOWN), &mkp, &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 1, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(0, mkp.restFramesForFreefall);
     EXPECT_TRUE(mkp.grounded);
+    EXPECT_TRUE(downAccepted);
 }
 
 TEST(CtrlTest, moveKumipuyoFreefall)
@@ -59,33 +67,38 @@ TEST(CtrlTest, moveKumipuyoFreefall)
     PlainField f;
     MovingKumipuyo mkp(KumipuyoPos(3, 12, 0));
     mkp.restFramesForFreefall = 2;
+    bool downAccepted = false;
 
-    Ctrl::moveKumipuyo(f, KeySet(), &mkp);
+    Ctrl::moveKumipuyo(f, KeySet(), &mkp, &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 12, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(1, mkp.restFramesForFreefall);
     EXPECT_FALSE(mkp.grounded);
+    EXPECT_FALSE(downAccepted);
 
-    Ctrl::moveKumipuyo(f, KeySet(), &mkp);
+    Ctrl::moveKumipuyo(f, KeySet(), &mkp, &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 11, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(FRAMES_FREE_FALL, mkp.restFramesForFreefall);
     EXPECT_FALSE(mkp.grounded);
+    EXPECT_FALSE(downAccepted);
 
     mkp.pos = KumipuyoPos(3, 1, 0);
     mkp.restFramesForFreefall = 2;
 
-    Ctrl::moveKumipuyo(f, KeySet(), &mkp);
+    Ctrl::moveKumipuyo(f, KeySet(), &mkp, &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 1, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(1, mkp.restFramesForFreefall);
     EXPECT_FALSE(mkp.grounded);
+    EXPECT_FALSE(downAccepted);
 
-    Ctrl::moveKumipuyo(f, KeySet(), &mkp);
+    Ctrl::moveKumipuyo(f, KeySet(), &mkp, &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 1, 0), mkp.pos);
     EXPECT_EQ(0, mkp.restFramesToAcceptQuickTurn);
     EXPECT_EQ(FRAMES_FREE_FALL, mkp.restFramesForFreefall);
     EXPECT_TRUE(mkp.grounded);
+    EXPECT_FALSE(downAccepted);
 }
 
 TEST(CtrlTest, isReachable1)
