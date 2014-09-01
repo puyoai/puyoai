@@ -16,8 +16,8 @@ class Decision;
 class KumipuyoPos;
 class PlainField;
 
-struct MovingKumipuyo {
-    explicit MovingKumipuyo(const KumipuyoPos& pos) : pos(pos) {}
+struct MovingKumipuyoState {
+    explicit MovingKumipuyoState(const KumipuyoPos& pos) : pos(pos) {}
 
     KumipuyoPos pos;
     int restFramesToAcceptQuickTurn = 0;
@@ -27,7 +27,7 @@ struct MovingKumipuyo {
 
 class Ctrl {
 public:
-    static void moveKumipuyo(const PlainField&, const KeySet&, MovingKumipuyo*, bool* downAccepted);
+    static void moveKumipuyo(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted);
 
     static bool isReachable(const PlainField&, const Decision&);
     /**
@@ -43,9 +43,9 @@ public:
 
 private:
     // Move kumipuyo using only arrow key. True is returned only when DOWN is accepted.
-    static void moveKumipuyoByArrowKey(const PlainField&, const KeySet&, MovingKumipuyo*, bool* downAccepted);
-    static void moveKumipuyoByTurnKey(const PlainField&, const KeySet&, MovingKumipuyo*);
-    static void moveKumipuyoByFreefall(const PlainField&, MovingKumipuyo*);
+    static void moveKumipuyoByArrowKey(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted);
+    static void moveKumipuyoByTurnKey(const PlainField&, const KeySet&, MovingKumipuyoState*);
+    static void moveKumipuyoByFreefall(const PlainField&, MovingKumipuyoState*);
 
     static bool isQuickturn(const PlainField&, const KumipuyoPos&);
     static bool isReachableFastpath(const PlainField&, const Decision&);
