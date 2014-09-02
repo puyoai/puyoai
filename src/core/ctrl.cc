@@ -249,7 +249,7 @@ struct Vertex {
 
     friend bool operator==(const Vertex& lhs, const Vertex& rhs)
     {
-        return lhs.pos == rhs.pos && lhs.turnProhibited && rhs.turnProhibited;
+        return lhs.pos == rhs.pos && lhs.turnProhibited == rhs.turnProhibited;
     }
     friend bool operator!=(const Vertex& lhs, const Vertex& rhs) { return !(lhs.pos == rhs.pos); }
     friend bool operator<(const Vertex& lhs, const Vertex& rhs)
@@ -288,6 +288,7 @@ typedef map<Vertex, tuple<Vertex, KeySet, Weight>> Potential;
 KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKumipuyoState& initialState, const Decision& decision)
 {
     static const KeySet KEY_CANDIDATES[] = {
+        KeySet(),
         KeySet(Key::KEY_LEFT),
         KeySet(Key::KEY_RIGHT),
         KeySet(Key::KEY_LEFT, Key::KEY_LEFT_TURN),
@@ -297,7 +298,7 @@ KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKum
         KeySet(Key::KEY_LEFT_TURN),
         KeySet(Key::KEY_RIGHT_TURN)
     };
-    static const int KEY_CANDIDATES_SIZE = 8;
+    static const int KEY_CANDIDATES_SIZE = ARRAY_SIZE(KEY_CANDIDATES);
 
     Potential pot;
     priority_queue<Edge, Edges, greater<Edge> > Q;
@@ -322,9 +323,9 @@ KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKum
             vector<KeySet> kss;
             kss.push_back(KeySet(Key::KEY_DOWN));
             while (pot.count(p)) {
-                const KeySet ks(std::get<1>(pot[p]));
-                if (!ks.hasSomeKey())
+                if (p == startV)
                     break;
+                const KeySet ks(std::get<1>(pot[p]));
                 kss.push_back(ks);
                 p = std::get<0>(pot[p]);
             }
@@ -333,17 +334,18 @@ KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKum
             return KeySetSeq(kss);
         }
 
-        int size = p.turnProhibited ? 2 : KEY_CANDIDATES_SIZE;
+        int size = p.turnProhibited ? 3 : KEY_CANDIDATES_SIZE;
         for (int i = 0; i < size; ++i) {
             MovingKumipuyoState mks(p.pos);
             moveKumipuyo(field, KEY_CANDIDATES[i], &mks);
 
-            bool turnProhibited = (i >= 2);
+            bool turnProhibited = (i >= 3);
             Vertex newP(mks.pos, turnProhibited);
 
             if (pot.count(newP))
                 continue;
-            Q.push(Edge(p, newP, curr + 1, KEY_CANDIDATES[i]));
+            // TODO(mayah): This is not correct. We'd like to prefer KeySet() to another key sequence a bit.
+            Q.push(Edge(p, newP, curr + 10 - (i == 0), KEY_CANDIDATES[i]));
         }
     }
 
