@@ -135,7 +135,7 @@ TEST(CtrlTest, findKeyStrokeByDijkstra)
     }
     {
         KeySetSeq kss = Ctrl::findKeyStrokeByDijkstra(f, mks, Decision(6, 2));
-        EXPECT_EQ(">A,>A,>,v", kss.toString());
+        EXPECT_EQ(">B,>,>B,v", kss.toString());
     }
 }
 

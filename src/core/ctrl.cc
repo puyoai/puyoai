@@ -245,14 +245,23 @@ void Ctrl::moveKumipuyoByFreefall(const PlainField& field, MovingKumipuyoState* 
 
 struct Vertex {
     Vertex() {}
-    Vertex(const KumipuyoPos& pos) : pos(pos) {}
+    Vertex(const KumipuyoPos& pos, bool turnProhibited) : pos(pos), turnProhibited(turnProhibited) {}
 
-    friend bool operator==(const Vertex& lhs, const Vertex& rhs) { return lhs.pos == rhs.pos; }
+    friend bool operator==(const Vertex& lhs, const Vertex& rhs)
+    {
+        return lhs.pos == rhs.pos && lhs.turnProhibited && rhs.turnProhibited;
+    }
     friend bool operator!=(const Vertex& lhs, const Vertex& rhs) { return !(lhs.pos == rhs.pos); }
-    friend bool operator<(const Vertex& lhs, const Vertex& rhs) { return lhs.pos < rhs.pos; }
+    friend bool operator<(const Vertex& lhs, const Vertex& rhs)
+    {
+        if (lhs.pos != rhs.pos)
+            return lhs.pos < rhs.pos;
+        return lhs.turnProhibited < rhs.turnProhibited;
+    }
     friend bool operator>(const Vertex& lhs, const Vertex& rhs) { return lhs.pos > rhs.pos; }
 
     KumipuyoPos pos;
+    bool turnProhibited;
 };
 
 typedef int Weight;
@@ -280,9 +289,9 @@ KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKum
 {
     static const KeySet KEY_CANDIDATES[] = {
         KeySet(Key::KEY_LEFT),
+        KeySet(Key::KEY_RIGHT),
         KeySet(Key::KEY_LEFT, Key::KEY_LEFT_TURN),
         KeySet(Key::KEY_LEFT, Key::KEY_RIGHT_TURN),
-        KeySet(Key::KEY_RIGHT),
         KeySet(Key::KEY_RIGHT, Key::KEY_LEFT_TURN),
         KeySet(Key::KEY_RIGHT, Key::KEY_RIGHT_TURN),
         KeySet(Key::KEY_LEFT_TURN),
@@ -293,7 +302,7 @@ KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKum
     Potential pot;
     priority_queue<Edge, Edges, greater<Edge> > Q;
 
-    Vertex startV(initialState.pos);
+    Vertex startV(initialState.pos, false);
     Q.push(Edge(startV, startV, 0, KeySet()));
 
     while (!Q.empty()) {
@@ -324,12 +333,13 @@ KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKum
             return KeySetSeq(kss);
         }
 
-        // We consider only the following edges: <, <A, <B, >, >A, >B
-        for (int i = 0; i < KEY_CANDIDATES_SIZE; ++i) {
+        int size = p.turnProhibited ? 2 : KEY_CANDIDATES_SIZE;
+        for (int i = 0; i < size; ++i) {
             MovingKumipuyoState mks(p.pos);
             moveKumipuyo(field, KEY_CANDIDATES[i], &mks);
 
-            Vertex newP(mks.pos);
+            bool turnProhibited = (i >= 2);
+            Vertex newP(mks.pos, turnProhibited);
 
             if (pot.count(newP))
                 continue;
