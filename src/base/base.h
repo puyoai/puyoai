@@ -1,6 +1,10 @@
 #ifndef BASE_BASE_H_
 #define BASE_BASE_H_
 
+#define ARRAY_SIZE(a)                                   \
+    ((sizeof(a) / sizeof(*(a))) /                       \
+     static_cast<size_t>(!(sizeof(a) % sizeof(*(a)))))
+
 #define CLEAR_ARRAY(a) memset(a, 0, sizeof(a))
 
 #define UNUSED_VARIABLE(x) (void)(x)
