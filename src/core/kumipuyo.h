@@ -54,6 +54,15 @@ public:
         return lhs.x == rhs.x && lhs.y == rhs.y && lhs.r == rhs.r;
     }
     friend bool operator!=(const KumipuyoPos& lhs, const KumipuyoPos& rhs) { return !(lhs == rhs); }
+    friend bool operator<(const KumipuyoPos& lhs, const KumipuyoPos& rhs)
+    {
+        if (lhs.x != rhs.x)
+            return lhs.x < rhs.x;
+        if (lhs.y != rhs.y)
+            return lhs.y < rhs.y;
+        return lhs.r < rhs.r;
+    }
+    friend bool operator>(const KumipuyoPos& lhs, const KumipuyoPos& rhs) { return rhs < lhs; }
 
 public:
     // TODO(mayah): Make these private?

@@ -27,7 +27,9 @@ struct MovingKumipuyoState {
 
 class Ctrl {
 public:
-    static void moveKumipuyo(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted);
+    static void moveKumipuyo(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted = nullptr);
+
+    static KeySetSeq findKeyStrokeByDijkstra(const PlainField&, const MovingKumipuyoState&, const Decision&);
 
     static bool isReachable(const PlainField&, const Decision&);
     /**
