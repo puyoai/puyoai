@@ -116,6 +116,53 @@ TEST(CtrlTest, moveKumipuyoMultipleKeys)
     EXPECT_FALSE(downAccepted);
 }
 
+TEST(CtrlTest, findKeyStrokeByDijkstra)
+{
+    PlainField f;
+    MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+
+    {
+        KeySetSeq kss = Ctrl::findKeyStrokeByDijkstra(f, mks, Decision(3, 0));
+        EXPECT_EQ("v", kss.toString());
+    }
+    {
+        KeySetSeq kss = Ctrl::findKeyStrokeByDijkstra(f, mks, Decision(3, 1));
+        EXPECT_EQ("A,v", kss.toString());
+    }
+    {
+        KeySetSeq kss = Ctrl::findKeyStrokeByDijkstra(f, mks, Decision(3, 2));
+        EXPECT_TRUE("A,A,v" == kss.toString() || "B,B,v" == kss.toString());
+    }
+    {
+        KeySetSeq kss = Ctrl::findKeyStrokeByDijkstra(f, mks, Decision(6, 2));
+        EXPECT_EQ(">A,>A,>,v", kss.toString());
+    }
+}
+
+TEST(CtrlTest, findKeyStrokeByDijkstraNonmovable)
+{
+    PlainField f(
+        " O O  "
+        " O O  " // 12
+        " O O  "
+        " O O  "
+        " O O  "
+        " O O  " // 8
+        " O O  "
+        " O O  "
+        " O O  "
+        " O O  " // 4
+        " O O  "
+        " O O  "
+        " O O  ");
+    MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+
+    {
+        KeySetSeq kss = Ctrl::findKeyStrokeByDijkstra(f, mks, Decision(6, 2));
+        EXPECT_EQ("", kss.toString());
+    }
+}
+
 TEST(CtrlTest, isReachable1)
 {
     PlainField f(

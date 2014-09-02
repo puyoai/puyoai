@@ -1,10 +1,17 @@
 #include "core/ctrl.h"
 
+#include <map>
+#include <queue>
+#include <tuple>
+#include <vector>
+
 #include <glog/logging.h>
 
 #include "core/decision.h"
 #include "core/kumipuyo.h"
 #include "core/plain_field.h"
+
+using namespace std;
 
 namespace {
 
@@ -62,7 +69,8 @@ void Ctrl::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet,
     }
 
     if (keySet.hasKey(Key::KEY_DOWN)) {
-        *downAccepted = true;
+        if (downAccepted)
+            *downAccepted = true;
         if (mks->restFramesForFreefall > 0) {
             mks->restFramesForFreefall = 0;
             return;
@@ -233,6 +241,104 @@ void Ctrl::moveKumipuyoByFreefall(const PlainField& field, MovingKumipuyoState* 
 
     mks->grounded = true;
     return;
+}
+
+struct Vertex {
+    Vertex() {}
+    Vertex(const KumipuyoPos& pos) : pos(pos) {}
+
+    friend bool operator==(const Vertex& lhs, const Vertex& rhs) { return lhs.pos == rhs.pos; }
+    friend bool operator!=(const Vertex& lhs, const Vertex& rhs) { return !(lhs.pos == rhs.pos); }
+    friend bool operator<(const Vertex& lhs, const Vertex& rhs) { return lhs.pos < rhs.pos; }
+    friend bool operator>(const Vertex& lhs, const Vertex& rhs) { return lhs.pos > rhs.pos; }
+
+    KumipuyoPos pos;
+};
+
+typedef int Weight;
+struct Edge {
+    Edge() {}
+    Edge(const Vertex& src, const Vertex& dest, Weight weight, const KeySet& keySet) :
+        src(src), dest(dest), weight(weight), keySet(keySet) {}
+
+    friend bool operator>(const Edge& lhs, const Edge& rhs) {
+        if (lhs.weight != rhs.weight) { return lhs.weight > rhs.weight; }
+        if (lhs.src != rhs.src) { lhs.src > rhs.src; }
+        return lhs.dest > rhs.dest;
+    }
+
+    Vertex src;
+    Vertex dest;
+    Weight weight;
+    KeySet keySet;
+};
+
+typedef vector<Edge> Edges;
+typedef map<Vertex, tuple<Vertex, KeySet, Weight>> Potential;
+
+KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKumipuyoState& initialState, const Decision& decision)
+{
+    static const KeySet KEY_CANDIDATES[] = {
+        KeySet(Key::KEY_LEFT),
+        KeySet(Key::KEY_LEFT, Key::KEY_LEFT_TURN),
+        KeySet(Key::KEY_LEFT, Key::KEY_RIGHT_TURN),
+        KeySet(Key::KEY_RIGHT),
+        KeySet(Key::KEY_RIGHT, Key::KEY_LEFT_TURN),
+        KeySet(Key::KEY_RIGHT, Key::KEY_RIGHT_TURN),
+        KeySet(Key::KEY_LEFT_TURN),
+        KeySet(Key::KEY_RIGHT_TURN)
+    };
+    static const int KEY_CANDIDATES_SIZE = 8;
+
+    Potential pot;
+    priority_queue<Edge, Edges, greater<Edge> > Q;
+
+    Vertex startV(initialState.pos);
+    Q.push(Edge(startV, startV, 0, KeySet()));
+
+    while (!Q.empty()) {
+        Edge edge = Q.top(); Q.pop();
+        Vertex p = edge.dest;
+        Weight curr = edge.weight;
+
+        // already visited?
+        if (pot.count(p))
+            continue;
+
+        pot[p] = make_tuple(edge.src, edge.keySet, curr);
+
+        // goal.
+        if (p.pos.axisX() == decision.x && p.pos.rot() == decision.r) {
+            // goal.
+            vector<KeySet> kss;
+            kss.push_back(KeySet(Key::KEY_DOWN));
+            while (pot.count(p)) {
+                const KeySet ks(std::get<1>(pot[p]));
+                if (!ks.hasSomeKey())
+                    break;
+                kss.push_back(ks);
+                p = std::get<0>(pot[p]);
+            }
+
+            reverse(kss.begin(), kss.end());
+            return KeySetSeq(kss);
+        }
+
+        // We consider only the following edges: <, <A, <B, >, >A, >B
+        for (int i = 0; i < KEY_CANDIDATES_SIZE; ++i) {
+            MovingKumipuyoState mks(p.pos);
+            moveKumipuyo(field, KEY_CANDIDATES[i], &mks);
+
+            Vertex newP(mks.pos);
+
+            if (pot.count(newP))
+                continue;
+            Q.push(Edge(p, newP, curr + 1, KEY_CANDIDATES[i]));
+        }
+    }
+
+    // No way...
+    return KeySetSeq();
 }
 
 void Ctrl::moveKumipuyo(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
