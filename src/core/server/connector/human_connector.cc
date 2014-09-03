@@ -28,8 +28,8 @@ ConnectorFrameResponse HumanConnector::read()
     cfr.keySet = currentKeySet_;
 
     if (!nextIsPlayable_) {
-        currentKeySet_.setKey(Key::KEY_LEFT_TURN, false);
-        currentKeySet_.setKey(Key::KEY_RIGHT_TURN, false);
+        currentKeySet_.setKey(Key::LEFT_TURN, false);
+        currentKeySet_.setKey(Key::RIGHT_TURN, false);
     }
     return cfr;
 }
@@ -49,14 +49,14 @@ void HumanConnector::setKeySet(const KeySet& keySet)
 {
     lock_guard<mutex> lock(mu_);
 
-    currentKeySet_.setKey(Key::KEY_DOWN, keySet.hasKey(Key::KEY_DOWN));
-    currentKeySet_.setKey(Key::KEY_LEFT, keySet.hasKey(Key::KEY_LEFT));
-    currentKeySet_.setKey(Key::KEY_RIGHT, keySet.hasKey(Key::KEY_RIGHT));
+    currentKeySet_.setKey(Key::DOWN, keySet.hasKey(Key::DOWN));
+    currentKeySet_.setKey(Key::LEFT, keySet.hasKey(Key::LEFT));
+    currentKeySet_.setKey(Key::RIGHT, keySet.hasKey(Key::RIGHT));
 
     // These key are bit-or. We will consume this only when playable state.
     // Otherwise, we often miss the key or uses too much.
-    if (keySet.hasKey(Key::KEY_LEFT_TURN))
-        currentKeySet_.setKey(Key::KEY_LEFT_TURN);
-    if (keySet.hasKey(Key::KEY_RIGHT_TURN))
-        currentKeySet_.setKey(Key::KEY_RIGHT_TURN);
+    if (keySet.hasKey(Key::LEFT_TURN))
+        currentKeySet_.setKey(Key::LEFT_TURN);
+    if (keySet.hasKey(Key::RIGHT_TURN))
+        currentKeySet_.setKey(Key::RIGHT_TURN);
 }
