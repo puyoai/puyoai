@@ -20,6 +20,7 @@ struct MovingKumipuyoState {
     explicit MovingKumipuyoState(const KumipuyoPos& pos) : pos(pos) {}
 
     KumipuyoPos pos;
+    int restFramesTurnProhibited = 0;
     int restFramesToAcceptQuickTurn = 0;
     int restFramesForFreefall = FRAMES_FREE_FALL;
     bool grounded = false;

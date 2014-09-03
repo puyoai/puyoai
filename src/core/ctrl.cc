@@ -91,7 +91,10 @@ void Ctrl::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet,
 
 void Ctrl::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks)
 {
+    DCHECK_EQ(0, mks->restFramesTurnProhibited) << mks->restFramesTurnProhibited;
+
     if (keySet.hasKey(Key::KEY_RIGHT_TURN)) {
+        mks->restFramesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
         switch (mks->pos.r) {
         case 0:
             if (field.get(mks->pos.x + 1, mks->pos.y) == PuyoColor::EMPTY) {
@@ -157,6 +160,7 @@ void Ctrl::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, 
     }
 
     if (keySet.hasKey(Key::KEY_LEFT_TURN)) {
+        mks->restFramesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
         switch (mks->pos.r) {
         case 0:
             if (field.get(mks->pos.x - 1, mks->pos.y) == PuyoColor::EMPTY) {
@@ -363,7 +367,11 @@ void Ctrl::moveKumipuyo(const PlainField& field, const KeySet& keySet, MovingKum
 {
     // TODO(mayah): Which key is consumed first? turn? arrow?
     moveKumipuyoByArrowKey(field, keySet, mks, downAccepted);
-    moveKumipuyoByTurnKey(field, keySet, mks);
+    if (mks->restFramesTurnProhibited > 0) {
+        mks->restFramesTurnProhibited--;
+    } else {
+        moveKumipuyoByTurnKey(field, keySet, mks);
+    }
     if (!keySet.hasKey(Key::KEY_DOWN))
         moveKumipuyoByFreefall(field, mks);
 }
