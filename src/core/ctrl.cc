@@ -245,26 +245,27 @@ void Ctrl::moveKumipuyoByFreefall(const PlainField& field, MovingKumipuyoState* 
 
 struct Vertex {
     Vertex() {}
-    Vertex(const KumipuyoPos& pos, bool turnProhibited) : pos(pos), turnProhibited(turnProhibited) {}
+    Vertex(const KumipuyoPos& pos, int framesTurnProhibited) :
+        pos(pos), framesTurnProhibited(framesTurnProhibited) {}
 
     friend bool operator==(const Vertex& lhs, const Vertex& rhs)
     {
-        return lhs.pos == rhs.pos && lhs.turnProhibited == rhs.turnProhibited;
+        return lhs.pos == rhs.pos && lhs.framesTurnProhibited == rhs.framesTurnProhibited;
     }
     friend bool operator!=(const Vertex& lhs, const Vertex& rhs) { return !(lhs.pos == rhs.pos); }
     friend bool operator<(const Vertex& lhs, const Vertex& rhs)
     {
         if (lhs.pos != rhs.pos)
             return lhs.pos < rhs.pos;
-        return lhs.turnProhibited < rhs.turnProhibited;
+        return lhs.framesTurnProhibited < rhs.framesTurnProhibited;
     }
     friend bool operator>(const Vertex& lhs, const Vertex& rhs) { return lhs.pos > rhs.pos; }
 
     KumipuyoPos pos;
-    bool turnProhibited;
+    int framesTurnProhibited;
 };
 
-typedef int Weight;
+typedef double Weight;
 struct Edge {
     Edge() {}
     Edge(const Vertex& src, const Vertex& dest, Weight weight, const KeySet& keySet) :
@@ -287,17 +288,19 @@ typedef map<Vertex, tuple<Vertex, KeySet, Weight>> Potential;
 
 KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKumipuyoState& initialState, const Decision& decision)
 {
-    static const KeySet KEY_CANDIDATES[] = {
-        KeySet(),
-        KeySet(Key::KEY_LEFT),
-        KeySet(Key::KEY_RIGHT),
-        KeySet(Key::KEY_LEFT, Key::KEY_LEFT_TURN),
-        KeySet(Key::KEY_LEFT, Key::KEY_RIGHT_TURN),
-        KeySet(Key::KEY_RIGHT, Key::KEY_LEFT_TURN),
-        KeySet(Key::KEY_RIGHT, Key::KEY_RIGHT_TURN),
-        KeySet(Key::KEY_LEFT_TURN),
-        KeySet(Key::KEY_RIGHT_TURN)
+    // We don't add KeySet(Key::KEY_DOWN) intentionally.
+    static const pair<KeySet, double> KEY_CANDIDATES[] = {
+        make_pair(KeySet(), 1),
+        make_pair(KeySet(Key::KEY_LEFT), 1.01),
+        make_pair(KeySet(Key::KEY_RIGHT), 1.01),
+        make_pair(KeySet(Key::KEY_LEFT, Key::KEY_LEFT_TURN), 1.03),
+        make_pair(KeySet(Key::KEY_LEFT, Key::KEY_RIGHT_TURN), 1.03),
+        make_pair(KeySet(Key::KEY_RIGHT, Key::KEY_LEFT_TURN), 1.03),
+        make_pair(KeySet(Key::KEY_RIGHT, Key::KEY_RIGHT_TURN), 1.03),
+        make_pair(KeySet(Key::KEY_LEFT_TURN), 1.01),
+        make_pair(KeySet(Key::KEY_RIGHT_TURN), 1.01),
     };
+    static const int KEY_CANDIDATES_WITHOUT_TURN_SIZE = 3;
     static const int KEY_CANDIDATES_SIZE = ARRAY_SIZE(KEY_CANDIDATES);
 
     Potential pot;
@@ -334,18 +337,21 @@ KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKum
             return KeySetSeq(kss);
         }
 
-        int size = p.turnProhibited ? 3 : KEY_CANDIDATES_SIZE;
+        int size = p.framesTurnProhibited > 0 ? KEY_CANDIDATES_WITHOUT_TURN_SIZE : KEY_CANDIDATES_SIZE;
         for (int i = 0; i < size; ++i) {
             MovingKumipuyoState mks(p.pos);
-            moveKumipuyo(field, KEY_CANDIDATES[i], &mks);
+            moveKumipuyo(field, KEY_CANDIDATES[i].first, &mks);
 
-            bool turnProhibited = (i >= 3);
-            Vertex newP(mks.pos, turnProhibited);
+            int framesTurnProhibited = std::max(0, p.framesTurnProhibited - 1);
+            if (i >= KEY_CANDIDATES_WITHOUT_TURN_SIZE)
+                framesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
+
+            Vertex newP(mks.pos, framesTurnProhibited);
 
             if (pot.count(newP))
                 continue;
             // TODO(mayah): This is not correct. We'd like to prefer KeySet() to another key sequence a bit.
-            Q.push(Edge(p, newP, curr + 10 - (i == 0), KEY_CANDIDATES[i]));
+            Q.push(Edge(p, newP, curr + KEY_CANDIDATES[i].second, KEY_CANDIDATES[i].first));
         }
     }
 
