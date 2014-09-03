@@ -131,11 +131,11 @@ TEST(CtrlTest, findKeyStrokeByDijkstra)
     }
     {
         KeySetSeq kss = Ctrl::findKeyStrokeByDijkstra(f, mks, Decision(3, 2));
-        EXPECT_TRUE("A,,A,v" == kss.toString() || "B,,B,v" == kss.toString()) << kss.toString();
+        EXPECT_TRUE("A,,,A,v" == kss.toString() || "B,,,B,v" == kss.toString()) << kss.toString();
     }
     {
         KeySetSeq kss = Ctrl::findKeyStrokeByDijkstra(f, mks, Decision(6, 2));
-        EXPECT_EQ(">B,>,>B,v", kss.toString());
+        EXPECT_EQ(">B,>,>,B,v", kss.toString());
     }
 }
 

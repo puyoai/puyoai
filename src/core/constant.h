@@ -16,6 +16,8 @@ const int FRAMES_NEXT2_DELAY = 8;
 const int FRAMES_FREE_FALL = 8;
 const int FRAMES_QUICKTURN = 10;
 
+const int FRAMES_CONTINUOUS_TURN_PROHIBITED = 2;
+
 // TODO(mayah): We should consider that margin time has been expired.
 const int SCORE_FOR_OJAMA = 70;
 const int ZENKESHI_BONUS = SCORE_FOR_OJAMA * 6 * 5;
