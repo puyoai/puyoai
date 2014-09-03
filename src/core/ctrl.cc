@@ -1,5 +1,6 @@
 #include "core/ctrl.h"
 
+#include <algorithm>
 #include <map>
 #include <queue>
 #include <tuple>
@@ -22,7 +23,7 @@ void removeRedundantKeySeq(const KumipuyoPos& pos, KeySetSeq* seq)
     case 0:
         return;
     case 1:
-        if (seq->size() >= 2 && (*seq)[0] == KeySet(Key::KEY_LEFT_TURN) && (*seq)[1] == KeySet(Key::KEY_RIGHT_TURN)) {
+        if (seq->size() >= 2 && (*seq)[0] == KeySet(Key::LEFT_TURN) && (*seq)[1] == KeySet(Key::RIGHT_TURN)) {
             // Remove 2 key strokes.
             seq->removeFront();
             seq->removeFront();
@@ -31,7 +32,7 @@ void removeRedundantKeySeq(const KumipuyoPos& pos, KeySetSeq* seq)
     case 2:
         return;
     case 3:
-        if (seq->size() >= 2 && (*seq)[0] == KeySet(Key::KEY_RIGHT_TURN) && (*seq)[1] == KeySet(Key::KEY_LEFT_TURN)) {
+        if (seq->size() >= 2 && (*seq)[0] == KeySet(Key::RIGHT_TURN) && (*seq)[1] == KeySet(Key::LEFT_TURN)) {
             seq->removeFront();
             seq->removeFront();
         }
@@ -52,7 +53,7 @@ void Ctrl::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet,
     // Only one key will be accepted.
     // When DOWN + RIGHT or DOWN + LEFT are simultaneously input, DOWN should be ignored.
 
-    if (keySet.hasKey(Key::KEY_RIGHT)) {
+    if (keySet.hasKey(Key::RIGHT)) {
         if (field.get(mks->pos.axisX() + 1, mks->pos.axisY()) == PuyoColor::EMPTY &&
             field.get(mks->pos.childX() + 1, mks->pos.childY()) == PuyoColor::EMPTY) {
             mks->pos.x++;
@@ -60,7 +61,7 @@ void Ctrl::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet,
         return;
     }
 
-    if (keySet.hasKey(Key::KEY_LEFT)) {
+    if (keySet.hasKey(Key::LEFT)) {
         if (field.get(mks->pos.axisX() - 1, mks->pos.axisY()) == PuyoColor::EMPTY &&
             field.get(mks->pos.childX() - 1, mks->pos.childY()) == PuyoColor::EMPTY) {
             mks->pos.x--;
@@ -68,7 +69,7 @@ void Ctrl::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet,
         return;
     }
 
-    if (keySet.hasKey(Key::KEY_DOWN)) {
+    if (keySet.hasKey(Key::DOWN)) {
         if (downAccepted)
             *downAccepted = true;
         if (mks->restFramesForFreefall > 0) {
@@ -93,7 +94,7 @@ void Ctrl::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, 
 {
     DCHECK_EQ(0, mks->restFramesTurnProhibited) << mks->restFramesTurnProhibited;
 
-    if (keySet.hasKey(Key::KEY_RIGHT_TURN)) {
+    if (keySet.hasKey(Key::RIGHT_TURN)) {
         mks->restFramesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
         switch (mks->pos.r) {
         case 0:
@@ -159,7 +160,7 @@ void Ctrl::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, 
         }
     }
 
-    if (keySet.hasKey(Key::KEY_LEFT_TURN)) {
+    if (keySet.hasKey(Key::LEFT_TURN)) {
         mks->restFramesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
         switch (mks->pos.r) {
         case 0:
@@ -292,17 +293,17 @@ typedef map<Vertex, tuple<Vertex, KeySet, Weight>> Potential;
 
 KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKumipuyoState& initialState, const Decision& decision)
 {
-    // We don't add KeySet(Key::KEY_DOWN) intentionally.
+    // We don't add KeySet(Key::DOWN) intentionally.
     static const pair<KeySet, double> KEY_CANDIDATES[] = {
         make_pair(KeySet(), 1),
-        make_pair(KeySet(Key::KEY_LEFT), 1.01),
-        make_pair(KeySet(Key::KEY_RIGHT), 1.01),
-        make_pair(KeySet(Key::KEY_LEFT, Key::KEY_LEFT_TURN), 1.03),
-        make_pair(KeySet(Key::KEY_LEFT, Key::KEY_RIGHT_TURN), 1.03),
-        make_pair(KeySet(Key::KEY_RIGHT, Key::KEY_LEFT_TURN), 1.03),
-        make_pair(KeySet(Key::KEY_RIGHT, Key::KEY_RIGHT_TURN), 1.03),
-        make_pair(KeySet(Key::KEY_LEFT_TURN), 1.01),
-        make_pair(KeySet(Key::KEY_RIGHT_TURN), 1.01),
+        make_pair(KeySet(Key::LEFT), 1.01),
+        make_pair(KeySet(Key::RIGHT), 1.01),
+        make_pair(KeySet(Key::LEFT, Key::LEFT_TURN), 1.03),
+        make_pair(KeySet(Key::LEFT, Key::RIGHT_TURN), 1.03),
+        make_pair(KeySet(Key::RIGHT, Key::LEFT_TURN), 1.03),
+        make_pair(KeySet(Key::RIGHT, Key::RIGHT_TURN), 1.03),
+        make_pair(KeySet(Key::LEFT_TURN), 1.01),
+        make_pair(KeySet(Key::RIGHT_TURN), 1.01),
     };
     static const int KEY_CANDIDATES_WITHOUT_TURN_SIZE = 3;
     static const int KEY_CANDIDATES_SIZE = ARRAY_SIZE(KEY_CANDIDATES);
@@ -328,7 +329,7 @@ KeySetSeq Ctrl::findKeyStrokeByDijkstra(const PlainField& field, const MovingKum
         if (p.pos.axisX() == decision.x && p.pos.rot() == decision.r) {
             // goal.
             vector<KeySet> kss;
-            kss.push_back(KeySet(Key::KEY_DOWN));
+            kss.push_back(KeySet(Key::DOWN));
             while (pot.count(p)) {
                 if (p == startV)
                     break;
@@ -372,7 +373,7 @@ void Ctrl::moveKumipuyo(const PlainField& field, const KeySet& keySet, MovingKum
     } else {
         moveKumipuyoByTurnKey(field, keySet, mks);
     }
-    if (!keySet.hasKey(Key::KEY_DOWN))
+    if (!keySet.hasKey(Key::DOWN))
         moveKumipuyoByFreefall(field, mks);
 }
 
@@ -443,37 +444,37 @@ bool Ctrl::getControl(const PlainField& field, const Decision& decision, KeySetS
         break;
 
     case 1:
-        add(Key::KEY_RIGHT_TURN, ret);
+        add(Key::RIGHT_TURN, ret);
         moveHorizontally(x - 3, ret);
         break;
 
     case 2:
         moveHorizontally(x - 3, ret);
         if (x < 3) {
-            add(Key::KEY_RIGHT_TURN, ret);
-            add(Key::KEY_RIGHT_TURN, ret);
+            add(Key::RIGHT_TURN, ret);
+            add(Key::RIGHT_TURN, ret);
         } else if (x > 3) {
-            add(Key::KEY_LEFT_TURN, ret);
-            add(Key::KEY_LEFT_TURN, ret);
+            add(Key::LEFT_TURN, ret);
+            add(Key::LEFT_TURN, ret);
         } else {
             if (field.get(4, 12) != PuyoColor::EMPTY) {
                 if (field.get(2, 12) != PuyoColor::EMPTY) {
                     // fever's quick turn
-                    add(Key::KEY_RIGHT_TURN, ret);
-                    add(Key::KEY_RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
                 } else {
-                    add(Key::KEY_LEFT_TURN, ret);
-                    add(Key::KEY_LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
                 }
             } else {
-                add(Key::KEY_RIGHT_TURN, ret);
-                add(Key::KEY_RIGHT_TURN, ret);
+                add(Key::RIGHT_TURN, ret);
+                add(Key::RIGHT_TURN, ret);
             }
         }
         break;
 
     case 3:
-        add(Key::KEY_LEFT_TURN, ret);
+        add(Key::LEFT_TURN, ret);
         moveHorizontally(x - 3, ret);
         break;
 
@@ -481,7 +482,7 @@ bool Ctrl::getControl(const PlainField& field, const Decision& decision, KeySetS
         LOG(FATAL) << r;
     }
 
-    add(Key::KEY_DOWN, ret);
+    add(Key::DOWN, ret);
 
     removeRedundantKeySeq(KumipuyoPos::InitialPos(), ret);
 
@@ -502,24 +503,24 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
         // for simpicity, direct child-puyo upwards
         // TODO(yamaguchi): eliminate unnecessary moves
         if (current.r == 1) {
-            add(Key::KEY_LEFT_TURN, ret);
+            add(Key::LEFT_TURN, ret);
             current.r = 0;
         } else if (current.r == 3) {
-            add(Key::KEY_RIGHT_TURN, ret);
+            add(Key::RIGHT_TURN, ret);
             current.r = 0;
         } else if (current.r == 2) {
             if (isQuickturn(field, current)) {
                 // do quick turn
-                add(Key::KEY_RIGHT_TURN, ret);
-                add(Key::KEY_RIGHT_TURN, ret);
+                add(Key::RIGHT_TURN, ret);
+                add(Key::RIGHT_TURN, ret);
                 current.y++;
             } else {
                 if (field.get(current.x - 1, current.y) != PuyoColor::EMPTY) {
-                    add(Key::KEY_LEFT_TURN, ret);
-                    add(Key::KEY_LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
                 } else {
-                    add(Key::KEY_RIGHT_TURN, ret);
-                    add(Key::KEY_RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
                 }
             }
             current.r = 0;
@@ -535,11 +536,11 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
                         return false;
                     }
                     // turn inversely to avoid kicking wall
-                    add(Key::KEY_LEFT_TURN, ret);
-                    add(Key::KEY_LEFT_TURN, ret);
-                    add(Key::KEY_LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
                 } else {
-                    add(Key::KEY_RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
                 }
                 break;
             case 3:
@@ -548,20 +549,20 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
                         field.get(current.x, current.y - 1) == PuyoColor::EMPTY) {
                         return false;
                     }
-                    add(Key::KEY_RIGHT_TURN, ret);
-                    add(Key::KEY_RIGHT_TURN, ret);
-                    add(Key::KEY_RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
                 } else {
-                    add(Key::KEY_LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
                 }
                 break;
             case 2:
                 if (field.get(current.x - 1, current.y) != PuyoColor::EMPTY) {
-                    add(Key::KEY_RIGHT_TURN, ret);
-                    add(Key::KEY_RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
                 } else {
-                    add(Key::KEY_LEFT_TURN, ret);
-                    add(Key::KEY_LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
                 }
                 break;
             }
@@ -572,7 +573,7 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
         if (goal.x > current.x) {
             // move to right
             if (field.get(current.x + 1, current.y) == PuyoColor::EMPTY) {
-                add(Key::KEY_RIGHT, ret);
+                add(Key::RIGHT, ret);
                 current.x++;
             } else {  // hits a wall
                 // climb if possible
@@ -591,17 +592,17 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
                     // can climb by kicking the ground or quick turn. In either case,
                     // kumi-puyo is never moved because right side is blocked
 
-                    add(Key::KEY_LEFT_TURN, ret);
-                    add(Key::KEY_LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
                     current.y++;
                     if (!field.get(current.x - 1, current.y + 1)) {
-                        add(Key::KEY_RIGHT_TURN, ret);
-                        add(Key::KEY_RIGHT, ret);
+                        add(Key::RIGHT_TURN, ret);
+                        add(Key::RIGHT, ret);
                     } else {
                         // if "a" in the figure is filled, kicks wall. we can omit right key.
-                        add(Key::KEY_RIGHT_TURN, ret);
+                        add(Key::RIGHT_TURN, ret);
                     }
-                    add(Key::KEY_RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
                     current.x++;
                 } else {
                     return false;
@@ -610,7 +611,7 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
         } else {
             // move to left
             if (!field.get(current.x - 1, current.y)) {
-                add(Key::KEY_LEFT, ret);
+                add(Key::LEFT, ret);
                 current.x--;
             } else {  // hits a wall
                 // climb if possible
@@ -628,17 +629,17 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
                 if (field.get(current.x, current.y - 1) != PuyoColor::EMPTY || isQuickturn(field, current)) {
                     // can climb by kicking the ground or quick turn. In either case,
                     // kumi-puyo is never moved because left side is blocked
-                    add(Key::KEY_RIGHT_TURN, ret);
-                    add(Key::KEY_RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
+                    add(Key::RIGHT_TURN, ret);
                     current.y++;
                     if (!field.get(current.x + 1, current.y)) {
-                        add(Key::KEY_LEFT_TURN, ret);
-                        add(Key::KEY_LEFT, ret);
+                        add(Key::LEFT_TURN, ret);
+                        add(Key::LEFT, ret);
                     } else {
                         // if "a" in the figure is filled, kicks wall. we can omit left key.
-                        add(Key::KEY_LEFT_TURN, ret);
+                        add(Key::LEFT_TURN, ret);
                     }
-                    add(Key::KEY_LEFT_TURN, ret);
+                    add(Key::LEFT_TURN, ret);
                     current.x--;
                 } else {
                     return false;
@@ -647,7 +648,7 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
         }
     }
 
-    add(Key::KEY_DOWN, ret);
+    add(Key::DOWN, ret);
     removeRedundantKeySeq(start, ret);
     // LOG(INFO) << buttonsDebugString();
     return true;
@@ -662,11 +663,11 @@ void Ctrl::moveHorizontally(int x, KeySetSeq* ret)
 {
     if (x < 0) {
         for (int i = 0; i < -x; i++) {
-            add(Key::KEY_LEFT, ret);
+            add(Key::LEFT, ret);
         }
     } else if (x > 0) {
         for (int i = 0; i < x; i++) {
-            add(Key::KEY_RIGHT, ret);
+            add(Key::RIGHT, ret);
         }
     }
 }

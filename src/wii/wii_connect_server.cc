@@ -146,7 +146,7 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
 {
     if (frameId % 10 == 0) {
         keySender_->sendKey(KeySet());
-        keySender_->sendKey(Key::KEY_RIGHT_TURN);
+        keySender_->sendKey(Key::RIGHT_TURN);
         keySender_->sendKey(KeySet());
     }
 
@@ -198,7 +198,7 @@ bool WiiConnectServer::playForFinished(int frameId)
 {
     if (frameId % 10 == 0) {
         keySender_->sendKey(KeySet());
-        keySender_->sendKey(Key::KEY_START);
+        keySender_->sendKey(Key::START);
         keySender_->sendKey(KeySet());
     }
 

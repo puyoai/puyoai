@@ -36,14 +36,14 @@ TEST_F(FieldRealtimeTest, stateWithoutOjama)
     // Waiting next.
     for (int i = 0; i < 6; ++i) {
         FrameContext context;
-        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_PREPARING_NEXT, f_->simulationState());
     }
 
     // It needs 12 frames to reach the bottom.
     for (int i = 0; i < 12; ++i) {
         FrameContext context;
-        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_PLAYABLE, f_->simulationState());
     }
 
@@ -51,20 +51,20 @@ TEST_F(FieldRealtimeTest, stateWithoutOjama)
     // Actually it might have to be counted as PLAYABLE, though.
     {
         FrameContext context;
-        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_DROPPING, f_->simulationState());
     }
 
     // Then, 10 frames ground animation.
     for (int i = 0; i < 10; ++i) {
         FrameContext context;
-        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_GROUNDING, f_->simulationState());
     }
 
     // Then, preparing next.
     FrameContext context;
-    f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+    f_->playOneFrame(KeySet(Key::DOWN), &context);
     EXPECT_EQ(FieldRealtime::SimulationState::STATE_PREPARING_NEXT, f_->simulationState());
 
     // Here, score must be 13. 12 frames dropping + 1 frame grounding.
@@ -79,26 +79,26 @@ TEST_F(FieldRealtimeTest, zenkeshi)
     // Waiting next (6) + reaching bottom (11) + dropping (1) + grounding (10)
     for (int i = 0; i < 6 + 11 + 1 + 10; ++i) {
         FrameContext context;
-        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        f_->playOneFrame(KeySet(Key::DOWN), &context);
         cout << (int)f_->simulationState() << endl;
         EXPECT_FALSE(f_->hasZenkeshi());
     }
 
     FrameContext context;
-    f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+    f_->playOneFrame(KeySet(Key::DOWN), &context);
     EXPECT_TRUE(f_->hasZenkeshi());
     EXPECT_EQ(0, context.numSentOjama());
 
     for (int i = 0; i < 24; ++i) {
         FrameContext context;
-        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_VANISHING, f_->simulationState());
     }
 
     // Since this should be quick, the current state must be PREPARING_NEXT.
     {
         FrameContext context;
-        f_->playOneFrame(KeySet(Key::KEY_DOWN), &context);
+        f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_PREPARING_NEXT, f_->simulationState());
     }
 }
@@ -111,7 +111,7 @@ TEST_F(FieldRealtimeTest, playOneFrameWithMultipleKey1)
     ASSERT_EQ(KumipuyoPos(3, 12, 0), f_->kumipuyoPos());
 
     FrameContext context;
-    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::KEY_RIGHT, Key::KEY_RIGHT_TURN), &context));
+    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::RIGHT, Key::RIGHT_TURN), &context));
 
     EXPECT_EQ(KumipuyoPos(4, 12, 1), f_->kumipuyoPos());
 }
@@ -124,7 +124,7 @@ TEST_F(FieldRealtimeTest, playOneFrameWithMultipleKey2)
     ASSERT_EQ(KumipuyoPos(3, 12, 0), f_->kumipuyoPos());
 
     FrameContext context;
-    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::KEY_LEFT, Key::KEY_LEFT_TURN), &context));
+    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::LEFT, Key::LEFT_TURN), &context));
 
     EXPECT_EQ(KumipuyoPos(2, 12, 3), f_->kumipuyoPos());
 }
@@ -137,7 +137,7 @@ TEST_F(FieldRealtimeTest, playOneFrameWithMultipleKey3)
     ASSERT_EQ(KumipuyoPos(3, 12, 0), f_->kumipuyoPos());
 
     FrameContext context;
-    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::KEY_DOWN, Key::KEY_RIGHT_TURN), &context));
+    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::DOWN, Key::RIGHT_TURN), &context));
 
     // Since Y = 12, you might think KEY_DOWN is ignored. This is not true.
     // After 1 frame, puyo should drop 1 cell.
@@ -154,7 +154,7 @@ TEST_F(FieldRealtimeTest, playOneFrameWithMultipleArrowKey1)
     ASSERT_EQ(KumipuyoPos(3, 12, 0), f_->kumipuyoPos());
 
     FrameContext context;
-    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::KEY_DOWN, Key::KEY_RIGHT), &context));
+    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::DOWN, Key::RIGHT), &context));
 
     // KEY_DOWN should be ignored.
     EXPECT_EQ(KumipuyoPos(4, 12, 0), f_->kumipuyoPos());
@@ -168,7 +168,7 @@ TEST_F(FieldRealtimeTest, playOneFrameWithMultipleArrowKey2)
     ASSERT_EQ(KumipuyoPos(3, 12, 0), f_->kumipuyoPos());
 
     FrameContext context;
-    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::KEY_DOWN, Key::KEY_LEFT), &context));
+    EXPECT_TRUE(f_->playOneFrame(KeySet(Key::DOWN, Key::LEFT), &context));
 
     // KEY_DOWN should be ignored.
     EXPECT_EQ(KumipuyoPos(2, 12, 0), f_->kumipuyoPos());

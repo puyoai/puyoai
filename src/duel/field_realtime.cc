@@ -112,9 +112,9 @@ bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
 
     *accepted = true;
     bool grounded = playInternal(keySet, accepted);
-    if (!grounded && restFramesForFreeFall_ <= 0 && !keySet.hasKey(Key::KEY_DOWN))
+    if (!grounded && restFramesForFreeFall_ <= 0 && !keySet.hasKey(Key::DOWN))
         grounded = doFreeFall();
-    if (keySet.hasKey(Key::KEY_DOWN) && *accepted)
+    if (keySet.hasKey(Key::DOWN) && *accepted)
         ++score_;
 
     if (grounded) {
@@ -350,7 +350,7 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
     // We consume right/left turn first. Then, left/right/down.
     // TODO(mayah): Move this to core/
 
-    if (keySet.hasKey(Key::KEY_RIGHT_TURN)) {
+    if (keySet.hasKey(Key::RIGHT_TURN)) {
         switch (kumipuyoPos_.r) {
         case 0:
             if (field_.color(kumipuyoPos_.x + 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
@@ -408,7 +408,7 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
             *accepted = true;
             break;
         }
-    } else if (keySet.hasKey(Key::KEY_LEFT_TURN)) {
+    } else if (keySet.hasKey(Key::LEFT_TURN)) {
         switch (kumipuyoPos_.r) {
         case 0:
             if (field_.color(kumipuyoPos_.x - 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
@@ -467,7 +467,7 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
         }
     }
 
-    if (keySet.hasKey(Key::KEY_RIGHT)) {
+    if (keySet.hasKey(Key::RIGHT)) {
         if (field_.color(pos.axisX() + 1, pos.axisY()) == PuyoColor::EMPTY &&
             field_.color(pos.childX() + 1, pos.childY()) == PuyoColor::EMPTY) {
             kumipuyoPos_.x++;
@@ -475,7 +475,7 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
         } else {
             *accepted = false;
         }
-    } else if (keySet.hasKey(Key::KEY_LEFT)) {
+    } else if (keySet.hasKey(Key::LEFT)) {
         if (field_.color(pos.axisX() - 1, pos.axisY()) == PuyoColor::EMPTY &&
             field_.color(pos.childX() - 1, pos.childY()) == PuyoColor::EMPTY) {
             kumipuyoPos_.x--;
@@ -483,7 +483,7 @@ bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
         } else {
             *accepted = false;
         }
-    } else if (keySet.hasKey(Key::KEY_DOWN)) {
+    } else if (keySet.hasKey(Key::DOWN)) {
         if (restFramesForFreeFall_ > 0) {
             restFramesForFreeFall_ = 0;
         } else {

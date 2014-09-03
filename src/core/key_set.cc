@@ -30,15 +30,15 @@ bool KeySet::hasKey(Key key) const
 string KeySet::toString() const
 {
     stringstream ss;
-    if (hasKey(Key::KEY_LEFT))
+    if (hasKey(Key::LEFT))
         ss << "<";
-    if (hasKey(Key::KEY_RIGHT))
+    if (hasKey(Key::RIGHT))
         ss << ">";
-    if (hasKey(Key::KEY_DOWN))
+    if (hasKey(Key::DOWN))
         ss << "v";
-    if (hasKey(Key::KEY_LEFT_TURN))
+    if (hasKey(Key::LEFT_TURN))
         ss << "B";
-    if (hasKey(Key::KEY_RIGHT_TURN))
+    if (hasKey(Key::RIGHT_TURN))
         ss << "A";
 
     return ss.str();

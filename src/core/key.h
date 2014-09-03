@@ -4,13 +4,13 @@
 #include <string>
 
 enum class Key {
-    KEY_UP,
-    KEY_RIGHT,
-    KEY_DOWN,
-    KEY_LEFT,
-    KEY_RIGHT_TURN,
-    KEY_LEFT_TURN,
-    KEY_START,
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT,
+    RIGHT_TURN,
+    LEFT_TURN,
+    START,
 };
 const int NUM_KEYS = 7;
 
