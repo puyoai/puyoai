@@ -85,6 +85,7 @@ private:
     // Returns true if we need to drop more.
     bool drop1Frame();
 
+    // TODO(mayah): Replace this with Ctrl methods.
     bool playInternal(const KeySet&, bool* ground);
 
     void transitToStatePreparingNext();
