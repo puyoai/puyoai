@@ -10,7 +10,6 @@
 #include "core/puyo_color.h"
 #include "gui/bounding_box.h"
 #include "gui/box.h"
-#include "gui/color_map.h"
 #include "gui/unique_sdl_surface.h"
 
 using namespace std;
