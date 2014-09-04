@@ -1,6 +1,5 @@
 #include "gui/commentator_drawer.h"
 
-#include "gui/color_map.h"
 #include "gui/screen.h"
 #include "gui/unique_sdl_surface.h"
 #include "gui/util.h"

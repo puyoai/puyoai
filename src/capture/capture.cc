@@ -1,7 +1,6 @@
 #include "capture/capture.h"
 
 #include "capture/source.h"
-#include "gui/color_map.h"
 #include "gui/screen.h"
 #include "gui/SDL_prims.h"
 
