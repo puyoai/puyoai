@@ -30,6 +30,8 @@ class Ctrl {
 public:
     static void moveKumipuyo(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted = nullptr);
 
+    // Finds a key stroke to move puyo from |MovingKumipuyoState| to |Decision|.
+    // When there is not such a way, the returned KeySetSeq would be empty sequence.
     static KeySetSeq findKeyStrokeByDijkstra(const PlainField&, const MovingKumipuyoState&, const Decision&);
 
     static bool isReachable(const PlainField&, const Decision&);
@@ -45,7 +47,7 @@ public:
     static bool getControlOnline(const PlainField&, const KumipuyoPos& goal, const KumipuyoPos& start, KeySetSeq* ret);
 
 private:
-    // Move kumipuyo using only arrow key. True is returned only when DOWN is accepted.
+    // Move kumipuyo using only arrow key. |downAccepted| gets true when DOWN is accepted.
     static void moveKumipuyoByArrowKey(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted);
     static void moveKumipuyoByTurnKey(const PlainField&, const KeySet&, MovingKumipuyoState*);
     static void moveKumipuyoByFreefall(const PlainField&, MovingKumipuyoState*);
