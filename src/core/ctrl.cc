@@ -383,7 +383,7 @@ bool Ctrl::isReachable(const PlainField& field, const Decision& decision)
         return true;
 
     // slowpath
-    return isReachableOnline(field, KumipuyoPos(decision.x, 1, decision.r), KumipuyoPos::InitialPos());
+    return isReachableOnline(field, KumipuyoPos(decision.x, 1, decision.r), KumipuyoPos::initialPos());
 }
 
 bool Ctrl::isReachableFastpath(const PlainField& field, const Decision& decision)
@@ -484,7 +484,7 @@ bool Ctrl::getControl(const PlainField& field, const Decision& decision, KeySetS
 
     add(Key::DOWN, ret);
 
-    removeRedundantKeySeq(KumipuyoPos::InitialPos(), ret);
+    removeRedundantKeySeq(KumipuyoPos::initialPos(), ret);
 
     return true;
 }

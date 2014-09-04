@@ -36,7 +36,11 @@ public:
 
 class KumipuyoPos {
 public:
-    static const KumipuyoPos& InitialPos();
+    static inline const KumipuyoPos& initialPos()
+    {
+        static const KumipuyoPos pos(3, 12, 0);
+        return pos;
+    }
 
     KumipuyoPos() : x(0), y(0), r(0) {}
     KumipuyoPos(int x, int y, int r) : x(x), y(y), r(r) {}
@@ -70,12 +74,6 @@ public:
     int y;
     int r;
 };
-
-inline const KumipuyoPos& KumipuyoPos::InitialPos()
-{
-    static const KumipuyoPos initial_pos(3, 12, 0);
-    return initial_pos;
-}
 
 class KumipuyoSeq {
 public:
