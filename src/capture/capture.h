@@ -25,9 +25,9 @@ public:
     bool start();
     void stop();
 
-    virtual void draw(Screen*) OVERRIDE;
+    virtual void draw(Screen*) override;
 
-    virtual std::unique_ptr<AnalyzerResult> analyzerResult() const OVERRIDE;
+    virtual std::unique_ptr<AnalyzerResult> analyzerResult() const override;
 
 private:
     void runLoop();

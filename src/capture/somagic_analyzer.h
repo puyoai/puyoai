@@ -31,8 +31,8 @@ public:
     void drawWithAnalysisResult(SDL_Surface*);
 
 private:
-    virtual CaptureGameState detectGameState(const SDL_Surface*) OVERRIDE;
-    virtual std::unique_ptr<DetectedField> detectField(int pi, const SDL_Surface*) OVERRIDE;
+    virtual CaptureGameState detectGameState(const SDL_Surface*) override;
+    virtual std::unique_ptr<DetectedField> detectField(int pi, const SDL_Surface*) override;
 
     bool isLevelSelect(const SDL_Surface*);
     bool isGameFinished(const SDL_Surface*);

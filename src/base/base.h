@@ -17,12 +17,6 @@
 #  define __has_extension(x) 0
 #endif
 
-#if __has_feature(cxx_override_control)
-#  define OVERRIDE override
-#else
-#  define OVERRIDE
-#endif
-
 #if __has_extension(attribute_deprecated_with_message)
 #  define DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
 #  define DEPRECATED __attribute__((deprecated()))

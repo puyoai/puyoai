@@ -21,7 +21,7 @@ public:
     // Don't take ownership of Capture.
     explicit AnalyzerResultDrawer(AnalyzerResultRetriever*);
 
-    void draw(Screen*) OVERRIDE;
+    void draw(Screen*) override;
 
 private:
     AnalyzerResultRetriever* retriever_;

@@ -10,15 +10,15 @@ public:
     explicit HumanConnector(int playerId) : Connector(playerId) {}
     virtual ~HumanConnector() {}
 
-    virtual void write(const ConnectorFrameRequest&) OVERRIDE;
-    virtual void writeString(const std::string&) OVERRIDE;
-    virtual ConnectorFrameResponse read() OVERRIDE;
-    virtual bool isHuman() const OVERRIDE { return true; }
+    virtual void write(const ConnectorFrameRequest&) override;
+    virtual void writeString(const std::string&) override;
+    virtual ConnectorFrameResponse read() override;
+    virtual bool isHuman() const override { return true; }
     // HumanConnector is always alive.
-    virtual bool alive() const OVERRIDE { return true; }
-    virtual void setAlive(bool flag) OVERRIDE;
-    virtual bool pollable() const OVERRIDE { return false; }
-    virtual int readerFd() const OVERRIDE;
+    virtual bool alive() const override { return true; }
+    virtual void setAlive(bool flag) override;
+    virtual bool pollable() const override { return false; }
+    virtual int readerFd() const override;
 
     void setKeySet(const KeySet&);
 

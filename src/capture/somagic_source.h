@@ -19,7 +19,7 @@ public:
     explicit SomagicSource(const char* name);
     virtual ~SomagicSource();
 
-    virtual UniqueSDLSurface getNextFrame() OVERRIDE;
+    virtual UniqueSDLSurface getNextFrame() override;
 
     virtual bool start() override;
 

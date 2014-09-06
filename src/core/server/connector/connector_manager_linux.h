@@ -12,12 +12,12 @@ class ConnectorManagerLinux : public ConnectorManager {
 public:
     ConnectorManagerLinux(std::unique_ptr<Connector> p1, std::unique_ptr<Connector> p2);
 
-    virtual void send(const ConnectorFrameRequest&) OVERRIDE;
-    virtual bool receive(int frameId, std::vector<ConnectorFrameResponse> cfr[2]) OVERRIDE;
+    virtual void send(const ConnectorFrameRequest&) override;
+    virtual bool receive(int frameId, std::vector<ConnectorFrameResponse> cfr[2]) override;
 
-    virtual Connector* connector(int i) OVERRIDE { return connectors_[i].get(); }
+    virtual Connector* connector(int i) override { return connectors_[i].get(); }
 
-    virtual void setWaitTimeout(bool flag) OVERRIDE { waitTimeout_ = flag; }
+    virtual void setWaitTimeout(bool flag) override { waitTimeout_ = flag; }
 
 private:
     static const int NUM_PLAYERS = 2;
