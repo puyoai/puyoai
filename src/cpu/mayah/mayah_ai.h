@@ -27,12 +27,12 @@ public:
     MayahAI(int argc, char* argv[]);
     ~MayahAI();
 
-    virtual void gameWillBegin(const FrameData&) OVERRIDE;
-    virtual void gameHasEnded(const FrameData&) OVERRIDE;
-    virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&) OVERRIDE;
-    virtual DropDecision thinkFast(int frameId, const PlainField&, const KumipuyoSeq&) OVERRIDE;
-    virtual void enemyGrounded(const FrameData&) OVERRIDE;
-    virtual void enemyNext2Appeared(const FrameData&) OVERRIDE;
+    virtual void gameWillBegin(const FrameData&) override;
+    virtual void gameHasEnded(const FrameData&) override;
+    virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&) override;
+    virtual DropDecision thinkFast(int frameId, const PlainField&, const KumipuyoSeq&) override;
+    virtual void enemyGrounded(const FrameData&) override;
+    virtual void enemyNext2Appeared(const FrameData&) override;
 
     // Use this directly in test. Otherwise, use via think/thinkFast.
     Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, int depth, int maxIteration);

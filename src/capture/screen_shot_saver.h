@@ -16,7 +16,7 @@ public:
     // If true, we draw the frameId and save the screenshot with it.
     void setDrawsFrameId(bool flag) { drawsFrameId_ = flag; }
 
-    virtual void draw(Screen*) OVERRIDE;
+    virtual void draw(Screen*) override;
 
 private:
     uintptr_t lastFrameId_;

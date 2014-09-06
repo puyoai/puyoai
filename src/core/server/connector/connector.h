@@ -39,14 +39,14 @@ public:
     PipeConnector(int playerId, int writerFd, int readerFd);
     virtual ~PipeConnector();
 
-    virtual void write(const ConnectorFrameRequest&) OVERRIDE;
-    virtual void writeString(const std::string&) OVERRIDE;
-    virtual ConnectorFrameResponse read() OVERRIDE;
-    virtual bool isHuman() const OVERRIDE { return false; }
-    virtual bool alive() const OVERRIDE { return alive_; }
-    virtual void setAlive(bool flag) OVERRIDE { alive_ = flag; }
-    virtual bool pollable() const OVERRIDE { return true; }
-    virtual int readerFd() const OVERRIDE { return readerFd_; }
+    virtual void write(const ConnectorFrameRequest&) override;
+    virtual void writeString(const std::string&) override;
+    virtual ConnectorFrameResponse read() override;
+    virtual bool isHuman() const override { return false; }
+    virtual bool alive() const override { return alive_; }
+    virtual void setAlive(bool flag) override { alive_ = flag; }
+    virtual bool pollable() const override { return true; }
+    virtual int readerFd() const override { return readerFd_; }
 
 private:
     bool alive_ = true;

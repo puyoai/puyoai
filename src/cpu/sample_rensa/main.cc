@@ -10,13 +10,13 @@ public:
     SampleRensaAI(int argc, char* argv[]) : AI(argc, argv, "sample_rensa") {}
     virtual ~SampleRensaAI() {}
 
-    virtual DropDecision thinkFast(int frameId, const PlainField& f, const KumipuyoSeq& seq) OVERRIDE
+    virtual DropDecision thinkFast(int frameId, const PlainField& f, const KumipuyoSeq& seq) override
     {
         UNUSED_VARIABLE(frameId);
         return eval(f, seq, 2);
     }
 
-    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) OVERRIDE
+    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) override
     {
         UNUSED_VARIABLE(frameId);
         return eval(f, seq, 3);
