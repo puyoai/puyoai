@@ -18,13 +18,13 @@ inline int chainBonus(int nthChain)
 
 inline int colorBonus(int numColors)
 {
-    DCHECK(0 <= numColors && numColors <= 5);
+    DCHECK(0 <= numColors && numColors <= 5) << numColors;
     return COLOR_BONUS[numColors];
 }
 
 inline int longBonus(int numPuyos)
 {
-    DCHECK(0 <= numPuyos);
+    DCHECK(0 <= numPuyos) << numPuyos;
     if (numPuyos > 11)
         numPuyos = 11;
 
