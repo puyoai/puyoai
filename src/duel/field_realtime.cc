@@ -574,7 +574,7 @@ KeySet FieldRealtime::getKeySet(const Decision& decision) const
               << decision.x << "(" << decision.r << ")]";
 
     KeySetSeq keySetSeq;
-    if (!Ctrl::getControlOnline(field_, KumipuyoPos(decision.x, 1, decision.r), pos, &keySetSeq)) {
+    if (!Ctrl::getControlOnline(field_, pos, decision, &keySetSeq)) {
         LOG(INFO) << "No way...";
         return KeySet();
     }

@@ -383,7 +383,7 @@ bool Ctrl::isReachable(const PlainField& field, const Decision& decision)
         return true;
 
     // slowpath
-    return isReachableOnline(field, KumipuyoPos(decision.x, 1, decision.r), KumipuyoPos::initialPos());
+    return isReachableOnline(field, KumipuyoPos::initialPos(), decision);
 }
 
 bool Ctrl::isReachableFastpath(const PlainField& field, const Decision& decision)
@@ -416,10 +416,10 @@ bool Ctrl::isReachableFastpath(const PlainField& field, const Decision& decision
     return true;
 }
 
-bool Ctrl::isReachableOnline(const PlainField& field, const KumipuyoPos& goal, const KumipuyoPos& start)
+bool Ctrl::isReachableOnline(const PlainField& field, const KumipuyoPos& start, const Decision& decision)
 {
     KeySetSeq keySetSeq;
-    return getControlOnline(field, goal, start, &keySetSeq);
+    return getControlOnline(field, start, decision, &keySetSeq);
 }
 
 bool Ctrl::isQuickturn(const PlainField& field, const KumipuyoPos& k)
@@ -490,13 +490,13 @@ bool Ctrl::getControl(const PlainField& field, const Decision& decision, KeySetS
 }
 
 // returns null if not reachable
-bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, const KumipuyoPos& start, KeySetSeq* ret)
+bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& start, const Decision& decision, KeySetSeq* ret)
 {
     KumipuyoPos current = start;
 
     ret->clear();
     while (true) {
-        if (goal.x == current.x && goal.r == current.r) {
+        if (current.x == decision.x && current.r == decision.r) {
             break;
         }
 
@@ -525,8 +525,9 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
             }
             current.r = 0;
         }
-        if (goal.x == current.x) {
-            switch(goal.r) {
+
+        if (current.x == decision.x) {
+            switch (decision.r) {
             case 0:
                 break;
             case 1:
@@ -570,7 +571,7 @@ bool Ctrl::getControlOnline(const PlainField& field, const KumipuyoPos& goal, co
         }
 
         // direction to move horizontally
-        if (goal.x > current.x) {
+        if (decision.x > current.x) {
             // move to right
             if (field.get(current.x + 1, current.y) == PuyoColor::EMPTY) {
                 add(Key::RIGHT, ret);
