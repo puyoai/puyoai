@@ -35,16 +35,15 @@ public:
     static KeySetSeq findKeyStrokeByDijkstra(const PlainField&, const MovingKumipuyoState&, const Decision&);
 
     static bool isReachable(const PlainField&, const Decision&);
+
     /**
-     * Judges if kumi-puyo can be moved to |goal| from |start|.
-     * goal.y is ignored. Always tries to place puyo on top of existing puyos.
-     * (because it is not needed for normal game, not nazopuyo)
+     * Judges if kumi-puyo can be moved to |Decision|.
      */
-    static bool isReachableOnline(const PlainField&, const KumipuyoPos& goal, const KumipuyoPos& start);
+    static bool isReachableOnline(const PlainField&, const KumipuyoPos&, const Decision&);
 
     static bool getControl(const PlainField&, const Decision&, KeySetSeq* ret);
 
-    static bool getControlOnline(const PlainField&, const KumipuyoPos& goal, const KumipuyoPos& start, KeySetSeq* ret);
+    static bool getControlOnline(const PlainField&, const KumipuyoPos& start, const Decision&, KeySetSeq* ret);
 
 private:
     // Move kumipuyo using only arrow key. |downAccepted| gets true when DOWN is accepted.

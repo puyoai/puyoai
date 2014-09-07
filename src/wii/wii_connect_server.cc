@@ -333,8 +333,6 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
 
         // TODO(mayah): Set an approapriate value for Y.
         KumipuyoPos start = lastDecision_[pi].isValid() ? KumipuyoPos(lastDecision_[pi].x, 12, lastDecision_[pi].r) : KumipuyoPos(3, 12, 0);
-        // TODO(mayah): It's OK since Ctrl::getControlOnline doesn't use Y.
-        KumipuyoPos goal(d.x, 1, d.r);
 
         // ----------
         // Set's the current area.
@@ -354,7 +352,7 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
             }
 
             // Not controllable?
-            if (!Ctrl::getControlOnline(field, goal, start, &keySetSeq))
+            if (!Ctrl::getControlOnline(field, start, d, &keySetSeq))
                 continue;
         }
 
