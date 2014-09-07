@@ -96,6 +96,18 @@ bool CoreField::isZenkeshi() const
     return true;
 }
 
+bool CoreField::isZenkeshiPrecise() const
+{
+    for (int x = 1; x <= WIDTH; ++x) {
+        for (int y = 1; y <= 13; ++y) {
+            if (color(x, y) != PuyoColor::EMPTY)
+                return false;
+        }
+    }
+
+    return true;
+}
+
 int CoreField::countPuyos() const
 {
     int count = 0;

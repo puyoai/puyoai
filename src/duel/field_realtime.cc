@@ -186,7 +186,7 @@ bool FieldRealtime::onStateVanish(FrameContext* context)
     // After ojama is calculated, we add ZENKESHI score,
     // because score for ZENKESHI is added, but not used for ojama calculation.
     hasZenkeshi_ = false;
-    if (field_.isZenkeshi()) {
+    if (field_.isZenkeshiPrecise()) {
         score_ += ZENKESHI_BONUS;
         hasZenkeshi_ = true;
     }
