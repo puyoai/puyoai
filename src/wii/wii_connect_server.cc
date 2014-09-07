@@ -4,8 +4,8 @@
 
 #include "capture/analyzer.h"
 #include "capture/source.h"
-#include "core/ctrl.h"
 #include "core/puyo_color.h"
+#include "core/puyo_controller.h"
 #include "core/server/connector/connector_manager_linux.h"
 #include "gui/screen.h"
 #include "wii/key_sender.h"
@@ -351,8 +351,8 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
                 field.recalcHeightOn(x);
             }
 
-            // Not controllable?
-            if (!Ctrl::getControlOnline(field, start, d, &keySetSeq))
+            keySetSeq = PuyoController::findKeyStroke(field, MovingKumipuyoState(start), d);
+            if (keySetSeq.empty())
                 continue;
         }
 

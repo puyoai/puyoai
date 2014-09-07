@@ -10,7 +10,6 @@
 #include <glog/logging.h>
 
 #include "core/constant.h"
-#include "core/ctrl.h"
 #include "core/kumipuyo.h"
 #include "core/state.h"
 #include "duel/frame_context.h"
@@ -59,11 +58,9 @@ void FieldRealtime::init()
     userState_.playable = false;
     sleepFor_ = 30;
 
-    restFramesForFreeFall_ = FRAMES_FREE_FALL;
     ojama_position_ = vector<int>(6, 0);
     ojama_dropping_ = false;
     current_chains_ = 1;
-    restFramesToAcceptQuickTurn_ = 0;
     delayFramesWNextAppear_ = 0;
     sent_wnext_appeared_ = false;
     drop_animation_ = false;
@@ -81,7 +78,7 @@ void FieldRealtime::transitToStatePreparingNext()
     sleepFor_ = FRAMES_PREPARING_NEXT;
     userState_.playable = false;
 
-    kumipuyoPos_ = KumipuyoPos(3, 12, 0);
+    mks_ = MovingKumipuyoState(KumipuyoPos(3, 12, 0));
 
     if (!kumipuyoSeq_.isEmpty())
         kumipuyoSeq_.dropFront();
@@ -93,7 +90,6 @@ void FieldRealtime::transitToStatePreparingNext()
 
 bool FieldRealtime::onStatePreparingNext()
 {
-    restFramesForFreeFall_ = FRAMES_FREE_FALL;
     simulationState_ = SimulationState::STATE_PLAYABLE;
     userState_.playable = true;
     return false;
@@ -102,22 +98,18 @@ bool FieldRealtime::onStatePreparingNext()
 bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
 {
     userState_.playable = true;
-
-    if (restFramesToAcceptQuickTurn_ > 0)
-        --restFramesToAcceptQuickTurn_;
-    if (restFramesForFreeFall_ > 0)
-        --restFramesForFreeFall_;
-
     current_chains_ = 1;
-
+    // TODO(mayah): We're always accepting KeySet? Then do we need to take |accepted| here?
     *accepted = true;
-    bool grounded = playInternal(keySet, accepted);
-    if (!grounded && restFramesForFreeFall_ <= 0 && !keySet.hasKey(Key::DOWN))
-        grounded = doFreeFall();
-    if (keySet.hasKey(Key::DOWN) && *accepted)
+
+    bool downAccepted = false;
+    PuyoController::moveKumipuyo(field_, keySet, &mks_, &downAccepted);
+    if (downAccepted)
         ++score_;
 
-    if (grounded) {
+    if (mks_.grounded) {
+        field_.setPuyoAndHeight(mks_.pos.axisX(), mks_.pos.axisY(), kumipuyoSeq_.axis(0));
+        field_.setPuyoAndHeight(mks_.pos.childX(), mks_.pos.childY(), kumipuyoSeq_.child(0));
         userState_.playable = false;
         userState_.grounded = true;
         dropVelocity_ = INITIAL_DROP_VELOCITY;
@@ -338,191 +330,6 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
     return false;
 }
 
-// returns true if the puyo grounded.
-// TODO(mayah): When we put more than one key, it is hard to define |accepted|, since
-// there will be a case that some of keys are accepted but the rest are not.
-// Do we need to reconsider "accpeted"?
-bool FieldRealtime::playInternal(const KeySet& keySet, bool* accepted)
-{
-    bool ground = false;
-    KumipuyoPos pos = kumipuyoPos();
-
-    // We consume right/left turn first. Then, left/right/down.
-    // TODO(mayah): Move this to core/
-
-    if (keySet.hasKey(Key::RIGHT_TURN)) {
-        switch (kumipuyoPos_.r) {
-        case 0:
-            if (field_.color(kumipuyoPos_.x + 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 1) % 4;
-                *accepted = true;
-            } else if (field_.color(kumipuyoPos_.x - 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 1) % 4;
-                kumipuyoPos_.x--;
-                *accepted = true;
-            } else {
-                if (restFramesToAcceptQuickTurn_ > 0) {
-                    kumipuyoPos_.r = 2;
-                    kumipuyoPos_.y++;
-                    *accepted = true;
-                    restFramesToAcceptQuickTurn_ = 0;
-                } else {
-                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
-                    *accepted = true;
-                }
-            }
-            break;
-        case 1:
-            if (field_.color(kumipuyoPos_.x, kumipuyoPos_.y - 1) == PuyoColor::EMPTY) {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 1) % 4;
-                *accepted = true;
-            } else {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 1) % 4;
-                kumipuyoPos_.y++;
-                *accepted = true;
-            }
-            break;
-        case 2:
-            if (field_.color(kumipuyoPos_.x - 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 1) % 4;
-                *accepted = true;
-            } else if (field_.color(kumipuyoPos_.x + 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 1) % 4;
-                kumipuyoPos_.x++;
-                *accepted = true;
-            } else {
-                if (restFramesToAcceptQuickTurn_ > 0) {
-                    kumipuyoPos_.r = 0;
-                    kumipuyoPos_.y--;
-                    *accepted = true;
-                    restFramesToAcceptQuickTurn_ = 0;
-                    *accepted = true;
-                } else {
-                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
-                    *accepted = true;
-                }
-            }
-            break;
-        case 3:
-            kumipuyoPos_.r = (kumipuyoPos_.r + 1) % 4;
-            *accepted = true;
-            break;
-        }
-    } else if (keySet.hasKey(Key::LEFT_TURN)) {
-        switch (kumipuyoPos_.r) {
-        case 0:
-            if (field_.color(kumipuyoPos_.x - 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 3) % 4;
-                *accepted = true;
-            } else if (field_.color(kumipuyoPos_.x + 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 3) % 4;
-                kumipuyoPos_.x++;
-                *accepted = true;
-            } else {
-                if (restFramesToAcceptQuickTurn_ > 0) {
-                    kumipuyoPos_.r = 2;
-                    kumipuyoPos_.y++;
-                    *accepted = true;
-                    restFramesToAcceptQuickTurn_ = 0;
-                } else {
-                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
-                    *accepted = true;
-                }
-            }
-            break;
-        case 1:
-            kumipuyoPos_.r = (kumipuyoPos_.r + 3) % 4;
-            *accepted = true;
-            break;
-        case 2:
-            if (field_.color(kumipuyoPos_.x + 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 3) % 4;
-                *accepted = true;
-            } else if (field_.color(kumipuyoPos_.x - 1, kumipuyoPos_.y) == PuyoColor::EMPTY) {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 3) % 4;
-                kumipuyoPos_.x--;
-                *accepted = true;
-            } else {
-                if (restFramesToAcceptQuickTurn_ > 0) {
-                    kumipuyoPos_.r = 0;
-                    kumipuyoPos_.y--;
-                    *accepted = true;
-                    restFramesToAcceptQuickTurn_ = 0;
-                } else {
-                    restFramesToAcceptQuickTurn_ = FRAMES_QUICKTURN;
-                    *accepted = true;
-                }
-            }
-            break;
-        case 3:
-            if (field_.color(kumipuyoPos_.x, kumipuyoPos_.y - 1) == PuyoColor::EMPTY) {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 3) % 4;
-                *accepted = true;
-            } else {
-                kumipuyoPos_.r = (kumipuyoPos_.r + 3) % 4;
-                kumipuyoPos_.y++;
-                *accepted = true;
-            }
-            break;
-        }
-    }
-
-    if (keySet.hasKey(Key::RIGHT)) {
-        if (field_.color(pos.axisX() + 1, pos.axisY()) == PuyoColor::EMPTY &&
-            field_.color(pos.childX() + 1, pos.childY()) == PuyoColor::EMPTY) {
-            kumipuyoPos_.x++;
-            *accepted = true;
-        } else {
-            *accepted = false;
-        }
-    } else if (keySet.hasKey(Key::LEFT)) {
-        if (field_.color(pos.axisX() - 1, pos.axisY()) == PuyoColor::EMPTY &&
-            field_.color(pos.childX() - 1, pos.childY()) == PuyoColor::EMPTY) {
-            kumipuyoPos_.x--;
-            *accepted = true;
-        } else {
-            *accepted = false;
-        }
-    } else if (keySet.hasKey(Key::DOWN)) {
-        if (restFramesForFreeFall_ > 0) {
-            restFramesForFreeFall_ = 0;
-        } else {
-            restFramesForFreeFall_ = 0;
-            if (field_.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
-                field_.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
-                kumipuyoPos_.y--;
-                *accepted = true;
-            } else {
-                // Ground.
-                field_.setPuyoAndHeight(pos.axisX(), pos.axisY(), kumipuyoSeq_.axis(0));
-                field_.setPuyoAndHeight(pos.childX(), pos.childY(), kumipuyoSeq_.child(0));
-                *accepted = true;
-                ground = true;
-            }
-        }
-    }
-
-    return ground;
-}
-
-bool FieldRealtime::doFreeFall()
-{
-    KumipuyoPos pos = kumipuyoPos();
-    bool grounded = false;
-    restFramesForFreeFall_ = FRAMES_FREE_FALL;
-    if (field_.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
-        field_.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
-        kumipuyoPos_.y--;
-    } else {
-        // Ground.
-        field_.setPuyoAndHeight(pos.axisX(), pos.axisY(), kumipuyoSeq_.axis(0));
-        field_.setPuyoAndHeight(pos.childX(), pos.childY(), kumipuyoSeq_.child(0));
-        grounded = true;
-    }
-
-    return grounded;
-}
-
 bool FieldRealtime::drop1Frame()
 {
     double velocity = dropVelocity_;
@@ -560,27 +367,6 @@ bool FieldRealtime::drop1Frame()
 PlayerFrameData FieldRealtime::playerFrameData() const
 {
     return PlayerFrameData(field(), kumipuyoSeq().subsequence(0, 3), kumipuyoPos(), userState(), score(), ojama());
-}
-
-// TODO(mayah): Remove this from FieldRealtime, and use Ctrl directly.
-KeySet FieldRealtime::getKeySet(const Decision& decision) const
-{
-    if (!decision.isValid())
-        return KeySet();
-
-    KumipuyoPos pos = kumipuyoPos();
-
-    LOG(INFO) << "[" << pos.axisX() << ", " << pos.axisY() << "(" << pos.r << ")] -> ["
-              << decision.x << "(" << decision.r << ")]";
-
-    KeySetSeq keySetSeq;
-    if (!Ctrl::getControlOnline(field_, pos, decision, &keySetSeq)) {
-        LOG(INFO) << "No way...";
-        return KeySet();
-    }
-
-    CHECK_GT(keySetSeq.size(), 0U) << keySetSeq.size() << " " << keySetSeq.toString();
-    return keySetSeq[0];
 }
 
 int FieldRealtime::reduceOjama(int n)

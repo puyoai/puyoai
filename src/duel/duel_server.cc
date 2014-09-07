@@ -55,8 +55,7 @@ static int updateDecision(const vector<ConnectorFrameResponse>& data, const Fiel
         if (!d.isValid())
             continue;
 
-        KeySet keySet = field.getKeySet(d);
-        if (keySet.hasSomeKey()) {
+        if (PuyoController::isReachableFrom(field.field(), field.movingKumipuyoState(), d)) {
             *decision = d;
             return i;
         }
@@ -244,7 +243,7 @@ void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse>
 
         int accepted_index = updateDecision(data[pi], *me, gameState->mutableDecision(pi));
 
-        // TODO(mayah): RecievedData from HumanConnector does not have any decision.
+        // TODO(mayah): ReceivedData from HumanConnector does not have any decision.
         // So, all data will be marked as NACK. Since the HumanConnector does not see ACK/NACK,
         // it's OK for now. However, this might cause future issues. Consider better way.
 
@@ -263,22 +262,32 @@ void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse>
             }
         }
 
+        if (accepted_index != -1) {
+            KeySetSeq kss = PuyoController::findKeyStroke(me->field(), me->movingKumipuyoState(), gameState->decision(pi));
+            me->setKeySetSeq(kss);
+        }
+
         string accepted_message;
         if (accepted_index != -1)
             accepted_message = data[pi][accepted_index].msg;
 
-        KeySet keySet = me->getKeySet(gameState->decision(pi));
-        // For human connector. The recieved data from HumanConnector might have some key.
-        if (accepted_index != -1 && data[pi][accepted_index].keySet.hasSomeKey())
+        LOG(INFO) << "Current KeySetSeq: " << pi << " " << me->keySetSeq().toString();
+        KeySet keySet = me->frontKeySet();
+        me->dropFrontKeySet();
+        // For human connector. The received data from HumanConnector might have some key.
+        if (accepted_index != -1 && data[pi][accepted_index].keySet.hasSomeKey()) {
             keySet = data[pi][accepted_index].keySet;
+        }
 
         FrameContext context;
         me->playOneFrame(keySet, &context);
         context.apply(me, opponent);
 
         // Clear current key input if the move is done.
-        if (me->userState().grounded)
+        if (me->userState().grounded) {
             gameState->setDecision(pi, Decision::NoInputDecision());
+            me->setKeySetSeq(KeySetSeq());
+        }
 
         if (accepted_message != "")
             gameState->setMessage(pi, accepted_message);

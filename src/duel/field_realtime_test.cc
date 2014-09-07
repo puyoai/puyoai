@@ -194,9 +194,11 @@ TEST_F(FieldRealtimeTest, Move1)
     f_->skipLevelSelect();
     f_->skipPreparingNext();
 
+    f_->setKeySetSeq(PuyoController::findKeyStroke(f_->field(), f_->movingKumipuyoState(), Decision(5, 1)));
     while (true) {
         FrameContext context;
-        KeySet keySet = f_->getKeySet(Decision(5, 1));
+        KeySet keySet = f_->frontKeySet();
+        f_->dropFrontKeySet();
         if (!f_->playOneFrame(keySet, &context))
             break;
     }
@@ -238,9 +240,11 @@ TEST_F(FieldRealtimeTest, Move2)
     f_->skipLevelSelect();
     f_->skipPreparingNext();
 
+    f_->setKeySetSeq(PuyoController::findKeyStroke(f_->field(), f_->movingKumipuyoState(), Decision(6, 2)));
     while (true) {
         FrameContext context;
-        KeySet keySet = f_->getKeySet(Decision(6, 2));
+        KeySet keySet = f_->frontKeySet();
+        f_->dropFrontKeySet();
         if (!f_->playOneFrame(keySet, &context))
             break;
     }
@@ -283,9 +287,11 @@ TEST_F(FieldRealtimeTest, Move3)
     f_->skipLevelSelect();
     f_->skipPreparingNext();
 
+    f_->setKeySetSeq(PuyoController::findKeyStroke(f_->field(), f_->movingKumipuyoState(), Decision(1, 2)));
     while (true) {
         FrameContext context;
-        KeySet keySet = f_->getKeySet(Decision(1, 2));
+        KeySet keySet = f_->frontKeySet();
+        f_->dropFrontKeySet();
         if (!f_->playOneFrame(keySet, &context))
             break;
     }
@@ -328,9 +334,11 @@ TEST_F(FieldRealtimeTest, Move4)
     f_->skipLevelSelect();
     f_->skipPreparingNext();
 
+    f_->setKeySetSeq(PuyoController::findKeyStroke(f_->field(), f_->movingKumipuyoState(), Decision(6, 3)));
     while (true) {
         FrameContext context;
-        KeySet keySet = f_->getKeySet(Decision(6, 3));
+        KeySet keySet = f_->frontKeySet();
+        f_->dropFrontKeySet();
         if (!f_->playOneFrame(keySet, &context))
             break;
     }
