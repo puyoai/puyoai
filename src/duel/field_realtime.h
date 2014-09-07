@@ -8,6 +8,7 @@
 #include "core/key_set.h"
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"
+#include "core/puyo_controller.h"
 #include "core/server/connector/connector_frame_response.h"
 #include "core/state.h"
 
@@ -36,41 +37,48 @@ public:
 
     FieldRealtime(int playerId, const KumipuyoSeq&);
 
-    // Gives a key input to the field, and control puyo. Returns true if a key
-    // input is accepted. FrameContext will collect events when playing frames.
-    // Currently, only ojama related events will be collected.
-    bool playOneFrame(const KeySet&, FrameContext*);
-
-    bool doFreeFall();
+    int playerId() const { return playerId_; }
 
     bool isDead() const { return simulationState_ == SimulationState::STATE_DEAD; }
+    bool userPlayable() const { return simulationState_ == SimulationState::STATE_PLAYABLE; }
 
     // Utility functions to be used by duel server.
     PlayerFrameData playerFrameData() const;
     UserState userState() const { return userState_; }
-    KeySet getKeySet(const Decision&) const;
+
+    void setKeySetSeq(const KeySetSeq& kss) { keySetSeq_ = kss; }
+    KeySet frontKeySet() const { return keySetSeq_.empty() ? KeySet() : keySetSeq_.front(); }
+    void dropFrontKeySet()
+    {
+        if (keySetSeq_.size() > 1 || (keySetSeq_.size() == 1 && keySetSeq_.front() != KeySet(Key::DOWN)))
+            keySetSeq_.removeFront();
+    }
+    const KeySetSeq& keySetSeq() const { return keySetSeq_; }
+    const Decision& lastDecision() const { return lastDecision_; }
 
     bool hasZenkeshi() const { return hasZenkeshi_; }
 
     int score() const { return score_; }
+
     int ojama() const { return numFixedOjama_ + numPendingOjama_; }
     int numFixedOjama() const { return numFixedOjama_; }
     int numPendingOjama() const { return numPendingOjama_; }
-
-    int playerId() const { return playerId_; }
-    bool userPlayable() const { return simulationState_ == SimulationState::STATE_PLAYABLE; }
-
     void addPendingOjama(int num) { numPendingOjama_ += num; }
     int reduceOjama(int num);
     void commitOjama() { numFixedOjama_ += numPendingOjama_; numPendingOjama_ = 0; }
-
     std::vector<int> determineColumnOjamaAmount();
 
     const CoreField& field() const { return field_; }
     const KumipuyoSeq& kumipuyoSeq() const { return kumipuyoSeq_; }
     Kumipuyo kumipuyo(int nth = 0) const;
-    const KumipuyoPos& kumipuyoPos() const { return kumipuyoPos_; }
+    const KumipuyoPos& kumipuyoPos() const { return mks_.pos; }
+    const MovingKumipuyoState& movingKumipuyoState() const { return mks_; }
     PuyoColor puyoColor(NextPuyoPosition) const;
+
+    // Gives a key input to the field, and control puyo. Returns true if a key
+    // input is accepted. FrameContext will collect events when playing frames.
+    // Currently, only ojama related events will be collected.
+    bool playOneFrame(const KeySet&, FrameContext*);
 
     // Testing only.
     void skipLevelSelect();
@@ -84,9 +92,6 @@ private:
 
     // Returns true if we need to drop more.
     bool drop1Frame();
-
-    // TODO(mayah): Replace this with Ctrl methods.
-    bool playInternal(const KeySet&, bool* ground);
 
     void transitToStatePreparingNext();
 
@@ -108,8 +113,11 @@ private:
 
     CoreField field_;
     KumipuyoSeq kumipuyoSeq_;
-    KumipuyoPos kumipuyoPos_;
     UserState userState_;
+
+    MovingKumipuyoState mks_;
+    KeySetSeq keySetSeq_;
+    Decision lastDecision_;
 
     int score_ = 0;
     int scoreConsumed_ = 0;
@@ -120,7 +128,6 @@ private:
     double dropAmount_ = 0.0;
 
     bool allowsQuick_ = false;
-    int restFramesForFreeFall_ = 0;
 
     bool hasZenkeshi_ = false;
 
@@ -128,7 +135,6 @@ private:
     std::vector<int> ojama_position_;
     bool drop_animation_;
     int current_chains_;
-    int restFramesToAcceptQuickTurn_;
 
     int delayFramesWNextAppear_;
     bool sent_wnext_appeared_;

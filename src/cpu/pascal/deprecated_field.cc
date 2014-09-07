@@ -7,8 +7,8 @@
 #include <string>
 #include <cassert>
 
-#include "core/ctrl.h"
 #include "core/decision.h"
+#include "core/puyo_controller.h"
 
 using namespace std;
 

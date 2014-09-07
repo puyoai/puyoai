@@ -4,8 +4,8 @@
 #include <sstream>
 
 #include "core/constant.h"
-#include "core/ctrl.h"
 #include "core/kumipuyo.h"
+#include "core/puyo_controller.h"
 
 using namespace std;
 
@@ -92,7 +92,7 @@ static void iterateAvailablePlansInternal(const CoreField& field,
             }
 
             const Decision& decision = DECISIONS[i];
-            if (!Ctrl::isReachable(field, decision))
+            if (!PuyoController::isReachable(field, decision))
                 continue;
 
             bool isChigiri = nextField.isChigiriDecision(decision);

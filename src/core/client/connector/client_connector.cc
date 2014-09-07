@@ -19,6 +19,7 @@ static string escapeMessage(string str)
 void ClientConnector::sendWithoutDecision(int frameId)
 {
     cout << "ID=" << frameId << endl;
+    LOG(INFO) << "ID=" << frameId << endl;
 }
 
 void ClientConnector::send(int frameId, const DropDecision& dropDecision)

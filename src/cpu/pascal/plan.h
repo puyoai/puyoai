@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "core/ctrl.h"
 #include "core/decision.h"
+#include "core/puyo_controller.h"
 #include "deprecated_field.h"
 
 typedef DeprecatedField Field;
