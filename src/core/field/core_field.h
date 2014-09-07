@@ -32,8 +32,11 @@ public:
     // ----------------------------------------------------------------------
     // field utilities
 
-    // Returns true if the field does not have any puyo.
+    // Returns true if the field does not have any puyo. Valid only all puyos are dropped.
     bool isZenkeshi() const;
+    // Retruns true if the field does not have any puyo. This will return valid value
+    // when some puyos are in the air.
+    bool isZenkeshiPrecise() const;
 
     // Counts the number of color puyos.
     int countColorPuyos() const;
