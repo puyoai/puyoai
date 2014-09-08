@@ -431,6 +431,8 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const
         }
 
         int size = p.restFramesTurnProhibited > 0 ? KEY_CANDIDATES_WITHOUT_TURN_SIZE : KEY_CANDIDATES_SIZE;
+        if (p.grounded)
+            size = 0;
         for (int i = 0; i < size; ++i) {
             MovingKumipuyoState mks(p);
             moveKumipuyo(field, KEY_CANDIDATES[i].first, &mks);
