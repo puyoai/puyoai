@@ -157,11 +157,15 @@ bool LF::Vanish(int chains, int* score) {
     }
   }
 
+  int erased_puyos = (read_head - erase_field) >> 1;
+  if (erased_puyos == 0) {
+    return false;
+  }
+
   bonus += COLOR_BONUS[num_colors];
   bonus += CHAIN_BONUS[chains];
   // We need to add rakka-bonus etc.
   // http://puyora.ktkr.net/puyozan.html
-  int erased_puyos = (read_head - erase_field) >> 1;
   if (bonus == 0) {
     bonus = 1;
   }
