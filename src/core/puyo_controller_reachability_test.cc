@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "core/decision.h"
+#include "core/field/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/plain_field.h"
 
@@ -11,7 +12,7 @@ using namespace std;
 
 TEST(PuyoControllerReachabilityTest, reachableOnEmptyField)
 {
-    PlainField f;
+    CoreField f;
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r <= 3; ++r) {
@@ -26,7 +27,7 @@ TEST(PuyoControllerReachabilityTest, reachableOnEmptyField)
 
 TEST(PuyoControllerReachabilityTest, reachableOnHigher)
 {
-    PlainField f(
+    CoreField f(
         "      " // 12
         "OOOOOO"
         "OOOOOO"
@@ -53,7 +54,7 @@ TEST(PuyoControllerReachabilityTest, reachableOnHigher)
 
 TEST(PuyoControllerReachabilityTest, reachableOn13thline)
 {
-    PlainField f(
+    CoreField f(
         "O    O" // 12
         "OOOOOO"
         "OOOOOO"
@@ -81,18 +82,19 @@ TEST(PuyoControllerReachabilityTest, reachableOn13thline)
 TEST(PuyoControllerReachabilityTest, beyondWall)
 {
     // need quick turn to go over a wall
-    PlainField f(" O O  " // 12
-                 " O O  "
-                 " O O  "
-                 " O O  "
-                 " O O  " // 8
-                 " O O  "
-                 " O O  "
-                 " O O  "
-                 " O O  " // 4
-                 " O O  "
-                 " O O  "
-                 " O O  ");
+    CoreField f(
+        " O O  " // 12
+        " O O  "
+        " O O  "
+        " O O  "
+        " O O  " // 8
+        " O O  "
+        " O O  "
+        " O O  "
+        " O O  " // 4
+        " O O  "
+        " O O  "
+        " O O  ");
 
     EXPECT_TRUE(PuyoController::isReachable(f, Decision(1, 0)));
     EXPECT_TRUE(PuyoController::isReachable(f, Decision(2, 0)));
@@ -111,7 +113,7 @@ TEST(PuyoControllerReachabilityTest, beyondWall)
 
 TEST(PuyoControllerReachabilityTest, wallAboveScreen)
 {
-    PlainField f(
+    CoreField f(
         " O O  "
         " O O  " // 12
         "OOOOOO"
@@ -148,8 +150,9 @@ TEST(PuyoControllerReachabilityTest, wallAboveScreen)
 //
 TEST(PuyoControllerReachabilityTest, cannotClimbTwoBlocks)
 {
-    PlainField f(" O  O "
-                 " O  O ");
+    CoreField f(
+        " O  O "
+        " O  O ");
 
     MovingKumipuyoState mks(KumipuyoPos(3, 2, 0));
     EXPECT_FALSE(PuyoController::isReachableFrom(f, mks, Decision(1, 0)));
@@ -168,19 +171,20 @@ TEST(PuyoControllerReachabilityTest, cannotClimbTwoBlocks)
 //
 TEST(PuyoControllerReachabilityTest, pivotCannotClimbUpTo14)
 {
-    PlainField f("O   OO"
-                 "OO OOO" // 12
-                 "OOOOOO"
-                 "OOOOOO"
-                 "OOOOOO"
-                 "OOOOOO" // 8
-                 "OOOOOO"
-                 "OOOOOO"
-                 "OOOOOO"
-                 "OOOOOO" // 4
-                 "OOOOOO"
-                 "OOOOOO"
-                 "OOOOOO");
+    CoreField f(
+        "O   OO"
+        "OO OOO" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
 
     EXPECT_FALSE(PuyoController::isReachable(f, Decision(1, 0)));
     EXPECT_FALSE(PuyoController::isReachable(f, Decision(1, 2)));
@@ -197,11 +201,12 @@ TEST(PuyoControllerReachabilityTest, pivotCannotClimbUpTo14)
 // 1  A@....  A: jiku-puyo
 TEST(PuyoControllerReachabilityTest, climbStairsRight)
 {
-    PlainField f("     O"
-                 "    OO" // 4
-                 "   OOO"
-                 "  OOOO"
-                 " OOOOO");
+    CoreField f(
+        "     O"
+        "    OO" // 4
+        "   OOO"
+        "  OOOO"
+        " OOOOO");
 
     for (int x = 1; x <= 6; x++) {
         EXPECT_TRUE(PuyoController::isReachableFrom(f, MovingKumipuyoState(KumipuyoPos(1, 1, 0)), Decision(x, 0)));
@@ -217,12 +222,13 @@ TEST(PuyoControllerReachabilityTest, climbStairsRight)
 // 1  ....@.  A: jiku-puyo
 TEST(PuyoControllerReachabilityTest, climbStairsLeft)
 {
-    PlainField f("O     "
-                 "OO    "
-                 "OOO   "
-                 "OOOO  "
-                 "OOOOO "
-                 "OOOOO ");
+    CoreField f(
+        "O     "
+        "OO    "
+        "OOO   "
+        "OOOO  "
+        "OOOOO "
+        "OOOOO ");
 
     for (int x = 1; x <= 6; x++) {
         EXPECT_TRUE(PuyoController::isReachableFrom(f, MovingKumipuyoState(KumipuyoPos(6, 2, 0)), Decision(x, 0)));

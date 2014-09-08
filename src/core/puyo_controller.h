@@ -15,7 +15,7 @@
 
 class Decision;
 class KumipuyoPos;
-class PlainField;
+class CoreField;
 
 struct MovingKumipuyoState {
     MovingKumipuyoState() {}
@@ -59,30 +59,30 @@ struct MovingKumipuyoState {
 
 class PuyoController {
 public:
-    static void moveKumipuyo(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted = nullptr);
+    static void moveKumipuyo(const CoreField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted = nullptr);
 
-    static bool isReachable(const PlainField&, const Decision&);
-    static bool isReachableFrom(const PlainField&, const MovingKumipuyoState&, const Decision&);
+    static bool isReachable(const CoreField&, const Decision&);
+    static bool isReachableFrom(const CoreField&, const MovingKumipuyoState&, const Decision&);
 
     // Finds a key stroke to move puyo from |MovingKumipuyoState| to |Decision|.
     // When there is not such a way, the returned KeySetSeq would be empty sequence.
-    static KeySetSeq findKeyStroke(const PlainField&, const MovingKumipuyoState&, const Decision&);
+    static KeySetSeq findKeyStroke(const CoreField&, const MovingKumipuyoState&, const Decision&);
 
+    static KeySetSeq findKeyStrokeFastpath(const CoreField&, const MovingKumipuyoState&, const Decision&);
     // This is faster, but might output worse key stroke.
-    static KeySetSeq findKeyStrokeOnline(const PlainField&, const MovingKumipuyoState&, const Decision&);
+    static KeySetSeq findKeyStrokeOnline(const CoreField&, const MovingKumipuyoState&, const Decision&);
     // This is slow, but precise.
-    static KeySetSeq findKeyStrokeByDijkstra(const PlainField&, const MovingKumipuyoState&, const Decision&);
+    static KeySetSeq findKeyStrokeByDijkstra(const CoreField&, const MovingKumipuyoState&, const Decision&);
 
 private:
     // Move kumipuyo using only arrow key. |downAccepted| gets true when DOWN is accepted.
-    static void moveKumipuyoByArrowKey(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted);
-    static void moveKumipuyoByTurnKey(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* needsFreefallProcess);
-    static void moveKumipuyoByFreefall(const PlainField&, MovingKumipuyoState*);
+    static void moveKumipuyoByArrowKey(const CoreField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted);
+    static void moveKumipuyoByTurnKey(const CoreField&, const KeySet&, MovingKumipuyoState*, bool* needsFreefallProcess);
+    static void moveKumipuyoByFreefall(const CoreField&, MovingKumipuyoState*);
 
-    static bool isReachableFastpath(const PlainField&, const Decision&);
+    static bool isReachableFastpath(const CoreField&, const Decision&);
 
-    static KeySetSeq findKeyStrokeOnlineInternal(const PlainField&, const MovingKumipuyoState&, const Decision&);
-
+    static KeySetSeq findKeyStrokeOnlineInternal(const CoreField&, const MovingKumipuyoState&, const Decision&);
 };
 
 #endif  // CORE_CTRL_H_
