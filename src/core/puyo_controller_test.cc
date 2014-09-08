@@ -4,14 +4,49 @@
 #include <vector>
 
 #include "core/decision.h"
+#include "core/field/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/plain_field.h"
 
 using namespace std;
 
+TEST(PuyoControllerTest, findKeyStrokeFastpath)
+{
+    CoreField f;
+    MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+
+    EXPECT_EQ("<,<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 0)).toString());
+    EXPECT_EQ("<A,<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 1)).toString());
+    EXPECT_EQ("<A,<,vA,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 2)).toString());
+
+    EXPECT_EQ("<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(2, 0)).toString());
+    EXPECT_EQ("<A,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(2, 1)).toString());
+    EXPECT_EQ("<A,v,vA,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(2, 2)).toString());
+    EXPECT_EQ("<B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(2, 3)).toString());
+
+    EXPECT_EQ("v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(3, 0)).toString());
+    EXPECT_EQ("vA,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(3, 1)).toString());
+    EXPECT_EQ("vA,v,vA,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(3, 2)).toString());
+    EXPECT_EQ("vB,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(3, 3)).toString());
+
+    EXPECT_EQ(">,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 0)).toString());
+    EXPECT_EQ(">A,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 1)).toString());
+    EXPECT_EQ(">B,v,vB,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 2)).toString());
+    EXPECT_EQ(">B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 3)).toString());
+
+    EXPECT_EQ(">,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 0)).toString());
+    EXPECT_EQ(">A,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 1)).toString());
+    EXPECT_EQ(">A,>,vA,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 2)).toString());
+    EXPECT_EQ(">B,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 3)).toString());
+
+    EXPECT_EQ(">,>,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 0)).toString());
+    EXPECT_EQ(">B,>,>B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 2)).toString());
+    EXPECT_EQ(">B,>,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 3)).toString());
+}
+
 TEST(PuyoControllerTest, findKeyStrokeOnline)
 {
-    PlainField f;
+    CoreField f;
     MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
 
     EXPECT_EQ("v", PuyoController::findKeyStrokeOnline(f, mks, Decision(3, 0)).toString());
@@ -25,7 +60,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnline)
 
 TEST(PuyoControllerTest, findKeyStrokeByDijkstra)
 {
-    PlainField f;
+    CoreField f;
     MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
 
     EXPECT_EQ("v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(3, 0)).toString());
@@ -41,7 +76,7 @@ TEST(PuyoControllerTest, findKeyStrokeByDijkstra)
 
 TEST(PuyoControllerTest, nonmovable)
 {
-    PlainField f(
+    CoreField f(
         " O O  "
         " O O  " // 12
         " O O  "
@@ -72,11 +107,11 @@ TEST(PuyoControllerTest, nonmovable)
 //
 TEST(PuyoControllerTest, climbStairsRight)
 {
-    PlainField f("     O"
-                 "    OO" // 4
-                 "   OOO"
-                 "  OOOO"
-                 " OOOOO");
+    CoreField f("     O"
+                "    OO" // 4
+                "   OOO"
+                "  OOOO"
+                " OOOOO");
 
     // TODO(mayah): Actually, dijkstra algorithm can find shorter key stroke.
     const string expected[] = {
@@ -105,12 +140,12 @@ TEST(PuyoControllerTest, climbStairsRight)
 //
 TEST(PuyoControllerTest, climbStairsLeft)
 {
-    PlainField f("O     "
-                 "OO    "
-                 "OOO   "
-                 "OOOO  "
-                 "OOOOO "
-                 "OOOOO ");
+    CoreField f("O     "
+                "OO    "
+                "OOO   "
+                "OOOO  "
+                "OOOOO "
+                "OOOOO ");
 
     const string expected[] = {
         "A,,A,,B,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,v",
@@ -130,7 +165,7 @@ TEST(PuyoControllerTest, climbStairsLeft)
 
 TEST(PuyoControllerTest, subpuyoIsHigher)
 {
-    PlainField f("    O ");
+    CoreField f("    O ");
 
     MovingKumipuyoState mks(KumipuyoPos(3, 1, 0));
     KeySetSeq kss = PuyoController::findKeyStroke(f, mks, Decision(4, 1));

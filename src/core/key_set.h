@@ -37,7 +37,8 @@ private:
 class KeySetSeq {
 public:
     KeySetSeq() {}
-    KeySetSeq(const std::vector<KeySet>& seq) : seq_(seq) {}
+    explicit KeySetSeq(const std::vector<KeySet>& seq) : seq_(seq) {}
+    KeySetSeq(const std::initializer_list<KeySet>& seq) : seq_(seq) {}
 
     bool empty() const { return seq_.empty(); }
     size_t size() const { return seq_.size(); }

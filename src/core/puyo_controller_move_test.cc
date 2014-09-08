@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "core/decision.h"
+#include "core/field/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/plain_field.h"
 
@@ -11,7 +12,7 @@ using namespace std;
 
 TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey)
 {
-    PlainField f;
+    CoreField f;
     MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
     bool downAccepted = false;
 
@@ -70,7 +71,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey)
 
 TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Right)
 {
-    PlainField f;
+    CoreField f;
     bool downAccepted = false;
 
     {
@@ -113,7 +114,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Right)
 
 TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Left)
 {
-    PlainField f;
+    CoreField f;
     bool downAccepted = false;
 
     {
@@ -156,7 +157,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Left)
 
 TEST(PuyoControllerMoveTest, moveKumipuyoFreefall)
 {
-    PlainField f;
+    CoreField f;
     MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
     mks.restFramesForFreefall = 2;
     bool downAccepted = false;
@@ -199,7 +200,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoFreefall)
 
 TEST(PuyoControllerMoveTest, moveKumipuyoWithTurnKey)
 {
-    PlainField f;
+    CoreField f;
     MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
     bool downAccepted = false;
 
@@ -230,7 +231,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithTurnKey)
 
 TEST(PuyoControllerMoveTest, moveKumipuyoMultipleKeys)
 {
-    PlainField f;
+    CoreField f;
     MovingKumipuyoState mks(KumipuyoPos(1, 12, 0));
     bool downAccepted = false;
 
@@ -245,7 +246,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoMultipleKeys)
 
 TEST(PuyoControllerMoveTest, moveKumipuyoWithLiftingAxis_RightTurn)
 {
-    PlainField f;
+    CoreField f;
     bool downAccepted = false;
 
     MovingKumipuyoState mks(KumipuyoPos(3, 1, 1));
@@ -267,7 +268,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithLiftingAxis_RightTurn)
 
 TEST(PuyoControllerMoveTest, moveKumipuyoWithLiftingAxis_LeftTurn)
 {
-    PlainField f;
+    CoreField f;
     bool downAccepted = false;
 
     MovingKumipuyoState mks(KumipuyoPos(3, 1, 3));
@@ -289,7 +290,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithLiftingAxis_LeftTurn)
 
 TEST(PuyoControllerMoveTest, moveKumipuyoWithLiftingAxis12)
 {
-    PlainField f(
+    CoreField f(
         "OOOOOO" // 11
         "OOOOOO"
         "OOOOOO"
@@ -323,7 +324,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithLiftingAxis12)
 
 TEST(PuyoControllerMoveTest, moveKumipuyoWithLiftingAxis13)
 {
-    PlainField f(
+    CoreField f(
         "   OOO" // 12
         "OOOOOO" // 11
         "OOOOOO"
@@ -355,7 +356,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithLiftingAxis13)
 
 TEST(PuyoControllerMoveTest, moveKumipuyoQuickTurn)
 {
-    PlainField f(
+    CoreField f(
         " O O  " // 12
         " O O  "
         " O O  "
