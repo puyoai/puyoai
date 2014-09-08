@@ -4,6 +4,7 @@
 #include <glog/logging.h>
 #include <string>
 #include <stdio.h>
+#include <tuple>
 #include <vector>
 
 #include "core/constant.h"
