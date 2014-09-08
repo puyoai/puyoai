@@ -117,14 +117,14 @@ TEST(PuyoControllerTest, climbStairsLeft)
         "A,,A,,B,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,v",
         "A,,A,,B,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,v",
         "A,,A,,B,,B,,A,,A,,B,<,,B,v",
-        "A,,B,,B,,A,,B,<,B,v",
+        "A,,A,,B,,B,v",
         "v",
     };
 
     for (int x = 1; x <= 6; ++x) {
         MovingKumipuyoState mks(KumipuyoPos(6, 2, 0));
         KeySetSeq kss = PuyoController::findKeyStroke(f, mks, Decision(x, 0));
-        EXPECT_EQ(expected[x - 1], kss.toString());
+        EXPECT_EQ(expected[x - 1], kss.toString()) << x;
     }
 }
 
@@ -136,4 +136,3 @@ TEST(PuyoControllerTest, subpuyoIsHigher)
     KeySetSeq kss = PuyoController::findKeyStroke(f, mks, Decision(4, 1));
     EXPECT_EQ(">,B,,B,,B,v", kss.toString());
 }
-
