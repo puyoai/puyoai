@@ -1,5 +1,5 @@
-#ifndef CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_LINUX_H_
-#define CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_LINUX_H_
+#ifndef CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_POSIX_H_
+#define CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_POSIX_H_
 
 #include <memory>
 #include <vector>
@@ -8,9 +8,9 @@
 #include "core/server/connector/connector.h"
 #include "core/server/connector/connector_manager.h"
 
-class ConnectorManagerLinux : public ConnectorManager {
+class ConnectorManagerPosix : public ConnectorManager {
 public:
-    ConnectorManagerLinux(std::unique_ptr<Connector> p1, std::unique_ptr<Connector> p2);
+    ConnectorManagerPosix(std::unique_ptr<Connector> p1, std::unique_ptr<Connector> p2);
 
     virtual void send(const ConnectorFrameRequest&) override;
     virtual bool receive(int frameId, std::vector<ConnectorFrameResponse> cfr[2]) override;

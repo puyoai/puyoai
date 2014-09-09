@@ -1,4 +1,4 @@
-#include "core/server/connector/connector_manager_linux.h"
+#include "core/server/connector/connector_manager_posix.h"
 
 #include <fcntl.h>
 #include <errno.h>
@@ -68,13 +68,13 @@ static void Log(int frameId, const vector<ConnectorFrameResponse> alldata[2])
     }
 }
 
-ConnectorManagerLinux::ConnectorManagerLinux(unique_ptr<Connector> p1, unique_ptr<Connector> p2) :
+ConnectorManagerPosix::ConnectorManagerPosix(unique_ptr<Connector> p1, unique_ptr<Connector> p2) :
     connectors_ { move(p1), move(p2) },
     waitTimeout_(true)
 {
 }
 
-void ConnectorManagerLinux::send(const ConnectorFrameRequest& req)
+void ConnectorManagerPosix::send(const ConnectorFrameRequest& req)
 {
     for (int pi = 0; pi < 2; ++pi) {
         connector(pi)->write(req);
@@ -83,7 +83,7 @@ void ConnectorManagerLinux::send(const ConnectorFrameRequest& req)
 
 // TODO(mayah): Without polling, each connector should make thread?
 // If we do so, Human connector can use MainWindow::addEventListener(), maybe.
-bool ConnectorManagerLinux::receive(int frame_id, vector<ConnectorFrameResponse> cfr[2])
+bool ConnectorManagerPosix::receive(int frame_id, vector<ConnectorFrameResponse> cfr[2])
 {
     for (int i = 0; i < 2; i++)
         cfr[i].clear();
