@@ -17,7 +17,7 @@ using namespace std;
 
 namespace {
 
-bool isQuickturn(const CoreField& field, const KumipuyoPos& pos)
+bool isQuickturn(const PlainField& field, const KumipuyoPos& pos)
 {
     DCHECK(pos.r == 0 || pos.r == 2) << pos.r;
     return (field.get(pos.x - 1, pos.y) != PuyoColor::EMPTY && field.get(pos.x + 1, pos.y) != PuyoColor::EMPTY);
@@ -68,7 +68,7 @@ void expandButtonDistance(KeySetSeq* seq)
 
 }
 
-void PuyoController::moveKumipuyo(const CoreField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
+void PuyoController::moveKumipuyo(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
 {
     // TODO(mayah): Which key is consumed first? turn? arrow?
     moveKumipuyoByArrowKey(field, keySet, mks, downAccepted);
@@ -86,7 +86,7 @@ void PuyoController::moveKumipuyo(const CoreField& field, const KeySet& keySet, 
         moveKumipuyoByFreefall(field, mks);
 }
 
-void PuyoController::moveKumipuyoByArrowKey(const CoreField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
+void PuyoController::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
 {
     DCHECK(mks);
     DCHECK(!mks->grounded) << "Grounded puyo cannot be moved.";
@@ -131,7 +131,7 @@ void PuyoController::moveKumipuyoByArrowKey(const CoreField& field, const KeySet
     }
 }
 
-void PuyoController::moveKumipuyoByTurnKey(const CoreField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* needsFreefallProcess)
+void PuyoController::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* needsFreefallProcess)
 {
     DCHECK_EQ(0, mks->restFramesTurnProhibited) << mks->restFramesTurnProhibited;
 
@@ -287,7 +287,7 @@ void PuyoController::moveKumipuyoByTurnKey(const CoreField& field, const KeySet&
     }
 }
 
-void PuyoController::moveKumipuyoByFreefall(const CoreField& field, MovingKumipuyoState* mks)
+void PuyoController::moveKumipuyoByFreefall(const PlainField& field, MovingKumipuyoState* mks)
 {
     DCHECK(!mks->grounded);
 
@@ -307,7 +307,7 @@ void PuyoController::moveKumipuyoByFreefall(const CoreField& field, MovingKumipu
     return;
 }
 
-bool PuyoController::isReachable(const CoreField& field, const Decision& decision)
+bool PuyoController::isReachable(const PlainField& field, const Decision& decision)
 {
     if (isReachableFastpath(field, decision))
         return true;
@@ -316,7 +316,7 @@ bool PuyoController::isReachable(const CoreField& field, const Decision& decisio
     return isReachableFrom(field, MovingKumipuyoState(KumipuyoPos::initialPos()), decision);
 }
 
-bool PuyoController::isReachableFastpath(const CoreField& field, const Decision& decision)
+bool PuyoController::isReachableFastpath(const PlainField& field, const Decision& decision)
 {
     DCHECK(decision.isValid()) << decision.toString();
 
@@ -346,7 +346,7 @@ bool PuyoController::isReachableFastpath(const CoreField& field, const Decision&
     return true;
 }
 
-bool PuyoController::isReachableFrom(const CoreField& field, const MovingKumipuyoState& mks, const Decision& decision)
+bool PuyoController::isReachableFrom(const PlainField& field, const MovingKumipuyoState& mks, const Decision& decision)
 {
     return !findKeyStrokeOnlineInternal(field, mks, decision).empty();
 }
@@ -383,7 +383,7 @@ struct Edge {
 typedef vector<Edge> Edges;
 typedef map<Vertex, tuple<Vertex, KeySet, Weight>> Potential;
 
-KeySetSeq PuyoController::findKeyStrokeByDijkstra(const CoreField& field, const MovingKumipuyoState& initialState, const Decision& decision)
+KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const MovingKumipuyoState& initialState, const Decision& decision)
 {
     // We don't add KeySet(Key::DOWN) intentionally.
     static const pair<KeySet, double> KEY_CANDIDATES[] = {
@@ -452,7 +452,7 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const CoreField& field, const 
     return KeySetSeq();
 }
 
-KeySetSeq PuyoController::findKeyStrokeOnline(const CoreField& field, const MovingKumipuyoState& mks, const Decision& decision)
+KeySetSeq PuyoController::findKeyStrokeOnline(const PlainField& field, const MovingKumipuyoState& mks, const Decision& decision)
 {
     KeySetSeq kss = findKeyStrokeOnlineInternal(field, mks, decision);
     removeRedundantKeySeq(mks.pos, &kss);
@@ -461,7 +461,7 @@ KeySetSeq PuyoController::findKeyStrokeOnline(const CoreField& field, const Movi
 }
 
 // returns null if not reachable
-KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const CoreField& field, const MovingKumipuyoState& mks, const Decision& decision)
+KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, const MovingKumipuyoState& mks, const Decision& decision)
 {
     KeySetSeq ret;
     KumipuyoPos current = mks.pos;
