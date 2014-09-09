@@ -13,7 +13,7 @@
 #include <glog/logging.h>
 
 #include "core/constant.h"
-#include "core/deprecated_constant.h"
+#include "deprecated_constant.h"
 #include "ctrl.h"
 
 // If this flag is turned on, we don't need to check the cell for vanishment
