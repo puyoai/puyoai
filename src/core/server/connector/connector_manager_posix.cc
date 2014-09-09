@@ -26,43 +26,43 @@ DEFINE_bool(no_timeout, false, "if true, wait ai's thought without timeout");
 
 const int TIMEOUT_USEC = 1000000 / FPS;
 
-static int GetUsecFromStart(const struct timeval& start)
+static int getUsecFromStart(const struct timeval& start)
 {
     struct timeval now;
     gettimeofday(&now, NULL);
     return (now.tv_sec - start.tv_sec) * 1000000 + (now.tv_usec - start.tv_usec);
 }
 
-static int GetRemainingMilliSeconds(const struct timeval& start)
+static int getRemainingMilliSeconds(const struct timeval& start)
 {
     if (FLAGS_no_timeout)
         return numeric_limits<int>::max();
 
-    int usec = GetUsecFromStart(start);
+    int usec = getUsecFromStart(start);
     return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
-static void Log(int frameId, const vector<ConnectorFrameResponse> alldata[2])
+static void logFrameResponses(int frameId, const vector<ConnectorFrameResponse> alldata[2])
 {
     // Print debug info.
     LOG(INFO) << "########## FRAME " << frameId << " ##########";
-    for (int i = 0; i < 2; i++) {
-        if (alldata[i].size() == 0) {
-            LOG(INFO) << "[P" << i << "] [NODATA]";
+    for (int pi = 0; pi < 2; pi++) {
+        if (alldata[pi].size() == 0) {
+            LOG(INFO) << "[P" << pi << "] [NODATA]";
         }
-        for (size_t j = 0; j < alldata[i].size(); j++) {
-            const ConnectorFrameResponse& data = alldata[i][j];
-            LOG(INFO) << "[P" << i << "] "
+        for (size_t j = 0; j < alldata[pi].size(); j++) {
+            const ConnectorFrameResponse& data = alldata[pi][j];
+            LOG(INFO) << "[P" << pi << "] "
                       << "[" << setfill(' ') << setw(5) << right << data.usec << "us] "
                       << "[" << data.original << "]";
 
             LOG_IF(WARNING, !data.isValid())
                 << "frameId=" << frameId << " "
-                << "user=" << i << " "
+                << "user=" << pi << " "
                 << "Ignoring the invalid command.";
             LOG_IF(WARNING, data.frameId > frameId)
                 << "frameId=" << frameId << " "
-                << "user=" << i << " "
+                << "user=" << pi << " "
                 << "Received a command for future frame.";
         }
     }
@@ -83,7 +83,7 @@ void ConnectorManagerPosix::send(const ConnectorFrameRequest& req)
 
 // TODO(mayah): Without polling, each connector should make thread?
 // If we do so, Human connector can use MainWindow::addEventListener(), maybe.
-bool ConnectorManagerPosix::receive(int frame_id, vector<ConnectorFrameResponse> cfr[2])
+bool ConnectorManagerPosix::receive(int frameId, vector<ConnectorFrameResponse> cfr[2])
 {
     for (int i = 0; i < 2; i++)
         cfr[i].clear();
@@ -120,7 +120,7 @@ bool ConnectorManagerPosix::receive(int frame_id, vector<ConnectorFrameResponse>
             // Check timeout.
             // The timeout delays for 50us in avarage (on pascal's machine)
             // Worst case is still in order of 100us, so it's OK to use gettimeofday.
-            timeout_ms = GetRemainingMilliSeconds(tv_start);
+            timeout_ms = getRemainingMilliSeconds(tv_start);
             if (timeout_ms <= 0) {
                 break;
             }
@@ -142,9 +142,9 @@ bool ConnectorManagerPosix::receive(int frame_id, vector<ConnectorFrameResponse>
             if (pollfds[i].revents & POLLIN) {
                 ConnectorFrameResponse data = connector(playerIds[i])->read();
                 if (data.received) {
-                    data.usec = GetUsecFromStart(tv_start);
+                    data.usec = getUsecFromStart(tv_start);
                     cfr[playerIds[i]].push_back(data);
-                    if (data.frameId == frame_id)
+                    if (data.frameId == frameId)
                         received_data_for_this_frame[playerIds[i]] = true;
                 }
             } else if ((pollfds[i].revents & POLLERR) ||
@@ -171,7 +171,7 @@ bool ConnectorManagerPosix::receive(int frame_id, vector<ConnectorFrameResponse>
         }
     }
 
-    Log(frame_id, cfr);
+    logFrameResponses(frameId, cfr);
 
     return !died;
 }
