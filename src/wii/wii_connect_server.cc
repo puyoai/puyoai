@@ -1,5 +1,6 @@
 #include "wii/wii_connect_server.h"
 
+#include <iostream>
 #include <vector>
 
 #include "capture/analyzer.h"
@@ -9,8 +10,6 @@
 #include "core/server/connector/connector_manager_linux.h"
 #include "gui/screen.h"
 #include "wii/key_sender.h"
-
-#include <iostream>
 
 using namespace std;
 
@@ -79,6 +78,8 @@ void WiiConnectServer::runLoop()
         UniqueSDLSurface surface(source_->getNextFrame());
         if (!surface.get())
             continue;
+
+        cout << "FRAME: " << frameId << endl;
 
         unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), analyzerResults_);
         LOG(INFO) << r->toString();

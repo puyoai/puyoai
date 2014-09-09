@@ -1,5 +1,9 @@
 #include "capture/movie_source.h"
 
+#include <iostream>
+
+using namespace std;
+
 MovieSource::MovieSource(const char* filename) :
     filename_(filename),
     sws_(NULL),
@@ -126,7 +130,7 @@ UniqueSDLSurface MovieSource::getNextFrame() {
         int d = 1000 / fps_ - elapsed;
         SDL_Delay(d);
         Uint32 hoge = SDL_GetTicks();
-        fprintf(stderr, "waiting... %dms ... %d\n", d, hoge - currentTime);
+        cout << "waiting... " << d << "ms ... " << (hoge - currentTime) << endl;
     }
     lastTaken_ = SDL_GetTicks();
 
