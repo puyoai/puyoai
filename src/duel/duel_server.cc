@@ -190,7 +190,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         manager->send(gameState.toConnectorFrameRequest(frameId));
 
         // --- Reads the response of the current frame information.
-        // It takes up to 16ms to finish this section.
+        // It takes up to 1/FPS [s] to finish this section.
         vector<ConnectorFrameResponse> data[2];
         if (!manager->receive(frameId, data)) {
             if (manager->connector(0)->alive()) {
@@ -234,9 +234,6 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
 
 void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse> data[2])
 {
-    int ackFrameId[2];
-    vector<int> nackFrameIds[2];
-
     for (int pi = 0; pi < 2; pi++) {
         FieldRealtime* me = gameState->mutableField(pi);
         FieldRealtime* opponent = gameState->mutableField(1 - pi);
@@ -248,6 +245,8 @@ void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse>
         // it's OK for now. However, this might cause future issues. Consider better way.
 
         // Take care of ack_info.
+        int ackFrameId = -1;
+        vector<int> nackFrameIds;
         for (size_t j = 0; j < data[pi].size(); j++) {
             const ConnectorFrameResponse& d = data[pi][j];
 
@@ -256,11 +255,14 @@ void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse>
                 continue;
 
             if (static_cast<int>(j) == accepted_index) {
-                ackFrameId[pi] = d.frameId;
+                ackFrameId = d.frameId;
             } else {
-                nackFrameIds[pi].push_back(d.frameId);
+                nackFrameIds.push_back(d.frameId);
             }
         }
+
+        gameState->setAckFrameId(pi, ackFrameId);
+        gameState->setNackFrameIds(pi, nackFrameIds);
 
         if (accepted_index != -1) {
             KeySetSeq kss = PuyoController::findKeyStroke(me->field(), me->movingKumipuyoState(), gameState->decision(pi));
