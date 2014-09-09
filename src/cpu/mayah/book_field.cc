@@ -51,9 +51,9 @@ BookField::BookField(const string& name, const vector<string>& field, double def
         CHECK_EQ(field[i].size(), 6U);
         int y = static_cast<int>(field.size()) - i;
         for (int x = 1; x <= 6; ++x) {
-            CHECK('A' <= field[i][x - 1] && field[i][x - 1] <= 'Z' ||
-                  'a' <= field[i][x - 1] && field[i][x - 1] <= 'z' ||
-                  field[i][x - 1] == '.');
+           CHECK(('A' <= field[i][x - 1] && field[i][x - 1] <= 'Z') ||
+                 ('a' <= field[i][x - 1] && field[i][x - 1] <= 'z') ||
+                 (field[i][x - 1] == '.'));
 
             if ('A' <= field[i][x - 1] && field[i][x - 1] <= 'Z') {
                 field_[x][y] = field[i][x - 1];

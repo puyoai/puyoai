@@ -441,10 +441,6 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const CoreField& field, const 
             MovingKumipuyoState mks(p);
             moveKumipuyo(field, KEY_CANDIDATES[i].first, &mks);
 
-            int framesTurnProhibited = std::max(0, p.restFramesTurnProhibited - 1);
-            if (i >= KEY_CANDIDATES_WITHOUT_TURN_SIZE)
-                framesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
-
             if (pot.count(mks))
                 continue;
             // TODO(mayah): This is not correct. We'd like to prefer KeySet() to another key sequence a bit.
