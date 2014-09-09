@@ -69,6 +69,8 @@ void FieldRealtime::init()
 bool FieldRealtime::onStateLevelSelect()
 {
     transitToStatePreparingNext();
+    // We always send 'grounded' before the initial puyo appear.
+    userState_.grounded = true;
     return false;
 }
 

@@ -51,10 +51,8 @@ void AI::runLoop()
             gameWillBegin(frameData);
             field_.clear();
 
-            // Consider the current (EMPTY/EMPTY) puyo has grounded.
             current.clear();
             next.clear();
-            current.hasGrounded = true;
         }
 
         // Update enemy info if necessary.
@@ -97,6 +95,12 @@ void AI::runLoop()
             LOG(INFO) << "STATE_YOU_GROUNDED";
             current.hasGrounded = true;
         }
+
+        LOG(INFO) << "FRAME: " << frameData.id
+                  << " CURRENT: grounded=" << current.hasGrounded
+                  << " needsSend=" << current.needsSend
+                  << " NEXT: grounded=" << next.hasGrounded
+                  << " needsSend=" << next.needsSend;
 
         // When the current puyo is grounded and the next hand is considered, we will move to the next hand.
         if (current.hasGrounded && next.needsSend) {

@@ -17,6 +17,7 @@
 #include <glog/logging.h>
 
 #include "core/constant.h"
+#include "core/player.h"
 #include "core/server/connector/connector_frame_request.h"
 
 using namespace std;
@@ -48,22 +49,20 @@ static void logFrameResponses(int frameId, const vector<ConnectorFrameResponse> 
     LOG(INFO) << "########## FRAME " << frameId << " ##########";
     for (int pi = 0; pi < 2; pi++) {
         if (alldata[pi].size() == 0) {
-            LOG(INFO) << "[P" << pi << "] [NODATA]";
+            LOG(INFO) << playerText(pi) << " [NODATA]";
         }
         for (size_t j = 0; j < alldata[pi].size(); j++) {
             const ConnectorFrameResponse& data = alldata[pi][j];
-            LOG(INFO) << "[P" << pi << "] "
+            LOG(INFO) << playerText(pi)
                       << "[" << setfill(' ') << setw(5) << right << data.usec << "us] "
                       << "[" << data.original << "]";
 
             LOG_IF(WARNING, !data.isValid())
-                << "frameId=" << frameId << " "
-                << "user=" << pi << " "
-                << "Ignoring the invalid command.";
+                << playerText(pi)
+                << " Ignoring the invalid command.";
             LOG_IF(WARNING, data.frameId > frameId)
-                << "frameId=" << frameId << " "
-                << "user=" << pi << " "
-                << "Received a command for future frame.";
+                << playerText(pi)
+                << " Received a command for future frame.";
         }
     }
 }
