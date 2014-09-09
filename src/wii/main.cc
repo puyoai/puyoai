@@ -14,7 +14,6 @@
 #include "capture/somagic_analyzer.h"
 #include "capture/somagic_source.h"
 #include "capture/movie_source.h"
-#include "core/server/connector/connector_manager_linux.h"
 #include "gui/main_window.h"
 #include "wii/serial_key_sender.h"
 #include "wii/stdout_key_sender.h"

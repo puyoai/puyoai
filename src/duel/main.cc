@@ -13,7 +13,7 @@
 #include "base/path.h"
 #include "core/httpd/http_server.h"
 #include "core/server/connector/human_connector.h"
-#include "core/server/connector/connector_manager_linux.h"
+#include "core/server/connector/connector_manager_posix.h"
 #include "duel/cui.h"
 #include "duel/duel_server.h"
 #include "duel/game_state.h"
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
     }
 #endif
 
-    ConnectorManagerLinux manager {
+    ConnectorManagerPosix manager {
         Connector::create(0, string(argv[1])),
         Connector::create(1, string(argv[2])),
     };

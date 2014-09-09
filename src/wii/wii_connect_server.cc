@@ -7,7 +7,7 @@
 #include "capture/source.h"
 #include "core/puyo_color.h"
 #include "core/puyo_controller.h"
-#include "core/server/connector/connector_manager_linux.h"
+#include "core/server/connector/connector_manager_posix.h"
 #include "gui/screen.h"
 #include "wii/key_sender.h"
 
@@ -24,7 +24,7 @@ WiiConnectServer::WiiConnectServer(Source* source, Analyzer* analyzer, KeySender
     isAi_[0] = (p1Program != "-");
     isAi_[1] = (p2Program != "-");
 
-    connector_.reset(new ConnectorManagerLinux {
+    connector_.reset(new ConnectorManagerPosix {
         Connector::create(0, p1Program),
         Connector::create(1, p2Program),
     });
