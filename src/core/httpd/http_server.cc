@@ -63,10 +63,9 @@ static int handleHandler(struct MHD_Connection* connection, const HttpHandler& h
 
 // static
 int HttpServer::accessHandler(void* cls, struct MHD_Connection* connection,
-                              const char* url, const char* method, const char* version,
-                              const char* upload_data, size_t* upload_data_size, void** con_cls)
+                              const char* url, const char* /*method*/, const char* /*version*/,
+                              const char* /*upload_data*/, size_t* /*upload_data_size*/, void** /*con_cls*/)
 {
-    UNUSED_VARIABLE(con_cls);
     HttpServer* server = reinterpret_cast<HttpServer*>(cls);
 
     LOG(INFO) << "access: " << url;
