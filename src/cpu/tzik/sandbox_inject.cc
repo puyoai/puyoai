@@ -10,6 +10,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <glog/logging.h>
+
 namespace {
 
 template <typename T, size_t N>
@@ -71,21 +73,22 @@ void apply_seccomp_filter() {
     .filter = filter
   };
 
-  struct sigaction action = {};
+  struct sigaction action;
+  memset(&action, 0, sizeof(action));
   action.sa_sigaction = [](int, siginfo_t* siginfo, void*) {
     int16_t syscall_number = -static_cast<int16_t>(siginfo->si_errno);
     const char msg[] = "Disallowed syscall: ";
-    write(2, msg, sizeof(msg));
+    CHECK_EQ(write(2, msg, sizeof(msg)), sizeof(msg));
     print_syscall_name(syscall_number);
 
-    write(2, " (", 2);
+    CHECK_EQ(write(2, " (", 2), 2);
     char buf[] = "     )\n";
     int i = 5;
     while (syscall_number) {
       buf[--i] = '0' + (syscall_number % 10);
       syscall_number /= 10;
     }
-    write(2, buf + i, 5 - i + 2);
+    CHECK_EQ(write(2, buf + i, 5 - i + 2), 5 - i + 2);
   };
   action.sa_flags = SA_SIGINFO;
   sigaction(SIGSYS, &action, nullptr);
@@ -98,11 +101,11 @@ void apply_seccomp_filter() {
 }
 
 void print_syscall_name(int syscall_number) {
-#define CASE(x)                                 \
-    case __NR_ ## x: {                          \
-      const char name[] = #x;                   \
-          write(2, name, sizeof(name));         \
-          break;                                \
+#define CASE(x)                                             \
+    case __NR_ ## x: {                                      \
+      const char name[] = #x;                               \
+      CHECK_EQ(write(2, name, sizeof(name)), sizeof(name)); \
+      break;                                                \
     }
   switch (syscall_number) {
     CASE(read);
@@ -421,7 +424,7 @@ void print_syscall_name(int syscall_number) {
     CASE(finit_module);
     default: {
       const char name[] = "unknown";
-      write(2, name, sizeof(name));
+      CHECK_EQ(write(2, name, sizeof(name)), sizeof(name));
       break;
     }
   }

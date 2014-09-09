@@ -32,8 +32,10 @@ public:
     const std::string& message(int pi) const { return message_[pi]; }
     void setMessage(int pi, const std::string& message) { message_[pi] = message; }
 
+    void setAckFrameId(int pi, int frameId) { ackFrameId_[pi] = frameId; }
     int ackFrameId(int pi) const { return ackFrameId_[pi]; }
 
+    void setNackFrameIds(int pi, const std::vector<int>& frameIds) { nackFrameIds_[pi] = frameIds; }
     const std::vector<int>& nackFrameIds(int pi) const { return nackFrameIds_[pi]; }
 
 private:
