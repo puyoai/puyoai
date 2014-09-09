@@ -42,10 +42,10 @@ static int GetRemainingMilliSeconds(const struct timeval& start)
     return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
-static void Log(int frame_id, const vector<ConnectorFrameResponse> alldata[2])
+static void Log(int frameId, const vector<ConnectorFrameResponse> alldata[2])
 {
     // Print debug info.
-    LOG(INFO) << "########## FRAME " << frame_id << " ##########";
+    LOG(INFO) << "########## FRAME " << frameId << " ##########";
     for (int i = 0; i < 2; i++) {
         if (alldata[i].size() == 0) {
             LOG(INFO) << "[P" << i << "] [NODATA]";
@@ -56,8 +56,14 @@ static void Log(int frame_id, const vector<ConnectorFrameResponse> alldata[2])
                       << "[" << setfill(' ') << setw(5) << right << data.usec << "us] "
                       << "[" << data.original << "]";
 
-            LOG_IF(WARNING, !data.isValid()) << "Ignoring the invalid command.";
-            LOG_IF(WARNING, data.frameId > frame_id) << "Received a command for future frame.";
+            LOG_IF(WARNING, !data.isValid())
+                << "frameId=" << frameId << " "
+                << "user=" << i << " "
+                << "Ignoring the invalid command.";
+            LOG_IF(WARNING, data.frameId > frameId)
+                << "frameId=" << frameId << " "
+                << "user=" << i << " "
+                << "Received a command for future frame.";
         }
     }
 }
