@@ -3,13 +3,15 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "base/tsc.h"
+#include "base/time_stamp_counter.h"
 #include "core/field/rensa_result.h"
 
 using namespace std;
 
 TEST(FieldPerformanceTest, Copy)
 {
+    TimeStampCounterData tsc;
+
     CoreField f("050745"
                 "574464"
                 "446676"
@@ -25,31 +27,30 @@ TEST(FieldPerformanceTest, Copy)
                 "475755");
 
     for (int i = 0; i < 1000000; i++) {
-        Tsc tsc("Copy");
+        ScopedTimeStampCounter tsct(&tsc);
         CoreField f2(f);
     }
-    double average, variance;
-    Tsc::GetStatistics("Copy", &average, &variance);
-    cout << "average: " << average << endl;
-    cout << "variance: " << variance << endl;
+
+    tsc.showStatistics();
 }
 
 TEST(FieldPerformanceTest, Simulate_Empty)
 {
+    TimeStampCounterData tsc;
+
     for (int i = 0; i < 1000000; i++) {
         CoreField f;
-        Tsc tsc("Simulate_Empty");
+        ScopedTimeStampCounter tsct(&tsc);
         f.simulate();
     }
 
-    double average, variance;
-    Tsc::GetStatistics("Simulate_Empty", &average, &variance);
-    cout << "average: " << average << endl;
-    cout << "variance: " << variance << endl;
+    tsc.showStatistics();
 }
 
 TEST(FieldPerformanceTest, Simulate_Filled)
 {
+    TimeStampCounterData tsc;
+
     for (int i = 0; i < 100000; i++) {
         CoreField f("050745"
                     "574464"
@@ -64,17 +65,17 @@ TEST(FieldPerformanceTest, Simulate_Filled)
                     "757644"
                     "657575"
                     "475755");
-        Tsc tsc("Simulate_Filled");
+        ScopedTimeStampCounter tsct(&tsc);
         f.simulate();
     }
-    double average, variance;
-    Tsc::GetStatistics("Simulate_Filled", &average, &variance);
-    cout << "average: " << average << endl;
-    cout << "variance: " << variance << endl;
+
+    tsc.showStatistics();
 }
 
 TEST(FieldPerformanceTest, Simulate_Filled_Track)
 {
+    TimeStampCounterData tsc;
+
     for (int i = 0; i < 100000; i++) {
         CoreField f("050745"
                     "574464"
@@ -90,14 +91,10 @@ TEST(FieldPerformanceTest, Simulate_Filled_Track)
                     "657575"
                     "475755");
 
-        Tsc tsc("Simulate_Filled_Track");
-
+        ScopedTimeStampCounter stsc(&tsc);
         RensaTrackResult trackResult;
         f.simulateAndTrack(&trackResult);
     }
 
-    double average, variance;
-    Tsc::GetStatistics("Simulate_Filled_Track", &average, &variance);
-    cout << "average: " << average << endl;
-    cout << "variance: " << variance << endl;
+    tsc.showStatistics();
 }

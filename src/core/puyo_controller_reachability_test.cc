@@ -25,7 +25,7 @@ TEST(PuyoControllerReachabilityTest, reachableOnEmptyField)
     }
 }
 
-TEST(PuyoControllerReachabilityTest, reachableOnHigher)
+TEST(PuyoControllerReachabilityTest, reachableOnHigherField)
 {
     CoreField f(
         "      " // 12
@@ -79,9 +79,8 @@ TEST(PuyoControllerReachabilityTest, reachableOn13thline)
     EXPECT_TRUE(PuyoController::isReachable(f, Decision(5, 1)));
 }
 
-TEST(PuyoControllerReachabilityTest, beyondWall)
+TEST(PuyoControllerReachabilityTest, quickTurnToGoBeyondWall)
 {
-    // need quick turn to go over a wall
     CoreField f(
         " O O  " // 12
         " O O  "
@@ -225,7 +224,7 @@ TEST(PuyoControllerReachabilityTest, climbStairsLeft)
     CoreField f(
         "O     "
         "OO    "
-        "OOO   "
+        "OOO   " // 4
         "OOOO  "
         "OOOOO "
         "OOOOO ");

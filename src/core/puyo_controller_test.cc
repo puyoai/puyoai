@@ -10,7 +10,7 @@
 
 using namespace std;
 
-TEST(PuyoControllerTest, findKeyStrokeFastpath)
+TEST(PuyoControllerTest, findKeyStrokeFastpathOnEmptyField)
 {
     CoreField f;
     MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
@@ -44,7 +44,7 @@ TEST(PuyoControllerTest, findKeyStrokeFastpath)
     EXPECT_EQ(">B,>,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 3)).toString());
 }
 
-TEST(PuyoControllerTest, findKeyStrokeOnline)
+TEST(PuyoControllerTest, findKeyStrokeOnlineOnEmptyField)
 {
     CoreField f;
     MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
@@ -58,7 +58,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnline)
     EXPECT_EQ("B,,B,>,>,>,>,>,v", PuyoController::findKeyStrokeOnline(f, MovingKumipuyoState(KumipuyoPos(1, 1, 2)), Decision(6, 0)).toString());
 }
 
-TEST(PuyoControllerTest, findKeyStrokeByDijkstra)
+TEST(PuyoControllerTest, findKeyStrokeByDijkstraOnEmptyField)
 {
     CoreField f;
     MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
@@ -92,6 +92,7 @@ TEST(PuyoControllerTest, nonmovable)
         " O O  ");
     MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
 
+    EXPECT_EQ("", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 2)).toString());
     EXPECT_EQ("", PuyoController::findKeyStrokeOnline(f, mks, Decision(6, 2)).toString());
     EXPECT_EQ("", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(6, 2)).toString());
 }
