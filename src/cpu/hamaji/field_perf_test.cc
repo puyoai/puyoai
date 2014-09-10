@@ -1,67 +1,65 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-#include "base/tsc.h"
+#include "base/time_stamp_counter.h"
 #include "field.h"
 
 using namespace std;
 
 TEST(PerformanceTest, Copy) {
-    LF f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
+  TimeStampCounterData tsc;
+
+  LF f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
   for (int i = 0; i < 10000000; i++) {
-    Tsc tsc("Copy");
+    ScopedTimeStampCounter stsc(&tsc);
     LF f2(f);
     UNUSED_VARIABLE(f2);
   }
-  double average, variance;
-  Tsc::GetStatistics("Copy", &average, &variance);
-  cout << "average: " << average << endl;
-  cout << "variance: " << variance << endl;
+  tsc.showStatistics();
 }
 
 TEST(PerformanceTest, Simulate_Empty) {
+  TimeStampCounterData tsc;
+
   for (int i = 0; i < 1000000; i++) {
-    Tsc tsc("Simulate_Empty");
+    ScopedTimeStampCounter stsc(&tsc);
     LF f;
     int chains, score, frames;
     f.Simulate(&chains, &score, &frames);
   }
-  double average, variance;
-  Tsc::GetStatistics("Simulate_Empty", &average, &variance);
-  cout << "average: " << average << endl;
-  cout << "variance: " << variance << endl;
+  tsc.showStatistics();
 }
 
 TEST(PerformanceTest, Simulate_Filled) {
+  TimeStampCounterData tsc;
+
   for (int i = 0; i < 100000; i++) {
-    Tsc tsc("Simulate_Filled");
+    ScopedTimeStampCounter stsc(&tsc);
     LF f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
     int chains, score, frames;
     f.Simulate(&chains, &score, &frames);
   }
-  double average, variance;
-  Tsc::GetStatistics("Simulate_Filled", &average, &variance);
-  cout << "average: " << average << endl;
-  cout << "variance: " << variance << endl;
+  tsc.showStatistics();
 }
 
 TEST(PerformanceTest, FindAvailablePlans_Empty) {
+  TimeStampCounterData tsc;
+
   for (int i = 0; i < 500; i++) {
-    Tsc tsc("FindAvailablePlans_Empty");
+    ScopedTimeStampCounter stsc(&tsc);
     LF f;
     const string& next = LF::parseNext("456745");
     vector<LP> plans;
     f.FindAvailablePlans(next, &plans);
   }
-  double average, variance;
-  Tsc::GetStatistics("FindAvailablePlans_Empty", &average, &variance);
-  cout << "average: " << average << endl;
-  cout << "variance: " << variance << endl;
+  tsc.showStatistics();
 }
 
 TEST(PerformanceTest, FindAvailablePlans_Filled) {
+  TimeStampCounterData tsc;
+
   for (int i = 0; i < 500; i++) {
-    Tsc tsc("FindAvailablePlans_Filled");
+    ScopedTimeStampCounter stsc(&tsc);
     LF f("446676"
          "456474"
          "656476"
@@ -77,8 +75,5 @@ TEST(PerformanceTest, FindAvailablePlans_Filled) {
     vector<LP> plans;
     f.FindAvailablePlans(next, &plans);
   }
-  double average, variance;
-  Tsc::GetStatistics("FindAvailablePlans_Filled", &average, &variance);
-  cout << "average: " << average << endl;
-  cout << "variance: " << variance << endl;
+  tsc.showStatistics();
 }

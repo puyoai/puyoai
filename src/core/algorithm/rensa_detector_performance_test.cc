@@ -5,13 +5,14 @@
 
 #include <gtest/gtest.h>
 
-#include "base/tsc.h"
+#include "base/time_stamp_counter.h"
 #include "core/field/core_field.h"
 
 using namespace std;
 
 TEST(RensaDetectorPerformanceTest, iteratePossibleRensas)
 {
+    TimeStampCounterData tsc;
     CoreField f(
         "  R G "
         "R GRBG"
@@ -24,13 +25,10 @@ TEST(RensaDetectorPerformanceTest, iteratePossibleRensas)
     };
 
     for (int i = 0; i < 10000; ++i) {
-        Tsc tsc("iteratePossibleRensas");
+        ScopedTimeStampCounter scts(&tsc);
         RensaDetector::iteratePossibleRensas(f, 1, callback);
     }
 
     cout << size << endl;
-    double average, variance;
-    Tsc::GetStatistics("iteratePossibleRensas", &average, &variance);
-    cout << "average: " << average << endl;
-    cout << "variance: " << variance << endl;
+    tsc.showStatistics();
 }

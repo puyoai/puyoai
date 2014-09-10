@@ -3,7 +3,7 @@
 #include <iostream>
 #include <gtest/gtest.h>
 
-#include "base/tsc.h"
+#include "base/time_stamp_counter.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/field/core_field.h"
 #include "core/kumipuyo.h"
@@ -23,6 +23,7 @@ unique_ptr<MayahAI> makeAI()
 TEST(MayahAIPerformanceTest, depth3_iter1)
 {
     TsumoPossibility::initialize();
+    TimeStampCounterData tsc;
 
     unique_ptr<MayahAI> ai(makeAI());
     int frameId = 1;
@@ -32,19 +33,17 @@ TEST(MayahAIPerformanceTest, depth3_iter1)
     int numIteration = 1;
 
     for (int i = 0; i < 3; ++i) {
-        Tsc tsc("depth3_iter1");
+        ScopedTimeStampCounter stsc(&tsc);
         (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
     }
 
-    double average, variance;
-    Tsc::GetStatistics("depth3_iter1", &average, &variance);
-    cout << "average: " << average << endl;
-    cout << "variance: " << variance << endl;
+    tsc.showStatistics();
 }
 
 TEST(MayahAIPerformanceTest, depth2_iter2)
 {
     TsumoPossibility::initialize();
+    TimeStampCounterData tsc;
 
     unique_ptr<MayahAI> ai(makeAI());
     int frameId = 1;
@@ -54,19 +53,17 @@ TEST(MayahAIPerformanceTest, depth2_iter2)
     int numIteration = 2;
 
     for (int i = 0; i < 3; ++i) {
-        Tsc tsc("depth2_iter2");
+        ScopedTimeStampCounter stsc(&tsc);
         (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
     }
 
-    double average, variance;
-    Tsc::GetStatistics("depth2_iter2", &average, &variance);
-    cout << "average: " << average << endl;
-    cout << "variance: " << variance << endl;
+    tsc.showStatistics();
 }
 
 TEST(MayahAIPerformanceTest, depth2_iter3)
 {
     TsumoPossibility::initialize();
+    TimeStampCounterData tsc;
 
     unique_ptr<MayahAI> ai(makeAI());
     int frameId = 1;
@@ -76,13 +73,10 @@ TEST(MayahAIPerformanceTest, depth2_iter3)
     int numIteration = 3;
 
     for (int i = 0; i < 3; ++i) {
-        Tsc tsc("depth2_iter3");
+        ScopedTimeStampCounter stsc(&tsc);
         (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
     }
 
-    double average, variance;
-    Tsc::GetStatistics("depth2_iter3", &average, &variance);
-    cout << "average: " << average << endl;
-    cout << "variance: " << variance << endl;
+    tsc.showStatistics();
 }
 
