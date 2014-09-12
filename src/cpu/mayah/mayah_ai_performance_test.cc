@@ -1,9 +1,8 @@
-#include "core/algorithm/plan.h"
-
 #include <iostream>
 #include <gtest/gtest.h>
 
 #include "base/time_stamp_counter.h"
+#include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/field/core_field.h"
 #include "core/kumipuyo.h"
