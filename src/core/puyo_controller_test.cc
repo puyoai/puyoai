@@ -172,3 +172,71 @@ TEST(PuyoControllerTest, subpuyoIsHigher)
     KeySetSeq kss = PuyoController::findKeyStroke(f, mks, Decision(4, 1));
     EXPECT_EQ(">,B,,B,,B,v", kss.toString());
 }
+
+TEST(PuyoControllerTest, checkHigherField1)
+{
+    CoreField f(
+        "      " // 12
+        "  OO  "
+        " OOOO "
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r < 4; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+            MovingKumipuyoState mks(KumipuyoPos::initialPos());
+            KeySetSeq kss = PuyoController::findKeyStrokeFastpath(f, mks, d);
+            if (kss.empty())
+                continue;
+            for (const auto& ks : kss) {
+                PuyoController::moveKumipuyo(f, ks, &mks);
+            }
+            EXPECT_EQ(x, mks.pos.x);
+            EXPECT_EQ(r, mks.pos.r);
+        }
+    }
+}
+
+TEST(PuyoControllerTest, checkHigherField2)
+{
+    CoreField f(
+        "      " // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r < 4; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+            MovingKumipuyoState mks(KumipuyoPos::initialPos());
+            KeySetSeq kss = PuyoController::findKeyStrokeFastpath(f, mks, d);
+            if (kss.empty())
+                continue;
+            for (const auto& ks : kss) {
+                PuyoController::moveKumipuyo(f, ks, &mks);
+            }
+            EXPECT_EQ(x, mks.pos.x);
+            EXPECT_EQ(r, mks.pos.r);
+        }
+    }
+}
