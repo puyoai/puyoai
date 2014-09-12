@@ -18,7 +18,7 @@ class CoreField : public PlainField {
 public:
     CoreField();
     CoreField(const std::string& url);
-    CoreField(const CoreField&);
+    CoreField(const CoreField&) = default;
     CoreField(const PlainField&);
 
     void clear();

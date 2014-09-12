@@ -26,11 +26,6 @@ PlainField::PlainField(const string& url)
     }
 }
 
-PlainField::PlainField(const PlainField& original)
-{
-    memcpy(field_, original.field_, sizeof(field_));
-}
-
 void PlainField::initialize()
 {
     // Initialize field information.
