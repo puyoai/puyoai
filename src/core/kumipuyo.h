@@ -6,8 +6,8 @@
 
 class Kumipuyo {
 public:
-    Kumipuyo() : axis(PuyoColor::EMPTY), child(PuyoColor::EMPTY) {}
-    Kumipuyo(PuyoColor axis, PuyoColor child) : axis(axis), child(child) {}
+    constexpr Kumipuyo() : axis(PuyoColor::EMPTY), child(PuyoColor::EMPTY) {}
+    constexpr Kumipuyo(PuyoColor axis, PuyoColor child) : axis(axis), child(child) {}
 
     std::string toString() const
     {
@@ -36,20 +36,19 @@ public:
 
 class KumipuyoPos {
 public:
-    static inline const KumipuyoPos& initialPos()
+    static constexpr KumipuyoPos initialPos()
     {
-        static const KumipuyoPos pos(3, 12, 0);
-        return pos;
+        return KumipuyoPos(3, 12, 0);
     }
 
-    KumipuyoPos() : x(0), y(0), r(0) {}
-    KumipuyoPos(int x, int y, int r) : x(x), y(y), r(r) {}
+    constexpr KumipuyoPos() : x(0), y(0), r(0) {}
+    constexpr KumipuyoPos(int x, int y, int r) : x(x), y(y), r(r) {}
 
-    int axisX() const { return x; }
-    int axisY() const { return y; }
-    int childX() const { return x + (r == 1) - (r == 3); }
-    int childY() const { return y + (r == 0) - (r == 2); }
-    int rot() const { return r; }
+    constexpr int axisX() const { return x; }
+    constexpr int axisY() const { return y; }
+    constexpr int childX() const { return x + (r == 1) - (r == 3); }
+    constexpr int childY() const { return y + (r == 0) - (r == 2); }
+    constexpr int rot() const { return r; }
 
     std::string toDebugString() const;
 

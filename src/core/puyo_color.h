@@ -34,7 +34,7 @@ char toChar(PuyoColor, char charIfEmpty = ' ');
 std::string toString(PuyoColor);
 
 // Returns true if puyo is normal color puyo.
-inline bool isNormalColor(PuyoColor color)
+constexpr bool isNormalColor(PuyoColor color)
 {
     return static_cast<int>(PuyoColor::RED) <= static_cast<int>(color) && static_cast<int>(color) <= static_cast<int>(PuyoColor::GREEN);
 }
