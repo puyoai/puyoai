@@ -353,11 +353,13 @@ bool PuyoController::isReachableFrom(const PlainField& field, const MovingKumipu
 
 KeySetSeq PuyoController::findKeyStroke(const CoreField& field, const MovingKumipuyoState& mks, const Decision& decision)
 {
+    if (!isReachableFrom(field, mks, decision))
+        return KeySetSeq();
+
     KeySetSeq kss = findKeyStrokeFastpath(field, mks, decision);
     if (!kss.empty())
         return kss;
-    return findKeyStrokeOnline(field, mks, decision);
-    // return findKeyStrokeByDijkstra(field, mks, decision);
+    return findKeyStrokeByDijkstra(field, mks, decision);
 }
 
 typedef MovingKumipuyoState Vertex;
