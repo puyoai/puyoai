@@ -117,11 +117,11 @@ TEST(PuyoControllerTest, climbStairsRight)
     // TODO(mayah): Actually, dijkstra algorithm can find shorter key stroke.
     const string expected[] = {
         "v",
-        "B,,B,,A,,A,v",
-        "B,,B,,A,,A,,B,,B,,A,>,,A,v",
-        "B,,B,,A,,A,,B,,B,,A,>,,A,,B,,B,,A,>,,A,v",
-        "B,,B,,A,,A,,B,,B,,A,>,,A,,B,,B,,A,>,,A,,B,,B,,A,>,,A,v",
-        "B,,B,,A,,A,,B,,B,,A,>,,A,,B,,B,,A,>,,A,,B,,B,,A,>,,A,,B,,B,,A,>,,A,v",
+        "A,,B,,A,,A,v",
+        "A,,B,,A,,B,,A,>,A,v",
+        "A,,B,,A,,B,,A,>,B,,A,>,A,v",
+        "A,,B,,A,,B,,A,>,B,,A,>,B,,A,>,A,v",
+        "A,,B,,A,,B,,A,>,B,,A,>,B,,A,>,B,,A,>,A,v"
     };
 
     for (int x = 1; x <= 6; ++x) {
@@ -149,11 +149,11 @@ TEST(PuyoControllerTest, climbStairsLeft)
                 "OOOOO ");
 
     const string expected[] = {
-        "A,,A,,B,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,v",
-        "A,,A,,B,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,v",
-        "A,,A,,B,,B,,A,,A,,B,<,,B,,A,,A,,B,<,,B,v",
-        "A,,A,,B,,B,,A,,A,,B,<,,B,v",
-        "A,,A,,B,,B,v",
+        "A,,B,,B,,A,,B,<,A,,B,<,A,,B,<,A,,B,<,B,v",
+        "A,,B,,B,,A,,B,<,A,,B,<,A,,B,<,B,v",
+        "A,,B,,B,,A,,B,<,A,,B,<,B,v",
+        "A,,B,,B,,A,,B,<,B,v",
+        "A,,B,,B,,B,v",
         "v",
     };
 
@@ -170,7 +170,7 @@ TEST(PuyoControllerTest, subpuyoIsHigher)
 
     MovingKumipuyoState mks(KumipuyoPos(3, 1, 0));
     KeySetSeq kss = PuyoController::findKeyStroke(f, mks, Decision(4, 1));
-    EXPECT_EQ(">,B,,B,,B,v", kss.toString());
+    EXPECT_EQ("A,,A,>,B,v", kss.toString());
 }
 
 TEST(PuyoControllerTest, checkHigherField1)
