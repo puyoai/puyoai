@@ -10,6 +10,7 @@
 
 #include <glog/logging.h>
 
+#include "base/time.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/rensa_info.h"
@@ -25,7 +26,6 @@
 #include "book_field.h"
 #include "feature_parameter.h"
 #include "gazer.h"
-#include "util.h"
 
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_CONNECTION_HORIZONTAL_FEATURE = false;
