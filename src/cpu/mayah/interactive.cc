@@ -5,6 +5,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "base/time.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_info.h"
@@ -19,7 +20,6 @@
 
 #include "evaluator.h"
 #include "mayah_ai.h"
-#include "util.h"
 
 DEFINE_string(seq, "", "initial puyo sequence");
 
@@ -115,9 +115,9 @@ int main(int argc, char* argv[])
 
         // Invoke Gazer.
         {
-            double t1 = now();
+            double t1 = currentTime();
             ai.enemyNext2Appeared(fd);
-            double t2 = now();
+            double t2 = currentTime();
             cout << "gazer time = " << (t2 - t1) << endl;
         }
 
@@ -125,10 +125,10 @@ int main(int argc, char* argv[])
         while (true) {
             FieldPrettyPrinter::print(field, seq.subsequence(i, 2));
 
-            double t1 = now();
+            double t1 = currentTime();
             Plan aiPlan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
                                        MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
-            double t2 = now();
+            double t2 = currentTime();
             if (aiPlan.decisions().empty())
                 cout << "No decision";
             else

@@ -1,8 +1,8 @@
-#include "util.h"
+#include "base/time.h"
 
 #include <sys/time.h>
 
-double now()
+double currentTime()
 {
     struct timeval tv;
     gettimeofday(&tv, nullptr);
