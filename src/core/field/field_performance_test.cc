@@ -29,6 +29,7 @@ TEST(FieldPerformanceTest, Copy)
     for (int i = 0; i < 1000000; i++) {
         ScopedTimeStampCounter tsct(&tsc);
         CoreField f2(f);
+        UNUSED_VARIABLE(f2);
     }
 
     tsc.showStatistics();
