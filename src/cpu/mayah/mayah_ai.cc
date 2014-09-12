@@ -5,6 +5,7 @@
 
 #include <gflags/gflags.h>
 
+#include "base/time.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/client/connector/drop_decision.h"
@@ -15,7 +16,6 @@
 #include "evaluator.h"
 #include "feature_parameter.h"
 #include "gazer.h"
-#include "util.h"
 
 DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.txt", "the path to feature parameter");
 DEFINE_string(book, SRC_DIR "/cpu/mayah/book.txt", "the path to book");
@@ -62,9 +62,9 @@ void MayahAI::gameHasEnded(const FrameData&)
 DropDecision MayahAI::think(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq)
 {
     CoreField f(plainField);
-    double beginTime = now();
+    double beginTime = currentTime();
     Plan plan = thinkPlan(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
-    double endTime = now();
+    double endTime = currentTime();
     std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_NUM_ITERATION, plan, endTime - beginTime);
     if (plan.decisions().empty())
         return DropDecision(Decision(3, 0), message);
@@ -74,9 +74,9 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
 DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq)
 {
     CoreField f(plainField);
-    double beginTime = now();
+    double beginTime = currentTime();
     Plan plan = thinkPlan(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_DEPTH, MayahAI::FAST_NUM_ITERATION);
-    double endTime = now();
+    double endTime = currentTime();
     std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::FAST_NUM_ITERATION, plan, endTime - beginTime);
     if (plan.decisions().empty())
         return DropDecision(Decision(3, 0), message);
