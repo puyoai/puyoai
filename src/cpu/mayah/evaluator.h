@@ -61,6 +61,7 @@ private:
     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures_;
 };
 
+// This collector collects score and bookname.
 class NormalScoreCollector {
 public:
     explicit NormalScoreCollector(const FeatureParameter& param) : param_(param) {}
@@ -81,6 +82,7 @@ private:
     std::string bookName_;
 };
 
+// This collector collects all features.
 class FeatureScoreCollector {
 public:
     FeatureScoreCollector(const FeatureParameter& param) : collector_(param) {}
