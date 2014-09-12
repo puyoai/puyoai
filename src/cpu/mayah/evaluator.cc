@@ -9,6 +9,7 @@
 
 #include <glog/logging.h>
 
+#include "base/time.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/rensa_info.h"
@@ -23,7 +24,6 @@
 
 #include "feature_parameter.h"
 #include "gazer.h"
-#include "util.h"
 
 using namespace std;
 
