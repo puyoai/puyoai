@@ -1,20 +1,27 @@
-#ifndef CORE_FIELD_BIT_FIELD_H_
-#define CORE_FIELD_BIT_FIELD_H_
+#ifndef CORE_FIELD_FIELD_BIT_FIELD_H_
+#define CORE_FIELD_FIELD_BIT_FIELD_H_
 
-#include <string.h>
+#include <bitset>
+#include <glog/logging.h>
+
 #include "core/plain_field.h"
 
 // FieldBitField is a bitset whose size if the same as field.
 class FieldBitField {
 public:
-    FieldBitField() { memset(field_, 0, sizeof(field_)); }
-
-    bool get(int x, int y) const { return field_[x] & (1 << y); }
-    void set(int x, int y) { field_[x] |= (1 << y); }
-    void clear(int x, int y) { field_[x] &= ~(1 << y); }
+    bool get(int x, int y) const { return field_[index(x, y)]; }
+    void set(int x, int y) { field_.set(index(x, y)); }
+    void clear(int x, int y) { field_.set(index(x, y), false); }
 
 private:
-    unsigned int field_[PlainField::MAP_WIDTH];
+    int index(int x, int y) const
+    {
+        DCHECK(0 <= x && x < PlainField::MAP_WIDTH);
+        DCHECK(0 <= y && y < PlainField::MAP_HEIGHT);
+        return y * PlainField::MAP_WIDTH + x;
+    }
+
+    std::bitset<PlainField::MAP_HEIGHT * PlainField::MAP_WIDTH> field_;
 };
 
 #endif
