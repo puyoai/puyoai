@@ -65,13 +65,6 @@ CoreField::CoreField(const std::string& url) :
         recalcHeightOn(x);
 }
 
-CoreField::CoreField(const CoreField& f) :
-    PlainField(f)
-{
-    for (int x = 0; x < MAP_WIDTH; ++x)
-        heights_[x] = f.heights_[x];
-}
-
 CoreField::CoreField(const PlainField& f) :
     PlainField(f)
 {
