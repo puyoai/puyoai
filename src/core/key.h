@@ -15,6 +15,6 @@ enum class Key {
 const int NUM_KEYS = 7;
 
 std::string toString(Key);
-inline int ordinal(Key key) { return static_cast<int>(key); }
+constexpr int ordinal(Key key) { return static_cast<int>(key); }
 
 #endif
