@@ -185,6 +185,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         frameId++;
 
         gameState.setFrameId(frameId);
+        VLOG(1) << "\n" << gameState.toDebugString();
 
         // --- Sends the current frame information.
         manager->send(gameState.toConnectorFrameRequest(frameId));

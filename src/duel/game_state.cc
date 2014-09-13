@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include "core/field/core_field.h"
+#include "core/field/field_pretty_printer.h"
 #include "core/kumipuyo.h"
 #include "duel/field_realtime.h"
 
@@ -80,6 +81,33 @@ string GameState::toJson() const
     ss << "\"m2\": \"" << escapeMessage(message(1)) << "\",\n";
     ss << "}";
 
+    return ss.str();
+}
+
+string GameState::toDebugString() const
+{
+    const FieldRealtime& f0 = field(0);
+    const FieldRealtime& f1 = field(1);
+
+    // Set the current field data to GameState.
+    CoreField cf0(f0.field());
+    CoreField cf1(f1.field());
+    if (f0.userPlayable()) {
+        KumipuyoPos pos = f0.kumipuyoPos();
+        Kumipuyo kp = f0.kumipuyo();
+        cf0.unsafeSet(pos.axisX(), pos.axisY(), kp.axis);
+        cf0.unsafeSet(pos.childX(), pos.childY(), kp.child);
+    }
+    if (f1.userPlayable()) {
+        KumipuyoPos pos = f1.kumipuyoPos();
+        Kumipuyo kp = f1.kumipuyo();
+        cf1.unsafeSet(pos.axisX(), pos.axisY(), kp.axis);
+        cf1.unsafeSet(pos.childX(), pos.childY(), kp.child);
+    }
+
+    ostringstream ss;
+    ss << FieldPrettyPrinter::toStringFromMultipleFields(f0.field(), f0.kumipuyoSeq(),
+                                                         f1.field(), f1.kumipuyoSeq());
     return ss.str();
 }
 
