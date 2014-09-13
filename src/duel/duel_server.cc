@@ -288,7 +288,7 @@ void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse>
 
         // Clear current key input if the move is done.
         if (me->userState().grounded) {
-            gameState->setDecision(pi, Decision::NoInputDecision());
+            gameState->setDecision(pi, Decision());
             me->setKeySetSeq(KeySetSeq());
         }
 

@@ -10,12 +10,6 @@
 
 class Decision {
 public:
-    static const Decision& NoInputDecision() {
-        static const Decision no_input(-1, -1);
-        return no_input;
-    }
-
-public:
     constexpr Decision() : x(0), r(0) {}
     constexpr Decision(int x0, int r0) : x(x0), r(r0) {}
 
