@@ -19,24 +19,9 @@ public:
     constexpr Decision() : x(0), r(0) {}
     constexpr Decision(int x0, int r0) : x(x0), r(r0) {}
 
-    int axisX() const { return x; }
-
-    int childX() const
-    {
-        switch (r) {
-        case 0:
-            return x;
-        case 1:
-            return x + 1;
-        case 2:
-            return x;
-        case 3:
-            return x - 1;
-        default:
-            CHECK(false) << r;
-            return x;
-        }
-    }
+    constexpr int axisX() const { return x; }
+    constexpr int childX() const { return x + (r == 1) - (r == 3); }
+    constexpr int rot() const { return r; }
 
     bool isValid() const
     {
@@ -56,8 +41,8 @@ public:
         return buf;
     }
 
-    bool operator==(const Decision& d) const { return x == d.x && r == d.r; }
-    bool operator!=(const Decision& d) const { return !(*this == d); }
+    friend bool operator==(const Decision& lhs, const Decision& rhs) { return lhs.x == rhs.x && lhs.r == rhs.r; }
+    friend bool operator!=(const Decision& lhs, const Decision& rhs) { return !(lhs == rhs); }
 
     friend bool operator<(const Decision& lhs, const Decision& rhs)
     {
