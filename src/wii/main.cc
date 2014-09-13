@@ -27,6 +27,7 @@ DEFINE_string(source, "somagic",
               "set image source. 'somagic' when using somagic video capture."
               " filename if you'd like to use movie.");
 DEFINE_int32(fps, 30, "FPS");
+DEFINE_bool(ignore_sigpipe, false, "ignore SIGPIPE");
 
 static unique_ptr<Source> makeVideoSource()
 {
@@ -62,7 +63,8 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    ignoreSIGPIPE();
+    if (FLAGS_ignore_sigpipe)
+        ignoreSIGPIPE();
 
     if (argc < 4) {
         fprintf(stderr, "Usage: %s [option] <serial> <1p> <2p>\n", argv[0]);
