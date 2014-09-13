@@ -153,9 +153,8 @@ void CoreField::forceDrop()
 
 bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
 {
-    int x1 = decision.x;
-    int x2 = decision.x + (decision.r == 1) - (decision.r == 3);
-
+    int x1 = decision.axisX();
+    int x2 = decision.childX();
     PuyoColor c1 = kumiPuyo.axis;
     PuyoColor c2 = kumiPuyo.child;
 
@@ -194,8 +193,8 @@ int CoreField::framesToDropNext(const Decision& decision) const
 
     // TODO(mayah): It looks drop animation is too short.
 
-    int x1 = decision.x;
-    int x2 = decision.x + (decision.r == 1) - (decision.r == 3);
+    int x1 = decision.axisX();
+    int x2 = decision.childX();
 
     int dropFrames = FRAMES_TO_MOVE_HORIZONTALLY[abs(3 - x1)];
 
@@ -484,7 +483,7 @@ RensaResult CoreField::simulateWhenLastDecisionIs(const Decision& decision)
 {
     RensaNonTracker tracker;
     int minHeights[MAP_WIDTH] = { 100, height(1) + 1, height(2) + 1, height(3) + 1, height(4) + 1, height(5) + 1, height(6) + 1, 100 };
-    minHeights[decision.x]--;
+    minHeights[decision.axisX()]--;
     minHeights[decision.childX()]--;
     return simulateWithTracker(1, minHeights, &tracker);
 }
