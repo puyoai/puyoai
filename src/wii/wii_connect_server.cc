@@ -5,6 +5,7 @@
 
 #include "capture/analyzer.h"
 #include "capture/source.h"
+#include "core/player.h"
 #include "core/puyo_color.h"
 #include "core/puyo_controller.h"
 #include "core/server/connector/connector_manager_posix.h"
@@ -154,6 +155,7 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
     // Sends an initialization message.
     for (int pi = 0; pi < 2; pi++) {
         if (!connector_->connector(pi)->alive()) {
+            LOG(INFO) << playerText(pi) << " disconnected";
             fprintf(stderr, "player #%d was disconnected\n", pi);
             return false;
         }
@@ -169,6 +171,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 {
     for (int pi = 0; pi < 2; pi++) {
         if (!connector_->connector(pi)->alive()) {
+            LOG(INFO) << playerText(pi) << " disconnected";
             fprintf(stderr, "player #%d was disconnected\n", pi);
             return false;
         }

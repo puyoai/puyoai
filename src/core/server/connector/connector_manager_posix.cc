@@ -82,9 +82,9 @@ void ConnectorManagerPosix::send(const ConnectorFrameRequest& req)
 
 // TODO(mayah): Without polling, each connector should make thread?
 // If we do so, Human connector can use MainWindow::addEventListener(), maybe.
-bool ConnectorManagerPosix::receive(int frameId, vector<ConnectorFrameResponse> cfr[2])
+bool ConnectorManagerPosix::receive(int frameId, vector<ConnectorFrameResponse> cfr[NUM_PLAYERS])
 {
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < NUM_PLAYERS; i++)
         cfr[i].clear();
 
     pollfd pollfds[NUM_PLAYERS];

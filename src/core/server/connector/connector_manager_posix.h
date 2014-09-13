@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "base/base.h"
+#include "core/player.h"
 #include "core/server/connector/connector.h"
 #include "core/server/connector/connector_manager.h"
 
@@ -13,14 +14,13 @@ public:
     ConnectorManagerPosix(std::unique_ptr<Connector> p1, std::unique_ptr<Connector> p2);
 
     virtual void send(const ConnectorFrameRequest&) override;
-    virtual bool receive(int frameId, std::vector<ConnectorFrameResponse> cfr[2]) override;
+    virtual bool receive(int frameId, std::vector<ConnectorFrameResponse> cfr[NUM_PLAYERS]) override;
 
     virtual Connector* connector(int i) override { return connectors_[i].get(); }
 
     virtual void setWaitTimeout(bool flag) override { waitTimeout_ = flag; }
 
 private:
-    static const int NUM_PLAYERS = 2;
     std::unique_ptr<Connector> connectors_[NUM_PLAYERS];
     bool waitTimeout_;
 };

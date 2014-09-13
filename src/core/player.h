@@ -4,6 +4,8 @@
 #include <sstream>
 #include <string>
 
+const int NUM_PLAYERS = 2;
+
 inline std::string playerText(int playerId)
 {
     std::stringstream ss;
