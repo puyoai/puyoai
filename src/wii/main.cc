@@ -45,13 +45,24 @@ static unique_ptr<Analyzer> makeVideoAnalyzer()
     return unique_ptr<Analyzer>(new SomagicAnalyzer);
 }
 
+static void ignoreSIGPIPE()
+{
+    struct sigaction act;
+    memset(&act, 0, sizeof(act));
+
+    act.sa_handler = SIG_IGN;
+    sigemptyset(&act.sa_mask);
+
+    CHECK(sigaction(SIGPIPE, &act, 0) == 0);
+}
+
 int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    signal(SIGPIPE, SIG_IGN);
+    ignoreSIGPIPE();
 
     if (argc < 4) {
         fprintf(stderr, "Usage: %s [option] <serial> <1p> <2p>\n", argv[0]);
