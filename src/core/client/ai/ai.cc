@@ -13,8 +13,12 @@ struct DecisionSending {
 
     DropDecision dropDecision = DropDecision();
     Kumipuyo kumipuyo = Kumipuyo();
+
+    // After we've decided the decision, needsSend will be true.
     bool needsSend = false;
-    bool hasGrounded = false;
+    // True when we need to reconsider this hand. This happens when we detected ojama etc.
+    bool needsReconsider = false;
+    bool prevHasGrounded = false;
 };
 
 AI::AI(int argc, char* argv[], const string& name) :
@@ -26,8 +30,8 @@ AI::AI(int argc, char* argv[], const string& name) :
 
 void AI::runLoop()
 {
-    DecisionSending current;
-    DecisionSending next;
+    DecisionSending next1;
+    DecisionSending next2;
 
     while (true) {
         FrameData frameData = connector_.receive();
@@ -51,8 +55,8 @@ void AI::runLoop()
             gameWillBegin(frameData);
             field_.clear();
 
-            current.clear();
-            next.clear();
+            next1.clear();
+            next2.clear();
         }
 
         // Update enemy info if necessary.
@@ -63,60 +67,63 @@ void AI::runLoop()
 
         // Update my info if necessary.
         if (frameData.myPlayerFrameData().userState.ojamaDropped) {
-            // We need to reconsider the current decision.
-            LOG(INFO) << "STATE_OJAMA_DROPPED";
-            resetCurrentField(frameData.myPlayerFrameData().field);
-            const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
-
-            current.dropDecision = thinkFast(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) });
-            current.kumipuyo = kumipuyoSeq.get(0);
-            current.needsSend = true;
-            current.hasGrounded = false;
-
-            if (current.dropDecision.decision().isValid() && current.kumipuyo.isValid()) {
-                field_.dropKumipuyo(current.dropDecision.decision(), current.kumipuyo);
-                field_.simulate();
-            }
+            // We need to reconsider the next1 decision.
+            next1.needsReconsider = true;
         }
 
         // STATE_YOU_GROUNDED and STATE_WNEXT_APPEARED might come out-of-order.
-
         if (frameData.myPlayerFrameData().userState.wnextAppeared) {
             const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
             LOG(INFO) << "STATE_WNEXT_APPEARED";
 
-            next.dropDecision = think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) } );
-            next.kumipuyo = kumipuyoSeq.get(1);
-            next.needsSend = true;
-            next.hasGrounded = false;
+            next2.dropDecision = think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) } );
+            next2.kumipuyo = kumipuyoSeq.get(1);
+            next2.needsSend = true;
+            next2.prevHasGrounded = false;
         }
 
         if (frameData.myPlayerFrameData().userState.grounded) {
             LOG(INFO) << "STATE_YOU_GROUNDED";
-            current.hasGrounded = true;
+            next1.prevHasGrounded = true;
         }
 
         LOG(INFO) << "FRAME: " << frameData.id
-                  << " CURRENT: grounded=" << current.hasGrounded
-                  << " needsSend=" << current.needsSend
-                  << " NEXT: grounded=" << next.hasGrounded
-                  << " needsSend=" << next.needsSend;
+                  << " NEXT1: prev_grounded=" << next1.prevHasGrounded
+                  << " needsSend=" << next1.needsSend
+                  << " NEXT2: prev_grounded=" << next2.prevHasGrounded
+                  << " needsSend=" << next2.needsSend;
 
         // When the current puyo is grounded and the next hand is considered, we will move to the next hand.
-        if (current.hasGrounded && next.needsSend) {
-            CHECK(!current.needsSend);
-            current = next;
-            next.clear();
+        if (next1.prevHasGrounded && next2.needsSend) {
+            CHECK(!next1.needsSend);
+            next1 = next2;
+            next2.clear();
 
-            if (current.dropDecision.decision().isValid() && current.kumipuyo.isValid()) {
-                field_.dropKumipuyo(current.dropDecision.decision(), current.kumipuyo);
+            if (next1.dropDecision.decision().isValid() && next1.kumipuyo.isValid()) {
+                field_.dropKumipuyo(next1.dropDecision.decision(), next1.kumipuyo);
                 field_.simulate();
             }
         }
 
-        if (current.needsSend && frameData.myPlayerFrameData().userState.playable) {
-            connector_.send(frameData.id, current.dropDecision);
-            current.needsSend = false;
+        if (frameData.myPlayerFrameData().userState.playable && next1.needsReconsider) {
+            LOG(INFO) << "RECONSIDER";
+
+            resetCurrentField(frameData.myPlayerFrameData().field);
+            const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
+            next1.dropDecision = thinkFast(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) });
+            next1.kumipuyo = kumipuyoSeq.get(0);
+            next1.needsSend = true;
+            next1.prevHasGrounded = false;
+
+            if (next1.dropDecision.decision().isValid() && next1.kumipuyo.isValid()) {
+                field_.dropKumipuyo(next1.dropDecision.decision(), next1.kumipuyo);
+                field_.simulate();
+            }
+        }
+
+        if (next1.needsSend && frameData.myPlayerFrameData().userState.playable) {
+            connector_.send(frameData.id, next1.dropDecision);
+            next1.needsSend = false;
             continue;
         }
 
