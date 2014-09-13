@@ -10,87 +10,106 @@
 using namespace std;
 
 namespace {
-const char RED_COLOR[] = "\x1b[41m";
-const char BLUE_COLOR[] = "\x1b[44m";
-const char GREEN_COLOR[] = "\x1b[42m";
-const char YELLOW_COLOR[] = "\x1b[43m";
-const char BLACK_COLOR[] = "\x1b[49m";
 
-string toPuyoColorString(PuyoColor c)
+enum class CellType {
+    HALF,
+    FULL_WITHOUT_COLOR,
+    FULL_WITH_COLOR,
+};
+
+constexpr int ordinal(CellType c) { return static_cast<int>(c); }
+
+const char* const EMPTY_STR[] = { " ", "  ", "  " };
+const char* const WALL_STR[] = { "#", "# ", "##" };
+const char* const OJAMA_STR[] = { "@", "@ ", "@@" };
+const char* const RED_STR[] = { "R", "R ", "\x1b[41m  \x1b[49m" };
+const char* const BLUE_STR[] = { "B", "B ", "\x1b[44m  \x1b[49m" };
+const char* const GREEN_STR[] = { "G", "G ", "\x1b[42m  \x1b[49m" };
+const char* const YELLOW_STR[] = { "Y", "Y ", "\x1b[43m  \x1b[49m" };
+
+const char* toPuyoString(PuyoColor c, CellType cellType)
 {
-    stringstream ss;
     switch (c) {
     case PuyoColor::EMPTY:
-        ss << "  ";
-        break;
+        return EMPTY_STR[ordinal(cellType)];
     case PuyoColor::WALL:
-        ss << "##";
-        break;
+        return WALL_STR[ordinal(cellType)];
     case PuyoColor::OJAMA:
-        ss << "@@";
-        break;
+        return OJAMA_STR[ordinal(cellType)];
     case PuyoColor::RED:
-        ss << RED_COLOR << "  " << BLACK_COLOR;
-        break;
+        return RED_STR[ordinal(cellType)];
     case PuyoColor::BLUE:
-        ss << BLUE_COLOR << "  " << BLACK_COLOR;
-        break;
+        return BLUE_STR[ordinal(cellType)];
     case PuyoColor::YELLOW:
-        ss << YELLOW_COLOR << "  " << BLACK_COLOR;
-        break;
+        return YELLOW_STR[ordinal(cellType)];
     case PuyoColor::GREEN:
-        ss << GREEN_COLOR << "  " << BLACK_COLOR;
-        break;
+        return GREEN_STR[ordinal(cellType)];
+    default:
+        CHECK(false) << "Unknown PuyoColor: " << toString(c) << endl;
     }
-
-    return ss.str();
 }
 
-void printLine(const PlainField& f, int y, const KumipuyoSeq& seq)
+template <typename Stream>
+void printLine(Stream* ss, const PlainField& f, int y, const KumipuyoSeq& seq, CellType cellType)
 {
     for (int x = 0; x < PlainField::MAP_WIDTH; ++x) {
         PuyoColor c = f.get(x, y);
-        cout << toPuyoColorString(c);
+        *ss << toPuyoString(c, cellType);
     }
 
     if (y == 11) {
-        cout << toPuyoColorString(PuyoColor::EMPTY);
-        cout << toPuyoColorString(seq.child(0));
+        *ss << toPuyoString(PuyoColor::EMPTY, cellType);
+        *ss << toPuyoString(seq.child(0), cellType);
     } else if (y == 10) {
-        cout << toPuyoColorString(PuyoColor::EMPTY);
-        cout << toPuyoColorString(seq.axis(0));
+        *ss << toPuyoString(PuyoColor::EMPTY, cellType);
+        *ss << toPuyoString(seq.axis(0), cellType);
     } else if (y == 8) {
-        cout << toPuyoColorString(PuyoColor::EMPTY);
-        cout << toPuyoColorString(seq.child(1));
+        *ss << toPuyoString(PuyoColor::EMPTY, cellType);
+        *ss << toPuyoString(seq.child(1), cellType);
     } else if (y == 7) {
-        cout << toPuyoColorString(PuyoColor::EMPTY);
-        cout << toPuyoColorString(seq.axis(1));
+        *ss << toPuyoString(PuyoColor::EMPTY, cellType);
+        *ss << toPuyoString(seq.axis(1), cellType);
     } else {
-        cout << toPuyoColorString(PuyoColor::EMPTY);
-        cout << toPuyoColorString(PuyoColor::EMPTY);
+        *ss << toPuyoString(PuyoColor::EMPTY, cellType);
+        *ss << toPuyoString(PuyoColor::EMPTY, cellType);
     }
 }
 
+}
+
+// static
+string FieldPrettyPrinter::toStringFromMultipleFields(const PlainField& f0, const KumipuyoSeq& seq0,
+                                                      const PlainField& f1, const KumipuyoSeq& seq1)
+{
+    stringstream ss;
+
+    for (int y = PlainField::MAP_HEIGHT - 1; y >= 0; --y) {
+        printLine(&ss, f0, y, seq0, CellType::FULL_WITHOUT_COLOR);
+        ss << toPuyoString(PuyoColor::EMPTY, CellType::FULL_WITHOUT_COLOR);
+        printLine(&ss, f1, y, seq1, CellType::FULL_WITHOUT_COLOR);
+        ss << endl;
+    }
+
+    return ss.str();
 }
 
 // static
 void FieldPrettyPrinter::print(const PlainField& f, const KumipuyoSeq& seq)
 {
     for (int y = PlainField::MAP_HEIGHT - 1; y >= 0; --y) {
-        printLine(f, y, seq);
+        printLine(&cout, f, y, seq, CellType::FULL_WITH_COLOR);
         cout << endl;
     }
 }
 
 // static
-void FieldPrettyPrinter::printMultipleFields(
-    const PlainField& f1, const KumipuyoSeq& seq1,
-    const PlainField& f2, const KumipuyoSeq& seq2)
+void FieldPrettyPrinter::printMultipleFields(const PlainField& f1, const KumipuyoSeq& seq1,
+                                             const PlainField& f2, const KumipuyoSeq& seq2)
 {
     for (int y = PlainField::MAP_HEIGHT - 1; y >= 0; --y) {
-        printLine(f1, y, seq1);
-        cout << toPuyoColorString(PuyoColor::EMPTY);
-        printLine(f2, y, seq2);
+        printLine(&cout, f1, y, seq1, CellType::FULL_WITH_COLOR);
+        cout << toPuyoString(PuyoColor::EMPTY, CellType::FULL_WITH_COLOR);
+        printLine(&cout, f2, y, seq2, CellType::FULL_WITH_COLOR);
         cout << endl;
     }
 }

@@ -15,6 +15,7 @@ public:
 
     GameResult gameResult() const;
     std::string toJson() const;
+    std::string toDebugString() const;
 
     int frameId() const { return frameId_; }
     void setFrameId(int frameId) { frameId_ = frameId; }
