@@ -54,7 +54,7 @@ DEFINE_bool(use_cui, false, "use CUI version drawer");
 DEFINE_bool(use_cui, true, "use CUI version drawer");
 #endif
 #if USE_AUDIO_COMMENTATOR
-DEFINE_bool(use_audio, true, "use audio commentator");
+DEFINE_bool(use_audio, false, "use audio commentator");
 #endif
 
 class GameStateHandler : public GameStateObserver {
