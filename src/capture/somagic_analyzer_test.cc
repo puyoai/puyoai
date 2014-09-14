@@ -220,9 +220,9 @@ TEST_F(SomagicAnalyzerTest, NextArrival)
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
     EXPECT_TRUE(rs[0]->playerResult(0)->userState.playable);
-    // Next disappears here.
-    // Either 13 or 14 should not be playable.
-    EXPECT_FALSE(rs[13]->playerResult(0)->userState.playable && rs[14]->playerResult(0)->userState.playable);
+    // Next disappears here. After detecting next disappearing. we'd like to make userState playable.
+    EXPECT_TRUE(rs[13]->playerResult(0)->userState.playable);
+    EXPECT_TRUE(rs[14]->playerResult(0)->userState.playable);
     // Then controllable now.
     EXPECT_TRUE(rs[16]->playerResult(0)->userState.playable);
 }

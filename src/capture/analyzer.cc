@@ -310,7 +310,7 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
         return;
 
     // Detected Next1 disappeared
-    result->restFramesUserCanPlay = 2;
+    result->restFramesUserCanPlay = 1; // TODO(mayah): magic number.
     result->nextPuyoState = NextPuyoState::NEXT2_WILL_DISAPPEAR;
     result->userState.playable = false;
     result->setRealColor(NextPuyoPosition::CURRENT_AXIS, result->realColor(NextPuyoPosition::NEXT1_AXIS));
