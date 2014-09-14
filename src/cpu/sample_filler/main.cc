@@ -6,8 +6,11 @@
 #include "core/algorithm/plan.h"
 #include "core/client/ai/ai.h"
 #include "core/field/core_field.h"
+#include "core/puyo_controller.h"
 
 using namespace std;
+
+DEFINE_bool(peak, false, "Use peak");
 
 class SampleFillerAI : public AI {
 public:
@@ -15,6 +18,14 @@ public:
     virtual ~SampleFillerAI() {}
 
     virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) override
+    {
+        if (FLAGS_peak)
+            return thinkPeak(frameId, f, seq);
+        return thinkFlat(frameId, f, seq);
+    }
+
+private:
+    DropDecision thinkFlat(int frameId, const PlainField& f, const KumipuyoSeq& seq)
     {
         UNUSED_VARIABLE(frameId);
         UNUSED_VARIABLE(seq);
@@ -42,6 +53,40 @@ public:
 
         return DropDecision(Decision(3, 2));
     }
+
+    DropDecision thinkPeak(int frameId, const PlainField& f, const KumipuyoSeq& seq)
+    {
+        UNUSED_VARIABLE(frameId);
+        UNUSED_VARIABLE(seq);
+
+        static const int order[] = { 3, 2, 4, 5, 1, 6 };
+
+        for (int i = 0; i < 6; ++i) {
+            CoreField cf(f);
+            int x = order[i];
+            if (cf.height(x) >= 9)
+                continue;
+            if (!PuyoController::isReachable(f, Decision(x, 2)))
+                continue;
+
+            cf.dropKumipuyo(Decision(x, 2), seq.get(0));
+            RensaResult rr = cf.simulate();
+            if (rr.score == 0)
+                return DropDecision(Decision(x, 2));
+        }
+
+        for (int i = 0; i < 6; ++i) {
+            CoreField cf(f);
+            int x = order[i];
+            if (x == 3 && cf.height(x) <= 9)
+                return DropDecision(Decision(3, 0));
+            if (x != 3 && cf.height(x) <= 11)
+                return DropDecision(Decision(x, 0));
+        }
+
+        return DropDecision(Decision(3, 2));
+    }
+
 };
 
 int main(int argc, char* argv[])
