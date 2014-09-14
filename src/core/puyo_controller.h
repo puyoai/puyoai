@@ -1,5 +1,5 @@
-#ifndef CORE_CTRL_H_
-#define CORE_CTRL_H_
+#ifndef CORE_PUYO_CONTROLLER_H_
+#define CORE_PUYO_CONTROLLER_H_
 
 #include <glog/logging.h>
 #include <string>
@@ -87,4 +87,4 @@ private:
     static KeySetSeq findKeyStrokeOnlineInternal(const PlainField&, const MovingKumipuyoState&, const Decision&);
 };
 
-#endif  // CORE_CTRL_H_
+#endif  // CORE_PUYO_CONTROLLER_H_
