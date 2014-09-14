@@ -28,7 +28,6 @@ private:
     DropDecision thinkFlat(int frameId, const PlainField& f, const KumipuyoSeq& seq)
     {
         UNUSED_VARIABLE(frameId);
-        UNUSED_VARIABLE(seq);
 
         const CoreField cf(f);
 
@@ -57,7 +56,6 @@ private:
     DropDecision thinkPeak(int frameId, const PlainField& f, const KumipuyoSeq& seq)
     {
         UNUSED_VARIABLE(frameId);
-        UNUSED_VARIABLE(seq);
 
         static const int order[] = { 3, 2, 4, 5, 1, 6 };
 
