@@ -94,7 +94,7 @@ void AI::runLoop()
                   << " needsSend=" << next2.needsSend;
 
         // When the current puyo is grounded and the next hand is considered, we will move to the next hand.
-        if (next1.prevHasGrounded && next2.needsSend) {
+        if (!next1.needsReconsider && next1.prevHasGrounded && next2.needsSend) {
             CHECK(!next1.needsSend);
             next1 = next2;
             next2.clear();
@@ -113,7 +113,6 @@ void AI::runLoop()
             next1.dropDecision = thinkFast(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) });
             next1.kumipuyo = kumipuyoSeq.get(0);
             next1.needsSend = true;
-            next1.prevHasGrounded = false;
 
             if (next1.dropDecision.decision().isValid() && next1.kumipuyo.isValid()) {
                 field_.dropKumipuyo(next1.dropDecision.decision(), next1.kumipuyo);
