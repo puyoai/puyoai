@@ -722,21 +722,45 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
 
 namespace {
 
-KeySetSeq findKeyStrokeFastpath1(const CoreField& field, const Decision& decision)
+KeySetSeq findKeyStrokeFastpath1(const CoreField& field, const Decision& decision, bool forWii)
 {
     switch (decision.r) {
     case 0:
         if (field.height(1) <= 11 && field.height(2) <= 11) {
-            return KeySetSeq { KeySet(Key::LEFT), KeySet(Key::LEFT), KeySet(Key::DOWN) };
+            if (forWii) {
+                return KeySetSeq {
+                    KeySet(Key::LEFT),
+                    KeySet(),
+                    KeySet(Key::LEFT),
+                    KeySet(Key::DOWN)
+                };
+            }
+            return KeySetSeq {
+                KeySet(Key::LEFT),
+                KeySet(Key::LEFT),
+                KeySet(Key::DOWN)
+            };
         }
         return KeySetSeq();
     case 1:
         if (field.height(1) <= 11 && field.height(2) <= 11) {
+            if (forWii) {
+                return KeySetSeq { KeySet(Key::LEFT, Key::RIGHT_TURN), KeySet(), KeySet(Key::LEFT), KeySet(Key::DOWN) };
+            }
             return KeySetSeq { KeySet(Key::LEFT, Key::RIGHT_TURN), KeySet(Key::LEFT), KeySet(Key::DOWN) };
         }
         return KeySetSeq();
     case 2:
         if (field.height(1) <= 11 && field.height(2) <= 10) {
+            if (forWii) {
+                return KeySetSeq {
+                    KeySet(Key::LEFT, Key::RIGHT_TURN),
+                    KeySet(),
+                    KeySet(Key::LEFT),
+                    KeySet(Key::DOWN, Key::RIGHT_TURN),
+                    KeySet(Key::DOWN)
+                };
+            }
             return KeySetSeq {
                 KeySet(Key::LEFT, Key::RIGHT_TURN),
                 KeySet(Key::LEFT),
@@ -750,7 +774,7 @@ KeySetSeq findKeyStrokeFastpath1(const CoreField& field, const Decision& decisio
     }
 }
 
-KeySetSeq findKeyStrokeFastpath2(const CoreField& field, const Decision& decision)
+KeySetSeq findKeyStrokeFastpath2(const CoreField& field, const Decision& decision, bool /*forWii*/)
 {
     switch (decision.r) {
     case 0:
@@ -786,7 +810,7 @@ KeySetSeq findKeyStrokeFastpath2(const CoreField& field, const Decision& decisio
     }
 }
 
-KeySetSeq findKeyStrokeFastpath3(const CoreField& field, const Decision& decision)
+KeySetSeq findKeyStrokeFastpath3(const CoreField& field, const Decision& decision, bool /*forWii*/)
 {
     switch (decision.r) {
     case 0:
@@ -825,7 +849,7 @@ KeySetSeq findKeyStrokeFastpath3(const CoreField& field, const Decision& decisio
     }
 }
 
-KeySetSeq findKeyStrokeFastpath4(const CoreField& field, const Decision& decision)
+KeySetSeq findKeyStrokeFastpath4(const CoreField& field, const Decision& decision, bool /*forWii*/)
 {
     switch (decision.r) {
     case 0:
@@ -861,21 +885,36 @@ KeySetSeq findKeyStrokeFastpath4(const CoreField& field, const Decision& decisio
     }
 }
 
-KeySetSeq findKeyStrokeFastpath5(const CoreField& field, const Decision& decision)
+KeySetSeq findKeyStrokeFastpath5(const CoreField& field, const Decision& decision, bool forWii)
 {
     switch (decision.r) {
     case 0:
         if (field.height(4) <= 11 && field.height(5) <= 11) {
+            if (forWii) {
+                return KeySetSeq { KeySet(Key::RIGHT), KeySet(), KeySet(Key::RIGHT), KeySet(Key::DOWN) };
+            }
             return KeySetSeq { KeySet(Key::RIGHT), KeySet(Key::RIGHT), KeySet(Key::DOWN) };
         }
         return KeySetSeq();
     case 1:
         if (field.height(5) <= 11 && field.height(6) <= 11) {
+            if (forWii) {
+                return KeySetSeq { KeySet(Key::RIGHT, Key::RIGHT_TURN), KeySet(), KeySet(Key::RIGHT), KeySet(Key::DOWN) };
+            }
             return KeySetSeq { KeySet(Key::RIGHT, Key::RIGHT_TURN), KeySet(Key::RIGHT), KeySet(Key::DOWN) };
         }
         return KeySetSeq();
     case 2:
         if (field.height(5) <= 9 && field.height(6) <= 9) {
+            if (forWii) {
+                return KeySetSeq {
+                    KeySet(Key::RIGHT, Key::RIGHT_TURN),
+                    KeySet(),
+                    KeySet(Key::RIGHT),
+                    KeySet(Key::DOWN,Key::RIGHT_TURN),
+                    KeySet(Key::DOWN)
+                };
+            }
             return KeySetSeq {
                 KeySet(Key::RIGHT, Key::RIGHT_TURN),
                 KeySet(Key::RIGHT),
@@ -886,6 +925,9 @@ KeySetSeq findKeyStrokeFastpath5(const CoreField& field, const Decision& decisio
         return KeySetSeq();
     case 3:
         if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11) {
+            if (forWii) {
+                return KeySetSeq { KeySet(Key::RIGHT, Key::LEFT_TURN), KeySet(), KeySet(Key::RIGHT), KeySet(Key::DOWN) };
+            }
             return KeySetSeq { KeySet(Key::RIGHT, Key::LEFT_TURN), KeySet(Key::RIGHT), KeySet(Key::DOWN) };
         }
         return KeySetSeq();
@@ -895,11 +937,21 @@ KeySetSeq findKeyStrokeFastpath5(const CoreField& field, const Decision& decisio
     return KeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath6(const CoreField& field, const Decision& decision)
+KeySetSeq findKeyStrokeFastpath6(const CoreField& field, const Decision& decision, bool forWii)
 {
     switch (decision.r) {
     case 0:
         if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11 ) {
+            if (forWii) {
+                return KeySetSeq {
+                    KeySet(Key::RIGHT),
+                    KeySet(),
+                    KeySet(Key::RIGHT),
+                    KeySet(),
+                    KeySet(Key::RIGHT),
+                    KeySet(Key::DOWN)
+                };
+            }
             return KeySetSeq {
                 KeySet(Key::RIGHT),
                 KeySet(Key::RIGHT),
@@ -910,6 +962,17 @@ KeySetSeq findKeyStrokeFastpath6(const CoreField& field, const Decision& decisio
         return KeySetSeq();
     case 2:
         if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 9 && field.height(6) <= 9) {
+            if (forWii) {
+                return KeySetSeq {
+                    KeySet(Key::RIGHT, Key::LEFT_TURN),
+                    KeySet(),
+                    KeySet(Key::RIGHT),
+                    KeySet(),
+                    KeySet(Key::RIGHT, Key::LEFT_TURN),
+                    KeySet(Key::DOWN)
+                };
+            }
+
             return KeySetSeq {
                 KeySet(Key::RIGHT, Key::LEFT_TURN),
                 KeySet(Key::RIGHT),
@@ -920,6 +983,16 @@ KeySetSeq findKeyStrokeFastpath6(const CoreField& field, const Decision& decisio
         return KeySetSeq();
     case 3:
         if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
+            if (forWii) {
+                return KeySetSeq {
+                    KeySet(Key::RIGHT, Key::LEFT_TURN),
+                    KeySet(),
+                    KeySet(Key::RIGHT),
+                    KeySet(),
+                    KeySet(Key::RIGHT),
+                    KeySet(Key::DOWN)
+                };
+            }
             return KeySetSeq {
                 KeySet(Key::RIGHT, Key::LEFT_TURN),
                 KeySet(Key::RIGHT),
@@ -943,12 +1016,12 @@ KeySetSeq PuyoController::findKeyStrokeFastpath(const CoreField& field, const Mo
         return KeySetSeq();
 
     switch (decision.x) {
-    case 1: return findKeyStrokeFastpath1(field, decision);
-    case 2: return findKeyStrokeFastpath2(field, decision);
-    case 3: return findKeyStrokeFastpath3(field, decision);
-    case 4: return findKeyStrokeFastpath4(field, decision);
-    case 5: return findKeyStrokeFastpath5(field, decision);
-    case 6: return findKeyStrokeFastpath6(field, decision);
+    case 1: return findKeyStrokeFastpath1(field, decision, false);
+    case 2: return findKeyStrokeFastpath2(field, decision, false);
+    case 3: return findKeyStrokeFastpath3(field, decision, false);
+    case 4: return findKeyStrokeFastpath4(field, decision, false);
+    case 5: return findKeyStrokeFastpath5(field, decision, false);
+    case 6: return findKeyStrokeFastpath6(field, decision, false);
     default:
         CHECK(false) << "Unknown x: " << decision.x;
         return KeySetSeq();
@@ -962,30 +1035,12 @@ KeySetSeq PuyoController::findKeyStrokeFastpathForWii(const CoreField& field, co
         return KeySetSeq();
 
     switch (decision.x) {
-    case 1: {
-        KeySetSeq kss = findKeyStrokeFastpath1(field, decision);
-        if (kss.empty())
-            return kss;
-        kss.addFront(KeySet(Key::LEFT));
-        return kss;
-    }
-    case 2: return findKeyStrokeFastpath2(field, decision);
-    case 3: return findKeyStrokeFastpath3(field, decision);
-    case 4: return findKeyStrokeFastpath4(field, decision);
-    case 5: {
-        KeySetSeq kss = findKeyStrokeFastpath5(field, decision);
-        if (kss.empty())
-            return kss;
-        kss.addFront(KeySet(Key::RIGHT));
-        return kss;
-    }
-    case 6: {
-        KeySetSeq kss = findKeyStrokeFastpath6(field, decision);
-        if (kss.empty())
-            return kss;
-        kss.addFront(KeySet(Key::RIGHT));
-        return kss;
-    }
+    case 1: return findKeyStrokeFastpath1(field, decision, true);
+    case 2: return findKeyStrokeFastpath2(field, decision, true);
+    case 3: return findKeyStrokeFastpath3(field, decision, true);
+    case 4: return findKeyStrokeFastpath4(field, decision, true);
+    case 5: return findKeyStrokeFastpath5(field, decision, true);
+    case 6: return findKeyStrokeFastpath6(field, decision, true);
     default:
         CHECK(false) << "Unknown x: " << decision.x;
         return KeySetSeq();
