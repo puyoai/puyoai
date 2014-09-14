@@ -15,6 +15,12 @@
 
 using namespace std;
 
+// TODO(mayah): Link error without these definition. Why?
+const int PuyoController::ParameterForDuel::FRAMES_CONTINUOUS_TURN_PROHIBITED;
+const int PuyoController::ParameterForDuel::FRAMES_CONTINUOUS_ARROW_PROHIBITED;
+const int PuyoController::ParameterForWii::FRAMES_CONTINUOUS_TURN_PROHIBITED;
+const int PuyoController::ParameterForWii::FRAMES_CONTINUOUS_ARROW_PROHIBITED;
+
 namespace {
 
 bool isQuickturn(const PlainField& field, const KumipuyoPos& pos)
@@ -68,24 +74,30 @@ void expandButtonDistance(KeySetSeq* seq)
 
 }
 
+template<typename Parameter>
 void PuyoController::moveKumipuyo(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
 {
-    // TODO(mayah): Which key is consumed first? turn? arrow?
-    moveKumipuyoByArrowKey(field, keySet, mks, downAccepted);
-
     if (mks->restFramesToAcceptQuickTurn > 0)
         mks->restFramesToAcceptQuickTurn--;
+
+    // TODO(mayah): Which key is consumed first? turn? arrow?
+    if (mks->restFramesArrowProhibited > 0) {
+        mks->restFramesArrowProhibited--;
+    } else {
+        moveKumipuyoByArrowKey<Parameter>(field, keySet, mks, downAccepted);
+    }
 
     bool needsFreefallProcess = true;
     if (mks->restFramesTurnProhibited > 0) {
         mks->restFramesTurnProhibited--;
     } else {
-        moveKumipuyoByTurnKey(field, keySet, mks, &needsFreefallProcess);
+        moveKumipuyoByTurnKey<Parameter>(field, keySet, mks, &needsFreefallProcess);
     }
     if (!keySet.hasKey(Key::DOWN) && needsFreefallProcess)
         moveKumipuyoByFreefall(field, mks);
 }
 
+template<typename Parameter>
 void PuyoController::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
 {
     DCHECK(mks);
@@ -95,6 +107,7 @@ void PuyoController::moveKumipuyoByArrowKey(const PlainField& field, const KeySe
     // When DOWN + RIGHT or DOWN + LEFT are simultaneously input, DOWN should be ignored.
 
     if (keySet.hasKey(Key::RIGHT)) {
+        mks->restFramesArrowProhibited = Parameter::FRAMES_CONTINUOUS_ARROW_PROHIBITED;
         if (field.get(mks->pos.axisX() + 1, mks->pos.axisY()) == PuyoColor::EMPTY &&
             field.get(mks->pos.childX() + 1, mks->pos.childY()) == PuyoColor::EMPTY) {
             mks->pos.x++;
@@ -103,6 +116,7 @@ void PuyoController::moveKumipuyoByArrowKey(const PlainField& field, const KeySe
     }
 
     if (keySet.hasKey(Key::LEFT)) {
+        mks->restFramesArrowProhibited = Parameter::FRAMES_CONTINUOUS_ARROW_PROHIBITED;
         if (field.get(mks->pos.axisX() - 1, mks->pos.axisY()) == PuyoColor::EMPTY &&
             field.get(mks->pos.childX() - 1, mks->pos.childY()) == PuyoColor::EMPTY) {
             mks->pos.x--;
@@ -110,7 +124,9 @@ void PuyoController::moveKumipuyoByArrowKey(const PlainField& field, const KeySe
         return;
     }
 
+
     if (keySet.hasKey(Key::DOWN)) {
+        // For DOWN key, we don't set restFramesArrowProhibited.
         if (downAccepted)
             *downAccepted = true;
         if (mks->restFramesForFreefall > 0) {
@@ -131,12 +147,13 @@ void PuyoController::moveKumipuyoByArrowKey(const PlainField& field, const KeySe
     }
 }
 
+template<typename Parameter>
 void PuyoController::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* needsFreefallProcess)
 {
     DCHECK_EQ(0, mks->restFramesTurnProhibited) << mks->restFramesTurnProhibited;
 
     if (keySet.hasKey(Key::RIGHT_TURN)) {
-        mks->restFramesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
+        mks->restFramesTurnProhibited = Parameter::FRAMES_CONTINUOUS_TURN_PROHIBITED;
         switch (mks->pos.r) {
         case 0:
             if (field.get(mks->pos.x + 1, mks->pos.y) == PuyoColor::EMPTY) {
@@ -211,7 +228,7 @@ void PuyoController::moveKumipuyoByTurnKey(const PlainField& field, const KeySet
     }
 
     if (keySet.hasKey(Key::LEFT_TURN)) {
-        mks->restFramesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
+        mks->restFramesTurnProhibited = Parameter::FRAMES_CONTINUOUS_TURN_PROHIBITED;
         switch (mks->pos.r) {
         case 0:
             if (field.get(mks->pos.x - 1, mks->pos.y) == PuyoColor::EMPTY) {
@@ -359,7 +376,20 @@ KeySetSeq PuyoController::findKeyStroke(const CoreField& field, const MovingKumi
     KeySetSeq kss = findKeyStrokeFastpath(field, mks, decision);
     if (!kss.empty())
         return kss;
-    return findKeyStrokeByDijkstra(field, mks, decision);
+    return findKeyStrokeByDijkstra<ParameterForDuel>(field, mks, decision);
+}
+
+KeySetSeq PuyoController::findKeyStrokeForWii(const CoreField& field, const Decision& decision)
+{
+    MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+    if (!isReachableFrom(field, mks, decision))
+        return KeySetSeq();
+
+    KeySetSeq kss = findKeyStrokeFastpathForWii(field, mks, decision);
+    if (!kss.empty())
+        return kss;
+
+    return findKeyStrokeByDijkstra<ParameterForWii>(field, mks, decision);
 }
 
 typedef MovingKumipuyoState Vertex;
@@ -385,6 +415,7 @@ struct Edge {
 typedef vector<Edge> Edges;
 typedef map<Vertex, tuple<Vertex, KeySet, Weight>> Potential;
 
+template<typename Parameter>
 KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const MovingKumipuyoState& initialState, const Decision& decision)
 {
     // We don't add KeySet(Key::DOWN) intentionally.
@@ -399,8 +430,26 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const
         make_pair(KeySet(Key::LEFT_TURN), 1.01),
         make_pair(KeySet(Key::RIGHT_TURN), 1.01),
     };
-    static const int KEY_CANDIDATES_WITHOUT_TURN_SIZE = 3;
     static const int KEY_CANDIDATES_SIZE = ARRAY_SIZE(KEY_CANDIDATES);
+
+    static const pair<KeySet, double> KEY_CANDIDATES_WITHOUT_TURN[] = {
+        make_pair(KeySet(), 1),
+        make_pair(KeySet(Key::LEFT), 1.01),
+        make_pair(KeySet(Key::RIGHT), 1.01),
+    };
+    static const int KEY_CANDIDATES_SIZE_WITHOUT_TURN = ARRAY_SIZE(KEY_CANDIDATES_WITHOUT_TURN);
+
+    static const pair<KeySet, double> KEY_CANDIDATES_WITHOUT_ARROW[] = {
+        make_pair(KeySet(), 1),
+        make_pair(KeySet(Key::LEFT_TURN), 1.01),
+        make_pair(KeySet(Key::RIGHT_TURN), 1.01),
+    };
+    static const int KEY_CANDIDATES_SIZE_WITHOUT_ARROW = ARRAY_SIZE(KEY_CANDIDATES_WITHOUT_ARROW);
+
+    static const pair<KeySet, double> KEY_CANDIDATES_WITHOUT_TURN_OR_ARROW[] = {
+        make_pair(KeySet(), 1),
+    };
+    static const int KEY_CANDIDATES_SIZE_WITHOUT_TURN_OR_ARROW = ARRAY_SIZE(KEY_CANDIDATES_WITHOUT_TURN_OR_ARROW);
 
     Potential pot;
     priority_queue<Edge, Edges, greater<Edge> > Q;
@@ -436,17 +485,34 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const
             return KeySetSeq(kss);
         }
 
-        int size = p.restFramesTurnProhibited > 0 ? KEY_CANDIDATES_WITHOUT_TURN_SIZE : KEY_CANDIDATES_SIZE;
         if (p.grounded)
-            size = 0;
+            continue;
+
+        const pair<KeySet, double>* candidates;
+        int size;
+        if (p.restFramesTurnProhibited > 0 && p.restFramesArrowProhibited > 0) {
+            candidates = KEY_CANDIDATES_WITHOUT_TURN_OR_ARROW;
+            size = KEY_CANDIDATES_SIZE_WITHOUT_TURN_OR_ARROW;
+        } else if (p.restFramesTurnProhibited > 0) {
+            candidates = KEY_CANDIDATES_WITHOUT_TURN;
+            size = KEY_CANDIDATES_SIZE_WITHOUT_TURN;
+        } else if (p.restFramesArrowProhibited > 0) {
+            candidates = KEY_CANDIDATES_WITHOUT_ARROW;
+            size = KEY_CANDIDATES_SIZE_WITHOUT_ARROW;
+        } else {
+            candidates = KEY_CANDIDATES;
+            size = KEY_CANDIDATES_SIZE;
+        }
+
         for (int i = 0; i < size; ++i) {
+            const pair<KeySet, double>& candidate = candidates[i];
             MovingKumipuyoState mks(p);
-            moveKumipuyo(field, KEY_CANDIDATES[i].first, &mks);
+            moveKumipuyo<Parameter>(field, candidate.first, &mks);
 
             if (pot.count(mks))
                 continue;
             // TODO(mayah): This is not correct. We'd like to prefer KeySet() to another key sequence a bit.
-            Q.push(Edge(p, mks, curr + KEY_CANDIDATES[i].second, KEY_CANDIDATES[i].first));
+            Q.push(Edge(p, mks, curr + candidate.second, candidate.first));
         }
     }
 
@@ -883,6 +949,43 @@ KeySetSeq PuyoController::findKeyStrokeFastpath(const CoreField& field, const Mo
     case 4: return findKeyStrokeFastpath4(field, decision);
     case 5: return findKeyStrokeFastpath5(field, decision);
     case 6: return findKeyStrokeFastpath6(field, decision);
+    default:
+        CHECK(false) << "Unknown x: " << decision.x;
+        return KeySetSeq();
+    }
+}
+
+KeySetSeq PuyoController::findKeyStrokeFastpathForWii(const CoreField& field, const MovingKumipuyoState& mks, const Decision& decision)
+{
+    // fastpath only works when pos is located at initial position.
+    if (!(mks.pos.x == 3 && mks.pos.y == 12 && mks.pos.r == 0))
+        return KeySetSeq();
+
+    switch (decision.x) {
+    case 1: {
+        KeySetSeq kss = findKeyStrokeFastpath1(field, decision);
+        if (kss.empty())
+            return kss;
+        kss.addFront(KeySet(Key::LEFT));
+        return kss;
+    }
+    case 2: return findKeyStrokeFastpath2(field, decision);
+    case 3: return findKeyStrokeFastpath3(field, decision);
+    case 4: return findKeyStrokeFastpath4(field, decision);
+    case 5: {
+        KeySetSeq kss = findKeyStrokeFastpath5(field, decision);
+        if (kss.empty())
+            return kss;
+        kss.addFront(KeySet(Key::RIGHT));
+        return kss;
+    }
+    case 6: {
+        KeySetSeq kss = findKeyStrokeFastpath6(field, decision);
+        if (kss.empty())
+            return kss;
+        kss.addFront(KeySet(Key::RIGHT));
+        return kss;
+    }
     default:
         CHECK(false) << "Unknown x: " << decision.x;
         return KeySetSeq();

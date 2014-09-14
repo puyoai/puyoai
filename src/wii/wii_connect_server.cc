@@ -335,9 +335,6 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
         if (!d.isValid() || d == lastDecision_[pi])
             continue;
 
-        // TODO(mayah): Set an approapriate value for Y.
-        KumipuyoPos start = lastDecision_[pi].isValid() ? KumipuyoPos(lastDecision_[pi].x, 12, lastDecision_[pi].r) : KumipuyoPos(3, 12, 0);
-
         // ----------
         // Set's the current area.
         // This is for checking the destination is reachable, it is ok to set ojama if the cell is occupied.
@@ -355,7 +352,7 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
                 field.recalcHeightOn(x);
             }
 
-            keySetSeq = PuyoController::findKeyStroke(field, MovingKumipuyoState(start), d);
+            keySetSeq = PuyoController::findKeyStrokeForWii(field, d);
             if (keySetSeq.empty())
                 continue;
         }
@@ -364,10 +361,6 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
         for (size_t j = 0; j < keySetSeq.size(); j++) {
             KeySet k = keySetSeq[j];
             keySender_->sendKey(k);
-
-            if (j + 1 < keySetSeq.size() && k.hasIntersection(keySetSeq[j+1])) {
-                keySender_->sendKey(KeySet());
-            }
         }
 
         return;
