@@ -240,3 +240,23 @@ TEST(PuyoControllerTest, checkHigherField2)
         }
     }
 }
+
+TEST(PuyoControllerTest, dijkstraForWii)
+{
+    CoreField f;
+
+    const string expected[] = {
+        "<,,<,v",
+        "<,v",
+        "v",
+        ">,v",
+        ">,,>,v",
+        ">,,>,,>,v"
+    };
+
+    for (int x = 1; x <= 6; ++x) {
+        MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+        KeySetSeq kss = PuyoController::findKeyStrokeByDijkstra<PuyoController::ParameterForWii>(f, mks, Decision(x, 0));
+        EXPECT_EQ(expected[x - 1], kss.toString());
+    }
+}

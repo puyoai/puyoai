@@ -54,6 +54,8 @@ public:
     // TODO(mayah): This is not O(1) but O(N). However, this method won't be called much.
     // So it would be acceptable.
     void removeFront() { seq_.erase(seq_.begin()); }
+    // TODO(mayah): This is O(N).
+    void addFront(const KeySet& ks) { seq_.insert(seq_.begin(), ks); }
 
     void clear() { seq_.clear(); }
 
