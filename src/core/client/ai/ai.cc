@@ -95,7 +95,7 @@ void AI::runLoop()
 
         // When the current puyo is grounded and the next hand is considered, we will move to the next hand.
         if (!next1.needsReconsider && next1.prevHasGrounded && next2.needsSend) {
-            CHECK(!next1.needsSend);
+            CHECK(!next1.needsSend) << "client/ai bug or your AI is too slow!";
             next1 = next2;
             next2.clear();
 
