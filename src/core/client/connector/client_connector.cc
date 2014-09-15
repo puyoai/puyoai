@@ -37,20 +37,20 @@ void ClientConnector::send(int frameId, const DropDecision& dropDecision)
 
 FrameData ClientConnector::receive()
 {
-    std::string line, term;
+    FrameData frameData;
+    std::string line;
     while (true) {
-        std::getline(std::cin, line);
+        if (!std::getline(std::cin, line)) {
+            frameData.connectionLost = true;
+            return frameData;
+        }
+
         if (line != "")
             break;
     }
     VLOG(1) << line;
 
-    FrameData frameData;
-    if (!std::cin) {
-        frameData.connectionLost = true;
-        return frameData;
-    }
-
+    string term;
     for (std::istringstream iss(line); iss >> term;) {
         if (term.find('=') == std::string::npos)
             continue;
