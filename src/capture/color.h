@@ -1,9 +1,6 @@
 #ifndef CAPTURE_COLOR_H_
 #define CAPTURE_COLOR_H_
 
-#include <algorithm>
-#include <cmath>
-
 struct HSV;
 struct RGB;
 
