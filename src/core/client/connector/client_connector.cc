@@ -92,5 +92,7 @@ FrameData ClientConnector::receive()
         }
     }
 
+    VLOG(1) << frameData.toString();
+
     return frameData;
 }

@@ -1,6 +1,7 @@
 #ifndef CORE_FRAME_DATA_H_
 #define CORE_FRAME_DATA_H_
 
+#include <string>
 #include <vector>
 
 #include "core/plain_field.h"
@@ -20,16 +21,15 @@ struct PlayerFrameData {
 };
 
 struct FrameData {
-    const int GAME_END_UNDEFINED = -255;
+    static const int GAME_END_UNDEFINED = -255;
 
     FrameData() {}
 
     const PlayerFrameData& myPlayerFrameData() const { return playerFrameData[0]; }
     const PlayerFrameData& enemyPlayerFrameData() const { return playerFrameData[1]; }
 
-    bool hasGameEnd() {
-        return gameEnd != GAME_END_UNDEFINED;
-    };
+    bool hasGameEnd() const { return gameEnd != GAME_END_UNDEFINED; }
+    std::string toString() const;
 
     bool connectionLost = false;
     bool valid = false;

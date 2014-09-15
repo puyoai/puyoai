@@ -59,16 +59,22 @@ void printLine(Stream* ss, const PlainField& f, int y, const KumipuyoSeq& seq, C
 
     if (y == 11) {
         *ss << toPuyoString(PuyoColor::EMPTY, cellType);
-        *ss << toPuyoString(seq.child(0), cellType);
+        *ss << toPuyoString(seq.size() >= 1 ? seq.child(0) : PuyoColor::EMPTY, cellType);
     } else if (y == 10) {
         *ss << toPuyoString(PuyoColor::EMPTY, cellType);
-        *ss << toPuyoString(seq.axis(0), cellType);
+        *ss << toPuyoString(seq.size() >= 1 ? seq.axis(0) : PuyoColor::EMPTY, cellType);
     } else if (y == 8) {
         *ss << toPuyoString(PuyoColor::EMPTY, cellType);
-        *ss << toPuyoString(seq.child(1), cellType);
+        *ss << toPuyoString(seq.size() >= 2 ? seq.child(1) : PuyoColor::EMPTY, cellType);
     } else if (y == 7) {
         *ss << toPuyoString(PuyoColor::EMPTY, cellType);
-        *ss << toPuyoString(seq.axis(1), cellType);
+        *ss << toPuyoString(seq.size() >= 2 ? seq.axis(1) : PuyoColor::EMPTY, cellType);
+    } else if (y == 5) {
+        *ss << toPuyoString(PuyoColor::EMPTY, cellType);
+        *ss << toPuyoString(seq.size() >= 3 ? seq.child(2) : PuyoColor::EMPTY, cellType);
+    } else if (y == 4) {
+        *ss << toPuyoString(PuyoColor::EMPTY, cellType);
+        *ss << toPuyoString(seq.size() >= 3 ? seq.axis(2) : PuyoColor::EMPTY, cellType);
     } else {
         *ss << toPuyoString(PuyoColor::EMPTY, cellType);
         *ss << toPuyoString(PuyoColor::EMPTY, cellType);
