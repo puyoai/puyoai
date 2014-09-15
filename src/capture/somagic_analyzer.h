@@ -30,6 +30,8 @@ public:
     // Draw each pixel of |surface| with RealColor. This is helpful for image analyzing test.
     void drawWithAnalysisResult(SDL_Surface*);
 
+    static RealColor estimateRealColor(const HSV&);
+
 private:
     virtual CaptureGameState detectGameState(const SDL_Surface*) override;
     virtual std::unique_ptr<DetectedField> detectField(int pi, const SDL_Surface*) override;

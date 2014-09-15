@@ -6,6 +6,8 @@
 #include <gflags/gflags.h>
 #include <gtest/gtest.h>
 #include <SDL_image.h>
+
+#include "capture/color.h"
 #include "core/next_puyo.h"
 #include "core/real_color.h"
 #include "gui/unique_sdl_surface.h"
@@ -51,6 +53,23 @@ protected:
         return results;
     }
 };
+
+TEST_F(SomagicAnalyzerTest, estimateRealColor)
+{
+    struct Testcase {
+        RealColor expected;
+        RGB rgb;
+    } testcases[] = {
+        { RealColor::RC_RED, RGB(255, 0, 0) },
+    };
+    int size = ARRAY_SIZE(testcases);
+
+    for (int i = 0; i < size; ++i) {
+        EXPECT_EQ(testcases[i].expected, SomagicAnalyzer::estimateRealColor(testcases[i].rgb.toHSV()))
+            << " RGB=" << testcases[i].rgb.toString()
+            << " HSV=" << testcases[i].rgb.toHSV().toString();
+    }
+}
 
 TEST_F(SomagicAnalyzerTest, AnalyzeNormalField1)
 {
