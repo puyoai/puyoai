@@ -94,6 +94,7 @@ bool FieldRealtime::onStatePreparingNext()
 {
     simulationState_ = SimulationState::STATE_PLAYABLE;
     userState_.playable = true;
+    userState_.decisionRequest = true;
     return false;
 }
 
