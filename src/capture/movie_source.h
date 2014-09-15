@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include <atomic>
 #include <string>
 
 #include <SDL.h>
@@ -26,6 +27,7 @@ public:
     virtual UniqueSDLSurface getNextFrame();
 
     void setFPS(int fps) { fps_ = fps; }
+    void nextStep();
 
     static void init();
 
@@ -34,6 +36,8 @@ private:
 
     int fps_ = 30;
     Uint32 lastTaken_ = 0;
+    // Default must be true to show the first image.
+    std::atomic<bool> waitUntilTrue_;
 
     AVFormatContext* format_;
     AVCodecContext* codec_;

@@ -6,6 +6,7 @@ using namespace std;
 
 MovieSource::MovieSource(const char* filename) :
     filename_(filename),
+    waitUntilTrue_(true),
     sws_(NULL),
     surf_(makeUniqueSDLSurface(nullptr))
 {
@@ -91,7 +92,13 @@ MovieSource::~MovieSource()
     // TODO(hamaji): Free resource.
 }
 
-UniqueSDLSurface MovieSource::getNextFrame() {
+void MovieSource::nextStep()
+{
+    waitUntilTrue_ = true;
+}
+
+UniqueSDLSurface MovieSource::getNextFrame()
+{
     int frame_finished;
     while (true) {
         if (av_read_frame(format_, &packet_) < 0)
@@ -126,7 +133,13 @@ UniqueSDLSurface MovieSource::getNextFrame() {
     // Wait until next frame.
     Uint32 currentTime = SDL_GetTicks();
     Uint32 elapsed = currentTime - lastTaken_;
-    if (static_cast<int>(elapsed) < 1000 / fps_) {
+    if (fps_ == 0) {
+        while (!waitUntilTrue_) {
+            SDL_Delay(10);
+        }
+        waitUntilTrue_ = false;
+        cout << "space detected" << endl;
+    } else if (static_cast<int>(elapsed) < 1000 / fps_) {
         int d = 1000 / fps_ - elapsed;
         SDL_Delay(d);
         Uint32 hoge = SDL_GetTicks();
