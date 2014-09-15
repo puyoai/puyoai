@@ -73,6 +73,22 @@ string PlayerAnalyzerResult::toString() const
     ss << "nextPuyoState: " << static_cast<int>(nextPuyoState) << endl;
     ss << "userState" << userState.toString() << endl;
 
+    ss << "Detected Field    Analyzed Field" << endl;
+    ss << "########          ########" << endl;
+    for (int y = 11; y >= 0; --y) {
+        ss << '#';
+        for (int x = 0; x < 6; ++x) {
+            ss << toChar(detectedField.puyos[x][y], !detectedField.vanishing[x][y]);
+        }
+        ss << "#          #";
+        for (int x = 0; x < 6; ++x) {
+            ss << toChar(adjustedField.puyos[x][y], !adjustedField.vanishing[x][y]);
+        }
+        ss << '#';
+        ss << endl;
+    }
+    ss << "########          ########" << endl;
+
     return ss.str();
 }
 
