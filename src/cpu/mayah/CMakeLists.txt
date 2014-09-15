@@ -26,6 +26,7 @@ mayah_add_executable(learn learn.cc)
 mayah_add_executable(tweaker tweaker.cc)
 
 cpu_add_runner(run.sh)
+cpu_add_runner(run_v.sh)
 
 cpu_add_runner(feature.txt)
 cpu_add_runner(run_for_tweaker_1p.sh)
