@@ -1,6 +1,7 @@
 #include "capture/color.h"
 
 #include <algorithm>
+#include <cmath>
 #include <glog/logging.h>
 
 using namespace std;

@@ -1,5 +1,7 @@
 #include "capture/color.h"
 
+#include <algorithm>
+#include <cmath>
 #include <gtest/gtest.h>
 
 using namespace std;
