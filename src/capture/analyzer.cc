@@ -211,14 +211,17 @@ Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<co
     // --- Finalize the current state
     if (result->restFramesUserCanPlay > 0) {
         result->restFramesUserCanPlay -= 1;
-        if (result->restFramesUserCanPlay == 0 && !result->userState.playable)
+        if (result->restFramesUserCanPlay == 0 && !result->userState.playable) {
             result->userState.playable = true;
+            result->userState.decisionRequest = true;
+        }
 
         // Even if restFramesUserCanPlay_[pi] > 0, a puyo might appear on (3, 12).
         // In that case, we skip the rest of waiting frame.
         if (result->realColor(3, 12) != RealColor::RC_EMPTY) {
             result->restFramesUserCanPlay = 0;
             result->userState.playable = true;
+            result->userState.decisionRequest = true;
         }
     }
 
