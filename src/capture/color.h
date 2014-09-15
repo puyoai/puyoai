@@ -1,6 +1,8 @@
 #ifndef CAPTURE_COLOR_H_
 #define CAPTURE_COLOR_H_
 
+#include <string>
+
 struct HSV;
 struct RGB;
 
@@ -10,6 +12,7 @@ struct HSV {
     HSV(float h, float s, float v) : h(h), s(s), v(v) {}
 
     RGB toRGB() const;
+    std::string toString() const;
 
     float h, s, v;
 };
@@ -19,6 +22,7 @@ struct RGB {
     RGB(float r, float g, float b) : r(r), g(g), b(b) {}
 
     HSV toHSV() const;
+    std::string toString() const;
 
     float r, g, b;
 };
