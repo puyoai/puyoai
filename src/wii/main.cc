@@ -14,6 +14,7 @@
 #include "capture/somagic_analyzer.h"
 #include "capture/somagic_source.h"
 #include "capture/movie_source.h"
+#include "capture/movie_source_key_listener.h"
 #include "gui/main_window.h"
 #include "wii/serial_key_sender.h"
 #include "wii/stdout_key_sender.h"
@@ -100,12 +101,21 @@ int main(int argc, char* argv[])
     if (FLAGS_draw_result)
         analyzerResultDrawer.reset(new AnalyzerResultDrawer(&server));
 
+    unique_ptr<MovieSourceKeyListener> movieSourceKeyListener;
+    // TODO(mayah): BAD! Don't check FLAGS_source here.
+    if (FLAGS_fps == 0 && FLAGS_source != "somagic") {
+        MovieSource* movieSource = static_cast<MovieSource*>(source.get());
+        movieSourceKeyListener.reset(new MovieSourceKeyListener(movieSource));
+    }
+
     MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
     mainWindow.addDrawer(&server);
     if (saver.get())
         mainWindow.addDrawer(saver.get());
     if (analyzerResultDrawer.get())
         mainWindow.addDrawer(analyzerResultDrawer.get());
+    if (movieSourceKeyListener.get())
+        mainWindow.addEventListener(movieSourceKeyListener.get());
 
     source->start();
     server.start();
