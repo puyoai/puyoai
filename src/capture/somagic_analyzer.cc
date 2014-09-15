@@ -260,3 +260,9 @@ void SomagicAnalyzer::drawBoxWithAnalysisResult(SDL_Surface* surface, const Box&
         }
     }
 }
+
+// static
+RealColor SomagicAnalyzer::estimateRealColor(const HSV& hsv)
+{
+    return toRealColor(hsv);
+}
