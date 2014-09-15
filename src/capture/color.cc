@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <sstream>
 #include <glog/logging.h>
 
 using namespace std;
@@ -34,6 +35,13 @@ HSV RGB::toHSV() const
     return hsv;
 }
 
+string RGB::toString() const
+{
+    stringstream ss;
+    ss << '(' << r << ',' << g << ',' << b << ')';
+    return ss.str();
+}
+
 RGB HSV::toRGB() const
 {
     if (v < 1e-9)
@@ -55,4 +63,11 @@ RGB HSV::toRGB() const
     }
 
     return RGB(0, 0, 0);
+}
+
+string HSV::toString() const
+{
+    stringstream ss;
+    ss << '(' << h << ',' << s << ',' << v << ')';
+    return ss.str();
 }
