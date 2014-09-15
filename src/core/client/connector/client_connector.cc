@@ -38,7 +38,11 @@ void ClientConnector::send(int frameId, const DropDecision& dropDecision)
 FrameData ClientConnector::receive()
 {
     std::string line, term;
-    std::getline(std::cin, line);
+    while (true) {
+        std::getline(std::cin, line);
+        if (line != "")
+            break;
+    }
     VLOG(1) << line;
 
     FrameData frameData;
