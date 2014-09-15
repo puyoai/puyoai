@@ -39,6 +39,7 @@
 using namespace std;
 
 DEFINE_string(record, "", "use Puyofu Recorder. 'transition' for transition log, 'field' for field log");
+DEFINE_bool(ignore_sigpipe, false, "true to ignore SIGPIPE");
 #ifdef USE_HTTPD
 DEFINE_bool(httpd, false, "use httpd");
 DEFINE_int32(port, 8000, "httpd port");
@@ -97,7 +98,8 @@ int main(int argc, char* argv[])
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InstallFailureSignalHandler();
 
-    ignoreSIGPIPE();
+    if (FLAGS_ignore_sigpipe)
+        ignoreSIGPIPE();
 
     if (argc != 3) {
         LOG(ERROR) << "There must be 2 arguments." << endl;

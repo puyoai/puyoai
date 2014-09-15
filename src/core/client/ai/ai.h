@@ -59,6 +59,7 @@ private:
     std::string name_;
     ClientConnector connector_;
     CoreField field_;  // estimated my field.
+    int hand_;
     bool difensive_;
 };
 
