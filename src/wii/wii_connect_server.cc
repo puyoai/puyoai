@@ -73,14 +73,22 @@ void WiiConnectServer::runLoop()
 {
     reset();
 
+    int noSurfaceCount = 0;
     int frameId = 0;
     UniqueSDLSurface prevSurface(emptyUniqueSDLSurface());
 
     while (!shouldStop_) {
         UniqueSDLSurface surface(source_->getNextFrame());
         if (!surface.get()) {
-            shouldStop_ = true;
-            break;
+            ++noSurfaceCount;
+            LOG(INFO) << "No surface?: count=" << noSurfaceCount << endl;
+            cout << "No surface? count=" << noSurfaceCount << endl;
+            // TODO(mayah): Why not sleep?
+            if (noSurfaceCount > 100000) {
+                shouldStop_ = true;
+                break;
+            }
+            continue;
         }
 
         cout << "FRAME: " << frameId << endl;
