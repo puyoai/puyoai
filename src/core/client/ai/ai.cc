@@ -113,6 +113,7 @@ void AI::runLoop()
             next1.dropDecision = thinkFast(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) });
             next1.kumipuyo = kumipuyoSeq.get(0);
             next1.needsSend = true;
+            next1.needsReconsider = false;
 
             if (next1.dropDecision.decision().isValid() && next1.kumipuyo.isValid()) {
                 field_.dropKumipuyo(next1.dropDecision.decision(), next1.kumipuyo);
