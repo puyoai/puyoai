@@ -34,7 +34,8 @@ public:
 
 private:
     virtual CaptureGameState detectGameState(const SDL_Surface*) override;
-    virtual std::unique_ptr<DetectedField> detectField(int pi, const SDL_Surface*) override;
+    virtual std::unique_ptr<DetectedField> detectField(int pi, const SDL_Surface* current, const SDL_Surface* prev) override;
+    bool detectOjamaDrop(const SDL_Surface* current, const SDL_Surface* prev, const Box&);
 
     bool isLevelSelect(const SDL_Surface*);
     bool isGameFinished(const SDL_Surface*);

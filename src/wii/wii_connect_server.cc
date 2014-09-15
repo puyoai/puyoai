@@ -74,15 +74,18 @@ void WiiConnectServer::runLoop()
     reset();
 
     int frameId = 0;
+    UniqueSDLSurface prevSurface(emptyUniqueSDLSurface());
 
     while (!shouldStop_) {
         UniqueSDLSurface surface(source_->getNextFrame());
-        if (!surface.get())
-            continue;
+        if (!surface.get()) {
+            shouldStop_ = true;
+            break;
+        }
 
         cout << "FRAME: " << frameId << endl;
 
-        unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), analyzerResults_);
+        unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), prevSurface.get(),  analyzerResults_);
         LOG(INFO) << r->toString();
 
         switch (r->state()) {
@@ -125,6 +128,7 @@ void WiiConnectServer::runLoop()
 
         {
             lock_guard<mutex> lock(mu_);
+            prevSurface = move(surface_);
             surface_ = move(surface);
             analyzerResults_.push_front(move(r));
             while (analyzerResults_.size() > 10)

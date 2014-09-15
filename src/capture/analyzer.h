@@ -29,7 +29,7 @@ enum class NextPuyoState {
     NEXT2_WILL_DISAPPEAR,
     NEXT2_WILL_APPEAR,
 };
-
+std::string toString(NextPuyoState);
 
 // DetectedField contains the detected field as-is.
 struct DetectedField {
@@ -42,9 +42,12 @@ struct DetectedField {
 
     bool isVanishing(int x, int y) const { return vanishing[x-1][y-1]; }
 
+    void setOjamaDropDetected(bool flag) { ojamaDropDetected = flag; }
+
     RealColor puyos[6][12];
     bool vanishing[6][12];
     RealColor nextPuyos[NUM_NEXT_PUYO_POSITION];
+    bool ojamaDropDetected = false;
 };
 
 // AdjustedField is adjusted using the previous frames etc.
@@ -148,12 +151,14 @@ public:
     virtual ~Analyzer() {}
 
     // Analyzes the specified frame. previousResults.front() should be the most recent results.
-    std::unique_ptr<AnalyzerResult> analyze(const SDL_Surface*, const std::deque<std::unique_ptr<AnalyzerResult>>& previousResults);
+    std::unique_ptr<AnalyzerResult> analyze(const SDL_Surface* current,
+                                            const SDL_Surface* prev,
+                                            const std::deque<std::unique_ptr<AnalyzerResult>>& previousResults);
 
 protected:
     // These methods should be implemented in the derived class.
     virtual CaptureGameState detectGameState(const SDL_Surface*) = 0;
-    virtual std::unique_ptr<DetectedField> detectField(int pi, const SDL_Surface*) = 0;
+    virtual std::unique_ptr<DetectedField> detectField(int pi, const SDL_Surface* current, const SDL_Surface* prev) = 0;
 
 private:
     std::unique_ptr<PlayerAnalyzerResult>
@@ -174,7 +179,6 @@ private:
     void analyzeNextForStateNext2WillDisappear(const DetectedField&, PlayerAnalyzerResult*);
     void analyzeNextForStateNext2WillAppear(const DetectedField&, PlayerAnalyzerResult*);
 
-    int countOjama(RealColor puyos[6][12]);
     int countVanishing(RealColor puyos[6][12], bool vanishing[6][12]);
 };
 
