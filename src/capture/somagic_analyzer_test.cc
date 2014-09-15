@@ -170,6 +170,59 @@ TEST_F(SomagicAnalyzerTest, analyzeFieldNormal7)
     EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(3, 6));
 }
 
+TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField1)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-another1.png");
+
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(1, 1));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(1, 2));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(2, 2));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(2, 3));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(3, 3));
+    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->realColor(3, 1));
+    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->realColor(3, 2));
+    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->realColor(3, 4));
+    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->realColor(4, 1));
+    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->realColor(4, 2));
+    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->realColor(4, 3));
+
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(1, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(2, 3));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(3, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(4, 1));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(5, 1));
+}
+
+TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField2)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-another2.png");
+
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(3, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 10));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 11));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(4, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(4, 3));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(4, 4));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(4, 7));
+
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(2, 2));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(4, 3));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(6, 6));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(1, 1));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(1, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(1, 3));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(2, 4));
+}
+
 TEST_F(SomagicAnalyzerTest, OjamaDetectionCase1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case1.png");
