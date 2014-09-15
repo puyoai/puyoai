@@ -56,22 +56,56 @@ protected:
 
 TEST_F(SomagicAnalyzerTest, estimateRealColor)
 {
+    // These RGB values are taken from the real example.
     struct Testcase {
         RealColor expected;
         RGB rgb;
     } testcases[] = {
-        { RealColor::RC_RED, RGB(255, 0, 0) },
+        { RealColor::RC_EMPTY,  RGB( 71,  62,   2) },
+        { RealColor::RC_EMPTY,  RGB( 71,  64,   0) },
+        { RealColor::RC_EMPTY,  RGB( 35,  26,   0) },
+        { RealColor::RC_OJAMA,  RGB(255, 255, 255) },
+        { RealColor::RC_OJAMA,  RGB(156, 199, 177) },
+        { RealColor::RC_OJAMA,  RGB(141, 187, 162) },
+        { RealColor::RC_RED,    RGB(255,   0,   0) },
+        { RealColor::RC_RED,    RGB(236, 134, 144) },
+        { RealColor::RC_RED,    RGB(220, 162, 172) },
+        { RealColor::RC_RED,    RGB(119,  59,  69) },
+        { RealColor::RC_RED,    RGB(105,  29,  53) },
+        { RealColor::RC_GREEN,  RGB(  0, 255,   0) },
+        { RealColor::RC_GREEN,  RGB(161, 193, 122) },
+        { RealColor::RC_GREEN,  RGB( 79, 200,  57) },
+        { RealColor::RC_GREEN,  RGB( 25, 117,   6) },
+        { RealColor::RC_GREEN,  RGB( 25,  95,   0) },
+        { RealColor::RC_GREEN,  RGB( 19,  89,   5) },
+        { RealColor::RC_GREEN,  RGB(  6,  73,   0) },
+        { RealColor::RC_BLUE,   RGB(  0,   0, 255) },
+        { RealColor::RC_BLUE,   RGB( 78, 165, 232) },
+        { RealColor::RC_BLUE,   RGB( 31,  81, 170) },
+        { RealColor::RC_BLUE,   RGB(114, 200, 235) },
+        { RealColor::RC_BLUE,   RGB( 43,  71,  71) },
+        { RealColor::RC_BLUE,   RGB( 52,  76,  76) },
+        { RealColor::RC_YELLOW, RGB(255, 255,   0) },
+        { RealColor::RC_YELLOW, RGB(177, 154,  64) },
+        { RealColor::RC_YELLOW, RGB(200, 153,  53) },
+        { RealColor::RC_PURPLE, RGB( 94,  21,  78) },
+        { RealColor::RC_PURPLE, RGB( 77,  23,  35) },
+        { RealColor::RC_PURPLE, RGB( 84,  45,  52) },
+        { RealColor::RC_PURPLE, RGB(135,  34, 142) },
     };
     int size = ARRAY_SIZE(testcases);
 
     for (int i = 0; i < size; ++i) {
         EXPECT_EQ(testcases[i].expected, SomagicAnalyzer::estimateRealColor(testcases[i].rgb.toHSV()))
+            << " expected=" << toString(testcases[i].expected)
+            << " actual=" << toString(SomagicAnalyzer::estimateRealColor(testcases[i].rgb.toHSV()))
             << " RGB=" << testcases[i].rgb.toString()
             << " HSV=" << testcases[i].rgb.toHSV().toString();
+
     }
 }
 
-TEST_F(SomagicAnalyzerTest, AnalyzeNormalField1)
+TEST_F(SomagicAnalyzerTest, analyzeNormalField1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal1.png");
 
@@ -99,7 +133,7 @@ TEST_F(SomagicAnalyzerTest, AnalyzeNormalField1)
     EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(6, 4));
 }
 
-TEST_F(SomagicAnalyzerTest, AnalyzeFieldNormal6)
+TEST_F(SomagicAnalyzerTest, analyzeFieldNormal6)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal6.png");
 
@@ -118,6 +152,22 @@ TEST_F(SomagicAnalyzerTest, AnalyzeFieldNormal6)
     EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(4, 2));
     EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(5, 2));
     EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(6, 2));
+}
+
+TEST_F(SomagicAnalyzerTest, analyzeFieldNormal7)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal7.png");
+
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 6));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 7));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 8));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(2, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(2, 3));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(3, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(3, 6));
 }
 
 TEST_F(SomagicAnalyzerTest, OjamaDetectionCase1)
@@ -263,10 +313,9 @@ TEST_F(SomagicAnalyzerTest, Vanishing)
         EXPECT_EQ(CaptureGameState::PLAYING, r->state());
     }
 
-    EXPECT_TRUE(rs[0]->playerResult(0)->userState.playable);
-    EXPECT_TRUE(rs[10]->playerResult(0)->userState.playable);
-    EXPECT_TRUE(rs[11]->playerResult(0)->userState.playable);
-    EXPECT_TRUE(rs[12]->playerResult(0)->userState.playable);
+    for (int i = 0; i <= 12; ++i) {
+        EXPECT_TRUE(rs[i]->playerResult(0)->userState.playable) << i;
+    }
 
     // vanishing should be detected here.
     // TODO(mayah): We might be able to detect in the previous frame?
@@ -361,7 +410,7 @@ TEST_F(SomagicAnalyzerTest, GameStart)
         { 30, "BBPP  ", "BBPP  " },
         { 31, "------", "BBPP--" },  // Player 2, frame 31: Since some stars are located on NEXT2_AXIS,
         { 32, "BBPP--", "BBPP--" },  // analyzer might consider the axis color is YELLOW.
-        { 33, "BBPPBB", "BBPPBB" },  // However, we should fix in frame33 at least.
+        { 33, "BBPPBB", "BBPP--" },  // However, we should fix in frame33 at least.
         { 34, "BBPPBB", "BBPPBB" },
         { 35, "BBPPBB", "BBPPBB" },
         { 36, "BBPPBB", "BBPPBB" },
@@ -375,7 +424,7 @@ TEST_F(SomagicAnalyzerTest, GameStart)
         { 44, "BBPPBB", "BBPPBB" },
         { 45, "BBPPBB", "BBPPBB" },
         { 46, "BBPPBB", "BBPPBB" },
-        { 47, "BBPPBB", "BBPPBB" },
+        { 47, "------", "BBPPBB" },
         { 48, "PPBB  ", "BBPPBB" },  // Player 1, frame 48: next1 will disappear. so next2 is moved to next1 on that time.
         { 49, "PPBB  ", "BBPPBB" },
         { 50, "PPBB  ", "BBPPBB" },

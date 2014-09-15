@@ -16,24 +16,30 @@ static RealColor toRealColor(const HSV& hsv)
     if (hsv.v < 38)
         return RealColor::RC_EMPTY;
 
-    if (130 < hsv.v && hsv.s < 30)
+    if (hsv.s < 50 && 130 < hsv.v)
         return RealColor::RC_OJAMA;
 
+    // The other colors are relatively easier. A bit tight range for now.
+    if ((hsv.h <= 15 || 350 < hsv.h) && 70 < hsv.v)
+        return RealColor::RC_RED;
+    if (35 <= hsv.h && hsv.h <= 75 && 90 < hsv.v)
+        return RealColor::RC_YELLOW;
+    if (85 <= hsv.h && hsv.h <= 135 && 70 < hsv.v)
+        return RealColor::RC_GREEN;
+    // Detecting blue is relatively hard. Let's have a relaxed margin.
+    if (180 <= hsv.h && hsv.h <= 255 && 60 < hsv.v)
+        return RealColor::RC_BLUE;
     // Detecting purple is really hard. We'd like to have relaxed margin for purple.
-    if (13 <= hsv.h && hsv.h < 75 && 65 < hsv.v)
+    if (290 <= hsv.h && hsv.h < 340 && 65 < hsv.v)
         return RealColor::RC_PURPLE;
 
-    // Detecting blue is relatively hard. Let's have a relaxed margin.
-    if (130 < hsv.h && hsv.h < 190 && 60 < hsv.v)
-        return RealColor::RC_BLUE;
-
-    // The other colors are relatively easier. A bit tight range for now.
-    if ((hsv.h < 10 || 340 < hsv.h) && 70 < hsv.v)
-        return RealColor::RC_RED;
-    if (240 < hsv.h && hsv.h < 270 && 90 < hsv.v)
-        return RealColor::RC_GREEN;
-    if (310 < hsv.h && hsv.h < 320 && 95 < hsv.v)
-        return RealColor::RC_YELLOW;
+    // Hard to distinguish RED and PURPLE.
+    if (340 <= hsv.h && hsv.h <= 350) {
+        if (85 < hsv.v)
+            return RealColor::RC_RED;
+        if (65 < hsv.v)
+            return RealColor::RC_PURPLE;
+    }
 
     return RealColor::RC_EMPTY;
 }
@@ -88,24 +94,32 @@ BoxAnalyzeResult SomagicAnalyzer::analyzeBox(const SDL_Surface* surface, const B
     for (int by = b.sy + 1; by <= b.dy - 1; ++by) {
         for (int bx = b.sx + 1; bx <= b.dx - 1; ++bx) {
             Uint32 c = getpixel(surface, bx, by);
-            Uint8 r, b, g;
+            Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
 
-            RGB rgb(r, b, g);
+            RGB rgb(r, g, b);
             HSV hsv = rgb.toHSV();
 
             RealColor rc = toRealColor(hsv);
 
             if (showsColor) {
                 char buf[240];
-                sprintf(buf, "%3d %3d : %3d %3d %3d : %7.3f %7.3f %7.3f : %d",
+                sprintf(buf, "%3d %3d : %3d %3d %3d : %7.3f %7.3f %7.3f : %s",
                         by, bx, static_cast<int>(r), static_cast<int>(g), static_cast<int>(b),
-                        hsv.h, hsv.s, hsv.v, static_cast<int>(rc));
+                        hsv.h, hsv.s, hsv.v, toString(rc));
                 cout << buf << endl;
             }
 
             colorCount[0][static_cast<int>(rc)]++;
             colorCount[(by % 2) + 1][static_cast<int>(rc)]++;
+        }
+    }
+
+    if (showsColor) {
+        cout << "Color count:" << endl;
+        for (int i = 0; i < NUM_REAL_COLORS; ++i) {
+            RealColor rc = intToRealColor(i);
+            cout << toString(rc) << " : " << colorCount[0][i] << endl;
         }
     }
 
@@ -179,10 +193,10 @@ bool SomagicAnalyzer::isLevelSelect(const SDL_Surface* surface)
     for (int bx = b.sx; bx <= b.dx; ++bx) {
         for (int by = b.sy; by <= b.dy; ++by) {
             Uint32 c = getpixel(surface, bx, by);
-            Uint8 r, b, g;
+            Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
 
-            RGB rgb(r, b, g);
+            RGB rgb(r, g, b);
             HSV hsv = rgb.toHSV();
             RealColor rc = toRealColor(hsv);
 
@@ -202,10 +216,10 @@ bool SomagicAnalyzer::isGameFinished(const SDL_Surface* surface)
     for (int bx = b.sx; bx <= b.dx; ++bx) {
         for (int by = b.sy; by <= b.dy; ++by) {
             Uint32 c = getpixel(surface, bx, by);
-            Uint8 r, b, g;
+            Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
 
-            RGB rgb(r, b, g);
+            RGB rgb(r, g, b);
             HSV hsv = rgb.toHSV();
             RealColor rc = toRealColor(hsv);
 
@@ -250,9 +264,9 @@ void SomagicAnalyzer::drawBoxWithAnalysisResult(SDL_Surface* surface, const Box&
     for (int by = box.sy; by <= box.dy; ++by) {
         for (int bx = box.sx; bx <= box.dx; ++bx) {
             Uint32 c = getpixel(surface, bx, by);
-            Uint8 r, b, g;
+            Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
-            RGB rgb(r, b, g);
+            RGB rgb(r, g, b);
             HSV hsv = rgb.toHSV();
 
             RealColor rc = toRealColor(hsv);
