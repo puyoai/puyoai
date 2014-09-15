@@ -135,11 +135,13 @@ unique_ptr<AnalyzerResult> AnalyzerResult::copy() const
     return unique_ptr<AnalyzerResult>(new AnalyzerResult(state(), move(p1), move(p2)));
 }
 
-std::unique_ptr<AnalyzerResult> Analyzer::analyze(const SDL_Surface* surface, const deque<unique_ptr<AnalyzerResult>>& previousResults)
+std::unique_ptr<AnalyzerResult> Analyzer::analyze(const SDL_Surface* surface,
+                                                  const SDL_Surface* prevSurface,
+                                                  const deque<unique_ptr<AnalyzerResult>>& previousResults)
 {
     auto gameState = detectGameState(surface);
-    auto player1FieldResult = detectField(0, surface);
-    auto player2FieldResult = detectField(1, surface);
+    auto player1FieldResult = detectField(0, surface, prevSurface);
+    auto player2FieldResult = detectField(1, surface, prevSurface);
 
     switch (gameState) {
     case CaptureGameState::UNKNOWN: {
@@ -420,6 +422,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField, const vector<con
                 result->setVanishing(x, y, detectedField.isVanishing(x, y));
             }
         }
+        result->hasDetectedOjamaDrop_ = detectedField.ojamaDropDetected;
         return;
     }
 
@@ -448,13 +451,14 @@ void Analyzer::analyzeField(const DetectedField& detectedField, const vector<con
     }
 
     if (!result->hasDetectedOjamaDrop_) {
-        // When # of ojama puyo is more than expected, maybe ojama dropping started.
-        int numOjama = countOjama(result->detectedField.puyos);
-        result->numOjama = numOjama;
-        if (!previousResults.empty() && numOjama > previousResults.front()->numOjama) {
-            LOG(INFO) << "should update field since ojama dropping detected";
+        if (detectedField.ojamaDropDetected) {
+            LOG(INFO) << "ojama dropping detected.";
             result->userState.playable = false;
             result->hasDetectedOjamaDrop_ = true;
+        }
+    } else {
+        if (!detectedField.ojamaDropDetected && !shouldUpdateField) {
+            LOG(INFO) << "should update field since ojama dropping has finished.";
             shouldUpdateField = true;
         }
     }
@@ -509,19 +513,6 @@ void Analyzer::analyzeField(const DetectedField& detectedField, const vector<con
                 shouldEmpty = true;
         }
     }
-}
-
-int Analyzer::countOjama(RealColor puyos[6][12])
-{
-    int cnt = 0;
-    for (int x = 0; x < 6; ++x) {
-        for (int y = 0; y < 12; ++y) {
-            if (puyos[x][y] == RealColor::RC_OJAMA)
-                ++cnt;
-        }
-    }
-
-    return cnt;
 }
 
 int Analyzer::countVanishing(RealColor puyos[6][12], bool vanishing[6][12])

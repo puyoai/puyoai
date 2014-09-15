@@ -153,7 +153,9 @@ CaptureGameState SomagicAnalyzer::detectGameState(const SDL_Surface* surface)
     return CaptureGameState::PLAYING;
 }
 
-unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi, const SDL_Surface* surface)
+unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi,
+                                                       const SDL_Surface* surface,
+                                                       const SDL_Surface* prevSurface)
 {
     unique_ptr<DetectedField> result(new DetectedField);
 
@@ -169,20 +171,62 @@ unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi, const SDL_Surface
     }
 
     // detect next
-    NextPuyoPosition np[4] = {
-        NextPuyoPosition::NEXT1_AXIS,
-        NextPuyoPosition::NEXT1_CHILD,
-        NextPuyoPosition::NEXT2_AXIS,
-        NextPuyoPosition::NEXT2_CHILD,
-    };
+    {
+        static const NextPuyoPosition np[4] = {
+            NextPuyoPosition::NEXT1_AXIS,
+            NextPuyoPosition::NEXT1_CHILD,
+            NextPuyoPosition::NEXT2_AXIS,
+            NextPuyoPosition::NEXT2_CHILD,
+        };
 
-    for (int i = 0; i < 4; ++i) {
-        Box b = BoundingBox::instance().get(pi, np[i]);
-        BoxAnalyzeResult r = analyzeBox(surface, b);
-        result->setRealColor(np[i], r.realColor);
+        for (int i = 0; i < 4; ++i) {
+            Box b = BoundingBox::instance().get(pi, np[i]);
+            BoxAnalyzeResult r = analyzeBox(surface, b);
+            result->setRealColor(np[i], r.realColor);
+        }
+    }
+
+    // detect ojama
+    {
+        Box left = BoundingBox::instance().get(pi, 1, 0);
+        Box right = BoundingBox::instance().get(pi, 6, 0);
+        Box b = Box(left.sx, left.sy, right.dx, right.dy);
+        result->setOjamaDropDetected(detectOjamaDrop(surface, prevSurface, b));
     }
 
     return result;
+}
+
+bool SomagicAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
+                                      const SDL_Surface* prevSurface,
+                                      const Box& box)
+{
+    // When prevSurface is NULL, we always think ojama is not dropped yet.
+    if (!prevSurface)
+        return false;
+
+    int area = (box.dy - box.sy + 1) * (box.dx - box.sx + 1);
+    double diffSum = 0;
+    for (int by = box.sy; by <= box.dy; ++by) {
+        for (int bx = box.sx; bx <= box.dx; ++bx) {
+            Uint32 c1 = getpixel(currentSurface, bx, by);
+            Uint8 r1, g1, b1;
+            SDL_GetRGB(c1, currentSurface->format, &r1, &g1, &b1);
+
+            Uint32 c2 = getpixel(prevSurface, bx, by);
+            Uint8 r2, g2, b2;
+            SDL_GetRGB(c2, prevSurface->format, &r2, &g2, &b2);
+
+            double diff = sqrt((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2));
+            diffSum += diff;
+            // cout << currentRGB.toString() << ' ' << prevRGB.toString() << endl;
+        }
+    }
+
+    // Usually, (diffSum / area) is around 5. When ojama is dropped, it will be over 20.
+    if (diffSum / area >= 15)
+        return true;
+    return false;
 }
 
 bool SomagicAnalyzer::isLevelSelect(const SDL_Surface* surface)

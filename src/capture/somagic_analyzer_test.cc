@@ -25,7 +25,7 @@ protected:
         CHECK(surf.get()) << "Failed to load " << filename;
 
         SomagicAnalyzer analyzer;
-        return analyzer.analyze(surf.get(), deque<unique_ptr<AnalyzerResult>>());
+        return analyzer.analyze(surf.get(), nullptr, deque<unique_ptr<AnalyzerResult>>());
     }
 
     deque<unique_ptr<AnalyzerResult>> analyzeMultipleFrames(const vector<string>& imgFilenames,
@@ -35,18 +35,20 @@ protected:
 
         SomagicAnalyzer analyzer;
         bool firstResult = true;
+        UniqueSDLSurface prev(emptyUniqueSDLSurface());
 
         for (const auto& imgFilename : imgFilenames) {
             string filename = FLAGS_testdata_dir + imgFilename;
             auto surface = makeUniqueSDLSurface(IMG_Load(filename.c_str()));
             CHECK(surface.get()) << "Failed to load "<< filename;
-            auto r = analyzer.analyze(surface.get(), results);
+            auto r = analyzer.analyze(surface.get(), prev.get(), results);
             if (firstResult) {
                 r->mutablePlayerResult(0)->userState.playable = userPlayable[0];
                 r->mutablePlayerResult(1)->userState.playable = userPlayable[1];
                 firstResult = false;
             }
             results.push_front(move(r));
+            prev = move(surface);
         }
 
         reverse(results.begin(), results.end());
@@ -375,7 +377,7 @@ TEST_F(SomagicAnalyzerTest, Vanishing)
     EXPECT_FALSE(rs[13]->playerResult(0)->userState.playable);
 }
 
-TEST_F(SomagicAnalyzerTest, OjamaDrop)
+TEST_F(SomagicAnalyzerTest, ojamaDrop)
 {
     vector<string> images;
     for (int i = 0; i <= 38; ++i) {
@@ -392,14 +394,10 @@ TEST_F(SomagicAnalyzerTest, OjamaDrop)
         EXPECT_EQ(CaptureGameState::PLAYING, r->state());
     }
 
-    EXPECT_TRUE(rs[0]->playerResult(1)->userState.playable);
-    EXPECT_TRUE(rs[1]->playerResult(1)->userState.playable);
-    EXPECT_TRUE(rs[2]->playerResult(1)->userState.playable);
-    EXPECT_TRUE(rs[3]->playerResult(1)->userState.playable);
-    EXPECT_TRUE(rs[4]->playerResult(1)->userState.playable);
-    EXPECT_TRUE(rs[5]->playerResult(1)->userState.playable);
-    // Around here, analyzer can detect the puyo is grounded, since we can see ojama puyo.
-    EXPECT_FALSE(rs[8]->playerResult(1)->userState.playable);
+    for (int i = 0; i <= 28; ++i)
+        EXPECT_TRUE(rs[i]->playerResult(1)->userState.playable);
+    // Around here, analyzer can detect ojama puyo is dropped.
+    EXPECT_FALSE(rs[30]->playerResult(1)->userState.playable);
     EXPECT_FALSE(rs[31]->playerResult(1)->userState.playable);
     // Then, next puyo will disappear.
     EXPECT_TRUE(rs[37]->playerResult(1)->userState.playable);
@@ -528,12 +526,6 @@ TEST_F(SomagicAnalyzerTest, GameStart)
             << "Player 1: Frame" << i << ": NEXT1_AXIS";
         EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->realColor(NextPuyoPosition::NEXT1_CHILD))
             << "Player 1: Frame" << i << ": NEXT1_CHILD";
-    }
-
-    // In any frame, ojama is not dropping.
-    for (int i = 0; i <= 61; ++i) {
-        EXPECT_FALSE(rs[i]->playerResult(0)->userState.ojamaDropped);
-        EXPECT_FALSE(rs[i]->playerResult(1)->userState.ojamaDropped);
     }
 }
 
