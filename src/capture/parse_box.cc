@@ -18,19 +18,54 @@
 
 using namespace std;
 
+void showUsage(const char* name)
+{
+    fprintf(stderr, "Usage: %s <in-bmp> [1|2] [NEXT1-AXIS|NEXT1-CHILD|NEXT2-AXIS|NEXT2-CHILD]\n", name);
+    fprintf(stderr, "Usage: %s <in-bmp> [1|2] x y\n", name);
+}
+
 int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
 
-    if (argc < 2) {
-        fprintf(stderr, "Usage: %s <in-bmp>\n", argv[0]);
+    if (argc < 4) {
+        showUsage(argv[0]);
         exit(EXIT_FAILURE);
     }
 
     SDL_Init(SDL_INIT_VIDEO);
+    atexit(SDL_Quit);
 
-    UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(argv[1])));
+    string imgFilename = argv[1];
+    int playerId = std::atoi(argv[2]);
+
+    bool usesNextPuyoPosition = false;
+    NextPuyoPosition npp;
+    int x, y;
+    if (argv[3] == string("NEXT1-AXIS")) {
+        usesNextPuyoPosition = true;
+        npp = NextPuyoPosition::NEXT1_AXIS;
+    } else if (argv[3] == string("NEXT1-CHILD")) {
+        usesNextPuyoPosition = true;
+        npp = NextPuyoPosition::NEXT1_CHILD;
+    } else if (argv[3] == string("NEXT2-AXIS")) {
+        usesNextPuyoPosition = true;
+        npp = NextPuyoPosition::NEXT2_AXIS;
+    } else if (argv[3] == string("NEXT2-CHILD")) {
+        usesNextPuyoPosition = true;
+        npp = NextPuyoPosition::NEXT2_CHILD;
+    } else {
+        if (argc < 5) {
+            showUsage(argv[0]);
+            exit(EXIT_FAILURE);
+        }
+
+        x = atoi(argv[3]);
+        y = atoi(argv[4]);
+    }
+
+    UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(imgFilename.c_str())));
     if (!surf) {
         fprintf(stderr, "Failed to load %s!\n", argv[1]);
         exit(EXIT_FAILURE);
@@ -39,12 +74,16 @@ int main(int argc, char* argv[])
     SomagicAnalyzer analyzer;
 
     // this should be called after |analyzer| is created.
-#if 0
-    Box b = BoundingBox::instance().get(0, NextPuyoPosition::NEXT2_AXIS);
-#else
-    Box b = BoundingBox::instance().get(0, 1, 4);
-#endif
-    analyzer.analyzeBox(surf.get(), b, true);
+    Box b;
+    if (usesNextPuyoPosition) {
+        b = BoundingBox::instance().get(playerId - 1, npp);
+    } else {
+        b = BoundingBox::instance().get(playerId - 1, x, y);
+    }
+
+    BoxAnalyzeResult r = analyzer.analyzeBox(surf.get(), b, true);
+    cout << "Color: " << toString(r.realColor) << endl;
+    cout << "Vanishing: " << r.vanishing << endl;
 
     analyzer.drawWithAnalysisResult(surf.get());
     SDL_SaveBMP(surf.get(), "output.bmp");
