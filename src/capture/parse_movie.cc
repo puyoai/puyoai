@@ -6,6 +6,7 @@
 #include "capture/screen_shot_saver.h"
 #include "capture/somagic_analyzer.h"
 #include "capture/movie_source.h"
+#include "capture/movie_source_key_listener.h"
 #include "gui/bounding_box_drawer.h"
 #include "gui/box.h"
 #include "gui/main_window.h"
@@ -16,7 +17,7 @@
 
 DEFINE_bool(save_screenshot, false, "save screenshot");
 DEFINE_bool(draw_result, true, "draw analyzer result");
-DEFINE_int32(fps, 30, "FPS");
+DEFINE_int32(fps, 30, "FPS. When 0, hitting space will go next step.");
 
 int main(int argc, char* argv[])
 {
@@ -51,12 +52,19 @@ int main(int argc, char* argv[])
     if (FLAGS_save_screenshot)
         saver.reset(new ScreenShotSaver);
 
+    unique_ptr<MovieSourceKeyListener> movieSourceKeyListener;
+    if (FLAGS_fps == 0) {
+        movieSourceKeyListener.reset(new MovieSourceKeyListener(&source));
+    }
+
     MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
     mainWindow.addDrawer(&capture);
     if (saver.get())
         mainWindow.addDrawer(saver.get());
     if (analyzerResultDrawer.get())
         mainWindow.addDrawer(analyzerResultDrawer.get());
+    if (movieSourceKeyListener.get())
+        mainWindow.addEventListener(movieSourceKeyListener.get());
 
     capture.start();
 

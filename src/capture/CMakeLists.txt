@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_capture
             analyzer.cc analyzer_result_drawer.cc
-            capture.cc color.cc images_source.cc movie_source.cc screen_shot_saver.cc source.cc)
+            capture.cc color.cc images_source.cc movie_source.cc screen_shot_saver.cc source.cc movie_source_key_listener.cc)
 
 if(V4L2_LIBRARY)
   puyoai_add_cxx_flags("-DUSE_V4L2")
