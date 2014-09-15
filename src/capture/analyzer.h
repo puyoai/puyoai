@@ -22,6 +22,7 @@ enum class CaptureGameState {
     PLAYING,       //
     FINISHED,      // A game is finished.
 };
+std::string toString(CaptureGameState);
 
 enum class NextPuyoState {
     STABLE,
@@ -29,7 +30,6 @@ enum class NextPuyoState {
     NEXT2_WILL_APPEAR,
 };
 
-std::string toString(CaptureGameState);
 
 // DetectedField contains the detected field as-is.
 struct DetectedField {

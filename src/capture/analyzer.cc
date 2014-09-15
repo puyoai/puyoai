@@ -38,6 +38,18 @@ string toString(CaptureGameState cgs)
     return "";
 }
 
+string toString(NextPuyoState nps)
+{
+    switch (nps) {
+    case NextPuyoState::STABLE:               return "stable";
+    case NextPuyoState::NEXT2_WILL_DISAPPEAR: return "next2_will_disappear";
+    case NextPuyoState::NEXT2_WILL_APPEAR:    return "next2_will_appear";
+    }
+
+    CHECK(false) << "Unknown NextPuyoState: " << static_cast<int>(nps);
+    return "";
+}
+
 DetectedField::DetectedField()
 {
     for (int x = 0; x < 6; ++x) {
