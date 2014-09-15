@@ -18,6 +18,22 @@ RealColor toRealColor(char c)
     return RealColor::RC_EMPTY;
 }
 
+char toChar(RealColor rc, bool usesCapital)
+{
+    switch (rc) {
+    case RealColor::RC_EMPTY:  return ' ';
+    case RealColor::RC_OJAMA:  return usesCapital ? 'O' : 'o';
+    case RealColor::RC_RED:    return usesCapital ? 'R' : 'r';
+    case RealColor::RC_BLUE:   return usesCapital ? 'B' : 'b';
+    case RealColor::RC_YELLOW: return usesCapital ? 'Y' : 'y';
+    case RealColor::RC_GREEN:  return usesCapital ? 'G' : 'g';
+    case RealColor::RC_PURPLE: return usesCapital ? 'P' : 'p';
+    }
+
+    CHECK(false) << "Unknown RealColor: " << static_cast<int>(rc);
+    return '-';
+}
+
 const char* toString(RealColor rc)
 {
     switch (rc) {

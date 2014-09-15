@@ -18,6 +18,7 @@ const int NUM_REAL_COLORS = 7;
 constexpr int ordinal(RealColor rc) { return static_cast<int>(rc); }
 constexpr RealColor intToRealColor(int x) { return static_cast<RealColor>(x); }
 RealColor toRealColor(char c);
+char toChar(RealColor, bool usesCapital = true);
 const char* toString(RealColor);
 std::ostream& operator<<(std::ostream&, RealColor);
 

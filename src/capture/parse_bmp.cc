@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
     }
 
     SDL_Init(SDL_INIT_VIDEO);
+    atexit(SDL_Quit);
 
     UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(argv[1])));
     if (!surf) {
