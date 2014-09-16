@@ -56,3 +56,35 @@ string PlainField::toString(char charIfEmpty) const
 
     return ss.str();
 }
+
+bool PlainField::isVisibllySame(const PlainField& f) const
+{
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            if (get(x, y) != f.get(x, y))
+                return false;
+        }
+    }
+
+    return true;
+}
+
+bool PlainField::canBeOverriden(const PlainField& f) const
+{
+    for (int x = 1; x <= 6; ++x) {
+        bool diffFound = false;
+        for (int y = 1; y <= 12; ++y) {
+            if (get(x, y) == f.get(x, y))
+                continue;
+            if (get(x, y) == PuyoColor::EMPTY || f.get(x, y) == PuyoColor::EMPTY) {
+                if (diffFound)
+                    return false;
+                diffFound = true;
+                continue;
+            }
+            return false;
+        }
+    }
+
+    return true;
+}
