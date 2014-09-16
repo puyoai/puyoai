@@ -345,7 +345,7 @@ TEST_F(SomagicAnalyzerTest, NextArrival)
 
     EXPECT_TRUE(rs[0]->playerResult(0)->userState.playable);
     // Next disappears here. After detecting next disappearing. we'd like to make userState playable.
-    EXPECT_TRUE(rs[13]->playerResult(0)->userState.playable);
+    EXPECT_FALSE(rs[13]->playerResult(0)->userState.playable);
     EXPECT_TRUE(rs[14]->playerResult(0)->userState.playable);
     // Then controllable now.
     EXPECT_TRUE(rs[16]->playerResult(0)->userState.playable);
