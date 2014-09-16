@@ -48,7 +48,6 @@ void AI::runLoop()
         if (frameData.hasGameEnd()) {
             gameHasEnded(frameData);
         }
-
         // Before starting a new game, we need to consider the first hand.
         // TODO(mayah): Maybe game server should send some information that we should initialize.
         if (frameData.id == 1) {
@@ -58,7 +57,6 @@ void AI::runLoop()
             next1.clear();
             next2.clear();
         }
-
         // Update enemy info if necessary.
         if (frameData.enemyPlayerFrameData().userState.grounded)
             enemyGrounded(frameData);

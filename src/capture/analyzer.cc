@@ -213,7 +213,6 @@ Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<co
         result->restFramesUserCanPlay -= 1;
         if (result->restFramesUserCanPlay == 0 && !result->userState.playable) {
             result->userState.playable = true;
-            result->userState.decisionRequest = true;
         }
 
         // Even if restFramesUserCanPlay_[pi] > 0, a puyo might appear on (3, 12).
@@ -221,7 +220,6 @@ Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<co
         if (result->realColor(3, 12) != RealColor::RC_EMPTY) {
             result->restFramesUserCanPlay = 0;
             result->userState.playable = true;
-            result->userState.decisionRequest = true;
         }
     }
 
@@ -343,9 +341,10 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
         return;
 
     // Detected Next1 disappeared
-    result->restFramesUserCanPlay = 1; // TODO(mayah): magic number.
+    result->restFramesUserCanPlay = 2; // TODO(mayah): magic number.
     result->nextPuyoState = NextPuyoState::NEXT2_WILL_DISAPPEAR;
     result->userState.playable = false;
+    result->userState.decisionRequest = true;
     result->setRealColor(NextPuyoPosition::CURRENT_AXIS, result->realColor(NextPuyoPosition::NEXT1_AXIS));
     result->setRealColor(NextPuyoPosition::CURRENT_CHILD, result->realColor(NextPuyoPosition::NEXT1_CHILD));
     result->setRealColor(NextPuyoPosition::NEXT1_AXIS, result->realColor(NextPuyoPosition::NEXT2_AXIS));

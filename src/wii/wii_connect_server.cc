@@ -226,19 +226,19 @@ string WiiConnectServer::makeStateString(int playerId, const AnalyzerResult& re)
 {
     int s1 = 0, s2 = 0;
 
-    s1 |= re.playerResult(0)->userState.playable        ? STATE_YOU_CAN_PLAY   : 0;
-    s1 |= re.playerResult(0)->userState.wnextAppeared   ? STATE_WNEXT_APPEARED : 0;
-    s1 |= re.playerResult(0)->userState.grounded        ? STATE_YOU_GROUNDED   : 0;
+    s1 |= re.playerResult(0)->userState.playable        ? STATE_YOU_CAN_PLAY     : 0;
+    s1 |= re.playerResult(0)->userState.wnextAppeared   ? STATE_WNEXT_APPEARED   : 0;
+    s1 |= re.playerResult(0)->userState.grounded        ? STATE_YOU_GROUNDED     : 0;
     s1 |= re.playerResult(0)->userState.decisionRequest ? STATE_DECISION_REQUEST : 0;
-    s1 |= re.playerResult(0)->userState.chainFinished   ? STATE_CHAIN_DONE     : 0;
-    s1 |= re.playerResult(0)->userState.ojamaDropped    ? STATE_OJAMA_DROPPED  : 0;
+    s1 |= re.playerResult(0)->userState.chainFinished   ? STATE_CHAIN_DONE       : 0;
+    s1 |= re.playerResult(0)->userState.ojamaDropped    ? STATE_OJAMA_DROPPED    : 0;
 
-    s2 |= re.playerResult(1)->userState.playable        ? STATE_YOU_CAN_PLAY   : 0;
-    s2 |= re.playerResult(1)->userState.wnextAppeared   ? STATE_WNEXT_APPEARED : 0;
-    s2 |= re.playerResult(1)->userState.grounded        ? STATE_YOU_GROUNDED   : 0;
+    s2 |= re.playerResult(1)->userState.playable        ? STATE_YOU_CAN_PLAY     : 0;
+    s2 |= re.playerResult(1)->userState.wnextAppeared   ? STATE_WNEXT_APPEARED   : 0;
+    s2 |= re.playerResult(1)->userState.grounded        ? STATE_YOU_GROUNDED     : 0;
     s2 |= re.playerResult(1)->userState.decisionRequest ? STATE_DECISION_REQUEST : 0;
-    s2 |= re.playerResult(1)->userState.chainFinished   ? STATE_CHAIN_DONE     : 0;
-    s2 |= re.playerResult(1)->userState.ojamaDropped    ? STATE_OJAMA_DROPPED  : 0;
+    s2 |= re.playerResult(1)->userState.chainFinished   ? STATE_CHAIN_DONE       : 0;
+    s2 |= re.playerResult(1)->userState.ojamaDropped    ? STATE_OJAMA_DROPPED    : 0;
 
     int s = playerId == 0 ? (s1 | (s2 << 1)) : (s2 | (s1 << 1));
 
