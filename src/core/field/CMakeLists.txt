@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_core_field
-            core_field.cc field_pretty_printer.cc rensa_result.cc)
+            core_field.cc rensa_result.cc)
 
 # ----------------------------------------------------------------------
 # test
