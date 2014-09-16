@@ -12,7 +12,7 @@
 #include "core/algorithm/rensa_detector.h"
 #include "core/client/connector/drop_decision.h"
 #include "core/field/core_field.h"
-#include "core/field/field_pretty_printer.h"
+#include "core/field_pretty_printer.h"
 #include "core/frame_data.h"
 #include "core/kumipuyo.h"
 #include "core/sequence_generator.h"

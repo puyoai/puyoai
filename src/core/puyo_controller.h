@@ -67,17 +67,9 @@ struct MovingKumipuyoState {
 
 class PuyoController {
 public:
-    struct ParameterForDuel {
-        static const int FRAMES_CONTINUOUS_TURN_PROHIBITED = 1;
-        static const int FRAMES_CONTINUOUS_ARROW_PROHIBITED = 0;
-    };
+    static const int FRAMES_CONTINUOUS_TURN_PROHIBITED = 1;
+    static const int FRAMES_CONTINUOUS_ARROW_PROHIBITED = 1;
 
-    struct ParameterForWii {
-        static const int FRAMES_CONTINUOUS_TURN_PROHIBITED = 1;
-        static const int FRAMES_CONTINUOUS_ARROW_PROHIBITED = 1;
-    };
-
-    template<typename Parameter = ParameterForDuel>
     static void moveKumipuyo(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted = nullptr);
 
     static bool isReachable(const PlainField&, const Decision&);
@@ -86,24 +78,18 @@ public:
     // Finds a key stroke to move puyo from |MovingKumipuyoState| to |Decision|.
     // When there is not such a way, the returned KeySetSeq would be empty sequence.
     static KeySetSeq findKeyStroke(const CoreField&, const MovingKumipuyoState&, const Decision&);
-    // TODO(mayah): Should we put this here?
-    static KeySetSeq findKeyStrokeForWii(const CoreField&, const Decision&);
 
+    // TODO(mayah): Move these to private section?
     // Fast, but usable in limited situation.
     static KeySetSeq findKeyStrokeFastpath(const CoreField&, const MovingKumipuyoState&, const Decision&);
-    static KeySetSeq findKeyStrokeFastpathForWii(const CoreField&, const MovingKumipuyoState&, const Decision&);
     // This is faster, but might output worse key stroke.
     static KeySetSeq findKeyStrokeOnline(const PlainField&, const MovingKumipuyoState&, const Decision&);
-
     // This is slow, but precise.
-    template<typename Parameter = ParameterForDuel>
     static KeySetSeq findKeyStrokeByDijkstra(const PlainField&, const MovingKumipuyoState&, const Decision&);
 
 private:
     // Move kumipuyo using only arrow key. |downAccepted| gets true when DOWN is accepted.
-    template<typename Parameter>
     static void moveKumipuyoByArrowKey(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted);
-    template<typename Parameter>
     static void moveKumipuyoByTurnKey(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* needsFreefallProcess);
     static void moveKumipuyoByFreefall(const PlainField&, MovingKumipuyoState*);
 

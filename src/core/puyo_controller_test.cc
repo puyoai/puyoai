@@ -15,9 +15,9 @@ TEST(PuyoControllerTest, findKeyStrokeFastpathOnEmptyField)
     CoreField f;
     MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
 
-    EXPECT_EQ("<,<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 0)).toString());
-    EXPECT_EQ("<A,<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 1)).toString());
-    EXPECT_EQ("<A,<,vA,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 2)).toString());
+    EXPECT_EQ("<,,<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 0)).toString());
+    EXPECT_EQ("<A,,<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 1)).toString());
+    EXPECT_EQ("<A,,<,vA,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 2)).toString());
 
     EXPECT_EQ("<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(2, 0)).toString());
     EXPECT_EQ("<A,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(2, 1)).toString());
@@ -34,14 +34,14 @@ TEST(PuyoControllerTest, findKeyStrokeFastpathOnEmptyField)
     EXPECT_EQ(">B,v,vB,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 2)).toString());
     EXPECT_EQ(">B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 3)).toString());
 
-    EXPECT_EQ(">,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 0)).toString());
-    EXPECT_EQ(">A,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 1)).toString());
-    EXPECT_EQ(">A,>,vA,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 2)).toString());
-    EXPECT_EQ(">B,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 3)).toString());
+    EXPECT_EQ(">,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 0)).toString());
+    EXPECT_EQ(">A,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 1)).toString());
+    EXPECT_EQ(">A,,>,vA,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 2)).toString());
+    EXPECT_EQ(">B,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 3)).toString());
 
-    EXPECT_EQ(">,>,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 0)).toString());
-    EXPECT_EQ(">B,>,>B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 2)).toString());
-    EXPECT_EQ(">B,>,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 3)).toString());
+    EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 0)).toString());
+    EXPECT_EQ(">B,,>,,>B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 2)).toString());
+    EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 3)).toString());
 }
 
 TEST(PuyoControllerTest, findKeyStrokeOnlineOnEmptyField)
@@ -65,13 +65,13 @@ TEST(PuyoControllerTest, findKeyStrokeByDijkstraOnEmptyField)
 
     EXPECT_EQ("v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(3, 0)).toString());
     EXPECT_EQ("<,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(2, 0)).toString());
-    EXPECT_EQ("<,<,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(1, 0)).toString());
+    EXPECT_EQ("<,,<,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(1, 0)).toString());
     EXPECT_EQ(">,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(4, 0)).toString());
-    EXPECT_EQ(">,>,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(5, 0)).toString());
-    EXPECT_EQ(">,>,>,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(6, 0)).toString());
+    EXPECT_EQ(">,,>,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(5, 0)).toString());
+    EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(6, 0)).toString());
     EXPECT_EQ("A,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(3, 1)).toString());
-    EXPECT_EQ("A,,A,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(3, 2)).toString());
-    EXPECT_EQ(">B,>,>B,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(6, 2)).toString());
+    EXPECT_EQ("B,,B,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(3, 2)).toString());
+    EXPECT_EQ(">,B,>,B,>,v", PuyoController::findKeyStrokeByDijkstra(f, mks, Decision(6, 2)).toString());
 }
 
 TEST(PuyoControllerTest, nonmovable)
@@ -170,7 +170,7 @@ TEST(PuyoControllerTest, subpuyoIsHigher)
 
     MovingKumipuyoState mks(KumipuyoPos(3, 1, 0));
     KeySetSeq kss = PuyoController::findKeyStroke(f, mks, Decision(4, 1));
-    EXPECT_EQ("A,,A,>,B,v", kss.toString());
+    EXPECT_EQ("B,,B,>,B,v", kss.toString());
 }
 
 TEST(PuyoControllerTest, checkHigherField1)
@@ -238,25 +238,5 @@ TEST(PuyoControllerTest, checkHigherField2)
             EXPECT_EQ(x, mks.pos.x);
             EXPECT_EQ(r, mks.pos.r);
         }
-    }
-}
-
-TEST(PuyoControllerTest, dijkstraForWii)
-{
-    CoreField f;
-
-    const string expected[] = {
-        "<,,<,v",
-        "<,v",
-        "v",
-        ">,v",
-        ">,,>,v",
-        ">,,>,,>,v"
-    };
-
-    for (int x = 1; x <= 6; ++x) {
-        MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
-        KeySetSeq kss = PuyoController::findKeyStrokeByDijkstra<PuyoController::ParameterForWii>(f, mks, Decision(x, 0));
-        EXPECT_EQ(expected[x - 1], kss.toString());
     }
 }

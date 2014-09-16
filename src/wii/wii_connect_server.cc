@@ -366,7 +366,8 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
                 field.recalcHeightOn(x);
             }
 
-            keySetSeq = PuyoController::findKeyStrokeForWii(field, d);
+            MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+            keySetSeq = PuyoController::findKeyStroke(field, mks, d);
             if (keySetSeq.empty())
                 continue;
         }

@@ -1,6 +1,6 @@
 #include "core/frame_data.h"
 
-#include "core/field/field_pretty_printer.h"
+#include "core/field_pretty_printer.h"
 
 #include <sstream>
 
