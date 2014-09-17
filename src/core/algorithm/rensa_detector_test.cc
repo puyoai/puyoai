@@ -1,6 +1,7 @@
 #include "core/algorithm/rensa_detector.h"
 
 #include "core/algorithm/rensa_ref_sequence.h"
+#include "core/kumipuyo.h"
 
 #include <gtest/gtest.h>
 #include <algorithm>
@@ -15,6 +16,26 @@ static void dropKeyAndFirePuyos(CoreField* f, const ColumnPuyoList& keyPuyos, co
     for (const auto& p : firePuyos) {
         f->dropPuyoOn(p.x, p.color);
     }
+}
+
+TEST(RensaDetectorTest, feasibleRensas)
+{
+    CoreField f(
+        "BRGY  "
+        "BBRGG "
+        "RRGYYY");
+    KumipuyoSeq seq("BYYY");
+
+    vector<FeasibleRensaInfo> infos = RensaDetector::findFeasibleRensas(f, seq);
+
+    bool found = false;
+    for (const auto info : infos) {
+        if (info.chains() == 4 && info.initiatingFrames() == 0) {
+            found = true;
+        }
+    }
+
+    EXPECT_TRUE(found);
 }
 
 TEST(RensaDetectorTest, iteratePossibleRensa)
