@@ -92,7 +92,13 @@ public:
     const Kumipuyo& front() const { return seq_.front(); }
     void dropFront() { seq_.erase(seq_.begin()); }
 
-    KumipuyoSeq subsequence(int begin, int n) const {
+    std::vector<Kumipuyo>::iterator begin() { return seq_.begin(); }
+    std::vector<Kumipuyo>::const_iterator begin() const { return seq_.cbegin(); }
+    std::vector<Kumipuyo>::iterator end() { return seq_.end(); }
+    std::vector<Kumipuyo>::const_iterator end() const { return seq_.cend(); }
+
+    KumipuyoSeq subsequence(int begin, int n) const
+    {
         KumipuyoSeq seq;
         seq.seq_.assign(seq_.begin() + begin, seq_.begin() + begin + n);
         return seq;
@@ -103,7 +109,6 @@ public:
 
     std::string toString() const;
 
-    const std::vector<Kumipuyo>& underlyingData() const { return seq_; }
     friend bool operator==(const KumipuyoSeq& lhs, const KumipuyoSeq& rhs) { return lhs.seq_ == rhs.seq_; }
     friend bool operator!=(const KumipuyoSeq& lhs, const KumipuyoSeq& rhs) { return !(lhs == rhs); }
 

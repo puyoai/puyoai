@@ -37,7 +37,7 @@ public:
     // Use this directly in test. Otherwise, use via think/thinkFast.
     Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, int depth, int maxIteration);
 
-    void initializeGazerForTest(int frameId) { gazer_.initializeWith(frameId); }
+    void initializeGazerForTest(int frameId) { gazer_.initialize(frameId); }
 
 protected:
     std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration,

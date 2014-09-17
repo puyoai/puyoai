@@ -47,7 +47,7 @@ FieldRealtime::FieldRealtime(int playerId, const KumipuyoSeq& seq) :
     // Since we don't use the first kumipuyo, we need to put EMPTY/EMPTY.
     vector<Kumipuyo> kps;
     kps.push_back(Kumipuyo(PuyoColor::EMPTY, PuyoColor::EMPTY));
-    kps.insert(kps.end(), seq.underlyingData().begin(), seq.underlyingData().end());
+    kps.insert(kps.end(), seq.begin(), seq.end());
     kumipuyoSeq_ = KumipuyoSeq(kps);
 
     init();
