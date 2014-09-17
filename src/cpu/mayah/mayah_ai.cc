@@ -144,7 +144,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
 
     if (gazer_.isRensaOngoing()) {
         ss << "Gazed ongoing rensa : " << gazer_.ongoingRensaInfo().rensaResult.score
-           << " in " << (gazer_.ongoingRensaInfo().finishingRensaFrame - frameId) << " / ";
+           << " in " << (gazer_.ongoingRensaInfo().finishingRensaFrameId - frameId) << " / ";
     } else {
         ss << "Gazed max score = "
            << gazer_.estimateMaxScore(frameId + refPlan.totalFrames())

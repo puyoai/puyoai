@@ -169,6 +169,10 @@ int Gazer::estimateMaxScore(int frameId) const
         return -1;
     }
 
+    if (isRensaOngoing() && frameId <= ongoingRensaInfo().finishingRensaFrameId) {
+        return ongoingRensaInfo().rensaResult.score;
+    }
+
     int scoreByFeasibleRensas = estimateMaxScoreFromFeasibleRensas(frameId);
     if (scoreByFeasibleRensas >= 0)
         return scoreByFeasibleRensas;
