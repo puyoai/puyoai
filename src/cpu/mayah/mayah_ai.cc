@@ -190,10 +190,5 @@ void MayahAI::enemyNext2Appeared(const FrameData& frameData)
     gazer_.updateFeasibleRensas(frameData.enemyPlayerFrameData().field, frameData.enemyPlayerFrameData().kumipuyoSeq);
     gazer_.updatePossibleRensas(frameData.enemyPlayerFrameData().field, frameData.enemyPlayerFrameData().kumipuyoSeq);
 
-    LOG(INFO) << "Possible rensa infos : ";
-    for (auto it = gazer_.possibleRensaInfos().begin(); it != gazer_.possibleRensaInfos().end(); ++it)
-        LOG(INFO) << it->toString();
-    LOG(INFO) << "Feasible rensa infos : ";
-    for (auto it = gazer_.feasibleRensaInfos().begin(); it != gazer_.feasibleRensaInfos().end(); ++it)
-        LOG(INFO) << it->toString();
+    LOG(INFO) << '\n' << gazer_.toRensaInfoString();
 }
