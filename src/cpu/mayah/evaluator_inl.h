@@ -283,7 +283,7 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
     if (gazer.isRensaOngoing() && gazer.ongoingRensaInfo().rensaResult.score > scoreForOjama(6)) {
         if (gazer.ongoingRensaInfo().rensaResult.score >= scoreForOjama(6) &&
             plan.score() >= gazer.ongoingRensaInfo().rensaResult.score &&
-            plan.initiatingFrames() <= gazer.ongoingRensaInfo().finishingRensaFrame) {
+            plan.initiatingFrames() <= gazer.ongoingRensaInfo().finishingRensaFrameId) {
             LOG(INFO) << plan.decisionText() << " TAIOU";
 
             sc->addScore(STRATEGY_TAIOU, 1.0);

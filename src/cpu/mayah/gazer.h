@@ -11,11 +11,11 @@ class KumipuyoSeq;
 
 struct OngoingRensaInfo {
     OngoingRensaInfo() {}
-    OngoingRensaInfo(const RensaResult& rensaResult, int finishingRensaFrame) :
-        rensaResult(rensaResult), finishingRensaFrame(finishingRensaFrame) {}
+    OngoingRensaInfo(const RensaResult& rensaResult, int finishingRensaFrameId) :
+        rensaResult(rensaResult), finishingRensaFrameId(finishingRensaFrameId) {}
 
     RensaResult rensaResult;
-    int finishingRensaFrame;
+    int finishingRensaFrameId;
 };
 
 struct EstimatedRensaInfo {
