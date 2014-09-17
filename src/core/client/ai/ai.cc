@@ -25,6 +25,7 @@ struct DecisionSending {
 AI::AI(int argc, char* argv[], const string& name) :
     name_(name),
     hand_(0),
+    reconsiderRequested_(false),
     difensive_(false)
 {
     UNUSED_VARIABLE(argc);
@@ -57,9 +58,9 @@ void AI::runLoop()
         // TODO(mayah): Maybe game server should send some information that we should initialize.
         if (frameData.id == 1) {
             hand_ = 0;
-            gameWillBegin(frameData);
+            reconsiderRequested_ = false;
             field_.clear();
-
+            gameWillBegin(frameData);
             next1.clear();
         }
         // Update enemy info if necessary.
@@ -109,7 +110,7 @@ void AI::runLoop()
         }
 
         // Reconsider if necessary.
-        if (next1.needsReconsider) {
+        if (next1.needsReconsider || reconsiderRequested_) {
             LOG(INFO) << "RECONSIDER";
 
             resetCurrentField(frameData.myPlayerFrameData().field);
@@ -118,6 +119,7 @@ void AI::runLoop()
             next1.kumipuyo = kumipuyoSeq.get(0);
             next1.ready = true;
             next1.needsReconsider = false;
+            reconsiderRequested_ = false;
         }
 
         // Send
