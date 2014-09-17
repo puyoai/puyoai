@@ -169,6 +169,7 @@ void MayahAI::enemyGrounded(const FrameData& frameData)
     RensaResult rensaResult = field.simulate();
 
     if (rensaResult.chains > 0) {
+        requestReconsider();
         gazer_.setOngoingRensa(OngoingRensaInfo(rensaResult, frameData.id + rensaResult.frames));
     } else {
         gazer_.unsetOngoingRensa();

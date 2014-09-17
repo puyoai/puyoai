@@ -51,6 +51,9 @@ protected:
     // You can update the enemy information here.
     virtual void enemyNext2Appeared(const FrameData&) {}
 
+    // Should reconsider just before sending next decision.
+    void requestReconsider() { reconsiderRequested_ = true; }
+
     void setDifensive(bool flag) { difensive_ = flag; }
 
 private:
@@ -60,6 +63,7 @@ private:
     ClientConnector connector_;
     CoreField field_;  // estimated my field.
     int hand_;
+    bool reconsiderRequested_;
     bool difensive_;
 };
 
