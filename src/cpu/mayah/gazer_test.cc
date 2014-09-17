@@ -14,7 +14,7 @@ protected:
     {
         TsumoPossibility::initialize();
         gazer_.reset(new Gazer());
-        gazer_->initializeWith(100);
+        gazer_->initialize(100);
     }
 
     virtual void TearDown() override
@@ -44,7 +44,7 @@ TEST_F(GazerTest, dontCrash)
                 "BBOBBR");
 
     KumipuyoSeq seq("BBRBYB");
-    gazer_->updatePossibleRensas(f, seq);
+    gazer_->gaze(100, f, seq);
 }
 
 TEST_F(GazerTest, feasibleRensas)
@@ -54,10 +54,23 @@ TEST_F(GazerTest, feasibleRensas)
         "BBRBBB"
         "RRYGGG");
     KumipuyoSeq seq("BYRRGG");
-    gazer_->updateFeasibleRensas(f, seq);
-    gazer_->updatePossibleRensas(f, seq);
+    gazer_->gaze(100, f, seq);
 
     // Gazer should find a rensa with the first BY.
     // 2280 = basic score of 4 rensa.
-    EXPECT_EQ(2280, gazer_->estimateMaxScore(0)) << gazer_->toRensaInfoString();
+    EXPECT_EQ(2280, gazer_->estimateMaxScore(100)) << gazer_->toRensaInfoString();
+}
+
+TEST_F(GazerTest, empty)
+{
+    CoreField f;
+    KumipuyoSeq seq("BYRRGG");
+    gazer_->gaze(100, f, seq);
+
+    for (int i = 100; i < 1000; i += 10)
+        cout << i << ' ' << gazer_->estimateMaxScore(i) << endl;
+
+    // Gazer should find a rensa with the first BY.
+    // 2280 = basic score of 4 rensa.
+    EXPECT_EQ(2280, gazer_->estimateMaxScore(100)) << gazer_->toRensaInfoString();
 }

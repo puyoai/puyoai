@@ -22,7 +22,7 @@ protected:
         Evaluator evaluator(parameter, books);
         Gazer gazer;
 
-        gazer.initializeWith(1);
+        gazer.initialize(100);
 
         vector<Decision> decisions { Decision(3, 0) };
         RensaResult rensaResult;

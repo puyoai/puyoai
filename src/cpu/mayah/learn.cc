@@ -243,7 +243,7 @@ void learnFromPuyofu()
     Gazer gazer;
 
     const int frameId = 1;
-    gazer.initializeWith(frameId);
+    gazer.initialize(frameId);
 
     while (true) {
         vector<FrameInput> inputs = readUntilGameEnd();

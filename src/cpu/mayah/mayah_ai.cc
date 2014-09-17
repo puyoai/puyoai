@@ -48,7 +48,7 @@ void MayahAI::gameWillBegin(const FrameData& frameData)
 {
     thoughtMaxRensa_ = 0;
     thoughtMaxScore_ = 0;
-    gazer_.initializeWith(frameData.id);
+    gazer_.initialize(frameData.id);
 }
 
 void MayahAI::gameHasEnded(const FrameData&)
@@ -142,7 +142,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
 
-    if (gazer_.rensaIsOngoing()) {
+    if (gazer_.isRensaOngoing()) {
         ss << "Gazed ongoing rensa : " << gazer_.ongoingRensaInfo().rensaResult.score
            << " in " << (gazer_.ongoingRensaInfo().finishingRensaFrame - frameId) << " / ";
     } else {
@@ -162,18 +162,17 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
 
 void MayahAI::enemyGrounded(const FrameData& frameData)
 {
-    gazer_.setId(frameData.id);
-
     // --- Check if Rensa starts.
     CoreField field(frameData.enemyPlayerFrameData().field);
     field.forceDrop();
 
     RensaResult rensaResult = field.simulate();
 
-    if (rensaResult.chains > 0)
+    if (rensaResult.chains > 0) {
         gazer_.setOngoingRensa(OngoingRensaInfo(rensaResult, frameData.id + rensaResult.frames));
-    else
-        gazer_.setRensaIsOngoing(false);
+    } else {
+        gazer_.unsetOngoingRensa();
+    }
 }
 
 void MayahAI::enemyNext2Appeared(const FrameData& frameData)
@@ -184,11 +183,7 @@ void MayahAI::enemyNext2Appeared(const FrameData& frameData)
     if (!isNormalColor(seq.axis(0)) || !isNormalColor(seq.child(0)))
         return;
 
-    int currentFrameId = frameData.id;
-
-    gazer_.setId(currentFrameId);
-    gazer_.updateFeasibleRensas(frameData.enemyPlayerFrameData().field, frameData.enemyPlayerFrameData().kumipuyoSeq);
-    gazer_.updatePossibleRensas(frameData.enemyPlayerFrameData().field, frameData.enemyPlayerFrameData().kumipuyoSeq);
+    gazer_.gaze(frameData.id, frameData.enemyPlayerFrameData().field, frameData.enemyPlayerFrameData().kumipuyoSeq);
 
     LOG(INFO) << '\n' << gazer_.toRensaInfoString();
 }

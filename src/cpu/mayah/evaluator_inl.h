@@ -280,7 +280,7 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
     if (!plan.isRensaPlan())
         return false;
 
-    if (gazer.rensaIsOngoing() && gazer.ongoingRensaInfo().rensaResult.score > scoreForOjama(6)) {
+    if (gazer.isRensaOngoing() && gazer.ongoingRensaInfo().rensaResult.score > scoreForOjama(6)) {
         if (gazer.ongoingRensaInfo().rensaResult.score >= scoreForOjama(6) &&
             plan.score() >= gazer.ongoingRensaInfo().rensaResult.score &&
             plan.initiatingFrames() <= gazer.ongoingRensaInfo().finishingRensaFrame) {
@@ -339,7 +339,7 @@ void evalRensaStrategy(ScoreCollector* sc, const RefPlan& plan, const RensaResul
 
     // TODO(mayah): Ah, maybe sakiuchi etc. wins this value?
     if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) && rensaResult.chains >= 7 &&
-        keyPuyos.size() + firePuyos.size() <= 3 && !gazer.rensaIsOngoing()) {
+        keyPuyos.size() + firePuyos.size() <= 3 && !gazer.isRensaOngoing()) {
         sc->addScore(STRATEGY_SAISOKU, 1);
     }
 }

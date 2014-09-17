@@ -39,52 +39,43 @@ struct EstimatedRensaInfo {
 
 class Gazer : noncopyable {
 public:
-    void initializeWith(int id) {
-        setId(id);
-        setRensaIsOngoing(false);
-        m_feasibleRensaInfos.clear();
-        m_possibleRensaInfos.clear();
-    }
+    void initialize(int frameIdGameWillBegin);
 
-    void setId(int id) { m_id = id; }
-    int id() const { return m_id; }
+    void setFrameIdGazedAt(int frameId) { frameIdGazedAt_ = frameId; }
+    int frameIdGazedAt() const { return frameIdGazedAt_; }
 
-    void setRensaIsOngoing(bool ongoing) { m_rensaIsOngoing = ongoing; }
     void setOngoingRensa(const OngoingRensaInfo&);
-    bool rensaIsOngoing() const { return m_rensaIsOngoing; }
-    const OngoingRensaInfo& ongoingRensaInfo() const { return m_ongoingRensaInfo; }
+    void unsetOngoingRensa() { isRensaOngoing_ = false; }
+    bool isRensaOngoing() const { return isRensaOngoing_; }
+    const OngoingRensaInfo& ongoingRensaInfo() const { return ongoingRensaInfo_; }
 
-    void updateFeasibleRensas(const CoreField&, const KumipuyoSeq&);
-    void updatePossibleRensas(const CoreField&, const KumipuyoSeq&);
+    void gaze(int frameId, const CoreField&, const KumipuyoSeq&);
 
     // Returns the (expecting) possible max score by this frame.
     int estimateMaxScore(int frameId) const;
-    int estimateMaxScoreFromFeasibleRensas(int frameId) const;
-    int estimateMaxScoreFromPossibleRensas(int frameId) const;
-
-    const std::vector<EstimatedRensaInfo>& possibleRensaInfos() const { return m_possibleRensaInfos; }
-    const std::vector<EstimatedRensaInfo>& feasibleRensaInfos() const { return m_feasibleRensaInfos; }
 
     std::string toRensaInfoString() const;
 
 private:
+    int estimateMaxScoreFromFeasibleRensas(int frameId) const;
+    int estimateMaxScoreFromPossibleRensas(int frameId) const;
     int estimateMaxScoreFrom(int frameId, const std::vector<EstimatedRensaInfo>& rensaInfos) const;
 
-    int m_id;
-    bool m_rensaIsOngoing;
-    OngoingRensaInfo m_ongoingRensaInfo;
+    void updateFeasibleRensas(const CoreField&, const KumipuyoSeq&);
+    void updatePossibleRensas(const CoreField&, const KumipuyoSeq&);
+
+    const std::vector<EstimatedRensaInfo>& possibleRensaInfos() const { return possibleRensaInfos_; }
+    const std::vector<EstimatedRensaInfo>& feasibleRensaInfos() const { return feasibleRensaInfos_; }
+
+    int frameIdGazedAt_;
+    bool isRensaOngoing_;
+    OngoingRensaInfo ongoingRensaInfo_;
 
     // --- For these rensaInfos, frames means the initiatingFrames.
     // Fiesible Rensa is the Rensa the enemy can really fire in current/next/nextnext tsumo.
-    std::vector<EstimatedRensaInfo> m_feasibleRensaInfos;
+    std::vector<EstimatedRensaInfo> feasibleRensaInfos_;
     // Possible Rensa is the Rensa the enemy will build in future.
-    std::vector<EstimatedRensaInfo> m_possibleRensaInfos;
+    std::vector<EstimatedRensaInfo> possibleRensaInfos_;
 };
-
-inline void Gazer::setOngoingRensa(const OngoingRensaInfo& info)
-{
-     m_rensaIsOngoing = true;
-     m_ongoingRensaInfo = info;
-}
 
 #endif
