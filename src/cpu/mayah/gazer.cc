@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <sstream>
 
 #include <glog/logging.h>
 
@@ -208,4 +209,17 @@ int Gazer::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInfo>& r
     }
 
     return -1;
+}
+
+string Gazer::toRensaInfoString() const
+{
+    stringstream ss;
+    ss << "Possible rensa infos : " << endl;
+    for (const auto& info : possibleRensaInfos())
+        ss << info.toString() << endl;
+    ss << "Feasible rensa infos : " << endl;
+    for (const auto& info : feasibleRensaInfos())
+        ss << info.toString() << endl;
+
+    return ss.str();
 }

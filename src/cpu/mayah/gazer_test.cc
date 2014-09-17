@@ -1,19 +1,33 @@
 #include "gazer.h"
 
+#include <memory>
 #include <gtest/gtest.h>
+
 #include "core/algorithm/puyo_possibility.h"
 #include "core/kumipuyo.h"
 
 using namespace std;
 
-TEST(GazerTest, dontCrash)
+class GazerTest : public testing::Test {
+protected:
+    virtual void SetUp() override
+    {
+        TsumoPossibility::initialize();
+        gazer_.reset(new Gazer());
+        gazer_->initializeWith(100);
+    }
+
+    virtual void TearDown() override
+    {
+        gazer_.reset();
+    }
+
+    std::unique_ptr<Gazer> gazer_;
+};
+
+TEST_F(GazerTest, dontCrash)
 {
     // Should not crash in this test case.
-
-    TsumoPossibility::initialize();
-
-    Gazer gazer;
-    gazer.initializeWith(100);
 
     CoreField f(" O    "
                 " O O  " // 12
@@ -29,6 +43,21 @@ TEST(GazerTest, dontCrash)
                 "OBOYOO"
                 "BBOBBR");
 
-    KumipuyoSeq kumipuyos("BBRBYB");
-    gazer.updatePossibleRensas(f, kumipuyos);
+    KumipuyoSeq seq("BBRBYB");
+    gazer_->updatePossibleRensas(f, seq);
+}
+
+TEST_F(GazerTest, feasibleRensas)
+{
+    CoreField f(
+        "BRBG  "
+        "BBRBBB"
+        "RRYGGG");
+    KumipuyoSeq seq("BYRRGG");
+    gazer_->updateFeasibleRensas(f, seq);
+    gazer_->updatePossibleRensas(f, seq);
+
+    // Gazer should find a rensa with the first BY.
+    // 2280 = basic score of 4 rensa.
+    EXPECT_EQ(2280, gazer_->estimateMaxScore(0)) << gazer_->toRensaInfoString();
 }

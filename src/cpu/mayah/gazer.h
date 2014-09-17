@@ -65,6 +65,8 @@ public:
     const std::vector<EstimatedRensaInfo>& possibleRensaInfos() const { return m_possibleRensaInfos; }
     const std::vector<EstimatedRensaInfo>& feasibleRensaInfos() const { return m_feasibleRensaInfos; }
 
+    std::string toRensaInfoString() const;
+
 private:
     int estimateMaxScoreFrom(int frameId, const std::vector<EstimatedRensaInfo>& rensaInfos) const;
 
