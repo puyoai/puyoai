@@ -124,12 +124,12 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
         ss << "LARGE_ENOUGH / ";
     if (cf.feature(STRATEGY_TSUBUSHI) > 0)
         ss << "TSUBUSHI / ";
-    if (cf.feature(STRATEGY_SAKIUCHI) > 0)
+    if (cf.feature(STRATEGY_SAISOKU) > 0)
+        ss << "SAISOKU / ";
+    else if (cf.feature(STRATEGY_SAKIUCHI) > 0)
         ss << "SAKIUCHI / ";
     if (cf.feature(STRATEGY_HOUWA) > 0)
         ss << "HOUWA / ";
-    if (cf.feature(STRATEGY_SAISOKU) > 0)
-        ss << "SAISOKU / ";
 
     if (!cf.bookName().empty())
         ss << cf.bookName() << " / ";
