@@ -230,7 +230,7 @@ void evalValleyDepthRidgeHeight(ScoreCollector* sc, const RefPlan& plan)
 template<typename ScoreCollector>
 void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
 {
-    static int DIFF[CoreField::MAP_WIDTH] = {
+    static const int DIFF[CoreField::MAP_WIDTH] = {
         0, -3, 0, 1, 1, 0, -3, 0,
     };
 
@@ -338,7 +338,7 @@ void evalRensaStrategy(ScoreCollector* sc, const RefPlan& plan, const RensaResul
     UNUSED_VARIABLE(currentFrameId);
 
     // TODO(mayah): Ah, maybe sakiuchi etc. wins this value?
-    if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) && rensaResult.chains >= 7 &&
+    if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) && plan.chains() <= 3 && rensaResult.chains >= 7 &&
         keyPuyos.size() + firePuyos.size() <= 3 && !gazer.isRensaOngoing()) {
         sc->addScore(STRATEGY_SAISOKU, 1);
     }
