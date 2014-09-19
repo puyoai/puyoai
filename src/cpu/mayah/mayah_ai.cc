@@ -87,20 +87,36 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
 {
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
 
+    int bestRensaScore = 0;
+    int bestVirtualRensaScore = 0;
+    Plan bestRensaPlan;
+
     double bestScore = -100000000.0;
     Plan bestPlan;
-    Plan::iterateAvailablePlans(field, kumipuyoSeq, depth,
-                                [this, frameId, maxIteration, &field, &bestScore, &bestPlan](const RefPlan& plan) {
-        double score = Evaluator(*featureParameter_, books_).eval(plan, field, frameId, maxIteration, gazer_);
-        if (bestScore < score) {
-            bestScore = score;
+    auto f = [&, this, frameId, maxIteration](const RefPlan& plan) {
+        EvalResult evalResult = Evaluator(*featureParameter_, books_).eval(plan, field, frameId, maxIteration, gazer_);
+        if (bestScore < evalResult.score()) {
+            bestScore = evalResult.score();
             bestPlan = plan.toPlan();
+        }
+
+        if (bestVirtualRensaScore < evalResult.maxVirtualScore()) {
+            bestVirtualRensaScore = evalResult.maxVirtualScore();
+        }
+
+        if (bestRensaScore < plan.score()) {
+            bestRensaScore = plan.score();
+            bestRensaPlan = plan.toPlan();
         }
 
         thoughtMaxScore_ = max(thoughtMaxScore_, plan.score());
         thoughtMaxRensa_ = max(thoughtMaxRensa_, plan.chains());
-    });
+    };
 
+    Plan::iterateAvailablePlans(field, kumipuyoSeq, depth, f);
+    if (bestVirtualRensaScore < bestRensaScore) {
+        return bestRensaPlan;
+    }
     return bestPlan;
 }
 

@@ -500,6 +500,8 @@ void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const
         evalFieldUShape(sc, plan);
     evalUnreachableSpace(sc, plan);
 
+    int numPuyo = currentField.countPuyos();
+    int maxVirtualRensaResultScore = 0;
     double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
     std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
@@ -521,12 +523,25 @@ void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const
             maxRensaScore = rensaScoreCollector->score();
             maxRensaScoreCollector = move(rensaScoreCollector);
         }
+
+        double rensaScore = rensaResult.score;
+        if (numPuyo > 63)
+            rensaScore *= 0.5;
+        else if (numPuyo > 61)
+            rensaScore *= 0.75;
+        else if (numPuyo > 55)
+            rensaScore *= 0.85;
+
+        if (maxVirtualRensaResultScore < rensaScore) {
+            maxVirtualRensaResultScore = rensaScore;
+        }
     };
 
     RensaDetector::iteratePossibleRensasIteratively(plan.field(), maxIteration, callback);
 
     if (maxRensaScoreCollector.get())
         sc->merge(*maxRensaScoreCollector);
+    sc->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }
 
 #endif
