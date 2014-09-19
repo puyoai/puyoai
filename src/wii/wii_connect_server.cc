@@ -297,7 +297,6 @@ string WiiConnectServer::makeMessageFor(int playerId, int frameId, const Analyze
     }
     ss << " YX=3 YY=12 YR=0 OX=3 OY=12 OR=0";
     ss << " YO=0 OO=0 YS=0 OS=0";
-    ss << "\n";
 
     return ss.str();
 }
