@@ -178,6 +178,20 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
 
 bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyzerResult)
 {
+    // Send KeySet() after detecting ojama-drop or grounded.
+    // It's important that it is sent before requesting the decision to client,
+    // because client may take time to return the rensponse.
+    // Otherwise, puyo might be dropped for a few frames.
+    for (int pi = 0; pi < 2; ++pi) {
+        if (!isAi_[pi])
+            continue;
+
+        if (analyzerResult.playerResult(pi)->userState.ojamaDropped ||
+            analyzerResult.playerResult(pi)->userState.grounded) {
+            keySender_->sendKey(KeySet());
+        }
+    }
+
     for (int pi = 0; pi < 2; pi++) {
         if (!connector_->connector(pi)->alive()) {
             LOG(INFO) << playerText(pi) << " disconnected";
@@ -198,7 +212,6 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 
         if (analyzerResult.playerResult(pi)->userState.grounded) {
             lastDecision_[pi] = Decision();
-            keySender_->sendKey(KeySet());
         }
 
         outputKeys(pi, analyzerResult, data[pi]);
