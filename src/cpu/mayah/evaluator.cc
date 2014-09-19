@@ -84,12 +84,13 @@ string CollectedFeature::toStringComparingWith(const CollectedFeature& cf) const
     return ss.str();
 }
 
-double Evaluator::eval(const RefPlan& plan, const CoreField& currentField,
-                       int currentFrameId, int maxIteration, const Gazer& gazer)
+EvalResult Evaluator::eval(const RefPlan& plan, const CoreField& currentField,
+                           int currentFrameId, int maxIteration, const Gazer& gazer)
 {
     NormalScoreCollector sc(param_);
     collectScore(&sc, books_, plan, currentField, currentFrameId, maxIteration, gazer);
-    return sc.score();
+
+    return EvalResult(sc.score(), sc.estimatedRensaScore());
 }
 
 CollectedFeature Evaluator::evalWithCollectingFeature(const RefPlan& plan, const CoreField& currentField,

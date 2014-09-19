@@ -61,6 +61,18 @@ private:
     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures_;
 };
 
+class EvalResult {
+public:
+    constexpr EvalResult(double score, int maxVirtualScore) : score_(score), maxVirtualScore_(maxVirtualScore) {}
+
+    double score() const { return score_; }
+    int maxVirtualScore() const { return maxVirtualScore_; }
+
+private:
+    double score_;
+    int maxVirtualScore_;
+};
+
 // This collector collects score and bookname.
 class NormalScoreCollector {
 public:
@@ -76,9 +88,13 @@ public:
     double score() const { return score_; }
     const FeatureParameter& featureParameter() const { return param_; }
 
+    void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
+    int estimatedRensaScore() const { return estimatedRensaScore_; }
+
 private:
     const FeatureParameter& param_;
     double score_ = 0.0;
+    int estimatedRensaScore_ = 0;
     std::string bookName_;
 };
 
@@ -121,6 +137,9 @@ public:
     double score() const { return collector_.score(); }
     const FeatureParameter& featureParameter() const { return collector_.featureParameter(); }
 
+    void setEstimatedRensaScore(int s) { collector_.setEstimatedRensaScore(s); }
+    int estimatedRensaScore() const { return collector_.estimatedRensaScore(); }
+
     CollectedFeature toCollectedFeature() const {
         return CollectedFeature {
             score(),
@@ -140,7 +159,7 @@ class Evaluator {
 public:
     Evaluator(const FeatureParameter& param, const std::vector<BookField>& books) : param_(param), books_(books) {}
 
-    double eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration, const Gazer&);
+    EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration, const Gazer&);
     // Same as eval(), but returns CollectedFeature.
     CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration, const Gazer&);
 
