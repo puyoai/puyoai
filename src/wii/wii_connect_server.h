@@ -12,7 +12,6 @@
 #include "base/base.h"
 #include "capture/analyzer_result_drawer.h"
 #include "core/decision.h"
-#include "core/field/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/puyo_color.h"
 #include "core/real_color.h"
@@ -31,11 +30,10 @@ public:
     ~WiiConnectServer();
 
     virtual void draw(Screen*) override;
+    virtual std::unique_ptr<AnalyzerResult> analyzerResult() const override;
 
     bool start();
     void stop();
-
-    virtual std::unique_ptr<AnalyzerResult> analyzerResult() const override;
 
 private:
     void reset();
