@@ -166,11 +166,9 @@ private:
     std::unique_ptr<PlayerAnalyzerResult>
     analyzePlayerFieldOnLevelSelect(const DetectedField&, const std::vector<const PlayerAnalyzerResult*>& previousResults);
 
-    enum ForLevelSelectEnum { FOR_LEVEL_SELECT, FOR_RUNNING };
-    void analyzeNext(const DetectedField&, const std::vector<const PlayerAnalyzerResult*>& previousResults,
-                     PlayerAnalyzerResult*, ForLevelSelectEnum);
-    void analyzeField(const DetectedField&, const std::vector<const PlayerAnalyzerResult*>& previousResults,
-                      PlayerAnalyzerResult*, ForLevelSelectEnum);
+    void analyzeNext(const DetectedField&,
+                     const std::vector<const PlayerAnalyzerResult*>& previousResults,
+                     PlayerAnalyzerResult*);
 
     void analyzeNextForLevelSelect(const DetectedField&, PlayerAnalyzerResult*);
     void analyzeNextWhenPreviousResultDoesNotExist(const DetectedField&, PlayerAnalyzerResult*);
@@ -178,6 +176,11 @@ private:
     void analyzeNextForStateStable(const DetectedField&, PlayerAnalyzerResult*);
     void analyzeNextForStateNext2WillDisappear(const DetectedField&, PlayerAnalyzerResult*);
     void analyzeNextForStateNext2WillAppear(const DetectedField&, PlayerAnalyzerResult*);
+
+    void analyzeField(const DetectedField&,
+                      const std::vector<const PlayerAnalyzerResult*>& previousResults,
+                      PlayerAnalyzerResult*);
+    void analyzeFieldForLevelSelect(const DetectedField& detectedField, PlayerAnalyzerResult* result);
 
     int countVanishing(RealColor puyos[6][12], bool vanishing[6][12]);
 };

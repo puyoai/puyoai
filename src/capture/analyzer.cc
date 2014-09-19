@@ -183,8 +183,9 @@ Analyzer::analyzePlayerFieldOnLevelSelect(const DetectedField& detectedField, co
         result->userState.clearEventStates();
     }
 
-    analyzeNext(detectedField, previousResults, result.get(), FOR_LEVEL_SELECT);
-    analyzeField(detectedField, previousResults, result.get(), FOR_LEVEL_SELECT);
+    // Note that Next should be analyzed before Field, since we use the result of the analysis.
+    analyzeNextForLevelSelect(detectedField, result.get());
+    analyzeFieldForLevelSelect(detectedField, result.get());
 
     result->resetCurrentPuyoState();
 
@@ -205,8 +206,8 @@ Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<co
     }
 
     // Note that Next should be analyzed before Field, since we use the result of the analysis.
-    analyzeNext(detectedField, previousResults, result.get(), FOR_RUNNING);
-    analyzeField(detectedField, previousResults, result.get(), FOR_RUNNING);
+    analyzeNext(detectedField, previousResults, result.get());
+    analyzeField(detectedField, previousResults, result.get());
 
     // --- Finalize the current state
     if (result->restFramesUserCanPlay > 0) {
@@ -226,15 +227,10 @@ Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<co
     return result;
 }
 
-void Analyzer::analyzeNext(const DetectedField& detectedField, const vector<const PlayerAnalyzerResult*>& previousResults,
-                           PlayerAnalyzerResult* result, Analyzer::ForLevelSelectEnum forLevelSelectEnum)
+void Analyzer::analyzeNext(const DetectedField& detectedField,
+                           const vector<const PlayerAnalyzerResult*>& previousResults,
+                           PlayerAnalyzerResult* result)
 {
-    // When selecting a level, there will not exist any obstracle.
-    // So, we don't need to stabilize next2, maybe.
-    if (forLevelSelectEnum == FOR_LEVEL_SELECT) {
-        return analyzeNextForLevelSelect(detectedField, result);
-    }
-
     // When the previous result does not exist, we will estimate from the current field.
     if (previousResults.empty()) {
         return analyzeNextWhenPreviousResultDoesNotExist(detectedField, result);
@@ -399,22 +395,11 @@ void Analyzer::analyzeNextForStateNext2WillAppear(const DetectedField& detectedF
     }
 }
 
-void Analyzer::analyzeField(const DetectedField& detectedField, const vector<const PlayerAnalyzerResult*>& previousResults,
-                            PlayerAnalyzerResult* result, ForLevelSelectEnum forLevelSelectEnum)
+void Analyzer::analyzeField(const DetectedField& detectedField,
+                            const vector<const PlayerAnalyzerResult*>& previousResults,
+                            PlayerAnalyzerResult* result)
 {
     result->detectedField = detectedField;
-
-    if (forLevelSelectEnum == FOR_LEVEL_SELECT) {
-        // On LevelSelect state, the whole field should be EMPTY.
-        for (int x = 1; x <= 6; ++x) {
-            for (int y = 1; y <= 12; ++y) {
-                result->setRealColor(x, y, RealColor::RC_EMPTY);
-                result->setVanishing(x, y, false);
-            }
-        }
-
-        return;
-    }
 
     // When the previous result does not empty, we use the detected field as is.
     if (previousResults.empty()) {
@@ -513,6 +498,19 @@ void Analyzer::analyzeField(const DetectedField& detectedField, const vector<con
             result->setRealColor(x, y, rc);
             if (rc == RealColor::RC_EMPTY)
                 shouldEmpty = true;
+        }
+    }
+}
+
+void Analyzer::analyzeFieldForLevelSelect(const DetectedField& detectedField, PlayerAnalyzerResult* result)
+{
+    result->detectedField = detectedField;
+
+    // On LevelSelect state, the whole field should be EMPTY.
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            result->setRealColor(x, y, RealColor::RC_EMPTY);
+            result->setVanishing(x, y, false);
         }
     }
 }
