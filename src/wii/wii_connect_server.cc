@@ -58,9 +58,6 @@ void WiiConnectServer::reset()
     for (int i = 0; i < 2; ++i) {
         lastDecision_[i] = Decision();
         estimatedKeySec_[i] = 0;
-        for (int j = 0; j < 6; ++j)
-            invisiblePuyoColors_[i][j] = PuyoColor::EMPTY;
-        currentPuyo_[i] = Kumipuyo();
     }
 
     colorMap_.clear();

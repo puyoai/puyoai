@@ -71,9 +71,6 @@ private:
     bool isAi_[2];
     Decision lastDecision_[2];
     double estimatedKeySec_[2];
-    PuyoColor invisiblePuyoColors_[2][6];
-    Kumipuyo currentPuyo_[2];
-
 };
 
 #endif
