@@ -5,6 +5,7 @@
 
 #include "capture/analyzer.h"
 #include "capture/source.h"
+#include "core/field/core_field.h"
 #include "core/player.h"
 #include "core/puyo_color.h"
 #include "core/puyo_controller.h"
