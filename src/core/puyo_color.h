@@ -28,9 +28,9 @@ constexpr PuyoColor NORMAL_PUYO_COLORS[] {
 // Returns puyo color from character.
 PuyoColor toPuyoColor(char);
 
+constexpr int ordinal(PuyoColor c) { return static_cast<int>(c); }
 // Converts PuyoColor to character.
 char toChar(PuyoColor, char charIfEmpty = ' ');
-
 std::string toString(PuyoColor);
 
 // Returns true if puyo is normal color puyo.
