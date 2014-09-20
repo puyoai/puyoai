@@ -285,6 +285,7 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
             if (k >= 3) {
                 result->setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
                 result->setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
+                // TODO(mayah): Need to check NEXT1 has been found?
                 result->userState.wnextAppeared = true;
                 result->next2Puyos.clear();
             }
