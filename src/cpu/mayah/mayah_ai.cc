@@ -8,7 +8,6 @@
 #include "base/time.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
-#include "core/client/connector/drop_decision.h"
 #include "core/frame_data.h"
 
 #include "book_field.h"

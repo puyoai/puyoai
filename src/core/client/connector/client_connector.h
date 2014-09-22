@@ -3,14 +3,12 @@
 
 #include "core/frame_data.h"
 
-class DropDecision;
+class ClientFrameResponse;
 
 class ClientConnector {
 public:
     FrameData receive();
-
-    void sendWithoutDecision(int frameId);
-    void send(int frameId, const DropDecision&);
+    void send(const ClientFrameResponse&);
 };
 
 #endif
