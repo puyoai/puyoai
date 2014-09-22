@@ -85,7 +85,7 @@ string PlayerAnalyzerResult::toString() const
     ss << "nextPuyoState: " << static_cast<int>(nextPuyoState) << endl;
     ss << "userState" << userState.toString() << endl;
 
-    ss << "Detected Field    Analyzed Field" << endl;
+    ss << "Detected Field    Adjusted Field" << endl;
     ss << "########          ########" << endl;
     for (int y = 11; y >= 0; --y) {
         ss << '#';
