@@ -68,7 +68,6 @@ private:
 
     bool isAi_[2];
     Decision lastDecision_[2];
-    double estimatedKeySec_[2];
 };
 
 #endif

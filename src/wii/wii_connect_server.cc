@@ -58,7 +58,6 @@ void WiiConnectServer::reset()
 {
     for (int i = 0; i < 2; ++i) {
         lastDecision_[i] = Decision();
-        estimatedKeySec_[i] = 0;
     }
 
     colorMap_.clear();
