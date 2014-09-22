@@ -367,11 +367,6 @@ bool FieldRealtime::drop1Frame()
     return stillDropping;
 }
 
-PlayerFrameData FieldRealtime::playerFrameData() const
-{
-    return PlayerFrameData(field(), kumipuyoSeq().subsequence(0, 3), kumipuyoPos(), userState(), score(), ojama());
-}
-
 int FieldRealtime::reduceOjama(int n)
 {
     if (numPendingOjama_ >= n) {

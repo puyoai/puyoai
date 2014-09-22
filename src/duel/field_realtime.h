@@ -43,7 +43,6 @@ public:
     bool userPlayable() const { return simulationState_ == SimulationState::STATE_PLAYABLE; }
 
     // Utility functions to be used by duel server.
-    PlayerFrameData playerFrameData() const;
     UserState userState() const { return userState_; }
 
     void setKeySetSeq(const KeySetSeq& kss) { keySetSeq_ = kss; }
