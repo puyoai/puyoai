@@ -1,7 +1,6 @@
 #ifndef CLIENT_CONNECTION_DROP_DECISION_H_
 #define CLIENT_CONNECTION_DROP_DECISION_H_
 
-#include <stdio.h>
 #include <string>
 
 #include "core/decision.h"
