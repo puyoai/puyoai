@@ -178,7 +178,7 @@ private:
     void analyzeField(const DetectedField&,
                       const std::vector<const PlayerAnalyzerResult*>& previousResults,
                       PlayerAnalyzerResult*);
-    void analyzeFieldForLevelSelect(const DetectedField& detectedField, PlayerAnalyzerResult* result);
+    void analyzeFieldForLevelSelect(const DetectedField&, PlayerAnalyzerResult*);
 
     int countVanishing(RealColor puyos[6][12], bool vanishing[6][12]);
 };
