@@ -349,10 +349,6 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     result->setRealColor(NextPuyoPosition::NEXT2_AXIS, RealColor::RC_EMPTY);
     result->setRealColor(NextPuyoPosition::NEXT2_CHILD, RealColor::RC_EMPTY);
 
-    if (result->hasDetectedOjamaDrop_ && !result->hasSentOjamaDropped_) {
-        result->userState.ojamaDropped = true;
-        result->hasSentOjamaDropped_ = true;
-    }
     if (result->hasDetectedRensaStart_ && !result->hasSentChainFinished_) {
         result->userState.chainFinished = true;
         result->hasSentChainFinished_ = true;
@@ -410,7 +406,11 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
                 result->setVanishing(x, y, detectedField.isVanishing(x, y));
             }
         }
-        result->hasDetectedOjamaDrop_ = detectedField.ojamaDropDetected;
+
+        if (detectedField.ojamaDropDetected && !result->hasSentOjamaDropped_) {
+            result->userState.ojamaDropped = true;
+            result->hasSentOjamaDropped_ = true;
+        }
         return;
     }
 
@@ -438,16 +438,12 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         }
     }
 
-    if (!result->hasDetectedOjamaDrop_) {
-        if (detectedField.ojamaDropDetected) {
-            LOG(INFO) << "ojama dropping detected.";
-            result->userState.playable = false;
-            result->hasDetectedOjamaDrop_ = true;
-        }
-    } else {
-        if (!detectedField.ojamaDropDetected && !shouldUpdateField) {
-            LOG(INFO) << "should update field since ojama dropping has finished.";
-            shouldUpdateField = true;
+    if (detectedField.ojamaDropDetected) {
+        LOG(INFO) << "ojama dropping detected";
+        result->userState.playable = false;
+        if (!result->hasSentOjamaDropped_) {
+            result->userState.ojamaDropped = true;
+            result->hasSentOjamaDropped_ = true;
         }
     }
 
@@ -456,11 +452,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         LOG(INFO) << "should update field since next puyo detected";
         shouldUpdateField = true;
 
-        result->hasDetectedOjamaDrop_ = false;
-        result->hasDetectedRensaStart_ = false;
-        result->hasSentGrounded_ = false;
-        result->hasSentOjamaDropped_ = false;
-        result->hasSentChainFinished_ = false;
+        result->resetCurrentPuyoState(false);
     }
 
     if (!shouldUpdateField)

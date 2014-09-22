@@ -89,7 +89,6 @@ struct PlayerAnalyzerResult {
     // In that case, use state == false.
     void resetCurrentPuyoState(bool state = true)
     {
-        hasDetectedOjamaDrop_ = state;
         hasDetectedRensaStart_ = state;
         hasSentGrounded_ = state;
         hasSentOjamaDropped_ = state;
@@ -113,7 +112,6 @@ public: // Make this private?
     std::map<std::pair<RealColor, RealColor>, int> next2Puyos;
 
     // Make these false when a current puyo has appeared.
-    bool hasDetectedOjamaDrop_ = true;
     bool hasDetectedRensaStart_ = true;
     bool hasSentGrounded_ = true;
     bool hasSentOjamaDropped_ = true;
