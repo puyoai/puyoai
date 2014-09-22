@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "core/client/connector/drop_decision.h"
+#include "core/client/ai/drop_decision.h"
 #include "core/client/connector/client_connector.h"
 #include "core/field/core_field.h"
 

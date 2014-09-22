@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "core/client/connector/drop_decision.h"
+#include "core/client/connector/client_frame_response.h"
 
 using namespace std;
 
@@ -14,25 +14,6 @@ static string escapeMessage(string str)
     }
 
     return str;
-}
-
-void ClientConnector::sendWithoutDecision(int frameId)
-{
-    cout << "ID=" << frameId << endl;
-    LOG(INFO) << "ID=" << frameId << endl;
-}
-
-void ClientConnector::send(int frameId, const DropDecision& dropDecision)
-{
-    ostringstream ss;
-    ss << "ID=" << frameId
-       << " X=" << dropDecision.decision().x
-       << " R=" << dropDecision.decision().r
-       << " MSG=" << escapeMessage(dropDecision.message());
-
-    string s = ss.str();
-    cout << s << endl;
-    LOG(INFO) << s;
 }
 
 FrameData ClientConnector::receive()
@@ -99,4 +80,21 @@ FrameData ClientConnector::receive()
     VLOG(1) << frameData.toString();
 
     return frameData;
+}
+
+void ClientConnector::send(const ClientFrameResponse& resp)
+{
+    ostringstream ss;
+    ss << "ID=" << resp.frameId();
+    if (resp.decision().isValid()) {
+        ss << " X=" << resp.decision().x
+           << " R=" << resp.decision().r;
+    }
+    if (!resp.message().empty()) {
+        ss << " MSG=" << escapeMessage(resp.message());
+    }
+
+    string s = ss.str();
+    cout << s << endl;
+    LOG(INFO) << s;
 }
