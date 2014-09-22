@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void StdoutKeySender::sendKey(const KeySet& keySet)
+void StdoutKeySender::sendKeySet(const KeySet& keySet)
 {
     cout << "SendKey: " << keySet.toString() << endl;
 }

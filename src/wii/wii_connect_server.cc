@@ -147,7 +147,7 @@ void WiiConnectServer::runLoop()
 bool WiiConnectServer::playForUnknown(int frameId)
 {
     if (frameId % 10 == 0)
-        keySender_->sendKey(KeySet());
+        keySender_->send(KeySet());
 
     reset();
     return true;
@@ -156,9 +156,9 @@ bool WiiConnectServer::playForUnknown(int frameId)
 bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& analyzerResult)
 {
     if (frameId % 10 == 0) {
-        keySender_->sendKey(KeySet());
-        keySender_->sendKey(Key::RIGHT_TURN);
-        keySender_->sendKey(KeySet());
+        keySender_->send(KeySet());
+        keySender_->send(Key::RIGHT_TURN);
+        keySender_->send(KeySet());
     }
 
     // Sends an initialization message.
@@ -188,7 +188,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 
         if (analyzerResult.playerResult(pi)->userState.ojamaDropped ||
             analyzerResult.playerResult(pi)->userState.grounded) {
-            keySender_->sendKey(KeySet());
+            keySender_->send(KeySet());
         }
     }
 
@@ -223,9 +223,9 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 bool WiiConnectServer::playForFinished(int frameId)
 {
     if (frameId % 10 == 0) {
-        keySender_->sendKey(KeySet());
-        keySender_->sendKey(Key::START);
-        keySender_->sendKey(KeySet());
+        keySender_->send(KeySet());
+        keySender_->send(Key::START);
+        keySender_->send(KeySet());
     }
 
     reset();
@@ -384,7 +384,7 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
         lastDecision_[pi] = d;
         for (size_t j = 0; j < keySetSeq.size(); j++) {
             KeySet k = keySetSeq[j];
-            keySender_->sendKey(k);
+            keySender_->send(k);
         }
 
         return;
