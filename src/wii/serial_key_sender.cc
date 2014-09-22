@@ -58,7 +58,7 @@ SerialKeySender::~SerialKeySender()
     }
 }
 
-void SerialKeySender::sendKey(const KeySet& keySet)
+void SerialKeySender::sendKeySet(const KeySet& keySet)
 {
     unsigned char c = static_cast<unsigned int>(keySet.toInt());
     CHECK_EQ(write(fd_, &c, sizeof(unsigned char)), 1);

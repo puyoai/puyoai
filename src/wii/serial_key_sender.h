@@ -12,7 +12,8 @@ public:
     explicit SerialKeySender(const std::string& deviceName);
     virtual ~SerialKeySender();
 
-    virtual void sendKey(const KeySet&) override;
+protected:
+    virtual void sendKeySet(const KeySet&) override;
 
 private:
     int fd_;

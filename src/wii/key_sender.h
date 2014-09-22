@@ -7,9 +7,22 @@ class KeySender {
 public:
     virtual ~KeySender() {}
 
-    virtual void sendKey(const KeySet&) = 0;
-    void sendKey(Key key) { sendKey(KeySet(key)); }
+    void send(const KeySet& keySet, bool forceSend = false)
+    {
+        if (forceSend || keySet != keySetLastSent_) {
+            keySetLastSent_ = keySet;
+            sendKeySet(keySet);
+        }
+    }
+    void send(Key key, bool forceSend = false) { send(KeySet(key), forceSend); }
 
+protected:
+    // TODO(mayah): Key::UP/Key::DOWN is chosen with probability.
+    KeySender() : keySetLastSent_(KeySet(Key::UP, Key::DOWN)) {}
+    virtual void sendKeySet(const KeySet&) = 0;
+
+private:
+    KeySet keySetLastSent_;
 };
 
 #endif
