@@ -351,7 +351,7 @@ TEST_F(SomagicAnalyzerTest, NextArrival)
     EXPECT_TRUE(rs[16]->playerResult(0)->userState.playable);
 }
 
-TEST_F(SomagicAnalyzerTest, Vanishing)
+TEST_F(SomagicAnalyzerTest, vanishing)
 {
     vector<string> images;
     for (int i = 0; i <= 15; ++i) {
@@ -375,6 +375,8 @@ TEST_F(SomagicAnalyzerTest, Vanishing)
     // vanishing should be detected here.
     // TODO(mayah): We might be able to detect in the previous frame?
     EXPECT_FALSE(rs[13]->playerResult(0)->userState.playable);
+    // Since we've detected vanishing, "grounded" event should come here.
+    EXPECT_TRUE(rs[13]->playerResult(0)->userState.grounded);
 }
 
 TEST_F(SomagicAnalyzerTest, ojamaDrop)
@@ -403,7 +405,7 @@ TEST_F(SomagicAnalyzerTest, ojamaDrop)
     EXPECT_TRUE(rs[37]->playerResult(1)->userState.playable);
 }
 
-TEST_F(SomagicAnalyzerTest, GameStart)
+TEST_F(SomagicAnalyzerTest, gameStart)
 {
     vector<string> images;
     for (int i = 0; i <= 61; ++i) {
@@ -449,17 +451,17 @@ TEST_F(SomagicAnalyzerTest, GameStart)
         { 18, "  BBPP", "  BBPP" },
         { 19, "  BBPP", "  BBPP" },
         { 20, "  BBPP", "  BBPP" },
-        { 21, "  BBPP", "  BBPP" },
-        { 22, "------", "------" },
-        { 23, "------", "------" },
-        { 24, "------", "------" },
-        { 25, "------", "------" },
-        { 26, "------", "------" },
-        { 27, "------", "------" },
-        { 28, "------", "BBPP  " },
+        { 21, "BBPP  ", "BBPP  " },  // Because of fastDecision, we would be able to detect NEXT moving here.
+        { 22, "BBPP  ", "BBPP  " },
+        { 23, "BBPP  ", "BBPP  " },
+        { 24, "BBPP  ", "BBPP  " },
+        { 25, "BBPP  ", "BBPP  " },
+        { 26, "BBPP  ", "BBPP  " },
+        { 27, "BBPP  ", "BBPP  " },
+        { 28, "BBPP  ", "BBPP  " },
         { 29, "BBPP  ", "BBPP  " },
         { 30, "BBPP  ", "BBPP  " },
-        { 31, "------", "BBPP--" },  // Player 2, frame 31: Since some stars are located on NEXT2_AXIS,
+        { 31, "BBPP--", "BBPP--" },  // Player 2, frame 31: Since some stars are located on NEXT2_AXIS,
         { 32, "BBPP--", "BBPP--" },  // analyzer might consider the axis color is YELLOW.
         { 33, "BBPPBB", "BBPP--" },  // However, we should fix in frame33 at least.
         { 34, "BBPPBB", "BBPPBB" },
@@ -474,9 +476,9 @@ TEST_F(SomagicAnalyzerTest, GameStart)
         { 43, "BBPPBB", "BBPPBB" },
         { 44, "BBPPBB", "BBPPBB" },
         { 45, "BBPPBB", "BBPPBB" },
-        { 46, "BBPPBB", "BBPPBB" },
-        { 47, "------", "BBPPBB" },
-        { 48, "PPBB  ", "BBPPBB" },  // Player 1, frame 48: next1 will disappear. so next2 is moved to next1 on that time.
+        { 46, "PPBB  ", "BBPPBB" },  // Player 1, frame 46: next1 will disappear. so next2 is moved to next1 on that time.
+        { 47, "PPBB  ", "BBPPBB" },
+        { 48, "PPBB  ", "BBPPBB" },
         { 49, "PPBB  ", "BBPPBB" },
         { 50, "PPBB  ", "BBPPBB" },
         { 51, "PPBB  ", "BBPPBB" },

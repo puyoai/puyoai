@@ -8,9 +8,9 @@ using namespace std;
 
 namespace {
 
-// It is OK 2, we will see puyo miscontrolling. (Maybe too fast to send keys?)
-// So, we'd like to adopt 3 for now.
-const int NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING = 3;
+// TODO(mayah): Should we make this 3, since we've seen puyo miscontrolling?
+// However, even 3, I've seen puyo miscontrolling.
+const int NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING = 2;
 
 const int NUM_FRAMES_TO_SEE_FOR_FIELD = 5;
 const int NUM_FRAMES_BEFORE_USER_CAN_PLAY = 2;
@@ -457,7 +457,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         // We should not check before first hand appears.
         int numVanishing = countVanishing(result->detectedField.puyos, result->detectedField.vanishing);
         if (numVanishing >= 4) {
-            LOG(INFO) << "should update field since vanishing detected";
+            LOG(INFO) << "should update field since vanishing detected.";
             result->userState.playable = false;
             result->hasDetectedRensaStart_ = true;
             shouldUpdateField = true;
@@ -474,12 +474,12 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         }
     }
 
+    bool shouldResetCurrentState = false;
     if (result->nextPuyoState == NextPuyoState::NEXT2_WILL_DISAPPEAR &&
         previousResults.front()->nextPuyoState == NextPuyoState::STABLE) {
         LOG(INFO) << "should update field since next puyo detected";
         shouldUpdateField = true;
-
-        result->resetCurrentPuyoState(false);
+        shouldResetCurrentState = true;
     }
 
     if (!shouldUpdateField)
@@ -488,6 +488,10 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
     if (!result->hasSentGrounded_) {
         result->hasSentGrounded_ = true;
         result->userState.grounded = true;
+    }
+
+    if (shouldResetCurrentState) {
+        result->resetCurrentPuyoState(false);
     }
 
     // Detecting the current field.
@@ -560,6 +564,8 @@ int Analyzer::countVanishing(RealColor puyos[6][12], bool vanishing[6][12])
                 if (xx < 0 || 6 <= xx || yy < 0 || 12 <= yy)
                     continue;
                 if (visited[xx][yy] || !vanishing[xx][yy])
+                    continue;
+                if (puyos[x][y] != puyos[xx][yy])
                     continue;
                 ++cnt;
                 visited[xx][yy] = true;
