@@ -8,7 +8,10 @@ using namespace std;
 
 namespace {
 
-const int NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING = 2;
+// It is OK 2, we will see puyo miscontrolling. (Maybe too fast to send keys?)
+// So, we'd like to adopt 3 for now.
+const int NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING = 3;
+
 const int NUM_FRAMES_TO_SEE_FOR_FIELD = 5;
 const int NUM_FRAMES_BEFORE_USER_CAN_PLAY = 2;
 
@@ -334,6 +337,7 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     // Check whether NEXT1 disappears.
     if (result->nextWillDisappearFast_ && detectedField.next1AxisMoving) {
         // In this case, we think NEXT1 has disappeared.
+        // Otherwise, it will take a few frames to move puyo correctly.
         result->framesWhileNext1Disappearing = NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING;
     } else {
         RealColor axisColor = detectedField.realColor(NextPuyoPosition::NEXT1_AXIS);
@@ -355,7 +359,7 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     if (!isNormalColor(next2AxisColor) || !isNormalColor(next2ChildColor))
         return;
 
-    // We want to see NEXT1 is absent in 2 frames for stability.
+    // We want to see NEXT1 is absent in <NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING> frames for stability.
     if (result->framesWhileNext1Disappearing < NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING)
         return;
 
