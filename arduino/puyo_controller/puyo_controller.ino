@@ -611,9 +611,6 @@ byte ly = calbuf[5]>>2;
 byte rx = calbuf[8]>>3;
 byte ry = calbuf[11]>>3;
 
-int pinRight = 2;
-
-
 // Wiimote button data stream
 byte *stream_callback(byte *buffer) {
 	wiimote_write_buffer(buffer, bdl, bdr, bdu, bdd, ba, bb, bx, by, bl, br,
@@ -630,8 +627,8 @@ void setup()
 	wiimote_stream = stream_callback;
 	wiimote_init();
 
-       digitalWrite(13, LOW);
- 
+    digitalWrite(13, LOW);
+
     Serial.begin(38400);
     delay(100);
 }
@@ -650,59 +647,54 @@ void loop()
     if (Serial.available() <= 0)
         return;
 
-    int pressed = 0;
     int x = Serial.read();
     x &= 0xFF;
-    
+
+#if 0
     if (x == 0xFF || x == 0x7F || ((x >> KEY_INIT) & 1)) {
-      	// wiimote_init();
         digitalWrite(13, HIGH);
         delay(100);
         return;
     }
-  
+#endif
+
     if ((x >> KEY_UP) & 1) {
-        pressed = 1;
         bdu = 1;
     } else {
         bdu = 0;
     }
     if ((x >> KEY_RIGHT) & 1) {
-        pressed = 1;
         bdr = 1;
+        digitalWrite(13, HIGH);
     } else {
         bdr = 0;
+        digitalWrite(13, LOW);
     }
     if ((x >> KEY_DOWN) & 1) {
-        pressed = 1;
         bdd = 1;
     } else {
         bdd = 0;
     }
     if ((x >> KEY_LEFT) & 1) {
-        pressed = 1;
         bdl = 1;
     } else {
         bdl = 0;
     }
     if ((x >> KEY_RIGHT_TURN) & 1) {
-        pressed = 1;
         ba = 1;
     } else {
         ba = 0;
     }
     if ((x >> KEY_LEFT_TURN) & 1) {
-        pressed = 1;
         bb = 1;
     } else {
         bb = 0;
     }
     if ((x >> KEY_START) & 1) {
-        pressed = 1;
         bp = 1;
     } else {
         bp = 0;
     }
-    
+
     delay(32);
 }
