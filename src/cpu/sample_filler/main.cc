@@ -10,7 +10,7 @@
 
 using namespace std;
 
-DEFINE_bool(peak, false, "Use peak");
+DEFINE_string(algorithm, "", "Choose algorithm: flat, peak, or nohoho");
 
 class SampleFillerAI : public AI {
 public:
@@ -19,8 +19,12 @@ public:
 
     virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) override
     {
-        if (FLAGS_peak)
+        if (FLAGS_algorithm == "peak") {
             return thinkPeak(frameId, f, seq);
+        }
+        if (FLAGS_algorithm == "nohoho") {
+            return thinkNohoho(frameId, f, seq);
+        }
         return thinkFlat(frameId, f, seq);
     }
 
@@ -85,6 +89,28 @@ private:
         return DropDecision(Decision(3, 2));
     }
 
+    DropDecision thinkNohoho(int frameId, const PlainField& f, const KumipuyoSeq& seq)
+    {
+        UNUSED_VARIABLE(frameId);
+        UNUSED_VARIABLE(seq);
+
+        CoreField cf(f);
+
+        static const int order[] = { 6, 5, 4, 1, 2, 3 };
+
+        for (int i = 0; i < 6; ++i) {
+            const int x = order[i];
+            if (PuyoController::isReachable(cf, Decision(x, 2))) {
+                return DropDecision(Decision(x, 2));
+            }
+            if (PuyoController::isReachable(cf, Decision(x, 0))) {
+                return DropDecision(Decision(x, 0));
+            }
+        }
+
+        // Nothing reachable? Die.
+        return DropDecision(Decision(3, 2));
+    }
 };
 
 int main(int argc, char* argv[])
