@@ -5,6 +5,8 @@
 #include "core/client/ai/ai.h"
 #include "core/field/core_field.h"
 
+DEFINE_bool(right_turn, false, "Use right turn");
+
 class SampleSuicideAI : public AI {
 public:
     SampleSuicideAI(int argc, char* argv[]) : AI(argc, argv, "sample-suicide") {}
@@ -16,7 +18,12 @@ public:
         UNUSED_VARIABLE(seq);
 
         CoreField cf(f);
-        Decision d = cf.height(3) > 6 ? Decision(3, 0) : Decision(3, 2);
+        Decision d;
+        if (FLAGS_right_turn) {
+            d = Decision(3, 1);
+        } else {
+            d = cf.height(3) > 6 ? Decision(3, 0) : Decision(3, 2);
+        }
         return DropDecision(d);
     }
 };

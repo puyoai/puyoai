@@ -8,3 +8,6 @@ function(sample_suicide_add_executable exe)
 endfunction()
 
 sample_suicide_add_executable(sample_suicide main.cc)
+
+cpu_add_runner(run.sh)
+cpu_add_runner(run_right_turn.sh)
