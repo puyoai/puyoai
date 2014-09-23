@@ -11,3 +11,4 @@ sample_filler_add_executable(sample_filler main.cc)
 
 cpu_add_runner(run.sh)
 cpu_add_runner(run_peak.sh)
+cpu_add_runner(run_nohoho.sh)
