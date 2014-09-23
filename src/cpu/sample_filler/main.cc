@@ -17,8 +17,10 @@ public:
     SampleFillerAI(int argc, char* argv[]) : AI(argc, argv, "sample-filler") {}
     virtual ~SampleFillerAI() {}
 
-    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) override
+    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq, const AdditionalThoughtInfo& info) override
     {
+        UNUSED_VARIABLE(info);
+
         if (FLAGS_algorithm == "peak") {
             return thinkPeak(frameId, f, seq);
         }

@@ -29,8 +29,10 @@ public:
 
     virtual void gameWillBegin(const FrameData&) override;
     virtual void gameHasEnded(const FrameData&) override;
-    virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&) override;
-    virtual DropDecision thinkFast(int frameId, const PlainField&, const KumipuyoSeq&) override;
+    virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&,
+                               const AdditionalThoughtInfo&) override;
+    virtual DropDecision thinkFast(int frameId, const PlainField&, const KumipuyoSeq&,
+                                   const AdditionalThoughtInfo&) override;
     virtual void enemyGrounded(const FrameData&) override;
     virtual void enemyNext2Appeared(const FrameData&) override;
 
