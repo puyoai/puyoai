@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_gui
             bounding_box.cc bounding_box_drawer.cc
-            commentator.cc commentator_drawer.cc
+            commentator_drawer.cc
             field_drawer.cc fps_drawer.cc
             human_connector_key_listener.cc
             main_window.cc screen.cc
@@ -22,5 +22,4 @@ function(puyoai_gui_add_test target)
     add_test(check-${target}_test ${target}_test)
 endfunction()
 
-puyoai_gui_add_test(commentator)
 puyoai_gui_add_test(box)

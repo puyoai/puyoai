@@ -1,4 +1,4 @@
-#include "gui/commentator.h"
+#include "core/server/commentator.h"
 
 #include <assert.h>
 #include <math.h>
