@@ -5,8 +5,8 @@
 #include "glog/logging.h"
 
 #include "audio/speaker.h"
+#include "core/server/commentator.h"
 #include "duel/game_state.h"
-#include "gui/commentator.h"
 
 using namespace std;
 

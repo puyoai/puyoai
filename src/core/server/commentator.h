@@ -14,7 +14,6 @@
 #include "core/field/core_field.h"
 #include "core/kumipuyo.h"
 #include "duel/game_state_observer.h"
-#include "gui/drawer.h"
 
 struct TrackedPossibleRensaInfo {
     TrackedPossibleRensaInfo() {}

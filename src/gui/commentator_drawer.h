@@ -1,7 +1,7 @@
 #ifndef GUI_COMMENTATOR_DRAWER_H_
 #define GUI_COMMENTATOR_DRAWER_H_
 
-#include "gui/commentator.h"
+#include "core/server/commentator.h"
 #include "gui/drawer.h"
 
 class Screen;
