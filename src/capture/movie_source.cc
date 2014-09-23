@@ -138,7 +138,6 @@ UniqueSDLSurface MovieSource::getNextFrame()
             SDL_Delay(10);
         }
         waitUntilTrue_ = false;
-        cout << "space detected" << endl;
     } else if (static_cast<int>(elapsed) < 1000 / fps_) {
         int d = 1000 / fps_ - elapsed;
         SDL_Delay(d);

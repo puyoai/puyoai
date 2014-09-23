@@ -8,7 +8,9 @@ using namespace std;
 
 namespace {
 
+const int NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING = 2;
 const int NUM_FRAMES_TO_SEE_FOR_FIELD = 5;
+const int NUM_FRAMES_BEFORE_USER_CAN_PLAY = 2;
 
 // The pointer will be alive while previousResults are alive.
 vector<const PlayerAnalyzerResult*> makePlayerOnlyResults(int pi, const deque<unique_ptr<AnalyzerResult>>& previousResults)
@@ -76,6 +78,15 @@ AdjustedField::AdjustedField()
     for (int i = 0; i < NUM_NEXT_PUYO_POSITION; ++i) {
         nextPuyos[i] = RealColor::RC_EMPTY;
     }
+}
+
+void PlayerAnalyzerResult::resetCurrentPuyoState(bool state)
+{
+    nextWillDisappearFast_ = false;
+    hasDetectedRensaStart_ = state;
+    hasSentGrounded_ = state;
+    hasSentOjamaDropped_ = state;
+    hasSentChainFinished_ = state;
 }
 
 string PlayerAnalyzerResult::toString() const
@@ -187,7 +198,8 @@ Analyzer::analyzePlayerFieldOnLevelSelect(const DetectedField& detectedField, co
     analyzeNextForLevelSelect(detectedField, result.get());
     analyzeFieldForLevelSelect(detectedField, result.get());
 
-    result->resetCurrentPuyoState();
+    result->resetCurrentPuyoState(true);
+    result->nextWillDisappearFast_ = true;
 
     return result;
 }
@@ -251,7 +263,8 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
     result->nextPuyoState = NextPuyoState::STABLE;
     result->userState.playable = false;
     result->restFramesUserCanPlay = 0;
-    result->resetCurrentPuyoState();
+    result->resetCurrentPuyoState(true);
+    result->nextWillDisappearFast_ = true;
 
     // There should not exist moving puyos. So, CURRENT_AXIS and CURRENT_CHILD should be empty.
     result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RealColor::RC_EMPTY);
@@ -300,6 +313,7 @@ void Analyzer::analyzeNextWhenPreviousResultDoesNotExist(const DetectedField& de
     result->userState.playable = false;
     result->restFramesUserCanPlay = 0;
     result->resetCurrentPuyoState(false);
+    result->nextWillDisappearFast_ = false;
 
     // We cannot detect moving puyos correctly. So, make them empty.
     result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RealColor::RC_EMPTY);
@@ -314,14 +328,22 @@ void Analyzer::analyzeNextWhenPreviousResultDoesNotExist(const DetectedField& de
 
 void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, PlayerAnalyzerResult* result)
 {
-    // Check Next1 disappears.
-    RealColor axisColor = detectedField.realColor(NextPuyoPosition::NEXT1_AXIS);
-    RealColor childColor = detectedField.realColor(NextPuyoPosition::NEXT1_CHILD);
+    // After ojama drop or first hand, CURRENT puyo will appear just in 3 frames
+    // after NEXT1 has moved. In other cases, NEXT1 will appear in 5 or 6 frames.
 
-    // NEXT1 has not disappeared yet.
-    if (axisColor != RealColor::RC_EMPTY && childColor != RealColor::RC_EMPTY) {
-        result->framesWhileNext1Disappearing = 0;
-        return;
+    // Check whether NEXT1 disappears.
+    if (result->nextWillDisappearFast_ && detectedField.next1AxisMoving) {
+        // In this case, we think NEXT1 has disappeared.
+        result->framesWhileNext1Disappearing = NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING;
+    } else {
+        RealColor axisColor = detectedField.realColor(NextPuyoPosition::NEXT1_AXIS);
+        RealColor childColor = detectedField.realColor(NextPuyoPosition::NEXT1_CHILD);
+
+        // NEXT1 has not disappeared yet.
+        if (axisColor != RealColor::RC_EMPTY && childColor != RealColor::RC_EMPTY) {
+            result->framesWhileNext1Disappearing = 0;
+            return;
+        }
     }
 
     // Detected NEXT1 has disappeard.
@@ -334,11 +356,11 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
         return;
 
     // We want to see NEXT1 is absent in 2 frames for stability.
-    if (result->framesWhileNext1Disappearing < 2)
+    if (result->framesWhileNext1Disappearing < NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING)
         return;
 
     // Detected Next1 disappeared
-    result->restFramesUserCanPlay = 2; // TODO(mayah): magic number.
+    result->restFramesUserCanPlay = NUM_FRAMES_BEFORE_USER_CAN_PLAY;
     result->nextPuyoState = NextPuyoState::NEXT2_WILL_DISAPPEAR;
     result->userState.playable = false;
     result->userState.decisionRequest = true;
@@ -444,6 +466,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         if (!result->hasSentOjamaDropped_) {
             result->userState.ojamaDropped = true;
             result->hasSentOjamaDropped_ = true;
+            result->nextWillDisappearFast_ = true;
         }
     }
 

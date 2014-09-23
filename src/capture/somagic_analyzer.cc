@@ -186,6 +186,14 @@ unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi,
         }
     }
 
+    // detect next1 move
+    {
+        Box b = BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_AXIS);
+        b = Box(b.sx, b.sy + b.h() / 2, b.dx, b.dy);
+        BoxAnalyzeResult r = analyzeBox(surface, b);
+        result->next1AxisMoving = (r.realColor == RealColor::RC_EMPTY);
+    }
+
     // detect ojama
     {
         Box left = BoundingBox::instance().get(pi, 1, 0);

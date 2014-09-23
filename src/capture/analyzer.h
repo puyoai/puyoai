@@ -48,6 +48,7 @@ struct DetectedField {
     bool vanishing[6][12];
     RealColor nextPuyos[NUM_NEXT_PUYO_POSITION];
     bool ojamaDropDetected = false;
+    bool next1AxisMoving = false;
 };
 
 // AdjustedField is adjusted using the previous frames etc.
@@ -85,15 +86,11 @@ struct PlayerAnalyzerResult {
             isNormalColor(realColor(NextPuyoPosition::NEXT2_CHILD));
     }
 
-    // Basically state == true. When the previous result does not exist, it will be for testing.
-    // In that case, use state == false.
-    void resetCurrentPuyoState(bool state = true)
-    {
-        hasDetectedRensaStart_ = state;
-        hasSentGrounded_ = state;
-        hasSentOjamaDropped_ = state;
-        hasSentChainFinished_ = state;
-    }
+    // |state| should be true when:
+    //   - the previous result does not exist
+    //   - for test
+    // Otherwise, |state| will be false.
+    void resetCurrentPuyoState(bool state);
 
     std::string toString() const;
 
@@ -116,6 +113,7 @@ public: // Make this private?
     bool hasSentGrounded_ = true;
     bool hasSentOjamaDropped_ = true;
     bool hasSentChainFinished_ = true;
+    bool nextWillDisappearFast_ = false;
 };
 
 class AnalyzerResult {
