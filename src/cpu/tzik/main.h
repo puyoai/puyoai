@@ -12,7 +12,8 @@ class AI final : public ::AI {
 
   DropDecision think(int frame_id,
                      const PlainField& field,
-                     const KumipuyoSeq& seq) override;
+                     const KumipuyoSeq& seq,
+                     const AdditionalThoughtInfo& info) override;
 
  private:
   DropDecision think_sample(int frame_id,

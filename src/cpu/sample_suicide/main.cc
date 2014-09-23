@@ -12,10 +12,11 @@ public:
     SampleSuicideAI(int argc, char* argv[]) : AI(argc, argv, "sample-suicide") {}
     virtual ~SampleSuicideAI() {}
 
-    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) override
+    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq, const AdditionalThoughtInfo& info) override
     {
         UNUSED_VARIABLE(frameId);
         UNUSED_VARIABLE(seq);
+        UNUSED_VARIABLE(info);
 
         CoreField cf(f);
         Decision d;

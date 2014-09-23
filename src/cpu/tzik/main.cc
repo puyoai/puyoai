@@ -13,7 +13,9 @@ AI::AI(int argc, char** argv) : ::AI(argc, argv, "tzik") {}
 
 DropDecision AI::think(int frame_id,
                        const PlainField& field,
-                       const KumipuyoSeq& seq) {
+                       const KumipuyoSeq& seq,
+                       const AdditionalThoughtInfo& info) {
+  UNUSED_VARIABLE(info);
   return think_sample(frame_id, field, seq);
 }
 

@@ -12,7 +12,8 @@ class AI : public ::AI {
   virtual ~AI() = default;
 
   DropDecision think(int frame_id, const PlainField& field,
-                     const KumipuyoSeq& seq) override;
+                     const KumipuyoSeq& seq,
+                     const AdditionalThoughtInfo&) override;
 
  protected:
   enum Strategy {

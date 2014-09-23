@@ -110,13 +110,14 @@ Ai::Ai(int argc, char* argv[]): ::AI(argc, argv, "peria") {}
 Ai::~Ai() {}
 
 DropDecision Ai::think(int frame_id,
-		       const PlainField& field,
-		       const KumipuyoSeq& seq) {
+                       const PlainField& field,
+                       const KumipuyoSeq& seq,
+                       const AdditionalThoughtInfo& info) {
+  UNUSED_VARIABLE(info);
   using namespace std::placeholders;
 
   if (attack_ && attack_->end_frame_id < frame_id)
     attack_.reset();
-
 
   // Check templates first with visible puyos.
   {

@@ -10,8 +10,10 @@ public:
     AIRoutine(int argc, char* argv[]) : AI(argc, argv, "sample") {}
     virtual ~AIRoutine() {}
 
-    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq) override {
+    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq, const AdditionalThoughtInfo& info) override
+    {
         UNUSED_VARIABLE(frameId);
+        UNUSED_VARIABLE(info);
 
         LOG(INFO) << CoreField(f).toDebugString() << seq.toString();
 

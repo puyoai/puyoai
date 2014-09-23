@@ -77,7 +77,7 @@ void AI::runLoop()
             VLOG(1) << '\n' << field_.toDebugString();
 
             next1.fieldBeforeThink = field_;
-            next1.dropDecision = think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) } );
+            next1.dropDecision = think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) }, AdditionalThoughtInfo());
             next1.kumipuyo = kumipuyoSeq.get(1);
             next1.ready = true;
         }
@@ -116,7 +116,7 @@ void AI::runLoop()
 
             resetCurrentField(frameData.myPlayerFrameData().field);
             const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
-            next1.dropDecision = thinkFast(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) });
+            next1.dropDecision = thinkFast(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) }, AdditionalThoughtInfo());
             next1.kumipuyo = kumipuyoSeq.get(0);
             next1.ready = true;
             next1.needsReconsider = false;

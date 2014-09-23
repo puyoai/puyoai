@@ -58,7 +58,7 @@ void MayahAI::gameHasEnded(const FrameData&)
     }
 }
 
-DropDecision MayahAI::think(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq)
+DropDecision MayahAI::think(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq, const AdditionalThoughtInfo&)
 {
     CoreField f(plainField);
     double beginTime = currentTime();
@@ -70,7 +70,7 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
     return DropDecision(plan.decisions().front(), message);
 }
 
-DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq)
+DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq, const AdditionalThoughtInfo&)
 {
     CoreField f(plainField);
     double beginTime = currentTime();

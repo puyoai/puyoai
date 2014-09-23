@@ -11,6 +11,10 @@ struct FrameData;
 class KumipuyoSeq;
 class PlainField;
 
+// TODO(mayah): This struct will contain zenkeshi info etc.
+struct AdditionalThoughtInfo {
+};
+
 // AI is a utility class of AI.
 // All you have to do is to implement think().
 class AI {
@@ -33,14 +37,16 @@ protected:
     // think will be called when ai should decide the next hand.
     // Basically, this will be called when NEXT2 has appeared.
     // You will have around 300 ms to decide your hand.
-    virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&) = 0;
+    virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&,
+                               const AdditionalThoughtInfo&) = 0;
 
     // thinkFast will be called when ai should decide the next hand immediately.
     // Basically this will be called when ojamas are dropped.
     // You will have around 30 ms to decide your hand.
-    virtual DropDecision thinkFast(int frameId, const PlainField& field, const KumipuyoSeq& next)
+    virtual DropDecision thinkFast(int frameId, const PlainField& field, const KumipuyoSeq& next,
+                                   const AdditionalThoughtInfo& info)
     {
-        return think(frameId, field, next);
+        return think(frameId, field, next, info);
     }
 
     // When enemy's puyo is grounded, this callback will be called.

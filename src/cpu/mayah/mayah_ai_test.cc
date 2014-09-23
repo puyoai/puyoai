@@ -36,7 +36,7 @@ TEST(MayahAITest, DontCrash1)
 
     auto ai = makeAI();
     ai->initializeGazerForTest(1);
-    (void)ai->think(1, f, seq);
+    (void)ai->think(1, f, seq, AdditionalThoughtInfo());
 }
 
 TEST(MayahAITest, DontCrash2)
@@ -62,7 +62,7 @@ TEST(MayahAITest, DontCrash2)
 
     auto ai = makeAI();
     ai->initializeGazerForTest(1);
-    (void)ai->think(1, f, seq);
+    (void)ai->think(1, f, seq, AdditionalThoughtInfo());
 }
 
 TEST(MayahAITest, DontCrash3)
@@ -88,5 +88,5 @@ TEST(MayahAITest, DontCrash3)
 
     auto ai = makeAI();
     ai->initializeGazerForTest(1);
-    (void)ai->think(1, f, seq);
+    (void)ai->think(1, f, seq, AdditionalThoughtInfo());
 }

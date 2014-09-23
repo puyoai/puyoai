@@ -20,7 +20,8 @@ void munetoshi::AI::gameWillBegin(const FrameData& frame) {
 }
 
 DropDecision munetoshi::AI::think(int frame_id, const PlainField& field,
-                                  const KumipuyoSeq& seq) {
+                                  const KumipuyoSeq& seq,
+                                  const AdditionalThoughtInfo&) {
   return think_internal(frame_id, CoreField(field), seq);
 }
 
