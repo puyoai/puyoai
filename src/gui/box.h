@@ -10,8 +10,14 @@ struct Box {
     int w() const { return dx - sx; }
     int h() const { return dy - sy; }
 
-    SDL_Rect toSDLRect() const {
-        return SDL_Rect { sx, sy, w(), h() };
+    SDL_Rect toSDLRect() const { return SDL_Rect { sx, sy, w(), h() }; }
+
+    void moveOffset(int x, int y)
+    {
+        sx += x;
+        dx += x;
+        sy += y;
+        dy += y;
     }
 
     int sx, sy, dx, dy;
