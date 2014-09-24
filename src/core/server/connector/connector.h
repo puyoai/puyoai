@@ -1,6 +1,7 @@
 #ifndef CORE_SERVER_CONNECTOR_CONNECTOR_H_
 #define CORE_SERVER_CONNECTOR_CONNECTOR_H_
 
+#include <memory>
 #include <string>
 
 #include "base/base.h"
