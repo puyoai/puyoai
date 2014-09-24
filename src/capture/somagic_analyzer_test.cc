@@ -374,9 +374,9 @@ TEST_F(SomagicAnalyzerTest, vanishing)
 
     // vanishing should be detected here.
     // TODO(mayah): We might be able to detect in the previous frame?
-    EXPECT_FALSE(rs[13]->playerResult(0)->userState.playable);
+    EXPECT_FALSE(rs[15]->playerResult(0)->userState.playable);
     // Since we've detected vanishing, "grounded" event should come here.
-    EXPECT_TRUE(rs[13]->playerResult(0)->userState.grounded);
+    EXPECT_TRUE(rs[15]->playerResult(0)->userState.grounded);
 }
 
 TEST_F(SomagicAnalyzerTest, ojamaDrop)

@@ -440,6 +440,57 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         return;
     }
 
+    AdjustedField adjustedField = result->adjustedField;
+    {
+        // Detecting the current field.
+        for (int x = 1; x <= 6; ++x) {
+            bool shouldEmpty = false;
+            for (int y = 1; y <= 12; ++y) {
+                if (shouldEmpty) {
+                    adjustedField.puyos[x-1][y-1] = RealColor::RC_EMPTY;
+                    adjustedField.vanishing[x-1][y-1] = false;
+                    continue;
+                }
+
+                map<RealColor, int> cnt;
+                cnt[detectedField.realColor(x, y)]++;
+                for (size_t i = 0; i < NUM_FRAMES_TO_SEE_FOR_FIELD && i < previousResults.size(); ++i) {
+                    cnt[previousResults[i]->detectedField.realColor(x, y)]++;
+                }
+
+                int framesContinuousVanishing = 0;
+                if (detectedField.isVanishing(x, y)) {
+                    framesContinuousVanishing = 1;
+                    for (size_t i = 0; i < NUM_FRAMES_TO_SEE_FOR_FIELD && i < previousResults.size(); ++i) {
+                        if (previousResults[i]->detectedField.isVanishing(x, y)) {
+                            framesContinuousVanishing += 1;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                // --- Finds the largest one;
+                RealColor rc = RealColor::RC_EMPTY;
+                int maxCount = 0;
+                for (const auto& entry : cnt) {
+                    if (maxCount < entry.second) {
+                        rc = entry.first;
+                        maxCount = entry.second;
+                    }
+                }
+
+                adjustedField.puyos[x-1][y-1] = rc;
+                if (rc == RealColor::RC_EMPTY) {
+                    shouldEmpty = true;
+                    adjustedField.vanishing[x-1][y-1] = false;
+                } else {
+                    adjustedField.vanishing[x-1][y-1] = (framesContinuousVanishing > 2);
+                }
+            }
+        }
+    }
+
     // We update the field only when
     //  (1) Next1 has disppear
     //  (2) Ojama Dropping has started
@@ -455,7 +506,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
     if (!result->hasDetectedRensaStart_) {
         // If # of disappearing puyo >= 4, vanishing has started.
         // We should not check before first hand appears.
-        int numVanishing = countVanishing(result->detectedField.puyos, result->detectedField.vanishing);
+        int numVanishing = countVanishing(adjustedField.puyos, adjustedField.vanishing);
         if (numVanishing >= 4) {
             LOG(INFO) << "should update field since vanishing detected.";
             result->userState.playable = false;
@@ -494,36 +545,8 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         result->resetCurrentPuyoState(false);
     }
 
-    // Detecting the current field.
-    for (int x = 1; x <= 6; ++x) {
-        bool shouldEmpty = false;
-        for (int y = 1; y <= 12; ++y) {
-            if (shouldEmpty) {
-                result->setRealColor(x, y, RealColor::RC_EMPTY);
-                continue;
-            }
-
-            map<RealColor, int> cnt;
-            cnt[detectedField.realColor(x, y)]++;
-            for (size_t i = 0; i < NUM_FRAMES_TO_SEE_FOR_FIELD && i < previousResults.size(); ++i) {
-                cnt[previousResults[i]->detectedField.realColor(x, y)]++;
-            }
-
-            // --- Finds the largest one;
-            RealColor rc = RealColor::RC_EMPTY;
-            int maxCount = 0;
-            for (const auto& entry : cnt) {
-                if (maxCount < entry.second) {
-                    rc = entry.first;
-                    maxCount = entry.second;
-                }
-            }
-
-            result->setRealColor(x, y, rc);
-            if (rc == RealColor::RC_EMPTY)
-                shouldEmpty = true;
-        }
-    }
+    // Commit the adjustedField.
+    result->adjustedField = adjustedField;
 }
 
 void Analyzer::analyzeFieldForLevelSelect(const DetectedField& detectedField, PlayerAnalyzerResult* result)
@@ -549,7 +572,7 @@ int Analyzer::countVanishing(RealColor puyos[6][12], bool vanishing[6][12])
             if (visited[x][y])
                 continue;
 
-            if (!vanishing[x][y] || puyos[x][y] == RealColor::RC_EMPTY) {
+            if (!vanishing[x][y] || !isNormalColor(puyos[x][y])) {
                 visited[x][y] = true;
                 continue;
             }
