@@ -26,6 +26,8 @@ void AnalyzerResultDrawer::draw(Screen* screen)
 
     CHECK_EQ(SDL_LockSurface(surface), 0);
 
+    SDL_Rect rect = screen->mainBox().toSDLRect();
+
     for (int pi = 0; pi < 2; ++pi) {
         const PlayerAnalyzerResult* par = result->playerResult(pi);
         if (!par)
@@ -34,6 +36,7 @@ void AnalyzerResultDrawer::draw(Screen* screen)
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
                 Box b = BoundingBox::instance().get(pi, x, y);
+                b.moveOffset(rect.x, rect.y);
                 RealColor rc = par->realColor(x, y);
                 Uint32 color = toPixelColor(surface, rc);
                 SDL_DrawLine(surface, b.sx + 1, b.sy + 1, b.dx - 1, b.sy + 1, color);
@@ -44,7 +47,7 @@ void AnalyzerResultDrawer::draw(Screen* screen)
         }
     }
 
-    NextPuyoPosition npp[4] = {
+    static const NextPuyoPosition npp[4] = {
         NextPuyoPosition::NEXT1_AXIS,
         NextPuyoPosition::NEXT1_CHILD,
         NextPuyoPosition::NEXT2_AXIS,
@@ -58,6 +61,7 @@ void AnalyzerResultDrawer::draw(Screen* screen)
 
         for (int i = 0; i < 4; ++i) {
             Box b = BoundingBox::instance().get(pi, npp[i]);
+            b.moveOffset(rect.x, rect.y);
             RealColor rc = par->realColor(npp[i]);
             Uint32 color = toPixelColor(surface, rc);
             SDL_DrawLine(surface, b.sx + 1, b.sy + 1, b.dx - 1, b.sy + 1, color);
