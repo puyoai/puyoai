@@ -65,14 +65,13 @@ struct PlayerAnalyzerResult {
     void setRealColor(NextPuyoPosition npp, RealColor prc) { adjustedField.nextPuyos[static_cast<int>(npp)] = prc; }
     RealColor realColor(int x, int y) const { return adjustedField.puyos[x-1][y-1]; }
     RealColor realColor(NextPuyoPosition npp) const { return adjustedField.nextPuyos[static_cast<int>(npp)]; }
+    void setVanishing(int x, int y, bool flag) { adjustedField.vanishing[x-1][y-1] = flag; }
 
     void clear() {
         *this = PlayerAnalyzerResult();
     }
 
     void copyRealColorFrom(NextPuyoPosition npp, const PlayerAnalyzerResult& par) { setRealColor(npp, par.realColor(npp)); }
-
-    void setVanishing(int x, int y, bool flag) { adjustedField.vanishing[x-1][y-1] = flag; }
 
     bool next1IsValid() const
     {
