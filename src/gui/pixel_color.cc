@@ -19,7 +19,7 @@ Uint32 toPixelColor(SDL_Surface* surface, PuyoColor pc)
         return SDL_MapRGB(surface->format,   0, 255,   0);
     }
 
-    DCHECK(false) << "Invalid PuyoColor: " << static_cast<int>(pc);
+    CHECK(false) << "Invalid PuyoColor: " << static_cast<int>(pc);
     return SDL_MapRGB(surface->format, 0, 0, 0);
 }
 
@@ -28,6 +28,8 @@ Uint32 toPixelColor(SDL_Surface* surface, RealColor rc)
     switch (rc) {
     case RealColor::RC_EMPTY:
         return SDL_MapRGB(surface->format,   0,   0,   0);
+    case RealColor::RC_WALL:
+        return SDL_MapRGB(surface->format, 127, 127, 127);
     case RealColor::RC_OJAMA:
         return SDL_MapRGB(surface->format, 255, 255, 255);
     case RealColor::RC_RED:
@@ -42,6 +44,6 @@ Uint32 toPixelColor(SDL_Surface* surface, RealColor rc)
         return SDL_MapRGB(surface->format, 255,   0, 255);
     }
 
-    DCHECK(false) << "Invalid PuyoColor " << static_cast<int>(rc);
+    CHECK(false) << "Invalid RealColor: " << static_cast<int>(rc);
     return SDL_MapRGB(surface->format, 127, 127, 127);
 }
