@@ -213,7 +213,7 @@ bool SomagicAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
     if (!prevSurface)
         return false;
 
-    int area = (box.dy - box.sy + 1) * (box.dx - box.sx + 1);
+    int area = 0;
     double diffSum = 0;
     for (int by = box.sy; by <= box.dy; ++by) {
         for (int bx = box.sx; bx <= box.dx; ++bx) {
@@ -221,18 +221,26 @@ bool SomagicAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
             Uint8 r1, g1, b1;
             SDL_GetRGB(c1, currentSurface->format, &r1, &g1, &b1);
 
+            // Since 3 SET MATCH etc. has RED or GREEN, we'd like to ignore them.
+            RealColor rc = toRealColor(RGB(r1, g1, b1).toHSV());
+            if (rc == RealColor::RC_RED || rc == RealColor::RC_GREEN)
+                continue;
+
             Uint32 c2 = getpixel(prevSurface, bx, by);
             Uint8 r2, g2, b2;
             SDL_GetRGB(c2, prevSurface->format, &r2, &g2, &b2);
 
             double diff = sqrt((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2));
             diffSum += diff;
-            // cout << currentRGB.toString() << ' ' << prevRGB.toString() << endl;
+            ++area;
         }
     }
 
+    if (area == 0)
+        return false;
+
     // Usually, (diffSum / area) is around 5. When ojama is dropped, it will be over 20.
-    if (diffSum / area >= 15)
+    if (diffSum / area >= 17)
         return true;
     return false;
 }

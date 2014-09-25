@@ -378,6 +378,30 @@ TEST_F(SomagicAnalyzerTest, vanishing)
     EXPECT_TRUE(rs[15]->playerResult(0)->userState.grounded);
 }
 
+TEST_F(SomagicAnalyzerTest, nonfastmove)
+{
+    vector<string> images;
+    for (int i = 0; i <= 33; ++i) {
+        char buf[80];
+        sprintf(buf, "/somagic/nonfastmove/frame%02d.png", i);
+        string s = buf;
+        images.push_back(s);
+    }
+
+    bool pgs[2] = { true, true };
+    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
+
+    for (const auto& r : rs) {
+        EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+    }
+
+    // Since this is not fast move, we should not request decision in
+    // frame26 or frame27.
+    EXPECT_FALSE(rs[25]->playerResult(1)->userState.decisionRequest);
+    EXPECT_FALSE(rs[26]->playerResult(1)->userState.decisionRequest);
+    EXPECT_FALSE(rs[27]->playerResult(1)->userState.decisionRequest);
+}
+
 TEST_F(SomagicAnalyzerTest, ojamaDrop)
 {
     vector<string> images;
@@ -475,8 +499,8 @@ TEST_F(SomagicAnalyzerTest, gameStart)
         { 43, "BBPPBB", "BBPPBB" },
         { 44, "BBPPBB", "BBPPBB" },
         { 45, "BBPPBB", "BBPPBB" },
-        { 46, "PPBB  ", "BBPPBB" },  // Player 1, frame 46: next1 will disappear. so next2 is moved to next1 on that time.
-        { 47, "PPBB  ", "BBPPBB" },
+        { 46, "BBPPBB", "BBPPBB" },
+        { 47, "PPBB  ", "BBPPBB" },  // Player 1, frame 47: next1 will disappear. so next2 is moved to next1 on that time.
         { 48, "PPBB  ", "BBPPBB" },
         { 49, "PPBB  ", "BBPPBB" },
         { 50, "PPBB  ", "BBPPBB" },
