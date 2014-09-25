@@ -20,7 +20,7 @@ using namespace std;
 
 void showUsage(const char* name)
 {
-    fprintf(stderr, "Usage: %s <in-bmp> [1|2] [NEXT1-AXIS|NEXT1-CHILD|NEXT2-AXIS|NEXT2-CHILD]\n", name);
+    fprintf(stderr, "Usage: %s <in-bmp> [1|2] [NEXT1-AXIS|NEXT1-AXIS-HALF|NEXT1-CHILD|NEXT2-AXIS|NEXT2-CHILD]\n", name);
     fprintf(stderr, "Usage: %s <in-bmp> [1|2] x y\n", name);
 }
 
@@ -40,12 +40,17 @@ int main(int argc, char* argv[])
     string imgFilename = argv[1];
     int playerId = std::atoi(argv[2]);
 
+    bool half = false;
     bool usesNextPuyoPosition = false;
     NextPuyoPosition npp;
     int x, y;
     if (argv[3] == string("NEXT1-AXIS")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT1_AXIS;
+    } else if (argv[3] == string("NEXT1-AXIS-HALF")) {
+        usesNextPuyoPosition = true;
+        npp = NextPuyoPosition::NEXT1_AXIS;
+        half = true;
     } else if (argv[3] == string("NEXT1-CHILD")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT1_CHILD;
@@ -79,6 +84,9 @@ int main(int argc, char* argv[])
         b = BoundingBox::instance().get(playerId - 1, npp);
     } else {
         b = BoundingBox::instance().get(playerId - 1, x, y);
+    }
+    if (half) {
+        b.sy += b.h() / 2;
     }
 
     BoxAnalyzeResult r = analyzer.analyzeBox(surf.get(), b, true);
