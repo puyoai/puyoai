@@ -9,11 +9,13 @@
 
 #include <SDL.h>
 
+#include "core/field/field_bit_field.h"
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"
 #include "core/real_color.h"
 #include "core/state.h"
 #include "gui/bounding_box.h"
+#include "capture/real_color_field.h"
 
 // TODO(mayah): Should be renamed?
 enum class CaptureGameState {
@@ -35,8 +37,8 @@ std::string toString(NextPuyoState);
 struct DetectedField {
     DetectedField();
 
-    void setRealColor(int x, int y, RealColor prc) { puyos[x - 1][y - 1] = prc; }
-    void setRealColor(NextPuyoPosition npp, RealColor prc) { nextPuyos[static_cast<int>(npp)] = prc; }
+    void setRealColor(int x, int y, RealColor rc) { puyos[x - 1][y - 1] = rc; }
+    void setRealColor(NextPuyoPosition npp, RealColor rc) { nextPuyos[static_cast<int>(npp)] = rc; }
     RealColor realColor(int x, int y) const { return puyos[x - 1][y - 1]; }
     RealColor realColor(NextPuyoPosition npp) const { return nextPuyos[static_cast<int>(npp)]; }
 
@@ -55,17 +57,17 @@ struct DetectedField {
 struct AdjustedField {
     AdjustedField();
 
-    RealColor puyos[6][12];
-    bool vanishing[6][12];
+    RealColorField field;
+    FieldBitField vanishing;
     RealColor nextPuyos[NUM_NEXT_PUYO_POSITION];
 };
 
 struct PlayerAnalyzerResult {
-    void setRealColor(int x, int y, RealColor prc) { adjustedField.puyos[x-1][y-1] = prc; }
-    void setRealColor(NextPuyoPosition npp, RealColor prc) { adjustedField.nextPuyos[static_cast<int>(npp)] = prc; }
-    RealColor realColor(int x, int y) const { return adjustedField.puyos[x-1][y-1]; }
+    void setRealColor(int x, int y, RealColor rc) { adjustedField.field.set(x, y, rc); }
+    void setRealColor(NextPuyoPosition npp, RealColor rc) { adjustedField.nextPuyos[static_cast<int>(npp)] = rc; }
+    RealColor realColor(int x, int y) const { return adjustedField.field.get(x, y); }
     RealColor realColor(NextPuyoPosition npp) const { return adjustedField.nextPuyos[static_cast<int>(npp)]; }
-    void setVanishing(int x, int y, bool flag) { adjustedField.vanishing[x-1][y-1] = flag; }
+    void setVanishing(int x, int y, bool flag) { adjustedField.vanishing.set(x, y, flag); }
 
     void clear() {
         *this = PlayerAnalyzerResult();
@@ -177,7 +179,7 @@ private:
                       PlayerAnalyzerResult*);
     void analyzeFieldForLevelSelect(const DetectedField&, PlayerAnalyzerResult*);
 
-    int countVanishing(RealColor puyos[6][12], bool vanishing[6][12]);
+    int countVanishing(const RealColorField&, const FieldBitField& vanishing);
 };
 
 #endif

@@ -71,10 +71,10 @@ DetectedField::DetectedField()
 
 AdjustedField::AdjustedField()
 {
-    for (int x = 0; x < 6; ++x) {
-        for (int y = 0; y < 12; ++y) {
-            puyos[x][y] = RealColor::RC_EMPTY;
-            vanishing[x][y] = false;
+    for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
+        for (int y = 0; y < FieldConstant::MAP_HEIGHT; ++y) {
+            field.set(x, y, RealColor::RC_EMPTY);
+            vanishing.set(x, y, false);
         }
     }
 
@@ -107,8 +107,8 @@ string PlayerAnalyzerResult::toString() const
             ss << toChar(detectedField.puyos[x][y], !detectedField.vanishing[x][y]);
         }
         ss << "#          #";
-        for (int x = 0; x < 6; ++x) {
-            ss << toChar(adjustedField.puyos[x][y], !adjustedField.vanishing[x][y]);
+        for (int x = 1; x <= 6; ++x) {
+            ss << toChar(adjustedField.field.get(x, y), !adjustedField.vanishing.get(x, y));
         }
         ss << '#';
         ss << endl;
@@ -447,8 +447,8 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
             bool shouldEmpty = false;
             for (int y = 1; y <= 12; ++y) {
                 if (shouldEmpty) {
-                    adjustedField.puyos[x-1][y-1] = RealColor::RC_EMPTY;
-                    adjustedField.vanishing[x-1][y-1] = false;
+                    adjustedField.field.set(x, y, RealColor::RC_EMPTY);
+                    adjustedField.vanishing.set(x, y, false);
                     continue;
                 }
 
@@ -480,12 +480,12 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
                     }
                 }
 
-                adjustedField.puyos[x-1][y-1] = rc;
+                adjustedField.field.set(x, y, rc);
                 if (rc == RealColor::RC_EMPTY) {
                     shouldEmpty = true;
-                    adjustedField.vanishing[x-1][y-1] = false;
+                    adjustedField.vanishing.set(x, y, false);
                 } else {
-                    adjustedField.vanishing[x-1][y-1] = (framesContinuousVanishing > 2);
+                    adjustedField.vanishing.set(x, y, (framesContinuousVanishing > 2));
                 }
             }
         }
@@ -506,7 +506,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
     if (!result->hasDetectedRensaStart_) {
         // If # of disappearing puyo >= 4, vanishing has started.
         // We should not check before first hand appears.
-        int numVanishing = countVanishing(adjustedField.puyos, adjustedField.vanishing);
+        int numVanishing = countVanishing(adjustedField.field, adjustedField.vanishing);
         if (numVanishing >= 4) {
             LOG(INFO) << "should update field since vanishing detected.";
             result->userState.playable = false;
@@ -562,18 +562,18 @@ void Analyzer::analyzeFieldForLevelSelect(const DetectedField& detectedField, Pl
     }
 }
 
-int Analyzer::countVanishing(RealColor puyos[6][12], bool vanishing[6][12])
+int Analyzer::countVanishing(const RealColorField& field, const FieldBitField& vanishing)
 {
     int result = 0;
-    bool visited[6][12] = {{false}};
+    FieldBitField visited;
 
-    for (int x = 0; x < 6; ++x) {
-        for (int y = 0; y < 12; ++y) {
-            if (visited[x][y])
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            if (visited.get(x, y))
                 continue;
 
-            if (!vanishing[x][y] || !isNormalColor(puyos[x][y])) {
-                visited[x][y] = true;
+            if (!vanishing.get(x, y) || !isNormalColor(field.get(x, y))) {
+                visited.set(x, y, true);
                 continue;
             }
 
@@ -584,14 +584,12 @@ int Analyzer::countVanishing(RealColor puyos[6][12], bool vanishing[6][12])
                 int xx = q.front().first;
                 int yy = q.front().second;
                 q.pop();
-                if (xx < 0 || 6 <= xx || yy < 0 || 12 <= yy)
+                if (visited.get(xx, yy) || !vanishing.get(xx, yy))
                     continue;
-                if (visited[xx][yy] || !vanishing[xx][yy])
-                    continue;
-                if (puyos[x][y] != puyos[xx][yy])
+                if (field.get(x, y) != field.get(xx, yy))
                     continue;
                 ++cnt;
-                visited[xx][yy] = true;
+                visited.set(xx, yy, true);
                 q.push(make_pair(xx + 1, yy));
                 q.push(make_pair(xx - 1, yy));
                 q.push(make_pair(xx, yy + 1));
