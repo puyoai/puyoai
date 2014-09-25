@@ -72,9 +72,7 @@ struct AdjustedField {
 };
 
 struct PlayerAnalyzerResult {
-    void clear() {
-        *this = PlayerAnalyzerResult();
-    }
+    void clear() { *this = PlayerAnalyzerResult(); }
 
     void copyRealColorFrom(NextPuyoPosition npp, const PlayerAnalyzerResult& par)
     {

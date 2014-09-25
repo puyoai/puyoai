@@ -103,7 +103,6 @@ TEST_F(SomagicAnalyzerTest, estimateRealColor)
             << " actual=" << toString(SomagicAnalyzer::estimateRealColor(testcases[i].rgb.toHSV()))
             << " RGB=" << testcases[i].rgb.toString()
             << " HSV=" << testcases[i].rgb.toHSV().toString();
-
     }
 }
 
