@@ -165,8 +165,8 @@ unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi,
             Box b = BoundingBox::instance().get(pi, x, y);
             BoxAnalyzeResult r = analyzeBox(surface, b);
 
-            result->puyos[x-1][y-1] = r.realColor;
-            result->vanishing[x-1][y-1] = r.vanishing;
+            result->field.set(x, y, r.realColor);
+            result->vanishing.set(x, y, r.vanishing);
         }
     }
 

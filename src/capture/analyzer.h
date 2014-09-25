@@ -37,17 +37,17 @@ std::string toString(NextPuyoState);
 struct DetectedField {
     DetectedField();
 
-    void setRealColor(int x, int y, RealColor rc) { puyos[x - 1][y - 1] = rc; }
+    void setRealColor(int x, int y, RealColor rc) { field.set(x, y, rc); }
     void setRealColor(NextPuyoPosition npp, RealColor rc) { nextPuyos[static_cast<int>(npp)] = rc; }
-    RealColor realColor(int x, int y) const { return puyos[x - 1][y - 1]; }
+    RealColor realColor(int x, int y) const { return field.get(x, y); }
     RealColor realColor(NextPuyoPosition npp) const { return nextPuyos[static_cast<int>(npp)]; }
 
-    bool isVanishing(int x, int y) const { return vanishing[x-1][y-1]; }
+    bool isVanishing(int x, int y) const { return vanishing.get(x, y); }
 
     void setOjamaDropDetected(bool flag) { ojamaDropDetected = flag; }
 
-    RealColor puyos[6][12];
-    bool vanishing[6][12];
+    RealColorField field;
+    FieldBitField vanishing;
     RealColor nextPuyos[NUM_NEXT_PUYO_POSITION];
     bool ojamaDropDetected = false;
     bool next1AxisMoving = false;

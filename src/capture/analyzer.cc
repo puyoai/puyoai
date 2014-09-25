@@ -57,13 +57,6 @@ string toString(NextPuyoState nps)
 
 DetectedField::DetectedField()
 {
-    for (int x = 0; x < 6; ++x) {
-        for (int y = 0; y < 12; ++y) {
-            puyos[x][y] = RealColor::RC_EMPTY;
-            vanishing[x][y] = false;
-        }
-    }
-
     for (int i = 0; i < NUM_NEXT_PUYO_POSITION; ++i) {
         nextPuyos[i] = RealColor::RC_EMPTY;
     }
@@ -71,13 +64,6 @@ DetectedField::DetectedField()
 
 AdjustedField::AdjustedField()
 {
-    for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
-        for (int y = 0; y < FieldConstant::MAP_HEIGHT; ++y) {
-            field.set(x, y, RealColor::RC_EMPTY);
-            vanishing.set(x, y, false);
-        }
-    }
-
     for (int i = 0; i < NUM_NEXT_PUYO_POSITION; ++i) {
         nextPuyos[i] = RealColor::RC_EMPTY;
     }
@@ -101,10 +87,10 @@ string PlayerAnalyzerResult::toString() const
 
     ss << "Detected Field    Adjusted Field" << endl;
     ss << "########          ########" << endl;
-    for (int y = 11; y >= 0; --y) {
+    for (int y = 12; y >= 1; --y) {
         ss << '#';
-        for (int x = 0; x < 6; ++x) {
-            ss << toChar(detectedField.puyos[x][y], !detectedField.vanishing[x][y]);
+        for (int x = 1; x <= 6; ++x) {
+            ss << toChar(detectedField.field.get(x, y), !detectedField.vanishing.get(x, y));
         }
         ss << "#          #";
         for (int x = 1; x <= 6; ++x) {
