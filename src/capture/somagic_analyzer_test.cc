@@ -113,26 +113,26 @@ TEST_F(SomagicAnalyzerTest, analyzeNormalField1)
 
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->realColor(1, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->realColor(3, 1));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(4, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->realColor(5, 1));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(6, 1));
+    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(1, 1));
+    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(3, 1));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(4, 1));
+    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(5, 1));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 1));
 
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->realColor(1, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(2, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(3, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(4, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(5, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(6, 2));
+    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(1, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(2, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(3, 2));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 2));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(5, 2));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 2));
 
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->realColor(1, 4));
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->realColor(2, 4));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(3, 4));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(4, 4));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(5, 4));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(6, 4));
+    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(1, 4));
+    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(2, 4));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(3, 4));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 4));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(5, 4));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 4));
 }
 
 TEST_F(SomagicAnalyzerTest, analyzeFieldNormal6)
@@ -141,19 +141,19 @@ TEST_F(SomagicAnalyzerTest, analyzeFieldNormal6)
 
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->realColor(1, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->realColor(3, 1));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(4, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->realColor(5, 1));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(6, 1));
+    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(1, 1));
+    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(3, 1));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 1));
+    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(5, 1));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 1));
 
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->realColor(1, 2));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->realColor(2, 2));
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->realColor(3, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(4, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(5, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->realColor(6, 2));
+    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(1, 2));
+    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(2, 2));
+    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(3, 2));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 2));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(5, 2));
+    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 2));
 }
 
 TEST_F(SomagicAnalyzerTest, analyzeFieldNormal7)
@@ -162,14 +162,14 @@ TEST_F(SomagicAnalyzerTest, analyzeFieldNormal7)
 
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 7));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 8));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(2, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(2, 3));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(3, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(3, 6));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 6));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 7));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 8));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(2, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(2, 3));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(3, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(3, 6));
 }
 
 TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField1)
@@ -178,25 +178,25 @@ TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField1)
 
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(1, 1));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(1, 2));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(2, 2));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(2, 3));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(3, 3));
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->realColor(3, 1));
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->realColor(3, 2));
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->realColor(3, 4));
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->realColor(4, 1));
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->realColor(4, 2));
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->realColor(4, 3));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(1, 1));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(1, 2));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(2, 2));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(2, 3));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(3, 3));
+    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(3, 1));
+    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(3, 2));
+    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(3, 4));
+    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(4, 1));
+    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(4, 2));
+    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(4, 3));
 
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(1, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(2, 3));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(3, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(4, 1));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(5, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(1, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(2, 3));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(3, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 1));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(5, 1));
 }
 
 TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField2)
@@ -205,72 +205,72 @@ TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField2)
 
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(3, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 10));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->realColor(4, 11));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(4, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(4, 3));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(4, 4));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->realColor(4, 7));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(3, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 10));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 11));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(4, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(4, 3));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(4, 4));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(4, 7));
 
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(2, 2));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(4, 3));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->realColor(6, 6));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(1, 1));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(1, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(1, 3));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->realColor(2, 4));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(2, 1));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(2, 2));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(4, 3));
+    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(6, 6));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(1, 1));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(1, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(1, 3));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(2, 4));
 }
 
 TEST_F(SomagicAnalyzerTest, OjamaDetectionCase1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case1.png");
 
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(1, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(2, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(3, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->realColor(5, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(6, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(1, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(2, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(3, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(4, 6));
+    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->adjustedField.realColor(5, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
 }
 
 TEST_F(SomagicAnalyzerTest, OjamaDetectionCase2)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case2.png");
 
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(1, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(2, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(3, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->realColor(5, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(6, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(1, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(2, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(3, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(4, 6));
+    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->adjustedField.realColor(5, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
 }
 
 TEST_F(SomagicAnalyzerTest, OjamaDetectionCase3)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case3.png");
 
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(1, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(2, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(3, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->realColor(5, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(6, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(1, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(2, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(3, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(4, 6));
+    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->adjustedField.realColor(5, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
 }
 
 TEST_F(SomagicAnalyzerTest, OjamaDetectionCase4)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case4.png");
 
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(1, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(2, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(3, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->realColor(5, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->realColor(6, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(1, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(2, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(3, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(4, 6));
+    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->adjustedField.realColor(5, 6));
+    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
 }
 
 TEST_F(SomagicAnalyzerTest, WnextDetection)
@@ -301,7 +301,7 @@ TEST_F(SomagicAnalyzerTest, WnextDetection)
             sprintf(buf, "/somagic/wnext/%s-%dp-case%d.png", testcases[i].name, testcases[i].playerId + 1, id);
             unique_ptr<AnalyzerResult> r = analyze(buf);
 
-            EXPECT_EQ(testcases[i].rc, r->playerResult(testcases[i].playerId)->realColor(NextPuyoPosition::NEXT2_AXIS))
+            EXPECT_EQ(testcases[i].rc, r->playerResult(testcases[i].playerId)->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS))
                 << " Player " << testcases[i].playerId
                 << " Testcase " << testcases[i].name
                 << " Case " << id;
@@ -500,33 +500,33 @@ TEST_F(SomagicAnalyzerTest, gameStart)
         const char* c1 = expectations[i].player1;
         const char* c2 = expectations[i].player2;
 
-        if (c1[0] != '-') EXPECT_EQ(toRealColor(c1[0]), p1->realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[1] != '-') EXPECT_EQ(toRealColor(c1[1]), p1->realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[2] != '-') EXPECT_EQ(toRealColor(c1[2]), p1->realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[3] != '-') EXPECT_EQ(toRealColor(c1[3]), p1->realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[4] != '-') EXPECT_EQ(toRealColor(c1[4]), p1->realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[5] != '-') EXPECT_EQ(toRealColor(c1[5]), p1->realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[0] != '-') EXPECT_EQ(toRealColor(c1[0]), p1->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[1] != '-') EXPECT_EQ(toRealColor(c1[1]), p1->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[2] != '-') EXPECT_EQ(toRealColor(c1[2]), p1->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[3] != '-') EXPECT_EQ(toRealColor(c1[3]), p1->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[4] != '-') EXPECT_EQ(toRealColor(c1[4]), p1->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player1 : Frame " << expectations[i].frame;
+        if (c1[5] != '-') EXPECT_EQ(toRealColor(c1[5]), p1->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player1 : Frame " << expectations[i].frame;
 
-        if (c2[0] != '-') EXPECT_EQ(toRealColor(c2[0]), p2->realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[1] != '-') EXPECT_EQ(toRealColor(c2[1]), p2->realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[2] != '-') EXPECT_EQ(toRealColor(c2[2]), p2->realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[3] != '-') EXPECT_EQ(toRealColor(c2[3]), p2->realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[4] != '-') EXPECT_EQ(toRealColor(c2[4]), p2->realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[5] != '-') EXPECT_EQ(toRealColor(c2[5]), p2->realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[0] != '-') EXPECT_EQ(toRealColor(c2[0]), p2->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[1] != '-') EXPECT_EQ(toRealColor(c2[1]), p2->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[2] != '-') EXPECT_EQ(toRealColor(c2[2]), p2->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[3] != '-') EXPECT_EQ(toRealColor(c2[3]), p2->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[4] != '-') EXPECT_EQ(toRealColor(c2[4]), p2->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player2 : Frame " << expectations[i].frame;
+        if (c2[5] != '-') EXPECT_EQ(toRealColor(c2[5]), p2->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player2 : Frame " << expectations[i].frame;
     }
 
     // ----------------------------------------------------------------------
 
     for (int i = 21; i <= 31; ++i) {
-        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->realColor(NextPuyoPosition::NEXT1_AXIS))
+        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS))
             << "Player 1: Frame" << i << ": NEXT1_AXIS";
-        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->realColor(NextPuyoPosition::NEXT1_CHILD))
+        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD))
             << "Player 1: Frame" << i << ": NEXT1_CHILD";
     }
     for (int i = 45; i <= 59; ++i) {
-        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->realColor(NextPuyoPosition::NEXT1_AXIS))
+        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS))
             << "Player 1: Frame" << i << ": NEXT1_AXIS";
-        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->realColor(NextPuyoPosition::NEXT1_CHILD))
+        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD))
             << "Player 1: Frame" << i << ": NEXT1_CHILD";
     }
 }

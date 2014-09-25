@@ -43,6 +43,7 @@ struct DetectedField {
     RealColor realColor(NextPuyoPosition npp) const { return nextPuyos[static_cast<int>(npp)]; }
 
     bool isVanishing(int x, int y) const { return vanishing.get(x, y); }
+    void setVanishing(int x, int y, bool flag) { vanishing.set(x, y, flag); }
 
     void setOjamaDropDetected(bool flag) { ojamaDropDetected = flag; }
 
@@ -57,34 +58,39 @@ struct DetectedField {
 struct AdjustedField {
     AdjustedField();
 
+    void setRealColor(int x, int y, RealColor rc) { field.set(x, y, rc); }
+    void setRealColor(NextPuyoPosition npp, RealColor rc) { nextPuyos[static_cast<int>(npp)] = rc; }
+    RealColor realColor(int x, int y) const { return field.get(x, y); }
+    RealColor realColor(NextPuyoPosition npp) const { return nextPuyos[static_cast<int>(npp)]; }
+
+    bool isVanishing(int x, int y) const { return vanishing.get(x, y); }
+    void setVanishing(int x, int y, bool flag) { vanishing.set(x, y, flag); }
+
     RealColorField field;
     FieldBitField vanishing;
     RealColor nextPuyos[NUM_NEXT_PUYO_POSITION];
 };
 
 struct PlayerAnalyzerResult {
-    void setRealColor(int x, int y, RealColor rc) { adjustedField.field.set(x, y, rc); }
-    void setRealColor(NextPuyoPosition npp, RealColor rc) { adjustedField.nextPuyos[static_cast<int>(npp)] = rc; }
-    RealColor realColor(int x, int y) const { return adjustedField.field.get(x, y); }
-    RealColor realColor(NextPuyoPosition npp) const { return adjustedField.nextPuyos[static_cast<int>(npp)]; }
-    void setVanishing(int x, int y, bool flag) { adjustedField.vanishing.set(x, y, flag); }
-
     void clear() {
         *this = PlayerAnalyzerResult();
     }
 
-    void copyRealColorFrom(NextPuyoPosition npp, const PlayerAnalyzerResult& par) { setRealColor(npp, par.realColor(npp)); }
+    void copyRealColorFrom(NextPuyoPosition npp, const PlayerAnalyzerResult& par)
+    {
+        adjustedField.setRealColor(npp, par.adjustedField.realColor(npp));
+    }
 
     bool next1IsValid() const
     {
-        return isNormalColor(realColor(NextPuyoPosition::NEXT1_AXIS)) &&
-            isNormalColor(realColor(NextPuyoPosition::NEXT1_CHILD));
+        return isNormalColor(adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS)) &&
+            isNormalColor(adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD));
     }
 
     bool next2IsValid() const
     {
-        return isNormalColor(realColor(NextPuyoPosition::NEXT2_AXIS)) &&
-            isNormalColor(realColor(NextPuyoPosition::NEXT2_CHILD));
+        return isNormalColor(adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)) &&
+            isNormalColor(adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD));
     }
 
     // |state| should be true when:

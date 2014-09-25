@@ -37,7 +37,7 @@ void AnalyzerResultDrawer::draw(Screen* screen)
             for (int y = 1; y <= 12; ++y) {
                 Box b = BoundingBox::instance().get(pi, x, y);
                 b.moveOffset(rect.x, rect.y);
-                RealColor rc = par->realColor(x, y);
+                RealColor rc = par->adjustedField.realColor(x, y);
                 Uint32 color = toPixelColor(surface, rc);
                 SDL_DrawLine(surface, b.sx + 1, b.sy + 1, b.dx - 1, b.sy + 1, color);
                 SDL_DrawLine(surface, b.sx + 1, b.sy + 1, b.sx + 1, b.dy - 1, color);
@@ -62,7 +62,7 @@ void AnalyzerResultDrawer::draw(Screen* screen)
         for (int i = 0; i < 4; ++i) {
             Box b = BoundingBox::instance().get(pi, npp[i]);
             b.moveOffset(rect.x, rect.y);
-            RealColor rc = par->realColor(npp[i]);
+            RealColor rc = par->adjustedField.realColor(npp[i]);
             Uint32 color = toPixelColor(surface, rc);
             SDL_DrawLine(surface, b.sx + 1, b.sy + 1, b.dx - 1, b.sy + 1, color);
             SDL_DrawLine(surface, b.sx + 1, b.sy + 1, b.sx + 1, b.dy - 1, color);

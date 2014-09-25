@@ -219,7 +219,7 @@ Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<co
 
         // Even if restFramesUserCanPlay_[pi] > 0, a puyo might appear on (3, 12).
         // In that case, we skip the rest of waiting frame.
-        if (result->realColor(3, 12) != RealColor::RC_EMPTY) {
+        if (result->adjustedField.realColor(3, 12) != RealColor::RC_EMPTY) {
             result->restFramesUserCanPlay = 0;
             result->userState.playable = true;
         }
@@ -256,8 +256,8 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
     result->nextWillDisappearFast_ = true;
 
     // There should not exist moving puyos. So, CURRENT_AXIS and CURRENT_CHILD should be empty.
-    result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RealColor::RC_EMPTY);
-    result->setRealColor(NextPuyoPosition::CURRENT_CHILD, RealColor::RC_EMPTY);
+    result->adjustedField.setRealColor(NextPuyoPosition::CURRENT_AXIS, RealColor::RC_EMPTY);
+    result->adjustedField.setRealColor(NextPuyoPosition::CURRENT_CHILD, RealColor::RC_EMPTY);
 
     // NOTE: When axisColor or childColor is not normal, we skip this analysis.
     // This is because sometimes we miss-detect the next field.
@@ -270,8 +270,8 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
         if (isNormalColor(axisColor) && isNormalColor(childColor)) {
             int k = ++result->next1Puyos[make_pair(axisColor, childColor)];
             if (k >= 3) {
-                result->setRealColor(NextPuyoPosition::NEXT1_AXIS, axisColor);
-                result->setRealColor(NextPuyoPosition::NEXT1_CHILD, childColor);
+                result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_AXIS, axisColor);
+                result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_CHILD, childColor);
                 result->next1Puyos.clear();
             }
         }
@@ -285,8 +285,8 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
         if (isNormalColor(axisColor) && isNormalColor(childColor)) {
             int k = ++result->next2Puyos[make_pair(axisColor, childColor)];
             if (k >= 3) {
-                result->setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
-                result->setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
+                result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
+                result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
                 // TODO(mayah): Need to check NEXT1 has been found?
                 result->userState.wnextAppeared = true;
                 result->next2Puyos.clear();
@@ -305,14 +305,18 @@ void Analyzer::analyzeNextWhenPreviousResultDoesNotExist(const DetectedField& de
     result->nextWillDisappearFast_ = false;
 
     // We cannot detect moving puyos correctly. So, make them empty.
-    result->setRealColor(NextPuyoPosition::CURRENT_AXIS, RealColor::RC_EMPTY);
-    result->setRealColor(NextPuyoPosition::CURRENT_CHILD, RealColor::RC_EMPTY);
+    result->adjustedField.setRealColor(NextPuyoPosition::CURRENT_AXIS, RealColor::RC_EMPTY);
+    result->adjustedField.setRealColor(NextPuyoPosition::CURRENT_CHILD, RealColor::RC_EMPTY);
 
     // Just copy the detected field.
-    result->setRealColor(NextPuyoPosition::NEXT1_AXIS, detectedField.realColor(NextPuyoPosition::NEXT1_AXIS));
-    result->setRealColor(NextPuyoPosition::NEXT1_CHILD, detectedField.realColor(NextPuyoPosition::NEXT1_CHILD));
-    result->setRealColor(NextPuyoPosition::NEXT2_AXIS, detectedField.realColor(NextPuyoPosition::NEXT2_AXIS));
-    result->setRealColor(NextPuyoPosition::NEXT2_CHILD, detectedField.realColor(NextPuyoPosition::NEXT2_CHILD));
+    result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_AXIS,
+                                       detectedField.realColor(NextPuyoPosition::NEXT1_AXIS));
+    result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_CHILD,
+                                       detectedField.realColor(NextPuyoPosition::NEXT1_CHILD));
+    result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS,
+                                       detectedField.realColor(NextPuyoPosition::NEXT2_AXIS));
+    result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD,
+                                       detectedField.realColor(NextPuyoPosition::NEXT2_CHILD));
 }
 
 void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, PlayerAnalyzerResult* result)
@@ -340,8 +344,8 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     result->framesWhileNext1Disappearing += 1;
 
     // When NEXT2 is not stabilized, we cannot proceed the current state.
-    RealColor next2AxisColor = result->realColor(NextPuyoPosition::NEXT2_AXIS);
-    RealColor next2ChildColor = result->realColor(NextPuyoPosition::NEXT2_CHILD);
+    RealColor next2AxisColor = result->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS);
+    RealColor next2ChildColor = result->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD);
     if (!isNormalColor(next2AxisColor) || !isNormalColor(next2ChildColor))
         return;
 
@@ -354,12 +358,12 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     result->nextPuyoState = NextPuyoState::NEXT2_WILL_DISAPPEAR;
     result->userState.playable = false;
     result->userState.decisionRequest = true;
-    result->setRealColor(NextPuyoPosition::CURRENT_AXIS, result->realColor(NextPuyoPosition::NEXT1_AXIS));
-    result->setRealColor(NextPuyoPosition::CURRENT_CHILD, result->realColor(NextPuyoPosition::NEXT1_CHILD));
-    result->setRealColor(NextPuyoPosition::NEXT1_AXIS, result->realColor(NextPuyoPosition::NEXT2_AXIS));
-    result->setRealColor(NextPuyoPosition::NEXT1_CHILD, result->realColor(NextPuyoPosition::NEXT2_CHILD));
-    result->setRealColor(NextPuyoPosition::NEXT2_AXIS, RealColor::RC_EMPTY);
-    result->setRealColor(NextPuyoPosition::NEXT2_CHILD, RealColor::RC_EMPTY);
+    result->adjustedField.setRealColor(NextPuyoPosition::CURRENT_AXIS, result->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS));
+    result->adjustedField.setRealColor(NextPuyoPosition::CURRENT_CHILD, result->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD));
+    result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_AXIS, result->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS));
+    result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_CHILD, result->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD));
+    result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS, RealColor::RC_EMPTY);
+    result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, RealColor::RC_EMPTY);
 
     if (result->hasDetectedRensaStart_ && !result->hasSentChainFinished_) {
         result->userState.chainFinished = true;
@@ -395,8 +399,8 @@ void Analyzer::analyzeNextForStateNext2WillAppear(const DetectedField& detectedF
         pair<RealColor, RealColor> kp(axisColor, childColor);
         result->next2Puyos[kp]++;
         if (result->next2Puyos[kp] >= 3) {
-            result->setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
-            result->setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
+            result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
+            result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
             result->nextPuyoState = NextPuyoState::STABLE;
             result->userState.wnextAppeared = true;
             result->next2Puyos.clear();
@@ -410,12 +414,12 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
 {
     result->detectedField = detectedField;
 
-    // When the previous result does not empty, we use the detected field as is.
+    // When the previous result is not empty, we use the detected field as is.
     if (previousResults.empty()) {
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
-                result->setRealColor(x, y, detectedField.realColor(x, y));
-                result->setVanishing(x, y, detectedField.isVanishing(x, y));
+                result->adjustedField.setRealColor(x, y, detectedField.realColor(x, y));
+                result->adjustedField.setVanishing(x, y, detectedField.isVanishing(x, y));
             }
         }
 
@@ -542,8 +546,8 @@ void Analyzer::analyzeFieldForLevelSelect(const DetectedField& detectedField, Pl
     // On LevelSelect state, the whole field should be EMPTY.
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            result->setRealColor(x, y, RealColor::RC_EMPTY);
-            result->setVanishing(x, y, false);
+            result->adjustedField.setRealColor(x, y, RealColor::RC_EMPTY);
+            result->adjustedField.setVanishing(x, y, false);
         }
     }
 }
