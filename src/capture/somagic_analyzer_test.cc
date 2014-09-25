@@ -90,6 +90,8 @@ TEST_F(SomagicAnalyzerTest, estimateRealColor)
         { RealColor::RC_YELLOW, RGB(255, 255,   0) },
         { RealColor::RC_YELLOW, RGB(177, 154,  64) },
         { RealColor::RC_YELLOW, RGB(200, 153,  53) },
+        { RealColor::RC_PURPLE, RGB( 90,  51,  58) },
+        { RealColor::RC_PURPLE, RGB( 98,  40,  50) },
         { RealColor::RC_PURPLE, RGB( 94,  21,  78) },
         { RealColor::RC_PURPLE, RGB( 77,  23,  35) },
         { RealColor::RC_PURPLE, RGB( 84,  45,  52) },

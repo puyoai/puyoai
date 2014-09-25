@@ -35,7 +35,7 @@ static RealColor toRealColor(const HSV& hsv)
 
     // Hard to distinguish RED and PURPLE.
     if (340 <= hsv.h && hsv.h <= 350) {
-        if (85 < hsv.v)
+        if (160 < hsv.s + hsv.v)
             return RealColor::RC_RED;
         if (65 < hsv.v)
             return RealColor::RC_PURPLE;
@@ -77,7 +77,7 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
 SomagicAnalyzer::SomagicAnalyzer()
 {
     // TODO(mayah): initializing here seems wrong.
-    BoundingBox::instance().setGenerator(68, 80, 32, 32);
+    BoundingBox::instance().setGenerator(69, 80, 32, 32);
     BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT, Box(260, 256, 270, 280));
     BoundingBox::instance().setRegion(BoundingBox::Region::GAME_FINISHED, Box(292, 352, 420, 367));
 }
