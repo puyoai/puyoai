@@ -270,7 +270,7 @@ string WiiConnectServer::makeMessageFor(int playerId, int frameId, const Analyze
 
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
-                field[pi].unsafeSet(x, y, toPuyoColor(pr->adjustedField.puyos[x-1][y-1]));
+                field[pi].unsafeSet(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
             }
             field[pi].recalcHeightOn(x);
         }
@@ -367,7 +367,7 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
             const AdjustedField& af = analyzerResult.playerResult(pi)->adjustedField;
             for (int x = 1; x <= 6; ++x) {
                 for (int y = 1; y <= 12; ++y) {
-                    if (af.puyos[x-1][y-1] == RealColor::RC_EMPTY)
+                    if (af.field.get(x, y) == RealColor::RC_EMPTY)
                         break;
 
                     field.unsafeSet(x, y, PuyoColor::OJAMA);

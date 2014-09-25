@@ -5,6 +5,7 @@
 
 enum class RealColor {
     RC_EMPTY,
+    RC_WALL,
     RC_OJAMA,
     RC_RED,
     RC_BLUE,
@@ -13,7 +14,7 @@ enum class RealColor {
     RC_PURPLE,
 };
 
-const int NUM_REAL_COLORS = 7;
+const int NUM_REAL_COLORS = 8;
 
 constexpr int ordinal(RealColor rc) { return static_cast<int>(rc); }
 constexpr RealColor intToRealColor(int x) { return static_cast<RealColor>(x); }

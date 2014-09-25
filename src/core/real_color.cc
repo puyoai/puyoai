@@ -6,6 +6,7 @@ RealColor toRealColor(char c)
 {
     switch (c) {
     case ' ': return RealColor::RC_EMPTY;
+    case '#': return RealColor::RC_WALL;
     case 'O': return RealColor::RC_OJAMA;
     case 'R': return RealColor::RC_RED;
     case 'B': return RealColor::RC_BLUE;
@@ -22,6 +23,7 @@ char toChar(RealColor rc, bool usesCapital)
 {
     switch (rc) {
     case RealColor::RC_EMPTY:  return ' ';
+    case RealColor::RC_WALL:   return '#';
     case RealColor::RC_OJAMA:  return usesCapital ? 'O' : 'o';
     case RealColor::RC_RED:    return usesCapital ? 'R' : 'r';
     case RealColor::RC_BLUE:   return usesCapital ? 'B' : 'b';
@@ -38,25 +40,28 @@ const char* toString(RealColor rc)
 {
     switch (rc) {
     case RealColor::RC_EMPTY:
-        return "空";
+        return "EMPTY";
+    case RealColor::RC_WALL:
+        return "WALL";
     case RealColor::RC_OJAMA:
-        return "邪";
+        return "OJAMA";
     case RealColor::RC_RED:
-        return "赤";
+        return "RED";
     case RealColor::RC_BLUE:
-        return "青";
+        return "BLUE";
     case RealColor::RC_YELLOW:
-        return "黄";
+        return "YELLOW";
     case RealColor::RC_GREEN:
-        return "緑";
+        return "GREEN";
     case RealColor::RC_PURPLE:
-        return "紫";
+        return "PURPLE";
     }
 
-    return "不";
+    CHECK(false) << "Unknown RealColor: " << static_cast<int>(rc);
+    return "UNKNOWN";
 }
 
 std::ostream& operator<<(std::ostream& os, RealColor rc)
 {
-    return os << static_cast<int>(rc);
+    return os << toString(rc);
 }
