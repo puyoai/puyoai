@@ -6,7 +6,7 @@
 #include "core/field_constant.h"
 #include "core/puyo_color.h"
 
-class PlainField : public FieldConstant{
+class PlainField : public FieldConstant {
 public:
     PlainField();
     PlainField(const std::string& url);
