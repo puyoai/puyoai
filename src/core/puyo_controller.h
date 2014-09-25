@@ -61,7 +61,8 @@ struct MovingKumipuyoState {
     int restFramesTurnProhibited = 0;
     int restFramesArrowProhibited = 0;
     int restFramesToAcceptQuickTurn = 0;
-    int restFramesForFreefall = FRAMES_FREE_FALL;
+    // After (FRAMES_FREE_FALL / 2) frames, puyo will drop by half.
+    int restFramesForFreefall = FRAMES_FREE_FALL / 2;
     bool grounded = false;
 };
 
