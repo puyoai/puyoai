@@ -240,3 +240,25 @@ TEST(PuyoControllerTest, checkHigherField2)
         }
     }
 }
+
+TEST(PuyoControllerTest, rightHigherField)
+{
+    CoreField f(
+        "      " // 12
+        "      "
+        "     O"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    MovingKumipuyoState mks(KumipuyoPos::initialPos());
+    KeySetSeq kss = PuyoController::findKeyStroke(f, mks, Decision(6, 2));
+
+    EXPECT_EQ(">,,>,B,>,B,v", kss.toString());
+}

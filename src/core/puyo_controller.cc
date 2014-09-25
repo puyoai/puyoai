@@ -77,12 +77,7 @@ void PuyoController::moveKumipuyo(const PlainField& field, const KeySet& keySet,
     if (mks->restFramesToAcceptQuickTurn > 0)
         mks->restFramesToAcceptQuickTurn--;
 
-    // TODO(mayah): Which key is consumed first? turn? arrow?
-    if (mks->restFramesArrowProhibited > 0) {
-        mks->restFramesArrowProhibited--;
-    } else {
-        moveKumipuyoByArrowKey(field, keySet, mks, downAccepted);
-    }
+    // It looks turn key is consumed before arrow key.
 
     bool needsFreefallProcess = true;
     if (mks->restFramesTurnProhibited > 0) {
@@ -90,8 +85,16 @@ void PuyoController::moveKumipuyo(const PlainField& field, const KeySet& keySet,
     } else {
         moveKumipuyoByTurnKey(field, keySet, mks, &needsFreefallProcess);
     }
+
     if (!keySet.hasKey(Key::DOWN) && needsFreefallProcess)
         moveKumipuyoByFreefall(field, mks);
+
+    if (mks->restFramesArrowProhibited > 0) {
+        mks->restFramesArrowProhibited--;
+    } else {
+        moveKumipuyoByArrowKey(field, keySet, mks, downAccepted);
+    }
+
 }
 
 void PuyoController::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
