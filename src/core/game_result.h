@@ -1,5 +1,5 @@
-#ifndef DUEL_GAME_RESULT_H_
-#define DUEL_GAME_RESULT_H_
+#ifndef CORE_GAME_RESULT_H_
+#define CORE_GAME_RESULT_H_
 
 enum class GameResult {
     PLAYING,
@@ -10,5 +10,7 @@ enum class GameResult {
     P2_WIN_WITH_CONNECTION_ERROR,
     GAME_HAS_STOPPED,
 };
+
+GameResult toOppositeResult(GameResult);
 
 #endif
