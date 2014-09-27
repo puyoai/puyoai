@@ -18,6 +18,7 @@
 
 #include "core/constant.h"
 #include "core/frame_request.h"
+#include "core/frame_response.h"
 #include "core/player.h"
 
 using namespace std;
@@ -43,7 +44,7 @@ static int getRemainingMilliSeconds(const struct timeval& start)
     return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
-static void logFrameResponses(int frameId, const vector<ConnectorFrameResponse> alldata[2])
+static void logFrameResponses(int frameId, const vector<FrameResponse> alldata[2])
 {
     // Print debug info.
     LOG(INFO) << "########## FRAME " << frameId << " ##########";
@@ -52,7 +53,7 @@ static void logFrameResponses(int frameId, const vector<ConnectorFrameResponse> 
             LOG(INFO) << playerText(pi) << " [NODATA]";
         }
         for (size_t j = 0; j < alldata[pi].size(); j++) {
-            const ConnectorFrameResponse& data = alldata[pi][j];
+            const FrameResponse& data = alldata[pi][j];
             LOG(INFO) << playerText(pi)
                       << "[" << setfill(' ') << setw(5) << right << data.usec << "us] "
                       << "[" << data.original << "]";
@@ -75,7 +76,7 @@ ConnectorManagerPosix::ConnectorManagerPosix(unique_ptr<Connector> p1, unique_pt
 
 // TODO(mayah): Without polling, each connector should make thread?
 // If we do so, Human connector can use MainWindow::addEventListener(), maybe.
-bool ConnectorManagerPosix::receive(int frameId, vector<ConnectorFrameResponse> cfr[NUM_PLAYERS])
+bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_PLAYERS])
 {
     for (int i = 0; i < NUM_PLAYERS; i++)
         cfr[i].clear();
@@ -132,7 +133,7 @@ bool ConnectorManagerPosix::receive(int frameId, vector<ConnectorFrameResponse> 
 
         for (int i = 0; i < numPollfds; i++) {
             if (pollfds[i].revents & POLLIN) {
-                ConnectorFrameResponse data = connector(playerIds[i])->read();
+                FrameResponse data = connector(playerIds[i])->read();
                 if (data.received) {
                     data.usec = getUsecFromStart(tv_start);
                     cfr[playerIds[i]].push_back(data);

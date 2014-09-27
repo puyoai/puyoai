@@ -13,7 +13,8 @@ endif()
 # library
 
 add_library(puyoai_core STATIC
-            field_pretty_printer.cc frame_request.cc game_result.cc key.cc key_set.cc kumipuyo.cc
+            field_pretty_printer.cc frame_request.cc frame_response.cc
+            game_result.cc key.cc key_set.cc kumipuyo.cc
             plain_field.cc puyo_color.cc puyo_controller.cc real_color.cc sequence_generator.cc)
 
 # ----------------------------------------------------------------------

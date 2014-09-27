@@ -13,7 +13,7 @@ class ConnectorManagerPosix : public ConnectorManager {
 public:
     ConnectorManagerPosix(std::unique_ptr<Connector> p1, std::unique_ptr<Connector> p2);
 
-    virtual bool receive(int frameId, std::vector<ConnectorFrameResponse> cfr[NUM_PLAYERS]) override;
+    virtual bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS]) override;
 
     virtual Connector* connector(int i) override { return connectors_[i].get(); }
 

@@ -4,11 +4,11 @@
 #include <vector>
 
 #include "core/field/core_field.h"
+#include "core/decision.h"
 #include "core/key_set.h"
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"
 #include "core/puyo_controller.h"
-#include "core/server/connector/connector_frame_response.h"
 #include "core/state.h"
 
 // TODO(mayah): We need to do refactoring this. This class is really messy.

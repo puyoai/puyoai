@@ -13,6 +13,7 @@
 #include "core/constant.h"
 #include "core/field/core_field.h"
 #include "core/field/rensa_result.h"
+#include "core/frame_request.h"
 #include "core/puyo_color.h"
 #include "pattern.h"
 

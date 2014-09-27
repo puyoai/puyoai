@@ -1,8 +1,9 @@
 #include "core/client/ai/ai.h"
 
-#include "core/client/connector/client_frame_response.h"
 #include "core/field/rensa_result.h"
 #include "core/field_pretty_printer.h"
+#include "core/frame_request.h"
+#include "core/frame_response.h"
 #include "core/state.h"
 
 using namespace std;
@@ -48,7 +49,7 @@ void AI::runLoop()
         }
 
         if (!frameRequest.isValid()) {
-            connector_.send(ClientFrameResponse(frameRequest.frameId));
+            connector_.send(FrameResponse(frameRequest.frameId));
             continue;
         }
 
@@ -94,7 +95,7 @@ void AI::runLoop()
         }
 
         if (!next1.requested || !next1.ready) {
-            connector_.send(ClientFrameResponse(frameRequest.frameId));
+            connector_.send(FrameResponse(frameRequest.frameId));
             continue;
         }
 
@@ -125,7 +126,7 @@ void AI::runLoop()
 
         // Send
         ++hand_;
-        connector_.send(ClientFrameResponse(frameRequest.frameId, next1.dropDecision.decision(), next1.dropDecision.message()));
+        connector_.send(FrameResponse(frameRequest.frameId, next1.dropDecision.decision(), next1.dropDecision.message()));
 
         // Move to next.
         if (next1.dropDecision.decision().isValid() && next1.kumipuyo.isValid()) {

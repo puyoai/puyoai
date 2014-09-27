@@ -1,6 +1,7 @@
 #include "core/server/connector/human_connector.h"
 
 #include "core/frame_request.h"
+#include "core/frame_response.h"
 #include "core/key.h"
 
 using namespace std;
@@ -18,20 +19,20 @@ void HumanConnector::writeString(const string& message)
     LOG(INFO) << message;
 }
 
-ConnectorFrameResponse HumanConnector::read()
+FrameResponse HumanConnector::read()
 {
-    ConnectorFrameResponse cfr;
-    cfr.received = true;
+    FrameResponse fr;
+    fr.received = true;
 
     // leftTurnKey or rightTurnKey should be prioritized.
     lock_guard<mutex> lock(mu_);
-    cfr.keySet = currentKeySet_;
+    fr.keySet = currentKeySet_;
 
     if (!nextIsPlayable_) {
         currentKeySet_.setKey(Key::LEFT_TURN, false);
         currentKeySet_.setKey(Key::RIGHT_TURN, false);
     }
-    return cfr;
+    return fr;
 }
 
 void HumanConnector::setAlive(bool)

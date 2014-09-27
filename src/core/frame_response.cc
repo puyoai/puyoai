@@ -1,7 +1,6 @@
-#include "core/server/connector/connector_frame_response.h"
+#include "core/frame_response.h"
 
 #include <sstream>
-#include <string>
 
 using namespace std;
 
@@ -15,13 +14,23 @@ static string unescapeMessage(string str)
     return str;
 }
 
+static string escapeMessage(string str)
+{
+    for (size_t i = 0; i < str.size(); ++i) {
+        if (str[i] == ' ')
+            str[i] = '_';
+    }
+
+    return str;
+}
+
 // static
-ConnectorFrameResponse ConnectorFrameResponse::parse(const char* str)
+FrameResponse FrameResponse::parse(const char* str)
 {
     std::istringstream iss(str);
     std::string tmp;
 
-    ConnectorFrameResponse data;
+    FrameResponse data;
 
     data.received = true;
     data.original = std::string(str);
@@ -39,17 +48,32 @@ ConnectorFrameResponse ConnectorFrameResponse::parse(const char* str)
         } else if (tmp.substr(0, 4) == "MSG=") {
             data.msg = unescapeMessage(tmp.c_str() + 4);
         } else if (tmp.substr(0, 3) == "MA=") {
-            data.mawashi_area = tmp.c_str() + 3;
+            data.mawashiArea = tmp.c_str() + 3;
         }
     }
 
     return data;
 }
 
-bool ConnectorFrameResponse::isValid() const
+bool FrameResponse::isValid() const
 {
-    if (!received)
+    if (!connectionLost || !received)
         return false;
 
     return decision.isValid();
+}
+
+std::string FrameResponse::toString() const
+{
+    ostringstream ss;
+    ss << "ID=" << frameId;
+    if (decision.isValid()) {
+        ss << " X=" << decision.x
+           << " R=" << decision.r;
+    }
+    if (!msg.empty()) {
+        ss << " MSG=" << escapeMessage(msg);
+    }
+
+    return ss.str();
 }
