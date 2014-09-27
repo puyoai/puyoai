@@ -5,7 +5,9 @@
 
 #include "capture/analyzer.h"
 #include "capture/source.h"
+#include "core/server/connector/connector_frame_request.h"
 #include "core/field/core_field.h"
+#include "core/game_result.h"
 #include "core/player.h"
 #include "core/puyo_color.h"
 #include "core/puyo_controller.h"
@@ -170,7 +172,7 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
         }
 
         if (isAi_[pi])
-            connector_->connector(pi)->writeString(makeMessageFor(pi, frameId, analyzerResult));
+            connector_->connector(pi)->write(makeFrameRequestFor(pi, frameId, analyzerResult));
     }
 
     return true;
@@ -200,7 +202,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
         }
 
         if (isAi_[pi])
-            connector_->connector(pi)->writeString(makeMessageFor(pi, frameId, analyzerResult));
+            connector_->connector(pi)->write(makeFrameRequestFor(pi, frameId, analyzerResult));
     }
 
     vector<ConnectorFrameResponse> data[2];
@@ -232,83 +234,44 @@ bool WiiConnectServer::playForFinished(int frameId)
     return true;
 }
 
-string WiiConnectServer::makeStateString(int playerId, const AnalyzerResult& re)
-{
-    int s1 = 0, s2 = 0;
-
-    s1 |= re.playerResult(0)->userState.playable        ? STATE_YOU_CAN_PLAY     : 0;
-    s1 |= re.playerResult(0)->userState.wnextAppeared   ? STATE_WNEXT_APPEARED   : 0;
-    s1 |= re.playerResult(0)->userState.grounded        ? STATE_YOU_GROUNDED     : 0;
-    s1 |= re.playerResult(0)->userState.decisionRequest ? STATE_DECISION_REQUEST : 0;
-    s1 |= re.playerResult(0)->userState.chainFinished   ? STATE_CHAIN_DONE       : 0;
-    s1 |= re.playerResult(0)->userState.ojamaDropped    ? STATE_OJAMA_DROPPED    : 0;
-
-    s2 |= re.playerResult(1)->userState.playable        ? STATE_YOU_CAN_PLAY     : 0;
-    s2 |= re.playerResult(1)->userState.wnextAppeared   ? STATE_WNEXT_APPEARED   : 0;
-    s2 |= re.playerResult(1)->userState.grounded        ? STATE_YOU_GROUNDED     : 0;
-    s2 |= re.playerResult(1)->userState.decisionRequest ? STATE_DECISION_REQUEST : 0;
-    s2 |= re.playerResult(1)->userState.chainFinished   ? STATE_CHAIN_DONE       : 0;
-    s2 |= re.playerResult(1)->userState.ojamaDropped    ? STATE_OJAMA_DROPPED    : 0;
-
-    int s = playerId == 0 ? (s1 | (s2 << 1)) : (s2 | (s1 << 1));
-
-    return to_string(s);
-}
-
 // TODO(mayah): Create FrameConnectorRequest instead of string.
-string WiiConnectServer::makeMessageFor(int playerId, int frameId, const AnalyzerResult& re)
+ConnectorFrameRequest WiiConnectServer::makeFrameRequestFor(int playerId, int frameId, const AnalyzerResult& re)
 {
-    CoreField field[2];
-    PuyoColor nexts[2][NUM_NEXT_PUYO_POSITION];
+    ConnectorFrameRequest cfr;
+    cfr.frameId = frameId;
+    if (re.state() == CaptureGameState::FINISHED) {
+        cfr.gameResult = GameResult::DRAW;
+    } else {
+        cfr.gameResult = GameResult::PLAYING;
+    }
 
-    // First, fill the current field and nexts.
-    // We only allocate a new puyo color when it appears in the next-puyo field.
-    for (int pi = 0; pi < 2; ++pi) {
+    for (int i = 0; i < 2; ++i) {
+        int pi = playerId == 0 ? i : (1 - i);
         const PlayerAnalyzerResult* pr = re.playerResult(pi);
-        for (int i = 0; i < NUM_NEXT_PUYO_POSITION; ++i)
-            nexts[pi][i] = toPuyoColor(pr->adjustedField.nextPuyos[i], true);
+
+        cfr.kumipuyo[i][0].axis  = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS), true);
+        cfr.kumipuyo[i][0].child = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD), true);
+        cfr.kumipuyo[i][1].axis  = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS), true);
+        cfr.kumipuyo[i][1].child = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD), true);
+        cfr.kumipuyo[i][2].axis  = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS), true);
+        cfr.kumipuyo[i][2].child = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD), true);
 
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
-                field[pi].unsafeSet(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
+                cfr.field[i].unsafeSet(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
             }
-            field[pi].recalcHeightOn(x);
         }
+
+        cfr.userState[i] = pr->userState;
+
+        // We cannot detect correct values, so we use some default values.
+        cfr.kumipuyoPos[i] = KumipuyoPos(3, 12, 0);
+        cfr.score[i] = 0;
+        cfr.ojama[i] = 0;
+        cfr.ackFrameId[i] = -1;
     }
 
-    const CoreField& myField = field[playerId];
-    const CoreField& enemyField = field[1 - playerId];
-    PuyoColor* myNexts = nexts[playerId];
-    PuyoColor* enemyNexts = nexts[1 - playerId];
-
-    // Then, send message.
-    stringstream ss;
-    ss << "ID=" << frameId
-       << " STATE=" << makeStateString(playerId, re);
-    ss << " YF=";
-    for (int y = 12; y >= 1; --y) {
-        for (int x = 1; x <= 6; ++x) {
-            ss << static_cast<int>(myField.get(x, y));
-        }
-    }
-    ss << " YP=";
-    for (int i = 0; i < NUM_NEXT_PUYO_POSITION; ++i) {
-        ss << static_cast<int>(myNexts[i]);
-    }
-    ss << " OF=";
-    for (int y = 12; y >= 1; --y) {
-        for (int x = 1; x <= 6; ++x) {
-            ss << static_cast<int>(enemyField.get(x, y));
-        }
-    }
-    ss << " OP=";
-    for (int i = 0; i < NUM_NEXT_PUYO_POSITION; ++i) {
-        ss << static_cast<int>(enemyNexts[i]);
-    }
-    ss << " YX=3 YY=12 YR=0 OX=3 OY=12 OR=0";
-    ss << " YO=0 OO=0 YS=0 OS=0";
-
-    return ss.str();
+    return cfr;
 }
 
 PuyoColor WiiConnectServer::toPuyoColor(RealColor rc, bool allowAllocation)

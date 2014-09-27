@@ -44,8 +44,7 @@ private:
     bool playForPlaying(int frameId, const AnalyzerResult&);
     bool playForFinished(int frameId);
 
-    std::string makeMessageFor(int playerId, int frameId, const AnalyzerResult&);
-    std::string makeStateString(int playerId, const AnalyzerResult&);
+    ConnectorFrameRequest makeFrameRequestFor(int playerId, int frameId, const AnalyzerResult&);
     void outputKeys(int playerId, const AnalyzerResult&, const std::vector<ConnectorFrameResponse>&);
 
     PuyoColor toPuyoColor(RealColor, bool allowAllocation = false);

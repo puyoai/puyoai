@@ -20,8 +20,8 @@ public:
     int frameId() const { return frameId_; }
     void setFrameId(int frameId) { frameId_ = frameId; }
 
-    ConnectorFrameRequest toConnectorFrameRequest(int frameId) const;
-    ConnectorFrameRequest toConnectorFrameRequest(int frameId, GameResult forceSetGameResult) const;
+    ConnectorFrameRequest toConnectorFrameRequest(int playerId, int frameId) const;
+    ConnectorFrameRequest toConnectorFrameRequest(int playerId, int frameId, GameResult forceSetGameResult) const;
 
     const FieldRealtime& field(int pi) const { return field_[pi]; }
     FieldRealtime* mutableField(int pi) { return &field_[pi]; }

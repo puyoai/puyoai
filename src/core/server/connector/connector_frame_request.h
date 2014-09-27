@@ -10,7 +10,7 @@
 #include "core/state.h"
 
 struct ConnectorFrameRequest {
-    std::string toRequestString(int playerId) const;
+    std::string toRequestString() const;
 
     int frameId = -1;
     GameResult gameResult;

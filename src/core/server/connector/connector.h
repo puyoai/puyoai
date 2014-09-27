@@ -13,7 +13,6 @@ class Connector : noncopyable {
 public:
     static std::unique_ptr<Connector> create(int playerId, const std::string& program);
 
-    explicit Connector(int playerId) : playerId_(playerId) {}
     virtual ~Connector() {}
 
     virtual void write(const ConnectorFrameRequest&) = 0;
@@ -28,9 +27,6 @@ public:
     virtual bool pollable() const = 0;
     // Returns reader file descriptor. Valid only when pollable() == true.
     virtual int readerFd() const = 0;
-
-protected:
-    int playerId_;
 };
 
 #endif

@@ -4,8 +4,7 @@
 
 using namespace std;
 
-PipeConnector::PipeConnector(int playerId, int writerFd, int readerFd) :
-    Connector(playerId),
+PipeConnector::PipeConnector(int writerFd, int readerFd) :
     writerFd_(writerFd),
     readerFd_(readerFd)
 {
@@ -24,7 +23,7 @@ PipeConnector::~PipeConnector()
 
 void PipeConnector::write(const ConnectorFrameRequest& req)
 {
-    writeString(req.toRequestString(playerId_));
+    writeString(req.toRequestString());
 }
 
 void PipeConnector::writeString(const string& message)

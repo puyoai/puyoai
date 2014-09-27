@@ -188,7 +188,9 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         VLOG(1) << "\n" << gameState.toDebugString();
 
         // --- Sends the current frame information.
-        manager->send(gameState.toConnectorFrameRequest(frameId));
+        for (int pi = 0; pi < 2; ++pi) {
+            manager->connector(pi)->write(gameState.toConnectorFrameRequest(pi, frameId));
+        }
 
         // --- Reads the response of the current frame information.
         // It takes up to 1/FPS [s] to finish this section.
@@ -213,13 +215,17 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         gameResult = gameState.gameResult();
         if (gameResult != GameResult::PLAYING) {
             frameId++;
-            manager->send(gameState.toConnectorFrameRequest(frameId));
+            for (int pi = 0; pi < 2; ++pi) {
+                manager->connector(pi)->write(gameState.toConnectorFrameRequest(pi, frameId));
+            }
             break;
         }
         if (FLAGS_use_even && frameId >= FPS * 120) {
             gameResult = GameResult::DRAW;
             frameId++;
-            manager->send(gameState.toConnectorFrameRequest(frameId, gameResult));
+            for (int pi = 0; pi < 2; ++pi) {
+                manager->connector(pi)->write(gameState.toConnectorFrameRequest(pi, frameId));
+            }
             break;
         }
     }
