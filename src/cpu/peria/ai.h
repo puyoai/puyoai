@@ -20,8 +20,8 @@ class Ai : public ::AI {
                              const PlainField& field,
                              const KumipuyoSeq& seq,
                              const AdditionalThoughtInfo& info) override;
-  virtual void gameWillBegin(const FrameData& frame_data) override;
-  virtual void enemyGrounded(const FrameData& frame_data) override;
+  virtual void gameWillBegin(const FrameRequest& frame_request) override;
+  virtual void enemyGrounded(const FrameRequest& frame_request) override;
 
   // Information about opponent's attacks.
   std::unique_ptr<Attack> attack_;

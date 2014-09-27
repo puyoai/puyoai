@@ -153,12 +153,12 @@ DropDecision Ai::think(int frame_id,
   return DropDecision(decision, message);
 }
 
-void Ai::gameWillBegin(const FrameData& /*frame_data*/) {
+void Ai::gameWillBegin(const FrameRequest& /*frame_request*/) {
   attack_.reset();
 }
 
-void Ai::enemyGrounded(const FrameData& frame_data) {
-  const PlainField& enemy = frame_data.enemyPlayerFrameData().field;
+void Ai::enemyGrounded(const FrameRequest& frame_request) {
+  const PlainField& enemy = frame_request.enemyPlayerFrameRequest().field;
   CoreField field(enemy);
   field.forceDrop();
   RensaResult result = field.simulate();
@@ -171,7 +171,7 @@ void Ai::enemyGrounded(const FrameData& frame_data) {
 
   attack_.reset(new Attack);
   attack_->score = result.score;
-  attack_->end_frame_id = frame_data.id + result.frames;
+  attack_->end_frame_id = frame_request.frameId + result.frames;
 }
 
 }  // namespace peria

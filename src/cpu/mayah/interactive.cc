@@ -12,7 +12,7 @@
 #include "core/algorithm/rensa_detector.h"
 #include "core/field/core_field.h"
 #include "core/field_pretty_printer.h"
-#include "core/frame_data.h"
+#include "core/frame_request.h"
 #include "core/kumipuyo.h"
 #include "core/sequence_generator.h"
 #include "core/state.h"
@@ -93,13 +93,12 @@ int main(int argc, char* argv[])
     for (int i = 0; i + 1 < seq.size(); ++i) {
         int frameId = 2 + i; // frameId 1 will be used for initializing now. Let's avoid it.
 
-        FrameData fd;
-        fd.id = frameId;
-        fd.valid = true;
+        FrameRequest fr;
+        fr.frameId = frameId;
 
         // Set up enemy field.
         // Make enemy will fire his large rensa.
-        fd.playerFrameData[1].field = CoreField(
+        fr.playerFrameRequest[1].field = CoreField(
             "500065"
             "400066"
             "545645"
@@ -110,12 +109,12 @@ int main(int argc, char* argv[])
             "456456"
             "456456"
             "456456");
-        fd.playerFrameData[1].kumipuyoSeq = KumipuyoSeq("666666");
+        fr.playerFrameRequest[1].kumipuyoSeq = KumipuyoSeq("666666");
 
         // Invoke Gazer.
         {
             double t1 = currentTime();
-            ai.enemyNext2Appeared(fd);
+            ai.enemyNext2Appeared(fr);
             double t2 = currentTime();
             cout << "gazer time = " << (t2 - t1) << endl;
         }

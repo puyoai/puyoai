@@ -111,28 +111,27 @@ string GameState::toDebugString() const
     return ss.str();
 }
 
-ConnectorFrameRequest GameState::toConnectorFrameRequest(int playerId, int frameId) const
+FrameRequest GameState::toFrameRequest(int playerId, int frameId) const
 {
-    return toConnectorFrameRequest(playerId, frameId, gameResult());
+    return toFrameRequest(playerId, frameId, gameResult());
 }
 
-ConnectorFrameRequest GameState::toConnectorFrameRequest(int playerId, int frameId, GameResult forceSetGameResult) const
+FrameRequest GameState::toFrameRequest(int playerId, int frameId, GameResult forceSetGameResult) const
 {
-    ConnectorFrameRequest req;
+    FrameRequest req;
     req.frameId = frameId;
     req.gameResult = playerId == 0 ? forceSetGameResult : toOppositeResult(forceSetGameResult);
-    for (int pi = 0; pi < 2; ++pi) {
-        const FieldRealtime& f = field(playerId == 0 ? pi : 1 - pi);
-        req.field[pi] = f.field();
-        req.kumipuyo[pi][0] = f.kumipuyo(0);
-        req.kumipuyo[pi][1] = f.kumipuyo(1);
-        req.kumipuyo[pi][2] = f.kumipuyo(2);
-        req.kumipuyoPos[pi] = f.kumipuyoPos();
-        req.userState[pi] = f.userState();
-        req.score[pi] = f.score();
-        req.ojama[pi] = f.ojama();
-        req.ackFrameId[pi] = ackFrameId(playerId == 0 ? pi : 1 - pi);
-        req.nackFrameIds[pi] = nackFrameIds(playerId == 0 ? pi : 1 - pi);
+    for (int i = 0; i < 2; ++i) {
+        PlayerFrameRequest& pfr = req.playerFrameRequest[i];
+        const FieldRealtime& f = field(playerId == 0 ? i : 1 - i);
+        pfr.field = f.field();
+        pfr.kumipuyoSeq = KumipuyoSeq { f.kumipuyo(0), f.kumipuyo(1), f.kumipuyo(2) };
+        pfr.kumipuyoPos = f.kumipuyoPos();
+        pfr.state = f.userState();
+        pfr.score = f.score();
+        pfr.ojama = f.ojama();
+        pfr.ackFrameId = ackFrameId(playerId == 0 ? i : 1 - i);
+        pfr.nackFrameIds = nackFrameIds(playerId == 0 ? i : 1 - i);
     }
 
     return req;

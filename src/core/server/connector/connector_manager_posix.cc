@@ -17,8 +17,8 @@
 #include <glog/logging.h>
 
 #include "core/constant.h"
+#include "core/frame_request.h"
 #include "core/player.h"
-#include "core/server/connector/connector_frame_request.h"
 
 using namespace std;
 

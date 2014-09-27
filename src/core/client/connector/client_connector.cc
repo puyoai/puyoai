@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <sstream>
+
 #include "core/client/connector/client_frame_response.h"
 
 using namespace std;
@@ -16,14 +17,14 @@ static string escapeMessage(string str)
     return str;
 }
 
-FrameData ClientConnector::receive()
+FrameRequest ClientConnector::receive()
 {
-    FrameData frameData;
+    FrameRequest frameRequest;
     std::string line;
     while (true) {
         if (!std::getline(std::cin, line)) {
-            frameData.connectionLost = true;
-            return frameData;
+            frameRequest.connectionLost = true;
+            return frameRequest;
         }
 
         if (line != "")
@@ -31,55 +32,7 @@ FrameData ClientConnector::receive()
     }
     VLOG(1) << line;
 
-    string term;
-    for (std::istringstream iss(line); iss >> term;) {
-        if (term.find('=') == std::string::npos)
-            continue;
-
-        const char* key = term.c_str();
-        const char* value = term.c_str() + term.find('=') + 1;
-        if (strncmp(key, "STATE", 5) == 0) {
-            int state = strtoull(value, NULL, 10);
-            frameData.playerFrameData[0].userState.parseFromDeprecatedState(state);
-            frameData.playerFrameData[1].userState.parseFromDeprecatedState(state >> 1);
-            continue;
-        } else if (strncmp(key, "ID", 2) == 0) {
-            frameData.valid = true;
-            frameData.id = std::atoi(value);
-            continue;
-        } else if (strncmp(key, "END", 3) == 0) {
-            frameData.gameEnd = std::atoi(value);
-        }
-
-        PlayerFrameData& playerFrameData = frameData.playerFrameData[(key[0] == 'Y') ? 0 : 1];
-        switch (key[1]) {
-        case 'F':
-            playerFrameData.field = PlainField(string(value));
-            break;
-        case 'P':
-            playerFrameData.kumipuyoSeq = KumipuyoSeq(string(value));
-            break;
-        case 'S':
-            playerFrameData.score = std::atoi(value);
-            break;
-        case 'X':
-            playerFrameData.kumipuyoPos.x = std::atoi(value);
-            break;
-        case 'Y':
-            playerFrameData.kumipuyoPos.y = std::atoi(value);
-            break;
-        case 'R':
-            playerFrameData.kumipuyoPos.r = std::atoi(value);
-            break;
-        case 'O':
-            playerFrameData.ojama = std::atoi(value);
-            break;
-        }
-    }
-
-    VLOG(1) << frameData.toString();
-
-    return frameData;
+    return FrameRequest::parse(line);
 }
 
 void ClientConnector::send(const ClientFrameResponse& resp)
