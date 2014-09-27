@@ -1,12 +1,10 @@
-#include "duel/field_realtime.h"
-
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
 
+#include "core/server/game_state.h"
 #include "duel/cui.h"
-#include "duel/game_state.h"
 
 using std::string;
 using std::cout;
@@ -81,9 +79,9 @@ void Cui::clear()
 
 void Cui::newGameWillStart()
 {
-    cout << locate(1, 1 + CoreField::MAP_HEIGHT + 3)
+    cout << locate(1, 1 + FieldConstant::MAP_HEIGHT + 3)
          << "\x1B[0K"
-         << locate(1, 1 + CoreField::MAP_HEIGHT + 4)
+         << locate(1, 1 + FieldConstant::MAP_HEIGHT + 4)
          << "\x1B[0K" << std::flush;
     printPuyoCache_.clear();
     printTextCache_.clear();
@@ -91,33 +89,33 @@ void Cui::newGameWillStart()
 
 void Cui::onUpdate(const GameState& gameState)
 {
-    print(0, gameState.field(0), gameState.message(0));
-    print(1, gameState.field(1), gameState.message(1));
+    print(0, gameState.playerGameState(0));
+    print(1, gameState.playerGameState(1));
     std::cout << std::flush;
 }
 
-void Cui::printField(int playerId, const FieldRealtime& field)
+void Cui::printField(int playerId, const PlayerGameState& pgs)
 {
-    Kumipuyo kumipuyo = field.kumipuyo();
-    KumipuyoPos kumipuyoPos = field.kumipuyoPos();
+    const Kumipuyo& kumipuyo = pgs.kumipuyoSeq.front();
+    const KumipuyoPos& kumipuyoPos = pgs.kumipuyoPos;
 
-    for (int y = 0; y < CoreField::MAP_HEIGHT; y++) {
-        for (int x = 0; x < CoreField::MAP_WIDTH; x++) {
-            PuyoColor color = field.field().color(x, y);
-            if (field.userPlayable()) {
+    for (int y = 0; y < FieldConstant::MAP_HEIGHT; y++) {
+        for (int x = 0; x < FieldConstant::MAP_WIDTH; x++) {
+            PuyoColor color = pgs.field.get(x, y);
+            if (pgs.playable) {
                 if (x == kumipuyoPos.axisX() && y == kumipuyoPos.axisY())
                     color = kumipuyo.axis;
                 if (x == kumipuyoPos.childX() && y == kumipuyoPos.childY())
                     color = kumipuyo.child;
             }
 
-            printPuyo(locate(playerId, x * 2, CoreField::MAP_HEIGHT - y),
+            printPuyo(locate(playerId, x * 2, FieldConstant::MAP_HEIGHT - y),
                       puyoText(color, y));
         }
     }
 }
 
-void Cui::printNextPuyo(int playerId, const FieldRealtime& field)
+void Cui::printNextPuyo(int playerId, const PlayerGameState& pgs)
 {
     static const NextPuyoPosition npp[] = {
         NextPuyoPosition::NEXT1_CHILD,
@@ -129,7 +127,7 @@ void Cui::printNextPuyo(int playerId, const FieldRealtime& field)
     // Next puyo info
     for (int i = 0; i < 4; ++i) {
         printPuyo(locate(playerId, 9 * 2, 3 + i + (i / 2)),
-                  puyoText(field.puyoColor(npp[i])));
+                  puyoText(pgs.kumipuyoSeq.color(npp[i])));
     }
 }
 
@@ -138,34 +136,34 @@ void Cui::printMessage(int playerId, const string& message)
     if (message.empty())
         return;
 
-    printText(locate(1, 1 + CoreField::MAP_HEIGHT + 3 + playerId) + CLEAR_LINE, message);
+    printText(locate(1, 1 + FieldConstant::MAP_HEIGHT + 3 + playerId) + CLEAR_LINE, message);
 }
 
-void Cui::print(int playerId, const FieldRealtime& field, const string& debug_message)
+void Cui::print(int playerId, const PlayerGameState& pgs)
 {
-    printField(playerId, field);
-    printOjamaPuyo(playerId, field);
-    printNextPuyo(playerId, field);
-    printMessage(playerId, debug_message);
-    printScore(playerId, field.score());
+    printField(playerId, pgs);
+    printOjamaPuyo(playerId, pgs);
+    printNextPuyo(playerId, pgs);
+    printMessage(playerId, pgs.message);
+    printScore(playerId, pgs.score);
 
     // Set cursor
-    cout << locate(0, CoreField::MAP_HEIGHT + 3);
+    cout << locate(0, FieldConstant::MAP_HEIGHT + 3);
 }
 
 void Cui::printScore(int playerId, int score)
 {
     std::ostringstream ss;
     ss << std::setw(10) << score;
-    printText(locate(playerId, 0, CoreField::MAP_HEIGHT + 1),
+    printText(locate(playerId, 0, FieldConstant::MAP_HEIGHT + 1),
               ss.str());
 }
 
-void Cui::printOjamaPuyo(int playerId, const FieldRealtime& field)
+void Cui::printOjamaPuyo(int playerId, const PlayerGameState& pgs)
 {
     std::ostringstream ss;
-    ss << field.numFixedOjama()
-       << "(" << field.numPendingOjama() << ")";
+    ss << pgs.fixedOjama
+       << "(" << pgs.pendingOjama << ")";
     printText(locate(playerId, 0, 0), ss.str());
 }
 

@@ -13,7 +13,7 @@
 #include "base/base.h"
 #include "core/field/core_field.h"
 #include "core/kumipuyo.h"
-#include "duel/game_state_observer.h"
+#include "core/server/game_state_observer.h"
 
 class Commentator;
 

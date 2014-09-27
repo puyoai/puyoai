@@ -13,7 +13,7 @@
 #include "core/algorithm/rensa_info.h"
 #include "core/field/core_field.h"
 #include "core/kumipuyo.h"
-#include "duel/game_state_observer.h"
+#include "core/server/game_state_observer.h"
 
 struct TrackedPossibleRensaInfo {
     TrackedPossibleRensaInfo() {}

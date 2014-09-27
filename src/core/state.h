@@ -28,6 +28,7 @@ inline std::string GetStateString(int st)
 }
 
 // TODO(mayah): Use UserState instead of State.
+// TODO(mayah): Rename to UserEvent after playable is removed.
 struct UserState {
     void clearEventStates()
     {

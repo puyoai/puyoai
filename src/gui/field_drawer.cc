@@ -15,9 +15,8 @@
 #include <glog/logging.h>
 
 #include "core/key.h"
+#include "core/server/game_state.h"
 #include "core/state.h"
-#include "duel/field_realtime.h"
-#include "duel/game_state.h"
 #include "gui/main_window.h"
 #include "gui/pixel_color.h"
 
@@ -65,8 +64,8 @@ void FieldDrawer::draw(Screen* screen)
     SDL_BlitSurface(backgroundSurface_.get(), nullptr, screen->surface(), &bgRect);
 
     lock_guard<mutex> lock(mu_);
-    drawField(screen, 0, gameState_->field(0));
-    drawField(screen, 1, gameState_->field(1));
+    drawField(screen, 0, gameState_->playerGameState(0));
+    drawField(screen, 1, gameState_->playerGameState(1));
 }
 
 SDL_Rect FieldDrawer::toRect(PuyoColor pc)
@@ -84,24 +83,24 @@ SDL_Rect FieldDrawer::toRect(PuyoColor pc)
     return SDL_Rect { 0, 0, 0, 0 };
 }
 
-void FieldDrawer::drawField(Screen* screen, int playerId, const FieldRealtime& field)
+void FieldDrawer::drawField(Screen* screen, int playerId, const PlayerGameState& pgs)
 {
     SDL_Surface* surface = screen->surface();
 
-    Kumipuyo kumipuyo = field.kumipuyo();
-    KumipuyoPos kumipuyoPos = field.kumipuyoPos();
+    const Kumipuyo& kumipuyo = pgs.kumipuyoSeq.front();
+    const KumipuyoPos& kumipuyoPos = pgs.kumipuyoPos;
 
-    for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
-        for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
-            PuyoColor c = field.field().color(x, y);
-            if (field.userPlayable()) {
+    for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
+        for (int y = 0; y < FieldConstant::MAP_HEIGHT; ++y) {
+            PuyoColor c = pgs.field.get(x, y);
+            if (pgs.state.playable) {
                 if (x == kumipuyoPos.axisX() && y == kumipuyoPos.axisY())
                     c = kumipuyo.axis;
                 if (x == kumipuyoPos.childX() && y == kumipuyoPos.childY())
                     c = kumipuyo.child;
             }
 
-            SDL_Rect r = BoundingBox::instance().get(field.playerId(), x, y).toSDLRect();
+            SDL_Rect r = BoundingBox::instance().get(playerId, x, y).toSDLRect();
             if (isNormalColor(c) || c == PuyoColor::OJAMA) {
                 SDL_Rect sourceRect = toRect(c);
                 SDL_BlitSurface(puyoSurface_.get(), &sourceRect, surface, &r);
@@ -110,15 +109,15 @@ void FieldDrawer::drawField(Screen* screen, int playerId, const FieldRealtime& f
     }
 
     // Next puyo info
-    const NextPuyoPosition positions[] = {
+    static const NextPuyoPosition positions[] = {
         NextPuyoPosition::NEXT1_AXIS,
         NextPuyoPosition::NEXT1_CHILD,
         NextPuyoPosition::NEXT2_AXIS,
         NextPuyoPosition::NEXT2_CHILD,
     };
     for (int i = 0; i < 4; ++i) {
-        SDL_Rect r = BoundingBox::instance().get(field.playerId(), positions[i]).toSDLRect();
-        PuyoColor c = field.puyoColor(positions[i]);
+        SDL_Rect r = BoundingBox::instance().get(playerId, positions[i]).toSDLRect();
+        PuyoColor c = pgs.kumipuyoSeq.color(positions[i]);
         if (isNormalColor(c) || c == PuyoColor::OJAMA) {
             SDL_Rect sourceRect = toRect(c);
             sourceRect.w = r.w;
@@ -132,8 +131,8 @@ void FieldDrawer::drawField(Screen* screen, int playerId, const FieldRealtime& f
     }
 
     // Ojama
-    int ojama = field.ojama();
-    Box offsetBox = BoundingBox::instance().get(field.playerId(), 1, 13);
+    int ojama = pgs.ojama();
+    Box offsetBox = BoundingBox::instance().get(playerId, 1, 13);
     int offsetX = offsetBox.sx;
     int offsetY = offsetBox.sy;
     while (ojama > 0) {
@@ -200,10 +199,8 @@ void FieldDrawer::drawField(Screen* screen, int playerId, const FieldRealtime& f
     // Score
     {
         ostringstream ss;
-        ss << setw(10) << field.score();
-        Box b = BoundingBox::instance().get(field.playerId(), 0, -1);
-        Kanji_PutText(font_,
-                      b.sx, b.sy,
-                      surface, ss.str().c_str(), white);
+        ss << setw(10) << pgs.score;
+        Box b = BoundingBox::instance().get(playerId, 0, -1);
+        Kanji_PutText(font_, b.sx, b.sy, surface, ss.str().c_str(), white);
     }
 }

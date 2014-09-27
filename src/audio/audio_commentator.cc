@@ -6,7 +6,7 @@
 
 #include "audio/speaker.h"
 #include "core/server/commentator.h"
-#include "duel/game_state.h"
+#include "core/server/game_state.h"
 
 using namespace std;
 

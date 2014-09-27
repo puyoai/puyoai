@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_duel
-            cui.cc duel_server.cc field_realtime.cc
-            frame_context.cc game_state.cc
-            puyofu_recorder.cc)
+            cui.cc duel_server.cc field_realtime.cc frame_context.cc puyofu_recorder.cc)
 
 add_executable(duel main.cc)
 

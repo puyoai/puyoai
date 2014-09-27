@@ -9,7 +9,6 @@
 #include "core/game_result.h"
 
 class ConnectorManager;
-class GameState;
 class GameStateObserver;
 struct FrameResponse;
 
@@ -32,8 +31,10 @@ public:
     }
 
 private:
+    struct DuelState;
+
     void runDuelLoop();
-    void play(GameState*, const std::vector<FrameResponse> data[2]);
+    void play(DuelState*, const std::vector<FrameResponse> data[2]);
 
     GameResult runGame(ConnectorManager* manager);
 

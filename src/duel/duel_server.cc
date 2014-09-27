@@ -13,10 +13,11 @@
 #include "core/frame_response.h"
 #include "core/server/connector/connector.h"
 #include "core/server/connector/connector_manager.h"
+#include "core/server/game_state.h"
+#include "core/server/game_state_observer.h"
 #include "core/sequence_generator.h"
+#include "duel/field_realtime.h"
 #include "duel/frame_context.h"
-#include "duel/game_state.h"
-#include "duel/game_state_observer.h"
 
 using namespace std;
 
@@ -29,6 +30,37 @@ DEFINE_string(seq, "", "initial puyo sequence");
 #ifdef USE_SDL2
 DECLARE_bool(use_gui);
 #endif
+
+struct DuelServer::DuelState {
+    explicit DuelState(const KumipuyoSeq& seq) : field { FieldRealtime(0, seq), FieldRealtime(1, seq) } {}
+
+    GameState toGameState() const
+    {
+        GameState gs(frameId);
+        for (int pi = 0; pi < 2; ++pi) {
+            PlayerGameState* pgs = gs.mutablePlayerGameState(pi);
+            const FieldRealtime& fr = field[pi];
+            pgs->field = fr.field();
+            pgs->kumipuyoSeq = fr.kumipuyoSeq();
+            pgs->kumipuyoPos = fr.kumipuyoPos();
+            pgs->state = fr.userState();
+            pgs->dead = fr.isDead();
+            pgs->playable = fr.userState().playable;
+            pgs->score = fr.score();
+            pgs->pendingOjama = fr.numPendingOjama();
+            pgs->fixedOjama = fr.numFixedOjama();
+            pgs->decision = decision[pi];
+            pgs->message = message[pi];
+        }
+
+        return gs;
+    }
+
+    int frameId = 0;
+    FieldRealtime field[2];
+    Decision decision[2];
+    std::string message[2];
+};
 
 /**
  * Updates decision when an applicable one is found.
@@ -178,19 +210,17 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         }
     }
 
-    GameState gameState(kumipuyoSeq);
+    DuelState duelState(kumipuyoSeq);
+    GameState gameState = duelState.toGameState();
 
-    int frameId = 0;
     GameResult gameResult = GameResult::GAME_HAS_STOPPED;
     while (!shouldStop_) {
-        frameId++;
-
-        gameState.setFrameId(frameId);
-        VLOG(1) << "\n" << gameState.toDebugString();
+        duelState.frameId += 1;
+        int frameId = duelState.frameId;
 
         // --- Sends the current frame information.
         for (int pi = 0; pi < 2; ++pi) {
-            manager->connector(pi)->write(gameState.toFrameRequest(pi, frameId));
+            manager->connector(pi)->write(gameState.toFrameRequestFor(pi));
         }
 
         // --- Reads the response of the current frame information.
@@ -207,7 +237,8 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         }
 
         // --- Play with input.
-        play(&gameState, data);
+        play(&duelState, data);
+        gameState = duelState.toGameState();
         for (GameStateObserver* observer : observers_)
             observer->onUpdate(gameState);
 
@@ -215,18 +246,10 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         // Timeout is 120s, and the game is 30fps.
         gameResult = gameState.gameResult();
         if (gameResult != GameResult::PLAYING) {
-            frameId++;
-            for (int pi = 0; pi < 2; ++pi) {
-                manager->connector(pi)->write(gameState.toFrameRequest(pi, frameId));
-            }
             break;
         }
         if (FLAGS_use_even && frameId >= FPS * 120) {
             gameResult = GameResult::DRAW;
-            frameId++;
-            for (int pi = 0; pi < 2; ++pi) {
-                manager->connector(pi)->write(gameState.toFrameRequest(pi, frameId));
-            }
             break;
         }
     }
@@ -234,46 +257,35 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
     if (shouldStop_)
         gameResult = GameResult::GAME_HAS_STOPPED;
 
+    // Send Request for GameResult.
+    {
+        ++duelState.frameId;
+        gameState = duelState.toGameState();
+        for (int pi = 0; pi < 2; ++pi) {
+            manager->connector(pi)->write(gameState.toFrameRequestFor(pi));
+        }
+    }
+
     for (auto observer : observers_)
         observer->gameHasDone(gameResult);
 
     return gameResult;
 }
 
-void DuelServer::play(GameState* gameState, const vector<FrameResponse> data[2])
+void DuelServer::play(DuelState* duelState, const vector<FrameResponse> data[2])
 {
     for (int pi = 0; pi < 2; pi++) {
-        FieldRealtime* me = gameState->mutableField(pi);
-        FieldRealtime* opponent = gameState->mutableField(1 - pi);
+        FieldRealtime* me = &duelState->field[pi];
+        FieldRealtime* opponent = &duelState->field[1 - pi];
 
-        int accepted_index = updateDecision(data[pi], *me, gameState->mutableDecision(pi));
+        int accepted_index = updateDecision(data[pi], *me, &duelState->decision[pi]);
 
         // TODO(mayah): ReceivedData from HumanConnector does not have any decision.
         // So, all data will be marked as NACK. Since the HumanConnector does not see ACK/NACK,
         // it's OK for now. However, this might cause future issues. Consider better way.
 
-        // Take care of ack_info.
-        int ackFrameId = -1;
-        vector<int> nackFrameIds;
-        for (size_t j = 0; j < data[pi].size(); j++) {
-            const FrameResponse& d = data[pi][j];
-
-            // This case does not require ack.
-            if (!d.isValid())
-                continue;
-
-            if (static_cast<int>(j) == accepted_index) {
-                ackFrameId = d.frameId;
-            } else {
-                nackFrameIds.push_back(d.frameId);
-            }
-        }
-
-        gameState->setAckFrameId(pi, ackFrameId);
-        gameState->setNackFrameIds(pi, nackFrameIds);
-
         if (accepted_index != -1) {
-            KeySetSeq kss = PuyoController::findKeyStroke(me->field(), me->movingKumipuyoState(), gameState->decision(pi));
+            KeySetSeq kss = PuyoController::findKeyStroke(me->field(), me->movingKumipuyoState(), duelState->decision[pi]);
             me->setKeySetSeq(kss);
         }
 
@@ -295,11 +307,12 @@ void DuelServer::play(GameState* gameState, const vector<FrameResponse> data[2])
 
         // Clear current key input if the move is done.
         if (me->userState().grounded) {
-            gameState->setDecision(pi, Decision());
+            duelState->decision[pi] = Decision();
             me->setKeySetSeq(KeySetSeq());
         }
 
-        if (accepted_message != "")
-            gameState->setMessage(pi, accepted_message);
+        if (accepted_message != "") {
+            duelState->message[pi] = accepted_message;
+        }
     }
 }

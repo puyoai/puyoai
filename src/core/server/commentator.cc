@@ -16,9 +16,8 @@
 #include "base/base.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
+#include "core/server/game_state.h"
 #include "core/state.h"
-#include "duel/game_state.h"
-#include "duel/field_realtime.h"
 
 using namespace std;
 
@@ -46,19 +45,18 @@ void Commentator::onUpdate(const GameState& gameState)
     lock_guard<mutex> lock(mu_);
 
     for (int i = 0; i < 2; ++i) {
-        const FieldRealtime& rf = gameState.field(i);
-        if (rf.userState().grounded) {
+        const PlayerGameState& pgs = gameState.playerGameState(i);
+        if (pgs.state.grounded) {
             frameId_[i] = gameState.frameId();
-            field_[i] = rf.field();
+            field_[i] = CoreField(pgs.field);
             // When chigiri is used, some puyo exists in the air. So we need to drop.
             field_[i].forceDrop();
-            kumipuyoSeq_[i] = rf.kumipuyoSeq();
+            kumipuyoSeq_[i] = pgs.kumipuyoSeq;
             needsUpdate_[i] = true;
         }
 
-        string msg = gameState.message(i);
-        if (msg != "")
-            message_[i] = msg;
+        if (!pgs.message.empty())
+            message_[i] = pgs.message;
     }
 }
 

@@ -1,20 +1,20 @@
-#ifndef DUEL_FIELD_DRAWER_H_
-#define DUEL_FIELD_DRAWER_H_
+#ifndef GUI_FIELD_DRAWER_H_
+#define GUI_FIELD_DRAWER_H_
 
 #include <memory>
 #include <mutex>
 
 #include "base/base.h"
-#include "duel/game_state_observer.h"
+#include "core/server/game_state_observer.h"
 #include "gui/box.h"
 #include "gui/drawer.h"
 #include "gui/screen.h"
 #include "gui/unique_sdl_surface.h"
 #include "gui/SDL_kanji.h"
 
-class FieldRealtime;
 class GameState;
 class MainWindow;
+struct PlayerGameState;
 class SDLCommentator;
 
 // FieldDrawer draws the current puyo field etc.
@@ -29,7 +29,7 @@ public:
     virtual void draw(Screen*) override;
 
 private:
-    void drawField(Screen*, int playerId, const FieldRealtime&);
+    void drawField(Screen*, int playerId, const PlayerGameState&);
     SDL_Rect toRect(PuyoColor);
 
     mutable std::mutex mu_;
