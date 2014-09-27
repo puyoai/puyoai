@@ -16,9 +16,6 @@ public:
 
     bool isValid() const;
 
-    // TODO(mayah): Rename toString() and returns std::string instead.
-    std::string toString() const;
-
     bool received = false;
     int frameId = -1;
     Decision decision;
