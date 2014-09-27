@@ -11,5 +11,6 @@ enum class NextPuyoPosition {
 };
 
 const int NUM_NEXT_PUYO_POSITION = 6;
+constexpr NextPuyoPosition toNextPuyoPosition(int x) { return static_cast<NextPuyoPosition>(x); }
 
 #endif

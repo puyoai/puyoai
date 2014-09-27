@@ -7,7 +7,6 @@
 
 class HumanConnector : public Connector {
 public:
-    explicit HumanConnector(int playerId) : Connector(playerId) {}
     virtual ~HumanConnector() {}
 
     virtual void write(const ConnectorFrameRequest&) override;

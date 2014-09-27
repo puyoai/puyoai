@@ -62,9 +62,10 @@ static std::string formatAckNack(int ackFrameId, const vector<int>& nackFrameIds
     return ret.str();
 }
 
-string ConnectorFrameRequest::toRequestString(int playerId) const
+string ConnectorFrameRequest::toRequestString() const
 {
-    int opponentId = 1 - playerId;
+    const int playerId = 0;
+    const int opponentId = 1;
 
     std::string f0 = formatPlainField(field[playerId]);
     std::string f1 = formatPlainField(field[opponentId]);

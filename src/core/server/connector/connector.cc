@@ -21,7 +21,7 @@ using namespace std;
 unique_ptr<Connector> Connector::create(int playerId, const string& programName)
 {
     if (programName == "-")
-        return unique_ptr<Connector>(new HumanConnector(playerId));
+        return unique_ptr<Connector>(new HumanConnector());
 
     if (programName.find("fifo:") == 0) {
         string::size_type colon = programName.find(":", 5);
@@ -36,7 +36,7 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
         int downlink_fd = open(downlink_fifo.c_str(), O_WRONLY);
         CHECK(downlink_fd >= 0);
 
-        unique_ptr<Connector> connector(new PipeConnector(playerId, downlink_fd, uplink_fd));
+        unique_ptr<Connector> connector(new PipeConnector(downlink_fd, uplink_fd));
         connector->writeString("PingMessage");
         (void)connector->read();
 
@@ -67,7 +67,7 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
         // Server.
         LOG(INFO) << "Created a child process (pid = " << pid << ")";
 
-        unique_ptr<Connector> connector(new PipeConnector(playerId, fd_field_status[1], fd_command[0]));
+        unique_ptr<Connector> connector(new PipeConnector(fd_field_status[1], fd_command[0]));
         close(fd_field_status[0]);
         close(fd_command[1]);
         close(fd_cpu_error[1]);

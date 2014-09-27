@@ -8,7 +8,7 @@
 
 class PipeConnector : public Connector {
 public:
-    PipeConnector(int playerId, int writerFd, int readerFd);
+    PipeConnector(int writerFd, int readerFd);
     virtual ~PipeConnector();
 
     virtual void write(const ConnectorFrameRequest&) override;

@@ -7,10 +7,10 @@ using namespace std;
 
 void HumanConnector::write(const ConnectorFrameRequest& req)
 {
-    writeString(req.toRequestString(playerId_));
+    writeString(req.toRequestString());
 
     lock_guard<mutex> lock(mu_);
-    nextIsPlayable_ = req.userState[playerId_].playable;
+    nextIsPlayable_ = req.userState[0].playable;
 }
 
 void HumanConnector::writeString(const string& message)

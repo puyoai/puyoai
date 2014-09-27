@@ -10,7 +10,6 @@ class Connector;
 
 class ConnectorManager {
 public:
-    virtual void send(const ConnectorFrameRequest&) = 0;
     // Receives decision and messages from clients.
     // Returns false when disconnected.
     virtual bool receive(int frameId, std::vector<ConnectorFrameResponse> data[2]) = 0;
