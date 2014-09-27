@@ -22,18 +22,18 @@ public:
     virtual void onUpdate(const GameState&) override;
 
 private:
-    void Print(int player_id, const FieldRealtime&, const std::string& debug_message);
-    void PrintField(int player_id, const FieldRealtime&);
-    void PrintNextPuyo(int player_id, const FieldRealtime&);
-    void PrintScore(int player_id, int score);
-    void PrintOjamaPuyo(int player_id, const FieldRealtime&);
-    void PrintDebugMessage(int player_id, const std::string& debug_message);
+    void print(int playerId, const FieldRealtime&, const std::string& message);
+    void printField(int playerId, const FieldRealtime&);
+    void printNextPuyo(int playerId, const FieldRealtime&);
+    void printScore(int playerId, int score);
+    void printOjamaPuyo(int playerId, const FieldRealtime&);
+    void printMessage(int playerId, const std::string& message);
 
-    void PrintPuyo(const std::string& location, const std::string& text);
-    void PrintText(const std::string& location, const std::string& text);
+    void printPuyo(const std::string& location, const std::string& text);
+    void printText(const std::string& location, const std::string& text);
 
-    std::unordered_map<std::string, std::string> print_puyo_cache_;
-    std::unordered_map<std::string, std::string> print_text_cache_;
+    std::unordered_map<std::string, std::string> printPuyoCache_;
+    std::unordered_map<std::string, std::string> printTextCache_;
 };
 
 #endif  // DUEL_CUI_H_
