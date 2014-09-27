@@ -46,27 +46,6 @@ ConnectorFrameResponse ConnectorFrameResponse::parse(const char* str)
     return data;
 }
 
-std::string ConnectorFrameResponse::toString() const
-{
-    stringstream ss;
-    ss << "{";
-    if (!original.empty()) {
-        ss << "'original':";
-        ss << "'" << original << "'";
-        ss << ",";
-    }
-    if (decision.isValid()) {
-        ss << "'decision':";
-        ss << "{'x':" << decision.x << ",'r':" << decision.r << "}";
-        ss << ",";
-    }
-    ss << "'frame_id':";
-    ss << frameId;
-    ss << "}";
-
-    return ss.str();
-}
-
 bool ConnectorFrameResponse::isValid() const
 {
     if (!received)
