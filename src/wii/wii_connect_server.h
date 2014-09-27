@@ -15,6 +15,7 @@
 #include "core/kumipuyo.h"
 #include "core/puyo_color.h"
 #include "core/real_color.h"
+#include "core/server/connector/connector_frame_request.h"
 #include "core/server/connector/connector_manager.h"
 #include "gui/drawer.h"
 #include "gui/unique_sdl_surface.h"

@@ -12,8 +12,8 @@ public:
     virtual ~PipeConnector();
 
     virtual void write(const ConnectorFrameRequest&) override;
-    virtual void writeString(const std::string&) override;
     virtual ConnectorFrameResponse read() override;
+
     virtual bool isHuman() const override { return false; }
     virtual bool alive() const override { return alive_; }
     virtual void setAlive(bool flag) override { alive_ = flag; }
@@ -21,6 +21,8 @@ public:
     virtual int readerFd() const override { return readerFd_; }
 
 private:
+    void writeString(const std::string&);
+
     bool alive_ = true;
     int writerFd_;
     int readerFd_;
