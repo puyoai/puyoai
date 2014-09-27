@@ -3,8 +3,8 @@
 #include <glog/logging.h>
 
 #include "core/state.h"
+#include "core/server/game_state.h"
 #include "duel/field_realtime.h"
-#include "duel/game_state.h"
 
 // TODO(mayah): Use PlainField instead of CoreField here.
 
@@ -19,14 +19,17 @@ void PuyofuRecorder::onUpdate(const GameState& gameState)
     // TODO(mayah); When should we log here?
 
     for (int pi = 0; pi < 2; ++pi) {
-        const FieldRealtime& field = gameState.field(pi);
-        KumipuyoSeq seq { field.kumipuyo(0), field.kumipuyo(1), field.kumipuyo(2) };
+        const PlayerGameState& pgs = gameState.playerGameState(pi);
 
         // TODO(mayah): Why not passing usec here instead of passing 0?
         // Or, do we really need usec?
-        if (field.userState().grounded) {
-            CoreField f(field.field());
+        if (pgs.state.grounded) {
+            CoreField f(pgs.field);
             f.forceDrop();
+            KumipuyoSeq seq = pgs.kumipuyoSeq;
+            if (seq.size() >= 4) {
+                seq.resize(3);
+            }
             addMove(pi, f, seq, 0);
         }
     }

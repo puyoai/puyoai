@@ -1,6 +1,6 @@
 #include "gui/main_window.h"
 
-#include "duel/game_state.h"
+#include "core/server/game_state.h"
 #include "gui/drawer.h"
 #include "gui/screen.h"
 

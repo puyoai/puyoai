@@ -14,10 +14,10 @@
 #include "core/httpd/http_server.h"
 #include "core/server/connector/human_connector.h"
 #include "core/server/connector/connector_manager_posix.h"
+#include "core/server/game_state.h"
+#include "core/server/game_state_observer.h"
 #include "duel/cui.h"
 #include "duel/duel_server.h"
-#include "duel/game_state.h"
-#include "duel/game_state_observer.h"
 #include "duel/puyofu_recorder.h"
 
 #ifdef USE_SDL2

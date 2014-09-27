@@ -26,6 +26,27 @@ KumipuyoSeq::KumipuyoSeq(initializer_list<Kumipuyo> seq) : seq_(seq)
 {
 }
 
+PuyoColor KumipuyoSeq::color(NextPuyoPosition npp) const
+{
+    switch (npp) {
+    case NextPuyoPosition::CURRENT_AXIS:
+        return axis(0);
+    case NextPuyoPosition::CURRENT_CHILD:
+        return child(1);
+    case NextPuyoPosition::NEXT1_AXIS:
+        return axis(1);
+    case NextPuyoPosition::NEXT1_CHILD:
+        return child(1);
+    case NextPuyoPosition::NEXT2_AXIS:
+        return axis(2);
+    case NextPuyoPosition::NEXT2_CHILD:
+        return child(2);
+    }
+
+    CHECK(false) << "Unknown NextPuyoPosition: " << static_cast<int>(npp);
+    return PuyoColor::EMPTY;
+}
+
 string KumipuyoSeq::toString() const
 {
     std::string s;

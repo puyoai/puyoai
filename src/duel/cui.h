@@ -6,10 +6,10 @@
 #include <unordered_map>
 
 #include "base/base.h"
-#include "duel/game_state_observer.h"
+#include "core/server/game_state_observer.h"
 
-class FieldRealtime;
 class GameState;
+struct PlayerGameState;
 
 class Cui : public GameStateObserver {
 public:
@@ -22,11 +22,11 @@ public:
     virtual void onUpdate(const GameState&) override;
 
 private:
-    void print(int playerId, const FieldRealtime&, const std::string& message);
-    void printField(int playerId, const FieldRealtime&);
-    void printNextPuyo(int playerId, const FieldRealtime&);
+    void print(int playerId, const PlayerGameState&);
+    void printField(int playerId, const PlayerGameState&);
+    void printNextPuyo(int playerId, const PlayerGameState&);
     void printScore(int playerId, int score);
-    void printOjamaPuyo(int playerId, const FieldRealtime&);
+    void printOjamaPuyo(int playerId, const PlayerGameState&);
     void printMessage(int playerId, const std::string& message);
 
     void printPuyo(const std::string& location, const std::string& text);

@@ -2,7 +2,9 @@
 #define CORE_KUMIPUYO_H_
 
 #include <string>
+
 #include "core/puyo_color.h"
+#include "core/next_puyo.h"
 
 class Kumipuyo {
 public:
@@ -82,6 +84,7 @@ public:
     KumipuyoSeq(std::initializer_list<Kumipuyo>);
 
     const Kumipuyo& get(int n) const { return seq_[n]; }
+    PuyoColor color(NextPuyoPosition) const;
     PuyoColor axis(int n) const { return seq_[n].axis; }
     PuyoColor child(int n) const { return seq_[n].child; }
 
