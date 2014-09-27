@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "core/field/core_field.h"
-#include "core/frame_data.h"
 #include "core/key_set.h"
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"

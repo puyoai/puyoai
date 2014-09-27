@@ -1,16 +1,16 @@
 #include "core/server/connector/human_connector.h"
 
+#include "core/frame_request.h"
 #include "core/key.h"
-#include "core/server/connector/connector_frame_request.h"
 
 using namespace std;
 
-void HumanConnector::write(const ConnectorFrameRequest& req)
+void HumanConnector::write(const FrameRequest& req)
 {
-    writeString(req.toRequestString());
+    writeString(req.toString());
 
     lock_guard<mutex> lock(mu_);
-    nextIsPlayable_ = req.userState[0].playable;
+    nextIsPlayable_ = req.myPlayerFrameRequest().state.playable;
 }
 
 void HumanConnector::writeString(const string& message)

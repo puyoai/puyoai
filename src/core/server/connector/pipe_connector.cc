@@ -1,6 +1,6 @@
 #include "core/server/connector/pipe_connector.h"
 
-#include "core/server/connector/connector_frame_request.h"
+#include "core/frame_request.h"
 
 using namespace std;
 
@@ -21,9 +21,9 @@ PipeConnector::~PipeConnector()
     fclose(reader_);
 }
 
-void PipeConnector::write(const ConnectorFrameRequest& req)
+void PipeConnector::write(const FrameRequest& req)
 {
-    writeString(req.toRequestString());
+    writeString(req.toString());
 }
 
 void PipeConnector::writeString(const string& message)

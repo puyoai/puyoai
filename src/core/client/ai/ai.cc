@@ -41,70 +41,70 @@ void AI::runLoop()
     while (true) {
         google::FlushLogFiles(google::INFO);
 
-        FrameData frameData = connector_.receive();
-        if (frameData.connectionLost) {
+        FrameRequest frameRequest = connector_.receive();
+        if (frameRequest.connectionLost) {
             LOG(INFO) << "connection lost";
             break;
         }
 
-        if (!frameData.valid) {
-            connector_.send(ClientFrameResponse(frameData.id));
+        if (!frameRequest.isValid()) {
+            connector_.send(ClientFrameResponse(frameRequest.frameId));
             continue;
         }
 
-        if (frameData.hasGameEnd()) {
-            gameHasEnded(frameData);
+        if (frameRequest.hasGameEnd()) {
+            gameHasEnded(frameRequest);
         }
         // Before starting a new game, we need to consider the first hand.
         // TODO(mayah): Maybe game server should send some information that we should initialize.
-        if (frameData.id == 1) {
+        if (frameRequest.frameId == 1) {
             hand_ = 0;
             reconsiderRequested_ = false;
             field_.clear();
-            gameWillBegin(frameData);
+            gameWillBegin(frameRequest);
             next1.clear();
         }
         // Update enemy info if necessary.
-        if (frameData.enemyPlayerFrameData().userState.grounded)
-            enemyGrounded(frameData);
-        if (frameData.enemyPlayerFrameData().userState.wnextAppeared)
-            enemyNext2Appeared(frameData);
+        if (frameRequest.enemyPlayerFrameRequest().state.grounded)
+            enemyGrounded(frameRequest);
+        if (frameRequest.enemyPlayerFrameRequest().state.wnextAppeared)
+            enemyNext2Appeared(frameRequest);
 
         // STATE_YOU_GROUNDED and STATE_WNEXT_APPEARED might come out-of-order.
-        if (frameData.myPlayerFrameData().userState.wnextAppeared) {
-            const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
+        if (frameRequest.myPlayerFrameRequest().state.wnextAppeared) {
+            const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
             LOG(INFO) << "STATE_WNEXT_APPEARED";
             VLOG(1) << '\n' << field_.toDebugString();
 
             next1.fieldBeforeThink = field_;
-            next1.dropDecision = think(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) }, AdditionalThoughtInfo());
+            next1.dropDecision = think(frameRequest.frameId, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) }, AdditionalThoughtInfo());
             next1.kumipuyo = kumipuyoSeq.get(1);
             next1.ready = true;
         }
 
         // Update my info if necessary.
-        if (frameData.myPlayerFrameData().userState.ojamaDropped) {
+        if (frameRequest.myPlayerFrameRequest().state.ojamaDropped) {
             // We need to reconsider the next1 decision.
             next1.needsReconsider = true;
         }
 
-        if (frameData.myPlayerFrameData().userState.decisionRequest) {
+        if (frameRequest.myPlayerFrameRequest().state.decisionRequest) {
             VLOG(1) << "REQUESTED";
             next1.requested = true;
         }
 
         if (!next1.requested || !next1.ready) {
-            connector_.send(ClientFrameResponse(frameData.id));
+            connector_.send(ClientFrameResponse(frameRequest.frameId));
             continue;
         }
 
         // Check field inconsistency. We only check when hand_ >= 3, since we cannot trust the field in 3 hands.
         if (hand_ >= 3) {
-            if (!next1.fieldBeforeThink.isVisibllySame(frameData.myPlayerFrameData().field)) {
+            if (!next1.fieldBeforeThink.isVisibllySame(frameRequest.myPlayerFrameRequest().field)) {
                 LOG(INFO) << "FIELD INCONSISTENCY DETECTED: hand=" << hand_;
                 VLOG(1) << '\n' << FieldPrettyPrinter::toStringFromMultipleFields(
-                    next1.fieldBeforeThink, frameData.myPlayerFrameData().kumipuyoSeq,
-                    frameData.myPlayerFrameData().field, frameData.myPlayerFrameData().kumipuyoSeq);
+                    next1.fieldBeforeThink, frameRequest.myPlayerFrameRequest().kumipuyoSeq,
+                    frameRequest.myPlayerFrameRequest().field, frameRequest.myPlayerFrameRequest().kumipuyoSeq);
 
                 next1.needsReconsider = true;
             }
@@ -114,9 +114,9 @@ void AI::runLoop()
         if (next1.needsReconsider || reconsiderRequested_) {
             LOG(INFO) << "RECONSIDER";
 
-            resetCurrentField(frameData.myPlayerFrameData().field);
-            const auto& kumipuyoSeq = frameData.myPlayerFrameData().kumipuyoSeq;
-            next1.dropDecision = thinkFast(frameData.id, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) }, AdditionalThoughtInfo());
+            resetCurrentField(frameRequest.myPlayerFrameRequest().field);
+            const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
+            next1.dropDecision = thinkFast(frameRequest.frameId, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) }, AdditionalThoughtInfo());
             next1.kumipuyo = kumipuyoSeq.get(0);
             next1.ready = true;
             next1.needsReconsider = false;
@@ -125,7 +125,7 @@ void AI::runLoop()
 
         // Send
         ++hand_;
-        connector_.send(ClientFrameResponse(frameData.id, next1.dropDecision.decision(), next1.dropDecision.message()));
+        connector_.send(ClientFrameResponse(frameRequest.frameId, next1.dropDecision.decision(), next1.dropDecision.message()));
 
         // Move to next.
         if (next1.dropDecision.decision().isValid() && next1.kumipuyo.isValid()) {

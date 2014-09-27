@@ -11,7 +11,7 @@ public:
     PipeConnector(int writerFd, int readerFd);
     virtual ~PipeConnector();
 
-    virtual void write(const ConnectorFrameRequest&) override;
+    virtual void write(const FrameRequest&) override;
     virtual ConnectorFrameResponse read() override;
 
     virtual bool isHuman() const override { return false; }

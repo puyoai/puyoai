@@ -13,4 +13,18 @@ enum class GameResult {
 
 GameResult toOppositeResult(GameResult);
 
+inline GameResult fromRequestEnd(int end)
+{
+    if (end == 1) {
+        return GameResult::P1_WIN;
+    } else if (end == 0) {
+        return GameResult::DRAW;
+    } else if (end == -1) {
+        return GameResult::P2_WIN;
+    }
+
+    return GameResult::PLAYING;
+}
+
+
 #endif

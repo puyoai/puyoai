@@ -5,8 +5,8 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
+#include "core/frame_request.h"
 #include "core/game_result.h"
-#include "core/server/connector/connector_frame_request.h"
 #include "duel/field_realtime.h"
 
 class GameState {
@@ -20,8 +20,8 @@ public:
     int frameId() const { return frameId_; }
     void setFrameId(int frameId) { frameId_ = frameId; }
 
-    ConnectorFrameRequest toConnectorFrameRequest(int playerId, int frameId) const;
-    ConnectorFrameRequest toConnectorFrameRequest(int playerId, int frameId, GameResult forceSetGameResult) const;
+    FrameRequest toFrameRequest(int playerId, int frameId) const;
+    FrameRequest toFrameRequest(int playerId, int frameId, GameResult forceSetGameResult) const;
 
     const FieldRealtime& field(int pi) const { return field_[pi]; }
     FieldRealtime* mutableField(int pi) { return &field_[pi]; }

@@ -8,7 +8,7 @@
 #include "base/time.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
-#include "core/frame_data.h"
+#include "core/frame_request.h"
 
 #include "book_field.h"
 #include "book_reader.h"
@@ -43,14 +43,14 @@ void MayahAI::reloadParameter()
     featureParameter_.reset(new FeatureParameter(FLAGS_feature));
 }
 
-void MayahAI::gameWillBegin(const FrameData& frameData)
+void MayahAI::gameWillBegin(const FrameRequest& frameRequest)
 {
     thoughtMaxRensa_ = 0;
     thoughtMaxScore_ = 0;
-    gazer_.initialize(frameData.id);
+    gazer_.initialize(frameRequest.frameId);
 }
 
-void MayahAI::gameHasEnded(const FrameData&)
+void MayahAI::gameHasEnded(const FrameRequest&)
 {
     if (FLAGS_log_max_score) {
         cerr << "max rensa = " << thoughtMaxRensa_ << endl;
@@ -175,31 +175,31 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     return ss.str();
 }
 
-void MayahAI::enemyGrounded(const FrameData& frameData)
+void MayahAI::enemyGrounded(const FrameRequest& frameRequest)
 {
     // --- Check if Rensa starts.
-    CoreField field(frameData.enemyPlayerFrameData().field);
+    CoreField field(frameRequest.enemyPlayerFrameRequest().field);
     field.forceDrop();
 
     RensaResult rensaResult = field.simulate();
 
     if (rensaResult.chains > 0) {
         requestReconsider();
-        gazer_.setOngoingRensa(OngoingRensaInfo(rensaResult, frameData.id + rensaResult.frames));
+        gazer_.setOngoingRensa(OngoingRensaInfo(rensaResult, frameRequest.frameId + rensaResult.frames));
     } else {
         gazer_.unsetOngoingRensa();
     }
 }
 
-void MayahAI::enemyNext2Appeared(const FrameData& frameData)
+void MayahAI::enemyNext2Appeared(const FrameRequest& frameRequest)
 {
     // At the beginning of the game, kumipuyoSeq might contain EMPTY/EMPTY.
     // In that case, we need to skip.
-    const KumipuyoSeq& seq = frameData.enemyPlayerFrameData().kumipuyoSeq;
+    const KumipuyoSeq& seq = frameRequest.enemyPlayerFrameRequest().kumipuyoSeq;
     if (!isNormalColor(seq.axis(0)) || !isNormalColor(seq.child(0)))
         return;
 
-    gazer_.gaze(frameData.id, frameData.enemyPlayerFrameData().field, frameData.enemyPlayerFrameData().kumipuyoSeq);
+    gazer_.gaze(frameRequest.frameId, frameRequest.enemyPlayerFrameRequest().field, frameRequest.enemyPlayerFrameRequest().kumipuyoSeq);
 
     LOG(INFO) << '\n' << gazer_.toRensaInfoString();
 }

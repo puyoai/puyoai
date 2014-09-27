@@ -7,7 +7,7 @@
 #include "base/base.h"
 #include "core/server/connector/connector_frame_response.h"
 
-struct ConnectorFrameRequest;
+struct FrameRequest;
 
 class Connector : noncopyable {
 public:
@@ -15,7 +15,7 @@ public:
 
     virtual ~Connector() {}
 
-    virtual void write(const ConnectorFrameRequest&) = 0;
+    virtual void write(const FrameRequest&) = 0;
     virtual ConnectorFrameResponse read() = 0;
     virtual bool isHuman() const = 0;
 

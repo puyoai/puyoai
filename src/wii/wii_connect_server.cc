@@ -233,44 +233,47 @@ bool WiiConnectServer::playForFinished(int frameId)
     return true;
 }
 
-ConnectorFrameRequest WiiConnectServer::makeFrameRequestFor(int playerId, int frameId, const AnalyzerResult& re)
+FrameRequest WiiConnectServer::makeFrameRequestFor(int playerId, int frameId, const AnalyzerResult& re)
 {
-    ConnectorFrameRequest cfr;
-    cfr.frameId = frameId;
+    FrameRequest fr;
+    fr.frameId = frameId;
     if (re.state() == CaptureGameState::FINISHED) {
         // TODO(mayah): Since we're not detecting which player has won, we send DRAW.
-        cfr.gameResult = GameResult::DRAW;
+        fr.gameResult = GameResult::DRAW;
     } else {
-        cfr.gameResult = GameResult::PLAYING;
+        fr.gameResult = GameResult::PLAYING;
     }
 
     for (int i = 0; i < 2; ++i) {
         int pi = playerId == 0 ? i : (1 - i);
+        PlayerFrameRequest& pfr = fr.playerFrameRequest[i];
         const PlayerAnalyzerResult* pr = re.playerResult(pi);
 
-        cfr.kumipuyo[i][0].axis  = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS), true);
-        cfr.kumipuyo[i][0].child = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD), true);
-        cfr.kumipuyo[i][1].axis  = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS), true);
-        cfr.kumipuyo[i][1].child = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD), true);
-        cfr.kumipuyo[i][2].axis  = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS), true);
-        cfr.kumipuyo[i][2].child = toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD), true);
+        pfr.kumipuyoSeq = KumipuyoSeq {
+            Kumipuyo(toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS), true),
+                     toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD), true)),
+            Kumipuyo(toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS), true),
+                     toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD), true)),
+            Kumipuyo(toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS), true),
+                     toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD), true)),
+        };
 
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
-                cfr.field[i].unsafeSet(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
+                pfr.field.unsafeSet(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
             }
         }
 
-        cfr.userState[i] = pr->userState;
+        pfr.state = pr->userState;
 
         // We cannot detect correct values, so we use some default values.
-        cfr.kumipuyoPos[i] = KumipuyoPos(3, 12, 0);
-        cfr.score[i] = 0;
-        cfr.ojama[i] = 0;
-        cfr.ackFrameId[i] = -1;
+        pfr.kumipuyoPos = KumipuyoPos(3, 12, 0);
+        pfr.score = 0;
+        pfr.ojama = 0;
+        pfr.ackFrameId = -1;
     }
 
-    return cfr;
+    return fr;
 }
 
 PuyoColor WiiConnectServer::toPuyoColor(RealColor rc, bool allowAllocation)

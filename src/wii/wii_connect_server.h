@@ -12,10 +12,10 @@
 #include "base/base.h"
 #include "capture/analyzer_result_drawer.h"
 #include "core/decision.h"
+#include "core/frame_request.h"
 #include "core/kumipuyo.h"
 #include "core/puyo_color.h"
 #include "core/real_color.h"
-#include "core/server/connector/connector_frame_request.h"
 #include "core/server/connector/connector_manager.h"
 #include "gui/drawer.h"
 #include "gui/unique_sdl_surface.h"
@@ -45,7 +45,7 @@ private:
     bool playForPlaying(int frameId, const AnalyzerResult&);
     bool playForFinished(int frameId);
 
-    ConnectorFrameRequest makeFrameRequestFor(int playerId, int frameId, const AnalyzerResult&);
+    FrameRequest makeFrameRequestFor(int playerId, int frameId, const AnalyzerResult&);
     void outputKeys(int playerId, const AnalyzerResult&, const std::vector<ConnectorFrameResponse>&);
 
     PuyoColor toPuyoColor(RealColor, bool allowAllocation = false);

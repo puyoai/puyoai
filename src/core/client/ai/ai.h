@@ -7,7 +7,7 @@
 #include "core/client/connector/client_connector.h"
 #include "core/field/core_field.h"
 
-struct FrameData;
+struct FrameRequest;
 class KumipuyoSeq;
 class PlainField;
 
@@ -27,12 +27,12 @@ protected:
     explicit AI(int argc, char* argv[], const std::string& name);
 
     // gameWillBegin will be called just before a new game will begin.
-    // FrameData will contain NEXT and NEXT2 puyos.
+    // FrameRequest will contain NEXT and NEXT2 puyos.
     // Please initialize your AI in this function.
-    virtual void gameWillBegin(const FrameData&) {}
+    virtual void gameWillBegin(const FrameRequest&) {}
 
     // When a game has finished, gameHasEnd will be called.
-    virtual void gameHasEnded(const FrameData&) {}
+    virtual void gameHasEnded(const FrameRequest&) {}
 
     // think will be called when ai should decide the next hand.
     // Basically, this will be called when NEXT2 has appeared.
@@ -51,11 +51,11 @@ protected:
 
     // When enemy's puyo is grounded, this callback will be called.
     // You can detect enemy has started his rensa in this callback.
-    virtual void enemyGrounded(const FrameData&) {}
+    virtual void enemyGrounded(const FrameRequest&) {}
 
     // When enemy's NEXT2 has appeared, this callback will be called.
     // You can update the enemy information here.
-    virtual void enemyNext2Appeared(const FrameData&) {}
+    virtual void enemyNext2Appeared(const FrameRequest&) {}
 
     // Should reconsider just before sending next decision.
     void requestReconsider() { reconsiderRequested_ = true; }

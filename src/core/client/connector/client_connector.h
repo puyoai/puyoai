@@ -1,13 +1,13 @@
 #ifndef CLIENT_CONNECTION_CLIENT_CONNECTOR_H_
 #define CLIENT_CONNECTION_CLIENT_CONNECTOR_H_
 
-#include "core/frame_data.h"
+#include "core/frame_request.h"
 
 class ClientFrameResponse;
 
 class ClientConnector {
 public:
-    FrameData receive();
+    FrameRequest receive();
     void send(const ClientFrameResponse&);
 };
 

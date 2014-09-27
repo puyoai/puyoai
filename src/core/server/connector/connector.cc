@@ -11,7 +11,6 @@
 
 #include <glog/logging.h>
 
-#include "core/server/connector/connector_frame_request.h"
 #include "core/server/connector/human_connector.h"
 #include "core/server/connector/pipe_connector.h"
 

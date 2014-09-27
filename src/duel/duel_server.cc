@@ -189,7 +189,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
 
         // --- Sends the current frame information.
         for (int pi = 0; pi < 2; ++pi) {
-            manager->connector(pi)->write(gameState.toConnectorFrameRequest(pi, frameId));
+            manager->connector(pi)->write(gameState.toFrameRequest(pi, frameId));
         }
 
         // --- Reads the response of the current frame information.
@@ -216,7 +216,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         if (gameResult != GameResult::PLAYING) {
             frameId++;
             for (int pi = 0; pi < 2; ++pi) {
-                manager->connector(pi)->write(gameState.toConnectorFrameRequest(pi, frameId));
+                manager->connector(pi)->write(gameState.toFrameRequest(pi, frameId));
             }
             break;
         }
@@ -224,7 +224,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
             gameResult = GameResult::DRAW;
             frameId++;
             for (int pi = 0; pi < 2; ++pi) {
-                manager->connector(pi)->write(gameState.toConnectorFrameRequest(pi, frameId));
+                manager->connector(pi)->write(gameState.toFrameRequest(pi, frameId));
             }
             break;
         }
