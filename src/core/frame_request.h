@@ -17,8 +17,6 @@ struct PlayerFrameRequest {
     UserState state;
     int score = 0;
     int ojama = 0;
-    int ackFrameId = -1;
-    std::vector<int> nackFrameIds;
 };
 
 struct FrameRequest {
