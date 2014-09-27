@@ -16,7 +16,6 @@ public:
     virtual ~Connector() {}
 
     virtual void write(const ConnectorFrameRequest&) = 0;
-    virtual void writeString(const std::string&) = 0;
     virtual ConnectorFrameResponse read() = 0;
     virtual bool isHuman() const = 0;
 

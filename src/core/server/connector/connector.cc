@@ -37,9 +37,6 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
         CHECK(downlink_fd >= 0);
 
         unique_ptr<Connector> connector(new PipeConnector(downlink_fd, uplink_fd));
-        connector->writeString("PingMessage");
-        (void)connector->read();
-
         return connector;
     }
 

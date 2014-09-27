@@ -5,7 +5,6 @@
 
 #include "capture/analyzer.h"
 #include "capture/source.h"
-#include "core/server/connector/connector_frame_request.h"
 #include "core/field/core_field.h"
 #include "core/game_result.h"
 #include "core/player.h"
@@ -234,12 +233,12 @@ bool WiiConnectServer::playForFinished(int frameId)
     return true;
 }
 
-// TODO(mayah): Create FrameConnectorRequest instead of string.
 ConnectorFrameRequest WiiConnectServer::makeFrameRequestFor(int playerId, int frameId, const AnalyzerResult& re)
 {
     ConnectorFrameRequest cfr;
     cfr.frameId = frameId;
     if (re.state() == CaptureGameState::FINISHED) {
+        // TODO(mayah): Since we're not detecting which player has won, we send DRAW.
         cfr.gameResult = GameResult::DRAW;
     } else {
         cfr.gameResult = GameResult::PLAYING;

@@ -10,7 +10,6 @@ public:
     virtual ~HumanConnector() {}
 
     virtual void write(const ConnectorFrameRequest&) override;
-    virtual void writeString(const std::string&) override;
     virtual ConnectorFrameResponse read() override;
     virtual bool isHuman() const override { return true; }
     // HumanConnector is always alive.
@@ -22,6 +21,8 @@ public:
     void setKeySet(const KeySet&);
 
 private:
+    void writeString(const std::string&);
+
     std::mutex mu_;
     bool nextIsPlayable_ = false;
     KeySet currentKeySet_;
