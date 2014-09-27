@@ -47,25 +47,6 @@ static string formatNext(const KumipuyoSeq& seq)
     return ss.str();
 }
 
-static std::string formatAckNack(int ackFrameId, const vector<int>& nackFrameIds)
-{
-    stringstream nack;
-    bool hasNack = false;
-    for (size_t i = 0; i < nackFrameIds.size(); i++) {
-        if (i != 0)
-            nack << ",";
-        nack << nackFrameIds[i];
-        hasNack = true;
-    }
-
-    stringstream ret;
-    if (ackFrameId > 0)
-        ret << "ACK=" << ackFrameId << " ";
-    if (hasNack)
-        ret << "NACK=" << nack.str();
-    return ret.str();
-}
-
 static GameResult parseEnd(const char* value)
 {
     int x = std::atoi(value);
@@ -180,8 +161,6 @@ string FrameRequest::toString() const
         break;
     }
 
-    std::string ack = formatAckNack(me.ackFrameId, me.nackFrameIds);
-
     stringstream ss;
     ss << "ID=" << frameId << " "
        << "STATE=" << (state0 + (state1 << 1)) << " "
@@ -199,7 +178,6 @@ string FrameRequest::toString() const
        << "OO=" << ojama1 << " "
        << "YS=" << score0 << " "
        << "OS=" << score1 << " "
-       << win
-       << ack;
+       << win;
     return ss.str();
 }

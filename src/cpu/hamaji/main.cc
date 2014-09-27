@@ -139,15 +139,7 @@ void letsPuyoShobu() {
     }
 
     int state = parseState(line);
-    if (line.find("NACK=") != string::npos) {
-      LOG(WARNING) << "=> " << line;
-      g_should_decide = true;
-    } else if (!state) {
-      if (line.find("ACK=") != string::npos) {
-        LOG(INFO) << "=> " << line;
-      } else {
-        VLOG(1) << "=> " << line;
-      }
+    if (!state) {
       int id = parseID(line);
       printf("ID=%d\n", id);
       fflush(stdout);

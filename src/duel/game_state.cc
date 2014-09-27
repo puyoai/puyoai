@@ -23,8 +23,7 @@ static string escapeMessage(const string& s)
 }
 
 GameState::GameState(const KumipuyoSeq& seq) :
-    field_ { FieldRealtime(0, seq), FieldRealtime(1, seq) },
-    ackFrameId_ { -1, -1 }
+    field_ { FieldRealtime(0, seq), FieldRealtime(1, seq) }
 {
 }
 
@@ -130,8 +129,6 @@ FrameRequest GameState::toFrameRequest(int playerId, int frameId, GameResult for
         pfr.state = f.userState();
         pfr.score = f.score();
         pfr.ojama = f.ojama();
-        pfr.ackFrameId = ackFrameId(playerId == 0 ? i : 1 - i);
-        pfr.nackFrameIds = nackFrameIds(playerId == 0 ? i : 1 - i);
     }
 
     return req;

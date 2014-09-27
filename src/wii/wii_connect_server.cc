@@ -271,7 +271,6 @@ FrameRequest WiiConnectServer::makeFrameRequestFor(int playerId, int frameId, co
         pfr.kumipuyoPos = KumipuyoPos(3, 12, 0);
         pfr.score = 0;
         pfr.ojama = 0;
-        pfr.ackFrameId = -1;
     }
 
     return fr;
