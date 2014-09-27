@@ -10,6 +10,7 @@
 
 #include "core/constant.h"
 #include "core/decision.h"
+#include "core/frame_response.h"
 #include "core/server/connector/connector.h"
 #include "core/server/connector/connector_manager.h"
 #include "core/sequence_generator.h"
@@ -37,7 +38,7 @@ DECLARE_bool(use_gui);
  *   else:
  *     -1
  */
-static int updateDecision(const vector<ConnectorFrameResponse>& data, const FieldRealtime& field, Decision* decision)
+static int updateDecision(const vector<FrameResponse>& data, const FieldRealtime& field, Decision* decision)
 {
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.
@@ -194,7 +195,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
 
         // --- Reads the response of the current frame information.
         // It takes up to 1/FPS [s] to finish this section.
-        vector<ConnectorFrameResponse> data[2];
+        vector<FrameResponse> data[2];
         if (!manager->receive(frameId, data)) {
             if (manager->connector(0)->alive()) {
                 gameResult = GameResult::P1_WIN_WITH_CONNECTION_ERROR;
@@ -239,7 +240,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
     return gameResult;
 }
 
-void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse> data[2])
+void DuelServer::play(GameState* gameState, const vector<FrameResponse> data[2])
 {
     for (int pi = 0; pi < 2; pi++) {
         FieldRealtime* me = gameState->mutableField(pi);
@@ -255,7 +256,7 @@ void DuelServer::play(GameState* gameState, const vector<ConnectorFrameResponse>
         int ackFrameId = -1;
         vector<int> nackFrameIds;
         for (size_t j = 0; j < data[pi].size(); j++) {
-            const ConnectorFrameResponse& d = data[pi][j];
+            const FrameResponse& d = data[pi][j];
 
             // This case does not require ack.
             if (!d.isValid())

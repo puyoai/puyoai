@@ -3,19 +3,10 @@
 #include <iostream>
 #include <sstream>
 
-#include "core/client/connector/client_frame_response.h"
+#include "core/frame_request.h"
+#include "core/frame_response.h"
 
 using namespace std;
-
-static string escapeMessage(string str)
-{
-    for (size_t i = 0; i < str.size(); ++i) {
-        if (str[i] == ' ')
-            str[i] = '_';
-    }
-
-    return str;
-}
 
 FrameRequest ClientConnector::receive()
 {
@@ -35,19 +26,9 @@ FrameRequest ClientConnector::receive()
     return FrameRequest::parse(line);
 }
 
-void ClientConnector::send(const ClientFrameResponse& resp)
+void ClientConnector::send(const FrameResponse& resp)
 {
-    ostringstream ss;
-    ss << "ID=" << resp.frameId();
-    if (resp.decision().isValid()) {
-        ss << " X=" << resp.decision().x
-           << " R=" << resp.decision().r;
-    }
-    if (!resp.message().empty()) {
-        ss << " MSG=" << escapeMessage(resp.message());
-    }
-
-    string s = ss.str();
+    string s = resp.toString();
     cout << s << endl;
     LOG(INFO) << s;
 }

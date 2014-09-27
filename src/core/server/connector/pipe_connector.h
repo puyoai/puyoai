@@ -12,7 +12,7 @@ public:
     virtual ~PipeConnector();
 
     virtual void write(const FrameRequest&) override;
-    virtual ConnectorFrameResponse read() override;
+    virtual FrameResponse read() override;
 
     virtual bool isHuman() const override { return false; }
     virtual bool alive() const override { return alive_; }

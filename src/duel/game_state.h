@@ -5,6 +5,7 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
+#include "core/decision.h"
 #include "core/frame_request.h"
 #include "core/game_result.h"
 #include "duel/field_realtime.h"

@@ -7,11 +7,11 @@
 #include <vector>
 
 #include "core/game_result.h"
-#include "core/server/connector/connector_frame_response.h"
 
 class ConnectorManager;
 class GameState;
 class GameStateObserver;
+struct FrameResponse;
 
 class DuelServer {
 public:
@@ -33,7 +33,7 @@ public:
 
 private:
     void runDuelLoop();
-    void play(GameState*, const std::vector<ConnectorFrameResponse> data[2]);
+    void play(GameState*, const std::vector<FrameResponse> data[2]);
 
     GameResult runGame(ConnectorManager* manager);
 

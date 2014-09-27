@@ -6,6 +6,7 @@
 #include "capture/analyzer.h"
 #include "capture/source.h"
 #include "core/field/core_field.h"
+#include "core/frame_response.h"
 #include "core/game_result.h"
 #include "core/player.h"
 #include "core/puyo_color.h"
@@ -204,7 +205,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
             connector_->connector(pi)->write(makeFrameRequestFor(pi, frameId, analyzerResult));
     }
 
-    vector<ConnectorFrameResponse> data[2];
+    vector<FrameResponse> data[2];
     connector_->receive(frameId, data);
 
     for (int pi = 0; pi < 2; pi++) {
@@ -310,7 +311,7 @@ PuyoColor WiiConnectServer::toPuyoColor(RealColor rc, bool allowAllocation)
     return PuyoColor::EMPTY;
 }
 
-void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, const vector<ConnectorFrameResponse>& data)
+void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, const vector<FrameResponse>& data)
 {
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.
