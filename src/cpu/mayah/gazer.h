@@ -70,6 +70,7 @@ private:
     int frameIdGazedAt_;
     bool isRensaOngoing_;
     OngoingRensaInfo ongoingRensaInfo_;
+    int restEmptyField_;
 
     // --- For these rensaInfos, frames means the initiatingFrames.
     // Fiesible Rensa is the Rensa the enemy can really fire in current/next/nextnext tsumo.
