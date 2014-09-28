@@ -47,6 +47,7 @@ void MayahAI::gameWillBegin(const FrameRequest& frameRequest)
 {
     thoughtMaxRensa_ = 0;
     thoughtMaxScore_ = 0;
+    enemyField_.clear();
     gazer_.initialize(frameRequest.frameId);
 }
 
@@ -175,6 +176,13 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     return ss.str();
 }
 
+void MayahAI::enemyDecisionRequest(const FrameRequest& frameRequest)
+{
+    enemyField_ = CoreField(frameRequest.enemyPlayerFrameRequest().field);
+    enemyField_.forceDrop();
+    enemyDecisonRequestFrameId_ = frameRequest.frameId;
+}
+
 void MayahAI::enemyGrounded(const FrameRequest& frameRequest)
 {
     // --- Check if Rensa starts.
@@ -199,7 +207,9 @@ void MayahAI::enemyNext2Appeared(const FrameRequest& frameRequest)
     if (!isNormalColor(seq.axis(0)) || !isNormalColor(seq.child(0)))
         return;
 
-    gazer_.gaze(frameRequest.frameId, frameRequest.enemyPlayerFrameRequest().field, frameRequest.enemyPlayerFrameRequest().kumipuyoSeq);
+    // Since enemy's current moving puyo might be grounded already. In that case, we use the same puyo twice.
+    // So, we need to use the field that is taken in DecisionRequest.
+    gazer_.gaze(enemyDecisonRequestFrameId_, enemyField_, frameRequest.enemyPlayerFrameRequest().kumipuyoSeq);
 
     LOG(INFO) << '\n' << gazer_.toRensaInfoString();
 }
