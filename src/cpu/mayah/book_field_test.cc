@@ -4,6 +4,24 @@
 
 using namespace std;
 
+TEST(BookFieldTest, varCount)
+{
+    BookField bf1("test",
+                  vector<string> {
+                      "AAA...",
+                  });
+    BookField bf2("test",
+                  vector<string> {
+                      "..ABBB",
+                  });
+
+    EXPECT_EQ(3, bf1.varCount());
+    EXPECT_EQ(4, bf2.varCount());
+
+    bf1.merge(bf2);
+    EXPECT_EQ(6, bf1.varCount());
+}
+
 TEST(BookFieldTest, match1)
 {
     BookField bf("test",

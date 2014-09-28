@@ -30,11 +30,16 @@ public:
     double defaultScore() const { return defaultScore_; }
     double score(int x, int y) const { return scoreField_[x][y]; }
 
+    int varCount() const { return varCount_; }
+
     std::string toDebugString() const;
 
 private:
+    int calculateVarCount() const;
+
     std::string name_;
     double defaultScore_;
+    int varCount_;
     char field_[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
     double scoreField_[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
 };

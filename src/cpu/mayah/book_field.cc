@@ -61,6 +61,8 @@ BookField::BookField(const string& name, const vector<string>& field, double def
             }
         }
     }
+
+    varCount_ = calculateVarCount();
 }
 
 void BookField::merge(const BookField& bf)
@@ -80,6 +82,8 @@ void BookField::merge(const BookField& bf)
             }
         }
     }
+
+    varCount_ = calculateVarCount();
 }
 
 BookField BookField::mirror() const
@@ -157,4 +161,18 @@ string BookField::toDebugString() const
         ss << endl;
     }
     return ss.str();
+}
+
+int BookField::calculateVarCount() const
+{
+    int count = 0;
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
+            if ('A' <= field_[x][y] && field_[x][y] <= 'Z') {
+                ++count;
+            }
+        }
+    }
+
+    return count;
 }
