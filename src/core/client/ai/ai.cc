@@ -65,7 +65,10 @@ void AI::runLoop()
             gameWillBegin(frameRequest);
             next1.clear();
         }
+
         // Update enemy info if necessary.
+        if (frameRequest.enemyPlayerFrameRequest().state.decisionRequest)
+            enemyDecisionRequest(frameRequest);
         if (frameRequest.enemyPlayerFrameRequest().state.grounded)
             enemyGrounded(frameRequest);
         if (frameRequest.enemyPlayerFrameRequest().state.wnextAppeared)

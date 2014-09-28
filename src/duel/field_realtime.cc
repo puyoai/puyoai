@@ -19,7 +19,6 @@ using namespace std;
 DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 
 // (n) means frames to transit to the next state.
-// TODO(mayah): quick?
 //
 // STATE_LEVEL_SELECT
 //  v (6)
@@ -36,7 +35,7 @@ DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 //  v  STATE_VANISHING --+       |
 //  v (0)                        |
 // STATE_OJAMA_DROPPING          |
-//  v (10)                       | (6)
+//  v (10 or 0 if no ojama)      | (6)
 // STATE_OJAMA_GROUNDING --------+
 //  v
 // STATE_DEAD

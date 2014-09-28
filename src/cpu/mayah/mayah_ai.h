@@ -33,6 +33,7 @@ public:
                                const AdditionalThoughtInfo&) override;
     virtual DropDecision thinkFast(int frameId, const PlainField&, const KumipuyoSeq&,
                                    const AdditionalThoughtInfo&) override;
+    virtual void enemyDecisionRequest(const FrameRequest&) override;
     virtual void enemyGrounded(const FrameRequest&) override;
     virtual void enemyNext2Appeared(const FrameRequest&) override;
 
@@ -50,6 +51,10 @@ protected:
 
     std::unique_ptr<FeatureParameter> featureParameter_;
     std::vector<BookField> books_;
+
+    CoreField enemyField_;
+    int enemyDecisonRequestFrameId_;
+
     Gazer gazer_;
     int thoughtMaxRensa_ = 0;
     int thoughtMaxScore_ = 0;

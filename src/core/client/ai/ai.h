@@ -49,6 +49,9 @@ protected:
         return think(frameId, field, next, info);
     }
 
+    // When enemy will start to move puyo, this callback will be called.
+    virtual void enemyDecisionRequest(const FrameRequest&) {}
+
     // When enemy's puyo is grounded, this callback will be called.
     // You can detect enemy has started his rensa in this callback.
     virtual void enemyGrounded(const FrameRequest&) {}
