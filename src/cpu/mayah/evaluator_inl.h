@@ -46,8 +46,12 @@ void evalBook(ScoreCollector* sc, const std::vector<BookField>& books, const Ref
     double totalPuyoCount = plan.field().countPuyos();
     for (const auto& bf : books) {
         BookField::MatchResult mr = bf.match(plan.field());
-        double score = mr.score / totalPuyoCount;
-        // double score = bf.match(plan.field());
+        double ratio = mr.count / totalPuyoCount;
+        DCHECK(0 <= ratio && ratio <= 1.0) << ratio;
+        if (ratio < 0.5)
+            continue;
+        ratio = (ratio - 0.5) * 2;
+        double score = mr.score * ratio / totalPuyoCount;
         if (maxScore < score) {
             bestBf = &bf;
             maxScore = score;
