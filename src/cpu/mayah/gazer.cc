@@ -204,10 +204,6 @@ int Gazer::estimateMaxScore(int frameId) const
         int newTotalChains = std::max(std::min(it->chains + newAdditionalChains, 19), 0);
         double ratio = static_cast<double>(ACCUMULATED_RENSA_SCORE[newTotalChains]) / ACCUMULATED_RENSA_SCORE[it->chains];
 
-        cout << numPossiblePuyos << ' ' << it->chains << ' ' << it->score << ' ' << newAdditionalChains << ' '
-             << ACCUMULATED_RENSA_SCORE[newTotalChains] << ' ' << ACCUMULATED_RENSA_SCORE[it->chains]
-             << ' ' << ratio << endl;
-
         int score = it->score * ratio - ACCUMULATED_RENSA_SCORE[newAdditionalChains];
         maxScore = std::max(maxScore, score);
     }
