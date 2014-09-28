@@ -66,6 +66,8 @@ protected:
     void setDifensive(bool flag) { difensive_ = flag; }
 
 private:
+    friend class Solver;
+
     void resetCurrentField(const CoreField&);
 
     std::string name_;
