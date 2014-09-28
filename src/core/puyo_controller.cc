@@ -917,7 +917,7 @@ KeySetSeq findKeyStrokeFastpath6(const CoreField& field, const Decision& decisio
         }
         return KeySetSeq();
     case 3:
-        if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
+        if (field.height(2) <= 11 && field.height(4) <= 10 && field.height(5) <= 10 && field.height(6) <= 10) {
             return KeySetSeq {
                 KeySet(Key::RIGHT, Key::LEFT_TURN),
                 KeySet(),
