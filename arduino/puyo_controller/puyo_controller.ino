@@ -640,23 +640,24 @@ void setup()
 #define KEY_RIGHT_TURN   4
 #define KEY_LEFT_TURN    5
 #define KEY_START        6
-#define KEY_INIT         7
+#define KEY_WAIT         7
 
 void loop()
 {
+    digitalWrite(13, LOW);
+
     if (Serial.available() <= 0)
         return;
 
     int x = Serial.read();
     x &= 0xFF;
 
-#if 0
-    if (x == 0xFF || x == 0x7F || ((x >> KEY_INIT) & 1)) {
+    if ((x >> KEY_WAIT) & 1) {
+        int wait = x & 0x7F;
         digitalWrite(13, HIGH);
-        delay(100);
+        delay(wait);
         return;
     }
-#endif
 
     if ((x >> KEY_UP) & 1) {
         bdu = 1;
@@ -665,10 +666,8 @@ void loop()
     }
     if ((x >> KEY_RIGHT) & 1) {
         bdr = 1;
-        digitalWrite(13, HIGH);
     } else {
         bdr = 0;
-        digitalWrite(13, LOW);
     }
     if ((x >> KEY_DOWN) & 1) {
         bdd = 1;

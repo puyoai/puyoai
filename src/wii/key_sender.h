@@ -7,6 +7,8 @@ class KeySender {
 public:
     virtual ~KeySender() {}
 
+    virtual void sendWait(int ms) = 0;
+
     void send(const KeySet& keySet, bool forceSend = false)
     {
         if (forceSend || keySet != keySetLastSent_) {
