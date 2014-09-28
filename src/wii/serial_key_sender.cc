@@ -58,6 +58,15 @@ SerialKeySender::~SerialKeySender()
     }
 }
 
+void SerialKeySender::sendWait(int ms)
+{
+    CHECK_LT(ms, 64);
+
+    unsigned char c = 0x80 + ms;
+    CHECK_EQ(write(fd_, &c, sizeof(unsigned char)), 1);
+    cout << "wait " << ms << endl;
+}
+
 void SerialKeySender::sendKeySet(const KeySet& keySet)
 {
     unsigned char c = static_cast<unsigned int>(keySet.toInt());

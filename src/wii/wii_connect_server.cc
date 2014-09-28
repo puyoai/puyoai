@@ -349,6 +349,9 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
         }
 
         lastDecision_[pi] = d;
+        if (!keySetSeq.empty()) {
+            keySender_->sendWait(10);
+        }
         for (size_t j = 0; j < keySetSeq.size(); j++) {
             KeySet k = keySetSeq[j];
             keySender_->send(k, true);
