@@ -58,7 +58,7 @@ public:
     void showMatchedBooks(const CoreField& field)
     {
         for (const auto& book : books_ ) {
-            if (book.match(field)) {
+            if (book.match(field).count) {
                 cout << book.toDebugString() << endl;
             }
         }

@@ -16,10 +16,10 @@ TEST(BookFieldTest, match1)
     PlainField pf2("R     ");
     PlainField pf3("R R   ");
 
-    EXPECT_EQ(0, bf.match(pf0));
-    EXPECT_EQ(3, bf.match(pf1));
-    EXPECT_EQ(1, bf.match(pf2));
-    EXPECT_EQ(2, bf.match(pf3));
+    EXPECT_EQ(BookField::MatchResult(0, 0), bf.match(pf0));
+    EXPECT_EQ(BookField::MatchResult(3, 3), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(1, 1), bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(2, 2), bf.match(pf3));
 }
 
 TEST(BookFieldTest, match2)
@@ -43,9 +43,9 @@ TEST(BookFieldTest, match2)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(0,  bf.match(pf0));
-    EXPECT_EQ(16, bf.match(pf1));
-    EXPECT_EQ(16, bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(0, 0), bf.match(pf0));
+    EXPECT_EQ(BookField::MatchResult(16, 16), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(16, 16), bf.match(pf2));
 }
 
 TEST(BookFieldTest, unmatch1)
@@ -79,10 +79,10 @@ TEST(BookFieldTest, unmatch1)
         "BBRBBB"
         "RRRRRY");
 
-    EXPECT_EQ(0, bf.match(pf1));
-    EXPECT_EQ(0, bf.match(pf2));
-    EXPECT_EQ(0, bf.match(pf3));
-    EXPECT_EQ(0, bf.match(pf4));
+    EXPECT_EQ(BookField::MatchResult(0, 0), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(0, 0), bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(0, 0), bf.match(pf3));
+    EXPECT_EQ(BookField::MatchResult(0, 0), bf.match(pf4));
 }
 
 TEST(BookFieldTest, unmatch2)
@@ -94,7 +94,7 @@ TEST(BookFieldTest, unmatch2)
 
     PlainField pf1(" B B  ");
 
-    EXPECT_EQ(0, bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(0, 0), bf.match(pf1));
 }
 
 TEST(BookFieldTest, unmatch3)
@@ -106,7 +106,7 @@ TEST(BookFieldTest, unmatch3)
 
     PlainField pf("Y    Y");
 
-    EXPECT_EQ(0, bf.match(pf));
+    EXPECT_EQ(BookField::MatchResult(0, 0), bf.match(pf));
 }
 
 TEST(BookFieldTest, merge)
@@ -150,7 +150,7 @@ TEST(BookFieldTest, merge)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(0, bf.match(pf0));
-    EXPECT_EQ(38, bf.match(pf1));
-    EXPECT_EQ(0, bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(0, 0), bf.match(pf0));
+    EXPECT_EQ(BookField::MatchResult(38, 19), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(0, 0), bf.match(pf2));
 }

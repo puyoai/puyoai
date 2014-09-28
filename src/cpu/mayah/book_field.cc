@@ -95,9 +95,10 @@ BookField BookField::mirror() const
     return bf;
 }
 
-double BookField::match(const PlainField& f) const
+BookField::MatchResult BookField::match(const PlainField& f) const
 {
     // First, make a map from char to PuyoColor.
+    int matchCount = 0;
     double matchScore = 0;
     map<char, PuyoColor> env;
     for (int x = 1; x <= 6; ++x) {
@@ -111,8 +112,9 @@ double BookField::match(const PlainField& f) const
                 continue;
 
             if (!isNormalColor(pc))
-                return 0;
+                return MatchResult(0, 0);
 
+            matchCount += 1;
             matchScore += scoreField_[x][y];
 
             if (!env.count(c)) {
@@ -121,28 +123,28 @@ double BookField::match(const PlainField& f) const
             }
 
             if (env[c] != pc)
-                return 0;
+                return MatchResult(0, 0);
         }
     }
 
     if (matchScore == 0)
-        return 0.0;
+        return MatchResult(0, 0);
 
     // Check the neighbors.
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12 && field_[x][y] != '.'; ++y) {
             if (!check(field_[x][y], field_[x][y + 1], f.get(x, y + 1), env))
-                return 0;
+                return MatchResult(0, 0);
             if (!check(field_[x][y], field_[x][y - 1], f.get(x, y - 1), env))
-                return 0;
+                return MatchResult(0, 0);
             if (!check(field_[x][y], field_[x + 1][y], f.get(x + 1, y), env))
-                return 0;
+                return MatchResult(0, 0);
             if (!check(field_[x][y], field_[x - 1][y], f.get(x - 1, y), env))
-                return 0;
+                return MatchResult(0, 0);
         }
     }
 
-    return matchScore;
+    return MatchResult(matchScore, matchCount);
 }
 
 string BookField::toDebugString() const
