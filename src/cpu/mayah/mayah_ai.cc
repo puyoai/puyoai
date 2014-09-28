@@ -88,6 +88,7 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
 
     int bestRensaScore = 0;
+    int bestRensaFrames = 0;
     int bestVirtualRensaScore = 0;
     Plan bestRensaPlan;
 
@@ -104,8 +105,9 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
             bestVirtualRensaScore = evalResult.maxVirtualScore();
         }
 
-        if (bestRensaScore < plan.score()) {
+        if (bestRensaScore < plan.score() || (bestRensaScore == plan.score() && bestRensaFrames > plan.totalFrames())) {
             bestRensaScore = plan.score();
+            bestRensaFrames = plan.totalFrames();
             bestRensaPlan = plan.toPlan();
         }
 
