@@ -20,7 +20,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey)
     EXPECT_EQ(KumipuyoPos(4, 12, 0), mks.pos);
     EXPECT_EQ(0, mks.restFramesTurnProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
 
     PuyoController::moveKumipuyo(f, KeySet(), &mks, &downAccepted);
@@ -28,13 +28,13 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey)
     EXPECT_EQ(KumipuyoPos(3, 12, 0), mks.pos);
     EXPECT_EQ(0, mks.restFramesTurnProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2 - 3, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - 3, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
 
     // TODO(mayah): Should we accept Key::DOWN here?
     PuyoController::moveKumipuyo(f, KeySet(), &mks, &downAccepted);
     PuyoController::moveKumipuyo(f, KeySet(Key::DOWN), &mks, &downAccepted);
-    EXPECT_EQ(KumipuyoPos(3, 11, 0), mks.pos);
+    EXPECT_EQ(KumipuyoPos(3, 12, 0), mks.pos);
     EXPECT_EQ(0, mks.restFramesTurnProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
     EXPECT_EQ(0, mks.restFramesForFreefall);
@@ -43,7 +43,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey)
 
     downAccepted = false;
     PuyoController::moveKumipuyo(f, KeySet(Key::DOWN), &mks, &downAccepted);
-    EXPECT_EQ(KumipuyoPos(3, 10, 0), mks.pos);
+    EXPECT_EQ(KumipuyoPos(3, 11, 0), mks.pos);
     EXPECT_EQ(0, mks.restFramesTurnProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
     EXPECT_EQ(0, mks.restFramesForFreefall);
@@ -83,7 +83,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Right)
         EXPECT_EQ(KumipuyoPos(4, 12, 0), mks.pos);
         EXPECT_EQ(0, mks.restFramesTurnProhibited);
         EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-        EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+        EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
         EXPECT_FALSE(mks.grounded);
     }
     {
@@ -92,7 +92,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Right)
         EXPECT_EQ(KumipuyoPos(4, 12, 1), mks.pos);
         EXPECT_EQ(0, mks.restFramesTurnProhibited);
         EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-        EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+        EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
         EXPECT_FALSE(mks.grounded);
     }
     {
@@ -101,7 +101,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Right)
         EXPECT_EQ(KumipuyoPos(4, 11, 2), mks.pos);
         EXPECT_EQ(0, mks.restFramesTurnProhibited);
         EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-        EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+        EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
         EXPECT_FALSE(mks.grounded);
     }
     {
@@ -110,7 +110,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Right)
         EXPECT_EQ(KumipuyoPos(4, 12, 3), mks.pos);
         EXPECT_EQ(0, mks.restFramesTurnProhibited);
         EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-        EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+        EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
         EXPECT_FALSE(mks.grounded);
     }
 }
@@ -126,7 +126,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Left)
         EXPECT_EQ(KumipuyoPos(2, 12, 0), mks.pos);
         EXPECT_EQ(0, mks.restFramesTurnProhibited);
         EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-        EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+        EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
         EXPECT_FALSE(mks.grounded);
     }
     {
@@ -135,7 +135,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Left)
         EXPECT_EQ(KumipuyoPos(2, 12, 1), mks.pos);
         EXPECT_EQ(0, mks.restFramesTurnProhibited);
         EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-        EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+        EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
         EXPECT_FALSE(mks.grounded);
     }
     {
@@ -144,7 +144,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Left)
         EXPECT_EQ(KumipuyoPos(2, 11, 2), mks.pos);
         EXPECT_EQ(0, mks.restFramesTurnProhibited);
         EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-        EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+        EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
         EXPECT_FALSE(mks.grounded);
     }
     {
@@ -153,7 +153,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithOnlyArrowKey_Left)
         EXPECT_EQ(KumipuyoPos(2, 12, 3), mks.pos);
         EXPECT_EQ(0, mks.restFramesTurnProhibited);
         EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-        EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+        EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
         EXPECT_FALSE(mks.grounded);
     }
 }
@@ -211,7 +211,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithTurnKey)
     EXPECT_EQ(KumipuyoPos(3, 12, 1), mks.pos);
     EXPECT_EQ(PuyoController::FRAMES_CONTINUOUS_TURN_PROHIBITED, mks.restFramesTurnProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
     EXPECT_FALSE(downAccepted);
 
@@ -220,7 +220,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoWithTurnKey)
     EXPECT_EQ(KumipuyoPos(3, 12, 1), mks.pos);
     EXPECT_EQ(PuyoController::FRAMES_CONTINUOUS_TURN_PROHIBITED - 1, mks.restFramesTurnProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2 - 2, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - 2, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
     EXPECT_FALSE(downAccepted);
 
@@ -242,7 +242,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoMultipleKeys)
     EXPECT_EQ(KumipuyoPos(3, 12, 3), mks.pos);
     EXPECT_EQ(PuyoController::FRAMES_CONTINUOUS_TURN_PROHIBITED, mks.restFramesTurnProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
     EXPECT_FALSE(downAccepted);
 }
@@ -380,7 +380,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoQuickTurn)
     EXPECT_EQ(KumipuyoPos(3, 12, 0), mks.pos);
     EXPECT_EQ(PuyoController::FRAMES_CONTINUOUS_TURN_PROHIBITED, mks.restFramesTurnProhibited);
     EXPECT_EQ(FRAMES_QUICKTURN, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - 1, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
     EXPECT_FALSE(downAccepted);
 
@@ -388,7 +388,7 @@ TEST(PuyoControllerMoveTest, moveKumipuyoQuickTurn)
     EXPECT_EQ(KumipuyoPos(3, 12, 0), mks.pos);
     EXPECT_EQ(PuyoController::FRAMES_CONTINUOUS_TURN_PROHIBITED - 1, mks.restFramesTurnProhibited);
     EXPECT_EQ(FRAMES_QUICKTURN - 1, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2 - 2, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - 2, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
     EXPECT_FALSE(downAccepted);
 
@@ -419,7 +419,7 @@ TEST(PuyoControllerMoveTest, moveForWii)
     EXPECT_EQ(0, mks.restFramesTurnProhibited);
     EXPECT_EQ(1, mks.restFramesArrowProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2- 1, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL- 1, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
 
     // This should be ignored.
@@ -428,7 +428,7 @@ TEST(PuyoControllerMoveTest, moveForWii)
     EXPECT_EQ(0, mks.restFramesTurnProhibited);
     EXPECT_EQ(0, mks.restFramesArrowProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2 - 2, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - 2, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
 
     PuyoController::moveKumipuyo(f, KeySet(Key::RIGHT), &mks, &downAccepted);
@@ -436,15 +436,15 @@ TEST(PuyoControllerMoveTest, moveForWii)
     EXPECT_EQ(0, mks.restFramesTurnProhibited);
     EXPECT_EQ(1, mks.restFramesArrowProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2 - 3, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - 3, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
 
     // This should be ignored.
     PuyoController::moveKumipuyo(f, KeySet(Key::LEFT), &mks, &downAccepted);
-    EXPECT_EQ(KumipuyoPos(5, 11, 0), mks.pos);
+    EXPECT_EQ(KumipuyoPos(5, 12, 0), mks.pos);
     EXPECT_EQ(0, mks.restFramesTurnProhibited);
     EXPECT_EQ(0, mks.restFramesArrowProhibited);
     EXPECT_EQ(0, mks.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL, mks.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - 4, mks.restFramesForFreefall);
     EXPECT_FALSE(mks.grounded);
 }

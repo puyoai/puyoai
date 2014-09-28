@@ -257,7 +257,9 @@ TEST(PuyoControllerTest, rightHigherField)
         "OOOOOO"
         "OOOOOO");
 
+    // This causes miscontrolling on wii.
     MovingKumipuyoState mks(KumipuyoPos::initialPos());
+    mks.restFramesForFreefall = FRAMES_FREE_FALL / 2;
     KeySetSeq kss = PuyoController::findKeyStroke(f, mks, Decision(6, 2));
 
     EXPECT_EQ(">,,>,B,>,B,v", kss.toString());

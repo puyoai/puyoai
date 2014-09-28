@@ -341,6 +341,10 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
             }
 
             MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+            // TODO(mayah): Since PuyoController does not understand the difference between 'grounded' and 'fixed',
+            // it does miscontrolling on the wii. To prevent this, we'd like to reduce restFramesForFreefall in
+            // the beginning.
+            mks.restFramesForFreefall = FRAMES_FREE_FALL / 2;
             keySetSeq = PuyoController::findKeyStroke(field, mks, d);
             if (keySetSeq.empty())
                 continue;
