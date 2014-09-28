@@ -89,6 +89,9 @@ void PuyoController::moveKumipuyo(const PlainField& field, const KeySet& keySet,
     if (!keySet.hasKey(Key::DOWN) && needsFreefallProcess)
         moveKumipuyoByFreefall(field, mks);
 
+    if (mks->grounded)
+        return;
+
     if (mks->restFramesArrowProhibited > 0) {
         mks->restFramesArrowProhibited--;
     } else {
