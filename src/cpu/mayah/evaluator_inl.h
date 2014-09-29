@@ -36,6 +36,8 @@ const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_DENSITY_FEATURE = false;
 const bool USE_IGNITION_HEIGHT_FEATURE = true;
 const bool USE_FIELD_USHAPE_FEATURE = true;
+const bool USE_RIDGE_FEATURE = true;
+const bool USE_VALLEY_FEATURE = true;
 
 template<typename ScoreCollector>
 void evalBook(ScoreCollector* sc, const std::vector<BookField>& books, const RefPlan& plan)
@@ -199,36 +201,34 @@ void evalThirdColumnHeightFeature(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-void evalValleyDepthRidgeHeight(ScoreCollector* sc, const RefPlan& plan)
+void evalValleyDepth(ScoreCollector* sc, const RefPlan& plan)
 {
     for (int x = 1; x <= 6; ++x) {
         int currentHeight = plan.field().height(x);
         int leftHeight = (x == 1) ? 14 : plan.field().height(x - 1);
         int rightHeight = (x == 6) ? 14 : plan.field().height(x + 1);
 
-        // --- valley
-        {
-            int left = std::max(leftHeight - currentHeight, 0);
-            int right = std::max(rightHeight - currentHeight, 0);
-            int depth = std::min(left, right);
-#if 0
-            if (x == 1 || x == 6) {
-                if (depth > 0)
-                    depth -= 1;
-            }
-#endif
-            DCHECK(0 <= depth && depth <= 14) << depth;
-            sc->addScore(VALLEY_DEPTH, depth, 1);
-        }
+        int left = std::max(leftHeight - currentHeight, 0);
+        int right = std::max(rightHeight - currentHeight, 0);
+        int depth = std::min(left, right);
+        DCHECK(0 <= depth && depth <= 14) << depth;
+        sc->addScore(VALLEY_DEPTH, depth, 1);
+    }
+}
 
-        // --- ridge
-        {
-            int left = std::max(currentHeight - leftHeight, 0);
-            int right = std::max(currentHeight - rightHeight, 0);
-            int height = std::min(left, right);
-            DCHECK(0 <= height && height <= 14) << height;
-            sc->addScore(RIDGE_HEIGHT, height, 1);
-        }
+template<typename ScoreCollector>
+void evalRidgeHeight(ScoreCollector* sc, const RefPlan& plan)
+{
+    for (int x = 1; x <= 6; ++x) {
+        int currentHeight = plan.field().height(x);
+        int leftHeight = (x == 1) ? 14 : plan.field().height(x - 1);
+        int rightHeight = (x == 6) ? 14 : plan.field().height(x + 1);
+
+        int left = std::max(currentHeight - leftHeight, 0);
+        int right = std::max(currentHeight - rightHeight, 0);
+        int height = std::min(left, right);
+        DCHECK(0 <= height && height <= 14) << height;
+        sc->addScore(RIDGE_HEIGHT, height, 1);
     }
 }
 
@@ -500,7 +500,10 @@ void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const
         evalFieldHeightFeature(sc, plan);
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(sc, plan);
-    evalValleyDepthRidgeHeight(sc, plan);
+    if (USE_VALLEY_FEATURE)
+        evalValleyDepth(sc, plan);
+    if (USE_RIDGE_FEATURE)
+        evalRidgeHeight(sc, plan);
     if (USE_FIELD_USHAPE_FEATURE)
         evalFieldUShape(sc, plan);
     evalUnreachableSpace(sc, plan);
