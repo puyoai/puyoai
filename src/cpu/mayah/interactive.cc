@@ -14,6 +14,7 @@
 #include "core/field_pretty_printer.h"
 #include "core/frame_request.h"
 #include "core/kumipuyo.h"
+#include "core/problem/problem.h"
 #include "core/sequence_generator.h"
 #include "core/state.h"
 
@@ -21,6 +22,7 @@
 #include "mayah_ai.h"
 
 DEFINE_string(seq, "", "initial puyo sequence");
+DEFINE_string(problem, "", "use problem");
 
 using namespace std;
 
@@ -28,6 +30,7 @@ class InteractiveAI : public MayahAI {
 public:
     InteractiveAI(int argc, char* argv[]) : MayahAI(argc, argv) {}
 
+    using MayahAI::additionalThoughtInfo;
     using MayahAI::gameWillBegin;
     using MayahAI::think;
     using MayahAI::enemyNext2Appeared;
@@ -65,40 +68,33 @@ public:
     }
 };
 
-// TODO(mayah): Implement with GUI!
-int main(int argc, char* argv[])
+Problem makeProblem()
 {
-    google::ParseCommandLineFlags(&argc, &argv, true);
-    google::InitGoogleLogging(argv[0]);
-    google::InstallFailureSignalHandler();
-
-    TsumoPossibility::initialize();
-
-    InteractiveAI ai(argc, argv);
-
-    CoreField field;
-    KumipuyoSeq seq = generateSequence();
-
-    if (FLAGS_seq != "") {
-        for (size_t i = 0; i < FLAGS_seq.size(); ++i) {
-            PuyoColor c = toPuyoColor(FLAGS_seq[i]);
-            CHECK(isNormalColor(c));
-            if (i % 2 == 0)
-                seq.setAxis(i / 2, c);
-            else
-                seq.setChild(i / 2, c);
+    KumipuyoSeq generated;
+    {
+        generated = generateSequence();
+        if (FLAGS_seq != "") {
+            for (size_t i = 0; i < FLAGS_seq.size(); ++i) {
+                PuyoColor c = toPuyoColor(FLAGS_seq[i]);
+                CHECK(isNormalColor(c));
+                if (i % 2 == 0)
+                    generated.setAxis(i / 2, c);
+                else
+                    generated.setChild(i / 2, c);
+            }
         }
     }
 
-    for (int i = 0; i + 1 < seq.size(); ++i) {
-        int frameId = 2 + i; // frameId 1 will be used for initializing now. Let's avoid it.
+    Problem problem;
+    if (!FLAGS_problem.empty()) {
+        problem = Problem::readProblem(FLAGS_problem);
 
-        FrameRequest fr;
-        fr.frameId = frameId;
-
-        // Set up enemy field.
-        // Make enemy will fire his large rensa.
-        fr.playerFrameRequest[1].field = CoreField(
+        // Add generated sequence after problem.
+        problem.kumipuyoSeq[0].append(generated);
+        problem.kumipuyoSeq[1].append(generated);
+    } else {
+        problem.kumipuyoSeq[0] = generated;
+        problem.field[1] = CoreField(
             "500065"
             "400066"
             "545645"
@@ -109,23 +105,59 @@ int main(int argc, char* argv[])
             "456456"
             "456456"
             "456456");
-        fr.playerFrameRequest[1].kumipuyoSeq = KumipuyoSeq("666666");
+        problem.kumipuyoSeq[1] = KumipuyoSeq("666666");
+        problem.kumipuyoSeq[1].append(generated);
+    }
 
-        // Invoke Gazer.
+    return problem;
+}
+
+// TODO(mayah): Implement with GUI!
+int main(int argc, char* argv[])
+{
+    google::ParseCommandLineFlags(&argc, &argv, true);
+    google::InitGoogleLogging(argv[0]);
+    google::InstallFailureSignalHandler();
+    TsumoPossibility::initialize();
+
+    InteractiveAI ai(argc, argv);
+
+    Problem problem = makeProblem();
+
+    FrameRequest req;
+    req.frameId = 1;
+    ai.gameWillBegin(req);
+
+    req.frameId = 2;
+    req.playerFrameRequest[0].field = problem.field[0];
+    req.playerFrameRequest[1].field = problem.field[1];
+    req.playerFrameRequest[0].kumipuyoSeq = problem.kumipuyoSeq[0];
+    req.playerFrameRequest[1].kumipuyoSeq = problem.kumipuyoSeq[1];
+
+    for (int i = 0; i < 50; ++i) {
+        // frameId 1 will be used for initializing now. Let's avoid it.
+        int frameId = 2 + i;
+        req.frameId = frameId;
+
+        // Call these callback for gazer.
         {
             double t1 = currentTime();
-            ai.enemyNext2Appeared(fr);
+            ai.enemyDecisionRequest(req);
+            ai.enemyNext2Appeared(req);
+            ai.enemyGrounded(req);
             double t2 = currentTime();
             cout << "gazer time = " << (t2 - t1) << endl;
         }
 
         // Waits for user enter.
         while (true) {
-            FieldPrettyPrinter::print(field, seq.subsequence(i, 2));
+            const PlainField& field = req.playerFrameRequest[0].field;
+            const KumipuyoSeq& seq = req.playerFrameRequest[0].kumipuyoSeq;
+
+            FieldPrettyPrinter::print(field, seq.subsequence(0, 2));
 
             double t1 = currentTime();
-            Plan aiPlan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
-                                       AdditionalThoughtInfo(),
+            Plan aiPlan = ai.thinkPlan(frameId, field, seq.subsequence(0, 2), ai.additionalThoughtInfo(),
                                        MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
             double t2 = currentTime();
             if (aiPlan.decisions().empty())
@@ -147,7 +179,7 @@ int main(int argc, char* argv[])
             if (str == "s") {
                 CollectedFeature cf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
                 cout << cf.toString() << endl;
-                cout << ai.makeMessageFrom(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
+                cout << ai.makeMessageFrom(frameId, field, seq.subsequence(0, 2),
                                            MayahAI::DEFAULT_NUM_ITERATION, aiPlan, (t2 - t1) * 1000);
                 continue;
             }
@@ -174,11 +206,18 @@ int main(int argc, char* argv[])
             }
         }
 
-        Plan aiPlan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
-                                   AdditionalThoughtInfo(),
+        Plan aiPlan = ai.thinkPlan(frameId,
+                                   req.playerFrameRequest[0].field,
+                                   req.playerFrameRequest[0].kumipuyoSeq.subsequence(0, 2),
+                                   ai.additionalThoughtInfo(),
                                    MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
-        field.dropKumipuyo(aiPlan.decisions().front(), seq.get(i));
-        field.simulate();
+        {
+            CoreField f = req.playerFrameRequest[0].field;
+            f.dropKumipuyo(aiPlan.decisions().front(), req.playerFrameRequest[0].kumipuyoSeq.front());
+            f.simulate();
+            req.playerFrameRequest[0].field = f;
+        }
+        req.playerFrameRequest[0].kumipuyoSeq.dropFront();
     }
 
     return 0;

@@ -64,9 +64,10 @@ void Gazer::initialize(int frameIdGameWillBegin)
 
 void Gazer::gaze(int frameId, const CoreField& cf, const KumipuyoSeq& seq)
 {
+    KumipuyoSeq s = (seq.size() > 4 ? seq.subsequence(0, 3) : seq);
     setFrameIdGazedAt(frameId);
-    updateFeasibleRensas(cf, seq);
-    updatePossibleRensas(cf, seq);
+    updateFeasibleRensas(cf, s);
+    updatePossibleRensas(cf, s);
 
     FieldBitField checked;
     restEmptyField_ = cf.countConnectedPuyos(3, 12, &checked);

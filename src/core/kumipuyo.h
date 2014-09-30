@@ -94,6 +94,7 @@ public:
 
     const Kumipuyo& front() const { return seq_.front(); }
     void dropFront() { seq_.erase(seq_.begin()); }
+    void append(const KumipuyoSeq& seq) { seq_.insert(seq_.end(), seq.seq_.begin(), seq.seq_.end()); }
 
     std::vector<Kumipuyo>::iterator begin() { return seq_.begin(); }
     std::vector<Kumipuyo>::const_iterator begin() const { return seq_.cbegin(); }
