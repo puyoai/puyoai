@@ -66,7 +66,10 @@ TEST_F(GazerTest, estimateMaxScoreUsingRensaIsOngoing)
     CoreField f;
     KumipuyoSeq seq("BYRRGG");
     gazer_->gaze(100, f, seq);
-    gazer_->setOngoingRensa(OngoingRensaInfo(RensaResult(10, 36840, 300, false), 400));
+
+    AdditionalThoughtInfo additionalThoughtInfo;
+    additionalThoughtInfo.setOngoingRensa(RensaResult(10, 36840, 300, false), 400);
+    gazer_->setAdditionalThoughtInfo(additionalThoughtInfo);
 
     // Since ongoing rensa will finish in frameId=400, we can estimate rensa score is 36840 until frameId=400.
     EXPECT_EQ(36840, gazer_->estimateMaxScore(200)) << gazer_->toRensaInfoString();

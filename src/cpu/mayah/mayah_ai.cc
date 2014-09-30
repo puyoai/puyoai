@@ -25,11 +25,13 @@ using namespace std;
 MayahAI::MayahAI(int argc, char* argv[]) :
     AI(argc, argv, "mayah")
 {
+    setBehaviorRethinkAfterOpponentRensa(true);
+
     featureParameter_.reset(new FeatureParameter(FLAGS_feature));
     books_ = BookReader::parse(FLAGS_book);
     LOG(INFO) << featureParameter_->toString();
     for (const auto& bf : books_) {
-        LOG(INFO) << bf.toDebugString();
+        VLOG(1) << bf.toDebugString();
     }
     google::FlushLogFiles(google::INFO);
 }
@@ -59,11 +61,13 @@ void MayahAI::gameHasEnded(const FrameRequest&)
     }
 }
 
-DropDecision MayahAI::think(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq, const AdditionalThoughtInfo&)
+DropDecision MayahAI::think(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq,
+                            const AdditionalThoughtInfo& additionalInfo)
 {
     CoreField f(plainField);
     double beginTime = currentTime();
-    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
+                          MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
     double endTime = currentTime();
     std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_NUM_ITERATION, plan, endTime - beginTime);
     if (plan.decisions().empty())
@@ -71,11 +75,13 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
     return DropDecision(plan.decisions().front(), message);
 }
 
-DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq, const AdditionalThoughtInfo&)
+DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq,
+                                const AdditionalThoughtInfo& additionalInfo)
 {
     CoreField f(plainField);
     double beginTime = currentTime();
-    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_DEPTH, MayahAI::FAST_NUM_ITERATION);
+    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
+                          MayahAI::DEFAULT_DEPTH, MayahAI::FAST_NUM_ITERATION);
     double endTime = currentTime();
     std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::FAST_NUM_ITERATION, plan, endTime - beginTime);
     if (plan.decisions().empty())
@@ -83,10 +89,14 @@ DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const
     return DropDecision(plan.decisions().front(), message);
 }
 
-Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int depth, int maxIteration)
+Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
+                        const AdditionalThoughtInfo& additionalInfo,
+                        int depth, int maxIteration)
 {
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
     VLOG(1) << gazer_.toRensaInfoString();
+
+    gazer_.setAdditionalThoughtInfo(additionalInfo);
 
     int bestRensaScore = 0;
     int bestRensaFrames = 0;
@@ -168,8 +178,8 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     }
 
     if (gazer_.isRensaOngoing()) {
-        ss << "Gazed ongoing rensa : " << gazer_.ongoingRensaInfo().rensaResult.score
-           << " in " << (gazer_.ongoingRensaInfo().finishingRensaFrameId - frameId) << " / ";
+        ss << "Gazed ongoing rensa : " << gazer_.ongoingRensaResult().score
+           << " in " << (gazer_.ongoingRensaFinishingFrameId() - frameId) << " / ";
     } else {
         ss << "Gazed max score = "
            << gazer_.estimateMaxScore(frameId + refPlan.totalFrames())
@@ -194,18 +204,7 @@ void MayahAI::enemyDecisionRequest(const FrameRequest& frameRequest)
 
 void MayahAI::enemyGrounded(const FrameRequest& frameRequest)
 {
-    // --- Check if Rensa starts.
-    CoreField field(frameRequest.enemyPlayerFrameRequest().field);
-    field.forceDrop();
-
-    RensaResult rensaResult = field.simulate();
-
-    if (rensaResult.chains > 0) {
-        requestReconsider();
-        gazer_.setOngoingRensa(OngoingRensaInfo(rensaResult, frameRequest.frameId + rensaResult.frames));
-    } else {
-        gazer_.unsetOngoingRensa();
-    }
+    UNUSED_VARIABLE(frameRequest);
 }
 
 void MayahAI::enemyNext2Appeared(const FrameRequest& frameRequest)

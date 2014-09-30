@@ -7,9 +7,11 @@ using namespace std;
 
 string RensaResult::toString() const
 {
-    char buf[80];
-    sprintf(buf, "chains, score, frames = %d, %d, %d", chains, score, frames);
-    return buf;
+    stringstream ss;
+    ss << "chains=" << chains
+       << " score=" << score
+       << " frames=" << frames;
+    return ss.str();
 }
 
 RensaTrackResult& RensaTrackResult::operator=(const RensaTrackResult& result)

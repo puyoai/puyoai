@@ -6,17 +6,9 @@
 #include <vector>
 
 #include "core/algorithm/rensa_info.h"
+#include "core/client/ai/ai.h"
 
 class KumipuyoSeq;
-
-struct OngoingRensaInfo {
-    OngoingRensaInfo() {}
-    OngoingRensaInfo(const RensaResult& rensaResult, int finishingRensaFrameId) :
-        rensaResult(rensaResult), finishingRensaFrameId(finishingRensaFrameId) {}
-
-    RensaResult rensaResult;
-    int finishingRensaFrameId;
-};
 
 struct EstimatedRensaInfo {
     EstimatedRensaInfo() {}
@@ -44,10 +36,10 @@ public:
     void setFrameIdGazedAt(int frameId) { frameIdGazedAt_ = frameId; }
     int frameIdGazedAt() const { return frameIdGazedAt_; }
 
-    void setOngoingRensa(const OngoingRensaInfo&);
-    void unsetOngoingRensa() { isRensaOngoing_ = false; }
-    bool isRensaOngoing() const { return isRensaOngoing_; }
-    const OngoingRensaInfo& ongoingRensaInfo() const { return ongoingRensaInfo_; }
+    void setAdditionalThoughtInfo(const AdditionalThoughtInfo& info) { additionalThoughtInfo_ = info; }
+    bool isRensaOngoing() const { return additionalThoughtInfo_.isRensaOngoing(); }
+    const RensaResult& ongoingRensaResult() const { return additionalThoughtInfo_.ongoingRensaResult(); }
+    int ongoingRensaFinishingFrameId() const { return additionalThoughtInfo_.ongoingRensaFinishingFrameId(); }
 
     void gaze(int frameId, const CoreField&, const KumipuyoSeq&);
 
@@ -68,9 +60,9 @@ private:
     const std::vector<EstimatedRensaInfo>& feasibleRensaInfos() const { return feasibleRensaInfos_; }
 
     int frameIdGazedAt_;
-    bool isRensaOngoing_;
-    OngoingRensaInfo ongoingRensaInfo_;
     int restEmptyField_;
+
+    AdditionalThoughtInfo additionalThoughtInfo_;
 
     // --- For these rensaInfos, frames means the initiatingFrames.
     // Fiesible Rensa is the Rensa the enemy can really fire in current/next/nextnext tsumo.

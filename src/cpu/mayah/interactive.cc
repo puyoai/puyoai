@@ -125,6 +125,7 @@ int main(int argc, char* argv[])
 
             double t1 = currentTime();
             Plan aiPlan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
+                                       AdditionalThoughtInfo(),
                                        MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
             double t2 = currentTime();
             if (aiPlan.decisions().empty())
@@ -174,6 +175,7 @@ int main(int argc, char* argv[])
         }
 
         Plan aiPlan = ai.thinkPlan(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
+                                   AdditionalThoughtInfo(),
                                    MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
         field.dropKumipuyo(aiPlan.decisions().front(), seq.get(i));
         field.simulate();

@@ -57,15 +57,9 @@ void Gazer::initialize(int frameIdGameWillBegin)
 {
     frameIdGazedAt_ = frameIdGameWillBegin;
     restEmptyField_ = 72;
-    unsetOngoingRensa();
+    additionalThoughtInfo_ = AdditionalThoughtInfo();
     feasibleRensaInfos_.clear();
     possibleRensaInfos_.clear();
-}
-
-void Gazer::setOngoingRensa(const OngoingRensaInfo& info)
-{
-    isRensaOngoing_ = true;
-    ongoingRensaInfo_ = info;
 }
 
 void Gazer::gaze(int frameId, const CoreField& cf, const KumipuyoSeq& seq)
@@ -174,8 +168,8 @@ int Gazer::estimateMaxScore(int frameId) const
         return -1;
     }
 
-    if (isRensaOngoing() && frameId <= ongoingRensaInfo().finishingRensaFrameId) {
-        return ongoingRensaInfo().rensaResult.score;
+    if (isRensaOngoing() && frameId <= ongoingRensaFinishingFrameId()) {
+        return ongoingRensaResult().score;
     }
 
     int scoreByFeasibleRensas = estimateMaxScoreFromFeasibleRensas(frameId);
@@ -251,10 +245,11 @@ int Gazer::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInfo>& r
 string Gazer::toRensaInfoString() const
 {
     stringstream ss;
-    ss << "Possible rensa infos : " << endl;
+    ss << "gazed at frameId: " << frameIdGazedAt_ << endl;
+    ss << "Possible rensa infos: " << endl;
     for (const auto& info : possibleRensaInfos())
         ss << info.toString() << endl;
-    ss << "Feasible rensa infos : " << endl;
+    ss << "Feasible rensa infos: " << endl;
     for (const auto& info : feasibleRensaInfos())
         ss << info.toString() << endl;
 
