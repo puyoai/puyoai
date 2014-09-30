@@ -51,7 +51,6 @@ AI::AI(int argc, char* argv[], const string& name) :
 void AI::runLoop()
 {
     DecisionSending next1;
-    AdditionalThoughtInfo additionalInfo;
 
     while (true) {
         google::FlushLogFiles(google::INFO);
@@ -84,8 +83,6 @@ void AI::runLoop()
         if (frameRequest.enemyPlayerFrameRequest().state.decisionRequest)
             enemyDecisionRequest(frameRequest);
         if (frameRequest.enemyPlayerFrameRequest().state.grounded) {
-            checkOngoingRensa(frameRequest, &additionalInfo);
-            // enemyGrounded should be called after checking ongoing rensa.
             enemyGrounded(frameRequest);
         }
         if (frameRequest.enemyPlayerFrameRequest().state.wnextAppeared)
@@ -98,7 +95,7 @@ void AI::runLoop()
             VLOG(1) << '\n' << field_.toDebugString();
 
             next1.fieldBeforeThink = field_;
-            next1.dropDecision = think(frameRequest.frameId, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) }, additionalInfo);
+            next1.dropDecision = think(frameRequest.frameId, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) }, additionalThoughtInfo_);
             next1.kumipuyo = kumipuyoSeq.get(1);
             next1.ready = true;
         }
@@ -137,7 +134,8 @@ void AI::runLoop()
 
             resetCurrentField(frameRequest.myPlayerFrameRequest().field);
             const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
-            next1.dropDecision = thinkFast(frameRequest.frameId, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) }, additionalInfo);
+            next1.dropDecision = thinkFast(frameRequest.frameId, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) },
+                                           additionalThoughtInfo_);
             next1.kumipuyo = kumipuyoSeq.get(0);
             next1.ready = true;
             next1.needsRethink = false;
@@ -159,6 +157,31 @@ void AI::runLoop()
     LOG(INFO) << "will exit run loop";
 }
 
+void AI::enemyDecisionRequest(const FrameRequest&)
+{
+}
+
+void AI::enemyGrounded(const FrameRequest& frameRequest)
+{
+    CoreField field(frameRequest.enemyPlayerFrameRequest().field);
+    field.forceDrop();
+
+    RensaResult rensaResult = field.simulate();
+
+    if (rensaResult.chains > 0) {
+        LOG(INFO) << "Detected the opponent has fired rensa: " << rensaResult.toString();
+        if (behaviorRethinkAfterOpponentRensa_)
+            requestRethink();
+        additionalThoughtInfo_.setOngoingRensa(rensaResult, frameRequest.frameId + rensaResult.frames);
+    } else {
+        additionalThoughtInfo_.unsetOngoingRensa();
+    }
+}
+
+void AI::enemyNext2Appeared(const FrameRequest&)
+{
+}
+
 void AI::resetCurrentField(const CoreField& field)
 {
     // TODO(mayah): Be more accurate.
@@ -178,22 +201,5 @@ void AI::resetCurrentField(const CoreField& field)
                     field_.dropPuyoOn(x, OJAMA);
             }
         }
-    }
-}
-
-void AI::checkOngoingRensa(const FrameRequest& frameRequest, AdditionalThoughtInfo* additionalInfo)
-{
-    CoreField field(frameRequest.enemyPlayerFrameRequest().field);
-    field.forceDrop();
-
-    RensaResult rensaResult = field.simulate();
-
-    if (rensaResult.chains > 0) {
-        LOG(INFO) << "Detected the opponent has fired rensa: " << rensaResult.toString();
-        if (behaviorRethinkAfterOpponentRensa_)
-            requestRethink();
-        additionalInfo->setOngoingRensa(rensaResult, frameRequest.frameId + rensaResult.frames);
-    } else {
-        additionalInfo->unsetOngoingRensa();
     }
 }

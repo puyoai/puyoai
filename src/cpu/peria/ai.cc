@@ -159,6 +159,8 @@ void Ai::gameWillBegin(const FrameRequest& /*frame_request*/) {
 }
 
 void Ai::enemyGrounded(const FrameRequest& frame_request) {
+  ::AI::enemyGrounded(frame_request);
+
   const PlainField& enemy = frame_request.enemyPlayerFrameRequest().field;
   CoreField field(enemy);
   field.forceDrop();
