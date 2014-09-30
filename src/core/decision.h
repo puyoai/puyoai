@@ -1,10 +1,8 @@
 #ifndef CORE_DECISION_H_
 #define CORE_DECISION_H_
 
-#include <stdio.h>
 #include <string>
-
-#include <glog/logging.h>
+#include <vector>
 
 #include "base/base.h"
 
@@ -28,12 +26,7 @@ public:
         return true;
     }
 
-    std::string toString() const
-    {
-        char buf[80];
-        sprintf(buf, "(%d, %d)", x, r);
-        return buf;
-    }
+    std::string toString() const;
 
     friend bool operator==(const Decision& lhs, const Decision& rhs) { return lhs.x == rhs.x && lhs.r == rhs.r; }
     friend bool operator!=(const Decision& lhs, const Decision& rhs) { return !(lhs == rhs); }
@@ -53,5 +46,7 @@ public:
     //  X         Y
     int r;
 };
+
+std::string toString(const std::vector<Decision>&);
 
 #endif  // CORE_DECISION_H_
