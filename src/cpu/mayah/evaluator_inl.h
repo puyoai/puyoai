@@ -39,6 +39,9 @@ const bool USE_FIELD_USHAPE_FEATURE = true;
 const bool USE_RIDGE_FEATURE = true;
 const bool USE_VALLEY_FEATURE = true;
 
+const bool USHAPE_ABS = false;
+const bool USHAPE_SQUARE = true;
+
 template<typename ScoreCollector>
 void evalBook(ScoreCollector* sc, const std::vector<BookField>& books, const RefPlan& plan)
 {
@@ -240,16 +243,34 @@ void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
     };
 
     const CoreField& f = plan.field();
-    int sumHeight = 0;
+    double average = 0;
     for (int x = 1; x <= 6; ++x)
-        sumHeight += f.height(x);
+        average += (f.height(x) + DIFF[x]);
+    average /= 6;
+
+    if (average < 0)
+        return;
 
     double s = 0;
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        if (f.height(x) <= 4) {
-            s += 0.06 * std::abs((f.height(x) + DIFF[x]) * 6 - sumHeight);
-        } else {
-            s += std::abs((f.height(x) + DIFF[x]) * 6 - sumHeight);
+    if (USHAPE_ABS) {
+        for (int x = 1; x <= CoreField::WIDTH; ++x) {
+            int h = f.height(x) + DIFF[x];
+            if (f.height(x) <= 4) {
+                s += 0.01 * std::abs(h - average);
+            } else {
+                s += std::abs(h - average);
+            }
+        }
+    }
+
+    if (USHAPE_SQUARE) {
+        for (int x = 1; x <= CoreField::WIDTH; ++x) {
+            int h = f.height(x) + DIFF[x];
+            if (f.height(x) <= 4) {
+                s += 0.01 * (h - average) * (h - average);
+            } else {
+                s += (h - average) * (h - average);
+            }
         }
     }
 
