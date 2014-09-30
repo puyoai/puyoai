@@ -86,6 +86,7 @@ DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const
 Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int depth, int maxIteration)
 {
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
+    VLOG(1) << gazer_.toRensaInfoString();
 
     int bestRensaScore = 0;
     int bestRensaFrames = 0;
@@ -96,6 +97,12 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
     Plan bestPlan;
     auto f = [&, this, frameId, maxIteration](const RefPlan& plan) {
         EvalResult evalResult = Evaluator(*featureParameter_, books_).eval(plan, field, frameId, maxIteration, gazer_);
+
+        VLOG(1) << toString(plan.decisions())
+                << ": eval=" << evalResult.score()
+                << " pscore=" << plan.score()
+                << " vscore=" << evalResult.maxVirtualScore();
+
         if (bestScore < evalResult.score()) {
             bestScore = evalResult.score();
             bestPlan = plan.toPlan();
