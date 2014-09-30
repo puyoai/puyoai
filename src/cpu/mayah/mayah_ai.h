@@ -38,7 +38,8 @@ public:
     virtual void enemyNext2Appeared(const FrameRequest&) override;
 
     // Use this directly in test. Otherwise, use via think/thinkFast.
-    Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, int depth, int maxIteration);
+    Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, const AdditionalThoughtInfo&,
+                   int depth, int maxIteration);
 
     void initializeGazerForTest(int frameId) { gazer_.initialize(frameId); }
 

@@ -33,7 +33,7 @@ TEST(MayahAIPerformanceTest, depth3_iter1)
 
     for (int i = 0; i < 3; ++i) {
         ScopedTimeStampCounter stsc(&tsc);
-        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
+        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, AdditionalThoughtInfo(), depth, numIteration);
     }
 
     tsc.showStatistics();
@@ -53,7 +53,7 @@ TEST(MayahAIPerformanceTest, depth2_iter2)
 
     for (int i = 0; i < 3; ++i) {
         ScopedTimeStampCounter stsc(&tsc);
-        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
+        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, AdditionalThoughtInfo(), depth, numIteration);
     }
 
     tsc.showStatistics();
@@ -73,7 +73,7 @@ TEST(MayahAIPerformanceTest, depth2_iter3)
 
     for (int i = 0; i < 3; ++i) {
         ScopedTimeStampCounter stsc(&tsc);
-        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, depth, numIteration);
+        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, AdditionalThoughtInfo(), depth, numIteration);
     }
 
     tsc.showStatistics();
