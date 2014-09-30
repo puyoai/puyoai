@@ -1,0 +1,18 @@
+NAME: GTR3
+
+FIELD:
+Y..... ......
+G..... ......
+YB.... ......
+YYB... ......
+BBR... ......
+
+NEXT: GRGYYGRR RRBBYYGG
+
+HAND: 2
+
+ENEMY: 3 2 3 2
+
+ANSWERS:
+100 3 2 2 0
+
