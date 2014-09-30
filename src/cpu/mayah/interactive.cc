@@ -154,7 +154,10 @@ int main(int argc, char* argv[])
             const PlainField& field = req.playerFrameRequest[0].field;
             const KumipuyoSeq& seq = req.playerFrameRequest[0].kumipuyoSeq;
 
-            FieldPrettyPrinter::print(field, seq.subsequence(0, 2));
+            FieldPrettyPrinter::printMultipleFields(
+                field, seq.subsequence(0, 2),
+                req.playerFrameRequest[1].field,
+                req.playerFrameRequest[1].kumipuyoSeq);
 
             double t1 = currentTime();
             Plan aiPlan = ai.thinkPlan(frameId, field, seq.subsequence(0, 2), ai.additionalThoughtInfo(),
