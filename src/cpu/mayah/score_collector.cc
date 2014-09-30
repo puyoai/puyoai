@@ -1,5 +1,6 @@
 #include "score_collector.h"
 
+#include <iomanip>
 #include <iostream>
 #include <set>
 #include <sstream>
@@ -44,18 +45,26 @@ string CollectedFeature::toStringComparingWith(const CollectedFeature& cf) const
     stringstream ss;
     ss << "score = " << score_ << " : " << cf.score_ << endl;
     for (EvaluationFeatureKey key : keys) {
-        ss << ::toString(key) << " = "
-           << to_string(feature(key)) << " : "
-           << to_string(cf.feature(key)) << endl;
+        ss << setw(30) << ::toString(key) << " = "
+           << setw(15) << to_string(feature(key)) << " : "
+           << setw(15) << to_string(cf.feature(key)) << endl;
     }
     for (EvaluationSparseFeatureKey key : sparseKeys) {
-        ss << ::toString(key) << " =";
-        for (int v : feature(key)) {
-            ss << " " << v;
+        ss << setw(30) << ::toString(key) << " = ";
+        {
+            stringstream st;
+            for (int v : feature(key)) {
+                st << " " << v;
+            }
+            ss << setw(15) << st.str();
         }
-        ss << " :";
-        for (int v : cf.feature(key)) {
-            ss << " " << v;
+        ss << " : ";
+        {
+            stringstream st;
+            for (int v : cf.feature(key)) {
+                st << " " << v;
+            }
+            ss << setw(15) << st.str();
         }
         ss << endl;
     }
