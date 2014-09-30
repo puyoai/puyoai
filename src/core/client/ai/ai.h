@@ -79,6 +79,8 @@ protected:
     void setBehaviorDefensive(bool flag) { behaviorDefensive_ = flag; }
     void setBehaviorRethinkAfterOpponentRensa(bool flag) { behaviorRethinkAfterOpponentRensa_ = flag; }
 
+    const AdditionalThoughtInfo& additionalThoughtInfo() const { return additionalThoughtInfo_; }
+
 private:
     friend class Solver;
 
