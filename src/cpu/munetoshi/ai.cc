@@ -59,6 +59,8 @@ DropDecision munetoshi::AI::think_internal(int frame_id,
 }
 
 void munetoshi::AI::enemyGrounded(const FrameRequest& frame) {
+  ::AI::enemyGrounded(frame);
+
   CoreField field(frame.enemyPlayerFrameRequest().field);
   field.forceDrop();
 

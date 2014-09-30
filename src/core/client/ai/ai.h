@@ -63,15 +63,15 @@ protected:
     }
 
     // When enemy will start to move puyo, this callback will be called.
-    virtual void enemyDecisionRequest(const FrameRequest&) {}
+    virtual void enemyDecisionRequest(const FrameRequest&);
 
     // When enemy's puyo is grounded, this callback will be called.
     // Enemy's rensa is automatically checked, so you don't need to do that. (Use AdditionalThoughtInfo)
-    virtual void enemyGrounded(const FrameRequest&) {}
+    virtual void enemyGrounded(const FrameRequest&);
 
     // When enemy's NEXT2 has appeared, this callback will be called.
     // You can update the enemy information here.
-    virtual void enemyNext2Appeared(const FrameRequest&) {}
+    virtual void enemyNext2Appeared(const FrameRequest&);
 
     // Should rethink just before sending next decision.
     void requestRethink() { rethinkRequested_ = true; }
@@ -83,11 +83,11 @@ private:
     friend class Solver;
 
     void resetCurrentField(const CoreField&);
-    void checkOngoingRensa(const FrameRequest&, AdditionalThoughtInfo*);
 
     std::string name_;
     ClientConnector connector_;
     CoreField field_;  // estimated my field.
+    AdditionalThoughtInfo additionalThoughtInfo_;
     int hand_;
     bool rethinkRequested_;
 

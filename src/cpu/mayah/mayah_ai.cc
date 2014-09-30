@@ -197,6 +197,8 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
 
 void MayahAI::enemyDecisionRequest(const FrameRequest& frameRequest)
 {
+    AI::enemyDecisionRequest(frameRequest);
+
     enemyField_ = CoreField(frameRequest.enemyPlayerFrameRequest().field);
     enemyField_.forceDrop();
     enemyDecisonRequestFrameId_ = frameRequest.frameId;
@@ -204,11 +206,13 @@ void MayahAI::enemyDecisionRequest(const FrameRequest& frameRequest)
 
 void MayahAI::enemyGrounded(const FrameRequest& frameRequest)
 {
-    UNUSED_VARIABLE(frameRequest);
+    AI::enemyGrounded(frameRequest);
 }
 
 void MayahAI::enemyNext2Appeared(const FrameRequest& frameRequest)
 {
+    AI::enemyNext2Appeared(frameRequest);
+
     // At the beginning of the game, kumipuyoSeq might contain EMPTY/EMPTY.
     // In that case, we need to skip.
     const KumipuyoSeq& seq = frameRequest.enemyPlayerFrameRequest().kumipuyoSeq;
