@@ -39,12 +39,23 @@ void AdditionalThoughtInfo::unsetOngoingRensa()
 AI::AI(int argc, char* argv[], const string& name) :
     name_(name),
     hand_(0),
+    enemyHand_(0),
     rethinkRequested_(false),
     behaviorDefensive_(false),
     behaviorRethinkAfterOpponentRensa_(false)
 {
     UNUSED_VARIABLE(argc);
     UNUSED_VARIABLE(argv);
+}
+
+AI::AI(const string& name) :
+    name_(name),
+    hand_(0),
+    enemyHand_(0),
+    rethinkRequested_(false),
+    behaviorDefensive_(false),
+    behaviorRethinkAfterOpponentRensa_(false)
+{
 }
 
 AI::~AI()
@@ -77,10 +88,11 @@ void AI::runLoop()
         // TODO(mayah): Maybe game server should send some information that we should initialize.
         if (frameRequest.frameId == 1) {
             hand_ = 0;
+            enemyHand_ = 0;
             rethinkRequested_ = false;
             field_.clear();
-            gameWillBegin(frameRequest);
             next1.clear();
+            gameWillBegin(frameRequest);
         }
 
         // Update enemy info if necessary.
@@ -103,16 +115,19 @@ void AI::runLoop()
             next1.kumipuyo = kumipuyoSeq.get(1);
             next1.ready = true;
         }
+        if (frameRequest.myPlayerFrameRequest().state.grounded) {
+            grounded(frameRequest);
+        }
 
         // Update my info if necessary.
         if (frameRequest.myPlayerFrameRequest().state.ojamaDropped) {
             // We need to rethink the next1 decision.
             next1.needsRethink = true;
         }
-
         if (frameRequest.myPlayerFrameRequest().state.decisionRequest) {
             VLOG(1) << "REQUESTED";
             next1.requested = true;
+            decisionRequested(frameRequest);
         }
 
         if (!next1.requested || !next1.ready) {
@@ -147,7 +162,6 @@ void AI::runLoop()
         }
 
         // Send
-        ++hand_;
         connector_.send(FrameResponse(frameRequest.frameId, next1.dropDecision.decision(), next1.dropDecision.message()));
 
         // Move to next.
@@ -171,8 +185,37 @@ void AI::gameHasEnded(const FrameRequest& frameRequest)
     onGameHasEnded(frameRequest);
 }
 
+void AI::decisionRequested(const FrameRequest& frameRequest)
+{
+    // Don't check zenkeshi if hand_ is 0.
+    if (hand_ != 0) {
+        CoreField cf(frameRequest.myPlayerFrameRequest().field);
+        if (cf.isZenkeshi())
+            additionalThoughtInfo_.setHasZenkeshi(true);
+    }
+
+    ++hand_;
+    onDecisionRequested(frameRequest);
+}
+
+void AI::grounded(const FrameRequest& frameRequest)
+{
+    CoreField field(frameRequest.myPlayerFrameRequest().field);
+    RensaResult rensaResult = field.simulate();
+    if (rensaResult.chains > 0) {
+        additionalThoughtInfo_.setHasZenkeshi(false);
+    }
+}
+
 void AI::enemyDecisionRequested(const FrameRequest& frameRequest)
 {
+    if (enemyHand_ != 0) {
+        CoreField cf(frameRequest.enemyPlayerFrameRequest().field);
+        if (cf.isZenkeshi())
+            additionalThoughtInfo_.setEnemyHasZenkeshi(true);
+    }
+
+    enemyHand_ += 1;
     onEnemyDecisionRequested(frameRequest);
 }
 
@@ -188,6 +231,7 @@ void AI::enemyGrounded(const FrameRequest& frameRequest)
         if (behaviorRethinkAfterOpponentRensa_)
             requestRethink();
         additionalThoughtInfo_.setOngoingRensa(rensaResult, frameRequest.frameId + rensaResult.frames);
+        additionalThoughtInfo_.setEnemyHasZenkeshi(false);
     } else {
         additionalThoughtInfo_.unsetOngoingRensa();
     }
