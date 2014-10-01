@@ -63,6 +63,9 @@ AI::~AI()
 }
 
 // TODO(mayah): Consider to introduce state. It's hard to maintain flags.
+// TODO(mayah): ZENKESHI is not accurate enough. For example, when calling think(), the just previous
+// decision might erase some puyos. If we had ZENKESHI in that time, ZENKESHI should not be passed to
+// think(). However, it does, now.
 void AI::runLoop()
 {
     DecisionSending next1;
@@ -205,6 +208,8 @@ void AI::grounded(const FrameRequest& frameRequest)
     if (rensaResult.chains > 0) {
         additionalThoughtInfo_.setHasZenkeshi(false);
     }
+
+    onGrounded(frameRequest);
 }
 
 void AI::enemyDecisionRequested(const FrameRequest& frameRequest)

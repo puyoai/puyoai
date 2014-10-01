@@ -70,6 +70,7 @@ protected:
     virtual void onGameWillBegin(const FrameRequest&) {}
     virtual void onGameHasEnded(const FrameRequest&) {}
     virtual void onDecisionRequested(const FrameRequest&) {}
+    virtual void onGrounded(const FrameRequest&) {}
     virtual void onEnemyDecisionRequested(const FrameRequest&) {}
     virtual void onEnemyGrounded(const FrameRequest&) {}
     virtual void onEnemyNext2Appeared(const FrameRequest&) {}
