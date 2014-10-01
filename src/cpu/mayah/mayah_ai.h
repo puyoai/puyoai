@@ -27,15 +27,15 @@ public:
     MayahAI(int argc, char* argv[]);
     ~MayahAI();
 
-    virtual void gameWillBegin(const FrameRequest&) override;
-    virtual void gameHasEnded(const FrameRequest&) override;
     virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&,
                                const AdditionalThoughtInfo&) override;
     virtual DropDecision thinkFast(int frameId, const PlainField&, const KumipuyoSeq&,
                                    const AdditionalThoughtInfo&) override;
-    virtual void enemyDecisionRequest(const FrameRequest&) override;
-    virtual void enemyGrounded(const FrameRequest&) override;
-    virtual void enemyNext2Appeared(const FrameRequest&) override;
+
+    virtual void onGameWillBegin(const FrameRequest&) override;
+    virtual void onGameHasEnded(const FrameRequest&) override;
+    virtual void onEnemyDecisionRequest(const FrameRequest&) override;
+    virtual void onEnemyNext2Appeared(const FrameRequest&) override;
 
     // Use this directly in test. Otherwise, use via think/thinkFast.
     Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, const AdditionalThoughtInfo&,

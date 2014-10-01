@@ -47,6 +47,10 @@ AI::AI(int argc, char* argv[], const string& name) :
     UNUSED_VARIABLE(argv);
 }
 
+AI::~AI()
+{
+}
+
 // TODO(mayah): Consider to introduce state. It's hard to maintain flags.
 void AI::runLoop()
 {
@@ -157,8 +161,19 @@ void AI::runLoop()
     LOG(INFO) << "will exit run loop";
 }
 
-void AI::enemyDecisionRequest(const FrameRequest&)
+void AI::gameWillBegin(const FrameRequest& frameRequest)
 {
+    onGameWillBegin(frameRequest);
+}
+
+void AI::gameHasEnded(const FrameRequest& frameRequest)
+{
+    onGameHasEnded(frameRequest);
+}
+
+void AI::enemyDecisionRequest(const FrameRequest& frameRequest)
+{
+    onEnemyDecisionRequest(frameRequest);
 }
 
 void AI::enemyGrounded(const FrameRequest& frameRequest)
@@ -176,10 +191,13 @@ void AI::enemyGrounded(const FrameRequest& frameRequest)
     } else {
         additionalThoughtInfo_.unsetOngoingRensa();
     }
+
+    onEnemyGrounded(frameRequest);
 }
 
-void AI::enemyNext2Appeared(const FrameRequest&)
+void AI::enemyNext2Appeared(const FrameRequest& frameRequest)
 {
+    onEnemyNext2Appeared(frameRequest);
 }
 
 void AI::resetCurrentField(const CoreField& field)

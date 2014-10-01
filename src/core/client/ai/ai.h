@@ -29,23 +29,16 @@ private:
 };
 
 // AI is a utility class of AI.
-// All you have to do is to implement think().
+// You need to implement think() at least.
 class AI {
 public:
+    virtual ~AI();
     const std::string& name() const { return name_; }
 
     void runLoop();
 
 protected:
     explicit AI(int argc, char* argv[], const std::string& name);
-
-    // |gameWillBegin| will be called just before a new game will begin.
-    // FrameRequest might contain NEXT and NEXT2 puyos, but it's not guaranteed.
-    // Please initialize your AI in this function.
-    virtual void gameWillBegin(const FrameRequest&) {}
-
-    // |gameHasEnded| will be called just after a game has ended.
-    virtual void gameHasEnded(const FrameRequest&) {}
 
     // |think| will be called when AI should decide the next decision.
     // Basically, this will be called when NEXT2 has appeared.
@@ -62,16 +55,32 @@ protected:
         return think(frameId, field, next, info);
     }
 
+    // These callbacks will be called from the corresponding method.
+    // i.e. onXXXYYY() will be called from XXXYYY().
+    virtual void onGameWillBegin(const FrameRequest&) {}
+    virtual void onGameHasEnded(const FrameRequest&) {}
+    virtual void onEnemyDecisionRequest(const FrameRequest&) {}
+    virtual void onEnemyGrounded(const FrameRequest&) {}
+    virtual void onEnemyNext2Appeared(const FrameRequest&) {}
+
+    // |gameWillBegin| will be called just before a new game will begin.
+    // FrameRequest might contain NEXT and NEXT2 puyos, but it's not guaranteed.
+    // Please initialize your AI in this function.
+    void gameWillBegin(const FrameRequest&);
+
+    // |gameHasEnded| will be called just after a game has ended.
+    void gameHasEnded(const FrameRequest&);
+
     // When enemy will start to move puyo, this callback will be called.
-    virtual void enemyDecisionRequest(const FrameRequest&);
+    void enemyDecisionRequest(const FrameRequest&);
 
     // When enemy's puyo is grounded, this callback will be called.
     // Enemy's rensa is automatically checked, so you don't need to do that. (Use AdditionalThoughtInfo)
-    virtual void enemyGrounded(const FrameRequest&);
+    void enemyGrounded(const FrameRequest&);
 
     // When enemy's NEXT2 has appeared, this callback will be called.
     // You can update the enemy information here.
-    virtual void enemyNext2Appeared(const FrameRequest&);
+    void enemyNext2Appeared(const FrameRequest&);
 
     // Should rethink just before sending next decision.
     void requestRethink() { rethinkRequested_ = true; }
