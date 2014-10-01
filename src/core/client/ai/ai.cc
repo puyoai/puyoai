@@ -85,7 +85,7 @@ void AI::runLoop()
 
         // Update enemy info if necessary.
         if (frameRequest.enemyPlayerFrameRequest().state.decisionRequest)
-            enemyDecisionRequest(frameRequest);
+            enemyDecisionRequested(frameRequest);
         if (frameRequest.enemyPlayerFrameRequest().state.grounded) {
             enemyGrounded(frameRequest);
         }
@@ -171,9 +171,9 @@ void AI::gameHasEnded(const FrameRequest& frameRequest)
     onGameHasEnded(frameRequest);
 }
 
-void AI::enemyDecisionRequest(const FrameRequest& frameRequest)
+void AI::enemyDecisionRequested(const FrameRequest& frameRequest)
 {
-    onEnemyDecisionRequest(frameRequest);
+    onEnemyDecisionRequested(frameRequest);
 }
 
 void AI::enemyGrounded(const FrameRequest& frameRequest)

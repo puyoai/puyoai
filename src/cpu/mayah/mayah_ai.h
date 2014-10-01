@@ -34,7 +34,7 @@ public:
 
     virtual void onGameWillBegin(const FrameRequest&) override;
     virtual void onGameHasEnded(const FrameRequest&) override;
-    virtual void onEnemyDecisionRequest(const FrameRequest&) override;
+    virtual void onEnemyDecisionRequested(const FrameRequest&) override;
     virtual void onEnemyNext2Appeared(const FrameRequest&) override;
 
     // Use this directly in test. Otherwise, use via think/thinkFast.

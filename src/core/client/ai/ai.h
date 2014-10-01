@@ -59,7 +59,7 @@ protected:
     // i.e. onXXXYYY() will be called from XXXYYY().
     virtual void onGameWillBegin(const FrameRequest&) {}
     virtual void onGameHasEnded(const FrameRequest&) {}
-    virtual void onEnemyDecisionRequest(const FrameRequest&) {}
+    virtual void onEnemyDecisionRequested(const FrameRequest&) {}
     virtual void onEnemyGrounded(const FrameRequest&) {}
     virtual void onEnemyNext2Appeared(const FrameRequest&) {}
 
@@ -72,7 +72,7 @@ protected:
     void gameHasEnded(const FrameRequest&);
 
     // When enemy will start to move puyo, this callback will be called.
-    void enemyDecisionRequest(const FrameRequest&);
+    void enemyDecisionRequested(const FrameRequest&);
 
     // When enemy's puyo is grounded, this callback will be called.
     // Enemy's rensa is automatically checked, so you don't need to do that. (Use AdditionalThoughtInfo)
