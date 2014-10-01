@@ -31,11 +31,15 @@ public:
     InteractiveAI(int argc, char* argv[]) : MayahAI(argc, argv) {}
 
     using MayahAI::additionalThoughtInfo;
-    using MayahAI::gameWillBegin;
     using MayahAI::think;
-    using MayahAI::enemyNext2Appeared;
     using MayahAI::reloadParameter;
     using MayahAI::makeMessageFrom;
+
+    using MayahAI::gameWillBegin;
+    using MayahAI::gameHasEnded;
+    using MayahAI::enemyNext2Appeared;
+    using MayahAI::enemyDecisionRequest;
+    using MayahAI::enemyGrounded;
 
     CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, int numKeyPuyos, const Plan& plan) const
     {

@@ -21,12 +21,12 @@ class AI : public ::AI {
     GROW,
   };
 
-  virtual void gameWillBegin(const FrameRequest&) override;
+  virtual void onGameWillBegin(const FrameRequest&) override;
 
   virtual DropDecision think_internal(int frame_id, const CoreField& field,
                                       const KumipuyoSeq& seq);
 
-  virtual void enemyGrounded(const FrameRequest&) override;
+  virtual void onEnemyGrounded(const FrameRequest&) override;
 
   virtual int evaluate(const CoreField& field);
 

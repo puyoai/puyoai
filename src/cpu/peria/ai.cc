@@ -154,13 +154,11 @@ DropDecision Ai::think(int frame_id,
   return DropDecision(decision, message);
 }
 
-void Ai::gameWillBegin(const FrameRequest& /*frame_request*/) {
+void Ai::onGameWillBegin(const FrameRequest& /*frame_request*/) {
   attack_.reset();
 }
 
-void Ai::enemyGrounded(const FrameRequest& frame_request) {
-  ::AI::enemyGrounded(frame_request);
-
+void Ai::onEnemyGrounded(const FrameRequest& frame_request) {
   const PlainField& enemy = frame_request.enemyPlayerFrameRequest().field;
   CoreField field(enemy);
   field.forceDrop();

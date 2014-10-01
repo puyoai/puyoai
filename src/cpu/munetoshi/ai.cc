@@ -15,7 +15,7 @@ munetoshi::AI::AI(int argc, char* argv[]) : ::AI(argc, argv, "munetoshi") {
   strategy = GROW;
 }
 
-void munetoshi::AI::gameWillBegin(const FrameRequest& frame) {
+void munetoshi::AI::onGameWillBegin(const FrameRequest& frame) {
   UNUSED_VARIABLE(frame);
   strategy = GROW;
 }
@@ -58,9 +58,7 @@ DropDecision munetoshi::AI::think_internal(int frame_id,
              : DropDecision(best_chain_decision);
 }
 
-void munetoshi::AI::enemyGrounded(const FrameRequest& frame) {
-  ::AI::enemyGrounded(frame);
-
+void munetoshi::AI::onEnemyGrounded(const FrameRequest& frame) {
   CoreField field(frame.enemyPlayerFrameRequest().field);
   field.forceDrop();
 

@@ -45,22 +45,6 @@ void MayahAI::reloadParameter()
     featureParameter_.reset(new FeatureParameter(FLAGS_feature));
 }
 
-void MayahAI::gameWillBegin(const FrameRequest& frameRequest)
-{
-    thoughtMaxRensa_ = 0;
-    thoughtMaxScore_ = 0;
-    enemyField_.clear();
-    gazer_.initialize(frameRequest.frameId);
-}
-
-void MayahAI::gameHasEnded(const FrameRequest&)
-{
-    if (FLAGS_log_max_score) {
-        cerr << "max rensa = " << thoughtMaxRensa_ << endl;
-        cerr << "max score = " << thoughtMaxScore_ << endl;
-    }
-}
-
 DropDecision MayahAI::think(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq,
                             const AdditionalThoughtInfo& additionalInfo)
 {
@@ -195,24 +179,31 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     return ss.str();
 }
 
-void MayahAI::enemyDecisionRequest(const FrameRequest& frameRequest)
+void MayahAI::onGameWillBegin(const FrameRequest& frameRequest)
 {
-    AI::enemyDecisionRequest(frameRequest);
+    thoughtMaxRensa_ = 0;
+    thoughtMaxScore_ = 0;
+    enemyField_.clear();
+    gazer_.initialize(frameRequest.frameId);
+}
 
+void MayahAI::onGameHasEnded(const FrameRequest&)
+{
+    if (FLAGS_log_max_score) {
+        cerr << "max rensa = " << thoughtMaxRensa_ << endl;
+        cerr << "max score = " << thoughtMaxScore_ << endl;
+    }
+}
+
+void MayahAI::onEnemyDecisionRequest(const FrameRequest& frameRequest)
+{
     enemyField_ = CoreField(frameRequest.enemyPlayerFrameRequest().field);
     enemyField_.forceDrop();
     enemyDecisonRequestFrameId_ = frameRequest.frameId;
 }
 
-void MayahAI::enemyGrounded(const FrameRequest& frameRequest)
+void MayahAI::onEnemyNext2Appeared(const FrameRequest& frameRequest)
 {
-    AI::enemyGrounded(frameRequest);
-}
-
-void MayahAI::enemyNext2Appeared(const FrameRequest& frameRequest)
-{
-    AI::enemyNext2Appeared(frameRequest);
-
     // At the beginning of the game, kumipuyoSeq might contain EMPTY/EMPTY.
     // In that case, we need to skip.
     const KumipuyoSeq& seq = frameRequest.enemyPlayerFrameRequest().kumipuyoSeq;
