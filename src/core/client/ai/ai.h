@@ -22,7 +22,16 @@ public:
     void setOngoingRensa(const RensaResult&, int finishingFrameId);
     void unsetOngoingRensa();
 
+    void setHasZenkeshi(bool flag) { hasZenkeshi_ = flag; }
+    bool hasZenkeshi() const { return hasZenkeshi_; }
+
+    void setEnemyHasZenkeshi(bool flag) { enemyHasZenkeshi_ = flag; }
+    bool enemyHasZenkeshi() const { return enemyHasZenkeshi_; }
+
 private:
+    bool hasZenkeshi_ = false;
+    bool enemyHasZenkeshi_ = false;
+
     bool isRensaOngoing_ = false;
     int finishingRensaFrameId_ = 0;
     RensaResult ongoingRensaResult_;
@@ -38,7 +47,8 @@ public:
     void runLoop();
 
 protected:
-    explicit AI(int argc, char* argv[], const std::string& name);
+    AI(int argc, char* argv[], const std::string& name);
+    explicit AI(const std::string& name);
 
     // |think| will be called when AI should decide the next decision.
     // Basically, this will be called when NEXT2 has appeared.
@@ -59,6 +69,7 @@ protected:
     // i.e. onXXXYYY() will be called from XXXYYY().
     virtual void onGameWillBegin(const FrameRequest&) {}
     virtual void onGameHasEnded(const FrameRequest&) {}
+    virtual void onDecisionRequested(const FrameRequest&) {}
     virtual void onEnemyDecisionRequested(const FrameRequest&) {}
     virtual void onEnemyGrounded(const FrameRequest&) {}
     virtual void onEnemyNext2Appeared(const FrameRequest&) {}
@@ -70,6 +81,9 @@ protected:
 
     // |gameHasEnded| will be called just after a game has ended.
     void gameHasEnded(const FrameRequest&);
+
+    void decisionRequested(const FrameRequest&);
+    void grounded(const FrameRequest&);
 
     // When enemy will start to move puyo, this callback will be called.
     void enemyDecisionRequested(const FrameRequest&);
@@ -100,6 +114,7 @@ private:
     CoreField field_;  // estimated my field.
     AdditionalThoughtInfo additionalThoughtInfo_;
     int hand_;
+    int enemyHand_;
     bool rethinkRequested_;
 
     bool behaviorDefensive_;
