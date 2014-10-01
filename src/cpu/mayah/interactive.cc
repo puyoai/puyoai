@@ -38,7 +38,7 @@ public:
     using MayahAI::gameWillBegin;
     using MayahAI::gameHasEnded;
     using MayahAI::enemyNext2Appeared;
-    using MayahAI::enemyDecisionRequest;
+    using MayahAI::enemyDecisionRequested;
     using MayahAI::enemyGrounded;
 
     CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, int numKeyPuyos, const Plan& plan) const
@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
         // Call these callback for gazer.
         {
             double t1 = currentTime();
-            ai.enemyDecisionRequest(req);
+            ai.enemyDecisionRequested(req);
             ai.enemyNext2Appeared(req);
             ai.enemyGrounded(req);
             double t2 = currentTime();

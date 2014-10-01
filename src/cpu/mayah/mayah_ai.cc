@@ -195,7 +195,7 @@ void MayahAI::onGameHasEnded(const FrameRequest&)
     }
 }
 
-void MayahAI::onEnemyDecisionRequest(const FrameRequest& frameRequest)
+void MayahAI::onEnemyDecisionRequested(const FrameRequest& frameRequest)
 {
     enemyField_ = CoreField(frameRequest.enemyPlayerFrameRequest().field);
     enemyField_.forceDrop();
