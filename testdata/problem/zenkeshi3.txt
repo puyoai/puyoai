@@ -1,0 +1,15 @@
+NAME: ZENKESHI-3
+
+FIELD:
+BBB... ......
+RRR... ......
+
+NEXT:
+BBRRYYGG BBRRYYGG
+
+HAND: 2
+
+ENEMY: 3 2 3 2
+
+ANSWERS:
+100 3 2 3 2
