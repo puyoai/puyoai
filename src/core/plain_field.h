@@ -15,11 +15,6 @@ public:
     void unsafeSet(int x, int y, PuyoColor c) { field_[x][y] = c; }
 
     std::string toString(char charIfEmpty = ' ') const;
-
-    // True when visible field is the same
-    bool isVisibllySame(const PlainField&) const;
-    bool canBeOverriden(const PlainField&) const;
-
 private:
     void initialize();
 

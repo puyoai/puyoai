@@ -139,22 +139,20 @@ void AI::runLoop()
         }
 
         // Check field inconsistency. We only check when hand_ >= 3, since we cannot trust the field in 3 hands.
-        if (hand_ >= 3) {
-            if (!next1.fieldBeforeThink.isVisibllySame(frameRequest.myPlayerFrameRequest().field)) {
-                LOG(INFO) << "FIELD INCONSISTENCY DETECTED: hand=" << hand_;
-                VLOG(1) << '\n' << FieldPrettyPrinter::toStringFromMultipleFields(
-                    next1.fieldBeforeThink, frameRequest.myPlayerFrameRequest().kumipuyoSeq,
-                    frameRequest.myPlayerFrameRequest().field, frameRequest.myPlayerFrameRequest().kumipuyoSeq);
+        if (hand_ >= 3 && isFieldInconsistent(next1.fieldBeforeThink, frameRequest.myPlayerFrameRequest().field)) {
+            LOG(INFO) << "FIELD INCONSISTENCY DETECTED: hand=" << hand_;
+            VLOG(1) << '\n' << FieldPrettyPrinter::toStringFromMultipleFields(
+                next1.fieldBeforeThink, frameRequest.myPlayerFrameRequest().kumipuyoSeq,
+                frameRequest.myPlayerFrameRequest().field, frameRequest.myPlayerFrameRequest().kumipuyoSeq);
 
-                next1.needsRethink = true;
-            }
+            next1.needsRethink = true;
         }
 
         // Rethink if necessary.
         if (next1.needsRethink || rethinkRequested_) {
             LOG(INFO) << "RETHINK";
 
-            resetCurrentField(frameRequest.myPlayerFrameRequest().field);
+            mergeField(&field_, frameRequest.myPlayerFrameRequest().field);
             const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
             next1.dropDecision = thinkFast(frameRequest.frameId, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) },
                                            additionalThoughtInfo_);
@@ -169,7 +167,9 @@ void AI::runLoop()
 
         // Move to next.
         if (next1.dropDecision.decision().isValid() && next1.kumipuyo.isValid()) {
-            field_.dropKumipuyo(next1.dropDecision.decision(), next1.kumipuyo);
+            if (!field_.dropKumipuyo(next1.dropDecision.decision(), next1.kumipuyo)) {
+                LOG(WARNING) << "failed to drop kumipuyo. Moving to impossible position?";
+            }
             field_.simulate();
         }
         next1.clear();
@@ -268,5 +268,41 @@ void AI::resetCurrentField(const CoreField& field)
                     field_.dropPuyoOn(x, OJAMA);
             }
         }
+    }
+}
+
+// static
+bool AI::isFieldInconsistent(const PlainField& f, const PlainField& provided)
+{
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            if (f.get(x, y) != provided.get(x, y))
+                return true;
+        }
+    }
+
+    return false;
+}
+
+// static
+void AI::mergeField(CoreField* f, const PlainField& provided)
+{
+    for (int x = 1; x <= 6; ++x) {
+        bool restIsEmpty = false;
+        int y;
+        for (y = 1; y <= 12; ++y) {
+            if (provided.get(x, y) == PuyoColor::EMPTY) {
+                restIsEmpty = true;
+                break;
+            }
+            f->unsafeSet(x, y, provided.get(x, y));
+        }
+        if (restIsEmpty) {
+            for (; y <= 13; ++y) {
+                DCHECK_EQ(PuyoColor::EMPTY, provided.get(x, y));
+                f->unsafeSet(x, y, PuyoColor::EMPTY);
+            }
+        }
+        f->recalcHeightOn(x);
     }
 }
