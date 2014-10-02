@@ -12,18 +12,20 @@ enum State {
     STATE_DECISION_REQUEST = 1 << 6,
     STATE_CHAIN_DONE = 1 << 8,
     STATE_OJAMA_DROPPED = 1 << 10,
+    STATE_DECISION_REQUEST_AGAIN = 1 << 12,
 };
 
 inline std::string GetStateString(int st)
 {
     std::string r;
-    r.resize(6);
+    r.resize(7);
     r[0] = ((st & STATE_YOU_CAN_PLAY) != 0) ? 'P' : '-';
     r[1] = ((st & STATE_WNEXT_APPEARED) != 0) ? 'W' : '-';
     r[2] = ((st & STATE_YOU_GROUNDED) != 0) ? 'G' : '-';
     r[3] = ((st & STATE_DECISION_REQUEST) != 0) ? 'D' : '-';
     r[4] = ((st & STATE_CHAIN_DONE) != 0) ? 'C' : '-';
     r[5] = ((st & STATE_OJAMA_DROPPED) != 0) ? 'O' : '-';
+    r[6] = ((st & STATE_DECISION_REQUEST_AGAIN) != 0) ? 'A' : '-';
     return r;
 }
 
@@ -35,13 +37,14 @@ struct UserState {
         wnextAppeared = false;
         grounded = false;
         decisionRequest = false;
+        decisionRequestAgain = false;
         chainFinished = false;
         ojamaDropped = false;
     }
 
     bool hasEventState() const
     {
-        return wnextAppeared || grounded || decisionRequest || chainFinished || ojamaDropped;
+        return wnextAppeared || grounded || decisionRequest || decisionRequestAgain || chainFinished || ojamaDropped;
     }
 
     void clear()
@@ -57,24 +60,25 @@ struct UserState {
     int toDeprecatedState() const
     {
         int s = 0;
-        s |= playable ? STATE_YOU_CAN_PLAY : 0;
-        s |= wnextAppeared ? STATE_WNEXT_APPEARED : 0;
-        s |= grounded ? STATE_YOU_GROUNDED : 0;
-        s |= decisionRequest ? STATE_DECISION_REQUEST : 0;
-        s |= chainFinished ? STATE_CHAIN_DONE : 0;
-        s |= ojamaDropped ? STATE_OJAMA_DROPPED : 0;
-
+        s |= playable             ? STATE_YOU_CAN_PLAY           : 0;
+        s |= wnextAppeared        ? STATE_WNEXT_APPEARED         : 0;
+        s |= grounded             ? STATE_YOU_GROUNDED           : 0;
+        s |= decisionRequest      ? STATE_DECISION_REQUEST       : 0;
+        s |= decisionRequestAgain ? STATE_DECISION_REQUEST_AGAIN : 0;
+        s |= chainFinished        ? STATE_CHAIN_DONE             : 0;
+        s |= ojamaDropped         ? STATE_OJAMA_DROPPED          : 0;
         return s;
     }
 
     void parseFromDeprecatedState(int state)
     {
-        playable        = state & STATE_YOU_CAN_PLAY;
-        wnextAppeared   = state & STATE_WNEXT_APPEARED;
-        grounded        = state & STATE_YOU_GROUNDED;
-        decisionRequest = state & STATE_DECISION_REQUEST;
-        chainFinished   = state & STATE_CHAIN_DONE;
-        ojamaDropped    = state & STATE_OJAMA_DROPPED;
+        playable             = state & STATE_YOU_CAN_PLAY;
+        wnextAppeared        = state & STATE_WNEXT_APPEARED;
+        grounded             = state & STATE_YOU_GROUNDED;
+        decisionRequest      = state & STATE_DECISION_REQUEST;
+        decisionRequestAgain = state & STATE_DECISION_REQUEST_AGAIN;
+        chainFinished        = state & STATE_CHAIN_DONE;
+        ojamaDropped         = state & STATE_OJAMA_DROPPED;
     }
 
     // ----- usual states
@@ -84,6 +88,7 @@ struct UserState {
     bool wnextAppeared = false;
     bool grounded = false;
     bool decisionRequest = false;
+    bool decisionRequestAgain = false;
     bool chainFinished = false;
     bool ojamaDropped = false;
 };
