@@ -107,6 +107,10 @@ protected:
 
 private:
     friend class Solver;
+    friend class AITest;
+
+    static bool isFieldInconsistent(const PlainField& ours, const PlainField& provided);
+    static void mergeField(CoreField* ours, const PlainField& provided);
 
     void resetCurrentField(const CoreField&);
 
