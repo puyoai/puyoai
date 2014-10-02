@@ -132,6 +132,15 @@ void AI::runLoop()
             next1.requested = true;
             decisionRequested(frameRequest);
         }
+        if (frameRequest.myPlayerFrameRequest().state.decisionRequestAgain) {
+            // We need to handle this specially. Since we've proceeded next1, we don't have any knowledge about this turn.
+            VLOG(1) << "REQUEST_AGAIN";
+            DropDecision dropDecision = thinkFast(frameRequest.frameId,
+                                                  frameRequest.myPlayerFrameRequest().field,
+                                                  frameRequest.myPlayerFrameRequest().kumipuyoSeq,
+                                                  additionalThoughtInfo_);
+            connector_.send(FrameResponse(frameRequest.frameId, dropDecision.decision(), dropDecision.message()));
+        }
 
         if (!next1.requested || !next1.ready) {
             connector_.send(FrameResponse(frameRequest.frameId));
