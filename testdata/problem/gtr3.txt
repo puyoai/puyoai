@@ -7,7 +7,7 @@ YB.... ......
 YYB... ......
 BBR... ......
 
-NEXT: GRGYYGRR RRBBYYGG
+NEXT: GRGYRRRR RRBBYYGG
 
 HAND: 2
 
@@ -15,4 +15,6 @@ ENEMY: 3 2 3 2
 
 ANSWERS:
 100 3 2 2 0
+100 3 2 2 3
+
 
