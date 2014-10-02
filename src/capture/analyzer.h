@@ -113,6 +113,9 @@ public: // Make this private?
     std::map<std::pair<RealColor, RealColor>, int> next1Puyos;
     std::map<std::pair<RealColor, RealColor>, int> next2Puyos;
 
+    bool nextHasDisappearedIrregularly_ = false;
+    int framesAfterFloorGetsStable_ = 0;
+
     // Make these false when a current puyo has appeared.
     bool hasDetectedRensaStart_ = true;
     bool hasSentGrounded_ = true;

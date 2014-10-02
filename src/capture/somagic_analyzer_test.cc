@@ -331,7 +331,7 @@ TEST_F(SomagicAnalyzerTest, GameFinished)
     EXPECT_EQ(CaptureGameState::FINISHED, r->state());
 }
 
-TEST_F(SomagicAnalyzerTest, NextArrival)
+TEST_F(SomagicAnalyzerTest, nextArrival)
 {
     vector<string> images;
     for (int i = 0; i <= 24; ++i) {
@@ -350,6 +350,22 @@ TEST_F(SomagicAnalyzerTest, NextArrival)
     EXPECT_TRUE(rs[14]->playerResult(0)->userState.playable);
     // Then controllable now.
     EXPECT_TRUE(rs[16]->playerResult(0)->userState.playable);
+}
+
+TEST_F(SomagicAnalyzerTest, irregularNextArrival)
+{
+    vector<string> images;
+    for (int i = 0; i <= 45; ++i) {
+        char buf[80];
+        sprintf(buf, "/somagic/next-arrival-irregular/frame%02d.png", i);
+        string s = buf;
+        images.push_back(s);
+    }
+
+    bool pgs[2] = { true, true };
+    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
+
+    EXPECT_TRUE(rs[38]->playerResult(1)->userState.decisionRequestAgain || rs[39]->playerResult(1)->userState.decisionRequestAgain || rs[40]->playerResult(1)->userState.decisionRequestAgain);
 }
 
 TEST_F(SomagicAnalyzerTest, vanishing)

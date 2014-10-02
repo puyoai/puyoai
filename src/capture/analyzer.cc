@@ -72,6 +72,8 @@ AdjustedField::AdjustedField()
 void PlayerAnalyzerResult::resetCurrentPuyoState(bool state)
 {
     nextWillDisappearFast_ = false;
+    nextHasDisappearedIrregularly_ = false;
+
     hasDetectedRensaStart_ = state;
     hasSentGrounded_ = state;
     hasSentOjamaDropped_ = state;
@@ -512,6 +514,13 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
             result->userState.ojamaDropped = true;
             result->hasSentOjamaDropped_ = true;
             result->nextWillDisappearFast_ = true;
+            // Since this is to analyze field, NEXT has already been analyzed.
+            bool axisAndChildsAreEmpty =
+                result->detectedField.realColor(NextPuyoPosition::NEXT1_AXIS) == RealColor::RC_EMPTY &&
+                result->detectedField.realColor(NextPuyoPosition::NEXT1_CHILD) == RealColor::RC_EMPTY;
+            if (axisAndChildsAreEmpty) {
+                result->nextHasDisappearedIrregularly_ = true;
+            }
         }
     }
 
@@ -521,6 +530,20 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         LOG(INFO) << "should update field since next puyo detected";
         shouldUpdateField = true;
         shouldResetCurrentState = true;
+    }
+
+    if (result->nextHasDisappearedIrregularly_) {
+        if (detectedField.ojamaDropDetected) {
+            result->framesAfterFloorGetsStable_ = 0;
+        } else {
+            result->framesAfterFloorGetsStable_++;
+        }
+
+        if (result->framesAfterFloorGetsStable_ > 3) {
+            shouldUpdateField = true;
+            shouldResetCurrentState = true;
+            result->userState.decisionRequestAgain = true;
+        }
     }
 
     if (!shouldUpdateField)
