@@ -148,7 +148,7 @@ RensaDetector::findFeasibleRensas(const CoreField& field, const KumipuyoSeq& kum
     std::vector<FeasibleRensaInfo> result;
     Plan::iterateAvailablePlans(field, kumipuyoSeq, kumipuyoSeq.size(), [&result](const RefPlan& plan) {
         if (plan.isRensaPlan())
-            result.emplace_back(plan.rensaResult(), plan.initiatingFrames());
+            result.emplace_back(plan.rensaResult(), plan.framesToInitiate());
     });
 
     return result;

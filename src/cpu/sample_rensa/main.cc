@@ -52,7 +52,7 @@ private:
                 break;
             }
 
-            s -= plan.initiatingFrames();
+            s -= plan.framesToInitiate();
             s -= plan.field().height(2) * 5;
             s -= plan.field().height(3) * 20; // Do not put 3rd column so much.
             s -= plan.field().height(4) * 10;

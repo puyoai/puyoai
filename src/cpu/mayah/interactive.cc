@@ -43,7 +43,7 @@ public:
 
     CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, int numKeyPuyos, const Plan& plan) const
     {
-        RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.initiatingFrames(), plan.lastDropFrames());
+        RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.framesToInitiate(), plan.lastDropFrames());
         return Evaluator(*featureParameter_, books_).evalWithCollectingFeature(refPlan, field, frameId, numKeyPuyos, gazer_);
     }
 

@@ -163,7 +163,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
                                                         -static_cast<double>(plan.score()) / plan.totalFrames());
             if (tsubushiScore < bestTsubushiScore) {
                 bestTsubushiScore = tsubushiScore;
-                feasibleRensaInfo = FeasibleRensaInfo(plan.rensaResult(), plan.initiatingFrames());
+                feasibleRensaInfo = FeasibleRensaInfo(plan.rensaResult(), plan.framesToInitiate());
             }
         });
 
