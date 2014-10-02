@@ -30,7 +30,7 @@ TEST(RensaDetectorTest, feasibleRensas)
 
     bool found = false;
     for (const auto info : infos) {
-        if (info.chains() == 4 && info.initiatingFrames() == 0) {
+        if (info.chains() == 4 && info.framesToInitiate() == 0) {
             found = true;
         }
     }

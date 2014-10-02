@@ -9,8 +9,8 @@
 class FeasibleRensaInfo {
 public:
     FeasibleRensaInfo() {}
-    FeasibleRensaInfo(const RensaResult& rensaResult, int initiatingFrames) :
-        rensaResult_(rensaResult), initiatingFrames_(initiatingFrames)
+    FeasibleRensaInfo(const RensaResult& rensaResult, int framesToInitiate) :
+        rensaResult_(rensaResult), framesToInitiate_(framesToInitiate)
     {
     }
 
@@ -18,12 +18,12 @@ public:
 
     int score() const { return rensaResult_.score; }
     int chains() const { return rensaResult_.chains; }
-    int totalFrames() const { return rensaResult_.frames + initiatingFrames_; }
-    int initiatingFrames() const { return initiatingFrames_; }
+    int totalFrames() const { return rensaResult_.frames + framesToInitiate_; }
+    int framesToInitiate() const { return framesToInitiate_; }
 
 private:
     RensaResult rensaResult_;
-    int initiatingFrames_;
+    int framesToInitiate_;
 };
 
 #endif

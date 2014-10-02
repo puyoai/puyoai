@@ -26,8 +26,8 @@ static const int ACCUMULATED_RENSA_SCORE[] = {
 struct SortByFrames {
     bool operator()(const EstimatedRensaInfo& lhs, const EstimatedRensaInfo& rhs) const
     {
-        if (lhs.initiatingFrames != rhs.initiatingFrames)
-            return lhs.initiatingFrames < rhs.initiatingFrames;
+        if (lhs.framesToInitiate != rhs.framesToInitiate)
+            return lhs.framesToInitiate < rhs.framesToInitiate;
 
         if (lhs.score != rhs.score)
             return lhs.score > rhs.score; // This '>' is intentional.
@@ -39,10 +39,10 @@ struct SortByFrames {
 struct SortByInitiatingFrames {
     bool operator()(const FeasibleRensaInfo& lhs, const FeasibleRensaInfo& rhs) const
     {
-        if (lhs.initiatingFrames() != rhs.initiatingFrames())
-            return lhs.initiatingFrames() < rhs.initiatingFrames();
+        if (lhs.framesToInitiate() != rhs.framesToInitiate())
+            return lhs.framesToInitiate() < rhs.framesToInitiate();
 
-        // If initiatingFrames is the same, preferrable Rensa should come first.
+        // If framesToInitiate is the same, preferrable Rensa should come first.
         // High score is more preferrable, faster rensa is more preferrable.
         if (lhs.score() != rhs.score())
             return lhs.score() > rhs.score();
@@ -85,19 +85,19 @@ void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     feasibleRensaInfos_.push_back(EstimatedRensaInfo(
                                       result.front().chains(),
                                       result.front().score(),
-                                      result.front().initiatingFrames()));
+                                      result.front().framesToInitiate()));
 
     for (const auto& info : result) {
         if (info.score() <= feasibleRensaInfos_.back().score)
             continue;
 
-        DCHECK(feasibleRensaInfos_.back().initiatingFrames < info.initiatingFrames())
-            << "feasible frames = " << feasibleRensaInfos_.back().initiatingFrames
-            << " initiating frames = " << info.initiatingFrames()
+        DCHECK(feasibleRensaInfos_.back().framesToInitiate < info.framesToInitiate())
+            << "feasible frames = " << feasibleRensaInfos_.back().framesToInitiate
+            << " initiating frames = " << info.framesToInitiate()
             << " score(1) = " << feasibleRensaInfos_.back().score
             << " score(2) = " << info.score() << endl;
 
-        feasibleRensaInfos_.push_back(EstimatedRensaInfo(info.chains(), info.score(), info.initiatingFrames()));
+        feasibleRensaInfos_.push_back(EstimatedRensaInfo(info.chains(), info.score(), info.framesToInitiate()));
     }
 }
 
@@ -138,10 +138,10 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
 
         // Estimate the number of frames to initiate the rensa.
         int heightMove = std::max(0, static_cast<int>(std::ceil(CoreField::HEIGHT - averageHeight)));
-        int initiatingFrames = (FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * (3 + k);
+        int framesToInitiate = (FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * (3 + k);
         int score = rensaResult.score;
         int chains = rensaResult.chains;
-        results.push_back(EstimatedRensaInfo(chains, score, initiatingFrames));
+        results.push_back(EstimatedRensaInfo(chains, score, framesToInitiate));
     };
 
     RensaDetector::iteratePossibleRensas(field, 3, callback, RensaDetector::Mode::FLOAT);
@@ -155,7 +155,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         if (info.score <= possibleRensaInfos_.back().score)
             continue;
 
-        DCHECK(possibleRensaInfos_.back().initiatingFrames < info.initiatingFrames);
+        DCHECK(possibleRensaInfos_.back().framesToInitiate < info.framesToInitiate);
         possibleRensaInfos_.push_back(info);
     }
 }
@@ -185,7 +185,7 @@ int Gazer::estimateMaxScore(int frameId) const
 
     int maxScore = -1;
     for (auto it = possibleRensaInfos().begin(); it != possibleRensaInfos().end(); ++it) {
-        int restFrames = frameId - (it->initiatingFrames + frameIdGazedAt());
+        int restFrames = frameId - (it->framesToInitiate + frameIdGazedAt());
         int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT));
         // At max, enemy will be able ot puyo restEmptyField. We have counted the puyos for possibleRensaInfos,
         // we substract 6 from restEmptyField_.
@@ -232,11 +232,11 @@ int Gazer::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInfo>& r
     if (rensaInfos.empty())
         return -1;
 
-    if (rensaInfos.back().initiatingFrames + frameIdGazedAt() < frameId)
+    if (rensaInfos.back().framesToInitiate + frameIdGazedAt() < frameId)
         return -1;
 
     for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (frameId <= it->initiatingFrames + frameIdGazedAt())
+        if (frameId <= it->framesToInitiate + frameIdGazedAt())
             return it->score;
     }
 

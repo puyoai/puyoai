@@ -54,7 +54,7 @@ TEST(Plan, iterateAvailablePlansWithRensa)
 
     EXPECT_EQ(FRAMES_TO_DROP_FAST[10] + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION,
               plan.totalFrames());
-    EXPECT_EQ(0, plan.initiatingFrames());
+    EXPECT_EQ(0, plan.framesToInitiate());
 }
 
 TEST(Plan, numChigiri)
