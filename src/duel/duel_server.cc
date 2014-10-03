@@ -211,12 +211,13 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
     }
 
     DuelState duelState(kumipuyoSeq);
-    GameState gameState = duelState.toGameState();
 
     GameResult gameResult = GameResult::GAME_HAS_STOPPED;
     while (!shouldStop_) {
         duelState.frameId += 1;
         int frameId = duelState.frameId;
+
+        GameState gameState = duelState.toGameState();
 
         // --- Sends the current frame information.
         for (int pi = 0; pi < 2; ++pi) {
@@ -260,7 +261,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
     // Send Request for GameResult.
     {
         ++duelState.frameId;
-        gameState = duelState.toGameState();
+        GameState gameState = duelState.toGameState();
         for (int pi = 0; pi < 2; ++pi) {
             manager->connector(pi)->write(gameState.toFrameRequestFor(pi));
         }
