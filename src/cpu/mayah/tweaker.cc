@@ -31,7 +31,9 @@ struct RunResult {
 void removeNontokopuyoParameter(FeatureParameter* parameter)
 {
     parameter->setValue(STRATEGY_ZENKESHI, 0);
+    parameter->setValue(STRATEGY_INITIAL_ZENKESHI, 0);
     parameter->setValue(STRATEGY_TSUBUSHI, 0);
+    parameter->setValue(STRATEGY_IBARA, 0);
 }
 
 RunResult run(Executor* executor, const FeatureParameter& parameter)
