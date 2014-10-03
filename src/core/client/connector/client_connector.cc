@@ -30,5 +30,5 @@ void ClientConnector::send(const FrameResponse& resp)
 {
     string s = resp.toString();
     cout << s << endl;
-    LOG(INFO) << s;
+    VLOG(1) << s;
 }
