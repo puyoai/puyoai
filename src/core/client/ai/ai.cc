@@ -130,12 +130,15 @@ void AI::runLoop()
         }
         if (frameRequest.myPlayerFrameRequest().state.decisionRequestAgain) {
             // We need to handle this specially. Since we've proceeded next1, we don't have any knowledge about this turn.
+            // TODO(mayah): Should we preserve DecisionSending after we used it for this?
             VLOG(1) << "REQUEST_AGAIN";
+            DCHECK(!frameRequest.myPlayerFrameRequest().state.decisionRequest) << "decisionRequestAgain should not come with decisionRequest.";
             DropDecision dropDecision = thinkFast(frameRequest.frameId,
                                                   frameRequest.myPlayerFrameRequest().field,
                                                   frameRequest.myPlayerFrameRequest().kumipuyoSeq,
                                                   additionalThoughtInfo_);
             connector_.send(FrameResponse(frameRequest.frameId, dropDecision.decision(), dropDecision.message()));
+            continue;
         }
 
         if (!next1.requested || !next1.ready) {
