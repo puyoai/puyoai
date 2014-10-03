@@ -6,7 +6,7 @@
 #include "core/field/core_field.h"
 #include "core/decision.h"
 #include "core/key_set.h"
-#include "core/kumipuyo.h"
+#include "core/kumipuyo_seq.h"
 #include "core/next_puyo.h"
 #include "core/puyo_controller.h"
 #include "core/state.h"

@@ -3,7 +3,7 @@
 
 #include <random>
 
-#include "core/kumipuyo.h"
+#include "core/kumipuyo_seq.h"
 
 KumipuyoSeq generateSequence();
 KumipuyoSeq generateSequenceWithSeed(int seed);

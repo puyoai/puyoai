@@ -9,7 +9,7 @@
 
 #include "core/constant.h"
 #include "core/field/field_bit_field.h"
-#include "core/kumipuyo.h"
+#include "core/kumipuyo_seq.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/algorithm/puyo_possibility.h"
 

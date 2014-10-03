@@ -7,7 +7,7 @@
 
 #include "core/decision.h"
 #include "core/field/core_field.h"
-#include "core/kumipuyo.h"
+#include "core/kumipuyo_seq.h"
 
 struct Problem {
 public:

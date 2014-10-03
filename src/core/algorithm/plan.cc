@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "core/constant.h"
-#include "core/kumipuyo.h"
+#include "core/kumipuyo_seq.h"
 #include "core/puyo_controller.h"
 
 using namespace std;

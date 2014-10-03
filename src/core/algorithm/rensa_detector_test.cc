@@ -1,7 +1,7 @@
 #include "core/algorithm/rensa_detector.h"
 
 #include "core/algorithm/rensa_ref_sequence.h"
-#include "core/kumipuyo.h"
+#include "core/kumipuyo_seq.h"
 
 #include <gtest/gtest.h>
 #include <algorithm>
