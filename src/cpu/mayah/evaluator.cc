@@ -44,6 +44,7 @@ const bool USE_VALLEY_FEATURE = true;
 const bool USE_FIRE_POINT_TABOO_FEATURE = true;
 const bool USHAPE_ABS = false;
 const bool USHAPE_SQUARE = true;
+const bool USE_IBARA = true;
 
 }
 
@@ -383,6 +384,12 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     if (plan.score() >= 80000) {
         sc_->addScore(STRATEGY_LARGE_ENOUGH, 1);
         return true;
+    }
+
+    // If IBARA found, we always consider it.
+    if (USE_IBARA && plan.chains() == 1 && plan.score() >= scoreForOjama(10)) {
+        sc_->addScore(STRATEGY_IBARA, 1);
+        return false;
     }
 
     // --- If we can send 18>= ojamas, and opponent does not have any hand to cope with it,
