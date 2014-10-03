@@ -11,6 +11,7 @@
 #include "core/key.h"
 #include "core/key_set.h"
 #include "core/kumipuyo.h"
+#include "core/kumipuyo_pos.h"
 #include "core/puyo_color.h"
 
 class CoreField;

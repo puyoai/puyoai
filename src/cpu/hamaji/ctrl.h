@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "core/kumipuyo.h"
+#include "core/kumipuyo_pos.h"
 #include "field.h"
 
 enum Key {
