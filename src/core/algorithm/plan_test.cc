@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include "core/constant.h"
 #include "core/field/core_field.h"
-#include "core/kumipuyo.h"
+#include "core/kumipuyo_seq.h"
 
 using namespace std;
 

@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 #include "core/algorithm/puyo_possibility.h"
-#include "core/kumipuyo.h"
+#include "core/kumipuyo_seq.h"
 
 using namespace std;
 

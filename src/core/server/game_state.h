@@ -6,6 +6,8 @@
 
 #include "base/base.h"
 #include "core/decision.h"
+#include "core/kumipuyo_pos.h"
+#include "core/kumipuyo_seq.h"
 #include "core/frame_request.h"
 #include "core/game_result.h"
 

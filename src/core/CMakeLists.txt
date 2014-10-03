@@ -16,7 +16,7 @@ endif()
 add_library(puyoai_core STATIC
             decision.cc
             field_pretty_printer.cc frame_request.cc frame_response.cc
-            game_result.cc key.cc key_set.cc kumipuyo.cc kumipuyo_pos.cc
+            game_result.cc key.cc key_set.cc kumipuyo.cc kumipuyo_pos.cc kumipuyo_seq.cc
             plain_field.cc puyo_color.cc puyo_controller.cc real_color.cc sequence_generator.cc)
 
 # ----------------------------------------------------------------------
@@ -38,6 +38,7 @@ puyoai_core_add_test(decision)
 puyoai_core_add_test(key_set)
 puyoai_core_add_test(kumipuyo)
 puyoai_core_add_test(kumipuyo_pos)
+puyoai_core_add_test(kumipuyo_seq)
 puyoai_core_add_test(plain_field)
 puyoai_core_add_test(puyo_color)
 puyoai_core_add_test(puyo_controller)
