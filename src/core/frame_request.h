@@ -6,6 +6,7 @@
 
 #include "core/game_result.h"
 #include "core/kumipuyo.h"
+#include "core/kumipuyo_pos.h"
 #include "core/plain_field.h"
 #include "core/player.h"
 #include "core/state.h"

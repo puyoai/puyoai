@@ -11,13 +11,6 @@ string Kumipuyo::toString() const
     return tmp;
 }
 
-string KumipuyoPos::toDebugString() const
-{
-    char buf[256];
-    snprintf(buf, 256, "<y=%d,x=%d,r=%d>", y, x, r);
-    return std::string(buf);
-}
-
 KumipuyoSeq::KumipuyoSeq(const string& str)
 {
     for (string::size_type i = 0; i * 2 + 1 < str.size(); ++i) {
