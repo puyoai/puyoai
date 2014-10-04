@@ -117,7 +117,7 @@ bool FeatureParameter::load(const string& filename)
                 }
                 ss << entry.first;
             }
-            CHECK(false) << "Unknown feature key is specified" << ss.str();
+            CHECK(false) << "Unknown feature key is specified: " << ss.str();
         }
 
         return true;
