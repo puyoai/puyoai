@@ -470,7 +470,7 @@ void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const Re
 template<typename ScoreCollector>
 void evalRensaIgnitionHeightFeature(ScoreCollector* sc, const RefPlan& plan, const RensaTrackResult& trackResult, bool enemyHasZenkeshi)
 {
-    auto key = enemyHasZenkeshi ? IGNITION_HEIGHT : IGNITION_HEIGHT_ON_ENEMY_ZENKESHI;
+    auto key = enemyHasZenkeshi ? IGNITION_HEIGHT_ON_ENEMY_ZENKESHI : IGNITION_HEIGHT;
 
     for (int y = CoreField::HEIGHT; y >= 1; --y) {
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
