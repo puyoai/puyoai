@@ -90,7 +90,7 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
     double bestScore = -100000000.0;
     Plan bestPlan;
     auto f = [&, this, frameId, maxIteration](const RefPlan& plan) {
-        EvalResult evalResult = Evaluator(*featureParameter_, books_).eval(plan, field, frameId, maxIteration, gazer_);
+        EvalResult evalResult = eval(plan, field, frameId, maxIteration);
 
         VLOG(1) << toString(plan.decisions())
                 << ": eval=" << evalResult.score()
@@ -123,6 +123,25 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
     return bestPlan;
 }
 
+EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
+                           int currentFrameId, int maxIteration) const
+{
+    NormalScoreCollector sc(*featureParameter_);
+    Evaluator<NormalScoreCollector> evaluator(books_, &sc);
+    evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, gazer_);
+
+    return EvalResult(sc.score(), sc.estimatedRensaScore());
+}
+
+CollectedFeature MayahAI::evalWithCollectingFeature(const RefPlan& plan, const CoreField& currentField,
+                                                    int currentFrameId, int maxIteration) const
+{
+    FeatureScoreCollector sc(*featureParameter_);
+    Evaluator<FeatureScoreCollector> evaluator(books_, &sc);
+    evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, gazer_);
+    return sc.toCollectedFeature();
+}
+
 std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
                                      const Plan& plan, double thoughtTimeInSeconds) const
 {
@@ -132,7 +151,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
         return string("give up :-(");
 
     RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.framesToInitiate(), plan.lastDropFrames());
-    CollectedFeature cf = Evaluator(*featureParameter_, books_).evalWithCollectingFeature(refPlan, field, frameId, maxIteration, gazer_);
+    CollectedFeature cf = evalWithCollectingFeature(refPlan, field, frameId, maxIteration);
 
     stringstream ss;
     if (cf.feature(STRATEGY_ZENKESHI) > 0)

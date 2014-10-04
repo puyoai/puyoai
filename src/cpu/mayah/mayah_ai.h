@@ -8,12 +8,12 @@
 #include "core/client/ai/ai.h"
 
 #include "book_field.h"
+#include "evaluator.h"
 #include "feature_parameter.h"
 #include "gazer.h"
 
 class CoreField;
 class DropDecision;
-class Evaluator;
 class KumipuyoSeq;
 class Plan;
 class RefPlan;
@@ -44,6 +44,9 @@ public:
     void initializeGazerForTest(int frameId) { gazer_.initialize(frameId); }
 
 protected:
+    EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration) const;
+    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration) const;
+
     std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration,
                                 const Plan&, double thoughtTimeInSeconds) const;
 

@@ -17,9 +17,8 @@ protected:
     {
         TsumoPossibility::initialize();
 
-        FeatureParameter parameter;
+        FeatureParameter featureParameter;
         vector<BookField> books;
-        Evaluator evaluator(parameter, books);
         Gazer gazer;
 
         gazer.initialize(100);
@@ -31,7 +30,10 @@ protected:
 
         RefPlan plan(f, decisions, rensaResult, 0, framesToInitiate, lastDropFrames);
 
-        return evaluator.evalWithCollectingFeature(plan, f, 1, numIteration, gazer);
+        FeatureScoreCollector sc(featureParameter);
+        Evaluator<FeatureScoreCollector> evaluator(books, &sc);
+        evaluator.collectScore(plan, f, 1, numIteration, gazer);
+        return sc.toCollectedFeature();
     }
 };
 
@@ -42,9 +44,11 @@ TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
                 "YYYGGG");
 
     FeatureParameter param;
+    std::vector<BookField> books;
     FeatureScoreCollector sc(param);
+    RensaEvaluator<FeatureScoreCollector> evaluator(books, &sc);
 
-    collectScoreForRensaGarbage(&sc, f);
+    evaluator.collectScoreForRensaGarbage(f);
     CollectedFeature cf = sc.toCollectedFeature();
 
     EXPECT_EQ(10, cf.feature(NUM_GARBAGE_PUYOS));
@@ -100,9 +104,11 @@ TEST_F(EvaluatorTest, connection)
                 "BBYYGO");
 
     FeatureParameter param;
+    std::vector<BookField> books;
     FeatureScoreCollector sc(param);
+    Evaluator<FeatureScoreCollector> evaluator(books, &sc);
 
-    collectScoreForConnection(&sc, f);
+    evaluator.collectScoreForConnection(f);
     CollectedFeature cf = sc.toCollectedFeature();
 
     map<int, int> vs;

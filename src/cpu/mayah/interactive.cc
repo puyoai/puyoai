@@ -43,8 +43,13 @@ public:
 
     CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, int numKeyPuyos, const Plan& plan) const
     {
+        FeatureScoreCollector sc(*featureParameter_);
+        Evaluator<FeatureScoreCollector> evaluator(books_, &sc);
+
         RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.framesToInitiate(), plan.lastDropFrames());
-        return Evaluator(*featureParameter_, books_).evalWithCollectingFeature(refPlan, field, frameId, numKeyPuyos, gazer_);
+        evaluator.collectScore(refPlan, field, frameId, numKeyPuyos, gazer_);
+
+        return sc.toCollectedFeature();
     }
 
     Plan thinkPlanOnly(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,

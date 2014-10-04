@@ -122,7 +122,11 @@ void learnWithInteractive()
         double currentScore = -1000000;
         pair<Decision, Decision> currentDecision;
         Plan::iterateAvailablePlans(field, seq, 2, [&](const RefPlan& plan) {
-            CollectedFeature f = Evaluator(parameter, books).evalWithCollectingFeature(plan, field, 1, false, gazer);
+            FeatureScoreCollector sc(parameter);
+            Evaluator<FeatureScoreCollector> evaluator(books, &sc);
+            evaluator.collectScore(plan, field, 1, false, gazer);
+
+            CollectedFeature f = sc.toCollectedFeature();
             pair<Decision, Decision> pd;
             if (plan.decisions().size() == 1)
                 pd = make_pair(plan.decision(0), Decision());
@@ -251,7 +255,6 @@ void learnFromPuyofu()
             break;
 
         for (size_t i = 0; i + 1 < inputs.size(); ++i) {
-            Evaluator evaluator(parameter, books);
             map<vector<Decision>, CollectedFeature> featureMap;
             CollectedFeature teacherFeature;
             bool teacherFound = false;
@@ -260,13 +263,17 @@ void learnFromPuyofu()
                  << inputs[i].seq.toString() << endl;
 
             Plan::iterateAvailablePlans(inputs[i].field, inputs[i].seq, MayahAI::DEFAULT_DEPTH, [&](const RefPlan& plan) {
-                    CollectedFeature f = evaluator.evalWithCollectingFeature(plan, inputs[i].field,
-                                                                             frameId, MayahAI::DEFAULT_NUM_ITERATION, gazer);
-                    featureMap[plan.decisions()] = f;
-                    if (plan.field() == inputs[i + 1].fieldAfter) {
-                        teacherFound = true;
-                        teacherFeature = f;
-                    }
+                FeatureScoreCollector sc(parameter);
+                Evaluator<FeatureScoreCollector> evaluator(books, &sc);
+                evaluator.collectScore(plan, inputs[i].field, frameId, MayahAI::DEFAULT_NUM_ITERATION, gazer);
+
+                CollectedFeature f = sc.toCollectedFeature();
+
+                featureMap[plan.decisions()] = f;
+                if (plan.field() == inputs[i + 1].fieldAfter) {
+                    teacherFound = true;
+                    teacherFeature = f;
+                }
             });
 
             if (!teacherFound) {
