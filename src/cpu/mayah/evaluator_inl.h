@@ -236,36 +236,42 @@ void evalRidgeHeight(ScoreCollector* sc, const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
+void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan, bool enemyHasZenkeshi)
 {
     static const int DIFF[CoreField::MAP_WIDTH] = {
         0, -3, 0, 1, 1, 0, -3, 0,
     };
 
+    static const int DIFF_ON_ZENKESHI[FieldConstant::MAP_WIDTH] = {
+        0, 2, 2, 2, -8, -6, -6, 0
+    };
+
+    const int* diff = enemyHasZenkeshi ? DIFF_ON_ZENKESHI : DIFF;
+
     const CoreField& f = plan.field();
     double average = 0;
     for (int x = 1; x <= 6; ++x)
-        average += (f.height(x) + DIFF[x]);
+        average += (f.height(x) + diff[x]);
     average /= 6;
 
-    if (average < 0)
-        return;
-
     double s = 0;
-    if (USHAPE_ABS) {
+    if (enemyHasZenkeshi) {
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
-            int h = f.height(x) + DIFF[x];
+            int h = f.height(x) + diff[x];
+            s += std::abs(h - average);
+        }
+    } else if (USHAPE_ABS) {
+        for (int x = 1; x <= CoreField::WIDTH; ++x) {
+            int h = f.height(x) + diff[x];
             if (f.height(x) <= 4) {
                 s += 0.01 * std::abs(h - average);
             } else {
                 s += std::abs(h - average);
             }
         }
-    }
-
-    if (USHAPE_SQUARE) {
+    } else if (USHAPE_SQUARE) {
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
-            int h = f.height(x) + DIFF[x];
+            int h = f.height(x) + diff[x];
             if (f.height(x) <= 4) {
                 s += 0.01 * (h - average) * (h - average);
             } else {
@@ -274,7 +280,8 @@ void evalFieldUShape(ScoreCollector* sc, const RefPlan& plan)
         }
     }
 
-    sc->addScore(FIELD_USHAPE, s);
+    auto key = enemyHasZenkeshi ? FIELD_USHAPE_ON_ZENKESHI : FIELD_USHAPE;
+    sc->addScore(key, s);
 }
 
 template<typename ScoreCollector>
@@ -322,12 +329,12 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
         return true;
     }
 
-    if (gazer.additionalThoughtInfo().hasZenkeshi()) {
-        if (!gazer.additionalThoughtInfo().enemyHasZenkeshi() && !gazer.isRensaOngoing()) {
+    if (gazer.additionalThoughtInfo().hasZenkeshi() && !gazer.additionalThoughtInfo().enemyHasZenkeshi()) {
+        if (!gazer.isRensaOngoing()) {
             sc->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
-        if (!gazer.additionalThoughtInfo().enemyHasZenkeshi() && gazer.isRensaOngoing() && gazer.ongoingRensaResult().score <= scoreForOjama(36)) {
+        if (gazer.isRensaOngoing() && gazer.ongoingRensaResult().score <= scoreForOjama(36)) {
             sc->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
@@ -455,36 +462,28 @@ void evalRensaHandWidthFeature(ScoreCollector* sc, const RefPlan& plan, const Re
         }
     }
 
-#if 0
-    std::cout << plan.field().toDebugString() << std::endl;
-    for (int y = 12; y >= 1; --y) {
-        for (int x = 1; x <= 6; ++x) {
-            std::cout << distance[x][y] << ' ';
-        }
-        std::cout << std::endl;
-    }
-#endif
-
     sc->addScore(HAND_WIDTH_2, distanceCount[2] > 10 ? 10 : distanceCount[2], 1);
     sc->addScore(HAND_WIDTH_3, distanceCount[3] > 10 ? 10 : distanceCount[3], 1);
     sc->addScore(HAND_WIDTH_4, distanceCount[4] > 10 ? 10 : distanceCount[4], 1);
 }
 
 template<typename ScoreCollector>
-void evalRensaIgnitionHeightFeature(ScoreCollector* sc, const RefPlan& plan, const RensaTrackResult& trackResult)
+void evalRensaIgnitionHeightFeature(ScoreCollector* sc, const RefPlan& plan, const RensaTrackResult& trackResult, bool enemyHasZenkeshi)
 {
+    auto key = enemyHasZenkeshi ? IGNITION_HEIGHT : IGNITION_HEIGHT_ON_ENEMY_ZENKESHI;
+
     for (int y = CoreField::HEIGHT; y >= 1; --y) {
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
             if (!isNormalColor(plan.field().color(x, y)))
                 continue;
             if (trackResult.erasedAt(x, y) == 1) {
-                sc->addScore(IGNITION_HEIGHT, y, 1);
+                sc->addScore(key, y, 1);
                 return;
             }
         }
     }
 
-    sc->addScore(IGNITION_HEIGHT, 0, 1);
+    sc->addScore(key, 0, 1);
 }
 
 template<typename ScoreCollector>
@@ -516,7 +515,8 @@ void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const
     if (evalStrategy(sc, plan, currentField, currentFrameId, gazer))
         return;
 
-    evalBook(sc, books, plan);
+    if (!gazer.additionalThoughtInfo().enemyHasZenkeshi())
+        evalBook(sc, books, plan);
     evalCountPuyoFeature(sc, plan);
     if (USE_CONNECTION_FEATURE)
         collectScoreForConnection(sc, plan.field());
@@ -535,7 +535,8 @@ void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const
     if (USE_RIDGE_FEATURE)
         evalRidgeHeight(sc, plan);
     if (USE_FIELD_USHAPE_FEATURE)
-        evalFieldUShape(sc, plan);
+        evalFieldUShape(sc, plan, gazer.additionalThoughtInfo().enemyHasZenkeshi());
+
     evalUnreachableSpace(sc, plan);
 
     int numPuyo = currentField.countPuyos();
@@ -551,7 +552,7 @@ void collectScore(ScoreCollector* sc, const std::vector<BookField>& books, const
         if (USE_HAND_WIDTH_FEATURE)
             evalRensaHandWidthFeature(rensaScoreCollector.get(), plan, trackResult);
         if (USE_IGNITION_HEIGHT_FEATURE)
-            evalRensaIgnitionHeightFeature(rensaScoreCollector.get(), plan, trackResult);
+            evalRensaIgnitionHeightFeature(rensaScoreCollector.get(), plan, trackResult, gazer.additionalThoughtInfo().enemyHasZenkeshi());
         if (USE_CONNECTION_FEATURE)
             evalRensaConnectionFeature(rensaScoreCollector.get(), fieldAfterRensa);
 
