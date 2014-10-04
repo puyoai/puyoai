@@ -8,9 +8,12 @@
 #include "feature_parameter.h"
 #include "score_collector.h"
 
+class ColumnPuyoList;
 class CoreField;
 class Gazer;
 class RefPlan;
+struct RensaResult;
+class RensaTrackResult;
 
 class EvalResult {
 public:
@@ -24,20 +27,63 @@ private:
     int maxVirtualScore_;
 };
 
-class Evaluator {
+template<typename ScoreCollector>
+class RensaEvaluator {
 public:
-    Evaluator(const FeatureParameter& param, const std::vector<BookField>& books) : param_(param), books_(books) {}
+    // Don't take ownership of |sc|.
+    explicit RensaEvaluator(const std::vector<BookField>& books, ScoreCollector* sc) :
+        books_(books),
+        sc_(sc) {}
 
-    EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration, const Gazer&);
-    // Same as eval(), but returns CollectedFeature.
-    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId,
-                                               int maxIteration, const Gazer&);
+    void evalRensaChainFeature(const RefPlan&,
+                               const RensaResult&,
+                               const ColumnPuyoList& keyPuyos,
+                               const ColumnPuyoList& firePuyos);
+    void collectScoreForRensaGarbage(const CoreField& fieldAfterDrop);
+    void evalRensaHandWidthFeature(const RefPlan&, const RensaTrackResult&);
+    void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaTrackResult&, bool enemyHasZenkeshi);
+    void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
+    void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                           int currentFrameId, const Gazer&);
 
 private:
-    const FeatureParameter& param_;
     const std::vector<BookField>& books_;
+    ScoreCollector* sc_;
 };
 
-#include "evaluator_inl.h"
+template<typename ScoreCollector>
+class Evaluator {
+public:
+    // Don't take ownership of |sc|.
+    explicit Evaluator(const std::vector<BookField>& books, ScoreCollector* sc) :
+        books_(books),
+        sc_(sc) {}
+
+    void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration, const Gazer& gazer);
+
+    // ----------------------------------------------------------------------
+
+    bool evalStrategy(const RefPlan& plan, const CoreField& currentField,
+                      int currentFrameId, const Gazer& gazer);
+
+    void evalBook(const std::vector<BookField>&, const RefPlan&);
+    void evalFrameFeature(const RefPlan&);
+    void evalConnectionHorizontalFeature(const RefPlan&);
+    void evalRestrictedConnectionHorizontalFeature(const RefPlan&);
+    void evalDensityFeature(const RefPlan&);
+    void evalFieldHeightFeature(const RefPlan&);
+    void evalThirdColumnHeightFeature(const RefPlan& plan);
+    void evalValleyDepth(const RefPlan& plan);
+    void evalRidgeHeight(const RefPlan& plan);
+    void evalFieldUShape(const RefPlan& plan, bool enemyHasZenkeshi);
+    void evalUnreachableSpace(const RefPlan& plan);
+
+    void collectScoreForConnection(const CoreField&);
+    void evalCountPuyoFeature(const RefPlan& plan);
+
+private:
+    const std::vector<BookField>& books_;
+    ScoreCollector* sc_;
+};
 
 #endif
