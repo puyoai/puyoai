@@ -149,6 +149,8 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
         ss << "SAKIUCHI / ";
     if (cf.feature(STRATEGY_HOUWA) > 0)
         ss << "HOUWA / ";
+    if (cf.feature(STRATEGY_ZENKESHI_CONSUME) > 0)
+        ss << "全消消費 / ";
 
     if (!cf.bookName().empty())
         ss << cf.bookName() << " / ";

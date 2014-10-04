@@ -13,8 +13,8 @@
 #include "base/time.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
-#include "core/algorithm/rensa_info.h"
 #include "core/algorithm/rensa_detector.h"
+#include "core/algorithm/rensa_info.h"
 #include "core/constant.h"
 #include "core/decision.h"
 #include "core/position.h"
@@ -320,6 +320,17 @@ bool evalStrategy(ScoreCollector* sc, const RefPlan& plan, const CoreField& curr
     if (plan.field().isZenkeshi()) {
         sc->addScore(STRATEGY_ZENKESHI, 1);
         return true;
+    }
+
+    if (gazer.additionalThoughtInfo().hasZenkeshi()) {
+        if (!gazer.additionalThoughtInfo().enemyHasZenkeshi() && !gazer.isRensaOngoing()) {
+            sc->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
+            return false;
+        }
+        if (!gazer.additionalThoughtInfo().enemyHasZenkeshi() && gazer.isRensaOngoing() && gazer.ongoingRensaResult().score <= scoreForOjama(36)) {
+            sc->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
+            return false;
+        }
     }
 
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();

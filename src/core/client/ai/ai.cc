@@ -90,10 +90,6 @@ void AI::runLoop()
         // Before starting a new game, we need to think the first hand.
         // TODO(mayah): Maybe game server should send some information that we should initialize.
         if (frameRequest.frameId == 1) {
-            hand_ = 0;
-            enemyHand_ = 0;
-            rethinkRequested_ = false;
-            field_.clear();
             next1.clear();
             gameWillBegin(frameRequest);
         }
@@ -189,6 +185,12 @@ void AI::runLoop()
 
 void AI::gameWillBegin(const FrameRequest& frameRequest)
 {
+    hand_ = 0;
+    enemyHand_ = 0;
+    rethinkRequested_ = false;
+    field_.clear();
+    additionalThoughtInfo_ = AdditionalThoughtInfo();
+
     onGameWillBegin(frameRequest);
 }
 
