@@ -37,6 +37,8 @@ public:
     int frameIdGazedAt() const { return frameIdGazedAt_; }
 
     void setAdditionalThoughtInfo(const AdditionalThoughtInfo& info) { additionalThoughtInfo_ = info; }
+    const AdditionalThoughtInfo& additionalThoughtInfo() const { return additionalThoughtInfo_; }
+
     bool isRensaOngoing() const { return additionalThoughtInfo_.isRensaOngoing(); }
     const RensaResult& ongoingRensaResult() const { return additionalThoughtInfo_.ongoingRensaResult(); }
     int ongoingRensaFinishingFrameId() const { return additionalThoughtInfo_.ongoingRensaFinishingFrameId(); }
