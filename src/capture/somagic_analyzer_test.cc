@@ -347,9 +347,27 @@ TEST_F(SomagicAnalyzerTest, nextArrival)
     EXPECT_TRUE(rs[0]->playerResult(0)->userState.playable);
     // Next disappears here. After detecting next disappearing. we'd like to make userState playable.
     EXPECT_FALSE(rs[13]->playerResult(0)->userState.playable);
+    EXPECT_TRUE(rs[13]->playerResult(0)->userState.decisionRequest);
     EXPECT_TRUE(rs[14]->playerResult(0)->userState.playable);
     // Then controllable now.
     EXPECT_TRUE(rs[16]->playerResult(0)->userState.playable);
+}
+
+TEST_F(SomagicAnalyzerTest, nextArrivalSousai)
+{
+    vector<string> images;
+    for (int i = 0; i <= 12; ++i) {
+        char buf[80];
+        sprintf(buf, "/somagic/next-arrival-sousai/frame%02d.png", i);
+        string s = buf;
+        images.push_back(s);
+    }
+
+    bool pgs[2] = { true, true };
+    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
+
+    EXPECT_TRUE(rs[9]->playerResult(1)->userState.decisionRequest || rs[10]->playerResult(1)->userState.decisionRequest);
+    EXPECT_TRUE(rs[9]->playerResult(1)->userState.grounded || rs[10]->playerResult(1)->userState.grounded);
 }
 
 TEST_F(SomagicAnalyzerTest, irregularNextArrival)
