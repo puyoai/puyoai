@@ -25,7 +25,8 @@ public:
     SomagicAnalyzer();
     virtual ~SomagicAnalyzer();
 
-    BoxAnalyzeResult analyzeBox(const SDL_Surface* surface, const Box& b, bool showsColor = false) const;
+    enum class AllowOjama { DONT_ALLOW_OJAMA, ALLOW_OJAMA };
+    BoxAnalyzeResult analyzeBox(const SDL_Surface* surface, const Box& b, AllowOjama = AllowOjama::ALLOW_OJAMA, bool showsColor = false) const;
 
     // Draw each pixel of |surface| with RealColor. This is helpful for image analyzing test.
     void drawWithAnalysisResult(SDL_Surface*);
