@@ -44,22 +44,28 @@ int main(int argc, char* argv[])
     bool usesNextPuyoPosition = false;
     NextPuyoPosition npp;
     int x, y;
+    SomagicAnalyzer::AllowOjama allowOjama = SomagicAnalyzer::AllowOjama::ALLOW_OJAMA;
     if (argv[3] == string("NEXT1-AXIS")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT1_AXIS;
+        allowOjama = SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
     } else if (argv[3] == string("NEXT1-AXIS-HALF")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT1_AXIS;
         half = true;
+        allowOjama = SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
     } else if (argv[3] == string("NEXT1-CHILD")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT1_CHILD;
+        allowOjama = SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
     } else if (argv[3] == string("NEXT2-AXIS")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT2_AXIS;
+        allowOjama = SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
     } else if (argv[3] == string("NEXT2-CHILD")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT2_CHILD;
+        allowOjama = SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
     } else {
         if (argc < 5) {
             showUsage(argv[0]);
@@ -89,7 +95,7 @@ int main(int argc, char* argv[])
         b.sy += b.h() / 2;
     }
 
-    BoxAnalyzeResult r = analyzer.analyzeBox(surf.get(), b, true);
+    BoxAnalyzeResult r = analyzer.analyzeBox(surf.get(), b, allowOjama, true);
     cout << "Color: " << toString(r.realColor) << endl;
     cout << "Vanishing: " << r.vanishing << endl;
 

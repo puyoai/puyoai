@@ -11,6 +11,15 @@
 
 using namespace std;
 
+namespace {
+
+const int BOX_THRESHOLD = 70;
+const int BOX_THRESHOLD_HALF = 50;
+const int SMALLER_BOX_THRESHOLD = 20;
+const int SMALLER_BOX_THRESHOLD_HALF = 15;
+
+}
+
 static RealColor toRealColor(const HSV& hsv)
 {
     if (hsv.v < 38)
@@ -44,7 +53,8 @@ static RealColor toRealColor(const HSV& hsv)
     return RealColor::RC_EMPTY;
 }
 
-static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS], int threshold)
+static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS], int threshold,
+                                                 SomagicAnalyzer::AllowOjama allowOjama = SomagicAnalyzer::AllowOjama::ALLOW_OJAMA)
 {
     static const RealColor colors[] = {
         RealColor::RC_RED,
@@ -67,9 +77,11 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
 
     // Since Ojama often makes their form smaller. So, it's a bit difficult to detect.
     // Let's relax a bit.
-    int ojamaCount = colorCount[static_cast<int>(RealColor::RC_OJAMA)] * 3 / 2;
-    if (ojamaCount > threshold && ojamaCount > maxCount)
-        return RealColor::RC_OJAMA;
+    if (allowOjama == SomagicAnalyzer::AllowOjama::ALLOW_OJAMA) {
+        int ojamaCount = colorCount[static_cast<int>(RealColor::RC_OJAMA)] * 3 / 2;
+        if (ojamaCount > threshold && ojamaCount > maxCount)
+            return RealColor::RC_OJAMA;
+    }
 
     return result;
 }
@@ -86,7 +98,8 @@ SomagicAnalyzer::~SomagicAnalyzer()
 {
 }
 
-BoxAnalyzeResult SomagicAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b, bool showsColor) const
+BoxAnalyzeResult SomagicAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
+                                             SomagicAnalyzer::AllowOjama allowOjama, bool showsColor) const
 {
     int colorCount[3][NUM_REAL_COLORS] = { { 0 } };
 
@@ -127,13 +140,13 @@ BoxAnalyzeResult SomagicAnalyzer::analyzeBox(const SDL_Surface* surface, const B
     // whole puyo will be 32 x 32 (or 31x31?, anyway 31x31 > 32x30)
     // WNEXT2 will have smaller area.
     int area = b.w() * b.h();
-    int threshold = (area >= 30 * 32) ? 50 : 20;
-    int halfThreshold = (area >= 30 * 32) ? 25 : 15;
+    int threshold = (area >= 30 * 32) ? BOX_THRESHOLD : SMALLER_BOX_THRESHOLD;
+    int halfThreshold = (area >= 30 * 32) ? BOX_THRESHOLD_HALF : SMALLER_BOX_THRESHOLD_HALF;
 
     RealColor rc[3] = {
-        estimateRealColorFromColorCount(colorCount[0], threshold),
-        estimateRealColorFromColorCount(colorCount[1], halfThreshold),
-        estimateRealColorFromColorCount(colorCount[2], halfThreshold),
+        estimateRealColorFromColorCount(colorCount[0], threshold, allowOjama),
+        estimateRealColorFromColorCount(colorCount[1], halfThreshold, allowOjama),
+        estimateRealColorFromColorCount(colorCount[2], halfThreshold, allowOjama),
     };
 
     bool vanishing = rc[1] != rc[2] && (rc[1] == RealColor::RC_EMPTY || rc[2] == RealColor::RC_EMPTY);
@@ -181,7 +194,7 @@ unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi,
 
         for (int i = 0; i < 4; ++i) {
             Box b = BoundingBox::instance().get(pi, np[i]);
-            BoxAnalyzeResult r = analyzeBox(surface, b);
+            BoxAnalyzeResult r = analyzeBox(surface, b, SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
             result->setRealColor(np[i], r.realColor);
         }
     }
@@ -190,7 +203,7 @@ unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi,
     {
         Box b = BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_AXIS);
         b = Box(b.sx, b.sy + b.h() / 2, b.dx, b.dy);
-        BoxAnalyzeResult r = analyzeBox(surface, b);
+        BoxAnalyzeResult r = analyzeBox(surface, b, SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
         result->next1AxisMoving = (r.realColor == RealColor::RC_EMPTY);
     }
 
