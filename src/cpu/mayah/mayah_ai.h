@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "core/client/ai/ai.h"
+#include "core/algorithm/plan.h"
 
 #include "book_field.h"
 #include "evaluator.h"
@@ -15,8 +16,16 @@
 class CoreField;
 class DropDecision;
 class KumipuyoSeq;
-class Plan;
-class RefPlan;
+
+struct ThoughtResult {
+    ThoughtResult(const Plan& plan, bool isRensaPlan, double rensaScore, double virtualRensaScore) :
+       plan(plan), isRensaPlan(isRensaPlan), rensaScore(rensaScore), virtualRensaScore(virtualRensaScore) {}
+
+    Plan plan;
+    bool isRensaPlan;
+    double rensaScore;
+    double virtualRensaScore;
+};
 
 class MayahAI : public AI {
 public:
@@ -38,8 +47,8 @@ public:
     virtual void onEnemyNext2Appeared(const FrameRequest&) override;
 
     // Use this directly in test. Otherwise, use via think/thinkFast.
-    Plan thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, const AdditionalThoughtInfo&,
-                   int depth, int maxIteration);
+    ThoughtResult thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, const AdditionalThoughtInfo&,
+                            int depth, int maxIteration);
 
     void initializeGazerForTest(int frameId) { gazer_.initialize(frameId); }
 
@@ -48,7 +57,7 @@ protected:
     CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration) const;
 
     std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration,
-                                const Plan&, double thoughtTimeInSeconds) const;
+                                const ThoughtResult&, double thoughtTimeInSeconds) const;
 
     // For debugging purpose.
     void reloadParameter();
