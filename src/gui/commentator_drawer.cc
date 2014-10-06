@@ -145,8 +145,14 @@ void CommentatorDrawer::drawCommentSurface(Screen* screen, const CommentatorResu
 
     int offsetY = screen->mainBox().dy + 40;
     int y = 0;
-    if (!result.message[pi].empty())
-        drawText(screen, ("AI: " + result.message[pi]).c_str(), LX, offsetY + LH * y++);
+    if (!result.message[pi].empty()) {
+        if (pi == 0) {
+            drawText(screen, ("AI: " + result.message[pi]).c_str(), 20, offsetY + LH * y);
+        } else {
+            drawText(screen, ("AI: " + result.message[pi]).c_str(), 20, offsetY + LH * (y + 1));
+        }
+        y += 2;
+    }
 
     for (const auto& msg : result.events[pi]) {
         drawText(screen, msg.c_str(), LX, offsetY + LH * y++);
