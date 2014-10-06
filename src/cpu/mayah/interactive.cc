@@ -169,8 +169,10 @@ int main(int argc, char* argv[])
                 req.playerFrameRequest[1].kumipuyoSeq);
 
             double t1 = currentTime();
-            Plan aiPlan = ai.thinkPlan(frameId, field, seq.subsequence(0, 2), ai.additionalThoughtInfo(),
-                                       MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+            ThoughtResult thoughtResult = ai.thinkPlan(frameId, field, seq.subsequence(0, 2), ai.additionalThoughtInfo(),
+                                                       MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+            const Plan& aiPlan = thoughtResult.plan;
+
             double t2 = currentTime();
             if (aiPlan.decisions().empty())
                 cout << "No decision";
@@ -191,8 +193,8 @@ int main(int argc, char* argv[])
             if (str == "s") {
                 CollectedFeature cf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
                 cout << cf.toString() << endl;
-                cout << ai.makeMessageFrom(frameId, field, seq.subsequence(0, 2),
-                                           MayahAI::DEFAULT_NUM_ITERATION, aiPlan, (t2 - t1) * 1000);
+                cout << ai.makeMessageFrom(frameId, field, seq.subsequence(0, 2), MayahAI::DEFAULT_NUM_ITERATION,
+                                           thoughtResult, (t2 - t1) * 1000);
                 continue;
             }
             if (str == "book") {
@@ -218,14 +220,14 @@ int main(int argc, char* argv[])
             }
         }
 
-        Plan aiPlan = ai.thinkPlan(frameId,
-                                   req.playerFrameRequest[0].field,
-                                   req.playerFrameRequest[0].kumipuyoSeq.subsequence(0, 2),
-                                   ai.additionalThoughtInfo(),
-                                   MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+        ThoughtResult thoughtResult = ai.thinkPlan(frameId,
+                                                   req.playerFrameRequest[0].field,
+                                                   req.playerFrameRequest[0].kumipuyoSeq.subsequence(0, 2),
+                                                   ai.additionalThoughtInfo(),
+                                                   MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
         {
             CoreField f = req.playerFrameRequest[0].field;
-            f.dropKumipuyo(aiPlan.decisions().front(), req.playerFrameRequest[0].kumipuyoSeq.front());
+            f.dropKumipuyo(thoughtResult.plan.decisions().front(), req.playerFrameRequest[0].kumipuyoSeq.front());
             f.simulate();
             req.playerFrameRequest[0].field = f;
         }

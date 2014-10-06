@@ -50,10 +50,13 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
 {
     CoreField f(plainField);
     double beginTime = currentTime();
-    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
-                          MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+    ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
+                                            MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
     double endTime = currentTime();
-    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_NUM_ITERATION, plan, endTime - beginTime);
+    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_NUM_ITERATION,
+                                          thoughtResult, endTime - beginTime);
+
+    const Plan& plan = thoughtResult.plan;
     if (plan.decisions().empty())
         return DropDecision(Decision(3, 0), message);
     return DropDecision(plan.decisions().front(), message);
@@ -64,18 +67,21 @@ DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const
 {
     CoreField f(plainField);
     double beginTime = currentTime();
-    Plan plan = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
-                          MayahAI::DEFAULT_DEPTH, MayahAI::FAST_NUM_ITERATION);
+    ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
+                                            MayahAI::DEFAULT_DEPTH, MayahAI::FAST_NUM_ITERATION);
     double endTime = currentTime();
-    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::FAST_NUM_ITERATION, plan, endTime - beginTime);
-    if (plan.decisions().empty())
+    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::FAST_NUM_ITERATION,
+                                          thoughtResult, endTime - beginTime);
+
+    const Plan& plan = thoughtResult.plan;
+    if (thoughtResult.plan.decisions().empty())
         return DropDecision(Decision(3, 0), message);
     return DropDecision(plan.decisions().front(), message);
 }
 
-Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
-                        const AdditionalThoughtInfo& additionalInfo,
-                        int depth, int maxIteration)
+ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
+                                 const AdditionalThoughtInfo& additionalInfo,
+                                 int depth, int maxIteration)
 {
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
     VLOG(1) << gazer_.toRensaInfoString();
@@ -117,10 +123,9 @@ Plan MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& 
     };
 
     Plan::iterateAvailablePlans(field, kumipuyoSeq, depth, f);
-    if (bestVirtualRensaScore < bestRensaScore) {
-        return bestRensaPlan;
-    }
-    return bestPlan;
+    if (bestVirtualRensaScore < bestRensaScore)
+        return ThoughtResult(bestRensaPlan, true, bestRensaScore, bestVirtualRensaScore);
+    return ThoughtResult(bestPlan, false, bestRensaScore, bestVirtualRensaScore);
 }
 
 EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
@@ -143,9 +148,11 @@ CollectedFeature MayahAI::evalWithCollectingFeature(const RefPlan& plan, const C
 }
 
 std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
-                                     const Plan& plan, double thoughtTimeInSeconds) const
+                                     const ThoughtResult& thoughtResult, double thoughtTimeInSeconds) const
 {
     UNUSED_VARIABLE(kumipuyoSeq);
+
+    const Plan& plan = thoughtResult.plan;
 
     if (plan.decisions().empty())
         return string("give up :-(");
@@ -169,7 +176,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     if (cf.feature(STRATEGY_HOUWA) > 0)
         ss << "HOUWA / ";
     if (cf.feature(STRATEGY_ZENKESHI_CONSUME) > 0)
-        ss << "全消消費 / ";
+        ss << "USE_ZENKESHI / ";
 
     if (!cf.bookName().empty())
         ss << cf.bookName() << " / ";
@@ -181,6 +188,9 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
         for (size_t i = 0; i < vs.size(); ++i)
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
+
+    ss << "RSCORE=" << thoughtResult.rensaScore
+       << "VSCORE=" << thoughtResult.virtualRensaScore << " / ";
 
     if (gazer_.isRensaOngoing()) {
         ss << "Gazed ongoing rensa : " << gazer_.ongoingRensaResult().score
