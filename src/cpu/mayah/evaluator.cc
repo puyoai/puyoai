@@ -329,8 +329,11 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
 
     sc_->addScore(STRATEGY_SCORE, plan.score());
 
+    // Take zenkeshi only when the number of puyo is <=16.
     if (plan.field().isZenkeshi()) {
-        sc_->addScore(STRATEGY_ZENKESHI, 1);
+        int puyoCount = plan.decisions().size() * 2 + currentField.countPuyos();
+        if (puyoCount <= 16)
+            sc_->addScore(STRATEGY_ZENKESHI, 1);
         return true;
     }
 
