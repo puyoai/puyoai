@@ -8,11 +8,42 @@
 
 using namespace std;
 
+struct PuyoColorEnv {
+public:
+    PuyoColorEnv()
+    {
+        for (int i = 0; i < 26; ++i) {
+            map_[i] = PuyoColor::WALL;
+        }
+    }
+
+    PuyoColor map(char var) const
+    {
+        DCHECK('A' <= var && var <= 'Z') << var;
+        return map_[var - 'A'];
+    }
+
+    bool isSet(char var) const
+    {
+        DCHECK('A' <= var && var <= 'Z') << var;
+        return map_[var - 'A'] != PuyoColor::WALL;
+    }
+
+    PuyoColor set(char var, PuyoColor pc)
+    {
+        DCHECK('A' <= var && var <= 'Z') << var;
+        return map_[var - 'A'] = pc;
+    }
+
+private:
+    PuyoColor map_[26];
+};
+
 static inline
-bool check(char currentVar, char neighborVar, PuyoColor neighborColor,
-           const map<char, PuyoColor>& env)
+bool check(char currentVar, char neighborVar, PuyoColor neighborColor, const PuyoColorEnv& env)
 {
-    DCHECK(currentVar != '.');
+    DCHECK_NE(currentVar, '.');
+    DCHECK('A' <= currentVar && currentVar <= 'Z') << currentVar;
 
     if (neighborColor == PuyoColor::OJAMA || neighborColor == PuyoColor::WALL)
         return true;
@@ -22,15 +53,13 @@ bool check(char currentVar, char neighborVar, PuyoColor neighborColor,
         return true;
 
     if (neighborVar == '.') {
-        auto it = env.find(currentVar);
-        if (it != env.end() && it->second == neighborColor)
+        if (env.map(currentVar) == neighborColor) {
             return false;
+        }
     } else {
-        auto it = env.find(currentVar);
-        auto jt = env.find(neighborVar);
-
-        if (it != env.end() && jt != env.end() && it->second == jt->second)
+        if (env.map(currentVar) == env.map(neighborVar) && env.isSet(currentVar)) {
             return false;
+        }
     }
 
     return true;
@@ -104,12 +133,16 @@ BookField::MatchResult BookField::match(const PlainField& f) const
     // First, make a map from char to PuyoColor.
     int matchCount = 0;
     double matchScore = 0;
-    map<char, PuyoColor> env;
+
+    PuyoColorEnv env;
+
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; f.get(x, y) != PuyoColor::EMPTY; ++y) {
             char c = field_[x][y];
             if (c == '.')
                 continue;
+
+            DCHECK('A' <= c && c <= 'Z') << c;
 
             PuyoColor pc = f.get(x, y);
             if (pc == PuyoColor::EMPTY)
@@ -121,12 +154,12 @@ BookField::MatchResult BookField::match(const PlainField& f) const
             matchCount += 1;
             matchScore += scoreField_[x][y];
 
-            if (!env.count(c)) {
-                env[c] = pc;
+            if (!env.isSet(c)) {
+                env.set(c, pc);
                 continue;
             }
 
-            if (env[c] != pc)
+            if (env.map(c) != pc)
                 return MatchResult(0, 0);
         }
     }
