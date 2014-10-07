@@ -110,8 +110,13 @@ void AI::runLoop()
             LOG(INFO) << "STATE_WNEXT_APPEARED";
             VLOG(1) << '\n' << field_.toDebugString();
 
+            KumipuyoSeq seq = rememberedSequence(hand_ + 1);
+            CHECK_EQ(kumipuyoSeq.get(1), seq.get(0));
+            CHECK_EQ(kumipuyoSeq.get(2), seq.get(1));
+
             next1.fieldBeforeThink = field_;
-            next1.dropDecision = think(frameRequest.frameId, field_, KumipuyoSeq { kumipuyoSeq.get(1), kumipuyoSeq.get(2) }, additionalThoughtInfo_);
+            next1.dropDecision = think(frameRequest.frameId, field_, seq, additionalThoughtInfo_);
+
             next1.kumipuyo = kumipuyoSeq.get(1);
             next1.ready = true;
         }
@@ -163,8 +168,12 @@ void AI::runLoop()
 
             mergeField(&field_, frameRequest.myPlayerFrameRequest().field);
             const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
-            next1.dropDecision = thinkFast(frameRequest.frameId, field_, KumipuyoSeq { kumipuyoSeq.get(0), kumipuyoSeq.get(1) },
-                                           additionalThoughtInfo_);
+
+            KumipuyoSeq seq = rememberedSequence(hand_);
+            CHECK_EQ(kumipuyoSeq.get(0), seq.get(0));
+            CHECK_EQ(kumipuyoSeq.get(1), seq.get(1));
+
+            next1.dropDecision = thinkFast(frameRequest.frameId, field_, seq, additionalThoughtInfo_);
             next1.kumipuyo = kumipuyoSeq.get(0);
             next1.ready = true;
             next1.needsRethink = false;
@@ -349,4 +358,12 @@ void AI::mergeField(CoreField* f, const PlainField& provided)
         }
         f->recalcHeightOn(x);
     }
+}
+
+KumipuyoSeq AI::rememberedSequence(int indexFrom) const
+{
+    if (seq_.size() < enemySeq_.size())
+        return enemySeq_.subsequence(indexFrom);
+    else
+        return seq_.subsequence(indexFrom);
 }

@@ -34,12 +34,8 @@ public:
     std::vector<Kumipuyo>::iterator end() { return seq_.end(); }
     std::vector<Kumipuyo>::const_iterator end() const { return seq_.cend(); }
 
-    KumipuyoSeq subsequence(int begin, int n) const
-    {
-        KumipuyoSeq seq;
-        seq.seq_.assign(seq_.begin() + begin, seq_.begin() + begin + n);
-        return seq;
-    }
+    KumipuyoSeq subsequence(int begin, int n) const;
+    KumipuyoSeq subsequence(int begin) const;
 
     void setAxis(int n, PuyoColor c) { seq_[n].axis = c; }
     void setChild(int n, PuyoColor c) { seq_[n].child = c; }

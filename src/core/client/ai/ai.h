@@ -65,6 +65,11 @@ protected:
         return think(frameId, field, next, info);
     }
 
+    void setBehaviorDefensive(bool flag) { behaviorDefensive_ = flag; }
+    void setBehaviorRethinkAfterOpponentRensa(bool flag) { behaviorRethinkAfterOpponentRensa_ = flag; }
+
+    const AdditionalThoughtInfo& additionalThoughtInfo() const { return additionalThoughtInfo_; }
+
     // These callbacks will be called from the corresponding method.
     // i.e. onXXXYYY() will be called from XXXYYY().
     virtual void onGameWillBegin(const FrameRequest&) {}
@@ -102,17 +107,14 @@ protected:
     // Should rethink just before sending next decision.
     void requestRethink() { rethinkRequested_ = true; }
 
-    void setBehaviorDefensive(bool flag) { behaviorDefensive_ = flag; }
-    void setBehaviorRethinkAfterOpponentRensa(bool flag) { behaviorRethinkAfterOpponentRensa_ = flag; }
-
-    const AdditionalThoughtInfo& additionalThoughtInfo() const { return additionalThoughtInfo_; }
-
 private:
     friend class Solver;
     friend class AITest;
 
     static bool isFieldInconsistent(const PlainField& ours, const PlainField& provided);
     static void mergeField(CoreField* ours, const PlainField& provided);
+
+    KumipuyoSeq rememberedSequence(int indexFrom) const;
 
     void resetCurrentField(const CoreField&);
 
