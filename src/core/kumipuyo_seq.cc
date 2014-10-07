@@ -50,3 +50,23 @@ string KumipuyoSeq::toString() const
 
     return s;
 }
+
+KumipuyoSeq KumipuyoSeq::subsequence(int begin, int n) const
+{
+    DCHECK(begin <= seq_.size());
+    DCHECK(begin + n <= seq_.size());
+    DCHECK(0 <= n);
+
+    KumipuyoSeq seq;
+    seq.seq_.assign(seq_.begin() + begin, seq_.begin() + begin + n);
+    return seq;
+}
+
+KumipuyoSeq KumipuyoSeq::subsequence(int begin) const
+{
+    DCHECK(begin <= seq_.size());
+
+    KumipuyoSeq seq;
+    seq.seq_.assign(seq_.begin() + begin, seq_.end());
+    return seq;
+}
