@@ -30,124 +30,107 @@ unique_ptr<MayahAI> makeAI()
     return unique_ptr<MayahAI>(ai);
 }
 
-TEST(MayahAIPerformanceTest, seq2_depth2_iter2)
+void runTest(int seqSize, int depth, int iteration, bool fulfilled)
 {
     TsumoPossibility::initialize();
     TimeStampCounterData tsc;
 
     unique_ptr<MayahAI> ai(makeAI());
     int frameId = 1;
+
     CoreField cf;
-    KumipuyoSeq kumipuyoSeq("RRGG");
-    int depth = 2;
-    int numIteration = 2;
+    if (fulfilled) {
+        cf = CoreField(
+            "G   YG"
+            "R   YY"
+            "GRGYRG"
+            "RGYRGG"
+            "GRGYRY"
+            "GRGYRY"
+            "GYRGYR"
+            "RGYRGY"
+            "RGYRGY"
+            "RGYRGY");
+    }
+
+
+    KumipuyoSeq kumipuyoSeq;
+    if (seqSize == 2) {
+        kumipuyoSeq = KumipuyoSeq("RRGG");
+    } else if (seqSize == 3) {
+        kumipuyoSeq = KumipuyoSeq("RRGGYY");
+    } else if (seqSize == 4) {
+        kumipuyoSeq = KumipuyoSeq("RRGGYYBB");
+    } else {
+        CHECK(false) << seqSize;
+    }
 
     for (int i = 0; i < 3; ++i) {
         ScopedTimeStampCounter stsc(&tsc);
-        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, AdditionalThoughtInfo(), depth, numIteration);
+        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, AdditionalThoughtInfo(), depth, iteration);
     }
 
     tsc.showStatistics();
+}
+
+TEST(MayahAIPerformanceTest, seq2_depth2_iter2)
+{
+    runTest(2, 2, 2, false);
+}
+
+TEST(MayahAIPerformanceTest, seq2_depth2_iter2_fulfilled)
+{
+    runTest(2, 2, 2, true);
 }
 
 TEST(MayahAIPerformanceTest, seq2_depth2_iter3)
 {
-    TsumoPossibility::initialize();
-    TimeStampCounterData tsc;
+    runTest(2, 2, 3, false);
+}
 
-    unique_ptr<MayahAI> ai(makeAI());
-    int frameId = 1;
-    CoreField cf;
-    KumipuyoSeq kumipuyoSeq("RRGG");
-    int depth = 2;
-    int numIteration = 3;
-
-    for (int i = 0; i < 3; ++i) {
-        ScopedTimeStampCounter stsc(&tsc);
-        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, AdditionalThoughtInfo(), depth, numIteration);
-    }
-
-    tsc.showStatistics();
+TEST(MayahAIPerformanceTest, seq2_depth2_iter3_fulfilled)
+{
+    runTest(2, 2, 3, true);
 }
 
 TEST(MayahAIPerformanceTest, seq2_depth3_iter1)
 {
-    TsumoPossibility::initialize();
-    TimeStampCounterData tsc;
+    runTest(2, 3, 1, false);
+}
 
-    unique_ptr<MayahAI> ai(makeAI());
-    int frameId = 1;
-    CoreField cf;
-    KumipuyoSeq kumipuyoSeq("RRGG");
-    int depth = 3;
-    int numIteration = 1;
-
-    for (int i = 0; i < 3; ++i) {
-        ScopedTimeStampCounter stsc(&tsc);
-        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, AdditionalThoughtInfo(), depth, numIteration);
-    }
-
-    tsc.showStatistics();
+TEST(MayahAIPerformanceTest, seq2_depth3_iter1_fulfilled)
+{
+    runTest(2, 3, 1, true);
 }
 
 TEST(MayahAIPerformanceTest, seq3_depth3_iter1)
 {
-    TsumoPossibility::initialize();
-    TimeStampCounterData tsc;
+    runTest(3, 3, 1, false);
+}
 
-    unique_ptr<MayahAI> ai(makeAI());
-    int frameId = 1;
-    CoreField cf;
-    KumipuyoSeq kumipuyoSeq("RRGGYY");
-    int depth = 3;
-    int numIteration = 1;
-
-    for (int i = 0; i < 3; ++i) {
-        ScopedTimeStampCounter stsc(&tsc);
-        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, AdditionalThoughtInfo(), depth, numIteration);
-    }
-
-    tsc.showStatistics();
+TEST(MayahAIPerformanceTest, seq3_depth3_iter1_fulfilled)
+{
+    runTest(3, 3, 1, true);
 }
 
 TEST(MayahAIPerformanceTest, seq3_depth3_iter2)
 {
-    TsumoPossibility::initialize();
-    TimeStampCounterData tsc;
+    runTest(3, 3, 2, false);
+}
 
-    unique_ptr<MayahAI> ai(makeAI());
-    int frameId = 1;
-    CoreField cf;
-    KumipuyoSeq kumipuyoSeq("RRGGYY");
-    int depth = 3;
-    int numIteration = 2;
-
-    for (int i = 0; i < 3; ++i) {
-        ScopedTimeStampCounter stsc(&tsc);
-        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, AdditionalThoughtInfo(), depth, numIteration);
-    }
-
-    tsc.showStatistics();
+TEST(MayahAIPerformanceTest, seq3_depth3_iter2_fulfilled)
+{
+    runTest(3, 3, 2, true);
 }
 
 TEST(MayahAIPerformanceTest, seq3_depth3_iter3)
 {
-    TsumoPossibility::initialize();
-    TimeStampCounterData tsc;
+    runTest(3, 3, 3, false);
+}
 
-    unique_ptr<MayahAI> ai(makeAI());
-    int frameId = 1;
-    CoreField cf;
-    KumipuyoSeq kumipuyoSeq("RRGGYY");
-    int depth = 3;
-    int numIteration = 3;
-
-    for (int i = 0; i < 3; ++i) {
-        ScopedTimeStampCounter stsc(&tsc);
-        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, AdditionalThoughtInfo(), depth, numIteration);
-    }
-
-    tsc.showStatistics();
+TEST(MayahAIPerformanceTest, seq3_depth3_iter3_fulfilled)
+{
+    runTest(3, 3, 3, true);
 }
 
 int main(int argc, char* argv[])
