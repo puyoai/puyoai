@@ -64,8 +64,10 @@ void Pattern::ReadBook(std::istream& is) {
     }
   }
 
-  if (pattern)
+  if (pattern) {
+    pattern->Optimize();
     g_pattern.push_back(*pattern);
+  }
 }
 
 const std::vector<Pattern>& Pattern::GetAllPattern() {
@@ -78,7 +80,8 @@ int Pattern::Match(const CoreField& field) const {
 
   std::map<char, std::map<PuyoColor, int> > matching0;
   std::map<char, std::map<PuyoColor, int> > matching1;  // Mirroring
-  for (size_t y = 1; y <= pattern_.size(); ++y) {
+  const int height = pattern_.size();
+  for (int y = 1; y <= height; ++y) {
     for (int x = 1; x <= PlainField::WIDTH; ++x) {
       const char c0 = pattern_[y - 1][x - 1];
       const char c1 = pattern_[y - 1][PlainField::WIDTH - x];
@@ -91,6 +94,26 @@ int Pattern::Match(const CoreField& field) const {
   }
   
   return std::max(GetScore(matching0), GetScore(matching1));
+}
+
+void Pattern::Optimize() {
+  static const int dx[] = {0, 1};
+  static const int dy[] = {1, 0};
+
+  const int height = pattern_.size();
+  for (int y0 = 0; y0 < height; ++y0) {
+    for (int x0 = 0; x0 < PlainField::WIDTH; ++x0) {
+      for (int i = 0; i < 2; ++i) {
+        int x1 = x0 + dx[i], y1 = y0 + dy[i];
+        if (x1 >= PlainField::WIDTH || y1 >= height)
+          continue;
+        char c0 = pattern_[y0][x0];
+        char c1 = pattern_[y1][x1];
+        neighbors_.insert(Neighbor(c0, c1));
+        neighbors_.insert(Neighbor(c1, c0));
+      }
+    }
+  } 
 }
 
 void Pattern::AppendField(std::string line) {
@@ -114,19 +137,25 @@ int Pattern::GetScore(
     sum = matching['_'][EMPTY];
   matching.erase('_');
 
-  std::set<PuyoColor> used;
   for (auto& matching_itr : matching) {
     DCHECK(std::isupper(matching_itr.first));
     auto& char_base = matching_itr.second;
     char_base.erase(EMPTY);
     if (char_base.size() > 1)
       return 0;
-    auto itr = char_base.begin();
-    // Do not allow duplicates.
-    if (!used.insert(itr->first).second)
-      return 0;
-    sum += itr->second;
+    sum += char_base.begin()->second;
   }
+
+  // Neighborhoods cannot be same color.
+  for (const auto& neighbor : neighbors_) {
+    char c0 = neighbor.first;
+    char c1 = neighbor.second;
+    if (matching[c0].empty() || matching[c1].empty())
+      continue;
+    if (matching[c0].begin()->first == matching[c1].begin()->first)
+      return 0;
+  }
+
   return score_ * sum / num_puyos_;
 }
 
