@@ -7,7 +7,6 @@
 #include <string>
 #include <thread>
 
-#include <SDL.h>
 #include <gtest/gtest.h>
 
 #include "core/algorithm/rensa_info.h"

@@ -11,6 +11,12 @@
 #include <set>
 #include <vector>
 
+// This #ifdef avoids compile errors.
+// TODO(peria): Migrate Commentator class to gui/.
+#if defined(USE_SDL2) && USE_SDL2
+#include <SDL.h>
+#endif
+
 #include <glog/logging.h>
 
 #include "base/base.h"
@@ -83,11 +89,17 @@ CommentatorResult Commentator::result() const
 
 bool Commentator::start()
 {
+    // This #ifdef avoids compile errors.
+    // TODO(peria): Migrate Commentator class to gui/.
+#if defined(USE_SDL2) && USE_SDL2
     th_ = thread([this]() {
         this->runLoop();
     });
 
     return true;
+#else
+    return false;
+#endif
 }
 
 void Commentator::stop()
@@ -100,7 +112,11 @@ void Commentator::stop()
 void Commentator::runLoop()
 {
      while (!shouldStop_) {
+       // This #ifdef avoids compile errors.
+       // TODO(peria): Migrate Commentator class to gui/.
+#if defined(USE_SDL2) && USE_SDL2
          SDL_Delay(16);
+#endif
          for (int pi = 0; pi < 2; ++pi) {
              // Since we don't want to lock for long, copy field and kumipuyo.
              CoreField field;
