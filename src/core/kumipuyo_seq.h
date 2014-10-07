@@ -13,6 +13,8 @@ public:
     KumipuyoSeq(const std::vector<Kumipuyo>&);
     KumipuyoSeq(std::initializer_list<Kumipuyo>);
 
+    void clear() { seq_.clear(); }
+
     const Kumipuyo& get(int n) const { return seq_[n]; }
     PuyoColor color(NextPuyoPosition) const;
     PuyoColor axis(int n) const { return seq_[n].axis; }
@@ -24,6 +26,7 @@ public:
 
     const Kumipuyo& front() const { return seq_.front(); }
     void dropFront() { seq_.erase(seq_.begin()); }
+    void add(const Kumipuyo& kp) { seq_.push_back(kp); }
     void append(const KumipuyoSeq& seq) { seq_.insert(seq_.end(), seq.seq_.begin(), seq.seq_.end()); }
 
     std::vector<Kumipuyo>::iterator begin() { return seq_.begin(); }

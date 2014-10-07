@@ -7,9 +7,9 @@
 #include "core/client/connector/client_connector.h"
 #include "core/field/core_field.h"
 #include "core/field/rensa_result.h"
+#include "core/kumipuyo_seq.h"
 
 struct FrameRequest;
-class KumipuyoSeq;
 class PlainField;
 
 // TODO(mayah): This struct will contain zenkeshi info etc.
@@ -71,6 +71,7 @@ protected:
     virtual void onGameHasEnded(const FrameRequest&) {}
     virtual void onDecisionRequested(const FrameRequest&) {}
     virtual void onGrounded(const FrameRequest&) {}
+    virtual void onNext2Appeared(const FrameRequest&) {}
     virtual void onEnemyDecisionRequested(const FrameRequest&) {}
     virtual void onEnemyGrounded(const FrameRequest&) {}
     virtual void onEnemyNext2Appeared(const FrameRequest&) {}
@@ -85,6 +86,7 @@ protected:
 
     void decisionRequested(const FrameRequest&);
     void grounded(const FrameRequest&);
+    void next2Appeared(const FrameRequest&);
 
     // When enemy will start to move puyo, this callback will be called.
     void enemyDecisionRequested(const FrameRequest&);
@@ -117,6 +119,8 @@ private:
     std::string name_;
     ClientConnector connector_;
     CoreField field_;  // estimated my field.
+    KumipuyoSeq seq_;  // remember kumipuyo sequence.
+    KumipuyoSeq enemySeq_;  // remember enemy's kumipuyo sequence.
     AdditionalThoughtInfo additionalThoughtInfo_;
     int hand_;
     int enemyHand_;

@@ -105,6 +105,7 @@ void AI::runLoop()
 
         // STATE_YOU_GROUNDED and STATE_WNEXT_APPEARED might come out-of-order.
         if (frameRequest.myPlayerFrameRequest().state.wnextAppeared) {
+            next2Appeared(frameRequest);
             const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
             LOG(INFO) << "STATE_WNEXT_APPEARED";
             VLOG(1) << '\n' << field_.toDebugString();
@@ -192,6 +193,8 @@ void AI::gameWillBegin(const FrameRequest& frameRequest)
     enemyHand_ = 0;
     rethinkRequested_ = false;
     field_.clear();
+    seq_.clear();
+    enemySeq_.clear();
     additionalThoughtInfo_ = AdditionalThoughtInfo();
 
     onGameWillBegin(frameRequest);
@@ -224,6 +227,23 @@ void AI::grounded(const FrameRequest& frameRequest)
     }
 
     onGrounded(frameRequest);
+}
+
+void AI::next2Appeared(const FrameRequest& frameRequest)
+{
+    const KumipuyoSeq& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
+
+    for (int i = 0; i < 3; ++i) {
+        if (hand_ + i < seq_.size()) {
+            CHECK_EQ(seq_.get(hand_ + i), kumipuyoSeq.get(i))
+                << hand_ << " " << i << " " << seq_.size()
+                << seq_.toString() << " " << kumipuyoSeq.toString();
+        } else {
+            seq_.add(kumipuyoSeq.get(i));
+        }
+    }
+
+    onNext2Appeared(frameRequest);
 }
 
 void AI::enemyDecisionRequested(const FrameRequest& frameRequest)
@@ -260,6 +280,16 @@ void AI::enemyGrounded(const FrameRequest& frameRequest)
 
 void AI::enemyNext2Appeared(const FrameRequest& frameRequest)
 {
+    const KumipuyoSeq& kumipuyoSeq = frameRequest.enemyPlayerFrameRequest().kumipuyoSeq;
+
+    for (int i = 0; i < 3; ++i) {
+        if (enemyHand_ + i < enemySeq_.size()) {
+            CHECK_EQ(enemySeq_.get(enemyHand_ + i), kumipuyoSeq.get(i));
+        } else {
+            enemySeq_.add(kumipuyoSeq.get(i));
+        }
+    }
+
     onEnemyNext2Appeared(frameRequest);
 }
 

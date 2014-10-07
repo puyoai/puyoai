@@ -1,6 +1,7 @@
 #ifndef CORE_KUMIPUYO_H_
 #define CORE_KUMIPUYO_H_
 
+#include <ostream>
 #include <string>
 
 #include "core/puyo_color.h"
@@ -17,6 +18,7 @@ public:
     friend bool operator==(const Kumipuyo& lhs, const Kumipuyo& rhs) { return lhs.axis == rhs.axis && lhs.child == rhs.child; }
     friend bool operator!=(const Kumipuyo& lhs, const Kumipuyo& rhs) { return !(lhs == rhs); }
 
+    friend std::ostream& operator<<(std::ostream& os, const Kumipuyo& kp) { return os << kp.toString(); }
 public:
     PuyoColor axis;
     PuyoColor child;
