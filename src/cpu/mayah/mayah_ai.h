@@ -18,6 +18,7 @@ class DropDecision;
 class KumipuyoSeq;
 
 struct ThoughtResult {
+    ThoughtResult() {}
     ThoughtResult(const Plan& plan, bool isRensaPlan, double rensaScore, double virtualRensaScore) :
        plan(plan), isRensaPlan(isRensaPlan), rensaScore(rensaScore), virtualRensaScore(virtualRensaScore) {}
 
