@@ -8,7 +8,7 @@
 
 using namespace std;
 
-struct PuyoColorEnv {
+class PuyoColorEnv {
 public:
     PuyoColorEnv()
     {
