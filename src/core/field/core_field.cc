@@ -472,6 +472,26 @@ bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
     return false;
 }
 
+bool CoreField::rensaWillOccurWithMinHeights(int minHeights[CoreField::MAP_WIDTH]) const
+{
+    FieldBitField checked;
+    for (int x = 1; x <= WIDTH; ++x) {
+        int h = height(x);
+        for (int y = minHeights[x]; y <= h; ++y) {
+            if (checked.get(x, y))
+                continue;
+
+            if (!isNormalColor(color(x, y)))
+                continue;
+
+            if (countConnectedPuyos(x, y, &checked) >= 4)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 RensaResult CoreField::simulate(int initialChain)
 {
     RensaNonTracker tracker;

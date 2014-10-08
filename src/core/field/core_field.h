@@ -80,6 +80,7 @@ public:
     // simulation
 
     bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;
+    bool rensaWillOccurWithMinHeights(int minHeights[MAP_WIDTH]) const;
 
     // Simulates rensa.
     RensaResult simulate(int initialChain = 1);
