@@ -137,7 +137,7 @@ DropDecision Ai::think(int frame_id,
   int score = 0;
   Decision decision;
   std::string message("Normal");
-  Plan::iterateAvailablePlans(CoreField(field), seq, seq.size(),
+  Plan::iterateAvailablePlans(CoreField(field), seq, 2,
                               std::bind(EvaluateUsual, _1, &score, &decision));
 
   // NOTE: 今は message が違うだけ
