@@ -18,7 +18,7 @@ unique_ptr<MayahAI> makeAI()
 {
     int argc = 1;
     char arg[] = "mayah";
-    char* argv[] = {arg};
+    char* argv[] = {arg, nullptr};
 
     MayahAI* ai = new MayahAI(argc, argv);
 
