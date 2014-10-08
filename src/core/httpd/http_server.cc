@@ -8,7 +8,7 @@
 #include <microhttpd.h>
 
 #include "base/base.h"
-#include "base/path.h"
+#include "base/file.h"
 #include "base/strings.h"
 
 using namespace std;
@@ -76,12 +76,12 @@ int HttpServer::accessHandler(void* cls, struct MHD_Connection* connection,
         return handleHandler(connection, it->second);
 
     // Check assets handlers.
-    string path = joinPath(server->assetDirPath_, url);
+    string path = file::joinPath(server->assetDirPath_, url);
     // Check path has the prefix |server->assetDirPath_| not to allow directory listing attack.
-    if (isPrefix(path, server->assetDirPath_)) {
+    if (strings::isPrefix(path, server->assetDirPath_)) {
         // When directory, we try to access index.html instead.
-        if (isDirectory(path))
-            return assetsHandler(connection, joinPath(path, "index.html"));
+        if (file::isDirectory(path))
+            return assetsHandler(connection, file::joinPath(path, "index.html"));
         return assetsHandler(connection, path);
     }
 

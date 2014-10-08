@@ -1,4 +1,4 @@
-#include "base/path.h"
+#include "base/file.h"
 
 #include <limits.h>
 #include <stdlib.h>
@@ -6,8 +6,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-
 using namespace std;
+
+namespace file {
 
 std::string joinPath(const std::string& lhs, const std::string& rhs)
 {
@@ -29,3 +30,5 @@ bool isDirectory(const std::string& path)
 
     return S_ISDIR(sb.st_mode);
 }
+
+} // namespace file

@@ -3,9 +3,13 @@
 
 #include <string>
 
+namespace file {
+
 // join 2 paths. The result will be cleaned.
 std::string joinPath(const std::string& lhs, const std::string& rhs);
 
 bool isDirectory(const std::string& path);
+
+} // namespace file
 
 #endif

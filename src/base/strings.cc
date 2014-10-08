@@ -2,6 +2,8 @@
 
 using namespace std;
 
+namespace strings {
+
 bool isPrefix(const string& s, const string& prefix)
 {
     if (s.size() < prefix.size())
@@ -19,3 +21,6 @@ string trim(const string& s)
     string::size_type p2 = s.find_last_not_of(" ");
     return s.substr(p1, p2 - p1 + 1);
 }
+
+} // namespace strings
+
