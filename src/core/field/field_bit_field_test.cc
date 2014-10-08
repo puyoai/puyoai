@@ -5,7 +5,7 @@
 
 using namespace std;
 
-TEST(FieldBitFieldTest, Initialize)
+TEST(FieldBitFieldTest, initialize)
 {
     FieldBitField bitField;
 
@@ -16,7 +16,7 @@ TEST(FieldBitFieldTest, Initialize)
     }
 }
 
-TEST(FieldBitFieldTest, GetAndSet)
+TEST(FieldBitFieldTest, getAndSet)
 {
     FieldBitField bitField;
 
