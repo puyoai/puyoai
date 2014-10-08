@@ -18,7 +18,7 @@ Problem Problem::readProblem(const string& filename)
     CHECK_EQ(str, "NAME:");
 
     CHECK(getline(ifs, str));
-    problem.name = trim(str);
+    problem.name = strings::trim(str);
 
     CHECK(ifs >> str);
     CHECK_EQ(str, "FIELD:");

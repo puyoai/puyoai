@@ -10,7 +10,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "base/path.h"
+#include "base/file.h"
 #include "core/httpd/http_server.h"
 #include "core/server/connector/human_connector.h"
 #include "core/server/connector/connector_manager_posix.h"
@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
         httpServer->installHandler("/data", [&](const HttpRequest* req, HttpResponse* res){
             gameStateHandler->handle(req, res);
         });
-        httpServer->setAssetDirectory(joinPath(FLAGS_data_dir, "assets"));
+        httpServer->setAssetDirectory(file::joinPath(FLAGS_data_dir, "assets"));
     }
 #endif
 
