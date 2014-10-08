@@ -30,17 +30,8 @@ unique_ptr<MayahAI> makeAI()
     return unique_ptr<MayahAI>(ai);
 }
 
-void runTest(int seqSize, int depth, int iteration, bool fulfilled)
-{
-    TsumoPossibility::initialize();
-    TimeStampCounterData tsc;
-
-    unique_ptr<MayahAI> ai(makeAI());
-    int frameId = 1;
-
-    CoreField cf;
-    if (fulfilled) {
-        cf = CoreField(
+CoreField fulfilledField() {
+    return CoreField(
             "G   YG"
             "R   YY"
             "GRGYRG"
@@ -51,19 +42,29 @@ void runTest(int seqSize, int depth, int iteration, bool fulfilled)
             "RGYRGY"
             "RGYRGY"
             "RGYRGY");
-    }
+}
 
-
-    KumipuyoSeq kumipuyoSeq;
-    if (seqSize == 2) {
-        kumipuyoSeq = KumipuyoSeq("RRGG");
-    } else if (seqSize == 3) {
-        kumipuyoSeq = KumipuyoSeq("RRGGYY");
-    } else if (seqSize == 4) {
-        kumipuyoSeq = KumipuyoSeq("RRGGYYBB");
-    } else {
-        CHECK(false) << seqSize;
+KumipuyoSeq defaultKumipuyoSeq(int n)
+{
+    switch (n) {
+    case 2:
+        return KumipuyoSeq("RRGG");
+    case 3:
+        return KumipuyoSeq("RRGGYY");
+    case 4:
+        return KumipuyoSeq("RRGGYYBB");
+    default:
+        CHECK(false) << n;
     }
+}
+
+void runTest(int depth, int iteration, const CoreField& cf, const KumipuyoSeq& kumipuyoSeq)
+{
+    TsumoPossibility::initialize();
+    TimeStampCounterData tsc;
+
+    unique_ptr<MayahAI> ai(makeAI());
+    int frameId = 1;
 
     for (int i = 0; i < 3; ++i) {
         ScopedTimeStampCounter stsc(&tsc);
@@ -75,62 +76,79 @@ void runTest(int seqSize, int depth, int iteration, bool fulfilled)
 
 TEST(MayahAIPerformanceTest, seq2_depth2_iter2)
 {
-    runTest(2, 2, 2, false);
+    runTest(2, 2, CoreField(), defaultKumipuyoSeq(2));
 }
 
 TEST(MayahAIPerformanceTest, seq2_depth2_iter2_fulfilled)
 {
-    runTest(2, 2, 2, true);
+    runTest(2, 2, fulfilledField(), defaultKumipuyoSeq(2));
 }
 
 TEST(MayahAIPerformanceTest, seq2_depth2_iter3)
 {
-    runTest(2, 2, 3, false);
+    runTest(2, 3, CoreField(), defaultKumipuyoSeq(2));
 }
 
 TEST(MayahAIPerformanceTest, seq2_depth2_iter3_fulfilled)
 {
-    runTest(2, 2, 3, true);
+    runTest(2, 3, fulfilledField(), defaultKumipuyoSeq(2));
 }
 
 TEST(MayahAIPerformanceTest, seq2_depth3_iter1)
 {
-    runTest(2, 3, 1, false);
+    runTest(3, 1, CoreField(), defaultKumipuyoSeq(2));
 }
 
 TEST(MayahAIPerformanceTest, seq2_depth3_iter1_fulfilled)
 {
-    runTest(2, 3, 1, true);
+    runTest(3, 1, fulfilledField(), defaultKumipuyoSeq(2));
 }
 
 TEST(MayahAIPerformanceTest, seq3_depth3_iter1)
 {
-    runTest(3, 3, 1, false);
+    runTest(3, 1, CoreField(), defaultKumipuyoSeq(3));
 }
 
 TEST(MayahAIPerformanceTest, seq3_depth3_iter1_fulfilled)
 {
-    runTest(3, 3, 1, true);
+    runTest(3, 1, fulfilledField(), defaultKumipuyoSeq(3));
 }
 
 TEST(MayahAIPerformanceTest, seq3_depth3_iter2)
 {
-    runTest(3, 3, 2, false);
+    runTest(3, 2, CoreField(), defaultKumipuyoSeq(3));
 }
 
 TEST(MayahAIPerformanceTest, seq3_depth3_iter2_fulfilled)
 {
-    runTest(3, 3, 2, true);
+    runTest(3, 2, fulfilledField(), defaultKumipuyoSeq(3));
 }
 
 TEST(MayahAIPerformanceTest, seq3_depth3_iter3)
 {
-    runTest(3, 3, 3, false);
+    runTest(3, 3, CoreField(), defaultKumipuyoSeq(3));
 }
 
 TEST(MayahAIPerformanceTest, seq3_depth3_iter3_fulfilled)
 {
-    runTest(3, 3, 3, true);
+    runTest(3, 3, fulfilledField(), defaultKumipuyoSeq(3));
+}
+
+TEST(MayahAIPerformanceTest, from_real)
+{
+    CoreField f(
+        "    RB"
+        " B GGG"
+        "GG YBR"
+        "YG YGR"
+        "GBYBGR"
+        "BBYYBG"
+        "GYBGRG"
+        "GGYGGR"
+        "YYBBBR");
+    KumipuyoSeq seq("RBRGRYYG");
+
+    runTest(3, 2, f, seq);
 }
 
 int main(int argc, char* argv[])
