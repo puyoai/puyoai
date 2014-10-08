@@ -157,7 +157,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat)
     EXPECT_TRUE(found);
 }
 
-TEST(RensaDetectorTest, iteratePossibleRensasIteratively)
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1)
 {
     CoreField f(
         "B     "
@@ -165,20 +165,20 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively)
         "RGG   "
         "RBB   ");
 
-    CoreField expected1(
+    CoreField expected(
+        "BG    "
+        "BG    "
+        "RGG   "
+        "RBB   ");
+
+    CoreField unexpected(
         "BR    "
         "BR    "
         "RGGG  "
         "RBBG  ");
 
-    CoreField expected2(
-        "BRG   "
-        "BRG   "
-        "RGG   "
-        "RBB   ");
-
-    bool foundExpected1 = false;
-    bool foundExpected2 = false;
+    bool foundExpected = false;
+    bool foundUnexpected = false;
 
     auto callback = [&](const CoreField&, const RensaResult&,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
@@ -189,16 +189,74 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively)
         for (const auto& cp : firePuyos)
             g.dropPuyoOn(cp.x, cp.color);
 
-        if (g == expected1)
+        if (g == expected)
+            foundExpected = true;
+        else if (g == unexpected)
+            foundUnexpected = true;
+    };
+
+    RensaDetector::iteratePossibleRensasIteratively(f, 1, callback);
+
+    EXPECT_TRUE(foundExpected);
+    EXPECT_FALSE(foundUnexpected);
+
+}
+
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2)
+{
+    CoreField f(
+        "B     "
+        "B     "
+        "RGGY  "
+        "RBBG  ");
+
+    CoreField expected1(
+        "BRG   "
+        "BRG   "
+        "RGGY  "
+        "RBBG  ");
+
+    CoreField expected2(
+        "B     "
+        "B  GY "
+        "RGGYY "
+        "RBBGY ");
+
+    CoreField unexpected(
+        "BR    "
+        "BR GY "
+        "RGGYY "
+        "RBBGY ");
+
+    bool foundExpected1 = false;
+    bool foundExpected2 = false;
+    bool foundUnexpected = false;
+
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&, const RensaRefSequence&) {
+        CoreField g(f);
+        for (const auto& cp : keyPuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+        for (const auto& cp : firePuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+
+        if (g == expected1) {
+            // Don't iterate the same one twice.
+            EXPECT_FALSE(foundExpected1);
             foundExpected1 = true;
-        else if (g == expected2)
+        } else if (g == expected2) {
+            EXPECT_FALSE(foundExpected2);
             foundExpected2 = true;
+        } else if (g == unexpected)
+            foundUnexpected = true;
     };
 
     RensaDetector::iteratePossibleRensasIteratively(f, 2, callback);
 
     EXPECT_TRUE(foundExpected1);
     EXPECT_TRUE(foundExpected2);
+    EXPECT_FALSE(foundUnexpected);
 }
 
 TEST(RensaDetectorTest, iteratePossibleRensasIteratively2)
