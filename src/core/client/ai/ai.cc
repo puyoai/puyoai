@@ -230,6 +230,7 @@ void AI::decisionRequested(const FrameRequest& frameRequest)
 void AI::grounded(const FrameRequest& frameRequest)
 {
     CoreField field(frameRequest.myPlayerFrameRequest().field);
+    field.forceDrop();
     RensaResult rensaResult = field.simulate();
     if (rensaResult.chains > 0) {
         additionalThoughtInfo_.setHasZenkeshi(false);
