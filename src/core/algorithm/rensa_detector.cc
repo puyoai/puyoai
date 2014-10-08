@@ -267,11 +267,9 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
                     int minHeights[CoreField::MAP_WIDTH] {
                         100, initialField.height(1) + 1, initialField.height(2) + 1, initialField.height(3) + 1,
                         initialField.height(4) + 1, initialField.height(5) + 1, initialField.height(6) + 1, 100 };
-                    RensaResult tempRensaResult = f.simulateWithMinHeights(minHeights);
-                    if (tempRensaResult.chains > 0) {
-                        // Rensa should not start when we add key puyos.
+                    // Rensa should not start when we add key puyos.
+                    if (f.rensaWillOccurWithMinHeights(minHeights))
                         return;
-                    }
                 }
 
                 // Since key puyo does not fire a rensa, we can safely include the key puyos in minHeights.

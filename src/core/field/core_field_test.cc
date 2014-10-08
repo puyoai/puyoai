@@ -384,3 +384,33 @@ TEST(CoreFieldTest, isChigiriDecision2)
     EXPECT_FALSE(cf.isChigiriDecision(Decision(3, 2)));
     EXPECT_TRUE(cf.isChigiriDecision(Decision(3, 3)));
 }
+
+TEST(CoreFieldTest, rensaWillOccurWithMinHeights)
+{
+    CoreField cf1(
+        "YYYY  ");
+    CoreField cf2(
+        " YYY  ");
+    CoreField cf3(
+        " GGG  "
+        "YYYY  ");
+    CoreField cf4(
+        " GGG  "
+        "YYYYY ");
+    CoreField cf5(
+        "OOOO  ");
+
+    int minHeights1[FieldConstant::MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
+    int minHeights2[FieldConstant::MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
+    int minHeights3[FieldConstant::MAP_WIDTH] = { 100, 2, 2, 2, 2, 1, 1, 100 };
+    int minHeights4[FieldConstant::MAP_WIDTH] = { 100, 2, 2, 2, 2, 1, 1, 100 };
+    int minHeights5[FieldConstant::MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
+
+    EXPECT_TRUE(cf1.rensaWillOccurWithMinHeights(minHeights1));
+    EXPECT_FALSE(cf2.rensaWillOccurWithMinHeights(minHeights2));
+    // 4Y is connected, but it won't be checked.
+    EXPECT_FALSE(cf3.rensaWillOccurWithMinHeights(minHeights3));
+    // 5Y is connected, and (5, 1) Y is checked, so it should be detected.
+    EXPECT_TRUE(cf4.rensaWillOccurWithMinHeights(minHeights4));
+    EXPECT_FALSE(cf5.rensaWillOccurWithMinHeights(minHeights5));
+}
