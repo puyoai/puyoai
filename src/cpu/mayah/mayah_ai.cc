@@ -50,8 +50,19 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
 {
     CoreField f(plainField);
     double beginTime = currentTime();
+#if 1
     ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
                                             MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+#else
+    ThoughtResult thoughtResult;
+    if (kumipuyoSeq.size() >= 3) {
+        thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 3, 2);
+    } else if (f.countPuyos() <= 54) {
+        thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 2, 3);
+    } else {
+        thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 2, 2);
+    }
+#endif
     double endTime = currentTime();
     std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_NUM_ITERATION,
                                           thoughtResult, endTime - beginTime);
