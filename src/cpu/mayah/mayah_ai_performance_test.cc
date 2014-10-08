@@ -134,7 +134,24 @@ TEST(MayahAIPerformanceTest, seq3_depth3_iter3_fulfilled)
     runTest(3, 3, fulfilledField(), defaultKumipuyoSeq(3));
 }
 
-TEST(MayahAIPerformanceTest, from_real)
+TEST(MayahAIPerformanceTest, seq4_depth3_iter1_real)
+{
+    CoreField f(
+        "    RB"
+        " B GGG"
+        "GG YBR"
+        "YG YGR"
+        "GBYBGR"
+        "BBYYBG"
+        "GYBGRG"
+        "GGYGGR"
+        "YYBBBR");
+    KumipuyoSeq seq("RBRGRYYG");
+
+    runTest(3, 1, f, seq);
+}
+
+TEST(MayahAIPerformanceTest, seq4_depth3_iter2_real)
 {
     CoreField f(
         "    RB"
