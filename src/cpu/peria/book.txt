@@ -9,14 +9,6 @@ THRESH: 4    # この個数以上合わないと評価しない
 ...BAA       # 大文字が評価対象ぷよ.
 ...CBB       # '.' や小文字は任意. '_'は強制空白.
 
-NAME: GTR-2
-SCORE: 1300
-MAX: 15
-THRESH: 4
-....BA
-...BAA
-...ABB
-
 NAME: Begin1
 SCORE: 1000
 MAX: 4
@@ -33,7 +25,7 @@ ABB...
 
 NAME: Begin3
 SCORE: 1500
-MAX: 6
+MAX: 8
 THREASH: 6
 CAA...
 CBB...
@@ -47,7 +39,7 @@ CB....
 
 NAME: GTR-Head
 SCORE: 1700
-MAX: 17
+MAX: 20
 .....A
 ....DD
 ....BA
@@ -56,21 +48,19 @@ MAX: 17
 
 NAME: Shin-GTR
 SCORE: 1000
-MAX: 10
+MAX: 20
 ..B...
 AAAB..
 BBB...
 
 NAME: GTR-Tail
 SCORE: 1000
-MAX: 19
+MAX: 22
 .CC...
 CBCA..
 AAA...
 BBBA..
 
-
 NAME: Zenkeshi
-SCORE: 99999
-MAX: 1
+SCORE: 4000
 ______
