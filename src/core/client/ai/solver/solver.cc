@@ -1,4 +1,4 @@
-#include "core/problem/solver.h"
+#include "core/client/ai/solver/solver.h"
 
 #include <iostream>
 
