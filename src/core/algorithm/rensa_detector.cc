@@ -1,5 +1,6 @@
 #include "rensa_detector.h"
 
+#include <algorithm>
 #include <iostream>
 #include <set>
 #include <vector>
@@ -308,9 +309,29 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
                 RensaRef rensaRef { originalField, fieldAfterSimulation, currentKeyPuyos, currentFirePuyos, rensaResult, trackResult };
                 rensaSequence->push(&rensaRef);
 
+                // Don't put key puyo on the column which fire puyo will be placed.
+                bool newProhibits[FieldConstant::MAP_WIDTH];
+                {
+                    std::fill(newProhibits, newProhibits + FieldConstant::MAP_WIDTH, true);
+
+                    for (int x = 1; x <= 6; ++x) {
+                        for (int y = 1; originalField.get(x, y) != PuyoColor::EMPTY && y <= 12; ++y) {
+                            if (combinedTrackResult.erasedAt(x, y) == combinedRensaResult.chains) {
+                                newProhibits[x - 1] = false;
+                                newProhibits[x] = false;
+                                newProhibits[x + 1] = false;
+                                ++x; // x will advance by 2 in total.
+                                break;
+                            }
+                        }
+                    }
+                    for (const auto& cp : firstRensaFirePuyos)
+                        newProhibits[cp.x] = true;
+                }
+
                 callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult, *rensaSequence);
                 iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, initialField, restIterations - 1,
-                                                         combinedKeyPuyos, firstRensaFirePuyos, prohibits,
+                                                         combinedKeyPuyos, firstRensaFirePuyos, newProhibits,
                                                          rensaSequence, callback, mode);
 
                 rensaSequence->pop();
@@ -334,6 +355,8 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
 void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalField, int maxIteration,
                                                      IterativePossibleRensaCallback callback, Mode mode)
 {
+    DCHECK_LE(1, maxIteration);
+
     RensaRefSequence rensaSequence;
 
     auto findRensaCallback = [&](CoreField* f, const ColumnPuyoList& firePuyos) {
@@ -346,19 +369,22 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
             callback(fieldAfterSimulation, rensaResult, keyPuyos, firePuyos, trackResult, rensaSequence);
 
             // Don't put key puyo on the column which fire puyo will be placed.
-            bool prohibits[FieldConstant::MAP_WIDTH] {};
-            for (const auto& cp : firePuyos)
-                prohibits[cp.x] = true;
-#if 0
-            // It should has no meaning to place key puyo on the column where puyo is not vanished.
-            for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-                if (originalField.height(x - 1) == fieldAfterSimulation.height(x - 1) &&
-                    originalField.height(x) == fieldAfterSimulation.height(x) &&
-                    originalField.height(x + 1) == fieldAfterSimulation.height(x + 1)) {
-                    prohibits[x] = true;
+            bool prohibits[FieldConstant::MAP_WIDTH];
+            std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, true);
+
+            for (int x = 1; x <= 6; ++x) {
+                for (int y = 1; originalField.get(x, y) != PuyoColor::EMPTY && y <= 12; ++y) {
+                    if (trackResult.erasedAt(x, y) == rensaResult.chains) {
+                        prohibits[x - 1] = false;
+                        prohibits[x] = false;
+                        prohibits[x + 1] = false;
+                        ++x; // x will advance by 2 in total.
+                        break;
+                    }
                 }
             }
-#endif
+            for (const auto& cp : firePuyos)
+                prohibits[cp.x] = true;
 
             iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, originalField, maxIteration - 1,
                                                      ColumnPuyoList(), firePuyos, prohibits, &rensaSequence, callback, mode);
