@@ -108,8 +108,9 @@ protected:
     void requestRethink() { rethinkRequested_ = true; }
 
 private:
-    friend class Solver;
     friend class AITest;
+    friend class Endless;
+    friend class Solver;
 
     static bool isFieldInconsistent(const PlainField& ours, const PlainField& provided);
     static void mergeField(CoreField* ours, const PlainField& provided);

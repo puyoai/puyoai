@@ -21,6 +21,8 @@ function(mayah_add_test exe)
 endfunction()
 
 mayah_add_executable(mayah_cpu main.cc)
+
+mayah_add_executable(endless endless.cc)
 mayah_add_executable(interactive interactive.cc)
 mayah_add_executable(learn learn.cc)
 mayah_add_executable(solver solver.cc)
