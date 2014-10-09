@@ -6,7 +6,7 @@
 #include <glog/logging.h>
 
 #include "core/algorithm/puyo_possibility.h"
-#include "core/problem/solver.h"
+#include "core/client/ai/solver/solver.h"
 
 using namespace std;
 
