@@ -372,11 +372,6 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         return true;
     }
 
-    if (currentField.countPuyos() >= 55) {
-        sc_->addScore(STRATEGY_HOUWA, 1);
-        return false;
-    }
-
     sc_->addScore(STRATEGY_SAKIUCHI, 1.0);
     return false;
 }

@@ -192,8 +192,6 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
         ss << "SAISOKU / ";
     else if (cf.feature(STRATEGY_SAKIUCHI) > 0)
         ss << "SAKIUCHI / ";
-    if (cf.feature(STRATEGY_HOUWA) > 0)
-        ss << "HOUWA / ";
     if (cf.feature(STRATEGY_ZENKESHI_CONSUME) > 0)
         ss << "USE_ZENKESHI / ";
 
