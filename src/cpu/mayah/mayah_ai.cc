@@ -51,23 +51,29 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
 {
     CoreField f(plainField);
     double beginTime = currentTime();
-    ThoughtResult thoughtResult;
+
+    int depth;
+    int iteration;
     if (FLAGS_use_advanced_next) {
         if (kumipuyoSeq.size() >= 3) {
-            thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 3, 2);
+            depth = 3;
+            iteration = 2;
         } else if (f.countPuyos() <= 54) {
-            thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 2, 3);
+            depth = 2;
+            iteration = 3;
         } else {
-            thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 2, 2);
+            depth = 2;
+            iteration = 2;
         }
     } else {
-        thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
-                                  MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+        depth = MayahAI::DEFAULT_DEPTH;
+        iteration = MayahAI::DEFAULT_NUM_ITERATION;
     }
 
+    ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, depth, iteration);
+
     double endTime = currentTime();
-    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_NUM_ITERATION,
-                                          thoughtResult, endTime - beginTime);
+    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, iteration, thoughtResult, endTime - beginTime);
 
     const Plan& plan = thoughtResult.plan;
     if (plan.decisions().empty())
