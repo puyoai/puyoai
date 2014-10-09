@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "core/frame_request.h"
+#include "core/field_pretty_printer.h"
 
 using namespace std;
 
@@ -43,19 +44,23 @@ int Endless::run(const KumipuyoSeq& seq)
             // couldn't drop. break.
             break;
         }
+
+        if (verbose_) {
+            FieldPrettyPrinter::print(f, req.playerFrameRequest[0].kumipuyoSeq.subsequence(1));
+        }
+
         RensaResult rensaResult = f.simulate();
         maxRensaScore = std::max(maxRensaScore, rensaResult.score);
         if (f.color(3, 12) != PuyoColor::EMPTY) {
-            // dead.
-            return -1;
+            maxRensaScore = -1;
+            break;
         }
         if (rensaResult.score > 10000) {
-            // Maybe the main rensa has been fired.
-            return rensaResult.score;
+            // The main rensa must be fired.
+            break;
         }
         req.playerFrameRequest[0].field = f;
         req.playerFrameRequest[0].kumipuyoSeq.dropFront();
-
         req.playerFrameRequest[1].kumipuyoSeq.dropFront();
 
         ai_->grounded(req);
