@@ -25,25 +25,32 @@ namespace {
 int PatternMatch(const RefPlan& plan, std::string* name) {
   int sum = 0;
   int best = 0;
+
+  const CoreField& field = plan.field();
+  std::ostringstream oss;
   for (const Pattern& pattern : Pattern::GetAllPattern()) {
-    int score = pattern.Match(plan.field());
+    int score = pattern.Match(field);
     sum += score;
     if (score > best) {
-      std::ostringstream oss;
       best = score;
-      oss << pattern.name() << " " << score << "/" << pattern.score();
-      *name = oss.str();
+      oss << " " << pattern.name() << " " << score << "/" << pattern.score();
     }
   }
+  *name = oss.str();
+
+  // Debug list
+  // LOG(INFO) << *name;
+  // LOG(INFO) << "Sum: " << sum;
+  // LOG(INFO) << "Num: " << field.countPuyos();
+  // LOG(INFO) << "\n" << field.toDebugString();
+
   return sum;
 }
 
 typedef std::map<Decision, std::vector<int> > CandidateMap;
 
 void EvaluateFuture(const RefPlan& plan, int* best_score) {
-  int score = 0;
-  if (plan.isRensaPlan())
-    score = plan.rensaResult().score;
+  int score = plan.rensaResult().score;
   if (score > *best_score)
     *best_score = score;
 }
@@ -61,9 +68,9 @@ void EvaluateUsual(const RefPlan& plan,
       score = result.score;
     }
   } else {
-    KumipuyoSeq seq;
-    Plan::iterateAvailablePlans(plan.field(), seq, 1,
-                                std::bind(EvaluateFuture, std::placeholders::_1, &score));
+    Plan::iterateAvailablePlans(
+        plan.field(), KumipuyoSeq(), 1,
+        std::bind(EvaluateFuture, std::placeholders::_1, &score));
     score /= 2;
   }
 
@@ -130,7 +137,7 @@ DropDecision Ai::think(int frame_id,
                                 std::bind(EvaluatePatterns, _1,
                                           &score, &name,
                                           &frames, &temp_decision));
-    if (!name.empty())
+    if (score > 200 && !name.empty())
       return DropDecision(temp_decision, "Template: " + name);
   }
 

@@ -88,10 +88,12 @@ int Pattern::Match(const CoreField& field) const {
       const char c0 = pattern_[y - 1][x - 1];
       const char c1 = pattern_[y - 1][PlainField::WIDTH - x];
       PuyoColor color = field.get(x, y);
-      if (c0 != '.' && color != OJAMA)
-        ++matching0[c0][color];
-      if (c1 != '.' && color != OJAMA)
-      ++matching1[c1][color];
+      if (color != OJAMA) {
+        if (c0 != '.')
+          ++matching0[c0][color];
+        if (c1 != '.')
+          ++matching1[c1][color];
+      }
     }
   }
   
@@ -117,6 +119,14 @@ void Pattern::Optimize() {
     }
   } 
 
+  num_puyos_ = 0;
+  for (const auto& line : pattern_) {
+    for (char c : line) {
+      if (c != '.')
+        ++num_puyos_;
+    }
+  }
+
   // Debug output
   LOG(INFO) << "name: " << name_;
   LOG(INFO) << "score: " << score_;
@@ -132,8 +142,6 @@ void Pattern::AppendField(std::string line) {
   for (auto& c : line) {
     if (std::islower(c))
       c = '.';
-    else  // std::isupper(c) || c == '_'
-      ++num_puyos_;
   }
   pattern_.push_front(line);
 }
@@ -148,11 +156,12 @@ int Pattern::GetScore(
 
   for (auto& matching_itr : matching) {
     DCHECK(std::isupper(matching_itr.first));
-    auto& char_base = matching_itr.second;
-    char_base.erase(EMPTY);
-    if (char_base.size() > 1)
+    auto& color_map = matching_itr.second;
+    color_map.erase(EMPTY);
+    if (color_map.size() > 1)
       return 0;
-    sum += char_base.begin()->second;
+    if (!color_map.empty())
+      sum += color_map.begin()->second;
   }
 
   // Neighborhoods cannot be same color.
@@ -164,6 +173,8 @@ int Pattern::GetScore(
     if (matching[c0].begin()->first == matching[c1].begin()->first)
       return 0;
   }
+
+  // TODO: 指定してないセルが指定セルと同じ色を持ってないか確認
 
   return score_ * sum / num_puyos_;
 }
