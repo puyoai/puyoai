@@ -29,10 +29,10 @@ class Pattern {
   std::string name_;
   std::deque<std::string> pattern_;
   std::set<Neighbor> neighbors_;
-  int score_;
+  int score_ = 0;
 
   // Maxium number of Puyos to apply the pattern.
-  int max_puyos_;
+  int max_puyos_ = -1;
 
   // The number of Puyos to check in the pattern.
   int num_puyos_ = 0;

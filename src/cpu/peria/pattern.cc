@@ -49,8 +49,10 @@ void Pattern::ReadBook(std::istream& is) {
     }
 
     if (first_segment == "NAME:") {
-      if (pattern)
+      if (pattern && !pattern->name_.empty()) {
+        pattern->Optimize();
         g_pattern.push_back(*pattern);
+      }
       pattern.reset(new Pattern);
       iss >> pattern->name_;
     } else if (first_segment == "SCORE:") {
@@ -64,7 +66,7 @@ void Pattern::ReadBook(std::istream& is) {
     }
   }
 
-  if (pattern) {
+  if (pattern && !pattern->name_.empty()) {
     pattern->Optimize();
     g_pattern.push_back(*pattern);
   }
@@ -75,7 +77,7 @@ const std::vector<Pattern>& Pattern::GetAllPattern() {
 }
 
 int Pattern::Match(const CoreField& field) const {
-  if (field.countPuyos() > max_puyos_)
+  if (max_puyos_ > 0 && field.countPuyos() > max_puyos_)
     return 0;
 
   std::map<char, std::map<PuyoColor, int> > matching0;
@@ -114,6 +116,14 @@ void Pattern::Optimize() {
       }
     }
   } 
+
+  // Debug output
+  LOG(INFO) << "name: " << name_;
+  LOG(INFO) << "score: " << score_;
+  LOG(INFO) << "max: " << max_puyos_;
+  LOG(INFO) << "num: " << num_puyos_;
+  for (auto& line : pattern_)
+    LOG(INFO) << line;
 }
 
 void Pattern::AppendField(std::string line) {
@@ -126,7 +136,6 @@ void Pattern::AppendField(std::string line) {
       ++num_puyos_;
   }
   pattern_.push_front(line);
-  LOG(INFO) << line;
 }
 
 int Pattern::GetScore(
