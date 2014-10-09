@@ -20,6 +20,7 @@ int main(int argc, char* argv[])
     TsumoPossibility::initialize();
 
     Endless endless(std::unique_ptr<AI>(new MayahAI(argc, argv)));
+    endless.setVerbose(true);
 
     KumipuyoSeq seq = generateSequence();
     cout << endless.run(seq) << endl;
