@@ -19,6 +19,7 @@
 DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.txt", "the path to feature parameter");
 DEFINE_string(book, SRC_DIR "/cpu/mayah/book.txt", "the path to book");
 DEFINE_bool(log_max_score, false, "log max score to stderr");
+DEFINE_bool(use_advanced_next, false, "Use enemy's NEXT sequence also");
 
 using namespace std;
 
@@ -50,19 +51,20 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
 {
     CoreField f(plainField);
     double beginTime = currentTime();
-#if 1
-    ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
-                                            MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
-#else
     ThoughtResult thoughtResult;
-    if (kumipuyoSeq.size() >= 3) {
-        thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 3, 2);
-    } else if (f.countPuyos() <= 54) {
-        thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 2, 3);
+    if (FLAGS_use_advanced_next) {
+        if (kumipuyoSeq.size() >= 3) {
+            thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 3, 2);
+        } else if (f.countPuyos() <= 54) {
+            thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 2, 3);
+        } else {
+            thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 2, 2);
+        }
     } else {
-        thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, 2, 2);
+        thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
+                                  MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
     }
-#endif
+
     double endTime = currentTime();
     std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::DEFAULT_NUM_ITERATION,
                                           thoughtResult, endTime - beginTime);

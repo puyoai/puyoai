@@ -79,6 +79,7 @@ void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books, co
         BookField::MatchResult mr = bf.match(plan.field());
         double ratio = mr.count / totalPuyoCount;
         DCHECK(0 <= ratio && ratio <= 1.0) << ratio;
+        // TODO(mayah): Make this configurable?
         if (ratio < 0.5)
             continue;
         ratio = (ratio - 0.5) * 2;

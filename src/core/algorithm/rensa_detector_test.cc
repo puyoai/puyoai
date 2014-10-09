@@ -222,6 +222,14 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2)
         "RGGYY "
         "RBBGY ");
 
+    CoreField expected3(
+        "R     "
+        "R     "
+        "BB    "
+        "BB    "
+        "RGGY  "
+        "RBBG  ");
+
     CoreField unexpected(
         "BR    "
         "BR GY "
@@ -230,6 +238,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2)
 
     bool foundExpected1 = false;
     bool foundExpected2 = false;
+    bool foundExpected3 = false;
     bool foundUnexpected = false;
 
     auto callback = [&](const CoreField&, const RensaResult&,
@@ -248,6 +257,9 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2)
         } else if (g == expected2) {
             EXPECT_FALSE(foundExpected2);
             foundExpected2 = true;
+        } else if (g == expected3) {
+            EXPECT_FALSE(foundExpected3);
+            foundExpected3 = true;
         } else if (g == unexpected)
             foundUnexpected = true;
     };
@@ -256,6 +268,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2)
 
     EXPECT_TRUE(foundExpected1);
     EXPECT_TRUE(foundExpected2);
+    EXPECT_TRUE(foundExpected3);
     EXPECT_FALSE(foundUnexpected);
 }
 
