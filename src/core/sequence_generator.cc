@@ -4,6 +4,8 @@
 #include <random>
 #include <vector>
 
+#include <gflags/gflags.h>
+
 DEFINE_string(seq, "", "default initial sequence");
 
 using namespace std;
