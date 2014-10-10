@@ -1,17 +1,19 @@
 #include "mayah_ai.h"
 
 #include <gtest/gtest.h>
+
 #include "core/algorithm/puyo_possibility.h"
+#include "core/frame_request.h"
 #include "core/kumipuyo_seq.h"
 
 using namespace std;
 
-unique_ptr<MayahAI> makeAI()
+unique_ptr<DebuggableMayahAI> makeAI()
 {
     int argc = 1;
     char arg[] = "mayah";
     char* argv[] = {arg};
-    return unique_ptr<MayahAI>(new MayahAI(argc, argv));
+    return unique_ptr<DebuggableMayahAI>(new DebuggableMayahAI(argc, argv));
 }
 
 TEST(MayahAITest, DontCrash1)
@@ -35,8 +37,10 @@ TEST(MayahAITest, DontCrash1)
     KumipuyoSeq seq("GGRG");
 
     auto ai = makeAI();
-    ai->initializeGazerForTest(1);
-    (void)ai->think(1, f, seq, AdditionalThoughtInfo());
+    FrameRequest req;
+    req.frameId = 1;
+    ai->gameWillBegin(req);
+    (void)ai->think(100, f, seq, AdditionalThoughtInfo());
 }
 
 TEST(MayahAITest, DontCrash2)
@@ -61,8 +65,10 @@ TEST(MayahAITest, DontCrash2)
     KumipuyoSeq seq("YYRG");
 
     auto ai = makeAI();
-    ai->initializeGazerForTest(1);
-    (void)ai->think(1, f, seq, AdditionalThoughtInfo());
+    FrameRequest req;
+    req.frameId = 1;
+    ai->gameWillBegin(req);
+    (void)ai->think(100, f, seq, AdditionalThoughtInfo());
 }
 
 TEST(MayahAITest, DontCrash3)
@@ -87,6 +93,8 @@ TEST(MayahAITest, DontCrash3)
     KumipuyoSeq seq("RYRR");
 
     auto ai = makeAI();
-    ai->initializeGazerForTest(1);
-    (void)ai->think(1, f, seq, AdditionalThoughtInfo());
+    FrameRequest req;
+    req.frameId = 1;
+    ai->gameWillBegin(req);
+    (void)ai->think(100, f, seq, AdditionalThoughtInfo());
 }
