@@ -4,23 +4,43 @@
 #include <random>
 #include <vector>
 
+DEFINE_string(seq, "", "default initial sequence");
+
 using namespace std;
 
 KumipuyoSeq generateSequence()
 {
+    KumipuyoSeq generated = generateRandomSequence();
+    if (FLAGS_seq != "") {
+        for (size_t i = 0; i < FLAGS_seq.size(); ++i) {
+            PuyoColor c = toPuyoColor(FLAGS_seq[i]);
+            CHECK(isNormalColor(c));
+            if (i % 2 == 0)
+                generated.setAxis(i / 2, c);
+            else
+                generated.setChild(i / 2, c);
+        }
+    }
+
+    return generated;
+}
+
+
+KumipuyoSeq generateRandomSequence()
+{
     random_device rd;
     mt19937 mt(rd());
 
-    return generateSequenceWithMt19937(mt);
+    return generateRandomSequenceWithMt19937(mt);
 }
 
-KumipuyoSeq generateSequenceWithSeed(int seed)
+KumipuyoSeq generateRandomSequenceWithSeed(int seed)
 {
     mt19937 mt(seed);
-    return generateSequenceWithMt19937(mt);
+    return generateRandomSequenceWithMt19937(mt);
 }
 
-KumipuyoSeq generateSequenceWithMt19937(mt19937 mt)
+KumipuyoSeq generateRandomSequenceWithMt19937(mt19937 mt)
 {
     // AC puyo2 algorithm
     // make 64 x 4 sequece -> shuffle
