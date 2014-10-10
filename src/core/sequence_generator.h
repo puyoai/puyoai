@@ -6,7 +6,9 @@
 #include "core/kumipuyo_seq.h"
 
 KumipuyoSeq generateSequence();
-KumipuyoSeq generateSequenceWithSeed(int seed);
-KumipuyoSeq generateSequenceWithMt19937(std::mt19937);
+
+KumipuyoSeq generateRandomSequence();
+KumipuyoSeq generateRandomSequenceWithSeed(int seed);
+KumipuyoSeq generateRandomSequenceWithMt19937(std::mt19937);
 
 #endif

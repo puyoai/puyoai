@@ -23,7 +23,10 @@ int main(int argc, char* argv[])
     endless.setVerbose(true);
 
     KumipuyoSeq seq = generateSequence();
-    cout << endless.run(seq) << endl;
+    int score = endless.run(seq);
+
+    cout << score << endl;
+    cout << seq.toString() << endl;
 
     return 0;
 }

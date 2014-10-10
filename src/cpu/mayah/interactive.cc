@@ -21,7 +21,6 @@
 #include "evaluator.h"
 #include "mayah_ai.h"
 
-DEFINE_string(seq, "", "initial puyo sequence");
 DEFINE_string(problem, "", "use problem");
 
 using namespace std;
@@ -79,20 +78,7 @@ public:
 
 Problem makeProblem()
 {
-    KumipuyoSeq generated;
-    {
-        generated = generateSequence();
-        if (FLAGS_seq != "") {
-            for (size_t i = 0; i < FLAGS_seq.size(); ++i) {
-                PuyoColor c = toPuyoColor(FLAGS_seq[i]);
-                CHECK(isNormalColor(c));
-                if (i % 2 == 0)
-                    generated.setAxis(i / 2, c);
-                else
-                    generated.setChild(i / 2, c);
-            }
-        }
-    }
+    KumipuyoSeq generated = generateSequence();
 
     Problem problem;
     if (!FLAGS_problem.empty()) {

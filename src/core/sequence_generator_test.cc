@@ -9,7 +9,7 @@ using namespace std;
 
 TEST(SequenceGeneratorTest, checkRestriction)
 {
-    KumipuyoSeq seq = generateSequence();
+    KumipuyoSeq seq = generateRandomSequence();
 
     EXPECT_EQ(128, seq.size());
 
@@ -34,9 +34,9 @@ TEST(SequenceGeneratorTest, checkRestriction)
 
 TEST(SequenceGeneratorTest, withSeed)
 {
-    KumipuyoSeq seq0a = generateSequenceWithSeed(0);
-    KumipuyoSeq seq0b = generateSequenceWithSeed(0);
-    KumipuyoSeq seq1 = generateSequenceWithSeed(1);
+    KumipuyoSeq seq0a = generateRandomSequenceWithSeed(0);
+    KumipuyoSeq seq0b = generateRandomSequenceWithSeed(0);
+    KumipuyoSeq seq1 = generateRandomSequenceWithSeed(1);
 
     EXPECT_EQ(seq0a, seq0b);
     EXPECT_NE(seq0a, seq1);
