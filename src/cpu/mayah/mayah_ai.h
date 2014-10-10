@@ -35,7 +35,7 @@ public:
     static const int FAST_NUM_ITERATION = 1;
 
     MayahAI(int argc, char* argv[]);
-    ~MayahAI();
+    virtual ~MayahAI();
 
     virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&,
                                const AdditionalThoughtInfo&) override;
