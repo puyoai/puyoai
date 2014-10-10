@@ -11,6 +11,8 @@
 
 using namespace std;
 
+DEFINE_bool(show_field, false, "show field after each hand");
+
 int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
@@ -20,13 +22,13 @@ int main(int argc, char* argv[])
     TsumoPossibility::initialize();
 
     Endless endless(std::unique_ptr<AI>(new MayahAI(argc, argv)));
-    endless.setVerbose(true);
+    endless.setVerbose(FLAGS_show_field);
 
     KumipuyoSeq seq = generateSequence();
     int score = endless.run(seq);
 
-    cout << score << endl;
-    cout << seq.toString() << endl;
+    cout << "score=" << score << endl;
+    cout << "seq=" << seq.toString() << endl;
 
     return 0;
 }
