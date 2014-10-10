@@ -51,8 +51,6 @@ public:
     ThoughtResult thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, const AdditionalThoughtInfo&,
                             int depth, int maxIteration);
 
-    void initializeGazerForTest(int frameId) { gazer_.initialize(frameId); }
-
 protected:
     EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration) const;
     CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration) const;
@@ -72,6 +70,23 @@ protected:
     Gazer gazer_;
     int thoughtMaxRensa_ = 0;
     int thoughtMaxScore_ = 0;
+};
+
+class DebuggableMayahAI : public MayahAI {
+public:
+    DebuggableMayahAI(int argc, char* argv[]) : MayahAI(argc, argv) {}
+    virtual ~DebuggableMayahAI() {}
+
+    using MayahAI::additionalThoughtInfo;
+    using MayahAI::think;
+    using MayahAI::reloadParameter;
+    using MayahAI::makeMessageFrom;
+
+    using MayahAI::gameWillBegin;
+    using MayahAI::gameHasEnded;
+    using MayahAI::enemyNext2Appeared;
+    using MayahAI::enemyDecisionRequested;
+    using MayahAI::enemyGrounded;
 };
 
 #endif

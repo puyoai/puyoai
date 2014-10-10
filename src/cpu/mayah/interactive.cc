@@ -25,20 +25,9 @@ DEFINE_string(problem, "", "use problem");
 
 using namespace std;
 
-class InteractiveAI : public MayahAI {
+class InteractiveAI : public DebuggableMayahAI {
 public:
-    InteractiveAI(int argc, char* argv[]) : MayahAI(argc, argv) {}
-
-    using MayahAI::additionalThoughtInfo;
-    using MayahAI::think;
-    using MayahAI::reloadParameter;
-    using MayahAI::makeMessageFrom;
-
-    using MayahAI::gameWillBegin;
-    using MayahAI::gameHasEnded;
-    using MayahAI::enemyNext2Appeared;
-    using MayahAI::enemyDecisionRequested;
-    using MayahAI::enemyGrounded;
+    InteractiveAI(int argc, char* argv[]) : DebuggableMayahAI(argc, argv) {}
 
     CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, int numKeyPuyos, const Plan& plan) const
     {
