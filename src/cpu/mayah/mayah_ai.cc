@@ -30,10 +30,14 @@ MayahAI::MayahAI(int argc, char* argv[]) :
 
     featureParameter_.reset(new FeatureParameter(FLAGS_feature));
     books_ = BookReader::parse(FLAGS_book);
-    LOG(INFO) << featureParameter_->toString();
-    for (const auto& bf : books_) {
+
+    VLOG(1) << featureParameter_->toString();
+    if (VLOG_IS_ON(1)) {
+      for (const auto& bf : books_) {
         VLOG(1) << bf.toDebugString();
+      }
     }
+
     google::FlushLogFiles(google::INFO);
 }
 
@@ -232,6 +236,7 @@ void MayahAI::onGameWillBegin(const FrameRequest& frameRequest)
     thoughtMaxRensa_ = 0;
     thoughtMaxScore_ = 0;
     enemyField_.clear();
+    enemyDecisonRequestFrameId_ = frameRequest.frameId;
     gazer_.initialize(frameRequest.frameId);
 }
 
