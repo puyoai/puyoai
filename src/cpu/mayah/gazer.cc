@@ -162,12 +162,10 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
 
 int Gazer::estimateMaxScore(int frameId) const
 {
-    if (frameId < frameIdGazedAt_) {
-        CHECK(false) << "Gazer is requested to check the past frame estimated score."
-                     << " frameId=" << frameId
-                     << " frameIdGazedAt=" << frameIdGazedAt_;
-        return -1;
-    }
+    CHECK_LE(frameIdGazedAt_, frameId)
+        << "Gazer is requested to check the past frame estimated score."
+        << " frameId=" << frameId
+        << " frameIdGazedAt=" << frameIdGazedAt_;
 
     if (isRensaOngoing() && frameId <= ongoingRensaFinishingFrameId()) {
         return ongoingRensaResult().score;

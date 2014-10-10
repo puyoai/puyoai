@@ -42,8 +42,8 @@ int main(int argc, char* argv[])
 
     bool half = false;
     bool usesNextPuyoPosition = false;
-    NextPuyoPosition npp;
-    int x, y;
+    NextPuyoPosition npp = NextPuyoPosition::NEXT1_AXIS;
+    int x = 1, y = 1;
     SomagicAnalyzer::AllowOjama allowOjama = SomagicAnalyzer::AllowOjama::ALLOW_OJAMA;
     if (argv[3] == string("NEXT1-AXIS")) {
         usesNextPuyoPosition = true;

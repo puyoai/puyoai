@@ -61,8 +61,8 @@ private:
     const std::vector<EstimatedRensaInfo>& possibleRensaInfos() const { return possibleRensaInfos_; }
     const std::vector<EstimatedRensaInfo>& feasibleRensaInfos() const { return feasibleRensaInfos_; }
 
-    int frameIdGazedAt_;
-    int restEmptyField_;
+    int frameIdGazedAt_ = -1;
+    int restEmptyField_ = -1;
 
     AdditionalThoughtInfo additionalThoughtInfo_;
 
