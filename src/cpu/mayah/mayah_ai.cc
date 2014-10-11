@@ -198,6 +198,8 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
         ss << "SAKIUCHI / ";
     if (cf.feature(STRATEGY_ZENKESHI_CONSUME) > 0)
         ss << "USE_ZENKESHI / ";
+    if (cf.feature(STRATEGY_LAND_LEVELING) > 0)
+        ss << "LEVELING / ";
 
     if (!cf.bookName().empty())
         ss << cf.bookName() << " / ";
