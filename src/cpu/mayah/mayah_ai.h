@@ -19,13 +19,14 @@ class KumipuyoSeq;
 
 struct ThoughtResult {
     ThoughtResult() {}
-    ThoughtResult(const Plan& plan, bool isRensaPlan, double rensaScore, double virtualRensaScore) :
-       plan(plan), isRensaPlan(isRensaPlan), rensaScore(rensaScore), virtualRensaScore(virtualRensaScore) {}
+    ThoughtResult(const Plan& plan, bool isRensaPlan, double rensaScore, double virtualRensaScore, const std::string& message) :
+        plan(plan), isRensaPlan(isRensaPlan), rensaScore(rensaScore), virtualRensaScore(virtualRensaScore), message(message) {}
 
     Plan plan;
     bool isRensaPlan;
     double rensaScore;
     double virtualRensaScore;
+    std::string message;
 };
 
 class MayahAI : public AI {
@@ -52,11 +53,13 @@ public:
                             int depth, int maxIteration);
 
 protected:
-    EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration) const;
-    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration) const;
+    PreEvalResult preEval(const CoreField& currentField);
+    EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration, const PreEvalResult&) const;
+    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+                                               const PreEvalResult&) const;
 
-    std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration,
-                                const ThoughtResult&, double thoughtTimeInSeconds) const;
+    std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration, const PreEvalResult&,
+                                const Plan& plan, double rensaScore, double virutalRensaScore, double thoughtTimeInSeconds) const;
 
     // For debugging purpose.
     void reloadParameter();

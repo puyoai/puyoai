@@ -121,10 +121,13 @@ void learnWithInteractive()
         map<pair<Decision, Decision>, CollectedFeature> collectedFeatures;
         double currentScore = -1000000;
         pair<Decision, Decision> currentDecision;
+
+        PreEvalResult preEvalResult = PreEvaluator(books).preEval(field);
+
         Plan::iterateAvailablePlans(field, seq, 2, [&](const RefPlan& plan) {
             FeatureScoreCollector sc(parameter);
             Evaluator<FeatureScoreCollector> evaluator(books, &sc);
-            evaluator.collectScore(plan, field, 1, false, gazer);
+            evaluator.collectScore(plan, field, 1, false, preEvalResult, gazer);
 
             CollectedFeature f = sc.toCollectedFeature();
             pair<Decision, Decision> pd;
@@ -262,10 +265,12 @@ void learnFromPuyofu()
             cout << inputs[i].field.toDebugString() << endl
                  << inputs[i].seq.toString() << endl;
 
+            PreEvalResult preEvalResult = PreEvaluator(books).preEval(inputs[i].field);
+
             Plan::iterateAvailablePlans(inputs[i].field, inputs[i].seq, MayahAI::DEFAULT_DEPTH, [&](const RefPlan& plan) {
                 FeatureScoreCollector sc(parameter);
                 Evaluator<FeatureScoreCollector> evaluator(books, &sc);
-                evaluator.collectScore(plan, inputs[i].field, frameId, MayahAI::DEFAULT_NUM_ITERATION, gazer);
+                evaluator.collectScore(plan, inputs[i].field, frameId, MayahAI::DEFAULT_NUM_ITERATION, preEvalResult, gazer);
 
                 CollectedFeature f = sc.toCollectedFeature();
 

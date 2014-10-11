@@ -31,11 +31,13 @@ public:
 
     CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, int numKeyPuyos, const Plan& plan) const
     {
+        PreEvalResult preEvalResult = PreEvaluator(books_).preEval(field);
+
         FeatureScoreCollector sc(*featureParameter_);
         Evaluator<FeatureScoreCollector> evaluator(books_, &sc);
 
         RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.framesToInitiate(), plan.lastDropFrames());
-        evaluator.collectScore(refPlan, field, frameId, numKeyPuyos, gazer_);
+        evaluator.collectScore(refPlan, field, frameId, numKeyPuyos, preEvalResult, gazer_);
 
         return sc.toCollectedFeature();
     }
@@ -163,13 +165,6 @@ int main(int argc, char* argv[])
                 break;
             if (str == "reload") {
                 ai.reloadParameter();
-                continue;
-            }
-            if (str == "s") {
-                CollectedFeature cf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
-                cout << cf.toString() << endl;
-                cout << ai.makeMessageFrom(frameId, field, seq.subsequence(0, 2), MayahAI::DEFAULT_NUM_ITERATION,
-                                           thoughtResult, (t2 - t1) * 1000);
                 continue;
             }
             if (str == "book") {
