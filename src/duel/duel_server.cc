@@ -24,7 +24,6 @@ using namespace std;
 DEFINE_int32(num_duel, -1, "After num_duel times of duel, the server will stop. negative is infinity.");
 DEFINE_int32(num_win, -1, "After num_win times of 1p or 2p win, the server will stop. negative is infinity");
 DEFINE_bool(use_even, true, "the match gets even after 2 minutes.");
-DEFINE_int32(seed, -1, "sets the random seed. When negative, seed will be chosen at random.");
 
 #ifdef USE_SDL2
 DECLARE_bool(use_gui);
@@ -193,12 +192,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
     for (auto observer : observers_)
         observer->newGameWillStart();
 
-    KumipuyoSeq kumipuyoSeq;
-    if (FLAGS_seed >= 0) {
-        kumipuyoSeq = generateRandomSequenceWithSeed(FLAGS_seed);
-    } else {
-        kumipuyoSeq = generateSequence();
-    }
+    KumipuyoSeq kumipuyoSeq = generateSequence();
 
     LOG(INFO) << "Puyo sequence=" << kumipuyoSeq.toString();
 
