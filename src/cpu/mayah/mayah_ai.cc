@@ -217,6 +217,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     if (!cf.bookName().empty())
         ss << cf.bookName() << " / ";
 
+    ss << "D/I = " << plan.decisions().size() << "/" << maxIteration << " / ";
     ss << "SCORE = " << cf.score() << " / ";
 
     if (!cf.feature(MAX_CHAINS).empty()) {
