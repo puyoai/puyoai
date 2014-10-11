@@ -96,8 +96,26 @@ void EvaluatePatterns(const RefPlan& plan,
     *best_score = score;
     *best_name = name;
     *frames = plan.rensaResult().frames;
-    *decision = plan.decisions().front();
+    *decision = plan.decision(0);
   }
+}
+
+void EvaluateCounter(const RefPlan& plan,
+                     int threshold,  // Threshold of score.
+                     int frame,
+                     int* score,
+                     Decision* decision) {
+  if (!plan.isRensaPlan())
+    return;
+  if (plan.framesToInitiate() < frame)
+    return;
+  if (plan.score() < threshold)
+    return;
+  if (*score > 0 && *score <= plan.score())
+    return;
+
+  *score = plan.score();
+  *decision = plan.decision(0);
 }
 
 }  // namespace
@@ -124,9 +142,8 @@ DropDecision Ai::think(int frame_id,
   UNUSED_VARIABLE(info);
   using namespace std::placeholders;
 
-  if (attack_ && attack_->end_frame_id < frame_id)
-    attack_.reset();
-
+  // TODO: Merge all Plan::iterateAvailablePlans() to reduce computing cost.
+  
   // Check templates first with visible puyos.
   {
     int score = 0;
@@ -141,24 +158,36 @@ DropDecision Ai::think(int frame_id,
       return DropDecision(temp_decision, "Template: " + name);
   }
 
-  int score = 0;
-  Decision decision;
-  std::string message("Normal");
-  Plan::iterateAvailablePlans(CoreField(field), seq, 2,
-                              std::bind(EvaluateUsual, _1, &score, &decision));
-
-  // NOTE: 今は message が違うだけ
   // 3 個以上おじゃまが来てたらカウンターしてみる
   if (attack_ && attack_->score >= SCORE_FOR_OJAMA * 3) {
     // TODO: Adjust |kAcceptablePuyo|.
-    // TODO: 受けられるかチェックする。
     const int kAcceptablePuyo = 3;
     int threshold = attack_->score - SCORE_FOR_OJAMA * kAcceptablePuyo;
+
+    int score = 0;
+    Decision decision;
+    Plan::iterateAvailablePlans(
+        CoreField(field), seq, 2,
+        std::bind(EvaluateCounter, _1,
+                  threshold,
+                  attack_->end_frame_id - frame_id,
+                  &score, &decision));
     if (threshold < score)
       return DropDecision(decision, "Counter");
   }
 
-  return DropDecision(decision, message);
+  // Default search
+  {
+    int score = 0;
+    Decision decision;
+    Plan::iterateAvailablePlans(
+        CoreField(field), seq, 2,
+        std::bind(EvaluateUsual, _1, &score, &decision));
+
+    return DropDecision(decision, "Normal");
+  }
+
+  // DO NOT REACH HERE
 }
 
 void Ai::onGameWillBegin(const FrameRequest& /*frame_request*/) {
