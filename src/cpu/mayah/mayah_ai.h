@@ -54,11 +54,12 @@ public:
 
 protected:
     PreEvalResult preEval(const CoreField& currentField);
-    EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration, const PreEvalResult&) const;
+    EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+                    const PreEvalResult&, const GazeResult&) const;
     CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
-                                               const PreEvalResult&) const;
+                                               const PreEvalResult&, const GazeResult&) const;
 
-    std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration, const PreEvalResult&,
+    std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration, const PreEvalResult&, const GazeResult&,
                                 const Plan& plan, double rensaScore, double virutalRensaScore, double thoughtTimeInSeconds) const;
 
     // For debugging purpose.

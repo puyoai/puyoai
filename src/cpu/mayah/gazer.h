@@ -17,16 +17,50 @@ struct EstimatedRensaInfo {
     {
     }
 
-    std::string toString() const
-    {
-        char buf[80];
-        sprintf(buf, "frames, chains, score = %d, %d, %d", framesToInitiate, chains, score);
-        return buf;
-    }
+    std::string toString() const;
 
     int chains;
     int score;
     int framesToInitiate;
+};
+
+class GazeResult {
+public:
+    GazeResult(int frameIdGazedAt, int restEmptyField,
+               const AdditionalThoughtInfo& info,
+               const std::vector<EstimatedRensaInfo>& feasible,
+               const std::vector<EstimatedRensaInfo>& possible) :
+        frameIdGazedAt_(frameIdGazedAt),
+        restEmptyField_(restEmptyField),
+        additionalThoughtInfo_(info),
+        feasibleRensaInfos_(feasible),
+        possibleRensaInfos_(possible)
+    {
+    }
+
+    int frameIdGazedAt() const { return frameIdGazedAt_; }
+    const AdditionalThoughtInfo& additionalThoughtInfo() const { return additionalThoughtInfo_; }
+
+    bool isRensaOngoing() const { return additionalThoughtInfo_.isRensaOngoing(); }
+    const RensaResult& ongoingRensaResult() const { return additionalThoughtInfo_.ongoingRensaResult(); }
+    int ongoingRensaFinishingFrameId() const { return additionalThoughtInfo_.ongoingRensaFinishingFrameId(); }
+
+    // Returns the (expecting) possible max score by this frame.
+    int estimateMaxScore(int frameId) const;
+
+    std::string toRensaInfoString() const;
+
+private:
+    int estimateMaxScoreFromFeasibleRensas(int frameId) const;
+    int estimateMaxScoreFromPossibleRensas(int frameId) const;
+    int estimateMaxScoreFrom(int frameId, const std::vector<EstimatedRensaInfo>& rensaInfos) const;
+
+    int frameIdGazedAt_;
+    int restEmptyField_;
+
+    AdditionalThoughtInfo additionalThoughtInfo_;
+    std::vector<EstimatedRensaInfo> feasibleRensaInfos_;
+    std::vector<EstimatedRensaInfo> possibleRensaInfos_;
 };
 
 class Gazer : noncopyable {
@@ -39,22 +73,11 @@ public:
     void setAdditionalThoughtInfo(const AdditionalThoughtInfo& info) { additionalThoughtInfo_ = info; }
     const AdditionalThoughtInfo& additionalThoughtInfo() const { return additionalThoughtInfo_; }
 
-    bool isRensaOngoing() const { return additionalThoughtInfo_.isRensaOngoing(); }
-    const RensaResult& ongoingRensaResult() const { return additionalThoughtInfo_.ongoingRensaResult(); }
-    int ongoingRensaFinishingFrameId() const { return additionalThoughtInfo_.ongoingRensaFinishingFrameId(); }
-
     void gaze(int frameId, const CoreField&, const KumipuyoSeq&);
 
-    // Returns the (expecting) possible max score by this frame.
-    int estimateMaxScore(int frameId) const;
-
-    std::string toRensaInfoString() const;
+    GazeResult gazeResult() const;
 
 private:
-    int estimateMaxScoreFromFeasibleRensas(int frameId) const;
-    int estimateMaxScoreFromPossibleRensas(int frameId) const;
-    int estimateMaxScoreFrom(int frameId, const std::vector<EstimatedRensaInfo>& rensaInfos) const;
-
     void updateFeasibleRensas(const CoreField&, const KumipuyoSeq&);
     void updatePossibleRensas(const CoreField&, const KumipuyoSeq&);
 

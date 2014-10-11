@@ -53,6 +53,110 @@ struct SortByInitiatingFrames {
     }
 };
 
+std::string EstimatedRensaInfo::toString() const
+{
+    char buf[80];
+    sprintf(buf, "frames, chains, score = %d, %d, %d", framesToInitiate, chains, score);
+    return buf;
+}
+
+int GazeResult::estimateMaxScore(int frameId) const
+{
+    CHECK_LE(frameIdGazedAt_, frameId)
+        << "Gazer is requested to check the past frame estimated score."
+        << " frameId=" << frameId
+        << " frameIdGazedAt=" << frameIdGazedAt_;
+
+    if (isRensaOngoing() && frameId <= ongoingRensaFinishingFrameId()) {
+        return ongoingRensaResult().score;
+    }
+
+    int scoreByFeasibleRensas = estimateMaxScoreFromFeasibleRensas(frameId);
+    if (scoreByFeasibleRensas >= 0)
+        return scoreByFeasibleRensas;
+
+    int scoreByPossibleRensas = estimateMaxScoreFromPossibleRensas(frameId);
+    if (scoreByPossibleRensas >= 0)
+        return scoreByPossibleRensas;
+
+    // We cannot estimate the score using feasible rensas and possible rensas.
+
+    int maxScore = -1;
+    for (auto it = possibleRensaInfos_.begin(); it != possibleRensaInfos_.end(); ++it) {
+        int restFrames = frameId - (it->framesToInitiate + frameIdGazedAt());
+        int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT));
+        // At max, enemy will be able ot puyo restEmptyField. We have counted the puyos for possibleRensaInfos,
+        // we substract 6 from restEmptyField_.
+        numPossiblePuyos = max(0, min(restEmptyField_ - 6, numPossiblePuyos));
+        int newAdditionalChains = min(numPossiblePuyos / 4, 19);
+
+        // TODO(mayah): newChains should not be negative. restFrames is negative?
+        if (newAdditionalChains < 0)
+            newAdditionalChains = 0;
+
+        int newTotalChains = std::max(std::min(it->chains + newAdditionalChains, 19), 0);
+        double ratio = static_cast<double>(ACCUMULATED_RENSA_SCORE[newTotalChains]) / ACCUMULATED_RENSA_SCORE[it->chains];
+
+        int score = it->score * ratio - ACCUMULATED_RENSA_SCORE[newAdditionalChains];
+        maxScore = std::max(maxScore, score);
+    }
+
+    if (maxScore >= 0)
+        return maxScore;
+
+    // When there is not possible rensa.
+    int restFrames = frameId - frameIdGazedAt();
+    int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING));
+    numPossiblePuyos = max(0, min(restEmptyField_ - 6, numPossiblePuyos));
+    int newChains = min((numPossiblePuyos / 4), 19);
+    // TODO(mayah): newChains should not be negative. restFrames is negative?
+    if (newChains < 0)
+        newChains = 0;
+    return ACCUMULATED_RENSA_SCORE[newChains];
+}
+
+int GazeResult::estimateMaxScoreFromFeasibleRensas(int frameId) const
+{
+    return estimateMaxScoreFrom(frameId, feasibleRensaInfos_);
+}
+
+int GazeResult::estimateMaxScoreFromPossibleRensas(int frameId) const
+{
+    return estimateMaxScoreFrom(frameId, possibleRensaInfos_);
+}
+
+int GazeResult::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInfo>& rensaInfos) const
+{
+    if (rensaInfos.empty())
+        return -1;
+
+    if (rensaInfos.back().framesToInitiate + frameIdGazedAt() < frameId)
+        return -1;
+
+    for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
+        if (frameId <= it->framesToInitiate + frameIdGazedAt())
+            return it->score;
+    }
+
+    return -1;
+}
+
+string GazeResult::toRensaInfoString() const
+{
+    stringstream ss;
+    ss << "gazed at frameId: " << frameIdGazedAt_ << endl;
+    ss << "Possible rensa infos: " << endl;
+    for (const auto& info : possibleRensaInfos_)
+        ss << info.toString() << endl;
+    ss << "Feasible rensa infos: " << endl;
+    for (const auto& info : feasibleRensaInfos_)
+        ss << info.toString() << endl;
+
+    return ss.str();
+}
+
+// ----------------------------------------------------------------------
+
 void Gazer::initialize(int frameIdGameWillBegin)
 {
     frameIdGazedAt_ = frameIdGameWillBegin;
@@ -160,97 +264,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     }
 }
 
-int Gazer::estimateMaxScore(int frameId) const
+GazeResult Gazer::gazeResult() const
 {
-    CHECK_LE(frameIdGazedAt_, frameId)
-        << "Gazer is requested to check the past frame estimated score."
-        << " frameId=" << frameId
-        << " frameIdGazedAt=" << frameIdGazedAt_;
-
-    if (isRensaOngoing() && frameId <= ongoingRensaFinishingFrameId()) {
-        return ongoingRensaResult().score;
-    }
-
-    int scoreByFeasibleRensas = estimateMaxScoreFromFeasibleRensas(frameId);
-    if (scoreByFeasibleRensas >= 0)
-        return scoreByFeasibleRensas;
-
-    int scoreByPossibleRensas = estimateMaxScoreFromPossibleRensas(frameId);
-    if (scoreByPossibleRensas >= 0)
-        return scoreByPossibleRensas;
-
-    // We cannot estimate the score using feasible rensas and possible rensas.
-
-    int maxScore = -1;
-    for (auto it = possibleRensaInfos().begin(); it != possibleRensaInfos().end(); ++it) {
-        int restFrames = frameId - (it->framesToInitiate + frameIdGazedAt());
-        int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT));
-        // At max, enemy will be able ot puyo restEmptyField. We have counted the puyos for possibleRensaInfos,
-        // we substract 6 from restEmptyField_.
-        numPossiblePuyos = max(0, min(restEmptyField_ - 6, numPossiblePuyos));
-        int newAdditionalChains = min(numPossiblePuyos / 4, 19);
-
-        // TODO(mayah): newChains should not be negative. restFrames is negative?
-        if (newAdditionalChains < 0)
-            newAdditionalChains = 0;
-
-        int newTotalChains = std::max(std::min(it->chains + newAdditionalChains, 19), 0);
-        double ratio = static_cast<double>(ACCUMULATED_RENSA_SCORE[newTotalChains]) / ACCUMULATED_RENSA_SCORE[it->chains];
-
-        int score = it->score * ratio - ACCUMULATED_RENSA_SCORE[newAdditionalChains];
-        maxScore = std::max(maxScore, score);
-    }
-
-    if (maxScore >= 0)
-        return maxScore;
-
-    // When there is not possible rensa.
-    int restFrames = frameId - frameIdGazedAt();
-    int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING));
-    numPossiblePuyos = max(0, min(restEmptyField_ - 6, numPossiblePuyos));
-    int newChains = min((numPossiblePuyos / 4), 19);
-    // TODO(mayah): newChains should not be negative. restFrames is negative?
-    if (newChains < 0)
-        newChains = 0;
-    return ACCUMULATED_RENSA_SCORE[newChains];
-}
-
-int Gazer::estimateMaxScoreFromFeasibleRensas(int frameId) const
-{
-    return estimateMaxScoreFrom(frameId, feasibleRensaInfos_);
-}
-
-int Gazer::estimateMaxScoreFromPossibleRensas(int frameId) const
-{
-    return estimateMaxScoreFrom(frameId, possibleRensaInfos_);
-}
-
-int Gazer::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInfo>& rensaInfos) const
-{
-    if (rensaInfos.empty())
-        return -1;
-
-    if (rensaInfos.back().framesToInitiate + frameIdGazedAt() < frameId)
-        return -1;
-
-    for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (frameId <= it->framesToInitiate + frameIdGazedAt())
-            return it->score;
-    }
-
-    return -1;
-}
-
-string Gazer::toRensaInfoString() const
-{
-    stringstream ss;
-    ss << "gazed at frameId: " << frameIdGazedAt_ << endl;
-    ss << "Possible rensa infos: " << endl;
-    for (const auto& info : possibleRensaInfos())
-        ss << info.toString() << endl;
-    ss << "Feasible rensa infos: " << endl;
-    for (const auto& info : feasibleRensaInfos())
-        ss << info.toString() << endl;
-
-    return ss.str();
+    return GazeResult(frameIdGazedAt_, restEmptyField_, additionalThoughtInfo_, feasibleRensaInfos_, possibleRensaInfos_);
 }
