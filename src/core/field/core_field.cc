@@ -332,7 +332,7 @@ int CoreField::vanish(int nthChain, int minHeights[], Tracker* tracker)
     for (int x = 1; x <= WIDTH; ++x) {
         int maxHeight = height(x);
         for (int y = minHeights[x]; y <= maxHeight; ++y) {
-            DCHECK(color(x, y) != PuyoColor::EMPTY)
+            DCHECK_NE(color(x, y), PuyoColor::EMPTY)
                 << x << ' ' << y << ' ' << toChar(color(x, y)) << '\n'
                 << toDebugString();
 
