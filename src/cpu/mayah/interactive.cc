@@ -37,7 +37,7 @@ public:
         Evaluator<FeatureScoreCollector> evaluator(books_, &sc);
 
         RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.framesToInitiate(), plan.lastDropFrames());
-        evaluator.collectScore(refPlan, field, frameId, numKeyPuyos, preEvalResult, gazer_);
+        evaluator.collectScore(refPlan, field, frameId, numKeyPuyos, preEvalResult, gazer_.gazeResult());
 
         return sc.toCollectedFeature();
     }

@@ -10,7 +10,7 @@
 
 class ColumnPuyoList;
 class CoreField;
-class Gazer;
+class GazeResult;
 class RefPlan;
 struct RensaResult;
 class RensaTrackResult;
@@ -64,7 +64,7 @@ public:
     void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaTrackResult&, bool enemyHasZenkeshi);
     void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                           int currentFrameId, const Gazer&);
+                           int currentFrameId, const GazeResult&);
 
 private:
     const std::vector<BookField>& books_;
@@ -80,12 +80,12 @@ public:
         sc_(sc) {}
 
     void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
-                      const PreEvalResult&, const Gazer&);
+                      const PreEvalResult&, const GazeResult&);
 
     // ----------------------------------------------------------------------
 
     bool evalStrategy(const RefPlan& plan, const CoreField& currentField,
-                      int currentFrameId, const Gazer& gazer);
+                      int currentFrameId, const GazeResult&);
 
     void evalBook(const std::vector<BookField>&, const std::vector<bool>& bookMatchable, const RefPlan&);
     void evalFrameFeature(const RefPlan&);

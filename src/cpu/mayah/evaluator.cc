@@ -330,14 +330,14 @@ void Evaluator<ScoreCollector>::evalUnreachableSpace(const RefPlan& plan)
 // Returns true If we don't need to evaluate other features.
 template<typename ScoreCollector>
 bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreField& currentField,
-                                             int currentFrameId, const Gazer& gazer)
+                                             int currentFrameId, const GazeResult& gazeResult)
 {
     if (!plan.isRensaPlan())
         return false;
 
-    if (gazer.isRensaOngoing() && gazer.ongoingRensaResult().score > scoreForOjama(6)) {
-        if ((plan.score() >= gazer.ongoingRensaResult().score) &&
-            (currentFrameId + plan.framesToInitiate() < gazer.ongoingRensaFinishingFrameId())) {
+    if (gazeResult.isRensaOngoing() && gazeResult.ongoingRensaResult().score > scoreForOjama(6)) {
+        if ((plan.score() >= gazeResult.ongoingRensaResult().score) &&
+            (currentFrameId + plan.framesToInitiate() < gazeResult.ongoingRensaFinishingFrameId())) {
             LOG(INFO) << plan.decisionText() << " TAIOU";
             sc_->addScore(STRATEGY_TAIOU, 1.0);
             return false;
@@ -354,19 +354,19 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         return true;
     }
 
-    if (gazer.additionalThoughtInfo().hasZenkeshi() && !gazer.additionalThoughtInfo().enemyHasZenkeshi()) {
-        if (!gazer.isRensaOngoing()) {
+    if (gazeResult.additionalThoughtInfo().hasZenkeshi() && !gazeResult.additionalThoughtInfo().enemyHasZenkeshi()) {
+        if (!gazeResult.isRensaOngoing()) {
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
-        if (gazer.isRensaOngoing() && gazer.ongoingRensaResult().score <= scoreForOjama(36)) {
+        if (gazeResult.isRensaOngoing() && gazeResult.ongoingRensaResult().score <= scoreForOjama(36)) {
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
     }
 
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
-    int estimatedMaxScore = gazer.estimateMaxScore(rensaEndingFrameId);
+    int estimatedMaxScore = gazeResult.estimateMaxScore(rensaEndingFrameId);
 
     // --- If the rensa is large enough, fire it.
     if (plan.score() >= estimatedMaxScore + scoreForOjama(60)) {
@@ -398,13 +398,13 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan, const RensaResult& rensaResult,
                                                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                                                       int currentFrameId, const Gazer& gazer)
+                                                       int currentFrameId, const GazeResult& gazeResult)
 {
     UNUSED_VARIABLE(currentFrameId);
 
     // TODO(mayah): Ah, maybe sakiuchi etc. wins this value?
     if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) && plan.chains() <= 3 && rensaResult.chains >= 7 &&
-        keyPuyos.size() + firePuyos.size() <= 3 && !gazer.isRensaOngoing()) {
+        keyPuyos.size() + firePuyos.size() <= 3 && !gazeResult.isRensaOngoing()) {
         sc_->addScore(STRATEGY_SAISOKU, 1);
     }
 }
@@ -532,15 +532,15 @@ void Evaluator<ScoreCollector>::evalCountPuyoFeature(const RefPlan& plan)
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreField& currentField,
                                              int currentFrameId, int maxIteration,
-                                             const PreEvalResult& preEvalResult, const Gazer& gazer)
+                                             const PreEvalResult& preEvalResult, const GazeResult& gazeResult)
 {
     // We'd like to evaluate frame feature always.
     evalFrameFeature(plan);
 
-    if (evalStrategy(plan, currentField, currentFrameId, gazer))
+    if (evalStrategy(plan, currentField, currentFrameId, gazeResult))
         return;
 
-    if (!gazer.additionalThoughtInfo().enemyHasZenkeshi())
+    if (!gazeResult.additionalThoughtInfo().enemyHasZenkeshi())
         evalBook(books_, preEvalResult.booksMatchable(), plan);
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
@@ -560,7 +560,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (USE_RIDGE_FEATURE)
         evalRidgeHeight(plan);
     if (USE_FIELD_USHAPE_FEATURE)
-        evalFieldUShape(plan, gazer.additionalThoughtInfo().enemyHasZenkeshi());
+        evalFieldUShape(plan, gazeResult.additionalThoughtInfo().enemyHasZenkeshi());
 
     evalUnreachableSpace(plan);
 
@@ -579,11 +579,11 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         if (USE_HAND_WIDTH_FEATURE)
             rensaEvaluator.evalRensaHandWidthFeature(plan, trackResult);
         if (USE_IGNITION_HEIGHT_FEATURE)
-            rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, gazer.additionalThoughtInfo().enemyHasZenkeshi());
+            rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, gazeResult.additionalThoughtInfo().enemyHasZenkeshi());
         if (USE_CONNECTION_FEATURE)
             rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
 
-        rensaEvaluator.evalRensaStrategy(plan, rensaResult, keyPuyos, firePuyos, currentFrameId, gazer);
+        rensaEvaluator.evalRensaStrategy(plan, rensaResult, keyPuyos, firePuyos, currentFrameId, gazeResult);
 
         if (rensaScoreCollector->score() > maxRensaScore) {
             maxRensaScore = rensaScoreCollector->score();
