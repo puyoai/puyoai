@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <future>
+#include <sstream>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
