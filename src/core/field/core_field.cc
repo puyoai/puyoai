@@ -298,11 +298,11 @@ Position* CoreField::fillSameColorPosition(int x, int y, PuyoColor c, Position* 
             *writeHead++ = Position(p.x - 1, p.y);
             checked->set(p.x - 1, p.y);
         }
-        if (color(p.x, p.y + 1) == c&& !checked->get(p.x, p.y + 1) && p.y + 1 <= FieldConstant::HEIGHT) {
+        if (color(p.x, p.y + 1) == c && !checked->get(p.x, p.y + 1) && p.y + 1 <= FieldConstant::HEIGHT) {
             *writeHead++ = Position(p.x, p.y + 1);
             checked->set(p.x, p.y + 1);
         }
-        if (color(p.x, p.y - 1) == c&& !checked->get(p.x, p.y - 1)) {
+        if (color(p.x, p.y - 1) == c && !checked->get(p.x, p.y - 1)) {
             *writeHead++ = Position(p.x, p.y - 1);
             checked->set(p.x, p.y - 1);
         }
