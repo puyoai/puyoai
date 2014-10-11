@@ -24,7 +24,7 @@ typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallba
 
 static inline
 void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                 SimulationCallback callback)
+                 bool fast, SimulationCallback callback)
 {
     bool visited[CoreField::MAP_WIDTH][NUM_PUYO_COLORS] {};
 
@@ -47,6 +47,11 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                     continue;
                 if (d == 0) {
                     if (originalField.color(x, y + 1) != PuyoColor::EMPTY)
+                        continue;
+
+                    // If the first rensa is this, any rensa won't continue.
+                    // So, we'd like to skip this.
+                    if (fast && originalField.countConnectedPuyos(x, y) == 1)
                         continue;
                 } else {
                     if (originalField.color(x + d, y) != PuyoColor::EMPTY)
@@ -140,11 +145,13 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
 
 static
 void findRensas(const CoreField& field, RensaDetector::Mode mode,
-                const bool prohibits[FieldConstant::MAP_WIDTH], SimulationCallback callback)
+                const bool prohibits[FieldConstant::MAP_WIDTH],
+                bool fast,
+                SimulationCallback callback)
 {
     switch (mode) {
     case RensaDetector::Mode::DROP:
-        tryDropFire(field, prohibits, callback);
+        tryDropFire(field, prohibits, fast, callback);
         break;
     case RensaDetector::Mode::FLOAT:
         tryFloatFire(field, prohibits, callback);
@@ -207,7 +214,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(originalField, mode, prohibits, findRensaCallback);
+    findRensas(originalField, mode, prohibits, false, findRensaCallback);
 
     if (restAdded <= 0)
         return;
@@ -342,7 +349,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
         simulateInternal(f, originalField, ColumnPuyoList(), currentFirePuyos, simulationCallback);
     };
 
-    findRensas(originalField, mode, prohibits, findRensaCallback);
+    findRensas(originalField, mode, prohibits, false, findRensaCallback);
 }
 
 // iteratePossibleRensasIteratively finds rensa with the following algorithm.
@@ -395,5 +402,5 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(originalField, mode, prohibits, findRensaCallback);
+    findRensas(originalField, mode, prohibits, true, findRensaCallback);
 }

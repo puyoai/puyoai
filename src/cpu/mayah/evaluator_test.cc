@@ -205,37 +205,6 @@ TEST_F(EvaluatorTest, NumUnreachableSpace2)
     EXPECT_EQ(12, cf.feature(NUM_UNREACHABLE_SPACE));
 }
 
-TEST_F(EvaluatorTest, HandWidth)
-{
-    CoreField f(
-        " G    "
-        " BR   "
-        " GYR  "
-        "BGGY  "
-        "YYYR  ");
-
-    CollectedFeature cf = eval(f);
-    EXPECT_EQ(1, cf.feature(HAND_WIDTH_2).front());
-    EXPECT_EQ(1, cf.feature(HAND_WIDTH_3).front());
-    EXPECT_EQ(2, cf.feature(HAND_WIDTH_4).front());
-}
-
-#if 0
-TEST_F(EvaluatorTest, numKeyPuyos)
-{
-    CoreField f(
-        " G    "
-        " BR   "
-        " GYR  "
-        " GGY  "
-        "YYYRR ");
-
-    CollectedFeature cf = eval(f);
-    EXPECT_EQ(4, cf.feature(MAX_CHAINS).front());
-    EXPECT_EQ(3, cf.feature(MAX_RENSA_FIRE_PUYOS_EARLY).front());
-}
-#endif
-
 TEST_F(EvaluatorTest, DontCrash1)
 {
     CoreField f(

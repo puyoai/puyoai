@@ -157,7 +157,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat)
     EXPECT_TRUE(found);
 }
 
-TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1)
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1_1)
 {
     CoreField f(
         "B     "
@@ -199,10 +199,45 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1)
 
     EXPECT_TRUE(foundExpected);
     EXPECT_FALSE(foundUnexpected);
-
 }
 
-TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2)
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1_2)
+{
+    CoreField f(
+        " G    "
+        " BR   "
+        " GYR  "
+        "BGGY  "
+        "YYYR  ");
+
+    CoreField expected(
+        " G    "
+        "BBR   "
+        "BGYR  "
+        "BGGY  "
+        "YYYR  ");
+
+    bool foundExpected = false;
+
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&, const RensaRefSequence&) {
+        CoreField g(f);
+        for (const auto& cp : keyPuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+        for (const auto& cp : firePuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+
+        if (g == expected)
+            foundExpected = true;
+    };
+
+    RensaDetector::iteratePossibleRensasIteratively(f, 1, callback);
+
+    EXPECT_TRUE(foundExpected);
+}
+
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2_1)
 {
     CoreField f(
         "B     "
@@ -272,7 +307,43 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2)
     EXPECT_FALSE(foundUnexpected);
 }
 
-TEST(RensaDetectorTest, iteratePossibleRensasIteratively2)
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2_2)
+{
+    CoreField f(
+        "  G   "
+        "  Y   ");
+
+    CoreField expected1(
+        "  Y   "
+        "  Y   "
+        "  YG  "
+        "  GG  "
+        "  YG  ");
+
+    bool foundExpected1 = false;
+
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&, const RensaRefSequence&) {
+        CoreField g(f);
+        for (const auto& cp : keyPuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+        for (const auto& cp : firePuyos)
+            g.dropPuyoOn(cp.x, cp.color);
+
+        if (g == expected1) {
+            // Don't iterate the same one twice.
+            EXPECT_FALSE(foundExpected1);
+            foundExpected1 = true;
+        }
+    };
+
+    RensaDetector::iteratePossibleRensasIteratively(f, 2, callback);
+
+    EXPECT_TRUE(foundExpected1);
+}
+
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth3_1)
 {
     CoreField f(
         "  G   "
@@ -303,7 +374,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively2)
     EXPECT_TRUE(foundExpected);
 }
 
-TEST(RensaDetectorTest, iteratePossibleRensasIteratively3)
+TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth3_2)
 {
     CoreField f(
         "  R   "
