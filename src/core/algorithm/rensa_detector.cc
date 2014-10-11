@@ -29,9 +29,6 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
     bool visited[CoreField::MAP_WIDTH][NUM_PUYO_COLORS] {};
 
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        if (prohibits[x])
-            continue;
-
         for (int y = originalField.height(x); y >= 1; --y) {
             PuyoColor c = originalField.color(x, y);
 
@@ -40,6 +37,9 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 
             // Drop puyo on
             for (int d = -1; d <= 1; ++d) {
+                if (prohibits[x + d])
+                    continue;
+
                 if (visited[x + d][c])
                     continue;
 
@@ -81,9 +81,6 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                   SimulationCallback callback)
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        if (prohibits[x])
-            continue;
-
         for (int y = originalField.height(x); y >= 1; --y) {
             PuyoColor c = originalField.color(x, y);
 
@@ -102,6 +99,8 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                     continue;
                 }
 
+                if (prohibits[dx])
+                    continue;
 
                 // Check y
                 if (dx != x) {
