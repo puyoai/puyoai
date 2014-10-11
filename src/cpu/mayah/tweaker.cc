@@ -13,31 +13,25 @@
 
 #include "feature_parameter.h"
 
+DEFINE_int32(core, 8, "the number of parallel tasks");
+DECLARE_string(feature);
+
 using namespace std;
 
-int main(int argc, char* argv[])
-{
-    google::ParseCommandLineFlags(&argc, &argv, true);
-    google::InitGoogleLogging(argv[0]);
-    google::InstallFailureSignalHandler();
+struct Result {
+    int score;
+    string msg;
+};
 
-    TsumoPossibility::initialize();
-
-    Executor executor(4);
-    executor.start();
-
-    struct Result {
-        int score;
-        string msg;
-    };
-
-    int N = 100;
+int run(Executor* executor, const FeatureParameter& parameter) {
+    const int N = 100;
     vector<promise<Result>> ps(N);
 
     int sumScore = 0;
     for (int i = 0; i < N; ++i) {
-        auto f = [i, &ps]() {
+        auto f = [i, &parameter, &ps]() {
             auto ai = new DebuggableMayahAI;
+            ai->setFeatureParameter(parameter);
             Endless endless(std::move(std::unique_ptr<AI>(ai)));
             stringstream ss;
             KumipuyoSeq seq = generateRandomSequenceWithSeed(i);
@@ -47,10 +41,8 @@ int main(int argc, char* argv[])
 
             ps[i].set_value(Result{score, ss.str()});
         };
-        executor.submit(f);
+        executor->submit(f);
     }
-
-    cout << "all submitted." << endl;
 
     for (int i = 0; i < N; ++i) {
         Result r = ps[i].get_future().get();
@@ -60,6 +52,34 @@ int main(int argc, char* argv[])
 
     cout << "sum score = " << sumScore << endl;
     cout << "ave score = " << (sumScore / 100) << endl;
+
+    return sumScore;
+}
+
+int main(int argc, char* argv[])
+{
+    google::ParseCommandLineFlags(&argc, &argv, true);
+    google::InitGoogleLogging(argv[0]);
+    google::InstallFailureSignalHandler();
+
+    TsumoPossibility::initialize();
+
+    Executor executor(FLAGS_core);
+    executor.start();
+
+    FeatureParameter parameter(FLAGS_feature);
+
+    map<int, int> scoreMap;
+
+    for (int x = 200; x <= 300; x += 10) {
+        cout << "current x = " << x << endl;
+        parameter.setValue(BOOK, x);
+        scoreMap[x] = run(&executor, parameter);
+    }
+
+    for (const auto& m : scoreMap) {
+        cout << m.first << " -> " << m.second << endl;
+    }
 
     return 0;
 }

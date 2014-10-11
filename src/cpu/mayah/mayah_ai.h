@@ -60,8 +60,6 @@ protected:
 
     // For debugging purpose.
     void reloadParameter();
-    const FeatureParameter& featureParameter() const { return *featureParameter_; }
-    void setFeatureParameter(const FeatureParameter& parameter) { *featureParameter_ = parameter; }
 
     std::unique_ptr<FeatureParameter> featureParameter_;
     std::vector<BookField> books_;
@@ -90,6 +88,9 @@ public:
     using MayahAI::enemyNext2Appeared;
     using MayahAI::enemyDecisionRequested;
     using MayahAI::enemyGrounded;
+
+    const FeatureParameter& featureParameter() const { return *featureParameter_; }
+    void setFeatureParameter(const FeatureParameter& parameter) { *featureParameter_ = parameter; }
 };
 
 #endif
