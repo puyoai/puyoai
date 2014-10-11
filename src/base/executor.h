@@ -1,6 +1,7 @@
 #ifndef BASE_EXECUTOR_H_
 #define BASE_EXECUTOR_H_
 
+#include <atomic>
 #include <condition_variable>
 #include <deque>
 #include <functional>
