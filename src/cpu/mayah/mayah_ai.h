@@ -60,6 +60,8 @@ protected:
 
     // For debugging purpose.
     void reloadParameter();
+    const FeatureParameter& featureParameter() const { return *featureParameter_; }
+    void setFeatureParameter(const FeatureParameter& parameter) { *featureParameter_ = parameter; }
 
     std::unique_ptr<FeatureParameter> featureParameter_;
     std::vector<BookField> books_;
@@ -74,6 +76,7 @@ protected:
 
 class DebuggableMayahAI : public MayahAI {
 public:
+    DebuggableMayahAI() : MayahAI(0, nullptr) {}
     DebuggableMayahAI(int argc, char* argv[]) : MayahAI(argc, argv) {}
     virtual ~DebuggableMayahAI() {}
 
