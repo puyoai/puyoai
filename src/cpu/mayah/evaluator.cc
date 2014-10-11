@@ -68,14 +68,30 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field, Eval
     }
 }
 
+PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
+{
+    vector<bool> booksMatchable(books_.size());
+    for (size_t i = 0; i < books_.size(); ++i) {
+        booksMatchable[i] = books_[i].match(currentField).score > 0;
+    }
+
+    return PreEvalResult(booksMatchable);
+}
+
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books, const RefPlan& plan)
+void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
+                                         const std::vector<bool>& bookMatchable,
+                                         const RefPlan& plan)
 {
     double maxScore = 0;
     const BookField* bestBf = nullptr;
 
     double totalPuyoCount = plan.field().countPuyos();
-    for (const auto& bf : books) {
+    for (size_t i = 0; i < books.size(); ++i) {
+        if (!bookMatchable[i])
+            continue;
+
+        const auto& bf = books[i];
         BookField::MatchResult mr = bf.match(plan.field());
         double ratio = mr.count / totalPuyoCount;
         DCHECK(0 <= ratio && ratio <= 1.0) << ratio;
@@ -515,7 +531,8 @@ void Evaluator<ScoreCollector>::evalCountPuyoFeature(const RefPlan& plan)
 
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreField& currentField,
-                                             int currentFrameId, int maxIteration, const Gazer& gazer)
+                                             int currentFrameId, int maxIteration,
+                                             const PreEvalResult& preEvalResult, const Gazer& gazer)
 {
     // We'd like to evaluate frame feature always.
     evalFrameFeature(plan);
@@ -524,7 +541,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         return;
 
     if (!gazer.additionalThoughtInfo().enemyHasZenkeshi())
-        evalBook(books_, plan);
+        evalBook(books_, preEvalResult.booksMatchable(), plan);
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
         collectScoreForConnection(plan.field());

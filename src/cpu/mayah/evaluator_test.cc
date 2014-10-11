@@ -30,9 +30,10 @@ protected:
 
         RefPlan plan(f, decisions, rensaResult, 0, framesToInitiate, lastDropFrames);
 
+        PreEvalResult preEvalResult = PreEvaluator(books).preEval(f);
         FeatureScoreCollector sc(featureParameter);
         Evaluator<FeatureScoreCollector> evaluator(books, &sc);
-        evaluator.collectScore(plan, f, 1, numIteration, gazer);
+        evaluator.collectScore(plan, f, 1, numIteration, preEvalResult, gazer);
         return sc.toCollectedFeature();
     }
 };

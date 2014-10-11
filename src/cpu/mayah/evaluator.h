@@ -15,6 +15,26 @@ class RefPlan;
 struct RensaResult;
 class RensaTrackResult;
 
+class PreEvalResult {
+public:
+    explicit PreEvalResult(const std::vector<bool>& booksMatchable) :
+        booksMatchable_(booksMatchable) {}
+
+    const std::vector<bool>& booksMatchable() const { return booksMatchable_; }
+private:
+    std::vector<bool> booksMatchable_;
+};
+
+class PreEvaluator {
+public:
+    explicit PreEvaluator(const std::vector<BookField>& books) : books_(books) {}
+
+    PreEvalResult preEval(const CoreField& currentField);
+
+private:
+    const std::vector<BookField>& books_;
+};
+
 class EvalResult {
 public:
     constexpr EvalResult(double score, int maxVirtualScore) : score_(score), maxVirtualScore_(maxVirtualScore) {}
@@ -59,14 +79,15 @@ public:
         books_(books),
         sc_(sc) {}
 
-    void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration, const Gazer& gazer);
+    void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+                      const PreEvalResult&, const Gazer&);
 
     // ----------------------------------------------------------------------
 
     bool evalStrategy(const RefPlan& plan, const CoreField& currentField,
                       int currentFrameId, const Gazer& gazer);
 
-    void evalBook(const std::vector<BookField>&, const RefPlan&);
+    void evalBook(const std::vector<BookField>&, const std::vector<bool>& bookMatchable, const RefPlan&);
     void evalFrameFeature(const RefPlan&);
     void evalConnectionHorizontalFeature(const RefPlan&);
     void evalRestrictedConnectionHorizontalFeature(const RefPlan&);

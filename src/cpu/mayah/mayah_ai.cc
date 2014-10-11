@@ -54,7 +54,6 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
                             const AdditionalThoughtInfo& additionalInfo)
 {
     CoreField f(plainField);
-    double beginTime = currentTime();
 
     int depth;
     int iteration;
@@ -76,40 +75,38 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
 
     ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo, depth, iteration);
 
-    double endTime = currentTime();
-    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, iteration, thoughtResult, endTime - beginTime);
-
     const Plan& plan = thoughtResult.plan;
     if (plan.decisions().empty())
-        return DropDecision(Decision(3, 0), message);
-    return DropDecision(plan.decisions().front(), message);
+        return DropDecision(Decision(3, 0), thoughtResult.message);
+    return DropDecision(plan.decisions().front(), thoughtResult.message);
 }
 
 DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq,
                                 const AdditionalThoughtInfo& additionalInfo)
 {
     CoreField f(plainField);
-    double beginTime = currentTime();
     ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
                                             MayahAI::DEFAULT_DEPTH, MayahAI::FAST_NUM_ITERATION);
-    double endTime = currentTime();
-    std::string message = makeMessageFrom(frameId, f, kumipuyoSeq, MayahAI::FAST_NUM_ITERATION,
-                                          thoughtResult, endTime - beginTime);
 
     const Plan& plan = thoughtResult.plan;
     if (thoughtResult.plan.decisions().empty())
-        return DropDecision(Decision(3, 0), message);
-    return DropDecision(plan.decisions().front(), message);
+        return DropDecision(Decision(3, 0), thoughtResult.message);
+    return DropDecision(plan.decisions().front(), thoughtResult.message);
 }
 
 ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
                                  const AdditionalThoughtInfo& additionalInfo,
                                  int depth, int maxIteration)
 {
+    double beginTime = currentTime();
+
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
     VLOG(1) << gazer_.toRensaInfoString();
 
     gazer_.setAdditionalThoughtInfo(additionalInfo);
+
+    // Before evaling, check Book.
+    PreEvalResult preEvalResult = preEval(field);
 
     int bestRensaScore = 0;
     int bestRensaFrames = 0;
@@ -119,7 +116,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     double bestScore = -100000000.0;
     Plan bestPlan;
     auto f = [&, this, frameId, maxIteration](const RefPlan& plan) {
-        EvalResult evalResult = eval(plan, field, frameId, maxIteration);
+        EvalResult evalResult = eval(plan, field, frameId, maxIteration, preEvalResult);
 
         VLOG(1) << toString(plan.decisions())
                 << ": eval=" << evalResult.score()
@@ -146,42 +143,55 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     };
 
     Plan::iterateAvailablePlans(field, kumipuyoSeq, depth, f);
-    if (bestVirtualRensaScore < bestRensaScore)
-        return ThoughtResult(bestRensaPlan, true, bestRensaScore, bestVirtualRensaScore);
-    return ThoughtResult(bestPlan, false, bestRensaScore, bestVirtualRensaScore);
+
+    double endTime = currentTime();
+    if (bestVirtualRensaScore < bestRensaScore) {
+        std::string message = makeMessageFrom(frameId, field, kumipuyoSeq, maxIteration, preEvalResult,
+                                              bestRensaPlan, bestRensaScore, bestVirtualRensaScore, endTime - beginTime);
+        return ThoughtResult(bestRensaPlan, true, bestRensaScore, bestVirtualRensaScore, message);
+    } else {
+        std::string message = makeMessageFrom(frameId, field, kumipuyoSeq, maxIteration, preEvalResult,
+                                              bestPlan, bestRensaScore, bestVirtualRensaScore, endTime - beginTime);
+        return ThoughtResult(bestPlan, false, bestRensaScore, bestVirtualRensaScore, message);
+    }
+}
+
+PreEvalResult MayahAI::preEval(const CoreField& currentField)
+{
+    PreEvaluator preEvaluator(books_);
+    return preEvaluator.preEval(currentField);
 }
 
 EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
-                           int currentFrameId, int maxIteration) const
+                         int currentFrameId, int maxIteration, const PreEvalResult& preEvalResult) const
 {
     NormalScoreCollector sc(*featureParameter_);
     Evaluator<NormalScoreCollector> evaluator(books_, &sc);
-    evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, gazer_);
+    evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, preEvalResult, gazer_);
 
     return EvalResult(sc.score(), sc.estimatedRensaScore());
 }
 
 CollectedFeature MayahAI::evalWithCollectingFeature(const RefPlan& plan, const CoreField& currentField,
-                                                    int currentFrameId, int maxIteration) const
+                                                    int currentFrameId, int maxIteration, const PreEvalResult& preEvalResult) const
 {
     FeatureScoreCollector sc(*featureParameter_);
     Evaluator<FeatureScoreCollector> evaluator(books_, &sc);
-    evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, gazer_);
+    evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, preEvalResult, gazer_);
     return sc.toCollectedFeature();
 }
 
 std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
-                                     const ThoughtResult& thoughtResult, double thoughtTimeInSeconds) const
+                                     const PreEvalResult& preEvalResult,
+                                     const Plan& plan, double rensaScore, double virtualRensaScore, double thoughtTimeInSeconds) const
 {
     UNUSED_VARIABLE(kumipuyoSeq);
-
-    const Plan& plan = thoughtResult.plan;
 
     if (plan.decisions().empty())
         return string("give up :-(");
 
     RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.framesToInitiate(), plan.lastDropFrames());
-    CollectedFeature cf = evalWithCollectingFeature(refPlan, field, frameId, maxIteration);
+    CollectedFeature cf = evalWithCollectingFeature(refPlan, field, frameId, maxIteration, preEvalResult);
 
     stringstream ss;
     if (cf.feature(STRATEGY_ZENKESHI) > 0)
@@ -212,8 +222,8 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
 
-    ss << "RSCORE=" << thoughtResult.rensaScore
-       << "VSCORE=" << thoughtResult.virtualRensaScore << " / ";
+    ss << "RSCORE=" << rensaScore
+       << "VSCORE=" << virtualRensaScore << " / ";
 
     if (gazer_.isRensaOngoing()) {
         ss << "Gazed ongoing rensa : " << gazer_.ongoingRensaResult().score
