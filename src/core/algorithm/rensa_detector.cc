@@ -23,6 +23,39 @@ typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallba
 };
 
 static inline
+void makeProhibitArray(const RensaResult& rensaResult, const RensaTrackResult& trackResult,
+                       const CoreField& originalField, const ColumnPuyoList& firePuyos,
+                       bool prohibits[FieldConstant::MAP_WIDTH])
+{
+    std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, true);
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = originalField.height(x); y >= 1; --y) {
+            if (trackResult.erasedAt(x, y) != rensaResult.chains)
+                continue;
+
+            if (originalField.color(x, y + 1) == PuyoColor::EMPTY || trackResult.erasedAt(x, y + 1) == rensaResult.chains) {
+                prohibits[x] = false;
+                // needs to check more.
+                // e.g. Let's consider the following field.
+                // A
+                // B
+                // C
+                // and A and C are erased. B will drop, so we need to check it.
+            } else {
+                prohibits[x - 1] = false;
+                prohibits[x] = false;
+                prohibits[x + 1] = false;
+                ++x; // x will advance by 2 in total.
+                break;
+            }
+        }
+    }
+    for (const auto& cp : firePuyos)
+        prohibits[cp.x] = true;
+}
+
+static inline
 void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
                  bool fast, SimulationCallback callback)
 {
@@ -317,23 +350,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
 
                 // Don't put key puyo on the column which fire puyo will be placed.
                 bool newProhibits[FieldConstant::MAP_WIDTH];
-                {
-                    std::fill(newProhibits, newProhibits + FieldConstant::MAP_WIDTH, true);
-
-                    for (int x = 1; x <= 6; ++x) {
-                        for (int y = 1; originalField.get(x, y) != PuyoColor::EMPTY && y <= 12; ++y) {
-                            if (combinedTrackResult.erasedAt(x, y) == combinedRensaResult.chains) {
-                                newProhibits[x - 1] = false;
-                                newProhibits[x] = false;
-                                newProhibits[x + 1] = false;
-                                ++x; // x will advance by 2 in total.
-                                break;
-                            }
-                        }
-                    }
-                    for (const auto& cp : firstRensaFirePuyos)
-                        newProhibits[cp.x] = true;
-                }
+                makeProhibitArray(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
 
                 callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult, *rensaSequence);
                 iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, initialField, restIterations - 1,
@@ -376,21 +393,7 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
 
             // Don't put key puyo on the column which fire puyo will be placed.
             bool prohibits[FieldConstant::MAP_WIDTH];
-            std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, true);
-
-            for (int x = 1; x <= 6; ++x) {
-                for (int y = 1; originalField.get(x, y) != PuyoColor::EMPTY && y <= 12; ++y) {
-                    if (trackResult.erasedAt(x, y) == rensaResult.chains) {
-                        prohibits[x - 1] = false;
-                        prohibits[x] = false;
-                        prohibits[x + 1] = false;
-                        ++x; // x will advance by 2 in total.
-                        break;
-                    }
-                }
-            }
-            for (const auto& cp : firePuyos)
-                prohibits[cp.x] = true;
+            makeProhibitArray(rensaResult, trackResult, originalField, firePuyos, prohibits);
 
             iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, originalField, maxIteration - 1,
                                                      ColumnPuyoList(), firePuyos, prohibits, &rensaSequence, callback, mode);
