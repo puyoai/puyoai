@@ -274,21 +274,12 @@ bool CoreField::dropPuyoOn(int x, PuyoColor c, bool isAxis)
     return true;
 }
 
-inline static
-Position* checkCell(const CoreField& field, PuyoColor c, FieldBitField* checked, Position* writeHead, int x, int y)
-{
-    if (c == field.color(x, y) && !checked->get(x, y) && y <= CoreField::HEIGHT) {
-        *writeHead = Position(x, y);
-        checked->set(x, y);
-        return writeHead + 1;
-    }
-
-    return writeHead;
-}
-
 Position* CoreField::fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBitField* checked) const
 {
     DCHECK(!checked->get(x, y));
+
+    if (FieldConstant::HEIGHT < y)
+        return positionQueueHead;
 
     Position* writeHead = positionQueueHead;
     Position* readHead = positionQueueHead;
@@ -299,10 +290,22 @@ Position* CoreField::fillSameColorPosition(int x, int y, PuyoColor c, Position* 
     while (readHead != writeHead) {
         Position p = *readHead++;
 
-        writeHead = checkCell(*this, c, checked, writeHead, p.x + 1, p.y);
-        writeHead = checkCell(*this, c, checked, writeHead, p.x - 1, p.y);
-        writeHead = checkCell(*this, c, checked, writeHead, p.x, p.y + 1);
-        writeHead = checkCell(*this, c, checked, writeHead, p.x, p.y - 1);
+        if (color(p.x + 1, p.y) == c && !checked->get(p.x + 1, p.y)) {
+            *writeHead++ = Position(p.x + 1, p.y);
+            checked->set(p.x + 1, p.y);
+        }
+        if (color(p.x - 1, p.y) == c && !checked->get(p.x - 1, p.y)) {
+            *writeHead++ = Position(p.x - 1, p.y);
+            checked->set(p.x - 1, p.y);
+        }
+        if (color(p.x, p.y + 1) == c&& !checked->get(p.x, p.y + 1) && p.y + 1 <= FieldConstant::HEIGHT) {
+            *writeHead++ = Position(p.x, p.y + 1);
+            checked->set(p.x, p.y + 1);
+        }
+        if (color(p.x, p.y - 1) == c&& !checked->get(p.x, p.y - 1)) {
+            *writeHead++ = Position(p.x, p.y - 1);
+            checked->set(p.x, p.y - 1);
+        }
     }
 
     return writeHead;
