@@ -183,11 +183,11 @@ int main(int argc, char* argv[])
                     Decision(x1, r1),
                     Decision(x2, r2)
                 };
-                Plan plan = ai.thinkPlanOnly(frameId, field, KumipuyoSeq { seq.get(i), seq.get(i + 1) },
+                Plan plan = ai.thinkPlanOnly(frameId, field, KumipuyoSeq { seq.get(0), seq.get(1) },
                                              MayahAI::DEFAULT_DEPTH, decisions);
 
-                FieldPrettyPrinter::printMultipleFields(plan.field(), KumipuyoSeq { seq.get(i + 2), seq.get(i + 3) },
-                                                        aiPlan.field(), KumipuyoSeq { seq.get(i + 2), seq.get(i + 3) });
+                FieldPrettyPrinter::printMultipleFields(plan.field(), KumipuyoSeq { seq.get(2), seq.get(3) },
+                                                        aiPlan.field(), KumipuyoSeq { seq.get(2), seq.get(3) });
 
                 CollectedFeature mycf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, plan);
                 CollectedFeature aicf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
