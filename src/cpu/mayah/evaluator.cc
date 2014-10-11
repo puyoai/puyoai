@@ -372,8 +372,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         return true;
     }
 
-    if (currentField.countPuyos() <= 32)
-        sc_->addScore(STRATEGY_SAKIUCHI, 1.0);
+    sc_->addScore(STRATEGY_SAKIUCHI, 1.0);
 
     // TODO(mayah): Check land leveling.
 
