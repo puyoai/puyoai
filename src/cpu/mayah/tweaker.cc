@@ -1,58 +1,19 @@
-#include <random>
+#include "mayah_ai.h"
+
+#include <iostream>
+#include <future>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "evaluation_feature_key.h"
+#include "base/executor.h"
+#include "core/algorithm/puyo_possibility.h"
+#include "core/client/ai/endless/endless.h"
+#include "core/sequence_generator.h"
+
 #include "feature_parameter.h"
 
-DECLARE_string(feature);
-
 using namespace std;
-
-void tweakParameter(FeatureParameter* param)
-{
-    random_device rd;
-    mt19937 mt(rd());
-
-#define DEFINE_PARAM(key)                                       \
-    switch (mt() % 20) {                                        \
-    case 0:                                                     \
-        param->setValue(key, param->getValue(key) + mt() % 20); \
-        break;                                                  \
-    case 1:                                                     \
-        param->setValue(key, param->getValue(key) - mt() % 20); \
-        break;                                                  \
-    default:                                                    \
-        break;                                                  \
-    }
-#define DEFINE_SPARSE_PARAM(key, maxVlaue)                   \
-    switch (mt() % 20) {                                     \
-    case 0: {                                                \
-        vector<double> vs = param->getValues(key);           \
-        double diff = mt() % 20;                             \
-        for (size_t i = 0; i < vs.size(); ++i) {             \
-            vs[i] += diff;                                   \
-        }                                                    \
-        param->setValues(key, vs);                           \
-        break;                                               \
-    }                                                        \
-    case 1: {                                                \
-        vector<double> vs = param->getValues(key);           \
-        double diff = mt() % 20;                             \
-        for (size_t i = 0; i < vs.size(); ++i) {             \
-            vs[i] -= diff;                                   \
-        }                                                    \
-        param->setValues(key, vs);                           \
-        break;                                               \
-    }                                                        \
-    default:                                                 \
-        break;                                               \
-    }
-#include "evaluation_feature.tab"
-#undef DEFINE_PARAM
-#undef DEFINE_SPARSE_PARAM
-}
 
 int main(int argc, char* argv[])
 {
@@ -60,10 +21,45 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    FeatureParameter param;
-    CHECK(param.load(FLAGS_feature));
-    tweakParameter(&param);
-    CHECK(param.save(FLAGS_feature));
+    TsumoPossibility::initialize();
+
+    Executor executor(4);
+    executor.start();
+
+    struct Result {
+        int score;
+        string msg;
+    };
+
+    int N = 100;
+    vector<promise<Result>> ps(N);
+
+    int sumScore = 0;
+    for (int i = 0; i < N; ++i) {
+        auto f = [i, &ps]() {
+            auto ai = new DebuggableMayahAI;
+            Endless endless(std::move(std::unique_ptr<AI>(ai)));
+            stringstream ss;
+            KumipuyoSeq seq = generateRandomSequenceWithSeed(i);
+            int score = endless.run(seq);
+            ss << "case " << i << ": "
+               << "score = " << score << endl;
+
+            ps[i].set_value(Result{score, ss.str()});
+        };
+        executor.submit(f);
+    }
+
+    cout << "all submitted." << endl;
+
+    for (int i = 0; i < N; ++i) {
+        Result r = ps[i].get_future().get();
+        sumScore += r.score;
+        cout << r.msg;
+    }
+
+    cout << "sum score = " << sumScore << endl;
+    cout << "ave score = " << (sumScore / 100) << endl;
 
     return 0;
 }
