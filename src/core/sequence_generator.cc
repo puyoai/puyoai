@@ -7,12 +7,19 @@
 #include <gflags/gflags.h>
 
 DEFINE_string(seq, "", "default initial sequence");
+DEFINE_int32(seed, -1, "sets the random seed. When negative, seed will be chosen at random.");
 
 using namespace std;
 
 KumipuyoSeq generateSequence()
 {
-    KumipuyoSeq generated = generateRandomSequence();
+    KumipuyoSeq generated;
+    if (FLAGS_seed >= 0) {
+        generated = generateRandomSequenceWithSeed(FLAGS_seed);
+    } else {
+        generated = generateRandomSequence();
+    }
+
     if (FLAGS_seq != "") {
         for (size_t i = 0; i < FLAGS_seq.size(); ++i) {
             PuyoColor c = toPuyoColor(FLAGS_seq[i]);
