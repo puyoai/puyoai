@@ -258,9 +258,9 @@ bool CoreField::isChigiriDecision(const Decision& decision) const
 
 bool CoreField::dropPuyoOn(int x, PuyoColor c, bool isAxis)
 {
-    DCHECK(c != PuyoColor::EMPTY) << toDebugString();
+    DCHECK_NE(c, PuyoColor::EMPTY) << toDebugString();
     if (height(x) < 13) {
-        DCHECK(color(x, height(x) + 1) == PuyoColor::EMPTY);
+        DCHECK_EQ(color(x, height(x) + 1), PuyoColor::EMPTY);
         unsafeSet(x, ++heights_[x], c);
         return true;
     }
@@ -423,7 +423,7 @@ int CoreField::dropAfterVanish(int minHeights[], Tracker* tracker)
         int writeAt = minHeights[x];
         heights_[x] = writeAt - 1;
 
-        DCHECK(color(x, writeAt) == PuyoColor::EMPTY) << writeAt << ' ' << toChar(color(x, writeAt));
+        DCHECK_EQ(color(x, writeAt), PuyoColor::EMPTY) << writeAt << ' ' << toChar(color(x, writeAt));
         for (int y = writeAt + 1; y <= maxHeight; ++y) {
             if (color(x, y) == PuyoColor::EMPTY)
                 continue;
