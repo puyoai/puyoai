@@ -173,6 +173,30 @@ TEST_F(SomagicAnalyzerTest, analyzeFieldNormal7)
     EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(3, 6));
 }
 
+TEST_F(SomagicAnalyzerTest, analyzeFieldNormal8)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal8.png");
+
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 4));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 7));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(6, 4));
+}
+
+TEST_F(SomagicAnalyzerTest, analyzeFieldNormal9)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal8.png");
+
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 2));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 4));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 7));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(6, 4));
+}
+
 TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-another1.png");

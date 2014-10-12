@@ -78,9 +78,17 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
     // Since Ojama often makes their form smaller. So, it's a bit difficult to detect.
     // Let's relax a bit.
     if (allowOjama == SomagicAnalyzer::AllowOjama::ALLOW_OJAMA) {
-        int ojamaCount = colorCount[static_cast<int>(RealColor::RC_OJAMA)] * 3 / 2;
-        if (ojamaCount > threshold && ojamaCount > maxCount)
-            return RealColor::RC_OJAMA;
+        int ojamaCount = colorCount[static_cast<int>(RealColor::RC_OJAMA)];
+        if (ojamaCount * 3 / 2 > threshold) {
+            // ojama sometimes looks green.
+            if (result == RealColor::RC_GREEN && ojamaCount * 3 / 2 > maxCount) {
+                return RealColor::RC_OJAMA;
+            }
+
+            if (ojamaCount > maxCount) {
+                return RealColor::RC_OJAMA;
+            }
+        }
     }
 
     return result;
