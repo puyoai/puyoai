@@ -38,11 +38,12 @@ class KeySetSeq {
 public:
     KeySetSeq() {}
     explicit KeySetSeq(const std::vector<KeySet>& seq) : seq_(seq) {}
-    KeySetSeq(std::initializer_list<KeySet> seq) : seq_(seq) {}
+    explicit KeySetSeq(std::initializer_list<KeySet> seq) : seq_(seq) {}
 
     bool empty() const { return seq_.empty(); }
     size_t size() const { return seq_.size(); }
     const KeySet& front() const { return seq_.front(); }
+    const KeySet& back() const { return seq_.back(); }
     const KeySet& operator[](int idx) const { return seq_[idx]; }
 
     std::vector<KeySet>::iterator begin() { return seq_.begin(); }

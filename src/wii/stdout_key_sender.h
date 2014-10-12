@@ -9,10 +9,9 @@ class StdoutKeySender : public KeySender {
 public:
     virtual ~StdoutKeySender() {}
 
-    virtual void sendWait(int ms);
-
-protected:
-    virtual void sendKeySet(const KeySet&) override;
+    virtual void sendWait(int ms) override;
+    virtual void sendKeySet(const KeySet&, bool forceSend) override;
+    virtual void sendKeySetSeq(const KeySetSeq&) override;
 };
 
 #endif

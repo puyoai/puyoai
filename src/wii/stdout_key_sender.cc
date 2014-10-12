@@ -4,12 +4,17 @@
 
 using namespace std;
 
-void StdoutKeySender::sendKeySet(const KeySet& keySet)
+void StdoutKeySender::sendWait(int ms)
+{
+    cout << "Wait: " << ms << endl;
+}
+
+void StdoutKeySender::sendKeySet(const KeySet& keySet, bool forceSend)
 {
     cout << "SendKey: " << keySet.toString() << endl;
 }
 
-void StdoutKeySender::sendWait(int ms)
+void StdoutKeySender::sendKeySetSeq(const KeySetSeq& keySetSeq)
 {
-    cout << "Wait: " << ms << endl;
+    cout << "SendKey: " << keySetSeq.toString() << endl;
 }

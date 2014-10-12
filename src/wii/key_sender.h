@@ -8,23 +8,11 @@ public:
     virtual ~KeySender() {}
 
     virtual void sendWait(int ms) = 0;
-
-    void send(const KeySet& keySet, bool forceSend = false)
-    {
-        if (forceSend || keySet != keySetLastSent_) {
-            keySetLastSent_ = keySet;
-            sendKeySet(keySet);
-        }
-    }
-    void send(Key key, bool forceSend = false) { send(KeySet(key), forceSend); }
+    virtual void sendKeySet(const KeySet&, bool forceSend = false) = 0;
+    virtual void sendKeySetSeq(const KeySetSeq& keySetSeq) = 0;
 
 protected:
-    // TODO(mayah): Key::UP/Key::DOWN is chosen with probability.
-    KeySender() : keySetLastSent_(KeySet(Key::UP, Key::DOWN)) {}
-    virtual void sendKeySet(const KeySet&) = 0;
-
-private:
-    KeySet keySetLastSent_;
+    KeySender() {}
 };
 
 #endif

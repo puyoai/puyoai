@@ -9,7 +9,8 @@
 
 using namespace std;
 
-SerialKeySender::SerialKeySender(const string& deviceName)
+SerialKeySender::SerialKeySender(const string& deviceName) :
+    lastSent_(KeySet(Key::UP, Key::DOWN))
 {
     struct termios tio;
     memset(&tio, 0, sizeof(tio));
@@ -67,9 +68,26 @@ void SerialKeySender::sendWait(int ms)
     cout << "wait " << ms << endl;
 }
 
-void SerialKeySender::sendKeySet(const KeySet& keySet)
+void SerialKeySender::sendKeySet(const KeySet& keySet, bool forceSend)
 {
+    if (!forceSend && keySet == lastSent_)
+        return;
+
+    sendKeySetInternal(keySet);
+    cout << keySet.toString() << endl;
+}
+
+void SerialKeySender::sendKeySetSeq(const KeySetSeq& keySetSeq)
+{
+    for (const KeySet& keySet : keySetSeq) {
+        sendKeySetInternal(keySet);
+    }
+    cout << keySetSeq.toString() << endl;
+}
+
+void SerialKeySender::sendKeySetInternal(const KeySet& keySet)
+{
+    lastSent_ = keySet;
     unsigned char c = static_cast<unsigned int>(keySet.toInt());
     CHECK_EQ(write(fd_, &c, sizeof(unsigned char)), 1);
-    cout << keySet.toString() << " " << static_cast<int>(c) << endl;
 }

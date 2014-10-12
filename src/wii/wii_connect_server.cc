@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 
+#include "base/time.h"
 #include "capture/analyzer.h"
 #include "capture/source.h"
 #include "core/field/core_field.h"
@@ -90,7 +91,7 @@ void WiiConnectServer::runLoop()
             continue;
         }
 
-        cout << "FRAME: " << frameId << endl;
+        // cout << "FRAME: " << frameId << endl;
 
         unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), prevSurface.get(),  analyzerResults_);
         LOG(INFO) << r->toString();
@@ -149,7 +150,7 @@ void WiiConnectServer::runLoop()
 bool WiiConnectServer::playForUnknown(int frameId)
 {
     if (frameId % 10 == 0)
-        keySender_->send(KeySet());
+        keySender_->sendKeySet(KeySet());
 
     reset();
     return true;
@@ -158,9 +159,9 @@ bool WiiConnectServer::playForUnknown(int frameId)
 bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& analyzerResult)
 {
     if (frameId % 10 == 0) {
-        keySender_->send(KeySet());
-        keySender_->send(Key::RIGHT_TURN);
-        keySender_->send(KeySet());
+        keySender_->sendKeySet(KeySet());
+        keySender_->sendKeySet(KeySet(Key::RIGHT_TURN));
+        keySender_->sendKeySet(KeySet());
     }
 
     // Sends an initialization message.
@@ -180,6 +181,8 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
 
 bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyzerResult)
 {
+    double beginTime = currentTime();
+
     // Send KeySet() after detecting ojama-drop or grounded.
     // It's important that it is sent before requesting the decision to client,
     // because client may take time to return the rensponse.
@@ -190,7 +193,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 
         if (analyzerResult.playerResult(pi)->userState.ojamaDropped ||
             analyzerResult.playerResult(pi)->userState.grounded) {
-            keySender_->send(KeySet());
+            keySender_->sendKeySet(KeySet());
         }
     }
 
@@ -216,7 +219,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
             lastDecision_[pi] = Decision();
         }
 
-        outputKeys(pi, analyzerResult, data[pi]);
+        outputKeys(pi, analyzerResult, data[pi], beginTime);
     }
 
     return true;
@@ -225,9 +228,9 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 bool WiiConnectServer::playForFinished(int frameId)
 {
     if (frameId % 10 == 0) {
-        keySender_->send(KeySet());
-        keySender_->send(Key::START);
-        keySender_->send(KeySet());
+        keySender_->sendKeySet(KeySet());
+        keySender_->sendKeySet(KeySet(Key::START));
+        keySender_->sendKeySet(KeySet());
     }
 
     reset();
@@ -310,7 +313,8 @@ PuyoColor WiiConnectServer::toPuyoColor(RealColor rc, bool allowAllocation)
     return PuyoColor::EMPTY;
 }
 
-void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, const vector<FrameResponse>& data)
+void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult,
+                                  const vector<FrameResponse>& data, double beginTime)
 {
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.
@@ -350,13 +354,16 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult, 
 
         lastDecision_[pi] = d;
         if (!keySetSeq.empty()) {
+            double endTime = currentTime();
+            cout << (endTime - beginTime) << endl;
+            double duration = 33.3333 - (endTime - beginTime) * 1000;
+            cout << duration << endl;
+
+            // TODO(mayah): Maybe we need to wait using duration?
             keySender_->sendWait(16);
         }
-        for (size_t j = 0; j < keySetSeq.size(); j++) {
-            KeySet k = keySetSeq[j];
-            keySender_->send(k, true);
-        }
 
+        keySender_->sendKeySetSeq(keySetSeq);
         return;
     }
 }
