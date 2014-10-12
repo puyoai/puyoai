@@ -130,7 +130,7 @@ void HttpServer::setAssetDirectory(const string& path)
 void HttpServer::installHandler(const string& path, HttpHandler handler)
 {
     DCHECK(handler);
-    DCHECK(handlers_[path] == nullptr);
+    DCHECK(!handlers_[path]);
 
     handlers_[path] = handler;
 }

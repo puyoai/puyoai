@@ -117,7 +117,7 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
         for (int y = originalField.height(x); y >= 1; --y) {
             PuyoColor c = originalField.color(x, y);
 
-            DCHECK(c != PuyoColor::EMPTY);
+            DCHECK_NE(c, PuyoColor::EMPTY);
             if (c == PuyoColor::OJAMA)
                 continue;
 
