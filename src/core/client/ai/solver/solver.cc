@@ -31,10 +31,12 @@ int Solver::solve(const std::string& filename)
 
     problem.field[0].dropKumipuyo(d0.decision(), problem.kumipuyoSeq[0].front());
     problem.kumipuyoSeq[0].dropFront();
+    problem.field[0].simulate();
 
     DropDecision d1 = ai_->think(4, problem.field[0], problem.kumipuyoSeq[0], AdditionalThoughtInfo());
 
-    cout << d0.decision().toString() << "-"
+    cout << problem.name << ": "
+         << d0.decision().toString() << "-"
          << d1.decision().toString() << endl;
 
     vector<Decision> decisions { d0.decision(), d1.decision() };
