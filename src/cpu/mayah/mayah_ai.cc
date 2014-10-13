@@ -146,23 +146,28 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
         }
     };
 
+    // NOTE: Since RefPlan will be destructed after this callback, if we'd like to pass RefPlan to
+    // an executor, we need to make Plan, and copy it.
+
     WaitGroup wg;
     auto evalAfterOne = [&, this, depth](const RefPlan& rp1) {
-        if (executor_) {
-            wg.add(1);
-            Plan p = rp1.toPlan();
-            executor_->submit([p, &wg, &evalRefPlan]() {
-                RefPlan refPlan(p.field(), p.decisions(),
-                                p.rensaResult(),
-                                p.numChigiri(),
-                                p.framesToInitiate(),
-                                p.lastDropFrames());
-                evalRefPlan(refPlan);
-                wg.done();
-            });
-            evalRefPlan(rp1);
-        } else {
-            evalRefPlan(rp1);
+        // Do eval after one drop.
+        if (rp1.isRensaPlan()) {
+            if (executor_) {
+                wg.add(1);
+                Plan p = rp1.toPlan();
+                executor_->submit([p, &wg, &evalRefPlan]() {
+                    RefPlan refPlan(p.field(), p.decisions(),
+                                    p.rensaResult(),
+                                    p.numChigiri(),
+                                    p.framesToInitiate(),
+                                    p.lastDropFrames());
+                    evalRefPlan(refPlan);
+                    wg.done();
+                });
+            } else {
+                evalRefPlan(rp1);
+            }
         }
 
         Plan p = rp1.toPlan();
