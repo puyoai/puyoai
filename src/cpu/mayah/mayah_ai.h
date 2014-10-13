@@ -80,7 +80,7 @@ protected:
 class DebuggableMayahAI : public MayahAI {
 public:
     DebuggableMayahAI() : MayahAI(0, nullptr) {}
-    DebuggableMayahAI(int argc, char* argv[]) : MayahAI(argc, argv) {}
+    DebuggableMayahAI(int argc, char* argv[], Executor* executor = nullptr) : MayahAI(argc, argv, executor) {}
     virtual ~DebuggableMayahAI() {}
 
     using MayahAI::additionalThoughtInfo;
