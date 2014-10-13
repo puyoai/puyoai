@@ -23,18 +23,22 @@ struct Result {
     string msg;
 };
 
+struct RunResult {
+    int sumScore;
+    int mainRensaCount;
+};
+
 void removeNontokopuyoParameter(FeatureParameter* parameter)
 {
     parameter->setValue(STRATEGY_ZENKESHI, 0);
     parameter->setValue(STRATEGY_TSUBUSHI, 0);
 }
 
-int run(Executor* executor, const FeatureParameter& parameter)
+RunResult run(Executor* executor, const FeatureParameter& parameter)
 {
     const int N = 100;
     vector<promise<Result>> ps(N);
 
-    int sumScore = 0;
     for (int i = 0; i < N; ++i) {
         auto f = [i, &parameter, &ps]() {
             auto ai = new DebuggableMayahAI;
@@ -51,16 +55,21 @@ int run(Executor* executor, const FeatureParameter& parameter)
         executor->submit(f);
     }
 
+    int sumScore = 0;
+    int mainRensaCount = 0;
     for (int i = 0; i < N; ++i) {
         Result r = ps[i].get_future().get();
         sumScore += r.score;
+        if (r.score >= 10000)
+            mainRensaCount++;
         cout << r.msg;
     }
 
-    cout << "sum score = " << sumScore << endl;
-    cout << "ave score = " << (sumScore / 100) << endl;
+    cout << "sum score  = " << sumScore << endl;
+    cout << "ave score  = " << (sumScore / 100) << endl;
+    cout << "main rensa = " << mainRensaCount << endl;
 
-    return sumScore;
+    return RunResult { sumScore, mainRensaCount };
 }
 
 int main(int argc, char* argv[])
@@ -76,20 +85,24 @@ int main(int argc, char* argv[])
     FeatureParameter parameter(FLAGS_feature);
     removeNontokopuyoParameter(&parameter);
 
-#if 0
-    map<int, int> scoreMap;
-    for (int x = -15; x <= -5; x += 1) {
-        cout << "current x = " << x << endl;
-        parameter.setValue(FIELD_USHAPE, x);
-        scoreMap[x] = run(executor.get(), parameter);
+#if 1
+    map<pair<int, int>, RunResult> scoreMap;
+    for (int x = 50; x <= 150; x += 10) {
+        for (int y = x; y <= 150; y += 10) {
+            cout << "current x = " << x << endl;
+            parameter.setValue(CONNECTION, 2, x);
+            parameter.setValue(CONNECTION, 3, y);
+            scoreMap[make_pair(x, y)] = run(executor.get(), parameter);
+        }
     }
     for (const auto& m : scoreMap) {
-        cout << m.first << " -> " << m.second << endl;
+        cout << m.first.first << "/" << m.first.second << " -> " << m.second.sumScore << " / " << m.second.mainRensaCount << endl;
     }
 
 #else
     run(executor.get(), parameter);
 #endif
 
+    executor->stop();
     return 0;
 }
