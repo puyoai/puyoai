@@ -110,12 +110,14 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     // Before evaling, check Book.
     const PreEvalResult preEvalResult = preEval(field);
 
+    Plan bestPlan;
+    double bestScore = -100000000.0;
+
+    Plan bestRensaPlan;
     int bestRensaScore = 0;
     int bestRensaFrames = 0;
+
     int bestVirtualRensaScore = 0;
-    Plan bestRensaPlan;
-    double bestScore = -100000000.0;
-    Plan bestPlan;
 
     mutex mu;
     auto evalRefPlan = [&, this, frameId, maxIteration](const RefPlan& plan) {
@@ -144,23 +146,56 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
         }
     };
 
-    if (executor_) {
-        WaitGroup wg;
-        auto callback = [this, &wg, &evalRefPlan](const RefPlan& refPlan){
-            Plan plan = refPlan.toPlan();
+    WaitGroup wg;
+    auto evalAfterOne = [&, this, depth](const RefPlan& rp1) {
+        if (executor_) {
             wg.add(1);
-            executor_->submit([this, plan, &wg, &evalRefPlan]() {
-                RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.framesToInitiate(), plan.lastDropFrames());
+            Plan p = rp1.toPlan();
+            executor_->submit([p, &wg, &evalRefPlan]() {
+                RefPlan refPlan(p.field(), p.decisions(),
+                                p.rensaResult(),
+                                p.numChigiri(),
+                                p.framesToInitiate(),
+                                p.lastDropFrames());
                 evalRefPlan(refPlan);
                 wg.done();
             });
+            evalRefPlan(rp1);
+        } else {
+            evalRefPlan(rp1);
+        }
+
+        Plan p = rp1.toPlan();
+        KumipuyoSeq seq(kumipuyoSeq);
+        if (seq.size() > 0)
+            seq.dropFront();
+
+        auto f = [p, &evalRefPlan](const RefPlan& plan) {
+            vector<Decision> decisions(p.decisions());
+            decisions.insert(decisions.end(), plan.decisions().begin(), plan.decisions().end());
+            RefPlan refPlan(plan.field(),
+                            decisions,
+                            plan.rensaResult(),
+                            p.numChigiri() + plan.numChigiri(),
+                            p.totalFrames() + plan.framesToInitiate(),
+                            plan.lastDropFrames());
+            evalRefPlan(refPlan);
         };
 
-        Plan::iterateAvailablePlans(field, kumipuyoSeq, depth, callback);
+        if (executor_) {
+            wg.add(1);
+            executor_->submit([p, seq, depth, f, &wg]() {
+                Plan::iterateAvailablePlans(p.field(), seq, depth - 1, f);
+                wg.done();
+            });
+        } else {
+            Plan::iterateAvailablePlans(p.field(), seq, depth - 1, f);
+        }
+    };
+
+    Plan::iterateAvailablePlans(field, kumipuyoSeq, 1, evalAfterOne);
+    if (executor_)
         wg.waitUntilDone();
-    } else {
-        Plan::iterateAvailablePlans(field, kumipuyoSeq, depth, evalRefPlan);
-    }
 
     double endTime = currentTime();
     if (bestVirtualRensaScore < bestRensaScore) {
