@@ -68,11 +68,11 @@ public:
 
     const CoreField& field() const { return field_; }
     const KumipuyoSeq& kumipuyoSeq() const { return kumipuyoSeq_; }
+    // If NEXT2 is delaying, this does not contain NEXT2.
     KumipuyoSeq visibleKumipuyoSeq() const;
     Kumipuyo kumipuyo(int nth = 0) const;
     const KumipuyoPos& kumipuyoPos() const { return mks_.pos; }
     const MovingKumipuyoState& movingKumipuyoState() const { return mks_; }
-    PuyoColor puyoColor(NextPuyoPosition) const;
 
     // Gives a key input to the field, and control puyo. Returns true if a key
     // input is accepted. FrameContext will collect events when playing frames.

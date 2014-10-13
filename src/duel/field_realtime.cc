@@ -429,29 +429,6 @@ Kumipuyo FieldRealtime::kumipuyo(int nth) const
     return kumipuyoSeq_.get(nth);
 }
 
-PuyoColor FieldRealtime::puyoColor(NextPuyoPosition npp) const
-{
-    switch (npp) {
-    case NextPuyoPosition::CURRENT_AXIS:
-        return kumipuyo(0).axis;
-    case NextPuyoPosition::CURRENT_CHILD:
-        return kumipuyo(0).child;
-    case NextPuyoPosition::NEXT1_AXIS:
-        return kumipuyo(1).axis;
-    case NextPuyoPosition::NEXT1_CHILD:
-        return kumipuyo(1).child;
-    case NextPuyoPosition::NEXT2_AXIS:
-        return kumipuyo(2).axis;
-    case NextPuyoPosition::NEXT2_CHILD:
-        return kumipuyo(2).child;
-    default:
-        break;
-    }
-
-    DCHECK(false) << static_cast<int>(npp);
-    return PuyoColor::EMPTY;
-}
-
 void FieldRealtime::skipLevelSelect()
 {
     CHECK(simulationState_ == SimulationState::STATE_LEVEL_SELECT);
