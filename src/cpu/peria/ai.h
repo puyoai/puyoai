@@ -1,12 +1,10 @@
-#ifndef CPU_PERIA_H_
-#define CPU_PERIA_H_
+#pragma once
 
 #include "core/client/ai/ai.h"
 
 #include <memory>  // available with C++11
 
 namespace peria {
-
 
 class Ai : public ::AI {
  public:
@@ -28,5 +26,3 @@ class Ai : public ::AI {
 };
 
 }  // namespace peria
-
-#endif // CPU_PERIA_H_
