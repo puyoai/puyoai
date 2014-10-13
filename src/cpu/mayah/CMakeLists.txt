@@ -33,8 +33,6 @@ cpu_add_runner(run_advanced.sh)
 cpu_add_runner(run_v.sh)
 
 cpu_add_runner(feature.txt)
-cpu_add_runner(run_for_tweaker_1p.sh)
-cpu_add_runner(run_for_tweaker_2p.sh)
 
 mayah_add_test(evaluator_test)
 mayah_add_test(book_field_test)
