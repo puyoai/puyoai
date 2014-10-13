@@ -11,6 +11,8 @@ void StdoutKeySender::sendWait(int ms)
 
 void StdoutKeySender::sendKeySet(const KeySet& keySet, bool forceSend)
 {
+    UNUSED_VARIABLE(forceSend);
+
     cout << "SendKey: " << keySet.toString() << endl;
 }
 
