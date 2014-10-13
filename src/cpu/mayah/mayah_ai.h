@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "base/executor.h"
 #include "core/client/ai/ai.h"
 #include "core/algorithm/plan.h"
 
@@ -35,7 +36,7 @@ public:
     static const int DEFAULT_NUM_ITERATION = 3;
     static const int FAST_NUM_ITERATION = 1;
 
-    MayahAI(int argc, char* argv[]);
+    MayahAI(int argc, char* argv[], Executor* executor = nullptr);
     virtual ~MayahAI();
 
     virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&,
@@ -68,12 +69,12 @@ protected:
     std::unique_ptr<FeatureParameter> featureParameter_;
     std::vector<BookField> books_;
 
+    Executor* executor_;
+
     CoreField enemyField_;
     int enemyDecisonRequestFrameId_;
 
     Gazer gazer_;
-    int thoughtMaxRensa_ = 0;
-    int thoughtMaxScore_ = 0;
 };
 
 class DebuggableMayahAI : public MayahAI {

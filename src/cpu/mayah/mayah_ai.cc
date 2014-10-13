@@ -6,6 +6,7 @@
 #include <gflags/gflags.h>
 
 #include "base/time.h"
+#include "base/wait_group.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/frame_request.h"
@@ -18,13 +19,13 @@
 
 DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.txt", "the path to feature parameter");
 DEFINE_string(book, SRC_DIR "/cpu/mayah/book.txt", "the path to book");
-DEFINE_bool(log_max_score, false, "log max score to stderr");
 DEFINE_bool(use_advanced_next, false, "Use enemy's NEXT sequence also");
 
 using namespace std;
 
-MayahAI::MayahAI(int argc, char* argv[]) :
-    AI(argc, argv, "mayah")
+MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
+    AI(argc, argv, "mayah"),
+    executor_(executor)
 {
     setBehaviorRethinkAfterOpponentRensa(true);
 
@@ -104,25 +105,28 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     VLOG(1) << gazer_.gazeResult().toRensaInfoString();
 
     gazer_.setAdditionalThoughtInfo(additionalInfo);
-    GazeResult gazeResult = gazer_.gazeResult();
+    const GazeResult gazeResult = gazer_.gazeResult();
 
     // Before evaling, check Book.
-    PreEvalResult preEvalResult = preEval(field);
+    const PreEvalResult preEvalResult = preEval(field);
 
     int bestRensaScore = 0;
     int bestRensaFrames = 0;
     int bestVirtualRensaScore = 0;
     Plan bestRensaPlan;
-
     double bestScore = -100000000.0;
     Plan bestPlan;
-    auto f = [&, this, frameId, maxIteration](const RefPlan& plan) {
+
+    mutex mu;
+    auto evalRefPlan = [&, this, frameId, maxIteration](const RefPlan& plan) {
         EvalResult evalResult = eval(plan, field, frameId, maxIteration, preEvalResult, gazeResult);
 
         VLOG(1) << toString(plan.decisions())
                 << ": eval=" << evalResult.score()
                 << " pscore=" << plan.score()
                 << " vscore=" << evalResult.maxVirtualScore();
+
+        lock_guard<mutex> lock(mu);
 
         if (bestScore < evalResult.score()) {
             bestScore = evalResult.score();
@@ -138,12 +142,25 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
             bestRensaFrames = plan.totalFrames();
             bestRensaPlan = plan.toPlan();
         }
-
-        thoughtMaxScore_ = max(thoughtMaxScore_, plan.score());
-        thoughtMaxRensa_ = max(thoughtMaxRensa_, plan.chains());
     };
 
-    Plan::iterateAvailablePlans(field, kumipuyoSeq, depth, f);
+    if (executor_) {
+        WaitGroup wg;
+        auto callback = [this, &wg, &evalRefPlan](const RefPlan& refPlan){
+            Plan plan = refPlan.toPlan();
+            wg.add(1);
+            executor_->submit([this, plan, &wg, &evalRefPlan]() {
+                RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.framesToInitiate(), plan.lastDropFrames());
+                evalRefPlan(refPlan);
+                wg.done();
+            });
+        };
+
+        Plan::iterateAvailablePlans(field, kumipuyoSeq, depth, callback);
+        wg.waitUntilDone();
+    } else {
+        Plan::iterateAvailablePlans(field, kumipuyoSeq, depth, evalRefPlan);
+    }
 
     double endTime = currentTime();
     if (bestVirtualRensaScore < bestRensaScore) {
@@ -249,8 +266,6 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
 
 void MayahAI::onGameWillBegin(const FrameRequest& frameRequest)
 {
-    thoughtMaxRensa_ = 0;
-    thoughtMaxScore_ = 0;
     enemyField_.clear();
     enemyDecisonRequestFrameId_ = frameRequest.frameId;
     gazer_.initialize(frameRequest.frameId);
@@ -258,10 +273,6 @@ void MayahAI::onGameWillBegin(const FrameRequest& frameRequest)
 
 void MayahAI::onGameHasEnded(const FrameRequest&)
 {
-    if (FLAGS_log_max_score) {
-        cerr << "max rensa = " << thoughtMaxRensa_ << endl;
-        cerr << "max score = " << thoughtMaxScore_ << endl;
-    }
 }
 
 void MayahAI::onEnemyDecisionRequested(const FrameRequest& frameRequest)
