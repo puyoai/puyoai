@@ -86,14 +86,17 @@ void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
     double maxScore = 0;
     const BookField* bestBf = nullptr;
 
-    double totalPuyoCount = plan.field().countPuyos();
+    int totalPuyoCount = plan.field().countPuyos();
+    if (totalPuyoCount == 0)
+        return;
+
     for (size_t i = 0; i < books.size(); ++i) {
         if (!bookMatchable[i])
             continue;
 
         const auto& bf = books[i];
         BookField::MatchResult mr = bf.match(plan.field());
-        double ratio = mr.count / totalPuyoCount;
+        double ratio = mr.count / static_cast<double>(totalPuyoCount);
         DCHECK(0 <= ratio && ratio <= 1.0) << ratio;
         // TODO(mayah): Make this configurable?
         if (ratio < 0.5)
