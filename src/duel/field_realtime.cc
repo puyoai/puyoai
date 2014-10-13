@@ -415,6 +415,13 @@ vector<int> FieldRealtime::determineColumnOjamaAmount()
     return ret;
 }
 
+KumipuyoSeq FieldRealtime::visibleKumipuyoSeq() const
+{
+    return KumipuyoSeq {
+        kumipuyo(0), kumipuyo(1), kumipuyo(2)
+    };
+}
+
 Kumipuyo FieldRealtime::kumipuyo(int nth) const
 {
     if (nth >= 2 && delayFramesWNextAppear_ > 0)
