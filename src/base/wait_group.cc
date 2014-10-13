@@ -1,5 +1,7 @@
 #include "base/wait_group.h"
 
+#include <glog/logging.h>
+
 using namespace std;
 
 WaitGroup::WaitGroup() :
@@ -16,6 +18,8 @@ void WaitGroup::add(int n)
 void WaitGroup::done()
 {
     lock_guard<mutex> lock(mu_);
+    CHECK_GT(num_, 0) << "Probably you forgot calling add().";
+
     --num_;
 
     if (num_ == 0)

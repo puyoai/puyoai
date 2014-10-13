@@ -13,6 +13,8 @@ class Executor {
 public:
     typedef std::function<void (void)> Func;
 
+    static std::unique_ptr<Executor> makeDefaultExecutor(bool automaticStart = true);
+
     Executor(int numThread);
     ~Executor();
 
@@ -30,6 +32,7 @@ private:
     std::condition_variable condVar_;
     std::atomic<bool> shouldStop_;
     std::deque<Func> tasks_;
+    bool hasStarted_;
 };
 
 #endif

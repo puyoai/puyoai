@@ -1,22 +1,39 @@
 #include "base/executor.h"
 
+#include <gflags/gflags.h>
 #include <glog/logging.h>
+
+DEFINE_int32(num_threads, 3, "The default number of threads");
 
 using namespace std;
 
+// static
+unique_ptr<Executor> Executor::makeDefaultExecutor(bool automaticStart)
+{
+    Executor* executor = new Executor(FLAGS_num_threads);
+    if (automaticStart)
+        executor->start();
+
+    return unique_ptr<Executor>(executor);
+}
+
 Executor::Executor(int numThread) :
     threads_(numThread),
-    shouldStop_(false)
+    shouldStop_(false),
+    hasStarted_(false)
 {
 }
 
 Executor::~Executor()
 {
-    stop();
+    if (hasStarted_)
+        stop();
 }
 
 void Executor::start()
 {
+    CHECK(!hasStarted_);
+
     for (size_t i = 0; i < threads_.size(); ++i) {
         threads_[i] = thread([this]() {
                 runWorkerLoop();
@@ -26,6 +43,8 @@ void Executor::start()
 
 void Executor::stop()
 {
+    CHECK(hasStarted_);
+
     shouldStop_ = true;
     condVar_.notify_all();
     for (size_t i = 0; i < threads_.size(); ++i) {
