@@ -14,7 +14,6 @@
 
 #include "feature_parameter.h"
 
-DEFINE_int32(core, 8, "the number of parallel tasks");
 DECLARE_string(feature);
 
 using namespace std;
@@ -72,8 +71,7 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    Executor executor(FLAGS_core);
-    executor.start();
+    unique_ptr<Executor> executor = Executor::makeDefaultExecutor();
 
     FeatureParameter parameter(FLAGS_feature);
     removeNontokopuyoParameter(&parameter);
@@ -83,16 +81,15 @@ int main(int argc, char* argv[])
     for (int x = -15; x <= -5; x += 1) {
         cout << "current x = " << x << endl;
         parameter.setValue(FIELD_USHAPE, x);
-        scoreMap[x] = run(&executor, parameter);
+        scoreMap[x] = run(executor.get(), parameter);
     }
     for (const auto& m : scoreMap) {
         cout << m.first << " -> " << m.second << endl;
     }
 
 #else
-    run(&executor, parameter);
+    run(executor.get(), parameter);
 #endif
-
 
     return 0;
 }

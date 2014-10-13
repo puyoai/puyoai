@@ -9,6 +9,8 @@
 
 using namespace std;
 
+DECLARE_int32(num_threads);
+
 int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
@@ -17,7 +19,14 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    MayahAI(argc, argv).runLoop();
+    cerr << "num_threads = " << FLAGS_num_threads << endl;
+
+    if (FLAGS_num_threads > 1) {
+        unique_ptr<Executor> executor = Executor::makeDefaultExecutor();
+        MayahAI(argc, argv, executor.get()).runLoop();
+    } else {
+        MayahAI(argc, argv).runLoop();
+    }
 
     return 0;
 }
