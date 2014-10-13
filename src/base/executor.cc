@@ -3,7 +3,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-DEFINE_int32(num_threads, 3, "The default number of threads");
+DEFINE_int32(num_threads, 1, "The default number of threads");
 
 using namespace std;
 
