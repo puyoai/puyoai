@@ -254,7 +254,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     CollectedFeature cf = evalWithCollectingFeature(refPlan, field, frameId, maxIteration, preEvalResult, gazeResult);
 
     stringstream ss;
-    if (cf.feature(STRATEGY_ZENKESHI) > 0)
+    if (cf.feature(STRATEGY_ZENKESHI) > 0 || cf.feature(STRATEGY_INITIAL_ZENKESHI) > 0)
         ss << "ZENKESHI / ";
     if (cf.feature(STRATEGY_TAIOU) > 0)
         ss << "TAIOU / ";
