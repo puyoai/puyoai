@@ -68,6 +68,7 @@ public:
 
     const CoreField& field() const { return field_; }
     const KumipuyoSeq& kumipuyoSeq() const { return kumipuyoSeq_; }
+    KumipuyoSeq visibleKumipuyoSeq() const;
     Kumipuyo kumipuyo(int nth = 0) const;
     const KumipuyoPos& kumipuyoPos() const { return mks_.pos; }
     const MovingKumipuyoState& movingKumipuyoState() const { return mks_; }

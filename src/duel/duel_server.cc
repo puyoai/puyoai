@@ -39,7 +39,7 @@ struct DuelServer::DuelState {
             PlayerGameState* pgs = gs.mutablePlayerGameState(pi);
             const FieldRealtime& fr = field[pi];
             pgs->field = fr.field();
-            pgs->kumipuyoSeq = fr.kumipuyoSeq();
+            pgs->kumipuyoSeq = fr.visibleKumipuyoSeq();
             pgs->kumipuyoPos = fr.kumipuyoPos();
             pgs->state = fr.userState();
             pgs->dead = fr.isDead();
