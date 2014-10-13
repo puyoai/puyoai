@@ -43,6 +43,17 @@ std::string Plan::decisionText() const
     return ss.str();
 }
 
+// friend static
+bool operator==(const Plan& lhs, const Plan& rhs)
+{
+    return lhs.field_ == rhs.field_ &&
+        lhs.decisions_ == rhs.decisions_ &&
+        lhs.rensaResult_ == rhs.rensaResult_ &&
+        lhs.numChigiri_ == rhs.numChigiri_ &&
+        lhs.framesToInitiate_ == rhs.framesToInitiate_ &&
+        lhs.lastDropFrames_ == rhs.lastDropFrames_;
+}
+
 std::string RefPlan::decisionText() const
 {
     std::ostringstream ss;

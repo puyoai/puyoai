@@ -47,6 +47,8 @@ public:
 
     std::string decisionText() const;
 
+    friend bool operator==(const Plan& lhs, const Plan& rhs);
+
 private:
     CoreField field_;      // Future field (after the rensa has been finished).
     std::vector<Decision> decisions_;
