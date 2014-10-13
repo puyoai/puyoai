@@ -33,6 +33,7 @@ Executor::~Executor()
 void Executor::start()
 {
     CHECK(!hasStarted_);
+    hasStarted_ = true;
 
     for (size_t i = 0; i < threads_.size(); ++i) {
         threads_[i] = thread([this]() {
