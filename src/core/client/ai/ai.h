@@ -65,6 +65,9 @@ protected:
         return think(frameId, field, next, info);
     }
 
+    // |gaze| will be called when AI should gaze the enemy's field.
+    virtual void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&);
+
     void setBehaviorDefensive(bool flag) { behaviorDefensive_ = flag; }
     void setBehaviorRethinkAfterOpponentRensa(bool flag) { behaviorRethinkAfterOpponentRensa_ = flag; }
 
@@ -123,11 +126,14 @@ private:
     ClientConnector connector_;
     CoreField field_;  // estimated my field.
     KumipuyoSeq seq_;  // remember kumipuyo sequence.
-    KumipuyoSeq enemySeq_;  // remember enemy's kumipuyo sequence.
     AdditionalThoughtInfo additionalThoughtInfo_;
     int hand_;
     int enemyHand_;
     bool rethinkRequested_;
+
+    int enemyDecisionRequestFrameId_;
+    CoreField enemyField_; // remember enemy's field
+    KumipuyoSeq enemySeq_; // remember enemy's kumipuyo sequence.
 
     bool behaviorDefensive_;
     bool behaviorRethinkAfterOpponentRensa_;

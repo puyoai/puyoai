@@ -306,33 +306,10 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
 
 void MayahAI::onGameWillBegin(const FrameRequest& frameRequest)
 {
-    enemyField_.clear();
-    enemyDecisonRequestFrameId_ = frameRequest.frameId;
     gazer_.initialize(frameRequest.frameId);
 }
 
-void MayahAI::onGameHasEnded(const FrameRequest&)
+void MayahAI::gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq& kumipuyoSeq)
 {
-}
-
-void MayahAI::onEnemyDecisionRequested(const FrameRequest& frameRequest)
-{
-    enemyField_ = CoreField(frameRequest.enemyPlayerFrameRequest().field);
-    enemyField_.forceDrop();
-    enemyDecisonRequestFrameId_ = frameRequest.frameId;
-}
-
-void MayahAI::onEnemyNext2Appeared(const FrameRequest& frameRequest)
-{
-    // At the beginning of the game, kumipuyoSeq might contain EMPTY/EMPTY.
-    // In that case, we need to skip.
-    const KumipuyoSeq& seq = frameRequest.enemyPlayerFrameRequest().kumipuyoSeq;
-    if (!isNormalColor(seq.axis(0)) || !isNormalColor(seq.child(0)))
-        return;
-
-    // Since enemy's current moving puyo might be grounded already. In that case, we use the same puyo twice.
-    // So, we need to use the field that is taken in DecisionRequest.
-    gazer_.gaze(enemyDecisonRequestFrameId_, enemyField_, frameRequest.enemyPlayerFrameRequest().kumipuyoSeq);
-
-    LOG(INFO) << '\n' << gazer_.gazeResult().toRensaInfoString();
+    gazer_.gaze(frameId, enemyField, kumipuyoSeq);
 }
