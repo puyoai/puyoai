@@ -25,7 +25,8 @@ int Solver::solve(const std::string& filename)
     req.playerFrameRequest[1].field = problem.field[1];
     req.playerFrameRequest[0].kumipuyoSeq = problem.kumipuyoSeq[0];
     req.playerFrameRequest[1].kumipuyoSeq = problem.kumipuyoSeq[1];
-    ai_->enemyDecisionRequested(req);
+
+    ai_->gaze(req.frameId, CoreField(problem.field[1]), problem.kumipuyoSeq[1]);
 
     DropDecision d0 = ai_->think(3, problem.field[0], problem.kumipuyoSeq[0], AdditionalThoughtInfo());
 
