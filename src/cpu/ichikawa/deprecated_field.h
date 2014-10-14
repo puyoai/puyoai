@@ -1,73 +1,54 @@
-#ifndef CORE_FIELD_H_
-#define CORE_FIELD_H_
+#ifndef DEPRECATED_FIELD_H_
+#define DEPRECATED_FIELD_H_
 
 #include <string>
 #include <vector>
 
 #include "core/constant.h"
-#include "core/puyo.h"
+#include "core/puyo_color.h"
+#include "core/field/rensa_result.h"
+#include "core/field/core_field.h"
 
 // DEPRECATED. A user should use Field instead.
 // This class contains unnecessary garbages.
-class DeprecatedField {
+class DeprecatedField : public FieldConstant {
  public:
-  static const int WIDTH = 6;
-  static const int HEIGHT = 12;
-  static const int MAP_WIDTH = 1 + WIDTH + 1;
-  static const int MAP_HEIGHT = 1 + HEIGHT + 3;
 
-  DeprecatedField();
-  DeprecatedField(const std::string& url);
-  DeprecatedField(const DeprecatedField& f);
+  DeprecatedField() {}
+  DeprecatedField(const std::string& url) : inner_(url) {}
+  DeprecatedField(const DeprecatedField& f) : inner_(f.inner_) {}
 
   // Put a puyo at a specified position.
-  void Set(int x, int y, char color);
+  void Set(int x, int y, char c) {
+    inner_.setPuyoAndHeight(x, y, toPuyoColor(c));
+  }
 
   // Get a color of puyo at a specified position.
   // TODO: Returning char seems weird. PuyoColor should be returned instead.
-  char Get(int x, int y) const;
+  PuyoColor Get(int x, int y) const {
+    return inner_.color(x, y);
+  }
 
   // Simulate chains until the end, and returns chains, score, and frames before
   // finishing the chain.
-  void Simulate();
-  void Simulate(int* chains, int* score, int* frames);
+  void Simulate() { inner_.simulate(); }
+  void Simulate(int* chains, int* score, int* frames) {
+    RensaResult rensaResult = inner_.simulate();
+    *chains = rensaResult.chains;
+    *score = rensaResult.score;
+    *frames = rensaResult.frames;
+  }
 
   // When some puyos are located in the air, drop them.
-  void ForceDrop() { Drop(); }
+  void ForceDrop() { inner_.forceDrop(); }
 
   // Normal print for debugging purpose.
-  std::string GetDebugOutput() const;
+  std::string GetDebugOutput() const { return inner_.toDebugString(); }
 
- protected:
-  // Crears every data this class has.
-  void Init();
-
-  // Clean internal states, related to Vanish and Drop.
-  void Clean();
-
-  // Vanish puyos, and adds score. The argument "chains" is used to calculate
-  // score.
-  bool Vanish(int chains, int* score);
-
-  // After vanishing, drop puyos. You should not Set puyos between vanish and
-  // drop.
-  void Drop();
+  const CoreField& inner() const { return inner_; }
 
  private:
-  void FillFieldInfo(std::stringstream& ss) const;
-  void Drop(int* frames);
-
-  byte field_[MAP_WIDTH][MAP_HEIGHT];
-
-  // Puyo at field[x][y] will not fall or will not be vanished iff
-  // y>min_heights[x].
-  //
-  // After Vanish(): Lowest position a puyo vanished.
-  // After Drop(): Lowest position where we should start vanishment-check.
-  int min_heights[MAP_WIDTH];
-
-  bool erased_;
-  friend class FieldRealtime;
+  CoreField inner_;
 };
 
 // DEPRECATED. A user should mange color sequence by himself.
@@ -94,8 +75,6 @@ public:
 private:
   std::string color_sequence_;
   int next_puyo_;
-
-  friend class FieldRealtime;
 };
 
-#endif  // CORE_FIELD_H_
+#endif  // DEPRECATED_FIELD_H_

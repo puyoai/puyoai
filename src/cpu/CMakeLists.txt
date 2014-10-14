@@ -41,7 +41,7 @@ function(cpu_add_runner runner)
 endfunction()
 
 add_subdirectory(hamaji)
-#add_subdirectory(ichikawa)
+add_subdirectory(ichikawa)
 add_subdirectory(mayah)
 add_subdirectory(munetoshi)
 add_subdirectory(pascal)

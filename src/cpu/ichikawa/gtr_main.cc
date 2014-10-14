@@ -11,7 +11,9 @@
 #include <sstream>
 #include <fstream>
 #include <climits>
+
 #include <gflags/gflags.h>
+#include <glog/logging.h>
 
 #include "deprecated_field.h"
 #include "core/decision.h"
@@ -21,7 +23,6 @@ typedef DeprecatedField Field;
 
 const char NORMAL_COLOR_BEGIN = 4;
 const char NORMAL_COLOR_END = 8;
-const char IMPOSSIBLE = NORMAL_COLOR_END;
 
 DEFINE_int32(goal_chain_len, 9, "");
 DEFINE_bool(hate_small_chain, false, "");
@@ -89,14 +90,14 @@ class Chunk {
   char fill_color_;
 };
 
-void GetInput(Input* input, ofstream& log) {
+void GetInput(Input* input) {
   string str;
   getline(cin, str, '\n');
 
   istringstream iss(str);
   string tmp;
   input->original = str;
-  //log << "[" << input->original << "]" << endl << flush;
+  //LOG(INFO) << "[" << input->original << "]" << endl << flush;
   string my_field_str, my_puyos_str, other_field_str;
   while(getline(iss, tmp, ' ')) {
     if (tmp.substr(0, 3) == "ID=") {
@@ -528,8 +529,8 @@ void EvaluateDecisions(
   if (!CanPut(input.my_field, input.my_current_point, decisions[0])) return;
   int happiness = GetHappiness(
       input.my_field, puyos_list, decisions, num_ojamas_list);
-  //log << "happiness: " << happiness << endl;
-  //log << new_field.GetDebugOutput() << endl;
+  //LOG(INFO) << "happiness: " << happiness << endl;
+  //LOG(INFO) << new_field.GetDebugOutput() << endl;
   if (happiness > *max_happiness) {
     *max_decisions = decisions;
     *max_happiness = happiness;
@@ -538,7 +539,7 @@ void EvaluateDecisions(
 
 void Act(
     const Input& input, int pending_ojamas, int ready_ojamas,
-    Decision* decision, ostream& log) {
+    Decision* decision) {
   const FieldWithColorSequence& field = input.my_field;
   vector<pair<char, char> > puyos_list;
   for (int i = 0; i < 3; ++i) {
@@ -577,12 +578,12 @@ void Act(
     for (int i = 0; i < int(max_decisions.size()); ++i) {
       Put(&new_field, max_decisions[i], puyos_list[i]);
     }
-    log << "---" << endl;
-    log << "current:" << endl;
-    log << input.my_field.GetDebugOutput() << endl;
-    log << "ojamas: " << pending_ojamas << "/" << ready_ojamas << endl;
-    log << "max_happiness: " << max_happiness << endl;
-    log << new_field.GetDebugOutput() << endl;
+    LOG(INFO) << "---" << endl;
+    LOG(INFO) << "current:" << endl;
+    LOG(INFO) << input.my_field.GetDebugOutput() << endl;
+    LOG(INFO) << "ojamas: " << pending_ojamas << "/" << ready_ojamas << endl;
+    LOG(INFO) << "max_happiness: " << max_happiness << endl;
+    LOG(INFO) << new_field.GetDebugOutput() << endl;
 
     int chains, score, frames;
     new_field.Simulate(&chains, &score, &frames);
@@ -590,8 +591,8 @@ void Act(
     char fire_color;
     vector<Chunk> chunks;
     Dream(&new_field, &fire_point, &fire_color, &chunks);
-    log << "dream:" << endl;
-    log << FieldToStr(new_field) << endl;
+    LOG(INFO) << "dream:" << endl;
+    LOG(INFO) << FieldToStr(new_field) << endl;
     *decision = max_decisions[0];
 
   } else {
@@ -608,15 +609,15 @@ bool other_active = false;
 int pending_ojamas = 0;
 int ready_ojamas = 0;
 
-void GetDecision(const Input& input, Decision* decision, ostream& log) {
+void GetDecision(const Input& input, Decision* decision) {
   if (input.state.other_grounded) {
     FieldWithColorSequence work_field = input.other_field;
     int chains, score, frames;
     work_field.ForceDrop();
     work_field.Simulate(&chains, &score, &frames);
     //log << work_field.GetDebugOutput() << endl << flush;
-    log << "other_chains: " << chains << endl << flush;
-    log << "other_score: " << score << endl << flush;
+    LOG(INFO) << "other_chains: " << chains << endl << flush;
+    LOG(INFO) << "other_score: " << score << endl << flush;
     //log << "---" << endl << flush;
     pending_ojamas += score / 70;
   }
@@ -666,7 +667,7 @@ void GetDecision(const Input& input, Decision* decision, ostream& log) {
 
   if (my_turn_begins) {
     //if (ojama_comming) log << "OJAMA!" << endl;
-    Act(input, pending_ojamas, ready_ojamas, decision, log);
+    Act(input, pending_ojamas, ready_ojamas, decision);
     //ojama_comming = false;
     ready_ojamas = 0;
   } else {
@@ -686,6 +687,9 @@ void TestHappiness(const string& field_str) {
 // argv[1] will have "Player1" for player 1, and "Player2" for player 2.
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
+  google::InitGoogleLogging(argv[0]);
+  google::InstallFailureSignalHandler();
+
   if (argc < 2) {
     cerr << "Usage: gtr_main Player1" << endl;
     return 1;
@@ -718,7 +722,7 @@ int main(int argc, char* argv[]) {
         FieldWithColorSequence("400000700000600005760504760505746745456774445645556745"), true);
     int happiness2 = GetDreamHappiness(
         FieldWithColorSequence("400000700000650000765000765400746745456774445645556745"), true);
-    assert(happiness2 > happiness1);
+    CHECK(happiness2 > happiness1);
 
   } else if (arg == "exp") {
     FieldWithColorSequence field("400000000000");
@@ -728,27 +732,25 @@ int main(int argc, char* argv[]) {
 
   } else {
     // Logging.
-    string name = arg + ".txt";
-    ofstream log(name.c_str(), ios_base::out);
-    log << "begin process" << endl;
-    log << "------------------" << endl;
+    LOG(INFO) << "begin process" << endl;
+    LOG(INFO) << "------------------" << endl;
 
     // Make sure the CPU is connected to the duel server.
     // Echo back what we receive.
     // MAKE SURE to flush.
     Input input;
-    GetInput(&input, log);
+    GetInput(&input);
     cout << input.original << endl << flush;
 
     while (1) {
-      GetInput(&input, log);
-      log << "Received: " << input.original << endl << flush;
+      GetInput(&input);
+      LOG(INFO) << "Received: " << input.original << endl << flush;
       Decision decision;
-      GetDecision(input, &decision, log);
+      GetDecision(input, &decision);
       ostringstream ss;
       if (decision.x >= 0) {
         ss << "ID=" << input.id << " X=" << decision.x << " R=" << decision.r << endl;
-        log << "Output: " << ss.str() << flush;
+        LOG(INFO) << "Output: " << ss.str() << flush;
       } else if (!FLAGS_slow_play) {
         ss << "ID=" << input.id << endl;
       }
