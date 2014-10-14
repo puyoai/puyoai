@@ -41,7 +41,7 @@ const bool USE_IGNITION_HEIGHT_FEATURE = true;
 const bool USE_FIELD_USHAPE_FEATURE = true;
 const bool USE_RIDGE_FEATURE = true;
 const bool USE_VALLEY_FEATURE = true;
-
+const bool USE_FIRE_POINT_TABOO_FEATURE = true;
 const bool USHAPE_ABS = false;
 const bool USHAPE_SQUARE = true;
 
@@ -497,6 +497,24 @@ void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const RefPlan& pl
 }
 
 template<typename ScoreCollector>
+void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const RefPlan& plan, const RensaTrackResult& trackResult)
+{
+    const CoreField& field = plan.field();
+
+    // A_A is taboo generally. Allow this from x == 1 or x == 4.
+    for (int x = 2; x <= 3; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            if (trackResult.erasedAt(x, y) != 1 || trackResult.erasedAt(x + 1, y) != 1 || trackResult.erasedAt(x + 2, y) != 1)
+                continue;
+
+            if (isNormalColor(field.color(x, y)) && field.color(x, y) == field.color(x + 2, y) && field.color(x + 1, y) == PuyoColor::EMPTY) {
+                sc_->addScore(FIRE_POINT_TABOO, 1);
+            }
+        }
+    }
+}
+
+template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const RefPlan& plan, const RensaTrackResult& trackResult, bool enemyHasZenkeshi)
 {
     auto key = enemyHasZenkeshi ? IGNITION_HEIGHT_ON_ENEMY_ZENKESHI : IGNITION_HEIGHT;
@@ -583,6 +601,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         rensaEvaluator.collectScoreForRensaGarbage(fieldAfterRensa);
         if (USE_HAND_WIDTH_FEATURE)
             rensaEvaluator.evalRensaHandWidthFeature(plan, trackResult);
+        if (USE_FIRE_POINT_TABOO_FEATURE)
+            rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
         if (USE_IGNITION_HEIGHT_FEATURE)
             rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, gazeResult.additionalThoughtInfo().enemyHasZenkeshi());
         if (USE_CONNECTION_FEATURE)
