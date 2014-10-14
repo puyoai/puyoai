@@ -41,6 +41,7 @@ AI::AI(int argc, char* argv[], const string& name) :
     hand_(0),
     enemyHand_(0),
     rethinkRequested_(false),
+    enemyDecisionRequestFrameId_(0),
     behaviorDefensive_(false),
     behaviorRethinkAfterOpponentRensa_(false)
 {
@@ -196,15 +197,23 @@ void AI::runLoop()
     LOG(INFO) << "will exit run loop";
 }
 
+void AI::gaze(int frameId, const CoreField&, const KumipuyoSeq&)
+{
+    UNUSED_VARIABLE(frameId);
+}
+
 void AI::gameWillBegin(const FrameRequest& frameRequest)
 {
     hand_ = 0;
-    enemyHand_ = 0;
     rethinkRequested_ = false;
     field_.clear();
     seq_.clear();
-    enemySeq_.clear();
     additionalThoughtInfo_ = AdditionalThoughtInfo();
+
+    enemyHand_ = 0;
+    enemyDecisionRequestFrameId_ = 0;
+    enemyField_.clear();
+    enemySeq_.clear();
 
     onGameWillBegin(frameRequest);
 }
@@ -265,6 +274,9 @@ void AI::enemyDecisionRequested(const FrameRequest& frameRequest)
     }
 
     enemyHand_ += 1;
+    enemyDecisionRequestFrameId_ = frameRequest.frameId;
+    enemyField_ = CoreField(frameRequest.enemyPlayerFrameRequest().field);
+    enemyField_.forceDrop();
     onEnemyDecisionRequested(frameRequest);
 }
 
@@ -299,6 +311,8 @@ void AI::enemyNext2Appeared(const FrameRequest& frameRequest)
             enemySeq_.add(kumipuyoSeq.get(i));
         }
     }
+
+    gaze(enemyDecisionRequestFrameId_, enemyField_, rememberedSequence(enemyHand_));
 
     onEnemyNext2Appeared(frameRequest);
 }

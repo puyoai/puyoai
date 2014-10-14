@@ -44,10 +44,9 @@ public:
     virtual DropDecision thinkFast(int frameId, const PlainField&, const KumipuyoSeq&,
                                    const AdditionalThoughtInfo&) override;
 
+    virtual void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&) override;
+
     virtual void onGameWillBegin(const FrameRequest&) override;
-    virtual void onGameHasEnded(const FrameRequest&) override;
-    virtual void onEnemyDecisionRequested(const FrameRequest&) override;
-    virtual void onEnemyNext2Appeared(const FrameRequest&) override;
 
     // Use this directly in test. Otherwise, use via think/thinkFast.
     ThoughtResult thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, const AdditionalThoughtInfo&,
@@ -71,9 +70,6 @@ protected:
 
     Executor* executor_;
 
-    CoreField enemyField_;
-    int enemyDecisonRequestFrameId_;
-
     Gazer gazer_;
 };
 
@@ -84,7 +80,6 @@ public:
     virtual ~DebuggableMayahAI() {}
 
     using MayahAI::additionalThoughtInfo;
-    using MayahAI::think;
     using MayahAI::reloadParameter;
     using MayahAI::makeMessageFrom;
 
