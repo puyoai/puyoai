@@ -28,6 +28,7 @@ hamaji_add_executable(lps main.cc)
 hamaji_add_executable(study study.cc)
 hamaji_add_executable(mkdb mkdb.cc)
 hamaji_add_executable(matchstat matchstat.cc)
+hamaji_add_executable(one one.cc)
 
 cpu_add_runner(lps-fast.sh)
 cpu_add_runner(lps-gtr.sh)
