@@ -7,6 +7,19 @@
 
 #include "core/plain_field.h"
 
+enum BookCellExpr {
+    ANY,
+    VAR,
+    NOT,
+    AND,
+    OR,
+    UNSPECIFIED,
+};
+
+class BookCell {
+
+};
+
 class BookField {
 public:
     struct MatchResult {

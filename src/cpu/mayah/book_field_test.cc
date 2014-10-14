@@ -147,6 +147,36 @@ TEST(BookFieldTest, unmatch1)
     EXPECT_EQ(BookField::MatchResult(false, 0, 0), bf.match(pf4));
 }
 
+TEST(BookFieldTest, matchWithAllowing)
+{
+    BookField bf("test",
+                 vector<string> {
+                     "..C...",
+                     "AAaBB."
+                 });
+
+    PlainField pf0;
+
+    PlainField pf1(
+        "RRBBB.");
+
+    PlainField pf2(
+        "RRRBB.");
+
+    PlainField pf3(
+        "R.RBB.");
+
+    PlainField pf4(
+        "..R..."
+        "RRYRR.");
+
+    EXPECT_EQ(BookField::MatchResult(true, 0, 0), bf.match(pf0));
+    EXPECT_EQ(BookField::MatchResult(false, 0, 0), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(true, 4, 4), bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(true, 3, 3), bf.match(pf3));
+    EXPECT_EQ(BookField::MatchResult(true, 5, 5), bf.match(pf4));
+}
+
 TEST(BookFieldTest, unmatch2)
 {
     BookField bf("test",

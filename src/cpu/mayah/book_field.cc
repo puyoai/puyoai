@@ -1,9 +1,11 @@
 #include "book_field.h"
 
 #include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <map>
 #include <sstream>
+
 #include "core/puyo_color.h"
 
 using namespace std;
@@ -40,7 +42,7 @@ private:
 };
 
 static inline
-bool check(char currentVar, char neighborVar, PuyoColor neighborColor, const PuyoColorEnv& env)
+bool checkCell(char currentVar, char neighborVar, PuyoColor neighborColor, const PuyoColorEnv& env)
 {
     DCHECK_NE(currentVar, '.');
     DCHECK_NE(currentVar, '*');
@@ -59,6 +61,10 @@ bool check(char currentVar, char neighborVar, PuyoColor neighborColor, const Puy
 
     if (neighborVar == '.') {
         if (env.map(currentVar) == neighborColor) {
+            return false;
+        }
+    } else if ('a' <= neighborVar && neighborVar <= 'z') {
+        if (currentVar != std::toupper(neighborVar) && env.map(currentVar) == neighborColor) {
             return false;
         }
     } else {
@@ -87,12 +93,15 @@ BookField::BookField(const string& name, const vector<string>& field, double def
         for (int x = 1; x <= 6; ++x) {
             if (field[i][x - 1] == '.')
                 continue;
-            if ('a' <= field[i][x - 1] && field[i][x - 1] <= 'z')
-                continue;
 
             if ('A' <= field[i][x - 1] && field[i][x - 1] <= 'Z') {
                 field_[x][y] = field[i][x - 1];
                 scoreField_[x][y] = defaultScore;
+                continue;
+            }
+
+            if ('a' <= field[i][x - 1] && field[i][x - 1] <= 'z') {
+                field_[x][y] = field[i][x - 1];
                 continue;
             }
 
@@ -128,9 +137,17 @@ void BookField::merge(const BookField& bf)
                 continue;
             }
 
-            CHECK_EQ(field_[x][y], bf.field_[x][y]) << name() << " : " << bf.name()
-                                                    << "x=" << x << " y=" << y;
-            scoreField_[x][y] = bf.scoreField_[x][y];
+            if (('A' <= field_[x][y] && field_[x][y] <= 'Z') &&
+                ('a' <= bf.field_[x][y] && bf.field_[x][y] <= 'z')) {
+                scoreField_[x][y] = std::max(scoreField_[x][y], bf.scoreField_[x][y]);
+                continue;
+            } else if (('A' <= field_[x][y] && field_[x][y] <= 'Z') &&
+                       ('a' <= bf.field_[x][y] && bf.field_[x][y] <= 'z')) {
+                field_[x][y] = bf.field_[x][y];
+                scoreField_[x][y] = std::max(scoreField_[x][y], bf.scoreField_[x][y]);
+            } else {
+                CHECK_EQ(field_[x][y], bf.field_[x][y]);
+            }
         }
     }
 
@@ -156,12 +173,15 @@ BookField::MatchResult BookField::match(const PlainField& f) const
     int matchCount = 0;
     double matchScore = 0;
 
+    // First, create a env (char -> PuyoColor)
     PuyoColorEnv env;
-
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; f.get(x, y) != PuyoColor::EMPTY; ++y) {
             char c = field_[x][y];
             if (c == '.' || c == '*')
+                continue;
+
+            if ('a' <= c && c <= 'z')
                 continue;
 
             DCHECK('A' <= c && c <= 'Z') << c;
@@ -189,15 +209,17 @@ BookField::MatchResult BookField::match(const PlainField& f) const
     // Check the neighbors.
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12 && field_[x][y] != '.'; ++y) {
-            if (field_[x][y] == '*')
+            if (field_[x][y] == '*' || ('a' <= field_[x][y] && field_[x][y] <= 'z'))
                 continue;
-            if (!check(field_[x][y], field_[x][y + 1], f.get(x, y + 1), env))
+
+            // Check neighbors.
+            if (!checkCell(field_[x][y], field_[x][y + 1], f.get(x, y + 1), env))
                 return MatchResult(false, 0, 0);
-            if (!check(field_[x][y], field_[x][y - 1], f.get(x, y - 1), env))
+            if (!checkCell(field_[x][y], field_[x][y - 1], f.get(x, y - 1), env))
                 return MatchResult(false, 0, 0);
-            if (!check(field_[x][y], field_[x + 1][y], f.get(x + 1, y), env))
+            if (!checkCell(field_[x][y], field_[x + 1][y], f.get(x + 1, y), env))
                 return MatchResult(false, 0, 0);
-            if (!check(field_[x][y], field_[x - 1][y], f.get(x - 1, y), env))
+            if (!checkCell(field_[x][y], field_[x - 1][y], f.get(x - 1, y), env))
                 return MatchResult(false, 0, 0);
         }
     }
