@@ -86,17 +86,14 @@ int main(int argc, char* argv[])
     removeNontokopuyoParameter(&parameter);
 
 #if 1
-    map<pair<int, int>, RunResult> scoreMap;
-    for (int x = 50; x <= 150; x += 10) {
-        for (int y = x; y <= 150; y += 10) {
-            cout << "current x = " << x << endl;
-            parameter.setValue(CONNECTION, 2, x);
-            parameter.setValue(CONNECTION, 3, y);
-            scoreMap[make_pair(x, y)] = run(executor.get(), parameter);
-        }
+    map<int, RunResult> scoreMap;
+    for (int x = 0; x <= 100; x += 10) {
+        cout << "current x = " << x << endl;
+        parameter.setValue(FIRE_POINT_TABOO, -x);
+        scoreMap[x] = run(executor.get(), parameter);
     }
     for (const auto& m : scoreMap) {
-        cout << m.first.first << "/" << m.first.second << " -> " << m.second.sumScore << " / " << m.second.mainRensaCount << endl;
+        cout << m.first << " -> " << m.second.sumScore << " / " << m.second.mainRensaCount << endl;
     }
 
 #else
