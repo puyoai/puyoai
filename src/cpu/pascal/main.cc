@@ -7,6 +7,7 @@
 #include <string>
 
 #include <glog/logging.h>
+#include <gflags/gflags.h>
 
 #include "deprecated_field.h"
 #include "plan.h"
