@@ -1,5 +1,5 @@
-#ifndef CORE_PLAN_H_
-#define CORE_PLAN_H_
+#ifndef DEPRECATED_PLAN_H_
+#define DEPRECATED_PLAN_H_
 
 #include <vector>
 
@@ -9,12 +9,12 @@
 
 typedef DeprecatedField Field;
 
-class Plan {
+class DeprecatedPlan {
  public:
   int numTurns() const;
 
   // Previous state.
-  const Plan* parent;
+  const DeprecatedPlan* parent;
   // Decision made for this plan.
   Decision decision;
   // Future field state (apply the state to the previous state).
@@ -25,8 +25,8 @@ class Plan {
   int ojama;
 };
 
-inline int Plan::numTurns() const {
-  const Plan* p = this;
+inline int DeprecatedPlan::numTurns() const {
+  const DeprecatedPlan* p = this;
   int n = 0;
   while (p) {
     p = p->parent;
@@ -36,8 +36,8 @@ inline int Plan::numTurns() const {
 }
 
 inline void FindAvailablePlansInternal(
-    const FieldWithColorSequence& field, const Plan* parent, int depth, int max_depth,
-    std::vector<Plan>* plans) {
+    const FieldWithColorSequence& field, const DeprecatedPlan* parent, int depth, int max_depth,
+    std::vector<DeprecatedPlan>* plans) {
 
   static const Decision decisions[] = {
     Decision(1, 2),
@@ -83,7 +83,7 @@ inline void FindAvailablePlansInternal(
 
   for (int i = 0; i < num_decisions; i++) {
     const Decision& decision = decisions[i];
-    if (!Ctrl::isReachable(field, decision)) {
+    if (!PuyoController::isReachable(field.inner(), decision)) {
       continue;
     }
 
@@ -108,8 +108,8 @@ inline void FindAvailablePlansInternal(
     }
 
     // Add a new plan.
-    plans->push_back(Plan());
-    Plan& plan = plans->at(plans->size() - 1);
+    plans->push_back(DeprecatedPlan());
+    DeprecatedPlan& plan = plans->at(plans->size() - 1);
     plan.field = next_field;
     plan.decision = decision;
     plan.parent = parent;
@@ -125,13 +125,13 @@ inline void FindAvailablePlansInternal(
   }
 }
 
-inline void FindAvailablePlans(const FieldWithColorSequence& field, int depth, std::vector<Plan>* plans) {
+inline void FindAvailablePlans(const FieldWithColorSequence& field, int depth, std::vector<DeprecatedPlan>* plans) {
   plans->clear();
   plans->reserve(22 + 22*22 + 22*22*22);
   FindAvailablePlansInternal(field, NULL, 0, depth, plans);
 }
 
-inline void FindAvailablePlans(const FieldWithColorSequence& field, std::vector<Plan>* plans) {
+inline void FindAvailablePlans(const FieldWithColorSequence& field, std::vector<DeprecatedPlan>* plans) {
   FindAvailablePlans(field, 3, plans);
 }
 
