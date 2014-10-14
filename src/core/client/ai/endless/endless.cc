@@ -28,9 +28,7 @@ int Endless::run(const KumipuyoSeq& seq)
         req.frameId = i + 2;
 
         // For gazing.
-        ai_->enemyNext2Appeared(req);
-        ai_->enemyDecisionRequested(req);
-        ai_->enemyGrounded(req);
+        ai_->gaze(req.frameId, CoreField(req.enemyPlayerFrameRequest().field), req.enemyPlayerFrameRequest().kumipuyoSeq);
 
         // think
         ai_->next2Appeared(req);

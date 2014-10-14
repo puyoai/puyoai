@@ -128,9 +128,7 @@ int main(int argc, char* argv[])
         // Call these callback for gazer.
         {
             double t1 = currentTime();
-            ai.enemyDecisionRequested(req);
-            ai.enemyNext2Appeared(req);
-            ai.enemyGrounded(req);
+            ai.gaze(frameId, req.playerFrameRequest[1].field, req.playerFrameRequest[1].kumipuyoSeq);
             double t2 = currentTime();
             cout << "gazer time = " << (t2 - t1) << endl;
         }
