@@ -1,17 +1,19 @@
 #include "main.h"
 
-#include <iostream>
-#include <fstream>
 #include <limits.h>
+
+#include <iostream>
 #include <sstream>
 #include <string>
+
+#include <glog/logging.h>
 
 #include "deprecated_field.h"
 #include "plan.h"
 
 using namespace std;
 
-double getScore(const Field& f, ofstream& ofs) {
+double getScore(const Field& f) {
   // If there are too many colors in a small section, it's bad.
   double colors_score = 0;
   if (0) {
@@ -101,26 +103,23 @@ double getScore(const Field& f, ofstream& ofs) {
 
 void PascalCpu::GetDecision(
     const Data& data, Decision* decision, string* message) {
-  // Logging.
-  string name = "/tmp/test.txt";
-  ofstream ofs(name.c_str());
 
   if (!data.HasControl(0)) {
     return;
   }
 
-  ofs << "Received: " << data.id << endl << flush;
-  ofs << data.player[0].field.GetDebugOutput() << endl << flush;
+  LOG(INFO) << "Received: " << data.id << endl << flush;
+  LOG(INFO) << data.player[0].field.GetDebugOutput() << endl << flush;
 
-  vector<Plan> plans;
+  vector<DeprecatedPlan> plans;
   FindAvailablePlans(data.player[0].field, 3, &plans);
-  ofs << "Plans = " << plans.size() << endl << flush;
+  LOG(INFO) << "Plans = " << plans.size() << endl << flush;
 
   // emergency.
   if (data.player[0].ojama > 6) {
-    ofs << "EMERGENCY" << endl << flush;
+    LOG(INFO) << "EMERGENCY" << endl << flush;
     int min_score = INT_MAX;
-    const Plan* my_plan = NULL;
+    const DeprecatedPlan* my_plan = NULL;
     for (unsigned int i = 0; i < plans.size(); i++) {
       if (plans[i].parent && (plans[i].parent->parent == NULL)) {
         int score = plans[i].score;
@@ -138,46 +137,45 @@ void PascalCpu::GetDecision(
       stringstream buf;
       buf << min_score;
       *message = buf.str();
-      ofs << "ID=" << data.id << " X=" << decision->x << " R=" << decision->r
+      LOG(INFO) << "ID=" << data.id << " X=" << decision->x << " R=" << decision->r
           << " SCORE=" << min_score << endl << flush;
       return;
     }
   }
 
   double max_score = -1;
-  const Plan* my_plan = NULL;
+  const DeprecatedPlan* my_plan = NULL;
   for (unsigned int i = 0; i < plans.size(); i++) {
-    double score = plans[i].score / 10.0 + getScore(plans[i].field, ofs);
+    double score = plans[i].score / 10.0 + getScore(plans[i].field);
     if (score > max_score) {
       max_score = score;
       my_plan = &plans[i];
-      ofs << "score: " << score << " / " << "planId = " << i << " / ["
+      LOG(INFO) << "score: " << score << " / " << "planId = " << i << " / ["
           << plans[i].decision.x << ", " << plans[i].decision.r << "]"
           << endl;
     }
   }
-  ofs << "Max score = " << max_score << endl;
+  LOG(INFO) << "Max score = " << max_score << endl;
   if (my_plan) {
-    ofs << my_plan->field.GetDebugOutput() << endl << flush;
+    LOG(INFO) << my_plan->field.GetDebugOutput() << endl << flush;
     while (my_plan->parent != NULL) {
       my_plan = my_plan->parent;
     }
     *decision = my_plan->decision;
   }
-  ofs << "decision = [" << decision->x << ", " << decision->r << "]" << endl;
+  LOG(INFO) << "decision = [" << decision->x << ", " << decision->r << "]" << endl;
 
   stringstream buf;
   buf << max_score;
   *message = buf.str();
-  ofs << "ID=" << data.id << " X=" << decision->x << " R=" << decision->r
+  LOG(INFO) << "ID=" << data.id << " X=" << decision->x << " R=" << decision->r
       << " SCORE=" << max_score << endl << flush;
 }
 
-// argv[1] will have "Player1" for player 1, and "Player2" for player 2.
 int main(int argc, char* argv[]) {
-  // Logging.
-  string name = "/tmp/" + string(argv[1]) + ".txt";
-  ofstream ofs(name.c_str());
+  google::ParseCommandLineFlags(&argc, &argv, true);
+  google::InitGoogleLogging(argv[0]);
+  google::InstallFailureSignalHandler();
 
   PascalCpu cpu;
   cpu.Run();
