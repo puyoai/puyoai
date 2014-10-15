@@ -35,7 +35,7 @@ int Endless::run(const KumipuyoSeq& seq)
         ai_->decisionRequested(req);
 
         DropDecision dropDecision = ai_->think(req.frameId, req.myPlayerFrameRequest().field,
-                                               req.myPlayerFrameRequest().kumipuyoSeq, ai_->additionalThoughtInfo());
+                                               req.myPlayerFrameRequest().kumipuyoSeq, ai_->additionalThoughtInfo(), false);
 
         CoreField f(req.myPlayerFrameRequest().field);
         if (!f.dropKumipuyo(dropDecision.decision(), req.myPlayerFrameRequest().kumipuyoSeq.front())) {

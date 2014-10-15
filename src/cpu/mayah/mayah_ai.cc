@@ -51,14 +51,15 @@ void MayahAI::reloadParameter()
     featureParameter_.reset(new FeatureParameter(FLAGS_feature));
 }
 
-DropDecision MayahAI::think(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq,
-                            const AdditionalThoughtInfo& additionalInfo)
+DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& kumipuyoSeq,
+                            const AdditionalThoughtInfo& additionalInfo, bool fast)
 {
-    CoreField f(plainField);
-
     int depth;
     int iteration;
-    if (FLAGS_use_advanced_next) {
+    if (fast) {
+      depth = MayahAI::DEFAULT_DEPTH;
+      iteration = MayahAI::FAST_NUM_ITERATION;
+    } else if (FLAGS_use_advanced_next) {
         if (kumipuyoSeq.size() >= 3) {
             depth = 3;
             iteration = 2;
@@ -78,19 +79,6 @@ DropDecision MayahAI::think(int frameId, const PlainField& plainField, const Kum
 
     const Plan& plan = thoughtResult.plan;
     if (plan.decisions().empty())
-        return DropDecision(Decision(3, 0), thoughtResult.message);
-    return DropDecision(plan.decisions().front(), thoughtResult.message);
-}
-
-DropDecision MayahAI::thinkFast(int frameId, const PlainField& plainField, const KumipuyoSeq& kumipuyoSeq,
-                                const AdditionalThoughtInfo& additionalInfo)
-{
-    CoreField f(plainField);
-    ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalInfo,
-                                            MayahAI::DEFAULT_DEPTH, MayahAI::FAST_NUM_ITERATION);
-
-    const Plan& plan = thoughtResult.plan;
-    if (thoughtResult.plan.decisions().empty())
         return DropDecision(Decision(3, 0), thoughtResult.message);
     return DropDecision(plan.decisions().front(), thoughtResult.message);
 }

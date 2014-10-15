@@ -15,9 +15,10 @@ class Ai : public ::AI {
   struct Attack;
 
   virtual DropDecision think(int frame_id,
-                             const PlainField& field,
+                             const CoreField& field,
                              const KumipuyoSeq& seq,
-                             const AdditionalThoughtInfo& info) override;
+                             const AdditionalThoughtInfo& info,
+                             bool fast) override;
   virtual void onGameWillBegin(const FrameRequest& frame_request) override;
   virtual void onEnemyGrounded(const FrameRequest& frame_request) override;
 

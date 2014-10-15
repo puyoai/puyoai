@@ -52,22 +52,21 @@ protected:
 
     // |think| will be called when AI should decide the next decision.
     // Basically, this will be called when NEXT2 has appeared.
-    // You will have around 300 ms to decide your hand.
-    virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&,
-                               const AdditionalThoughtInfo&) = 0;
-
-    // |thinkFast| will be called when AI should decide the next decision immediately.
-    // Basically this will be called when ojamas are dropped or the enemy has fired some rensa.
-    // You will have around 30 ms to decide your hand.
-    virtual DropDecision thinkFast(int frameId, const PlainField& field, const KumipuyoSeq& next,
-                                   const AdditionalThoughtInfo& info)
-    {
-        return think(frameId, field, next, info);
-    }
+    // |fast| will be true when AI should decide the next decision immeidately,
+    // e.g. ojamas are dropped or the enemy has fired some rensa
+    // (if you set behavior). This might be called when field is inconsistent
+    // in wii_server.
+    // If |fast| is true, you will have 30 ms to decide your hand.
+    // Otherwise, you will have at least 300 ms to decide your hand.
+    // KumipuyoSeq will have at least 2 kumipuyos. When we know more Kumipuyo sequence,
+    // it might contain more.
+    virtual DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
+                               const AdditionalThoughtInfo&, bool fast) = 0;
 
     // gaze will be called when AI should gaze the enemy's field.
     // |frameId| is the frameId where the enemy has started moving his puyo.
-    // KumipuyoSeq will have at least 2 kumipuyos. When we know more Kumipuyo sequence,
+    // His moving puyo is the front puyo of the KumipuyoSeq.
+    // KumipuyoSeq has at least 2 kumipuyos. When we know more Kumipuyo sequence,
     // it might contain more.
     // Since gaze might be called in the same frame as think(), you shouldn't consume
     // much time for gaze.

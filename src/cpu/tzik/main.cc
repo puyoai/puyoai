@@ -12,10 +12,12 @@ namespace tzik {
 AI::AI(int argc, char** argv) : ::AI(argc, argv, "tzik") {}
 
 DropDecision AI::think(int frame_id,
-                       const PlainField& field,
+                       const CoreField& field,
                        const KumipuyoSeq& seq,
-                       const AdditionalThoughtInfo& info) {
+                       const AdditionalThoughtInfo& info,
+                       bool fast) {
   UNUSED_VARIABLE(info);
+  UNUSED_VARIABLE(fast);
   return think_sample(frame_id, field, seq);
 }
 

@@ -11,17 +11,18 @@ public:
     AIRoutine(int argc, char* argv[]) : AI(argc, argv, "sample") {}
     virtual ~AIRoutine() {}
 
-    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq, const AdditionalThoughtInfo& info) override
+    virtual DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq, const AdditionalThoughtInfo& info, bool fast) override
     {
         UNUSED_VARIABLE(frameId);
         UNUSED_VARIABLE(info);
+        UNUSED_VARIABLE(fast);
 
-        LOG(INFO) << CoreField(f).toDebugString() << seq.toString();
+        LOG(INFO) << f.toDebugString() << seq.toString();
 
         Decision best;
         int score = -1;
 
-        Plan::iterateAvailablePlans(CoreField(f), seq, 2, [&best, &score](const RefPlan& plan) {
+        Plan::iterateAvailablePlans(f, seq, 2, [&best, &score](const RefPlan& plan) {
                 int s = 0;
                 if (plan.isRensaPlan()) {
                     s += plan.rensaResult().chains * 10;

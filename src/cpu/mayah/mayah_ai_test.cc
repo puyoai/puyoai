@@ -66,7 +66,7 @@ TEST(MayahAITest, DontCrash1)
     FrameRequest req;
     req.frameId = 1;
     ai->gameWillBegin(req);
-    (void)ai->think(100, f, seq, AdditionalThoughtInfo());
+    (void)ai->think(100, f, seq, AdditionalThoughtInfo(), false);
 }
 
 TEST(MayahAITest, DontCrash2)
@@ -94,7 +94,7 @@ TEST(MayahAITest, DontCrash2)
     FrameRequest req;
     req.frameId = 1;
     ai->gameWillBegin(req);
-    (void)ai->think(100, f, seq, AdditionalThoughtInfo());
+    (void)ai->think(100, f, seq, AdditionalThoughtInfo(), false);
 }
 
 TEST(MayahAITest, DontCrash3)
@@ -122,5 +122,5 @@ TEST(MayahAITest, DontCrash3)
     FrameRequest req;
     req.frameId = 1;
     ai->gameWillBegin(req);
-    (void)ai->think(100, f, seq, AdditionalThoughtInfo());
+    (void)ai->think(100, f, seq, AdditionalThoughtInfo(), false);
 }

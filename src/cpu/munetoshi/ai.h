@@ -11,9 +11,10 @@ class AI : public ::AI {
   AI(int argc, char* argv[]);
   virtual ~AI() = default;
 
-  DropDecision think(int frame_id, const PlainField& field,
+  DropDecision think(int frame_id, const CoreField& field,
                      const KumipuyoSeq& seq,
-                     const AdditionalThoughtInfo&) override;
+                     const AdditionalThoughtInfo&,
+                     bool fast) override;
 
  protected:
   enum Strategy {
