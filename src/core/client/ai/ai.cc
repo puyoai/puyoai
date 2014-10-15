@@ -312,7 +312,10 @@ void AI::enemyNext2Appeared(const FrameRequest& frameRequest)
         }
     }
 
-    gaze(enemyDecisionRequestFrameId_, enemyField_, rememberedSequence(enemyHand_));
+    // When enemyHand_ == 0, rememberedSequence(0) contains PuyoColor::EMPTY.
+    // So, don't gaze at that time.
+    if (enemyHand_ > 0)
+        gaze(enemyDecisionRequestFrameId_, enemyField_, rememberedSequence(enemyHand_));
 
     onEnemyNext2Appeared(frameRequest);
 }
