@@ -39,10 +39,8 @@ public:
     MayahAI(int argc, char* argv[], Executor* executor = nullptr);
     virtual ~MayahAI();
 
-    virtual DropDecision think(int frameId, const PlainField&, const KumipuyoSeq&,
-                               const AdditionalThoughtInfo&) override;
-    virtual DropDecision thinkFast(int frameId, const PlainField&, const KumipuyoSeq&,
-                                   const AdditionalThoughtInfo&) override;
+    virtual DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
+                               const AdditionalThoughtInfo&, bool fast) override;
 
     virtual void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&) override;
 

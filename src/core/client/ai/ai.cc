@@ -116,7 +116,7 @@ void AI::runLoop()
             CHECK_EQ(kumipuyoSeq.get(2), seq.get(1));
 
             next1.fieldBeforeThink = field_;
-            next1.dropDecision = think(frameRequest.frameId, field_, seq, additionalThoughtInfo_);
+            next1.dropDecision = think(frameRequest.frameId, field_, seq, additionalThoughtInfo_, false);
 
             next1.kumipuyo = kumipuyoSeq.get(1);
             next1.ready = true;
@@ -140,10 +140,10 @@ void AI::runLoop()
             // TODO(mayah): Should we preserve DecisionSending after we used it for this?
             VLOG(1) << "REQUEST_AGAIN";
             DCHECK(!frameRequest.myPlayerFrameRequest().state.decisionRequest) << "decisionRequestAgain should not come with decisionRequest.";
-            DropDecision dropDecision = thinkFast(frameRequest.frameId,
-                                                  frameRequest.myPlayerFrameRequest().field,
-                                                  frameRequest.myPlayerFrameRequest().kumipuyoSeq,
-                                                  additionalThoughtInfo_);
+            DropDecision dropDecision = think(frameRequest.frameId,
+                                              frameRequest.myPlayerFrameRequest().field,
+                                              frameRequest.myPlayerFrameRequest().kumipuyoSeq,
+                                              additionalThoughtInfo_, true);
             connector_.send(FrameResponse(frameRequest.frameId, dropDecision.decision(), dropDecision.message()));
             continue;
         }
@@ -174,7 +174,7 @@ void AI::runLoop()
             CHECK_EQ(kumipuyoSeq.get(0), seq.get(0));
             CHECK_EQ(kumipuyoSeq.get(1), seq.get(1));
 
-            next1.dropDecision = thinkFast(frameRequest.frameId, field_, seq, additionalThoughtInfo_);
+            next1.dropDecision = think(frameRequest.frameId, field_, seq, additionalThoughtInfo_, true);
             next1.kumipuyo = kumipuyoSeq.get(0);
             next1.ready = true;
             next1.needsRethink = false;

@@ -18,9 +18,11 @@ public:
     SampleFillerAI(int argc, char* argv[]) : AI(argc, argv, "sample-filler") {}
     virtual ~SampleFillerAI() {}
 
-    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq, const AdditionalThoughtInfo& info) override
+    virtual DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq,
+                               const AdditionalThoughtInfo& info, bool fast) override
     {
         UNUSED_VARIABLE(info);
+        UNUSED_VARIABLE(fast);
 
         if (FLAGS_algorithm == "peak") {
             return thinkPeak(frameId, f, seq);
@@ -32,27 +34,25 @@ public:
     }
 
 private:
-    DropDecision thinkFlat(int frameId, const PlainField& f, const KumipuyoSeq& seq)
+    DropDecision thinkFlat(int frameId, const CoreField& f, const KumipuyoSeq& seq)
     {
         UNUSED_VARIABLE(frameId);
 
-        const CoreField cf(f);
-
         pair<int, int> heights[] = {
-            make_pair(cf.height(1), 1),
-            make_pair(cf.height(6), 6),
-            make_pair(cf.height(2), 2),
-            make_pair(cf.height(5), 5),
-            make_pair(cf.height(4), 4),
-            make_pair(cf.height(3), 3),
+            make_pair(f.height(1), 1),
+            make_pair(f.height(6), 6),
+            make_pair(f.height(2), 2),
+            make_pair(f.height(5), 5),
+            make_pair(f.height(4), 4),
+            make_pair(f.height(3), 3),
         };
 
         sort(heights, heights + 6);
         for (int i = 0; i < 6; ++i) {
-            CoreField cf2(cf);
+            CoreField cf(f);
             int x = heights[i].second;
-            cf2.dropKumipuyo(Decision(x, 2), seq.get(0));
-            RensaResult rr = cf2.simulate();
+            cf.dropKumipuyo(Decision(x, 2), seq.get(0));
+            RensaResult rr = cf.simulate();
             if (rr.score == 0)
                 return DropDecision(Decision(x, 2));
         }
@@ -92,21 +92,19 @@ private:
         return DropDecision(Decision(3, 2));
     }
 
-    DropDecision thinkNohoho(int frameId, const PlainField& f, const KumipuyoSeq& seq)
+    DropDecision thinkNohoho(int frameId, const CoreField& f, const KumipuyoSeq& seq)
     {
         UNUSED_VARIABLE(frameId);
         UNUSED_VARIABLE(seq);
-
-        CoreField cf(f);
 
         static const int order[] = { 6, 5, 4, 1, 2, 3 };
 
         for (int i = 0; i < 6; ++i) {
             const int x = order[i];
-            if (PuyoController::isReachable(cf, Decision(x, 2))) {
+            if (PuyoController::isReachable(f, Decision(x, 2))) {
                 return DropDecision(Decision(x, 2));
             }
-            if (PuyoController::isReachable(cf, Decision(x, 0))) {
+            if (PuyoController::isReachable(f, Decision(x, 0))) {
                 return DropDecision(Decision(x, 0));
             }
         }

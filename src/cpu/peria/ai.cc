@@ -28,21 +28,23 @@ Ai::Ai(int argc, char* argv[]): ::AI(argc, argv, "peria") {}
 Ai::~Ai() {}
 
 DropDecision Ai::think(int frame_id,
-                       const PlainField& field,
+                       const CoreField& field,
                        const KumipuyoSeq& seq,
-                       const AdditionalThoughtInfo& info) {
+                       const AdditionalThoughtInfo& info,
+                       bool fast) {
   UNUSED_VARIABLE(info);
+  UNUSED_VARIABLE(fast);
   using namespace std::placeholders;
 
   // TODO: Merge all Plan::iterateAvailablePlans() to reduce computing cost.
-  
+
   // Check templates first with visible puyos.
   {
     int score = 0;
     std::string name;
     int frames = 1e+8;
     Decision temp_decision;
-    Plan::iterateAvailablePlans(CoreField(field), seq, 2,
+    Plan::iterateAvailablePlans(field, seq, 2,
                                 std::bind(Evaluate::Patterns, _1,
                                           &score, &name,
                                           &frames, &temp_decision));
@@ -59,7 +61,7 @@ DropDecision Ai::think(int frame_id,
     int score = 0;
     Decision decision;
     Plan::iterateAvailablePlans(
-        CoreField(field), seq, 2,
+        field, seq, 2,
         std::bind(Evaluate::Counter, _1,
                   threshold,
                   attack_->end_frame_id - frame_id,
@@ -73,7 +75,7 @@ DropDecision Ai::think(int frame_id,
     int score = 0;
     Decision decision;
     Plan::iterateAvailablePlans(
-        CoreField(field), seq, 2,
+        field, seq, 2,
         std::bind(Evaluate::Usual, _1, &score, &decision));
 
     return DropDecision(decision, "Normal");

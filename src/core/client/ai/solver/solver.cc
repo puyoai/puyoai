@@ -28,13 +28,13 @@ int Solver::solve(const std::string& filename)
 
     ai_->gaze(req.frameId, CoreField(problem.field[1]), problem.kumipuyoSeq[1]);
 
-    DropDecision d0 = ai_->think(3, problem.field[0], problem.kumipuyoSeq[0], AdditionalThoughtInfo());
+    DropDecision d0 = ai_->think(3, problem.field[0], problem.kumipuyoSeq[0], AdditionalThoughtInfo(), false);
 
     problem.field[0].dropKumipuyo(d0.decision(), problem.kumipuyoSeq[0].front());
     problem.kumipuyoSeq[0].dropFront();
     problem.field[0].simulate();
 
-    DropDecision d1 = ai_->think(4, problem.field[0], problem.kumipuyoSeq[0], AdditionalThoughtInfo());
+    DropDecision d1 = ai_->think(4, problem.field[0], problem.kumipuyoSeq[0], AdditionalThoughtInfo(), false);
 
     cout << problem.name << ": "
          << d0.decision().toString() << "-"

@@ -8,6 +8,7 @@
 class TestAI : public AI {
 public:
     TestAI() : AI("test") {}
+    virtual ~TestAI() {}
 
     using AI::gameWillBegin;
     using AI::decisionRequested;
@@ -18,8 +19,8 @@ public:
     using AI::additionalThoughtInfo;
 
 protected:
-    virtual DropDecision think(int, const PlainField&, const KumipuyoSeq&,
-                               const AdditionalThoughtInfo&)
+    virtual DropDecision think(int, const CoreField&, const KumipuyoSeq&,
+                               const AdditionalThoughtInfo&, bool)
     {
         return DropDecision(Decision(3, 0), "test");
     }

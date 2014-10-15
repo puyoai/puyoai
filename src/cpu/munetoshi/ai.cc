@@ -20,10 +20,11 @@ void munetoshi::AI::onGameWillBegin(const FrameRequest& frame) {
   strategy = GROW;
 }
 
-DropDecision munetoshi::AI::think(int frame_id, const PlainField& field,
+DropDecision munetoshi::AI::think(int frame_id, const CoreField& field,
                                   const KumipuyoSeq& seq,
-                                  const AdditionalThoughtInfo&) {
-  return think_internal(frame_id, CoreField(field), seq);
+                                  const AdditionalThoughtInfo&,
+                                  bool) {
+  return think_internal(frame_id, field, seq);
 }
 
 DropDecision munetoshi::AI::think_internal(int frame_id,

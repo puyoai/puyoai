@@ -21,19 +21,21 @@ class One : public AI {
   virtual ~One() {}
 
   virtual DropDecision think(int frameId,
-                             const PlainField& f,
+                             const CoreField& f,
                              const KumipuyoSeq& seq,
-                             const AdditionalThoughtInfo& info) override {
+                             const AdditionalThoughtInfo& info,
+                             bool fast) override {
     UNUSED_VARIABLE(frameId);
     UNUSED_VARIABLE(info);
+    UNUSED_VARIABLE(fast);
 
-    LOG(INFO) << CoreField(f).toDebugString() << seq.toString();
+    LOG(INFO) << f.toDebugString() << seq.toString();
 
     Decision best;
     int score = -1;
 
     Plan::iterateAvailablePlans(
-        CoreField(f), seq, 2, [&best, &score](const RefPlan& plan) {
+        f, seq, 2, [&best, &score](const RefPlan& plan) {
           int s = -1;
           if (plan.decisions().size() == 1 && plan.isRensaPlan() &&
               plan.rensaResult().score > 2000) {
@@ -52,7 +54,7 @@ class One : public AI {
 
     score = INT_MIN;
     Plan::iterateAvailablePlans(
-        CoreField(f), seq, 2, [&best, &score](const RefPlan& plan) {
+        f, seq, 2, [&best, &score](const RefPlan& plan) {
           int s = -1;
           auto callback = [&](const CoreField&,
                               const RensaResult& rensa_result,

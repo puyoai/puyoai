@@ -11,9 +11,10 @@ class AI final : public ::AI {
   virtual ~AI() = default;
 
   DropDecision think(int frame_id,
-                     const PlainField& field,
+                     const CoreField& field,
                      const KumipuyoSeq& seq,
-                     const AdditionalThoughtInfo& info) override;
+                     const AdditionalThoughtInfo& info,
+                     bool fast) override;
 
  private:
   DropDecision think_sample(int frame_id,

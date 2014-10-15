@@ -11,29 +11,22 @@ public:
     SampleRensaAI(int argc, char* argv[]) : AI(argc, argv, "sample_rensa") {}
     virtual ~SampleRensaAI() {}
 
-    virtual DropDecision thinkFast(int frameId, const PlainField& f, const KumipuyoSeq& seq, const AdditionalThoughtInfo& info) override
+    virtual DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq, const AdditionalThoughtInfo& info, bool fast) override
     {
         UNUSED_VARIABLE(frameId);
         UNUSED_VARIABLE(info);
-        return eval(f, seq, 2);
-    }
-
-    virtual DropDecision think(int frameId, const PlainField& f, const KumipuyoSeq& seq, const AdditionalThoughtInfo& info) override
-    {
-        UNUSED_VARIABLE(frameId);
-        UNUSED_VARIABLE(info);
-        return eval(f, seq, 3);
+        return eval(f, seq, fast ? 2 : 3);
     }
 
 private:
-    DropDecision eval(const PlainField& f, const KumipuyoSeq& nexts, int depth)
+    DropDecision eval(const CoreField& f, const KumipuyoSeq& nexts, int depth)
     {
-        LOG(INFO) << CoreField(f).toDebugString() << nexts.toString();
+        LOG(INFO) << f.toDebugString() << nexts.toString();
 
         Decision best = Decision(3, 0);
         int score = -100000;
 
-        Plan::iterateAvailablePlans(CoreField(f), nexts, depth, [&best, &score](const RefPlan& plan) {
+        Plan::iterateAvailablePlans(f, nexts, depth, [&best, &score](const RefPlan& plan) {
             if (!plan.isRensaPlan())
                 return;
 
