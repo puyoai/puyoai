@@ -65,16 +65,23 @@ protected:
         return think(frameId, field, next, info);
     }
 
-    // |gaze| will be called when AI should gaze the enemy's field.
+    // gaze will be called when AI should gaze the enemy's field.
+    // |frameId| is the frameId where the enemy has started moving his puyo.
+    // KumipuyoSeq will have at least 2 kumipuyos. When we know more Kumipuyo sequence,
+    // it might contain more.
+    // Since gaze might be called in the same frame as think(), you shouldn't consume
+    // much time for gaze.
     virtual void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&);
 
+    // Set AI's behavior.
     void setBehaviorDefensive(bool flag) { behaviorDefensive_ = flag; }
+    // Set AI's behavior. If true, you can rethink next decision when the enemy has started his rensa.
     void setBehaviorRethinkAfterOpponentRensa(bool flag) { behaviorRethinkAfterOpponentRensa_ = flag; }
 
     const AdditionalThoughtInfo& additionalThoughtInfo() const { return additionalThoughtInfo_; }
 
     // These callbacks will be called from the corresponding method.
-    // i.e. onXXXYYY() will be called from XXXYYY().
+    // i.e. onXXX() will be called from XXX().
     virtual void onGameWillBegin(const FrameRequest&) {}
     virtual void onGameHasEnded(const FrameRequest&) {}
     virtual void onDecisionRequested(const FrameRequest&) {}
