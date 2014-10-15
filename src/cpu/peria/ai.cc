@@ -3,6 +3,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include <sstream>
 #include <vector>
 
 #include "core/algorithm/plan.h"
@@ -66,8 +67,11 @@ DropDecision Ai::think(int frame_id,
                   threshold,
                   attack_->end_frame_id - frame_id,
                   &score, &decision));
-    if (threshold < score)
-      return DropDecision(decision, "Counter");
+    if (threshold < score) {
+      std::ostringstream oss;
+      oss << "Counter:_" << score << "/" << attack_->score;
+      return DropDecision(decision, oss.str());
+    }
   }
 
   // Default search
