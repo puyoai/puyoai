@@ -14,12 +14,27 @@ TEST(BookFieldTest, varCount)
                   vector<string> {
                       "..ABBB",
                   });
+    BookField bf3("test",
+                  vector<string> {
+                      ".*ABBB",
+                  });
 
     EXPECT_EQ(3, bf1.varCount());
     EXPECT_EQ(4, bf2.varCount());
 
-    bf1.merge(bf2);
-    EXPECT_EQ(6, bf1.varCount());
+    // We don't count *
+    EXPECT_EQ(4, bf3.varCount());
+
+    {
+        BookField f(bf1);
+        f.merge(bf2);
+        EXPECT_EQ(6, f.varCount());
+    }
+    {
+        BookField f(bf1);
+        f.merge(bf3);
+        EXPECT_EQ(6, f.varCount());
+    }
 }
 
 TEST(BookFieldTest, match1)
@@ -64,6 +79,35 @@ TEST(BookFieldTest, match2)
     EXPECT_EQ(BookField::MatchResult(true, 0, 0), bf.match(pf0));
     EXPECT_EQ(BookField::MatchResult(true, 16, 16), bf.match(pf1));
     EXPECT_EQ(BookField::MatchResult(true, 16, 16), bf.match(pf2));
+}
+
+TEST(BookFieldTest, matchWithStar)
+{
+    BookField bf("test",
+                 vector<string> {
+                     ".***CC",
+                     ".AABBB"
+                 });
+
+    PlainField pf0;
+
+    PlainField pf1(
+        ".YYYGG"
+        ".RRBBB");
+
+    PlainField pf2(
+        ".B...."
+        ".BBYYY"
+        ".RRBBB");
+
+    PlainField pf3(
+        ".GGGYY"
+        ".RRBBB");
+
+    EXPECT_EQ(BookField::MatchResult(true, 0, 0), bf.match(pf0));
+    EXPECT_EQ(BookField::MatchResult(true, 7, 7), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(true, 7, 7), bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(true, 7, 7), bf.match(pf3));
 }
 
 TEST(BookFieldTest, unmatch1)
