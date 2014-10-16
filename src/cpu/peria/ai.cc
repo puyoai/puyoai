@@ -3,21 +3,28 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include <climits>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "core/algorithm/plan.h"
 #include "core/constant.h"
 #include "core/frame_request.h"
 
-#include "cpu/peria/evaluate.h"
+#include "cpu/peria/pattern.h"
 
 namespace peria {
-
 
 struct Ai::Attack {
   int score;
   int end_frame_id;
+};
+
+struct Ai::Control {
+  std::string message;
+  int score = 0;
+  Decision decision;
 };
 
 // TODO: (want to implement)
@@ -33,59 +40,15 @@ DropDecision Ai::think(int frame_id,
                        const KumipuyoSeq& seq,
                        const AdditionalThoughtInfo& info,
                        bool fast) {
+  UNUSED_VARIABLE(frame_id);
   UNUSED_VARIABLE(info);
   UNUSED_VARIABLE(fast);
   using namespace std::placeholders;
 
-  // TODO: Merge all Plan::iterateAvailablePlans() to reduce computing cost.
-
-  // Check templates first with visible puyos.
-  {
-    int score = 0;
-    std::string name;
-    int frames = 1e+8;
-    Decision temp_decision;
-    Plan::iterateAvailablePlans(field, seq, 2,
-                                std::bind(Evaluate::Patterns, _1,
-                                          &score, &name,
-                                          &frames, &temp_decision));
-    if (score > 200 && !name.empty())
-      return DropDecision(temp_decision, "Template: " + name);
-  }
-
-  // 3 個以上おじゃまが来てたらカウンターしてみる
-  if (attack_ && attack_->score >= SCORE_FOR_OJAMA * 3) {
-    // TODO: Adjust |kAcceptablePuyo|.
-    const int kAcceptablePuyo = 3;
-    int threshold = attack_->score - SCORE_FOR_OJAMA * kAcceptablePuyo;
-
-    int score = 0;
-    Decision decision;
-    Plan::iterateAvailablePlans(
-        field, seq, 2,
-        std::bind(Evaluate::Counter, _1,
-                  threshold,
-                  attack_->end_frame_id - frame_id,
-                  &score, &decision));
-    if (threshold < score) {
-      std::ostringstream oss;
-      oss << "Counter:_" << score << "/" << attack_->score;
-      return DropDecision(decision, oss.str());
-    }
-  }
-
-  // Default search
-  {
-    int score = 0;
-    Decision decision;
-    Plan::iterateAvailablePlans(
-        field, seq, 2,
-        std::bind(Evaluate::Usual, _1, &score, &decision));
-
-    return DropDecision(decision, "Normal");
-  }
-
-  // DO NOT REACH HERE
+  Control control;
+  auto evaluate = std::bind(Ai::Eval, _1, attack_.get(), &control);
+  Plan::iterateAvailablePlans(field, seq, 2, evaluate);
+  return DropDecision(control.decision, control.message);
 }
 
 void Ai::onGameWillBegin(const FrameRequest& /*frame_request*/) {
@@ -107,6 +70,72 @@ void Ai::onEnemyGrounded(const FrameRequest& frame_request) {
   attack_.reset(new Attack);
   attack_->score = result.score;
   attack_->end_frame_id = frame_request.frameId + result.frames;
+}
+
+int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
+  int sum = 0;
+  int best = 0;
+
+  const CoreField& field = plan.field();
+  std::ostringstream oss;
+  for (const Pattern& pattern : Pattern::GetAllPattern()) {
+    int score = pattern.Match(field);
+    sum += score;
+    if (score > best) {
+      best = score;
+      oss << " " << pattern.name() << " " << score << "/" << pattern.score();
+    }
+  }
+  *name = oss.str();
+
+  return sum;
+}
+
+void Ai::Eval(const RefPlan& plan, Attack* attack, Control* control) {
+  int score = 0;
+  int value = 0;
+  std::ostringstream oss;
+  std::string message;
+
+  value = PatternMatch(plan, &message);
+  oss << "Pattern(" << message << "," << value << ")_";
+  score += value;
+
+  int future = 0;
+  Plan::iterateAvailablePlans(
+      plan.field(), KumipuyoSeq(), 1,
+      [&future](const RefPlan& p) {
+        future = std::max(future, p.rensaResult().score);
+      });
+
+  if (plan.isRensaPlan()) {
+    const int kAcceptablePuyo = 3;
+    if (attack &&
+        attack->score >= SCORE_FOR_OJAMA * kAcceptablePuyo &&
+        attack->score < plan.score()) {
+      value = plan.score();
+      oss << "Counter(" << value << ")_";
+      score += value;
+    }
+
+    value = plan.rensaResult().score;
+    oss << "Current(" << value << ")_";
+    score += value;
+
+    value = future / 2;
+    oss << "Future(" << value << ")";
+    score += value;
+  } else {
+    value = future / 2;
+    oss << "Future(" << value << ")";
+    score += value;
+  }
+
+  if (score > control->score) {
+    control->score = score;
+    control->message = oss.str();
+    control->decision = plan.decisions().front();
+  }
 }
 
 }  // namespace peria
