@@ -97,7 +97,8 @@ int Pattern::Match(const CoreField& field) const {
     }
   }
   
-  return std::max(GetScore(matching0), GetScore(matching1));
+  int score = std::max(GetScore(matching0), GetScore(matching1));
+  return score;
 }
 
 void Pattern::Optimize() {

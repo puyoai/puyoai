@@ -26,7 +26,7 @@ class Ai : public ::AI {
   virtual void onEnemyGrounded(const FrameRequest& frame_request) override;
 
   static int PatternMatch(const RefPlan& plan, std::string* name);
-  static void Eval(const RefPlan& plan, Attack* attack, Control* control);
+  static void Evaluate(const RefPlan& plan, Attack* attack, Control* control);
 
   // Information about opponent's attacks.
   std::unique_ptr<Attack> attack_;
