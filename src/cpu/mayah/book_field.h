@@ -10,12 +10,16 @@
 class BookField {
 public:
     struct MatchResult {
-        MatchResult(double score, int count) : score(score), count(count) {}
+        MatchResult(bool matched, double score, int count) : matched(matched), score(score), count(count) {}
 
-        friend bool operator==(const MatchResult& lhs, const MatchResult& rhs) { return std::tie(lhs.score, lhs.count) == std::tie(rhs.score, rhs.count); }
+        friend bool operator==(const MatchResult& lhs, const MatchResult& rhs)
+        {
+            return std::tie(lhs.matched, lhs.score, lhs.count) == std::tie(rhs.matched, rhs.score, rhs.count);
+        }
 
-        double score = 0.0;
-        int count = 0;
+        bool matched;
+        double score;
+        int count;
     };
 
     BookField(const std::string& name, const std::vector<std::string>& field, double defaultScore = 1);
