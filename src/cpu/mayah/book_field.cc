@@ -43,7 +43,12 @@ static inline
 bool check(char currentVar, char neighborVar, PuyoColor neighborColor, const PuyoColorEnv& env)
 {
     DCHECK_NE(currentVar, '.');
+    DCHECK_NE(currentVar, '*');
     DCHECK('A' <= currentVar && currentVar <= 'Z') << currentVar;
+
+    // If neighbor is '*', we don't care what color the cell has.
+    if (neighborVar == '*')
+        return true;
 
     if (neighborColor == PuyoColor::OJAMA || neighborColor == PuyoColor::WALL)
         return true;
@@ -80,14 +85,23 @@ BookField::BookField(const string& name, const vector<string>& field, double def
         CHECK_EQ(field[i].size(), 6U);
         int y = static_cast<int>(field.size()) - i;
         for (int x = 1; x <= 6; ++x) {
-           CHECK(('A' <= field[i][x - 1] && field[i][x - 1] <= 'Z') ||
-                 ('a' <= field[i][x - 1] && field[i][x - 1] <= 'z') ||
-                 (field[i][x - 1] == '.'));
+            if (field[i][x - 1] == '.')
+                continue;
+            if ('a' <= field[i][x - 1] && field[i][x - 1] <= 'z')
+                continue;
 
             if ('A' <= field[i][x - 1] && field[i][x - 1] <= 'Z') {
                 field_[x][y] = field[i][x - 1];
                 scoreField_[x][y] = defaultScore;
+                continue;
             }
+
+            if (field[i][x - 1] == '*') {
+                field_[x][y] = field[i][x - 1];
+                continue;
+            }
+
+            CHECK(false) << "Unknown field character: " << field[i][x - 1];
         }
     }
 
@@ -98,17 +112,25 @@ void BookField::merge(const BookField& bf)
 {
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            if (bf.field_[x][y] == '.')
+            if (bf.field_[x][y] == '.') {
                 continue;
-
-            if (field_[x][y] == '.') {
+            } else if (field_[x][y] == '.') {
                 field_[x][y] = bf.field_[x][y];
                 scoreField_[x][y] = bf.scoreField_[x][y];
-            } else {
-                CHECK_EQ(field_[x][y], bf.field_[x][y]) << name() << " : " << bf.name()
-                                                        << "x=" << x << " y=" << y;
-                scoreField_[x][y] = bf.scoreField_[x][y];
+                continue;
             }
+
+            if (field_[x][y] != '*' && bf.field_[x][y] == '*') {
+                continue;
+            } else if (field_[x][y] == '*' && bf.field_[x][y] != '*') {
+                field_[x][y] = bf.field_[x][y];
+                scoreField_[x][y] = bf.scoreField_[x][y];
+                continue;
+            }
+
+            CHECK_EQ(field_[x][y], bf.field_[x][y]) << name() << " : " << bf.name()
+                                                    << "x=" << x << " y=" << y;
+            scoreField_[x][y] = bf.scoreField_[x][y];
         }
     }
 
@@ -139,7 +161,7 @@ BookField::MatchResult BookField::match(const PlainField& f) const
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; f.get(x, y) != PuyoColor::EMPTY; ++y) {
             char c = field_[x][y];
-            if (c == '.')
+            if (c == '.' || c == '*')
                 continue;
 
             DCHECK('A' <= c && c <= 'Z') << c;
@@ -167,6 +189,8 @@ BookField::MatchResult BookField::match(const PlainField& f) const
     // Check the neighbors.
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12 && field_[x][y] != '.'; ++y) {
+            if (field_[x][y] == '*')
+                continue;
             if (!check(field_[x][y], field_[x][y + 1], f.get(x, y + 1), env))
                 return MatchResult(false, 0, 0);
             if (!check(field_[x][y], field_[x][y - 1], f.get(x, y - 1), env))
