@@ -72,7 +72,7 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
 {
     vector<bool> booksMatchable(books_.size());
     for (size_t i = 0; i < books_.size(); ++i) {
-        booksMatchable[i] = books_[i].match(currentField).score > 0;
+        booksMatchable[i] = books_[i].match(currentField).matched;
     }
 
     return PreEvalResult(booksMatchable);

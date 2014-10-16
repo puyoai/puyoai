@@ -149,7 +149,7 @@ BookField::MatchResult BookField::match(const PlainField& f) const
                 continue;
 
             if (!isNormalColor(pc))
-                return MatchResult(0, 0);
+                return MatchResult(false, 0, 0);
 
             matchCount += 1;
             matchScore += scoreField_[x][y];
@@ -160,28 +160,25 @@ BookField::MatchResult BookField::match(const PlainField& f) const
             }
 
             if (env.map(c) != pc)
-                return MatchResult(0, 0);
+                return MatchResult(false, 0, 0);
         }
     }
-
-    if (matchScore == 0)
-        return MatchResult(0, 0);
 
     // Check the neighbors.
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12 && field_[x][y] != '.'; ++y) {
             if (!check(field_[x][y], field_[x][y + 1], f.get(x, y + 1), env))
-                return MatchResult(0, 0);
+                return MatchResult(false, 0, 0);
             if (!check(field_[x][y], field_[x][y - 1], f.get(x, y - 1), env))
-                return MatchResult(0, 0);
+                return MatchResult(false, 0, 0);
             if (!check(field_[x][y], field_[x + 1][y], f.get(x + 1, y), env))
-                return MatchResult(0, 0);
+                return MatchResult(false, 0, 0);
             if (!check(field_[x][y], field_[x - 1][y], f.get(x - 1, y), env))
-                return MatchResult(0, 0);
+                return MatchResult(false, 0, 0);
         }
     }
 
-    return MatchResult(matchScore, matchCount);
+    return MatchResult(true, matchScore, matchCount);
 }
 
 string BookField::toDebugString() const
