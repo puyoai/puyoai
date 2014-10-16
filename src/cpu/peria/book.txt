@@ -21,28 +21,24 @@ MAX: 20
 NAME: Begin1
 SCORE: 1000
 MAX: 4
-THREASH: 4
 .AA...
 .BB...
 
 NAME: Begin2
 SCORE: 1000
 MAX: 4
-THREASH: 4
 ..C...
 ABB...
 
 NAME: Begin3
 SCORE: 1500
 MAX: 8
-THREASH: 6
 CAA...
 CBB...
 
 NAME: Begin4
 SCORE: 1000
 MAX: 4
-THREASH: 4
 CA....
 CB....
 
@@ -60,7 +56,3 @@ MAX: 22
 CBCA..
 AAA...
 BBBA..
-
-NAME: Zenkeshi
-SCORE: 4000
-______

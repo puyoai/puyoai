@@ -27,10 +27,6 @@ struct Ai::Control {
   Decision decision;
 };
 
-// TODO: (want to implement)
-// - Search decisions for all known |seq|
-// --- Count the number of HAKKA-able KumiPuyos
-
 Ai::Ai(int argc, char* argv[]): ::AI(argc, argv, "peria") {}
 
 Ai::~Ai() {}
@@ -46,7 +42,7 @@ DropDecision Ai::think(int frame_id,
   using namespace std::placeholders;
 
   Control control;
-  auto evaluate = std::bind(Ai::Eval, _1, attack_.get(), &control);
+  auto evaluate = std::bind(Ai::Evaluate, _1, attack_.get(), &control);
   Plan::iterateAvailablePlans(field, seq, 2, evaluate);
   return DropDecision(control.decision, control.message);
 }
@@ -83,7 +79,7 @@ int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
     sum += score;
     if (score > best) {
       best = score;
-      oss << " " << pattern.name() << " " << score << "/" << pattern.score();
+      oss << pattern.name() << "[" << score << "/" << pattern.score() << "]";
     }
   }
   *name = oss.str();
@@ -91,22 +87,30 @@ int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
   return sum;
 }
 
-void Ai::Eval(const RefPlan& plan, Attack* attack, Control* control) {
+void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
   int score = 0;
   int value = 0;
   std::ostringstream oss;
   std::string message;
 
   value = PatternMatch(plan, &message);
-  oss << "Pattern(" << message << "," << value << ")_";
-  score += value;
+  if (value) {
+    oss << "Pattern(" << message << "," << value << ")_";
+    score += value;
+  }
 
-  int future = 0;
+  int expect = 0;
+  int num_start = 0;
   Plan::iterateAvailablePlans(
       plan.field(), KumipuyoSeq(), 1,
-      [&future](const RefPlan& p) {
-        future = std::max(future, p.rensaResult().score);
+      [&expect, &num_start](const RefPlan& p) {
+        expect += p.rensaResult().score;
+        num_start += (p.isRensaPlan() ? 1 : 0);
       });
+  if (num_start == 0)
+    expect = 0;
+  else
+    expect /= num_start;
 
   if (plan.isRensaPlan()) {
     const int kAcceptablePuyo = 3;
@@ -122,11 +126,17 @@ void Ai::Eval(const RefPlan& plan, Attack* attack, Control* control) {
     oss << "Current(" << value << ")_";
     score += value;
 
-    value = future / 2;
+    value = expect / 2;
     oss << "Future(" << value << ")";
     score += value;
+
+    if (plan.field().countPuyos() == 0) {
+      value = 9999;
+      oss << "Zenkeshi(" << value << ")";
+      score += value;
+    }
   } else {
-    value = future / 2;
+    value = expect / 2;
     oss << "Future(" << value << ")";
     score += value;
   }
