@@ -35,6 +35,24 @@ private:
     const std::vector<BookField>& books_;
 };
 
+class MidEvalResult {
+public:
+    void add(EvaluationFeatureKey key, double value)
+    {
+        collectedFeatures_[key] = value;
+    }
+
+    const std::map<EvaluationFeatureKey, double>& collectedFeatures() const { return collectedFeatures_; }
+
+private:
+    std::map<EvaluationFeatureKey, double> collectedFeatures_;
+};
+
+class MidEvaluator {
+public:
+    MidEvalResult eval(const RefPlan&, const CoreField& currentField);
+};
+
 class EvalResult {
 public:
     constexpr EvalResult(double score, int maxVirtualScore) : score_(score), maxVirtualScore_(maxVirtualScore) {}
@@ -80,7 +98,7 @@ public:
         sc_(sc) {}
 
     void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
-                      const PreEvalResult&, const GazeResult&);
+                      const PreEvalResult&, const MidEvalResult&, const GazeResult&);
 
     // ----------------------------------------------------------------------
 
@@ -98,6 +116,8 @@ public:
     void evalRidgeHeight(const RefPlan& plan);
     void evalFieldUShape(const RefPlan& plan, bool enemyHasZenkeshi);
     void evalUnreachableSpace(const RefPlan& plan);
+
+    void evalMidEval(const MidEvalResult&);
 
     void collectScoreForConnection(const CoreField&);
     void evalCountPuyoFeature(const RefPlan& plan);
