@@ -4,6 +4,7 @@
 #include <glog/logging.h>
 
 #include <climits>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -87,30 +88,44 @@ int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
   return sum;
 }
 
+int FieldEvaluate(const CoreField& field) {
+#if 0
+  return 0;
+#else
+  int num_connect = 0;
+  for (int x = 1; x < PlainField::WIDTH; ++x) {
+    int height = field.height(x);
+    for (int y = 1; y <= height; ++y) {
+      PuyoColor c = field.color(x, y);
+      if (c == OJAMA)
+        continue;
+      if (c == field.color(x + 1, y))
+        num_connect += 2;
+      if (c == field.color(x, y + 1))
+        num_connect += 3;
+    }
+  }
+  return num_connect;
+#endif
+}
+
 void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
   int score = 0;
   int value = 0;
   std::ostringstream oss;
   std::string message;
 
-  value = PatternMatch(plan, &message);
-  if (value) {
-    oss << "Pattern(" << message << "," << value << ")_";
-    score += value;
-  }
-
-  int expect = 0;
-  int num_start = 0;
+  std::vector<int> expects;
+  expects.clear();
   Plan::iterateAvailablePlans(
       plan.field(), KumipuyoSeq(), 1,
-      [&expect, &num_start](const RefPlan& p) {
-        expect += p.rensaResult().score;
-        num_start += (p.isRensaPlan() ? 1 : 0);
+      [&expects](const RefPlan& p) {
+        if (p.isRensaPlan())
+          expects.push_back(p.rensaResult().score);
       });
-  if (num_start == 0)
-    expect = 0;
-  else
-    expect /= num_start;
+  int expect = std::accumulate(expects.begin(), expects.end(), 0);
+  if (expects.size())
+    expect /= expects.size();
 
   if (plan.isRensaPlan()) {
     const int kAcceptablePuyo = 3;
@@ -126,7 +141,7 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
     oss << "Current(" << value << ")_";
     score += value;
 
-    value = expect / 2;
+    value = expect;
     oss << "Future(" << value << ")";
     score += value;
 
@@ -136,8 +151,18 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
       score += value;
     }
   } else {
-    value = expect / 2;
+    value = PatternMatch(plan, &message);
+    if (value) {
+      oss << "Pattern(" << message << "," << value << ")_";
+      score += value;
+    }
+
+    value = expect;
     oss << "Future(" << value << ")";
+    score += value;
+
+    value = FieldEvaluate(plan.field());
+    oss << "Field(" << value << ")";
     score += value;
   }
 
