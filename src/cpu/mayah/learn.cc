@@ -127,7 +127,8 @@ void learnWithInteractive()
         Plan::iterateAvailablePlans(field, seq, 2, [&](const RefPlan& plan) {
             FeatureScoreCollector sc(parameter);
             Evaluator<FeatureScoreCollector> evaluator(books, &sc);
-            evaluator.collectScore(plan, field, 1, false, preEvalResult, gazer.gazeResult());
+            // TODO(mayah): should use the correct MidEvalResult
+            evaluator.collectScore(plan, field, 1, false, preEvalResult, MidEvalResult(), gazer.gazeResult());
 
             CollectedFeature f = sc.toCollectedFeature();
             pair<Decision, Decision> pd;
@@ -270,7 +271,8 @@ void learnFromPuyofu()
             Plan::iterateAvailablePlans(inputs[i].field, inputs[i].seq, MayahAI::DEFAULT_DEPTH, [&](const RefPlan& plan) {
                 FeatureScoreCollector sc(parameter);
                 Evaluator<FeatureScoreCollector> evaluator(books, &sc);
-                evaluator.collectScore(plan, inputs[i].field, frameId, MayahAI::DEFAULT_NUM_ITERATION, preEvalResult, gazer.gazeResult());
+                // TODO(mayah): Should use the correct MidEvalResult.
+                evaluator.collectScore(plan, inputs[i].field, frameId, MayahAI::DEFAULT_NUM_ITERATION, preEvalResult, MidEvalResult(), gazer.gazeResult());
 
                 CollectedFeature f = sc.toCollectedFeature();
 

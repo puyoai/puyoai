@@ -29,15 +29,34 @@ class InteractiveAI : public DebuggableMayahAI {
 public:
     InteractiveAI(int argc, char* argv[]) : DebuggableMayahAI(argc, argv) {}
 
-    CollectedFeature makeCollectedFeature(int frameId, const CoreField& field, int numKeyPuyos, const Plan& plan) const
+    CollectedFeature makeCollectedFeature(int frameId, const CoreField& currentField, const KumipuyoSeq& seq,
+                                          int numKeyPuyos, const Plan& plan) const
     {
-        PreEvalResult preEvalResult = PreEvaluator(books_).preEval(field);
+        PreEvalResult preEvalResult = PreEvaluator(books_).preEval(currentField);
 
         FeatureScoreCollector sc(*featureParameter_);
         Evaluator<FeatureScoreCollector> evaluator(books_, &sc);
 
-        RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(), plan.framesToInitiate(), plan.lastDropFrames());
-        evaluator.collectScore(refPlan, field, frameId, numKeyPuyos, preEvalResult, gazer_.gazeResult());
+        // TODO(mayah): Make this accurate.
+        MidEvalResult midEvalResult;
+        {
+            CoreField f(currentField);
+            f.dropKumipuyo(plan.decisions().front(), seq.front());
+            RensaResult rensaResult = f.simulate();
+            int numChigiri = 0;
+            int framesToInitiate = 0;
+            int lastDropFrames = 0;
+            vector<Decision> decisions { plan.decisions().front() };
+            RefPlan refPlan(f, decisions, rensaResult, numChigiri,
+                            framesToInitiate, lastDropFrames);
+            MidEvaluator().eval(refPlan, currentField);
+        }
+
+        {
+            RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(),
+                            plan.framesToInitiate(), plan.lastDropFrames());
+            evaluator.collectScore(refPlan, currentField, frameId, numKeyPuyos, preEvalResult, midEvalResult, gazer_.gazeResult());
+        }
 
         return sc.toCollectedFeature();
     }
@@ -182,8 +201,8 @@ int main(int argc, char* argv[])
                 FieldPrettyPrinter::printMultipleFields(plan.field(), KumipuyoSeq { seq.get(2), seq.get(3) },
                                                         aiPlan.field(), KumipuyoSeq { seq.get(2), seq.get(3) });
 
-                CollectedFeature mycf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, plan);
-                CollectedFeature aicf = ai.makeCollectedFeature(frameId, field, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
+                CollectedFeature mycf = ai.makeCollectedFeature(frameId, field, seq, MayahAI::DEFAULT_NUM_ITERATION, plan);
+                CollectedFeature aicf = ai.makeCollectedFeature(frameId, field, seq, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
                 cout << mycf.toStringComparingWith(aicf) << endl;
             }
         }

@@ -79,6 +79,19 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
     return PreEvalResult(booksMatchable);
 }
 
+MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentField)
+{
+    UNUSED_VARIABLE(currentField);
+
+    MidEvalResult result;
+
+    if (plan.isRensaPlan()) {
+        result.add(MIDEVAL_ERASE, 1);
+    }
+
+    return result;
+}
+
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
                                          const std::vector<bool>& bookMatchable,
@@ -560,10 +573,23 @@ void Evaluator<ScoreCollector>::evalCountPuyoFeature(const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
+void Evaluator<ScoreCollector>::evalMidEval(const MidEvalResult& midEvalResult)
+{
+    // Copy midEvalResult.
+    for (const auto& entry : midEvalResult.collectedFeatures()) {
+        sc_->addScore(entry.first, entry.second);
+    }
+}
+
+template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreField& currentField,
                                              int currentFrameId, int maxIteration,
-                                             const PreEvalResult& preEvalResult, const GazeResult& gazeResult)
+                                             const PreEvalResult& preEvalResult,
+                                             const MidEvalResult& midEvalResult,
+                                             const GazeResult& gazeResult)
 {
+    evalMidEval(midEvalResult);
+
     // We'd like to evaluate frame feature always.
     evalFrameFeature(plan);
 
