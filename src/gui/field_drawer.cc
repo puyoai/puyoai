@@ -44,9 +44,9 @@ FieldDrawer::~FieldDrawer()
 {
 }
 
-void FieldDrawer::onInit(Screen* screen)
+void FieldDrawer::onInit()
 {
-    BoundingBox::instance().setGenerator(screen->mainBox().sx + PUYO_W, screen->mainBox().sy + 2 * PUYO_H, PUYO_W, PUYO_H);
+    BoundingBox::instance().setGenerator(PUYO_W, 2 * PUYO_H, PUYO_W, PUYO_H);
 }
 
 void FieldDrawer::onUpdate(const GameState& gameState)
@@ -100,7 +100,9 @@ void FieldDrawer::drawField(Screen* screen, int playerId, const PlayerGameState&
                     c = kumipuyo.child;
             }
 
-            SDL_Rect r = BoundingBox::instance().get(playerId, x, y).toSDLRect();
+            Box b = BoundingBox::instance().get(playerId, x, y);
+            b.moveOffset(screen->mainBox().sx, screen->mainBox().sy);
+            SDL_Rect r = b.toSDLRect();
             if (isNormalColor(c) || c == PuyoColor::OJAMA) {
                 SDL_Rect sourceRect = toRect(c);
                 SDL_BlitSurface(puyoSurface_.get(), &sourceRect, surface, &r);
@@ -116,7 +118,9 @@ void FieldDrawer::drawField(Screen* screen, int playerId, const PlayerGameState&
         NextPuyoPosition::NEXT2_CHILD,
     };
     for (int i = 0; i < 4; ++i) {
-        SDL_Rect r = BoundingBox::instance().get(playerId, positions[i]).toSDLRect();
+        Box b = BoundingBox::instance().get(playerId, positions[i]);
+        b.moveOffset(screen->mainBox().sx, screen->mainBox().sy);
+        SDL_Rect r = b.toSDLRect();
         PuyoColor c = pgs.kumipuyoSeq.color(positions[i]);
         if (isNormalColor(c) || c == PuyoColor::OJAMA) {
             SDL_Rect sourceRect = toRect(c);
@@ -133,6 +137,7 @@ void FieldDrawer::drawField(Screen* screen, int playerId, const PlayerGameState&
     // Ojama
     int ojama = pgs.ojama();
     Box offsetBox = BoundingBox::instance().get(playerId, 1, 13);
+    offsetBox.moveOffset(screen->mainBox().sx, screen->mainBox().sy);
     int offsetX = offsetBox.sx;
     int offsetY = offsetBox.sy;
     while (ojama > 0) {
@@ -201,6 +206,7 @@ void FieldDrawer::drawField(Screen* screen, int playerId, const PlayerGameState&
         ostringstream ss;
         ss << setw(10) << pgs.score;
         Box b = BoundingBox::instance().get(playerId, 0, -1);
+        b.moveOffset(screen->mainBox().sx, screen->mainBox().sy);
         Kanji_PutText(font_, b.sx, b.sy, surface, ss.str().c_str(), white);
     }
 }

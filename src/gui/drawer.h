@@ -6,7 +6,7 @@ class Screen;
 class Drawer {
 public:
     virtual ~Drawer() {}
-    virtual void onInit(Screen*) {}
+    virtual void onInit() {}
     virtual void draw(Screen*) = 0;
 };
 

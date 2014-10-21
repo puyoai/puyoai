@@ -24,7 +24,7 @@ public:
     FieldDrawer();
     virtual ~FieldDrawer();
 
-    virtual void onInit(Screen*) override;
+    virtual void onInit() override;
     virtual void onUpdate(const GameState&) override;
     virtual void draw(Screen*) override;
 
