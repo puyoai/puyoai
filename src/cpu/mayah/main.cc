@@ -19,8 +19,6 @@ int main(int argc, char* argv[])
 
     TsumoPossibility::initialize();
 
-    cerr << "num_threads = " << FLAGS_num_threads << endl;
-
     if (FLAGS_num_threads > 1) {
         unique_ptr<Executor> executor = Executor::makeDefaultExecutor();
         MayahAI(argc, argv, executor.get()).runLoop();
