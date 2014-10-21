@@ -100,31 +100,31 @@ void Commentator::stop()
 
 void Commentator::runLoop()
 {
-     while (!shouldStop_) {
-         struct timespec req { 0, 16 * 1000 * 1000 };
-         struct timespec rem;
-         while (nanosleep(&req, &rem) < 0) {
-             PCHECK(errno == EINTR);
-             req = rem;
-         }
+    while (!shouldStop_) {
+        struct timespec req { 0, 16 * 1000 * 1000 };
+        struct timespec rem;
+        while (nanosleep(&req, &rem) < 0) {
+            PCHECK(errno == EINTR);
+            req = rem;
+        }
 
-         for (int pi = 0; pi < 2; ++pi) {
-             // Since we don't want to lock for long, copy field and kumipuyo.
-             CoreField field;
-             KumipuyoSeq kumipuyoSeq;
-             {
-                 lock_guard<mutex> lock(mu_);
-                 if (!needsUpdate_[pi])
-                     continue;
+        for (int pi = 0; pi < 2; ++pi) {
+            // Since we don't want to lock for long, copy field and kumipuyo.
+            CoreField field;
+            KumipuyoSeq kumipuyoSeq;
+            {
+                lock_guard<mutex> lock(mu_);
+                if (!needsUpdate_[pi])
+                    continue;
 
-                 field = field_[pi];
-                 kumipuyoSeq = kumipuyoSeq_[pi];
-                 needsUpdate_[pi] = false;
-             }
+                field = field_[pi];
+                kumipuyoSeq = kumipuyoSeq_[pi];
+                needsUpdate_[pi] = false;
+            }
 
-             update(pi, field, kumipuyoSeq);
-         }
-     }
+            update(pi, field, kumipuyoSeq);
+        }
+    }
 }
 
 void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
@@ -222,4 +222,3 @@ void Commentator::addEventMessage(int pi, const string& msg)
     while (events_[pi].size() > 3)
         events_[pi].pop_back();
 }
-
