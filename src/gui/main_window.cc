@@ -56,7 +56,7 @@ void MainWindow::runMainLoop()
 void MainWindow::addDrawer(Drawer* drawer)
 {
     drawers_.push_back(drawer);
-    drawer->onInit(screen());
+    drawer->onInit();
 }
 
 void MainWindow::addEventListener(EventListener* listener)
