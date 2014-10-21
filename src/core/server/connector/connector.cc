@@ -98,4 +98,3 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
     LOG(FATAL) << "should not be reached.";
     return unique_ptr<Connector>();
 }
-
