@@ -146,17 +146,16 @@ void CommentatorDrawer::drawCommentSurface(Screen* screen, const CommentatorResu
                  LX2, LH * 10);
     }
 
-    int offsetY = screen->mainBox().dy + 40;
-    int y = 0;
+    int offsetY = screen->mainBox().dy + 20;
     if (!result.message[pi].empty()) {
         if (pi == 0) {
-            drawText(screen, ("AI: " + result.message[pi]).c_str(), 20, offsetY + LH * y);
+            drawText(screen, ("AI: " + result.message[pi]).c_str(), 20, offsetY);
         } else {
-            drawText(screen, ("AI: " + result.message[pi]).c_str(), 20, offsetY + LH * (y + 1));
+            drawText(screen, ("AI: " + result.message[pi]).c_str(), 20, offsetY + LH);
         }
-        y += 2;
     }
 
+    int y = 2;
     for (const auto& msg : result.events[pi]) {
         drawText(screen, msg.c_str(), LX, offsetY + LH * y++);
     }

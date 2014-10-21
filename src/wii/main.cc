@@ -15,6 +15,8 @@
 #include "capture/somagic_source.h"
 #include "capture/movie_source.h"
 #include "capture/movie_source_key_listener.h"
+#include "core/server/commentator.h"
+#include "gui/commentator_drawer.h"
 #include "gui/main_window.h"
 #include "wii/serial_key_sender.h"
 #include "wii/stdout_key_sender.h"
@@ -29,6 +31,7 @@ DEFINE_string(source, "somagic",
               " filename if you'd like to use movie.");
 DEFINE_int32(fps, 30, "FPS");
 DEFINE_bool(ignore_sigpipe, false, "ignore SIGPIPE");
+DEFINE_bool(use_commentator, false, "use commentator");
 
 static unique_ptr<Source> makeVideoSource()
 {
@@ -108,21 +111,42 @@ int main(int argc, char* argv[])
         movieSourceKeyListener.reset(new MovieSourceKeyListener(movieSource));
     }
 
-    MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
-    mainWindow.addDrawer(&server);
+    unique_ptr<MainWindow> mainWindow;
+    unique_ptr<Commentator> commentator;
+    unique_ptr<CommentatorDrawer> commentatorDrawer;
+    if (FLAGS_use_commentator) {
+        mainWindow.reset(new MainWindow(720 + 2 * 144, 480 + 176, Box(144, 40, 144 + 720, 40 + 480)));
+    } else {
+        mainWindow.reset(new MainWindow(720, 480, Box(0, 0, 720, 480)));
+    }
+
+    mainWindow->addDrawer(&server);
     if (saver.get())
-        mainWindow.addDrawer(saver.get());
+        mainWindow->addDrawer(saver.get());
     if (analyzerResultDrawer.get())
-        mainWindow.addDrawer(analyzerResultDrawer.get());
+        mainWindow->addDrawer(analyzerResultDrawer.get());
     if (movieSourceKeyListener.get())
-        mainWindow.addEventListener(movieSourceKeyListener.get());
+        mainWindow->addEventListener(movieSourceKeyListener.get());
+
+    if (FLAGS_use_commentator) {
+        commentator.reset(new Commentator);
+        commentatorDrawer.reset(new CommentatorDrawer(commentator.get()));
+        mainWindow->addDrawer(commentatorDrawer.get());
+    }
+
+    if (commentator.get())
+        server.addObserver(commentator.get());
 
     source->start();
     server.start();
+    if (commentator.get())
+        CHECK(commentator->start());
 
-    mainWindow.runMainLoop();
+    mainWindow->runMainLoop();
 
     server.stop();
+    if (commentator.get())
+        commentator->stop();
 
     return 0;
 }

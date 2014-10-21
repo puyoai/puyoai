@@ -6,6 +6,7 @@
 #include "base/time.h"
 #include "capture/analyzer.h"
 #include "capture/source.h"
+#include "core/game_result.h"
 #include "core/field/core_field.h"
 #include "core/frame_response.h"
 #include "core/game_result.h"
@@ -13,6 +14,8 @@
 #include "core/puyo_color.h"
 #include "core/puyo_controller.h"
 #include "core/server/connector/connector_manager_posix.h"
+#include "core/server/game_state.h"
+#include "core/server/game_state_observer.h"
 #include "gui/screen.h"
 #include "wii/key_sender.h"
 
@@ -42,6 +45,12 @@ WiiConnectServer::~WiiConnectServer()
         th_.join();
 }
 
+void WiiConnectServer::addObserver(GameStateObserver* observer)
+{
+    CHECK(observer) << "observer should not be nullptr.";
+    observers_.push_back(observer);
+}
+
 bool WiiConnectServer::start()
 {
     th_ = thread([this]() {
@@ -61,6 +70,7 @@ void WiiConnectServer::reset()
 {
     for (int i = 0; i < 2; ++i) {
         lastDecision_[i] = Decision();
+        messages_[i].clear();
     }
 
     colorMap_.clear();
@@ -73,6 +83,7 @@ void WiiConnectServer::runLoop()
 {
     reset();
 
+    bool gameStarted = false;
     int noSurfaceCount = 0;
     int frameId = 0;
     UniqueSDLSurface prevSurface(emptyUniqueSDLSurface());
@@ -116,6 +127,11 @@ void WiiConnectServer::runLoop()
                     // So, remove all the results.
                     analyzerResults_.clear();
                     r->clear();
+
+                    for (auto observer : observers_) {
+                        observer->newGameWillStart();
+                    }
+                    gameStarted = true;
                 }
             }
             if (!playForLevelSelect(frameId, *r))
@@ -124,10 +140,19 @@ void WiiConnectServer::runLoop()
         case CaptureGameState::PLAYING:
             if (!playForPlaying(frameId, *r))
                 shouldStop_ = true;
+            for (auto observer : observers_)
+                observer->onUpdate(toGameState(frameId, *r));
             break;
         case CaptureGameState::FINISHED:
             if (!playForFinished(frameId))
                 shouldStop_ = true;
+            if (!gameStarted) {
+                for (auto observer : observers_) {
+                    // TODO(mayah): This is not DRAW, of course.
+                    observer->gameHasDone(GameResult::DRAW);
+                }
+                gameStarted = false;
+            }
             break;
         }
 
@@ -208,8 +233,8 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
             connector_->connector(pi)->write(makeFrameRequestFor(pi, frameId, analyzerResult));
     }
 
-    vector<FrameResponse> data[2];
-    connector_->receive(frameId, data);
+    vector<FrameResponse> responses[2];
+    connector_->receive(frameId, responses);
 
     for (int pi = 0; pi < 2; pi++) {
         if (!isAi_[pi])
@@ -219,7 +244,15 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
             lastDecision_[pi] = Decision();
         }
 
-        outputKeys(pi, analyzerResult, data[pi], beginTime);
+        for (int j = static_cast<int>(responses[pi].size()) - 1; j >= 0; --j) {
+            const FrameResponse& fr = responses[pi][j];
+            if (!fr.msg.empty()) {
+                messages_[pi] = fr.msg;
+                break;
+            }
+        }
+
+        outputKeys(pi, analyzerResult, responses[pi], beginTime);
     }
 
     return true;
@@ -313,15 +346,50 @@ PuyoColor WiiConnectServer::toPuyoColor(RealColor rc, bool allowAllocation)
     return PuyoColor::EMPTY;
 }
 
+GameState WiiConnectServer::toGameState(int frameId, const AnalyzerResult& analyzerResult)
+{
+    GameState gameState(frameId);
+    for (int pi = 0; pi < 2; ++pi) {
+        PlayerGameState* pgs = gameState.mutablePlayerGameState(pi);
+        const PlayerAnalyzerResult* pr = analyzerResult.playerResult(pi);
+
+        for (int x = 1; x <= 6; ++x) {
+            for (int y = 1; y <= 12; ++y) {
+                pgs->field.unsafeSet(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
+            }
+        }
+
+        pgs->kumipuyoSeq = KumipuyoSeq {
+            Kumipuyo(toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS)),
+                     toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD))),
+            Kumipuyo(toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS)),
+                     toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD))),
+            Kumipuyo(toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)),
+                     toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD))),
+        };
+
+        pgs->state = pr->userState;
+        pgs->dead = false;
+        pgs->playable = false;
+        pgs->score = 0;
+        pgs->pendingOjama = 0;
+        pgs->fixedOjama = 0;
+        pgs->decision = Decision();
+        pgs->message = messages_[pi];
+    }
+
+    return gameState;
+}
+
 void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult,
-                                  const vector<FrameResponse>& data, double beginTime)
+                                  const vector<FrameResponse>& responses, double beginTime)
 {
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.
-    for (unsigned int i = data.size(); i > 0; ) {
+    for (unsigned int i = responses.size(); i > 0; ) {
         i--;
 
-        const Decision& d = data[i].decision;
+        const Decision& d = responses[i].decision;
 
         // We don't need ACK/NACK for ID only messages.
         if (!d.isValid() || d == lastDecision_[pi])
@@ -380,7 +448,8 @@ void WiiConnectServer::draw(Screen* screen)
         return;
 
     surface->userdata = surface_->userdata;
-    SDL_BlitSurface(surface_.get(), nullptr, surface, nullptr);
+    SDL_Rect rect = screen->mainBox().toSDLRect();
+    SDL_BlitSurface(surface_.get(), nullptr, surface, &rect);
 }
 
 unique_ptr<AnalyzerResult> WiiConnectServer::analyzerResult() const
