@@ -22,6 +22,8 @@
 
 class Analyzer;
 class AnalyzerResult;
+class GameState;
+class GameStateObserver;
 class KeySender;
 class Source;
 
@@ -29,6 +31,9 @@ class WiiConnectServer : public Drawer, public AnalyzerResultRetriever {
 public:
     WiiConnectServer(Source*, Analyzer*, KeySender*, const std::string& p1, const std::string& p2);
     ~WiiConnectServer();
+
+    // Dont' take the ownership.
+    void addObserver(GameStateObserver*);
 
     virtual void draw(Screen*) override;
     virtual std::unique_ptr<AnalyzerResult> analyzerResult() const override;
@@ -50,9 +55,13 @@ private:
 
     PuyoColor toPuyoColor(RealColor, bool allowAllocation = false);
 
+    GameState toGameState(int frameId, const AnalyzerResult&);
+
     std::thread th_;
     volatile bool shouldStop_;
     std::unique_ptr<ConnectorManager> connector_;
+
+    std::vector<GameStateObserver*> observers_;
 
     // These 3 field should be used for only drawing.
     mutable std::mutex mu_;
@@ -68,6 +77,7 @@ private:
 
     bool isAi_[2];
     Decision lastDecision_[2];
+    std::string messages_[2];
 };
 
 #endif
