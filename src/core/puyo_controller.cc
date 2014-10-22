@@ -646,7 +646,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
                     current.y++;
                     if (current.y >= 14)
                         return KeySetSeq();
-                    if (!field.get(current.x - 1, current.y + 1)) {
+                    if (field.get(current.x - 1, current.y + 1) != PuyoColor::EMPTY) {
                         ret.add(KeySet(Key::RIGHT_TURN));
                         ret.add(KeySet(Key::RIGHT));
                     } else {
@@ -661,7 +661,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
             }
         } else {
             // move to left
-            if (!field.get(current.x - 1, current.y)) {
+            if (field.get(current.x - 1, current.y) != PuyoColor::EMPTY) {
                 ret.add(KeySet(Key::LEFT));
                 current.x--;
             } else {  // hits a wall
@@ -687,7 +687,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
                     current.y++;
                     if (current.y >= 14)
                         return KeySetSeq();
-                    if (!field.get(current.x + 1, current.y)) {
+                    if (field.get(current.x + 1, current.y) != PuyoColor::EMPTY) {
                         ret.add(KeySet(Key::LEFT_TURN));
                         ret.add(KeySet(Key::LEFT));
                     } else {

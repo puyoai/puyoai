@@ -324,15 +324,15 @@ void AI::resetCurrentField(const CoreField& field)
             field_.unsafeSet(x, y, field.color(x, y));
 
         for (int y = CoreField::HEIGHT + 1; y <= 14; ++y)
-            field_.unsafeSet(x, y, EMPTY);
+          field_.unsafeSet(x, y, PuyoColor::EMPTY);
 
         field_.recalcHeightOn(x);
 
         // This might be useful for defensive players.
         if (behaviorDefensive_) {
-            if (field_.color(x, CoreField::HEIGHT) != EMPTY) {
+            if (field_.color(x, CoreField::HEIGHT) != PuyoColor::EMPTY) {
                 while (field_.height(x) < 13)
-                    field_.dropPuyoOn(x, OJAMA);
+                    field_.dropPuyoOn(x, PuyoColor::OJAMA);
             }
         }
     }
