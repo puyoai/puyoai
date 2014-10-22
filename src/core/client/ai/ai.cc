@@ -24,26 +24,8 @@ struct DecisionSending {
     bool needsRethink = false;
 };
 
-void AdditionalThoughtInfo::setOngoingRensa(const RensaResult& rensaResult, int finishingFrameId)
-{
-    isRensaOngoing_ = true;
-    ongoingRensaResult_ = rensaResult;
-    finishingRensaFrameId_ = finishingFrameId;
-}
-
-void AdditionalThoughtInfo::unsetOngoingRensa()
-{
-    isRensaOngoing_ = false;
-}
-
 AI::AI(int argc, char* argv[], const string& name) :
-    name_(name),
-    hand_(0),
-    enemyHand_(0),
-    rethinkRequested_(false),
-    enemyDecisionRequestFrameId_(0),
-    behaviorDefensive_(false),
-    behaviorRethinkAfterOpponentRensa_(false)
+    AI(name)
 {
     UNUSED_VARIABLE(argc);
     UNUSED_VARIABLE(argv);
@@ -51,9 +33,8 @@ AI::AI(int argc, char* argv[], const string& name) :
 
 AI::AI(const string& name) :
     name_(name),
-    hand_(0),
-    enemyHand_(0),
     rethinkRequested_(false),
+    enemyDecisionRequestFrameId_(0),
     behaviorDefensive_(false),
     behaviorRethinkAfterOpponentRensa_(false)
 {
@@ -98,9 +79,10 @@ void AI::runLoop()
         // Update enemy info if necessary.
         if (frameRequest.enemyPlayerFrameRequest().state.decisionRequest)
             enemyDecisionRequested(frameRequest);
-        if (frameRequest.enemyPlayerFrameRequest().state.grounded) {
+        if (frameRequest.enemyPlayerFrameRequest().state.ojamaDropped)
+            enemyOjamaDropped(frameRequest);
+        if (frameRequest.enemyPlayerFrameRequest().state.grounded)
             enemyGrounded(frameRequest);
-        }
         if (frameRequest.enemyPlayerFrameRequest().state.wnextAppeared)
             enemyNext2Appeared(frameRequest);
 
@@ -109,26 +91,27 @@ void AI::runLoop()
             next2Appeared(frameRequest);
             const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
             LOG(INFO) << "STATE_WNEXT_APPEARED";
-            VLOG(1) << '\n' << field_.toDebugString();
+            VLOG(1) << '\n' << me_.field.toDebugString();
 
-            KumipuyoSeq seq = rememberedSequence(hand_ + 1);
+            KumipuyoSeq seq = rememberedSequence(me_.hand + 1);
             CHECK_EQ(kumipuyoSeq.get(1), seq.get(0));
             CHECK_EQ(kumipuyoSeq.get(2), seq.get(1));
 
-            next1.fieldBeforeThink = field_;
-            next1.dropDecision = think(frameRequest.frameId, field_, seq, additionalThoughtInfo_, false);
+            next1.fieldBeforeThink = me_.field;
+            AdditionalThoughtInfo info { myPlayerState(), enemyPlayerState() };
+            next1.dropDecision = think(frameRequest.frameId, me_.field, seq, info, false);
 
             next1.kumipuyo = kumipuyoSeq.get(1);
             next1.ready = true;
         }
-        if (frameRequest.myPlayerFrameRequest().state.grounded) {
-            grounded(frameRequest);
-        }
-
         // Update my info if necessary.
         if (frameRequest.myPlayerFrameRequest().state.ojamaDropped) {
             // We need to rethink the next1 decision.
             next1.needsRethink = true;
+            ojamaDropped(frameRequest);
+        }
+        if (frameRequest.myPlayerFrameRequest().state.grounded) {
+            grounded(frameRequest);
         }
         if (frameRequest.myPlayerFrameRequest().state.decisionRequest) {
             VLOG(1) << "REQUESTED";
@@ -139,11 +122,13 @@ void AI::runLoop()
             // We need to handle this specially. Since we've proceeded next1, we don't have any knowledge about this turn.
             // TODO(mayah): Should we preserve DecisionSending after we used it for this?
             VLOG(1) << "REQUEST_AGAIN";
-            DCHECK(!frameRequest.myPlayerFrameRequest().state.decisionRequest) << "decisionRequestAgain should not come with decisionRequest.";
+            DCHECK(!frameRequest.myPlayerFrameRequest().state.decisionRequest)
+                << "decisionRequestAgain should not come with decisionRequest.";
+            AdditionalThoughtInfo info { myPlayerState(), enemyPlayerState() };
             DropDecision dropDecision = think(frameRequest.frameId,
                                               frameRequest.myPlayerFrameRequest().field,
                                               frameRequest.myPlayerFrameRequest().kumipuyoSeq,
-                                              additionalThoughtInfo_, true);
+                                              info, true);
             connector_.send(FrameResponse(frameRequest.frameId, dropDecision.decision(), dropDecision.message()));
             continue;
         }
@@ -153,9 +138,9 @@ void AI::runLoop()
             continue;
         }
 
-        // Check field inconsistency. We only check when hand_ >= 3, since we cannot trust the field in 3 hands.
-        if (hand_ >= 3 && isFieldInconsistent(next1.fieldBeforeThink, frameRequest.myPlayerFrameRequest().field)) {
-            LOG(INFO) << "FIELD INCONSISTENCY DETECTED: hand=" << hand_;
+        // Check field inconsistency. We only check when me_hand >= 3, since we cannot trust the field in 3 hands.
+        if (me_.hand >= 3 && isFieldInconsistent(next1.fieldBeforeThink, frameRequest.myPlayerFrameRequest().field)) {
+            LOG(INFO) << "FIELD INCONSISTENCY DETECTED: hand=" << me_.hand;
             VLOG(1) << '\n' << FieldPrettyPrinter::toStringFromMultipleFields(
                 next1.fieldBeforeThink, frameRequest.myPlayerFrameRequest().kumipuyoSeq,
                 frameRequest.myPlayerFrameRequest().field, frameRequest.myPlayerFrameRequest().kumipuyoSeq);
@@ -167,14 +152,15 @@ void AI::runLoop()
         if (next1.needsRethink || rethinkRequested_) {
             LOG(INFO) << "RETHINK";
 
-            mergeField(&field_, frameRequest.myPlayerFrameRequest().field);
+            mergeField(&me_.field, frameRequest.myPlayerFrameRequest().field);
             const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
 
-            KumipuyoSeq seq = rememberedSequence(hand_);
+            KumipuyoSeq seq = rememberedSequence(me_.hand);
             CHECK_EQ(kumipuyoSeq.get(0), seq.get(0));
             CHECK_EQ(kumipuyoSeq.get(1), seq.get(1));
 
-            next1.dropDecision = think(frameRequest.frameId, field_, seq, additionalThoughtInfo_, true);
+            AdditionalThoughtInfo info { myPlayerState(), enemyPlayerState() };
+            next1.dropDecision = think(frameRequest.frameId, me_.field, seq, info, true);
             next1.kumipuyo = kumipuyoSeq.get(0);
             next1.ready = true;
             next1.needsRethink = false;
@@ -186,10 +172,10 @@ void AI::runLoop()
 
         // Move to next.
         if (next1.dropDecision.decision().isValid() && next1.kumipuyo.isValid()) {
-            if (!field_.dropKumipuyo(next1.dropDecision.decision(), next1.kumipuyo)) {
+            if (!me_.field.dropKumipuyo(next1.dropDecision.decision(), next1.kumipuyo)) {
                 LOG(WARNING) << "failed to drop kumipuyo. Moving to impossible position?";
             }
-            field_.simulate();
+            me_.field.simulate();
         }
         next1.clear();
     }
@@ -204,16 +190,11 @@ void AI::gaze(int frameId, const CoreField&, const KumipuyoSeq&)
 
 void AI::gameWillBegin(const FrameRequest& frameRequest)
 {
-    hand_ = 0;
-    rethinkRequested_ = false;
-    field_.clear();
-    seq_.clear();
-    additionalThoughtInfo_ = AdditionalThoughtInfo();
+    me_.clear();
+    enemy_.clear();
 
-    enemyHand_ = 0;
+    rethinkRequested_ = false;
     enemyDecisionRequestFrameId_ = 0;
-    enemyField_.clear();
-    enemySeq_.clear();
 
     onGameWillBegin(frameRequest);
 }
@@ -225,7 +206,23 @@ void AI::gameHasEnded(const FrameRequest& frameRequest)
 
 void AI::decisionRequested(const FrameRequest& frameRequest)
 {
-    ++hand_;
+    me_.hand += 1;
+
+    // our field will be updated in runLoop().
+
+    if (enemy_.pendingOjama > 0) {
+        enemy_.fixedOjama += enemy_.pendingOjama;
+        enemy_.pendingOjama = 0;
+    }
+
+    me_.isRensaOngoing = false;
+    me_.finishingRensaFrameId = 0;
+    me_.ongoingRensaResult = RensaResult();
+
+    if (!me_.hasOjamaDropped)
+        me_.fixedOjama = 0;
+    me_.hasOjamaDropped = false;
+
     onDecisionRequested(frameRequest);
 }
 
@@ -235,15 +232,51 @@ void AI::grounded(const FrameRequest& frameRequest)
     field.forceDrop();
     RensaResult rensaResult = field.simulate();
     if (rensaResult.chains > 0) {
-        additionalThoughtInfo_.setHasZenkeshi(false);
+        int ojamaCount = rensaResult.score / 70;;
+        if (me_.hasZenkeshi) {
+            ojamaCount += 30;
+        }
+
+        if (me_.pendingOjama > 0) {
+            if (me_.pendingOjama > ojamaCount) {
+                me_.pendingOjama -= ojamaCount;
+                ojamaCount = 0;
+            } else {
+                ojamaCount -= me_.pendingOjama;
+                me_.pendingOjama = 0;
+            }
+        }
+        if (me_.fixedOjama > 0) {
+            if (me_.fixedOjama > ojamaCount) {
+                me_.fixedOjama -= ojamaCount;
+                ojamaCount = 0;
+            } else {
+                ojamaCount -= me_.fixedOjama;
+                me_.fixedOjama = 0;
+            }
+        }
+
+        enemy_.pendingOjama += ojamaCount;
+
+        me_.isRensaOngoing = true;
+        me_.ongoingRensaResult = rensaResult;
+        me_.finishingRensaFrameId = frameRequest.frameId + rensaResult.frames;
+        me_.hasZenkeshi = false;
     }
 
-    // Don't check zenkeshi if hand_ is 0.
-    if (hand_ != 0 && field.isZenkeshi()) {
-        additionalThoughtInfo_.setHasZenkeshi(true);
+    // Don't check zenkeshi if me_.hand is 0.
+    if (me_.hand != 0 && field.isZenkeshi()) {
+        me_.hasZenkeshi = true;
     }
 
     onGrounded(frameRequest);
+}
+
+void AI::ojamaDropped(const FrameRequest& frameRequest)
+{
+    me_.fixedOjama = std::max(me_.fixedOjama - 30, 0);
+    me_.hasOjamaDropped = true;
+    onOjamaDropped(frameRequest);
 }
 
 void AI::next2Appeared(const FrameRequest& frameRequest)
@@ -251,12 +284,12 @@ void AI::next2Appeared(const FrameRequest& frameRequest)
     const KumipuyoSeq& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
 
     for (int i = 0; i < 3; ++i) {
-        if (hand_ + i < seq_.size()) {
-            CHECK_EQ(seq_.get(hand_ + i), kumipuyoSeq.get(i))
-                << hand_ << " " << i << " " << seq_.size()
-                << seq_.toString() << " " << kumipuyoSeq.toString();
+        if (me_.hand + i < me_.seq.size()) {
+            CHECK_EQ(me_.seq.get(me_.hand + i), kumipuyoSeq.get(i))
+                << me_.hand << " " << i << " " << me_.seq.size()
+                << me_.seq.toString() << " " << kumipuyoSeq.toString();
         } else {
-            seq_.add(kumipuyoSeq.get(i));
+            me_.seq.add(kumipuyoSeq.get(i));
         }
     }
 
@@ -265,10 +298,25 @@ void AI::next2Appeared(const FrameRequest& frameRequest)
 
 void AI::enemyDecisionRequested(const FrameRequest& frameRequest)
 {
-    enemyHand_ += 1;
     enemyDecisionRequestFrameId_ = frameRequest.frameId;
-    enemyField_ = CoreField(frameRequest.enemyPlayerFrameRequest().field);
-    enemyField_.forceDrop();
+
+    enemy_.hand += 1;
+    enemy_.field = CoreField(frameRequest.enemyPlayerFrameRequest().field);
+    enemy_.field.forceDrop();
+
+    // Should this be here?
+    if (me_.pendingOjama > 0) {
+        me_.fixedOjama += me_.pendingOjama;
+        me_.pendingOjama = 0;
+    }
+    enemy_.isRensaOngoing = false;
+    enemy_.finishingRensaFrameId = 0;
+    enemy_.ongoingRensaResult = RensaResult();
+
+    if (!enemy_.hasOjamaDropped)
+        enemy_.fixedOjama = 0;
+    enemy_.hasOjamaDropped = false;
+
     onEnemyDecisionRequested(frameRequest);
 }
 
@@ -283,17 +331,51 @@ void AI::enemyGrounded(const FrameRequest& frameRequest)
         LOG(INFO) << "Detected the opponent has fired rensa: " << rensaResult.toString();
         if (behaviorRethinkAfterOpponentRensa_)
             requestRethink();
-        additionalThoughtInfo_.setOngoingRensa(rensaResult, frameRequest.frameId + rensaResult.frames);
-        additionalThoughtInfo_.setEnemyHasZenkeshi(false);
-    } else {
-        additionalThoughtInfo_.unsetOngoingRensa();
+
+        int ojamaCount = rensaResult.score / 70;;
+        if (enemy_.hasZenkeshi) {
+            ojamaCount += 30;
+        }
+
+        if (enemy_.pendingOjama > 0) {
+            if (enemy_.pendingOjama > ojamaCount) {
+                enemy_.pendingOjama -= ojamaCount;
+                ojamaCount = 0;
+            } else {
+                ojamaCount -= enemy_.pendingOjama;
+                enemy_.pendingOjama = 0;
+            }
+        }
+        if (enemy_.fixedOjama > 0) {
+            if (enemy_.fixedOjama > ojamaCount) {
+                enemy_.fixedOjama -= ojamaCount;
+                ojamaCount = 0;
+            } else {
+                ojamaCount -= enemy_.fixedOjama;
+                enemy_.fixedOjama = 0;
+            }
+        }
+
+        me_.pendingOjama = ojamaCount;
+
+        enemy_.isRensaOngoing = true;
+        enemy_.ongoingRensaResult = rensaResult;
+        enemy_.finishingRensaFrameId = frameRequest.frameId + rensaResult.frames;
+        enemy_.hasZenkeshi = false;
     }
 
-    if (enemyHand_ != 0 && field.isZenkeshi()) {
-        additionalThoughtInfo_.setEnemyHasZenkeshi(true);
+    if (enemy_.hand != 0 && field.isZenkeshi()) {
+        enemy_.hasZenkeshi = true;
     }
 
     onEnemyGrounded(frameRequest);
+}
+
+void AI::enemyOjamaDropped(const FrameRequest& frameRequest)
+{
+    enemy_.fixedOjama = std::max(enemy_.fixedOjama - 30, 0);
+    enemy_.hasOjamaDropped = true;
+    onEnemyOjamaDropped(frameRequest);
 }
 
 void AI::enemyNext2Appeared(const FrameRequest& frameRequest)
@@ -301,41 +383,19 @@ void AI::enemyNext2Appeared(const FrameRequest& frameRequest)
     const KumipuyoSeq& kumipuyoSeq = frameRequest.enemyPlayerFrameRequest().kumipuyoSeq;
 
     for (int i = 0; i < 3; ++i) {
-        if (enemyHand_ + i < enemySeq_.size()) {
-            CHECK_EQ(enemySeq_.get(enemyHand_ + i), kumipuyoSeq.get(i));
+        if (enemy_.hand + i < enemy_.seq.size()) {
+            CHECK_EQ(enemy_.seq.get(enemy_.hand + i), kumipuyoSeq.get(i));
         } else {
-            enemySeq_.add(kumipuyoSeq.get(i));
+            enemy_.seq.add(kumipuyoSeq.get(i));
         }
     }
 
-    // When enemyHand_ == 0, rememberedSequence(0) contains PuyoColor::EMPTY.
+    // When enemy_.hand == 0, rememberedSequence(0) contains PuyoColor::EMPTY.
     // So, don't gaze at that time.
-    if (enemyHand_ > 0)
-        gaze(enemyDecisionRequestFrameId_, enemyField_, rememberedSequence(enemyHand_));
+    if (enemy_.hand > 0)
+        gaze(enemyDecisionRequestFrameId_, enemy_.field, rememberedSequence(enemy_.hand));
 
     onEnemyNext2Appeared(frameRequest);
-}
-
-void AI::resetCurrentField(const CoreField& field)
-{
-    // TODO(mayah): Be more accurate.
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        for (int y = 1; y <= CoreField::HEIGHT; ++y)
-            field_.unsafeSet(x, y, field.color(x, y));
-
-        for (int y = CoreField::HEIGHT + 1; y <= 14; ++y)
-            field_.unsafeSet(x, y, EMPTY);
-
-        field_.recalcHeightOn(x);
-
-        // This might be useful for defensive players.
-        if (behaviorDefensive_) {
-            if (field_.color(x, CoreField::HEIGHT) != EMPTY) {
-                while (field_.height(x) < 13)
-                    field_.dropPuyoOn(x, OJAMA);
-            }
-        }
-    }
 }
 
 // static
@@ -376,8 +436,8 @@ void AI::mergeField(CoreField* f, const PlainField& provided)
 
 KumipuyoSeq AI::rememberedSequence(int indexFrom) const
 {
-    if (seq_.size() < enemySeq_.size())
-        return enemySeq_.subsequence(indexFrom);
+    if (me_.seq.size() < enemy_.seq.size())
+        return enemy_.seq.subsequence(indexFrom);
     else
-        return seq_.subsequence(indexFrom);
+        return me_.seq.subsequence(indexFrom);
 }

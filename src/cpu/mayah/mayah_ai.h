@@ -47,17 +47,22 @@ public:
     virtual void onGameWillBegin(const FrameRequest&) override;
 
     // Use this directly in test. Otherwise, use via think/thinkFast.
-    ThoughtResult thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&, const AdditionalThoughtInfo&,
+    ThoughtResult thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&,
+                            const PlayerState& me, const PlayerState& enemy,
                             int depth, int maxIteration);
 
 protected:
     PreEvalResult preEval(const CoreField& currentField);
     EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+                    const PlayerState& me, const PlayerState& enemy,
                     const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
-    CollectedFeature evalWithCollectingFeature(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
-                                               const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
+    CollectedFeature evalWithCollectingFeature(
+        const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+        const PlayerState& me, const PlayerState& enemy,
+        const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
 
     std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration,
+                                const PlayerState& me, const PlayerState& enemy,
                                 const PreEvalResult&, const MidEvalResult&, const GazeResult&,
                                 const Plan& plan, double rensaScore, double virutalRensaScore, double thoughtTimeInSeconds) const;
 
@@ -78,7 +83,6 @@ public:
     DebuggableMayahAI(int argc, char* argv[], Executor* executor = nullptr) : MayahAI(argc, argv, executor) {}
     virtual ~DebuggableMayahAI() {}
 
-    using MayahAI::additionalThoughtInfo;
     using MayahAI::reloadParameter;
     using MayahAI::makeMessageFrom;
 

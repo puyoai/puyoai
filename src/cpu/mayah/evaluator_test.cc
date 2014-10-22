@@ -33,7 +33,7 @@ protected:
         PreEvalResult preEvalResult = PreEvaluator(books).preEval(f);
         FeatureScoreCollector sc(featureParameter);
         Evaluator<FeatureScoreCollector> evaluator(books, &sc);
-        evaluator.collectScore(plan, f, 1, numIteration, preEvalResult, MidEvalResult(), gazer.gazeResult());
+        evaluator.collectScore(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
         return sc.toCollectedFeature();
     }
 };

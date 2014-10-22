@@ -354,15 +354,15 @@ void Evaluator<ScoreCollector>::evalUnreachableSpace(const RefPlan& plan)
 
 // Returns true If we don't need to evaluate other features.
 template<typename ScoreCollector>
-bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreField& currentField,
-                                             int currentFrameId, const GazeResult& gazeResult)
+bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreField& currentField, int currentFrameId,
+                                             const PlayerState& me, const PlayerState& enemy, const GazeResult& gazeResult)
 {
     if (!plan.isRensaPlan())
         return false;
 
-    if (gazeResult.isRensaOngoing() && gazeResult.ongoingRensaResult().score > scoreForOjama(6)) {
-        if ((plan.score() >= gazeResult.ongoingRensaResult().score) &&
-            (currentFrameId + plan.framesToInitiate() < gazeResult.ongoingRensaFinishingFrameId())) {
+    if (enemy.isRensaOngoing && enemy.ongoingRensaResult.score > scoreForOjama(6)) {
+        if ((plan.score() >= enemy.ongoingRensaResult.score) &&
+            (currentFrameId + plan.framesToInitiate() < enemy.finishingRensaFrameId)) {
             LOG(INFO) << plan.decisionText() << " TAIOU";
             sc_->addScore(STRATEGY_TAIOU, 1.0);
             return false;
@@ -381,19 +381,19 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         return true;
     }
 
-    if (gazeResult.additionalThoughtInfo().hasZenkeshi() && !gazeResult.additionalThoughtInfo().enemyHasZenkeshi()) {
-        if (!gazeResult.isRensaOngoing()) {
+    if (me.hasZenkeshi && !enemy.hasZenkeshi) {
+        if (!enemy.isRensaOngoing) {
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
-        if (gazeResult.isRensaOngoing() && gazeResult.ongoingRensaResult().score <= scoreForOjama(36)) {
+        if (enemy.isRensaOngoing && enemy.ongoingRensaResult.score <= scoreForOjama(36)) {
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
     }
 
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
-    int estimatedMaxScore = gazeResult.estimateMaxScore(rensaEndingFrameId);
+    int estimatedMaxScore = gazeResult.estimateMaxScore(rensaEndingFrameId, enemy);
 
     // --- If the rensa is large enough, fire it.
     if (plan.score() >= estimatedMaxScore + scoreForOjama(60)) {
@@ -431,13 +431,14 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan, const RensaResult& rensaResult,
                                                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                                                       int currentFrameId, const GazeResult& gazeResult)
+                                                       int currentFrameId,
+                                                       const PlayerState& me, const PlayerState& enemy)
 {
     UNUSED_VARIABLE(currentFrameId);
+    UNUSED_VARIABLE(me);
 
-    // TODO(mayah): Ah, maybe sakiuchi etc. wins this value?
     if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) && plan.chains() <= 3 && rensaResult.chains >= 7 &&
-        keyPuyos.size() + firePuyos.size() <= 3 && !gazeResult.isRensaOngoing()) {
+        keyPuyos.size() + firePuyos.size() <= 3 && !enemy.isRensaOngoing) {
         sc_->addScore(STRATEGY_SAISOKU, 1);
     }
 }
@@ -592,6 +593,8 @@ void Evaluator<ScoreCollector>::evalMidEval(const MidEvalResult& midEvalResult)
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreField& currentField,
                                              int currentFrameId, int maxIteration,
+                                             const PlayerState& me,
+                                             const PlayerState& enemy,
                                              const PreEvalResult& preEvalResult,
                                              const MidEvalResult& midEvalResult,
                                              const GazeResult& gazeResult)
@@ -601,10 +604,10 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     // We'd like to evaluate frame feature always.
     evalFrameFeature(plan);
 
-    if (evalStrategy(plan, currentField, currentFrameId, gazeResult))
+    if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult))
         return;
 
-    if (!gazeResult.additionalThoughtInfo().enemyHasZenkeshi())
+    if (!enemy.hasZenkeshi)
         evalBook(books_, preEvalResult.booksMatchable(), plan);
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
@@ -624,7 +627,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (USE_RIDGE_FEATURE)
         evalRidgeHeight(plan);
     if (USE_FIELD_USHAPE_FEATURE)
-        evalFieldUShape(plan, gazeResult.additionalThoughtInfo().enemyHasZenkeshi());
+        evalFieldUShape(plan, enemy.hasZenkeshi);
 
     evalUnreachableSpace(plan);
 
@@ -645,11 +648,11 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         if (USE_FIRE_POINT_TABOO_FEATURE)
             rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
         if (USE_IGNITION_HEIGHT_FEATURE)
-            rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, gazeResult.additionalThoughtInfo().enemyHasZenkeshi());
+            rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, enemy.hasZenkeshi);
         if (USE_CONNECTION_FEATURE)
             rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
 
-        rensaEvaluator.evalRensaStrategy(plan, rensaResult, keyPuyos, firePuyos, currentFrameId, gazeResult);
+        rensaEvaluator.evalRensaStrategy(plan, rensaResult, keyPuyos, firePuyos, currentFrameId, me, enemy);
 
         if (rensaScoreCollector->score() > maxRensaScore) {
             maxRensaScore = rensaScoreCollector->score();
