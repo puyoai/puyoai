@@ -55,7 +55,9 @@ public:
         {
             RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(),
                             plan.framesToInitiate(), plan.lastDropFrames());
-            evaluator.collectScore(refPlan, currentField, frameId, numKeyPuyos, preEvalResult, midEvalResult, gazer_.gazeResult());
+            evaluator.collectScore(refPlan, currentField, frameId, numKeyPuyos,
+                                   PlayerState(), PlayerState(),
+                                   preEvalResult, midEvalResult, gazer_.gazeResult());
         }
 
         return sc.toCollectedFeature();
@@ -163,7 +165,8 @@ int main(int argc, char* argv[])
                 req.playerFrameRequest[1].kumipuyoSeq);
 
             double t1 = currentTime();
-            ThoughtResult thoughtResult = ai.thinkPlan(frameId, field, seq.subsequence(0, 2), ai.additionalThoughtInfo(),
+            ThoughtResult thoughtResult = ai.thinkPlan(frameId, field, seq.subsequence(0, 2),
+                                                       PlayerState(), PlayerState(),
                                                        MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
             const Plan& aiPlan = thoughtResult.plan;
 
@@ -210,7 +213,7 @@ int main(int argc, char* argv[])
         ThoughtResult thoughtResult = ai.thinkPlan(frameId,
                                                    req.playerFrameRequest[0].field,
                                                    req.playerFrameRequest[0].kumipuyoSeq.subsequence(0, 2),
-                                                   ai.additionalThoughtInfo(),
+                                                   PlayerState(), PlayerState(),
                                                    MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
         {
             CoreField f = req.playerFrameRequest[0].field;

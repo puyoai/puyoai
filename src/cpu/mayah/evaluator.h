@@ -11,6 +11,7 @@
 class ColumnPuyoList;
 class CoreField;
 class GazeResult;
+struct PlayerState;
 class RefPlan;
 struct RensaResult;
 class RensaTrackResult;
@@ -83,7 +84,7 @@ public:
     void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaTrackResult&, bool enemyHasZenkeshi);
     void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                           int currentFrameId, const GazeResult&);
+                           int currentFrameId, const PlayerState& me, const PlayerState& enemy);
 private:
     const std::vector<BookField>& books_;
     ScoreCollector* sc_;
@@ -98,12 +99,13 @@ public:
         sc_(sc) {}
 
     void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+                      const PlayerState& me, const PlayerState& enemy,
                       const PreEvalResult&, const MidEvalResult&, const GazeResult&);
 
     // ----------------------------------------------------------------------
 
-    bool evalStrategy(const RefPlan& plan, const CoreField& currentField,
-                      int currentFrameId, const GazeResult&);
+    bool evalStrategy(const RefPlan&, const CoreField& currentField, int currentFrameId,
+                      const PlayerState& me, const PlayerState& enemy, const GazeResult&);
 
     void evalBook(const std::vector<BookField>&, const std::vector<bool>& bookMatchable, const RefPlan&);
     void evalFrameFeature(const RefPlan&);

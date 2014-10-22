@@ -128,7 +128,7 @@ void learnWithInteractive()
             FeatureScoreCollector sc(parameter);
             Evaluator<FeatureScoreCollector> evaluator(books, &sc);
             // TODO(mayah): should use the correct MidEvalResult
-            evaluator.collectScore(plan, field, 1, false, preEvalResult, MidEvalResult(), gazer.gazeResult());
+            evaluator.collectScore(plan, field, 1, false, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
 
             CollectedFeature f = sc.toCollectedFeature();
             pair<Decision, Decision> pd;
@@ -272,7 +272,9 @@ void learnFromPuyofu()
                 FeatureScoreCollector sc(parameter);
                 Evaluator<FeatureScoreCollector> evaluator(books, &sc);
                 // TODO(mayah): Should use the correct MidEvalResult.
-                evaluator.collectScore(plan, inputs[i].field, frameId, MayahAI::DEFAULT_NUM_ITERATION, preEvalResult, MidEvalResult(), gazer.gazeResult());
+                evaluator.collectScore(plan, inputs[i].field, frameId, MayahAI::DEFAULT_NUM_ITERATION,
+                                       PlayerState(), PlayerState(),
+                                       preEvalResult, MidEvalResult(), gazer.gazeResult());
 
                 CollectedFeature f = sc.toCollectedFeature();
 

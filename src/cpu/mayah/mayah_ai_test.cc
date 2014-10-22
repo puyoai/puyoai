@@ -33,8 +33,8 @@ TEST(MayahAITest, parallel)
     auto ai = makeAI();
     auto parallelAi = makeAI(executor.get());
 
-    ThoughtResult thoughtResult = ai->thinkPlan(2, f, seq, AdditionalThoughtInfo(), 2, 3);
-    ThoughtResult parallelThoughtResult = parallelAi->thinkPlan(2, f, seq, AdditionalThoughtInfo(), 2, 3);
+    ThoughtResult thoughtResult = ai->thinkPlan(2, f, seq, PlayerState(), PlayerState(), 2, 3);
+    ThoughtResult parallelThoughtResult = parallelAi->thinkPlan(2, f, seq, PlayerState(), PlayerState(), 2, 3);
 
     EXPECT_EQ(thoughtResult.plan, parallelThoughtResult.plan);
     EXPECT_EQ(thoughtResult.isRensaPlan, parallelThoughtResult.isRensaPlan);

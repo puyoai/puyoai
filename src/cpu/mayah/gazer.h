@@ -27,26 +27,19 @@ struct EstimatedRensaInfo {
 class GazeResult {
 public:
     GazeResult(int frameIdGazedAt, int restEmptyField,
-               const AdditionalThoughtInfo& info,
                const std::vector<EstimatedRensaInfo>& feasible,
                const std::vector<EstimatedRensaInfo>& possible) :
         frameIdGazedAt_(frameIdGazedAt),
         restEmptyField_(restEmptyField),
-        additionalThoughtInfo_(info),
         feasibleRensaInfos_(feasible),
         possibleRensaInfos_(possible)
     {
     }
 
     int frameIdGazedAt() const { return frameIdGazedAt_; }
-    const AdditionalThoughtInfo& additionalThoughtInfo() const { return additionalThoughtInfo_; }
-
-    bool isRensaOngoing() const { return additionalThoughtInfo_.isRensaOngoing(); }
-    const RensaResult& ongoingRensaResult() const { return additionalThoughtInfo_.ongoingRensaResult(); }
-    int ongoingRensaFinishingFrameId() const { return additionalThoughtInfo_.ongoingRensaFinishingFrameId(); }
 
     // Returns the (expecting) possible max score by this frame.
-    int estimateMaxScore(int frameId) const;
+    int estimateMaxScore(int frameId, const PlayerState& enemy) const;
 
     std::string toRensaInfoString() const;
 
@@ -58,7 +51,6 @@ private:
     int frameIdGazedAt_;
     int restEmptyField_;
 
-    AdditionalThoughtInfo additionalThoughtInfo_;
     std::vector<EstimatedRensaInfo> feasibleRensaInfos_;
     std::vector<EstimatedRensaInfo> possibleRensaInfos_;
 };
@@ -69,9 +61,6 @@ public:
 
     void setFrameIdGazedAt(int frameId) { frameIdGazedAt_ = frameId; }
     int frameIdGazedAt() const { return frameIdGazedAt_; }
-
-    void setAdditionalThoughtInfo(const AdditionalThoughtInfo& info) { additionalThoughtInfo_ = info; }
-    const AdditionalThoughtInfo& additionalThoughtInfo() const { return additionalThoughtInfo_; }
 
     void gaze(int frameId, const CoreField&, const KumipuyoSeq&);
 
@@ -86,8 +75,6 @@ private:
 
     int frameIdGazedAt_ = -1;
     int restEmptyField_ = -1;
-
-    AdditionalThoughtInfo additionalThoughtInfo_;
 
     // --- For these rensaInfos, frames means the framesToInitiate.
     // Fiesible Rensa is the Rensa the enemy can really fire in current/next/nextnext tsumo.

@@ -60,15 +60,15 @@ std::string EstimatedRensaInfo::toString() const
     return buf;
 }
 
-int GazeResult::estimateMaxScore(int frameId) const
+int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
 {
     CHECK_LE(frameIdGazedAt_, frameId)
         << "Gazer is requested to check the past frame estimated score."
         << " frameId=" << frameId
         << " frameIdGazedAt=" << frameIdGazedAt_;
 
-    if (isRensaOngoing() && frameId <= ongoingRensaFinishingFrameId()) {
-        return ongoingRensaResult().score;
+    if (enemy.isRensaOngoing && frameId <= enemy.finishingRensaFrameId) {
+        return enemy.ongoingRensaResult.score;
     }
 
     int scoreByFeasibleRensas = estimateMaxScoreFromFeasibleRensas(frameId);
@@ -161,7 +161,6 @@ void Gazer::initialize(int frameIdGameWillBegin)
 {
     frameIdGazedAt_ = frameIdGameWillBegin;
     restEmptyField_ = 72;
-    additionalThoughtInfo_ = AdditionalThoughtInfo();
     feasibleRensaInfos_.clear();
     possibleRensaInfos_.clear();
 }
@@ -266,5 +265,5 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
 
 GazeResult Gazer::gazeResult() const
 {
-    return GazeResult(frameIdGazedAt_, restEmptyField_, additionalThoughtInfo_, feasibleRensaInfos_, possibleRensaInfos_);
+    return GazeResult(frameIdGazedAt_, restEmptyField_, feasibleRensaInfos_, possibleRensaInfos_);
 }

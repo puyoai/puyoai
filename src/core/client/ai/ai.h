@@ -12,29 +12,27 @@
 struct FrameRequest;
 class PlainField;
 
-// TODO(mayah): This struct will contain zenkeshi info etc.
-class AdditionalThoughtInfo {
-public:
-    bool isRensaOngoing() const { return isRensaOngoing_; }
-    const RensaResult& ongoingRensaResult() const { return ongoingRensaResult_; }
-    int ongoingRensaFinishingFrameId() const { return finishingRensaFrameId_; }
+struct PlayerState {
+    void clear() { *this = PlayerState(); }
 
-    void setOngoingRensa(const RensaResult&, int finishingFrameId);
-    void unsetOngoingRensa();
+    int hand = 0;
+    CoreField field;
+    KumipuyoSeq seq;
+    bool hasZenkeshi = false;
+    int fixedOjama = 0;
+    int pendingOjama = 0;
 
-    void setHasZenkeshi(bool flag) { hasZenkeshi_ = flag; }
-    bool hasZenkeshi() const { return hasZenkeshi_; }
+    bool isRensaOngoing = false;
+    int finishingRensaFrameId = 0;
+    RensaResult ongoingRensaResult;
 
-    void setEnemyHasZenkeshi(bool flag) { enemyHasZenkeshi_ = flag; }
-    bool enemyHasZenkeshi() const { return enemyHasZenkeshi_; }
+    // make false in decisionRequest. If false twice, fixedOjama should be 0.
+    bool hasOjamaDropped = false;
+};
 
-private:
-    bool hasZenkeshi_ = false;
-    bool enemyHasZenkeshi_ = false;
-
-    bool isRensaOngoing_ = false;
-    int finishingRensaFrameId_ = 0;
-    RensaResult ongoingRensaResult_;
+struct AdditionalThoughtInfo {
+    PlayerState me;
+    PlayerState enemy;
 };
 
 // AI is a utility class of AI.
@@ -77,17 +75,17 @@ protected:
     // Set AI's behavior. If true, you can rethink next decision when the enemy has started his rensa.
     void setBehaviorRethinkAfterOpponentRensa(bool flag) { behaviorRethinkAfterOpponentRensa_ = flag; }
 
-    const AdditionalThoughtInfo& additionalThoughtInfo() const { return additionalThoughtInfo_; }
-
     // These callbacks will be called from the corresponding method.
     // i.e. onXXX() will be called from XXX().
     virtual void onGameWillBegin(const FrameRequest&) {}
     virtual void onGameHasEnded(const FrameRequest&) {}
     virtual void onDecisionRequested(const FrameRequest&) {}
     virtual void onGrounded(const FrameRequest&) {}
+    virtual void onOjamaDropped(const FrameRequest&) {}
     virtual void onNext2Appeared(const FrameRequest&) {}
     virtual void onEnemyDecisionRequested(const FrameRequest&) {}
     virtual void onEnemyGrounded(const FrameRequest&) {}
+    virtual void onEnemyOjamaDropped(const FrameRequest&) {}
     virtual void onEnemyNext2Appeared(const FrameRequest&) {}
 
     // |gameWillBegin| will be called just before a new game will begin.
@@ -100,6 +98,7 @@ protected:
 
     void decisionRequested(const FrameRequest&);
     void grounded(const FrameRequest&);
+    void ojamaDropped(const FrameRequest&);
     void next2Appeared(const FrameRequest&);
 
     // When enemy will start to move puyo, this callback will be called.
@@ -108,6 +107,7 @@ protected:
     // When enemy's puyo is grounded, this callback will be called.
     // Enemy's rensa is automatically checked, so you don't need to do that. (Use AdditionalThoughtInfo)
     void enemyGrounded(const FrameRequest&);
+    void enemyOjamaDropped(const FrameRequest&);
 
     // When enemy's NEXT2 has appeared, this callback will be called.
     // You can update the enemy information here.
@@ -126,20 +126,17 @@ private:
 
     KumipuyoSeq rememberedSequence(int indexFrom) const;
 
-    void resetCurrentField(const CoreField&);
+    const PlayerState& myPlayerState() const { return me_; }
+    const PlayerState& enemyPlayerState() const { return enemy_; }
 
     std::string name_;
     ClientConnector connector_;
-    CoreField field_;  // estimated my field.
-    KumipuyoSeq seq_;  // remember kumipuyo sequence.
-    AdditionalThoughtInfo additionalThoughtInfo_;
-    int hand_;
-    int enemyHand_;
-    bool rethinkRequested_;
 
+    bool rethinkRequested_;
     int enemyDecisionRequestFrameId_;
-    CoreField enemyField_; // remember enemy's field
-    KumipuyoSeq enemySeq_; // remember enemy's kumipuyo sequence.
+
+    PlayerState me_;
+    PlayerState enemy_;
 
     bool behaviorDefensive_;
     bool behaviorRethinkAfterOpponentRensa_;

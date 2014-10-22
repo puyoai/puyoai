@@ -59,7 +59,7 @@ TEST_F(GazerTest, feasibleRensas)
     GazeResult gazeResult = gazer_->gazeResult();
     // Gazer should find a rensa with the first BY.
     // 2280 = basic score of 4 rensa.
-    EXPECT_EQ(2280, gazeResult.estimateMaxScore(100)) << gazeResult.toRensaInfoString();
+    EXPECT_EQ(2280, gazeResult.estimateMaxScore(100, PlayerState())) << gazeResult.toRensaInfoString();
 }
 
 TEST_F(GazerTest, estimateMaxScoreUsingRensaIsOngoing)
@@ -68,14 +68,15 @@ TEST_F(GazerTest, estimateMaxScoreUsingRensaIsOngoing)
     KumipuyoSeq seq("BYRRGG");
     gazer_->gaze(100, f, seq);
 
-    AdditionalThoughtInfo additionalThoughtInfo;
-    additionalThoughtInfo.setOngoingRensa(RensaResult(10, 36840, 300, false), 400);
-    gazer_->setAdditionalThoughtInfo(additionalThoughtInfo);
+    PlayerState enemy;
+    enemy.isRensaOngoing = true;
+    enemy.finishingRensaFrameId = 400;
+    enemy.ongoingRensaResult = RensaResult(10, 36840, 300, false);
 
     GazeResult gazeResult = gazer_->gazeResult();
 
     // Since ongoing rensa will finish in frameId=400, we can estimate rensa score is 36840 until frameId=400.
-    EXPECT_EQ(36840, gazeResult.estimateMaxScore(200)) << gazeResult.toRensaInfoString();
-    EXPECT_EQ(36840, gazeResult.estimateMaxScore(300)) << gazeResult.toRensaInfoString();
-    EXPECT_EQ(36840, gazeResult.estimateMaxScore(400)) << gazeResult.toRensaInfoString();
+    EXPECT_EQ(36840, gazeResult.estimateMaxScore(200, enemy)) << gazeResult.toRensaInfoString();
+    EXPECT_EQ(36840, gazeResult.estimateMaxScore(300, enemy)) << gazeResult.toRensaInfoString();
+    EXPECT_EQ(36840, gazeResult.estimateMaxScore(400, enemy)) << gazeResult.toRensaInfoString();
 }
