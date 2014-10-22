@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "core/puyo_color.h"
+#include "core/plain_field.h"
 
 using namespace std;
 
@@ -80,8 +81,8 @@ BookField::BookField(const string& name, const vector<string>& field, double def
     name_(name),
     defaultScore_(defaultScore)
 {
-    for (int x = 0; x < PlainField::MAP_WIDTH; ++x) {
-        for (int y = 0; y < PlainField::MAP_HEIGHT; ++y) {
+    for (int x = 0; x < MAP_WIDTH; ++x) {
+        for (int y = 0; y < MAP_HEIGHT; ++y) {
             field_[x][y] = '.';
             scoreField_[x][y] = 0;
         }
@@ -240,8 +241,8 @@ string BookField::toDebugString() const
 int BookField::calculateVarCount() const
 {
     int count = 0;
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
+    for (int x = 1; x <= WIDTH; ++x) {
+        for (int y = 1; y <= HEIGHT; ++y) {
             if ('A' <= field_[x][y] && field_[x][y] <= 'Z') {
                 ++count;
             }

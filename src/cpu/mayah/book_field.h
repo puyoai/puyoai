@@ -5,9 +5,10 @@
 #include <tuple>
 #include <vector>
 
-#include "core/plain_field.h"
+#include "core/field_constant.h"
+class PlainField;
 
-class BookField {
+class BookField : FieldConstant {
 public:
     struct MatchResult {
         MatchResult(bool matched, double score, int count) : matched(matched), score(score), count(count) {}
@@ -44,8 +45,8 @@ private:
     std::string name_;
     double defaultScore_;
     int varCount_;
-    char field_[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
-    double scoreField_[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
+    char field_[MAP_WIDTH][MAP_HEIGHT];
+    double scoreField_[MAP_WIDTH][MAP_HEIGHT];
 };
 
 #endif
