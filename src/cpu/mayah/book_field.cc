@@ -139,15 +139,13 @@ void BookField::merge(const BookField& bf)
 
             if (('A' <= field_[x][y] && field_[x][y] <= 'Z') &&
                 ('a' <= bf.field_[x][y] && bf.field_[x][y] <= 'z')) {
-                scoreField_[x][y] = std::max(scoreField_[x][y], bf.scoreField_[x][y]);
-                continue;
-            } else if (('A' <= field_[x][y] && field_[x][y] <= 'Z') &&
-                       ('a' <= bf.field_[x][y] && bf.field_[x][y] <= 'z')) {
+            } else if (('a' <= field_[x][y] && field_[x][y] <= 'z') &&
+                       ('A' <= bf.field_[x][y] && bf.field_[x][y] <= 'Z')) {
                 field_[x][y] = bf.field_[x][y];
-                scoreField_[x][y] = std::max(scoreField_[x][y], bf.scoreField_[x][y]);
             } else {
                 CHECK_EQ(field_[x][y], bf.field_[x][y]);
             }
+            scoreField_[x][y] = std::max(scoreField_[x][y], bf.scoreField_[x][y]);
         }
     }
 
