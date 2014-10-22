@@ -225,13 +225,6 @@ void AI::gameHasEnded(const FrameRequest& frameRequest)
 
 void AI::decisionRequested(const FrameRequest& frameRequest)
 {
-    // Don't check zenkeshi if hand_ is 0.
-    if (hand_ != 0) {
-        CoreField cf(frameRequest.myPlayerFrameRequest().field);
-        if (cf.isZenkeshi())
-            additionalThoughtInfo_.setHasZenkeshi(true);
-    }
-
     ++hand_;
     onDecisionRequested(frameRequest);
 }
@@ -243,6 +236,11 @@ void AI::grounded(const FrameRequest& frameRequest)
     RensaResult rensaResult = field.simulate();
     if (rensaResult.chains > 0) {
         additionalThoughtInfo_.setHasZenkeshi(false);
+    }
+
+    // Don't check zenkeshi if hand_ is 0.
+    if (hand_ != 0 && field.isZenkeshi()) {
+        additionalThoughtInfo_.setHasZenkeshi(true);
     }
 
     onGrounded(frameRequest);
@@ -267,12 +265,6 @@ void AI::next2Appeared(const FrameRequest& frameRequest)
 
 void AI::enemyDecisionRequested(const FrameRequest& frameRequest)
 {
-    if (enemyHand_ != 0) {
-        CoreField cf(frameRequest.enemyPlayerFrameRequest().field);
-        if (cf.isZenkeshi())
-            additionalThoughtInfo_.setEnemyHasZenkeshi(true);
-    }
-
     enemyHand_ += 1;
     enemyDecisionRequestFrameId_ = frameRequest.frameId;
     enemyField_ = CoreField(frameRequest.enemyPlayerFrameRequest().field);
@@ -295,6 +287,10 @@ void AI::enemyGrounded(const FrameRequest& frameRequest)
         additionalThoughtInfo_.setEnemyHasZenkeshi(false);
     } else {
         additionalThoughtInfo_.unsetOngoingRensa();
+    }
+
+    if (enemyHand_ != 0 && field.isZenkeshi()) {
+        additionalThoughtInfo_.setEnemyHasZenkeshi(true);
     }
 
     onEnemyGrounded(frameRequest);

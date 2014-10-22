@@ -61,51 +61,40 @@ TEST_F(AITest, zenkeshi)
     EXPECT_FALSE(ai.additionalThoughtInfo().enemyHasZenkeshi());
 
     req.frameId = 3;
+    req.playerFrameRequest[0].field = CoreField("  RR  ");
     req.playerFrameRequest[1].field = CoreField("  RR  ");
-    ai.decisionRequested(req);
-    ai.enemyDecisionRequested(req);
-    EXPECT_TRUE(ai.additionalThoughtInfo().hasZenkeshi());
-    EXPECT_FALSE(ai.additionalThoughtInfo().enemyHasZenkeshi());
-
-    req.frameId = 4;
-    req.playerFrameRequest[0].field = CoreField("  RRBB");
-    req.playerFrameRequest[1].field = CoreField();
-    ai.decisionRequested(req);
-    ai.enemyDecisionRequested(req);
-    EXPECT_TRUE(ai.additionalThoughtInfo().hasZenkeshi());
-    EXPECT_TRUE(ai.additionalThoughtInfo().enemyHasZenkeshi());
-
-    req.frameId = 5;
-    req.playerFrameRequest[0].field = CoreField("  RRBB");
-    req.playerFrameRequest[1].field = CoreField("  RRBB");
-    ai.decisionRequested(req);
-    ai.enemyDecisionRequested(req);
-    EXPECT_TRUE(ai.additionalThoughtInfo().hasZenkeshi());
-    EXPECT_TRUE(ai.additionalThoughtInfo().enemyHasZenkeshi());
-
-    req.frameId = 6;
-    req.playerFrameRequest[0].field = CoreField("  RRBB");
-    req.playerFrameRequest[1].field = CoreField("  RRRR");
-    ai.grounded(req);
-    ai.enemyGrounded(req);
-    EXPECT_TRUE(ai.additionalThoughtInfo().hasZenkeshi());
-    EXPECT_FALSE(ai.additionalThoughtInfo().enemyHasZenkeshi());
-
-    req.frameId = 7;
-    req.playerFrameRequest[0].field = CoreField("RRRRBB");
-    req.playerFrameRequest[1].field = CoreField("  RRRR");
     ai.grounded(req);
     ai.enemyGrounded(req);
     EXPECT_FALSE(ai.additionalThoughtInfo().hasZenkeshi());
     EXPECT_FALSE(ai.additionalThoughtInfo().enemyHasZenkeshi());
 
-    req.frameId = 8;
-    req.playerFrameRequest[0].field = CoreField();
-    req.playerFrameRequest[1].field = CoreField();
+    req.frameId = 4;
+    ai.decisionRequested(req);
+    ai.enemyDecisionRequested(req);
+    EXPECT_FALSE(ai.additionalThoughtInfo().hasZenkeshi());
+    EXPECT_FALSE(ai.additionalThoughtInfo().enemyHasZenkeshi());
+
+    req.frameId = 5;
+    req.playerFrameRequest[0].field = CoreField("  RRRR");
+    req.playerFrameRequest[1].field = CoreField("  RRRR");
+    ai.grounded(req);
+    ai.enemyGrounded(req);
+    EXPECT_TRUE(ai.additionalThoughtInfo().hasZenkeshi());
+    EXPECT_TRUE(ai.additionalThoughtInfo().enemyHasZenkeshi());
+
+    req.frameId = 6;
     ai.decisionRequested(req);
     ai.enemyDecisionRequested(req);
     EXPECT_TRUE(ai.additionalThoughtInfo().hasZenkeshi());
     EXPECT_TRUE(ai.additionalThoughtInfo().enemyHasZenkeshi());
+
+    req.frameId = 7;
+    req.playerFrameRequest[0].field = CoreField(" BRRRR");
+    req.playerFrameRequest[1].field = CoreField(" BRRRR");
+    ai.grounded(req);
+    ai.enemyGrounded(req);
+    EXPECT_FALSE(ai.additionalThoughtInfo().hasZenkeshi());
+    EXPECT_FALSE(ai.additionalThoughtInfo().enemyHasZenkeshi());
 }
 
 TEST_F(AITest, isFieldInconsistent)
