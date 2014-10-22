@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "core/plain_field.h"
+
 using namespace std;
 
 TEST(BookFieldTest, varCount)
