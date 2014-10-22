@@ -74,3 +74,8 @@ std::string toString(PuyoColor c)
 
     return "";
 }
+
+std::ostream& operator<<(std::ostream& os, PuyoColor pc)
+{
+    return os << toChar(pc);
+}
