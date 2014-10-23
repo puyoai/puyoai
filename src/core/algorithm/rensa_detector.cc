@@ -73,7 +73,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                 if (prohibits[x + d])
                     continue;
 
-                if (visited[x + d][ordinal(c)])
+                if (visited[x + d][c])
                     continue;
 
                 if (x + d <= 0 || CoreField::WIDTH < x + d)
@@ -91,7 +91,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                         continue;
                 }
 
-                visited[x + d][ordinal(c)] = true;
+                visited[x + d][c] = true;
 
                 CoreField f(originalField);
                 int necessaryPuyos = 0;
