@@ -110,7 +110,14 @@ void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
 
         const auto& bf = books[i];
         BookField::MatchResult mr = bf.match(plan.field());
-        double ratio = mr.count / static_cast<double>(totalPuyoCount);
+        if (!mr.matched || mr.count == 0)
+            continue;
+
+        // TODO(mayah): How do we handle 'allowedCount' ?
+        // 'allowed' cell can be considered as 'matched', however, we'd like to have penalty about it?
+        // Some cells should have penalty, however, other cells should not have penalty.
+
+        double ratio = static_cast<double>(mr.count) / totalPuyoCount;
         DCHECK(0 <= ratio && ratio <= 1.0) << ratio;
         // TODO(mayah): Make this configurable?
         if (ratio < 0.5)

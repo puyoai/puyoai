@@ -51,10 +51,10 @@ TEST(BookFieldTest, match1)
     PlainField pf2("R     ");
     PlainField pf3("R R   ");
 
-    EXPECT_EQ(BookField::MatchResult(true, 0, 0), bf.match(pf0));
-    EXPECT_EQ(BookField::MatchResult(true, 3, 3), bf.match(pf1));
-    EXPECT_EQ(BookField::MatchResult(true, 1, 1), bf.match(pf2));
-    EXPECT_EQ(BookField::MatchResult(true, 2, 2), bf.match(pf3));
+    EXPECT_EQ(BookField::MatchResult(true, 0, 0, 0), bf.match(pf0));
+    EXPECT_EQ(BookField::MatchResult(true, 3, 3, 0), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(true, 1, 1, 0), bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(true, 2, 2, 0), bf.match(pf3));
 }
 
 TEST(BookFieldTest, match2)
@@ -78,9 +78,9 @@ TEST(BookFieldTest, match2)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(BookField::MatchResult(true, 0, 0), bf.match(pf0));
-    EXPECT_EQ(BookField::MatchResult(true, 16, 16), bf.match(pf1));
-    EXPECT_EQ(BookField::MatchResult(true, 16, 16), bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(true, 0, 0, 0), bf.match(pf0));
+    EXPECT_EQ(BookField::MatchResult(true, 16, 16, 0), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(true, 16, 16, 0), bf.match(pf2));
 }
 
 TEST(BookFieldTest, matchWithStar)
@@ -106,10 +106,44 @@ TEST(BookFieldTest, matchWithStar)
         ".GGGYY"
         ".RRBBB");
 
-    EXPECT_EQ(BookField::MatchResult(true, 0, 0), bf.match(pf0));
-    EXPECT_EQ(BookField::MatchResult(true, 7, 7), bf.match(pf1));
-    EXPECT_EQ(BookField::MatchResult(true, 7, 7), bf.match(pf2));
-    EXPECT_EQ(BookField::MatchResult(true, 7, 7), bf.match(pf3));
+    EXPECT_EQ(BookField::MatchResult(true, 0, 0, 0), bf.match(pf0));
+    EXPECT_EQ(BookField::MatchResult(true, 7, 7, 0), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(true, 7, 7, 0), bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(true, 7, 7, 0), bf.match(pf3));
+}
+
+TEST(BookFieldTest, matchWithAllowing)
+{
+    BookField bf("test",
+                 vector<string> {
+                     "..C...",
+                     "AAaBB."
+                 });
+
+    PlainField pf0;
+
+    PlainField pf1(
+        "RRBBB.");
+
+    PlainField pf2(
+        "RRRBB.");
+
+    PlainField pf3(
+        "R.RBB.");
+
+    PlainField pf4(
+        "..R..."
+        "RRYRR.");
+
+    PlainField pf5(
+        "RRRRR.");
+
+    EXPECT_EQ(BookField::MatchResult(true, 0, 0, 0), bf.match(pf0));
+    EXPECT_EQ(BookField::MatchResult(false, 0, 0, 0), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(true, 4, 4, 1), bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(true, 3, 3, 1), bf.match(pf3));
+    EXPECT_EQ(BookField::MatchResult(true, 5, 5, 0), bf.match(pf4));
+    EXPECT_EQ(BookField::MatchResult(false, 0, 0, 0), bf.match(pf5));
 }
 
 TEST(BookFieldTest, unmatch1)
@@ -143,40 +177,10 @@ TEST(BookFieldTest, unmatch1)
         "BBRBBB"
         "RRRRRY");
 
-    EXPECT_EQ(BookField::MatchResult(false, 0, 0), bf.match(pf1));
-    EXPECT_EQ(BookField::MatchResult(false, 0, 0), bf.match(pf2));
-    EXPECT_EQ(BookField::MatchResult(false, 0, 0), bf.match(pf3));
-    EXPECT_EQ(BookField::MatchResult(false, 0, 0), bf.match(pf4));
-}
-
-TEST(BookFieldTest, matchWithAllowing)
-{
-    BookField bf("test",
-                 vector<string> {
-                     "..C...",
-                     "AAaBB."
-                 });
-
-    PlainField pf0;
-
-    PlainField pf1(
-        "RRBBB.");
-
-    PlainField pf2(
-        "RRRBB.");
-
-    PlainField pf3(
-        "R.RBB.");
-
-    PlainField pf4(
-        "..R..."
-        "RRYRR.");
-
-    EXPECT_EQ(BookField::MatchResult(true, 0, 0), bf.match(pf0));
-    EXPECT_EQ(BookField::MatchResult(false, 0, 0), bf.match(pf1));
-    EXPECT_EQ(BookField::MatchResult(true, 4, 4), bf.match(pf2));
-    EXPECT_EQ(BookField::MatchResult(true, 3, 3), bf.match(pf3));
-    EXPECT_EQ(BookField::MatchResult(true, 5, 5), bf.match(pf4));
+    EXPECT_EQ(BookField::MatchResult(false, 0, 0, 0), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(false, 0, 0, 0), bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(false, 0, 0, 0), bf.match(pf3));
+    EXPECT_EQ(BookField::MatchResult(false, 0, 0, 0), bf.match(pf4));
 }
 
 TEST(BookFieldTest, unmatch2)
@@ -188,7 +192,7 @@ TEST(BookFieldTest, unmatch2)
 
     PlainField pf1(" B B  ");
 
-    EXPECT_EQ(BookField::MatchResult(false, 0, 0), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(false, 0, 0, 0), bf.match(pf1));
 }
 
 TEST(BookFieldTest, unmatch3)
@@ -200,7 +204,7 @@ TEST(BookFieldTest, unmatch3)
 
     PlainField pf("Y    Y");
 
-    EXPECT_EQ(BookField::MatchResult(false, 0, 0), bf.match(pf));
+    EXPECT_EQ(BookField::MatchResult(false, 0, 0, 0), bf.match(pf));
 }
 
 TEST(BookFieldTest, merge)
@@ -244,8 +248,8 @@ TEST(BookFieldTest, merge)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(BookField::MatchResult(true, 0, 0), bf.match(pf0));
-    EXPECT_EQ(BookField::MatchResult(true, 38, 19), bf.match(pf1));
+    EXPECT_EQ(BookField::MatchResult(true, 0, 0, 0), bf.match(pf0));
+    EXPECT_EQ(BookField::MatchResult(true, 38, 19, 0), bf.match(pf1));
 
-    EXPECT_EQ(BookField::MatchResult(false, 0, 0), bf.match(pf2));
+    EXPECT_EQ(BookField::MatchResult(false, 0, 0, 0), bf.match(pf2));
 }

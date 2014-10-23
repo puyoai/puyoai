@@ -11,16 +11,18 @@ class PlainField;
 class BookField : FieldConstant {
 public:
     struct MatchResult {
-        MatchResult(bool matched, double score, int count) : matched(matched), score(score), count(count) {}
+        MatchResult(bool matched, double score, int count, int allowedCount) :
+            matched(matched), score(score), count(count), allowedCount(allowedCount) {}
 
         friend bool operator==(const MatchResult& lhs, const MatchResult& rhs)
         {
-            return std::tie(lhs.matched, lhs.score, lhs.count) == std::tie(rhs.matched, rhs.score, rhs.count);
+            return std::tie(lhs.matched, lhs.score, lhs.count, lhs.allowedCount) == std::tie(rhs.matched, rhs.score, rhs.count, rhs.allowedCount);
         }
 
         bool matched;
         double score;
         int count;
+        int allowedCount;
     };
 
     BookField(const std::string& name, const std::vector<std::string>& field, double defaultScore = 1);
