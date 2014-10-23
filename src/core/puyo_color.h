@@ -1,12 +1,9 @@
 #ifndef CORE_PUYO_COLOR_H_
 #define CORE_PUYO_COLOR_H_
 
+#include <string>
 #include <stdint.h>
 #include <glog/logging.h>
-
-#include <ostream>
-#include <string>
-
 #include "base/base.h"
 
 // TODO(mayah): Consider use enum class.
@@ -35,8 +32,6 @@ constexpr int ordinal(PuyoColor c) { return static_cast<int>(c); }
 // Converts PuyoColor to character.
 char toChar(PuyoColor, char charIfEmpty = ' ');
 std::string toString(PuyoColor);
-
-std::ostream& operator<<(std::ostream&, PuyoColor);
 
 // Returns true if puyo is normal color puyo.
 constexpr bool isNormalColor(PuyoColor color)
