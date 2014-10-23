@@ -1,5 +1,6 @@
 #include "mayah_ai.h"
 
+#include <iomanip>
 #include <iostream>
 #include <future>
 #include <sstream>
@@ -26,6 +27,7 @@ struct Result {
 struct RunResult {
     int sumScore;
     int mainRensaCount;
+    int aveMainRensaScore;
 };
 
 void removeNontokopuyoParameter(FeatureParameter* parameter)
@@ -34,6 +36,7 @@ void removeNontokopuyoParameter(FeatureParameter* parameter)
     parameter->setValue(STRATEGY_INITIAL_ZENKESHI, 0);
     parameter->setValue(STRATEGY_TSUBUSHI, 0);
     parameter->setValue(STRATEGY_IBARA, 0);
+    parameter->setValue(STRATEGY_SAISOKU, 0);
 }
 
 RunResult run(Executor* executor, const FeatureParameter& parameter)
@@ -58,20 +61,25 @@ RunResult run(Executor* executor, const FeatureParameter& parameter)
     }
 
     int sumScore = 0;
+    int sumMainRensaScore = 0;
     int mainRensaCount = 0;
     for (int i = 0; i < N; ++i) {
         Result r = ps[i].get_future().get();
         sumScore += r.score;
-        if (r.score >= 10000)
+        if (r.score >= 10000) {
             mainRensaCount++;
+            sumMainRensaScore += r.score;
+        }
         cout << r.msg;
     }
 
+    int aveMainRensaScore = mainRensaCount > 0 ? sumMainRensaScore / mainRensaCount : 0;
     cout << "sum score  = " << sumScore << endl;
     cout << "ave score  = " << (sumScore / 100) << endl;
     cout << "main rensa = " << mainRensaCount << endl;
+    cout << "ave main rensa = " << aveMainRensaScore << endl;
 
-    return RunResult { sumScore, mainRensaCount };
+    return RunResult { sumScore, mainRensaCount, aveMainRensaScore };
 }
 
 int main(int argc, char* argv[])
@@ -89,13 +97,16 @@ int main(int argc, char* argv[])
 
 #if 1
     map<int, RunResult> scoreMap;
-    for (int x = 0; x <= 100; x += 10) {
+    for (int x = -15; x <= 0; x += 1) {
         cout << "current x = " << x << endl;
-        parameter.setValue(FIRE_POINT_TABOO, -x);
+        parameter.setValue(VALLEY_DEPTH, 2, x);
         scoreMap[x] = run(executor.get(), parameter);
     }
     for (const auto& m : scoreMap) {
-        cout << m.first << " -> " << m.second.sumScore << " / " << m.second.mainRensaCount << endl;
+        cout << setw(5) << m.first << " -> " << m.second.sumScore
+             << " / " << m.second.mainRensaCount
+             << " / " << m.second.aveMainRensaScore
+             << endl;
     }
 
 #else
