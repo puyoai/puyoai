@@ -123,7 +123,9 @@ void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
         if (ratio < 0.5)
             continue;
         ratio = (ratio - 0.5) * 2;
-        double score = mr.score * ratio / totalPuyoCount;
+
+        DCHECK_NE(bf.varCount(), 0);
+        double score = mr.score * ratio / bf.varCount();
         if (maxScore < score) {
             bestBf = &bf;
             maxScore = score;
