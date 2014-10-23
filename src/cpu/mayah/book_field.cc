@@ -170,6 +170,7 @@ BookField::MatchResult BookField::match(const PlainField& f) const
 {
     // First, make a map from char to PuyoColor.
     int matchCount = 0;
+    int matchAllowedCount = 0;
     double matchScore = 0;
 
     // First, create a env (char -> PuyoColor)
@@ -190,7 +191,7 @@ BookField::MatchResult BookField::match(const PlainField& f) const
                 continue;
 
             if (!isNormalColor(pc))
-                return MatchResult(false, 0, 0);
+                return MatchResult(false, 0, 0, 0);
 
             matchCount += 1;
             matchScore += scoreField_[x][y];
@@ -201,29 +202,36 @@ BookField::MatchResult BookField::match(const PlainField& f) const
             }
 
             if (env.map(c) != pc)
-                return MatchResult(false, 0, 0);
+                return MatchResult(false, 0, 0, 0);
         }
     }
 
     // Check the neighbors.
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12 && field_[x][y] != '.'; ++y) {
-            if (field_[x][y] == '*' || ('a' <= field_[x][y] && field_[x][y] <= 'z'))
+            if (field_[x][y] == '*')
                 continue;
+
+            if ('a' <= field_[x][y] && field_[x][y] <= 'z') {
+                char c = std::toupper(field_[x][y]);
+                if (env.isSet(c) && env.map(c) == f.get(x, y)) {
+                    ++matchAllowedCount;
+                }
+            }
 
             // Check neighbors.
             if (!checkCell(field_[x][y], field_[x][y + 1], f.get(x, y + 1), env))
-                return MatchResult(false, 0, 0);
+                return MatchResult(false, 0, 0, 0);
             if (!checkCell(field_[x][y], field_[x][y - 1], f.get(x, y - 1), env))
-                return MatchResult(false, 0, 0);
+                return MatchResult(false, 0, 0, 0);
             if (!checkCell(field_[x][y], field_[x + 1][y], f.get(x + 1, y), env))
-                return MatchResult(false, 0, 0);
+                return MatchResult(false, 0, 0, 0);
             if (!checkCell(field_[x][y], field_[x - 1][y], f.get(x - 1, y), env))
-                return MatchResult(false, 0, 0);
+                return MatchResult(false, 0, 0, 0);
         }
     }
 
-    return MatchResult(true, matchScore, matchCount);
+    return MatchResult(true, matchScore, matchCount, matchAllowedCount);
 }
 
 string BookField::toDebugString() const
