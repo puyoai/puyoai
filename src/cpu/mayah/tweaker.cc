@@ -28,6 +28,9 @@ struct RunResult {
     int sumScore;
     int mainRensaCount;
     int aveMainRensaScore;
+    int over60000Count;
+    int over70000Count;
+    int over80000Count;
 };
 
 void removeNontokopuyoParameter(FeatureParameter* parameter)
@@ -63,12 +66,25 @@ RunResult run(Executor* executor, const FeatureParameter& parameter)
     int sumScore = 0;
     int sumMainRensaScore = 0;
     int mainRensaCount = 0;
+    int over60000Count = 0;
+    int over70000Count = 0;
+    int over80000Count = 0;
     for (int i = 0; i < N; ++i) {
         Result r = ps[i].get_future().get();
         sumScore += r.score;
         if (r.score >= 10000) {
             mainRensaCount++;
             sumMainRensaScore += r.score;
+        }
+
+        if (r.score >= 60000) {
+            over60000Count++;
+        }
+        if (r.score >= 70000) {
+            over70000Count++;
+        }
+        if (r.score >= 80000) {
+            over80000Count++;
         }
         cout << r.msg;
     }
@@ -78,8 +94,11 @@ RunResult run(Executor* executor, const FeatureParameter& parameter)
     cout << "ave score  = " << (sumScore / 100) << endl;
     cout << "main rensa = " << mainRensaCount << endl;
     cout << "ave main rensa = " << aveMainRensaScore << endl;
+    cout << "over 60000 = " << over60000Count << endl;
+    cout << "over 70000 = " << over70000Count << endl;
+    cout << "over 80000 = " << over80000Count << endl;
 
-    return RunResult { sumScore, mainRensaCount, aveMainRensaScore };
+    return RunResult { sumScore, mainRensaCount, aveMainRensaScore, over60000Count, over70000Count, over80000Count };
 }
 
 int main(int argc, char* argv[])
@@ -97,15 +116,18 @@ int main(int argc, char* argv[])
 
 #if 1
     map<int, RunResult> scoreMap;
-    for (int x = -15; x <= 0; x += 1) {
+    for (int x = 150; x <= 300; x += 100) {
         cout << "current x = " << x << endl;
-        parameter.setValue(VALLEY_DEPTH, 2, x);
+        parameter.setValue(BOOK, x);
         scoreMap[x] = run(executor.get(), parameter);
     }
     for (const auto& m : scoreMap) {
         cout << setw(5) << m.first << " -> " << m.second.sumScore
              << " / " << m.second.mainRensaCount
              << " / " << m.second.aveMainRensaScore
+             << " / " << m.second.over60000Count
+             << " / " << m.second.over70000Count
+             << " / " << m.second.over80000Count
              << endl;
     }
 
