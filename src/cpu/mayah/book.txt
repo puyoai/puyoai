@@ -57,6 +57,29 @@ SCORE: 9.8
 ..CXXX
 
 NAME: GTR-TAIL
+SCORE: 9.8
+....YY
+..CXXX
+...CCC
+..CYYX
+
+NAME: GTR-TAIL
+SCORE: 9.8
+.....Y
+.....Y
+..CXXX
+...CCC
+..CYYX
+
+NAME: GTR-TAIL
+SCORE: 9.8
+.....Y
+....YZ
+..CXXX
+...CCC
+..CYYX
+
+NAME: GTR-TAIL
 SCORE: 9.9
 .....y
 ...xxY
