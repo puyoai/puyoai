@@ -124,8 +124,7 @@ void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
             continue;
         ratio = (ratio - 0.5) * 2;
 
-        DCHECK_NE(bf.varCount(), 0);
-        double score = mr.score * ratio / bf.varCount();
+        double score = mr.score * ratio / totalPuyoCount;
         if (maxScore < score) {
             bestBf = &bf;
             maxScore = score;
@@ -565,7 +564,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const RefPla
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaConnectionFeature(const CoreField& fieldAfterDrop)
 {
-    calculateConnection(sc_, fieldAfterDrop, CONNECTION_AFTER_VANISH);
+    calculateConnection(sc_, fieldAfterDrop, CONNECTION_AFTER_DROP);
 }
 
 template<typename ScoreCollector>

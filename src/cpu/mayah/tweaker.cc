@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 
 #if 1
     map<int, RunResult> scoreMap;
-    for (int x = 150; x <= 300; x += 100) {
+    for (int x = 200; x <= 300; x += 100) {
         cout << "current x = " << x << endl;
         parameter.setValue(BOOK, x);
         scoreMap[x] = run(executor.get(), parameter);
