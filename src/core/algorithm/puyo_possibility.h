@@ -9,40 +9,34 @@ class TsumoPossibility {
 public:
     static const int MAX_K = 32;
     static const int MAX_N = 16;
-    typedef double (*PossibilityArrayPtr)[MAX_N][MAX_N][MAX_N][MAX_N];
 
-    // RED, BLUE, YELLOW, GREEN をそれぞれ少なくとも a, b, c, d 個欲しい場合に、
-    // k ぷよ（組ではない）引いてそれらを得られる確率
-    static double possibility(int k, int a, int b, int c, int d)
-    {
-        DCHECK(s_initialized) << "TsumoPossibility is not initialized.";
-        DCHECK(0 <= k && k < MAX_K) << k;
+    static double possibility(const PuyoSet& puyoSet, unsigned int k) {
+        int a = std::min(MAX_N - 1, puyoSet.red());
+        int b = std::min(MAX_N - 1, puyoSet.blue());
+        int c = std::min(MAX_N - 1, puyoSet.yellow());
+        int d = std::min(MAX_N - 1, puyoSet.green());
 
-        a = std::min(a, MAX_N - 1);
-        b = std::min(b, MAX_N - 1);
-        c = std::min(c, MAX_N - 1);
-        d = std::min(d, MAX_N - 1);
-
-        return s_possibility[k][a][b][c][d];
+        return possibility(a, b, c, d, k);
     }
 
-    static double possibility(unsigned int k, const PuyoSet& set) {
-        return possibility(k, set.red(), set.blue(), set.yellow(), set.green());
-    }
-
-    static int necessaryPuyos(double threshold, const PuyoSet& set) {
+    static int necessaryPuyos(const PuyoSet& puyoSet, double threshold) {
         DCHECK(0 <= threshold && threshold < 1.0);
 
-        if (possibility(MAX_K - 1, set) < threshold)
+        if (possibility(puyoSet, MAX_K - 1) < threshold)
             return MAX_K;
 
-        DCHECK(possibility(0, set) < threshold);
-        DCHECK(possibility(MAX_K - 1, set) >= threshold);
+        int a = std::min(MAX_N - 1, puyoSet.red());
+        int b = std::min(MAX_N - 1, puyoSet.blue());
+        int c = std::min(MAX_N - 1, puyoSet.yellow());
+        int d = std::min(MAX_N - 1, puyoSet.green());
+
+        DCHECK(possibility(a, b, c, d, 0) < threshold);
+        DCHECK(possibility(a, b, c, d, MAX_K - 1) >= threshold);
 
         int left = 0, right = MAX_K - 1;
         while (right - left > 1) {
             int mid = (left + right) / 2;
-            if (possibility(mid, set) >= threshold) {
+            if (possibility(a, b, c, d, mid) >= threshold) {
                 right = mid;
             } else {
                 left = mid;
@@ -55,8 +49,22 @@ public:
     static void initialize();
 
 private:
+    // RED, BLUE, YELLOW, GREEN をそれぞれ少なくとも a, b, c, d 個欲しい場合に、
+    // k ぷよ（組ではない）引いてそれらを得られる確率
+    static double possibility(int a, int b, int c, int d, int k)
+    {
+        DCHECK(s_initialized) << "TsumoPossibility is not initialized.";
+        DCHECK(0 <= a && a < MAX_N) << a;
+        DCHECK(0 <= b && b < MAX_N) << b;
+        DCHECK(0 <= c && c < MAX_N) << c;
+        DCHECK(0 <= d && d < MAX_N) << d;
+        DCHECK(0 <= k && k < MAX_K) << k;
+
+        return s_possibility[a][b][c][d][k];
+    }
+
     static bool s_initialized;
-    static PossibilityArrayPtr s_possibility;
+    static double s_possibility[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
 };
 
 #endif

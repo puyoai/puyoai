@@ -235,7 +235,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         // When the enemy took |k| hands, enemy will be able to fire the rensa in 20%.
         int k = 0;
         for (k = 0; k < 15; ++k) {
-            double p = TsumoPossibility::possibility(k * 2, puyoSet);
+            double p = TsumoPossibility::possibility(puyoSet, k * 2);
             if (p >= 0.2)
                 break;
         }
