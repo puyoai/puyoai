@@ -85,7 +85,7 @@ DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& 
 
 ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
                                  const PlayerState& me, const PlayerState& enemy,
-                                 int depth, int maxIteration)
+                                 int depth, int maxIteration, vector<Decision>* specifiedDecisions)
 {
     double beginTime = currentTime();
 
@@ -110,6 +110,9 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     mutex mu;
     auto evalRefPlan = [&, this, frameId, maxIteration](const RefPlan& plan, const MidEvalResult& midEvalResult) {
+        if (specifiedDecisions && plan.decisions() != *specifiedDecisions)
+            return;
+
         EvalResult evalResult = eval(plan, field, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
         VLOG(1) << toString(plan.decisions())
@@ -142,6 +145,13 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     WaitGroup wg;
     auto evalAfterOne = [&, this, depth](const RefPlan& rp1) {
+        if (specifiedDecisions) {
+            if (rp1.decisions().empty() || specifiedDecisions->empty())
+                return;
+            if (rp1.decisions()[0] != (*specifiedDecisions)[0])
+                return;
+        }
+
         // Do eval after one drop.
         if (rp1.isRensaPlan()) {
             if (executor_) {
