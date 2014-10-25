@@ -136,7 +136,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
             bestRensaScore = plan.score();
             bestRensaFrames = plan.totalFrames();
             bestRensaPlan = plan.toPlan();
-            bestMidEvalResult = midEvalResult;
+            bestRensaMidEvalResult = midEvalResult;
         }
     };
 
@@ -158,12 +158,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                 wg.add(1);
                 Plan p = rp1.toPlan();
                 executor_->submit([p, &wg, &evalRefPlan]() {
-                    RefPlan refPlan(p.field(), p.decisions(),
-                                    p.rensaResult(),
-                                    p.numChigiri(),
-                                    p.framesToInitiate(),
-                                    p.lastDropFrames());
-                    evalRefPlan(refPlan, MidEvalResult());
+                    evalRefPlan(RefPlan(p), MidEvalResult());
                     wg.done();
                 });
             } else {
@@ -209,15 +204,15 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     if (bestVirtualRensaScore < bestRensaScore) {
         std::string message = makeMessageFrom(frameId, field, kumipuyoSeq, maxIteration,
                                               me, enemy,
-                                              preEvalResult, bestMidEvalResult, gazeResult,
+                                              preEvalResult, bestRensaMidEvalResult, gazeResult,
                                               bestRensaPlan, bestRensaScore, bestVirtualRensaScore, endTime - beginTime);
-        return ThoughtResult(bestRensaPlan, true, bestRensaScore, bestVirtualRensaScore, message);
+        return ThoughtResult(bestRensaPlan, true, bestRensaScore, bestVirtualRensaScore, bestRensaMidEvalResult, message);
     } else {
         std::string message = makeMessageFrom(frameId, field, kumipuyoSeq, maxIteration,
                                               me, enemy,
-                                              preEvalResult, bestRensaMidEvalResult, gazeResult,
+                                              preEvalResult, bestMidEvalResult, gazeResult,
                                               bestPlan, bestRensaScore, bestVirtualRensaScore, endTime - beginTime);
-        return ThoughtResult(bestPlan, false, bestRensaScore, bestVirtualRensaScore, message);
+        return ThoughtResult(bestPlan, false, bestRensaScore, bestVirtualRensaScore, bestMidEvalResult, message);
     }
 }
 

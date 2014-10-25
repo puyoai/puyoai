@@ -29,58 +29,9 @@ class InteractiveAI : public DebuggableMayahAI {
 public:
     InteractiveAI(int argc, char* argv[]) : DebuggableMayahAI(argc, argv) {}
 
-    CollectedFeature makeCollectedFeature(int frameId, const CoreField& currentField, const KumipuyoSeq& seq,
-                                          int numKeyPuyos, const Plan& plan) const
-    {
-        PreEvalResult preEvalResult = PreEvaluator(books_).preEval(currentField);
-
-        FeatureScoreCollector sc(*featureParameter_);
-        Evaluator<FeatureScoreCollector> evaluator(books_, &sc);
-
-        // TODO(mayah): Make this accurate.
-        MidEvalResult midEvalResult;
-        {
-            CoreField f(currentField);
-            f.dropKumipuyo(plan.decisions().front(), seq.front());
-            RensaResult rensaResult = f.simulate();
-            int numChigiri = 0;
-            int framesToInitiate = 0;
-            int lastDropFrames = 0;
-            vector<Decision> decisions { plan.decisions().front() };
-            RefPlan refPlan(f, decisions, rensaResult, numChigiri,
-                            framesToInitiate, lastDropFrames);
-            MidEvaluator().eval(refPlan, currentField);
-        }
-
-        {
-            RefPlan refPlan(plan.field(), plan.decisions(), plan.rensaResult(), plan.numChigiri(),
-                            plan.framesToInitiate(), plan.lastDropFrames());
-            evaluator.collectScore(refPlan, currentField, frameId, numKeyPuyos,
-                                   PlayerState(), PlayerState(),
-                                   preEvalResult, midEvalResult, gazer_.gazeResult());
-        }
-
-        return sc.toCollectedFeature();
-    }
-
-    Plan thinkPlanOnly(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
-                       int depth, const vector<Decision>& decisions) const
-    {
-        Plan result;
-        Plan::iterateAvailablePlans(field, kumipuyoSeq, depth,
-                                    [this, frameId, &field, &decisions, &result](const RefPlan& plan) {
-            if (plan.decisions() != decisions)
-                return;
-
-            result = plan.toPlan();
-        });
-
-        return result;
-    }
-
     void showMatchedBooks(const CoreField& field)
     {
-        for (const auto& book : books_ ) {
+        for (const auto& book : books_) {
             if (book.match(field).count) {
                 cout << book.toDebugString() << endl;
             }
@@ -156,19 +107,17 @@ int main(int argc, char* argv[])
 
         // Waits for user enter.
         while (true) {
-            const PlainField& field = req.playerFrameRequest[0].field;
+            const PlainField& currentField = req.playerFrameRequest[0].field;
             const KumipuyoSeq& seq = req.playerFrameRequest[0].kumipuyoSeq;
 
-            FieldPrettyPrinter::printMultipleFields(
-                field, seq.subsequence(0, 2),
-                req.playerFrameRequest[1].field,
-                req.playerFrameRequest[1].kumipuyoSeq);
+            FieldPrettyPrinter::printMultipleFields(currentField, seq.subsequence(0, 2),
+                                                    req.playerFrameRequest[1].field, req.playerFrameRequest[1].kumipuyoSeq);
 
             double t1 = currentTime();
-            ThoughtResult thoughtResult = ai.thinkPlan(frameId, field, seq.subsequence(0, 2),
-                                                       PlayerState(), PlayerState(),
-                                                       MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
-            const Plan& aiPlan = thoughtResult.plan;
+            ThoughtResult aiThoughtResult = ai.thinkPlan(frameId, currentField, seq.subsequence(0, 2),
+                                                         ai.myPlayerState(), ai.enemyPlayerState(),
+                                                         MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+            const Plan& aiPlan = aiThoughtResult.plan;
 
             double t2 = currentTime();
             if (aiPlan.decisions().empty())
@@ -188,7 +137,7 @@ int main(int argc, char* argv[])
                 continue;
             }
             if (str == "book") {
-                ai.showMatchedBooks(field);
+                ai.showMatchedBooks(currentField);
                 continue;
             }
 
@@ -212,14 +161,20 @@ int main(int argc, char* argv[])
                     continue;
                 }
 
-                Plan plan = ai.thinkPlanOnly(frameId, field, KumipuyoSeq { seq.get(0), seq.get(1) },
-                                             MayahAI::DEFAULT_DEPTH, decisions);
+                ThoughtResult myThoughtResult = ai.thinkPlan(frameId, currentField, KumipuyoSeq { seq.get(0), seq.get(1) },
+                                                             ai.myPlayerState(), ai.enemyPlayerState(),
+                                                             MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, &decisions);
 
-                FieldPrettyPrinter::printMultipleFields(plan.field(), KumipuyoSeq { seq.get(2), seq.get(3) },
-                                                        aiPlan.field(), KumipuyoSeq { seq.get(2), seq.get(3) });
+                FieldPrettyPrinter::printMultipleFields(myThoughtResult.plan.field(), KumipuyoSeq { seq.get(2), seq.get(3) },
+                                                        aiThoughtResult.plan.field(), KumipuyoSeq { seq.get(2), seq.get(3) });
 
-                CollectedFeature mycf = ai.makeCollectedFeature(frameId, field, seq, MayahAI::DEFAULT_NUM_ITERATION, plan);
-                CollectedFeature aicf = ai.makeCollectedFeature(frameId, field, seq, MayahAI::DEFAULT_NUM_ITERATION, aiPlan);
+                const PreEvalResult preEvalResult = ai.preEval(currentField);
+                CollectedFeature mycf = ai.evalWithCollectingFeature(RefPlan(myThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
+                                                                     ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, myThoughtResult.midEvalResult,
+                                                                     ai.gazer().gazeResult());
+                CollectedFeature aicf = ai.evalWithCollectingFeature(RefPlan(aiThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
+                                                                     ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, aiThoughtResult.midEvalResult,
+                                                                     ai.gazer().gazeResult());
                 cout << mycf.toStringComparingWith(aicf) << endl;
             }
         }
