@@ -95,6 +95,7 @@ public:
     // Simulates rensa with tracking.
     RensaResult simulateAndTrack(RensaTrackResult* trackResult, int initialChain = 1);
 
+    // Same as simualteAndTrack, but specifies |minHeights| for performance.
     RensaResult simulateAndTrackWithMinHeights(RensaTrackResult* trackResult, int minHeights[MAP_WIDTH]);
 
     // Vanish the connected puyos. Score will be returned.

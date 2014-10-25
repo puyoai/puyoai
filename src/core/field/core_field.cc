@@ -13,6 +13,23 @@
 
 using namespace std;
 
+namespace {
+int g_originalY[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
+
+bool initializeOriginalY()
+{
+    for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
+        for (int y = 0; y < FieldConstant::MAP_HEIGHT; ++y) {
+            g_originalY[x][y] = y;
+        }
+    }
+
+    return true;
+}
+
+static bool g_originalYIsInitialized = initializeOriginalY();
+}
+
 class RensaNonTracker {
 public:
     void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) { }
@@ -23,31 +40,28 @@ public:
 class RensaTracker {
 public:
     RensaTracker(RensaTrackResult* trackResult) :
-        m_result(trackResult)
+        result_(trackResult)
     {
-        for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
-            for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
-                m_originalY[x][y] = y;
-                m_result->setErasedAt(x, y, 0);
-            }
-        }
+        static_assert(sizeof(originalY_ == g_originalY), "originalY_ and g_originalY should have the same size.");
+        result_->initialize();
+        memcpy(originalY_, g_originalY, sizeof(originalY_));
     }
 
     void colorPuyoIsVanished(int x, int y, int nthChain) {
-        m_result->setErasedAt(x, m_originalY[x][y], nthChain);
+        result_->setErasedAt(x, originalY_[x][y], nthChain);
     }
 
     void ojamaPuyoIsVanished(int x, int y, int nthChain) {
-        m_result->setErasedAt(x, m_originalY[x][y], nthChain);
+        result_->setErasedAt(x, originalY_[x][y], nthChain);
     }
 
     void puyoIsDropped(int x, int fromY, int toY) {
-        m_originalY[x][toY] = m_originalY[x][fromY];
+        originalY_[x][toY] = originalY_[x][fromY];
     }
 
 private:
-    int m_originalY[CoreField::MAP_WIDTH][CoreField::MAP_HEIGHT];
-    RensaTrackResult* m_result;
+    int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
+    RensaTrackResult* result_;
 };
 
 CoreField::CoreField()
