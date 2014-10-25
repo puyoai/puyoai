@@ -46,10 +46,12 @@ public:
 
     virtual void onGameWillBegin(const FrameRequest&) override;
 
-    // Use this directly in test. Otherwise, use via think/thinkFast.
+    // Use this directly in test. Otherwise, use via think.
+    // When |specifiedDecisionsOnly| is specified, only that decision will be considered.
     ThoughtResult thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&,
                             const PlayerState& me, const PlayerState& enemy,
-                            int depth, int maxIteration);
+                            int depth, int maxIteration,
+                            std::vector<Decision>* specifiedDecisions = nullptr);
 
 protected:
     PreEvalResult preEval(const CoreField& currentField);

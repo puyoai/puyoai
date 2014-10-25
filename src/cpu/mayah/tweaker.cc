@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
     FeatureParameter parameter(FLAGS_feature);
     removeNontokopuyoParameter(&parameter);
 
-#if 1
+#if 0
     map<int, RunResult> scoreMap;
     for (int x = 200; x <= 300; x += 100) {
         cout << "current x = " << x << endl;

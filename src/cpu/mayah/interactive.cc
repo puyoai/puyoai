@@ -193,11 +193,25 @@ int main(int argc, char* argv[])
             }
 
             int x1, r1, x2, r2;
-            if (sscanf(str.c_str(), "%d %d %d %d", &x1, &r1, &x2, &r2) == 4) {
-                vector<Decision> decisions {
-                    Decision(x1, r1),
-                    Decision(x2, r2)
-                };
+            int r = sscanf(str.c_str(), "%d %d %d %d", &x1, &r1, &x2, &r2);
+            if (r == 2 || r == 4) {
+                vector<Decision> decisions;
+                if (r == 2) {
+                    Decision d1(x1, r1);
+                    if (!d1.isValid())
+                        continue;
+                    decisions.push_back(d1);
+                } else if (r == 4) {
+                    Decision d1(x1, r1);
+                    Decision d2(x2, r2);
+                    if (!d1.isValid() || !d2.isValid())
+                        continue;
+                    decisions.push_back(d1);
+                    decisions.push_back(d2);
+                } else {
+                    continue;
+                }
+
                 Plan plan = ai.thinkPlanOnly(frameId, field, KumipuyoSeq { seq.get(0), seq.get(1) },
                                              MayahAI::DEFAULT_DEPTH, decisions);
 
