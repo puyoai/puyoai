@@ -62,6 +62,12 @@ private:
 // You can convert this to Plan with calling toPlan().
 class RefPlan : noncopyable {
 public:
+    explicit RefPlan(const Plan& plan) :
+        field_(plan.field()), decisions_(plan.decisions()), rensaResult_(plan.rensaResult()),
+        numChigiri_(plan.numChigiri()), framesToInitiate_(plan.framesToInitiate()), lastDropFrames_(plan.lastDropFrames())
+    {
+    }
+
     RefPlan(const CoreField& field, const std::vector<Decision>& decisions,
             const RensaResult& rensaResult, int numChigiri, int framesToInitiate, int lastDropFrames) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),

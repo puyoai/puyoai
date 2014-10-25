@@ -116,6 +116,9 @@ protected:
     // Should rethink just before sending next decision.
     void requestRethink() { rethinkRequested_ = true; }
 
+    const PlayerState& myPlayerState() const { return me_; }
+    const PlayerState& enemyPlayerState() const { return enemy_; }
+
 private:
     friend class AITest;
     friend class Endless;
@@ -125,9 +128,6 @@ private:
     static void mergeField(CoreField* ours, const PlainField& provided);
 
     KumipuyoSeq rememberedSequence(int indexFrom) const;
-
-    const PlayerState& myPlayerState() const { return me_; }
-    const PlayerState& enemyPlayerState() const { return enemy_; }
 
     std::string name_;
     ClientConnector connector_;

@@ -20,13 +20,18 @@ class KumipuyoSeq;
 
 struct ThoughtResult {
     ThoughtResult() {}
-    ThoughtResult(const Plan& plan, bool isRensaPlan, double rensaScore, double virtualRensaScore, const std::string& message) :
-        plan(plan), isRensaPlan(isRensaPlan), rensaScore(rensaScore), virtualRensaScore(virtualRensaScore), message(message) {}
+    ThoughtResult(const Plan& plan, bool isRensaPlan, double rensaScore, double virtualRensaScore,
+                  const MidEvalResult& midEvalResult, const std::string& message) :
+        plan(plan), isRensaPlan(isRensaPlan), rensaScore(rensaScore), virtualRensaScore(virtualRensaScore),
+        midEvalResult(midEvalResult), message(message)
+    {
+    }
 
     Plan plan;
     bool isRensaPlan;
     double rensaScore;
     double virtualRensaScore;
+    MidEvalResult midEvalResult;
     std::string message;
 };
 
@@ -85,6 +90,7 @@ public:
     DebuggableMayahAI(int argc, char* argv[], Executor* executor = nullptr) : MayahAI(argc, argv, executor) {}
     virtual ~DebuggableMayahAI() {}
 
+    using MayahAI::preEval;
     using MayahAI::reloadParameter;
     using MayahAI::makeMessageFrom;
 
@@ -93,6 +99,12 @@ public:
     using MayahAI::enemyNext2Appeared;
     using MayahAI::enemyDecisionRequested;
     using MayahAI::enemyGrounded;
+
+    using MayahAI::myPlayerState;
+    using MayahAI::enemyPlayerState;
+    using MayahAI::evalWithCollectingFeature;
+
+    const Gazer& gazer() const { return gazer_; }
 
     const FeatureParameter& featureParameter() const { return *featureParameter_; }
     void setFeatureParameter(const FeatureParameter& parameter) { *featureParameter_ = parameter; }
