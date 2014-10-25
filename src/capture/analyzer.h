@@ -118,6 +118,7 @@ public: // Make this private?
 
     // Make these false when a current puyo has appeared.
     bool hasDetectedRensaStart_ = true;
+    bool hasDetectedPuyoErase_ = true;
     bool hasSentGrounded_ = true;
     bool hasSentOjamaDropped_ = true;
     bool hasSentChainFinished_ = true;

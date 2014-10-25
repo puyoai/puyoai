@@ -75,6 +75,7 @@ void PlayerAnalyzerResult::resetCurrentPuyoState(bool state)
     nextHasDisappearedIrregularly_ = false;
 
     hasDetectedRensaStart_ = state;
+    hasDetectedPuyoErase_ = state;
     hasSentGrounded_ = state;
     hasSentOjamaDropped_ = state;
     hasSentChainFinished_ = state;
@@ -495,16 +496,23 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
 
     bool shouldUpdateField = false;
 
-    if (!result->hasDetectedRensaStart_) {
-        // If # of disappearing puyo >= 4, vanishing has started.
-        // We should not check before first hand appears.
-        int numVanishing = countVanishing(adjustedField.field, adjustedField.vanishing);
-        if (numVanishing >= 4) {
+    // If # of disappearing puyo >= 4, vanishing has started.
+    // We should not check before first hand appears.
+    int numVanishing = countVanishing(adjustedField.field, adjustedField.vanishing);
+    if (numVanishing >= 4) {
+        if (!result->hasDetectedRensaStart_) {
             LOG(INFO) << "should update field since vanishing detected.";
             result->userState.playable = false;
             result->hasDetectedRensaStart_ = true;
             shouldUpdateField = true;
         }
+
+        if (!result->hasDetectedPuyoErase_) {
+            result->userState.puyoErased = true;
+        }
+        result->hasDetectedPuyoErase_ = true;
+    } else {
+        result->hasDetectedPuyoErase_ = false;
     }
 
     if (detectedField.ojamaDropDetected) {
