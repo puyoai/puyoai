@@ -60,7 +60,6 @@ KumipuyoSeq defaultKumipuyoSeq(int n)
 
 void runTest(int depth, int iteration, const CoreField& cf, const KumipuyoSeq& kumipuyoSeq)
 {
-    TsumoPossibility::initialize();
     TimeStampCounterData tsc;
 
     unique_ptr<Executor> executor(Executor::makeDefaultExecutor());
@@ -175,6 +174,7 @@ int main(int argc, char* argv[])
     testing::InitGoogleTest(&argc, argv);
     google::ParseCommandLineFlags(&argc, &argv, true);
 
+    TsumoPossibility::initialize();
+
     return RUN_ALL_TESTS();
 }
-
