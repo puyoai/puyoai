@@ -149,7 +149,7 @@ TEST_F(AITest, ojamaCount)
     req.frameId = 5;
     req.playerFrameRequest[0].field = CoreField("R     ");
     req.playerFrameRequest[1].field = CoreField(" B    ");
-    ai_.decisionRequested(req);
+    // don't call ai_.decisionRequested(req); here.
     ai_.enemyDecisionRequested(req);
     EXPECT_EQ(37, myPlayerState().fixedOjama);
     EXPECT_EQ(0, myPlayerState().pendingOjama);
