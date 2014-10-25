@@ -360,8 +360,8 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     if (!plan.isRensaPlan())
         return false;
 
-    if (enemy.isRensaOngoing && enemy.ongoingRensaResult.score > scoreForOjama(6)) {
-        if ((plan.score() >= enemy.ongoingRensaResult.score) &&
+    if (enemy.isRensaOngoing && me.fixedOjama + me.pendingOjama >= scoreForOjama(6)) {
+        if ((plan.score() >= scoreForOjama(me.fixedOjama + me.pendingOjama - 3)) &&
             (currentFrameId + plan.framesToInitiate() < enemy.finishingRensaFrameId)) {
             LOG(INFO) << plan.decisionText() << " TAIOU";
             sc_->addScore(STRATEGY_TAIOU, 1.0);
@@ -386,7 +386,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
-        if (enemy.isRensaOngoing && enemy.ongoingRensaResult.score <= scoreForOjama(36)) {
+        if (me.pendingOjama + me.fixedOjama <= 36) {
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
