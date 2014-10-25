@@ -83,6 +83,25 @@ TEST(BookFieldTest, match2)
     EXPECT_EQ(BookField::MatchResult(true, 16, 16, 0), bf.match(pf2));
 }
 
+TEST(BookFieldTest, match3)
+{
+    BookField bf("test",
+                 vector<string> {
+                     "b.....",
+                     "BEExy.",
+                     "DDEXYy",
+                     "BACXYZ",
+                     "BBACXY",
+                     "AACCXY",
+                 });
+
+    PlainField pf(
+        "R..B.B"
+        "YYBB.B");
+
+    EXPECT_EQ(BookField::MatchResult(true, 8, 8, 0), bf.match(pf));
+}
+
 TEST(BookFieldTest, matchWithStar)
 {
     BookField bf("test",

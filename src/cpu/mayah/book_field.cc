@@ -217,6 +217,7 @@ BookField::MatchResult BookField::match(const PlainField& f) const
                 if (env.isSet(c) && env.map(c) == f.get(x, y)) {
                     ++matchAllowedCount;
                 }
+                continue;
             }
 
             // Check neighbors.
