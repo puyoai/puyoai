@@ -493,30 +493,31 @@ void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const RefPlan& pl
         int y = qHead->y;
         qHead++;
 
-        if (distance[x][y] > 3)
-            continue;
-
         int d = distance[x][y] + 1;
 
         if (distance[x + 1][y] == 0 && field.color(x + 1, y) == PuyoColor::EMPTY) {
             distance[x + 1][y] = d;
             distanceCount[d]++;
-            *qTail++ = Position(x + 1, y);
+            if (d <= 3)
+                *qTail++ = Position(x + 1, y);
         }
         if (distance[x - 1][y] == 0 && field.color(x - 1, y) == PuyoColor::EMPTY) {
             distance[x - 1][y] = d;
             distanceCount[d]++;
-            *qTail++ = Position(x - 1, y);
+            if (d <= 3)
+                *qTail++ = Position(x - 1, y);
         }
         if (distance[x][y + 1] == 0 && field.color(x, y + 1) == PuyoColor::EMPTY) {
             distance[x][y + 1] = d;
             distanceCount[d]++;
-            *qTail++ = Position(x, y + 1);
+            if (d <= 3)
+                *qTail++ = Position(x, y + 1);
         }
         if (distance[x][y - 1] == 0 && field.color(x, y - 1) == PuyoColor::EMPTY) {
             distance[x][y - 1] = d;
             distanceCount[d]++;
-            *qTail++ = Position(x, y - 1);
+            if (d <= 3)
+                *qTail++ = Position(x, y - 1);
         }
     }
 
