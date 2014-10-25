@@ -166,6 +166,8 @@ bool FieldRealtime::onStateVanish(FrameContext* context)
         return false;
     }
 
+    userState_.puyoErased = true;
+
     // Here, something has been vanished.
     score_ += score;
 

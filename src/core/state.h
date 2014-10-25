@@ -13,21 +13,8 @@ enum State {
     STATE_CHAIN_DONE = 1 << 8,
     STATE_OJAMA_DROPPED = 1 << 10,
     STATE_DECISION_REQUEST_AGAIN = 1 << 12,
+    STATE_PUYO_ERASED = 1 << 14,
 };
-
-inline std::string GetStateString(int st)
-{
-    std::string r;
-    r.resize(7);
-    r[0] = ((st & STATE_YOU_CAN_PLAY) != 0) ? 'P' : '-';
-    r[1] = ((st & STATE_WNEXT_APPEARED) != 0) ? 'W' : '-';
-    r[2] = ((st & STATE_YOU_GROUNDED) != 0) ? 'G' : '-';
-    r[3] = ((st & STATE_DECISION_REQUEST) != 0) ? 'D' : '-';
-    r[4] = ((st & STATE_CHAIN_DONE) != 0) ? 'C' : '-';
-    r[5] = ((st & STATE_OJAMA_DROPPED) != 0) ? 'O' : '-';
-    r[6] = ((st & STATE_DECISION_REQUEST_AGAIN) != 0) ? 'A' : '-';
-    return r;
-}
 
 // TODO(mayah): Use UserState instead of State.
 // TODO(mayah): Rename to UserEvent after playable is removed.
@@ -40,11 +27,12 @@ struct UserState {
         decisionRequestAgain = false;
         chainFinished = false;
         ojamaDropped = false;
+        puyoErased = false;
     }
 
     bool hasEventState() const
     {
-        return wnextAppeared || grounded || decisionRequest || decisionRequestAgain || chainFinished || ojamaDropped;
+        return wnextAppeared || grounded || decisionRequest || decisionRequestAgain || chainFinished || ojamaDropped || puyoErased;
     }
 
     void clear()
@@ -54,7 +42,17 @@ struct UserState {
 
     std::string toString() const
     {
-        return GetStateString(toDeprecatedState());
+        std::string r;
+        r.resize(8);
+        r[0] = playable             ? 'P' : '-';
+        r[1] = wnextAppeared        ? 'W' : '-';
+        r[2] = grounded             ? 'G' : '-';
+        r[3] = decisionRequest      ? 'D' : '-';
+        r[4] = decisionRequestAgain ? 'C' : '-';
+        r[5] = chainFinished        ? 'O' : '-';
+        r[6] = ojamaDropped         ? 'A' : '-';
+        r[7] = puyoErased           ? 'E' : '-';
+        return r;
     }
 
     int toDeprecatedState() const
@@ -67,6 +65,7 @@ struct UserState {
         s |= decisionRequestAgain ? STATE_DECISION_REQUEST_AGAIN : 0;
         s |= chainFinished        ? STATE_CHAIN_DONE             : 0;
         s |= ojamaDropped         ? STATE_OJAMA_DROPPED          : 0;
+        s |= puyoErased           ? STATE_PUYO_ERASED            : 0;
         return s;
     }
 
@@ -79,6 +78,7 @@ struct UserState {
         decisionRequestAgain = state & STATE_DECISION_REQUEST_AGAIN;
         chainFinished        = state & STATE_CHAIN_DONE;
         ojamaDropped         = state & STATE_OJAMA_DROPPED;
+        puyoErased           = state & STATE_PUYO_ERASED;
     }
 
     // ----- usual states
@@ -91,6 +91,7 @@ struct UserState {
     bool decisionRequestAgain = false;
     bool chainFinished = false;
     bool ojamaDropped = false;
+    bool puyoErased = false;
 };
 
 #endif  // CORE_STATE_H_
