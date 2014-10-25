@@ -87,8 +87,16 @@ void AI::runLoop()
             enemyNext2Appeared(frameRequest);
 
         // STATE_YOU_GROUNDED and STATE_WNEXT_APPEARED might come out-of-order.
+        bool shouldThink = false;
         if (frameRequest.myPlayerFrameRequest().state.wnextAppeared) {
             next2Appeared(frameRequest);
+            shouldThink = true;
+        }
+        if (frameRequest.myPlayerFrameRequest().state.puyoErased) {
+            shouldThink = true;
+        }
+
+        if (shouldThink) {
             const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
             LOG(INFO) << "STATE_WNEXT_APPEARED";
             VLOG(1) << '\n' << me_.field.toDebugString();
