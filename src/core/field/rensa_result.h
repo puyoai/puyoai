@@ -35,6 +35,8 @@ class RensaTrackResult {
 public:
     RensaTrackResult& operator=(const RensaTrackResult& result);
 
+    void initialize();
+
     // Nth Rensa where (x, y) is erased. 0 if not erased.
     int erasedAt(int x, int y) const { return erasedAt_[x][y]; }
     void setErasedAt(int x, int y, int nthChain) { erasedAt_[x][y] = nthChain; }

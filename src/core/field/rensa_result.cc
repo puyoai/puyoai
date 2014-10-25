@@ -14,6 +14,11 @@ string RensaResult::toString() const
     return ss.str();
 }
 
+void RensaTrackResult::initialize()
+{
+    memset(erasedAt_, 0, sizeof(erasedAt_));
+}
+
 RensaTrackResult& RensaTrackResult::operator=(const RensaTrackResult& result)
 {
     for (int x = 0; x < PlainField::MAP_WIDTH; ++x) {
