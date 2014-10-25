@@ -293,14 +293,13 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
 
-    ss << "RSCORE=" << rensaScore
-       << "VSCORE=" << virtualRensaScore << " / ";
+    ss << "R/V SCORE=" << rensaScore << "/" << virtualRensaScore << " / ";
 
     if (enemy.isRensaOngoing) {
         ss << "Gazed ongoing rensa : " << enemy.ongoingRensaResult.score
            << " in " << (enemy.finishingRensaFrameId - frameId) << " / ";
     } else {
-        ss << "Gazed max score = "
+        ss << "Gazed = "
            << gazeResult.estimateMaxScore(frameId + refPlan.totalFrames(), enemy)
            << " in " << refPlan.totalFrames() << " / "
            << gazeResult.estimateMaxScore(frameId + refPlan.totalFrames() + 100, enemy)
@@ -308,6 +307,9 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
            << gazeResult.estimateMaxScore(frameId + refPlan.totalFrames() + 200, enemy)
            << " in " << (refPlan.totalFrames() + 200) << " / ";
     }
+
+    ss << "O = " << (myPlayerState().fixedOjama + myPlayerState().pendingOjama)
+       << "/" << (enemyPlayerState().fixedOjama + enemyPlayerState().pendingOjama) << " / ";
 
     ss << (thoughtTimeInSeconds * 1000) << " [ms]";
 
