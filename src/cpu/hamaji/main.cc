@@ -78,6 +78,7 @@ bool tick(Game* game) {
     char buf[1024];
     int i = sprintf(buf, "ID=%d X=%d R=%d MSG=%-40s MA=",
                     game->id, decision.x, decision.r, g_core->msg().c_str());
+    g_core->clear_msg();
     for (int y = 13; y <= 14; y++) {
       for (int x = 1; x <= 6; x++) {
         char c = game->p[0].f.Get(x, y) + '0';
