@@ -24,6 +24,7 @@ public:
   int best_score() const { return best_score_; }
 
   const string& msg() const { return msg_; }
+  void clear_msg() { msg_ = ""; }
 
 private:
   string getEvalString(const LP& plan) const;
