@@ -230,6 +230,7 @@ Decision Core::decide(Game* game) {
     if (FLAGS_eval2) {
       value = eval2_->eval(p);
     } else {
+      eval_->setIsEmergency(game->p[1].expected_ojama > 15);
       value = eval_->eval(p);
     }
     if (best_value < value) {

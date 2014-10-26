@@ -27,6 +27,8 @@ public:
 
   void study();
 
+  void setIsEmergency(bool is_emergency) { is_emergency_ = is_emergency; }
+
 private:
   struct Param;
   struct Teacher;
@@ -45,6 +47,7 @@ private:
 
   vector<Param> params_;
   vector<int> param_index_offsets_;
+  bool is_emergency_;
 };
 
 #endif  // HAMAJI_EVAL_H_
