@@ -96,13 +96,13 @@ static void iterateAvailablePlansInternal(const CoreField& field,
         const Kumipuyo& kumipuyo = ptr[i];
         int num_decisions = (kumipuyo.axis == kumipuyo.child) ? 11 : 22;
 
-        for (int i = 0; i < num_decisions; i++) {
+        for (int j = 0; j < num_decisions; j++) {
             if (needsNextFieldRefresh) {
                 needsNextFieldRefresh = false;
                 nextField = field;
             }
 
-            const Decision& decision = DECISIONS[i];
+            const Decision& decision = DECISIONS[j];
             if (!PuyoController::isReachable(field, decision))
                 continue;
 
