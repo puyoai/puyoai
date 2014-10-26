@@ -360,20 +360,37 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     if (!plan.isRensaPlan())
         return false;
 
+    bool inTime = false;
+    {
+        if (plan.decisions().size() == 1) {
+            // Sometimes, enemy.finishingRensaFrameId might be wrong.
+            // So, if plan.decisions.size() == 1, we always consider it's in time.
+            inTime = true;
+        } else if (me.fixedOjama > 0) {
+            // If fixedOjama > 0, after our first hand, ojama will be dropped.
+            // So it's not in time.
+            inTime = false;
+        } else if (!enemy.isRensaOngoing) {
+            // If enemy is not firing rensa, we can think in time.
+            inTime = true;
+        } else if (currentFrameId + plan.framesToInitiate() < enemy.finishingRensaFrameId) {
+            // If we can play before finishing enemy's rensa, it's in time.
+            inTime = true;
+        } else {
+            // Otherwise, it's not in time.
+            inTime = false;
+        }
+    }
+
+    // If not in time, we cannot fire a rensa. So considering firing rensa is meaning less.
+    if (!inTime) {
+        return false;
+    }
+
     if (enemy.isRensaOngoing && me.fixedOjama + me.pendingOjama >= 6) {
         if (plan.score() >= scoreForOjama(std::max(0, me.fixedOjama + me.pendingOjama - 3))) {
-            if (currentFrameId + plan.framesToInitiate() < enemy.finishingRensaFrameId) {
-                sc_->addScore(STRATEGY_TAIOU, 1.0);
-                return false;
-            }
-
-            // Sometimes, enemy.finishingRensaFrameId might be wrong.
-            // So currentFrameId > finishingRensaFrameId might hold. In this case, we might be able to
-            // put 1 puyo.
-            if (currentFrameId > enemy.finishingRensaFrameId && plan.decisions().size() == 1) {
-                sc_->addScore(STRATEGY_TAIOU, 1.0);
-                return false;
-            }
+            sc_->addScore(STRATEGY_TAIOU, 1.0);
+            return false;
         }
     }
 
