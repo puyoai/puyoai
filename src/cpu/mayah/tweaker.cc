@@ -117,9 +117,12 @@ int main(int argc, char* argv[])
 
     if (FLAGS_tweak) {
         map<int, RunResult> scoreMap;
-        for (int x = 50; x <= 200; x += 10) {
+        for (int x = 10; x <= 100; x += 10) {
           cout << "current x = " << x << endl;
-          parameter.setValue(FIRE_POINT_TABOO, x);
+          parameter.setValue(CONNECTION_HORIZONTAL_FROM_1, 2, x);
+          parameter.setValue(CONNECTION_HORIZONTAL_FROM_2, 2, x);
+          parameter.setValue(CONNECTION_HORIZONTAL_FROM_4, 2, x);
+          parameter.setValue(CONNECTION_HORIZONTAL_FROM_5, 2, x);
           scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {
