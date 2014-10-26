@@ -70,7 +70,9 @@ bool tick(Game* game) {
   if ((state & STATE_YOU_GROUNDED)) {
     g_should_decide = true;
   }
-  if ((g_should_decide && (state & STATE_YOU_CAN_PLAY)) || emergency) {
+  // TODO(hamaji): Emergency handling was removed.
+  //if ((g_should_decide && (state & STATE_YOU_CAN_PLAY)) || emergency) {
+  if (g_should_decide && (state & STATE_YOU_CAN_PLAY)) {
     g_should_decide = false;
     Decision decision = g_core->decide(game);
     char buf[1024];
