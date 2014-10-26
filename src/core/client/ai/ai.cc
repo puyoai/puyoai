@@ -1,5 +1,6 @@
 #include "core/client/ai/ai.h"
 
+#include "core/constant.h"
 #include "core/field/rensa_result.h"
 #include "core/field_pretty_printer.h"
 #include "core/frame_request.h"
@@ -52,6 +53,9 @@ void AI::runLoop()
 {
     DecisionSending next1;
 
+    // nextThinkFrameId is frameId in which the decision of think() is sent.
+    int nextThinkFrameId = 0;
+
     while (true) {
         google::FlushLogFiles(google::INFO);
 
@@ -73,6 +77,7 @@ void AI::runLoop()
         // TODO(mayah): Maybe game server should send some information that we should initialize.
         if (frameRequest.frameId == 1) {
             next1.clear();
+            nextThinkFrameId = 0;
             gameWillBegin(frameRequest);
         }
 
@@ -91,9 +96,15 @@ void AI::runLoop()
         if (frameRequest.myPlayerFrameRequest().state.wnextAppeared) {
             next2Appeared(frameRequest);
             shouldThink = true;
+
+            // When hand == 0, nextThinkFrameId will be 0. We'd like to keep frameId is increasing.
+            if (nextThinkFrameId < frameRequest.frameId)
+                nextThinkFrameId = frameRequest.frameId;
         }
         if (frameRequest.myPlayerFrameRequest().state.puyoErased) {
             shouldThink = true;
+            // TODO(mayah): This is not so accurate. We need to consider FRAMES_GROUNDING and frames for dropping.
+            nextThinkFrameId = frameRequest.frameId + FRAMES_VANISH_ANIMATION + FRAMES_PREPARING_NEXT;
         }
 
         if (shouldThink) {
@@ -107,7 +118,7 @@ void AI::runLoop()
 
             next1.fieldBeforeThink = me_.field;
             AdditionalThoughtInfo info { myPlayerState(), enemyPlayerState() };
-            next1.dropDecision = think(frameRequest.frameId, me_.field, seq, info, false);
+            next1.dropDecision = think(nextThinkFrameId, me_.field, seq, info, false);
 
             next1.kumipuyo = kumipuyoSeq.get(1);
             next1.ready = true;
@@ -177,6 +188,10 @@ void AI::runLoop()
 
         // Send
         connector_.send(FrameResponse(frameRequest.frameId, next1.dropDecision.decision(), next1.dropDecision.message()));
+        nextThinkFrameId =
+            frameRequest.frameId +
+            next1.fieldBeforeThink.framesToDropNext(next1.dropDecision.decision()) +
+            FRAMES_PREPARING_NEXT;
 
         // Move to next.
         if (next1.dropDecision.decision().isValid() && next1.kumipuyo.isValid()) {
