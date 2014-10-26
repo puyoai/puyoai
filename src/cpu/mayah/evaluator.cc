@@ -33,7 +33,6 @@ namespace {
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
-const bool USE_HEIGHT_DIFF_FEATURE = false;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_DENSITY_FEATURE = false;
 const bool USE_IGNITION_HEIGHT_FEATURE = true;
@@ -198,28 +197,6 @@ void Evaluator<ScoreCollector>::evalDensityFeature(const RefPlan& plan)
             }
         }
     }
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalFieldHeightFeature(const RefPlan& plan)
-{
-    const CoreField& field = plan.field();
-
-    double sumHeight = 0;
-    for (int x = 1; x < CoreField::WIDTH; ++x)
-        sumHeight += field.height(x);
-    double averageHeight = sumHeight / 6.0;
-
-    double heightSum = 0.0;
-    double heightSquareSum = 0.0;
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        double diff = std::abs(field.height(x) - averageHeight);
-        heightSum += diff;
-        heightSquareSum += diff * diff;
-    }
-
-    sc_->addScore(SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSum);
-    sc_->addScore(SQUARE_SUM_OF_HEIGHT_DIFF_FROM_AVERAGE, heightSquareSum);
 }
 
 template<typename ScoreCollector>
@@ -620,8 +597,6 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         evalRestrictedConnectionHorizontalFeature(plan);
     if (USE_DENSITY_FEATURE)
         evalDensityFeature(plan);
-    if (USE_HEIGHT_DIFF_FEATURE)
-        evalFieldHeightFeature(plan);
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(plan);
     if (USE_VALLEY_FEATURE)
