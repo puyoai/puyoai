@@ -163,17 +163,6 @@ TEST_F(EvaluatorTest, ConnectionHorizontal1)
     EXPECT_EQ(0, m[5][3]);
 }
 
-TEST_F(EvaluatorTest, ConnectionHorizontal2)
-{
-    CoreField f(
-        "OOOOOO"
-        "OOOOOO"
-        "OOOOOO");
-    CollectedFeature cf = eval(f);
-
-    EXPECT_TRUE(cf.feature(CONNECTION_HORIZONTAL).empty());
-}
-
 TEST_F(EvaluatorTest, NumUnreachableSpace1)
 {
     CoreField f(
