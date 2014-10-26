@@ -633,7 +633,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult))
         return;
 
-    if (!enemy.hasZenkeshi)
+    if (!enemy.hasZenkeshi && !plan.isRensaPlan())
         evalBook(books_, preEvalResult.booksMatchable(), plan);
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
