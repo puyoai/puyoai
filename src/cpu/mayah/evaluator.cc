@@ -31,7 +31,6 @@ using namespace std;
 namespace {
 
 const bool USE_CONNECTION_FEATURE = true;
-const bool USE_CONNECTION_HORIZONTAL_FEATURE = false;
 const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
 const bool USE_HEIGHT_DIFF_FEATURE = false;
@@ -148,27 +147,6 @@ template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::collectScoreForConnection(const CoreField& field)
 {
     calculateConnection(sc_, field, CONNECTION);
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalConnectionHorizontalFeature(const RefPlan& plan)
-{
-    const int MAX_HEIGHT = 3; // instead of CoreField::HEIGHT
-    const CoreField& f = plan.field();
-    for (int y = 1; y <= MAX_HEIGHT; ++y) {
-        for (int x = 1; x <= CoreField::WIDTH; ++x) {
-            if (!isNormalColor(f.color(x, y)))
-                continue;
-
-            int len = 1;
-            while (f.color(x, y) == f.color(x + len, y))
-                ++len;
-
-            DCHECK(0 <= len && len < 4) << len;
-            sc_->addScore(CONNECTION_HORIZONTAL, len, 1);
-            x += len - 1;
-        }
-    }
 }
 
 template<typename ScoreCollector>
@@ -638,8 +616,6 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
         collectScoreForConnection(plan.field());
-    if (USE_CONNECTION_HORIZONTAL_FEATURE)
-        evalConnectionHorizontalFeature(plan);
     if (USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE)
         evalRestrictedConnectionHorizontalFeature(plan);
     if (USE_DENSITY_FEATURE)
