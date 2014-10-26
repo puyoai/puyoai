@@ -16,6 +16,7 @@
 #include "feature_parameter.h"
 
 DECLARE_string(feature);
+DEFINE_bool(tweak, true, "true for tweaking");
 
 using namespace std;
 
@@ -114,26 +115,25 @@ int main(int argc, char* argv[])
     FeatureParameter parameter(FLAGS_feature);
     removeNontokopuyoParameter(&parameter);
 
-#if 0
-    map<int, RunResult> scoreMap;
-    for (int x = 200; x <= 300; x += 100) {
-        cout << "current x = " << x << endl;
-        parameter.setValue(BOOK, x);
-        scoreMap[x] = run(executor.get(), parameter);
+    if (FLAGS_tweak) {
+        map<int, RunResult> scoreMap;
+        for (int x = 200; x <= 300; x += 10) {
+          cout << "current x = " << x << endl;
+          parameter.setValue(BOOK, x);
+          scoreMap[x] = run(executor.get(), parameter);
+        }
+        for (const auto& m : scoreMap) {
+            cout << setw(5) << m.first << " -> " << m.second.sumScore
+                 << " / " << m.second.mainRensaCount
+                 << " / " << m.second.aveMainRensaScore
+                 << " / " << m.second.over60000Count
+                 << " / " << m.second.over70000Count
+                 << " / " << m.second.over80000Count
+                 << endl;
+        }
+    } else {
+        run(executor.get(), parameter);
     }
-    for (const auto& m : scoreMap) {
-        cout << setw(5) << m.first << " -> " << m.second.sumScore
-             << " / " << m.second.mainRensaCount
-             << " / " << m.second.aveMainRensaScore
-             << " / " << m.second.over60000Count
-             << " / " << m.second.over70000Count
-             << " / " << m.second.over80000Count
-             << endl;
-    }
-
-#else
-    run(executor.get(), parameter);
-#endif
 
     executor->stop();
     return 0;
