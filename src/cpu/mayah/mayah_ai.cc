@@ -90,7 +90,16 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     double beginTime = currentTime();
 
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
-    VLOG(1) << gazer_.gazeResult().toRensaInfoString();
+    if (VLOG_IS_ON(1)) {
+        VLOG(1) << "\n"
+                << "----------------------------------------------------------------------" << endl
+                << "think frameId = " << frameId << endl
+                << "my ojama: fixed = " << me.fixedOjama << " pending = " << me.pendingOjama << endl
+                << "enemy ojama: fixed = " << enemy.fixedOjama << " pending = " << enemy.pendingOjama << endl
+                << "enemy rensa: ending = " << (enemy.isRensaOngoing ? enemy.finishingRensaFrameId : 0) << endl
+                << gazer_.gazeResult().toRensaInfoString()
+                << "----------------------------------------------------------------------" << endl;
+    }
 
     const GazeResult gazeResult = gazer_.gazeResult();
 

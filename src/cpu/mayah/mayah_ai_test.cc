@@ -1,5 +1,7 @@
 #include "mayah_ai.h"
 
+#include <gflags/gflags.h>
+#include <glog/logging.h>
 #include <gtest/gtest.h>
 
 #include "base/executor.h"
@@ -20,8 +22,6 @@ static unique_ptr<DebuggableMayahAI> makeAI(Executor* executor = nullptr)
 // Parallel execution should return the same result as single thread execution.
 TEST(MayahAITest, parallel)
 {
-    TsumoPossibility::initialize();
-
     CoreField f(
         " R    "
         "YY BBB"
@@ -42,10 +42,108 @@ TEST(MayahAITest, parallel)
     EXPECT_EQ(thoughtResult.virtualRensaScore, parallelThoughtResult.virtualRensaScore);
 }
 
+TEST(MayahAITest, fromReal1)
+{
+    CoreField myField(
+        "@     " // 12
+        "@    G"
+        "@    G"
+        "Y G  R"
+        "YGY GG" // 8
+        "BRRRBY"
+        "G@@YRY"
+        "G@@BRY"
+        "GBYBYG" // 4
+        "BYRBGG"
+        "BYYRBB"
+        "RRRBRG");
+
+    CoreField enemyField(
+        "RG    "
+        "GY    "
+        "GG    "
+        "YR    "
+        "GRG   "
+        "GRB   "
+        "RGY  B"
+        "RBR YR"
+        "BRG RB"
+        "RRYYRR");
+
+    KumipuyoSeq mySeq("RYBR");
+    KumipuyoSeq enemySeq("YRGRBG");
+
+    auto ai = makeAI();
+    FrameRequest req;
+    req.frameId = 1;
+    ai->gameWillBegin(req);
+
+    ai->gaze(1148, enemyField, enemySeq);
+
+    PlayerState me;
+    me.pendingOjama = 67;
+
+    PlayerState enemy;
+    enemy.isRensaOngoing = true;
+    enemy.finishingRensaFrameId = 1346;
+
+    ThoughtResult thoughtResult = ai->thinkPlan(1328, myField, mySeq, me, enemy, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+
+    EXPECT_TRUE(thoughtResult.plan.isRensaPlan());
+}
+
+TEST(MayahAITest, fromReal2)
+{
+    CoreField myField(
+        "@     " // 12
+        "@    G"
+        "@G   G"
+        "YYG  R"
+        "YGY GG" // 8
+        "BRRRBY"
+        "G@@YRY"
+        "G@@BRY"
+        "GBYBYG" // 4
+        "BYRBGG"
+        "BYYRBB"
+        "RRRBRG");
+
+    CoreField enemyField(
+        "RG    "
+        "GY    "
+        "GG    "
+        "YR    "
+        "GRG   "
+        "GRB   "
+        "RGY  B"
+        "RBR YR"
+        "BRG RB"
+        "RRYYRR");
+
+    KumipuyoSeq mySeq("BRYG");
+    KumipuyoSeq enemySeq("YRGRBG");
+
+    auto ai = makeAI();
+    FrameRequest req;
+    req.frameId = 1;
+    ai->gameWillBegin(req);
+
+    ai->gaze(1148, enemyField, enemySeq);
+
+    PlayerState me;
+    me.pendingOjama = 67;
+
+    PlayerState enemy;
+    enemy.isRensaOngoing = true;
+    enemy.finishingRensaFrameId = 1346;
+
+    ThoughtResult thoughtResult = ai->thinkPlan(1352, myField, mySeq, me, enemy, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+
+    EXPECT_TRUE(thoughtResult.plan.isRensaPlan());
+}
+
 TEST(MayahAITest, DontCrash1)
 {
-    TsumoPossibility::initialize();
-
     CoreField f(
         "OO  OO"
         "OO  OO"
@@ -71,8 +169,6 @@ TEST(MayahAITest, DontCrash1)
 
 TEST(MayahAITest, DontCrash2)
 {
-    TsumoPossibility::initialize();
-
     CoreField f(
         "G     "
         "RR    "
@@ -99,8 +195,6 @@ TEST(MayahAITest, DontCrash2)
 
 TEST(MayahAITest, DontCrash3)
 {
-    TsumoPossibility::initialize();
-
     CoreField f(
         "OO OOO"
         "OO OOO"
@@ -123,4 +217,15 @@ TEST(MayahAITest, DontCrash3)
     req.frameId = 1;
     ai->gameWillBegin(req);
     (void)ai->think(100, f, seq, AdditionalThoughtInfo(), false);
+}
+
+int main(int argc, char* argv[])
+{
+    google::InitGoogleLogging(argv[0]);
+    testing::InitGoogleTest(&argc, argv);
+    google::ParseCommandLineFlags(&argc, &argv, true);
+
+    TsumoPossibility::initialize();
+
+    return RUN_ALL_TESTS();
 }
