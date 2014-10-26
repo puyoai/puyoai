@@ -53,9 +53,9 @@ private:
     CoreField field_;      // Future field (after the rensa has been finished).
     std::vector<Decision> decisions_;
     RensaResult rensaResult_;
-    int numChigiri_;
-    int framesToInitiate_;
-    int lastDropFrames_;
+    int numChigiri_ = 0;
+    int framesToInitiate_ = 0;
+    int lastDropFrames_ = 0;
 };
 
 // RefPlan is almost same as plan, but holding references so that field copy will not occur.
