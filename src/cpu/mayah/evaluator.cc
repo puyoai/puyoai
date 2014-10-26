@@ -360,12 +360,20 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     if (!plan.isRensaPlan())
         return false;
 
-    if (enemy.isRensaOngoing && me.fixedOjama + me.pendingOjama >= scoreForOjama(6)) {
-        if ((plan.score() >= scoreForOjama(me.fixedOjama + me.pendingOjama - 3)) &&
-            (currentFrameId + plan.framesToInitiate() < enemy.finishingRensaFrameId)) {
-            LOG(INFO) << plan.decisionText() << " TAIOU";
-            sc_->addScore(STRATEGY_TAIOU, 1.0);
-            return false;
+    if (enemy.isRensaOngoing && me.fixedOjama + me.pendingOjama >= 6) {
+        if (plan.score() >= scoreForOjama(std::max(0, me.fixedOjama + me.pendingOjama - 3))) {
+            if (currentFrameId + plan.framesToInitiate() < enemy.finishingRensaFrameId) {
+                sc_->addScore(STRATEGY_TAIOU, 1.0);
+                return false;
+            }
+
+            // Sometimes, enemy.finishingRensaFrameId might be wrong.
+            // So currentFrameId > finishingRensaFrameId might hold. In this case, we might be able to
+            // put 1 puyo.
+            if (currentFrameId > enemy.finishingRensaFrameId && plan.decisions().size() == 1) {
+                sc_->addScore(STRATEGY_TAIOU, 1.0);
+                return false;
+            }
         }
     }
 
