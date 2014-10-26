@@ -315,7 +315,7 @@ double Eval::eval(LP* plan) {
   if (plan->field.Get(3, 11))
     r -= 5;
 
-  if (puyo_cnt < 40) {
+  if (puyo_cnt < 40 || is_emergency_) {
     const LP* p = plan;
     while (p->parent) {
       int score = p->score - p->parent->score;
