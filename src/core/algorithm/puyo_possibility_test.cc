@@ -44,3 +44,19 @@ TEST(TsumoPossibilityTest, possibility)
     // 4 * (5!/2!) / 4^5
     EXPECT_EQ(15.0 / 64.0, TsumoPossibility::possibility(PuyoSet(1, 1, 1, 1), 5));
 }
+
+TEST(TsumoPossibilityTest, necessaryPuyos)
+{
+    TsumoPossibility::initialize();
+
+    EXPECT_EQ(0, TsumoPossibility::necessaryPuyos(PuyoSet(0, 0, 0, 0), 1.0));
+    EXPECT_EQ(0, TsumoPossibility::necessaryPuyos(PuyoSet(0, 0, 0, 0), 0.8));
+
+    EXPECT_EQ(1, TsumoPossibility::necessaryPuyos(PuyoSet(1, 0, 0, 0), 0.25));
+    EXPECT_EQ(1, TsumoPossibility::necessaryPuyos(PuyoSet(0, 1, 0, 0), 0.25));
+    EXPECT_EQ(1, TsumoPossibility::necessaryPuyos(PuyoSet(0, 0, 1, 0), 0.25));
+    EXPECT_EQ(1, TsumoPossibility::necessaryPuyos(PuyoSet(0, 0, 0, 1), 0.25));
+
+    EXPECT_EQ(1, TsumoPossibility::necessaryPuyos(PuyoSet(1, 0, 0, 0), 0.2));
+    EXPECT_EQ(2, TsumoPossibility::necessaryPuyos(PuyoSet(1, 0, 0, 0), 0.3));
+}
