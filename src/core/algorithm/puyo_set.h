@@ -31,6 +31,7 @@ public:
     }
 
     int count() const { return red_ + blue_ + yellow_ + green_; }
+    bool isEmpty() const { return count() == 0; }
 
     int red() const { return red_; }
     int blue() const { return blue_; }

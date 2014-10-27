@@ -19,6 +19,18 @@ TEST(PuyoSetTest, ctor)
     EXPECT_EQ(4, set2.green());
 }
 
+TEST(PuyoSetTest, count)
+{
+    {
+        PuyoSet ps;
+        EXPECT_EQ(0, ps.count());
+    }
+    {
+        PuyoSet ps(1, 2, 3, 4);
+        EXPECT_EQ(10, ps.count());
+    }
+}
+
 TEST(PuyoSetTest, addPuyoColor)
 {
     PuyoSet set;
