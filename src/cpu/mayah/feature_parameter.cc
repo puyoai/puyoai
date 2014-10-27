@@ -66,6 +66,14 @@ bool FeatureParameter::load(const string& filename)
 
         string str;
         while (getline(ifs, str)) {
+            while (!str.empty() && str.back() == '\\') {
+                str.back() = ' ';
+                string line;
+                if (getline(ifs, line)) {
+                    str += line;
+                }
+            }
+
             istringstream ss(str);
             string key;
             if (!(ss >> key))

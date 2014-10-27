@@ -22,6 +22,11 @@ public:
     {
     }
 
+    explicit PuyoSet(const ColumnPuyoList& columnPuyoList) : PuyoSet()
+    {
+        add(columnPuyoList);
+    }
+
     std::string toString() const
     {
         char buf[80];
