@@ -16,7 +16,11 @@
 #include "feature_parameter.h"
 
 DECLARE_string(feature);
+DECLARE_string(seq);
+DECLARE_int32(seed);
+
 DEFINE_bool(tweak, true, "true for tweaking");
+DEFINE_bool(show_field, false, "show field after each hand");
 
 using namespace std;
 
@@ -41,6 +45,21 @@ void removeNontokopuyoParameter(FeatureParameter* parameter)
     parameter->setValue(STRATEGY_TSUBUSHI, 0);
     parameter->setValue(STRATEGY_IBARA, 0);
     parameter->setValue(STRATEGY_SAISOKU, 0);
+}
+
+void runOnce(const FeatureParameter& parameter)
+{
+    auto ai = new DebuggableMayahAI;
+    ai->setFeatureParameter(parameter);
+
+    Endless endless(std::move(std::unique_ptr<AI>(ai)));
+    endless.setVerbose(FLAGS_show_field);
+
+    KumipuyoSeq seq = generateSequence();
+    int score = endless.run(seq);
+
+    cout << seq.toString() << endl;
+    cout << "score = " << score << endl;
 }
 
 RunResult run(Executor* executor, const FeatureParameter& parameter)
@@ -115,7 +134,9 @@ int main(int argc, char* argv[])
     FeatureParameter parameter(FLAGS_feature);
     removeNontokopuyoParameter(&parameter);
 
-    if (FLAGS_tweak) {
+    if (!FLAGS_seq.empty() || FLAGS_seed >= 0) {
+        runOnce(parameter);
+    } else if (FLAGS_tweak) {
         map<int, RunResult> scoreMap;
         for (int x = 400; x <= 1000; x += 50) {
           cout << "current x = " << x << endl;
