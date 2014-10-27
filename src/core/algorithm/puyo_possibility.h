@@ -10,6 +10,8 @@ public:
     static const int MAX_K = 32;
     static const int MAX_N = 16;
 
+    // Returns the possibility that when there are randomly |k| puyos,
+    // that set will contain |puyoSet|.
     static double possibility(const PuyoSet& puyoSet, unsigned int k) {
         int a = std::min(MAX_N - 1, puyoSet.red());
         int b = std::min(MAX_N - 1, puyoSet.blue());
@@ -19,6 +21,7 @@ public:
         return s_possibility[a][b][c][d][k];
     }
 
+    // Returns how many puyos are required to get |puyoSet| with possibility |threshold|?
     static int necessaryPuyos(const PuyoSet& puyoSet, double threshold) {
         DCHECK(s_initialized) << "TsumoPossibility is not initialized.";
         DCHECK(0 <= threshold && threshold <= 1.0);
