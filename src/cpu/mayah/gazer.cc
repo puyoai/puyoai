@@ -232,12 +232,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         puyoSet.sub(kumipuyoSet);
 
         // When the enemy took |k| hands, enemy will be able to fire the rensa in 20%.
-        int k = 0;
-        for (k = 0; k < 15; ++k) {
-            double p = TsumoPossibility::possibility(puyoSet, k * 2);
-            if (p >= 0.2)
-                break;
-        }
+        int k = (TsumoPossibility::necessaryPuyos(puyoSet, 0.2) + 1) / 2;
 
         // Estimate the number of frames to initiate the rensa.
         int heightMove = std::max(0, static_cast<int>(std::ceil(CoreField::HEIGHT - averageHeight)));
