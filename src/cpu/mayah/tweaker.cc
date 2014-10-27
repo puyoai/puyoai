@@ -139,11 +139,11 @@ int main(int argc, char* argv[])
     } else if (FLAGS_once) {
         run(executor.get(), parameter);
     } else {
-        map<int, RunResult> scoreMap;
-        for (int x = 100; x <= 300; x += 10) {
-          cout << "current x = " << x << endl;
-          parameter.setValue(BOOK, x);
-          scoreMap[x] = run(executor.get(), parameter);
+        map<double, RunResult> scoreMap;
+        for (double x = 4.9; x <= 5.100001; x += 0.1) {
+            cout << "current x = " << x << endl;
+            parameter.setValue(FIRE_NECESSARY_PUYOS_EARLY_SQUARE, -x);
+            scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {
             cout << setw(5) << m.first << " -> " << m.second.sumScore
