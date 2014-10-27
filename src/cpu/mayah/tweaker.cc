@@ -19,7 +19,7 @@ DECLARE_string(feature);
 DECLARE_string(seq);
 DECLARE_int32(seed);
 
-DEFINE_bool(tweak, true, "true for tweaking");
+DEFINE_bool(once, false, "true if running only once");
 DEFINE_bool(show_field, false, "show field after each hand");
 
 using namespace std;
@@ -136,11 +136,13 @@ int main(int argc, char* argv[])
 
     if (!FLAGS_seq.empty() || FLAGS_seed >= 0) {
         runOnce(parameter);
-    } else if (FLAGS_tweak) {
+    } else if (FLAGS_once) {
+        run(executor.get(), parameter);
+    } else {
         map<int, RunResult> scoreMap;
-        for (int x = 400; x <= 1000; x += 50) {
+        for (int x = 100; x <= 300; x += 10) {
           cout << "current x = " << x << endl;
-          parameter.setValue(MAX_RENSA_FIRE_PUYOS_LATE, 2, -x);
+          parameter.setValue(BOOK, x);
           scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {
@@ -152,8 +154,6 @@ int main(int argc, char* argv[])
                  << " / " << m.second.over80000Count
                  << endl;
         }
-    } else {
-        run(executor.get(), parameter);
     }
 
     executor->stop();
