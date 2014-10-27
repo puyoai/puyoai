@@ -51,7 +51,6 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field, Eval
 {
     FieldBitField checked;
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        // TODO(mayah): Why checking EMPTY? Why not height?
         int height = field.height(x);
         for (int y = 1; y <= height; ++y) {
             if (!isNormalColor(field.color(x, y)))
@@ -391,7 +390,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     }
 
     // If IBARA found, we always consider it.
-    if (USE_IBARA && plan.chains() == 1 && plan.score() >= scoreForOjama(10)) {
+    if (USE_IBARA && plan.chains() == 1 && plan.score() >= scoreForOjama(10) && me.pendingOjama + me.fixedOjama <= 10) {
         sc_->addScore(STRATEGY_IBARA, 1);
         return false;
     }
@@ -407,7 +406,6 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     sc_->addScore(STRATEGY_SAKIUCHI, 1.0);
 
     // TODO(mayah): Check land leveling.
-
     return false;
 }
 
