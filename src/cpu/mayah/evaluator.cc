@@ -115,12 +115,15 @@ void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
         // 'allowed' cell can be considered as 'matched', however, we'd like to have penalty about it?
         // Some cells should have penalty, however, other cells should not have penalty.
 
+        // TODO(mayah): cutoff ratio should be set to each book?
+
         double ratio = static_cast<double>(mr.count) / totalPuyoCount;
         DCHECK(0 <= ratio && ratio <= 1.0) << ratio;
         // TODO(mayah): Make this configurable?
-        if (ratio < 0.5)
+        const double cutoffRatio = 0.39;
+        if (ratio < cutoffRatio)
             continue;
-        ratio = (ratio - 0.5) * 2;
+        ratio = (ratio - 1) / (1 - cutoffRatio) + 1;
 
         double score = mr.score * ratio / totalPuyoCount;
         if (maxScore < score) {
