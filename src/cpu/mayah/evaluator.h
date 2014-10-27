@@ -16,6 +16,9 @@ class RefPlan;
 struct RensaResult;
 class RensaTrackResult;
 
+const int EARLY_THRESHOLD = 24;
+const int MIDDLE_THRESHOLD = 54;
+
 class PreEvalResult {
 public:
     explicit PreEvalResult(const std::vector<bool>& booksMatchable) :
