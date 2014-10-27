@@ -63,7 +63,7 @@ DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& 
         if (kumipuyoSeq.size() >= 3) {
             depth = 3;
             iteration = 2;
-        } else if (f.countPuyos() <= 54) {
+        } else if (f.countPuyos() <= MIDDLE_THRESHOLD) {
             depth = 2;
             iteration = 3;
         } else {

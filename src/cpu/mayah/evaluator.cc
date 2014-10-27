@@ -433,10 +433,11 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RefPlan& plan,
     int numFirePuyos = std::min(7, static_cast<int>(firePuyos.size()));
 
     sc_->addScore(MAX_CHAINS, rensaResult.chains, 1);
-    if (plan.field().countPuyos() <= 24) {
+    int count = plan.field().countPuyos();
+    if (count <= EARLY_THRESHOLD) {
         sc_->addScore(MAX_RENSA_KEY_PUYOS_EARLY, numKeyPuyos, 1);
         sc_->addScore(MAX_RENSA_FIRE_PUYOS_EARLY, numFirePuyos, 1);
-    } else if (plan.field().countPuyos() <= 42) {
+    } else if (count <= MIDDLE_THRESHOLD) {
         sc_->addScore(MAX_RENSA_KEY_PUYOS_MIDDLE, numKeyPuyos, 1);
         sc_->addScore(MAX_RENSA_FIRE_PUYOS_MIDDLE, numFirePuyos, 1);
     } else {
