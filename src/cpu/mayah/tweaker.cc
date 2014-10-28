@@ -140,9 +140,9 @@ int main(int argc, char* argv[])
         run(executor.get(), parameter);
     } else {
         map<double, RunResult> scoreMap;
-        for (double x = 4.9; x <= 5.100001; x += 0.1) {
+        for (double x = 170; x <= 230; x += 10) {
             cout << "current x = " << x << endl;
-            parameter.setValue(FIRE_NECESSARY_PUYOS_EARLY_SQUARE, -x);
+            parameter.setValue(BOOK_COMPLETE, x);
             scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {
