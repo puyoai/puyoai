@@ -90,16 +90,18 @@ MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentFi
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
+bool Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
                                          const std::vector<bool>& bookMatchable,
-                                         const RefPlan& plan)
+                                         const RefPlan& plan,
+                                         const MidEvalResult& midEvalResult)
 {
     double maxScore = 0;
     const BookField* bestBf = nullptr;
+    bool completeMatch = false;
 
     int totalPuyoCount = plan.field().countPuyos();
     if (totalPuyoCount == 0)
-        return;
+        return false;
 
     for (size_t i = 0; i < books.size(); ++i) {
         if (!bookMatchable[i])
@@ -128,13 +130,20 @@ void Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
         if (maxScore < score) {
             bestBf = &bf;
             maxScore = score;
+            completeMatch = mr.count == totalPuyoCount;
         }
     }
 
     if (bestBf) {
         sc_->addScore(BOOK, maxScore);
         sc_->setBookName(bestBf->name());
+        if (completeMatch && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
+            sc_->addScore(BOOK_COMPLETE, maxScore);
+            return true;
+        }
     }
+
+    return false;
 }
 
 template<typename ScoreCollector>
@@ -610,8 +619,10 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult))
         return;
 
-    if (!enemy.hasZenkeshi && !plan.isRensaPlan())
-        evalBook(books_, preEvalResult.booksMatchable(), plan);
+    bool complete = false;
+    if (!enemy.hasZenkeshi && !plan.isRensaPlan()) {
+        complete = evalBook(books_, preEvalResult.booksMatchable(), plan, midEvalResult);
+    }
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
         collectScoreForConnection(plan.field());
@@ -640,7 +651,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->featureParameter()));
         RensaEvaluator<ScoreCollector> rensaEvaluator(books_, rensaScoreCollector.get());
 
-        rensaEvaluator.evalRensaChainFeature(plan, rensaResult, keyPuyos, firePuyos);
+        if (!complete)
+            rensaEvaluator.evalRensaChainFeature(plan, rensaResult, keyPuyos, firePuyos);
         rensaEvaluator.collectScoreForRensaGarbage(fieldAfterRensa);
         if (USE_HAND_WIDTH_FEATURE)
             rensaEvaluator.evalRensaHandWidthFeature(plan, trackResult);

@@ -437,6 +437,13 @@ SCORE: 9.7
 ....CC
 ...EEC
 
+NAME: NEWGTR2-TAIL
+SCORE: 8.2
+....xX
+...CXC
+....CC
+...EXX
+
 COMBINE: NEWGTR NEWGTR2-HEAD NEWGTR2-TAIL
 
 # ----------------------------------------------------------------------

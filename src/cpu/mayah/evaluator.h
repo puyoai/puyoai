@@ -46,6 +46,14 @@ public:
         collectedFeatures_[key] = value;
     }
 
+    double feature(EvaluationFeatureKey key) const {
+        auto it = collectedFeatures_.find(key);
+        if (it == collectedFeatures_.end())
+            return 0;
+
+        return it->second;
+    }
+
     const std::map<EvaluationFeatureKey, double>& collectedFeatures() const { return collectedFeatures_; }
 
 private:
@@ -110,7 +118,8 @@ public:
     bool evalStrategy(const RefPlan&, const CoreField& currentField, int currentFrameId,
                       const PlayerState& me, const PlayerState& enemy, const GazeResult&);
 
-    void evalBook(const std::vector<BookField>&, const std::vector<bool>& bookMatchable, const RefPlan&);
+    // Returns true if complete match.
+    bool evalBook(const std::vector<BookField>&, const std::vector<bool>& bookMatchable, const RefPlan&, const MidEvalResult&);
     void evalFrameFeature(const RefPlan&);
     void evalConnectionHorizontalFeature(const RefPlan&);
     void evalRestrictedConnectionHorizontalFeature(const RefPlan&);
