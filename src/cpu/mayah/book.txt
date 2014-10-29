@@ -302,6 +302,29 @@ DEAC..
 BBBA..
 AAAC..
 
+NAME: NEWGTR-HEAD
+SCORE: 9.8
+b.....
+B.....
+E.....
+E.....
+E.....
+DD....
+DEAC..
+BBBA..
+AAAC..
+
+NAME: NEWGTR-HEAD
+SCORE: 9.7
+B.....
+D.....
+D.....
+E.....
+DEE...
+DFAC..
+BBBA..
+AAAC..
+
 NAME: NEWGTR-TAIL
 SCORE: 10
 .....x
@@ -393,6 +416,28 @@ DFAC..
 BBBA..
 AAAE..
 
+NAME: NEWGTR2-HEAD
+SCORE: 9.7
+B.....
+D.....
+D.....
+G.....
+DGG...
+DFAC..
+BBBA..
+AAAE..
+
+NAME: NEWGTR2-HEAD
+SCORE: 9.7
+B.....
+D.....
+D.....
+GG....
+DG....
+DFAC..
+BBBA..
+AAAE..
+
 NAME: NEWGTR2-TAIL
 SCORE: 9.5
 ...C..
@@ -450,14 +495,14 @@ COMBINE: NEWGTR NEWGTR2-HEAD NEWGTR2-TAIL
 # LTR
 
 NAME: LTR-HEAD
-SCORE: 10
+SCORE: 9.6
 D.....
 DBAC..
 DBBA..
 AAAC..
 
 NAME: LTR-HEAD
-SCORE: 10
+SCORE: 9.6
 b.....
 B.....
 Dd....
@@ -469,7 +514,7 @@ DBBA..
 AAAC..
 
 NAME: LTR-HEAD
-SCORE: 10
+SCORE: 9.6
 b.....
 Bb....
 Dd....
@@ -499,6 +544,16 @@ DBBA..
 BAAC..
 
 COMBINE: FUKIGENGTR-HEAD NEWGTR-TAIL
+
+NAME: FUKIGENGTR2-HEAD
+SCORE: 9.8
+b.....
+Bb....
+DDAC..
+DBBA..
+BAAE..
+
+COMBINE: FUKIGENGTR2-HEAD NEWGTR2-TAIL
 
 # ----------------------------------------------------------------------
 # 座布団L字
