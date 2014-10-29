@@ -21,6 +21,7 @@ DECLARE_int32(seed);
 
 DEFINE_bool(once, false, "true if running only once");
 DEFINE_bool(show_field, false, "show field after each hand");
+DEFINE_bool(long, false, "Run long check");
 
 using namespace std;
 
@@ -64,7 +65,7 @@ void runOnce(const FeatureParameter& parameter)
 
 RunResult run(Executor* executor, const FeatureParameter& parameter)
 {
-    const int N = 100;
+    const int N = FLAGS_long ? 5000 : 100;
     vector<promise<Result>> ps(N);
 
     for (int i = 0; i < N; ++i) {
