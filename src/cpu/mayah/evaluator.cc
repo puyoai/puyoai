@@ -30,6 +30,7 @@ using namespace std;
 
 namespace {
 
+const bool USE_BOOK = true;
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
@@ -411,7 +412,8 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     // --- If we can send 18>= ojamas, and opponent does not have any hand to cope with it,
     // we can fire it.
     // TODO(mayah): We need to check if the enemy cannot fire his rensa after ojama is dropped.
-    if (plan.score() >= scoreForOjama(18) && estimatedMaxScore <= scoreForOjama(6)) {
+    if (plan.chains() <= 3 && plan.score() >= scoreForOjama(15) &&
+        me.pendingOjama + me.fixedOjama <= 3 && estimatedMaxScore <= scoreForOjama(12)) {
         sc_->addScore(STRATEGY_TSUBUSHI, 1);
         return true;
     }
@@ -624,7 +626,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         return;
 
     bool complete = false;
-    if (!enemy.hasZenkeshi && !plan.isRensaPlan()) {
+    if (USE_BOOK && !enemy.hasZenkeshi && !plan.isRensaPlan()) {
         complete = evalBook(books_, preEvalResult.booksMatchable(), plan, midEvalResult);
     }
     evalCountPuyoFeature(plan);
