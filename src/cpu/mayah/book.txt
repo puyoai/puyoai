@@ -6,11 +6,16 @@
 # ----------------------------------------------------------------------
 # GTR
 
+NAME: GTR-BASE
+SCORE: 10.3
+BBA...
+AAC...
+
 NAME: GTR
-SCORE: 10.15
+SCORE: 10.2
 BA....
 BBA...
-AA....
+AAC...
 
 NAME: GTR-HEAD
 SCORE: 9
@@ -144,7 +149,7 @@ SCORE: 9.8
 ...CXY
 ..CCXY
 
-COMBINE: GTR GTR-HEAD GTR-TAIL
+COMBINE: GTR GTR-BASE GTR-HEAD GTR-TAIL
 
 # ----------------------------------------------------------------------
 # LR
@@ -202,27 +207,27 @@ SCORE: 10
 b.....
 B.....
 EEE...
-BAC...
+BAD...
 BBA...
-AAD...
+AAC...
 
 NAME: GTR2-HEAD
 SCORE: 10
 b.....
 Bb....
 EEE...
-BAC...
+BAD...
 BBA...
-AAD...
+AAC...
 
 NAME: GTR2-HEAD
 SCORE: 10
 b.....
 BE....
 EE....
-BAC...
+BAD...
 BBA...
-AAD...
+AAC...
 
 NAME: GTR2-HEAD
 SCORE: 10
@@ -230,42 +235,47 @@ b.....
 B.....
 E.....
 EE....
-BAC...
+BAD...
 BBA...
-AAD...
+AAC...
 
 NAME: GTR2-TAIL
 SCORE: 9.5
-.....d
-....dD
-..CXXX
-...CCC
-..DDDX
+.....c
+....cC
+..DXXX
+...DDD
+..CCCX
 
 NAME: GTR2-TAIL
 SCORE: 9.5
 ...xXx
-..CXDX
-...CCC
-..DDDX
+..DXCX
+...DDD
+..CCCX
 
 NAME: GTR2-TAIL
 SCORE: 9.5
-..C.X.
-...CCC
-..DXXX
+..D.X.
+...DDD
+..CXXX
 
-COMBINE: GTR GTR2-HEAD GTR2-TAIL
+COMBINE: GTR GTR-BASE GTR2-HEAD GTR2-TAIL
 
 # ----------------------------------------------------------------------
 #
 
+NAME: NEWGTR-BASE
+SCORE: 10.3
+BBBA..
+AAAC..
+
 NAME: NEWGTR
-SCORE: 10.15
+SCORE: 10.2
 ......
 ..A...
 BBBA..
-AAA...
+AAAC..
 
 NAME: NEWGTR-HEAD
 SCORE: 10.0
@@ -354,7 +364,7 @@ SCORE: 9.7
 ....CC
 ...CXX
 
-COMBINE: NEWGTR NEWGTR-HEAD NEWGTR-TAIL
+COMBINE: NEWGTR NEWGTR-BASE NEWGTR-HEAD NEWGTR-TAIL
 
 # ----------------------------------------------------------------------
 # New GTR(2)
@@ -363,34 +373,34 @@ NAME: NEWGTR2-HEAD
 SCORE: 10
 .b....
 DBb...
-DDAC..
+DDAE..
 BBBA..
-AAAE..
+AAAC..
 
 NAME: NEWGTR2-HEAD
 SCORE: 10
 b.....
 Bb....
 D.....
-DDAC..
+DDAE..
 BBBA..
-AAAE..
+AAAC..
 
 NAME: NEWGTR2-HEAD
 SCORE: 10
 b.....
 BD....
-DDAC..
+DDAE..
 BBBA..
-AAAE..
+AAAC..
 
 NAME: NEWGTR2-HEAD
 SCORE: 10
 B.....
 DD....
-DFAC..
+DFAE..
 BBBA..
-AAAE..
+AAAC..
 
 NAME: NEWGTR2-HEAD
 SCORE: 10
@@ -400,9 +410,9 @@ F.....
 F.....
 F.....
 DD....
-DFAC..
+DFAE..
 BBBA..
-AAAE..
+AAAC..
 
 NAME: NEWGTR2-HEAD
 SCORE: 10
@@ -412,9 +422,9 @@ F.....
 F.....
 D.....
 DFf...
-DFAC..
+DFAE..
 BBBA..
-AAAE..
+AAAC..
 
 NAME: NEWGTR2-HEAD
 SCORE: 9.7
@@ -423,9 +433,9 @@ D.....
 D.....
 G.....
 DGG...
-DFAC..
+DFAE..
 BBBA..
-AAAE..
+AAAC..
 
 NAME: NEWGTR2-HEAD
 SCORE: 9.7
@@ -434,62 +444,62 @@ D.....
 D.....
 GG....
 DG....
-DFAC..
+DFAE..
 BBBA..
-AAAE..
+AAAC..
 
 NAME: NEWGTR2-TAIL
 SCORE: 9.5
-...C..
-....CC
-...ECX
-
-NAME: NEWGTR2-TAIL
-SCORE: 9.8
-....ee
-...CEE
-....CC
-...ECE
-
-NAME: NEWGTR2-TAIL
-SCORE: 9.8
-...ce.
-...CEC
-....CC
-...EEE
-
-NAME: NEWGTR2-TAIL
-SCORE: 9.8
-...cee
-...CEE
-....CC
-...EEC
-
-NAME: NEWGTR2-TAIL
-SCORE: 9.8
-....xe
-...*XE
+...E..
+....EE
 ...CEX
-....CC
-...EEC
+
+NAME: NEWGTR2-TAIL
+SCORE: 9.8
+....cc
+...ECC
+....EE
+...CEC
+
+NAME: NEWGTR2-TAIL
+SCORE: 9.8
+...ec.
+...ECE
+....EE
+...CCC
+
+NAME: NEWGTR2-TAIL
+SCORE: 9.8
+...ecc
+...ECC
+....EE
+...CCE
+
+NAME: NEWGTR2-TAIL
+SCORE: 9.8
+....xc
+...*XC
+...ECX
+....EE
+...CCE
 
 NAME: NEWGTR2-TAIL
 SCORE: 9.7
-.....e
-....*E
-...*XE
-...CEX
-....CC
-...EEC
+.....c
+....*C
+...*XC
+...ECX
+....EE
+...CCE
 
 NAME: NEWGTR2-TAIL
 SCORE: 8.2
 ....xX
-...CXC
-....CC
-...EXX
+...EXE
+....EE
+...CXX
 
-COMBINE: NEWGTR NEWGTR2-HEAD NEWGTR2-TAIL
+COMBINE: NEWGTR NEWGTR-BASE NEWGTR2-HEAD NEWGTR2-TAIL
 
 # ----------------------------------------------------------------------
 # LTR
@@ -549,9 +559,9 @@ NAME: FUKIGENGTR2-HEAD
 SCORE: 9.8
 b.....
 Bb....
-DDAC..
+DDAE..
 DBBA..
-BAAE..
+BAAC..
 
 COMBINE: FUKIGENGTR2-HEAD NEWGTR2-TAIL
 
@@ -624,7 +634,7 @@ AAAEE.
 COMBINE: ZABUTONL-HEAD ZABUTONL-TAIL
 
 # ----------------------------------------------------------------------
-# だぁ積み
+# DAA
 
 NAME: DAAZUMI
 SCORE: 9.8
@@ -670,7 +680,7 @@ BBCCDD
 COMBINE: LLR
 
 # ----------------------------------------------------------------------
-# なめくじ
+# NAMEKUJI
 
 NAME: NAMEKUJI
 SCORE: 5.2
@@ -693,3 +703,22 @@ BAA...
 BBC...
 
 COMBINE: NAMEKUJI GTR-TAIL
+
+# ----------------------------------------------------------------------
+# YAYOI
+
+NAME: YAYOI
+SCORE: 9
+EC....
+EEDAbb
+CCCDDD
+AAABBB
+
+NAME: YAYOI
+SCORE: 8.8
+CE....
+EEDAbb
+CCCDDD
+AAABBB
+
+COMBINE: YAYOI
