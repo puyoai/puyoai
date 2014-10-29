@@ -30,6 +30,26 @@ static vector<string> split(const string& str)
     return result;
 }
 
+static void merge(vector<BookField>* result,
+                  const BookField& current,
+                  const multimap<string, BookField>& partialFields,
+                  const vector<string>& names,
+                  size_t pos)
+{
+    if (pos == names.size()) {
+        result->push_back(current);
+        result->push_back(current.mirror());
+        return;
+    }
+
+    auto range = partialFields.equal_range(names[pos]);
+    for (auto it = range.first; it != range.second; ++it) {
+        BookField field(current);
+        field.merge(it->second);
+        merge(result, field, partialFields, names, pos + 1);
+    }
+}
+
 // static
 vector<BookField> BookReader::parse(const string& filename)
 {
@@ -76,44 +96,11 @@ vector<BookField> BookReader::parse(const string& filename)
 
             // TODO(mayah): awful bad code.
             vector<string> names = split(trim(str.substr(8)));
-            CHECK(1 <= names.size() && names.size() <= 3);
-            if (names.size() == 1) {
+            CHECK(names.size() > 0);
+            {
                 auto range = partialFields.equal_range(names[0]);
-                CHECK(range.first != range.second);
                 for (auto it = range.first; it != range.second; ++it) {
-                    result.push_back(it->second);
-                    result.push_back(it->second.mirror());
-                }
-            } else if (names.size() == 2) {
-                auto range1 = partialFields.equal_range(names[0]);
-                auto range2 = partialFields.equal_range(names[1]);
-                CHECK(range1.first != range1.second);
-                CHECK(range2.first != range2.second);
-                for (auto it = range1.first; it != range1.second; ++it) {
-                    for (auto jt = range2.first; jt != range2.second; ++jt) {
-                        BookField bf(it->second);
-                        bf.merge(jt->second);
-                        result.push_back(bf);
-                        result.push_back(bf.mirror());
-                    }
-                }
-            } else if (names.size() == 3) {
-                auto range1 = partialFields.equal_range(names[0]);
-                auto range2 = partialFields.equal_range(names[1]);
-                auto range3 = partialFields.equal_range(names[2]);
-                CHECK(range1.first != range1.second);
-                CHECK(range2.first != range2.second);
-                CHECK(range3.first != range3.second);
-                for (auto it = range1.first; it != range1.second; ++it) {
-                    for (auto jt = range2.first; jt != range2.second; ++jt) {
-                        for (auto kt = range3.first; kt != range3.second; ++kt) {
-                            BookField bf(it->second);
-                            bf.merge(jt->second);
-                            bf.merge(kt->second);
-                            result.push_back(bf);
-                            result.push_back(bf.mirror());
-                        }
-                    }
+                    merge(&result, it->second, partialFields, names, 1);
                 }
             }
             continue;
