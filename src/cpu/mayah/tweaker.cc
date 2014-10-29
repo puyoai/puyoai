@@ -19,9 +19,9 @@ DECLARE_string(feature);
 DECLARE_string(seq);
 DECLARE_int32(seed);
 
-DEFINE_bool(once, false, "true if running only once");
-DEFINE_bool(show_field, false, "show field after each hand");
-DEFINE_bool(long, false, "Run long check");
+DEFINE_bool(once, false, "true if running only once.");
+DEFINE_bool(show_field, false, "show field after each hand.");
+DEFINE_int32(size, 100, "the number of case size.");
 
 using namespace std;
 
@@ -65,7 +65,7 @@ void runOnce(const FeatureParameter& parameter)
 
 RunResult run(Executor* executor, const FeatureParameter& parameter)
 {
-    const int N = FLAGS_long ? 5000 : 100;
+    const int N = FLAGS_size;
     vector<promise<Result>> ps(N);
 
     for (int i = 0; i < N; ++i) {
@@ -112,7 +112,7 @@ RunResult run(Executor* executor, const FeatureParameter& parameter)
 
     int aveMainRensaScore = mainRensaCount > 0 ? sumMainRensaScore / mainRensaCount : 0;
     cout << "sum score  = " << sumScore << endl;
-    cout << "ave score  = " << (sumScore / 100) << endl;
+    cout << "ave score  = " << (sumScore / N) << endl;
     cout << "main rensa = " << mainRensaCount << endl;
     cout << "ave main rensa = " << aveMainRensaScore << endl;
     cout << "over 60000 = " << over60000Count << endl;
@@ -141,9 +141,9 @@ int main(int argc, char* argv[])
         run(executor.get(), parameter);
     } else {
         map<double, RunResult> scoreMap;
-        for (double x = 20; x <= 50; x += 10) {
+        for (double x = 270; x <= 330; x += 10) {
             cout << "current x = " << x << endl;
-            parameter.setValue(BOOK_KIND, x);
+            parameter.setValue(BOOK, x);
             scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {
