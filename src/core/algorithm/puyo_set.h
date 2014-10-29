@@ -53,14 +53,6 @@ public:
         green_ += set.green_;
     }
 
-    void sub(const PuyoSet& set)
-    {
-        red_ = red_ < set.red_ ? 0 : red_ - set.red_;
-        blue_ = blue_ < set.blue_ ? 0 : blue_ - set.blue_;
-        yellow_ = yellow_ < set.yellow_ ? 0 : yellow_ - set.yellow_;
-        green_ = green_ < set.green_ ? 0 : green_ - set.green_;
-    }
-
     void add(PuyoColor c, int n = 1)
     {
         switch (c) {
@@ -77,7 +69,39 @@ public:
             green_ += n;
             break;
         default:
-            DCHECK(false);
+            CHECK(false) << c;
+        }
+    }
+
+    void sub(const PuyoSet& set)
+    {
+        red_ = red_ < set.red_ ? 0 : red_ - set.red_;
+        blue_ = blue_ < set.blue_ ? 0 : blue_ - set.blue_;
+        yellow_ = yellow_ < set.yellow_ ? 0 : yellow_ - set.yellow_;
+        green_ = green_ < set.green_ ? 0 : green_ - set.green_;
+    }
+
+    void sub(PuyoColor c)
+    {
+        switch (c) {
+        case PuyoColor::RED:
+            if (red_ > 0)
+                red_ -= 1;
+            break;
+        case PuyoColor::BLUE:
+            if (blue_ > 0)
+                blue_ -= 1;
+            break;
+        case PuyoColor::YELLOW:
+            if (yellow_ > 0)
+                yellow_ -= 1;
+            break;
+        case PuyoColor::GREEN:
+            if (green_ > 0)
+                green_ -= 1;
+            break;
+        default:
+            CHECK(false) << c;
         }
     }
 
