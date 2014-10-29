@@ -167,10 +167,9 @@ void Gazer::initialize(int frameIdGameWillBegin)
 
 void Gazer::gaze(int frameId, const CoreField& cf, const KumipuyoSeq& seq)
 {
-    KumipuyoSeq s = (seq.size() > 4 ? seq.subsequence(0, 3) : seq);
     setFrameIdGazedAt(frameId);
-    updateFeasibleRensas(cf, s);
-    updatePossibleRensas(cf, s);
+    updateFeasibleRensas(cf, seq);
+    updatePossibleRensas(cf, seq);
 
     FieldBitField checked;
     restEmptyField_ = cf.countConnectedPuyos(3, 12, &checked);
@@ -180,7 +179,12 @@ void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumi
 {
     feasibleRensaInfos_.clear();
 
-    vector<FeasibleRensaInfo> result = RensaDetector::findFeasibleRensas(field, kumipuyoSeq);
+    // It might take long time if size() >= 4. Consider only size <= 3.
+    KumipuyoSeq seq(kumipuyoSeq);
+    if (seq.size() >= 4)
+        seq = seq.subsequence(0, 3);
+
+    vector<FeasibleRensaInfo> result = RensaDetector::findFeasibleRensas(field, seq);
     if (result.empty())
         return;
 
@@ -208,12 +212,6 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
 {
     possibleRensaInfos_.clear();
 
-    PuyoSet kumipuyoSet;
-    for (const auto& x : kumipuyoSeq) {
-        kumipuyoSet.add(x.axis);
-        kumipuyoSet.add(x.child);
-    }
-
     double averageHeight = 0;
     for (int x = 1; x <= CoreField::WIDTH; ++x)
         averageHeight += field.height(x) / 6.0;
@@ -229,14 +227,29 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         PuyoSet puyoSet;
         puyoSet.add(keyPuyos);
         puyoSet.add(firePuyos);
-        puyoSet.sub(kumipuyoSet);
 
-        // When the enemy took |k| hands, enemy will be able to fire the rensa in 20%.
-        int k = (TsumoPossibility::necessaryPuyos(puyoSet, 0.2) + 1) / 2;
+        int necessaryHands = kumipuyoSeq.size();
+        for (int i = 0; i < kumipuyoSeq.size(); ++i) {
+            puyoSet.sub(kumipuyoSeq.axis(i));
+            puyoSet.sub(kumipuyoSeq.child(i));
+            if (puyoSet.isEmpty()) {
+                necessaryHands = i + 1;
+                break;
+            }
+        }
+
+        // When the enemy took |k| hands, enemy will be able to fire the rensa in 30%.
+        if (!puyoSet.isEmpty()) {
+            necessaryHands += (TsumoPossibility::necessaryPuyos(puyoSet, 0.3) + 1) / 2;
+        }
+
+        // We need to remove last hand frames.
+        if (necessaryHands > 1)
+            --necessaryHands;
 
         // Estimate the number of frames to initiate the rensa.
         int heightMove = std::max(0, static_cast<int>(std::ceil(CoreField::HEIGHT - averageHeight)));
-        int framesToInitiate = (FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * (3 + k);
+        int framesToInitiate = (FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * necessaryHands;
         int score = rensaResult.score;
         int chains = rensaResult.chains;
         results.push_back(EstimatedRensaInfo(chains, score, framesToInitiate));
