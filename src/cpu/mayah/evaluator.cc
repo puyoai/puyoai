@@ -98,6 +98,7 @@ bool Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
     double maxScore = 0;
     const BookField* bestBf = nullptr;
     bool completeMatch = false;
+    set<string> matchedBookNames;
 
     int totalPuyoCount = plan.field().countPuyos();
     if (totalPuyoCount == 0)
@@ -111,6 +112,8 @@ bool Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
         BookField::MatchResult mr = bf.match(plan.field());
         if (!mr.matched || mr.count == 0)
             continue;
+
+        matchedBookNames.insert(bf.name());
 
         // TODO(mayah): How do we handle 'allowedCount' ?
         // 'allowed' cell can be considered as 'matched', however, we'd like to have penalty about it?
@@ -135,8 +138,9 @@ bool Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
     }
 
     if (bestBf) {
-        sc_->addScore(BOOK, maxScore);
         sc_->setBookName(bestBf->name());
+        sc_->addScore(BOOK, maxScore);
+        sc_->addScore(BOOK_KIND, matchedBookNames.size());
         if (completeMatch && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
             sc_->addScore(BOOK_COMPLETE, maxScore);
             return true;

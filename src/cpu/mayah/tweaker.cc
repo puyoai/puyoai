@@ -140,9 +140,9 @@ int main(int argc, char* argv[])
         run(executor.get(), parameter);
     } else {
         map<double, RunResult> scoreMap;
-        for (double x = 170; x <= 230; x += 10) {
+        for (double x = 20; x <= 50; x += 10) {
             cout << "current x = " << x << endl;
-            parameter.setValue(BOOK_COMPLETE, x);
+            parameter.setValue(BOOK_KIND, x);
             scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {
