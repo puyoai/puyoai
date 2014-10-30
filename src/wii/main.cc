@@ -22,6 +22,12 @@
 #include "wii/stdout_key_sender.h"
 #include "wii/wii_connect_server.h"
 
+#if USE_AUDIO_COMMENTATOR
+#include "audio/audio_commentator.h"
+#include "audio/audio_server.h"
+#include "internal/audio/internal_speaker.h"
+#endif
+
 using namespace std;
 
 DEFINE_bool(save_screenshot, false, "save screenshot");
@@ -32,6 +38,10 @@ DEFINE_string(source, "somagic",
 DEFINE_int32(fps, 30, "FPS");
 DEFINE_bool(ignore_sigpipe, false, "ignore SIGPIPE");
 DEFINE_bool(use_commentator, false, "use commentator");
+
+#if USE_AUDIO_COMMENTATOR
+DEFINE_bool(use_audio, false, "use audio commentator");
+#endif
 
 static unique_ptr<Source> makeVideoSource()
 {
@@ -134,8 +144,27 @@ int main(int argc, char* argv[])
         mainWindow->addDrawer(commentatorDrawer.get());
     }
 
+#if USE_AUDIO_COMMENTATOR
+    unique_ptr<InternalSpeaker> internalSpeaker;
+    unique_ptr<AudioServer> audioServer;
+    unique_ptr<AudioCommentator> audioCommentator;
+
+    if (FLAGS_use_commentator && FLAGS_use_audio) {
+        internalSpeaker.reset(new InternalSpeaker);
+        audioServer.reset(new AudioServer(internalSpeaker.get()));
+        audioCommentator.reset(new AudioCommentator(commentator.get()));
+        audioServer->addSpeakRequester(audioCommentator.get());
+    }
+#endif
+
     if (commentator.get())
         server.addObserver(commentator.get());
+#if USE_AUDIO_COMMENTATOR
+    if (audioCommentator.get())
+        server.addObserver(audioCommentator.get());
+    if (audioServer.get())
+        audioServer->start();
+#endif
 
     source->start();
     server.start();
@@ -147,6 +176,11 @@ int main(int argc, char* argv[])
     server.stop();
     if (commentator.get())
         commentator->stop();
+
+#if USE_AUDIO_COMMENTATOR
+    if (audioServer.get())
+        audioServer->stop();
+#endif
 
     return 0;
 }
