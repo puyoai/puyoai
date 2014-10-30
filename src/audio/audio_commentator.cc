@@ -10,9 +10,8 @@
 
 using namespace std;
 
-AudioCommentator::AudioCommentator(const Commentator* commentator) :
-    rnd_(random_device()()),
-    commentator_(commentator)
+AudioCommentator::AudioCommentator() :
+    rnd_(random_device()())
 {
 }
 
@@ -23,7 +22,6 @@ AudioCommentator::~AudioCommentator()
 void AudioCommentator::newGameWillStart()
 {
     std::uniform_int_distribution<int> uid(0, 2);
-
     lock_guard<mutex> lock(mu_);
     switch (uid(rnd_)) {
     case 0:
@@ -57,8 +55,15 @@ void AudioCommentator::gameHasDone(GameResult gameResult)
     }
 }
 
+void AudioCommentator::onCommentatorResultUpdate(const CommentatorResult& result)
+{
+    lock_guard<mutex> lock(mu_);
+    result_ = result;
+}
+
 SpeakRequest AudioCommentator::requestSpeak()
 {
+    CommentatorResult result;
     {
         lock_guard<mutex> lock(mu_);
         if (!texts_.empty()) {
@@ -66,13 +71,13 @@ SpeakRequest AudioCommentator::requestSpeak()
             texts_.clear();
             return SpeakRequest { textToSpeak };
         }
+        result = result_;
     }
 
     vector<tuple<int, int, string>> candidates;
 
     string playerNames[] = {"ワンピー", "ツーピー"};
 
-    CommentatorResult result = commentator_->result();
     for (int pi = 0; pi < 2; ++pi) {
         if (result.firingChain[pi].chains() > 0) {
             if (!firing_[pi]) {

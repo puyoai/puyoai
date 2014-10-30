@@ -40,6 +40,12 @@ struct CommentatorResult {
     std::deque<std::string> events[2];
 };
 
+class CommentatorObserver {
+public:
+    virtual ~CommentatorObserver() {}
+    virtual void onCommentatorResultUpdate(const CommentatorResult& result) = 0;
+};
+
 class Commentator : public GameStateObserver {
 public:
     Commentator();
@@ -49,7 +55,7 @@ public:
     virtual void newGameWillStart() override;
     virtual void onUpdate(const GameState&) override;
 
-    CommentatorResult result() const;
+    void addCommentatorObserver(CommentatorObserver*);
 
     bool start();
     void stop();
@@ -62,10 +68,14 @@ private:
     void update(int pi, const CoreField&, const KumipuyoSeq&);
 
     void addEventMessage(int pi, const std::string&);
+    CommentatorResult result() const;
 
     std::thread th_;
     volatile bool shouldStop_;
+    volatile bool hasStarted_ = false;
     volatile bool needsUpdate_[2];
+
+    std::vector<CommentatorObserver*> observers_;
 
     mutable std::mutex mu_;
     CoreField field_[2];

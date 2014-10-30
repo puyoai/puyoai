@@ -6,6 +6,7 @@
 struct SpeakRequest {
     SpeakRequest() {}
     explicit SpeakRequest(std::string text) : text(text) {}
+
     std::string text;
 };
 

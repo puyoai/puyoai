@@ -1,3 +1,5 @@
+// -*- encoding: utf-8 -*-
+
 #include "core/server/commentator.h"
 
 #include <assert.h>
@@ -34,6 +36,14 @@ Commentator::~Commentator()
     shouldStop_ = true;
     if (th_.joinable())
         th_.join();
+}
+
+void Commentator::addCommentatorObserver(CommentatorObserver* observer)
+{
+    CHECK(observer);
+    CHECK(!hasStarted_);
+
+    observers_.push_back(observer);
 }
 
 void Commentator::newGameWillStart()
@@ -88,14 +98,18 @@ bool Commentator::start()
         this->runLoop();
     });
 
+    hasStarted_ = true;
     return true;
 }
 
 void Commentator::stop()
 {
     shouldStop_ = true;
-    if (th_.joinable())
+    if (th_.joinable()) {
         th_.join();
+    }
+
+    hasStarted_ = false;
 }
 
 void Commentator::runLoop()
@@ -108,6 +122,7 @@ void Commentator::runLoop()
             req = rem;
         }
 
+        bool updated = false;
         for (int pi = 0; pi < 2; ++pi) {
             // Since we don't want to lock for long, copy field and kumipuyo.
             CoreField field;
@@ -123,6 +138,14 @@ void Commentator::runLoop()
             }
 
             update(pi, field, kumipuyoSeq);
+            updated = true;
+        }
+
+        if (updated) {
+            CommentatorResult r = result();
+            for (auto observer : observers_) {
+                observer->onCommentatorResultUpdate(r);
+            }
         }
     }
 }
