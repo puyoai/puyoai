@@ -41,6 +41,7 @@ DEFINE_bool(use_commentator, false, "use commentator");
 
 #if USE_AUDIO_COMMENTATOR
 DEFINE_bool(use_audio, false, "use audio commentator");
+DEFINE_bool(use_audio_commentator, false, "use audio commentator");
 #endif
 
 static unique_ptr<Source> makeVideoSource()
@@ -152,8 +153,10 @@ int main(int argc, char* argv[])
     if (FLAGS_use_commentator && FLAGS_use_audio) {
         internalSpeaker.reset(new InternalSpeaker);
         audioServer.reset(new AudioServer(internalSpeaker.get()));
-        audioCommentator.reset(new AudioCommentator(commentator.get()));
-        audioServer->addSpeakRequester(audioCommentator.get());
+        if (FLAGS_use_audio_commentator) {
+            audioCommentator.reset(new AudioCommentator(commentator.get()));
+            audioServer->addSpeakRequester(audioCommentator.get());
+        }
     }
 #endif
 
