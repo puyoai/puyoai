@@ -13,20 +13,21 @@
 #include "base/base.h"
 #include "core/field/core_field.h"
 #include "core/kumipuyo.h"
+#include "core/server/commentator.h"
 #include "core/server/game_state_observer.h"
 
 class Commentator;
 
-class AudioCommentator : public GameStateObserver, public SpeakRequester, noncopyable {
+class AudioCommentator : public GameStateObserver, public SpeakRequester, public CommentatorObserver, noncopyable {
 public:
-    // Does not take the ownership. |speaker| should be alive
-    // AudioCommentator is alive.
-    AudioCommentator(const Commentator* commentator);
+    AudioCommentator();
     virtual ~AudioCommentator();
 
     virtual void newGameWillStart() override;
     virtual void onUpdate(const GameState&) override;
     virtual void gameHasDone(GameResult) override;
+
+    virtual void onCommentatorResultUpdate(const CommentatorResult&) override;
 
     virtual SpeakRequest requestSpeak();
 
@@ -36,7 +37,7 @@ private:
 
     std::default_random_engine rnd_;
 
-    const Commentator* commentator_ = nullptr;
+    CommentatorResult result_;
     int penalty_[3] {};
     bool firing_[2] {};
     int lastMaxRensa_[2] {};

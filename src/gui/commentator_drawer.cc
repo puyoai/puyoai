@@ -72,8 +72,7 @@ static void drawTrace(Screen* screen, int pi, const RensaTrackResult& result)
 
 }  // anonymous namespace
 
-CommentatorDrawer::CommentatorDrawer(const Commentator* commentator) :
-    commentator_(commentator)
+CommentatorDrawer::CommentatorDrawer()
 {
 }
 
@@ -81,9 +80,20 @@ CommentatorDrawer::~CommentatorDrawer()
 {
 }
 
+void CommentatorDrawer::onCommentatorResultUpdate(const CommentatorResult& result)
+{
+    lock_guard<mutex> lock(mu_);
+    result_ = result;
+}
+
 void CommentatorDrawer::draw(Screen* screen)
 {
-    CommentatorResult result = commentator_->result();
+    CommentatorResult result;
+    {
+        lock_guard<mutex> lock(mu_);
+        result = result_;
+    }
+
     drawCommentSurface(screen, result, 0);
     drawCommentSurface(screen, result, 1);
     drawMainChain(screen, result);
