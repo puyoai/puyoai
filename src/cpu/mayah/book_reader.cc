@@ -94,7 +94,6 @@ vector<BookField> BookReader::parse(const string& filename)
                 score = 1.0;
             }
 
-            // TODO(mayah): awful bad code.
             vector<string> names = split(trim(str.substr(8)));
             CHECK(names.size() > 0);
             {
