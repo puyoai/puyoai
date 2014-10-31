@@ -4,13 +4,18 @@
 
 #include "audio/audio_server.h"
 #include "audio/speaker.h"
-#include "audio/speak_requester.h"
 
 using namespace std;
 
 AudioServer::AudioServer(Speaker* speaker) :
-    speaker_(speaker)
+    speaker_(speaker),
+    shouldStop_(false)
 {
+}
+
+AudioServer::~AudioServer()
+{
+    stop();
 }
 
 void AudioServer::start()
@@ -28,46 +33,51 @@ void AudioServer::stop()
         th_.join();
 }
 
-void AudioServer::addSpeakRequester(SpeakRequester* requester)
+void AudioServer::submit(const std::string& text, int priority, int timeout)
 {
-    lock_guard<mutex> lock(mu_);
-    speakRequesters_.push_back(requester);
-}
+    LOG(INFO) << "audio submitted: " << text;
 
-void AudioServer::addText(const std::string& text)
-{
     unique_lock<mutex> lock(mu_);
-    texts_.push_back(text);
+
+    chrono::system_clock::time_point p = chrono::system_clock::now();
+    p += chrono::seconds(timeout);
+
+    requests_.emplace(text, priority, p);
     cond_.notify_one();
 }
 
 void AudioServer::runLoop()
 {
+    LOG(INFO) << "hogehoge";
     while (!shouldStop_) {
-        for (SpeakRequester* requester : speakRequesters_) {
-            SpeakRequest req = requester->requestSpeak();
-            if (!req.text.empty()) {
-                addText(req.text);
-            }
+        LOG(INFO) << "hoge";
+        SpeakRequest request = take();
+        LOG(INFO) << "fuga";
+        if (request.text.empty())
+            continue;
+
+        chrono::system_clock::time_point p = chrono::system_clock::now();
+        if (request.timeoutPoint < p) {
+            LOG(INFO) << "timeout: " << request.text;
+            continue;
         }
 
-        string textToSpeak;
-        {
-            unique_lock<mutex> lock(mu_);
-            if (texts_.empty()) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(16));
-            }
-
-            if (!texts_.empty()) {
-                textToSpeak = texts_.back();
-                texts_.pop_back();
-                texts_.clear();
-            }
-        }
-
-        LOG(INFO) << "Speak: " << textToSpeak;
-        if (speaker_)
-            speaker_->speak(textToSpeak);
+        LOG(INFO) << "Speak: " << request.text;
+        speaker_->speak(request.text);
     }
+}
+
+AudioServer::SpeakRequest AudioServer::take()
+{
+    unique_lock<mutex> lock(mu_);
+    while (requests_.empty()) {
+        if (shouldStop_)
+            return SpeakRequest();
+        cond_.wait(lock);
+    }
+
+    SpeakRequest request = requests_.top();
+    requests_.pop();
+    return request;
 }
 

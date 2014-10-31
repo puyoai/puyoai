@@ -4,13 +4,14 @@
 #include <iostream>
 #include "glog/logging.h"
 
-#include "audio/speaker.h"
+#include "audio/audio_server.h"
 #include "core/server/commentator.h"
 #include "core/server/game_state.h"
 
 using namespace std;
 
-AudioCommentator::AudioCommentator() :
+AudioCommentator::AudioCommentator(AudioServer* audioServer) :
+    audioServer_(audioServer),
     rnd_(random_device()())
 {
 }
@@ -25,13 +26,13 @@ void AudioCommentator::newGameWillStart()
     lock_guard<mutex> lock(mu_);
     switch (uid(rnd_)) {
     case 0:
-        texts_.push_back("さあ、ゲームの始まりです。");
+        audioServer_->submit("さあ、ゲームの始まりです。");
         break;
     case 1:
-        texts_.push_back("始まりましたよ、おくさん。");
+        audioServer_->submit("始まりましたよ、おくさん。");
         break;
     case 2:
-        texts_.push_back("はじまりました。");
+        audioServer_->submit("はじまりました。", 1, 5);
         break;
     }
 }
@@ -42,13 +43,12 @@ void AudioCommentator::onUpdate(const GameState&)
 
 void AudioCommentator::gameHasDone(GameResult gameResult)
 {
-    lock_guard<mutex> lock(mu_);
     switch (gameResult) {
     case GameResult::P1_WIN:
-        texts_.push_back("ワンピーの勝ち");
+        audioServer_->submit("ワンピーの勝ち");
         break;
     case GameResult::P2_WIN:
-        texts_.push_back("ツーピーの勝ち");
+        audioServer_->submit("ツーピーの勝ち");
         break;
     default:
         break;
@@ -57,23 +57,6 @@ void AudioCommentator::gameHasDone(GameResult gameResult)
 
 void AudioCommentator::onCommentatorResultUpdate(const CommentatorResult& result)
 {
-    lock_guard<mutex> lock(mu_);
-    result_ = result;
-}
-
-SpeakRequest AudioCommentator::requestSpeak()
-{
-    CommentatorResult result;
-    {
-        lock_guard<mutex> lock(mu_);
-        if (!texts_.empty()) {
-            string textToSpeak = texts_.back();
-            texts_.clear();
-            return SpeakRequest { textToSpeak };
-        }
-        result = result_;
-    }
-
     vector<tuple<int, int, string>> candidates;
 
     string playerNames[] = {"ワンピー", "ツーピー"};
@@ -141,7 +124,7 @@ SpeakRequest AudioCommentator::requestSpeak()
     }
 
     if (candidates.empty())
-        return SpeakRequest();
+        return;
 
     const auto& st = *max_element(candidates.begin(), candidates.end());
     switch (get<1>(st)) {
@@ -158,5 +141,6 @@ SpeakRequest AudioCommentator::requestSpeak()
         penalty_[2] = 12;
         break;
     }
-    return SpeakRequest(get<2>(st));
+
+    audioServer_->submit(get<2>(st));
 }

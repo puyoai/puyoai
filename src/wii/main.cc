@@ -156,9 +156,8 @@ int main(int argc, char* argv[])
     if (FLAGS_use_commentator && FLAGS_use_audio) {
         internalSpeaker.reset(new InternalSpeaker);
         audioServer.reset(new AudioServer(internalSpeaker.get()));
-        audioCommentator.reset(new AudioCommentator);
+        audioCommentator.reset(new AudioCommentator(audioServer.get()));
         commentator->addCommentatorObserver(audioCommentator.get());
-        audioServer->addSpeakRequester(audioCommentator.get());
     }
 #endif
 
