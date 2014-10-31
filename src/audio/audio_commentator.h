@@ -9,18 +9,19 @@
 #include <thread>
 #include <vector>
 
-#include "audio/speak_requester.h"
 #include "base/noncopyable.h"
 #include "core/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/server/commentator.h"
 #include "core/server/game_state_observer.h"
 
+class AudioServer;
 class Commentator;
 
-class AudioCommentator : public GameStateObserver, public SpeakRequester, public CommentatorObserver, noncopyable {
+class AudioCommentator : public GameStateObserver, public CommentatorObserver, noncopyable {
 public:
-    AudioCommentator();
+    // Doesn't take onwership
+    explicit AudioCommentator(AudioServer* audioServer);
     virtual ~AudioCommentator();
 
     virtual void newGameWillStart() override;
@@ -28,15 +29,12 @@ public:
     virtual void gameHasDone(GameResult) override;
 
     virtual void onCommentatorResultUpdate(const CommentatorResult&) override;
-
-    virtual SpeakRequest requestSpeak();
-
 private:
-    std::mutex mu_;
-    std::vector<std::string> texts_;
+    AudioServer* audioServer_;
 
     std::default_random_engine rnd_;
 
+    std::mutex mu_;
     CommentatorResult result_;
     int penalty_[3] {};
     bool firing_[2] {};

@@ -11,11 +11,10 @@ int main(void)
 {
     InternalSpeaker speaker;
     AudioServer ac(&speaker);
-
-    ac.addText("進捗どうですか");
-    ac.addText("進捗だめです");
-
     ac.start();
+
+    ac.submit("進捗どうですか");
+    ac.submit("進捗だめです");
 
     string s;
     getline(cin, s);
