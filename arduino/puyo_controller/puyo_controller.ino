@@ -695,5 +695,5 @@ void loop()
         bp = 0;
     }
 
-    delay(32);
+    delay(34);
 }
