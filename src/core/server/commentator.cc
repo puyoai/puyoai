@@ -152,6 +152,11 @@ void Commentator::runLoop()
 
 void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
 {
+    for (const Kumipuyo& kp : kumipuyoSeq) {
+        if (kp.axis == PuyoColor::EMPTY || kp.child == PuyoColor::EMPTY)
+            return;
+    }
+
     // 1. Check field is firing a rensa.
     {
         CoreField f(field);
