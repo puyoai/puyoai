@@ -35,15 +35,19 @@ static string formatPlainField(const PlainField& field)
 
 static string formatNext(const KumipuyoSeq& seq)
 {
-    CHECK(seq.size() >= 3);
-
     stringstream ss;
-    ss << toCompatibleChar(seq.get(0).axis);
-    ss << toCompatibleChar(seq.get(0).child);
-    ss << toCompatibleChar(seq.get(1).axis);
-    ss << toCompatibleChar(seq.get(1).child);
-    ss << toCompatibleChar(seq.get(2).axis);
-    ss << toCompatibleChar(seq.get(2).child);
+    if (seq.size() >= 1) {
+        ss << toCompatibleChar(seq.get(0).axis);
+        ss << toCompatibleChar(seq.get(0).child);
+    }
+    if (seq.size() >= 2) {
+        ss << toCompatibleChar(seq.get(1).axis);
+        ss << toCompatibleChar(seq.get(1).child);
+    }
+    if (seq.size() >= 3) {
+        ss << toCompatibleChar(seq.get(2).axis);
+        ss << toCompatibleChar(seq.get(2).child);
+    }
     return ss.str();
 }
 
