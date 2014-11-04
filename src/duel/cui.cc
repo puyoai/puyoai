@@ -35,9 +35,9 @@ string locate(int playerId, int x, int y)
 string puyoText(PuyoColor color, int y = 0)
 {
     string text;
-    if (color == OJAMA) {
+    if (color == PuyoColor::OJAMA) {
         text = "@@";
-    } else if (color == WALL) {
+    } else if (color == PuyoColor::WALL) {
         text = "##";
     } else {
         if (y == 13)
