@@ -7,7 +7,7 @@
 #include "core/key_set.h"
 
 struct FrameResponse {
-    static FrameResponse parse(const char* str);
+    static FrameResponse parse(const std::string&);
 
     FrameResponse() {}
     explicit FrameResponse(int frameId,
