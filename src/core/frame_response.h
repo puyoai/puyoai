@@ -10,7 +10,9 @@ struct FrameResponse {
     static FrameResponse parse(const char* str);
 
     FrameResponse() {}
-    explicit FrameResponse(int frameId, const Decision& decision = Decision(), const std::string& msg = std::string()) :
+    explicit FrameResponse(int frameId,
+                           const Decision& decision = Decision(),
+                           const std::string& msg = std::string()) :
         frameId(frameId), decision(decision), msg(msg) {}
 
     bool isValid() const;

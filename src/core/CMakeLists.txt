@@ -35,6 +35,8 @@ function(puyoai_core_add_test target)
 endfunction()
 
 puyoai_core_add_test(decision)
+puyoai_core_add_test(frame_response)
+puyoai_core_add_test(frame_request)
 puyoai_core_add_test(key_set)
 puyoai_core_add_test(kumipuyo)
 puyoai_core_add_test(kumipuyo_pos)

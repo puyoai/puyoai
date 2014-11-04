@@ -31,7 +31,6 @@ FrameResponse FrameResponse::parse(const char* str)
     std::string tmp;
 
     FrameResponse data;
-
     data.received = true;
     data.original = std::string(str);
 
@@ -57,7 +56,7 @@ FrameResponse FrameResponse::parse(const char* str)
 
 bool FrameResponse::isValid() const
 {
-    if (!connectionLost || !received)
+    if (connectionLost || !received)
         return false;
 
     return decision.isValid();
