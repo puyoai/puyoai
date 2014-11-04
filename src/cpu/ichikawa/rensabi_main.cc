@@ -23,7 +23,6 @@ typedef DeprecatedField Field;
 
 const char NORMAL_COLOR_BEGIN = 4;
 const char NORMAL_COLOR_END = 8;
-const char IMPOSSIBLE = NORMAL_COLOR_END;
 
 DEFINE_int32(goal_chain_len, 9, "");
 DEFINE_bool(hate_small_chain, false, "");
