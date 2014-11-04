@@ -39,4 +39,9 @@ constexpr bool isNormalColor(PuyoColor color)
     return static_cast<int>(PuyoColor::RED) <= static_cast<int>(color) && static_cast<int>(color) <= static_cast<int>(PuyoColor::GREEN);
 }
 
+inline std::ostream& operator<<(std::ostream& os, PuyoColor c)
+{
+    return os << toChar(c);
+}
+
 #endif
