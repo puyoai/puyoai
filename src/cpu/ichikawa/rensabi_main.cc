@@ -88,14 +88,14 @@ class Chunk {
   char fill_color_;
 };
 
-void GetInput(Input* input, ofstream& log) {
+void GetInput(Input* input) {
   string str;
   getline(cin, str, '\n');
 
   istringstream iss(str);
   string tmp;
   input->original = str;
-  //log << "[" << input->original << "]" << endl << flush;
+
   string my_field_str, my_puyos_str;
   while(getline(iss, tmp, ' ')) {
     if (tmp.substr(0, 3) == "ID=") {
@@ -320,7 +320,7 @@ bool CreateKagiChunk(
 }
 
 void Dream(
-    FieldWithColorSequence* field, Point* fire_point, char* fire_color, vector<Chunk>* chunks, bool debug = false) {
+    FieldWithColorSequence* field, Point* fire_point, char* fire_color, vector<Chunk>* chunks) {
   chunks->clear();
 
   Chunk chunk(field);
@@ -336,22 +336,16 @@ void Dream(
   *fire_color = chunks->back().fill_color();
 }
 
-int GetMaxChainLen(const FieldWithColorSequence& work_field, int* num_valuable_puyos, bool debug = false) {
+int GetMaxChainLen(const FieldWithColorSequence& work_field, int* num_valuable_puyos) {
   FieldWithColorSequence dream_field = work_field;
   Point fire_point;
   char fire_color = 0;
   vector<Chunk> chunks;
-  Dream(&dream_field, &fire_point, &fire_color, &chunks, debug);
-  if (debug) {
-    cout << "work:" << endl << FieldToStr(work_field) << endl;
-    cout << "dream:" << endl << FieldToStr(dream_field) << endl;
-  }
+  Dream(&dream_field, &fire_point, &fire_color, &chunks);
   int chains, score, frames;
   dream_field.Simulate(&chains, &score, &frames);
   Dream(&dream_field, fire_point, fire_color);
   dream_field.Simulate(&chains, &score, &frames);
-  if (debug) cout << "chains: " << chains << endl;
-
   *num_valuable_puyos = 0;
   for (int i = 0; i < int(chunks.size()); ++i) {
     for (int j = 0; j < int(chunks[i].points().size()); ++j) {
@@ -393,6 +387,7 @@ void DropOjamas(FieldWithColorSequence* field, int num_ojamas) {
 }
 
 int FirstColumnBonus(const FieldWithColorSequence& field) {
+  UNUSED_VARIABLE(field);
   return 0;
   /*
   for (int y = 1; y <= FieldWithColorSequence::HEIGHT; ++y) {
@@ -404,9 +399,9 @@ int FirstColumnBonus(const FieldWithColorSequence& field) {
   */
 }
 
-int GetDreamHappiness(const FieldWithColorSequence& field, bool debug = false) {
+int GetDreamHappiness(const FieldWithColorSequence& field) {
   int num_valuable_puyos = 0;
-  int max_chain_len = GetMaxChainLen(field, &num_valuable_puyos, debug);
+  int max_chain_len = GetMaxChainLen(field, &num_valuable_puyos);
   return FirstColumnBonus(field) * 100000000 +
       max_chain_len * 1000000 +
       num_valuable_puyos * 1000 +
@@ -417,8 +412,7 @@ int GetHappiness(
     const FieldWithColorSequence& field,
     const vector<pair<char, char> >& puyos_list,
     const vector<Decision>& decisions,
-    const vector<int>& num_ojamas_list,
-    bool debug = false) {
+    const vector<int>& num_ojamas_list) {
   assert(decisions.size() >= 2);
   assert(puyos_list.size() >= decisions.size());
   assert(num_ojamas_list.size() >= decisions.size());
@@ -447,7 +441,7 @@ int GetHappiness(
   } else if (step < int(decisions.size())) {
     return immediate_happiness;
   } else {
-    int dream_happiness = GetDreamHappiness(work_field, debug);
+    int dream_happiness = GetDreamHappiness(work_field);
     if (FLAGS_hate_small_chain) {
       return max_chains > 0 ? immediate_happiness : dream_happiness;
     } else {
@@ -478,15 +472,13 @@ void EvaluateDecisions(
   if (!CanPut(input.my_field, input.my_current_point, decisions[0])) return;
   int happiness = GetHappiness(
       input.my_field, puyos_list, decisions, num_ojamas_list);
-  //log << "happiness: " << happiness << endl;
-  //log << new_field.GetDebugOutput() << endl;
   if (happiness > *max_happiness) {
     *max_decisions = decisions;
     *max_happiness = happiness;
   }
 }
 
-void Act(const Input& input, bool ojama_comming, Decision* decision, ostream& log) {
+void Act(const Input& input, bool ojama_comming, Decision* decision) {
   const FieldWithColorSequence& field = input.my_field;
   vector<pair<char, char> > puyos_list;
   for (int i = 0; i < 3; ++i) {
@@ -525,10 +517,9 @@ void Act(const Input& input, bool ojama_comming, Decision* decision, ostream& lo
     for (int i = 0; i < int(max_decisions.size()); ++i) {
       Put(&new_field, max_decisions[i], puyos_list[i]);
     }
-    //log << "current:" << endl;
-    //log << input.my_field.GetDebugOutput() << endl;
-    log << "max_happiness: " << max_happiness << endl;
-    log << new_field.GetDebugOutput() << endl;
+
+    LOG(INFO) << "max_happiness: " << max_happiness << endl;
+    LOG(INFO) << new_field.GetDebugOutput() << endl;
 
     int chains, score, frames;
     new_field.Simulate(&chains, &score, &frames);
@@ -536,8 +527,8 @@ void Act(const Input& input, bool ojama_comming, Decision* decision, ostream& lo
     char fire_color;
     vector<Chunk> chunks;
     Dream(&new_field, &fire_point, &fire_color, &chunks);
-    log << "dream:" << endl;
-    log << FieldToStr(new_field) << endl;
+    LOG(INFO) << "dream:" << endl;
+    LOG(INFO) << FieldToStr(new_field) << endl;
     *decision = max_decisions[0];
 
   } else {
@@ -549,21 +540,7 @@ void Act(const Input& input, bool ojama_comming, Decision* decision, ostream& lo
 bool chain_finished = true;
 bool ojama_comming = false;
 
-void GetDecision(const Input& input, Decision* decision, ostream& log) {
-  /*
-  log
-    << input.state.i_activated
-    << input.state.other_activated
-    << input.state.i_next_next
-    << input.state.other_next_next
-    << input.state.i_fixed
-    << input.state.other_fixed
-    << input.state.i_won
-    << input.state.other_won
-    << input.state.i_chain_finished
-    << input.state.other_chain_finished << endl;
-  log << input.my_field.GetDebugOutput() << endl;
-  */
+void GetDecision(const Input& input, Decision* decision) {
   if (input.id == 1 || input.state.i_chain_finished) {
     chain_finished = true;
   }
@@ -572,8 +549,8 @@ void GetDecision(const Input& input, Decision* decision, ostream& log) {
   }
 
   if (input.state.i_activated && (chain_finished || ojama_comming)) {
-    if (ojama_comming) log << "OJAMA!" << endl;
-    Act(input, ojama_comming, decision, log);
+    LOG_IF(INFO, ojama_comming) << "OJAMA!" << endl;
+    Act(input, ojama_comming, decision);
     chain_finished = false;
     ojama_comming = false;
   } else {
@@ -584,8 +561,7 @@ void GetDecision(const Input& input, Decision* decision, ostream& log) {
 
 void TestHappiness(const string& field_str) {
   FieldWithColorSequence field(field_str);
-  GetDreamHappiness(field, true);
-  cout << "------------------" << endl;
+  GetDreamHappiness(field);
 }
 
 // argv[1] will have "Player1" for player 1, and "Player2" for player 2.
@@ -604,27 +580,21 @@ int main(int argc, char* argv[]) {
   } else if (arg == "exp") {
 
   } else {
-    // Logging.
-    string name = arg + ".txt";
-    ofstream log(name.c_str(), ios_base::out | ios_base::app);
-    log << "------------------" << endl;
-
     // Make sure the CPU is connected to the duel server.
     // Echo back what we receive.
     // MAKE SURE to flush.
     Input input;
-    GetInput(&input, log);
+    GetInput(&input);
     cout << input.original << endl << flush;
 
     while (1) {
-      GetInput(&input, log);
-      //log << "Received: " << input.original << endl << flush;
+      GetInput(&input);
       Decision decision;
-      GetDecision(input, &decision, log);
+      GetDecision(input, &decision);
       if (decision.x >= 0) {
         cout << "ID=" << input.id
             << " X=" << decision.x << " R=" << decision.r << endl << flush;
-        log << "Output: ID=" << input.id << " X=" << decision.x << " R=" << decision.r << endl << flush;
+        LOG(INFO) << "Output: ID=" << input.id << " X=" << decision.x << " R=" << decision.r << endl << flush;
       }
     }
 
