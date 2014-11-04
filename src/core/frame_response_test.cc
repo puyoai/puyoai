@@ -21,3 +21,19 @@ TEST(FrameResponseTest, parse)
 
     EXPECT_TRUE(response.isValid());
 }
+
+TEST(FrameResponseTest, toStringAndParse)
+{
+    FrameResponse expected;
+    expected.received = true;
+    expected.frameId = 100;
+    expected.decision = Decision(3, 0);
+    expected.msg = "message with space";
+
+    FrameResponse actual = FrameResponse::parse(expected.toString());
+
+    EXPECT_TRUE(actual.isValid());
+    EXPECT_EQ(expected.frameId, actual.frameId);
+    EXPECT_EQ(expected.decision, actual.decision);
+    EXPECT_EQ(expected.msg, actual.msg);
+}

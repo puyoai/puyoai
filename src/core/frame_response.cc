@@ -25,7 +25,7 @@ static string escapeMessage(string str)
 }
 
 // static
-FrameResponse FrameResponse::parse(const char* str)
+FrameResponse FrameResponse::parse(const string& str)
 {
     std::istringstream iss(str);
     std::string tmp;
