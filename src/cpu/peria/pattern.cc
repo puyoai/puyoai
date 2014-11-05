@@ -88,7 +88,7 @@ int Pattern::Match(const CoreField& field) const {
       const char c0 = pattern_[y - 1][x - 1];
       const char c1 = pattern_[y - 1][PlainField::WIDTH - x];
       PuyoColor color = field.get(x, y);
-      if (color != OJAMA) {
+      if (color != PuyoColor::OJAMA) {
         if (c0 != '.')
           ++matching0[c0][color];
         if (c1 != '.')
@@ -96,7 +96,7 @@ int Pattern::Match(const CoreField& field) const {
       }
     }
   }
-  
+
   int score = std::max(GetScore(matching0), GetScore(matching1));
   return score;
 }
@@ -118,7 +118,7 @@ void Pattern::Optimize() {
         neighbors_.insert(Neighbor(c1, c0));
       }
     }
-  } 
+  }
 
   num_puyos_ = 0;
   for (const auto& line : pattern_) {
@@ -139,7 +139,7 @@ void Pattern::Optimize() {
 
 void Pattern::AppendField(std::string line) {
   DCHECK(line.size() == PlainField::WIDTH);
-  
+
   for (auto& c : line) {
     if (std::islower(c))
       c = '.';
@@ -150,9 +150,9 @@ void Pattern::AppendField(std::string line) {
 int Pattern::GetScore(
     std::map<char, std::map<PuyoColor, int> >& matching) const {
   int sum = 0;
-  matching['_'][EMPTY] += 0;
+  matching['_'][PuyoColor::EMPTY] += 0;
   if (matching['_'].size() == 1)
-    sum = matching['_'][EMPTY];
+    sum = matching['_'][PuyoColor::EMPTY];
   matching.erase('_');
 
   for (auto& matching_itr : matching) {
