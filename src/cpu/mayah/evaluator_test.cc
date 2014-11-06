@@ -36,6 +36,20 @@ protected:
         evaluator.collectScore(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
         return sc.toCollectedFeature();
     }
+
+    template<typename F>
+    CollectedFeature withEvaluator(F f) {
+        TsumoPossibility::initialize();
+
+        FeatureParameter featureParameter;
+        vector<BookField> books;
+        FeatureScoreCollector sc(featureParameter);
+        Evaluator<FeatureScoreCollector> evaluator(books, &sc);
+
+        f(&evaluator);
+
+        return sc.toCollectedFeature();
+    }
 };
 
 TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
@@ -65,7 +79,10 @@ TEST_F(EvaluatorTest, RidgeHeight1)
         "  O  O"
         "OOOOOO");
 
-    CollectedFeature cf = eval(f);
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+        evaluator->evalRidgeHeight(f);
+    });
+
     const vector<int>& vs = cf.feature(RIDGE_HEIGHT);
     EXPECT_TRUE(find(vs.begin(), vs.end(), 4) != vs.end());
 }
@@ -79,7 +96,10 @@ TEST_F(EvaluatorTest, RidgeHeight2)
         " OOO O"
         "OOOOOO");
 
-    CollectedFeature cf = eval(f);
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+        evaluator->evalRidgeHeight(f);
+    });
+
     const vector<int>& vs = cf.feature(RIDGE_HEIGHT);
     EXPECT_TRUE(find(vs.begin(), vs.end(), 2) != vs.end());
 }
@@ -93,7 +113,10 @@ TEST_F(EvaluatorTest, RidgeHeight3)
         " OOO O"
         "OOOOOO");
 
-    CollectedFeature cf = eval(f);
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+        evaluator->evalRidgeHeight(f);
+    });
+
     const vector<int>& vs = cf.feature(RIDGE_HEIGHT);
     EXPECT_TRUE(find(vs.begin(), vs.end(), 1) != vs.end());
 }
@@ -104,13 +127,9 @@ TEST_F(EvaluatorTest, connection)
                 "OOOOOO"
                 "BBYYGO");
 
-    FeatureParameter param;
-    std::vector<BookField> books;
-    FeatureScoreCollector sc(param);
-    Evaluator<FeatureScoreCollector> evaluator(books, &sc);
-
-    evaluator.collectScoreForConnection(f);
-    CollectedFeature cf = sc.toCollectedFeature();
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+        evaluator->collectScoreForConnection(f);
+    });
 
     map<int, int> vs;
     for (int v : cf.feature(CONNECTION)) {
@@ -128,6 +147,7 @@ TEST_F(EvaluatorTest, ConnectionHorizontal1)
         "B B B "
         "GG YY "
         "RRRGGG");
+
     CollectedFeature cf = eval(f);
 
     map<int, int> m[7];

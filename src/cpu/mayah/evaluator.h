@@ -125,10 +125,10 @@ public:
     void evalRestrictedConnectionHorizontalFeature(const RefPlan&);
     void evalDensityFeature(const RefPlan&);
     void evalThirdColumnHeightFeature(const RefPlan& plan);
-    void evalValleyDepth(const RefPlan& plan);
-    void evalRidgeHeight(const RefPlan& plan);
-    void evalFieldUShape(const RefPlan& plan, bool enemyHasZenkeshi);
-    void evalUnreachableSpace(const RefPlan& plan);
+    void evalValleyDepth(const CoreField&);
+    void evalRidgeHeight(const CoreField&);
+    void evalFieldUShape(const RefPlan&, bool enemyHasZenkeshi);
+    void evalUnreachableSpace(const RefPlan&);
 
     void evalMidEval(const MidEvalResult&);
 
