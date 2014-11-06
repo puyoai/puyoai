@@ -222,12 +222,12 @@ void Evaluator<ScoreCollector>::evalThirdColumnHeightFeature(const RefPlan& plan
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalValleyDepth(const RefPlan& plan)
+void Evaluator<ScoreCollector>::evalValleyDepth(const CoreField& field)
 {
     for (int x = 1; x <= 6; ++x) {
-        int currentHeight = plan.field().height(x);
-        int leftHeight = (x == 1) ? 14 : plan.field().height(x - 1);
-        int rightHeight = (x == 6) ? 14 : plan.field().height(x + 1);
+        int currentHeight = field.height(x);
+        int leftHeight = (x == 1) ? 14 : field.height(x - 1);
+        int rightHeight = (x == 6) ? 14 : field.height(x + 1);
 
         int left = std::max(leftHeight - currentHeight, 0);
         int right = std::max(rightHeight - currentHeight, 0);
@@ -238,12 +238,12 @@ void Evaluator<ScoreCollector>::evalValleyDepth(const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalRidgeHeight(const RefPlan& plan)
+void Evaluator<ScoreCollector>::evalRidgeHeight(const CoreField& field)
 {
     for (int x = 1; x <= 6; ++x) {
-        int currentHeight = plan.field().height(x);
-        int leftHeight = (x == 1) ? 14 : plan.field().height(x - 1);
-        int rightHeight = (x == 6) ? 14 : plan.field().height(x + 1);
+        int currentHeight = field.height(x);
+        int leftHeight = (x == 1) ? 14 : field.height(x - 1);
+        int rightHeight = (x == 6) ? 14 : field.height(x + 1);
 
         int left = std::max(currentHeight - leftHeight, 0);
         int right = std::max(currentHeight - rightHeight, 0);
@@ -639,9 +639,9 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(plan);
     if (USE_VALLEY_FEATURE)
-        evalValleyDepth(plan);
+        evalValleyDepth(plan.field());
     if (USE_RIDGE_FEATURE)
-        evalRidgeHeight(plan);
+        evalRidgeHeight(plan.field());
     if (USE_FIELD_USHAPE_FEATURE)
         evalFieldUShape(plan, enemy.hasZenkeshi);
 
