@@ -124,10 +124,11 @@ BoxAnalyzeResult SomagicAnalyzer::analyzeBox(const SDL_Surface* surface, const B
             RealColor rc = toRealColor(hsv);
 
             if (showsColor) {
+                // TODO(mayah): stringstream?
                 char buf[240];
                 sprintf(buf, "%3d %3d : %3d %3d %3d : %7.3f %7.3f %7.3f : %s",
                         by, bx, static_cast<int>(r), static_cast<int>(g), static_cast<int>(b),
-                        hsv.h, hsv.s, hsv.v, toString(rc));
+                        hsv.h, hsv.s, hsv.v, toString(rc).c_str());
                 cout << buf << endl;
             }
 

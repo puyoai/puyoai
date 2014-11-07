@@ -2,6 +2,7 @@
 #define CORE_REAL_COLOR_H_
 
 #include <ostream>
+#include <string>
 
 enum class RealColor {
     RC_EMPTY,
@@ -20,7 +21,7 @@ constexpr int ordinal(RealColor rc) { return static_cast<int>(rc); }
 constexpr RealColor intToRealColor(int x) { return static_cast<RealColor>(x); }
 RealColor toRealColor(char c);
 char toChar(RealColor, bool usesCapital = true);
-const char* toString(RealColor);
+std::string toString(RealColor);
 std::ostream& operator<<(std::ostream&, RealColor);
 
 inline bool isNormalColor(RealColor rc)

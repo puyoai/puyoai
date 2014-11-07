@@ -39,8 +39,8 @@ string toString(CaptureGameState cgs)
     case CaptureGameState::FINISHED:     return "finished";
     }
 
-    DCHECK(false) << "Unknown CaptureGameState: "  << static_cast<int>(cgs);
-    return "";
+    CHECK(false) << "Unknown CaptureGameState: "  << static_cast<int>(cgs);
+    return string();
 }
 
 string toString(NextPuyoState nps)
@@ -52,7 +52,7 @@ string toString(NextPuyoState nps)
     }
 
     CHECK(false) << "Unknown NextPuyoState: " << static_cast<int>(nps);
-    return "";
+    return string();
 }
 
 DetectedField::DetectedField()
