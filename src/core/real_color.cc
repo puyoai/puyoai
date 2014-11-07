@@ -2,6 +2,8 @@
 
 #include <glog/logging.h>
 
+using namespace std;
+
 RealColor toRealColor(char c)
 {
     switch (c) {
@@ -36,7 +38,7 @@ char toChar(RealColor rc, bool usesCapital)
     return '-';
 }
 
-const char* toString(RealColor rc)
+string toString(RealColor rc)
 {
     switch (rc) {
     case RealColor::RC_EMPTY:
