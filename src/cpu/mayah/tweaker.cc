@@ -143,9 +143,9 @@ int main(int argc, char* argv[])
         run(executor.get(), parameter);
     } else {
         map<double, RunResult> scoreMap;
-        for (double x = 0; x <= 20; x += 1) {
+        for (double x = 13; x <= 16; x += 0.5) {
             cout << "current x = " << x << endl;
-            parameter.setValue(HAND_WIDTH_2, 1, -x);
+            parameter.setValue(FIELD_USHAPE, -x);
             scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {
