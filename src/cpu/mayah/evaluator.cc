@@ -569,9 +569,12 @@ void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const RefPlan& pl
         }
     }
 
-    sc_->addScore(HAND_WIDTH_2, distanceCount[2] > 10 ? 10 : distanceCount[2], 1);
-    sc_->addScore(HAND_WIDTH_3, distanceCount[3] > 10 ? 10 : distanceCount[3], 1);
-    sc_->addScore(HAND_WIDTH_4, distanceCount[4] > 10 ? 10 : distanceCount[4], 1);
+    if (distanceCount[2] > 0)
+        sc_->addScore(HAND_WIDTH_2, distanceCount[2] > 10 ? 10 : distanceCount[2], 1);
+    if (distanceCount[3] > 0)
+        sc_->addScore(HAND_WIDTH_3, distanceCount[3] > 10 ? 10 : distanceCount[3], 1);
+    if (distanceCount[4] > 0)
+        sc_->addScore(HAND_WIDTH_4, distanceCount[4] > 10 ? 10 : distanceCount[4], 1);
 }
 
 template<typename ScoreCollector>
