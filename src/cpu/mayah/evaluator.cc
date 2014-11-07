@@ -493,7 +493,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const RefPlan& pl
 
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = 1; y <= CoreField::HEIGHT; ++y) {
-            if (!trackResult.erasedAt(x, y) != 1)
+            if (trackResult.erasedAt(x, y) != 1)
                 continue;
             if (plan.field().color(x, y) == PuyoColor::EMPTY)
                 continue;
