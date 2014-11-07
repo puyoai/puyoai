@@ -1,73 +1,63 @@
-#include "capture.h"
-#include "viddev.h"
-
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-int main(int argc, char* argv[]) {
-  google::ParseCommandLineFlags(&argc, &argv, true);
-  google::InitGoogleLogging(argv[0]);
+#include "capture/capture.h"
+#include "capture/screen_shot_saver.h"
+#include "capture/somagic_analyzer.h"
+#include "capture/viddev_source.h"
+#include "gui/bounding_box_drawer.h"
+#include "gui/box.h"
+#include "gui/main_window.h"
 
-  if (argc != 2) {
-    fprintf(stderr, "Usage: %s <viddev>\n", argv[0]);
-    exit(EXIT_FAILURE);
-  }
+#include "gui/screen.h"
 
-#ifdef __linux__
+#include <iostream>
 
-  SDL_Init(SDL_INIT_VIDEO);
+DEFINE_bool(save_screenshot, false, "save screenshot");
+DEFINE_bool(draw_result, true, "draw analyzer result");
 
-  VidDev* dev = new VidDev(argv[1]);
+int main(int argc, char* argv[])
+{
+    google::ParseCommandLineFlags(&argc, &argv, true);
+    google::InitGoogleLogging(argv[0]);
 
-  if (!dev->ok()) {
-    fprintf(stderr, "Failed to load %s\n", argv[1]);
-    exit(EXIT_FAILURE);
-  }
-
-  Capture cap(dev->width(), dev->height(), 16);
-  SDL_Surface* scr = cap.getScreen()->scr();
-
-  Uint32 start_ticks = SDL_GetTicks();
-  bool save_all_frames = false;
-  while (1) {
-    SDL_Surface* surf = dev->getNextFrame();
-    if (!surf)
-      break;
-
-    cap.addFrame(surf);
-    cap.show();
-
-    SDL_Event ev;
-    while (SDL_PollEvent(&ev)) {
-      switch (ev.type) {
-      case SDL_QUIT:
-        return 0;
-      case SDL_KEYDOWN:
-        if (ev.key.keysym.sym == SDLK_s) {
-          Source::saveScreenShot(surf, scr);
-        } else if (ev.key.keysym.sym == SDLK_t) {
-          save_all_frames = !save_all_frames;
-        }
-        break;
-      }
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <viddev>\n", argv[0]);
+        exit(EXIT_FAILURE);
     }
 
-    if (save_all_frames) {
-      Source::saveScreenShot(surf, scr);
+    SDL_Init(SDL_INIT_VIDEO);
+    atexit(SDL_Quit);
+
+    VidDevSource source(argv[1]);
+    if (!source.ok()) {
+        fprintf(stderr, "Failed to load %s\n", argv[1]);
+        exit(EXIT_FAILURE);
     }
 
-    if (0) {
-      static int current_id = 0;
-      current_id++;
-      Uint32 now = SDL_GetTicks();
-      if (now != start_ticks) {
-        fprintf(stderr, "%f fps\n",
-                (float)current_id * 1000 / (now - start_ticks));
-      }
-    }
-  }
+    // TODO(mayah): Needs to implement ViddevAnalyzer.
+    // VidDevAnalyzer analyzer;
+    SomagicAnalyzer analyzer;
+    Capture capture(&source, &analyzer);
 
-#endif
+    unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;
+    if (FLAGS_draw_result)
+        analyzerResultDrawer.reset(new AnalyzerResultDrawer(&capture));
 
-  return 0;
+    unique_ptr<ScreenShotSaver> saver;
+    if (FLAGS_save_screenshot)
+        saver.reset(new ScreenShotSaver);
+
+    MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
+    mainWindow.addDrawer(&capture);
+    if (saver.get())
+        mainWindow.addDrawer(saver.get());
+    if (analyzerResultDrawer.get())
+        mainWindow.addDrawer(analyzerResultDrawer.get());
+
+    capture.start();
+
+    mainWindow.runMainLoop();
+
+    return 0;
 }
