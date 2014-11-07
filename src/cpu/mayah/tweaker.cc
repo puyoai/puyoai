@@ -46,6 +46,8 @@ void removeNontokopuyoParameter(FeatureParameter* parameter)
     parameter->setValue(STRATEGY_TSUBUSHI, 0);
     parameter->setValue(STRATEGY_IBARA, 0);
     parameter->setValue(STRATEGY_SAISOKU, 0);
+
+    // parameter->setValue(NUM_CHIGIRI, 0);
 }
 
 void runOnce(const FeatureParameter& parameter)
@@ -141,9 +143,9 @@ int main(int argc, char* argv[])
         run(executor.get(), parameter);
     } else {
         map<double, RunResult> scoreMap;
-        for (double x = 270; x <= 330; x += 10) {
+        for (double x = 0; x <= 20; x += 1) {
             cout << "current x = " << x << endl;
-            parameter.setValue(BOOK, x);
+            parameter.setValue(HAND_WIDTH_2, 1, -x);
             scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {

@@ -497,13 +497,48 @@ void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const RefPlan& pl
 
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = 1; y <= CoreField::HEIGHT; ++y) {
-            if (trackResult.erasedAt(x, y) == 1) {
+            if (!trackResult.erasedAt(x, y) != 1)
+                continue;
+            if (plan.field().color(x, y) == PuyoColor::EMPTY)
+                continue;
+
+            if (trackResult.erasedAt(x, y + 1) == 2) {
                 distanceCount[1]++;
                 distance[x][y] = 1;
                 *qTail++ = Position(x, y);
+                break;
             }
         }
     }
+
+    while (qHead != qTail) {
+        int x = qHead->x;
+        int y = qHead->y;
+        qHead++;
+
+        if (trackResult.erasedAt(x, y + 1) == 1 && distance[x][y + 1] == 0) {
+            *qTail++ = Position(x, y + 1);
+            distanceCount[1]++;
+            distance[x][y + 1] = 1;
+        }
+        if (trackResult.erasedAt(x, y - 1) == 1 && distance[x][y - 1] == 0) {
+            *qTail++ = Position(x, y - 1);
+            distanceCount[1]++;
+            distance[x][y - 1] = 1;
+        }
+        if (trackResult.erasedAt(x + 1, y) == 1 && distance[x + 1][y] == 0) {
+            *qTail++ = Position(x + 1, y);
+            distanceCount[1]++;
+            distance[x + 1][y] = 1;
+        }
+        if (trackResult.erasedAt(x - 1, y) == 1 && distance[x - 1][y] == 0) {
+            *qTail++ = Position(x - 1, y);
+            distanceCount[1]++;
+            distance[x - 1][y] = 1;
+        }
+    }
+
+    qHead = q;
 
     while (qHead != qTail) {
         int x = qHead->x;
