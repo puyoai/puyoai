@@ -404,13 +404,13 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     }
 
     // If IBARA found, we always consider it.
+    // TODO(mayah): Don't consider IBARA if we don't have enough puyos. Better not to fire IBARA in that case.
     if (USE_IBARA && plan.chains() == 1 && plan.score() >= scoreForOjama(10) && me.pendingOjama + me.fixedOjama <= 10) {
         sc_->addScore(STRATEGY_IBARA, 1);
         return false;
     }
 
-    // --- If we can send 18>= ojamas, and opponent does not have any hand to cope with it,
-    // we can fire it.
+    // If we can send 18>= ojamas, and opponent does not have any hand to cope with it, we can fire it.
     // TODO(mayah): We need to check if the enemy cannot fire his rensa after ojama is dropped.
     if (plan.chains() <= 3 && plan.score() >= scoreForOjama(15) &&
         me.pendingOjama + me.fixedOjama <= 3 && estimatedMaxScore <= scoreForOjama(12)) {
@@ -421,6 +421,8 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     sc_->addScore(STRATEGY_SAKIUCHI, 1.0);
 
     // TODO(mayah): Check land leveling.
+    // TODO(mayah): OIUCHI?
+    // TODO(mayah): KILL when enemy has a lot of puyos?
     return false;
 }
 
