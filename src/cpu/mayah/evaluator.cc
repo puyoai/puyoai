@@ -397,12 +397,6 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         return true;
     }
 
-    // If the rensa score is larger than 80,000, usually it's really large enough.
-    if (plan.score() >= 80000) {
-        sc_->addScore(STRATEGY_LARGE_ENOUGH, 1);
-        return true;
-    }
-
     // If IBARA found, we always consider it.
     // TODO(mayah): Don't consider IBARA if we don't have enough puyos. Better not to fire IBARA in that case.
     if (USE_IBARA && plan.chains() == 1 && plan.score() >= scoreForOjama(10) && me.pendingOjama + me.fixedOjama <= 10) {
@@ -684,7 +678,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
     evalUnreachableSpace(plan);
 
-    int numPuyo = currentField.countPuyos();
+    int numReachableSpace = plan.field().countConnectedPuyos(3, 12);
     int maxVirtualRensaResultScore = 0;
     double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
     std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
@@ -714,12 +708,12 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         }
 
         double rensaScore = rensaResult.score;
-        if (numPuyo > 63)
-            rensaScore *= 0.5;
-        else if (numPuyo > 61)
-            rensaScore *= 0.75;
-        else if (numPuyo > 55)
-            rensaScore *= 0.85;
+
+        PuyoSet necessaryPuyos;
+        necessaryPuyos.add(keyPuyos);
+        necessaryPuyos.add(firePuyos);
+        double possibility = TsumoPossibility::possibility(necessaryPuyos, std::max(0, numReachableSpace - 4));
+        rensaScore *= possibility;
 
         if (maxVirtualRensaResultScore < rensaScore) {
             maxVirtualRensaResultScore = rensaScore;
