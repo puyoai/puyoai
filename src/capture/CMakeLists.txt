@@ -51,7 +51,7 @@ capture_add_executable(parse_box)
 capture_add_executable(parse_movie)
 if(V4L2_LIBRARY)
 # Disabled.
-#  capture_add_executable(parse_viddev)
+  capture_add_executable(parse_viddev)
 endif()
 if(LIB_USB AND LIB_GCRYPT)
   capture_add_executable(parse_somagic)

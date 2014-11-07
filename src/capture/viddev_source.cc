@@ -101,12 +101,12 @@ void showCurrentAudio(int fd) {
 
 }  // anonymous namespace
 
-VidDev::VidDev(const char* dev)
+VidDevSource::VidDevSource(const char* dev)
   : dev_(dev) {
   init();
 }
 
-void VidDev::init() {
+void VidDevSource::init() {
   fd_ = v4l2_open(dev_, O_RDWR);
   if (fd_ < 0) {
     perror("v4l2_open");
@@ -150,11 +150,11 @@ void VidDev::init() {
   ok_ = true;
 }
 
-VidDev::~VidDev() {
+VidDevSource::~VidDevSource() {
   quit();
 }
 
-void VidDev::quit() {
+void VidDevSource::quit() {
   int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   if (v4l2_ioctl(fd_, VIDIOC_STREAMOFF, &type) < 0) {
     perror("v4l2_ioctl VIDIOC_STREAMOFF");
@@ -167,7 +167,7 @@ void VidDev::quit() {
   free(buffers_);
 }
 
-void VidDev::initBuffers() {
+void VidDevSource::initBuffers() {
   struct v4l2_requestbuffers reqbuf;
   memset(&reqbuf, 0, sizeof (reqbuf));
   reqbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -248,7 +248,7 @@ void VidDev::initBuffers() {
   }
 }
 
-UniqueSDLSurface VidDev::getNextFrame() {
+UniqueSDLSurface VidDevSource::getNextFrame() {
   int r;
   do {
     fd_set fds;

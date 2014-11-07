@@ -5,12 +5,12 @@
 
 #include "source.h"
 
-class VidDev : public Source {
+class VidDevSource : public Source {
 public:
-    explicit VidDev(const char* dev);
-    virtual ~VidDev();
+    explicit VidDevSource(const char* dev);
+    virtual ~VidDevSource();
 
-    virtual UniqueSDLSurface getNextFrame();
+    virtual UniqueSDLSurface getNextFrame() override;
 
 private:
     struct Buffer {
