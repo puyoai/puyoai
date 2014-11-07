@@ -484,15 +484,6 @@ SCORE: 9.8
 ...CCE
 
 NAME: NEWGTR2-TAIL
-SCORE: 9.7
-.....c
-....*C
-...*XC
-...ECX
-....EE
-...CCE
-
-NAME: NEWGTR2-TAIL
 SCORE: 8.2
 ....xX
 ...EXE
