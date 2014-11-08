@@ -124,21 +124,15 @@ TEST_F(EvaluatorTest, RidgeHeight3)
 TEST_F(EvaluatorTest, connection)
 {
     CoreField f("BBBYYY"
-                "OOOOOO"
+                "OOOOGO"
                 "BBYYGO");
 
     CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->collectScoreForConnection(f);
     });
 
-    map<int, int> vs;
-    for (int v : cf.feature(CONNECTION)) {
-        vs[v]++;
-    }
-    EXPECT_EQ(3U, vs.size());
-    EXPECT_EQ(2, vs[3]);
-    EXPECT_EQ(2, vs[2]);
-    EXPECT_EQ(1, vs[1]);
+    EXPECT_EQ(2, cf.feature(CONNECTION_3));
+    EXPECT_EQ(3, cf.feature(CONNECTION_2));
 }
 
 TEST_F(EvaluatorTest, connectionHorizontal)

@@ -47,7 +47,8 @@ const bool USE_IBARA = true;
 }
 
 template<typename ScoreCollector>
-static void calculateConnection(ScoreCollector* sc, const CoreField& field, EvaluationSparseFeatureKey key)
+static void calculateConnection(ScoreCollector* sc, const CoreField& field,
+                                EvaluationFeatureKey key2, EvaluationFeatureKey key3)
 {
     FieldBitField checked;
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
@@ -59,9 +60,11 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field, Eval
                 continue;
 
             int numConnected = field.countConnectedPuyos(x, y, &checked);
-            if (numConnected >= 4)
-                numConnected = 3;
-            sc->addScore(key, numConnected, 1);
+            if (numConnected >= 3) {
+                sc->addScore(key3, 1);
+            } else if (numConnected >= 2) {
+                sc->addScore(key2, 1);
+            }
         }
     }
 }
@@ -160,7 +163,7 @@ void Evaluator<ScoreCollector>::evalFrameFeature(const RefPlan& plan)
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::collectScoreForConnection(const CoreField& field)
 {
-    calculateConnection(sc_, field, CONNECTION);
+    calculateConnection(sc_, field, CONNECTION_2, CONNECTION_3);
 }
 
 template<typename ScoreCollector>
@@ -604,7 +607,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const RefPla
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaConnectionFeature(const CoreField& fieldAfterDrop)
 {
-    calculateConnection(sc_, fieldAfterDrop, CONNECTION_AFTER_DROP);
+    calculateConnection(sc_, fieldAfterDrop, CONNECTION_AFTER_DROP_2, CONNECTION_AFTER_DROP_3);
 }
 
 template<typename ScoreCollector>
