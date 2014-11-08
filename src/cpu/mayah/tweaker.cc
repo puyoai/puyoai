@@ -104,6 +104,8 @@ public:
                 values[i] += d;
             }
         }
+
+        parameter->setValues(feature.key(), values);
     }
 
 private:
