@@ -4,8 +4,8 @@
 #include <glog/logging.h>
 
 enum EvaluationFeatureKey {
-#define DEFINE_PARAM(NAME) NAME,
-#define DEFINE_SPARSE_PARAM(NAME, numValue) /* ignored */
+#define DEFINE_PARAM(NAME, tweakable) NAME,
+#define DEFINE_SPARSE_PARAM(NAME, numValue, tweakable) /* ignored */
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_SPARSE_PARAM
@@ -13,8 +13,8 @@ enum EvaluationFeatureKey {
 };
 
 enum EvaluationSparseFeatureKey {
-#define DEFINE_PARAM(NAME) /* ignored */
-#define DEFINE_SPARSE_PARAM(NAME, numValue) NAME,
+#define DEFINE_PARAM(NAME, tweakable) /* ignored */
+#define DEFINE_SPARSE_PARAM(NAME, numValue, tweakable) NAME,
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_SPARSE_PARAM
@@ -30,8 +30,8 @@ inline EvaluationFeatureKey toEvaluationFeatureKey(int ith)
 inline std::string toString(EvaluationFeatureKey key)
 {
     switch (key) {
-#define DEFINE_PARAM(key) case key: return #key;
-#define DEFINE_SPARSE_PARAM(key, value) /* ignored */
+#define DEFINE_PARAM(key, tweakable) case key: return #key;
+#define DEFINE_SPARSE_PARAM(key, value, tweakable) /* ignored */
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_SPARSE_PARAM
@@ -52,8 +52,8 @@ inline EvaluationSparseFeatureKey toEvaluationSparseFeatureKey(int ith)
 inline std::string toString(EvaluationSparseFeatureKey key)
 {
     switch (key) {
-#define DEFINE_PARAM(key) /* ignored */
-#define DEFINE_SPARSE_PARAM(key, value) case key: return #key;
+#define DEFINE_PARAM(key, tweakable) /* ignored */
+#define DEFINE_SPARSE_PARAM(key, value, tweakable) case key: return #key;
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_SPARSE_PARAM
