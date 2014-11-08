@@ -123,7 +123,6 @@ public:
     void evalFrameFeature(const RefPlan&);
     void evalConnectionHorizontalFeature(const RefPlan&);
     void evalRestrictedConnectionHorizontalFeature(const RefPlan&);
-    void evalDensityFeature(const RefPlan&);
     void evalThirdColumnHeightFeature(const RefPlan& plan);
     void evalValleyDepth(const CoreField&);
     void evalRidgeHeight(const CoreField&);

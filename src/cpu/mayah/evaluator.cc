@@ -35,7 +35,6 @@ const bool USE_CONNECTION_FEATURE = true;
 const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
-const bool USE_DENSITY_FEATURE = false;
 const bool USE_IGNITION_HEIGHT_FEATURE = true;
 const bool USE_FIELD_USHAPE_FEATURE = true;
 const bool USE_RIDGE_FEATURE = true;
@@ -199,28 +198,6 @@ void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const 
 
             sc_->addScore(key, 1);
             x += len - 1;
-        }
-    }
-}
-
-// Takes 2x3 field, and counts each color puyo number.
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalDensityFeature(const RefPlan& plan)
-{
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        for (int y = 1; y <= CoreField::HEIGHT + 1; ++y) {
-            int numColors[NUM_PUYO_COLORS] = { 0 };
-
-            for (int dx = -1; dx <= 1; ++dx) {
-                for (int dy = -1; dy <= 1; ++dy) {
-                    numColors[plan.field().color(x + dx, y + dy)] += 1;
-                }
-            }
-
-            for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
-                PuyoColor c = NORMAL_PUYO_COLORS[i];
-                sc_->addScore(DENSITY, c, 1);
-            }
         }
     }
 }
@@ -678,8 +655,6 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         collectScoreForConnection(plan.field());
     if (USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE)
         evalRestrictedConnectionHorizontalFeature(plan);
-    if (USE_DENSITY_FEATURE)
-        evalDensityFeature(plan);
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(plan);
     if (USE_VALLEY_FEATURE)
