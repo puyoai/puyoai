@@ -129,7 +129,7 @@ bool Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
             continue;
         ratio = (ratio - 1) / (1 - cutoffRatio) + 1;
 
-        double score = mr.score * ratio / totalPuyoCount;
+        double score = mr.score * ratio;
         if (maxScore < score) {
             bestBf = &bf;
             maxScore = score;
