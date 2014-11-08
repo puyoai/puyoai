@@ -41,7 +41,7 @@ struct RunResult {
     int over80000Count;
 
     int resultScore() {
-        return mainRensaCount * 20 + over60000Count * 6 + over70000Count * 7 + over80000Count * 8;
+        return mainRensaCount * 20 + over60000Count * 6 + over70000Count + over80000Count;
     }
 };
 
