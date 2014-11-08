@@ -253,9 +253,9 @@ int main(int argc, char* argv[])
         runAutoTweaker(executor.get(), parameter, FLAGS_auto_count);
     } else {
         map<double, RunResult> scoreMap;
-        for (double x = 13; x <= 16; x += 0.5) {
+        for (double x = 10; x <= 30; x += 1) {
             cout << "current x = " << x << endl;
-            parameter.setValue(FIELD_USHAPE, -x);
+            parameter.setValue(BOOK_COMPLETE, x);
             scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {
