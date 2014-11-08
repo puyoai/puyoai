@@ -13,6 +13,13 @@
 struct ColumnPuyo {
     int x;
     PuyoColor color;
+
+    friend bool operator==(const ColumnPuyo& lhs, const ColumnPuyo& rhs)
+    {
+        return lhs.x == rhs.x && lhs.color == rhs.color;
+    }
+
+    friend bool operator!=(const ColumnPuyo& lhs, const ColumnPuyo& rhs) { return !(lhs == rhs); }
 };
 
 class ColumnPuyoList {
@@ -65,6 +72,18 @@ public:
 
     PuyoSet toPuyoSet() const;
     std::string toString() const;
+
+    friend bool operator==(const ColumnPuyoList& lhs, const ColumnPuyoList& rhs)
+    {
+        if (lhs.size_ != rhs.size_)
+            return false;
+
+        for (int i = 0; i < lhs.size_; ++i) {
+            if (lhs.puyos_[i] != rhs.puyos_[i])
+                return false;
+        }
+        return true;
+    }
 
 private:
     int size_ = 0;
