@@ -157,6 +157,32 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat)
     EXPECT_TRUE(found);
 }
 
+TEST(RensaDetectorTest, iteratePossibleRensasFloat2)
+{
+    CoreField f(
+        ".....G"
+        ".....R"
+        ".....R"
+        ".....G"
+        ".....G"
+        ".....R"
+        "....GR"
+        "...GGR");
+
+    bool found = false;
+    ColumnPuyoList expectedFireList;
+    expectedFireList.addPuyo(5, PuyoColor::GREEN, 2);
+    auto callback = [&](const CoreField& /*fieldAfterRensa*/, const RensaResult& rensaResult,
+                        const ColumnPuyoList& /*keyPuyos*/, const ColumnPuyoList& firePuyos) {
+        if (rensaResult.chains == 3 && firePuyos == expectedFireList) {
+            found = true;
+        }
+    };
+
+    RensaDetector::iteratePossibleRensas(f, 0, callback, RensaDetector::Mode::FLOAT);
+    EXPECT_TRUE(found);
+}
+
 TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1_1)
 {
     CoreField f(

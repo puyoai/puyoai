@@ -166,10 +166,10 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                 }
 
                 f.recalcHeightOn(dx);
-            }
 
-            if (restPuyos <= 0) {
-                callback(&f, ColumnPuyoList(dx, c, necessaryPuyos));
+                if (restPuyos <= 0) {
+                    callback(&f, ColumnPuyoList(dx, c, necessaryPuyos));
+                }
             }
         }
     }
