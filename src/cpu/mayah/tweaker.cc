@@ -4,6 +4,7 @@
 #include <iostream>
 #include <future>
 #include <sstream>
+#include <random>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -20,6 +21,7 @@ DECLARE_string(seq);
 DECLARE_int32(seed);
 
 DEFINE_bool(once, false, "true if running only once.");
+DEFINE_int32(auto_count, 0, "run auto tweaker for this count.");
 DEFINE_bool(show_field, false, "show field after each hand.");
 DEFINE_int32(size, 100, "the number of case size.");
 
@@ -37,17 +39,93 @@ struct RunResult {
     int over60000Count;
     int over70000Count;
     int over80000Count;
+
+    int resultScore() {
+        return mainRensaCount * 20 + over60000Count * 6 + over70000Count * 7 + over80000Count * 8;
+    }
+};
+
+class ParameterTweaker {
+public:
+    ParameterTweaker() : mt_(random_device()())
+    {
+        for (const auto& ef : EvaluationFeature::all()) {
+            if (ef.tweakable()) {
+                tweakableFeatures_.push_back(ef);
+            }
+        }
+
+        for (const auto& ef : EvaluationSparseFeature::all()) {
+            if (ef.tweakable()) {
+                tweakableSparseFeatures_.push_back(ef);
+            }
+        }
+    }
+
+    void tweakParameter(EvaluationParameter* parameter)
+    {
+        if (tweakableFeatures_.empty() && tweakableSparseFeatures_.empty())
+            return;
+
+        size_t N = tweakableFeatures_.size() + tweakableSparseFeatures_.size();
+
+        // Currently consider only non sparse keys.
+        std::uniform_int_distribution<> dist(0, N - 1);
+        size_t i = dist(mt_);
+        if (i < tweakableFeatures_.size()) {
+            tweak(tweakableFeatures_[i], parameter);
+        } else {
+            tweak(tweakableSparseFeatures_[i - tweakableFeatures_.size()], parameter);
+        }
+    }
+
+    void tweak(const EvaluationFeature& feature, EvaluationParameter* parameter)
+    {
+        double original = parameter->getValue(feature.key());
+        normal_distribution<> dist(0, 10.0);
+        double newValue = original + dist(mt_);
+
+        cout << feature.str() << ": " << original << " -> " << newValue << endl;
+        parameter->setValue(feature.key(), newValue);
+    }
+
+    void tweak(const EvaluationSparseFeature& feature, EvaluationParameter* parameter)
+    {
+        vector<double> values = parameter->getValues(feature.key());
+        double d = normal_distribution<>(0, 10.0)(mt_);
+        size_t k = uniform_int_distribution<>(0, values.size() - 1)(mt_);
+
+        if ((feature.ascending() && d > 0) || (feature.descending() && d < 0)) {
+            for (size_t i = 0; i < k; ++i) {
+                values[i] += d;
+            }
+        } else {
+            for (size_t i = k; k < values.size(); ++i) {
+                values[i] += d;
+            }
+        }
+    }
+
+private:
+    mt19937 mt_;
+    vector<EvaluationFeature> tweakableFeatures_;
+    vector<EvaluationSparseFeature> tweakableSparseFeatures_;
 };
 
 void removeNontokopuyoParameter(EvaluationParameter* parameter)
 {
-    parameter->setValue(STRATEGY_ZENKESHI, 0);
-    parameter->setValue(STRATEGY_INITIAL_ZENKESHI, 0);
-    parameter->setValue(STRATEGY_TSUBUSHI, 0);
-    parameter->setValue(STRATEGY_IBARA, 0);
-    parameter->setValue(STRATEGY_SAISOKU, 0);
+    for (const auto& ef : EvaluationFeature::all()) {
+        if (ef.shouldIgnore())
+            parameter->setValue(ef.key(), 0);
+    }
 
-    // parameter->setValue(NUM_CHIGIRI, 0);
+    for (const auto& ef : EvaluationSparseFeature::all()) {
+        if (ef.shouldIgnore()) {
+            for (size_t i = 0; i < ef.size(); ++i) {
+                parameter->setValue(ef.key(), i, 0);
+            }
+        }
+    }
 }
 
 void runOnce(const EvaluationParameter& parameter)
@@ -124,6 +202,34 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
     return RunResult { sumScore, mainRensaCount, aveMainRensaScore, over60000Count, over70000Count, over80000Count };
 }
 
+void runAutoTweaker(Executor* executor, const EvaluationParameter& original, int num)
+{
+    cout << "Run with the original parameter." << endl;
+    EvaluationParameter currentBestParameter(original);
+    RunResult currentBestResult = run(executor, original);
+
+    cout << "original score = " << currentBestResult.resultScore() << endl;
+
+    ParameterTweaker tweaker;
+
+    for (int i = 0; i < num; ++i) {
+        EvaluationParameter parameter(currentBestParameter);
+        tweaker.tweakParameter(&parameter);
+
+        RunResult result = run(executor, parameter);
+        cout << "score = " << result.resultScore() << endl;
+
+        if (currentBestResult.resultScore() < result.resultScore()) {
+            currentBestResult = result;
+            currentBestParameter = parameter;
+
+            cout << "Best parameter is updated." << endl;
+            cout << currentBestParameter.toString() << endl;
+            currentBestParameter.save("best-parameter.txt");
+        }
+    }
+}
+
 int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
@@ -141,6 +247,8 @@ int main(int argc, char* argv[])
         runOnce(parameter);
     } else if (FLAGS_once) {
         run(executor.get(), parameter);
+    } else if (FLAGS_auto_count > 0) {
+        runAutoTweaker(executor.get(), parameter, FLAGS_auto_count);
     } else {
         map<double, RunResult> scoreMap;
         for (double x = 13; x <= 16; x += 0.5) {

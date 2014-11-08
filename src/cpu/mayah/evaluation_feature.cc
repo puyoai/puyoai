@@ -7,16 +7,16 @@
 using namespace std;
 
 const vector<EvaluationFeature> g_allEvaluationFeatures {
-#define DEFINE_PARAM(NAME, tweakable) EvaluationFeature(NAME, Tweakable::tweakable, #NAME),
-#define DEFINE_SPARSE_PARAM(NAME, numValue, tweakable) /* ignored */
+#define DEFINE_PARAM(NAME, tweakability) EvaluationFeature(NAME, Tweakability::tweakability, #NAME),
+#define DEFINE_SPARSE_PARAM(NAME, numValue, tweakability) /* ignored */
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_SPARSE_PARAM
 };
 
 const vector<EvaluationSparseFeature> g_allEvaluationSparseFeatures {
-#define DEFINE_PARAM(NAME, tweakable) /* ignored */
-#define DEFINE_SPARSE_PARAM(NAME, numValue, tweakable) EvaluationSparseFeature(NAME, numValue, Tweakable::tweakable, #NAME),
+#define DEFINE_PARAM(NAME, tweakability) /* ignored */
+#define DEFINE_SPARSE_PARAM(NAME, numValue, tweakability) EvaluationSparseFeature(NAME, numValue, SparseTweakability::tweakability, #NAME),
 #include "evaluation_feature.tab"
 #undef DEFINE_PARAM
 #undef DEFINE_SPARSE_PARAM
