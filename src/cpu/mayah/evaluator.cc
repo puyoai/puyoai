@@ -31,6 +31,7 @@ using namespace std;
 namespace {
 
 const bool USE_BOOK = true;
+const bool USE_BOOK_COMPLETE = false;
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
@@ -144,7 +145,7 @@ bool Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
         sc_->setBookName(bestBf->name());
         sc_->addScore(BOOK, maxScore);
         sc_->addScore(BOOK_KIND, matchedBookNames.size());
-        if (completeMatch && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
+        if (USE_BOOK_COMPLETE && completeMatch && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
             sc_->addScore(BOOK_COMPLETE, maxScore);
             return true;
         }
