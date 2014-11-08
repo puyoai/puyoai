@@ -141,46 +141,19 @@ TEST_F(EvaluatorTest, connection)
     EXPECT_EQ(1, vs[1]);
 }
 
-TEST_F(EvaluatorTest, ConnectionHorizontal1)
+TEST_F(EvaluatorTest, connectionHorizontal)
 {
     CoreField f(
-        "B B B "
-        "GG YY "
-        "RRRGGG");
+        "OGGGOO"
+        "OOYYOO"
+        "RRROGG");
 
     CollectedFeature cf = eval(f);
 
-    map<int, int> m[7];
-    for (auto v : cf.feature(CONNECTION_HORIZONTAL_FROM_1))
-        m[1][v]++;
-    for (auto v : cf.feature(CONNECTION_HORIZONTAL_FROM_2))
-        m[2][v]++;
-    for (auto v : cf.feature(CONNECTION_HORIZONTAL_FROM_3))
-        m[3][v]++;
-    for (auto v : cf.feature(CONNECTION_HORIZONTAL_FROM_4))
-        m[4][v]++;
-    for (auto v : cf.feature(CONNECTION_HORIZONTAL_FROM_5))
-        m[5][v]++;
-
-    EXPECT_EQ(1, m[1][1]);
-    EXPECT_EQ(1, m[1][2]);
-    EXPECT_EQ(1, m[1][3]);
-
-    EXPECT_EQ(0, m[2][1]);
-    EXPECT_EQ(0, m[2][2]);
-    EXPECT_EQ(0, m[2][3]);
-
-    EXPECT_EQ(1, m[3][1]);
-    EXPECT_EQ(0, m[3][2]);
-    EXPECT_EQ(0, m[3][3]);
-
-    EXPECT_EQ(0, m[4][1]);
-    EXPECT_EQ(1, m[4][2]);
-    EXPECT_EQ(1, m[4][3]);
-
-    EXPECT_EQ(1, m[5][1]);
-    EXPECT_EQ(0, m[5][2]);
-    EXPECT_EQ(0, m[5][3]);
+    EXPECT_EQ(1, cf.feature(CONNECTION_HORIZONTAL_2));
+    EXPECT_EQ(1, cf.feature(CONNECTION_HORIZONTAL_3));
+    EXPECT_EQ(1, cf.feature(CONNECTION_HORIZONTAL_CROSSED_2));
+    EXPECT_EQ(1, cf.feature(CONNECTION_HORIZONTAL_CROSSED_3));
 }
 
 TEST_F(EvaluatorTest, NumUnreachableSpace1)
