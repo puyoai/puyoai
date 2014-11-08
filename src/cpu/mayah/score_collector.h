@@ -91,7 +91,7 @@ public:
     void addScore(EvaluationFeatureKey key, double v)
     {
         collector_.addScore(key, v);
-        collectedFeatures_[key] = v;
+        collectedFeatures_[key] += v;
     }
 
     void addScore(EvaluationSparseFeatureKey key, int idx, int n)
