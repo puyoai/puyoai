@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "book_field.h"
-#include "feature_parameter.h"
+#include "evaluation_feature.h"
 #include "score_collector.h"
 
 class ColumnPuyoList;

@@ -40,11 +40,11 @@ public:
 
     void removeNontokopuyoParameter()
     {
-        featureParameter_->setValue(STRATEGY_ZENKESHI, 0);
-        featureParameter_->setValue(STRATEGY_INITIAL_ZENKESHI, 0);
-        featureParameter_->setValue(STRATEGY_TSUBUSHI, 0);
-        featureParameter_->setValue(STRATEGY_IBARA, 0);
-        featureParameter_->setValue(STRATEGY_SAISOKU, 0);
+        evaluationParameter_->setValue(STRATEGY_ZENKESHI, 0);
+        evaluationParameter_->setValue(STRATEGY_INITIAL_ZENKESHI, 0);
+        evaluationParameter_->setValue(STRATEGY_TSUBUSHI, 0);
+        evaluationParameter_->setValue(STRATEGY_IBARA, 0);
+        evaluationParameter_->setValue(STRATEGY_SAISOKU, 0);
     }
 };
 

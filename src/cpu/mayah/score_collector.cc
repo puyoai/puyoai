@@ -12,10 +12,10 @@ string CollectedFeature::toString() const
     stringstream ss;
     ss << "score = " << score_ << endl;
     for (const auto& entry : collectedFeatures_) {
-        ss << ::toString(entry.first) << "=" << to_string(entry.second) << endl;
+        ss << EvaluationFeature::toFeature(entry.first).str() << "=" << to_string(entry.second) << endl;
     }
     for (const auto& entry : collectedSparseFeatures_) {
-        ss << ::toString(entry.first) << "=";
+        ss << EvaluationSparseFeature::toFeature(entry.first).str() << "=";
         for (int v : entry.second)
             ss << v << ' ';
         ss << endl;
@@ -45,12 +45,12 @@ string CollectedFeature::toStringComparingWith(const CollectedFeature& cf) const
     stringstream ss;
     ss << "score = " << score_ << " : " << cf.score_ << endl;
     for (EvaluationFeatureKey key : keys) {
-        ss << setw(30) << ::toString(key) << " = "
+        ss << setw(30) << EvaluationFeature::toFeature(key).str() << " = "
            << setw(15) << to_string(feature(key)) << " : "
            << setw(15) << to_string(cf.feature(key)) << endl;
     }
     for (EvaluationSparseFeatureKey key : sparseKeys) {
-        ss << setw(30) << ::toString(key) << " = ";
+        ss << setw(30) << EvaluationSparseFeature::toFeature(key).str() << " = ";
         {
             stringstream st;
             for (int v : feature(key)) {

@@ -23,7 +23,7 @@
 #include "core/score.h"
 
 #include "book_field.h"
-#include "feature_parameter.h"
+#include "evaluation_parameter.h"
 #include "gazer.h"
 
 using namespace std;
@@ -673,7 +673,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                         const RensaTrackResult& trackResult, const RensaRefSequence&) {
-        std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->featureParameter()));
+        std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
         RensaEvaluator<ScoreCollector> rensaEvaluator(books_, rensaScoreCollector.get());
 
         if (!complete)
