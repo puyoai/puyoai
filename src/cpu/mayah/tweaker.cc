@@ -100,7 +100,7 @@ public:
                 values[i] += d;
             }
         } else {
-            for (size_t i = k; k < values.size(); ++i) {
+            for (size_t i = k; i < values.size(); ++i) {
                 values[i] += d;
             }
         }
