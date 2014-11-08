@@ -13,7 +13,7 @@
 #include "core/client/ai/endless/endless.h"
 #include "core/sequence_generator.h"
 
-#include "feature_parameter.h"
+#include "evaluation_parameter.h"
 
 DECLARE_string(feature);
 DECLARE_string(seq);
@@ -39,7 +39,7 @@ struct RunResult {
     int over80000Count;
 };
 
-void removeNontokopuyoParameter(FeatureParameter* parameter)
+void removeNontokopuyoParameter(EvaluationParameter* parameter)
 {
     parameter->setValue(STRATEGY_ZENKESHI, 0);
     parameter->setValue(STRATEGY_INITIAL_ZENKESHI, 0);
@@ -50,10 +50,10 @@ void removeNontokopuyoParameter(FeatureParameter* parameter)
     // parameter->setValue(NUM_CHIGIRI, 0);
 }
 
-void runOnce(const FeatureParameter& parameter)
+void runOnce(const EvaluationParameter& parameter)
 {
     auto ai = new DebuggableMayahAI;
-    ai->setFeatureParameter(parameter);
+    ai->setEvaluationParameter(parameter);
 
     Endless endless(std::move(std::unique_ptr<AI>(ai)));
     endless.setVerbose(FLAGS_show_field);
@@ -65,7 +65,7 @@ void runOnce(const FeatureParameter& parameter)
     cout << "score = " << score << endl;
 }
 
-RunResult run(Executor* executor, const FeatureParameter& parameter)
+RunResult run(Executor* executor, const EvaluationParameter& parameter)
 {
     const int N = FLAGS_size;
     vector<promise<Result>> ps(N);
@@ -73,7 +73,7 @@ RunResult run(Executor* executor, const FeatureParameter& parameter)
     for (int i = 0; i < N; ++i) {
         auto f = [i, &parameter, &ps]() {
             auto ai = new DebuggableMayahAI;
-            ai->setFeatureParameter(parameter);
+            ai->setEvaluationParameter(parameter);
             Endless endless(std::move(std::unique_ptr<AI>(ai)));
             stringstream ss;
             KumipuyoSeq seq = generateRandomSequenceWithSeed(i);
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 
     unique_ptr<Executor> executor = Executor::makeDefaultExecutor();
 
-    FeatureParameter parameter(FLAGS_feature);
+    EvaluationParameter parameter(FLAGS_feature);
     removeNontokopuyoParameter(&parameter);
 
     if (!FLAGS_seq.empty() || FLAGS_seed >= 0) {

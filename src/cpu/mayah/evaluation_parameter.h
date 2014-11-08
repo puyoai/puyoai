@@ -5,12 +5,12 @@
 #include <vector>
 #include <glog/logging.h>
 
-#include "evaluation_feature_key.h"
+#include "evaluation_feature.h"
 
-class FeatureParameter {
+class EvaluationParameter {
 public:
-    FeatureParameter();
-    explicit FeatureParameter(const std::string& filename);
+    EvaluationParameter();
+    explicit EvaluationParameter(const std::string& filename);
 
     double score(EvaluationFeatureKey key, double value) const { return coef_[key] * value; }
     double score(EvaluationSparseFeatureKey key, int idx, int n) const { return sparseCoef_[key][idx] * n; }
@@ -26,7 +26,7 @@ public:
     void addValue(EvaluationSparseFeatureKey key, int idx, double value)
     {
         CHECK(0 <= idx && static_cast<size_t>(idx) < sparseCoef_[key].size())
-            << "key=" << ::toString(key)
+            << "key=" << EvaluationSparseFeature::toFeature(key).str()
             << " idx=" << idx
             << " size=" << sparseCoef_[key].size();
         sparseCoef_[key][idx] += value;
@@ -37,7 +37,7 @@ public:
     bool save(const std::string& filename);
     bool load(const std::string& filename);
 
-    friend bool operator==(const FeatureParameter&, const FeatureParameter&);
+    friend bool operator==(const EvaluationParameter&, const EvaluationParameter&);
 
 private:
     std::vector<double> coef_;

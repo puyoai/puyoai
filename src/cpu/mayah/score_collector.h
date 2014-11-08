@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "evaluation_feature_key.h"
-#include "feature_parameter.h"
+#include "evaluation_feature.h"
+#include "evaluation_parameter.h"
 
 class CollectedFeature {
 public:
@@ -61,7 +61,7 @@ private:
 // This collector collects score and bookname.
 class NormalScoreCollector {
 public:
-    explicit NormalScoreCollector(const FeatureParameter& param) : param_(param) {}
+    explicit NormalScoreCollector(const EvaluationParameter& param) : param_(param) {}
 
     void addScore(EvaluationFeatureKey key, double v) { score_ += param_.score(key, v); }
     void addScore(EvaluationSparseFeatureKey key, int idx, int n) { score_ += param_.score(key, idx, n); }
@@ -71,13 +71,13 @@ public:
     std::string bookName() const { return bookName_; }
 
     double score() const { return score_; }
-    const FeatureParameter& featureParameter() const { return param_; }
+    const EvaluationParameter& evaluationParameter() const { return param_; }
 
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }
 
 private:
-    const FeatureParameter& param_;
+    const EvaluationParameter& param_;
     double score_ = 0.0;
     int estimatedRensaScore_ = 0;
     std::string bookName_;
@@ -86,7 +86,7 @@ private:
 // This collector collects all features.
 class FeatureScoreCollector {
 public:
-    FeatureScoreCollector(const FeatureParameter& param) : collector_(param) {}
+    FeatureScoreCollector(const EvaluationParameter& param) : collector_(param) {}
 
     void addScore(EvaluationFeatureKey key, double v)
     {
@@ -120,7 +120,7 @@ public:
     std::string bookName() const { return collector_.bookName(); }
 
     double score() const { return collector_.score(); }
-    const FeatureParameter& featureParameter() const { return collector_.featureParameter(); }
+    const EvaluationParameter& evaluationParameter() const { return collector_.evaluationParameter(); }
 
     void setEstimatedRensaScore(int s) { collector_.setEstimatedRensaScore(s); }
     int estimatedRensaScore() const { return collector_.estimatedRensaScore(); }

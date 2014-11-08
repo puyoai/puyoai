@@ -13,8 +13,8 @@
 
 #include "book_field.h"
 #include "book_reader.h"
+#include "evaluation_parameter.h"
 #include "evaluator.h"
-#include "feature_parameter.h"
 #include "gazer.h"
 
 DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.txt", "the path to feature parameter");
@@ -29,10 +29,10 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
 {
     setBehaviorRethinkAfterOpponentRensa(true);
 
-    featureParameter_.reset(new FeatureParameter(FLAGS_feature));
+    evaluationParameter_.reset(new EvaluationParameter(FLAGS_feature));
     books_ = BookReader::parse(FLAGS_book);
 
-    VLOG(1) << featureParameter_->toString();
+    VLOG(1) << evaluationParameter_->toString();
     if (VLOG_IS_ON(1)) {
       for (const auto& bf : books_) {
         VLOG(1) << bf.toDebugString();
@@ -48,7 +48,7 @@ MayahAI::~MayahAI()
 
 void MayahAI::reloadParameter()
 {
-    featureParameter_.reset(new FeatureParameter(FLAGS_feature));
+    evaluationParameter_.reset(new EvaluationParameter(FLAGS_feature));
 }
 
 DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& kumipuyoSeq,
@@ -238,7 +238,7 @@ EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
                          const MidEvalResult& midEvalResult,
                          const GazeResult& gazeResult) const
 {
-    NormalScoreCollector sc(*featureParameter_);
+    NormalScoreCollector sc(*evaluationParameter_);
     Evaluator<NormalScoreCollector> evaluator(books_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
@@ -253,7 +253,7 @@ CollectedFeature MayahAI::evalWithCollectingFeature(const RefPlan& plan, const C
                                                     const MidEvalResult& midEvalResult,
                                                     const GazeResult& gazeResult) const
 {
-    FeatureScoreCollector sc(*featureParameter_);
+    FeatureScoreCollector sc(*evaluationParameter_);
     Evaluator<FeatureScoreCollector> evaluator(books_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
     return sc.toCollectedFeature();

@@ -17,7 +17,7 @@ protected:
     {
         TsumoPossibility::initialize();
 
-        FeatureParameter featureParameter;
+        EvaluationParameter evaluationParameter;
         vector<BookField> books;
         Gazer gazer;
 
@@ -31,7 +31,7 @@ protected:
         RefPlan plan(f, decisions, rensaResult, 0, framesToInitiate, lastDropFrames);
 
         PreEvalResult preEvalResult = PreEvaluator(books).preEval(f);
-        FeatureScoreCollector sc(featureParameter);
+        FeatureScoreCollector sc(evaluationParameter);
         Evaluator<FeatureScoreCollector> evaluator(books, &sc);
         evaluator.collectScore(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
         return sc.toCollectedFeature();
@@ -41,9 +41,9 @@ protected:
     CollectedFeature withEvaluator(F f) {
         TsumoPossibility::initialize();
 
-        FeatureParameter featureParameter;
+        EvaluationParameter evaluationParameter;
         vector<BookField> books;
-        FeatureScoreCollector sc(featureParameter);
+        FeatureScoreCollector sc(evaluationParameter);
         Evaluator<FeatureScoreCollector> evaluator(books, &sc);
 
         f(&evaluator);
@@ -58,7 +58,7 @@ TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
                 "R    R"
                 "YYYGGG");
 
-    FeatureParameter param;
+    EvaluationParameter param;
     std::vector<BookField> books;
     FeatureScoreCollector sc(param);
     RensaEvaluator<FeatureScoreCollector> evaluator(books, &sc);

@@ -10,8 +10,8 @@
 #include "core/algorithm/plan.h"
 
 #include "book_field.h"
+#include "evaluation_parameter.h"
 #include "evaluator.h"
-#include "feature_parameter.h"
 #include "gazer.h"
 
 class CoreField;
@@ -76,7 +76,7 @@ protected:
     // For debugging purpose.
     void reloadParameter();
 
-    std::unique_ptr<FeatureParameter> featureParameter_;
+    std::unique_ptr<EvaluationParameter> evaluationParameter_;
     std::vector<BookField> books_;
 
     Executor* executor_;
@@ -106,8 +106,8 @@ public:
 
     const Gazer& gazer() const { return gazer_; }
 
-    const FeatureParameter& featureParameter() const { return *featureParameter_; }
-    void setFeatureParameter(const FeatureParameter& parameter) { *featureParameter_ = parameter; }
+    const EvaluationParameter& evaluationParameter() const { return *evaluationParameter_; }
+    void setEvaluationParameter(const EvaluationParameter& parameter) { *evaluationParameter_ = parameter; }
 };
 
 #endif

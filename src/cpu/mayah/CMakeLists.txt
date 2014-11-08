@@ -4,7 +4,7 @@ cpu_setup("mayah")
 
 add_library(mayah_lib
             book_field.cc book_reader.cc
-            evaluator.cc feature_parameter.cc gazer.cc mayah_ai.cc score_collector.cc)
+            evaluator.cc evaluation_feature.cc evaluation_parameter.cc gazer.cc mayah_ai.cc score_collector.cc)
 
 function(mayah_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
@@ -23,7 +23,6 @@ endfunction()
 mayah_add_executable(mayah_cpu main.cc)
 
 mayah_add_executable(interactive interactive.cc)
-mayah_add_executable(learn learn.cc)
 mayah_add_executable(solver solver.cc)
 mayah_add_executable(tweaker tweaker.cc)
 
