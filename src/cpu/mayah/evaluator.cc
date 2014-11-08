@@ -167,15 +167,6 @@ void Evaluator<ScoreCollector>::collectScoreForConnection(const CoreField& field
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const RefPlan& plan)
 {
-    static const EvaluationSparseFeatureKey keys[] = {
-        SPARSE_INVALID,
-        CONNECTION_HORIZONTAL_FROM_1,
-        CONNECTION_HORIZONTAL_FROM_2,
-        CONNECTION_HORIZONTAL_FROM_3,
-        CONNECTION_HORIZONTAL_FROM_4,
-        CONNECTION_HORIZONTAL_FROM_5,
-    };
-
     const int MAX_HEIGHT = 3; // instead of CoreField::HEIGHT
     const CoreField& f = plan.field();
     for (int y = 1; y <= MAX_HEIGHT; ++y) {
@@ -187,7 +178,26 @@ void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const 
             while (f.color(x, y) == f.color(x + len, y))
                 ++len;
 
-            sc_->addScore(keys[x], len, 1);
+            EvaluationFeatureKey key;
+            if (len == 1) {
+                continue;
+            } else if (len == 2) {
+                if (x <= 3 && 4 < x + len) {
+                    key = CONNECTION_HORIZONTAL_CROSSED_2;
+                } else {
+                    key = CONNECTION_HORIZONTAL_2;
+                }
+            } else if (len == 3) {
+                if (x <= 3 && 4 < x + len) {
+                    key = CONNECTION_HORIZONTAL_CROSSED_3;
+                } else {
+                    key = CONNECTION_HORIZONTAL_3;
+                }
+            } else {
+                CHECK(false) << "shouldn't happen: " << len;
+            }
+
+            sc_->addScore(key, 1);
             x += len - 1;
         }
     }
