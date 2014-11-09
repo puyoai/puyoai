@@ -19,6 +19,7 @@ function(cpu_target_link_common_libraries target)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_field)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_base)
+  target_link_libraries(${target}_${CPU_NAMESPACE} ${LIB_JSONCPP})
   puyoai_target_link_libraries(${target}_${CPU_NAMESPACE})
 endfunction()
 

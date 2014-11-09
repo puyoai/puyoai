@@ -70,6 +70,9 @@ include_directories(.)
 add_subdirectory(third_party/gtest-1.7.0)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
+add_subdirectory(third_party/jsoncpp)
+include_directories(third_party/jsoncpp)
+
 include_directories(${GFLAGS_INCLUDE_DIRS})
 include_directories(${GLOG_INCLUDE_DIRS})
 
