@@ -45,6 +45,9 @@ DropDecision Ai::think(int frame_id,
   Control control;
   auto evaluate = std::bind(Ai::Evaluate, _1, attack_.get(), &control);
   Plan::iterateAvailablePlans(field, seq, 2, evaluate);
+  
+  DLOG(INFO) << control.message;
+  DLOG(INFO) << field.toDebugString();
   return DropDecision(control.decision, control.message);
 }
 
@@ -75,6 +78,7 @@ int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
 
   const CoreField& field = plan.field();
   std::ostringstream oss;
+  oss << "Puyo.count:" << field.countPuyos() << "_";
   for (const Pattern& pattern : Pattern::GetAllPattern()) {
     int score = pattern.Match(field);
     sum += score;
@@ -127,8 +131,12 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
   if (expects.size())
     expect /= expects.size();
 
+  value = PatternMatch(plan, &message);
+  oss << "Pattern(" << message << "," << value << ")_";
+  score += value;
+
   if (plan.isRensaPlan()) {
-    const int kAcceptablePuyo = 3;
+    const int kAcceptablePuyo = 6;
     if (attack &&
         attack->score >= SCORE_FOR_OJAMA * kAcceptablePuyo &&
         attack->score < plan.score()) {
@@ -151,11 +159,6 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
       score += value;
     }
   } else {
-    value = PatternMatch(plan, &message);
-    if (value) {
-      oss << "Pattern(" << message << "," << value << ")_";
-      score += value;
-    }
 
     value = expect;
     oss << "Future(" << value << ")";

@@ -20,25 +20,25 @@ MAX: 20
 
 NAME: Begin1
 SCORE: 1000
-MAX: 4
+MAX: 8
 .AA...
 .BB...
 
 NAME: Begin2
 SCORE: 1000
-MAX: 4
+MAX: 8
 ..C...
 ABB...
 
 NAME: Begin3
 SCORE: 1500
-MAX: 8
+MAX: 10
 CAA...
 CBB...
 
 NAME: Begin4
 SCORE: 1000
-MAX: 4
+MAX: 8
 CA....
 CB....
 
