@@ -80,15 +80,12 @@ bool EvaluationParameter::load(const string& filename)
         if (!v)
             continue;
 
-        if (v->is<int>()) {
-            coef_[ef.key()] = v->as<int>();
-        } else if (v->is<double>()) {
-            coef_[ef.key()] = v->as<double>();
-        } else {
+        if (!v->isNumber()) {
             LOG(ERROR) << ef.key() << " is not a number";
             return false;
         }
 
+        coef_[ef.key()] = v->asNumber();
         value.erase(ef.str());
     }
 
@@ -112,16 +109,12 @@ bool EvaluationParameter::load(const string& filename)
         }
 
         for (size_t i = 0; i < ary.size(); ++i) {
-            double d;
-            if (ary[i].is<int>()) {
-                d = ary[i].as<int>();
-            } else if (ary[i].is<double>()) {
-                d = ary[i].as<double>();
-            } else {
+            if (!ary[i].isNumber()) {
                 LOG(ERROR) << ef.key() << "[" << i << "] is not a number.";
                 return false;
             }
-            (*vs)[i] = d;
+
+            (*vs)[i] = ary[i].asNumber();
         }
 
         value.erase(ef.str());
