@@ -19,6 +19,7 @@
 
 DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.toml", "the path to feature parameter");
 DEFINE_string(book, SRC_DIR "/cpu/mayah/book.toml", "the path to book");
+DEFINE_string(initial_book, SRC_DIR "/cpu/mayah/initial.toml", "the path to initial book");
 DEFINE_bool(use_advanced_next, false, "Use enemy's NEXT sequence also");
 
 using namespace std;
@@ -31,6 +32,7 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
 
     evaluationParameter_.reset(new EvaluationParameter(FLAGS_feature));
     books_ = BookReader::parse(FLAGS_book);
+    initialBook_.load(FLAGS_initial_book);
 
     VLOG(1) << evaluationParameter_->toString();
     if (VLOG_IS_ON(1)) {
@@ -99,6 +101,19 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                 << "enemy rensa: ending = " << (enemy.isRensaOngoing ? enemy.finishingRensaFrameId : 0) << endl
                 << gazer_.gazeResult().toRensaInfoString()
                 << "----------------------------------------------------------------------" << endl;
+    }
+
+    if (usesInitialBook_) {
+        Decision d = initialBook_.nextDecision(field, kumipuyoSeq);
+        if (d.isValid()) {
+            CoreField cf(field);
+            cf.dropKumipuyo(d, kumipuyoSeq.front());
+            vector<Decision> decisions { d };
+
+            ThoughtResult tr(Plan(cf, decisions, RensaResult(), 0, 0, 0),
+                             false, 0.0, 0.0, MidEvalResult(), "INITIAL");
+            return tr;
+        }
     }
 
     const GazeResult gazeResult = gazer_.gazeResult();
