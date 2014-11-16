@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <gflags/gflags.h>
+#include <toml/toml.h>
 
 #include "core/field/core_field.h"
 
@@ -29,20 +30,24 @@ EvaluationParameter::EvaluationParameter(const string& filename) :
 
 bool EvaluationParameter::save(const string& filename)
 {
+    toml::Value v;
+
+    for (const auto& ef : EvaluationFeature::all()) {
+        v.set(ef.str(), getValue(ef.key()));
+    }
+
+    for (const auto& ef : EvaluationSparseFeature::all()) {
+        toml::Value vs;
+        for (size_t i = 0; i < ef.size(); ++i) {
+            vs.push(getValue(ef.key(), i));
+        }
+
+        v.set(ef.str(), vs);
+    }
+
     try {
         ofstream ofs(filename, ios::out | ios::trunc);
-
-        for (const auto& ef : EvaluationFeature::all()) {
-            ofs << ef.str() << " = " << getValue(ef.key()) << endl;
-        }
-        for (const auto& ef : EvaluationSparseFeature::all()) {
-            ofs << ef.str() << " =";
-            for (size_t i = 0; i < ef.size(); ++i) {
-                ofs << ' ' << getValue(ef.key(), i);
-            }
-            ofs << endl;
-        }
-
+        v.write(ofs);
         return true;
     } catch (std::exception& e) {
         LOG(WARNING) << "EvaluationParameter::save failed: " << e.what();
@@ -56,39 +61,14 @@ bool EvaluationParameter::load(const string& filename)
         sparseCoef_[feature.key()].resize(feature.size());
     }
 
-    map<string, vector<double>> keyValues;
+    toml::Value value;
     try {
         ifstream ifs(filename, ios::in);
-
-        string str;
-        while (getline(ifs, str)) {
-            while (!str.empty() && str.back() == '\\') {
-                str.back() = ' ';
-                string line;
-                if (getline(ifs, line)) {
-                    str += line;
-                }
-            }
-
-            istringstream ss(str);
-            string key;
-            if (!(ss >> key))
-                continue;
-
-            char c;
-            if (!((ss >> c) && c == '=')) {
-                LOG(WARNING) << "Invalid EvaluationParameterFormat: "
-                             << key << " : "
-                             << str;
-                return false;
-            }
-
-            vector<double> values;
-            double v;
-            while (ss >> v)
-                values.push_back(v);
-
-            keyValues.insert(make_pair(key, values));
+        toml::Parser parser(ifs);
+        value = parser.parse();
+        if (!value.valid()) {
+            LOG(ERROR) << parser.errorReason();
+            return false;
         }
     } catch (std::exception& e) {
         LOG(WARNING) << "EvaluationParameter::load failed: " << e.what();
@@ -96,29 +76,61 @@ bool EvaluationParameter::load(const string& filename)
     }
 
     for (const EvaluationFeature& ef : EvaluationFeature::all()) {
-        if (keyValues.count(ef.str())) {
-            coef_[ef.key()] = keyValues[ef.str()].front();
-            keyValues.erase(ef.str());
+        const toml::Value* v = value.find(ef.str());
+        if (!v)
+            continue;
+
+        if (v->is<int>()) {
+            coef_[ef.key()] = v->as<int>();
+        } else if (v->is<double>()) {
+            coef_[ef.key()] = v->as<double>();
+        } else {
+            LOG(ERROR) << ef.key() << " is not a number";
+            return false;
         }
+
+        value.erase(ef.str());
     }
 
     for (const EvaluationSparseFeature& ef : EvaluationSparseFeature::all()) {
-        if (keyValues.count(ef.str())) {
-            if (ef.size() != keyValues[ef.str()].size()) {
-                LOG(ERROR) << "Invalid EvaluationParameterFormat: "
-                           << ef.str() << " : Length mismatch.";
+        const toml::Value* v = value.find(ef.str());
+        if (!v)
+            continue;
+
+        if (!v->is<toml::Array>()) {
+            LOG(ERROR) << ef.key() << " is not an array";
+            return false;
+        }
+
+        vector<double>* vs = &sparseCoef_[ef.key()];
+        const toml::Array& ary = v->as<toml::Array>();
+
+        if (ary.size() != vs->size()) {
+            LOG(ERROR) << ef.key() << " should have size " << vs->size()
+                       << ", but configuration has size " << ary.size();
+            return false;
+        }
+
+        for (size_t i = 0; i < ary.size(); ++i) {
+            double d;
+            if (ary[i].is<int>()) {
+                d = ary[i].as<int>();
+            } else if (ary[i].is<double>()) {
+                d = ary[i].as<double>();
+            } else {
+                LOG(ERROR) << ef.key() << "[" << i << "] is not a number.";
                 return false;
             }
-
-            sparseCoef_[ef.key()] = keyValues[ef.str()];
-            keyValues.erase(ef.str());
+            (*vs)[i] = d;
         }
+
+        value.erase(ef.str());
     }
 
-    if (!keyValues.empty()) {
+    if (!value.empty()) {
         stringstream ss;
         bool first = true;
-        for (const auto& entry : keyValues) {
+        for (const auto& entry : value.as<toml::Table>()) {
             if (first) {
                 first = false;
             } else {
