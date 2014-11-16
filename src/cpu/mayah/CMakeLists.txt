@@ -4,7 +4,9 @@ cpu_setup("mayah")
 
 add_library(mayah_lib
             book_field.cc book_reader.cc
-            evaluator.cc evaluation_feature.cc evaluation_parameter.cc gazer.cc mayah_ai.cc score_collector.cc)
+            evaluator.cc evaluation_feature.cc evaluation_parameter.cc
+            initial_book.cc
+            gazer.cc mayah_ai.cc score_collector.cc)
 
 function(mayah_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
@@ -25,6 +27,7 @@ mayah_add_executable(mayah_cpu main.cc)
 mayah_add_executable(interactive interactive.cc)
 mayah_add_executable(solver solver.cc)
 mayah_add_executable(tweaker tweaker.cc)
+mayah_add_executable(experiment experiment.cc)
 
 cpu_add_runner(run.sh)
 cpu_add_runner(run_v.sh)
@@ -32,9 +35,10 @@ cpu_add_runner(run_advanced.sh)
 cpu_add_runner(run_advanced_v.sh)
 cpu_add_runner(run_parallel.sh)
 
-mayah_add_test(evaluator_test)
 mayah_add_test(book_field_test)
+mayah_add_test(evaluator_test)
 mayah_add_test(gazer_test)
+mayah_add_test(initial_book_test)
 mayah_add_test(mayah_ai_test)
 
 mayah_add_test(mayah_ai_performance_test 1)

@@ -14,6 +14,8 @@ public:
     std::string toString() const;
 
     bool isValid() const { return isNormalColor(axis) && isNormalColor(child); }
+    constexpr Kumipuyo reverse() const { return Kumipuyo(child, axis); }
+    bool isRep() const { return axis == child; }
 
     friend bool operator==(const Kumipuyo& lhs, const Kumipuyo& rhs) { return lhs.axis == rhs.axis && lhs.child == rhs.child; }
     friend bool operator!=(const Kumipuyo& lhs, const Kumipuyo& rhs) { return !(lhs == rhs); }

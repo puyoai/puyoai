@@ -26,6 +26,11 @@ public:
         return true;
     }
 
+    constexpr Decision reverse() const
+    {
+        return Decision(childX(), (r + 2) & 0x3);
+    }
+
     std::string toString() const;
 
     friend bool operator==(const Decision& lhs, const Decision& rhs) { return lhs.x == rhs.x && lhs.r == rhs.r; }
