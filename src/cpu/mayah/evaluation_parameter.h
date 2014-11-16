@@ -41,7 +41,7 @@ public:
 
 private:
     std::vector<double> coef_;
-    std::vector<std::vector<double> > sparseCoef_;
+    std::vector<std::vector<double>> sparseCoef_;
 };
 
 #endif
