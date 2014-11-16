@@ -1,4 +1,5 @@
 /build
+/out
 .DS_Store
 *.cmake
 Makefile
