@@ -1,0 +1,22 @@
+name = "GTR3"
+
+field = [
+    "Y.....",
+    "G.....",
+    "YB....",
+    "YYB...",
+    "BBR...",
+]
+next = "GRGYRRRR"
+
+enemy_field = []
+enemy_next = "RRBBYYGG"
+enemy_decisions = [[3, 2], [3, 2]]
+
+[[answers]]
+score = 100
+decisions = [[3, 2], [2, 0]]
+
+[[answers]]
+score = 100
+decisions = [[3, 2], [2, 3]]

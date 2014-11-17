@@ -1,0 +1,28 @@
+name = "fire because large enough"
+
+field = [
+      ".....B",
+      "....BB",
+      "...BRR",
+      "RYGRBR",
+      "RRYGGG",
+      "YYGBBB"
+]
+next = "YYRYGGBB"
+
+enemy_field = []
+enemy_next = "RRYYGGBB"
+
+enemy_decisions = [[3, 2], [4, 2]]
+
+[[answers]]
+score = 100
+decisions = [[3, 2], [1, 0]]
+
+[[answers]]
+score = 100
+decisions = [[3, 2], [1, 0]]
+
+[[answers]]
+score = 99
+decisions = [[2, 1], [1, 0]]
