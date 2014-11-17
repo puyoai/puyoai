@@ -1,0 +1,15 @@
+name = "ZENKESHI-3"
+
+field = [
+    "BBB...",
+    "RRR...",
+]
+next = "BBRRYYGG"
+
+enemy_field = []
+enemy_next = "BBRRYYGG"
+enemy_decisions = [[3, 2], [3, 2]]
+
+[[answers]]
+score = 100
+decisions = [[3, 2], [3, 2]]
