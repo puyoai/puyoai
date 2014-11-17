@@ -47,7 +47,7 @@ bool EvaluationParameter::save(const string& filename)
 
     try {
         ofstream ofs(filename, ios::out | ios::trunc);
-        v.write(ofs);
+        v.write(&ofs);
         return true;
     } catch (std::exception& e) {
         LOG(WARNING) << "EvaluationParameter::save failed: " << e.what();
