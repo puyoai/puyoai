@@ -356,24 +356,25 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         }
     }
 
-    sc_->addScore(STRATEGY_SCORE, plan.score());
-
     if (plan.field().isZenkeshi()) {
         int puyoCount = plan.decisions().size() * 2 + currentField.countPuyos();
         if (puyoCount <= 16) {
             sc_->addScore(STRATEGY_INITIAL_ZENKESHI, 1);
             return true;
         }
+        sc_->addScore(STRATEGY_SCORE, plan.score());
         sc_->addScore(STRATEGY_ZENKESHI, 1);
         return true;
     }
 
     if (me.hasZenkeshi && !enemy.hasZenkeshi) {
         if (!enemy.isRensaOngoing) {
+            sc_->addScore(STRATEGY_SCORE, plan.score());
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
         if (me.pendingOjama + me.fixedOjama <= 36) {
+            sc_->addScore(STRATEGY_SCORE, plan.score());
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
@@ -387,6 +388,8 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         sc_->addScore(STRATEGY_LARGE_ENOUGH, 1);
         return true;
     }
+
+    sc_->addScore(STRATEGY_SCORE, plan.score());
 
     // If IBARA found, we always consider it.
     // TODO(mayah): Don't consider IBARA if we don't have enough puyos. Better not to fire IBARA in that case.
