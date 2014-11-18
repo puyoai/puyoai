@@ -293,9 +293,8 @@ void Evaluator<ScoreCollector>::evalFieldUShape(const RefPlan& plan, bool enemyH
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalUnreachableSpace(const RefPlan& plan)
+void Evaluator<ScoreCollector>::evalUnreachableSpace(const CoreField& f)
 {
-    const CoreField& f = plan.field();
     FieldBitField checked;
     f.countConnectedPuyos(3, 12, &checked);
 
@@ -670,7 +669,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (USE_FIELD_USHAPE_FEATURE)
         evalFieldUShape(plan, enemy.hasZenkeshi);
 
-    evalUnreachableSpace(plan);
+    evalUnreachableSpace(plan.field());
 
     int numReachableSpace = plan.field().countConnectedPuyos(3, 12);
     int maxVirtualRensaResultScore = 0;
