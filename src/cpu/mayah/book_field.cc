@@ -61,17 +61,14 @@ bool checkCell(char currentVar, char neighborVar, PuyoColor neighborColor, const
         return true;
 
     if (neighborVar == '.') {
-        if (env.map(currentVar) == neighborColor) {
+        if (env.map(currentVar) == neighborColor)
             return false;
-        }
     } else if ('a' <= neighborVar && neighborVar <= 'z') {
-        if (currentVar != std::toupper(neighborVar) && env.map(currentVar) == neighborColor) {
+        if (currentVar != std::toupper(neighborVar) && env.map(currentVar) == neighborColor)
             return false;
-        }
     } else {
-        if (env.map(currentVar) == env.map(neighborVar) && env.isSet(currentVar)) {
+        if (env.map(currentVar) == env.map(neighborVar) && env.isSet(currentVar))
             return false;
-        }
     }
 
     return true;
@@ -158,8 +155,8 @@ BookField BookField::mirror() const
     BookField bf(*this);
     for (int x = 1; x <= 3; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            swap(bf.field_[x][y], bf.field_[7-x][y]);
-            swap(bf.scoreField_[x][y], bf.scoreField_[7-x][y]);
+            swap(bf.field_[x][y], bf.field_[7 - x][y]);
+            swap(bf.scoreField_[x][y], bf.scoreField_[7 - x][y]);
         }
     }
 
