@@ -5,30 +5,9 @@
 #include <map>
 #include <sstream>
 
+#include "base/strings.h"
+
 using namespace std;
-
-static string trim(const string& str)
-{
-    string::size_type left = str.find_first_not_of(" ");
-    if (left == string::npos)
-        return str;
-
-    string::size_type right = str.find_last_not_of(" ");
-    return str.substr(left, right - left + 1);
-}
-
-static vector<string> split(const string& str)
-{
-    vector<string> result;
-
-    istringstream ss(str);
-    string s;
-    while (ss >> s) {
-        result.push_back(s);
-    }
-
-    return result;
-}
 
 static void merge(vector<BookField>* result,
                   const BookField& current,
@@ -72,7 +51,7 @@ vector<BookField> BookReader::parse(const string& filename)
             if (!currentName.empty())
                 partialFields.emplace(currentName, BookField(currentName, currentField, score));
 
-            currentName = trim(str.substr(5));
+            currentName = strings::trim(str.substr(5));
             currentField.clear();
             score = 1.0;
             continue;
@@ -89,12 +68,12 @@ vector<BookField> BookReader::parse(const string& filename)
         if (str.find("COMBINE:") == 0) {
             if (!currentName.empty()) {
                 partialFields.emplace(currentName, BookField(currentName, currentField, score));
-                currentName = trim(str.substr(5));
+                currentName = strings::trim(str.substr(5));
                 currentField.clear();
                 score = 1.0;
             }
 
-            vector<string> names = split(trim(str.substr(8)));
+            vector<string> names = strings::split(strings::trim(str.substr(8)), ' ');
             CHECK(names.size() > 0);
             {
                 auto range = partialFields.equal_range(names[0]);
