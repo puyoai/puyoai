@@ -142,7 +142,9 @@ TEST_F(EvaluatorTest, connectionHorizontal)
         "OOYYOO"
         "RRROGG");
 
-    CollectedFeature cf = eval(f);
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+        evaluator->evalRestrictedConnectionHorizontalFeature(f);
+    });
 
     EXPECT_EQ(1, cf.feature(CONNECTION_HORIZONTAL_2));
     EXPECT_EQ(1, cf.feature(CONNECTION_HORIZONTAL_3));

@@ -168,10 +168,9 @@ void Evaluator<ScoreCollector>::collectScoreForConnection(const CoreField& field
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const RefPlan& plan)
+void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const CoreField& f)
 {
     const int MAX_HEIGHT = 3; // instead of CoreField::HEIGHT
-    const CoreField& f = plan.field();
     for (int y = 1; y <= MAX_HEIGHT; ++y) {
         for (int x = 1; x < CoreField::WIDTH; ++x) {
             if (!isNormalColor(f.color(x, y)))
@@ -661,7 +660,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (USE_CONNECTION_FEATURE)
         collectScoreForConnection(plan.field());
     if (USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE)
-        evalRestrictedConnectionHorizontalFeature(plan);
+        evalRestrictedConnectionHorizontalFeature(plan.field());
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(plan);
     if (USE_VALLEY_FEATURE)
