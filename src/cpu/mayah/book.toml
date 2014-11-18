@@ -1,0 +1,942 @@
+# A = should be A, neighbors will be checked.
+# a = A is allowed, neighbors won't be checked.
+# * = anything allowed
+# For more information, see book_field_test.cc for examples.
+
+[[book]]
+field = [
+    "BBA...",
+    "AAC..."
+]
+name = "GTR-BASE"
+score = 10.300000
+
+[[book]]
+field = [
+    "BA....",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR"
+score = 10.200000
+
+[[book]]
+field = [
+    "bDD...",
+    "BEE...",
+    "DDE...",
+    "BAC...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR-HEAD"
+score = 9.000000
+
+[[book]]
+field = [
+    ".D....",
+    "bD....",
+    "BEE...",
+    "DDE...",
+    "BAC...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR-HEAD"
+score = 9.000000
+
+[[book]]
+field = [
+    "b.....",
+    "BD....",
+    "DD....",
+    "BAC...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "Bb....",
+    "D.....",
+    "DD....",
+    "BAC...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "Bb....",
+    "DDD...",
+    "BAC...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "....YY",
+    "..CYXY",
+    "...CCC",
+    "..CXXX"
+]
+name = "GTR-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    "....YY",
+    "..CXXX",
+    "...CCC",
+    "..CYYX"
+]
+name = "GTR-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    ".....Y",
+    ".....Y",
+    "..CXXX",
+    "...CCC",
+    "..CYYX"
+]
+name = "GTR-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    ".....Y",
+    "....YZ",
+    "..CXXX",
+    "...CCC",
+    "..CYYX"
+]
+name = "GTR-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    ".....y",
+    "...xxY",
+    "..CXXY",
+    "...CCX",
+    "..CYYX"
+]
+name = "GTR-TAIL"
+score = 9.900000
+
+[[book]]
+field = [
+    ".....y",
+    "...xxY",
+    "..CXXY",
+    "...YYX",
+    "..CCCX"
+]
+name = "GTR-TAIL"
+score = 9.900000
+
+[[book]]
+field = [
+    "....yy",
+    "...*YY",
+    "..CXXZ",
+    "...YYX",
+    "..CCCX"
+]
+name = "GTR-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    "...x.Y",
+    "..CXYY",
+    "...CXX",
+    "..CCXY"
+]
+name = "GTR-TAIL"
+score = 9.900000
+
+[[book]]
+field = [
+    "...x..",
+    "..xXxY",
+    "..CZYY",
+    "...CXX",
+    "..CCXY"
+]
+name = "GTR-TAIL"
+score = 9.900000
+
+[[book]]
+field = [
+    "...xy.",
+    "..xXYy",
+    "..CXYZ",
+    "...CXY",
+    "..CCXY"
+]
+name = "GTR-TAIL"
+score = 9.700000
+
+[[book]]
+field = [
+    "...xyz",
+    "..xXYZ",
+    "..CXZY",
+    "...CXY",
+    "..CCXY"
+]
+name = "GTR-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    "a.....",
+    "A.....",
+    "Bb....",
+    "DD....",
+    "BDC...",
+    "BAA...",
+    "BAC..."
+]
+name = "LR-HEAD"
+score = 9.700000
+
+[[book]]
+field = [
+    "a.....",
+    "A.....",
+    "B.....",
+    "A.....",
+    "AA....",
+    "BDC...",
+    "BAA...",
+    "BAC..."
+]
+name = "LR-HEAD"
+score = 9.500000
+
+[[book]]
+field = [
+    "a.....",
+    "A.....",
+    "B.....",
+    "B.....",
+    "A.....",
+    "AA....",
+    "BDC...",
+    "BAA...",
+    "BAC..."
+]
+name = "LR-HEAD"
+score = 9.400000
+
+[[book]]
+field = [
+    "ad....",
+    "AD....",
+    "BEE...",
+    "DED...",
+    "BDC...",
+    "BAA...",
+    "BAC..."
+]
+name = "LR-HEAD"
+score = 8.000000
+
+[[book]]
+field = [
+    "b.....",
+    "B.....",
+    "EEE...",
+    "BAD...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR2-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "Bb....",
+    "EEE...",
+    "BAD...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR2-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "BE....",
+    "EE....",
+    "BAD...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR2-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "B.....",
+    "E.....",
+    "EE....",
+    "BAD...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR2-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    ".....c",
+    "....cC",
+    "..DXXX",
+    "...DDD",
+    "..CCCX"
+]
+name = "GTR2-TAIL"
+score = 9.500000
+
+[[book]]
+field = [
+    "...xXx",
+    "..DXCX",
+    "...DDD",
+    "..CCCX"
+]
+name = "GTR2-TAIL"
+score = 9.500000
+
+[[book]]
+field = [
+    "..D.X.",
+    "...DDD",
+    "..CXXX"
+]
+name = "GTR2-TAIL"
+score = 9.500000
+
+[[book]]
+field = [
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR-BASE"
+score = 10.300000
+
+[[book]]
+field = [
+    "......",
+    "..A...",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR"
+score = 10.200000
+
+[[book]]
+field = [
+    ".b....",
+    "DBb...",
+    "DDAC..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "BD....",
+    "DDAC..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "Bb....",
+    "D.....",
+    "DDAC..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR-HEAD"
+score = 10.100000
+
+[[book]]
+field = [
+    "b.....",
+    "Bb....",
+    "E.....",
+    "D.....",
+    "DEE...",
+    "DEAC..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR-HEAD"
+score = 9.800000
+
+[[book]]
+field = [
+    "b.....",
+    "B.....",
+    "E.....",
+    "E.....",
+    "E.....",
+    "DD....",
+    "DEAC..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR-HEAD"
+score = 9.800000
+
+[[book]]
+field = [
+    "B.....",
+    "D.....",
+    "D.....",
+    "E.....",
+    "DEE...",
+    "DFAC..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR-HEAD"
+score = 9.700000
+
+[[book]]
+field = [
+    ".....x",
+    "...cxX",
+    "...CxX",
+    "....CC",
+    "...CXX"
+]
+name = "NEWGTR-TAIL"
+score = 10.000000
+
+[[book]]
+field = [
+    "...c.X",
+    "...CXX",
+    "....CC",
+    "...CYX"
+]
+name = "NEWGTR-TAIL"
+score = 10.000000
+
+[[book]]
+field = [
+    "...c.X",
+    "...CXX",
+    "....CC",
+    "...CXC"
+]
+name = "NEWGTR-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    "...cxx",
+    "...CXX",
+    "....CC",
+    "...CXX"
+]
+name = "NEWGTR-TAIL"
+score = 9.700000
+
+[[book]]
+field = [
+    ".b....",
+    "DBb...",
+    "DDAE..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR2-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "Bb....",
+    "D.....",
+    "DDAE..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR2-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "BD....",
+    "DDAE..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR2-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "B.....",
+    "DD....",
+    "DFAE..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR2-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "B.....",
+    "F.....",
+    "F.....",
+    "F.....",
+    "DD....",
+    "DFAE..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR2-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "B.....",
+    "F.....",
+    "F.....",
+    "D.....",
+    "DFf...",
+    "DFAE..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR2-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
+    "B.....",
+    "D.....",
+    "D.....",
+    "G.....",
+    "DGG...",
+    "DFAE..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR2-HEAD"
+score = 9.700000
+
+[[book]]
+field = [
+    "B.....",
+    "D.....",
+    "D.....",
+    "GG....",
+    "DG....",
+    "DFAE..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR2-HEAD"
+score = 9.700000
+
+[[book]]
+field = [
+    "...E..",
+    "....EE",
+    "...CEX"
+]
+name = "NEWGTR2-TAIL"
+score = 9.500000
+
+[[book]]
+field = [
+    "....cc",
+    "...ECC",
+    "....EE",
+    "...CEC"
+]
+name = "NEWGTR2-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    "...ec.",
+    "...ECE",
+    "....EE",
+    "...CCC"
+]
+name = "NEWGTR2-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    "...ecc",
+    "...ECC",
+    "....EE",
+    "...CCE"
+]
+name = "NEWGTR2-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    "....xc",
+    "...*XC",
+    "...ECX",
+    "....EE",
+    "...CCE"
+]
+name = "NEWGTR2-TAIL"
+score = 9.800000
+
+[[book]]
+field = [
+    "....xX",
+    "...EXE",
+    "....EE",
+    "...CXX"
+]
+name = "NEWGTR2-TAIL"
+score = 8.200000
+
+[[book]]
+field = [
+    "D.....",
+    "DBAC..",
+    "DBBA..",
+    "AAAC.."
+]
+name = "LTR-HEAD"
+score = 9.600000
+
+[[book]]
+field = [
+    "b.....",
+    "B.....",
+    "Dd....",
+    "Dd....",
+    "Tt....",
+    "Tt....",
+    "DBAC..",
+    "DBBA..",
+    "AAAC.."
+]
+name = "LTR-HEAD"
+score = 9.600000
+
+[[book]]
+field = [
+    "b.....",
+    "Bb....",
+    "Dd....",
+    "T.....",
+    "Td....",
+    "TDd...",
+    "DBAC..",
+    "DBBA..",
+    "AAAC.."
+]
+name = "LTR-HEAD"
+score = 9.600000
+
+[[book]]
+field = [
+    "DDAC..",
+    "DBBA..",
+    "BAAC.."
+]
+name = "FUKIGENGTR-HEAD"
+score = 9.900000
+
+[[book]]
+field = [
+    "D.....",
+    "DbAC..",
+    "DBBA..",
+    "BAAC.."
+]
+name = "FUKIGENGTR-HEAD"
+score = 9.800000
+
+[[book]]
+field = [
+    "b.....",
+    "Bb....",
+    "DDAE..",
+    "DBBA..",
+    "BAAC.."
+]
+name = "FUKIGENGTR2-HEAD"
+score = 9.800000
+
+[[book]]
+field = [
+    "b.....",
+    "Bb....",
+    "DDD...",
+    "BAC...",
+    "BBE...",
+    "AAA..."
+]
+name = "ZABUTONL-HEAD"
+score = 9.200000
+
+[[book]]
+field = [
+    "b.....",
+    "BD....",
+    "DD....",
+    "BAC...",
+    "BBE...",
+    "AAA..."
+]
+name = "ZABUTONL-HEAD"
+score = 9.100000
+
+[[book]]
+field = [
+    "b.....",
+    "Bb....",
+    "D.....",
+    "DD....",
+    "BAC...",
+    "BBE...",
+    "AAA..."
+]
+name = "ZABUTONL-HEAD"
+score = 9.100000
+
+[[book]]
+field = [
+    "b.....",
+    "B.....",
+    "DD....",
+    "DF*...",
+    "BAC...",
+    "BBE...",
+    "AAA..."
+]
+name = "ZABUTONL-HEAD"
+score = 8.900000
+
+[[book]]
+field = [
+    "BAC...",
+    "BBECC.",
+    "AAAFC."
+]
+name = "ZABUTONL-TAIL"
+score = 9.000000
+
+[[book]]
+field = [
+    "BACXXx",
+    "BBECCC",
+    "AAAFXX"
+]
+name = "ZABUTONL-TAIL"
+score = 9.000000
+
+[[book]]
+field = [
+    "BACXXx",
+    "BBECCC",
+    "AAAFXX"
+]
+name = "ZABUTONL-TAIL"
+score = 9.000000
+
+[[book]]
+field = [
+    "..c...",
+    "BACc..",
+    "BBE.E.",
+    "AAAEE."
+]
+name = "ZABUTONL-TAIL"
+score = 9.000000
+
+[[book]]
+field = [
+    "e.....",
+    "E*c.d.",
+    "EBCdD.",
+    "AABCCD",
+    "ABBCDD"
+]
+name = "DAAZUMI"
+score = 9.800000
+
+[[book]]
+field = [
+    "e.....",
+    "E*cd..",
+    "EBCDd.",
+    "AABCCD",
+    "ABBCDD"
+]
+name = "DAAZUMI"
+score = 9.800000
+
+[[book]]
+field = [
+    "ACBD..",
+    "AACB.D",
+    "BBCCDD"
+]
+name = "LLR"
+score = 9.300000
+
+[[book]]
+field = [
+    "..bd..",
+    "ACBDd.",
+    "AACC.D",
+    "BBCBDD"
+]
+name = "LLR"
+score = 9.300000
+
+[[book]]
+field = [
+    "..bb..",
+    "ACBBb.",
+    "AACD.D",
+    "BBCCDD"
+]
+name = "LLR"
+score = 9.300000
+
+[[book]]
+field = [
+    "a.....",
+    "Aa....",
+    "Bb....",
+    "DD....",
+    "DAC...",
+    "BAA...",
+    "BBC..."
+]
+name = "NAMEKUJI"
+score = 5.200000
+
+[[book]]
+field = [
+    "a.....",
+    "Aa....",
+    "Bb....",
+    "DD....",
+    "DAC...",
+    "BAA...",
+    "BBC..."
+]
+name = "NAMEKUJI"
+score = 5.200000
+
+[[book]]
+field = [
+    "EC....",
+    "EEDAbb",
+    "CCCDDD",
+    "AAABBB"
+]
+name = "YAYOI"
+score = 9.000000
+
+[[book]]
+field = [
+    "CE....",
+    "EEDAbb",
+    "CCCDDD",
+    "AAABBB"
+]
+name = "YAYOI"
+score = 8.800000
+
+# ----------------------------------------------------------------------
+
+[[combine]]
+name = "GTR"
+combine = ["GTR", "GTR-BASE", "GTR-HEAD", "GTR-TAIL"]
+
+[[combine]]
+name = "LR-HEAD"
+combine = ["LR-HEAD", "GTR-TAIL"]
+
+[[combine]]
+name = "GTR"
+combine = ["GTR", "GTR-BASE", "GTR2-HEAD", "GTR2-TAIL"]
+
+[[combine]]
+name = "NEWGTR"
+combine = ["NEWGTR", "NEWGTR-BASE", "NEWGTR-HEAD", "NEWGTR-TAIL"]
+
+[[combine]]
+name = "NEWGTR"
+combine = ["NEWGTR", "NEWGTR-BASE", "NEWGTR2-HEAD", "NEWGTR2-TAIL"]
+
+[[combine]]
+name = "LTR-HEAD"
+combine = ["LTR-HEAD", "NEWGTR-TAIL"]
+
+[[combine]]
+name = "FUKIGENGTR-HEAD"
+combine = ["FUKIGENGTR-HEAD", "NEWGTR-TAIL"]
+
+[[combine]]
+name = "FUKIGENGTR2-HEAD"
+combine = ["FUKIGENGTR2-HEAD", "NEWGTR2-TAIL"]
+
+[[combine]]
+name = "ZABUTONL-HEAD"
+combine = ["ZABUTONL-HEAD","ZABUTONL-TAIL"]
+
+[[combine]]
+name = "DAAZUMI"
+combine = ["DAAZUMI"]
+
+[[combine]]
+name = "LLR"
+combine = ["LLR"]
+
+[[combine]]
+name = "NAMEKUJI"
+combine = ["NAMEKUJI", "GTR-TAIL"]
+
+[[combine]]
+name = "YAYOI"
+combine = ["YAYOI"
+]

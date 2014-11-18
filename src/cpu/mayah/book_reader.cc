@@ -5,8 +5,9 @@
 #include <map>
 #include <sstream>
 
-#include "base/strings.h"
+#include <toml/toml.h>
 
+#include "base/strings.h"
 using namespace std;
 
 static void merge(vector<BookField>* result,
@@ -32,59 +33,46 @@ static void merge(vector<BookField>* result,
 // static
 vector<BookField> BookReader::parse(const string& filename)
 {
-    ifstream ifs(filename);
-
     vector<BookField> result;
-
     multimap<string, BookField> partialFields;
-    string currentName;
-    vector<string> currentField;
-    double score = 1.0;
 
-    string str;
-    while (getline(ifs, str)) {
-        if (str.empty())
-            continue;
-        if (str[0] == '#')
-            continue;
-        if (str.find("NAME:") == 0) {
-            if (!currentName.empty())
-                partialFields.emplace(currentName, BookField(currentName, currentField, score));
-
-            currentName = strings::trim(str.substr(5));
-            currentField.clear();
-            score = 1.0;
-            continue;
+    ifstream ifs(filename);
+    toml::Value value;
+    try {
+        toml::Parser parser(ifs);
+        value = parser.parse();
+        if (!value.valid()) {
+            LOG(ERROR) << parser.errorReason();
+            return vector<BookField>();
         }
-        if (str.find("SCORE:") == 0) {
-            score = stof(str.substr(6));
-            continue;
-        }
-        if (str.size() == 6) {
-            currentField.push_back(str);
-            continue;
-        }
+    } catch (std::exception& e) {
+        LOG(ERROR) << e.what();
+        return vector<BookField>();
+    }
 
-        if (str.find("COMBINE:") == 0) {
-            if (!currentName.empty()) {
-                partialFields.emplace(currentName, BookField(currentName, currentField, score));
-                currentName = strings::trim(str.substr(5));
-                currentField.clear();
-                score = 1.0;
-            }
+    const toml::Array& books = value.find("book")->as<toml::Array>();
+    for (const auto& book : books) {
+        string name = book.get<string>("name");
+        double score = book.get<double>("score");
+        vector<string> field;
+        for (const auto& s : book.get<toml::Array>("field"))
+            field.push_back(s.as<string>());
 
-            vector<string> names = strings::split(strings::trim(str.substr(8)), ' ');
-            CHECK(names.size() > 0);
-            {
-                auto range = partialFields.equal_range(names[0]);
-                for (auto it = range.first; it != range.second; ++it) {
-                    merge(&result, it->second, partialFields, names, 1);
-                }
-            }
-            continue;
+        partialFields.emplace(name, BookField(name, field, score));
+    }
+
+    const toml::Array& combines = value.find("combine")->as<toml::Array>();
+    for (const auto& combine : combines) {
+        string combinedName = combine.get<string>("name");
+        vector<string> names;
+        for (const auto& s : combine.get<toml::Array>("combine")) {
+            names.push_back(s.as<string>());
         }
 
-        CHECK(false) << "Unexpected line: " << str;
+        auto range = partialFields.equal_range(names[0]);
+        for (auto it = range.first; it != range.second; ++it) {
+            merge(&result, it->second, partialFields, names, 1);
+        }
     }
 
     return result;

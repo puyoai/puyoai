@@ -18,7 +18,7 @@
 #include "gazer.h"
 
 DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.toml", "the path to feature parameter");
-DEFINE_string(book, SRC_DIR "/cpu/mayah/book.txt", "the path to book");
+DEFINE_string(book, SRC_DIR "/cpu/mayah/book.toml", "the path to book");
 DEFINE_bool(use_advanced_next, false, "Use enemy's NEXT sequence also");
 
 using namespace std;
