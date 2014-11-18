@@ -121,7 +121,6 @@ public:
     // Returns true if complete match.
     bool evalBook(const std::vector<BookField>&, const std::vector<bool>& bookMatchable, const RefPlan&, const MidEvalResult&);
     void evalFrameFeature(const RefPlan&);
-    void evalConnectionHorizontalFeature(const RefPlan&);
     void evalRestrictedConnectionHorizontalFeature(const RefPlan&);
     void evalThirdColumnHeightFeature(const RefPlan& plan);
     void evalValleyDepth(const CoreField&);
