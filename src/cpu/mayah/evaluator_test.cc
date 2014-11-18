@@ -158,7 +158,10 @@ TEST_F(EvaluatorTest, NumUnreachableSpace1)
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
-    CollectedFeature cf = eval(f);
+
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+        evaluator->evalUnreachableSpace(f);
+    });
 
     EXPECT_EQ(0, cf.feature(NUM_UNREACHABLE_SPACE));
 }
@@ -178,7 +181,10 @@ TEST_F(EvaluatorTest, NumUnreachableSpace2)
         "    O "
         "    O "
         "    O ");
-    CollectedFeature cf = eval(f);
+
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+        evaluator->evalUnreachableSpace(f);
+    });
 
     EXPECT_EQ(12, cf.feature(NUM_UNREACHABLE_SPACE));
 }

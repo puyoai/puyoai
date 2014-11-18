@@ -126,7 +126,7 @@ public:
     void evalValleyDepth(const CoreField&);
     void evalRidgeHeight(const CoreField&);
     void evalFieldUShape(const RefPlan&, bool enemyHasZenkeshi);
-    void evalUnreachableSpace(const RefPlan&);
+    void evalUnreachableSpace(const CoreField&);
 
     void evalMidEval(const MidEvalResult&);
 
