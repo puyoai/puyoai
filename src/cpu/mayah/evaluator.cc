@@ -471,9 +471,11 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RefPlan& plan,
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const RefPlan& plan, const RensaTrackResult& trackResult)
+void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const CoreField& field,
+                                                               const RensaTrackResult& trackResult)
 {
-    const CoreField& field = plan.field();
+    static const int dx[4] = { 0,  0, 1, -1 };
+    static const int dy[4] = { 1, -1, 0,  0 };
 
     int distanceCount[5] {};
     int distance[CoreField::MAP_WIDTH][CoreField::MAP_HEIGHT] {};
@@ -487,7 +489,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const RefPlan& pl
         for (int y = 1; y <= CoreField::HEIGHT; ++y) {
             if (trackResult.erasedAt(x, y) != 1)
                 continue;
-            if (plan.field().color(x, y) == PuyoColor::EMPTY)
+            if (field.color(x, y) == PuyoColor::EMPTY)
                 continue;
 
             if (trackResult.erasedAt(x, y + 1) == 2) {
@@ -500,64 +502,49 @@ void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const RefPlan& pl
     }
 
     while (qHead != qTail) {
-        int x = qHead->x;
-        int y = qHead->y;
+        const int x = qHead->x;
+        const int y = qHead->y;
         qHead++;
 
-        if (trackResult.erasedAt(x, y + 1) == 1 && distance[x][y + 1] == 0) {
-            *qTail++ = Position(x, y + 1);
+        for (int i = 0; i < 4; ++i) {
+            const int xx = x + dx[i];
+            const int yy = y + dy[i];
+
+            if (field.color(xx, yy) == PuyoColor::EMPTY)
+                continue;
+            if (trackResult.erasedAt(xx, yy) != 1)
+                continue;
+            if (distance[xx][yy] != 0)
+                continue;
+
+            *qTail++ = Position(xx, yy);
             distanceCount[1]++;
-            distance[x][y + 1] = 1;
-        }
-        if (trackResult.erasedAt(x, y - 1) == 1 && distance[x][y - 1] == 0) {
-            *qTail++ = Position(x, y - 1);
-            distanceCount[1]++;
-            distance[x][y - 1] = 1;
-        }
-        if (trackResult.erasedAt(x + 1, y) == 1 && distance[x + 1][y] == 0) {
-            *qTail++ = Position(x + 1, y);
-            distanceCount[1]++;
-            distance[x + 1][y] = 1;
-        }
-        if (trackResult.erasedAt(x - 1, y) == 1 && distance[x - 1][y] == 0) {
-            *qTail++ = Position(x - 1, y);
-            distanceCount[1]++;
-            distance[x - 1][y] = 1;
+            distance[xx][yy] = 1;
         }
     }
 
     qHead = q;
 
     while (qHead != qTail) {
-        int x = qHead->x;
-        int y = qHead->y;
+        const int x = qHead->x;
+        const int y = qHead->y;
         qHead++;
 
         int d = distance[x][y] + 1;
 
-        if (distance[x + 1][y] == 0 && field.color(x + 1, y) == PuyoColor::EMPTY) {
-            distance[x + 1][y] = d;
+        for (int i = 0; i < 4; ++i) {
+            const int xx = x + dx[i];
+            const int yy = y + dy[i];
+
+            if (distance[xx][yy] != 0)
+                continue;
+            if (field.color(xx, yy) != PuyoColor::EMPTY)
+                continue;
+
+            distance[xx][yy] = d;
             distanceCount[d]++;
             if (d <= 3)
-                *qTail++ = Position(x + 1, y);
-        }
-        if (distance[x - 1][y] == 0 && field.color(x - 1, y) == PuyoColor::EMPTY) {
-            distance[x - 1][y] = d;
-            distanceCount[d]++;
-            if (d <= 3)
-                *qTail++ = Position(x - 1, y);
-        }
-        if (distance[x][y + 1] == 0 && field.color(x, y + 1) == PuyoColor::EMPTY) {
-            distance[x][y + 1] = d;
-            distanceCount[d]++;
-            if (d <= 3)
-                *qTail++ = Position(x, y + 1);
-        }
-        if (distance[x][y - 1] == 0 && field.color(x, y - 1) == PuyoColor::EMPTY) {
-            distance[x][y - 1] = d;
-            distanceCount[d]++;
-            if (d <= 3)
-                *qTail++ = Position(x, y - 1);
+                *qTail++ = Position(xx, yy);
         }
     }
 
@@ -685,7 +672,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
             rensaEvaluator.evalRensaChainFeature(plan, rensaResult, keyPuyos, firePuyos);
         rensaEvaluator.collectScoreForRensaGarbage(fieldAfterRensa);
         if (USE_HAND_WIDTH_FEATURE)
-            rensaEvaluator.evalRensaHandWidthFeature(plan, trackResult);
+            rensaEvaluator.evalRensaHandWidthFeature(plan.field(), trackResult);
         if (USE_FIRE_POINT_TABOO_FEATURE)
             rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
         if (USE_IGNITION_HEIGHT_FEATURE)

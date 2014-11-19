@@ -90,7 +90,7 @@ public:
                                const ColumnPuyoList& keyPuyos,
                                const ColumnPuyoList& firePuyos);
     void collectScoreForRensaGarbage(const CoreField& fieldAfterDrop);
-    void evalRensaHandWidthFeature(const RefPlan&, const RensaTrackResult&);
+    void evalRensaHandWidthFeature(const CoreField&, const RensaTrackResult&);
     void evalFirePointTabooFeature(const RefPlan&, const RensaTrackResult&);
     void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaTrackResult&, bool enemyHasZenkeshi);
     void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
