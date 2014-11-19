@@ -5,7 +5,7 @@
 #include <string>
 
 #include "base/base.h"
-#include "core/field/core_field.h"
+#include "core/field_constant.h"
 
 struct RensaResult {
     RensaResult() : chains(0), score(0), frames(0), quick(false) {}
@@ -33,9 +33,10 @@ struct RensaResult {
 // RensaTrackResult represents in what-th chain puyo is erased.
 class RensaTrackResult {
 public:
-    RensaTrackResult& operator=(const RensaTrackResult& result);
+    RensaTrackResult();
+    explicit RensaTrackResult(const std::string&);
 
-    void initialize();
+    RensaTrackResult& operator=(const RensaTrackResult& result);
 
     // Nth Rensa where (x, y) is erased. 0 if not erased.
     int erasedAt(int x, int y) const { return erasedAt_[x][y]; }
@@ -44,7 +45,7 @@ public:
     std::string toString() const;
 
 private:
-    uint8_t erasedAt_[PlainField::MAP_WIDTH][PlainField::MAP_HEIGHT];
+    uint8_t erasedAt_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
 };
 
 #endif

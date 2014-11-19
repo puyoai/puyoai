@@ -42,8 +42,8 @@ public:
     RensaTracker(RensaTrackResult* trackResult) :
         result_(trackResult)
     {
+        // TODO(mayah): Assert trackResult is initialized.
         static_assert(sizeof(originalY_ == g_originalY), "originalY_ and g_originalY should have the same size.");
-        result_->initialize();
         memcpy(originalY_, g_originalY, sizeof(originalY_));
     }
 
