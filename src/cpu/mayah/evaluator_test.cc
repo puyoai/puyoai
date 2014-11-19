@@ -50,6 +50,20 @@ protected:
 
         return sc.toCollectedFeature();
     }
+
+    template<typename F>
+    CollectedFeature withRensaEvaluator(F f) {
+        TsumoPossibility::initialize();
+
+        EvaluationParameter evaluationParameter;
+        vector<BookField> books;
+        FeatureScoreCollector sc(evaluationParameter);
+        RensaEvaluator<FeatureScoreCollector> rensaEvaluator(books, &sc);
+
+        f(&rensaEvaluator);
+
+        return sc.toCollectedFeature();
+    }
 };
 
 TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
@@ -187,6 +201,28 @@ TEST_F(EvaluatorTest, NumUnreachableSpace2)
     });
 
     EXPECT_EQ(12, cf.feature(NUM_UNREACHABLE_SPACE));
+}
+
+TEST_F(EvaluatorTest, handWidth)
+{
+    CoreField f(
+        " RG.B."
+        ".BRGGG"
+        "RRGBBB"
+        );
+    RensaTrackResult rtr(
+        "1....."
+        "123.4."
+        "112333"
+        "223444");
+
+    CollectedFeature cf = withRensaEvaluator([&f, &rtr](RensaEvaluator<FeatureScoreCollector>* evaluator) {
+        evaluator->evalRensaHandWidthFeature(f, rtr);
+    });
+
+    EXPECT_EQ(1, cf.feature(HAND_WIDTH_2).front());
+    EXPECT_EQ(1, cf.feature(HAND_WIDTH_3).front());
+    EXPECT_EQ(1, cf.feature(HAND_WIDTH_4).front());
 }
 
 TEST_F(EvaluatorTest, DontCrash1)
