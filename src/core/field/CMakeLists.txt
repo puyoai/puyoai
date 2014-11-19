@@ -18,5 +18,6 @@ endfunction()
 
 puyoai_core_field_add_test(core_field)
 puyoai_core_field_add_test(field_bit_field)
+puyoai_core_field_add_test(rensa_result)
 
 puyoai_core_field_add_test(field_performance 1)
