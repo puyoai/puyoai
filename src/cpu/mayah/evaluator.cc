@@ -539,6 +539,8 @@ void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const CoreField& 
                 continue;
             if (field.color(xx, yy) != PuyoColor::EMPTY)
                 continue;
+            if (trackResult.erasedAt(xx, yy) >= 2)
+                continue;
 
             distance[xx][yy] = d;
             distanceCount[d]++;
