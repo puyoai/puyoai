@@ -486,18 +486,17 @@ void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const CoreField& 
     Position* qTail = q;
 
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        for (int y = 1; y <= CoreField::HEIGHT; ++y) {
+        int h = field.height(x);
+        for (int y = 1; y <= h - 1; ++y) {
+            DCHECK(field.color(x, y) != PuyoColor::EMPTY);
+            DCHECK(field.color(x, y + 1) != PuyoColor::EMPTY);
             if (trackResult.erasedAt(x, y) != 1)
                 continue;
-            if (field.color(x, y) == PuyoColor::EMPTY)
-                continue;
 
-            if (trackResult.erasedAt(x, y + 1) == 2) {
-                distanceCount[1]++;
-                distance[x][y] = 1;
-                *qTail++ = Position(x, y);
-                break;
-            }
+            distanceCount[1]++;
+            distance[x][y] = 1;
+            *qTail++ = Position(x, y);
+            break;
         }
     }
 
