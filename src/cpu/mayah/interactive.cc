@@ -51,6 +51,7 @@ public:
 Problem makeProblem()
 {
     KumipuyoSeq generated = generateSequence();
+    LOG(INFO) << "seq=" << generated.toString();
 
     Problem problem;
     if (!FLAGS_problem.empty()) {
