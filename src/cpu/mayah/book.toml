@@ -633,6 +633,17 @@ name = "NEWGTR2-TAIL"
 score = 8.200000
 
 [[book]]
+name = "NEWGTR2-TAIL"
+score = 8.0
+field = [
+    ".....X",
+    "...EXX",
+    "...ECC",
+    "....EE",
+    "...CCX"
+]
+
+[[book]]
 field = [
     "D.....",
     "DBAC..",
