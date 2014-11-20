@@ -36,9 +36,11 @@ struct RunResult {
     int sumScore;
     int mainRensaCount;
     int aveMainRensaScore;
+    int over40000Count;
     int over60000Count;
     int over70000Count;
     int over80000Count;
+    int over100000Count;
 
     int resultScore() {
         return mainRensaCount * 20 + over60000Count * 6 + over70000Count + over80000Count;
@@ -169,9 +171,11 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
     int sumScore = 0;
     int sumMainRensaScore = 0;
     int mainRensaCount = 0;
+    int over40000Count = 0;
     int over60000Count = 0;
     int over70000Count = 0;
     int over80000Count = 0;
+    int over100000Count = 0;
     for (int i = 0; i < N; ++i) {
         Result r = ps[i].get_future().get();
         sumScore += r.score;
@@ -179,16 +183,11 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
             mainRensaCount++;
             sumMainRensaScore += r.score;
         }
-
-        if (r.score >= 60000) {
-            over60000Count++;
-        }
-        if (r.score >= 70000) {
-            over70000Count++;
-        }
-        if (r.score >= 80000) {
-            over80000Count++;
-        }
+        if (r.score >= 40000) { over40000Count++; }
+        if (r.score >= 60000) { over60000Count++; }
+        if (r.score >= 70000) { over70000Count++; }
+        if (r.score >= 80000) { over80000Count++; }
+        if (r.score >= 100000) { over100000Count++; }
         cout << r.msg;
     }
 
@@ -197,11 +196,14 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
     cout << "ave score  = " << (sumScore / N) << endl;
     cout << "main rensa = " << mainRensaCount << endl;
     cout << "ave main rensa = " << aveMainRensaScore << endl;
-    cout << "over 60000 = " << over60000Count << endl;
-    cout << "over 70000 = " << over70000Count << endl;
-    cout << "over 80000 = " << over80000Count << endl;
+    cout << "over  40000 = " << over40000Count << endl;
+    cout << "over  60000 = " << over60000Count << endl;
+    cout << "over  70000 = " << over70000Count << endl;
+    cout << "over  80000 = " << over80000Count << endl;
+    cout << "over 100000 = " << over100000Count << endl;
 
-    return RunResult { sumScore, mainRensaCount, aveMainRensaScore, over60000Count, over70000Count, over80000Count };
+    return RunResult { sumScore, mainRensaCount, aveMainRensaScore,
+            over40000Count, over60000Count, over70000Count, over80000Count, over100000Count };
 }
 
 void runAutoTweaker(Executor* executor, const EvaluationParameter& original, int num)
@@ -262,9 +264,11 @@ int main(int argc, char* argv[])
             cout << setw(5) << m.first << " -> " << m.second.sumScore
                  << " / " << m.second.mainRensaCount
                  << " / " << m.second.aveMainRensaScore
+                 << " / " << m.second.over40000Count
                  << " / " << m.second.over60000Count
                  << " / " << m.second.over70000Count
                  << " / " << m.second.over80000Count
+                 << " / " << m.second.over100000Count
                  << endl;
         }
     }

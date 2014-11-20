@@ -949,5 +949,4 @@ combine = ["NAMEKUJI", "GTR-TAIL"]
 
 [[combine]]
 name = "YAYOI"
-combine = ["YAYOI"
-]
+combine = ["YAYOI"]
