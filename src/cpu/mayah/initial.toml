@@ -38,7 +38,9 @@ field = [
     "..B...",
     "..A..."
 ]
+AACC = [3, 3]
 ABAB = [2, 0]
+ACAB = [1, 0]
 ACAC = [2, 0]
 ACCC = [2, 3]
 
@@ -50,3 +52,24 @@ field = [
 ABAB = [3, 0]
 ABCC = [3, 0]
 ABAC = [3, 0]
+
+[[book]]
+field = [
+    ".BB...",
+    ".AA..."
+]
+ACAB = [4, 2]
+
+[[book]]
+field = [
+   "..B...",
+   "AAA..."
+]
+BCAD = [1, 0]
+
+[[book]]
+field = [
+   "BBC...",
+   "AAA..."
+]
+BCBB = [3, 1]
