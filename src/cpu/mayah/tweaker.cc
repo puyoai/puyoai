@@ -24,6 +24,7 @@ DEFINE_bool(once, false, "true if running only once.");
 DEFINE_int32(auto_count, 0, "run auto tweaker for this count.");
 DEFINE_bool(show_field, false, "show field after each hand.");
 DEFINE_int32(size, 100, "the number of case size.");
+DEFINE_int32(offset, 0, "offset for random seed");
 
 using namespace std;
 
@@ -158,7 +159,7 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
             ai->setEvaluationParameter(parameter);
             Endless endless(std::move(std::unique_ptr<AI>(ai)));
             stringstream ss;
-            KumipuyoSeq seq = generateRandomSequenceWithSeed(i);
+            KumipuyoSeq seq = generateRandomSequenceWithSeed(i + FLAGS_offset);
             int score = endless.run(seq);
             ss << "case " << i << ": "
                << "score = " << score << endl;
