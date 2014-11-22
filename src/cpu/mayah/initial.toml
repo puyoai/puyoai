@@ -33,6 +33,7 @@ field = [
     "AA...."
 ]
 ABAB = [3, 0]
+ABCC = [3, 0]
 
 [[book]]
 field = [
