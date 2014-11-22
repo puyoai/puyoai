@@ -177,9 +177,11 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
     int over70000Count = 0;
     int over80000Count = 0;
     int over100000Count = 0;
+    multimap<int, int> scoreToId;
     for (int i = 0; i < N; ++i) {
         Result r = ps[i].get_future().get();
         sumScore += r.score;
+        scoreToId.insert(make_pair(r.score, i + FLAGS_offset));
         if (r.score >= 10000) {
             mainRensaCount++;
             sumMainRensaScore += r.score;
@@ -202,6 +204,16 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
     cout << "over  70000 = " << over70000Count << endl;
     cout << "over  80000 = " << over80000Count << endl;
     cout << "over 100000 = " << over100000Count << endl;
+    if (scoreToId.size() >= 10) {
+        cout << "Worst cases:" << endl;
+        int cnt = 0;
+        for (const auto& entry : scoreToId) {
+            cout << "  id: " << entry.second << " -> " << entry.first << endl;
+            ++cnt;
+            if (cnt > 5)
+                break;
+        }
+    }
 
     return RunResult { sumScore, mainRensaCount, aveMainRensaScore,
             over40000Count, over60000Count, over70000Count, over80000Count, over100000Count };
