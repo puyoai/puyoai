@@ -72,11 +72,11 @@ CCBD = [5, 1]
 
 [[book]]
 field = [
-    "AB....",
-    "AC...."
+    "AC....",
+    "AB...."
 ]
-ABDD = [5, 3]  # TODO: [1, 1] is better?
-CCBC = [1, 2]
+ACDD = [5, 3]  # TODO: [1, 1] is better?
+BBCB = [1, 2]
 
 [[book]]
 field = [
@@ -124,16 +124,16 @@ CDCD = [3, 1]
 
 [[book]]
 field = [
-    ".CC...",
-    "CBB...",
-    "CAA..."
+    ".AA...",
+    "ACC...",
+    "ABB..."
 ]
-CDAD = [6, 2]
+ADBD = [6, 2]
 
 [[book]]
 field = [
-    "AB....",
-    "BCC...",
-    "BAA..."
+    "BA....",
+    "ACC...",
+    "ABB..."
 ]
-AABD = [5, 1]
+BBAD = [5, 1]
