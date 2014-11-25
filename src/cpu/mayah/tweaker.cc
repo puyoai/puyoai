@@ -208,7 +208,7 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
     if (scores.size() >= 10) {
         sort(scores.begin(), scores.end());
         for (int i = 0; i < 5; ++i) {
-            cout << "  seed= " << scores[i].second << " -> " << scores[i].first << endl;
+            cout << "  seed " << scores[i].second << " -> " << scores[i].first << endl;
         }
     }
 
