@@ -1,5 +1,6 @@
 #include "mayah_ai.h"
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <future>
