@@ -115,7 +115,7 @@ BookField::BookField(const string& name, const vector<string>& field, double def
     varCount_ = calculateVarCount();
 }
 
-void BookField::merge(const BookField& bf)
+bool BookField::merge(const BookField& bf)
 {
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
@@ -141,13 +141,17 @@ void BookField::merge(const BookField& bf)
                        ('A' <= bf.field_[x][y] && bf.field_[x][y] <= 'Z')) {
                 field_[x][y] = bf.field_[x][y];
             } else {
-                CHECK_EQ(field_[x][y], bf.field_[x][y]);
+                VLOG(1) << "These field cannot be merged: "
+                        << toDebugString() << '\n'
+                        << bf.toDebugString();
+                return false;
             }
             scoreField_[x][y] = std::max(scoreField_[x][y], bf.scoreField_[x][y]);
         }
     }
 
     varCount_ = calculateVarCount();
+    return true;
 }
 
 BookField BookField::mirror() const

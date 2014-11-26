@@ -30,7 +30,7 @@ public:
     // match returns the matched score. If not matched, 0 will be returned.
     MatchResult match(const PlainField&) const;
 
-    void merge(const BookField&);
+    bool merge(const BookField&);
     BookField mirror() const;
 
     std::string name() const { return name_; }

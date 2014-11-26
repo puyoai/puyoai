@@ -6,7 +6,7 @@ AABB = [3, 3]
 AABC = [1, 2]
 ABAA = [3, 0]
 ABAB = [2, 2]
-ABAC = [3, 0]
+ABAC = [1, 1]
 ABCC = [2, 2]
 
 [[book]]
@@ -44,10 +44,18 @@ ABCC = [3, 0]
 
 [[book]]
 field = [
+    "AB...."
+]
+ACBC = [1, 1]
+ACAC = [1, 1]
+
+[[book]]
+field = [
     "..B...",
     "..A..."
 ]
-AACC = [3, 3]
+AAAC = [2, 3]
+AACC = [2, 3]
 ABAB = [2, 0]
 ACAB = [1, 0]
 ACAC = [2, 0]
@@ -58,9 +66,12 @@ field = [
     ".B....",
     ".A...."
 ]
+ABAA = [3, 0]
 ABAB = [3, 0]
+ABBB = [3, 0]
 ABCC = [3, 0]
 ABAC = [3, 0]
+ABBC = [3, 0]
 CCAB = [1, 2]
 CCAC = [1, 2]
 
@@ -86,13 +97,20 @@ field = [
 ACAB = [4, 2]
 ACAC = [4, 2]
 ACAD = [4, 2]
+CCAC = [1, 2]
+CCBC = [5, 1]
+CCBD = [1, 2]
+CCCC = [1, 2]
 
 [[book]]
 field = [
     "..B...",
     "AAA..."
 ]
+ABAB = [2, 2]
+ACBB = [4, 2]
 BCAD = [1, 0]
+BCAC = [4, 1]
 
 [[book]]
 field = [
@@ -110,6 +128,13 @@ BCBB = [3, 1]
 
 [[book]]
 field = [
+    "BCC...",
+    "AAA...",
+]
+ADBB = [4, 2]
+
+[[book]]
+field = [
     "BBB...",
     "AAA..."
 ]
@@ -117,10 +142,32 @@ ACBC = [3, 3]
 
 [[book]]
 field = [
+    "C.....",
+    "B.B...",
+    "AAA..."
+]
+ACCC = [4, 2]
+
+[[book]]
+field = [
     ".AAC..",
     ".CCB..",
 ]
 CDCD = [3, 1]
+
+[[book]]
+field = [
+    ".BB...",
+    ".AABC."
+]
+DDAC = [1, 2]
+
+[[book]]
+field = [
+    "..B...",
+    "AAABC."
+]
+ACDD = [6, 2]
 
 [[book]]
 field = [
