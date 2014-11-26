@@ -133,8 +133,13 @@ int main(int argc, char* argv[])
             double t2 = currentTime();
             if (aiPlan.decisions().empty())
                 cout << "No decision";
-            else
-                cout << aiPlan.decision(0).toString() << "-" << aiPlan.decision(1).toString();
+            else {
+                for (size_t i = 0; i < aiPlan.decisions().size(); ++i) {
+                    if (i)
+                        cout << "-";
+                    cout << aiPlan.decision(i).toString();
+                }
+            }
             cout << " time = " << ((t2 - t1) * 1000) << " [ms]" << endl;
 
             string str;
