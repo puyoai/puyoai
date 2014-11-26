@@ -244,6 +244,28 @@ TEST_F(EvaluatorTest, handWidth2)
     EXPECT_EQ(1, cf.feature(HAND_WIDTH_4).front());
 }
 
+TEST_F(EvaluatorTest, handWidth3)
+{
+    CoreField f(
+        ".Y...."
+        ".RRBGG"
+        "BBBYYY");
+
+    RensaTrackResult rtr(
+        "     1"
+        "    21"
+        "   311"
+        "333222");
+
+    CollectedFeature cf = withRensaEvaluator([&f, &rtr](RensaEvaluator<FeatureScoreCollector>* evaluator) {
+        evaluator->evalRensaHandWidthFeature(f, rtr);
+    });
+
+    EXPECT_EQ(1, cf.feature(HAND_WIDTH_2).front());
+    EXPECT_EQ(1, cf.feature(HAND_WIDTH_3).front());
+    EXPECT_EQ(2, cf.feature(HAND_WIDTH_4).front());
+}
+
 TEST_F(EvaluatorTest, DontCrash1)
 {
     CoreField f(

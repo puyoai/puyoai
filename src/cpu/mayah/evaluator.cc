@@ -487,10 +487,12 @@ void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const CoreField& 
 
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         int h = field.height(x);
-        for (int y = 1; y <= h - 1; ++y) {
+        for (int y = 1; y <= h; ++y) {
             DCHECK(field.color(x, y) != PuyoColor::EMPTY);
             DCHECK(field.color(x, y + 1) != PuyoColor::EMPTY);
             if (trackResult.erasedAt(x, y) != 1)
+                continue;
+            if (field.color(x, y + 1) == PuyoColor::EMPTY && trackResult.erasedAt(x, y + 1) == 0)
                 continue;
 
             distanceCount[1]++;
