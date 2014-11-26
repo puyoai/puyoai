@@ -1,7 +1,7 @@
 [[book]]
 field = []
 AAAA = [3, 2]
-AAAB = [2, 3]
+AAAB = [3, 3]
 AABB = [3, 3]
 AABC = [1, 2]
 ABAA = [3, 0]
@@ -31,6 +31,7 @@ BCAC = [4, 3]
 field = [
     ".AA..."
 ]
+BBAA = [1, 2]  # TODO: other?
 BBBB = [3, 3]
 BBBC = [3, 3]
 BBCC = [3, 3]
@@ -47,6 +48,7 @@ ABCC = [3, 0]
 field = [
     "AB...."
 ]
+ACBB = [1, 0]
 ACBC = [1, 1]
 ACAC = [1, 1]
 
@@ -69,12 +71,14 @@ field = [
 ]
 ABAA = [3, 0]
 ABAB = [3, 0]
+ABAC = [1, 0]
 ABBB = [3, 0]
 ABCC = [3, 0]
-ABAC = [3, 0]
 ABBC = [3, 0]
 CCAB = [5, 1]
 CCAC = [1, 2]
+
+# ----------------------------------------------------------------------
 
 [[book]]
 field = [
@@ -87,10 +91,12 @@ field = [
     "AC....",
     "AB...."
 ]
+ABBD = [2, 3]
 ACAC = [2, 3]
 ACDD = [5, 3]  # TODO: [1, 1] is better?
 BBCB = [1, 2]
-BCBC = [2, 3]
+BCBC = [3, 0]
+BDAB = [3, 1]
 
 [[book]]
 field = [
@@ -104,6 +110,8 @@ ACAC = [4, 2]
 ACAD = [4, 2]
 BCBC = [4, 1]  # TODO: [1, 0] ?
 BCBD = [4, 1]
+BCCC = [4, 0]
+BCCD = [4, 1]
 CCAC = [1, 2]
 CCBC = [5, 1]
 CCBD = [1, 2]
@@ -116,6 +124,8 @@ field = [
 ]
 ABAB = [2, 2]
 ACBB = [4, 2]
+ACBD = [4, 2]
+ACDD = [4, 2]
 BCAD = [1, 0]
 BCAC = [4, 1]
 
@@ -125,6 +135,38 @@ field = [
     "A.A..."
 ]
 ACCD = [2, 0]
+
+[[book]]
+field = [
+    "A.....",
+    "A.BC.."
+]
+ABAD = [2, 0]
+
+[[book]]
+field = [
+    "C.....",
+    "A.....",
+    "AB...."
+]
+BBAD = [3, 2]
+
+# ----------------------------------------------------------------------
+
+[[book]]
+field = [
+    "BBB...",
+    "AAA..."
+]
+ACBC = [3, 3]
+BCAB = [4, 0]
+
+[[book]]
+field = [
+    ".BB...",
+    ".AABB."
+]
+BCBD = [6, 0]
 
 [[book]]
 field = [
@@ -139,13 +181,7 @@ field = [
     "AAA...",
 ]
 ADBB = [4, 2]
-
-[[book]]
-field = [
-    "BBB...",
-    "AAA..."
-]
-ACBC = [3, 3]
+CDAD = [2, 0]
 
 [[book]]
 field = [
@@ -155,6 +191,12 @@ field = [
 ADBC = [3, 0]
 CDCD = [4, 1]
 
+[[book]]
+field = [
+    ".CC...",
+    ".AA.BB"
+]
+ABAB = [4, 2]
 
 [[book]]
 field = [
@@ -176,7 +218,15 @@ field = [
     ".BB...",
     ".AABC."
 ]
+CDCD = [6, 0]
 DDAC = [1, 2]
+
+[[book]]
+field = [
+    ".B....",
+    ".AABCC",
+]
+BDCD = [3, 0]  # TODO: other?
 
 [[book]]
 field = [
@@ -184,6 +234,8 @@ field = [
     "AAABC."
 ]
 ACDD = [6, 2]
+
+# ----------------------------------------------------------------------
 
 [[book]]
 field = [
