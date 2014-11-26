@@ -32,6 +32,7 @@ field = [
     ".AA..."
 ]
 BBBB = [3, 3]
+BBBC = [3, 3]
 BBCC = [3, 3]
 BCAB = [2, 0]
 
@@ -96,6 +97,8 @@ field = [
     ".BB...",
     ".AA..."
 ]
+AAAC = [5, 1]  # TODO: [2, 3] ?
+AACC = [5, 1]  # TODO: [2, 3] ?
 ACAB = [4, 2]
 ACAC = [4, 2]
 ACAD = [4, 2]
