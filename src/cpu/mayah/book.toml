@@ -94,6 +94,16 @@ score = 9.800000
 
 [[book]]
 field = [
+    "..C...",
+    "..CXYX",
+    "...CXX",
+    "..CYYY"
+]
+name = "GTR-TAIL"
+score = 9.500000
+
+[[book]]
+field = [
     "....YY",
     "..CXXX",
     "...CCC",

@@ -25,7 +25,8 @@ static void merge(vector<BookField>* result,
     auto range = partialFields.equal_range(names[pos]);
     for (auto it = range.first; it != range.second; ++it) {
         BookField field(current);
-        field.merge(it->second);
+        if (!field.merge(it->second))
+            continue;
         merge(result, field, partialFields, names, pos + 1);
     }
 }
