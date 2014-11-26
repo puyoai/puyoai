@@ -140,7 +140,7 @@ bool BookField::merge(const BookField& bf)
             } else if (('a' <= field_[x][y] && field_[x][y] <= 'z') &&
                        ('A' <= bf.field_[x][y] && bf.field_[x][y] <= 'Z')) {
                 field_[x][y] = bf.field_[x][y];
-            } else {
+            } else if (field_[x][y] != bf.field_[x][y]) {
                 VLOG(1) << "These field cannot be merged: "
                         << toDebugString() << '\n'
                         << bf.toDebugString();
