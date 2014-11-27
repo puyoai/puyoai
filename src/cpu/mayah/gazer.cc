@@ -255,7 +255,9 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         results.push_back(EstimatedRensaInfo(chains, score, framesToInitiate));
     };
 
-    RensaDetector::iteratePossibleRensas(field, 3, callback, RensaDetector::Mode::FLOAT);
+    RensaDetector::iteratePossibleRensas(field, 3,
+                                         RensaDetectorStrategy::defaultFloatStrategy(),
+                                         callback);
     if (results.empty())
         return;
 

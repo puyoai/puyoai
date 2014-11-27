@@ -66,7 +66,7 @@ TEST(RensaDetectorTest, iteratePossibleRensa)
             found2 = true;
     };
 
-    RensaDetector::iteratePossibleRensas(f, 0, callback);
+    RensaDetector::iteratePossibleRensas(f, 0, RensaDetectorStrategy::defaultDropStrategy(), callback);
     EXPECT_TRUE(found1);
     EXPECT_TRUE(found2);
 }
@@ -111,7 +111,7 @@ TEST(RensaDetectorTest, iteratePossibleRensaWithKeyPuyos)
         }
     };
 
-    RensaDetector::iteratePossibleRensas(f, 3, callback);
+    RensaDetector::iteratePossibleRensas(f, 3, RensaDetectorStrategy::defaultDropStrategy(), callback);
 
     EXPECT_TRUE(found[0]);
     EXPECT_TRUE(found[1]);
@@ -153,7 +153,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat)
             found = true;
     };
 
-    RensaDetector::iteratePossibleRensas(f, 0, callback, RensaDetector::Mode::FLOAT);
+    RensaDetector::iteratePossibleRensas(f, 0, RensaDetectorStrategy::defaultFloatStrategy(), callback);
     EXPECT_TRUE(found);
 }
 
@@ -179,7 +179,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat2)
         }
     };
 
-    RensaDetector::iteratePossibleRensas(f, 0, callback, RensaDetector::Mode::FLOAT);
+    RensaDetector::iteratePossibleRensas(f, 0, RensaDetectorStrategy::defaultFloatStrategy(), callback);
     EXPECT_TRUE(found);
 }
 
@@ -221,7 +221,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1_1)
             foundUnexpected = true;
     };
 
-    RensaDetector::iteratePossibleRensasIteratively(f, 1, callback);
+    RensaDetector::iteratePossibleRensasIteratively(f, 1, RensaDetectorStrategy::defaultDropStrategy(), callback);
 
     EXPECT_TRUE(foundExpected);
     EXPECT_FALSE(foundUnexpected);
@@ -258,7 +258,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1_2)
             foundExpected = true;
     };
 
-    RensaDetector::iteratePossibleRensasIteratively(f, 1, callback);
+    RensaDetector::iteratePossibleRensasIteratively(f, 1, RensaDetectorStrategy::defaultDropStrategy(), callback);
 
     EXPECT_TRUE(foundExpected);
 }
@@ -325,7 +325,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2_1)
             foundUnexpected = true;
     };
 
-    RensaDetector::iteratePossibleRensasIteratively(f, 2, callback);
+    RensaDetector::iteratePossibleRensasIteratively(f, 2, RensaDetectorStrategy::defaultDropStrategy(), callback);
 
     EXPECT_TRUE(foundExpected1);
     EXPECT_TRUE(foundExpected2);
@@ -364,7 +364,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2_2)
         }
     };
 
-    RensaDetector::iteratePossibleRensasIteratively(f, 2, callback);
+    RensaDetector::iteratePossibleRensasIteratively(f, 2, RensaDetectorStrategy::defaultDropStrategy(), callback);
 
     EXPECT_TRUE(foundExpected1);
 }
@@ -395,7 +395,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth3_1)
             foundExpected = true;
     };
 
-    RensaDetector::iteratePossibleRensasIteratively(f, 3, callback);
+    RensaDetector::iteratePossibleRensasIteratively(f, 3, RensaDetectorStrategy::defaultDropStrategy(), callback);
 
     EXPECT_TRUE(foundExpected);
 }
@@ -427,7 +427,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth3_2)
             foundExpected = true;
     };
 
-    RensaDetector::iteratePossibleRensasIteratively(f, 3, callback);
+    RensaDetector::iteratePossibleRensasIteratively(f, 3, RensaDetectorStrategy::defaultDropStrategy(), callback);
 
     EXPECT_TRUE(foundExpected);
 }
@@ -439,5 +439,5 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_DontCrash)
                        const ColumnPuyoList&, const ColumnPuyoList&,
                        const RensaTrackResult&, const RensaRefSequence&) {
     };
-    RensaDetector::iteratePossibleRensasIteratively(f, 2, callback);
+    RensaDetector::iteratePossibleRensasIteratively(f, 2, RensaDetectorStrategy::defaultDropStrategy(), callback);
 }

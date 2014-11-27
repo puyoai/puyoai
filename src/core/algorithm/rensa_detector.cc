@@ -19,8 +19,22 @@ using namespace std;
 namespace {
 
 typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
+RensaDetectorStrategy gDefaultFloatStrategy(RensaDetectorStrategy::Mode::FLOAT);
+RensaDetectorStrategy gDefaultDropStrategy(RensaDetectorStrategy::Mode::DROP);
 
-};
+}  // namespace anomymous
+
+// static
+const RensaDetectorStrategy& RensaDetectorStrategy::defaultFloatStrategy()
+{
+    return gDefaultFloatStrategy;
+}
+
+// static
+const RensaDetectorStrategy& RensaDetectorStrategy::defaultDropStrategy()
+{
+    return gDefaultDropStrategy;
+}
 
 static inline
 void makeProhibitArray(const RensaResult& rensaResult, const RensaTrackResult& trackResult,
@@ -176,20 +190,21 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
 }
 
 static
-void findRensas(const CoreField& field, RensaDetector::Mode mode,
+void findRensas(const CoreField& field,
+                const RensaDetectorStrategy& strategy,
                 const bool prohibits[FieldConstant::MAP_WIDTH],
                 bool fast,
                 SimulationCallback callback)
 {
-    switch (mode) {
-    case RensaDetector::Mode::DROP:
+    switch (strategy.mode()) {
+    case RensaDetectorStrategy::Mode::DROP:
         tryDropFire(field, prohibits, fast, callback);
         break;
-    case RensaDetector::Mode::FLOAT:
+    case RensaDetectorStrategy::Mode::FLOAT:
         tryFloatFire(field, prohibits, callback);
         break;
     default:
-        CHECK(false) << "Unknown mode : " << static_cast<int>(mode);
+        CHECK(false) << "Unknown mode : " << static_cast<int>(strategy.mode());
     }
 }
 
@@ -238,7 +253,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
                                        const ColumnPuyoList& keyPuyos,
                                        int leftX,
                                        int restAdded,
-                                       RensaDetector::Mode mode,
+                                       const RensaDetectorStrategy& strategy,
                                        Callback callback)
 {
     auto findRensaCallback = [&originalField, &keyPuyos, &callback](CoreField* f, const ColumnPuyoList& firePuyos) {
@@ -246,7 +261,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(originalField, mode, prohibits, false, findRensaCallback);
+    findRensas(originalField, strategy, prohibits, false, findRensaCallback);
 
     if (restAdded <= 0)
         return;
@@ -266,7 +281,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
             puyoList.addPuyo(x, c);
 
             if (f.countConnectedPuyos(x, f.height(x)) < 4)
-                findPossibleRensasInternal(f, puyoList, x, restAdded - 1, mode, callback);
+                findPossibleRensasInternal(f, puyoList, x, restAdded - 1, strategy, callback);
 
             f.removeTopPuyoFrom(x);
             puyoList.removeLastAddedPuyo();
@@ -274,27 +289,34 @@ static void findPossibleRensasInternal(const CoreField& originalField,
     }
 }
 
-void RensaDetector::iteratePossibleRensas(const CoreField& field, int maxKeyPuyos,
-                                          RensaDetector::PossibleRensaCallback callback, RensaDetector::Mode mode)
+void RensaDetector::iteratePossibleRensas(const CoreField& field,
+                                          int maxKeyPuyos,
+                                          const RensaDetectorStrategy& strategy,
+                                          RensaDetector::PossibleRensaCallback callback)
 {
     ColumnPuyoList puyoList;
-    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos,mode, callback);
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, strategy, callback);
 }
 
-void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& field, int maxKeyPuyos,
-                                                      RensaDetector::TrackedPossibleRensaCallback callback, RensaDetector::Mode mode)
+void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& field,
+                                                      int maxKeyPuyos,
+                                                      const RensaDetectorStrategy& strategy,
+                                                      RensaDetector::TrackedPossibleRensaCallback callback)
 {
     ColumnPuyoList puyoList;
-    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, mode, callback);
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, strategy, callback);
 }
 
 static
-void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, const CoreField& initialField, int restIterations,
-                                              const ColumnPuyoList& accumulatedKeyPuyos, const ColumnPuyoList& firstRensaFirePuyos,
+void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
+                                              const CoreField& initialField,
+                                              int restIterations,
+                                              const ColumnPuyoList& accumulatedKeyPuyos,
+                                              const ColumnPuyoList& firstRensaFirePuyos,
                                               const bool prohibits[FieldConstant::MAP_WIDTH],
                                               RensaRefSequence* rensaSequence,
-                                              const RensaDetector::IterativePossibleRensaCallback& callback,
-                                              RensaDetector::Mode mode)
+                                              const RensaDetectorStrategy& strategy,
+                                              const RensaDetector::IterativePossibleRensaCallback& callback)
 {
     if (restIterations <= 0)
         return;
@@ -355,7 +377,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
                 callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult, *rensaSequence);
                 iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, initialField, restIterations - 1,
                                                          combinedKeyPuyos, firstRensaFirePuyos, newProhibits,
-                                                         rensaSequence, callback, mode);
+                                                         rensaSequence, strategy, callback);
 
                 rensaSequence->pop();
             }
@@ -365,7 +387,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
         simulateInternal(f, originalField, ColumnPuyoList(), currentFirePuyos, simulationCallback);
     };
 
-    findRensas(originalField, mode, prohibits, false, findRensaCallback);
+    findRensas(originalField, strategy, prohibits, false, findRensaCallback);
 }
 
 // iteratePossibleRensasIteratively finds rensa with the following algorithm.
@@ -375,8 +397,10 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField, co
 //    Add the key puyos to the original field, and try to fire a rensa. If the first rensa and the second
 //    rensa can be combined, we think the combined rensa as the whole rensa.
 //    Otherwise, we think it is broken.
-void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalField, int maxIteration,
-                                                     IterativePossibleRensaCallback callback, Mode mode)
+void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalField,
+                                                     int maxIteration,
+                                                     const RensaDetectorStrategy& strategy,
+                                                     IterativePossibleRensaCallback callback)
 {
     DCHECK_LE(1, maxIteration);
 
@@ -396,7 +420,7 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
             makeProhibitArray(rensaResult, trackResult, originalField, firePuyos, prohibits);
 
             iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, originalField, maxIteration - 1,
-                                                     ColumnPuyoList(), firePuyos, prohibits, &rensaSequence, callback, mode);
+                                                     ColumnPuyoList(), firePuyos, prohibits, &rensaSequence, strategy, callback);
             rensaSequence.pop();
         };
 
@@ -404,5 +428,5 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(originalField, mode, prohibits, true, findRensaCallback);
+    findRensas(originalField, strategy, prohibits, true, findRensaCallback);
 }
