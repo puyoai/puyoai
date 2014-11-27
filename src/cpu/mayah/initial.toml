@@ -31,6 +31,7 @@ BCAC = [4, 3]
 field = [
     ".AA..."
 ]
+ABAB = [1, 0]
 BBAA = [1, 2]  # TODO: other?
 BBBB = [3, 3]
 BBBC = [3, 3]
@@ -48,9 +49,11 @@ ABCC = [3, 0]
 field = [
     "AB...."
 ]
+ACAB = [1, 1]
+ACAC = [1, 1]
 ACBB = [1, 0]
 ACBC = [1, 1]
-ACAC = [1, 1]
+ACCC = [1, 1]
 
 [[book]]
 field = [
@@ -128,6 +131,7 @@ ACBD = [4, 2]
 ACDD = [4, 2]
 BCAD = [1, 0]
 BCAC = [4, 1]
+CCAB = [5, 1]
 
 [[book]]
 field = [
@@ -243,6 +247,7 @@ field = [
     "ACC...",
     "ABB..."
 ]
+ADAD = [6, 2]
 ADBD = [6, 2]
 
 [[book]]
