@@ -86,6 +86,6 @@ int munetoshi::AI::evaluate(const CoreField& field) {
         - std::max(field.height(5) - field.height(6) - 2, 0) * 3);
   };
 
-  RensaDetector::iteratePossibleRensasWithTracking(field, 1, callback, RensaDetector::Mode::FLOAT);
+  RensaDetector::iteratePossibleRensasWithTracking(field, 1, RensaDetectorStrategy::defaultFloatStrategy(), callback);
   return std::max(grade, 0);
 }

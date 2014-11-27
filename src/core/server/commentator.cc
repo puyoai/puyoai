@@ -221,7 +221,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
             }
         };
 
-        RensaDetector::iteratePossibleRensasWithTracking(field, 3, callback, RensaDetector::Mode::FLOAT);
+        RensaDetector::iteratePossibleRensasWithTracking(field, 3, RensaDetectorStrategy::defaultFloatStrategy(), callback);
 
         if (bestRensa != nullptr) {
             lock_guard<mutex> lock(mu_);

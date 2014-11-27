@@ -26,7 +26,7 @@ TEST(RensaDetectorPerformanceTest, iteratePossibleRensas)
 
     for (int i = 0; i < 10000; ++i) {
         ScopedTimeStampCounter scts(&tsc);
-        RensaDetector::iteratePossibleRensas(f, 1, callback);
+        RensaDetector::iteratePossibleRensas(f, 1, RensaDetectorStrategy::defaultDropStrategy(), callback);
     }
 
     cout << size << endl;

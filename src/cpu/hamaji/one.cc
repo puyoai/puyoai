@@ -64,7 +64,7 @@ class One : public AI {
             s = max(s, rensa_result.score);
           };
           RensaDetector::iteratePossibleRensasWithTracking(
-              plan.field(), 1, callback, RensaDetector::Mode::FLOAT);
+              plan.field(), 1, RensaDetectorStrategy::defaultFloatStrategy(), callback);
 
           if (plan.isRensaPlan()) {
             if (plan.decisions().size() == 1) {
