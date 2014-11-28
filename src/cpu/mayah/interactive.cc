@@ -1,6 +1,8 @@
+#include <stdlib.h>
+
 #include <fstream>
 #include <iostream>
-#include <stdlib.h>
+#include <tuple>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -118,12 +120,12 @@ int main(int argc, char* argv[])
 
         // Waits for user enter.
         while (true) {
-            const PlainField& currentField = req.playerFrameRequest[0].field;
+            const CoreField& currentField = req.playerFrameRequest[0].field;
             const KumipuyoSeq& seq = req.playerFrameRequest[0].kumipuyoSeq;
 
-            FieldPrettyPrinter::printMultipleFields(currentField, seq.subsequence(0, 2),
-                                                    req.playerFrameRequest[1].field, req.playerFrameRequest[1].kumipuyoSeq);
-
+            FieldPrettyPrinter::printMultipleFields(
+                { currentField, req.playerFrameRequest[1].field },
+                { seq.subsequence(0, 2), req.playerFrameRequest[1].kumipuyoSeq });
             double t1 = currentTime();
             ThoughtResult aiThoughtResult = ai.thinkPlan(frameId, currentField, seq.subsequence(0, 2),
                                                          ai.myPlayerState(), ai.enemyPlayerState(),
@@ -181,9 +183,6 @@ int main(int argc, char* argv[])
                                                              ai.myPlayerState(), ai.enemyPlayerState(),
                                                              MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, &decisions);
 
-                FieldPrettyPrinter::printMultipleFields(myThoughtResult.plan.field(), KumipuyoSeq { seq.get(2), seq.get(3) },
-                                                        aiThoughtResult.plan.field(), KumipuyoSeq { seq.get(2), seq.get(3) });
-
                 const PreEvalResult preEvalResult = ai.preEval(currentField);
                 CollectedFeature mycf = ai.evalWithCollectingFeature(RefPlan(myThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
                                                                      ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, myThoughtResult.midEvalResult,
@@ -191,6 +190,24 @@ int main(int argc, char* argv[])
                 CollectedFeature aicf = ai.evalWithCollectingFeature(RefPlan(aiThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
                                                                      ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, aiThoughtResult.midEvalResult,
                                                                      ai.gazer().gazeResult());
+
+                CoreField myTargetField(myThoughtResult.plan.field());
+                for (const ColumnPuyo& cp : mycf.rensaKeyPuyos())
+                    myTargetField.dropPuyoOn(cp.x, cp.color);
+                for (const ColumnPuyo& cp : mycf.rensaFirePuyos())
+                    myTargetField.dropPuyoOn(cp.x, cp.color);
+
+                CoreField aiTargetField(aiThoughtResult.plan.field());
+                for (const ColumnPuyo& cp : aicf.rensaKeyPuyos())
+                    aiTargetField.dropPuyoOn(cp.x, cp.color);
+                for (const ColumnPuyo& cp : aicf.rensaFirePuyos())
+                    aiTargetField.dropPuyoOn(cp.x, cp.color);
+
+                KumipuyoSeq seqToShow { seq.get(2), seq.get(3) };
+                FieldPrettyPrinter::printMultipleFields(
+                    { myThoughtResult.plan.field(), aiThoughtResult.plan.field(), myTargetField, aiTargetField },
+                    { seqToShow, seqToShow, KumipuyoSeq(), KumipuyoSeq() });
+
                 cout << mycf.toStringComparingWith(aicf) << endl;
             }
         }

@@ -82,41 +82,47 @@ void printLine(Stream* ss, const PlainField& f, int y, const KumipuyoSeq& seq, C
     }
 }
 
+void writeTo(ostream* os,
+             std::initializer_list<PlainField> fields,
+             std::initializer_list<KumipuyoSeq> seqs,
+             CellType cellType)
+{
+    for (int y = FieldConstant::MAP_HEIGHT - 1; y >= 0; --y) {
+        auto seqIt = seqs.begin();
+        for (auto it = fields.begin(); it != fields.end(); ++it) {
+            if (it != fields.begin())
+                *os << toPuyoString(PuyoColor::EMPTY, cellType);
+            if (seqIt != seqs.end()) {
+                printLine(os, *it, y, *seqIt, cellType);
+                ++seqIt;
+            } else {
+                printLine(os, *it, y, KumipuyoSeq(), cellType);
+            }
+        }
+        *os << endl;
+    }
+}
+
 }
 
 // static
-string FieldPrettyPrinter::toStringFromMultipleFields(const PlainField& f0, const KumipuyoSeq& seq0,
-                                                      const PlainField& f1, const KumipuyoSeq& seq1)
+string FieldPrettyPrinter::toStringFromMultipleFields(initializer_list<PlainField> fields,
+                                                      initializer_list<KumipuyoSeq> seq)
 {
-    stringstream ss;
-
-    for (int y = PlainField::MAP_HEIGHT - 1; y >= 0; --y) {
-        printLine(&ss, f0, y, seq0, CellType::FULL_WITHOUT_COLOR);
-        ss << toPuyoString(PuyoColor::EMPTY, CellType::FULL_WITHOUT_COLOR);
-        printLine(&ss, f1, y, seq1, CellType::FULL_WITHOUT_COLOR);
-        ss << endl;
-    }
-
+    ostringstream ss;
+    writeTo(&ss, fields, seq, CellType::FULL_WITHOUT_COLOR);
     return ss.str();
 }
 
 // static
-void FieldPrettyPrinter::print(const PlainField& f, const KumipuyoSeq& seq)
+void FieldPrettyPrinter::print(const CoreField& f, const KumipuyoSeq& seq)
 {
-    for (int y = PlainField::MAP_HEIGHT - 1; y >= 0; --y) {
-        printLine(&cout, f, y, seq, CellType::FULL_WITH_COLOR);
-        cout << endl;
-    }
+    writeTo(&cout, { f }, { seq }, CellType::FULL_WITH_COLOR);
 }
 
 // static
-void FieldPrettyPrinter::printMultipleFields(const PlainField& f1, const KumipuyoSeq& seq1,
-                                             const PlainField& f2, const KumipuyoSeq& seq2)
+void FieldPrettyPrinter::printMultipleFields(initializer_list<PlainField> fields,
+                                             initializer_list<KumipuyoSeq> seqs)
 {
-    for (int y = PlainField::MAP_HEIGHT - 1; y >= 0; --y) {
-        printLine(&cout, f1, y, seq1, CellType::FULL_WITH_COLOR);
-        cout << toPuyoString(PuyoColor::EMPTY, CellType::FULL_WITH_COLOR);
-        printLine(&cout, f2, y, seq2, CellType::FULL_WITH_COLOR);
-        cout << endl;
-    }
+    writeTo(&cout, fields, seqs, CellType::FULL_WITH_COLOR);
 }

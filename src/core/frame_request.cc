@@ -126,8 +126,8 @@ string FrameRequest::toDebugString() const
     stringstream ss;
     ss << "ID=" << frameId << endl;
     ss << FieldPrettyPrinter::toStringFromMultipleFields(
-        playerFrameRequest[0].field, playerFrameRequest[0].kumipuyoSeq,
-        playerFrameRequest[1].field, playerFrameRequest[1].kumipuyoSeq) << endl;
+        { playerFrameRequest[0].field, playerFrameRequest[1].field },
+        { playerFrameRequest[0].kumipuyoSeq, playerFrameRequest[1].kumipuyoSeq }) << endl;
 
     return ss.str();
 }

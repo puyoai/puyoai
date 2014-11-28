@@ -81,7 +81,9 @@ string GameState::toDebugString() const
     }
 
     ostringstream ss;
-    ss << FieldPrettyPrinter::toStringFromMultipleFields(f[0], playerGameState_[0].kumipuyoSeq, f[1], playerGameState_[1].kumipuyoSeq);
+    ss << FieldPrettyPrinter::toStringFromMultipleFields(
+        { f[0], f[1] },
+        { playerGameState_[0].kumipuyoSeq, playerGameState_[1].kumipuyoSeq });
     return ss.str();
 }
 
