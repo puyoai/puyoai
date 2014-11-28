@@ -1,19 +1,21 @@
 #ifndef CORE_FIELD_FIELD_PRETTY_PRINTER_H_
 #define CORE_FIELD_FIELD_PRETTY_PRINTER_H_
 
+#include <initializer_list>
 #include <string>
 
-class PlainField;
+#include "core/field/core_field.h"
+
 class KumipuyoSeq;
 
 class FieldPrettyPrinter {
 public:
-    static std::string toStringFromMultipleFields(const PlainField&, const KumipuyoSeq&,
-                                                  const PlainField&, const KumipuyoSeq&);
+    static std::string toStringFromMultipleFields(std::initializer_list<PlainField>,
+                                                  std::initializer_list<KumipuyoSeq>);
 
-    static void print(const PlainField&, const KumipuyoSeq&);
-    static void printMultipleFields(const PlainField&, const KumipuyoSeq&,
-                                    const PlainField&, const KumipuyoSeq&);
+    static void print(const CoreField&, const KumipuyoSeq&);
+    static void printMultipleFields(std::initializer_list<PlainField>,
+                                    std::initializer_list<KumipuyoSeq>);
 };
 
 #endif

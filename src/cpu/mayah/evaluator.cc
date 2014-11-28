@@ -664,6 +664,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     int numReachableSpace = plan.field().countConnectedPuyos(3, 12);
     int maxVirtualRensaResultScore = 0;
     double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
+    ColumnPuyoList maxRensaKeyPuyos;
+    ColumnPuyoList maxRensaFirePuyos;
     std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
@@ -688,6 +690,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         if (rensaScoreCollector->score() > maxRensaScore) {
             maxRensaScore = rensaScoreCollector->score();
             maxRensaScoreCollector = move(rensaScoreCollector);
+            maxRensaKeyPuyos = keyPuyos;
+            maxRensaFirePuyos = firePuyos;
         }
 
         double rensaScore = rensaResult.score;
@@ -705,8 +709,11 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
     RensaDetector::iteratePossibleRensasIteratively(plan.field(), maxIteration, RensaDetectorStrategy::defaultDropStrategy(), callback);
 
-    if (maxRensaScoreCollector.get())
+    if (maxRensaScoreCollector.get()) {
         sc_->merge(*maxRensaScoreCollector);
+        sc_->setRensaKeyPuyos(maxRensaKeyPuyos);
+        sc_->setRensaFirePuyos(maxRensaFirePuyos);
+    }
     sc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }
 
