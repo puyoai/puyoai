@@ -78,42 +78,24 @@ Decision makeDecision(const toml::Value& v)
 } // namespace anonymous
 
 InitialBookField::InitialBookField(const vector<string>& field, map<string, Decision>&& decisions) :
+    patternField_(field),
     decisions_(move(decisions))
 {
-    for (int i = 0; i < MAP_WIDTH; ++i)
-        heights_[i] = 0;
-    for (int x = 0; x < MAP_WIDTH; ++x) {
-        for (int y = 0; y < MAP_HEIGHT; ++y) {
-            field_[x][y] = '.';
-        }
-    }
-
-    for (size_t i = 0; i < field.size(); ++i) {
-        CHECK_EQ(field[i].size(), 6UL);
-        int y = static_cast<int>(field.size() - i);
-        for (int x = 1; x <= 6; ++x) {
-            char c = field[i][x-1];
-            CHECK(c == '.' || ('A' <= c && c <= 'D')) << c;
-            field_[x][y] = field[i][x - 1];
-            if (c != '.')
-                heights_[x] = std::max(static_cast<int>(heights_[x]), y);
-        }
-    }
 }
 
 Decision InitialBookField::nextDecision(const CoreField& cf, const KumipuyoSeq& seq) const
 {
     // Check heights first, since this is fast.
     for (int x = 1; x <= 6; ++x) {
-        if (cf.height(x) != heights_[x])
+        if (cf.height(x) != patternField_.height(x))
             return Decision();
     }
 
     MatchState ms;
     for (int x = 1; x <= 6; ++x) {
-        int h = heights_[x];
+        int h = patternField_.height(x);
         for (int y = 1; y <= h; ++y) {
-            if (!ms.match(field_[x][y], cf.color(x, y)))
+            if (!ms.match(patternField_.get(x, y), cf.color(x, y)))
                 return Decision();
         }
     }

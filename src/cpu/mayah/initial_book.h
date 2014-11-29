@@ -6,6 +6,7 @@
 
 #include <toml/toml.h>
 
+#include "core/algorithm/pattern_field.h"
 #include "core/decision.h"
 #include "core/field_constant.h"
 #include "core/puyo_color.h"
@@ -13,7 +14,7 @@
 class CoreField;
 class KumipuyoSeq;
 
-class InitialBookField : FieldConstant {
+class InitialBookField {
 public:
     InitialBookField(const std::vector<std::string>& field,
                      std::map<std::string, Decision>&& decisions);
@@ -21,8 +22,7 @@ public:
     Decision nextDecision(const CoreField&, const KumipuyoSeq&) const;
 
 private:
-    int8_t heights_[MAP_WIDTH];
-    char field_[MAP_WIDTH][MAP_HEIGHT];
+    PatternField patternField_;
     std::map<std::string, Decision> decisions_;
 };
 
