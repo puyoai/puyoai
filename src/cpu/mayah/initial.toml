@@ -111,6 +111,7 @@ ACBC = [2, 3]
 ACDD = [5, 3]  # TODO: [1, 1] is better?
 BBCB = [1, 2]
 BCBC = [3, 0]
+BCAC = [3, 0]
 BDAB = [3, 1]
 
 [[book]]
@@ -123,7 +124,7 @@ AACC = [5, 1]  # TODO: [2, 3] ?
 ACAB = [4, 2]
 ACAC = [4, 2]
 ACAD = [4, 2]
-BCBC = [4, 1]  # TODO: [1, 0] ?
+BCBC = [1, 0]
 BCBD = [4, 1]
 BCCC = [4, 0]
 BCCD = [4, 1]
@@ -138,6 +139,8 @@ field = [
     "AAA...",
 ]
 ABBC = [2, 2]
+ACAB = [4, 2]
+ACAD = [4, 0]  # TODO: [3, 2] ?
 BCBD = [2, 0]
 
 [[book]]
@@ -193,6 +196,7 @@ field = [
     "AAA..."
 ]
 BCBC = [4, 1]
+BCCD = [4, 1]
 
 [[book]]
 field = [
@@ -267,6 +271,14 @@ field = [
     "AAABC."
 ]
 ACDD = [6, 2]
+
+[[book]]
+field = [
+    "CA....",
+    "AC....",
+    "AB...."
+]
+BDCD = [3, 1]
 
 # ----------------------------------------------------------------------
 
