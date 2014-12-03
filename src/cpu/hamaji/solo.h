@@ -1,8 +1,9 @@
 #include <string>
 
+#include <random>
+
 #include "base.h"
 #include "core.h"
-#include "mt19937int.h"
 
 class Game;
 
@@ -19,7 +20,7 @@ class SoloGame {
   Game* game;
   Core cpu;
   string next;
-  MT mt;
+  std::mt19937 mt;
   bool evalmode_;
   int chigiri_frames;
   int puyo_sequence_index_;

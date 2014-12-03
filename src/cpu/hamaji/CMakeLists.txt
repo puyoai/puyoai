@@ -7,7 +7,7 @@ puyoai_add_cxx_flags("-Wno-error=unused-variable -Wno-error=sign-compare")
 
 add_library(hamaji_lib
             core.cc ctrl.cc db.cc eval_base.cc eval.cc eval2.cc
-            field.cc game.cc mt19937int.cc
+            field.cc game.cc
             rater.cc ratingstats.cc solo.cc util.cc)
 
 function(hamaji_add_executable exe)
@@ -44,7 +44,3 @@ hamaji_add_test(db_test)
 # TODO(hamaji): Slow!
 hamaji_add_test(field_perf_test 1)
 hamaji_add_test(field_test)
-
-
-# TODO(hamaji): Build?
-# parse_movie.cc
