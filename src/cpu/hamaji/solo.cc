@@ -121,8 +121,8 @@ int SoloGame::run() {
       printf("Broken decision\n");
       return 0;
     }
-    int score = game->p[0].f.PutDecision(d, next[0], next[1], &chigiri_frames);
-    printf("%s\n", game->p[0].f.GetDebugOutput(game->p[0].next).c_str());
+    int score = game->p[0].f.PutDecision(d, toPuyoColor(next[0]), toPuyoColor(next[1]), &chigiri_frames);
+    printf("%s\n", game->p[0].next.toString().c_str());
     /*
     F::showNext(next);
     field.show();
@@ -154,7 +154,7 @@ int SoloGame::step() {
     return -1;
   }
 
-  int score = game->p[0].f.PutDecision(d, next[0], next[1], &chigiri_frames);
+  int score = game->p[0].f.PutDecision(d, toPuyoColor(next[0]), toPuyoColor(next[1]), &chigiri_frames);
   if (score < 0)
     return -2;
 

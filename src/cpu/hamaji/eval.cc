@@ -393,7 +393,7 @@ static void parseField(char* p, LF* field) {
       int c = *p - '0';
       CHECK_GE(c, 0) << x << "," << y;
       CHECK_LE(c, 5) << x << "," << y;
-      field->Set(x, y, "045671"[c] - '0');
+      field->Set(x, y, toPuyoColor("045671"[c] - '0'));
       p++;
     }
   }
