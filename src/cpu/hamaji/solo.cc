@@ -98,7 +98,7 @@ int SoloGame::pickNextPuyo() {
       return found + 4;
     return c - '0';
   }
-  return mt.genrand_int32() % 4 + 4;
+  return mt() % 4 + 4;
 }
 
 void SoloGame::pickNext() {
