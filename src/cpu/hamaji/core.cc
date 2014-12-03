@@ -169,7 +169,7 @@ Decision Core::decide(Game* game) {
 
   if ((game->state & (STATE_YOU_GROUNDED << 1))) {
     vector<LP> oplans;
-    game->p[1].f.FindAvailablePlans(game->p[1].next.substr(2), 2, &oplans);
+    game->p[1].f.FindAvailablePlans(game->p[1].next.subsequence(2), 2, &oplans);
     int obest_score = 0;
     for (size_t i = 0; i < oplans.size(); i++) {
       if (obest_score < oplans[i].score)
