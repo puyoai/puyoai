@@ -48,14 +48,16 @@ void Rater::eval(RatingStats* all_stats) {
   for (size_t i = 0; i < threads_.size(); i++) {
     states_[i].tid = i;
     states_[i].rater = this;
-    pthread_create(&threads_[i], NULL, &Rater::runWorker, &states_[i]);
+    threads_[i] = std::thread([i, this]() {
+        Rater::runWorker((void*)&states_[i]);
+    });
   }
 
   while (true) {
     // 1msec
     usleep(1000);
 
-    MutexLock lock(&mu_);
+    std::lock_guard<std::mutex> lock(mu_);
 
     if (FLAGS_show_progress) {
       fprintf(stderr, "\r");
@@ -73,14 +75,15 @@ void Rater::eval(RatingStats* all_stats) {
   }
 
   for (size_t i = 0; i < threads_.size(); i++) {
-    pthread_join(threads_[i], NULL);
+    if (threads_[i].joinable())
+      threads_[i].join();
   }
 #ifdef OS_LINUX
   if (FLAGS_puyo_cloud) {
     puyo_cloud_->Wait();
   }
 #endif // OS_LINUX
-  MutexLock lock(&mu_);
+  std::lock_guard<std::mutex> lock(mu_);
   for (size_t i = 0; i < rating_stats_vec_.size(); ++i) {
     all_stats->merge(rating_stats_vec_[i]);
   }
@@ -113,14 +116,14 @@ void Rater::runWorker(int tid) {
 }
 
 void Rater::GameDone(const int /* index */, const RatingStats& stats) {
-  MutexLock lock(&mu_);
+  std::lock_guard<std::mutex> lock(mu_);
   // LOG(INFO) << rating_stats_vec_.size() << " done.";
   rating_stats_vec_.push_back(stats);
   finished_games_++;
 }
 
 int Rater::pickGameIndex() {
-  MutexLock lock(&mu_);
+  std::lock_guard<std::mutex> lock(mu_);
   if (game_index_ == eval_cnt_)
     return -1;
   return game_index_++;
