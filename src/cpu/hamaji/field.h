@@ -5,8 +5,6 @@
 #include <vector>
 
 #include "core/decision.h"
-#include "core/field/core_field.h"
-#include "core/kumipuyo_seq.h"
 #include "core/puyo_color.h"
 
 #include "base.h"
@@ -35,18 +33,36 @@ struct Chain {
   };
 };
 
-class LF : public CoreField {
+class LF {
  public:
-  LF() {}
-  explicit LF(const string& url) : CoreField(url) {}
+  static const int WIDTH = 6;
+  static const int HEIGHT = 12;
+  static const int MAP_WIDTH = 1 + WIDTH + 1;
+  static const int MAP_HEIGHT = 1 + HEIGHT + 3;
+  static const int ERASE_NUM = 4;
+  static const int COLORS = 8;
+
+  LF();
+  explicit LF(const string& url);
+
+  // Crears every data this class has.
+  void Init();
 
   // Put a puyo at a specified position.
-  void Set(int x, int y, PuyoColor c) { setPuyoAndHeight(x, y, c); }
+  void Set(int x, int y, char color);
 
   // Get a color of puyo at a specified position.
-  PuyoColor Get(int x, int y) const { return color(x, y); }
+  byte Get(int x, int y) const;
 
-  void SafeDrop() { forceDrop(); }
+  // Vanish puyos, and adds score. The argument "chains" is used to calculate
+  // score.
+  bool Vanish(int chains, int* score);
+
+  // After vanishing, drop puyos. You should not Set puyos between vanish and
+  // drop.
+  void Drop();
+
+  void SafeDrop();
 
   // Simulate chains until the end, and returns chains, score, and frames before
   // finishing the chain.
@@ -57,21 +73,24 @@ class LF : public CoreField {
 
   // Normal print for debugging purpose.
   const string GetDebugOutput() const;
+  const string GetDebugOutput(const string& next) const;
+  static const string GetDebugOutputForNext(const string& next);
 
   // depth = 1 -- think about the next pair of puyos.
   // depth = 2 -- think about the next 2 pairs of puyos.
   // depth = 3 -- think about the next 3 pairs of puyos.
-  void FindAvailablePlans(const KumipuyoSeq& next, int depth, vector<LP>* plans);
+  void FindAvailablePlans(const string& next, int depth, vector<LP>* plans);
   // == FindAvailablePlans(3, plans);
-  void FindAvailablePlans(const KumipuyoSeq& next, vector<LP>* plans);
+  void FindAvailablePlans(const string& next, vector<LP>* plans);
 
   // Slow, maybe.
-  int PutDecision(Decision decision, PuyoColor c1, PuyoColor c2,
+  int PutDecision(Decision decision, char c1, char c2,
                   int* chigiri_frames = NULL);
 
-  string query_string() const;
-  string url() const { return "http://www.inosendo.com/puyo/rensim/?" + query_string(); }
-  int countPuyo() const { return countPuyos(); }
+  const string query_string() const;
+  const string url() const;
+
+  int countPuyo() const;
   int countColorPuyo() const;
   bool hasPuyo() const;
 
@@ -92,9 +111,21 @@ class LF : public CoreField {
 
   bool complementOjamasDropped(const LF& f);
 
+ protected:
+  // Clean internal states, related to Vanish and Drop.
+  void Clean_();
+
+  byte field[MAP_WIDTH][MAP_HEIGHT];
+  // Puyo at field[x][y] will not fall or will not be vanished iff
+  // y>min_heights[x].
+  //
+  // After Vanish(): Lowest position a puyo vanished.
+  // After Drop(): Lowest position where we should start vanishment-check.
+  byte min_heights[MAP_WIDTH];
+
  private:
   void FillFieldInfo(stringstream& ss) const;
-  void FindAvailablePlansInternal(const LF& field, const KumipuyoSeq& next,
+  void FindAvailablePlansInternal(const LF& field, const string& next,
                                   const LP* parent,
                                   int depth, int max_depth,
                                   vector<LP>* plans);

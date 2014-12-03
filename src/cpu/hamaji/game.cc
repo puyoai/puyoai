@@ -30,8 +30,6 @@ Game::Game()
 }
 
 Game::Game(const Game& prev_game, const string& line) {
-  // TODO: Use FrameRequest::parse().
-
   map<string, string> kv;
   vector<string> tokens;
   split(line, " ", &tokens);
@@ -49,10 +47,16 @@ Game::Game(const Game& prev_game, const string& line) {
   id = atoi(kv["ID"].c_str());
 
   p[0].f = LF(kv["YF"]);
-  p[0].next = KumipuyoSeq(kv["YP"]);
+  p[0].next = kv["YP"];
+  for (unsigned int i = 0; i < p[0].next.size(); i++) {
+    p[0].next[i] -= '0';
+  }
   p[0].score = atoi(kv["YS"].c_str());
   p[1].f = LF(kv["OF"]);
-  p[1].next = KumipuyoSeq(kv["OP"]);
+  p[1].next = kv["OP"];
+  for (unsigned int i = 0; i < p[1].next.size(); i++) {
+    p[1].next[i] -= '0';
+  }
   p[1].score = atoi(kv["OS"].c_str());
 
   decided_field = prev_game.decided_field;
@@ -131,8 +135,8 @@ const string Game::getDebugOutput() const {
     oss << lines[1][i];
     oss << '\n';
   }
-  oss << "YOKOKU=" << p[0].next.toString() << "    ";
-  oss << "YOKOKU=" << p[1].next.toString() << '\n';
+  oss << "YOKOKU=" << LF::GetDebugOutputForNext(p[0].next) << "    ";
+  oss << "YOKOKU=" << LF::GetDebugOutputForNext(p[1].next) << '\n';
   for (int i = 0; i < 2; i++) {
     const Player& pl = p[i];
     oss << "SC=" << pl.score << " SS=" << pl.spent_score

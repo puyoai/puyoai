@@ -95,8 +95,7 @@ bool tick(Game* game) {
     if (decision.isValid()) {
       game->decided_field = game->p[0].f;
       game->decided_field.PutDecision(decision,
-                                      game->p[0].next.axis(0),
-                                      game->p[0].next.child(1));
+                                      game->p[0].next[0], game->p[0].next[1]);
     }
     LOG(INFO) << "<= " << buf
               << " (cnt=" << game->p[0].f.countPuyo() << ")";

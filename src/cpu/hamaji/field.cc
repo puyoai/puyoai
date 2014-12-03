@@ -13,13 +13,275 @@
 #include <glog/logging.h>
 
 #include "core/constant.h"
-#include "core/field/rensa_result.h"
-#include "core/kumipuyo_seq.h"
-
 #include "deprecated_constant.h"
 #include "ctrl.h"
 
+// If this flag is turned on, we don't need to check the cell for vanishment
+// anymore.
+static const int MASK_CHECKED = 0x80;
+
 using namespace std;
+
+void LF::Init() {
+  // Initialize field information.
+  for (int x = 0; x < LF::MAP_WIDTH; x++) {
+    for (int y = 0; y < LF::MAP_HEIGHT; y++) {
+      field[x][y] = EMPTY;
+    }
+  }
+  for (int x = 0; x < LF::MAP_WIDTH; x++) {
+    field[x][0] = field[x][MAP_HEIGHT - 1] = WALL;
+  }
+  for (int y = 0; y < LF::MAP_HEIGHT; y++) {
+    field[0][y] = field[MAP_WIDTH - 1][y] = WALL;
+  }
+
+  for (int i = 0; i < MAP_WIDTH; i++) {
+    min_heights[i] = 100;
+  }
+}
+
+LF::LF() {
+  Init();
+}
+
+LF::LF(const std::string& url) {
+  Init();
+
+  std::string prefix = "http://www.inosendo.com/puyo/rensim/??";
+  int data_starts_at;
+  if (url.find(prefix) == 0) {
+    data_starts_at = prefix.length();
+  } else {
+    data_starts_at = 0;
+  }
+
+  int counter = 0;
+  for (int i = url.length() - 1; i >= data_starts_at; i--) {
+    int x = 6 - (counter % 6);
+    int y = counter / 6 + 1;
+    char color = EMPTY;
+    switch(url[i]) {
+      case '0': color = EMPTY; break;
+      case '1': color = OJAMA; break;
+      case '2': color = WALL; break;
+      case '4': color = RED; break;
+      case '5': color = BLUE; break;
+      case '6': color = YELLOW; break;
+      case '7': color = GREEN; break;
+      default: break;
+    }
+    Set(x, y, color);
+    counter++;
+  }
+}
+
+void LF::Set(int x, int y, char color) {
+  field[x][y] = color;
+  if (y < min_heights[x]) {
+    min_heights[x] = y;
+  }
+}
+
+byte LF::Get(int x, int y) const {
+  return field[x][y] & (MASK_CHECKED - 1);
+}
+
+static int getLongBonus(int length) {
+  if (length >= 11) {
+    length = 11;
+  }
+  return LONG_BONUS[length];
+}
+
+inline void check_cell(unsigned char color, unsigned char field[][16],
+                       int** writer, int x, int y) {
+  // If MASK_CHECKED is there, the cell is already checked for deletion.
+  if (y <= 12 && color == field[x][y]) {
+    (*writer)[0] = x;
+    (*writer)[1] = y;
+    *writer += 2;
+    field[x][y] |= MASK_CHECKED;
+  }
+}
+
+bool LF::Vanish(int chains, int* score) {
+  int erase_field[WIDTH * HEIGHT * 2];
+  int* read_head = erase_field;
+  int* write_head = erase_field;
+  int* prev_head = erase_field;
+
+  int used_colors[COLORS + 1] = {0};
+  int num_colors = 0;
+  int bonus = 0;
+
+  for (int x = 1; x <= LF::WIDTH; x++) {
+    for (int y = min_heights[x]; y <= LF::HEIGHT; y++) {
+      // No puyos above.
+      if (field[x][y] == EMPTY) {
+        break;
+      }
+      // This cell is already checked.
+      if (field[x][y] & MASK_CHECKED) {
+        continue;
+      }
+      if (field[x][y] == OJAMA) {
+        continue;
+      }
+
+      write_head[0] = x;
+      write_head[1] = y;
+      write_head += 2;
+      char color = field[x][y];
+      field[x][y] |= MASK_CHECKED;
+
+      while (read_head != write_head) {
+        int x = read_head[0];
+        int y = read_head[1];
+        read_head += 2;
+        check_cell(color, field, &write_head, x + 1, y);
+        check_cell(color, field, &write_head, x - 1, y);
+        check_cell(color, field, &write_head, x, y + 1);
+        check_cell(color, field, &write_head, x, y - 1);
+      }
+      if (read_head - prev_head < ERASE_NUM * 2) {
+        read_head = write_head = prev_head;
+      } else {
+        bonus += getLongBonus((read_head - prev_head) >> 1);
+        if (!used_colors[(int)color]) {
+          num_colors++;
+          used_colors[(int)color] = 1;
+        }
+        prev_head = read_head;
+      }
+    }
+  }
+
+  int erased_puyos = (read_head - erase_field) >> 1;
+  if (erased_puyos == 0) {
+    return false;
+  }
+
+  bonus += COLOR_BONUS[num_colors];
+  bonus += CHAIN_BONUS[chains];
+  // We need to add rakka-bonus etc.
+  // http://puyora.ktkr.net/puyozan.html
+  if (bonus == 0) {
+    bonus = 1;
+  }
+  if (bonus > 999) {
+    bonus = 999;
+  }
+
+  // Actually erase the Puyos to be vanished.
+  for (int i = 1; i <= WIDTH; i++) {
+    min_heights[i] = 100;
+  }
+
+  bool erased = false;
+  if (erase_field == read_head) {
+    erased = false;
+  } else {
+    erased = true;
+
+    int* head = erase_field;
+    while (head < read_head) {
+      int x = head[0];
+      int y = head[1];
+      field[x][y] = EMPTY | MASK_CHECKED;
+      if (y < min_heights[x]) {
+        min_heights[x] = y;
+      }
+
+      if (field[x+1][y] == OJAMA) {
+        field[x+1][y] = EMPTY | MASK_CHECKED;
+        if (y < min_heights[x + 1]) {
+          min_heights[x + 1] = y;
+        }
+      }
+      if (field[x-1][y] == OJAMA) {
+        field[x-1][y] = EMPTY | MASK_CHECKED;
+        if (y < min_heights[x - 1]) {
+          min_heights[x - 1] = y;
+        }
+      }
+      if (field[x][y+1] == OJAMA && y + 1 <= 12) {
+        field[x][y+1] = EMPTY | MASK_CHECKED;
+      }
+      if (field[x][y-1] == OJAMA) {
+        field[x][y-1] = EMPTY | MASK_CHECKED;
+        if (y - 1 < min_heights[x]) {
+          min_heights[x] = y - 1;
+        }
+      }
+
+      head += 2;
+    }
+  }
+
+  *score += 10 * erased_puyos * bonus;
+  return erased;
+}
+
+// Adds frames it takes to the argument "int* frames".
+void LF::Drop(int* frames) {
+  int max_drops = 0;
+  for (int x = 1; x <= LF::WIDTH; x++) {
+    int write_at = min_heights[x];
+    // Puyo in 14th row won't drop to 13th row. It is a well known bug in Puyo2.
+    // Puyos in 14th row can't fall, so they'll stay there forever.
+    for (int y = write_at + 1; y < LF::MAP_HEIGHT - 2; y++) {
+      if (field[x][y] == EMPTY) {
+        break;
+      }
+      if (field[x][y] != (EMPTY | MASK_CHECKED)) {
+        if (y - write_at > max_drops) {
+          max_drops = y - write_at;
+        }
+        field[x][write_at] = field[x][y] & (MASK_CHECKED - 1);
+        field[x][y] = EMPTY | MASK_CHECKED;
+        write_at++;
+      }
+    }
+  }
+  Clean_();
+
+  if (max_drops == 0) {
+    *frames += FRAMES_AFTER_NO_DROP;
+  } else {
+    *frames += FRAMES_DROP_1_LINE * max_drops + FRAMES_AFTER_DROP;
+  }
+}
+
+void LF::Drop() {
+  int frames;
+  Drop(&frames);
+}
+
+void LF::SafeDrop() {
+  for (int x = 1; x <= LF::WIDTH; x++) {
+    for (int y = 1; y < LF::MAP_HEIGHT - 1; y++) {
+      if (field[x][y] && !field[x][y-1]) {
+        int ny = y - 1;
+        while (!field[x][ny-1])
+          ny--;
+        field[x][ny] = field[x][y];
+        field[x][y] = EMPTY;
+      }
+    }
+  }
+}
+
+void LF::Clean_() {
+  for (int x = 1; x <= LF::WIDTH; x++) {
+    for (int y = 1; y <= LF::HEIGHT + 2; y++) {
+      if (field[x][y] == EMPTY) {
+        break;
+      }
+      field[x][y] &= (MASK_CHECKED - 1);
+    }
+  }
+}
 
 void LF::Simulate() {
   int score, chain, frames;
@@ -32,17 +294,74 @@ void LF::Simulate(int* chains, int* score, int* frames) {
 
 void LF::SimulateFromChain(int init_chains,
                            int* chains, int* score, int* frames) {
-  RensaResult result = simulate(init_chains);
-  *score = result.score;
-  *chains = result.chains;
-  *frames = result.frames;
+  *score = 0;
+  *chains = init_chains;
+  *frames = 0;
+  while (Vanish(*chains, score)) {
+    *frames += FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION;
+    Drop(frames);
+    (*chains)++;
+  }
+  Clean_();
+  (*chains)--;
+}
+
+static char getPuyoChar(char c) {
+  switch (c & 0x3f) {
+  case OJAMA:
+    return '@';
+  case RED:
+    return 'R';
+  case BLUE:
+    return 'B';
+  case YELLOW:
+    return 'Y';
+  case GREEN:
+    return 'G';
+  case EMPTY:
+    return ' ';
+  case WALL:
+    return '#';
+  default:
+    return '?';
+  }
 }
 
 const string LF::GetDebugOutput() const {
-  return toDebugString();
+  std::ostringstream s;
+  for (int y = MAP_HEIGHT - 1; y >= 0; y--) {
+    for (int x = 0; x < MAP_WIDTH; x++) {
+      s << getPuyoChar(field[x][y]) << " ";
+    }
+    s << std::endl;
+  }
+  s << "  ";
+  for (int x = 1; x <= WIDTH; x++) {
+    s << (int)min_heights[x] << " ";
+  }
+  s << '\n';
+  s << url();
+  s << '\n';
+  return s.str();
 }
 
-void LF::FindAvailablePlans(const KumipuyoSeq& next, int depth, vector<LP>* plans) {
+const string LF::GetDebugOutput(const string& next) const {
+  string s(GetDebugOutput());
+  s += "YOKOKU=";
+  s += GetDebugOutputForNext(next);
+  s += '\n';
+  return s;
+}
+
+const string LF::GetDebugOutputForNext(const string& next) {
+  string s;
+  for (int i = 0; i < 6; i++) {
+    s += getPuyoChar(next[i]);
+  }
+  return s;
+}
+
+void LF::FindAvailablePlans(const string& next, int depth, vector<LP>* plans) {
   if (depth <= 0 || 4 <= depth) {
     LOG(ERROR) << "depth parameter shoube be 1, 2 or 3.";
   }
@@ -51,7 +370,7 @@ void LF::FindAvailablePlans(const KumipuyoSeq& next, int depth, vector<LP>* plan
   FindAvailablePlansInternal(*this, next, NULL, 0, depth, plans);
 }
 
-void LF::FindAvailablePlans(const KumipuyoSeq& next, vector<LP>* plans) {
+void LF::FindAvailablePlans(const string& next, vector<LP>* plans) {
   FindAvailablePlans(next, 3, plans);
 }
 
@@ -81,9 +400,9 @@ static const Decision all_decisions[22] = {
   Decision(5, 1),
 };
 
-void LF::FindAvailablePlansInternal(const LF& field, const KumipuyoSeq& next, const LP* parent, int depth, int max_depth, vector<LP>* plans) {
-  PuyoColor c1 = next.axis(depth);
-  PuyoColor c2 = next.child(depth);
+void LF::FindAvailablePlansInternal(const LF& field, const string& next, const LP* parent, int depth, int max_depth, vector<LP>* plans) {
+  char c1 = next[depth * 2 + 0];
+  char c2 = next[depth * 2 + 1];
   int num_decisions;
   const Decision* decisions;
   if (c1 == c2) {
@@ -99,7 +418,7 @@ void LF::FindAvailablePlansInternal(const LF& field, const KumipuyoSeq& next, co
   for (int x = 1; x <= LF::WIDTH; x++) {
     heights[x] = 100;
     for (int y = 1; y <= LF::HEIGHT + 2; y++) {
-      if (field.Get(x, y) == PuyoColor::EMPTY) {
+      if (field.Get(x, y) == EMPTY) {
         heights[x] = y;
         break;
       }
@@ -156,7 +475,7 @@ void LF::FindAvailablePlansInternal(const LF& field, const KumipuyoSeq& next, co
   }
 }
 
-int LF::PutDecision(Decision decision, PuyoColor c1, PuyoColor c2, int* chigiri_frames) {
+int LF::PutDecision(Decision decision, char c1, char c2, int* chigiri_frames) {
   // Cause of slowness?
   int heights[LF::MAP_WIDTH];
   for (int x = 1; x <= LF::WIDTH; x++) {
@@ -191,6 +510,54 @@ int LF::PutDecision(Decision decision, PuyoColor c1, PuyoColor c2, int* chigiri_
   }
 
   return score;
+}
+
+const string LF::query_string() const {
+  string q;
+  for (int y = 13; y >= 1; y--) {
+    for (int x = 1; x <= 6; x++) {
+      if (Get(x, y) || !q.empty()) {
+        char c = '?';
+        switch (Get(x, y)) {
+        case OJAMA:
+          c = '1'; break;
+        case RED:
+          c = '4'; break;
+        case BLUE:
+          c = '5'; break;
+        case YELLOW:
+          c = '6'; break;
+        case GREEN:
+          c = '7'; break;
+        case EMPTY:
+          c = '0'; break;
+        case 8:
+          // for purple in parse_movie
+          c = '8'; break;
+        default:
+          LOG(ERROR) << (int)field[x][y];
+        }
+        q.push_back(c);
+      }
+    }
+  }
+  return q;
+}
+
+const string LF::url() const {
+  return "http://www.inosendo.com/puyo/rensim/?" + query_string();
+}
+
+int LF::countPuyo() const {
+  int n = 0;
+  for (int x = 1; x <= 6; x++) {
+    for (int y = 1; y <= 13; y++) {
+      if (!Get(x, y))
+        break;
+      n++;
+    }
+  }
+  return n;
 }
 
 int LF::countColorPuyo() const {
@@ -253,9 +620,12 @@ int LF::getBestChainCount(int* ignition_puyo_cnt,
         continue;
 
       LF nf(*this);
+      for (int i = 1; i <= 6; i++) {
+        nf.min_heights[i] = 100;
+      }
       int n = 0;
 #define SET_EMPTY(x, y)                         \
-      nf.Set(x, y, PuyoColor::EMPTY);           \
+      nf.Set(x, y, EMPTY | MASK_CHECKED);       \
       n++;                                      \
       has_checked[x][y] = true;
 
@@ -303,7 +673,7 @@ int LF::getBestChainCount(int* ignition_puyo_cnt,
 #undef SET_EMPTY
 
       int chain, score, frame;
-      nf.forceDrop();
+      nf.Drop();
       nf.SimulateFromChain(2, &chain, &score, &frame);
       if (best_chain < chain) {
         best_chain = chain;
@@ -340,7 +710,7 @@ int LF::getOjamaFilmHeight(int* hidden_color_puyo_cnt) const {
   for (int x = 1; x <= 6; x++) {
     int next_ojama_max_y = 0;
     for (int y = ojama_max_y + 1; y >= ojama_min_y - 1; y--) {
-      if (Get(x, y) == PuyoColor::OJAMA) {
+      if (field[x][y] == OJAMA) {
         next_ojama_max_y = y;
         break;
       }
@@ -349,7 +719,7 @@ int LF::getOjamaFilmHeight(int* hidden_color_puyo_cnt) const {
       return 0;
 
     int next_ojama_min_y = next_ojama_max_y;
-    while (Get(x, next_ojama_min_y-1) == PuyoColor::OJAMA)
+    while (field[x][next_ojama_min_y-1] == OJAMA)
       next_ojama_min_y--;
 
     h = min(h, next_ojama_max_y - max(ojama_min_y - 1, next_ojama_min_y) + 1);
@@ -358,7 +728,7 @@ int LF::getOjamaFilmHeight(int* hidden_color_puyo_cnt) const {
     ojama_min_y = next_ojama_min_y;
 
     for (int y = ojama_min_y - 1; y >= 1; y--) {
-      if (Get(x, y) >= PuyoColor::RED)
+      if (field[x][y] >= RED)
         cnt++;
     }
   }
@@ -409,7 +779,7 @@ void LF::getProspectiveChains(vector<Chain*>* pchains,
       continue;
 
     LF f(*this);
-    f.Set(x, y, toPuyoColor(c));
+    f.Set(x, y, c);
 
     if (d < depth) {
       f.getProspectiveChains(pchains, i / 4 * 4, d + 1, depth);
@@ -511,34 +881,4 @@ bool LF::complementOjamasDropped(const LF& f) {
 
   LOG(INFO) << "Guessed the field after the ojama:\n" << GetDebugOutput();
   return true;
-}
-
-string LF::query_string() const {
-  string q;
-  for (int y = 13; y >= 1; y--) {
-    for (int x = 1; x <= 6; x++) {
-      if (color(x, y) != PuyoColor::EMPTY || !q.empty()) {
-        char c = '?';
-        switch (color(x, y)) {
-        case PuyoColor::OJAMA:
-          c = '1'; break;
-        case PuyoColor::RED:
-          c = '4'; break;
-        case PuyoColor::BLUE:
-          c = '5'; break;
-        case PuyoColor::YELLOW:
-          c = '6'; break;
-        case PuyoColor::GREEN:
-          c = '7'; break;
-        case PuyoColor::EMPTY:
-          c = '0'; break;
-        default:
-          LOG(ERROR) << toChar(color(x, y));
-        }
-        q.push_back(c);
-      }
-    }
-  }
-
-  return q;
 }
