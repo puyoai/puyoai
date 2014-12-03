@@ -46,7 +46,9 @@ static bool g_should_decide = true;
 
 bool tick(Game* game) {
   int state = game->state;
+#if 0
   bool emergency = false;
+#endif
   if ((state & (STATE_YOU_GROUNDED << 1))) {
     int chain_cnt;
     int score;
@@ -61,7 +63,9 @@ bool tick(Game* game) {
       game->p[1].spent_score += ojama_cnt * 70;
       game->p[1].expected_ojama += ojama_cnt;
       game->p[1].expected_frame = frame_cnt;
+#if 0
       emergency = FLAGS_handle_opponent_grounded;
+#endif
       LOG(INFO) << "Opponent fired! ojama=" << game->p[1].expected_ojama
                 << " frames=" << game->p[1].expected_frame
                 << "\n" << game->p[1].f.GetDebugOutput();
@@ -70,8 +74,10 @@ bool tick(Game* game) {
   if ((state & STATE_YOU_GROUNDED)) {
     g_should_decide = true;
   }
+#if 0
   // TODO(hamaji): Emergency handling was removed.
   //if ((g_should_decide && (state & STATE_YOU_CAN_PLAY)) || emergency) {
+#endif
   if (g_should_decide && (state & STATE_YOU_CAN_PLAY)) {
     g_should_decide = false;
     Decision decision = g_core->decide(game);
