@@ -1,14 +1,14 @@
 #ifndef HAMAJI_EVAL_H_
 #define HAMAJI_EVAL_H_
 
-#include "../../core/decision.h"
+#include "core/decision.h"
 
+#include <mutex>
 #include <string>
 #include <vector>
 
 #include "base.h"
 #include "eval_base.h"
-#include "mutex.h"
 
 class LF;
 class LP;
@@ -41,7 +41,7 @@ private:
   double calcParamError(vector<Teacher>& teachers);
 
   static void init();
-  static Mutex g_mu;
+  static std::mutex g_mu;
   static vector<Param> g_params;
   static vector<int> g_param_index_offsets;
 

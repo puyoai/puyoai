@@ -10,7 +10,6 @@
 #include <glog/logging.h>
 
 #include "field.h"
-#include "mutex.h"
 #include "util.h"
 
 DEFINE_string(params, "params.txt", "");
@@ -51,12 +50,12 @@ struct Eval::Param {
   string name;
 };
 
-Mutex Eval::g_mu;
+std::mutex Eval::g_mu;
 vector<Eval::Param> Eval::g_params;
 vector<int> Eval::g_param_index_offsets;
 
 void Eval::init() {
-  MutexLock lock(&g_mu);
+  std::lock_guard<std::mutex> lock(g_mu);
 
   static bool inited = false;
   if (inited)

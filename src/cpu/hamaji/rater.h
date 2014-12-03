@@ -1,10 +1,11 @@
 #ifndef HAMAJI_RATER_H_
 #define HAMAJI_RATER_H_
 
+#include <thread>
+#include <mutex>
 #include <vector>
 
 #include "base.h"
-#include "mutex.h"
 
 class RatingStats;
 class PuyoCloudManager;
@@ -33,9 +34,9 @@ private:
   int pickGameIndex();
 
  private:
-  Mutex mu_;
+  std::mutex mu_;
 
-  vector<pthread_t> threads_;
+  vector<std::thread> threads_;
   vector<ThreadState> states_;
   vector<RatingStats> rating_stats_vec_;
   int game_index_;
