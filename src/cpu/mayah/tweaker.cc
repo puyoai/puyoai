@@ -178,6 +178,7 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
     int over70000Count = 0;
     int over80000Count = 0;
     int over100000Count = 0;
+
     vector<pair<int, int>> scores;
     for (int i = 0; i < N; ++i) {
         Result r = ps[i].get_future().get();
@@ -195,9 +196,20 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
         cout << r.msg;
     }
 
+    sort(scores.begin(), scores.end());
+
+    double mean = static_cast<double>(sumScore) / N;
+    double variance = 0.0;
+    for (int i = 0; i < N; ++i) {
+        variance += (scores[i].first - mean) * (scores[i].first - mean);
+    }
+    double deviation = N >= 2 ? sqrt(variance / (N - 1)) : 0;
+
     int aveMainRensaScore = mainRensaCount > 0 ? sumMainRensaScore / mainRensaCount : 0;
     cout << "sum score  = " << sumScore << endl;
     cout << "ave score  = " << (sumScore / N) << endl;
+    cout << "median     = " << scores[N / 2].first << endl;
+    cout << "deviation  = " << deviation << endl;
     cout << "main rensa = " << mainRensaCount << endl;
     cout << "ave main rensa = " << aveMainRensaScore << endl;
     cout << "over  40000 = " << over40000Count << endl;
@@ -206,7 +218,6 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
     cout << "over  80000 = " << over80000Count << endl;
     cout << "over 100000 = " << over100000Count << endl;
     if (scores.size() >= 10) {
-        sort(scores.begin(), scores.end());
         for (int i = 0; i < 5; ++i) {
             cout << "  seed " << scores[i].second << " -> " << scores[i].first << endl;
         }
