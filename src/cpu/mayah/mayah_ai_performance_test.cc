@@ -151,7 +151,7 @@ TEST(MayahAIPerformanceTest, seq4_depth3_iter1_real)
     runTest(3, 1, f, seq);
 }
 
-TEST(MayahAIPerformanceTest, seq4_depth3_iter2_real)
+TEST(MayahAIPerformanceTest, slow_pattern_from_real_1)
 {
     CoreField f(
         "    RB"
@@ -164,6 +164,23 @@ TEST(MayahAIPerformanceTest, seq4_depth3_iter2_real)
         "GGYGGR"
         "YYBBBR");
     KumipuyoSeq seq("RBRGRYYG");
+
+    runTest(3, 2, f, seq);
+}
+
+TEST(MayahAIPerformanceTest, slow_pattern_from_real_2)
+{
+    CoreField f(
+        "   B  "
+        "  RGGB"
+        " BGBRB"
+        " YBBYB"
+        " YGGYY"
+        "RBGYBR"
+        "BBYGRR"
+        "RRRYGG"
+        "YYYGBR");
+    KumipuyoSeq seq("GYRYRG");
 
     runTest(3, 2, f, seq);
 }
