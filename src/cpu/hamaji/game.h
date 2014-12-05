@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "core/kumipuyo_seq.h"
 #include "core/state.h"
 
 #include "base.h"
@@ -13,7 +14,7 @@ public:
   Player();
 
   LF f;
-  string next;
+  KumipuyoSeq next;
   int score;
   int spent_score;
   int ojama_cnt;

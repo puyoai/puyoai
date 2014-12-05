@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
           }
         }
 
-        f.PutDecision(match.decisions[t], next[0], next[1]);
+        f.PutDecision(match.decisions[t], toPuyoColor(next[0]), toPuyoColor(next[1]));
       }
 
       stats.total_count++;
