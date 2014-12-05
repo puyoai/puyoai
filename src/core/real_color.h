@@ -1,10 +1,11 @@
 #ifndef CORE_REAL_COLOR_H_
 #define CORE_REAL_COLOR_H_
 
+#include <cstdint>
 #include <ostream>
 #include <string>
 
-enum class RealColor {
+enum class RealColor : std::uint8_t {
     RC_EMPTY,
     RC_WALL,
     RC_OJAMA,

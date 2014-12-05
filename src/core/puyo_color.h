@@ -36,7 +36,7 @@ std::string toString(PuyoColor);
 // Returns true if puyo is normal color puyo.
 constexpr bool isNormalColor(PuyoColor color)
 {
-    return static_cast<int>(PuyoColor::RED) <= static_cast<int>(color) && static_cast<int>(color) <= static_cast<int>(PuyoColor::GREEN);
+    return ordinal(PuyoColor::RED) <= ordinal(color) && ordinal(color) <= ordinal(PuyoColor::GREEN);
 }
 
 inline std::ostream& operator<<(std::ostream& os, PuyoColor c)
