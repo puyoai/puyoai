@@ -301,7 +301,7 @@ void Evaluator<ScoreCollector>::evalUnreachableSpace(const CoreField& f)
     int countUnreachable = 0;
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = f.height(x) + 1; y <= CoreField::HEIGHT; ++y) {
-            if (f.color(x, y) != EMPTY)
+            if (f.color(x, y) != PuyoColor::EMPTY)
                 continue;
             if (checked.get(x, y))
                 continue;

@@ -77,11 +77,11 @@ TEST(FieldTest, SafeDropTest) {
   {
     LF f("http://www.inosendo.com/puyo/rensim/??5500044000");
     f.SafeDrop();
-    EXPECT_EQ(RED, f.Get(2, 1));
-    EXPECT_EQ(RED, f.Get(3, 1));
-    EXPECT_EQ(BLUE, f.Get(3, 2));
-    EXPECT_EQ(BLUE, f.Get(4, 1));
-    EXPECT_EQ(EMPTY, f.Get(4, 2));
+    EXPECT_EQ(PuyoColor::RED, f.Get(2, 1));
+    EXPECT_EQ(PuyoColor::RED, f.Get(3, 1));
+    EXPECT_EQ(PuyoColor::BLUE, f.Get(3, 2));
+    EXPECT_EQ(PuyoColor::BLUE, f.Get(4, 1));
+    EXPECT_EQ(PuyoColor::EMPTY, f.Get(4, 2));
   }
 }
 

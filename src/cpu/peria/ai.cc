@@ -45,7 +45,7 @@ DropDecision Ai::think(int frame_id,
   Control control;
   auto evaluate = std::bind(Ai::Evaluate, _1, attack_.get(), &control);
   Plan::iterateAvailablePlans(field, seq, 2, evaluate);
-  
+
   DLOG(INFO) << control.message;
   DLOG(INFO) << field.toDebugString();
   return DropDecision(control.decision, control.message);
@@ -101,7 +101,7 @@ int FieldEvaluate(const CoreField& field) {
     int height = field.height(x);
     for (int y = 1; y <= height; ++y) {
       PuyoColor c = field.color(x, y);
-      if (c == OJAMA)
+      if (c == PuyoColor::OJAMA)
         continue;
       if (c == field.color(x + 1, y))
         num_connect += 2;

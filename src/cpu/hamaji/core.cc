@@ -99,9 +99,9 @@ Decision Core::decide(Game* game) {
     }
     if (best_plan &&
         best_score / 70 - 30 > game->p[1].expected_ojama &&
-        (game->p[0].f.Get(3, 11) ||
-         (game->p[0].f.Get(2, 12) && game->p[0].f.Get(4, 11)) ||
-         (game->p[0].f.Get(2, 11) && game->p[0].f.Get(4, 12)) ||
+        (game->p[0].f.Get(3, 11) != PuyoColor::EMPTY ||
+         (game->p[0].f.Get(2, 12) != PuyoColor::EMPTY && game->p[0].f.Get(4, 11) != PuyoColor::EMPTY) ||
+         (game->p[0].f.Get(2, 11) != PuyoColor::EMPTY && game->p[0].f.Get(4, 12) != PuyoColor::EMPTY) ||
          best_score > FLAGS_immediate_fire_score)) {
       msg_ = ssprintf("IMMEDIATE_%d", best_score);
       LOG(INFO) << "Immediate fire! score=" << best_score
@@ -203,7 +203,7 @@ Decision Core::decide(Game* game) {
   int ojama_height = 0;
   if (ojama > 3) {
     ojama_height = (ojama + 5) / 6;
-    if (ojama_height >= 12 || game->p[0].f.Get(3, 12-ojama_height))
+    if (ojama_height >= 12 || game->p[0].f.Get(3, 12-ojama_height) != PuyoColor::EMPTY)
       ojama_height = 0;
   }
 

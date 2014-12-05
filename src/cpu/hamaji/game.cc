@@ -60,7 +60,7 @@ Game::Game(const Game& prev_game, const string& line) {
   for (int i = 0; i < 2; i++) {
     for (int x = 1; x <= 6; x++) {
       for (int y = 13; y <= 14; y++) {
-        if (p[i].f.Get(x, y-1) == EMPTY)
+        if (p[i].f.Get(x, y-1) == PuyoColor::EMPTY)
           break;
         p[i].f.Set(x, y, prev_game.p[i].f.Get(x, y));
       }

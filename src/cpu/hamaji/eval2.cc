@@ -27,7 +27,8 @@ static double getConnectionScore(const LF& field) {
           num_colors[(int)field.Get(x+dx, y+dy)]++;
         }
       }
-      for (int i = RED; i <= GREEN; i++) {
+      for (const PuyoColor c : NORMAL_PUYO_COLORS) {
+        int i = ordinal(c);
         // We need this check for 13 danme
         if (num_colors[i] > 4) {
           num_colors[i] = 4;
@@ -54,7 +55,7 @@ double Eval2::eval(LP* plan) {
   for (int x = 1; x <= 6; x++) {
     for (int y = 1; y <= 14; y++) {
       heights[x] = y - 1;
-      if (!f.Get(x, y))
+      if (f.Get(x, y) == PuyoColor::EMPTY)
         break;
     }
   }

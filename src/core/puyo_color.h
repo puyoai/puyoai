@@ -7,7 +7,7 @@
 #include "base/base.h"
 
 // TODO(mayah): Consider use enum class.
-enum PuyoColor : uint8_t {
+enum class PuyoColor : uint8_t {
     EMPTY = 0,
     OJAMA = 1,
     WALL = 2,
