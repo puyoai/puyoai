@@ -13,7 +13,7 @@ TEST(FieldTest, getBestChainCount) {
     EXPECT_EQ(1, field.getBestChainCount());
   }
   {
-    LF field("http://www.inosendo.com/puyo/rensim/?500000450004455");
+    LF field("http://www.inosendo.com/puyo/rensim/??500000450004455");
     int ipc, ucc, vpc;
     EXPECT_EQ(2, field.getBestChainCount(&ipc, &ucc, &vpc));
     EXPECT_EQ(3, ipc);
@@ -21,7 +21,7 @@ TEST(FieldTest, getBestChainCount) {
     EXPECT_EQ(4, vpc);
   }
   {
-    LF field("http://www.inosendo.com/puyo/rensim/?500004500066450064455");
+    LF field("http://www.inosendo.com/puyo/rensim/??500004500066450064455");
     int ipc, ucc, vpc;
     EXPECT_EQ(3, field.getBestChainCount(&ipc, &ucc, &vpc));
     EXPECT_EQ(3, ipc);
@@ -85,100 +85,6 @@ TEST(FieldTest, SafeDropTest) {
     EXPECT_EQ(EMPTY, f.Get(4, 2));
   }
 }
-
-TEST(FieldTest, FramesTest) {
-  int chains, score, frames;
-  {
-    // 1 Rensa, no drop.
-    LF f("444400");
-    f.Simulate(&chains, &score, &frames);
-    EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION + FRAMES_AFTER_NO_DROP, frames);
-  }
-  {
-    LF f("500000"
-         "444400");
-    f.Simulate(&chains, &score, &frames);
-    EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP, frames);
-  }
-  {
-    LF f("500000"
-         "400000"
-         "444000");
-    f.Simulate(&chains, &score, &frames);
-    EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP,
-              frames);
-  }
-  {
-    LF f("500000"
-         "450000"
-         "444000");
-    f.Simulate(&chains, &score, &frames);
-    EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP,
-              frames);
-  }
-  {
-    LF f("500000"
-         "455000"
-         "444500");
-    f.Simulate(&chains, &score, &frames);
-    EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP +
-              FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION + FRAMES_AFTER_NO_DROP,
-              frames);
-  }
-  {
-    LF f("560000"
-         "455000"
-         "444500");
-    f.Simulate(&chains, &score, &frames);
-    EXPECT_EQ(FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION + FRAMES_DROP_1_LINE * 2 + FRAMES_AFTER_DROP +
-              FRAMES_AFTER_VANISH + FRAMES_VANISH_ANIMATION + FRAMES_DROP_1_LINE + FRAMES_AFTER_DROP,
-              frames);
-  }
-}
-
-TEST(FieldTest, FindAvailablePlansTest) {
-  {
-    LF f;
-    const string& next = LF::parseNext("444444");
-
-    vector<LP> plans;
-    f.FindAvailablePlans(next, &plans);
-    EXPECT_EQ(11U + 11*11 + 11*11*11, plans.size());
-  }
-  {
-    LF f;
-    const string& next = LF::parseNext("445566");
-
-    vector<LP> plans;
-    f.FindAvailablePlans(next, &plans);
-    EXPECT_EQ(11U + 11*11 + 11*11*11, plans.size());
-  }
-  {
-    LF f;
-    const string& next = LF::parseNext("456745");
-
-    vector<LP> plans;
-    f.FindAvailablePlans(next, &plans);
-    EXPECT_EQ(22U + 22*22 + 22*22*22, plans.size());
-  }
-  {
-    LF f;
-    const string& next = LF::parseNext("445675");
-
-    vector<LP> plans;
-    f.FindAvailablePlans(next, &plans);
-    EXPECT_EQ(11U + 11*22 + 11*22*22, plans.size());
-  }
-  {
-    LF f;
-    const string& next = LF::parseNext("456477");
-
-    vector<LP> plans;
-    f.FindAvailablePlans(next, &plans);
-    EXPECT_EQ(22U + 22*22 + 22*22*11, plans.size());
-  }
-}
-
 
 TEST(FieldTest, getOjamaFilmHeightTest) {
   {
