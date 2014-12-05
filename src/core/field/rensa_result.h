@@ -14,15 +14,15 @@ struct RensaResult {
 
     std::string toString() const;
 
-    friend bool operator==(const RensaResult& lhs, const RensaResult& rhs) {
+    friend bool operator==(const RensaResult& lhs, const RensaResult& rhs)
+    {
         return lhs.chains == rhs.chains &&
             lhs.score == rhs.score &&
-            lhs.frames == rhs.frames;
+            lhs.frames == rhs.frames &&
+            lhs.quick == rhs.quick;
     }
 
-    friend bool operator!=(const RensaResult& lhs, const RensaResult& rhs) {
-        return !(lhs == rhs);
-    }
+    friend bool operator!=(const RensaResult& lhs, const RensaResult& rhs) { return !(lhs == rhs); }
 
     int chains;
     int score;
