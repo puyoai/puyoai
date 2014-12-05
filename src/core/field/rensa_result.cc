@@ -12,7 +12,8 @@ string RensaResult::toString() const
     stringstream ss;
     ss << "chains=" << chains
        << " score=" << score
-       << " frames=" << frames;
+       << " frames=" << frames
+       << " quick=" << (quick ? "true" : "false");
     return ss.str();
 }
 
