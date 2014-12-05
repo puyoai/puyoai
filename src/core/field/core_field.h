@@ -47,6 +47,8 @@ public:
     int countConnectedPuyos(int x, int y) const;
     // Same as countConnectedPuyos(x, y), but with checking using |checked|.
     int countConnectedPuyos(int x, int y, FieldBitField* checked) const;
+    // Returns true if color(x, y) is connected in some direction.
+    bool isConnectedPuyo(int x, int y) const;
 
     // ----------------------------------------------------------------------
     // field manipulation

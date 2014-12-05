@@ -151,6 +151,12 @@ int CoreField::countConnectedPuyos(int x, int y, FieldBitField* checked) const
     return filledHead - positions;
 }
 
+bool CoreField::isConnectedPuyo(int x, int y) const
+{
+    PuyoColor c = color(x, y);
+    return color(x, y - 1) == c || color(x, y + 1) == c || color(x - 1, y) == c || color(x + 1, y) == c;
+}
+
 void CoreField::forceDrop()
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
@@ -288,7 +294,8 @@ bool CoreField::dropPuyoOn(int x, PuyoColor c, bool isAxis)
     return true;
 }
 
-Position* CoreField::fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBitField* checked) const
+Position* CoreField::fillSameColorPosition(int x, int y, PuyoColor c,
+                                           Position* positionQueueHead, FieldBitField* checked) const
 {
     DCHECK(!checked->get(x, y));
 

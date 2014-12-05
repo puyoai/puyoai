@@ -97,8 +97,14 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                         continue;
 
                     // If the first rensa is this, any rensa won't continue.
-                    // So, we'd like to skip this.
-                    if (fast && originalField.countConnectedPuyos(x, y) == 1)
+                    // This is like erasing the following X.
+                    // ......
+                    // .YXY..
+                    // BZZZBB
+                    // CAAACC
+                    //
+                    // So, we should be able to skip this.
+                    if (fast && !originalField.isConnectedPuyo(x, y))
                         continue;
                 } else {
                     if (originalField.color(x + d, y) != PuyoColor::EMPTY)
