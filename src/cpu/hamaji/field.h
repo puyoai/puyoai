@@ -58,6 +58,7 @@ class LF : public CoreField {
   // Normal print for debugging purpose.
   const string GetDebugOutput() const;
 
+  // TODO(mayah): Consider using Plan::iterateAvailablePlans().
   // depth = 1 -- think about the next pair of puyos.
   // depth = 2 -- think about the next 2 pairs of puyos.
   // depth = 3 -- think about the next 3 pairs of puyos.
@@ -93,12 +94,10 @@ class LF : public CoreField {
   bool complementOjamasDropped(const LF& f);
 
  private:
-  void FillFieldInfo(stringstream& ss) const;
   void FindAvailablePlansInternal(const LF& field, const KumipuyoSeq& next,
                                   const LP* parent,
                                   int depth, int max_depth,
                                   vector<LP>* plans);
-  void Drop(int* frames);
 };
 
 class LP {

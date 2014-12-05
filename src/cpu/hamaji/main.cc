@@ -87,7 +87,8 @@ bool tick(Game* game) {
     g_core->clear_msg();
     for (int y = 13; y <= 14; y++) {
       for (int x = 1; x <= 6; x++) {
-        char c = game->p[0].f.Get(x, y) + '0';
+        // TODO: Not good to use ordinal(). Define toDeprecatedChar() in core?
+        char c = ordinal(game->p[0].f.Get(x, y)) + '0';
         buf[i++] = c;
       }
     }

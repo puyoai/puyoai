@@ -158,7 +158,7 @@ int Pattern::GetScore(
   for (auto& matching_itr : matching) {
     DCHECK(std::isupper(matching_itr.first));
     auto& color_map = matching_itr.second;
-    color_map.erase(EMPTY);
+    color_map.erase(PuyoColor::EMPTY);
     if (color_map.size() > 1)
       return 0;
     if (!color_map.empty())

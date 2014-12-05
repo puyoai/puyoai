@@ -40,9 +40,9 @@ bool MatchState::match(char a, PuyoColor c)
     if (colors_[idx] == c)
         return true;
 
-    if (colors_[idx] == PuyoColor::EMPTY && chars_[c] == ' ') {
+    if (colors_[idx] == PuyoColor::EMPTY && chars_[ordinal(c)] == ' ') {
         colors_[idx] = c;
-        chars_[c] = a;
+        chars_[ordinal(c)] = a;
         return true;
     }
 

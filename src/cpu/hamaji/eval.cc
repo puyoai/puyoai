@@ -146,7 +146,8 @@ double Eval::getConnectionScore(const LF& field,
           num_colors[(int)field.Get(x+dx, y+dy)]++;
         }
       }
-      for (int i = RED; i <= GREEN; i++) {
+      for (const PuyoColor c : NORMAL_PUYO_COLORS) {
+        int i = ordinal(c);
         // We need this check for 13 danme
         if (num_colors[i] > 4) {
           num_colors[i] = 4;
@@ -165,7 +166,7 @@ void Eval::getHeightScore(const LF& field, vector<double>* param_scores) {
   for (int x = 0; x < 6; x++) {
     int h = 0;
     for (int y = 1; y <= 13; y++) {
-      if (!field.Get(x + 1, y))
+      if (field.Get(x + 1, y) == PuyoColor::EMPTY)
         break;
       h++;
     }
@@ -209,10 +210,10 @@ void Eval::getHeightScore(const LF& field, vector<double>* param_scores) {
 void Eval::getVertical3(const LF& field, vector<double>* param_scores) {
   for (int x = 1; x <= 6; x++) {
     for (int y = 3; y <= 4; y++) {
-      char c = field.Get(x, y);
-      if (c == EMPTY)
+      PuyoColor c = field.Get(x, y);
+      if (c == PuyoColor::EMPTY)
         break;
-      if (c >= RED) {
+      if (c >= PuyoColor::RED) {
         if (field.Get(x, y-1) == c && field.Get(x, y-2) == c)
           (*param_scores)[getParamIndex(VERTICAL_3, 0)]++;
       }
@@ -311,7 +312,7 @@ double Eval::eval(LP* plan) {
     r -= ojama_height * 20;
   }
 
-  if (plan->field.Get(3, 11))
+  if (plan->field.Get(3, 11) != PuyoColor::EMPTY)
     r -= 5;
 
   if (puyo_cnt < 40 || is_emergency_) {
@@ -335,14 +336,14 @@ double Eval::eval(LP* plan) {
     for (int p1 = 0; p1 < 13*6; p1++) {
       int x1 = p1 % 6 + 1;
       int y1 = p1 / 6 + 1;
-      char c1 = plan->field.Get(x1, y1);
-      if (c1 < RED)
+      PuyoColor c1 = plan->field.Get(x1, y1);
+      if (!isNormalColor(c1))
         continue;
       for (int p2 = p1+1; p2 < 13*6; p2++) {
         int x2 = p2 % 6 + 1;
         int y2 = p2 / 6 + 1;
-        char c2 = plan->field.Get(x2, y2);
-        if (c2 < RED)
+        PuyoColor c2 = plan->field.Get(x2, y2);
+        if (!isNormalColor(c2))
           continue;
 
         int tav = g_ta[p1][p2];

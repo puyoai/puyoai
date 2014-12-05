@@ -15,8 +15,7 @@
 #include "core/constant.h"
 #include "core/field/rensa_result.h"
 #include "core/kumipuyo_seq.h"
-
-#include "ctrl.h"
+#include "core/puyo_controller.h"
 
 using namespace std;
 
@@ -107,7 +106,7 @@ void LF::FindAvailablePlansInternal(const LF& field, const KumipuyoSeq& next, co
 
   for (int i = 0; i < num_decisions; i++) {
     const Decision& decision = decisions[i];
-    if (!LC::isReachable(field, decision)) {
+    if (!PuyoController::isReachable(field, decision)) {
       continue;
     }
 
@@ -129,7 +128,7 @@ void LF::FindAvailablePlansInternal(const LF& field, const KumipuyoSeq& next, co
     heights[x2]--;
     int chains, score, frames;
     next_field.Simulate(&chains, &score, &frames);
-    if (next_field.Get(3, 12) != EMPTY) {
+    if (next_field.Get(3, 12) != PuyoColor::EMPTY) {
       continue;
     }
 
@@ -161,7 +160,7 @@ int LF::PutDecision(Decision decision, PuyoColor c1, PuyoColor c2, int* chigiri_
   for (int x = 1; x <= LF::WIDTH; x++) {
     heights[x] = 100;
     for (int y = 1; y <= LF::HEIGHT + 2; y++) {
-      if (Get(x, y) == EMPTY) {
+      if (Get(x, y) == PuyoColor::EMPTY) {
         heights[x] = y;
         break;
       }
@@ -185,7 +184,7 @@ int LF::PutDecision(Decision decision, PuyoColor c1, PuyoColor c2, int* chigiri_
 
   int chains, score, frames;
   Simulate(&chains, &score, &frames);
-  if (Get(3, 12) != EMPTY) {
+  if (Get(3, 12) != PuyoColor::EMPTY) {
     return -1;
   }
 
@@ -196,10 +195,10 @@ int LF::countColorPuyo() const {
   int n = 0;
   for (int x = 1; x <= 6; x++) {
     for (int y = 1; y <= 13; y++) {
-      char c = Get(x, y);
-      if (!c)
+      PuyoColor c = Get(x, y);
+      if (c == PuyoColor::EMPTY)
         break;
-      if (c >= RED || c <= GREEN + 1)
+      if (isNormalColor(c))
         n++;
     }
   }
@@ -208,7 +207,7 @@ int LF::countColorPuyo() const {
 
 bool LF::hasPuyo() const {
   for (int x = 1; x <= 6; x++) {
-    if (Get(x, 1))
+    if (Get(x, 1) != PuyoColor::EMPTY)
       return true;
   }
   return false;
@@ -243,12 +242,12 @@ int LF::getBestChainCount(int* ignition_puyo_cnt,
     for (int y = 1; y < 13; y++) {
       if (has_checked[x][y])
         continue;
-      char c = Get(x, y);
-      if (!c)
+      PuyoColor c = Get(x, y);
+      if (c == PuyoColor::EMPTY)
         break;
-      if (c < RED)
+      if (!isNormalColor(c))
         continue;
-      if (Get(x + 1, y) && Get(x - 1, y) && Get(x, y + 1))
+      if (Get(x + 1, y) != PuyoColor::EMPTY && Get(x - 1, y) != PuyoColor::EMPTY && Get(x, y + 1) != PuyoColor::EMPTY)
         continue;
 
       LF nf(*this);
@@ -401,7 +400,7 @@ void LF::getProspectiveChains(vector<Chain*>* pchains,
     int c = i % 4 + 4;
     int y;
     for (y = 1; y <= 13; y++) {
-      if (!Get(x, y))
+      if (Get(x, y) == PuyoColor::EMPTY)
         break;
     }
     if (y > 12)
@@ -449,14 +448,14 @@ bool LF::complementOjamasDropped(const LF& f) {
     heights[x] = 1;
     int n = 0;
     for (int y = 1; y <= 12; heights[x] = ++y) {
-      char c = Get(x, y);
-      char pc = f.Get(x, y);
+      PuyoColor c = Get(x, y);
+      PuyoColor pc = f.Get(x, y);
       if (c == pc) {
-        if (c == EMPTY && pc == EMPTY)
+        if (c == PuyoColor::EMPTY && pc == PuyoColor::EMPTY)
           break;
         continue;
       }
-      if (c != OJAMA || pc != EMPTY) {
+      if (c != PuyoColor::OJAMA || pc != PuyoColor::EMPTY) {
 #if 0
         LOG(WARNING) << "Inconsistent field from the previous field "
                      << (char)(c + '0') << " vs " << (char)(pc + '0')
@@ -500,9 +499,9 @@ bool LF::complementOjamasDropped(const LF& f) {
       continue;
     int n = max_ojama - num_ojamas[x];
     for (int y = heights[x]; y <= 14 && n > 0; y++) {
-      char pc = f.Get(x, y);
-      if (pc == EMPTY) {
-        Set(x, y, OJAMA);
+      PuyoColor pc = f.Get(x, y);
+      if (pc == PuyoColor::EMPTY) {
+        Set(x, y, PuyoColor::OJAMA);
         n--;
       }
     }
