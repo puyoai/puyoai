@@ -16,7 +16,6 @@
 #include "core/field/rensa_result.h"
 #include "core/kumipuyo_seq.h"
 
-#include "deprecated_constant.h"
 #include "ctrl.h"
 
 using namespace std;
@@ -117,7 +116,7 @@ void LF::FindAvailablePlansInternal(const LF& field, const KumipuyoSeq& next, co
     int x1 = decision.x;
     int x2 = decision.x + (decision.r == 1) - (decision.r == 3);
 
-    int chigiri_frames = FRAMES_AFTER_CHIGIRI + abs(x1 - x2) / 2;
+    int chigiri_frames = FRAMES_TO_DROP[abs(x1 - x2)] + FRAMES_GROUNDING;
 
     if (decision.r == 2) {
       next_field.Set(x2, heights[x2]++, c2);
@@ -174,7 +173,7 @@ int LF::PutDecision(Decision decision, PuyoColor c1, PuyoColor c2, int* chigiri_
   if (chigiri_frames && heights[x1] != heights[x2]) {
     int d = abs(heights[x1] - heights[x2]);
     // Wow, this looks a precise approximation.
-    *chigiri_frames += FRAMES_AFTER_CHIGIRI + d / 2;
+    *chigiri_frames += FRAMES_GROUNDING + FRAMES_TO_DROP[d];
   }
   if (decision.r == 2) {
     Set(x2, heights[x2]++, c2);
