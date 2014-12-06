@@ -99,3 +99,17 @@ TEST(FieldPerformanceTest, Simulate_Filled_Track)
 
     tsc.showStatistics();
 }
+
+TEST(FieldPerformanceTest, countConnectedPuyos)
+{
+    TimeStampCounterData tsc;
+
+    for (int i = 0; i < 1000000; i++) {
+        CoreField f;
+
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(f.countConnectedPuyos(3, 12), 72);
+    }
+
+    tsc.showStatistics();
+}
