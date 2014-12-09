@@ -9,13 +9,15 @@
 #include <thread>
 #include <vector>
 
-class Executor {
+#include "base/base.h"
+
+class Executor : noncopyable {
 public:
     typedef std::function<void (void)> Func;
 
     static std::unique_ptr<Executor> makeDefaultExecutor(bool automaticStart = true);
 
-    Executor(int numThread);
+    explicit Executor(int numThread);
     ~Executor();
 
     void start();
