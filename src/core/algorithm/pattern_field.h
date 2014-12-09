@@ -21,8 +21,8 @@ public:
     char get(int x, int y) const { return field_[x][y]; }
 
 private:
-    std::int8_t heights_[MAP_WIDTH];
     char field_[MAP_WIDTH][MAP_HEIGHT];
+    std::int8_t heights_[MAP_WIDTH];
 };
 
 #endif // CPU_MAYAH_PATTERN_FIELD_H_
