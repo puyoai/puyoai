@@ -1,8 +1,7 @@
 #ifndef CPU_MAYAH_PATTERN_FIELD_H_
 #define CPU_MAYAH_PATTERN_FIELD_H_
 
-#include <stdint.h>
-
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -12,7 +11,7 @@
 // This would be useful if you want to write an algorithm to do pattern-match.
 //
 // Generally we use 'A' to 'Z' for representing variables.
-// ' ' or '.'  represents emtpy.
+// ' ' or '.'  represents empty.
 class PatternField : FieldConstant {
 public:
     PatternField();
@@ -22,7 +21,7 @@ public:
     char get(int x, int y) const { return field_[x][y]; }
 
 private:
-    int8_t heights_[MAP_WIDTH];
+    std::int8_t heights_[MAP_WIDTH];
     char field_[MAP_WIDTH][MAP_HEIGHT];
 };
 
