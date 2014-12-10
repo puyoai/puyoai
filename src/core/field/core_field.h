@@ -17,9 +17,10 @@ struct RensaResult;
 class CoreField : public PlainField {
 public:
     CoreField();
-    CoreField(const std::string& url);
-    CoreField(const CoreField&) = default;
+    explicit CoreField(const std::string& url);
+    // TODO(mayah): Make this constructor explicit.
     CoreField(const PlainField&);
+    CoreField(const CoreField&) = default;
 
     void clear();
 
