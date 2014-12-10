@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include "base/base.h"
+#include "base/noncopyable.h"
 #include "core/next_puyo.h"
 #include "gui/box.h"
 

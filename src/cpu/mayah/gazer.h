@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "base/noncopyable.h"
 #include "core/algorithm/rensa_info.h"
 #include "core/client/ai/ai.h"
 
