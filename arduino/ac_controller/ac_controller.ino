@@ -20,21 +20,20 @@
 
 #define ARRAY_SIZE(xs)   (sizeof(xs) / sizeof(xs[0]))
 
-static int OUTPUT_PINS[] = {
+static const int OUTPUT_PINS[] = {
     PIN_UP, PIN_RIGHT, PIN_DOWN, PIN_LEFT,
     PIN_RIGHT_TURN, PIN_LEFT_TURN, PIN_START, PIN_LED
 };
 
 void setup()
 {
-	// Set PushButton pins as input, turning pull-up on
-	pinMode(PIN_LED, OUTPUT);
-
     for (int i = 0; i < ARRAY_SIZE(OUTPUT_PINS); ++i)
         pinMode(OUTPUT_PINS[i], OUTPUT);
 
     for (int i = 0; i < ARRAY_SIZE(OUTPUT_PINS); ++i)
         digitalWrite(OUTPUT_PINS[i], LOW);
+
+    digitalWrite(PIN_LED, HIGH);
 
     Serial.begin(38400);
     delay(100);
@@ -63,12 +62,12 @@ void loop()
     int left_turn = ((x >> KEY_LEFT_TURN) & 1) ? HIGH : LOW;
     int start = ((x >> KEY_START) & 1) ? HIGH : LOW;
 
-    digitWrite(PIN_UP, up);
-    digitWrite(PIN_RIGHT, right);
-    digitWrite(PIN_DOWN, down);
-    digitWrite(PIN_LEFT, left);
-    digitWrite(PIN_RIGHT_TURN, right_turn);
-    digitWrite(PIN_LEFT_TURN, left_turn);
-    digitWrite(PIN_START, start);
+    digitalWrite(PIN_UP, up);
+    digitalWrite(PIN_RIGHT, right);
+    digitalWrite(PIN_DOWN, down);
+    digitalWrite(PIN_LEFT, left);
+    digitalWrite(PIN_RIGHT_TURN, right_turn);
+    digitalWrite(PIN_LEFT_TURN, left_turn);
+    digitalWrite(PIN_START, start);
     delay(34);
 }
