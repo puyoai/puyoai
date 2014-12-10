@@ -4,7 +4,7 @@
 #include <vector>
 #include <glog/logging.h>
 
-#include "base/base.h"
+#include "base/noncopyable.h"
 #include "core/field/rensa_result.h"
 
 #include "core/field/core_field.h"

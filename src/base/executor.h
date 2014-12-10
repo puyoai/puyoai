@@ -9,7 +9,7 @@
 #include <thread>
 #include <vector>
 
-#include "base/base.h"
+#include "base/noncopyable.h"
 
 class Executor : noncopyable {
 public:

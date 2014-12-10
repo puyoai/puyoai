@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include "base/base.h"
+#include "base/noncopyable.h"
 
 struct FrameRequest;
 struct FrameResponse;

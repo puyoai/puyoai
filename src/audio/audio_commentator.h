@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "audio/speak_requester.h"
-#include "base/base.h"
+#include "base/noncopyable.h"
 #include "core/field/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/server/commentator.h"

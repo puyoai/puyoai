@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "base/base.h"
+#include "base/noncopyable.h"
 #include "core/decision.h"
 #include "core/field/core_field.h"
 #include "core/field/rensa_result.h"
