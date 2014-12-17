@@ -5,7 +5,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "core/constant.h"
+#include "core/score.h"
 
 #include "eval.h"
 #include "eval2.h"
@@ -115,7 +115,7 @@ Decision Core::decide(Game* game) {
           min((puyo_cnt + best_plan->chain_cnt * 2 + 3) / 4, 19);
       int max_score = 0;
       for (int i = 2; i <= max_chain_cnt; i++) {
-        max_score += CHAIN_BONUS[i];
+        max_score += chainBonus(i);
       }
       max_score *= 40;
       max_score += game->p[1].score - game->p[1].spent_score;
