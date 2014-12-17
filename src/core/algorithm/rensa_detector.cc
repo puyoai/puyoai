@@ -18,9 +18,14 @@ using namespace std;
 
 namespace {
 
+enum class PurposeToFindRensa {
+    FOR_FIRE,
+    FOR_KEY,
+};
+
 typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
-RensaDetectorStrategy gDefaultFloatStrategy(RensaDetectorStrategy::Mode::FLOAT);
-RensaDetectorStrategy gDefaultDropStrategy(RensaDetectorStrategy::Mode::DROP);
+RensaDetectorStrategy gDefaultFloatStrategy(RensaDetectorStrategy::Mode::FLOAT, 3, 3);
+RensaDetectorStrategy gDefaultDropStrategy(RensaDetectorStrategy::Mode::DROP, 3, 3);
 
 }  // namespace anomymous
 
@@ -71,7 +76,7 @@ void makeProhibitArray(const RensaResult& rensaResult, const RensaTrackResult& t
 
 static inline
 void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                 bool fast, SimulationCallback callback)
+                 PurposeToFindRensa purpose, int maxComplementPuyos, SimulationCallback callback)
 {
     bool visited[CoreField::MAP_WIDTH][NUM_PUYO_COLORS] {};
 
@@ -104,7 +109,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                     // CAAACC
                     //
                     // So, we should be able to skip this.
-                    if (fast && !originalField.isConnectedPuyo(x, y))
+                    if (purpose == PurposeToFindRensa::FOR_FIRE && !originalField.isConnectedPuyo(x, y))
                         continue;
                 } else {
                     if (originalField.color(x + d, y) != PuyoColor::EMPTY)
@@ -115,12 +120,12 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 
                 CoreField f(originalField);
                 int necessaryPuyos = 0;
-                while (necessaryPuyos <= 4 && f.countConnectedPuyosMax4(x, y) < 4 && f.height(x + d) <= 12) {
+                while (necessaryPuyos <= maxComplementPuyos && f.countConnectedPuyosMax4(x, y) < 4 && f.height(x + d) <= 12) {
                     f.dropPuyoOn(x + d, c, true);
                     ++necessaryPuyos;
                 }
 
-                if (necessaryPuyos > 4)
+                if (necessaryPuyos > maxComplementPuyos)
                     continue;
 
                 callback(&f, ColumnPuyoList(x + d, c, necessaryPuyos));
@@ -131,7 +136,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 
 static inline
 void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                  SimulationCallback callback)
+                  int maxComplementPuyos, SimulationCallback callback)
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = originalField.height(x); y >= 1; --y) {
@@ -142,6 +147,9 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                 continue;
 
             int necessaryPuyos = 4 - originalField.countConnectedPuyosMax4(x, y);
+            if (necessaryPuyos > maxComplementPuyos)
+                continue;
+
             int restPuyos = necessaryPuyos;
             CoreField f(originalField);
 
@@ -195,19 +203,30 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
     }
 }
 
-static
-void findRensas(const CoreField& field,
-                const RensaDetectorStrategy& strategy,
-                const bool prohibits[FieldConstant::MAP_WIDTH],
-                bool fast,
-                SimulationCallback callback)
+static inline void findRensas(const CoreField& field,
+                              const RensaDetectorStrategy& strategy,
+                              const bool prohibits[FieldConstant::MAP_WIDTH],
+                              PurposeToFindRensa purpose,
+                              SimulationCallback callback)
 {
+    int complementPuyos;
+    switch (purpose) {
+    case PurposeToFindRensa::FOR_KEY:
+        complementPuyos = strategy.maxNumOfComplementPuyosForKey();
+        break;
+    case PurposeToFindRensa::FOR_FIRE:
+        complementPuyos = strategy.maxNumOfComplementPuyosForFire();
+        break;
+    default:
+        CHECK(false);
+    }
+
     switch (strategy.mode()) {
     case RensaDetectorStrategy::Mode::DROP:
-        tryDropFire(field, prohibits, fast, callback);
+        tryDropFire(field, prohibits, purpose, complementPuyos, callback);
         break;
     case RensaDetectorStrategy::Mode::FLOAT:
-        tryFloatFire(field, prohibits, callback);
+        tryFloatFire(field, prohibits, complementPuyos, callback);
         break;
     default:
         CHECK(false) << "Unknown mode : " << static_cast<int>(strategy.mode());
@@ -267,7 +286,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(originalField, strategy, prohibits, false, findRensaCallback);
+    findRensas(originalField, strategy, prohibits, PurposeToFindRensa::FOR_KEY, findRensaCallback);
 
     if (restAdded <= 0)
         return;
@@ -393,7 +412,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
         simulateInternal(f, originalField, ColumnPuyoList(), currentFirePuyos, simulationCallback);
     };
 
-    findRensas(originalField, strategy, prohibits, false, findRensaCallback);
+    findRensas(originalField, strategy, prohibits, PurposeToFindRensa::FOR_KEY, findRensaCallback);
 }
 
 // iteratePossibleRensasIteratively finds rensa with the following algorithm.
@@ -434,5 +453,5 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(originalField, strategy, prohibits, true, findRensaCallback);
+    findRensas(originalField, strategy, prohibits, PurposeToFindRensa::FOR_FIRE, findRensaCallback);
 }
