@@ -115,7 +115,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 
                 CoreField f(originalField);
                 int necessaryPuyos = 0;
-                while (necessaryPuyos <= 4 && f.countConnectedPuyos(x, y) < 4 && f.height(x + d) <= 12) {
+                while (necessaryPuyos <= 4 && f.countConnectedPuyosMax4(x, y) < 4 && f.height(x + d) <= 12) {
                     f.dropPuyoOn(x + d, c, true);
                     ++necessaryPuyos;
                 }
@@ -141,7 +141,7 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
             if (c == PuyoColor::OJAMA)
                 continue;
 
-            int necessaryPuyos = 4 - originalField.countConnectedPuyos(x, y);
+            int necessaryPuyos = 4 - originalField.countConnectedPuyosMax4(x, y);
             int restPuyos = necessaryPuyos;
             CoreField f(originalField);
 
@@ -286,7 +286,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
                 continue;
             puyoList.addPuyo(x, c);
 
-            if (f.countConnectedPuyos(x, f.height(x)) < 4)
+            if (f.countConnectedPuyosMax4(x, f.height(x)) < 4)
                 findPossibleRensasInternal(f, puyoList, x, restAdded - 1, strategy, callback);
 
             f.removeTopPuyoFrom(x);

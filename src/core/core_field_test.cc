@@ -367,6 +367,18 @@ TEST(CoreFieldTest, countConnectedPuyosEmptyCase2)
     EXPECT_EQ(48, f.countConnectedPuyos(3, 12));
 }
 
+TEST(CoreFieldTest, countConnectedPuyosMax4)
+{
+    CoreField f(" YYY Y"
+                "BBBOYO"
+                "RRRGGG");
+
+    EXPECT_EQ(3, f.countConnectedPuyosMax4(1, 1));
+    EXPECT_EQ(3, f.countConnectedPuyosMax4(4, 1));
+    EXPECT_EQ(3, f.countConnectedPuyosMax4(1, 2));
+    EXPECT_EQ(1, f.countConnectedPuyosMax4(5, 2));
+}
+
 TEST(CoreFieldTest, isChigiriDecision1)
 {
     CoreField cf;
