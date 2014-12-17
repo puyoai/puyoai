@@ -17,15 +17,26 @@ public:
         DROP, FLOAT
     };
 
-    explicit RensaDetectorStrategy(Mode mode) : mode_(mode) {}
+    explicit RensaDetectorStrategy(Mode mode,
+                                   int maxNumOfComplementPuyosForKey,
+                                   int maxNumOfComplementPuyosForFire) :
+        mode_(mode),
+        maxNumOfComplementPuyosForKey_(maxNumOfComplementPuyosForKey),
+        maxNumOfComplementPuyosForFire_(maxNumOfComplementPuyosForFire)
+    {
+    }
 
     static const RensaDetectorStrategy& defaultFloatStrategy();
     static const RensaDetectorStrategy& defaultDropStrategy();
 
     Mode mode() const { return mode_; }
+    int maxNumOfComplementPuyosForKey() const { return maxNumOfComplementPuyosForKey_; }
+    int maxNumOfComplementPuyosForFire() const { return maxNumOfComplementPuyosForFire_; }
 
 private:
     Mode mode_;
+    int maxNumOfComplementPuyosForKey_;
+    int maxNumOfComplementPuyosForFire_;
 };
 
 class RensaDetector {
