@@ -100,7 +100,7 @@ TEST(FieldPerformanceTest, Simulate_Filled_Track)
     tsc.showStatistics();
 }
 
-TEST(FieldPerformanceTest, countConnectedPuyos)
+TEST(FieldPerformanceTest, countConnectedPuyosEmpty)
 {
     TimeStampCounterData tsc;
 
@@ -109,6 +109,56 @@ TEST(FieldPerformanceTest, countConnectedPuyos)
 
         ScopedTimeStampCounter stsc(&tsc);
         EXPECT_EQ(f.countConnectedPuyos(3, 12), 72);
+    }
+
+    tsc.showStatistics();
+}
+
+TEST(FieldPerformanceTest, countConnectedPuyosFilled)
+{
+    CoreField f("050745"
+                "574464"
+                "446676"
+                "456474"
+                "656476"
+                "657564"
+                "547564"
+                "747676"
+                "466766"
+                "747674"
+                "757644"
+                "657575"
+                "475755");
+
+    TimeStampCounterData tsc;
+    for (int i = 0; i < 1000000; i++) {
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(3, f.countConnectedPuyos(3, 2));
+    }
+
+    tsc.showStatistics();
+}
+
+TEST(FieldPerformanceTest, countConnectedPuyosMax4)
+{
+    CoreField f("050745"
+                "574464"
+                "446676"
+                "456474"
+                "656476"
+                "657564"
+                "547564"
+                "747676"
+                "466766"
+                "747674"
+                "757644"
+                "657575"
+                "475755");
+
+    TimeStampCounterData tsc;
+    for (int i = 0; i < 1000000; i++) {
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(3, f.countConnectedPuyosMax4(3, 2));
     }
 
     tsc.showStatistics();

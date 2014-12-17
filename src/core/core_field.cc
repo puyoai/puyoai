@@ -151,6 +151,92 @@ int CoreField::countConnectedPuyos(int x, int y, FieldBitField* checked) const
     return filledHead - positions;
 }
 
+int CoreField::countConnectedPuyosMax4(int x, int y) const
+{
+    bool leftUp = false, leftDown = false, rightUp = false, rightDown = false;
+    int cnt = 1;
+    PuyoColor c = color(x, y);
+
+    if (color(x - 1, y) == c) {
+        if (color(x - 2, y) == c) {
+            if (color(x - 3, y) == c || color(x - 2, y + 1) == c || color(x - 2, y - 1) == c)
+                return 4;
+            ++cnt;
+        }
+        if (color(x - 1, y + 1) == c) {
+            if (color(x - 2, y + 1) == c || color(x - 1, y + 2) == c)
+                return 4;
+            ++cnt;
+            leftUp = true;
+        }
+        if (color(x - 1, y - 1) == c) {
+            if (color(x - 2, y - 1) == c || color(x - 1, y - 2) == c)
+                return 4;
+            ++cnt;
+            leftDown = true;
+        }
+        ++cnt;
+    }
+    if (color(x + 1, y) == c) {
+        if (color(x + 2, y) == c) {
+            if (color(x + 3, y) == c || color(x + 2, y + 1) == c || color(x + 2, y - 1) == c)
+                return 4;
+            ++cnt;
+        }
+        if (color(x + 1, y + 1) == c) {
+            if (color(x + 2, y + 1) == c || color(x + 1, y + 2) == c)
+                return 4;
+            ++cnt;
+            rightUp = true;
+        }
+        if (color(x + 1, y - 1) == c) {
+            if (color(x + 2, y - 1) == c || color(x + 1, y - 2) == c)
+                return 4;
+            ++cnt;
+            rightDown = true;
+        }
+        ++cnt;
+    }
+    if (color(x, y - 1) == c) {
+        if (color(x, y - 2) == c) {
+            if (color(x, y - 3) == c || color(x - 1, y - 2) == c || color(x + 1, y - 2) == c)
+                return 4;
+            ++cnt;
+        }
+        if (color(x - 1, y - 1) == c && !leftDown) {
+            if (color(x - 2, y - 1) == c || color(x - 1, y - 2) == c)
+                return 4;
+            ++cnt;
+        }
+        if (color(x + 1, y - 1) == c && !rightDown) {
+            if (color(x + 2, y - 1) == c || color(x + 1, y - 2) == c)
+                return 4;
+            ++cnt;
+        }
+        ++cnt;
+    }
+    if (color(x, y + 1) == c) {
+        if (color(x, y + 2) == c) {
+            if (color(x, y + 3) == c || color(x - 1, y + 2) == c || color(x + 1, y + 2) == c)
+                return 4;
+            ++cnt;
+        }
+        if (color(x - 1, y + 1) == c && !leftUp) {
+            if (color(x - 2, y + 1) == c || color(x - 1, y + 2) == c)
+                return 4;
+            ++cnt;
+        }
+        if (color(x + 1, y + 1) == c && !rightUp) {
+            if (color(x + 2, y + 1) == c || color(x + 1, y + 2) == c)
+                return 4;
+            ++cnt;
+        }
+        ++cnt;
+    }
+
+    return (cnt >= 5) ? 4 : cnt;
+}
+
 bool CoreField::isConnectedPuyo(int x, int y) const
 {
     PuyoColor c = color(x, y);
