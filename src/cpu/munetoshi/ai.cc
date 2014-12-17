@@ -7,9 +7,9 @@
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_info.h"
 #include "core/algorithm/rensa_detector.h"
-#include "core/field/core_field.h"
-#include "core/field/rensa_result.h"
+#include "core/core_field.h"
 #include "core/frame_request.h"
+#include "core/rensa_result.h"
 
 munetoshi::AI::AI(int argc, char* argv[]) : ::AI(argc, argv, "munetoshi") {
   strategy = GROW;

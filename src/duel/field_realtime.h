@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 #include "core/decision.h"
 #include "core/key_set.h"
 #include "core/kumipuyo_seq.h"

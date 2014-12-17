@@ -1,7 +1,8 @@
-#include "core/field/rensa_result.h"
+#include "core/rensa_result.h"
+
+#include <string>
 
 #include <gtest/gtest.h>
-#include <string>
 
 using namespace std;
 

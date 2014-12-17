@@ -1,4 +1,4 @@
-#include "core/field/rensa_result.h"
+#include "core/rensa_result.h"
 
 #include <sstream>
 #include <iomanip>

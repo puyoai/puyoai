@@ -6,9 +6,9 @@
 #include <vector>
 
 #include "base/noncopyable.h"
+#include "core/core_field.h"
 #include "core/decision.h"
-#include "core/field/core_field.h"
-#include "core/field/rensa_result.h"
+#include "core/rensa_result.h"
 
 class KumipuyoSeq;
 class RefPlan;

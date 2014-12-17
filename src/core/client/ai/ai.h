@@ -5,9 +5,9 @@
 
 #include "core/client/ai/drop_decision.h"
 #include "core/client/connector/client_connector.h"
-#include "core/field/core_field.h"
-#include "core/field/rensa_result.h"
+#include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
+#include "core/rensa_result.h"
 
 struct FrameRequest;
 class PlainField;

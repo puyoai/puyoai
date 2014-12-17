@@ -8,7 +8,7 @@
 #include <gflags/gflags.h>
 #include <toml/toml.h>
 
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 
 using namespace std;
 

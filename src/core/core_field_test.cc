@@ -1,11 +1,11 @@
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 
 #include <gtest/gtest.h>
 #include <string>
 
 #include "core/constant.h"
 #include "core/decision.h"
-#include "core/field/rensa_result.h"
+#include "core/rensa_result.h"
 
 using namespace std;
 

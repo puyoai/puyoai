@@ -4,7 +4,7 @@
 #include <initializer_list>
 #include <string>
 
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 
 class KumipuyoSeq;
 

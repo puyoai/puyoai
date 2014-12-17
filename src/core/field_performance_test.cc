@@ -1,10 +1,10 @@
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 
 #include <gtest/gtest.h>
 #include <vector>
 
 #include "base/time_stamp_counter.h"
-#include "core/field/rensa_result.h"
+#include "core/rensa_result.h"
 
 using namespace std;
 

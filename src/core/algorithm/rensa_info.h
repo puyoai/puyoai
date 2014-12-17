@@ -2,8 +2,8 @@
 #define CORE_ALGORITHM_RENSA_INFO_H_
 
 #include <string>
-#include "core/field/rensa_result.h"
 #include "core/algorithm/column_puyo_list.h"
+#include "core/rensa_result.h"
 
 // TODO(mayah): Consider move this to somewhere.
 class FeasibleRensaInfo {

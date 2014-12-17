@@ -4,7 +4,7 @@
 #include <fstream>
 #include <glog/logging.h>
 
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_seq.h"
 

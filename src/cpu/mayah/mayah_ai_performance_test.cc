@@ -6,7 +6,7 @@
 #include "base/time_stamp_counter.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 #include "core/frame_request.h"
 #include "core/kumipuyo_seq.h"
 

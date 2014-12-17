@@ -1,11 +1,10 @@
-
 #include "main.h"
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
 #include "core/algorithm/plan.h"
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 
 namespace tzik {
 

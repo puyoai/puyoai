@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "base/time_stamp_counter.h"
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
 
 using namespace std;
