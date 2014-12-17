@@ -5,10 +5,9 @@
 #include <glog/logging.h>
 
 #include "base/noncopyable.h"
-#include "core/field/rensa_result.h"
-
-#include "core/field/core_field.h"
 #include "core/algorithm/column_puyo_list.h"
+#include "core/core_field.h"
+#include "core/rensa_result.h"
 
 class CoreField;
 class ColumnPuyoList;

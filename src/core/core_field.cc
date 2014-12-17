@@ -1,14 +1,14 @@
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 
 #include <iomanip>
 #include <sstream>
 
 #include "core/constant.h"
 #include "core/decision.h"
-#include "core/field/field_bit_field.h"
-#include "core/field/rensa_result.h"
+#include "core/field_bit_field.h"
 #include "core/kumipuyo.h"
 #include "core/position.h"
+#include "core/rensa_result.h"
 #include "core/score.h"
 
 using namespace std;

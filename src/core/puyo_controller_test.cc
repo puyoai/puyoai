@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 #include <vector>
 
+#include "core/core_field.h"
 #include "core/decision.h"
-#include "core/field/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/plain_field.h"
 

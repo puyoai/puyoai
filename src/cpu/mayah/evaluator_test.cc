@@ -6,7 +6,7 @@
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/decision.h"
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 #include "gazer.h"
 
 using namespace std;

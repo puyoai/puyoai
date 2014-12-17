@@ -5,7 +5,7 @@
 
 #include "core/algorithm/plan.h"
 #include "core/client/ai/ai.h"
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
 #include "core/puyo_controller.h"
 

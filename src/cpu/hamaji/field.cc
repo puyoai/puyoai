@@ -13,9 +13,9 @@
 #include <glog/logging.h>
 
 #include "core/constant.h"
-#include "core/field/rensa_result.h"
 #include "core/kumipuyo_seq.h"
 #include "core/puyo_controller.h"
+#include "core/rensa_result.h"
 
 using namespace std;
 

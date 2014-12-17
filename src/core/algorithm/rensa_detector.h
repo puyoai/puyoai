@@ -4,9 +4,9 @@
 #include <functional>
 #include <vector>
 
-#include "core/field/core_field.h"
 #include "core/algorithm/puyo_set.h"
 #include "core/algorithm/rensa_info.h"
+#include "core/core_field.h"
 
 class KumipuyoSeq;
 class RensaRefSequence;

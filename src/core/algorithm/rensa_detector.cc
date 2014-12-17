@@ -9,8 +9,8 @@
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_info.h"
 #include "core/algorithm/rensa_ref_sequence.h"
+#include "core/core_field.h"
 #include "core/decision.h"
-#include "core/field/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_seq.h"
 

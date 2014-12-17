@@ -4,8 +4,8 @@
 #include <gtest/gtest.h>
 
 #include "base/time_stamp_counter.h"
+#include "core/core_field.h"
 #include "core/decision.h"
-#include "core/field/core_field.h"
 
 using namespace std;
 
@@ -54,4 +54,3 @@ TEST(PuyoControllerPerformanceTest, unreachable)
 
     tsc.showStatistics();
 }
-

@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 #include "core/field_pretty_printer.h"
 #include "core/kumipuyo.h"
 

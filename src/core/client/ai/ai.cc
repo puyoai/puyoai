@@ -1,10 +1,10 @@
 #include "core/client/ai/ai.h"
 
 #include "core/constant.h"
-#include "core/field/rensa_result.h"
 #include "core/field_pretty_printer.h"
 #include "core/frame_request.h"
 #include "core/frame_response.h"
+#include "core/rensa_result.h"
 #include "core/state.h"
 
 using namespace std;

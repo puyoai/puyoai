@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "core/core_field.h"
 #include "core/decision.h"
-#include "core/field/core_field.h"
 #include "core/kumipuyo_seq.h"
 #include "core/puyo_color.h"
 

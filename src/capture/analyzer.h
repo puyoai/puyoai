@@ -9,7 +9,7 @@
 
 #include <SDL.h>
 
-#include "core/field/field_bit_field.h"
+#include "core/field_bit_field.h"
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"
 #include "core/real_color.h"

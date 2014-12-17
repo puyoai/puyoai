@@ -3,7 +3,7 @@
 
 #include "core/algorithm/plan.h"
 #include "core/client/ai/ai.h"
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 
 DEFINE_bool(right_turn, false, "Use right turn");
 

@@ -6,13 +6,13 @@
 #include <set>
 #include <string>
 
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 
 namespace peria {
 
 class Pattern {
   typedef std::pair<char, char> Neighbor;
-  
+
  public:
   static void ReadBook(std::istream& is);
   static const std::vector<Pattern>& GetAllPattern();
@@ -39,5 +39,3 @@ class Pattern {
 };
 
 }  // namespace peria
-
-

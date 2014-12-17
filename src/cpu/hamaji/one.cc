@@ -9,7 +9,7 @@
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/client/ai/ai.h"
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 #include "core/frame_request.h"
 
 using namespace std;

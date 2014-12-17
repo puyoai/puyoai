@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
 #include "core/server/game_state_observer.h"
 

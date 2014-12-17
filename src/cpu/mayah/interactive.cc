@@ -12,7 +12,7 @@
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_info.h"
 #include "core/algorithm/rensa_detector.h"
-#include "core/field/core_field.h"
+#include "core/core_field.h"
 #include "core/field_pretty_printer.h"
 #include "core/frame_request.h"
 #include "core/kumipuyo.h"
