@@ -196,6 +196,7 @@ field = [
     ".BB...",
     "AAA..."
 ]
+BCAB = [1, 0]
 BCBC = [4, 1]
 BCCD = [4, 1]
 
@@ -299,3 +300,12 @@ field = [
     "ABB..."
 ]
 BBAD = [5, 1]
+BBAC = [1, 2]
+
+[[book]]
+field = [
+    "CA....",
+    "ACC...",
+    "ABB..."
+]
+CCAB = [1, 2]
