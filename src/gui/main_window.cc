@@ -4,6 +4,8 @@
 #include "gui/drawer.h"
 #include "gui/screen.h"
 
+DEFINE_bool(fullscreen, false, "show fullscreen");
+
 MainWindow::MainWindow(int width, int height, const Box& mainBox) :
     window_(nullptr, SDL_DestroyWindow),
     renderer_(nullptr, SDL_DestroyRenderer),
@@ -20,7 +22,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::runMainLoop()
 {
-    window_.reset(SDL_CreateWindow("puyo", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width_, height_, SDL_WINDOW_SHOWN));
+    Uint32 windowOption = SDL_WINDOW_SHOWN;
+    if (FLAGS_fullscreen)
+        windowOption |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    window_.reset(SDL_CreateWindow("puyo", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width_, height_, windowOption));
     renderer_.reset(SDL_CreateRenderer(window_.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
     texture_.reset(SDL_CreateTexture(renderer_.get(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width_, height_));
 
