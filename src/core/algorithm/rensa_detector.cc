@@ -18,14 +18,14 @@ using namespace std;
 
 namespace {
 
-enum class PurposeToFindRensa {
+enum class PurposeForFindingRensa {
     FOR_FIRE,
     FOR_KEY,
 };
 
 typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
-RensaDetectorStrategy gDefaultFloatStrategy(RensaDetectorStrategy::Mode::FLOAT, 3, 3);
-RensaDetectorStrategy gDefaultDropStrategy(RensaDetectorStrategy::Mode::DROP, 3, 3);
+RensaDetectorStrategy gDefaultFloatStrategy(RensaDetectorStrategy::Mode::FLOAT, 3, 3, true);
+RensaDetectorStrategy gDefaultDropStrategy(RensaDetectorStrategy::Mode::DROP, 3, 3, true);
 
 }  // namespace anomymous
 
@@ -76,7 +76,7 @@ void makeProhibitArray(const RensaResult& rensaResult, const RensaTrackResult& t
 
 static inline
 void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                 PurposeToFindRensa purpose, int maxComplementPuyos, SimulationCallback callback)
+                 PurposeForFindingRensa purpose, int maxComplementPuyos, int maxPuyoHeight, SimulationCallback callback)
 {
     bool visited[CoreField::MAP_WIDTH][NUM_PUYO_COLORS] {};
 
@@ -109,7 +109,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                     // CAAACC
                     //
                     // So, we should be able to skip this.
-                    if (purpose == PurposeToFindRensa::FOR_FIRE && !originalField.isConnectedPuyo(x, y))
+                    if (purpose == PurposeForFindingRensa::FOR_FIRE && !originalField.isConnectedPuyo(x, y))
                         continue;
                 } else {
                     if (originalField.color(x + d, y) != PuyoColor::EMPTY)
@@ -120,7 +120,9 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 
                 CoreField f(originalField);
                 int necessaryPuyos = 0;
-                while (necessaryPuyos <= maxComplementPuyos && f.countConnectedPuyosMax4(x, y) < 4 && f.height(x + d) <= 12) {
+                while (necessaryPuyos <= maxComplementPuyos &&
+                       f.countConnectedPuyosMax4(x, y) < 4 &&
+                       f.height(x + d) < maxPuyoHeight) {
                     f.dropPuyoOn(x + d, c, true);
                     ++necessaryPuyos;
                 }
@@ -136,7 +138,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 
 static inline
 void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                  int maxComplementPuyos, SimulationCallback callback)
+                  int maxComplementPuyos, int maxPuyoHeight, SimulationCallback callback)
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = originalField.height(x); y >= 1; --y) {
@@ -175,15 +177,14 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
 
                 int dy_min = y - 1;
                 // Check under y
-                for (; restPuyos > 0 && dy_min > 0 && originalField.color(dx ,dy_min) == PuyoColor::EMPTY;
+                for (; restPuyos > 0 && dy_min > 0 && originalField.color(dx, dy_min) == PuyoColor::EMPTY;
                      --dy_min) {
                     f.unsafeSet(dx, dy_min, c);
                     --restPuyos;
                 }
 
                 // Check over y
-                for (int dy = y + 1;
-                     restPuyos > 0 && dy <= 12 && originalField.color(dx ,dy) == PuyoColor::EMPTY; ++dy) {
+                for (int dy = y + 1; restPuyos > 0 && dy <= maxPuyoHeight && originalField.color(dx, dy) == PuyoColor::EMPTY; ++dy) {
                     f.unsafeSet(dx, dy, c);
                     --restPuyos;
                 }
@@ -206,15 +207,18 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
 static inline void findRensas(const CoreField& field,
                               const RensaDetectorStrategy& strategy,
                               const bool prohibits[FieldConstant::MAP_WIDTH],
-                              PurposeToFindRensa purpose,
+                              PurposeForFindingRensa purpose,
                               SimulationCallback callback)
 {
+    int maxPuyoHeight = 12;
     int complementPuyos;
     switch (purpose) {
-    case PurposeToFindRensa::FOR_KEY:
+    case PurposeForFindingRensa::FOR_KEY:
         complementPuyos = strategy.maxNumOfComplementPuyosForKey();
+        if (strategy.allowsPuttingKeyPuyoOn13thRow())
+            maxPuyoHeight = 13;
         break;
-    case PurposeToFindRensa::FOR_FIRE:
+    case PurposeForFindingRensa::FOR_FIRE:
         complementPuyos = strategy.maxNumOfComplementPuyosForFire();
         break;
     default:
@@ -223,10 +227,10 @@ static inline void findRensas(const CoreField& field,
 
     switch (strategy.mode()) {
     case RensaDetectorStrategy::Mode::DROP:
-        tryDropFire(field, prohibits, purpose, complementPuyos, callback);
+        tryDropFire(field, prohibits, purpose, complementPuyos, maxPuyoHeight, callback);
         break;
     case RensaDetectorStrategy::Mode::FLOAT:
-        tryFloatFire(field, prohibits, complementPuyos, callback);
+        tryFloatFire(field, prohibits, complementPuyos, maxPuyoHeight, callback);
         break;
     default:
         CHECK(false) << "Unknown mode : " << static_cast<int>(strategy.mode());
@@ -286,7 +290,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(originalField, strategy, prohibits, PurposeToFindRensa::FOR_KEY, findRensaCallback);
+    findRensas(originalField, strategy, prohibits, PurposeForFindingRensa::FOR_KEY, findRensaCallback);
 
     if (restAdded <= 0)
         return;
@@ -354,65 +358,64 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             combinedKeyPuyos.append(currentFirePuyos);
 
             // Here, try to fire the combined rensa.
-            {
-                CoreField f(initialField);
-                for (const ColumnPuyo& cp : combinedKeyPuyos) {
-                    // When we cannot put a puyo, that rensa is broken.
-                    if (!f.dropPuyoOn(cp.x, cp.color, true))
-                        return;
-                }
-
-                // Check putting key puyo does not fire a rensa.
-                {
-                    int minHeights[CoreField::MAP_WIDTH] {
-                        100, initialField.height(1) + 1, initialField.height(2) + 1, initialField.height(3) + 1,
-                        initialField.height(4) + 1, initialField.height(5) + 1, initialField.height(6) + 1, 100 };
-                    // Rensa should not start when we add key puyos.
-                    if (f.rensaWillOccurWithMinHeights(minHeights))
-                        return;
-                }
-
-                // Since key puyo does not fire a rensa, we can safely include the key puyos in minHeights.
-                int minHeights[CoreField::MAP_WIDTH] {
-                    100, f.height(1) + 1, f.height(2) + 1, f.height(3) + 1,
-                    f.height(4) + 1, f.height(5) + 1, f.height(6) + 1, 100 };
-
-                // Then, fire a rensa.
-                for (const ColumnPuyo& cp : firstRensaFirePuyos) {
-                    if (!f.dropPuyoOn(cp.x, cp.color, true))
-                        return;
-                }
-
-                RensaTrackResult combinedTrackResult;
-                RensaResult combinedRensaResult = f.simulateAndTrackWithMinHeights(&combinedTrackResult, minHeights);
-
-                if (combinedRensaResult.chains != rensaSequence->totalChains() + rensaResult.chains) {
-                    // Rensa looks broken. We don't count such rensa.
-                    return;
-                }
-
-                // OK.
-                RensaRef rensaRef { originalField, fieldAfterSimulation, currentKeyPuyos, currentFirePuyos, rensaResult, trackResult };
-                rensaSequence->push(&rensaRef);
-
-                // Don't put key puyo on the column which fire puyo will be placed.
-                bool newProhibits[FieldConstant::MAP_WIDTH];
-                makeProhibitArray(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
-
-                callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult, *rensaSequence);
-                iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, initialField, restIterations - 1,
-                                                         combinedKeyPuyos, firstRensaFirePuyos, newProhibits,
-                                                         rensaSequence, strategy, callback);
-
-                rensaSequence->pop();
+            CoreField f(initialField);
+            for (const ColumnPuyo& cp : combinedKeyPuyos) {
+                if (!strategy.allowsPuttingKeyPuyoOn13thRow() && f.height(cp.x) == 12)
+                  return;
+                // When we cannot put a puyo, that rensa is broken.
+                if (!f.dropPuyoOn(cp.x, cp.color, true))
+                  return;
             }
 
+            // Check putting key puyo does not fire a rensa.
+            {
+                int minHeights[CoreField::MAP_WIDTH] {
+                    100, initialField.height(1) + 1, initialField.height(2) + 1, initialField.height(3) + 1,
+                    initialField.height(4) + 1, initialField.height(5) + 1, initialField.height(6) + 1, 100 };
+                // Rensa should not start when we add key puyos.
+                if (f.rensaWillOccurWithMinHeights(minHeights))
+                    return;
+            }
+
+            // Since key puyo does not fire a rensa, we can safely include the key puyos in minHeights.
+            int minHeights[CoreField::MAP_WIDTH] {
+                100, f.height(1) + 1, f.height(2) + 1, f.height(3) + 1,
+                f.height(4) + 1, f.height(5) + 1, f.height(6) + 1, 100 };
+
+            // Then, fire a rensa.
+            for (const ColumnPuyo& cp : firstRensaFirePuyos) {
+                if (!f.dropPuyoOn(cp.x, cp.color, true))
+                    return;
+            }
+
+            RensaTrackResult combinedTrackResult;
+            RensaResult combinedRensaResult = f.simulateAndTrackWithMinHeights(&combinedTrackResult, minHeights);
+
+            if (combinedRensaResult.chains != rensaSequence->totalChains() + rensaResult.chains) {
+                // Rensa looks broken. We don't count such rensa.
+                return;
+            }
+
+            // OK.
+            RensaRef rensaRef { originalField, fieldAfterSimulation, currentKeyPuyos, currentFirePuyos, rensaResult, trackResult };
+            rensaSequence->push(&rensaRef);
+
+            // Don't put key puyo on the column which fire puyo will be placed.
+            bool newProhibits[FieldConstant::MAP_WIDTH];
+            makeProhibitArray(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
+
+            callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult, *rensaSequence);
+            iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, initialField, restIterations - 1,
+                                                     combinedKeyPuyos, firstRensaFirePuyos, newProhibits,
+                                                     rensaSequence, strategy, callback);
+
+            rensaSequence->pop();
         };
 
         simulateInternal(f, originalField, ColumnPuyoList(), currentFirePuyos, simulationCallback);
     };
 
-    findRensas(originalField, strategy, prohibits, PurposeToFindRensa::FOR_KEY, findRensaCallback);
+    findRensas(originalField, strategy, prohibits, PurposeForFindingRensa::FOR_KEY, findRensaCallback);
 }
 
 // iteratePossibleRensasIteratively finds rensa with the following algorithm.
@@ -453,5 +456,5 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(originalField, strategy, prohibits, PurposeToFindRensa::FOR_FIRE, findRensaCallback);
+    findRensas(originalField, strategy, prohibits, PurposeForFindingRensa::FOR_FIRE, findRensaCallback);
 }

@@ -19,10 +19,12 @@ public:
 
     explicit RensaDetectorStrategy(Mode mode,
                                    int maxNumOfComplementPuyosForKey,
-                                   int maxNumOfComplementPuyosForFire) :
+                                   int maxNumOfComplementPuyosForFire,
+                                   bool allowsPuttingKeyPuyoOn13thRow) :
         mode_(mode),
         maxNumOfComplementPuyosForKey_(maxNumOfComplementPuyosForKey),
-        maxNumOfComplementPuyosForFire_(maxNumOfComplementPuyosForFire)
+        maxNumOfComplementPuyosForFire_(maxNumOfComplementPuyosForFire),
+        allowsPuttingKeyPuyoOn13thRow_(allowsPuttingKeyPuyoOn13thRow)
     {
     }
 
@@ -32,11 +34,13 @@ public:
     Mode mode() const { return mode_; }
     int maxNumOfComplementPuyosForKey() const { return maxNumOfComplementPuyosForKey_; }
     int maxNumOfComplementPuyosForFire() const { return maxNumOfComplementPuyosForFire_; }
+    bool allowsPuttingKeyPuyoOn13thRow() const { return allowsPuttingKeyPuyoOn13thRow_; }
 
 private:
     Mode mode_;
     int maxNumOfComplementPuyosForKey_;
     int maxNumOfComplementPuyosForFire_;
+    bool allowsPuttingKeyPuyoOn13thRow_;
 };
 
 class RensaDetector {
