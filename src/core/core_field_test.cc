@@ -379,6 +379,31 @@ TEST(CoreFieldTest, countConnectedPuyosMax4)
     EXPECT_EQ(1, f.countConnectedPuyosMax4(5, 2));
 }
 
+TEST(CoreFieldTest, countConnectedPuyosMax4EdgeCase)
+{
+    CoreField f(
+      "YYYGGG" // 13
+      "YYYGGG" // 12
+      "OOOOOO"
+      "OOOOOO"
+      "OOOOOO"
+      "OOOOOO" // 8
+      "OOOOOO"
+      "OOOOOO"
+      "OOOOOO"
+      "OOOOOO" // 4
+      "OOOOOO"
+      "OOOOOO"
+      "OOOOOO");
+
+    EXPECT_EQ(3, f.countConnectedPuyosMax4(1, 12));
+    EXPECT_EQ(3, f.countConnectedPuyosMax4(2, 12));
+    EXPECT_EQ(3, f.countConnectedPuyosMax4(3, 12));
+    EXPECT_EQ(3, f.countConnectedPuyosMax4(4, 12));
+    EXPECT_EQ(3, f.countConnectedPuyosMax4(5, 12));
+    EXPECT_EQ(3, f.countConnectedPuyosMax4(6, 12));
+}
+
 TEST(CoreFieldTest, isChigiriDecision1)
 {
     CoreField cf;
