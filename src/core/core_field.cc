@@ -159,12 +159,12 @@ int CoreField::countConnectedPuyosMax4(int x, int y) const
 
     if (color(x - 1, y) == c) {
         if (color(x - 2, y) == c) {
-            if (color(x - 3, y) == c || color(x - 2, y + 1) == c || color(x - 2, y - 1) == c)
+            if (color(x - 3, y) == c || (color(x - 2, y + 1) == c && y + 1 <= 12) || color(x - 2, y - 1) == c)
                 return 4;
             ++cnt;
         }
-        if (color(x - 1, y + 1) == c) {
-            if (color(x - 2, y + 1) == c || color(x - 1, y + 2) == c)
+        if (color(x - 1, y + 1) == c && y + 1 <= 12) {
+            if (color(x - 2, y + 1) == c || (color(x - 1, y + 2) == c && y + 2 <= 12))
                 return 4;
             ++cnt;
             leftUp = true;
@@ -179,12 +179,12 @@ int CoreField::countConnectedPuyosMax4(int x, int y) const
     }
     if (color(x + 1, y) == c) {
         if (color(x + 2, y) == c) {
-            if (color(x + 3, y) == c || color(x + 2, y + 1) == c || color(x + 2, y - 1) == c)
+            if (color(x + 3, y) == c || (color(x + 2, y + 1) == c && y + 1 <= 12) || color(x + 2, y - 1) == c)
                 return 4;
             ++cnt;
         }
-        if (color(x + 1, y + 1) == c) {
-            if (color(x + 2, y + 1) == c || color(x + 1, y + 2) == c)
+        if (color(x + 1, y + 1) == c && y + 1 <= 12) {
+            if (color(x + 2, y + 1) == c || (color(x + 1, y + 2) == c && y + 2 <= 12))
                 return 4;
             ++cnt;
             rightUp = true;
@@ -215,19 +215,19 @@ int CoreField::countConnectedPuyosMax4(int x, int y) const
         }
         ++cnt;
     }
-    if (color(x, y + 1) == c) {
-        if (color(x, y + 2) == c) {
-            if (color(x, y + 3) == c || color(x - 1, y + 2) == c || color(x + 1, y + 2) == c)
+    if (color(x, y + 1) == c && y + 1 <= 12) {
+        if (color(x, y + 2) == c && y + 2 <= 12) {
+            if ((color(x, y + 3) == c && y + 3 <= 12) || color(x - 1, y + 2) == c || color(x + 1, y + 2) == c)
                 return 4;
             ++cnt;
         }
         if (color(x - 1, y + 1) == c && !leftUp) {
-            if (color(x - 2, y + 1) == c || color(x - 1, y + 2) == c)
+            if (color(x - 2, y + 1) == c || (color(x - 1, y + 2) == c && y + 2 <= 12))
                 return 4;
             ++cnt;
         }
         if (color(x + 1, y + 1) == c && !rightUp) {
-            if (color(x + 2, y + 1) == c || color(x + 1, y + 2) == c)
+            if (color(x + 2, y + 1) == c || (color(x + 1, y + 2) == c && y + 2 <= 12))
                 return 4;
             ++cnt;
         }
