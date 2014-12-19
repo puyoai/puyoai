@@ -57,6 +57,7 @@ ABCC = [3, 0]
 field = [
     "AB...."
 ]
+ACAA = [1, 1]
 ACAB = [1, 1]
 ACAC = [1, 1]
 ACBB = [1, 0]
