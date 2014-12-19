@@ -23,7 +23,7 @@ void WaitGroup::done()
     --num_;
 
     if (num_ == 0)
-        condVar_.notify_one();
+        condVar_.notify_all();
 }
 
 void WaitGroup::waitUntilDone()
