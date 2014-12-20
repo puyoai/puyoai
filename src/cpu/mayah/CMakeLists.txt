@@ -5,7 +5,7 @@ cpu_setup("mayah")
 add_library(mayah_lib
             book_field.cc book_reader.cc
             evaluator.cc evaluation_feature.cc evaluation_parameter.cc
-            initial_book.cc
+            initial_book.cc pattern_book.cc
             gazer.cc mayah_ai.cc score_collector.cc)
 
 function(mayah_add_executable exe)
