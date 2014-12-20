@@ -707,7 +707,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         }
     };
 
-    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 3, 2, false);
+    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 3, false);
     RensaDetector::iteratePossibleRensasIteratively(plan.field(), maxIteration, strategy, callback);
 
     if (maxRensaScoreCollector.get()) {
