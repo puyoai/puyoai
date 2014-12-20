@@ -18,7 +18,7 @@ class KumipuyoSeq;
 class DecisionBookField {
 public:
     DecisionBookField(const std::vector<std::string>& field,
-                     std::map<std::string, Decision>&& decisions);
+                      std::map<std::string, Decision>&& decisions);
 
     Decision nextDecision(const CoreField&, const KumipuyoSeq&) const;
 

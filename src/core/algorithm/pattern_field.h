@@ -15,6 +15,7 @@
 class PatternField : FieldConstant {
 public:
     PatternField();
+    explicit PatternField(const std::string&);
     explicit PatternField(const std::vector<std::string>&);
 
     int height(int x) const { return heights_[x]; }
