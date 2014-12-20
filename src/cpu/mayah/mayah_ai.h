@@ -9,7 +9,7 @@
 #include "core/client/ai/ai.h"
 #include "core/algorithm/plan.h"
 
-#include "book_field.h"
+#include "opening_book.h"
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
@@ -78,7 +78,7 @@ protected:
     void reloadParameter();
 
     std::unique_ptr<EvaluationParameter> evaluationParameter_;
-    std::vector<BookField> books_;
+    std::vector<OpeningBookField> books_;
     DecisionBook decisionBook_;
     bool usesDecisionBook_ = true;
 

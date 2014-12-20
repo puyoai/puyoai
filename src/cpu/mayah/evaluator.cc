@@ -22,7 +22,7 @@
 #include "core/rensa_result.h"
 #include "core/score.h"
 
-#include "book_field.h"
+#include "opening_book.h"
 #include "evaluation_parameter.h"
 #include "gazer.h"
 
@@ -94,13 +94,13 @@ MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentFi
 }
 
 template<typename ScoreCollector>
-bool Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
+bool Evaluator<ScoreCollector>::evalBook(const std::vector<OpeningBookField>& books,
                                          const std::vector<bool>& bookMatchable,
                                          const RefPlan& plan,
                                          const MidEvalResult& midEvalResult)
 {
     double maxScore = 0;
-    const BookField* bestBf = nullptr;
+    const OpeningBookField* bestBf = nullptr;
     bool completeMatch = false;
     set<string> matchedBookNames;
 
@@ -113,7 +113,7 @@ bool Evaluator<ScoreCollector>::evalBook(const std::vector<BookField>& books,
             continue;
 
         const auto& bf = books[i];
-        BookField::MatchResult mr = bf.match(plan.field());
+        OpeningBookField::MatchResult mr = bf.match(plan.field());
         if (!mr.matched || mr.count == 0)
             continue;
 
