@@ -13,7 +13,7 @@
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
-#include "initial_book.h"
+#include "decision_book.h"
 
 class CoreField;
 class DropDecision;
@@ -79,8 +79,8 @@ protected:
 
     std::unique_ptr<EvaluationParameter> evaluationParameter_;
     std::vector<BookField> books_;
-    InitialBook initialBook_;
-    bool usesInitialBook_ = true;
+    DecisionBook decisionBook_;
+    bool usesDecisionBook_ = true;
 
     Executor* executor_;
 
