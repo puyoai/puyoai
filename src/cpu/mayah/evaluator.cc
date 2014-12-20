@@ -699,7 +699,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         PuyoSet necessaryPuyos;
         necessaryPuyos.add(keyPuyos);
         necessaryPuyos.add(firePuyos);
-        double possibility = TsumoPossibility::possibility(necessaryPuyos, std::max(0, numReachableSpace - 4));
+        double possibility = TsumoPossibility::possibility(necessaryPuyos, std::max(0, numReachableSpace - 2));
         rensaScore *= possibility;
 
         if (maxVirtualRensaResultScore < rensaScore) {
