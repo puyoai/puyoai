@@ -1,5 +1,7 @@
 #include "gui/main_window.h"
 
+#include <gflags/gflags.h>
+
 #include "core/server/game_state.h"
 #include "gui/drawer.h"
 #include "gui/screen.h"
