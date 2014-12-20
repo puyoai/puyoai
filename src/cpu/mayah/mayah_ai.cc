@@ -11,14 +11,13 @@
 #include "core/algorithm/puyo_possibility.h"
 #include "core/frame_request.h"
 
-#include "book_field.h"
-#include "book_reader.h"
+#include "opening_book.h"
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
 
 DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.toml", "the path to feature parameter");
-DEFINE_string(book, SRC_DIR "/cpu/mayah/book.toml", "the path to book");
+DEFINE_string(opening_book, SRC_DIR "/cpu/mayah/opening.toml", "the path to opening book");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_bool(use_advanced_next, false, "Use enemy's NEXT sequence also");
 
@@ -31,7 +30,7 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
     setBehaviorRethinkAfterOpponentRensa(true);
 
     evaluationParameter_.reset(new EvaluationParameter(FLAGS_feature));
-    books_ = BookReader::parse(FLAGS_book);
+    books_ = BookReader::parse(FLAGS_opening_book);
     decisionBook_.load(FLAGS_decision_book);
 
     VLOG(1) << evaluationParameter_->toString();

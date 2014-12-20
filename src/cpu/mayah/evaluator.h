@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 
-#include "book_field.h"
+#include "opening_book.h"
 #include "evaluation_feature.h"
 #include "score_collector.h"
 
@@ -31,12 +31,12 @@ private:
 
 class PreEvaluator {
 public:
-    explicit PreEvaluator(const std::vector<BookField>& books) : books_(books) {}
+    explicit PreEvaluator(const std::vector<OpeningBookField>& books) : books_(books) {}
 
     PreEvalResult preEval(const CoreField& currentField);
 
 private:
-    const std::vector<BookField>& books_;
+    const std::vector<OpeningBookField>& books_;
 };
 
 class MidEvalResult {
@@ -81,7 +81,7 @@ template<typename ScoreCollector>
 class RensaEvaluator {
 public:
     // Don't take ownership of |sc|.
-    explicit RensaEvaluator(const std::vector<BookField>& books, ScoreCollector* sc) :
+    explicit RensaEvaluator(const std::vector<OpeningBookField>& books, ScoreCollector* sc) :
         books_(books),
         sc_(sc) {}
 
@@ -97,7 +97,7 @@ public:
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                            int currentFrameId, const PlayerState& me, const PlayerState& enemy);
 private:
-    const std::vector<BookField>& books_;
+    const std::vector<OpeningBookField>& books_;
     ScoreCollector* sc_;
 };
 
@@ -105,7 +105,7 @@ template<typename ScoreCollector>
 class Evaluator {
 public:
     // Don't take ownership of |sc|.
-    explicit Evaluator(const std::vector<BookField>& books, ScoreCollector* sc) :
+    explicit Evaluator(const std::vector<OpeningBookField>& books, ScoreCollector* sc) :
         books_(books),
         sc_(sc) {}
 
@@ -119,7 +119,7 @@ public:
                       const PlayerState& me, const PlayerState& enemy, const GazeResult&);
 
     // Returns true if complete match.
-    bool evalBook(const std::vector<BookField>&, const std::vector<bool>& bookMatchable, const RefPlan&, const MidEvalResult&);
+    bool evalBook(const std::vector<OpeningBookField>&, const std::vector<bool>& bookMatchable, const RefPlan&, const MidEvalResult&);
     void evalFrameFeature(const RefPlan&);
     void evalRestrictedConnectionHorizontalFeature(const CoreField&);
     void evalThirdColumnHeightFeature(const RefPlan&);
@@ -134,7 +134,7 @@ public:
     void evalCountPuyoFeature(const RefPlan& plan);
 
 private:
-    const std::vector<BookField>& books_;
+    const std::vector<OpeningBookField>& books_;
     ScoreCollector* sc_;
 };
 

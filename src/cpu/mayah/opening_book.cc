@@ -1,13 +1,17 @@
-#include "book_field.h"
+#include "opening_book.h"
 
 #include <algorithm>
 #include <cctype>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <sstream>
 
+#include <toml/toml.h>
+
 #include "core/puyo_color.h"
 #include "core/plain_field.h"
+
 
 using namespace std;
 
@@ -74,7 +78,7 @@ bool checkCell(char currentVar, char neighborVar, PuyoColor neighborColor, const
     return true;
 }
 
-BookField::BookField(const string& name, const vector<string>& field, double defaultScore) :
+OpeningBookField::OpeningBookField(const string& name, const vector<string>& field, double defaultScore) :
     name_(name),
     defaultScore_(defaultScore)
 {
@@ -115,38 +119,38 @@ BookField::BookField(const string& name, const vector<string>& field, double def
     varCount_ = calculateVarCount();
 }
 
-bool BookField::merge(const BookField& bf)
+bool OpeningBookField::merge(const OpeningBookField& obf)
 {
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            if (bf.field_[x][y] == '.') {
+            if (obf.field_[x][y] == '.') {
                 continue;
             } else if (field_[x][y] == '.') {
-                field_[x][y] = bf.field_[x][y];
-                scoreField_[x][y] = bf.scoreField_[x][y];
+                field_[x][y] = obf.field_[x][y];
+                scoreField_[x][y] = obf.scoreField_[x][y];
                 continue;
             }
 
-            if (field_[x][y] != '*' && bf.field_[x][y] == '*') {
+            if (field_[x][y] != '*' && obf.field_[x][y] == '*') {
                 continue;
-            } else if (field_[x][y] == '*' && bf.field_[x][y] != '*') {
-                field_[x][y] = bf.field_[x][y];
-                scoreField_[x][y] = bf.scoreField_[x][y];
+            } else if (field_[x][y] == '*' && obf.field_[x][y] != '*') {
+                field_[x][y] = obf.field_[x][y];
+                scoreField_[x][y] = obf.scoreField_[x][y];
                 continue;
             }
 
             if (('A' <= field_[x][y] && field_[x][y] <= 'Z') &&
-                ('a' <= bf.field_[x][y] && bf.field_[x][y] <= 'z')) {
+                ('a' <= obf.field_[x][y] && obf.field_[x][y] <= 'z')) {
             } else if (('a' <= field_[x][y] && field_[x][y] <= 'z') &&
-                       ('A' <= bf.field_[x][y] && bf.field_[x][y] <= 'Z')) {
-                field_[x][y] = bf.field_[x][y];
-            } else if (field_[x][y] != bf.field_[x][y]) {
+                       ('A' <= obf.field_[x][y] && obf.field_[x][y] <= 'Z')) {
+                field_[x][y] = obf.field_[x][y];
+            } else if (field_[x][y] != obf.field_[x][y]) {
                 VLOG(1) << "These field cannot be merged: "
                         << toDebugString() << '\n'
-                        << bf.toDebugString();
+                        << obf.toDebugString();
                 return false;
             }
-            scoreField_[x][y] = std::max(scoreField_[x][y], bf.scoreField_[x][y]);
+            scoreField_[x][y] = std::max(scoreField_[x][y], obf.scoreField_[x][y]);
         }
     }
 
@@ -154,20 +158,20 @@ bool BookField::merge(const BookField& bf)
     return true;
 }
 
-BookField BookField::mirror() const
+OpeningBookField OpeningBookField::mirror() const
 {
-    BookField bf(*this);
+    OpeningBookField obf(*this);
     for (int x = 1; x <= 3; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            swap(bf.field_[x][y], bf.field_[7 - x][y]);
-            swap(bf.scoreField_[x][y], bf.scoreField_[7 - x][y]);
+            swap(obf.field_[x][y], obf.field_[7 - x][y]);
+            swap(obf.scoreField_[x][y], obf.scoreField_[7 - x][y]);
         }
     }
 
-    return bf;
+    return obf;
 }
 
-BookField::MatchResult BookField::match(const PlainField& f) const
+OpeningBookField::MatchResult OpeningBookField::match(const PlainField& f) const
 {
     // First, make a map from char to PuyoColor.
     int matchCount = 0;
@@ -236,7 +240,7 @@ BookField::MatchResult BookField::match(const PlainField& f) const
     return MatchResult(true, matchScore, matchCount, matchAllowedCount);
 }
 
-string BookField::toDebugString() const
+string OpeningBookField::toDebugString() const
 {
     stringstream ss;
     for (int y = 12; y >= 1; --y) {
@@ -248,7 +252,7 @@ string BookField::toDebugString() const
     return ss.str();
 }
 
-int BookField::calculateVarCount() const
+int OpeningBookField::calculateVarCount() const
 {
     int count = 0;
     for (int x = 1; x <= WIDTH; ++x) {
@@ -260,4 +264,73 @@ int BookField::calculateVarCount() const
     }
 
     return count;
+}
+
+static void merge(vector<OpeningBookField>* result,
+                  const OpeningBookField& current,
+                  const multimap<string, OpeningBookField>& partialFields,
+                  const vector<string>& names,
+                  size_t pos)
+{
+    if (pos == names.size()) {
+        result->push_back(current);
+        result->push_back(current.mirror());
+        return;
+    }
+
+    auto range = partialFields.equal_range(names[pos]);
+    for (auto it = range.first; it != range.second; ++it) {
+        OpeningBookField field(current);
+        if (!field.merge(it->second))
+            continue;
+        merge(result, field, partialFields, names, pos + 1);
+    }
+}
+
+// static
+vector<OpeningBookField> BookReader::parse(const string& filename)
+{
+    vector<OpeningBookField> result;
+    multimap<string, OpeningBookField> partialFields;
+
+    ifstream ifs(filename);
+    toml::Value value;
+    try {
+        toml::Parser parser(ifs);
+        value = parser.parse();
+        if (!value.valid()) {
+            LOG(ERROR) << parser.errorReason();
+            return vector<OpeningBookField>();
+        }
+    } catch (std::exception& e) {
+        LOG(ERROR) << e.what();
+        return vector<OpeningBookField>();
+    }
+
+    const toml::Array& books = value.find("book")->as<toml::Array>();
+    for (const auto& book : books) {
+        string name = book.get<string>("name");
+        double score = book.get<double>("score");
+        vector<string> field;
+        for (const auto& s : book.get<toml::Array>("field"))
+            field.push_back(s.as<string>());
+
+        partialFields.emplace(name, OpeningBookField(name, field, score));
+    }
+
+    const toml::Array& combines = value.find("combine")->as<toml::Array>();
+    for (const auto& combine : combines) {
+        string combinedName = combine.get<string>("name");
+        vector<string> names;
+        for (const auto& s : combine.get<toml::Array>("combine")) {
+            names.push_back(s.as<string>());
+        }
+
+        auto range = partialFields.equal_range(names[0]);
+        for (auto it = range.first; it != range.second; ++it) {
+            merge(&result, it->second, partialFields, names, 1);
+        }
+    }
+
+    return result;
 }

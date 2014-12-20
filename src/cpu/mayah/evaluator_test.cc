@@ -18,7 +18,7 @@ protected:
         TsumoPossibility::initialize();
 
         EvaluationParameter evaluationParameter;
-        vector<BookField> books;
+        vector<OpeningBookField> books;
         Gazer gazer;
 
         gazer.initialize(100);
@@ -42,7 +42,7 @@ protected:
         TsumoPossibility::initialize();
 
         EvaluationParameter evaluationParameter;
-        vector<BookField> books;
+        vector<OpeningBookField> books;
         FeatureScoreCollector sc(evaluationParameter);
         Evaluator<FeatureScoreCollector> evaluator(books, &sc);
 
@@ -56,7 +56,7 @@ protected:
         TsumoPossibility::initialize();
 
         EvaluationParameter evaluationParameter;
-        vector<BookField> books;
+        vector<OpeningBookField> books;
         FeatureScoreCollector sc(evaluationParameter);
         RensaEvaluator<FeatureScoreCollector> rensaEvaluator(books, &sc);
 
@@ -73,7 +73,7 @@ TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
                 "YYYGGG");
 
     EvaluationParameter param;
-    std::vector<BookField> books;
+    std::vector<OpeningBookField> books;
     FeatureScoreCollector sc(param);
     RensaEvaluator<FeatureScoreCollector> evaluator(books, &sc);
 

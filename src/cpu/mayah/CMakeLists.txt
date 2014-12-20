@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 2.8)
 cpu_setup("mayah")
 
 add_library(mayah_lib
-            book_field.cc book_reader.cc
+            decision_book.cc
             evaluator.cc evaluation_feature.cc evaluation_parameter.cc
-            decision_book.cc pattern_book.cc
-            gazer.cc mayah_ai.cc score_collector.cc)
+            gazer.cc mayah_ai.cc opening_book.cc pattern_book.cc
+            score_collector.cc)
 
 function(mayah_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
@@ -35,10 +35,10 @@ cpu_add_runner(run_advanced.sh)
 cpu_add_runner(run_advanced_v.sh)
 cpu_add_runner(run_parallel.sh)
 
-mayah_add_test(book_field_test)
+mayah_add_test(decision_book_test)
+mayah_add_test(opening_book_test)
 mayah_add_test(evaluator_test)
 mayah_add_test(gazer_test)
-mayah_add_test(decision_book_test)
 mayah_add_test(mayah_ai_test)
 
 mayah_add_test(mayah_ai_performance_test 1)
