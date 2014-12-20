@@ -6,6 +6,7 @@
 
 #include <toml/toml.h>
 
+#include "base/noncopyable.h"
 #include "core/algorithm/pattern_field.h"
 #include "core/decision.h"
 #include "core/field_constant.h"
@@ -26,7 +27,7 @@ private:
     std::map<std::string, Decision> decisions_;
 };
 
-class DecisionBook {
+class DecisionBook : noncopyable {
 public:
     DecisionBook();
     explicit DecisionBook(const std::string& filename);

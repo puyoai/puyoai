@@ -5,6 +5,7 @@
 #include <tuple>
 #include <vector>
 
+#include "base/noncopyable.h"
 #include "core/field_constant.h"
 class PlainField;
 
@@ -51,9 +52,19 @@ private:
     double scoreField_[MAP_WIDTH][MAP_HEIGHT];
 };
 
-class BookReader {
+class OpeningBook : noncopyable {
 public:
-    static std::vector<OpeningBookField> parse(const std::string& filename);
+    bool load(const std::string& filename);
+
+    std::string toString() const;
+
+    size_t size() const { return fields_.size(); }
+    const std::vector<OpeningBookField>& fields() const { return fields_; }
+    const OpeningBookField& field(int ith) const { return fields_[ith]; }
+
+
+private:
+    std::vector<OpeningBookField> fields_;
 };
 
 #endif

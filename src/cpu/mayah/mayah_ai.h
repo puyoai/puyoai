@@ -78,7 +78,7 @@ protected:
     void reloadParameter();
 
     std::unique_ptr<EvaluationParameter> evaluationParameter_;
-    std::vector<OpeningBookField> books_;
+    OpeningBook openingBook_;
     DecisionBook decisionBook_;
     bool usesDecisionBook_ = true;
 

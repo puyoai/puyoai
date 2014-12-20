@@ -30,15 +30,11 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
     setBehaviorRethinkAfterOpponentRensa(true);
 
     evaluationParameter_.reset(new EvaluationParameter(FLAGS_feature));
-    books_ = BookReader::parse(FLAGS_opening_book);
-    decisionBook_.load(FLAGS_decision_book);
+    CHECK(openingBook_.load(FLAGS_opening_book));
+    CHECK(decisionBook_.load(FLAGS_decision_book));
 
     VLOG(1) << evaluationParameter_->toString();
-    if (VLOG_IS_ON(1)) {
-      for (const auto& bf : books_) {
-        VLOG(1) << bf.toDebugString();
-      }
-    }
+    VLOG(1) << openingBook_.toString();
 
     google::FlushLogFiles(google::INFO);
 }
@@ -241,7 +237,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
 PreEvalResult MayahAI::preEval(const CoreField& currentField)
 {
-    PreEvaluator preEvaluator(books_);
+    PreEvaluator preEvaluator(openingBook_);
     return preEvaluator.preEval(currentField);
 }
 
@@ -253,7 +249,7 @@ EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
                          const GazeResult& gazeResult) const
 {
     NormalScoreCollector sc(*evaluationParameter_);
-    Evaluator<NormalScoreCollector> evaluator(books_, &sc);
+    Evaluator<NormalScoreCollector> evaluator(openingBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     return EvalResult(sc.score(), sc.estimatedRensaScore());
@@ -268,7 +264,7 @@ CollectedFeature MayahAI::evalWithCollectingFeature(const RefPlan& plan, const C
                                                     const GazeResult& gazeResult) const
 {
     FeatureScoreCollector sc(*evaluationParameter_);
-    Evaluator<FeatureScoreCollector> evaluator(books_, &sc);
+    Evaluator<FeatureScoreCollector> evaluator(openingBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
     return sc.toCollectedFeature();
 }

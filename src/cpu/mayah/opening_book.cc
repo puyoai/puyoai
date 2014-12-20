@@ -266,6 +266,15 @@ int OpeningBookField::calculateVarCount() const
     return count;
 }
 
+string OpeningBook::toString() const
+{
+    stringstream ss;
+    for (const auto& bf : fields_) {
+        ss << bf.toDebugString() << '\n';
+    }
+    return ss.str();
+}
+
 static void merge(vector<OpeningBookField>* result,
                   const OpeningBookField& current,
                   const multimap<string, OpeningBookField>& partialFields,
@@ -287,10 +296,8 @@ static void merge(vector<OpeningBookField>* result,
     }
 }
 
-// static
-vector<OpeningBookField> BookReader::parse(const string& filename)
+bool OpeningBook::load(const string& filename)
 {
-    vector<OpeningBookField> result;
     multimap<string, OpeningBookField> partialFields;
 
     ifstream ifs(filename);
@@ -300,11 +307,11 @@ vector<OpeningBookField> BookReader::parse(const string& filename)
         value = parser.parse();
         if (!value.valid()) {
             LOG(ERROR) << parser.errorReason();
-            return vector<OpeningBookField>();
+            return false;
         }
     } catch (std::exception& e) {
         LOG(ERROR) << e.what();
-        return vector<OpeningBookField>();
+        return false;
     }
 
     const toml::Array& books = value.find("book")->as<toml::Array>();
@@ -328,9 +335,9 @@ vector<OpeningBookField> BookReader::parse(const string& filename)
 
         auto range = partialFields.equal_range(names[0]);
         for (auto it = range.first; it != range.second; ++it) {
-            merge(&result, it->second, partialFields, names, 1);
+            merge(&fields_, it->second, partialFields, names, 1);
         }
     }
 
-    return result;
+    return true;
 }
