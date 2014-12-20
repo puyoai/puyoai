@@ -1,4 +1,4 @@
-#include "initial_book.h"
+#include "decision_book.h"
 
 #include <gtest/gtest.h>
 
@@ -41,9 +41,9 @@ const char* TEST_BOOK =
     "]\n"
     "ABAB = [3, 0]\n";
 
-TEST(InitialBookTest, nextDecision1)
+TEST(DecisionBookTest, nextDecision1)
 {
-    InitialBook book;
+    DecisionBook book;
     ASSERT_TRUE(book.loadFromString(TEST_BOOK));
 
     CoreField cf;
@@ -60,9 +60,9 @@ TEST(InitialBookTest, nextDecision1)
     EXPECT_FALSE(book.nextDecision(cf, seq).isValid());
 }
 
-TEST(InitialBookTest, nextDecision2)
+TEST(DecisionBookTest, nextDecision2)
 {
-    InitialBook book;
+    DecisionBook book;
     ASSERT_TRUE(book.loadFromString(TEST_BOOK));
 
     CoreField cf;
@@ -77,9 +77,9 @@ TEST(InitialBookTest, nextDecision2)
     seq.dropFront();
 }
 
-TEST(InitialBookTest, nextDecision3)
+TEST(DecisionBookTest, nextDecision3)
 {
-    InitialBook book;
+    DecisionBook book;
     ASSERT_TRUE(book.loadFromString(TEST_BOOK));
 
     CoreField cf;

@@ -1,5 +1,5 @@
-#ifndef PATTERN_BOOK_H_
-#define PATTERN_BOOK_H_
+#ifndef CPU_MAYAH_PATTERN_BOOK_H_
+#define CPU_MAYAH_PATTERN_BOOK_H_
 
 class PatternBook {
 public:

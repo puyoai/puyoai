@@ -1,4 +1,4 @@
-#include "initial_book.h"
+#include "decision_book.h"
 
 #include <algorithm>
 #include <fstream>
@@ -77,13 +77,13 @@ Decision makeDecision(const toml::Value& v)
 
 } // namespace anonymous
 
-InitialBookField::InitialBookField(const vector<string>& field, map<string, Decision>&& decisions) :
+DecisionBookField::DecisionBookField(const vector<string>& field, map<string, Decision>&& decisions) :
     patternField_(field),
     decisions_(move(decisions))
 {
 }
 
-Decision InitialBookField::nextDecision(const CoreField& cf, const KumipuyoSeq& seq) const
+Decision DecisionBookField::nextDecision(const CoreField& cf, const KumipuyoSeq& seq) const
 {
     // Check heights first, since this is fast.
     for (int x = 1; x <= 6; ++x) {
@@ -121,16 +121,16 @@ Decision InitialBookField::nextDecision(const CoreField& cf, const KumipuyoSeq& 
     return Decision();
 }
 
-InitialBook::InitialBook()
+DecisionBook::DecisionBook()
 {
 }
 
-InitialBook::InitialBook(const std::string& filename)
+DecisionBook::DecisionBook(const std::string& filename)
 {
     CHECK(load(filename));
 }
 
-bool InitialBook::load(const std::string& filename)
+bool DecisionBook::load(const std::string& filename)
 {
     ifstream ifs(filename);
     toml::Parser parser(ifs);
@@ -143,7 +143,7 @@ bool InitialBook::load(const std::string& filename)
     return loadFromValue(std::move(v));
 }
 
-bool InitialBook::loadFromString(const std::string& str)
+bool DecisionBook::loadFromString(const std::string& str)
 {
     istringstream iss(str);
     toml::Parser parser(iss);
@@ -156,7 +156,7 @@ bool InitialBook::loadFromString(const std::string& str)
     return loadFromValue(std::move(v));
 }
 
-bool InitialBook::loadFromValue(const toml::Value& book)
+bool DecisionBook::loadFromValue(const toml::Value& book)
 {
     if (!book.valid())
         return false;
@@ -180,7 +180,7 @@ bool InitialBook::loadFromValue(const toml::Value& book)
     return true;
 }
 
-Decision InitialBook::nextDecision(const CoreField& cf, const KumipuyoSeq& seq)
+Decision DecisionBook::nextDecision(const CoreField& cf, const KumipuyoSeq& seq)
 {
     for (const auto& f : fields_) {
         Decision decision = f.nextDecision(cf, seq);

@@ -1,5 +1,5 @@
-#ifndef CPU_MAYAH_INITIAL_BOOK_H_
-#define CPU_MAYAH_INITIAL_BOOK_H_
+#ifndef CPU_MAYAH_DECISION_BOOK_H_
+#define CPU_MAYAH_DECISION_BOOK_H_
 
 #include <string>
 #include <map>
@@ -14,9 +14,9 @@
 class CoreField;
 class KumipuyoSeq;
 
-class InitialBookField {
+class DecisionBookField {
 public:
-    InitialBookField(const std::vector<std::string>& field,
+    DecisionBookField(const std::vector<std::string>& field,
                      std::map<std::string, Decision>&& decisions);
 
     Decision nextDecision(const CoreField&, const KumipuyoSeq&) const;
@@ -26,10 +26,10 @@ private:
     std::map<std::string, Decision> decisions_;
 };
 
-class InitialBook {
+class DecisionBook {
 public:
-    InitialBook();
-    explicit InitialBook(const std::string& filename);
+    DecisionBook();
+    explicit DecisionBook(const std::string& filename);
 
     bool load(const std::string& filename);
     bool loadFromString(const std::string&);
@@ -41,7 +41,7 @@ public:
 private:
     void makeFieldFromValue(const CoreField&, const std::string&, const toml::Value&);
 
-    std::vector<InitialBookField> fields_;
+    std::vector<DecisionBookField> fields_;
 };
 
 #endif
