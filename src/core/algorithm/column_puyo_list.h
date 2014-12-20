@@ -54,6 +54,11 @@ public:
             addPuyo(cp.x, cp.color);
     }
 
+    void clear()
+    {
+        size_ = 0;
+    }
+
     void removeLastAddedPuyo()
     {
         DCHECK(0 < size_);

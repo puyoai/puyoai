@@ -36,9 +36,10 @@ cpu_add_runner(run_advanced_v.sh)
 cpu_add_runner(run_parallel.sh)
 
 mayah_add_test(decision_book_test)
-mayah_add_test(opening_book_test)
 mayah_add_test(evaluator_test)
 mayah_add_test(gazer_test)
 mayah_add_test(mayah_ai_test)
+mayah_add_test(opening_book_test)
+mayah_add_test(pattern_book_test)
 
 mayah_add_test(mayah_ai_performance_test 1)

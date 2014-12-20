@@ -16,6 +16,23 @@ PatternField::PatternField() :
     }
 }
 
+PatternField::PatternField(const std::string& field) :
+    PatternField()
+{
+    int counter = 0;
+    for (int i = field.length() - 1; i >= 0; --i) {
+        int c = field[i];
+        int x = 6 - (counter % 6);
+        int y = counter / 6 + 1;
+
+        if (c != '.' && c != ' ') {
+            field_[x][y] = c;
+            heights_[x] = std::max(height(x), y);
+        }
+        counter++;
+    }
+}
+
 PatternField::PatternField(const vector<string>& field) :
     PatternField()
 {
