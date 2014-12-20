@@ -21,22 +21,23 @@ const int MIDDLE_THRESHOLD = 54;
 
 class PreEvalResult {
 public:
-    explicit PreEvalResult(const std::vector<bool>& booksMatchable) :
-        booksMatchable_(booksMatchable) {}
+    explicit PreEvalResult(const std::vector<int>& matchableBookIds) :
+        matchableBookIds_(matchableBookIds) {}
 
-    const std::vector<bool>& booksMatchable() const { return booksMatchable_; }
+    const std::vector<int>& matchableBookIds() const { return matchableBookIds_; }
+
 private:
-    std::vector<bool> booksMatchable_;
+    std::vector<int> matchableBookIds_;
 };
 
 class PreEvaluator {
 public:
-    explicit PreEvaluator(const std::vector<OpeningBookField>& books) : books_(books) {}
+    explicit PreEvaluator(const OpeningBook& openingBook) : openingBook_(openingBook) {}
 
     PreEvalResult preEval(const CoreField& currentField);
 
 private:
-    const std::vector<OpeningBookField>& books_;
+    const OpeningBook& openingBook_;
 };
 
 class MidEvalResult {
@@ -81,8 +82,8 @@ template<typename ScoreCollector>
 class RensaEvaluator {
 public:
     // Don't take ownership of |sc|.
-    explicit RensaEvaluator(const std::vector<OpeningBookField>& books, ScoreCollector* sc) :
-        books_(books),
+    explicit RensaEvaluator(const OpeningBook& openingBook, ScoreCollector* sc) :
+        openingBook_(openingBook),
         sc_(sc) {}
 
     void evalRensaChainFeature(const RefPlan&,
@@ -97,7 +98,7 @@ public:
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                            int currentFrameId, const PlayerState& me, const PlayerState& enemy);
 private:
-    const std::vector<OpeningBookField>& books_;
+    const OpeningBook& openingBook_;
     ScoreCollector* sc_;
 };
 
@@ -105,8 +106,8 @@ template<typename ScoreCollector>
 class Evaluator {
 public:
     // Don't take ownership of |sc|.
-    explicit Evaluator(const std::vector<OpeningBookField>& books, ScoreCollector* sc) :
-        books_(books),
+    explicit Evaluator(const OpeningBook& openingBook, ScoreCollector* sc) :
+        openingBook_(openingBook),
         sc_(sc) {}
 
     void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
@@ -119,7 +120,7 @@ public:
                       const PlayerState& me, const PlayerState& enemy, const GazeResult&);
 
     // Returns true if complete match.
-    bool evalBook(const std::vector<OpeningBookField>&, const std::vector<bool>& bookMatchable, const RefPlan&, const MidEvalResult&);
+    bool evalBook(const OpeningBook&, const std::vector<int>& matchableBookIds, const RefPlan&, const MidEvalResult&);
     void evalFrameFeature(const RefPlan&);
     void evalRestrictedConnectionHorizontalFeature(const CoreField&);
     void evalThirdColumnHeightFeature(const RefPlan&);
@@ -134,7 +135,7 @@ public:
     void evalCountPuyoFeature(const RefPlan& plan);
 
 private:
-    const std::vector<OpeningBookField>& books_;
+    const OpeningBook& openingBook_;
     ScoreCollector* sc_;
 };
 

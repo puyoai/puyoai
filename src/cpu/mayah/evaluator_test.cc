@@ -18,7 +18,7 @@ protected:
         TsumoPossibility::initialize();
 
         EvaluationParameter evaluationParameter;
-        vector<OpeningBookField> books;
+        OpeningBook openingBook;
         Gazer gazer;
 
         gazer.initialize(100);
@@ -30,9 +30,9 @@ protected:
 
         RefPlan plan(f, decisions, rensaResult, 0, framesToInitiate, lastDropFrames);
 
-        PreEvalResult preEvalResult = PreEvaluator(books).preEval(f);
+        PreEvalResult preEvalResult = PreEvaluator(openingBook).preEval(f);
         FeatureScoreCollector sc(evaluationParameter);
-        Evaluator<FeatureScoreCollector> evaluator(books, &sc);
+        Evaluator<FeatureScoreCollector> evaluator(openingBook, &sc);
         evaluator.collectScore(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
         return sc.toCollectedFeature();
     }
@@ -42,9 +42,9 @@ protected:
         TsumoPossibility::initialize();
 
         EvaluationParameter evaluationParameter;
-        vector<OpeningBookField> books;
+        OpeningBook openingBook;
         FeatureScoreCollector sc(evaluationParameter);
-        Evaluator<FeatureScoreCollector> evaluator(books, &sc);
+        Evaluator<FeatureScoreCollector> evaluator(openingBook, &sc);
 
         f(&evaluator);
 
@@ -56,9 +56,9 @@ protected:
         TsumoPossibility::initialize();
 
         EvaluationParameter evaluationParameter;
-        vector<OpeningBookField> books;
+        OpeningBook openingBook;
         FeatureScoreCollector sc(evaluationParameter);
-        RensaEvaluator<FeatureScoreCollector> rensaEvaluator(books, &sc);
+        RensaEvaluator<FeatureScoreCollector> rensaEvaluator(openingBook, &sc);
 
         f(&rensaEvaluator);
 
@@ -73,9 +73,9 @@ TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
                 "YYYGGG");
 
     EvaluationParameter param;
-    std::vector<OpeningBookField> books;
+    OpeningBook openingBook;
     FeatureScoreCollector sc(param);
-    RensaEvaluator<FeatureScoreCollector> evaluator(books, &sc);
+    RensaEvaluator<FeatureScoreCollector> evaluator(openingBook, &sc);
 
     evaluator.collectScoreForRensaGarbage(f);
     CollectedFeature cf = sc.toCollectedFeature();

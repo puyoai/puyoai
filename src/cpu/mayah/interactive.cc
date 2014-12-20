@@ -33,7 +33,7 @@ public:
 
     void showMatchedBooks(const CoreField& field)
     {
-        for (const auto& book : books_) {
+        for (const auto& book : openingBook_.fields()) {
             if (book.match(field).count) {
                 cout << book.toDebugString() << endl;
             }

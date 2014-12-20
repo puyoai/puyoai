@@ -72,12 +72,14 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field,
 
 PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
 {
-    vector<bool> booksMatchable(books_.size());
-    for (size_t i = 0; i < books_.size(); ++i) {
-        booksMatchable[i] = books_[i].match(currentField).matched;
+    vector<int> matchableIds;
+    for (size_t i = 0; i < openingBook_.size(); ++i) {
+        const OpeningBookField& obf = openingBook_.field(i);
+        if (obf.match(currentField).matched)
+            matchableIds.push_back(static_cast<int>(i));
     }
 
-    return PreEvalResult(booksMatchable);
+    return PreEvalResult(matchableIds);
 }
 
 MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentField)
@@ -94,8 +96,8 @@ MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentFi
 }
 
 template<typename ScoreCollector>
-bool Evaluator<ScoreCollector>::evalBook(const std::vector<OpeningBookField>& books,
-                                         const std::vector<bool>& bookMatchable,
+bool Evaluator<ScoreCollector>::evalBook(const OpeningBook& openingBook,
+                                         const std::vector<int>& matchableBookIds,
                                          const RefPlan& plan,
                                          const MidEvalResult& midEvalResult)
 {
@@ -108,11 +110,8 @@ bool Evaluator<ScoreCollector>::evalBook(const std::vector<OpeningBookField>& bo
     if (totalPuyoCount == 0)
         return false;
 
-    for (size_t i = 0; i < books.size(); ++i) {
-        if (!bookMatchable[i])
-            continue;
-
-        const auto& bf = books[i];
+    for (int id : matchableBookIds) {
+        const auto& bf = openingBook.field(id);
         OpeningBookField::MatchResult mr = bf.match(plan.field());
         if (!mr.matched || mr.count == 0)
             continue;
@@ -643,7 +642,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
     bool complete = false;
     if (USE_BOOK && !enemy.hasZenkeshi && !plan.isRensaPlan()) {
-        complete = evalBook(books_, preEvalResult.booksMatchable(), plan, midEvalResult);
+        complete = evalBook(openingBook_, preEvalResult.matchableBookIds(), plan, midEvalResult);
     }
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
@@ -671,7 +670,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                         const RensaTrackResult& trackResult, const RensaRefSequence&) {
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
-        RensaEvaluator<ScoreCollector> rensaEvaluator(books_, rensaScoreCollector.get());
+        RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook_, rensaScoreCollector.get());
 
         if (!complete)
             rensaEvaluator.evalRensaChainFeature(plan, rensaResult, keyPuyos, firePuyos);
