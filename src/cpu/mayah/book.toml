@@ -512,14 +512,36 @@ name = "NEWGTR-TAIL"
 score = 9.800000
 
 [[book]]
+name = "NEWGTR-TAIL"
+score = 9.000000
 field = [
     "...cxx",
     "...CXX",
     "....CC",
     "...CXX"
 ]
+
+[[book]]
 name = "NEWGTR-TAIL"
-score = 9.700000
+score = 9.000000
+field = [
+    ".....Y",
+    "...CXY",
+    "...CXY",
+    "....CX",
+    "...CXY"
+]
+
+[[book]]
+name = "NEWGTR-TAIL"
+score = 9.000000
+field = [
+    ".....Y",
+    "...CXY",
+    "...CXX",
+    "....CY",
+    "...CXY"
+]
 
 [[book]]
 field = [
