@@ -19,6 +19,17 @@ class RensaTrackResult;
 const int EARLY_THRESHOLD = 24;
 const int MIDDLE_THRESHOLD = 54;
 
+class EvaluatorBase {
+protected:
+    explicit EvaluatorBase(const OpeningBook& openingBook) :
+        openingBook_(openingBook) {}
+
+    const OpeningBook& openingBook() const { return openingBook_; }
+
+private:
+    const OpeningBook& openingBook_;
+};
+
 class PreEvalResult {
 public:
     explicit PreEvalResult(const std::vector<int>& matchableBookIds) :
@@ -30,14 +41,11 @@ private:
     std::vector<int> matchableBookIds_;
 };
 
-class PreEvaluator {
+class PreEvaluator : public EvaluatorBase {
 public:
-    explicit PreEvaluator(const OpeningBook& openingBook) : openingBook_(openingBook) {}
+    explicit PreEvaluator(const OpeningBook& openingBook) : EvaluatorBase(openingBook) {}
 
     PreEvalResult preEval(const CoreField& currentField);
-
-private:
-    const OpeningBook& openingBook_;
 };
 
 class MidEvalResult {
@@ -61,8 +69,10 @@ private:
     std::map<EvaluationFeatureKey, double> collectedFeatures_;
 };
 
-class MidEvaluator {
+class MidEvaluator : public EvaluatorBase {
 public:
+    MidEvaluator(const OpeningBook& openingBook) : EvaluatorBase(openingBook) {}
+
     MidEvalResult eval(const RefPlan&, const CoreField& currentField);
 };
 
@@ -79,11 +89,11 @@ private:
 };
 
 template<typename ScoreCollector>
-class RensaEvaluator {
+class RensaEvaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
     explicit RensaEvaluator(const OpeningBook& openingBook, ScoreCollector* sc) :
-        openingBook_(openingBook),
+        EvaluatorBase(openingBook),
         sc_(sc) {}
 
     void evalRensaChainFeature(const RefPlan&,
@@ -98,16 +108,15 @@ public:
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                            int currentFrameId, const PlayerState& me, const PlayerState& enemy);
 private:
-    const OpeningBook& openingBook_;
     ScoreCollector* sc_;
 };
 
 template<typename ScoreCollector>
-class Evaluator {
+class Evaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    explicit Evaluator(const OpeningBook& openingBook, ScoreCollector* sc) :
-        openingBook_(openingBook),
+    Evaluator(const OpeningBook& openingBook, ScoreCollector* sc) :
+        EvaluatorBase(openingBook),
         sc_(sc) {}
 
     void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
@@ -135,7 +144,6 @@ public:
     void evalCountPuyoFeature(const RefPlan& plan);
 
 private:
-    const OpeningBook& openingBook_;
     ScoreCollector* sc_;
 };
 

@@ -185,7 +185,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
             }
         }
 
-        MidEvalResult midEvalResult = MidEvaluator().eval(rp1, field);
+        MidEvalResult midEvalResult = MidEvaluator(openingBook_).eval(rp1, field);
 
         Plan p = rp1.toPlan();
         KumipuyoSeq seq(kumipuyoSeq);
