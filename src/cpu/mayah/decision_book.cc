@@ -4,6 +4,7 @@
 #include <fstream>
 #include <glog/logging.h>
 
+#include "core/algorithm/pattern_matcher.h"
 #include "core/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_seq.h"
@@ -21,42 +22,6 @@ Decision makeDecision(const toml::Value& v)
 }
 
 } // namespace anonymous
-
-class BijectionMatcher {
-public:
-    BijectionMatcher();
-
-    bool match(char, PuyoColor);
-
-private:
-    PuyoColor colors_[4];
-    char chars_[NUM_PUYO_COLORS];
-};
-
-BijectionMatcher::BijectionMatcher()
-{
-    for (int i = 0; i < 4; ++i)
-        colors_[i] = PuyoColor::EMPTY;
-    for (int i = 0; i < NUM_PUYO_COLORS; ++i)
-        chars_[i] = ' ';
-}
-
-bool BijectionMatcher::match(char a, PuyoColor c)
-{
-    DCHECK('A' <= a && a <= 'D') << a;
-    int idx = a - 'A';
-
-    if (colors_[idx] == c)
-        return true;
-
-    if (colors_[idx] == PuyoColor::EMPTY && chars_[ordinal(c)] == ' ') {
-        colors_[idx] = c;
-        chars_[ordinal(c)] = a;
-        return true;
-    }
-
-    return false;
-}
 
 DecisionBookField::DecisionBookField(const vector<string>& field, map<string, Decision>&& decisions) :
     patternField_(field),
