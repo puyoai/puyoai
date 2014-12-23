@@ -12,7 +12,9 @@
 #include "core/field_constant.h"
 #include "core/puyo_color.h"
 
+class BijectionMatcher;
 class CoreField;
+class Kumipuyo;
 class KumipuyoSeq;
 
 class DecisionBookField {
@@ -23,6 +25,8 @@ public:
     Decision nextDecision(const CoreField&, const KumipuyoSeq&) const;
 
 private:
+    bool matchNext(BijectionMatcher*, const std::string& nextPattern, const Kumipuyo& next1, const Kumipuyo& next2) const;
+
     PatternField patternField_;
     std::map<std::string, Decision> decisions_;
 };

@@ -12,19 +12,28 @@ using namespace std;
 
 namespace {
 
-class MatchState {
+Decision makeDecision(const toml::Value& v)
+{
+    const toml::Array ary = v.as<toml::Array>();
+    int x = ary[0].as<int>();
+    int r = ary[1].as<int>();
+    return Decision(x, r);
+}
+
+} // namespace anonymous
+
+class BijectionMatcher {
 public:
-    MatchState();
+    BijectionMatcher();
 
     bool match(char, PuyoColor);
-    bool match(const std::string&, const Kumipuyo& kp1, const Kumipuyo& kp2);
 
 private:
     PuyoColor colors_[4];
     char chars_[NUM_PUYO_COLORS];
 };
 
-MatchState::MatchState()
+BijectionMatcher::BijectionMatcher()
 {
     for (int i = 0; i < 4; ++i)
         colors_[i] = PuyoColor::EMPTY;
@@ -32,7 +41,7 @@ MatchState::MatchState()
         chars_[i] = ' ';
 }
 
-bool MatchState::match(char a, PuyoColor c)
+bool BijectionMatcher::match(char a, PuyoColor c)
 {
     DCHECK('A' <= a && a <= 'D') << a;
     int idx = a - 'A';
@@ -49,34 +58,6 @@ bool MatchState::match(char a, PuyoColor c)
     return false;
 }
 
-bool MatchState::match(const std::string& s, const Kumipuyo& kp1, const Kumipuyo& kp2)
-{
-    DCHECK_EQ(s.size(), 4UL) << s;
-    MatchState ms(*this);
-
-    if (!ms.match(s[0], kp1.axis))
-        return false;
-    if (!ms.match(s[1], kp1.child))
-        return false;
-    if (!ms.match(s[2], kp2.axis))
-        return false;
-    if (!ms.match(s[3], kp2.child))
-        return false;
-
-    *this = ms;
-    return true;
-}
-
-Decision makeDecision(const toml::Value& v)
-{
-    const toml::Array ary = v.as<toml::Array>();
-    int x = ary[0].as<int>();
-    int r = ary[1].as<int>();
-    return Decision(x, r);
-}
-
-} // namespace anonymous
-
 DecisionBookField::DecisionBookField(const vector<string>& field, map<string, Decision>&& decisions) :
     patternField_(field),
     decisions_(move(decisions))
@@ -91,11 +72,11 @@ Decision DecisionBookField::nextDecision(const CoreField& cf, const KumipuyoSeq&
             return Decision();
     }
 
-    MatchState ms;
+    BijectionMatcher matcher;
     for (int x = 1; x <= 6; ++x) {
         int h = patternField_.height(x);
         for (int y = 1; y <= h; ++y) {
-            if (!ms.match(patternField_.variable(x, y), cf.color(x, y)))
+            if (!matcher.match(patternField_.variable(x, y), cf.color(x, y)))
                 return Decision();
         }
     }
@@ -105,20 +86,41 @@ Decision DecisionBookField::nextDecision(const CoreField& cf, const KumipuyoSeq&
 
     // Field matched. check next sequence.
     for (const auto& entry : decisions_) {
-        if (ms.match(entry.first, kp1, kp2))
+        if (matchNext(&matcher, entry.first, kp1, kp2))
             return entry.second;
 
-        if (!kp2.isRep() && ms.match(entry.first, kp1, kp2.reverse()))
+        if (!kp2.isRep() && matchNext(&matcher, entry.first, kp1, kp2.reverse()))
             return entry.second;
 
-        if (!kp1.isRep() && ms.match(entry.first, kp1.reverse(), kp2))
+        if (!kp1.isRep() && matchNext(&matcher, entry.first, kp1.reverse(), kp2))
             return entry.second.reverse();
 
-        if (!kp1.isRep() && !kp2.isRep() && ms.match(entry.first, kp1.reverse(), kp2.reverse()))
+        if (!kp1.isRep() && !kp2.isRep() && matchNext(&matcher, entry.first, kp1.reverse(), kp2.reverse()))
             return entry.second.reverse();
     }
 
     return Decision();
+}
+
+bool DecisionBookField::matchNext(BijectionMatcher* matcher,
+                                  const std::string& nextPattern,
+                                  const Kumipuyo& next1,
+                                  const Kumipuyo& next2) const
+{
+    DCHECK_EQ(nextPattern.size(), 4UL) << nextPattern;
+    BijectionMatcher bm(*matcher);
+
+    if (!bm.match(nextPattern[0], next1.axis))
+        return false;
+    if (!bm.match(nextPattern[1], next1.child))
+        return false;
+    if (!bm.match(nextPattern[2], next2.axis))
+        return false;
+    if (!bm.match(nextPattern[3], next2.child))
+        return false;
+
+    *matcher = bm;
+    return true;
 }
 
 DecisionBook::DecisionBook()

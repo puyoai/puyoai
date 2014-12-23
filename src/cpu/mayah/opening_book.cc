@@ -12,7 +12,6 @@
 #include "core/puyo_color.h"
 #include "core/plain_field.h"
 
-
 using namespace std;
 
 class PuyoColorEnv {
