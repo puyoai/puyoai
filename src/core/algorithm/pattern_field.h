@@ -19,10 +19,10 @@ public:
     explicit PatternField(const std::vector<std::string>&);
 
     int height(int x) const { return heights_[x]; }
-    char get(int x, int y) const { return field_[x][y]; }
+    char variable(int x, int y) const { return vars_[x][y]; }
 
 private:
-    char field_[MAP_WIDTH][MAP_HEIGHT];
+    char vars_[MAP_WIDTH][MAP_HEIGHT];
     std::int8_t heights_[MAP_WIDTH];
 };
 

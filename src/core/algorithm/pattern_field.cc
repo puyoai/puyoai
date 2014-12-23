@@ -11,7 +11,7 @@ PatternField::PatternField() :
 {
     for (int x = 0; x < MAP_WIDTH; ++x) {
         for (int y = 0; y < MAP_HEIGHT; ++y) {
-            field_[x][y] = ' ';
+            vars_[x][y] = ' ';
         }
     }
 }
@@ -26,7 +26,7 @@ PatternField::PatternField(const std::string& field) :
         int y = counter / 6 + 1;
 
         if (c != '.' && c != ' ') {
-            field_[x][y] = c;
+            vars_[x][y] = c;
             heights_[x] = std::max(height(x), y);
         }
         counter++;
@@ -44,7 +44,7 @@ PatternField::PatternField(const vector<string>& field) :
             if (field[i][x - 1] == '.')
                 continue;
 
-            field_[x][y] = field[i][x - 1];
+            vars_[x][y] = field[i][x - 1];
             heights_[x] = std::max(height(x), y);
         }
     }

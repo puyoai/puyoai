@@ -16,7 +16,7 @@ bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl)
     for (int x = 1; x <= 6; ++x) {
         int h = patternField_.height(x);
         for (int y = 1; y <= h; ++y) {
-            char c = patternField_.get(x, y);
+            char c = patternField_.variable(x, y);
             if (c == ' ') {
                 if (field.color(x, y) == PuyoColor::EMPTY)
                     return false;
@@ -54,13 +54,13 @@ bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl)
     for (int x = 1; x <= 6; ++x) {
         int h = patternField_.height(x);
         for (int y = 1; y <= h; ++y) {
-            if (patternField_.get(x, y) == ' ')
+            if (patternField_.variable(x, y) == ' ')
                 continue;
             if (field.color(x, y) != PuyoColor::EMPTY)
                 continue;
             if (ColumnPuyoList::MAX_SIZE <= cpl->size())
                 return false;
-            int i = patternField_.get(x, y) == '*' ? 1 : patternField_.get(x, y) - '0';
+            int i = patternField_.variable(x, y) == '*' ? 1 : patternField_.variable(x, y) - '0';
             cpl->addPuyo(x, cs[i]);
         }
     }

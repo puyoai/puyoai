@@ -95,7 +95,7 @@ Decision DecisionBookField::nextDecision(const CoreField& cf, const KumipuyoSeq&
     for (int x = 1; x <= 6; ++x) {
         int h = patternField_.height(x);
         for (int y = 1; y <= h; ++y) {
-            if (!ms.match(patternField_.get(x, y), cf.color(x, y)))
+            if (!ms.match(patternField_.variable(x, y), cf.color(x, y)))
                 return Decision();
         }
     }
