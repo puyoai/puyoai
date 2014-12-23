@@ -7,6 +7,10 @@
 
 #include "core/field_constant.h"
 
+enum class PatternType : std::uint8_t {
+    EMPTY, ANY, MUST, ALLOW_VAR, MUST_VAR,
+};
+
 // PatternField is a field that holds characters.
 // This would be useful if you want to write an algorithm to do pattern-match.
 //
@@ -20,6 +24,7 @@ public:
 
     int height(int x) const { return heights_[x]; }
     char variable(int x, int y) const { return vars_[x][y]; }
+    PatternType type(int x, int y) const;
 
 private:
     char vars_[MAP_WIDTH][MAP_HEIGHT];

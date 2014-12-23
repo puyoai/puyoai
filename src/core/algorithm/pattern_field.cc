@@ -49,3 +49,18 @@ PatternField::PatternField(const vector<string>& field) :
         }
     }
 }
+
+PatternType PatternField::type(int x, int y) const
+{
+    char c = variable(x, y);
+    if (c == ' ' || c == '.')
+        return PatternType::EMPTY;
+    if (c == '*')
+        return PatternType::ANY;
+    if ('A' <= c && c <= 'Z')
+        return PatternType::MUST_VAR;
+    if ('a' <= c && c <= 'z')
+        return PatternType::ALLOW_VAR;
+
+    return PatternType::MUST;
+}
