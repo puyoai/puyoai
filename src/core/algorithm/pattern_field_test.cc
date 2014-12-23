@@ -32,10 +32,10 @@ TEST(PatternFieldTest, constructor1)
     EXPECT_EQ(5, pf.height(5));
     EXPECT_EQ(6, pf.height(6));
 
-    EXPECT_EQ('A', pf.get(1, 1));
-    EXPECT_EQ('B', pf.get(2, 2));
-    EXPECT_EQ('C', pf.get(6, 1));
-    EXPECT_EQ(' ', pf.get(1, 2));
+    EXPECT_EQ('A', pf.variable(1, 1));
+    EXPECT_EQ('B', pf.variable(2, 2));
+    EXPECT_EQ('C', pf.variable(6, 1));
+    EXPECT_EQ(' ', pf.variable(1, 2));
 }
 
 TEST(PatternFieldTest, constructor2)
@@ -56,8 +56,8 @@ TEST(PatternFieldTest, constructor2)
     EXPECT_EQ(5, pf.height(5));
     EXPECT_EQ(6, pf.height(6));
 
-    EXPECT_EQ('A', pf.get(1, 1));
-    EXPECT_EQ('B', pf.get(2, 2));
-    EXPECT_EQ('C', pf.get(6, 1));
-    EXPECT_EQ(' ', pf.get(1, 2));
+    EXPECT_EQ('A', pf.variable(1, 1));
+    EXPECT_EQ('B', pf.variable(2, 2));
+    EXPECT_EQ('C', pf.variable(6, 1));
+    EXPECT_EQ(' ', pf.variable(1, 2));
 }
