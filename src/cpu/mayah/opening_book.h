@@ -8,31 +8,15 @@
 #include "base/noncopyable.h"
 #include "core/field_constant.h"
 #include "core/algorithm/pattern_field.h"
-
-class PlainField;
+#include "core/algorithm/pattern_matcher.h"
 
 class OpeningBookField : FieldConstant {
 public:
-    struct MatchResult {
-        MatchResult(bool matched, double score, int count, int allowedCount) :
-            matched(matched), score(score), count(count), allowedCount(allowedCount) {}
-
-        friend bool operator==(const MatchResult& lhs, const MatchResult& rhs)
-        {
-            return std::tie(lhs.matched, lhs.score, lhs.count, lhs.allowedCount) == std::tie(rhs.matched, rhs.score, rhs.count, rhs.allowedCount);
-        }
-
-        bool matched;
-        double score;
-        int count;
-        int allowedCount;
-    };
-
     OpeningBookField(const std::string& name, const std::vector<std::string>& field, double defaultScore = 1);
     OpeningBookField(const std::string& name, const PatternField&);
 
     // match returns the matched score. If not matched, 0 will be returned.
-    MatchResult match(const PlainField&) const;
+    PatternMatchResult match(const CoreField&) const;
 
     bool merge(const OpeningBookField&);
     OpeningBookField mirror() const { return OpeningBookField(name(), patternField_.mirror()); }

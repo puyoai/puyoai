@@ -112,7 +112,7 @@ bool Evaluator<ScoreCollector>::evalBook(const OpeningBook& openingBook,
 
     for (int id : matchableBookIds) {
         const auto& bf = openingBook.field(id);
-        OpeningBookField::MatchResult mr = bf.match(plan.field());
+        PatternMatchResult mr = bf.match(plan.field());
         if (!mr.matched || mr.count == 0)
             continue;
 
