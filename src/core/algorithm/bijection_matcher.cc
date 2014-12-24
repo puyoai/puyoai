@@ -1,4 +1,4 @@
-#include "core/algorithm/pattern_matcher.h"
+#include "core/algorithm/bijection_matcher.h"
 
 #include "core/algorithm/pattern_field.h"
 #include "core/core_field.h"
@@ -46,3 +46,4 @@ bool BijectionMatcher::match(char v, PuyoColor c)
 
     return false;
 }
+
