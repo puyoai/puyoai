@@ -74,7 +74,7 @@ PatternType PatternField::type(int x, int y) const
 PatternField PatternField::mirror() const
 {
     PatternField pf(*this);
-    for (int x = 1; x < 3; ++x) {
+    for (int x = 1; x <= 3; ++x) {
         std::swap(pf.heights_[x], pf.heights_[7 - x]);
         for (int y = 1; y < MAP_HEIGHT; ++y) {
             std::swap(pf.vars_[x][y], pf.vars_[7 - x][y]);
