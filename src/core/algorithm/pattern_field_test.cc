@@ -5,6 +5,8 @@
 
 #include <gtest/gtest.h>
 
+#include "core/core_field.h"
+
 using namespace std;
 
 TEST(PatternFieldTest, initial)
@@ -73,13 +75,14 @@ TEST(PatternFieldTest, varCount)
     EXPECT_EQ(4, pf3.numVariables()); // We don't count *
 
     {
-        PatternField f(pf1);
-        ASSERT_TRUE(f.merge(pf2));
+        PatternField f;
+        ASSERT_TRUE(PatternField::merge(pf1, pf2, &f));
         EXPECT_EQ(6, f.numVariables());
     }
     {
-        PatternField f(pf1);
-        ASSERT_TRUE(f.merge(pf3));
+        PatternField f;
+        ASSERT_TRUE(PatternField::merge(pf1, pf2, &f));
         EXPECT_EQ(6, f.numVariables());
     }
 }
+
