@@ -4,7 +4,7 @@
 #include <fstream>
 #include <glog/logging.h>
 
-#include "core/algorithm/pattern_matcher.h"
+#include "core/algorithm/bijection_matcher.h"
 #include "core/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_seq.h"
