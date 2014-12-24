@@ -31,20 +31,9 @@ DecisionBookField::DecisionBookField(const vector<string>& field, map<string, De
 
 Decision DecisionBookField::nextDecision(const CoreField& cf, const KumipuyoSeq& seq) const
 {
-    // Check heights first, since this is fast.
-    for (int x = 1; x <= 6; ++x) {
-        if (cf.height(x) != patternField_.height(x))
-            return Decision();
-    }
-
     BijectionMatcher matcher;
-    for (int x = 1; x <= 6; ++x) {
-        int h = patternField_.height(x);
-        for (int y = 1; y <= h; ++y) {
-            if (!matcher.match(patternField_.variable(x, y), cf.color(x, y)))
-                return Decision();
-        }
-    }
+    if (!matcher.match(patternField_, cf))
+        return Decision();
 
     const Kumipuyo& kp1 = seq.get(0);
     const Kumipuyo& kp2 = seq.get(1);
