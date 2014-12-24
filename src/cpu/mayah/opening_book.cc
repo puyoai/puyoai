@@ -48,8 +48,6 @@ private:
 static inline
 bool checkCell(char currentVar, char neighborVar, PuyoColor neighborColor, const PuyoColorEnv& env)
 {
-    DCHECK_NE(currentVar, '.');
-    DCHECK_NE(currentVar, '*');
     DCHECK('A' <= currentVar && currentVar <= 'Z') << currentVar;
 
     // If neighbor is '*', we don't care what color the cell has.
@@ -63,7 +61,7 @@ bool checkCell(char currentVar, char neighborVar, PuyoColor neighborColor, const
     if (currentVar == neighborVar)
         return true;
 
-    if (neighborVar == '.') {
+    if (neighborVar == '.' || neighborVar == ' ') {
         if (env.map(currentVar) == neighborColor)
             return false;
     } else if ('a' <= neighborVar && neighborVar <= 'z') {
@@ -79,95 +77,19 @@ bool checkCell(char currentVar, char neighborVar, PuyoColor neighborColor, const
 
 OpeningBookField::OpeningBookField(const string& name, const vector<string>& field, double defaultScore) :
     name_(name),
-    defaultScore_(defaultScore)
+    patternField_(field, defaultScore)
 {
-    for (int x = 0; x < MAP_WIDTH; ++x) {
-        for (int y = 0; y < MAP_HEIGHT; ++y) {
-            field_[x][y] = '.';
-            scoreField_[x][y] = 0;
-        }
-    }
+}
 
-    for (size_t i = 0; i < field.size(); ++i) {
-        CHECK_EQ(field[i].size(), 6U);
-        int y = static_cast<int>(field.size()) - i;
-        for (int x = 1; x <= 6; ++x) {
-            if (field[i][x - 1] == '.')
-                continue;
-
-            if ('A' <= field[i][x - 1] && field[i][x - 1] <= 'Z') {
-                field_[x][y] = field[i][x - 1];
-                scoreField_[x][y] = defaultScore;
-                continue;
-            }
-
-            if ('a' <= field[i][x - 1] && field[i][x - 1] <= 'z') {
-                field_[x][y] = field[i][x - 1];
-                continue;
-            }
-
-            if (field[i][x - 1] == '*') {
-                field_[x][y] = field[i][x - 1];
-                continue;
-            }
-
-            CHECK(false) << "Unknown field character: " << field[i][x - 1];
-        }
-    }
-
-    varCount_ = calculateVarCount();
+OpeningBookField::OpeningBookField(const string& name, const PatternField& patternField) :
+    name_(name),
+    patternField_(patternField)
+{
 }
 
 bool OpeningBookField::merge(const OpeningBookField& obf)
 {
-    for (int x = 1; x <= 6; ++x) {
-        for (int y = 1; y <= 12; ++y) {
-            if (obf.field_[x][y] == '.') {
-                continue;
-            } else if (field_[x][y] == '.') {
-                field_[x][y] = obf.field_[x][y];
-                scoreField_[x][y] = obf.scoreField_[x][y];
-                continue;
-            }
-
-            if (field_[x][y] != '*' && obf.field_[x][y] == '*') {
-                continue;
-            } else if (field_[x][y] == '*' && obf.field_[x][y] != '*') {
-                field_[x][y] = obf.field_[x][y];
-                scoreField_[x][y] = obf.scoreField_[x][y];
-                continue;
-            }
-
-            if (('A' <= field_[x][y] && field_[x][y] <= 'Z') &&
-                ('a' <= obf.field_[x][y] && obf.field_[x][y] <= 'z')) {
-            } else if (('a' <= field_[x][y] && field_[x][y] <= 'z') &&
-                       ('A' <= obf.field_[x][y] && obf.field_[x][y] <= 'Z')) {
-                field_[x][y] = obf.field_[x][y];
-            } else if (field_[x][y] != obf.field_[x][y]) {
-                VLOG(1) << "These field cannot be merged: "
-                        << toDebugString() << '\n'
-                        << obf.toDebugString();
-                return false;
-            }
-            scoreField_[x][y] = std::max(scoreField_[x][y], obf.scoreField_[x][y]);
-        }
-    }
-
-    varCount_ = calculateVarCount();
-    return true;
-}
-
-OpeningBookField OpeningBookField::mirror() const
-{
-    OpeningBookField obf(*this);
-    for (int x = 1; x <= 3; ++x) {
-        for (int y = 1; y <= 12; ++y) {
-            swap(obf.field_[x][y], obf.field_[7 - x][y]);
-            swap(obf.scoreField_[x][y], obf.scoreField_[7 - x][y]);
-        }
-    }
-
-    return obf;
+    return patternField_.merge(obf.patternField_);
 }
 
 OpeningBookField::MatchResult OpeningBookField::match(const PlainField& f) const
@@ -181,8 +103,8 @@ OpeningBookField::MatchResult OpeningBookField::match(const PlainField& f) const
     PuyoColorEnv env;
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; f.get(x, y) != PuyoColor::EMPTY; ++y) {
-            char c = field_[x][y];
-            if (c == '.' || c == '*')
+            char c = patternField_.variable(x, y);
+            if (c == '.' || c == ' '|| c == '*')
                 continue;
 
             if ('a' <= c && c <= 'z')
@@ -198,7 +120,7 @@ OpeningBookField::MatchResult OpeningBookField::match(const PlainField& f) const
                 return MatchResult(false, 0, 0, 0);
 
             matchCount += 1;
-            matchScore += scoreField_[x][y];
+            matchScore += patternField_.score(x, y);
 
             if (!env.isSet(c)) {
                 env.set(c, pc);
@@ -212,26 +134,28 @@ OpeningBookField::MatchResult OpeningBookField::match(const PlainField& f) const
 
     // Check the neighbors.
     for (int x = 1; x <= 6; ++x) {
-        for (int y = 1; y <= 12 && field_[x][y] != '.'; ++y) {
-            if (field_[x][y] == '*')
+        int h = patternField_.height(x);
+        for (int y = 1; y <= h; ++y) {
+            char c = patternField_.variable(x, y);
+            if (c == '*' || c == ' ' || c == '.')
                 continue;
 
-            if ('a' <= field_[x][y] && field_[x][y] <= 'z') {
-                char c = std::toupper(field_[x][y]);
-                if (env.isSet(c) && env.map(c) == f.get(x, y)) {
+            if ('a' <= c && c <= 'z') {
+                char uv = std::toupper(patternField_.variable(x, y));
+                if (env.isSet(uv) && env.map(uv) == f.get(x, y)) {
                     ++matchAllowedCount;
                 }
                 continue;
             }
 
             // Check neighbors.
-            if (!checkCell(field_[x][y], field_[x][y + 1], f.get(x, y + 1), env))
+            if (!checkCell(c, patternField_.variable(x, y + 1), f.get(x, y + 1), env))
                 return MatchResult(false, 0, 0, 0);
-            if (!checkCell(field_[x][y], field_[x][y - 1], f.get(x, y - 1), env))
+            if (!checkCell(c, patternField_.variable(x, y - 1), f.get(x, y - 1), env))
                 return MatchResult(false, 0, 0, 0);
-            if (!checkCell(field_[x][y], field_[x + 1][y], f.get(x + 1, y), env))
+            if (!checkCell(c, patternField_.variable(x + 1, y), f.get(x + 1, y), env))
                 return MatchResult(false, 0, 0, 0);
-            if (!checkCell(field_[x][y], field_[x - 1][y], f.get(x - 1, y), env))
+            if (!checkCell(c, patternField_.variable(x - 1, y), f.get(x - 1, y), env))
                 return MatchResult(false, 0, 0, 0);
         }
     }
@@ -241,28 +165,7 @@ OpeningBookField::MatchResult OpeningBookField::match(const PlainField& f) const
 
 string OpeningBookField::toDebugString() const
 {
-    stringstream ss;
-    for (int y = 12; y >= 1; --y) {
-        for (int x = 1; x <= 6; ++x) {
-            ss << field_[x][y];
-        }
-        ss << endl;
-    }
-    return ss.str();
-}
-
-int OpeningBookField::calculateVarCount() const
-{
-    int count = 0;
-    for (int x = 1; x <= WIDTH; ++x) {
-        for (int y = 1; y <= HEIGHT; ++y) {
-            if ('A' <= field_[x][y] && field_[x][y] <= 'Z') {
-                ++count;
-            }
-        }
-    }
-
-    return count;
+    return patternField_.toDebugString();
 }
 
 string OpeningBook::toString() const

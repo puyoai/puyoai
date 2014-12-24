@@ -7,6 +7,8 @@
 
 #include "base/noncopyable.h"
 #include "core/field_constant.h"
+#include "core/algorithm/pattern_field.h"
+
 class PlainField;
 
 class OpeningBookField : FieldConstant {
@@ -27,29 +29,20 @@ public:
     };
 
     OpeningBookField(const std::string& name, const std::vector<std::string>& field, double defaultScore = 1);
+    OpeningBookField(const std::string& name, const PatternField&);
 
     // match returns the matched score. If not matched, 0 will be returned.
     MatchResult match(const PlainField&) const;
 
     bool merge(const OpeningBookField&);
-    OpeningBookField mirror() const;
+    OpeningBookField mirror() const { return OpeningBookField(name(), patternField_.mirror()); }
 
     std::string name() const { return name_; }
-    double defaultScore() const { return defaultScore_; }
-    double score(int x, int y) const { return scoreField_[x][y]; }
-
-    int varCount() const { return varCount_; }
-
     std::string toDebugString() const;
 
 private:
-    int calculateVarCount() const;
-
     std::string name_;
-    double defaultScore_;
-    int varCount_;
-    char field_[MAP_WIDTH][MAP_HEIGHT];
-    double scoreField_[MAP_WIDTH][MAP_HEIGHT];
+    PatternField patternField_;
 };
 
 class OpeningBook : noncopyable {
@@ -61,7 +54,6 @@ public:
     size_t size() const { return fields_.size(); }
     const std::vector<OpeningBookField>& fields() const { return fields_; }
     const OpeningBookField& field(int ith) const { return fields_[ith]; }
-
 
 private:
     std::vector<OpeningBookField> fields_;
