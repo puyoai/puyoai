@@ -14,6 +14,11 @@
 
 using namespace std;
 
+OpeningBookField::OpeningBookField(const string& name) :
+    name_(name)
+{
+}
+
 OpeningBookField::OpeningBookField(const string& name, const vector<string>& field, double defaultScore) :
     name_(name),
     patternField_(field, defaultScore)
@@ -24,11 +29,6 @@ OpeningBookField::OpeningBookField(const string& name, const PatternField& patte
     name_(name),
     patternField_(patternField)
 {
-}
-
-bool OpeningBookField::merge(const OpeningBookField& obf)
-{
-    return patternField_.merge(obf.patternField_);
 }
 
 PatternMatchResult OpeningBookField::match(const CoreField& cf) const
@@ -65,8 +65,8 @@ static void merge(vector<OpeningBookField>* result,
 
     auto range = partialFields.equal_range(names[pos]);
     for (auto it = range.first; it != range.second; ++it) {
-        OpeningBookField field(current);
-        if (!field.merge(it->second))
+        OpeningBookField field(current.name());
+        if (PatternField::merge(current.patternField(), it->second.patternField(), field.mutablePatternField()))
             continue;
         merge(result, field, partialFields, names, pos + 1);
     }

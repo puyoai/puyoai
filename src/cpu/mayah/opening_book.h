@@ -12,16 +12,18 @@
 
 class OpeningBookField : FieldConstant {
 public:
+    OpeningBookField(const std::string& name);
     OpeningBookField(const std::string& name, const std::vector<std::string>& field, double defaultScore = 1);
     OpeningBookField(const std::string& name, const PatternField&);
 
     // match returns the matched score. If not matched, 0 will be returned.
     PatternMatchResult match(const CoreField&) const;
 
-    bool merge(const OpeningBookField&);
     OpeningBookField mirror() const { return OpeningBookField(name(), patternField_.mirror()); }
 
     std::string name() const { return name_; }
+    const PatternField& patternField() const { return patternField_; }
+    PatternField* mutablePatternField() { return &patternField_; }
     std::string toDebugString() const;
 
 private:

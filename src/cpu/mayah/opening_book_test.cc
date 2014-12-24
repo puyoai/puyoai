@@ -8,24 +8,20 @@ using namespace std;
 
 TEST(OpeningBookFieldTest, merge)
 {
-    OpeningBookField obf("test",
-                         vector<string> {
-                             "BX....",
-                             "XX....",
-                             "BAD.C.",
-                             "BBADDD",
-                             "AACCCE",
-                         }, 1);
+    PatternField pf1(
+        "BX...."
+        "XX...."
+        "BAD.C."
+        "BBADDD"
+        "AACCCE", 1);
+    PatternField pf2(
+        "....E."
+        "BADECE"
+        "BBADDD"
+        "AACCCE", 2);
 
-    OpeningBookField obf2("test2",
-                          vector<string> {
-                              "....E.",
-                              "BADECE",
-                              "BBADDD",
-                              "AACCCE",
-                          }, 2);
-
-    ASSERT_TRUE(obf.merge(obf2));
+    PatternField pf;
+    ASSERT_TRUE(PatternField::merge(pf1, pf2, &pf));
 
     CoreField f0;
     CoreField f1(
@@ -39,6 +35,7 @@ TEST(OpeningBookFieldTest, merge)
         "BBYBBB"
         "YYRRRG");
 
+    OpeningBookField obf("test", pf);
     EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), obf.match(f0));
     EXPECT_EQ(PatternMatchResult(true, 38, 19, 0), obf.match(f1));
     EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), obf.match(f2));
