@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_core_algorithm
             bijection_matcher.cc
-            column_puyo_list.cc pattern_field.cc plan.cc rensa_detector.cc
+            column_puyo_list.cc pattern_field.cc pattern_matcher.cc plan.cc rensa_detector.cc
             rensa_ref_sequence.cc
             puyo_set.cc puyo_possibility.cc)
 
@@ -22,6 +22,7 @@ function(puyoai_core_algorithm_add_test target)
 endfunction()
 
 puyoai_core_algorithm_add_test(pattern_field)
+puyoai_core_algorithm_add_test(pattern_matcher)
 puyoai_core_algorithm_add_test(plan)
 puyoai_core_algorithm_add_test(puyo_set)
 puyoai_core_algorithm_add_test(puyo_possibility)
