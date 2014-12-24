@@ -2,42 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include "core/plain_field.h"
+#include "core/core_field.h"
 
 using namespace std;
-
-TEST(OpeningBookFieldTest, varCount)
-{
-    OpeningBookField obf1("test",
-                          vector<string> {
-                              "AAA...",
-                          });
-    OpeningBookField obf2("test",
-                          vector<string> {
-                              "..ABBB",
-                          });
-    OpeningBookField obf3("test",
-                          vector<string> {
-                              ".*ABBB",
-                          });
-
-    EXPECT_EQ(3, obf1.varCount());
-    EXPECT_EQ(4, obf2.varCount());
-
-    // We don't count *
-    EXPECT_EQ(4, obf3.varCount());
-
-    {
-        OpeningBookField f(obf1);
-        f.merge(obf2);
-        EXPECT_EQ(6, f.varCount());
-    }
-    {
-        OpeningBookField f(obf1);
-        f.merge(obf3);
-        EXPECT_EQ(6, f.varCount());
-    }
-}
 
 TEST(OpeningBookFieldTest, match1)
 {
@@ -46,15 +13,15 @@ TEST(OpeningBookFieldTest, match1)
                              "AAA...",
                          });
 
-    PlainField pf0;
-    PlainField pf1("RRR   ");
-    PlainField pf2("R     ");
-    PlainField pf3("R R   ");
+    CoreField f0;
+    CoreField f1("RRR   ");
+    CoreField f2("R     ");
+    CoreField f3("R R   ");
 
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 0, 0, 0), obf.match(pf0));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 3, 3, 0), obf.match(pf1));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 1, 1, 0), obf.match(pf2));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 2, 2, 0), obf.match(pf3));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 0, 0, 0), obf.match(f0));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 3, 3, 0), obf.match(f1));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 1, 1, 0), obf.match(f2));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 2, 2, 0), obf.match(f3));
 }
 
 TEST(OpeningBookFieldTest, match2)
@@ -66,21 +33,21 @@ TEST(OpeningBookFieldTest, match2)
                              "AACCCX",
                          });
 
-    PlainField pf0;
+    CoreField f0;
 
-    PlainField pf1(
+    CoreField f1(
         "BYGBRB"
         "BBYGGG"
         "YYRRRB");
 
-    PlainField pf2(
+    CoreField f2(
         "BYB R "
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 0, 0, 0), obf.match(pf0));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 16, 16, 0), obf.match(pf1));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 16, 16, 0), obf.match(pf2));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 0, 0, 0), obf.match(f0));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 16, 16, 0), obf.match(f1));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 16, 16, 0), obf.match(f2));
 }
 
 TEST(OpeningBookFieldTest, match3)
@@ -95,11 +62,11 @@ TEST(OpeningBookFieldTest, match3)
                              "AACCXY",
                          });
 
-    PlainField pf(
+    CoreField f(
         "R..B.B"
         "YYBB.B");
 
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 8, 8, 0), obf.match(pf));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 8, 8, 0), obf.match(f));
 }
 
 TEST(OpeningBookFieldTest, matchWithStar)
@@ -110,25 +77,25 @@ TEST(OpeningBookFieldTest, matchWithStar)
                              ".AABBB"
                          });
 
-    PlainField pf0;
+    CoreField f0;
 
-    PlainField pf1(
+    CoreField f1(
         ".YYYGG"
         ".RRBBB");
 
-    PlainField pf2(
+    CoreField f2(
         ".B...."
         ".BBYYY"
         ".RRBBB");
 
-    PlainField pf3(
+    CoreField f3(
         ".GGGYY"
         ".RRBBB");
 
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 0, 0, 0), obf.match(pf0));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 7, 7, 0), obf.match(pf1));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 7, 7, 0), obf.match(pf2));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 7, 7, 0), obf.match(pf3));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 0, 0, 0), obf.match(f0));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 7, 7, 0), obf.match(f1));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 7, 7, 0), obf.match(f2));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 7, 7, 0), obf.match(f3));
 }
 
 TEST(OpeningBookFieldTest, matchWithAllowing)
@@ -139,30 +106,30 @@ TEST(OpeningBookFieldTest, matchWithAllowing)
                              "AAaBB."
                          });
 
-    PlainField pf0;
+    CoreField f0;
 
-    PlainField pf1(
+    CoreField f1(
         "RRBBB.");
 
-    PlainField pf2(
+    CoreField f2(
         "RRRBB.");
 
-    PlainField pf3(
+    CoreField f3(
         "R.RBB.");
 
-    PlainField pf4(
+    CoreField f4(
         "..R..."
         "RRYRR.");
 
-    PlainField pf5(
+    CoreField f5(
         "RRRRR.");
 
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 0, 0, 0), obf.match(pf0));
-    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(pf1));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 4, 4, 1), obf.match(pf2));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 3, 3, 1), obf.match(pf3));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 5, 5, 0), obf.match(pf4));
-    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(pf5));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 0, 0, 0), obf.match(f0));
+    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(f1));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 4, 4, 1), obf.match(f2));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 3, 3, 1), obf.match(f3));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 5, 5, 0), obf.match(f4));
+    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(f5));
 }
 
 TEST(OpeningBookFieldTest, unmatch1)
@@ -174,32 +141,32 @@ TEST(OpeningBookFieldTest, unmatch1)
                              "AACCCX",
                          });
 
-    PlainField pf1(
+    CoreField f1(
         "B     "
         "BYGBRB"
         "BBYGGG"
         "YYRRRB");
 
-    PlainField pf2(
+    CoreField f2(
         "    R "
         "BYB R "
         "BBYBBB"
         "YYRRRG");
 
-    PlainField pf3(
+    CoreField f3(
         "BYO R "
         "BBYOOO"
         "YYRRRY");
 
-    PlainField pf4(
+    CoreField f4(
         "BRB R "
         "BBRBBB"
         "RRRRRY");
 
-    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(pf1));
-    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(pf2));
-    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(pf3));
-    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(pf4));
+    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(f1));
+    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(f2));
+    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(f3));
+    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(f4));
 }
 
 TEST(OpeningBookFieldTest, unmatch2)
@@ -209,9 +176,9 @@ TEST(OpeningBookFieldTest, unmatch2)
                              "..AAA.",
                          });
 
-    PlainField pf1(" B B  ");
+    CoreField f1(" B B  ");
 
-    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(pf1));
+    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(f1));
 }
 
 TEST(OpeningBookFieldTest, unmatch3)
@@ -221,9 +188,9 @@ TEST(OpeningBookFieldTest, unmatch3)
                              "AAABBB",
                          });
 
-    PlainField pf("Y    Y");
+    CoreField f("Y    Y");
 
-    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(pf));
+    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(f));
 }
 
 TEST(OpeningBookFieldTest, merge)
@@ -245,30 +212,21 @@ TEST(OpeningBookFieldTest, merge)
                               "AACCCE",
                           }, 2);
 
-    obf.merge(obf2);
+    ASSERT_TRUE(obf.merge(obf2));
 
-    EXPECT_EQ(0, obf.score(6, 6));
-    EXPECT_EQ(1, obf.score(1, 4));
-    EXPECT_EQ(1, obf.score(1, 5));
-    EXPECT_EQ(2, obf.score(1, 1));
-    EXPECT_EQ(2, obf.score(6, 1));
-
-    PlainField pf0;
-
-    PlainField pf1(
+    CoreField f0;
+    CoreField f1(
         "    B "
         "BYGBRB"
         "BBYGGG"
         "YYRRRB");
-
-    PlainField pf2(
+    CoreField f2(
         "    GG"
         "BYBGRG"
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 0, 0, 0), obf.match(pf0));
-    EXPECT_EQ(OpeningBookField::MatchResult(true, 38, 19, 0), obf.match(pf1));
-
-    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(pf2));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 0, 0, 0), obf.match(f0));
+    EXPECT_EQ(OpeningBookField::MatchResult(true, 38, 19, 0), obf.match(f1));
+    EXPECT_EQ(OpeningBookField::MatchResult(false, 0, 0, 0), obf.match(f2));
 }

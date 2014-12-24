@@ -61,3 +61,25 @@ TEST(PatternFieldTest, constructor2)
     EXPECT_EQ('C', pf.variable(6, 1));
     EXPECT_EQ(' ', pf.variable(1, 2));
 }
+
+TEST(PatternFieldTest, varCount)
+{
+    PatternField pf1("AAA...");
+    PatternField pf2("..AAAB");
+    PatternField pf3(".*ABBB");
+
+    EXPECT_EQ(3, pf1.numVariables());
+    EXPECT_EQ(4, pf2.numVariables());
+    EXPECT_EQ(4, pf3.numVariables()); // We don't count *
+
+    {
+        PatternField f(pf1);
+        ASSERT_TRUE(f.merge(pf2));
+        EXPECT_EQ(6, f.numVariables());
+    }
+    {
+        PatternField f(pf1);
+        ASSERT_TRUE(f.merge(pf3));
+        EXPECT_EQ(6, f.numVariables());
+    }
+}
