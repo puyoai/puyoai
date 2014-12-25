@@ -5,9 +5,9 @@
 TEST(PatternBookField, complement1)
 {
     PatternBookField pbf(
-        ".*23.."
-        "1112.."
-        "222333");
+        "..BC.."
+        "AAAB.."
+        "BBBCCC");
 
     CoreField cf(
         "......"
@@ -15,7 +15,7 @@ TEST(PatternBookField, complement1)
         "BBBG..");
 
     CoreField expected(
-        ".YBG.."
+        "..BG.."
         "YYYB.."
         "BBBGGG");
 
@@ -24,17 +24,17 @@ TEST(PatternBookField, complement1)
     for (const auto& cp : cpl) {
         cf.dropPuyoOn(cp.x, cp.color);
     }
-    EXPECT_EQ(expected, cf);
+    EXPECT_EQ(expected, cf) << cf.toDebugString();
 }
 
 TEST(PatternBookField, complement2)
 {
     PatternBookField pbf(
-        "2....."
-        "111..."
-        "23...."
-        "223..."
-        "33....");
+        "B....."
+        "AAA..."
+        "BC...."
+        "BBC..."
+        "CC....");
 
     CoreField cf(
         "YB...."

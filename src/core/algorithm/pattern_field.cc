@@ -56,53 +56,71 @@ PatternField::PatternField(const vector<string>& field, double defaultScore) :
 // static
 bool PatternField::merge(const PatternField& pf1, const PatternField& pf2, PatternField* pf)
 {
-/*
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-
-            PatternType pt1 = type(x, y);
-            PatternType pt2 = pf.type(x, y);
-
-            if (pt2 == PatternType::NONE)
-                continue;
+            PatternType pt1 = pf1.type(x, y);
+            PatternType pt2 = pf2.type(x, y);
             if (pt1 == PatternType::NONE) {
-                set(x, y, pf.type(x, y), pf.variable(x, y), pf.score(x, y));
+                pf->setPattern(x, y, pf2.type(x, y), pf2.variable(x, y), pf2.score(x, y));
+                continue;
+            } else if (pt2 == PatternType::NONE) {
+                pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), pf1.score(x, y));
                 continue;
             }
 
-            if (pt1 != PatternType::ANY && pt2 == PatternType::ANY)
+            if (pt1 == PatternType::ANY) {
+                if (pt2 == PatternType::MUST_EMPTY)
+                    return false;
+                pf->setPattern(x, y, pf2.type(x, y), pf2.variable(x, y), pf2.score(x, y));
                 continue;
-            if (pt1 == PatternType::ANY && pt2 != PatternType::ANY) {
-                set(x, y, pf.type(x, y), pf.variable(x, y), pf.score(x, y));
+            }
+            if (pt2 == PatternType::ANY) {
+                if (pt1 == PatternType::MUST_EMPTY)
+                    return false;
+                pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), pf1.score(x, y));
                 continue;
             }
 
-            if (('A' <= variable(x, y) && variable(x, y) <= 'Z') &&
-                ('a' <= pf.variable(x, y) && pf.variable(x, y) <= 'z')) {
+            if (pt1 == PatternType::MUST_EMPTY) {
+                if (pt2 != PatternType::MUST_EMPTY)
+                    return false;
+                pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), pf1.score(x, y));
                 continue;
-            } else if (('a' <= variable(x, y) && variable(x, y) <= 'z') &&
-                       ('A' <= pf.variable(x, y) && pf.variable(x, y) <= 'Z')) {
-                setVariable(x, y, pf.variable(x, y));
-                setScore(x, y, pf.score(x, y));
-                heights_[x] = std::max(height(x), y);
+            }
+            if (pt2 == PatternType::MUST_EMPTY) {
+                if (pt1 != PatternType::MUST_EMPTY)
+                    return false;
+                pf->setPattern(x, y, pf2.type(x, y), pf2.variable(x, y), pf2.score(x, y));
                 continue;
             }
 
-            setScore(x, y, std::max(score(x, y), pf.score(x, y)));
-
-            if (variable(x, y) != pf.variable(x, y)) {
-                VLOG(1) << "These field cannot be merged: "
-                        << toDebugString() << '\n'
-                        << pf.toDebugString();
+            if (pt1 == PatternType::MUST_VAR && pt2 == PatternType::MUST_VAR) {
+                if (pf1.variable(x, y) != pf2.variable(x, y))
+                    return false;
+                pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), std::max(pf1.score(x, y), pf2.score(x, y)));
+                continue;
+            }
+            if (pt1 == PatternType::MUST_VAR) {
+                if (pt2 == PatternType::ALLOW_VAR || pt2 == PatternType::NOT_VAR) {
+                    pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), pf1.score(x, y));
+                    continue;
+                }
                 return false;
             }
+            if (pt2 == PatternType::MUST_VAR) {
+                if (pt1 == PatternType::ALLOW_VAR || pt1 == PatternType::NOT_VAR) {
+                    pf->setPattern(x, y, pf2.type(x, y), pf2.variable(x, y), pf2.score(x, y));
+                    continue;
+                }
+                return false;
+            }
+
+            return false;
         }
     }
 
-    numVariables_ = countVariables();
+    pf->numVariables_ = pf->countVariables();
     return true;
-*/
-    return false;
 }
 
 void PatternField::setPattern(int x, int y, PatternType t, char variable, double score)

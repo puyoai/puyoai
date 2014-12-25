@@ -85,4 +85,3 @@ TEST(PatternFieldTest, varCount)
         EXPECT_EQ(6, f.numVariables());
     }
 }
-

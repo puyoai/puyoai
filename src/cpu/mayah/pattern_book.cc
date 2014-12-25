@@ -7,30 +7,29 @@ using namespace std;
 
 bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl)
 {
-    PuyoColor cs[10] {
-        PuyoColor::EMPTY, PuyoColor::EMPTY, PuyoColor::EMPTY, PuyoColor::EMPTY, PuyoColor::EMPTY,
-        PuyoColor::EMPTY, PuyoColor::EMPTY, PuyoColor::EMPTY, PuyoColor::EMPTY, PuyoColor::EMPTY,
-    };
+    PuyoColor cs[26];
+    for (int i = 0; i < 26; ++i)
+        cs[i] = PuyoColor::EMPTY;
 
     int maxIndex = 0;
     for (int x = 1; x <= 6; ++x) {
         int h = patternField_.height(x);
         for (int y = 1; y <= h; ++y) {
-            char c = patternField_.variable(x, y);
-            if (c == ' ') {
+            PatternType pt = patternField_.type(x, y);
+            if (pt == PatternType::NONE) {
                 if (field.color(x, y) == PuyoColor::EMPTY)
                     return false;
                 continue;
             }
-            if (c == '*') {
+            if (pt == PatternType::ANY) {
                 if (field.color(x, y) != PuyoColor::EMPTY)
                     return false;
                 continue;
             }
 
-            if (c < '1' || '9' < c)
+            if (pt != PatternType::MUST_VAR)
                 continue;
-            int i = c - '0';
+            int i = patternField_.variable(x, y) - 'A';
             maxIndex = std::max(i, maxIndex);
             if (cs[i] == PuyoColor::EMPTY) {
                 if (field.color(x, y) == PuyoColor::OJAMA)
@@ -54,13 +53,13 @@ bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl)
     for (int x = 1; x <= 6; ++x) {
         int h = patternField_.height(x);
         for (int y = 1; y <= h; ++y) {
-            if (patternField_.variable(x, y) == ' ')
+            if (patternField_.type(x, y) == PatternType::NONE)
                 continue;
             if (field.color(x, y) != PuyoColor::EMPTY)
                 continue;
             if (ColumnPuyoList::MAX_SIZE <= cpl->size())
                 return false;
-            int i = patternField_.variable(x, y) == '*' ? 1 : patternField_.variable(x, y) - '0';
+            int i = patternField_.variable(x, y) == '*' ? 1 : patternField_.variable(x, y) - 'A';
             cpl->addPuyo(x, cs[i]);
         }
     }

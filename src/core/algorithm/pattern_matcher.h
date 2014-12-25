@@ -2,6 +2,7 @@
 #define CORE_ALGORITHM_PATTERN_MATCHER_H_
 
 #include "core/puyo_color.h"
+#include "core/algorithm/pattern_field.h"
 
 class CoreField;
 class PatternField;
@@ -46,7 +47,7 @@ private:
         return map_[var - 'A'] = pc;
     }
 
-    bool checkCell(char currentVar, char neighborVar, PuyoColor neighborColor);
+    bool checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor);
 
     PuyoColor map_[26];
 };
