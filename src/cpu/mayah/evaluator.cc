@@ -434,38 +434,21 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RefPlan& plan,
 {
     sc_->addScore(MAX_CHAINS, rensaResult.chains, 1);
 
-    PuyoSet keyPuyoSet(keyPuyos);
-    PuyoSet firePuyoSet(firePuyos);
     PuyoSet totalPuyoSet;
     totalPuyoSet.add(keyPuyos);
     totalPuyoSet.add(firePuyos);
-
-    int keyNecessaryPuyos = TsumoPossibility::necessaryPuyos(keyPuyoSet, 0.5);
-    int fireNecessaryPuyos = TsumoPossibility::necessaryPuyos(firePuyoSet, 0.5);
     int totalNecessaryPuyos = TsumoPossibility::necessaryPuyos(totalPuyoSet, 0.5);
 
     int count = plan.field().countPuyos();
     if (count <= EARLY_THRESHOLD) {
-        sc_->addScore(KEY_NECESSARY_PUYOS_EARLY_LINEAR, keyNecessaryPuyos);
-        sc_->addScore(KEY_NECESSARY_PUYOS_EARLY_SQUARE, keyNecessaryPuyos * keyNecessaryPuyos);
-        sc_->addScore(FIRE_NECESSARY_PUYOS_EARLY_LINEAR, fireNecessaryPuyos);
-        sc_->addScore(FIRE_NECESSARY_PUYOS_EARLY_SQUARE, fireNecessaryPuyos * fireNecessaryPuyos);
-        sc_->addScore(TOTAL_NECESSARY_PUYOS_EARLY_LINEAR, totalNecessaryPuyos);
-        sc_->addScore(TOTAL_NECESSARY_PUYOS_EARLY_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
+        sc_->addScore(NECESSARY_PUYOS_EARLY_LINEAR, totalNecessaryPuyos);
+        sc_->addScore(NECESSARY_PUYOS_EARLY_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
     } else if (count <= MIDDLE_THRESHOLD) {
-        sc_->addScore(KEY_NECESSARY_PUYOS_MIDDLE_LINEAR, keyNecessaryPuyos);
-        sc_->addScore(KEY_NECESSARY_PUYOS_MIDDLE_SQUARE, keyNecessaryPuyos * keyNecessaryPuyos);
-        sc_->addScore(FIRE_NECESSARY_PUYOS_MIDDLE_LINEAR, fireNecessaryPuyos);
-        sc_->addScore(FIRE_NECESSARY_PUYOS_MIDDLE_SQUARE, fireNecessaryPuyos * fireNecessaryPuyos);
-        sc_->addScore(TOTAL_NECESSARY_PUYOS_MIDDLE_LINEAR, totalNecessaryPuyos);
-        sc_->addScore(TOTAL_NECESSARY_PUYOS_MIDDLE_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
+        sc_->addScore(NECESSARY_PUYOS_MIDDLE_LINEAR, totalNecessaryPuyos);
+        sc_->addScore(NECESSARY_PUYOS_MIDDLE_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
     } else {
-        sc_->addScore(KEY_NECESSARY_PUYOS_LATE_LINEAR, keyNecessaryPuyos);
-        sc_->addScore(KEY_NECESSARY_PUYOS_LATE_SQUARE, keyNecessaryPuyos * keyNecessaryPuyos);
-        sc_->addScore(FIRE_NECESSARY_PUYOS_LATE_LINEAR, fireNecessaryPuyos);
-        sc_->addScore(FIRE_NECESSARY_PUYOS_LATE_SQUARE, fireNecessaryPuyos * fireNecessaryPuyos);
-        sc_->addScore(TOTAL_NECESSARY_PUYOS_LATE_LINEAR, totalNecessaryPuyos);
-        sc_->addScore(TOTAL_NECESSARY_PUYOS_LATE_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
+        sc_->addScore(NECESSARY_PUYOS_LATE_LINEAR, totalNecessaryPuyos);
+        sc_->addScore(NECESSARY_PUYOS_LATE_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
     }
 }
 
