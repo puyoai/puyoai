@@ -171,7 +171,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                 return;
         }
 
-        // Do eval after one drop.
+        // --- Do eval after one drop when the plan is RensaPlan.
         if (rp1.isRensaPlan()) {
             if (executor_) {
                 wg.add(1);
@@ -185,7 +185,8 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
             }
         }
 
-        MidEvalResult midEvalResult = MidEvaluator(openingBook_).eval(rp1, field);
+        // --- Proceed the evaluation for the rest hands.
+        MidEvalResult midEvalResult = midEval(rp1, field);
 
         Plan p = rp1.toPlan();
         KumipuyoSeq seq(kumipuyoSeq);
@@ -239,6 +240,12 @@ PreEvalResult MayahAI::preEval(const CoreField& currentField)
 {
     PreEvaluator preEvaluator(openingBook_);
     return preEvaluator.preEval(currentField);
+}
+
+MidEvalResult MayahAI::midEval(const RefPlan& refPlan, const CoreField& currentField)
+{
+    MidEvaluator midEvaluator(openingBook_);
+    return midEvaluator.eval(refPlan, currentField);
 }
 
 EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
