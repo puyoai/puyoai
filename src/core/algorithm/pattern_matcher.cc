@@ -21,7 +21,12 @@ PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField
         int h = cf.height(x);
         for (int y = 1; y <= h; ++y) {
             char c = pf.variable(x, y);
-            if (c < 'A' || 'Z' < c)
+            if (pf.type(x, y) == PatternType::MUST_EMPTY) {
+                if (cf.color(x, y) != PuyoColor::EMPTY)
+                    return PatternMatchResult(false, 0, 0, 0);
+                continue;
+            }
+            if (pf.type(x, y) != PatternType::MUST_VAR)
                 continue;
 
             PuyoColor pc = cf.color(x, y);
@@ -49,10 +54,10 @@ PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField
         int h = pf.height(x);
         for (int y = 1; y <= h; ++y) {
             char c = pf.variable(x, y);
-            if (c == '*' || c == ' ' || c == '.')
+            if (pf.type(x, y) == PatternType::NONE || pf.type(x, y) == PatternType::ANY)
                 continue;
 
-            if ('a' <= c && c <= 'z') {
+            if (pf.type(x, y) == PatternType::ALLOW_VAR) {
                 char uv = std::toupper(pf.variable(x, y));
                 if (isSet(uv) && map(uv) == cf.color(x, y)) {
                     ++matchAllowedCount;
@@ -61,13 +66,13 @@ PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField
             }
 
             // Check neighbors.
-            if (!checkCell(c, pf.variable(x, y + 1), cf.color(x, y + 1)))
+            if (!checkCell(c, pf.type(x, y + 1), pf.variable(x, y + 1), cf.color(x, y + 1)))
                 return PatternMatchResult(false, 0, 0, 0);
-            if (!checkCell(c, pf.variable(x, y - 1), cf.color(x, y - 1)))
+            if (!checkCell(c, pf.type(x, y - 1), pf.variable(x, y - 1), cf.color(x, y - 1)))
                 return PatternMatchResult(false, 0, 0, 0);
-            if (!checkCell(c, pf.variable(x + 1, y), cf.color(x + 1, y)))
+            if (!checkCell(c, pf.type(x + 1, y), pf.variable(x + 1, y), cf.color(x + 1, y)))
                 return PatternMatchResult(false, 0, 0, 0);
-            if (!checkCell(c, pf.variable(x - 1, y), cf.color(x - 1, y)))
+            if (!checkCell(c, pf.type(x - 1, y), pf.variable(x - 1, y), cf.color(x - 1, y)))
                 return PatternMatchResult(false, 0, 0, 0);
         }
     }
@@ -76,12 +81,12 @@ PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField
 }
 
 inline
-bool PatternMatcher::checkCell(char currentVar, char neighborVar, PuyoColor neighborColor)
+bool PatternMatcher::checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor)
 {
     DCHECK('A' <= currentVar && currentVar <= 'Z') << currentVar;
 
     // If neighbor is '*', we don't care what color the cell has.
-    if (neighborVar == '*')
+    if (neighborType == PatternType::ANY)
         return true;
 
     if (neighborColor == PuyoColor::OJAMA || neighborColor == PuyoColor::WALL)
@@ -91,11 +96,12 @@ bool PatternMatcher::checkCell(char currentVar, char neighborVar, PuyoColor neig
     if (currentVar == neighborVar)
         return true;
 
-    if (neighborVar == '.' || neighborVar == ' ') {
+    if (neighborType == PatternType::NONE) {
         if (map(currentVar) == neighborColor)
             return false;
-    } else if ('a' <= neighborVar && neighborVar <= 'z') {
-        if (currentVar != std::toupper(neighborVar) && map(currentVar) == neighborColor)
+    } else if (neighborType == PatternType::ALLOW_VAR) {
+        DCHECK('A' <= neighborVar && neighborVar <= 'Z');
+        if (currentVar != neighborVar && map(currentVar) == neighborColor)
             return false;
     } else {
         if (map(currentVar) == map(neighborVar) && isSet(currentVar))
