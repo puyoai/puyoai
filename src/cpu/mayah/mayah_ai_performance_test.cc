@@ -185,6 +185,20 @@ TEST(MayahAIPerformanceTest, slow_pattern_from_real_2)
     runTest(3, 2, f, seq);
 }
 
+TEST(MayahAIPerformanceTest, slow_pattern_from_real_3)
+{
+    CoreField f(
+        "  G   "
+        " BG   "
+        "RGRY  "
+        "RGYG  "
+        "BBBYG "
+        "YYYRRR");
+    KumipuyoSeq seq("BYBGYB");
+
+    runTest(3, 2, f, seq);
+}
+
 int main(int argc, char* argv[])
 {
     google::InitGoogleLogging(argv[0]);
