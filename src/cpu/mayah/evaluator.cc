@@ -703,6 +703,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
             ColumnPuyoList cpl;
             if (!pbf.complement(plan.field(), &cpl))
                 continue;
+            if (cpl.isEmpty())
+                continue;
 
             CoreField complementedField(plan.field());
             for (const auto& cp : cpl)
