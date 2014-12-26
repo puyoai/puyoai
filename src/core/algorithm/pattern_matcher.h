@@ -28,7 +28,6 @@ public:
 
     PatternMatchResult match(const PatternField&, const CoreField&);
 
-private:
     PuyoColor map(char var) const
     {
         DCHECK('A' <= var && var <= 'Z') << var;
@@ -41,6 +40,7 @@ private:
         return map_[var - 'A'] != PuyoColor::WALL;
     }
 
+private:
     PuyoColor set(char var, PuyoColor pc)
     {
         DCHECK('A' <= var && var <= 'Z') << var;

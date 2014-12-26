@@ -19,6 +19,7 @@
 DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.toml", "the path to feature parameter");
 DEFINE_string(opening_book, SRC_DIR "/cpu/mayah/opening.toml", "the path to opening book");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
+DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
 DEFINE_bool(use_advanced_next, false, "Use enemy's NEXT sequence also");
 
 using namespace std;
@@ -32,6 +33,7 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
     evaluationParameter_.reset(new EvaluationParameter(FLAGS_feature));
     CHECK(openingBook_.load(FLAGS_opening_book));
     CHECK(decisionBook_.load(FLAGS_decision_book));
+    CHECK(patternBook_.load(FLAGS_pattern_book));
 
     VLOG(1) << evaluationParameter_->toString();
     VLOG(1) << openingBook_.toString();
@@ -238,13 +240,13 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
 PreEvalResult MayahAI::preEval(const CoreField& currentField)
 {
-    PreEvaluator preEvaluator(openingBook_);
+    PreEvaluator preEvaluator(openingBook_, patternBook_);
     return preEvaluator.preEval(currentField);
 }
 
 MidEvalResult MayahAI::midEval(const RefPlan& refPlan, const CoreField& currentField)
 {
-    MidEvaluator midEvaluator(openingBook_);
+    MidEvaluator midEvaluator(openingBook_, patternBook_);
     return midEvaluator.eval(refPlan, currentField);
 }
 
@@ -256,7 +258,7 @@ EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
                          const GazeResult& gazeResult) const
 {
     NormalScoreCollector sc(*evaluationParameter_);
-    Evaluator<NormalScoreCollector> evaluator(openingBook_, &sc);
+    Evaluator<NormalScoreCollector> evaluator(openingBook_, patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     return EvalResult(sc.score(), sc.estimatedRensaScore());
@@ -271,7 +273,7 @@ CollectedFeature MayahAI::evalWithCollectingFeature(const RefPlan& plan, const C
                                                     const GazeResult& gazeResult) const
 {
     FeatureScoreCollector sc(*evaluationParameter_);
-    Evaluator<FeatureScoreCollector> evaluator(openingBook_, &sc);
+    Evaluator<FeatureScoreCollector> evaluator(openingBook_, patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
     return sc.toCollectedFeature();
 }

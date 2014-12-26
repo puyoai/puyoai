@@ -3,64 +3,38 @@
 #include <fstream>
 #include <glog/logging.h>
 
+#include "core/algorithm/pattern_matcher.h"
+
 using namespace std;
 
-bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl)
+bool PatternBookField::isMatchable(const CoreField& field) const
 {
-    PuyoColor cs[26];
-    for (int i = 0; i < 26; ++i)
-        cs[i] = PuyoColor::EMPTY;
+    PatternMatcher matcher;
+    return matcher.match(patternField_, field).matched;
+}
 
-    int maxIndex = 0;
-    for (int x = 1; x <= 6; ++x) {
-        int h = patternField_.height(x);
-        for (int y = 1; y <= h; ++y) {
-            PatternType pt = patternField_.type(x, y);
-            if (pt == PatternType::NONE) {
-                if (field.color(x, y) == PuyoColor::EMPTY)
-                    return false;
-                continue;
-            }
-            if (pt == PatternType::ANY) {
-                if (field.color(x, y) != PuyoColor::EMPTY)
-                    return false;
-                continue;
-            }
-
-            if (pt != PatternType::MUST_VAR)
-                continue;
-            int i = patternField_.variable(x, y) - 'A';
-            maxIndex = std::max(i, maxIndex);
-            if (cs[i] == PuyoColor::EMPTY) {
-                if (field.color(x, y) == PuyoColor::OJAMA)
-                    return false;
-                if (isNormalColor(field.color(x, y)))
-                    cs[i] = field.color(x, y);
-            } else {
-                if (cs[i] != field.color(x, y) && field.color(x, y) != PuyoColor::EMPTY)
-                    return false;
-            }
-        }
-    }
-
-    // If some variable is not matched, the template should be considered as unmatchched.
-    for (int i = 1; i <= maxIndex; ++i) {
-        if (cs[i] == PuyoColor::EMPTY)
-            return false;
-    }
+bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl) const
+{
+    PatternMatcher matcher;
+    if (!matcher.match(patternField_, field).matched)
+        return false;
 
     cpl->clear();
     for (int x = 1; x <= 6; ++x) {
         int h = patternField_.height(x);
         for (int y = 1; y <= h; ++y) {
-            if (patternField_.type(x, y) == PatternType::NONE)
+            if (patternField_.type(x, y) != PatternType::MUST_VAR) {
+                if (field.color(x, y) == PuyoColor::EMPTY)
+                    return false;
                 continue;
-            if (field.color(x, y) != PuyoColor::EMPTY)
-                continue;
+            }
+            char c = patternField_.variable(x, y);
+            if (!matcher.isSet(c))
+                return false;
             if (ColumnPuyoList::MAX_SIZE <= cpl->size())
                 return false;
-            int i = patternField_.variable(x, y) == '*' ? 1 : patternField_.variable(x, y) - 'A';
-            cpl->addPuyo(x, cs[i]);
+            if (field.color(x, y) == PuyoColor::EMPTY)
+                cpl->addPuyo(x, matcher.map(c));
         }
     }
 

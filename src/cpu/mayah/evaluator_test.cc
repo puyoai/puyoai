@@ -19,6 +19,7 @@ protected:
 
         EvaluationParameter evaluationParameter;
         OpeningBook openingBook;
+        PatternBook patternBook;
         Gazer gazer;
 
         gazer.initialize(100);
@@ -30,9 +31,9 @@ protected:
 
         RefPlan plan(f, decisions, rensaResult, 0, framesToInitiate, lastDropFrames);
 
-        PreEvalResult preEvalResult = PreEvaluator(openingBook).preEval(f);
+        PreEvalResult preEvalResult = PreEvaluator(openingBook, patternBook).preEval(f);
         FeatureScoreCollector sc(evaluationParameter);
-        Evaluator<FeatureScoreCollector> evaluator(openingBook, &sc);
+        Evaluator<FeatureScoreCollector> evaluator(openingBook, patternBook, &sc);
         evaluator.collectScore(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
         return sc.toCollectedFeature();
     }
@@ -43,8 +44,9 @@ protected:
 
         EvaluationParameter evaluationParameter;
         OpeningBook openingBook;
+        PatternBook patternBook;
         FeatureScoreCollector sc(evaluationParameter);
-        Evaluator<FeatureScoreCollector> evaluator(openingBook, &sc);
+        Evaluator<FeatureScoreCollector> evaluator(openingBook, patternBook, &sc);
 
         f(&evaluator);
 
@@ -57,8 +59,9 @@ protected:
 
         EvaluationParameter evaluationParameter;
         OpeningBook openingBook;
+        PatternBook patternBook;
         FeatureScoreCollector sc(evaluationParameter);
-        RensaEvaluator<FeatureScoreCollector> rensaEvaluator(openingBook, &sc);
+        RensaEvaluator<FeatureScoreCollector> rensaEvaluator(openingBook, patternBook, &sc);
 
         f(&rensaEvaluator);
 
@@ -74,8 +77,9 @@ TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
 
     EvaluationParameter param;
     OpeningBook openingBook;
+    PatternBook patternBook;
     FeatureScoreCollector sc(param);
-    RensaEvaluator<FeatureScoreCollector> evaluator(openingBook, &sc);
+    RensaEvaluator<FeatureScoreCollector> evaluator(openingBook, patternBook, &sc);
 
     evaluator.collectScoreForRensaGarbage(f);
     CollectedFeature cf = sc.toCollectedFeature();
@@ -242,6 +246,30 @@ TEST_F(EvaluatorTest, handWidth2)
     EXPECT_EQ(1, cf.feature(HAND_WIDTH_2).front());
     EXPECT_EQ(1, cf.feature(HAND_WIDTH_3).front());
     EXPECT_EQ(1, cf.feature(HAND_WIDTH_4).front());
+}
+
+TEST_F(EvaluatorTest, handWidth4)
+{
+    CoreField f(
+        "RY    "
+        "RRB   "
+        "YYYB  "
+        "BBBRRR");
+
+    RensaTrackResult rtr(
+        "1     "
+        "12    "
+        "1134  "
+        "2223  "
+        "333444");
+
+    CollectedFeature cf = withRensaEvaluator([&f, &rtr](RensaEvaluator<FeatureScoreCollector>* evaluator) {
+        evaluator->evalRensaHandWidthFeature(f, rtr);
+    });
+
+    EXPECT_EQ(1, cf.feature(HAND_WIDTH_2).front());
+    EXPECT_EQ(2, cf.feature(HAND_WIDTH_3).front());
+    EXPECT_EQ(3, cf.feature(HAND_WIDTH_4).front());
 }
 
 TEST_F(EvaluatorTest, handWidth3)
