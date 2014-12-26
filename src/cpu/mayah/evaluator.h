@@ -4,9 +4,10 @@
 #include <map>
 #include <vector>
 
-#include "opening_book.h"
 #include "evaluation_feature.h"
+#include "opening_book.h"
 #include "score_collector.h"
+#include "pattern_book.h"
 
 class ColumnPuyoList;
 class CoreField;
@@ -21,29 +22,37 @@ const int MIDDLE_THRESHOLD = 54;
 
 class EvaluatorBase {
 protected:
-    explicit EvaluatorBase(const OpeningBook& openingBook) :
-        openingBook_(openingBook) {}
+    EvaluatorBase(const OpeningBook& openingBook, const PatternBook& patternBook) :
+        openingBook_(openingBook),
+        patternBook_(patternBook) {}
 
     const OpeningBook& openingBook() const { return openingBook_; }
+    const PatternBook& patternBook() const { return patternBook_; }
 
 private:
     const OpeningBook& openingBook_;
+    const PatternBook& patternBook_;
 };
 
 class PreEvalResult {
 public:
-    explicit PreEvalResult(const std::vector<int>& matchableBookIds) :
-        matchableBookIds_(matchableBookIds) {}
+    PreEvalResult() {}
 
-    const std::vector<int>& matchableBookIds() const { return matchableBookIds_; }
+    const std::vector<int>& matchableOpeningIds() const { return matchableOpeningIds_; }
+    const std::vector<int>& matchablePatternIds() const { return matchablePatternIds_; }
+
+    std::vector<int>* mutableMatchableOpeningIds() { return &matchableOpeningIds_; }
+    std::vector<int>* mutableMatchablePatternIds() { return &matchablePatternIds_; }
 
 private:
-    std::vector<int> matchableBookIds_;
+    std::vector<int> matchableOpeningIds_;
+    std::vector<int> matchablePatternIds_;
 };
 
 class PreEvaluator : public EvaluatorBase {
 public:
-    explicit PreEvaluator(const OpeningBook& openingBook) : EvaluatorBase(openingBook) {}
+    explicit PreEvaluator(const OpeningBook& openingBook, const PatternBook& patternBook) :
+        EvaluatorBase(openingBook, patternBook) {}
 
     PreEvalResult preEval(const CoreField& currentField);
 };
@@ -71,7 +80,8 @@ private:
 
 class MidEvaluator : public EvaluatorBase {
 public:
-    MidEvaluator(const OpeningBook& openingBook) : EvaluatorBase(openingBook) {}
+    MidEvaluator(const OpeningBook& openingBook, const PatternBook& patternBook) :
+        EvaluatorBase(openingBook, patternBook) {}
 
     MidEvalResult eval(const RefPlan&, const CoreField& currentField);
 };
@@ -92,15 +102,14 @@ template<typename ScoreCollector>
 class RensaEvaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    explicit RensaEvaluator(const OpeningBook& openingBook, ScoreCollector* sc) :
-        EvaluatorBase(openingBook),
+    RensaEvaluator(const OpeningBook& openingBook,
+                   const PatternBook& patternBook,
+                   ScoreCollector* sc) :
+        EvaluatorBase(openingBook, patternBook),
         sc_(sc) {}
 
-    void evalRensaChainFeature(const RefPlan&,
-                               const RensaResult&,
-                               const ColumnPuyoList& keyPuyos,
-                               const ColumnPuyoList& firePuyos);
-    void collectScoreForRensaGarbage(const CoreField& fieldAfterDrop);
+    void evalRensaChainFeature(const CoreField&, const RensaResult&, const PuyoSet&);
+    void collectScoreForRensaGarbage(const CoreField& fieldAfterRensa);
     void evalRensaHandWidthFeature(const CoreField&, const RensaTrackResult&);
     void evalFirePointTabooFeature(const RefPlan&, const RensaTrackResult&);
     void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaTrackResult&, bool enemyHasZenkeshi);
@@ -115,8 +124,8 @@ template<typename ScoreCollector>
 class Evaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    Evaluator(const OpeningBook& openingBook, ScoreCollector* sc) :
-        EvaluatorBase(openingBook),
+    Evaluator(const OpeningBook& openingBook, const PatternBook& patternBook, ScoreCollector* sc) :
+        EvaluatorBase(openingBook, patternBook),
         sc_(sc) {}
 
     void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,

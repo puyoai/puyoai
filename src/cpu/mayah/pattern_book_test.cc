@@ -45,3 +45,21 @@ TEST(PatternBookField, complement2)
     ColumnPuyoList cpl;
     EXPECT_FALSE(pbf.complement(cf, &cpl));
 }
+
+TEST(PatternBookField, complement3)
+{
+    PatternBookField pbf(
+        "BA...."
+        "AA...."
+        "BC...."
+        "BBC..."
+        "CC....");
+
+    CoreField cf(
+        " R    "
+        "YY BBB"
+        "RRRGGG");
+
+    ColumnPuyoList cpl;
+    EXPECT_FALSE(pbf.complement(cf, &cpl));
+}

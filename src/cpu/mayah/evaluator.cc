@@ -30,6 +30,7 @@ using namespace std;
 
 namespace {
 
+const bool USE_PATTERN = true;
 const bool USE_BOOK = true;
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
@@ -71,14 +72,24 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field,
 
 PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
 {
-    vector<int> matchableIds;
+    PreEvalResult preEvalResult;
+
+    auto matchableOpeningIds = preEvalResult.mutableMatchableOpeningIds();
     for (size_t i = 0; i < openingBook().size(); ++i) {
         const OpeningBookField& obf = openingBook().field(i);
         if (obf.match(currentField).matched)
-            matchableIds.push_back(static_cast<int>(i));
+            matchableOpeningIds->push_back(static_cast<int>(i));
     }
 
-    return PreEvalResult(matchableIds);
+    auto matchablePatternIds = preEvalResult.mutableMatchablePatternIds();
+    ColumnPuyoList cpl;
+    for (size_t i = 0; i < patternBook().size(); ++i) {
+        const PatternBookField& pbf = patternBook().field(i);
+        if (pbf.isMatchable(currentField))
+            matchablePatternIds->push_back(static_cast<int>(i));
+    }
+
+    return preEvalResult;
 }
 
 MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentField)
@@ -419,19 +430,15 @@ void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan, cons
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RefPlan& plan,
+void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const CoreField& field,
                                                            const RensaResult& rensaResult,
-                                                           const ColumnPuyoList& keyPuyos,
-                                                           const ColumnPuyoList& firePuyos)
+                                                           const PuyoSet& totalPuyoSet)
 {
     sc_->addScore(MAX_CHAINS, rensaResult.chains, 1);
 
-    PuyoSet totalPuyoSet;
-    totalPuyoSet.add(keyPuyos);
-    totalPuyoSet.add(firePuyos);
     int totalNecessaryPuyos = TsumoPossibility::necessaryPuyos(totalPuyoSet, 0.5);
 
-    int count = plan.field().countPuyos();
+    int count = field.countPuyos();
     if (count <= EARLY_THRESHOLD) {
         sc_->addScore(NECESSARY_PUYOS_EARLY_LINEAR, totalNecessaryPuyos);
         sc_->addScore(NECESSARY_PUYOS_EARLY_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
@@ -615,7 +622,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         return;
 
     if (USE_BOOK && !enemy.hasZenkeshi && !plan.isRensaPlan()) {
-        evalBook(openingBook(), preEvalResult.matchableBookIds(), plan);
+        evalBook(openingBook(), preEvalResult.matchableOpeningIds(), plan);
     }
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
@@ -639,16 +646,21 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     ColumnPuyoList maxRensaKeyPuyos;
     ColumnPuyoList maxRensaFirePuyos;
     std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
-    auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult& trackResult, const RensaRefSequence&) {
+    auto evalCallback = [&](const CoreField& fieldBeforeRensa, const CoreField& fieldAfterRensa,
+                            const RensaResult& rensaResult,
+                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                            const RensaTrackResult& trackResult) {
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
-        RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), rensaScoreCollector.get());
+        RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), patternBook(), rensaScoreCollector.get());
 
-        rensaEvaluator.evalRensaChainFeature(plan, rensaResult, keyPuyos, firePuyos);
+        PuyoSet necessaryPuyos;
+        necessaryPuyos.add(keyPuyos);
+        necessaryPuyos.add(firePuyos);
+
+        rensaEvaluator.evalRensaChainFeature(fieldBeforeRensa, rensaResult, necessaryPuyos);
         rensaEvaluator.collectScoreForRensaGarbage(fieldAfterRensa);
         if (USE_HAND_WIDTH_FEATURE)
-            rensaEvaluator.evalRensaHandWidthFeature(plan.field(), trackResult);
+            rensaEvaluator.evalRensaHandWidthFeature(fieldBeforeRensa, trackResult);
         if (USE_FIRE_POINT_TABOO_FEATURE)
             rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
         if (USE_IGNITION_HEIGHT_FEATURE)
@@ -667,9 +679,6 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
         double rensaScore = rensaResult.score;
 
-        PuyoSet necessaryPuyos;
-        necessaryPuyos.add(keyPuyos);
-        necessaryPuyos.add(firePuyos);
         double possibility = TsumoPossibility::possibility(necessaryPuyos, std::max(0, numReachableSpace - 2));
         rensaScore *= possibility;
 
@@ -678,8 +687,41 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         }
     };
 
-    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 3, false);
-    RensaDetector::iteratePossibleRensasIteratively(plan.field(), maxIteration, strategy, callback);
+    {
+        RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 3, false);
+        auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
+                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                            const RensaTrackResult& trackResult, const RensaRefSequence&) {
+            evalCallback(plan.field(), fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
+        };
+        RensaDetector::iteratePossibleRensasIteratively(plan.field(), maxIteration, strategy, callback);
+    }
+
+    if (USE_PATTERN) {
+        RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 1, false);
+        for (const int id : preEvalResult.matchablePatternIds()) {
+            const PatternBookField& pbf = patternBook().field(id);
+            ColumnPuyoList cpl;
+            if (!pbf.complement(plan.field(), &cpl))
+                continue;
+
+            CoreField complementedField(plan.field());
+            for (const auto& cp : cpl)
+                complementedField.dropPuyoOn(cp.x, cp.color);
+
+            auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
+                                const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                                const RensaTrackResult& trackResult, const RensaRefSequence&) {
+                if (keyPuyos.size() + cpl.size() > ColumnPuyoList::MAX_SIZE)
+                    return;
+                ColumnPuyoList allKeyPuyos;
+                allKeyPuyos.append(cpl);
+                allKeyPuyos.append(keyPuyos);
+                evalCallback(complementedField, fieldAfterRensa, rensaResult, allKeyPuyos, firePuyos, trackResult);
+            };
+            RensaDetector::iteratePossibleRensasIteratively(complementedField, maxIteration, strategy, callback);
+        }
+    }
 
     if (maxRensaScoreCollector.get()) {
         sc_->merge(*maxRensaScoreCollector);

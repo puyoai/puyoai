@@ -9,11 +9,12 @@
 #include "core/client/ai/ai.h"
 #include "core/algorithm/plan.h"
 
-#include "opening_book.h"
+#include "decision_book.h"
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
-#include "decision_book.h"
+#include "opening_book.h"
+#include "pattern_book.h"
 
 class CoreField;
 class DropDecision;
@@ -81,6 +82,8 @@ protected:
     std::unique_ptr<EvaluationParameter> evaluationParameter_;
     OpeningBook openingBook_;
     DecisionBook decisionBook_;
+    PatternBook patternBook_;
+
     bool usesDecisionBook_ = true;
 
     Executor* executor_;
