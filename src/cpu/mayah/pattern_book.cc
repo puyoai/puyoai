@@ -62,7 +62,9 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
         vector<string> f;
         for (const auto& s : v.get<toml::Array>("field"))
             f.push_back(s.as<string>());
-        fields_.emplace_back(f);
+        PatternBookField patternBookField(f);
+        fields_.push_back(patternBookField);
+        fields_.push_back(patternBookField.mirror());
     }
 
     return true;

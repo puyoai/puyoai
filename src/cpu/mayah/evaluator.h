@@ -83,7 +83,7 @@ public:
     MidEvaluator(const OpeningBook& openingBook, const PatternBook& patternBook) :
         EvaluatorBase(openingBook, patternBook) {}
 
-    MidEvalResult eval(const RefPlan&, const CoreField& currentField);
+    MidEvalResult eval(const RefPlan&, const CoreField& currentField, double score);
 };
 
 class EvalResult {

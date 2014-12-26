@@ -62,7 +62,9 @@ public:
 
 protected:
     PreEvalResult preEval(const CoreField& currentField);
-    MidEvalResult midEval(const RefPlan&, const CoreField& currentField);
+    MidEvalResult midEval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+                          const PlayerState& me, const PlayerState& enemy,
+                          const PreEvalResult&, const GazeResult&) const;
     EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
                     const PlayerState& me, const PlayerState& enemy,
                     const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
