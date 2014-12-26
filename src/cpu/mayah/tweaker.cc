@@ -162,7 +162,7 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
             stringstream ss;
             KumipuyoSeq seq = generateRandomSequenceWithSeed(i + FLAGS_offset);
             int score = endless.run(seq);
-            ss << "case " << i << ": "
+            ss << "case " << setw(2) << i << ": "
                << "score = " << score << endl;
 
             ps[i].set_value(Result{score, ss.str()});
