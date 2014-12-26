@@ -27,6 +27,13 @@ field = [
 
 [[pattern]]
 field = [
+    "..B...",
+    "AAAB..",
+    "BBB..."
+]
+
+[[pattern]]
+field = [
     "AB....",
     "AAC...",
     "BBBC..",
