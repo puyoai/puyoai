@@ -31,7 +31,6 @@ using namespace std;
 namespace {
 
 const bool USE_BOOK = true;
-const bool USE_BOOK_COMPLETE = false;
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
@@ -96,10 +95,9 @@ MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentFi
 }
 
 template<typename ScoreCollector>
-bool Evaluator<ScoreCollector>::evalBook(const OpeningBook& openingBook,
+void Evaluator<ScoreCollector>::evalBook(const OpeningBook& openingBook,
                                          const std::vector<int>& matchableBookIds,
-                                         const RefPlan& plan,
-                                         const MidEvalResult& midEvalResult)
+                                         const RefPlan& plan)
 {
     double maxScore = 0;
     const OpeningBookField* bestBf = nullptr;
@@ -108,7 +106,7 @@ bool Evaluator<ScoreCollector>::evalBook(const OpeningBook& openingBook,
 
     int totalPuyoCount = plan.field().countPuyos();
     if (totalPuyoCount == 0)
-        return false;
+        return;
 
     for (int id : matchableBookIds) {
         const auto& bf = openingBook.field(id);
@@ -144,13 +142,7 @@ bool Evaluator<ScoreCollector>::evalBook(const OpeningBook& openingBook,
         sc_->setBookName(bestBf->name());
         sc_->addScore(BOOK, maxScore);
         sc_->addScore(BOOK_KIND, matchedBookNames.size());
-        if (USE_BOOK_COMPLETE && completeMatch && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
-            sc_->addScore(BOOK_COMPLETE, maxScore);
-            return true;
-        }
     }
-
-    return false;
 }
 
 template<typename ScoreCollector>
@@ -622,9 +614,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult))
         return;
 
-    bool complete = false;
     if (USE_BOOK && !enemy.hasZenkeshi && !plan.isRensaPlan()) {
-        complete = evalBook(openingBook(), preEvalResult.matchableBookIds(), plan, midEvalResult);
+        evalBook(openingBook(), preEvalResult.matchableBookIds(), plan);
     }
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
@@ -654,8 +645,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
         RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), rensaScoreCollector.get());
 
-        if (!complete)
-            rensaEvaluator.evalRensaChainFeature(plan, rensaResult, keyPuyos, firePuyos);
+        rensaEvaluator.evalRensaChainFeature(plan, rensaResult, keyPuyos, firePuyos);
         rensaEvaluator.collectScoreForRensaGarbage(fieldAfterRensa);
         if (USE_HAND_WIDTH_FEATURE)
             rensaEvaluator.evalRensaHandWidthFeature(plan.field(), trackResult);
