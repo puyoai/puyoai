@@ -128,8 +128,7 @@ public:
     bool evalStrategy(const RefPlan&, const CoreField& currentField, int currentFrameId,
                       const PlayerState& me, const PlayerState& enemy, const GazeResult&);
 
-    // Returns true if complete match.
-    bool evalBook(const OpeningBook&, const std::vector<int>& matchableBookIds, const RefPlan&, const MidEvalResult&);
+    void evalBook(const OpeningBook&, const std::vector<int>& matchableBookIds, const RefPlan&);
     void evalFrameFeature(const RefPlan&);
     void evalRestrictedConnectionHorizontalFeature(const CoreField&);
     void evalThirdColumnHeightFeature(const RefPlan&);
