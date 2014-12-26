@@ -188,7 +188,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
         }
 
         // --- Proceed the evaluation for the rest hands.
-        MidEvalResult midEvalResult = midEval(rp1, field);
+        MidEvalResult midEvalResult = midEval(rp1, field, frameId, maxIteration, me, enemy, preEvalResult, gazeResult);
 
         Plan p = rp1.toPlan();
         KumipuyoSeq seq(kumipuyoSeq);
@@ -244,10 +244,20 @@ PreEvalResult MayahAI::preEval(const CoreField& currentField)
     return preEvaluator.preEval(currentField);
 }
 
-MidEvalResult MayahAI::midEval(const RefPlan& refPlan, const CoreField& currentField)
+MidEvalResult MayahAI::midEval(const RefPlan& plan, const CoreField& currentField,
+                               int currentFrameId, int maxIteration,
+                               const PlayerState& me,
+                               const PlayerState& enemy,
+                               const PreEvalResult& preEvalResult,
+                               const GazeResult& gazeResult) const
+
 {
+    NormalScoreCollector sc(*evaluationParameter_);
+    Evaluator<NormalScoreCollector> evaluator(openingBook_, patternBook_, &sc);
+    evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), gazeResult);
+
     MidEvaluator midEvaluator(openingBook_, patternBook_);
-    return midEvaluator.eval(refPlan, currentField);
+    return midEvaluator.eval(plan, currentField, sc.score());
 }
 
 EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,

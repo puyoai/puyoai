@@ -92,16 +92,15 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
     return preEvalResult;
 }
 
-MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentField)
+MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentField, double score)
 {
     UNUSED_VARIABLE(currentField);
 
     MidEvalResult result;
-
-    if (plan.isRensaPlan()) {
+    if (plan.isRensaPlan())
         result.add(MIDEVAL_ERASE, 1);
-    }
 
+    result.add(MIDEVAL_RESULT, score);
     return result;
 }
 

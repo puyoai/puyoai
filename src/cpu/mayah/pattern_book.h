@@ -13,11 +13,14 @@ class ColumnPuyoList;
 
 class PatternBookField {
 public:
+    explicit PatternBookField(const PatternField& field) : patternField_(field) {}
     explicit PatternBookField(const std::string& field) : patternField_(field) {}
     explicit PatternBookField(const std::vector<std::string>& field) : patternField_(field) {}
 
     bool isMatchable(const CoreField&) const;
     bool complement(const CoreField&, ColumnPuyoList* cpl) const;
+
+    PatternBookField mirror() const { return PatternBookField(patternField_.mirror()); }
 
 private:
     PatternField patternField_;

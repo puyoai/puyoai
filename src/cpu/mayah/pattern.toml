@@ -1,9 +1,8 @@
 [[pattern]]
 field = [
-    "C.....",
-    "CBB...",
-    "BAA...",
-    "BCCA..",
+    "ABC...",
+    "AABCC.",
+    "BBC...",
 ]
 
 [[pattern]]
@@ -30,4 +29,12 @@ field = [
     "AAC...",
     "BBBC..",
     "CCC..."
+]
+
+[[pattern]]
+field = [
+    "C.....",
+    "CBB...",
+    "BAA...",
+    "BCCA..",
 ]
