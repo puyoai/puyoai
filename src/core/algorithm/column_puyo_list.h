@@ -33,6 +33,7 @@ public:
         addPuyo(x, c, n);
     }
 
+    bool isEmpty() const { return size_ == 0; }
     int size() const { return size_; }
 
     void addPuyo(int x, PuyoColor c)
