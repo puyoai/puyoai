@@ -30,11 +30,12 @@ DEFINE_int32(offset, 0, "offset for random seed");
 using namespace std;
 
 struct Result {
-    int score;
+    EndlessResult result;
     string msg;
 };
 
 struct RunResult {
+    int numZenkeshi;
     int sumScore;
     int mainRensaCount;
     int aveMainRensaScore;
@@ -166,16 +167,17 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
             KumipuyoSeq seq = generateRandomSequenceWithSeed(i + FLAGS_offset);
             EndlessResult result = endless.run(seq);
             ss << "case " << setw(2) << i << ": "
-               << "score = " << result.score << " rensa = " << result.maxRensa;
+               << "score=" << setw(6) << result.score << " rensa=" << setw(2) << result.maxRensa;
             if (result.zenkeshi)
                 ss << " / ZENKESHI";
             ss << endl;
 
-            ps[i].set_value(Result{result.score, ss.str()});
+            ps[i].set_value(Result{result, ss.str()});
         };
         executor->submit(f);
     }
 
+    int numZenkeshi = 0;
     int sumScore = 0;
     int sumMainRensaScore = 0;
     int mainRensaCount = 0;
@@ -188,33 +190,39 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
     vector<pair<int, int>> scores;
     for (int i = 0; i < N; ++i) {
         Result r = ps[i].get_future().get();
-        sumScore += r.score;
-        scores.push_back(make_pair(r.score, i + FLAGS_offset));
-        if (r.score >= 10000) {
-            mainRensaCount++;
-            sumMainRensaScore += r.score;
-        }
-        if (r.score >= 40000) { over40000Count++; }
-        if (r.score >= 60000) { over60000Count++; }
-        if (r.score >= 70000) { over70000Count++; }
-        if (r.score >= 80000) { over80000Count++; }
-        if (r.score >= 100000) { over100000Count++; }
         cout << r.msg;
+        if (r.result.zenkeshi && r.result.hand < 8) {
+            numZenkeshi++;
+            continue;
+        }
+        int score = r.result.score;
+        sumScore += score;
+        scores.push_back(make_pair(score, i + FLAGS_offset));
+        if (score >= 10000) {
+            mainRensaCount++;
+            sumMainRensaScore += score;
+        }
+        if (score >= 40000) { over40000Count++; }
+        if (score >= 60000) { over60000Count++; }
+        if (score >= 70000) { over70000Count++; }
+        if (score >= 80000) { over80000Count++; }
+        if (score >= 100000) { over100000Count++; }
     }
 
     sort(scores.begin(), scores.end());
 
-    double mean = static_cast<double>(sumScore) / N;
+    double mean = static_cast<double>(sumScore) / scores.size();
     double variance = 0.0;
-    for (int i = 0; i < N; ++i) {
+    for (size_t i = 0; i < scores.size(); ++i) {
         variance += (scores[i].first - mean) * (scores[i].first - mean);
     }
-    double deviation = N >= 2 ? sqrt(variance / (N - 1)) : 0;
+    double deviation = scores.size() >= 2 ? sqrt(variance / (scores.size() - 1)) : 0;
 
     int aveMainRensaScore = mainRensaCount > 0 ? sumMainRensaScore / mainRensaCount : 0;
+    cout << "zenkeshi   = " << numZenkeshi << endl;
     cout << "sum score  = " << sumScore << endl;
-    cout << "ave score  = " << (sumScore / N) << endl;
-    cout << "median     = " << scores[N / 2].first << endl;
+    cout << "ave score  = " << (sumScore / scores.size()) << endl;
+    cout << "median     = " << scores[scores.size() / 2].first << endl;
     cout << "deviation  = " << deviation << endl;
     cout << "main rensa = " << mainRensaCount << endl;
     cout << "ave main rensa = " << aveMainRensaScore << endl;
@@ -229,7 +237,7 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
         }
     }
 
-    return RunResult { sumScore, mainRensaCount, aveMainRensaScore,
+    return RunResult { numZenkeshi, sumScore, mainRensaCount, aveMainRensaScore,
             over40000Count, over60000Count, over70000Count, over80000Count, over100000Count };
 }
 
