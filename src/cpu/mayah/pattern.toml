@@ -26,6 +26,15 @@ field = [
     "CC....",
 ]
 
+field = [
+    "B.....",
+    "A.....",
+    "AA....",
+    "BCD...",
+    "BBCDD.",
+    "CCD...",
+]
+
 [[pattern]]
 field = [
     "B.....",

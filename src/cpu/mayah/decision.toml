@@ -188,6 +188,7 @@ field = [
     "AAA..."
 ]
 ACBC = [3, 3]
+ACAD = [4, 2]
 BCAB = [4, 0]
 
 [[book]]
