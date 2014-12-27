@@ -420,6 +420,18 @@ score = 10.000000
 
 [[book]]
 field = [
+    "De....",
+    "EEe...",
+    "DBb...",
+    "DDAC..",
+    "BBBA..",
+    "AAAC.."
+]
+name = "NEWGTR-HEAD"
+score = 10.000000
+
+[[book]]
+field = [
     "BD....",
     "DDAC..",
     "BBBA..",
