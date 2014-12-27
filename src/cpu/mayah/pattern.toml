@@ -26,6 +26,7 @@ field = [
     "CC....",
 ]
 
+[[pattern]]
 field = [
     "B.....",
     "A.....",
@@ -33,6 +34,26 @@ field = [
     "BCD...",
     "BBCDD.",
     "CCD...",
+]
+
+[[pattern]]
+field = [
+    "B.....",
+    "A.....",
+    "AAD...",
+    "BCDD..",
+    "BBC...",
+    "CCD...",
+]
+
+[[pattern]]
+field = [
+    "B.....",
+    "A.....",
+    "AA....",
+    "BCD...",
+    "BBCDDD",
+    "CC....",
 ]
 
 [[pattern]]
@@ -60,6 +81,15 @@ field = [
     "AAC...",
     "BBBC..",
     "CCC..."
+]
+
+[[pattern]]
+field = [
+    "B.....",
+    "A.....",
+    "ABCD..",
+    "ABBCDD",
+    "CCCD.."
 ]
 
 [[pattern]]

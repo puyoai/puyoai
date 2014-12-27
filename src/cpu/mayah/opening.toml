@@ -12,6 +12,15 @@ name = "GTR-BASE"
 score = 10.300000
 
 [[book]]
+name = "GTR-KEY"
+score = 11.0
+field = [
+    "B.....",
+    "......",
+    "......"
+]
+
+[[book]]
 field = [
     "bDD...",
     "BEE...",
@@ -72,6 +81,34 @@ field = [
 ]
 name = "GTR-HEAD"
 score = 10.000000
+
+[[book]]
+field = [
+    "b.....",
+    "B.....",
+    "DD....",
+    "DE....",
+    "BAC...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR-HEAD"
+score = 9.000000
+
+[[book]]
+field = [
+    "B.....",
+    "E.....",
+    "E.....",
+    "E.....",
+    "DD....",
+    "DE....",
+    "BAC...",
+    "BBA...",
+    "AAC..."
+]
+name = "GTR-HEAD"
+score = 9.000000
 
 [[book]]
 name = "GTR-HEAD"
@@ -232,6 +269,17 @@ field = [
 ]
 name = "GTR-TAIL"
 score = 9.800000
+
+[[book]]
+name = "GTR-TAIL"
+score = 8.800000
+field = [
+    ".....Z",
+    "..CXYZ",
+    "..CCYZ",
+    "...XXY",
+    "..CXZY"
+]
 
 [[book]]
 field = [
@@ -496,6 +544,8 @@ name = "NEWGTR-HEAD"
 score = 9.700000
 
 [[book]]
+name = "NEWGTR-TAIL"
+score = 10.000000
 field = [
     ".....x",
     "...cxX",
@@ -503,18 +553,16 @@ field = [
     "....CC",
     "...CXX"
 ]
-name = "NEWGTR-TAIL"
-score = 10.000000
 
 [[book]]
+name = "NEWGTR-TAIL"
+score = 10.000000
 field = [
     "...c.X",
     "...CXX",
     "....CC",
     "...CYX"
 ]
-name = "NEWGTR-TAIL"
-score = 10.000000
 
 [[book]]
 field = [
@@ -581,6 +629,20 @@ field = [
 ]
 
 [[book]]
+name = "NEWGTR-TAIL"
+score = 9.000000
+field = [
+    ".....y",
+    "....yY",
+    "....YX",
+    "...CXX",
+    "....CC",
+    "...CXY"
+]
+
+[[book]]
+name = "NEWGTR2-HEAD"
+score = 10.000000
 field = [
     ".b....",
     "DBb...",
@@ -588,8 +650,6 @@ field = [
     "BBBA..",
     "AAAC.."
 ]
-name = "NEWGTR2-HEAD"
-score = 10.000000
 
 [[book]]
 field = [
@@ -670,6 +730,8 @@ name = "NEWGTR2-HEAD"
 score = 9.700000
 
 [[book]]
+name = "NEWGTR2-HEAD"
+score = 9.700000
 field = [
     "B.....",
     "D.....",
@@ -680,8 +742,6 @@ field = [
     "BBBA..",
     "AAAC.."
 ]
-name = "NEWGTR2-HEAD"
-score = 9.700000
 
 [[book]]
 field = [
@@ -1030,13 +1090,50 @@ score = 8.800000
 
 # ----------------------------------------------------------------------
 
-[[combine]]
-name = "GTR"
-combine = ["GTR-BASE", "GTR-HEAD", "GTR-TAIL"]
+[[book]]
+name = "DOUSHOKU"
+score = 9.0
+field = [
+    "....EE",
+    "BAAEDE",
+    "BBCAAA",
+    "AAADDD"
+]
+
+[[book]]
+name = "DOUSHOKU"
+score = 8.9
+field = [
+    "A.....",
+    "B.....",
+    "B.....",
+    "X...EE",
+    "XXAEDE",
+    "BBCAAA",
+    "AAADDD"
+]
+
+[[book]]
+name = "DOUSHOKU"
+score = 8.9
+field = [
+    "A.....",
+    "B.....",
+    "XX..EE",
+    "BXAEDE",
+    "BBCAAA",
+    "AAADDD"
+]
+
+# ----------------------------------------------------------------------
 
 [[combine]]
 name = "GTR"
-combine = ["GTR-BASE", "GTR2-HEAD", "GTR2-TAIL"]
+combine = ["GTR-BASE", "GTR-KEY", "GTR-HEAD", "GTR-TAIL"]
+
+[[combine]]
+name = "GTR"
+combine = ["GTR-BASE", "GTR-KEY", "GTR2-HEAD", "GTR2-TAIL"]
 
 [[combine]]
 name = "NEWGTR"
@@ -1081,3 +1178,7 @@ combine = ["NAMEKUJI", "GTR-TAIL"]
 [[combine]]
 name = "YAYOI"
 combine = ["YAYOI"]
+
+[[combine]]
+name = "DOUSHOKU"
+combine = ["DOUSHOKU"]
