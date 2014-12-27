@@ -28,10 +28,11 @@
 
 using namespace std;
 
+DEFINE_bool(pattern, true, "use pattern book");
+DEFINE_bool(opening, true, "use opening book");
+
 namespace {
 
-const bool USE_PATTERN = true;
-const bool USE_BOOK = true;
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
 const bool USE_HAND_WIDTH_FEATURE = true;
@@ -620,7 +621,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult))
         return;
 
-    if (USE_BOOK && !enemy.hasZenkeshi && !plan.isRensaPlan()) {
+    if (FLAGS_opening && !enemy.hasZenkeshi && !plan.isRensaPlan()) {
         evalBook(openingBook(), preEvalResult.matchableOpeningIds(), plan);
     }
     evalCountPuyoFeature(plan);
@@ -696,7 +697,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         RensaDetector::iteratePossibleRensasIteratively(plan.field(), maxIteration, strategy, callback);
     }
 
-    if (USE_PATTERN) {
+    if (FLAGS_pattern) {
         RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 1, false);
         for (const int id : preEvalResult.matchablePatternIds()) {
             const PatternBookField& pbf = patternBook().field(id);
