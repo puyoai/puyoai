@@ -13,15 +13,6 @@ score = 10.300000
 
 [[book]]
 field = [
-    "BA....",
-    "BBA...",
-    "AAC..."
-]
-name = "GTR"
-score = 10.200000
-
-[[book]]
-field = [
     "bDD...",
     "BEE...",
     "DDE...",
@@ -81,6 +72,18 @@ field = [
 ]
 name = "GTR-HEAD"
 score = 10.000000
+
+[[book]]
+name = "GTR-HEAD"
+score = 8.000000
+field = [
+    "B.....",
+    "B.....",
+    "D.....",
+    "DAC...",
+    "BBA...",
+    "AAC..."
+]
 
 [[book]]
 field = [
@@ -1017,15 +1020,11 @@ score = 8.800000
 
 [[combine]]
 name = "GTR"
-combine = ["GTR", "GTR-BASE", "GTR-HEAD", "GTR-TAIL"]
-
-[[combine]]
-name = "LR-HEAD"
-combine = ["LR-HEAD", "GTR-TAIL"]
+combine = ["GTR-BASE", "GTR-HEAD", "GTR-TAIL"]
 
 [[combine]]
 name = "GTR"
-combine = ["GTR", "GTR-BASE", "GTR2-HEAD", "GTR2-TAIL"]
+combine = ["GTR-BASE", "GTR2-HEAD", "GTR2-TAIL"]
 
 [[combine]]
 name = "NEWGTR"
@@ -1034,6 +1033,10 @@ combine = ["NEWGTR", "NEWGTR-BASE", "NEWGTR-HEAD", "NEWGTR-TAIL"]
 [[combine]]
 name = "NEWGTR"
 combine = ["NEWGTR", "NEWGTR-BASE", "NEWGTR2-HEAD", "NEWGTR2-TAIL"]
+
+[[combine]]
+name = "LR-HEAD"
+combine = ["LR-HEAD", "GTR-TAIL"]
 
 [[combine]]
 name = "LTR-HEAD"

@@ -66,8 +66,10 @@ static void merge(vector<OpeningBookField>* result,
     auto range = partialFields.equal_range(names[pos]);
     for (auto it = range.first; it != range.second; ++it) {
         OpeningBookField field(current.name());
-        if (!PatternField::merge(current.patternField(), it->second.patternField(), field.mutablePatternField()))
+        if (!PatternField::merge(current.patternField(), it->second.patternField(), field.mutablePatternField())) {
+            LOG(INFO) << "couldn't merge: \n" << current.patternField().toDebugString() << '\n' << it->second.patternField().toDebugString();
             continue;
+        }
         merge(result, field, partialFields, names, pos + 1);
     }
 }
