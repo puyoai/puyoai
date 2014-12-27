@@ -60,7 +60,7 @@ field = [
 ACAA = [1, 1]
 ACAB = [1, 1]
 ACAC = [1, 1]
-ACBB = [1, 0]
+ACBB = [1, 1]
 ACBC = [1, 1]
 ACCC = [1, 1]
 

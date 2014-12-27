@@ -152,3 +152,29 @@ field = [
     "CAAB..",
     "ABB...",
 ]
+
+# ----------------------------------------------------------------------
+# DOUSHOKU
+
+[[pattern]]
+field = [
+    "...BBA",
+    "BBBCAA",
+    "...BBB"
+]
+
+[[pattern]]
+field = [
+    ".D.BBA",
+    "BBBCAA",
+    "DDDBBB"
+]
+
+[[pattern]]
+field = [
+    ".....A",
+    "...EEE",
+    ".D.BBA",
+    "BBBCAA",
+    "DDDBBB"
+]
