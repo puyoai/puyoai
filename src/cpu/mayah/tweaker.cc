@@ -143,10 +143,13 @@ void runOnce(const EvaluationParameter& parameter)
     endless.setVerbose(FLAGS_show_field);
 
     KumipuyoSeq seq = generateSequence();
-    int score = endless.run(seq);
+    EndlessResult result = endless.run(seq);
 
     cout << seq.toString() << endl;
-    cout << "score = " << score << endl;
+    cout << "score = " << result.score << " rensa = " << result.maxRensa;
+    if (result.zenkeshi)
+        cout << " / ZENKESHI";
+    cout << endl;
 }
 
 RunResult run(Executor* executor, const EvaluationParameter& parameter)
@@ -161,11 +164,14 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
             Endless endless(std::move(std::unique_ptr<AI>(ai)));
             stringstream ss;
             KumipuyoSeq seq = generateRandomSequenceWithSeed(i + FLAGS_offset);
-            int score = endless.run(seq);
+            EndlessResult result = endless.run(seq);
             ss << "case " << setw(2) << i << ": "
-               << "score = " << score << endl;
+               << "score = " << result.score << " rensa = " << result.maxRensa;
+            if (result.zenkeshi)
+                ss << " / ZENKESHI";
+            ss << endl;
 
-            ps[i].set_value(Result{score, ss.str()});
+            ps[i].set_value(Result{result.score, ss.str()});
         };
         executor->submit(f);
     }

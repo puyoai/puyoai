@@ -11,7 +11,7 @@ Endless::Endless(unique_ptr<AI> ai) : ai_(std::move(ai))
 {
 }
 
-int Endless::run(const KumipuyoSeq& seq)
+EndlessResult Endless::run(const KumipuyoSeq& seq)
 {
     // Initialize ai.
     FrameRequest req;
@@ -24,6 +24,7 @@ int Endless::run(const KumipuyoSeq& seq)
     setEnemyField(&req);
 
     int maxRensaScore = 0;
+    int maxRensa = 0;
     for (int i = 0; i < 50; ++i) {
         req.frameId = i + 2;
 
@@ -50,13 +51,31 @@ int Endless::run(const KumipuyoSeq& seq)
 
         RensaResult rensaResult = f.simulate();
         maxRensaScore = std::max(maxRensaScore, rensaResult.score);
+        maxRensa = std::max(maxRensa, rensaResult.chains);
         if (f.color(3, 12) != PuyoColor::EMPTY) {
-            maxRensaScore = -1;
-            break;
+            return EndlessResult {
+                .hand = i,
+                .score = -1,
+                .maxRensa = -1,
+                .zenkeshi = false,
+            };
         }
         if (rensaResult.score > 10000) {
             // The main rensa must be fired.
-            break;
+            return EndlessResult {
+                .hand = i,
+                .score = rensaResult.score,
+                .maxRensa = rensaResult.chains,
+                .zenkeshi = f.isZenkeshi(),
+            };
+        }
+        if (f.isZenkeshi()) {
+            return EndlessResult {
+                .hand = i,
+                .score = rensaResult.score,
+                .maxRensa = rensaResult.chains,
+                .zenkeshi = true,
+            };
         }
         req.playerFrameRequest[0].field = f;
         req.playerFrameRequest[0].kumipuyoSeq.dropFront();
@@ -65,7 +84,12 @@ int Endless::run(const KumipuyoSeq& seq)
         ai_->grounded(req);
     }
 
-    return maxRensaScore;
+    return EndlessResult {
+        .hand = 50,
+        .score = maxRensaScore,
+        .maxRensa = maxRensa,
+        .zenkeshi = false,
+    };
 }
 
 void Endless::setEnemyField(FrameRequest* req)
