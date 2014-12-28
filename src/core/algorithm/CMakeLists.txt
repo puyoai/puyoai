@@ -21,6 +21,7 @@ function(puyoai_core_algorithm_add_test target)
     endif()
 endfunction()
 
+puyoai_core_algorithm_add_test(column_puyo_list)
 puyoai_core_algorithm_add_test(pattern_field)
 puyoai_core_algorithm_add_test(pattern_matcher)
 puyoai_core_algorithm_add_test(plan)
