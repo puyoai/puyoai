@@ -366,7 +366,8 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
                                       const ColumnPuyoList& currentKeyPuyos, const ColumnPuyoList& currentFirePuyos,
                                       const RensaTrackResult& trackResult) {
             ColumnPuyoList combinedKeyPuyos(accumulatedKeyPuyos);
-            combinedKeyPuyos.append(currentFirePuyos);
+            if (!combinedKeyPuyos.append(currentFirePuyos))
+                return;
 
             // Here, try to fire the combined rensa.
             CoreField f(initialField);

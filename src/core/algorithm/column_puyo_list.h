@@ -49,10 +49,14 @@ public:
         }
     }
 
-    void append(const ColumnPuyoList& cpl)
+    // Appends |cpl|. If the result size exceeds the max size, false will be returned.
+    bool append(const ColumnPuyoList& cpl)
     {
+        if (size_ + cpl.size() > MAX_SIZE)
+            return false;
         for (const auto& cp : cpl)
             addPuyo(cp.x, cp.color);
+        return true;
     }
 
     void clear()
