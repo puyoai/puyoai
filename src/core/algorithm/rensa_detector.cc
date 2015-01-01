@@ -271,7 +271,8 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
     };
 
     RensaResult rensaResult = f->simulateWithMinHeights(minHeights);
-    callback(*f, rensaResult, keyPuyos, firePuyos);
+    if (rensaResult.chains > 0)
+        callback(*f, rensaResult, keyPuyos, firePuyos);
 }
 
 static inline void simulateInternal(CoreField* f, const CoreField& original,
@@ -285,7 +286,8 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
 
     RensaTrackResult rensaTrackResult;
     RensaResult rensaResult = f->simulateAndTrackWithMinHeights(&rensaTrackResult, minHeights);
-    callback(*f, rensaResult, keyPuyos, firePuyos, rensaTrackResult);
+    if (rensaResult.chains > 0)
+        callback(*f, rensaResult, keyPuyos, firePuyos, rensaTrackResult);
 }
 
 template<typename Callback>
