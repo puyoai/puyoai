@@ -577,14 +577,14 @@ field = [
 ]
 
 [[book]]
+name = "NEWGTR-TAIL"
+score = 9.800000
 field = [
     "...c.X",
     "...CXX",
     "....CC",
     "...CXC"
 ]
-name = "NEWGTR-TAIL"
-score = 9.800000
 
 [[book]]
 name = "NEWGTR-TAIL"
