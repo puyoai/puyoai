@@ -93,10 +93,10 @@ TEST(PuyoSetTest, subPuyoSet)
 TEST(PuyoSetTest, addColumnPuyoList)
 {
     ColumnPuyoList cpl;
-    cpl.addPuyo(1, PuyoColor::RED);
-    cpl.addPuyo(1, PuyoColor::YELLOW);
-    cpl.addPuyo(2, PuyoColor::RED);
-    cpl.addPuyo(3, PuyoColor::RED);
+    cpl.add(1, PuyoColor::RED);
+    cpl.add(1, PuyoColor::YELLOW);
+    cpl.add(2, PuyoColor::RED);
+    cpl.add(3, PuyoColor::RED);
 
     PuyoSet set;
     set.add(cpl);

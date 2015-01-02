@@ -34,7 +34,7 @@ bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl) c
             if (ColumnPuyoList::MAX_SIZE <= cpl->size())
                 return false;
             if (field.color(x, y) == PuyoColor::EMPTY)
-                cpl->addPuyo(x, matcher.map(c));
+                cpl->add(x, matcher.map(c));
         }
     }
 

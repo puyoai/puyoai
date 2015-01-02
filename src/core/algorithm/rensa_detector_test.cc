@@ -171,7 +171,8 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat2)
 
     bool found = false;
     ColumnPuyoList expectedFireList;
-    expectedFireList.addPuyo(5, PuyoColor::GREEN, 2);
+    expectedFireList.add(5, PuyoColor::GREEN);
+    expectedFireList.add(5, PuyoColor::GREEN);
     auto callback = [&](const CoreField& /*fieldAfterRensa*/, const RensaResult& rensaResult,
                         const ColumnPuyoList& /*keyPuyos*/, const ColumnPuyoList& firePuyos) {
         if (rensaResult.chains == 3 && firePuyos == expectedFireList) {
