@@ -320,7 +320,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
 
             if (!f.dropPuyoOn(x, c, true))
                 continue;
-            puyoList.addPuyo(x, c);
+            puyoList.add(x, c);
 
             if (f.countConnectedPuyosMax4(x, f.height(x)) < 4)
                 findPossibleRensasInternal(f, puyoList, x, restAdded - 1, strategy, callback);
