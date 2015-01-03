@@ -42,8 +42,6 @@ const bool USE_FIELD_USHAPE_FEATURE = true;
 const bool USE_RIDGE_FEATURE = true;
 const bool USE_VALLEY_FEATURE = true;
 const bool USE_FIRE_POINT_TABOO_FEATURE = true;
-const bool USHAPE_ABS = false;
-const bool USHAPE_SQUARE = true;
 const bool USE_IBARA = true;
 
 }
@@ -264,34 +262,26 @@ void Evaluator<ScoreCollector>::evalFieldUShape(const RefPlan& plan, bool enemyH
         average += (f.height(x) + diff[x]);
     average /= 6;
 
-    double s = 0;
-    if (enemyHasZenkeshi) {
-        for (int x = 1; x <= CoreField::WIDTH; ++x) {
-            int h = f.height(x) + diff[x];
-            s += std::abs(h - average);
-        }
-    } else if (USHAPE_ABS) {
-        for (int x = 1; x <= CoreField::WIDTH; ++x) {
-            int h = f.height(x) + diff[x];
-            if (f.height(x) <= 4) {
-                s += 0.01 * std::abs(h - average);
-            } else {
-                s += std::abs(h - average);
-            }
-        }
-    } else if (USHAPE_SQUARE) {
-        for (int x = 1; x <= CoreField::WIDTH; ++x) {
-            int h = f.height(x) + diff[x];
-            if (f.height(x) <= 4) {
-                s += 0.01 * (h - average) * (h - average);
-            } else {
-                s += (h - average) * (h - average);
-            }
-        }
+    double linearValue = 0;
+    double squareValue = 0;
+    double expValue = 0;
+
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        int h = f.height(x) + diff[x];
+        linearValue += std::abs(h - average);
+        squareValue += (h - average) * (h - average);
+        expValue += std::exp(std::abs(h - average));
     }
 
-    auto key = enemyHasZenkeshi ? FIELD_USHAPE_ON_ZENKESHI : FIELD_USHAPE;
-    sc_->addScore(key, s);
+    if (enemyHasZenkeshi) {
+        sc_->addScore(FIELD_USHAPE_LINEAR_ON_ZENKESHI, linearValue);
+        sc_->addScore(FIELD_USHAPE_SQUARE_ON_ZENKESHI, squareValue);
+        sc_->addScore(FIELD_USHAPE_EXP_ON_ZENKESHI, expValue);
+    } else {
+        sc_->addScore(FIELD_USHAPE_LINEAR, linearValue);
+        sc_->addScore(FIELD_USHAPE_SQUARE, squareValue);
+        sc_->addScore(FIELD_USHAPE_EXP, expValue);
+    }
 }
 
 template<typename ScoreCollector>

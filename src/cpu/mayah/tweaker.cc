@@ -290,9 +290,9 @@ int main(int argc, char* argv[])
         runAutoTweaker(executor.get(), parameter, FLAGS_auto_count);
     } else {
         map<double, RunResult> scoreMap;
-        for (double x = 20; x <= 100; x += 20) {
+        for (double x = 1; x <= 20; x += 1) {
             cout << "current x = " << x << endl;
-            parameter.setValue(NECESSARY_PUYOS_MIDDLE_LINEAR, -x);
+            parameter.setValue(FIELD_USHAPE_EXP, -x);
             scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {
