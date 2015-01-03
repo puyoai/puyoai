@@ -182,6 +182,16 @@ field = [
 # ----------------------------------------------------------------------
 # ZABUTON
 
+[[pattern]]
+field = [
+    "BA....",
+    "AA....",
+    "BC....",
+    "BBD.D.",
+    "CCCDD."
+]
+
+[[pattern]]
 field = [
     "BA....",
     "AA....",
@@ -190,6 +200,7 @@ field = [
     "CCCDDE"
 ]
 
+[[pattern]]
 field = [
     "B.....",
     "AAA...",
@@ -198,6 +209,7 @@ field = [
     "CCCDDE"
 ]
 
+[[pattern]]
 field = [
     "AB..D.",
     "AACDCD",

@@ -896,6 +896,8 @@ field = [
 name = "FUKIGENGTR2-HEAD"
 score = 9.800000
 
+# ----------------------------------------------------------------------
+
 [[book]]
 field = [
     "b.....",
@@ -921,6 +923,8 @@ name = "ZABUTONL-HEAD"
 score = 9.100000
 
 [[book]]
+name = "ZABUTONL-HEAD"
+score = 9.100000
 field = [
     "b.....",
     "Bb....",
@@ -930,10 +934,10 @@ field = [
     "BBE...",
     "AAA..."
 ]
-name = "ZABUTONL-HEAD"
-score = 9.100000
 
 [[book]]
+name = "ZABUTONL-HEAD"
+score = 8.900000
 field = [
     "b.....",
     "B.....",
@@ -943,8 +947,6 @@ field = [
     "BBE...",
     "AAA..."
 ]
-name = "ZABUTONL-HEAD"
-score = 8.900000
 
 [[book]]
 field = [
@@ -976,9 +978,9 @@ score = 9.000000
 [[book]]
 field = [
     "..c...",
-    "BACc..",
-    "BBE.E.",
-    "AAAEE."
+    "BACcX.",
+    "BBEXEX",
+    "AAAEEX"
 ]
 name = "ZABUTONL-TAIL"
 score = 9.000000
