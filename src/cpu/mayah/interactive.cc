@@ -42,11 +42,18 @@ public:
 
     void removeNontokopuyoParameter()
     {
-        evaluationParameter_->setValue(STRATEGY_ZENKESHI, 0);
-        evaluationParameter_->setValue(STRATEGY_INITIAL_ZENKESHI, 0);
-        evaluationParameter_->setValue(STRATEGY_TSUBUSHI, 0);
-        evaluationParameter_->setValue(STRATEGY_IBARA, 0);
-        evaluationParameter_->setValue(STRATEGY_SAISOKU, 0);
+        for (const auto& ef : EvaluationFeature::all()) {
+            if (ef.shouldIgnore())
+                evaluationParameter_->setValue(ef.key(), 0);
+        }
+
+        for (const auto& ef : EvaluationSparseFeature::all()) {
+            if (ef.shouldIgnore()) {
+                for (size_t i = 0; i < ef.size(); ++i) {
+                    evaluationParameter_->setValue(ef.key(), i, 0);
+                }
+            }
+        }
     }
 };
 
