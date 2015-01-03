@@ -74,7 +74,7 @@ AACC = [2, 3]
 ABAB = [2, 0]
 ACAB = [1, 0]
 ACBB = [4, 2]
-ACAC = [2, 0]
+ACAC = [1, 0]
 ACCC = [2, 3]
 
 [[book]]
