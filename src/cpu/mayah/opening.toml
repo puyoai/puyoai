@@ -21,6 +21,8 @@ field = [
 ]
 
 [[book]]
+name = "GTR-HEAD"
+score = 9.000000
 field = [
     "bDD...",
     "BEE...",
@@ -29,8 +31,6 @@ field = [
     "BBA...",
     "AAC..."
 ]
-name = "GTR-HEAD"
-score = 9.000000
 
 [[book]]
 field = [
@@ -215,6 +215,38 @@ field = [
 ]
 name = "GTR-TAIL"
 score = 9.900000
+
+[[book]]
+name = "GTR-TAIL"
+score = 8.900000
+field = [
+    "....XY",
+    "..C.YX",
+    "...YYX",
+    "..CCCX"
+]
+
+[[book]]
+name = "GTR-TAIL"
+score = 8.900000
+field = [
+    ".....Z",
+    "....ZY",
+    "....XY",
+    "..CZYX",
+    "...ZYX",
+    "..CCCX"
+]
+
+[[book]]
+name = "GTR-TAIL"
+score = 8.500000
+field = [
+    "....XY",
+    "..C.XY",
+    "...YYX",
+    "..CCCX"
+]
 
 [[book]]
 field = [
@@ -489,6 +521,19 @@ name = "NEWGTR-HEAD"
 score = 10.000000
 
 [[book]]
+name = "NEWGTR-HEAD"
+score = 9.500000
+field = [
+    "B.....",
+    "D.....",
+    "EE....",
+    "ED....",
+    "DDAC..",
+    "BBBA..",
+    "AAAC.."
+]
+
+[[book]]
 field = [
     "b.....",
     "Bb....",
@@ -551,6 +596,20 @@ field = [
     "E.....",
     "DEE...",
     "DFAC..",
+    "BBBA..",
+    "AAAC.."
+]
+
+[[book]]
+name = "NEWGTR-HEAD"
+score = 9.600000
+field = [
+    "B.....",
+    "D.....",
+    "D.....",
+    "E.....",
+    "EE....",
+    "DDAC..",
     "BBBA..",
     "AAAC.."
 ]
@@ -620,7 +679,7 @@ field = [
 
 [[book]]
 name = "NEWGTR-TAIL"
-score = 7.000000
+score = 2.000000
 field = [
     ".....Y",
     "...CXY",
@@ -631,7 +690,7 @@ field = [
 
 [[book]]
 name = "NEWGTR-TAIL"
-score = 7.000000
+score = 2.000000
 field = [
     ".....Y",
     "...CXY",
