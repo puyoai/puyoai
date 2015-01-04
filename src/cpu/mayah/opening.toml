@@ -140,7 +140,7 @@ field = [
     "..CYYY"
 ]
 name = "GTR-TAIL"
-score = 9.200000
+score = 8.800000
 
 [[book]]
 name = "GTR-TAIL"
@@ -756,6 +756,39 @@ field = [
 ]
 
 [[book]]
+name = "NEWGTR-TAIL"
+score = 9.000000
+field = [
+    "....X.",
+    "...CX.",
+    "....CX",
+    "...CCX"
+]
+
+[[book]]
+name = "NEWGTR-TAIL"
+score = 9.000000
+field = [
+    ".....Y",
+    ".....Y",
+    "....XY",
+    "...CYX",
+    "....CX",
+    "...CCX"
+]
+
+[[book]]
+name = "NEWGTR-TAIL"
+score = 8.800000
+field = [
+    "....YY",
+    "....XY",
+    "...CYX",
+    "....CX",
+    "...CCX"
+]
+
+[[book]]
 name = "NEWGTR2-HEAD"
 score = 10.000000
 field = [
@@ -885,11 +918,11 @@ field = [
     "...CCC"
 ]
 name = "NEWGTR2-TAIL"
-score = 9.800000
+score = 7.800000
 
 [[book]]
 name = "NEWGTR2-TAIL"
-score = 9.800000
+score = 8.000000
 field = [
     ".....X",
     "...XCX",

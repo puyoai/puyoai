@@ -44,6 +44,12 @@ const bool USE_VALLEY_FEATURE = true;
 const bool USE_FIRE_POINT_TABOO_FEATURE = true;
 const bool USE_IBARA = true;
 
+const double FIELD_USHAPE_HEIGHT_COEF[15] = {
+    0.0, 0.1, 0.1, 0.3, 0.3,
+    0.5, 0.5, 0.7, 0.7, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0,
+};
+
 }
 
 template<typename ScoreCollector>
@@ -268,9 +274,10 @@ void Evaluator<ScoreCollector>::evalFieldUShape(const RefPlan& plan, bool enemyH
 
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         int h = f.height(x) + diff[x];
-        linearValue += std::abs(h - average);
-        squareValue += (h - average) * (h - average);
-        expValue += std::exp(std::abs(h - average));
+        double coef = FIELD_USHAPE_HEIGHT_COEF[f.height(x)];
+        linearValue += std::abs(h - average) * coef;
+        squareValue += (h - average) * (h - average) * coef;
+        expValue += std::exp(std::abs(h - average)) * coef;
     }
 
     if (enemyHasZenkeshi) {
