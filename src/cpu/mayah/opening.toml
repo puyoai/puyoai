@@ -604,6 +604,8 @@ name = "NEWGTR-HEAD"
 score = 9.800000
 
 [[book]]
+name = "NEWGTR-HEAD"
+score = 9.800000
 field = [
     "b.....",
     "B.....",
@@ -615,8 +617,6 @@ field = [
     "BBBA..",
     "AAAC.."
 ]
-name = "NEWGTR-HEAD"
-score = 9.800000
 
 [[book]]
 name = "NEWGTR-HEAD"
@@ -973,15 +973,30 @@ field = [
     "...CCX"
 ]
 
+# ----------------------------------------------------------------------
+
 [[book]]
+name = "LTR-HEAD"
+score = 8.600000
 field = [
     "D.....",
     "DBAC..",
     "DBBA..",
     "AAAC.."
 ]
+
+[[book]]
 name = "LTR-HEAD"
-score = 9.600000
+score = 8.600000
+field = [
+    "B.....",
+    "D.....",
+    "E.....",
+    "ED....",
+    "DBAC..",
+    "DBBA..",
+    "AAAC.."
+]
 
 [[book]]
 field = [
@@ -1012,6 +1027,8 @@ field = [
 ]
 name = "LTR-HEAD"
 score = 9.600000
+
+# ----------------------------------------------------------------------
 
 [[book]]
 field = [
