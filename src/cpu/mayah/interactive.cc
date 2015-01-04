@@ -216,6 +216,8 @@ int main(int argc, char* argv[])
                     { seqToShow, seqToShow, KumipuyoSeq(), KumipuyoSeq() });
 
                 cout << mycf.toStringComparingWith(aicf) << endl;
+                cout << aiThoughtResult.message << endl;
+                cout << myThoughtResult.message << endl;
             }
         }
 
