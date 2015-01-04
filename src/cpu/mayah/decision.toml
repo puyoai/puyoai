@@ -115,7 +115,7 @@ ACAC = [2, 3]
 ACBB = [1, 1]
 ACBC = [2, 3]
 ACCC = [1, 1]
-ACDD = [5, 3]  # TODO: [1, 1] is better?
+ACDD = [1, 1]  # [5, 3]?
 BBCB = [1, 2]
 BCBB = [3, 0]
 BCBC = [3, 0]
@@ -190,6 +190,7 @@ field = [
     "..CA..",
     "..AB.."
 ]
+CCAA = [2, 3]
 CCCB = [2, 3]
 
 [[book]]

@@ -3,6 +3,14 @@
 
 [[pattern]]
 field = [
+    "..B...",
+    "..BC..",
+    "..ABC.",
+    "AABCC.",
+]
+
+[[pattern]]
+field = [
     "ABC...",
     "AABCC.",
     "BBC...",
