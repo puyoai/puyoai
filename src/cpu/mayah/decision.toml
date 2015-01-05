@@ -151,6 +151,7 @@ field = [
     "AA...."
 ]
 ACAA = [3, 2]
+ACAB = [3, 2]
 ACAC = [3, 2]
 ACAD = [3, 2]
 
@@ -301,6 +302,13 @@ field = [
 ]
 ACCC = [4, 2]
 ADAC = [4, 2]
+
+[[book]]
+field = [
+    "CCA...",
+    "AAB...",
+]
+ABAB = [2, 1]
 
 [[book]]
 field = [
