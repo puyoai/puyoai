@@ -989,6 +989,17 @@ field = [
 # ----------------------------------------------------------------------
 
 [[book]]
+name = "LTR-KEY"
+score = 1.0
+field = [
+    "......",
+    "D.....",
+    "D.....",
+    "......"
+]
+precondition = [[1, 2], [1, 3]]
+
+[[book]]
 name = "LTR-HEAD"
 score = 8.600000
 field = [
@@ -1340,7 +1351,7 @@ combine = ["LR-HEAD", "LR-KEY", "GTR-TAIL"]
 
 [[combine]]
 name = "LTR-HEAD"
-combine = ["LTR-HEAD", "NEWGTR-TAIL"]
+combine = ["LTR-HEAD", "LTR-KEY", "NEWGTR-TAIL"]
 
 [[combine]]
 name = "FUKIGENGTR-HEAD"
