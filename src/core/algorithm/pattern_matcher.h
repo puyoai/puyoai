@@ -28,7 +28,8 @@ class PatternMatcher {
 public:
     PatternMatcher();
 
-    PatternMatchResult match(const PatternField&, const CoreField&);
+    // If |ignoreMustVar| is true, don't check the existence.
+    PatternMatchResult match(const PatternField&, const CoreField&, bool ignoresMustVar = false);
 
     PuyoColor map(char var) const
     {

@@ -23,7 +23,8 @@ bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl) c
     for (int x = 1; x <= 6; ++x) {
         int h = patternField_.height(x);
         for (int y = 1; y <= h; ++y) {
-            if (patternField_.type(x, y) != PatternType::MUST_VAR) {
+            if (patternField_.type(x, y) != PatternType::VAR &&
+                patternField_.type(x, y) != PatternType::MUST_VAR) {
                 if (field.color(x, y) == PuyoColor::EMPTY)
                     return false;
                 continue;
@@ -33,6 +34,10 @@ bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl) c
                 return false;
             if (ColumnPuyoList::MAX_SIZE <= cpl->size())
                 return false;
+            if (patternField_.type(x, y) == PatternType::MUST_VAR) {
+                if (!isNormalColor(field.color(x, y)))
+                    return false;
+            }
             if (field.color(x, y) == PuyoColor::EMPTY)
                 cpl->add(x, matcher.map(c));
         }

@@ -18,6 +18,7 @@ public:
 
     // match returns the matched score. If not matched, 0 will be returned.
     PatternMatchResult match(const CoreField&) const;
+    bool preMatch(const CoreField&) const;
 
     OpeningBookField mirror() const { return OpeningBookField(name(), patternField_.mirror()); }
 

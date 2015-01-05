@@ -97,17 +97,38 @@ bool PatternField::merge(const PatternField& pf1, const PatternField& pf2, Patte
             if (pt1 == PatternType::MUST_VAR && pt2 == PatternType::MUST_VAR) {
                 if (pf1.variable(x, y) != pf2.variable(x, y))
                     return false;
+            }
+            if (pt1 == PatternType::MUST_VAR) {
+                if (pt2 != PatternType::VAR)
+                    return false;
+                if (pf1.variable(x, y) != pf2.variable(x, y))
+                    return false;
+                pf->setPattern(x, y, pt1, pf1.variable(x, y), std::max(pf1.score(x, y), pf2.score(x, y)));
+                continue;
+            }
+            if (pt2 == PatternType::MUST_VAR) {
+                if (pt1 != PatternType::VAR)
+                    return false;
+                if (pf2.variable(x, y) != pf1.variable(x, y))
+                    return false;
+                pf->setPattern(x, y, pt2, pf2.variable(x, y), std::max(pf1.score(x, y), pf2.score(x, y)));
+                continue;
+            }
+
+            if (pt1 == PatternType::VAR && pt2 == PatternType::VAR) {
+                if (pf1.variable(x, y) != pf2.variable(x, y))
+                    return false;
                 pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), std::max(pf1.score(x, y), pf2.score(x, y)));
                 continue;
             }
-            if (pt1 == PatternType::MUST_VAR) {
+            if (pt1 == PatternType::VAR) {
                 if (pt2 == PatternType::ALLOW_VAR || pt2 == PatternType::NOT_VAR) {
                     pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), pf1.score(x, y));
                     continue;
                 }
                 return false;
             }
-            if (pt2 == PatternType::MUST_VAR) {
+            if (pt2 == PatternType::VAR) {
                 if (pt1 == PatternType::ALLOW_VAR || pt1 == PatternType::NOT_VAR) {
                     pf->setPattern(x, y, pf2.type(x, y), pf2.variable(x, y), pf2.score(x, y));
                     continue;
@@ -140,6 +161,7 @@ void PatternField::setPattern(int x, int y, PatternType t, char variable, double
         scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
+    case PatternType::VAR:
     case PatternType::MUST_VAR:
         CHECK('A' <= variable && variable <= 'Z');
         types_[x][y] = t;
@@ -148,12 +170,6 @@ void PatternField::setPattern(int x, int y, PatternType t, char variable, double
         heights_[x] = std::max(height(x), y);
         break;
     case PatternType::ALLOW_VAR:
-        CHECK(('A' <= variable && variable <= 'Z') || ('a' <= variable && variable <= 'z'));
-        types_[x][y] = t;
-        vars_[x][y] = std::toupper(variable);
-        scores_[x][y] = score;
-        heights_[x] = std::max(height(x), y);
-        break;
     case PatternType::NOT_VAR:
         CHECK(('A' <= variable && variable <= 'Z') || ('a' <= variable && variable <= 'z'));
         types_[x][y] = t;
@@ -176,7 +192,7 @@ PatternType PatternField::inferType(char c, PatternType typeForLowerCase)
     if (c == '_')
         return PatternType::MUST_EMPTY;
     if ('A' <= c && c <= 'Z')
-        return PatternType::MUST_VAR;
+        return PatternType::VAR;
     if ('a' <= c && c <= 'z')
         return typeForLowerCase;
 

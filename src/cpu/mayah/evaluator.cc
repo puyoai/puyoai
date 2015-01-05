@@ -82,7 +82,7 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
     auto matchableOpeningIds = preEvalResult.mutableMatchableOpeningIds();
     for (size_t i = 0; i < openingBook().size(); ++i) {
         const OpeningBookField& obf = openingBook().field(i);
-        if (obf.match(currentField).matched)
+        if (obf.preMatch(currentField))
             matchableOpeningIds->push_back(static_cast<int>(i));
     }
 

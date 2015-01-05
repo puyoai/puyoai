@@ -357,7 +357,20 @@ field = [
     "..CXZY"
 ]
 
+# ----------------------------------------------------------------------
 [[book]]
+name = "LR-KEY"
+score = 1.0
+field = [
+    "B.....",
+    "B.....",
+    "B.....",
+]
+precondition = [[1, 1], [1, 2], [1, 3]]
+
+[[book]]
+name = "LR-HEAD"
+score = 9.700000
 field = [
     "a.....",
     "A.....",
@@ -367,10 +380,10 @@ field = [
     "BAA...",
     "BAC..."
 ]
-name = "LR-HEAD"
-score = 9.700000
 
 [[book]]
+name = "LR-HEAD"
+score = 9.500000
 field = [
     "a.....",
     "A.....",
@@ -381,8 +394,6 @@ field = [
     "BAA...",
     "BAC..."
 ]
-name = "LR-HEAD"
-score = 9.500000
 
 [[book]]
 field = [
@@ -411,6 +422,8 @@ field = [
 ]
 name = "LR-HEAD"
 score = 8.000000
+
+# ----------------------------------------------------------------------
 
 [[book]]
 field = [
@@ -1323,7 +1336,7 @@ combine = ["NEWGTR", "NEWGTR-BASE", "NEWGTR2-HEAD", "NEWGTR2-TAIL"]
 
 [[combine]]
 name = "LR-HEAD"
-combine = ["LR-HEAD", "GTR-TAIL"]
+combine = ["LR-HEAD", "LR-KEY", "GTR-TAIL"]
 
 [[combine]]
 name = "LTR-HEAD"

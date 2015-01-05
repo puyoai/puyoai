@@ -37,6 +37,12 @@ PatternMatchResult OpeningBookField::match(const CoreField& cf) const
     return matcher.match(patternField_, cf);
 }
 
+bool OpeningBookField::preMatch(const CoreField& cf) const
+{
+    PatternMatcher matcher;
+    return matcher.match(patternField_, cf, true).matched;
+}
+
 string OpeningBookField::toDebugString() const
 {
     return patternField_.toDebugString();
@@ -100,7 +106,18 @@ bool OpeningBook::load(const string& filename)
         for (const auto& s : book.get<toml::Array>("field"))
             field.push_back(s.as<string>());
 
-        partialFields.emplace(name, OpeningBookField(name, field, score));
+        OpeningBookField obf(name, field, score);
+        if (const toml::Value* precond = book.find("precondition")) {
+            for (const auto& v : precond->as<toml::Array>()) {
+                int x = v.get<int>(0);
+                int y = v.get<int>(1);
+                PatternField* pf = obf.mutablePatternField();
+                CHECK(pf->type(x, y) == PatternType::VAR);
+                pf->setType(x, y, PatternType::MUST_VAR);
+            }
+        }
+
+        partialFields.emplace(name, obf);
     }
 
     const toml::Array& combines = value.find("combine")->as<toml::Array>();
