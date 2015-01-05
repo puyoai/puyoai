@@ -7,10 +7,10 @@
 #include "core/core_field.h"
 #include "core/algorithm/pattern_field.h"
 
-static PatternMatchResult match(const PatternField& pf, const CoreField& cf)
+static PatternMatchResult match(const PatternField& pf, const CoreField& cf, bool ignoresMustVar = false)
 {
     PatternMatcher matcher;
-    return matcher.match(pf, cf);
+    return matcher.match(pf, cf, ignoresMustVar);
 }
 
 TEST(PatternMatcherTest, match1)
@@ -127,6 +127,40 @@ TEST(PatternMatcherTest, matchWithAllowing)
     EXPECT_EQ(PatternMatchResult(true, 3, 3, 1), match(pf, f3));
     EXPECT_EQ(PatternMatchResult(true, 5, 5, 0), match(pf, f4));
     EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f5));
+}
+
+TEST(PatternMatcherTest, matchWithMust)
+{
+    PatternField pf("AAABBB");
+    pf.setType(1, 1, PatternType::MUST_VAR);
+    pf.setType(6, 1, PatternType::MUST_VAR);
+
+    CoreField f0;
+    CoreField f1(
+        "RRRBBB");
+    CoreField f2(
+        "RRRBB.");
+    CoreField f3(
+        "R.RB.B");
+    CoreField f4(
+        "R....."
+        "RR.BBB");
+    CoreField f5(
+        "RRRRRR");
+
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f0));
+    EXPECT_EQ(PatternMatchResult(true, 6, 6, 0), match(pf, f1));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f2));
+    EXPECT_EQ(PatternMatchResult(true, 4, 4, 0), match(pf, f3));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f4));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f5));
+
+    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pf, f0, true));
+    EXPECT_EQ(PatternMatchResult(true, 6, 6, 0), match(pf, f1, true));
+    EXPECT_EQ(PatternMatchResult(true, 5, 5, 0), match(pf, f2, true));
+    EXPECT_EQ(PatternMatchResult(true, 4, 4, 0), match(pf, f3, true));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f4, true));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f5, true));
 }
 
 TEST(PatternMatcherTest, unmatch1)

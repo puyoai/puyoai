@@ -9,7 +9,7 @@ PatternMatcher::PatternMatcher()
         map_[i] = PuyoColor::WALL;
 }
 
-PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField& cf)
+PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField& cf, bool ignoresMustVar)
 {
     // First, make a map from char to PuyoColor.
     int matchCount = 0;
@@ -26,12 +26,15 @@ PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField
                     return PatternMatchResult(false, 0, 0, 0);
                 continue;
             }
-            if (pf.type(x, y) != PatternType::MUST_VAR)
+            if (pf.type(x, y) != PatternType::VAR && pf.type(x, y) != PatternType::MUST_VAR)
                 continue;
 
             PuyoColor pc = cf.color(x, y);
-            if (pc == PuyoColor::EMPTY)
+            if (pc == PuyoColor::EMPTY) {
+                if (!ignoresMustVar && pf.type(x, y) == PatternType::MUST_VAR)
+                    return PatternMatchResult(false, 0, 0, 0);
                 continue;
+            }
 
             if (!isNormalColor(pc))
                 return PatternMatchResult(false, 0, 0, 0);
@@ -64,6 +67,11 @@ PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField
                 }
                 continue;
             }
+
+            if (!ignoresMustVar && pf.type(x, y) == PatternType::MUST_VAR && cf.color(x, y) == PuyoColor::EMPTY)
+                return PatternMatchResult(false, 0, 0, 0);
+
+            DCHECK(pf.type(x, y) == PatternType::VAR || pf.type(x, y) == PatternType::MUST_VAR);
 
             // Check neighbors.
             if (!checkCell(c, pf.type(x, y + 1), pf.variable(x, y + 1), cf.color(x, y + 1)))

@@ -8,7 +8,7 @@
 #include "core/field_constant.h"
 
 enum class PatternType : std::uint8_t {
-    NONE, ANY, MUST_EMPTY, MUST_VAR, ALLOW_VAR, NOT_VAR,
+    NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR,
 };
 
 // PatternField is a field that holds characters.
@@ -38,6 +38,7 @@ public:
     std::string toDebugString() const;
 
     void setScore(int x, int y, double d) { scores_[x][y] = d; }
+    void setType(int x, int y, PatternType t) { types_[x][y] = t; }
     void setVariable(int x, int y, char c) { vars_[x][y] = c; }
 
 private:
