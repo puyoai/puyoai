@@ -111,6 +111,7 @@ ABBB = [2, 3]  # TODO: [2, 1]? [2, 3]
 ABAD = [2, 3]
 ABBD = [2, 3]
 ABDD = [2, 3]  # TODO: [1, 1]?
+ACAA = [1, 1]
 ACAB = [1, 1]
 ACAC = [2, 3]
 ACBB = [1, 1]
