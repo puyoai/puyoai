@@ -116,7 +116,6 @@ void Evaluator<ScoreCollector>::evalBook(const OpeningBook& openingBook,
 {
     double maxScore = 0;
     const OpeningBookField* bestBf = nullptr;
-    bool completeMatch = false;
     set<string> matchedBookNames;
 
     int totalPuyoCount = plan.field().countPuyos();
@@ -149,7 +148,6 @@ void Evaluator<ScoreCollector>::evalBook(const OpeningBook& openingBook,
         if (maxScore < score) {
             bestBf = &bf;
             maxScore = score;
-            completeMatch = mr.count == totalPuyoCount;
         }
     }
 
