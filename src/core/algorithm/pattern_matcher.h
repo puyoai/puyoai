@@ -1,6 +1,8 @@
 #ifndef CORE_ALGORITHM_PATTERN_MATCHER_H_
 #define CORE_ALGORITHM_PATTERN_MATCHER_H_
 
+#include <tuple>
+
 #include "core/puyo_color.h"
 #include "core/algorithm/pattern_field.h"
 
