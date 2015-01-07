@@ -28,7 +28,7 @@ public:
 
 private:
     PatternField patternField_;
-    char ignoreables[26];
+    bool ignoreables[26];
 };
 
 class PatternBook : noncopyable {
