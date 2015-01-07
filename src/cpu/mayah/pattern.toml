@@ -200,6 +200,7 @@ field = [
     "BCCA..",
 ]
 
+[[pattern]]
 field = [
     "......",
     "..BCC.",
