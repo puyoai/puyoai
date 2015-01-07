@@ -76,7 +76,7 @@ ABAB = [2, 0]
 ACAA = [4, 2]
 ACAB = [1, 0]
 ACBB = [4, 2]
-ACAC = [1, 0]
+ACAC = [2, 3]  # [1, 0]? [2, 3]?
 ACCC = [2, 3]
 
 [[book]]
@@ -179,6 +179,7 @@ ACBD = [4, 2]
 ACDD = [4, 2]
 BCAD = [1, 0]
 BCAC = [4, 1]
+BCBD = [1, 0]
 CCAB = [5, 1]  # TODO: [1, 2] ?
 
 [[book]]
@@ -188,6 +189,7 @@ field = [
 ]
 ACBC = [1, 1]
 AAAC = [5, 1]
+AAAB = [5, 1]
 
 [[book]]
 field = [
@@ -203,6 +205,7 @@ field = [
     "B.C...",
     "A.A..."
 ]
+ABCD = [2, 0]
 ACCD = [2, 0]
 
 [[book]]
@@ -220,6 +223,14 @@ field = [
 ]
 BBAD = [3, 2]
 
+[[book]]
+field = [
+    "B.....",
+    "A.C...",
+    "ABB..."
+]
+ACAA = [2, 2]
+
 # ----------------------------------------------------------------------
 
 [[book]]
@@ -230,6 +241,7 @@ field = [
 ACBC = [3, 3]
 ACAD = [4, 2]
 BCAB = [4, 0]
+BCBD = [4, 0]
 CCAB = [2, 3]
 
 [[book]]
@@ -263,12 +275,14 @@ field = [
 ]
 BCBB = [3, 1]
 ADAD = [2, 0]
+CDBB = [4, 0]
 
 [[book]]
 field = [
     "BCC...",
     "AAA...",
 ]
+ABAC = [2, 3]
 ADBB = [4, 2]
 CDAD = [4, 1] # [2, 0]? [4, 1]?
 CCCD = [4, 1]
@@ -373,6 +387,7 @@ field = [
     "ACC...",
     "ABB..."
 ]
+AABC = [3, 2]  # for ZENKESHI
 BBAD = [5, 1]
 BBAC = [1, 2]
 
