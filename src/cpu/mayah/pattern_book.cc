@@ -19,6 +19,11 @@ bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl) c
     if (!matcher.match(patternField_, field).matched)
         return false;
 
+    int currentHeights[FieldConstant::MAP_WIDTH] {
+        0, field.height(1), field.height(2), field.height(3),
+        field.height(4), field.height(5), field.height(6), 0
+    };
+
     cpl->clear();
     for (int x = 1; x <= 6; ++x) {
         int h = patternField_.height(x);
@@ -30,20 +35,37 @@ bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl) c
                 continue;
             }
             char c = patternField_.variable(x, y);
-            if (!matcher.isSet(c))
+            if (!matcher.isSet(c)) {
+                if (isIgnoreable(c))
+                    continue;
                 return false;
+            }
             if (ColumnPuyoList::MAX_SIZE <= cpl->size())
                 return false;
             if (patternField_.type(x, y) == PatternType::MUST_VAR) {
                 if (!isNormalColor(field.color(x, y)))
                     return false;
             }
-            if (field.color(x, y) == PuyoColor::EMPTY)
+            if (field.color(x, y) == PuyoColor::EMPTY && currentHeights[x] + 1 == y) {
                 cpl->add(x, matcher.map(c));
+                currentHeights[x]++;
+            }
         }
     }
 
     return true;
+}
+
+bool PatternBookField::isIgnoreable(char c) const
+{
+    DCHECK('A' <= c && c <= 'Z');
+    return ignoreables[c - 'A'];
+}
+
+void PatternBookField::setIgnoreable(char c)
+{
+    DCHECK('A' <= c && c <= 'Z');
+    ignoreables[c - 'A'] = true;
 }
 
 bool PatternBook::load(const std::string& filename)
@@ -68,6 +90,11 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
         for (const auto& s : v.get<toml::Array>("field"))
             f.push_back(s.as<string>());
         PatternBookField patternBookField(f);
+        if (const toml::Value* ignoreables = v.find("ignoreables")) {
+            for (char c : ignoreables->as<string>()) {
+                patternBookField.setIgnoreable(c);
+            }
+        }
         fields_.push_back(patternBookField);
         fields_.push_back(patternBookField.mirror());
     }

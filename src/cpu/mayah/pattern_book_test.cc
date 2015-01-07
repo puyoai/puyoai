@@ -63,3 +63,25 @@ TEST(PatternBookField, complement3)
     ColumnPuyoList cpl;
     EXPECT_FALSE(pbf.complement(cf, &cpl));
 }
+
+TEST(PatternBookField, ignoreable)
+{
+    PatternBookField pbf(
+        ".BCD.."
+        ".ABCD."
+        ".ABCD."
+        ".ABCD.");
+
+    CoreField cf(
+        ".G...."
+        ".RG..."
+        ".RGB.."
+        ".RGB..");
+
+    ColumnPuyoList cpl;
+    EXPECT_FALSE(pbf.complement(cf, &cpl));
+
+    cpl.clear();
+    pbf.setIgnoreable('D');
+    EXPECT_TRUE(pbf.complement(cf, &cpl));
+}
