@@ -2,8 +2,10 @@
 #define CORE_CLIENT_AI_ENDLESS_ENDLESS_H_
 
 #include <memory>
+#include <vector>
 
 #include "core/client/ai/ai.h"
+#include "core/decision.h"
 
 struct FrameRequest;
 class KumipuyoSeq;
@@ -13,6 +15,7 @@ struct EndlessResult {
     int score;
     int maxRensa;
     bool zenkeshi;
+    std::vector<Decision> decisions;
 };
 
 // Endless implements endless mode. This can be used to check your AI's strength.
