@@ -23,6 +23,8 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
 
     setEnemyField(&req);
 
+    vector<Decision> decisions;
+
     int maxRensaScore = 0;
     int maxRensa = 0;
     for (int i = 0; i < 50; ++i) {
@@ -49,6 +51,8 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
             FieldPrettyPrinter::print(f, req.playerFrameRequest[0].kumipuyoSeq.subsequence(1));
         }
 
+        decisions.push_back(dropDecision.decision());
+
         RensaResult rensaResult = f.simulate();
         maxRensaScore = std::max(maxRensaScore, rensaResult.score);
         maxRensa = std::max(maxRensa, rensaResult.chains);
@@ -58,6 +62,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
                 .score = -1,
                 .maxRensa = -1,
                 .zenkeshi = false,
+                .decisions = decisions,
             };
         }
         if (rensaResult.score > 10000) {
@@ -67,6 +72,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
                 .score = rensaResult.score,
                 .maxRensa = rensaResult.chains,
                 .zenkeshi = f.isZenkeshi(),
+                .decisions = decisions,
             };
         }
         if (f.isZenkeshi()) {
@@ -75,6 +81,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
                 .score = rensaResult.score,
                 .maxRensa = rensaResult.chains,
                 .zenkeshi = true,
+                .decisions = decisions,
             };
         }
         req.playerFrameRequest[0].field = f;
@@ -89,6 +96,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
         .score = maxRensaScore,
         .maxRensa = maxRensa,
         .zenkeshi = false,
+        .decisions = decisions,
     };
 }
 
