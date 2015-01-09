@@ -41,6 +41,7 @@ ABBB = [1, 0]
 ABBC = [1, 0]
 ABCC = [4, 2]
 BBAA = [1, 2] # [1, 2]? [3, 3]?
+BBAC = [3, 3]
 BBBB = [3, 3]
 BBBC = [3, 3]
 BBCC = [3, 3]
@@ -134,6 +135,7 @@ AACC = [5, 1]  # TODO: [2, 3] ?
 ACAB = [4, 2]
 ACAC = [4, 2]
 ACAD = [4, 2]
+ACCC = [1, 0]
 BBBC = [4, 1]
 BCAC = [4, 1]
 BCBC = [1, 0]
@@ -177,6 +179,7 @@ ACAB = [4, 2]
 ACBB = [4, 2]
 ACBD = [4, 2]
 ACDD = [4, 2]
+BBCD = [2, 3]
 BCAD = [1, 0]
 BCAC = [4, 1]
 BCBD = [1, 0]
@@ -416,3 +419,11 @@ field = [
     "AAA..."
 ]
 ADBD = [6, 2]
+
+[[book]]
+field = [
+    "BA....",
+    "BCC...",
+    "AAA..."
+]
+BCAC = [2, 1]  # For ZENKESHI
