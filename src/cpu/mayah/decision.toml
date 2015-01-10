@@ -53,6 +53,7 @@ field = [
 ]
 ABAB = [3, 0]
 ABAC = [3, 0]
+ABBC = [3, 0]
 ABCC = [3, 2]
 
 [[book]]
@@ -139,7 +140,7 @@ ACCC = [1, 0]
 BBBC = [4, 1]
 BCAC = [4, 1]
 BCBC = [1, 0]
-BCBD = [4, 1]
+BCBD = [1, 0]  # [1, 0]? [4, 1]?
 BCCC = [4, 0]
 BCCD = [4, 1]
 CCAC = [1, 2]
@@ -209,6 +210,7 @@ field = [
     "A.A..."
 ]
 ABCD = [2, 0]
+ACCC = [2, 0]
 ACCD = [2, 0]
 ACDD = [2, 0]
 
@@ -247,6 +249,7 @@ ACAD = [4, 2]
 BCAB = [4, 0]
 BCBD = [4, 0]
 CCAB = [2, 3]
+CDBC = [6, 2]
 
 [[book]]
 field = [
@@ -306,6 +309,7 @@ field = [
     "AAAB..",
 ]
 CDAC = [1, 0]
+DDAC = [1, 2]
 
 [[book]]
 field = [

@@ -1255,20 +1255,22 @@ field = [
 name = "LLR"
 score = 9.300000
 
-[[book]]
-field = [
-    "a.....",
-    "Aa....",
-    "Bb....",
-    "DD....",
-    "DAC...",
-    "BAA...",
-    "BBC..."
-]
-name = "NAMEKUJI"
-score = 5.200000
+# ----------------------------------------------------------------------
 
 [[book]]
+name = "NAMEKUJI-KEY"
+score = 10.0
+field = [
+    "D.....",
+    "D.....",
+    "......",
+    "......"
+]
+
+
+[[book]]
+name = "NAMEKUJI"
+score = 5.200000
 field = [
     "a.....",
     "Aa....",
@@ -1278,8 +1280,36 @@ field = [
     "BAA...",
     "BBC..."
 ]
+
+[[book]]
 name = "NAMEKUJI"
 score = 5.200000
+field = [
+    "a.....",
+    "Aa....",
+    "Bb....",
+    "DD....",
+    "DAC...",
+    "BAA...",
+    "BBC..."
+]
+
+[[book]]
+name = "NAMEKUJI"
+score = 5.200000
+field = [
+    "B.....",
+    "A.....",
+    "D.....",
+    "D.....",
+    "BB....",
+    "DB....",
+    "DAC...",
+    "BAA...",
+    "BBC..."
+]
+
+# ----------------------------------------------------------------------
 
 [[book]]
 field = [
@@ -1386,7 +1416,7 @@ combine = ["LLR"]
 
 [[combine]]
 name = "NAMEKUJI"
-combine = ["NAMEKUJI", "GTR-TAIL"]
+combine = ["NAMEKUJI", "NAMEKUJI-KEY", "GTR-TAIL"]
 
 [[combine]]
 name = "YAYOI"
