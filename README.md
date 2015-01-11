@@ -43,7 +43,7 @@ build ディレクトリを掘って、そこで build するのがオススメ�
 * SDL と SDL_ttf が無い場合、 GUI がつきません。
 * capture/ ディレクトリについては、 capture/README を参照してください。
 
-* Macの場合、brewを使うと楽です。
+Macの場合、brewを使うと楽です。Xcode、コマンドラインツール、homebrewをインストールしてください。デフォルトで/usr/local/includeなどを見ないようになっている可能性がありますが、xcode-select --installを叩いておくと解決します。
 
     $ brew install pkg-config
     $ brew install gflags glog sdl2 SDL2_ttf SDL2_image ffmpeg libusb libgcrypt
