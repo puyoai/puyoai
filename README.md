@@ -44,6 +44,7 @@ build ディレクトリを掘って、そこで build するのがオススメ�
 * capture/ ディレクトリについては、 capture/README を参照してください。
 
 * Macの場合、brewを使うと楽です。
+
     $ brew install pkg-config
     $ brew install gflags glog sdl2 SDL2_ttf SDL2_image ffmpeg libusb libgcrypt
 
