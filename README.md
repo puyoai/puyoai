@@ -5,7 +5,7 @@ puyoai
 
 ## ビルド方法
 
-現状、Mac OS X(10.9) と Ubuntu Linux 14.04 でビルドできることを確認しています。
+現状、Mac OS X(10.10 Yosemite) と Ubuntu Linux 14.04 でビルドできることを確認しています。
 古めの Linux (Ubuntu 12.04 など)では、SDL 2.0 がないのと、gcc や clang が古いのとで、
 いろいろ自分でビルドしなければなりません。
 
@@ -43,7 +43,9 @@ build ディレクトリを掘って、そこで build するのがオススメ�
 * SDL と SDL_ttf が無い場合、 GUI がつきません。
 * capture/ ディレクトリについては、 capture/README を参照してください。
 
-Macの場合、brewを使うと楽です。Xcode、コマンドラインツール、homebrewをインストールしてください。デフォルトで/usr/local/includeなどを見ないようになっている可能性がありますが、xcode-select --installを叩いておくと解決します。
+Macの場合、homebrewを使うと楽です。Xcode、コマンドラインツール、homebrewをインストールしてください。デフォルトで/usr/local/includeなどを見ないようになっている可能性がありますが、xcode-select --installを叩いておくと解決します。
+
+次のコマンドで必要なものが入るとおもいます。
 
     $ brew install pkg-config
     $ brew install gflags glog sdl2 SDL2_ttf SDL2_image ffmpeg libusb libgcrypt
