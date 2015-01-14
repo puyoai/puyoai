@@ -142,7 +142,7 @@ string makePuyopURL(const KumipuyoSeq& seq, const vector<Decision>& decisions)
 
     ss << "http://www.puyop.com/s/_";
 
-    for (int i = 0; i < 50; ++i) {
+    for (size_t i = 0; i < 50; ++i) {
         const Kumipuyo& kp = seq.get(i);
         int d = 0;
         switch (kp.axis) {
