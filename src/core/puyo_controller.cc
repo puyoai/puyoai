@@ -98,6 +98,28 @@ void PuyoController::moveKumipuyo(const PlainField& field, const KeySet& keySet,
         moveKumipuyoByArrowKey(field, keySet, mks, downAccepted);
     }
 
+    bool grounding = mks->grounding;
+    if (field.get(mks->pos.axisX(), mks->pos.axisY() - 1) != PuyoColor::EMPTY ||
+        field.get(mks->pos.childX(), mks->pos.childY() - 1) != PuyoColor::EMPTY) {
+        grounding |= mks->restFramesForFreefall <= FRAMES_FREE_FALL / 2;
+    } else {
+        grounding = false;
+    }
+
+    if (grounding && !mks->grounding) {
+        mks->restFramesForFreefall = FRAMES_FREE_FALL;
+        mks->grounding = true;
+        mks->numGrounded += 1;
+
+        if (mks->numGrounded >= 8) {
+            mks->grounded = true;
+            return;
+        }
+    }
+    if (!grounding && mks->grounding) {
+        mks->restFramesForFreefall = FRAMES_FREE_FALL / 2;
+        mks->grounding = false;
+    }
 }
 
 void PuyoController::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
@@ -131,6 +153,13 @@ void PuyoController::moveKumipuyoByArrowKey(const PlainField& field, const KeySe
         // For DOWN key, we don't set restFramesArrowProhibited.
         if (downAccepted)
             *downAccepted = true;
+
+        if (mks->grounding) {
+            mks->restFramesForFreefall = 0;
+            mks->grounded = true;
+            return;
+        }
+
         if (mks->restFramesForFreefall > 0) {
             mks->restFramesForFreefall = 0;
             return;
@@ -173,7 +202,7 @@ void PuyoController::moveKumipuyoByTurnKey(const PlainField& field, const KeySet
                 mks->pos.r = 2;
                 mks->pos.y++;
                 mks->restFramesToAcceptQuickTurn = 0;
-                mks->restFramesForFreefall = FRAMES_FREE_FALL;
+                mks->restFramesForFreefall = FRAMES_FREE_FALL / 2;
                 *needsFreefallProcess = false;
                 return;
             }
@@ -189,7 +218,7 @@ void PuyoController::moveKumipuyoByTurnKey(const PlainField& field, const KeySet
             if (mks->pos.y < 13) {
                 mks->pos.r = (mks->pos.r + 1) % 4;
                 mks->pos.y++;
-                mks->restFramesForFreefall = FRAMES_FREE_FALL;
+                mks->restFramesForFreefall = FRAMES_FREE_FALL / 2;
                 *needsFreefallProcess = false;
                 return;
             }
@@ -249,7 +278,7 @@ void PuyoController::moveKumipuyoByTurnKey(const PlainField& field, const KeySet
                 mks->pos.r = 2;
                 mks->pos.y++;
                 mks->restFramesToAcceptQuickTurn = 0;
-                mks->restFramesForFreefall = FRAMES_FREE_FALL;
+                mks->restFramesForFreefall = FRAMES_FREE_FALL / 2;
                 *needsFreefallProcess = false;
                 return;
             }
@@ -291,7 +320,7 @@ void PuyoController::moveKumipuyoByTurnKey(const PlainField& field, const KeySet
             if (mks->pos.y < 13) {
                 mks->pos.r = (mks->pos.r + 3) % 4;
                 mks->pos.y++;
-                mks->restFramesForFreefall = FRAMES_FREE_FALL;
+                mks->restFramesForFreefall = FRAMES_FREE_FALL / 2;
                 *needsFreefallProcess = false;
                 return;
             }

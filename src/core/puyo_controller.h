@@ -32,12 +32,16 @@ struct MovingKumipuyoState {
                         lhs.restFramesArrowProhibited,
                         lhs.restFramesToAcceptQuickTurn,
                         lhs.restFramesForFreefall,
+                        lhs.numGrounded,
+                        lhs.grounding,
                         lhs.grounded) ==
             std::tie(rhs.pos,
                      rhs.restFramesTurnProhibited,
                      rhs.restFramesArrowProhibited,
                      rhs.restFramesToAcceptQuickTurn,
                      rhs.restFramesForFreefall,
+                     rhs.numGrounded,
+                     rhs.grounding,
                      rhs.grounded);
     }
     friend bool operator!=(const MovingKumipuyoState& lhs, const MovingKumipuyoState& rhs) { return !(lhs == rhs); }
@@ -48,12 +52,16 @@ struct MovingKumipuyoState {
                         lhs.restFramesArrowProhibited,
                         lhs.restFramesToAcceptQuickTurn,
                         lhs.restFramesForFreefall,
+                        lhs.numGrounded,
+                        lhs.grounding,
                         lhs.grounded) <
             std::tie(rhs.pos,
                      rhs.restFramesTurnProhibited,
                      rhs.restFramesArrowProhibited,
                      rhs.restFramesToAcceptQuickTurn,
                      rhs.restFramesForFreefall,
+                     rhs.numGrounded,
+                     rhs.grounding,
                      rhs.grounded);
     }
     friend bool operator>(const MovingKumipuyoState& lhs, const MovingKumipuyoState& rhs) { return rhs < lhs; }
@@ -63,6 +71,8 @@ struct MovingKumipuyoState {
     int restFramesArrowProhibited = 0;
     int restFramesToAcceptQuickTurn = 0;
     int restFramesForFreefall = FRAMES_FREE_FALL;
+    int numGrounded = 0;
+    bool grounding = false;
     bool grounded = false;
 };
 
