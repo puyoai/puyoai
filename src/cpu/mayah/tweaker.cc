@@ -281,6 +281,7 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
     cout << "median     = " << scores[scores.size() / 2].first << endl;
     cout << "deviation  = " << deviation << endl;
     cout << "main rensa = " << mainRensaCount << endl;
+    cout << "main rensa % = " << (100.0 * mainRensaCount / scores.size()) << endl;
     cout << "ave main rensa = " << aveMainRensaScore << endl;
     cout << "over  40000 = " << over40000Count << endl;
     cout << "over  60000 = " << over60000Count << endl;
