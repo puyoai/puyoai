@@ -41,7 +41,7 @@ static int getRemainingMilliSeconds(const struct timeval& start)
         return numeric_limits<int>::max();
 
     int usec = getUsecFromStart(start);
-    return (TIMEOUT_USEC - usec + 999999) / 1000000;
+    return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
 static void logFrameResponses(int frameId, const vector<FrameResponse> alldata[2])
