@@ -6,6 +6,7 @@
 #include "capture/capture.h"
 #include "capture/screen_shot_saver.h"
 #include "capture/somagic_source.h"
+#include "capture/syntek_source.h"
 #include "gui/bounding_box_drawer.h"
 #include "gui/box.h"
 #include "gui/fps_drawer.h"
@@ -23,6 +24,8 @@ static unique_ptr<Source> makeVideoSource()
 {
     if (FLAGS_source == "somagic")
         return unique_ptr<Source>(new SomagicSource("connect"));
+    if (FLAGS_source == "syntek")
+        return unique_ptr<Source>(new SyntekSource);
 
     return unique_ptr<Source>(nullptr);
 }
