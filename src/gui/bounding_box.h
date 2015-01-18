@@ -16,7 +16,7 @@ public:
 
     static BoundingBox& instance();
 
-    void setGenerator(int offsetX, int offsetY, int bbWidth, int bbHeight);
+    void setGenerator(double offsetX, double offsetY, double bbWidth, double bbHeight);
     Box get(int pi, int x, int y) const;
     Box get(int pi, NextPuyoPosition n) const;
 
@@ -33,10 +33,10 @@ private:
     BoundingBox();
     ~BoundingBox();
 
-    int offsetX_;
-    int offsetY_;
-    int bbWidth_;
-    int bbHeight_;
+    double offsetX_;
+    double offsetY_;
+    double bbWidth_;
+    double bbHeight_;
 
     std::map<Region, Box> regionBox_;
 };

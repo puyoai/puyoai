@@ -21,7 +21,7 @@ BoundingBox::~BoundingBox()
 {
 }
 
-void BoundingBox::setGenerator(int offsetX, int offsetY, int bbWidth, int bbHeight)
+void BoundingBox::setGenerator(double offsetX, double offsetY, double bbWidth, double bbHeight)
 {
     offsetX_ = offsetX;
     offsetY_ = offsetY;
@@ -33,10 +33,10 @@ Box BoundingBox::get(int pi, int x, int y) const
 {
     x = 12 * pi + x;
 
-    int sx = offsetX_ + (x - 1) * bbWidth_;
-    int dx = offsetX_ + x * bbWidth_;
-    int sy = offsetY_ + (11 - y) * bbHeight_;
-    int dy = offsetY_ + (12 - y) * bbHeight_;
+    int sx = static_cast<int>(offsetX_ + (x - 1) * bbWidth_);
+    int dx = static_cast<int>(offsetX_ + x * bbWidth_);
+    int sy = static_cast<int>(offsetY_ + (11 - y) * bbHeight_);
+    int dy = static_cast<int>(offsetY_ + (12 - y) * bbHeight_);
 
     return Box(sx, sy, dx, dy);
 }
