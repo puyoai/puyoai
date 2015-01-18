@@ -13,6 +13,7 @@
 #include "capture/capture.h"
 #include "capture/screen_shot_saver.h"
 #include "capture/somagic_source.h"
+#include "capture/syntek_source.h"
 #include "capture/movie_source.h"
 #include "capture/movie_source_key_listener.h"
 #include "core/server/commentator.h"
@@ -47,6 +48,8 @@ static unique_ptr<Source> makeVideoSource()
 {
     if (FLAGS_source == "somagic")
         return unique_ptr<Source>(new SomagicSource("connect"));
+    if (FLAGS_source == "syntek")
+        return unique_ptr<Source>(new SyntekSource);
 
     MovieSource* source = new MovieSource(FLAGS_source);
     CHECK(source->ok());

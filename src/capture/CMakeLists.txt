@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
+add_subdirectory(driver)
+
 add_library(puyoai_capture
             ac_analyzer.cc
             analyzer.cc analyzer_result_drawer.cc
@@ -12,17 +14,28 @@ if(V4L2_LIBRARY)
     add_library(puyoai_capture_viddev viddev_source.cc)
 endif()
 
+if(LIB_USB)
+    add_library(puyoai_capture_syntek syntek_source.cc)
+endif()
+
 if(LIB_USB AND LIB_GCRYPT)
-  puyoai_add_cxx_flags("-DUSE_SOMAGIC")
-  add_library(puyoai_capture_somagic somagic_source.cc)
+    puyoai_add_cxx_flags("-DUSE_SOMAGIC")
+    add_library(puyoai_capture_somagic somagic_source.cc)
 endif()
 
 # ----------------------------------------------------------------------
 
 function(capture_add_executable exe)
   add_executable(${exe} ${exe}.cc)
+  if(LIB_USB)
+    target_link_libraries(${exe} puyoai_capture_syntek)
+    target_link_libraries(${exe} puyoai_capture_driver_syntek)
+  endif()
   if(LIB_USB AND LIB_GCRYPT)
     target_link_libraries(${exe} puyoai_capture_somagic)
+  endif()
+  if(V4L2_LIBRARY)
+    target_link_libraries(${exe} puyoai_capture_viddev)
   endif()
   target_link_libraries(${exe} puyoai_capture)
   target_link_libraries(${exe} puyoai_gui)
