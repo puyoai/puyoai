@@ -11,6 +11,7 @@
 #include <memory>
 #include <glog/logging.h>
 
+#include "capture/capture_source.h"
 #include "capture/usb_device.h"
 #include "gui/box.h"
 #include "gui/screen.h"
@@ -1133,27 +1134,6 @@ bool SomagicSource::start()
     return true;
 }
 
-static int convertUVY2RGBA(int u, int v, int y)
-{
-    u -= 128;
-    v -= 128;
-
-    double r1 = y + 1.40200 * v;
-    double g1 = y - 0.34414 * u - 0.71414 * v;
-    double b1 = y + 1.77200 * u;
-
-    r1 = (r1 - 16) * 255 / 219;
-    g1 = (g1 - 16) * 255 / 219;
-    b1 = (b1 - 16) * 255 / 219;
-
-    int r = std::max(0, std::min(255, static_cast<int>(r1)));
-    int g = std::max(0, std::min(255, static_cast<int>(g1)));
-    int b = std::max(0, std::min(255, static_cast<int>(b1)));
-
-    //return SDL_MapRGBA(, (Uint8)r, (Uint8)g, (Uint8)b, 0);
-    return b + (g << 8) + (r << 16);
-}
-
 void SomagicSource::setBuffer(const unsigned char* buf, int size)
 {
     int pos = 0;
@@ -1166,8 +1146,11 @@ void SomagicSource::setBuffer(const unsigned char* buf, int size)
             int y1 = buf[1];
             int v  = buf[2];
             int y2 = buf[3];
-            data[pos++] = convertUVY2RGBA(u, v, y1);
-            data[pos++] = convertUVY2RGBA(u, v, y2);
+            int r, g, b;
+            convertUVY2RGBA(u, v, y1, &r, &g, &b);
+            data[pos++] = b + (g << 8) + (r << 16);
+            convertUVY2RGBA(u, v, y2, &r, &g, &b);
+            data[pos++] = b + (g << 8) + (r << 16);
             buf += 4;
         }
         size -= 1440;
