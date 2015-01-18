@@ -4,7 +4,7 @@
 
 #include "capture/capture.h"
 #include "capture/screen_shot_saver.h"
-#include "capture/somagic_analyzer.h"
+#include "capture/ac_analyzer.h"
 #include "capture/somagic_source.h"
 #include "gui/bounding_box_drawer.h"
 #include "gui/box.h"
@@ -31,8 +31,8 @@ int main(int argc, char* argv[])
             exit(EXIT_FAILURE);
         }
 
-        SomagicAnalyzer somagicAnalyzer;
-        Capture capture(&somagicSource, &somagicAnalyzer);
+        ACAnalyzer analyzer;
+        Capture capture(&somagicSource, &analyzer);
 
         unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;
         if (FLAGS_draw_result)

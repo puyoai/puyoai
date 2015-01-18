@@ -13,7 +13,7 @@ endif()
 
 if(LIB_USB AND LIB_GCRYPT)
   puyoai_add_cxx_flags("-DUSE_SOMAGIC")
-  add_library(puyoai_capture_somagic somagic_analyzer.cc somagic_source.cc)
+  add_library(puyoai_capture_somagic ac_analyzer.cc somagic_source.cc)
 endif()
 
 # ----------------------------------------------------------------------
@@ -65,6 +65,6 @@ function(capture_add_test exe)
   add_test(check-${exe} ${exe})
 endfunction()
 
+capture_add_test(ac_analyzer_test)
 capture_add_test(color_test)
 capture_add_test(real_color_field_test)
-capture_add_test(somagic_analyzer_test)
