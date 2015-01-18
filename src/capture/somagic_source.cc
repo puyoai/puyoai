@@ -11,6 +11,7 @@
 #include <memory>
 #include <glog/logging.h>
 
+#include "capture/usb_device.h"
 #include "gui/box.h"
 #include "gui/screen.h"
 
@@ -160,28 +161,6 @@ static void release_usb_device(int ret)
 	libusb_close(devh);
 	libusb_exit(NULL);
 	exit(1);
-}
-
-static struct libusb_device *find_device(int vendor, int product)
-{
-	struct libusb_device **list;
-	struct libusb_device *dev = NULL;
-	struct libusb_device_descriptor descriptor;
-	struct libusb_device *item;
-	int i;
-	ssize_t count;
-	count = libusb_get_device_list(NULL, &list);
-	for (i = 0; i < count; i++) {
-		item = list[i];
-		libusb_get_device_descriptor(item, &descriptor);
-		if (descriptor.idVendor == vendor && descriptor.idProduct == product) {
-			dev = item;
-		} else {
-			libusb_unref_device(item);
-		}
-	}
-	libusb_free_device_list(list, 0);
-	return dev;
 }
 
 static void print_bytes(unsigned char *bytes, int len)
@@ -731,7 +710,7 @@ static int somagic_init()
 	libusb_set_debug(NULL, 0);
 
 	for (p = 0; p < PRODUCT_COUNT; p++) {
-		dev = find_device(VENDOR, PRODUCT[p]);
+		dev = findDevice(VENDOR, PRODUCT[p]);
 		if (dev) {
 			break;
 		}
