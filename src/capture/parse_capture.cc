@@ -36,8 +36,10 @@ int main(int argc, char* argv[])
     atexit(SDL_Quit);
 
     unique_ptr<Source> source(makeVideoSource());
-
-    printf("source initialized\n");
+    if (!source.get()) {
+        printf("source is not initialized.\n");
+        return 1;
+    }
 
     ACAnalyzer analyzer;
     Capture capture(source.get(), &analyzer);
