@@ -408,10 +408,10 @@ bool SyntekDriver::initChip()
     if (!writeSAA711XRegister(0x0a, 0x7f))
         return false;
     // contrast
-    if (!writeSAA711XRegister(0x0b, 0x7f))
+    if (!writeSAA711XRegister(0x0b, 0x40))
         return false;
     // saturation
-    if (!writeSAA711XRegister(0x0c, 0x7f))
+    if (!writeSAA711XRegister(0x0c, 0x40))
         return false;
     // hue
     if (!writeSAA711XRegister(0x0d, 00))
