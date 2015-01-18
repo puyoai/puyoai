@@ -1,4 +1,4 @@
-#include "capture/somagic_analyzer.h"
+#include "capture/ac_analyzer.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -54,7 +54,7 @@ static RealColor toRealColor(const HSV& hsv)
 }
 
 static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS], int threshold,
-                                                 SomagicAnalyzer::AllowOjama allowOjama = SomagicAnalyzer::AllowOjama::ALLOW_OJAMA)
+                                                 ACAnalyzer::AllowOjama allowOjama = ACAnalyzer::AllowOjama::ALLOW_OJAMA)
 {
     static const RealColor colors[] = {
         RealColor::RC_RED,
@@ -77,7 +77,7 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
 
     // Since Ojama often makes their form smaller. So, it's a bit difficult to detect.
     // Let's relax a bit.
-    if (allowOjama == SomagicAnalyzer::AllowOjama::ALLOW_OJAMA) {
+    if (allowOjama == ACAnalyzer::AllowOjama::ALLOW_OJAMA) {
         int ojamaCount = colorCount[static_cast<int>(RealColor::RC_OJAMA)];
         if (ojamaCount * 3 / 2 > threshold) {
             // ojama sometimes looks green.
@@ -94,7 +94,7 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
     return result;
 }
 
-SomagicAnalyzer::SomagicAnalyzer()
+ACAnalyzer::ACAnalyzer()
 {
     // TODO(mayah): initializing here seems wrong.
     BoundingBox::instance().setGenerator(69, 80, 32, 32);
@@ -102,12 +102,12 @@ SomagicAnalyzer::SomagicAnalyzer()
     BoundingBox::instance().setRegion(BoundingBox::Region::GAME_FINISHED, Box(292, 352, 420, 367));
 }
 
-SomagicAnalyzer::~SomagicAnalyzer()
+ACAnalyzer::~ACAnalyzer()
 {
 }
 
-BoxAnalyzeResult SomagicAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
-                                             SomagicAnalyzer::AllowOjama allowOjama, bool showsColor) const
+BoxAnalyzeResult ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
+                                        ACAnalyzer::AllowOjama allowOjama, bool showsColor) const
 {
     int colorCount[3][NUM_REAL_COLORS] = { { 0 } };
 
@@ -164,7 +164,7 @@ BoxAnalyzeResult SomagicAnalyzer::analyzeBox(const SDL_Surface* surface, const B
     return BoxAnalyzeResult(prc, vanishing);
 }
 
-CaptureGameState SomagicAnalyzer::detectGameState(const SDL_Surface* surface)
+CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
 {
     if (isLevelSelect(surface))
         return CaptureGameState::LEVEL_SELECT;
@@ -175,9 +175,9 @@ CaptureGameState SomagicAnalyzer::detectGameState(const SDL_Surface* surface)
     return CaptureGameState::PLAYING;
 }
 
-unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi,
-                                                       const SDL_Surface* surface,
-                                                       const SDL_Surface* prevSurface)
+unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
+                                                  const SDL_Surface* surface,
+                                                  const SDL_Surface* prevSurface)
 {
     unique_ptr<DetectedField> result(new DetectedField);
 
@@ -203,7 +203,7 @@ unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi,
 
         for (int i = 0; i < 4; ++i) {
             Box b = BoundingBox::instance().get(pi, np[i]);
-            BoxAnalyzeResult r = analyzeBox(surface, b, SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
+            BoxAnalyzeResult r = analyzeBox(surface, b, ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
             result->setRealColor(np[i], r.realColor);
         }
     }
@@ -212,7 +212,7 @@ unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi,
     {
         Box b = BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_AXIS);
         b = Box(b.sx, b.sy + b.h() / 2, b.dx, b.dy);
-        BoxAnalyzeResult r = analyzeBox(surface, b, SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
+        BoxAnalyzeResult r = analyzeBox(surface, b, ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
         result->next1AxisMoving = (r.realColor == RealColor::RC_EMPTY);
     }
 
@@ -227,9 +227,9 @@ unique_ptr<DetectedField> SomagicAnalyzer::detectField(int pi,
     return result;
 }
 
-bool SomagicAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
-                                      const SDL_Surface* prevSurface,
-                                      const Box& box)
+bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
+                                 const SDL_Surface* prevSurface,
+                                 const Box& box)
 {
     // When prevSurface is NULL, we always think ojama is not dropped yet.
     if (!prevSurface)
@@ -267,7 +267,7 @@ bool SomagicAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
     return false;
 }
 
-bool SomagicAnalyzer::isLevelSelect(const SDL_Surface* surface)
+bool ACAnalyzer::isLevelSelect(const SDL_Surface* surface)
 {
     Box b = BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT);
 
@@ -290,7 +290,7 @@ bool SomagicAnalyzer::isLevelSelect(const SDL_Surface* surface)
     return whiteCount >= 40;
 }
 
-bool SomagicAnalyzer::isGameFinished(const SDL_Surface* surface)
+bool ACAnalyzer::isGameFinished(const SDL_Surface* surface)
 {
     Box b = BoundingBox::instance().getBy(BoundingBox::Region::GAME_FINISHED);
 
@@ -313,7 +313,7 @@ bool SomagicAnalyzer::isGameFinished(const SDL_Surface* surface)
     return whiteCount >= 50;
 }
 
-void SomagicAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
+void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
 {
     for (int pi = 0; pi < 2; ++pi) {
         for (int y = 1; y <= 12; ++y) {
@@ -341,7 +341,7 @@ void SomagicAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
     drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::GAME_FINISHED));
 }
 
-void SomagicAnalyzer::drawBoxWithAnalysisResult(SDL_Surface* surface, const Box& box)
+void ACAnalyzer::drawBoxWithAnalysisResult(SDL_Surface* surface, const Box& box)
 {
     for (int by = box.sy; by <= box.dy; ++by) {
         for (int bx = box.sx; bx <= box.dx; ++bx) {
@@ -358,7 +358,7 @@ void SomagicAnalyzer::drawBoxWithAnalysisResult(SDL_Surface* surface, const Box&
 }
 
 // static
-RealColor SomagicAnalyzer::estimateRealColor(const HSV& hsv)
+RealColor ACAnalyzer::estimateRealColor(const HSV& hsv)
 {
     return toRealColor(hsv);
 }

@@ -1,9 +1,9 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "capture/ac_analyzer.h"
 #include "capture/capture.h"
 #include "capture/screen_shot_saver.h"
-#include "capture/somagic_analyzer.h"
 #include "capture/movie_source.h"
 #include "capture/movie_source_key_listener.h"
 #include "gui/bounding_box_drawer.h"
@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     }
     source.setFPS(FLAGS_fps);
 
-    SomagicAnalyzer analyzer;
+    ACAnalyzer analyzer;
     Capture capture(&source, &analyzer);
 
     unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;

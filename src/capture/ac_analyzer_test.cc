@@ -1,4 +1,4 @@
-#include "capture/somagic_analyzer.h"
+#include "capture/ac_analyzer.h"
 
 #include <algorithm>
 #include <iostream>
@@ -16,7 +16,7 @@ using namespace std;
 
 DECLARE_string(testdata_dir);
 
-class SomagicAnalyzerTest : public testing::Test {
+class ACAnalyzerTest : public testing::Test {
 protected:
     unique_ptr<AnalyzerResult> analyze(const string& imgFilename)
     {
@@ -24,7 +24,7 @@ protected:
         UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(filename.c_str())));
         CHECK(surf.get()) << "Failed to load " << filename;
 
-        SomagicAnalyzer analyzer;
+        ACAnalyzer analyzer;
         return analyzer.analyze(surf.get(), nullptr, deque<unique_ptr<AnalyzerResult>>());
     }
 
@@ -33,7 +33,7 @@ protected:
     {
         deque<unique_ptr<AnalyzerResult>> results;
 
-        SomagicAnalyzer analyzer;
+        ACAnalyzer analyzer;
         bool firstResult = true;
         UniqueSDLSurface prev(emptyUniqueSDLSurface());
 
@@ -56,7 +56,7 @@ protected:
     }
 };
 
-TEST_F(SomagicAnalyzerTest, estimateRealColor)
+TEST_F(ACAnalyzerTest, estimateRealColor)
 {
     // These RGB values are taken from the real example.
     struct Testcase {
@@ -100,15 +100,15 @@ TEST_F(SomagicAnalyzerTest, estimateRealColor)
     int size = ARRAY_SIZE(testcases);
 
     for (int i = 0; i < size; ++i) {
-        EXPECT_EQ(testcases[i].expected, SomagicAnalyzer::estimateRealColor(testcases[i].rgb.toHSV()))
+        EXPECT_EQ(testcases[i].expected, ACAnalyzer::estimateRealColor(testcases[i].rgb.toHSV()))
             << " expected=" << toString(testcases[i].expected)
-            << " actual=" << toString(SomagicAnalyzer::estimateRealColor(testcases[i].rgb.toHSV()))
+            << " actual=" << toString(ACAnalyzer::estimateRealColor(testcases[i].rgb.toHSV()))
             << " RGB=" << testcases[i].rgb.toString()
             << " HSV=" << testcases[i].rgb.toHSV().toString();
     }
 }
 
-TEST_F(SomagicAnalyzerTest, analyzeNormalField1)
+TEST_F(ACAnalyzerTest, analyzeNormalField1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal1.png");
 
@@ -136,7 +136,7 @@ TEST_F(SomagicAnalyzerTest, analyzeNormalField1)
     EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 4));
 }
 
-TEST_F(SomagicAnalyzerTest, analyzeFieldNormal6)
+TEST_F(ACAnalyzerTest, analyzeFieldNormal6)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal6.png");
 
@@ -157,7 +157,7 @@ TEST_F(SomagicAnalyzerTest, analyzeFieldNormal6)
     EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 2));
 }
 
-TEST_F(SomagicAnalyzerTest, analyzeFieldNormal7)
+TEST_F(ACAnalyzerTest, analyzeFieldNormal7)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal7.png");
 
@@ -173,7 +173,7 @@ TEST_F(SomagicAnalyzerTest, analyzeFieldNormal7)
     EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(3, 6));
 }
 
-TEST_F(SomagicAnalyzerTest, analyzeFieldNormal8)
+TEST_F(ACAnalyzerTest, analyzeFieldNormal8)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal8.png");
 
@@ -185,7 +185,7 @@ TEST_F(SomagicAnalyzerTest, analyzeFieldNormal8)
     EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(6, 4));
 }
 
-TEST_F(SomagicAnalyzerTest, analyzeFieldNormal9)
+TEST_F(ACAnalyzerTest, analyzeFieldNormal9)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal8.png");
 
@@ -197,7 +197,7 @@ TEST_F(SomagicAnalyzerTest, analyzeFieldNormal9)
     EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(6, 4));
 }
 
-TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField1)
+TEST_F(ACAnalyzerTest, AnalyzeAnotherField1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-another1.png");
 
@@ -224,7 +224,7 @@ TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField1)
     EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(5, 1));
 }
 
-TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField2)
+TEST_F(ACAnalyzerTest, AnalyzeAnotherField2)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-another2.png");
 
@@ -250,7 +250,7 @@ TEST_F(SomagicAnalyzerTest, AnalyzeAnotherField2)
     EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(2, 4));
 }
 
-TEST_F(SomagicAnalyzerTest, OjamaDetectionCase1)
+TEST_F(ACAnalyzerTest, OjamaDetectionCase1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case1.png");
 
@@ -262,7 +262,7 @@ TEST_F(SomagicAnalyzerTest, OjamaDetectionCase1)
     EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
 }
 
-TEST_F(SomagicAnalyzerTest, OjamaDetectionCase2)
+TEST_F(ACAnalyzerTest, OjamaDetectionCase2)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case2.png");
 
@@ -274,7 +274,7 @@ TEST_F(SomagicAnalyzerTest, OjamaDetectionCase2)
     EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
 }
 
-TEST_F(SomagicAnalyzerTest, OjamaDetectionCase3)
+TEST_F(ACAnalyzerTest, OjamaDetectionCase3)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case3.png");
 
@@ -286,7 +286,7 @@ TEST_F(SomagicAnalyzerTest, OjamaDetectionCase3)
     EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
 }
 
-TEST_F(SomagicAnalyzerTest, OjamaDetectionCase4)
+TEST_F(ACAnalyzerTest, OjamaDetectionCase4)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case4.png");
 
@@ -298,7 +298,7 @@ TEST_F(SomagicAnalyzerTest, OjamaDetectionCase4)
     EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
 }
 
-TEST_F(SomagicAnalyzerTest, WnextDetection)
+TEST_F(ACAnalyzerTest, WnextDetection)
 {
     struct Testcase {
         int playerId;
@@ -334,28 +334,28 @@ TEST_F(SomagicAnalyzerTest, WnextDetection)
     }
 }
 
-TEST_F(SomagicAnalyzerTest, LevelSelect1)
+TEST_F(ACAnalyzerTest, LevelSelect1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/level-select1.png");
 
     EXPECT_EQ(CaptureGameState::LEVEL_SELECT, r->state());
 }
 
-TEST_F(SomagicAnalyzerTest, LevelSelect2)
+TEST_F(ACAnalyzerTest, LevelSelect2)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/level-select2.png");
 
     EXPECT_EQ(CaptureGameState::LEVEL_SELECT, r->state());
 }
 
-TEST_F(SomagicAnalyzerTest, GameFinished)
+TEST_F(ACAnalyzerTest, GameFinished)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/game-finished1.png");
 
     EXPECT_EQ(CaptureGameState::FINISHED, r->state());
 }
 
-TEST_F(SomagicAnalyzerTest, nextArrival)
+TEST_F(ACAnalyzerTest, nextArrival)
 {
     vector<string> images;
     for (int i = 0; i <= 24; ++i) {
@@ -377,7 +377,7 @@ TEST_F(SomagicAnalyzerTest, nextArrival)
     EXPECT_TRUE(rs[16]->playerResult(0)->userState.playable);
 }
 
-TEST_F(SomagicAnalyzerTest, nextArrivalSousai)
+TEST_F(ACAnalyzerTest, nextArrivalSousai)
 {
     vector<string> images;
     for (int i = 0; i <= 12; ++i) {
@@ -394,7 +394,7 @@ TEST_F(SomagicAnalyzerTest, nextArrivalSousai)
     EXPECT_TRUE(rs[9]->playerResult(1)->userState.grounded || rs[10]->playerResult(1)->userState.grounded);
 }
 
-TEST_F(SomagicAnalyzerTest, irregularNextArrival)
+TEST_F(ACAnalyzerTest, irregularNextArrival)
 {
     vector<string> images;
     for (int i = 0; i <= 45; ++i) {
@@ -410,7 +410,7 @@ TEST_F(SomagicAnalyzerTest, irregularNextArrival)
     EXPECT_TRUE(rs[38]->playerResult(1)->userState.decisionRequestAgain || rs[39]->playerResult(1)->userState.decisionRequestAgain || rs[40]->playerResult(1)->userState.decisionRequestAgain);
 }
 
-TEST_F(SomagicAnalyzerTest, vanishing)
+TEST_F(ACAnalyzerTest, vanishing)
 {
     vector<string> images;
     for (int i = 0; i <= 15; ++i) {
@@ -438,7 +438,7 @@ TEST_F(SomagicAnalyzerTest, vanishing)
     EXPECT_TRUE(rs[15]->playerResult(0)->userState.grounded);
 }
 
-TEST_F(SomagicAnalyzerTest, nonfastmove)
+TEST_F(ACAnalyzerTest, nonfastmove)
 {
     vector<string> images;
     for (int i = 0; i <= 33; ++i) {
@@ -462,7 +462,7 @@ TEST_F(SomagicAnalyzerTest, nonfastmove)
     EXPECT_FALSE(rs[27]->playerResult(1)->userState.decisionRequest);
 }
 
-TEST_F(SomagicAnalyzerTest, ojamaDrop)
+TEST_F(ACAnalyzerTest, ojamaDrop)
 {
     vector<string> images;
     for (int i = 0; i <= 38; ++i) {
@@ -488,7 +488,7 @@ TEST_F(SomagicAnalyzerTest, ojamaDrop)
     EXPECT_TRUE(rs[37]->playerResult(1)->userState.playable);
 }
 
-TEST_F(SomagicAnalyzerTest, gameStart)
+TEST_F(ACAnalyzerTest, gameStart)
 {
     vector<string> images;
     for (int i = 0; i <= 61; ++i) {

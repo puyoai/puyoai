@@ -1,5 +1,5 @@
-#ifndef CAPTURE_SOMAGIC_ANALYZER_H_
-#define CAPTURE_SOMAGIC_ANALYZER_H_
+#ifndef CAPTURE_AC_ANALYZER_H_
+#define CAPTURE_AC_ANALYZER_H_
 
 #include "base/base.h"
 #include "capture/analyzer.h"
@@ -20,10 +20,10 @@ struct BoxAnalyzeResult {
     bool vanishing;
 };
 
-class SomagicAnalyzer : public Analyzer {
+class ACAnalyzer : public Analyzer {
 public:
-    SomagicAnalyzer();
-    virtual ~SomagicAnalyzer();
+    ACAnalyzer();
+    virtual ~ACAnalyzer();
 
     enum class AllowOjama { DONT_ALLOW_OJAMA, ALLOW_OJAMA };
     BoxAnalyzeResult analyzeBox(const SDL_Surface* surface, const Box& b, AllowOjama = AllowOjama::ALLOW_OJAMA, bool showsColor = false) const;

@@ -10,7 +10,7 @@
 
 #include "capture/capture.h"
 #include "capture/color.h"
-#include "capture/somagic_analyzer.h"
+#include "capture/ac_analyzer.h"
 #include "gui/bounding_box.h"
 #include "gui/main_window.h"
 #include "gui/unique_sdl_surface.h"
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    SomagicAnalyzer analyzer;
+    ACAnalyzer analyzer;
     unique_ptr<AnalyzerResult> result(analyzer.analyze(surf.get(), nullptr, deque<unique_ptr<AnalyzerResult>>()));
 
     analyzer.drawWithAnalysisResult(surf.get());

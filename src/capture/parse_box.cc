@@ -8,9 +8,9 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#include "capture/ac_analyzer.h"
 #include "capture/capture.h"
 #include "capture/color.h"
-#include "capture/somagic_analyzer.h"
 #include "gui/bounding_box.h"
 #include "gui/main_window.h"
 #include "gui/unique_sdl_surface.h"
@@ -44,28 +44,28 @@ int main(int argc, char* argv[])
     bool usesNextPuyoPosition = false;
     NextPuyoPosition npp = NextPuyoPosition::NEXT1_AXIS;
     int x = 1, y = 1;
-    SomagicAnalyzer::AllowOjama allowOjama = SomagicAnalyzer::AllowOjama::ALLOW_OJAMA;
+    ACAnalyzer::AllowOjama allowOjama = ACAnalyzer::AllowOjama::ALLOW_OJAMA;
     if (argv[3] == string("NEXT1-AXIS")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT1_AXIS;
-        allowOjama = SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
+        allowOjama = ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
     } else if (argv[3] == string("NEXT1-AXIS-HALF")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT1_AXIS;
         half = true;
-        allowOjama = SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
+        allowOjama = ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
     } else if (argv[3] == string("NEXT1-CHILD")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT1_CHILD;
-        allowOjama = SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
+        allowOjama = ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
     } else if (argv[3] == string("NEXT2-AXIS")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT2_AXIS;
-        allowOjama = SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
+        allowOjama = ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
     } else if (argv[3] == string("NEXT2-CHILD")) {
         usesNextPuyoPosition = true;
         npp = NextPuyoPosition::NEXT2_CHILD;
-        allowOjama = SomagicAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
+        allowOjama = ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA;
     } else {
         if (argc < 5) {
             showUsage(argv[0]);
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    SomagicAnalyzer analyzer;
+    ACAnalyzer analyzer;
 
     // this should be called after |analyzer| is created.
     Box b;
