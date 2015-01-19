@@ -277,6 +277,22 @@ field = [
 
 [[pattern]]
 field = [
+    "AB....",
+    "AACD..",
+    "BBBCD.",
+    "CCCDD."
+]
+
+[[pattern]]
+field = [
+    "AB...E",
+    "AACDEE",
+    "BBBCDD",
+    "CCCEDE"
+]
+
+[[pattern]]
+field = [
     "B.....",
     "A.....",
     "ABCD..",
