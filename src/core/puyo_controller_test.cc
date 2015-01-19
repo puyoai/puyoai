@@ -31,7 +31,7 @@ TEST(PuyoControllerTest, findKeyStrokeFastpathOnEmptyField)
 
     EXPECT_EQ(">,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 0)).toString());
     EXPECT_EQ(">A,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 1)).toString());
-    EXPECT_EQ(">B,v,vB,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 2)).toString());
+    EXPECT_EQ(">A,v,vA,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 2)).toString());
     EXPECT_EQ(">B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 3)).toString());
 
     EXPECT_EQ(">,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 0)).toString());
@@ -42,6 +42,81 @@ TEST(PuyoControllerTest, findKeyStrokeFastpathOnEmptyField)
     EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 0)).toString());
     EXPECT_EQ(">B,,>,,>B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 2)).toString());
     EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 3)).toString());
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r <= 3; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+            MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+            KeySetSeq kss = PuyoController::findKeyStrokeFastpath(f, mks, d);
+            for (const auto& ks : kss)
+                PuyoController::moveKumipuyo(f, ks, &mks);
+            EXPECT_EQ(x, mks.pos.x);
+            EXPECT_EQ(r, mks.pos.r);
+        }
+    }
+}
+
+TEST(PuyoControllerTest, findKeyStrokeFastpathOnFilledField)
+{
+    CoreField f(
+        "......" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+
+    EXPECT_EQ("<,,<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 0)).toString());
+    EXPECT_EQ("<A,,<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 1)).toString());
+    EXPECT_EQ("<A,,<,A,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(1, 2)).toString());
+
+    EXPECT_EQ("<,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(2, 0)).toString());
+    EXPECT_EQ("<A,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(2, 1)).toString());
+    EXPECT_EQ("<A,,A,,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(2, 2)).toString());
+    EXPECT_EQ("<B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(2, 3)).toString());
+
+    EXPECT_EQ("v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(3, 0)).toString());
+    EXPECT_EQ("A,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(3, 1)).toString());
+    EXPECT_EQ("A,,A,,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(3, 2)).toString());
+    EXPECT_EQ("B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(3, 3)).toString());
+
+    EXPECT_EQ(">,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 0)).toString());
+    EXPECT_EQ(">A,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 1)).toString());
+    EXPECT_EQ(">A,,A,,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 2)).toString());
+    EXPECT_EQ(">B,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(4, 3)).toString());
+
+    EXPECT_EQ(">,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 0)).toString());
+    EXPECT_EQ(">A,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 1)).toString());
+    EXPECT_EQ(">A,,>,A,,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 2)).toString());
+    EXPECT_EQ(">B,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(5, 3)).toString());
+
+    EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 0)).toString());
+    EXPECT_EQ(">B,,>,,>B,,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 2)).toString());
+    EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStrokeFastpath(f, mks, Decision(6, 3)).toString());
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r <= 3; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+            MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+            KeySetSeq kss = PuyoController::findKeyStrokeFastpath(f, mks, d);
+            for (const auto& ks : kss)
+                PuyoController::moveKumipuyo(f, ks, &mks);
+            EXPECT_EQ(x, mks.pos.x);
+            EXPECT_EQ(r, mks.pos.r);
+        }
+    }
 }
 
 TEST(PuyoControllerTest, findKeyStrokeOnlineOnEmptyField)
@@ -260,5 +335,5 @@ TEST(PuyoControllerTest, rightHigherField)
     // This causes miscontrolling on wii.
     MovingKumipuyoState mks(KumipuyoPos::initialPos());
     KeySetSeq kss = PuyoController::findKeyStroke(f, mks, Decision(6, 2));
-    EXPECT_EQ(">,B,>,B,>,v", kss.toString());
+    EXPECT_EQ(">B,,>,,>B,,v", kss.toString());
 }
