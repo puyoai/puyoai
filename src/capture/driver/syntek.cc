@@ -1,6 +1,8 @@
 #include "capture/driver/syntek.h"
 
+#include <signal.h>
 #include <unistd.h>
+
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -279,6 +281,7 @@ bool SyntekDriver::claimInterface()
     }
     libusb_unref_device(dev);
 
+    // TODO(mayah): Don't use signal, but use sigaction.
     signal(SIGTERM, SyntekDriver::release);
     int ret = libusb_claim_interface(deviceHandle_, 0);
     if (ret < 0) {

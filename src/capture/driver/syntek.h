@@ -2,6 +2,8 @@
 #define CAPTURE_DRIVER_SYNTEK_H_
 
 #include <functional>
+#include <memory>
+
 #include <libusb-1.0/libusb.h>
 
 // TODO(mayah): noncopyable
