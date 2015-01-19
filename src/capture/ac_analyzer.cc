@@ -11,19 +11,17 @@
 
 using namespace std;
 
+DEFINE_double(bb_x, 69, "bouding box x");
+DEFINE_double(bb_y, 80, "bouding box y");
+DEFINE_double(bb_w, 32, "bouding box w");
+DEFINE_double(bb_h, 32, "bouding box h");
+
 namespace {
 const int BOX_THRESHOLD = 70;
 const int BOX_THRESHOLD_HALF = 50;
 const int SMALLER_BOX_THRESHOLD = 20;
 const int SMALLER_BOX_THRESHOLD_HALF = 15;
 }
-
-DEFINE_double(bb_x, 69, "bouding box x");
-DEFINE_double(bb_y, 80, "bouding box y");
-DEFINE_double(bb_w, 32, "bouding box w");
-DEFINE_double(bb_h, 32, "bouding box h");
-
-// BoundingBox::instance().setGenerator(69, 80, 32, 32);
 
 static RealColor toRealColor(const HSV& hsv)
 {
