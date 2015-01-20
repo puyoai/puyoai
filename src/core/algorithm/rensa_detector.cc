@@ -11,12 +11,71 @@
 #include "core/algorithm/rensa_ref_sequence.h"
 #include "core/core_field.h"
 #include "core/decision.h"
+#include "core/field_bit_field.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_seq.h"
+#include "core/position.h"
 
 using namespace std;
 
 namespace {
+
+const int EXTENTIONS[][3][2] = {
+    // I
+    {{ 0, 1}, { 0, 2}, { 0, 3}},
+    {{-3, 0}, {-2, 0}, {-1, 0}},
+    {{-2, 0}, {-1, 0}, { 1, 0}},
+    {{-1, 0}, { 1, 0}, { 2, 0}},
+    {{ 1, 0}, { 2, 0}, { 3, 0}},
+    // O
+    {{ 0, 1}, {-1, 0}, {-1, 1}},
+    {{ 0, 1}, { 1, 0}, { 1, 1}},
+    // Z
+    {{ 0, 1}, { 1, 1}, { 1, 2}},
+    {{ 0, 1}, {-1,-1}, {-1, 0}},
+    {{ 1,-1}, { 1, 0}, { 2,-1}},
+    {{ 0, 1}, {-1, 1}, { 1, 0}},
+    {{-2, 1}, {-1, 0}, {-1, 1}},
+    // S
+    {{ 0, 1}, { 1,-1}, { 1, 0}},
+    {{ 0, 1}, {-1, 1}, {-1, 2}},
+    {{ 1, 0}, { 1, 1}, { 2, 1}},
+    {{-1, 0}, { 0, 1}, { 1, 1}},
+    {{-2,-1}, {-1,-1}, {-1, 0}},
+    // J
+    {{ 1, 0}, { 1, 1}, { 1, 2}},
+    {{-1, 0}, { 0, 1}, { 0, 2}},
+    {{ 0, 1}, { 1, 0}, { 2, 0}},
+    {{-1, 0}, {-1, 1}, { 1, 0}},
+    {{-2, 0}, {-2, 1}, {-1, 0}},
+    {{ 0, 1}, { 0, 2}, { 1, 2}},
+    {{-1,-2}, {-1,-1}, {-1, 0}},
+    {{ 1, 0}, { 2,-1}, { 2, 0}},
+    {{-1, 0}, { 1,-1}, { 1, 0}},
+    {{-2, 1}, {-1, 1}, { 0, 1}},
+    // L
+    {{ 0, 1}, { 0, 2}, { 1, 0}},
+    {{-1, 0}, {-1, 1}, {-1, 2}},
+    {{ 0, 1}, { 1, 1}, { 2, 1}},
+    {{-1,-1}, {-1, 0}, { 1, 0}},
+    {{-2,-1}, {-2, 0}, {-1, 0}},
+    {{ 1,-2}, { 1,-1}, { 1, 0}},
+    {{-1, 2}, { 0, 1}, { 0, 2}},
+    {{ 1, 0}, { 2, 0}, { 2, 1}},
+    {{-1, 0}, { 1, 0}, { 1, 1}},
+    {{-2, 0}, {-1, 0}, { 0, 1}},
+    // T
+    {{ 1, 0}, { 1, 1}, { 2, 0}},
+    {{-1, 0}, { 0, 1}, { 1, 0}},
+    {{-2, 0}, {-1, 0}, {-1, 1}},
+    {{ 0, 1}, { 0, 2}, { 1, 1}},
+    {{-1,-1}, {-1, 0}, {-1, 1}},
+    {{ 1,-1}, { 1, 0}, { 2, 0}},
+    {{-1, 1}, { 0, 1}, { 1, 1}},
+    {{-2, 0}, {-1,-1}, {-1, 0}},
+    {{ 1,-1}, { 1, 0}, { 1, 1}},
+    {{-1, 1}, { 0, 1}, { 0, 2}},
+};
 
 enum class PurposeForFindingRensa {
     FOR_FIRE,
@@ -215,6 +274,176 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
     }
 }
 
+static inline
+void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
+                  int maxComplementPuyos, int maxPuyoHeight, SimulationCallback callback)
+{
+    FieldBitField checked;
+    Position positions[FieldConstant::HEIGHT * FieldConstant::WIDTH];
+    int working[FieldConstant::HEIGHT * FieldConstant::WIDTH];
+
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
+            PuyoColor c = originalField.color(x, y);
+            if (!isNormalColor(c))
+                continue;
+            if (checked(x, y))
+                continue;
+            if (!originalField.hasEmptyNeighbor(x, y))
+                continue;
+            Position* const head = originalField.fillSameColorPosition(x, y, c, positions, &checked);
+            int size = head - positions;
+            switch (size) {
+            case 1: {
+                Position origin = positions[0];
+                for (size_t i = 0; i < ARRAY_SIZE(EXTENTIONS); ++i) {
+                    bool ok = true;
+                    for (int j = 0; j < 3; ++j) {
+                        int xx = origin.x + EXTENTIONS[i][j][0];
+                        int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (!(originalField.color(xx, yy) == PuyoColor::EMPTY || originalField.color(xx, yy) == c)) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (!ok)
+                        continue;
+
+                    CoreField cf(originalField);
+                    ColumnPuyoList cpl;
+                    for (int j = 0; j < 3; ++j) {
+                        int xx = origin.x + EXTENTIONS[i][j][0];
+                        int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (cf.color(xx, yy) == c)
+                            continue;
+                        DCHECK_EQ(originalField.color(xx, yy), PuyoColor::EMPTY);
+                        if (cf.color(xx, yy - 1) == PuyoColor::EMPTY) {
+                            ok = false;
+                            break;
+                        }
+                        if (prohibits[xx]) {
+                            ok = false;
+                            break;
+                        }
+                        if (!cf.dropPuyoOn(xx, c, false)) {
+                            ok = false;
+                            break;
+                        }
+                        if (maxPuyoHeight < cf.height(xx)) {
+                            ok = false;
+                            break;
+                        }
+                        cpl.add(xx, c);
+                    }
+
+                    if (!ok)
+                        continue;
+
+                    if (maxComplementPuyos < cpl.size())
+                        continue;
+
+                    callback(&cf, cpl);
+                }
+                break;
+            }
+            case 2: {
+                Position origin;
+                Position mustPosition;
+                if (positions[0].x == positions[1].x) {
+                    origin = Position(positions[0].x, std::min(positions[0].y, positions[1].y));
+                    mustPosition = Position(positions[0].x, std::max(positions[0].y, positions[1].y));
+                } else {
+                    origin = Position(positions[0]);
+                    mustPosition = Position(positions[1]);
+                }
+
+                for (size_t i = 0; i < ARRAY_SIZE(EXTENTIONS); ++i) {
+                    bool ok = false;
+                    for (int j = 0; j < 3; ++j) {
+                        int xx = origin.x + EXTENTIONS[i][j][0];
+                        int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (!(originalField.color(xx, yy) == PuyoColor::EMPTY || originalField.color(xx, yy) == c)) {
+                            ok = false;
+                            break;
+                        }
+                        if (Position(xx, yy) == mustPosition)
+                            ok = true;
+                    }
+
+                    if (!ok)
+                        continue;
+
+                    CoreField cf(originalField);
+                    ColumnPuyoList cpl;
+                    for (int j = 0; j < 3; ++j) {
+                        int xx = origin.x + EXTENTIONS[i][j][0];
+                        int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (cf.color(xx, yy) == c)
+                            continue;
+                        DCHECK_EQ(originalField.color(xx, yy), PuyoColor::EMPTY);
+                        if (cf.color(xx, yy - 1) == PuyoColor::EMPTY) {
+                            ok = false;
+                            break;
+                        }
+                        if (prohibits[xx]) {
+                            ok = false;
+                            break;
+                        }
+                        if (!cf.dropPuyoOn(xx, c, false)) {
+                            ok = false;
+                            break;
+                        }
+                        if (maxPuyoHeight < cf.height(xx)) {
+                            ok = false;
+                            break;
+                        }
+                        cpl.add(xx, c);
+                    }
+
+                    if (maxComplementPuyos < cpl.size())
+                        continue;
+
+                    if (!ok)
+                        continue;
+
+                    callback(&cf, cpl);
+                }
+                break;
+            }
+            case 3: {
+                int pos = 0;
+                for (Position* p = positions; p != head; ++p) {
+                    if (originalField.color(p->x + 1, p->y) == PuyoColor::EMPTY)
+                        working[pos++] = p->x + 1;
+                    if (originalField.color(p->x - 1, p->y) == PuyoColor::EMPTY)
+                        working[pos++] = p->x - 1;
+                    if (originalField.color(p->x, p->y + 1) == PuyoColor::EMPTY)
+                        working[pos++] = p->x;
+                    if (originalField.color(p->x, p->y - 1) == PuyoColor::EMPTY)
+                        working[pos++] = p->x;
+                }
+                std::sort(working, working + pos);
+                int* endX = std::unique(working, working + pos);
+                for (int i = 0; i < endX - working; ++i) {
+                    int xx = working[i];
+                    if (prohibits[xx])
+                        continue;
+                    CoreField cf(originalField);
+                    if (!cf.dropPuyoOn(xx, c))
+                        continue;
+                    if (maxPuyoHeight < cf.height(xx))
+                        continue;
+                    callback(&cf, ColumnPuyoList(working[i], c, 1));
+                }
+                break;
+            }
+            default:
+                CHECK(false) << size << '\n' << originalField.toDebugString();
+            }
+        }
+    }
+}
+
 static inline void findRensas(const CoreField& field,
                               const RensaDetectorStrategy& strategy,
                               const bool prohibits[FieldConstant::MAP_WIDTH],
@@ -242,6 +471,9 @@ static inline void findRensas(const CoreField& field,
         break;
     case RensaDetectorStrategy::Mode::FLOAT:
         tryFloatFire(field, prohibits, complementPuyos, maxPuyoHeight, callback);
+        break;
+    case RensaDetectorStrategy::Mode::EXTEND:
+        tryExtendFire(field, prohibits, complementPuyos, maxPuyoHeight, callback);
         break;
     default:
         CHECK(false) << "Unknown mode : " << static_cast<int>(strategy.mode());
@@ -295,6 +527,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
                                        const ColumnPuyoList& keyPuyos,
                                        int leftX,
                                        int restAdded,
+                                       PurposeForFindingRensa purpose,
                                        const RensaDetectorStrategy& strategy,
                                        Callback callback)
 {
@@ -303,7 +536,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(originalField, strategy, prohibits, PurposeForFindingRensa::FOR_KEY, findRensaCallback);
+    findRensas(originalField, strategy, prohibits, purpose, findRensaCallback);
 
     if (restAdded <= 0)
         return;
@@ -323,7 +556,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
             puyoList.add(x, c);
 
             if (f.countConnectedPuyosMax4(x, f.height(x)) < 4)
-                findPossibleRensasInternal(f, puyoList, x, restAdded - 1, strategy, callback);
+                findPossibleRensasInternal(f, puyoList, x, restAdded - 1, purpose, strategy, callback);
 
             f.removeTopPuyoFrom(x);
             puyoList.removeLastAddedPuyo();
@@ -337,7 +570,7 @@ void RensaDetector::iteratePossibleRensas(const CoreField& field,
                                           RensaDetector::PossibleRensaCallback callback)
 {
     ColumnPuyoList puyoList;
-    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, strategy, callback);
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, callback);
 }
 
 void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& field,
@@ -346,7 +579,7 @@ void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& field,
                                                       RensaDetector::TrackedPossibleRensaCallback callback)
 {
     ColumnPuyoList puyoList;
-    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, strategy, callback);
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, callback);
 }
 
 static

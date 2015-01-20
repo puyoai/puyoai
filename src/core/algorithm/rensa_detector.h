@@ -14,7 +14,7 @@ class RensaRefSequence;
 class RensaDetectorStrategy {
 public:
     enum class Mode {
-        DROP, FLOAT
+        DROP, FLOAT, EXTEND,
     };
 
     explicit RensaDetectorStrategy(Mode mode,
@@ -30,6 +30,7 @@ public:
 
     static const RensaDetectorStrategy& defaultFloatStrategy();
     static const RensaDetectorStrategy& defaultDropStrategy();
+    static RensaDetectorStrategy defaultExtendStrategy() { return RensaDetectorStrategy(Mode::EXTEND, 3, 3, false); }
 
     Mode mode() const { return mode_; }
     int maxNumOfComplementPuyosForKey() const { return maxNumOfComplementPuyosForKey_; }

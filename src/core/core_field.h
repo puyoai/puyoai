@@ -48,10 +48,17 @@ public:
     int countConnectedPuyos(int x, int y) const;
     // Same as countConnectedPuyos(x, y), but with checking using |checked|.
     int countConnectedPuyos(int x, int y, FieldBitField* checked) const;
-    // Returns true if color(x, y) is connected in some direction.
-    bool isConnectedPuyo(int x, int y) const;
     // Smae as countConnectedPuyos(x, y). But you can call this only when the number of connected puyos <= 3.
     int countConnectedPuyosMax4(int x, int y) const;
+    // Returns true if color(x, y) is connected in some direction.
+    bool isConnectedPuyo(int x, int y) const;
+    // Returns true if neighbor is empty.
+    bool hasEmptyNeighbor(int x, int y) const;
+
+    // Inserts positions whose puyo color is the same as |c|, and connected to (x, y).
+    // The checked cells will be marked in |checked|.
+    // PositionQueueHead should have enough capacity.
+    Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBitField* checked) const;
 
     // ----------------------------------------------------------------------
     // field manipulation
@@ -149,10 +156,6 @@ protected:
     // Returns the max drop height.
     template<typename Tracker>
     int dropAfterVanish(int minHeights[], Tracker*);
-
-    // Inserts positions whose puyo color is the same as |c|, and connected to (x, y).
-    // The checked cells will be marked in |checked|.
-    Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBitField* checked) const;
 
     uint8_t heights_[MAP_WIDTH];
 };
