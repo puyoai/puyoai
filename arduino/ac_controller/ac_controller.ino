@@ -8,7 +8,7 @@
 #define KEY_WAIT         7
 
 // TODO(mayah): Change PIN numbers appropriately.
-#define PIN_UP           6
+// #define PIN_UP           6
 #define PIN_RIGHT        7
 #define PIN_DOWN         8
 #define PIN_LEFT         9
@@ -16,13 +16,16 @@
 #define PIN_LEFT_TURN    11
 #define PIN_START        12
 
-#define PIN_LED          13
-
 #define ARRAY_SIZE(xs)   (sizeof(xs) / sizeof(xs[0]))
 
 static const int OUTPUT_PINS[] = {
-    PIN_UP, PIN_RIGHT, PIN_DOWN, PIN_LEFT,
-    PIN_RIGHT_TURN, PIN_LEFT_TURN, PIN_START, PIN_LED
+//     PIN_UP,
+    PIN_RIGHT,
+    PIN_DOWN,
+    PIN_LEFT,
+    PIN_RIGHT_TURN,
+    PIN_LEFT_TURN,
+    PIN_START
 };
 
 void setup()
@@ -32,8 +35,6 @@ void setup()
 
     for (int i = 0; i < ARRAY_SIZE(OUTPUT_PINS); ++i)
         digitalWrite(OUTPUT_PINS[i], LOW);
-
-    digitalWrite(PIN_LED, HIGH);
 
     Serial.begin(38400);
     delay(100);
@@ -54,7 +55,7 @@ void loop()
         return;
     }
 
-    int up = ((x >> KEY_UP) & 1) ? HIGH : LOW;
+    // int up = ((x >> KEY_UP) & 1) ? HIGH : LOW;
     int right = ((x >> KEY_RIGHT) & 1) ? HIGH : LOW;
     int left = ((x >> KEY_LEFT) & 1) ? HIGH : LOW;
     int down = ((x >> KEY_DOWN) & 1) ? HIGH : LOW;
@@ -62,7 +63,7 @@ void loop()
     int left_turn = ((x >> KEY_LEFT_TURN) & 1) ? HIGH : LOW;
     int start = ((x >> KEY_START) & 1) ? HIGH : LOW;
 
-    digitalWrite(PIN_UP, up);
+    // digitalWrite(PIN_UP, up);
     digitalWrite(PIN_RIGHT, right);
     digitalWrite(PIN_DOWN, down);
     digitalWrite(PIN_LEFT, left);
