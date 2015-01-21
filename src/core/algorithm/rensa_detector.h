@@ -46,6 +46,12 @@ private:
 
 class RensaDetector {
 public:
+    typedef std::function<void (const CoreField& fieldAfterRensa,
+                                const RensaResult&,
+                                const ColumnPuyoList&)> RensaCallback;
+    // Detects a rensa from the field. We don't add key puyos etc.
+    static void detectSingle(const CoreField&, const RensaDetectorStrategy&, RensaCallback);
+
     // Finds rensa using |kumipuyos|.
     static std::vector<FeasibleRensaInfo> findFeasibleRensas(const CoreField&, const KumipuyoSeq&);
 

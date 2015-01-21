@@ -480,6 +480,21 @@ static inline void findRensas(const CoreField& field,
     }
 }
 
+void RensaDetector::detectSingle(const CoreField& original, const RensaDetectorStrategy& strategy, RensaCallback callback)
+{
+    static const bool nonProhibits[FieldConstant::MAP_WIDTH] {};
+    auto f = [&original, &callback](CoreField* f, const ColumnPuyoList& firePuyos) {
+        int minHeights[CoreField::MAP_WIDTH] {
+            100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
+            original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
+        };
+
+        RensaResult rensaResult = f->simulateWithMinHeights(minHeights);
+        if (rensaResult.chains > 0)
+            callback(*f, rensaResult, firePuyos);
+    };
+    findRensas(original, strategy, nonProhibits, PurposeForFindingRensa::FOR_FIRE, f);
+}
 
 std::vector<FeasibleRensaInfo>
 RensaDetector::findFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
