@@ -133,6 +133,17 @@ void makeProhibitArray(const RensaResult& rensaResult, const RensaTrackResult& t
         prohibits[cp.x] = true;
 }
 
+// TODO(mayah): Consider to improve this.
+static inline
+void makeProhibitArrayForExtend(const RensaResult& /*rensaResult*/, const RensaTrackResult& /*trackResult*/,
+                                const CoreField& /*originalField*/, const ColumnPuyoList& firePuyos,
+                                bool prohibits[FieldConstant::MAP_WIDTH])
+{
+    std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, false);
+    for (const auto& cp : firePuyos)
+        prohibits[cp.x] = true;
+}
+
 static inline
 void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
                  PurposeForFindingRensa purpose, int maxComplementPuyos, int maxPuyoHeight, SimulationCallback callback)
@@ -664,7 +675,11 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
 
             // Don't put key puyo on the column which fire puyo will be placed.
             bool newProhibits[FieldConstant::MAP_WIDTH];
-            makeProhibitArray(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
+            if (strategy.mode() == RensaDetectorStrategy::Mode::EXTEND)
+                makeProhibitArrayForExtend(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
+            else
+                makeProhibitArray(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
+
 
             callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult, *rensaSequence);
             iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, initialField, restIterations - 1,
@@ -707,7 +722,10 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
 
             // Don't put key puyo on the column which fire puyo will be placed.
             bool prohibits[FieldConstant::MAP_WIDTH];
-            makeProhibitArray(rensaResult, trackResult, originalField, firePuyos, prohibits);
+            if (strategy.mode() == RensaDetectorStrategy::Mode::EXTEND)
+                makeProhibitArrayForExtend(rensaResult, trackResult, originalField, firePuyos, prohibits);
+            else
+                makeProhibitArray(rensaResult, trackResult, originalField, firePuyos, prohibits);
 
             iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, originalField, maxIteration - 1,
                                                      ColumnPuyoList(), firePuyos, prohibits, &rensaSequence, strategy, callback);

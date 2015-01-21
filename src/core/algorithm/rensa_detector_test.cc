@@ -460,6 +460,46 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat2)
     EXPECT_TRUE(found);
 }
 
+TEST(RensaDetectorTest, iteratePossibleRensasExtend1)
+{
+    CoreField f(
+        "....R."
+        "..RGGY");
+
+    CoreField expected[] {
+        CoreField("....G."
+                  "....G."
+                  "..RRR."
+                  "..RGGY"),
+        CoreField("......"
+                  "....G."
+                  "..RRRG"
+                  "..RGGY"),
+    };
+
+    const int N = ARRAY_SIZE(expected);
+
+    bool found[N] {};
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&, const RensaRefSequence&) {
+        CoreField g(f);
+        dropKeyAndFirePuyos(&g, keyPuyos, firePuyos);
+
+        for (int i = 0; i < N; ++i) {
+            if (g == expected[i])
+                found[i] = true;
+        }
+    };
+
+    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 3, 3, false);
+    RensaDetector::iteratePossibleRensasIteratively(f, 2, RensaDetectorStrategy::defaultExtendStrategy(), callback);
+
+    for (int i = 0; i < N; ++i) {
+        EXPECT_TRUE(found[i]) << i;
+    }
+}
+
 TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1_1)
 {
     CoreField f(
