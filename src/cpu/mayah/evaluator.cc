@@ -329,7 +329,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         } else if (!enemy.isRensaOngoing) {
             // If enemy is not firing rensa, we can think in time.
             inTime = true;
-        } else if (currentFrameId + plan.framesToInitiate() < enemy.finishingRensaFrameId) {
+        } else if (currentFrameId + plan.framesToIgnite() < enemy.finishingRensaFrameId) {
             // If we can play before finishing enemy's rensa, it's in time.
             inTime = true;
         } else {

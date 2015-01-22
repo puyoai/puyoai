@@ -17,9 +17,9 @@ class Plan {
 public:
     Plan() {}
     Plan(const CoreField& field, const std::vector<Decision>& decisions,
-         const RensaResult& rensaResult, int numChigiri, int framesToInitiate, int lastDropFrames) :
+         const RensaResult& rensaResult, int numChigiri, int framesToIgnite, int lastDropFrames) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
-        numChigiri_(numChigiri), framesToInitiate_(framesToInitiate), lastDropFrames_(lastDropFrames)
+        numChigiri_(numChigiri), framesToIgnite_(framesToIgnite), lastDropFrames_(lastDropFrames)
     {
     }
 
@@ -34,14 +34,14 @@ public:
     const std::vector<Decision>& decisions() const { return decisions_; }
 
     const RensaResult& rensaResult() const { return rensaResult_; }
-    int framesToInitiate() const { return framesToInitiate_; }
+    int framesToIgnite() const { return framesToIgnite_; }
     int lastDropFrames() const { return lastDropFrames_; }
 
     int score() const { return rensaResult_.score; }
     int chains() const { return rensaResult_.chains; }
 
     int numChigiri() const { return numChigiri_; }
-    int totalFrames() const { return framesToInitiate_ + lastDropFrames_ + rensaResult_.frames; }
+    int totalFrames() const { return framesToIgnite_ + lastDropFrames_ + rensaResult_.frames; }
 
     bool isRensaPlan() const { return rensaResult_.chains > 0; }
 
@@ -54,7 +54,7 @@ private:
     std::vector<Decision> decisions_;
     RensaResult rensaResult_;
     int numChigiri_ = 0;
-    int framesToInitiate_ = 0;
+    int framesToIgnite_ = 0;
     int lastDropFrames_ = 0;
 };
 
@@ -64,14 +64,14 @@ class RefPlan : noncopyable {
 public:
     explicit RefPlan(const Plan& plan) :
         field_(plan.field()), decisions_(plan.decisions()), rensaResult_(plan.rensaResult()),
-        numChigiri_(plan.numChigiri()), framesToInitiate_(plan.framesToInitiate()), lastDropFrames_(plan.lastDropFrames())
+        numChigiri_(plan.numChigiri()), framesToIgnite_(plan.framesToIgnite()), lastDropFrames_(plan.lastDropFrames())
     {
     }
 
     RefPlan(const CoreField& field, const std::vector<Decision>& decisions,
-            const RensaResult& rensaResult, int numChigiri, int framesToInitiate, int lastDropFrames) :
+            const RensaResult& rensaResult, int numChigiri, int framesToIgnite, int lastDropFrames) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
-        numChigiri_(numChigiri), framesToInitiate_(framesToInitiate), lastDropFrames_(lastDropFrames)
+        numChigiri_(numChigiri), framesToIgnite_(framesToIgnite), lastDropFrames_(lastDropFrames)
     {
     }
 
@@ -83,15 +83,15 @@ public:
     int chains() const { return rensaResult_.chains; }
     int score() const { return rensaResult_.score; }
 
-    // framesToInitiate returns how many frames are required just before the last hand.
-    int framesToInitiate() const { return framesToInitiate_; }
+    // framesToIgnite returns how many frames are required just before the last hand.
+    int framesToIgnite() const { return framesToIgnite_; }
     int lastDropFrames() const { return lastDropFrames_; }
-    int totalFrames() const { return framesToInitiate_ + lastDropFrames_ + rensaResult_.frames; }
+    int totalFrames() const { return framesToIgnite_ + lastDropFrames_ + rensaResult_.frames; }
     int numChigiri() const { return numChigiri_; }
 
     bool isRensaPlan() const { return rensaResult_.chains > 0; }
 
-    Plan toPlan() const { return Plan(field_, decisions_, rensaResult_, numChigiri_, framesToInitiate_, lastDropFrames_); }
+    Plan toPlan() const { return Plan(field_, decisions_, rensaResult_, numChigiri_, framesToIgnite_, lastDropFrames_); }
 
     std::string decisionText() const;
 
@@ -100,7 +100,7 @@ private:
     const std::vector<Decision>& decisions_;
     const RensaResult& rensaResult_;
     int numChigiri_;
-    int framesToInitiate_;
+    int framesToIgnite_;
     int lastDropFrames_;
 };
 
