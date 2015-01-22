@@ -10,8 +10,9 @@
 #include "core/constant.h"
 #include "core/field_bit_field.h"
 #include "core/kumipuyo_seq.h"
-#include "core/algorithm/rensa_detector.h"
+#include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
+#include "core/algorithm/rensa_detector.h"
 
 using namespace std;
 
@@ -37,7 +38,7 @@ struct SortByFrames {
 };
 
 struct SortByInitiatingFrames {
-    bool operator()(const FeasibleRensaInfo& lhs, const FeasibleRensaInfo& rhs) const
+    bool operator()(const IgnitionRensaResult& lhs, const IgnitionRensaResult& rhs) const
     {
         if (lhs.framesToInitiate() != rhs.framesToInitiate())
             return lhs.framesToInitiate() < rhs.framesToInitiate();
@@ -184,7 +185,12 @@ void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     if (seq.size() >= 4)
         seq = seq.subsequence(0, 3);
 
-    vector<FeasibleRensaInfo> result = RensaDetector::findFeasibleRensas(field, seq);
+    std::vector<IgnitionRensaResult> result;
+    Plan::iterateAvailablePlans(field, seq, seq.size(), [&result](const RefPlan& plan) {
+        if (plan.isRensaPlan())
+            result.emplace_back(plan.rensaResult(), plan.framesToInitiate());
+    });
+
     if (result.empty())
         return;
 

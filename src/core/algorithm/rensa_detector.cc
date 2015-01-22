@@ -7,7 +7,6 @@
 
 #include "core/algorithm/column_puyo_list.h"
 #include "core/algorithm/plan.h"
-#include "core/algorithm/rensa_info.h"
 #include "core/algorithm/rensa_ref_sequence.h"
 #include "core/core_field.h"
 #include "core/decision.h"
@@ -505,18 +504,6 @@ void RensaDetector::detectSingle(const CoreField& original, const RensaDetectorS
             callback(*f, rensaResult, firePuyos);
     };
     findRensas(original, strategy, nonProhibits, PurposeForFindingRensa::FOR_FIRE, f);
-}
-
-std::vector<FeasibleRensaInfo>
-RensaDetector::findFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
-{
-    std::vector<FeasibleRensaInfo> result;
-    Plan::iterateAvailablePlans(field, kumipuyoSeq, kumipuyoSeq.size(), [&result](const RefPlan& plan) {
-        if (plan.isRensaPlan())
-            result.emplace_back(plan.rensaResult(), plan.framesToInitiate());
-    });
-
-    return result;
 }
 
 static inline void simulateInternal(CoreField* f, const CoreField& original,

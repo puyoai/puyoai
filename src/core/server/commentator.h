@@ -9,9 +9,10 @@
 
 #include <gtest/gtest.h>
 
-#include "core/algorithm/rensa_info.h"
+#include "core/algorithm/column_puyo_list.h"
 #include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
+#include "core/rensa_result.h"
 #include "core/server/game_state_observer.h"
 
 struct TrackedPossibleRensaInfo {
@@ -33,7 +34,7 @@ struct TrackedPossibleRensaInfo {
 struct CommentatorResult {
     int frameId[2];
     TrackedPossibleRensaInfo fireableMainChain[2];
-    FeasibleRensaInfo fireableTsubushiChain[2];
+    IgnitionRensaResult fireableTsubushiChain[2];
     TrackedPossibleRensaInfo firingChain[2];
     std::string message[2];
 
@@ -84,7 +85,7 @@ private:
 
     int frameId_[2];
     std::unique_ptr<TrackedPossibleRensaInfo> fireableMainChain_[2];
-    std::unique_ptr<FeasibleRensaInfo> fireableTsubushiChain_[2];
+    std::unique_ptr<IgnitionRensaResult> fireableTsubushiChain_[2];
     std::unique_ptr<TrackedPossibleRensaInfo> firingChain_[2];
 
     std::deque<std::string> events_[2];
