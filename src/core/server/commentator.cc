@@ -198,7 +198,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
                                                         -static_cast<double>(plan.score()) / plan.totalFrames());
             if (tsubushiScore < bestTsubushiScore) {
                 bestTsubushiScore = tsubushiScore;
-                ignitionRensaResult = IgnitionRensaResult(plan.rensaResult(), plan.framesToInitiate());
+                ignitionRensaResult = IgnitionRensaResult(plan.rensaResult(), plan.framesToIgnite());
             }
         });
 

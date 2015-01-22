@@ -26,10 +26,10 @@ protected:
 
         vector<Decision> decisions { Decision(3, 0) };
         RensaResult rensaResult;
-        int framesToInitiate = 10;
+        int framesToIgnite = 10;
         int lastDropFrames = 10;
 
-        RefPlan plan(f, decisions, rensaResult, 0, framesToInitiate, lastDropFrames);
+        RefPlan plan(f, decisions, rensaResult, 0, framesToIgnite, lastDropFrames);
 
         PreEvalResult preEvalResult = PreEvaluator(openingBook, patternBook).preEval(f);
         FeatureScoreCollector sc(evaluationParameter);

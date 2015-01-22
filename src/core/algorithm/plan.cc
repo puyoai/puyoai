@@ -50,7 +50,7 @@ bool operator==(const Plan& lhs, const Plan& rhs)
         lhs.decisions_ == rhs.decisions_ &&
         lhs.rensaResult_ == rhs.rensaResult_ &&
         lhs.numChigiri_ == rhs.numChigiri_ &&
-        lhs.framesToInitiate_ == rhs.framesToInitiate_ &&
+        lhs.framesToIgnite_ == rhs.framesToIgnite_ &&
         lhs.lastDropFrames_ == rhs.lastDropFrames_;
 }
 

@@ -13,8 +13,8 @@ class KumipuyoSeq;
 
 struct EstimatedRensaInfo {
     EstimatedRensaInfo() {}
-    EstimatedRensaInfo(int chains, int score, int framesToInitiate) :
-        chains(chains), score(score), framesToInitiate(framesToInitiate)
+    EstimatedRensaInfo(int chains, int score, int framesToIgnite) :
+        chains(chains), score(score), framesToIgnite(framesToIgnite)
     {
     }
 
@@ -22,7 +22,7 @@ struct EstimatedRensaInfo {
 
     int chains;
     int score;
-    int framesToInitiate;
+    int framesToIgnite;
 };
 
 class GazeResult {
@@ -77,7 +77,7 @@ private:
     int frameIdGazedAt_ = -1;
     int restEmptyField_ = -1;
 
-    // --- For these rensaInfos, frames means the framesToInitiate.
+    // --- For these rensaInfos, frames means the framesToIgnite.
     // Fiesible Rensa is the Rensa the enemy can really fire in current/next/nextnext tsumo.
     std::vector<EstimatedRensaInfo> feasibleRensaInfos_;
     // Possible Rensa is the Rensa the enemy will build in future.

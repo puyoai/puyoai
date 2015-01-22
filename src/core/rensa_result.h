@@ -51,21 +51,20 @@ private:
 class IgnitionRensaResult {
 public:
     IgnitionRensaResult() {}
-    IgnitionRensaResult(const RensaResult& rensaResult, int framesToInitiate) :
-        rensaResult_(rensaResult), framesToInitiate_(framesToInitiate)
-    {
-    }
+    IgnitionRensaResult(const RensaResult& rensaResult, int framesToIgnite) :
+        rensaResult_(rensaResult), framesToIgnite_(framesToIgnite)
+    {}
 
     const RensaResult& rensaResult() const { return rensaResult_; }
 
     int score() const { return rensaResult_.score; }
     int chains() const { return rensaResult_.chains; }
-    int totalFrames() const { return rensaResult_.frames + framesToInitiate_; }
-    int framesToInitiate() const { return framesToInitiate_; }
+    int totalFrames() const { return rensaResult_.frames + framesToIgnite(); }
+    int framesToIgnite() const { return framesToIgnite_; }
 
 private:
     RensaResult rensaResult_;
-    int framesToInitiate_;
+    int framesToIgnite_;
 };
 
 #endif
