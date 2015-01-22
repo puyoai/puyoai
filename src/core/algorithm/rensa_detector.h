@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "core/algorithm/puyo_set.h"
-#include "core/algorithm/rensa_info.h"
 #include "core/core_field.h"
 
 class KumipuyoSeq;
@@ -51,9 +50,6 @@ public:
                                 const ColumnPuyoList&)> RensaCallback;
     // Detects a rensa from the field. We don't add key puyos etc.
     static void detectSingle(const CoreField&, const RensaDetectorStrategy&, RensaCallback);
-
-    // Finds rensa using |kumipuyos|.
-    static std::vector<FeasibleRensaInfo> findFeasibleRensas(const CoreField&, const KumipuyoSeq&);
 
     // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
     typedef std::function<void (const CoreField&,

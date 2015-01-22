@@ -4,8 +4,8 @@
 #include <tuple>
 #include <vector>
 
+#include "core/algorithm/column_puyo_list.h"
 #include "core/algorithm/plan.h"
-#include "core/algorithm/rensa_info.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/core_field.h"
 #include "core/frame_request.h"

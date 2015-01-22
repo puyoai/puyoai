@@ -12,7 +12,6 @@
 #include "base/time.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
-#include "core/algorithm/rensa_info.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/constant.h"
 #include "core/core_field.h"

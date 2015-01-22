@@ -294,26 +294,6 @@ TEST(RensaDetectorTest, detectSingleExtend5)
         EXPECT_TRUE(found[i]) << i;
 }
 
-TEST(RensaDetectorTest, feasibleRensas)
-{
-    CoreField f(
-        "BRGY  "
-        "BBRGG "
-        "RRGYYY");
-    KumipuyoSeq seq("BYYY");
-
-    vector<FeasibleRensaInfo> infos = RensaDetector::findFeasibleRensas(f, seq);
-
-    bool found = false;
-    for (const auto info : infos) {
-        if (info.chains() == 4 && info.framesToInitiate() == 0) {
-            found = true;
-        }
-    }
-
-    EXPECT_TRUE(found);
-}
-
 TEST(RensaDetectorTest, iteratePossibleRensa)
 {
     CoreField f(" BRR  "

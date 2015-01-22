@@ -183,8 +183,8 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
             kp.resize(3);
 
         pair<int, double> bestTsubushiScore = make_pair(100, 0.0); // # of hand & score. Smaller is better.
-        FeasibleRensaInfo feasibleRensaInfo;
-        Plan::iterateAvailablePlans(field, kp, kp.size(), [&bestTsubushiScore, &feasibleRensaInfo](const RefPlan& plan) {
+        IgnitionRensaResult ignitionRensaResult;
+        Plan::iterateAvailablePlans(field, kp, kp.size(), [&bestTsubushiScore, &ignitionRensaResult](const RefPlan& plan) {
             if (plan.chains() != 2 && plan.chains() != 3)
                 return;
 
@@ -198,13 +198,13 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
                                                         -static_cast<double>(plan.score()) / plan.totalFrames());
             if (tsubushiScore < bestTsubushiScore) {
                 bestTsubushiScore = tsubushiScore;
-                feasibleRensaInfo = FeasibleRensaInfo(plan.rensaResult(), plan.framesToInitiate());
+                ignitionRensaResult = IgnitionRensaResult(plan.rensaResult(), plan.framesToInitiate());
             }
         });
 
         if (bestTsubushiScore.first < 100) {
             lock_guard<mutex> lock(mu_);
-            fireableTsubushiChain_[pi].reset(new FeasibleRensaInfo(feasibleRensaInfo));
+            fireableTsubushiChain_[pi].reset(new IgnitionRensaResult(ignitionRensaResult));
         }
     }
 

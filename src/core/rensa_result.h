@@ -48,4 +48,24 @@ private:
     uint8_t erasedAt_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
 };
 
+class IgnitionRensaResult {
+public:
+    IgnitionRensaResult() {}
+    IgnitionRensaResult(const RensaResult& rensaResult, int framesToInitiate) :
+        rensaResult_(rensaResult), framesToInitiate_(framesToInitiate)
+    {
+    }
+
+    const RensaResult& rensaResult() const { return rensaResult_; }
+
+    int score() const { return rensaResult_.score; }
+    int chains() const { return rensaResult_.chains; }
+    int totalFrames() const { return rensaResult_.frames + framesToInitiate_; }
+    int framesToInitiate() const { return framesToInitiate_; }
+
+private:
+    RensaResult rensaResult_;
+    int framesToInitiate_;
+};
+
 #endif
