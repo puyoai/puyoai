@@ -9,12 +9,12 @@
 
 // TODO(mayah): Change PIN numbers appropriately.
 // #define PIN_UP           6
-#define PIN_RIGHT        7
-#define PIN_DOWN         8
-#define PIN_LEFT         9
-#define PIN_RIGHT_TURN   10
-#define PIN_LEFT_TURN    11
-#define PIN_START        12
+#define PIN_START        8
+#define PIN_DOWN         9
+#define PIN_LEFT         10
+#define PIN_RIGHT        11
+#define PIN_LEFT_TURN    12
+#define PIN_RIGHT_TURN   13
 
 #define ARRAY_SIZE(xs)   (sizeof(xs) / sizeof(xs[0]))
 
@@ -28,13 +28,22 @@ static const int OUTPUT_PINS[] = {
     PIN_START
 };
 
+void pressButton(int pin, boolean pressed)
+{
+    if (pressed) {
+        pinMode(pin, OUTPUT);
+        digitalWrite(pin, LOW);
+    } else {
+        // If we set the pin mode INPUT, the pin will have
+        // high impedance. This means the button is not pressed.
+        pinMode(pin, INPUT);
+    }
+}
+
 void setup()
 {
     for (int i = 0; i < ARRAY_SIZE(OUTPUT_PINS); ++i)
-        pinMode(OUTPUT_PINS[i], OUTPUT);
-
-    for (int i = 0; i < ARRAY_SIZE(OUTPUT_PINS); ++i)
-        digitalWrite(OUTPUT_PINS[i], LOW);
+        pressButton(OUTPUT_PINS[i], false);
 
     Serial.begin(38400);
     delay(100);
@@ -50,25 +59,24 @@ void loop()
 
     if ((x >> KEY_WAIT) & 1) {
         int wait = x & 0x7F;
-        digitalWrite(PIN_LED, HIGH);
         delay(wait);
         return;
     }
 
-    // int up = ((x >> KEY_UP) & 1) ? HIGH : LOW;
-    int right = ((x >> KEY_RIGHT) & 1) ? HIGH : LOW;
-    int left = ((x >> KEY_LEFT) & 1) ? HIGH : LOW;
-    int down = ((x >> KEY_DOWN) & 1) ? HIGH : LOW;
-    int right_turn = ((x >> KEY_RIGHT_TURN) & 1) ? HIGH : LOW;
-    int left_turn = ((x >> KEY_LEFT_TURN) & 1) ? HIGH : LOW;
-    int start = ((x >> KEY_START) & 1) ? HIGH : LOW;
+    // boolean up = ((x >> KEY_UP) & 1);
+    boolean right = ((x >> KEY_RIGHT) & 1);
+    boolean left = ((x >> KEY_LEFT) & 1);
+    boolean down = ((x >> KEY_DOWN) & 1);
+    boolean right_turn = ((x >> KEY_RIGHT_TURN) & 1);
+    boolean left_turn = ((x >> KEY_LEFT_TURN) & 1);
+    boolean start = ((x >> KEY_START) & 1);
 
-    // digitalWrite(PIN_UP, up);
-    digitalWrite(PIN_RIGHT, right);
-    digitalWrite(PIN_DOWN, down);
-    digitalWrite(PIN_LEFT, left);
-    digitalWrite(PIN_RIGHT_TURN, right_turn);
-    digitalWrite(PIN_LEFT_TURN, left_turn);
-    digitalWrite(PIN_START, start);
+    // pressButton(PIN_UP, up);
+    pressButton(PIN_RIGHT, right);
+    pressButton(PIN_DOWN, down);
+    pressButton(PIN_LEFT, left);
+    pressButton(PIN_RIGHT_TURN, right_turn);
+    pressButton(PIN_LEFT_TURN, left_turn);
+    pressButton(PIN_START, start);
     delay(34);
 }
