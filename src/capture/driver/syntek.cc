@@ -401,14 +401,8 @@ bool SyntekDriver::initChip()
             return false;
     }
 
-#if 0
-    [self setBrightness:_brightness];
-    [self setContrast:_contrast];
-    [self setSaturation:_saturation];
-    [self setHue:_hue];
-#else
     // brightness
-    if (!writeSAA711XRegister(0x0a, 0x7f))
+    if (!writeSAA711XRegister(0x0a, 0x5f))
         return false;
     // contrast
     if (!writeSAA711XRegister(0x0b, 0x40))
@@ -419,7 +413,6 @@ bool SyntekDriver::initChip()
     // hue
     if (!writeSAA711XRegister(0x0d, 00))
         return false;
-#endif
 
     return true;
 
