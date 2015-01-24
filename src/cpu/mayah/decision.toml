@@ -249,6 +249,7 @@ ACAD = [4, 2]
 BCAB = [4, 0]
 BCBD = [4, 0]
 CCAB = [2, 3]
+CCDD = [5, 1]
 CDBC = [6, 2]
 
 [[book]]
