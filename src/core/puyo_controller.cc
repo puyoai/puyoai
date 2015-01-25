@@ -50,21 +50,18 @@ void removeRedundantKeySeq(const KumipuyoPos& pos, KeySetSeq* seq)
     }
 }
 
-void expandButtonDistance(KeySetSeq* seq)
+KeySetSeq expandButtonDistance(const KeySetSeq& seq)
 {
-    KeySetSeq kss;
-    bool shouldSkipButton = false;
-    for (const auto& ks : *seq) {
-        bool hasTurnKey = ks.hasTurnKey();
-        if (shouldSkipButton && hasTurnKey)
-            kss.add(KeySet());
-        kss.add(ks);
-        if (hasTurnKey)
-            shouldSkipButton = hasTurnKey;
+    KeySetSeq result;
+    for (size_t i = 0; i < seq.size(); ++i) {
+        if (i > 0 && seq[i].hasIntersection(seq[i - 1]))
+            result.add(KeySet());
+        result.add(seq[i]);
     }
 
-    *seq = kss;
+    return result;
 }
+
 
 }
 
@@ -540,8 +537,7 @@ KeySetSeq PuyoController::findKeyStrokeOnline(const PlainField& field, const Mov
 {
     KeySetSeq kss = findKeyStrokeOnlineInternal(field, mks, decision);
     removeRedundantKeySeq(mks.pos, &kss);
-    expandButtonDistance(&kss);
-    return kss;
+    return expandButtonDistance(kss);
 }
 
 // returns null if not reachable
