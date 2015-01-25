@@ -12,23 +12,37 @@ using namespace std;
 
 TEST(RensaDetectorPerformanceTest, iteratePossibleRensas)
 {
-    TimeStampCounterData tsc;
+    TimeStampCounterData tsc1;
+    TimeStampCounterData tsc2;
+
     CoreField f(
         "  R G "
         "R GRBG"
         "RBGRBG"
         "RBGRBG");
 
-    size_t size = 0;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&) {
-        ++size;
+    size_t size1 = 0;
+    size_t size2 = 0;
+    auto callback1 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&) {
+        ++size1;
+    };
+    auto callback2 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&, const RensaTrackResult&) {
+        ++size2;
     };
 
     for (int i = 0; i < 10000; ++i) {
-        ScopedTimeStampCounter scts(&tsc);
-        RensaDetector::iteratePossibleRensas(f, 1, RensaDetectorStrategy::defaultDropStrategy(), callback);
+        ScopedTimeStampCounter scts(&tsc1);
+        RensaDetector::iteratePossibleRensas(f, 1, RensaDetectorStrategy::defaultDropStrategy(), callback1);
     }
 
-    cout << size << endl;
-    tsc.showStatistics();
+    for (int i = 0; i < 10000; ++i) {
+        ScopedTimeStampCounter scts(&tsc2);
+        RensaDetector::iteratePossibleRensasWithTracking(f, 1, RensaDetectorStrategy::defaultDropStrategy(), callback2);
+    }
+
+    cout << size1 << endl;
+    cout << size2 << endl;
+    tsc1.showStatistics();
+    cout << endl;
+    tsc2.showStatistics();
 }
