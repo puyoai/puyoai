@@ -126,11 +126,11 @@ TEST(PuyoControllerTest, findKeyStrokeOnlineOnEmptyField)
 
     EXPECT_EQ("v", PuyoController::findKeyStrokeOnline(f, mks, Decision(3, 0)).toString());
     EXPECT_EQ("<,v", PuyoController::findKeyStrokeOnline(f, mks, Decision(2, 0)).toString());
-    EXPECT_EQ(">,>,v", PuyoController::findKeyStrokeOnline(f, mks, Decision(5, 0)).toString());
-    EXPECT_EQ(">,>,>,B,,B,v", PuyoController::findKeyStrokeOnline(f, mks, Decision(6, 2)).toString());
-    EXPECT_EQ("<,<,A,,A,v", PuyoController::findKeyStrokeOnline(f, mks, Decision(1, 2)).toString());
+    EXPECT_EQ(">,,>,v", PuyoController::findKeyStrokeOnline(f, mks, Decision(5, 0)).toString());
+    EXPECT_EQ(">,,>,,>,B,,B,v", PuyoController::findKeyStrokeOnline(f, mks, Decision(6, 2)).toString());
+    EXPECT_EQ("<,,<,A,,A,v", PuyoController::findKeyStrokeOnline(f, mks, Decision(1, 2)).toString());
 
-    EXPECT_EQ("B,,B,>,>,>,>,>,v", PuyoController::findKeyStrokeOnline(f, MovingKumipuyoState(KumipuyoPos(1, 1, 2)), Decision(6, 0)).toString());
+    EXPECT_EQ("B,,B,>,,>,,>,,>,,>,v", PuyoController::findKeyStrokeOnline(f, MovingKumipuyoState(KumipuyoPos(1, 1, 2)), Decision(6, 0)).toString());
 }
 
 TEST(PuyoControllerTest, findKeyStrokeByDijkstraOnEmptyField)
