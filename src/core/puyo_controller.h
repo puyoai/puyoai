@@ -22,8 +22,8 @@ class PlainField;
 // TODO(mayah): Currently this file is a bit messy. Refactoring is desired.
 
 struct MovingKumipuyoState {
-    MovingKumipuyoState() {}
-    explicit MovingKumipuyoState(const KumipuyoPos& pos) : pos(pos) {}
+    constexpr MovingKumipuyoState() : pos(KumipuyoPos()) {}
+    constexpr explicit MovingKumipuyoState(const KumipuyoPos& pos) : pos(pos) {}
 
     friend bool operator==(const MovingKumipuyoState& lhs, const MovingKumipuyoState& rhs)
     {
