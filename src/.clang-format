@@ -1,0 +1,10 @@
+---
+BasedOnStyle: WebKit
+ColumnLimit: 120
+Standard: Cpp11
+AlignAfterOpenBracket: true
+AllowShortFunctionsOnASingleLine: Inline
+AlwaysBreakTemplateDeclarations: true 
+BreakConstructorInitializersBeforeComma: false
+...
+
