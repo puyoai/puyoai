@@ -1,5 +1,7 @@
 #include "core/key.h"
 
+#include <glog/logging.h>
+
 using namespace std;
 
 string toString(Key key)
@@ -15,4 +17,19 @@ string toString(Key key)
     }
 
     return "";
+}
+
+Key toKey(char c)
+{
+    switch (c) {
+    case '^': return Key::UP;
+    case '>': return Key::RIGHT;
+    case 'v': return Key::DOWN;
+    case '<': return Key::LEFT;
+    case 'A': return Key::RIGHT_TURN;
+    case 'B': return Key::LEFT_TURN;
+    case 'S': return Key::START;
+    default:
+        CHECK(false) << "Unknown key: " << c;
+    }
 }

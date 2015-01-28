@@ -1,8 +1,9 @@
 #include "core/key_set.h"
 
 #include <sstream>
-
 #include <glog/logging.h>
+
+#include "base/strings.h"
 
 using namespace std;
 
@@ -42,6 +43,16 @@ string KeySet::toString() const
         ss << "A";
 
     return ss.str();
+}
+
+KeySetSeq::KeySetSeq(const string& str)
+{
+    for (const auto& s : strings::split(str, ',')) {
+        KeySet ks;
+        for (const auto& c : s)
+            ks.setKey(toKey(c));
+        seq_.push_back(ks);
+    }
 }
 
 std::string KeySetSeq::toString() const

@@ -14,6 +14,7 @@ public:
     KeySet(Key, Key);
 
     void setKey(Key, bool b = true);
+    void setKey(char c);
     bool hasKey(Key) const;
 
     bool hasTurnKey() const { return hasKey(Key::RIGHT_TURN) || hasKey(Key::LEFT_TURN); }
@@ -39,6 +40,7 @@ public:
     KeySetSeq() {}
     explicit KeySetSeq(const std::vector<KeySet>& seq) : seq_(seq) {}
     explicit KeySetSeq(std::initializer_list<KeySet> seq) : seq_(seq) {}
+    explicit KeySetSeq(const std::string&);
 
     bool empty() const { return seq_.empty(); }
     size_t size() const { return seq_.size(); }
