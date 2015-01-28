@@ -16,5 +16,6 @@ const int NUM_KEYS = 7;
 
 std::string toString(Key);
 constexpr int ordinal(Key key) { return static_cast<int>(key); }
+Key toKey(char c);
 
 #endif

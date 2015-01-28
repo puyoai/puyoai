@@ -42,3 +42,17 @@ TEST(KeySetTest, tuple)
 
     EXPECT_EQ(">A,>A,<B,<B,vA,vB", KeySetSeq(keySets).toString());
 }
+
+TEST(KeySetSeqTest, parse)
+{
+    const string s("<,<A,>B,v");
+    const KeySetSeq kss(s);
+
+    EXPECT_EQ(4UL, kss.size());
+    EXPECT_EQ(KeySet(Key::LEFT), kss[0]);
+    EXPECT_EQ(KeySet(Key::LEFT, Key::RIGHT_TURN), kss[1]);
+    EXPECT_EQ(KeySet(Key::RIGHT, Key::LEFT_TURN), kss[2]);
+    EXPECT_EQ(KeySet(Key::DOWN), kss[3]);
+
+    EXPECT_EQ("<,<A,>B,v", kss.toString());
+}
