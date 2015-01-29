@@ -21,7 +21,7 @@ FrameRequest ClientConnector::receive()
         if (line != "")
             break;
     }
-    VLOG(1) << line;
+    LOG(INFO) << line;
 
     return FrameRequest::parse(line);
 }
@@ -30,5 +30,5 @@ void ClientConnector::send(const FrameResponse& resp)
 {
     string s = resp.toString();
     cout << s << endl;
-    VLOG(1) << s;
+    LOG(INFO) << s;
 }
