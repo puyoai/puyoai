@@ -24,12 +24,12 @@ public:
         UNUSED_VARIABLE(info);
         UNUSED_VARIABLE(fast);
 
-        if (FLAGS_algorithm == "peak") {
+        if (FLAGS_algorithm == "peak")
             return thinkPeak(frameId, f, seq);
-        }
-        if (FLAGS_algorithm == "nohoho") {
+        if (FLAGS_algorithm == "nohoho")
             return thinkNohoho(frameId, f, seq);
-        }
+        if (FLAGS_algorithm == "quickturn")
+            return thinkQuickTurn(frameId, f, seq);
         return thinkFlat(frameId, f, seq);
     }
 
@@ -60,7 +60,7 @@ private:
         return DropDecision(Decision(3, 2));
     }
 
-    DropDecision thinkPeak(int frameId, const PlainField& f, const KumipuyoSeq& seq)
+    DropDecision thinkPeak(int frameId, const CoreField& f, const KumipuyoSeq& seq)
     {
         UNUSED_VARIABLE(frameId);
 
@@ -88,6 +88,30 @@ private:
             if (x != 3 && cf.height(x) <= 11)
                 return DropDecision(Decision(x, 0));
         }
+
+        return DropDecision(Decision(3, 2));
+    }
+
+    DropDecision thinkQuickTurn(int frameId, const CoreField& f, const KumipuyoSeq& seq)
+    {
+        UNUSED_VARIABLE(frameId);
+
+        if (f.height(4) <= 10)
+            return DropDecision(Decision(4, 2));
+        if (f.height(4) == 11)
+            return DropDecision(Decision(4, 1));
+        if (f.height(2) <= 10)
+            return DropDecision(Decision(2, 2));
+        if (f.height(2) == 11)
+            return DropDecision(Decision(2, 3));
+
+        if (f.height(2) == 12 && f.height(4) == 12) {
+            if (f.height(6) == 0)
+                return DropDecision(Decision(6, 2));
+            return DropDecision(Decision(4, 1));
+        }
+        if (f.height(2) == 12 && f.height(4) == 13)
+            return DropDecision(Decision(2, 3));
 
         return DropDecision(Decision(3, 2));
     }
