@@ -111,6 +111,8 @@ private:
                 return DropDecision(Decision(5, 2));
             if (f.height(5) == 11 || f.height(5) == 12)
                 return DropDecision(Decision(5, 1));
+            if (f.height(5) == 13)
+                return DropDecision(Decision(4, 3));
             return DropDecision(Decision(4, 1));
         }
 
