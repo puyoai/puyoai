@@ -977,6 +977,9 @@ KeySetSeq findKeyStrokeFastpath52(const CoreField& field)
     }
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 11)
         return KeySetSeq("B,,B,,B,>,,>,A,v");
+    if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 11 && field.height(6) <= 12)
+        return KeySetSeq("B,,B,,A,>,A,>,A,,A,v");
+
     return KeySetSeq();
 }
 
