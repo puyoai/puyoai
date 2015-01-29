@@ -54,14 +54,14 @@ KeySetSeq expandButtonDistance(const KeySetSeq& seq)
 {
     KeySetSeq result;
     for (size_t i = 0; i < seq.size(); ++i) {
-        if (i > 0 && seq[i].hasIntersection(seq[i - 1]))
+        if (i > 0 && ((seq[i - 1].hasTurnKey() && seq[i].hasTurnKey()) || (seq[i - 1].hasArrowKey() && seq[i].hasArrowKey()))) {
             result.add(KeySet());
+        }
         result.add(seq[i]);
     }
 
     return result;
 }
-
 
 }
 
@@ -355,9 +355,11 @@ bool PuyoController::isReachable(const PlainField& field, const Decision& decisi
 {
     if (isReachableFastpath(field, decision))
         return true;
+    if (!findKeyStrokeFastpath(field, decision).empty())
+        return true;
 
     // slowpath
-    return isReachableFrom(field, MovingKumipuyoState(KumipuyoPos::initialPos()), decision);
+    return isReachableFrom(field, MovingKumipuyoState::initialState(), decision);
 }
 
 bool PuyoController::isReachableFastpath(const PlainField& field, const Decision& decision)
@@ -397,12 +399,16 @@ bool PuyoController::isReachableFrom(const PlainField& field, const MovingKumipu
 
 KeySetSeq PuyoController::findKeyStroke(const CoreField& field, const MovingKumipuyoState& mks, const Decision& decision)
 {
+    if (mks.isInitialPosition()) {
+        KeySetSeq kss = findKeyStrokeFastpath(field, decision);
+        if (!kss.empty())
+            return kss;
+        return findKeyStrokeOnline(field, mks, decision);
+    }
+
     if (!isReachableFrom(field, mks, decision))
         return KeySetSeq();
 
-    KeySetSeq kss = findKeyStrokeFastpath(field, mks, decision);
-    if (!kss.empty())
-        return kss;
     return findKeyStrokeByDijkstra(field, mks, decision);
 }
 
@@ -551,7 +557,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
             break;
         }
 
-        // for simpicity, direct child-puyo upwards
+        // for simplicity, direct child-puyo upwards
         // TODO(yamaguchi): eliminate unnecessary moves
         if (current.r == 1) {
             ret.add(KeySet(Key::LEFT_TURN));
@@ -734,329 +740,364 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
 
 namespace {
 
-KeySetSeq findKeyStrokeFastpath1(const CoreField& field, const Decision& decision)
+KeySetSeq findKeyStrokeFastpath10(const CoreField& field)
 {
-    switch (decision.r) {
-    case 0:
-        if (field.height(1) <= 11 && field.height(2) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::LEFT),
-                KeySet(),
-                KeySet(Key::LEFT),
-                KeySet(Key::DOWN)
-            };
-        }
-        return KeySetSeq();
-    case 1:
-        if (field.height(1) <= 11 && field.height(2) <= 11) {
-            return KeySetSeq { KeySet(Key::LEFT, Key::RIGHT_TURN), KeySet(), KeySet(Key::LEFT), KeySet(Key::DOWN) };
-        }
-        return KeySetSeq();
-    case 2:
-        if (field.height(1) <= 9 && field.height(2) <= 9) {
-            return KeySetSeq {
-                KeySet(Key::LEFT, Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::LEFT),
-                KeySet(Key::DOWN, Key::RIGHT_TURN),
-                KeySet(Key::DOWN)
-            };
-        }
-        if (field.height(1) <= 11 && field.height(2) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::LEFT, Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::LEFT),
-                KeySet(Key::RIGHT_TURN),
-                KeySet(Key::DOWN)
-            };
-        }
-        return KeySetSeq();
-    default:
-        CHECK(false) << "Invalid r: " << decision.r;
-    }
-}
-
-KeySetSeq findKeyStrokeFastpath2(const CoreField& field, const Decision& decision)
-{
-    switch (decision.r) {
-    case 0:
-        if (field.height(2) <= 11) {
-            return KeySetSeq { KeySet(Key::LEFT), KeySet(Key::DOWN) };
-        }
-        return KeySetSeq();
-    case 1:
-        if (field.height(2) <= 11 && field.height(4) <= 11) {
-            return KeySetSeq { KeySet(Key::LEFT, Key::RIGHT_TURN), KeySet(Key::DOWN) };
-        }
-        if (field.height(2) <= 11 && field.height(4) >= 12) {
-            // Kabe-keri will happen.
-            return KeySetSeq { KeySet(Key::RIGHT_TURN), KeySet(Key::DOWN) };
-        }
-        return KeySetSeq();
-    case 2:
-        if (field.height(2) <= 10 && field.height(3) <= 10) {
-            return KeySetSeq {
-                KeySet(Key::LEFT, Key::RIGHT_TURN),
-                KeySet(Key::DOWN),
-                KeySet(Key::DOWN, Key::RIGHT_TURN),
-                KeySet(Key::DOWN)
-            };
-        }
-        if (field.height(2) <= 11 && field.height(4) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::LEFT, Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::DOWN),
-            };
-        }
-        return KeySetSeq();
-    case 3:
-        if (field.height(1) <= 11 && field.height(2) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::LEFT, Key::LEFT_TURN),
-                KeySet(Key::DOWN)
-            };
-        }
-        return KeySetSeq();
-    default:
-        CHECK(false) << "Invalid r: " << decision.r;
-    }
-}
-
-KeySetSeq findKeyStrokeFastpath3(const CoreField& field, const Decision& decision)
-{
-    switch (decision.r) {
-    case 0:
-        return KeySetSeq { KeySet(Key::DOWN) };
-    case 1:
-        if (field.height(4) <= 9)
-            return KeySetSeq { KeySet(Key::DOWN, Key::RIGHT_TURN), KeySet(Key::DOWN) };
-        if (field.height(4) <= 11)
-            return KeySetSeq { KeySet(Key::RIGHT_TURN), KeySet(Key::DOWN) };
-        return KeySetSeq();
-    case 2:
-        if (field.height(4) <= 6) {
-            return KeySetSeq {
-                KeySet(Key::DOWN, Key::RIGHT_TURN),
-                KeySet(Key::DOWN),
-                KeySet(Key::DOWN, Key::RIGHT_TURN),
-                KeySet(Key::DOWN),
-            };
-        }
-        if (field.height(2) <= 6) {
-            return KeySetSeq {
-                KeySet(Key::DOWN, Key::LEFT_TURN),
-                KeySet(Key::DOWN),
-                KeySet(Key::DOWN, Key::LEFT_TURN),
-                KeySet(Key::DOWN),
-            };
-        }
-        if (field.height(4) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::DOWN)
-            };
-        }
-        if (field.height(2) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::LEFT_TURN),
-                KeySet(),
-                KeySet(Key::LEFT_TURN),
-                KeySet(),
-                KeySet(Key::DOWN)
-            };
-        }
-        return KeySetSeq();
-    case 3:
-        if (field.height(2) <= 9) {
-            return KeySetSeq {
-                KeySet(Key::DOWN, Key::LEFT_TURN),
-                KeySet(Key::DOWN)
-            };
-        }
-        if (field.height(2) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::LEFT_TURN),
-                KeySet(Key::DOWN)
-            };
-        }
-        return KeySetSeq();
-    default:
-        CHECK(false) << "Unknown r: " << decision.r;
-    }
-}
-
-KeySetSeq findKeyStrokeFastpath4(const CoreField& field, const Decision& decision)
-{
-    switch (decision.r) {
-    case 0:
-        if (field.height(4) <= 11) {
-            return KeySetSeq { KeySet(Key::RIGHT), KeySet(Key::DOWN) };
-        }
-        return KeySetSeq();
-    case 1:
-        if (field.height(4) <= 11 && field.height(5) <= 11) {
-            return KeySetSeq { KeySet(Key::RIGHT, Key::RIGHT_TURN), KeySet(Key::DOWN) };
-        }
-        return KeySetSeq();
-    case 2:
-        if (field.height(4) <= 9 && field.height(5) <= 9) {
-            return KeySetSeq {
-                KeySet(Key::RIGHT, Key::RIGHT_TURN),
-                KeySet(Key::DOWN),
-                KeySet(Key::DOWN, Key::RIGHT_TURN),
-                KeySet(Key::DOWN)
-            };
-        }
-        if (field.height(4) <= 11 && field.height(5) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::RIGHT, Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::DOWN)
-            };
-        }
-        return KeySetSeq();
-    case 3:
-        if (field.height(4) <= 11 && field.height(2) <= 11) {
-            return KeySetSeq { KeySet(Key::RIGHT, Key::LEFT_TURN), KeySet(Key::DOWN) };
-        }
-        return KeySetSeq();
-    default:
-        CHECK(false) << "Unknown r: " << decision.r;
-    }
-}
-
-KeySetSeq findKeyStrokeFastpath5(const CoreField& field, const Decision& decision)
-{
-    switch (decision.r) {
-    case 0:
-        if (field.height(4) <= 11 && field.height(5) <= 11) {
-            return KeySetSeq { KeySet(Key::RIGHT), KeySet(), KeySet(Key::RIGHT), KeySet(Key::DOWN) };
-        }
-        return KeySetSeq();
-    case 1:
-        if (field.height(5) <= 11 && field.height(6) <= 11) {
-            return KeySetSeq { KeySet(Key::RIGHT, Key::RIGHT_TURN), KeySet(), KeySet(Key::RIGHT), KeySet(Key::DOWN) };
-        }
-        return KeySetSeq();
-    case 2:
-        if (field.height(4) <= 11 && field.height(5) <= 9 && field.height(6) <= 9) {
-            return KeySetSeq {
-                KeySet(Key::RIGHT, Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::RIGHT),
-                KeySet(Key::DOWN,Key::RIGHT_TURN),
-                KeySet(Key::DOWN)
-            };
-        }
-        if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::RIGHT, Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::RIGHT),
-                KeySet(Key::RIGHT_TURN),
-                KeySet(),
-                KeySet(Key::DOWN)
-            };
-        }
-        return KeySetSeq();
-    case 3:
-        if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::RIGHT, Key::LEFT_TURN),
-                KeySet(),
-                KeySet(Key::RIGHT),
-                KeySet(Key::DOWN),
-            };
-        }
-        return KeySetSeq();
-    default:
-        CHECK(false) << "Unknown r: " << decision.r;
+    if (field.height(1) <= 11 && field.height(2) <= 11)
+        return KeySetSeq("<,,<,v");
+    if ((field.height(1) == 12 && field.height(2) == 11) ||
+        (field.height(1) <= 12 && field.height(2) == 12 && (field.height(3) == 11 || field.height(4) == 12))) {
+        return KeySetSeq("<A,<,<A,<,<B,<,<,<,<B,<,v");
     }
     return KeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath6(const CoreField& field, const Decision& decision)
+KeySetSeq findKeyStrokeFastpath11(const CoreField& field)
 {
-    switch (decision.r) {
-    case 0:
-        if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::RIGHT),
-                KeySet(),
-                KeySet(Key::RIGHT),
-                KeySet(),
-                KeySet(Key::RIGHT),
-                KeySet(Key::DOWN)
-            };
-        }
-        return KeySetSeq();
-    case 2:
-        if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 9 && field.height(6) <= 9) {
-            return KeySetSeq {
-                KeySet(Key::RIGHT, Key::LEFT_TURN),
-                KeySet(),
-                KeySet(Key::RIGHT),
-                KeySet(),
-                KeySet(Key::RIGHT, Key::LEFT_TURN),
-                KeySet(Key::DOWN)
-            };
-        }
-        if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::RIGHT, Key::LEFT_TURN),
-                KeySet(),
-                KeySet(Key::RIGHT),
-                KeySet(),
-                KeySet(Key::RIGHT, Key::LEFT_TURN),
-                KeySet(),
-                KeySet(Key::DOWN)
-            };
-        }
-        return KeySetSeq();
-    case 3:
-        if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
-            return KeySetSeq {
-                KeySet(Key::RIGHT, Key::LEFT_TURN),
-                KeySet(),
-                KeySet(Key::RIGHT),
-                KeySet(),
-                KeySet(Key::RIGHT),
-                KeySet(Key::DOWN)
-            };
-        }
-        return KeySetSeq();
-    default:
-        CHECK(false) << "Unknown r: " << decision.r;
+    if (field.height(1) <= 11 && field.height(2) <= 11)
+        return KeySetSeq("<A,,<,v");
+    if (field.height(1) == 12 && field.height(2) == 11)
+        return KeySetSeq("<A,<,<A,<,<B,<,<,<,v");
+    if (field.height(1) <= 12 && field.height(2) == 12 && field.height(4) == 12)
+        return KeySetSeq("<A,<,<A,<,<B,<,<,<,v");
+    if (field.height(1) <= 12 && field.height(2) == 12 && field.height(3) == 11)
+        return KeySetSeq("<A,<,<A,<,<B,<,<,<,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath12(const CoreField& field)
+{
+    if (field.height(1) <= 9 && field.height(2) <= 9)
+        return KeySetSeq("<A,,<,vA,v");
+    if (field.height(1) <= 11 && field.height(2) <= 11)
+        return KeySetSeq("<A,,<,A,v");
+    if (field.height(1) <= 11 && field.height(2) == 12 && field.height(4) == 12)
+        return KeySetSeq("<A,<,<A,<,<B,<,<,<,<A,<,v");
+    if (field.height(1) <= 11 && field.height(2) == 12 && field.height(3) == 11)
+        return KeySetSeq("<A,<,<A,<,<B,<,<,<,<A,<,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath13(const CoreField&)
+{
+    CHECK(false) << "shouldn't be called";
+}
+
+KeySetSeq findKeyStrokeFastpath20(const CoreField& field)
+{
+    if (field.height(2) <= 11) {
+        return KeySetSeq { KeySet(Key::LEFT), KeySet(Key::DOWN) };
     }
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath21(const CoreField& field)
+{
+    if (field.height(2) <= 11 && field.height(4) <= 11)
+        return KeySetSeq("<A,v");
+    if (field.height(2) <= 11 && field.height(4) >= 12)
+        return KeySetSeq("A,v");
+    if (field.height(2) == 12 && field.height(4) == 12)
+        return KeySetSeq("A,,A,,B,<,v");
+    if (field.height(2) == 12 && field.height(3) == 11 && field.height(4) <= 11)
+        return KeySetSeq("A,,A,,B,<,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath22(const CoreField& field)
+{
+    if (field.height(2) <= 10 && field.height(3) <= 10 && field.height(4) <= 11)
+        return KeySetSeq("<A,v,vA,v");
+    if (field.height(2) <= 11 && field.height(4) <= 11)
+        return KeySetSeq("<A,,A,v");
+    if (field.height(2) <= 11 && field.height(4) >= 12)
+        return KeySetSeq("A,,A,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath23(const CoreField& field)
+{
+    if (field.height(1) <= 11 && field.height(2) <= 11)
+        return KeySetSeq("<B,v");
+    if (field.height(1) == 12 && field.height(2) == 11)
+        return KeySetSeq("<A,<,<A,<,<A,<,v");
+    if (field.height(1) <= 12 && field.height(2) == 12 && field.height(4) == 12)
+        return KeySetSeq("A,,A,,A,<,v");
+    if (field.height(1) <= 12 && field.height(2) == 12 && field.height(3) == 11 && field.height(4) <= 11)
+        return KeySetSeq("A,,A,,A,<,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath30(const CoreField&)
+{
+    return KeySetSeq { KeySet(Key::DOWN) };
+}
+
+KeySetSeq findKeyStrokeFastpath31(const CoreField& field)
+{
+    if (field.height(4) <= 9)
+        return KeySetSeq("vA,v");
+    if (field.height(4) <= 11)
+        return KeySetSeq("A,v");
+    if (field.height(2) == 12 && field.height(4) == 12)
+        return KeySetSeq("B,,B,,B,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath32(const CoreField& field)
+{
+    if (field.height(4) <= 6)
+        return KeySetSeq("vA,v,vA,v");
+    if (field.height(2) <= 6)
+        return KeySetSeq("vB,v,vB,v");
+    if (field.height(4) <= 11)
+        return KeySetSeq("A,,A,v");
+    if (field.height(2) <= 11)
+        return KeySetSeq("B,,B,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath33(const CoreField& field)
+{
+    if (field.height(2) <= 9)
+        return KeySetSeq("Bv,v");
+    if (field.height(2) <= 11)
+        return KeySetSeq("B,v");
+    if (field.height(2) == 12 && field.height(4) == 12)
+        return KeySetSeq("A,,A,,A,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath40(const CoreField& field)
+{
+    if (field.height(4) <= 11)
+        return KeySetSeq(">,v");
+    if (field.height(2) == 12 && field.height(4) == 12)
+        return KeySetSeq("A,,A,,A,>,A,v");
+    if (field.height(3) == 11 && field.height(4) == 12)
+        return KeySetSeq("B,,B,,B,,>,B,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath41(const CoreField& field)
+{
+    if (field.height(4) <= 11 && field.height(5) <= 11)
+        return KeySetSeq(">A,v");
+    if (field.height(4) == 11 && field.height(5) == 12)
+        return KeySetSeq(">,B,,B,,B,v");
+    if (field.height(3) == 11 && field.height(4) == 12 && field.height(6) <= 12)
+        return KeySetSeq("B,,B,,B,>,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath42(const CoreField& field)
+{
+    if (field.height(4) <= 9 && field.height(5) <= 9)
+        return KeySetSeq(">A,v,vA,v");
+    if (field.height(4) <= 11 && field.height(5) <= 11)
+        return KeySetSeq(">A,,A,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath43(const CoreField& field)
+{
+    if (field.height(4) <= 11 && field.height(2) <= 11)
+        return KeySetSeq(">B,v");
+    if (field.height(2) == 12 && field.height(4) == 12)
+        return KeySetSeq("A,,A,,A,>,v");
+    if (field.height(3) == 11 && field.height(4) == 12)
+        return KeySetSeq("B,,B,,A,,>,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath50(const CoreField& field)
+{
+    if (field.height(4) <= 11 && field.height(5) <= 11)
+        return KeySetSeq(">,,>,v");
+    if (field.height(4) == 11 && field.height(5) == 12)
+        return KeySetSeq(">B,>,>B,>,>B,>,,B,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath51(const CoreField& field)
+{
+    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
+        return KeySetSeq { KeySet(Key::RIGHT, Key::RIGHT_TURN), KeySet(), KeySet(Key::RIGHT), KeySet(Key::DOWN) };
+    }
+    if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12) {
+        return KeySetSeq {
+            KeySet(Key::RIGHT, Key::LEFT_TURN),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT, Key::LEFT_TURN),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT, Key::LEFT_TURN),
+            KeySet(Key::RIGHT),
+            KeySet(Key::DOWN)
+       };
+    }
+    if (field.height(4) == 11 && field.height(5) == 12)
+        return KeySetSeq(">B,>,>B,>,>B,>,>,>,v");
+    if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
+        return KeySetSeq("B,,B,,B,>,,>,v");
+
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath52(const CoreField& field)
+{
+    if (field.height(4) <= 11 && field.height(5) <= 9 && field.height(6) <= 9) {
+        return KeySetSeq {
+            KeySet(Key::RIGHT, Key::RIGHT_TURN),
+            KeySet(),
+            KeySet(Key::RIGHT),
+            KeySet(Key::DOWN,Key::RIGHT_TURN),
+            KeySet(Key::DOWN)
+        };
+    }
+    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
+        return KeySetSeq {
+            KeySet(Key::RIGHT, Key::RIGHT_TURN),
+            KeySet(),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT_TURN),
+            KeySet(),
+            KeySet(Key::DOWN)
+        };
+    }
+    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) >= 12) {
+        return KeySetSeq {
+            KeySet(Key::RIGHT, Key::LEFT_TURN),
+            KeySet(),
+            KeySet(Key::RIGHT),
+            KeySet(Key::LEFT_TURN),
+            KeySet(),
+            KeySet(Key::DOWN)
+        };
+    }
+    if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 11)
+        return KeySetSeq("B,,B,,B,>,,>,A,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath53(const CoreField& field)
+{
+    if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11) {
+        return KeySetSeq {
+            KeySet(Key::RIGHT, Key::LEFT_TURN),
+            KeySet(),
+            KeySet(Key::RIGHT),
+            KeySet(Key::DOWN),
+        };
+    }
+    if (field.height(4) == 11 && field.height(5) == 12)
+        return KeySetSeq(">B,,>B,,A,>,v");
+    if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 11)
+        return KeySetSeq("B,,B,,A,>,,>,,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath60(const CoreField& field)
+{
+    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
+        return KeySetSeq {
+            KeySet(Key::RIGHT),
+            KeySet(),
+            KeySet(Key::RIGHT),
+            KeySet(),
+            KeySet(Key::RIGHT),
+            KeySet(Key::DOWN)
+        };
+    }
+    if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12) {
+        return KeySetSeq {
+            KeySet(Key::RIGHT, Key::LEFT_TURN),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT, Key::LEFT_TURN),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT, Key::RIGHT_TURN),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT, Key::RIGHT_TURN),
+            KeySet(Key::RIGHT),
+            KeySet(Key::DOWN),
+        };
+    }
+    if (field.height(2) == 12 & field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
+        return KeySetSeq("A,,A,,A,>,,>,,>,A,v");
+    if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 12)
+        return KeySetSeq(">B,>,>B,>,>A,>,>,>,>A,>,v");
+    if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
+        return KeySetSeq(">B,>,>B,>,>A,>,>,>,>A,>,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath61(const CoreField&)
+{
+    CHECK(false) << "shouldn't be callede";
+}
+
+KeySetSeq findKeyStrokeFastpath62(const CoreField& field)
+{
+    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11)
+        return KeySetSeq(">B,,>,,>B,,v");
+    if (field.height(2) == 12 & field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 11)
+        return KeySetSeq("A,,A,,A,>,,>,,>,B,v");
+    if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 12)
+        return KeySetSeq(">B,>,>B,>,>A,>,>,>,>B,>,v");
+    if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 11)
+        return KeySetSeq(">B,>,>B,>,>A,>,>,>,>B,>,v");
+    return KeySetSeq();
+}
+
+KeySetSeq findKeyStrokeFastpath63(const CoreField& field)
+{
+    if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
+        return KeySetSeq {
+            KeySet(Key::RIGHT, Key::LEFT_TURN),
+            KeySet(),
+            KeySet(Key::RIGHT),
+            KeySet(),
+            KeySet(Key::RIGHT),
+            KeySet(Key::DOWN)
+        };
+    }
+    if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12) {
+        return KeySetSeq {
+            KeySet(Key::RIGHT, Key::LEFT_TURN),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT, Key::LEFT_TURN),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT, Key::RIGHT_TURN),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT),
+            KeySet(Key::RIGHT),
+            KeySet(Key::DOWN),
+        };
+    }
+    if (field.height(2) == 12 & field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
+        return KeySetSeq("A,,A,,A,>,,>,,>,v");
+    if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 12)
+        return KeySetSeq(">B,>,>B,>,>A,>,>,>,v");
+    if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
+        return KeySetSeq(">B,>,>B,>,>A,>,>,>,>,>,v");
     return KeySetSeq();
 }
 
 }
 
-KeySetSeq PuyoController::findKeyStrokeFastpath(const CoreField& field, const MovingKumipuyoState& mks, const Decision& decision)
+KeySetSeq PuyoController::findKeyStrokeFastpath(const CoreField& field, const Decision& decision)
 {
-    // fastpath only works when pos is located at initial position.
-    if (!(mks.pos.x == 3 && mks.pos.y == 12 && mks.pos.r == 0))
-        return KeySetSeq();
+    typedef KeySetSeq (*func)(const CoreField&);
+    static const func fs[6][4] = {
+        { findKeyStrokeFastpath10, findKeyStrokeFastpath11, findKeyStrokeFastpath12, findKeyStrokeFastpath13, },
+        { findKeyStrokeFastpath20, findKeyStrokeFastpath21, findKeyStrokeFastpath22, findKeyStrokeFastpath23, },
+        { findKeyStrokeFastpath30, findKeyStrokeFastpath31, findKeyStrokeFastpath32, findKeyStrokeFastpath33, },
+        { findKeyStrokeFastpath40, findKeyStrokeFastpath41, findKeyStrokeFastpath42, findKeyStrokeFastpath43, },
+        { findKeyStrokeFastpath50, findKeyStrokeFastpath51, findKeyStrokeFastpath52, findKeyStrokeFastpath53, },
+        { findKeyStrokeFastpath60, findKeyStrokeFastpath61, findKeyStrokeFastpath62, findKeyStrokeFastpath63, },
+    };
 
-    switch (decision.x) {
-    case 1: return findKeyStrokeFastpath1(field, decision);
-    case 2: return findKeyStrokeFastpath2(field, decision);
-    case 3: return findKeyStrokeFastpath3(field, decision);
-    case 4: return findKeyStrokeFastpath4(field, decision);
-    case 5: return findKeyStrokeFastpath5(field, decision);
-    case 6: return findKeyStrokeFastpath6(field, decision);
-    default:
-        CHECK(false) << "Unknown x: " << decision.x;
-        return KeySetSeq();
-    }
+    CHECK(decision.isValid()) << decision.toString();
+
+    return fs[decision.x - 1][decision.r](field);
 }
