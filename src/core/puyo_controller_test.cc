@@ -508,7 +508,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField6)
 
     EXPECT_EQ("B,,B,,A,>,A,>,,v", PuyoController::findKeyStroke(f, mks, Decision(5, 0)).toString());
     EXPECT_EQ("B,,B,,A,>,A,>,A,v", PuyoController::findKeyStroke(f, mks, Decision(5, 1)).toString());
-    EXPECT_EQ("B,,B,,A,>,A,>,B,,B,v", PuyoController::findKeyStroke(f, mks, Decision(5, 2)).toString());
+    EXPECT_EQ("B,,B,,A,>,A,>,A,,A,v", PuyoController::findKeyStroke(f, mks, Decision(5, 2)).toString());
     EXPECT_EQ("B,,B,,A,>,A,>,B,v", PuyoController::findKeyStroke(f, mks, Decision(5, 3)).toString());
 
     EXPECT_EQ("A,,A,,A,>,,>,,>,A,v", PuyoController::findKeyStroke(f, mks, Decision(6, 0)).toString());
