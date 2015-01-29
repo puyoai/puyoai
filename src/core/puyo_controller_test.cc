@@ -687,3 +687,24 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField8)
         }
     }
 }
+
+TEST(PuyoControllerTest, reachableHigherField1)
+{
+    CoreField f(
+        ".....O" // 14
+        ".....O"
+        "    OO" // 12
+        "OO OOO"
+        "OO OOO"
+        "OO OOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    EXPECT_FALSE(PuyoController::isReachable(f, Decision(5, 1)));
+}
