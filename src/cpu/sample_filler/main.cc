@@ -107,10 +107,13 @@ private:
             return DropDecision(Decision(2, 3));
 
         if (f.height(2) == 12 && f.height(4) == 12) {
-            if (f.height(6) == 0)
-                return DropDecision(Decision(6, 2));
+            if (f.height(5) <= 10)
+                return DropDecision(Decision(5, 2));
+            if (f.height(5) == 11 || f.height(5) == 12)
+                return DropDecision(Decision(5, 1));
             return DropDecision(Decision(4, 1));
         }
+
         if (f.height(2) == 12 && f.height(4) == 13)
             return DropDecision(Decision(2, 3));
 
