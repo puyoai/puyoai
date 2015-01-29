@@ -25,6 +25,16 @@ struct MovingKumipuyoState {
     constexpr MovingKumipuyoState() : pos(KumipuyoPos()) {}
     constexpr explicit MovingKumipuyoState(const KumipuyoPos& pos) : pos(pos) {}
 
+    static constexpr MovingKumipuyoState initialState()
+    {
+        return MovingKumipuyoState(KumipuyoPos::initialPos());
+    }
+
+    bool isInitialPosition() const
+    {
+        return pos.x == 3 && pos.y == 12 && pos.r == 0;
+    }
+
     friend bool operator==(const MovingKumipuyoState& lhs, const MovingKumipuyoState& rhs)
     {
         return std::tie(lhs.pos,
@@ -92,7 +102,7 @@ public:
 
     // TODO(mayah): Move these to private section?
     // Fast, but usable in limited situation.
-    static KeySetSeq findKeyStrokeFastpath(const CoreField&, const MovingKumipuyoState&, const Decision&);
+    static KeySetSeq findKeyStrokeFastpath(const CoreField&, const Decision&);
     // This is faster, but might output worse key stroke.
     static KeySetSeq findKeyStrokeOnline(const PlainField&, const MovingKumipuyoState&, const Decision&);
     // This is slow, but precise.

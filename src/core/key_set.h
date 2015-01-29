@@ -18,6 +18,7 @@ public:
     bool hasKey(Key) const;
 
     bool hasTurnKey() const { return hasKey(Key::RIGHT_TURN) || hasKey(Key::LEFT_TURN); }
+    bool hasArrowKey() const { return hasKey(Key::RIGHT) || hasKey(Key::LEFT) || hasKey(Key::UP) || hasKey(Key::DOWN); }
     bool hasSomeKey() const { return keys_.any(); }
     bool hasIntersection(const KeySet& rhs) const
     {
