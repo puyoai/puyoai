@@ -95,6 +95,7 @@ private:
     DropDecision thinkQuickTurn(int frameId, const CoreField& f, const KumipuyoSeq& seq)
     {
         UNUSED_VARIABLE(frameId);
+        UNUSED_VARIABLE(seq);
 
         if (f.height(4) <= 10)
             return DropDecision(Decision(4, 2));
