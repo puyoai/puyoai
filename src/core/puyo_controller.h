@@ -27,20 +27,20 @@ public:
 
     // Finds a key stroke to move puyo from |KumipuyoMovingState| to |Decision|.
     // When there is not such a way, the returned KeySetSeq would be empty sequence.
-    static KeySetSeq findKeyStroke(const CoreField&, const KumipuyoMovingState&, const Decision&);
+    static KeySetSeq findKeyStroke(const CoreField&, const Decision&);
+    static KeySetSeq findKeyStrokeFrom(const CoreField&, const KumipuyoMovingState&, const Decision&);
 
-    // TODO(mayah): Move these to private section?
+private:
+    static bool isReachableFastpath(const PlainField&, const Decision&);
+
+    static KeySetSeq findKeyStrokeOnlineInternal(const PlainField&, const KumipuyoMovingState&, const Decision&);
+
     // Fast, but usable in limited situation.
     static KeySetSeq findKeyStrokeFastpath(const CoreField&, const Decision&);
     // This is faster, but might output worse key stroke.
     static KeySetSeq findKeyStrokeOnline(const PlainField&, const KumipuyoMovingState&, const Decision&);
     // This is slow, but precise.
     static KeySetSeq findKeyStrokeByDijkstra(const PlainField&, const KumipuyoMovingState&, const Decision&);
-
-private:
-    static bool isReachableFastpath(const PlainField&, const Decision&);
-
-    static KeySetSeq findKeyStrokeOnlineInternal(const PlainField&, const KumipuyoMovingState&, const Decision&);
 };
 
 #endif  // CORE_PUYO_CONTROLLER_H_

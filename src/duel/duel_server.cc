@@ -273,7 +273,7 @@ void DuelServer::play(DuelState* duelState, const vector<FrameResponse> data[2])
         // it's OK for now. However, this might cause future issues. Consider better way.
 
         if (accepted_index != -1) {
-            KeySetSeq kss = PuyoController::findKeyStroke(me->field(), me->kumipuyoMovingState(), duelState->decision[pi]);
+            KeySetSeq kss = PuyoController::findKeyStrokeFrom(me->field(), me->kumipuyoMovingState(), duelState->decision[pi]);
             me->setKeySetSeq(kss);
         }
 
