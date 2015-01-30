@@ -40,7 +40,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnEmptyField)
     EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
 
     EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ(">B,,>,,>B,,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
+    EXPECT_EQ(">B,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
     EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
 
     for (int x = 1; x <= 6; ++x) {
@@ -163,7 +163,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField1)
     EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
 
     EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ(">B,,>,,>B,,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
+    EXPECT_EQ(">B,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
     EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
 
     for (int x = 1; x <= 6; ++x) {
@@ -224,13 +224,13 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField2)
     EXPECT_EQ(">B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
 
     EXPECT_EQ(">,,>,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ(">B,>,>B,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
+    EXPECT_EQ(">B,>,>,>B,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
     EXPECT_EQ(">B,,>,B,,v", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
     EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
 
-    EXPECT_EQ(">B,>,>B,>,>A,>,>A,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
+    EXPECT_EQ(">B,>,>,>B,>,>A,>,>A,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ(">B,>,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
@@ -301,7 +301,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField3)
 
     EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>A,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
     EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ(">B,>,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
@@ -684,6 +684,65 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField8)
                 kms.moveKumipuyo(f, ks);
             EXPECT_EQ(x, kms.pos.x);
             EXPECT_EQ(r, kms.pos.r);
+        }
+    }
+}
+
+TEST(PuyoControllerTest, findKeyStrokeHigherExhaustive)
+{
+    CoreField f(
+        "OOOOOO" // 10
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    for (int i = 0; i < 4 * 4 * 4 * 4 * 4; ++i) {
+        int heights[] = {
+            0,
+            (i >> 0) & 3,
+            (i >> 2) & 3,
+            0,
+            (i >> 4) & 3,
+            (i >> 6) & 3,
+            (i >> 8) & 3,
+        };
+
+        for (int x = 1; x <= 6; ++x) {
+            if (x == 3)
+                continue;
+            for (int j = 0; j < 4; ++j)
+                f.unsafeSet(x, 10 + j, PuyoColor::EMPTY);
+            for (int j = 0; j < heights[x]; ++j)
+                f.unsafeSet(x, 10 + j, PuyoColor::OJAMA);
+            f.recalcHeightOn(x);
+        }
+
+        for (int x = 1; x <= 6; ++x) {
+            for (int r = 0; r < 4; ++r) {
+                Decision d(x, r);
+                if (!d.isValid())
+                    continue;
+                bool reachable = PuyoController::isReachable(f, d);
+
+                KumipuyoMovingState kms(KumipuyoPos::initialPos());
+                KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+                if (!reachable) {
+                    EXPECT_TRUE(kss.empty()) << f.toDebugString() << '\n' << d.toString();
+                    continue;
+                }
+
+                EXPECT_FALSE(kss.empty());
+                for (const auto& ks : kss)
+                    kms.moveKumipuyo(f, ks);
+                EXPECT_EQ(x, kms.pos.x) << f.toDebugString() << '\n' << d.toString() << ' ' << kss.toString();
+                EXPECT_EQ(r, kms.pos.r) << f.toDebugString() << '\n' << d.toString() << ' ' << kss.toString();
+            }
         }
     }
 }
