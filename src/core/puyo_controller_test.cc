@@ -688,11 +688,11 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField8)
     }
 }
 
-TEST(PuyoControllerTest, reachableHigherField1)
+TEST(PuyoControllerTest, reachable1)
 {
     CoreField f(
-        ".....O" // 14
-        ".....O"
+        "     O" // 14
+        "     O"
         "    OO" // 12
         "OO OOO"
         "OO OOO"
@@ -706,5 +706,186 @@ TEST(PuyoControllerTest, reachableHigherField1)
         "OOOOOO"
         "OOOOOO");
 
-    EXPECT_FALSE(PuyoController::isReachable(f, Decision(5, 1)));
+    set<Decision> unreachable;
+    unreachable.insert(Decision(5, 1));
+    unreachable.insert(Decision(5, 2));
+    unreachable.insert(Decision(6, 0));
+    unreachable.insert(Decision(6, 2));
+    unreachable.insert(Decision(6, 3));
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r <= 3; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+            if (unreachable.count(d))
+                EXPECT_FALSE(PuyoController::isReachable(f, d)) << d.toString();
+            else
+                EXPECT_TRUE(PuyoController::isReachable(f, d)) << d.toString();
+        }
+    }
+}
+
+TEST(PuyoControllerTest, reachable2)
+{
+    CoreField f(
+        "    O " // 14
+        "    O "
+        "    OO" // 12
+        "OO OOO"
+        "OO OOO"
+        "OO OOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    set<Decision> unreachable;
+    unreachable.insert(Decision(4, 1));
+    unreachable.insert(Decision(5, 0));
+    unreachable.insert(Decision(5, 1));
+    unreachable.insert(Decision(5, 2));
+    unreachable.insert(Decision(5, 3));
+    unreachable.insert(Decision(6, 0));
+    unreachable.insert(Decision(6, 2));
+    unreachable.insert(Decision(6, 3));
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r <= 3; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+            if (unreachable.count(d))
+                EXPECT_FALSE(PuyoController::isReachable(f, d)) << d.toString();
+            else
+                EXPECT_TRUE(PuyoController::isReachable(f, d)) << d.toString();
+        }
+    }
+}
+
+TEST(PuyoControllerTest, reachable3)
+{
+    CoreField f(
+        "   O  " // 14
+        "   O  "
+        "   O  " // 12
+        "OO OOO"
+        "OO OOO"
+        "OO OOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    set<Decision> unreachable;
+    unreachable.insert(Decision(3, 1));
+    unreachable.insert(Decision(4, 0));
+    unreachable.insert(Decision(4, 1));
+    unreachable.insert(Decision(4, 2));
+    unreachable.insert(Decision(4, 3));
+    unreachable.insert(Decision(5, 0));
+    unreachable.insert(Decision(5, 1));
+    unreachable.insert(Decision(5, 2));
+    unreachable.insert(Decision(5, 3));
+    unreachable.insert(Decision(6, 0));
+    unreachable.insert(Decision(6, 2));
+    unreachable.insert(Decision(6, 3));
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r <= 3; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+            if (unreachable.count(d))
+                EXPECT_FALSE(PuyoController::isReachable(f, d)) << d.toString();
+            else
+                EXPECT_TRUE(PuyoController::isReachable(f, d)) << d.toString();
+        }
+    }
+}
+
+TEST(PuyoControllerTest, reachable4)
+{
+    CoreField f(
+        " O    " // 14
+        " O    "
+        " O    " // 12
+        "OO OOO"
+        "OO OOO"
+        "OO OOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    set<Decision> unreachable;
+    unreachable.insert(Decision(1, 0));
+    unreachable.insert(Decision(1, 1));
+    unreachable.insert(Decision(1, 2));
+    unreachable.insert(Decision(2, 0));
+    unreachable.insert(Decision(2, 1));
+    unreachable.insert(Decision(2, 2));
+    unreachable.insert(Decision(2, 3));
+    unreachable.insert(Decision(3, 3));
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r <= 3; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+            if (unreachable.count(d))
+                EXPECT_FALSE(PuyoController::isReachable(f, d)) << d.toString();
+            else
+                EXPECT_TRUE(PuyoController::isReachable(f, d)) << d.toString();
+        }
+    }
+}
+
+TEST(PuyoControllerTest, reachable6)
+{
+    CoreField f(
+        "O     " // 14
+        "O     "
+        "O     " // 12
+        "OO OOO"
+        "OO OOO"
+        "OO OOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    set<Decision> unreachable;
+    unreachable.insert(Decision(1, 0));
+    unreachable.insert(Decision(1, 1));
+    unreachable.insert(Decision(1, 2));
+    unreachable.insert(Decision(2, 3));
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int r = 0; r <= 3; ++r) {
+            Decision d(x, r);
+            if (!d.isValid())
+                continue;
+            if (unreachable.count(d))
+                EXPECT_FALSE(PuyoController::isReachable(f, d)) << d.toString();
+            else
+                EXPECT_TRUE(PuyoController::isReachable(f, d)) << d.toString();
+        }
+    }
 }
