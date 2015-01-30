@@ -22,7 +22,7 @@ class PlainField;
 
 class PuyoController {
 public:
-    static bool isReachable(const PlainField&, const Decision&);
+    static bool isReachable(const CoreField&, const Decision&);
     static bool isReachableFrom(const PlainField&, const KumipuyoMovingState&, const Decision&);
 
     // Finds a key stroke to move puyo from |KumipuyoMovingState| to |Decision|.
@@ -31,8 +31,6 @@ public:
     static KeySetSeq findKeyStrokeFrom(const CoreField&, const KumipuyoMovingState&, const Decision&);
 
 private:
-    static bool isReachableFastpath(const PlainField&, const Decision&);
-
     static KeySetSeq findKeyStrokeOnlineInternal(const PlainField&, const KumipuyoMovingState&, const Decision&);
 
     // Fast, but usable in limited situation.

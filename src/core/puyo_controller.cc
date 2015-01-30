@@ -421,15 +421,54 @@ KeySetSeq findKeyStrokeFastpath63(const CoreField& field)
 
 } // namespace anomymous
 
-bool PuyoController::isReachable(const PlainField& field, const Decision& decision)
+bool PuyoController::isReachable(const CoreField& field, const Decision& decision)
 {
-    if (isReachableFastpath(field, decision))
-        return true;
-    if (!findKeyStrokeFastpath(field, decision).empty())
-        return true;
+    DCHECK(decision.isValid()) << decision.toString();
 
-    // slowpath
-    return isReachableFrom(field, KumipuyoMovingState::initialState(), decision);
+    static const int checker[6][5] = {
+        { 3, 2, 1, 0 },
+        { 3, 2, 0 },
+        { 3, 0 },
+        { 3, 4, 0 },
+        { 3, 4, 5, 0 },
+        { 3, 4, 5, 6, 0 },
+    };
+
+    int checkerIdx = decision.x - 1;
+    if (decision.r == 1 && 3 <= decision.x)
+        checkerIdx += 1;
+    else if (decision.r == 3 && decision.x <= 3)
+        checkerIdx -= 1;
+
+    // When decision is valid, this should hold.
+    DCHECK(0 <= checkerIdx && checkerIdx < 6) << checkerIdx;
+
+    bool yMightBe13 = field.height(2) >= 12 && field.height(4) >= 12;
+    for (int i = 1; checker[checkerIdx][i] != 0; ++i) {
+        int x = checker[checkerIdx][i];
+        if (field.height(x) <= 11) {
+            yMightBe13 = false;
+            continue;
+        }
+        if (field.height(x) == 12) {
+            if (yMightBe13)
+                continue;
+            if (field.height(checker[checkerIdx][i - 1]) == 11) {
+                yMightBe13 = true;
+                continue;
+            }
+            if (i - 2 >= 0 && field.height(checker[checkerIdx][i - 2]) == 12) {
+                yMightBe13 = true;
+                continue;
+            }
+        }
+        return false;
+    }
+
+    if (decision.r == 2 && field.height(decision.x) >= 12)
+        return false;
+
+    return true;
 }
 
 bool PuyoController::isReachableFrom(const PlainField& field, const KumipuyoMovingState& mks, const Decision& decision)
@@ -453,39 +492,6 @@ KeySetSeq PuyoController::findKeyStrokeFrom(const CoreField& field, const Kumipu
     if (!isReachableFrom(field, mks, decision))
         return KeySetSeq();
     return findKeyStrokeByDijkstra(field, mks, decision);
-}
-
-bool PuyoController::isReachableFastpath(const PlainField& field, const Decision& decision)
-{
-    DCHECK(decision.isValid()) << decision.toString();
-
-    static const int checker[6][4] = {
-        { 2, 1, 0 },
-        { 2, 0 },
-        { 0 },
-        { 4, 0 },
-        { 4, 5, 0 },
-        { 4, 5, 6, 0 },
-    };
-
-    int checkerIdx = decision.x - 1;
-    if (decision.r == 1 && 3 <= decision.x)
-        checkerIdx += 1;
-    else if (decision.r == 3 && decision.x <= 3)
-        checkerIdx -= 1;
-
-    // When decision is valid, this should hold.
-    DCHECK(0 <= checkerIdx && checkerIdx < 6) << checkerIdx;
-
-    for (int i = 0; checker[checkerIdx][i] != 0; ++i) {
-        if (field.get(checker[checkerIdx][i], 12) != PuyoColor::EMPTY)
-            return false;
-    }
-
-    if (decision.r == 2 && field.get(decision.x, 12) != PuyoColor::EMPTY)
-        return false;
-
-    return true;
 }
 
 typedef KumipuyoMovingState Vertex;
