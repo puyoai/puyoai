@@ -27,12 +27,13 @@ public:
     void moveKumipuyo(const PlainField&, const KeySet&, bool* downAccepted = nullptr);
 
 public:
+    // TODO(mayah): Make this private.
+
     // Move kumipuyo using only arrow key. |downAccepted| gets true when DOWN is accepted.
     void moveKumipuyoByArrowKey(const PlainField&, const KeySet&, bool* downAccepted);
     void moveKumipuyoByTurnKey(const PlainField&, const KeySet&, bool* needsFreefallProcess);
     void moveKumipuyoByFreefall(const PlainField&);
 
-    // TODO(mayah): Make this private.
     KumipuyoPos pos;
     int restFramesTurnProhibited = 0;
     int restFramesArrowProhibited = 0;

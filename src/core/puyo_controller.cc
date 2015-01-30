@@ -423,6 +423,29 @@ bool PuyoController::isReachable(const PlainField& field, const Decision& decisi
     return isReachableFrom(field, KumipuyoMovingState::initialState(), decision);
 }
 
+bool PuyoController::isReachableFrom(const PlainField& field, const KumipuyoMovingState& mks, const Decision& decision)
+{
+    return !findKeyStrokeOnlineInternal(field, mks, decision).empty();
+}
+
+KeySetSeq PuyoController::findKeyStroke(const CoreField& field, const Decision& decision)
+{
+    KeySetSeq kss = findKeyStrokeFastpath(field, decision);
+    if (!kss.empty())
+        return kss;
+    return findKeyStrokeOnline(field, KumipuyoMovingState::initialState(), decision);
+}
+
+KeySetSeq PuyoController::findKeyStrokeFrom(const CoreField& field, const KumipuyoMovingState& mks, const Decision& decision)
+{
+    if (mks.isInitialPosition())
+        return findKeyStroke(field, decision);
+
+    if (!isReachableFrom(field, mks, decision))
+        return KeySetSeq();
+    return findKeyStrokeByDijkstra(field, mks, decision);
+}
+
 bool PuyoController::isReachableFastpath(const PlainField& field, const Decision& decision)
 {
     DCHECK(decision.isValid()) << decision.toString();
@@ -451,26 +474,6 @@ bool PuyoController::isReachableFastpath(const PlainField& field, const Decision
     }
 
     return true;
-}
-
-bool PuyoController::isReachableFrom(const PlainField& field, const KumipuyoMovingState& mks, const Decision& decision)
-{
-    return !findKeyStrokeOnlineInternal(field, mks, decision).empty();
-}
-
-KeySetSeq PuyoController::findKeyStroke(const CoreField& field, const KumipuyoMovingState& mks, const Decision& decision)
-{
-    if (mks.isInitialPosition()) {
-        KeySetSeq kss = findKeyStrokeFastpath(field, decision);
-        if (!kss.empty())
-            return kss;
-        return findKeyStrokeOnline(field, mks, decision);
-    }
-
-    if (!isReachableFrom(field, mks, decision))
-        return KeySetSeq();
-
-    return findKeyStrokeByDijkstra(field, mks, decision);
 }
 
 typedef KumipuyoMovingState Vertex;
