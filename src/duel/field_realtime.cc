@@ -79,7 +79,7 @@ void FieldRealtime::transitToStatePreparingNext()
     sleepFor_ = FRAMES_PREPARING_NEXT;
     userState_.playable = false;
 
-    mks_ = MovingKumipuyoState(KumipuyoPos(3, 12, 0));
+    kms_ = KumipuyoMovingState(KumipuyoPos(3, 12, 0));
 
     if (!kumipuyoSeq_.isEmpty())
         kumipuyoSeq_.dropFront();
@@ -105,13 +105,13 @@ bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
     *accepted = true;
 
     bool downAccepted = false;
-    PuyoController::moveKumipuyo(field_, keySet, &mks_, &downAccepted);
+    kms_.moveKumipuyo(field_, keySet, &downAccepted);
     if (downAccepted)
         ++score_;
 
-    if (mks_.grounded) {
-        field_.setPuyoAndHeight(mks_.pos.axisX(), mks_.pos.axisY(), kumipuyoSeq_.axis(0));
-        field_.setPuyoAndHeight(mks_.pos.childX(), mks_.pos.childY(), kumipuyoSeq_.child(0));
+    if (kms_.grounded) {
+        field_.setPuyoAndHeight(kms_.pos.axisX(), kms_.pos.axisY(), kumipuyoSeq_.axis(0));
+        field_.setPuyoAndHeight(kms_.pos.childX(), kms_.pos.childY(), kumipuyoSeq_.child(0));
         userState_.playable = false;
         userState_.grounded = true;
         dropVelocity_ = INITIAL_DROP_VELOCITY;

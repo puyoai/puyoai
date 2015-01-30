@@ -11,6 +11,7 @@
 #include "core/key.h"
 #include "core/key_set.h"
 #include "core/kumipuyo.h"
+#include "core/kumipuyo_moving_state.h"
 #include "core/kumipuyo_pos.h"
 #include "core/puyo_color.h"
 
@@ -19,104 +20,27 @@ class Decision;
 class KumipuyoPos;
 class PlainField;
 
-// TODO(mayah): Currently this file is a bit messy. Refactoring is desired.
-
-struct MovingKumipuyoState {
-    constexpr MovingKumipuyoState() : pos(KumipuyoPos()) {}
-    constexpr explicit MovingKumipuyoState(const KumipuyoPos& pos) : pos(pos) {}
-
-    static constexpr MovingKumipuyoState initialState()
-    {
-        return MovingKumipuyoState(KumipuyoPos::initialPos());
-    }
-
-    bool isInitialPosition() const
-    {
-        return pos.x == 3 && pos.y == 12 && pos.r == 0;
-    }
-
-    friend bool operator==(const MovingKumipuyoState& lhs, const MovingKumipuyoState& rhs)
-    {
-        return std::tie(lhs.pos,
-                        lhs.restFramesTurnProhibited,
-                        lhs.restFramesArrowProhibited,
-                        lhs.restFramesToAcceptQuickTurn,
-                        lhs.restFramesForFreefall,
-                        lhs.numGrounded,
-                        lhs.grounding,
-                        lhs.grounded) ==
-            std::tie(rhs.pos,
-                     rhs.restFramesTurnProhibited,
-                     rhs.restFramesArrowProhibited,
-                     rhs.restFramesToAcceptQuickTurn,
-                     rhs.restFramesForFreefall,
-                     rhs.numGrounded,
-                     rhs.grounding,
-                     rhs.grounded);
-    }
-    friend bool operator!=(const MovingKumipuyoState& lhs, const MovingKumipuyoState& rhs) { return !(lhs == rhs); }
-    friend bool operator<(const MovingKumipuyoState& lhs, const MovingKumipuyoState& rhs)
-    {
-        return std::tie(lhs.pos,
-                        lhs.restFramesTurnProhibited,
-                        lhs.restFramesArrowProhibited,
-                        lhs.restFramesToAcceptQuickTurn,
-                        lhs.restFramesForFreefall,
-                        lhs.numGrounded,
-                        lhs.grounding,
-                        lhs.grounded) <
-            std::tie(rhs.pos,
-                     rhs.restFramesTurnProhibited,
-                     rhs.restFramesArrowProhibited,
-                     rhs.restFramesToAcceptQuickTurn,
-                     rhs.restFramesForFreefall,
-                     rhs.numGrounded,
-                     rhs.grounding,
-                     rhs.grounded);
-    }
-    friend bool operator>(const MovingKumipuyoState& lhs, const MovingKumipuyoState& rhs) { return rhs < lhs; }
-
-    KumipuyoPos pos;
-    int restFramesTurnProhibited = 0;
-    int restFramesArrowProhibited = 0;
-    int restFramesToAcceptQuickTurn = 0;
-    int restFramesForFreefall = FRAMES_FREE_FALL;
-    int numGrounded = 0;
-    bool grounding = false;
-    bool grounded = false;
-};
-
 class PuyoController {
 public:
-    static const int FRAMES_CONTINUOUS_TURN_PROHIBITED = 1;
-    static const int FRAMES_CONTINUOUS_ARROW_PROHIBITED = 1;
-
-    static void moveKumipuyo(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted = nullptr);
-
     static bool isReachable(const PlainField&, const Decision&);
-    static bool isReachableFrom(const PlainField&, const MovingKumipuyoState&, const Decision&);
+    static bool isReachableFrom(const PlainField&, const KumipuyoMovingState&, const Decision&);
 
-    // Finds a key stroke to move puyo from |MovingKumipuyoState| to |Decision|.
+    // Finds a key stroke to move puyo from |KumipuyoMovingState| to |Decision|.
     // When there is not such a way, the returned KeySetSeq would be empty sequence.
-    static KeySetSeq findKeyStroke(const CoreField&, const MovingKumipuyoState&, const Decision&);
+    static KeySetSeq findKeyStroke(const CoreField&, const KumipuyoMovingState&, const Decision&);
 
     // TODO(mayah): Move these to private section?
     // Fast, but usable in limited situation.
     static KeySetSeq findKeyStrokeFastpath(const CoreField&, const Decision&);
     // This is faster, but might output worse key stroke.
-    static KeySetSeq findKeyStrokeOnline(const PlainField&, const MovingKumipuyoState&, const Decision&);
+    static KeySetSeq findKeyStrokeOnline(const PlainField&, const KumipuyoMovingState&, const Decision&);
     // This is slow, but precise.
-    static KeySetSeq findKeyStrokeByDijkstra(const PlainField&, const MovingKumipuyoState&, const Decision&);
+    static KeySetSeq findKeyStrokeByDijkstra(const PlainField&, const KumipuyoMovingState&, const Decision&);
 
 private:
-    // Move kumipuyo using only arrow key. |downAccepted| gets true when DOWN is accepted.
-    static void moveKumipuyoByArrowKey(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* downAccepted);
-    static void moveKumipuyoByTurnKey(const PlainField&, const KeySet&, MovingKumipuyoState*, bool* needsFreefallProcess);
-    static void moveKumipuyoByFreefall(const PlainField&, MovingKumipuyoState*);
-
     static bool isReachableFastpath(const PlainField&, const Decision&);
 
-    static KeySetSeq findKeyStrokeOnlineInternal(const PlainField&, const MovingKumipuyoState&, const Decision&);
+    static KeySetSeq findKeyStrokeOnlineInternal(const PlainField&, const KumipuyoMovingState&, const Decision&);
 };
 
 #endif  // CORE_PUYO_CONTROLLER_H_

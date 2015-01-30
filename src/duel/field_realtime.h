@@ -6,9 +6,9 @@
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/key_set.h"
+#include "core/kumipuyo_moving_state.h"
 #include "core/kumipuyo_seq.h"
 #include "core/next_puyo.h"
-#include "core/puyo_controller.h"
 #include "core/state.h"
 
 // TODO(mayah): We need to do refactoring this. This class is really messy.
@@ -71,8 +71,8 @@ public:
     // If NEXT2 is delaying, this does not contain NEXT2.
     KumipuyoSeq visibleKumipuyoSeq() const;
     Kumipuyo kumipuyo(int nth = 0) const;
-    const KumipuyoPos& kumipuyoPos() const { return mks_.pos; }
-    const MovingKumipuyoState& movingKumipuyoState() const { return mks_; }
+    const KumipuyoPos& kumipuyoPos() const { return kms_.pos; }
+    const KumipuyoMovingState& kumipuyoMovingState() const { return kms_; }
 
     // Gives a key input to the field, and control puyo. Returns true if a key
     // input is accepted. FrameContext will collect events when playing frames.
@@ -114,7 +114,7 @@ private:
     KumipuyoSeq kumipuyoSeq_;
     UserState userState_;
 
-    MovingKumipuyoState mks_;
+    KumipuyoMovingState kms_;
     KeySetSeq keySetSeq_;
     Decision lastDecision_;
 

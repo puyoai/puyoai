@@ -11,6 +11,7 @@
 #include "core/constant.h"
 #include "core/decision.h"
 #include "core/frame_response.h"
+#include "core/puyo_controller.h"
 #include "core/server/connector/connector.h"
 #include "core/server/connector/connector_manager.h"
 #include "core/server/game_state.h"
@@ -86,7 +87,7 @@ static int updateDecision(const vector<FrameResponse>& data, const FieldRealtime
         if (!d.isValid())
             continue;
 
-        if (PuyoController::isReachableFrom(field.field(), field.movingKumipuyoState(), d)) {
+        if (PuyoController::isReachableFrom(field.field(), field.kumipuyoMovingState(), d)) {
             *decision = d;
             return i;
         }
@@ -272,7 +273,7 @@ void DuelServer::play(DuelState* duelState, const vector<FrameResponse> data[2])
         // it's OK for now. However, this might cause future issues. Consider better way.
 
         if (accepted_index != -1) {
-            KeySetSeq kss = PuyoController::findKeyStroke(me->field(), me->movingKumipuyoState(), duelState->decision[pi]);
+            KeySetSeq kss = PuyoController::findKeyStroke(me->field(), me->kumipuyoMovingState(), duelState->decision[pi]);
             me->setKeySetSeq(kss);
         }
 

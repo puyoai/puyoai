@@ -412,8 +412,8 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult,
                 field.recalcHeightOn(x);
             }
 
-            MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
-            keySetSeq = PuyoController::findKeyStroke(field, mks, d);
+            KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
+            keySetSeq = PuyoController::findKeyStroke(field, kms, d);
             if (keySetSeq.empty()) {
                 cout << "Cannot move?" << endl;
                 continue;
