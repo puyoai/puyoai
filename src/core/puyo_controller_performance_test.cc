@@ -14,7 +14,7 @@ TEST(PuyoControllerPerformanceTest, empty)
     TimeStampCounterData tsc;
 
     CoreField f;
-    MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+    KumipuyoMovingState mks(KumipuyoPos(3, 12, 0));
 
     for (int i = 0; i < 100; ++i) {
         Decision d(6, 3);
@@ -44,7 +44,7 @@ TEST(PuyoControllerPerformanceTest, unreachable)
         " O O  "
         " O O  ");
 
-    MovingKumipuyoState mks(KumipuyoPos(3, 12, 0));
+    KumipuyoMovingState mks(KumipuyoPos(3, 12, 0));
 
     for (int i = 0; i < 100; ++i) {
         Decision d(6, 3);

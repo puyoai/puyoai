@@ -360,6 +360,7 @@ KeySetSeq findKeyStrokeFastpath60(const CoreField& field)
 KeySetSeq findKeyStrokeFastpath61(const CoreField&)
 {
     CHECK(false) << "shouldn't be callede";
+    return KeySetSeq();
 }
 
 KeySetSeq findKeyStrokeFastpath62(const CoreField& field)
@@ -411,292 +412,6 @@ KeySetSeq findKeyStrokeFastpath63(const CoreField& field)
 
 } // namespace anomymous
 
-// TODO(mayah): Why these definitions are required for gtest?
-const int PuyoController::FRAMES_CONTINUOUS_TURN_PROHIBITED;
-const int PuyoController::FRAMES_CONTINUOUS_ARROW_PROHIBITED;
-
-void PuyoController::moveKumipuyo(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
-{
-    if (mks->restFramesToAcceptQuickTurn > 0)
-        mks->restFramesToAcceptQuickTurn--;
-
-    // It looks turn key is consumed before arrow key.
-
-    bool needsFreefallProcess = true;
-    if (mks->restFramesTurnProhibited > 0) {
-        mks->restFramesTurnProhibited--;
-    } else {
-        moveKumipuyoByTurnKey(field, keySet, mks, &needsFreefallProcess);
-    }
-
-    if (!keySet.hasKey(Key::DOWN) && needsFreefallProcess)
-        moveKumipuyoByFreefall(field, mks);
-
-    if (mks->grounded)
-        return;
-
-    if (mks->restFramesArrowProhibited > 0) {
-        mks->restFramesArrowProhibited--;
-    } else {
-        moveKumipuyoByArrowKey(field, keySet, mks, downAccepted);
-    }
-
-    bool grounding = mks->grounding;
-    if (field.get(mks->pos.axisX(), mks->pos.axisY() - 1) != PuyoColor::EMPTY ||
-        field.get(mks->pos.childX(), mks->pos.childY() - 1) != PuyoColor::EMPTY) {
-        grounding |= mks->restFramesForFreefall <= FRAMES_FREE_FALL / 2;
-    } else {
-        grounding = false;
-    }
-
-    if (grounding && !mks->grounding) {
-        mks->restFramesForFreefall = FRAMES_FREE_FALL;
-        mks->grounding = true;
-        mks->numGrounded += 1;
-
-        if (mks->numGrounded >= 8) {
-            mks->grounded = true;
-            return;
-        }
-    }
-    if (!grounding && mks->grounding) {
-        mks->restFramesForFreefall = FRAMES_FREE_FALL / 2;
-        mks->grounding = false;
-    }
-}
-
-void PuyoController::moveKumipuyoByArrowKey(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* downAccepted)
-{
-    DCHECK(mks);
-    DCHECK(!mks->grounded) << "Grounded puyo cannot be moved.";
-
-    // Only one key will be accepted.
-    // When DOWN + RIGHT or DOWN + LEFT are simultaneously input, DOWN should be ignored.
-
-    if (keySet.hasKey(Key::RIGHT)) {
-        mks->restFramesArrowProhibited = FRAMES_CONTINUOUS_ARROW_PROHIBITED;
-        if (field.get(mks->pos.axisX() + 1, mks->pos.axisY()) == PuyoColor::EMPTY &&
-            field.get(mks->pos.childX() + 1, mks->pos.childY()) == PuyoColor::EMPTY) {
-            mks->pos.x++;
-        }
-        return;
-    }
-
-    if (keySet.hasKey(Key::LEFT)) {
-        mks->restFramesArrowProhibited = FRAMES_CONTINUOUS_ARROW_PROHIBITED;
-        if (field.get(mks->pos.axisX() - 1, mks->pos.axisY()) == PuyoColor::EMPTY &&
-            field.get(mks->pos.childX() - 1, mks->pos.childY()) == PuyoColor::EMPTY) {
-            mks->pos.x--;
-        }
-        return;
-    }
-
-
-    if (keySet.hasKey(Key::DOWN)) {
-        // For DOWN key, we don't set restFramesArrowProhibited.
-        if (downAccepted)
-            *downAccepted = true;
-
-        if (mks->grounding) {
-            mks->restFramesForFreefall = 0;
-            mks->grounded = true;
-            return;
-        }
-
-        if (mks->restFramesForFreefall > 0) {
-            mks->restFramesForFreefall = 0;
-            return;
-        }
-
-        mks->restFramesForFreefall = 0;
-        if (field.get(mks->pos.axisX(), mks->pos.axisY() - 1) == PuyoColor::EMPTY &&
-            field.get(mks->pos.childX(), mks->pos.childY() - 1) == PuyoColor::EMPTY) {
-            mks->pos.y--;
-            return;
-        }
-
-        // Grounded.
-        mks->grounded = true;
-        return;
-    }
-}
-
-void PuyoController::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, MovingKumipuyoState* mks, bool* needsFreefallProcess)
-{
-    DCHECK_EQ(0, mks->restFramesTurnProhibited) << mks->restFramesTurnProhibited;
-
-    if (keySet.hasKey(Key::RIGHT_TURN)) {
-        mks->restFramesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
-        switch (mks->pos.r) {
-        case 0:
-            if (field.get(mks->pos.x + 1, mks->pos.y) == PuyoColor::EMPTY) {
-                mks->pos.r = (mks->pos.r + 1) % 4;
-                mks->restFramesToAcceptQuickTurn = 0;
-                return;
-            }
-            if (field.get(mks->pos.x - 1, mks->pos.y) == PuyoColor::EMPTY) {
-                mks->pos.r = (mks->pos.r + 1) % 4;
-                mks->pos.x--;
-                mks->restFramesToAcceptQuickTurn = 0;
-                return;
-            }
-
-            if (mks->restFramesToAcceptQuickTurn > 0) {
-                mks->pos.r = 2;
-                mks->pos.y++;
-                mks->restFramesToAcceptQuickTurn = 0;
-                mks->restFramesForFreefall = FRAMES_FREE_FALL / 2;
-                *needsFreefallProcess = false;
-                return;
-            }
-
-            mks->restFramesToAcceptQuickTurn = FRAMES_QUICKTURN;
-            return;
-        case 1:
-            if (field.get(mks->pos.x, mks->pos.y - 1) == PuyoColor::EMPTY) {
-                mks->pos.r = (mks->pos.r + 1) % 4;
-                return;
-            }
-
-            if (mks->pos.y < 13) {
-                mks->pos.r = (mks->pos.r + 1) % 4;
-                mks->pos.y++;
-                mks->restFramesForFreefall = FRAMES_FREE_FALL / 2;
-                *needsFreefallProcess = false;
-                return;
-            }
-
-            // The axis cannot be moved to 14th line.
-            return;
-        case 2:
-            if (field.get(mks->pos.x - 1, mks->pos.y) == PuyoColor::EMPTY) {
-                mks->pos.r = (mks->pos.r + 1) % 4;
-                mks->restFramesToAcceptQuickTurn = 0;
-                return;
-            }
-
-            if (field.get(mks->pos.x + 1, mks->pos.y) == PuyoColor::EMPTY) {
-                mks->pos.r = (mks->pos.r + 1) % 4;
-                mks->pos.x++;
-                mks->restFramesToAcceptQuickTurn = 0;
-                return;
-            }
-
-            if (mks->restFramesToAcceptQuickTurn > 0) {
-                mks->pos.r = 0;
-                mks->pos.y--;
-                mks->restFramesToAcceptQuickTurn = 0;
-                return;
-            }
-
-            mks->restFramesToAcceptQuickTurn = FRAMES_QUICKTURN;
-            return;
-        case 3:
-            mks->pos.r = (mks->pos.r + 1) % 4;
-            return;
-        default:
-            CHECK(false) << mks->pos.r;
-            return;
-        }
-    }
-
-    if (keySet.hasKey(Key::LEFT_TURN)) {
-        mks->restFramesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
-        switch (mks->pos.r) {
-        case 0:
-            if (field.get(mks->pos.x - 1, mks->pos.y) == PuyoColor::EMPTY) {
-                mks->pos.r = (mks->pos.r + 3) % 4;
-                mks->restFramesToAcceptQuickTurn = 0;
-                return;
-            }
-
-            if (field.get(mks->pos.x + 1, mks->pos.y) == PuyoColor::EMPTY) {
-                mks->pos.r = (mks->pos.r + 3) % 4;
-                mks->pos.x++;
-                mks->restFramesToAcceptQuickTurn = 0;
-                return;
-            }
-
-            if (mks->restFramesToAcceptQuickTurn > 0) {
-                mks->pos.r = 2;
-                mks->pos.y++;
-                mks->restFramesToAcceptQuickTurn = 0;
-                mks->restFramesForFreefall = FRAMES_FREE_FALL / 2;
-                *needsFreefallProcess = false;
-                return;
-            }
-
-            mks->restFramesToAcceptQuickTurn = FRAMES_QUICKTURN;
-            return;
-        case 1:
-            mks->pos.r = (mks->pos.r + 3) % 4;
-            return;
-        case 2:
-            if (field.get(mks->pos.x + 1, mks->pos.y) == PuyoColor::EMPTY) {
-                mks->pos.r = (mks->pos.r + 3) % 4;
-                mks->restFramesToAcceptQuickTurn = 0;
-                return;
-            }
-
-            if (field.get(mks->pos.x - 1, mks->pos.y) == PuyoColor::EMPTY) {
-                mks->pos.r = (mks->pos.r + 3) % 4;
-                mks->pos.x--;
-                mks->restFramesToAcceptQuickTurn = 0;
-                return;
-            }
-
-            if (mks->restFramesToAcceptQuickTurn > 0) {
-                mks->pos.r = 0;
-                mks->pos.y--;
-                mks->restFramesToAcceptQuickTurn = 0;
-                return;
-            }
-
-            mks->restFramesToAcceptQuickTurn = FRAMES_QUICKTURN;
-            return;
-        case 3:
-            if (field.get(mks->pos.x, mks->pos.y - 1) == PuyoColor::EMPTY) {
-                mks->pos.r = (mks->pos.r + 3) % 4;
-                return;
-            }
-
-            if (mks->pos.y < 13) {
-                mks->pos.r = (mks->pos.r + 3) % 4;
-                mks->pos.y++;
-                mks->restFramesForFreefall = FRAMES_FREE_FALL / 2;
-                *needsFreefallProcess = false;
-                return;
-            }
-
-            // The axis cannot be moved to 14th line.
-            return;
-        default:
-            CHECK(false) << mks->pos.r;
-            return;
-        }
-    }
-}
-
-void PuyoController::moveKumipuyoByFreefall(const PlainField& field, MovingKumipuyoState* mks)
-{
-    DCHECK(!mks->grounded);
-
-    if (mks->restFramesForFreefall > 1) {
-        mks->restFramesForFreefall--;
-        return;
-    }
-
-    mks->restFramesForFreefall = FRAMES_FREE_FALL;
-    if (field.get(mks->pos.axisX(), mks->pos.axisY() - 1) == PuyoColor::EMPTY &&
-        field.get(mks->pos.childX(), mks->pos.childY() - 1) == PuyoColor::EMPTY) {
-        mks->pos.y--;
-        return;
-    }
-
-    mks->grounded = true;
-    return;
-}
-
 bool PuyoController::isReachable(const PlainField& field, const Decision& decision)
 {
     if (isReachableFastpath(field, decision))
@@ -705,7 +420,7 @@ bool PuyoController::isReachable(const PlainField& field, const Decision& decisi
         return true;
 
     // slowpath
-    return isReachableFrom(field, MovingKumipuyoState::initialState(), decision);
+    return isReachableFrom(field, KumipuyoMovingState::initialState(), decision);
 }
 
 bool PuyoController::isReachableFastpath(const PlainField& field, const Decision& decision)
@@ -738,12 +453,12 @@ bool PuyoController::isReachableFastpath(const PlainField& field, const Decision
     return true;
 }
 
-bool PuyoController::isReachableFrom(const PlainField& field, const MovingKumipuyoState& mks, const Decision& decision)
+bool PuyoController::isReachableFrom(const PlainField& field, const KumipuyoMovingState& mks, const Decision& decision)
 {
     return !findKeyStrokeOnlineInternal(field, mks, decision).empty();
 }
 
-KeySetSeq PuyoController::findKeyStroke(const CoreField& field, const MovingKumipuyoState& mks, const Decision& decision)
+KeySetSeq PuyoController::findKeyStroke(const CoreField& field, const KumipuyoMovingState& mks, const Decision& decision)
 {
     if (mks.isInitialPosition()) {
         KeySetSeq kss = findKeyStrokeFastpath(field, decision);
@@ -758,7 +473,7 @@ KeySetSeq PuyoController::findKeyStroke(const CoreField& field, const MovingKumi
     return findKeyStrokeByDijkstra(field, mks, decision);
 }
 
-typedef MovingKumipuyoState Vertex;
+typedef KumipuyoMovingState Vertex;
 
 typedef double Weight;
 struct Edge {
@@ -781,7 +496,7 @@ struct Edge {
 typedef vector<Edge> Edges;
 typedef map<Vertex, tuple<Vertex, KeySet, Weight>> Potential;
 
-KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const MovingKumipuyoState& initialState, const Decision& decision)
+KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const KumipuyoMovingState& initialState, const Decision& decision)
 {
     // We don't add KeySet(Key::DOWN) intentionally.
     static const pair<KeySet, double> KEY_CANDIDATES[] = {
@@ -871,8 +586,8 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const
 
         for (int i = 0; i < size; ++i) {
             const pair<KeySet, double>& candidate = candidates[i];
-            MovingKumipuyoState mks(p);
-            moveKumipuyo(field, candidate.first, &mks);
+            KumipuyoMovingState mks(p);
+            mks.moveKumipuyo(field, candidate.first);
 
             if (pot.count(mks))
                 continue;
@@ -885,7 +600,7 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const
     return KeySetSeq();
 }
 
-KeySetSeq PuyoController::findKeyStrokeOnline(const PlainField& field, const MovingKumipuyoState& mks, const Decision& decision)
+KeySetSeq PuyoController::findKeyStrokeOnline(const PlainField& field, const KumipuyoMovingState& mks, const Decision& decision)
 {
     KeySetSeq kss = findKeyStrokeOnlineInternal(field, mks, decision);
     removeRedundantKeySeq(mks.pos, &kss);
@@ -893,7 +608,7 @@ KeySetSeq PuyoController::findKeyStrokeOnline(const PlainField& field, const Mov
 }
 
 // returns null if not reachable
-KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, const MovingKumipuyoState& mks, const Decision& decision)
+KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, const KumipuyoMovingState& mks, const Decision& decision)
 {
     KeySetSeq ret;
     KumipuyoPos current = mks.pos;
