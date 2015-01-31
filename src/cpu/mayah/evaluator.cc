@@ -716,10 +716,6 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
             if (cpl.isEmpty())
                 continue;
 
-            CoreField complementedField(plan.field());
-            for (const auto& cp : cpl)
-                complementedField.dropPuyoOn(cp.x, cp.color);
-
             auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                                 const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                                 const RensaTrackResult& trackResult, const RensaRefSequence&) {
@@ -728,8 +724,11 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                 ColumnPuyoList allKeyPuyos;
                 allKeyPuyos.append(cpl);
                 allKeyPuyos.append(keyPuyos);
-                evalCallback(complementedField, fieldAfterRensa, rensaResult, allKeyPuyos, firePuyos, trackResult);
+                evalCallback(plan.field(), fieldAfterRensa, rensaResult, allKeyPuyos, firePuyos, trackResult);
             };
+            CoreField complementedField(plan.field());
+            for (const auto& cp : cpl)
+                complementedField.dropPuyoOn(cp.x, cp.color);
             RensaDetector::iteratePossibleRensasIteratively(complementedField, maxIteration, strategy, callback);
         }
     }
