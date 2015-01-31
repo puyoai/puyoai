@@ -347,9 +347,9 @@ int main(int argc, char* argv[])
         runAutoTweaker(executor.get(), parameter, FLAGS_auto_count);
     } else {
         map<double, RunResult> scoreMap;
-        for (double x = 1; x <= 20; x += 1) {
+        for (double x = 0; x <= 20; x += 1) {
             cout << "current x = " << x << endl;
-            parameter.setValue(FIELD_USHAPE_EXP, -x);
+            parameter.setValue(RENSA_FIELD_USHAPE_SQUARE, -x);
             scoreMap[x] = run(executor.get(), parameter);
         }
         for (const auto& m : scoreMap) {
