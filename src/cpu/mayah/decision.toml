@@ -186,6 +186,7 @@ BCAD = [1, 0]
 BCAC = [4, 1]
 BCBD = [1, 0]
 CCAB = [5, 1]  # TODO: [1, 2] ?
+CCAC = [2, 3]  # [5, 1]?
 
 [[book]]
 field = [
