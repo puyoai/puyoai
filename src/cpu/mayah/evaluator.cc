@@ -74,6 +74,40 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field,
     }
 }
 
+template<typename ScoreCollector>
+static void calculateValleyDepth(ScoreCollector* sc, EvaluationSparseFeatureKey key, const CoreField& field)
+{
+    for (int x = 1; x <= 6; ++x) {
+        int currentHeight = field.height(x);
+        int leftHeight = (x == 1) ? 14 : field.height(x - 1);
+        int rightHeight = (x == 6) ? 14 : field.height(x + 1);
+
+        int left = std::max(leftHeight - currentHeight, 0);
+        int right = std::max(rightHeight - currentHeight, 0);
+        int depth = std::min(left, right);
+        DCHECK(0 <= depth && depth <= 14) << depth;
+        sc->addScore(key, depth, 1);
+    }
+}
+
+template<typename ScoreCollector>
+static void calculateRidgeHeight(ScoreCollector* sc, EvaluationSparseFeatureKey key, const CoreField& field)
+{
+    for (int x = 1; x <= 6; ++x) {
+        int currentHeight = field.height(x);
+        int leftHeight = (x == 1) ? 14 : field.height(x - 1);
+        int rightHeight = (x == 6) ? 14 : field.height(x + 1);
+
+        int left = std::max(currentHeight - leftHeight, 0);
+        int right = std::max(currentHeight - rightHeight, 0);
+        int height = std::min(left, right);
+        DCHECK(0 <= height && height <= 14) << height;
+        sc->addScore(key, height, 1);
+    }
+}
+
+// ----------------------------------------------------------------------
+
 PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
 {
     PreEvalResult preEvalResult;
@@ -217,33 +251,13 @@ void Evaluator<ScoreCollector>::evalThirdColumnHeightFeature(const RefPlan& plan
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::evalValleyDepth(const CoreField& field)
 {
-    for (int x = 1; x <= 6; ++x) {
-        int currentHeight = field.height(x);
-        int leftHeight = (x == 1) ? 14 : field.height(x - 1);
-        int rightHeight = (x == 6) ? 14 : field.height(x + 1);
-
-        int left = std::max(leftHeight - currentHeight, 0);
-        int right = std::max(rightHeight - currentHeight, 0);
-        int depth = std::min(left, right);
-        DCHECK(0 <= depth && depth <= 14) << depth;
-        sc_->addScore(VALLEY_DEPTH, depth, 1);
-    }
+    calculateValleyDepth(sc_, VALLEY_DEPTH, field);
 }
 
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::evalRidgeHeight(const CoreField& field)
 {
-    for (int x = 1; x <= 6; ++x) {
-        int currentHeight = field.height(x);
-        int leftHeight = (x == 1) ? 14 : field.height(x - 1);
-        int rightHeight = (x == 6) ? 14 : field.height(x + 1);
-
-        int left = std::max(currentHeight - leftHeight, 0);
-        int right = std::max(currentHeight - rightHeight, 0);
-        int height = std::min(left, right);
-        DCHECK(0 <= height && height <= 14) << height;
-        sc_->addScore(RIDGE_HEIGHT, height, 1);
-    }
+    calculateRidgeHeight(sc_, RIDGE_HEIGHT, field);
 }
 
 template<typename ScoreCollector>
