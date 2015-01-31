@@ -114,6 +114,9 @@ public:
     void evalFirePointTabooFeature(const RefPlan&, const RensaTrackResult&);
     void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaTrackResult&, bool enemyHasZenkeshi);
     void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
+    void evalRensaRidgeHeight(const CoreField&);
+    void evalRensaValleyDepth(const CoreField&);
+    void evalRensaFieldUShape(const CoreField&, bool enemyHasZenkeshi);
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                            int currentFrameId, const PlayerState& me, const PlayerState& enemy);
 private:
@@ -143,7 +146,7 @@ public:
     void evalThirdColumnHeightFeature(const RefPlan&);
     void evalValleyDepth(const CoreField&);
     void evalRidgeHeight(const CoreField&);
-    void evalFieldUShape(const RefPlan&, bool enemyHasZenkeshi);
+    void evalFieldUShape(const CoreField&, bool enemyHasZenkeshi);
     void evalUnreachableSpace(const CoreField&);
 
     void evalMidEval(const MidEvalResult&);

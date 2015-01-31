@@ -106,6 +106,46 @@ static void calculateRidgeHeight(ScoreCollector* sc, EvaluationSparseFeatureKey 
     }
 }
 
+template<typename ScoreCollector>
+static void calculateFieldUShape(ScoreCollector* sc,
+                                 EvaluationFeatureKey linearKey,
+                                 EvaluationFeatureKey squareKey,
+                                 EvaluationFeatureKey expKey,
+                                 bool enemyHasZenkeshi,
+                                 const CoreField& field)
+{
+    static const int DIFF[CoreField::MAP_WIDTH] = {
+        0, -3, 0, 1, 1, 0, -3, 0,
+    };
+
+    static const int DIFF_ON_ZENKESHI[FieldConstant::MAP_WIDTH] = {
+        0, 2, 2, 2, -8, -6, -6, 0
+    };
+
+    const int* diff = enemyHasZenkeshi ? DIFF_ON_ZENKESHI : DIFF;
+
+    double average = 0;
+    for (int x = 1; x <= 6; ++x)
+        average += (field.height(x) + diff[x]);
+    average /= 6;
+
+    double linearValue = 0;
+    double squareValue = 0;
+    double expValue = 0;
+
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        int h = field.height(x) + diff[x];
+        double coef = FIELD_USHAPE_HEIGHT_COEF[field.height(x)];
+        linearValue += std::abs(h - average) * coef;
+        squareValue += (h - average) * (h - average) * coef;
+        expValue += std::exp(std::abs(h - average)) * coef;
+    }
+
+    sc->addScore(linearKey, linearValue);
+    sc->addScore(squareKey, squareValue);
+    sc->addScore(expKey, expValue);
+}
+
 // ----------------------------------------------------------------------
 
 PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
@@ -261,44 +301,22 @@ void Evaluator<ScoreCollector>::evalRidgeHeight(const CoreField& field)
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalFieldUShape(const RefPlan& plan, bool enemyHasZenkeshi)
+void Evaluator<ScoreCollector>::evalFieldUShape(const CoreField& field, bool enemyHasZenkeshi)
 {
-    static const int DIFF[CoreField::MAP_WIDTH] = {
-        0, -3, 0, 1, 1, 0, -3, 0,
-    };
-
-    static const int DIFF_ON_ZENKESHI[FieldConstant::MAP_WIDTH] = {
-        0, 2, 2, 2, -8, -6, -6, 0
-    };
-
-    const int* diff = enemyHasZenkeshi ? DIFF_ON_ZENKESHI : DIFF;
-
-    const CoreField& f = plan.field();
-    double average = 0;
-    for (int x = 1; x <= 6; ++x)
-        average += (f.height(x) + diff[x]);
-    average /= 6;
-
-    double linearValue = 0;
-    double squareValue = 0;
-    double expValue = 0;
-
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        int h = f.height(x) + diff[x];
-        double coef = FIELD_USHAPE_HEIGHT_COEF[f.height(x)];
-        linearValue += std::abs(h - average) * coef;
-        squareValue += (h - average) * (h - average) * coef;
-        expValue += std::exp(std::abs(h - average)) * coef;
-    }
-
     if (enemyHasZenkeshi) {
-        sc_->addScore(FIELD_USHAPE_LINEAR_ON_ZENKESHI, linearValue);
-        sc_->addScore(FIELD_USHAPE_SQUARE_ON_ZENKESHI, squareValue);
-        sc_->addScore(FIELD_USHAPE_EXP_ON_ZENKESHI, expValue);
+        calculateFieldUShape(sc_,
+                             FIELD_USHAPE_LINEAR_ON_ZENKESHI,
+                             FIELD_USHAPE_SQUARE_ON_ZENKESHI,
+                             FIELD_USHAPE_EXP_ON_ZENKESHI,
+                             true,
+                             field);
     } else {
-        sc_->addScore(FIELD_USHAPE_LINEAR, linearValue);
-        sc_->addScore(FIELD_USHAPE_SQUARE, squareValue);
-        sc_->addScore(FIELD_USHAPE_EXP, expValue);
+        calculateFieldUShape(sc_,
+                             FIELD_USHAPE_LINEAR,
+                             FIELD_USHAPE_SQUARE,
+                             FIELD_USHAPE_EXP,
+                             false,
+                             field);
     }
 }
 
@@ -591,6 +609,38 @@ void RensaEvaluator<ScoreCollector>::evalRensaConnectionFeature(const CoreField&
 }
 
 template<typename ScoreCollector>
+void RensaEvaluator<ScoreCollector>::evalRensaRidgeHeight(const CoreField& field)
+{
+    calculateRidgeHeight(sc_, RENSA_RIDGE_HEIGHT, field);
+}
+
+template<typename ScoreCollector>
+void RensaEvaluator<ScoreCollector>::evalRensaValleyDepth(const CoreField& field)
+{
+    calculateValleyDepth(sc_, RENSA_VALLEY_DEPTH, field);
+}
+
+template<typename ScoreCollector>
+void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field, bool enemyHasZenkeshi)
+{
+    if (enemyHasZenkeshi) {
+        calculateFieldUShape(sc_,
+                             RENSA_FIELD_USHAPE_LINEAR_ON_ZENKESHI,
+                             RENSA_FIELD_USHAPE_SQUARE_ON_ZENKESHI,
+                             RENSA_FIELD_USHAPE_EXP_ON_ZENKESHI,
+                             true,
+                             field);
+    } else {
+        calculateFieldUShape(sc_,
+                             RENSA_FIELD_USHAPE_LINEAR,
+                             RENSA_FIELD_USHAPE_SQUARE,
+                             RENSA_FIELD_USHAPE_EXP,
+                             false,
+                             field);
+    }
+}
+
+template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::collectScoreForRensaGarbage(const CoreField& fieldAfterDrop)
 {
     sc_->addScore(NUM_GARBAGE_PUYOS, fieldAfterDrop.countPuyos());
@@ -621,6 +671,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                                              const MidEvalResult& midEvalResult,
                                              const GazeResult& gazeResult)
 {
+    const CoreField& fieldBeforeRensa = plan.field();
+
     evalMidEval(midEvalResult);
 
     // We'd like to evaluate frame feature always.
@@ -634,21 +686,21 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     }
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
-        collectScoreForConnection(plan.field());
+        collectScoreForConnection(fieldBeforeRensa);
     if (USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE)
-        evalRestrictedConnectionHorizontalFeature(plan.field());
+        evalRestrictedConnectionHorizontalFeature(fieldBeforeRensa);
     if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
         evalThirdColumnHeightFeature(plan);
     if (USE_VALLEY_FEATURE)
-        evalValleyDepth(plan.field());
+        evalValleyDepth(fieldBeforeRensa);
     if (USE_RIDGE_FEATURE)
-        evalRidgeHeight(plan.field());
+        evalRidgeHeight(fieldBeforeRensa);
     if (USE_FIELD_USHAPE_FEATURE)
-        evalFieldUShape(plan, enemy.hasZenkeshi);
+        evalFieldUShape(plan.field(), enemy.hasZenkeshi);
 
-    evalUnreachableSpace(plan.field());
+    evalUnreachableSpace(fieldBeforeRensa);
 
-    int numReachableSpace = plan.field().countConnectedPuyos(3, 12);
+    int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
     int maxVirtualRensaResultScore = 0;
     double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
     ColumnPuyoList maxRensaKeyPuyos;
@@ -660,6 +712,16 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                             const RensaTrackResult& trackResult) {
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
         RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), patternBook(), rensaScoreCollector.get());
+
+        CoreField complementedField(fieldBeforeRensa);
+        for (const auto& cp : keyPuyos)
+            complementedField.dropPuyoOn(cp.x, cp.color);
+        for (const auto& cp : firePuyos)
+            complementedField.dropPuyoOn(cp.x, cp.color);
+
+        rensaEvaluator.evalRensaRidgeHeight(complementedField);
+        rensaEvaluator.evalRensaValleyDepth(complementedField);
+        rensaEvaluator.evalRensaFieldUShape(complementedField, enemy.hasZenkeshi);
 
         PuyoSet necessaryPuyos;
         necessaryPuyos.add(keyPuyos);
@@ -701,9 +763,9 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                             const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                             const RensaTrackResult& trackResult, const RensaRefSequence&) {
-            evalCallback(plan.field(), fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
+            evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
         };
-        RensaDetector::iteratePossibleRensasIteratively(plan.field(), maxIteration, strategy, callback);
+        RensaDetector::iteratePossibleRensasIteratively(fieldBeforeRensa, maxIteration, strategy, callback);
     }
 
     if (FLAGS_pattern) {
