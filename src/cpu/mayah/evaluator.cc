@@ -609,6 +609,19 @@ void RensaEvaluator<ScoreCollector>::evalRensaConnectionFeature(const CoreField&
 }
 
 template<typename ScoreCollector>
+void RensaEvaluator<ScoreCollector>::evalRensaScore(const CoreField& field, double score, double virtualScore)
+{
+    int count = field.countPuyos();
+    if (count <= MIDDLE_THRESHOLD) {
+        sc_->addScore(SCORE_EARLY_OR_MIDDLE, score);
+        sc_->addScore(VIRTUAL_SCORE_EARLY_OR_MIDDLE, virtualScore);
+    } else {
+        sc_->addScore(SCORE_LATE, score);
+        sc_->addScore(VIRTUAL_SCORE_LATE, virtualScore);
+    }
+}
+
+template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaRidgeHeight(const CoreField& field)
 {
     calculateRidgeHeight(sc_, RENSA_RIDGE_HEIGHT, field);
@@ -747,14 +760,15 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
             maxRensaFirePuyos = firePuyos;
         }
 
-        double rensaScore = rensaResult.score;
-
+        const double rensaScore = rensaResult.score;
         double possibility = TsumoPossibility::possibility(necessaryPuyos, std::max(0, numReachableSpace));
-        possibility = std::min(1.0, possibility + 0.15);
-        rensaScore *= possibility;
+        // possibility = std::min(1.0, possibility + 0.15);
 
-        if (maxVirtualRensaResultScore < rensaScore) {
-            maxVirtualRensaResultScore = rensaScore;
+        const double virtualRensaScore = rensaScore * possibility;
+        rensaEvaluator.evalRensaScore(fieldBeforeRensa, rensaScore, virtualRensaScore);
+
+        if (maxVirtualRensaResultScore < virtualRensaScore) {
+            maxVirtualRensaResultScore = virtualRensaScore;
         }
     };
 
