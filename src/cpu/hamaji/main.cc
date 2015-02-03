@@ -10,12 +10,7 @@
 #include "base.h"
 #include "core.h"
 #include "game.h"
-#include "rater.h"
-#include "ratingstats.h"
 
-DEFINE_int32(eval_cnt, 0,
-             "Run the game this times and show some stats");
-DEFINE_int32(eval_threads, 1, "");
 DEFINE_int32(seed, -1, "");
 DEFINE_bool(puyo_cloud_worker, false, "work as puyocloud worker");
 DEFINE_bool(handle_opponent_grounded, true, "");
@@ -181,12 +176,5 @@ int main(int argc, char* argv[]) {
   }
   LOG(INFO) << "seed=" << FLAGS_seed;
 
-  if (FLAGS_eval_cnt > 0) {
-    Rater rater(FLAGS_eval_threads, FLAGS_eval_cnt, FLAGS_seed);
-    RatingStats all_stats;
-    rater.eval(&all_stats);
-    all_stats.Print();
-  } else {
-    letsPuyoShobu();
-  }
+  letsPuyoShobu();
 }
