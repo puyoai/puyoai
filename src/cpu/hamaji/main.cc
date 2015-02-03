@@ -12,9 +12,7 @@
 #include "game.h"
 #include "rater.h"
 #include "ratingstats.h"
-#include "solo.h"
 
-DEFINE_bool(solo, false, "");
 DEFINE_int32(eval_cnt, 0,
              "Run the game this times and show some stats");
 DEFINE_int32(eval_threads, 1, "");
@@ -173,11 +171,6 @@ void letsPuyoShobu() {
   }
 }
 
-void tokotonPuyoPuyo(int seed) {
-  SoloGame solo(seed, true);
-  solo.run();
-}
-
 int main(int argc, char* argv[]) {
   ParseCommandLineFlags(&argc, &argv, true);
   InitGoogleLogging(argv[0]);
@@ -193,8 +186,6 @@ int main(int argc, char* argv[]) {
     RatingStats all_stats;
     rater.eval(&all_stats);
     all_stats.Print();
-  } else if (FLAGS_solo) {
-    tokotonPuyoPuyo(FLAGS_seed);
   } else {
     letsPuyoShobu();
   }
