@@ -713,6 +713,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
     evalUnreachableSpace(fieldBeforeRensa);
 
+    bool hasSideChain = false;
     int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
     int maxVirtualRensaResultScore = 0;
     double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
@@ -735,6 +736,10 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
         rensaEvaluator.evalRensaFieldUShape(complementedField, enemy.hasZenkeshi);
+
+        if (keyPuyos.size() == 0 && rensaResult.chains == 2 && rensaResult.score >= 1000) {
+            hasSideChain = true;
+        }
 
         PuyoSet necessaryPuyos;
         necessaryPuyos.add(keyPuyos);
@@ -806,6 +811,15 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
             for (const auto& cp : cpl)
                 complementedField.dropPuyoOn(cp.x, cp.color);
             RensaDetector::iteratePossibleRensasIteratively(complementedField, maxIteration, strategy, callback);
+        }
+    }
+
+    if (hasSideChain) {
+        int count = plan.field().countPuyos();
+        if (count <= EARLY_THRESHOLD) {
+            sc_->addScore(HOLDING_SIDE_CHAIN_EARLY, 1.0);
+        } else {
+            sc_->addScore(HOLDING_SIDE_CHAIN_MIDDLE_OR_LATE, 1.0);
         }
     }
 
