@@ -100,7 +100,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                 << "----------------------------------------------------------------------" << endl;
     }
 
-    if (usesDecisionBook_) {
+    if (usesDecisionBook_ && !enemy.hasZenkeshi) {
         Decision d = decisionBook_.nextDecision(field, kumipuyoSeq);
         if (d.isValid()) {
             CoreField cf(field);
