@@ -26,34 +26,19 @@ void Game::reset() {
 }
 
 Game::Game()
-  : state(0), id(0) {
+  : id(0) {
 }
 
-Game::Game(const Game& prev_game, const string& line) {
-  // TODO: Use FrameRequest::parse().
-
-  map<string, string> kv;
-  vector<string> tokens;
-  split(line, " ", &tokens);
-  for (unsigned int i = 0; i < tokens.size(); i++) {
-    const string& tok = tokens[i];
-    if (tok[0] == '\r' || tok[0] == '\n')
-      continue;
-    size_t sep = tok.find('=');
-    CHECK_NE(sep, string::npos) << tok << " in " << line;
-    CHECK(kv.insert(make_pair(tok.substr(0, sep), tok.substr(sep+1))).second)
-      << tok << " in " << line;
-  }
-
-  state = atoi(kv["STATE"].c_str());
-  id = atoi(kv["ID"].c_str());
-
-  p[0].f = LF(kv["YF"]);
-  p[0].next = KumipuyoSeq(kv["YP"]);
-  p[0].score = atoi(kv["YS"].c_str());
-  p[1].f = LF(kv["OF"]);
-  p[1].next = KumipuyoSeq(kv["OP"]);
-  p[1].score = atoi(kv["OS"].c_str());
+Game::Game(const Game& prev_game, const FrameRequest& request) {
+  id = request.frameId;
+  p[0].f = LF(CoreField(request.myPlayerFrameRequest().field));
+  p[0].next = request.myPlayerFrameRequest().kumipuyoSeq;
+  p[0].score = request.myPlayerFrameRequest().score;
+  p[0].state = request.myPlayerFrameRequest().state;
+  p[1].f = LF(CoreField(request.enemyPlayerFrameRequest().field));
+  p[1].next = request.enemyPlayerFrameRequest().kumipuyoSeq;
+  p[1].score = request.enemyPlayerFrameRequest().score;
+  p[1].state = request.enemyPlayerFrameRequest().state;
 
   decided_field = prev_game.decided_field;
 
@@ -68,8 +53,7 @@ Game::Game(const Game& prev_game, const string& line) {
   }
 
   for (int i = 0; i < 2; i++) {
-    int s = STATE_YOU_GROUNDED << i;
-    if ((state & s) == 0) {
+    if (!p[i].state.grounded) {
       continue;
     }
 
@@ -85,14 +69,12 @@ Game::Game(const Game& prev_game, const string& line) {
   }
 
   for (int i = 0; i < 2; i++) {
-    int s = STATE_YOU_CAN_PLAY << i;
-    if ((state & s) == 0 || (prev_game.state & s) != 0) {
+    if (!(p[i].state.decisionRequest || p[i].state.decisionRequestAgain))
       continue;
-    }
 
     // TODO(hamaji): We might not need to check this every frame.
     if (p[i].f.complementOjamasDropped(prev_you_can_play_field[i])) {
-      LOG(INFO) << "Ojama guessed for: " << line;
+      LOG(INFO) << "Ojama guessed for; " << request.toDebugString();
     }
 
     prev_you_can_play_field[i] = p[i].f;
@@ -104,7 +86,7 @@ Game::Game(const Game& prev_game, const string& line) {
   p[1].expected_ojama = prev_game.p[1].expected_ojama;
   p[1].expected_frame = prev_game.p[1].expected_frame;
   p[1].spent_score = prev_game.p[1].spent_score;
-  if ((state & (STATE_CHAIN_DONE << 1))) {
+  if (request.enemyPlayerFrameRequest().state.chainFinished) {
     p[1].expected_ojama = 0;
   }
 }
@@ -116,7 +98,7 @@ void Game::tick() {
 
 const string Game::getDebugOutput() const {
   ostringstream oss;
-  oss << "ID=" << id << " STATE=" << bitset<10>(state) << '\n';
+  oss << "ID=" << id << '\n';
   vector<string> lines[2];
   split(p[0].f.GetDebugOutput(), "\n", &lines[0]);
   split(p[1].f.GetDebugOutput(), "\n", &lines[1]);
