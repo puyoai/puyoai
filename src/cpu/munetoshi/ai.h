@@ -3,6 +3,7 @@
 #include "core/client/ai/ai.h"
 
 class CoreField;
+class RefPlan;
 
 namespace munetoshi {
 
@@ -20,11 +21,13 @@ class AI : public ::AI {
 	  CHAIN_LENGTH,
 	  NUM_REQUIRED_PUYO,
 	  DEATH_RATIO,
+	  TEAR,
 	  GRACE_VALLEY_2_1,
 	  GRACE_VALLEY_3_2,
 	  GRACE_VALLEY_3_4,
 	  GRACE_VALLEY_4_5,
 	  GRACE_VALLEY_5_6,
+	  GRACE_VALLEY_4_3_GT2,
 	  GRADE_NUM,
   };
 
@@ -41,7 +44,7 @@ class AI : public ::AI {
 
   virtual void onEnemyGrounded(const FrameRequest&) override;
 
-  virtual int evaluate(const CoreField& field);
+  virtual int evaluate(const CoreField& field, const RefPlan* plan);
 
   Strategy strategy;
 };

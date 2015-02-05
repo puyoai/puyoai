@@ -1,6 +1,7 @@
 #include "ai.h"
 
 #include <algorithm>
+#include <climits>
 #include <tuple>
 #include <vector>
 
@@ -17,6 +18,8 @@ static const double GRADE_WAIT_GROW[munetoshi::AI::GRADE_NUM] = {
 		10,
 		-3,
 		-10,
+		-1,
+		-4,
 		-4,
 		-4,
 		-4,
@@ -49,10 +52,10 @@ DropDecision munetoshi::AI::think_internal(int frame_id,
   Decision best_fire_decision;
   int best_chain_grade = -1;
   int best_fire_grade = -1;
-  int previous_chain_grade = evaluate(field);
+  int previous_chain_grade = evaluate(field, nullptr);
   auto dicisionMaker = [&](const RefPlan& plan) {
     int fire_grade = plan.rensaResult().score;
-    int chain_grade = evaluate(plan.field());
+    int chain_grade = evaluate(plan.field(), &plan);
 
     if (best_fire_grade < fire_grade) {
       best_fire_grade = fire_grade;
@@ -81,8 +84,8 @@ void munetoshi::AI::onEnemyGrounded(const FrameRequest& frame) {
   }
 }
 
-int munetoshi::AI::evaluate(const CoreField& field) {
-  int grade = -1;
+int munetoshi::AI::evaluate(const CoreField& field, const RefPlan *plan) {
+  int grade = INT_MIN;
   int required_puyos;
   auto adder = [&](const ColumnPuyo& cp) { required_puyos += cp.x; };
   auto callback = [&](const CoreField&, const RensaResult& rensa_result,
@@ -95,6 +98,8 @@ int munetoshi::AI::evaluate(const CoreField& field) {
     grade_vect[CHAIN_LENGTH] = rensa_result.chains;
     grade_vect[NUM_REQUIRED_PUYO] = required_puyos;
     grade_vect[DEATH_RATIO] = std::max(field.height(3) - 9, 0);
+    grade_vect[TEAR] = plan != nullptr && plan->numChigiri() > 0
+    		? 1 : 0;
     grade_vect[GRACE_VALLEY_2_1] =
     		std::max(field.height(2) - field.height(1), 0);
     grade_vect[GRACE_VALLEY_3_2] =
@@ -105,6 +110,8 @@ int munetoshi::AI::evaluate(const CoreField& field) {
     		std::max(field.height(4) - field.height(5), 0);
     grade_vect[GRACE_VALLEY_5_6] =
     		std::max(field.height(5) - field.height(6), 0);
+    grade_vect[GRACE_VALLEY_4_3_GT2] =
+    		std::max(field.height(4) - field.height(3) - 2, 0);
     grade = std::max(
     		(int) inner_product(grade_vect, GRADE_WAIT_GROW, GRADE_NUM),
 			grade);
