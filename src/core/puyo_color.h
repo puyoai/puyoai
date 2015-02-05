@@ -6,7 +6,6 @@
 #include <glog/logging.h>
 #include "base/base.h"
 
-// TODO(mayah): Consider use enum class.
 enum class PuyoColor : uint8_t {
     EMPTY = 0,
     OJAMA = 1,
