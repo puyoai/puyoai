@@ -38,6 +38,7 @@ struct Chain {
 class LF : public CoreField {
  public:
   LF() {}
+  explicit LF(const CoreField& cf) : CoreField(cf) {}
   explicit LF(const string& url) : CoreField(url) {}
 
   // Put a puyo at a specified position.

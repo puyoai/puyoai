@@ -294,6 +294,24 @@ TEST_F(EvaluatorTest, handWidth3)
     EXPECT_EQ(2, cf.feature(HAND_WIDTH_4).front());
 }
 
+TEST_F(EvaluatorTest, sideChain)
+{
+    CoreField f(
+        ".R...."
+        "RB...."
+        "RB...."
+        "RB...."
+        "BR...."
+        "BR...."
+        "BRGYG."
+        "RGYGB."
+        "RGYGB."
+        "RGYGB.");
+
+    CollectedFeature cf = eval(f, 1);
+    EXPECT_EQ(1.0, cf.feature(HOLDING_SIDE_CHAIN_MIDDLE_OR_LATE));
+}
+
 TEST_F(EvaluatorTest, DontCrash1)
 {
     CoreField f(

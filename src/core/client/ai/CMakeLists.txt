@@ -4,7 +4,8 @@ add_subdirectory(endless)
 add_subdirectory(solver)
 
 add_library(puyoai_core_client_ai
-            ai.cc)
+            ai.cc
+            raw_ai.cc)
 
 function(puyoai_client_ai_add_test target)
     add_executable(${target}_test ${target}_test.cc)

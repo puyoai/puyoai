@@ -10,14 +10,7 @@
 #include "base.h"
 #include "core.h"
 #include "game.h"
-#include "rater.h"
-#include "ratingstats.h"
-#include "solo.h"
 
-DEFINE_bool(solo, false, "");
-DEFINE_int32(eval_cnt, 0,
-             "Run the game this times and show some stats");
-DEFINE_int32(eval_threads, 1, "");
 DEFINE_int32(seed, -1, "");
 DEFINE_bool(puyo_cloud_worker, false, "work as puyocloud worker");
 DEFINE_bool(handle_opponent_grounded, true, "");
@@ -173,11 +166,6 @@ void letsPuyoShobu() {
   }
 }
 
-void tokotonPuyoPuyo(int seed) {
-  SoloGame solo(seed, true);
-  solo.run();
-}
-
 int main(int argc, char* argv[]) {
   ParseCommandLineFlags(&argc, &argv, true);
   InitGoogleLogging(argv[0]);
@@ -188,14 +176,5 @@ int main(int argc, char* argv[]) {
   }
   LOG(INFO) << "seed=" << FLAGS_seed;
 
-  if (FLAGS_eval_cnt > 0) {
-    Rater rater(FLAGS_eval_threads, FLAGS_eval_cnt, FLAGS_seed);
-    RatingStats all_stats;
-    rater.eval(&all_stats);
-    all_stats.Print();
-  } else if (FLAGS_solo) {
-    tokotonPuyoPuyo(FLAGS_seed);
-  } else {
-    letsPuyoShobu();
-  }
+  letsPuyoShobu();
 }

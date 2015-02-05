@@ -26,6 +26,7 @@ Core::Core(bool is_solo)
 
 Core::~Core() {
   delete eval_;
+  delete eval2_;
 }
 
 int numTurns(const LP& r) {
