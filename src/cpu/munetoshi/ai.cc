@@ -11,6 +11,19 @@
 #include "core/frame_request.h"
 #include "core/rensa_result.h"
 
+double inner_product(const double* vect1, const double* vect2, int n);
+
+static const double GRADE_WAIT_GROW[munetoshi::AI::GRADE_NUM] = {
+		10,
+		-3,
+		-10,
+		-4,
+		-4,
+		-4,
+		-4,
+		-4,
+};
+
 munetoshi::AI::AI(int argc, char* argv[]) : ::AI(argc, argv, "munetoshi") {
   strategy = GROW;
 }
@@ -70,22 +83,41 @@ void munetoshi::AI::onEnemyGrounded(const FrameRequest& frame) {
 
 int munetoshi::AI::evaluate(const CoreField& field) {
   int grade = -1;
-  int sum;
-  auto adder = [&](const ColumnPuyo& cp) { sum += cp.x; };
+  int required_puyos;
+  auto adder = [&](const ColumnPuyo& cp) { required_puyos += cp.x; };
   auto callback = [&](const CoreField&, const RensaResult& rensa_result,
                       const ColumnPuyoList& key_puyos, const ColumnPuyoList& fire_puyos,
                       const RensaTrackResult&) {
-    sum = 0;
+	required_puyos = 0;
     std::for_each(key_puyos.begin(), key_puyos.end(), adder);
     std::for_each(fire_puyos.begin(), fire_puyos.end(), adder);
-    grade = std::max(grade, rensa_result.chains * 10 - sum * 3
-        - std::max(field.height(2) - field.height(1) - 2, 0) * 3
-        - std::max(field.height(3) - field.height(2) - 2, 0) * 3
-        - std::max(field.height(4) - field.height(3) - 2, 0) * 3
-        - std::max(field.height(4) - field.height(5) - 2, 0) * 3
-        - std::max(field.height(5) - field.height(6) - 2, 0) * 3);
+    double grade_vect[GRADE_NUM];
+    grade_vect[CHAIN_LENGTH] = rensa_result.chains;
+    grade_vect[NUM_REQUIRED_PUYO] = required_puyos;
+    grade_vect[DEATH_RATIO] = std::max(field.height(3) - 9, 0);
+    grade_vect[GRACE_VALLEY_2_1] =
+    		std::max(field.height(2) - field.height(1), 0);
+    grade_vect[GRACE_VALLEY_3_2] =
+    		std::max(field.height(3) - field.height(2), 0);
+    grade_vect[GRACE_VALLEY_3_4] =
+    		std::max(field.height(3) - field.height(4), 0);
+    grade_vect[GRACE_VALLEY_4_5] =
+    		std::max(field.height(4) - field.height(5), 0);
+    grade_vect[GRACE_VALLEY_5_6] =
+    		std::max(field.height(5) - field.height(6), 0);
+    grade = std::max(
+    		(int) inner_product(grade_vect, GRADE_WAIT_GROW, GRADE_NUM),
+			grade);
   };
 
   RensaDetector::iteratePossibleRensasWithTracking(field, 1, RensaDetectorStrategy::defaultFloatStrategy(), callback);
   return std::max(grade, 0);
+}
+
+double inner_product(const double* vect1, const double* vect2, int n) {
+	double sum = 0;
+	for (int i = 0; i < n; ++i) {
+		sum += vect1[i] * vect2[i];
+	}
+	return sum;
 }

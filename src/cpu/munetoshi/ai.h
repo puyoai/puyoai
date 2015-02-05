@@ -16,6 +16,18 @@ class AI : public ::AI {
                      const AdditionalThoughtInfo&,
                      bool fast) override;
 
+  enum GradeElement {
+	  CHAIN_LENGTH,
+	  NUM_REQUIRED_PUYO,
+	  DEATH_RATIO,
+	  GRACE_VALLEY_2_1,
+	  GRACE_VALLEY_3_2,
+	  GRACE_VALLEY_3_4,
+	  GRACE_VALLEY_4_5,
+	  GRACE_VALLEY_5_6,
+	  GRADE_NUM,
+  };
+
  protected:
   enum Strategy {
     FIRE,
