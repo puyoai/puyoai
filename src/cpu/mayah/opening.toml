@@ -575,11 +575,11 @@ field = [
     "AAAC.."
 ]
 name = "NEWGTR-HEAD"
-score = 10.000000
+score = 8.200000
 
 [[book]]
 name = "NEWGTR-HEAD"
-score = 9.500000
+score = 8.200000
 field = [
     "B.....",
     "D.....",
@@ -614,11 +614,11 @@ field = [
     "AAAC.."
 ]
 name = "NEWGTR-HEAD"
-score = 9.800000
+score = 8.800000
 
 [[book]]
 name = "NEWGTR-HEAD"
-score = 9.800000
+score = 9.200000
 field = [
     "b.....",
     "B.....",
