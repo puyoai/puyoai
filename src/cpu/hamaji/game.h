@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "core/frame_request.h"
 #include "core/kumipuyo_seq.h"
 #include "core/state.h"
 
@@ -15,6 +16,7 @@ public:
 
   LF f;
   KumipuyoSeq next;
+  UserState state;
   int score;
   int spent_score;
   int ojama_cnt;
@@ -25,15 +27,14 @@ public:
 class Game {
 public:
   Game();
-  Game(const Game& prev_game, const string& line);
+  Game(const Game& prev_game, const FrameRequest&);
 
   const string getDebugOutput() const;
 
   void tick();
 
-  Player p[2];
-  int state;
   int id;
+  Player p[2];
   LF decided_field;
 
   static void reset();

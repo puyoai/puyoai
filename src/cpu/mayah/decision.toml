@@ -193,6 +193,7 @@ field = [
     "..C...",
     "ABB..."
 ]
+ACAC = [1, 1]
 ACBC = [1, 1]
 AAAC = [5, 1]
 AAAB = [5, 1]
@@ -312,6 +313,7 @@ field = [
     "ACC...",
     "ABB...",
 ]
+ACBC = [3, 1]
 ADBC = [3, 0]
 CDCD = [4, 1]
 

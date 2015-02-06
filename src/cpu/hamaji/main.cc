@@ -7,42 +7,36 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "core/client/ai/raw_ai.h"
+#include "core/frame_request.h"
+#include "core/frame_response.h"
+
 #include "base.h"
 #include "core.h"
 #include "game.h"
 
-DEFINE_int32(seed, -1, "");
 DEFINE_bool(puyo_cloud_worker, false, "work as puyocloud worker");
 DEFINE_bool(handle_opponent_grounded, true, "");
 
-int parseState(const string& line) {
-  size_t st = line.find("STATE=");
-  CHECK_NE(st, string::npos) << line;
-  return atoi(&line[st + strlen("STATE=")]);
-}
-
-int parseID(const string& line) {
-  size_t st = line.find("ID=");
-  CHECK_NE(st, string::npos) << line;
-  return atoi(&line[st + strlen("ID=")]);
-}
-
-int parseEnd(const string& line) {
-  size_t st = line.find("END=");
-  if (st == string::npos)
-    return -2;
-  return atoi(&line[st + strlen("END=")]);
-}
-
+// TODO(mayah): g_core should be held in HamajiAI.
 static Core* g_core;
-static bool g_should_decide = true;
 
-bool tick(Game* game) {
-  int state = game->state;
-#if 0
-  bool emergency = false;
-#endif
-  if ((state & (STATE_YOU_GROUNDED << 1))) {
+class HamajiAI : public RawAI {
+public:
+  HamajiAI();
+  ~HamajiAI() override {}
+protected:
+  FrameResponse playOneFrame(const FrameRequest&) override;
+private:
+  auto_ptr<Game> prev_game;
+};
+
+HamajiAI::HamajiAI() {
+  prev_game.reset(new Game());
+}
+
+FrameResponse tick(Game* game) {
+  if (game->p[1].state.grounded) {
     int chain_cnt;
     int score;
     int frame_cnt;
@@ -64,20 +58,20 @@ bool tick(Game* game) {
                 << "\n" << game->p[1].f.GetDebugOutput();
     }
   }
-  if ((state & STATE_YOU_GROUNDED)) {
-    g_should_decide = true;
-  }
+
 #if 0
   // TODO(hamaji): Emergency handling was removed.
   //if ((g_should_decide && (state & STATE_YOU_CAN_PLAY)) || emergency) {
 #endif
-  if (g_should_decide && (state & STATE_YOU_CAN_PLAY)) {
-    g_should_decide = false;
+  if (game->p[0].state.decisionRequest || game->p[0].state.decisionRequestAgain) {
     Decision decision = g_core->decide(game);
+    string message = g_core->msg();
+
+#if 0
+    // TODO(mayah): Support mawashi-area
     char buf[1024];
     int i = sprintf(buf, "ID=%d X=%d R=%d MSG=%-40s MA=",
                     game->id, decision.x, decision.r, g_core->msg().c_str());
-    g_core->clear_msg();
     for (int y = 13; y <= 14; y++) {
       for (int x = 1; x <= 6; x++) {
         // TODO: Not good to use ordinal(). Define toDeprecatedChar() in core?
@@ -86,95 +80,53 @@ bool tick(Game* game) {
       }
     }
     buf[i] = 0;
+#endif
+
+    g_core->clear_msg();
     if (decision.isValid()) {
       game->decided_field = game->p[0].f;
       game->decided_field.PutDecision(decision,
                                       game->p[0].next.axis(0),
                                       game->p[0].next.child(1));
     }
+#if 0
     LOG(INFO) << "<= " << buf
               << " (cnt=" << game->p[0].f.countPuyo() << ")";
-    puts(buf);
-    fflush(stdout);
-    return true;
+#endif
+    return FrameResponse(game->id, decision, message);
   }
-  return false;
+
+  return FrameResponse(game->id);
 }
 
-void letsPuyoShobu() {
-  char line_buf[1024];
-  line_buf[1023] = '\0';
-
-  CHECK(fgets(line_buf, 1023, stdin));
-  puts(line_buf);
-  fflush(stdout);
-
-  LOG(INFO) << "Start!";
-
-  g_should_decide = true;
-  auto_ptr<Game> prev_game(new Game());
-  g_core = new Core(false);
-
-  for (; fgets(line_buf, 1023, stdin); prev_game->tick()) {
-    google::FlushLogFiles(google::INFO);
-
-    const string& line = line_buf;
-    CHECK_NE(line.size(), 1023UL) << line;
-
-    VLOG(1) << line;
-    int winner = parseEnd(line);
-    if (winner >= -1) {
-      Game::reset();
-      LOG(INFO) << line;
-      switch (winner) {
-      case -1:
-        LOG(INFO) << "=== YOU /(^o^)\\ LOSE ===";
-        break;
-      case 0:
-        LOG(INFO) << "=== DRAW -(-_-)- GAME ===";
-        break;
-      case 1:
-        LOG(INFO) << "=== YOU \\(^o^)/ WIN ===";
-        break;
-      }
-      g_should_decide = true;
-      prev_game.reset(new Game());
-      continue;
+FrameResponse HamajiAI::playOneFrame(const FrameRequest& request) {
+  if (request.gameResult != GameResult::PLAYING) {
+    Game::reset();
+    if (request.gameResult == GameResult::P2_WIN || request.gameResult == GameResult::P2_WIN_WITH_CONNECTION_ERROR) {
+      LOG(INFO) << "=== YOU /(^o^)\\ LOSE ===";
+    } else if (request.gameResult == GameResult::DRAW) {
+      LOG(INFO) << "=== DRAW -(-_-)- GAME ===";
+    } else if (request.gameResult == GameResult::P1_WIN || request.gameResult == GameResult::P1_WIN_WITH_CONNECTION_ERROR) {
+      LOG(INFO) << "=== YOU \\(^o^)/ WIN ===";
     }
+    prev_game.reset(new Game());
 
-    int state = parseState(line);
-    if (!state) {
-      int id = parseID(line);
-      printf("ID=%d\n", id);
-      fflush(stdout);
-      continue;
-    } else {
-      VLOG(1) << "=> " << line;
-    }
-
-    auto_ptr<Game> game(new Game(*prev_game, line));
-
-    CHECK_EQ(state, game->state);
-
-    if (!tick(game.get())) {
-      int id = parseID(line);
-      printf("ID=%d\n", id);
-      fflush(stdout);
-    }
-
-    prev_game = game;
+    return FrameResponse(request.frameId);
   }
+
+  auto_ptr<Game> game(new Game(*prev_game, request));
+
+  FrameResponse response = tick(game.get());
+  prev_game = game;
+  return response;
 }
 
 int main(int argc, char* argv[]) {
   ParseCommandLineFlags(&argc, &argv, true);
   InitGoogleLogging(argv[0]);
 
-  if (FLAGS_seed < 0) {
-    srand(time(NULL));
-    FLAGS_seed = rand();
-  }
-  LOG(INFO) << "seed=" << FLAGS_seed;
+  g_core = new Core(false);
 
-  letsPuyoShobu();
+  HamajiAI().runLoop();
+  return 0;
 }
