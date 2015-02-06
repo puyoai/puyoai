@@ -216,15 +216,15 @@ Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<co
     // --- Finalize the current state
     if (result->restFramesUserCanPlay > 0) {
         result->restFramesUserCanPlay -= 1;
-        if (result->restFramesUserCanPlay == 0 && !result->userState.playable) {
-            result->userState.playable = true;
+        if (result->restFramesUserCanPlay == 0 && !result->playable) {
+            result->playable = true;
         }
 
         // Even if restFramesUserCanPlay_[pi] > 0, a puyo might appear on (3, 12).
         // In that case, we skip the rest of waiting frame.
         if (result->adjustedField.realColor(3, 12) != RealColor::RC_EMPTY) {
             result->restFramesUserCanPlay = 0;
-            result->userState.playable = true;
+            result->playable = true;
         }
     }
 
@@ -253,7 +253,7 @@ void Analyzer::analyzeNext(const DetectedField& detectedField,
 void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, PlayerAnalyzerResult* result)
 {
     result->nextPuyoState = NextPuyoState::STABLE;
-    result->userState.playable = false;
+    result->playable = false;
     result->restFramesUserCanPlay = 0;
     result->resetCurrentPuyoState(true);
     result->nextWillDisappearFast_ = true;
@@ -302,7 +302,7 @@ void Analyzer::analyzeNextWhenPreviousResultDoesNotExist(const DetectedField& de
 {
     // We cannot do much thing. Let's consider that the current next state is STABLE.
     result->nextPuyoState = NextPuyoState::STABLE;
-    result->userState.playable = false;
+    result->playable = false;
     result->restFramesUserCanPlay = 0;
     result->resetCurrentPuyoState(false);
     result->nextWillDisappearFast_ = false;
@@ -359,7 +359,7 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     // Detected Next1 disappeared
     result->restFramesUserCanPlay = NUM_FRAMES_BEFORE_USER_CAN_PLAY;
     result->nextPuyoState = NextPuyoState::NEXT2_WILL_DISAPPEAR;
-    result->userState.playable = false;
+    result->playable = false;
     result->userState.decisionRequest = true;
     result->adjustedField.setRealColor(NextPuyoPosition::CURRENT_AXIS, result->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS));
     result->adjustedField.setRealColor(NextPuyoPosition::CURRENT_CHILD, result->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD));
@@ -502,7 +502,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
     if (numVanishing >= 4) {
         if (!result->hasDetectedRensaStart_) {
             LOG(INFO) << "should update field since vanishing detected.";
-            result->userState.playable = false;
+            result->playable = false;
             result->hasDetectedRensaStart_ = true;
             shouldUpdateField = true;
         }
@@ -517,7 +517,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
 
     if (detectedField.ojamaDropDetected) {
         LOG(INFO) << "ojama dropping detected";
-        result->userState.playable = false;
+        result->playable = false;
         if (!result->hasSentOjamaDropped_) {
             result->userState.ojamaDropped = true;
             result->hasSentOjamaDropped_ = true;
