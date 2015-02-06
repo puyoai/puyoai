@@ -265,6 +265,7 @@ bool FieldRealtime::onStateDead()
 // Returns true if a key input is accepted.
 bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
 {
+    playable_ = false;
     userState_.clear();
 
     if (delayFramesWNextAppear_ > 0)
