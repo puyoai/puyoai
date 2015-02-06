@@ -43,6 +43,7 @@ public:
 
     // Utility functions to be used by duel server.
     UserState userState() const { return userState_; }
+    bool playable() const { return playable_; }
 
     void setKeySetSeq(const KeySetSeq& kss) { keySetSeq_ = kss; }
     KeySet frontKeySet() const { return keySetSeq_.empty() ? KeySet() : keySetSeq_.front(); }
@@ -113,6 +114,7 @@ private:
     CoreField field_;
     KumipuyoSeq kumipuyoSeq_;
     UserState userState_;
+    bool playable_;
 
     KumipuyoMovingState kms_;
     KeySetSeq keySetSeq_;
