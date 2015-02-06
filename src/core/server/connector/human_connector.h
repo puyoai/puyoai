@@ -24,7 +24,6 @@ private:
     void writeString(const std::string&);
 
     std::mutex mu_;
-    bool nextIsPlayable_ = false;
     KeySet currentKeySet_;
 };
 
