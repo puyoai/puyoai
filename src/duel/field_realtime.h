@@ -9,7 +9,7 @@
 #include "core/kumipuyo_moving_state.h"
 #include "core/kumipuyo_seq.h"
 #include "core/next_puyo.h"
-#include "core/state.h"
+#include "core/user_event.h"
 
 // TODO(mayah): We need to do refactoring this. This class is really messy.
 class FrameContext;
@@ -42,7 +42,7 @@ public:
     bool userPlayable() const { return simulationState_ == SimulationState::STATE_PLAYABLE; }
 
     // Utility functions to be used by duel server.
-    UserState userState() const { return userState_; }
+    UserEvent userEvent() const { return userEvent_; }
     bool playable() const { return playable_; }
 
     void setKeySetSeq(const KeySetSeq& kss) { keySetSeq_ = kss; }
@@ -113,7 +113,7 @@ private:
 
     CoreField field_;
     KumipuyoSeq kumipuyoSeq_;
-    UserState userState_;
+    UserEvent userEvent_;
     bool playable_;
 
     KumipuyoMovingState kms_;

@@ -2,7 +2,6 @@
 
 #include <glog/logging.h>
 
-#include "core/state.h"
 #include "core/server/game_state.h"
 #include "duel/field_realtime.h"
 
@@ -23,7 +22,7 @@ void PuyofuRecorder::onUpdate(const GameState& gameState)
 
         // TODO(mayah): Why not passing usec here instead of passing 0?
         // Or, do we really need usec?
-        if (pgs.state.grounded) {
+        if (pgs.event.grounded) {
             CoreField f(pgs.field);
             f.forceDrop();
             KumipuyoSeq seq = pgs.kumipuyoSeq;

@@ -13,7 +13,7 @@
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"
 #include "core/real_color.h"
-#include "core/state.h"
+#include "core/user_event.h"
 #include "gui/bounding_box.h"
 #include "capture/real_color_field.h"
 
@@ -100,7 +100,7 @@ struct PlayerAnalyzerResult {
     std::string toString() const;
 
 public: // Make this private?
-    UserState userState;
+    UserEvent userEvent;
     bool playable = false;
     DetectedField detectedField;
     AdjustedField adjustedField;

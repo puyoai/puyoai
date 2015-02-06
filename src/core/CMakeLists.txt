@@ -18,8 +18,7 @@ add_library(puyoai_core STATIC
             game_result.cc key.cc key_set.cc
             kumipuyo.cc kumipuyo_pos.cc kumipuyo_seq.cc kumipuyo_moving_state.cc
             plain_field.cc puyo_color.cc puyo_controller.cc real_color.cc rensa_result.cc
-            state.cc
-            sequence_generator.cc)
+            sequence_generator.cc user_event.cc)
 
 # ----------------------------------------------------------------------
 # tests

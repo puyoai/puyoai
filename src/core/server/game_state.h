@@ -17,7 +17,7 @@ struct PlayerGameState {
     PlainField field;
     KumipuyoSeq kumipuyoSeq;
     KumipuyoPos kumipuyoPos;
-    UserState state;
+    UserEvent event;
     bool dead;
     bool playable;
     int score;

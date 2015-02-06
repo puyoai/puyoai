@@ -34,11 +34,11 @@ Game::Game(const Game& prev_game, const FrameRequest& request) {
   p[0].f = LF(CoreField(request.myPlayerFrameRequest().field));
   p[0].next = request.myPlayerFrameRequest().kumipuyoSeq;
   p[0].score = request.myPlayerFrameRequest().score;
-  p[0].state = request.myPlayerFrameRequest().state;
+  p[0].event = request.myPlayerFrameRequest().event;
   p[1].f = LF(CoreField(request.enemyPlayerFrameRequest().field));
   p[1].next = request.enemyPlayerFrameRequest().kumipuyoSeq;
   p[1].score = request.enemyPlayerFrameRequest().score;
-  p[1].state = request.enemyPlayerFrameRequest().state;
+  p[1].event = request.enemyPlayerFrameRequest().event;
 
   decided_field = prev_game.decided_field;
 
@@ -53,7 +53,7 @@ Game::Game(const Game& prev_game, const FrameRequest& request) {
   }
 
   for (int i = 0; i < 2; i++) {
-    if (!p[i].state.grounded) {
+    if (!p[i].event.grounded) {
       continue;
     }
 
@@ -69,7 +69,7 @@ Game::Game(const Game& prev_game, const FrameRequest& request) {
   }
 
   for (int i = 0; i < 2; i++) {
-    if (!(p[i].state.decisionRequest || p[i].state.decisionRequestAgain))
+    if (!(p[i].event.decisionRequest || p[i].event.decisionRequestAgain))
       continue;
 
     // TODO(hamaji): We might not need to check this every frame.
@@ -86,7 +86,7 @@ Game::Game(const Game& prev_game, const FrameRequest& request) {
   p[1].expected_ojama = prev_game.p[1].expected_ojama;
   p[1].expected_frame = prev_game.p[1].expected_frame;
   p[1].spent_score = prev_game.p[1].spent_score;
-  if (request.enemyPlayerFrameRequest().state.chainFinished) {
+  if (request.enemyPlayerFrameRequest().event.chainFinished) {
     p[1].expected_ojama = 0;
   }
 }

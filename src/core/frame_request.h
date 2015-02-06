@@ -10,13 +10,13 @@
 #include "core/kumipuyo_seq.h"
 #include "core/plain_field.h"
 #include "core/player.h"
-#include "core/state.h"
+#include "core/user_event.h"
 
 struct PlayerFrameRequest {
     PlainField field;
     KumipuyoSeq kumipuyoSeq;
     KumipuyoPos kumipuyoPos;
-    UserState state;
+    UserEvent event;
     int score = 0;
     int ojama = 0;
 };

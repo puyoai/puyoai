@@ -168,7 +168,7 @@ Decision Core::decide(Game* game) {
     }
   }
 
-  if (game->p[1].state.grounded) {
+  if (game->p[1].event.grounded) {
     vector<LP> oplans;
     game->p[1].f.FindAvailablePlans(game->p[1].next.subsequence(2), 2, &oplans);
     int obest_score = 0;

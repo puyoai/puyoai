@@ -8,7 +8,6 @@
 #include "core/constant.h"
 #include "core/kumipuyo.h"
 #include "core/puyo_controller.h"
-#include "core/state.h"
 #include "duel/field_realtime.h"
 #include "duel/frame_context.h"
 

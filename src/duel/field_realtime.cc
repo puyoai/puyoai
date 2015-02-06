@@ -11,7 +11,6 @@
 
 #include "core/constant.h"
 #include "core/kumipuyo.h"
-#include "core/state.h"
 #include "duel/frame_context.h"
 
 using namespace std;
@@ -69,7 +68,7 @@ bool FieldRealtime::onStateLevelSelect()
 {
     transitToStatePreparingNext();
     // We always send 'grounded' before the initial puyo appear.
-    userState_.grounded = true;
+    userEvent_.grounded = true;
     return false;
 }
 
@@ -93,7 +92,7 @@ bool FieldRealtime::onStatePreparingNext()
 {
     simulationState_ = SimulationState::STATE_PLAYABLE;
     playable_ = true;
-    userState_.decisionRequest = true;
+    userEvent_.decisionRequest = true;
     return false;
 }
 
@@ -113,7 +112,7 @@ bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
         field_.setPuyoAndHeight(kms_.pos.axisX(), kms_.pos.axisY(), kumipuyoSeq_.axis(0));
         field_.setPuyoAndHeight(kms_.pos.childX(), kms_.pos.childY(), kumipuyoSeq_.child(0));
         playable_ = false;
-        userState_.grounded = true;
+        userEvent_.grounded = true;
         dropVelocity_ = INITIAL_DROP_VELOCITY;
         dropAmount_ = 0.0;
         drop_animation_ = false;
@@ -162,11 +161,11 @@ bool FieldRealtime::onStateVanish(FrameContext* context)
         sleepFor_ = 0;
         drop_animation_ = false;
         simulationState_ = SimulationState::STATE_OJAMA_DROPPING;
-        userState_.chainFinished = true;
+        userEvent_.chainFinished = true;
         return false;
     }
 
-    userState_.puyoErased = true;
+    userEvent_.puyoErased = true;
 
     // Here, something has been vanished.
     score_ += score;
@@ -245,7 +244,7 @@ bool FieldRealtime::onStateOjamaDropping()
 bool FieldRealtime::onStateOjamaGrounding()
 {
     if (ojama_dropping_)
-        userState_.ojamaDropped = true;
+        userEvent_.ojamaDropped = true;
     ojama_dropping_ = false;
 
     if (field_.color(3, 12) != PuyoColor::EMPTY) {
@@ -266,13 +265,13 @@ bool FieldRealtime::onStateDead()
 bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
 {
     playable_ = false;
-    userState_.clear();
+    userEvent_.clear();
 
     if (delayFramesWNextAppear_ > 0)
         --delayFramesWNextAppear_;
 
     if (delayFramesWNextAppear_ == 0 && !sent_wnext_appeared_) {
-        userState_.wnextAppeared = true;
+        userEvent_.wnextAppeared = true;
         sent_wnext_appeared_ = true;
     }
 

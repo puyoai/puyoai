@@ -20,7 +20,6 @@
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/server/game_state.h"
-#include "core/state.h"
 
 using namespace std;
 
@@ -57,7 +56,7 @@ void Commentator::onUpdate(const GameState& gameState)
 
     for (int i = 0; i < 2; ++i) {
         const PlayerGameState& pgs = gameState.playerGameState(i);
-        if (pgs.state.grounded) {
+        if (pgs.event.grounded) {
             frameId_[i] = gameState.frameId();
             field_[i] = CoreField(pgs.field);
             // When chigiri is used, some puyo exists in the air. So we need to drop.

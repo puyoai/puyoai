@@ -86,7 +86,7 @@ string PlayerAnalyzerResult::toString() const
     stringstream ss;
 
     ss << "nextPuyoState: " << static_cast<int>(nextPuyoState) << endl;
-    ss << "userState" << userState.toString() << endl;
+    ss << "userEvent" << userEvent.toString() << endl;
 
     ss << "Detected Field    Adjusted Field" << endl;
     ss << "########          ########" << endl;
@@ -183,7 +183,7 @@ Analyzer::analyzePlayerFieldOnLevelSelect(const DetectedField& detectedField, co
     // Copy the previous state, however, clear event states.
     if (!previousResults.empty()) {
         *result = *previousResults.front();
-        result->userState.clear();
+        result->userEvent.clear();
     }
 
     // Note that Next should be analyzed before Field, since we use the result of the analysis.
@@ -203,7 +203,7 @@ Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<co
     if (!previousResults.empty()) {
         // Copy the previous state, however, clear event states.
         *result = *previousResults.front();
-        result->userState.clear();
+        result->userEvent.clear();
     } else {
         // When previous result does not exist, we reset the puyo state for testing.
         result->resetCurrentPuyoState(false);
@@ -291,7 +291,7 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
                 result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
                 result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
                 // TODO(mayah): Need to check NEXT1 has been found?
-                result->userState.wnextAppeared = true;
+                result->userEvent.wnextAppeared = true;
                 result->next2Puyos.clear();
             }
         }
@@ -360,7 +360,7 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     result->restFramesUserCanPlay = NUM_FRAMES_BEFORE_USER_CAN_PLAY;
     result->nextPuyoState = NextPuyoState::NEXT2_WILL_DISAPPEAR;
     result->playable = false;
-    result->userState.decisionRequest = true;
+    result->userEvent.decisionRequest = true;
     result->adjustedField.setRealColor(NextPuyoPosition::CURRENT_AXIS, result->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS));
     result->adjustedField.setRealColor(NextPuyoPosition::CURRENT_CHILD, result->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD));
     result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_AXIS, result->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS));
@@ -369,7 +369,7 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, RealColor::RC_EMPTY);
 
     if (result->hasDetectedRensaStart_ && !result->hasSentChainFinished_) {
-        result->userState.chainFinished = true;
+        result->userEvent.chainFinished = true;
         result->hasSentChainFinished_ = true;
     }
 }
@@ -405,7 +405,7 @@ void Analyzer::analyzeNextForStateNext2WillAppear(const DetectedField& detectedF
             result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
             result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
             result->nextPuyoState = NextPuyoState::STABLE;
-            result->userState.wnextAppeared = true;
+            result->userEvent.wnextAppeared = true;
             result->next2Puyos.clear();
         }
     }
@@ -427,7 +427,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         }
 
         if (detectedField.ojamaDropDetected && !result->hasSentOjamaDropped_) {
-            result->userState.ojamaDropped = true;
+            result->userEvent.ojamaDropped = true;
             result->hasSentOjamaDropped_ = true;
         }
         return;
@@ -508,7 +508,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         }
 
         if (!result->hasDetectedPuyoErase_) {
-            result->userState.puyoErased = true;
+            result->userEvent.puyoErased = true;
         }
         result->hasDetectedPuyoErase_ = true;
     } else {
@@ -519,7 +519,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         LOG(INFO) << "ojama dropping detected";
         result->playable = false;
         if (!result->hasSentOjamaDropped_) {
-            result->userState.ojamaDropped = true;
+            result->userEvent.ojamaDropped = true;
             result->hasSentOjamaDropped_ = true;
             result->nextWillDisappearFast_ = true;
             // Since this is to analyze field, NEXT has already been analyzed.
@@ -550,7 +550,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         if (result->framesAfterFloorGetsStable_ > 3) {
             shouldUpdateField = true;
             shouldResetCurrentState = true;
-            result->userState.decisionRequestAgain = true;
+            result->userEvent.decisionRequestAgain = true;
         }
     }
 
@@ -559,7 +559,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
 
     if (!result->hasSentGrounded_) {
         result->hasSentGrounded_ = true;
-        result->userState.grounded = true;
+        result->userEvent.grounded = true;
     }
 
     if (shouldResetCurrentState) {

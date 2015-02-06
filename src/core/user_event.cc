@@ -1,8 +1,8 @@
-#include "core/state.h"
+#include "core/user_event.h"
 
 using namespace std;
 
-string UserState::toString() const
+string UserEvent::toString() const
 {
     std::string r;
     r.resize(7);
