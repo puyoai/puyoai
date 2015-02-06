@@ -51,6 +51,36 @@ static string formatNext(const KumipuyoSeq& seq)
     return ss.str();
 }
 
+static string formatEvent(const UserState& event)
+{
+    stringstream ss;
+    ss << (event.wnextAppeared        ? 'W' : '-');
+    ss << (event.grounded             ? 'G' : '-');
+    ss << (event.decisionRequest      ? 'D' : '-');
+    ss << (event.decisionRequestAgain ? 'A' : '-');
+    ss << (event.chainFinished        ? 'C' : '-');
+    ss << (event.ojamaDropped         ? 'O' : '-');
+    ss << (event.puyoErased           ? 'E' : '-');
+    return ss.str();
+}
+
+static UserState parseEvent(const string& s)
+{
+    UserState event;
+    for (const char c : s) {
+        switch (c) {
+        case 'W': event.wnextAppeared = true; break;
+        case 'G': event.grounded = true; break;
+        case 'D': event.decisionRequest = true; break;
+        case 'A': event.decisionRequestAgain = true; break;
+        case 'C': event.chainFinished = true; break;
+        case 'O': event.ojamaDropped = true; break;
+        case 'E': event.puyoErased = true; break;
+        }
+    }
+    return event;
+}
+
 static GameResult parseEnd(const char* value)
 {
     int x = std::atoi(value);
@@ -77,12 +107,7 @@ FrameRequest FrameRequest::parse(const std::string& line)
 
         const char* key = term.c_str();
         const char* value = term.c_str() + term.find('=') + 1;
-        if (strncmp(key, "STATE", 5) == 0) {
-            int state = strtoull(value, NULL, 10);
-            req.playerFrameRequest[0].state.parseFromDeprecatedState(state);
-            req.playerFrameRequest[1].state.parseFromDeprecatedState(state >> 1);
-            continue;
-        } else if (strncmp(key, "ID", 2) == 0) {
+        if (strncmp(key, "ID", 2) == 0) {
             req.frameId = std::atoi(value);
             continue;
         } else if (strncmp(key, "END", 3) == 0) {
@@ -113,6 +138,9 @@ FrameRequest FrameRequest::parse(const std::string& line)
         case 'O':
             pReq.ojama = std::atoi(value);
             break;
+        case 'E':
+            pReq.state = parseEvent(string(value));
+            break;
         }
     }
 
@@ -141,12 +169,12 @@ string FrameRequest::toString() const
     std::string f1 = formatPlainField(op.field);
     std::string y0 = formatNext(me.kumipuyoSeq);
     std::string y1 = formatNext(op.kumipuyoSeq);
+    std::string e0 = formatEvent(me.state);
+    std::string e1 = formatEvent(op.state);
     int score0 = me.score;
     int score1 = op.score;
     int ojama0 = me.ojama;
     int ojama1 = op.ojama;
-    int state0 = me.state.toDeprecatedState();
-    int state1 = op.state.toDeprecatedState();
     KumipuyoPos pos0 = me.kumipuyoPos;
     KumipuyoPos pos1 = op.kumipuyoPos;
 
@@ -167,11 +195,12 @@ string FrameRequest::toString() const
 
     stringstream ss;
     ss << "ID=" << frameId << " "
-       << "STATE=" << (state0 + (state1 << 1)) << " "
        << "YF=" << f0 << " "
        << "OF=" << f1 << " "
        << "YP=" << y0 << " "
        << "OP=" << y1 << " "
+       << "YE=" << e0 << " "
+       << "OE=" << e1 << " "
        << "YX=" << pos0.axisX() << " "
        << "YY=" << pos0.axisY() << " "
        << "YR=" << pos0.r << " "

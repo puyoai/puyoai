@@ -183,7 +183,7 @@ Analyzer::analyzePlayerFieldOnLevelSelect(const DetectedField& detectedField, co
     // Copy the previous state, however, clear event states.
     if (!previousResults.empty()) {
         *result = *previousResults.front();
-        result->userState.clearEventStates();
+        result->userState.clear();
     }
 
     // Note that Next should be analyzed before Field, since we use the result of the analysis.
@@ -203,7 +203,7 @@ Analyzer::analyzePlayerField(const DetectedField& detectedField, const vector<co
     if (!previousResults.empty()) {
         // Copy the previous state, however, clear event states.
         *result = *previousResults.front();
-        result->userState.clearEventStates();
+        result->userState.clear();
     } else {
         // When previous result does not exist, we reset the puyo state for testing.
         result->resetCurrentPuyoState(false);
