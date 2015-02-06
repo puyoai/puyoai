@@ -17,7 +17,6 @@
 #include "core/kumipuyo.h"
 #include "core/problem/problem.h"
 #include "core/sequence_generator.h"
-#include "core/state.h"
 
 #include "evaluator.h"
 #include "mayah_ai.h"

@@ -107,7 +107,7 @@ FrameRequest GameState::toFrameRequestFor(int playerId, GameResult forceSetGameR
         pfr.field = pgs.field;
         pfr.kumipuyoSeq = pgs.kumipuyoSeq;
         pfr.kumipuyoPos = pgs.kumipuyoPos;
-        pfr.state = pgs.state;
+        pfr.event = pgs.event;
         pfr.score = pgs.score;
         pfr.ojama = pgs.ojama();
     }

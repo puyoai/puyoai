@@ -369,9 +369,9 @@ TEST_F(ACAnalyzerTest, nextArrival)
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
     EXPECT_TRUE(rs[0]->playerResult(0)->playable);
-    // Next disappears here. After detecting next disappearing. we'd like to make userState playable.
+    // Next disappears here. After detecting next disappearing. we'd like to make userEvent playable.
     EXPECT_FALSE(rs[13]->playerResult(0)->playable);
-    EXPECT_TRUE(rs[13]->playerResult(0)->userState.decisionRequest);
+    EXPECT_TRUE(rs[13]->playerResult(0)->userEvent.decisionRequest);
     EXPECT_TRUE(rs[14]->playerResult(0)->playable);
     // Then controllable now.
     EXPECT_TRUE(rs[16]->playerResult(0)->playable);
@@ -390,8 +390,8 @@ TEST_F(ACAnalyzerTest, nextArrivalSousai)
     bool pgs[2] = { true, true };
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
-    EXPECT_TRUE(rs[9]->playerResult(1)->userState.decisionRequest || rs[10]->playerResult(1)->userState.decisionRequest);
-    EXPECT_TRUE(rs[9]->playerResult(1)->userState.grounded || rs[10]->playerResult(1)->userState.grounded);
+    EXPECT_TRUE(rs[9]->playerResult(1)->userEvent.decisionRequest || rs[10]->playerResult(1)->userEvent.decisionRequest);
+    EXPECT_TRUE(rs[9]->playerResult(1)->userEvent.grounded || rs[10]->playerResult(1)->userEvent.grounded);
 }
 
 TEST_F(ACAnalyzerTest, irregularNextArrival)
@@ -407,7 +407,7 @@ TEST_F(ACAnalyzerTest, irregularNextArrival)
     bool pgs[2] = { true, true };
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
-    EXPECT_TRUE(rs[38]->playerResult(1)->userState.decisionRequestAgain || rs[39]->playerResult(1)->userState.decisionRequestAgain || rs[40]->playerResult(1)->userState.decisionRequestAgain);
+    EXPECT_TRUE(rs[38]->playerResult(1)->userEvent.decisionRequestAgain || rs[39]->playerResult(1)->userEvent.decisionRequestAgain || rs[40]->playerResult(1)->userEvent.decisionRequestAgain);
 }
 
 TEST_F(ACAnalyzerTest, vanishing)
@@ -435,7 +435,7 @@ TEST_F(ACAnalyzerTest, vanishing)
     // TODO(mayah): We might be able to detect in the previous frame?
     EXPECT_FALSE(rs[15]->playerResult(0)->playable);
     // Since we've detected vanishing, "grounded" event should come here.
-    EXPECT_TRUE(rs[15]->playerResult(0)->userState.grounded);
+    EXPECT_TRUE(rs[15]->playerResult(0)->userEvent.grounded);
 }
 
 TEST_F(ACAnalyzerTest, nonfastmove)
@@ -457,9 +457,9 @@ TEST_F(ACAnalyzerTest, nonfastmove)
 
     // Since this is not fast move, we should not request decision in
     // frame26 or frame27.
-    EXPECT_FALSE(rs[25]->playerResult(1)->userState.decisionRequest);
-    EXPECT_FALSE(rs[26]->playerResult(1)->userState.decisionRequest);
-    EXPECT_FALSE(rs[27]->playerResult(1)->userState.decisionRequest);
+    EXPECT_FALSE(rs[25]->playerResult(1)->userEvent.decisionRequest);
+    EXPECT_FALSE(rs[26]->playerResult(1)->userEvent.decisionRequest);
+    EXPECT_FALSE(rs[27]->playerResult(1)->userEvent.decisionRequest);
 }
 
 TEST_F(ACAnalyzerTest, ojamaDrop)

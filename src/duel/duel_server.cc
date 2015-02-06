@@ -42,7 +42,7 @@ struct DuelServer::DuelState {
             pgs->field = fr.field();
             pgs->kumipuyoSeq = fr.visibleKumipuyoSeq();
             pgs->kumipuyoPos = fr.kumipuyoPos();
-            pgs->state = fr.userState();
+            pgs->event = fr.userEvent();
             pgs->dead = fr.isDead();
             pgs->playable = fr.playable();
             pgs->score = fr.score();
@@ -294,7 +294,7 @@ void DuelServer::play(DuelState* duelState, const vector<FrameResponse> data[2])
         context.apply(me, opponent);
 
         // Clear current key input if the move is done.
-        if (me->userState().grounded) {
+        if (me->userEvent().grounded) {
             duelState->decision[pi] = Decision();
             me->setKeySetSeq(KeySetSeq());
         }

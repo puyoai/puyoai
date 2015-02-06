@@ -16,7 +16,6 @@
 
 #include "core/key.h"
 #include "core/server/game_state.h"
-#include "core/state.h"
 #include "gui/main_window.h"
 #include "gui/pixel_color.h"
 

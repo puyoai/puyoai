@@ -216,8 +216,8 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
         if (!isAi_[pi])
             continue;
 
-        if (analyzerResult.playerResult(pi)->userState.ojamaDropped ||
-            analyzerResult.playerResult(pi)->userState.grounded) {
+        if (analyzerResult.playerResult(pi)->userEvent.ojamaDropped ||
+            analyzerResult.playerResult(pi)->userEvent.grounded) {
             keySender_->sendKeySet(KeySet());
         }
     }
@@ -240,7 +240,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
         if (!isAi_[pi])
             continue;
 
-        if (analyzerResult.playerResult(pi)->userState.grounded) {
+        if (analyzerResult.playerResult(pi)->userEvent.grounded) {
             lastDecision_[pi] = Decision();
         }
 
@@ -301,7 +301,7 @@ FrameRequest WiiConnectServer::makeFrameRequestFor(int playerId, int frameId, co
             }
         }
 
-        pfr.state = pr->userState;
+        pfr.event = pr->userEvent;
 
         // We cannot detect correct values, so we use some default values.
         pfr.kumipuyoPos = KumipuyoPos(3, 12, 0);
@@ -368,7 +368,7 @@ GameState WiiConnectServer::toGameState(int frameId, const AnalyzerResult& analy
                      toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD))),
         };
 
-        pgs->state = pr->userState;
+        pgs->event = pr->userEvent;
         pgs->dead = false;
         pgs->playable = false;
         pgs->score = 0;

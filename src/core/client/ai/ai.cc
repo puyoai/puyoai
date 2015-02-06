@@ -5,7 +5,6 @@
 #include "core/frame_request.h"
 #include "core/frame_response.h"
 #include "core/rensa_result.h"
-#include "core/state.h"
 
 using namespace std;
 
@@ -82,18 +81,18 @@ void AI::runLoop()
         }
 
         // Update enemy info if necessary.
-        if (frameRequest.enemyPlayerFrameRequest().state.decisionRequest)
+        if (frameRequest.enemyPlayerFrameRequest().event.decisionRequest)
             enemyDecisionRequested(frameRequest);
-        if (frameRequest.enemyPlayerFrameRequest().state.ojamaDropped)
+        if (frameRequest.enemyPlayerFrameRequest().event.ojamaDropped)
             enemyOjamaDropped(frameRequest);
-        if (frameRequest.enemyPlayerFrameRequest().state.grounded)
+        if (frameRequest.enemyPlayerFrameRequest().event.grounded)
             enemyGrounded(frameRequest);
-        if (frameRequest.enemyPlayerFrameRequest().state.wnextAppeared)
+        if (frameRequest.enemyPlayerFrameRequest().event.wnextAppeared)
             enemyNext2Appeared(frameRequest);
 
         // STATE_YOU_GROUNDED and STATE_WNEXT_APPEARED might come out-of-order.
         bool shouldThink = false;
-        if (frameRequest.myPlayerFrameRequest().state.wnextAppeared) {
+        if (frameRequest.myPlayerFrameRequest().event.wnextAppeared) {
             next2Appeared(frameRequest);
             shouldThink = true;
 
@@ -101,7 +100,7 @@ void AI::runLoop()
             if (nextThinkFrameId < frameRequest.frameId)
                 nextThinkFrameId = frameRequest.frameId;
         }
-        if (frameRequest.myPlayerFrameRequest().state.puyoErased) {
+        if (frameRequest.myPlayerFrameRequest().event.puyoErased) {
             shouldThink = true;
             // TODO(mayah): This is not so accurate. We need to consider FRAMES_GROUNDING and frames for dropping.
             nextThinkFrameId = frameRequest.frameId + FRAMES_VANISH_ANIMATION + FRAMES_PREPARING_NEXT;
@@ -124,24 +123,24 @@ void AI::runLoop()
             next1.ready = true;
         }
         // Update my info if necessary.
-        if (frameRequest.myPlayerFrameRequest().state.ojamaDropped) {
+        if (frameRequest.myPlayerFrameRequest().event.ojamaDropped) {
             // We need to rethink the next1 decision.
             next1.needsRethink = true;
             ojamaDropped(frameRequest);
         }
-        if (frameRequest.myPlayerFrameRequest().state.grounded) {
+        if (frameRequest.myPlayerFrameRequest().event.grounded) {
             grounded(frameRequest);
         }
-        if (frameRequest.myPlayerFrameRequest().state.decisionRequest) {
+        if (frameRequest.myPlayerFrameRequest().event.decisionRequest) {
             VLOG(1) << "REQUESTED";
             next1.requested = true;
             decisionRequested(frameRequest);
         }
-        if (frameRequest.myPlayerFrameRequest().state.decisionRequestAgain) {
+        if (frameRequest.myPlayerFrameRequest().event.decisionRequestAgain) {
             // We need to handle this specially. Since we've proceeded next1, we don't have any knowledge about this turn.
             // TODO(mayah): Should we preserve DecisionSending after we used it for this?
             VLOG(1) << "REQUEST_AGAIN";
-            DCHECK(!frameRequest.myPlayerFrameRequest().state.decisionRequest)
+            DCHECK(!frameRequest.myPlayerFrameRequest().event.decisionRequest)
                 << "decisionRequestAgain should not come with decisionRequest.";
             AdditionalThoughtInfo info { myPlayerState(), enemyPlayerState() };
             DropDecision dropDecision = think(frameRequest.frameId,

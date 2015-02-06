@@ -1,13 +1,13 @@
-#ifndef CORE_STATE_H_
-#define CORE_STATE_H_
+#ifndef CORE_USER_EVENT_H_
+#define CORE_USER_EVENT_H_
 
 #include <string>
 
 // TODO(mayah): Rename to UserEvent.
-struct UserState {
+struct UserEvent {
     void clear()
     {
-        *this = UserState();
+        *this = UserEvent();
     }
 
     bool hasEventState() const
@@ -26,4 +26,4 @@ struct UserState {
     bool puyoErased = false;
 };
 
-#endif  // CORE_STATE_H_
+#endif // CORE_USER_EVENT_H_

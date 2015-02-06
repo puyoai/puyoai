@@ -5,7 +5,7 @@
 
 #include "core/frame_request.h"
 #include "core/kumipuyo_seq.h"
-#include "core/state.h"
+#include "core/user_event.h"
 
 #include "base.h"
 #include "field.h"
@@ -16,7 +16,7 @@ public:
 
   LF f;
   KumipuyoSeq next;
-  UserState state;
+  UserEvent event;
   int score;
   int spent_score;
   int ojama_cnt;

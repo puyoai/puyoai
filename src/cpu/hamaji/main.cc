@@ -36,7 +36,7 @@ HamajiAI::HamajiAI() {
 }
 
 FrameResponse tick(Game* game) {
-  if (game->p[1].state.grounded) {
+  if (game->p[1].event.grounded) {
     int chain_cnt;
     int score;
     int frame_cnt;
@@ -63,7 +63,7 @@ FrameResponse tick(Game* game) {
   // TODO(hamaji): Emergency handling was removed.
   //if ((g_should_decide && (state & STATE_YOU_CAN_PLAY)) || emergency) {
 #endif
-  if (game->p[0].state.decisionRequest || game->p[0].state.decisionRequestAgain) {
+  if (game->p[0].event.decisionRequest || game->p[0].event.decisionRequestAgain) {
     Decision decision = g_core->decide(game);
     string message = g_core->msg();
 
