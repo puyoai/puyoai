@@ -14,9 +14,9 @@
 
 double inner_product(const double* vect1, const double* vect2, int n);
 
-static const double GRADE_WAIT_GROW[munetoshi::AI::GRADE_NUM] = {
+static const double GRADE_WEIGHT_GROW[munetoshi::AI::GRADE_NUM] = {
 		10,
-		-3,
+		-2,
 		-10,
 		-1,
 		-4,
@@ -71,8 +71,8 @@ DropDecision munetoshi::AI::think_internal(int frame_id,
   Plan::iterateAvailablePlans(field, seq, 2, dicisionMaker);
   return best_chain_grade < previous_chain_grade
     || (strategy == FIRE && best_fire_grade > 1000)
-             ? DropDecision(best_fire_decision)
-             : DropDecision(best_chain_decision);
+             ? DropDecision(best_fire_decision, "munetoshi: FIRE")
+             : DropDecision(best_chain_decision, "munetoshi: GROW");
 }
 
 void munetoshi::AI::onEnemyGrounded(const FrameRequest& frame) {
@@ -113,7 +113,7 @@ int munetoshi::AI::evaluate(const CoreField& field, const RefPlan *plan) {
     grade_vect[GRACE_VALLEY_4_3_GT2] =
     		std::max(field.height(4) - field.height(3) - 2, 0);
     grade = std::max(
-    		(int) inner_product(grade_vect, GRADE_WAIT_GROW, GRADE_NUM),
+    		(int) inner_product(grade_vect, GRADE_WEIGHT_GROW, GRADE_NUM),
 			grade);
   };
 
