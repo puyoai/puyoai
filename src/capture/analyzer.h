@@ -101,6 +101,7 @@ struct PlayerAnalyzerResult {
 
 public: // Make this private?
     UserState userState;
+    bool playable = false;
     DetectedField detectedField;
     AdjustedField adjustedField;
 

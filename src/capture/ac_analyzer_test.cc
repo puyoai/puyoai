@@ -43,8 +43,8 @@ protected:
             CHECK(surface.get()) << "Failed to load "<< filename;
             auto r = analyzer.analyze(surface.get(), prev.get(), results);
             if (firstResult) {
-                r->mutablePlayerResult(0)->userState.playable = userPlayable[0];
-                r->mutablePlayerResult(1)->userState.playable = userPlayable[1];
+                r->mutablePlayerResult(0)->playable = userPlayable[0];
+                r->mutablePlayerResult(1)->playable = userPlayable[1];
                 firstResult = false;
             }
             results.push_front(move(r));
@@ -368,13 +368,13 @@ TEST_F(ACAnalyzerTest, nextArrival)
     bool pgs[2] = { true, true };
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
-    EXPECT_TRUE(rs[0]->playerResult(0)->userState.playable);
+    EXPECT_TRUE(rs[0]->playerResult(0)->playable);
     // Next disappears here. After detecting next disappearing. we'd like to make userState playable.
-    EXPECT_FALSE(rs[13]->playerResult(0)->userState.playable);
+    EXPECT_FALSE(rs[13]->playerResult(0)->playable);
     EXPECT_TRUE(rs[13]->playerResult(0)->userState.decisionRequest);
-    EXPECT_TRUE(rs[14]->playerResult(0)->userState.playable);
+    EXPECT_TRUE(rs[14]->playerResult(0)->playable);
     // Then controllable now.
-    EXPECT_TRUE(rs[16]->playerResult(0)->userState.playable);
+    EXPECT_TRUE(rs[16]->playerResult(0)->playable);
 }
 
 TEST_F(ACAnalyzerTest, nextArrivalSousai)
@@ -428,12 +428,12 @@ TEST_F(ACAnalyzerTest, vanishing)
     }
 
     for (int i = 0; i <= 12; ++i) {
-        EXPECT_TRUE(rs[i]->playerResult(0)->userState.playable) << i;
+        EXPECT_TRUE(rs[i]->playerResult(0)->playable) << i;
     }
 
     // vanishing should be detected here.
     // TODO(mayah): We might be able to detect in the previous frame?
-    EXPECT_FALSE(rs[15]->playerResult(0)->userState.playable);
+    EXPECT_FALSE(rs[15]->playerResult(0)->playable);
     // Since we've detected vanishing, "grounded" event should come here.
     EXPECT_TRUE(rs[15]->playerResult(0)->userState.grounded);
 }
@@ -480,12 +480,12 @@ TEST_F(ACAnalyzerTest, ojamaDrop)
     }
 
     for (int i = 0; i <= 28; ++i)
-        EXPECT_TRUE(rs[i]->playerResult(1)->userState.playable);
+        EXPECT_TRUE(rs[i]->playerResult(1)->playable);
     // Around here, analyzer can detect ojama puyo is dropped.
-    EXPECT_FALSE(rs[30]->playerResult(1)->userState.playable);
-    EXPECT_FALSE(rs[31]->playerResult(1)->userState.playable);
+    EXPECT_FALSE(rs[30]->playerResult(1)->playable);
+    EXPECT_FALSE(rs[31]->playerResult(1)->playable);
     // Then, next puyo will disappear.
-    EXPECT_TRUE(rs[37]->playerResult(1)->userState.playable);
+    EXPECT_TRUE(rs[37]->playerResult(1)->playable);
 }
 
 TEST_F(ACAnalyzerTest, gameStart)

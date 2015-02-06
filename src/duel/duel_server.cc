@@ -44,7 +44,7 @@ struct DuelServer::DuelState {
             pgs->kumipuyoPos = fr.kumipuyoPos();
             pgs->state = fr.userState();
             pgs->dead = fr.isDead();
-            pgs->playable = fr.userState().playable;
+            pgs->playable = fr.playable();
             pgs->score = fr.score();
             pgs->pendingOjama = fr.numPendingOjama();
             pgs->fixedOjama = fr.numFixedOjama();

@@ -54,7 +54,7 @@ FieldRealtime::FieldRealtime(int playerId, const KumipuyoSeq& seq) :
 
 void FieldRealtime::init()
 {
-    userState_.playable = false;
+    playable_ = false;
     sleepFor_ = 30;
 
     ojama_position_ = vector<int>(6, 0);
@@ -77,7 +77,7 @@ void FieldRealtime::transitToStatePreparingNext()
 {
     simulationState_ = SimulationState::STATE_PREPARING_NEXT;
     sleepFor_ = FRAMES_PREPARING_NEXT;
-    userState_.playable = false;
+    playable_ = false;
 
     kms_ = KumipuyoMovingState(KumipuyoPos(3, 12, 0));
 
@@ -92,14 +92,14 @@ void FieldRealtime::transitToStatePreparingNext()
 bool FieldRealtime::onStatePreparingNext()
 {
     simulationState_ = SimulationState::STATE_PLAYABLE;
-    userState_.playable = true;
+    playable_ = true;
     userState_.decisionRequest = true;
     return false;
 }
 
 bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
 {
-    userState_.playable = true;
+    playable_ = true;
     current_chains_ = 1;
     // TODO(mayah): We're always accepting KeySet? Then do we need to take |accepted| here?
     *accepted = true;
@@ -112,7 +112,7 @@ bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
     if (kms_.grounded) {
         field_.setPuyoAndHeight(kms_.pos.axisX(), kms_.pos.axisY(), kumipuyoSeq_.axis(0));
         field_.setPuyoAndHeight(kms_.pos.childX(), kms_.pos.childY(), kumipuyoSeq_.child(0));
-        userState_.playable = false;
+        playable_ = false;
         userState_.grounded = true;
         dropVelocity_ = INITIAL_DROP_VELOCITY;
         dropAmount_ = 0.0;

@@ -6,7 +6,7 @@
 // TODO(mayah): Remove this.
 enum State {
     STATE_NONE = 0,
-    STATE_YOU_CAN_PLAY = 1 << 0,
+    // STATE_YOU_CAN_PLAY = 1 << 0,
     STATE_WNEXT_APPEARED = 1 << 2,
     STATE_YOU_GROUNDED = 1 << 4,
     STATE_DECISION_REQUEST = 1 << 6,
@@ -17,7 +17,7 @@ enum State {
 };
 
 // TODO(mayah): Use UserState instead of State.
-// TODO(mayah): Rename to UserEvent after playable is removed.
+// TODO(mayah): Rename to UserEvent.
 struct UserState {
     void clearEventStates()
     {
@@ -43,22 +43,20 @@ struct UserState {
     std::string toString() const
     {
         std::string r;
-        r.resize(8);
-        r[0] = playable             ? 'P' : '-';
-        r[1] = wnextAppeared        ? 'W' : '-';
-        r[2] = grounded             ? 'G' : '-';
-        r[3] = decisionRequest      ? 'D' : '-';
-        r[4] = decisionRequestAgain ? 'C' : '-';
-        r[5] = chainFinished        ? 'O' : '-';
-        r[6] = ojamaDropped         ? 'A' : '-';
-        r[7] = puyoErased           ? 'E' : '-';
+        r.resize(7);
+        r[0] = wnextAppeared        ? 'W' : '-';
+        r[1] = grounded             ? 'G' : '-';
+        r[2] = decisionRequest      ? 'D' : '-';
+        r[3] = decisionRequestAgain ? 'C' : '-';
+        r[4] = chainFinished        ? 'O' : '-';
+        r[5] = ojamaDropped         ? 'A' : '-';
+        r[6] = puyoErased           ? 'E' : '-';
         return r;
     }
 
     int toDeprecatedState() const
     {
         int s = 0;
-        s |= playable             ? STATE_YOU_CAN_PLAY           : 0;
         s |= wnextAppeared        ? STATE_WNEXT_APPEARED         : 0;
         s |= grounded             ? STATE_YOU_GROUNDED           : 0;
         s |= decisionRequest      ? STATE_DECISION_REQUEST       : 0;
@@ -71,7 +69,6 @@ struct UserState {
 
     void parseFromDeprecatedState(int state)
     {
-        playable             = state & STATE_YOU_CAN_PLAY;
         wnextAppeared        = state & STATE_WNEXT_APPEARED;
         grounded             = state & STATE_YOU_GROUNDED;
         decisionRequest      = state & STATE_DECISION_REQUEST;
@@ -80,9 +77,6 @@ struct UserState {
         ojamaDropped         = state & STATE_OJAMA_DROPPED;
         puyoErased           = state & STATE_PUYO_ERASED;
     }
-
-    // ----- usual states
-    bool playable = false;
 
     // ----- event states
     bool wnextAppeared = false;
