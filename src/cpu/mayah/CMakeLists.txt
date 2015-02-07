@@ -30,7 +30,7 @@ endfunction()
 mayah_add_executable(mayah_cpu main.cc)
 
 mayah_add_executable(interactive interactive.cc)
-mayah_add_executable(solver solver.cc)
+mayah_add_executable(solver solver_main.cc)
 mayah_add_executable(tweaker tweaker.cc)
 
 cpu_add_runner(run.sh)
