@@ -1,4 +1,4 @@
-#include "core/client/ai/endless/endless.h"
+#include "solver/endless.h"
 
 #include <algorithm>
 
