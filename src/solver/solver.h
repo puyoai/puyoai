@@ -5,12 +5,15 @@
 #include <memory>
 
 #include "core/client/ai/ai.h"
+#include "solver/problem.h"
 
 class Solver {
 public:
     explicit Solver(std::unique_ptr<AI> ai);
 
-    int solve(const std::string& filename);
+    // Returns true if |ai| could return one of the answer decisions.
+    // Otherwise, false will be returned.
+    bool solve(const Problem&);
 
 private:
     std::unique_ptr<AI> ai_;

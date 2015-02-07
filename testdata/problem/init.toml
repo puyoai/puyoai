@@ -3,17 +3,11 @@ name = "GTR (initial)"
 field = [
     ".RR..."
 ]
-next = "RBRBBYYY"
+next = "RBRBBY"
 
 enemy_field = []
-enemy_next = "RBRBBBYY"
+enemy_next = "RBRBBB"
 
-enemy_decisions = [[3, 2], [4, 2]]
-
-[[answers]]
-score = 100
-decisions = [[1, 0], [3, 2]]
-
-[[answers]]
-score = 100
-decisions = [[1, 0], [2, 2]]
+answers = [
+    [1, 0]
+]

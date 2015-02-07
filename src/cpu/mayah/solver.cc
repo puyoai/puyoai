@@ -24,7 +24,9 @@ int main(int argc, char* argv[])
     }
 
     Solver solver(std::unique_ptr<AI>(new MayahAI(argc, argv)));
-    solver.solve(argv[1]);
+    Problem problem = Problem::readProblem(argv[1]);
+    cout << problem.name << ": "
+         << (solver.solve(problem) ? "OK" : "NG") << endl;
 
     return 0;
 }

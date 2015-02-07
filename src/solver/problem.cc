@@ -59,32 +59,14 @@ Problem Problem::readProblem(const string& filename)
         problem.kumipuyoSeq[1] = KumipuyoSeq(enemyNext->as<string>());
     }
     {
-        const toml::Value* enemyDecisions = value.find("enemy_decisions");
-        CHECK(enemyDecisions && enemyDecisions->is<toml::Array>());
-        for (const auto& vs : enemyDecisions->as<toml::Array>()) {
-            CHECK(vs.size() == 2UL);
-            int x = vs.get<int>(0);
-            int r = vs.get<int>(1);
-            problem.enemyHands.push_back(Decision(x, r));
-        }
-    }
-
-    {
         const toml::Value* answers = value.find("answers");
         CHECK(answers && answers->is<toml::Array>());
-        for (const auto& vs : answers->as<toml::Array>()) {
-            int score = vs.get<int>("score");
-            const toml::Array& decisions = vs.get<toml::Array>("decisions");
-            CHECK(decisions.size() == 2UL);
-            int x1 = decisions[0].get<int>(0);
-            int r1 = decisions[0].get<int>(1);
-            int x2 = decisions[1].get<int>(0);
-            int r2 = decisions[1].get<int>(1);
-            vector<Decision> ds {
-                Decision(x1, r1),
-                Decision(x2, r2)
-            };
-            problem.answers[ds] = score;
+        for (const auto& decisions : answers->as<toml::Array>()) {
+            CHECK(decisions.is<toml::Array>());
+            CHECK_EQ(decisions.size(), 2UL);
+            int x = decisions.get<int>(0);
+            int r = decisions.get<int>(1);
+            problem.answers.insert(Decision(x, r));
         }
     }
 
