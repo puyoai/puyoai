@@ -7,16 +7,11 @@ field = [
     "YYB...",
     "BBR...",
 ]
-next = "GRGYRRRR"
+next = "GRGYRR"
 
 enemy_field = []
 enemy_next = "RRBBYYGG"
-enemy_decisions = [[3, 2], [3, 2]]
 
-[[answers]]
-score = 100
-decisions = [[3, 2], [2, 0]]
-
-[[answers]]
-score = 100
-decisions = [[3, 2], [2, 3]]
+answers = [
+    [3, 2]
+]

@@ -1,4 +1,4 @@
-name = "GTR"
+name = "GTR1"
 
 field = [
     "..Y...",
@@ -6,16 +6,11 @@ field = [
     "RRBYY.",
     "BBYGG.",
 ]
-next = "RBYGGBBB"
+next = "RBYGGB"
 
 enemy_field = []
-enemy_next = "RRBBYYGG"
-enemy_decisions = [[3, 2], [3, 2]]
+enemy_next = "RRBBYY"
 
-[[answers]]
-score = 100
-decisions = [[1, 1], [6, 2]]
-
-[[answers]]
-score = 100
-decisions = [[1, 1], [6, 0]]
+answers = [
+    [1, 1]
+]

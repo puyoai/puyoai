@@ -1,13 +1,11 @@
 name = "ZENKESHI"
 
 field = []
-next = "RRRRGGGG"
+next = "RRRRGG"
 
 enemy_field = []
-enemy_next = "RRRRGGGG"
+enemy_next = "RRRRGG"
 
-enemy_decisions = [[3, 2], [3, 2]]
-
-[[answers]]
-score = 100
-decisions = [[3, 2], [3, 2]]
+answers = [
+    [3, 2]
+]

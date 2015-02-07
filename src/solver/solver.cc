@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "core/frame_request.h"
-#include "solver/problem.h"
 
 using namespace std;
 
@@ -12,10 +11,8 @@ Solver::Solver(unique_ptr<AI> ai) :
 {
 }
 
-int Solver::solve(const std::string& filename)
+bool Solver::solve(const Problem& problem)
 {
-    Problem problem = Problem::readProblem(filename);
-
     FrameRequest req;
     req.frameId = 1;
     ai_->gameWillBegin(req);
@@ -28,28 +25,8 @@ int Solver::solve(const std::string& filename)
 
     ai_->gaze(req.frameId, CoreField(problem.field[1]), problem.kumipuyoSeq[1]);
 
-    DropDecision d0;
-    {
-        AdditionalThoughtInfo info { ai_->myPlayerState(), ai_->enemyPlayerState() };
-        d0 = ai_->think(3, problem.field[0], problem.kumipuyoSeq[0], info, false);
-    }
+    AdditionalThoughtInfo thoughtInfo { ai_->myPlayerState(), ai_->enemyPlayerState() };
+    DropDecision dd = ai_->think(3, problem.field[0], problem.kumipuyoSeq[0], thoughtInfo, false);
 
-    problem.field[0].dropKumipuyo(d0.decision(), problem.kumipuyoSeq[0].front());
-    problem.kumipuyoSeq[0].dropFront();
-    problem.field[0].simulate();
-
-    DropDecision d1;
-    {
-        AdditionalThoughtInfo info { ai_->myPlayerState(), ai_->enemyPlayerState() };
-        d1 = ai_->think(4, problem.field[0], problem.kumipuyoSeq[0], info, false);
-    }
-
-    cout << problem.name << ": "
-         << d0.decision().toString() << "-"
-         << d1.decision().toString() << endl;
-
-    vector<Decision> decisions { d0.decision(), d1.decision() };
-    cout << "score: " << problem.answers[decisions] << endl;
-
-    return problem.answers[decisions];
+    return problem.answers.count(dd.decision());
 }
