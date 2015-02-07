@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 
-add_subdirectory(endless)
-
 add_library(puyoai_core_client_ai
             ai.cc
             raw_ai.cc)

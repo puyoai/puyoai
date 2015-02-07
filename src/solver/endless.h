@@ -1,5 +1,5 @@
-#ifndef CORE_CLIENT_AI_ENDLESS_ENDLESS_H_
-#define CORE_CLIENT_AI_ENDLESS_ENDLESS_H_
+#ifndef SOLVER_ENDLESS_H_
+#define SOLVER_ENDLESS_H_
 
 #include <memory>
 #include <vector>

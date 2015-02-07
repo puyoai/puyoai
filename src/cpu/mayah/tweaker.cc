@@ -12,8 +12,8 @@
 
 #include "base/executor.h"
 #include "core/algorithm/puyo_possibility.h"
-#include "core/client/ai/endless/endless.h"
 #include "core/sequence_generator.h"
+#include "solver/endless.h"
 
 #include "evaluation_parameter.h"
 
