@@ -5,12 +5,11 @@ function(cpu_setup namespace)
 endfunction()
 
 function(cpu_target_link_common_libraries target)
+  target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_solver)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_algorithm)
-  target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_client_ai_solver)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_client_ai_endless)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_client_ai)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_client_connector)
-  target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_problem)
 
   if(USE_HTTPD)
     target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_httpd)
