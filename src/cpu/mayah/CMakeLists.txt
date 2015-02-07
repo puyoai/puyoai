@@ -4,22 +4,27 @@ cpu_setup("mayah")
 
 add_library(mayah_lib
             decision_book.cc
-            evaluator.cc evaluation_feature.cc evaluation_parameter.cc
-            gazer.cc mayah_ai.cc opening_book.cc pattern_book.cc
+            evaluator.cc
+            evaluation_feature.cc
+            evaluation_parameter.cc
+            gazer.cc
+            mayah_ai.cc
+            opening_book.cc
+            pattern_book.cc
             score_collector.cc)
 
 function(mayah_add_executable exe)
-  cpu_add_executable(${exe} ${ARGN})
-  cpu_target_link_libraries(${exe} mayah_lib)
-  cpu_target_link_common_libraries(${exe})
+    cpu_add_executable(${exe} ${ARGN})
+    cpu_target_link_libraries(${exe} mayah_lib)
+    cpu_target_link_common_libraries(${exe})
 endfunction()
 
 function(mayah_add_test exe)
-  mayah_add_executable(${exe} ${exe}.cc)
-  cpu_target_link_libraries(${exe} gtest gtest_main)
-  if(NOT ARGV1)
-    cpu_add_test(${exe})
-  endif()
+    mayah_add_executable(${exe} ${exe}.cc)
+    cpu_target_link_libraries(${exe} gtest gtest_main)
+    if(NOT ARGV1)
+        cpu_add_test(${exe})
+    endif()
 endfunction()
 
 mayah_add_executable(mayah_cpu main.cc)
