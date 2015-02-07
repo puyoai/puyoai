@@ -11,9 +11,7 @@ class Solver {
 public:
     explicit Solver(std::unique_ptr<AI> ai);
 
-    // Returns true if |ai| could return one of the answer decisions.
-    // Otherwise, false will be returned.
-    bool solve(const Problem&);
+    Decision solve(const Problem&);
 
 private:
     std::unique_ptr<AI> ai_;

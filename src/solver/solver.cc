@@ -11,7 +11,7 @@ Solver::Solver(unique_ptr<AI> ai) :
 {
 }
 
-bool Solver::solve(const Problem& problem)
+Decision Solver::solve(const Problem& problem)
 {
     FrameRequest req;
     req.frameId = 1;
@@ -27,6 +27,5 @@ bool Solver::solve(const Problem& problem)
 
     AdditionalThoughtInfo thoughtInfo { ai_->myPlayerState(), ai_->enemyPlayerState() };
     DropDecision dd = ai_->think(3, problem.field[0], problem.kumipuyoSeq[0], thoughtInfo, false);
-
-    return problem.answers.count(dd.decision());
+    return dd.decision();
 }
