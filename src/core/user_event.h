@@ -3,7 +3,7 @@
 
 #include <string>
 
-// TODO(mayah): Rename to UserEvent.
+// UserEvent is a set of events in user's field.
 struct UserEvent {
     void clear()
     {
