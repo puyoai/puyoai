@@ -1,9 +1,9 @@
-#include "core/client/ai/solver/solver.h"
+#include "solver/solver.h"
 
 #include <iostream>
 
 #include "core/frame_request.h"
-#include "core/problem/problem.h"
+#include "solver/problem.h"
 
 using namespace std;
 

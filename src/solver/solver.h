@@ -1,5 +1,5 @@
-#ifndef CORE_CLIENT_AI_SOLVER_SOLVER_H_
-#define CORE_CLIENT_AI_SOLVER_SOLVER_H_
+#ifndef SOLVER_SOLVER_H_
+#define SOLVER_SOLVER_H_
 
 #include <string>
 #include <memory>

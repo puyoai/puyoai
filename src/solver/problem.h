@@ -1,5 +1,5 @@
-#ifndef CORE_PROBLEM_PROBLEM_H_
-#define CORE_PROBLEM_PROBLEM_H_
+#ifndef SOLVER_PROBLEM_H_
+#define SOLVER_PROBLEM_H_
 
 #include <map>
 #include <string>

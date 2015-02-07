@@ -15,8 +15,8 @@
 #include "core/field_pretty_printer.h"
 #include "core/frame_request.h"
 #include "core/kumipuyo.h"
-#include "core/problem/problem.h"
 #include "core/sequence_generator.h"
+#include "solver/problem.h"
 
 #include "evaluator.h"
 #include "mayah_ai.h"
