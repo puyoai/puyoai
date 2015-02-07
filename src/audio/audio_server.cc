@@ -48,11 +48,8 @@ void AudioServer::submit(const std::string& text, int priority, int timeout)
 
 void AudioServer::runLoop()
 {
-    LOG(INFO) << "hogehoge";
     while (!shouldStop_) {
-        LOG(INFO) << "hoge";
         SpeakRequest request = take();
-        LOG(INFO) << "fuga";
         if (request.text.empty())
             continue;
 
