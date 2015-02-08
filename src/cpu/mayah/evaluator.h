@@ -64,7 +64,8 @@ public:
         collectedFeatures_[key] = value;
     }
 
-    double feature(EvaluationFeatureKey key) const {
+    double feature(EvaluationFeatureKey key) const
+    {
         auto it = collectedFeatures_.find(key);
         if (it == collectedFeatures_.end())
             return 0;
