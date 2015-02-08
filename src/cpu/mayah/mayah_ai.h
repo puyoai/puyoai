@@ -47,7 +47,7 @@ public:
     virtual ~MayahAI();
 
     virtual DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
-                               const AdditionalThoughtInfo&, bool fast) override;
+                               const PlayerState& me, const PlayerState& enemy, bool fast) const override;
 
     virtual void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&) override;
 
@@ -58,10 +58,10 @@ public:
     ThoughtResult thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&,
                             const PlayerState& me, const PlayerState& enemy,
                             int depth, int maxIteration,
-                            std::vector<Decision>* specifiedDecisions = nullptr);
+                            std::vector<Decision>* specifiedDecisions = nullptr) const;
 
 protected:
-    PreEvalResult preEval(const CoreField& currentField);
+    PreEvalResult preEval(const CoreField& currentField) const;
     MidEvalResult midEval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
                           const PlayerState& me, const PlayerState& enemy,
                           const PreEvalResult&, const GazeResult&) const;

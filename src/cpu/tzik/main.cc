@@ -13,16 +13,18 @@ AI::AI(int argc, char** argv) : ::AI(argc, argv, "tzik") {}
 DropDecision AI::think(int frame_id,
                        const CoreField& field,
                        const KumipuyoSeq& seq,
-                       const AdditionalThoughtInfo& info,
-                       bool fast) {
-  UNUSED_VARIABLE(info);
+                       const PlayerState& me,
+                       const PlayerState& enemy,
+                       bool fast) const {
+  UNUSED_VARIABLE(me);
+  UNUSED_VARIABLE(enemy);
   UNUSED_VARIABLE(fast);
   return think_sample(frame_id, field, seq);
 }
 
 DropDecision AI::think_sample(int frame_id,
                               const PlainField& field,
-                              const KumipuyoSeq& seq) {
+                              const KumipuyoSeq& seq) const {
   UNUSED_VARIABLE(frame_id);
 
   Decision best;

@@ -14,8 +14,9 @@ class AI : public ::AI {
 
   DropDecision think(int frame_id, const CoreField& field,
                      const KumipuyoSeq& seq,
-                     const AdditionalThoughtInfo&,
-                     bool fast) override;
+                     const PlayerState& me,
+                     const PlayerState& enemy,
+                     bool fast) const override;
 
   enum GradeElement {
 	  CHAIN_LENGTH,
@@ -40,11 +41,11 @@ class AI : public ::AI {
   virtual void onGameWillBegin(const FrameRequest&) override;
 
   virtual DropDecision think_internal(int frame_id, const CoreField& field,
-                                      const KumipuyoSeq& seq);
+                                      const KumipuyoSeq& seq) const;
 
   virtual void onEnemyGrounded(const FrameRequest&) override;
 
-  virtual int evaluate(const CoreField& field, const RefPlan* plan);
+  virtual int evaluate(const CoreField& field, const RefPlan* plan) const;
 
   Strategy strategy;
 };

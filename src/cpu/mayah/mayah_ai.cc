@@ -51,7 +51,7 @@ void MayahAI::reloadParameter()
 }
 
 DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& kumipuyoSeq,
-                            const AdditionalThoughtInfo& additionalThoughtInfo, bool fast)
+                            const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
     int depth;
     int iteration;
@@ -74,7 +74,7 @@ DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& 
         iteration = MayahAI::DEFAULT_NUM_ITERATION;
     }
 
-    ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, additionalThoughtInfo.me, additionalThoughtInfo.enemy, depth, iteration);
+    ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, me, enemy, depth, iteration);
 
     const Plan& plan = thoughtResult.plan;
     if (plan.decisions().empty())
@@ -84,7 +84,7 @@ DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& 
 
 ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
                                  const PlayerState& me, const PlayerState& enemy,
-                                 int depth, int maxIteration, vector<Decision>* specifiedDecisions)
+                                 int depth, int maxIteration, vector<Decision>* specifiedDecisions) const
 {
     double beginTime = currentTime();
 
@@ -238,7 +238,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     }
 }
 
-PreEvalResult MayahAI::preEval(const CoreField& currentField)
+PreEvalResult MayahAI::preEval(const CoreField& currentField) const
 {
     PreEvaluator preEvaluator(openingBook_, patternBook_);
     return preEvaluator.preEval(currentField);
