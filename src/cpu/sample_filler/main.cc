@@ -19,9 +19,10 @@ public:
     virtual ~SampleFillerAI() {}
 
     virtual DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq,
-                               const AdditionalThoughtInfo& info, bool fast) override
+                               const PlayerState& me, const PlayerState& enemy, bool fast) const override
     {
-        UNUSED_VARIABLE(info);
+        UNUSED_VARIABLE(me);
+        UNUSED_VARIABLE(enemy);
         UNUSED_VARIABLE(fast);
 
         if (FLAGS_algorithm == "peak")
@@ -34,7 +35,7 @@ public:
     }
 
 private:
-    DropDecision thinkFlat(int frameId, const CoreField& f, const KumipuyoSeq& seq)
+    DropDecision thinkFlat(int frameId, const CoreField& f, const KumipuyoSeq& seq) const
     {
         UNUSED_VARIABLE(frameId);
 
@@ -60,7 +61,7 @@ private:
         return DropDecision(Decision(3, 2));
     }
 
-    DropDecision thinkPeak(int frameId, const CoreField& f, const KumipuyoSeq& seq)
+    DropDecision thinkPeak(int frameId, const CoreField& f, const KumipuyoSeq& seq) const
     {
         UNUSED_VARIABLE(frameId);
 
@@ -92,7 +93,7 @@ private:
         return DropDecision(Decision(3, 2));
     }
 
-    DropDecision thinkQuickTurn(int frameId, const CoreField& f, const KumipuyoSeq& seq)
+    DropDecision thinkQuickTurn(int frameId, const CoreField& f, const KumipuyoSeq& seq) const
     {
         UNUSED_VARIABLE(frameId);
         UNUSED_VARIABLE(seq);
@@ -122,7 +123,7 @@ private:
         return DropDecision(Decision(3, 2));
     }
 
-    DropDecision thinkNohoho(int frameId, const CoreField& f, const KumipuyoSeq& seq)
+    DropDecision thinkNohoho(int frameId, const CoreField& f, const KumipuyoSeq& seq) const
     {
         UNUSED_VARIABLE(frameId);
         UNUSED_VARIABLE(seq);

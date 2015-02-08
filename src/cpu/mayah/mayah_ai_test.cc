@@ -164,7 +164,14 @@ TEST(MayahAITest, DontCrash1)
     FrameRequest req;
     req.frameId = 1;
     ai->gameWillBegin(req);
-    (void)ai->think(100, f, seq, AdditionalThoughtInfo(), false);
+
+    PlayerState me;
+    me.field = f;
+    me.seq = seq;
+
+    PlayerState enemy;
+
+    (void)ai->think(100, f, seq, me, enemy, false);
 }
 
 TEST(MayahAITest, DontCrash2)
@@ -190,7 +197,14 @@ TEST(MayahAITest, DontCrash2)
     FrameRequest req;
     req.frameId = 1;
     ai->gameWillBegin(req);
-    (void)ai->think(100, f, seq, AdditionalThoughtInfo(), false);
+
+    PlayerState me;
+    me.field = f;
+    me.seq = seq;
+
+    PlayerState enemy;
+
+    (void)ai->think(100, f, seq, me, enemy, false);
 }
 
 TEST(MayahAITest, DontCrash3)
@@ -216,7 +230,14 @@ TEST(MayahAITest, DontCrash3)
     FrameRequest req;
     req.frameId = 1;
     ai->gameWillBegin(req);
-    (void)ai->think(100, f, seq, AdditionalThoughtInfo(), false);
+
+    PlayerState me;
+    me.field = f;
+    me.seq = seq;
+
+    PlayerState enemy;
+
+    (void)ai->think(100, f, seq, me, enemy, false);
 }
 
 int main(int argc, char* argv[])

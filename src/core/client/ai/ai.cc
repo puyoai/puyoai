@@ -116,8 +116,8 @@ void AI::runLoop()
             CHECK_EQ(kumipuyoSeq.get(2), seq.get(1));
 
             next1.fieldBeforeThink = me_.field;
-            AdditionalThoughtInfo info { myPlayerState(), enemyPlayerState() };
-            next1.dropDecision = think(nextThinkFrameId, me_.field, seq, info, false);
+            next1.dropDecision = think(nextThinkFrameId, me_.field, seq,
+                                       myPlayerState(), enemyPlayerState(), false);
 
             next1.kumipuyo = kumipuyoSeq.get(1);
             next1.ready = true;
@@ -142,11 +142,12 @@ void AI::runLoop()
             VLOG(1) << "REQUEST_AGAIN";
             DCHECK(!frameRequest.myPlayerFrameRequest().event.decisionRequest)
                 << "decisionRequestAgain should not come with decisionRequest.";
-            AdditionalThoughtInfo info { myPlayerState(), enemyPlayerState() };
             DropDecision dropDecision = think(frameRequest.frameId,
                                               frameRequest.myPlayerFrameRequest().field,
                                               frameRequest.myPlayerFrameRequest().kumipuyoSeq,
-                                              info, true);
+                                              myPlayerState(),
+                                              enemyPlayerState(),
+                                              true);
             connector_.send(FrameResponse(frameRequest.frameId, dropDecision.decision(), dropDecision.message()));
             continue;
         }
@@ -177,8 +178,7 @@ void AI::runLoop()
             CHECK_EQ(kumipuyoSeq.get(0), seq.get(0));
             CHECK_EQ(kumipuyoSeq.get(1), seq.get(1));
 
-            AdditionalThoughtInfo info { myPlayerState(), enemyPlayerState() };
-            next1.dropDecision = think(frameRequest.frameId, me_.field, seq, info, true);
+            next1.dropDecision = think(frameRequest.frameId, me_.field, seq, myPlayerState(), enemyPlayerState(), true);
             next1.kumipuyo = kumipuyoSeq.get(0);
             next1.ready = true;
             next1.needsRethink = false;

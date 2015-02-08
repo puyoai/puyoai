@@ -12,15 +12,16 @@ public:
     virtual ~SampleRensaAI() {}
 
     virtual DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq,
-                               const AdditionalThoughtInfo& info, bool fast) override
+                               const PlayerState& me, const PlayerState& enemy, bool fast) const override
     {
         UNUSED_VARIABLE(frameId);
-        UNUSED_VARIABLE(info);
+        UNUSED_VARIABLE(me);
+        UNUSED_VARIABLE(enemy);
         return eval(f, seq, fast ? 2 : 3);
     }
 
 private:
-    DropDecision eval(const CoreField& f, const KumipuyoSeq& nexts, int depth)
+    DropDecision eval(const CoreField& f, const KumipuyoSeq& nexts, int depth) const
     {
         LOG(INFO) << f.toDebugString() << nexts.toString();
 

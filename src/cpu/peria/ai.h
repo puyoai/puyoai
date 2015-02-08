@@ -20,8 +20,9 @@ class Ai : public ::AI {
   virtual DropDecision think(int frame_id,
                              const CoreField& field,
                              const KumipuyoSeq& seq,
-                             const AdditionalThoughtInfo& info,
-                             bool fast) override;
+                             const PlayerState& me,
+                             const PlayerState& enemy,
+                             bool fast) const override;
   virtual void onGameWillBegin(const FrameRequest& frame_request) override;
   virtual void onEnemyGrounded(const FrameRequest& frame_request) override;
 

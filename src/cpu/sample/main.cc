@@ -11,10 +11,12 @@ public:
     AIRoutine(int argc, char* argv[]) : AI(argc, argv, "sample") {}
     virtual ~AIRoutine() {}
 
-    virtual DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq, const AdditionalThoughtInfo& info, bool fast) override
+    virtual DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq,
+                               const PlayerState& me, const PlayerState& enemy, bool fast) const override
     {
         UNUSED_VARIABLE(frameId);
-        UNUSED_VARIABLE(info);
+        UNUSED_VARIABLE(me);
+        UNUSED_VARIABLE(enemy);
         UNUSED_VARIABLE(fast);
 
         LOG(INFO) << f.toDebugString() << seq.toString();

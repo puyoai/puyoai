@@ -41,7 +41,7 @@ public:
     bool loadFromValue(const toml::Value&);
 
     // Finds next decision. If next decision is not found, invalid Decision will be returned.
-    Decision nextDecision(const CoreField&, const KumipuyoSeq&);
+    Decision nextDecision(const CoreField&, const KumipuyoSeq&) const;
 
 private:
     void makeFieldFromValue(const CoreField&, const std::string&, const toml::Value&);

@@ -38,14 +38,15 @@ void munetoshi::AI::onGameWillBegin(const FrameRequest& frame) {
 
 DropDecision munetoshi::AI::think(int frame_id, const CoreField& field,
                                   const KumipuyoSeq& seq,
-                                  const AdditionalThoughtInfo&,
-                                  bool) {
+                                  const PlayerState&,
+                                  const PlayerState&,
+                                  bool) const {
   return think_internal(frame_id, field, seq);
 }
 
 DropDecision munetoshi::AI::think_internal(int frame_id,
                                            const CoreField& field,
-                                           const KumipuyoSeq& seq) {
+                                           const KumipuyoSeq& seq) const {
   UNUSED_VARIABLE(frame_id);
 
   Decision best_chain_decision;
@@ -84,7 +85,7 @@ void munetoshi::AI::onEnemyGrounded(const FrameRequest& frame) {
   }
 }
 
-int munetoshi::AI::evaluate(const CoreField& field, const RefPlan *plan) {
+int munetoshi::AI::evaluate(const CoreField& field, const RefPlan *plan) const {
   int grade = INT_MIN;
   int required_puyos;
   auto adder = [&](const ColumnPuyo& cp) { required_puyos += cp.x; };

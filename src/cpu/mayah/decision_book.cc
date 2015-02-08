@@ -136,7 +136,7 @@ bool DecisionBook::loadFromValue(const toml::Value& book)
     return true;
 }
 
-Decision DecisionBook::nextDecision(const CoreField& cf, const KumipuyoSeq& seq)
+Decision DecisionBook::nextDecision(const CoreField& cf, const KumipuyoSeq& seq) const
 {
     for (const auto& f : fields_) {
         Decision decision = f.nextDecision(cf, seq);

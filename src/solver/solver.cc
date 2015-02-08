@@ -25,7 +25,11 @@ Decision Solver::solve(const Problem& problem)
 
     ai_->gaze(req.frameId, CoreField(problem.field[1]), problem.kumipuyoSeq[1]);
 
-    AdditionalThoughtInfo thoughtInfo { ai_->myPlayerState(), ai_->enemyPlayerState() };
-    DropDecision dd = ai_->think(3, problem.field[0], problem.kumipuyoSeq[0], thoughtInfo, false);
+    DropDecision dd = ai_->think(3,
+                                 problem.field[0],
+                                 problem.kumipuyoSeq[0],
+                                 ai_->myPlayerState(),
+                                 ai_->enemyPlayerState(),
+                                 false);
     return dd.decision();
 }

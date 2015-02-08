@@ -18,7 +18,7 @@ public:
 
 protected:
     virtual DropDecision think(int, const CoreField&, const KumipuyoSeq&,
-                               const AdditionalThoughtInfo&, bool)
+                               const PlayerState&, const PlayerState&, bool) const override
     {
         return DropDecision(Decision(3, 0), "test");
     }

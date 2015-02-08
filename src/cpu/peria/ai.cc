@@ -35,10 +35,12 @@ Ai::~Ai() {}
 DropDecision Ai::think(int frame_id,
                        const CoreField& field,
                        const KumipuyoSeq& seq,
-                       const AdditionalThoughtInfo& info,
-                       bool fast) {
+                       const PlayerState& me,
+                       const PlayerState& enemy,
+                       bool fast) const {
   UNUSED_VARIABLE(frame_id);
-  UNUSED_VARIABLE(info);
+  UNUSED_VARIABLE(me);
+  UNUSED_VARIABLE(enemy);
   UNUSED_VARIABLE(fast);
   using namespace std::placeholders;
 
