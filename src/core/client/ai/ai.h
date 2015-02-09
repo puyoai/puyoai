@@ -4,31 +4,12 @@
 #include <string>
 
 #include "core/client/ai/drop_decision.h"
+#include "core/client/ai/player_state.h"
 #include "core/client/connector/client_connector.h"
 #include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
-#include "core/rensa_result.h"
 
 struct FrameRequest;
-class PlainField;
-
-struct PlayerState {
-    void clear() { *this = PlayerState(); }
-
-    int hand = 0;
-    CoreField field;
-    KumipuyoSeq seq;
-    bool hasZenkeshi = false;
-    int fixedOjama = 0;
-    int pendingOjama = 0;
-
-    bool isRensaOngoing = false;
-    int finishingRensaFrameId = 0;
-    RensaResult ongoingRensaResult;
-
-    // make false in decisionRequest. If false twice, fixedOjama should be 0.
-    bool hasOjamaDropped = false;
-};
 
 // AI is a utility class of AI.
 // You need to implement think() at least.
