@@ -137,12 +137,14 @@ void WiiConnectServer::runLoop()
             if (!playForLevelSelect(frameId, *r))
                 shouldStop_ = true;
             break;
-        case CaptureGameState::PLAYING:
+        case CaptureGameState::PLAYING: {
             if (!playForPlaying(frameId, *r))
                 shouldStop_ = true;
+            GameState gameState = toGameState(frameId, *r);
             for (auto observer : observers_)
-                observer->onUpdate(toGameState(frameId, *r));
+                observer->onUpdate(gameState);
             break;
+        }
         case CaptureGameState::FINISHED:
             if (!playForFinished(frameId))
                 shouldStop_ = true;
@@ -359,14 +361,22 @@ GameState WiiConnectServer::toGameState(int frameId, const AnalyzerResult& analy
             }
         }
 
-        pgs->kumipuyoSeq = KumipuyoSeq {
-            Kumipuyo(toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS)),
-                     toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD))),
-            Kumipuyo(toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS)),
-                     toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD))),
-            Kumipuyo(toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)),
-                     toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD))),
+        PuyoColor pcs[6] = {
+            toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS)),
+            toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD)),
+            toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS)),
+            toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD)),
+            toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)),
+            toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD)),
         };
+
+        KumipuyoSeq seq;
+        for (int i = 0; i < 3; ++i) {
+            if (pcs[2 * i] == PuyoColor::EMPTY || pcs[2 * i + 1] == PuyoColor::EMPTY)
+                break;
+            seq.add(Kumipuyo(pcs[2 * i], pcs[2 * i + 1]));
+        }
+        pgs->kumipuyoSeq = seq;
 
         pgs->event = pr->userEvent;
         pgs->dead = false;
