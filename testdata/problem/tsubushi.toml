@@ -1,0 +1,32 @@
+name = "tsubushi"
+
+field = [
+    "R.....",
+    "B.....",
+    "R.....",
+    "BR....",
+    "BR....",
+    "BYG...",
+    "RBYG..",
+    "RBYG..",
+    "RBYG..",
+]
+next = "RBYGGB"
+
+enemy_field = [
+    "BOOOOO",
+    "ROOOOO",
+    "BGOOOO",
+    "GGOOOO",
+    "BOOOOO",
+    "BGOOOO",
+    "BYGYGO",
+    "RBYGYG",
+    "RBYGYG",
+    "RBYGYG",
+]
+enemy_next = "YYYYYY"
+
+answers = [
+    [2, 0]
+]
