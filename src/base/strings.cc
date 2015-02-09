@@ -12,6 +12,11 @@ bool isPrefix(const string& s, const string& prefix)
     return s.substr(0, prefix.size()) == prefix;
 }
 
+bool contains(const string& s, const string& t)
+{
+    return s.find(t) != string::npos;
+}
+
 string trim(const string& s)
 {
     string::size_type p1 = s.find_first_not_of(" ");
