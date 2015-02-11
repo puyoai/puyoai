@@ -8,17 +8,19 @@
 void RawAI::runLoop()
 {
     while (true) {
-        FrameRequest request = connector_.receive();
-        if (request.connectionLost) {
-            LOG(INFO) << "connection lost";
+        FrameRequest frameRequest;
+        if (!connector_.receive(&frameRequest)) {
+            if (connector_.isClosed()) {
+                LOG(INFO) << "connection is closed";
+                break;
+            }
+            LOG(ERROR) << "received unexpected request?";
             break;
         }
 
-        if (!request.isValid())
+        if (!frameRequest.isValid())
             continue;
 
-        connector_.send(playOneFrame(request));
+        connector_.send(playOneFrame(frameRequest));
     }
 }
-
-

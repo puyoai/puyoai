@@ -8,22 +8,25 @@
 
 using namespace std;
 
-FrameRequest ClientConnector::receive()
+bool ClientConnector::receive(FrameRequest* frameRequest)
 {
-    FrameRequest frameRequest;
+    if (closed_)
+        return false;
+
     std::string line;
     while (true) {
         if (!std::getline(std::cin, line)) {
-            frameRequest.connectionLost = true;
-            return frameRequest;
+            closed_ = true;
+            return false;
         }
 
         if (line != "")
             break;
     }
-    LOG(INFO) << line;
 
-    return FrameRequest::parse(line);
+    LOG(INFO) << line;
+    *frameRequest = FrameRequest::parse(line);
+    return true;
 }
 
 void ClientConnector::send(const FrameResponse& resp)
