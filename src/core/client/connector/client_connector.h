@@ -6,8 +6,14 @@ struct FrameResponse;
 
 class ClientConnector {
 public:
-    FrameRequest receive();
+    // Returns true if receive suceeded.
+    bool receive(FrameRequest* request);
     void send(const FrameResponse&);
+
+    bool isClosed() { return closed_; }
+
+private:
+    bool closed_ = false;
 };
 
 #endif

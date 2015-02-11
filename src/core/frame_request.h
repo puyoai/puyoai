@@ -33,7 +33,6 @@ struct FrameRequest {
     const PlayerFrameRequest& myPlayerFrameRequest() const { return playerFrameRequest[0]; }
     const PlayerFrameRequest& enemyPlayerFrameRequest() const { return playerFrameRequest[1]; }
 
-    bool connectionLost = false;
     int frameId = -1;
     GameResult gameResult = GameResult::PLAYING;
     PlayerFrameRequest playerFrameRequest[NUM_PLAYERS];

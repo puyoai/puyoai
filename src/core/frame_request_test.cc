@@ -11,7 +11,6 @@ TEST(FrameRequestTest, parse)
 {
     FrameRequest request = FrameRequest::parse("ID=1");
 
-    EXPECT_FALSE(request.connectionLost);
     EXPECT_EQ(1, request.frameId);
     EXPECT_EQ(GameResult::PLAYING, request.gameResult);
 

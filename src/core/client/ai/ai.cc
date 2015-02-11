@@ -58,9 +58,13 @@ void AI::runLoop()
     while (true) {
         google::FlushLogFiles(google::INFO);
 
-        FrameRequest frameRequest = connector_.receive();
-        if (frameRequest.connectionLost) {
-            LOG(INFO) << "connection lost";
+        FrameRequest frameRequest;
+        if (!connector_.receive(&frameRequest)) {
+            if (connector_.isClosed()) {
+                LOG(INFO) << "connection is closed";
+                break;
+            }
+            LOG(ERROR) << "received unexpected request?";
             break;
         }
 
