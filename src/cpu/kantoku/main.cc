@@ -7,7 +7,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "core/client/connector/client_connector.h"
+#include "core/client/ai/raw_ai.h"
 #include "core/frame_request.h"
 #include "core/frame_response.h"
 #include "core/server/connector/connector.h"
@@ -29,7 +29,7 @@ private:
     unique_ptr<Connector> connector_;
 };
 
-class Kantoku {
+class Kantoku : public RawAI {
 public:
     Kantoku() : rnd_(random_device()())
     {
@@ -40,22 +40,14 @@ public:
         ais_.emplace_back(name, program);
     }
 
-    void runLoop()
+    FrameResponse playOneFrame(const FrameRequest& req) override
     {
-        while (true) {
-            FrameRequest req = clientConnector_.receive();
-            if (req.connectionLost)
-                break;
-
-            if (req.frameId == 1) {
-                chooseAI();
-            }
-
-            current().connector().write(req);
-            FrameResponse resp = current().connector().read();
-
-            clientConnector_.send(resp);
+        if (req.frameId == 1) {
+            chooseAI();
         }
+
+        current().connector().write(req);
+        return current().connector().read();
     }
 
 private:
@@ -68,7 +60,6 @@ private:
     ChildAI& current() { return ais_[index_]; }
 
     default_random_engine rnd_;
-    ClientConnector clientConnector_;
     int index_;
     vector<ChildAI> ais_;
 };
