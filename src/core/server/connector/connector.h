@@ -19,8 +19,8 @@ public:
     virtual bool receive(FrameResponse*) = 0;
     virtual bool isHuman() const = 0;
 
-    virtual bool alive() const = 0;
-    virtual void setAlive(bool) = 0;
+    virtual bool isClosed() const = 0;
+    virtual void setClosed(bool) = 0;
 
     // Returns true if this connector can use poll().
     virtual bool pollable() const = 0;

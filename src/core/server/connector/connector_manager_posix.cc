@@ -124,7 +124,7 @@ bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_P
                        (pollfds[i].revents & POLLNVAL)) {
                 LOG(ERROR) << "[P" << playerIds[i] << "] Closed the connection.";
                 died = true;
-                connector(playerIds[i])->setAlive(false);
+                connector(playerIds[i])->setClosed(true);
             }
         }
 

@@ -15,15 +15,16 @@ public:
     virtual bool receive(FrameResponse*) override;
 
     virtual bool isHuman() const override { return false; }
-    virtual bool alive() const override { return alive_; }
-    virtual void setAlive(bool flag) override { alive_ = flag; }
+    virtual bool isClosed() const override { return closed_; }
+    virtual void setClosed(bool flag) override { closed_ = flag; }
     virtual bool pollable() const override { return true; }
     virtual int readerFd() const override { return readerFd_; }
 
 private:
     void writeString(const std::string&);
 
-    bool alive_ = true;
+    bool closed_ = false;
+
     int writerFd_;
     int readerFd_;
     FILE* writer_;
