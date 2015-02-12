@@ -22,6 +22,7 @@
 #include "mayah_ai.h"
 
 DEFINE_string(problem, "", "use problem");
+DEFINE_bool(tokopuyo, false, "Use tokopuyo parameter");
 
 using namespace std;
 
@@ -96,7 +97,12 @@ int main(int argc, char* argv[])
     TsumoPossibility::initialize();
 
     InteractiveAI ai(argc, argv);
-    ai.removeNontokopuyoParameter();
+    if (FLAGS_tokopuyo) {
+        ai.removeNontokopuyoParameter();
+        cout << "CAUTION --- tokopuyo parameter is used. --- CAUTION" << endl;
+    } else {
+        cout << "Non tokopuyo parameter is used." << endl;
+    }
 
     Problem problem = makeProblem();
 

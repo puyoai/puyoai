@@ -142,6 +142,30 @@ TEST(MayahAITest, fromReal2)
     EXPECT_TRUE(thoughtResult.plan.isRensaPlan());
 }
 
+TEST(MayahAITest, zenkeshi1)
+{
+    CoreField myField(
+        ".GGG.."
+        ".YYY..");
+
+    CoreField enemyField;
+
+    KumipuyoSeq mySeq("GYRB");
+    KumipuyoSeq enemySeq("GYBR");
+
+    auto ai = makeAI();
+    FrameRequest req;
+    req.frameId = 1;
+    ai->gameWillBegin(req);
+
+    PlayerState me;
+    PlayerState enemy;
+
+    ThoughtResult thoughtResult = ai->thinkPlan(10, myField, mySeq, me, enemy, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+
+    EXPECT_EQ(Decision(3, 0), thoughtResult.plan.firstDecision());
+}
+
 TEST(MayahAITest, DontCrash1)
 {
     CoreField f(

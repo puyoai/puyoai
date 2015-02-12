@@ -134,6 +134,7 @@ field = [
 ]
 AAAC = [5, 1]  # TODO: [2, 3] ?
 AACC = [5, 1]  # TODO: [2, 3] ?
+ABAB = [1, 0]  # [2, 2] is faster, but if AB comes again, taking 1-rensa double is big.
 ACAB = [4, 2]
 ACAC = [4, 2]
 ACAD = [4, 2]
