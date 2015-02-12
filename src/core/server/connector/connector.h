@@ -15,8 +15,8 @@ public:
 
     virtual ~Connector() {}
 
-    virtual void write(const FrameRequest&) = 0;
-    virtual FrameResponse read() = 0;
+    virtual void send(const FrameRequest&) = 0;
+    virtual bool receive(FrameResponse*) = 0;
     virtual bool isHuman() const = 0;
 
     virtual bool alive() const = 0;

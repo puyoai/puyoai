@@ -11,8 +11,6 @@ TEST(FrameResponseTest, parse)
 {
     FrameResponse response = FrameResponse::parse("ID=1 X=3 R=0 MSG=hoge");
 
-    EXPECT_FALSE(response.connectionLost);
-    EXPECT_TRUE(response.received);
     EXPECT_EQ(1, response.frameId);
     EXPECT_TRUE(response.decision.isValid());
 
@@ -25,7 +23,6 @@ TEST(FrameResponseTest, parse)
 TEST(FrameResponseTest, toStringAndParse)
 {
     FrameResponse expected;
-    expected.received = true;
     expected.frameId = 100;
     expected.decision = Decision(3, 0);
     expected.msg = "message with space";

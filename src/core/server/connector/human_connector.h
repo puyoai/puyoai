@@ -9,8 +9,9 @@ class HumanConnector : public Connector {
 public:
     virtual ~HumanConnector() {}
 
-    virtual void write(const FrameRequest&) override;
-    virtual FrameResponse read() override;
+    virtual void send(const FrameRequest&) override;
+    virtual bool receive(FrameResponse*) override;
+
     virtual bool isHuman() const override { return true; }
     // HumanConnector is always alive.
     virtual bool alive() const override { return true; }

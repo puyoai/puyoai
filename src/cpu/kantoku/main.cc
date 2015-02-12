@@ -46,8 +46,10 @@ public:
             chooseAI();
         }
 
-        current().connector().write(req);
-        return current().connector().read();
+        current().connector().send(req);
+        FrameResponse response;
+        CHECK(current().connector().receive(&response));
+        return response;
     }
 
 private:

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void HumanConnector::write(const FrameRequest& req)
+void HumanConnector::send(const FrameRequest& req)
 {
     writeString(req.toString());
 }
@@ -16,14 +16,13 @@ void HumanConnector::writeString(const string& message)
     LOG(INFO) << message;
 }
 
-FrameResponse HumanConnector::read()
+bool HumanConnector::receive(FrameResponse* response)
 {
-    FrameResponse fr;
-    fr.received = true;
+    *response = FrameResponse();
 
     lock_guard<mutex> lock(mu_);
-    fr.keySet = currentKeySet_;
-    return fr;
+    response->keySet = currentKeySet_;
+    return true;
 }
 
 void HumanConnector::setAlive(bool)

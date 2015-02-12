@@ -200,7 +200,7 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
         }
 
         if (isAi_[pi])
-            connector_->connector(pi)->write(makeFrameRequestFor(pi, frameId, analyzerResult));
+            connector_->connector(pi)->send(makeFrameRequestFor(pi, frameId, analyzerResult));
     }
 
     return true;
@@ -232,7 +232,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
         }
 
         if (isAi_[pi])
-            connector_->connector(pi)->write(makeFrameRequestFor(pi, frameId, analyzerResult));
+            connector_->connector(pi)->send(makeFrameRequestFor(pi, frameId, analyzerResult));
     }
 
     vector<FrameResponse> responses[2];

@@ -22,7 +22,7 @@ PipeConnector::~PipeConnector()
     fclose(reader_);
 }
 
-void PipeConnector::write(const FrameRequest& req)
+void PipeConnector::send(const FrameRequest& req)
 {
     writeString(req.toString());
 }
@@ -34,24 +34,26 @@ void PipeConnector::writeString(const string& message)
     LOG(INFO) << message;
 }
 
-FrameResponse PipeConnector::read()
+bool PipeConnector::receive(FrameResponse* response)
 {
     char buf[1000];
     char* ptr = fgets(buf, 999, reader_);
     if (!ptr)
-        return FrameResponse();
+        return false;
 
     size_t len = strlen(ptr);
     if (len == 0)
-        return FrameResponse();
+        return false;
+
     if (ptr[len-1] == '\n') {
         ptr[--len] = '\0';
     }
     if (len == 0)
-        return FrameResponse();
+        return false;
     if (ptr[len-1] == '\r') {
         ptr[--len] = '\0';
     }
 
-    return FrameResponse::parse(buf);
+    *response = FrameResponse::parse(buf);
+    return true;
 }
