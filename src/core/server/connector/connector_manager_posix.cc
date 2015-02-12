@@ -86,7 +86,9 @@ bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_P
     int numPollfds = 0;
     for (int i = 0; i < NUM_PLAYERS; i++) {
         if (connector(i)->isHuman()) {
-            cfr[i].push_back(connector(i)->read());
+            FrameResponse response;
+            CHECK(connector(i)->receive(&response)) << "Human connector must be always receivable.";
+            cfr[i].push_back(response);
             continue;
         }
 
@@ -98,7 +100,7 @@ bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_P
             continue;
         }
 
-        DCHECK(false) << "connector is not pollable or human. Then what's connector?";
+        CHECK(false) << "connector is not pollable or human. Then what's connector?";
     }
     DCHECK(numPollfds <= NUM_PLAYERS) << numPollfds;
 
@@ -133,12 +135,13 @@ bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_P
 
         for (int i = 0; i < numPollfds; i++) {
             if (pollfds[i].revents & POLLIN) {
-                FrameResponse data = connector(playerIds[i])->read();
-                if (data.received) {
-                    data.usec = getUsecFromStart(tv_start);
-                    cfr[playerIds[i]].push_back(data);
-                    if (data.frameId == frameId)
+                FrameResponse response;
+                if (connector(playerIds[i])->receive(&response)) {
+                    response.usec = getUsecFromStart(tv_start);
+                    cfr[playerIds[i]].push_back(response);
+                    if (response.frameId == frameId) {
                         received_data_for_this_frame[playerIds[i]] = true;
+                    }
                 }
             } else if ((pollfds[i].revents & POLLERR) ||
                        (pollfds[i].revents & POLLHUP) ||

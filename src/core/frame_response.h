@@ -18,9 +18,6 @@ struct FrameResponse {
     bool isValid() const;
     std::string toString() const;
 
-    bool connectionLost = false;
-    bool received = false;
-
     int frameId = -1;
     Decision decision;
     std::string msg;
