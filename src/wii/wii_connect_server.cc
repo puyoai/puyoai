@@ -193,7 +193,7 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
 
     // Sends an initialization message.
     for (int pi = 0; pi < 2; pi++) {
-        if (!connector_->connector(pi)->alive()) {
+        if (connector_->connector(pi)->isClosed()) {
             LOG(INFO) << playerText(pi) << " disconnected";
             fprintf(stderr, "player #%d was disconnected\n", pi);
             return false;
@@ -225,7 +225,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
     }
 
     for (int pi = 0; pi < 2; pi++) {
-        if (!connector_->connector(pi)->alive()) {
+        if (connector_->connector(pi)->isClosed()) {
             LOG(INFO) << playerText(pi) << " disconnected";
             fprintf(stderr, "player #%d was disconnected\n", pi);
             return false;

@@ -215,11 +215,11 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         // It takes up to 1/FPS [s] to finish this section.
         vector<FrameResponse> data[2];
         if (!manager->receive(frameId, data)) {
-            if (manager->connector(0)->alive()) {
-                gameResult = GameResult::P1_WIN_WITH_CONNECTION_ERROR;
+            if (manager->connector(0)->isClosed()) {
+                gameResult = GameResult::P2_WIN_WITH_CONNECTION_ERROR;
                 break;
             } else {
-                gameResult = GameResult::P2_WIN_WITH_CONNECTION_ERROR;
+                gameResult = GameResult::P1_WIN_WITH_CONNECTION_ERROR;
                 break;
             }
         }

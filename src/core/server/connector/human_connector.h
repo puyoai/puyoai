@@ -14,8 +14,8 @@ public:
 
     virtual bool isHuman() const override { return true; }
     // HumanConnector is always alive.
-    virtual bool alive() const override { return true; }
-    virtual void setAlive(bool flag) override;
+    virtual bool isClosed() const override { return false; }
+    virtual void setClosed(bool flag) override;
     virtual bool pollable() const override { return false; }
     virtual int readerFd() const override;
 

@@ -25,9 +25,9 @@ bool HumanConnector::receive(FrameResponse* response)
     return true;
 }
 
-void HumanConnector::setAlive(bool)
+void HumanConnector::setClosed(bool)
 {
-    CHECK(false) << "HumanConnector does not have alive flag.";
+    CHECK(false) << "HumanConnector does not have closed flag.";
 }
 
 int HumanConnector::readerFd() const
