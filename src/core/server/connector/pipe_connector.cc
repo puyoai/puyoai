@@ -54,6 +54,7 @@ bool PipeConnector::receive(FrameResponse* response)
         ptr[--len] = '\0';
     }
 
+    LOG(INFO) << buf;
     *response = FrameResponse::parse(buf);
     return true;
 }

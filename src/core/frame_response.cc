@@ -31,7 +31,6 @@ FrameResponse FrameResponse::parse(const string& str)
     std::string tmp;
 
     FrameResponse data;
-    data.original = std::string(str);
 
     while (getline(iss, tmp, ' ')) {
         if (tmp.substr(0, 3) == "ID=") {
