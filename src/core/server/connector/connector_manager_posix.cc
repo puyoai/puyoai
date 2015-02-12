@@ -44,30 +44,6 @@ static int getRemainingMilliSeconds(const struct timeval& start)
     return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
-static void logFrameResponses(int frameId, const vector<FrameResponse> alldata[2])
-{
-    // Print debug info.
-    LOG(INFO) << "########## FRAME " << frameId << " ##########";
-    for (int pi = 0; pi < 2; pi++) {
-        if (alldata[pi].size() == 0) {
-            LOG(INFO) << playerText(pi) << " [NODATA]";
-        }
-        for (size_t j = 0; j < alldata[pi].size(); j++) {
-            const FrameResponse& data = alldata[pi][j];
-            LOG(INFO) << playerText(pi)
-                      << "[" << setfill(' ') << setw(5) << right << data.usec << "us] "
-                      << "[" << data.original << "]";
-
-            LOG_IF(WARNING, !data.isValid())
-                << playerText(pi)
-                << " Ignoring the invalid command.";
-            LOG_IF(WARNING, data.frameId > frameId)
-                << playerText(pi)
-                << " Received a command for future frame.";
-        }
-    }
-}
-
 ConnectorManagerPosix::ConnectorManagerPosix(unique_ptr<Connector> p1, unique_ptr<Connector> p2) :
     connectors_ { move(p1), move(p2) },
     waitTimeout_(true)
@@ -109,6 +85,7 @@ bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_P
 
     struct timeval tv_start;
     gettimeofday(&tv_start, NULL);
+
     while (true) {
         int timeout_ms = 0;
         if (waitTimeout_) {
@@ -137,7 +114,6 @@ bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_P
             if (pollfds[i].revents & POLLIN) {
                 FrameResponse response;
                 if (connector(playerIds[i])->receive(&response)) {
-                    response.usec = getUsecFromStart(tv_start);
                     cfr[playerIds[i]].push_back(response);
                     if (response.frameId == frameId) {
                         received_data_for_this_frame[playerIds[i]] = true;
@@ -167,7 +143,8 @@ bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_P
         }
     }
 
-    logFrameResponses(frameId, cfr);
+    int usec = getUsecFromStart(tv_start);
+    LOG(INFO) << "Frame " << frameId  << " took " << usec << " [us]";
 
     return !died;
 }

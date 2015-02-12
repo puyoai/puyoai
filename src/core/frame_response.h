@@ -26,8 +26,6 @@ struct FrameResponse {
     KeySet keySet;
 
     std::string mawashiArea;
-    std::string original;
-    int usec = 0;
 };
 
 #endif
