@@ -25,7 +25,7 @@ public:
 
     typedef std::function<void (const RefPlan&)> IterationCallback;
     // if |kumipuyos.size()| < |depth|, we will add extra kumipuyo.
-    static void iterateAvailablePlans(const CoreField&, const KumipuyoSeq&, int depth, IterationCallback);
+    static void iterateAvailablePlans(const CoreField&, const KumipuyoSeq&, int depth, const IterationCallback&);
 
     const CoreField& field() const { return field_; }
 

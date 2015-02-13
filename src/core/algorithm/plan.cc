@@ -73,7 +73,7 @@ static void iterateAvailablePlansInternal(const CoreField& field,
                                           int maxDepth,
                                           int currentNumChigiri,
                                           int totalFrames,
-                                          Plan::IterationCallback callback)
+                                          const Plan::IterationCallback& callback)
 {
     const Kumipuyo* ptr;
     int n;
@@ -149,7 +149,7 @@ static void iterateAvailablePlansInternal(const CoreField& field,
 void Plan::iterateAvailablePlans(const CoreField& field,
                                  const KumipuyoSeq& kumipuyoSeq,
                                  int maxDepth,
-                                 Plan::IterationCallback callback)
+                                 const Plan::IterationCallback& callback)
 {
     std::vector<Decision> decisions;
     decisions.reserve(maxDepth);
