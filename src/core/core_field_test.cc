@@ -266,6 +266,30 @@ TEST(CoreFieldTest, TrackedCoreFieldSimulation)
     EXPECT_EQ(5, trackResult.erasedAt(5, 4));
 }
 
+TEST(CoreFieldTest, simualteWithRensaCoefResult)
+{
+    CoreField f("R...RR"
+                "RGBRYR"
+                "RRGBBY"
+                "GGBYYR");
+
+    RensaCoefResult coefResult;
+    RensaResult rensaResult = f.simulate(&coefResult);
+
+    EXPECT_EQ(5, rensaResult.chains);
+    EXPECT_EQ(4, coefResult.numErased(1));
+    EXPECT_EQ(4, coefResult.numErased(2));
+    EXPECT_EQ(4, coefResult.numErased(3));
+    EXPECT_EQ(4, coefResult.numErased(4));
+    EXPECT_EQ(5, coefResult.numErased(5));
+
+    EXPECT_EQ(1, coefResult.coef(1));
+    EXPECT_EQ(8, coefResult.coef(2));
+    EXPECT_EQ(16, coefResult.coef(3));
+    EXPECT_EQ(32, coefResult.coef(4));
+    EXPECT_EQ(64 + 2, coefResult.coef(5));
+}
+
 TEST(CoreFieldTest, FramesToDropNextWithoutChigiri)
 {
     // TODO(mayah): We have to confirm this.

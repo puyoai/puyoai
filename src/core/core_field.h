@@ -96,8 +96,11 @@ public:
 
     // Simulates rensa.
     // When trackResult is passed, RensaTrackResult will be fulfilled.
-    RensaResult simulate(int initialChain, RensaTrackResult* trackResult = nullptr);
-    RensaResult simulate(RensaTrackResult* trackResult = nullptr) { return simulate(1, trackResult); }
+    RensaResult simulate(int initialChain = 1,
+                         RensaTrackResult* rensaTrackResult = nullptr,
+                         RensaCoefResult* rensaCoefResult = nullptr);
+    RensaResult simulate(RensaCoefResult* rensaCoefResult) { return simulate(1, nullptr, rensaCoefResult); }
+    RensaResult simulate(RensaTrackResult* rensaTrackResult) { return simulate(1, rensaTrackResult, nullptr); }
 
     // Simulates rensa, but the last decision is specified. This will be faster then simulate().
     RensaResult simulateWhenLastDecisionIs(const Decision&);

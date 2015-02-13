@@ -48,6 +48,27 @@ private:
     uint8_t erasedAt_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
 };
 
+// RensaCoefResult represents
+//  - the number of erased puyo in each chain
+//  - the coefficient in each chain.
+class RensaCoefResult {
+public:
+    RensaCoefResult() : numErased_{}, coef_{} {}
+
+    void setCoef(int nth, int numErased, int coef)
+    {
+        numErased_[nth] = numErased;
+        coef_[nth] = coef;
+    }
+
+    int numErased(int nth) const { return numErased_[nth]; }
+    int coef(int nth) const { return coef_[nth]; }
+
+private:
+    int numErased_[20]; // numErased does not contain ojama puyos.
+    int coef_[20];
+};
+
 class IgnitionRensaResult {
 public:
     IgnitionRensaResult() {}

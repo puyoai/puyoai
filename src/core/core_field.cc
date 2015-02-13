@@ -35,6 +35,7 @@ public:
     void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) { }
     void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) { }
     void puyoIsDropped(int /*x*/, int /*fromY*/, int /*toY*/) { }
+    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
 };
 
 class RensaTracker {
@@ -47,21 +48,27 @@ public:
         memcpy(originalY_, g_originalY, sizeof(originalY_));
     }
 
-    void colorPuyoIsVanished(int x, int y, int nthChain) {
-        result_->setErasedAt(x, originalY_[x][y], nthChain);
-    }
-
-    void ojamaPuyoIsVanished(int x, int y, int nthChain) {
-        result_->setErasedAt(x, originalY_[x][y], nthChain);
-    }
-
-    void puyoIsDropped(int x, int fromY, int toY) {
-        originalY_[x][toY] = originalY_[x][fromY];
-    }
+    void colorPuyoIsVanished(int x, int y, int nthChain) { result_->setErasedAt(x, originalY_[x][y], nthChain); }
+    void ojamaPuyoIsVanished(int x, int y, int nthChain) { result_->setErasedAt(x, originalY_[x][y], nthChain); }
+    void puyoIsDropped(int x, int fromY, int toY) { originalY_[x][toY] = originalY_[x][fromY]; }
+    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
 
 private:
     int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
     RensaTrackResult* result_;
+};
+
+class RensaCoefTracker {
+public:
+    explicit RensaCoefTracker(RensaCoefResult* result) : result_(result) {}
+
+    void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
+    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
+    void puyoIsDropped(int /*x*/, int /*fromY*/, int /*toY*/) {}
+    void nthChainDone(int nthChain, int numErasedPuyo, int coef) { result_->setCoef(nthChain, numErasedPuyo, coef); }
+
+private:
+    RensaCoefResult* result_;
 };
 
 CoreField::CoreField()
@@ -479,6 +486,7 @@ int CoreField::vanish(int nthChain, int minHeights[], Tracker* tracker)
     eraseQueuedPuyos(nthChain, eraseQueue, eraseQueueHead, minHeights, tracker);
 
     int rensaBonusCoef = calculateRensaBonusCoef(chainBonus(nthChain), longBonusCoef, colorBonus(numUsedColors));
+    tracker->nthChainDone(nthChain, numErasedPuyos, rensaBonusCoef);
     return 10 * numErasedPuyos * rensaBonusCoef;
 }
 
@@ -604,12 +612,18 @@ bool CoreField::rensaWillOccurWithMinHeights(int minHeights[CoreField::MAP_WIDTH
     return false;
 }
 
-RensaResult CoreField::simulate(int initialChain, RensaTrackResult* rensaTrackResult)
+RensaResult CoreField::simulate(int initialChain, RensaTrackResult* rensaTrackResult, RensaCoefResult* rensaCoefResult)
 {
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
 
-    if (rensaTrackResult) {
+    if (rensaTrackResult && rensaCoefResult) {
+        CHECK(false) << "Not supported yet";
+        return RensaResult();
+    } else if (rensaTrackResult) {
         RensaTracker tracker(rensaTrackResult);
+        return simulateWithTracker(initialChain, minHeights, &tracker);
+    } else if (rensaCoefResult) {
+        RensaCoefTracker tracker(rensaCoefResult);
         return simulateWithTracker(initialChain, minHeights, &tracker);
     } else {
         RensaNonTracker tracker;
