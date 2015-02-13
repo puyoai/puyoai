@@ -160,7 +160,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
     {
         CoreField f(field);
         unique_ptr<TrackedPossibleRensaInfo> track(new TrackedPossibleRensaInfo);
-        track->rensaResult = f.simulateAndTrack(&track->trackResult);
+        track->rensaResult = f.simulate(&track->trackResult);
         if (track->rensaResult.score > 0) {
             lock_guard<mutex> lock(mu_);
             string msg = std::to_string(track->rensaResult.chains) + "連鎖発火: " + std::to_string(track->rensaResult.score) + "点";

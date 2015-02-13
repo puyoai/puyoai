@@ -604,11 +604,17 @@ bool CoreField::rensaWillOccurWithMinHeights(int minHeights[CoreField::MAP_WIDTH
     return false;
 }
 
-RensaResult CoreField::simulate(int initialChain)
+RensaResult CoreField::simulate(int initialChain, RensaTrackResult* rensaTrackResult)
 {
-    RensaNonTracker tracker;
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
-    return simulateWithTracker(initialChain, minHeights, &tracker);
+
+    if (rensaTrackResult) {
+        RensaTracker tracker(rensaTrackResult);
+        return simulateWithTracker(initialChain, minHeights, &tracker);
+    } else {
+        RensaNonTracker tracker;
+        return simulateWithTracker(initialChain, minHeights, &tracker);
+    }
 }
 
 RensaResult CoreField::simulateWhenLastDecisionIs(const Decision& decision)
@@ -620,25 +626,15 @@ RensaResult CoreField::simulateWhenLastDecisionIs(const Decision& decision)
     return simulateWithTracker(1, minHeights, &tracker);
 }
 
-RensaResult CoreField::simulateWithMinHeights(int minHeights[MAP_WIDTH])
+RensaResult CoreField::simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaTrackResult* rensaTrackResult)
 {
-    RensaNonTracker tracker;
-    return simulateWithTracker(1, minHeights, &tracker);
-}
-
-RensaResult CoreField::simulateAndTrack(RensaTrackResult* trackResult, int initialChain)
-{
-    DCHECK(trackResult);
-    RensaTracker tracker(trackResult);
-    int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
-    return simulateWithTracker(initialChain, minHeights, &tracker);
-}
-
-RensaResult CoreField::simulateAndTrackWithMinHeights(RensaTrackResult* trackResult, int minHeights[MAP_WIDTH])
-{
-    DCHECK(trackResult);
-    RensaTracker tracker(trackResult);
-    return simulateWithTracker(1, minHeights, &tracker);
+    if (rensaTrackResult) {
+        RensaTracker tracker(rensaTrackResult);
+        return simulateWithTracker(1, minHeights, &tracker);
+    } else {
+        RensaNonTracker tracker;
+        return simulateWithTracker(1, minHeights, &tracker);
+    }
 }
 
 template<typename Tracker>

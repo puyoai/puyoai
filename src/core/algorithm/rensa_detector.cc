@@ -530,7 +530,7 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
     };
 
     RensaTrackResult rensaTrackResult;
-    RensaResult rensaResult = f->simulateAndTrackWithMinHeights(&rensaTrackResult, minHeights);
+    RensaResult rensaResult = f->simulateWithMinHeights(minHeights, &rensaTrackResult);
     if (rensaResult.chains > 0)
         callback(*f, rensaResult, keyPuyos, firePuyos, rensaTrackResult);
 }
@@ -649,7 +649,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             }
 
             RensaTrackResult combinedTrackResult;
-            RensaResult combinedRensaResult = f.simulateAndTrackWithMinHeights(&combinedTrackResult, minHeights);
+            RensaResult combinedRensaResult = f.simulateWithMinHeights(minHeights, &combinedTrackResult);
 
             if (combinedRensaResult.chains != rensaSequence->totalChains() + rensaResult.chains) {
                 // Rensa looks broken. We don't count such rensa.
