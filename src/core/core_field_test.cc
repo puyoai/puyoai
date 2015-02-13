@@ -256,7 +256,7 @@ TEST(CoreFieldTest, TrackedCoreFieldSimulation)
 
 
     RensaTrackResult trackResult;
-    RensaResult basicRensaResult = f.simulateAndTrack(&trackResult);
+    RensaResult basicRensaResult = f.simulate(&trackResult);
 
     EXPECT_EQ(5, basicRensaResult.chains);
     EXPECT_EQ(1, trackResult.erasedAt(1, 2));

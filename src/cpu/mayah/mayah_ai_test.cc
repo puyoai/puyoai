@@ -163,7 +163,7 @@ TEST(MayahAITest, zenkeshi1)
 
     ThoughtResult thoughtResult = ai->thinkPlan(10, myField, mySeq, me, enemy, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
 
-    EXPECT_EQ(Decision(3, 0), thoughtResult.plan.firstDecision());
+    EXPECT_TRUE(thoughtResult.plan.firstDecision() == Decision(3, 0) || thoughtResult.plan.firstDecision() == Decision(3, 3));
 }
 
 TEST(MayahAITest, DontCrash1)

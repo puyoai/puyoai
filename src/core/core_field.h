@@ -6,13 +6,13 @@
 #include "base/base.h"
 #include "core/puyo_color.h"
 #include "core/plain_field.h"
+#include "core/rensa_result.h"
 
 class Decision;
 class FieldBitField;
 class Kumipuyo;
 struct Position;
 class RensaTrackResult;
-struct RensaResult;
 
 class CoreField : public PlainField {
 public:
@@ -95,20 +95,16 @@ public:
     bool rensaWillOccurWithMinHeights(int minHeights[MAP_WIDTH]) const;
 
     // Simulates rensa.
-    RensaResult simulate(int initialChain = 1);
+    // When trackResult is passed, RensaTrackResult will be fulfilled.
+    RensaResult simulate(int initialChain, RensaTrackResult* trackResult = nullptr);
+    RensaResult simulate(RensaTrackResult* trackResult = nullptr) { return simulate(1, trackResult); }
 
     // Simulates rensa, but the last decision is specified. This will be faster then simulate().
     RensaResult simulateWhenLastDecisionIs(const Decision&);
 
     // Simulates rensa with specifying the original heights.
     // Note that minHeights will be modified after function return.
-    RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH]);
-
-    // Simulates rensa with tracking.
-    RensaResult simulateAndTrack(RensaTrackResult* trackResult, int initialChain = 1);
-
-    // Same as simualteAndTrack, but specifies |minHeights| for performance.
-    RensaResult simulateAndTrackWithMinHeights(RensaTrackResult* trackResult, int minHeights[MAP_WIDTH]);
+    RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaTrackResult* trackResult = nullptr);
 
     // Vanish the connected puyos. Score will be returned.
     int vanishOnly(int currentChain);
