@@ -66,14 +66,15 @@ std::string RefPlan::decisionText() const
     return ss.str();
 }
 
-static void iterateAvailablePlansInternal(const CoreField& field,
-                                          const KumipuyoSeq& kumipuyoSeq,
-                                          std::vector<Decision>& decisions,
-                                          int currentDepth,
-                                          int maxDepth,
-                                          int currentNumChigiri,
-                                          int totalFrames,
-                                          const Plan::IterationCallback& callback)
+template<typename Callback>
+void iterateAvailablePlansInternal(const CoreField& field,
+                                   const KumipuyoSeq& kumipuyoSeq,
+                                   std::vector<Decision>& decisions,
+                                   int currentDepth,
+                                   int maxDepth,
+                                   int currentNumChigiri,
+                                   int totalFrames,
+                                   Callback callback)
 {
     const Kumipuyo* ptr;
     int n;
@@ -113,19 +114,11 @@ static void iterateAvailablePlansInternal(const CoreField& field,
             // Even using simulateWhenLastDecisionIs, it looks checking rensaWillOccurWhenLastDecisionIs
             // is 7~8 % faster.
             if (nextField.rensaWillOccurWhenLastDecisionIs(decision)) {
-                CoreField cf(nextField);
-                RensaResult rensaResult = cf.simulateWhenLastDecisionIs(decision);
-                DCHECK_GT(rensaResult.chains, 0);
-
-                if (cf.color(3, 12) == PuyoColor::EMPTY) {
-                    decisions.push_back(decision);
-                    callback(RefPlan(cf, decisions, rensaResult, currentNumChigiri + isChigiri, totalFrames, dropFrames));
-                    decisions.pop_back();
-                }
-
+                decisions.push_back(decision);
+                callback(nextField, decisions, currentNumChigiri + isChigiri, totalFrames, dropFrames, true);
+                decisions.pop_back();
                 nextField.undoKumipuyo(decision);
             } else {
-                RensaResult rensaResult;
                 if (nextField.color(3, 12) != PuyoColor::EMPTY) {
                     nextField.undoKumipuyo(decision);
                     continue;
@@ -133,7 +126,7 @@ static void iterateAvailablePlansInternal(const CoreField& field,
 
                 decisions.push_back(decision);
                 if (currentDepth + 1 == maxDepth) {
-                    callback(RefPlan(nextField, decisions, rensaResult, currentNumChigiri + isChigiri, totalFrames, dropFrames));
+                    callback(nextField, decisions, currentNumChigiri + isChigiri, totalFrames, dropFrames, false);
                 } else {
                     iterateAvailablePlansInternal(nextField, kumipuyoSeq, decisions, currentDepth + 1, maxDepth,
                                                   currentNumChigiri + isChigiri, totalFrames + dropFrames, callback);
@@ -153,5 +146,25 @@ void Plan::iterateAvailablePlans(const CoreField& field,
 {
     std::vector<Decision> decisions;
     decisions.reserve(maxDepth);
-    iterateAvailablePlansInternal(field, kumipuyoSeq, decisions, 0, maxDepth, 0, 0, callback);
+
+    auto f = [&callback](const CoreField& fieldBeforeRensa, const std::vector<Decision>& decisions,
+                         int numChigiri, int framesToIgnite, int lastDropFrames, bool shouldFire) {
+        DCHECK(!decisions.empty());
+
+        if (shouldFire) {
+            CoreField cf(fieldBeforeRensa);
+            RensaResult rensaResult = cf.simulateWhenLastDecisionIs(decisions.back());
+            DCHECK_GT(rensaResult.chains, 0);
+            if (cf.color(3, 12) == PuyoColor::EMPTY) {
+                callback(RefPlan(cf, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames));
+            }
+        } else {
+            if (fieldBeforeRensa.color(3, 12) == PuyoColor::EMPTY) {
+                RensaResult rensaResult;
+                callback(RefPlan(fieldBeforeRensa, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames));
+            }
+        }
+    };
+
+    iterateAvailablePlansInternal(field, kumipuyoSeq, decisions, 0, maxDepth, 0, 0, f);
 }
