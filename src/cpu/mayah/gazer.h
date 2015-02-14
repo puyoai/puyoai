@@ -1,5 +1,5 @@
-#ifndef GAZER_H_
-#define GAZER_H_
+#ifndef CPU_MAYAH_GAZER_H_
+#define CPU_MAYAH_GAZER_H_
 
 #include <map>
 #include <string>
