@@ -1,6 +1,7 @@
 #include "pattern_field.h"
 
 #include <algorithm>
+#include <sstream>
 
 #include <glog/logging.h>
 
@@ -216,7 +217,7 @@ PatternField PatternField::mirror() const
 
 std::string PatternField::toDebugString() const
 {
-    stringstream ss;
+    std::stringstream ss;
     for (int y = 12; y >= 1; --y) {
         for (int x = 1; x <= 6; ++x) {
             ss << variable(x, y);
