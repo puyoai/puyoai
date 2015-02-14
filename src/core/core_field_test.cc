@@ -234,6 +234,16 @@ TEST(CoreFieldTest, DropPuyoOn)
     EXPECT_EQ(3, f.height(1));
 }
 
+TEST(CoreFieldTest, dropPosition)
+{
+    CoreField f("..O..."
+                "..O..."
+                "..O...");
+
+    EXPECT_EQ(KumipuyoPos(3, 4, 1), f.dropPosition(Decision(3, 1)));
+    EXPECT_EQ(KumipuyoPos(4, 4, 3), f.dropPosition(Decision(4, 3)));
+}
+
 TEST(CoreFieldTest, RemoveTopPuyoFrom)
 {
     CoreField f("456756");

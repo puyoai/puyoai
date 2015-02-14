@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "base/base.h"
+#include "core/kumipuyo_pos.h"
 #include "core/puyo_color.h"
 #include "core/plain_field.h"
 #include "core/rensa_result.h"
@@ -68,6 +69,9 @@ public:
 
     // Remove puyos.
     void undoKumipuyo(const Decision&);
+
+    // Returns the position to drop.
+    KumipuyoPos dropPosition(const Decision&) const;
 
     // Returns #frame to drop the next KumiPuyo with decision. This function does not drop the puyo.
     int framesToDropNext(const Decision&) const;

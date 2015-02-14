@@ -305,6 +305,18 @@ void CoreField::undoKumipuyo(const Decision& decision)
     removeTopPuyoFrom(decision.childX());
 }
 
+KumipuyoPos CoreField::dropPosition(const Decision& decision) const
+{
+    int x1 = decision.axisX();
+    int x2 = decision.childX();
+
+    if (decision.r == 2)
+        return KumipuyoPos(x1, height(x1) + 2, decision.rot());
+
+    int y = std::max(height(x1), height(x2)) + 1;
+    return KumipuyoPos(x1, y, decision.rot());
+}
+
 int CoreField::framesToDropNext(const Decision& decision) const
 {
     // TODO(mayah): This calculation should be more accurate. We need to compare this with
