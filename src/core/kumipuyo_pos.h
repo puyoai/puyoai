@@ -16,6 +16,8 @@ public:
     constexpr int childY() const { return y + (r == 0) - (r == 2); }
     constexpr int rot() const { return r; }
 
+    bool isValid() const { return 1 <= x && x <= 6 && 1 <= y && y <= 13 && 0 <= r && r <= 4; }
+
     std::string toDebugString() const;
 
     friend bool operator==(const KumipuyoPos& lhs, const KumipuyoPos& rhs) { return lhs.x == rhs.x && lhs.y == rhs.y && lhs.r == rhs.r; }
