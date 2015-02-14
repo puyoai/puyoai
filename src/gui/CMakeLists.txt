@@ -1,12 +1,19 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_gui
-            bounding_box.cc bounding_box_drawer.cc
+            SDL_kanji.c
+            SDL_prims.c
+            bounding_box.cc
+            bounding_box_drawer.cc
             commentator_drawer.cc
-            field_drawer.cc fps_drawer.cc
+            decision_drawer.cc
+            field_drawer.cc
+            fps_drawer.cc
             human_connector_key_listener.cc
-            main_window.cc screen.cc
-            util.cc pixel_color.cc SDL_kanji.c SDL_prims.c)
+            main_window.cc
+            screen.cc
+            pixel_color.cc
+            util.cc)
 
 function(puyoai_gui_add_test target)
     add_executable(${target}_test ${target}_test.cc)

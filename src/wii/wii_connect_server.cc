@@ -102,8 +102,6 @@ void WiiConnectServer::runLoop()
             continue;
         }
 
-        // cout << "FRAME: " << frameId << endl;
-
         unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), prevSurface.get(),  analyzerResults_);
         LOG(INFO) << r->toString();
 
@@ -359,6 +357,7 @@ GameState WiiConnectServer::toGameState(int frameId, const AnalyzerResult& analy
             for (int y = 1; y <= 12; ++y) {
                 pgs->field.unsafeSet(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
             }
+            pgs->field.recalcHeightOn(x);
         }
 
         PuyoColor pcs[6] = {
@@ -380,11 +379,17 @@ GameState WiiConnectServer::toGameState(int frameId, const AnalyzerResult& analy
 
         pgs->event = pr->userEvent;
         pgs->dead = false;
-        pgs->playable = false;
+        pgs->playable = pr->playable;
         pgs->score = 0;
         pgs->pendingOjama = 0;
         pgs->fixedOjama = 0;
-        pgs->decision = Decision();
+        if (pr->playable) {
+            pgs->decision = lastDecision_[pi];
+            pgs->kumipuyoPos = pgs->field.dropPosition(lastDecision_[pi]);
+        } else {
+            pgs->decision = Decision();
+            pgs->kumipuyoPos = KumipuyoPos();
+        }
         pgs->message = messages_[pi];
     }
 
@@ -401,7 +406,6 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult,
 
         const Decision& d = responses[i].decision;
 
-        // We don't need ACK/NACK for ID only messages.
         if (!d.isValid() || d == lastDecision_[pi])
             continue;
 

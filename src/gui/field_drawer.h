@@ -18,11 +18,11 @@ struct PlayerGameState;
 class SDLCommentator;
 
 // FieldDrawer draws the current puyo field etc.
-class FieldDrawer : public GameStateObserver, public Drawer {
+class FieldDrawer : public Drawer, public GameStateObserver {
 public:
     // Don't take ownership
     FieldDrawer();
-    virtual ~FieldDrawer();
+    virtual ~FieldDrawer() override;
 
     virtual void onInit() override;
     virtual void onUpdate(const GameState&) override;

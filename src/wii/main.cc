@@ -18,6 +18,7 @@
 #include "capture/movie_source_key_listener.h"
 #include "core/server/commentator.h"
 #include "gui/commentator_drawer.h"
+#include "gui/decision_drawer.h"
 #include "gui/main_window.h"
 #include "wii/serial_key_sender.h"
 #include "wii/stdout_key_sender.h"
@@ -33,6 +34,7 @@ using namespace std;
 
 DEFINE_bool(save_screenshot, false, "save screenshot");
 DEFINE_bool(draw_result, true, "draw analyzer result");
+DEFINE_bool(draw_decision, true, "draw decision");
 DEFINE_string(source, "somagic",
               "set image source. 'somagic' when using somagic video capture."
               " filename if you'd like to use movie.");
@@ -117,9 +119,13 @@ int main(int argc, char* argv[])
     if (FLAGS_draw_result)
         analyzerResultDrawer.reset(new AnalyzerResultDrawer(&server));
 
+    unique_ptr<DecisionDrawer> decisionDrawer;
+    if (FLAGS_draw_decision)
+        decisionDrawer.reset(new DecisionDrawer);
+
     unique_ptr<MovieSourceKeyListener> movieSourceKeyListener;
     // TODO(mayah): BAD! Don't check FLAGS_source here.
-    if (FLAGS_fps == 0 && FLAGS_source != "somagic") {
+    if (FLAGS_fps == 0 && FLAGS_source != "somagic" && FLAGS_source != "syntek") {
         MovieSource* movieSource = static_cast<MovieSource*>(source.get());
         movieSourceKeyListener.reset(new MovieSourceKeyListener(movieSource));
     }
@@ -127,6 +133,7 @@ int main(int argc, char* argv[])
     unique_ptr<MainWindow> mainWindow;
     unique_ptr<Commentator> commentator;
     unique_ptr<CommentatorDrawer> commentatorDrawer;
+
     if (FLAGS_use_commentator) {
         mainWindow.reset(new MainWindow(720 + 2 * 144, 480 + 176, Box(144, 40, 144 + 720, 40 + 480)));
     } else {
@@ -148,6 +155,9 @@ int main(int argc, char* argv[])
         mainWindow->addDrawer(commentatorDrawer.get());
     }
 
+    if (decisionDrawer.get())
+        mainWindow->addDrawer(decisionDrawer.get());
+
 #if USE_AUDIO_COMMENTATOR
     unique_ptr<InternalSpeaker> internalSpeaker;
     unique_ptr<AudioServer> audioServer;
@@ -163,6 +173,8 @@ int main(int argc, char* argv[])
 
     if (commentator.get())
         server.addObserver(commentator.get());
+    if (decisionDrawer.get())
+        server.addObserver(decisionDrawer.get());
 #if USE_AUDIO_COMMENTATOR
     if (audioCommentator.get())
         server.addObserver(audioCommentator.get());
