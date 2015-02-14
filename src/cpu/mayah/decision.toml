@@ -198,6 +198,7 @@ ACAC = [1, 1]
 ACBC = [1, 1]
 AAAC = [5, 1]
 AAAB = [5, 1]
+AAAD = [1, 2]
 
 [[book]]
 field = [
