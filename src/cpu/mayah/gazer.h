@@ -13,8 +13,8 @@ class KumipuyoSeq;
 
 struct EstimatedRensaInfo {
     EstimatedRensaInfo() {}
-    EstimatedRensaInfo(int chains, int score, int framesToIgnite) :
-        chains(chains), score(score), framesToIgnite(framesToIgnite)
+    EstimatedRensaInfo(int chains, int score, int framesToIgnite, const RensaCoefResult& coefResult) :
+        chains(chains), score(score), framesToIgnite(framesToIgnite), coefResult(coefResult)
     {
     }
 
@@ -23,6 +23,7 @@ struct EstimatedRensaInfo {
     int chains;
     int score;
     int framesToIgnite;
+    RensaCoefResult coefResult;
 };
 
 class GazeResult {

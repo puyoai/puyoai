@@ -27,6 +27,10 @@ public:
     // if |kumipuyos.size()| < |depth|, we will add extra kumipuyo.
     static void iterateAvailablePlans(const CoreField&, const KumipuyoSeq&, int depth, const IterationCallback&);
 
+    typedef std::function<void (const CoreField&, const std::vector<Decision>&,
+                                int numChigiri, int framesToIgnite, int lastDropFrames, bool shouldFire)> RensaIterationCallback;
+    static void iterateAvailablePlansWithoutFiring(const CoreField&, const KumipuyoSeq&, int depth, const RensaIterationCallback&);
+
     const CoreField& field() const { return field_; }
 
     const Decision& firstDecision() const { return decisions_[0]; }

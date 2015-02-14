@@ -652,15 +652,22 @@ RensaResult CoreField::simulateWhenLastDecisionIs(const Decision& decision)
     return simulateWithTracker(1, minHeights, &tracker);
 }
 
+RensaResult CoreField::simulateWithMinHeights(int minHeights[MAP_WIDTH])
+{
+    RensaNonTracker tracker;
+    return simulateWithTracker(1, minHeights, &tracker);
+}
+
 RensaResult CoreField::simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaTrackResult* rensaTrackResult)
 {
-    if (rensaTrackResult) {
-        RensaTracker tracker(rensaTrackResult);
-        return simulateWithTracker(1, minHeights, &tracker);
-    } else {
-        RensaNonTracker tracker;
-        return simulateWithTracker(1, minHeights, &tracker);
-    }
+    RensaTracker tracker(rensaTrackResult);
+    return simulateWithTracker(1, minHeights, &tracker);
+}
+
+RensaResult CoreField::simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaCoefResult* rensaCoefResult)
+{
+    RensaCoefTracker tracker(rensaCoefResult);
+    return simulateWithTracker(1, minHeights, &tracker);
 }
 
 template<typename Tracker>
