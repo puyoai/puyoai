@@ -111,7 +111,9 @@ public:
 
     // Simulates rensa with specifying the original heights.
     // Note that minHeights will be modified after function return.
-    RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaTrackResult* trackResult = nullptr);
+    RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH]);
+    RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaTrackResult* trackResult);
+    RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaCoefResult* coefResult);
 
     // Vanish the connected puyos. Score will be returned.
     int vanishOnly(int currentChain);

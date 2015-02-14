@@ -168,3 +168,14 @@ void Plan::iterateAvailablePlans(const CoreField& field,
 
     iterateAvailablePlansInternal(field, kumipuyoSeq, decisions, 0, maxDepth, 0, 0, f);
 }
+
+// static
+void Plan::iterateAvailablePlansWithoutFiring(const CoreField& field,
+                                              const KumipuyoSeq& kumipuyoSeq,
+                                              int maxDepth,
+                                              const Plan::RensaIterationCallback& callback)
+{
+    std::vector<Decision> decisions;
+    decisions.reserve(maxDepth);
+    iterateAvailablePlansInternal(field, kumipuyoSeq, decisions, 0, maxDepth, 0, 0, callback);
+}

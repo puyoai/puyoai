@@ -62,13 +62,25 @@ public:
                                       PossibleRensaCallback);
 
     // Same as iteratePossibleRensas with checking trackResult.
-    typedef std::function<void (const CoreField&, const RensaResult&,
-                                const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+    typedef std::function<void (const CoreField&,
+                                const RensaResult&,
+                                const ColumnPuyoList& keyPuyos,
+                                const ColumnPuyoList& firePuyos,
                                 const RensaTrackResult&)> TrackedPossibleRensaCallback;
     static void iteratePossibleRensasWithTracking(const CoreField&,
                                                   int maxKeyPuyos,
                                                   const RensaDetectorStrategy&,
                                                   TrackedPossibleRensaCallback);
+
+    typedef std::function<void (const CoreField&,
+                                const RensaResult&,
+                                const ColumnPuyoList& keyPuyos,
+                                const ColumnPuyoList& firePuyos,
+                                const RensaCoefResult& coefResult)> CoefPossibleRensaCallback;
+    static void iteratePossibleRensasWithCoefTracking(const CoreField&,
+                                                      int maxKeyPuyos,
+                                                      const RensaDetectorStrategy&,
+                                                      CoefPossibleRensaCallback);
 
     // Without adding key puyos, we find rensas iteratively.
     typedef std::function<void (const CoreField&,
