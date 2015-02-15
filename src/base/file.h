@@ -7,7 +7,10 @@
 namespace file {
 
 // join 2 paths. The result will be cleaned.
+// TODO(mayah): Use variadic template.
 std::string joinPath(const std::string& lhs, const std::string& rhs);
+std::string joinPath(const std::string& p1, const std::string& p2, const std::string& p3);
+std::string joinPath(const std::string& p1, const std::string& p2, const std::string& p3, const std::string& p4);
 
 bool isDirectory(const std::string& path);
 
