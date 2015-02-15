@@ -12,6 +12,14 @@ bool isPrefix(const string& s, const string& prefix)
     return s.substr(0, prefix.size()) == prefix;
 }
 
+bool isSuffix(const string& s, const string& suffix)
+{
+    if (s.size() < suffix.size())
+        return false;
+
+    return s.substr(s.size() - suffix.size()) == suffix;
+}
+
 bool contains(const string& s, const string& t)
 {
     return s.find(t) != string::npos;

@@ -8,6 +8,7 @@ namespace strings {
 
 // When |s|'s prefix is prefix, true will be returned.
 bool isPrefix(const std::string& s, const std::string& prefix);
+bool isSuffix(const std::string& s, const std::string& suffix);
 
 // true if |s| contains |t|.
 bool contains(const std::string& s, const std::string& t);
