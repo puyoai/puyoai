@@ -11,7 +11,7 @@ using namespace std;
 
 namespace file {
 
-std::string joinPath(const std::string& lhs, const std::string& rhs)
+string joinPath(const string& lhs, const string& rhs)
 {
     string s = lhs + "/" + rhs;
     char* x = realpath(s.c_str(), nullptr);
@@ -23,7 +23,17 @@ std::string joinPath(const std::string& lhs, const std::string& rhs)
     return result;
 }
 
-bool isDirectory(const std::string& path)
+string joinPath(const string& p1, const string& p2, const string& p3)
+{
+    return joinPath(joinPath(p1, p2), p3);
+}
+
+string joinPath(const string& p1, const string& p2, const string& p3, const string& p4)
+{
+    return joinPath(joinPath(p1, p2, p3), p4);
+}
+
+bool isDirectory(const string& path)
 {
     struct stat sb;
     if (stat(path.c_str(), &sb) < 0)
