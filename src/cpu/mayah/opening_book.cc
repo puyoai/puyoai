@@ -128,10 +128,8 @@ bool OpeningBook::load(const string& filename)
             names.push_back(s.as<string>());
         }
 
-        auto range = partialFields.equal_range(names[0]);
-        for (auto it = range.first; it != range.second; ++it) {
-            merge(&fields_, it->second, partialFields, names, 1);
-        }
+        OpeningBookField obf(combinedName);
+        merge(&fields_, obf, partialFields, names, 0);
     }
 
     return true;
