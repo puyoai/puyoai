@@ -25,6 +25,14 @@ field = [
 
 [[pattern]]
 field = [
+    "....E.",
+    "ABCEDE",
+    "AABCCE",
+    "BBCDDD",
+]
+
+[[pattern]]
+field = [
     "AF....",
     "FF..EE",
     "ABCEDE",
