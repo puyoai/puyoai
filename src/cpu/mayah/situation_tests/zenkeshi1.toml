@@ -1,0 +1,11 @@
+name = "ZENKESHI"
+
+field = []
+next = "RRRRGG"
+
+enemy_field = []
+enemy_next = "RRRRGG"
+
+answers = [
+    [3, 2]
+]
