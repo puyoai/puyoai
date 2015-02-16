@@ -51,6 +51,7 @@ BCAB = [2, 0]
 field = [
     "AA...."
 ]
+ABAA = [3, 0]
 ABAB = [3, 0]
 ABAC = [3, 0]
 ABBC = [3, 0]
