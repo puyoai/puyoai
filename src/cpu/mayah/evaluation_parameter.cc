@@ -2,11 +2,11 @@
 
 #include <fstream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <vector>
 
 #include <gflags/gflags.h>
-#include <toml/toml.h>
 
 #include "core/core_field.h"
 
@@ -22,13 +22,26 @@ EvaluationParameter::EvaluationParameter() :
 }
 
 EvaluationParameter::EvaluationParameter(const string& filename) :
-    coef_(EvaluationFeature::all().size()),
-    sparseCoef_(EvaluationSparseFeature::all().size())
+    EvaluationParameter::EvaluationParameter()
 {
     CHECK(load(filename));
 }
 
 bool EvaluationParameter::save(const string& filename)
+{
+    toml::Value v = toTomlValue();
+
+    try {
+        ofstream ofs(filename, ios::out | ios::trunc);
+        v.write(&ofs);
+        return true;
+    } catch (std::exception& e) {
+        LOG(WARNING) << "EvaluationParameter::save failed: " << e.what();
+        return false;
+    }
+}
+
+toml::Value EvaluationParameter::toTomlValue() const
 {
     toml::Value v;
 
@@ -45,22 +58,11 @@ bool EvaluationParameter::save(const string& filename)
         v.set(ef.str(), vs);
     }
 
-    try {
-        ofstream ofs(filename, ios::out | ios::trunc);
-        v.write(&ofs);
-        return true;
-    } catch (std::exception& e) {
-        LOG(WARNING) << "EvaluationParameter::save failed: " << e.what();
-        return false;
-    }
+    return v;
 }
 
 bool EvaluationParameter::load(const string& filename)
 {
-    for (const EvaluationSparseFeature& feature : EvaluationSparseFeature::all()) {
-        sparseCoef_[feature.key()].resize(feature.size());
-    }
-
     toml::Value value;
     try {
         ifstream ifs(filename, ios::in);
@@ -75,6 +77,16 @@ bool EvaluationParameter::load(const string& filename)
         return false;
     }
 
+    return loadValue(value);
+}
+
+bool EvaluationParameter::loadValue(const toml::Value& value)
+{
+    set<string> keys;
+    for (const auto& entry : value.as<toml::Table>()) {
+        keys.insert(entry.first);
+    }
+
     for (const EvaluationFeature& ef : EvaluationFeature::all()) {
         const toml::Value* v = value.find(ef.str());
         if (!v)
@@ -86,7 +98,7 @@ bool EvaluationParameter::load(const string& filename)
         }
 
         coef_[ef.key()] = v->asNumber();
-        value.erase(ef.str());
+        keys.erase(ef.str());
     }
 
     for (const EvaluationSparseFeature& ef : EvaluationSparseFeature::all()) {
@@ -117,19 +129,19 @@ bool EvaluationParameter::load(const string& filename)
             (*vs)[i] = ary[i].asNumber();
         }
 
-        value.erase(ef.str());
+        keys.erase(ef.str());
     }
 
-    if (!value.empty()) {
+    if (!keys.empty()) {
         stringstream ss;
         bool first = true;
-        for (const auto& entry : value.as<toml::Table>()) {
+        for (const auto& key : keys) {
             if (first) {
                 first = false;
             } else {
                 ss << ",";
             }
-            ss << entry.first;
+            ss << key;
         }
         CHECK(false) << "Unknown feature key is specified: " << ss.str();
     }

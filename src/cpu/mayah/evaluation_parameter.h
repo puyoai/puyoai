@@ -3,7 +3,9 @@
 
 #include <string>
 #include <vector>
+
 #include <glog/logging.h>
+#include <toml/toml.h>
 
 #include "evaluation_feature.h"
 
@@ -36,6 +38,9 @@ public:
 
     bool save(const std::string& filename);
     bool load(const std::string& filename);
+
+    toml::Value toTomlValue() const;
+    bool loadValue(const toml::Value&);
 
     friend bool operator==(const EvaluationParameter&, const EvaluationParameter&);
 
