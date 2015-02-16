@@ -1,5 +1,6 @@
 #include "mayah_ai.h"
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
 
@@ -30,12 +31,12 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
 {
     setBehaviorRethinkAfterOpponentRensa(true);
 
-    evaluationParameter_.reset(new EvaluationParameter(FLAGS_feature));
+    loadEvaluationParameter();
     CHECK(openingBook_.load(FLAGS_opening_book));
     CHECK(decisionBook_.load(FLAGS_decision_book));
     CHECK(patternBook_.load(FLAGS_pattern_book));
 
-    VLOG(1) << evaluationParameter_->toString();
+    VLOG(1) << evaluationParameter_.toString();
     VLOG(1) << openingBook_.toString();
 
     google::FlushLogFiles(google::INFO);
@@ -45,9 +46,40 @@ MayahAI::~MayahAI()
 {
 }
 
-void MayahAI::reloadParameter()
+bool MayahAI::saveEvaluationParameter() const
 {
-    evaluationParameter_.reset(new EvaluationParameter(FLAGS_feature));
+    toml::Value v = evaluationParameter_.toTomlValue();
+
+    try {
+        ofstream ofs(FLAGS_feature, ios::out | ios::trunc);
+        v.write(&ofs);
+    } catch (std::exception& e) {
+        LOG(WARNING) << "EvaluationParameter::save failed: " << e.what();
+        return false;
+    }
+
+    return true;
+}
+
+bool MayahAI::loadEvaluationParameter()
+{
+    toml::Value value;
+
+    try {
+        ifstream ifs(FLAGS_feature, ios::in);
+        toml::Parser parser(ifs);
+        value = parser.parse();
+        if (!value.valid()) {
+            LOG(ERROR) << parser.errorReason();
+            return false;
+        }
+    } catch (std::exception& e) {
+        LOG(WARNING) << "EvaluationParameter::load failed: " << e.what();
+        return false;
+    }
+
+    evaluationParameter_.loadValue(value);
+    return true;
 }
 
 DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& kumipuyoSeq,
@@ -252,7 +284,7 @@ MidEvalResult MayahAI::midEval(const RefPlan& plan, const CoreField& currentFiel
                                const GazeResult& gazeResult) const
 
 {
-    NormalScoreCollector sc(*evaluationParameter_);
+    NormalScoreCollector sc(evaluationParameter_);
     Evaluator<NormalScoreCollector> evaluator(openingBook_, patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), gazeResult);
 
@@ -267,7 +299,7 @@ EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
                          const MidEvalResult& midEvalResult,
                          const GazeResult& gazeResult) const
 {
-    NormalScoreCollector sc(*evaluationParameter_);
+    NormalScoreCollector sc(evaluationParameter_);
     Evaluator<NormalScoreCollector> evaluator(openingBook_, patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
@@ -282,7 +314,7 @@ CollectedFeature MayahAI::evalWithCollectingFeature(const RefPlan& plan, const C
                                                     const MidEvalResult& midEvalResult,
                                                     const GazeResult& gazeResult) const
 {
-    FeatureScoreCollector sc(*evaluationParameter_);
+    FeatureScoreCollector sc(evaluationParameter_);
     Evaluator<FeatureScoreCollector> evaluator(openingBook_, patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
     return sc.toCollectedFeature();

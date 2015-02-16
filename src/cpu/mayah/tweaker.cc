@@ -1,6 +1,7 @@
 #include "mayah_ai.h"
 
 #include <algorithm>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <future>
@@ -321,7 +322,14 @@ void runAutoTweaker(Executor* executor, const EvaluationParameter& original, int
 
             cout << "Best parameter is updated." << endl;
             cout << currentBestParameter.toString() << endl;
-            currentBestParameter.save("best-parameter.txt");
+
+            toml::Value v = currentBestParameter.toTomlValue();
+            try {
+                ofstream ofs("best-parameter.txt", ios::out | ios::trunc);
+                v.write(&ofs);
+            } catch (std::exception& e) {
+                LOG(WARNING) << "Saving best-parameter.txt failed";
+            }
         }
     }
 }

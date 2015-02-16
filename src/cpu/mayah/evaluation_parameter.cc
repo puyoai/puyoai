@@ -1,6 +1,5 @@
 #include "evaluation_parameter.h"
 
-#include <fstream>
 #include <map>
 #include <set>
 #include <sstream>
@@ -21,24 +20,10 @@ EvaluationParameter::EvaluationParameter() :
     }
 }
 
-EvaluationParameter::EvaluationParameter(const string& filename) :
+EvaluationParameter::EvaluationParameter(const toml::Value& value) :
     EvaluationParameter::EvaluationParameter()
 {
-    CHECK(load(filename));
-}
-
-bool EvaluationParameter::save(const string& filename)
-{
-    toml::Value v = toTomlValue();
-
-    try {
-        ofstream ofs(filename, ios::out | ios::trunc);
-        v.write(&ofs);
-        return true;
-    } catch (std::exception& e) {
-        LOG(WARNING) << "EvaluationParameter::save failed: " << e.what();
-        return false;
-    }
+    CHECK(loadValue(value));
 }
 
 toml::Value EvaluationParameter::toTomlValue() const
@@ -59,25 +44,6 @@ toml::Value EvaluationParameter::toTomlValue() const
     }
 
     return v;
-}
-
-bool EvaluationParameter::load(const string& filename)
-{
-    toml::Value value;
-    try {
-        ifstream ifs(filename, ios::in);
-        toml::Parser parser(ifs);
-        value = parser.parse();
-        if (!value.valid()) {
-            LOG(ERROR) << parser.errorReason();
-            return false;
-        }
-    } catch (std::exception& e) {
-        LOG(WARNING) << "EvaluationParameter::load failed: " << e.what();
-        return false;
-    }
-
-    return loadValue(value);
 }
 
 bool EvaluationParameter::loadValue(const toml::Value& value)
