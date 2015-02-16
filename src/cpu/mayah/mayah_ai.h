@@ -78,10 +78,10 @@ protected:
                                 const PreEvalResult&, const MidEvalResult&, const GazeResult&,
                                 const Plan& plan, double rensaScore, double virutalRensaScore, double thoughtTimeInSeconds) const;
 
-    // For debugging purpose.
-    void reloadParameter();
+    bool saveEvaluationParameter() const;
+    bool loadEvaluationParameter();
 
-    std::unique_ptr<EvaluationParameter> evaluationParameter_;
+    EvaluationParameter evaluationParameter_;
     OpeningBook openingBook_;
     DecisionBook decisionBook_;
     PatternBook patternBook_;
@@ -100,7 +100,8 @@ public:
     virtual ~DebuggableMayahAI() {}
 
     using MayahAI::preEval;
-    using MayahAI::reloadParameter;
+    using MayahAI::saveEvaluationParameter;
+    using MayahAI::loadEvaluationParameter;
     using MayahAI::makeMessageFrom;
 
     using MayahAI::gameWillBegin;
@@ -115,8 +116,8 @@ public:
 
     const Gazer& gazer() const { return gazer_; }
 
-    const EvaluationParameter& evaluationParameter() const { return *evaluationParameter_; }
-    void setEvaluationParameter(const EvaluationParameter& parameter) { *evaluationParameter_ = parameter; }
+    const EvaluationParameter& evaluationParameter() const { return evaluationParameter_; }
+    void setEvaluationParameter(const EvaluationParameter& parameter) { evaluationParameter_ = parameter; }
 };
 
 #endif

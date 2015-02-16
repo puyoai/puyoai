@@ -12,7 +12,7 @@
 class EvaluationParameter {
 public:
     EvaluationParameter();
-    explicit EvaluationParameter(const std::string& filename);
+    explicit EvaluationParameter(const toml::Value&);
 
     double score(EvaluationFeatureKey key, double value) const { return coef_[key] * value; }
     double score(EvaluationSparseFeatureKey key, int idx, int n) const { return sparseCoef_[key][idx] * n; }
@@ -35,9 +35,6 @@ public:
     }
 
     std::string toString() const;
-
-    bool save(const std::string& filename);
-    bool load(const std::string& filename);
 
     toml::Value toTomlValue() const;
     bool loadValue(const toml::Value&);
