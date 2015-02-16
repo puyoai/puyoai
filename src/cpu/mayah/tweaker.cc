@@ -344,7 +344,22 @@ int main(int argc, char* argv[])
 
     unique_ptr<Executor> executor = Executor::makeDefaultExecutor();
 
-    EvaluationParameter parameter(FLAGS_feature);
+    EvaluationParameter parameter;
+    {
+        toml::Value value;
+
+        try {
+            ifstream ifs(FLAGS_feature, ios::in);
+            toml::Parser parser(ifs);
+            value = parser.parse();
+            CHECK(value.valid());
+        } catch (std::exception& e) {
+            CHECK(false) << "EvaluationParameter::load failed: " << e.what();
+        }
+
+        parameter.loadValue(value);
+    }
+
     removeNontokopuyoParameter(&parameter);
 
     if (!FLAGS_seq.empty() || FLAGS_seed >= 0) {
