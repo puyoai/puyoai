@@ -1,0 +1,12 @@
+name = "ZENKESHI-3"
+
+field = [
+    "BBB...",
+    "RRR...",
+]
+next = "BBRRYY"
+
+enemy_field = []
+enemy_next = "BBRRYY"
+
+answers = [[3, 2]]

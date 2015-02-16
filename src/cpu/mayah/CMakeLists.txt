@@ -43,6 +43,7 @@ mayah_add_test(decision_book_test)
 mayah_add_test(evaluator_test)
 mayah_add_test(gazer_test)
 mayah_add_test(mayah_ai_test)
+mayah_add_test(mayah_ai_situation_test)
 mayah_add_test(opening_book_test)
 mayah_add_test(pattern_book_test)
 
