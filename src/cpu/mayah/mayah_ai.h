@@ -81,7 +81,7 @@ protected:
     bool saveEvaluationParameter() const;
     bool loadEvaluationParameter();
 
-    EvaluationParameter evaluationParameter_;
+    EvaluationParameterMap evaluationParameterMap_;
     OpeningBook openingBook_;
     DecisionBook decisionBook_;
     PatternBook patternBook_;
@@ -116,8 +116,9 @@ public:
 
     const Gazer& gazer() const { return gazer_; }
 
-    const EvaluationParameter& evaluationParameter() const { return evaluationParameter_; }
-    void setEvaluationParameter(const EvaluationParameter& parameter) { evaluationParameter_ = parameter; }
+    void removeNontokopuyoParameter() { evaluationParameterMap_.removeNontokopuyoParameter(); }
+    const EvaluationParameterMap& evaluationParameterMap() const { return evaluationParameterMap_; }
+    void setEvaluationParameterMap(const EvaluationParameterMap& parameterMap) { evaluationParameterMap_ = parameterMap; }
 };
 
 #endif

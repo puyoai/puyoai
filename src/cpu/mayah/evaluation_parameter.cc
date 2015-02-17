@@ -1,5 +1,6 @@
 #include "evaluation_parameter.h"
 
+#include <fstream>
 #include <map>
 #include <set>
 #include <sstream>
@@ -137,4 +138,61 @@ string EvaluationParameter::toString() const
 bool operator==(const EvaluationParameter& lhs, const EvaluationParameter& rhs)
 {
     return lhs.coef_ == rhs.coef_ && lhs.sparseCoef_ == rhs.sparseCoef_;
+}
+
+bool EvaluationParameterMap::load(const string& filename)
+{
+    toml::Value value;
+
+    try {
+        ifstream ifs(filename, ios::in);
+        toml::Parser parser(ifs);
+        value = parser.parse();
+        if (!value.valid()) {
+            LOG(ERROR) << parser.errorReason();
+            return false;
+        }
+    } catch (std::exception& e) {
+        LOG(WARNING) << "EvaluationParameter::load failed: " << e.what();
+        return false;
+    }
+
+    param_.loadValue(value);
+    return true;
+}
+
+bool EvaluationParameterMap::save(const string& filename) const
+{
+    toml::Value v = param_.toTomlValue();
+
+    try {
+        ofstream ofs(filename, ios::out | ios::trunc);
+        v.write(&ofs);
+    } catch (std::exception& e) {
+        LOG(WARNING) << "EvaluationParameter::save failed: " << e.what();
+        return false;
+    }
+
+    return true;
+}
+
+string EvaluationParameterMap::toString() const
+{
+    return param_.toString();
+}
+
+void EvaluationParameterMap::removeNontokopuyoParameter()
+{
+    for (const auto& ef : EvaluationFeature::all()) {
+        if (ef.shouldIgnore())
+            param_.setValue(ef.key(), 0);
+    }
+
+    for (const auto& ef : EvaluationSparseFeature::all()) {
+        if (ef.shouldIgnore()) {
+            for (size_t i = 0; i < ef.size(); ++i) {
+                param_.setValue(ef.key(), i, 0);
+            }
+        }
+    }
 }
