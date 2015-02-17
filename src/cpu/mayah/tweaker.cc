@@ -68,10 +68,12 @@ public:
         }
     }
 
-    void tweakParameter(EvaluationParameter* parameter)
+    void tweakParameter(EvaluationParameterMap* paramMap)
     {
         if (tweakableFeatures_.empty() && tweakableSparseFeatures_.empty())
             return;
+
+        EvaluationParameter* parameter = paramMap->mutableDefaultParameter();
 
         size_t N = tweakableFeatures_.size() + tweakableSparseFeatures_.size();
 
@@ -119,22 +121,6 @@ private:
     vector<EvaluationFeature> tweakableFeatures_;
     vector<EvaluationSparseFeature> tweakableSparseFeatures_;
 };
-
-void removeNontokopuyoParameter(EvaluationParameter* parameter)
-{
-    for (const auto& ef : EvaluationFeature::all()) {
-        if (ef.shouldIgnore())
-            parameter->setValue(ef.key(), 0);
-    }
-
-    for (const auto& ef : EvaluationSparseFeature::all()) {
-        if (ef.shouldIgnore()) {
-            for (size_t i = 0; i < ef.size(); ++i) {
-                parameter->setValue(ef.key(), i, 0);
-            }
-        }
-    }
-}
 
 string makePuyopURL(const KumipuyoSeq& seq, const vector<Decision>& decisions)
 {
@@ -191,10 +177,10 @@ string makePuyopURL(const KumipuyoSeq& seq, const vector<Decision>& decisions)
     return ss.str();
 }
 
-void runOnce(const EvaluationParameter& parameter)
+void runOnce(const EvaluationParameterMap& paramMap)
 {
     auto ai = new DebuggableMayahAI;
-    ai->setEvaluationParameter(parameter);
+    ai->setEvaluationParameterMap(paramMap);
 
     Endless endless(std::move(std::unique_ptr<AI>(ai)));
     endless.setVerbose(FLAGS_show_field);
@@ -210,15 +196,15 @@ void runOnce(const EvaluationParameter& parameter)
     cout << endl;
 }
 
-RunResult run(Executor* executor, const EvaluationParameter& parameter)
+RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
 {
     const int N = FLAGS_size;
     vector<promise<Result>> ps(N);
 
     for (int i = 0; i < N; ++i) {
-        auto f = [i, &parameter, &ps]() {
+        auto f = [i, &paramMap, &ps]() {
             auto ai = new DebuggableMayahAI;
-            ai->setEvaluationParameter(parameter);
+            ai->setEvaluationParameterMap(paramMap);
             Endless endless(std::move(std::unique_ptr<AI>(ai)));
             stringstream ss;
             KumipuyoSeq seq = generateRandomSequenceWithSeed(i + FLAGS_offset);
@@ -299,10 +285,10 @@ RunResult run(Executor* executor, const EvaluationParameter& parameter)
             over40000Count, over60000Count, over70000Count, over80000Count, over100000Count };
 }
 
-void runAutoTweaker(Executor* executor, const EvaluationParameter& original, int num)
+void runAutoTweaker(Executor* executor, const EvaluationParameterMap& original, int num)
 {
     cout << "Run with the original parameter." << endl;
-    EvaluationParameter currentBestParameter(original);
+    EvaluationParameterMap currentBestParameter(original);
     RunResult currentBestResult = run(executor, original);
 
     cout << "original score = " << currentBestResult.resultScore() << endl;
@@ -310,7 +296,7 @@ void runAutoTweaker(Executor* executor, const EvaluationParameter& original, int
     ParameterTweaker tweaker;
 
     for (int i = 0; i < num; ++i) {
-        EvaluationParameter parameter(currentBestParameter);
+        EvaluationParameterMap parameter(currentBestParameter);
         tweaker.tweakParameter(&parameter);
 
         RunResult result = run(executor, parameter);
@@ -323,13 +309,7 @@ void runAutoTweaker(Executor* executor, const EvaluationParameter& original, int
             cout << "Best parameter is updated." << endl;
             cout << currentBestParameter.toString() << endl;
 
-            toml::Value v = currentBestParameter.toTomlValue();
-            try {
-                ofstream ofs("best-parameter.txt", ios::out | ios::trunc);
-                v.write(&ofs);
-            } catch (std::exception& e) {
-                LOG(WARNING) << "Saving best-parameter.txt failed";
-            }
+            CHECK(currentBestParameter.save("best-parameter.txt"));
         }
     }
 }
@@ -344,36 +324,24 @@ int main(int argc, char* argv[])
 
     unique_ptr<Executor> executor = Executor::makeDefaultExecutor();
 
-    EvaluationParameter parameter;
-    {
-        toml::Value value;
-
-        try {
-            ifstream ifs(FLAGS_feature, ios::in);
-            toml::Parser parser(ifs);
-            value = parser.parse();
-            CHECK(value.valid());
-        } catch (std::exception& e) {
-            CHECK(false) << "EvaluationParameter::load failed: " << e.what();
-        }
-
-        parameter.loadValue(value);
-    }
-
-    removeNontokopuyoParameter(&parameter);
+    EvaluationParameterMap paramMap;
+    CHECK(paramMap.load(FLAGS_feature));
+    paramMap.removeNontokopuyoParameter();
 
     if (!FLAGS_seq.empty() || FLAGS_seed >= 0) {
-        runOnce(parameter);
+        runOnce(paramMap);
     } else if (FLAGS_once) {
-        run(executor.get(), parameter);
+        run(executor.get(), paramMap);
     } else if (FLAGS_auto_count > 0) {
-        runAutoTweaker(executor.get(), parameter, FLAGS_auto_count);
+        runAutoTweaker(executor.get(), paramMap, FLAGS_auto_count);
     } else {
+        EvaluationParameter* parameter = paramMap.mutableDefaultParameter();
+
         map<double, RunResult> scoreMap;
         for (double x = 0; x <= 1; x += 0.1) {
             cout << "current x = " << x << endl;
-            parameter.setValue(SCORE_LATE, x);
-            scoreMap[x] = run(executor.get(), parameter);
+            parameter->setValue(SCORE_LATE, x);
+            scoreMap[x] = run(executor.get(), paramMap);
         }
         for (const auto& m : scoreMap) {
             cout << setw(5) << m.first << " -> " << m.second.sumScore

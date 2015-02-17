@@ -46,4 +46,21 @@ private:
     std::vector<std::vector<double>> sparseCoef_;
 };
 
+class EvaluationParameterMap {
+public:
+    EvaluationParameter* mutableDefaultParameter() { return &param_; }
+    const EvaluationParameter& defaultParameter() const { return param_; }
+
+    std::string toString() const;
+
+    bool load(const std::string& filename);
+    bool save(const std::string& filename) const;
+
+    // For interactive UI.
+    void removeNontokopuyoParameter();
+
+private:
+    EvaluationParameter param_;
+};
+
 #endif

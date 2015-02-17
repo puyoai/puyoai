@@ -38,22 +38,6 @@ public:
             }
         }
     }
-
-    void removeNontokopuyoParameter()
-    {
-        for (const auto& ef : EvaluationFeature::all()) {
-            if (ef.shouldIgnore())
-                evaluationParameter_.setValue(ef.key(), 0);
-        }
-
-        for (const auto& ef : EvaluationSparseFeature::all()) {
-            if (ef.shouldIgnore()) {
-                for (size_t i = 0; i < ef.size(); ++i) {
-                    evaluationParameter_.setValue(ef.key(), i, 0);
-                }
-            }
-        }
-    }
 };
 
 Problem makeProblem()
