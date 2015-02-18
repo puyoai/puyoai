@@ -274,6 +274,14 @@ BCCD = [4, 1]
 
 [[book]]
 field = [
+    ".C....",
+    ".BB...",
+    "AAA..."
+]
+ABBD = [1, 2]
+
+[[book]]
+field = [
     ".BB...",
     ".AA.AA"
 ]
