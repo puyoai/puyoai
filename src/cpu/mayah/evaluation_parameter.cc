@@ -1,5 +1,6 @@
 #include "evaluation_parameter.h"
 
+#include <algorithm>
 #include <fstream>
 #include <map>
 #include <set>
@@ -12,9 +13,23 @@
 
 using namespace std;
 
+string toString(EvaluationMode mode)
+{
+    switch (mode) {
+    case EvaluationMode::DEFAULT: return "";
+    case EvaluationMode::EARLY: return "early";
+    case EvaluationMode::MIDDLE: return "middle";
+    case EvaluationMode::LATE: return "late";
+    default:
+        CHECK(false) << static_cast<int>(mode);
+    }
+}
+
 EvaluationParameter::EvaluationParameter() :
     coef_(EvaluationFeature::all().size()),
-    sparseCoef_(EvaluationSparseFeature::all().size())
+    sparseCoef_(EvaluationSparseFeature::all().size()),
+    coefChanged_(EvaluationFeature::all().size()),
+    sparseCoefChanged_(EvaluationSparseFeature::all().size())
 {
     for (const EvaluationSparseFeature& feature : EvaluationSparseFeature::all()) {
         sparseCoef_[feature.key()].resize(feature.size());
@@ -27,20 +42,66 @@ EvaluationParameter::EvaluationParameter(const toml::Value& value) :
     CHECK(loadValue(value));
 }
 
+void EvaluationParameter::setValue(EvaluationFeatureKey key, double value)
+{
+    coef_[key] = value;
+    coefChanged_[key] = true;
+}
+
+void EvaluationParameter::addValue(EvaluationFeatureKey key, double value)
+{
+    coef_[key] += value;
+    coefChanged_[key] = true;
+}
+
+void EvaluationParameter::setValues(EvaluationSparseFeatureKey key, const std::vector<double>& values)
+{
+    sparseCoef_[key] = values;
+    sparseCoefChanged_[key] = true;
+}
+
+void EvaluationParameter::setValue(EvaluationSparseFeatureKey key, int index, double value)
+{
+   sparseCoef_[key][index] = value;
+   sparseCoefChanged_[key] = true;
+}
+
+void EvaluationParameter::addValue(EvaluationSparseFeatureKey key, int idx, double value)
+{
+    DCHECK(0 <= idx && static_cast<size_t>(idx) < sparseCoef_[key].size())
+        << "key=" << EvaluationSparseFeature::toFeature(key).str()
+        << " idx=" << idx
+        << " size=" << sparseCoef_[key].size();
+    sparseCoef_[key][idx] += value;
+    sparseCoefChanged_[key] = true;
+}
+
+void EvaluationParameter::setDefault(const EvaluationParameter& param)
+{
+    coef_ = param.coef_;
+    sparseCoef_ = param.sparseCoef_;
+    std::fill(coefChanged_.begin(), coefChanged_.end(), false);
+    std::fill(sparseCoefChanged_.begin(), sparseCoefChanged_.end(), false);
+}
+
 toml::Value EvaluationParameter::toTomlValue() const
 {
     toml::Value v;
 
     for (const auto& ef : EvaluationFeature::all()) {
+        if (!isChanged(ef.key()))
+            continue;
         v.set(ef.str(), getValue(ef.key()));
     }
 
     for (const auto& ef : EvaluationSparseFeature::all()) {
+        if (!isChanged(ef.key()))
+            continue;
+
         toml::Value vs;
         for (size_t i = 0; i < ef.size(); ++i) {
             vs.push(getValue(ef.key(), i));
         }
-
         v.set(ef.str(), vs);
     }
 
@@ -64,7 +125,7 @@ bool EvaluationParameter::loadValue(const toml::Value& value)
             return false;
         }
 
-        coef_[ef.key()] = v->asNumber();
+        setValue(ef.key(), v->asNumber());
         keys.erase(ef.str());
     }
 
@@ -78,11 +139,11 @@ bool EvaluationParameter::loadValue(const toml::Value& value)
             return false;
         }
 
-        vector<double>* vs = &sparseCoef_[ef.key()];
+        vector<double> vs(sparseCoef_[ef.key()].size());
         const toml::Array& ary = v->as<toml::Array>();
 
-        if (ary.size() != vs->size()) {
-            LOG(ERROR) << ef.key() << " should have size " << vs->size()
+        if (ary.size() != vs.size()) {
+            LOG(ERROR) << ef.key() << " should have size " << vs.size()
                        << ", but configuration has size " << ary.size();
             return false;
         }
@@ -93,9 +154,10 @@ bool EvaluationParameter::loadValue(const toml::Value& value)
                 return false;
             }
 
-            (*vs)[i] = ary[i].asNumber();
+            vs[i] = ary[i].asNumber();
         }
 
+        setValues(ef.key(), vs);
         keys.erase(ef.str());
     }
 
@@ -121,10 +183,14 @@ string EvaluationParameter::toString() const
     ostringstream ss;
 
     for (const EvaluationFeature& ef : EvaluationFeature::all()) {
+        if (!isChanged(ef.key()))
+            continue;
         ss << ef.str() << " = " << coef_[ef.key()] << endl;
     }
 
     for (const EvaluationSparseFeature& ef : EvaluationSparseFeature::all()) {
+        if (!isChanged(ef.key()))
+            continue;
         ss << ef.str() << " =";
         for (size_t i = 0; i < ef.size(); ++i) {
             ss << ' ' << sparseCoef_[ef.key()][i];
@@ -133,6 +199,25 @@ string EvaluationParameter::toString() const
     }
 
     return ss.str();
+}
+
+void EvaluationParameter::removeNontokopuyoParameter()
+{
+    for (const auto& ef : EvaluationFeature::all()) {
+        if (ef.shouldIgnore()) {
+            setValue(ef.key(), 0);
+            setChanged(ef.key(), false);
+        }
+    }
+
+    for (const auto& ef : EvaluationSparseFeature::all()) {
+        if (ef.shouldIgnore()) {
+            for (size_t i = 0; i < ef.size(); ++i) {
+                setValue(ef.key(), i, 0);
+                setChanged(ef.key(), false);
+            }
+        }
+    }
 }
 
 bool operator==(const EvaluationParameter& lhs, const EvaluationParameter& rhs)
@@ -157,17 +242,43 @@ bool EvaluationParameterMap::load(const string& filename)
         return false;
     }
 
-    param_.loadValue(value);
+    toml::Value modeValues;
+    if (toml::Value* modeValue = value.find("mode")) {
+        modeValues = std::move(*modeValue);
+        value.erase("mode");
+    }
+
+    mutableDefaultParameter()->loadValue(value);
+    for (auto mode : ALL_EVALUATION_MODES) {
+        if (mode == EvaluationMode::DEFAULT)
+            continue;
+        mutableParameter(mode)->setDefault(defaultParameter());
+        if (toml::Value* v = modeValues.find(::toString(mode))) {
+            mutableParameter(mode)->loadValue(*v);
+            modeValues.erase(::toString(mode));
+        }
+    }
+
+    // check modeValues is empty.
+    CHECK(modeValues.empty()) << modeValues;
+
     return true;
 }
 
 bool EvaluationParameterMap::save(const string& filename) const
 {
-    toml::Value v = param_.toTomlValue();
+    toml::Value value = defaultParameter().toTomlValue();
+    for (auto mode : ALL_EVALUATION_MODES) {
+        if (mode == EvaluationMode::DEFAULT)
+            continue;
+
+        toml::Value* v = value.ensureTable(string("mode.") + ::toString(mode));
+        *v = parameter(mode).toTomlValue();
+    }
 
     try {
         ofstream ofs(filename, ios::out | ios::trunc);
-        v.write(&ofs);
+        value.write(&ofs);
     } catch (std::exception& e) {
         LOG(WARNING) << "EvaluationParameter::save failed: " << e.what();
         return false;
@@ -178,21 +289,23 @@ bool EvaluationParameterMap::save(const string& filename) const
 
 string EvaluationParameterMap::toString() const
 {
-    return param_.toString();
+    toml::Value value = defaultParameter().toTomlValue();
+    for (auto mode : ALL_EVALUATION_MODES) {
+        if (mode == EvaluationMode::DEFAULT)
+            continue;
+
+        toml::Value* v = value.ensureTable(string("mode.") + ::toString(mode));
+        *v = parameter(mode).toTomlValue();
+    }
+
+    stringstream ss;
+    ss << value;
+    return ss.str();
 }
 
 void EvaluationParameterMap::removeNontokopuyoParameter()
 {
-    for (const auto& ef : EvaluationFeature::all()) {
-        if (ef.shouldIgnore())
-            param_.setValue(ef.key(), 0);
-    }
-
-    for (const auto& ef : EvaluationSparseFeature::all()) {
-        if (ef.shouldIgnore()) {
-            for (size_t i = 0; i < ef.size(); ++i) {
-                param_.setValue(ef.key(), i, 0);
-            }
-        }
+    for (auto mode : ALL_EVALUATION_MODES) {
+        mutableParameter(mode)->removeNontokopuyoParameter();
     }
 }

@@ -7,7 +7,23 @@
 #include <glog/logging.h>
 #include <toml/toml.h>
 
+#include "base/base.h"
 #include "evaluation_feature.h"
+
+enum class EvaluationMode {
+    DEFAULT,
+    EARLY,
+    MIDDLE,
+    LATE,
+};
+const EvaluationMode ALL_EVALUATION_MODES[] = {
+    EvaluationMode::DEFAULT,
+    EvaluationMode::EARLY,
+    EvaluationMode::MIDDLE,
+    EvaluationMode::LATE,
+};
+inline int ordinal(EvaluationMode mode) { return static_cast<int>(mode); }
+std::string toString(EvaluationMode);
 
 class EvaluationParameter {
 public:
@@ -18,38 +34,50 @@ public:
     double score(EvaluationSparseFeatureKey key, int idx, int n) const { return sparseCoef_[key][idx] * n; }
 
     double getValue(EvaluationFeatureKey key) const { return coef_[key]; }
-    void setValue(EvaluationFeatureKey key, double value) { coef_[key] = value; }
-    void addValue(EvaluationFeatureKey key, double value) { coef_[key] += value; }
-
     std::vector<double> getValues(EvaluationSparseFeatureKey key) const { return sparseCoef_[key]; }
-    void setValues(EvaluationSparseFeatureKey key, const std::vector<double>& values) { sparseCoef_[key] = values; }
     double getValue(EvaluationSparseFeatureKey key, int index) const { return sparseCoef_[key][index]; }
-    void setValue(EvaluationSparseFeatureKey key, int index, double value) { sparseCoef_[key][index] = value; }
-    void addValue(EvaluationSparseFeatureKey key, int idx, double value)
-    {
-        CHECK(0 <= idx && static_cast<size_t>(idx) < sparseCoef_[key].size())
-            << "key=" << EvaluationSparseFeature::toFeature(key).str()
-            << " idx=" << idx
-            << " size=" << sparseCoef_[key].size();
-        sparseCoef_[key][idx] += value;
-    }
+
+    void setValue(EvaluationFeatureKey key, double value);
+    void addValue(EvaluationFeatureKey key, double value);
+
+    void setValues(EvaluationSparseFeatureKey key, const std::vector<double>& values);
+    void setValue(EvaluationSparseFeatureKey key, int index, double value);
+    void addValue(EvaluationSparseFeatureKey key, int idx, double value);
+
+    bool isChanged(EvaluationFeatureKey key) const { return coefChanged_[key]; }
+    bool isChanged(EvaluationSparseFeatureKey key) const { return sparseCoefChanged_[key]; }
+
+    // Copies the parameter, and changed flag will be cleared.
+    void setDefault(const EvaluationParameter&);
 
     std::string toString() const;
 
     toml::Value toTomlValue() const;
     bool loadValue(const toml::Value&);
 
+    void removeNontokopuyoParameter();
+
     friend bool operator==(const EvaluationParameter&, const EvaluationParameter&);
 
 private:
+    void setChanged(EvaluationFeatureKey key, bool flag) { coefChanged_[key] = flag; }
+    void setChanged(EvaluationSparseFeatureKey key, bool flag) { sparseCoefChanged_[key] = flag; }
+
     std::vector<double> coef_;
     std::vector<std::vector<double>> sparseCoef_;
+    std::vector<bool> coefChanged_;
+    std::vector<bool> sparseCoefChanged_;
 };
 
 class EvaluationParameterMap {
 public:
-    EvaluationParameter* mutableDefaultParameter() { return &param_; }
-    const EvaluationParameter& defaultParameter() const { return param_; }
+    EvaluationParameterMap() : map_(ARRAY_SIZE(ALL_EVALUATION_MODES)) {}
+
+    EvaluationParameter* mutableDefaultParameter() { return mutableParameter(EvaluationMode::DEFAULT); }
+    const EvaluationParameter& defaultParameter() const { return parameter(EvaluationMode::DEFAULT); }
+
+    EvaluationParameter* mutableParameter(EvaluationMode mode) { return &map_[ordinal(mode)]; }
+    const EvaluationParameter& parameter(EvaluationMode mode) const { return map_[ordinal(mode)]; }
 
     std::string toString() const;
 
@@ -60,7 +88,7 @@ public:
     void removeNontokopuyoParameter();
 
 private:
-    EvaluationParameter param_;
+    std::vector<EvaluationParameter> map_;
 };
 
 #endif
