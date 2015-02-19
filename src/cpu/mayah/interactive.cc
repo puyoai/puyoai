@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 
     for (int i = 0; i < 50; ++i) {
         // frameId 1 will be used for initializing now. Let's avoid it.
-        int frameId = 2 + i;
+        const int frameId = 2 + i;
         req.frameId = frameId;
 
         // Call these callback for gazer.
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
                     continue;
                 }
 
-                ThoughtResult myThoughtResult = ai.thinkPlan(frameId, currentField, KumipuyoSeq { seq.get(0), seq.get(1) },
+                ThoughtResult myThoughtResult = ai.thinkPlan(frameId, currentField,  seq.subsequence(0, 2),
                                                              ai.myPlayerState(), ai.enemyPlayerState(),
                                                              MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, &decisions);
 
@@ -205,8 +205,8 @@ int main(int argc, char* argv[])
                     { seqToShow, seqToShow, KumipuyoSeq(), KumipuyoSeq() });
 
                 cout << mycf.toStringComparingWith(aicf) << endl;
-                cout << aiThoughtResult.message << endl;
-                cout << myThoughtResult.message << endl;
+                cout << "MY: " << myThoughtResult.message << endl;
+                cout << "AI: " << aiThoughtResult.message << endl;
             }
         }
 

@@ -330,6 +330,8 @@ std::string MayahAI::makeMessageFrom(EvaluationMode mode,
     stringstream ss;
     if (cf.feature(STRATEGY_ZENKESHI) > 0 || cf.feature(STRATEGY_INITIAL_ZENKESHI) > 0)
         ss << "ZENKESHI / ";
+    if (cf.feature(STRATEGY_KILL) > 0)
+        ss << "KILL / ";
     if (cf.feature(STRATEGY_TAIOU) > 0)
         ss << "TAIOU / ";
     if (cf.feature(STRATEGY_LARGE_ENOUGH) > 0)
