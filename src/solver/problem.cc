@@ -52,6 +52,7 @@ Problem Problem::readProblem(const string& filename)
         string s;
         for (const auto& v : enemyField->as<toml::Array>())
             s += v.as<string>();
+        problem.field[1] = CoreField(s);
     }
     {
         const toml::Value* enemyNext = value.find("enemy_next");
