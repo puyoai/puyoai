@@ -64,6 +64,24 @@ TEST(PatternBookField, complement3)
     EXPECT_FALSE(pbf.complement(cf, &cpl));
 }
 
+TEST(PatternBookField, complement4)
+{
+    PatternBookField pbf(
+        "....De"
+        "ABCDDE"
+        "AABCCD"
+        "BBCEEE");
+
+    CoreField cf(
+        ".....Y"
+        "Y....Y"
+        "Y..RRB"
+        "GG.YYY");
+
+    ColumnPuyoList cpl;
+    EXPECT_TRUE(pbf.complement(cf, &cpl));
+}
+
 TEST(PatternBookField, ignoreable)
 {
     PatternBookField pbf(

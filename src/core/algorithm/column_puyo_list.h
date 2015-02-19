@@ -27,7 +27,7 @@ struct ColumnPuyo {
 
 class ColumnPuyoList {
 public:
-    static const int MAX_SIZE = 8;
+    static const int MAX_SIZE = 16;
 
     ColumnPuyoList() {}
 
