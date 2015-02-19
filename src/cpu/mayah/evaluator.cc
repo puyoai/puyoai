@@ -457,25 +457,14 @@ void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan, cons
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const CoreField& field,
-                                                           const RensaResult& rensaResult,
+void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& rensaResult,
                                                            const PuyoSet& totalPuyoSet)
 {
     sc_->addScore(MAX_CHAINS, rensaResult.chains, 1);
 
     int totalNecessaryPuyos = TsumoPossibility::necessaryPuyos(totalPuyoSet, 0.5);
-
-    int count = field.countPuyos();
-    if (count <= EARLY_THRESHOLD) {
-        sc_->addScore(NECESSARY_PUYOS_EARLY_LINEAR, totalNecessaryPuyos);
-        sc_->addScore(NECESSARY_PUYOS_EARLY_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
-    } else if (count <= MIDDLE_THRESHOLD) {
-        sc_->addScore(NECESSARY_PUYOS_MIDDLE_LINEAR, totalNecessaryPuyos);
-        sc_->addScore(NECESSARY_PUYOS_MIDDLE_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
-    } else {
-        sc_->addScore(NECESSARY_PUYOS_LATE_LINEAR, totalNecessaryPuyos);
-        sc_->addScore(NECESSARY_PUYOS_LATE_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
-    }
+    sc_->addScore(NECESSARY_PUYOS_LINEAR, totalNecessaryPuyos);
+    sc_->addScore(NECESSARY_PUYOS_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
 }
 
 template<typename ScoreCollector>
@@ -610,16 +599,10 @@ void RensaEvaluator<ScoreCollector>::evalRensaConnectionFeature(const CoreField&
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaScore(const CoreField& field, double score, double virtualScore)
+void RensaEvaluator<ScoreCollector>::evalRensaScore(double score, double virtualScore)
 {
-    int count = field.countPuyos();
-    if (count <= MIDDLE_THRESHOLD) {
-        sc_->addScore(SCORE_EARLY_OR_MIDDLE, score);
-        sc_->addScore(VIRTUAL_SCORE_EARLY_OR_MIDDLE, virtualScore);
-    } else {
-        sc_->addScore(SCORE_LATE, score);
-        sc_->addScore(VIRTUAL_SCORE_LATE, virtualScore);
-    }
+    sc_->addScore(SCORE, score);
+    sc_->addScore(VIRTUAL_SCORE, virtualScore);
 }
 
 template<typename ScoreCollector>
@@ -746,7 +729,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         necessaryPuyos.add(keyPuyos);
         necessaryPuyos.add(firePuyos);
 
-        rensaEvaluator.evalRensaChainFeature(fieldBeforeRensa, rensaResult, necessaryPuyos);
+        rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyos);
         rensaEvaluator.collectScoreForRensaGarbage(fieldAfterRensa);
         if (USE_HAND_WIDTH_FEATURE)
             rensaEvaluator.evalRensaHandWidthFeature(fieldBeforeRensa, trackResult);
@@ -771,7 +754,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         // possibility = std::min(1.0, possibility + 0.15);
 
         const double virtualRensaScore = rensaScore * possibility;
-        rensaEvaluator.evalRensaScore(fieldBeforeRensa, rensaScore, virtualRensaScore);
+        rensaEvaluator.evalRensaScore(rensaScore, virtualRensaScore);
 
         if (maxVirtualRensaResultScore < virtualRensaScore) {
             maxVirtualRensaResultScore = virtualRensaScore;
@@ -816,12 +799,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     }
 
     if (hasSideChain) {
-        int count = plan.field().countPuyos();
-        if (count <= EARLY_THRESHOLD) {
-            sc_->addScore(HOLDING_SIDE_CHAIN_EARLY, 1.0);
-        } else {
-            sc_->addScore(HOLDING_SIDE_CHAIN_MIDDLE_OR_LATE, 1.0);
-        }
+        sc_->addScore(HOLDING_SIDE_CHAIN, 1.0);
     }
 
     if (maxRensaScoreCollector.get()) {
