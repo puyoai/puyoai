@@ -526,23 +526,16 @@ field = [
     "..CDDX"
 ]
 
+# ----------------------------------------------------------------------
+
 [[book]]
 field = [
+    "..A...",
     "BBBA..",
     "AAAC.."
 ]
 name = "NEWGTR-BASE"
 score = 10.300000
-
-[[book]]
-field = [
-    "......",
-    "..A...",
-    "BBBA..",
-    "AAAC.."
-]
-name = "NEWGTR"
-score = 10.200000
 
 [[book]]
 field = [
@@ -1034,6 +1027,8 @@ field = [
 ]
 
 [[book]]
+name = "LTR-HEAD"
+score = 8.600000
 field = [
     "b.....",
     "B.....",
@@ -1045,10 +1040,10 @@ field = [
     "DBBA..",
     "AAAC.."
 ]
-name = "LTR-HEAD"
-score = 9.600000
 
 [[book]]
+name = "LTR-HEAD"
+score = 8.600000
 field = [
     "b.....",
     "Bb....",
@@ -1060,8 +1055,46 @@ field = [
     "DBBA..",
     "AAAC.."
 ]
-name = "LTR-HEAD"
-score = 9.600000
+
+# ----------------------------------------------------------------------
+# LTR2
+
+[[book]]
+name = "LTR2-HEAD"
+score = 8.000000
+field = [
+    "D.....",
+    "DBAE..",
+    "DBBA..",
+    "AAAC.."
+]
+
+[[book]]
+name = "LTR2-HEAD"
+score = 8.000000
+field = [
+    "B.....",
+    "D.....",
+    "D.....",
+    "Ff....",
+    "Ff....",
+    "DBAE..",
+    "DBBA..",
+    "AAAC.."
+]
+
+[[book]]
+name = "LTR2-HEAD"
+score = 8.000000
+field = [
+    "B.....",
+    "D.....",
+    "FF....",
+    "FD....",
+    "DBAE..",
+    "DBBA..",
+    "AAAC.."
+]
 
 # ----------------------------------------------------------------------
 
@@ -1372,38 +1405,42 @@ field = [
 
 [[combine]]
 name = "GTR"
-combine = ["GTR-BASE", "GTR-KEY", "GTR-HEAD", "GTR-TAIL"]
+combine = ["GTR-KEY", "GTR-BASE", "GTR-HEAD", "GTR-TAIL"]
 
 [[combine]]
 name = "GTR"
-combine = ["GTR-BASE", "GTR-KEY", "GTR2-HEAD", "GTR2-TAIL"]
+combine = ["GTR-KEY", "GTR-BASE", "GTR2-HEAD", "GTR2-TAIL"]
 
 [[combine]]
 name = "NEWGTR"
-combine = ["NEWGTR", "NEWGTR-BASE", "NEWGTR-HEAD", "NEWGTR-TAIL"]
+combine = ["NEWGTR-BASE", "NEWGTR-HEAD", "NEWGTR-TAIL"]
 
 [[combine]]
 name = "NEWGTR"
-combine = ["NEWGTR", "NEWGTR-BASE", "NEWGTR2-HEAD", "NEWGTR2-TAIL"]
+combine = ["NEWGTR-BASE", "NEWGTR2-HEAD", "NEWGTR2-TAIL"]
 
 [[combine]]
 name = "LR"
-combine = ["LR-HEAD", "LR-KEY", "GTR-TAIL"]
+combine = ["LR-KEY", "LR-HEAD", "GTR-TAIL"]
 
 [[combine]]
 name = "LTR"
-combine = ["LTR-HEAD", "LTR-KEY", "NEWGTR-TAIL"]
+combine = ["LTR-KEY", "LTR-HEAD", "NEWGTR-TAIL"]
 
 [[combine]]
-name = "FUKIGENGTR"
+name = "LTR"
+combine = ["LTR-KEY", "LTR2-HEAD", "NEWGTR2-TAIL"]
+
+[[combine]]
+name = "FUKIGEN-GTR"
 combine = ["FUKIGENGTR-HEAD", "NEWGTR-TAIL"]
 
 [[combine]]
-name = "FUKIGENGTR2"
+name = "FUKIGEN-GTR2"
 combine = ["FUKIGENGTR2-HEAD", "NEWGTR2-TAIL"]
 
 [[combine]]
-name = "ZABUTONL"
+name = "ZABUTON-L"
 combine = ["ZABUTONL-HEAD","ZABUTONL-TAIL"]
 
 [[combine]]
