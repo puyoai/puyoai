@@ -1,0 +1,19 @@
+name = "fire because large enough"
+
+field = [
+      ".....B",
+      "....BB",
+      "...BRR",
+      "RYGRBR",
+      "RRYGGG",
+      "YYGBBB"
+]
+next = "RYGGRR"
+
+enemy_field = []
+enemy_next = "RRYYGG"
+
+answers = [
+    [1, 0],
+    [1, 1],
+]

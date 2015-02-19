@@ -375,6 +375,24 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         return false;
     }
 
+    int rensaEndingFrameId = currentFrameId + plan.totalFrames();
+    int estimatedMaxScore = gazeResult.estimateMaxScore(rensaEndingFrameId, enemy);
+
+    {
+        int h = 12 - enemy.field.height(3);
+        if (plan.score() - estimatedMaxScore >= scoreForOjama(6 * h)) {
+            sc_->addScore(STRATEGY_KILL, 1);
+            sc_->addScore(STRATEGY_KILL_FRAME, plan.totalFrames());
+            return true;
+        }
+    }
+
+    // --- If the rensa is large enough, fire it.
+    if (plan.score() >= estimatedMaxScore + scoreForOjama(60) && !enemy.isRensaOngoing) {
+        sc_->addScore(STRATEGY_LARGE_ENOUGH, 1);
+        return true;
+    }
+
     if (enemy.isRensaOngoing && me.fixedOjama + me.pendingOjama >= 6) {
         if (plan.score() >= scoreForOjama(std::max(0, me.fixedOjama + me.pendingOjama - 3))) {
             sc_->addScore(STRATEGY_TAIOU, 1.0);
@@ -405,15 +423,6 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
-    }
-
-    int rensaEndingFrameId = currentFrameId + plan.totalFrames();
-    int estimatedMaxScore = gazeResult.estimateMaxScore(rensaEndingFrameId, enemy);
-
-    // --- If the rensa is large enough, fire it.
-    if (plan.score() >= estimatedMaxScore + scoreForOjama(60)) {
-        sc_->addScore(STRATEGY_LARGE_ENOUGH, 1);
-        return true;
     }
 
     sc_->addScore(STRATEGY_SCORE, plan.score());
