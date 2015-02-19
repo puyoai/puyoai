@@ -340,7 +340,7 @@ int main(int argc, char* argv[])
         map<double, RunResult> scoreMap;
         for (double x = 0; x <= 1; x += 0.1) {
             cout << "current x = " << x << endl;
-            parameter->setValue(SCORE_LATE, x);
+            parameter->setValue(SCORE, x);
             scoreMap[x] = run(executor.get(), paramMap);
         }
         for (const auto& m : scoreMap) {
