@@ -1387,23 +1387,23 @@ name = "NEWGTR"
 combine = ["NEWGTR", "NEWGTR-BASE", "NEWGTR2-HEAD", "NEWGTR2-TAIL"]
 
 [[combine]]
-name = "LR-HEAD"
+name = "LR"
 combine = ["LR-HEAD", "LR-KEY", "GTR-TAIL"]
 
 [[combine]]
-name = "LTR-HEAD"
+name = "LTR"
 combine = ["LTR-HEAD", "LTR-KEY", "NEWGTR-TAIL"]
 
 [[combine]]
-name = "FUKIGENGTR-HEAD"
+name = "FUKIGENGTR"
 combine = ["FUKIGENGTR-HEAD", "NEWGTR-TAIL"]
 
 [[combine]]
-name = "FUKIGENGTR2-HEAD"
+name = "FUKIGENGTR2"
 combine = ["FUKIGENGTR2-HEAD", "NEWGTR2-TAIL"]
 
 [[combine]]
-name = "ZABUTONL-HEAD"
+name = "ZABUTONL"
 combine = ["ZABUTONL-HEAD","ZABUTONL-TAIL"]
 
 [[combine]]
