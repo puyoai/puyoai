@@ -37,11 +37,11 @@ TEST(MayahAITest, parallel)
     ThoughtResult parallelThoughtResult = parallelAi->thinkPlan(2, f, seq, PlayerState(), PlayerState(), 2, 3);
 
     EXPECT_EQ(thoughtResult.plan, parallelThoughtResult.plan);
-    EXPECT_EQ(thoughtResult.isRensaPlan, parallelThoughtResult.isRensaPlan);
     EXPECT_EQ(thoughtResult.rensaScore, parallelThoughtResult.rensaScore);
     EXPECT_EQ(thoughtResult.virtualRensaScore, parallelThoughtResult.virtualRensaScore);
 }
 
+// TODO(mayah): Move this test to situation_test.
 TEST(MayahAITest, fromReal1)
 {
     CoreField myField(

@@ -22,15 +22,14 @@ class KumipuyoSeq;
 
 struct ThoughtResult {
     ThoughtResult() {}
-    ThoughtResult(const Plan& plan, bool isRensaPlan, double rensaScore, double virtualRensaScore,
+    ThoughtResult(const Plan& plan, double rensaScore, double virtualRensaScore,
                   const MidEvalResult& midEvalResult, const std::string& message) :
-        plan(plan), isRensaPlan(isRensaPlan), rensaScore(rensaScore), virtualRensaScore(virtualRensaScore),
+        plan(plan), rensaScore(rensaScore), virtualRensaScore(virtualRensaScore),
         midEvalResult(midEvalResult), message(message)
     {
     }
 
     Plan plan;
-    bool isRensaPlan;
     double rensaScore;
     double virtualRensaScore;
     MidEvalResult midEvalResult;
