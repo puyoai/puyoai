@@ -116,7 +116,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
             vector<Decision> decisions { d };
 
             ThoughtResult tr(Plan(cf, decisions, RensaResult(), 0, 0, 0),
-                             false, 0.0, 0.0, MidEvalResult(), "BY DECISION BOOK");
+                             0.0, 0.0, MidEvalResult(), "BY DECISION BOOK");
             return tr;
         }
     }
