@@ -235,14 +235,16 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
         std::string message = makeMessageFrom(mode, frameId, field, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               preEvalResult, bestRensaMidEvalResult, gazeResult,
-                                              bestRensaPlan, bestRensaScore, bestVirtualRensaScore, endTime - beginTime);
-        return ThoughtResult(bestRensaPlan, true, bestRensaScore, bestVirtualRensaScore, bestRensaMidEvalResult, message);
+                                              bestRensaPlan, bestRensaScore, bestVirtualRensaScore,
+                                              true, endTime - beginTime);
+        return ThoughtResult(bestRensaPlan, bestRensaScore, bestVirtualRensaScore, bestRensaMidEvalResult, message);
     } else {
         std::string message = makeMessageFrom(mode, frameId, field, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               preEvalResult, bestMidEvalResult, gazeResult,
-                                              bestPlan, bestRensaScore, bestVirtualRensaScore, endTime - beginTime);
-        return ThoughtResult(bestPlan, false, bestRensaScore, bestVirtualRensaScore, bestMidEvalResult, message);
+                                              bestPlan, bestRensaScore, bestVirtualRensaScore,
+                                              false, endTime - beginTime);
+        return ThoughtResult(bestPlan, bestRensaScore, bestVirtualRensaScore, bestMidEvalResult, message);
     }
 }
 
@@ -312,8 +314,10 @@ CollectedFeature MayahAI::evalWithCollectingFeature(EvaluationMode mode,
 std::string MayahAI::makeMessageFrom(EvaluationMode mode,
                                      int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
                                      const PlayerState& me, const PlayerState& enemy,
-                                     const PreEvalResult& preEvalResult, const MidEvalResult& midEvalResult, const GazeResult& gazeResult,
-                                     const Plan& plan, double rensaScore, double virtualRensaScore, double thoughtTimeInSeconds) const
+                                     const PreEvalResult& preEvalResult, const MidEvalResult& midEvalResult,
+                                     const GazeResult& gazeResult,
+                                     const Plan& plan, double rensaScore, double virtualRensaScore,
+                                     bool saturated, double thoughtTimeInSeconds) const
 {
     UNUSED_VARIABLE(kumipuyoSeq);
 
@@ -334,6 +338,8 @@ std::string MayahAI::makeMessageFrom(EvaluationMode mode,
         ss << "TSUBUSHI / ";
     if (cf.feature(STRATEGY_SAISOKU) > 0)
         ss << "SAISOKU / ";
+    else if (saturated)
+        ss << "SATURATED / ";
     else if (cf.feature(STRATEGY_SAKIUCHI) > 0)
         ss << "SAKIUCHI / ";
     if (cf.feature(STRATEGY_ZENKESHI_CONSUME) > 0)

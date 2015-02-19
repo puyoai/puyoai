@@ -79,7 +79,9 @@ protected:
                                 int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration,
                                 const PlayerState& me, const PlayerState& enemy,
                                 const PreEvalResult&, const MidEvalResult&, const GazeResult&,
-                                const Plan& plan, double rensaScore, double virutalRensaScore, double thoughtTimeInSeconds) const;
+                                const Plan& plan, double rensaScore, double virutalRensaScore,
+                                bool saturated,
+                                double thoughtTimeInSeconds) const;
 
     bool saveEvaluationParameter() const;
     bool loadEvaluationParameter();
