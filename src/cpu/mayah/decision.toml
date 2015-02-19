@@ -162,6 +162,7 @@ ACAA = [3, 2]
 ACAB = [3, 2]
 ACAC = [3, 2]
 ACAD = [3, 2]
+ACBD = [3, 2]
 
 [[book]]
 field = [
@@ -417,6 +418,14 @@ field = [
     "ABB.AA"
 ]
 ABBD = [1, 0]
+
+[[book]]
+field = [
+    "......",
+    "..C...",
+    "ABB.BB"
+]
+ACBD = [1, 1]
 
 [[book]]
 field = [
