@@ -192,7 +192,11 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 
                 bool ok = true;
                 while (true) {
-                    f.dropPuyoOn(x + d, c, true);
+                    if (!f.dropPuyoOn(x + d, c, true)) {
+                        ok = false;
+                        break;
+                    }
+
                     ++necessaryPuyos;
 
                     if (maxComplementPuyos < necessaryPuyos) {
@@ -203,7 +207,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                         ok = false;
                         break;
                     }
-                    if (f.countConnectedPuyosMax4(x, y) >= 4)
+                    if (f.countConnectedPuyosMax4(x + d, f.height(x + d)) >= 4)
                         break;
                 }
 
