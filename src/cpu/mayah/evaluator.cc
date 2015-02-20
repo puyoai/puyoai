@@ -378,7 +378,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
     int estimatedMaxScore = gazeResult.estimateMaxScore(rensaEndingFrameId, enemy);
 
-    {
+    if (!enemy.isRensaOngoing && plan.chains() <= 4) {
         int h = 12 - enemy.field.height(3);
         if (plan.score() - estimatedMaxScore >= scoreForOjama(6 * h)) {
             sc_->addScore(STRATEGY_KILL, 1);
