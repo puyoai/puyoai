@@ -309,7 +309,7 @@ TEST_F(EvaluatorTest, sideChain)
         "RGYGB.");
 
     CollectedFeature cf = eval(f, 1);
-    EXPECT_EQ(1.0, cf.feature(HOLDING_SIDE_CHAIN));
+    EXPECT_EQ(1.0, cf.feature(HOLDING_SIDE_CHAIN_MEDIUM));
 }
 
 TEST_F(EvaluatorTest, DontCrash1)
