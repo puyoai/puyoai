@@ -1321,6 +1321,14 @@ field = [
     "......"
 ]
 
+[[book]]
+name = "NAMEKUJI-PRECOND"
+field = [
+    ".AA...",
+    "BB...."
+]
+score = 1.0
+precondition = [[1, 1], [2, 1], [2, 2], [3, 2]]
 
 [[book]]
 name = "NAMEKUJI"
@@ -1474,7 +1482,7 @@ combine = ["LLR"]
 
 [[combine]]
 name = "NAMEKUJI"
-combine = ["NAMEKUJI", "NAMEKUJI-KEY", "GTR-TAIL"]
+combine = ["NAMEKUJI-PRECOND", "NAMEKUJI", "NAMEKUJI-KEY", "GTR-TAIL"]
 
 [[combine]]
 name = "YAYOI"
