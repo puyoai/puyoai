@@ -102,9 +102,11 @@ public:
     // When trackResult is passed, RensaTrackResult will be fulfilled.
     RensaResult simulate(int initialChain = 1,
                          RensaTrackResult* rensaTrackResult = nullptr,
-                         RensaCoefResult* rensaCoefResult = nullptr);
-    RensaResult simulate(RensaCoefResult* rensaCoefResult) { return simulate(1, nullptr, rensaCoefResult); }
-    RensaResult simulate(RensaTrackResult* rensaTrackResult) { return simulate(1, rensaTrackResult, nullptr); }
+                         RensaCoefResult* rensaCoefResult = nullptr,
+						 RensaVanishingPositionResult* rensaVanishingPositionResult = nullptr);
+    RensaResult simulate(RensaCoefResult* rensaCoefResult) { return simulate(1, nullptr, rensaCoefResult, nullptr); }
+    RensaResult simulate(RensaTrackResult* rensaTrackResult) { return simulate(1, rensaTrackResult, nullptr, nullptr); }
+    RensaResult simulate(RensaVanishingPositionResult* rensaVanishingPositionResult) { return simulate(1, nullptr, nullptr, rensaVanishingPositionResult); }
 
     // Simulates rensa, but the last decision is specified. This will be faster then simulate().
     RensaResult simulateWhenLastDecisionIs(const Decision&);
@@ -114,6 +116,7 @@ public:
     RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH]);
     RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaTrackResult* trackResult);
     RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaCoefResult* coefResult);
+    RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaVanishingPositionResult* vanishingPositionResult);
 
     // Vanish the connected puyos. Score will be returned.
     int vanishOnly(int currentChain);

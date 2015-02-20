@@ -82,6 +82,16 @@ public:
                                                       const RensaDetectorStrategy&,
                                                       CoefPossibleRensaCallback);
 
+    typedef std::function<void (const CoreField&,
+                                const RensaResult&,
+                                const ColumnPuyoList& keyPuyos,
+                                const ColumnPuyoList& firePuyos,
+                                const RensaVanishingPositionResult& coefResult)> VanishingPositionPossibleRensaCallback;
+    static void iteratePossibleRensasWithVanishingPositionTracking(const CoreField&,
+                                                                   int maxKeyPuyos,
+                                                                   const RensaDetectorStrategy&,
+                                                                   VanishingPositionPossibleRensaCallback);
+
     // Without adding key puyos, we find rensas iteratively.
     typedef std::function<void (const CoreField&,
                                 const RensaResult&,
