@@ -1141,6 +1141,19 @@ score = 9.8
 # ----------------------------------------------------------------------
 
 [[book]]
+name = "ZABUTONL-KEY"
+score = 2.0
+field = [
+    ".B....",
+    "BAC...",
+    "BBE...",
+    "AAA..."
+]
+# When B is placed on (2, 4), the score will be decreased.
+
+[[book]]
+name = "ZABUTONL-HEAD"
+score = 9.2
 field = [
     "b.....",
     "Bb....",
@@ -1149,8 +1162,6 @@ field = [
     "BBE...",
     "AAA..."
 ]
-name = "ZABUTONL-HEAD"
-score = 9.2
 
 [[book]]
 field = [
@@ -1451,7 +1462,7 @@ combine = ["FUKIGENGTR2-HEAD", "NEWGTR2-TAIL"]
 
 [[combine]]
 name = "ZABUTON-L"
-combine = ["ZABUTONL-HEAD","ZABUTONL-TAIL"]
+combine = ["ZABUTONL-KEY", "ZABUTONL-HEAD","ZABUTONL-TAIL"]
 
 [[combine]]
 name = "DAAZUMI"
