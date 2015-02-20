@@ -29,6 +29,7 @@ class AI : public ::AI {
 	  GRACE_VALLEY_4_5,
 	  GRACE_VALLEY_5_6,
 	  GRACE_VALLEY_4_3_GT2,
+	  TURNDOWN,
 	  GRADE_NUM,
   };
 

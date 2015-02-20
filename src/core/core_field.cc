@@ -1,5 +1,6 @@
 #include "core/core_field.h"
 
+#include <array>
 #include <iomanip>
 #include <sstream>
 
@@ -69,6 +70,39 @@ public:
 
 private:
     RensaCoefResult* result_;
+};
+
+class RensaVanishingPositionTracker {
+public:
+	RensaVanishingPositionTracker(RensaVanishingPositionResult* result) : result_(result) {
+	  resetY();
+	}
+
+    void colorPuyoIsVanished(int x, int y, int nthChain) {
+        if (yAtPrevRensa_[x][y] == 0) {
+            result_->setBasePuyo(x, y, nthChain);
+        } else {
+            result_->setFallingPuyo(x, yAtPrevRensa_[x][y], y, nthChain);
+        }
+    }
+
+    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
+
+    void puyoIsDropped(int x, int fromY, int toY) {;
+        yAtPrevRensa_[x][toY] = fromY;
+    }
+
+    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {
+        resetY();
+    }
+
+private:
+    RensaVanishingPositionResult* result_;
+    std::array<std::array<int, FieldConstant::MAP_HEIGHT>, FieldConstant::MAP_WIDTH> yAtPrevRensa_;
+    void resetY() {
+        constexpr std::array<int, FieldConstant::MAP_HEIGHT> INVALID_COLUMN = {{}};
+        yAtPrevRensa_.fill(INVALID_COLUMN);
+    }
 };
 
 CoreField::CoreField()
@@ -624,11 +658,17 @@ bool CoreField::rensaWillOccurWithMinHeights(int minHeights[CoreField::MAP_WIDTH
     return false;
 }
 
-RensaResult CoreField::simulate(int initialChain, RensaTrackResult* rensaTrackResult, RensaCoefResult* rensaCoefResult)
+RensaResult CoreField::simulate(
+		int initialChain,
+		RensaTrackResult* rensaTrackResult,
+		RensaCoefResult* rensaCoefResult,
+		RensaVanishingPositionResult* rensaVanishingPositionResult)
 {
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
 
-    if (rensaTrackResult && rensaCoefResult) {
+    if ((rensaTrackResult && rensaCoefResult)
+         || (rensaCoefResult && rensaVanishingPositionResult)
+         || (rensaVanishingPositionResult && rensaTrackResult)) {
         CHECK(false) << "Not supported yet";
         return RensaResult();
     } else if (rensaTrackResult) {
@@ -636,6 +676,9 @@ RensaResult CoreField::simulate(int initialChain, RensaTrackResult* rensaTrackRe
         return simulateWithTracker(initialChain, minHeights, &tracker);
     } else if (rensaCoefResult) {
         RensaCoefTracker tracker(rensaCoefResult);
+        return simulateWithTracker(initialChain, minHeights, &tracker);
+    } else if (rensaVanishingPositionResult){
+        RensaVanishingPositionTracker tracker(rensaVanishingPositionResult);
         return simulateWithTracker(initialChain, minHeights, &tracker);
     } else {
         RensaNonTracker tracker;
@@ -667,6 +710,12 @@ RensaResult CoreField::simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaTr
 RensaResult CoreField::simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaCoefResult* rensaCoefResult)
 {
     RensaCoefTracker tracker(rensaCoefResult);
+    return simulateWithTracker(1, minHeights, &tracker);
+}
+
+RensaResult CoreField::simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaVanishingPositionResult* rensaVanishingPositionResult)
+{
+    RensaVanishingPositionTracker tracker(rensaVanishingPositionResult);
     return simulateWithTracker(1, minHeights, &tracker);
 }
 

@@ -25,6 +25,7 @@ static const double GRADE_WEIGHT_GROW[munetoshi::AI::GRADE_NUM] = {
 		-4,
 		-4,
 		-4,
+		50,
 };
 
 munetoshi::AI::AI(int argc, char* argv[]) : ::AI(argc, argv, "munetoshi") {
@@ -91,7 +92,30 @@ int munetoshi::AI::evaluate(const CoreField& field, const RefPlan *plan) const {
   auto adder = [&](const ColumnPuyo& cp) { required_puyos += cp.x; };
   auto callback = [&](const CoreField&, const RensaResult& rensa_result,
                       const ColumnPuyoList& key_puyos, const ColumnPuyoList& fire_puyos,
-                      const RensaTrackResult&) {
+                      const RensaVanishingPositionResult& position_result) {
+	int turn_down_chain = 0;
+	for (int nth_chain = 1;
+	    nth_chain <= (int) position_result.size() && turn_down_chain == 0;
+	    ++nth_chain) {
+	  bool has_left_side = false;
+	  bool has_left_center = false;
+	  bool has_right_side = false;
+	  bool has_right_center = false;
+	  for (auto base_puyo : position_result.getReferenceBasePuyosAt(nth_chain)) {
+		if (base_puyo.x <= 2 && base_puyo.y == 1) {
+		  has_left_side = true;
+		} else if (base_puyo.x == 3 && base_puyo.y <= 2) {
+		  has_left_center = true;
+		} else if (base_puyo.x >= 5 && base_puyo.y == 1) {
+		  has_right_side = true;
+		} else if (base_puyo.x == 4 && base_puyo.y <= 2) {
+		  has_right_center = true;
+		}
+	  }
+	  if ((has_left_side && has_left_center) || (has_right_side && has_right_center)) {
+		turn_down_chain = nth_chain;
+	  }
+	}
 	required_puyos = 0;
     std::for_each(key_puyos.begin(), key_puyos.end(), adder);
     std::for_each(fire_puyos.begin(), fire_puyos.end(), adder);
@@ -113,12 +137,13 @@ int munetoshi::AI::evaluate(const CoreField& field, const RefPlan *plan) const {
     		std::max(field.height(5) - field.height(6), 0);
     grade_vect[GRACE_VALLEY_4_3_GT2] =
     		std::max(field.height(4) - field.height(3) - 2, 0);
+    grade_vect[TURNDOWN] = turn_down_chain != 0 ? 1 : 0; 
     grade = std::max(
     		(int) inner_product(grade_vect, GRADE_WEIGHT_GROW, GRADE_NUM),
 			grade);
   };
 
-  RensaDetector::iteratePossibleRensasWithTracking(field, 1, RensaDetectorStrategy::defaultFloatStrategy(), callback);
+  RensaDetector::iteratePossibleRensasWithVanishingPositionTracking(field, 1, RensaDetectorStrategy::defaultFloatStrategy(), callback);
   return std::max(grade, 0);
 }
 

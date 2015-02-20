@@ -550,6 +550,21 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
         callback(*f, rensaResult, keyPuyos, firePuyos, rensaCoefResult);
 }
 
+static inline void simulateInternal(CoreField* f, const CoreField& original,
+                                    const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                                    RensaDetector::VanishingPositionPossibleRensaCallback callback)
+{
+    int minHeights[CoreField::MAP_WIDTH] {
+        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
+        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
+    };
+
+    RensaVanishingPositionResult rensaVanishingPositionResult;
+    RensaResult rensaResult = f->simulateWithMinHeights(minHeights, &rensaVanishingPositionResult);
+    if (rensaResult.chains > 0)
+        callback(*f, rensaResult, keyPuyos, firePuyos, rensaVanishingPositionResult);
+}
+
 template<typename Callback>
 static void findPossibleRensasInternal(const CoreField& originalField,
                                        const ColumnPuyoList& keyPuyos,
@@ -614,6 +629,15 @@ void RensaDetector::iteratePossibleRensasWithCoefTracking(const CoreField& field
                                                           int maxKeyPuyos,
                                                           const RensaDetectorStrategy& strategy,
                                                           RensaDetector::CoefPossibleRensaCallback callback)
+{
+    ColumnPuyoList puyoList;
+    findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, callback);
+}
+
+void RensaDetector::iteratePossibleRensasWithVanishingPositionTracking(const CoreField& field,
+                                                                       int maxKeyPuyos,
+                                                                       const RensaDetectorStrategy& strategy,
+                                                                       RensaDetector::VanishingPositionPossibleRensaCallback callback)
 {
     ColumnPuyoList puyoList;
     findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, callback);

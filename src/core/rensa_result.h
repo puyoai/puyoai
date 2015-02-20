@@ -1,11 +1,14 @@
 #ifndef CORE_RENSA_RESULT_H_
 #define CORE_RENSA_RESULT_H_
 
+#include <array>
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 #include "base/base.h"
 #include "core/field_constant.h"
+#include "core/position.h"
 
 struct RensaResult {
     RensaResult() : chains(0), score(0), frames(0), quick(false) {}
@@ -67,6 +70,42 @@ public:
 private:
     int numErased_[20]; // numErased does not contain ojama puyos.
     int coef_[20];
+};
+
+// This tracks puyo position at "n-1"-th chain, where the puyo vanishes at n-th chain.     
+class RensaVanishingPositionResult {
+public:
+	RensaVanishingPositionResult() {
+		basePuyosErasedAt_.reserve(19);
+		fallingPuyosErasedAt_.reserve(19);
+	}
+	
+	int size() const {
+		return fallingPuyosErasedAt_.size();
+	}
+	
+	// Gets the reference of position set, where the puyos vanish after falling at n-th chain.  
+	// The return value is valid while this result instance is valid.
+	const std::vector<const Position>& getReferenceFallingPuyosAt(int nthChain) const {
+		return fallingPuyosErasedAt_[nthChain - 1];
+	}
+	
+	// Gets the reference of position set, where the puyos vanish without falling at n-th chain.
+	// The return value is valid while this result instance is valid.
+	const std::vector<const Position>& getReferenceBasePuyosAt(int nthChain) const {
+		return basePuyosErasedAt_[nthChain - 1];
+	}
+	
+	std::array<float, 2> getWeightedCenterAfterFall(int nthChain);
+	
+	void setFallingPuyo(int x, int yBeforeFall, int yAfterFall, int nthChain);
+	void setBasePuyo(int x, int y, int nthChain);
+	
+private:
+	std::vector<std::vector<const Position>> basePuyosErasedAt_;
+	std::vector<std::vector<const Position>> fallingPuyosErasedAt_;
+	std::vector<std::vector<int>> yOfFalledPuyosErasedAt_;
+	void maybeResize(int nthChain);
 };
 
 class IgnitionRensaResult {
