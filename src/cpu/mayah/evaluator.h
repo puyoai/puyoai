@@ -140,7 +140,8 @@ public:
     // ----------------------------------------------------------------------
 
     bool evalStrategy(const RefPlan&, const CoreField& currentField, int currentFrameId,
-                      const PlayerState& me, const PlayerState& enemy, const GazeResult&);
+                      const PlayerState& me, const PlayerState& enemy, const GazeResult&,
+                      const MidEvalResult&);
 
     void evalBook(const OpeningBook&, const std::vector<int>& matchableBookIds, const RefPlan&);
     void evalFrameFeature(const RefPlan&);
