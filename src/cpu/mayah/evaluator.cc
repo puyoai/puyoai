@@ -343,7 +343,8 @@ void Evaluator<ScoreCollector>::evalUnreachableSpace(const CoreField& f)
 // Returns true If we don't need to evaluate other features.
 template<typename ScoreCollector>
 bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreField& currentField, int currentFrameId,
-                                             const PlayerState& me, const PlayerState& enemy, const GazeResult& gazeResult)
+                                             const PlayerState& me, const PlayerState& enemy, const GazeResult& gazeResult,
+                                             const MidEvalResult& midEvalResult)
 {
     if (!plan.isRensaPlan())
         return false;
@@ -378,7 +379,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
     int estimatedMaxScore = gazeResult.estimateMaxScore(rensaEndingFrameId, enemy);
 
-    {
+    if (!enemy.isRensaOngoing && plan.chains() <= 4) {
         int h = 12 - enemy.field.height(3);
         if (plan.score() - estimatedMaxScore >= scoreForOjama(6 * h)) {
             sc_->addScore(STRATEGY_KILL, 1);
@@ -440,6 +441,17 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         me.pendingOjama + me.fixedOjama <= 3 && estimatedMaxScore <= scoreForOjama(12)) {
         sc_->addScore(STRATEGY_TSUBUSHI, 1);
         return true;
+    }
+
+    if (plan.chains() <= 3 && me.pendingOjama + me.fixedOjama == 0 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
+        if (plan.score() >= scoreForOjama(30)) {
+            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_LARGE, 1);
+        } else if (plan.score() >= scoreForOjama(18)) {
+            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM, 1);
+        } else if (plan.score() >= scoreForOjama(15)) {
+            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_SMALL, 1);
+        }
+        return false;
     }
 
     sc_->addScore(STRATEGY_SAKIUCHI, 1.0);
@@ -684,7 +696,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     // We'd like to evaluate frame feature always.
     evalFrameFeature(plan);
 
-    if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult))
+    if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult, midEvalResult))
         return;
 
     if (FLAGS_opening && !enemy.hasZenkeshi && !plan.isRensaPlan()) {
@@ -706,7 +718,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
     evalUnreachableSpace(fieldBeforeRensa);
 
-    bool hasSideChain = false;
+    int sideChainMaxScore = 0;
     int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
     int maxVirtualRensaResultScore = 0;
     double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
@@ -730,8 +742,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         rensaEvaluator.evalRensaValleyDepth(complementedField);
         rensaEvaluator.evalRensaFieldUShape(complementedField, enemy.hasZenkeshi);
 
-        if (keyPuyos.size() == 0 && rensaResult.chains == 2 && rensaResult.score >= 1000) {
-            hasSideChain = true;
+        if (keyPuyos.size() == 0 && rensaResult.chains == 2) {
+            sideChainMaxScore = std::max(sideChainMaxScore, rensaResult.score);
         }
 
         PuyoSet necessaryPuyos;
@@ -807,8 +819,12 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         }
     }
 
-    if (hasSideChain) {
-        sc_->addScore(HOLDING_SIDE_CHAIN, 1.0);
+    if (sideChainMaxScore >= scoreForOjama(21)) {
+        sc_->addScore(HOLDING_SIDE_CHAIN_LARGE, 1);
+    } else if (sideChainMaxScore >= scoreForOjama(15)) {
+        sc_->addScore(HOLDING_SIDE_CHAIN_MEDIUM, 1);
+    } else if (sideChainMaxScore >= scoreForOjama(12)) {
+        sc_->addScore(HOLDING_SIDE_CHAIN_SMALL, 1);
     }
 
     if (maxRensaScoreCollector.get()) {

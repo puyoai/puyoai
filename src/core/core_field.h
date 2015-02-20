@@ -165,7 +165,7 @@ protected:
     template<typename Tracker>
     int dropAfterVanish(int minHeights[], Tracker*);
 
-    uint8_t heights_[MAP_WIDTH];
+    int heights_[MAP_WIDTH];
 };
 
 #endif
