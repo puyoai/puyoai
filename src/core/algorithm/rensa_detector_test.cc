@@ -20,6 +20,47 @@ static void dropKeyAndFirePuyos(CoreField* f, const ColumnPuyoList& keyPuyos, co
     dropPuyos(f, firePuyos);
 }
 
+TEST(RensaDetectorTest, detectSingleDrop1)
+{
+    CoreField f(
+        ".R...."
+        "RB...."
+        "RB...."
+        "RB...."
+        "BR...."
+        "BR...."
+        "BRGYG."
+        "RGYGB."
+        "RGYGB."
+        "RGYGB.");
+
+    CoreField expected(
+        ".R...."
+        "RB...."
+        "RB...."
+        "RB...."
+        "BR...."
+        "BRR..."
+        "BRGYG."
+        "RGYGB."
+        "RGYGB."
+        "RGYGB.");
+
+    bool found = false;
+    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& firePuyos) {
+        CoreField actual(f);
+        dropPuyos(&actual, firePuyos);
+
+        if (actual == expected) {
+            found = true;
+        }
+    };
+
+    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 2, false);
+    RensaDetector::detectSingle(f, strategy, callback);
+    EXPECT_TRUE(found);
+}
+
 TEST(RensaDetectorTest, detectSingleExtend1)
 {
     CoreField f(
