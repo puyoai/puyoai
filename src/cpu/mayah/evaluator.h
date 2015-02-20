@@ -17,9 +17,6 @@ class RefPlan;
 struct RensaResult;
 class RensaTrackResult;
 
-const int EARLY_THRESHOLD = 24;
-const int MIDDLE_THRESHOLD = 54;
-
 class EvaluatorBase {
 protected:
     EvaluatorBase(const OpeningBook& openingBook, const PatternBook& patternBook) :
@@ -140,7 +137,8 @@ public:
     // ----------------------------------------------------------------------
 
     bool evalStrategy(const RefPlan&, const CoreField& currentField, int currentFrameId,
-                      const PlayerState& me, const PlayerState& enemy, const GazeResult&);
+                      const PlayerState& me, const PlayerState& enemy, const GazeResult&,
+                      const MidEvalResult&);
 
     void evalBook(const OpeningBook&, const std::vector<int>& matchableBookIds, const RefPlan&);
     void evalFrameFeature(const RefPlan&);

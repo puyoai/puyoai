@@ -68,12 +68,9 @@ DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& 
         if (kumipuyoSeq.size() >= 3) {
             depth = 3;
             iteration = 2;
-        } else if (f.countPuyos() <= MIDDLE_THRESHOLD) {
-            depth = 2;
-            iteration = 3;
         } else {
-            depth = 2;
-            iteration = 2;
+            depth = MayahAI::DEFAULT_DEPTH;
+            iteration = MayahAI::DEFAULT_NUM_ITERATION;
         }
     } else {
         depth = MayahAI::DEFAULT_DEPTH;
@@ -250,6 +247,9 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
 EvaluationMode MayahAI::calculateMode(const PlayerState& me, const PlayerState& enemy) const
 {
+    const int EARLY_THRESHOLD = 24;
+    const int MIDDLE_THRESHOLD = 54;
+
     UNUSED_VARIABLE(enemy);
 
     int count = me.field.countPuyos();
@@ -332,6 +332,11 @@ std::string MayahAI::makeMessageFrom(EvaluationMode mode,
         ss << "ZENKESHI / ";
     if (cf.feature(STRATEGY_KILL) > 0)
         ss << "KILL / ";
+    if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_LARGE) > 0 ||
+        cf.feature(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM) > 0 ||
+        cf.feature(STRATEGY_FIRE_SIDE_CHAIN_SMALL) > 0) {
+        ss << "SIDE_CHAIN / ";
+    }
     if (cf.feature(STRATEGY_TAIOU) > 0)
         ss << "TAIOU / ";
     if (cf.feature(STRATEGY_LARGE_ENOUGH) > 0)

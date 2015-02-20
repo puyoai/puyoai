@@ -73,7 +73,8 @@ int main(int argc, char* argv[])
     google::InstallFailureSignalHandler();
 
     Kantoku kantoku;
-    kantoku.add("mayah", "../mayah/run.sh");
+    kantoku.add("mayah", "../mayah/run_advanced.sh");
+    kantoku.add("nidub", "../../internal/cpu/test_lockit/nidub.sh");
 
     kantoku.runLoop();
 
