@@ -22,6 +22,8 @@ public:
         connector_ = std::move(Connector::create(1, program));
     }
 
+    std::string name() const { return name_; }
+
     Connector& connector() { return *connector_; }
 
 private:
@@ -31,7 +33,7 @@ private:
 
 class Kantoku : public RawAI {
 public:
-    Kantoku() : rnd_(random_device()())
+    Kantoku() : rnd_(random_device()()), index_(0)
     {
     }
 
@@ -57,9 +59,14 @@ private:
     {
         DCHECK_LT(0UL, ais_.size());
         index_ = uniform_int_distribution<int>(0, ais_.size() - 1)(rnd_);
+
+        LOG(INFO) << "Current CPU: " << current().name();
     }
 
-    ChildAI& current() { return ais_[index_]; }
+    ChildAI& current()
+    {
+        return ais_[index_];
+    }
 
     default_random_engine rnd_;
     int index_;
@@ -73,8 +80,12 @@ int main(int argc, char* argv[])
     google::InstallFailureSignalHandler();
 
     Kantoku kantoku;
-    kantoku.add("mayah", "../mayah/run_advanced.sh");
+    kantoku.add("mayah-1", "../mayah/run_advanced.sh");
+    kantoku.add("mayah-2", "../mayah/run_advanced.sh");
+    kantoku.add("mayah-3", "../mayah/run_advanced.sh");
     kantoku.add("nidub", "../../internal/cpu/test_lockit/nidub.sh");
+    kantoku.add("rendaS9", "../../internal/cpu/test_lockit/rendaS9.sh");
+    kantoku.add("rendaGS9", "../../internal/cpu/test_lockit/rendaGS9.sh");
 
     kantoku.runLoop();
 
