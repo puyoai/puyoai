@@ -119,7 +119,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
     }
 }
 
-FrameResponse sendmes(READ_P* p1, READ_P* p2, COMAI_HI* coo)
+FrameResponse sendmes(READ_P* p1, READ_P* /*p2*/, COMAI_HI* coo)
 {
     stringstream ss;
     ss << "you="
@@ -131,12 +131,6 @@ FrameResponse sendmes(READ_P* p1, READ_P* p2, COMAI_HI* coo)
        << "a-m:" << count_all[9] << ","
        << "ret:" << count_all[10] << ","
        << "nok:" << coo->aite_hakka_nokori;
-        //		 << "op="
-        //		 <<"nxt:"<< count_all[0] << ","
-        //		 <<"set:"<< count_all[1] << ","
-        //		 <<"end:"<< count_all[2] << ","
-        //		 <<"act:"<< count_all[3] << ","
-        //		 <<"a-m:"<< count_all[8]
 
     return FrameResponse(p1->id, Decision(p1->te_x, p1->te_r), ss.str());
 }
