@@ -24,6 +24,7 @@ class Pattern {
   int score() const { return score_; }
 
  protected:
+  bool ParseBook(std::istream& is);
   void Optimize();
   void AppendField(std::string line);
   int GetScore(MatchingCounts& matching) const;
