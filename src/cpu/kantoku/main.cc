@@ -44,7 +44,7 @@ public:
 
     FrameResponse playOneFrame(const FrameRequest& req) override
     {
-        if (req.frameId == 1) {
+        if (req.shouldInitialize()) {
             chooseAI();
         }
 

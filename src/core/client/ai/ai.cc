@@ -78,7 +78,7 @@ void AI::runLoop()
         }
         // Before starting a new game, we need to think the first hand.
         // TODO(mayah): Maybe game server should send some information that we should initialize.
-        if (frameRequest.frameId == 1) {
+        if (frameRequest.shouldInitialize()) {
             next1.clear();
             nextThinkFrameId = 0;
             gameWillBegin(frameRequest);

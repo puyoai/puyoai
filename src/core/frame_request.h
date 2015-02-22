@@ -28,6 +28,7 @@ struct FrameRequest {
     std::string toDebugString() const;
 
     bool isValid() const { return frameId != -1; }
+    bool shouldInitialize() const { return frameId == 1; }
     bool hasGameEnd() const { return gameResult != GameResult::PLAYING; }
 
     const PlayerFrameRequest& myPlayerFrameRequest() const { return playerFrameRequest[0]; }

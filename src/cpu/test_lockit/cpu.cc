@@ -38,7 +38,7 @@ TestLockitAI::TestLockitAI()
 void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI* coo)
 {
     p1->id = request.frameId;
-    if (request.frameId == 1) {
+    if (request.shouldInitialize()) {
         p1->ref();
         p2->ref();
         coo->ref();
