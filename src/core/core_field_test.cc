@@ -512,3 +512,21 @@ TEST(CoreFieldTest, rensaWillOccurWithMinHeights)
     EXPECT_TRUE(cf4.rensaWillOccurWithMinHeights(minHeights4));
     EXPECT_FALSE(cf5.rensaWillOccurWithMinHeights(minHeights5));
 }
+
+TEST(CoreFieldTest, vanishDrop)
+{
+    CoreField cf(
+        "..BB.."
+        "RRRRBB");
+    int minHeights[FieldConstant::MAP_WIDTH] {
+        1, 1, 1, 1, 1, 1, 1, 1
+    };
+
+    int score = cf.vanishDrop(2, minHeights);
+
+    CoreField expected(
+        "..BBBB");
+
+    EXPECT_EQ(expected, cf);
+    EXPECT_EQ(40 * 8, score);
+}

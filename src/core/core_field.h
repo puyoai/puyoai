@@ -49,7 +49,7 @@ public:
     int countConnectedPuyos(int x, int y) const;
     // Same as countConnectedPuyos(x, y), but with checking using |checked|.
     int countConnectedPuyos(int x, int y, FieldBitField* checked) const;
-    // Smae as countConnectedPuyos(x, y). But you can call this only when the number of connected puyos <= 3.
+    // Same as countConnectedPuyos(x, y). But you can call this only when the number of connected puyos <= 3.
     int countConnectedPuyosMax4(int x, int y) const;
     // Returns true if color(x, y) is connected in some direction.
     bool isConnectedPuyo(int x, int y) const;
@@ -118,8 +118,12 @@ public:
     RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaCoefResult* coefResult);
     RensaResult simulateWithMinHeights(int minHeights[MAP_WIDTH], RensaVanishingPositionResult* vanishingPositionResult);
 
-    // Vanish the connected puyos. Score will be returned.
+    // Vanishes the connected puyos. Score will be returned.
     int vanishOnly(int currentChain);
+
+    // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
+    // |minHeights| might be modified.
+    int vanishDrop(int currentChain, int minHeights[MAP_WIDTH]);
 
     // ----------------------------------------------------------------------
     // utility methods

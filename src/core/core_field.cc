@@ -484,6 +484,16 @@ int CoreField::vanishOnly(int currentNthChain)
     return vanish(currentNthChain, minHeights, &nonTracker);
 }
 
+int CoreField::vanishDrop(int currentChain, int minHeights[FieldConstant::MAP_WIDTH])
+{
+    RensaNonTracker tracker;
+    int score = vanish(currentChain, minHeights, &tracker);
+    if (score > 0)
+        dropAfterVanish(minHeights, &tracker);
+
+    return score;
+}
+
 template<typename Tracker>
 int CoreField::vanish(int nthChain, int minHeights[], Tracker* tracker)
 {
