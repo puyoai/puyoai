@@ -27,7 +27,7 @@
 
 using namespace std;
 
-DEFINE_bool(pattern, true, "use pattern book");
+DEFINE_bool(complement, true, "use complement book");
 DEFINE_bool(opening, true, "use opening book");
 
 namespace {
@@ -161,9 +161,9 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
 
     auto matchablePatternIds = preEvalResult.mutableMatchablePatternIds();
     ColumnPuyoList cpl;
-    for (size_t i = 0; i < patternBook().size(); ++i) {
-        const PatternBookField& pbf = patternBook().field(i);
-        if (pbf.isMatchable(currentField))
+    for (size_t i = 0; i < complementBook().size(); ++i) {
+        const ComplementBookField& cbf = complementBook().field(i);
+        if (cbf.isMatchable(currentField))
             matchablePatternIds->push_back(static_cast<int>(i));
     }
 
@@ -730,7 +730,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                             const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                             const RensaTrackResult& trackResult) {
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
-        RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), patternBook(), rensaScoreCollector.get());
+        RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), complementBook(), rensaScoreCollector.get());
 
         CoreField complementedField(fieldBeforeRensa);
         for (const auto& cp : keyPuyos)
@@ -792,12 +792,12 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         RensaDetector::iteratePossibleRensasIteratively(fieldBeforeRensa, maxIteration, strategy, callback);
     }
 
-    if (FLAGS_pattern) {
+    if (FLAGS_complement) {
         RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 1, false);
         for (const int id : preEvalResult.matchablePatternIds()) {
-            const PatternBookField& pbf = patternBook().field(id);
+            const ComplementBookField& cbf = complementBook().field(id);
             ColumnPuyoList cpl;
-            if (!pbf.complement(plan.field(), &cpl))
+            if (!cbf.complement(plan.field(), &cpl))
                 continue;
             if (cpl.isEmpty())
                 continue;

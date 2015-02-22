@@ -9,12 +9,12 @@
 #include "core/client/ai/ai.h"
 #include "core/algorithm/plan.h"
 
+#include "complement_book.h"
 #include "decision_book.h"
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
 #include "opening_book.h"
-#include "pattern_book.h"
 
 class CoreField;
 class DropDecision;
@@ -89,7 +89,7 @@ protected:
     EvaluationParameterMap evaluationParameterMap_;
     OpeningBook openingBook_;
     DecisionBook decisionBook_;
-    PatternBook patternBook_;
+    ComplementBook complementBook_;
 
     bool usesDecisionBook_ = true;
 
