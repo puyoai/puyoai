@@ -504,7 +504,7 @@ struct Edge {
 
     friend bool operator>(const Edge& lhs, const Edge& rhs) {
         if (lhs.weight != rhs.weight) { return lhs.weight > rhs.weight; }
-        if (lhs.src != rhs.src) { lhs.src > rhs.src; }
+        if (lhs.src != rhs.src) { return lhs.src > rhs.src; }
         return lhs.dest > rhs.dest;
     }
 
