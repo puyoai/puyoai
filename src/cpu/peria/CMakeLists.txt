@@ -29,6 +29,7 @@ cpu_add_runner(book.txt)
 include_directories(${gtest_SOURCE_DIR}/include
                     ${gtest_SOURCE_DIR})
 # TODO(peria): add tests if needed
+peria_add_test(pattern_test)
 #peria_add_test(field_test)
 #peria_add_test(player_test)
 
