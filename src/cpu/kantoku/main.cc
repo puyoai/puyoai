@@ -22,8 +22,7 @@ public:
         connector_ = std::move(Connector::create(1, program));
     }
 
-    std::string name() const { return name_; }
-
+    const std::string& name() const { return name_; }
     Connector& connector() { return *connector_; }
 
 private:
