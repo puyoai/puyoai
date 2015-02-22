@@ -104,7 +104,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
 
 void Endless::setEnemyField(FrameRequest* req)
 {
-    req->playerFrameRequest[1].field = PlainField(
+    req->playerFrameRequest[1].field = CoreField(
             "Y   GY"
             "R   GG"
             "YRYGRY"

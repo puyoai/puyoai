@@ -4,16 +4,16 @@
 #include <string>
 #include <vector>
 
+#include "core/core_field.h"
 #include "core/game_result.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_pos.h"
 #include "core/kumipuyo_seq.h"
-#include "core/plain_field.h"
 #include "core/player.h"
 #include "core/user_event.h"
 
 struct PlayerFrameRequest {
-    PlainField field;
+    CoreField field;
     KumipuyoSeq kumipuyoSeq;
     KumipuyoPos kumipuyoPos;
     UserEvent event;

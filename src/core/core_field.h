@@ -19,8 +19,7 @@ class CoreField : public PlainField {
 public:
     CoreField();
     explicit CoreField(const std::string& url);
-    // TODO(mayah): Make this constructor explicit.
-    CoreField(const PlainField&);
+    explicit CoreField(const PlainField&);
     CoreField(const CoreField&) = default;
 
     void clear();
