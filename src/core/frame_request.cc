@@ -118,7 +118,7 @@ FrameRequest FrameRequest::parse(const std::string& line)
         PlayerFrameRequest& pReq = req.playerFrameRequest[(key[0] == 'Y') ? 0 : 1];
         switch (key[1]) {
         case 'F':
-            pReq.field = PlainField(string(value));
+            pReq.field = CoreField(string(value));
             break;
         case 'P':
             pReq.kumipuyoSeq = KumipuyoSeq(string(value));
