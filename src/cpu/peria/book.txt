@@ -8,7 +8,7 @@ THRESH: 3    # この個数以上合わないと評価しない
 ....BA       # ':' がない行がフィールド.
 ...BAA       # 大文字が評価対象ぷよ.
 ....BB       # '.' や小文字は任意. '_'は強制空白.
-
+----
 NAME: GTR-Head
 SCORE: 2000
 MAX: 20
@@ -17,38 +17,38 @@ MAX: 20
 ....BA
 ...BAA
 ....BB
-
+----
 NAME: Begin1
 SCORE: 1000
 MAX: 8
 .AA...
 .BB...
-
+----
 NAME: Begin2
 SCORE: 1000
 MAX: 8
 ..C...
 ABB...
-
+----
 NAME: Begin3
 SCORE: 1500
 MAX: 10
 CAA...
 CBB...
-
+----
 NAME: Begin4
 SCORE: 1000
 MAX: 8
 CA....
 CB....
-
+----
 NAME: Shin-GTR
 SCORE: 1000
 MAX: 20
 ..B...
 AAAB..
 BBB...
-
+----
 NAME: GTR-Tail
 SCORE: 1000
 MAX: 22

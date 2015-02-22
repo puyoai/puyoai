@@ -14,7 +14,7 @@ namespace peria {
 
 namespace {
 
-std::vector<Pattern> g_pattern;
+std::vector<Pattern> g_patterns;
 
 std::string Trim(std::string line) {
   size_t pos = line.find('#');
@@ -33,47 +33,50 @@ std::string Trim(std::string line) {
 }  // namespace
 
 void Pattern::ReadBook(std::istream& is) {
-  g_pattern.clear();
-
-  std::unique_ptr<Pattern> pattern(new Pattern);
-  for (std::string line; std::getline(is, line);) {
-    line = Trim(line);
-    if (line.empty())
-      continue;
-    std::istringstream iss(line);
-    std::string first_segment;
-    iss >> first_segment;
-    if (first_segment.find(':') == std::string::npos) {
-      pattern->AppendField(first_segment);
-      continue;
-    }
-
-    if (first_segment == "NAME:") {
-      if (pattern && !pattern->name_.empty()) {
-        pattern->Optimize();
-        g_pattern.push_back(*pattern);
-      }
-      pattern.reset(new Pattern);
-      iss >> pattern->name_;
-    } else if (first_segment == "SCORE:") {
-      int score;
-      iss >> score;
-      pattern->score_ = score;
-    } else if (first_segment == "MAX:") {
-      int max_puyos;
-      iss >> max_puyos;
-      pattern->max_puyos_ = max_puyos;
-    }
-  }
-
-  if (pattern && !pattern->name_.empty()) {
-    pattern->Optimize();
-    g_pattern.push_back(*pattern);
+  g_patterns.clear();
+  while (!is.eof()) {
+    Pattern pattern;
+    if (!pattern.ParseBook(is))
+      break;
+    g_patterns.push_back(pattern);
   }
 }
 
 const std::vector<Pattern>& Pattern::GetAllPattern() {
-  return g_pattern;
+  return g_patterns;
+}
+
+bool Pattern::ParseBook(std::istream& is) {
+  for (std::string line; std::getline(is, line);) {
+    line = Trim(line);
+    if (line.empty())
+      continue;
+    if (line.find("----") == 0)
+      break;
+
+    std::istringstream iss(line);
+    std::string first_segment;
+    iss >> first_segment;
+    if (first_segment.find(':') == std::string::npos) {
+      AppendField(first_segment);
+      continue;
+    }
+
+    if (first_segment == "NAME:") {
+      iss >> name_;
+    } else if (first_segment == "SCORE:") {
+      iss >> score_;
+    } else if (first_segment == "MAX:") {
+      iss >> max_puyos_;
+    }
+  }
+
+  if (name_.empty())
+    return false;
+
+  Optimize();
+
+  return true;
 }
 
 int Pattern::Match(const CoreField& field) const {
@@ -127,14 +130,6 @@ void Pattern::Optimize() {
         ++num_puyos_;
     }
   }
-
-  // Debug output
-  LOG(INFO) << "name: " << name_;
-  LOG(INFO) << "score: " << score_;
-  LOG(INFO) << "max: " << max_puyos_;
-  LOG(INFO) << "num: " << num_puyos_;
-  for (auto& line : pattern_)
-    LOG(INFO) << line;
 }
 
 void Pattern::AppendField(std::string line) {
