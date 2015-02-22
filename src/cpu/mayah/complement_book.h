@@ -1,5 +1,5 @@
-#ifndef CPU_MAYAH_PATTERN_BOOK_H_
-#define CPU_MAYAH_PATTERN_BOOK_H_
+#ifndef CPU_MAYAH_COMPLEMENT_BOOK_H_
+#define CPU_MAYAH_COMPLEMENT_BOOK_H_
 
 #include <string>
 #include <toml/toml.h>
@@ -11,11 +11,11 @@
 
 class ColumnPuyoList;
 
-class PatternBookField {
+class ComplementBookField {
 public:
-    explicit PatternBookField(const PatternField& field) : patternField_(field), ignoreables{} {}
-    explicit PatternBookField(const std::string& field) : patternField_(field), ignoreables{} {}
-    explicit PatternBookField(const std::vector<std::string>& field) : patternField_(field), ignoreables{} {}
+    explicit ComplementBookField(const PatternField& field) : patternField_(field), ignoreables{} {}
+    explicit ComplementBookField(const std::string& field) : patternField_(field), ignoreables{} {}
+    explicit ComplementBookField(const std::vector<std::string>& field) : patternField_(field), ignoreables{} {}
 
     bool isMatchable(const CoreField&) const;
     bool complement(const CoreField&, ColumnPuyoList*) const;
@@ -24,23 +24,23 @@ public:
     bool isIgnoreable(char c) const;
     void setIgnoreable(char c);
 
-    PatternBookField mirror() const { return PatternBookField(patternField_.mirror()); }
+    ComplementBookField mirror() const { return ComplementBookField(patternField_.mirror()); }
 
 private:
     PatternField patternField_;
     bool ignoreables[26];
 };
 
-class PatternBook : noncopyable {
+class ComplementBook : noncopyable {
 public:
     bool load(const std::string& filename);
     bool loadFromValue(const toml::Value&);
 
     size_t size() const { return fields_.size(); }
-    const PatternBookField& field(int i) const { return fields_[i]; }
+    const ComplementBookField& field(int i) const { return fields_[i]; }
 
 private:
-    std::vector<PatternBookField> fields_;
+    std::vector<ComplementBookField> fields_;
 };
 
 #endif

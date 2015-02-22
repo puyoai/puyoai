@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 cpu_setup("mayah")
 
 add_library(mayah_lib
+            complement_book.cc
             decision_book.cc
             evaluator.cc
             evaluation_feature.cc
@@ -10,7 +11,6 @@ add_library(mayah_lib
             gazer.cc
             mayah_ai.cc
             opening_book.cc
-            pattern_book.cc
             score_collector.cc)
 
 function(mayah_add_executable exe)
@@ -46,6 +46,6 @@ mayah_add_test(gazer_test)
 mayah_add_test(mayah_ai_test)
 mayah_add_test(mayah_ai_situation_test)
 mayah_add_test(opening_book_test)
-mayah_add_test(pattern_book_test)
+mayah_add_test(complement_book_test)
 
 mayah_add_test(mayah_ai_performance_test 1)
