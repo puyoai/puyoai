@@ -170,7 +170,7 @@ int Pattern::GetScore(MatchingCounts& matching) const {
   }
 
   // TODO: 指定してないセルが指定セルと同じ色を持ってないか確認
-
+  LOG(INFO) << name_ << ": " << score_ << " " << sum << " " << num_puyos_;
   return score_ * sum / num_puyos_;
 }
 

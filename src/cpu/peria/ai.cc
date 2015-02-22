@@ -79,6 +79,8 @@ int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
   int best = 0;
 
   const CoreField& field = plan.field();
+  LOG(INFO) << field.toDebugString();
+
   std::ostringstream oss;
   oss << "Puyo.count:" << field.countPuyos() << "_";
   for (const Pattern& pattern : Pattern::GetAllPattern()) {
@@ -86,8 +88,8 @@ int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
     sum += score;
     if (score > best) {
       best = score;
-      oss << pattern.name() << "[" << score << "/" << pattern.score() << "]";
     }
+    oss << pattern.name() << "[" << score << "/" << pattern.score() << "]";
   }
   *name = oss.str();
 
@@ -121,6 +123,9 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
   std::ostringstream oss;
   std::string message;
 
+  UNUSED_VARIABLE(attack);
+
+#if 0  // Futreu expectation
   std::vector<int> expects;
   expects.clear();
   Plan::iterateAvailablePlans(
@@ -132,11 +137,15 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
   int expect = std::accumulate(expects.begin(), expects.end(), 0);
   if (expects.size())
     expect /= expects.size();
+#endif
 
+#if 1  // Pattern maching
   value = PatternMatch(plan, &message);
   oss << "Pattern(" << message << "," << value << ")_";
   score += value;
+#endif
 
+#if 0
   if (plan.isRensaPlan()) {
     const int kAcceptablePuyo = 6;
     if (attack &&
@@ -161,7 +170,6 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
       score += value;
     }
   } else {
-
     value = expect;
     oss << "Future(" << value << ")";
     score += value;
@@ -170,7 +178,9 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
     oss << "Field(" << value << ")";
     score += value;
   }
+#endif
 
+  LOG(INFO) << score << " " << oss.str();
   if (score > control->score) {
     control->score = score;
     control->message = oss.str();
