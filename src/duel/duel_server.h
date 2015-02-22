@@ -17,7 +17,7 @@ public:
     explicit DuelServer(ConnectorManager*);
     ~DuelServer();
 
-    // Don't take ownership.
+    // Doesn't take ownership.
     void addObserver(GameStateObserver*);
 
     bool start();
