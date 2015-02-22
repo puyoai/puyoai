@@ -19,7 +19,7 @@ protected:
 
         EvaluationParameter evaluationParameter;
         OpeningBook openingBook;
-        PatternBook patternBook;
+        ComplementBook complementBook;
         Gazer gazer;
 
         gazer.initialize(100);
@@ -31,9 +31,9 @@ protected:
 
         RefPlan plan(f, decisions, rensaResult, 0, framesToIgnite, lastDropFrames);
 
-        PreEvalResult preEvalResult = PreEvaluator(openingBook, patternBook).preEval(f);
+        PreEvalResult preEvalResult = PreEvaluator(openingBook, complementBook).preEval(f);
         FeatureScoreCollector sc(evaluationParameter);
-        Evaluator<FeatureScoreCollector> evaluator(openingBook, patternBook, &sc);
+        Evaluator<FeatureScoreCollector> evaluator(openingBook, complementBook, &sc);
         evaluator.collectScore(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
         return sc.toCollectedFeature();
     }
@@ -44,9 +44,9 @@ protected:
 
         EvaluationParameter evaluationParameter;
         OpeningBook openingBook;
-        PatternBook patternBook;
+        ComplementBook complementBook;
         FeatureScoreCollector sc(evaluationParameter);
-        Evaluator<FeatureScoreCollector> evaluator(openingBook, patternBook, &sc);
+        Evaluator<FeatureScoreCollector> evaluator(openingBook, complementBook, &sc);
 
         f(&evaluator);
 
@@ -59,9 +59,9 @@ protected:
 
         EvaluationParameter evaluationParameter;
         OpeningBook openingBook;
-        PatternBook patternBook;
+        ComplementBook complementBook;
         FeatureScoreCollector sc(evaluationParameter);
-        RensaEvaluator<FeatureScoreCollector> rensaEvaluator(openingBook, patternBook, &sc);
+        RensaEvaluator<FeatureScoreCollector> rensaEvaluator(openingBook, complementBook, &sc);
 
         f(&rensaEvaluator);
 
@@ -77,9 +77,9 @@ TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
 
     EvaluationParameter param;
     OpeningBook openingBook;
-    PatternBook patternBook;
+    ComplementBook complementBook;
     FeatureScoreCollector sc(param);
-    RensaEvaluator<FeatureScoreCollector> evaluator(openingBook, patternBook, &sc);
+    RensaEvaluator<FeatureScoreCollector> evaluator(openingBook, complementBook, &sc);
 
     evaluator.collectScoreForRensaGarbage(f);
     CollectedFeature cf = sc.toCollectedFeature();

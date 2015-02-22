@@ -1,4 +1,4 @@
-#include "pattern_book.h"
+#include "complement_book.h"
 
 #include <fstream>
 #include <glog/logging.h>
@@ -7,13 +7,13 @@
 
 using namespace std;
 
-bool PatternBookField::isMatchable(const CoreField& field) const
+bool ComplementBookField::isMatchable(const CoreField& field) const
 {
     PatternMatcher matcher;
     return matcher.match(patternField_, field).matched;
 }
 
-bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl) const
+bool ComplementBookField::complement(const CoreField& field, ColumnPuyoList* cpl) const
 {
     PatternMatcher matcher;
     if (!matcher.match(patternField_, field).matched)
@@ -56,19 +56,19 @@ bool PatternBookField::complement(const CoreField& field, ColumnPuyoList* cpl) c
     return true;
 }
 
-bool PatternBookField::isIgnoreable(char c) const
+bool ComplementBookField::isIgnoreable(char c) const
 {
     DCHECK('A' <= c && c <= 'Z');
     return ignoreables[c - 'A'];
 }
 
-void PatternBookField::setIgnoreable(char c)
+void ComplementBookField::setIgnoreable(char c)
 {
     DCHECK('A' <= c && c <= 'Z');
     ignoreables[c - 'A'] = true;
 }
 
-bool PatternBook::load(const std::string& filename)
+bool ComplementBook::load(const std::string& filename)
 {
     ifstream ifs(filename);
     toml::Parser parser(ifs);
@@ -81,7 +81,7 @@ bool PatternBook::load(const std::string& filename)
     return loadFromValue(std::move(v));
 }
 
-bool PatternBook::loadFromValue(const toml::Value& patterns)
+bool ComplementBook::loadFromValue(const toml::Value& patterns)
 {
     const toml::Array& vs = patterns.find("pattern")->as<toml::Array>();
     fields_.reserve(vs.size());
@@ -89,7 +89,7 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
         vector<string> f;
         for (const auto& s : v.get<toml::Array>("field"))
             f.push_back(s.as<string>());
-        PatternBookField patternBookField(f);
+        ComplementBookField patternBookField(f);
         if (const toml::Value* ignoreables = v.find("ignoreables")) {
             for (char c : ignoreables->as<string>()) {
                 patternBookField.setIgnoreable(c);
