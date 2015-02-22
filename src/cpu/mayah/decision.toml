@@ -117,6 +117,7 @@ ABDD = [2, 3]  # TODO: [1, 1]?
 ACAA = [1, 1]
 ACAB = [1, 1]
 ACAC = [2, 3]
+ACAD = [1, 1]
 ACBB = [1, 1]
 ACBC = [2, 3]
 ACCC = [1, 1]
