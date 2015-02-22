@@ -14,6 +14,8 @@ class Pattern {
   typedef std::pair<char, char> Neighbor;
 
  public:
+  typedef std::map<char, std::map<PuyoColor, int> > MatchingCounts;
+
   static void ReadBook(std::istream& is);
   static const std::vector<Pattern>& GetAllPattern();
 
@@ -21,10 +23,10 @@ class Pattern {
   const std::string& name() const { return name_; }
   int score() const { return score_; }
 
- private:
+ protected:
   void Optimize();
   void AppendField(std::string line);
-  int GetScore(std::map<char, std::map<PuyoColor, int> >& matching) const;
+  int GetScore(MatchingCounts& matching) const;
 
   std::string name_;
   std::deque<std::string> pattern_;

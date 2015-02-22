@@ -80,8 +80,8 @@ int Pattern::Match(const CoreField& field) const {
   if (max_puyos_ > 0 && field.countPuyos() > max_puyos_)
     return 0;
 
-  std::map<char, std::map<PuyoColor, int> > matching0;
-  std::map<char, std::map<PuyoColor, int> > matching1;  // Mirroring
+  MatchingCounts matching0;
+  MatchingCounts matching1;  // Mirroring
   const int height = pattern_.size();
   for (int y = 1; y <= height; ++y) {
     for (int x = 1; x <= PlainField::WIDTH; ++x) {
@@ -147,8 +147,7 @@ void Pattern::AppendField(std::string line) {
   pattern_.push_front(line);
 }
 
-int Pattern::GetScore(
-    std::map<char, std::map<PuyoColor, int> >& matching) const {
+int Pattern::GetScore(MatchingCounts& matching) const {
   int sum = 0;
   matching['_'][PuyoColor::EMPTY] += 0;
   if (matching['_'].size() == 1)
