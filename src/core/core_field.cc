@@ -74,11 +74,13 @@ private:
 
 class RensaVanishingPositionTracker {
 public:
-	RensaVanishingPositionTracker(RensaVanishingPositionResult* result) : result_(result) {
-	  resetY();
+	RensaVanishingPositionTracker(RensaVanishingPositionResult* result) : result_(result)
+    {
+        resetY();
 	}
 
-    void colorPuyoIsVanished(int x, int y, int nthChain) {
+    void colorPuyoIsVanished(int x, int y, int nthChain)
+    {
         if (yAtPrevRensa_[x][y] == 0) {
             result_->setBasePuyo(x, y, nthChain);
         } else {
@@ -87,22 +89,17 @@ public:
     }
 
     void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
-
-    void puyoIsDropped(int x, int fromY, int toY) {;
-        yAtPrevRensa_[x][toY] = fromY;
-    }
-
-    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {
-        resetY();
-    }
+    void puyoIsDropped(int x, int fromY, int toY) { yAtPrevRensa_[x][toY] = fromY; }
+    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) { resetY(); }
 
 private:
-    RensaVanishingPositionResult* result_;
-    std::array<std::array<int, FieldConstant::MAP_HEIGHT>, FieldConstant::MAP_WIDTH> yAtPrevRensa_;
     void resetY() {
-        constexpr std::array<int, FieldConstant::MAP_HEIGHT> INVALID_COLUMN = {{}};
+        constexpr std::array<int, FieldConstant::MAP_HEIGHT> INVALID_COLUMN {};
         yAtPrevRensa_.fill(INVALID_COLUMN);
     }
+
+    RensaVanishingPositionResult* result_;
+    std::array<std::array<int, FieldConstant::MAP_HEIGHT>, FieldConstant::MAP_WIDTH> yAtPrevRensa_;
 };
 
 CoreField::CoreField()
