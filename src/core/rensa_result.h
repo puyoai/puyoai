@@ -86,13 +86,13 @@ public:
 	
 	// Gets the reference of position set, where the puyos vanish after falling at n-th chain.  
 	// The return value is valid while this result instance is valid.
-	const std::vector<const Position>& getReferenceFallingPuyosAt(int nthChain) const {
+	const std::vector<Position>& getReferenceFallingPuyosAt(int nthChain) const {
 		return fallingPuyosErasedAt_[nthChain - 1];
 	}
 	
 	// Gets the reference of position set, where the puyos vanish without falling at n-th chain.
 	// The return value is valid while this result instance is valid.
-	const std::vector<const Position>& getReferenceBasePuyosAt(int nthChain) const {
+	const std::vector<Position>& getReferenceBasePuyosAt(int nthChain) const {
 		return basePuyosErasedAt_[nthChain - 1];
 	}
 	
@@ -102,8 +102,8 @@ public:
 	void setBasePuyo(int x, int y, int nthChain);
 	
 private:
-	std::vector<std::vector<const Position>> basePuyosErasedAt_;
-	std::vector<std::vector<const Position>> fallingPuyosErasedAt_;
+	std::vector<std::vector<Position>> basePuyosErasedAt_;
+	std::vector<std::vector<Position>> fallingPuyosErasedAt_;
 	std::vector<std::vector<int>> yOfFalledPuyosErasedAt_;
 	void maybeResize(int nthChain);
 };
