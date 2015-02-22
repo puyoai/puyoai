@@ -1,10 +1,10 @@
-#include "pattern_book.h"
+#include "complement_book.h"
 
 #include <gtest/gtest.h>
 
-TEST(PatternBookField, complement1)
+TEST(ComplementBookField, complement1)
 {
-    PatternBookField pbf(
+    ComplementBookField cbf(
         "..BC.."
         "AAAB.."
         "BBBCCC");
@@ -20,16 +20,16 @@ TEST(PatternBookField, complement1)
         "BBBGGG");
 
     ColumnPuyoList cpl;
-    EXPECT_TRUE(pbf.complement(cf, &cpl));
+    EXPECT_TRUE(cbf.complement(cf, &cpl));
     for (const auto& cp : cpl) {
         cf.dropPuyoOn(cp.x, cp.color);
     }
     EXPECT_EQ(expected, cf) << cf.toDebugString();
 }
 
-TEST(PatternBookField, complement2)
+TEST(ComplementBookField, complement2)
 {
-    PatternBookField pbf(
+    ComplementBookField cbf(
         "B....."
         "AAA..."
         "BC...."
@@ -43,12 +43,12 @@ TEST(PatternBookField, complement2)
 
     // Since we cannot complement (3, 3), so this pattern should not match.
     ColumnPuyoList cpl;
-    EXPECT_FALSE(pbf.complement(cf, &cpl));
+    EXPECT_FALSE(cbf.complement(cf, &cpl));
 }
 
-TEST(PatternBookField, complement3)
+TEST(ComplementBookField, complement3)
 {
-    PatternBookField pbf(
+    ComplementBookField cbf(
         "BA...."
         "AA...."
         "BC...."
@@ -61,12 +61,12 @@ TEST(PatternBookField, complement3)
         "RRRGGG");
 
     ColumnPuyoList cpl;
-    EXPECT_FALSE(pbf.complement(cf, &cpl));
+    EXPECT_FALSE(cbf.complement(cf, &cpl));
 }
 
-TEST(PatternBookField, complement4)
+TEST(ComplementBookField, complement4)
 {
-    PatternBookField pbf(
+    ComplementBookField cbf(
         "....De"
         "ABCDDE"
         "AABCCD"
@@ -79,12 +79,12 @@ TEST(PatternBookField, complement4)
         "GG.YYY");
 
     ColumnPuyoList cpl;
-    EXPECT_TRUE(pbf.complement(cf, &cpl));
+    EXPECT_TRUE(cbf.complement(cf, &cpl));
 }
 
-TEST(PatternBookField, ignoreable)
+TEST(ComplementBookField, ignoreable)
 {
-    PatternBookField pbf(
+    ComplementBookField cbf(
         ".BCD.."
         ".ABCD."
         ".ABCD."
@@ -97,9 +97,9 @@ TEST(PatternBookField, ignoreable)
         ".RGB..");
 
     ColumnPuyoList cpl;
-    EXPECT_FALSE(pbf.complement(cf, &cpl));
+    EXPECT_FALSE(cbf.complement(cf, &cpl));
 
     cpl.clear();
-    pbf.setIgnoreable('D');
-    EXPECT_TRUE(pbf.complement(cf, &cpl));
+    cbf.setIgnoreable('D');
+    EXPECT_TRUE(cbf.complement(cf, &cpl));
 }
