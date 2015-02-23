@@ -303,21 +303,12 @@ void Evaluator<ScoreCollector>::evalRidgeHeight(const CoreField& field)
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::evalFieldUShape(const CoreField& field, bool enemyHasZenkeshi)
 {
-    if (enemyHasZenkeshi) {
-        calculateFieldUShape(sc_,
-                             FIELD_USHAPE_LINEAR_ON_ZENKESHI,
-                             FIELD_USHAPE_SQUARE_ON_ZENKESHI,
-                             FIELD_USHAPE_EXP_ON_ZENKESHI,
-                             true,
-                             field);
-    } else {
-        calculateFieldUShape(sc_,
-                             FIELD_USHAPE_LINEAR,
-                             FIELD_USHAPE_SQUARE,
-                             FIELD_USHAPE_EXP,
-                             false,
-                             field);
-    }
+    calculateFieldUShape(sc_,
+                         FIELD_USHAPE_LINEAR,
+                         FIELD_USHAPE_SQUARE,
+                         FIELD_USHAPE_EXP,
+                         enemyHasZenkeshi,
+                         field);
 }
 
 template<typename ScoreCollector>
@@ -641,21 +632,12 @@ void RensaEvaluator<ScoreCollector>::evalRensaValleyDepth(const CoreField& field
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field, bool enemyHasZenkeshi)
 {
-    if (enemyHasZenkeshi) {
-        calculateFieldUShape(sc_,
-                             RENSA_FIELD_USHAPE_LINEAR_ON_ZENKESHI,
-                             RENSA_FIELD_USHAPE_SQUARE_ON_ZENKESHI,
-                             RENSA_FIELD_USHAPE_EXP_ON_ZENKESHI,
-                             true,
-                             field);
-    } else {
-        calculateFieldUShape(sc_,
-                             RENSA_FIELD_USHAPE_LINEAR,
-                             RENSA_FIELD_USHAPE_SQUARE,
-                             RENSA_FIELD_USHAPE_EXP,
-                             false,
-                             field);
-    }
+    calculateFieldUShape(sc_,
+                         RENSA_FIELD_USHAPE_LINEAR,
+                         RENSA_FIELD_USHAPE_SQUARE,
+                         RENSA_FIELD_USHAPE_EXP,
+                         enemyHasZenkeshi,
+                         field);
 }
 
 template<typename ScoreCollector>
