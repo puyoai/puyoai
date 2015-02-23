@@ -1281,33 +1281,33 @@ score = 9.8
 # ----------------------------------------------------------------------
 
 [[book]]
+name = "LLR"
+score = 9.3
 field = [
     "ACBD..",
     "AACB.D",
     "BBCCDD"
 ]
-name = "LLR"
-score = 9.3
 
 [[book]]
+name = "LLR"
+score = 9.3
 field = [
     "..bd..",
     "ACBDd.",
     "AACC.D",
     "BBCBDD"
 ]
-name = "LLR"
-score = 9.3
 
 [[book]]
+name = "LLR"
+score = 9.3
 field = [
     "..bb..",
     "ACBBb.",
     "AACD.D",
     "BBCCDD"
 ]
-name = "LLR"
-score = 9.3
 
 # ----------------------------------------------------------------------
 
