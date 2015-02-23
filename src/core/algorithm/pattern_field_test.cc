@@ -85,3 +85,23 @@ TEST(PatternFieldTest, varCount)
         EXPECT_EQ(6, f.numVariables());
     }
 }
+
+TEST(PatternFieldTest, fillSameVariablePositions)
+{
+    PatternField pf(
+        "C....."
+        "CAA..."
+        "CCDAAA"
+        "AAADDD");
+
+    FieldBitField checked;
+    Position positionQueue[FieldConstant::WIDTH * FieldConstant::HEIGHT];
+    Position* p = pf.fillSameVariablePositions(1, 2, 'C', positionQueue, &checked);
+    EXPECT_EQ(4, p - positionQueue);
+
+    std::sort(positionQueue, p);
+    EXPECT_EQ(Position(1, 2), positionQueue[0]);
+    EXPECT_EQ(Position(1, 3), positionQueue[1]);
+    EXPECT_EQ(Position(1, 4), positionQueue[2]);
+    EXPECT_EQ(Position(2, 2), positionQueue[3]);
+}

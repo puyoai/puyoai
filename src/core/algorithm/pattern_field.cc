@@ -18,6 +18,20 @@ PatternField::PatternField(double defaultScore) :
             types_[x][y] = PatternType::NONE;
         }
     }
+
+    for (int y = 0; y < MAP_HEIGHT; ++y) {
+        vars_[0][y] = '\0';
+        types_[0][y] = PatternType::WALL;
+        vars_[MAP_WIDTH - 1][y] = '\0';
+        types_[MAP_WIDTH - 1][y] = PatternType::WALL;
+    }
+
+    for (int x = 0; x < MAP_WIDTH; ++x) {
+        vars_[x][0] = '\0';
+        types_[x][0] = PatternType::WALL;
+        vars_[x][MAP_HEIGHT - 1] = '\0';
+        types_[x][MAP_HEIGHT - 1] = PatternType::WALL;
+    }
 }
 
 PatternField::PatternField(const std::string& field, double defaultScore) :
@@ -198,6 +212,43 @@ PatternType PatternField::inferType(char c, PatternType typeForLowerCase)
         return typeForLowerCase;
 
     return PatternType::NONE;
+}
+
+Position* PatternField::fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldBitField* checked) const
+{
+    DCHECK(!checked->get(x, y));
+
+    if (FieldConstant::HEIGHT < y)
+        return positionQueueHead;
+
+    Position* writeHead = positionQueueHead;
+    Position* readHead = positionQueueHead;
+
+    *writeHead++ = Position(x, y);
+    checked->set(x, y);
+
+    while (readHead != writeHead) {
+        Position p = *readHead++;
+
+        if (variable(p.x + 1, p.y) == c && !checked->get(p.x + 1, p.y)) {
+            *writeHead++ = Position(p.x + 1, p.y);
+            checked->set(p.x + 1, p.y);
+        }
+        if (variable(p.x - 1, p.y) == c && !checked->get(p.x - 1, p.y)) {
+            *writeHead++ = Position(p.x - 1, p.y);
+            checked->set(p.x - 1, p.y);
+        }
+        if (variable(p.x, p.y + 1) == c && !checked->get(p.x, p.y + 1) && p.y + 1 <= FieldConstant::HEIGHT) {
+            *writeHead++ = Position(p.x, p.y + 1);
+            checked->set(p.x, p.y + 1);
+        }
+        if (variable(p.x, p.y - 1) == c && !checked->get(p.x, p.y - 1)) {
+            *writeHead++ = Position(p.x, p.y - 1);
+            checked->set(p.x, p.y - 1);
+        }
+    }
+
+    return writeHead;
 }
 
 PatternField PatternField::mirror() const
