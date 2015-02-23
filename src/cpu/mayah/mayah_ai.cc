@@ -252,6 +252,9 @@ EvaluationMode MayahAI::calculateMode(const PlayerState& me, const PlayerState& 
 
     UNUSED_VARIABLE(enemy);
 
+    if (enemy.field.isZenkeshi())
+        return EvaluationMode::ENEMY_HAS_ZENKESHI;
+
     int count = me.field.countPuyos();
     if (count <= EARLY_THRESHOLD)
         return EvaluationMode::EARLY;

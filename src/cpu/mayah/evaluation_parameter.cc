@@ -20,6 +20,7 @@ string toString(EvaluationMode mode)
     case EvaluationMode::EARLY: return "early";
     case EvaluationMode::MIDDLE: return "middle";
     case EvaluationMode::LATE: return "late";
+    case EvaluationMode::ENEMY_HAS_ZENKESHI: return "enemy_has_zenkeshi";
     default:
         CHECK(false) << static_cast<int>(mode);
     }

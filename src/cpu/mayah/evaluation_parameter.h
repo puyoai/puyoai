@@ -15,12 +15,15 @@ enum class EvaluationMode {
     EARLY,
     MIDDLE,
     LATE,
+    ENEMY_HAS_ZENKESHI,
 };
+
 const EvaluationMode ALL_EVALUATION_MODES[] = {
     EvaluationMode::DEFAULT,
     EvaluationMode::EARLY,
     EvaluationMode::MIDDLE,
     EvaluationMode::LATE,
+    EvaluationMode::ENEMY_HAS_ZENKESHI,
 };
 inline int ordinal(EvaluationMode mode) { return static_cast<int>(mode); }
 std::string toString(EvaluationMode);
