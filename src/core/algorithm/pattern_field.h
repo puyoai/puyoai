@@ -6,9 +6,11 @@
 #include <vector>
 
 #include "core/field_constant.h"
+#include "core/position.h"
+#include "core/field_bit_field.h"
 
 enum class PatternType : std::uint8_t {
-    NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR,
+    NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR, WALL
 };
 
 // PatternField is a field that holds characters.
@@ -32,6 +34,8 @@ public:
     char variable(int x, int y) const { return vars_[x][y]; }
     double score(int x, int y) const { return scores_[x][y]; }
     PatternType type(int x, int y) const { return types_[x][y]; }
+
+    Position* fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldBitField*) const;
 
     PatternField mirror() const;
 
