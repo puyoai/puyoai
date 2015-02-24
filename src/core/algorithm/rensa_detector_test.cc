@@ -20,6 +20,58 @@ static void dropKeyAndFirePuyos(CoreField* f, const ColumnPuyoList& keyPuyos, co
     dropPuyos(f, firePuyos);
 }
 
+TEST(RensaDetectorTest, detect1)
+{
+    CoreField f(
+        "..RRR.");
+
+    pair<CoreField, ColumnPuyoList> expected[] {
+        make_pair(CoreField(
+                      ".RRRR."),
+                  ColumnPuyoList(2, PuyoColor::RED, 1)),
+        make_pair(CoreField(
+                      "..R..."
+                      "..RRR."),
+                  ColumnPuyoList(3, PuyoColor::RED, 1)),
+        make_pair(CoreField(
+                      "...R.."
+                      "..RRR."),
+                  ColumnPuyoList(4, PuyoColor::RED, 1)),
+        make_pair(CoreField(
+                      "....R."
+                      "..RRR."),
+                  ColumnPuyoList(5, PuyoColor::RED, 1)),
+        make_pair(CoreField(
+                      "..RRRR"),
+                  ColumnPuyoList(6, PuyoColor::RED, 1)),
+    };
+
+    bool found[5] {};
+    bool unexpectedFound = false;
+    auto callback = [&](CoreField* cf, const ColumnPuyoList& firePuyos) {
+        bool ok = false;
+        for (int i = 0; i < 5; ++i) {
+            if (expected[i].first == *cf && expected[i].second == firePuyos) {
+                found[i] = true;
+                ok = true;
+                break;
+            }
+        }
+
+        if (!ok)
+            unexpectedFound = true;
+    };
+
+    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 1, false);
+    RensaDetector::detect(f, strategy, callback);
+    EXPECT_FALSE(unexpectedFound);
+    EXPECT_TRUE(found[0]);
+    EXPECT_TRUE(found[1]);
+    EXPECT_TRUE(found[2]);
+    EXPECT_TRUE(found[3]);
+    EXPECT_TRUE(found[4]);
+}
+
 TEST(RensaDetectorTest, detectSingleDrop1)
 {
     CoreField f(

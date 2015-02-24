@@ -81,23 +81,7 @@ enum class PurposeForFindingRensa {
     FOR_KEY,
 };
 
-typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
-RensaDetectorStrategy gDefaultFloatStrategy(RensaDetectorStrategy::Mode::FLOAT, 3, 3, true);
-RensaDetectorStrategy gDefaultDropStrategy(RensaDetectorStrategy::Mode::DROP, 3, 3, true);
-
 }  // namespace anomymous
-
-// static
-const RensaDetectorStrategy& RensaDetectorStrategy::defaultFloatStrategy()
-{
-    return gDefaultFloatStrategy;
-}
-
-// static
-const RensaDetectorStrategy& RensaDetectorStrategy::defaultDropStrategy()
-{
-    return gDefaultDropStrategy;
-}
 
 static inline
 void makeProhibitArray(const RensaResult& rensaResult, const RensaTrackResult& trackResult,
@@ -145,7 +129,8 @@ void makeProhibitArrayForExtend(const RensaResult& /*rensaResult*/, const RensaT
 
 static inline
 void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                 PurposeForFindingRensa purpose, int maxComplementPuyos, int maxPuyoHeight, SimulationCallback callback)
+                 PurposeForFindingRensa purpose, int maxComplementPuyos, int maxPuyoHeight,
+                 const RensaDetector::SimulationCallback& callback)
 {
     bool visited[CoreField::MAP_WIDTH][NUM_PUYO_COLORS] {};
 
@@ -222,7 +207,8 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 
 static inline
 void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                  int maxComplementPuyos, int maxPuyoHeight, SimulationCallback callback)
+                  int maxComplementPuyos, int maxPuyoHeight,
+                  const RensaDetector::SimulationCallback& callback)
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = originalField.height(x); y >= 1; --y) {
@@ -290,7 +276,8 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
 
 static inline
 void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                  int maxComplementPuyos, int maxPuyoHeight, SimulationCallback callback)
+                   int maxComplementPuyos, int maxPuyoHeight,
+                   const RensaDetector::SimulationCallback& callback)
 {
     FieldBitField checked;
     Position positions[FieldConstant::HEIGHT * FieldConstant::WIDTH];
@@ -462,7 +449,7 @@ static inline void findRensas(const CoreField& field,
                               const RensaDetectorStrategy& strategy,
                               const bool prohibits[FieldConstant::MAP_WIDTH],
                               PurposeForFindingRensa purpose,
-                              SimulationCallback callback)
+                              const RensaDetector::SimulationCallback& callback)
 {
     int maxPuyoHeight = 12;
     int complementPuyos;
@@ -492,6 +479,13 @@ static inline void findRensas(const CoreField& field,
     default:
         CHECK(false) << "Unknown mode : " << static_cast<int>(strategy.mode());
     }
+}
+
+void RensaDetector::detect(const CoreField& original, const RensaDetectorStrategy& strategy,
+                           const RensaDetector::SimulationCallback& callback)
+{
+    static const bool nonProhibits[FieldConstant::MAP_WIDTH] {};
+    findRensas(original, strategy, nonProhibits, PurposeForFindingRensa::FOR_FIRE, callback);
 }
 
 void RensaDetector::detectSingle(const CoreField& original, const RensaDetectorStrategy& strategy, RensaCallback callback)

@@ -16,10 +16,10 @@ public:
         DROP, FLOAT, EXTEND,
     };
 
-    explicit RensaDetectorStrategy(Mode mode,
-                                   int maxNumOfComplementPuyosForKey,
-                                   int maxNumOfComplementPuyosForFire,
-                                   bool allowsPuttingKeyPuyoOn13thRow) :
+    RensaDetectorStrategy(Mode mode,
+                          int maxNumOfComplementPuyosForKey,
+                          int maxNumOfComplementPuyosForFire,
+                          bool allowsPuttingKeyPuyoOn13thRow) :
         mode_(mode),
         maxNumOfComplementPuyosForKey_(maxNumOfComplementPuyosForKey),
         maxNumOfComplementPuyosForFire_(maxNumOfComplementPuyosForFire),
@@ -27,8 +27,8 @@ public:
     {
     }
 
-    static const RensaDetectorStrategy& defaultFloatStrategy();
-    static const RensaDetectorStrategy& defaultDropStrategy();
+    static RensaDetectorStrategy defaultFloatStrategy() { return RensaDetectorStrategy(Mode::FLOAT, 3, 3, true); }
+    static RensaDetectorStrategy defaultDropStrategy() { return RensaDetectorStrategy(Mode::DROP, 3, 3, true); }
     static RensaDetectorStrategy defaultExtendStrategy() { return RensaDetectorStrategy(Mode::EXTEND, 3, 3, false); }
 
     Mode mode() const { return mode_; }
@@ -45,6 +45,12 @@ private:
 
 class RensaDetector {
 public:
+    typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
+    // Detects a rensa from the field. The ColumnPuyoList to fire a rensa will be passed to
+    // |callback|. Note that invalid column puyo list might be passed to |callback|.
+    // The field that puyo list is added is also passed to DetectionCallback.
+    static void detect(const CoreField&, const RensaDetectorStrategy&, const SimulationCallback& callback);
+
     typedef std::function<void (const CoreField& fieldAfterRensa,
                                 const RensaResult&,
                                 const ColumnPuyoList&)> RensaCallback;
