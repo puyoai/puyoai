@@ -1,5 +1,6 @@
 #include "pattern_field.h"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
