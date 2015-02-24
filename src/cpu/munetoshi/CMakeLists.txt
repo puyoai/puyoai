@@ -7,4 +7,4 @@ function(munetoshi_add_executable exe)
   cpu_target_link_common_libraries(${exe})
 endfunction()
 
-munetoshi_add_executable(munetoshi main.cc ai.h ai.cc)
+munetoshi_add_executable(munetoshi main.cc ai.h ai.cc utilities.cc)
