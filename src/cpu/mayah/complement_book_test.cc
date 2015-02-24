@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-TEST(ComplementBookField, complement1)
+TEST(ComplementBookFieldTest, complement1)
 {
     ComplementBookField cbf(
         "..BC.."
@@ -27,7 +27,7 @@ TEST(ComplementBookField, complement1)
     EXPECT_EQ(expected, cf) << cf.toDebugString();
 }
 
-TEST(ComplementBookField, complement2)
+TEST(ComplementBookFieldTest, complement2)
 {
     ComplementBookField cbf(
         "B....."
@@ -46,7 +46,7 @@ TEST(ComplementBookField, complement2)
     EXPECT_FALSE(cbf.complement(cf, &cpl));
 }
 
-TEST(ComplementBookField, complement3)
+TEST(ComplementBookFieldTest, complement3)
 {
     ComplementBookField cbf(
         "BA...."
@@ -64,7 +64,7 @@ TEST(ComplementBookField, complement3)
     EXPECT_FALSE(cbf.complement(cf, &cpl));
 }
 
-TEST(ComplementBookField, complement4)
+TEST(ComplementBookFieldTest, complement4)
 {
     ComplementBookField cbf(
         "....De"
@@ -82,7 +82,7 @@ TEST(ComplementBookField, complement4)
     EXPECT_TRUE(cbf.complement(cf, &cpl));
 }
 
-TEST(ComplementBookField, ignoreable)
+TEST(ComplementBookFieldTest, ignoreable)
 {
     ComplementBookField cbf(
         ".BCD.."
