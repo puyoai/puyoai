@@ -97,7 +97,7 @@ int munetoshi::AI::evaluate(const CoreField& core_field, const RefPlan *plan_ptr
             const ColumnPuyoList& fire_puyos,
             const RensaVanishingPositionResult& position_result) {
 
-        grade grade_vect[NUM_EVALUATOR_TYPES] = {{}};
+        grade grade_vect[NUM_EVALUATOR_TYPES] = {};
         EvaluationElements e = {
                 plan_ptr,
                 core_field,
