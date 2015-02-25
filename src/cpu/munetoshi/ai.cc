@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <climits>
+#include <string>
 #include <tuple>
 #include <vector>
 
@@ -19,12 +20,12 @@ munetoshi::grade inner_product(
         int n);
 
 static const munetoshi::grade GRADE_WEIGHT_GROW[munetoshi::NUM_EVALUATOR_TYPES] = {
-        10, // CHAIN_LENGTH
-        -2, // NUM_REQUIRED_PUYO
-        -5, // DEATH_RATIO
-        -0.5, // TEAR
-        -1, // VALLEY_SHAPE
-        40, // TURNOVER_SHAPE
+        20, // CHAIN_LENGTH
+        -4, // NUM_REQUIRED_PUYO
+        -10, // DEATH_RATIO
+        -1, // TEAR
+        -2, // VALLEY_SHAPE
+        80, // TURNOVER_SHAPE
 };
 
 munetoshi::AI::AI(int argc, char* argv[]) :
@@ -37,28 +38,37 @@ void munetoshi::AI::onGameWillBegin(const FrameRequest& /*frame*/) {
 }
 
 DropDecision munetoshi::AI::think(
-        int frame_id,
+        int /*frame_id*/,
         const CoreField& field,
         const KumipuyoSeq& seq,
-        const PlayerState&,
-        const PlayerState&,
+        const PlayerState& my_state,
+        const PlayerState& opponent_state,
         bool) const {
-    return think_internal(frame_id, field, seq);
+    return think_internal(field, seq, my_state, opponent_state);
 }
 
 DropDecision munetoshi::AI::think_internal(
-        int /*frame_id*/,
         const CoreField& field,
-        const KumipuyoSeq& seq) const {
+        const KumipuyoSeq& seq,
+        const PlayerState& my_state,
+        const PlayerState& opponent_state) const {
 
+    std::string message;
     Decision best_chain_decision;
     Decision best_fire_decision;
     grade best_chain_grade = GRADE_MIN;
     grade best_fire_grade = GRADE_MIN;
-    grade previous_chain_grade = evaluate(field, nullptr);
+    grade previous_chain_grade = evaluate(
+            field,
+            my_state,
+            opponent_state);
     auto dicisionMaker = [&](const RefPlan& plan) {
         grade fire_grade = plan.rensaResult().score;
-        grade chain_grade = evaluate(plan.field(), &plan);
+        grade chain_grade = evaluate(
+                plan.field(),
+                my_state,
+                opponent_state,
+                &plan);
 
         if (best_fire_grade < fire_grade) {
             best_fire_grade = fire_grade;
@@ -68,14 +78,15 @@ DropDecision munetoshi::AI::think_internal(
         if (best_chain_grade < chain_grade) {
             best_chain_grade = chain_grade;
             best_chain_decision = plan.decisions().front();
+            message = "munetoshi:" + std::to_string(best_chain_grade);
         }
     };
 
-    Plan::iterateAvailablePlans(field, seq, 2, dicisionMaker);
+    Plan::iterateAvailablePlans(field, seq, 2 /*max_depth*/, dicisionMaker);
     return best_chain_grade < previous_chain_grade
             || (strategy == FIRE && best_fire_grade > 1000) ?
-            DropDecision(best_fire_decision, "munetoshi: FIRE") :
-            DropDecision(best_chain_decision, "munetoshi: GROW");
+            DropDecision(best_fire_decision, message):
+            DropDecision(best_chain_decision, message);
 }
 
 void munetoshi::AI::onEnemyGrounded(const FrameRequest& frame) {
@@ -87,7 +98,11 @@ void munetoshi::AI::onEnemyGrounded(const FrameRequest& frame) {
     }
 }
 
-int munetoshi::AI::evaluate(const CoreField& core_field, const RefPlan *plan_ptr) const {
+munetoshi::grade munetoshi::AI::evaluate(
+        const CoreField& core_field,
+        const PlayerState& my_state,
+        const PlayerState& opponent_state,
+        const RefPlan *plan_ptr) const {
     grade optimal_grade = GRADE_MIN;
     auto callback = [&](
             const CoreField& /*field_after_chain*/,
@@ -98,12 +113,16 @@ int munetoshi::AI::evaluate(const CoreField& core_field, const RefPlan *plan_ptr
 
         grade grade_vect[NUM_EVALUATOR_TYPES] = {};
         EvaluationElements e = {
-                plan_ptr,
                 core_field,
+                my_state,
+                opponent_state,
+
                 rensa_result,
                 key_puyos,
                 fire_puyos,
                 position_result,
+
+                plan_ptr,
         };
 
         auto grade_vect_setter = [&](EVALUATOR_TYPES type, float result) {
@@ -125,8 +144,11 @@ int munetoshi::AI::evaluate(const CoreField& core_field, const RefPlan *plan_ptr
                 optimal_grade);
     };
 
-    RensaDetector::iteratePossibleRensasWithVanishingPositionTracking(core_field, 1,
-            RensaDetectorStrategy::defaultFloatStrategy(), callback);
+    RensaDetector::iteratePossibleRensasWithVanishingPositionTracking(
+            core_field,
+            1 /*key_puyos*/,
+            RensaDetectorStrategy::defaultFloatStrategy(),
+            callback);
     return optimal_grade;
 }
 
