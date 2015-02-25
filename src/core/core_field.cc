@@ -74,10 +74,10 @@ private:
 
 class RensaVanishingPositionTracker {
 public:
-	RensaVanishingPositionTracker(RensaVanishingPositionResult* result) : result_(result)
+    RensaVanishingPositionTracker(RensaVanishingPositionResult* result) : result_(result)
     {
         resetY();
-	}
+    }
 
     void colorPuyoIsVanished(int x, int y, int nthChain)
     {
@@ -665,11 +665,10 @@ bool CoreField::rensaWillOccurWithMinHeights(int minHeights[CoreField::MAP_WIDTH
     return false;
 }
 
-RensaResult CoreField::simulate(
-		int initialChain,
-		RensaTrackResult* rensaTrackResult,
-		RensaCoefResult* rensaCoefResult,
-		RensaVanishingPositionResult* rensaVanishingPositionResult)
+RensaResult CoreField::simulate(int initialChain,
+                                RensaTrackResult* rensaTrackResult,
+                                RensaCoefResult* rensaCoefResult,
+                                RensaVanishingPositionResult* rensaVanishingPositionResult)
 {
     int minHeights[MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
 

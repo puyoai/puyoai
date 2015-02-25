@@ -102,7 +102,7 @@ public:
     RensaResult simulate(int initialChain = 1,
                          RensaTrackResult* rensaTrackResult = nullptr,
                          RensaCoefResult* rensaCoefResult = nullptr,
-						 RensaVanishingPositionResult* rensaVanishingPositionResult = nullptr);
+                         RensaVanishingPositionResult* rensaVanishingPositionResult = nullptr);
     RensaResult simulate(RensaCoefResult* rensaCoefResult) { return simulate(1, nullptr, rensaCoefResult, nullptr); }
     RensaResult simulate(RensaTrackResult* rensaTrackResult) { return simulate(1, rensaTrackResult, nullptr, nullptr); }
     RensaResult simulate(RensaVanishingPositionResult* rensaVanishingPositionResult) { return simulate(1, nullptr, nullptr, rensaVanishingPositionResult); }
