@@ -29,7 +29,7 @@ static const munetoshi::grade GRADE_WEIGHT_GROW[munetoshi::NUM_EVALUATOR_TYPES] 
 };
 
 munetoshi::AI::AI(int argc, char* argv[]) :
-        ::AI(argc, argv, "munetoshi") {
+        ::AI(argc, argv, "minim") {
     strategy = GROW;
 }
 
@@ -78,7 +78,7 @@ DropDecision munetoshi::AI::think_internal(
         if (best_chain_grade < chain_grade) {
             best_chain_grade = chain_grade;
             best_chain_decision = plan.decisions().front();
-            message = "munetoshi:" + std::to_string(best_chain_grade);
+            message = "minim:" + std::to_string(best_chain_grade);
         }
     };
 
