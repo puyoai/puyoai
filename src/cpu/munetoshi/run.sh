@@ -1,4 +1,4 @@
 #!/bin/bash
 cd "$(dirname "$0")"
-exec ./munetoshi "$@" 2> munetoshi.err
+exec ./minim "$@" 2> minim.err
 
