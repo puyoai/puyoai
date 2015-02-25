@@ -28,12 +28,19 @@ protected:
 
     virtual void onGameWillBegin(const FrameRequest&) override;
 
-    virtual DropDecision think_internal(int frame_id, const CoreField& field,
-            const KumipuyoSeq& seq) const;
+    virtual DropDecision think_internal(
+            const CoreField& field,
+            const KumipuyoSeq& seq,
+            const PlayerState& my_state,
+            const PlayerState& opponent_state) const;
 
     virtual void onEnemyGrounded(const FrameRequest&) override;
 
-    virtual int evaluate(const CoreField& field, const RefPlan* plan) const;
+    virtual grade evaluate(
+            const CoreField& field,
+            const PlayerState& my_state,
+            const PlayerState& opponent_state,
+            const RefPlan* plan = nullptr) const;
 
     Strategy strategy;
 

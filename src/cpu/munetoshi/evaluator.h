@@ -2,21 +2,26 @@
 
 #include "constants.h"
 
+struct PlayerState;
 struct RensaResult;
-class RefPlan;
+
 class CoreField;
 class ColumnPuyoList;
+class RefPlan;
 class RensaVanishingPositionResult;
 
 namespace munetoshi {
 
 struct EvaluationElements {
-    const RefPlan* plan_ptr;
     const CoreField& field;
+    const PlayerState& my_state;
+    const PlayerState& opponent_state;
     const RensaResult& rensa_result;
     const ColumnPuyoList& key_puyos;
     const ColumnPuyoList& fire_puyos;
     const RensaVanishingPositionResult& position_result;
+
+    const RefPlan* plan_ptr;
 };
 
 template<EVALUATOR_TYPES E>

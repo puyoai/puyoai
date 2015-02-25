@@ -5,7 +5,7 @@
 
 namespace munetoshi {
 
-typedef float grade;
+typedef int grade;
 constexpr grade GRADE_MIN = std::numeric_limits<grade>::min();
 
 enum class EVALUATOR_TYPES {
