@@ -130,6 +130,7 @@ munetoshi::grade munetoshi::AI::evaluate(
         };
 
         Evaluators<
+        EvaluationElements,
         EVALUATOR_TYPES::CHAIN_LENGTH,
         EVALUATOR_TYPES::NUM_REQUIRED_PUYO,
         EVALUATOR_TYPES::DEATH_RATIO,
@@ -137,7 +138,7 @@ munetoshi::grade munetoshi::AI::evaluate(
         EVALUATOR_TYPES::VALLEY_SHAPE,
         EVALUATOR_TYPES::TURNOVER_SHAPE,
         EVALUATOR_TYPES::_NIL_TYPE>
-        ::evaluate_all(e, grade_vect_setter);
+        ::evaluate_all(&e, grade_vect_setter);
 
         optimal_grade = std::max(
                 inner_product(grade_vect, GRADE_WEIGHT_GROW, NUM_EVALUATOR_TYPES),

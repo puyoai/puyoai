@@ -24,10 +24,10 @@ struct EvaluationElements {
     const RefPlan* plan_ptr;
 };
 
-template<EVALUATOR_TYPES E>
+template<EVALUATOR_TYPES TYPE, typename PARAM>
 class Evaluator {
 public:
-    static grade EVALUATE(const EvaluationElements& e);
+    static grade EVALUATE(PARAM* e);
 private:
     Evaluator() = delete;
     Evaluator(const Evaluator&) = delete;
@@ -36,51 +36,51 @@ private:
     Evaluator& operator =(Evaluator&&) = delete;
 };
 
-template<EVALUATOR_TYPES... TYPES>
+template<typename PARAM, EVALUATOR_TYPES... TYPES>
 struct Evaluators;
 
-template<EVALUATOR_TYPES FIRST, EVALUATOR_TYPES... REST>
-struct Evaluators<FIRST, REST...> {
+template<typename PARAM, EVALUATOR_TYPES FIRST, EVALUATOR_TYPES... REST>
+struct Evaluators<PARAM, FIRST, REST...> {
     template<typename FUNC>
     static void evaluate_all(
-            const EvaluationElements& e,
+            PARAM* e,
             const FUNC& f) {
-        f(FIRST, Evaluator<FIRST>::EVALUATE(e));
-        Evaluators<REST...>::evaluate_all(e, f);
+        f(FIRST, Evaluator<FIRST, PARAM>::EVALUATE(e));
+        Evaluators<PARAM, REST...>::evaluate_all(e, f);
     }
 };
 
-template<>
-struct Evaluators<EVALUATOR_TYPES::_NIL_TYPE> {
+template<typename PARAM>
+struct Evaluators<PARAM, EVALUATOR_TYPES::_NIL_TYPE> {
     template<typename FUNC>
     static void evaluate_all(
-            const EvaluationElements&,
+            PARAM*,
             const FUNC&) {
         // Do nothing.
     }
 };
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::CHAIN_LENGTH>::EVALUATE(
-            const EvaluationElements& e);
+grade Evaluator<EVALUATOR_TYPES::CHAIN_LENGTH, EvaluationElements>::EVALUATE(
+            EvaluationElements* e);
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::NUM_REQUIRED_PUYO>::EVALUATE(
-            const EvaluationElements& e);
+grade Evaluator<EVALUATOR_TYPES::NUM_REQUIRED_PUYO, EvaluationElements>::EVALUATE(
+            EvaluationElements* e);
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::DEATH_RATIO>::EVALUATE(
-            const EvaluationElements& e);
+grade Evaluator<EVALUATOR_TYPES::DEATH_RATIO, EvaluationElements>::EVALUATE(
+            EvaluationElements* e);
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::TEAR>::EVALUATE(
-            const EvaluationElements& e);
+grade Evaluator<EVALUATOR_TYPES::TEAR, EvaluationElements>::EVALUATE(
+            EvaluationElements* e);
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::VALLEY_SHAPE>::EVALUATE(
-            const EvaluationElements& e);
+grade Evaluator<EVALUATOR_TYPES::VALLEY_SHAPE, EvaluationElements>::EVALUATE(
+            EvaluationElements* e);
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::TURNOVER_SHAPE>::EVALUATE(
-            const EvaluationElements& e);
+grade Evaluator<EVALUATOR_TYPES::TURNOVER_SHAPE, EvaluationElements>::EVALUATE(
+            EvaluationElements* e);
 } // namespace munetoshi
