@@ -492,12 +492,8 @@ void RensaDetector::detectSingle(const CoreField& original, const RensaDetectorS
 {
     static const bool nonProhibits[FieldConstant::MAP_WIDTH] {};
     auto f = [&original, &callback](CoreField* f, const ColumnPuyoList& firePuyos) {
-        int minHeights[CoreField::MAP_WIDTH] {
-            100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
-            original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
-        };
-
-        RensaResult rensaResult = f->simulateWithMinHeights(minHeights);
+        CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
+        RensaResult rensaResult = f->simulateWithContext(&context);
         if (rensaResult.chains > 0)
             callback(*f, rensaResult, firePuyos);
     };
@@ -508,12 +504,8 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
                                     const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                                     RensaDetector::PossibleRensaCallback callback)
 {
-    int minHeights[CoreField::MAP_WIDTH] {
-        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
-        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
-    };
-
-    RensaResult rensaResult = f->simulateWithMinHeights(minHeights);
+    CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
+    RensaResult rensaResult = f->simulateWithContext(&context);
     if (rensaResult.chains > 0)
         callback(*f, rensaResult, keyPuyos, firePuyos);
 }
@@ -522,13 +514,9 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
                                     const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                                     RensaDetector::TrackedPossibleRensaCallback callback)
 {
-    int minHeights[CoreField::MAP_WIDTH] {
-        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
-        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
-    };
-
+    CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
     RensaTrackResult rensaTrackResult;
-    RensaResult rensaResult = f->simulateWithMinHeights(minHeights, &rensaTrackResult);
+    RensaResult rensaResult = f->simulateWithContext(&context, &rensaTrackResult);
     if (rensaResult.chains > 0)
         callback(*f, rensaResult, keyPuyos, firePuyos, rensaTrackResult);
 }
@@ -537,13 +525,9 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
                                     const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                                     RensaDetector::CoefPossibleRensaCallback callback)
 {
-    int minHeights[CoreField::MAP_WIDTH] {
-        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
-        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
-    };
-
+    CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
     RensaCoefResult rensaCoefResult;
-    RensaResult rensaResult = f->simulateWithMinHeights(minHeights, &rensaCoefResult);
+    RensaResult rensaResult = f->simulateWithContext(&context, &rensaCoefResult);
     if (rensaResult.chains > 0)
         callback(*f, rensaResult, keyPuyos, firePuyos, rensaCoefResult);
 }
@@ -552,13 +536,9 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
                                     const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                                     RensaDetector::VanishingPositionPossibleRensaCallback callback)
 {
-    int minHeights[CoreField::MAP_WIDTH] {
-        100, original.height(1) + 1, original.height(2) + 1, original.height(3) + 1,
-        original.height(4) + 1, original.height(5) + 1, original.height(6) + 1, 100,
-    };
-
+    CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
     RensaVanishingPositionResult rensaVanishingPositionResult;
-    RensaResult rensaResult = f->simulateWithMinHeights(minHeights, &rensaVanishingPositionResult);
+    RensaResult rensaResult = f->simulateWithContext(&context, &rensaVanishingPositionResult);
     if (rensaResult.chains > 0)
         callback(*f, rensaResult, keyPuyos, firePuyos, rensaVanishingPositionResult);
 }
@@ -675,18 +655,14 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
 
             // Check putting key puyo does not fire a rensa.
             {
-                int minHeights[CoreField::MAP_WIDTH] {
-                    100, initialField.height(1) + 1, initialField.height(2) + 1, initialField.height(3) + 1,
-                    initialField.height(4) + 1, initialField.height(5) + 1, initialField.height(6) + 1, 100 };
+                CoreField::SimulationContext context = CoreField::SimulationContext::fromField(initialField);
                 // Rensa should not start when we add key puyos.
-                if (f.rensaWillOccurWithMinHeights(minHeights))
+                if (f.rensaWillOccurWithContext(&context))
                     return;
             }
 
-            // Since key puyo does not fire a rensa, we can safely include the key puyos in minHeights.
-            int minHeights[CoreField::MAP_WIDTH] {
-                100, f.height(1) + 1, f.height(2) + 1, f.height(3) + 1,
-                f.height(4) + 1, f.height(5) + 1, f.height(6) + 1, 100 };
+            // Since key puyo does not fire a rensa, we can safely include the key puyos in context.
+            CoreField::SimulationContext context = CoreField::SimulationContext::fromField(f);
 
             // Then, fire a rensa.
             for (const ColumnPuyo& cp : firstRensaFirePuyos) {
@@ -695,7 +671,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             }
 
             RensaTrackResult combinedTrackResult;
-            RensaResult combinedRensaResult = f.simulateWithMinHeights(minHeights, &combinedTrackResult);
+            RensaResult combinedRensaResult = f.simulateWithContext(&context, &combinedTrackResult);
 
             if (combinedRensaResult.chains != rensaSequence->totalChains() + rensaResult.chains) {
                 // Rensa looks broken. We don't count such rensa.
