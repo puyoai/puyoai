@@ -14,6 +14,7 @@
 
 #include "evaluator.h"
 
+namespace {
 template<int N>
 munetoshi::grade inner_product(
         const std::array<munetoshi::grade, N> vect1,
@@ -27,6 +28,7 @@ constexpr std::array<munetoshi::grade, munetoshi::NUM_EVALUATOR_TYPES> GRADE_WEI
         -4, // NUM_REQUIRED_PUYO
         80, // TURNOVER_SHAPE
 }};
+} // namespace
 
 munetoshi::AI::AI(int argc, char* argv[]) :
         ::AI(argc, argv, "minim") {
@@ -171,6 +173,7 @@ munetoshi::grade munetoshi::AI::evaluate(
     return optimal_grade;
 }
 
+namespace {
 template<int N>
 munetoshi::grade inner_product(
         const std::array<munetoshi::grade, N> vect1,
@@ -181,3 +184,4 @@ munetoshi::grade inner_product(
     }
     return sum;
 }
+} // namespace
