@@ -81,25 +81,3 @@ TEST(ComplementBookFieldTest, complement4)
     ColumnPuyoList cpl;
     EXPECT_TRUE(cbf.complement(cf, &cpl));
 }
-
-TEST(ComplementBookFieldTest, ignoreable)
-{
-    ComplementBookField cbf(
-        ".BCD.."
-        ".ABCD."
-        ".ABCD."
-        ".ABCD.");
-
-    CoreField cf(
-        ".G...."
-        ".RG..."
-        ".RGB.."
-        ".RGB..");
-
-    ColumnPuyoList cpl;
-    EXPECT_FALSE(cbf.complement(cf, &cpl));
-
-    cpl.clear();
-    cbf.setIgnoreable('D');
-    EXPECT_TRUE(cbf.complement(cf, &cpl));
-}
