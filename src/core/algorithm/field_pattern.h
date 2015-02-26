@@ -13,18 +13,18 @@ enum class PatternType : std::uint8_t {
     NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR, WALL
 };
 
-// PatternField is a field that holds characters.
+// FieldPattern is a field that holds characters.
 // This would be useful if you want to write an algorithm to do pattern-match.
 //
 // Generally we use 'A' to 'Z' for representing variables.
 // ' ' or '.'  represents empty.
-class PatternField : FieldConstant {
+class FieldPattern : FieldConstant {
 public:
-    explicit PatternField(double defaultScore = 1);
-    explicit PatternField(const std::string&, double defaultScore = 1);
-    explicit PatternField(const std::vector<std::string>&, double defaultScore = 1);
+    explicit FieldPattern(double defaultScore = 1);
+    explicit FieldPattern(const std::string&, double defaultScore = 1);
+    explicit FieldPattern(const std::vector<std::string>&, double defaultScore = 1);
 
-    static bool merge(const PatternField&, const PatternField&, PatternField*);
+    static bool merge(const FieldPattern&, const FieldPattern&, FieldPattern*);
 
     void setPattern(int x, int y, PatternType t, char variable, double score);
 
@@ -37,7 +37,7 @@ public:
 
     Position* fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldBitField*) const;
 
-    PatternField mirror() const;
+    FieldPattern mirror() const;
 
     std::string toDebugString() const;
 
