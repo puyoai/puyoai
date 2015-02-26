@@ -153,7 +153,8 @@ void Plan::iterateAvailablePlans(const CoreField& field,
 
         if (shouldFire) {
             CoreField cf(fieldBeforeRensa);
-            RensaResult rensaResult = cf.simulateWhenLastDecisionIs(decisions.back());
+            CoreField::SimulationContext context(CoreField::SimulationContext::fromLastDecision(cf, decisions.back()));
+            RensaResult rensaResult = cf.simulateWithContext(&context);
             DCHECK_GT(rensaResult.chains, 0);
             if (cf.color(3, 12) == PuyoColor::EMPTY) {
                 callback(RefPlan(cf, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames));

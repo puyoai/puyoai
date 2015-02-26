@@ -483,7 +483,7 @@ TEST(CoreFieldTest, isChigiriDecision2)
     EXPECT_TRUE(cf.isChigiriDecision(Decision(3, 3)));
 }
 
-TEST(CoreFieldTest, rensaWillOccurWithMinHeights)
+TEST(CoreFieldTest, rensaWillOccurWithContext)
 {
     CoreField cf1(
         "YYYY  ");
@@ -498,19 +498,19 @@ TEST(CoreFieldTest, rensaWillOccurWithMinHeights)
     CoreField cf5(
         "OOOO  ");
 
-    int minHeights1[FieldConstant::MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
-    int minHeights2[FieldConstant::MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
-    int minHeights3[FieldConstant::MAP_WIDTH] = { 100, 2, 2, 2, 2, 1, 1, 100 };
-    int minHeights4[FieldConstant::MAP_WIDTH] = { 100, 2, 2, 2, 2, 1, 1, 100 };
-    int minHeights5[FieldConstant::MAP_WIDTH] = { 100, 1, 1, 1, 1, 1, 1, 100 };
+    CoreField::SimulationContext context1(1, { 1, 1, 1, 1, 1, 1, 1, 1 });
+    CoreField::SimulationContext context2(1, { 1, 1, 1, 1, 1, 1, 1, 1 });
+    CoreField::SimulationContext context3(1, { 1, 2, 2, 2, 2, 1, 1, 1 });
+    CoreField::SimulationContext context4(1, { 1, 2, 2, 2, 2, 1, 1, 1 });
+    CoreField::SimulationContext context5(1, { 1, 1, 1, 1, 1, 1, 1, 1 });
 
-    EXPECT_TRUE(cf1.rensaWillOccurWithMinHeights(minHeights1));
-    EXPECT_FALSE(cf2.rensaWillOccurWithMinHeights(minHeights2));
+    EXPECT_TRUE(cf1.rensaWillOccurWithContext(&context1));
+    EXPECT_FALSE(cf2.rensaWillOccurWithContext(&context2));
     // 4Y is connected, but it won't be checked.
-    EXPECT_FALSE(cf3.rensaWillOccurWithMinHeights(minHeights3));
+    EXPECT_FALSE(cf3.rensaWillOccurWithContext(&context3));
     // 5Y is connected, and (5, 1) Y is checked, so it should be detected.
-    EXPECT_TRUE(cf4.rensaWillOccurWithMinHeights(minHeights4));
-    EXPECT_FALSE(cf5.rensaWillOccurWithMinHeights(minHeights5));
+    EXPECT_TRUE(cf4.rensaWillOccurWithContext(&context4));
+    EXPECT_FALSE(cf5.rensaWillOccurWithContext(&context5));
 }
 
 TEST(CoreFieldTest, vanishDrop)
@@ -518,11 +518,9 @@ TEST(CoreFieldTest, vanishDrop)
     CoreField cf(
         "..BB.."
         "RRRRBB");
-    int minHeights[FieldConstant::MAP_WIDTH] {
-        1, 1, 1, 1, 1, 1, 1, 1
-    };
+    CoreField::SimulationContext context(2);
 
-    int score = cf.vanishDrop(2, minHeights);
+    int score = cf.vanishDrop(&context);
 
     CoreField expected(
         "..BBBB");
