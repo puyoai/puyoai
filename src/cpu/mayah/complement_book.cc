@@ -35,11 +35,8 @@ bool ComplementBookField::complement(const CoreField& field, ColumnPuyoList* cpl
                 continue;
             }
             char c = patternField_.variable(x, y);
-            if (!matcher.isSet(c)) {
-                if (isIgnoreable(c))
-                    continue;
+            if (!matcher.isSet(c))
                 return false;
-            }
             if (ColumnPuyoList::MAX_SIZE <= cpl->size())
                 return false;
             if (patternField_.type(x, y) == PatternType::MUST_VAR) {
@@ -54,18 +51,6 @@ bool ComplementBookField::complement(const CoreField& field, ColumnPuyoList* cpl
     }
 
     return true;
-}
-
-bool ComplementBookField::isIgnoreable(char c) const
-{
-    DCHECK('A' <= c && c <= 'Z');
-    return ignoreables[c - 'A'];
-}
-
-void ComplementBookField::setIgnoreable(char c)
-{
-    DCHECK('A' <= c && c <= 'Z');
-    ignoreables[c - 'A'] = true;
 }
 
 bool ComplementBook::load(const std::string& filename)
@@ -90,11 +75,6 @@ bool ComplementBook::loadFromValue(const toml::Value& patterns)
         for (const auto& s : v.get<toml::Array>("field"))
             f.push_back(s.as<string>());
         ComplementBookField patternBookField(f);
-        if (const toml::Value* ignoreables = v.find("ignoreables")) {
-            for (char c : ignoreables->as<string>()) {
-                patternBookField.setIgnoreable(c);
-            }
-        }
         fields_.push_back(patternBookField);
         fields_.push_back(patternBookField.mirror());
     }

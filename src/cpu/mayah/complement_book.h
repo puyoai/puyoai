@@ -13,22 +13,17 @@ class ColumnPuyoList;
 
 class ComplementBookField {
 public:
-    explicit ComplementBookField(const PatternField& field) : patternField_(field), ignoreables{} {}
-    explicit ComplementBookField(const std::string& field) : patternField_(field), ignoreables{} {}
-    explicit ComplementBookField(const std::vector<std::string>& field) : patternField_(field), ignoreables{} {}
+    explicit ComplementBookField(const PatternField& field) : patternField_(field) {}
+    explicit ComplementBookField(const std::string& field) : patternField_(field) {}
+    explicit ComplementBookField(const std::vector<std::string>& field) : patternField_(field) {}
 
     bool isMatchable(const CoreField&) const;
     bool complement(const CoreField&, ColumnPuyoList*) const;
-
-    // If ignoreable is set, complement() allows the corresponding PuyoColor of the ignoreable char is PuyoColor::EMPTY.
-    bool isIgnoreable(char c) const;
-    void setIgnoreable(char c);
 
     ComplementBookField mirror() const { return ComplementBookField(patternField_.mirror()); }
 
 private:
     PatternField patternField_;
-    bool ignoreables[26];
 };
 
 class ComplementBook : noncopyable {
