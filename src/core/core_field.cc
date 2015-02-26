@@ -94,8 +94,7 @@ public:
 
 private:
     void resetY() {
-        // TODO(mayah): gcc-4.8 warns if we omit 0.
-        constexpr std::array<int, FieldConstant::MAP_HEIGHT> ALL_ZERO { 0 };
+        constexpr std::array<int, FieldConstant::MAP_HEIGHT> ALL_ZERO {{}};
         yAtPrevRensa_.fill(ALL_ZERO);
     }
 
