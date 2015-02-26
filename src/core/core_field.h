@@ -137,15 +137,15 @@ public:
 
     // Simulates rensa with specifying the context.
     RensaResult simulateWithContext(SimulationContext*);
-    RensaResult simulateWithContext(SimulationContext*, RensaTrackResult* trackResult);
-    RensaResult simulateWithContext(SimulationContext*, RensaCoefResult* coefResult);
-    RensaResult simulateWithContext(SimulationContext*, RensaVanishingPositionResult* vanishingPositionResult);
+    RensaResult simulateWithContext(SimulationContext*, RensaTrackResult*);
+    RensaResult simulateWithContext(SimulationContext*, RensaCoefResult*);
+    RensaResult simulateWithContext(SimulationContext*, RensaVanishingPositionResult*);
 
     // Vanishes the connected puyos. Score will be returned.
     int vanishOnly(int currentChain);
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
-    int vanishDrop(SimulationContext* context);
+    int vanishDrop(SimulationContext*);
 
     // ----------------------------------------------------------------------
     // utility methods
