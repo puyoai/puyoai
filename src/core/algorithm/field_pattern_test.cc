@@ -106,3 +106,83 @@ TEST(FieldPatternTest, fillSameVariablePositions)
     EXPECT_EQ(Position(1, 4), positionQueue[2]);
     EXPECT_EQ(Position(2, 2), positionQueue[3]);
 }
+
+TEST(FieldPatternTest, complement1)
+{
+    FieldPattern pattern(
+        "..BC.."
+        "AAAB.."
+        "BBBCCC");
+
+    CoreField cf(
+        "......"
+        "..YB.."
+        "BBBG..");
+
+    CoreField expected(
+        "..BG.."
+        "YYYB.."
+        "BBBGGG");
+
+    ColumnPuyoList cpl;
+    EXPECT_TRUE(pattern.complement(cf, &cpl));
+    for (const auto& cp : cpl) {
+        cf.dropPuyoOn(cp.x, cp.color);
+    }
+    EXPECT_EQ(expected, cf) << cf.toDebugString();
+}
+
+TEST(FieldPatternTest, complement2)
+{
+    FieldPattern pattern(
+        "B....."
+        "AAA..."
+        "BC...."
+        "BBC..."
+        "CC....");
+
+    CoreField cf(
+        "YB...."
+        "YYB..."
+        "BBGGG.");
+
+    // Since we cannot complement (3, 3), so this pattern should not match.
+    ColumnPuyoList cpl;
+    EXPECT_FALSE(pattern.complement(cf, &cpl));
+}
+
+TEST(FieldPatternTest, complement3)
+{
+    FieldPattern pattern(
+        "BA...."
+        "AA...."
+        "BC...."
+        "BBC..."
+        "CC....");
+
+    CoreField cf(
+        " R    "
+        "YY BBB"
+        "RRRGGG");
+
+    ColumnPuyoList cpl;
+    EXPECT_FALSE(pattern.complement(cf, &cpl));
+}
+
+TEST(FieldPatternTest, complement4)
+{
+    FieldPattern pattern(
+        "....De"
+        "ABCDDE"
+        "AABCCD"
+        "BBCEEE");
+
+    CoreField cf(
+        ".....Y"
+        "Y....Y"
+        "Y..RRB"
+        "GG.YYY");
+
+    ColumnPuyoList cpl;
+    EXPECT_TRUE(pattern.complement(cf, &cpl));
+}

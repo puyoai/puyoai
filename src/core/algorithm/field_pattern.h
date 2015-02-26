@@ -1,13 +1,15 @@
-#ifndef CPU_MAYAH_PATTERN_FIELD_H_
-#define CPU_MAYAH_PATTERN_FIELD_H_
+#ifndef CORE_ALGORITHM_PATTERN_FIELD_H_
+#define CORE_ALGORITHM_PATTERN_FIELD_H_
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
+#include "core/algorithm/column_puyo_list.h"
+#include "core/core_field.h"
 #include "core/field_constant.h"
-#include "core/position.h"
 #include "core/field_bit_field.h"
+#include "core/position.h"
 
 enum class PatternType : std::uint8_t {
     NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR, WALL
@@ -25,6 +27,9 @@ public:
     explicit FieldPattern(const std::vector<std::string>&, double defaultScore = 1);
 
     static bool merge(const FieldPattern&, const FieldPattern&, FieldPattern*);
+
+    bool isMatchable(const CoreField&) const;
+    bool complement(const CoreField&, ColumnPuyoList*) const;
 
     void setPattern(int x, int y, PatternType t, char variable, double score);
 
@@ -56,4 +61,4 @@ private:
     int numVariables_;
 };
 
-#endif // CPU_MAYAH_PATTERN_FIELD_H_
+#endif // CORE_ALGORITHM_PATTERN_FIELD_H_
