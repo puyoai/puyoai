@@ -5,6 +5,8 @@
 
 #include <glog/logging.h>
 
+#include "core/algorithm/pattern_matcher.h"
+
 using namespace std;
 
 FieldPattern::FieldPattern(double defaultScore) :
@@ -156,6 +158,52 @@ bool FieldPattern::merge(const FieldPattern& pf1, const FieldPattern& pf2, Field
     }
 
     pf->numVariables_ = pf->countVariables();
+    return true;
+}
+
+bool FieldPattern::isMatchable(const CoreField& field) const
+{
+    PatternMatcher matcher;
+    return matcher.match(*this, field).matched;
+}
+
+bool FieldPattern::complement(const CoreField& field, ColumnPuyoList* cpl) const
+{
+    PatternMatcher matcher;
+    if (!matcher.match(*this, field).matched)
+        return false;
+
+    int currentHeights[FieldConstant::MAP_WIDTH] {
+        0, field.height(1), field.height(2), field.height(3),
+        field.height(4), field.height(5), field.height(6), 0
+    };
+
+    cpl->clear();
+    for (int x = 1; x <= 6; ++x) {
+        int h = height(x);
+        for (int y = 1; y <= h; ++y) {
+            if (type(x, y) != PatternType::VAR &&
+                type(x, y) != PatternType::MUST_VAR) {
+                if (field.color(x, y) == PuyoColor::EMPTY)
+                    return false;
+                continue;
+            }
+            char c = variable(x, y);
+            if (!matcher.isSet(c))
+                return false;
+            if (ColumnPuyoList::MAX_SIZE <= cpl->size())
+                return false;
+            if (type(x, y) == PatternType::MUST_VAR) {
+                if (!isNormalColor(field.color(x, y)))
+                    return false;
+            }
+            if (field.color(x, y) == PuyoColor::EMPTY && currentHeights[x] + 1 == y) {
+                cpl->add(x, matcher.map(c));
+                currentHeights[x]++;
+            }
+        }
+    }
+
     return true;
 }
 
