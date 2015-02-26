@@ -14,19 +14,19 @@
 
 #include "evaluator.h"
 
+template<int N>
 munetoshi::grade inner_product(
-        const munetoshi::grade* vect1,
-        const munetoshi::grade* vect2,
-        int n);
+        const std::array<munetoshi::grade, N> vect1,
+        const std::array<munetoshi::grade, N> vect2);
 
-static const munetoshi::grade GRADE_WEIGHT_GROW[munetoshi::NUM_EVALUATOR_TYPES] = {
-        20, // CHAIN_LENGTH
-        -4, // NUM_REQUIRED_PUYO
+constexpr std::array<munetoshi::grade, munetoshi::NUM_EVALUATOR_TYPES> GRADE_WEIGHT_GROW = {{
         -10, // DEATH_RATIO
         -1, // TEAR
         -2, // VALLEY_SHAPE
+        20, // CHAIN_LENGTH
+        -4, // NUM_REQUIRED_PUYO
         80, // TURNOVER_SHAPE
-};
+}};
 
 munetoshi::AI::AI(int argc, char* argv[]) :
         ::AI(argc, argv, "minim") {
@@ -103,7 +103,31 @@ munetoshi::grade munetoshi::AI::evaluate(
         const PlayerState& my_state,
         const PlayerState& opponent_state,
         const RefPlan *plan_ptr) const {
+
     grade optimal_grade = GRADE_MIN;
+
+    PlanResult plan_result = {
+            core_field,
+            my_state,
+            opponent_state,
+            plan_ptr,
+    };
+
+    std::array<grade, NUM_EVALUATOR_TYPES> plan_grade_vect = {};
+    auto plan_grade_vect_setter = [&](
+            EVALUATOR_TYPES type,
+            grade result) {
+        plan_grade_vect[static_cast<size_t>(type)] = result;
+    };
+
+    Evaluators<
+    PlanResult,
+    EVALUATOR_TYPES::DEATH_RATIO,
+    EVALUATOR_TYPES::TEAR,
+    EVALUATOR_TYPES::VALLEY_SHAPE,
+    EVALUATOR_TYPES::_NIL_TYPE>
+    ::evaluate_all(&plan_result, plan_grade_vect_setter);
+
     auto callback = [&](
             const CoreField& /*field_after_chain*/,
             const RensaResult& rensa_result,
@@ -111,37 +135,31 @@ munetoshi::grade munetoshi::AI::evaluate(
             const ColumnPuyoList& fire_puyos,
             const RensaVanishingPositionResult& position_result) {
 
-        grade grade_vect[NUM_EVALUATOR_TYPES] = {};
-        EvaluationElements e = {
-                core_field,
-                my_state,
-                opponent_state,
-
+        PossibleChainResult possible_chain_result = {
+                plan_result,
                 rensa_result,
                 key_puyos,
                 fire_puyos,
                 position_result,
-
-                plan_ptr,
         };
 
-        auto grade_vect_setter = [&](EVALUATOR_TYPES type, float result) {
-            grade_vect[static_cast<size_t>(type)] = result;
+        std::array<grade, NUM_EVALUATOR_TYPES> possible_chain_grade_vect = plan_grade_vect;;
+        auto possible_chain_grade_vect_setter = [&](
+                EVALUATOR_TYPES type,
+                grade result) {
+            possible_chain_grade_vect[static_cast<size_t>(type)] = result;
         };
 
         Evaluators<
-        EvaluationElements,
+        PossibleChainResult,
         EVALUATOR_TYPES::CHAIN_LENGTH,
         EVALUATOR_TYPES::NUM_REQUIRED_PUYO,
-        EVALUATOR_TYPES::DEATH_RATIO,
-        EVALUATOR_TYPES::TEAR,
-        EVALUATOR_TYPES::VALLEY_SHAPE,
         EVALUATOR_TYPES::TURNOVER_SHAPE,
         EVALUATOR_TYPES::_NIL_TYPE>
-        ::evaluate_all(&e, grade_vect_setter);
+        ::evaluate_all(&possible_chain_result, possible_chain_grade_vect_setter);
 
         optimal_grade = std::max(
-                inner_product(grade_vect, GRADE_WEIGHT_GROW, NUM_EVALUATOR_TYPES),
+                inner_product<NUM_EVALUATOR_TYPES>(possible_chain_grade_vect, GRADE_WEIGHT_GROW),
                 optimal_grade);
     };
 
@@ -153,12 +171,12 @@ munetoshi::grade munetoshi::AI::evaluate(
     return optimal_grade;
 }
 
+template<int N>
 munetoshi::grade inner_product(
-        const munetoshi::grade* vect1,
-        const munetoshi::grade* vect2,
-        int n) {
+        const std::array<munetoshi::grade, N> vect1,
+        const std::array<munetoshi::grade, N> vect2) {
     munetoshi::grade sum = 0;
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < N; ++i) {
         sum += vect1[i] * vect2[i];
     }
     return sum;

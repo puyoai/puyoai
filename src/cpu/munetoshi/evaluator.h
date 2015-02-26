@@ -12,16 +12,32 @@ class RensaVanishingPositionResult;
 
 namespace munetoshi {
 
-struct EvaluationElements {
+struct PlanResult {
     const CoreField& field;
     const PlayerState& my_state;
     const PlayerState& opponent_state;
+
+    const RefPlan* plan_ptr;
+};
+
+struct PossibleChainResult : public PlanResult {
     const RensaResult& rensa_result;
     const ColumnPuyoList& key_puyos;
     const ColumnPuyoList& fire_puyos;
     const RensaVanishingPositionResult& position_result;
 
-    const RefPlan* plan_ptr;
+    PossibleChainResult(
+            const PlanResult& plan_result,
+            const RensaResult& rensa_result,
+            const ColumnPuyoList& key_puyos,
+            const ColumnPuyoList& fire_puyos,
+            const RensaVanishingPositionResult& position_result) :
+    PlanResult(plan_result),
+    rensa_result(rensa_result),
+    key_puyos(key_puyos),
+    fire_puyos(fire_puyos),
+    position_result(position_result) {
+    }
 };
 
 template<EVALUATOR_TYPES TYPE, typename PARAM>
@@ -61,26 +77,26 @@ struct Evaluators<PARAM, EVALUATOR_TYPES::_NIL_TYPE> {
 };
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::CHAIN_LENGTH, EvaluationElements>::EVALUATE(
-            EvaluationElements* e);
+grade Evaluator<EVALUATOR_TYPES::DEATH_RATIO, PlanResult>::EVALUATE(
+            PlanResult* e);
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::NUM_REQUIRED_PUYO, EvaluationElements>::EVALUATE(
-            EvaluationElements* e);
+grade Evaluator<EVALUATOR_TYPES::TEAR, PlanResult>::EVALUATE(
+            PlanResult* e);
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::DEATH_RATIO, EvaluationElements>::EVALUATE(
-            EvaluationElements* e);
+grade Evaluator<EVALUATOR_TYPES::VALLEY_SHAPE, PlanResult>::EVALUATE(
+            PlanResult* e);
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::TEAR, EvaluationElements>::EVALUATE(
-            EvaluationElements* e);
+grade Evaluator<EVALUATOR_TYPES::CHAIN_LENGTH, PossibleChainResult>::EVALUATE(
+            PossibleChainResult* e);
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::VALLEY_SHAPE, EvaluationElements>::EVALUATE(
-            EvaluationElements* e);
+grade Evaluator<EVALUATOR_TYPES::NUM_REQUIRED_PUYO, PossibleChainResult>::EVALUATE(
+            PossibleChainResult* e);
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::TURNOVER_SHAPE, EvaluationElements>::EVALUATE(
-            EvaluationElements* e);
+grade Evaluator<EVALUATOR_TYPES::TURNOVER_SHAPE, PossibleChainResult>::EVALUATE(
+            PossibleChainResult* e);
 } // namespace munetoshi
