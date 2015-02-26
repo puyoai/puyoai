@@ -115,8 +115,7 @@ munetoshi::grade munetoshi::AI::evaluate(
             plan_ptr,
     };
 
-    // TODO(munetoshi): gcc-4.8 warns if we omit grade().
-    std::array<grade, NUM_EVALUATOR_TYPES> plan_grade_vect = { grade() };
+    std::array<grade, NUM_EVALUATOR_TYPES> plan_grade_vect {{}};
     auto plan_grade_vect_setter = [&](
             EVALUATOR_TYPES type,
             grade result) {
