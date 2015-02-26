@@ -1,5 +1,7 @@
 #include "evaluator.h"
 
+#include <algorithm>
+
 #include "core/algorithm/column_puyo_list.h"
 #include "core/algorithm/plan.h"
 #include "core/rensa_result.h"
@@ -79,4 +81,3 @@ grade Evaluator<EVALUATOR_TYPES::TURNOVER_SHAPE, PossibleChainResult>::EVALUATE(
 }
 
 } // namespace munetoshi
-
