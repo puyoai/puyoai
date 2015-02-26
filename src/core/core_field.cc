@@ -501,7 +501,7 @@ int CoreField::vanish(int nthChain, int minHeights[], Tracker* tracker)
     Position eraseQueue[WIDTH * HEIGHT]; // All the positions of erased puyos will be stored here.
     Position* eraseQueueHead = eraseQueue;
 
-    bool usedColors[NUM_PUYO_COLORS] = { 0 };
+    bool usedColors[NUM_PUYO_COLORS] {};
     int numUsedColors = 0;
     int longBonusCoef = 0;
 
