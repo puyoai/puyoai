@@ -7,36 +7,20 @@
 namespace munetoshi {
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::CHAIN_LENGTH, EvaluationElements>::EVALUATE(
-            EvaluationElements* e) {
-    return e->rensa_result.chains;
-}
-
-template<>
-grade Evaluator<EVALUATOR_TYPES::NUM_REQUIRED_PUYO, EvaluationElements>::EVALUATE(
-            EvaluationElements* e) {
-    int required_puyos = 0;
-    auto adder = [&](const ColumnPuyo& cp) {required_puyos += cp.x;};
-    std::for_each(e->key_puyos.begin(), e->key_puyos.end(), adder);
-    std::for_each(e->fire_puyos.begin(), e->fire_puyos.end(), adder);
-    return required_puyos;
-}
-
-template<>
-grade Evaluator<EVALUATOR_TYPES::DEATH_RATIO, EvaluationElements>::EVALUATE(
-            EvaluationElements* e) {
+grade Evaluator<EVALUATOR_TYPES::DEATH_RATIO, PlanResult>::EVALUATE(
+        PlanResult* e) {
     return std::max(e->field.height(3) - 9, 0);
 }
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::TEAR, EvaluationElements>::EVALUATE(
-            EvaluationElements* e) {
+grade Evaluator<EVALUATOR_TYPES::TEAR, PlanResult>::EVALUATE(
+            PlanResult* e) {
     return e->plan_ptr != nullptr ? e->plan_ptr->numChigiri() : 0;
 }
 
 template<>
-grade Evaluator<EVALUATOR_TYPES::VALLEY_SHAPE, EvaluationElements>::EVALUATE(
-            EvaluationElements* e) {
+grade Evaluator<EVALUATOR_TYPES::VALLEY_SHAPE, PlanResult>::EVALUATE(
+            PlanResult* e) {
     grade valley_grade = 0;
     valley_grade += std::max(e->field.height(2) - e->field.height(1), 0) * 10;
     valley_grade += std::max(e->field.height(3) - e->field.height(2), 0);
@@ -47,9 +31,26 @@ grade Evaluator<EVALUATOR_TYPES::VALLEY_SHAPE, EvaluationElements>::EVALUATE(
     return valley_grade;
 }
 
+
 template<>
-grade Evaluator<EVALUATOR_TYPES::TURNOVER_SHAPE, EvaluationElements>::EVALUATE(
-            EvaluationElements* e) {
+grade Evaluator<EVALUATOR_TYPES::CHAIN_LENGTH, PossibleChainResult>::EVALUATE(
+        PossibleChainResult* e) {
+    return e->rensa_result.chains;
+}
+
+template<>
+grade Evaluator<EVALUATOR_TYPES::NUM_REQUIRED_PUYO, PossibleChainResult>::EVALUATE(
+        PossibleChainResult* e) {
+    int required_puyos = 0;
+    auto adder = [&](const ColumnPuyo& cp) {required_puyos += cp.x;};
+    std::for_each(e->key_puyos.begin(), e->key_puyos.end(), adder);
+    std::for_each(e->fire_puyos.begin(), e->fire_puyos.end(), adder);
+    return required_puyos;
+}
+
+template<>
+grade Evaluator<EVALUATOR_TYPES::TURNOVER_SHAPE, PossibleChainResult>::EVALUATE(
+        PossibleChainResult* e) {
     int turn_down_chain = 0;
     for (int nth_chain = 1;
             nth_chain <= (int) e->position_result.size() && turn_down_chain == 0;

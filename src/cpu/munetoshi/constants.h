@@ -9,11 +9,14 @@ typedef int grade;
 constexpr grade GRADE_MIN = std::numeric_limits<grade>::min();
 
 enum class EVALUATOR_TYPES {
-    CHAIN_LENGTH,
-    NUM_REQUIRED_PUYO,
+    // Plan evaluators
     DEATH_RATIO,
     TEAR,
     VALLEY_SHAPE,
+
+    // Possible chain evaluators
+    CHAIN_LENGTH,
+    NUM_REQUIRED_PUYO,
     TURNOVER_SHAPE,
 
     _NIL_TYPE,
