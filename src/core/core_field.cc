@@ -94,8 +94,9 @@ public:
 
 private:
     void resetY() {
-        constexpr std::array<int, FieldConstant::MAP_HEIGHT> INVALID_COLUMN {};
-        yAtPrevRensa_.fill(INVALID_COLUMN);
+        // TODO(mayah): gcc-4.8 warns if we omit 0.
+        constexpr std::array<int, FieldConstant::MAP_HEIGHT> ALL_ZERO { 0 };
+        yAtPrevRensa_.fill(ALL_ZERO);
     }
 
     RensaVanishingPositionResult* result_;
