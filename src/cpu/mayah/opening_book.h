@@ -7,29 +7,29 @@
 
 #include "base/noncopyable.h"
 #include "core/field_constant.h"
-#include "core/algorithm/pattern_field.h"
+#include "core/algorithm/field_pattern.h"
 #include "core/algorithm/pattern_matcher.h"
 
 class OpeningBookField : FieldConstant {
 public:
     OpeningBookField(const std::string& name);
     OpeningBookField(const std::string& name, const std::vector<std::string>& field, double defaultScore = 1);
-    OpeningBookField(const std::string& name, const PatternField&);
+    OpeningBookField(const std::string& name, const FieldPattern&);
 
     // match returns the matched score. If not matched, 0 will be returned.
     PatternMatchResult match(const CoreField&) const;
     bool preMatch(const CoreField&) const;
 
-    OpeningBookField mirror() const { return OpeningBookField(name(), patternField_.mirror()); }
+    OpeningBookField mirror() const { return OpeningBookField(name(), pattern_.mirror()); }
 
     std::string name() const { return name_; }
-    const PatternField& patternField() const { return patternField_; }
-    PatternField* mutablePatternField() { return &patternField_; }
+    const FieldPattern& fieldPattern() const { return pattern_; }
+    FieldPattern* mutableFieldPattern() { return &pattern_; }
     std::string toDebugString() const;
 
 private:
     std::string name_;
-    PatternField patternField_;
+    FieldPattern pattern_;
 };
 
 class OpeningBook : noncopyable {

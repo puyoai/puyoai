@@ -6,24 +6,24 @@
 
 #include "base/noncopyable.h"
 #include "core/algorithm/column_puyo_list.h"
-#include "core/algorithm/pattern_field.h"
+#include "core/algorithm/field_pattern.h"
 #include "core/core_field.h"
 
 class ColumnPuyoList;
 
 class ComplementBookField {
 public:
-    explicit ComplementBookField(const PatternField& field) : patternField_(field) {}
-    explicit ComplementBookField(const std::string& field) : patternField_(field) {}
-    explicit ComplementBookField(const std::vector<std::string>& field) : patternField_(field) {}
+    explicit ComplementBookField(const FieldPattern& field) : pattern_(field) {}
+    explicit ComplementBookField(const std::string& field) : pattern_(field) {}
+    explicit ComplementBookField(const std::vector<std::string>& field) : pattern_(field) {}
 
     bool isMatchable(const CoreField&) const;
     bool complement(const CoreField&, ColumnPuyoList*) const;
 
-    ComplementBookField mirror() const { return ComplementBookField(patternField_.mirror()); }
+    ComplementBookField mirror() const { return ComplementBookField(pattern_.mirror()); }
 
 private:
-    PatternField patternField_;
+    FieldPattern pattern_;
 };
 
 class ComplementBook : noncopyable {

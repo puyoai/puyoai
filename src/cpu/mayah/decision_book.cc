@@ -24,7 +24,7 @@ Decision makeDecision(const toml::Value& v)
 } // namespace anonymous
 
 DecisionBookField::DecisionBookField(const vector<string>& field, map<string, Decision>&& decisions) :
-    patternField_(field),
+    pattern_(field),
     decisions_(move(decisions))
 {
 }
@@ -32,7 +32,7 @@ DecisionBookField::DecisionBookField(const vector<string>& field, map<string, De
 Decision DecisionBookField::nextDecision(const CoreField& cf, const KumipuyoSeq& seq) const
 {
     BijectionMatcher matcher;
-    if (!matcher.match(patternField_, cf))
+    if (!matcher.match(pattern_, cf))
         return Decision();
 
     const Kumipuyo& kp1 = seq.get(0);

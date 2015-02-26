@@ -21,31 +21,31 @@ OpeningBookField::OpeningBookField(const string& name) :
 
 OpeningBookField::OpeningBookField(const string& name, const vector<string>& field, double defaultScore) :
     name_(name),
-    patternField_(field, defaultScore)
+    pattern_(field, defaultScore)
 {
 }
 
-OpeningBookField::OpeningBookField(const string& name, const PatternField& patternField) :
+OpeningBookField::OpeningBookField(const string& name, const FieldPattern& pattern) :
     name_(name),
-    patternField_(patternField)
+    pattern_(pattern)
 {
 }
 
 PatternMatchResult OpeningBookField::match(const CoreField& cf) const
 {
     PatternMatcher matcher;
-    return matcher.match(patternField_, cf);
+    return matcher.match(pattern_, cf);
 }
 
 bool OpeningBookField::preMatch(const CoreField& cf) const
 {
     PatternMatcher matcher;
-    return matcher.match(patternField_, cf, true).matched;
+    return matcher.match(pattern_, cf, true).matched;
 }
 
 string OpeningBookField::toDebugString() const
 {
-    return patternField_.toDebugString();
+    return pattern_.toDebugString();
 }
 
 string OpeningBook::toString() const
@@ -72,8 +72,8 @@ static void merge(vector<OpeningBookField>* result,
     auto range = partialFields.equal_range(names[pos]);
     for (auto it = range.first; it != range.second; ++it) {
         OpeningBookField field(current.name());
-        if (!PatternField::merge(current.patternField(), it->second.patternField(), field.mutablePatternField())) {
-            LOG(INFO) << "couldn't merge: \n" << current.patternField().toDebugString() << '\n' << it->second.patternField().toDebugString();
+        if (!FieldPattern::merge(current.fieldPattern(), it->second.fieldPattern(), field.mutableFieldPattern())) {
+            LOG(INFO) << "couldn't merge: \n" << current.fieldPattern().toDebugString() << '\n' << it->second.fieldPattern().toDebugString();
             continue;
         }
         merge(result, field, partialFields, names, pos + 1);
@@ -111,7 +111,7 @@ bool OpeningBook::load(const string& filename)
             for (const auto& v : precond->as<toml::Array>()) {
                 int x = v.get<int>(0);
                 int y = v.get<int>(1);
-                PatternField* pf = obf.mutablePatternField();
+                FieldPattern* pf = obf.mutableFieldPattern();
                 CHECK(pf->type(x, y) == PatternType::VAR);
                 pf->setType(x, y, PatternType::MUST_VAR);
             }

@@ -7,7 +7,7 @@
 #include <toml/toml.h>
 
 #include "base/noncopyable.h"
-#include "core/algorithm/pattern_field.h"
+#include "core/algorithm/field_pattern.h"
 #include "core/decision.h"
 #include "core/field_constant.h"
 #include "core/puyo_color.h"
@@ -27,7 +27,7 @@ public:
 private:
     bool matchNext(BijectionMatcher*, const std::string& nextPattern, const Kumipuyo& next1, const Kumipuyo& next2) const;
 
-    PatternField patternField_;
+    FieldPattern pattern_;
     std::map<std::string, Decision> decisions_;
 };
 

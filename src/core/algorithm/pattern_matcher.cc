@@ -1,6 +1,6 @@
 #include "core/algorithm/pattern_matcher.h"
 
-#include "core/algorithm/pattern_field.h"
+#include "core/algorithm/field_pattern.h"
 #include "core/core_field.h"
 
 PatternMatcher::PatternMatcher()
@@ -9,7 +9,7 @@ PatternMatcher::PatternMatcher()
         map_[i] = PuyoColor::WALL;
 }
 
-PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField& cf, bool ignoresMustVar)
+PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const CoreField& cf, bool ignoresMustVar)
 {
     // First, make a map from char to PuyoColor.
     int matchCount = 0;
@@ -20,18 +20,18 @@ PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField
     for (int x = 1; x <= 6; ++x) {
         int h = cf.height(x);
         for (int y = 1; y <= h; ++y) {
-            char c = pf.variable(x, y);
-            if (pf.type(x, y) == PatternType::MUST_EMPTY) {
+            char c = pattern.variable(x, y);
+            if (pattern.type(x, y) == PatternType::MUST_EMPTY) {
                 if (cf.color(x, y) != PuyoColor::EMPTY)
                     return PatternMatchResult(false, 0, 0, 0);
                 continue;
             }
-            if (pf.type(x, y) != PatternType::VAR && pf.type(x, y) != PatternType::MUST_VAR)
+            if (pattern.type(x, y) != PatternType::VAR && pattern.type(x, y) != PatternType::MUST_VAR)
                 continue;
 
             PuyoColor pc = cf.color(x, y);
             if (pc == PuyoColor::EMPTY) {
-                if (!ignoresMustVar && pf.type(x, y) == PatternType::MUST_VAR)
+                if (!ignoresMustVar && pattern.type(x, y) == PatternType::MUST_VAR)
                     return PatternMatchResult(false, 0, 0, 0);
                 continue;
             }
@@ -40,7 +40,7 @@ PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField
                 return PatternMatchResult(false, 0, 0, 0);
 
             matchCount += 1;
-            matchScore += pf.score(x, y);
+            matchScore += pattern.score(x, y);
 
             if (!isSet(c)) {
                 set(c, pc);
@@ -54,33 +54,33 @@ PatternMatchResult PatternMatcher::match(const PatternField& pf, const CoreField
 
     // Check the neighbors.
     for (int x = 1; x <= 6; ++x) {
-        int h = pf.height(x);
+        int h = pattern.height(x);
         for (int y = 1; y <= h; ++y) {
-            char c = pf.variable(x, y);
-            if (pf.type(x, y) == PatternType::NONE || pf.type(x, y) == PatternType::ANY)
+            char c = pattern.variable(x, y);
+            if (pattern.type(x, y) == PatternType::NONE || pattern.type(x, y) == PatternType::ANY)
                 continue;
 
-            if (pf.type(x, y) == PatternType::ALLOW_VAR) {
-                char uv = std::toupper(pf.variable(x, y));
+            if (pattern.type(x, y) == PatternType::ALLOW_VAR) {
+                char uv = std::toupper(pattern.variable(x, y));
                 if (isSet(uv) && map(uv) == cf.color(x, y)) {
                     ++matchAllowedCount;
                 }
                 continue;
             }
 
-            if (!ignoresMustVar && pf.type(x, y) == PatternType::MUST_VAR && cf.color(x, y) == PuyoColor::EMPTY)
+            if (!ignoresMustVar && pattern.type(x, y) == PatternType::MUST_VAR && cf.color(x, y) == PuyoColor::EMPTY)
                 return PatternMatchResult(false, 0, 0, 0);
 
-            DCHECK(pf.type(x, y) == PatternType::VAR || pf.type(x, y) == PatternType::MUST_VAR);
+            DCHECK(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR);
 
             // Check neighbors.
-            if (!checkCell(c, pf.type(x, y + 1), pf.variable(x, y + 1), cf.color(x, y + 1)))
+            if (!checkCell(c, pattern.type(x, y + 1), pattern.variable(x, y + 1), cf.color(x, y + 1)))
                 return PatternMatchResult(false, 0, 0, 0);
-            if (!checkCell(c, pf.type(x, y - 1), pf.variable(x, y - 1), cf.color(x, y - 1)))
+            if (!checkCell(c, pattern.type(x, y - 1), pattern.variable(x, y - 1), cf.color(x, y - 1)))
                 return PatternMatchResult(false, 0, 0, 0);
-            if (!checkCell(c, pf.type(x + 1, y), pf.variable(x + 1, y), cf.color(x + 1, y)))
+            if (!checkCell(c, pattern.type(x + 1, y), pattern.variable(x + 1, y), cf.color(x + 1, y)))
                 return PatternMatchResult(false, 0, 0, 0);
-            if (!checkCell(c, pf.type(x - 1, y), pf.variable(x - 1, y), cf.color(x - 1, y)))
+            if (!checkCell(c, pattern.type(x - 1, y), pattern.variable(x - 1, y), cf.color(x - 1, y)))
                 return PatternMatchResult(false, 0, 0, 0);
         }
     }

@@ -1,4 +1,4 @@
-#include "pattern_field.h"
+#include "core/algorithm/field_pattern.h"
 
 #include <algorithm>
 #include <sstream>
@@ -7,7 +7,7 @@
 
 using namespace std;
 
-PatternField::PatternField(double defaultScore) :
+FieldPattern::FieldPattern(double defaultScore) :
     heights_{},
     numVariables_(0)
 {
@@ -34,8 +34,8 @@ PatternField::PatternField(double defaultScore) :
     }
 }
 
-PatternField::PatternField(const std::string& field, double defaultScore) :
-    PatternField(defaultScore)
+FieldPattern::FieldPattern(const std::string& field, double defaultScore) :
+    FieldPattern(defaultScore)
 {
     int counter = 0;
     for (int i = field.length() - 1; i >= 0; --i) {
@@ -51,8 +51,8 @@ PatternField::PatternField(const std::string& field, double defaultScore) :
     numVariables_ = countVariables();
 }
 
-PatternField::PatternField(const vector<string>& field, double defaultScore) :
-    PatternField(defaultScore)
+FieldPattern::FieldPattern(const vector<string>& field, double defaultScore) :
+    FieldPattern(defaultScore)
 {
     for (size_t i = 0; i < field.size(); ++i) {
         CHECK_EQ(field[i].size(), 6U);
@@ -69,7 +69,7 @@ PatternField::PatternField(const vector<string>& field, double defaultScore) :
 }
 
 // static
-bool PatternField::merge(const PatternField& pf1, const PatternField& pf2, PatternField* pf)
+bool FieldPattern::merge(const FieldPattern& pf1, const FieldPattern& pf2, FieldPattern* pf)
 {
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
@@ -159,7 +159,7 @@ bool PatternField::merge(const PatternField& pf1, const PatternField& pf2, Patte
     return true;
 }
 
-void PatternField::setPattern(int x, int y, PatternType t, char variable, double score)
+void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double score)
 {
     switch (t) {
     case PatternType::NONE:
@@ -198,7 +198,7 @@ void PatternField::setPattern(int x, int y, PatternType t, char variable, double
 }
 
 // static
-PatternType PatternField::inferType(char c, PatternType typeForLowerCase)
+PatternType FieldPattern::inferType(char c, PatternType typeForLowerCase)
 {
     if (c == ' ' || c == '.')
         return PatternType::NONE;
@@ -214,7 +214,7 @@ PatternType PatternField::inferType(char c, PatternType typeForLowerCase)
     return PatternType::NONE;
 }
 
-Position* PatternField::fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldBitField* checked) const
+Position* FieldPattern::fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldBitField* checked) const
 {
     DCHECK(!checked->get(x, y));
 
@@ -251,9 +251,9 @@ Position* PatternField::fillSameVariablePositions(int x, int y, char c, Position
     return writeHead;
 }
 
-PatternField PatternField::mirror() const
+FieldPattern FieldPattern::mirror() const
 {
-    PatternField pf(*this);
+    FieldPattern pf(*this);
     for (int x = 1; x <= 3; ++x) {
         std::swap(pf.heights_[x], pf.heights_[7 - x]);
         for (int y = 1; y < MAP_HEIGHT; ++y) {
@@ -266,7 +266,7 @@ PatternField PatternField::mirror() const
     return pf;
 }
 
-std::string PatternField::toDebugString() const
+std::string FieldPattern::toDebugString() const
 {
     std::stringstream ss;
     for (int y = 12; y >= 1; --y) {
@@ -278,7 +278,7 @@ std::string PatternField::toDebugString() const
     return ss.str();
 }
 
-int PatternField::countVariables() const
+int FieldPattern::countVariables() const
 {
     int count = 0;
     for (int x = 1; x <= WIDTH; ++x) {

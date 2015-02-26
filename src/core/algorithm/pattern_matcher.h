@@ -4,10 +4,10 @@
 #include <tuple>
 
 #include "core/puyo_color.h"
-#include "core/algorithm/pattern_field.h"
+#include "core/algorithm/field_pattern.h"
 
 class CoreField;
-class PatternField;
+class FieldPattern;
 
 struct PatternMatchResult {
     PatternMatchResult(bool matched, double score, int count, int allowedCount) :
@@ -29,7 +29,7 @@ public:
     PatternMatcher();
 
     // If |ignoreMustVar| is true, don't check the existence.
-    PatternMatchResult match(const PatternField&, const CoreField&, bool ignoresMustVar = false);
+    PatternMatchResult match(const FieldPattern&, const CoreField&, bool ignoresMustVar = false);
 
     PuyoColor map(char var) const
     {

@@ -5,17 +5,17 @@
 #include <gtest/gtest.h>
 
 #include "core/core_field.h"
-#include "core/algorithm/pattern_field.h"
+#include "core/algorithm/field_pattern.h"
 
-static PatternMatchResult match(const PatternField& pf, const CoreField& cf, bool ignoresMustVar = false)
+static PatternMatchResult match(const FieldPattern& pattern, const CoreField& cf, bool ignoresMustVar = false)
 {
     PatternMatcher matcher;
-    return matcher.match(pf, cf, ignoresMustVar);
+    return matcher.match(pattern, cf, ignoresMustVar);
 }
 
 TEST(PatternMatcherTest, match1)
 {
-    PatternField pf(
+    FieldPattern pattern(
         "AAA...");
 
     CoreField f0;
@@ -23,15 +23,15 @@ TEST(PatternMatcherTest, match1)
     CoreField f2("R     ");
     CoreField f3("R R   ");
 
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pf, f0));
-    EXPECT_EQ(PatternMatchResult(true, 3, 3, 0), match(pf, f1));
-    EXPECT_EQ(PatternMatchResult(true, 1, 1, 0), match(pf, f2));
-    EXPECT_EQ(PatternMatchResult(true, 2, 2, 0), match(pf, f3));
+    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(true, 3, 3, 0), match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(true, 1, 1, 0), match(pattern, f2));
+    EXPECT_EQ(PatternMatchResult(true, 2, 2, 0), match(pattern, f3));
 }
 
 TEST(PatternMatcherTest, match2)
 {
-    PatternField pf(
+    FieldPattern pattern(
         "BAD.C."
         "BBADDD"
         "AACCCX");
@@ -48,14 +48,14 @@ TEST(PatternMatcherTest, match2)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pf, f0));
-    EXPECT_EQ(PatternMatchResult(true, 16, 16, 0), match(pf, f1));
-    EXPECT_EQ(PatternMatchResult(true, 16, 16, 0), match(pf, f2));
+    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(true, 16, 16, 0), match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(true, 16, 16, 0), match(pattern, f2));
 }
 
 TEST(PatternMatcherTest, match3)
 {
-    PatternField pf(
+    FieldPattern pattern(
         "b....."
         "BEExy."
         "DDEXYy"
@@ -67,12 +67,12 @@ TEST(PatternMatcherTest, match3)
         "R..B.B"
         "YYBB.B");
 
-    EXPECT_EQ(PatternMatchResult(true, 8, 8, 0), match(pf, f));
+    EXPECT_EQ(PatternMatchResult(true, 8, 8, 0), match(pattern, f));
 }
 
 TEST(PatternMatcherTest, matchWithStar)
 {
-    PatternField pf(
+    FieldPattern pattern(
         ".***CC"
         ".AABBB");
 
@@ -91,15 +91,15 @@ TEST(PatternMatcherTest, matchWithStar)
         ".GGGYY"
         ".RRBBB");
 
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pf, f0));
-    EXPECT_EQ(PatternMatchResult(true, 7, 7, 0), match(pf, f1));
-    EXPECT_EQ(PatternMatchResult(true, 7, 7, 0), match(pf, f2));
-    EXPECT_EQ(PatternMatchResult(true, 7, 7, 0), match(pf, f3));
+    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(true, 7, 7, 0), match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(true, 7, 7, 0), match(pattern, f2));
+    EXPECT_EQ(PatternMatchResult(true, 7, 7, 0), match(pattern, f3));
 }
 
 TEST(PatternMatcherTest, matchWithAllowing)
 {
-    PatternField pf(
+    FieldPattern pattern(
         "..C..."
         "AAaBB.");
 
@@ -121,19 +121,19 @@ TEST(PatternMatcherTest, matchWithAllowing)
     CoreField f5(
         "RRRRR.");
 
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pf, f0));
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f1));
-    EXPECT_EQ(PatternMatchResult(true, 4, 4, 1), match(pf, f2));
-    EXPECT_EQ(PatternMatchResult(true, 3, 3, 1), match(pf, f3));
-    EXPECT_EQ(PatternMatchResult(true, 5, 5, 0), match(pf, f4));
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f5));
+    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(true, 4, 4, 1), match(pattern, f2));
+    EXPECT_EQ(PatternMatchResult(true, 3, 3, 1), match(pattern, f3));
+    EXPECT_EQ(PatternMatchResult(true, 5, 5, 0), match(pattern, f4));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f5));
 }
 
 TEST(PatternMatcherTest, matchWithMust)
 {
-    PatternField pf("AAABBB");
-    pf.setType(1, 1, PatternType::MUST_VAR);
-    pf.setType(6, 1, PatternType::MUST_VAR);
+    FieldPattern pattern("AAABBB");
+    pattern.setType(1, 1, PatternType::MUST_VAR);
+    pattern.setType(6, 1, PatternType::MUST_VAR);
 
     CoreField f0;
     CoreField f1(
@@ -148,24 +148,24 @@ TEST(PatternMatcherTest, matchWithMust)
     CoreField f5(
         "RRRRRR");
 
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f0));
-    EXPECT_EQ(PatternMatchResult(true, 6, 6, 0), match(pf, f1));
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f2));
-    EXPECT_EQ(PatternMatchResult(true, 4, 4, 0), match(pf, f3));
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f4));
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f5));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(true, 6, 6, 0), match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f2));
+    EXPECT_EQ(PatternMatchResult(true, 4, 4, 0), match(pattern, f3));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f4));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f5));
 
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pf, f0, true));
-    EXPECT_EQ(PatternMatchResult(true, 6, 6, 0), match(pf, f1, true));
-    EXPECT_EQ(PatternMatchResult(true, 5, 5, 0), match(pf, f2, true));
-    EXPECT_EQ(PatternMatchResult(true, 4, 4, 0), match(pf, f3, true));
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f4, true));
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f5, true));
+    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), match(pattern, f0, true));
+    EXPECT_EQ(PatternMatchResult(true, 6, 6, 0), match(pattern, f1, true));
+    EXPECT_EQ(PatternMatchResult(true, 5, 5, 0), match(pattern, f2, true));
+    EXPECT_EQ(PatternMatchResult(true, 4, 4, 0), match(pattern, f3, true));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f4, true));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f5, true));
 }
 
 TEST(PatternMatcherTest, unmatch1)
 {
-    PatternField pf(
+    FieldPattern pattern(
         "BAD.C."
         "BBADDD"
         "AACCCX");
@@ -192,28 +192,28 @@ TEST(PatternMatcherTest, unmatch1)
         "BBRBBB"
         "RRRRRY");
 
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f1));
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f2));
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f3));
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f4));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f2));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f3));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f4));
 }
 
 TEST(PatternMatcherTest, unmatch2)
 {
-    PatternField pf(
+    FieldPattern pattern(
         "..AAA.");
 
     CoreField f1(" B B  ");
 
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f1));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f1));
 }
 
 TEST(PatternMatcherTest, unmatch3)
 {
-    PatternField pf(
+    FieldPattern pattern(
         "AAABBB");
 
     CoreField f("Y    Y");
 
-    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pf, f));
+    EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), match(pattern, f));
 }

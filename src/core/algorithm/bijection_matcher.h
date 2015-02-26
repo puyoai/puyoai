@@ -3,7 +3,7 @@
 
 #include "core/puyo_color.h"
 
-class PatternField;
+class FieldPattern;
 class CoreField;
 
 // BijectionMatcher is a pattern matcher s.t.
@@ -13,7 +13,7 @@ class BijectionMatcher {
 public:
     BijectionMatcher();
 
-    bool match(const PatternField&, const CoreField&);
+    bool match(const FieldPattern&, const CoreField&);
     bool match(char, PuyoColor);
 
 private:
