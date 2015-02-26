@@ -17,8 +17,8 @@
 namespace {
 template<int N>
 munetoshi::grade inner_product(
-        const std::array<munetoshi::grade, N> vect1,
-        const std::array<munetoshi::grade, N> vect2);
+        const std::array<munetoshi::grade, N>& vect1,
+        const std::array<munetoshi::grade, N>& vect2);
 
 constexpr std::array<munetoshi::grade, munetoshi::NUM_EVALUATOR_TYPES> GRADE_WEIGHT_GROW = {{
         -10, // DEATH_RATIO
@@ -115,7 +115,8 @@ munetoshi::grade munetoshi::AI::evaluate(
             plan_ptr,
     };
 
-    std::array<grade, NUM_EVALUATOR_TYPES> plan_grade_vect = {};
+    // TODO(munetoshi): gcc-4.8 warns if we omit grade().
+    std::array<grade, NUM_EVALUATOR_TYPES> plan_grade_vect = { grade() };
     auto plan_grade_vect_setter = [&](
             EVALUATOR_TYPES type,
             grade result) {
@@ -176,8 +177,8 @@ munetoshi::grade munetoshi::AI::evaluate(
 namespace {
 template<int N>
 munetoshi::grade inner_product(
-        const std::array<munetoshi::grade, N> vect1,
-        const std::array<munetoshi::grade, N> vect2) {
+        const std::array<munetoshi::grade, N>& vect1,
+        const std::array<munetoshi::grade, N>& vect2) {
     munetoshi::grade sum = 0;
     for (int i = 0; i < N; ++i) {
         sum += vect1[i] * vect2[i];
