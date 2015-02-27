@@ -1,7 +1,9 @@
 #include "core/core_field.h"
 
-#include <gtest/gtest.h>
+#include <algorithm>
 #include <string>
+
+#include <gtest/gtest.h>
 
 #include "core/constant.h"
 #include "core/decision.h"
@@ -527,4 +529,45 @@ TEST(CoreFieldTest, vanishDrop)
 
     EXPECT_EQ(expected, cf);
     EXPECT_EQ(40 * 8, score);
+}
+
+TEST(CoreFieldTest, erasingPuyoPositions1)
+{
+    CoreField cf(
+        "..BB.."
+        "RRRRBB");
+    CoreField::SimulationContext context;
+
+    vector<Position> positions = cf.erasingPuyoPositions(context);
+    std::sort(positions.begin(), positions.end());
+
+    vector<Position> expected = {
+        Position(1, 1),
+        Position(2, 1),
+        Position(3, 1),
+        Position(4, 1),
+    };
+
+    EXPECT_EQ(expected, positions);
+}
+
+TEST(CoreFieldTest, erasingPuyoPositions2)
+{
+    CoreField cf(
+        ".OBBOO"
+        "RRRRBB");
+    CoreField::SimulationContext context;
+
+    vector<Position> positions = cf.erasingPuyoPositions(context);
+    std::sort(positions.begin(), positions.end());
+
+    vector<Position> expected = {
+        Position(1, 1),
+        Position(2, 1),
+        Position(2, 2),
+        Position(3, 1),
+        Position(4, 1),
+    };
+
+    EXPECT_EQ(expected, positions);
 }

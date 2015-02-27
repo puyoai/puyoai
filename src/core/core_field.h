@@ -97,7 +97,7 @@ public:
 
     // SimulationContext can be used when we continue simulation from the intermediate points.
     struct SimulationContext {
-        explicit SimulationContext(int currentChain) : currentChain(currentChain) {}
+        explicit SimulationContext(int currentChain = 1) : currentChain(currentChain) {}
         SimulationContext(int currentChain, std::initializer_list<int> list) :
             currentChain(currentChain)
         {
@@ -121,6 +121,11 @@ public:
         {
         }
     };
+
+    // Returns the list of positions that contains puyo that will be erased.
+    // The position of ojama puyos is also included.
+    // This does not consider 2>= rensa.
+    std::vector<Position> erasingPuyoPositions(const SimulationContext&) const;
 
     bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;
     bool rensaWillOccurWithContext(const SimulationContext&) const;
