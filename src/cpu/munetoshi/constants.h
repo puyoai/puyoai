@@ -1,9 +1,12 @@
 #pragma once
 
-#include<cstddef>
-#include<limits>
+#include <string>
+#include <cstddef>
+#include <limits>
 
 namespace munetoshi {
+
+const std::string AI_NAME("minim");
 
 typedef int grade;
 constexpr grade GRADE_MIN = std::numeric_limits<grade>::min();

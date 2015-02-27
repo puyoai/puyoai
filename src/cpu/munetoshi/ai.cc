@@ -25,8 +25,9 @@ constexpr std::array<munetoshi::grade, munetoshi::NUM_EVALUATOR_TYPES> GRADE_WEI
         -1, // TEAR
         -2, // VALLEY_SHAPE
         20, // CHAIN_LENGTH
+
         -4, // NUM_REQUIRED_PUYO
-        80, // TURNOVER_SHAPE
+        10, // TURNOVER_SHAPE
 }};
 } // namespace
 
@@ -80,7 +81,9 @@ DropDecision munetoshi::AI::think_internal(
         if (best_chain_grade < chain_grade) {
             best_chain_grade = chain_grade;
             best_chain_decision = plan.decisions().front();
-            message = "minim:" + std::to_string(best_chain_grade);
+            message = AI_NAME
+                    + (strategy == FIRE ? "ヽ(｀Д´#)ﾉ" : "ヽ(´ー｀)ノ" )
+                    + std::to_string(best_chain_grade);
         }
     };
 
