@@ -618,6 +618,74 @@ int CoreField::dropAfterVanish(SimulationContext* context, Tracker* tracker)
     return maxDrops;
 }
 
+vector<Position> CoreField::erasingPuyoPositions(const SimulationContext& context) const
+{
+    // All the positions of erased puyos will be stored here.
+    Position eraseQueue[WIDTH * HEIGHT];
+    Position* eraseQueueHead = eraseQueue;
+
+    {
+        FieldBitField checked;
+        for (int x = 1; x <= WIDTH; ++x) {
+            int maxHeight = height(x);
+            for (int y = context.minHeights[x]; y <= maxHeight; ++y) {
+                DCHECK_NE(color(x, y), PuyoColor::EMPTY)
+                    << x << ' ' << y << ' ' << toChar(color(x, y)) << '\n'
+                    << toDebugString();
+
+                if (checked.get(x, y) || color(x, y) == PuyoColor::OJAMA)
+                    continue;
+
+                PuyoColor c = color(x, y);
+                Position* head = fillSameColorPosition(x, y, c, eraseQueueHead, &checked);
+
+                int connectedPuyoNum = head - eraseQueueHead;
+                if (connectedPuyoNum < PUYO_ERASE_NUM)
+                    continue;
+
+                eraseQueueHead = head;
+            }
+        }
+    }
+
+    vector<Position> results;
+
+    int numErasedPuyos = eraseQueueHead - eraseQueue;
+    if (numErasedPuyos == 0)
+        return results;
+
+    FieldBitField checked;
+    for (Position* head = eraseQueue; head != eraseQueueHead; ++head) {
+        int x = head->x;
+        int y = head->y;
+
+        results.emplace_back(x, y);
+
+        // Check OJAMA puyos erased
+        if (color(x + 1, y) == PuyoColor::OJAMA && !checked(x + 1, y)) {
+            checked.set(x + 1, y);
+            results.emplace_back(x + 1, y);
+        }
+
+        if (color(x - 1, y) == PuyoColor::OJAMA && !checked(x + 1, y)) {
+            checked.set(x - 1, y);
+            results.emplace_back(x - 1, y);
+        }
+
+        if (color(x, y + 1) == PuyoColor::OJAMA && y + 1 <= HEIGHT && !checked(x + 1, y)) {
+            checked.set(x, y + 1);
+            results.emplace_back(x, y + 1);
+        }
+
+        if (color(x, y - 1) == PuyoColor::OJAMA && !checked(x + 1, y)) {
+            checked.set(x, y - 1);
+            results.emplace_back(x, y - 1);
+        }
+    }
+
+    return results;
+}
+
 bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
 {
     Position p1 = Position(decision.x, height(decision.x));
