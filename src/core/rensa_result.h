@@ -96,7 +96,7 @@ public:
 		return basePuyosErasedAt_[nthChain - 1];
 	}
 	
-	std::array<float, 2> getWeightedCenterAfterFall(int nthChain);
+	std::array<float, 2> getWeightedCenterAfterFall(int nthChain) const;
 	
 	void setFallingPuyo(int x, int yBeforeFall, int yAfterFall, int nthChain);
 	void setBasePuyo(int x, int y, int nthChain);
