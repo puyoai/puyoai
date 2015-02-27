@@ -76,11 +76,15 @@ grade Evaluator<EVALUATOR_TYPES::TURNOVER_SHAPE, PossibleChainResult>::EVALUATE(
                 has_left_center = std::max(has_left_center, base_puyo.y);
             } else if (base_puyo.x == 4 && base_puyo.y == 1) {
                 has_left_penalty = true;
+            } else if (base_puyo.x == 1 && base_puyo.y == 2) {
+                has_left_penalty = true;
             } else if (base_puyo.x >= 5 && base_puyo.y == 1) {
                 has_right_side = std::max(has_right_side, base_puyo.x - 4);
             } else if (base_puyo.x == 4 && base_puyo.y <= 2) {
                 has_right_center = std::max(has_right_center, base_puyo.y);
             } else if (base_puyo.x == 3 && base_puyo.y == 1) {
+                has_right_penalty = true;
+            } else if (base_puyo.x == 6 && base_puyo.y == 2) {
                 has_right_penalty = true;
             }
         }
