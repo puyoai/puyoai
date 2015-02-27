@@ -72,40 +72,40 @@ private:
     int coef_[20];
 };
 
-// This tracks puyo position at "n-1"-th chain, where the puyo vanishes at n-th chain.     
+// This tracks puyo position at "n-1"-th chain, where the puyo vanishes at n-th chain.
 class RensaVanishingPositionResult {
 public:
-	RensaVanishingPositionResult() {
-		basePuyosErasedAt_.reserve(19);
-		fallingPuyosErasedAt_.reserve(19);
-	}
-	
-	int size() const {
-		return fallingPuyosErasedAt_.size();
-	}
-	
-	// Gets the reference of position set, where the puyos vanish after falling at n-th chain.  
-	// The return value is valid while this result instance is valid.
-	const std::vector<Position>& getReferenceFallingPuyosAt(int nthChain) const {
-		return fallingPuyosErasedAt_[nthChain - 1];
-	}
-	
-	// Gets the reference of position set, where the puyos vanish without falling at n-th chain.
-	// The return value is valid while this result instance is valid.
-	const std::vector<Position>& getReferenceBasePuyosAt(int nthChain) const {
-		return basePuyosErasedAt_[nthChain - 1];
-	}
-	
-	std::array<float, 2> getWeightedCenterAfterFall(int nthChain) const;
-	
-	void setFallingPuyo(int x, int yBeforeFall, int yAfterFall, int nthChain);
-	void setBasePuyo(int x, int y, int nthChain);
-	
+    RensaVanishingPositionResult() {
+        basePuyosErasedAt_.reserve(19);
+        fallingPuyosErasedAt_.reserve(19);
+    }
+
+    int size() const {
+        return fallingPuyosErasedAt_.size();
+    }
+
+    // Gets the reference of position set, where the puyos vanish after falling at n-th chain.
+    // The return value is valid while this result instance is valid.
+    const std::vector<Position>& getReferenceFallingPuyosAt(int nthChain) const {
+        return fallingPuyosErasedAt_[nthChain - 1];
+    }
+
+    // Gets the reference of position set, where the puyos vanish without falling at n-th chain.
+    // The return value is valid while this result instance is valid.
+    const std::vector<Position>& getReferenceBasePuyosAt(int nthChain) const {
+        return basePuyosErasedAt_[nthChain - 1];
+    }
+
+    std::array<float, 2> getWeightedCenterAfterFall(int nthChain) const;
+
+    void setFallingPuyo(int x, int yBeforeFall, int yAfterFall, int nthChain);
+    void setBasePuyo(int x, int y, int nthChain);
+
 private:
-	std::vector<std::vector<Position>> basePuyosErasedAt_;
-	std::vector<std::vector<Position>> fallingPuyosErasedAt_;
-	std::vector<std::vector<int>> yOfFalledPuyosErasedAt_;
-	void maybeResize(int nthChain);
+    std::vector<std::vector<Position>> basePuyosErasedAt_;
+    std::vector<std::vector<Position>> fallingPuyosErasedAt_;
+    std::vector<std::vector<int>> yOfFalledPuyosErasedAt_;
+    void maybeResize(int nthChain);
 };
 
 class IgnitionRensaResult {
