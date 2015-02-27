@@ -657,7 +657,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             {
                 CoreField::SimulationContext context = CoreField::SimulationContext::fromField(initialField);
                 // Rensa should not start when we add key puyos.
-                if (f.rensaWillOccurWithContext(&context))
+                if (f.rensaWillOccurWithContext(context))
                     return;
             }
 

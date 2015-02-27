@@ -123,7 +123,7 @@ public:
     };
 
     bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;
-    bool rensaWillOccurWithContext(SimulationContext*) const;
+    bool rensaWillOccurWithContext(const SimulationContext&) const;
 
     // Simulates rensa.
     // When trackResult is passed, RensaTrackResult will be fulfilled.

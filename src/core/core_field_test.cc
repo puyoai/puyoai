@@ -504,13 +504,13 @@ TEST(CoreFieldTest, rensaWillOccurWithContext)
     CoreField::SimulationContext context4(1, { 1, 2, 2, 2, 2, 1, 1, 1 });
     CoreField::SimulationContext context5(1, { 1, 1, 1, 1, 1, 1, 1, 1 });
 
-    EXPECT_TRUE(cf1.rensaWillOccurWithContext(&context1));
-    EXPECT_FALSE(cf2.rensaWillOccurWithContext(&context2));
+    EXPECT_TRUE(cf1.rensaWillOccurWithContext(context1));
+    EXPECT_FALSE(cf2.rensaWillOccurWithContext(context2));
     // 4Y is connected, but it won't be checked.
-    EXPECT_FALSE(cf3.rensaWillOccurWithContext(&context3));
+    EXPECT_FALSE(cf3.rensaWillOccurWithContext(context3));
     // 5Y is connected, and (5, 1) Y is checked, so it should be detected.
-    EXPECT_TRUE(cf4.rensaWillOccurWithContext(&context4));
-    EXPECT_FALSE(cf5.rensaWillOccurWithContext(&context5));
+    EXPECT_TRUE(cf4.rensaWillOccurWithContext(context4));
+    EXPECT_FALSE(cf5.rensaWillOccurWithContext(context5));
 }
 
 TEST(CoreFieldTest, vanishDrop)
