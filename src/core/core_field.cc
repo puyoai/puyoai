@@ -647,12 +647,12 @@ bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
     return false;
 }
 
-bool CoreField::rensaWillOccurWithContext(SimulationContext* context) const
+bool CoreField::rensaWillOccurWithContext(const SimulationContext& context) const
 {
     FieldBitField checked;
     for (int x = 1; x <= WIDTH; ++x) {
         int h = height(x);
-        for (int y = context->minHeights[x]; y <= h; ++y) {
+        for (int y = context.minHeights[x]; y <= h; ++y) {
             if (checked.get(x, y))
                 continue;
 
