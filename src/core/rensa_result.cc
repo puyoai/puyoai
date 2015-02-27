@@ -86,23 +86,23 @@ void RensaVanishingPositionResult::maybeResize(int nthChain) {
     }
 }
 
-std::array<float, 2> RensaVanishingPositionResult::getWeightedCenterAfterFall(int nthChain) {
+std::array<float, 2> RensaVanishingPositionResult::getWeightedCenterAfterFall(int nthChain) const {
     std::array<float, 2> weightedCenter = {{0, 0}};
 
-    for (Position pos : basePuyosErasedAt_[nthChain]) {
+    for (Position pos : basePuyosErasedAt_[nthChain - 1]) {
         weightedCenter[0] += pos.x;
         weightedCenter[1] += pos.y;
     }
 
-    for (Position pos : fallingPuyosErasedAt_[nthChain]) {
+    for (Position pos : fallingPuyosErasedAt_[nthChain - 1]) {
         weightedCenter[0] += pos.x;
     }
 
-    for (int y : yOfFalledPuyosErasedAt_[nthChain]) {
+    for (int y : yOfFalledPuyosErasedAt_[nthChain - 1]) {
         weightedCenter[1] += y;
     }
 
-    auto puyosCount = basePuyosErasedAt_[nthChain].size() + fallingPuyosErasedAt_[nthChain].size(); 
+    auto puyosCount = basePuyosErasedAt_[nthChain - 1].size() + fallingPuyosErasedAt_[nthChain].size();
     if (puyosCount != 0) {
         weightedCenter[0] /= puyosCount;
         weightedCenter[1] /= puyosCount;
