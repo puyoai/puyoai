@@ -1459,7 +1459,7 @@ combine = ["FUKIGENGTR2-HEAD", "NEWGTR2-TAIL"]
 
 [[combine]]
 name = "ZABUTONL"
-combine = ["ZABUTONL-HEAD","ZABUTONL-TAIL"]
+combine = ["ZABUTONL-HEAD", "ZABUTONL-TAIL"]
 
 [[combine]]
 name = "DAAZUMI"

@@ -39,7 +39,6 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
     CHECK(patternBook_.load(FLAGS_pattern_book));
 
     VLOG(1) << evaluationParameterMap_.toString();
-    VLOG(1) << openingBook_.toString();
 
     google::FlushLogFiles(google::INFO);
 }

@@ -52,7 +52,8 @@ string OpeningBook::toString() const
 {
     stringstream ss;
     for (const auto& bf : fields_) {
-        ss << bf.toDebugString() << '\n';
+        ss << bf.name() << '\n'
+           << bf.toDebugString() << '\n';
     }
     return ss.str();
 }
@@ -130,6 +131,13 @@ bool OpeningBook::load(const string& filename)
 
         OpeningBookField obf(combinedName);
         merge(&fields_, obf, partialFields, names, 0);
+    }
+
+    if (VLOG_IS_ON(1)) {
+        for (const auto& bf : fields_) {
+            VLOG(1) << bf.name() << '\n'
+                    << bf.toDebugString();
+        }
     }
 
     return true;
