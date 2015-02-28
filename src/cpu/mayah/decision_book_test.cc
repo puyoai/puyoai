@@ -7,7 +7,7 @@
 
 using namespace std;
 
-const char* TEST_BOOK =
+static const char TEST_BOOK[] =
     "[[book]]\n"
     "field = []\n"
     "AAAA = [3, 2]\n"
