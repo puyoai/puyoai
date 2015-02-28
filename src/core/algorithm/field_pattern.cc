@@ -167,7 +167,7 @@ bool FieldPattern::isMatchable(const CoreField& field) const
     return matcher.match(*this, field).matched;
 }
 
-bool FieldPattern::complement(const CoreField& field, ColumnPuyoList* cpl) const
+bool FieldPattern::complement(const CoreField& field, bool allowsFillOjama, ColumnPuyoList* cpl) const
 {
     PatternMatcher matcher;
     if (!matcher.match(*this, field).matched)
@@ -182,10 +182,16 @@ bool FieldPattern::complement(const CoreField& field, ColumnPuyoList* cpl) const
     for (int x = 1; x <= 6; ++x) {
         int h = height(x);
         for (int y = 1; y <= h; ++y) {
-            if (type(x, y) != PatternType::VAR &&
-                type(x, y) != PatternType::MUST_VAR) {
-                if (field.color(x, y) == PuyoColor::EMPTY)
+            if (allowsFillOjama && type(x, y) == PatternType::NONE && field.color(x, y) == PuyoColor::EMPTY) {
+                if (!cpl->add(x, PuyoColor::OJAMA))
                     return false;
+                ++currentHeights[x];
+                continue;
+            }
+            if (!(type(x, y) == PatternType::VAR || type(x, y) == PatternType::MUST_VAR)) {
+                if (field.color(x, y) == PuyoColor::EMPTY) {
+                    return false;
+                }
                 continue;
             }
             char c = variable(x, y);
@@ -198,8 +204,9 @@ bool FieldPattern::complement(const CoreField& field, ColumnPuyoList* cpl) const
                     return false;
             }
             if (field.color(x, y) == PuyoColor::EMPTY && currentHeights[x] + 1 == y) {
-                cpl->add(x, matcher.map(c));
-                currentHeights[x]++;
+                if (!cpl->add(x, matcher.map(c)))
+                    return false;
+                ++currentHeights[x];
             }
         }
     }
