@@ -28,6 +28,7 @@
 using namespace std;
 
 DEFINE_bool(complement, true, "use complement book");
+DEFINE_bool(pattern, true, "use pattern book");
 DEFINE_bool(opening, true, "use opening book");
 
 namespace {
@@ -712,7 +713,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                             const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                             const RensaTrackResult& trackResult) {
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
-        RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), complementBook(), rensaScoreCollector.get());
+        RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), complementBook(), patternBook(), rensaScoreCollector.get());
 
         CoreField complementedField(fieldBeforeRensa);
         for (const auto& cp : keyPuyos)
@@ -799,6 +800,15 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                 complementedField.dropPuyoOn(cp.x, cp.color);
             RensaDetector::iteratePossibleRensasIteratively(complementedField, maxIteration, strategy, callback);
         }
+    }
+
+    if (FLAGS_pattern) {
+        auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
+                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                            const RensaTrackResult& trackResult) {
+            evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
+        };
+        patternBook().iteratePossibleRensas(fieldBeforeRensa, maxIteration, callback);
     }
 
     if (sideChainMaxScore >= scoreForOjama(21)) {

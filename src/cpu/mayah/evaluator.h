@@ -4,10 +4,11 @@
 #include <map>
 #include <vector>
 
+#include "complement_book.h"
 #include "evaluation_feature.h"
 #include "opening_book.h"
+#include "pattern_book.h"
 #include "score_collector.h"
-#include "complement_book.h"
 
 class ColumnPuyoList;
 class CoreField;
@@ -19,16 +20,21 @@ class RensaTrackResult;
 
 class EvaluatorBase {
 protected:
-    EvaluatorBase(const OpeningBook& openingBook, const ComplementBook& complementBook) :
+    EvaluatorBase(const OpeningBook& openingBook,
+                  const ComplementBook& complementBook,
+                  const PatternBook& patternBook) :
         openingBook_(openingBook),
-        complementBook_(complementBook) {}
+        complementBook_(complementBook),
+        patternBook_(patternBook) {}
 
     const OpeningBook& openingBook() const { return openingBook_; }
     const ComplementBook& complementBook() const { return complementBook_; }
+    const PatternBook& patternBook() const { return patternBook_; }
 
 private:
     const OpeningBook& openingBook_;
     const ComplementBook& complementBook_;
+    const PatternBook& patternBook_;
 };
 
 class PreEvalResult {
@@ -48,8 +54,10 @@ private:
 
 class PreEvaluator : public EvaluatorBase {
 public:
-    explicit PreEvaluator(const OpeningBook& openingBook, const ComplementBook& complementBook) :
-        EvaluatorBase(openingBook, complementBook) {}
+    PreEvaluator(const OpeningBook& openingBook,
+                 const ComplementBook& complementBook,
+                 const PatternBook& patternBook) :
+        EvaluatorBase(openingBook, complementBook, patternBook) {}
 
     PreEvalResult preEval(const CoreField& currentField);
 };
@@ -78,8 +86,10 @@ private:
 
 class MidEvaluator : public EvaluatorBase {
 public:
-    MidEvaluator(const OpeningBook& openingBook, const ComplementBook& complementBook) :
-        EvaluatorBase(openingBook, complementBook) {}
+    MidEvaluator(const OpeningBook& openingBook,
+                 const ComplementBook& complementBook,
+                 const PatternBook& patternBook) :
+        EvaluatorBase(openingBook, complementBook, patternBook) {}
 
     MidEvalResult eval(const RefPlan&, const CoreField& currentField, double score);
 };
@@ -102,8 +112,9 @@ public:
     // Don't take ownership of |sc|.
     RensaEvaluator(const OpeningBook& openingBook,
                    const ComplementBook& complementBook,
+                   const PatternBook& patternBook,
                    ScoreCollector* sc) :
-        EvaluatorBase(openingBook, complementBook),
+        EvaluatorBase(openingBook, complementBook, patternBook),
         sc_(sc) {}
 
     void evalRensaScore(double score, double virtualScore);
@@ -126,8 +137,11 @@ template<typename ScoreCollector>
 class Evaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    Evaluator(const OpeningBook& openingBook, const ComplementBook& complementBook, ScoreCollector* sc) :
-        EvaluatorBase(openingBook, complementBook),
+    Evaluator(const OpeningBook& openingBook,
+              const ComplementBook& complementBook,
+              const PatternBook& patternBook,
+              ScoreCollector* sc) :
+        EvaluatorBase(openingBook, complementBook, patternBook),
         sc_(sc) {}
 
     void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,

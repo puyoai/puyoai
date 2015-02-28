@@ -11,6 +11,7 @@ add_library(mayah_lib
             gazer.cc
             mayah_ai.cc
             opening_book.cc
+            pattern_book.cc
             score_collector.cc)
 
 function(mayah_add_executable exe)
@@ -46,5 +47,6 @@ mayah_add_test(gazer_test)
 mayah_add_test(mayah_ai_test)
 mayah_add_test(mayah_ai_situation_test)
 mayah_add_test(opening_book_test)
+mayah_add_test(pattern_book_test)
 
 mayah_add_test(mayah_ai_performance_test 1)
