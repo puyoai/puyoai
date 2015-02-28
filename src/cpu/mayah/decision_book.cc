@@ -57,7 +57,7 @@ Decision DecisionBookField::nextDecision(const CoreField& cf, const KumipuyoSeq&
 }
 
 bool DecisionBookField::matchNext(BijectionMatcher* matcher,
-                                  const std::string& nextPattern,
+                                  const string& nextPattern,
                                   const Kumipuyo& next1,
                                   const Kumipuyo& next2) const
 {
@@ -81,12 +81,12 @@ DecisionBook::DecisionBook()
 {
 }
 
-DecisionBook::DecisionBook(const std::string& filename)
+DecisionBook::DecisionBook(const string& filename)
 {
     CHECK(load(filename));
 }
 
-bool DecisionBook::load(const std::string& filename)
+bool DecisionBook::load(const string& filename)
 {
     ifstream ifs(filename);
     toml::Parser parser(ifs);
@@ -99,7 +99,7 @@ bool DecisionBook::load(const std::string& filename)
     return loadFromValue(std::move(v));
 }
 
-bool DecisionBook::loadFromString(const std::string& str)
+bool DecisionBook::loadFromString(const string& str)
 {
     istringstream iss(str);
     toml::Parser parser(iss);
@@ -109,7 +109,7 @@ bool DecisionBook::loadFromString(const std::string& str)
         return false;
     }
 
-    return loadFromValue(std::move(v));
+    return loadFromValue(v);
 }
 
 bool DecisionBook::loadFromValue(const toml::Value& book)
