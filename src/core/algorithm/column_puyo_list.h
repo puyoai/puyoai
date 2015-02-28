@@ -40,10 +40,14 @@ public:
     bool isEmpty() const { return size_ == 0; }
     int size() const { return size_; }
 
-    void add(int x, PuyoColor c)
+    bool add(int x, PuyoColor c) { return add(ColumnPuyo(x, c)); }
+    bool add(const ColumnPuyo& cp)
     {
-        DCHECK(size_ < MAX_SIZE);
-        puyos_[size_++] = ColumnPuyo(x, c);
+        if (MAX_SIZE <= size())
+            return false;
+
+        puyos_[size_++] = cp;
+        return true;
     }
 
     // Appends |cpl|. If the result size exceeds the max size, false will be returned.
