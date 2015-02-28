@@ -1,0 +1,50 @@
+# ----------------------------------------------------------------------
+# GTR-HEAD
+
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AABCC.",
+    "BBC...",
+]
+ignition = 1
+
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AABCCC",
+    "BBC...",
+]
+ignition = 1
+
+[[pattern]]
+field = [
+    "..B...",
+    "..BC..",
+    ".AABC.",
+    "AABCC.",
+]
+ignition = 2
+
+# ----------------------------------------------------------------------
+# GTR-TAIL
+
+[[pattern]]
+field = [
+    "....CC",
+    "...CBC",
+    "..AAAA",
+    "..ABBB",
+]
+ignition = 3
+
+[[pattern]]
+field = [
+    "....C.",
+    "...CBC",
+    "..AAAC",
+    "..ABBB",
+]
+ignition = 3

@@ -204,6 +204,11 @@ TEST(FieldPatternTest, complement5)
         "YYGBB."
         "GGBOO.");
 
+    {
+        ColumnPuyoList cpl;
+        EXPECT_FALSE(pattern.complement(cf, false, &cpl));
+    }
+
     ColumnPuyoList cpl;
     EXPECT_TRUE(pattern.complement(cf, true, &cpl));
     for (const ColumnPuyo& cp : cpl) {

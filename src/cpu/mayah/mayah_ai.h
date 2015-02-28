@@ -15,6 +15,7 @@
 #include "evaluator.h"
 #include "gazer.h"
 #include "opening_book.h"
+#include "pattern_book.h"
 
 class CoreField;
 class DropDecision;
@@ -90,6 +91,7 @@ protected:
     OpeningBook openingBook_;
     DecisionBook decisionBook_;
     ComplementBook complementBook_;
+    PatternBook patternBook_;
 
     bool usesDecisionBook_ = true;
 

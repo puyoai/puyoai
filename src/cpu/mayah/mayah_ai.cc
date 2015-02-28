@@ -21,6 +21,7 @@ DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.toml", "the path to feature p
 DEFINE_string(opening_book, SRC_DIR "/cpu/mayah/opening.toml", "the path to opening book");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(complement_book, SRC_DIR "/cpu/mayah/complement.toml", "the path to complement book");
+DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
 DEFINE_bool(use_advanced_next, false, "Use enemy's NEXT sequence also");
 
 using namespace std;
@@ -35,6 +36,7 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
     CHECK(openingBook_.load(FLAGS_opening_book));
     CHECK(decisionBook_.load(FLAGS_decision_book));
     CHECK(complementBook_.load(FLAGS_complement_book));
+    CHECK(patternBook_.load(FLAGS_pattern_book));
 
     VLOG(1) << evaluationParameterMap_.toString();
     VLOG(1) << openingBook_.toString();
@@ -265,7 +267,7 @@ EvaluationMode MayahAI::calculateMode(const PlayerState& me, const PlayerState& 
 
 PreEvalResult MayahAI::preEval(const CoreField& currentField) const
 {
-    PreEvaluator preEvaluator(openingBook_, complementBook_);
+    PreEvaluator preEvaluator(openingBook_, complementBook_, patternBook_);
     return preEvaluator.preEval(currentField);
 }
 
@@ -278,10 +280,10 @@ MidEvalResult MayahAI::midEval(EvaluationMode mode, const RefPlan& plan, const C
 
 {
     NormalScoreCollector sc(evaluationParameterMap_.parameter(mode));
-    Evaluator<NormalScoreCollector> evaluator(openingBook_, complementBook_, &sc);
+    Evaluator<NormalScoreCollector> evaluator(openingBook_, complementBook_, patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), gazeResult);
 
-    MidEvaluator midEvaluator(openingBook_, complementBook_);
+    MidEvaluator midEvaluator(openingBook_, complementBook_, patternBook_);
     return midEvaluator.eval(plan, currentField, sc.score());
 }
 
@@ -293,7 +295,7 @@ EvalResult MayahAI::eval(EvaluationMode mode, const RefPlan& plan, const CoreFie
                          const GazeResult& gazeResult) const
 {
     NormalScoreCollector sc(evaluationParameterMap_.parameter(mode));
-    Evaluator<NormalScoreCollector> evaluator(openingBook_, complementBook_, &sc);
+    Evaluator<NormalScoreCollector> evaluator(openingBook_, complementBook_, patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     return EvalResult(sc.score(), sc.estimatedRensaScore());
@@ -309,7 +311,7 @@ CollectedFeature MayahAI::evalWithCollectingFeature(EvaluationMode mode,
                                                     const GazeResult& gazeResult) const
 {
     FeatureScoreCollector sc(evaluationParameterMap_.parameter(mode));
-    Evaluator<FeatureScoreCollector> evaluator(openingBook_, complementBook_, &sc);
+    Evaluator<FeatureScoreCollector> evaluator(openingBook_, complementBook_, patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
     return sc.toCollectedFeature();
 }
