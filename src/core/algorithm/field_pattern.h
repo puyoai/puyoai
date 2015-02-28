@@ -29,7 +29,7 @@ public:
     static bool merge(const FieldPattern&, const FieldPattern&, FieldPattern*);
 
     bool isMatchable(const CoreField&) const;
-    bool complement(const CoreField&, ColumnPuyoList*) const;
+    bool complement(const CoreField&, bool allowsFillOjama, ColumnPuyoList*) const;
 
     void setPattern(int x, int y, PatternType t, char variable, double score);
 
