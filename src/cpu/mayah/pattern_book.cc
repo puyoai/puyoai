@@ -1,5 +1,6 @@
 #include "pattern_book.h"
 
+#include <algorithm>
 #include <fstream>
 
 using namespace std;
