@@ -53,7 +53,7 @@ public:
     const ColumnPuyoList& rensaFirePuyos() const { return rensaFirePuyos_; }
 
     std::string toString() const;
-    std::string toStringComparingWith(const CollectedFeature&) const;
+    std::string toStringComparingWith(const CollectedFeature&, const EvaluationParameter&) const;
 
 private:
     static const std::vector<int>& emptyVector()

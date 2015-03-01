@@ -24,7 +24,7 @@ string CollectedFeature::toString() const
     return ss.str();
 }
 
-string CollectedFeature::toStringComparingWith(const CollectedFeature& cf) const
+string CollectedFeature::toStringComparingWith(const CollectedFeature& cf, const EvaluationParameter& param) const
 {
     set<EvaluationFeatureKey> keys;
     for (const auto& entry : collectedFeatures_) {
@@ -43,28 +43,40 @@ string CollectedFeature::toStringComparingWith(const CollectedFeature& cf) const
     }
 
     stringstream ss;
-    ss << "score = " << score_ << " : " << cf.score_ << endl;
+    ss << setw(30) << "WHOLE SCORE" << " = "
+       << setw(15) << fixed << setprecision(6) << score_ << "          : "
+       << setw(15) << fixed << setprecision(6) << cf.score_ << endl;
+    ss << "----------------------------------------------------------------------" << endl;
     for (EvaluationFeatureKey key : keys) {
-        ss << setw(30) << EvaluationFeature::toFeature(key).str() << " = "
-           << setw(15) << to_string(feature(key)) << " : "
-           << setw(15) << to_string(cf.feature(key)) << endl;
+        ss << setw(30) << EvaluationFeature::toFeature(key).str() << " = ";
+        ss << setw(12) << fixed << setprecision(3) << feature(key) << " ("
+           << setw(9) << fixed << setprecision(3) << param.score(key, feature(key)) << ") : ";
+        ss << setw(12) << fixed << setprecision(3) << cf.feature(key) << " ("
+           << setw(9) << fixed << setprecision(3) << param.score(key, cf.feature(key)) << ")";
+        ss << endl;
     }
     for (EvaluationSparseFeatureKey key : sparseKeys) {
         ss << setw(30) << EvaluationSparseFeature::toFeature(key).str() << " = ";
         {
+            double d = 0;
             stringstream st;
             for (int v : feature(key)) {
+                d += param.score(key, v, 1);
                 st << " " << v;
             }
-            ss << setw(15) << st.str();
+            ss << setw(12) << st.str() << " ("
+               << setw(9) << fixed << setprecision(3) << d << ")";
         }
         ss << " : ";
         {
+            double d = 0;
             stringstream st;
             for (int v : cf.feature(key)) {
                 st << " " << v;
+                d += param.score(key, v, 1);
             }
-            ss << setw(15) << st.str();
+            ss << setw(12) << st.str() << " ("
+               << setw(9) << fixed << setprecision(3) << d << ")";
         }
         ss << endl;
     }

@@ -95,6 +95,10 @@ protected:
     const PlayerState& myPlayerState() const { return me_; }
     const PlayerState& enemyPlayerState() const { return enemy_; }
 
+protected:
+    PlayerState* mutableMyPlayerState() { return &me_; }
+    PlayerState* mutableEnemyPlayerState() { return &enemy_; }
+
 private:
     friend class AITest;
     friend class Endless;
