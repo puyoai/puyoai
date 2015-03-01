@@ -173,3 +173,23 @@ field = [
     "AAABCC",
 ]
 ignition = 2
+
+# ----------------------------------------------------------------------
+# ZABUTON-L
+
+[[pattern]]
+field = [
+    "A.....",
+    "AB....",
+    "AAC.C.",
+    "BBBCC."
+]
+ignition = 1
+
+[[pattern]]
+field = [
+    "....C.",
+    ".ABCBC",
+    "AAABBC"
+]
+ignition = 2
