@@ -48,3 +48,14 @@ field = [
     "..ABBB",
 ]
 ignition = 3
+
+# ----------------------------------------------------------------------
+# NEWGTR-HEAD
+
+[[pattern]]
+field = [
+    "A.BC..",
+    "AAABCC",
+    "BBBC..",
+]
+ignition = 1
