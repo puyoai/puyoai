@@ -52,6 +52,15 @@ ignition = 1
 
 [[pattern]]
 field = [
+    "....CD",
+    "..B.CD",
+    ".AABBC",
+    "AABDDC",
+]
+ignition = 2
+
+[[pattern]]
+field = [
     "..B...",
     "..BC..",
     ".AABCC",

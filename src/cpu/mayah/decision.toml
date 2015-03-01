@@ -335,6 +335,7 @@ field = [
     "ACC...",
     "ABB...",
 ]
+ABAB = [2, 3]
 ACBC = [3, 1]
 ADBC = [3, 0]
 CDCD = [4, 1]
