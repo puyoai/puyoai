@@ -3,6 +3,28 @@
 
 [[pattern]]
 field = [
+    ".A....",
+    "BA....",
+    "AA....",
+    "BC....",
+    "BBC...",
+    "CC....",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "......",
+    "BA....",
+    "AAA...",
+    "BC....",
+    "BBC...",
+    "CC....",
+]
+ignition = 2
+
+[[pattern]]
+field = [
     "A.....",
     "ABC...",
     "AABCC.",
@@ -21,12 +43,39 @@ ignition = 1
 
 [[pattern]]
 field = [
+    "A.C...",
+    "ABC...",
+    "AABC..",
+    "BBC...",
+]
+ignition = 1
+
+[[pattern]]
+field = [
     "..B...",
     "..BC..",
-    ".AABC.",
-    "AABCC.",
+    ".AABCC",
+    "AABC..",
 ]
 ignition = 2
+
+[[pattern]]
+field = [
+    "..BC..",
+    "..BC..",
+    ".AABC.",
+    "AABC..",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    ".....C",
+    "..AB.C",
+    "..AABB",
+    "..ABCC",
+]
+ignition = 3
 
 # ----------------------------------------------------------------------
 # GTR-TAIL
