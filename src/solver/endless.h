@@ -11,11 +11,18 @@ struct FrameRequest;
 class KumipuyoSeq;
 
 struct EndlessResult {
+    enum class Type {
+        DEAD,
+        MAIN_CHAIN,
+        ZENKESHI,
+        PUYOSEQ_RUNOUT,
+    };
     int hand;
     int score;
     int maxRensa;
     bool zenkeshi;
     std::vector<Decision> decisions;
+    Type type;
 };
 
 // Endless implements endless mode. This can be used to check your AI's strength.

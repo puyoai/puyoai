@@ -8,5 +8,6 @@ function(munetoshi_add_executable exe)
 endfunction()
 
 munetoshi_add_executable(minim main.cc ai.cc utilities.cc evaluator.cc)
+munetoshi_add_executable(minim_eval eval.cc ai.cc utilities.cc evaluator.cc)
 
 cpu_add_runner(run.sh)
