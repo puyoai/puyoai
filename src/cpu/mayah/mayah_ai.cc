@@ -251,8 +251,6 @@ EvaluationMode MayahAI::calculateMode(const PlayerState& me, const PlayerState& 
     const int EARLY_THRESHOLD = 24;
     const int MIDDLE_THRESHOLD = 54;
 
-    UNUSED_VARIABLE(enemy);
-
     if (enemy.field.isZenkeshi())
         return EvaluationMode::ENEMY_HAS_ZENKESHI;
 

@@ -23,6 +23,9 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
 
     setEnemyField(&req);
 
+    ai_->enemy_.field = req.playerFrameRequest[1].field;
+    ai_->enemy_.seq = req.playerFrameRequest[1].kumipuyoSeq;
+
     vector<Decision> decisions;
 
     int maxRensaScore = 0;
