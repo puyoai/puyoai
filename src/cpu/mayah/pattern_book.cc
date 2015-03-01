@@ -130,6 +130,11 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
                 break;
             }
             if (foundFirePuyo) {
+                if (cp.x == pbf.ignitionColumn()) {
+                    keyPuyos.add(firePuyo);
+                    firePuyo = cp;
+                    continue;
+                }
                 if (!keyPuyos.add(cp)) {
                     ok = false;
                     break;
