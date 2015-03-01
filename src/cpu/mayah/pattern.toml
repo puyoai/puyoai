@@ -103,8 +103,73 @@ ignition = 3
 
 [[pattern]]
 field = [
+    ".A....",
+    "BA....",
+    "AAC...",
+    "BBBC..",
+    "CCC...",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "A.....",
+    "AB....",
+    "AAC...",
+    "BBBC..",
+    "CCC...",
+]
+ignition = 1
+
+[[pattern]]
+field = [
     "A.BC..",
     "AAABCC",
     "BBBC..",
 ]
 ignition = 1
+
+[[pattern]]
+field = [
+    ".ABC..",
+    "AAABCC",
+    "BBBC..",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "A.BC..",
+    "AAABC.",
+    "BBBCC.",
+]
+ignition = 1
+
+[[pattern]]
+field = [
+    ".ABC..",
+    "AAABC.",
+    "BBBCC.",
+]
+ignition = 2
+
+# ----------------------------------------------------------------------
+# NEWGTR-TAIL
+
+[[pattern]]
+field = [
+    "....C.",
+    "...BC.",
+    "..AABC",
+    "AAABBC",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    ".....C",
+    "...B.C",
+    "..AABB",
+    "AAABCC",
+]
+ignition = 2
