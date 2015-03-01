@@ -37,7 +37,29 @@ ignition = 2
 
 )";
 
-TEST(PatternBookTest, pattern)
+static const char TEST_BOOK3[] = R"(
+[[pattern]]
+field = [
+    ".A....",
+    "BA....",
+    "AA....",
+    "BC....",
+    "BBC...",
+    "CC....",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AABCC.",
+    "BBC@@.",
+]
+ignition = 1
+)";
+
+TEST(PatternBookTest, pattern1)
 {
     PatternBook patternBook;
     ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK));
@@ -85,6 +107,43 @@ TEST(PatternBookTest, pattern2)
                        "GGYB.Y"
                        "RRRYBB"
                        "YYYBYY");
+
+    bool found = false;
+    auto callback = [&](const CoreField&,
+                        const RensaResult&,
+                        const ColumnPuyoList& keyPuyos,
+                        const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&) {
+        CoreField cf(field);
+        for (const auto& cp : keyPuyos)
+            cf.dropPuyoOn(cp.x, cp.color);
+        for (const auto& cp : firePuyos)
+            cf.dropPuyoOn(cp.x, cp.color);
+
+        if (expected == cf)
+            found = true;
+    };
+
+    patternBook.iteratePossibleRensas(field, 2, callback);
+    EXPECT_TRUE(found);
+}
+
+TEST(PatternBookTest, pattern3)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK3));
+
+    CoreField field("G....."
+                    "R....."
+                    "RRY..."
+                    "YYB...");
+
+    CoreField expected(".G...."
+                       "RG...."
+                       "GG...."
+                       "RYB..."
+                       "RRYBB."
+                       "YYB@@.");
 
     bool found = false;
     auto callback = [&](const CoreField&,
