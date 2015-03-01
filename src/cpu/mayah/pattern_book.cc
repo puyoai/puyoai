@@ -113,51 +113,44 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
 
     const CoreField::SimulationContext originalContext = CoreField::SimulationContext::fromField(originalField);
 
-    auto detectionCallback = [this, maxIteration, &callback,
-                              &originalField, &originalContext](CoreField* cf, const ColumnPuyoList& firePuyoList) {
-        std::vector<Position> ignitionPositions = cf->erasingPuyoPositions(originalContext);
-        if (ignitionPositions.empty())
-            return;
+    for (Iterator it = fields_.begin(); it != fields_.end(); ++it) {
+        const PatternBookField& pbf = it->second;
+        ColumnPuyoList cpl;
+        if (!pbf.complement(originalField, &cpl))
+            continue;
 
-        std::sort(ignitionPositions.begin(), ignitionPositions.end());
-        std::pair<Iterator, Iterator> p = this->find(ignitionPositions);
-        for (Iterator it = p.first; it != p.second; ++it) {
-            const PatternBookField& pbf = it->second;
-            if (pbf.ignitionColumn() == 0)
+        CoreField cf(originalField);
+        bool ok = true;
+        bool foundFirePuyo = false;
+        ColumnPuyo firePuyo;
+        ColumnPuyoList keyPuyos;
+        for (const ColumnPuyo& cp : cpl) {
+            if (!cf.dropPuyoOn(cp.x, cp.color)) {
+                ok = false;
+                break;
+            }
+            if (foundFirePuyo) {
+                if (!keyPuyos.add(cp)) {
+                    ok = false;
+                    break;
+                }
                 continue;
-
-            bool ok = true;
-
-            bool foundFirePuyo = false;
-            ColumnPuyo firePuyo;
-            ColumnPuyoList keyPuyos;
-            for (const ColumnPuyo& cp : firePuyoList) {
-                if (foundFirePuyo) {
-                    if (!keyPuyos.add(cp)) {
-                        ok = false;
-                        break;
-                    }
-                    continue;
-                }
-
-                if (cp.x == pbf.ignitionColumn()) {
-                    foundFirePuyo = true;
-                    firePuyo = cp;
-                    continue;
-                }
-
-                keyPuyos.add(cp);
             }
 
-            if (!ok || !foundFirePuyo)
-                return;
+            if (cp.x == pbf.ignitionColumn()) {
+                foundFirePuyo = true;
+                firePuyo = cp;
+                continue;
+            }
 
-            iteratePossibleRensasInternal(originalField, 0, *cf, firePuyo, keyPuyos, originalContext, maxIteration, callback);
+            keyPuyos.add(cp);
         }
-    };
 
-    RensaDetectorStrategy strategy = RensaDetectorStrategy::defaultExtendStrategy();
-    RensaDetector::detect(originalField, strategy, detectionCallback);
+        if (!ok || !foundFirePuyo)
+            continue;
+
+        iteratePossibleRensasInternal(originalField, 0, cf, firePuyo, keyPuyos, originalContext, maxIteration - 1, callback);
+    }
 }
 
 void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
