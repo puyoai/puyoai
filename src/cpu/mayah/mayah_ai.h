@@ -123,10 +123,17 @@ public:
 
     using MayahAI::calculateMode;
 
+    using MayahAI::mutableMyPlayerState;
+    using MayahAI::mutableEnemyPlayerState;
+
     const Gazer& gazer() const { return gazer_; }
 
     void removeNontokopuyoParameter() { evaluationParameterMap_.removeNontokopuyoParameter(); }
     const EvaluationParameterMap& evaluationParameterMap() const { return evaluationParameterMap_; }
+    const EvaluationParameter& evaluationParameter(EvaluationMode mode) const
+    {
+        return evaluationParameterMap().parameter(mode);
+    }
     void setEvaluationParameterMap(const EvaluationParameterMap& parameterMap) { evaluationParameterMap_ = parameterMap; }
 };
 

@@ -55,8 +55,8 @@ Problem makeProblem()
     } else {
         problem.kumipuyoSeq[0] = generated;
         problem.field[1] = CoreField(
-            "500065"
-            "400066"
+            "5...65"
+            "4...66"
             "545645"
             "456455"
             "545646"
@@ -99,6 +99,9 @@ int main(int argc, char* argv[])
     req.playerFrameRequest[1].field = problem.field[1];
     req.playerFrameRequest[0].kumipuyoSeq = problem.kumipuyoSeq[0];
     req.playerFrameRequest[1].kumipuyoSeq = problem.kumipuyoSeq[1];
+
+    ai.mutableEnemyPlayerState()->field = problem.field[1];
+    ai.mutableEnemyPlayerState()->seq = problem.kumipuyoSeq[1];
 
     for (int i = 0; i < 50; ++i) {
         // frameId 1 will be used for initializing now. Let's avoid it.
@@ -180,12 +183,14 @@ int main(int argc, char* argv[])
 
                 EvaluationMode mode = ai.calculateMode(ai.myPlayerState(), ai.enemyPlayerState());
                 const PreEvalResult preEvalResult = ai.preEval(currentField);
-                CollectedFeature mycf = ai.evalWithCollectingFeature(mode, RefPlan(myThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
-                                                                     ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, myThoughtResult.midEvalResult,
-                                                                     ai.gazer().gazeResult());
-                CollectedFeature aicf = ai.evalWithCollectingFeature(mode, RefPlan(aiThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
-                                                                     ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, aiThoughtResult.midEvalResult,
-                                                                     ai.gazer().gazeResult());
+                CollectedFeature mycf = ai.evalWithCollectingFeature(
+                    mode, RefPlan(myThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
+                    ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, myThoughtResult.midEvalResult,
+                    ai.gazer().gazeResult());
+                CollectedFeature aicf = ai.evalWithCollectingFeature(
+                    mode, RefPlan(aiThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
+                    ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, aiThoughtResult.midEvalResult,
+                    ai.gazer().gazeResult());
 
                 CoreField myTargetField(myThoughtResult.plan.field());
                 for (const ColumnPuyo& cp : mycf.rensaKeyPuyos())
@@ -204,7 +209,7 @@ int main(int argc, char* argv[])
                     { myThoughtResult.plan.field(), aiThoughtResult.plan.field(), myTargetField, aiTargetField },
                     { seqToShow, seqToShow, KumipuyoSeq(), KumipuyoSeq() });
 
-                cout << mycf.toStringComparingWith(aicf) << endl;
+                cout << mycf.toStringComparingWith(aicf, ai.evaluationParameter(mode)) << endl;
                 cout << "MY: " << myThoughtResult.message << endl;
                 cout << "AI: " << aiThoughtResult.message << endl;
             }
@@ -213,7 +218,8 @@ int main(int argc, char* argv[])
         ThoughtResult thoughtResult = ai.thinkPlan(frameId,
                                                    req.playerFrameRequest[0].field,
                                                    req.playerFrameRequest[0].kumipuyoSeq.subsequence(0, 2),
-                                                   PlayerState(), PlayerState(),
+                                                   ai.myPlayerState(),
+                                                   ai.enemyPlayerState(),
                                                    MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
         {
             CoreField f = req.playerFrameRequest[0].field;
