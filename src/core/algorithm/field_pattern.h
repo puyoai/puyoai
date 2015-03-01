@@ -12,7 +12,7 @@
 #include "core/position.h"
 
 enum class PatternType : std::uint8_t {
-    NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR, WALL
+    NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR, ALLOW_FILLING_OJAMA, WALL
 };
 
 // FieldPattern is a field that holds characters.
@@ -29,7 +29,7 @@ public:
     static bool merge(const FieldPattern&, const FieldPattern&, FieldPattern*);
 
     bool isMatchable(const CoreField&) const;
-    bool complement(const CoreField&, bool allowsFillOjama, ColumnPuyoList*) const;
+    bool complement(const CoreField&, ColumnPuyoList*) const;
 
     void setPattern(int x, int y, PatternType t, char variable, double score);
 

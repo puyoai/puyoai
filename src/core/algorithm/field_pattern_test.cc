@@ -125,7 +125,7 @@ TEST(FieldPatternTest, complement1)
         "BBBGGG");
 
     ColumnPuyoList cpl;
-    EXPECT_TRUE(pattern.complement(cf, false, &cpl));
+    EXPECT_TRUE(pattern.complement(cf, &cpl));
     for (const auto& cp : cpl) {
         cf.dropPuyoOn(cp.x, cp.color);
     }
@@ -148,7 +148,7 @@ TEST(FieldPatternTest, complement2)
 
     // Since we cannot complement (3, 3), so this pattern should not match.
     ColumnPuyoList cpl;
-    EXPECT_FALSE(pattern.complement(cf, false, &cpl));
+    EXPECT_FALSE(pattern.complement(cf, &cpl));
 }
 
 TEST(FieldPatternTest, complement3)
@@ -166,7 +166,7 @@ TEST(FieldPatternTest, complement3)
         "RRRGGG");
 
     ColumnPuyoList cpl;
-    EXPECT_FALSE(pattern.complement(cf, false, &cpl));
+    EXPECT_FALSE(pattern.complement(cf, &cpl));
 }
 
 TEST(FieldPatternTest, complement4)
@@ -184,7 +184,7 @@ TEST(FieldPatternTest, complement4)
         "GG.YYY");
 
     ColumnPuyoList cpl;
-    EXPECT_TRUE(pattern.complement(cf, false, &cpl));
+    EXPECT_TRUE(pattern.complement(cf, &cpl));
 }
 
 TEST(FieldPatternTest, complement5)
@@ -192,7 +192,9 @@ TEST(FieldPatternTest, complement5)
     FieldPattern pattern(
         "ABC..."
         "AABCC."
-        "BBC...");
+        "BBC@@.");
+
+    EXPECT_EQ(PatternType::ALLOW_FILLING_OJAMA, pattern.type(4, 1));
 
     CoreField cf(
         "Y....."
@@ -204,13 +206,8 @@ TEST(FieldPatternTest, complement5)
         "YYGBB."
         "GGBOO.");
 
-    {
-        ColumnPuyoList cpl;
-        EXPECT_FALSE(pattern.complement(cf, false, &cpl));
-    }
-
     ColumnPuyoList cpl;
-    EXPECT_TRUE(pattern.complement(cf, true, &cpl));
+    EXPECT_TRUE(pattern.complement(cf, &cpl));
     for (const ColumnPuyo& cp : cpl) {
         cf.dropPuyoOn(cp.x, cp.color);
     }

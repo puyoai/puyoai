@@ -22,7 +22,7 @@ public:
     int ignitionColumn() const { return ignitionColumn_;}
     const std::vector<Position>& ignitionPositions() const { return ignitionPositions_; }
 
-    bool complement(const CoreField& cf, ColumnPuyoList* cpl) const { return pattern_.complement(cf, true, cpl); }
+    bool complement(const CoreField& cf, ColumnPuyoList* cpl) const { return pattern_.complement(cf, cpl); }
 
     PatternBookField mirror() const
     {
