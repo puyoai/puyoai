@@ -17,9 +17,9 @@ field = [
     "......",
     "BA....",
     "AAA...",
-    "BC....",
+    "BC@...",
     "BBC...",
-    "CC....",
+    "CC@...",
 ]
 ignition = 2
 
@@ -28,7 +28,7 @@ field = [
     "A.....",
     "ABC...",
     "AABCC.",
-    "BBC...",
+    "BBC@@.",
 ]
 ignition = 1
 
@@ -37,7 +37,7 @@ field = [
     "A.....",
     "ABC...",
     "AABCCC",
-    "BBC...",
+    "BBC@@@",
 ]
 ignition = 1
 
@@ -46,16 +46,16 @@ field = [
     "A.C...",
     "ABC...",
     "AABC..",
-    "BBC...",
+    "BBC@..",
 ]
 ignition = 1
 
 [[pattern]]
 field = [
-    "....CD",
-    "..B.CD",
+    "....C.",
+    "..B.C.",
     ".AABBC",
-    "AABDDC",
+    "AAB@@C",
 ]
 ignition = 2
 
@@ -64,7 +64,7 @@ field = [
     "..B...",
     "..BC..",
     ".AABCC",
-    "AABC..",
+    "AABC@@",
 ]
 ignition = 2
 
@@ -73,7 +73,7 @@ field = [
     "..BC..",
     "..BC..",
     ".AABC.",
-    "AABC..",
+    "AABC@.",
 ]
 ignition = 2
 
@@ -116,7 +116,7 @@ field = [
     "BA....",
     "AAC...",
     "BBBC..",
-    "CCC...",
+    "CCC@..",
 ]
 ignition = 2
 
@@ -126,7 +126,7 @@ field = [
     "AB....",
     "AAC...",
     "BBBC..",
-    "CCC...",
+    "CCC@..",
 ]
 ignition = 1
 
@@ -134,7 +134,7 @@ ignition = 1
 field = [
     "A.BC..",
     "AAABCC",
-    "BBBC..",
+    "BBBC@@",
 ]
 ignition = 1
 
@@ -142,7 +142,7 @@ ignition = 1
 field = [
     ".ABC..",
     "AAABCC",
-    "BBBC..",
+    "BBBC@@",
 ]
 ignition = 2
 
@@ -191,7 +191,7 @@ field = [
     "BA....",
     "AAC...",
     "ABBC..",
-    "BCC...",
+    "BCC@..",
 ]
 ignition = 2
 
