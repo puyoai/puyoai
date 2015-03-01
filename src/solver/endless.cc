@@ -68,6 +68,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
                 .maxRensa = -1,
                 .zenkeshi = false,
                 .decisions = decisions,
+                .type = EndlessResult::Type::DEAD,
             };
         }
         if (rensaResult.score > 10000) {
@@ -78,6 +79,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
                 .maxRensa = rensaResult.chains,
                 .zenkeshi = f.isZenkeshi(),
                 .decisions = decisions,
+                .type = EndlessResult::Type::MAIN_CHAIN,
             };
         }
         if (f.isZenkeshi()) {
@@ -87,6 +89,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
                 .maxRensa = rensaResult.chains,
                 .zenkeshi = true,
                 .decisions = decisions,
+                .type = EndlessResult::Type::ZENKESHI,
             };
         }
         req.playerFrameRequest[0].field = f;
@@ -102,6 +105,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
         .maxRensa = maxRensa,
         .zenkeshi = false,
         .decisions = decisions,
+        .type = EndlessResult::Type::PUYOSEQ_RUNOUT,
     };
 }
 
