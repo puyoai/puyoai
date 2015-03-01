@@ -21,12 +21,17 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
         int h = cf.height(x);
         for (int y = 1; y <= h; ++y) {
             char c = pattern.variable(x, y);
+
             if (pattern.type(x, y) == PatternType::MUST_EMPTY) {
                 if (cf.color(x, y) != PuyoColor::EMPTY)
                     return PatternMatchResult(false, 0, 0, 0);
                 continue;
             }
-            if (pattern.type(x, y) != PatternType::VAR && pattern.type(x, y) != PatternType::MUST_VAR)
+
+            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_OJAMA)
+                continue;
+
+            if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
                 continue;
 
             PuyoColor pc = cf.color(x, y);
@@ -57,7 +62,11 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
         int h = pattern.height(x);
         for (int y = 1; y <= h; ++y) {
             char c = pattern.variable(x, y);
-            if (pattern.type(x, y) == PatternType::NONE || pattern.type(x, y) == PatternType::ANY)
+            if (pattern.type(x, y) == PatternType::NONE)
+                continue;
+            if (pattern.type(x, y) == PatternType::ANY)
+                continue;
+            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_OJAMA)
                 continue;
 
             if (pattern.type(x, y) == PatternType::ALLOW_VAR) {
@@ -104,7 +113,7 @@ bool PatternMatcher::checkCell(char currentVar, PatternType neighborType, char n
     if (currentVar == neighborVar)
         return true;
 
-    if (neighborType == PatternType::NONE) {
+    if (neighborType == PatternType::NONE || neighborType == PatternType::ALLOW_FILLING_OJAMA) {
         if (map(currentVar) == neighborColor)
             return false;
     } else if (neighborType == PatternType::ALLOW_VAR) {

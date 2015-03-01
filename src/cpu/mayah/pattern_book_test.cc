@@ -10,7 +10,7 @@ field = [
     "A.....",
     "ABC...",
     "AABCC.",
-    "BBC...",
+    "BBC@@.",
 ]
 ignition = 1
 )";
@@ -22,7 +22,7 @@ field = [
     "AB....",
     "AAC...",
     "BBBC..",
-    "CCC...",
+    "CCC@..",
 ]
 ignition = 1
 

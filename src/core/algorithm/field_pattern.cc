@@ -167,7 +167,7 @@ bool FieldPattern::isMatchable(const CoreField& field) const
     return matcher.match(*this, field).matched;
 }
 
-bool FieldPattern::complement(const CoreField& field, bool allowsFillOjama, ColumnPuyoList* cpl) const
+bool FieldPattern::complement(const CoreField& field, ColumnPuyoList* cpl) const
 {
     PatternMatcher matcher;
     if (!matcher.match(*this, field).matched)
@@ -182,18 +182,22 @@ bool FieldPattern::complement(const CoreField& field, bool allowsFillOjama, Colu
     for (int x = 1; x <= 6; ++x) {
         int h = height(x);
         for (int y = 1; y <= h; ++y) {
-            if (allowsFillOjama && type(x, y) == PatternType::NONE && field.color(x, y) == PuyoColor::EMPTY) {
+            if (type(x, y) == PatternType::ALLOW_FILLING_OJAMA) {
+                if (field.color(x, y) != PuyoColor::EMPTY)
+                    continue;
                 if (!cpl->add(x, PuyoColor::OJAMA))
                     return false;
                 ++currentHeights[x];
                 continue;
             }
+
             if (!(type(x, y) == PatternType::VAR || type(x, y) == PatternType::MUST_VAR)) {
                 if (field.color(x, y) == PuyoColor::EMPTY) {
                     return false;
                 }
                 continue;
             }
+
             char c = variable(x, y);
             if (!matcher.isSet(c))
                 return false;
@@ -247,6 +251,13 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
         scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
+    case PatternType::ALLOW_FILLING_OJAMA:
+        CHECK_EQ(variable, '@');
+        types_[x][y] = t;
+        vars_[x][y] = '@';
+        scores_[x][y] = score;
+        heights_[x] = std::max(height(x), y);
+        break;
     default:
         CHECK(false);
     }
@@ -261,6 +272,8 @@ PatternType FieldPattern::inferType(char c, PatternType typeForLowerCase)
         return PatternType::ANY;
     if (c == '_')
         return PatternType::MUST_EMPTY;
+    if (c == '@')
+        return PatternType::ALLOW_FILLING_OJAMA;
     if ('A' <= c && c <= 'Z')
         return PatternType::VAR;
     if ('a' <= c && c <= 'z')
