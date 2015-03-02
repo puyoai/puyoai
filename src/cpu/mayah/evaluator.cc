@@ -642,6 +642,26 @@ void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field
 }
 
 template<typename ScoreCollector>
+void RensaEvaluator<ScoreCollector>::evalComplementationBias(const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
+{
+    PuyoSet puyoSets[FieldConstant::MAP_WIDTH];
+    for (const auto& cp : keyPuyos)
+        puyoSets[cp.x].add(cp.color);
+    for (const auto& cp : firePuyos)
+        puyoSets[cp.x].add(cp.color);
+
+    for (int x = 1; x <= 6; ++x) {
+        const PuyoSet& ps = puyoSets[x];
+        if (ps.count() < 3)
+            continue;
+        if (ps.red() >= 3 || ps.blue() >= 3 || ps.yellow() >= 3 || ps.green() >= 3) {
+            EvaluationFeatureKey key = (x == 1 || x == 6) ? COMPLEMENTATION_BIAS_EDGE : COMPLEMENTATION_BIAS;
+            sc_->addScore(key, 1);
+        }
+    }
+}
+
+template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::collectScoreForRensaGarbage(const CoreField& fieldAfterDrop)
 {
     sc_->addScore(NUM_GARBAGE_PUYOS, fieldAfterDrop.countPuyos());
@@ -710,7 +730,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
     auto evalCallback = [&](const CoreField& fieldBeforeRensa, const CoreField& fieldAfterRensa,
                             const RensaResult& rensaResult,
-                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                            const ColumnPuyoList& keyPuyos,
+                            const ColumnPuyoList& firePuyos,
                             const RensaTrackResult& trackResult) {
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
         RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), complementBook(), patternBook(), rensaScoreCollector.get());
@@ -744,6 +765,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         if (USE_CONNECTION_FEATURE)
             rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
 
+        rensaEvaluator.evalComplementationBias(keyPuyos, firePuyos);
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, keyPuyos, firePuyos, currentFrameId, me, enemy);
 
         if (rensaScoreCollector->score() > maxRensaScore) {

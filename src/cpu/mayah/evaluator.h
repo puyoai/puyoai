@@ -127,6 +127,7 @@ public:
     void evalRensaRidgeHeight(const CoreField&);
     void evalRensaValleyDepth(const CoreField&);
     void evalRensaFieldUShape(const CoreField&, bool enemyHasZenkeshi);
+    void evalComplementationBias(const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos);
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                            int currentFrameId, const PlayerState& me, const PlayerState& enemy);
 private:
