@@ -3,6 +3,19 @@
 
 [[pattern]]
 field = [
+    "A.....",
+    "AB....",
+    "AA....",
+    "CB....",
+    "BB....",
+    "C.....",
+    "CC....",
+    "......",
+]
+ignition = 1
+
+[[pattern]]
+field = [
     ".A....",
     "BA....",
     "AA....",
@@ -91,6 +104,24 @@ ignition = 3
 
 [[pattern]]
 field = [
+    "....C.",
+    "...CBC",
+    "..AAAC",
+    "..ABBB",
+]
+ignition = 3
+
+[[pattern]]
+field = [
+    ".....C",
+    "...BBC",
+    "..AAAB",
+    "..ACCB",
+]
+ignition = 3
+
+[[pattern]]
+field = [
     "....CC",
     "...CBC",
     "..AAAA",
@@ -100,12 +131,13 @@ ignition = 3
 
 [[pattern]]
 field = [
-    "....C.",
-    "...CBC",
-    "..AAAC",
-    "..ABBB",
+    ".....C",
+    ".....C",
+    ".....B",
+    "...CCB",
+    "...BBA",
+    "...AAA",
 ]
-ignition = 3
 
 # ----------------------------------------------------------------------
 # NEWGTR-HEAD
@@ -192,7 +224,18 @@ field = [
     "...AAA",
     "...ABC",
 ]
-ignition = 3
+ignition = 4
+
+[[pattern]]
+field = [
+    ".....C",
+    ".....C",
+    "....CB",
+    "....CB",
+    "...AAA",
+    "...ABB",
+]
+ignition = 4
 
 # ----------------------------------------------------------------------
 # FUKIGEN-GTR
