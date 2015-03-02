@@ -468,6 +468,7 @@ field = [
     "ABB..."
 ]
 AABC = [3, 2]  # for ZENKESHI
+ABAA = [2, 3]
 BBAD = [5, 1]
 BBAC = [1, 2]
 
