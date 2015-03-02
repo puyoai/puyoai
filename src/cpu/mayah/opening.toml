@@ -250,6 +250,16 @@ name = "GTR-TAIL"
 score = 9.7
 
 [[book]]
+name = "GTR-TAIL"
+score = 9.4
+field = [
+    "....XY",
+    "..C.YX",
+    "...CCX",
+    "..CYYX"
+]
+
+[[book]]
 field = [
     ".....y",
     ".....Y",
