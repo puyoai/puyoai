@@ -805,7 +805,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (FLAGS_pattern) {
         auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                             const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                            const RensaTrackResult& trackResult) {
+                            const RensaTrackResult& trackResult, int /*patternScore*/) {
             evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
         };
         patternBook().iteratePossibleRensas(fieldBeforeRensa, maxIteration, callback);

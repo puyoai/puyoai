@@ -33,17 +33,19 @@ vector<Position> findIgnitionPositions(const FieldPattern& pattern)
 
 } // anonymous namespace
 
-PatternBookField::PatternBookField(const std::string& field, int ignitionColumn) :
+PatternBookField::PatternBookField(const std::string& field, int ignitionColumn, int score) :
     pattern_(field),
     ignitionColumn_(ignitionColumn),
+    score_(score),
     ignitionPositions_(findIgnitionPositions(pattern_))
 {
     DCHECK(0 <= ignitionColumn && ignitionColumn <= 6);
 }
 
-PatternBookField::PatternBookField(const FieldPattern& pattern, int ignitionColumn) :
+PatternBookField::PatternBookField(const FieldPattern& pattern, int ignitionColumn, int score) :
     pattern_(pattern),
     ignitionColumn_(ignitionColumn),
+    score_(score),
     ignitionPositions_(findIgnitionPositions(pattern_))
 {
     DCHECK(0 <= ignitionColumn && ignitionColumn <= 6);
@@ -89,7 +91,12 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
             CHECK(1 <= ignitionColumn && ignitionColumn <= 6) << ignitionColumn;
         }
 
-        PatternBookField pbf(str, ignitionColumn);
+        int score = 0;
+        if (const toml::Value* p = v.find("score")) {
+            score = p->as<int>();
+        }
+
+        PatternBookField pbf(str, ignitionColumn, score);
         fields_.emplace(pbf.ignitionPositions(), pbf);
 
         PatternBookField mirrored(pbf.mirror());
@@ -107,7 +114,7 @@ PatternBook::find(const vector<Position>& ignitionPositions) const
 
 void PatternBook::iteratePossibleRensas(const CoreField& originalField,
                                         int maxIteration,
-                                        const RensaDetector::TrackedPossibleRensaCallback& callback) const
+                                        const Callback& callback) const
 {
     DCHECK_GE(maxIteration, 1);
 
@@ -154,7 +161,8 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
         if (!ok || !foundFirePuyo)
             continue;
 
-        iteratePossibleRensasInternal(originalField, 0, cf, firePuyo, keyPuyos, originalContext, maxIteration - 1, callback);
+        iteratePossibleRensasInternal(originalField, 0, cf, firePuyo, keyPuyos, originalContext, maxIteration - 1,
+                                      pbf.score(), callback);
     }
 }
 
@@ -165,20 +173,21 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
                                                 const ColumnPuyoList& originalKeyPuyos,
                                                 const CoreField::SimulationContext& fieldContext,
                                                 int restIteration,
-                                                const RensaDetector::TrackedPossibleRensaCallback& callback) const
+                                                int patternScore,
+                                                const Callback& callback) const
 {
     // Check without adding anything.
     {
         CoreField cf(field);
         CoreField::SimulationContext context(fieldContext);
         if (cf.vanishDrop(&context) == 0) {
-            checkRensa(original, currentChains, firePuyo, originalKeyPuyos, fieldContext, callback);
+            checkRensa(original, currentChains, firePuyo, originalKeyPuyos, patternScore, callback);
             return;
         }
 
         // Proceed without adding anything.
         iteratePossibleRensasInternal(original, currentChains + 1, cf, firePuyo,
-                                      originalKeyPuyos, context, restIteration, callback);
+                                      originalKeyPuyos, context, restIteration, patternScore, callback);
 
         // Don't return here. We might be able to complement if we can erase something.
     }
@@ -228,7 +237,8 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
         int score = cf.vanishDrop(&context);
         CHECK(score > 0) << score;
 
-        iteratePossibleRensasInternal(original, currentChains + 1, cf, firePuyo, keyPuyos, context, restIteration - 1, callback);
+        iteratePossibleRensasInternal(original, currentChains + 1, cf, firePuyo, keyPuyos, context, restIteration - 1,
+                                      patternScore + pbf.score(), callback);
     }
 }
 
@@ -236,8 +246,8 @@ void PatternBook::checkRensa(const CoreField& originalField,
                              int currentChains,
                              const ColumnPuyo& firePuyo,
                              const ColumnPuyoList& keyPuyos,
-                             const CoreField::SimulationContext&,
-                             const RensaDetector::TrackedPossibleRensaCallback& callback) const
+                             int patternScore,
+                             const Callback& callback) const
 {
     CoreField cf(originalField);
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(originalField);
@@ -261,5 +271,5 @@ void PatternBook::checkRensa(const CoreField& originalField,
 
     ColumnPuyoList firePuyos;
     firePuyos.add(firePuyo);
-    callback(cf, rensaResult, keyPuyos, firePuyos, trackResult);
+    callback(cf, rensaResult, keyPuyos, firePuyos, trackResult, patternScore);
 }

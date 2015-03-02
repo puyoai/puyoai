@@ -13,6 +13,7 @@ field = [
     "BBC@@.",
 ]
 ignition = 1
+score = 72
 )";
 
 static const char TEST_BOOK2[] = R"(
@@ -78,15 +79,18 @@ TEST(PatternBookTest, pattern1)
                         const RensaResult&,
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&) {
+                        const RensaTrackResult&,
+                        int patternScore) {
         CoreField cf(field);
         for (const auto& cp : keyPuyos)
             cf.dropPuyoOn(cp.x, cp.color);
         for (const auto& cp : firePuyos)
             cf.dropPuyoOn(cp.x, cp.color);
 
-        if (expected == cf)
+        if (expected == cf) {
             found = true;
+            EXPECT_EQ(72, patternScore);
+        }
     };
 
     patternBook.iteratePossibleRensas(field, 1, callback);
@@ -113,7 +117,8 @@ TEST(PatternBookTest, pattern2)
                         const RensaResult&,
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&) {
+                        const RensaTrackResult&,
+                        int /*patternScore*/) {
         CoreField cf(field);
         for (const auto& cp : keyPuyos)
             cf.dropPuyoOn(cp.x, cp.color);
@@ -150,7 +155,8 @@ TEST(PatternBookTest, pattern3)
                         const RensaResult&,
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&) {
+                        const RensaTrackResult&,
+                        int /*patternScore*/) {
         CoreField cf(field);
         for (const auto& cp : keyPuyos)
             cf.dropPuyoOn(cp.x, cp.color);
