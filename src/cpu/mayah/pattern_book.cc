@@ -171,11 +171,16 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
     {
         CoreField cf(field);
         CoreField::SimulationContext context(fieldContext);
-        if (cf.vanishDrop(&context) > 0) {
-            iteratePossibleRensasInternal(original, currentChains + 1, cf, firePuyo, originalKeyPuyos, context, restIteration, callback);
-        } else {
+        if (cf.vanishDrop(&context) == 0) {
             checkRensa(original, currentChains, firePuyo, originalKeyPuyos, fieldContext, callback);
+            return;
         }
+
+        // Proceed without adding anything.
+        iteratePossibleRensasInternal(original, currentChains + 1, cf, firePuyo,
+                                      originalKeyPuyos, context, restIteration, callback);
+
+        // Don't return here. We might be able to complement if we can erase something.
     }
 
     if (restIteration == 0)
