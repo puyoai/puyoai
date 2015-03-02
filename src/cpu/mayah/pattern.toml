@@ -254,6 +254,16 @@ ignition = 2
 
 [[pattern]]
 field = [
+    "BA....",
+    "AAA...",
+    "BC@...",
+    "BB@...",
+    "CCC..."
+]
+ignition = 2
+
+[[pattern]]
+field = [
     "A.....",
     "AB....",
     "AAC.C.",
@@ -268,3 +278,76 @@ field = [
     "AAABBC"
 ]
 ignition = 2
+
+[[pattern]]
+field = [
+    "....C.",
+    "...CBC",
+    "..CBAB",
+    "..AAAB"
+]
+
+# ----------------------------------------------------------------------
+# DAA
+
+[[pattern]]
+field = [
+    "ABC...",
+    "AABCC.",
+    "ABBC@."
+]
+ignition = 1
+
+[[pattern]]
+field = [
+    "..B.C.",
+    ".AABBC",
+    ".AABCC"
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "..BC..",
+    ".AABBC",
+    ".AABCC"
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "..BC..",
+    ".AABCC",
+    ".AABBC"
+]
+ignition = 2
+
+# ----------------------------------------------------------------------
+# LLR
+
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AABC..",
+    "CCBB.."
+]
+ignition = 1
+
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AABB..",
+    "CCBC.."
+]
+ignition = 1
+
+[[book]]
+field = [
+    "A.....",
+    "ACBB..",
+    "AACD.D",
+    "BBCCDD"
+]
+ignition = 1
