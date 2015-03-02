@@ -1,40 +1,5 @@
 # ----------------------------------------------------------------------
-# GTR-HEAD
-
-[[pattern]]
-field = [
-    "A.....",
-    "AB....",
-    "AA....",
-    "CB....",
-    "BB....",
-    "C.....",
-    "CC....",
-    "......",
-]
-ignition = 1
-
-[[pattern]]
-field = [
-    ".A....",
-    "BA....",
-    "AA....",
-    "BC....",
-    "BBC...",
-    "CC....",
-]
-ignition = 2
-
-[[pattern]]
-field = [
-    "......",
-    "BA....",
-    "AAA...",
-    "BC@...",
-    "BBC...",
-    "CC@...",
-]
-ignition = 2
+# GTR-CORE
 
 [[pattern]]
 field = [
@@ -63,6 +28,115 @@ field = [
 ]
 ignition = 1
 
+# ----------------------------------------------------------------------
+# GTR-HEAD-1
+
+[[pattern]]
+field = [
+    ".A....",
+    "BA....",
+    "AA....",
+    "BC....",
+    "BBC...",
+    "CC....",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "BA....",
+    "AAA...",
+    "BC@...",
+    "BBC...",
+    "CC@...",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "B.....",
+    "AA....",
+    "AA....",
+    "BC@...",
+    "BBC...",
+    "CC@...",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "BA....",
+    "AA....",
+    "A@....",
+    "BC@...",
+    "BBC...",
+    "CC@...",
+]
+ignition = 2
+
+# ----------------------------------------------------------------------
+# GTR-HEAD-2
+
+[[pattern]]
+field = [
+    "A.....",
+    "AB....",
+    "AA....",
+    "CB....",
+    "BB....",
+    "C.....",
+    "CC....",
+    "......",
+]
+ignition = 1
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "B.....",
+    "BA....",
+    "AA....",
+    "AB....",
+    "C.....",
+    "CC....",
+    "......",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "B.....",
+    "AA....",
+    "AB....",
+    "AB....",
+    "C.....",
+    "CC....",
+    "......",
+]
+ignition = 2
+
+# ----------------------------------------------------------------------
+# GTR-HEAD-3
+
+[[pattern]]
+field = [
+    "C.....",
+    "CB....",
+    "BAA...",
+    "BCA...",
+    "BCA...",
+    "......",
+    "......",
+    "......",
+]
+ignition = 3
+
+# ----------------------------------------------------------------------
+# GTR-TAIL-1
+
 [[pattern]]
 field = [
     "....C.",
@@ -90,17 +164,8 @@ field = [
 ]
 ignition = 2
 
-[[pattern]]
-field = [
-    ".....C",
-    "..AB.C",
-    "..AABB",
-    "..ABCC",
-]
-ignition = 3
-
 # ----------------------------------------------------------------------
-# GTR-TAIL
+# GTR-TAIL-2
 
 [[pattern]]
 field = [
@@ -132,6 +197,26 @@ ignition = 3
 [[pattern]]
 field = [
     ".....C",
+    "..AB.C",
+    "..AABB",
+    "..ABCC",
+]
+ignition = 3
+
+[[pattern]]
+field = [
+    "..ABCB",
+    "..AABB",
+    "..ACCC",
+]
+ignition = 3
+
+# ----------------------------------------------------------------------
+# GTR-TAIL-3
+
+[[pattern]]
+field = [
+    ".....C",
     ".....C",
     ".....B",
     "...CCB",
@@ -139,8 +224,63 @@ field = [
     "...AAA",
 ]
 
+[[pattern]]
+field = [
+    ".....C",
+    "....BC",
+    "...ABC",
+    "...AAB",
+    "...ABC",
+]
+ignition = 4
+
+[[pattern]]
+field = [
+    ".....C",
+    "....BC",
+    "...ABB",
+    "...AAC",
+    "...ABC",
+]
+ignition = 4
+
 # ----------------------------------------------------------------------
-# NEWGTR-HEAD
+# NEWGTR-CORE
+
+[[pattern]]
+field = [
+    "A.BC..",
+    "AAABCC",
+    "BBBC@@",
+]
+ignition = 1
+
+[[pattern]]
+field = [
+    ".ABC..",
+    "AAABCC",
+    "BBBC@@",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "A.BC..",
+    "AAABC.",
+    "BBBCC.",
+]
+ignition = 1
+
+[[pattern]]
+field = [
+    ".ABC..",
+    "AAABC.",
+    "BBBCC.",
+]
+ignition = 2
+
+# ----------------------------------------------------------------------
+# NEWGTR-HEAD-1
 
 [[pattern]]
 field = [
@@ -162,40 +302,8 @@ field = [
 ]
 ignition = 1
 
-[[pattern]]
-field = [
-    "A.BC..",
-    "AAABCC",
-    "BBBC@@",
-]
-ignition = 1
-
-[[pattern]]
-field = [
-    ".ABC..",
-    "AAABCC",
-    "BBBC@@",
-]
-ignition = 2
-
-[[pattern]]
-field = [
-    "A.BC..",
-    "AAABC.",
-    "BBBCC.",
-]
-ignition = 1
-
-[[pattern]]
-field = [
-    ".ABC..",
-    "AAABC.",
-    "BBBCC.",
-]
-ignition = 2
-
 # ----------------------------------------------------------------------
-# NEWGTR-TAIL
+# NEWGTR-TAIL-1
 
 [[pattern]]
 field = [
@@ -238,7 +346,7 @@ field = [
 ignition = 4
 
 # ----------------------------------------------------------------------
-# FUKIGEN-GTR
+# FUKIGENGTR-CORE
 
 [[pattern]]
 field = [
@@ -250,7 +358,19 @@ field = [
 ignition = 2
 
 # ----------------------------------------------------------------------
-# ZABUTON-L
+# ZABUTONL-CORE
+
+[[pattern]]
+field = [
+    "A.....",
+    "AB....",
+    "AAC.C.",
+    "BBBCC."
+]
+ignition = 1
+
+# ----------------------------------------------------------------------
+# ZABUTONL-HEAD-1
 
 [[pattern]]
 field = [
@@ -262,14 +382,8 @@ field = [
 ]
 ignition = 2
 
-[[pattern]]
-field = [
-    "A.....",
-    "AB....",
-    "AAC.C.",
-    "BBBCC."
-]
-ignition = 1
+# ----------------------------------------------------------------------
+# ZABUTONL-TAIL-1
 
 [[pattern]]
 field = [
@@ -278,6 +392,9 @@ field = [
     "AAABBC"
 ]
 ignition = 2
+
+# ----------------------------------------------------------------------
+# ZABUTONL-TAIL-2
 
 [[pattern]]
 field = [
