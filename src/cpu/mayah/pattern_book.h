@@ -17,8 +17,9 @@
 class PatternBookField {
 public:
     // If ignitionColumn is 0, we ignore ignitionColumn when detecting rensa.
-    PatternBookField(const std::string& field, int ignitionColumn);
+    PatternBookField(const std::string& field, int ignitionColumn, int score);
 
+    int score() const { return score_; }
     int ignitionColumn() const { return ignitionColumn_;}
     const std::vector<Position>& ignitionPositions() const { return ignitionPositions_; }
 
@@ -27,14 +28,15 @@ public:
     PatternBookField mirror() const
     {
         int mirroredIgnitionColumn = ignitionColumn() == 0 ? 0 : 7 - ignitionColumn();
-        return PatternBookField(pattern_.mirror(), mirroredIgnitionColumn);
+        return PatternBookField(pattern_.mirror(), mirroredIgnitionColumn, score_);
     }
 
 private:
-    PatternBookField(const FieldPattern&, int ignitionColumn);
+    PatternBookField(const FieldPattern&, int ignitionColumn, int score);
 
     FieldPattern pattern_;
     int ignitionColumn_;
+    int score_;
     std::vector<Position> ignitionPositions_;
 };
 
@@ -53,8 +55,15 @@ public:
     // Note that ignitionPositions must be sorted.
     std::pair<Iterator, Iterator> find(const std::vector<Position>& ignitionPositions) const;
 
+    typedef std::function<void (const CoreField&,
+                                const RensaResult&,
+                                const ColumnPuyoList& keyPuyos,
+                                const ColumnPuyoList& firePuyos,
+                                const RensaTrackResult&,
+                                int patternScore)> Callback;
+
     void iteratePossibleRensas(const CoreField&, int maxIteration,
-                               const RensaDetector::TrackedPossibleRensaCallback& callback) const;
+                               const Callback& callback) const;
 
     size_t size() const { return fields_.size(); }
     Iterator begin() const { return fields_.begin(); }
@@ -68,14 +77,15 @@ private:
                                        const ColumnPuyoList& keyPuyos,
                                        const CoreField::SimulationContext&,
                                        int restIteration,
-                                       const RensaDetector::TrackedPossibleRensaCallback& callback) const;
+                                       int scoreSum,
+                                       const Callback& callback) const;
 
     void checkRensa(const CoreField& originalField,
                     int currentChains,
                     const ColumnPuyo& firePuyo,
                     const ColumnPuyoList& keyPuyos,
-                    const CoreField::SimulationContext&,
-                    const RensaDetector::TrackedPossibleRensaCallback& callback) const;
+                    int sumScore,
+                    const Callback& callback) const;
 
     Map fields_;
 };
