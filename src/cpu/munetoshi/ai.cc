@@ -28,6 +28,7 @@ constexpr std::array<munetoshi::grade, munetoshi::NUM_EVALUATOR_TYPES> GRADE_WEI
 
         -4, // NUM_REQUIRED_PUYO
         10, // TURNOVER_SHAPE
+        1, // TURNOVER_HEAD
 }};
 } // namespace
 
@@ -160,6 +161,7 @@ munetoshi::grade munetoshi::AI::evaluate(
         EVALUATOR_TYPES::CHAIN_LENGTH,
         EVALUATOR_TYPES::NUM_REQUIRED_PUYO,
         EVALUATOR_TYPES::TURNOVER_SHAPE,
+        EVALUATOR_TYPES::TURNOVER_HEAD,
         EVALUATOR_TYPES::_NIL_TYPE>
         ::evaluate_all(&possible_chain_result, possible_chain_grade_vect_setter);
 

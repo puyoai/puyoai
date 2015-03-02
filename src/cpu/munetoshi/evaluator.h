@@ -120,4 +120,9 @@ grade Evaluator<EVALUATOR_TYPES::NUM_REQUIRED_PUYO, PossibleChainResult>::EVALUA
 template<>
 grade Evaluator<EVALUATOR_TYPES::TURNOVER_SHAPE, PossibleChainResult>::EVALUATE(
             PossibleChainResult* e);
+
+template<>
+grade Evaluator<EVALUATOR_TYPES::TURNOVER_HEAD, PossibleChainResult>::EVALUATE(
+            PossibleChainResult* e);
+
 } // namespace munetoshi

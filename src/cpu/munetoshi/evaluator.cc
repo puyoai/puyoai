@@ -25,12 +25,26 @@ template<>
 grade Evaluator<EVALUATOR_TYPES::VALLEY_SHAPE, PlanResult>::EVALUATE(
             PlanResult* e) {
     grade valley_grade = 0;
-    valley_grade += std::max(e->field.height(2) - e->field.height(1), 0) * 10;
-    valley_grade += std::max(e->field.height(3) - e->field.height(2), 0);
-    valley_grade += std::max(e->field.height(3) - e->field.height(4), 0);
-    valley_grade += std::max(e->field.height(4) - e->field.height(5), 0);
-    valley_grade += std::max(e->field.height(5) - e->field.height(6), 0) * 10;
-    valley_grade += std::max(e->field.height(4) - e->field.height(3) - 2, 0);
+    std::min(1,2);
+    std::min(1,2+1);
+    for (int col = 1; col <= FieldConstant::WIDTH; ++col) {
+        int valley_depth = std::min(
+                (col == 1 ? FieldConstant::MAP_HEIGHT : e->field.height(col - 1)) - e->field.height(col),
+                (col == FieldConstant::WIDTH ? FieldConstant::MAP_HEIGHT : e->field.height(col + 1)) - e->field.height(col));
+        valley_depth *= col == 1 || col == FieldConstant::WIDTH ? 10 : 1;
+        if (valley_depth >= 2) {
+            valley_grade += valley_depth;
+        }
+    }
+
+    for (int col = 2; col < FieldConstant::WIDTH; ++col) {
+        int mountain_hight = std::max(
+                e->field.height(col) - e->field.height(col - 1),
+                e->field.height(col) - e->field.height(col + 1));
+        if (mountain_hight >= 3) {
+            valley_grade += mountain_hight;
+        }
+    }
     return valley_grade;
 }
 
@@ -73,11 +87,20 @@ grade Evaluator<EVALUATOR_TYPES::TURNOVER_SHAPE, PossibleChainResult>::EVALUATE(
             }
         }
         if ((has_left_side && has_left_center) || (has_right_side && has_right_center)) {
-            // nth_chain;
+            e->turnover_bottom = nth_chain;
             return 1;
         }
     }
     return 0;
+}
+
+template<>
+grade Evaluator<EVALUATOR_TYPES::TURNOVER_HEAD, PossibleChainResult>::EVALUATE(
+        PossibleChainResult* e) {
+    if (e->turnover_bottom == 0) {
+        return 0;
+    }
+    return e->rensa_result.chains - e->turnover_bottom;
 }
 
 } // namespace munetoshi
