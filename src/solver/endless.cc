@@ -92,9 +92,13 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
                 .type = EndlessResult::Type::ZENKESHI,
             };
         }
+
         req.playerFrameRequest[0].field = f;
         req.playerFrameRequest[0].kumipuyoSeq.dropFront();
         req.playerFrameRequest[1].kumipuyoSeq.dropFront();
+
+        // Update the current field.
+        ai_->me_.field = f;
 
         ai_->grounded(req);
     }
