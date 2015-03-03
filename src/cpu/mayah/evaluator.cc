@@ -161,7 +161,6 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
     }
 
     auto matchablePatternIds = preEvalResult.mutableMatchablePatternIds();
-    ColumnPuyoList cpl;
     for (size_t i = 0; i < complementBook().size(); ++i) {
         const ComplementBookField& cbf = complementBook().field(i);
         if (cbf.isMatchable(currentField))

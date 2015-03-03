@@ -79,6 +79,9 @@ bool PatternBook::loadFromString(const string& str)
 
 bool PatternBook::loadFromValue(const toml::Value& patterns)
 {
+    CHECK(fields_.empty());
+    CHECK(index_.empty());
+
     const toml::Array& vs = patterns.find("pattern")->as<toml::Array>();
     for (const toml::Value& v : vs) {
         string str;
@@ -97,19 +100,21 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
         }
 
         PatternBookField pbf(str, ignitionColumn, score);
-        fields_.emplace(pbf.ignitionPositions(), pbf);
-
-        PatternBookField mirrored(pbf.mirror());
-        fields_.emplace(mirrored.ignitionPositions(), mirrored);
+        fields_.push_back(pbf);
+        fields_.push_back(pbf.mirror());
     }
+
+    index_.clear();
+    for (int i = 0; i < static_cast<int>(fields_.size()); ++i)
+        index_.emplace(fields_[i].ignitionPositions(), i);
 
     return true;
 }
 
-pair<PatternBook::Iterator, PatternBook::Iterator>
+pair<PatternBook::IndexIterator, PatternBook::IndexIterator>
 PatternBook::find(const vector<Position>& ignitionPositions) const
 {
-    return fields_.equal_range(ignitionPositions);
+    return index_.equal_range(ignitionPositions);
 }
 
 void PatternBook::iteratePossibleRensas(const CoreField& originalField,
@@ -120,8 +125,7 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
 
     const CoreField::SimulationContext originalContext = CoreField::SimulationContext::fromField(originalField);
 
-    for (Iterator it = fields_.begin(); it != fields_.end(); ++it) {
-        const PatternBookField& pbf = it->second;
+    for (const PatternBookField& pbf : fields_) {
         ColumnPuyoList cpl;
         if (!pbf.complement(originalField, &cpl))
             continue;
@@ -201,9 +205,9 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
         return;
 
     std::sort(ignitionPositions.begin(), ignitionPositions.end());
-    std::pair<Iterator, Iterator> p = this->find(ignitionPositions);
-    for (Iterator it = p.first; it != p.second; ++it) {
-        const PatternBookField& pbf = it->second;
+    std::pair<IndexIterator, IndexIterator> p = this->find(ignitionPositions);
+    for (IndexIterator it = p.first; it != p.second; ++it) {
+        const PatternBookField& pbf = patternBookField(it->second);
 
         ColumnPuyoList cpl;
         if (!pbf.complement(field, &cpl))
