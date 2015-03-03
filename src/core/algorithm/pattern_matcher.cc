@@ -3,10 +3,14 @@
 #include "core/algorithm/field_pattern.h"
 #include "core/core_field.h"
 
+using namespace std;
+
 PatternMatcher::PatternMatcher()
 {
-    for (int i = 0; i < 26; ++i)
+    for (int i = 0; i < 26; ++i) {
         map_[i] = PuyoColor::WALL;
+        seen_[i] = false;
+    }
 }
 
 PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const CoreField& cf, bool ignoresMustVar)
@@ -24,7 +28,7 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
 
             if (pattern.type(x, y) == PatternType::MUST_EMPTY) {
                 if (cf.color(x, y) != PuyoColor::EMPTY)
-                    return PatternMatchResult(false, 0, 0, 0);
+                    return PatternMatchResult();
                 continue;
             }
 
@@ -37,12 +41,12 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
             PuyoColor pc = cf.color(x, y);
             if (pc == PuyoColor::EMPTY) {
                 if (!ignoresMustVar && pattern.type(x, y) == PatternType::MUST_VAR)
-                    return PatternMatchResult(false, 0, 0, 0);
+                    return PatternMatchResult();
                 continue;
             }
 
             if (!isNormalColor(pc))
-                return PatternMatchResult(false, 0, 0, 0);
+                return PatternMatchResult();
 
             matchCount += 1;
             matchScore += pattern.score(x, y);
@@ -53,7 +57,7 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
             }
 
             if (map(c) != pc)
-                return PatternMatchResult(false, 0, 0, 0);
+                return PatternMatchResult();
         }
     }
 
@@ -77,24 +81,32 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
                 continue;
             }
 
+            setSeen(c);
+
             if (!ignoresMustVar && pattern.type(x, y) == PatternType::MUST_VAR && cf.color(x, y) == PuyoColor::EMPTY)
-                return PatternMatchResult(false, 0, 0, 0);
+                return PatternMatchResult();
 
             DCHECK(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR);
 
             // Check neighbors.
             if (!checkCell(c, pattern.type(x, y + 1), pattern.variable(x, y + 1), cf.color(x, y + 1)))
-                return PatternMatchResult(false, 0, 0, 0);
+                return PatternMatchResult();
             if (!checkCell(c, pattern.type(x, y - 1), pattern.variable(x, y - 1), cf.color(x, y - 1)))
-                return PatternMatchResult(false, 0, 0, 0);
+                return PatternMatchResult();
             if (!checkCell(c, pattern.type(x + 1, y), pattern.variable(x + 1, y), cf.color(x + 1, y)))
-                return PatternMatchResult(false, 0, 0, 0);
+                return PatternMatchResult();
             if (!checkCell(c, pattern.type(x - 1, y), pattern.variable(x - 1, y), cf.color(x - 1, y)))
-                return PatternMatchResult(false, 0, 0, 0);
+                return PatternMatchResult();
         }
     }
 
-    return PatternMatchResult(true, matchScore, matchCount, matchAllowedCount);
+    vector<char> unusedVariables;
+    for (char c = 'A'; c <= 'Z'; ++c) {
+        if (isSeen(c) && !isSet(c))
+            unusedVariables.push_back(c);
+    }
+
+    return PatternMatchResult(true, matchScore, matchCount, matchAllowedCount, std::move(unusedVariables));
 }
 
 inline
