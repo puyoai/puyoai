@@ -2,6 +2,7 @@
 #define CORE_ALGORITHM_PATTERN_MATCHER_H_
 
 #include <tuple>
+#include <vector>
 
 #include "core/puyo_color.h"
 #include "core/algorithm/field_pattern.h"
@@ -10,18 +11,25 @@ class CoreField;
 class FieldPattern;
 
 struct PatternMatchResult {
+    PatternMatchResult() : matched(false), score(0), count(0), allowedCount(0) {}
     PatternMatchResult(bool matched, double score, int count, int allowedCount) :
         matched(matched), score(score), count(count), allowedCount(allowedCount) {}
+    PatternMatchResult(bool matched, double score, int count, int allowedCount,
+                       std::vector<char> unusedVariables) :
+        matched(matched), score(score), count(count), allowedCount(allowedCount),
+        unusedVariables(std::move(unusedVariables)) {}
 
     friend bool operator==(const PatternMatchResult& lhs, const PatternMatchResult& rhs)
     {
-        return std::tie(lhs.matched, lhs.score, lhs.count, lhs.allowedCount) == std::tie(rhs.matched, rhs.score, rhs.count, rhs.allowedCount);
+        return std::tie(lhs.matched, lhs.score, lhs.count, lhs.allowedCount, lhs.unusedVariables) ==
+            std::tie(rhs.matched, rhs.score, rhs.count, rhs.allowedCount, rhs.unusedVariables);
     }
 
     bool matched;
     double score;
     int count;
     int allowedCount;
+    std::vector<char> unusedVariables;
 };
 
 class PatternMatcher {
@@ -50,9 +58,18 @@ private:
         return map_[var - 'A'] = pc;
     }
 
+    bool isSeen(char var) const { return seen_[var - 'A']; }
+
+    void setSeen(char var)
+    {
+        DCHECK('A' <= var && var <= 'Z') << var;
+        seen_[var - 'A'] = true;
+    }
+
     bool checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor);
 
     PuyoColor map_[26];
+    bool seen_[26];
 };
 
 #endif

@@ -36,7 +36,7 @@ TEST(OpeningBookFieldTest, merge)
         "YYRRRG");
 
     OpeningBookField obf("test", pattern);
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0), obf.match(f0));
-    EXPECT_EQ(PatternMatchResult(true, 38, 19, 0), obf.match(f1));
+    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0, {'A', 'B', 'C', 'D', 'E', 'X'}), obf.match(f0));
+    EXPECT_EQ(PatternMatchResult(true, 38, 19, 0, {'X'}), obf.match(f1));
     EXPECT_EQ(PatternMatchResult(false, 0, 0, 0), obf.match(f2));
 }
