@@ -93,7 +93,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     double beginTime = currentTime();
 
     EvaluationMode mode = calculateMode(me, enemy);
-
+    LOG(INFO) << "mode = " << toString(mode);
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
     if (VLOG_IS_ON(1)) {
         VLOG(1) << "\n"
