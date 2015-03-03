@@ -23,6 +23,7 @@ public:
     int ignitionColumn() const { return ignitionColumn_;}
     const std::vector<Position>& ignitionPositions() const { return ignitionPositions_; }
 
+    bool isMatchable(const CoreField& cf) const { return pattern_.isMatchable(cf); }
     bool complement(const CoreField& cf, ColumnPuyoList* cpl) const { return pattern_.complement(cf, cpl); }
 
     PatternBookField mirror() const
@@ -42,8 +43,8 @@ private:
 
 class PatternBook : noncopyable {
 public:
-    typedef std::multimap<std::vector<Position>, PatternBookField> Map;
-    typedef Map::const_iterator Iterator;
+    typedef std::multimap<std::vector<Position>, int> IndexMap;
+    typedef IndexMap::const_iterator IndexIterator;
 
     bool load(const std::string& filename);
     bool loadFromString(const std::string&);
@@ -53,7 +54,7 @@ public:
     // Multiple PatternBookField might be found, so begin-iterator and end-iterator will be
     // returned. If no such PatternBookField is found, begin-iterator and end-iterator are the same.
     // Note that ignitionPositions must be sorted.
-    std::pair<Iterator, Iterator> find(const std::vector<Position>& ignitionPositions) const;
+    std::pair<IndexIterator, IndexIterator> find(const std::vector<Position>& ignitionPositions) const;
 
     typedef std::function<void (const CoreField&,
                                 const RensaResult&,
@@ -66,8 +67,7 @@ public:
                                const Callback& callback) const;
 
     size_t size() const { return fields_.size(); }
-    Iterator begin() const { return fields_.begin(); }
-    Iterator end() const { return fields_.end(); }
+    const PatternBookField& patternBookField(int i) const { return fields_[i]; }
 
 private:
     void iteratePossibleRensasInternal(const CoreField& originalField,
@@ -87,7 +87,8 @@ private:
                     int sumScore,
                     const Callback& callback) const;
 
-    Map fields_;
+    std::vector<PatternBookField> fields_;
+    IndexMap index_;
 };
 
 #endif
