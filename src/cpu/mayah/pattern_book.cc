@@ -121,6 +121,7 @@ PatternBook::find(const vector<Position>& ignitionPositions) const
 }
 
 void PatternBook::iteratePossibleRensas(const CoreField& originalField,
+                                        const vector<int>& matchableIds,
                                         int maxIteration,
                                         const Callback& callback) const
 {
@@ -128,7 +129,8 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
 
     const CoreField::SimulationContext originalContext = CoreField::SimulationContext::fromField(originalField);
 
-    for (const PatternBookField& pbf : fields_) {
+    for (const int id : matchableIds) {
+        const PatternBookField& pbf = patternBookField(id);
         ColumnPuyoList cpl;
         ComplementResult complementResult = pbf.complement(originalField, MAX_UNUSED_VARIABLES, &cpl);
         if (!complementResult.success)

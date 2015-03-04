@@ -93,7 +93,7 @@ TEST(PatternBookTest, pattern1)
         }
     };
 
-    patternBook.iteratePossibleRensas(field, 1, callback);
+    patternBook.iteratePossibleRensas(field, {0}, 1, callback);
     EXPECT_TRUE(found);
 }
 
@@ -134,7 +134,7 @@ TEST(PatternBookTest, pattern1_complement)
         }
     };
 
-    patternBook.iteratePossibleRensas(field, 1, callback);
+    patternBook.iteratePossibleRensas(field, {0}, 1, callback);
     EXPECT_TRUE(found);
 }
 
@@ -170,7 +170,7 @@ TEST(PatternBookTest, pattern2)
             found = true;
     };
 
-    patternBook.iteratePossibleRensas(field, 2, callback);
+    patternBook.iteratePossibleRensas(field, {0, 1}, 2, callback);
     EXPECT_TRUE(found);
 }
 
@@ -208,6 +208,6 @@ TEST(PatternBookTest, pattern3)
             found = true;
     };
 
-    patternBook.iteratePossibleRensas(field, 2, callback);
+    patternBook.iteratePossibleRensas(field, {0, 1}, 2, callback);
     EXPECT_TRUE(found);
 }

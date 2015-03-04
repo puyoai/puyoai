@@ -167,6 +167,13 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
             matchableComplementIds->push_back(static_cast<int>(i));
     }
 
+    auto matchablePatternIds = preEvalResult.mutableMatchablePatternIds();
+    for (size_t i = 0; i < patternBook().size(); ++i) {
+        const PatternBookField& pbf = patternBook().patternBookField(i);
+        if (pbf.isMatchable(currentField))
+          matchablePatternIds->push_back(static_cast<int>(i));
+    }
+
     return preEvalResult;
 }
 
@@ -829,7 +836,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                             const RensaTrackResult& trackResult, int /*patternScore*/) {
             evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
         };
-        patternBook().iteratePossibleRensas(fieldBeforeRensa, maxIteration, callback);
+        patternBook().iteratePossibleRensas(fieldBeforeRensa, preEvalResult.matchablePatternIds(), maxIteration, callback);
     }
 
     if (sideChainMaxScore >= scoreForOjama(21)) {
