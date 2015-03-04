@@ -51,6 +51,12 @@ public:
         return map_[var - 'A'] != PuyoColor::WALL;
     }
 
+    void forceSet(char var, PuyoColor pc)
+    {
+        DCHECK('A' <= var && var <= 'Z') << var;
+        map_[var - 'A'] = pc;
+    }
+
 private:
     PuyoColor set(char var, PuyoColor pc)
     {

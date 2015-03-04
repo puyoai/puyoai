@@ -24,7 +24,12 @@ public:
     const std::vector<Position>& ignitionPositions() const { return ignitionPositions_; }
 
     bool isMatchable(const CoreField& cf) const { return pattern_.isMatchable(cf); }
-    bool complement(const CoreField& cf, ColumnPuyoList* cpl) const { return pattern_.complement(cf, cpl); }
+    ComplementResult complement(const CoreField& cf,
+                                int numAllowingFillingUnusedVariables,
+                                ColumnPuyoList* cpl) const
+    {
+        return pattern_.complement(cf, numAllowingFillingUnusedVariables, cpl);
+    }
 
     PatternBookField mirror() const
     {
@@ -77,6 +82,7 @@ private:
                                        const ColumnPuyoList& keyPuyos,
                                        const CoreField::SimulationContext&,
                                        int restIteration,
+                                       int restUnusedVariables,
                                        int scoreSum,
                                        const Callback& callback) const;
 

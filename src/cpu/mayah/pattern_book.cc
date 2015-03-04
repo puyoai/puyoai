@@ -6,6 +6,9 @@
 using namespace std;
 
 namespace {
+
+const int MAX_UNUSED_VARIABLES = 1;
+
 vector<Position> findIgnitionPositions(const FieldPattern& pattern)
 {
     Position positions[FieldConstant::MAP_WIDTH * FieldConstant::MAP_HEIGHT];
@@ -127,7 +130,8 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
 
     for (const PatternBookField& pbf : fields_) {
         ColumnPuyoList cpl;
-        if (!pbf.complement(originalField, &cpl))
+        ComplementResult complementResult = pbf.complement(originalField, MAX_UNUSED_VARIABLES, &cpl);
+        if (!complementResult.success)
             continue;
 
         CoreField cf(originalField);
@@ -165,8 +169,9 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
         if (!ok || !foundFirePuyo)
             continue;
 
-        iteratePossibleRensasInternal(originalField, 0, cf, firePuyo, keyPuyos, originalContext, maxIteration - 1,
-                                      pbf.score(), callback);
+        int restUnusedVariables = MAX_UNUSED_VARIABLES - complementResult.numFilledUnusedVariables;
+        iteratePossibleRensasInternal(originalField, 0, cf, firePuyo, keyPuyos, originalContext,
+                                      maxIteration - 1, restUnusedVariables, pbf.score(), callback);
     }
 }
 
@@ -177,6 +182,7 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
                                                 const ColumnPuyoList& originalKeyPuyos,
                                                 const CoreField::SimulationContext& fieldContext,
                                                 int restIteration,
+                                                int restUnusedVariables,
                                                 int patternScore,
                                                 const Callback& callback) const
 {
@@ -191,7 +197,8 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
 
         // Proceed without adding anything.
         iteratePossibleRensasInternal(original, currentChains + 1, cf, firePuyo,
-                                      originalKeyPuyos, context, restIteration, patternScore, callback);
+                                      originalKeyPuyos, context, restIteration, restUnusedVariables,
+                                      patternScore, callback);
 
         // Don't return here. We might be able to complement if we can erase something.
     }
@@ -210,7 +217,8 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
         const PatternBookField& pbf = patternBookField(it->second);
 
         ColumnPuyoList cpl;
-        if (!pbf.complement(field, &cpl))
+        ComplementResult complementResult = pbf.complement(field, restUnusedVariables, &cpl);
+        if (!complementResult.success)
             continue;
         if (cpl.size() == 0)
             continue;
@@ -241,7 +249,9 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
         int score = cf.vanishDrop(&context);
         CHECK(score > 0) << score;
 
-        iteratePossibleRensasInternal(original, currentChains + 1, cf, firePuyo, keyPuyos, context, restIteration - 1,
+        iteratePossibleRensasInternal(original, currentChains + 1, cf, firePuyo, keyPuyos, context,
+                                      restIteration - 1,
+                                      restUnusedVariables - complementResult.numFilledUnusedVariables,
                                       patternScore + pbf.score(), callback);
     }
 }

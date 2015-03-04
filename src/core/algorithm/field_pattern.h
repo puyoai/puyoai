@@ -11,8 +11,18 @@
 #include "core/field_bit_field.h"
 #include "core/position.h"
 
+class PatternMatcher;
+
 enum class PatternType : std::uint8_t {
     NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR, ALLOW_FILLING_OJAMA, WALL
+};
+
+struct ComplementResult {
+    explicit ComplementResult(bool success, int filled = 0) :
+        success(success), numFilledUnusedVariables(filled) {}
+
+    bool success = false;
+    int numFilledUnusedVariables = 0;
 };
 
 // FieldPattern is a field that holds characters.
@@ -29,7 +39,13 @@ public:
     static bool merge(const FieldPattern&, const FieldPattern&, FieldPattern*);
 
     bool isMatchable(const CoreField&) const;
-    bool complement(const CoreField&, ColumnPuyoList*) const;
+    ComplementResult complement(const CoreField&,
+                                int numAllowingFillingUnusedVariables,
+                                ColumnPuyoList*) const;
+    ComplementResult complement(const CoreField& cf, ColumnPuyoList* cpl) const
+    {
+        return complement(cf, 0, cpl);
+    }
 
     void setPattern(int x, int y, PatternType t, char variable, double score);
 
@@ -53,6 +69,15 @@ public:
 private:
     static PatternType inferType(char c, PatternType typeForLowerCase = PatternType::ALLOW_VAR);
     int countVariables() const;
+
+    bool fillUnusedVariableColors(const CoreField&,
+                                  int pos,
+                                  const std::vector<char>& unusedVariables,
+                                  PatternMatcher*,
+                                  ColumnPuyoList*) const;
+    bool complementInternal(const CoreField&,
+                            const PatternMatcher&,
+                            ColumnPuyoList*) const;
 
     char vars_[MAP_WIDTH][MAP_HEIGHT];
     double scores_[MAP_WIDTH][MAP_HEIGHT];
