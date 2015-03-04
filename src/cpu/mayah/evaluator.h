@@ -4,7 +4,6 @@
 #include <map>
 #include <vector>
 
-#include "complement_book.h"
 #include "evaluation_feature.h"
 #include "opening_book.h"
 #include "pattern_book.h"
@@ -21,19 +20,15 @@ class RensaTrackResult;
 class EvaluatorBase {
 protected:
     EvaluatorBase(const OpeningBook& openingBook,
-                  const ComplementBook& complementBook,
                   const PatternBook& patternBook) :
         openingBook_(openingBook),
-        complementBook_(complementBook),
         patternBook_(patternBook) {}
 
     const OpeningBook& openingBook() const { return openingBook_; }
-    const ComplementBook& complementBook() const { return complementBook_; }
     const PatternBook& patternBook() const { return patternBook_; }
 
 private:
     const OpeningBook& openingBook_;
-    const ComplementBook& complementBook_;
     const PatternBook& patternBook_;
 };
 
@@ -42,26 +37,22 @@ public:
     PreEvalResult() {}
 
     const std::vector<int>& matchableOpeningIds() const { return matchableOpeningIds_; }
-    const std::vector<int>& matchableComplementIds() const { return matchableComplementIds_; }
     const std::vector<int>& matchablePatternIds() const { return matchablePatternIds_; }
 
 
     std::vector<int>* mutableMatchableOpeningIds() { return &matchableOpeningIds_; }
-    std::vector<int>* mutableMatchableComplementIds() { return &matchableComplementIds_; }
     std::vector<int>* mutableMatchablePatternIds() { return &matchablePatternIds_; }
 
 private:
     std::vector<int> matchableOpeningIds_;
-    std::vector<int> matchableComplementIds_;
     std::vector<int> matchablePatternIds_;
 };
 
 class PreEvaluator : public EvaluatorBase {
 public:
     PreEvaluator(const OpeningBook& openingBook,
-                 const ComplementBook& complementBook,
                  const PatternBook& patternBook) :
-        EvaluatorBase(openingBook, complementBook, patternBook) {}
+        EvaluatorBase(openingBook, patternBook) {}
 
     PreEvalResult preEval(const CoreField& currentField);
 };
@@ -91,9 +82,8 @@ private:
 class MidEvaluator : public EvaluatorBase {
 public:
     MidEvaluator(const OpeningBook& openingBook,
-                 const ComplementBook& complementBook,
                  const PatternBook& patternBook) :
-        EvaluatorBase(openingBook, complementBook, patternBook) {}
+        EvaluatorBase(openingBook, patternBook) {}
 
     MidEvalResult eval(const RefPlan&, const CoreField& currentField, double score);
 };
@@ -115,10 +105,9 @@ class RensaEvaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
     RensaEvaluator(const OpeningBook& openingBook,
-                   const ComplementBook& complementBook,
                    const PatternBook& patternBook,
                    ScoreCollector* sc) :
-        EvaluatorBase(openingBook, complementBook, patternBook),
+        EvaluatorBase(openingBook, patternBook),
         sc_(sc) {}
 
     void evalRensaScore(double score, double virtualScore);
@@ -143,10 +132,9 @@ class Evaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
     Evaluator(const OpeningBook& openingBook,
-              const ComplementBook& complementBook,
               const PatternBook& patternBook,
               ScoreCollector* sc) :
-        EvaluatorBase(openingBook, complementBook, patternBook),
+        EvaluatorBase(openingBook, patternBook),
         sc_(sc) {}
 
     void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
