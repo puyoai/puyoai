@@ -160,11 +160,11 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
             matchableOpeningIds->push_back(static_cast<int>(i));
     }
 
-    auto matchablePatternIds = preEvalResult.mutableMatchablePatternIds();
+    auto matchableComplementIds = preEvalResult.mutableMatchableComplementIds();
     for (size_t i = 0; i < complementBook().size(); ++i) {
         const ComplementBookField& cbf = complementBook().field(i);
         if (cbf.isMatchable(currentField))
-            matchablePatternIds->push_back(static_cast<int>(i));
+            matchableComplementIds->push_back(static_cast<int>(i));
     }
 
     return preEvalResult;
@@ -798,7 +798,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
     if (FLAGS_complement) {
         RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 1, false);
-        for (const int id : preEvalResult.matchablePatternIds()) {
+        for (const int id : preEvalResult.matchableComplementIds()) {
             const ComplementBookField& cbf = complementBook().field(id);
             ColumnPuyoList cpl;
             if (!cbf.complement(plan.field(), &cpl).success)
