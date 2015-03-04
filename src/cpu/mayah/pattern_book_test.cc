@@ -97,6 +97,47 @@ TEST(PatternBookTest, pattern1)
     EXPECT_TRUE(found);
 }
 
+TEST(PatternBookTest, pattern1_complement)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK));
+
+    CoreField field("G....."
+                    "G....."
+                    "YY....");
+
+    CoreField expected1("G....."
+                        "GYB..."
+                        "GGYBB."
+                        "YYBOO.");
+    CoreField expected2("G....."
+                        "GYR..."
+                        "GGYRR."
+                        "YYROO.");
+
+    bool found = false;
+    auto callback = [&](const CoreField&,
+                        const RensaResult&,
+                        const ColumnPuyoList& keyPuyos,
+                        const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&,
+                        int patternScore) {
+        CoreField cf(field);
+        for (const auto& cp : keyPuyos)
+            cf.dropPuyoOn(cp.x, cp.color);
+        for (const auto& cp : firePuyos)
+            cf.dropPuyoOn(cp.x, cp.color);
+
+        if (cf == expected1 || cf == expected2) {
+            found = true;
+            EXPECT_EQ(72, patternScore);
+        }
+    };
+
+    patternBook.iteratePossibleRensas(field, 1, callback);
+    EXPECT_TRUE(found);
+}
+
 TEST(PatternBookTest, pattern2)
 {
     PatternBook patternBook;

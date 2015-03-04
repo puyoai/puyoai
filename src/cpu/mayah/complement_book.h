@@ -18,7 +18,7 @@ public:
     explicit ComplementBookField(const std::vector<std::string>& field) : pattern_(field) {}
 
     bool isMatchable(const CoreField& cf) const { return pattern_.isMatchable(cf); }
-    bool complement(const CoreField& cf, ColumnPuyoList* cpl) const { return pattern_.complement(cf, cpl); }
+    ComplementResult complement(const CoreField& cf, ColumnPuyoList* cpl) const { return pattern_.complement(cf, cpl); }
 
     ComplementBookField mirror() const { return ComplementBookField(pattern_.mirror()); }
 

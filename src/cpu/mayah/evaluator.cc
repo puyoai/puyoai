@@ -801,7 +801,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         for (const int id : preEvalResult.matchablePatternIds()) {
             const ComplementBookField& cbf = complementBook().field(id);
             ColumnPuyoList cpl;
-            if (!cbf.complement(plan.field(), &cpl))
+            if (!cbf.complement(plan.field(), &cpl).success)
                 continue;
             if (cpl.isEmpty())
                 continue;

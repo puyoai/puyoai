@@ -125,7 +125,7 @@ TEST(FieldPatternTest, complement1)
         "BBBGGG");
 
     ColumnPuyoList cpl;
-    EXPECT_TRUE(pattern.complement(cf, &cpl));
+    EXPECT_TRUE(pattern.complement(cf, &cpl).success);
     for (const auto& cp : cpl) {
         cf.dropPuyoOn(cp.x, cp.color);
     }
@@ -148,7 +148,7 @@ TEST(FieldPatternTest, complement2)
 
     // Since we cannot complement (3, 3), so this pattern should not match.
     ColumnPuyoList cpl;
-    EXPECT_FALSE(pattern.complement(cf, &cpl));
+    EXPECT_FALSE(pattern.complement(cf, &cpl).success);
 }
 
 TEST(FieldPatternTest, complement3)
@@ -166,7 +166,7 @@ TEST(FieldPatternTest, complement3)
         "RRRGGG");
 
     ColumnPuyoList cpl;
-    EXPECT_FALSE(pattern.complement(cf, &cpl));
+    EXPECT_FALSE(pattern.complement(cf, &cpl).success);
 }
 
 TEST(FieldPatternTest, complement4)
@@ -184,7 +184,7 @@ TEST(FieldPatternTest, complement4)
         "GG.YYY");
 
     ColumnPuyoList cpl;
-    EXPECT_TRUE(pattern.complement(cf, &cpl));
+    EXPECT_TRUE(pattern.complement(cf, &cpl).success);
 }
 
 TEST(FieldPatternTest, complement5)
@@ -207,10 +207,43 @@ TEST(FieldPatternTest, complement5)
         "GGBOO.");
 
     ColumnPuyoList cpl;
-    EXPECT_TRUE(pattern.complement(cf, &cpl));
+    EXPECT_TRUE(pattern.complement(cf, &cpl).success);
     for (const ColumnPuyo& cp : cpl) {
         cf.dropPuyoOn(cp.x, cp.color);
     }
 
     EXPECT_EQ(expected, cf) << expected.toDebugString() << '\n' << cf.toDebugString();
+}
+
+TEST(FieldPatternTest, complement6)
+{
+    FieldPattern pattern(
+        "ABC..."
+        "AABCC."
+        "BBC@@.");
+
+    EXPECT_EQ(PatternType::ALLOW_FILLING_OJAMA, pattern.type(4, 1));
+
+    CoreField cf(
+        "Y....."
+        "Y....."
+        "GG....");
+
+    CoreField expected1(
+        "YGB..."
+        "YYGBB."
+        "GGBOO.");
+
+    CoreField expected2(
+        "YGR..."
+        "YYGRR."
+        "GGROO.");
+
+    ColumnPuyoList cpl;
+    EXPECT_TRUE(pattern.complement(cf, 1, &cpl).success);
+    for (const ColumnPuyo& cp : cpl) {
+        cf.dropPuyoOn(cp.x, cp.color);
+    }
+
+    EXPECT_TRUE(cf == expected1 || cf == expected2) << cf.toDebugString();
 }

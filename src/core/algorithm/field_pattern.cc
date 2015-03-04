@@ -167,18 +167,55 @@ bool FieldPattern::isMatchable(const CoreField& field) const
     return matcher.match(*this, field).matched;
 }
 
-bool FieldPattern::complement(const CoreField& field, ColumnPuyoList* cpl) const
+ComplementResult FieldPattern::complement(const CoreField& field,
+                                          int numAllowingFillingUnusedVariables,
+                                          ColumnPuyoList* cpl) const
 {
+    DCHECK_EQ(cpl->size(), 0) << "result must be empty";
+
     PatternMatcher matcher;
-    if (!matcher.match(*this, field).matched)
-        return false;
+    PatternMatchResult result = matcher.match(*this, field);
+    if (!result.matched)
+        return ComplementResult(false);
+
+    if (static_cast<int>(result.unusedVariables.size()) > numAllowingFillingUnusedVariables)
+        return ComplementResult(false);
+
+    bool ok = fillUnusedVariableColors(field, 0, result.unusedVariables, &matcher, cpl);
+    int filled = std::min(static_cast<int>(result.unusedVariables.size()),
+                          numAllowingFillingUnusedVariables);
+    return ComplementResult(ok, filled);
+}
+
+bool FieldPattern::fillUnusedVariableColors(const CoreField& field,
+                                            int pos,
+                                            const vector<char>& unusedVariables,
+                                            PatternMatcher* matcher,
+                                            ColumnPuyoList* cpl) const
+{
+    if (pos == static_cast<int>(unusedVariables.size()))
+        return complementInternal(field, *matcher, cpl);
+
+    char c = unusedVariables[pos];
+    for (PuyoColor pc : NORMAL_PUYO_COLORS) {
+        matcher->forceSet(c, pc);
+        if (fillUnusedVariableColors(field, pos + 1, unusedVariables, matcher, cpl))
+            return true;
+    }
+    return false;
+}
+
+bool FieldPattern::complementInternal(const CoreField& field,
+                                      const PatternMatcher& matcher,
+                                      ColumnPuyoList* cpl) const
+{
+    cpl->clear();
 
     int currentHeights[FieldConstant::MAP_WIDTH] {
         0, field.height(1), field.height(2), field.height(3),
         field.height(4), field.height(5), field.height(6), 0
     };
 
-    cpl->clear();
     for (int x = 1; x <= 6; ++x) {
         int h = height(x);
         for (int y = 1; y <= h; ++y) {
