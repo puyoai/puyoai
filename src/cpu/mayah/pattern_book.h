@@ -68,8 +68,10 @@ public:
                                 const RensaTrackResult&,
                                 int patternScore)> Callback;
 
-    void iteratePossibleRensas(const CoreField&, int maxIteration,
-                               const Callback& callback) const;
+    void iteratePossibleRensas(const CoreField&,
+                               const std::vector<int>& matchableIds,
+                               int maxIteration,
+                               const Callback&) const;
 
     size_t size() const { return fields_.size(); }
     const PatternBookField& patternBookField(int i) const { return fields_[i]; }

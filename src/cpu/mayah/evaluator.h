@@ -43,13 +43,17 @@ public:
 
     const std::vector<int>& matchableOpeningIds() const { return matchableOpeningIds_; }
     const std::vector<int>& matchableComplementIds() const { return matchableComplementIds_; }
+    const std::vector<int>& matchablePatternIds() const { return matchablePatternIds_; }
+
 
     std::vector<int>* mutableMatchableOpeningIds() { return &matchableOpeningIds_; }
     std::vector<int>* mutableMatchableComplementIds() { return &matchableComplementIds_; }
+    std::vector<int>* mutableMatchablePatternIds() { return &matchablePatternIds_; }
 
 private:
     std::vector<int> matchableOpeningIds_;
     std::vector<int> matchableComplementIds_;
+    std::vector<int> matchablePatternIds_;
 };
 
 class PreEvaluator : public EvaluatorBase {
