@@ -109,8 +109,31 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
     return PatternMatchResult(true, matchScore, matchCount, matchAllowedCount, std::move(unusedVariables));
 }
 
+bool PatternMatcher::checkNeighborsForCompletion(const FieldPattern& pattern, const CoreField& cf) const
+{
+    // Check the neighbors.
+    for (int x = 1; x <= 6; ++x) {
+        int h = pattern.height(x);
+        for (int y = 1; y <= h; ++y) {
+            char c = pattern.variable(x, y);
+            if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
+                continue;
+            if (!checkCell(c, pattern.type(x, y + 1), pattern.variable(x, y + 1), cf.color(x, y + 1)))
+                return false;
+            if (!checkCell(c, pattern.type(x, y - 1), pattern.variable(x, y - 1), cf.color(x, y - 1)))
+                return false;
+            if (!checkCell(c, pattern.type(x + 1, y), pattern.variable(x + 1, y), cf.color(x + 1, y)))
+                return false;
+            if (!checkCell(c, pattern.type(x - 1, y), pattern.variable(x - 1, y), cf.color(x - 1, y)))
+                return false;
+        }
+    }
+
+    return true;
+}
+
 inline
-bool PatternMatcher::checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor)
+bool PatternMatcher::checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor) const
 {
     DCHECK('A' <= currentVar && currentVar <= 'Z') << currentVar;
 
