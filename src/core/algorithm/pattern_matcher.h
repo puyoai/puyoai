@@ -38,6 +38,7 @@ public:
 
     // If |ignoreMustVar| is true, don't check the existence.
     PatternMatchResult match(const FieldPattern&, const CoreField&, bool ignoresMustVar = false);
+    bool checkNeighborsForCompletion(const FieldPattern&, const CoreField&) const;
 
     PuyoColor map(char var) const
     {
@@ -72,7 +73,7 @@ private:
         seen_[var - 'A'] = true;
     }
 
-    bool checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor);
+    bool checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor) const;
 
     PuyoColor map_[26];
     bool seen_[26];

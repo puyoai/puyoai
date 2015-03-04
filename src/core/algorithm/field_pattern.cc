@@ -193,8 +193,13 @@ bool FieldPattern::fillUnusedVariableColors(const CoreField& field,
                                             PatternMatcher* matcher,
                                             ColumnPuyoList* cpl) const
 {
-    if (pos == static_cast<int>(unusedVariables.size()))
+    if (pos == static_cast<int>(unusedVariables.size())) {
+        if (!unusedVariables.empty()) {
+            if (!matcher->checkNeighborsForCompletion(*this, field))
+                return false;
+        }
         return complementInternal(field, *matcher, cpl);
+    }
 
     char c = unusedVariables[pos];
     for (PuyoColor pc : NORMAL_PUYO_COLORS) {

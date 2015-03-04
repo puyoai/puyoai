@@ -60,6 +60,38 @@ field = [
 ignition = 1
 )";
 
+static const char TEST_BOOK4[] = R"(
+[[pattern]]
+field = [
+    ".A....",
+    "BA....",
+    "AA....",
+    "BC....",
+    "BBC...",
+    "CC....",
+]
+ignition = 2
+
+[[pattern]]
+field = [
+    "......",
+    "A.....",
+    "ABC...",
+    "AABCC.",
+    "BBC...",
+]
+ignition = 1
+
+[[pattern]]
+field = [
+    ".....C",
+    "...BBC",
+    "..AAAB",
+    "..ACCB",
+]
+ignition = 3
+)";
+
 TEST(PatternBookTest, pattern1)
 {
     PatternBook patternBook;
@@ -209,5 +241,50 @@ TEST(PatternBookTest, pattern3)
     };
 
     patternBook.iteratePossibleRensas(field, {0, 1}, 2, callback);
+    EXPECT_TRUE(found);
+}
+
+TEST(PatternBookTest, pattern4)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK4));
+
+    CoreField field("G....."
+                    "RBR..."
+                    "RRBRR."
+                    "BBRYY.");
+
+    CoreField expected1(".G...."
+                        "RG...."
+                        "GG...Y"
+                        "RBRBBY"
+                        "RRBRRB"
+                        "BBRYYB");
+
+    CoreField expected2(".G...."
+                        "RG...."
+                        "GG...Y"
+                        "RBRGGY"
+                        "RRBRRG"
+                        "BBRYYG");
+
+    bool found = false;
+    auto callback = [&](const CoreField&,
+                        const RensaResult&,
+                        const ColumnPuyoList& keyPuyos,
+                        const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&,
+                        int /*patternScore*/) {
+        CoreField cf(field);
+        for (const auto& cp : keyPuyos)
+            cf.dropPuyoOn(cp.x, cp.color);
+        for (const auto& cp : firePuyos)
+            cf.dropPuyoOn(cp.x, cp.color);
+
+        if (cf == expected1 || cf == expected2)
+            found = true;
+    };
+
+    patternBook.iteratePossibleRensas(field, {0, 1, 2}, 3, callback);
     EXPECT_TRUE(found);
 }
