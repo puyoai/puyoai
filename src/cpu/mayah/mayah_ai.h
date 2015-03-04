@@ -9,7 +9,6 @@
 #include "core/client/ai/ai.h"
 #include "core/algorithm/plan.h"
 
-#include "complement_book.h"
 #include "decision_book.h"
 #include "evaluation_parameter.h"
 #include "evaluator.h"
@@ -90,7 +89,6 @@ protected:
     EvaluationParameterMap evaluationParameterMap_;
     OpeningBook openingBook_;
     DecisionBook decisionBook_;
-    ComplementBook complementBook_;
     PatternBook patternBook_;
 
     bool usesDecisionBook_ = true;

@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 2.8)
 cpu_setup("mayah")
 
 add_library(mayah_lib
-            complement_book.cc
             decision_book.cc
             evaluator.cc
             evaluation_feature.cc

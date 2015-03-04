@@ -27,7 +27,6 @@
 
 using namespace std;
 
-DEFINE_bool(complement, true, "use complement book");
 DEFINE_bool(pattern, true, "use pattern book");
 DEFINE_bool(opening, true, "use opening book");
 
@@ -158,13 +157,6 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
         const OpeningBookField& obf = openingBook().field(i);
         if (obf.preMatch(currentField))
             matchableOpeningIds->push_back(static_cast<int>(i));
-    }
-
-    auto matchableComplementIds = preEvalResult.mutableMatchableComplementIds();
-    for (size_t i = 0; i < complementBook().size(); ++i) {
-        const ComplementBookField& cbf = complementBook().field(i);
-        if (cbf.isMatchable(currentField))
-            matchableComplementIds->push_back(static_cast<int>(i));
     }
 
     auto matchablePatternIds = preEvalResult.mutableMatchablePatternIds();
@@ -740,7 +732,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                             const ColumnPuyoList& firePuyos,
                             const RensaTrackResult& trackResult) {
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
-        RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), complementBook(), patternBook(), rensaScoreCollector.get());
+        RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), patternBook(), rensaScoreCollector.get());
 
         CoreField complementedField(fieldBeforeRensa);
         for (const auto& cp : keyPuyos)
@@ -801,33 +793,6 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
             evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
         };
         RensaDetector::iteratePossibleRensasIteratively(fieldBeforeRensa, maxIteration, strategy, callback);
-    }
-
-    if (FLAGS_complement) {
-        RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 1, false);
-        for (const int id : preEvalResult.matchableComplementIds()) {
-            const ComplementBookField& cbf = complementBook().field(id);
-            ColumnPuyoList cpl;
-            if (!cbf.complement(plan.field(), &cpl).success)
-                continue;
-            if (cpl.isEmpty())
-                continue;
-
-            auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
-                                const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                                const RensaTrackResult& trackResult, const RensaRefSequence&) {
-                if (keyPuyos.size() + cpl.size() > ColumnPuyoList::MAX_SIZE)
-                    return;
-                ColumnPuyoList allKeyPuyos;
-                allKeyPuyos.append(cpl);
-                allKeyPuyos.append(keyPuyos);
-                evalCallback(plan.field(), fieldAfterRensa, rensaResult, allKeyPuyos, firePuyos, trackResult);
-            };
-            CoreField complementedField(plan.field());
-            for (const auto& cp : cpl)
-                complementedField.dropPuyoOn(cp.x, cp.color);
-            RensaDetector::iteratePossibleRensasIteratively(complementedField, maxIteration, strategy, callback);
-        }
     }
 
     if (FLAGS_pattern) {
