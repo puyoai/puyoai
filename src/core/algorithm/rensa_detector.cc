@@ -76,11 +76,6 @@ const int EXTENTIONS[][3][2] = {
     {{-1, 1}, { 0, 1}, { 0, 2}},
 };
 
-enum class PurposeForFindingRensa {
-    FOR_FIRE,
-    FOR_KEY,
-};
-
 }  // namespace anomymous
 
 static inline
@@ -481,11 +476,13 @@ static inline void findRensas(const CoreField& field,
     }
 }
 
-void RensaDetector::detect(const CoreField& original, const RensaDetectorStrategy& strategy,
+void RensaDetector::detect(const CoreField& original,
+                           const RensaDetectorStrategy& strategy,
+                           PurposeForFindingRensa purpose,
                            const RensaDetector::SimulationCallback& callback)
 {
     static const bool nonProhibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(original, strategy, nonProhibits, PurposeForFindingRensa::FOR_FIRE, callback);
+    findRensas(original, strategy, nonProhibits, purpose, callback);
 }
 
 void RensaDetector::detectSingle(const CoreField& original, const RensaDetectorStrategy& strategy, RensaCallback callback)
