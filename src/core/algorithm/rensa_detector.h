@@ -43,13 +43,21 @@ private:
     bool allowsPuttingKeyPuyoOn13thRow_;
 };
 
+enum class PurposeForFindingRensa {
+    FOR_FIRE,
+    FOR_KEY,
+};
+
 class RensaDetector {
 public:
     typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
     // Detects a rensa from the field. The ColumnPuyoList to fire a rensa will be passed to
     // |callback|. Note that invalid column puyo list might be passed to |callback|.
     // The field that puyo list is added is also passed to DetectionCallback.
-    static void detect(const CoreField&, const RensaDetectorStrategy&, const SimulationCallback& callback);
+    static void detect(const CoreField&,
+                       const RensaDetectorStrategy&,
+                       PurposeForFindingRensa,
+                       const SimulationCallback& callback);
 
     typedef std::function<void (const CoreField& fieldAfterRensa,
                                 const RensaResult&,
