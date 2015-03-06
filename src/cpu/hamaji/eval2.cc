@@ -1,8 +1,15 @@
 #include "eval2.h"
 
+#include <algorithm>
 #include <numeric>
 
+#include "core/core_field.h"
+#include "core/algorithm/column_puyo_list.h"
+#include "core/algorithm/rensa_detector.h"
+
 #include "field.h"
+
+using namespace std;
 
 Eval2::Eval2() {
 }
@@ -41,13 +48,48 @@ static double getConnectionScore(const LF& field) {
   return connection_score;
 }
 
+double hoge(const CoreField& cf) {
+  //int puyo_num = cf.countPuyos();
+  double score = 0.0;
+  auto callback = [&](const CoreField& f,
+                      const RensaResult& rensa_result,
+                      const ColumnPuyoList&,
+                      const ColumnPuyoList& fire_puyos) {
+    double y_avg = 0;
+    for (ColumnPuyo cp : fire_puyos) {
+      y_avg += f.height(cp.x);
+    }
+    y_avg /= fire_puyos.size();
+
+    //if (y_avg >= puyo_num / 6.0 - 15) {
+    if (1) {
+      //score = max<double>(score, rensa_result.score);
+      score = max(score, rensa_result.chains * 1.0);
+    }
+  };
+  RensaDetector::iteratePossibleRensas(
+      cf, 1, RensaDetectorStrategy::defaultFloatStrategy(), callback);
+      //cf, 1, RensaDetectorStrategy::defaultDropStrategy(), callback);
+  return score;
+}
+
 double Eval2::eval(LP* plan) {
+#if 0
+  if (1) {
+    return hoge(plan->field);
+  }
+#endif
+
   const LF& f = plan->field;
   double score = 0.0;
 
-  int ipc = 0, ucc = 0, vpc = 0;
-  int cc = f.getBestChainCount(&ipc, &ucc, &vpc);
-  score += cc;
+  if (0) {
+    int ipc = 0, ucc = 0, vpc = 0;
+    int cc = f.getBestChainCount(&ipc, &ucc, &vpc);
+    score += cc;
+  } else {
+    score += hoge(plan->field);
+  }
 
   score += getConnectionScore(f);
 

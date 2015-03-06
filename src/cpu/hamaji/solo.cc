@@ -123,6 +123,7 @@ int SoloGame::run() {
     }
     int score = game->p[0].f.PutDecision(d, toPuyoColor(next[0]), toPuyoColor(next[1]), &chigiri_frames);
     printf("%s\n", game->p[0].next.toString().c_str());
+    printf("%s\n", game->p[0].f.GetDebugOutput().c_str());
     /*
     F::showNext(next);
     field.show();
