@@ -1,4 +1,4 @@
-#include "core/algorithm/column_puyo_list.h"
+#include "core/column_puyo_list.h"
 
 #include <gtest/gtest.h>
 
