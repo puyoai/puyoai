@@ -11,6 +11,7 @@
 #include "core/plain_field.h"
 #include "core/rensa_result.h"
 
+class ColumnPuyoList;
 class FieldBitField;
 class Kumipuyo;
 struct Position;
@@ -82,6 +83,8 @@ public:
     // Places a puyo on the top of column |x|.
     // Returns true if succeeded. False if failed. When false is returned, field will not change.
     bool dropPuyoOn(int x, PuyoColor, bool isAxis = false);
+
+    bool dropPuyoList(const ColumnPuyoList&, bool isAxis = false);
 
     // Removes the puyo from top of column |x|. If there is no puyo on column |x|, nothing will happen.
     void removeTopPuyoFrom(int x) {

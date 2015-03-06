@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <sstream>
 
+#include "core/column_puyo_list.h"
 #include "core/constant.h"
 #include "core/decision.h"
 #include "core/field_bit_field.h"
@@ -437,6 +438,16 @@ bool CoreField::dropPuyoOn(int x, PuyoColor c, bool isAxis)
         return false;
 
     unsafeSet(x, ++heights_[x], c);
+    return true;
+}
+
+bool CoreField::dropPuyoList(const ColumnPuyoList& cpl, bool isAxis)
+{
+    for (const auto& cp : cpl) {
+        if (!dropPuyoOn(cp.x, cp.color, isAxis))
+            return false;
+    }
+
     return true;
 }
 
