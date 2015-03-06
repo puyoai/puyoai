@@ -5,7 +5,7 @@
 #include <glog/logging.h>
 
 #include "base/noncopyable.h"
-#include "core/algorithm/column_puyo_list.h"
+#include "core/column_puyo_list.h"
 #include "core/core_field.h"
 #include "core/rensa_result.h"
 

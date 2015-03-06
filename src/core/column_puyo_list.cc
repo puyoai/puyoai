@@ -1,4 +1,4 @@
-#include "core/algorithm/column_puyo_list.h"
+#include "core/column_puyo_list.h"
 
 #include <sstream>
 
@@ -12,16 +12,6 @@ string ColumnPuyoList::toString() const
     }
 
     return oss.str();
-}
-
-PuyoSet ColumnPuyoList::toPuyoSet() const
-{
-    PuyoSet puyoSet;
-    for (const auto& p : *this) {
-        puyoSet.add(p.color);
-    }
-
-    return puyoSet;
 }
 
 // static

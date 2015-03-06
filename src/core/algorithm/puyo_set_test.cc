@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "core/algorithm/column_puyo_list.h"
+#include "core/column_puyo_list.h"
 
 TEST(PuyoSetTest, ctor)
 {

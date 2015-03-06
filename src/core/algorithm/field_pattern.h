@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "core/algorithm/column_puyo_list.h"
+#include "core/column_puyo_list.h"
 #include "core/core_field.h"
 #include "core/field_constant.h"
 #include "core/field_bit_field.h"

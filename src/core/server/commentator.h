@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include "core/algorithm/column_puyo_list.h"
+#include "core/column_puyo_list.h"
 #include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
 #include "core/rensa_result.h"

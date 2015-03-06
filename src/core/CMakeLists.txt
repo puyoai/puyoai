@@ -12,6 +12,7 @@ endif()
 # library
 
 add_library(puyoai_core STATIC
+            column_puyo_list.cc
             core_field.cc decision.cc
             field_pretty_printer.cc frame_request.cc frame_response.cc
             game_result.cc key.cc key_set.cc
@@ -33,6 +34,7 @@ function(puyoai_core_add_test target)
     endif()
 endfunction()
 
+puyoai_core_add_test(column_puyo_list)
 puyoai_core_add_test(core_field)
 puyoai_core_add_test(decision)
 puyoai_core_add_test(field_bit_field)

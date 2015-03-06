@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "core/algorithm/column_puyo_list.h"
+#include "core/column_puyo_list.h"
 
 #include "evaluation_feature.h"
 #include "evaluation_parameter.h"

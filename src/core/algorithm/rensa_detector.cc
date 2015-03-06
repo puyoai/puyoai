@@ -5,9 +5,9 @@
 #include <set>
 #include <vector>
 
-#include "core/algorithm/column_puyo_list.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_ref_sequence.h"
+#include "core/column_puyo_list.h"
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/field_bit_field.h"

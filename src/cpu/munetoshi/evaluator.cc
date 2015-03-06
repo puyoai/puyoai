@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <array>
 
-#include "core/algorithm/column_puyo_list.h"
 #include "core/algorithm/plan.h"
+#include "core/column_puyo_list.h"
 #include "core/rensa_result.h"
 
 namespace munetoshi {

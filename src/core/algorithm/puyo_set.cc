@@ -1,6 +1,6 @@
 #include "core/algorithm/puyo_set.h"
 
-#include "core/algorithm/column_puyo_list.h"
+#include "core/column_puyo_list.h"
 
 using namespace std;
 
