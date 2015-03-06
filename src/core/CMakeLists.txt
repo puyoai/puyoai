@@ -13,12 +13,25 @@ endif()
 
 add_library(puyoai_core STATIC
             column_puyo_list.cc
-            core_field.cc decision.cc
-            field_pretty_printer.cc frame_request.cc frame_response.cc
-            game_result.cc key.cc key_set.cc
-            kumipuyo.cc kumipuyo_pos.cc kumipuyo_seq.cc kumipuyo_moving_state.cc
-            plain_field.cc puyo_color.cc puyo_controller.cc real_color.cc rensa_result.cc
-            sequence_generator.cc user_event.cc)
+            core_field.cc
+            decision.cc
+            field_pretty_printer.cc
+            frame_request.cc
+            frame_response.cc
+            game_result.cc
+            key.cc
+            key_set.cc
+            kumipuyo.cc
+            kumipuyo_moving_state.cc
+            kumipuyo_pos.cc
+            kumipuyo_seq.cc
+            plain_field.cc
+            puyo_color.cc
+            puyo_controller.cc
+            real_color.cc
+            rensa_result.cc
+            sequence_generator.cc
+            user_event.cc)
 
 # ----------------------------------------------------------------------
 # tests
