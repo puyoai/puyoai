@@ -75,6 +75,7 @@ public:
     friend bool operator==(const ColumnPuyoList&, const ColumnPuyoList&);
 
 private:
+    // We don't make this std::vector due to performance reason.
     int size_ = 0;
     std::array<ColumnPuyo, MAX_SIZE> puyos_;
 };
