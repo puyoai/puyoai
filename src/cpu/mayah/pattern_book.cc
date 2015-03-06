@@ -268,10 +268,8 @@ void PatternBook::checkRensa(const CoreField& originalField,
     CoreField cf(originalField);
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(originalField);
 
-    for (const auto& cp : keyPuyos) {
-        if (!cf.dropPuyoOn(cp.x, cp.color))
-            return;
-    }
+    if (!cf.dropPuyoList(keyPuyos))
+        return;
 
     // If rensa occurs after adding key puyos, this is invalid.
     if (cf.rensaWillOccurWithContext(context))
@@ -286,6 +284,8 @@ void PatternBook::checkRensa(const CoreField& originalField,
         return;
 
     ColumnPuyoList firePuyos;
-    firePuyos.add(firePuyo);
+    if (!firePuyos.add(firePuyo))
+        return;
+
     callback(cf, rensaResult, keyPuyos, firePuyos, trackResult, patternScore);
 }
