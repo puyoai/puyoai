@@ -639,6 +639,12 @@ void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field
 }
 
 template<typename ScoreCollector>
+void RensaEvaluator<ScoreCollector>::evalPatternScore(double patternScore)
+{
+    sc_->addScore(PATTERN_BOOK, patternScore);
+}
+
+template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalComplementationBias(const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
 {
     PuyoSet puyoSets[FieldConstant::MAP_WIDTH];
@@ -725,10 +731,12 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     ColumnPuyoList maxRensaKeyPuyos;
     ColumnPuyoList maxRensaFirePuyos;
     std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
-    auto evalCallback = [&](const CoreField& fieldBeforeRensa, const CoreField& fieldAfterRensa,
+    auto evalCallback = [&](const CoreField& fieldBeforeRensa,
+                            const CoreField& fieldAfterRensa,
                             const RensaResult& rensaResult,
                             const ColumnPuyoList& keyPuyos,
                             const ColumnPuyoList& firePuyos,
+                            double patternScore,
                             const RensaTrackResult& trackResult) {
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
         RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), patternBook(), rensaScoreCollector.get());
@@ -742,6 +750,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
         rensaEvaluator.evalRensaFieldUShape(complementedField, enemy.hasZenkeshi);
+        rensaEvaluator.evalPatternScore(patternScore);
 
         if (keyPuyos.size() == 0 && rensaResult.chains == 2) {
             sideChainMaxScore = std::max(sideChainMaxScore, rensaResult.score);
@@ -786,8 +795,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult& trackResult, int /*patternScore*/) {
-        evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
+                        const RensaTrackResult& trackResult, double patternScore) {
+        evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, patternScore, trackResult);
     };
     patternBook().iteratePossibleRensas(fieldBeforeRensa, preEvalResult.matchablePatternIds(), maxIteration, callback);
 
