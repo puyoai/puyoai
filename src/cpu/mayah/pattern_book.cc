@@ -185,9 +185,19 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
         int score = cf.vanishDrop(&context);
         CHECK(score > 0) << score;
         int restUnusedVariables = MAX_UNUSED_VARIABLES - complementResult.numFilledUnusedVariables;
+        double ratio = 0;
+        if (pbf.numVariables() > 0) {
+            int count = 0;
+            for (const auto& cp : cpl) {
+                if (cp.color != PuyoColor::OJAMA)
+                    ++count;
+            }
+            double d = pbf.numVariables() - count;
+            ratio = d / pbf.numVariables();
+        }
         iteratePossibleRensasInternal(originalField, strategy, 1,
                                       cf, context, firePuyo, keyPuyos,
-                                      maxIteration - 1, restUnusedVariables, pbf.score(), callback);
+                                      maxIteration - 1, restUnusedVariables, pbf.score() * ratio, callback);
     }
 
     // --- Iterate without complementing.
@@ -326,12 +336,22 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
         CoreField::SimulationContext context(currentFieldContext);
         int score = cf.vanishDrop(&context);
         CHECK(score > 0) << score;
+        double ratio = 0.0;
+        if (pbf.numVariables() > 0) {
+            int count = 0;
+            for (const auto& cp : cpl) {
+                if (cp.color != PuyoColor::OJAMA)
+                    ++count;
+            }
+            double d = pbf.numVariables() - count;
+            ratio = d / pbf.numVariables();
+        }
 
         iteratePossibleRensasInternal(original, strategy, currentChains + 1,
                                       cf, context, firePuyo, keyPuyos,
                                       restIteration - 1,
                                       restUnusedVariables - complementResult.numFilledUnusedVariables,
-                                      patternScore + pbf.score(), callback);
+                                      patternScore + pbf.score() * ratio, callback);
     }
 
     // proceed one without complementing.
