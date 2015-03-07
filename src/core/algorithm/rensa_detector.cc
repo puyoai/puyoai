@@ -78,10 +78,10 @@ const int EXTENTIONS[][3][2] = {
 
 }  // namespace anomymous
 
-static inline
-void makeProhibitArray(const RensaResult& rensaResult, const RensaTrackResult& trackResult,
-                       const CoreField& originalField, const ColumnPuyoList& firePuyos,
-                       bool prohibits[FieldConstant::MAP_WIDTH])
+// static
+void RensaDetector::makeProhibitArray(const RensaResult& rensaResult, const RensaTrackResult& trackResult,
+                                      const CoreField& originalField, const ColumnPuyoList& firePuyos,
+                                      bool prohibits[FieldConstant::MAP_WIDTH])
 {
     std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, true);
 
@@ -479,10 +479,10 @@ static inline void findRensas(const CoreField& field,
 void RensaDetector::detect(const CoreField& original,
                            const RensaDetectorStrategy& strategy,
                            PurposeForFindingRensa purpose,
+                           const bool prohibits[FieldConstant::MAP_WIDTH],
                            const RensaDetector::SimulationCallback& callback)
 {
-    static const bool nonProhibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(original, strategy, nonProhibits, purpose, callback);
+    findRensas(original, strategy, prohibits, purpose, callback);
 }
 
 void RensaDetector::detectSingle(const CoreField& original, const RensaDetectorStrategy& strategy, RensaCallback callback)
@@ -684,7 +684,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             if (strategy.mode() == RensaDetectorStrategy::Mode::EXTEND)
                 makeProhibitArrayForExtend(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
             else
-                makeProhibitArray(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
+                RensaDetector::makeProhibitArray(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
 
 
             callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult, *rensaSequence);

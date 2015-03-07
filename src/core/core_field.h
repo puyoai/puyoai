@@ -108,6 +108,12 @@ public:
             std::copy(list.begin(), list.end(), minHeights);
         }
 
+        void updateFromField(const CoreField& cf)
+        {
+            for (int x = 1; x <= 6; ++x)
+                minHeights[x] = cf.height(x) + 1;
+        }
+
         static SimulationContext fromLastDecision(const CoreField&, const Decision& lastDecision);
         static SimulationContext fromField(const CoreField&);
 
@@ -222,5 +228,6 @@ CoreField::SimulationContext::fromLastDecision(const CoreField& cf,
     context.minHeights[decision.childX()]--;
     return context;
 }
+
 
 #endif

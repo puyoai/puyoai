@@ -63,7 +63,8 @@ TEST(RensaDetectorTest, detect1)
     };
 
     RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 1, false);
-    RensaDetector::detect(f, strategy, PurposeForFindingRensa::FOR_FIRE, callback);
+    static const bool nonProhibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detect(f, strategy, PurposeForFindingRensa::FOR_FIRE, nonProhibits, callback);
     EXPECT_FALSE(unexpectedFound);
     EXPECT_TRUE(found[0]);
     EXPECT_TRUE(found[1]);

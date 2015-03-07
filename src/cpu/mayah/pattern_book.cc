@@ -128,7 +128,9 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
     DCHECK_GE(maxIteration, 1);
 
     const CoreField::SimulationContext originalContext = CoreField::SimulationContext::fromField(originalField);
+    const RensaDetectorStrategy strategy = RensaDetectorStrategy(RensaDetectorStrategy::Mode::DROP, 2, 2, false);
 
+    // --- Iterate with complementing
     for (const int id : matchableIds) {
         const PatternBookField& pbf = patternBookField(id);
         ColumnPuyoList cpl;
@@ -150,34 +152,57 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
                 if (cp.x == pbf.ignitionColumn()) {
                     keyPuyos.add(firePuyo);
                     firePuyo = cp;
-                    continue;
-                }
-                if (!keyPuyos.add(cp)) {
+                } else if (!keyPuyos.add(cp)) {
                     ok = false;
                     break;
                 }
-                continue;
+            } else {
+                if (cp.x == pbf.ignitionColumn()) {
+                    foundFirePuyo = true;
+                    firePuyo = cp;
+                } else {
+                    keyPuyos.add(cp);
+                }
             }
-
-            if (cp.x == pbf.ignitionColumn()) {
-                foundFirePuyo = true;
-                firePuyo = cp;
-                continue;
-            }
-
-            keyPuyos.add(cp);
         }
 
         if (!ok || !foundFirePuyo)
             continue;
 
         int restUnusedVariables = MAX_UNUSED_VARIABLES - complementResult.numFilledUnusedVariables;
-        iteratePossibleRensasInternal(originalField, 0, cf, firePuyo, keyPuyos, originalContext,
+        iteratePossibleRensasInternal(originalField, strategy, 0, cf, firePuyo, keyPuyos, originalContext,
                                       maxIteration - 1, restUnusedVariables, pbf.score(), callback);
     }
+
+    // --- Iterate without complementing.
+    auto detectCallback = [&](CoreField* cf, const ColumnPuyoList& cpl) {
+        if (cpl.size() == 0)
+            return;
+
+        bool first = true;
+        ColumnPuyo firePuyo;
+        ColumnPuyoList keyPuyos;
+        for (const ColumnPuyo& cp : cpl) {
+            if (first) {
+                firePuyo = cp;
+                first = false;
+                continue;
+            }
+
+            keyPuyos.add(firePuyo);
+            firePuyo = cp;
+        }
+
+        iteratePossibleRensasInternal(originalField, strategy, 0, *cf, firePuyo, keyPuyos,
+                                      originalContext, maxIteration - 1, 0, 0, callback);
+    };
+
+    bool prohibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detect(originalField, strategy, PurposeForFindingRensa::FOR_FIRE, prohibits, detectCallback);
 }
 
 void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
+                                                const RensaDetectorStrategy& strategy,
                                                 int currentChains,
                                                 const CoreField& field,
                                                 const ColumnPuyo& firePuyo,
@@ -188,19 +213,23 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
                                                 int patternScore,
                                                 const Callback& callback) const
 {
+    bool needsToCheckWithoutComplement = false;
+    bool prohibits[FieldConstant::MAP_WIDTH] {};
+
     // Check without adding anything.
     {
         CoreField cf(field);
         CoreField::SimulationContext context(fieldContext);
         if (cf.vanishDrop(&context) == 0) {
-            checkRensa(original, currentChains, firePuyo, originalKeyPuyos, patternScore, callback);
-            return;
+            needsToCheckWithoutComplement = checkRensa(original, currentChains,
+                                                       firePuyo, originalKeyPuyos, patternScore,
+                                                       prohibits, callback);
+        } else {
+            // Proceed without adding anything.
+            iteratePossibleRensasInternal(original, strategy, currentChains + 1, cf, firePuyo,
+                                          originalKeyPuyos, context, restIteration, restUnusedVariables,
+                                          patternScore, callback);
         }
-
-        // Proceed without adding anything.
-        iteratePossibleRensasInternal(original, currentChains + 1, cf, firePuyo,
-                                      originalKeyPuyos, context, restIteration, restUnusedVariables,
-                                      patternScore, callback);
 
         // Don't return here. We might be able to complement if we can erase something.
     }
@@ -208,7 +237,38 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
     if (restIteration == 0)
         return;
 
-    // Complement.
+    // Proceed without complement
+    if (needsToCheckWithoutComplement) {
+        auto detectCallback = [&](CoreField* cf, const ColumnPuyoList& cpl) {
+            if (cpl.size() == 0)
+                return;
+
+            bool ok = true;
+            ColumnPuyoList keyPuyos(originalKeyPuyos);
+            for (const ColumnPuyo& cp : cpl) {
+                if (!keyPuyos.add(cp)) {
+                    ok = false;
+                    break;
+                }
+            }
+
+            if (!ok)
+                return;
+
+            CoreField::SimulationContext context(fieldContext);
+            int score = cf->vanishDrop(&context);
+            if (score == 0)
+                return;
+
+            iteratePossibleRensasInternal(original, strategy, currentChains + 1, *cf, firePuyo, keyPuyos,
+                                          context, restIteration - 1, restUnusedVariables,
+                                          patternScore, callback);
+        };
+
+        RensaDetector::detect(field, strategy, PurposeForFindingRensa::FOR_KEY, prohibits, detectCallback);
+    }
+
+    // With complement.
     std::vector<Position> ignitionPositions = field.erasingPuyoPositions(fieldContext);
     if (ignitionPositions.empty())
         return;
@@ -251,41 +311,48 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
         int score = cf.vanishDrop(&context);
         CHECK(score > 0) << score;
 
-        iteratePossibleRensasInternal(original, currentChains + 1, cf, firePuyo, keyPuyos, context,
+        iteratePossibleRensasInternal(original, strategy, currentChains + 1, cf, firePuyo, keyPuyos, context,
                                       restIteration - 1,
                                       restUnusedVariables - complementResult.numFilledUnusedVariables,
                                       patternScore + pbf.score(), callback);
     }
 }
 
-void PatternBook::checkRensa(const CoreField& originalField,
+bool PatternBook::checkRensa(const CoreField& originalField,
                              int currentChains,
                              const ColumnPuyo& firePuyo,
                              const ColumnPuyoList& keyPuyos,
                              int patternScore,
+                             bool prohibits[FieldConstant::MAP_WIDTH],
                              const Callback& callback) const
 {
     CoreField cf(originalField);
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(originalField);
 
     if (!cf.dropPuyoList(keyPuyos))
-        return;
+        return false;
 
     // If rensa occurs after adding key puyos, this is invalid.
     if (cf.rensaWillOccurWithContext(context))
-        return;
+        return false;
+
+    context.updateFromField(cf);
 
     if (!cf.dropPuyoOn(firePuyo.x, firePuyo.color))
-        return;
+        return false;
 
     RensaTrackResult trackResult;
     RensaResult rensaResult = cf.simulateWithContext(&context, &trackResult);
     if (rensaResult.chains != currentChains)
-        return;
+        return false;
 
     ColumnPuyoList firePuyos;
     if (!firePuyos.add(firePuyo))
-        return;
+        return false;
 
     callback(cf, rensaResult, keyPuyos, firePuyos, trackResult, patternScore);
+
+    RensaDetector::makeProhibitArray(rensaResult, trackResult, originalField,
+                                     firePuyos, prohibits);
+    return true;
 }
