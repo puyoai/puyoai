@@ -465,6 +465,57 @@ field = [
 ignition = 3
 score = 9.4
 
+[[pattern]]
+field = [
+    ".....C",
+    "...BBB",
+    "..AAAA",
+    "..CCCB",
+]
+ignition = 3
+score = 9.5
+
+[[pattern]]
+field = [
+    "....C.",
+    "...CBC",
+    "..AAAA",
+    "..BBBC",
+]
+ignition = 3
+score = 9.5
+
+[[pattern]]
+field = [
+    "....BC",
+    "...CBC",
+    "..AAAB",
+    "...ACB",
+]
+ignition = 3
+score = 9.5
+
+[[pattern]]
+field = [
+    ".....C",
+    "....BC",
+    "....BC",
+    "..AAAB",
+    "...ACB",
+]
+ignition = 3
+score = 9.5
+
+[[pattern]]
+field = [
+    "....BC",
+    "...CBC",
+    "..AACB",
+    "...AAB",
+]
+ignition = 3
+score = 8.5
+
 # ----------------------------------------------------------------------
 # GTR-TAIL-3
 
