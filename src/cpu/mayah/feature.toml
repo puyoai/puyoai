@@ -60,6 +60,9 @@ MIDEVAL_RESULT = 0.0001
 [mode.early]
 NECESSARY_PUYOS_LINEAR = -40
 NECESSARY_PUYOS_SQUARE = -5.3
+THIRD_COLUMN_HEIGHT = [
+        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0]
 
 [mode.middle]
 NECESSARY_PUYOS_LINEAR = -80

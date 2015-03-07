@@ -78,6 +78,17 @@ name = "GTR"
 score = 7.0
 ignition = 1
 
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AAB...",
+    "BBCCC.",
+]
+name = "GTR"
+score = 7.5
+ignition = 1
+
 # ----------------------------------------------------------------------
 # GTR-HEAD-1
 
@@ -528,7 +539,7 @@ field = [
     "...BBA",
     "...AAA",
 ]
-score = 8.0
+score = 4.0
 
 [[pattern]]
 field = [
@@ -688,6 +699,32 @@ score = 9.0
 field = [
     ".A....",
     "BA....",
+    "AA....",
+    "BC....",
+    "BB....",
+    "CCC...",
+    "......",
+]
+ignition = 2
+score = 9.0
+
+[[pattern]]
+field = [
+    "C.....",
+    "BA....",
+    "BA....",
+    "AA....",
+    "BB....",
+    "CCC...",
+    "......",
+]
+ignition = 2
+score = 8.0
+
+[[pattern]]
+field = [
+    "B.....",
+    "AA....",
     "AA....",
     "BC....",
     "BB....",
