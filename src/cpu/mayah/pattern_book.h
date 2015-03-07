@@ -17,8 +17,9 @@
 class PatternBookField {
 public:
     // If ignitionColumn is 0, we ignore ignitionColumn when detecting rensa.
-    PatternBookField(const std::string& field, int ignitionColumn, double score);
+    PatternBookField(const std::string& field, const std::string& name, int ignitionColumn, double score);
 
+    const std::string& name() const { return name_; }
     double score() const { return score_; }
     int ignitionColumn() const { return ignitionColumn_;}
     const std::vector<Position>& ignitionPositions() const { return ignitionPositions_; }
@@ -34,13 +35,14 @@ public:
     PatternBookField mirror() const
     {
         int mirroredIgnitionColumn = ignitionColumn() == 0 ? 0 : 7 - ignitionColumn();
-        return PatternBookField(pattern_.mirror(), mirroredIgnitionColumn, score_);
+        return PatternBookField(pattern_.mirror(), name(), mirroredIgnitionColumn, score());
     }
 
 private:
-    PatternBookField(const FieldPattern&, int ignitionColumn, double score);
+    PatternBookField(const FieldPattern&, const std::string& name, int ignitionColumn, double score);
 
     FieldPattern pattern_;
+    std::string name_;
     int ignitionColumn_;
     double score_;
     std::vector<Position> ignitionPositions_;
@@ -81,9 +83,9 @@ private:
                                        const RensaDetectorStrategy&,
                                        int currentChains,
                                        const CoreField& currentField,
+                                       const CoreField::SimulationContext& currentFieldContext,
                                        const ColumnPuyo& firePuyo,
                                        const ColumnPuyoList& keyPuyos,
-                                       const CoreField::SimulationContext&,
                                        int restIteration,
                                        int restUnusedVariables,
                                        double sumPatternScore,

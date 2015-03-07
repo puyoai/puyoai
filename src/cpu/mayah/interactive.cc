@@ -29,15 +29,6 @@ using namespace std;
 class InteractiveAI : public DebuggableMayahAI {
 public:
     InteractiveAI(int argc, char* argv[]) : DebuggableMayahAI(argc, argv) {}
-
-    void showMatchedBooks(const CoreField& field)
-    {
-        for (const auto& book : openingBook_.fields()) {
-            if (book.match(field).count) {
-                cout << book.toDebugString() << endl;
-            }
-        }
-    }
 };
 
 Problem makeProblem()
@@ -150,10 +141,6 @@ int main(int argc, char* argv[])
                 break;
             if (str == "reload") {
                 ai.loadEvaluationParameter();
-                continue;
-            }
-            if (str == "book") {
-                ai.showMatchedBooks(currentField);
                 continue;
             }
 
