@@ -542,6 +542,26 @@ ignition = 2
 
 [[pattern]]
 field = [
+    "A.BC.C",
+    "AAABCC",
+    "BBBC@@",
+]
+name = "NEWGTR"
+score = 9.5
+ignition = 1
+
+[[pattern]]
+field = [
+    ".ABC.C",
+    "AAABCC",
+    "BBBC@@",
+]
+name = "NEWGTR"
+score = 9.5
+ignition = 2
+
+[[pattern]]
+field = [
     "A.BC..",
     "AAABC.",
     "BBBCC.",
@@ -615,6 +635,19 @@ score = 9.0
 
 [[pattern]]
 field = [
+    ".A....",
+    "BA....",
+    "AA....",
+    "BC....",
+    "BB....",
+    "CCC...",
+    "......",
+]
+ignition = 2
+score = 9.0
+
+[[pattern]]
+field = [
     "C.....",
     "B.....",
     "B.....",
@@ -635,6 +668,33 @@ field = [
     "A.....",
     "AA....",
     "AB....",
+    "CCC...",
+    "......",
+]
+ignition = 2
+score = 8.0
+
+[[pattern]]
+field = [
+    "B.....",
+    "B.....",
+    "B.....",
+    "AA....",
+    "AC....",
+    "AB....",
+    "CCC...",
+    "......",
+]
+ignition = 2
+score = 8.0
+
+[[pattern]]
+field = [
+    "C.....",
+    "BA....",
+    "AA....",
+    "AB....",
+    "BB....",
     "CCC...",
     "......",
 ]
@@ -747,6 +807,18 @@ name = "LTR"
 ignition = 2
 score = 9.0
 
+[[pattern]]
+field = [
+    "B.....",
+    "A.....",
+    "A.....",
+    "ABC...",
+    "ABBC..",
+    "CCC@..",
+]
+name = "LTR"
+score = 8.8
+
 # ----------------------------------------------------------------------
 # LTR-HEAD-2
 
@@ -773,6 +845,124 @@ field = [
 ]
 ignition = 2
 score = 8.0
+
+# ----------------------------------------------------------------------
+# LR-CORE
+
+[[pattern]]
+field = [
+    "C.....",
+    "BA....",
+    "AA....",
+    "BA....",
+    "BCC...",
+    "BC....",
+]
+name = "LR"
+ignition = 2
+score = 7.0
+precondition = [[1, 1], [1, 2], [1, 3]]
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "AA....",
+    "BAA...",
+    "BCC...",
+    "BC....",
+]
+name = "LR"
+ignition = 2
+score = 7.0
+precondition = [[1, 1], [1, 2], [1, 3]]
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "A.....",
+    "AA....",
+    "BA....",
+    "BCC...",
+    "BC....",
+]
+name = "LR"
+ignition = 2
+score = 7.0
+precondition = [[1, 1], [1, 2], [1, 3]]
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "AA....",
+    "AA....",
+    "B.....",
+    "BCC...",
+    "BC....",
+]
+name = "LR"
+ignition = 2
+score = 7.0
+precondition = [[1, 1], [1, 2], [1, 3]]
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "AAA...",
+    "BA....",
+    "BCC...",
+    "BC....",
+]
+name = "LR"
+ignition = 3
+score = 7.0
+precondition = [[1, 1], [1, 2], [1, 3]]
+
+# ----------------------------------------------------------------------
+# LR-TAIL
+
+[[pattern]]
+field = [
+    "B.....",
+    "A.....",
+    "A.C...",
+    "ABBCC.",
+    "ABC...",
+]
+score = 7.0
+
+[[pattern]]
+field = [
+    "B.....",
+    "A.....",
+    "A.C...",
+    "ABBCCC",
+    "ABC...",
+]
+score = 7.0
+
+[[pattern]]
+field = [
+    "B.....",
+    "A.....",
+    "A.C...",
+    "ABBC..",
+    "ABCC..",
+]
+score = 6.5
+
+[[pattern]]
+field = [
+    "B.....",
+    "A.....",
+    "A.C...",
+    "ABBCCC",
+    "AB....",
+]
+score = 7.0
 
 # ----------------------------------------------------------------------
 # FUKIGENGTR-CORE
