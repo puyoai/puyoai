@@ -121,7 +121,7 @@ TEST(PatternBookTest, pattern1)
 
         if (expected == cf) {
             found = true;
-            EXPECT_EQ(72, patternScore);
+            EXPECT_EQ(72.0 * (6.0 / 12.0), patternScore);
         }
     };
 
@@ -162,7 +162,7 @@ TEST(PatternBookTest, pattern1_complement)
 
         if (cf == expected1 || cf == expected2) {
             found = true;
-            EXPECT_EQ(72, patternScore);
+            EXPECT_EQ(72.0 * (4.0 / 12.0), patternScore);
         }
     };
 

@@ -21,8 +21,10 @@ public:
 
     const std::string& name() const { return name_; }
     double score() const { return score_; }
-    int ignitionColumn() const { return ignitionColumn_;}
+    int ignitionColumn() const { return ignitionColumn_; }
     const std::vector<Position>& ignitionPositions() const { return ignitionPositions_; }
+
+    int numVariables() const { return pattern_.numVariables(); }
 
     bool isMatchable(const CoreField& cf) const { return pattern_.isMatchable(cf); }
     ComplementResult complement(const CoreField& cf,
