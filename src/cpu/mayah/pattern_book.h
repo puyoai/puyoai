@@ -78,6 +78,7 @@ public:
 
 private:
     void iteratePossibleRensasInternal(const CoreField& originalField,
+                                       const RensaDetectorStrategy&,
                                        int currentChains,
                                        const CoreField& currentField,
                                        const ColumnPuyo& firePuyo,
@@ -88,11 +89,12 @@ private:
                                        int scoreSum,
                                        const Callback& callback) const;
 
-    void checkRensa(const CoreField& originalField,
+    bool checkRensa(const CoreField& originalField,
                     int currentChains,
                     const ColumnPuyo& firePuyo,
                     const ColumnPuyoList& keyPuyos,
                     int sumScore,
+                    bool prohibits[FieldConstant::MAP_WIDTH],
                     const Callback& callback) const;
 
     std::vector<PatternBookField> fields_;

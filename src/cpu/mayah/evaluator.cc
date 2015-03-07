@@ -27,7 +27,6 @@
 
 using namespace std;
 
-DEFINE_bool(pattern, true, "use pattern book");
 DEFINE_bool(opening, true, "use opening book");
 
 namespace {
@@ -785,24 +784,12 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         }
     };
 
-    {
-        RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 3, false);
-        auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
-                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                            const RensaTrackResult& trackResult, const RensaRefSequence&) {
-            evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
-        };
-        RensaDetector::iteratePossibleRensasIteratively(fieldBeforeRensa, maxIteration, strategy, callback);
-    }
-
-    if (FLAGS_pattern) {
-        auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
-                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                            const RensaTrackResult& trackResult, int /*patternScore*/) {
-            evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
-        };
-        patternBook().iteratePossibleRensas(fieldBeforeRensa, preEvalResult.matchablePatternIds(), maxIteration, callback);
-    }
+    auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
+                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult& trackResult, int /*patternScore*/) {
+        evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, trackResult);
+    };
+    patternBook().iteratePossibleRensas(fieldBeforeRensa, preEvalResult.matchablePatternIds(), maxIteration, callback);
 
     if (sideChainMaxScore >= scoreForOjama(21)) {
         sc_->addScore(HOLDING_SIDE_CHAIN_LARGE, 1);

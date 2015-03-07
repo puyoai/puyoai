@@ -57,6 +57,7 @@ public:
     static void detect(const CoreField&,
                        const RensaDetectorStrategy&,
                        PurposeForFindingRensa,
+                       const bool prohibits[FieldConstant::MAP_WIDTH],
                        const SimulationCallback& callback);
 
     typedef std::function<void (const CoreField& fieldAfterRensa,
@@ -117,6 +118,12 @@ public:
                                                  int maxIteration,
                                                  const RensaDetectorStrategy&,
                                                  IterativePossibleRensaCallback);
+
+    static void makeProhibitArray(const RensaResult&,
+                                  const RensaTrackResult&,
+                                  const CoreField& originalField,
+                                  const ColumnPuyoList& firePuyos,
+                                  bool prohibits[FieldConstant::MAP_WIDTH]);
 };
 
 #endif

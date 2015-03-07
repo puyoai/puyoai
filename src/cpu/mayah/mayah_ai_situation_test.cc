@@ -49,7 +49,9 @@ TEST_P(MayahAISituationTest, ThinkAsExpected) {
     Problem problem = Problem::readProblem(filename);
 
     Decision d = solver.solve(problem);
-    EXPECT_TRUE(problem.answers.count(d)) << "  Your decision: " << d.toString() << endl;
+    EXPECT_TRUE(problem.answers.count(d))
+        << "  Problem name : " << problem.name << endl
+        << "  Your decision: " << d.toString();
 }
 
 INSTANTIATE_TEST_CASE_P(
