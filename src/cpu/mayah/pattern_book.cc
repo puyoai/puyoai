@@ -36,7 +36,7 @@ vector<Position> findIgnitionPositions(const FieldPattern& pattern)
 
 } // anonymous namespace
 
-PatternBookField::PatternBookField(const std::string& field, int ignitionColumn, int score) :
+PatternBookField::PatternBookField(const std::string& field, int ignitionColumn, double score) :
     pattern_(field),
     ignitionColumn_(ignitionColumn),
     score_(score),
@@ -45,7 +45,7 @@ PatternBookField::PatternBookField(const std::string& field, int ignitionColumn,
     DCHECK(0 <= ignitionColumn && ignitionColumn <= 6);
 }
 
-PatternBookField::PatternBookField(const FieldPattern& pattern, int ignitionColumn, int score) :
+PatternBookField::PatternBookField(const FieldPattern& pattern, int ignitionColumn, double score) :
     pattern_(pattern),
     ignitionColumn_(ignitionColumn),
     score_(score),
@@ -97,9 +97,14 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
             CHECK(1 <= ignitionColumn && ignitionColumn <= 6) << ignitionColumn;
         }
 
-        int score = 0;
+        double score = 0;
         if (const toml::Value* p = v.find("score")) {
-            score = p->as<int>();
+            if (p->is<int>())
+                score = p->as<int>();
+            else if (p->is<double>())
+                score = p->as<double>();
+            else
+                CHECK(false);
         }
 
         PatternBookField pbf(str, ignitionColumn, score);
@@ -210,7 +215,7 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
                                                 const CoreField::SimulationContext& fieldContext,
                                                 int restIteration,
                                                 int restUnusedVariables,
-                                                int patternScore,
+                                                double patternScore,
                                                 const Callback& callback) const
 {
     bool needsToCheckWithoutComplement = false;
@@ -322,7 +327,7 @@ bool PatternBook::checkRensa(const CoreField& originalField,
                              int currentChains,
                              const ColumnPuyo& firePuyo,
                              const ColumnPuyoList& keyPuyos,
-                             int patternScore,
+                             double patternScore,
                              bool prohibits[FieldConstant::MAP_WIDTH],
                              const Callback& callback) const
 {

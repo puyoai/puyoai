@@ -276,10 +276,8 @@ TEST(PatternBookTest, pattern4)
                         const RensaTrackResult&,
                         int /*patternScore*/) {
         CoreField cf(field);
-        for (const auto& cp : keyPuyos)
-            cf.dropPuyoOn(cp.x, cp.color);
-        for (const auto& cp : firePuyos)
-            cf.dropPuyoOn(cp.x, cp.color);
+        ASSERT_TRUE(cf.dropPuyoList(keyPuyos));
+        ASSERT_TRUE(cf.dropPuyoList(firePuyos));
 
         if (cf == expected1 || cf == expected2)
             found = true;

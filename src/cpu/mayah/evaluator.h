@@ -110,6 +110,7 @@ public:
         EvaluatorBase(openingBook, patternBook),
         sc_(sc) {}
 
+    void evalPatternScore(double patternScore);
     void evalRensaScore(double score, double virtualScore);
     void evalRensaChainFeature(const RensaResult&, const PuyoSet&);
     void collectScoreForRensaGarbage(const CoreField& fieldAfterRensa);

@@ -17,9 +17,9 @@
 class PatternBookField {
 public:
     // If ignitionColumn is 0, we ignore ignitionColumn when detecting rensa.
-    PatternBookField(const std::string& field, int ignitionColumn, int score);
+    PatternBookField(const std::string& field, int ignitionColumn, double score);
 
-    int score() const { return score_; }
+    double score() const { return score_; }
     int ignitionColumn() const { return ignitionColumn_;}
     const std::vector<Position>& ignitionPositions() const { return ignitionPositions_; }
 
@@ -38,11 +38,11 @@ public:
     }
 
 private:
-    PatternBookField(const FieldPattern&, int ignitionColumn, int score);
+    PatternBookField(const FieldPattern&, int ignitionColumn, double score);
 
     FieldPattern pattern_;
     int ignitionColumn_;
-    int score_;
+    double score_;
     std::vector<Position> ignitionPositions_;
 };
 
@@ -66,7 +66,7 @@ public:
                                 const ColumnPuyoList& keyPuyos,
                                 const ColumnPuyoList& firePuyos,
                                 const RensaTrackResult&,
-                                int patternScore)> Callback;
+                                double patternScore)> Callback;
 
     void iteratePossibleRensas(const CoreField&,
                                const std::vector<int>& matchableIds,
@@ -86,14 +86,14 @@ private:
                                        const CoreField::SimulationContext&,
                                        int restIteration,
                                        int restUnusedVariables,
-                                       int scoreSum,
+                                       double sumPatternScore,
                                        const Callback& callback) const;
 
     bool checkRensa(const CoreField& originalField,
                     int currentChains,
                     const ColumnPuyo& firePuyo,
                     const ColumnPuyoList& keyPuyos,
-                    int sumScore,
+                    double sumPatternScore,
                     bool prohibits[FieldConstant::MAP_WIDTH],
                     const Callback& callback) const;
 
