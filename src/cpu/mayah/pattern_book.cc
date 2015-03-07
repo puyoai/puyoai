@@ -36,8 +36,9 @@ vector<Position> findIgnitionPositions(const FieldPattern& pattern)
 
 } // anonymous namespace
 
-PatternBookField::PatternBookField(const std::string& field, int ignitionColumn, double score) :
+PatternBookField::PatternBookField(const string& field, const string& name, int ignitionColumn, double score) :
     pattern_(field),
+    name_(name),
     ignitionColumn_(ignitionColumn),
     score_(score),
     ignitionPositions_(findIgnitionPositions(pattern_))
@@ -45,8 +46,9 @@ PatternBookField::PatternBookField(const std::string& field, int ignitionColumn,
     DCHECK(0 <= ignitionColumn && ignitionColumn <= 6);
 }
 
-PatternBookField::PatternBookField(const FieldPattern& pattern, int ignitionColumn, double score) :
+PatternBookField::PatternBookField(const FieldPattern& pattern, const string& name, int ignitionColumn, double score) :
     pattern_(pattern),
+    name_(name),
     ignitionColumn_(ignitionColumn),
     score_(score),
     ignitionPositions_(findIgnitionPositions(pattern_))
@@ -91,6 +93,11 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
         for (const auto& s : v.get<toml::Array>("field"))
             str += s.as<string>();
 
+        string name;
+        if (const toml::Value* p = v.find("name")) {
+            name = p->as<string>();
+        }
+
         int ignitionColumn = 0;
         if (const toml::Value* p = v.find("ignition")) {
             ignitionColumn = p->as<int>();
@@ -107,7 +114,7 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
                 CHECK(false);
         }
 
-        PatternBookField pbf(str, ignitionColumn, score);
+        PatternBookField pbf(str, name, ignitionColumn, score);
         fields_.push_back(pbf);
         fields_.push_back(pbf.mirror());
     }
@@ -174,8 +181,12 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
         if (!ok || !foundFirePuyo)
             continue;
 
+        CoreField::SimulationContext context(originalContext);
+        int score = cf.vanishDrop(&context);
+        CHECK(score > 0) << score;
         int restUnusedVariables = MAX_UNUSED_VARIABLES - complementResult.numFilledUnusedVariables;
-        iteratePossibleRensasInternal(originalField, strategy, 0, cf, firePuyo, keyPuyos, originalContext,
+        iteratePossibleRensasInternal(originalField, strategy, 1,
+                                      cf, context, firePuyo, keyPuyos,
                                       maxIteration - 1, restUnusedVariables, pbf.score(), callback);
     }
 
@@ -198,8 +209,9 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
             firePuyo = cp;
         }
 
-        iteratePossibleRensasInternal(originalField, strategy, 0, *cf, firePuyo, keyPuyos,
-                                      originalContext, maxIteration - 1, 0, 0, callback);
+        iteratePossibleRensasInternal(originalField, strategy, 0, *cf, originalContext,
+                                      firePuyo, keyPuyos, maxIteration - 1, 0, 0, callback);
+
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
@@ -209,41 +221,22 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
 void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
                                                 const RensaDetectorStrategy& strategy,
                                                 int currentChains,
-                                                const CoreField& field,
+                                                const CoreField& currentField,
+                                                const CoreField::SimulationContext& currentFieldContext,
                                                 const ColumnPuyo& firePuyo,
                                                 const ColumnPuyoList& originalKeyPuyos,
-                                                const CoreField::SimulationContext& fieldContext,
                                                 int restIteration,
                                                 int restUnusedVariables,
                                                 double patternScore,
                                                 const Callback& callback) const
 {
-    bool needsToCheckWithoutComplement = false;
-    bool prohibits[FieldConstant::MAP_WIDTH] {};
-
-    // Check without adding anything.
-    {
-        CoreField cf(field);
-        CoreField::SimulationContext context(fieldContext);
-        if (cf.vanishDrop(&context) == 0) {
-            needsToCheckWithoutComplement = checkRensa(original, currentChains,
-                                                       firePuyo, originalKeyPuyos, patternScore,
-                                                       prohibits, callback);
-        } else {
-            // Proceed without adding anything.
-            iteratePossibleRensasInternal(original, strategy, currentChains + 1, cf, firePuyo,
-                                          originalKeyPuyos, context, restIteration, restUnusedVariables,
-                                          patternScore, callback);
-        }
-
-        // Don't return here. We might be able to complement if we can erase something.
-    }
-
-    if (restIteration == 0)
-        return;
-
-    // Proceed without complement
-    if (needsToCheckWithoutComplement) {
+    // if currentField does not erase anything...
+    if (!currentField.rensaWillOccurWithContext(currentFieldContext)) {
+        bool prohibits[FieldConstant::MAP_WIDTH] {};
+        if (!checkRensa(original, currentChains, firePuyo, originalKeyPuyos, patternScore, prohibits, callback))
+            return;
+        if (restIteration == 0)
+            return;
         auto detectCallback = [&](CoreField* cf, const ColumnPuyoList& cpl) {
             if (cpl.size() == 0)
                 return;
@@ -260,40 +253,58 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
             if (!ok)
                 return;
 
-            CoreField::SimulationContext context(fieldContext);
+            CoreField::SimulationContext context(currentFieldContext);
             int score = cf->vanishDrop(&context);
             if (score == 0)
                 return;
 
-            iteratePossibleRensasInternal(original, strategy, currentChains + 1, *cf, firePuyo, keyPuyos,
-                                          context, restIteration - 1, restUnusedVariables,
+            iteratePossibleRensasInternal(original, strategy, currentChains + 1, *cf, context,
+                                          firePuyo, keyPuyos, restIteration - 1, restUnusedVariables,
                                           patternScore, callback);
         };
 
-        RensaDetector::detect(field, strategy, PurposeForFindingRensa::FOR_KEY, prohibits, detectCallback);
+        RensaDetector::detect(currentField, strategy, PurposeForFindingRensa::FOR_KEY, prohibits, detectCallback);
+        return;
     }
 
     // With complement.
-    std::vector<Position> ignitionPositions = field.erasingPuyoPositions(fieldContext);
+    std::vector<Position> ignitionPositions = currentField.erasingPuyoPositions(currentFieldContext);
     if (ignitionPositions.empty())
         return;
 
     std::sort(ignitionPositions.begin(), ignitionPositions.end());
     std::pair<IndexIterator, IndexIterator> p = this->find(ignitionPositions);
+    bool needsToProceedWithoutComplement = true;
     for (IndexIterator it = p.first; it != p.second; ++it) {
         const PatternBookField& pbf = patternBookField(it->second);
 
         ColumnPuyoList cpl;
-        ComplementResult complementResult = pbf.complement(field, restUnusedVariables, &cpl);
+        ComplementResult complementResult = pbf.complement(currentField, restUnusedVariables, &cpl);
         if (!complementResult.success)
             continue;
-        if (cpl.size() == 0)
+
+        if (cpl.size() == 0) {
+            needsToProceedWithoutComplement = false;
+
+            CoreField cf(currentField);
+            CoreField::SimulationContext context(currentFieldContext);
+            int score = cf.vanishDrop(&context);
+            CHECK(score > 0) << score;
+
+            iteratePossibleRensasInternal(original, strategy, currentChains + 1,
+                                          cf, context, firePuyo, originalKeyPuyos,
+                                          restIteration, restUnusedVariables,
+                                          patternScore + pbf.score(), callback);
+            continue;
+        }
+
+        if (restIteration == 0)
             continue;
 
-        CoreField cf(field);
+        CoreField cf(currentField);
+        ColumnPuyoList keyPuyos(originalKeyPuyos);
 
         bool ok = true;
-        ColumnPuyoList keyPuyos(originalKeyPuyos);
         for (const ColumnPuyo& cp : cpl) {
             if (cp.x == firePuyo.x) {
                 ok = false;
@@ -312,15 +323,29 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
         if (!ok)
             continue;
 
-        CoreField::SimulationContext context(fieldContext);
+        CoreField::SimulationContext context(currentFieldContext);
         int score = cf.vanishDrop(&context);
         CHECK(score > 0) << score;
 
-        iteratePossibleRensasInternal(original, strategy, currentChains + 1, cf, firePuyo, keyPuyos, context,
+        iteratePossibleRensasInternal(original, strategy, currentChains + 1,
+                                      cf, context, firePuyo, keyPuyos,
                                       restIteration - 1,
                                       restUnusedVariables - complementResult.numFilledUnusedVariables,
                                       patternScore + pbf.score(), callback);
     }
+
+    // proceed one without complementing.
+    if (needsToProceedWithoutComplement) {
+        CoreField cf(currentField);
+        CoreField::SimulationContext context(currentFieldContext);
+        int score = cf.vanishDrop(&context);
+        CHECK(score > 0) << score;
+
+        iteratePossibleRensasInternal(original, strategy, currentChains + 1,
+                                      cf, context, firePuyo, originalKeyPuyos,
+                                      restIteration, restUnusedVariables, patternScore, callback);
+    }
+
 }
 
 bool PatternBook::checkRensa(const CoreField& originalField,

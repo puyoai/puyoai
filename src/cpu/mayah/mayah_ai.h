@@ -13,7 +13,6 @@
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
-#include "opening_book.h"
 #include "pattern_book.h"
 
 class CoreField;
@@ -87,7 +86,6 @@ protected:
     bool loadEvaluationParameter();
 
     EvaluationParameterMap evaluationParameterMap_;
-    OpeningBook openingBook_;
     DecisionBook decisionBook_;
     PatternBook patternBook_;
 

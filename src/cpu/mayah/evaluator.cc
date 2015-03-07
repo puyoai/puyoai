@@ -21,13 +21,10 @@
 #include "core/rensa_result.h"
 #include "core/score.h"
 
-#include "opening_book.h"
 #include "evaluation_parameter.h"
 #include "gazer.h"
 
 using namespace std;
-
-DEFINE_bool(opening, true, "use opening book");
 
 namespace {
 
@@ -151,13 +148,6 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
 {
     PreEvalResult preEvalResult;
 
-    auto matchableOpeningIds = preEvalResult.mutableMatchableOpeningIds();
-    for (size_t i = 0; i < openingBook().size(); ++i) {
-        const OpeningBookField& obf = openingBook().field(i);
-        if (obf.preMatch(currentField))
-            matchableOpeningIds->push_back(static_cast<int>(i));
-    }
-
     auto matchablePatternIds = preEvalResult.mutableMatchablePatternIds();
     for (size_t i = 0; i < patternBook().size(); ++i) {
         const PatternBookField& pbf = patternBook().patternBookField(i);
@@ -178,55 +168,6 @@ MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentFi
 
     result.add(MIDEVAL_RESULT, score);
     return result;
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalBook(const OpeningBook& openingBook,
-                                         const std::vector<int>& matchableBookIds,
-                                         const RefPlan& plan)
-{
-    double maxScore = 0;
-    const OpeningBookField* bestBf = nullptr;
-    set<string> matchedBookNames;
-
-    int totalPuyoCount = plan.field().countPuyos();
-    if (totalPuyoCount == 0)
-        return;
-
-    for (int id : matchableBookIds) {
-        const auto& bf = openingBook.field(id);
-        PatternMatchResult mr = bf.match(plan.field());
-        if (!mr.matched || mr.count == 0)
-            continue;
-
-        matchedBookNames.insert(bf.name());
-
-        // TODO(mayah): How do we handle 'allowedCount' ?
-        // 'allowed' cell can be considered as 'matched', however, we'd like to have penalty about it?
-        // Some cells should have penalty, however, other cells should not have penalty.
-
-        // TODO(mayah): cutoff ratio should be set to each book?
-
-        double ratio = static_cast<double>(mr.count) / totalPuyoCount;
-        DCHECK(0 <= ratio && ratio <= 1.0) << ratio;
-        // TODO(mayah): Make this configurable?
-        const double cutoffRatio = 0.39;
-        if (ratio < cutoffRatio)
-            continue;
-        ratio = (ratio - 1) / (1 - cutoffRatio) + 1;
-
-        double score = mr.score * ratio;
-        if (maxScore < score) {
-            bestBf = &bf;
-            maxScore = score;
-        }
-    }
-
-    if (bestBf) {
-        sc_->setBookName(bestBf->name());
-        sc_->addScore(BOOK, maxScore);
-        sc_->addScore(BOOK_KIND, matchedBookNames.size());
-    }
 }
 
 template<typename ScoreCollector>
@@ -705,9 +646,6 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult, midEvalResult))
         return;
 
-    if (FLAGS_opening && !enemy.hasZenkeshi && !plan.isRensaPlan()) {
-        evalBook(openingBook(), preEvalResult.matchableOpeningIds(), plan);
-    }
     evalCountPuyoFeature(plan);
     if (USE_CONNECTION_FEATURE)
         collectScoreForConnection(fieldBeforeRensa);
@@ -739,7 +677,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                             double patternScore,
                             const RensaTrackResult& trackResult) {
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
-        RensaEvaluator<ScoreCollector> rensaEvaluator(openingBook(), patternBook(), rensaScoreCollector.get());
+        RensaEvaluator<ScoreCollector> rensaEvaluator(patternBook(), rensaScoreCollector.get());
 
         CoreField complementedField(fieldBeforeRensa);
         for (const auto& cp : keyPuyos)
