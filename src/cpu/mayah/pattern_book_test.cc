@@ -136,7 +136,7 @@ TEST(PatternBookTest, pattern1_complement)
 
     CoreField field("G....."
                     "G....."
-                    "YY....");
+                    "YYB...");
 
     CoreField expected1("G....."
                         "GYB..."
@@ -162,7 +162,7 @@ TEST(PatternBookTest, pattern1_complement)
 
         if (cf == expected1 || cf == expected2) {
             found = true;
-            EXPECT_EQ(72.0 * (4.0 / 12.0), patternScore);
+            EXPECT_EQ(72.0 * (5.0 / 12.0), patternScore);
         }
     };
 
