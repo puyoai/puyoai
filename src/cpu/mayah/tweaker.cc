@@ -205,6 +205,7 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
         auto f = [i, &paramMap, &ps]() {
             auto ai = new DebuggableMayahAI;
             ai->setEvaluationParameterMap(paramMap);
+
             Endless endless(std::move(std::unique_ptr<AI>(ai)));
             stringstream ss;
             KumipuyoSeq seq = generateRandomSequenceWithSeed(i + FLAGS_offset);
@@ -338,9 +339,9 @@ int main(int argc, char* argv[])
         EvaluationParameter* parameter = paramMap.mutableDefaultParameter();
 
         map<double, RunResult> scoreMap;
-        for (double x = 0; x <= 1; x += 0.1) {
+        for (double x = 30; x <= 70; x += 10) {
             cout << "current x = " << x << endl;
-            parameter->setValue(SCORE, x);
+            parameter->setValue(COMPLEMENTATION_BIAS_MUCH, -x);
             scoreMap[x] = run(executor.get(), paramMap);
         }
         for (const auto& m : scoreMap) {

@@ -395,3 +395,8 @@ void MayahAI::gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq& 
 {
     gazer_.gaze(frameId, enemyField, kumipuyoSeq);
 }
+
+void DebuggableMayahAI::setEvaluationParameterMap(const EvaluationParameterMap& map)
+{
+    evaluationParameterMap_.loadValue(map.toTomlValue());
+}

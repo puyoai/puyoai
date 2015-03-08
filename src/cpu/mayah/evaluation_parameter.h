@@ -1,6 +1,7 @@
 #ifndef FEATURE_PARAMETER_H_
 #define FEATURE_PARAMETER_H_
 
+#include <array>
 #include <string>
 #include <vector>
 
@@ -30,15 +31,15 @@ std::string toString(EvaluationMode);
 
 class EvaluationParameter {
 public:
-    EvaluationParameter();
-    explicit EvaluationParameter(const toml::Value&);
+    explicit EvaluationParameter(const EvaluationParameter* parent = nullptr);
+    EvaluationParameter(const EvaluationParameter* parent, const toml::Value&);
 
-    double score(EvaluationFeatureKey key, double value) const { return coef_[key] * value; }
-    double score(EvaluationSparseFeatureKey key, int idx, int n) const { return sparseCoef_[key][idx] * n; }
+    double score(EvaluationFeatureKey key, double value) const;
+    double score(EvaluationSparseFeatureKey key, int idx, int n) const;
 
-    double getValue(EvaluationFeatureKey key) const { return coef_[key]; }
-    std::vector<double> getValues(EvaluationSparseFeatureKey key) const { return sparseCoef_[key]; }
-    double getValue(EvaluationSparseFeatureKey key, int index) const { return sparseCoef_[key][index]; }
+    double getValue(EvaluationFeatureKey key) const;
+    const std::vector<double>& getValues(EvaluationSparseFeatureKey key) const;
+    double getValue(EvaluationSparseFeatureKey key, int index) const;
 
     void setValue(EvaluationFeatureKey key, double value);
     void addValue(EvaluationFeatureKey key, double value);
@@ -47,11 +48,8 @@ public:
     void setValue(EvaluationSparseFeatureKey key, int index, double value);
     void addValue(EvaluationSparseFeatureKey key, int idx, double value);
 
-    bool isChanged(EvaluationFeatureKey key) const { return coefChanged_[key]; }
-    bool isChanged(EvaluationSparseFeatureKey key) const { return sparseCoefChanged_[key]; }
-
-    // Copies the parameter, and changed flag will be cleared.
-    void setDefault(const EvaluationParameter&);
+    bool hasValue(EvaluationFeatureKey key) const { return coefChanged_[key]; }
+    bool hasValue(EvaluationSparseFeatureKey key) const { return sparseCoefChanged_[key]; }
 
     std::string toString() const;
 
@@ -63,26 +61,72 @@ public:
     friend bool operator==(const EvaluationParameter&, const EvaluationParameter&);
 
 private:
+    void clear();
     void setChanged(EvaluationFeatureKey key, bool flag) { coefChanged_[key] = flag; }
     void setChanged(EvaluationSparseFeatureKey key, bool flag) { sparseCoefChanged_[key] = flag; }
 
+    const EvaluationParameter* parent_;
     std::vector<double> coef_;
     std::vector<std::vector<double>> sparseCoef_;
     std::vector<bool> coefChanged_;
     std::vector<bool> sparseCoefChanged_;
 };
 
+inline double EvaluationParameter::score(EvaluationFeatureKey key, double value) const
+{
+    if (hasValue(key) || !parent_)
+        return coef_[key] * value;
+    return parent_->score(key, value);
+}
+
+inline double EvaluationParameter::score(EvaluationSparseFeatureKey key, int idx, int n) const
+{
+    if (hasValue(key) || !parent_)
+        return sparseCoef_[key][idx] * n;
+    return parent_->score(key, idx, n);
+}
+
+inline double EvaluationParameter::getValue(EvaluationFeatureKey key) const
+{
+    if (hasValue(key) || !parent_)
+        return coef_[key];
+    return parent_->getValue(key);
+}
+
+inline const std::vector<double>& EvaluationParameter::getValues(EvaluationSparseFeatureKey key) const
+{
+    if (hasValue(key) || !parent_)
+        return sparseCoef_[key];
+    return parent_->getValues(key);
+}
+
+inline double EvaluationParameter::getValue(EvaluationSparseFeatureKey key, int index) const
+{
+    if (hasValue(key) || !parent_)
+        return sparseCoef_[key][index];
+    return parent_->getValue(key, index);
+}
+
+// ----------------------------------------------------------------------
+
 class EvaluationParameterMap {
 public:
-    EvaluationParameterMap() : map_(ARRAY_SIZE(ALL_EVALUATION_MODES)) {}
+    EvaluationParameterMap();
+    ~EvaluationParameterMap();
+
+    EvaluationParameterMap(const EvaluationParameterMap&);
+    EvaluationParameterMap& operator=(const EvaluationParameterMap&);
 
     EvaluationParameter* mutableDefaultParameter() { return mutableParameter(EvaluationMode::DEFAULT); }
     const EvaluationParameter& defaultParameter() const { return parameter(EvaluationMode::DEFAULT); }
 
-    EvaluationParameter* mutableParameter(EvaluationMode mode) { return &map_[ordinal(mode)]; }
-    const EvaluationParameter& parameter(EvaluationMode mode) const { return map_[ordinal(mode)]; }
+    EvaluationParameter* mutableParameter(EvaluationMode mode) { return map_[ordinal(mode)].get(); }
+    const EvaluationParameter& parameter(EvaluationMode mode) const { return *map_[ordinal(mode)]; }
 
     std::string toString() const;
+
+    toml::Value toTomlValue() const;
+    bool loadValue(const toml::Value&);
 
     bool load(const std::string& filename);
     bool save(const std::string& filename) const;
@@ -91,7 +135,7 @@ public:
     void removeNontokopuyoParameter();
 
 private:
-    std::vector<EvaluationParameter> map_;
+    std::array<std::unique_ptr<EvaluationParameter>, ARRAY_SIZE(ALL_EVALUATION_MODES)> map_;
 };
 
 #endif

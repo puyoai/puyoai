@@ -26,7 +26,8 @@ string toString(EvaluationMode mode)
     }
 }
 
-EvaluationParameter::EvaluationParameter() :
+EvaluationParameter::EvaluationParameter(const EvaluationParameter* parent) :
+    parent_(parent),
     coef_(EvaluationFeature::all().size()),
     sparseCoef_(EvaluationSparseFeature::all().size()),
     coefChanged_(EvaluationFeature::all().size()),
@@ -37,8 +38,8 @@ EvaluationParameter::EvaluationParameter() :
     }
 }
 
-EvaluationParameter::EvaluationParameter(const toml::Value& value) :
-    EvaluationParameter::EvaluationParameter()
+EvaluationParameter::EvaluationParameter(const EvaluationParameter* parent, const toml::Value& value) :
+    EvaluationParameter::EvaluationParameter(parent)
 {
     CHECK(loadValue(value));
 }
@@ -77,26 +78,18 @@ void EvaluationParameter::addValue(EvaluationSparseFeatureKey key, int idx, doub
     sparseCoefChanged_[key] = true;
 }
 
-void EvaluationParameter::setDefault(const EvaluationParameter& param)
-{
-    coef_ = param.coef_;
-    sparseCoef_ = param.sparseCoef_;
-    std::fill(coefChanged_.begin(), coefChanged_.end(), false);
-    std::fill(sparseCoefChanged_.begin(), sparseCoefChanged_.end(), false);
-}
-
 toml::Value EvaluationParameter::toTomlValue() const
 {
     toml::Value v;
 
     for (const auto& ef : EvaluationFeature::all()) {
-        if (!isChanged(ef.key()))
+        if (!hasValue(ef.key()))
             continue;
         v.set(ef.str(), getValue(ef.key()));
     }
 
     for (const auto& ef : EvaluationSparseFeature::all()) {
-        if (!isChanged(ef.key()))
+        if (!hasValue(ef.key()))
             continue;
 
         toml::Value vs;
@@ -111,6 +104,8 @@ toml::Value EvaluationParameter::toTomlValue() const
 
 bool EvaluationParameter::loadValue(const toml::Value& value)
 {
+    clear();
+
     set<string> keys;
     for (const auto& entry : value.as<toml::Table>()) {
         keys.insert(entry.first);
@@ -184,13 +179,13 @@ string EvaluationParameter::toString() const
     ostringstream ss;
 
     for (const EvaluationFeature& ef : EvaluationFeature::all()) {
-        if (!isChanged(ef.key()))
+        if (!hasValue(ef.key()))
             continue;
         ss << ef.str() << " = " << coef_[ef.key()] << endl;
     }
 
     for (const EvaluationSparseFeature& ef : EvaluationSparseFeature::all()) {
-        if (!isChanged(ef.key()))
+        if (!hasValue(ef.key()))
             continue;
         ss << ef.str() << " =";
         for (size_t i = 0; i < ef.size(); ++i) {
@@ -221,9 +216,49 @@ void EvaluationParameter::removeNontokopuyoParameter()
     }
 }
 
+void EvaluationParameter::clear()
+{
+    for (const auto& ef : EvaluationFeature::all()) {
+        coef_[ef.key()] = 0.0;
+        setChanged(ef.key(), false);
+    }
+    for (const auto& ef : EvaluationSparseFeature::all()) {
+        std::fill(sparseCoef_[ef.key()].begin(),
+                  sparseCoef_[ef.key()].end(),
+                  0.0);
+        setChanged(ef.key(), false);
+    }
+}
+
 bool operator==(const EvaluationParameter& lhs, const EvaluationParameter& rhs)
 {
     return lhs.coef_ == rhs.coef_ && lhs.sparseCoef_ == rhs.sparseCoef_;
+}
+
+EvaluationParameterMap::EvaluationParameterMap()
+{
+    for (size_t i = 0; i < map_.size(); ++i) {
+        if (i == 0)
+            map_[i].reset(new EvaluationParameter(nullptr));
+        else
+            map_[i].reset(new EvaluationParameter(map_[0].get()));
+    }
+}
+
+EvaluationParameterMap::~EvaluationParameterMap()
+{
+}
+
+EvaluationParameterMap::EvaluationParameterMap(const EvaluationParameterMap& map) :
+    EvaluationParameterMap()
+{
+    loadValue(map.toTomlValue());
+}
+
+EvaluationParameterMap& EvaluationParameterMap::operator=(const EvaluationParameterMap& map)
+{
+    loadValue(map.toTomlValue());
+    return *this;
 }
 
 bool EvaluationParameterMap::load(const string& filename)
@@ -243,6 +278,13 @@ bool EvaluationParameterMap::load(const string& filename)
         return false;
     }
 
+    return loadValue(value);
+}
+
+bool EvaluationParameterMap::loadValue(const toml::Value& v)
+{
+    toml::Value value(v);
+
     toml::Value modeValues;
     if (toml::Value* modeValue = value.find("mode")) {
         modeValues = std::move(*modeValue);
@@ -253,7 +295,6 @@ bool EvaluationParameterMap::load(const string& filename)
     for (auto mode : ALL_EVALUATION_MODES) {
         if (mode == EvaluationMode::DEFAULT)
             continue;
-        mutableParameter(mode)->setDefault(defaultParameter());
         if (toml::Value* v = modeValues.find(::toString(mode))) {
             mutableParameter(mode)->loadValue(*v);
             modeValues.erase(::toString(mode));
@@ -268,14 +309,7 @@ bool EvaluationParameterMap::load(const string& filename)
 
 bool EvaluationParameterMap::save(const string& filename) const
 {
-    toml::Value value = defaultParameter().toTomlValue();
-    for (auto mode : ALL_EVALUATION_MODES) {
-        if (mode == EvaluationMode::DEFAULT)
-            continue;
-
-        toml::Value* v = value.ensureTable(string("mode.") + ::toString(mode));
-        *v = parameter(mode).toTomlValue();
-    }
+    toml::Value value = toTomlValue();
 
     try {
         ofstream ofs(filename, ios::out | ios::trunc);
@@ -288,7 +322,7 @@ bool EvaluationParameterMap::save(const string& filename) const
     return true;
 }
 
-string EvaluationParameterMap::toString() const
+toml::Value EvaluationParameterMap::toTomlValue() const
 {
     toml::Value value = defaultParameter().toTomlValue();
     for (auto mode : ALL_EVALUATION_MODES) {
@@ -298,6 +332,13 @@ string EvaluationParameterMap::toString() const
         toml::Value* v = value.ensureTable(string("mode.") + ::toString(mode));
         *v = parameter(mode).toTomlValue();
     }
+
+    return value;
+}
+
+string EvaluationParameterMap::toString() const
+{
+    toml::Value value = toTomlValue();
 
     stringstream ss;
     ss << value;
