@@ -12,7 +12,6 @@
 #include "core/algorithm/puyo_possibility.h"
 #include "core/frame_request.h"
 
-#include "opening_book.h"
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
