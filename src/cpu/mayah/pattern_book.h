@@ -24,6 +24,9 @@ public:
     int ignitionColumn() const { return ignitionColumn_; }
     const std::vector<Position>& ignitionPositions() const { return ignitionPositions_; }
 
+    const FieldPattern& pattern() const { return pattern_; }
+    FieldPattern* mutablePattern() { return &pattern_; }
+
     int numVariables() const { return pattern_.numVariables(); }
 
     bool isMatchable(const CoreField& cf) const { return pattern_.isMatchable(cf); }
