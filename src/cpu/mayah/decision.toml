@@ -269,7 +269,6 @@ field = [
 ACBC = [3, 3]
 ACAD = [4, 2]
 ADAD = [4, 2]
-BCAB = [4, 0]
 BCBD = [4, 0]
 CCAB = [2, 3]
 CCDD = [5, 1]
