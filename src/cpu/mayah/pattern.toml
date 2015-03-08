@@ -527,6 +527,16 @@ field = [
 ignition = 3
 score = 8.5
 
+[[pattern]]
+field = [
+    "....BC",
+    "....CB",
+    "..ACCB",
+    "..AAAB",
+]
+ignition = 3
+score = 8.0
+
 # ----------------------------------------------------------------------
 # GTR-TAIL-3
 
@@ -537,6 +547,16 @@ field = [
     ".....B",
     "...CCB",
     "...BBA",
+    "...AAA",
+]
+score = 4.0
+
+[[pattern]]
+field = [
+    ".....C",
+    "...C.C",
+    "...BCB",
+    "...ABB",
     "...AAA",
 ]
 score = 4.0
@@ -679,6 +699,29 @@ field = [
 ignition = 2
 score = 9.0
 
+[[pattern]]
+field = [
+    "BA....",
+    "AA....",
+    "A@C...",
+    "BBBC..",
+    "CCC@..",
+]
+ignition = 2
+score = 9.0
+
+[[pattern]]
+field = [
+    "B.....",
+    "A.....",
+    "AA....",
+    "A@C...",
+    "BBBC..",
+    "CCC@..",
+]
+ignition = 2
+score = 8.8
+
 # ----------------------------------------------------------------------
 # NEWGTR-HEAD-2
 
@@ -720,6 +763,20 @@ field = [
 ]
 ignition = 2
 score = 8.0
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "B.....",
+    "AA....",
+    "AA....",
+    "BB....",
+    "CCC...",
+    "......",
+]
+ignition = 2
+score = 8.1
 
 [[pattern]]
 field = [
@@ -783,6 +840,20 @@ field = [
     "AA....",
     "AB....",
     "BB....",
+    "CCC...",
+    "......",
+]
+ignition = 2
+score = 8.0
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "AA....",
+    "AA....",
+    "BB....",
+    "B.....",
     "CCC...",
     "......",
 ]
@@ -1149,6 +1220,27 @@ ignition = 3
 score = 8.0
 
 # ----------------------------------------------------------------------
+# FUKIGENGTR-TAIL-1
+
+[[pattern]]
+field = [
+    "..BC..",
+    "AAABCC",
+    "ABBC@@",
+]
+ignition = 1
+score = 8.0
+
+[[pattern]]
+field = [
+    "..BC..",
+    "AAABCC",
+    "ABB.C@",
+]
+ignition = 1
+score = 8.0
+
+# ----------------------------------------------------------------------
 # ZABUTONL-CORE
 
 [[pattern]]
@@ -1468,3 +1560,19 @@ field = [
 name = "DOUSHOKU"
 ignition = 2
 score = 8.9
+
+# ----------------------------------------------------------------------
+#
+
+[[pattern]]
+field = [
+    "C.....",
+    "CBA...",
+    "BAA...",
+    "BBA...",
+    "CC....",
+    "......",
+    "......",
+]
+ignition = 3
+score = 4.0

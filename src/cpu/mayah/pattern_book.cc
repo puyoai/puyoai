@@ -149,6 +149,8 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
         ComplementResult complementResult = pbf.complement(originalField, MAX_UNUSED_VARIABLES, &cpl);
         if (!complementResult.success)
             continue;
+        if (complementResult.numFilledUnusedVariables > 0)
+            continue;
 
         CoreField cf(originalField);
         bool ok = true;
