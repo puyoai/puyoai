@@ -449,7 +449,7 @@ field = [
 ]
 ignition = 3
 score = 8.8
-precondition = [[5, 2], [6, 2], [6, 3]]
+precondition = [[5, 2], [6, 2]]
 
 [[pattern]]
 field = [
@@ -580,6 +580,27 @@ score = 4.0
 [[pattern]]
 field = [
     ".....C",
+    "....CC",
+    "...CBB",
+    "...BAB",
+    "...AAA",
+]
+score = 4.0
+
+[[pattern]]
+field = [
+    ".....C",
+    ".....C",
+    "....CB",
+    "....BA",
+    "...CBA",
+    "...BAA",
+]
+score = 4.0
+
+[[pattern]]
+field = [
+    ".....C",
     "...C.C",
     "...BCB",
     "...ABB",
@@ -608,6 +629,16 @@ field = [
 ]
 ignition = 4
 score = 7.2
+
+[[pattern]]
+field = [
+    ".....C",
+    "....CB",
+    "...CCB",
+    "...AAA",
+    "...ABB",
+]
+score = 6.0
 
 # ----------------------------------------------------------------------
 # GTR-AIR
@@ -1351,7 +1382,7 @@ field = [
 ]
 name = "DAA"
 ignition = 1
-score = 9.8
+score = 8.8
 
 # ----------------------------------------------------------------------
 # DAA-HEAD
