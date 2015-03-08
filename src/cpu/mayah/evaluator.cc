@@ -598,6 +598,8 @@ void RensaEvaluator<ScoreCollector>::evalComplementationBias(const ColumnPuyoLis
         const PuyoSet& ps = puyoSets[x];
         if (ps.count() < 3)
             continue;
+        if (ps.count() >= 4)
+            sc_->addScore(COMPLEMENTATION_BIAS_MUCH, 1);
         if (ps.red() >= 3 || ps.blue() >= 3 || ps.yellow() >= 3 || ps.green() >= 3) {
             EvaluationFeatureKey key = (x == 1 || x == 6) ? COMPLEMENTATION_BIAS_EDGE : COMPLEMENTATION_BIAS;
             sc_->addScore(key, 1);
