@@ -115,6 +115,16 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
         }
 
         PatternBookField pbf(str, name, ignitionColumn, score);
+
+        if (const toml::Value* p = v.find("precondition")) {
+            for (const auto& cp : p->as<toml::Array>()) {
+                int x = cp.get<int>(0);
+                int y = cp.get<int>(1);
+                CHECK(pbf.pattern().type(x, y) == PatternType::VAR);
+                pbf.mutablePattern()->setType(x, y, PatternType::MUST_VAR);
+            }
+        }
+
         fields_.push_back(pbf);
         fields_.push_back(pbf.mirror());
     }
