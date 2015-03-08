@@ -213,6 +213,20 @@ TEST(MayahAIPerformanceTest, slow_pattern_from_real_4)
     runTest(3, 2, f, seq);
 }
 
+TEST(MayahAIPerformanceTest, slow_pattern_from_real_5)
+{
+    CoreField f("   R  "
+                "   BY "
+                "   BY "
+                "R  RB "
+                "Y  GYB"
+                "YRYBRG"
+                "YRRYYY"
+                "BBBRRR");
+    KumipuyoSeq seq("GBGBRGBB");
+
+    runTest(3, 2, f, seq);
+}
 
 int main(int argc, char* argv[])
 {
