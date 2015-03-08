@@ -257,7 +257,7 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
         bool prohibits[FieldConstant::MAP_WIDTH] {};
         if (!checkRensa(original, currentChains, firePuyo, originalKeyPuyos, patternScore, prohibits, callback))
             return;
-        if (restIteration == 0)
+        if (restIteration <= 0)
             return;
         auto detectCallback = [&](CoreField* cf, const ColumnPuyoList& cpl) {
             if (cpl.size() == 0)
@@ -320,7 +320,7 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
             continue;
         }
 
-        if (restIteration == 0)
+        if (restIteration <= 0)
             continue;
 
         CoreField cf(currentField);
