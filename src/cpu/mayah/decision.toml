@@ -7,7 +7,7 @@ AABC = [1, 2]  # [1, 2], [3, 3]?
 ABAA = [3, 0]  # [2, 0]?
 ABAB = [2, 2]
 ABAC = [3, 0]  # TODO {1, 1] ?
-ABCC = [2, 2]
+ABCC = [2, 2]  # [2, 2]? [3, 1]?
 
 [[book]]
 field = [
@@ -68,6 +68,13 @@ ACAC = [1, 1]
 ACBB = [1, 1]
 ACBC = [1, 1]
 ACCC = [1, 1]
+
+[[book]]
+field = [
+    "..AB.."
+]
+CCAC = [2, 3]
+CCBC = [2, 3]
 
 [[book]]
 field = [
