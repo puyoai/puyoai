@@ -122,6 +122,7 @@ ACAC = [2, 3]
 ACAD = [1, 1]
 ACBB = [1, 1]
 ACBC = [2, 3]
+ACBD = [1, 1]
 ACCC = [1, 1]
 ACDD = [1, 1]  # [5, 3]?
 BBCB = [1, 2]
@@ -213,6 +214,7 @@ ACBC = [1, 1]
 AAAC = [5, 1]
 AAAB = [5, 1]
 AAAD = [1, 2]
+BBBC = [5, 1]
 
 [[book]]
 field = [
