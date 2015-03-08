@@ -264,6 +264,19 @@ TEST(MayahAITest, DontCrash3)
     (void)ai->think(100, f, seq, me, enemy, false);
 }
 
+TEST(MayahAITest, setEvaluationParameter)
+{
+    auto ai = makeAI();
+    EXPECT_EQ(0, ai->evaluationParameter(EvaluationMode::DEFAULT).getValue(SCORE));
+
+    EvaluationParameterMap map = ai->evaluationParameterMap();
+    map.mutableDefaultParameter()->setValue(SCORE, 1.0);
+    ai->setEvaluationParameterMap(map);
+
+    EXPECT_EQ(1.0, ai->evaluationParameter(EvaluationMode::DEFAULT).getValue(SCORE));
+    EXPECT_EQ(1.0, ai->evaluationParameter(EvaluationMode::EARLY).getValue(SCORE));
+}
+
 int main(int argc, char* argv[])
 {
     google::InitGoogleLogging(argv[0]);

@@ -10,17 +10,19 @@ using namespace std;
 TEST(EvaluationParameterTest, toString)
 {
     EvaluationParameter param;
-    param.setValue(BOOK, 1.0);
+    param.setValue(SCORE, 1.0);
 
     // Since only BOOK parameter is changed, only it's be emitted.
-    EXPECT_EQ("BOOK = 1\n", param.toString());
+    EXPECT_EQ("SCORE = 1\n", param.toString());
 }
 
-TEST(EvaluationParameterMapTest, toString)
+TEST(EvaluationParameterMapTest, setter)
 {
-    EvaluationParameter param;
-    param.setValue(BOOK, 1.0);
+    EvaluationParameterMap m;
+    EXPECT_EQ(0.0, m.defaultParameter().getValue(SCORE));
+    EXPECT_EQ(0.0, m.parameter(EvaluationMode::EARLY).getValue(SCORE));
 
-    // Since only BOOK parameter is changed, only it's be emitted.
-    EXPECT_EQ("BOOK = 1\n", param.toString());
+    m.mutableDefaultParameter()->setValue(SCORE, 1.0);
+    EXPECT_EQ(1.0, m.defaultParameter().getValue(SCORE));
+    EXPECT_EQ(1.0, m.parameter(EvaluationMode::EARLY).getValue(SCORE));
 }

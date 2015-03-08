@@ -130,7 +130,7 @@ public:
     {
         return evaluationParameterMap().parameter(mode);
     }
-    void setEvaluationParameterMap(const EvaluationParameterMap& parameterMap) { evaluationParameterMap_ = parameterMap; }
+    void setEvaluationParameterMap(const EvaluationParameterMap&);
 };
 
 #endif
