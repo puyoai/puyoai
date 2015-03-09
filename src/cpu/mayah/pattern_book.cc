@@ -392,8 +392,14 @@ bool PatternBook::checkRensa(const CoreField& originalField,
     CoreField cf(originalField);
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(originalField);
 
-    if (!cf.dropPuyoList(keyPuyos, !strategy.allowsPuttingKeyPuyoOn13thRow()))
-        return false;
+    const int maxHeight = strategy.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
+
+    for (const auto& cp : keyPuyos) {
+        if (!cf.dropPuyoOn(cp.x, cp.color))
+            return false;
+        if (cf.height(cp.x) > maxHeight)
+            return false;
+    }
 
     // If rensa occurs after adding key puyos, this is invalid.
     if (cf.rensaWillOccurWithContext(context))
@@ -401,7 +407,7 @@ bool PatternBook::checkRensa(const CoreField& originalField,
 
     context.updateFromField(cf);
 
-    if (!cf.dropPuyoOn(firePuyo.x, firePuyo.color, !strategy.allowsPuttingKeyPuyoOn13thRow()))
+    if (!cf.dropPuyoOn(firePuyo.x, firePuyo.color))
         return false;
 
     RensaTrackResult trackResult;
