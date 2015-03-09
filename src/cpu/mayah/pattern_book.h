@@ -97,6 +97,7 @@ private:
                                        const Callback& callback) const;
 
     bool checkRensa(const CoreField& originalField,
+                    const RensaDetectorStrategy&,
                     int currentChains,
                     const ColumnPuyo& firePuyo,
                     const ColumnPuyoList& keyPuyos,

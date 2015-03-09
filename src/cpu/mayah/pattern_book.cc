@@ -255,7 +255,7 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
     // if currentField does not erase anything...
     if (!currentField.rensaWillOccurWithContext(currentFieldContext)) {
         bool prohibits[FieldConstant::MAP_WIDTH] {};
-        if (!checkRensa(original, currentChains, firePuyo, originalKeyPuyos, patternScore, prohibits, callback))
+        if (!checkRensa(original, strategy, currentChains, firePuyo, originalKeyPuyos, patternScore, prohibits, callback))
             return;
         if (restIteration <= 0)
             return;
@@ -381,6 +381,7 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
 }
 
 bool PatternBook::checkRensa(const CoreField& originalField,
+                             const RensaDetectorStrategy& strategy,
                              int currentChains,
                              const ColumnPuyo& firePuyo,
                              const ColumnPuyoList& keyPuyos,
@@ -391,7 +392,7 @@ bool PatternBook::checkRensa(const CoreField& originalField,
     CoreField cf(originalField);
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(originalField);
 
-    if (!cf.dropPuyoList(keyPuyos))
+    if (!cf.dropPuyoList(keyPuyos, !strategy.allowsPuttingKeyPuyoOn13thRow()))
         return false;
 
     // If rensa occurs after adding key puyos, this is invalid.
@@ -400,7 +401,7 @@ bool PatternBook::checkRensa(const CoreField& originalField,
 
     context.updateFromField(cf);
 
-    if (!cf.dropPuyoOn(firePuyo.x, firePuyo.color))
+    if (!cf.dropPuyoOn(firePuyo.x, firePuyo.color, !strategy.allowsPuttingKeyPuyoOn13thRow()))
         return false;
 
     RensaTrackResult trackResult;
