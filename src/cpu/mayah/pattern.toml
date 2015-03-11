@@ -1346,8 +1346,19 @@ score = 8.8
 field = [
     "A.....",
     "ABC...",
-    "AA.CC.",
+    "AA&CC.",
     "BBB.C."
+]
+name = "ZABUTONL"
+ignition = 1
+score = 8.8
+
+[[pattern]]
+field = [
+    "A.....",
+    "ABC.C.",
+    "AA&CC.",
+    "BBB..."
 ]
 name = "ZABUTONL"
 ignition = 1
@@ -1674,6 +1685,17 @@ field = [
 ]
 ignition = 4
 score = 4.0
+
+[[pattern]]
+field = [
+    ".....C",
+    "....BC",
+    "....AB",
+    "..AAAB",
+    "..@CCB",
+]
+ignition = 3
+score = 3.0
 
 # ----------------------------------------------------------------------
 #

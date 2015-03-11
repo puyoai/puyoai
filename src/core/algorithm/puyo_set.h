@@ -68,10 +68,7 @@ public:
         case PuyoColor::GREEN:
             green_ += n;
             break;
-        case PuyoColor::OJAMA:
-            break;
         default:
-            CHECK(false) << c;
             break;
         }
     }
@@ -104,7 +101,7 @@ public:
                 green_ -= 1;
             break;
         default:
-            CHECK(false) << c;
+            break;
         }
     }
 
