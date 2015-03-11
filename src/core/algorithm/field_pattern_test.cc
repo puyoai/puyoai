@@ -247,3 +247,61 @@ TEST(FieldPatternTest, complement6)
 
     EXPECT_TRUE(cf == expected1 || cf == expected2) << cf.toDebugString();
 }
+
+TEST(FieldPatternTest, complementWithAllow1)
+{
+    FieldPattern pattern(
+        ".ab..."
+        ".AB..."
+        "ABC..."
+        "ABC..."
+        "ABCC..");
+
+    CoreField cf(
+        "YGB..."
+        "YGB..."
+        "YGB...");
+
+    CoreField expected(
+        ".YG..."
+        "YGB..."
+        "YGB..."
+        "YGBB..");
+
+    ColumnPuyoList cpl;
+    EXPECT_TRUE(pattern.complement(cf, 1, &cpl).success);
+
+    cf.dropPuyoList(cpl);
+    EXPECT_TRUE(expected == cf);
+}
+
+TEST(FieldPatternTest, complementWithAllow2)
+{
+    FieldPattern pattern(
+        ".ab..."
+        ".AB..."
+        "ABC..."
+        "ABC..."
+        "ABCC..");
+
+    CoreField cf(
+        ".Y...."
+        ".Y...."
+        "YGB..."
+        "YGB..."
+        "YGB...");
+
+    CoreField expected(
+        ".Y...."
+        ".YG..."
+        "YGB..."
+        "YGB..."
+        "YGBB..");
+
+
+    ColumnPuyoList cpl;
+    EXPECT_TRUE(pattern.complement(cf, 1, &cpl).success);
+
+    cf.dropPuyoList(cpl);
+    EXPECT_TRUE(expected == cf);
+}

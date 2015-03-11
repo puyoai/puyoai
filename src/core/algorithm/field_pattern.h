@@ -14,7 +14,8 @@
 class PatternMatcher;
 
 enum class PatternType : std::uint8_t {
-    NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR, ALLOW_FILLING_OJAMA, WALL
+    NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR,
+    ALLOW_FILLING_OJAMA, ALLOW_FILLING_IRON, WALL
 };
 
 struct ComplementResult {

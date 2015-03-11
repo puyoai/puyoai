@@ -233,6 +233,18 @@ bool FieldPattern::complementInternal(const CoreField& field,
                 continue;
             }
 
+            if (type(x, y) == PatternType::ALLOW_FILLING_IRON) {
+                if (field.color(x, y) != PuyoColor::EMPTY)
+                    continue;
+                if (!cpl->add(x, PuyoColor::IRON))
+                    return false;
+                ++currentHeights[x];
+                continue;
+            }
+
+            if (type(x, y) == PatternType::ALLOW_VAR)
+                continue;
+
             if (!(type(x, y) == PatternType::VAR || type(x, y) == PatternType::MUST_VAR)) {
                 if (field.color(x, y) == PuyoColor::EMPTY) {
                     return false;
@@ -300,6 +312,13 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
         scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
+    case PatternType::ALLOW_FILLING_IRON:
+        CHECK_EQ(variable, '&');
+        types_[x][y] = t;
+        vars_[x][y] = '&';
+        scores_[x][y] = score;
+        heights_[x] = std::max(height(x), y);
+        break;
     default:
         CHECK(false);
     }
@@ -316,6 +335,8 @@ PatternType FieldPattern::inferType(char c, PatternType typeForLowerCase)
         return PatternType::MUST_EMPTY;
     if (c == '@')
         return PatternType::ALLOW_FILLING_OJAMA;
+    if (c == '&')
+        return PatternType::ALLOW_FILLING_IRON;
     if ('A' <= c && c <= 'Z')
         return PatternType::VAR;
     if ('a' <= c && c <= 'z')
