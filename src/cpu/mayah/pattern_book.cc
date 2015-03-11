@@ -201,7 +201,7 @@ void PatternBook::iteratePossibleRensas(const CoreField& originalField,
         if (pbf.numVariables() > 0) {
             int count = 0;
             for (const auto& cp : cpl) {
-                if (cp.color != PuyoColor::OJAMA)
+                if (isNormalColor(cp.color))
                     ++count;
             }
             double d = pbf.numVariables() - count;
@@ -352,7 +352,7 @@ void PatternBook::iteratePossibleRensasInternal(const CoreField& original,
         if (pbf.numVariables() > 0) {
             int count = 0;
             for (const auto& cp : cpl) {
-                if (cp.color != PuyoColor::OJAMA)
+                if (isNormalColor(cp.color))
                     ++count;
             }
             double d = pbf.numVariables() - count;
