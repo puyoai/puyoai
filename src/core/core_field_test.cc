@@ -24,7 +24,7 @@ TEST(CoreFieldTest, Initial)
 
 TEST(CoreFieldTest, Color)
 {
-    CoreField f("444000");
+    CoreField f("RRR   ");
 
     EXPECT_EQ(PuyoColor::WALL, f.color(0, 1));
     EXPECT_EQ(PuyoColor::RED, f.color(1, 1));
@@ -38,10 +38,10 @@ TEST(CoreFieldTest, Color)
 
 TEST(CoreFieldTest, ForceDrop)
 {
-    CoreField f("544555"
-                "000000"
-                "464646"
-                "000000");
+    CoreField f("BRRBBB"
+                "      "
+                "RYRYRY"
+                "      ");
 
     f.forceDrop();
 
@@ -137,6 +137,21 @@ TEST(CoreFieldTest, FramesTest) {
                   FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[1] + FRAMES_GROUNDING,
                   rensaResult.frames);
     }
+}
+
+TEST(CoreFieldTest, vanishWithIron)
+{
+    CoreField cf(
+        ".@@.&&"
+        "RRRR&&");
+
+    CoreField expected(
+        "....&&"
+        "....&&");
+
+    cf.simulate();
+
+    EXPECT_EQ(expected, cf) << cf.toDebugString();
 }
 
 TEST(CoreFieldTest, Height)
