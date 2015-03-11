@@ -646,7 +646,9 @@ vector<Position> CoreField::erasingPuyoPositions(const SimulationContext& contex
                     << x << ' ' << y << ' ' << toChar(color(x, y)) << '\n'
                     << toDebugString();
 
-                if (checked.get(x, y) || color(x, y) == PuyoColor::OJAMA)
+                if (checked.get(x, y))
+                    continue;
+                if (!isNormalColor(color(x, y)))
                     continue;
 
                 PuyoColor c = color(x, y);
