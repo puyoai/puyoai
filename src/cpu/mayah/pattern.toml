@@ -1307,7 +1307,7 @@ ignition = 1
 score = 8.0
 
 # ----------------------------------------------------------------------
-# FUKIGENGTR-TAIL-1
+# FUKIGENGTR-TAIL-2
 
 [[pattern]]
 field = [
@@ -1318,6 +1318,15 @@ field = [
 ]
 ignition = 3
 score = 4.0
+
+[[pattern]]
+field = [
+    "...BCC",
+    "..AABB",
+    ".AACBC",
+]
+ignition = 3
+score = 8.0
 
 # ----------------------------------------------------------------------
 # ZABUTONL-CORE
