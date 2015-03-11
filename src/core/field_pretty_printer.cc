@@ -23,6 +23,7 @@ constexpr int ordinal(CellType c) { return static_cast<int>(c); }
 const char* const EMPTY_STR[] = { " ", "  ", "  " };
 const char* const WALL_STR[] = { "#", "# ", "##" };
 const char* const OJAMA_STR[] = { "@", "@ ", "@@" };
+const char* const IRON_STR[] = { "&", "& ", "&&" };
 const char* const RED_STR[] = { "R", "R ", "\x1b[41m  \x1b[49m" };
 const char* const BLUE_STR[] = { "B", "B ", "\x1b[44m  \x1b[49m" };
 const char* const GREEN_STR[] = { "G", "G ", "\x1b[42m  \x1b[49m" };
@@ -37,6 +38,8 @@ const char* toPuyoString(PuyoColor c, CellType cellType)
         return WALL_STR[ordinal(cellType)];
     case PuyoColor::OJAMA:
         return OJAMA_STR[ordinal(cellType)];
+    case PuyoColor::IRON:
+        return IRON_STR[ordinal(cellType)];
     case PuyoColor::RED:
         return RED_STR[ordinal(cellType)];
     case PuyoColor::BLUE:
