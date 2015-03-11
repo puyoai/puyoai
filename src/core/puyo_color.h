@@ -10,6 +10,7 @@ enum class PuyoColor : uint8_t {
     EMPTY = 0,
     OJAMA = 1,
     WALL = 2,
+    IRON = 3,
     RED = 4,
     BLUE = 5,
     YELLOW = 6,
