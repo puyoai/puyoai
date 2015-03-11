@@ -15,6 +15,9 @@ PuyoColor toPuyoColor(char c)
     case '2':
     case '#':
         return PuyoColor::WALL;
+    case '3':
+    case '&':
+        return PuyoColor::IRON;
     case '4':
     case 'R':
     case 'r':
@@ -51,6 +54,7 @@ char toChar(PuyoColor c, char charIfEmpty)
     case PuyoColor::EMPTY: return charIfEmpty;
     case PuyoColor::OJAMA: return '@';
     case PuyoColor::WALL: return '#';
+    case PuyoColor::IRON: return '&';
     case PuyoColor::RED: return 'R';
     case PuyoColor::BLUE: return 'B';
     case PuyoColor::YELLOW: return 'Y';
@@ -66,6 +70,7 @@ std::string toString(PuyoColor c)
     case PuyoColor::EMPTY: return "";
     case PuyoColor::OJAMA: return "";
     case PuyoColor::WALL: return "";
+    case PuyoColor::IRON: return "鉄";
     case PuyoColor::RED: return "赤";
     case PuyoColor::BLUE: return "青";
     case PuyoColor::YELLOW: return "黄";

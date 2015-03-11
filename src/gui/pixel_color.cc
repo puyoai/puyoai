@@ -9,6 +9,8 @@ Uint32 toPixelColor(SDL_Surface* surface, PuyoColor pc)
         return SDL_MapRGB(surface->format, 127, 127, 127);
     case PuyoColor::WALL:
         return SDL_MapRGB(surface->format, 255, 255, 255);
+    case PuyoColor::IRON:
+        return SDL_MapRGB(surface->format, 255, 255, 255);
     case PuyoColor::RED:
         return SDL_MapRGB(surface->format, 255,   0,   0);
     case PuyoColor::BLUE:
