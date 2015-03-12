@@ -97,6 +97,7 @@ field = [
     ".A...."
 ]
 AAAC = [1, 2]
+AABC = [1, 2]
 ABAA = [3, 0]
 ABAB = [3, 0]
 ABAC = [1, 0]
@@ -218,6 +219,7 @@ field = [
     "AA...."
 ]
 ACBC = [2, 3]
+BBBC = [3, 1]
 
 [[book]]
 field = [
