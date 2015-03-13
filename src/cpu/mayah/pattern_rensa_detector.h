@@ -8,8 +8,6 @@
 
 class PatternRensaDetector {
 public:
-    explicit PatternRensaDetector(const PatternBook& patternBook) : patternBook_(patternBook) {}
-
     typedef std::function<void (const CoreField&,
                                 const RensaResult&,
                                 const ColumnPuyoList& keyPuyos,
@@ -17,34 +15,41 @@ public:
                                 const RensaTrackResult&,
                                 double patternScore)> Callback;
 
-    void iteratePossibleRensas(const CoreField&,
-                               const std::vector<int>& matchableIds,
-                               int maxIteration,
-                               const Callback&) const;
+    PatternRensaDetector(const PatternBook& patternBook,
+                         const CoreField& originalField,
+                         const Callback& callback) :
+        patternBook_(patternBook),
+        originalField_(originalField),
+        callback_(callback),
+        originalContext_(CoreField::SimulationContext::fromField(originalField)),
+        strategy_(RensaDetectorStrategy(RensaDetectorStrategy::Mode::DROP, 2, 2, false))
+    {
+    }
+
+    void iteratePossibleRensas(const std::vector<int>& matchableIds,
+                               int maxIteration) const;;
 
 private:
-    void iteratePossibleRensasInternal(const CoreField& originalField,
-                                       const RensaDetectorStrategy&,
-                                       int currentChains,
-                                       const CoreField& currentField,
+    void iteratePossibleRensasInternal(const CoreField& currentField,
                                        const CoreField::SimulationContext& currentFieldContext,
+                                       int currentChains,
                                        const ColumnPuyo& firePuyo,
                                        const ColumnPuyoList& keyPuyos,
                                        int restIteration,
                                        int restUnusedVariables,
-                                       double sumPatternScore,
-                                       const Callback& callback) const;
+                                       double sumPatternScore) const;
 
-    bool checkRensa(const CoreField& originalField,
-                    const RensaDetectorStrategy&,
-                    int currentChains,
+    bool checkRensa(int currentChains,
                     const ColumnPuyo& firePuyo,
                     const ColumnPuyoList& keyPuyos,
                     double sumPatternScore,
-                    bool prohibits[FieldConstant::MAP_WIDTH],
-                    const Callback& callback) const;
+                    bool prohibits[FieldConstant::MAP_WIDTH]) const;
 
     const PatternBook& patternBook_;
+    const CoreField& originalField_;
+    const Callback& callback_;
+    const CoreField::SimulationContext originalContext_;
+    const RensaDetectorStrategy strategy_;
 };
 
 #endif

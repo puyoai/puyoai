@@ -653,7 +653,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                         const RensaTrackResult& trackResult, double patternScore) {
         evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, patternScore, trackResult);
     };
-    PatternRensaDetector(patternBook()).iteratePossibleRensas(fieldBeforeRensa, preEvalResult.matchablePatternIds(), maxIteration, callback);
+    PatternRensaDetector detector(patternBook(), fieldBeforeRensa, callback);
+    detector.iteratePossibleRensas(preEvalResult.matchablePatternIds(), maxIteration);
 
     if (sideChainMaxScore >= scoreForOjama(21)) {
         sc_->addScore(HOLDING_SIDE_CHAIN_LARGE, 1);

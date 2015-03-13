@@ -125,7 +125,7 @@ TEST(PatternBookTest, pattern1)
         }
     };
 
-    PatternRensaDetector(patternBook).iteratePossibleRensas(field, {0}, 1, callback);
+    PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0}, 1);
     EXPECT_TRUE(found);
 }
 
@@ -166,7 +166,7 @@ TEST(PatternBookTest, pattern1_complement)
         }
     };
 
-    PatternRensaDetector(patternBook).iteratePossibleRensas(field, {0}, 1, callback);
+    PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0}, 1);
     EXPECT_TRUE(found);
 }
 
@@ -202,7 +202,7 @@ TEST(PatternBookTest, pattern2)
             found = true;
     };
 
-    PatternRensaDetector(patternBook).iteratePossibleRensas(field, {0, 1}, 2, callback);
+    PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0, 1}, 2);
     EXPECT_TRUE(found);
 }
 
@@ -240,7 +240,7 @@ TEST(PatternBookTest, pattern3)
             found = true;
     };
 
-    PatternRensaDetector(patternBook).iteratePossibleRensas(field, {0, 1}, 2, callback);
+    PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0, 1}, 2);
     EXPECT_TRUE(found);
 }
 
@@ -283,6 +283,6 @@ TEST(PatternBookTest, pattern4)
             found = true;
     };
 
-    PatternRensaDetector(patternBook).iteratePossibleRensas(field, {0, 1, 2}, 3, callback);
+    PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0, 1, 2}, 3);
     EXPECT_TRUE(found);
 }
