@@ -582,6 +582,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     ColumnPuyoList maxRensaKeyPuyos;
     ColumnPuyoList maxRensaFirePuyos;
     std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
+    int rensaCounts[20] {};
+    int maxScoreChains = 0;
     auto evalCallback = [&](const CoreField& fieldBeforeRensa,
                             const CoreField& fieldAfterRensa,
                             const RensaResult& rensaResult,
@@ -589,6 +591,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                             const ColumnPuyoList& firePuyos,
                             double patternScore,
                             const RensaTrackResult& trackResult) {
+        ++rensaCounts[rensaResult.chains];
+
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
         RensaEvaluator<ScoreCollector> rensaEvaluator(patternBook(), rensaScoreCollector.get());
 
@@ -628,6 +632,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
             maxRensaScoreCollector = move(rensaScoreCollector);
             maxRensaKeyPuyos = keyPuyos;
             maxRensaFirePuyos = firePuyos;
+            maxScoreChains = rensaResult.chains;
         }
 
         const double rensaScore = rensaResult.score;
@@ -656,6 +661,11 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     } else if (sideChainMaxScore >= scoreForOjama(12)) {
         sc_->addScore(HOLDING_SIDE_CHAIN_SMALL, 1);
     }
+
+    int rensaKind = 0;
+    for (int i = maxScoreChains; i < 20; ++i)
+        rensaKind += rensaCounts[i];
+    sc_->addScore(RENSA_KIND, rensaKind);
 
     if (maxRensaScoreCollector.get()) {
         sc_->merge(*maxRensaScoreCollector);
