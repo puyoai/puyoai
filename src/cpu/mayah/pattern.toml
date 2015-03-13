@@ -222,6 +222,19 @@ score = 8.0
 
 [[pattern]]
 field = [
+    "......",
+    "CBA...",
+    "BAA...",
+    "BBA...",
+    "C.....",
+    "CC....",
+    "......",
+]
+ignition = 3
+score = 8.0
+
+[[pattern]]
+field = [
     "A.....",
     "AB....",
     "AA....",
