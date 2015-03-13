@@ -23,6 +23,7 @@
 
 #include "evaluation_parameter.h"
 #include "gazer.h"
+#include "pattern_rensa_detector.h"
 
 using namespace std;
 
@@ -652,7 +653,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                         const RensaTrackResult& trackResult, double patternScore) {
         evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, patternScore, trackResult);
     };
-    patternBook().iteratePossibleRensas(fieldBeforeRensa, preEvalResult.matchablePatternIds(), maxIteration, callback);
+    PatternRensaDetector(patternBook()).iteratePossibleRensas(fieldBeforeRensa, preEvalResult.matchablePatternIds(), maxIteration, callback);
 
     if (sideChainMaxScore >= scoreForOjama(21)) {
         sc_->addScore(HOLDING_SIDE_CHAIN_LARGE, 1);
