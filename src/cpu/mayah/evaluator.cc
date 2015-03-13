@@ -30,7 +30,6 @@ namespace {
 
 const bool USE_CONNECTION_FEATURE = true;
 const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
-const bool USE_HAND_WIDTH_FEATURE = true;
 const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
 const bool USE_IGNITION_HEIGHT_FEATURE = true;
 const bool USE_FIELD_USHAPE_FEATURE = true;
@@ -419,94 +418,6 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& re
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaHandWidthFeature(const CoreField& field,
-                                                               const RensaTrackResult& trackResult)
-{
-    static const int dx[4] = { 0,  0, 1, -1 };
-    static const int dy[4] = { 1, -1, 0,  0 };
-
-    int distanceCount[5] {};
-    int distance[CoreField::MAP_WIDTH][CoreField::MAP_HEIGHT] {};
-
-    // TODO(mayah): Using std::queue is 2x slower here.
-    Position q[CoreField::MAP_WIDTH * CoreField::MAP_HEIGHT];
-    Position* qHead = q;
-    Position* qTail = q;
-
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        int h = field.height(x);
-        for (int y = 1; y <= h; ++y) {
-            DCHECK(field.color(x, y) != PuyoColor::EMPTY);
-            if (trackResult.erasedAt(x, y) != 1)
-                continue;
-            if (field.color(x, y + 1) == PuyoColor::EMPTY && trackResult.erasedAt(x, y + 1) == 0)
-                continue;
-
-            distanceCount[1]++;
-            distance[x][y] = 1;
-            *qTail++ = Position(x, y);
-            break;
-        }
-    }
-
-    while (qHead != qTail) {
-        const int x = qHead->x;
-        const int y = qHead->y;
-        qHead++;
-
-        for (int i = 0; i < 4; ++i) {
-            const int xx = x + dx[i];
-            const int yy = y + dy[i];
-
-            if (field.color(xx, yy) == PuyoColor::EMPTY)
-                continue;
-            if (trackResult.erasedAt(xx, yy) != 1)
-                continue;
-            if (distance[xx][yy] != 0)
-                continue;
-
-            *qTail++ = Position(xx, yy);
-            distanceCount[1]++;
-            distance[xx][yy] = 1;
-        }
-    }
-
-    qHead = q;
-
-    while (qHead != qTail) {
-        const int x = qHead->x;
-        const int y = qHead->y;
-        qHead++;
-
-        int d = distance[x][y] + 1;
-
-        for (int i = 0; i < 4; ++i) {
-            const int xx = x + dx[i];
-            const int yy = y + dy[i];
-
-            if (distance[xx][yy] != 0)
-                continue;
-            if (field.color(xx, yy) != PuyoColor::EMPTY)
-                continue;
-            if (trackResult.erasedAt(xx, yy) >= 2)
-                continue;
-
-            distance[xx][yy] = d;
-            distanceCount[d]++;
-            if (d <= 3)
-                *qTail++ = Position(xx, yy);
-        }
-    }
-
-    if (distanceCount[2] > 0)
-        sc_->addScore(HAND_WIDTH_2, distanceCount[2] > 10 ? 10 : distanceCount[2], 1);
-    if (distanceCount[3] > 0)
-        sc_->addScore(HAND_WIDTH_3, distanceCount[3] > 10 ? 10 : distanceCount[3], 1);
-    if (distanceCount[4] > 0)
-        sc_->addScore(HAND_WIDTH_4, distanceCount[4] > 10 ? 10 : distanceCount[4], 1);
-}
-
-template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const RefPlan& plan, const RensaTrackResult& trackResult)
 {
     const CoreField& field = plan.field();
@@ -702,8 +613,6 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
         rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyos);
         rensaEvaluator.collectScoreForRensaGarbage(fieldAfterRensa);
-        if (USE_HAND_WIDTH_FEATURE)
-            rensaEvaluator.evalRensaHandWidthFeature(fieldBeforeRensa, trackResult);
         if (USE_FIRE_POINT_TABOO_FEATURE)
             rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
         if (USE_IGNITION_HEIGHT_FEATURE)
