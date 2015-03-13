@@ -209,6 +209,19 @@ score = 8.0
 
 [[pattern]]
 field = [
+    "......",
+    "CBA...",
+    "BAA...",
+    "BBA...",
+    "C.....",
+    "CC....",
+    "......",
+]
+ignition = 3
+score = 8.0
+
+[[pattern]]
+field = [
     "A.....",
     "AB....",
     "AA....",
@@ -737,6 +750,46 @@ field = [
 ]
 name = "NEWGTR"
 score = 8.0
+ignition = 2
+
+[[pattern]]
+field = [
+    ".AB.C.",
+    "AAABB.",
+    "BBBCCC",
+]
+name = "NEWGTR"
+score = 6.0
+ignition = 2
+
+[[pattern]]
+field = [
+    "A.B.C.",
+    "AAABB.",
+    "BBBCCC",
+]
+name = "NEWGTR"
+score = 6.0
+ignition = 2
+
+[[pattern]]
+field = [
+    ".AB.C.",
+    "AAABBB",
+    "BBBCCC",
+]
+name = "NEWGTR"
+score = 6.0
+ignition = 2
+
+[[pattern]]
+field = [
+    "A.B.C.",
+    "AAABBB",
+    "BBBCCC",
+]
+name = "NEWGTR"
+score = 6.0
 ignition = 2
 
 # ----------------------------------------------------------------------
@@ -1316,6 +1369,24 @@ field = [
 ]
 ignition = 1
 score = 8.0
+
+[[pattern]]
+field = [
+    "..B.C.",
+    "AAABB.",
+    "ABBCCC",
+]
+ignition = 1
+score = 6.0
+
+[[pattern]]
+field = [
+    "..B.C.",
+    "AAABBB",
+    "ABBCCC",
+]
+ignition = 1
+score = 6.0
 
 # ----------------------------------------------------------------------
 # FUKIGENGTR-TAIL-2
