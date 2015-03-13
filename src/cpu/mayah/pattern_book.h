@@ -68,43 +68,10 @@ public:
     // Note that ignitionPositions must be sorted.
     std::pair<IndexIterator, IndexIterator> find(const std::vector<Position>& ignitionPositions) const;
 
-    typedef std::function<void (const CoreField&,
-                                const RensaResult&,
-                                const ColumnPuyoList& keyPuyos,
-                                const ColumnPuyoList& firePuyos,
-                                const RensaTrackResult&,
-                                double patternScore)> Callback;
-
-    void iteratePossibleRensas(const CoreField&,
-                               const std::vector<int>& matchableIds,
-                               int maxIteration,
-                               const Callback&) const;
-
     size_t size() const { return fields_.size(); }
     const PatternBookField& patternBookField(int i) const { return fields_[i]; }
 
 private:
-    void iteratePossibleRensasInternal(const CoreField& originalField,
-                                       const RensaDetectorStrategy&,
-                                       int currentChains,
-                                       const CoreField& currentField,
-                                       const CoreField::SimulationContext& currentFieldContext,
-                                       const ColumnPuyo& firePuyo,
-                                       const ColumnPuyoList& keyPuyos,
-                                       int restIteration,
-                                       int restUnusedVariables,
-                                       double sumPatternScore,
-                                       const Callback& callback) const;
-
-    bool checkRensa(const CoreField& originalField,
-                    const RensaDetectorStrategy&,
-                    int currentChains,
-                    const ColumnPuyo& firePuyo,
-                    const ColumnPuyoList& keyPuyos,
-                    double sumPatternScore,
-                    bool prohibits[FieldConstant::MAP_WIDTH],
-                    const Callback& callback) const;
-
     std::vector<PatternBookField> fields_;
     IndexMap index_;
 };
