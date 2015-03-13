@@ -102,7 +102,6 @@ public:
     void evalRensaScore(double score, double virtualScore);
     void evalRensaChainFeature(const RensaResult&, const PuyoSet&);
     void collectScoreForRensaGarbage(const CoreField& fieldAfterRensa);
-    void evalRensaHandWidthFeature(const CoreField&, const RensaTrackResult&);
     void evalFirePointTabooFeature(const RefPlan&, const RensaTrackResult&);
     void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaTrackResult&, bool enemyHasZenkeshi);
     void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
