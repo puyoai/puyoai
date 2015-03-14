@@ -69,7 +69,8 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
             ratio = d / pbf.numVariables();
         }
         iteratePossibleRensasInternal(cf, context, 1, firePuyo, keyPuyos,
-                                      maxIteration - 1, restUnusedVariables, pbf.score() * ratio);
+                                      maxIteration - 1, restUnusedVariables,
+                                      pbf.name(), pbf.score() * ratio);
     }
 
     // --- Iterate without complementing.
@@ -92,7 +93,7 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         }
 
         iteratePossibleRensasInternal(*cf, originalContext_, 0,
-                                      firePuyo, keyPuyos, maxIteration - 1, 0, 0);
+                                      firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0);
 
     };
 
@@ -107,12 +108,13 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
                                                          const ColumnPuyoList& originalKeyPuyos,
                                                          int restIteration,
                                                          int restUnusedVariables,
+                                                         const std::string& patternName,
                                                          double patternScore) const
 {
     // if currentField does not erase anything...
     if (!currentField.rensaWillOccurWithContext(currentFieldContext)) {
         bool prohibits[FieldConstant::MAP_WIDTH] {};
-        if (!checkRensa(currentChains, firePuyo, originalKeyPuyos, patternScore, prohibits))
+        if (!checkRensa(currentChains, firePuyo, originalKeyPuyos, patternScore, patternName, prohibits))
             return;
         if (restIteration <= 0)
             return;
@@ -139,7 +141,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
 
             iteratePossibleRensasInternal(*cf, context, currentChains + 1,
                                           firePuyo, keyPuyos, restIteration - 1, restUnusedVariables,
-                                          patternScore);
+                                          patternName, patternScore);
         };
 
         RensaDetector::detect(currentField, strategy_, PurposeForFindingRensa::FOR_KEY, prohibits, detectCallback);
@@ -172,6 +174,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
 
             iteratePossibleRensasInternal(cf, context, currentChains + 1, firePuyo, originalKeyPuyos,
                                           restIteration, restUnusedVariables,
+                                          patternName.empty() ? pbf.name() : patternName,
                                           patternScore + pbf.score());
             continue;
         }
@@ -218,6 +221,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         iteratePossibleRensasInternal(cf, context, currentChains + 1, firePuyo, keyPuyos,
                                       restIteration - 1,
                                       restUnusedVariables - complementResult.numFilledUnusedVariables,
+                                      patternName.empty() ? pbf.name() : patternName,
                                       patternScore + pbf.score() * ratio);
     }
 
@@ -229,7 +233,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         CHECK(score > 0) << score;
 
         iteratePossibleRensasInternal(cf, context, currentChains + 1, firePuyo, originalKeyPuyos,
-                                      restIteration, restUnusedVariables, patternScore);
+                                      restIteration, restUnusedVariables, patternName, patternScore);
     }
 
 }
@@ -238,6 +242,7 @@ bool PatternRensaDetector::checkRensa(int currentChains,
                                       const ColumnPuyo& firePuyo,
                                       const ColumnPuyoList& keyPuyos,
                                       double patternScore,
+                                      const std::string& patternName,
                                       bool prohibits[FieldConstant::MAP_WIDTH]) const
 {
     CoreField cf(originalField_);
@@ -270,7 +275,7 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     if (!firePuyos.add(firePuyo))
         return false;
 
-    callback_(cf, rensaResult, keyPuyos, firePuyos, trackResult, patternScore);
+    callback_(cf, rensaResult, keyPuyos, firePuyos, trackResult, patternName, patternScore);
 
     RensaDetector::makeProhibitArray(rensaResult, trackResult, originalField_,
                                      firePuyos, prohibits);

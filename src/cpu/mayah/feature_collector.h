@@ -91,6 +91,9 @@ public:
     void merge(const FeatureCollector& fc)
     {
         score_ += fc.score();
+        if (bookName_.empty())
+            bookName_ = fc.bookName();
+
         for (const auto& entry : fc.collectedFeatures_) {
             collectedFeatures_[entry.first] = entry.second;
         }
