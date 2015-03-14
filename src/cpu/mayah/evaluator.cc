@@ -563,11 +563,14 @@ void Evaluator::collectScore(const RefPlan& plan, const CoreField& currentField,
                             const ColumnPuyoList& keyPuyos,
                             const ColumnPuyoList& firePuyos,
                             double patternScore,
+                            const string& patternName,
                             const RensaTrackResult& trackResult) {
         ++rensaCounts[rensaResult.chains];
 
         std::unique_ptr<FeatureCollector> rensaScoreCollector(new FeatureCollector(fc_->evaluationParameter()));
         RensaEvaluator rensaEvaluator(patternBook(), rensaScoreCollector.get());
+
+        rensaScoreCollector->setBookName(patternName);
 
         CoreField complementedField(fieldBeforeRensa);
         for (const auto& cp : keyPuyos)
@@ -622,8 +625,8 @@ void Evaluator::collectScore(const RefPlan& plan, const CoreField& currentField,
 
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult& trackResult, double patternScore) {
-        evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, patternScore, trackResult);
+                        const RensaTrackResult& trackResult, const string& patternName, double patternScore) {
+        evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, patternScore, patternName, trackResult);
     };
     PatternRensaDetector detector(patternBook(), fieldBeforeRensa, callback);
     detector.iteratePossibleRensas(preEvalResult.matchablePatternIds(), maxIteration);

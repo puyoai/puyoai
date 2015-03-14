@@ -14,6 +14,7 @@ field = [
 ]
 ignition = 1
 score = 72
+name = "GTR"
 )";
 
 static const char TEST_BOOK2[] = R"(
@@ -26,6 +27,7 @@ field = [
     "CCC@..",
 ]
 ignition = 1
+name = "NEWGTR"
 
 [[pattern]]
 field = [
@@ -112,16 +114,16 @@ TEST(PatternBookTest, pattern1)
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
                         const RensaTrackResult&,
+                        const std::string& patternName,
                         int patternScore) {
         CoreField cf(field);
-        for (const auto& cp : keyPuyos)
-            cf.dropPuyoOn(cp.x, cp.color);
-        for (const auto& cp : firePuyos)
-            cf.dropPuyoOn(cp.x, cp.color);
+        cf.dropPuyoList(keyPuyos);
+        cf.dropPuyoList(firePuyos);
 
         if (expected == cf) {
             found = true;
             EXPECT_EQ(72.0 * (6.0 / 12.0), patternScore);
+            EXPECT_EQ("GTR", patternName);
         }
     };
 
@@ -153,16 +155,16 @@ TEST(PatternBookTest, pattern1_complement)
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
                         const RensaTrackResult&,
+                        const std::string& patternName,
                         int patternScore) {
         CoreField cf(field);
-        for (const auto& cp : keyPuyos)
-            cf.dropPuyoOn(cp.x, cp.color);
-        for (const auto& cp : firePuyos)
-            cf.dropPuyoOn(cp.x, cp.color);
+        cf.dropPuyoList(keyPuyos);
+        cf.dropPuyoList(firePuyos);
 
         if (cf == expected1 || cf == expected2) {
             found = true;
             EXPECT_EQ(72.0 * (5.0 / 12.0), patternScore);
+            EXPECT_EQ("GTR", patternName);
         }
     };
 
@@ -191,15 +193,16 @@ TEST(PatternBookTest, pattern2)
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
                         const RensaTrackResult&,
+                        const std::string& patternName,
                         int /*patternScore*/) {
         CoreField cf(field);
-        for (const auto& cp : keyPuyos)
-            cf.dropPuyoOn(cp.x, cp.color);
-        for (const auto& cp : firePuyos)
-            cf.dropPuyoOn(cp.x, cp.color);
+        cf.dropPuyoList(keyPuyos);
+        cf.dropPuyoList(firePuyos);
 
-        if (expected == cf)
+        if (expected == cf) {
             found = true;
+            EXPECT_EQ("NEWGTR", patternName);
+        }
     };
 
     PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0, 1}, 2);
@@ -229,6 +232,7 @@ TEST(PatternBookTest, pattern3)
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
                         const RensaTrackResult&,
+                        const std::string&,
                         int /*patternScore*/) {
         CoreField cf(field);
         for (const auto& cp : keyPuyos)
@@ -274,6 +278,7 @@ TEST(PatternBookTest, pattern4)
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
                         const RensaTrackResult&,
+                        const std::string&,
                         int /*patternScore*/) {
         CoreField cf(field);
         ASSERT_TRUE(cf.dropPuyoList(keyPuyos));
