@@ -70,56 +70,27 @@ private:
     ColumnPuyoList rensaFirePuyos_;
 };
 
-// This collector collects score and bookname.
-class NormalScoreCollector {
-public:
-    explicit NormalScoreCollector(const EvaluationParameter& param) : param_(param) {}
-
-    void addScore(EvaluationFeatureKey key, double v) { score_ += param_.score(key, v); }
-    void addScore(EvaluationSparseFeatureKey key, int idx, int n) { score_ += param_.score(key, idx, n); }
-    void merge(const NormalScoreCollector& sc) { score_ += sc.score(); }
-
-    void setBookName(const std::string& bookName) { bookName_ = bookName; }
-    std::string bookName() const { return bookName_; }
-
-    double score() const { return score_; }
-    const EvaluationParameter& evaluationParameter() const { return param_; }
-
-    void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
-    int estimatedRensaScore() const { return estimatedRensaScore_; }
-
-    void setRensaKeyPuyos(const ColumnPuyoList&) {}
-    void setRensaFirePuyos(const ColumnPuyoList&) {}
-
-private:
-    const EvaluationParameter& param_;
-    double score_ = 0.0;
-    int estimatedRensaScore_ = 0;
-    std::string bookName_;
-};
-
 // This collector collects all features.
 class FeatureCollector {
 public:
-    FeatureCollector(const EvaluationParameter& param) : collector_(param) {}
+    FeatureCollector(const EvaluationParameter& param) : param_(param) {}
 
     void addScore(EvaluationFeatureKey key, double v)
     {
-        collector_.addScore(key, v);
+        score_ += param_.score(key, v);
         collectedFeatures_[key] += v;
     }
 
     void addScore(EvaluationSparseFeatureKey key, int idx, int n)
     {
-        collector_.addScore(key, idx, n);
+        score_ += param_.score(key, idx, n);
         for (int i = 0; i < n; ++i)
             collectedSparseFeatures_[key].push_back(idx);
     }
 
     void merge(const FeatureCollector& fc)
     {
-        collector_.merge(fc.collector_);
-
+        score_ += fc.score();
         for (const auto& entry : fc.collectedFeatures_) {
             collectedFeatures_[entry.first] = entry.second;
         }
@@ -131,14 +102,14 @@ public:
         }
     }
 
-    void setBookName(const std::string& bookName) { collector_.setBookName(bookName); }
-    std::string bookName() const { return collector_.bookName(); }
+    void setBookName(const std::string& bookName) { bookName_ = bookName; }
+    std::string bookName() const { return bookName_; }
 
-    double score() const { return collector_.score(); }
-    const EvaluationParameter& evaluationParameter() const { return collector_.evaluationParameter(); }
+    double score() const { return score_; }
+    const EvaluationParameter& evaluationParameter() const { return param_; }
 
-    void setEstimatedRensaScore(int s) { collector_.setEstimatedRensaScore(s); }
-    int estimatedRensaScore() const { return collector_.estimatedRensaScore(); }
+    void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
+    int estimatedRensaScore() const { return estimatedRensaScore_; }
 
     void setRensaKeyPuyos(const ColumnPuyoList& cpl) { rensaKeyPuyos_ = cpl; }
     void setRensaFirePuyos(const ColumnPuyoList& cpl) { rensaFirePuyos_ = cpl; }
@@ -155,7 +126,11 @@ public:
     }
 
 private:
-    NormalScoreCollector collector_;
+    const EvaluationParameter& param_;
+    double score_ = 0.0;
+    int estimatedRensaScore_ = 0;
+    std::string bookName_;
+
     std::map<EvaluationFeatureKey, double> collectedFeatures_;
     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures_;
     ColumnPuyoList rensaKeyPuyos_;
