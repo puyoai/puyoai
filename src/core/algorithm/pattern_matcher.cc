@@ -34,6 +34,8 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
 
             if (pattern.type(x, y) == PatternType::ALLOW_FILLING_OJAMA)
                 continue;
+            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_IRON)
+                continue;
 
             if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
                 continue;
@@ -72,7 +74,8 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
                 continue;
             if (pattern.type(x, y) == PatternType::ALLOW_FILLING_OJAMA)
                 continue;
-
+            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_IRON)
+                continue;
             if (pattern.type(x, y) == PatternType::ALLOW_VAR) {
                 char uv = std::toupper(pattern.variable(x, y));
                 if (isSet(uv) && map(uv) == cf.color(x, y)) {
@@ -148,7 +151,7 @@ bool PatternMatcher::checkCell(char currentVar, PatternType neighborType, char n
     if (currentVar == neighborVar)
         return true;
 
-    if (neighborType == PatternType::NONE || neighborType == PatternType::ALLOW_FILLING_OJAMA) {
+    if (neighborType == PatternType::NONE || neighborType == PatternType::ALLOW_FILLING_OJAMA || neighborType == PatternType::ALLOW_FILLING_IRON) {
         if (map(currentVar) == neighborColor)
             return false;
     } else if (neighborType == PatternType::ALLOW_VAR) {
