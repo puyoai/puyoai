@@ -325,6 +325,7 @@ std::string MayahAI::makeMessageFrom(EvaluationMode mode,
     CollectedFeature cf = evalWithCollectingFeature(mode, refPlan, field, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     stringstream ss;
+    ss << "MODE = " << toString(mode) << " / ";
     if (cf.feature(STRATEGY_ZENKESHI) > 0 || cf.feature(STRATEGY_INITIAL_ZENKESHI) > 0)
         ss << "ZENKESHI / ";
     if (cf.feature(STRATEGY_KILL) > 0)
@@ -363,7 +364,9 @@ std::string MayahAI::makeMessageFrom(EvaluationMode mode,
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
 
-    ss << "R/V SCORE=" << rensaScore << "/" << virtualRensaScore << " / ";
+    ss << "R/V SCORE=" << rensaScore << "/" << virtualRensaScore;
+
+    ss << ",";
 
     if (enemy.isRensaOngoing) {
         ss << "Gazed ongoing rensa : " << enemy.ongoingRensaResult.score
