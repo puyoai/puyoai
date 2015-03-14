@@ -74,13 +74,12 @@ protected:
         const PlayerState& me, const PlayerState& enemy,
         const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
 
-    std::string makeMessageFrom(EvaluationMode mode,
-                                int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration,
+    std::string makeMessageFrom(EvaluationMode mode, int frameId,
+                                const Plan&, const CollectedFeature&,
                                 const PlayerState& me, const PlayerState& enemy,
-                                const PreEvalResult&, const MidEvalResult&, const GazeResult&,
-                                const Plan& plan, double rensaScore, double virutalRensaScore,
-                                bool saturated,
-                                double thoughtTimeInSeconds) const;
+                                int maxIteration, const GazeResult& gazeResult,
+                                double rensaScore, double virutalRensaScore,
+                                bool saturated, double thoughtTimeInSeconds) const;
 
     bool saveEvaluationParameter() const;
     bool loadEvaluationParameter();
