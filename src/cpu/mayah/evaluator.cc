@@ -514,8 +514,10 @@ void Evaluator::evalMidEval(const MidEvalResult& midEvalResult)
     }
 }
 
-void Evaluator::collectScore(const RefPlan& plan, const CoreField& currentField,
-                             int currentFrameId, int maxIteration,
+void Evaluator::collectScore(const RefPlan& plan,
+                             const CoreField& currentField,
+                             int currentFrameId,
+                             int maxIteration,
                              const PlayerState& me,
                              const PlayerState& enemy,
                              const PreEvalResult& preEvalResult,
@@ -548,15 +550,19 @@ void Evaluator::collectScore(const RefPlan& plan, const CoreField& currentField,
 
     evalUnreachableSpace(fieldBeforeRensa);
 
+    const int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
+
+    struct MaxRensaScore {
+        double score = -100000000;
+        std::unique_ptr<FeatureCollector> collector;
+        ColumnPuyoList keyPuyos;
+        ColumnPuyoList firePuyos;
+        int chains;
+    } maxRensa;
+
     int sideChainMaxScore = 0;
-    int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
     int maxVirtualRensaResultScore = 0;
-    double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
-    ColumnPuyoList maxRensaKeyPuyos;
-    ColumnPuyoList maxRensaFirePuyos;
-    std::unique_ptr<FeatureCollector> maxRensaScoreCollector;
     int rensaCounts[20] {};
-    int maxScoreChains = 0;
     auto evalCallback = [&](const CoreField& fieldBeforeRensa,
                             const CoreField& fieldAfterRensa,
                             const RensaResult& rensaResult,
@@ -603,12 +609,12 @@ void Evaluator::collectScore(const RefPlan& plan, const CoreField& currentField,
         rensaEvaluator.evalComplementationBias(keyPuyos, firePuyos);
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, keyPuyos, firePuyos, currentFrameId, me, enemy);
 
-        if (rensaScoreCollector->score() > maxRensaScore) {
-            maxRensaScore = rensaScoreCollector->score();
-            maxRensaScoreCollector = move(rensaScoreCollector);
-            maxRensaKeyPuyos = keyPuyos;
-            maxRensaFirePuyos = firePuyos;
-            maxScoreChains = rensaResult.chains;
+        if (rensaScoreCollector->score() > maxRensa.score) {
+            maxRensa.score = rensaScoreCollector->score();
+            maxRensa.collector = move(rensaScoreCollector);
+            maxRensa.keyPuyos = keyPuyos;
+            maxRensa.firePuyos = firePuyos;
+            maxRensa.chains = rensaResult.chains;
         }
 
         const double rensaScore = rensaResult.score;
@@ -640,14 +646,14 @@ void Evaluator::collectScore(const RefPlan& plan, const CoreField& currentField,
     }
 
     int rensaKind = 0;
-    for (int i = maxScoreChains; i < 20; ++i)
+    for (int i = maxRensa.chains; i < 20; ++i)
         rensaKind += rensaCounts[i];
     fc_->addScore(RENSA_KIND, rensaKind);
 
-    if (maxRensaScoreCollector.get()) {
-        fc_->merge(*maxRensaScoreCollector);
-        fc_->setRensaKeyPuyos(maxRensaKeyPuyos);
-        fc_->setRensaFirePuyos(maxRensaFirePuyos);
+    if (maxRensa.collector.get()) {
+        fc_->merge(*maxRensa.collector);
+        fc_->setRensaKeyPuyos(maxRensa.keyPuyos);
+        fc_->setRensaFirePuyos(maxRensa.firePuyos);
     }
     fc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }
