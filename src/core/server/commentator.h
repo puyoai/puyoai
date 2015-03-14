@@ -6,6 +6,7 @@
 #include <queue>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -36,7 +37,7 @@ struct CommentatorResult {
     TrackedPossibleRensaInfo fireableMainChain[2];
     IgnitionRensaResult fireableTsubushiChain[2];
     TrackedPossibleRensaInfo firingChain[2];
-    std::string message[2];
+    std::vector<std::string> message[2];
 
     std::deque<std::string> events[2];
 };
@@ -81,7 +82,7 @@ private:
     mutable std::mutex mu_;
     CoreField field_[2];
     KumipuyoSeq kumipuyoSeq_[2];
-    std::string message_[2];
+    std::vector<std::string> message_[2];
 
     int frameId_[2];
     std::unique_ptr<TrackedPossibleRensaInfo> fireableMainChain_[2];

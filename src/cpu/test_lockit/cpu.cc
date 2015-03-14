@@ -123,13 +123,13 @@ FrameResponse sendmes(READ_P* p1, READ_P* /*p2*/, COMAI_HI* coo)
 {
     stringstream ss;
     ss << "you="
-       << "x-r:" << p1->te_x << p1->te_r << ","
-       << "nxt:" << count_all[4] << ","
-       << "set:" << count_all[5] << ","
-       << "end:" << count_all[6] << ","
-       << "act:" << count_all[7] << ","
-       << "a-m:" << count_all[9] << ","
-       << "ret:" << count_all[10] << ","
+       << "x-r:" << p1->te_x << p1->te_r << " "
+       << "nxt:" << count_all[4] << " "
+       << "set:" << count_all[5] << " "
+       << "end:" << count_all[6] << " "
+       << "act:" << count_all[7] << " "
+       << "a-m:" << count_all[9] << " "
+       << "ret:" << count_all[10] << " "
        << "nok:" << coo->aite_hakka_nokori;
 
     return FrameResponse(p1->id, Decision(p1->te_x, p1->te_r), ss.str());

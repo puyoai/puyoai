@@ -17,6 +17,7 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
+#include "base/strings.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/server/game_state.h"
@@ -66,7 +67,7 @@ void Commentator::onUpdate(const GameState& gameState)
         }
 
         if (!pgs.message.empty())
-            message_[i] = pgs.message;
+            message_[i] = strings::split(pgs.message, ',');
     }
 }
 
@@ -233,7 +234,8 @@ void Commentator::reset()
 {
     lock_guard<mutex> lock(mu_);
     needsUpdate_[0] = needsUpdate_[1] = false;
-    message_[0] = message_[1] = "";
+    message_[0].clear();
+    message_[1].clear();
     for (int i = 0; i < 2; i++) {
         fireableMainChain_[i].reset();
         fireableTsubushiChain_[i].reset();
