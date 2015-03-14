@@ -79,14 +79,20 @@ public:
 
 class EvalResult {
 public:
-    constexpr EvalResult(double score, int maxVirtualScore) : score_(score), maxVirtualScore_(maxVirtualScore) {}
+    EvalResult(double score, int maxVirtualScore, const CollectedFeature& collectedFeature) :
+        score_(score),
+        maxVirtualScore_(maxVirtualScore),
+        collectedFeature_(collectedFeature)
+    {}
 
     double score() const { return score_; }
     int maxVirtualScore() const { return maxVirtualScore_; }
+    const CollectedFeature& collectedFeature() const { return collectedFeature_; }
 
 private:
     double score_;
     int maxVirtualScore_;
+    CollectedFeature collectedFeature_;
 };
 
 class RensaEvaluator : public EvaluatorBase {
