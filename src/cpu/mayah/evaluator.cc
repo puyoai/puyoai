@@ -573,10 +573,10 @@ void Evaluator::collectScore(const RefPlan& plan, const CoreField& currentField,
         rensaScoreCollector->setBookName(patternName);
 
         CoreField complementedField(fieldBeforeRensa);
-        for (const auto& cp : keyPuyos)
-            complementedField.dropPuyoOn(cp.x, cp.color);
-        for (const auto& cp : firePuyos)
-            complementedField.dropPuyoOn(cp.x, cp.color);
+        if (!complementedField.dropPuyoList(keyPuyos))
+            return;
+        if (!complementedField.dropPuyoList(firePuyos))
+            return;
 
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
