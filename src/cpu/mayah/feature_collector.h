@@ -1,5 +1,5 @@
-#ifndef MAYAH_AI_SCORE_COLLECTOR_H_
-#define MAYAH_AI_SCORE_COLLECTOR_H_
+#ifndef MAYAH_AI_FEATURE_COLLECTOR_H_
+#define MAYAH_AI_FEATURE_COLLECTOR_H_
 
 #include <map>
 #include <string>
@@ -99,9 +99,9 @@ private:
 };
 
 // This collector collects all features.
-class FeatureScoreCollector {
+class FeatureCollector {
 public:
-    FeatureScoreCollector(const EvaluationParameter& param) : collector_(param) {}
+    FeatureCollector(const EvaluationParameter& param) : collector_(param) {}
 
     void addScore(EvaluationFeatureKey key, double v)
     {
@@ -116,14 +116,14 @@ public:
             collectedSparseFeatures_[key].push_back(idx);
     }
 
-    void merge(const FeatureScoreCollector& sc)
+    void merge(const FeatureCollector& fc)
     {
-        collector_.merge(sc.collector_);
+        collector_.merge(fc.collector_);
 
-        for (const auto& entry : sc.collectedFeatures_) {
+        for (const auto& entry : fc.collectedFeatures_) {
             collectedFeatures_[entry.first] = entry.second;
         }
-        for (const auto& entry : sc.collectedSparseFeatures_) {
+        for (const auto& entry : fc.collectedSparseFeatures_) {
             collectedSparseFeatures_[entry.first].insert(
                 collectedSparseFeatures_[entry.first].end(),
                 entry.second.begin(),

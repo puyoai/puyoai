@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "evaluation_feature.h"
+#include "feature_collector.h"
 #include "pattern_book.h"
-#include "score_collector.h"
 
 class ColumnPuyoList;
 class CoreField;
@@ -89,14 +89,12 @@ private:
     int maxVirtualScore_;
 };
 
-template<typename ScoreCollector>
 class RensaEvaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    RensaEvaluator(const PatternBook& patternBook,
-                   ScoreCollector* sc) :
+    RensaEvaluator(const PatternBook& patternBook, FeatureCollector* fc) :
         EvaluatorBase(patternBook),
-        sc_(sc) {}
+        fc_(fc) {}
 
     void evalPatternScore(double patternScore);
     void evalRensaScore(double score, double virtualScore);
@@ -112,17 +110,15 @@ public:
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                            int currentFrameId, const PlayerState& me, const PlayerState& enemy);
 private:
-    ScoreCollector* sc_;
+    FeatureCollector* fc_;
 };
 
-template<typename ScoreCollector>
 class Evaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    Evaluator(const PatternBook& patternBook,
-              ScoreCollector* sc) :
+    Evaluator(const PatternBook& patternBook, FeatureCollector* fc) :
         EvaluatorBase(patternBook),
-        sc_(sc) {}
+        fc_(fc) {}
 
     void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
                       const PlayerState& me, const PlayerState& enemy,
@@ -148,7 +144,7 @@ public:
     void evalCountPuyoFeature(const RefPlan& plan);
 
 private:
-    ScoreCollector* sc_;
+    FeatureCollector* fc_;
 };
 
 #endif

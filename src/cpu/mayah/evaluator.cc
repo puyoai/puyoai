@@ -47,8 +47,7 @@ const double FIELD_USHAPE_HEIGHT_COEF[15] = {
 
 }
 
-template<typename ScoreCollector>
-static void calculateConnection(ScoreCollector* sc, const CoreField& field,
+static void calculateConnection(FeatureCollector* fc, const CoreField& field,
                                 EvaluationFeatureKey key2, EvaluationFeatureKey key3)
 {
     FieldBitField checked;
@@ -62,16 +61,15 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field,
 
             int numConnected = field.countConnectedPuyos(x, y, &checked);
             if (numConnected >= 3) {
-                sc->addScore(key3, 1);
+                fc->addScore(key3, 1);
             } else if (numConnected >= 2) {
-                sc->addScore(key2, 1);
+                fc->addScore(key2, 1);
             }
         }
     }
 }
 
-template<typename ScoreCollector>
-static void calculateValleyDepth(ScoreCollector* sc, EvaluationSparseFeatureKey key, const CoreField& field)
+static void calculateValleyDepth(FeatureCollector* fc, EvaluationSparseFeatureKey key, const CoreField& field)
 {
     for (int x = 1; x <= 6; ++x) {
         int currentHeight = field.height(x);
@@ -82,12 +80,11 @@ static void calculateValleyDepth(ScoreCollector* sc, EvaluationSparseFeatureKey 
         int right = std::max(rightHeight - currentHeight, 0);
         int depth = std::min(left, right);
         DCHECK(0 <= depth && depth <= 14) << depth;
-        sc->addScore(key, depth, 1);
+        fc->addScore(key, depth, 1);
     }
 }
 
-template<typename ScoreCollector>
-static void calculateRidgeHeight(ScoreCollector* sc, EvaluationSparseFeatureKey key, const CoreField& field)
+static void calculateRidgeHeight(FeatureCollector* fc, EvaluationSparseFeatureKey key, const CoreField& field)
 {
     for (int x = 1; x <= 6; ++x) {
         int currentHeight = field.height(x);
@@ -98,12 +95,11 @@ static void calculateRidgeHeight(ScoreCollector* sc, EvaluationSparseFeatureKey 
         int right = std::max(currentHeight - rightHeight, 0);
         int height = std::min(left, right);
         DCHECK(0 <= height && height <= 14) << height;
-        sc->addScore(key, height, 1);
+        fc->addScore(key, height, 1);
     }
 }
 
-template<typename ScoreCollector>
-static void calculateFieldUShape(ScoreCollector* sc,
+static void calculateFieldUShape(FeatureCollector* fc,
                                  EvaluationFeatureKey linearKey,
                                  EvaluationFeatureKey squareKey,
                                  EvaluationFeatureKey expKey,
@@ -137,9 +133,9 @@ static void calculateFieldUShape(ScoreCollector* sc,
         expValue += std::exp(std::abs(h - average)) * coef;
     }
 
-    sc->addScore(linearKey, linearValue);
-    sc->addScore(squareKey, squareValue);
-    sc->addScore(expKey, expValue);
+    fc->addScore(linearKey, linearValue);
+    fc->addScore(squareKey, squareValue);
+    fc->addScore(expKey, expValue);
 }
 
 // ----------------------------------------------------------------------
@@ -170,21 +166,18 @@ MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentFi
     return result;
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalFrameFeature(const RefPlan& plan)
+void Evaluator::evalFrameFeature(const RefPlan& plan)
 {
-    sc_->addScore(TOTAL_FRAMES, plan.totalFrames());
-    sc_->addScore(NUM_CHIGIRI, plan.numChigiri());
+    fc_->addScore(TOTAL_FRAMES, plan.totalFrames());
+    fc_->addScore(NUM_CHIGIRI, plan.numChigiri());
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::collectScoreForConnection(const CoreField& field)
+void Evaluator::collectScoreForConnection(const CoreField& field)
 {
-    calculateConnection(sc_, field, CONNECTION_2, CONNECTION_3);
+    calculateConnection(fc_, field, CONNECTION_2, CONNECTION_3);
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const CoreField& f)
+void Evaluator::evalRestrictedConnectionHorizontalFeature(const CoreField& f)
 {
     const int MAX_HEIGHT = 3; // instead of CoreField::HEIGHT
     for (int y = 1; y <= MAX_HEIGHT; ++y) {
@@ -215,34 +208,30 @@ void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const 
                 CHECK(false) << "shouldn't happen: " << len;
             }
 
-            sc_->addScore(key, 1);
+            fc_->addScore(key, 1);
             x += len - 1;
         }
     }
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalThirdColumnHeightFeature(const RefPlan& plan)
+void Evaluator::evalThirdColumnHeightFeature(const RefPlan& plan)
 {
-    sc_->addScore(THIRD_COLUMN_HEIGHT, plan.field().height(3), 1);
+    fc_->addScore(THIRD_COLUMN_HEIGHT, plan.field().height(3), 1);
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalValleyDepth(const CoreField& field)
+void Evaluator::evalValleyDepth(const CoreField& field)
 {
-    calculateValleyDepth(sc_, VALLEY_DEPTH, field);
+    calculateValleyDepth(fc_, VALLEY_DEPTH, field);
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalRidgeHeight(const CoreField& field)
+void Evaluator::evalRidgeHeight(const CoreField& field)
 {
-    calculateRidgeHeight(sc_, RIDGE_HEIGHT, field);
+    calculateRidgeHeight(fc_, RIDGE_HEIGHT, field);
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalFieldUShape(const CoreField& field, bool enemyHasZenkeshi)
+void Evaluator::evalFieldUShape(const CoreField& field, bool enemyHasZenkeshi)
 {
-    calculateFieldUShape(sc_,
+    calculateFieldUShape(fc_,
                          FIELD_USHAPE_LINEAR,
                          FIELD_USHAPE_SQUARE,
                          FIELD_USHAPE_EXP,
@@ -250,8 +239,7 @@ void Evaluator<ScoreCollector>::evalFieldUShape(const CoreField& field, bool ene
                          field);
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalUnreachableSpace(const CoreField& f)
+void Evaluator::evalUnreachableSpace(const CoreField& f)
 {
     FieldBitField checked;
     f.countConnectedPuyos(3, 12, &checked);
@@ -267,14 +255,13 @@ void Evaluator<ScoreCollector>::evalUnreachableSpace(const CoreField& f)
         }
     }
 
-    sc_->addScore(NUM_UNREACHABLE_SPACE, countUnreachable);
+    fc_->addScore(NUM_UNREACHABLE_SPACE, countUnreachable);
 }
 
 // Returns true If we don't need to evaluate other features.
-template<typename ScoreCollector>
-bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreField& currentField, int currentFrameId,
-                                             const PlayerState& me, const PlayerState& enemy, const GazeResult& gazeResult,
-                                             const MidEvalResult& midEvalResult)
+bool Evaluator::evalStrategy(const RefPlan& plan, const CoreField& currentField, int currentFrameId,
+                             const PlayerState& me, const PlayerState& enemy, const GazeResult& gazeResult,
+                             const MidEvalResult& midEvalResult)
 {
     if (!plan.isRensaPlan())
         return false;
@@ -312,21 +299,21 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     if (!enemy.isRensaOngoing && plan.chains() <= 4) {
         int h = 12 - enemy.field.height(3);
         if (plan.score() - estimatedMaxScore >= scoreForOjama(6 * h)) {
-            sc_->addScore(STRATEGY_KILL, 1);
-            sc_->addScore(STRATEGY_KILL_FRAME, plan.totalFrames());
+            fc_->addScore(STRATEGY_KILL, 1);
+            fc_->addScore(STRATEGY_KILL_FRAME, plan.totalFrames());
             return true;
         }
     }
 
     // --- If the rensa is large enough, fire it.
     if (plan.score() >= estimatedMaxScore + scoreForOjama(60) && !enemy.isRensaOngoing) {
-        sc_->addScore(STRATEGY_LARGE_ENOUGH, 1);
+        fc_->addScore(STRATEGY_LARGE_ENOUGH, 1);
         return true;
     }
 
     if (enemy.isRensaOngoing && me.fixedOjama + me.pendingOjama >= 6) {
         if (plan.score() >= scoreForOjama(std::max(0, me.fixedOjama + me.pendingOjama - 3))) {
-            sc_->addScore(STRATEGY_TAIOU, 1.0);
+            fc_->addScore(STRATEGY_TAIOU, 1.0);
             return false;
         }
     }
@@ -334,34 +321,34 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     if (plan.field().isZenkeshi()) {
         int puyoCount = plan.decisions().size() * 2 + currentField.countPuyos();
         if (puyoCount <= 16) {
-            sc_->addScore(STRATEGY_SCORE, plan.score());
-            sc_->addScore(STRATEGY_INITIAL_ZENKESHI, 1);
+            fc_->addScore(STRATEGY_SCORE, plan.score());
+            fc_->addScore(STRATEGY_INITIAL_ZENKESHI, 1);
             return true;
         }
-        sc_->addScore(STRATEGY_SCORE, plan.score());
-        sc_->addScore(STRATEGY_ZENKESHI, 1);
+        fc_->addScore(STRATEGY_SCORE, plan.score());
+        fc_->addScore(STRATEGY_ZENKESHI, 1);
         return true;
     }
 
     if (me.hasZenkeshi && !enemy.hasZenkeshi) {
         if (!enemy.isRensaOngoing) {
-            sc_->addScore(STRATEGY_SCORE, plan.score());
-            sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
+            fc_->addScore(STRATEGY_SCORE, plan.score());
+            fc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
         if (me.pendingOjama + me.fixedOjama <= 36) {
-            sc_->addScore(STRATEGY_SCORE, plan.score());
-            sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
+            fc_->addScore(STRATEGY_SCORE, plan.score());
+            fc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
     }
 
-    sc_->addScore(STRATEGY_SCORE, plan.score());
+    fc_->addScore(STRATEGY_SCORE, plan.score());
 
     // If IBARA found, we always consider it.
     // TODO(mayah): Don't consider IBARA if we don't have enough puyos. Better not to fire IBARA in that case.
     if (USE_IBARA && plan.chains() == 1 && plan.score() >= scoreForOjama(10) && me.pendingOjama + me.fixedOjama <= 10) {
-        sc_->addScore(STRATEGY_IBARA, 1);
+        fc_->addScore(STRATEGY_IBARA, 1);
         return false;
     }
 
@@ -369,22 +356,22 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     // TODO(mayah): We need to check if the enemy cannot fire his rensa after ojama is dropped.
     if (plan.chains() <= 3 && plan.score() >= scoreForOjama(15) &&
         me.pendingOjama + me.fixedOjama <= 3 && estimatedMaxScore <= scoreForOjama(12)) {
-        sc_->addScore(STRATEGY_TSUBUSHI, 1);
+        fc_->addScore(STRATEGY_TSUBUSHI, 1);
         return true;
     }
 
     if (plan.chains() <= 3 && me.pendingOjama + me.fixedOjama == 0 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
         if (plan.score() >= scoreForOjama(30)) {
-            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_LARGE, 1);
+            fc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_LARGE, 1);
         } else if (plan.score() >= scoreForOjama(18)) {
-            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM, 1);
+            fc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM, 1);
         } else if (plan.score() >= scoreForOjama(15)) {
-            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_SMALL, 1);
+            fc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_SMALL, 1);
         }
         return false;
     }
 
-    sc_->addScore(STRATEGY_SAKIUCHI, 1.0);
+    fc_->addScore(STRATEGY_SAKIUCHI, 1.0);
 
     // TODO(mayah): Check land leveling.
     // TODO(mayah): OIUCHI?
@@ -392,34 +379,31 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     return false;
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan, const RensaResult& rensaResult,
-                                                       const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                                                       int currentFrameId,
-                                                       const PlayerState& me, const PlayerState& enemy)
+void RensaEvaluator::evalRensaStrategy(const RefPlan& plan, const RensaResult& rensaResult,
+                                       const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                                       int currentFrameId,
+                                       const PlayerState& me, const PlayerState& enemy)
 {
     UNUSED_VARIABLE(currentFrameId);
     UNUSED_VARIABLE(me);
 
     if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) && plan.chains() <= 3 && rensaResult.chains >= 7 &&
         keyPuyos.size() + firePuyos.size() <= 3 && !enemy.isRensaOngoing) {
-        sc_->addScore(STRATEGY_SAISOKU, 1);
+        fc_->addScore(STRATEGY_SAISOKU, 1);
     }
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& rensaResult,
-                                                           const PuyoSet& totalPuyoSet)
+void RensaEvaluator::evalRensaChainFeature(const RensaResult& rensaResult,
+                                           const PuyoSet& totalPuyoSet)
 {
-    sc_->addScore(MAX_CHAINS, rensaResult.chains, 1);
+    fc_->addScore(MAX_CHAINS, rensaResult.chains, 1);
 
     int totalNecessaryPuyos = TsumoPossibility::necessaryPuyos(totalPuyoSet, 0.5);
-    sc_->addScore(NECESSARY_PUYOS_LINEAR, totalNecessaryPuyos);
-    sc_->addScore(NECESSARY_PUYOS_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
+    fc_->addScore(NECESSARY_PUYOS_LINEAR, totalNecessaryPuyos);
+    fc_->addScore(NECESSARY_PUYOS_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const RefPlan& plan, const RensaTrackResult& trackResult)
+void RensaEvaluator::evalFirePointTabooFeature(const RefPlan& plan, const RensaTrackResult& trackResult)
 {
     const CoreField& field = plan.field();
 
@@ -430,14 +414,13 @@ void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const RefPlan& pl
                 continue;
 
             if (isNormalColor(field.color(x, y)) && field.color(x, y) == field.color(x + 2, y) && field.color(x + 1, y) == PuyoColor::EMPTY) {
-                sc_->addScore(FIRE_POINT_TABOO, 1);
+                fc_->addScore(FIRE_POINT_TABOO, 1);
             }
         }
     }
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const RefPlan& plan, const RensaTrackResult& trackResult, bool enemyHasZenkeshi)
+void RensaEvaluator::evalRensaIgnitionHeightFeature(const RefPlan& plan, const RensaTrackResult& trackResult, bool enemyHasZenkeshi)
 {
     auto key = enemyHasZenkeshi ? IGNITION_HEIGHT_ON_ENEMY_ZENKESHI : IGNITION_HEIGHT;
 
@@ -446,44 +429,39 @@ void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const RefPla
             if (!isNormalColor(plan.field().color(x, y)))
                 continue;
             if (trackResult.erasedAt(x, y) == 1) {
-                sc_->addScore(key, y, 1);
+                fc_->addScore(key, y, 1);
                 return;
             }
         }
     }
 
-    sc_->addScore(key, 0, 1);
+    fc_->addScore(key, 0, 1);
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaConnectionFeature(const CoreField& fieldAfterDrop)
+void RensaEvaluator::evalRensaConnectionFeature(const CoreField& fieldAfterDrop)
 {
-    calculateConnection(sc_, fieldAfterDrop, CONNECTION_AFTER_DROP_2, CONNECTION_AFTER_DROP_3);
+    calculateConnection(fc_, fieldAfterDrop, CONNECTION_AFTER_DROP_2, CONNECTION_AFTER_DROP_3);
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaScore(double score, double virtualScore)
+void RensaEvaluator::evalRensaScore(double score, double virtualScore)
 {
-    sc_->addScore(SCORE, score);
-    sc_->addScore(VIRTUAL_SCORE, virtualScore);
+    fc_->addScore(SCORE, score);
+    fc_->addScore(VIRTUAL_SCORE, virtualScore);
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaRidgeHeight(const CoreField& field)
+void RensaEvaluator::evalRensaRidgeHeight(const CoreField& field)
 {
-    calculateRidgeHeight(sc_, RENSA_RIDGE_HEIGHT, field);
+    calculateRidgeHeight(fc_, RENSA_RIDGE_HEIGHT, field);
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaValleyDepth(const CoreField& field)
+void RensaEvaluator::evalRensaValleyDepth(const CoreField& field)
 {
-    calculateValleyDepth(sc_, RENSA_VALLEY_DEPTH, field);
+    calculateValleyDepth(fc_, RENSA_VALLEY_DEPTH, field);
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field, bool enemyHasZenkeshi)
+void RensaEvaluator::evalRensaFieldUShape(const CoreField& field, bool enemyHasZenkeshi)
 {
-    calculateFieldUShape(sc_,
+    calculateFieldUShape(fc_,
                          RENSA_FIELD_USHAPE_LINEAR,
                          RENSA_FIELD_USHAPE_SQUARE,
                          RENSA_FIELD_USHAPE_EXP,
@@ -491,14 +469,12 @@ void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field
                          field);
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalPatternScore(double patternScore)
+void RensaEvaluator::evalPatternScore(double patternScore)
 {
-    sc_->addScore(PATTERN_BOOK, patternScore);
+    fc_->addScore(PATTERN_BOOK, patternScore);
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalComplementationBias(const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
+void RensaEvaluator::evalComplementationBias(const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
 {
     PuyoSet puyoSets[FieldConstant::MAP_WIDTH];
     for (const auto& cp : keyPuyos)
@@ -511,44 +487,40 @@ void RensaEvaluator<ScoreCollector>::evalComplementationBias(const ColumnPuyoLis
         if (ps.count() < 3)
             continue;
         if (ps.count() >= 4)
-            sc_->addScore(COMPLEMENTATION_BIAS_MUCH, 1);
+            fc_->addScore(COMPLEMENTATION_BIAS_MUCH, 1);
         if (ps.red() >= 3 || ps.blue() >= 3 || ps.yellow() >= 3 || ps.green() >= 3) {
             EvaluationFeatureKey key = (x == 1 || x == 6) ? COMPLEMENTATION_BIAS_EDGE : COMPLEMENTATION_BIAS;
-            sc_->addScore(key, 1);
+            fc_->addScore(key, 1);
         }
     }
 }
 
-template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::collectScoreForRensaGarbage(const CoreField& fieldAfterDrop)
+void RensaEvaluator::collectScoreForRensaGarbage(const CoreField& fieldAfterDrop)
 {
-    sc_->addScore(NUM_GARBAGE_PUYOS, fieldAfterDrop.countPuyos());
-    sc_->addScore(NUM_SIDE_GARBAGE_PUYOS, fieldAfterDrop.height(1) + fieldAfterDrop.height(6));
+    fc_->addScore(NUM_GARBAGE_PUYOS, fieldAfterDrop.countPuyos());
+    fc_->addScore(NUM_SIDE_GARBAGE_PUYOS, fieldAfterDrop.height(1) + fieldAfterDrop.height(6));
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalCountPuyoFeature(const RefPlan& plan)
+void Evaluator::evalCountPuyoFeature(const RefPlan& plan)
 {
-    sc_->addScore(NUM_COUNT_PUYOS, plan.field().countColorPuyos(), 1);
+    fc_->addScore(NUM_COUNT_PUYOS, plan.field().countColorPuyos(), 1);
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalMidEval(const MidEvalResult& midEvalResult)
+void Evaluator::evalMidEval(const MidEvalResult& midEvalResult)
 {
     // Copy midEvalResult.
     for (const auto& entry : midEvalResult.collectedFeatures()) {
-        sc_->addScore(entry.first, entry.second);
+        fc_->addScore(entry.first, entry.second);
     }
 }
 
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreField& currentField,
-                                             int currentFrameId, int maxIteration,
-                                             const PlayerState& me,
-                                             const PlayerState& enemy,
-                                             const PreEvalResult& preEvalResult,
-                                             const MidEvalResult& midEvalResult,
-                                             const GazeResult& gazeResult)
+void Evaluator::collectScore(const RefPlan& plan, const CoreField& currentField,
+                             int currentFrameId, int maxIteration,
+                             const PlayerState& me,
+                             const PlayerState& enemy,
+                             const PreEvalResult& preEvalResult,
+                             const MidEvalResult& midEvalResult,
+                             const GazeResult& gazeResult)
 {
     const CoreField& fieldBeforeRensa = plan.field();
 
@@ -582,7 +554,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
     ColumnPuyoList maxRensaKeyPuyos;
     ColumnPuyoList maxRensaFirePuyos;
-    std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
+    std::unique_ptr<FeatureCollector> maxRensaScoreCollector;
     int rensaCounts[20] {};
     int maxScoreChains = 0;
     auto evalCallback = [&](const CoreField& fieldBeforeRensa,
@@ -594,8 +566,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                             const RensaTrackResult& trackResult) {
         ++rensaCounts[rensaResult.chains];
 
-        std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
-        RensaEvaluator<ScoreCollector> rensaEvaluator(patternBook(), rensaScoreCollector.get());
+        std::unique_ptr<FeatureCollector> rensaScoreCollector(new FeatureCollector(fc_->evaluationParameter()));
+        RensaEvaluator rensaEvaluator(patternBook(), rensaScoreCollector.get());
 
         CoreField complementedField(fieldBeforeRensa);
         for (const auto& cp : keyPuyos)
@@ -657,27 +629,22 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
     detector.iteratePossibleRensas(preEvalResult.matchablePatternIds(), maxIteration);
 
     if (sideChainMaxScore >= scoreForOjama(21)) {
-        sc_->addScore(HOLDING_SIDE_CHAIN_LARGE, 1);
+        fc_->addScore(HOLDING_SIDE_CHAIN_LARGE, 1);
     } else if (sideChainMaxScore >= scoreForOjama(15)) {
-        sc_->addScore(HOLDING_SIDE_CHAIN_MEDIUM, 1);
+        fc_->addScore(HOLDING_SIDE_CHAIN_MEDIUM, 1);
     } else if (sideChainMaxScore >= scoreForOjama(12)) {
-        sc_->addScore(HOLDING_SIDE_CHAIN_SMALL, 1);
+        fc_->addScore(HOLDING_SIDE_CHAIN_SMALL, 1);
     }
 
     int rensaKind = 0;
     for (int i = maxScoreChains; i < 20; ++i)
         rensaKind += rensaCounts[i];
-    sc_->addScore(RENSA_KIND, rensaKind);
+    fc_->addScore(RENSA_KIND, rensaKind);
 
     if (maxRensaScoreCollector.get()) {
-        sc_->merge(*maxRensaScoreCollector);
-        sc_->setRensaKeyPuyos(maxRensaKeyPuyos);
-        sc_->setRensaFirePuyos(maxRensaFirePuyos);
+        fc_->merge(*maxRensaScoreCollector);
+        fc_->setRensaKeyPuyos(maxRensaKeyPuyos);
+        fc_->setRensaFirePuyos(maxRensaFirePuyos);
     }
-    sc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
+    fc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }
-
-template class Evaluator<FeatureScoreCollector>;
-template class Evaluator<NormalScoreCollector>;
-template class RensaEvaluator<FeatureScoreCollector>;
-template class RensaEvaluator<NormalScoreCollector>;
