@@ -26,6 +26,9 @@ static void drawNumber(Screen* screen, const Box& b, int n)
     dr.w = 8;
     dr.h = 20;
 
+    if (screen->surface()->h < dr.y + dr.h)
+        return;
+
     SDL_FillRect(surface, &dr, SDL_MapRGB(s->format, 1, 1, 1));
     SDL_BlitSurface(s.get(), NULL, surface, &dr);
 }
@@ -157,16 +160,16 @@ void CommentatorDrawer::drawCommentSurface(Screen* screen, const CommentatorResu
     }
 
     int offsetY = screen->mainBox().dy + 20;
-    if (!result.message[pi].empty()) {
-        if (pi == 0) {
-            drawText(screen, ("AI: " + result.message[pi]).c_str(), 20, offsetY);
-        } else {
-            drawText(screen, ("AI: " + result.message[pi]).c_str(), 20, offsetY + LH);
+    for (int pi = 0; pi < 2; ++pi) {
+        for (size_t i = 0; i < result.message[pi].size(); ++i) {
+            const string& s = result.message[pi][i];
+            drawText(screen, s.c_str(), 20, offsetY);
+            offsetY += LH;
         }
     }
 
-    int y = 2;
     for (const auto& msg : result.events[pi]) {
-        drawText(screen, msg.c_str(), LX, offsetY + LH * y++);
+        drawText(screen, msg.c_str(), LX, offsetY);
+        offsetY += LH;
     }
 }
