@@ -271,8 +271,8 @@ MidEvalResult MayahAI::midEval(EvaluationMode mode, const RefPlan& plan, const C
                                const GazeResult& gazeResult) const
 
 {
-    NormalScoreCollector sc(evaluationParameterMap_.parameter(mode));
-    Evaluator<NormalScoreCollector> evaluator(patternBook_, &sc);
+    FeatureCollector sc(evaluationParameterMap_.parameter(mode));
+    Evaluator evaluator(patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), gazeResult);
 
     MidEvaluator midEvaluator(patternBook_);
@@ -286,8 +286,8 @@ EvalResult MayahAI::eval(EvaluationMode mode, const RefPlan& plan, const CoreFie
                          const MidEvalResult& midEvalResult,
                          const GazeResult& gazeResult) const
 {
-    NormalScoreCollector sc(evaluationParameterMap_.parameter(mode));
-    Evaluator<NormalScoreCollector> evaluator(patternBook_, &sc);
+    FeatureCollector sc(evaluationParameterMap_.parameter(mode));
+    Evaluator evaluator(patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     return EvalResult(sc.score(), sc.estimatedRensaScore());
@@ -302,8 +302,8 @@ CollectedFeature MayahAI::evalWithCollectingFeature(EvaluationMode mode,
                                                     const MidEvalResult& midEvalResult,
                                                     const GazeResult& gazeResult) const
 {
-    FeatureScoreCollector sc(evaluationParameterMap_.parameter(mode));
-    Evaluator<FeatureScoreCollector> evaluator(patternBook_, &sc);
+    FeatureCollector sc(evaluationParameterMap_.parameter(mode));
+    Evaluator evaluator(patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
     return sc.toCollectedFeature();
 }

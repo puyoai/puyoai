@@ -7,11 +7,11 @@ add_library(mayah_lib
             evaluator.cc
             evaluation_feature.cc
             evaluation_parameter.cc
+            feature_collector.cc
             gazer.cc
             mayah_ai.cc
             pattern_book.cc
-            pattern_rensa_detector.cc
-            score_collector.cc)
+            pattern_rensa_detector.cc)
 
 function(mayah_add_executable exe)
     cpu_add_executable(${exe} ${ARGN})
