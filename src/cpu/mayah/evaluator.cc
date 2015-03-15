@@ -561,6 +561,7 @@ void Evaluator::collectScore(const RefPlan& plan,
     } maxRensa;
 
     int sideChainMaxScore = 0;
+    int fastChainMaxScore = 0;
     int maxVirtualRensaResultScore = 0;
     int rensaCounts[20] {};
     auto evalCallback = [&](const CoreField& fieldBeforeRensa,
@@ -627,6 +628,11 @@ void Evaluator::collectScore(const RefPlan& plan,
         if (maxVirtualRensaResultScore < virtualRensaScore) {
             maxVirtualRensaResultScore = virtualRensaScore;
         }
+
+        int n = TsumoPossibility::necessaryPuyos(necessaryPuyos, 0.5);
+        if (n <= 5 && fastChainMaxScore > rensaScore) {
+            fastChainMaxScore = rensaScore;
+        }
     };
 
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
@@ -643,6 +649,12 @@ void Evaluator::collectScore(const RefPlan& plan,
         fc_->addScore(HOLDING_SIDE_CHAIN_MEDIUM, 1);
     } else if (sideChainMaxScore >= scoreForOjama(12)) {
         fc_->addScore(HOLDING_SIDE_CHAIN_SMALL, 1);
+    }
+
+    if (fastChainMaxScore >= scoreForOjama(30)) {
+        fc_->addScore(HOLDING_FAST_CHAIN_LARGE, 1);
+    } else if (fastChainMaxScore >= scoreForOjama(18)) {
+        fc_->addScore(HOLDING_FAST_CHAIN_MEDIUM, 1);
     }
 
     int rensaKind = 0;
