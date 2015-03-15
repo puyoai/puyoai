@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "evaluation_feature.h"
-#include "feature_collector.h"
 #include "pattern_book.h"
+#include "score_collector.h"
 
 class ColumnPuyoList;
 class CoreField;
@@ -79,28 +79,24 @@ public:
 
 class EvalResult {
 public:
-    EvalResult(double score, int maxVirtualScore, const CollectedFeature& collectedFeature) :
-        score_(score),
-        maxVirtualScore_(maxVirtualScore),
-        collectedFeature_(collectedFeature)
-    {}
+    constexpr EvalResult(double score, int maxVirtualScore) : score_(score), maxVirtualScore_(maxVirtualScore) {}
 
     double score() const { return score_; }
     int maxVirtualScore() const { return maxVirtualScore_; }
-    const CollectedFeature& collectedFeature() const { return collectedFeature_; }
 
 private:
     double score_;
     int maxVirtualScore_;
-    CollectedFeature collectedFeature_;
 };
 
+template<typename ScoreCollector>
 class RensaEvaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    RensaEvaluator(const PatternBook& patternBook, FeatureCollector* fc) :
+    RensaEvaluator(const PatternBook& patternBook,
+                   ScoreCollector* sc) :
         EvaluatorBase(patternBook),
-        fc_(fc) {}
+        sc_(sc) {}
 
     void evalPatternScore(double patternScore);
     void evalRensaScore(double score, double virtualScore);
@@ -116,15 +112,17 @@ public:
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                            int currentFrameId, const PlayerState& me, const PlayerState& enemy);
 private:
-    FeatureCollector* fc_;
+    ScoreCollector* sc_;
 };
 
+template<typename ScoreCollector>
 class Evaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    Evaluator(const PatternBook& patternBook, FeatureCollector* fc) :
+    Evaluator(const PatternBook& patternBook,
+              ScoreCollector* sc) :
         EvaluatorBase(patternBook),
-        fc_(fc) {}
+        sc_(sc) {}
 
     void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
                       const PlayerState& me, const PlayerState& enemy,
@@ -150,7 +148,7 @@ public:
     void evalCountPuyoFeature(const RefPlan& plan);
 
 private:
-    FeatureCollector* fc_;
+    ScoreCollector* sc_;
 };
 
 #endif

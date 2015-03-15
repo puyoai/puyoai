@@ -122,13 +122,11 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     Plan bestPlan;
     double bestScore = -100000000.0;
     MidEvalResult bestMidEvalResult;
-    CollectedFeature bestCollectedFeature;
 
     Plan bestRensaPlan;
     int bestRensaScore = 0;
     int bestRensaFrames = 0;
     MidEvalResult bestRensaMidEvalResult;
-    CollectedFeature bestRensaCollectedFeature;
 
     int bestVirtualRensaScore = 0;
 
@@ -150,7 +148,6 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
             bestScore = evalResult.score();
             bestPlan = plan.toPlan();
             bestMidEvalResult = midEvalResult;
-            bestCollectedFeature = evalResult.collectedFeature();
         }
 
         if (bestVirtualRensaScore < evalResult.maxVirtualScore()) {
@@ -162,7 +159,6 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
             bestRensaFrames = plan.totalFrames();
             bestRensaPlan = plan.toPlan();
             bestRensaMidEvalResult = midEvalResult;
-            bestCollectedFeature = evalResult.collectedFeature();
         }
     };
 
@@ -229,14 +225,18 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     double endTime = currentTime();
     if (bestVirtualRensaScore < bestRensaScore) {
-        std::string message = makeMessageFrom(mode, frameId, bestRensaPlan, bestRensaCollectedFeature,
-                                              me, enemy, maxIteration, gazeResult,
-                                              bestRensaScore, bestVirtualRensaScore, true, endTime - beginTime);
+        std::string message = makeMessageFrom(mode, frameId, field, kumipuyoSeq, maxIteration,
+                                              me, enemy,
+                                              preEvalResult, bestRensaMidEvalResult, gazeResult,
+                                              bestRensaPlan, bestRensaScore, bestVirtualRensaScore,
+                                              true, endTime - beginTime);
         return ThoughtResult(bestRensaPlan, bestRensaScore, bestVirtualRensaScore, bestRensaMidEvalResult, message);
     } else {
-        std::string message = makeMessageFrom(mode, frameId, bestPlan, bestCollectedFeature,
-                                              me, enemy, maxIteration, gazeResult,
-                                              bestRensaScore, bestVirtualRensaScore, false, endTime - beginTime);
+        std::string message = makeMessageFrom(mode, frameId, field, kumipuyoSeq, maxIteration,
+                                              me, enemy,
+                                              preEvalResult, bestMidEvalResult, gazeResult,
+                                              bestPlan, bestRensaScore, bestVirtualRensaScore,
+                                              false, endTime - beginTime);
         return ThoughtResult(bestPlan, bestRensaScore, bestVirtualRensaScore, bestMidEvalResult, message);
     }
 }
@@ -271,8 +271,8 @@ MidEvalResult MayahAI::midEval(EvaluationMode mode, const RefPlan& plan, const C
                                const GazeResult& gazeResult) const
 
 {
-    FeatureCollector sc(evaluationParameterMap_.parameter(mode));
-    Evaluator evaluator(patternBook_, &sc);
+    NormalScoreCollector sc(evaluationParameterMap_.parameter(mode));
+    Evaluator<NormalScoreCollector> evaluator(patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), gazeResult);
 
     MidEvaluator midEvaluator(patternBook_);
@@ -286,11 +286,11 @@ EvalResult MayahAI::eval(EvaluationMode mode, const RefPlan& plan, const CoreFie
                          const MidEvalResult& midEvalResult,
                          const GazeResult& gazeResult) const
 {
-    FeatureCollector sc(evaluationParameterMap_.parameter(mode));
-    Evaluator evaluator(patternBook_, &sc);
+    NormalScoreCollector sc(evaluationParameterMap_.parameter(mode));
+    Evaluator<NormalScoreCollector> evaluator(patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
-    return EvalResult(sc.score(), sc.estimatedRensaScore(), sc.toCollectedFeature());
+    return EvalResult(sc.score(), sc.estimatedRensaScore());
 }
 
 CollectedFeature MayahAI::evalWithCollectingFeature(EvaluationMode mode,
@@ -302,60 +302,64 @@ CollectedFeature MayahAI::evalWithCollectingFeature(EvaluationMode mode,
                                                     const MidEvalResult& midEvalResult,
                                                     const GazeResult& gazeResult) const
 {
-    FeatureCollector sc(evaluationParameterMap_.parameter(mode));
-    Evaluator evaluator(patternBook_, &sc);
+    FeatureScoreCollector sc(evaluationParameterMap_.parameter(mode));
+    Evaluator<FeatureScoreCollector> evaluator(patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
     return sc.toCollectedFeature();
 }
 
-std::string MayahAI::makeMessageFrom(EvaluationMode mode, int frameId,
-                                     const Plan& plan, const CollectedFeature& collectedFeature,
+std::string MayahAI::makeMessageFrom(EvaluationMode mode,
+                                     int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
                                      const PlayerState& me, const PlayerState& enemy,
-                                     int maxIteration, const GazeResult& gazeResult,
-                                     double rensaScore, double virtualRensaScore,
+                                     const PreEvalResult& preEvalResult, const MidEvalResult& midEvalResult,
+                                     const GazeResult& gazeResult,
+                                     const Plan& plan, double rensaScore, double virtualRensaScore,
                                      bool saturated, double thoughtTimeInSeconds) const
 {
-    UNUSED_VARIABLE(me);
+    UNUSED_VARIABLE(kumipuyoSeq);
 
     if (plan.decisions().empty())
         return string("give up :-(");
 
+    RefPlan refPlan(plan);
+    CollectedFeature cf = evalWithCollectingFeature(mode, refPlan, field, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
+
     stringstream ss;
     ss << "MODE = " << toString(mode) << " / ";
-    if (collectedFeature.feature(STRATEGY_ZENKESHI) > 0 || collectedFeature.feature(STRATEGY_INITIAL_ZENKESHI) > 0)
+    if (cf.feature(STRATEGY_ZENKESHI) > 0 || cf.feature(STRATEGY_INITIAL_ZENKESHI) > 0)
         ss << "ZENKESHI / ";
-    if (collectedFeature.feature(STRATEGY_KILL) > 0)
+    if (cf.feature(STRATEGY_KILL) > 0)
         ss << "KILL / ";
-    if (collectedFeature.feature(STRATEGY_FIRE_SIDE_CHAIN_LARGE) > 0 ||
-        collectedFeature.feature(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM) > 0 ||
-        collectedFeature.feature(STRATEGY_FIRE_SIDE_CHAIN_SMALL) > 0) {
+    if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_LARGE) > 0 ||
+        cf.feature(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM) > 0 ||
+        cf.feature(STRATEGY_FIRE_SIDE_CHAIN_SMALL) > 0) {
         ss << "SIDE_CHAIN / ";
     }
-    if (collectedFeature.feature(STRATEGY_TAIOU) > 0)
+    if (cf.feature(STRATEGY_TAIOU) > 0)
         ss << "TAIOU / ";
-    if (collectedFeature.feature(STRATEGY_LARGE_ENOUGH) > 0)
+    if (cf.feature(STRATEGY_LARGE_ENOUGH) > 0)
         ss << "LARGE_ENOUGH / ";
-    if (collectedFeature.feature(STRATEGY_TSUBUSHI) > 0)
+    if (cf.feature(STRATEGY_TSUBUSHI) > 0)
         ss << "TSUBUSHI / ";
-    if (collectedFeature.feature(STRATEGY_SAISOKU) > 0)
+    if (cf.feature(STRATEGY_SAISOKU) > 0)
         ss << "SAISOKU / ";
     else if (saturated)
         ss << "SATURATED / ";
-    else if (collectedFeature.feature(STRATEGY_SAKIUCHI) > 0)
+    else if (cf.feature(STRATEGY_SAKIUCHI) > 0)
         ss << "SAKIUCHI / ";
-    if (collectedFeature.feature(STRATEGY_ZENKESHI_CONSUME) > 0)
+    if (cf.feature(STRATEGY_ZENKESHI_CONSUME) > 0)
         ss << "USE_ZENKESHI / ";
-    if (collectedFeature.feature(STRATEGY_LAND_LEVELING) > 0)
+    if (cf.feature(STRATEGY_LAND_LEVELING) > 0)
         ss << "LEVELING / ";
 
-    if (!collectedFeature.bookName().empty())
-        ss << collectedFeature.bookName() << " / ";
+    if (!cf.bookName().empty())
+        ss << cf.bookName() << " / ";
 
     ss << "D/I = " << plan.decisions().size() << "/" << maxIteration << " / ";
-    ss << "SCORE = " << collectedFeature.score() << " / ";
+    ss << "SCORE = " << cf.score() << " / ";
 
-    if (!collectedFeature.feature(MAX_CHAINS).empty()) {
-        const vector<int>& vs = collectedFeature.feature(MAX_CHAINS);
+    if (!cf.feature(MAX_CHAINS).empty()) {
+        const vector<int>& vs = cf.feature(MAX_CHAINS);
         for (size_t i = 0; i < vs.size(); ++i)
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
@@ -369,12 +373,12 @@ std::string MayahAI::makeMessageFrom(EvaluationMode mode, int frameId,
            << " in " << (enemy.finishingRensaFrameId - frameId) << " / ";
     } else {
         ss << "Gazed = "
-           << gazeResult.estimateMaxScore(frameId + plan.totalFrames(), enemy)
-           << " in " << plan.totalFrames() << " / "
-           << gazeResult.estimateMaxScore(frameId + plan.totalFrames() + 100, enemy)
-           << " in " << (plan.totalFrames() + 100) << " / "
-           << gazeResult.estimateMaxScore(frameId + plan.totalFrames() + 200, enemy)
-           << " in " << (plan.totalFrames() + 200) << " / ";
+           << gazeResult.estimateMaxScore(frameId + refPlan.totalFrames(), enemy)
+           << " in " << refPlan.totalFrames() << " / "
+           << gazeResult.estimateMaxScore(frameId + refPlan.totalFrames() + 100, enemy)
+           << " in " << (refPlan.totalFrames() + 100) << " / "
+           << gazeResult.estimateMaxScore(frameId + refPlan.totalFrames() + 200, enemy)
+           << " in " << (refPlan.totalFrames() + 200) << " / ";
     }
 
     ss << "O = " << (myPlayerState().fixedOjama + myPlayerState().pendingOjama)

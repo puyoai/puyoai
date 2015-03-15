@@ -1,4 +1,4 @@
-#include "feature_collector.h"
+#include "score_collector.h"
 
 #include <iomanip>
 #include <iostream>
