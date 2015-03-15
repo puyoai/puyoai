@@ -61,27 +61,7 @@ sample は、消せるところがあれば消し、そうでなければ左に�
 
 ## ディレクトリの説明
 
-### src/ ソース
-
-* src/base このプロジェクト専用ではないような関数の定義など。
-* src/core 定数や、ぷよの色の定義など、全員が利用するべきもの。
- * src/core/algorithm AI を実装するときにあると便利なアルゴリズムたち。サーバー実装でも利用。
- * src/core/client クライアントが利用すると便利なもの。
-   * src/core/client/ai AIのベース。ここにあるクラスを継承してthink()だけ実装すれば、とりあえず動く。
-   * src/core/client/connector サーバーと接続するときに使うと便利なクラス。
- * src/core/field フィールドの実装。gui とかはこれを使っている。
- * src/core/server サーバー実装に必要なもの
-   * src/core/srever/connector クライアントとの通信に使うと便利なクラス。
-* src/capture キャプチャー関連。画面解析など。
-* src/cpu みんなの AI 実装
-* src/duel ローカルでの対戦サーバー
-* src/gui GUI関連。対戦サーバーやwiiの実装で使う。
-* src/solver AIを作成してテストするときに便利なもの。とこぷよルーチンなど。
-* src/third_party 第三者ライブラリをそのまま持ってきたもの。
-* src/wii Wii実機と接続して対戦するサーバー。
-
-### その他
-
+* src/ 主なプログラムのソース
 * arduino/ Wii実機と接続する際に使う、arduino関連
 * data/    フォントとか画像とか
 * testdata/ キャプチャー用のテストデータ
