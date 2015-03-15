@@ -31,10 +31,10 @@ protected:
         RefPlan plan(f, decisions, rensaResult, 0, framesToIgnite, lastDropFrames);
 
         PreEvalResult preEvalResult = PreEvaluator(patternBook).preEval(f);
-        FeatureCollector fc(evaluationParameter);
-        Evaluator evaluator(patternBook, &fc);
+        FeatureScoreCollector sc(evaluationParameter);
+        Evaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
         evaluator.collectScore(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
-        return fc.toCollectedFeature();
+        return sc.toCollectedFeature();
     }
 
     template<typename F>
@@ -43,12 +43,12 @@ protected:
 
         EvaluationParameter evaluationParameter;
         PatternBook patternBook;
-        FeatureCollector fc(evaluationParameter);
-        Evaluator evaluator(patternBook, &fc);
+        FeatureScoreCollector sc(evaluationParameter);
+        Evaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
 
         f(&evaluator);
 
-        return fc.toCollectedFeature();
+        return sc.toCollectedFeature();
     }
 
     template<typename F>
@@ -57,12 +57,12 @@ protected:
 
         EvaluationParameter evaluationParameter;
         PatternBook patternBook;
-        FeatureCollector fc(evaluationParameter);
-        RensaEvaluator rensaEvaluator(patternBook, &fc);
+        FeatureScoreCollector sc(evaluationParameter);
+        RensaEvaluator<FeatureScoreCollector> rensaEvaluator(patternBook, &sc);
 
         f(&rensaEvaluator);
 
-        return fc.toCollectedFeature();
+        return sc.toCollectedFeature();
     }
 };
 
@@ -74,11 +74,11 @@ TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
 
     EvaluationParameter param;
     PatternBook patternBook;
-    FeatureCollector fc(param);
-    RensaEvaluator evaluator(patternBook, &fc);
+    FeatureScoreCollector sc(param);
+    RensaEvaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
 
     evaluator.collectScoreForRensaGarbage(f);
-    CollectedFeature cf = fc.toCollectedFeature();
+    CollectedFeature cf = sc.toCollectedFeature();
 
     EXPECT_EQ(10, cf.feature(NUM_GARBAGE_PUYOS));
     EXPECT_EQ(6, cf.feature(NUM_SIDE_GARBAGE_PUYOS));
@@ -93,7 +93,7 @@ TEST_F(EvaluatorTest, RidgeHeight1)
         "  O  O"
         "OOOOOO");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator* evaluator) {
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalRidgeHeight(f);
     });
 
@@ -110,7 +110,7 @@ TEST_F(EvaluatorTest, RidgeHeight2)
         " OOO O"
         "OOOOOO");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator* evaluator) {
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalRidgeHeight(f);
     });
 
@@ -127,7 +127,7 @@ TEST_F(EvaluatorTest, RidgeHeight3)
         " OOO O"
         "OOOOOO");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator* evaluator) {
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalRidgeHeight(f);
     });
 
@@ -141,7 +141,7 @@ TEST_F(EvaluatorTest, connection)
                 "OOOOGO"
                 "BBYYGO");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator* evaluator) {
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->collectScoreForConnection(f);
     });
 
@@ -156,7 +156,7 @@ TEST_F(EvaluatorTest, connectionHorizontal)
         "OOYYOO"
         "RRROGG");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator* evaluator) {
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalRestrictedConnectionHorizontalFeature(f);
     });
 
@@ -173,7 +173,7 @@ TEST_F(EvaluatorTest, NumUnreachableSpace1)
         "OOOOOO"
         "OOOOOO");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator* evaluator) {
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalUnreachableSpace(f);
     });
 
@@ -196,7 +196,7 @@ TEST_F(EvaluatorTest, NumUnreachableSpace2)
         "    O "
         "    O ");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator* evaluator) {
+    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalUnreachableSpace(f);
     });
 
