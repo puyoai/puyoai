@@ -1,7 +1,8 @@
 #include "core/key_set.h"
 
+#include <ext/alloc_traits.h>
+
 #include <sstream>
-#include <glog/logging.h>
 
 #include "base/strings.h"
 

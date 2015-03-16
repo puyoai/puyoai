@@ -1,9 +1,12 @@
 #include "core/core_field.h"
 
 #include <array>
+#include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <sstream>
 
+#include "core/column_puyo.h"
 #include "core/column_puyo_list.h"
 #include "core/constant.h"
 #include "core/decision.h"

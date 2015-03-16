@@ -1,7 +1,6 @@
 #ifndef CORE_REAL_COLOR_H_
 #define CORE_REAL_COLOR_H_
 
-#include <cstdint>
 #include <ostream>
 #include <string>
 

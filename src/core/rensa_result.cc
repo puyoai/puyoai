@@ -1,9 +1,12 @@
 #include "core/rensa_result.h"
 
+#include <ext/alloc_traits.h>
+#include <glog/logging.h>
+
+#include <cstddef>
 #include <sstream>
 #include <iomanip>
 
-#include <glog/logging.h>
 
 using namespace std;
 

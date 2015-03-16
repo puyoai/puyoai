@@ -2,9 +2,8 @@
 #define CORE_DECISION_H_
 
 #include <string>
+#include <utility>
 #include <vector>
-
-#include "base/base.h"
 
 class Decision {
 public:

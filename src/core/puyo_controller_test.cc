@@ -1,13 +1,15 @@
 #include "core/puyo_controller.h"
 
 #include <gtest/gtest.h>
-#include <vector>
+
+#include <set>
+#include <string>
 
 #include "core/core_field.h"
 #include "core/decision.h"
-#include "core/kumipuyo.h"
+#include "core/kumipuyo_pos.h"
 #include "core/kumipuyo_moving_state.h"
-#include "core/plain_field.h"
+#include "core/puyo_color.h"
 
 using namespace std;
 

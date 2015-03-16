@@ -1,5 +1,9 @@
 #include "core/kumipuyo_seq.h"
 
+#include <glog/logging.h>
+
+#include <ostream>
+
 using namespace std;
 
 KumipuyoSeq::KumipuyoSeq(const string& str)

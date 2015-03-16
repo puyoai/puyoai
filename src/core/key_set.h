@@ -2,6 +2,8 @@
 #define CORE_KEY_SET_H_
 
 #include <bitset>
+#include <cstddef>
+#include <initializer_list>
 #include <string>
 #include <vector>
 

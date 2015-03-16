@@ -1,5 +1,6 @@
 #include "core/frame_response.h"
 
+#include <cstddef>
 #include <sstream>
 
 using namespace std;

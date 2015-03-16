@@ -1,12 +1,16 @@
 #include "core/field_pretty_printer.h"
 
+#include <glog/logging.h>
+
 #include <iostream>
 #include <sstream>
 #include <string>
 
+#include "core/core_field.h"
+#include "core/field_constant.h"
 #include "core/plain_field.h"
-#include "core/kumipuyo.h"
 #include "core/kumipuyo_seq.h"
+#include "core/puyo_color.h"
 
 using namespace std;
 

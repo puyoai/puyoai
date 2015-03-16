@@ -1,11 +1,15 @@
 #ifndef CORE_CORE_FIELD_H_
 #define CORE_CORE_FIELD_H_
 
-#include <cstdint>
-#include <initializer_list>
+#include <glog/logging.h>
 
-#include "base/base.h"
+#include <algorithm>
+#include <initializer_list>
+#include <string>
+#include <vector>
+
 #include "core/decision.h"
+#include "core/field_constant.h"
 #include "core/kumipuyo_pos.h"
 #include "core/puyo_color.h"
 #include "core/plain_field.h"
@@ -15,7 +19,6 @@ class ColumnPuyoList;
 class FieldBitField;
 class Kumipuyo;
 struct Position;
-class RensaTrackResult;
 
 class CoreField : public PlainField {
 public:

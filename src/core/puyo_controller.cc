@@ -1,17 +1,26 @@
 #include "core/puyo_controller.h"
 
 #include <algorithm>
+#include <cstddef>
+#include <functional>
 #include <map>
+#include <ostream>
 #include <queue>
+#include <string>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 #include <glog/logging.h>
 
+#include "base/base.h"
 #include "core/core_field.h"
 #include "core/decision.h"
-#include "core/kumipuyo.h"
+#include "core/key.h"
+#include "core/kumipuyo_pos.h"
+#include "core/kumipuyo_moving_state.h"
 #include "core/plain_field.h"
+#include "core/puyo_color.h"
 
 using namespace std;
 

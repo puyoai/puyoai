@@ -1,10 +1,17 @@
 #include "core/sequence_generator.h"
 
+#include <ext/alloc_traits.h>
+#include <gflags/gflags.h>
+#include <glog/logging.h>
+
 #include <algorithm>
+#include <cstddef>
 #include <random>
+#include <string>
 #include <vector>
 
-#include <gflags/gflags.h>
+#include "core/kumipuyo.h"
+#include "core/puyo_color.h"
 
 DEFINE_string(seq, "", "default initial sequence");
 DEFINE_int32(seed, -1, "sets the random seed. When negative, seed will be chosen at random.");

@@ -1,5 +1,7 @@
 #include "core/kumipuyo_pos.h"
 
+#include <cstdio>
+
 using namespace std;
 
 string KumipuyoPos::toDebugString() const

@@ -1,8 +1,5 @@
 #include "core/frame_request.h"
 
-#include <string>
-#include <map>
-
 #include <gtest/gtest.h>
 
 using namespace std;
