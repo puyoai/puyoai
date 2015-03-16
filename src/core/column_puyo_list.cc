@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+#include "core/column_puyo.h"
+
 using namespace std;
 
 string ColumnPuyoList::toString() const

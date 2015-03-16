@@ -1,12 +1,15 @@
 #include "core/core_field.h"
 
-#include <algorithm>
-#include <string>
-
+#include <ext/alloc_traits.h>
 #include <gtest/gtest.h>
+
+#include <algorithm>
+#include <cstddef>
+#include <string>
 
 #include "core/constant.h"
 #include "core/decision.h"
+#include "core/position.h"
 #include "core/rensa_result.h"
 
 using namespace std;

@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-#include "base/base.h"
 #include "core/field_constant.h"
 #include "core/position.h"
 

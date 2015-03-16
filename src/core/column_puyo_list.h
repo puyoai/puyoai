@@ -8,6 +8,7 @@
 #include <glog/logging.h>
 
 #include "column_puyo.h"
+#include "core/puyo_color.h"
 
 class ColumnPuyoList {
 public:

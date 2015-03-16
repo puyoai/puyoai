@@ -1,6 +1,5 @@
 #include "core/puyo_controller.h"
 
-#include <iostream>
 #include <gtest/gtest.h>
 
 #include "base/time_stamp_counter.h"

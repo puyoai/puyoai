@@ -1,10 +1,15 @@
 #ifndef CORE_KUMIPUYO_SEQ_H_
 #define CORE_KUMIPUYO_SEQ_H_
 
+#include <ext/alloc_traits.h>
+
+#include <initializer_list>
 #include <string>
+#include <vector>
 
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"
+#include "core/puyo_color.h"
 
 class KumipuyoSeq {
 public:

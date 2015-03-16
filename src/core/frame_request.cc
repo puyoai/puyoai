@@ -1,8 +1,15 @@
 #include "core/frame_request.h"
 
+#include <glog/logging.h>
+
+#include <cstdlib>
+#include <cstring>
 #include <sstream>
 
 #include "core/field_pretty_printer.h"
+#include "core/kumipuyo.h"
+#include "core/plain_field.h"
+#include "core/puyo_color.h"
 
 using namespace std;
 

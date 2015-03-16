@@ -1,9 +1,10 @@
 #include "core/sequence_generator.h"
 
-#include <string>
 #include <map>
 
 #include <gtest/gtest.h>
+
+#include "core/puyo_color.h"
 
 using namespace std;
 

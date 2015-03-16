@@ -4,9 +4,9 @@
 #include <initializer_list>
 #include <string>
 
-#include "core/core_field.h"
-
+class CoreField;
 class KumipuyoSeq;
+class PlainField;
 
 class FieldPrettyPrinter {
 public:

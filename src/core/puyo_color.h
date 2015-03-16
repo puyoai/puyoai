@@ -1,10 +1,8 @@
 #ifndef CORE_PUYO_COLOR_H_
 #define CORE_PUYO_COLOR_H_
 
+#include <ostream>
 #include <string>
-#include <stdint.h>
-#include <glog/logging.h>
-#include "base/base.h"
 
 enum class PuyoColor : uint8_t {
     EMPTY = 0,

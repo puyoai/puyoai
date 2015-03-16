@@ -2,11 +2,9 @@
 #define CORE_FRAME_REQUEST_H_
 
 #include <string>
-#include <vector>
 
 #include "core/core_field.h"
 #include "core/game_result.h"
-#include "core/kumipuyo.h"
 #include "core/kumipuyo_pos.h"
 #include "core/kumipuyo_seq.h"
 #include "core/player.h"

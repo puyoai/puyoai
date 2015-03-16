@@ -1,23 +1,11 @@
 #ifndef CORE_PUYO_CONTROLLER_H_
 #define CORE_PUYO_CONTROLLER_H_
 
-#include <glog/logging.h>
-#include <string>
-#include <stdio.h>
-#include <tuple>
-#include <vector>
-
-#include "core/constant.h"
-#include "core/key.h"
 #include "core/key_set.h"
-#include "core/kumipuyo.h"
-#include "core/kumipuyo_moving_state.h"
-#include "core/kumipuyo_pos.h"
-#include "core/puyo_color.h"
 
 class CoreField;
 class Decision;
-class KumipuyoPos;
+class KumipuyoMovingState;
 class PlainField;
 
 class PuyoController {

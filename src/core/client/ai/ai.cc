@@ -1,5 +1,6 @@
 #include "core/client/ai/ai.h"
 
+#include "base/base.h"
 #include "core/constant.h"
 #include "core/field_pretty_printer.h"
 #include "core/frame_request.h"

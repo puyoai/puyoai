@@ -1,7 +1,5 @@
 #include "core/rensa_result.h"
 
-#include <string>
-
 #include <gtest/gtest.h>
 
 using namespace std;
