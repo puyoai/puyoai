@@ -77,7 +77,12 @@ public:
 
     void addScore(EvaluationFeatureKey key, double v) { score_ += param_.score(key, v); }
     void addScore(EvaluationSparseFeatureKey key, int idx, int n) { score_ += param_.score(key, idx, n); }
-    void merge(const NormalScoreCollector& sc) { score_ += sc.score(); }
+    void merge(const NormalScoreCollector& sc)
+    {
+        score_ += sc.score();
+        if (bookName_.empty())
+            bookName_ = sc.bookName();
+    }
 
     void setBookName(const std::string& bookName) { bookName_ = bookName; }
     std::string bookName() const { return bookName_; }
