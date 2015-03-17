@@ -631,10 +631,8 @@ int CoreField::dropAfterVanish(SimulationContext* context, Tracker* tracker)
     return maxDrops;
 }
 
-vector<Position> CoreField::erasingPuyoPositions(const SimulationContext& context) const
+int CoreField::fillErasingPuyoPositions(const SimulationContext& context, Position* eraseQueue) const
 {
-    // All the positions of erased puyos will be stored here.
-    Position eraseQueue[WIDTH * HEIGHT];
     Position* eraseQueueHead = eraseQueue;
 
     {
@@ -663,42 +661,48 @@ vector<Position> CoreField::erasingPuyoPositions(const SimulationContext& contex
         }
     }
 
-    vector<Position> results;
-
     int numErasedPuyos = eraseQueueHead - eraseQueue;
     if (numErasedPuyos == 0)
-        return results;
+        return 0;
+
+    Position* colorEraseQueueHead = eraseQueueHead;
 
     FieldBitField checked;
-    for (Position* head = eraseQueue; head != eraseQueueHead; ++head) {
+    for (Position* head = eraseQueue; head != colorEraseQueueHead; ++head) {
         int x = head->x;
         int y = head->y;
-
-        results.emplace_back(x, y);
 
         // Check OJAMA puyos erased
         if (color(x + 1, y) == PuyoColor::OJAMA && !checked(x + 1, y)) {
             checked.set(x + 1, y);
-            results.emplace_back(x + 1, y);
+            *eraseQueueHead++ = Position(x + 1, y);
         }
 
-        if (color(x - 1, y) == PuyoColor::OJAMA && !checked(x + 1, y)) {
+        if (color(x - 1, y) == PuyoColor::OJAMA && !checked(x - 1, y)) {
             checked.set(x - 1, y);
-            results.emplace_back(x - 1, y);
+            *eraseQueueHead++ = Position(x + 1, y);
         }
 
-        if (color(x, y + 1) == PuyoColor::OJAMA && y + 1 <= HEIGHT && !checked(x + 1, y)) {
+        if (color(x, y + 1) == PuyoColor::OJAMA && y + 1 <= HEIGHT && !checked(x, y + 1)) {
             checked.set(x, y + 1);
-            results.emplace_back(x, y + 1);
+            *eraseQueueHead++ = Position(x, y + 1);
         }
 
-        if (color(x, y - 1) == PuyoColor::OJAMA && !checked(x + 1, y)) {
+        if (color(x, y - 1) == PuyoColor::OJAMA && !checked(x, y - 1)) {
             checked.set(x, y - 1);
-            results.emplace_back(x, y - 1);
+            *eraseQueueHead++ = Position(x, y - 1);
         }
     }
 
-    return results;
+    return eraseQueueHead - eraseQueue;
+}
+
+vector<Position> CoreField::erasingPuyoPositions(const SimulationContext& context) const
+{
+    // All the positions of erased puyos will be stored here.
+    Position eraseQueue[MAP_WIDTH * MAP_HEIGHT];
+    int n = fillErasingPuyoPositions(context, eraseQueue);
+    return vector<Position>(eraseQueue, eraseQueue + n);
 }
 
 bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
