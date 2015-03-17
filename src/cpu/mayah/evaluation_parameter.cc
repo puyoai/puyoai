@@ -18,6 +18,7 @@ string toString(EvaluationMode mode)
     switch (mode) {
     case EvaluationMode::DEFAULT: return "";
     case EvaluationMode::EARLY: return "early";
+    case EvaluationMode::EARLY_MIDDLE: return "early_middle";
     case EvaluationMode::MIDDLE: return "middle";
     case EvaluationMode::LATE: return "late";
     case EvaluationMode::ENEMY_HAS_ZENKESHI: return "enemy_has_zenkeshi";

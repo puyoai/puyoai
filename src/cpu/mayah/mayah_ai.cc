@@ -244,6 +244,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 EvaluationMode MayahAI::calculateMode(const PlayerState& me, const PlayerState& enemy) const
 {
     const int EARLY_THRESHOLD = 24;
+    const int EARLY_MIDDLE_THRESHOLD = 36;
     const int MIDDLE_THRESHOLD = 54;
 
     if (enemy.field.isZenkeshi())
@@ -252,6 +253,8 @@ EvaluationMode MayahAI::calculateMode(const PlayerState& me, const PlayerState& 
     int count = me.field.countPuyos();
     if (count <= EARLY_THRESHOLD)
         return EvaluationMode::EARLY;
+    if (count <= EARLY_MIDDLE_THRESHOLD)
+        return EvaluationMode::EARLY_MIDDLE;
     if (count <= MIDDLE_THRESHOLD)
         return EvaluationMode::MIDDLE;
     return EvaluationMode::LATE;

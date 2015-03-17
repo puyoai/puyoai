@@ -14,6 +14,7 @@
 enum class EvaluationMode {
     DEFAULT,
     EARLY,
+    EARLY_MIDDLE,
     MIDDLE,
     LATE,
     ENEMY_HAS_ZENKESHI,
@@ -22,6 +23,7 @@ enum class EvaluationMode {
 const EvaluationMode ALL_EVALUATION_MODES[] = {
     EvaluationMode::DEFAULT,
     EvaluationMode::EARLY,
+    EvaluationMode::EARLY_MIDDLE,
     EvaluationMode::MIDDLE,
     EvaluationMode::LATE,
     EvaluationMode::ENEMY_HAS_ZENKESHI,
