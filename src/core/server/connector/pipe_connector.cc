@@ -1,5 +1,10 @@
 #include "core/server/connector/pipe_connector.h"
 
+#include <glog/logging.h>
+
+#include <cstddef>
+#include <cstring>
+
 #include "core/frame_request.h"
 #include "core/frame_response.h"
 

@@ -2,13 +2,16 @@
 #define CORE_ALGORITHM_RENSA_DETECTOR_H_
 
 #include <functional>
-#include <vector>
 
-#include "core/algorithm/puyo_set.h"
-#include "core/core_field.h"
+#include "core/field_constant.h"
 
-class KumipuyoSeq;
+class ColumnPuyoList;
+class CoreField;
+class RensaCoefResult;
 class RensaRefSequence;
+class RensaTrackResult;
+class RensaVanishingPositionResult;
+struct RensaResult;
 
 class RensaDetectorStrategy {
 public:

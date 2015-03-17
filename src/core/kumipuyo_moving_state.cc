@@ -2,7 +2,6 @@
 
 #include <glog/logging.h>
 
-#include <ostream>
 #include <tuple>
 
 #include "core/constant.h"

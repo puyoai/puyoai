@@ -2,17 +2,12 @@
 #define CORE_ALGORITHM_RENSA_REF_SEQUENCE_H_
 
 #include <vector>
-#include <glog/logging.h>
 
 #include "base/noncopyable.h"
-#include "core/column_puyo_list.h"
-#include "core/core_field.h"
 #include "core/rensa_result.h"
 
 class CoreField;
 class ColumnPuyoList;
-struct RensaResult;
-class RensaTrackResult;
 
 struct RensaRef {
     const CoreField& fieldBeforeRensa;

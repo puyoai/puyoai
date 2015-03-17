@@ -1,6 +1,5 @@
 #include "core/sequence_generator.h"
 
-#include <ext/alloc_traits.h>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 

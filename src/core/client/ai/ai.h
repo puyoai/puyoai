@@ -6,9 +6,10 @@
 #include "core/client/ai/drop_decision.h"
 #include "core/client/ai/player_state.h"
 #include "core/client/connector/client_connector.h"
-#include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
 
+class CoreField;
+class PlainField;
 struct FrameRequest;
 
 // AI is a utility class of AI.

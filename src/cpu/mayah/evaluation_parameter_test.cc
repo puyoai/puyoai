@@ -2,9 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "core/core_field.h"
-#include "core/kumipuyo_seq.h"
-
 using namespace std;
 
 TEST(EvaluationParameterTest, toString)

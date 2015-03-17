@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 
+#include "base/base.h"
 #include "base/time_stamp_counter.h"
 #include "field.h"
 

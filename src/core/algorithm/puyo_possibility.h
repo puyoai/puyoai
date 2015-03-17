@@ -3,6 +3,8 @@
 
 #include <glog/logging.h>
 
+#include <algorithm>
+
 #include "core/algorithm/puyo_set.h"
 
 class TsumoPossibility {

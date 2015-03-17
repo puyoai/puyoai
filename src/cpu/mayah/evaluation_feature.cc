@@ -1,9 +1,5 @@
 #include "evaluation_feature.h"
 
-#include <initializer_list>
-
-#include "core/field_constant.h"
-
 using namespace std;
 
 const vector<EvaluationFeature> g_allEvaluationFeatures {

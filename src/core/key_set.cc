@@ -1,7 +1,5 @@
 #include "core/key_set.h"
 
-#include <ext/alloc_traits.h>
-
 #include <sstream>
 
 #include "base/strings.h"

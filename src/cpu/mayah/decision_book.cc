@@ -1,11 +1,13 @@
 #include "decision_book.h"
 
+#include <glog/logging.h>
+#include <toml/toml.h>
+
 #include <algorithm>
 #include <fstream>
-#include <glog/logging.h>
+#include <utility>
 
 #include "core/algorithm/bijection_matcher.h"
-#include "core/core_field.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_seq.h"
 

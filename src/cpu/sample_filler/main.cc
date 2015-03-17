@@ -3,6 +3,7 @@
 
 #include <algorithm>
 
+#include "base/base.h"
 #include "core/algorithm/plan.h"
 #include "core/client/ai/ai.h"
 #include "core/core_field.h"

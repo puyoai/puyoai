@@ -1,11 +1,18 @@
 #include "core/algorithm/field_pattern.h"
 
-#include <algorithm>
-#include <sstream>
-
 #include <glog/logging.h>
 
+#include <algorithm>
+#include <cctype>
+#include <cstddef>
+#include <sstream>
+
 #include "core/algorithm/pattern_matcher.h"
+#include "core/column_puyo_list.h"
+#include "core/core_field.h"
+#include "core/field_bit_field.h"
+#include "core/position.h"
+#include "core/puyo_color.h"
 
 using namespace std;
 

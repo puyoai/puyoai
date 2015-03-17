@@ -1,24 +1,21 @@
 #include "core/server/connector/connector_manager_posix.h"
 
-#include <fcntl.h>
-#include <errno.h>
 #include <poll.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/time.h>
-#include <unistd.h>
 
-#include <iomanip>
+#include <algorithm>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
 #include <limits>
-#include <string>
 #include <vector>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
 #include "core/constant.h"
-#include "core/frame_request.h"
 #include "core/frame_response.h"
+#include "core/server/connector/connector.h"
 #include "core/player.h"
 
 using namespace std;

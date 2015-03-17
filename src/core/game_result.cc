@@ -2,8 +2,6 @@
 
 #include <glog/logging.h>
 
-#include <ostream>
-
 GameResult toOppositeResult(GameResult gameResult)
 {
     switch (gameResult) {

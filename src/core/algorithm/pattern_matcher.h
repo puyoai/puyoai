@@ -1,6 +1,9 @@
 #ifndef CORE_ALGORITHM_PATTERN_MATCHER_H_
 #define CORE_ALGORITHM_PATTERN_MATCHER_H_
 
+#include <glog/logging.h>
+
+#include <algorithm>
 #include <tuple>
 #include <vector>
 
@@ -8,7 +11,6 @@
 #include "core/algorithm/field_pattern.h"
 
 class CoreField;
-class FieldPattern;
 
 struct PatternMatchResult {
     PatternMatchResult() : matched(false), score(0), count(0), allowedCount(0) {}

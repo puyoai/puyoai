@@ -4,10 +4,11 @@
 #include <memory>
 #include <vector>
 
-#include "base/base.h"
 #include "core/player.h"
-#include "core/server/connector/connector.h"
 #include "core/server/connector/connector_manager.h"
+
+class Connector;
+struct FrameResponse;
 
 class ConnectorManagerPosix : public ConnectorManager {
 public:

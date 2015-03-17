@@ -2,8 +2,6 @@
 
 #include <glog/logging.h>
 
-#include <ostream>
-
 using namespace std;
 
 string toString(Key key)

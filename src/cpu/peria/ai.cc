@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "base/base.h"
 #include "core/algorithm/plan.h"
 #include "core/constant.h"
 #include "core/frame_request.h"
