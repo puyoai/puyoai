@@ -20,10 +20,10 @@ public:
 
     PatternRensaDetector(const PatternBook& patternBook,
                          const CoreField& originalField,
-                         const Callback& callback) :
+                         Callback callback) :
         patternBook_(patternBook),
         originalField_(originalField),
-        callback_(callback),
+        callback_(std::move(callback)),
         originalContext_(CoreField::SimulationContext::fromField(originalField)),
         strategy_(RensaDetectorStrategy(RensaDetectorStrategy::Mode::DROP, 2, 2, false))
     {
@@ -52,7 +52,7 @@ private:
 
     const PatternBook& patternBook_;
     const CoreField& originalField_;
-    const Callback& callback_;
+    Callback callback_;
     const CoreField::SimulationContext originalContext_;
     const RensaDetectorStrategy strategy_;
 };
