@@ -2,8 +2,10 @@
 
 #include <gtest/gtest.h>
 
+#include "core/core_field.h"
+#include "core/decision.h"
 #include "core/frame_request.h"
-#include "core/kumipuyo.h"
+#include "core/plain_field.h"
 
 class TestAI : public AI {
 public:

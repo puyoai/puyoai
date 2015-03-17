@@ -1,8 +1,11 @@
 #ifndef EVALUATION_FEATURE_H_
 #define EVALUATION_FEATURE_H_
 
+#include <cstddef>
 #include <string>
 #include <vector>
+
+#include "core/field_constant.h"
 
 enum EvaluationFeatureKey {
 #define DEFINE_PARAM(NAME, tweakability) NAME,

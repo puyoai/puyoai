@@ -1,8 +1,9 @@
 #include "core/server/connector/human_connector.h"
 
+#include <glog/logging.h>
+
 #include "core/frame_request.h"
 #include "core/frame_response.h"
-#include "core/key.h"
 
 using namespace std;
 

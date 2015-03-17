@@ -2,9 +2,12 @@
 #define CORE_SERVER_CONNECTOR_PIPE_CONNECTOR_H_
 
 #include <cstdio>
-#include <memory>
+#include <string>
 
 #include "core/server/connector/connector.h"
+
+struct FrameRequest;
+struct FrameResponse;
 
 class PipeConnector : public Connector {
 public:

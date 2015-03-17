@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <fstream>
 
+#include "core/field_bit_field.h"
+
 using namespace std;
 
 namespace {

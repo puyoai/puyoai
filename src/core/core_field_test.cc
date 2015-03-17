@@ -1,6 +1,5 @@
 #include "core/core_field.h"
 
-#include <ext/alloc_traits.h>
 #include <gtest/gtest.h>
 
 #include <algorithm>

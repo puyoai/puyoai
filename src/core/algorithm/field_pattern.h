@@ -5,13 +5,13 @@
 #include <string>
 #include <vector>
 
-#include "core/column_puyo_list.h"
-#include "core/core_field.h"
 #include "core/field_constant.h"
-#include "core/field_bit_field.h"
-#include "core/position.h"
 
+class ColumnPuyoList;
+class CoreField;
+class FieldBitField;
 class PatternMatcher;
+struct Position;
 
 enum class PatternType : std::uint8_t {
     NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR,

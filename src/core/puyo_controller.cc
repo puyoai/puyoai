@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <functional>
 #include <map>
-#include <ostream>
 #include <queue>
 #include <string>
 #include <tuple>

@@ -1,12 +1,16 @@
 #include "core/algorithm/rensa_detector.h"
 
-#include <iostream>
-#include <vector>
-
 #include <gtest/gtest.h>
+
+#include <cstddef>
+#include <iostream>
 
 #include "base/time_stamp_counter.h"
 #include "core/core_field.h"
+
+class ColumnPuyoList;
+class RensaTrackResult;
+struct RensaResult;
 
 using namespace std;
 

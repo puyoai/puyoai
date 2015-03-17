@@ -2,6 +2,7 @@
 #define FEATURE_PARAMETER_H_
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 

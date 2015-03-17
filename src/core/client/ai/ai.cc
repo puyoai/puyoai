@@ -1,11 +1,21 @@
 #include "core/client/ai/ai.h"
 
+#include <glog/logging.h>
+
+#include <algorithm>
+
 #include "base/base.h"
 #include "core/constant.h"
+#include "core/core_field.h"
+#include "core/decision.h"
 #include "core/field_pretty_printer.h"
 #include "core/frame_request.h"
 #include "core/frame_response.h"
+#include "core/kumipuyo.h"
+#include "core/plain_field.h"
+#include "core/puyo_color.h"
 #include "core/rensa_result.h"
+#include "core/user_event.h"
 
 using namespace std;
 

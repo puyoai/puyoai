@@ -1,16 +1,15 @@
 #ifndef CPU_MAYAH_DECISION_BOOK_H_
 #define CPU_MAYAH_DECISION_BOOK_H_
 
-#include <string>
-#include <map>
-
 #include <toml/toml.h>
+
+#include <map>
+#include <string>
+#include <vector>
 
 #include "base/noncopyable.h"
 #include "core/algorithm/field_pattern.h"
 #include "core/decision.h"
-#include "core/field_constant.h"
-#include "core/puyo_color.h"
 
 class BijectionMatcher;
 class CoreField;

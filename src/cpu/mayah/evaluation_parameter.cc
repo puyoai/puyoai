@@ -1,15 +1,18 @@
 #include "evaluation_parameter.h"
 
+#include <glog/logging.h>
+#include <toml/toml.h>
+
 #include <algorithm>
 #include <fstream>
-#include <map>
 #include <set>
-#include <sstream>
 #include <vector>
 
-#include <gflags/gflags.h>
+#include <cstddef>
+#include <exception>
+#include <utility>
 
-#include "core/core_field.h"
+#include "cpu/mayah/evaluation_feature.h"
 
 using namespace std;
 

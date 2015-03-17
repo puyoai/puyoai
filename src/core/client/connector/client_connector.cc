@@ -1,7 +1,9 @@
 #include "core/client/connector/client_connector.h"
 
+#include <glog/logging.h>
+
 #include <iostream>
-#include <sstream>
+#include <string>
 
 #include "core/frame_request.h"
 #include "core/frame_response.h"

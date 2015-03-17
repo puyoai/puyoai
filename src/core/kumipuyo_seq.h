@@ -1,8 +1,6 @@
 #ifndef CORE_KUMIPUYO_SEQ_H_
 #define CORE_KUMIPUYO_SEQ_H_
 
-#include <ext/alloc_traits.h>
-
 #include <initializer_list>
 #include <string>
 #include <vector>

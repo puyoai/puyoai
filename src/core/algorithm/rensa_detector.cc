@@ -1,20 +1,20 @@
 #include "rensa_detector.h"
 
+#include <glog/logging.h>
+
 #include <algorithm>
-#include <iostream>
-#include <set>
-#include <vector>
+#include <cstddef>
+#include <string>
 
 #include "base/base.h"
-#include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_ref_sequence.h"
+#include "core/column_puyo.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
-#include "core/decision.h"
 #include "core/field_bit_field.h"
-#include "core/kumipuyo.h"
-#include "core/kumipuyo_seq.h"
 #include "core/position.h"
+#include "core/puyo_color.h"
+#include "core/rensa_result.h"
 
 using namespace std;
 

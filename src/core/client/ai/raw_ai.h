@@ -3,6 +3,9 @@
 
 #include "core/client/connector/client_connector.h"
 
+struct FrameRequest;
+struct FrameResponse;
+
 class RawAI {
 public:
     virtual ~RawAI() {}

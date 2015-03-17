@@ -6,7 +6,11 @@
 
 #include <gtest/gtest.h>
 
+#include "core/column_puyo.h"
+#include "core/column_puyo_list.h"
 #include "core/core_field.h"
+#include "core/field_bit_field.h"
+#include "core/position.h"
 
 using namespace std;
 

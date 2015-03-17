@@ -11,10 +11,12 @@
 class ColumnPuyoList;
 class CoreField;
 class GazeResult;
-struct PlayerState;
 class RefPlan;
-struct RensaResult;
 class RensaTrackResult;
+
+struct PlayerState;
+struct PuyoSet;
+struct RensaResult;
 
 class EvaluatorBase {
 protected:

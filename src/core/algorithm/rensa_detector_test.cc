@@ -1,10 +1,17 @@
 #include "core/algorithm/rensa_detector.h"
 
-#include "core/algorithm/rensa_ref_sequence.h"
-#include "core/kumipuyo_seq.h"
-
 #include <gtest/gtest.h>
-#include <algorithm>
+
+#include <cstddef>
+#include <string>
+#include <utility>
+
+#include "base/base.h"
+#include "core/column_puyo.h"
+#include "core/column_puyo_list.h"
+#include "core/core_field.h"
+#include "core/puyo_color.h"
+#include "core/rensa_result.h"
 
 using namespace std;
 
