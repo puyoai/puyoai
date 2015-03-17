@@ -149,6 +149,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     }
 
     // With complement.
+    // TODO(mayah): making std::vector is too slow. call currentField.fillErasingPuyoPosition()?
     std::vector<Position> ignitionPositions = currentField.erasingPuyoPositions(currentFieldContext);
     if (ignitionPositions.empty())
         return;

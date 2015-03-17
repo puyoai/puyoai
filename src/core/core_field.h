@@ -131,9 +131,10 @@ public:
         }
     };
 
-    // Returns the list of positions that contains puyo that will be erased.
-    // The position of ojama puyos is also included.
-    // This does not consider 2>= rensa.
+    // Fills the positions where puyo is vanished in the 1-rensa.
+    // Returns the length of the filled positions. The max length should be 72.
+    // So, |Position*| must have 72 Position spaces.
+    int fillErasingPuyoPositions(const SimulationContext&, Position*) const;
     std::vector<Position> erasingPuyoPositions(const SimulationContext&) const;
 
     bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;
