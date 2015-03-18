@@ -609,11 +609,11 @@ int CoreField::dropAfterVanish(SimulationContext* context, Tracker* tracker)
 
     int maxDrops = 0;
     for (int x = 1; x <= WIDTH; x++) {
-        if (context->minHeights[x] >= MAP_HEIGHT)
-            continue;
-        int maxHeight = height(x);
-
         int writeAt = context->minHeights[x];
+        if (writeAt >= 14)
+            continue;
+
+        int maxHeight = height(x);
         heights_[x] = writeAt - 1;
 
         DCHECK_EQ(color(x, writeAt), PuyoColor::EMPTY) << writeAt << ' ' << toChar(color(x, writeAt));
