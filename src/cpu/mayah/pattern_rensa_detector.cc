@@ -111,46 +111,10 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
                                                          const std::string& patternName,
                                                          double patternScore) const
 {
-    // if currentField does not erase anything...
-    if (!currentField.rensaWillOccurWithContext(currentFieldContext)) {
-        bool prohibits[FieldConstant::MAP_WIDTH] {};
-        if (!checkRensa(currentChains, firePuyo, originalKeyPuyos, patternScore, patternName, prohibits))
-            return;
-        if (restIteration <= 0)
-            return;
-        auto detectCallback = [&](CoreField* cf, const ColumnPuyoList& cpl) {
-            if (cpl.size() == 0)
-                return;
-
-            bool ok = true;
-            ColumnPuyoList keyPuyos(originalKeyPuyos);
-            for (const ColumnPuyo& cp : cpl) {
-                if (!keyPuyos.add(cp)) {
-                    ok = false;
-                    break;
-                }
-            }
-
-            if (!ok)
-                return;
-
-            CoreField::SimulationContext context(currentFieldContext);
-            int score = cf->vanishDrop(&context);
-            if (score == 0)
-                return;
-
-            iteratePossibleRensasInternal(*cf, context, currentChains + 1,
-                                          firePuyo, keyPuyos, restIteration - 1, restUnusedVariables,
-                                          patternName, patternScore);
-        };
-
-        RensaDetector::detect(currentField, strategy_, PurposeForFindingRensa::FOR_KEY, prohibits, detectCallback);
-        return;
-    }
-
     // With complement.
     // TODO(mayah): making std::vector is too slow. call currentField.fillErasingPuyoPosition()?
     std::vector<Position> ignitionPositions = currentField.erasingPuyoPositions(currentFieldContext);
+    DCHECK(!ignitionPositions.empty()) << currentField.toDebugString();
     if (ignitionPositions.empty())
         return;
 
@@ -226,17 +190,48 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
                                       patternScore + pbf.score() * ratio);
     }
 
-    // proceed one without complementing.
-    if (needsToProceedWithoutComplement) {
-        CoreField cf(currentField);
-        CoreField::SimulationContext context(currentFieldContext);
-        int score = cf.vanishDrop(&context);
-        CHECK(score > 0) << score;
+    if (!needsToProceedWithoutComplement)
+        return;
 
+    // proceed one without complementing.
+    CoreField cf(currentField);
+    CoreField::SimulationContext context(currentFieldContext);
+    CHECK(cf.vanishDrop(&context) > 0) << cf.toDebugString();
+
+    // If rensa continues, proceed to next.
+    if (cf.rensaWillOccurWithContext(context)) {
         iteratePossibleRensasInternal(cf, context, currentChains + 1, firePuyo, originalKeyPuyos,
                                       restIteration, restUnusedVariables, patternName, patternScore);
+        return;
     }
 
+    // if currentField does not erase anything...
+    bool prohibits[FieldConstant::MAP_WIDTH] {};
+    if (!checkRensa(currentChains + 1, firePuyo, originalKeyPuyos, patternScore, patternName, prohibits))
+        return;
+    if (restIteration <= 0)
+        return;
+    auto detectCallback = [&](CoreField* cf2, const ColumnPuyoList& cpl) {
+        if (cpl.size() == 0)
+            return;
+
+        bool ok = true;
+        ColumnPuyoList keyPuyos(originalKeyPuyos);
+        for (const ColumnPuyo& cp : cpl) {
+            if (!keyPuyos.add(cp)) {
+                ok = false;
+                break;
+            }
+        }
+
+        if (!ok)
+            return;
+
+        iteratePossibleRensasInternal(*cf2, context, currentChains + 1,
+                                      firePuyo, keyPuyos, restIteration - 1, restUnusedVariables,
+                                      patternName, patternScore);
+    };
+    RensaDetector::detect(cf, strategy_, PurposeForFindingRensa::FOR_KEY, prohibits, detectCallback);
 }
 
 bool PatternRensaDetector::checkRensa(int currentChains,
