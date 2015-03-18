@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <initializer_list>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -119,6 +120,19 @@ public:
 
         static SimulationContext fromLastDecision(const CoreField&, const Decision& lastDecision);
         static SimulationContext fromField(const CoreField&);
+
+        friend std::ostream& operator<<(std::ostream& os, const SimulationContext& context)
+        {
+            os << "chain = " << context.currentChain << " / "
+               << "heights=["
+               << context.minHeights[1] << ", "
+               << context.minHeights[2] << ", "
+               << context.minHeights[3] << ", "
+               << context.minHeights[4] << ", "
+               << context.minHeights[5] << ", "
+               << context.minHeights[6] << "]";
+            return os;
+        }
 
         int currentChain = 1;
         int minHeights[FieldConstant::MAP_WIDTH] = { 1, 1, 1, 1, 1, 1, 1, 1 };
