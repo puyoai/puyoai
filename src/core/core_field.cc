@@ -565,9 +565,7 @@ void CoreField::eraseQueuedPuyos(SimulationContext* context, Position* eraseQueu
 {
     DCHECK(tracker);
 
-    for (int i = 1; i <= WIDTH; i++) {
-        context->minHeights[i] = 100;
-    }
+    context->updateFromField(*this);
 
     for (Position* head = eraseQueue; head != eraseQueueHead; ++head) {
         int x = head->x;
