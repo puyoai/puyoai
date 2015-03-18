@@ -1,5 +1,7 @@
 #include "gui/bounding_box_drawer.h"
 
+#include <glog/logging.h>
+
 #include "gui/SDL_prims.h"
 #include "gui/screen.h"
 

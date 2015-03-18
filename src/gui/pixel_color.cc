@@ -1,5 +1,7 @@
 #include "gui/pixel_color.h"
 
+#include <glog/logging.h>
+
 Uint32 toPixelColor(SDL_Surface* surface, PuyoColor pc)
 {
     switch (pc) {

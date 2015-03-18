@@ -13,6 +13,7 @@
 #include "core/player.h"
 #include "core/puyo_color.h"
 #include "core/puyo_controller.h"
+#include "core/server/connector/connector.h"
 #include "core/server/connector/connector_manager_posix.h"
 #include "core/server/game_state.h"
 #include "core/server/game_state_observer.h"
