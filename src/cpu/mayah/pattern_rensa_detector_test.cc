@@ -184,22 +184,20 @@ TEST(PatternBookTest, pattern1_complement2)
         "BRRGYY"
         "BYYRGG");
 
+    bool found = false;
     auto callback = [&](const CoreField&,
                         const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList&,
+                        const ColumnPuyoList&,
                         const RensaTrackResult&,
                         const std::string&,
                         int patternScore) {
-        CoreField cf(field);
-        cf.dropPuyoList(keyPuyos);
-        cf.dropPuyoList(firePuyos);
-
-        cout << cf.toDebugString() << endl;
-        cout << patternScore << endl;
+        if (patternScore > 0)
+            found = true;
     };
 
     PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({}, 3);
+    EXPECT_TRUE(found);
 }
 
 TEST(PatternBookTest, pattern2)
