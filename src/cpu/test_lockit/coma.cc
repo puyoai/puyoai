@@ -3077,10 +3077,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                 continue;
         }
 
-#pragma omp parallel for private(chig_aa, chig_bb, chig_dd, teimen, aveteimen, score_tmp2, score_aonly, score_bonly,   \
-                                 score_mm, score_tmp, aa, bb, ba_a, setti_basyo, ee, ba_ee, eex, eecol, ba, i, j, i2,  \
-                                 j2, num2, chain, poi2s, bass, tokus, rakkaflg, kiept, n, syo, num, point, pois,       \
-                                 keshiko_aa, keshiko_bb, keshiko_dd, hakkatakasa, tanpatu_on) firstprivate(point2)
         for (aa = 0; aa < 22; aa++) {
             if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                 continue;
