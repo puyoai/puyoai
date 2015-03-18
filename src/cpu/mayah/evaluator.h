@@ -11,11 +11,11 @@
 class ColumnPuyoList;
 class CoreField;
 class GazeResult;
+class PuyoSet;
 class RefPlan;
 class RensaTrackResult;
 
 struct PlayerState;
-struct PuyoSet;
 struct RensaResult;
 
 class EvaluatorBase {
