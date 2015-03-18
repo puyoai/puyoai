@@ -61,7 +61,6 @@ COMAI_HI::COMAI_HI()
     for (i = 0; i < 22; i++) {
         para[i] = 0;
     }
-    //	para[13]=1;
     myf_kosuu = 0;
     saisoku_flag = saisoku_point;
     aite_hakka_rensa = 0;
@@ -126,7 +125,6 @@ int COMAI_HI::aite_attack_start(int ba3[6][TATE], int zenkesi_aite, int scos, in
     if (aite_hakka_rensa > 0) {
         ret_keshi = 1;
         aite_hakka_zenkesi = zenkesi_aite;
-        //		score = score + zenkesi_aite * 2100;
         jamako_sabun = aite_hakkaji_score / 70;
         aite_hakkaji_score = scos + score;
         aite_hakka_jamako = aite_hakkaji_score / 70 - jamako_sabun;
@@ -154,30 +152,6 @@ int COMAI_HI::aite_attack_start(int ba3[6][TATE], int zenkesi_aite, int scos, in
 
 int COMAI_HI::aite_attack_nokori(int [6][TATE], int hakata)
 {
-    /*	int ba[6][TAT_SIZE]={0};
-            int i, j;
-            int n;
-            aite_puyo_uki=0;
-            for(i=0;i<6;i++){
-                    for(j=0;j<13;j++){
-                    if(ba3[i][j]<7)ba[i][j] = ba3[i][j];
-                    else if(ba3[i][j]>6)aite_puyo_uki=1;
-                    }
-            }
-            for(i=0;i<6;i++){
-                    n=0;
-                    for(j=0;j<13;j++){
-                            if(ba[i][j]==0){
-                                    n++;
-                            }
-                            else if(n!=0){
-                                    ba[i][j-n] = ba[i][j];
-                                    ba[i][j] = 0;
-                            }
-                    }
-            }
-
-            aite_hakka_nokori=hon_syoukyo(ba);*/
     aite_hakka_nokori = aite_hakka_rensa - (hakata - hakkatime + 30) / 40;
     return 0;
 }
@@ -232,10 +206,6 @@ int COMAI_HI::aite_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2
 
     int cc;
     int chain2 = 0;
-
-    //	aite_hakka_rensa = 0;
-    //	aite_hakka_zenkesi=0;
-    //	aite_hakka_kosuu=0;
 
     maxkss = 0;
     aite_rensa_score = 0;
@@ -300,8 +270,6 @@ int COMAI_HI::aite_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2
                     if (keshikos * 2 < irokosuu) {
                         if (nocc_aite_rensa_score < scores) {
                             nocc_aite_rensa_score = scores;
-                            //			moni_kesiko=keshikos;
-                            //			moni_iroko=irokosuu;
                             moni_kesiko[0] = keshiko_aa;
                             moni_iroko[0] = score_aa;
                             moni_kesiko[1] = keshiko_bb;
@@ -440,14 +408,6 @@ int COMAI_HI::aite_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2
 int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE],
                      int zenkesi_aite)
 {
-
-    /*	int ba[6][19];= {4,1,1,1,4,4,1,1,4,2,4,1,2,0,0,0,0,0,0,
-                                            2,2,2,4,1,2,2,1,4,2,4,0,0,0,0,0,0,0,0,
-                                            3,3,3,2,3,3,2,3,2,2,0,0,0,0,0,0,0,0,0,
-                                            4,4,4,3,4,4,3,4,0,0,0,0,0,0,0,0,0,0,0,
-                                            1,1,1,4,1,1,4,1,0,0,0,0,0,0,0,0,0,0,0,
-                                            2,2,2,3,3,3,1,3,2,1,0,0,0,0,0,0,0,0,0
-            };*/
     int ba[6][TAT_SIZE] {};
     int ba_a[6][TAT_SIZE] {};
     int ba2[6][TAT_SIZE] {};
@@ -484,7 +444,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
 
     int ee;
     int ba_ee[6][TAT_SIZE];
-    /*	int max_ee, key_ee;*/
     int keshiko_aa, keshiko_bb;
     int syuusoku = 0;
 
@@ -503,8 +462,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
     int aite_ojama = 0;
 
     zenke_uke = (zenkesi_aite == 1) || ((aite_hakka_zenkesi == 1) && (aite_hakka_jamako < 36));
-
-    //	hukks++;
     zenchk = 0;
     zenchain = 0;
 
@@ -542,7 +499,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
     aite_ojama = aite_ojama - aite_kosuu_iro;
     if (aite_ojama > 5)
         one_tanpatu = 0;
-    //	if((myf_kosuu_iro>=aite_kosuu_iro*2)&&(cchai>6)){
     if ((myf_kosuu_iro >= aite_kosuu_iro * 2) && (cchai > 6) && (aite_hakka_rensa < 4)) {
         kes2 = 1;
     } else {
@@ -571,8 +527,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
     tm_moni = 0;
 
     if (hukks < 255) {
-        //	if(hukks<0){
-
         for (aa = 0; aa < 22; aa++) {
             if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                 continue;
@@ -582,7 +536,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
                 chig_aa = 1;
             else
                 chig_aa = 0;
-            //		keshiko_aa=chousei_syoukyo_sc(ba_a, setti_basyo, &score_tmp);
             keshiko_aa = chousei_syoukyo_2(ba_a, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_tmp);
             if ((chain == 2) && (dabuchk[1] > 1)) {
                 for (bb = 0; bb < 22; bb++) {
@@ -605,7 +558,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
                     chig_bb = 1;
                 else
                     chig_bb = 0;
-                //			keshiko_bb=chousei_syoukyo_sc(ba_ee, setti_basyo, &score_tmp);
                 keshiko_bb = chousei_syoukyo_2(ba_ee, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_tmp);
                 if ((chain == 2) && (dabuchk[1] > 1)) {
                     for (dd = 0; dd < 22; dd++) {
@@ -616,91 +568,8 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
                     continue;
                 if (ba_ee[2][11] != 0)
                     continue;
-                /*
-                                        for(dd=0;dd<22;dd++){
-                                                if(tobashi_hantei_a(ba_ee, dd, nk1, nk2))continue;
-                                                memcpy(bass, ba_ee, sizeof(ba));
-                                                setti_puyo(bass, dd, nk1, nk2, setti_basyo);
-                                                if((setti_basyo[0]!=setti_basyo[2])&&(setti_basyo[1]!=setti_basyo[3]))chig_dd=1;
-                                                else chig_dd=0;
-                //				keshiko_dd=chousei_syoukyo_sc(bass, setti_basyo, &score_tmp);
-                                                keshiko_dd=chousei_syoukyo_2(bass, setti_basyo, &chain, dabuchk,
-                &ichiren_kesi, &score_tmp);
-                                                if((chain==2)&&(dabuchk[1]>1)){
-                                                        adubpt[aa][bb][dd]=1;
-                                                }
-                                                if(keshiko_dd!=0)continue;
-                                                if(bass[2][11]!=0)continue;
-
-                                                chigss = (chig_aa + chig_bb + chig_dd)*1;
-
-                                                for(i=0;i<numg;i++){
-                                                        if(tm_turn[i]<hukks)break;
-                                                        memset(cps,0,sizeof(cps));
-                                                        pont= -chigss;
-                                                        for(j=1;j<colko[i];j++){
-                                                                memset(cpps,0,sizeof(cpps));
-                                                                for(k=0;k<kko[i][j];k++){
-                                                                        tmpes = bass[katax[i][j][k]][katay[i][j][k]];
-                                                        //		if((tmpes!=0)&&(tmpes!=6))cpps[tmpes]++;
-                                                                        if((tmpes!=0))cpps[tmpes]++;
-                                                                }
-                                                                if((cpps[6]!=0)){pont -= 1000000;break;}
-                                                                if(((cpps[1]!=0)+(cpps[2]!=0)+(cpps[3]!=0)+(cpps[4]!=0)+(cpps[5]!=0))==1){
-                                                                        for(k=1;k<6;k++){
-                                                                                if(cpps[k]!=0)cps[j]=k;
-                                                                        }
-                                                //			pont += cpps[cps[j]] * 2000;
-                                                                        pont += cpps[cps[j]] * colscore[i][j];
-                                                                }
-                                                                else
-                if(((cpps[1]!=0)+(cpps[2]!=0)+(cpps[3]!=0)+(cpps[4]!=0)+(cpps[5]!=0))>1){
-                                                                        pont -= 1000000;
-                                                                }
-                                                        }
-                                                        for(j=0;j<kinko[i];j++){
-                                                                if((cps[kinsi_a[i][j]]==cps[kinsi_b[i][j]]) &&
-                (cps[kinsi_a[i][j]]!=0)){
-                                                                        pont -= 1000000;
-                                                                }
-                                                        }
-                                                        for(j=0;j<tankinko[i];j++){
-                                                                if(bass[tankinx[i][j]][tankiny[i][j]]!=0){
-                                                                        pont -= 1000000;
-                                                                }
-                                                        }
-                                                        for(j=0;j<jatako[i];j++){
-                                                                cpj[j] = bass[jatax[i][j]][jatay[i][j]];
-                                                        }
-                                                        for(j=0;j<jakkinko[i];j++){
-                                                                if((jakkin_a[i][j]<101)&&(jakkin_b[i][j]<101)){
-                                                                        if((cps[jakkin_a[i][j]]==cps[jakkin_b[i][j]]) &&
-                (cps[jakkin_a[i][j]]!=0)){
-                                                                                pont -= 1000;
-                                                                        }
-                                                                }
-                                                                else if((jakkin_a[i][j]<101)&&(jakkin_b[i][j]>100)){
-                                                                        if((cps[jakkin_a[i][j]]==cpj[jakkin_b[i][j]-101])
-                && (cps[jakkin_a[i][j]]!=0)){
-                                                                                pont -= 1000;
-                                                                        }
-                                                                }
-                                                                else if((jakkin_a[i][j]>100)&&(jakkin_b[i][j]>100)){
-                                                                        if((cpj[jakkin_a[i][j]-101]==cpj[jakkin_b[i][j]-101])
-                && (cpj[jakkin_a[i][j]-101]!=0)){
-                                                                                pont -= 1000;
-                                                                        }
-                                                                }
-                                                        }
-                                                        if(maxpont[i][aa]<pont){
-                                                                maxpont[i][aa]=pont;
-                                                                tm_moni = 1;
-                                                        }
-                                                }
-                                        }*/
             }
         }
-
     } // hukks
 
     for (aa = 0; aa < 22; aa++) {
@@ -719,31 +588,15 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
     }
     // aaaaaaaaaaaaaaaaaaaaaa
 
-    /*	for(dd=0;dd<221;dd++){
-                    for(aa=0;aa<22;aa++){
-                    for(bb=0;bb<22;bb++){
-                    score_hukasa[aa][bb][dd]=3000;
-                    for(ee=0;ee<EE_SIZE;ee++){
-                            chainhyk[aa][bb][dd][ee]=0;
-                            poihyo[aa][bb][dd][ee]=-2000;
-                    }
-                    }
-                    }
-            }*/
     for (aa = 0; aa < 22; aa++) {
         hym[aa] = -10000;
         zenke[aa] = 0;
     }
-    /*	for(i=0;i<20;i++){
-                    dabuchk[i]=0;
-            }*/
 
     kurai_large = 0;
     kurai_middle = 0;
     kurai_small = 0;
-    //	if(aite_hakka_rensa-aite_hakka_nokori<4){
     if (aite_hakka_nokori < 3) {
-        //		if((((aite_hakka_rensa>3)||(aite_hakka_kosuu>15))&&(aite_hakka_jamako>4))||((aite_hakka_zenkesi==1)&&(aite_hakka_jamako>35))){
         if ((((aite_hakka_rensa > 3) || (aite_hakka_kosuu > 15)) && (aite_hakka_jamako > 4))
             || ((aite_hakka_zenkesi == 1) && (aite_hakka_jamako > 35))
             || ((aite_hakka_zenkesi == 1) && (aite_hakka_jamako > 35))) {
@@ -810,20 +663,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
                                 zenkes[aa][bb][dd] += score + 2100 - (chig_aa + chig_bb) * 3;
                             }
                         }
-                        /*
-                                                if(myf_kosuu<11){
-                                                for(dd=0;dd<22;dd++){
-                                                        memcpy(ba, ba_ee, sizeof(ba));
-                                                        setti_puyo(ba, dd, nk1, nk2, setti_basyo);
-                                                        if((setti_basyo[0]!=setti_basyo[2])&&(setti_basyo[1]!=setti_basyo[3]))chig_dd=1;
-                                                        else chig_dd=0;
-                                                        hon_syoukyo_score(ba, &score, &quick);
-                                                        if((ba[0][0]==0)&&(ba[1][0]==0)&&(ba[2][0]==0)&&(ba[3][0]==0)&&(ba[4][0]==0)&&(ba[5][0]==0)){
-                                                                zenkes[aa][bb][dd] +=
-                           score+2100-(chig_aa+chig_bb+chig_dd)*3;
-                                                        }
-                                                }
-                                                }//p<5*/
                     }
                 } // p<6
             }
@@ -845,7 +684,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
 
     num = 0;
 
-    //	if((aite_rensa_m<3)||(kesu==1)||(zenkesi_own==1)||(saisoku==1)||(kurai_large==1)||(kurai_middle==1)||(kurai_small==1)||(kes2==1)){
     for (aa = 0; aa < 22; aa++) {
 
         for (i = 0; i < 20; i++) {
@@ -864,11 +702,7 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
         setti_puyo(ba, aa, nx1, nx2, setti_basyo);
         chain = hon_syoukyo_score(ba, &score, &quick);
 
-        //つぶし
-        //			if((chain==3)||(chain==4)){
-        ///			if((chain<5)&&(chain>1)&&(score>aite_rensa_score+130*chain)&&(score>990)){
-        ///				hym[aa]+=25000;keschk=1;
-        ///			}
+        // つぶし
         if ((e_t) && (aite_hakka_rensa < 4)) {
             if ((chain == 2) && (score > aite_rensa_score + 260) && (score > 1600)) {
                 hym[aa] += 77000 + score;
@@ -892,8 +726,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
                 kougeki_on = 1;
             }
         }
-        ///			if(maxscore<score){
-        //			if(maxch<chain){
         if ((maxch <= chain) && (maxscore < score)) {
             maxch = chain;
             maxach = aa;
@@ -911,10 +743,8 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
             hym[aa] += 74000;
             keschk = 1;
         }
-        //さいそく
+        // さいそく
         if (saisoku == 1) {
-            //		if((myf_kosuu_iro-myf_kosuu_kesi<myf_kosuu_kesi)&&(score>nocc_aite_rensa_score+130*chain)&&(chain>1)){
-            //			if((myf_kosuu_iro-myf_kosuu_kesi+4<myf_kosuu_kesi)&&(score>nocc_aite_rensa_score+130*chain)&&(chain>1)&&(aite_hakka_rensa==0)){
             if ((myf_kosuu_iro - myf_kosuu_kesi + 10 < myf_kosuu_kesi) && (score > nocc_aite_rensa_score + 130 * chain)
                 && (chain > 1) && (aite_hakka_rensa == 0)) {
                 hym[aa] += 73000;
@@ -923,7 +753,7 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
                 kougeki_on = 1;
             }
         }
-        // kurai//対応
+        // kurai 対応
         if (u_t == 0) {
             if (((score > aite_hakka_jamako * 70 - 280) && (score < aite_hakka_jamako * 70 + 1400))
                 && ((kurai_small == 1) || (kurai_middle == 1) || (kurai_large == 1)) && (aite_hakka_honsen == 0)
@@ -933,10 +763,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
             }
         }
         if (zenkesi_own == 1) { // aaaa0909
-            //			if((chain==1)&&(zenkesi_aite==1)&&(myf_kosuu_iro>14)){
-            //				hym[aa]+=74000;
-            //			}
-            //				if((chain==1)&&(aite_hakka_zenkesi==1)){ //add121014
             if ((chain == 1) && (aite_hakka_zenkesi == 1) && (aite_hakka_jamako < 36)) { // add121014
                 hym[aa] += 74000;
             }
@@ -945,18 +771,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
             }
         }
     } // aa
-    //		if((saisoku==1)&&(keschk==1))saisoku_flag=0;
-    /*		if((kesu==1)){
-                            if((maxch>cchai)&&(cchai>1)){
-                                    hym[maxach]+=30000;keschk=1;
-                            }
-                            else if((maxch>cchai-1)&&(cchai-1>1)){
-                                    hym[maxach]+=28000;keschk=1;
-                            }
-                            else if((maxch>cchai-2)&&(cchai-2>1)){
-                                    hym[maxach]+=26000;keschk=1;
-                            }
-                    }*/
     if (kes2 == 1) {
         if ((maxch > cchai) && (cchai > 1)) {
             hym[maxach] += 150000;
@@ -979,58 +793,22 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
         && (aite_hakka_honsen == 0) && (keschk == 0)) {
         taiouchk = 1;
     }
-    //		if(((kurai_large==1)&&(keschk==0))||((kurai_middle==1)&&(keschk==0))||((kurai_small==1)&&(keschk==0))||((aite_hakka_honsen==1)&&(aite_hakka_nokori<3))){
     if (((kurai_mini == 1) && (keschk == 0) && (myf_kosuu > 64)) || ((kurai_large == 1) && (keschk == 0))
         || ((kurai_middle == 1) && (keschk == 0)) || ((kurai_small == 1) && (keschk == 0))
         || ((aite_hakka_honsen == 1) && (aite_hakka_nokori < 3))) {
-        /*			if((maxch>cchai-1)&&(cchai-1>1)){
-                                        hym[maxach]+=28000;keschk=1;
-                                        aite_hakka_zenkesi=0;
-                                }
-                                else if((maxch>cchai-2)&&(cchai-2>1)){
-                                        hym[maxach]+=27000;keschk=1;
-                                        aite_hakka_zenkesi=0;
-                                }
-                                else if((maxch>cchai-3)&&(cchai-3>1)){
-                                        hym[maxach]+=26000;keschk=1;
-                                        aite_hakka_zenkesi=0;
-                                }
-                                else if((maxch>aite_hakka_rensa)){
-                                        hym[maxach]+=23000;keschk=1;
-                                        aite_hakka_zenkesi=0;
-                                }*/
         kuraichk = 1;
     }
-    if (zenkesi_own == 1) {
-        /*	if((maxch>cchai-1)&&(cchai-1>0)){
-                        hym[maxach]+=28000;keschk=1;
-                }
-                else if((maxch>cchai-2)&&(cchai-2>0)){
-                        hym[maxach]+=27000;keschk=1;
-                }
-                else if((maxch>cchai-3)&&(cchai-3>0)){
-                        hym[maxach]+=26000;keschk=1;
-                }*/
-        //			else if(maxch>0){
-        //				hym[maxach]+=24000;keschk=1;
-        //			}
-    }
-    //	}
 
     num = 0;
     if ((aite_hakka_honsen == 0) && (q_t)) {
         if (myf_kosuu > 23) {
             for (aa = 0; aa < 22; aa++) {
-                //	if(aa!=22){
                 if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                     continue;
                 memcpy(ba_a, ba2, sizeof(ba));
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
                 if (chousei_syoukyo(ba_a, setti_basyo) != 0)
                     continue;
-                //	}else{
-                //			memcpy(ba_a, ba2, sizeof(ba));
-                //	}
                 for (cplace = 0; cplace < 6; cplace++) {
                     if (ba_a[0][11] != 0) {
                         if (cplace == 0)
@@ -1078,10 +856,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
                                 if ((myf_kosuu < 46) && (chain == 2) && (dabuchk[1] > 1))
                                     nidub_point_a[aa] = 1200;
                             }
-                            //				if((myf_kosuu<46)&&(chain==2)&&(dabuchk[1]>1))
-                            //nidub_point_a[aa]=300;
-                            //				if((myf_kosuu<46)&&((chain==3)||(chain==4)))
-                            //nidub_point_a[aa]+=300;
                         }
                     } // cyy
                 } // cc
@@ -1094,7 +868,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
         wariko_taiou = taiouchk;
 
     cchai = 0;
-    // tesuu_mon=0;
 
     for (aa = 0; aa < 22; aa++) {
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
@@ -1120,9 +893,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
                 tai_max_score = aa;
             }
         }
-        //			if(zenke_uke==1){ //121013
-        //				setti_ojama(ba_a, 30);
-        //			}
         if ((myf_kosuu_iro - keshiko_aa + 8) < cchai * 4)
             continue;
         if (ba_a[2][11] != 0) {
@@ -1151,8 +921,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
             score_tmp2 = score_tmp;
             if ((kuraichk == 1) && (aite_hakka_nokori < 2) && (score_aonly > 0))
                 score_tmp = 0; // only
-            //			if((kuraichk==1)&&((aite_hakka_nokori<1) ||
-            //(aite_hakka_nokori<2)&&(aite_puyo_uki==0)))score_tmp=0;
             if ((kuraichk == 1) && ((aite_hakka_nokori < 1)
                                     || ((aite_hakka_nokori < 2) && ((aite_puyo_uki == 0) && (aite_hakka_quick == 1)))))
                 score_tmp = 0; // 0225
@@ -1187,21 +955,13 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
             } // 110604
         } // bb
     } // aa
-    //	printf("\n");//1a1
-    //		printf("count=%d\n",cnt);//1a1
-    // printf("aaaaa\n");
 
     for (aa = 0; aa < 22; aa++) {
-        //		hym[aa]=0;
         for (bb = 0; bb < 22; bb++) {
             for (dd = 0; dd < 221; dd++) {
                 for (ee = 0; ee < EE_SIZE; ee++) {
                     if ((key_ee == 0) && (ee > 0))
                         break; // t2
-                    //		printf("(%d)%d ",aa,poihyo[aa][bb] );
-                    //			if(maxchain_sub[aa]<chainhyk[aa][bb])maxchain_sub[aa]=chainhyk[aa][bb];
-                    //			hyktmp = chainhyk[aa][bb][dd][ee]*1000 + poihyo[aa][bb][dd][ee] +
-                    //(((myf_kosuu>40)||syuusoku)*(ee==0)*300);
                     hyktmp = chainhyk[aa][bb][dd][ee] * 1000 + poihyo[aa][bb][dd][ee]
                              + (((myf_kosuu > 40) || syuusoku) * (ee == 0) * 300) + score_hukasa[aa][bb][dd];
                     if (hym[aa] < hyktmp) {
@@ -1222,7 +982,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
     }
     kuraichk_mon = kuraichk;
     score_mon = -1;
-    //	if(((kesu==1) && (score_max<score_aa)) || (kuraichk==1)){
     if (((kesu == 1) && (score_max < score_aa)) || ((kuraichk == 1) && (score_aa > 530))) {
         hym[aa_max_score] += 100000;
         score_mon = score_aa;
@@ -1233,30 +992,17 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
     if (u_t == 1) {
         if ((wariko_taiou == 1) && (((score_tai > 270) && ((myf_kosuu > 36) || (ba2[2][10] != 0)
                                                            || (aite_hakka_zenkesi == 1))) || (score_tai > 840))) {
-            //	if((wariko_taiou==1)&&(score_tai>270)){
             hym[tai_max_score] += 140000;
             score_mon = score_tai;
         }
     }
 
-    /*	for(aa=0;aa<22;aa++){
-                    for(aa=0;bb<22;bb++){
-                    }
-            }*/
-    //		printf("\n");
-
-    /*	for(i=0;i<6;i++){
-                    for(j=0;j<18;j++){
-                            ba[i][j] = ba2[i][j];
-                    }
-            }*/
-    // hikui basyo
+    // 低い場所
     for (i = 0; i < 6; i++) {
         n = 0;
         for (j = 0; j < 13; j++) {
             if (ba2[i][j] == 0)
                 n++;
-            //			zr[j]=n;
         }
         hym[i] += n * 2;
         hym[i + 6] += n * 2;
@@ -1302,50 +1048,16 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
             }
         }
     }
-    /*	for(aa=12;aa<22;aa++){
-            if(aa<17){
-                    if(teimen[aa-11]>teimen[aa-12])hym[aa]=hym[aa]+teimen[aa-12]*3-teimen[aa-11]*3;
-                    if(teimen[aa-11]<teimen[aa-12])hym[aa]=hym[aa]-teimen[aa-12]*3+teimen[aa-11]*3;
-            }
-            else if(aa<22){
-                    if(teimen[aa-17]>teimen[aa-16])hym[aa]=hym[aa]+teimen[aa-16]*3-teimen[aa-17]*3;
-                    if(teimen[aa-17]<teimen[aa-16])hym[aa]=hym[aa]-teimen[aa-16]*3+teimen[aa-17]*3;
-            }
-            }*/
 
-    /*	if( ( (zenkesi_aite==1)|| ((aite_hakka_zenkesi==1)&&(aite_hakka_jamako<36)) ) && ((teimen[3]-teimen[2])<7) ){
-                    if((teimen[3]<9)){
-                            hym[3]+=5100;
-                            hym[9]+=5100;
-                    }
-                    if((teimen[4]<10)){
-                            hym[4]+=5000;
-                            hym[10]+=5000;
-                    }
-                    if((teimen[5]<10)){
-                            hym[5]+=5000;
-                            hym[11]+=5000;
-                    }
-                    if((teimen[3]<9)&&(teimen[4]<10)){
-                            hym[15]+=5100;
-                            hym[20]+=5100;
-                    }
-                    if((teimen[4]<10)&&(teimen[5]<10)){
-                            hym[16]+=5000;
-                            hym[21]+=5000;
-                    }
-            }*/
     if ((zenkesi_own == 1) && (myf_kosuu_iro == 0)) {
         hym[5] += 5000;
         hym[11] += 5000;
         hym[16] += 5000;
         hym[21] += 5000;
     }
-    // chigiri
 
+    // chigiri
     if (((zenkesi_own == 1) && (zenkesi_aite != 1)) || ((aite_hakka_honsen == 0) && (w_t)) || (zenkesi_aite == 1)) {
-        //	if((zenkesi_own==1)&&(zenkesi_aite!=1)){
-        //
         for (aa = 0; aa < 22; aa++) {
             memcpy(ba, ba2, sizeof(ba));
             if (aa < 6) {
@@ -1412,7 +1124,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
                                 hym[aa] += 120;
                             if ((zenkesi_aite == 1) && (num == 3))
                                 hym[aa] += 480;
-                            //						point[i][j]=num;
                             num = 0;
                         }
                     }
@@ -1422,7 +1133,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
     }
 
     for (aa = 0; aa < 22; aa++) {
-        //		hym[aa]+=maxp_matome[aa]*1;
         if ((myf_kosuu < 52) && (myf_kosuu_iro > 23) && (aite_hakka_rensa < 4) && (aite_hakka_honsen == 0))
             hym[aa] += apos[aa] * 2000;
         if (is_2dub_cpu) {
@@ -1436,8 +1146,6 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
             para[aa] = hym[aa] * 10 + 4;
         else if (aa < 12)
             para[aa + 5] = hym[aa] * 10 + 3;
-        //		else if(aa<17)para[aa-6] = hym[aa];
-        //		else if(aa<22)para[aa] = hym[aa];
         else if (aa < 17)
             para[aa + 5] = hym[aa] * 10 + 2;
         else if (aa < 22)
@@ -1958,7 +1666,6 @@ int COMAI_HI::chousei_syoukyo(int ba[][TAT_SIZE], int setti_basyo[])
     b = setti_basyo[1];
     c = setti_basyo[2];
     d = setti_basyo[3];
-    //	memset(point, 0, sizeof(point));
     if ((b < 12) && (b >= 0)) {
         saiki(ba, point, a, b, &numa, ba[a][b]);
     }
@@ -2038,7 +1745,7 @@ int COMAI_HI::chousei_syoukyo(int ba[][TAT_SIZE], int setti_basyo[])
             }
         }
     }
-    //	}
+
     return keshiko;
 }
 
@@ -2153,7 +1860,6 @@ int COMAI_HI::hon_syoukyo_score(int ba[][TAT_SIZE], int* score, int* quick)
                 }
             }
         }
-        //		(*quick)=1;
         if (syo == 1)
             (*quick) = 1;
         for (i = 0; i < 6; i++) {
@@ -2269,7 +1975,6 @@ int COMAI_HI::chousei_syoukyo_2(int ba[][TAT_SIZE], int setti_basyo[], int* chai
     b = setti_basyo[1];
     c = setti_basyo[2];
     d = setti_basyo[3];
-    //	memset(point, 0, sizeof(point));
     if ((b < 12) && (b >= 0)) {
         saiki(ba, point, a, b, &numa, ba[a][b]);
     }
@@ -2370,8 +2075,6 @@ int COMAI_HI::chousei_syoukyo_2(int ba[][TAT_SIZE], int setti_basyo[], int* chai
         if (syo == 1)
             *chain += 1;
     }
-    //	}
-    //	*score = 0;
     for (i = 0; i < (*chain); i++) {
         rate = 0;
         colnum = 0;
@@ -2417,7 +2120,6 @@ int COMAI_HI::chousei_syoukyo_sc(int ba[][TAT_SIZE], int setti_basyo[], int* sco
     b = setti_basyo[1];
     c = setti_basyo[2];
     d = setti_basyo[3];
-    //	memset(point, 0, sizeof(point));
     if ((b < 12) && (b >= 0)) {
         saiki(ba, point, a, b, &numa, ba[a][b]);
     }
@@ -2517,8 +2219,6 @@ int COMAI_HI::chousei_syoukyo_sc(int ba[][TAT_SIZE], int setti_basyo[], int* sco
         if (syo == 1)
             chain += 1;
     }
-    //	}
-    //	*score = 0;
     for (i = 0; i < (chain); i++) {
         rate = 0;
         colnum = 0;
@@ -2604,7 +2304,6 @@ int COMAI_HI::chousei_syoukyo_3(int bass[][TAT_SIZE], int[], int* poi2s, int* sc
     }
 
     while (syo) {
-        //					pois = 0;
         syo = 0;
         memset(point, 0, sizeof(point));
         rakkaflg[0] = 0;
@@ -2803,7 +2502,6 @@ int COMAI_HI::read_template()
         return 0;
     }
     i = 0;
-    //	return 0;
 
     while (1) {
         if (cnt == 0) {
@@ -2856,7 +2554,6 @@ int COMAI_HI::read_template()
                     jatako[i]++;
                 }
             }
-            //				return 0;
         } else if (cnt == 8) {
             if ((fscanf(fp, "%d", &numg)) == EOF)
                 break;
@@ -2902,16 +2599,6 @@ int COMAI_HI::read_template()
     fclose(fp);
     return numg;
 }
-
-/*
-#define TM_TMNMUM 30
-#define TM_COLNUM 19
-#define TM_COLPER 8
-#define TM_KINPT 30
-#define TM_JAKKINPT 10
-#define TM_TANKINPT 10
-#define TM_OBJE 10
-*/
 
 int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE],
                          int zenkesi_aite, int fast)
@@ -2959,7 +2646,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
 
     int ee, eex, eecol;
     int ba_ee[6][TAT_SIZE];
-    /*	int max_ee, key_ee;*/
     int keshiko_aa, keshiko_bb, keshiko_dd;
     int syuusoku = 0;
 
@@ -3025,7 +2711,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
     aite_ojama = aite_ojama - aite_kosuu_iro;
     if (aite_ojama > 5)
         one_tanpatu = 0;
-    //	if((myf_kosuu_iro>=aite_kosuu_iro*2)&&(cchai>6)){
     if ((myf_kosuu_iro >= aite_kosuu_iro * 2) && (cchai > 6) && (aite_hakka_rensa < 4)) {
         kes2 = 1;
     } else {
@@ -3061,16 +2746,11 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
         hym[aa] = -10000;
         zenke[aa] = 0;
     }
-    /*	for(i=0;i<20;i++){
-                    dabuchk[i]=0;
-            }*/
 
     kurai_large = 0;
     kurai_middle = 0;
     kurai_small = 0;
-    //	if(aite_hakka_rensa-aite_hakka_nokori<4){
     if (aite_hakka_nokori < 3) {
-        //		if((((aite_hakka_rensa>3)||(aite_hakka_kosuu>15))&&(aite_hakka_jamako>4))||((aite_hakka_zenkesi==1)&&(aite_hakka_jamako>35))){
         if ((((aite_hakka_rensa > 3) || (aite_hakka_kosuu > 15)) && (aite_hakka_jamako > 4))
             || ((aite_hakka_zenkesi == 1) && (aite_hakka_jamako > 35))
             || ((aite_hakka_zenkesi == 1) && (aite_hakka_jamako > 35))) {
@@ -3137,20 +2817,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                                 zenkes[aa][bb][dd] += score + 2100 - (chig_aa + chig_bb) * 3;
                             }
                         }
-                        /*
-                                                if(myf_kosuu<11){
-                                                for(dd=0;dd<22;dd++){
-                                                        memcpy(ba, ba_ee, sizeof(ba));
-                                                        setti_puyo(ba, dd, nk1, nk2, setti_basyo);
-                                                        if((setti_basyo[0]!=setti_basyo[2])&&(setti_basyo[1]!=setti_basyo[3]))chig_dd=1;
-                                                        else chig_dd=0;
-                                                        hon_syoukyo_score(ba, &score, &quick);
-                                                        if((ba[0][0]==0)&&(ba[1][0]==0)&&(ba[2][0]==0)&&(ba[3][0]==0)&&(ba[4][0]==0)&&(ba[5][0]==0)){
-                                                                zenkes[aa][bb][dd] +=
-                           score+2100-(chig_aa+chig_bb+chig_dd)*3;
-                                                        }
-                                                }
-                                                }//p<5*/
                     }
                 } // p<6
             }
@@ -3172,7 +2838,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
 
     num = 0;
 
-    //	if((aite_rensa_m<3)||(kesu==1)||(zenkesi_own==1)||(saisoku==1)||(kurai_large==1)||(kurai_middle==1)||(kurai_small==1)||(kes2==1)){
     for (aa = 0; aa < 22; aa++) {
 
         for (i = 0; i < 20; i++) {
@@ -3191,11 +2856,7 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
         setti_puyo(ba, aa, nx1, nx2, setti_basyo);
         chain = hon_syoukyo_score(ba, &score, &quick);
 
-        //つぶし
-        //			if((chain==3)||(chain==4)){
-        ///			if((chain<5)&&(chain>1)&&(score>aite_rensa_score+130*chain)&&(score>990)){
-        ///				hym[aa]+=25000;keschk=1;
-        ///			}
+        // つぶし
         if ((e_t) && (aite_hakka_rensa < 4)) {
             if ((chain == 2) && (score > aite_rensa_score + 260) && (score > 1600)) {
                 hym[aa] += 77000 + score;
@@ -3219,8 +2880,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                 kougeki_on = 1;
             }
         }
-        ///			if(maxscore<score){
-        //			if(maxch<chain){
         if ((maxch <= chain) && (maxscore < score)) {
             maxch = chain;
             maxach = aa;
@@ -3238,10 +2897,8 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
             hym[aa] += 74000;
             keschk = 1;
         }
-        //さいそく
+        // さいそく
         if (saisoku == 1) {
-            //		if((myf_kosuu_iro-myf_kosuu_kesi<myf_kosuu_kesi)&&(score>nocc_aite_rensa_score+130*chain)&&(chain>1)){
-            //			if((myf_kosuu_iro-myf_kosuu_kesi+4<myf_kosuu_kesi)&&(score>nocc_aite_rensa_score+130*chain)&&(chain>1)&&(aite_hakka_rensa==0)){
             if ((myf_kosuu_iro - myf_kosuu_kesi + 10 < myf_kosuu_kesi) && (score > nocc_aite_rensa_score + 130 * chain)
                 && (chain > 1) && (aite_hakka_rensa == 0)) {
                 hym[aa] += 73000;
@@ -3250,7 +2907,7 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                 kougeki_on = 1;
             }
         }
-        // kurai//対応
+        // kurai 対応
         if (u_t == 0) {
             if (((score > aite_hakka_jamako * 70 - 280) && (score < aite_hakka_jamako * 70 + 1400))
                 && ((kurai_small == 1) || (kurai_middle == 1) || (kurai_large == 1)) && (aite_hakka_honsen == 0)
@@ -3260,10 +2917,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
             }
         }
         if (zenkesi_own == 1) { // aaaa0909
-            //			if((chain==1)&&(zenkesi_aite==1)&&(myf_kosuu_iro>14)){
-            //				hym[aa]+=74000;
-            //			}
-            //				if((chain==1)&&(aite_hakka_zenkesi==1)){ //add121014
             if ((chain == 1) && (aite_hakka_zenkesi == 1) && (aite_hakka_jamako < 36)) { // add121014
                 hym[aa] += 74000;
             }
@@ -3272,18 +2925,7 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
             }
         }
     } // aa
-    //		if((saisoku==1)&&(keschk==1))saisoku_flag=0;
-    /*		if((kesu==1)){
-                            if((maxch>cchai)&&(cchai>1)){
-                                    hym[maxach]+=30000;keschk=1;
-                            }
-                            else if((maxch>cchai-1)&&(cchai-1>1)){
-                                    hym[maxach]+=28000;keschk=1;
-                            }
-                            else if((maxch>cchai-2)&&(cchai-2>1)){
-                                    hym[maxach]+=26000;keschk=1;
-                            }
-                    }*/
+
     if (kes2 == 1) {
         if ((maxch > cchai) && (cchai > 1)) {
             hym[maxach] += 150000;
@@ -3306,58 +2948,22 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
         && (aite_hakka_honsen == 0) && (keschk == 0)) {
         taiouchk = 1;
     }
-    //		if(((kurai_large==1)&&(keschk==0))||((kurai_middle==1)&&(keschk==0))||((kurai_small==1)&&(keschk==0))||((aite_hakka_honsen==1)&&(aite_hakka_nokori<3))){
     if (((kurai_mini == 1) && (keschk == 0) && (myf_kosuu > 64)) || ((kurai_large == 1) && (keschk == 0))
         || ((kurai_middle == 1) && (keschk == 0)) || ((kurai_small == 1) && (keschk == 0))
         || ((aite_hakka_honsen == 1) && (aite_hakka_nokori < 3))) {
-        /*			if((maxch>cchai-1)&&(cchai-1>1)){
-                                        hym[maxach]+=28000;keschk=1;
-                                        aite_hakka_zenkesi=0;
-                                }
-                                else if((maxch>cchai-2)&&(cchai-2>1)){
-                                        hym[maxach]+=27000;keschk=1;
-                                        aite_hakka_zenkesi=0;
-                                }
-                                else if((maxch>cchai-3)&&(cchai-3>1)){
-                                        hym[maxach]+=26000;keschk=1;
-                                        aite_hakka_zenkesi=0;
-                                }
-                                else if((maxch>aite_hakka_rensa)){
-                                        hym[maxach]+=23000;keschk=1;
-                                        aite_hakka_zenkesi=0;
-                                }*/
         kuraichk = 1;
     }
-    if (zenkesi_own == 1) {
-        /*	if((maxch>cchai-1)&&(cchai-1>0)){
-                        hym[maxach]+=28000;keschk=1;
-                }
-                else if((maxch>cchai-2)&&(cchai-2>0)){
-                        hym[maxach]+=27000;keschk=1;
-                }
-                else if((maxch>cchai-3)&&(cchai-3>0)){
-                        hym[maxach]+=26000;keschk=1;
-                }*/
-        //			else if(maxch>0){
-        //				hym[maxach]+=24000;keschk=1;
-        //			}
-    }
-    //	}
 
     num = 0;
     if ((aite_hakka_honsen == 0) && (q_t)) {
         if (myf_kosuu > 23) {
             for (aa = 0; aa < 22; aa++) {
-                //	if(aa!=22){
                 if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                     continue;
                 memcpy(ba_a, ba2, sizeof(ba));
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
                 if (chousei_syoukyo(ba_a, setti_basyo) != 0)
                     continue;
-                //	}else{
-                //			memcpy(ba_a, ba2, sizeof(ba));
-                //	}
                 for (cplace = 0; cplace < 6; cplace++) {
                     if (ba_a[0][11] != 0) {
                         if (cplace == 0)
@@ -3400,10 +3006,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                             chousei_syoukyo_2(ba, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score);
                             if ((myf_kosuu < 46) && (chain == 2) && (dabuchk[1] > 1))
                                 nidub_point_a[aa] = 1200;
-                            //				if((myf_kosuu<46)&&(chain==2)&&(dabuchk[1]>1))
-                            //nidub_point_a[aa]=300;
-                            //				if((myf_kosuu<46)&&((chain==3)||(chain==4)))
-                            //nidub_point_a[aa]+=300;
                         }
                     } // cyy
                 } // cc
@@ -3422,7 +3024,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
     chig_dd = 0;
 
     for (dd = 0; dd < 221; dd++) {
-        //			if((hukks==1)&&(dd<220))continue;
         if ((fast != 0) && (dd < 220))
             continue;
         if (dd < 22) {
@@ -3475,15 +3076,11 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
             if (((dd > 5 + 198) && (dd < 12 + 198)) || ((dd > 13 + 198) && (dd < 19 + 198)))
                 continue;
         }
-//			#pragma omp parallel for private(chig_aa, chig_bb,
-//chig_dd,teimen,aveteimen,score_tmp2,score_aonly,score_bonly,score_mm,score_tmp,aa,bb,ba_a,setti_basyo,ee,ba_ee,eex,eecol,ba,i,j,i2,j2,num2,chain,poi2s,bass,tokus,rakkaflg,kiept,n,syo,num,point,pois,keshiko_aa,keshiko_bb,keshiko_dd,hakkatakasa)
-//firstprivate(point2)
+
 #pragma omp parallel for private(chig_aa, chig_bb, chig_dd, teimen, aveteimen, score_tmp2, score_aonly, score_bonly,   \
                                  score_mm, score_tmp, aa, bb, ba_a, setti_basyo, ee, ba_ee, eex, eecol, ba, i, j, i2,  \
                                  j2, num2, chain, poi2s, bass, tokus, rakkaflg, kiept, n, syo, num, point, pois,       \
                                  keshiko_aa, keshiko_bb, keshiko_dd, hakkatakasa, tanpatu_on) firstprivate(point2)
-        //			#pragma omp parallel for
-        //private(aa,bb,ba_a,setti_basyo,ee,ba_ee,eex,eecol,ba,point2,i,j,i2,j2,num2,chain,poi2s,bass,tokus,rakkaflg,kiept,n,syo,num,point,pois,keshiko_aa,keshiko_bb,keshiko_dd)
         for (aa = 0; aa < 22; aa++) {
             if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                 continue;
@@ -3508,9 +3105,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                     tai_max_score = aa;
                 }
             }
-            //			if(zenke_uke==1){ //121013
-            //				setti_ojama(ba_a, 30);
-            //			}
             if ((myf_kosuu_iro - keshiko_aa + 8) < cchai * 4)
                 continue;
             if (ba_a[2][11] != 0) {
@@ -3537,8 +3131,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                 score_tmp2 = score_tmp;
                 if ((kuraichk == 1) && (aite_hakka_nokori < 2) && (score_aonly > 0))
                     score_tmp = 0; // only
-                //			if((kuraichk==1)&&((aite_hakka_nokori<1) ||
-                //(aite_hakka_nokori<2)&&(aite_puyo_uki==0)))score_tmp=0;
                 if ((kuraichk == 1)
                     && ((aite_hakka_nokori < 1)
                         || ((aite_hakka_nokori < 2) && ((aite_puyo_uki == 0) && (aite_hakka_quick == 1)))))
@@ -3610,18 +3202,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                             tesuu_mon = 3;
                         }
                     }
-                    /*				if((wariko_taiou==1)&&((score_aonly>0)||(score_bonly>0)))score_tmp2=0;
-                       //only
-                                                    if((wariko_taiou==1)&&(aite_hakka_nokori<2))score_tmp2=0;
-                                                    if((ba_ee[2][11]==0)&&(score_tmp2>score_tai) && (score_tmp2>270) &&
-                       (aite_hakka_jamako*70>score_tmp2-1400) && (score_tmp2+150>aite_hakka_jamako*70)){
-                                                            if((myf_kosuu_iro+3>(keshiko_aa+keshiko_bb+keshiko_dd)*2)||(i_t)){
-                                                                    score_tai=score_tmp2;tai_max_score = aa;
-                                                            }
-                                                    }*/
-                    //			if(zenkesi_aite==1){ //121007
-                    //				setti_ojama(ba_ee, 30);
-                    //			}
                     if ((myf_kosuu_iro - keshiko_aa - keshiko_bb - keshiko_dd + 8) < cchai * 4)
                         continue;
                     if (ba_ee[2][11] != 0) {
@@ -3652,14 +3232,10 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                     if (p_t == 1)
                         score_hukasa[aa][bb][dd] -= (chig_aa * 1 + chig_bb * 1 + chig_dd * 1);
                 }
-                //	if(zenke_uke!=1){ //121007
-                //	if(myf_kosuu_iro<44){
                 if (ba_ee[2][10] != 0)
                     score_hukasa[aa][bb][dd] -= 1200;
                 if (ba_ee[3][10] != 0)
                     score_hukasa[aa][bb][dd] -= 1200;
-                //	}
-                //	}
                 for (j = 0; j < 9; j++) {
                     if (ba_ee[0][j] == 0) {
                         if (ba_ee[1][j + 1] != 0)
@@ -3697,9 +3273,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                         }
                     }
                 }
-                //	if(teimen[0]+teimen[1]+teimen[4]+teimen[5]+6<(teimen[2]+teimen[3])*2){
-                //		score_hukasa[aa][bb][dd]-=(1000+((teimen[2]+teimen[3])*2-(teimen[0]+teimen[1]+teimen[4]+teimen[5]+6))*300);
-                //	}
                 if ((zenkesi_aite != 1) && (r_t)) {
                     aveteimen = teimen[0] + teimen[1] + teimen[2] + teimen[3] + teimen[4] + teimen[5];
                     teimen[0] = (teimen[0] - 3) * 6 - aveteimen;
@@ -3746,7 +3319,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                     } else {
                         eex = (ee - 1) % 6;
                         eecol = (ee - 1) / 6 + 1;
-                        //			if((eex==1)||(eex==2)||(eex==3)||(eex==4))continue;
                         if ((eex == 2) || (eex == 3))
                             continue;
                         if (ba_ee[0][11] != 0) {
@@ -3776,13 +3348,11 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                             continue;
                     }
 
-                    //		if(zenkesi_aite!=1){ //121007
                     if (ba[2][11] != 0) {
                         chainhyk[aa][bb][dd][ee] = 0;
                         poihyo[aa][bb][dd][ee] = -3000;
                         continue;
                     }
-                    //				if(zenke_uke!=1){ //121013
                     if ((ba[0][10] == 0) && (ba[1][11] != 0) && (ba2[1][11] == 0)) {
                         chainhyk[aa][bb][dd][ee] = 0;
                         poihyo[aa][bb][dd][ee] = -2000;
@@ -3798,14 +3368,10 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                         poihyo[aa][bb][dd][ee] = -2000;
                         continue;
                     }
-                    //				}
-                    //		memset(point2, '1', sizeof(point2));
                     for (i = 0; i < 6; i++) {
                         for (j = 0; j < 12; j++) {
                             point2[i][j] = 8;
                             if ((ba[i][j] != 0) && (ba[i][j] != 6)) {
-                                //							if(((ba[i+1][j]==0)&&(i!=5)) ||
-                                //((ba[i-1][j]==0)&&(i!=0)) || (ba[i][j+1]==0))point2[i][j]=0;
                                 if ((ba[i][j + 1] == 0) && ((ba[i + 1][j] == 0) && (i != 5))) {
                                     if ((j != 11) && ((i != 4) || (ba[3][11] == 0))) {
                                         point2[i][j] = 2;
@@ -3863,14 +3429,11 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                                 hakkatakasa++;
                             if (point2[i2][j2] == 1)
                                 continue;
-                            //					printf("mitayo\n");
-
-                            /*if((num2!=1)&&(num2!=2))*/ if ((num2 > 2))
+                            if ((num2 > 2))
                                 memcpy(bass, ba, sizeof(bass));
                             chain = 0;
                             num2 = 0;
                             poi2s = 0;
-                            //				memset(point, 0, sizeof(point));
                             tokus = point2[i2][j2];
                             saiki_3(bass, point2, i2, j2, &num2, bass[i2][j2]);
                             if ((num2 < 3))
@@ -3896,7 +3459,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                             pois = 0;
                             if (cchai <= chain) {
                                 cchai = chain;
-                                //		pois=0;
                                 memset(point, 0, sizeof(point));
                                 num = 0;
                                 for (i = 0; i < 6; i++) {
@@ -3905,12 +3467,8 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                                             break;
                                         if ((point[i][j] != 1) && (bass[i][j] != 6)) {
                                             saiki(bass, point, i, j, &num, bass[i][j]);
-                                            //									if(num!=0){
                                             pois = pois + num * num * num;
-                                            //						point[i][j]=num;
                                             num = 0;
-                                            // cnt++;
-                                            //									}
                                         }
                                     }
                                 }
@@ -3926,7 +3484,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                                 } // 12-2
                             }
                             if (chainhyk[aa][bb][dd][ee] < chain) {
-                                //					cchai = chain;//
                                 chainhyk[aa][bb][dd][ee] = chain;
                                 poihyo[aa][bb][dd][ee] = (pois + poi2s);
                             } else if (chainhyk[aa][bb][dd][ee] == chain) {
@@ -3940,7 +3497,6 @@ int COMAI_HI::pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2,
                                 score_max = score_mm;
                                 mmmax = aa;
                             }
-                            //		}
                         }
                     }
                 } // ee
