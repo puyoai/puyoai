@@ -131,7 +131,7 @@ TEST(PatternBookTest, pattern1)
     EXPECT_TRUE(found);
 }
 
-TEST(PatternBookTest, pattern1_complement)
+TEST(PatternBookTest, pattern1_complement1)
 {
     PatternBook patternBook;
     ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK));
@@ -170,6 +170,36 @@ TEST(PatternBookTest, pattern1_complement)
 
     PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0}, 1);
     EXPECT_TRUE(found);
+}
+
+TEST(PatternBookTest, pattern1_complement2)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK));
+
+    CoreField field(
+        "....GG"
+        ".G.GRR"
+        ".B.RGR"
+        "BRRGYY"
+        "BYYRGG");
+
+    auto callback = [&](const CoreField&,
+                        const RensaResult&,
+                        const ColumnPuyoList& keyPuyos,
+                        const ColumnPuyoList& firePuyos,
+                        const RensaTrackResult&,
+                        const std::string&,
+                        int patternScore) {
+        CoreField cf(field);
+        cf.dropPuyoList(keyPuyos);
+        cf.dropPuyoList(firePuyos);
+
+        cout << cf.toDebugString() << endl;
+        cout << patternScore << endl;
+    };
+
+    PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({}, 3);
 }
 
 TEST(PatternBookTest, pattern2)
