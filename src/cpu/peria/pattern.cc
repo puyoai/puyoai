@@ -117,6 +117,8 @@ void Pattern::Optimize() {
           continue;
         char c0 = pattern_[y0][x0];
         char c1 = pattern_[y1][x1];
+        if (c0 == c1)
+          continue;
         neighbors_.insert(Neighbor(c0, c1));
         neighbors_.insert(Neighbor(c1, c0));
       }
