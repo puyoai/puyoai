@@ -7,7 +7,6 @@
 #include <string>
 
 #include "base/base.h"
-#include "core/algorithm/rensa_ref_sequence.h"
 #include "core/column_puyo.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
@@ -625,18 +624,18 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
                                               int restIterations,
                                               const ColumnPuyoList& accumulatedKeyPuyos,
                                               const ColumnPuyoList& firstRensaFirePuyos,
+                                              int currentTotalChains,
                                               const bool prohibits[FieldConstant::MAP_WIDTH],
-                                              RensaRefSequence* rensaSequence,
                                               const RensaDetectorStrategy& strategy,
-                                              const RensaDetector::IterativePossibleRensaCallback& callback)
+                                              const RensaDetector::TrackedPossibleRensaCallback& callback)
 {
     if (restIterations <= 0)
         return;
 
     auto findRensaCallback = [&](CoreField* f, const ColumnPuyoList& currentFirePuyos) {
         auto simulationCallback = [&](const CoreField& fieldAfterSimulation, const RensaResult& rensaResult,
-                                      const ColumnPuyoList& currentKeyPuyos, const ColumnPuyoList& currentFirePuyos,
-                                      const RensaTrackResult& trackResult) {
+                                      const ColumnPuyoList& /*currentKeyPuyos*/, const ColumnPuyoList& currentFirePuyos,
+                                      const RensaTrackResult& /*trackResult*/) {
             ColumnPuyoList combinedKeyPuyos(accumulatedKeyPuyos);
             if (!combinedKeyPuyos.append(currentFirePuyos))
                 return;
@@ -671,14 +670,10 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             RensaTrackResult combinedTrackResult;
             RensaResult combinedRensaResult = f.simulateWithContext(&context, &combinedTrackResult);
 
-            if (combinedRensaResult.chains != rensaSequence->totalChains() + rensaResult.chains) {
+            if (combinedRensaResult.chains != currentTotalChains + rensaResult.chains) {
                 // Rensa looks broken. We don't count such rensa.
                 return;
             }
-
-            // OK.
-            RensaRef rensaRef { originalField, fieldAfterSimulation, currentKeyPuyos, currentFirePuyos, rensaResult, trackResult };
-            rensaSequence->push(&rensaRef);
 
             // Don't put key puyo on the column which fire puyo will be placed.
             bool newProhibits[FieldConstant::MAP_WIDTH];
@@ -687,13 +682,12 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             else
                 RensaDetector::makeProhibitArray(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
 
-
-            callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult, *rensaSequence);
+            callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult);
             iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, initialField, restIterations - 1,
-                                                     combinedKeyPuyos, firstRensaFirePuyos, newProhibits,
-                                                     rensaSequence, strategy, callback);
-
-            rensaSequence->pop();
+                                                     combinedKeyPuyos, firstRensaFirePuyos,
+                                                     combinedRensaResult.chains,
+                                                     newProhibits,
+                                                     strategy, callback);
         };
 
         simulateInternal(f, originalField, ColumnPuyoList(), currentFirePuyos, simulationCallback);
@@ -712,20 +706,15 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
 void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalField,
                                                      int maxIteration,
                                                      const RensaDetectorStrategy& strategy,
-                                                     IterativePossibleRensaCallback callback)
+                                                     TrackedPossibleRensaCallback callback)
 {
     DCHECK_LE(1, maxIteration);
-
-    RensaRefSequence rensaSequence;
 
     auto findRensaCallback = [&](CoreField* f, const ColumnPuyoList& firePuyos) {
         auto simulationCallback = [&](const CoreField& fieldAfterSimulation, const RensaResult& rensaResult,
                                       const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                                       const RensaTrackResult& trackResult) {
-            RensaRef ref { originalField, fieldAfterSimulation, keyPuyos, firePuyos, rensaResult, trackResult };
-            rensaSequence.push(&ref);
-
-            callback(fieldAfterSimulation, rensaResult, keyPuyos, firePuyos, trackResult, rensaSequence);
+            callback(fieldAfterSimulation, rensaResult, keyPuyos, firePuyos, trackResult);
 
             // Don't put key puyo on the column which fire puyo will be placed.
             bool prohibits[FieldConstant::MAP_WIDTH];
@@ -735,8 +724,7 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
                 makeProhibitArray(rensaResult, trackResult, originalField, firePuyos, prohibits);
 
             iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, originalField, maxIteration - 1,
-                                                     ColumnPuyoList(), firePuyos, prohibits, &rensaSequence, strategy, callback);
-            rensaSequence.pop();
+                                                     ColumnPuyoList(), firePuyos, rensaResult.chains, prohibits, strategy, callback);
         };
 
         simulateInternal(f, originalField, ColumnPuyoList(), firePuyos, simulationCallback);
