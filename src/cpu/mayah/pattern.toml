@@ -1347,6 +1347,31 @@ field = [
 ignition = 2
 score = 8.0
 
+[[pattern]]
+field = [
+    "C.....",
+    "BA....",
+    "AAA...",
+    "BB....",
+    "BCC...",
+    "C.....",
+]
+ignition = 2
+score = 8.0
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "AA....",
+    "AA....",
+    "BB....",
+    "BCC...",
+    "C.....",
+]
+ignition = 2
+score = 8.0
+
 # ----------------------------------------------------------------------
 # FUKIGENGTR-HEAD-2
 
@@ -1421,7 +1446,28 @@ field = [
     ".AACBC",
 ]
 ignition = 3
-score = 8.0
+score = 6.0
+
+[[pattern]]
+field = [
+    ".....C",
+    ".....C",
+    "...B.B",
+    "..AABB",
+    ".AA.CC",
+]
+ignition = 3
+score = 6.0
+
+[[pattern]]
+field = [
+    "...B.C",
+    "...B.C",
+    "..AABB",
+    ".AA.CC",
+]
+ignition = 3
+score = 6.0
 
 # ----------------------------------------------------------------------
 # ZABUTONL-CORE
@@ -1522,7 +1568,35 @@ ignition = 1
 score = 8.8
 
 # ----------------------------------------------------------------------
-# DAA-HEAD
+# DAA-HEAD-1
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "AA....",
+    "AA....",
+    "BBC...",
+    "BCC..."
+]
+ignition = 2
+score = 8.0
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "A.....",
+    "A.....",
+    "AA....",
+    "BBC...",
+    "BCC..."
+]
+ignition = 2
+score = 8.0
+
+# ----------------------------------------------------------------------
+# DAA-HEAD-3
 
 [[pattern]]
 field = [
@@ -1580,6 +1654,15 @@ field = [
     ".AABBC"
 ]
 ignition = 2
+score = 8.0
+
+[[pattern]]
+field = [
+    "..B.C.",
+    "..ABBC",
+    "AAABCC"
+]
+ignition = 1
 score = 8.0
 
 # ----------------------------------------------------------------------
@@ -1807,3 +1890,17 @@ field = [
 ]
 ignition = 3
 score = 4.0
+
+[[pattern]]
+field = [
+    "C.....",
+    "CB....",
+    "BAA...",
+    "BAA...",
+    "BCC...",
+    "......",
+    "......",
+    "......",
+]
+ignition = 3
+score = 1.0
