@@ -6,7 +6,6 @@ add_library(puyoai_core_algorithm
             pattern_matcher.cc
             plan.cc
             rensa_detector.cc
-            rensa_ref_sequence.cc
             puyo_set.cc
             puyo_possibility.cc)
 

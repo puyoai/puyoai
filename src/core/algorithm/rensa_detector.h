@@ -8,7 +8,6 @@
 class ColumnPuyoList;
 class CoreField;
 class RensaCoefResult;
-class RensaRefSequence;
 class RensaTrackResult;
 class RensaVanishingPositionResult;
 struct RensaResult;
@@ -111,16 +110,10 @@ public:
                                                                    VanishingPositionPossibleRensaCallback);
 
     // Without adding key puyos, we find rensas iteratively.
-    typedef std::function<void (const CoreField&,
-                                const RensaResult&,
-                                const ColumnPuyoList& keyPuyos,
-                                const ColumnPuyoList& firePuyos,
-                                const RensaTrackResult&,
-                                const RensaRefSequence&)> IterativePossibleRensaCallback;
     static void iteratePossibleRensasIteratively(const CoreField&,
                                                  int maxIteration,
                                                  const RensaDetectorStrategy&,
-                                                 IterativePossibleRensaCallback);
+                                                 TrackedPossibleRensaCallback);
 
     static void makeProhibitArray(const RensaResult&,
                                   const RensaTrackResult&,
