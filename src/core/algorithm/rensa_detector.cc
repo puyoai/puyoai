@@ -172,7 +172,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 
                 bool ok = true;
                 while (true) {
-                    if (!f.dropPuyoOn(x + d, c, true)) {
+                    if (!f.dropPuyoOnWithMaxHeight(x + d, c, maxPuyoHeight)) {
                         ok = false;
                         break;
                     }
@@ -180,10 +180,6 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                     ++necessaryPuyos;
 
                     if (maxComplementPuyos < necessaryPuyos) {
-                        ok = false;
-                        break;
-                    }
-                    if (maxPuyoHeight <= f.height(x + d)) {
                         ok = false;
                         break;
                     }
@@ -321,11 +317,7 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                             ok = false;
                             break;
                         }
-                        if (!cf.dropPuyoOn(xx, c, false)) {
-                            ok = false;
-                            break;
-                        }
-                        if (maxPuyoHeight < cf.height(xx)) {
+                        if (!cf.dropPuyoOnWithMaxHeight(xx, c, maxPuyoHeight)) {
                             ok = false;
                             break;
                         }
@@ -385,11 +377,7 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                             ok = false;
                             break;
                         }
-                        if (!cf.dropPuyoOn(xx, c, false)) {
-                            ok = false;
-                            break;
-                        }
-                        if (maxPuyoHeight < cf.height(xx)) {
+                        if (!cf.dropPuyoOnWithMaxHeight(xx, c, maxPuyoHeight)) {
                             ok = false;
                             break;
                         }
@@ -569,7 +557,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
         for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
             PuyoColor c = NORMAL_PUYO_COLORS[i];
 
-            if (!f.dropPuyoOn(x, c, true))
+            if (!f.dropPuyoOn(x, c))
                 continue;
             puyoList.add(x, c);
 
@@ -646,7 +634,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
                 if (!strategy.allowsPuttingKeyPuyoOn13thRow() && f.height(cp.x) == 12)
                   return;
                 // When we cannot put a puyo, that rensa is broken.
-                if (!f.dropPuyoOn(cp.x, cp.color, true))
+                if (!f.dropPuyoOn(cp.x, cp.color))
                   return;
             }
 
@@ -663,7 +651,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
 
             // Then, fire a rensa.
             for (const ColumnPuyo& cp : firstRensaFirePuyos) {
-                if (!f.dropPuyoOn(cp.x, cp.color, true))
+                if (!f.dropPuyoOn(cp.x, cp.color))
                     return;
             }
 

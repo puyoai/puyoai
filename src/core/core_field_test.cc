@@ -240,17 +240,41 @@ TEST(CoreFieldTest, notQuick)
     EXPECT_FALSE(r.quick);
 }
 
-TEST(CoreFieldTest, DropPuyoOn)
+TEST(CoreFieldTest, dropPuyoOn)
 {
-    CoreField f("050005"
-                "050055"
-                "445644"
-                "445644");
+    CoreField f(".O...." // 12
+                ".O...."
+                ".O...."
+                ".O...."
+                ".O...." // 8
+                ".O...."
+                ".O...."
+                ".O...."
+                ".O...." // 4
+                ".O...."
+                ".O...."
+                ".O....");
 
-    f.dropPuyoOn(1, PuyoColor::RED);
+    EXPECT_TRUE(f.dropPuyoOn(2, PuyoColor::RED));
+    EXPECT_EQ(PuyoColor::RED, f.color(2, 13));
+    EXPECT_EQ(13, f.height(2));
 
-    EXPECT_EQ(PuyoColor::RED, f.color(1, 3));
-    EXPECT_EQ(3, f.height(1));
+    EXPECT_FALSE(f.dropPuyoOn(2, PuyoColor::RED));
+    EXPECT_EQ(13, f.height(2));
+}
+
+TEST(CoreFieldTest, dropPuyoOnWithMaxHeight)
+{
+    CoreField f("..R..."
+                "..R..."
+                "..R...");
+
+    EXPECT_FALSE(f.dropPuyoOnWithMaxHeight(3, PuyoColor::GREEN, 3));
+    EXPECT_EQ(3, f.height(3));
+
+    EXPECT_TRUE(f.dropPuyoOnWithMaxHeight(3, PuyoColor::GREEN, 4));
+    EXPECT_EQ(4, f.height(3));
+    EXPECT_EQ(PuyoColor::GREEN, f.color(3, 4));
 }
 
 TEST(CoreFieldTest, dropPosition)
