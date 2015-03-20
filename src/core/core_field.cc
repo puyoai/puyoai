@@ -317,18 +317,18 @@ bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
     PuyoColor c2 = kumiPuyo.child;
 
     if (decision.r == 2) {
-        if (!dropPuyoOn(x2, c2, false))
+        if (!dropPuyoOnWithMaxHeight(x2, c2, 14))
             return false;
-        if (!dropPuyoOn(x1, c1, true)) {
+        if (!dropPuyoOnWithMaxHeight(x1, c1, 13)) {
             removeTopPuyoFrom(x2);
             return false;
         }
         return true;
     }
 
-    if (!dropPuyoOn(x1, c1, true))
+    if (!dropPuyoOnWithMaxHeight(x1, c1, 13))
         return false;
-    if (!dropPuyoOn(x2, c2, false)) {
+    if (!dropPuyoOnWithMaxHeight(x2, c2, 14)) {
         removeTopPuyoFrom(x1);
         return false;
     }
@@ -426,28 +426,23 @@ bool CoreField::isChigiriDecision(const Decision& decision) const
     return height(decision.axisX()) != height(decision.childX());
 }
 
-bool CoreField::dropPuyoOn(int x, PuyoColor c, bool isAxis)
+bool CoreField::dropPuyoOnWithMaxHeight(int x, PuyoColor c, int maxHeight)
 {
     DCHECK_NE(c, PuyoColor::EMPTY) << toDebugString();
-    if (height(x) < 13) {
-        DCHECK_EQ(color(x, height(x) + 1), PuyoColor::EMPTY);
-        unsafeSet(x, ++heights_[x], c);
-        return true;
-    }
+    DCHECK_LE(maxHeight, 14);
 
-    if (height(x) > 14)
-        return false;
-    if (isAxis)
+    if (height(x) >= maxHeight)
         return false;
 
+    DCHECK_EQ(color(x, height(x) + 1), PuyoColor::EMPTY);
     unsafeSet(x, ++heights_[x], c);
     return true;
 }
 
-bool CoreField::dropPuyoList(const ColumnPuyoList& cpl, bool isAxis)
+bool CoreField::dropPuyoListWithMaxHeight(const ColumnPuyoList& cpl, int maxHeight)
 {
     for (const auto& cp : cpl) {
-        if (!dropPuyoOn(cp.x, cp.color, isAxis))
+        if (!dropPuyoOnWithMaxHeight(cp.x, cp.color, maxHeight))
             return false;
     }
 

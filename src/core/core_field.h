@@ -86,9 +86,11 @@ public:
 
     // Places a puyo on the top of column |x|.
     // Returns true if succeeded. False if failed. When false is returned, field will not change.
-    bool dropPuyoOn(int x, PuyoColor, bool isAxis = false);
+    bool dropPuyoOn(int x, PuyoColor pc) { return dropPuyoOnWithMaxHeight(x, pc, 13); }
+    bool dropPuyoOnWithMaxHeight(int x, PuyoColor, int maxHeight);
 
-    bool dropPuyoList(const ColumnPuyoList&, bool isAxis = false);
+    bool dropPuyoList(const ColumnPuyoList& cpl) { return dropPuyoListWithMaxHeight(cpl, 13); }
+    bool dropPuyoListWithMaxHeight(const ColumnPuyoList&, int maxHeight);
 
     // Removes the puyo from top of column |x|. If there is no puyo on column |x|, nothing will happen.
     void removeTopPuyoFrom(int x) {
