@@ -358,14 +358,14 @@ TEST(CoreFieldTest, simualteWithRensaVanishingPositionResult)
 
     EXPECT_EQ(7, rensaResult.chains);
     EXPECT_EQ(7, positionResult.size());
-    EXPECT_EQ((size_t) 0, positionResult.getReferenceFallingPuyosAt(1).size());
-    EXPECT_EQ((size_t) 4, positionResult.getReferenceBasePuyosAt(1).size());
-    EXPECT_EQ((size_t) 2, positionResult.getReferenceFallingPuyosAt(2).size());
-    EXPECT_EQ((size_t) 2, positionResult.getReferenceBasePuyosAt(2).size());
-    EXPECT_EQ((size_t) 2, positionResult.getReferenceFallingPuyosAt(3).size());
-    EXPECT_EQ((size_t) 2, positionResult.getReferenceBasePuyosAt(3).size());
-    EXPECT_EQ((size_t) 1, positionResult.getReferenceFallingPuyosAt(4).size());
-    EXPECT_EQ((size_t) 3, positionResult.getReferenceBasePuyosAt(4).size());
+    EXPECT_EQ(0U, positionResult.getReferenceFallingPuyosAt(1).size());
+    EXPECT_EQ(4U, positionResult.getReferenceBasePuyosAt(1).size());
+    EXPECT_EQ(2U, positionResult.getReferenceFallingPuyosAt(2).size());
+    EXPECT_EQ(2U, positionResult.getReferenceBasePuyosAt(2).size());
+    EXPECT_EQ(2U, positionResult.getReferenceFallingPuyosAt(3).size());
+    EXPECT_EQ(2U, positionResult.getReferenceBasePuyosAt(3).size());
+    EXPECT_EQ(1U, positionResult.getReferenceFallingPuyosAt(4).size());
+    EXPECT_EQ(3U, positionResult.getReferenceBasePuyosAt(4).size());
     EXPECT_EQ(2, positionResult.getReferenceFallingPuyosAt(4)[0].x);
     EXPECT_EQ(3, positionResult.getReferenceFallingPuyosAt(4)[0].y);
 }
