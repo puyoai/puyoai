@@ -2,7 +2,7 @@
 # '#' 以降はコメント
 
 NAME: GTR    # テンプレ名. テンプレ内の最初の行にすること.
-SCORE: 1300  # テンプレのスコア
+SCORE: 700   # テンプレのスコア
 MAX: 15      # この個数以下の時しか評価対象にならない
 THRESH: 3    # この個数以上合わないと評価しない
 ....BA       # ':' がない行がフィールド.
@@ -10,7 +10,7 @@ THRESH: 3    # この個数以上合わないと評価しない
 ....BB       # '.' や小文字は任意. '_'は強制空白.
 ----
 NAME: GTR-Head
-SCORE: 2000
+SCORE: 1000
 MAX: 20
 .....A
 ....DD
@@ -19,38 +19,38 @@ MAX: 20
 ....BB
 ----
 NAME: Begin1
-SCORE: 1000
+SCORE: 500
 MAX: 8
 .AA...
 .BB...
 ----
 NAME: Begin2
-SCORE: 1000
+SCORE: 500
 MAX: 8
 ..C...
 ABB...
 ----
 NAME: Begin3
-SCORE: 1500
+SCORE: 800
 MAX: 10
 CAA...
 CBB...
 ----
 NAME: Begin4
-SCORE: 1000
+SCORE: 500
 MAX: 8
 CA....
 CB....
 ----
 NAME: Shin-GTR
-SCORE: 1000
+SCORE: 600
 MAX: 20
 ..B...
 AAAB..
 BBB...
 ----
 NAME: GTR-Tail
-SCORE: 1000
+SCORE: 700
 MAX: 22
 .CC...
 CBCA..
