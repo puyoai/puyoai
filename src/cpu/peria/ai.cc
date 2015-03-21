@@ -77,26 +77,23 @@ void Ai::onEnemyGrounded(const FrameRequest& frame_request) {
 
 int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
   const CoreField& field = plan.field();
-  std::ostringstream oss;
-  oss << "Puyo.count:" << field.countPuyos() << "_";
 
   int best = 0;
   for (const Pattern& pattern : Pattern::GetAllPattern()) {
     int score = pattern.Match(field);
     if (score > best) {
       best = score;
+
+      std::ostringstream oss;
       oss << pattern.name() << "[" << score << "/" << pattern.score() << "]";
+      *name = oss.str();
     }
   }
-  *name = oss.str();
 
   return best;
 }
 
 int FieldEvaluate(const CoreField& field) {
-#if 0
-  return 0;
-#else
   int num_connect = 0;
   for (int x = 1; x < PlainField::WIDTH; ++x) {
     int height = field.height(x);
@@ -111,7 +108,6 @@ int FieldEvaluate(const CoreField& field) {
     }
   }
   return num_connect;
-#endif
 }
 
 void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
@@ -137,7 +133,8 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
 
   // Pattern maching
   value = PatternMatch(plan, &message);
-  oss << "Pattern(" << message << "," << value << ")_";
+  if (value)
+    oss << "Pattern(" << message << "," << value << ")_";
   score += value;
 
   if (plan.isRensaPlan()) {
