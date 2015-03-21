@@ -107,8 +107,9 @@ void RensaDetector::makeProhibitArray(const RensaResult& rensaResult, const Rens
             }
         }
     }
-    for (const auto& cp : firePuyos)
-        prohibits[cp.x] = true;
+
+    for (int x = 1; x <= 6; ++x)
+        prohibits[x] = (firePuyos.sizeOn(x) > 0);
 }
 
 // TODO(mayah): Consider to improve this.
@@ -118,8 +119,8 @@ void makeProhibitArrayForExtend(const RensaResult& /*rensaResult*/, const RensaT
                                 bool prohibits[FieldConstant::MAP_WIDTH])
 {
     std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, false);
-    for (const auto& cp : firePuyos)
-        prohibits[cp.x] = true;
+    for (int x = 1; x <= 6; ++x)
+        prohibits[x] = (firePuyos.sizeOn(x) > 0);
 }
 
 static inline
@@ -190,7 +191,11 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                 if (!ok)
                     continue;
 
-                callback(&f, ColumnPuyoList(x + d, c, necessaryPuyos));
+                ColumnPuyoList cpl;
+                if (!cpl.add(x + d, c, necessaryPuyos))
+                    continue;
+
+                callback(&f, cpl);
             }
         }
     }
@@ -258,7 +263,10 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                 f.recalcHeightOn(dx);
 
                 if (restPuyos <= 0) {
-                    callback(&f, ColumnPuyoList(dx, c, necessaryPuyos));
+                    ColumnPuyoList cpl;
+                    if (!cpl.add(dx, c, necessaryPuyos))
+                        continue;
+                    callback(&f, cpl);
                 }
             }
         }
@@ -417,7 +425,10 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                         continue;
                     if (maxPuyoHeight < cf.height(xx))
                         continue;
-                    callback(&cf, ColumnPuyoList(working[i], c, 1));
+                    ColumnPuyoList cpl;
+                    if (!cpl.add(working[i], c))
+                        continue;
+                    callback(&cf, cpl);
                 }
                 break;
             }
@@ -566,7 +577,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
                 findPossibleRensasInternal(f, puyoList, x, restAdded - 1, purpose, strategy, callback);
 
             f.removeTopPuyoFrom(x);
-            puyoList.removeLastAddedPuyo();
+            puyoList.removeTopFrom(x);
         }
     }
 }
@@ -626,7 +637,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
                                       const ColumnPuyoList& /*currentKeyPuyos*/, const ColumnPuyoList& currentFirePuyos,
                                       const RensaTrackResult& /*trackResult*/) {
             ColumnPuyoList combinedKeyPuyos(accumulatedKeyPuyos);
-            if (!combinedKeyPuyos.append(currentFirePuyos))
+            if (!combinedKeyPuyos.merge(currentFirePuyos))
                 return;
 
             int maxHeight = strategy.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;

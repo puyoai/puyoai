@@ -5,9 +5,11 @@
 
 using namespace std;
 
-void PuyoSet::add(const ColumnPuyoList& list)
+void PuyoSet::add(const ColumnPuyoList& cpl)
 {
-    for (const auto& p : list) {
-        add(p.color);
+    for (int x = 1; x <= 6; ++x) {
+        int h = cpl.sizeOn(x);
+        for (int i = 0; i < h; ++i)
+            add(cpl.get(x, i));
     }
 }
