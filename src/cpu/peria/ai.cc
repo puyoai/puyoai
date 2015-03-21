@@ -93,7 +93,15 @@ int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
   return best;
 }
 
+int ScoreDiffHeight(int higher, int lower) {
+  int diff = higher - lower;
+  diff = diff * diff;
+  return ((higher > lower) ? diff : -diff) * 3;
+}
+
 int FieldEvaluate(const CoreField& field) {
+  int score = 0;
+
   int num_connect = 0;
   for (int x = 1; x < PlainField::WIDTH; ++x) {
     int height = field.height(x);
@@ -102,12 +110,19 @@ int FieldEvaluate(const CoreField& field) {
       if (c == PuyoColor::OJAMA)
         continue;
       if (c == field.color(x + 1, y))
-        num_connect += 2;
+        ++num_connect;
       if (c == field.color(x, y + 1))
-        num_connect += 3;
+        ++num_connect;
     }
   }
-  return num_connect;
+  score += num_connect * 2;
+
+  score += ScoreDiffHeight(field.height(1), field.height(2));
+  score += ScoreDiffHeight(field.height(2), field.height(3));
+  score += ScoreDiffHeight(field.height(5), field.height(4));
+  score += ScoreDiffHeight(field.height(6), field.height(5));
+  
+  return score;
 }
 
 void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
@@ -116,26 +131,32 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
   std::ostringstream oss;
   std::string message;
 
-  UNUSED_VARIABLE(attack);
-
   // Future expectation
-  std::vector<int> expects;
-  expects.clear();
-  Plan::iterateAvailablePlans(
-      plan.field(), KumipuyoSeq(), 1,
-      [&expects](const RefPlan& p) {
-        if (p.isRensaPlan())
+  {
+    std::vector<int> expects;
+    expects.clear();
+    Plan::iterateAvailablePlans(
+        plan.field(), KumipuyoSeq(), 1,
+        [&expects](const RefPlan& p) {
+          if (p.isRensaPlan())
           expects.push_back(p.rensaResult().score);
-      });
-  int expect = std::accumulate(expects.begin(), expects.end(), 0);
-  if (expects.size())
-    expect /= expects.size();
+        });
+    value = std::accumulate(expects.begin(), expects.end(), 0);
+    if (expects.size()) {
+      value /= expects.size();
+      oss << "Future(" << value << ")_";
+      score += value;
+    }
+  }
 
   // Pattern maching
-  value = PatternMatch(plan, &message);
-  if (value)
-    oss << "Pattern(" << message << "," << value << ")_";
-  score += value;
+  {
+    value = PatternMatch(plan, &message);
+    if (value) {
+      oss << "Pattern(" << message << "," << value << ")_";
+      score += value;
+    }
+  }
 
   if (plan.isRensaPlan()) {
     const int kAcceptablePuyo = 6;
@@ -151,20 +172,17 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
     oss << "Current(" << value << ")_";
     score += value;
 
-    value = expect;
-    oss << "Future(" << value << ")";
+    // Penalty for vanishments.
+    value = -plan.totalFrames() * 5;
+    oss << "Time(" << value << ")_";
     score += value;
-
+    
     if (plan.field().countPuyos() == 0) {
-      value = 9999;
+      value = ZENKESHI_BONUS;
       oss << "Zenkeshi(" << value << ")";
       score += value;
     }
   } else {
-    value = expect;
-    oss << "Future(" << value << ")";
-    score += value;
-
     value = FieldEvaluate(plan.field());
     oss << "Field(" << value << ")";
     score += value;
