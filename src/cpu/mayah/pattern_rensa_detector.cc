@@ -245,13 +245,8 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     CoreField::SimulationContext context(originalContext_);
 
     const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
-
-    for (const auto& cp : keyPuyos) {
-        if (!cf.dropPuyoOn(cp.x, cp.color))
-            return false;
-        if (cf.height(cp.x) > maxHeight)
-            return false;
-    }
+    if (!cf.dropPuyoListWithMaxHeight(keyPuyos, maxHeight))
+        return false;
 
     // If rensa occurs after adding key puyos, this is invalid.
     if (cf.rensaWillOccurWithContext(context))
