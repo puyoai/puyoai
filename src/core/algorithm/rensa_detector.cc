@@ -559,7 +559,8 @@ static void findPossibleRensasInternal(const CoreField& originalField,
 
             if (!f.dropPuyoOn(x, c))
                 continue;
-            puyoList.add(x, c);
+            if (!puyoList.add(x, c))
+                continue;
 
             if (f.countConnectedPuyosMax4(x, f.height(x)) < 4)
                 findPossibleRensasInternal(f, puyoList, x, restAdded - 1, purpose, strategy, callback);
@@ -628,15 +629,12 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             if (!combinedKeyPuyos.append(currentFirePuyos))
                 return;
 
+            int maxHeight = strategy.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
+
             // Here, try to fire the combined rensa.
             CoreField f(initialField);
-            for (const ColumnPuyo& cp : combinedKeyPuyos) {
-                if (!strategy.allowsPuttingKeyPuyoOn13thRow() && f.height(cp.x) == 12)
-                  return;
-                // When we cannot put a puyo, that rensa is broken.
-                if (!f.dropPuyoOn(cp.x, cp.color))
-                  return;
-            }
+            if (!f.dropPuyoListWithMaxHeight(combinedKeyPuyos, maxHeight))
+                return;
 
             // Check putting key puyo does not fire a rensa.
             {
@@ -650,10 +648,8 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             CoreField::SimulationContext context = CoreField::SimulationContext::fromField(f);
 
             // Then, fire a rensa.
-            for (const ColumnPuyo& cp : firstRensaFirePuyos) {
-                if (!f.dropPuyoOn(cp.x, cp.color))
-                    return;
-            }
+            if (!f.dropPuyoListWithMaxHeight(firstRensaFirePuyos, maxHeight))
+                return;
 
             RensaTrackResult combinedTrackResult;
             RensaResult combinedRensaResult = f.simulateWithContext(&context, &combinedTrackResult);

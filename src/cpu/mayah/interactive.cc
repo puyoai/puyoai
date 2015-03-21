@@ -180,16 +180,12 @@ int main(int argc, char* argv[])
                     ai.gazer().gazeResult());
 
                 CoreField myTargetField(myThoughtResult.plan.field());
-                for (const ColumnPuyo& cp : mycf.rensaKeyPuyos())
-                    myTargetField.dropPuyoOn(cp.x, cp.color);
-                for (const ColumnPuyo& cp : mycf.rensaFirePuyos())
-                    myTargetField.dropPuyoOn(cp.x, cp.color);
+                myTargetField.dropPuyoList(mycf.rensaKeyPuyos());
+                myTargetField.dropPuyoList(mycf.rensaFirePuyos());
 
                 CoreField aiTargetField(aiThoughtResult.plan.field());
-                for (const ColumnPuyo& cp : aicf.rensaKeyPuyos())
-                    aiTargetField.dropPuyoOn(cp.x, cp.color);
-                for (const ColumnPuyo& cp : aicf.rensaFirePuyos())
-                    aiTargetField.dropPuyoOn(cp.x, cp.color);
+                aiTargetField.dropPuyoList(aicf.rensaKeyPuyos());
+                aiTargetField.dropPuyoList(aicf.rensaFirePuyos());
 
                 KumipuyoSeq seqToShow { seq.get(2), seq.get(3) };
                 FieldPrettyPrinter::printMultipleFields(

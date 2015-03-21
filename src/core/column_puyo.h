@@ -7,6 +7,8 @@ struct ColumnPuyo {
     ColumnPuyo() {}
     ColumnPuyo(int x, PuyoColor color) : x(x), color(color) {}
 
+    bool isValid() const { return x > 0; }
+
     friend bool operator==(const ColumnPuyo& lhs, const ColumnPuyo& rhs)
     {
         return lhs.x == rhs.x && lhs.color == rhs.color;
@@ -14,8 +16,8 @@ struct ColumnPuyo {
 
     friend bool operator!=(const ColumnPuyo& lhs, const ColumnPuyo& rhs) { return !(lhs == rhs); }
 
-    int x;
-    PuyoColor color;
+    int x = 0;
+    PuyoColor color = PuyoColor::EMPTY;
 };
 
 #endif

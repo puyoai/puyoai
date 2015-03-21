@@ -130,9 +130,7 @@ TEST(FieldPatternTest, complement1)
 
     ColumnPuyoList cpl;
     EXPECT_TRUE(pattern.complement(cf, &cpl).success);
-    for (const auto& cp : cpl) {
-        cf.dropPuyoOn(cp.x, cp.color);
-    }
+    EXPECT_TRUE(cf.dropPuyoList(cpl));
     EXPECT_EQ(expected, cf) << cf.toDebugString();
 }
 
@@ -212,10 +210,7 @@ TEST(FieldPatternTest, complement5)
 
     ColumnPuyoList cpl;
     EXPECT_TRUE(pattern.complement(cf, &cpl).success);
-    for (const ColumnPuyo& cp : cpl) {
-        cf.dropPuyoOn(cp.x, cp.color);
-    }
-
+    EXPECT_TRUE(cf.dropPuyoList(cpl));
     EXPECT_EQ(expected, cf) << expected.toDebugString() << '\n' << cf.toDebugString();
 }
 
@@ -245,10 +240,7 @@ TEST(FieldPatternTest, complement6)
 
     ColumnPuyoList cpl;
     EXPECT_TRUE(pattern.complement(cf, 1, &cpl).success);
-    for (const ColumnPuyo& cp : cpl) {
-        cf.dropPuyoOn(cp.x, cp.color);
-    }
-
+    EXPECT_TRUE(cf.dropPuyoList(cpl));
     EXPECT_TRUE(cf == expected1 || cf == expected2) << cf.toDebugString();
 }
 
@@ -274,8 +266,7 @@ TEST(FieldPatternTest, complementWithAllow1)
 
     ColumnPuyoList cpl;
     EXPECT_TRUE(pattern.complement(cf, 1, &cpl).success);
-
-    cf.dropPuyoList(cpl);
+    EXPECT_TRUE(cf.dropPuyoList(cpl));
     EXPECT_TRUE(expected == cf);
 }
 
@@ -305,7 +296,6 @@ TEST(FieldPatternTest, complementWithAllow2)
 
     ColumnPuyoList cpl;
     EXPECT_TRUE(pattern.complement(cf, 1, &cpl).success);
-
-    cf.dropPuyoList(cpl);
+    EXPECT_TRUE(cf.dropPuyoList(cpl));
     EXPECT_TRUE(expected == cf);
 }

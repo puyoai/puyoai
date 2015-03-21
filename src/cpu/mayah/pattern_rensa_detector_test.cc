@@ -263,10 +263,8 @@ TEST(PatternBookTest, pattern3)
                         const std::string&,
                         int /*patternScore*/) {
         CoreField cf(field);
-        for (const auto& cp : keyPuyos)
-            cf.dropPuyoOn(cp.x, cp.color);
-        for (const auto& cp : firePuyos)
-            cf.dropPuyoOn(cp.x, cp.color);
+        EXPECT_TRUE(cf.dropPuyoList(keyPuyos));
+        EXPECT_TRUE(cf.dropPuyoList(firePuyos));
 
         if (expected == cf)
             found = true;
