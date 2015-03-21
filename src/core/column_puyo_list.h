@@ -12,58 +12,89 @@
 
 class ColumnPuyoList {
 public:
-    static const int MAX_SIZE = 16;
+    ColumnPuyoList() : size_{} {}
 
-    ColumnPuyoList() {}
-
-    ColumnPuyoList(int x, PuyoColor c, int n)
+    int sizeOn(int x) const
     {
-        for (int i = 0; i < n; ++i)
-            add(x, c);
+        DCHECK(1 <= x && x <= 6);
+        return size_[x-1];
     }
 
-    bool isEmpty() const { return size_ == 0; }
-    int size() const { return size_; }
-
-    bool add(int x, PuyoColor c) { return add(ColumnPuyo(x, c)); }
-    bool add(const ColumnPuyo& cp)
+    PuyoColor get(int x, int i) const
     {
-        if (MAX_SIZE <= size())
-            return false;
+        DCHECK(1 <= x && x <= 6);
+        DCHECK(0 <= i && i <= sizeOn(x));
+        return puyos_[x-1][i];
+    }
 
-        puyos_[size_++] = cp;
+    bool isEmpty() const { return size() == 0; }
+    int size() const { return size_[0] + size_[1] + size_[2] + size_[3] + size_[4] + size_[5]; }
+    void clear() { std::fill(size_, size_ + 6, 0); }
+
+    bool add(const ColumnPuyo& cp) { return add(cp.x, cp.color); }
+    bool add(int x, PuyoColor c)
+    {
+        DCHECK(1 <= x && x <= 6);
+        if (MAX_SIZE <= size_[x-1])
+            return false;
+        puyos_[x-1][size_[x-1]++] = c;
+        return true;
+    }
+    bool add(int x, PuyoColor c, int n)
+    {
+        DCHECK(1 <= x && x <= 6);
+        if (MAX_SIZE < size_[x-1] + n)
+            return false;
+        for (int i = 0; i < n; ++i)
+            puyos_[x-1][size_[x-1] + i] = c;
+        size_[x-1] += n;
         return true;
     }
 
     // Appends |cpl|. If the result size exceeds the max size, false will be returned.
-    bool append(const ColumnPuyoList& cpl)
+    // When false is returned, the object does not change.
+    bool merge(const ColumnPuyoList& cpl)
     {
-        if (size_ + cpl.size() > MAX_SIZE)
-            return false;
-        for (const auto& cp : cpl)
-            add(cp.x, cp.color);
+        for (int i = 0; i < 6; ++i) {
+            if (MAX_SIZE < size_[i] + cpl.size_[i])
+                return false;
+        }
+
+        for (int i = 0; i < 6; ++i) {
+            for (int j = 0; j < cpl.size_[i]; ++j)
+                puyos_[i][size_[i]++] = cpl.puyos_[i][j];
+        }
         return true;
     }
 
-    void clear() { size_ = 0; }
-
-    void removeLastAddedPuyo()
+    void removeTopFrom(int x)
     {
-        DCHECK(0 < size_);
-        --size_;
+        DCHECK(1 <= x && x <= 6);
+        DCHECK_GT(sizeOn(x), 0);
+        size_[x-1] -= 1;
     }
 
-    std::array<ColumnPuyo, MAX_SIZE>::const_iterator begin() const { return std::begin(puyos_); }
-    std::array<ColumnPuyo, MAX_SIZE>::const_iterator end() const { return std::begin(puyos_) + size_; }
+    template<typename Func>
+    void iterate(Func f)
+    {
+        for (int x = 1; x <= 6; ++x) {
+            int h = sizeOn(x);
+            for (int i = 0; i < h; ++i) {
+                f(x, get(x, i));
+            }
+        }
+    }
 
     std::string toString() const;
 
     friend bool operator==(const ColumnPuyoList&, const ColumnPuyoList&);
 
 private:
+    static const int MAX_SIZE = 8;
+
     // We don't make this std::vector due to performance reason.
-    int size_ = 0;
-    std::array<ColumnPuyo, MAX_SIZE> puyos_;
+    int size_[6];
+    PuyoColor puyos_[6][MAX_SIZE];
 };
 
 #endif

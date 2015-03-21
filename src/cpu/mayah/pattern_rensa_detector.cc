@@ -13,6 +13,8 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
 {
     DCHECK_GE(maxIteration, 1);
 
+    const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
+
     // --- Iterate with complementing
     for (const int id : matchableIds) {
         const PatternBookField& pbf = patternBook_.patternBookField(id);
@@ -23,36 +25,18 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         if (complementResult.numFilledUnusedVariables > 0)
             continue;
 
-        CoreField cf(originalField_);
-        bool ok = true;
-        bool foundFirePuyo = false;
-        ColumnPuyo firePuyo;
-        ColumnPuyoList keyPuyos;
-        for (const ColumnPuyo& cp : cpl) {
-            if (!cf.dropPuyoOn(cp.x, cp.color)) {
-                ok = false;
-                break;
-            }
-            if (foundFirePuyo) {
-                if (cp.x == pbf.ignitionColumn()) {
-                    keyPuyos.add(firePuyo);
-                    firePuyo = cp;
-                } else if (!keyPuyos.add(cp)) {
-                    ok = false;
-                    break;
-                }
-            } else {
-                if (cp.x == pbf.ignitionColumn()) {
-                    foundFirePuyo = true;
-                    firePuyo = cp;
-                } else {
-                    keyPuyos.add(cp);
-                }
-            }
-        }
-
-        if (!ok || !foundFirePuyo)
+        // No ignition puyo.
+        if (cpl.sizeOn(pbf.ignitionColumn()) == 0)
             continue;
+
+        CoreField cf(originalField_);
+        if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
+            continue;
+
+        int x = pbf.ignitionColumn();
+        ColumnPuyo firePuyo(x, cpl.get(x, cpl.sizeOn(x) - 1));
+        ColumnPuyoList keyPuyos(cpl);
+        keyPuyos.removeTopFrom(x);
 
         CoreField::SimulationContext context(originalContext_);
         int score = cf.vanishDrop(&context);
@@ -61,10 +45,14 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         double ratio = 0;
         if (pbf.numVariables() > 0) {
             int count = 0;
-            for (const auto& cp : cpl) {
-                if (isNormalColor(cp.color))
-                    ++count;
+            for (int x = 1; x <= 6; ++x) {
+                int h = cpl.sizeOn(x);
+                for (int i = 0; i < h; ++i) {
+                    if (isNormalColor(cpl.get(x, i)))
+                        ++count;
+                }
             }
+
             double d = pbf.numVariables() - count;
             ratio = d / pbf.numVariables();
         }
@@ -75,22 +63,20 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
 
     // --- Iterate without complementing.
     auto detectCallback = [&](CoreField* cf, const ColumnPuyoList& cpl) {
-        if (cpl.size() == 0)
+        if (cpl.isEmpty())
             return;
 
-        bool first = true;
         ColumnPuyo firePuyo;
-        ColumnPuyoList keyPuyos;
-        for (const ColumnPuyo& cp : cpl) {
-            if (first) {
-                firePuyo = cp;
-                first = false;
-                continue;
+        ColumnPuyoList keyPuyos(cpl);
+        for (int x = 1; x <= 6; ++x) {
+            if (keyPuyos.sizeOn(x) > 0) {
+                firePuyo = ColumnPuyo(x, keyPuyos.get(x, keyPuyos.sizeOn(x) - 1));
+                keyPuyos.removeTopFrom(x);
+                break;
             }
-
-            keyPuyos.add(firePuyo);
-            firePuyo = cp;
         }
+
+        DCHECK(firePuyo.isValid());
 
         iteratePossibleRensasInternal(*cf, originalContext_, 0,
                                       firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0);
@@ -111,6 +97,8 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
                                                          const std::string& patternName,
                                                          double patternScore) const
 {
+    const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
+
     // With complement.
     // TODO(mayah): making std::vector is too slow. call currentField.fillErasingPuyoPosition()?
     std::vector<Position> ignitionPositions = currentField.erasingPuyoPositions(currentFieldContext);
@@ -147,26 +135,15 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         if (restIteration <= 0)
             continue;
 
+        if (cpl.sizeOn(firePuyo.x) > 0)
+            continue;
+
         CoreField cf(currentField);
+        if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
+            continue;
+
         ColumnPuyoList keyPuyos(originalKeyPuyos);
-
-        bool ok = true;
-        for (const ColumnPuyo& cp : cpl) {
-            if (cp.x == firePuyo.x) {
-                ok = false;
-                break;
-            }
-            if (!keyPuyos.add(cp)) {
-                ok = false;
-                break;
-            }
-            if (!cf.dropPuyoOn(cp.x, cp.color)) {
-                ok = false;
-                break;
-            }
-        }
-
-        if (!ok)
+        if (!keyPuyos.merge(cpl))
             continue;
 
         CoreField::SimulationContext context(currentFieldContext);
@@ -175,10 +152,10 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         double ratio = 0.0;
         if (pbf.numVariables() > 0) {
             int count = 0;
-            for (const auto& cp : cpl) {
-                if (isNormalColor(cp.color))
+            cpl.iterate([&count](int /*x*/, PuyoColor pc) {
+                if (isNormalColor(pc))
                     ++count;
-            }
+            });
             double d = pbf.numVariables() - count;
             ratio = d / pbf.numVariables();
         }
@@ -215,16 +192,8 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         if (cpl.size() == 0)
             return;
 
-        bool ok = true;
         ColumnPuyoList keyPuyos(originalKeyPuyos);
-        for (const ColumnPuyo& cp : cpl) {
-            if (!keyPuyos.add(cp)) {
-                ok = false;
-                break;
-            }
-        }
-
-        if (!ok)
+        if (!keyPuyos.merge(cpl))
             return;
 
         iteratePossibleRensasInternal(*cf2, context, currentChains + 1,

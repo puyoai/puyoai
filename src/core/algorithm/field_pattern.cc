@@ -262,8 +262,6 @@ bool FieldPattern::complementInternal(const CoreField& field,
             char c = variable(x, y);
             if (!matcher.isSet(c))
                 return false;
-            if (ColumnPuyoList::MAX_SIZE <= cpl->size())
-                return false;
             if (type(x, y) == PatternType::MUST_VAR) {
                 if (!isNormalColor(field.color(x, y)))
                     return false;

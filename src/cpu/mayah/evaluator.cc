@@ -500,14 +500,16 @@ void RensaEvaluator<ScoreCollector>::evalPatternScore(double patternScore)
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalComplementationBias(const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
 {
-    PuyoSet puyoSets[FieldConstant::MAP_WIDTH];
-    for (const auto& cp : keyPuyos)
-        puyoSets[cp.x].add(cp.color);
-    for (const auto& cp : firePuyos)
-        puyoSets[cp.x].add(cp.color);
-
     for (int x = 1; x <= 6; ++x) {
-        const PuyoSet& ps = puyoSets[x];
+        PuyoSet ps;
+        int h = keyPuyos.sizeOn(x);
+        for (int i = 0; i < h; ++i)
+            ps.add(keyPuyos.get(x, i));
+
+        h = firePuyos.sizeOn(x);
+        for (int i = 0; i < h; ++i)
+            ps.add(firePuyos.get(x, i));
+
         if (ps.count() < 3)
             continue;
         if (ps.count() >= 4)

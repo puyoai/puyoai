@@ -56,8 +56,9 @@ double hoge(const CoreField& cf) {
                       const ColumnPuyoList&,
                       const ColumnPuyoList& fire_puyos) {
     double y_avg = 0;
-    for (ColumnPuyo cp : fire_puyos) {
-      y_avg += f.height(cp.x);
+    for (int x = 1; x <= 6; ++x) {
+        int h = fire_puyos.sizeOn(x);
+        y_avg += f.height(x) * h;
     }
     y_avg /= fire_puyos.size();
 

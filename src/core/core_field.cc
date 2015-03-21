@@ -441,9 +441,13 @@ bool CoreField::dropPuyoOnWithMaxHeight(int x, PuyoColor c, int maxHeight)
 
 bool CoreField::dropPuyoListWithMaxHeight(const ColumnPuyoList& cpl, int maxHeight)
 {
-    for (const auto& cp : cpl) {
-        if (!dropPuyoOnWithMaxHeight(cp.x, cp.color, maxHeight))
-            return false;
+    for (int x = 1; x <= 6; ++x) {
+        int s = cpl.sizeOn(x);
+        for (int i = 0; i < s; ++i) {
+            PuyoColor pc = cpl.get(x, i);
+            if (!dropPuyoOnWithMaxHeight(x, pc, maxHeight))
+                return false;
+        }
     }
 
     return true;

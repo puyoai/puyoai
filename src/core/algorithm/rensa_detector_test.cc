@@ -20,26 +20,35 @@ TEST(RensaDetectorTest, detect1)
     CoreField f(
         "..RRR.");
 
-    pair<CoreField, ColumnPuyoList> expected[] {
-        make_pair(CoreField(
-                      ".RRRR."),
-                  ColumnPuyoList(2, PuyoColor::RED, 1)),
-        make_pair(CoreField(
-                      "..R..."
-                      "..RRR."),
-                  ColumnPuyoList(3, PuyoColor::RED, 1)),
-        make_pair(CoreField(
-                      "...R.."
-                      "..RRR."),
-                  ColumnPuyoList(4, PuyoColor::RED, 1)),
-        make_pair(CoreField(
-                      "....R."
-                      "..RRR."),
-                  ColumnPuyoList(5, PuyoColor::RED, 1)),
-        make_pair(CoreField(
-                      "..RRRR"),
-                  ColumnPuyoList(6, PuyoColor::RED, 1)),
-    };
+    pair<CoreField, ColumnPuyoList> expected[5];
+    {
+        expected[0].first = CoreField(
+            ".RRRR.");
+        expected[0].second.add(2, PuyoColor::RED, 1);
+    }
+    {
+        expected[1].first = CoreField(
+            "..R..."
+            "..RRR.");
+        expected[1].second.add(3, PuyoColor::RED, 1);
+    }
+    {
+        expected[2].first = CoreField(
+            "...R.."
+            "..RRR.");
+        expected[2].second.add(4, PuyoColor::RED, 1);
+    }
+    {
+        expected[3].first = CoreField(
+            "....R."
+            "..RRR.");
+        expected[3].second.add(5, PuyoColor::RED, 1);
+    }
+    {
+        expected[4].first = CoreField(
+            "..RRRR");
+        expected[4].second.add(6, PuyoColor::RED, 1);
+    }
 
     bool found[5] {};
     bool unexpectedFound = false;
