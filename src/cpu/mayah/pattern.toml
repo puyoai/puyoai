@@ -190,6 +190,7 @@ field = [
 ]
 ignition = 2
 score = 1.0
+precondition = [[1, 2], [1, 3], [1, 4], [2, 2]]
 
 # ----------------------------------------------------------------------
 # GTR-HEAD-2
@@ -516,6 +517,28 @@ field = [
 ]
 ignition = 3
 score = 9.9
+
+[[pattern]]
+field = [
+    ".....C",
+    "....BC",
+    "...ABC",
+    "...AAB",
+    "...ACB",
+]
+ignition = 4
+score = 8.9
+
+[[pattern]]
+field = [
+    ".....C",
+    "....BC",
+    "....BC",
+    "...AAB",
+    "..AACB",
+]
+ignition = 3
+score = 8.0
 
 [[pattern]]
 field = [
@@ -1094,6 +1117,18 @@ field = [
 ignition = 4
 score = 8.0
 
+[[pattern]]
+field = [
+    ".....C",
+    ".....C",
+    "....BC",
+    "....AB",
+    "...AAB",
+    "...ACB",
+]
+ignition = 4
+score = 8.0
+
 # ----------------------------------------------------------------------
 # LTR-CORE
 
@@ -1392,6 +1427,15 @@ score = 8.0
 
 [[pattern]]
 field = [
+    "..BCC.",
+    "AAABC.",
+    "ABBC..",
+]
+ignition = 1
+score = 6.0
+
+[[pattern]]
+field = [
     "..BC..",
     "AAABCC",
     "ABBC@@",
@@ -1437,7 +1481,7 @@ field = [
     ".AAB.C",
 ]
 ignition = 3
-score = 4.0
+score = 6.0
 
 [[pattern]]
 field = [
@@ -1631,6 +1675,24 @@ score = 9.5
 
 [[pattern]]
 field = [
+    "ABC...",
+    "AABCC.",
+    "ABBC.."
+]
+ignition = 1
+score = 8.0
+
+[[pattern]]
+field = [
+    "ABC...",
+    "AABC..",
+    "ABBCC."
+]
+ignition = 1
+score = 7.8
+
+[[pattern]]
+field = [
     "..B.C.",
     ".AABBC",
     ".AABCC"
@@ -1655,6 +1717,16 @@ field = [
 ]
 ignition = 2
 score = 8.0
+
+[[pattern]]
+field = [
+    "....C.",
+    "..B.C.",
+    ".AABBC",
+    ".AAB.C"
+]
+ignition = 2
+score = 6.0
 
 [[pattern]]
 field = [
@@ -1840,18 +1912,6 @@ score = 8.9
 
 # ----------------------------------------------------------------------
 # TAIL
-
-[[pattern]]
-field = [
-    ".....C",
-    ".....C",
-    "....BC",
-    "....AB",
-    "...AAB",
-    "...ACB",
-]
-ignition = 4
-score = 4.0
 
 [[pattern]]
 field = [
