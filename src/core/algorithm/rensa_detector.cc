@@ -489,7 +489,7 @@ void RensaDetector::detectSingle(const CoreField& original, const RensaDetectorS
     static const bool nonProhibits[FieldConstant::MAP_WIDTH] {};
     auto f = [&original, &callback](CoreField* f, const ColumnPuyoList& firePuyos) {
         CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
-        RensaResult rensaResult = f->simulateWithContext(&context);
+        RensaResult rensaResult = f->simulate(&context);
         if (rensaResult.chains > 0)
             callback(*f, rensaResult, firePuyos);
     };
@@ -501,7 +501,7 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
                                     RensaDetector::PossibleRensaCallback callback)
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
-    RensaResult rensaResult = f->simulateWithContext(&context);
+    RensaResult rensaResult = f->simulate(&context);
     if (rensaResult.chains > 0)
         callback(*f, rensaResult, keyPuyos, firePuyos);
 }
@@ -512,7 +512,8 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
     RensaTrackResult rensaTrackResult;
-    RensaResult rensaResult = f->simulateWithContext(&context, &rensaTrackResult);
+    RensaTracker tracker(&rensaTrackResult);
+    RensaResult rensaResult = f->simulate(&context, &tracker);
     if (rensaResult.chains > 0)
         callback(*f, rensaResult, keyPuyos, firePuyos, rensaTrackResult);
 }
@@ -523,7 +524,8 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
     RensaCoefResult rensaCoefResult;
-    RensaResult rensaResult = f->simulateWithContext(&context, &rensaCoefResult);
+    RensaCoefTracker tracker(&rensaCoefResult);
+    RensaResult rensaResult = f->simulate(&context, &tracker);
     if (rensaResult.chains > 0)
         callback(*f, rensaResult, keyPuyos, firePuyos, rensaCoefResult);
 }
@@ -534,7 +536,8 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
     RensaVanishingPositionResult rensaVanishingPositionResult;
-    RensaResult rensaResult = f->simulateWithContext(&context, &rensaVanishingPositionResult);
+    RensaVanishingPositionTracker tracker(&rensaVanishingPositionResult);
+    RensaResult rensaResult = f->simulate(&context, &tracker);
     if (rensaResult.chains > 0)
         callback(*f, rensaResult, keyPuyos, firePuyos, rensaVanishingPositionResult);
 }
@@ -663,7 +666,8 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
                 return;
 
             RensaTrackResult combinedTrackResult;
-            RensaResult combinedRensaResult = f.simulateWithContext(&context, &combinedTrackResult);
+            RensaTracker tracker(&combinedTrackResult);
+            RensaResult combinedRensaResult = f.simulate(&context, &tracker);
 
             if (combinedRensaResult.chains != currentTotalChains + rensaResult.chains) {
                 // Rensa looks broken. We don't count such rensa.

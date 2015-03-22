@@ -227,7 +227,8 @@ bool PatternRensaDetector::checkRensa(int currentChains,
         return false;
 
     RensaTrackResult trackResult;
-    RensaResult rensaResult = cf.simulateWithContext(&context, &trackResult);
+    RensaTracker tracker(&trackResult);
+    RensaResult rensaResult = cf.simulate(&context, &tracker);
     if (rensaResult.chains != currentChains)
         return false;
 
