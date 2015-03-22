@@ -1143,6 +1143,7 @@ field = [
 name = "LTR"
 ignition = 2
 score = 9.0
+precondition = [[1, 1], [1, 2]]
 
 [[pattern]]
 field = [
@@ -1155,9 +1156,10 @@ field = [
 ]
 name = "LTR"
 score = 8.8
+precondition = [[1, 1], [1, 2]]
 
 # ----------------------------------------------------------------------
-# LTR-HEAD-2
+# LTR-HEAD-1
 
 [[pattern]]
 field = [
@@ -1198,7 +1200,6 @@ field = [
 name = "LR"
 ignition = 2
 score = 7.0
-precondition = [[1, 1], [1, 2]]
 
 [[pattern]]
 field = [
@@ -1212,7 +1213,6 @@ field = [
 name = "LR"
 ignition = 2
 score = 7.0
-precondition = [[1, 1], [1, 2]]
 
 [[pattern]]
 field = [
@@ -1227,7 +1227,6 @@ field = [
 name = "LR"
 ignition = 2
 score = 7.0
-precondition = [[1, 1], [1, 2]]
 
 [[pattern]]
 field = [
@@ -1242,7 +1241,6 @@ field = [
 name = "LR"
 ignition = 2
 score = 7.0
-precondition = [[1, 1], [1, 2]]
 
 [[pattern]]
 field = [
@@ -1256,7 +1254,6 @@ field = [
 name = "LR"
 ignition = 3
 score = 7.0
-precondition = [[1, 1], [1, 2]]
 
 # ----------------------------------------------------------------------
 # LR-TAIL
