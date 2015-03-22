@@ -26,12 +26,15 @@ struct EndlessResult {
 };
 
 // Endless implements endless mode. This can be used to check your AI's strength.
+// Just pass your AI to constructor, and call run(). KumipuyoSeq can be generated with
+// core/sequence_generator.h
 class Endless {
 public:
     explicit Endless(std::unique_ptr<AI> ai);
 
     EndlessResult run(const KumipuyoSeq&);
 
+    // Sets verbose mode. This will show fields in each hand.
     void setVerbose(bool flag) { verbose_ = flag; }
 
 private:
