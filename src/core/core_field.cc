@@ -14,98 +14,9 @@
 #include "core/kumipuyo.h"
 #include "core/position.h"
 #include "core/rensa_result.h"
-#include "core/score.h"
+#include "core/rensa_tracker.h"
 
 using namespace std;
-
-namespace {
-int g_originalY[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
-
-bool initializeOriginalY()
-{
-    for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
-        for (int y = 0; y < FieldConstant::MAP_HEIGHT; ++y) {
-            g_originalY[x][y] = y;
-        }
-    }
-
-    return true;
-}
-
-static bool g_originalYIsInitialized = initializeOriginalY();
-}
-
-class RensaNonTracker {
-public:
-    void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) { }
-    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) { }
-    void puyoIsDropped(int /*x*/, int /*fromY*/, int /*toY*/) { }
-    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
-};
-
-class RensaTracker {
-public:
-    RensaTracker(RensaTrackResult* trackResult) :
-        result_(trackResult)
-    {
-        // TODO(mayah): Assert trackResult is initialized.
-        DCHECK(g_originalYIsInitialized);
-        static_assert(sizeof(originalY_ == g_originalY), "originalY_ and g_originalY should have the same size.");
-        memcpy(originalY_, g_originalY, sizeof(originalY_));
-    }
-
-    void colorPuyoIsVanished(int x, int y, int nthChain) { result_->setErasedAt(x, originalY_[x][y], nthChain); }
-    void ojamaPuyoIsVanished(int x, int y, int nthChain) { result_->setErasedAt(x, originalY_[x][y], nthChain); }
-    void puyoIsDropped(int x, int fromY, int toY) { originalY_[x][toY] = originalY_[x][fromY]; }
-    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
-
-private:
-    int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
-    RensaTrackResult* result_;
-};
-
-class RensaCoefTracker {
-public:
-    explicit RensaCoefTracker(RensaCoefResult* result) : result_(result) {}
-
-    void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
-    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
-    void puyoIsDropped(int /*x*/, int /*fromY*/, int /*toY*/) {}
-    void nthChainDone(int nthChain, int numErasedPuyo, int coef) { result_->setCoef(nthChain, numErasedPuyo, coef); }
-
-private:
-    RensaCoefResult* result_;
-};
-
-class RensaVanishingPositionTracker {
-public:
-    RensaVanishingPositionTracker(RensaVanishingPositionResult* result) : result_(result)
-    {
-        resetY();
-    }
-
-    void colorPuyoIsVanished(int x, int y, int nthChain)
-    {
-        if (yAtPrevRensa_[x][y] == 0) {
-            result_->setBasePuyo(x, y, nthChain);
-        } else {
-            result_->setFallingPuyo(x, yAtPrevRensa_[x][y], y, nthChain);
-        }
-    }
-
-    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
-    void puyoIsDropped(int x, int fromY, int toY) { yAtPrevRensa_[x][toY] = fromY; }
-    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) { resetY(); }
-
-private:
-    void resetY() {
-        constexpr std::array<int, FieldConstant::MAP_HEIGHT> ALL_ZERO {{}};
-        yAtPrevRensa_.fill(ALL_ZERO);
-    }
-
-    RensaVanishingPositionResult* result_;
-    std::array<std::array<int, FieldConstant::MAP_HEIGHT>, FieldConstant::MAP_WIDTH> yAtPrevRensa_;
-};
 
 CoreField::CoreField()
 {
@@ -508,129 +419,6 @@ int CoreField::vanishDrop(SimulationContext* context)
     return score;
 }
 
-template<typename Tracker>
-int CoreField::vanish(SimulationContext* context, Tracker* tracker)
-{
-    FieldBitField checked;
-    Position eraseQueue[WIDTH * HEIGHT]; // All the positions of erased puyos will be stored here.
-    Position* eraseQueueHead = eraseQueue;
-
-    bool usedColors[NUM_PUYO_COLORS] {};
-    int numUsedColors = 0;
-    int longBonusCoef = 0;
-
-    for (int x = 1; x <= WIDTH; ++x) {
-        int maxHeight = height(x);
-        for (int y = context->minHeights[x]; y <= maxHeight; ++y) {
-            DCHECK_NE(color(x, y), PuyoColor::EMPTY)
-                << x << ' ' << y << ' ' << toChar(color(x, y)) << '\n'
-                << toDebugString();
-
-            if (checked.get(x, y))
-                continue;
-            if (!isNormalColor(color(x, y)))
-                continue;
-
-            PuyoColor c = color(x, y);
-            Position* head = fillSameColorPosition(x, y, c, eraseQueueHead, &checked);
-
-            int connectedPuyoNum = head - eraseQueueHead;
-            if (connectedPuyoNum < PUYO_ERASE_NUM)
-                continue;
-
-            eraseQueueHead = head;
-            longBonusCoef += longBonus(connectedPuyoNum);
-            if (!usedColors[static_cast<int>(c)]) {
-                ++numUsedColors;
-                usedColors[static_cast<int>(c)] = true;
-            }
-        }
-    }
-
-    int numErasedPuyos = eraseQueueHead - eraseQueue;
-    if (numErasedPuyos == 0)
-        return 0;
-
-    // --- Actually erase the Puyos to be vanished. We erase ojama here also.
-    eraseQueuedPuyos(context, eraseQueue, eraseQueueHead, tracker);
-
-    int rensaBonusCoef = calculateRensaBonusCoef(chainBonus(context->currentChain), longBonusCoef, colorBonus(numUsedColors));
-    tracker->nthChainDone(context->currentChain, numErasedPuyos, rensaBonusCoef);
-    return 10 * numErasedPuyos * rensaBonusCoef;
-}
-
-template<typename Tracker>
-void CoreField::eraseQueuedPuyos(SimulationContext* context, Position* eraseQueue, Position* eraseQueueHead, Tracker* tracker)
-{
-    DCHECK(tracker);
-
-    context->updateFromField(*this);
-
-    for (Position* head = eraseQueue; head != eraseQueueHead; ++head) {
-        int x = head->x;
-        int y = head->y;
-
-        unsafeSet(x, y, PuyoColor::EMPTY);
-        tracker->colorPuyoIsVanished(x, y, context->currentChain);
-        context->minHeights[x] = std::min(context->minHeights[x], y);
-
-        // Check OJAMA puyos erased
-        if (color(x + 1, y) == PuyoColor::OJAMA) {
-            unsafeSet(x + 1, y, PuyoColor::EMPTY);
-            tracker->ojamaPuyoIsVanished(x + 1, y, context->currentChain);
-            context->minHeights[x + 1] = std::min(context->minHeights[x + 1], y);
-        }
-
-        if (color(x - 1, y) == PuyoColor::OJAMA) {
-            unsafeSet(x - 1, y, PuyoColor::EMPTY);
-            tracker->ojamaPuyoIsVanished(x - 1, y, context->currentChain);
-            context->minHeights[x - 1] = std::min(context->minHeights[x - 1], y);
-        }
-
-        // We don't need to update minHeights here.
-        if (color(x, y + 1) == PuyoColor::OJAMA && y + 1 <= HEIGHT) {
-            unsafeSet(x, y + 1, PuyoColor::EMPTY);
-            tracker->ojamaPuyoIsVanished(x, y + 1, context->currentChain);
-        }
-
-        if (color(x, y - 1) == PuyoColor::OJAMA) {
-            unsafeSet(x, y - 1, PuyoColor::EMPTY);
-            tracker->ojamaPuyoIsVanished(x, y - 1, context->currentChain);
-            context->minHeights[x] = std::min(context->minHeights[x], y - 1);
-        }
-    }
-}
-
-template<typename Tracker>
-int CoreField::dropAfterVanish(SimulationContext* context, Tracker* tracker)
-{
-    DCHECK(tracker);
-
-    int maxDrops = 0;
-    for (int x = 1; x <= WIDTH; x++) {
-        int writeAt = context->minHeights[x];
-        if (writeAt >= 14)
-            continue;
-
-        int maxHeight = height(x);
-        heights_[x] = writeAt - 1;
-
-        DCHECK_EQ(color(x, writeAt), PuyoColor::EMPTY) << writeAt << ' ' << toChar(color(x, writeAt));
-        for (int y = writeAt + 1; y <= maxHeight; ++y) {
-            if (color(x, y) == PuyoColor::EMPTY)
-                continue;
-
-            maxDrops = max(maxDrops, y - writeAt);
-            unsafeSet(x, writeAt, color(x, y));
-            unsafeSet(x, y, PuyoColor::EMPTY);
-            heights_[x] = writeAt;
-            tracker->puyoIsDropped(x, y, writeAt++);
-        }
-    }
-
-    return maxDrops;
-}
-
 int CoreField::fillErasingPuyoPositions(const SimulationContext& context, Position* eraseQueue) const
 {
     Position* eraseQueueHead = eraseQueue;
@@ -754,81 +542,6 @@ bool CoreField::rensaWillOccurWithContext(const SimulationContext& context) cons
     return false;
 }
 
-RensaResult CoreField::simulate(int initialChain,
-                                RensaTrackResult* rensaTrackResult,
-                                RensaCoefResult* rensaCoefResult,
-                                RensaVanishingPositionResult* rensaVanishingPositionResult)
-{
-    SimulationContext context(initialChain);
-
-    if ((rensaTrackResult && rensaCoefResult)
-         || (rensaCoefResult && rensaVanishingPositionResult)
-         || (rensaVanishingPositionResult && rensaTrackResult)) {
-        CHECK(false) << "Not supported yet";
-        return RensaResult();
-    } else if (rensaTrackResult) {
-        RensaTracker tracker(rensaTrackResult);
-        return simulateWithTracker(&context, &tracker);
-    } else if (rensaCoefResult) {
-        RensaCoefTracker tracker(rensaCoefResult);
-        return simulateWithTracker(&context, &tracker);
-    } else if (rensaVanishingPositionResult){
-        RensaVanishingPositionTracker tracker(rensaVanishingPositionResult);
-        return simulateWithTracker(&context, &tracker);
-    } else {
-        RensaNonTracker tracker;
-        return simulateWithTracker(&context, &tracker);
-    }
-}
-
-RensaResult CoreField::simulateWithContext(SimulationContext* context)
-{
-    RensaNonTracker tracker;
-    return simulateWithTracker(context, &tracker);
-}
-
-RensaResult CoreField::simulateWithContext(SimulationContext* context, RensaTrackResult* rensaTrackResult)
-{
-    RensaTracker tracker(rensaTrackResult);
-    return simulateWithTracker(context, &tracker);
-}
-
-RensaResult CoreField::simulateWithContext(SimulationContext* context, RensaCoefResult* rensaCoefResult)
-{
-    RensaCoefTracker tracker(rensaCoefResult);
-    return simulateWithTracker(context, &tracker);
-}
-
-RensaResult CoreField::simulateWithContext(SimulationContext* context, RensaVanishingPositionResult* rensaVanishingPositionResult)
-{
-    RensaVanishingPositionTracker tracker(rensaVanishingPositionResult);
-    return simulateWithTracker(context, &tracker);
-}
-
-template<typename Tracker>
-inline RensaResult CoreField::simulateWithTracker(SimulationContext* context, Tracker* tracker)
-{
-    int score = 0;
-    int frames = 0;
-
-    int nthChainScore;
-    bool quick = false;
-    while ((nthChainScore = vanish(context, tracker)) > 0) {
-        context->currentChain += 1;
-        score += nthChainScore;
-        frames += FRAMES_VANISH_ANIMATION;
-        int maxDrops = dropAfterVanish(context, tracker);
-        if (maxDrops > 0) {
-            DCHECK(maxDrops < 14);
-            frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
-        } else {
-            quick = true;
-        }
-    }
-
-    return RensaResult(context->currentChain - 1, score, frames, quick);
-}
-
 std::string CoreField::toDebugString() const
 {
     std::ostringstream s;
@@ -866,3 +579,9 @@ bool operator!=(const CoreField& lhs, const CoreField& rhs)
 {
     return !(lhs == rhs);
 }
+
+// instantiate CoreField::simulate().
+template RensaResult CoreField::simulate(SimulationContext*, RensaNonTracker*);
+template RensaResult CoreField::simulate(SimulationContext*, RensaTracker*);
+template RensaResult CoreField::simulate(SimulationContext*, RensaCoefTracker*);
+template RensaResult CoreField::simulate(SimulationContext*, RensaVanishingPositionTracker*);

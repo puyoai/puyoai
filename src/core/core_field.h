@@ -15,6 +15,7 @@
 #include "core/puyo_color.h"
 #include "core/plain_field.h"
 #include "core/rensa_result.h"
+#include "core/rensa_tracker.h"
 
 class ColumnPuyoList;
 class FieldBitField;
@@ -159,21 +160,13 @@ public:
     bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;
     bool rensaWillOccurWithContext(const SimulationContext&) const;
 
-    // Simulates rensa.
-    // When trackResult is passed, RensaTrackResult will be fulfilled.
-    RensaResult simulate(int initialChain = 1,
-                         RensaTrackResult* rensaTrackResult = nullptr,
-                         RensaCoefResult* rensaCoefResult = nullptr,
-                         RensaVanishingPositionResult* rensaVanishingPositionResult = nullptr);
-    RensaResult simulate(RensaCoefResult* rensaCoefResult) { return simulate(1, nullptr, rensaCoefResult, nullptr); }
-    RensaResult simulate(RensaTrackResult* rensaTrackResult) { return simulate(1, rensaTrackResult, nullptr, nullptr); }
-    RensaResult simulate(RensaVanishingPositionResult* rensaVanishingPositionResult) { return simulate(1, nullptr, nullptr, rensaVanishingPositionResult); }
-
-    // Simulates rensa with specifying the context.
-    RensaResult simulateWithContext(SimulationContext*);
-    RensaResult simulateWithContext(SimulationContext*, RensaTrackResult*);
-    RensaResult simulateWithContext(SimulationContext*, RensaCoefResult*);
-    RensaResult simulateWithContext(SimulationContext*, RensaVanishingPositionResult*);
+    // Simulates chains. Returns RensaResult.
+    RensaResult simulate(int initialChain = 1);
+    RensaResult simulate(SimulationContext* context);
+    template<typename Tracker>
+    RensaResult simulate(Tracker* tracker);
+    template<typename Tracker>
+    RensaResult simulate(SimulationContext*, Tracker*);
 
     // Vanishes the connected puyos. Score will be returned.
     int vanishOnly(int currentChain);
@@ -211,10 +204,6 @@ public:
     }
 
 protected:
-    // Simulates chains. Returns RensaResult.
-    template<typename Tracker>
-    RensaResult simulateWithTracker(SimulationContext*, Tracker*);
-
     // Vanishes connected puyos and returns score. If score is 0, no puyos are vanished.
     template<typename Tracker>
     int vanish(SimulationContext*, Tracker*);
@@ -249,5 +238,6 @@ CoreField::SimulationContext::fromLastDecision(const CoreField& cf,
     return context;
 }
 
+#include "core/core_field_inl.h"
 
 #endif

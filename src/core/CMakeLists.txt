@@ -30,6 +30,7 @@ add_library(puyoai_core STATIC
             puyo_controller.cc
             real_color.cc
             rensa_result.cc
+            rensa_tracker.cc
             sequence_generator.cc
             user_event.cc)
 
