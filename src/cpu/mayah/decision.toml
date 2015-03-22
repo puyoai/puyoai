@@ -208,6 +208,7 @@ ACBB = [4, 2]
 ACBD = [4, 2]
 ACDD = [4, 2]
 BBBC = [2, 3]
+BBCC = [2, 3]
 BBCD = [2, 3]
 BBAC = [2, 3]
 BCAD = [1, 0]
@@ -247,6 +248,13 @@ field = [
 AABD = [2, 3]
 CCAA = [2, 3]
 CCCB = [2, 3]
+
+[[book]]
+field = [
+    "..A...",
+    "AAB..."
+]
+CCAD = [2, 3]
 
 [[book]]
 field = [
