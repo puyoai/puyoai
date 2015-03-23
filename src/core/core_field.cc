@@ -18,12 +18,6 @@
 
 using namespace std;
 
-CoreField::CoreField()
-{
-    for (int x = 0; x < MAP_WIDTH; ++x)
-        heights_[x] = 0;
-}
-
 CoreField::CoreField(const std::string& url) :
     PlainField(url)
 {
