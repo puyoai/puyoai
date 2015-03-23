@@ -151,8 +151,10 @@ PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
     auto matchablePatternIds = preEvalResult.mutableMatchablePatternIds();
     for (size_t i = 0; i < patternBook().size(); ++i) {
         const PatternBookField& pbf = patternBook().patternBookField(i);
+        if (pbf.ignitionColumn() == 0)
+            continue;
         if (pbf.isMatchable(currentField))
-          matchablePatternIds->push_back(static_cast<int>(i));
+            matchablePatternIds->push_back(static_cast<int>(i));
     }
 
     return preEvalResult;
