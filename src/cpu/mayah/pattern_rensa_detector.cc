@@ -18,6 +18,10 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
     // --- Iterate with complementing
     for (const int id : matchableIds) {
         const PatternBookField& pbf = patternBook_.patternBookField(id);
+        int x = pbf.ignitionColumn();
+        if (x == 0)
+            continue;
+
         ColumnPuyoList cpl;
         ComplementResult complementResult = pbf.complement(originalField_, MAX_UNUSED_VARIABLES, &cpl);
         if (!complementResult.success)
@@ -26,14 +30,14 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
             continue;
 
         // No ignition puyo.
-        if (cpl.sizeOn(pbf.ignitionColumn()) == 0)
+        if (cpl.sizeOn(x) == 0)
             continue;
 
         CoreField cf(originalField_);
         if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
             continue;
 
-        int x = pbf.ignitionColumn();
+
         ColumnPuyo firePuyo(x, cpl.get(x, cpl.sizeOn(x) - 1));
         ColumnPuyoList keyPuyos(cpl);
         keyPuyos.removeTopFrom(x);

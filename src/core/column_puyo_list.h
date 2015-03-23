@@ -16,14 +16,14 @@ public:
 
     int sizeOn(int x) const
     {
-        DCHECK(1 <= x && x <= 6);
+        DCHECK(1 <= x && x <= 6) << x;
         return size_[x-1];
     }
 
     PuyoColor get(int x, int i) const
     {
-        DCHECK(1 <= x && x <= 6);
-        DCHECK(0 <= i && i <= sizeOn(x));
+        DCHECK(1 <= x && x <= 6) << x;
+        DCHECK(0 <= i && i < sizeOn(x)) << x << ' ' << i;
         return puyos_[x-1][i];
     }
 
