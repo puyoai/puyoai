@@ -15,7 +15,7 @@ public:
 
 class RensaTracker {
 public:
-    RensaTracker(RensaTrackResult* trackResult) :
+    explicit RensaTracker(RensaTrackResult* trackResult) :
         result_(trackResult)
     {
         // TODO(mayah): Assert trackResult is initialized.
@@ -49,7 +49,7 @@ private:
 
 class RensaVanishingPositionTracker {
 public:
-    RensaVanishingPositionTracker(RensaVanishingPositionResult* result) : result_(result)
+    explicit RensaVanishingPositionTracker(RensaVanishingPositionResult* result) : result_(result)
     {
         resetY();
     }
