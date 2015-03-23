@@ -24,7 +24,7 @@ struct Position;
 
 class CoreField : public PlainField {
 public:
-    CoreField();
+    CoreField() : heights_{} {}
     explicit CoreField(const std::string& url);
     explicit CoreField(const PlainField&);
     CoreField(const CoreField&) = default;
