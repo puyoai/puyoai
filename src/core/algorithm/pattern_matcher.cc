@@ -7,11 +7,11 @@
 
 using namespace std;
 
-PatternMatcher::PatternMatcher()
+PatternMatcher::PatternMatcher() :
+    seen_ {}
 {
     for (int i = 0; i < 26; ++i) {
         map_[i] = PuyoColor::WALL;
-        seen_[i] = false;
     }
 }
 
