@@ -409,16 +409,6 @@ int CoreField::vanishOnly(int currentNthChain)
     return vanish(&context, &nonTracker);
 }
 
-int CoreField::vanishDrop(SimulationContext* context)
-{
-    RensaNonTracker tracker;
-    int score = vanish(context, &tracker);
-    if (score > 0)
-        dropAfterVanish(context, &tracker);
-
-    return score;
-}
-
 int CoreField::fillErasingPuyoPositions(const SimulationContext& context, Position* eraseQueue) const
 {
     Position* eraseQueueHead = eraseQueue;

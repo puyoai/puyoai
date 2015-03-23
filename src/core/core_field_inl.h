@@ -53,6 +53,23 @@ inline RensaResult CoreField::simulate(SimulationContext* context, Tracker* trac
     return RensaResult(context->currentChain - 1, score, frames, quick);
 }
 
+inline
+int CoreField::vanishDrop(SimulationContext* context)
+{
+    RensaNonTracker tracker;
+    return vanishDrop(context, &tracker);
+}
+
+template<typename Tracker>
+int CoreField::vanishDrop(SimulationContext* context, Tracker* tracker)
+{
+    int score = vanish(context, tracker);
+    if (score > 0)
+        dropAfterVanish(context, tracker);
+
+    return score;
+}
+
 template<typename Tracker>
 int CoreField::vanish(SimulationContext* context, Tracker* tracker)
 {
