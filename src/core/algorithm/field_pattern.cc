@@ -182,7 +182,7 @@ ComplementResult FieldPattern::complement(const CoreField& field,
     DCHECK_EQ(cpl->size(), 0) << "result must be empty";
 
     PatternMatcher matcher;
-    PatternMatchResult result = matcher.match(*this, field, false, scoreCallback);
+    PatternMatchResult result = matcher.match(*this, field, false, std::move(scoreCallback));
     if (!result.matched)
         return ComplementResult(false);
 
