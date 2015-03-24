@@ -233,3 +233,200 @@ TEST(PatternMatcherTest, unusedVariables)
     EXPECT_TRUE(result.matched);
     EXPECT_EQ(expected, result.unusedVariables);
 }
+
+TEST(PatternMatcherTest, complement1)
+{
+    FieldPattern pattern(
+        "..BC.."
+        "AAAB.."
+        "BBBCCC");
+
+    CoreField cf(
+        "......"
+        "..YB.."
+        "BBBG..");
+
+    CoreField expected(
+        "..BG.."
+        "YYYB.."
+        "BBBGGG");
+
+    ColumnPuyoList cpl;
+    PatternMatcher matcher;
+    EXPECT_TRUE(matcher.complement(pattern, cf, &cpl).success);
+    EXPECT_TRUE(cf.dropPuyoList(cpl));
+    EXPECT_EQ(expected, cf) << cf.toDebugString();
+}
+
+TEST(PatternMatcherTest, complement2)
+{
+    FieldPattern pattern(
+        "B....."
+        "AAA..."
+        "BC...."
+        "BBC..."
+        "CC....");
+
+    CoreField cf(
+        "YB...."
+        "YYB..."
+        "BBGGG.");
+
+    // Since we cannot complement (3, 3), so this pattern should not match.
+    ColumnPuyoList cpl;
+    PatternMatcher matcher;
+    EXPECT_FALSE(matcher.complement(pattern, cf, &cpl).success);
+}
+
+TEST(PatternMatcherTest, complement3)
+{
+    FieldPattern pattern(
+        "BA...."
+        "AA...."
+        "BC...."
+        "BBC..."
+        "CC....");
+
+    CoreField cf(
+        " R    "
+        "YY BBB"
+        "RRRGGG");
+
+    ColumnPuyoList cpl;
+    PatternMatcher matcher;
+    EXPECT_FALSE(matcher.complement(pattern, cf, &cpl).success);
+}
+
+TEST(PatternMatcherTest, complement4)
+{
+    FieldPattern pattern(
+        "....De"
+        "ABCDDE"
+        "AABCCD"
+        "BBCEEE");
+
+    CoreField cf(
+        ".....Y"
+        "Y....Y"
+        "Y..RRB"
+        "GG.YYY");
+
+    ColumnPuyoList cpl;
+    PatternMatcher matcher;
+    EXPECT_TRUE(matcher.complement(pattern, cf, &cpl).success);
+}
+
+TEST(PatternMatcherTest, complement5)
+{
+    FieldPattern pattern(
+        "ABC..."
+        "AABCC."
+        "BBC@@.");
+
+    EXPECT_EQ(PatternType::ALLOW_FILLING_OJAMA, pattern.type(4, 1));
+
+    CoreField cf(
+        "Y....."
+        "Y....."
+        "GGB...");
+
+    CoreField expected(
+        "YGB..."
+        "YYGBB."
+        "GGBOO.");
+
+    ColumnPuyoList cpl;
+    PatternMatcher matcher;
+    EXPECT_TRUE(matcher.complement(pattern, cf, &cpl).success);
+    EXPECT_TRUE(cf.dropPuyoList(cpl));
+    EXPECT_EQ(expected, cf) << expected.toDebugString() << '\n' << cf.toDebugString();
+}
+
+TEST(PatternMatcherTest, complement6)
+{
+    FieldPattern pattern(
+        "ABC..."
+        "AABCC."
+        "BBC@@.");
+
+    EXPECT_EQ(PatternType::ALLOW_FILLING_OJAMA, pattern.type(4, 1));
+
+    CoreField cf(
+        "Y....."
+        "Y....."
+        "GG....");
+
+    CoreField expected1(
+        "YGB..."
+        "YYGBB."
+        "GGBOO.");
+
+    CoreField expected2(
+        "YGR..."
+        "YYGRR."
+        "GGROO.");
+
+    ColumnPuyoList cpl;
+    PatternMatcher matcher;
+    EXPECT_TRUE(matcher.complement(pattern, cf, 1, &cpl).success);
+    EXPECT_TRUE(cf.dropPuyoList(cpl));
+    EXPECT_TRUE(cf == expected1 || cf == expected2) << cf.toDebugString();
+}
+
+TEST(PatternMatcherTest, complementWithAllow1)
+{
+    FieldPattern pattern(
+        ".ab..."
+        ".AB..."
+        "ABC..."
+        "ABC..."
+        "ABCC..");
+
+    CoreField cf(
+        "YGB..."
+        "YGB..."
+        "YGB...");
+
+    CoreField expected(
+        ".YG..."
+        "YGB..."
+        "YGB..."
+        "YGBB..");
+
+    ColumnPuyoList cpl;
+    PatternMatcher matcher;
+    EXPECT_TRUE(matcher.complement(pattern, cf, 1, &cpl).success);
+    EXPECT_TRUE(cf.dropPuyoList(cpl));
+    EXPECT_TRUE(expected == cf);
+}
+
+TEST(PatternMatcherTest, complementWithAllow2)
+{
+    FieldPattern pattern(
+        ".ab..."
+        ".AB..."
+        "ABC..."
+        "ABC..."
+        "ABCC..");
+
+    CoreField cf(
+        ".Y...."
+        ".Y...."
+        "YGB..."
+        "YGB..."
+        "YGB...");
+
+    CoreField expected(
+        ".Y...."
+        ".YG..."
+        "YGB..."
+        "YGB..."
+        "YGBB..");
+
+
+    ColumnPuyoList cpl;
+    PatternMatcher matcher;
+    EXPECT_TRUE(matcher.complement(pattern, cf, 1, &cpl).success);
+    EXPECT_TRUE(cf.dropPuyoList(cpl));
+    EXPECT_TRUE(expected == cf);
+}

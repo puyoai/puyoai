@@ -19,14 +19,6 @@ enum class PatternType : std::uint8_t {
     ALLOW_FILLING_OJAMA, ALLOW_FILLING_IRON, WALL
 };
 
-struct ComplementResult {
-    explicit ComplementResult(bool success, int filled = 0) :
-        success(success), numFilledUnusedVariables(filled) {}
-
-    bool success = false;
-    int numFilledUnusedVariables = 0;
-};
-
 // FieldPattern is a field that holds characters.
 // This would be useful if you want to write an algorithm to do pattern-match.
 //
@@ -41,16 +33,6 @@ public:
     static bool merge(const FieldPattern&, const FieldPattern&, FieldPattern*);
 
     bool isMatchable(const CoreField&) const;
-
-    typedef std::function<void (int x, int y, double score)> ScoreCallback;
-    ComplementResult complement(const CoreField&,
-                                int numAllowingFillingUnusedVariables,
-                                ColumnPuyoList*,
-                                ScoreCallback callback = ScoreCallback()) const;
-    ComplementResult complement(const CoreField& cf, ColumnPuyoList* cpl) const
-    {
-        return complement(cf, 0, cpl);
-    }
 
     void setPattern(int x, int y, PatternType t, char variable, double score);
 
@@ -72,6 +54,8 @@ public:
     void setVariable(int x, int y, char c) { vars_[x][y] = c; }
 
 private:
+    friend class PatternMatcher;
+
     static PatternType inferType(char c, PatternType typeForLowerCase = PatternType::ALLOW_VAR);
     int countVariables() const;
 

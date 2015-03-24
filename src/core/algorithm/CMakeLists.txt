@@ -20,7 +20,7 @@ function(puyoai_core_algorithm_add_test target)
     target_link_libraries(${target}_test puyoai_base)
     puyoai_target_link_libraries(${target}_test)
     if(NOT ARGV1)
-      add_test(check-${target}_test ${target}_test)
+        add_test(check-${target}_test ${target}_test)
     endif()
 endfunction()
 
