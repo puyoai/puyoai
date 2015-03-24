@@ -28,4 +28,26 @@ struct Position {
     int y;
 };
 
+namespace std {
+
+template<>
+struct hash<Position>
+{
+    size_t operator()(const Position& p) const { return p.x * 16 + p.y; }
+};
+
+template<>
+struct hash<vector<Position>>
+{
+    size_t operator()(const vector<Position>& vs) const
+    {
+        size_t h = 0;
+        for (size_t i = 0; i < vs.size(); ++i)
+            h = h * 37 + hash<Position>()(vs[i]);
+        return h;
+    }
+};
+
+}
+
 #endif

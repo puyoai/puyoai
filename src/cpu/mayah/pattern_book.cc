@@ -36,6 +36,8 @@ vector<Position> findIgnitionPositions(const FieldPattern& pattern)
 
 } // anonymous namespace
 
+const vector<int> PatternBook::s_emptyVector;
+
 PatternBookField::PatternBookField(const string& field, const string& name, int ignitionColumn, double score) :
     pattern_(field, score),
     name_(name),
@@ -130,8 +132,9 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
     }
 
     index_.clear();
-    for (int i = 0; i < static_cast<int>(fields_.size()); ++i)
-        index_.emplace(fields_[i].ignitionPositions(), i);
+    for (int i = 0; i < static_cast<int>(fields_.size()); ++i) {
+        index_[fields_[i].ignitionPositions()].push_back(i);
+    }
 
     return true;
 }
@@ -139,5 +142,9 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
 pair<PatternBook::IndexIterator, PatternBook::IndexIterator>
 PatternBook::find(const vector<Position>& ignitionPositions) const
 {
-    return index_.equal_range(ignitionPositions);
+    auto it = index_.find(ignitionPositions);
+    if (it != index_.end())
+        return make_pair(it->second.begin(), it->second.end());
+
+    return make_pair(s_emptyVector.begin(), s_emptyVector.end());
 }

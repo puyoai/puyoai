@@ -1,8 +1,8 @@
 #ifndef CPU_MAYAH_PATTERN_BOOK_H_
 #define CPU_MAYAH_PATTERN_BOOK_H_
 
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -59,8 +59,8 @@ private:
 
 class PatternBook : noncopyable {
 public:
-    typedef std::multimap<std::vector<Position>, int> IndexMap;
-    typedef IndexMap::const_iterator IndexIterator;
+    typedef std::unordered_map<std::vector<Position>, std::vector<int>> IndexMap;
+    typedef std::vector<int>::const_iterator IndexIterator;
 
     bool load(const std::string& filename);
     bool loadFromString(const std::string&);
@@ -76,6 +76,8 @@ public:
     const PatternBookField& patternBookField(int i) const { return fields_[i]; }
 
 private:
+    static const std::vector<int> s_emptyVector;
+
     std::vector<PatternBookField> fields_;
     IndexMap index_;
 };
