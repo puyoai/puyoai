@@ -174,27 +174,6 @@ bool FieldPattern::isMatchable(const CoreField& field) const
     return matcher.match(*this, field).matched;
 }
 
-ComplementResult FieldPattern::complement(const CoreField& field,
-                                          int numAllowingFillingUnusedVariables,
-                                          ColumnPuyoList* cpl,
-                                          FieldPattern::ScoreCallback scoreCallback) const
-{
-    DCHECK_EQ(cpl->size(), 0) << "result must be empty";
-
-    PatternMatcher matcher;
-    PatternMatchResult result = matcher.match(*this, field, false, std::move(scoreCallback));
-    if (!result.matched)
-        return ComplementResult(false);
-
-    if (static_cast<int>(result.unusedVariables.size()) > numAllowingFillingUnusedVariables)
-        return ComplementResult(false);
-
-    bool ok = fillUnusedVariableColors(field, 0, result.unusedVariables, &matcher, cpl);
-    int filled = std::min(static_cast<int>(result.unusedVariables.size()),
-                          numAllowingFillingUnusedVariables);
-    return ComplementResult(ok, filled);
-}
-
 bool FieldPattern::fillUnusedVariableColors(const CoreField& field,
                                             int pos,
                                             const vector<char>& unusedVariables,

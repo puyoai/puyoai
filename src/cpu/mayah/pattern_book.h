@@ -10,6 +10,7 @@
 
 #include "base/noncopyable.h"
 #include "core/algorithm/field_pattern.h"
+#include "core/algorithm/pattern_matcher.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
@@ -31,12 +32,13 @@ public:
     int numVariables() const { return pattern_.numVariables(); }
 
     bool isMatchable(const CoreField& cf) const { return pattern_.isMatchable(cf); }
+    template<typename ScoreCallback>
     ComplementResult complement(const CoreField& cf,
                                 int numAllowingFillingUnusedVariables,
                                 ColumnPuyoList* cpl,
-                                FieldPattern::ScoreCallback scoreCallback) const
+                                ScoreCallback scoreCallback) const
     {
-        return pattern_.complement(cf, numAllowingFillingUnusedVariables, cpl, std::move(scoreCallback));
+        return PatternMatcher().complement(pattern_, cf, numAllowingFillingUnusedVariables, cpl, std::move(scoreCallback));
     }
 
     PatternBookField mirror() const
