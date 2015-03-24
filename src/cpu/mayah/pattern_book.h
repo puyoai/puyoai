@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <toml/toml.h>
@@ -35,7 +36,7 @@ public:
                                 ColumnPuyoList* cpl,
                                 FieldPattern::ScoreCallback scoreCallback) const
     {
-        return pattern_.complement(cf, numAllowingFillingUnusedVariables, cpl, scoreCallback);
+        return pattern_.complement(cf, numAllowingFillingUnusedVariables, cpl, std::move(scoreCallback));
     }
 
     PatternBookField mirror() const
