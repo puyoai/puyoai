@@ -37,7 +37,7 @@ vector<Position> findIgnitionPositions(const FieldPattern& pattern)
 } // anonymous namespace
 
 PatternBookField::PatternBookField(const string& field, const string& name, int ignitionColumn, double score) :
-    pattern_(field),
+    pattern_(field, score),
     name_(name),
     ignitionColumn_(ignitionColumn),
     score_(score),
