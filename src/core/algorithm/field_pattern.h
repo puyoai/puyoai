@@ -2,6 +2,7 @@
 #define CORE_ALGORITHM_PATTERN_FIELD_H_
 
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -40,9 +41,12 @@ public:
     static bool merge(const FieldPattern&, const FieldPattern&, FieldPattern*);
 
     bool isMatchable(const CoreField&) const;
+
+    typedef std::function<void (int x, int y, double score)> ScoreCallback;
     ComplementResult complement(const CoreField&,
                                 int numAllowingFillingUnusedVariables,
-                                ColumnPuyoList*) const;
+                                ColumnPuyoList*,
+                                ScoreCallback callback = ScoreCallback()) const;
     ComplementResult complement(const CoreField& cf, ColumnPuyoList* cpl) const
     {
         return complement(cf, 0, cpl);

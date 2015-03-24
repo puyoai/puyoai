@@ -40,6 +40,10 @@ public:
 
     // If |ignoreMustVar| is true, don't check the existence.
     PatternMatchResult match(const FieldPattern&, const CoreField&, bool ignoresMustVar = false);
+    typedef std::function<void (int x, int y, double score)> ScoreCallback;
+    PatternMatchResult match(const FieldPattern&, const CoreField&, bool ignoresMustVar,
+                             ScoreCallback scoreCallback);
+
     bool checkNeighborsForCompletion(const FieldPattern&, const CoreField&) const;
 
     PuyoColor map(char var) const

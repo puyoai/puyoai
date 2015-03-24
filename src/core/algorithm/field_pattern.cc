@@ -176,12 +176,13 @@ bool FieldPattern::isMatchable(const CoreField& field) const
 
 ComplementResult FieldPattern::complement(const CoreField& field,
                                           int numAllowingFillingUnusedVariables,
-                                          ColumnPuyoList* cpl) const
+                                          ColumnPuyoList* cpl,
+                                          FieldPattern::ScoreCallback scoreCallback) const
 {
     DCHECK_EQ(cpl->size(), 0) << "result must be empty";
 
     PatternMatcher matcher;
-    PatternMatchResult result = matcher.match(*this, field);
+    PatternMatchResult result = matcher.match(*this, field, false, scoreCallback);
     if (!result.matched)
         return ComplementResult(false);
 

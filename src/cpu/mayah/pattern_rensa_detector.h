@@ -15,7 +15,7 @@ public:
                                 const ColumnPuyoList& keyPuyos,
                                 const ColumnPuyoList& firePuyos,
                                 const RensaTrackResult&,
-                                const std::string patternName,
+                                const std::string& patternName,
                                 double patternScore)> Callback;
 
     PatternRensaDetector(const PatternBook& patternBook,
@@ -35,18 +35,19 @@ public:
 private:
     void iteratePossibleRensasInternal(const CoreField& currentField,
                                        const CoreField::SimulationContext& currentFieldContext,
+                                       const RensaYPositionTracker& currentFieldTracker,
                                        int currentChains,
                                        const ColumnPuyo& firePuyo,
                                        const ColumnPuyoList& keyPuyos,
                                        int restIteration,
                                        int restUnusedVariables,
                                        const std::string& patternName,
-                                       double sumPatternScore) const;
+                                       double currentPatternScore) const;
 
     bool checkRensa(int currentChains,
                     const ColumnPuyo& firePuyo,
                     const ColumnPuyoList& keyPuyos,
-                    double sumPatternScore,
+                    double patternScore,
                     const std::string& patternName,
                     bool prohibits[FieldConstant::MAP_WIDTH]) const;
 

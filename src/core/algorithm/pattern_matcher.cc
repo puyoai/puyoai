@@ -17,6 +17,12 @@ PatternMatcher::PatternMatcher() :
 
 PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const CoreField& cf, bool ignoresMustVar)
 {
+    return match(pattern, cf, ignoresMustVar, ScoreCallback());
+}
+
+PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const CoreField& cf, bool ignoresMustVar,
+                                         PatternMatcher::ScoreCallback scoreCallback)
+{
     // First, make a map from char to PuyoColor.
     int matchCount = 0;
     int matchAllowedCount = 0;
@@ -34,11 +40,6 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
                 continue;
             }
 
-            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_OJAMA)
-                continue;
-            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_IRON)
-                continue;
-
             if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
                 continue;
 
@@ -54,6 +55,8 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern, const Core
 
             matchCount += 1;
             matchScore += pattern.score(x, y);
+            if (scoreCallback)
+                scoreCallback(x, y, pattern.score(x, y));
 
             if (!isSet(c)) {
                 set(c, pc);

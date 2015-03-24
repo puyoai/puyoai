@@ -22,8 +22,14 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         if (x == 0)
             continue;
 
+        double patternScore = 0.0;
+        auto scoreCallback = [this, &patternScore, &pbf](int x, int y, double score) {
+            if (isNormalColor(originalField_.color(x, y)))
+                patternScore += score / pbf.numVariables();
+        };
+
         ColumnPuyoList cpl;
-        ComplementResult complementResult = pbf.complement(originalField_, MAX_UNUSED_VARIABLES, &cpl);
+        ComplementResult complementResult = pbf.complement(originalField_, MAX_UNUSED_VARIABLES, &cpl, scoreCallback);
         if (!complementResult.success)
             continue;
         if (complementResult.numFilledUnusedVariables > 0)
@@ -37,32 +43,19 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
             continue;
 
-
         ColumnPuyo firePuyo(x, cpl.get(x, cpl.sizeOn(x) - 1));
         ColumnPuyoList keyPuyos(cpl);
         keyPuyos.removeTopFrom(x);
 
         CoreField::SimulationContext context(originalContext_);
-        int score = cf.vanishDrop(&context);
+        RensaYPositionTracker tracker;
+
+        int score = cf.vanishDrop(&context, &tracker);
         CHECK(score > 0) << score;
         int restUnusedVariables = MAX_UNUSED_VARIABLES - complementResult.numFilledUnusedVariables;
-        double ratio = 0;
-        if (pbf.numVariables() > 0) {
-            int count = 0;
-            for (int x = 1; x <= 6; ++x) {
-                int h = cpl.sizeOn(x);
-                for (int i = 0; i < h; ++i) {
-                    if (isNormalColor(cpl.get(x, i)))
-                        ++count;
-                }
-            }
-
-            double d = pbf.numVariables() - count;
-            ratio = d / pbf.numVariables();
-        }
-        iteratePossibleRensasInternal(cf, context, 1, firePuyo, keyPuyos,
+        iteratePossibleRensasInternal(cf, context, tracker, 1, firePuyo, keyPuyos,
                                       maxIteration - 1, restUnusedVariables,
-                                      pbf.name(), pbf.score() * ratio);
+                                      pbf.name(), patternScore);
     }
 
     // --- Iterate without complementing.
@@ -82,9 +75,9 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
 
         DCHECK(firePuyo.isValid());
 
-        iteratePossibleRensasInternal(*cf, originalContext_, 0,
-                                      firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0);
-
+        RensaYPositionTracker tracker;
+        iteratePossibleRensasInternal(*cf, originalContext_, tracker, 0,
+                                      firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0.0);
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
@@ -93,13 +86,14 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
 
 void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& currentField,
                                                          const CoreField::SimulationContext& currentFieldContext,
+                                                         const RensaYPositionTracker& currentFieldTracker,
                                                          int currentChains,
                                                          const ColumnPuyo& firePuyo,
                                                          const ColumnPuyoList& originalKeyPuyos,
                                                          int restIteration,
                                                          int restUnusedVariables,
                                                          const std::string& patternName,
-                                                         double patternScore) const
+                                                         double currentPatternScore) const
 {
     const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
 
@@ -116,8 +110,15 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     for (PatternBook::IndexIterator it = p.first; it != p.second; ++it) {
         const PatternBookField& pbf = patternBook_.patternBookField(it->second);
 
+        double patternScore = currentPatternScore;
+        auto scoreCallback = [this, &patternScore, &pbf, &currentFieldTracker](int x, int y, double score) {
+            int actualY = currentFieldTracker.originalY(x, y);
+            if (isNormalColor(originalField_.color(x, actualY)))
+                patternScore += score / pbf.numVariables();
+        };
+
         ColumnPuyoList cpl;
-        ComplementResult complementResult = pbf.complement(currentField, restUnusedVariables, &cpl);
+        ComplementResult complementResult = pbf.complement(currentField, restUnusedVariables, &cpl, scoreCallback);
         if (!complementResult.success)
             continue;
 
@@ -126,13 +127,14 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
 
             CoreField cf(currentField);
             CoreField::SimulationContext context(currentFieldContext);
-            int score = cf.vanishDrop(&context);
+            RensaYPositionTracker tracker(currentFieldTracker);
+            int score = cf.vanishDrop(&context, &tracker);
             CHECK(score > 0) << score;
 
-            iteratePossibleRensasInternal(cf, context, currentChains + 1, firePuyo, originalKeyPuyos,
+            iteratePossibleRensasInternal(cf, context, tracker, currentChains + 1, firePuyo, originalKeyPuyos,
                                           restIteration, restUnusedVariables,
                                           patternName.empty() ? pbf.name() : patternName,
-                                          patternScore + pbf.score());
+                                          patternScore);
             continue;
         }
 
@@ -151,24 +153,15 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
             continue;
 
         CoreField::SimulationContext context(currentFieldContext);
-        int score = cf.vanishDrop(&context);
+        RensaYPositionTracker tracker(currentFieldTracker);
+        int score = cf.vanishDrop(&context, &tracker);
         CHECK(score > 0) << score;
-        double ratio = 0.0;
-        if (pbf.numVariables() > 0) {
-            int count = 0;
-            cpl.iterate([&count](int /*x*/, PuyoColor pc) {
-                if (isNormalColor(pc))
-                    ++count;
-            });
-            double d = pbf.numVariables() - count;
-            ratio = d / pbf.numVariables();
-        }
 
-        iteratePossibleRensasInternal(cf, context, currentChains + 1, firePuyo, keyPuyos,
+        iteratePossibleRensasInternal(cf, context, tracker, currentChains + 1, firePuyo, keyPuyos,
                                       restIteration - 1,
                                       restUnusedVariables - complementResult.numFilledUnusedVariables,
                                       patternName.empty() ? pbf.name() : patternName,
-                                      patternScore + pbf.score() * ratio);
+                                      patternScore);
     }
 
     if (!needsToProceedWithoutComplement)
@@ -177,18 +170,19 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     // proceed one without complementing.
     CoreField cf(currentField);
     CoreField::SimulationContext context(currentFieldContext);
-    CHECK(cf.vanishDrop(&context) > 0) << cf.toDebugString();
+    RensaYPositionTracker tracker(currentFieldTracker);
+    CHECK(cf.vanishDrop(&context, &tracker) > 0) << cf.toDebugString();
 
     // If rensa continues, proceed to next.
     if (cf.rensaWillOccurWithContext(context)) {
-        iteratePossibleRensasInternal(cf, context, currentChains + 1, firePuyo, originalKeyPuyos,
-                                      restIteration, restUnusedVariables, patternName, patternScore);
+        iteratePossibleRensasInternal(cf, context, tracker, currentChains + 1, firePuyo, originalKeyPuyos,
+                                      restIteration, restUnusedVariables, patternName, currentPatternScore);
         return;
     }
 
     // if currentField does not erase anything...
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    if (!checkRensa(currentChains + 1, firePuyo, originalKeyPuyos, patternScore, patternName, prohibits))
+    if (!checkRensa(currentChains + 1, firePuyo, originalKeyPuyos, currentPatternScore, patternName, prohibits))
         return;
     if (restIteration <= 0)
         return;
@@ -200,9 +194,9 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         if (!keyPuyos.merge(cpl))
             return;
 
-        iteratePossibleRensasInternal(*cf2, context, currentChains + 1,
+        iteratePossibleRensasInternal(*cf2, context, tracker, currentChains + 1,
                                       firePuyo, keyPuyos, restIteration - 1, restUnusedVariables,
-                                      patternName, patternScore);
+                                      patternName, currentPatternScore);
     };
     RensaDetector::detect(cf, strategy_, PurposeForFindingRensa::FOR_KEY, prohibits, detectCallback);
 }
