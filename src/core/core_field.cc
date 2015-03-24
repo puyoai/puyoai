@@ -508,17 +508,13 @@ bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
 
 bool CoreField::rensaWillOccurWithContext(const SimulationContext& context) const
 {
-    FieldBitField checked;
     for (int x = 1; x <= WIDTH; ++x) {
         int h = height(x);
         for (int y = context.minHeights[x]; y <= h; ++y) {
-            if (checked.get(x, y))
-                continue;
-
             if (!isNormalColor(color(x, y)))
                 continue;
 
-            if (countConnectedPuyos(x, y, &checked) >= 4)
+            if (countConnectedPuyosMax4(x, y) >= 4)
                 return true;
         }
     }
