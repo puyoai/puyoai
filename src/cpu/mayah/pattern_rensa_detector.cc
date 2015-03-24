@@ -9,7 +9,7 @@ const int MAX_UNUSED_VARIABLES = 1;
 }
 
 void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds,
-                                                 int maxIteration) const
+                                                 int maxIteration)
 {
     DCHECK_GE(maxIteration, 1);
 
@@ -74,6 +74,8 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         }
 
         DCHECK(firePuyo.isValid());
+        if (!checkDup(firePuyo, keyPuyos))
+            return;
 
         RensaYPositionTracker tracker;
         iteratePossibleRensasInternal(*cf, originalContext_, tracker, 0,
@@ -93,7 +95,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
                                                          int restIteration,
                                                          int restUnusedVariables,
                                                          const std::string& patternName,
-                                                         double currentPatternScore) const
+                                                         double currentPatternScore)
 {
     const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
 
@@ -144,12 +146,14 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         if (cpl.sizeOn(firePuyo.x) > 0)
             continue;
 
-        CoreField cf(currentField);
-        if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
-            continue;
-
         ColumnPuyoList keyPuyos(originalKeyPuyos);
         if (!keyPuyos.merge(cpl))
+            continue;
+        if (!checkDup(firePuyo, keyPuyos))
+            continue;
+
+        CoreField cf(currentField);
+        if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
             continue;
 
         CoreField::SimulationContext context(currentFieldContext);
@@ -193,6 +197,8 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         ColumnPuyoList keyPuyos(originalKeyPuyos);
         if (!keyPuyos.merge(cpl))
             return;
+        if (!checkDup(firePuyo, keyPuyos))
+            return;
 
         iteratePossibleRensasInternal(*cf2, context, tracker, currentChains + 1,
                                       firePuyo, keyPuyos, restIteration - 1, restUnusedVariables,
@@ -201,13 +207,25 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     RensaDetector::detect(cf, strategy_, PurposeForFindingRensa::FOR_KEY, prohibits, detectCallback);
 }
 
+bool PatternRensaDetector::checkDup(const ColumnPuyo& firePuyo,
+                                    const ColumnPuyoList& keyPuyos)
+{
+    ColumnPuyoList whole(keyPuyos);
+    whole.add(firePuyo);
+    if (usedSet_.count(whole))
+        return false;
+    usedSet_.insert(whole);
+    return true;
+}
+
 bool PatternRensaDetector::checkRensa(int currentChains,
                                       const ColumnPuyo& firePuyo,
                                       const ColumnPuyoList& keyPuyos,
                                       double patternScore,
                                       const std::string& patternName,
-                                      bool prohibits[FieldConstant::MAP_WIDTH]) const
+                                      bool prohibits[FieldConstant::MAP_WIDTH])
 {
+
     CoreField cf(originalField_);
     CoreField::SimulationContext context(originalContext_);
 
