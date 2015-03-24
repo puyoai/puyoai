@@ -2,6 +2,7 @@
 #define CPU_MAYAH_PATTERN_RENSA_DETECTOR_H_
 
 #include <string>
+#include <unordered_set>
 
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
@@ -30,7 +31,7 @@ public:
     }
 
     void iteratePossibleRensas(const std::vector<int>& matchableIds,
-                               int maxIteration) const;;
+                               int maxIteration);
 
 private:
     void iteratePossibleRensasInternal(const CoreField& currentField,
@@ -42,20 +43,25 @@ private:
                                        int restIteration,
                                        int restUnusedVariables,
                                        const std::string& patternName,
-                                       double currentPatternScore) const;
+                                       double currentPatternScore);
+
+    bool checkDup(const ColumnPuyo& firePuyo,
+                  const ColumnPuyoList& keyPuyos);
 
     bool checkRensa(int currentChains,
                     const ColumnPuyo& firePuyo,
                     const ColumnPuyoList& keyPuyos,
                     double patternScore,
                     const std::string& patternName,
-                    bool prohibits[FieldConstant::MAP_WIDTH]) const;
+                    bool prohibits[FieldConstant::MAP_WIDTH]);
 
     const PatternBook& patternBook_;
     const CoreField& originalField_;
     Callback callback_;
     const CoreField::SimulationContext originalContext_;
     const RensaDetectorStrategy strategy_;
+
+    std::unordered_set<ColumnPuyoList> usedSet_;
 };
 
 #endif
