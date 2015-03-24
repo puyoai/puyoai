@@ -34,6 +34,38 @@ private:
     RensaTrackResult* result_;
 };
 
+class RensaYPositionTracker {
+public:
+    RensaYPositionTracker() :
+        originalY_ {
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+        }
+    {
+    }
+
+    int originalY(int x, int y) const { return originalY_[x][y]; }
+
+    void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
+    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
+    void puyoIsDropped(int x, int fromY, int toY)
+    {
+        DCHECK_NE(fromY, toY);
+        originalY_[x][toY] = originalY_[x][fromY];
+        originalY_[x][fromY] = 0;
+    }
+    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
+
+private:
+    int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
+};
+
 class RensaCoefTracker {
 public:
     explicit RensaCoefTracker(RensaCoefResult* result) : result_(result) {}
