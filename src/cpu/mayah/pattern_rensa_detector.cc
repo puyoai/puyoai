@@ -110,7 +110,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     std::pair<PatternBook::IndexIterator, PatternBook::IndexIterator> p = patternBook_.find(ignitionPositions);
     bool needsToProceedWithoutComplement = true;
     for (PatternBook::IndexIterator it = p.first; it != p.second; ++it) {
-        const PatternBookField& pbf = patternBook_.patternBookField(it->second);
+        const PatternBookField& pbf = patternBook_.patternBookField(*it);
 
         double patternScore = currentPatternScore;
         auto scoreCallback = [this, &patternScore, &pbf, &currentFieldTracker](int x, int y, double score) {
