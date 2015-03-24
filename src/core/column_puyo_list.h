@@ -119,3 +119,5 @@ struct hash<ColumnPuyoList>
 };
 
 }
+
+#endif
