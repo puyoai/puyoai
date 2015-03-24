@@ -94,6 +94,19 @@ field = [
 ignition = 3
 )";
 
+static const char TEST_BOOK5[] = R"(
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AABCCC",
+    "BBC@@@",
+]
+ignition = 1
+score = 72
+name = "GTR"
+)";
+
 TEST(PatternBookTest, pattern1)
 {
     PatternBook patternBook;
@@ -316,4 +329,42 @@ TEST(PatternBookTest, pattern4)
 
     PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0, 1, 2}, 3);
     EXPECT_TRUE(found);
+}
+
+TEST(PatternBookTest, pattern5)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK5));
+
+    CoreField field1("......"
+                     "YYY.BB"
+                     "BRR.RR");
+
+    CoreField field2(".....B"
+                     "YYY..B"
+                     "BRR.RR");
+
+    double score1 = 0;
+    double score2 = 0;
+
+    double* score = nullptr;
+    auto callback = [&](const CoreField&,
+                        const RensaResult&,
+                        const ColumnPuyoList&,
+                        const ColumnPuyoList&,
+                        const RensaTrackResult&,
+                        const std::string&,
+                        int patternScore) {
+        if (patternScore > 0)
+            *score = patternScore;
+    };
+
+    score = &score1;
+    PatternRensaDetector(patternBook, field1, callback).iteratePossibleRensas({0, 1}, 3);
+    score = &score2;
+    PatternRensaDetector(patternBook, field2, callback).iteratePossibleRensas({0, 1}, 3);
+
+    EXPECT_GT(score1, 0.0);
+    EXPECT_GT(score2, 0.0);
+    EXPECT_EQ(score1, score2);
 }

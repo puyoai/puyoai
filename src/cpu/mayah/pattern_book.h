@@ -32,9 +32,10 @@ public:
     bool isMatchable(const CoreField& cf) const { return pattern_.isMatchable(cf); }
     ComplementResult complement(const CoreField& cf,
                                 int numAllowingFillingUnusedVariables,
-                                ColumnPuyoList* cpl) const
+                                ColumnPuyoList* cpl,
+                                FieldPattern::ScoreCallback scoreCallback) const
     {
-        return pattern_.complement(cf, numAllowingFillingUnusedVariables, cpl);
+        return pattern_.complement(cf, numAllowingFillingUnusedVariables, cpl, scoreCallback);
     }
 
     PatternBookField mirror() const
