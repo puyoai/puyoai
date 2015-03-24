@@ -89,6 +89,19 @@ public:
 
     friend bool operator==(const ColumnPuyoList&, const ColumnPuyoList&);
 
+    size_t hash() const
+    {
+        size_t v = 0;
+        for (int i = 0; i < 6; ++i) {
+            v += 37 * v + size_[i];
+            for (int j = 0; j < size_[i]; ++j) {
+                v += 37 * v + ordinal(puyos_[i][j]);
+            }
+        }
+
+        return v;
+    }
+
 private:
     static const int MAX_SIZE = 8;
 
@@ -97,4 +110,12 @@ private:
     PuyoColor puyos_[6][MAX_SIZE];
 };
 
-#endif
+namespace std {
+
+template<>
+struct hash<ColumnPuyoList>
+{
+    size_t operator()(const ColumnPuyoList& cpl) const { return cpl.hash(); }
+};
+
+}
