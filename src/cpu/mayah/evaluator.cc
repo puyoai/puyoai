@@ -29,16 +29,6 @@ using namespace std;
 
 namespace {
 
-const bool USE_CONNECTION_FEATURE = true;
-const bool USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE = true;
-const bool USE_THIRD_COLUMN_HEIGHT_FEATURE = true;
-const bool USE_IGNITION_HEIGHT_FEATURE = true;
-const bool USE_FIELD_USHAPE_FEATURE = true;
-const bool USE_RIDGE_FEATURE = true;
-const bool USE_VALLEY_FEATURE = true;
-const bool USE_FIRE_POINT_TABOO_FEATURE = true;
-const bool USE_IBARA = true;
-
 const double FIELD_USHAPE_HEIGHT_COEF[15] = {
     0.0, 0.1, 0.1, 0.3, 0.3,
     0.5, 0.5, 0.7, 0.7, 1.0,
@@ -362,7 +352,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
 
     // If IBARA found, we always consider it.
     // TODO(mayah): Don't consider IBARA if we don't have enough puyos. Better not to fire IBARA in that case.
-    if (USE_IBARA && plan.chains() == 1 && plan.score() >= scoreForOjama(10) && me.pendingOjama + me.fixedOjama <= 10) {
+    if (plan.chains() == 1 && plan.score() >= scoreForOjama(10) && me.pendingOjama + me.fixedOjama <= 10) {
         sc_->addScore(STRATEGY_IBARA, 1);
         return false;
     }
@@ -565,18 +555,12 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         return;
 
     evalCountPuyoFeature(plan);
-    if (USE_CONNECTION_FEATURE)
-        collectScoreForConnection(fieldBeforeRensa);
-    if (USE_RESTRICTED_CONNECTION_HORIZONTAL_FEATURE)
-        evalRestrictedConnectionHorizontalFeature(fieldBeforeRensa);
-    if (USE_THIRD_COLUMN_HEIGHT_FEATURE)
-        evalThirdColumnHeightFeature(plan);
-    if (USE_VALLEY_FEATURE)
-        evalValleyDepth(fieldBeforeRensa);
-    if (USE_RIDGE_FEATURE)
-        evalRidgeHeight(fieldBeforeRensa);
-    if (USE_FIELD_USHAPE_FEATURE)
-        evalFieldUShape(plan.field(), enemy.hasZenkeshi);
+    collectScoreForConnection(fieldBeforeRensa);
+    evalRestrictedConnectionHorizontalFeature(fieldBeforeRensa);
+    evalThirdColumnHeightFeature(plan);
+    evalValleyDepth(fieldBeforeRensa);
+    evalRidgeHeight(fieldBeforeRensa);
+    evalFieldUShape(plan.field(), enemy.hasZenkeshi);
 
     evalUnreachableSpace(fieldBeforeRensa);
 
@@ -626,12 +610,9 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
         rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyos);
         rensaEvaluator.collectScoreForRensaGarbage(fieldAfterRensa);
-        if (USE_FIRE_POINT_TABOO_FEATURE)
-            rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
-        if (USE_IGNITION_HEIGHT_FEATURE)
-            rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, enemy.hasZenkeshi);
-        if (USE_CONNECTION_FEATURE)
-            rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
+        rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
+        rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, enemy.hasZenkeshi);
+        rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
 
         rensaEvaluator.evalComplementationBias(keyPuyos, firePuyos);
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, keyPuyos, firePuyos, currentFrameId, me, enemy);
