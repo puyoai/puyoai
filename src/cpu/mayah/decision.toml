@@ -129,7 +129,7 @@ ABBD = [2, 3]
 ABDD = [2, 3]  # TODO: [1, 1]?
 ACAA = [1, 1]
 ACAB = [1, 1]
-ACAC = [2, 3]
+ACAC = [1, 1]
 ACAD = [1, 1]
 ACBB = [1, 1]
 ACBC = [2, 3]
@@ -387,7 +387,7 @@ field = [
     "AAAB..",
 ]
 CDAC = [1, 0]
-DDAC = [1, 2]
+DDAC = [5, 1] # [5, 1], [1, 2]?
 
 [[book]]
 field = [
@@ -449,6 +449,14 @@ field = [
     "AB...."
 ]
 BDCD = [3, 1]
+
+[[book]]
+field = [
+    "AC....",
+    "AC....",
+    "AB...."
+]
+ACCC = [2, 3]
 
 [[book]]
 field = [
