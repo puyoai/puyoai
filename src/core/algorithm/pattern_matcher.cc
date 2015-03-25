@@ -38,7 +38,10 @@ bool PatternMatcher::checkNeighborsForCompletion(const FieldPattern& pattern, co
     return true;
 }
 
-bool PatternMatcher::checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor) const
+bool PatternMatcher::checkCell(char currentVar,
+                               PatternType neighborType,
+                               char neighborVar,
+                               PuyoColor neighborColor) const
 {
     DCHECK('A' <= currentVar && currentVar <= 'Z') << currentVar;
 
@@ -53,16 +56,24 @@ bool PatternMatcher::checkCell(char currentVar, PatternType neighborType, char n
     if (currentVar == neighborVar)
         return true;
 
-    if (neighborType == PatternType::NONE || neighborType == PatternType::ALLOW_FILLING_OJAMA || neighborType == PatternType::ALLOW_FILLING_IRON) {
+    switch (neighborType) {
+    case PatternType::NONE:
+    case PatternType::ALLOW_FILLING_OJAMA:
+    case PatternType::ALLOW_FILLING_IRON:
         if (map(currentVar) == neighborColor)
             return false;
-    } else if (neighborType == PatternType::ALLOW_VAR) {
+        break;
+    case PatternType::ALLOW_VAR:
         DCHECK('A' <= neighborVar && neighborVar <= 'Z');
         if (currentVar != neighborVar && map(currentVar) == neighborColor)
             return false;
-    } else {
+        break;
+    case PatternType::ANY:
+        CHECK(false) << "shoudn't be reached";
+    default:
         if (map(currentVar) == map(neighborVar) && isSet(currentVar))
             return false;
+        break;
     }
 
     return true;
