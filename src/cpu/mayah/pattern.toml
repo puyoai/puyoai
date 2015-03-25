@@ -346,6 +346,15 @@ score = 9.0
 
 [[pattern]]
 field = [
+    "..BCC.",
+    ".AABB.",
+    "AAB.CC",
+]
+ignition = 2
+score = 7.0
+
+[[pattern]]
+field = [
     "....C.",
     "..B.C.",
     ".AABBC",
@@ -438,6 +447,16 @@ score = 8.0
 
 [[pattern]]
 field = [
+    "....C.",
+    "...BBC",
+    "..AAAC",
+    "..ACBB",
+]
+ignition = 3
+score = 6.0
+
+[[pattern]]
+field = [
     "....CC",
     "...CBC",
     "..AAAA",
@@ -477,6 +496,16 @@ field = [
 ]
 ignition = 3
 score = 9.8
+
+[[pattern]]
+field = [
+    "....CC",
+    "...BBB",
+    "..AAAA",
+    "..ACBC",
+]
+ignition = 3
+score = 7.8
 
 [[pattern]]
 field = [
@@ -631,6 +660,17 @@ field = [
 ]
 ignition = 3
 score = 8.0
+
+[[pattern]]
+field = [
+    ".....C",
+    "....BC",
+    "...ACB",
+    "...ACB",
+    "...AAB",
+]
+ignition = 4
+score = 6.0
 
 # ----------------------------------------------------------------------
 # GTR-TAIL-3
@@ -869,7 +909,7 @@ score = 9.0
 field = [
     "BA....",
     "AA....",
-    "A@C...",
+    "A.C...",  # Don't put @ at (2, 3)
     "BBBC..",
     "CCC@..",
 ]
@@ -880,8 +920,8 @@ score = 9.0
 field = [
     "B.....",
     "A.....",
-    "AA....",
-    "A@C...",
+    "AA....",  # Don't put @ at (2, 3)
+    "A.C...",
     "BBBC..",
     "CCC@..",
 ]
@@ -1026,6 +1066,20 @@ field = [
 ignition = 2
 score = 8.0
 
+[[pattern]]
+field = [
+    "C.....",
+    "C.....",
+    "B.....",
+    "AA....",
+    "BA....",
+    "BA....",
+    "BCC...",
+    "......",
+]
+ignition = 2
+score = 7.0
+
 # ----------------------------------------------------------------------
 # NEWGTR-TAIL-1
 
@@ -1067,7 +1121,17 @@ field = [
     "AAACBC",
 ]
 ignition = 3
-score = 9.0
+score = 7.0
+
+[[pattern]]
+field = [
+    "...C..",
+    "...BC.",
+    "..AABB",
+    "AAACBC",
+]
+ignition = 3
+score = 5.0
 
 [[pattern]]
 field = [
