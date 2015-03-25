@@ -54,19 +54,8 @@ public:
     void setVariable(int x, int y, char c) { vars_[x][y] = c; }
 
 private:
-    friend class PatternMatcher;
-
     static PatternType inferType(char c, PatternType typeForLowerCase = PatternType::ALLOW_VAR);
     int countVariables() const;
-
-    bool fillUnusedVariableColors(const CoreField&,
-                                  int pos,
-                                  const std::vector<char>& unusedVariables,
-                                  PatternMatcher*,
-                                  ColumnPuyoList*) const;
-    bool complementInternal(const CoreField&,
-                            const PatternMatcher&,
-                            ColumnPuyoList*) const;
 
     char vars_[MAP_WIDTH][MAP_HEIGHT];
     double scores_[MAP_WIDTH][MAP_HEIGHT];

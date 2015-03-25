@@ -67,3 +67,86 @@ bool PatternMatcher::checkCell(char currentVar, PatternType neighborType, char n
 
     return true;
 }
+
+bool PatternMatcher::fillUnusedVariableColors(const FieldPattern& pattern,
+                                              const CoreField& field,
+                                              int pos,
+                                              const vector<char>& unusedVariables,
+                                              ColumnPuyoList* cpl)
+{
+    if (pos == static_cast<int>(unusedVariables.size())) {
+        if (!unusedVariables.empty()) {
+            if (!checkNeighborsForCompletion(pattern, field))
+                return false;
+        }
+        return complementInternal(pattern, field, cpl);
+    }
+
+    char c = unusedVariables[pos];
+    for (PuyoColor pc : NORMAL_PUYO_COLORS) {
+        forceSet(c, pc);
+        if (fillUnusedVariableColors(pattern, field, pos + 1, unusedVariables, cpl))
+            return true;
+    }
+    return false;
+}
+
+bool PatternMatcher::complementInternal(const FieldPattern& pattern,
+                                        const CoreField& field,
+                                        ColumnPuyoList* cpl)
+{
+    cpl->clear();
+
+    int currentHeights[FieldConstant::MAP_WIDTH] {
+        0, field.height(1), field.height(2), field.height(3),
+        field.height(4), field.height(5), field.height(6), 0
+    };
+
+    for (int x = 1; x <= 6; ++x) {
+        int h = pattern.height(x);
+        for (int y = 1; y <= h; ++y) {
+            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_OJAMA) {
+                if (field.color(x, y) != PuyoColor::EMPTY)
+                    continue;
+                if (!cpl->add(x, PuyoColor::OJAMA))
+                    return false;
+                ++currentHeights[x];
+                continue;
+            }
+
+            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_IRON) {
+                if (field.color(x, y) != PuyoColor::EMPTY)
+                    continue;
+                if (!cpl->add(x, PuyoColor::IRON))
+                    return false;
+                ++currentHeights[x];
+                continue;
+            }
+
+            if (pattern.type(x, y) == PatternType::ALLOW_VAR)
+                continue;
+
+            if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR)) {
+                if (field.color(x, y) == PuyoColor::EMPTY) {
+                    return false;
+                }
+                continue;
+            }
+
+            char c = pattern.variable(x, y);
+            if (!isSet(c))
+                return false;
+            if (pattern.type(x, y) == PatternType::MUST_VAR) {
+                if (!isNormalColor(field.color(x, y)))
+                    return false;
+            }
+            if (field.color(x, y) == PuyoColor::EMPTY && currentHeights[x] + 1 == y) {
+                if (!cpl->add(x, map(c)))
+                    return false;
+                ++currentHeights[x];
+            }
+        }
+    }
+
+    return true;
+}
