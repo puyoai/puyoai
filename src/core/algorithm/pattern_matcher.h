@@ -113,6 +113,15 @@ private:
 
     bool checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor) const;
 
+    bool fillUnusedVariableColors(const FieldPattern&,
+                                  const CoreField&,
+                                  int pos,
+                                  const std::vector<char>& unusedVariables,
+                                  ColumnPuyoList*);
+    bool complementInternal(const FieldPattern&,
+                            const CoreField&,
+                            ColumnPuyoList*);
+
     PuyoColor map_[26];
     bool seen_[26];
 };
@@ -232,7 +241,7 @@ ComplementResult PatternMatcher::complement(const FieldPattern& pattern,
     if (static_cast<int>(result.unusedVariables.size()) > numAllowingFillingUnusedVariables)
         return ComplementResult(false);
 
-    bool ok = pattern.fillUnusedVariableColors(field, 0, result.unusedVariables, this, cpl);
+    bool ok = fillUnusedVariableColors(pattern, field, 0, result.unusedVariables, cpl);
     int filled = std::min(static_cast<int>(result.unusedVariables.size()),
                           numAllowingFillingUnusedVariables);
     return ComplementResult(ok, filled);
