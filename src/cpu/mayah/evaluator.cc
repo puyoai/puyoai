@@ -41,23 +41,26 @@ template<typename ScoreCollector>
 static void calculateConnection(ScoreCollector* sc, const CoreField& field,
                                 EvaluationFeatureKey key2, EvaluationFeatureKey key3)
 {
-    FieldBitField checked;
+    int count3 = 0;
+    int count2 = 0;
+
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         int height = field.height(x);
         for (int y = 1; y <= height; ++y) {
             if (!isNormalColor(field.color(x, y)))
                 continue;
-            if (checked.get(x, y))
-                continue;
 
-            int numConnected = field.countConnectedPuyos(x, y, &checked);
+            int numConnected = field.countConnectedPuyosMax4(x, y);
             if (numConnected >= 3) {
-                sc->addScore(key3, 1);
+                ++count3;
             } else if (numConnected >= 2) {
-                sc->addScore(key2, 1);
+                ++count2;
             }
         }
     }
+
+    sc->addScore(key3, count3 / 3);
+    sc->addScore(key2, count2 / 2);
 }
 
 template<typename ScoreCollector>
