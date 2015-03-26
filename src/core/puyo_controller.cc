@@ -18,17 +18,16 @@
 #include "core/key.h"
 #include "core/kumipuyo_pos.h"
 #include "core/kumipuyo_moving_state.h"
-#include "core/plain_field.h"
 #include "core/puyo_color.h"
 
 using namespace std;
 
 namespace {
 
-bool isQuickturn(const PlainField& field, const KumipuyoPos& pos)
+bool isQuickturn(const CoreField& field, const KumipuyoPos& pos)
 {
     DCHECK(pos.r == 0 || pos.r == 2) << pos.r;
-    return (field.get(pos.x - 1, pos.y) != PuyoColor::EMPTY && field.get(pos.x + 1, pos.y) != PuyoColor::EMPTY);
+    return (field.color(pos.x - 1, pos.y) != PuyoColor::EMPTY && field.color(pos.x + 1, pos.y) != PuyoColor::EMPTY);
 }
 
 // Remove redundant key stroke.
@@ -479,7 +478,7 @@ bool PuyoController::isReachable(const CoreField& field, const Decision& decisio
     return true;
 }
 
-bool PuyoController::isReachableFrom(const PlainField& field, const KumipuyoMovingState& mks, const Decision& decision)
+bool PuyoController::isReachableFrom(const CoreField& field, const KumipuyoMovingState& mks, const Decision& decision)
 {
     return !findKeyStrokeOnlineInternal(field, mks, decision).empty();
 }
@@ -525,7 +524,7 @@ struct Edge {
 typedef vector<Edge> Edges;
 typedef map<Vertex, tuple<Vertex, KeySet, Weight>> Potential;
 
-KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const KumipuyoMovingState& initialState, const Decision& decision)
+KeySetSeq PuyoController::findKeyStrokeByDijkstra(const CoreField& field, const KumipuyoMovingState& initialState, const Decision& decision)
 {
     // We don't add KeySet(Key::DOWN) intentionally.
     static const pair<KeySet, double> KEY_CANDIDATES[] = {
@@ -629,7 +628,7 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const PlainField& field, const
     return KeySetSeq();
 }
 
-KeySetSeq PuyoController::findKeyStrokeOnline(const PlainField& field, const KumipuyoMovingState& mks, const Decision& decision)
+KeySetSeq PuyoController::findKeyStrokeOnline(const CoreField& field, const KumipuyoMovingState& mks, const Decision& decision)
 {
     KeySetSeq kss = findKeyStrokeOnlineInternal(field, mks, decision);
     removeRedundantKeySeq(mks.pos, &kss);
@@ -637,7 +636,7 @@ KeySetSeq PuyoController::findKeyStrokeOnline(const PlainField& field, const Kum
 }
 
 // returns null if not reachable
-KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, const KumipuyoMovingState& mks, const Decision& decision)
+KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const CoreField& field, const KumipuyoMovingState& mks, const Decision& decision)
 {
     KeySetSeq ret;
     KumipuyoPos current = mks.pos;
@@ -664,7 +663,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
                 if (current.y >= 14)
                     return KeySetSeq();
             } else {
-                if (field.get(current.x - 1, current.y) != PuyoColor::EMPTY) {
+                if (field.color(current.x - 1, current.y) != PuyoColor::EMPTY) {
                     ret.add(KeySet(Key::LEFT_TURN));
                     ret.add(KeySet(Key::LEFT_TURN));
                 } else {
@@ -680,9 +679,9 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
             case 0:
                 break;
             case 1:
-                if (field.get(current.x + 1, current.y) != PuyoColor::EMPTY) {
-                    if (field.get(current.x + 1, current.y + 1) != PuyoColor::EMPTY ||
-                        field.get(current.x, current.y - 1) == PuyoColor::EMPTY) {
+                if (field.color(current.x + 1, current.y) != PuyoColor::EMPTY) {
+                    if (field.color(current.x + 1, current.y + 1) != PuyoColor::EMPTY ||
+                        field.color(current.x, current.y - 1) == PuyoColor::EMPTY) {
                         return KeySetSeq();
                     }
                     // turn inversely to avoid kicking wall
@@ -691,7 +690,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
                     ret.add(KeySet(Key::LEFT_TURN));
 
                     // TODO(mayah): In some case, this can reject possible key stroke?
-                    if (current.y == 13 && field.get(current.x, 12) != PuyoColor::EMPTY) {
+                    if (current.y == 13 && field.color(current.x, 12) != PuyoColor::EMPTY) {
                         return KeySetSeq();
                     }
 
@@ -701,9 +700,9 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
 
                 break;
             case 3:
-                if (field.get(current.x - 1, current.y) != PuyoColor::EMPTY) {
-                    if (field.get(current.x - 1, current.y + 1) != PuyoColor::EMPTY ||
-                        field.get(current.x, current.y - 1) == PuyoColor::EMPTY) {
+                if (field.color(current.x - 1, current.y) != PuyoColor::EMPTY) {
+                    if (field.color(current.x - 1, current.y + 1) != PuyoColor::EMPTY ||
+                        field.color(current.x, current.y - 1) == PuyoColor::EMPTY) {
                         return KeySetSeq();
                     }
                     ret.add(KeySet(Key::RIGHT_TURN));
@@ -711,7 +710,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
                     ret.add(KeySet(Key::RIGHT_TURN));
 
                     // TODO(mayah): In some case, this can reject possible key stroke?
-                    if (current.y == 13 && field.get(current.x, 12) != PuyoColor::EMPTY) {
+                    if (current.y == 13 && field.color(current.x, 12) != PuyoColor::EMPTY) {
                         return KeySetSeq();
                     }
 
@@ -721,7 +720,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
 
                 break;
             case 2:
-                if (field.get(current.x - 1, current.y) != PuyoColor::EMPTY) {
+                if (field.color(current.x - 1, current.y) != PuyoColor::EMPTY) {
                     ret.add(KeySet(Key::RIGHT_TURN));
                     ret.add(KeySet(Key::RIGHT_TURN));
                 } else {
@@ -729,7 +728,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
                     ret.add(KeySet(Key::LEFT_TURN));
                 }
 
-                if (current.y == 13 && field.get(current.x, 12) != PuyoColor::EMPTY) {
+                if (current.y == 13 && field.color(current.x, 12) != PuyoColor::EMPTY) {
                     return KeySetSeq();
                 }
 
@@ -741,7 +740,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
         // direction to move horizontally
         if (decision.x > current.x) {
             // move to right
-            if (field.get(current.x + 1, current.y) == PuyoColor::EMPTY) {
+            if (field.color(current.x + 1, current.y) == PuyoColor::EMPTY) {
                 ret.add(KeySet(Key::RIGHT));
                 current.x++;
             } else {  // hits a wall
@@ -755,10 +754,10 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
                 if (current.y >= 13)
                     return KeySetSeq();
                 // check "b"
-                if (field.get(current.x + 1, current.y + 1) != PuyoColor::EMPTY) {
+                if (field.color(current.x + 1, current.y + 1) != PuyoColor::EMPTY) {
                     return KeySetSeq();
                 }
-                if (field.get(current.x, current.y - 1) != PuyoColor::EMPTY || isQuickturn(field, current)) {
+                if (field.color(current.x, current.y - 1) != PuyoColor::EMPTY || isQuickturn(field, current)) {
                     // can climb by kicking the ground or quick turn. In either case,
                     // kumi-puyo is never moved because right side is blocked
 
@@ -767,7 +766,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
                     current.y++;
                     if (current.y >= 14)
                         return KeySetSeq();
-                    if (field.get(current.x - 1, current.y + 1) == PuyoColor::EMPTY) {
+                    if (field.color(current.x - 1, current.y + 1) == PuyoColor::EMPTY) {
                         ret.add(KeySet(Key::RIGHT_TURN));
                         ret.add(KeySet(Key::RIGHT));
                     } else {
@@ -782,7 +781,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
             }
         } else {
             // move to left
-            if (field.get(current.x - 1, current.y) == PuyoColor::EMPTY) {
+            if (field.color(current.x - 1, current.y) == PuyoColor::EMPTY) {
                 ret.add(KeySet(Key::LEFT));
                 current.x--;
             } else {  // hits a wall
@@ -797,10 +796,10 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
                     return KeySetSeq();
                 }
                 // check "b"
-                if (field.get(current.x - 1, current.y + 1) != PuyoColor::EMPTY) {
+                if (field.color(current.x - 1, current.y + 1) != PuyoColor::EMPTY) {
                     return KeySetSeq();
                 }
-                if (field.get(current.x, current.y - 1) != PuyoColor::EMPTY || isQuickturn(field, current)) {
+                if (field.color(current.x, current.y - 1) != PuyoColor::EMPTY || isQuickturn(field, current)) {
                     // can climb by kicking the ground or quick turn. In either case,
                     // kumi-puyo is never moved because left side is blocked
                     ret.add(KeySet(Key::RIGHT_TURN));
@@ -808,7 +807,7 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const PlainField& field, c
                     current.y++;
                     if (current.y >= 14)
                         return KeySetSeq();
-                    if (field.get(current.x + 1, current.y) == PuyoColor::EMPTY) {
+                    if (field.color(current.x + 1, current.y) == PuyoColor::EMPTY) {
                         ret.add(KeySet(Key::LEFT_TURN));
                         ret.add(KeySet(Key::LEFT));
                     } else {
