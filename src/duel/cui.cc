@@ -101,7 +101,7 @@ void Cui::printField(int playerId, const PlayerGameState& pgs)
 
     for (int y = 0; y < FieldConstant::MAP_HEIGHT; y++) {
         for (int x = 0; x < FieldConstant::MAP_WIDTH; x++) {
-            PuyoColor color = pgs.field.get(x, y);
+            PuyoColor color = pgs.field.color(x, y);
             if (pgs.playable) {
                 if (x == kumipuyoPos.axisX() && y == kumipuyoPos.axisY())
                     color = kumipuyo.axis;

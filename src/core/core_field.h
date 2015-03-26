@@ -31,9 +31,6 @@ public:
 
     void clear();
 
-    // Gets a color of puyo at a specified position.
-    PuyoColor color(int x, int y) const { return get(x, y); }
-
     // Returns the height of the specified column.
     int height(int x) const { return heights_[x]; }
 

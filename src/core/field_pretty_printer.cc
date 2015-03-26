@@ -61,7 +61,7 @@ template <typename Stream>
 void printLine(Stream* ss, const PlainField& f, int y, const KumipuyoSeq& seq, CellType cellType)
 {
     for (int x = 0; x < PlainField::MAP_WIDTH; ++x) {
-        PuyoColor c = f.get(x, y);
+        PuyoColor c = f.color(x, y);
         *ss << toPuyoString(c, cellType);
     }
 

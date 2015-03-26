@@ -91,7 +91,7 @@ void FieldDrawer::drawField(Screen* screen, int playerId, const PlayerGameState&
 
     for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
         for (int y = 0; y < FieldConstant::MAP_HEIGHT; ++y) {
-            PuyoColor c = pgs.field.get(x, y);
+            PuyoColor c = pgs.field.color(x, y);
             if (pgs.playable) {
                 if (x == kumipuyoPos.axisX() && y == kumipuyoPos.axisY())
                     c = kumipuyo.axis;

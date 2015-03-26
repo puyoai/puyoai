@@ -440,7 +440,7 @@ bool AI::isFieldInconsistent(const PlainField& f, const PlainField& provided)
 {
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            if (f.get(x, y) != provided.get(x, y))
+            if (f.color(x, y) != provided.color(x, y))
                 return true;
         }
     }
@@ -455,15 +455,15 @@ void AI::mergeField(CoreField* f, const PlainField& provided)
         bool restIsEmpty = false;
         int y;
         for (y = 1; y <= 12; ++y) {
-            if (provided.get(x, y) == PuyoColor::EMPTY) {
+            if (provided.color(x, y) == PuyoColor::EMPTY) {
                 restIsEmpty = true;
                 break;
             }
-            f->unsafeSet(x, y, provided.get(x, y));
+            f->unsafeSet(x, y, provided.color(x, y));
         }
         if (restIsEmpty) {
             for (; y <= 13; ++y) {
-                DCHECK_EQ(PuyoColor::EMPTY, provided.get(x, y));
+                DCHECK_EQ(PuyoColor::EMPTY, provided.color(x, y));
                 f->unsafeSet(x, y, PuyoColor::EMPTY);
             }
         }

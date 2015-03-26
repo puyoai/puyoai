@@ -79,7 +79,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
         const PlainField& pf = request.myPlayerFrameRequest().field;
         for (int x = 0; x < 6; ++x) {
             for (int y = 0; y < 12; ++y) {
-                p1->field[x][y] = toTestLockitCompatibleInt(pf.get(x + 1, y + 1));
+                p1->field[x][y] = toTestLockitCompatibleInt(pf.color(x + 1, y + 1));
             }
         }
     }
@@ -87,7 +87,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
         const PlainField& pf = request.enemyPlayerFrameRequest().field;
         for (int x = 0; x < 6; ++x) {
             for (int y = 0; y < 12; ++y) {
-                p2->field[x][y] = toTestLockitCompatibleInt(pf.get(x + 1, y + 1));
+                p2->field[x][y] = toTestLockitCompatibleInt(pf.color(x + 1, y + 1));
             }
         }
     }
