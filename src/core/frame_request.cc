@@ -34,7 +34,7 @@ static string formatPlainField(const PlainField& field)
     stringstream ss;
     for (int y = 12; y >= 1; y--) {
         for (int x = 1; x <= 6; x++) {
-            ss << toCompatibleChar(field.get(x, y));
+            ss << toCompatibleChar(field.color(x, y));
         }
     }
     return ss.str();

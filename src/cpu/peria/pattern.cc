@@ -90,7 +90,7 @@ int Pattern::Match(const CoreField& field) const {
     for (int x = 1; x <= PlainField::WIDTH; ++x) {
       const char c0 = pattern_[y - 1][x - 1];
       const char c1 = pattern_[y - 1][PlainField::WIDTH - x];
-      PuyoColor color = field.get(x, y);
+      PuyoColor color = field.color(x, y);
       if (color != PuyoColor::OJAMA) {
         if (c0 != '.')
           ++matching0[c0][color];

@@ -50,7 +50,7 @@ string PlainField::toString(char charIfEmpty) const
     ostringstream ss;
     for (int y = 14; y >= 1; --y) {
         for (int x = 1; x <= WIDTH; ++x) {
-            ss << toChar(get(x, y), charIfEmpty);
+            ss << toChar(color(x, y), charIfEmpty);
         }
     }
 

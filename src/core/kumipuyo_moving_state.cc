@@ -81,8 +81,8 @@ void KumipuyoMovingState::moveKumipuyo(const PlainField& field, const KeySet& ke
     }
 
     bool tmpGrounding = grounding;
-    if (field.get(pos.axisX(), pos.axisY() - 1) != PuyoColor::EMPTY ||
-        field.get(pos.childX(), pos.childY() - 1) != PuyoColor::EMPTY) {
+    if (field.color(pos.axisX(), pos.axisY() - 1) != PuyoColor::EMPTY ||
+        field.color(pos.childX(), pos.childY() - 1) != PuyoColor::EMPTY) {
         tmpGrounding |= restFramesForFreefall <= FRAMES_FREE_FALL / 2;
     } else {
         tmpGrounding = false;
@@ -113,8 +113,8 @@ void KumipuyoMovingState::moveKumipuyoByArrowKey(const PlainField& field, const 
 
     if (keySet.hasKey(Key::RIGHT)) {
         restFramesArrowProhibited = FRAMES_CONTINUOUS_ARROW_PROHIBITED;
-        if (field.get(pos.axisX() + 1, pos.axisY()) == PuyoColor::EMPTY &&
-            field.get(pos.childX() + 1, pos.childY()) == PuyoColor::EMPTY) {
+        if (field.color(pos.axisX() + 1, pos.axisY()) == PuyoColor::EMPTY &&
+            field.color(pos.childX() + 1, pos.childY()) == PuyoColor::EMPTY) {
             pos.x++;
         }
         return;
@@ -122,8 +122,8 @@ void KumipuyoMovingState::moveKumipuyoByArrowKey(const PlainField& field, const 
 
     if (keySet.hasKey(Key::LEFT)) {
         restFramesArrowProhibited = FRAMES_CONTINUOUS_ARROW_PROHIBITED;
-        if (field.get(pos.axisX() - 1, pos.axisY()) == PuyoColor::EMPTY &&
-            field.get(pos.childX() - 1, pos.childY()) == PuyoColor::EMPTY) {
+        if (field.color(pos.axisX() - 1, pos.axisY()) == PuyoColor::EMPTY &&
+            field.color(pos.childX() - 1, pos.childY()) == PuyoColor::EMPTY) {
             pos.x--;
         }
         return;
@@ -147,8 +147,8 @@ void KumipuyoMovingState::moveKumipuyoByArrowKey(const PlainField& field, const 
         }
 
         restFramesForFreefall = 0;
-        if (field.get(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
-            field.get(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
+        if (field.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
+            field.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
             pos.y--;
             return;
         }
@@ -167,12 +167,12 @@ void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const K
         restFramesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
         switch (pos.r) {
         case 0:
-            if (field.get(pos.x + 1, pos.y) == PuyoColor::EMPTY) {
+            if (field.color(pos.x + 1, pos.y) == PuyoColor::EMPTY) {
                 pos.r = (pos.r + 1) % 4;
                 restFramesToAcceptQuickTurn = 0;
                 return;
             }
-            if (field.get(pos.x - 1, pos.y) == PuyoColor::EMPTY) {
+            if (field.color(pos.x - 1, pos.y) == PuyoColor::EMPTY) {
                 pos.r = (pos.r + 1) % 4;
                 pos.x--;
                 restFramesToAcceptQuickTurn = 0;
@@ -191,7 +191,7 @@ void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const K
             restFramesToAcceptQuickTurn = FRAMES_QUICKTURN;
             return;
         case 1:
-            if (field.get(pos.x, pos.y - 1) == PuyoColor::EMPTY) {
+            if (field.color(pos.x, pos.y - 1) == PuyoColor::EMPTY) {
                 pos.r = (pos.r + 1) % 4;
                 return;
             }
@@ -207,13 +207,13 @@ void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const K
             // The axis cannot be moved to 14th line.
             return;
         case 2:
-            if (field.get(pos.x - 1, pos.y) == PuyoColor::EMPTY) {
+            if (field.color(pos.x - 1, pos.y) == PuyoColor::EMPTY) {
                 pos.r = (pos.r + 1) % 4;
                 restFramesToAcceptQuickTurn = 0;
                 return;
             }
 
-            if (field.get(pos.x + 1, pos.y) == PuyoColor::EMPTY) {
+            if (field.color(pos.x + 1, pos.y) == PuyoColor::EMPTY) {
                 pos.r = (pos.r + 1) % 4;
                 pos.x++;
                 restFramesToAcceptQuickTurn = 0;
@@ -242,13 +242,13 @@ void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const K
         restFramesTurnProhibited = FRAMES_CONTINUOUS_TURN_PROHIBITED;
         switch (pos.r) {
         case 0:
-            if (field.get(pos.x - 1, pos.y) == PuyoColor::EMPTY) {
+            if (field.color(pos.x - 1, pos.y) == PuyoColor::EMPTY) {
                 pos.r = (pos.r + 3) % 4;
                 restFramesToAcceptQuickTurn = 0;
                 return;
             }
 
-            if (field.get(pos.x + 1, pos.y) == PuyoColor::EMPTY) {
+            if (field.color(pos.x + 1, pos.y) == PuyoColor::EMPTY) {
                 pos.r = (pos.r + 3) % 4;
                 pos.x++;
                 restFramesToAcceptQuickTurn = 0;
@@ -270,13 +270,13 @@ void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const K
             pos.r = (pos.r + 3) % 4;
             return;
         case 2:
-            if (field.get(pos.x + 1, pos.y) == PuyoColor::EMPTY) {
+            if (field.color(pos.x + 1, pos.y) == PuyoColor::EMPTY) {
                 pos.r = (pos.r + 3) % 4;
                 restFramesToAcceptQuickTurn = 0;
                 return;
             }
 
-            if (field.get(pos.x - 1, pos.y) == PuyoColor::EMPTY) {
+            if (field.color(pos.x - 1, pos.y) == PuyoColor::EMPTY) {
                 pos.r = (pos.r + 3) % 4;
                 pos.x--;
                 restFramesToAcceptQuickTurn = 0;
@@ -293,7 +293,7 @@ void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const K
             restFramesToAcceptQuickTurn = FRAMES_QUICKTURN;
             return;
         case 3:
-            if (field.get(pos.x, pos.y - 1) == PuyoColor::EMPTY) {
+            if (field.color(pos.x, pos.y - 1) == PuyoColor::EMPTY) {
                 pos.r = (pos.r + 3) % 4;
                 return;
             }
@@ -325,8 +325,8 @@ void KumipuyoMovingState::moveKumipuyoByFreefall(const PlainField& field)
     }
 
     restFramesForFreefall = FRAMES_FREE_FALL;
-    if (field.get(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
-        field.get(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
+    if (field.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
+        field.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
         pos.y--;
         return;
     }
