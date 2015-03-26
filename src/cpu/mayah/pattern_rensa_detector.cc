@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "base/slice.h"
+
 using namespace std;
 
 namespace {
@@ -101,13 +103,15 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
 
     // With complement.
     // TODO(mayah): making std::vector is too slow. call currentField.fillErasingPuyoPosition()?
-    std::vector<Position> ignitionPositions = currentField.erasingPuyoPositions(currentFieldContext);
-    DCHECK(!ignitionPositions.empty()) << currentField.toDebugString();
-    if (ignitionPositions.empty())
+    Position ignitionPositions[FieldConstant::WIDTH * FieldConstant::HEIGHT];
+    int size = currentField.fillErasingPuyoPositions(currentFieldContext, ignitionPositions);
+    DCHECK_NE(size, 0) << size;
+    if (size == 0)
         return;
 
-    std::sort(ignitionPositions.begin(), ignitionPositions.end());
-    std::pair<PatternBook::IndexIterator, PatternBook::IndexIterator> p = patternBook_.find(ignitionPositions);
+    std::sort(ignitionPositions, ignitionPositions + size);
+    Slice<Position> slice(ignitionPositions, size);
+    std::pair<PatternBook::IndexIterator, PatternBook::IndexIterator> p = patternBook_.find(slice);
     bool needsToProceedWithoutComplement = true;
     for (PatternBook::IndexIterator it = p.first; it != p.second; ++it) {
         const PatternBookField& pbf = patternBook_.patternBookField(*it);

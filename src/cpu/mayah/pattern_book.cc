@@ -131,16 +131,28 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
         fields_.push_back(pbf.mirror());
     }
 
-    index_.clear();
     for (int i = 0; i < static_cast<int>(fields_.size()); ++i) {
-        index_[fields_[i].ignitionPositions()].push_back(i);
+        const vector<Position>& ps = fields_[i].ignitionPositions();
+        Slice<Position> slice(ps.data(), ps.size());
+
+        auto it = index_.find(slice);
+        if (it != index_.end()) {
+            it->second.push_back(i);
+            continue;
+        }
+
+        // No such key.
+        unique_ptr<Position[]> newKey(new Position[ps.size()]);
+        std::copy(ps.begin(), ps.end(), newKey.get());
+        index_.emplace(Slice<Position>(newKey.get(), ps.size()), vector<int>{i});
+        indexKeys_.push_back(std::move(newKey));
     }
 
     return true;
 }
 
 pair<PatternBook::IndexIterator, PatternBook::IndexIterator>
-PatternBook::find(const vector<Position>& ignitionPositions) const
+PatternBook::find(Slice<Position> ignitionPositions) const
 {
     auto it = index_.find(ignitionPositions);
     if (it != index_.end())

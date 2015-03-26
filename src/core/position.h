@@ -3,6 +3,8 @@
 
 #include <ostream>
 
+#include "base/slice.h"
+
 // Position is used to represent puyo position.
 struct Position {
     Position() {}
@@ -17,6 +19,10 @@ struct Position {
     friend bool operator==(const Position& lhs, const Position& rhs)
     {
         return lhs.x == rhs.x && lhs.y == rhs.y;
+    }
+    friend bool operator!=(const Position& lhs, const Position& rhs)
+    {
+        return !(lhs == rhs);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Position& p)
@@ -37,13 +43,14 @@ struct hash<Position>
 };
 
 template<>
-struct hash<vector<Position>>
+struct hash<Slice<Position>>
 {
-    size_t operator()(const vector<Position>& vs) const
+    size_t operator()(const Slice<Position>& vs) const
     {
         size_t h = 0;
-        for (size_t i = 0; i < vs.size(); ++i)
-            h = h * 37 + hash<Position>()(vs[i]);
+        for (const auto& p : vs) {
+            h = h * 37 + hash<Position>()(p);
+        }
         return h;
     }
 };
