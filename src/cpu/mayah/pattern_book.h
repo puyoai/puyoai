@@ -1,6 +1,7 @@
 #ifndef CPU_MAYAH_PATTERN_BOOK_H_
 #define CPU_MAYAH_PATTERN_BOOK_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -9,6 +10,7 @@
 #include <toml/toml.h>
 
 #include "base/noncopyable.h"
+#include "base/slice.h"
 #include "core/algorithm/field_pattern.h"
 #include "core/algorithm/pattern_matcher.h"
 #include "core/algorithm/rensa_detector.h"
@@ -59,7 +61,7 @@ private:
 
 class PatternBook : noncopyable {
 public:
-    typedef std::unordered_map<std::vector<Position>, std::vector<int>> IndexMap;
+    typedef std::unordered_map<Slice<Position>, std::vector<int>> IndexMap;
     typedef std::vector<int>::const_iterator IndexIterator;
 
     bool load(const std::string& filename);
@@ -70,7 +72,7 @@ public:
     // Multiple PatternBookField might be found, so begin-iterator and end-iterator will be
     // returned. If no such PatternBookField is found, begin-iterator and end-iterator are the same.
     // Note that ignitionPositions must be sorted.
-    std::pair<IndexIterator, IndexIterator> find(const std::vector<Position>& ignitionPositions) const;
+    std::pair<IndexIterator, IndexIterator> find(Slice<Position> ignitionPositions) const;
 
     size_t size() const { return fields_.size(); }
     const PatternBookField& patternBookField(int i) const { return fields_[i]; }
@@ -80,6 +82,7 @@ private:
 
     std::vector<PatternBookField> fields_;
     IndexMap index_;
+    std::vector<std::unique_ptr<Position[]>> indexKeys_;
 };
 
 #endif
