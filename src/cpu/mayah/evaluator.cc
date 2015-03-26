@@ -248,21 +248,16 @@ void Evaluator<ScoreCollector>::evalFieldUShape(const CoreField& field, bool ene
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::evalUnreachableSpace(const CoreField& f)
 {
-    FieldBitField checked;
-    f.countConnectedPuyos(3, 12, &checked);
+    int count = 0;
 
-    int countUnreachable = 0;
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        for (int y = f.height(x) + 1; y <= CoreField::HEIGHT; ++y) {
-            if (f.color(x, y) != PuyoColor::EMPTY)
-                continue;
-            if (checked.get(x, y))
-                continue;
-            countUnreachable++;
-        }
-    }
+    if (f.height(2) >= 12 && f.height(1) < 12)
+        count += 12 - f.height(1);
+    if (f.height(4) >= 12 && f.height(5) < 12)
+        count += 12 - f.height(5);
+    if ((f.height(4) >= 12 || f.height(5) >= 12) && f.height(6) < 12)
+        count += 12 - f.height(6);
 
-    sc_->addScore(NUM_UNREACHABLE_SPACE, countUnreachable);
+    sc_->addScore(NUM_UNREACHABLE_SPACE, count);
 }
 
 // Returns true If we don't need to evaluate other features.
