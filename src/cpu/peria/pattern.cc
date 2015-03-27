@@ -68,6 +68,10 @@ bool Pattern::ParseBook(std::istream& is) {
       iss >> score_;
     } else if (first_segment == "MAX:") {
       iss >> max_puyos_;
+    } else if (first_segment == "DIFF:") {
+      char c0, c1;
+      iss >> c0 >> c1;
+      neighbors_.insert(Neighbor(c0, c1));
     }
   }
 
@@ -120,7 +124,6 @@ void Pattern::Optimize() {
         if (c0 == c1)
           continue;
         neighbors_.insert(Neighbor(c0, c1));
-        neighbors_.insert(Neighbor(c1, c0));
       }
     }
   }
