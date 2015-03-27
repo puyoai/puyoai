@@ -6,6 +6,7 @@
 #include "core/frame_request.h"
 #include "core/frame_response.h"
 
+#include "color.h"
 #include "cpu.h"
 
 using namespace std;
@@ -15,15 +16,15 @@ int count_tsumo_2p = 0;
 int count_all[20] = { 0 };
 int checks = 0;
 
-int toTestLockitCompatibleInt(PuyoColor pc)
+TLColor toTLColor(PuyoColor pc)
 {
     switch (pc) {
-    case PuyoColor::EMPTY:  return 0;
-    case PuyoColor::OJAMA:  return 9;
-    case PuyoColor::RED:    return 1;
-    case PuyoColor::BLUE:   return 2;
-    case PuyoColor::YELLOW: return 3;
-    case PuyoColor::GREEN:  return 4;
+    case PuyoColor::EMPTY:  return TLColor::TL_EMPTY;
+    case PuyoColor::OJAMA:  return TLColor::TL_OJAMA;
+    case PuyoColor::RED:    return TLColor::TL_RED;
+    case PuyoColor::BLUE:   return TLColor::TL_BLUE;
+    case PuyoColor::YELLOW: return TLColor::TL_YELLOW;
+    case PuyoColor::GREEN:  return TLColor::TL_OJAMA;
     default: CHECK(false);
     }
 }
@@ -48,27 +49,27 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
 
     {
         const KumipuyoSeq& seq = request.myPlayerFrameRequest().kumipuyoSeq;
-        p1->tsumo[0] = toTestLockitCompatibleInt(seq.axis(0));
-        p1->tsumo[1] = toTestLockitCompatibleInt(seq.child(0));
-        p1->tsumo[2] = toTestLockitCompatibleInt(seq.axis(1));
-        p1->tsumo[3] = toTestLockitCompatibleInt(seq.child(1));
+        p1->tsumo[0] = toTLColor(seq.axis(0));
+        p1->tsumo[1] = toTLColor(seq.child(0));
+        p1->tsumo[2] = toTLColor(seq.axis(1));
+        p1->tsumo[3] = toTLColor(seq.child(1));
         if (seq.size() >= 3) {
-            p1->tsumo[4] = toTestLockitCompatibleInt(seq.axis(2));
-                p1->tsumo[5] = toTestLockitCompatibleInt(seq.child(2));
+            p1->tsumo[4] = toTLColor(seq.axis(2));
+            p1->tsumo[5] = toTLColor(seq.child(2));
         } else {
-            p1->tsumo[4] = 0;
-            p1->tsumo[5] = 0;
+            p1->tsumo[4] = TLColor::TL_EMPTY;
+            p1->tsumo[5] = TLColor::TL_EMPTY;
         }
     }
     {
         const KumipuyoSeq& seq = request.enemyPlayerFrameRequest().kumipuyoSeq;
-        p2->tsumo[0] = toTestLockitCompatibleInt(seq.axis(0));
-        p2->tsumo[1] = toTestLockitCompatibleInt(seq.child(0));
-        p2->tsumo[2] = toTestLockitCompatibleInt(seq.axis(1));
-        p2->tsumo[3] = toTestLockitCompatibleInt(seq.child(1));
+        p2->tsumo[0] = toTLColor(seq.axis(0));
+        p2->tsumo[1] = toTLColor(seq.child(0));
+        p2->tsumo[2] = toTLColor(seq.axis(1));
+        p2->tsumo[3] = toTLColor(seq.child(1));
         if (seq.size() >= 3) {
-            p2->tsumo[4] = toTestLockitCompatibleInt(seq.axis(2));
-            p2->tsumo[5] = toTestLockitCompatibleInt(seq.child(2));
+            p2->tsumo[4] = toTLColor(seq.axis(2));
+            p2->tsumo[5] = toTLColor(seq.child(2));
         } else {
             p2->tsumo[4] = 0;
             p2->tsumo[5] = 0;
@@ -79,7 +80,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
         const PlainField& pf = request.myPlayerFrameRequest().field;
         for (int x = 0; x < 6; ++x) {
             for (int y = 0; y < 12; ++y) {
-                p1->field[x][y] = toTestLockitCompatibleInt(pf.color(x + 1, y + 1));
+                p1->field[x][y] = toTLColor(pf.color(x + 1, y + 1));
             }
         }
     }
@@ -87,7 +88,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
         const PlainField& pf = request.enemyPlayerFrameRequest().field;
         for (int x = 0; x < 6; ++x) {
             for (int y = 0; y < 12; ++y) {
-                p2->field[x][y] = toTestLockitCompatibleInt(pf.color(x + 1, y + 1));
+                p2->field[x][y] = toTLColor(pf.color(x + 1, y + 1));
             }
         }
     }
