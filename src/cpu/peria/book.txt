@@ -10,13 +10,12 @@ THRESH: 3    # この個数以上合わないと評価しない
 ....BB       # '.' や小文字は任意. '_'は強制空白.
 ----
 NAME: GTR-Head
-SCORE: 1000
+SCORE: 1400
 MAX: 20
-.....A
 ....DD
-....BA
+...CBA
 ...BAA
-....BB
+...CBB
 ----
 NAME: Begin1
 SCORE: 500
@@ -43,9 +42,19 @@ CA....
 CB....
 ----
 NAME: Shin-GTR
-SCORE: 600
+SCORE: 800
 MAX: 20
 ..B...
+AAAB..
+BBB...
+----
+NAME: Shin-GTR2
+SCORE: 1600
+MAX: 20
+DIFF: C D
+D.....
+CA....
+CCB...
 AAAB..
 BBB...
 ----
