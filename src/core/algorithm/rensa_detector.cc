@@ -484,18 +484,6 @@ void RensaDetector::detect(const CoreField& original,
     findRensas(original, strategy, prohibits, purpose, callback);
 }
 
-void RensaDetector::detectSingle(const CoreField& original, const RensaDetectorStrategy& strategy, RensaCallback callback)
-{
-    static const bool nonProhibits[FieldConstant::MAP_WIDTH] {};
-    auto f = [&original, &callback](CoreField* f, const ColumnPuyoList& firePuyos) {
-        CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
-        RensaResult rensaResult = f->simulate(&context);
-        if (rensaResult.chains > 0)
-            callback(*f, rensaResult, firePuyos);
-    };
-    findRensas(original, strategy, nonProhibits, PurposeForFindingRensa::FOR_FIRE, f);
-}
-
 static inline void simulateInternal(CoreField* f,
                                     const CoreField& original,
                                     const ColumnPuyoList& keyPuyos,

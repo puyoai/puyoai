@@ -62,12 +62,6 @@ public:
                        const bool prohibits[FieldConstant::MAP_WIDTH],
                        const SimulationCallback& callback);
 
-    typedef std::function<void (const CoreField& fieldAfterRensa,
-                                const RensaResult&,
-                                const ColumnPuyoList&)> RensaCallback;
-    // Detects a rensa from the field. We don't add key puyos etc.
-    static void detectSingle(const CoreField&, const RensaDetectorStrategy&, RensaCallback);
-
     // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
     typedef std::function<void (const CoreField&,
                                 const RensaResult&,
