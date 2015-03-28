@@ -93,8 +93,7 @@ TEST(FieldPerformanceTest, Simulate_Filled_Track)
                     "475755");
 
         ScopedTimeStampCounter stsc(&tsc);
-        RensaTrackResult trackResult;
-        RensaTracker tracker(&trackResult);
+        RensaTracker tracker;
         f.simulate(&tracker);
     }
 

@@ -193,10 +193,9 @@ void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumi
             return;
 
         CoreField copied(cf);
-        RensaCoefResult coefResult;
-        RensaCoefTracker tracker(&coefResult);
+        RensaCoefTracker tracker;
         RensaResult rensaResult = copied.simulate(&tracker);
-        results.emplace_back(rensaResult.chains, rensaResult.score, framesToIgnite, coefResult);
+        results.emplace_back(rensaResult.chains, rensaResult.score, framesToIgnite, tracker.result());
     };
     Plan::iterateAvailablePlansWithoutFiring(field, seq, seq.size(), f);
 
