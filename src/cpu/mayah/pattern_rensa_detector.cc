@@ -246,8 +246,7 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     if (!cf.dropPuyoOn(firePuyo.x, firePuyo.color))
         return false;
 
-    RensaTrackResult trackResult;
-    RensaTracker tracker(&trackResult);
+    RensaTracker tracker;
     RensaResult rensaResult = cf.simulate(&context, &tracker);
     if (rensaResult.chains != currentChains)
         return false;
@@ -256,9 +255,9 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     if (!firePuyos.add(firePuyo))
         return false;
 
-    callback_(cf, rensaResult, keyPuyos, firePuyos, trackResult, patternName, patternScore);
+    callback_(cf, rensaResult, keyPuyos, firePuyos, tracker.result(), patternName, patternScore);
 
-    RensaDetector::makeProhibitArray(rensaResult, trackResult, originalField_,
+    RensaDetector::makeProhibitArray(rensaResult, tracker.result(), originalField_,
                                      firePuyos, prohibits);
     return true;
 }
