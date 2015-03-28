@@ -78,32 +78,26 @@ public:
                                       const RensaDetectorStrategy&,
                                       PossibleRensaCallback);
 
-    // Same as iteratePossibleRensas with checking trackResult.
-    typedef std::function<void (const CoreField&,
-                                const RensaResult&,
-                                const ColumnPuyoList& keyPuyos,
-                                const ColumnPuyoList& firePuyos,
-                                const RensaTrackResult&)> TrackedPossibleRensaCallback;
+    template<typename TrackResult>
+    using TrackedRensaCallback = std::function<void (const CoreField&,
+                                                     const RensaResult&,
+                                                     const ColumnPuyoList& keyPuyos,
+                                                     const ColumnPuyoList& firePuyos,
+                                                     const TrackResult&)>;
+
+    typedef TrackedRensaCallback<RensaTrackResult> TrackedPossibleRensaCallback;
     static void iteratePossibleRensasWithTracking(const CoreField&,
                                                   int maxKeyPuyos,
                                                   const RensaDetectorStrategy&,
                                                   TrackedPossibleRensaCallback);
 
-    typedef std::function<void (const CoreField&,
-                                const RensaResult&,
-                                const ColumnPuyoList& keyPuyos,
-                                const ColumnPuyoList& firePuyos,
-                                const RensaCoefResult& coefResult)> CoefPossibleRensaCallback;
+    typedef TrackedRensaCallback<RensaCoefResult> CoefPossibleRensaCallback;
     static void iteratePossibleRensasWithCoefTracking(const CoreField&,
                                                       int maxKeyPuyos,
                                                       const RensaDetectorStrategy&,
                                                       CoefPossibleRensaCallback);
 
-    typedef std::function<void (const CoreField&,
-                                const RensaResult&,
-                                const ColumnPuyoList& keyPuyos,
-                                const ColumnPuyoList& firePuyos,
-                                const RensaVanishingPositionResult& coefResult)> VanishingPositionPossibleRensaCallback;
+    typedef TrackedRensaCallback<RensaVanishingPositionResult> VanishingPositionPossibleRensaCallback;
     static void iteratePossibleRensasWithVanishingPositionTracking(const CoreField&,
                                                                    int maxKeyPuyos,
                                                                    const RensaDetectorStrategy&,
