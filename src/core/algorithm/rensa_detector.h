@@ -62,16 +62,11 @@ public:
                        const bool prohibits[FieldConstant::MAP_WIDTH],
                        const SimulationCallback& callback);
 
-    // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
+
     typedef std::function<void (const CoreField&,
                                 const RensaResult&,
                                 const ColumnPuyoList& keyPuyos,
-                                const ColumnPuyoList& firePuyos)> PossibleRensaCallback;
-    static void iteratePossibleRensas(const CoreField&,
-                                      int maxKeyPuyo,
-                                      const RensaDetectorStrategy&,
-                                      PossibleRensaCallback);
-
+                                const ColumnPuyoList& firePuyos)> RensaCallback;
     template<typename TrackResult>
     using TrackedRensaCallback = std::function<void (const CoreField&,
                                                      const RensaResult&,
@@ -79,29 +74,35 @@ public:
                                                      const ColumnPuyoList& firePuyos,
                                                      const TrackResult&)>;
 
+    // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
+    static void iteratePossibleRensas(const CoreField&,
+                                      int maxKeyPuyo,
+                                      const RensaDetectorStrategy&,
+                                      const RensaCallback&);
+
     typedef TrackedRensaCallback<RensaTrackResult> TrackedPossibleRensaCallback;
     static void iteratePossibleRensasWithTracking(const CoreField&,
                                                   int maxKeyPuyos,
                                                   const RensaDetectorStrategy&,
-                                                  TrackedPossibleRensaCallback);
+                                                  const TrackedPossibleRensaCallback&);
 
     typedef TrackedRensaCallback<RensaCoefResult> CoefPossibleRensaCallback;
     static void iteratePossibleRensasWithCoefTracking(const CoreField&,
                                                       int maxKeyPuyos,
                                                       const RensaDetectorStrategy&,
-                                                      CoefPossibleRensaCallback);
+                                                      const CoefPossibleRensaCallback&);
 
     typedef TrackedRensaCallback<RensaVanishingPositionResult> VanishingPositionPossibleRensaCallback;
     static void iteratePossibleRensasWithVanishingPositionTracking(const CoreField&,
                                                                    int maxKeyPuyos,
                                                                    const RensaDetectorStrategy&,
-                                                                   VanishingPositionPossibleRensaCallback);
+                                                                   const VanishingPositionPossibleRensaCallback&);
 
     // Without adding key puyos, we find rensas iteratively.
     static void iteratePossibleRensasIteratively(const CoreField&,
                                                  int maxIteration,
                                                  const RensaDetectorStrategy&,
-                                                 TrackedPossibleRensaCallback);
+                                                 const TrackedPossibleRensaCallback&);
 
     static void makeProhibitArray(const RensaResult&,
                                   const RensaTrackResult&,
