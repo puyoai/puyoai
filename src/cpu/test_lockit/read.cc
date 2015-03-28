@@ -78,8 +78,7 @@ void READ_P::fall()
 
 void READ_P::setti_12()
 {
-    int i;
-    for (i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++) {
         field[i][12] = field12[i];
     }
 }
@@ -91,13 +90,10 @@ void READ_P::field_kioku()
 
 int READ_P::field_hikaku()
 {
-    int i, j;
-    int count;
-    count = 0;
-    for (i = 0; i < 6; i++) {
-        for (j = 0; j < 12; j++) {
+    int count = 0;
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 12; j++) {
             if (field[i][j] != yosou_field[i][j]) {
-                //			if(field[i][j]!=field_hoz[i][j]){
                 count++;
             }
         }
