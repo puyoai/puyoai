@@ -58,7 +58,7 @@ static void drawText(Screen* screen, const std::string& str, int x, int y)
     drawText(screen, str.c_str(), x, y);
 }
 
-static void drawTrace(Screen* screen, int pi, const RensaTrackResult& result)
+static void drawTrace(Screen* screen, int pi, const RensaChainTrackResult& result)
 {
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 13; ++y) {

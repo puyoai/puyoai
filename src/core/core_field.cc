@@ -562,6 +562,6 @@ bool operator!=(const CoreField& lhs, const CoreField& rhs)
 
 // instantiate CoreField::simulate().
 template RensaResult CoreField::simulate(SimulationContext*, RensaNonTracker*);
-template RensaResult CoreField::simulate(SimulationContext*, RensaTracker*);
+template RensaResult CoreField::simulate(SimulationContext*, RensaChainTracker*);
 template RensaResult CoreField::simulate(SimulationContext*, RensaCoefTracker*);
 template RensaResult CoreField::simulate(SimulationContext*, RensaVanishingPositionTracker*);

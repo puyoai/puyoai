@@ -9,7 +9,7 @@
 #include "core/core_field.h"
 
 class ColumnPuyoList;
-class RensaTrackResult;
+class RensaChainTrackResult;
 struct RensaResult;
 
 using namespace std;
@@ -30,7 +30,7 @@ TEST(RensaDetectorPerformanceTest, iteratePossibleRensas)
     auto callback1 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&) {
         ++size1;
     };
-    auto callback2 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&, const RensaTrackResult&) {
+    auto callback2 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&, const RensaChainTrackResult&) {
         ++size2;
     };
 

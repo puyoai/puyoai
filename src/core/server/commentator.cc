@@ -161,7 +161,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
     {
         CoreField f(field);
         unique_ptr<TrackedPossibleRensaInfo> track(new TrackedPossibleRensaInfo);
-        RensaPtrTracker tracker(&track->trackResult);
+        RensaChainPointerTracker tracker(&track->trackResult);
         track->rensaResult = f.simulate(&tracker);
         if (track->rensaResult.score > 0) {
             lock_guard<mutex> lock(mu_);
@@ -215,7 +215,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
         unique_ptr<TrackedPossibleRensaInfo> bestRensa;
         auto callback = [&](const CoreField&, const RensaResult& rensaResult,
                             const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                            const RensaTrackResult& trackResult) {
+                            const RensaChainTrackResult& trackResult) {
             if (bestScore < rensaResult.score) {
                 bestScore = rensaResult.score;
                 bestRensa.reset(new TrackedPossibleRensaInfo(rensaResult, keyPuyos, firePuyos, trackResult));

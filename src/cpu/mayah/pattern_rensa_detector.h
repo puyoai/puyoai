@@ -15,7 +15,7 @@ public:
                                 const RensaResult&,
                                 const ColumnPuyoList& keyPuyos,
                                 const ColumnPuyoList& firePuyos,
-                                const RensaTrackResult&,
+                                const RensaChainTrackResult&,
                                 const std::string& patternName,
                                 double patternScore)> Callback;
 

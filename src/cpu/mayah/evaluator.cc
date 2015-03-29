@@ -409,7 +409,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& re
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const RefPlan& plan, const RensaTrackResult& trackResult)
+void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const RefPlan& plan, const RensaChainTrackResult& trackResult)
 {
     const CoreField& field = plan.field();
 
@@ -427,7 +427,7 @@ void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const RefPlan& pl
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const RefPlan& plan, const RensaTrackResult& trackResult, bool enemyHasZenkeshi)
+void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const RefPlan& plan, const RensaChainTrackResult& trackResult, bool enemyHasZenkeshi)
 {
     auto key = enemyHasZenkeshi ? IGNITION_HEIGHT_ON_ENEMY_ZENKESHI : IGNITION_HEIGHT;
 
@@ -579,7 +579,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                             const ColumnPuyoList& firePuyos,
                             double patternScore,
                             const string& patternName,
-                            const RensaTrackResult& trackResult) {
+                            const RensaChainTrackResult& trackResult) {
         ++rensaCounts[rensaResult.chains];
 
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
@@ -642,7 +642,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
 
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult& trackResult, const string& patternName, double patternScore) {
+                        const RensaChainTrackResult& trackResult, const string& patternName, double patternScore) {
         evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, patternScore, patternName, trackResult);
     };
     PatternRensaDetector detector(patternBook(), fieldBeforeRensa, callback);

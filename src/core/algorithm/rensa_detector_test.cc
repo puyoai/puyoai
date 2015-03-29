@@ -586,7 +586,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasExtend1)
     bool found[N] {};
     auto callback = [&](const CoreField&, const RensaResult&,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&) {
+                        const RensaChainTrackResult&) {
         CoreField g(f);
         EXPECT_TRUE(g.dropPuyoList(keyPuyos));
         EXPECT_TRUE(g.dropPuyoList(firePuyos));
@@ -630,7 +630,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1_1)
 
     auto callback = [&](const CoreField&, const RensaResult&,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&) {
+                        const RensaChainTrackResult&) {
         CoreField g(f);
         EXPECT_TRUE(g.dropPuyoList(keyPuyos));
         EXPECT_TRUE(g.dropPuyoList(firePuyos));
@@ -667,7 +667,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1_2)
 
     auto callback = [&](const CoreField&, const RensaResult&,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&) {
+                        const RensaChainTrackResult&) {
         CoreField g(f);
         EXPECT_TRUE(g.dropPuyoList(keyPuyos));
         EXPECT_TRUE(g.dropPuyoList(firePuyos));
@@ -722,7 +722,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2_1)
 
     auto callback = [&](const CoreField&, const RensaResult&,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&) {
+                        const RensaChainTrackResult&) {
         CoreField g(f);
         EXPECT_TRUE(g.dropPuyoList(keyPuyos));
         EXPECT_TRUE(g.dropPuyoList(firePuyos));
@@ -766,7 +766,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2_2)
 
     auto callback = [&](const CoreField&, const RensaResult&,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&) {
+                        const RensaChainTrackResult&) {
         CoreField g(f);
         EXPECT_TRUE(g.dropPuyoList(keyPuyos));
         EXPECT_TRUE(g.dropPuyoList(firePuyos));
@@ -798,7 +798,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth3_1)
     bool foundExpected = false;
     auto callback = [&](const CoreField&, const RensaResult&,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&) {
+                        const RensaChainTrackResult&) {
         CoreField g(f);
         EXPECT_TRUE(g.dropPuyoList(keyPuyos));
         EXPECT_TRUE(g.dropPuyoList(firePuyos));
@@ -827,7 +827,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth3_2)
     bool foundExpected = false;
     auto callback = [&](const CoreField&, const RensaResult&,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&) {
+                        const RensaChainTrackResult&) {
 
         CoreField g(f);
         EXPECT_TRUE(g.dropPuyoList(keyPuyos));
@@ -847,7 +847,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_DontCrash)
     CoreField f;
     auto callback = [](const CoreField&, const RensaResult&,
                        const ColumnPuyoList&, const ColumnPuyoList&,
-                       const RensaTrackResult&) {
+                       const RensaChainTrackResult&) {
     };
     RensaDetector::iteratePossibleRensasIteratively(f, 2, RensaDetectorStrategy::defaultDropStrategy(), callback);
 }
