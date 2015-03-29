@@ -18,17 +18,17 @@
 
 struct TrackedPossibleRensaInfo {
     TrackedPossibleRensaInfo() {}
-    TrackedPossibleRensaInfo(const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos,
-                             const ColumnPuyoList& firePuyos, const RensaChainTrackResult& trackResult) :
-        rensaResult(rensaResult), keyPuyos(keyPuyos), firePuyos(firePuyos), trackResult(trackResult) {}
+    TrackedPossibleRensaInfo(const RensaResult& rensaResult,
+                             const ColumnPuyoList& puyosToComplement,
+                             const RensaChainTrackResult& trackResult) :
+        rensaResult(rensaResult), puyosToComplement(puyosToComplement), trackResult(trackResult) {}
 
     int chains() const { return rensaResult.chains; }
     int score() const { return rensaResult.score; }
     int frames() const { return rensaResult.frames; }
 
     RensaResult rensaResult;
-    ColumnPuyoList keyPuyos;
-    ColumnPuyoList firePuyos;
+    ColumnPuyoList puyosToComplement;
     RensaChainTrackResult trackResult;
 };
 

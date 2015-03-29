@@ -230,15 +230,14 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     vector<EstimatedRensaInfo> results;
     results.reserve(20000);
     auto callback = [&](const CoreField&, const RensaResult& rensaResult,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& puyosToComplement,
                         const RensaCoefResult& coefResult) {
         // Ignore rensa whose power is really small.
         if (rensaResult.score < 70)
             return;
 
         PuyoSet puyoSet;
-        puyoSet.add(keyPuyos);
-        puyoSet.add(firePuyos);
+        puyoSet.add(puyosToComplement);
 
         int necessaryHands = kumipuyoSeq.size();
         for (int i = 0; i < kumipuyoSeq.size(); ++i) {

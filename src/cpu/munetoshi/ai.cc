@@ -137,15 +137,13 @@ munetoshi::grade munetoshi::AI::evaluate(
     auto callback = [&](
             const CoreField& /*field_after_chain*/,
             const RensaResult& rensa_result,
-            const ColumnPuyoList& key_puyos,
-            const ColumnPuyoList& fire_puyos,
+            const ColumnPuyoList& puyos_to_complement,
             const RensaVanishingPositionResult& position_result) {
 
         PossibleChainResult possible_chain_result = {
                 plan_result,
                 rensa_result,
-                key_puyos,
-                fire_puyos,
+                puyos_to_complement,
                 position_result,
         };
 

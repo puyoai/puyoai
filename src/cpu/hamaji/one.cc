@@ -62,7 +62,6 @@ class One : public AI {
           auto callback = [&](const CoreField&,
                               const RensaResult& rensa_result,
                               const ColumnPuyoList&,
-                              const ColumnPuyoList&,
                               const RensaChainTrackResult&) {
             s = max(s, rensa_result.score);
           };

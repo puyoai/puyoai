@@ -61,13 +61,12 @@ grade Evaluator<EVALUATOR_TYPES::NUM_REQUIRED_PUYO, PossibleChainResult>::EVALUA
 #if 1
     // TODO(mayah); ColumnPuyoList now does not provide iterator.
     // I believe this is the code that you want. If not, please rewrite this.
-    return e->key_puyos.size() + e->fire_puyos.size();
+    return e->puyos_to_complement.size();
 #else
     // original code is here.
     int required_puyos = 0;
     auto adder = [&](const ColumnPuyo& cp) {required_puyos += cp.x;};
-    std::for_each(e->key_puyos.begin(), e->key_puyos.end(), adder);
-    std::for_each(e->fire_puyos.begin(), e->fire_puyos.end(), adder);
+    std::for_each(e->puyos_to_complement.begin(), e->puyos_to_complement.end(), adder);
     return required_puyos;
 #endif
 }

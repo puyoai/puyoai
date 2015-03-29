@@ -104,12 +104,9 @@ TEST(RensaDetectorTest, detectDrop1)
         "RGYGB.");
 
     bool found = false;
-    auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
         CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(actual.dropPuyoList(firePuyos));
+        EXPECT_TRUE(actual.dropPuyoList(cpl));
 
         if (actual == expected) {
             found = true;
@@ -144,12 +141,9 @@ TEST(RensaDetectorTest, detectExtend1)
 
     bool found[5] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
         CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(actual.dropPuyoList(firePuyos));
+        EXPECT_TRUE(actual.dropPuyoList(cpl));
 
         bool ok = false;
         for (int i = 0; i < 5; ++i) {
@@ -198,12 +192,9 @@ TEST(RensaDetectorTest, detectExtend2)
 
     bool found[4] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
         CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(actual.dropPuyoList(firePuyos));
+        EXPECT_TRUE(actual.dropPuyoList(cpl));
 
         bool ok = false;
         for (int i = 0; i < 4; ++i) {
@@ -248,12 +239,9 @@ TEST(RensaDetectorTest, detectExtend3)
 
     bool found[2] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
         CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(actual.dropPuyoList(firePuyos));
+        EXPECT_TRUE(actual.dropPuyoList(cpl));
 
         bool ok = false;
         for (int i = 0; i < 2; ++i) {
@@ -308,12 +296,9 @@ TEST(RensaDetectorTest, detectExtend4)
 
     bool found[N] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
         CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(actual.dropPuyoList(firePuyos));
+        EXPECT_TRUE(actual.dropPuyoList(cpl));
 
         bool ok = false;
         for (size_t i = 0; i < N; ++i) {
@@ -385,12 +370,9 @@ TEST(RensaDetectorTest, detectExtend5)
 
     bool found[N] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
         CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(actual.dropPuyoList(firePuyos));
+        EXPECT_TRUE(actual.dropPuyoList(cpl));
 
         bool ok = false;
         for (size_t i = 0; i < N; ++i) {
@@ -431,12 +413,11 @@ TEST(RensaDetectorTest, iteratePossibleRensa)
     bool found1 = false;
     bool found2 = false;
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+                        const ColumnPuyoList& cpl) {
         UNUSED_VARIABLE(fieldAfterRensa);
         UNUSED_VARIABLE(rensaResult);
         CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(actual.dropPuyoList(firePuyos));
+        EXPECT_TRUE(actual.dropPuyoList(cpl));
 
         if (actual == expected1)
             found1 = true;
@@ -476,12 +457,11 @@ TEST(RensaDetectorTest, iteratePossibleRensaWithKeyPuyos)
 
     bool found[4] {};
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+                        const ColumnPuyoList& cpl) {
         UNUSED_VARIABLE(fieldAfterRensa);
         UNUSED_VARIABLE(rensaResult);
         CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(actual.dropPuyoList(firePuyos));
+        EXPECT_TRUE(actual.dropPuyoList(cpl));
 
         for (int i = 0; i < 4; ++i) {
             if (actual == expected[i]) {
@@ -525,10 +505,9 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat)
 
     bool found = false;
     auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos) {
+                        const ColumnPuyoList& cpl) {
         UNUSED_VARIABLE(fieldAfterRensa);
-        UNUSED_VARIABLE(keyPuyos);
-        UNUSED_VARIABLE(firePuyos);
+        UNUSED_VARIABLE(cpl);
         if (rensaResult == expected)
             found = true;
     };
@@ -554,8 +533,8 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat2)
     expectedFireList.add(5, PuyoColor::GREEN);
     expectedFireList.add(5, PuyoColor::GREEN);
     auto callback = [&](const CoreField& /*fieldAfterRensa*/, const RensaResult& rensaResult,
-                        const ColumnPuyoList& /*keyPuyos*/, const ColumnPuyoList& firePuyos) {
-        if (rensaResult.chains == 3 && firePuyos == expectedFireList) {
+                        const ColumnPuyoList& cpl) {
+        if (rensaResult.chains == 3 && cpl == expectedFireList) {
             found = true;
         }
     };
@@ -585,11 +564,10 @@ TEST(RensaDetectorTest, iteratePossibleRensasExtend1)
 
     bool found[N] {};
     auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
                         const RensaChainTrackResult&) {
         CoreField g(f);
-        EXPECT_TRUE(g.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(g.dropPuyoList(firePuyos));
+        EXPECT_TRUE(g.dropPuyoList(cpl));
 
         for (int i = 0; i < N; ++i) {
             if (g == expected[i])
@@ -629,11 +607,10 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1_1)
     bool foundUnexpected = false;
 
     auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
                         const RensaChainTrackResult&) {
         CoreField g(f);
-        EXPECT_TRUE(g.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(g.dropPuyoList(firePuyos));
+        EXPECT_TRUE(g.dropPuyoList(cpl));
 
         if (g == expected)
             foundExpected = true;
@@ -666,11 +643,10 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth1_2)
     bool foundExpected = false;
 
     auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
                         const RensaChainTrackResult&) {
         CoreField g(f);
-        EXPECT_TRUE(g.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(g.dropPuyoList(firePuyos));
+        EXPECT_TRUE(g.dropPuyoList(cpl));
 
         if (g == expected)
             foundExpected = true;
@@ -721,11 +697,10 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2_1)
     bool foundUnexpected = false;
 
     auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
                         const RensaChainTrackResult&) {
         CoreField g(f);
-        EXPECT_TRUE(g.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(g.dropPuyoList(firePuyos));
+        EXPECT_TRUE(g.dropPuyoList(cpl));
 
         if (g == expected1) {
             // Don't iterate the same one twice.
@@ -765,11 +740,10 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth2_2)
     bool foundExpected1 = false;
 
     auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
                         const RensaChainTrackResult&) {
         CoreField g(f);
-        EXPECT_TRUE(g.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(g.dropPuyoList(firePuyos));
+        EXPECT_TRUE(g.dropPuyoList(cpl));
 
         if (g == expected1) {
             // Don't iterate the same one twice.
@@ -797,11 +771,10 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth3_1)
 
     bool foundExpected = false;
     auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
                         const RensaChainTrackResult&) {
         CoreField g(f);
-        EXPECT_TRUE(g.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(g.dropPuyoList(firePuyos));
+        EXPECT_TRUE(g.dropPuyoList(cpl));
 
         if (g == expected)
             foundExpected = true;
@@ -826,12 +799,11 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_depth3_2)
 
     bool foundExpected = false;
     auto callback = [&](const CoreField&, const RensaResult&,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
                         const RensaChainTrackResult&) {
 
         CoreField g(f);
-        EXPECT_TRUE(g.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(g.dropPuyoList(firePuyos));
+        EXPECT_TRUE(g.dropPuyoList(cpl));
 
         if (g == expected)
             foundExpected = true;
@@ -846,7 +818,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_DontCrash)
 {
     CoreField f;
     auto callback = [](const CoreField&, const RensaResult&,
-                       const ColumnPuyoList&, const ColumnPuyoList&,
+                       const ColumnPuyoList&,
                        const RensaChainTrackResult&) {
     };
     RensaDetector::iteratePossibleRensasIteratively(f, 2, RensaDetectorStrategy::defaultDropStrategy(), callback);

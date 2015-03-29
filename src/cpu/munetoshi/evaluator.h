@@ -32,8 +32,7 @@ struct PlanResult {
 
 struct PossibleChainResult : public PlanResult {
     const RensaResult& rensa_result;
-    const ColumnPuyoList& key_puyos;
-    const ColumnPuyoList& fire_puyos;
+    const ColumnPuyoList& puyos_to_complement;
     const RensaVanishingPositionResult& position_result;
 
     // These are non const because they are set by an evaluator.
@@ -46,13 +45,11 @@ struct PossibleChainResult : public PlanResult {
     PossibleChainResult(
             const PlanResult& plan_result,
             const RensaResult& rensa_result,
-            const ColumnPuyoList& key_puyos,
-            const ColumnPuyoList& fire_puyos,
+            const ColumnPuyoList& puyos_to_complement,
             const RensaVanishingPositionResult& position_result) :
     PlanResult(plan_result),
     rensa_result(rensa_result),
-    key_puyos(key_puyos),
-    fire_puyos(fire_puyos),
+    puyos_to_complement(puyos_to_complement),
     position_result(position_result),
     turnover_bottom(0),
     turnover_top(0),

@@ -65,13 +65,11 @@ public:
 
     typedef std::function<void (const CoreField&,
                                 const RensaResult&,
-                                const ColumnPuyoList& keyPuyos,
-                                const ColumnPuyoList& firePuyos)> RensaCallback;
+                                const ColumnPuyoList&)> RensaCallback;
     template<typename TrackResult>
     using TrackedRensaCallback = std::function<void (const CoreField&,
                                                      const RensaResult&,
-                                                     const ColumnPuyoList& keyPuyos,
-                                                     const ColumnPuyoList& firePuyos,
+                                                     const ColumnPuyoList&,
                                                      const TrackResult&)>;
 
     // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
