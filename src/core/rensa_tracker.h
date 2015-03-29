@@ -13,9 +13,13 @@ public:
     void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
 };
 
-class RensaChainTracker {
+template<typename TrackResult>
+class RensaTracker;
+
+template<>
+class RensaTracker<RensaChainTrackResult> {
 public:
-    RensaChainTracker() :
+    RensaTracker() :
         originalY_ {
             { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
             { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
@@ -40,6 +44,58 @@ private:
     int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
     RensaChainTrackResult result_;
 };
+typedef RensaTracker<RensaChainTrackResult> RensaChainTracker;
+
+template<>
+class RensaTracker<RensaCoefResult> {
+public:
+    const RensaCoefResult& result() const { return result_; }
+
+    void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
+    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
+    void puyoIsDropped(int /*x*/, int /*fromY*/, int /*toY*/) {}
+    void nthChainDone(int nthChain, int numErasedPuyo, int coef) { result_.setCoef(nthChain, numErasedPuyo, coef); }
+
+private:
+    RensaCoefResult result_;
+};
+typedef RensaTracker<RensaCoefResult> RensaCoefTracker;
+
+template<>
+class RensaTracker<RensaVanishingPositionResult> {
+public:
+    RensaTracker()
+    {
+        resetY();
+    }
+
+    const RensaVanishingPositionResult& result() const { return result_; }
+
+    void colorPuyoIsVanished(int x, int y, int nthChain)
+    {
+        if (yAtPrevRensa_[x][y] == 0) {
+            result_.setBasePuyo(x, y, nthChain);
+        } else {
+            result_.setFallingPuyo(x, yAtPrevRensa_[x][y], y, nthChain);
+        }
+    }
+
+    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
+    void puyoIsDropped(int x, int fromY, int toY) { yAtPrevRensa_[x][toY] = fromY; }
+    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) { resetY(); }
+
+private:
+    void resetY() {
+        constexpr std::array<int, FieldConstant::MAP_HEIGHT> ALL_ZERO {{}};
+        yAtPrevRensa_.fill(ALL_ZERO);
+    }
+
+    RensaVanishingPositionResult result_;
+    std::array<std::array<int, FieldConstant::MAP_HEIGHT>, FieldConstant::MAP_WIDTH> yAtPrevRensa_;
+};
+typedef RensaTracker<RensaVanishingPositionResult> RensaVanishingPositionTracker;
+
+// ----------------------------------------------------------------------
 
 class RensaChainPointerTracker {
 public:
@@ -71,7 +127,6 @@ private:
     RensaChainTrackResult* result_;
 };
 
-
 class RensaYPositionTracker {
 public:
     RensaYPositionTracker() :
@@ -102,51 +157,6 @@ public:
 
 private:
     int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
-};
-
-class RensaCoefTracker {
-public:
-    const RensaCoefResult& result() const { return result_; }
-
-    void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
-    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
-    void puyoIsDropped(int /*x*/, int /*fromY*/, int /*toY*/) {}
-    void nthChainDone(int nthChain, int numErasedPuyo, int coef) { result_.setCoef(nthChain, numErasedPuyo, coef); }
-
-private:
-    RensaCoefResult result_;
-};
-
-class RensaVanishingPositionTracker {
-public:
-    RensaVanishingPositionTracker()
-    {
-        resetY();
-    }
-
-    const RensaVanishingPositionResult& result() const { return result_; }
-
-    void colorPuyoIsVanished(int x, int y, int nthChain)
-    {
-        if (yAtPrevRensa_[x][y] == 0) {
-            result_.setBasePuyo(x, y, nthChain);
-        } else {
-            result_.setFallingPuyo(x, yAtPrevRensa_[x][y], y, nthChain);
-        }
-    }
-
-    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
-    void puyoIsDropped(int x, int fromY, int toY) { yAtPrevRensa_[x][toY] = fromY; }
-    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) { resetY(); }
-
-private:
-    void resetY() {
-        constexpr std::array<int, FieldConstant::MAP_HEIGHT> ALL_ZERO {{}};
-        yAtPrevRensa_.fill(ALL_ZERO);
-    }
-
-    RensaVanishingPositionResult result_;
-    std::array<std::array<int, FieldConstant::MAP_HEIGHT>, FieldConstant::MAP_WIDTH> yAtPrevRensa_;
 };
 
 #endif
