@@ -13,9 +13,9 @@ public:
     void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
 };
 
-class RensaTracker {
+class RensaChainTracker {
 public:
-    RensaTracker() :
+    RensaChainTracker() :
         originalY_ {
             { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
             { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
@@ -29,7 +29,7 @@ public:
     {
     }
 
-    const RensaTrackResult& result() const { return result_; }
+    const RensaChainTrackResult& result() const { return result_; }
 
     void colorPuyoIsVanished(int x, int y, int nthChain) { result_.setErasedAt(x, originalY_[x][y], nthChain); }
     void ojamaPuyoIsVanished(int x, int y, int nthChain) { result_.setErasedAt(x, originalY_[x][y], nthChain); }
@@ -38,12 +38,12 @@ public:
 
 private:
     int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
-    RensaTrackResult result_;
+    RensaChainTrackResult result_;
 };
 
-class RensaPtrTracker {
+class RensaChainPointerTracker {
 public:
-    explicit RensaPtrTracker(RensaTrackResult* trackResult) :
+    explicit RensaChainPointerTracker(RensaChainTrackResult* trackResult) :
         originalY_ {
             { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
             { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
@@ -59,7 +59,7 @@ public:
         // TODO(mayah): Assert trackResult is initialized?
     }
 
-    const RensaTrackResult& result() const { return *result_; }
+    const RensaChainTrackResult& result() const { return *result_; }
 
     void colorPuyoIsVanished(int x, int y, int nthChain) { result_->setErasedAt(x, originalY_[x][y], nthChain); }
     void ojamaPuyoIsVanished(int x, int y, int nthChain) { result_->setErasedAt(x, originalY_[x][y], nthChain); }
@@ -68,7 +68,7 @@ public:
 
 private:
     int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
-    RensaTrackResult* result_;
+    RensaChainTrackResult* result_;
 };
 
 

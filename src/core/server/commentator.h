@@ -19,7 +19,7 @@
 struct TrackedPossibleRensaInfo {
     TrackedPossibleRensaInfo() {}
     TrackedPossibleRensaInfo(const RensaResult& rensaResult, const ColumnPuyoList& keyPuyos,
-                             const ColumnPuyoList& firePuyos, const RensaTrackResult& trackResult) :
+                             const ColumnPuyoList& firePuyos, const RensaChainTrackResult& trackResult) :
         rensaResult(rensaResult), keyPuyos(keyPuyos), firePuyos(firePuyos), trackResult(trackResult) {}
 
     int chains() const { return rensaResult.chains; }
@@ -29,7 +29,7 @@ struct TrackedPossibleRensaInfo {
     RensaResult rensaResult;
     ColumnPuyoList keyPuyos;
     ColumnPuyoList firePuyos;
-    RensaTrackResult trackResult;
+    RensaChainTrackResult trackResult;
 };
 
 struct CommentatorResult {

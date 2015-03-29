@@ -4,9 +4,9 @@
 
 using namespace std;
 
-TEST(RensaTrackResult, initial)
+TEST(RensaChainTrackResult, initial)
 {
-    RensaTrackResult rtr;
+    RensaChainTrackResult rtr;
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
             EXPECT_EQ(0, rtr.erasedAt(x, y)) << "x=" << x << " y=" << y;
@@ -14,9 +14,9 @@ TEST(RensaTrackResult, initial)
     }
 }
 
-TEST(RensaTrackResult, constructor)
+TEST(RensaChainTrackResult, constructor)
 {
-    RensaTrackResult rtr(
+    RensaChainTrackResult rtr(
         "aB...."
         "12....");
 

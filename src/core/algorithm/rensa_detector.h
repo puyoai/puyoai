@@ -7,8 +7,8 @@
 
 class ColumnPuyoList;
 class CoreField;
+class RensaChainTrackResult;
 class RensaCoefResult;
-class RensaTrackResult;
 class RensaVanishingPositionResult;
 struct RensaResult;
 
@@ -80,7 +80,7 @@ public:
                                       const RensaDetectorStrategy&,
                                       const RensaCallback&);
 
-    typedef TrackedRensaCallback<RensaTrackResult> TrackedPossibleRensaCallback;
+    typedef TrackedRensaCallback<RensaChainTrackResult> TrackedPossibleRensaCallback;
     static void iteratePossibleRensasWithTracking(const CoreField&,
                                                   int maxKeyPuyos,
                                                   const RensaDetectorStrategy&,
@@ -105,7 +105,7 @@ public:
                                                  const TrackedPossibleRensaCallback&);
 
     static void makeProhibitArray(const RensaResult&,
-                                  const RensaTrackResult&,
+                                  const RensaChainTrackResult&,
                                   const CoreField& originalField,
                                   const ColumnPuyoList& firePuyos,
                                   bool prohibits[FieldConstant::MAP_WIDTH]);

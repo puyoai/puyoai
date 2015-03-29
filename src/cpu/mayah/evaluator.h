@@ -13,7 +13,7 @@ class CoreField;
 class GazeResult;
 class PuyoSet;
 class RefPlan;
-class RensaTrackResult;
+class RensaChainTrackResult;
 
 struct PlayerState;
 struct RensaResult;
@@ -104,8 +104,8 @@ public:
     void evalRensaScore(double score, double virtualScore);
     void evalRensaChainFeature(const RensaResult&, const PuyoSet&);
     void collectScoreForRensaGarbage(const CoreField& fieldAfterRensa);
-    void evalFirePointTabooFeature(const RefPlan&, const RensaTrackResult&);
-    void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaTrackResult&, bool enemyHasZenkeshi);
+    void evalFirePointTabooFeature(const RefPlan&, const RensaChainTrackResult&);
+    void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaChainTrackResult&, bool enemyHasZenkeshi);
     void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
     void evalRensaRidgeHeight(const CoreField&);
     void evalRensaValleyDepth(const CoreField&);

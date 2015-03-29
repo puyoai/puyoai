@@ -126,7 +126,7 @@ TEST(PatternBookTest, pattern1)
                         const RensaResult&,
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&,
+                        const RensaChainTrackResult&,
                         const std::string& patternName,
                         int patternScore) {
         CoreField cf(field);
@@ -167,7 +167,7 @@ TEST(PatternBookTest, pattern1_complement1)
                         const RensaResult&,
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&,
+                        const RensaChainTrackResult&,
                         const std::string& patternName,
                         int patternScore) {
         CoreField cf(field);
@@ -202,7 +202,7 @@ TEST(PatternBookTest, pattern1_complement2)
                         const RensaResult&,
                         const ColumnPuyoList&,
                         const ColumnPuyoList&,
-                        const RensaTrackResult&,
+                        const RensaChainTrackResult&,
                         const std::string&,
                         int patternScore) {
         if (patternScore > 0)
@@ -233,7 +233,7 @@ TEST(PatternBookTest, pattern2)
                         const RensaResult&,
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&,
+                        const RensaChainTrackResult&,
                         const std::string& patternName,
                         int /*patternScore*/) {
         CoreField cf(field);
@@ -272,7 +272,7 @@ TEST(PatternBookTest, pattern3)
                         const RensaResult&,
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&,
+                        const RensaChainTrackResult&,
                         const std::string&,
                         int /*patternScore*/) {
         CoreField cf(field);
@@ -316,7 +316,7 @@ TEST(PatternBookTest, pattern4)
                         const RensaResult&,
                         const ColumnPuyoList& keyPuyos,
                         const ColumnPuyoList& firePuyos,
-                        const RensaTrackResult&,
+                        const RensaChainTrackResult&,
                         const std::string&,
                         int /*patternScore*/) {
         CoreField cf(field);
@@ -352,7 +352,7 @@ TEST(PatternBookTest, pattern5)
                         const RensaResult&,
                         const ColumnPuyoList&,
                         const ColumnPuyoList&,
-                        const RensaTrackResult&,
+                        const RensaChainTrackResult&,
                         const std::string&,
                         int patternScore) {
         if (patternScore > 0)

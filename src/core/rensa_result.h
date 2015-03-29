@@ -32,13 +32,13 @@ struct RensaResult {
     bool quick;  // Last vanishment does not drop any puyos.
 };
 
-// RensaTrackResult represents in what-th chain puyo is erased.
-class RensaTrackResult {
+// RensaChainTrackResult represents in what-th chain puyo is erased.
+class RensaChainTrackResult {
 public:
-    RensaTrackResult();
-    explicit RensaTrackResult(const std::string&);
+    RensaChainTrackResult();
+    explicit RensaChainTrackResult(const std::string&);
 
-    RensaTrackResult& operator=(const RensaTrackResult& result);
+    RensaChainTrackResult& operator=(const RensaChainTrackResult& result);
 
     // Nth Rensa where (x, y) is erased. 0 if not erased.
     int erasedAt(int x, int y) const { return erasedAt_[x][y]; }

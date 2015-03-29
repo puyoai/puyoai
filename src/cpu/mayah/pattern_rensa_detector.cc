@@ -246,7 +246,7 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     if (!cf.dropPuyoOn(firePuyo.x, firePuyo.color))
         return false;
 
-    RensaTracker tracker;
+    RensaChainTracker tracker;
     RensaResult rensaResult = cf.simulate(&context, &tracker);
     if (rensaResult.chains != currentChains)
         return false;

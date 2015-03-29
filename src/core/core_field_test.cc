@@ -308,10 +308,10 @@ TEST(CoreFieldTest, TrackedCoreFieldSimulation)
                 "556774");
 
 
-    RensaTracker tracker;
+    RensaChainTracker tracker;
     RensaResult basicRensaResult = f.simulate(&tracker);
 
-    const RensaTrackResult& trackResult = tracker.result();
+    const RensaChainTrackResult& trackResult = tracker.result();
 
     EXPECT_EQ(5, basicRensaResult.chains);
     EXPECT_EQ(1, trackResult.erasedAt(1, 2));

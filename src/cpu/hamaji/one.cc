@@ -63,7 +63,7 @@ class One : public AI {
                               const RensaResult& rensa_result,
                               const ColumnPuyoList&,
                               const ColumnPuyoList&,
-                              const RensaTrackResult&) {
+                              const RensaChainTrackResult&) {
             s = max(s, rensa_result.score);
           };
           RensaDetector::iteratePossibleRensasWithTracking(

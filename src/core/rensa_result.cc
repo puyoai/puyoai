@@ -19,13 +19,13 @@ string RensaResult::toString() const
     return ss.str();
 }
 
-RensaTrackResult::RensaTrackResult() :
+RensaChainTrackResult::RensaChainTrackResult() :
     erasedAt_ {}
 {
 }
 
-RensaTrackResult::RensaTrackResult(const string& s) :
-    RensaTrackResult()
+RensaChainTrackResult::RensaChainTrackResult(const string& s) :
+    RensaChainTrackResult()
 {
     CHECK(s.size() % 6 == 0) << s.size();
 
@@ -47,7 +47,7 @@ RensaTrackResult::RensaTrackResult(const string& s) :
     }
 }
 
-RensaTrackResult& RensaTrackResult::operator=(const RensaTrackResult& result)
+RensaChainTrackResult& RensaChainTrackResult::operator=(const RensaChainTrackResult& result)
 {
     for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
         for (int y = 0; y < FieldConstant::MAP_HEIGHT; ++y)
@@ -57,7 +57,7 @@ RensaTrackResult& RensaTrackResult::operator=(const RensaTrackResult& result)
     return *this;
 }
 
-string RensaTrackResult::toString() const
+string RensaChainTrackResult::toString() const
 {
     ostringstream ss;
     for (int y = FieldConstant::HEIGHT; y >= 1; --y) {
