@@ -491,9 +491,11 @@ static inline void simulateInternal(CoreField* f,
                                     const RensaDetector::RensaCallback& callback)
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
+    ColumnPuyoList whole(keyPuyos);
+    whole.merge(firePuyos);
     RensaResult rensaResult = f->simulate(&context);
     if (rensaResult.chains > 0)
-        callback(*f, rensaResult, keyPuyos, firePuyos);
+        callback(*f, rensaResult, whole);
 }
 
 static inline void simulateInternal(CoreField* f,
@@ -503,10 +505,12 @@ static inline void simulateInternal(CoreField* f,
                                     const RensaDetector::TrackedPossibleRensaCallback& callback)
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
+    ColumnPuyoList whole(keyPuyos);
+    whole.merge(firePuyos);
     RensaChainTracker tracker;
     RensaResult rensaResult = f->simulate(&context, &tracker);
     if (rensaResult.chains > 0)
-        callback(*f, rensaResult, keyPuyos, firePuyos, tracker.result());
+        callback(*f, rensaResult, whole, tracker.result());
 }
 
 static inline void simulateInternal(CoreField* f, const CoreField& original,
@@ -514,10 +518,12 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
                                     const RensaDetector::CoefPossibleRensaCallback& callback)
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
+    ColumnPuyoList whole(keyPuyos);
+    whole.merge(firePuyos);
     RensaCoefTracker tracker;
     RensaResult rensaResult = f->simulate(&context, &tracker);
     if (rensaResult.chains > 0)
-        callback(*f, rensaResult, keyPuyos, firePuyos, tracker.result());
+        callback(*f, rensaResult, whole, tracker.result());
 }
 
 static inline void simulateInternal(CoreField* f, const CoreField& original,
@@ -525,10 +531,12 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
                                     const RensaDetector::VanishingPositionPossibleRensaCallback& callback)
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
+    ColumnPuyoList whole(keyPuyos);
+    whole.merge(firePuyos);
     RensaVanishingPositionTracker tracker;
     RensaResult rensaResult = f->simulate(&context, &tracker);
     if (rensaResult.chains > 0)
-        callback(*f, rensaResult, keyPuyos, firePuyos, tracker.result());
+        callback(*f, rensaResult, whole, tracker.result());
 }
 
 template<typename Callback>
@@ -625,8 +633,9 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
         return;
 
     auto findRensaCallback = [&](CoreField* f, const ColumnPuyoList& currentFirePuyos) {
-        auto simulationCallback = [&](const CoreField& fieldAfterSimulation, const RensaResult& rensaResult,
-                                      const ColumnPuyoList& /*currentKeyPuyos*/, const ColumnPuyoList& currentFirePuyos,
+        auto simulationCallback = [&](const CoreField& fieldAfterSimulation,
+                                      const RensaResult& rensaResult,
+                                      const ColumnPuyoList& currentFirePuyos,
                                       const RensaChainTrackResult& /*trackResult*/) {
             ColumnPuyoList combinedKeyPuyos(accumulatedKeyPuyos);
             if (!combinedKeyPuyos.merge(currentFirePuyos))
@@ -670,7 +679,9 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             else
                 RensaDetector::makeProhibitArray(combinedRensaResult, combinedTrackResult, originalField, firstRensaFirePuyos, newProhibits);
 
-            callback(f, combinedRensaResult, combinedKeyPuyos, firstRensaFirePuyos, combinedTrackResult);
+            ColumnPuyoList wholeColumnPuyoList(combinedKeyPuyos);
+            wholeColumnPuyoList.merge(firstRensaFirePuyos);
+            callback(f, combinedRensaResult, wholeColumnPuyoList, combinedTrackResult);
             iteratePossibleRensasIterativelyInternal(fieldAfterSimulation, initialField, restIterations - 1,
                                                      combinedKeyPuyos, firstRensaFirePuyos,
                                                      combinedRensaResult.chains,
@@ -699,10 +710,11 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
     DCHECK_LE(1, maxIteration);
 
     auto findRensaCallback = [&](CoreField* f, const ColumnPuyoList& firePuyos) {
-        auto simulationCallback = [&](const CoreField& fieldAfterSimulation, const RensaResult& rensaResult,
-                                      const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+        auto simulationCallback = [&](const CoreField& fieldAfterSimulation,
+                                      const RensaResult& rensaResult,
+                                      const ColumnPuyoList& wholeColumnPuyoList,
                                       const RensaChainTrackResult& trackResult) {
-            callback(fieldAfterSimulation, rensaResult, keyPuyos, firePuyos, trackResult);
+            callback(fieldAfterSimulation, rensaResult, wholeColumnPuyoList, trackResult);
 
             // Don't put key puyo on the column which fire puyo will be placed.
             bool prohibits[FieldConstant::MAP_WIDTH];

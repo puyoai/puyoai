@@ -53,7 +53,6 @@ double hoge(const CoreField& cf) {
   double score = 0.0;
   auto callback = [&](const CoreField& f,
                       const RensaResult& rensa_result,
-                      const ColumnPuyoList&,
                       const ColumnPuyoList& fire_puyos) {
     double y_avg = 0;
     for (int x = 1; x <= 6; ++x) {

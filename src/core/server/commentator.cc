@@ -213,12 +213,13 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
     {
         int bestScore = 0;
         unique_ptr<TrackedPossibleRensaInfo> bestRensa;
-        auto callback = [&](const CoreField&, const RensaResult& rensaResult,
-                            const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+        auto callback = [&](const CoreField&,
+                            const RensaResult& rensaResult,
+                            const ColumnPuyoList& puyosToComplement,
                             const RensaChainTrackResult& trackResult) {
             if (bestScore < rensaResult.score) {
                 bestScore = rensaResult.score;
-                bestRensa.reset(new TrackedPossibleRensaInfo(rensaResult, keyPuyos, firePuyos, trackResult));
+                bestRensa.reset(new TrackedPossibleRensaInfo(rensaResult, puyosToComplement, trackResult));
             }
         };
 

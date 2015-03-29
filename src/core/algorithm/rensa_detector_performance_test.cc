@@ -27,10 +27,10 @@ TEST(RensaDetectorPerformanceTest, iteratePossibleRensas)
 
     size_t size1 = 0;
     size_t size2 = 0;
-    auto callback1 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&) {
+    auto callback1 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&) {
         ++size1;
     };
-    auto callback2 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&, const ColumnPuyoList&, const RensaChainTrackResult&) {
+    auto callback2 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&, const RensaChainTrackResult&) {
         ++size2;
     };
 
