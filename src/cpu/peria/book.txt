@@ -17,6 +17,16 @@ MAX: 20
 ...BAA
 ...CBB
 ----
+NAME: GTR-Head2
+SCORE: 1500
+MAX: 20
+.....A
+.....D
+.....D
+...CBA
+...BAA
+...CBB
+----
 NAME: Begin1
 SCORE: 500
 MAX: 8
