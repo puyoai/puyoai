@@ -193,10 +193,9 @@ void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumi
             return;
 
         CoreField copied(cf);
-        RensaCoefResult coefResult;
-        RensaCoefTracker tracker(&coefResult);
+        RensaCoefTracker tracker;
         RensaResult rensaResult = copied.simulate(&tracker);
-        results.emplace_back(rensaResult.chains, rensaResult.score, framesToIgnite, coefResult);
+        results.emplace_back(rensaResult.chains, rensaResult.score, framesToIgnite, tracker.result());
     };
     Plan::iterateAvailablePlansWithoutFiring(field, seq, seq.size(), f);
 
@@ -229,7 +228,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         averageHeight += field.height(x) / 6.0;
 
     vector<EstimatedRensaInfo> results;
-    results.reserve(1000);
+    results.reserve(20000);
     auto callback = [&](const CoreField&, const RensaResult& rensaResult,
                         const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
                         const RensaCoefResult& coefResult) {

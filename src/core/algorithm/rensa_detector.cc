@@ -484,21 +484,11 @@ void RensaDetector::detect(const CoreField& original,
     findRensas(original, strategy, prohibits, purpose, callback);
 }
 
-void RensaDetector::detectSingle(const CoreField& original, const RensaDetectorStrategy& strategy, RensaCallback callback)
-{
-    static const bool nonProhibits[FieldConstant::MAP_WIDTH] {};
-    auto f = [&original, &callback](CoreField* f, const ColumnPuyoList& firePuyos) {
-        CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
-        RensaResult rensaResult = f->simulate(&context);
-        if (rensaResult.chains > 0)
-            callback(*f, rensaResult, firePuyos);
-    };
-    findRensas(original, strategy, nonProhibits, PurposeForFindingRensa::FOR_FIRE, f);
-}
-
-static inline void simulateInternal(CoreField* f, const CoreField& original,
-                                    const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                                    RensaDetector::PossibleRensaCallback callback)
+static inline void simulateInternal(CoreField* f,
+                                    const CoreField& original,
+                                    const ColumnPuyoList& keyPuyos,
+                                    const ColumnPuyoList& firePuyos,
+                                    const RensaDetector::RensaCallback& callback)
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
     RensaResult rensaResult = f->simulate(&context);
@@ -506,40 +496,39 @@ static inline void simulateInternal(CoreField* f, const CoreField& original,
         callback(*f, rensaResult, keyPuyos, firePuyos);
 }
 
-static inline void simulateInternal(CoreField* f, const CoreField& original,
-                                    const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                                    RensaDetector::TrackedPossibleRensaCallback callback)
+static inline void simulateInternal(CoreField* f,
+                                    const CoreField& original,
+                                    const ColumnPuyoList& keyPuyos,
+                                    const ColumnPuyoList& firePuyos,
+                                    const RensaDetector::TrackedPossibleRensaCallback& callback)
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
-    RensaTrackResult rensaTrackResult;
-    RensaTracker tracker(&rensaTrackResult);
+    RensaTracker tracker;
     RensaResult rensaResult = f->simulate(&context, &tracker);
     if (rensaResult.chains > 0)
-        callback(*f, rensaResult, keyPuyos, firePuyos, rensaTrackResult);
+        callback(*f, rensaResult, keyPuyos, firePuyos, tracker.result());
 }
 
 static inline void simulateInternal(CoreField* f, const CoreField& original,
                                     const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                                    RensaDetector::CoefPossibleRensaCallback callback)
+                                    const RensaDetector::CoefPossibleRensaCallback& callback)
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
-    RensaCoefResult rensaCoefResult;
-    RensaCoefTracker tracker(&rensaCoefResult);
+    RensaCoefTracker tracker;
     RensaResult rensaResult = f->simulate(&context, &tracker);
     if (rensaResult.chains > 0)
-        callback(*f, rensaResult, keyPuyos, firePuyos, rensaCoefResult);
+        callback(*f, rensaResult, keyPuyos, firePuyos, tracker.result());
 }
 
 static inline void simulateInternal(CoreField* f, const CoreField& original,
                                     const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                                    RensaDetector::VanishingPositionPossibleRensaCallback callback)
+                                    const RensaDetector::VanishingPositionPossibleRensaCallback& callback)
 {
     CoreField::SimulationContext context = CoreField::SimulationContext::fromField(original);
-    RensaVanishingPositionResult rensaVanishingPositionResult;
-    RensaVanishingPositionTracker tracker(&rensaVanishingPositionResult);
+    RensaVanishingPositionTracker tracker;
     RensaResult rensaResult = f->simulate(&context, &tracker);
     if (rensaResult.chains > 0)
-        callback(*f, rensaResult, keyPuyos, firePuyos, rensaVanishingPositionResult);
+        callback(*f, rensaResult, keyPuyos, firePuyos, tracker.result());
 }
 
 template<typename Callback>
@@ -549,7 +538,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
                                        int restAdded,
                                        PurposeForFindingRensa purpose,
                                        const RensaDetectorStrategy& strategy,
-                                       Callback callback)
+                                       const Callback& callback)
 {
     auto findRensaCallback = [&originalField, &keyPuyos, &callback](CoreField* f, const ColumnPuyoList& firePuyos) {
         simulateInternal(f, originalField, keyPuyos, firePuyos, callback);
@@ -588,7 +577,7 @@ static void findPossibleRensasInternal(const CoreField& originalField,
 void RensaDetector::iteratePossibleRensas(const CoreField& field,
                                           int maxKeyPuyos,
                                           const RensaDetectorStrategy& strategy,
-                                          RensaDetector::PossibleRensaCallback callback)
+                                          const RensaDetector::RensaCallback& callback)
 {
     ColumnPuyoList puyoList;
     findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, callback);
@@ -597,7 +586,7 @@ void RensaDetector::iteratePossibleRensas(const CoreField& field,
 void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& field,
                                                       int maxKeyPuyos,
                                                       const RensaDetectorStrategy& strategy,
-                                                      RensaDetector::TrackedPossibleRensaCallback callback)
+                                                      const RensaDetector::TrackedPossibleRensaCallback& callback)
 {
     ColumnPuyoList puyoList;
     findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, callback);
@@ -606,7 +595,7 @@ void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& field,
 void RensaDetector::iteratePossibleRensasWithCoefTracking(const CoreField& field,
                                                           int maxKeyPuyos,
                                                           const RensaDetectorStrategy& strategy,
-                                                          RensaDetector::CoefPossibleRensaCallback callback)
+                                                          const RensaDetector::CoefPossibleRensaCallback& callback)
 {
     ColumnPuyoList puyoList;
     findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, callback);
@@ -615,7 +604,7 @@ void RensaDetector::iteratePossibleRensasWithCoefTracking(const CoreField& field
 void RensaDetector::iteratePossibleRensasWithVanishingPositionTracking(const CoreField& field,
                                                                        int maxKeyPuyos,
                                                                        const RensaDetectorStrategy& strategy,
-                                                                       RensaDetector::VanishingPositionPossibleRensaCallback callback)
+                                                                       const RensaDetector::VanishingPositionPossibleRensaCallback& callback)
 {
     ColumnPuyoList puyoList;
     findPossibleRensasInternal(field, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, callback);
@@ -665,9 +654,9 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
             if (!f.dropPuyoListWithMaxHeight(firstRensaFirePuyos, maxHeight))
                 return;
 
-            RensaTrackResult combinedTrackResult;
-            RensaTracker tracker(&combinedTrackResult);
+            RensaTracker tracker;
             RensaResult combinedRensaResult = f.simulate(&context, &tracker);
+            const RensaTrackResult& combinedTrackResult = tracker.result();
 
             if (combinedRensaResult.chains != currentTotalChains + rensaResult.chains) {
                 // Rensa looks broken. We don't count such rensa.
@@ -705,7 +694,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& originalField,
 void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalField,
                                                      int maxIteration,
                                                      const RensaDetectorStrategy& strategy,
-                                                     TrackedPossibleRensaCallback callback)
+                                                     const TrackedPossibleRensaCallback& callback)
 {
     DCHECK_LE(1, maxIteration);
 

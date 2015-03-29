@@ -308,9 +308,10 @@ TEST(CoreFieldTest, TrackedCoreFieldSimulation)
                 "556774");
 
 
-    RensaTrackResult trackResult;
-    RensaTracker tracker(&trackResult);
+    RensaTracker tracker;
     RensaResult basicRensaResult = f.simulate(&tracker);
+
+    const RensaTrackResult& trackResult = tracker.result();
 
     EXPECT_EQ(5, basicRensaResult.chains);
     EXPECT_EQ(1, trackResult.erasedAt(1, 2));
@@ -327,9 +328,10 @@ TEST(CoreFieldTest, simualteWithRensaCoefResult)
                 "RRGBBY"
                 "GGBYYR");
 
-    RensaCoefResult coefResult;
-    RensaCoefTracker tracker(&coefResult);
+    RensaCoefTracker tracker;
     RensaResult rensaResult = f.simulate(&tracker);
+
+    const RensaCoefResult& coefResult = tracker.result();
 
     EXPECT_EQ(5, rensaResult.chains);
     EXPECT_EQ(4, coefResult.numErased(1));
@@ -355,9 +357,10 @@ TEST(CoreFieldTest, simualteWithRensaVanishingPositionResult)
                 "RRGRRB"
                 "GGRBBR");
 
-    RensaVanishingPositionResult positionResult;
-    RensaVanishingPositionTracker tracker(&positionResult);
+    RensaVanishingPositionTracker tracker;
     RensaResult rensaResult = f.simulate(&tracker);
+
+    const RensaVanishingPositionResult& positionResult = tracker.result();
 
     EXPECT_EQ(7, rensaResult.chains);
     EXPECT_EQ(7, positionResult.size());

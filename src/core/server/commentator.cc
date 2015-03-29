@@ -161,7 +161,7 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
     {
         CoreField f(field);
         unique_ptr<TrackedPossibleRensaInfo> track(new TrackedPossibleRensaInfo);
-        RensaTracker tracker(&track->trackResult);
+        RensaPtrTracker tracker(&track->trackResult);
         track->rensaResult = f.simulate(&tracker);
         if (track->rensaResult.score > 0) {
             lock_guard<mutex> lock(mu_);

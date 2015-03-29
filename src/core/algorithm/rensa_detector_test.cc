@@ -77,7 +77,7 @@ TEST(RensaDetectorTest, detect1)
     EXPECT_TRUE(found[4]);
 }
 
-TEST(RensaDetectorTest, detectSingleDrop1)
+TEST(RensaDetectorTest, detectDrop1)
 {
     CoreField f(
         ".R...."
@@ -104,8 +104,11 @@ TEST(RensaDetectorTest, detectSingleDrop1)
         "RGYGB.");
 
     bool found = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos,
+                        const ColumnPuyoList& firePuyos) {
         CoreField actual(f);
+        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
         EXPECT_TRUE(actual.dropPuyoList(firePuyos));
 
         if (actual == expected) {
@@ -114,11 +117,11 @@ TEST(RensaDetectorTest, detectSingleDrop1)
     };
 
     RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 2, false);
-    RensaDetector::detectSingle(f, strategy, callback);
+    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
     EXPECT_TRUE(found);
 }
 
-TEST(RensaDetectorTest, detectSingleExtend1)
+TEST(RensaDetectorTest, detectExtend1)
 {
     CoreField f(
         "..RRR.");
@@ -141,8 +144,11 @@ TEST(RensaDetectorTest, detectSingleExtend1)
 
     bool found[5] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos,
+                        const ColumnPuyoList& firePuyos) {
         CoreField actual(f);
+        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
         EXPECT_TRUE(actual.dropPuyoList(firePuyos));
 
         bool ok = false;
@@ -159,7 +165,7 @@ TEST(RensaDetectorTest, detectSingleExtend1)
     };
 
     RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 1, false);
-    RensaDetector::detectSingle(f, strategy, callback);
+    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
     EXPECT_FALSE(unexpectedFound);
     EXPECT_TRUE(found[0]);
     EXPECT_TRUE(found[1]);
@@ -168,7 +174,7 @@ TEST(RensaDetectorTest, detectSingleExtend1)
     EXPECT_TRUE(found[4]);
 }
 
-TEST(RensaDetectorTest, detectSingleExtend2)
+TEST(RensaDetectorTest, detectExtend2)
 {
     CoreField f(
         "...R.."
@@ -192,8 +198,11 @@ TEST(RensaDetectorTest, detectSingleExtend2)
 
     bool found[4] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos,
+                        const ColumnPuyoList& firePuyos) {
         CoreField actual(f);
+        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
         EXPECT_TRUE(actual.dropPuyoList(firePuyos));
 
         bool ok = false;
@@ -210,7 +219,7 @@ TEST(RensaDetectorTest, detectSingleExtend2)
     };
 
     RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 1, false);
-    RensaDetector::detectSingle(f, strategy, callback);
+    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
     EXPECT_FALSE(unexpectedFound);
     EXPECT_TRUE(found[0]);
     EXPECT_TRUE(found[1]);
@@ -218,7 +227,7 @@ TEST(RensaDetectorTest, detectSingleExtend2)
     EXPECT_TRUE(found[3]);
 }
 
-TEST(RensaDetectorTest, detectSingleExtend3)
+TEST(RensaDetectorTest, detectExtend3)
 {
     CoreField f(
         "...R.."
@@ -239,8 +248,11 @@ TEST(RensaDetectorTest, detectSingleExtend3)
 
     bool found[2] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos,
+                        const ColumnPuyoList& firePuyos) {
         CoreField actual(f);
+        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
         EXPECT_TRUE(actual.dropPuyoList(firePuyos));
 
         bool ok = false;
@@ -257,13 +269,13 @@ TEST(RensaDetectorTest, detectSingleExtend3)
     };
 
     RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 1, false);
-    RensaDetector::detectSingle(f, strategy, callback);
+    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
     EXPECT_FALSE(unexpectedFound);
     EXPECT_TRUE(found[0]);
     EXPECT_TRUE(found[1]);
 }
 
-TEST(RensaDetectorTest, detectSingleExtend4)
+TEST(RensaDetectorTest, detectExtend4)
 {
     CoreField f(
         "..RR.."
@@ -296,8 +308,11 @@ TEST(RensaDetectorTest, detectSingleExtend4)
 
     bool found[N] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos,
+                        const ColumnPuyoList& firePuyos) {
         CoreField actual(f);
+        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
         EXPECT_TRUE(actual.dropPuyoList(firePuyos));
 
         bool ok = false;
@@ -314,13 +329,13 @@ TEST(RensaDetectorTest, detectSingleExtend4)
     };
 
     RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 2, false);
-    RensaDetector::detectSingle(f, strategy, callback);
+    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
     EXPECT_FALSE(unexpectedFound);
     for (size_t i = 0; i < N; ++i)
         EXPECT_TRUE(found[i]) << i;
 }
 
-TEST(RensaDetectorTest, detectSingleExtend5)
+TEST(RensaDetectorTest, detectExtend5)
 {
     CoreField f(
         "..R..."
@@ -370,8 +385,11 @@ TEST(RensaDetectorTest, detectSingleExtend5)
 
     bool found[N] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField&, const RensaResult&,
+                        const ColumnPuyoList& keyPuyos,
+                        const ColumnPuyoList& firePuyos) {
         CoreField actual(f);
+        EXPECT_TRUE(actual.dropPuyoList(keyPuyos));
         EXPECT_TRUE(actual.dropPuyoList(firePuyos));
 
         bool ok = false;
@@ -390,7 +408,7 @@ TEST(RensaDetectorTest, detectSingleExtend5)
     };
 
     RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 3, false);
-    RensaDetector::detectSingle(f, strategy, callback);
+    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
     EXPECT_FALSE(unexpectedFound);
     for (size_t i = 0; i < N; ++i)
         EXPECT_TRUE(found[i]) << i;

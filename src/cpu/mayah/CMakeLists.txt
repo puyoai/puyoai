@@ -47,3 +47,4 @@ mayah_add_test(mayah_ai_situation_test)
 mayah_add_test(pattern_rensa_detector_test)
 
 mayah_add_test(mayah_ai_performance_test 1)
+mayah_add_test(gazer_performance_test 1)
