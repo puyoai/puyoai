@@ -88,6 +88,8 @@ public:
     bool dropPuyoOn(int x, PuyoColor pc) { return dropPuyoOnWithMaxHeight(x, pc, 13); }
     bool dropPuyoOnWithMaxHeight(int x, PuyoColor, int maxHeight);
 
+    // Drop all puyos in |cpl|. If failed, false will be returned. In that case, the CoreField
+    // might be corrupted, so you cannot use this CoreField.
     bool dropPuyoList(const ColumnPuyoList& cpl) { return dropPuyoListWithMaxHeight(cpl, 13); }
     bool dropPuyoListWithMaxHeight(const ColumnPuyoList&, int maxHeight);
 
@@ -104,6 +106,9 @@ public:
     // simulation
 
     // SimulationContext can be used when we continue simulation from the intermediate points.
+    // SimulationContext has the current chain and the minimam height to check the rensa.
+    // We check only the (x, y) puyos where minHeights[x] <= y <= height(x) to reduce
+    // the number of puyos to check.
     struct SimulationContext {
         explicit SimulationContext(int currentChain = 1) : currentChain(currentChain) {}
         SimulationContext(int currentChain, std::initializer_list<int> list) :
