@@ -46,6 +46,7 @@ DropDecision Ai::think(int frame_id,
   using namespace std::placeholders;
 
   Control control;
+  control.score = -10000;
   auto evaluate = std::bind(Ai::Evaluate, _1, attack_.get(), &control);
   Plan::iterateAvailablePlans(field, seq, 2, evaluate);
 
@@ -96,7 +97,7 @@ int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
 int ScoreDiffHeight(int higher, int lower) {
   int diff = higher - lower;
   diff = diff * diff;
-  return ((higher > lower) ? diff : -diff) * 3;
+  return ((higher > lower) ? 0 : -diff) * 50;
 }
 
 int FieldEvaluate(const CoreField& field) {
@@ -158,6 +159,10 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
     }
   }
 
+  value = FieldEvaluate(plan.field());
+  oss << "Field(" << value << ")";
+  score += value;
+
   if (plan.isRensaPlan()) {
     const int kAcceptablePuyo = 6;
     if (attack &&
@@ -182,10 +187,6 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
       oss << "Zenkeshi(" << value << ")";
       score += value;
     }
-  } else {
-    value = FieldEvaluate(plan.field());
-    oss << "Field(" << value << ")";
-    score += value;
   }
 
   LOG(INFO) << score << " " << oss.str();

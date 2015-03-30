@@ -11,7 +11,7 @@ THRESH: 3    # この個数以上合わないと評価しない
 ----
 NAME: GTR-Head
 SCORE: 1400
-MAX: 20
+MAX: 30
 ....DD
 ...CBA
 ...BAA
@@ -19,7 +19,7 @@ MAX: 20
 ----
 NAME: GTR-Head2
 SCORE: 1500
-MAX: 20
+MAX: 30
 .....A
 .....D
 .....D
@@ -35,7 +35,8 @@ MAX: 8
 ----
 NAME: Begin2
 SCORE: 500
-MAX: 8
+MAX: 6
+DIFF: AC
 ..C...
 ABB...
 ----
@@ -46,7 +47,7 @@ CAA...
 CBB...
 ----
 NAME: Begin4
-SCORE: 500
+SCORE: 450
 MAX: 8
 CA....
 CB....
