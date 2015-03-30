@@ -1,5 +1,6 @@
 name = "tsubushi"
 
+[me]
 field = [
     "R.....",
     "B.....",
@@ -13,7 +14,8 @@ field = [
 ]
 next = "RBYGGB"
 
-enemy_field = [
+[enemy]
+field = [
     "BOOOOO",
     "ROOOOO",
     "BGOOOO",
@@ -25,8 +27,9 @@ enemy_field = [
     "RBYGYG",
     "RBYGYG",
 ]
-enemy_next = "YYYYYY"
+next = "YYYYYY"
 
+[answer]
 answers = [
     [2, 0]
 ]

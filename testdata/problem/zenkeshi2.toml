@@ -1,11 +1,14 @@
 name = "ZENKESHI-2"
 
+[me]
 field = []
 next = "RRRRRR"
 
-enemy_field = []
-enemy_next = "RRRRRR"
+[enemy]
+field = []
+next = "RRRRRR"
 
+[answer]
 answers = [
     [3, 2]
 ]

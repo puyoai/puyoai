@@ -1,5 +1,6 @@
 name = "GTR3"
 
+[me]
 field = [
     "Y.....",
     "G.....",
@@ -9,9 +10,11 @@ field = [
 ]
 next = "GRGYRR"
 
-enemy_field = []
-enemy_next = "RRBBYYGG"
+[enemy]
+field = []
+next = "RRBBYYGG"
 
+[answer]
 answers = [
     [3, 2]
 ]

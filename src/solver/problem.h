@@ -5,16 +5,24 @@
 #include <set>
 #include <string>
 
+#include <toml/toml.h>
+
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/kumipuyo_seq.h"
 
+struct PlayerSituation {
+    CoreField field;
+    KumipuyoSeq kumipuyoSeq;
+};
+
 struct Problem {
     static Problem readProblem(const std::string& filename);
+    static Problem parse(const toml::Value&);
 
     std::string name;
-    CoreField field[2];
-    KumipuyoSeq kumipuyoSeq[2];
+    PlayerSituation mySituation;
+    PlayerSituation enemySituation;
     std::set<Decision> answers;
 };
 
