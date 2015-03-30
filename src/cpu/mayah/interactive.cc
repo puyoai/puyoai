@@ -41,11 +41,11 @@ Problem makeProblem()
         problem = Problem::readProblem(FLAGS_problem);
 
         // Add generated sequence after problem.
-        problem.kumipuyoSeq[0].append(generated);
-        problem.kumipuyoSeq[1].append(generated);
+        problem.mySituation.kumipuyoSeq.append(generated);
+        problem.enemySituation.kumipuyoSeq.append(generated);
     } else {
-        problem.kumipuyoSeq[0] = generated;
-        problem.field[1] = CoreField(
+        problem.mySituation.kumipuyoSeq = generated;
+        problem.enemySituation.field = CoreField(
             "5...65"
             "4...66"
             "545645"
@@ -56,8 +56,8 @@ Problem makeProblem()
             "456456"
             "456456"
             "456456");
-        problem.kumipuyoSeq[1] = KumipuyoSeq("666666");
-        problem.kumipuyoSeq[1].append(generated);
+        problem.enemySituation.kumipuyoSeq = KumipuyoSeq("666666");
+        problem.enemySituation.kumipuyoSeq.append(generated);
     }
 
     return problem;
@@ -86,13 +86,13 @@ int main(int argc, char* argv[])
     ai.gameWillBegin(req);
 
     req.frameId = 2;
-    req.playerFrameRequest[0].field = problem.field[0];
-    req.playerFrameRequest[1].field = problem.field[1];
-    req.playerFrameRequest[0].kumipuyoSeq = problem.kumipuyoSeq[0];
-    req.playerFrameRequest[1].kumipuyoSeq = problem.kumipuyoSeq[1];
+    req.playerFrameRequest[0].field = problem.mySituation.field;
+    req.playerFrameRequest[1].field = problem.enemySituation.field;
+    req.playerFrameRequest[0].kumipuyoSeq = problem.mySituation.kumipuyoSeq;
+    req.playerFrameRequest[1].kumipuyoSeq = problem.enemySituation.kumipuyoSeq;
 
-    ai.mutableEnemyPlayerState()->field = problem.field[1];
-    ai.mutableEnemyPlayerState()->seq = problem.kumipuyoSeq[1];
+    ai.mutableEnemyPlayerState()->field = problem.enemySituation.field;
+    ai.mutableEnemyPlayerState()->seq = problem.enemySituation.kumipuyoSeq;
 
     for (int i = 0; i < 50; ++i) {
         // frameId 1 will be used for initializing now. Let's avoid it.

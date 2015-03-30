@@ -18,22 +18,22 @@ Decision Solver::solve(const Problem& problem)
     ai_->gameWillBegin(req);
 
     req.frameId = 2;
-    req.playerFrameRequest[0].field = problem.field[0];
-    req.playerFrameRequest[1].field = problem.field[1];
-    req.playerFrameRequest[0].kumipuyoSeq = problem.kumipuyoSeq[0];
-    req.playerFrameRequest[1].kumipuyoSeq = problem.kumipuyoSeq[1];
+    req.playerFrameRequest[0].field = problem.mySituation.field;
+    req.playerFrameRequest[1].field = problem.enemySituation.field;
+    req.playerFrameRequest[0].kumipuyoSeq = problem.mySituation.kumipuyoSeq;
+    req.playerFrameRequest[1].kumipuyoSeq = problem.enemySituation.kumipuyoSeq;
 
     // TODO(mayah): Consider adding an interface to set situation.
-    ai_->me_.field = problem.field[0];
-    ai_->me_.seq = problem.kumipuyoSeq[0];
-    ai_->enemy_.field = problem.field[1];
-    ai_->enemy_.seq = problem.kumipuyoSeq[1];
+    ai_->me_.field = problem.mySituation.field;
+    ai_->me_.seq = problem.mySituation.kumipuyoSeq;
+    ai_->enemy_.field = problem.enemySituation.field;
+    ai_->enemy_.seq = problem.enemySituation.kumipuyoSeq;
 
-    ai_->gaze(req.frameId, CoreField(problem.field[1]), problem.kumipuyoSeq[1]);
+    ai_->gaze(req.frameId, CoreField(problem.enemySituation.field), problem.enemySituation.kumipuyoSeq);
 
     DropDecision dd = ai_->think(3,
-                                 problem.field[0],
-                                 problem.kumipuyoSeq[0],
+                                 problem.mySituation.field,
+                                 problem.mySituation.kumipuyoSeq,
                                  ai_->myPlayerState(),
                                  ai_->enemyPlayerState(),
                                  false);

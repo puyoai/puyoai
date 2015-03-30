@@ -1,5 +1,6 @@
 name = "fire because large enough"
 
+[me]
 field = [
       ".....B",
       "....BB",
@@ -10,9 +11,11 @@ field = [
 ]
 next = "RYGGRR"
 
-enemy_field = []
-enemy_next = "RRYYGG"
+[enemy]
+field = []
+next = "RRYYGG"
 
+[answer]
 answers = [
     [1, 0],
     [1, 1],
