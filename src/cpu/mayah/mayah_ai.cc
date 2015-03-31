@@ -87,8 +87,6 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 {
     double beginTime = currentTime();
 
-    EvaluationMode mode = calculateMode(me, enemy);
-    LOG(INFO) << "mode = " << toString(mode);
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
     if (VLOG_IS_ON(1)) {
         VLOG(1) << "\n"
@@ -135,7 +133,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
         if (specifiedDecisions && plan.decisions() != *specifiedDecisions)
             return;
 
-        EvalResult evalResult = eval(mode, plan, field, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
+        EvalResult evalResult = eval(plan, field, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
         VLOG(1) << toString(plan.decisions())
                 << ": eval=" << evalResult.score()
@@ -189,7 +187,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
         }
 
         // --- Proceed the evaluation for the rest hands.
-        MidEvalResult midEvalResult = midEval(mode, rp1, field, frameId, maxIteration, me, enemy, preEvalResult, gazeResult);
+        MidEvalResult midEvalResult = midEval(rp1, field, frameId, maxIteration, me, enemy, preEvalResult, gazeResult);
 
         Plan p = rp1.toPlan();
         KumipuyoSeq seq(kumipuyoSeq);
@@ -225,14 +223,14 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     double endTime = currentTime();
     if (bestVirtualRensaScore < bestRensaScore) {
-        std::string message = makeMessageFrom(mode, frameId, field, kumipuyoSeq, maxIteration,
+        std::string message = makeMessageFrom(frameId, field, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               preEvalResult, bestRensaMidEvalResult, gazeResult,
                                               bestRensaPlan, bestRensaScore, bestVirtualRensaScore,
                                               true, endTime - beginTime);
         return ThoughtResult(bestRensaPlan, bestRensaScore, bestVirtualRensaScore, bestRensaMidEvalResult, message);
     } else {
-        std::string message = makeMessageFrom(mode, frameId, field, kumipuyoSeq, maxIteration,
+        std::string message = makeMessageFrom(frameId, field, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               preEvalResult, bestMidEvalResult, gazeResult,
                                               bestPlan, bestRensaScore, bestVirtualRensaScore,
@@ -241,32 +239,13 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     }
 }
 
-EvaluationMode MayahAI::calculateMode(const PlayerState& me, const PlayerState& enemy) const
-{
-    const int EARLY_THRESHOLD = 24;
-    const int EARLY_MIDDLE_THRESHOLD = 36;
-    const int MIDDLE_THRESHOLD = 54;
-
-    if (enemy.field.isZenkeshi())
-        return EvaluationMode::ENEMY_HAS_ZENKESHI;
-
-    int count = me.field.countPuyos();
-    if (count <= EARLY_THRESHOLD)
-        return EvaluationMode::EARLY;
-    if (count <= EARLY_MIDDLE_THRESHOLD)
-        return EvaluationMode::EARLY_MIDDLE;
-    if (count <= MIDDLE_THRESHOLD)
-        return EvaluationMode::MIDDLE;
-    return EvaluationMode::LATE;
-}
-
 PreEvalResult MayahAI::preEval(const CoreField& currentField) const
 {
     PreEvaluator preEvaluator(patternBook_);
     return preEvaluator.preEval(currentField);
 }
 
-MidEvalResult MayahAI::midEval(EvaluationMode mode, const RefPlan& plan, const CoreField& currentField,
+MidEvalResult MayahAI::midEval(const RefPlan& plan, const CoreField& currentField,
                                int currentFrameId, int maxIteration,
                                const PlayerState& me,
                                const PlayerState& enemy,
@@ -274,7 +253,7 @@ MidEvalResult MayahAI::midEval(EvaluationMode mode, const RefPlan& plan, const C
                                const GazeResult& gazeResult) const
 
 {
-    NormalScoreCollector sc(evaluationParameterMap_.parameter(mode));
+    NormalScoreCollector sc(evaluationParameterMap_);
     Evaluator<NormalScoreCollector> evaluator(patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), gazeResult);
 
@@ -282,22 +261,21 @@ MidEvalResult MayahAI::midEval(EvaluationMode mode, const RefPlan& plan, const C
     return midEvaluator.eval(plan, currentField, sc.score());
 }
 
-EvalResult MayahAI::eval(EvaluationMode mode, const RefPlan& plan, const CoreField& currentField,
+EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
                          int currentFrameId, int maxIteration,
                          const PlayerState& me, const PlayerState& enemy,
                          const PreEvalResult& preEvalResult,
                          const MidEvalResult& midEvalResult,
                          const GazeResult& gazeResult) const
 {
-    NormalScoreCollector sc(evaluationParameterMap_.parameter(mode));
+    NormalScoreCollector sc(evaluationParameterMap_);
     Evaluator<NormalScoreCollector> evaluator(patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     return EvalResult(sc.score(), sc.estimatedRensaScore());
 }
 
-CollectedFeature MayahAI::evalWithCollectingFeature(EvaluationMode mode,
-                                                    const RefPlan& plan, const CoreField& currentField,
+CollectedFeature MayahAI::evalWithCollectingFeature(const RefPlan& plan, const CoreField& currentField,
                                                     int currentFrameId, int maxIteration,
                                                     const PlayerState& me,
                                                     const PlayerState& enemy,
@@ -305,14 +283,13 @@ CollectedFeature MayahAI::evalWithCollectingFeature(EvaluationMode mode,
                                                     const MidEvalResult& midEvalResult,
                                                     const GazeResult& gazeResult) const
 {
-    FeatureScoreCollector sc(evaluationParameterMap_.parameter(mode));
+    FeatureScoreCollector sc(evaluationParameterMap_);
     Evaluator<FeatureScoreCollector> evaluator(patternBook_, &sc);
     evaluator.collectScore(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
     return sc.toCollectedFeature();
 }
 
-std::string MayahAI::makeMessageFrom(EvaluationMode mode,
-                                     int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
+std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
                                      const PlayerState& me, const PlayerState& enemy,
                                      const PreEvalResult& preEvalResult, const MidEvalResult& midEvalResult,
                                      const GazeResult& gazeResult,
@@ -325,10 +302,10 @@ std::string MayahAI::makeMessageFrom(EvaluationMode mode,
         return string("give up :-(");
 
     RefPlan refPlan(plan);
-    CollectedFeature cf = evalWithCollectingFeature(mode, refPlan, field, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
+    CollectedFeature cf = evalWithCollectingFeature(refPlan, field, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     stringstream ss;
-    ss << "MODE = " << toString(mode) << " / ";
+    ss << "MODE = " << toString(cf.mode()) << " / ";
     if (cf.feature(STRATEGY_ZENKESHI) > 0 || cf.feature(STRATEGY_INITIAL_ZENKESHI) > 0)
         ss << "ZENKESHI / ";
     if (cf.feature(STRATEGY_KILL) > 0)

@@ -13,13 +13,15 @@
 class CollectedFeature {
 public:
     CollectedFeature() {}
-    CollectedFeature(double score,
+    CollectedFeature(EvaluationMode mode,
+                     double score,
                      std::string bookName,
                      std::map<EvaluationFeatureKey, double> collectedFeatures,
                      std::map<EvaluationSparseFeatureKey,
                      std::vector<int>> collectedSparseFeatures,
                      const ColumnPuyoList& rensaKeyPuyos,
                      const ColumnPuyoList& rensaFirePuyos) :
+        mode_(mode),
         score_(score),
         bookName_(bookName),
         collectedFeatures_(std::move(collectedFeatures)),
@@ -29,6 +31,7 @@ public:
     {
     }
 
+    EvaluationMode mode() const { return mode_; }
     double score() const { return score_; }
     double feature(EvaluationFeatureKey key) const
     {
@@ -53,7 +56,7 @@ public:
     const ColumnPuyoList& rensaFirePuyos() const { return rensaFirePuyos_; }
 
     std::string toString() const;
-    std::string toStringComparingWith(const CollectedFeature&, const EvaluationParameter&) const;
+    std::string toStringComparingWith(const CollectedFeature&, const EvaluationParameterMap&) const;
 
 private:
     static const std::vector<int>& emptyVector()
@@ -62,6 +65,7 @@ private:
         return vs;
     }
 
+    EvaluationMode mode_;
     double score_ = 0.0;
     std::string bookName_;
     std::map<EvaluationFeatureKey, double> collectedFeatures_;
@@ -73,13 +77,28 @@ private:
 // This collector collects score and bookname.
 class NormalScoreCollector {
 public:
-    explicit NormalScoreCollector(const EvaluationParameter& param) : param_(param) {}
+    explicit NormalScoreCollector(const EvaluationParameterMap& paramMap) :
+        paramMap_(paramMap),
+        scoreMap_ {}
+    {}
 
-    void addScore(EvaluationFeatureKey key, double v) { score_ += param_.score(key, v); }
-    void addScore(EvaluationSparseFeatureKey key, int idx, int n) { score_ += param_.score(key, idx, n); }
+    void addScore(EvaluationFeatureKey key, double v)
+    {
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            scoreMap_[ordinal(mode)] += paramMap_.parameter(mode).score(key, v);
+        }
+    }
+    void addScore(EvaluationSparseFeatureKey key, int idx, int n)
+    {
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            scoreMap_[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
+        }
+    }
     void merge(const NormalScoreCollector& sc)
     {
-        score_ += sc.score();
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            scoreMap_[ordinal(mode)] += sc.scoreMap_[ordinal(mode)];
+        }
         if (bookName_.empty())
             bookName_ = sc.bookName();
     }
@@ -87,8 +106,12 @@ public:
     void setBookName(const std::string& bookName) { bookName_ = bookName; }
     std::string bookName() const { return bookName_; }
 
-    double score() const { return score_; }
-    const EvaluationParameter& evaluationParameter() const { return param_; }
+    double score() const { return scoreMap_[ordinal(mode_)]; }
+    EvaluationMode mode() const { return mode_; }
+
+    const EvaluationParameterMap& evaluationParameterMap() const { return paramMap_; }
+
+    void setMode(EvaluationMode m) { mode_ = m; }
 
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }
@@ -97,8 +120,9 @@ public:
     void setRensaFirePuyos(const ColumnPuyoList&) {}
 
 private:
-    const EvaluationParameter& param_;
-    double score_ = 0.0;
+    const EvaluationParameterMap& paramMap_;
+    std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> scoreMap_; // score of each mode.
+    EvaluationMode mode_ = EvaluationMode::DEFAULT;
     int estimatedRensaScore_ = 0;
     std::string bookName_;
 };
@@ -106,7 +130,7 @@ private:
 // This collector collects all features.
 class FeatureScoreCollector {
 public:
-    FeatureScoreCollector(const EvaluationParameter& param) : collector_(param) {}
+    FeatureScoreCollector(const EvaluationParameterMap& paramMap) : collector_(paramMap) {}
 
     void addScore(EvaluationFeatureKey key, double v)
     {
@@ -140,7 +164,10 @@ public:
     std::string bookName() const { return collector_.bookName(); }
 
     double score() const { return collector_.score(); }
-    const EvaluationParameter& evaluationParameter() const { return collector_.evaluationParameter(); }
+    const EvaluationParameterMap& evaluationParameterMap() const { return collector_.evaluationParameterMap(); }
+
+    EvaluationMode mode() const { return collector_.mode(); }
+    void setMode(EvaluationMode mode) { collector_.setMode(mode); }
 
     void setEstimatedRensaScore(int s) { collector_.setEstimatedRensaScore(s); }
     int estimatedRensaScore() const { return collector_.estimatedRensaScore(); }
@@ -150,6 +177,7 @@ public:
 
     CollectedFeature toCollectedFeature() const {
         return CollectedFeature {
+            mode(),
             score(),
             bookName(),
             collectedFeatures_,

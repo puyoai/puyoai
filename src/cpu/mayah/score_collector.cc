@@ -24,7 +24,7 @@ string CollectedFeature::toString() const
     return ss.str();
 }
 
-string CollectedFeature::toStringComparingWith(const CollectedFeature& cf, const EvaluationParameter& param) const
+string CollectedFeature::toStringComparingWith(const CollectedFeature& cf, const EvaluationParameterMap& paramMap) const
 {
     set<EvaluationFeatureKey> keys;
     for (const auto& entry : collectedFeatures_) {
@@ -42,6 +42,9 @@ string CollectedFeature::toStringComparingWith(const CollectedFeature& cf, const
         sparseKeys.insert(entry.first);
     }
 
+    const EvaluationParameter& param = paramMap.parameter(mode());
+    const EvaluationParameter& cfparam = paramMap.parameter(cf.mode());
+
     stringstream ss;
     ss << setw(30) << "WHOLE SCORE" << " = "
        << setw(15) << fixed << setprecision(6) << score_ << "          : "
@@ -52,7 +55,7 @@ string CollectedFeature::toStringComparingWith(const CollectedFeature& cf, const
         ss << setw(12) << fixed << setprecision(3) << feature(key) << " ("
            << setw(9) << fixed << setprecision(3) << param.score(key, feature(key)) << ") : ";
         ss << setw(12) << fixed << setprecision(3) << cf.feature(key) << " ("
-           << setw(9) << fixed << setprecision(3) << param.score(key, cf.feature(key)) << ")";
+           << setw(9) << fixed << setprecision(3) << cfparam.score(key, cf.feature(key)) << ")";
         ss << endl;
     }
     for (EvaluationSparseFeatureKey key : sparseKeys) {
@@ -73,7 +76,7 @@ string CollectedFeature::toStringComparingWith(const CollectedFeature& cf, const
             stringstream st;
             for (int v : cf.feature(key)) {
                 st << " " << v;
-                d += param.score(key, v, 1);
+                d += cfparam.score(key, v, 1);
             }
             ss << setw(12) << st.str() << " ("
                << setw(9) << fixed << setprecision(3) << d << ")";
