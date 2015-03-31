@@ -168,14 +168,13 @@ int main(int argc, char* argv[])
                                                              ai.myPlayerState(), ai.enemyPlayerState(),
                                                              MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, &decisions);
 
-                EvaluationMode mode = ai.calculateMode(ai.myPlayerState(), ai.enemyPlayerState());
                 const PreEvalResult preEvalResult = ai.preEval(currentField);
                 CollectedFeature mycf = ai.evalWithCollectingFeature(
-                    mode, RefPlan(myThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
+                    RefPlan(myThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
                     ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, myThoughtResult.midEvalResult,
                     ai.gazer().gazeResult());
                 CollectedFeature aicf = ai.evalWithCollectingFeature(
-                    mode, RefPlan(aiThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
+                    RefPlan(aiThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
                     ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, aiThoughtResult.midEvalResult,
                     ai.gazer().gazeResult());
 
@@ -192,7 +191,7 @@ int main(int argc, char* argv[])
                     { myThoughtResult.plan.field(), aiThoughtResult.plan.field(), myTargetField, aiTargetField },
                     { seqToShow, seqToShow, KumipuyoSeq(), KumipuyoSeq() });
 
-                cout << mycf.toStringComparingWith(aicf, ai.evaluationParameter(mode)) << endl;
+                cout << mycf.toStringComparingWith(aicf, ai.evaluationParameterMap()) << endl;
                 cout << "MY: " << myThoughtResult.message << endl;
                 cout << "AI: " << aiThoughtResult.message << endl;
             }

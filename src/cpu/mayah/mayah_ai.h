@@ -59,23 +59,19 @@ public:
                             std::vector<Decision>* specifiedDecisions = nullptr) const;
 
 protected:
-    EvaluationMode calculateMode(const PlayerState& me, const PlayerState& enemy) const;
-
     PreEvalResult preEval(const CoreField& currentField) const;
-    MidEvalResult midEval(EvaluationMode mode, const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+    MidEvalResult midEval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
                           const PlayerState& me, const PlayerState& enemy,
                           const PreEvalResult&, const GazeResult&) const;
-    EvalResult eval(EvaluationMode mode, const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+    EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
                     const PlayerState& me, const PlayerState& enemy,
                     const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
     CollectedFeature evalWithCollectingFeature(
-        EvaluationMode mode,
         const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
         const PlayerState& me, const PlayerState& enemy,
         const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
 
-    std::string makeMessageFrom(EvaluationMode mode,
-                                int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration,
+    std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration,
                                 const PlayerState& me, const PlayerState& enemy,
                                 const PreEvalResult&, const MidEvalResult&, const GazeResult&,
                                 const Plan& plan, double rensaScore, double virutalRensaScore,
@@ -116,8 +112,6 @@ public:
     using MayahAI::myPlayerState;
     using MayahAI::enemyPlayerState;
     using MayahAI::evalWithCollectingFeature;
-
-    using MayahAI::calculateMode;
 
     using MayahAI::mutableMyPlayerState;
     using MayahAI::mutableEnemyPlayerState;

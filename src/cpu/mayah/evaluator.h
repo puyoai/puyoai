@@ -121,8 +121,7 @@ template<typename ScoreCollector>
 class Evaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    Evaluator(const PatternBook& patternBook,
-              ScoreCollector* sc) :
+    Evaluator(const PatternBook& patternBook, ScoreCollector* sc) :
         EvaluatorBase(patternBook),
         sc_(sc) {}
 
@@ -150,6 +149,8 @@ public:
     void evalCountPuyoFeature(const RefPlan& plan);
 
 private:
+    void calculateMode(const PlayerState& me, const PlayerState& enemy) const;
+
     ScoreCollector* sc_;
 };
 

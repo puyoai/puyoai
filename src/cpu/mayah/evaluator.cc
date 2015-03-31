@@ -534,6 +534,35 @@ void Evaluator<ScoreCollector>::evalMidEval(const MidEvalResult& midEvalResult)
 }
 
 template<typename ScoreCollector>
+void Evaluator<ScoreCollector>::calculateMode(const PlayerState& me, const PlayerState& enemy) const
+{
+    const int EARLY_THRESHOLD = 24;
+    const int EARLY_MIDDLE_THRESHOLD = 36;
+    const int MIDDLE_THRESHOLD = 54;
+
+    if (enemy.field.isZenkeshi()) {
+        sc_->setMode(EvaluationMode::ENEMY_HAS_ZENKESHI);
+        return;
+    }
+
+    int count = me.field.countPuyos();
+    if (count <= EARLY_THRESHOLD) {
+        sc_->setMode(EvaluationMode::EARLY);
+        return;
+    }
+    if (count <= EARLY_MIDDLE_THRESHOLD) {
+        sc_->setMode(EvaluationMode::EARLY_MIDDLE);
+        return;
+    }
+    if (count <= MIDDLE_THRESHOLD) {
+        sc_->setMode(EvaluationMode::MIDDLE);
+        return;
+    }
+
+    sc_->setMode(EvaluationMode::LATE);
+}
+
+template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreField& currentField,
                                              int currentFrameId, int maxIteration,
                                              const PlayerState& me,
@@ -542,6 +571,8 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                                              const MidEvalResult& midEvalResult,
                                              const GazeResult& gazeResult)
 {
+    calculateMode(me, enemy);
+
     const CoreField& fieldBeforeRensa = plan.field();
 
     evalMidEval(midEvalResult);
@@ -582,7 +613,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
                             const RensaChainTrackResult& trackResult) {
         ++rensaCounts[rensaResult.chains];
 
-        std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameter()));
+        std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameterMap()));
         RensaEvaluator<ScoreCollector> rensaEvaluator(patternBook(), rensaScoreCollector.get());
 
         rensaScoreCollector->setBookName(patternName);

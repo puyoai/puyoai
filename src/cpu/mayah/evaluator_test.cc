@@ -17,7 +17,7 @@ protected:
     {
         TsumoPossibility::initialize();
 
-        EvaluationParameter evaluationParameter;
+        EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
         Gazer gazer;
 
@@ -31,7 +31,7 @@ protected:
         RefPlan plan(f, decisions, rensaResult, 0, framesToIgnite, lastDropFrames);
 
         PreEvalResult preEvalResult = PreEvaluator(patternBook).preEval(f);
-        FeatureScoreCollector sc(evaluationParameter);
+        FeatureScoreCollector sc(evaluationParameterMap);
         Evaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
         evaluator.collectScore(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
         return sc.toCollectedFeature();
@@ -41,9 +41,9 @@ protected:
     CollectedFeature withEvaluator(F f) {
         TsumoPossibility::initialize();
 
-        EvaluationParameter evaluationParameter;
+        EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
-        FeatureScoreCollector sc(evaluationParameter);
+        FeatureScoreCollector sc(evaluationParameterMap);
         Evaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
 
         f(&evaluator);
@@ -55,9 +55,9 @@ protected:
     CollectedFeature withRensaEvaluator(F f) {
         TsumoPossibility::initialize();
 
-        EvaluationParameter evaluationParameter;
+        EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
-        FeatureScoreCollector sc(evaluationParameter);
+        FeatureScoreCollector sc(evaluationParameterMap);
         RensaEvaluator<FeatureScoreCollector> rensaEvaluator(patternBook, &sc);
 
         f(&rensaEvaluator);
@@ -72,9 +72,9 @@ TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
                 "R    R"
                 "YYYGGG");
 
-    EvaluationParameter param;
+    EvaluationParameterMap paramMap;
     PatternBook patternBook;
-    FeatureScoreCollector sc(param);
+    FeatureScoreCollector sc(paramMap);
     RensaEvaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
 
     evaluator.collectScoreForRensaGarbage(f);
