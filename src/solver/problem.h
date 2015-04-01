@@ -8,21 +8,17 @@
 #include <toml/toml.h>
 
 #include "core/core_field.h"
+#include "core/client/ai/player_state.h"
 #include "core/decision.h"
 #include "core/kumipuyo_seq.h"
-
-struct PlayerSituation {
-    CoreField field;
-    KumipuyoSeq kumipuyoSeq;
-};
 
 struct Problem {
     static Problem readProblem(const std::string& filename);
     static Problem parse(const toml::Value&);
 
     std::string name;
-    PlayerSituation mySituation;
-    PlayerSituation enemySituation;
+    PlayerState myState;
+    PlayerState enemyState;
     std::set<Decision> answers;
 };
 
