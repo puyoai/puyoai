@@ -173,7 +173,7 @@ void Evaluator<ScoreCollector>::evalFrameFeature(const RefPlan& plan)
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::collectScoreForConnection(const CoreField& field)
+void Evaluator<ScoreCollector>::evalConnection(const CoreField& field)
 {
     calculateConnection(sc_, field, CONNECTION_2, CONNECTION_3);
 }
@@ -512,7 +512,7 @@ void RensaEvaluator<ScoreCollector>::evalComplementationBias(const ColumnPuyoLis
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::collectScoreForRensaGarbage(const CoreField& fieldAfterDrop)
+void RensaEvaluator<ScoreCollector>::evalRensaGarbage(const CoreField& fieldAfterDrop)
 {
     sc_->addScore(NUM_GARBAGE_PUYOS, fieldAfterDrop.countPuyos());
     sc_->addScore(NUM_SIDE_GARBAGE_PUYOS, fieldAfterDrop.height(1) + fieldAfterDrop.height(6));
@@ -563,13 +563,13 @@ void Evaluator<ScoreCollector>::calculateMode(const PlayerState& me, const Playe
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreField& currentField,
-                                             int currentFrameId, int maxIteration,
-                                             const PlayerState& me,
-                                             const PlayerState& enemy,
-                                             const PreEvalResult& preEvalResult,
-                                             const MidEvalResult& midEvalResult,
-                                             const GazeResult& gazeResult)
+void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& currentField,
+                                     int currentFrameId, int maxIteration,
+                                     const PlayerState& me,
+                                     const PlayerState& enemy,
+                                     const PreEvalResult& preEvalResult,
+                                     const MidEvalResult& midEvalResult,
+                                     const GazeResult& gazeResult)
 {
     calculateMode(me, enemy);
 
@@ -584,7 +584,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         return;
 
     evalCountPuyoFeature(plan);
-    collectScoreForConnection(fieldBeforeRensa);
+    evalConnection(fieldBeforeRensa);
     evalRestrictedConnectionHorizontalFeature(fieldBeforeRensa);
     evalThirdColumnHeightFeature(plan);
     evalValleyDepth(fieldBeforeRensa);
@@ -638,7 +638,7 @@ void Evaluator<ScoreCollector>::collectScore(const RefPlan& plan, const CoreFiel
         necessaryPuyos.add(firePuyos);
 
         rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyos);
-        rensaEvaluator.collectScoreForRensaGarbage(fieldAfterRensa);
+        rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
         rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
         rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, enemy.hasZenkeshi);
         rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
