@@ -5,7 +5,10 @@
 
 #include "core/field_constant.h"
 
-// FieldBitField is a bitset whose size if the same as field.
+// FieldBitField is a bitset whose size is the same as field.
+//
+// For performance reason, this is an array of bool instead of std::bitset or something.
+// Converting a bit to bool is slow.
 class FieldBitField {
 public:
     FieldBitField() : field_{} {}

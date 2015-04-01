@@ -3,6 +3,7 @@
 
 #include "core/puyo_color.h"
 
+// ColumnPuyo is a pair of x-axis and PuyoColor.
 struct ColumnPuyo {
     ColumnPuyo() {}
     ColumnPuyo(int x, PuyoColor color) : x(x), color(color) {}
