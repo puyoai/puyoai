@@ -5,6 +5,16 @@
 
 #include "core/rensa_result.h"
 
+// RensaTracker tracks how rensa is vanished.
+// For example, a puyo is vanished in what-th chain, coefficient of each chain, etc.
+// You can pass a RensaTracker to CoreField::simulate() to track the rensa.
+// You can also define you own RensaTracker, and pass it to CoreField::simulate().
+//
+// RensaTracker must define several interface. CoreField::simulate() has several hook poinits
+// that calls the corresponding Tracker methods. If you'd like to add a new hook point,
+// you need to define a hook point in CoreField.
+
+// RensaNonTracker is a tracker that does not track anything.
 class RensaNonTracker {
 public:
     void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) { }
@@ -16,6 +26,7 @@ public:
 template<typename TrackResult>
 class RensaTracker;
 
+// RensaTracker<RensaChainTrackResult> tracks in what-th rensa a puyo is vanished.
 template<>
 class RensaTracker<RensaChainTrackResult> {
 public:

@@ -23,6 +23,8 @@ class FieldBitField;
 class Kumipuyo;
 struct Position;
 
+// CoreField represents a field. Without strong reason, this class should be used for
+// field implementation.
 class CoreField : public PlainField {
 public:
     CoreField() : heights_{} {}
@@ -30,6 +32,7 @@ public:
     explicit CoreField(const PlainField&);
     CoreField(const CoreField&) = default;
 
+    // Clears all puyos.
     void clear();
 
     // Returns the height of the specified column.
@@ -165,14 +168,19 @@ public:
 
     // Simulates chains. Returns RensaResult.
     RensaResult simulate(int initialChain = 1);
-    RensaResult simulate(SimulationContext* context);
+    // Simulates chains with SimulationContext.
+    RensaResult simulate(SimulationContext*);
+    // Simulates chains with Tracker. Tracker can track various rensa information.
+    // Several trackers are defined in core/rensa_trackers.h. You can define your own Tracker.
     template<typename Tracker>
-    RensaResult simulate(Tracker* tracker);
+    RensaResult simulate(Tracker*);
+    // Simualtes chains with SimulationContext and Tracker.
     template<typename Tracker>
     RensaResult simulate(SimulationContext*, Tracker*);
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
-    int vanishDrop(SimulationContext* context);
+    int vanishDrop(SimulationContext*);
+    // Vanishes the connected puyos with Tracker.
     template<typename Tracker>
     int vanishDrop(SimulationContext*, Tracker*);
 
