@@ -10,16 +10,20 @@
 #include "column_puyo.h"
 #include "core/puyo_color.h"
 
+// ColumnPuyoList is a list of PuyoColor for each column.
+// You can think this is a list of ColumnPuyo, however, the implementation is different.
 class ColumnPuyoList {
 public:
     ColumnPuyoList() : size_{} {}
 
+    // Returns the size of column |x|.
     int sizeOn(int x) const
     {
         DCHECK(1 <= x && x <= 6) << x;
         return size_[x-1];
     }
 
+    // Returns the |i|-th PuyoColor of column |x|
     PuyoColor get(int x, int i) const
     {
         DCHECK(1 <= x && x <= 6) << x;
@@ -32,6 +36,10 @@ public:
     void clear() { std::fill(size_, size_ + 6, 0); }
 
     bool add(const ColumnPuyo& cp) { return add(cp.x, cp.color); }
+
+    // Adds PuyoColor |c| to column |x|. Returns false if failed.
+    // TODO(mayah): If |c| is PuyoColor::EMPTY or PuyoColor::IRON, these are should be
+    // treated as a placeholder.
     bool add(int x, PuyoColor c)
     {
         DCHECK(1 <= x && x <= 6);
@@ -53,6 +61,7 @@ public:
 
     // Appends |cpl|. If the result size exceeds the max size, false will be returned.
     // When false is returned, the object does not change.
+    // TODO(mayah): This function should consider placeholders.
     bool merge(const ColumnPuyoList& cpl)
     {
         for (int i = 0; i < 6; ++i) {
@@ -74,6 +83,7 @@ public:
         size_[x-1] -= 1;
     }
 
+    // Calls |f| for each pair of (x, PuyoColor).
     template<typename Func>
     void iterate(Func f)
     {
