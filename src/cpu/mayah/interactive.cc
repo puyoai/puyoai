@@ -41,11 +41,11 @@ Problem makeProblem()
         problem = Problem::readProblem(FLAGS_problem);
 
         // Add generated sequence after problem.
-        problem.mySituation.kumipuyoSeq.append(generated);
-        problem.enemySituation.kumipuyoSeq.append(generated);
+        problem.myState.seq.append(generated);
+        problem.enemyState.seq.append(generated);
     } else {
-        problem.mySituation.kumipuyoSeq = generated;
-        problem.enemySituation.field = CoreField(
+        problem.myState.seq = generated;
+        problem.enemyState.field = CoreField(
             "5...65"
             "4...66"
             "545645"
@@ -56,8 +56,8 @@ Problem makeProblem()
             "456456"
             "456456"
             "456456");
-        problem.enemySituation.kumipuyoSeq = KumipuyoSeq("666666");
-        problem.enemySituation.kumipuyoSeq.append(generated);
+        problem.enemyState.seq = KumipuyoSeq("666666");
+        problem.enemyState.seq.append(generated);
     }
 
     return problem;
@@ -86,13 +86,15 @@ int main(int argc, char* argv[])
     ai.gameWillBegin(req);
 
     req.frameId = 2;
-    req.playerFrameRequest[0].field = problem.mySituation.field;
-    req.playerFrameRequest[1].field = problem.enemySituation.field;
-    req.playerFrameRequest[0].kumipuyoSeq = problem.mySituation.kumipuyoSeq;
-    req.playerFrameRequest[1].kumipuyoSeq = problem.enemySituation.kumipuyoSeq;
+    req.playerFrameRequest[0].field = problem.myState.field;
+    req.playerFrameRequest[1].field = problem.enemyState.field;
+    req.playerFrameRequest[0].kumipuyoSeq = problem.myState.seq;
+    req.playerFrameRequest[1].kumipuyoSeq = problem.enemyState.seq;
 
-    ai.mutableEnemyPlayerState()->field = problem.enemySituation.field;
-    ai.mutableEnemyPlayerState()->seq = problem.enemySituation.kumipuyoSeq;
+    ai.mutableMyPlayerState()->field = problem.myState.field;
+    ai.mutableMyPlayerState()->seq = problem.enemyState.seq;
+    ai.mutableEnemyPlayerState()->field = problem.enemyState.field;
+    ai.mutableEnemyPlayerState()->seq = problem.enemyState.seq;
 
     for (int i = 0; i < 50; ++i) {
         // frameId 1 will be used for initializing now. Let's avoid it.

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-bool parsePlayerSituation(const toml::Value& value, PlayerSituation* situation)
+bool parsePlayerState(const toml::Value& value, PlayerState* state)
 {
     {
         const toml::Value* field = value.find("field");
@@ -17,12 +17,12 @@ bool parsePlayerSituation(const toml::Value& value, PlayerSituation* situation)
         string s;
         for (const auto& v : field->as<toml::Array>())
             s += v.as<string>();
-        situation->field = CoreField(s);
+        state->field = CoreField(s);
     }
     {
         const toml::Value* next = value.find("next");
         CHECK(next && next->is<string>());
-        situation->kumipuyoSeq = KumipuyoSeq(next->as<string>());
+        state->seq = KumipuyoSeq(next->as<string>());
     }
 
     return true;
@@ -57,12 +57,12 @@ Problem Problem::parse(const toml::Value& value)
     {
         const toml::Value* me = value.find("me");
         CHECK(me && me->is<toml::Table>());
-        CHECK(parsePlayerSituation(*me, &problem.mySituation));
+        CHECK(parsePlayerState(*me, &problem.myState));
     }
     {
         const toml::Value* enemy = value.find("enemy");
         CHECK(enemy && enemy->is<toml::Table>());
-        CHECK(parsePlayerSituation(*enemy, &problem.enemySituation));
+        CHECK(parsePlayerState(*enemy, &problem.enemyState));
     }
     {
         const toml::Value* answers = value.find("answer.answers");
