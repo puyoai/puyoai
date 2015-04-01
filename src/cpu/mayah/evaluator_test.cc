@@ -33,7 +33,7 @@ protected:
         PreEvalResult preEvalResult = PreEvaluator(patternBook).preEval(f);
         FeatureScoreCollector sc(evaluationParameterMap);
         Evaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
-        evaluator.collectScore(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
+        evaluator.eval(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
         return sc.toCollectedFeature();
     }
 
@@ -66,7 +66,7 @@ protected:
     }
 };
 
-TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
+TEST_F(EvaluatorTest, evalRensaGarbage)
 {
     CoreField f("R    R"
                 "R    R"
@@ -77,7 +77,7 @@ TEST_F(EvaluatorTest, collectScoreForRensaGarbage)
     FeatureScoreCollector sc(paramMap);
     RensaEvaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
 
-    evaluator.collectScoreForRensaGarbage(f);
+    evaluator.evalRensaGarbage(f);
     CollectedFeature cf = sc.toCollectedFeature();
 
     EXPECT_EQ(10, cf.feature(NUM_GARBAGE_PUYOS));
@@ -142,7 +142,7 @@ TEST_F(EvaluatorTest, connection)
                 "BBYYGO");
 
     CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
-        evaluator->collectScoreForConnection(f);
+        evaluator->evalConnection(f);
     });
 
     EXPECT_EQ(2, cf.feature(CONNECTION_3));

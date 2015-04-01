@@ -103,7 +103,7 @@ public:
     void evalPatternScore(double patternScore);
     void evalRensaScore(double score, double virtualScore);
     void evalRensaChainFeature(const RensaResult&, const PuyoSet&);
-    void collectScoreForRensaGarbage(const CoreField& fieldAfterRensa);
+    void evalRensaGarbage(const CoreField& fieldAfterRensa);
     void evalFirePointTabooFeature(const RefPlan&, const RensaChainTrackResult&);
     void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaChainTrackResult&, bool enemyHasZenkeshi);
     void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
@@ -125,9 +125,9 @@ public:
         EvaluatorBase(patternBook),
         sc_(sc) {}
 
-    void collectScore(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
-                      const PlayerState& me, const PlayerState& enemy,
-                      const PreEvalResult&, const MidEvalResult&, const GazeResult&);
+    void eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+              const PlayerState& me, const PlayerState& enemy,
+              const PreEvalResult&, const MidEvalResult&, const GazeResult&);
 
     // ----------------------------------------------------------------------
 
@@ -145,7 +145,7 @@ public:
 
     void evalMidEval(const MidEvalResult&);
 
-    void collectScoreForConnection(const CoreField&);
+    void evalConnection(const CoreField&);
     void evalCountPuyoFeature(const RefPlan& plan);
 
 private:
