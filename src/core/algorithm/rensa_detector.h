@@ -50,6 +50,8 @@ enum class PurposeForFindingRensa {
     FOR_KEY,
 };
 
+// RensaDetector is a set of functions to find a rensa from the specified field.
+// Using iteratePossibleRensasIteratively() is recommended for most cases.
 class RensaDetector {
 public:
     typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
@@ -96,7 +98,13 @@ public:
                                                                    const RensaDetectorStrategy&,
                                                                    const VanishingPositionPossibleRensaCallback&);
 
-    // Without adding key puyos, we find rensas iteratively.
+    // Finds a rensa from CoreField. TrackedPossibleRensaCallback is called for all detected rensas.
+    // Algorithm is like the following (not accurate):
+    // 1. Vanish puyos from CoreField.
+    // 2. After (1), Also vanish puyos from CoreField. The complemneted puyos to fire this rensa are considered
+    //    as key puyos. Iterate this (maxIteration - 1) times.
+    // 3. Complement all puyos for (1) and (2), and check the rensa is not corrupted. If not corrupted,
+    //    call the callback.
     static void iteratePossibleRensasIteratively(const CoreField&,
                                                  int maxIteration,
                                                  const RensaDetectorStrategy&,
