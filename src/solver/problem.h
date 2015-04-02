@@ -8,9 +8,9 @@
 #include <toml/toml.h>
 
 #include "core/core_field.h"
-#include "core/client/ai/player_state.h"
 #include "core/decision.h"
 #include "core/kumipuyo_seq.h"
+#include "core/player_state.h"
 
 struct Problem {
     static Problem readProblem(const std::string& filename);
