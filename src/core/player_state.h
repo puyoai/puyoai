@@ -1,5 +1,5 @@
-#ifndef CORE_CLIENT_PLAYER_STATE_H_
-#define CORE_CLIENT_PLAYER_STATE_H_
+#ifndef CORE_PLAYER_STATE_H_
+#define CORE_PLAYER_STATE_H_
 
 #include "core/core_field.h"
 #include "core/rensa_result.h"
