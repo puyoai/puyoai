@@ -33,6 +33,23 @@ public:
 
     EvaluationMode mode() const { return mode_; }
     double score() const { return score_; }
+
+    double scoreFor(EvaluationFeatureKey key, const EvaluationParameterMap& paramMap) const
+    {
+        const EvaluationParameter& param = paramMap.parameter(mode_);
+        return param.score(key, feature(key));
+    }
+
+    double scoreFor(EvaluationSparseFeatureKey key, const EvaluationParameterMap& paramMap) const
+    {
+        const EvaluationParameter& param = paramMap.parameter(mode_);
+        double s = 0;
+        for (int v : feature(key)) {
+            s += param.score(key, v, 1);
+        }
+        return s;
+    }
+
     double feature(EvaluationFeatureKey key) const
     {
         auto it = collectedFeatures_.find(key);
