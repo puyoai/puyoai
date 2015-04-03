@@ -149,7 +149,7 @@ public:
     void evalCountPuyoFeature(const RefPlan& plan);
 
 private:
-    void calculateMode(const PlayerState& me, const PlayerState& enemy) const;
+    EvaluationMode calculateMode(const PlayerState& me, const PlayerState& enemy) const;
 
     ScoreCollector* sc_;
 };
