@@ -534,32 +534,24 @@ void Evaluator<ScoreCollector>::evalMidEval(const MidEvalResult& midEvalResult)
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::calculateMode(const PlayerState& me, const PlayerState& enemy) const
+EvaluationMode Evaluator<ScoreCollector>::calculateMode(const PlayerState& me, const PlayerState& enemy) const
 {
     const int EARLY_THRESHOLD = 24;
     const int EARLY_MIDDLE_THRESHOLD = 36;
     const int MIDDLE_THRESHOLD = 54;
 
-    if (enemy.field.isZenkeshi()) {
-        sc_->setMode(EvaluationMode::ENEMY_HAS_ZENKESHI);
-        return;
-    }
+    if (enemy.field.isZenkeshi())
+        return EvaluationMode::ENEMY_HAS_ZENKESHI;
 
     int count = me.field.countPuyos();
-    if (count <= EARLY_THRESHOLD) {
-        sc_->setMode(EvaluationMode::EARLY);
-        return;
-    }
-    if (count <= EARLY_MIDDLE_THRESHOLD) {
-        sc_->setMode(EvaluationMode::EARLY_MIDDLE);
-        return;
-    }
-    if (count <= MIDDLE_THRESHOLD) {
-        sc_->setMode(EvaluationMode::MIDDLE);
-        return;
-    }
+    if (count <= EARLY_THRESHOLD)
+        return EvaluationMode::EARLY;
+    if (count <= EARLY_MIDDLE_THRESHOLD)
+        return EvaluationMode::EARLY_MIDDLE;
+    if (count <= MIDDLE_THRESHOLD)
+        return EvaluationMode::MIDDLE;
 
-    sc_->setMode(EvaluationMode::LATE);
+    return EvaluationMode::LATE;
 }
 
 template<typename ScoreCollector>
@@ -571,7 +563,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
                                      const MidEvalResult& midEvalResult,
                                      const GazeResult& gazeResult)
 {
-    calculateMode(me, enemy);
+    EvaluationMode mode = calculateMode(me, enemy);
+    sc_->setMode(mode);
 
     const CoreField& fieldBeforeRensa = plan.field();
 
@@ -645,6 +638,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
 
         rensaEvaluator.evalComplementationBias(keyPuyos, firePuyos);
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, keyPuyos, firePuyos, currentFrameId, me, enemy);
+
+        // TODO(mayah): need to set a better mode here.
+        rensaScoreCollector->setMode(mode);
 
         if (rensaScoreCollector->score() > maxRensaScore) {
             maxRensaScore = rensaScoreCollector->score();

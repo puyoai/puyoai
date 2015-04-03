@@ -101,8 +101,7 @@ private:
 class NormalScoreCollector {
 public:
     explicit NormalScoreCollector(const EvaluationParameterMap& paramMap) :
-        paramMap_(paramMap),
-        scoreMap_ {}
+        paramMap_(paramMap)
     {}
 
     void addScore(EvaluationFeatureKey key, double v)
@@ -129,19 +128,33 @@ public:
     void setBookName(const std::string& bookName) { bookName_ = bookName; }
     std::string bookName() const { return bookName_; }
 
-    double score() const { return scoreMap_[ordinal(mode_)]; }
-    EvaluationMode mode() const { return mode_; }
-
-    std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> scoreCoef() const
+    double score() const
     {
-        std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> coef {};
-        coef[ordinal(mode_)] = 1.0;
-        return coef;
+        double s = 0.0;
+        for (const auto& m : ALL_EVALUATION_MODES) {
+            s += coef(m) * scoreMap_[ordinal(m)];
+        }
+
+        return s;
+    }
+
+    const std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)>& scoreCoef() const
+    {
+        return scoreCoef_;
+    }
+    double coef(EvaluationMode mode) const
+    {
+        return scoreCoef_[ordinal(mode)];
     }
 
     const EvaluationParameterMap& evaluationParameterMap() const { return paramMap_; }
 
-    void setMode(EvaluationMode m) { mode_ = m; }
+    void setMode(EvaluationMode mode)
+    {
+        for (const auto& m : ALL_EVALUATION_MODES)
+            scoreCoef_[ordinal(m)] = 0.0;
+        scoreCoef_[ordinal(mode)] = 1.0;
+    }
 
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }
@@ -151,8 +164,8 @@ public:
 
 private:
     const EvaluationParameterMap& paramMap_;
-    std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> scoreMap_; // score of each mode.
-    EvaluationMode mode_ = EvaluationMode::DEFAULT;
+    std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> scoreMap_ {}; // score of each mode.
+    std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> scoreCoef_ {}; // score of each mode.
     int estimatedRensaScore_ = 0;
     std::string bookName_;
 };
@@ -197,7 +210,6 @@ public:
     const EvaluationParameterMap& evaluationParameterMap() const { return collector_.evaluationParameterMap(); }
     std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> scoreCoef() const { return collector_.scoreCoef(); }
 
-    EvaluationMode mode() const { return collector_.mode(); }
     void setMode(EvaluationMode mode) { collector_.setMode(mode); }
 
     void setEstimatedRensaScore(int s) { collector_.setEstimatedRensaScore(s); }
