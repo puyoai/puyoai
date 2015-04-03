@@ -42,9 +42,6 @@ string CollectedFeature::toStringComparingWith(const CollectedFeature& cf, const
         sparseKeys.insert(entry.first);
     }
 
-    const EvaluationParameter& param = paramMap.parameter(mode());
-    const EvaluationParameter& cfparam = paramMap.parameter(cf.mode());
-
     stringstream ss;
     ss << setw(30) << "WHOLE SCORE" << " = "
        << setw(15) << fixed << setprecision(6) << score_ << "          : "
@@ -53,33 +50,29 @@ string CollectedFeature::toStringComparingWith(const CollectedFeature& cf, const
     for (EvaluationFeatureKey key : keys) {
         ss << setw(30) << EvaluationFeature::toFeature(key).str() << " = ";
         ss << setw(12) << fixed << setprecision(3) << feature(key) << " ("
-           << setw(9) << fixed << setprecision(3) << param.score(key, feature(key)) << ") : ";
+           << setw(9) << fixed << setprecision(3) << scoreFor(key, paramMap) << ") : ";
         ss << setw(12) << fixed << setprecision(3) << cf.feature(key) << " ("
-           << setw(9) << fixed << setprecision(3) << cfparam.score(key, cf.feature(key)) << ")";
+           << setw(9) << fixed << setprecision(3) << cf.scoreFor(key, paramMap) << ")";
         ss << endl;
     }
     for (EvaluationSparseFeatureKey key : sparseKeys) {
         ss << setw(30) << EvaluationSparseFeature::toFeature(key).str() << " = ";
         {
-            double d = 0;
             stringstream st;
             for (int v : feature(key)) {
-                d += param.score(key, v, 1);
                 st << " " << v;
             }
             ss << setw(12) << st.str() << " ("
-               << setw(9) << fixed << setprecision(3) << d << ")";
+               << setw(9) << fixed << setprecision(3) << scoreFor(key, paramMap) << ")";
         }
         ss << " : ";
         {
-            double d = 0;
             stringstream st;
             for (int v : cf.feature(key)) {
                 st << " " << v;
-                d += cfparam.score(key, v, 1);
             }
             ss << setw(12) << st.str() << " ("
-               << setw(9) << fixed << setprecision(3) << d << ")";
+               << setw(9) << fixed << setprecision(3) << cf.scoreFor(key, paramMap) << ")";
         }
         ss << endl;
     }
