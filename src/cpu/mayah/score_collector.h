@@ -138,15 +138,8 @@ public:
         return s;
     }
 
-    const std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)>& scoreCoef() const
-    {
-        return scoreCoef_;
-    }
-    double coef(EvaluationMode mode) const
-    {
-        return scoreCoef_[ordinal(mode)];
-    }
-
+    const std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)>& scoreCoef() const { return scoreCoef_; }
+    double coef(EvaluationMode mode) const { return scoreCoef_[ordinal(mode)]; }
     const EvaluationParameterMap& evaluationParameterMap() const { return paramMap_; }
 
     void setMode(EvaluationMode mode)
