@@ -305,7 +305,12 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     CollectedFeature cf = evalWithCollectingFeature(refPlan, field, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     stringstream ss;
-    ss << "MODE = " << toString(cf.mode()) << " / ";
+    ss << "MODE ";
+    for (const auto& mode : ALL_EVALUATION_MODES) {
+        if (cf.coef(mode) > 0)
+            ss << toString(mode) << "(" << cf.coef(mode) << ") ";
+    }
+    ss << "/ ";
     if (cf.feature(STRATEGY_ZENKESHI) > 0 || cf.feature(STRATEGY_INITIAL_ZENKESHI) > 0)
         ss << "ZENKESHI / ";
     if (cf.feature(STRATEGY_KILL) > 0)
