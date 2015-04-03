@@ -13,16 +13,16 @@
 class CollectedFeature {
 public:
     CollectedFeature() {}
-    CollectedFeature(EvaluationMode mode,
-                     double score,
+    CollectedFeature(double score,
+                     const std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)>& scoreCoef,
                      std::string bookName,
                      std::map<EvaluationFeatureKey, double> collectedFeatures,
                      std::map<EvaluationSparseFeatureKey,
                      std::vector<int>> collectedSparseFeatures,
                      const ColumnPuyoList& rensaKeyPuyos,
                      const ColumnPuyoList& rensaFirePuyos) :
-        mode_(mode),
         score_(score),
+        scoreCoef_(scoreCoef),
         bookName_(bookName),
         collectedFeatures_(std::move(collectedFeatures)),
         collectedSparseFeatures_(std::move(collectedSparseFeatures)),
@@ -31,21 +31,27 @@ public:
     {
     }
 
-    EvaluationMode mode() const { return mode_; }
     double score() const { return score_; }
+
+    double coef(EvaluationMode mode) const { return scoreCoef_[ordinal(mode)]; }
 
     double scoreFor(EvaluationFeatureKey key, const EvaluationParameterMap& paramMap) const
     {
-        const EvaluationParameter& param = paramMap.parameter(mode_);
-        return param.score(key, feature(key));
+        double s = 0;
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            const EvaluationParameter& param = paramMap.parameter(mode);
+            s += param.score(key, feature(key)) * coef(mode);
+        }
+        return s;
     }
-
     double scoreFor(EvaluationSparseFeatureKey key, const EvaluationParameterMap& paramMap) const
     {
-        const EvaluationParameter& param = paramMap.parameter(mode_);
         double s = 0;
-        for (int v : feature(key)) {
-            s += param.score(key, v, 1);
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            const EvaluationParameter& param = paramMap.parameter(mode);
+            for (int v : feature(key)) {
+                s += param.score(key, v, 1) * coef(mode);
+            }
         }
         return s;
     }
@@ -82,8 +88,8 @@ private:
         return vs;
     }
 
-    EvaluationMode mode_;
     double score_ = 0.0;
+    std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> scoreCoef_ {};
     std::string bookName_;
     std::map<EvaluationFeatureKey, double> collectedFeatures_;
     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures_;
@@ -125,6 +131,13 @@ public:
 
     double score() const { return scoreMap_[ordinal(mode_)]; }
     EvaluationMode mode() const { return mode_; }
+
+    std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> scoreCoef() const
+    {
+        std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> coef {};
+        coef[ordinal(mode_)] = 1.0;
+        return coef;
+    }
 
     const EvaluationParameterMap& evaluationParameterMap() const { return paramMap_; }
 
@@ -182,6 +195,7 @@ public:
 
     double score() const { return collector_.score(); }
     const EvaluationParameterMap& evaluationParameterMap() const { return collector_.evaluationParameterMap(); }
+    std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)> scoreCoef() const { return collector_.scoreCoef(); }
 
     EvaluationMode mode() const { return collector_.mode(); }
     void setMode(EvaluationMode mode) { collector_.setMode(mode); }
@@ -194,8 +208,8 @@ public:
 
     CollectedFeature toCollectedFeature() const {
         return CollectedFeature {
-            mode(),
             score(),
+            scoreCoef(),
             bookName(),
             collectedFeatures_,
             collectedSparseFeatures_,
