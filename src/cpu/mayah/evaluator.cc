@@ -563,6 +563,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
                                      const MidEvalResult& midEvalResult,
                                      const GazeResult& gazeResult)
 {
+    // TODO(mayah): Instead of setting mode here, we would like to set after all the evaluation
+    // has finished. We would like to postpone RensaScoreCollector.
     EvaluationMode mode = calculateMode(me, enemy);
     sc_->setMode(mode);
 
