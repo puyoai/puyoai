@@ -13,7 +13,7 @@ using namespace std;
 
 class EvaluatorTest : public testing::Test {
 protected:
-    CollectedFeature eval(const CoreField& f, int numIteration = 1)
+    CollectedFeatureScore eval(const CoreField& f, int numIteration = 1)
     {
         TsumoPossibility::initialize();
 
@@ -34,11 +34,11 @@ protected:
         FeatureScoreCollector sc(evaluationParameterMap);
         Evaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
         evaluator.eval(plan, f, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
-        return sc.toCollectedFeature();
+        return sc.collectedScore();
     }
 
     template<typename F>
-    CollectedFeature withEvaluator(F f) {
+    CollectedFeatureScore withEvaluator(F f) {
         TsumoPossibility::initialize();
 
         EvaluationParameterMap evaluationParameterMap;
@@ -48,11 +48,11 @@ protected:
 
         f(&evaluator);
 
-        return sc.toCollectedFeature();
+        return sc.collectedScore();
     }
 
     template<typename F>
-    CollectedFeature withRensaEvaluator(F f) {
+    CollectedFeatureScore withRensaEvaluator(F f) {
         TsumoPossibility::initialize();
 
         EvaluationParameterMap evaluationParameterMap;
@@ -62,7 +62,7 @@ protected:
 
         f(&rensaEvaluator);
 
-        return sc.toCollectedFeature();
+        return sc.collectedScore();
     }
 };
 
@@ -78,10 +78,10 @@ TEST_F(EvaluatorTest, evalRensaGarbage)
     RensaEvaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
 
     evaluator.evalRensaGarbage(f);
-    CollectedFeature cf = sc.toCollectedFeature();
+    CollectedFeatureScore cfs = sc.collectedScore();
 
-    EXPECT_EQ(10, cf.feature(NUM_GARBAGE_PUYOS));
-    EXPECT_EQ(6, cf.feature(NUM_SIDE_GARBAGE_PUYOS));
+    EXPECT_EQ(10, cfs.feature(NUM_GARBAGE_PUYOS));
+    EXPECT_EQ(6, cfs.feature(NUM_SIDE_GARBAGE_PUYOS));
 }
 
 TEST_F(EvaluatorTest, RidgeHeight1)
@@ -93,11 +93,11 @@ TEST_F(EvaluatorTest, RidgeHeight1)
         "  O  O"
         "OOOOOO");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalRidgeHeight(f);
     });
 
-    const vector<int>& vs = cf.feature(RIDGE_HEIGHT);
+    const vector<int>& vs = cfs.feature(RIDGE_HEIGHT);
     EXPECT_TRUE(find(vs.begin(), vs.end(), 4) != vs.end());
 }
 
@@ -110,11 +110,11 @@ TEST_F(EvaluatorTest, RidgeHeight2)
         " OOO O"
         "OOOOOO");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalRidgeHeight(f);
     });
 
-    const vector<int>& vs = cf.feature(RIDGE_HEIGHT);
+    const vector<int>& vs = cfs.feature(RIDGE_HEIGHT);
     EXPECT_TRUE(find(vs.begin(), vs.end(), 2) != vs.end());
 }
 
@@ -127,11 +127,11 @@ TEST_F(EvaluatorTest, RidgeHeight3)
         " OOO O"
         "OOOOOO");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalRidgeHeight(f);
     });
 
-    const vector<int>& vs = cf.feature(RIDGE_HEIGHT);
+    const vector<int>& vs = cfs.feature(RIDGE_HEIGHT);
     EXPECT_TRUE(find(vs.begin(), vs.end(), 1) != vs.end());
 }
 
@@ -141,12 +141,12 @@ TEST_F(EvaluatorTest, connection)
                 "OOOOGO"
                 "BBYYGO");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalConnection(f);
     });
 
-    EXPECT_EQ(2, cf.feature(CONNECTION_3));
-    EXPECT_EQ(3, cf.feature(CONNECTION_2));
+    EXPECT_EQ(2, cfs.feature(CONNECTION_3));
+    EXPECT_EQ(3, cfs.feature(CONNECTION_2));
 }
 
 TEST_F(EvaluatorTest, connectionHorizontal)
@@ -156,14 +156,14 @@ TEST_F(EvaluatorTest, connectionHorizontal)
         "OOYYOO"
         "RRROGG");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalRestrictedConnectionHorizontalFeature(f);
     });
 
-    EXPECT_EQ(1, cf.feature(CONNECTION_HORIZONTAL_2));
-    EXPECT_EQ(1, cf.feature(CONNECTION_HORIZONTAL_3));
-    EXPECT_EQ(1, cf.feature(CONNECTION_HORIZONTAL_CROSSED_2));
-    EXPECT_EQ(1, cf.feature(CONNECTION_HORIZONTAL_CROSSED_3));
+    EXPECT_EQ(1, cfs.feature(CONNECTION_HORIZONTAL_2));
+    EXPECT_EQ(1, cfs.feature(CONNECTION_HORIZONTAL_3));
+    EXPECT_EQ(1, cfs.feature(CONNECTION_HORIZONTAL_CROSSED_2));
+    EXPECT_EQ(1, cfs.feature(CONNECTION_HORIZONTAL_CROSSED_3));
 }
 
 TEST_F(EvaluatorTest, NumUnreachableSpace1)
@@ -173,11 +173,11 @@ TEST_F(EvaluatorTest, NumUnreachableSpace1)
         "OOOOOO"
         "OOOOOO");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalUnreachableSpace(f);
     });
 
-    EXPECT_EQ(0, cf.feature(NUM_UNREACHABLE_SPACE));
+    EXPECT_EQ(0, cfs.feature(NUM_UNREACHABLE_SPACE));
 }
 
 TEST_F(EvaluatorTest, NumUnreachableSpace2)
@@ -196,11 +196,11 @@ TEST_F(EvaluatorTest, NumUnreachableSpace2)
         "    O "
         "    O ");
 
-    CollectedFeature cf = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
+    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
         evaluator->evalUnreachableSpace(f);
     });
 
-    EXPECT_EQ(12, cf.feature(NUM_UNREACHABLE_SPACE));
+    EXPECT_EQ(12, cfs.feature(NUM_UNREACHABLE_SPACE));
 }
 
 TEST_F(EvaluatorTest, sideChain)
@@ -217,8 +217,8 @@ TEST_F(EvaluatorTest, sideChain)
         "RGYGB."
         "RGYGB.");
 
-    CollectedFeature cf = eval(f, 1);
-    EXPECT_EQ(1.0, cf.feature(HOLDING_SIDE_CHAIN_MEDIUM));
+    CollectedFeatureScore cfs = eval(f, 1);
+    EXPECT_EQ(1.0, cfs.feature(HOLDING_SIDE_CHAIN_MEDIUM));
 }
 
 TEST_F(EvaluatorTest, DontCrash1)

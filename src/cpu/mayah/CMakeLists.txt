@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 cpu_setup("mayah")
 
 add_library(mayah_lib
+            collected_score.cc
             decision_book.cc
             evaluator.cc
             evaluation_feature.cc
@@ -10,8 +11,7 @@ add_library(mayah_lib
             gazer.cc
             mayah_ai.cc
             pattern_book.cc
-            pattern_rensa_detector.cc
-            score_collector.cc)
+            pattern_rensa_detector.cc)
 
 function(mayah_add_executable exe)
     cpu_add_executable(${exe} ${ARGN})

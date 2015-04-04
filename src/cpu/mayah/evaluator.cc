@@ -564,13 +564,12 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
 {
     // TODO(mayah): Instead of setting mode here, we would like to set after all the evaluation
     // has finished. We would like to postpone RensaScoreCollector.
-    EvaluationMode mode = calculateMode(me, enemy);
+    const EvaluationMode mode = calculateMode(me, enemy);
     sc_->setMode(mode);
 
     const CoreField& fieldBeforeRensa = plan.field();
 
     evalMidEval(midEvalResult);
-
     // We'd like to evaluate frame feature always.
     evalFrameFeature(plan);
 
@@ -584,7 +583,6 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
     evalValleyDepth(fieldBeforeRensa);
     evalRidgeHeight(fieldBeforeRensa);
     evalFieldUShape(plan.field(), enemy.hasZenkeshi);
-
     evalUnreachableSpace(fieldBeforeRensa);
 
     int sideChainMaxScore = 0;
@@ -596,8 +594,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
 
     struct MaxRensaInfo {
         double score = -100000000;
-        std::unique_ptr<ScoreCollector> scoreCollector;
+        typename ScoreCollector::CollectedScore collectedScore;
         ColumnPuyoList puyosToComplement;
+        string bookName;
     } maxRensa;
 
     auto evalCallback = [&](const CoreField& fieldAfterRensa,
@@ -611,8 +610,6 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
 
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameterMap()));
         RensaEvaluator<ScoreCollector> rensaEvaluator(patternBook(), rensaScoreCollector.get());
-
-        rensaScoreCollector->setBookName(patternName);
 
         CoreField complementedField(fieldBeforeRensa);
         if (!complementedField.dropPuyoList(puyosToComplement))
@@ -638,12 +635,12 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
 
         // TODO(mayah): need to set a better mode here.
-        rensaScoreCollector->setMode(mode);
-
-        if (rensaScoreCollector->score() > maxRensa.score) {
-            maxRensa.score = rensaScoreCollector->score();
-            maxRensa.scoreCollector = move(rensaScoreCollector);
+        const typename ScoreCollector::CollectedScore& rensaCollectedScore = rensaScoreCollector->collectedScore();
+        if (rensaCollectedScore.score(mode) > maxRensa.score) {
+            maxRensa.score = rensaCollectedScore.score(mode);
+            maxRensa.collectedScore = rensaCollectedScore;
             maxRensa.puyosToComplement = puyosToComplement;
+            maxRensa.bookName = patternName;
             maxScoreChains = rensaResult.chains;
         }
 
@@ -686,14 +683,13 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         rensaKind += rensaCounts[i];
     sc_->addScore(RENSA_KIND, rensaKind);
 
-    if (maxRensa.scoreCollector.get()) {
-        sc_->merge(*maxRensa.scoreCollector);
-        sc_->setPuyosToComplement(maxRensa.puyosToComplement);
-    }
+    sc_->merge(maxRensa.collectedScore);
+    sc_->setBookName(maxRensa.bookName);
+    sc_->setPuyosToComplement(maxRensa.puyosToComplement);
     sc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }
 
 template class Evaluator<FeatureScoreCollector>;
-template class Evaluator<NormalScoreCollector>;
+template class Evaluator<SimpleScoreCollector>;
 template class RensaEvaluator<FeatureScoreCollector>;
-template class RensaEvaluator<NormalScoreCollector>;
+template class RensaEvaluator<SimpleScoreCollector>;

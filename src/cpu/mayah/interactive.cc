@@ -171,11 +171,11 @@ int main(int argc, char* argv[])
                                                              MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, &decisions);
 
                 const PreEvalResult preEvalResult = ai.preEval(currentField);
-                CollectedFeature mycf = ai.evalWithCollectingFeature(
+                CollectedFeatureCoefScore mycf = ai.evalWithCollectingFeature(
                     RefPlan(myThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
                     ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, myThoughtResult.midEvalResult,
                     ai.gazer().gazeResult());
-                CollectedFeature aicf = ai.evalWithCollectingFeature(
+                CollectedFeatureCoefScore aicf = ai.evalWithCollectingFeature(
                     RefPlan(aiThoughtResult.plan), currentField, frameId, MayahAI::DEFAULT_NUM_ITERATION,
                     ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, aiThoughtResult.midEvalResult,
                     ai.gazer().gazeResult());
