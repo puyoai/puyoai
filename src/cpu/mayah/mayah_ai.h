@@ -66,7 +66,7 @@ protected:
     EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
                     const PlayerState& me, const PlayerState& enemy,
                     const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
-    CollectedFeature evalWithCollectingFeature(
+    CollectedFeatureCoefScore evalWithCollectingFeature(
         const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
         const PlayerState& me, const PlayerState& enemy,
         const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
