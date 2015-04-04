@@ -591,11 +591,14 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
     int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
     int fastChainMaxScore = 0;
     int maxVirtualRensaResultScore = 0;
-    double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
-    ColumnPuyoList maxRensaPuyosToComplement;
-    std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
     int rensaCounts[20] {};
     int maxScoreChains = 0;
+
+    struct MaxRensaInfo {
+        double score = -100000000;
+        std::unique_ptr<ScoreCollector> scoreCollector;
+        ColumnPuyoList puyosToComplement;
+    } maxRensa;
 
     auto evalCallback = [&](const CoreField& fieldAfterRensa,
                             const RensaResult& rensaResult,
@@ -638,10 +641,10 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         // TODO(mayah): need to set a better mode here.
         rensaScoreCollector->setMode(mode);
 
-        if (rensaScoreCollector->score() > maxRensaScore) {
-            maxRensaScore = rensaScoreCollector->score();
-            maxRensaScoreCollector = move(rensaScoreCollector);
-            maxRensaPuyosToComplement = puyosToComplement;
+        if (rensaScoreCollector->score() > maxRensa.score) {
+            maxRensa.score = rensaScoreCollector->score();
+            maxRensa.scoreCollector = move(rensaScoreCollector);
+            maxRensa.puyosToComplement = puyosToComplement;
             maxScoreChains = rensaResult.chains;
         }
 
@@ -684,9 +687,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         rensaKind += rensaCounts[i];
     sc_->addScore(RENSA_KIND, rensaKind);
 
-    if (maxRensaScoreCollector.get()) {
-        sc_->merge(*maxRensaScoreCollector);
-        sc_->setPuyosToComplement(maxRensaPuyosToComplement);
+    if (maxRensa.scoreCollector.get()) {
+        sc_->merge(*maxRensa.scoreCollector);
+        sc_->setPuyosToComplement(maxRensa.puyosToComplement);
     }
     sc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }
