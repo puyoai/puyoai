@@ -251,13 +251,16 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     if (rensaResult.chains != currentChains)
         return false;
 
-    ColumnPuyoList firePuyos;
-    if (!firePuyos.add(firePuyo))
+    ColumnPuyoList puyosToComplement(keyPuyos);
+    if (!puyosToComplement.add(firePuyo))
         return false;
 
-    callback_(cf, rensaResult, keyPuyos, firePuyos, tracker.result(), patternName, patternScore);
+    callback_(cf, rensaResult, puyosToComplement, firePuyo.color, tracker.result(), patternName, patternScore);
 
-    RensaDetector::makeProhibitArray(rensaResult, tracker.result(), originalField_,
-                                     firePuyos, prohibits);
+    // TODO(mayah): Making ColumnPuyoList here is time-consuming a bit.
+    ColumnPuyoList firePuyos;
+    firePuyos.add(firePuyo);
+    RensaDetector::makeProhibitArray(rensaResult, tracker.result(), originalField_, firePuyos, prohibits);
+
     return true;
 }

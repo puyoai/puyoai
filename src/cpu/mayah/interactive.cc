@@ -181,12 +181,10 @@ int main(int argc, char* argv[])
                     ai.gazer().gazeResult());
 
                 CoreField myTargetField(myThoughtResult.plan.field());
-                myTargetField.dropPuyoList(mycf.rensaKeyPuyos());
-                myTargetField.dropPuyoList(mycf.rensaFirePuyos());
+                myTargetField.dropPuyoList(mycf.puyosToComplement());
 
                 CoreField aiTargetField(aiThoughtResult.plan.field());
-                aiTargetField.dropPuyoList(aicf.rensaKeyPuyos());
-                aiTargetField.dropPuyoList(aicf.rensaFirePuyos());
+                aiTargetField.dropPuyoList(aicf.puyosToComplement());
 
                 KumipuyoSeq seqToShow { seq.get(2), seq.get(3) };
                 FieldPrettyPrinter::printMultipleFields(

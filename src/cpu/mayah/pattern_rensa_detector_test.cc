@@ -124,14 +124,13 @@ TEST(PatternBookTest, pattern1)
     bool found = false;
     auto callback = [&](const CoreField&,
                         const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
+                        PuyoColor,
                         const RensaChainTrackResult&,
                         const std::string& patternName,
-                        int patternScore) {
+                        double patternScore) {
         CoreField cf(field);
-        cf.dropPuyoList(keyPuyos);
-        cf.dropPuyoList(firePuyos);
+        ASSERT_TRUE(cf.dropPuyoList(cpl));
 
         if (expected == cf) {
             found = true;
@@ -165,14 +164,13 @@ TEST(PatternBookTest, pattern1_complement1)
     bool found = false;
     auto callback = [&](const CoreField&,
                         const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
+                        PuyoColor,
                         const RensaChainTrackResult&,
                         const std::string& patternName,
-                        int patternScore) {
+                        double patternScore) {
         CoreField cf(field);
-        cf.dropPuyoList(keyPuyos);
-        cf.dropPuyoList(firePuyos);
+        ASSERT_TRUE(cf.dropPuyoList(cpl));
 
         if (cf == expected1 || cf == expected2) {
             found = true;
@@ -201,10 +199,10 @@ TEST(PatternBookTest, pattern1_complement2)
     auto callback = [&](const CoreField&,
                         const RensaResult&,
                         const ColumnPuyoList&,
-                        const ColumnPuyoList&,
+                        PuyoColor,
                         const RensaChainTrackResult&,
                         const std::string&,
-                        int patternScore) {
+                        double patternScore) {
         if (patternScore > 0)
             found = true;
     };
@@ -231,14 +229,13 @@ TEST(PatternBookTest, pattern2)
     bool found = false;
     auto callback = [&](const CoreField&,
                         const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
+                        PuyoColor,
                         const RensaChainTrackResult&,
                         const std::string& patternName,
-                        int /*patternScore*/) {
+                        double /*patternScore*/) {
         CoreField cf(field);
-        cf.dropPuyoList(keyPuyos);
-        cf.dropPuyoList(firePuyos);
+        ASSERT_TRUE(cf.dropPuyoList(cpl));
 
         if (expected == cf) {
             found = true;
@@ -270,14 +267,13 @@ TEST(PatternBookTest, pattern3)
     bool found = false;
     auto callback = [&](const CoreField&,
                         const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
+                        PuyoColor,
                         const RensaChainTrackResult&,
                         const std::string&,
-                        int /*patternScore*/) {
+                        double /*patternScore*/) {
         CoreField cf(field);
-        EXPECT_TRUE(cf.dropPuyoList(keyPuyos));
-        EXPECT_TRUE(cf.dropPuyoList(firePuyos));
+        ASSERT_TRUE(cf.dropPuyoList(cpl));
 
         if (expected == cf)
             found = true;
@@ -314,14 +310,13 @@ TEST(PatternBookTest, pattern4)
     bool found = false;
     auto callback = [&](const CoreField&,
                         const RensaResult&,
-                        const ColumnPuyoList& keyPuyos,
-                        const ColumnPuyoList& firePuyos,
+                        const ColumnPuyoList& cpl,
+                        PuyoColor,
                         const RensaChainTrackResult&,
                         const std::string&,
-                        int /*patternScore*/) {
+                        double /*patternScore*/) {
         CoreField cf(field);
-        ASSERT_TRUE(cf.dropPuyoList(keyPuyos));
-        ASSERT_TRUE(cf.dropPuyoList(firePuyos));
+        ASSERT_TRUE(cf.dropPuyoList(cpl));
 
         if (cf == expected1 || cf == expected2)
             found = true;
@@ -351,10 +346,10 @@ TEST(PatternBookTest, pattern5)
     auto callback = [&](const CoreField&,
                         const RensaResult&,
                         const ColumnPuyoList&,
-                        const ColumnPuyoList&,
+                        PuyoColor,
                         const RensaChainTrackResult&,
                         const std::string&,
-                        int patternScore) {
+                        double patternScore) {
         if (patternScore > 0)
             *score = patternScore;
     };

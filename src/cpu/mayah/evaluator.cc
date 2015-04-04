@@ -383,16 +383,19 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan, const RensaResult& rensaResult,
-                                                       const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
+void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan,
+                                                       const RensaResult& rensaResult,
+                                                       const ColumnPuyoList& cpl,
                                                        int currentFrameId,
-                                                       const PlayerState& me, const PlayerState& enemy)
+                                                       const PlayerState& me,
+                                                       const PlayerState& enemy)
 {
     UNUSED_VARIABLE(currentFrameId);
     UNUSED_VARIABLE(me);
 
-    if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) && plan.chains() <= 3 && rensaResult.chains >= 7 &&
-        keyPuyos.size() + firePuyos.size() <= 3 && !enemy.isRensaOngoing) {
+    if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) &&
+        plan.chains() <= 3 && rensaResult.chains >= 7 &&
+        cpl.size() <= 3 && !enemy.isRensaOngoing) {
         sc_->addScore(STRATEGY_SAISOKU, 1);
     }
 }
@@ -488,17 +491,13 @@ void RensaEvaluator<ScoreCollector>::evalPatternScore(double patternScore)
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalComplementationBias(const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos)
+void RensaEvaluator<ScoreCollector>::evalComplementationBias(const ColumnPuyoList& cpl)
 {
     for (int x = 1; x <= 6; ++x) {
         PuyoSet ps;
-        int h = keyPuyos.sizeOn(x);
+        int h = cpl.sizeOn(x);
         for (int i = 0; i < h; ++i)
-            ps.add(keyPuyos.get(x, i));
-
-        h = firePuyos.sizeOn(x);
-        for (int i = 0; i < h; ++i)
-            ps.add(firePuyos.get(x, i));
+            ps.add(cpl.get(x, i));
 
         if (ps.count() < 3)
             continue;
@@ -593,19 +592,18 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
     int fastChainMaxScore = 0;
     int maxVirtualRensaResultScore = 0;
     double maxRensaScore = -100000000; // TODO(mayah): Should be negative infty?
-    ColumnPuyoList maxRensaKeyPuyos;
-    ColumnPuyoList maxRensaFirePuyos;
+    ColumnPuyoList maxRensaPuyosToComplement;
     std::unique_ptr<ScoreCollector> maxRensaScoreCollector;
     int rensaCounts[20] {};
     int maxScoreChains = 0;
-    auto evalCallback = [&](const CoreField& fieldBeforeRensa,
-                            const CoreField& fieldAfterRensa,
+
+    auto evalCallback = [&](const CoreField& fieldAfterRensa,
                             const RensaResult& rensaResult,
-                            const ColumnPuyoList& keyPuyos,
-                            const ColumnPuyoList& firePuyos,
-                            double patternScore,
+                            const ColumnPuyoList& puyosToComplement,
+                            PuyoColor /*firePuyoColor*/,
+                            const RensaChainTrackResult& trackResult,
                             const string& patternName,
-                            const RensaChainTrackResult& trackResult) {
+                            double patternScore) {
         ++rensaCounts[rensaResult.chains];
 
         std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameterMap()));
@@ -614,9 +612,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         rensaScoreCollector->setBookName(patternName);
 
         CoreField complementedField(fieldBeforeRensa);
-        if (!complementedField.dropPuyoList(keyPuyos))
-            return;
-        if (!complementedField.dropPuyoList(firePuyos))
+        if (!complementedField.dropPuyoList(puyosToComplement))
             return;
 
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
@@ -624,13 +620,11 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         rensaEvaluator.evalRensaFieldUShape(complementedField, enemy.hasZenkeshi);
         rensaEvaluator.evalPatternScore(patternScore);
 
-        if (keyPuyos.size() == 0 && rensaResult.chains == 2) {
+        if (puyosToComplement.size() <= 2 && rensaResult.chains == 2) {
             sideChainMaxScore = std::max(sideChainMaxScore, rensaResult.score);
         }
 
-        PuyoSet necessaryPuyos;
-        necessaryPuyos.add(keyPuyos);
-        necessaryPuyos.add(firePuyos);
+        PuyoSet necessaryPuyos(puyosToComplement);
 
         rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyos);
         rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
@@ -638,8 +632,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, enemy.hasZenkeshi);
         rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
 
-        rensaEvaluator.evalComplementationBias(keyPuyos, firePuyos);
-        rensaEvaluator.evalRensaStrategy(plan, rensaResult, keyPuyos, firePuyos, currentFrameId, me, enemy);
+        rensaEvaluator.evalComplementationBias(puyosToComplement);
+        rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
 
         // TODO(mayah): need to set a better mode here.
         rensaScoreCollector->setMode(mode);
@@ -647,8 +641,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         if (rensaScoreCollector->score() > maxRensaScore) {
             maxRensaScore = rensaScoreCollector->score();
             maxRensaScoreCollector = move(rensaScoreCollector);
-            maxRensaKeyPuyos = keyPuyos;
-            maxRensaFirePuyos = firePuyos;
+            maxRensaPuyosToComplement = puyosToComplement;
             maxScoreChains = rensaResult.chains;
         }
 
@@ -669,12 +662,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         }
     };
 
-    auto callback = [&](const CoreField& fieldAfterRensa, const RensaResult& rensaResult,
-                        const ColumnPuyoList& keyPuyos, const ColumnPuyoList& firePuyos,
-                        const RensaChainTrackResult& trackResult, const string& patternName, double patternScore) {
-        evalCallback(fieldBeforeRensa, fieldAfterRensa, rensaResult, keyPuyos, firePuyos, patternScore, patternName, trackResult);
-    };
-    PatternRensaDetector detector(patternBook(), fieldBeforeRensa, callback);
+    PatternRensaDetector detector(patternBook(), fieldBeforeRensa, evalCallback);
     detector.iteratePossibleRensas(preEvalResult.matchablePatternIds(), maxIteration);
 
     if (sideChainMaxScore >= scoreForOjama(21)) {
@@ -698,8 +686,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
 
     if (maxRensaScoreCollector.get()) {
         sc_->merge(*maxRensaScoreCollector);
-        sc_->setRensaKeyPuyos(maxRensaKeyPuyos);
-        sc_->setRensaFirePuyos(maxRensaFirePuyos);
+        sc_->setPuyosToComplement(maxRensaPuyosToComplement);
     }
     sc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }

@@ -11,11 +11,11 @@
 
 class PatternRensaDetector {
 public:
-    typedef std::function<void (const CoreField&,
-                                const RensaResult&,
-                                const ColumnPuyoList& keyPuyos,
-                                const ColumnPuyoList& firePuyos,
-                                const RensaChainTrackResult&,
+    typedef std::function<void (const CoreField& fieldAfterRensa,
+                                const RensaResult& rensaResult,
+                                const ColumnPuyoList& puyosToComplement,
+                                PuyoColor firePuyosColor,
+                                const RensaChainTrackResult& chainTrackResult,
                                 const std::string& patternName,
                                 double patternScore)> Callback;
 
