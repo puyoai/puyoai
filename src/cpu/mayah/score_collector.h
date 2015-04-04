@@ -19,15 +19,13 @@ public:
                      std::map<EvaluationFeatureKey, double> collectedFeatures,
                      std::map<EvaluationSparseFeatureKey,
                      std::vector<int>> collectedSparseFeatures,
-                     const ColumnPuyoList& rensaKeyPuyos,
-                     const ColumnPuyoList& rensaFirePuyos) :
+                     const ColumnPuyoList& puyosToComplement) :
         score_(score),
         scoreCoef_(scoreCoef),
         bookName_(bookName),
         collectedFeatures_(std::move(collectedFeatures)),
         collectedSparseFeatures_(std::move(collectedSparseFeatures)),
-        rensaKeyPuyos_(rensaKeyPuyos),
-        rensaFirePuyos_(rensaFirePuyos)
+        puyosToComplement_(puyosToComplement)
     {
     }
 
@@ -75,8 +73,7 @@ public:
 
     const std::string& bookName() const { return bookName_; }
 
-    const ColumnPuyoList& rensaKeyPuyos() const { return rensaKeyPuyos_; }
-    const ColumnPuyoList& rensaFirePuyos() const { return rensaFirePuyos_; }
+    const ColumnPuyoList& puyosToComplement() const { return puyosToComplement_; }
 
     std::string toString() const;
     std::string toStringComparingWith(const CollectedFeature&, const EvaluationParameterMap&) const;
@@ -93,8 +90,7 @@ private:
     std::string bookName_;
     std::map<EvaluationFeatureKey, double> collectedFeatures_;
     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures_;
-    ColumnPuyoList rensaKeyPuyos_;
-    ColumnPuyoList rensaFirePuyos_;
+    ColumnPuyoList puyosToComplement_;
 };
 
 // This collector collects score and bookname.
@@ -152,8 +148,7 @@ public:
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }
 
-    void setRensaKeyPuyos(const ColumnPuyoList&) {}
-    void setRensaFirePuyos(const ColumnPuyoList&) {}
+    void setPuyosToComplement(const ColumnPuyoList&) {}
 
 private:
     const EvaluationParameterMap& paramMap_;
@@ -208,8 +203,7 @@ public:
     void setEstimatedRensaScore(int s) { collector_.setEstimatedRensaScore(s); }
     int estimatedRensaScore() const { return collector_.estimatedRensaScore(); }
 
-    void setRensaKeyPuyos(const ColumnPuyoList& cpl) { rensaKeyPuyos_ = cpl; }
-    void setRensaFirePuyos(const ColumnPuyoList& cpl) { rensaFirePuyos_ = cpl; }
+    void setPuyosToComplement(const ColumnPuyoList& cpl) { puyosToComplement_ = cpl; }
 
     CollectedFeature toCollectedFeature() const {
         return CollectedFeature {
@@ -218,8 +212,7 @@ public:
             bookName(),
             collectedFeatures_,
             collectedSparseFeatures_,
-            rensaKeyPuyos_,
-            rensaFirePuyos_
+            puyosToComplement_,
         };
     }
 
@@ -227,8 +220,7 @@ private:
     NormalScoreCollector collector_;
     std::map<EvaluationFeatureKey, double> collectedFeatures_;
     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures_;
-    ColumnPuyoList rensaKeyPuyos_;
-    ColumnPuyoList rensaFirePuyos_;
+    ColumnPuyoList puyosToComplement_;
 };
 
 #endif
