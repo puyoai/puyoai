@@ -634,7 +634,6 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
         rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, enemy.hasZenkeshi);
         rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
-
         rensaEvaluator.evalComplementationBias(puyosToComplement);
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
 

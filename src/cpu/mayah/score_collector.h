@@ -17,8 +17,7 @@ public:
                      const std::array<double, ARRAY_SIZE(ALL_EVALUATION_MODES)>& scoreCoef,
                      std::string bookName,
                      std::map<EvaluationFeatureKey, double> collectedFeatures,
-                     std::map<EvaluationSparseFeatureKey,
-                     std::vector<int>> collectedSparseFeatures,
+                     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures,
                      const ColumnPuyoList& puyosToComplement) :
         score_(score),
         scoreCoef_(scoreCoef),
