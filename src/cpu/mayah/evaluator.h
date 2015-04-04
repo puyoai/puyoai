@@ -137,7 +137,7 @@ public:
 
     void evalFrameFeature(const RefPlan&);
     void evalRestrictedConnectionHorizontalFeature(const CoreField&);
-    void evalThirdColumnHeightFeature(const RefPlan&);
+    void evalThirdColumnHeightFeature(const CoreField&);
     void evalValleyDepth(const CoreField&);
     void evalRidgeHeight(const CoreField&);
     void evalFieldUShape(const CoreField&, bool enemyHasZenkeshi);
@@ -146,7 +146,7 @@ public:
     void evalMidEval(const MidEvalResult&);
 
     void evalConnection(const CoreField&);
-    void evalCountPuyoFeature(const RefPlan& plan);
+    void evalCountPuyoFeature(const CoreField&);
 
 private:
     EvaluationMode calculateMode(const PlayerState& me, const PlayerState& enemy) const;
