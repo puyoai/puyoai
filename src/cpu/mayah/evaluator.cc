@@ -217,9 +217,9 @@ void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const 
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalThirdColumnHeightFeature(const RefPlan& plan)
+void Evaluator<ScoreCollector>::evalThirdColumnHeightFeature(const CoreField& field)
 {
-    sc_->addScore(THIRD_COLUMN_HEIGHT, plan.field().height(3), 1);
+    sc_->addScore(THIRD_COLUMN_HEIGHT, field.height(3), 1);
 }
 
 template<typename ScoreCollector>
@@ -518,9 +518,9 @@ void RensaEvaluator<ScoreCollector>::evalRensaGarbage(const CoreField& fieldAfte
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalCountPuyoFeature(const RefPlan& plan)
+void Evaluator<ScoreCollector>::evalCountPuyoFeature(const CoreField& field)
 {
-    sc_->addScore(NUM_COUNT_PUYOS, plan.field().countColorPuyos(), 1);
+    sc_->addScore(NUM_COUNT_PUYOS, field.countColorPuyos(), 1);
 }
 
 template<typename ScoreCollector>
@@ -577,10 +577,10 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
     if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult, midEvalResult))
         return;
 
-    evalCountPuyoFeature(plan);
+    evalCountPuyoFeature(fieldBeforeRensa);
     evalConnection(fieldBeforeRensa);
     evalRestrictedConnectionHorizontalFeature(fieldBeforeRensa);
-    evalThirdColumnHeightFeature(plan);
+    evalThirdColumnHeightFeature(fieldBeforeRensa);
     evalValleyDepth(fieldBeforeRensa);
     evalRidgeHeight(fieldBeforeRensa);
     evalFieldUShape(plan.field(), enemy.hasZenkeshi);
