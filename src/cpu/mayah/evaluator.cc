@@ -569,9 +569,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
 
     const CoreField& fieldBeforeRensa = plan.field();
 
-    evalMidEval(midEvalResult);
     // We'd like to evaluate frame feature always.
     evalFrameFeature(plan);
+    evalMidEval(midEvalResult);
 
     if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult, midEvalResult))
         return;
@@ -615,24 +615,22 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         if (!complementedField.dropPuyoList(puyosToComplement))
             return;
 
+        const PuyoSet necessaryPuyoSet(puyosToComplement);
+        const double possibility = TsumoPossibility::possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
+        const double virtualRensaScore = rensaResult.score * possibility;
+
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
         rensaEvaluator.evalRensaFieldUShape(complementedField, enemy.hasZenkeshi);
         rensaEvaluator.evalPatternScore(patternScore);
-
-        if (puyosToComplement.size() <= 2 && rensaResult.chains == 2) {
-            sideChainMaxScore = std::max(sideChainMaxScore, rensaResult.score);
-        }
-
-        PuyoSet necessaryPuyos(puyosToComplement);
-
-        rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyos);
+        rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyoSet);
         rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
         rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
         rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, enemy.hasZenkeshi);
         rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
         rensaEvaluator.evalComplementationBias(puyosToComplement);
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
+        rensaEvaluator.evalRensaScore(rensaResult.score, virtualRensaScore);
 
         // TODO(mayah): need to set a better mode here.
         const typename ScoreCollector::CollectedScore& rensaCollectedScore = rensaScoreCollector->collectedScore();
@@ -644,20 +642,17 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
             maxScoreChains = rensaResult.chains;
         }
 
-        const double rensaScore = rensaResult.score;
-        double possibility = TsumoPossibility::possibility(necessaryPuyos, std::max(0, numReachableSpace));
-        // possibility = std::min(1.0, possibility + 0.15);
-
-        const double virtualRensaScore = rensaScore * possibility;
-        rensaEvaluator.evalRensaScore(rensaScore, virtualRensaScore);
-
         if (maxVirtualRensaResultScore < virtualRensaScore) {
             maxVirtualRensaResultScore = virtualRensaScore;
         }
 
-        int n = TsumoPossibility::necessaryPuyos(necessaryPuyos, 0.5);
-        if (n <= 5 && fastChainMaxScore > rensaScore) {
-            fastChainMaxScore = rensaScore;
+        if (puyosToComplement.size() <= 2 && rensaResult.chains == 2) {
+            sideChainMaxScore = std::max(sideChainMaxScore, rensaResult.score);
+        }
+
+        int nessesaryPuyos = TsumoPossibility::necessaryPuyos(necessaryPuyoSet, 0.5);
+        if (nessesaryPuyos <= 5 && fastChainMaxScore > rensaResult.score) {
+            fastChainMaxScore = rensaResult.score;
         }
     };
 
