@@ -103,7 +103,7 @@ public:
     }
 
     void setBookName(const std::string& bookName) { collectedFeatureScore_.bookName = bookName; }
-    std::string bookName() const { return collectedFeatureScore_.bookName; }
+    const std::string& bookName() const { return collectedFeatureScore_.bookName; }
 
     const CollectedCoef& collectedCoef() const { return collector_.collectedCoef(); }
     const CollectedFeatureScore& collectedScore() const { return collectedFeatureScore_; }

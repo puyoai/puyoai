@@ -582,7 +582,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
     evalThirdColumnHeightFeature(fieldBeforeRensa);
     evalValleyDepth(fieldBeforeRensa);
     evalRidgeHeight(fieldBeforeRensa);
-    evalFieldUShape(plan.field(), enemy.hasZenkeshi);
+    evalFieldUShape(fieldBeforeRensa, enemy.hasZenkeshi);
     evalUnreachableSpace(fieldBeforeRensa);
 
     int sideChainMaxScore = 0;
