@@ -331,6 +331,15 @@ bool CoreField::isChigiriDecision(const Decision& decision) const
     return height(decision.axisX()) != height(decision.childX());
 }
 
+void CoreField::fallOjama(int lines)
+{
+    for (int x = 1; x <= WIDTH; ++x) {
+        for (int i = 0; i < lines; ++i) {
+            (void)dropPuyoOnWithMaxHeight(x, PuyoColor::OJAMA, 13);
+        }
+    }
+}
+
 bool CoreField::dropPuyoOnWithMaxHeight(int x, PuyoColor c, int maxHeight)
 {
     DCHECK_NE(c, PuyoColor::EMPTY) << toDebugString();

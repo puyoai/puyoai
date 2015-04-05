@@ -240,6 +240,57 @@ TEST(CoreFieldTest, notQuick)
     EXPECT_FALSE(r.quick);
 }
 
+TEST(CoreFieldTest, fallOjama1)
+{
+    CoreField cf;
+    CoreField expected(
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    cf.fallOjama(3);
+
+    EXPECT_EQ(expected, cf) << cf.toDebugString();
+}
+
+TEST(CoreFieldTest, fallOjama2)
+{
+    CoreField cf(
+        ".....Y" // 14 (some puyo is in the air).
+        "......"
+        "......"
+        "O....O"
+        "OO.OOO" // 10
+        "OO.OOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+    CoreField expected(
+        ".....Y"
+        "OO.OOO" // 13
+        "OO.OOO" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    // Ojama won't drop on 14th line.
+    cf.fallOjama(3);
+    EXPECT_EQ(expected, cf) << cf.toDebugString();
+}
+
 TEST(CoreFieldTest, dropPuyoOn)
 {
     CoreField f(".O...." // 12

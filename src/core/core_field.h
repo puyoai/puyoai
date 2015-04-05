@@ -86,6 +86,9 @@ public:
     // Returns true if |decision| will cause chigiri.
     bool isChigiriDecision(const Decision&) const;
 
+    // Fall ojama puyos |lines| lines.
+    void fallOjama(int lines);
+
     // Places a puyo on the top of column |x|.
     // Returns true if succeeded. False if failed. When false is returned, field will not change.
     bool dropPuyoOn(int x, PuyoColor pc) { return dropPuyoOnWithMaxHeight(x, pc, 13); }
