@@ -166,10 +166,10 @@ MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentFi
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalFrameFeature(const RefPlan& plan)
+void Evaluator<ScoreCollector>::evalFrameFeature(int totalFrames, int numChigiri)
 {
-    sc_->addScore(TOTAL_FRAMES, plan.totalFrames());
-    sc_->addScore(NUM_CHIGIRI, plan.numChigiri());
+    sc_->addScore(TOTAL_FRAMES, totalFrames);
+    sc_->addScore(NUM_CHIGIRI, numChigiri);
 }
 
 template<typename ScoreCollector>
@@ -412,10 +412,8 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& re
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const RefPlan& plan, const RensaChainTrackResult& trackResult)
+void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const CoreField& field, const RensaChainTrackResult& trackResult)
 {
-    const CoreField& field = plan.field();
-
     // A_A is taboo generally. Allow this from x == 1 or x == 4.
     for (int x = 2; x <= 3; ++x) {
         for (int y = 1; y <= 12; ++y) {
@@ -430,13 +428,13 @@ void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const RefPlan& pl
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const RefPlan& plan, const RensaChainTrackResult& trackResult, bool enemyHasZenkeshi)
+void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const CoreField& field, const RensaChainTrackResult& trackResult, bool enemyHasZenkeshi)
 {
     auto key = enemyHasZenkeshi ? IGNITION_HEIGHT_ON_ENEMY_ZENKESHI : IGNITION_HEIGHT;
 
     for (int y = CoreField::HEIGHT; y >= 1; --y) {
         for (int x = 1; x <= CoreField::WIDTH; ++x) {
-            if (!isNormalColor(plan.field().color(x, y)))
+            if (!isNormalColor(field.color(x, y)))
                 continue;
             if (trackResult.erasedAt(x, y) == 1) {
                 sc_->addScore(key, y, 1);
@@ -570,7 +568,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
     const CoreField& fieldBeforeRensa = plan.field();
 
     // We'd like to evaluate frame feature always.
-    evalFrameFeature(plan);
+    evalFrameFeature(plan.totalFrames(), plan.numChigiri());
     evalMidEval(midEvalResult);
 
     if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult, midEvalResult))
@@ -622,15 +620,15 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
         rensaEvaluator.evalRensaFieldUShape(complementedField, enemy.hasZenkeshi);
-        rensaEvaluator.evalPatternScore(patternScore);
+        rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, trackResult, enemy.hasZenkeshi);
         rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyoSet);
         rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
-        rensaEvaluator.evalFirePointTabooFeature(plan, trackResult);
-        rensaEvaluator.evalRensaIgnitionHeightFeature(plan, trackResult, enemy.hasZenkeshi);
+        rensaEvaluator.evalPatternScore(patternScore);
+        rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, trackResult); // fieldBeforeRensa is correct.
         rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
         rensaEvaluator.evalComplementationBias(puyosToComplement);
-        rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
         rensaEvaluator.evalRensaScore(rensaResult.score, virtualRensaScore);
+        rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
 
         // TODO(mayah): need to set a better mode here.
         const typename ScoreCollector::CollectedScore& rensaCollectedScore = rensaScoreCollector->collectedScore();
