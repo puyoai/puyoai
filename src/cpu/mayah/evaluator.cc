@@ -585,12 +585,12 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
     evalFieldUShape(fieldBeforeRensa, enemy.hasZenkeshi);
     evalUnreachableSpace(fieldBeforeRensa);
 
+    const int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
+    int maxChainMaxChains = 0;
     int sideChainMaxScore = 0;
-    int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
     int fastChainMaxScore = 0;
     int maxVirtualRensaResultScore = 0;
     int rensaCounts[20] {};
-    int maxScoreChains = 0;
 
     struct MaxRensaInfo {
         double score = -100000000;
@@ -639,7 +639,10 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
             maxRensa.collectedScore = rensaCollectedScore;
             maxRensa.puyosToComplement = puyosToComplement;
             maxRensa.bookName = patternName;
-            maxScoreChains = rensaResult.chains;
+        }
+
+        if (maxChainMaxChains < rensaResult.chains) {
+            maxChainMaxChains = rensaResult.chains;
         }
 
         if (maxVirtualRensaResultScore < virtualRensaScore) {
@@ -659,6 +662,10 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
     PatternRensaDetector detector(patternBook(), fieldBeforeRensa, evalCallback);
     detector.iteratePossibleRensas(preEvalResult.matchablePatternIds(), maxIteration);
 
+    // max chain
+    sc_->addScore(RENSA_KIND, rensaCounts[maxChainMaxChains]);
+
+    // side chain
     if (sideChainMaxScore >= scoreForOjama(21)) {
         sc_->addScore(HOLDING_SIDE_CHAIN_LARGE, 1);
     } else if (sideChainMaxScore >= scoreForOjama(15)) {
@@ -667,17 +674,14 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         sc_->addScore(HOLDING_SIDE_CHAIN_SMALL, 1);
     }
 
+    // fast chain
     if (fastChainMaxScore >= scoreForOjama(30)) {
         sc_->addScore(HOLDING_FAST_CHAIN_LARGE, 1);
     } else if (fastChainMaxScore >= scoreForOjama(18)) {
         sc_->addScore(HOLDING_FAST_CHAIN_MEDIUM, 1);
     }
 
-    int rensaKind = 0;
-    for (int i = maxScoreChains; i < 20; ++i)
-        rensaKind += rensaCounts[i];
-    sc_->addScore(RENSA_KIND, rensaKind);
-
+    // finalize.
     sc_->merge(maxRensa.collectedScore);
     sc_->setBookName(maxRensa.bookName);
     sc_->setPuyosToComplement(maxRensa.puyosToComplement);
