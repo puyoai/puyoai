@@ -31,6 +31,7 @@ const EvaluationMode ALL_EVALUATION_MODES[] = {
 };
 inline int ordinal(EvaluationMode mode) { return static_cast<int>(mode); }
 std::string toString(EvaluationMode);
+const int NUM_EVALUATION_MODES = ARRAY_SIZE(ALL_EVALUATION_MODES);
 
 class EvaluationParameter {
 public:
