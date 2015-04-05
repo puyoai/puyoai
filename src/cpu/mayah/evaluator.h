@@ -104,8 +104,8 @@ public:
     void evalRensaScore(double score, double virtualScore);
     void evalRensaChainFeature(const RensaResult&, const PuyoSet&);
     void evalRensaGarbage(const CoreField& fieldAfterRensa);
-    void evalFirePointTabooFeature(const RefPlan&, const RensaChainTrackResult&);
-    void evalRensaIgnitionHeightFeature(const RefPlan&, const RensaChainTrackResult&, bool enemyHasZenkeshi);
+    void evalFirePointTabooFeature(const CoreField&, const RensaChainTrackResult&);
+    void evalRensaIgnitionHeightFeature(const CoreField&, const RensaChainTrackResult&, bool enemyHasZenkeshi);
     void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
     void evalRensaRidgeHeight(const CoreField&);
     void evalRensaValleyDepth(const CoreField&);
@@ -135,7 +135,7 @@ public:
                       const PlayerState& me, const PlayerState& enemy, const GazeResult&,
                       const MidEvalResult&);
 
-    void evalFrameFeature(const RefPlan&);
+    void evalFrameFeature(int totalFrames, int numChigiri);
     void evalRestrictedConnectionHorizontalFeature(const CoreField&);
     void evalThirdColumnHeightFeature(const CoreField&);
     void evalValleyDepth(const CoreField&);
