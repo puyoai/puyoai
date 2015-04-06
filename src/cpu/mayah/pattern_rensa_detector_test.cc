@@ -107,6 +107,17 @@ score = 72
 name = "GTR"
 )";
 
+static const char TEST_BOOK6[] = R"(
+[[pattern]]
+field = [
+    "..B.C.",
+    ".AABB.",
+    "AABCCC",
+]
+ignition = 2
+score = 72
+)";
+
 TEST(PatternBookTest, pattern1)
 {
     PatternBook patternBook;
@@ -362,4 +373,29 @@ TEST(PatternBookTest, pattern5)
     EXPECT_GT(score1, 0.0);
     EXPECT_GT(score2, 0.0);
     EXPECT_EQ(score1, score2);
+}
+
+TEST(PatternBookTest, pattern6)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK6));
+
+    CoreField field("......"
+                    ".BBRR."
+                    ".BRYY.");
+
+    double score = 0;
+    auto callback = [&](const CoreField&,
+                        const RensaResult&,
+                        const ColumnPuyoList&,
+                        PuyoColor,
+                        const RensaChainTrackResult&,
+                        const std::string&,
+                        double patternScore) {
+        if (patternScore > 0)
+            score = patternScore;
+    };
+
+    PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0, 1}, 3);
+    EXPECT_EQ(score, 0.0);
 }
