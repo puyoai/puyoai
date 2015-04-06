@@ -37,6 +37,14 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         if (complementResult.numFilledUnusedVariables > 0)
             continue;
 
+        ColumnPuyo firePuyo(x, cpl.get(x, cpl.sizeOn(x) - 1));
+        ColumnPuyoList keyPuyos(cpl);
+        keyPuyos.removeTopFrom(x);
+
+        // Needs to register even if no ignition puyo. So check this before checking ignition puyo.
+        if (!checkDup(firePuyo, keyPuyos))
+            continue;
+
         // No ignition puyo.
         if (cpl.sizeOn(x) == 0)
             continue;
@@ -44,10 +52,6 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         CoreField cf(originalField_);
         if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
             continue;
-
-        ColumnPuyo firePuyo(x, cpl.get(x, cpl.sizeOn(x) - 1));
-        ColumnPuyoList keyPuyos(cpl);
-        keyPuyos.removeTopFrom(x);
 
         CoreField::SimulationContext context(originalContext_);
         RensaYPositionTracker tracker;
