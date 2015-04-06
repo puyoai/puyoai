@@ -5,6 +5,7 @@ cpu_setup("mayah")
 add_library(mayah_lib
             collected_score.cc
             decision_book.cc
+            decision_planner.cc
             evaluator.cc
             evaluation_feature.cc
             evaluation_parameter.cc
@@ -39,6 +40,7 @@ cpu_add_runner(run_fast.sh)
 cpu_add_runner(run_without_joseki.sh)
 
 mayah_add_test(decision_book_test)
+mayah_add_test(decision_planner_test)
 mayah_add_test(evaluator_test)
 mayah_add_test(evaluation_parameter_test)
 mayah_add_test(gazer_test)

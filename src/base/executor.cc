@@ -86,7 +86,7 @@ Executor::Func Executor::take()
         condVar_.wait(lock);
     }
 
-    Func f = tasks_.front();
+    Func f = std::move(tasks_.front());
     tasks_.pop_front();
     return f;
 }

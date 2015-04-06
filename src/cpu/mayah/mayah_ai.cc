@@ -12,6 +12,7 @@
 #include "core/algorithm/puyo_possibility.h"
 #include "core/frame_request.h"
 
+#include "decision_planner.h"
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
@@ -130,9 +131,6 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     mutex mu;
     auto evalRefPlan = [&, this, frameId, maxIteration](const RefPlan& plan, const MidEvalResult& midEvalResult) {
-        if (specifiedDecisions && plan.decisions() != *specifiedDecisions)
-            return;
-
         EvalResult evalResult = eval(plan, field, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
         VLOG(1) << toString(plan.decisions())
@@ -159,67 +157,15 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
             bestRensaMidEvalResult = midEvalResult;
         }
     };
-
-    // NOTE: Since RefPlan will be destructed after this callback, if we'd like to pass RefPlan to
-    // an executor, we need to make Plan, and copy it.
-
-    WaitGroup wg;
-    auto evalAfterOne = [&, this, depth](const RefPlan& rp1) {
-        if (specifiedDecisions) {
-            if (rp1.decisions().empty() || specifiedDecisions->empty())
-                return;
-            if (rp1.decisions()[0] != (*specifiedDecisions)[0])
-                return;
-        }
-
-        // --- Do eval after one drop when the plan is RensaPlan.
-        if (rp1.isRensaPlan()) {
-            if (executor_) {
-                wg.add(1);
-                Plan p = rp1.toPlan();
-                executor_->submit([p, &wg, &evalRefPlan]() {
-                    evalRefPlan(RefPlan(p), MidEvalResult());
-                    wg.done();
-                });
-            } else {
-                evalRefPlan(rp1, MidEvalResult());
-            }
-        }
-
-        // --- Proceed the evaluation for the rest hands.
-        MidEvalResult midEvalResult = midEval(rp1, field, frameId, maxIteration, me, enemy, preEvalResult, gazeResult);
-
-        Plan p = rp1.toPlan();
-        KumipuyoSeq seq(kumipuyoSeq);
-        if (seq.size() > 0)
-            seq.dropFront();
-
-        auto f = [p, midEvalResult, &evalRefPlan](const RefPlan& plan) {
-            vector<Decision> decisions(p.decisions());
-            decisions.insert(decisions.end(), plan.decisions().begin(), plan.decisions().end());
-            RefPlan refPlan(plan.field(),
-                            decisions,
-                            plan.rensaResult(),
-                            p.numChigiri() + plan.numChigiri(),
-                            p.totalFrames() + plan.framesToIgnite(),
-                            plan.lastDropFrames());
-            evalRefPlan(refPlan, midEvalResult);
-        };
-
-        if (executor_) {
-            wg.add(1);
-            executor_->submit([p, seq, depth, f, &wg]() {
-                Plan::iterateAvailablePlans(p.field(), seq, depth - 1, f);
-                wg.done();
-            });
-        } else {
-            Plan::iterateAvailablePlans(p.field(), seq, depth - 1, f);
-        }
+    auto evalMidEval = [&](const RefPlan& plan) {
+        return midEval(plan, field, frameId, maxIteration, me, enemy, preEvalResult, gazeResult);
     };
 
-    Plan::iterateAvailablePlans(field, kumipuyoSeq, 1, evalAfterOne);
-    if (executor_)
-        wg.waitUntilDone();
+    DecisionPlanner<MidEvalResult> planner(executor_, evalMidEval, evalRefPlan);
+    if (specifiedDecisions)
+        planner.setSpecifiedDecisions(*specifiedDecisions);
+    planner.iterate(field, kumipuyoSeq, depth);
+
 
     double endTime = currentTime();
     if (bestVirtualRensaScore < bestRensaScore) {
