@@ -11,7 +11,7 @@
 struct CollectedCoef {
     double coef(EvaluationMode mode) const { return coefMap[ordinal(mode)]; }
 
-    std::array<double, NUM_EVALUATION_MODES> coefMap {};
+    std::array<double, NUM_EVALUATION_MODES> coefMap {{}};
 };
 
 struct CollectedSimpleScore {
@@ -24,7 +24,7 @@ struct CollectedSimpleScore {
         return s;
     }
 
-    std::array<double, NUM_EVALUATION_MODES> scoreMap {};
+    std::array<double, NUM_EVALUATION_MODES> scoreMap {{}};
 };
 
 struct CollectedFeatureScore {
