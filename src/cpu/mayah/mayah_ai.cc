@@ -265,10 +265,12 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
         ss << "ZENKESHI / ";
     if (cf.feature(STRATEGY_KILL) > 0)
         ss << "KILL / ";
-    if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_LARGE) > 0 ||
-        cf.feature(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM) > 0 ||
-        cf.feature(STRATEGY_FIRE_SIDE_CHAIN_SMALL) > 0) {
-        ss << "SIDE_CHAIN / ";
+    if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_LARGE) > 0) {
+        ss << "SIDE CHAIN LARGE / ";
+    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM) > 0) {
+        ss << "SIDE_CHAIN MEDIUM / ";
+    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_SMALL) > 0) {
+        ss << "SIDE_CHAIN SMALL / ";
     }
     if (cf.feature(STRATEGY_TAIOU) > 0)
         ss << "TAIOU / ";
