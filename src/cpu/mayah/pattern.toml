@@ -699,6 +699,16 @@ score = 4.0
 [[pattern]]
 field = [
     ".....C",
+    "....BC",
+    "...BCB",
+    "...CAB",
+    "...AAA",
+]
+score = 4.0
+
+[[pattern]]
+field = [
+    ".....C",
     ".....C",
     "....CB",
     "....BA",
