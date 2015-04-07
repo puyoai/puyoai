@@ -46,12 +46,12 @@ string CollectedFeatureCoefScore::toStringComparingWith(const CollectedFeatureCo
     }
 
     stringstream ss;
-    ss << setw(30) << "WHOLE SCORE" << " = "
+    ss << setw(32) << "WHOLE SCORE" << " = "
        << setw(15) << fixed << setprecision(6) << lhs.score() << "          : "
        << setw(15) << fixed << setprecision(6) << rhs.score() << endl;
     ss << "----------------------------------------------------------------------" << endl;
     for (EvaluationFeatureKey key : keys) {
-        ss << setw(30) << EvaluationFeature::toFeature(key).str() << " = ";
+        ss << setw(32) << EvaluationFeature::toFeature(key).str() << " = ";
         ss << setw(12) << fixed << setprecision(3) << lhs.feature(key) << " ("
            << setw(9) << fixed << setprecision(3) << lhs.scoreFor(key, paramMap) << ") : ";
         ss << setw(12) << fixed << setprecision(3) << rhs.feature(key) << " ("
