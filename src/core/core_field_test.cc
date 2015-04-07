@@ -14,7 +14,7 @@
 
 using namespace std;
 
-TEST(CoreFieldTest, Initial)
+TEST(CoreFieldTest, constructor)
 {
     CoreField f;
 
@@ -25,40 +25,63 @@ TEST(CoreFieldTest, Initial)
     }
 }
 
-TEST(CoreFieldTest, Color)
+TEST(CoreFieldTest, color)
 {
-    CoreField f("RRR   ");
+    CoreField cf("RRR   ");
 
-    EXPECT_EQ(PuyoColor::WALL, f.color(0, 1));
-    EXPECT_EQ(PuyoColor::RED, f.color(1, 1));
-    EXPECT_EQ(PuyoColor::RED, f.color(2, 1));
-    EXPECT_EQ(PuyoColor::RED, f.color(3, 1));
-    EXPECT_EQ(PuyoColor::EMPTY, f.color(4, 1));
-    EXPECT_EQ(PuyoColor::EMPTY, f.color(5, 1));
-    EXPECT_EQ(PuyoColor::EMPTY, f.color(6, 1));
-    EXPECT_EQ(PuyoColor::WALL, f.color(7, 1));
+    EXPECT_EQ(PuyoColor::WALL, cf.color(0, 1));
+    EXPECT_EQ(PuyoColor::RED, cf.color(1, 1));
+    EXPECT_EQ(PuyoColor::RED, cf.color(2, 1));
+    EXPECT_EQ(PuyoColor::RED, cf.color(3, 1));
+    EXPECT_EQ(PuyoColor::EMPTY, cf.color(4, 1));
+    EXPECT_EQ(PuyoColor::EMPTY, cf.color(5, 1));
+    EXPECT_EQ(PuyoColor::EMPTY, cf.color(6, 1));
+    EXPECT_EQ(PuyoColor::WALL, cf.color(7, 1));
 }
 
-TEST(CoreFieldTest, ForceDrop)
+TEST(CoreFieldTest, forceDrop)
 {
-    CoreField f("BRRBBB"
-                "      "
-                "RYRYRY"
-                "      ");
+    CoreField cf(
+        "BRRBBB"
+        "      "
+        "RYRYRY"
+        "      ");
 
-    f.forceDrop();
+    CoreField expected(
+        "BRRBBB"
+        "RYRYRY");
 
-    EXPECT_EQ(2, f.height(1));
-    EXPECT_EQ(2, f.height(2));
-    EXPECT_EQ(2, f.height(3));
-    EXPECT_EQ(2, f.height(4));
-    EXPECT_EQ(2, f.height(5));
-    EXPECT_EQ(2, f.height(6));
+    cf.forceDrop();
 
-    EXPECT_EQ(PuyoColor::RED, f.color(1, 1));
-    EXPECT_EQ(PuyoColor::BLUE, f.color(1, 2));
-    EXPECT_EQ(PuyoColor::EMPTY, f.color(1, 3));
-    EXPECT_EQ(PuyoColor::EMPTY, f.color(1, 4));
+    EXPECT_EQ(2, cf.height(1));
+    EXPECT_EQ(2, cf.height(2));
+    EXPECT_EQ(2, cf.height(3));
+    EXPECT_EQ(2, cf.height(4));
+    EXPECT_EQ(2, cf.height(5));
+    EXPECT_EQ(2, cf.height(6));
+    EXPECT_TRUE(expected == cf);
+}
+
+TEST(CoreFieldTest, simulate1)
+{
+    CoreField cf("RRRR..");
+
+    RensaResult rensaResult = cf.simulate();
+    EXPECT_EQ(1, rensaResult.chains);
+    EXPECT_EQ(40, rensaResult.score);
+    EXPECT_EQ(FRAMES_VANISH_ANIMATION, rensaResult.frames);
+}
+
+TEST(CoreFieldTest, simulate2)
+{
+    CoreField cf(
+        "..B..."
+        "..BBYB"
+        "RRRRBB");
+
+    RensaResult rensaResult = cf.simulate();
+    EXPECT_EQ(2, rensaResult.chains);
+    EXPECT_EQ(700, rensaResult.score);
 }
 
 void testUrl(string url, int expected_chains, int expected_score)
@@ -67,16 +90,6 @@ void testUrl(string url, int expected_chains, int expected_score)
     RensaResult rensaResult = f.simulate();
     EXPECT_EQ(expected_chains, rensaResult.chains);
     EXPECT_EQ(expected_score, rensaResult.score);
-}
-
-TEST(CoreFieldTest, ChainAndScoreTest1)
-{
-    testUrl("http://www.inosendo.com/puyo/rensim/??444400", 1, 40);
-}
-
-TEST(CoreFieldTest, ChainAndScoreTest2)
-{
-    testUrl("http://www.inosendo.com/puyo/rensim/??5000005565444455", 2, 700);
 }
 
 TEST(CoreFieldTest, ChainAndScoreTest3)
