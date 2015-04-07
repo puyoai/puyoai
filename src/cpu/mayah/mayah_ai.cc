@@ -299,12 +299,31 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
 
-    ss << "R/V SCORE=" << rensaScore << "/" << virtualRensaScore;
+    ss << "R/V SCORE=" << rensaScore << "/" << virtualRensaScore << " / ";
+
+    if (cf.feature(HOLDING_SIDE_CHAIN_SMALL) > 0) {
+        ss << "SIDE=SMALL";
+    } else if (cf.feature(HOLDING_SIDE_CHAIN_MEDIUM) > 0) {
+        ss << "SIDE=MEDIUM";
+    } else if (cf.feature(HOLDING_SIDE_CHAIN_LARGE) > 0) {
+        ss << "SIDE=LARGE";
+    } else {
+        ss << "SIDE=NONE";
+    }
+    ss << " / ";
+
+    if (cf.feature(HOLDING_FAST_CHAIN_MEDIUM) > 0) {
+        ss << "FAST=MEDIUM";
+    } else if (cf.feature(HOLDING_FAST_CHAIN_LARGE) > 0) {
+        ss << "FAST=LARGE";
+    } else {
+        ss << "FAST=NONE";
+    }
 
     ss << ",";
 
     if (enemy.isRensaOngoing) {
-        ss << "Gazed ongoing rensa : " << enemy.ongoingRensaResult.score
+        ss << "Gazed (ongoing) : " << enemy.ongoingRensaResult.score
            << " in " << (enemy.finishingRensaFrameId - frameId) << " / ";
     } else {
         ss << "Gazed = "
