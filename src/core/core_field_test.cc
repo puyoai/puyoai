@@ -82,6 +82,11 @@ TEST(CoreFieldTest, simulate2)
     RensaResult rensaResult = cf.simulate();
     EXPECT_EQ(2, rensaResult.chains);
     EXPECT_EQ(700, rensaResult.score);
+
+    int frames = 0;
+    frames += FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[1] + FRAMES_GROUNDING;
+    frames += FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[1] + FRAMES_GROUNDING;
+    EXPECT_EQ(frames, rensaResult.frames);
 }
 
 void testUrl(string url, int expected_chains, int expected_score)
