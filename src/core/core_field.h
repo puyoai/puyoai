@@ -87,7 +87,8 @@ public:
     bool isChigiriDecision(const Decision&) const;
 
     // Fall ojama puyos |lines| lines.
-    void fallOjama(int lines);
+    // Returns the frame to fall ojama.
+    int fallOjama(int lines);
 
     // Places a puyo on the top of column |x|.
     // Returns true if succeeded. False if failed. When false is returned, field will not change.
