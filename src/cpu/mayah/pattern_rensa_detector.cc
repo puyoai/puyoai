@@ -37,14 +37,6 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         if (complementResult.numFilledUnusedVariables > 0)
             continue;
 
-        ColumnPuyo firePuyo(x, cpl.get(x, cpl.sizeOn(x) - 1));
-        ColumnPuyoList keyPuyos(cpl);
-        keyPuyos.removeTopFrom(x);
-
-        // Needs to register even if no ignition puyo. So check this before checking ignition puyo.
-        if (!checkDup(firePuyo, keyPuyos))
-            continue;
-
         // No ignition puyo.
         if (cpl.sizeOn(x) == 0)
             continue;
@@ -52,6 +44,10 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         CoreField cf(originalField_);
         if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
             continue;
+
+        ColumnPuyo firePuyo(x, cpl.get(x, cpl.sizeOn(x) - 1));
+        ColumnPuyoList keyPuyos(cpl);
+        keyPuyos.removeTopFrom(x);
 
         CoreField::SimulationContext context(originalContext_);
         RensaYPositionTracker tracker;
@@ -85,7 +81,7 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
 
         RensaYPositionTracker tracker;
         iteratePossibleRensasInternal(*cf, originalContext_, tracker, 0,
-                                      firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0.0);
+                                      firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0.0, false);
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
@@ -101,7 +97,8 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
                                                          int restIteration,
                                                          int restUnusedVariables,
                                                          const std::string& patternName,
-                                                         double currentPatternScore)
+                                                         double currentPatternScore,
+                                                         bool addsPatternScore)
 {
     const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
 
@@ -121,14 +118,18 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         const PatternBookField& pbf = patternBook_.patternBookField(*it);
 
         double patternScore = currentPatternScore;
-        auto scoreCallback = [this, &patternScore, &pbf, &currentFieldTracker](int x, int y, double score) {
+        auto addScoreCallback = [this, &patternScore, &pbf, &currentFieldTracker](int x, int y, double score) {
             int actualY = currentFieldTracker.originalY(x, y);
             if (isNormalColor(originalField_.color(x, actualY)))
                 patternScore += score / pbf.numVariables();
         };
+        auto dontAddScoreCallback = [](int, int, double) {};
 
         ColumnPuyoList cpl;
-        ComplementResult complementResult = pbf.complement(currentField, restUnusedVariables, &cpl, scoreCallback);
+        ComplementResult complementResult = addsPatternScore ?
+            pbf.complement(currentField, restUnusedVariables, &cpl, addScoreCallback) :
+            pbf.complement(currentField, restUnusedVariables, &cpl, dontAddScoreCallback);
+
         if (!complementResult.success)
             continue;
 

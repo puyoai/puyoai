@@ -43,7 +43,8 @@ private:
                                        int restIteration,
                                        int restUnusedVariables,
                                        const std::string& patternName,
-                                       double currentPatternScore);
+                                       double currentPatternScore,
+                                       bool addsPatternScore = true);
 
     bool checkDup(const ColumnPuyo& firePuyo,
                   const ColumnPuyoList& keyPuyos);
