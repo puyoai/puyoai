@@ -652,7 +652,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         }
 
         int nessesaryPuyos = TsumoPossibility::necessaryPuyos(necessaryPuyoSet, 0.5);
-        if (nessesaryPuyos <= 5 && fastChainMaxScore > rensaResult.score) {
+        if (nessesaryPuyos <= 5 && fastChainMaxScore < rensaResult.score) {
             fastChainMaxScore = rensaResult.score;
         }
     };
