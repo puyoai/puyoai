@@ -11,6 +11,7 @@
 #include "core/constant.h"
 #include "core/decision.h"
 #include "core/field_bit_field.h"
+#include "core/frame.h"
 #include "core/kumipuyo.h"
 #include "core/position.h"
 #include "core/rensa_result.h"
@@ -331,13 +332,22 @@ bool CoreField::isChigiriDecision(const Decision& decision) const
     return height(decision.axisX()) != height(decision.childX());
 }
 
-void CoreField::fallOjama(int lines)
+int CoreField::fallOjama(int lines)
 {
+    if (lines == 0)
+        return 0;
+
+    int dropHeight = 0;
     for (int x = 1; x <= WIDTH; ++x) {
+        dropHeight = std::max(dropHeight, 12 - height(x));
         for (int i = 0; i < lines; ++i) {
             (void)dropPuyoOnWithMaxHeight(x, PuyoColor::OJAMA, 13);
         }
     }
+
+    // TODO(mayah): When more ojamas are dropped, grounding frames is necessary more.
+    // See FieldRealtime::onStateOjamaDropping() also.
+    return FRAMES_TO_DROP[dropHeight] + framesGroundingOjama(6 * lines);
 }
 
 bool CoreField::dropPuyoOnWithMaxHeight(int x, PuyoColor c, int maxHeight)

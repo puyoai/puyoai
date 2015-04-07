@@ -8,6 +8,7 @@
 
 #include "core/constant.h"
 #include "core/decision.h"
+#include "core/frame.h"
 #include "core/position.h"
 #include "core/rensa_result.h"
 
@@ -248,9 +249,11 @@ TEST(CoreFieldTest, fallOjama1)
         "OOOOOO"
         "OOOOOO");
 
-    cf.fallOjama(3);
+    int framesOjamaDropping = cf.fallOjama(3);
+    int expectedFrames = FRAMES_TO_DROP[12] + framesGroundingOjama(18);
 
     EXPECT_EQ(expected, cf) << cf.toDebugString();
+    EXPECT_EQ(expectedFrames, framesOjamaDropping);
 }
 
 TEST(CoreFieldTest, fallOjama2)
@@ -287,8 +290,11 @@ TEST(CoreFieldTest, fallOjama2)
         "OOOOOO");
 
     // Ojama won't drop on 14th line.
-    cf.fallOjama(3);
+    int framesOjamaDropping = cf.fallOjama(3);
+    int expectedFrames = FRAMES_TO_DROP[4] + framesGroundingOjama(18);
+
     EXPECT_EQ(expected, cf) << cf.toDebugString();
+    EXPECT_EQ(expectedFrames, framesOjamaDropping);
 }
 
 TEST(CoreFieldTest, dropPuyoOn)

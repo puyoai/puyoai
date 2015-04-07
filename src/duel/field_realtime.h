@@ -125,6 +125,7 @@ private:
     int numFixedOjama_ = 0;
     int numPendingOjama_ = 0;
 
+    int ojamaDroppingAmount_ = 0;
     double dropVelocity_ = 0.0;
     double dropAmount_ = 0.0;
 

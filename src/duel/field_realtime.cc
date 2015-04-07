@@ -10,6 +10,7 @@
 #include <glog/logging.h>
 
 #include "core/constant.h"
+#include "core/frame.h"
 #include "core/kumipuyo.h"
 #include "duel/frame_context.h"
 
@@ -211,6 +212,11 @@ bool FieldRealtime::onStateOjamaDropping()
             }
         }
 
+        int ojamaAmount = 0;
+        for (int i = 0; i < 6; ++i)
+            ojamaAmount += ojama_position_[i];
+
+        ojamaDroppingAmount_ = ojamaAmount;
         dropVelocity_ = INITIAL_DROP_VELOCITY;
         dropAmount_ = 0.0;
     }
@@ -233,8 +239,8 @@ bool FieldRealtime::onStateOjamaDropping()
     if (!ojamaWasDropping) {
         sleepFor_ = 0;
     } else {
-        // TODO(mayah): We need to sleep more. 1 ojama -> +4 frames, 30 ojama -> 16frames, etc.
-        sleepFor_ = FRAMES_GROUNDING;
+        sleepFor_ = framesGroundingOjama(ojamaDroppingAmount_);
+        ojamaDroppingAmount_ = 0;
     }
 
     simulationState_ = SimulationState::STATE_OJAMA_GROUNDING;
