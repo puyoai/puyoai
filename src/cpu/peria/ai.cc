@@ -178,7 +178,7 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
     score += value;
 
     // Penalty for vanishments.
-    value = -plan.totalFrames() * 5;
+    value = -plan.totalFrames() * 10;
     oss << "Time(" << value << ")_";
     score += value;
     

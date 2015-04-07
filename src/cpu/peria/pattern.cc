@@ -84,9 +84,6 @@ bool Pattern::ParseBook(std::istream& is) {
 }
 
 int Pattern::Match(const CoreField& field) const {
-  if (max_puyos_ > 0 && field.countPuyos() > max_puyos_)
-    return 0;
-
   MatchingCounts matching0;
   MatchingCounts matching1;  // Mirroring
   const int height = pattern_.size();
