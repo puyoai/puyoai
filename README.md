@@ -61,23 +61,11 @@ sample は、消せるところがあれば消し、そうでなければ左に�
 
 ## ディレクトリの説明
 
-* src/ 主なプログラムのソース
-* arduino/ Wii実機と接続する際に使う、arduino関連
-* data/    フォントとか画像とか
-* testdata/ キャプチャー用のテストデータ
-* tools/ いろいろなツール類
+* src/ 主なプログラムのソース。
+* build/ ビルド関連のスクリプトなど。意味のわかる方のみ使ってください。
+* arduino/ Wii実機と接続する際に使う、arduino関連のソース。
+* data/    フォントとか画像とか。
+* testdata/ キャプチャー用のテストデータ。
+* tools/ いろいろなツール類。
 * deprecated/ 過去のソース。今ほどモジュールに分かれていない。
 
-### そのほか
-
-雑な細かい説明がここに書いてあります。
-
-http://d.hatena.ne.jp/shinichiro_h/20130203
-
-AI のプロトコル仕様について、とても雑で不完全なドキュメントはここにあります。
-
-https://docs.google.com/document/d/1cTIJgRHCBhmxXVtBb45Jm3yAQVaogfVN3oayi-FrA74/edit
-
-適当な情報を wiki に足していく予定です…
-
-https://github.com/puyoai/puyoai/wiki

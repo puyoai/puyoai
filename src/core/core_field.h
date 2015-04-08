@@ -43,7 +43,7 @@ public:
 
     // Returns true if the field does not have any puyo. Valid only all puyos are dropped.
     bool isZenkeshi() const;
-    // Retruns true if the field does not have any puyo. This will return valid value
+    // Returns true if the field does not have any puyo. This will return valid value
     // when some puyos are in the air.
     bool isZenkeshiPrecise() const;
 
@@ -56,7 +56,11 @@ public:
     int countConnectedPuyos(int x, int y) const;
     // Same as countConnectedPuyos(x, y), but with checking using |checked|.
     int countConnectedPuyos(int x, int y, FieldBitField* checked) const;
-    // Same as countConnectedPuyos(x, y). But you can call this only when the number of connected puyos <= 4.
+    // Same as countConnectedPuyos(x, y).
+    // If # of connected puyos is >= 4, the result is any value >= 4.
+    // For example, if the actual number of connected is 6, result is 4, 5, or 6.
+    // This is faster than countConnectedPuyos, so this will be useful when checking
+    // puyo is vanished or not.
     int countConnectedPuyosMax4(int x, int y) const;
     // Returns true if color(x, y) is connected in some direction.
     bool isConnectedPuyo(int x, int y) const;
