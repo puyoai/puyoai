@@ -451,7 +451,7 @@ TEST(CoreFieldTest, simualteWithRensaVanishingPositionResult)
     EXPECT_EQ(3, positionResult.getReferenceFallingPuyosAt(4)[0].y);
 }
 
-TEST(CoreFieldTest, FramesToDropNextWithoutChigiri)
+TEST(CoreFieldTest, framesToDropNextWithoutChigiri)
 {
     // TODO(mayah): We have to confirm this.
     CoreField f;
@@ -468,12 +468,12 @@ TEST(CoreFieldTest, FramesToDropNextWithoutChigiri)
               f.framesToDropNext(Decision(1, 0)));
 }
 
-TEST(CoreFieldTest, FramesToDropNextWithChigiri)
+TEST(CoreFieldTest, framesToDropNextWithChigiri)
 {
-    CoreField f("004000"
-                "005000"
-                "006000"
-                "007000");
+    CoreField f("..O..."
+                "..O..."
+                "..O..."
+                "..O...");
 
     EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT - 4] + FRAMES_GROUNDING +
               FRAMES_TO_DROP[4] + FRAMES_GROUNDING,
