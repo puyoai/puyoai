@@ -9,7 +9,7 @@ field = [
     "BBC@@.",
 ]
 name = "GTR"
-score = 10.0
+score = 10.5
 ignition = 1
 
 [[pattern]]
@@ -20,7 +20,7 @@ field = [
     "BBC@@@",
 ]
 name = "GTR"
-score = 10.0
+score = 10.5
 ignition = 1
 
 [[pattern]]
@@ -1478,6 +1478,20 @@ field = [
 ignition = 2
 score = 8.0
 
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "A.....",
+    "A.....",
+    "A.....",
+    "A.....",
+    "BB....",
+    "BCC...",
+    "C.....",
+]
+score = 7.0
+
 # ----------------------------------------------------------------------
 # FUKIGENGTR-HEAD-2
 
@@ -1492,6 +1506,21 @@ field = [
 ]
 ignition = 3
 score = 8.0
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "B.....",
+    "AA....",
+    "BA....",
+    "BA....",
+    "CC....",
+    "C.....",
+    "......",
+]
+ignition = 2
+score = 6.0
 
 # ----------------------------------------------------------------------
 # FUKIGENGTR-TAIL-1
@@ -1580,6 +1609,27 @@ field = [
     "...B.C",
     "..AABB",
     ".AA.CC",
+]
+ignition = 3
+score = 6.0
+
+[[pattern]]
+field = [
+    ".....C",
+    "...BCC",
+    "..AABB",
+    ".AABC.",
+]
+ignition = 3
+score = 6.0
+
+[[pattern]]
+field = [
+    ".....C",
+    ".....C",
+    "...B.C",
+    "..AABB",
+    ".AAB.C",
 ]
 ignition = 3
 score = 6.0
