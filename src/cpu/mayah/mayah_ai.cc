@@ -59,12 +59,12 @@ DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& 
     int depth;
     int iteration;
     if (fast) {
-      depth = MayahAI::DEFAULT_DEPTH;
+      depth = MayahAI::FAST_DEPTH;
       iteration = MayahAI::FAST_NUM_ITERATION;
     } else if (FLAGS_use_advanced_next) {
         if (kumipuyoSeq.size() >= 3) {
-            depth = 3;
-            iteration = 2;
+            depth = DEEP_DEPTH;
+            iteration = DEEP_NUM_ITERATION;
         } else {
             depth = MayahAI::DEFAULT_DEPTH;
             iteration = MayahAI::DEFAULT_NUM_ITERATION;
