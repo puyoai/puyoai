@@ -3,6 +3,7 @@
 
 #include <string>
 
+// RensaResult includes the result of rensa.
 struct RensaResult {
     RensaResult() : chains(0), score(0), frames(0), quick(false) {}
 
@@ -23,7 +24,7 @@ struct RensaResult {
     int chains;
     int score;
     int frames;
-    bool quick;  // Last vanishment does not drop any puyos.
+    bool quick; // True if the last vanishment does not drop any puyos.
 };
 
 class IgnitionRensaResult {

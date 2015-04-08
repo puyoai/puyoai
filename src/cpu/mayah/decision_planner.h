@@ -216,6 +216,8 @@ template<typename MidEvaluationResult>
 void DecisionPlanner<MidEvaluationResult>::parallelEval(int currentDepth, const RefPlan& refPlan,
                                                         const MidEvaluationResult& midEvaluationResult, WaitGroup* wg)
 {
+    // We only submit a task to executor when currentDepth <= 1. (current + next).
+    // If we submit a task for currentDepth == 2, the number of task is too much, and overhead is high.
     if (executor_ && currentDepth <= 1) {
         wg->add(1);
         Plan plan(refPlan.toPlan());
