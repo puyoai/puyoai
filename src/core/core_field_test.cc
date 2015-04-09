@@ -116,43 +116,43 @@ TEST(CoreFieldTest, ChainAndScoreTest3)
 TEST(CoreFieldTest, FramesTest) {
     {
         // 1 Rensa, no drop.
-        CoreField f("444400");
+        CoreField f("RRRR..");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_VANISH_ANIMATION, rensaResult.frames);
     }
     {
-        CoreField f("500000"
-                    "444400");
+        CoreField f("Y....."
+                    "RRRR..");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[1] + FRAMES_GROUNDING, rensaResult.frames);
     }
     {
-        CoreField f("500000"
-                    "400000"
-                    "444000");
+        CoreField f("Y....."
+                    "R....."
+                    "RRR...");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[2] + FRAMES_GROUNDING, rensaResult.frames);
     }
     {
-        CoreField f("500000"
-                    "450000"
-                    "444000");
+        CoreField f("Y....."
+                    "RY...."
+                    "RRR...");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[2] + FRAMES_GROUNDING, rensaResult.frames);
     }
     {
-        CoreField f("500000"
-                    "455000"
-                    "444500");
+        CoreField f("Y....."
+                    "RYY..."
+                    "RRRY..");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[2] + FRAMES_GROUNDING +
                   FRAMES_VANISH_ANIMATION,
                   rensaResult.frames);
     }
     {
-        CoreField f("560000"
-                    "455000"
-                    "444500");
+        CoreField f("YB...."
+                    "RYY..."
+                    "RRRY..");
         RensaResult rensaResult = f.simulate();
         EXPECT_EQ(FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[2] + FRAMES_GROUNDING +
                   FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[1] + FRAMES_GROUNDING,
