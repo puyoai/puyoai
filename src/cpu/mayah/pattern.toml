@@ -1616,6 +1616,16 @@ score = 6.0
 [[pattern]]
 field = [
     ".....C",
+    "...B.C",
+    "..AABB",
+    ".AABCC",
+]
+ignition = 3
+score = 6.0
+
+[[pattern]]
+field = [
+    ".....C",
     "...BCC",
     "..AABB",
     ".AABC.",
