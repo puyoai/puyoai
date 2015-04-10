@@ -59,7 +59,7 @@ string CollectedFeatureCoefScore::toStringComparingWith(const CollectedFeatureCo
         ss << endl;
     }
     for (EvaluationSparseFeatureKey key : sparseKeys) {
-        ss << setw(30) << EvaluationSparseFeature::toFeature(key).str() << " = ";
+        ss << setw(32) << EvaluationSparseFeature::toFeature(key).str() << " = ";
         {
             stringstream st;
             for (int v : lhs.feature(key)) {
