@@ -537,7 +537,7 @@ EvaluationMode Evaluator<ScoreCollector>::calculateMode(const PlayerState& me, c
     const int EARLY_MIDDLE_THRESHOLD = 36;
     const int MIDDLE_THRESHOLD = 54;
 
-    if (enemy.field.isZenkeshi())
+    if (enemy.hasZenkeshi)
         return EvaluationMode::ENEMY_HAS_ZENKESHI;
 
     int count = me.field.countPuyos();
