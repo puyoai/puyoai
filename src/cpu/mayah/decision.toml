@@ -302,11 +302,12 @@ field = [
     "BBB...",
     "AAA..."
 ]
-ACBC = [3, 3]
 ACAD = [4, 2]
+ACBC = [3, 3]
 ADAD = [4, 2]
 BCAB = [4, 0]
 BCBD = [4, 0]
+BCCC = [2, 2]
 CCAB = [2, 3]
 CCDD = [5, 1]
 CDBC = [6, 0]
