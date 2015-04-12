@@ -71,7 +71,7 @@ void WiiConnectServer::reset()
 {
     for (int i = 0; i < 2; ++i) {
         lastDecision_[i] = Decision();
-        messages_[i].clear();
+        message_[i].clear();
     }
 
     colorMap_.clear();
@@ -247,8 +247,8 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 
         for (int j = static_cast<int>(responses[pi].size()) - 1; j >= 0; --j) {
             const FrameResponse& fr = responses[pi][j];
-            if (!fr.msg.empty()) {
-                messages_[pi] = fr.msg;
+            if (!fr.message.empty()) {
+                message_[pi] = fr.message;
                 break;
             }
         }
@@ -391,7 +391,7 @@ GameState WiiConnectServer::toGameState(int frameId, const AnalyzerResult& analy
             pgs->decision = Decision();
             pgs->kumipuyoPos = KumipuyoPos();
         }
-        pgs->message = messages_[pi];
+        pgs->message = message_[pi];
     }
 
     return gameState;

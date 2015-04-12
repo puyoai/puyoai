@@ -77,7 +77,7 @@ private:
 
     bool isAi_[2];
     Decision lastDecision_[2];
-    std::string messages_[2];
+    std::string message_[2];
 };
 
 #endif

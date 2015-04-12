@@ -58,7 +58,7 @@ struct DuelServer::DuelState {
     int frameId = 0;
     FieldRealtime field[2];
     Decision decision[2];
-    std::string message[2];
+    string message[2];
 };
 
 /**
@@ -277,9 +277,9 @@ void DuelServer::play(DuelState* duelState, const vector<FrameResponse> data[2])
             me->setKeySetSeq(kss);
         }
 
-        string accepted_message;
+        string acceptedMessage;
         if (accepted_index != -1)
-            accepted_message = data[pi][accepted_index].msg;
+            acceptedMessage = data[pi][accepted_index].message;
 
         LOG(INFO) << "Current KeySetSeq: " << pi << " " << me->keySetSeq().toString();
         KeySet keySet = me->frontKeySet();
@@ -299,8 +299,8 @@ void DuelServer::play(DuelState* duelState, const vector<FrameResponse> data[2])
             me->setKeySetSeq(KeySetSeq());
         }
 
-        if (accepted_message != "") {
-            duelState->message[pi] = accepted_message;
+        if (!acceptedMessage.empty()) {
+            duelState->message[pi] = acceptedMessage;
         }
     }
 }

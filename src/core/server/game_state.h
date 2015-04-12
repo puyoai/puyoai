@@ -2,6 +2,8 @@
 #define CORE_SERVER_GAME_STATE_H_
 
 #include <string>
+#include <vector>
+
 #include <glog/logging.h>
 
 #include "base/base.h"

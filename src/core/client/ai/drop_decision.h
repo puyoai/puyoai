@@ -8,14 +8,14 @@
 class DropDecision {
 public:
     explicit DropDecision(const Decision& decision = Decision(),
-                          std::string message = std::string()) :
+                          const std::string& message = std::string()) :
         decision_(decision),
-        message_(std::move(message))
+        message_ { message }
     {
     }
 
     const Decision& decision() const { return decision_; }
-    const std::string message() const { return message_; }
+    const std::string& message() const { return message_; }
 
 private:
     Decision decision_;

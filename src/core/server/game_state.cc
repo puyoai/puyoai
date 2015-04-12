@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+#include <json/json.h>
+
 #include "core/core_field.h"
 #include "core/field_pretty_printer.h"
 #include "core/kumipuyo.h"
@@ -9,18 +11,6 @@
 // TODO(mayah): Do we need CoreField here? PlainField looks OK.
 
 using namespace std;
-
-static string escapeMessage(const string& s)
-{
-    ostringstream ss;
-    for (char c: s) {
-        if (c == '\"')
-            ss << "\\\"";
-        else
-            ss << c;
-    }
-    return ss.str();
-}
 
 GameResult GameState::gameResult() const
 {
@@ -49,22 +39,20 @@ string GameState::toJson() const
         }
     }
 
-    ostringstream ss;
-    ss << "{";
-    ss << "\"p1\": \"" << f[0].toString() << "\",\n";
-    ss << "\"s1\": " << playerGameState_[0].score << ",\n";
-    ss << "\"o1\": " << playerGameState_[0].ojama() << ",\n";
-    ss << "\"n1\": \"" << playerGameState_[0].kumipuyoSeq.toString() << "\",\n";
-    ss << "\"m1\": \"" << escapeMessage(playerGameState_[0].message) << "\",\n";
+    Json::Value root;
+    root["p1"] = f[0].toString();
+    root["s1"] = playerGameState_[0].score;
+    root["o1"] = playerGameState_[0].ojama();
+    root["n1"] = playerGameState_[0].kumipuyoSeq.toString();
+    root["m1"] = playerGameState_[0].message;
 
-    ss << "\"p2\": \"" << f[1].toString() << "\",\n";
-    ss << "\"s2\": " << playerGameState_[1].score << ",\n";
-    ss << "\"o2\": " << playerGameState_[1].ojama() << ",\n";
-    ss << "\"n2\": \"" << playerGameState_[1].kumipuyoSeq.toString() << "\",\n";
-    ss << "\"m2\": \"" << escapeMessage(playerGameState_[1].message) << "\",\n";
-    ss << "}";
+    root["p2"] = f[1].toString();
+    root["s2"] = playerGameState_[1].score;
+    root["o2"] = playerGameState_[1].ojama();
+    root["n2"] = playerGameState_[1].kumipuyoSeq.toString();
+    root["m2"] = playerGameState_[1].message;
 
-    return ss.str();
+    return root.asString();
 }
 
 string GameState::toDebugString() const

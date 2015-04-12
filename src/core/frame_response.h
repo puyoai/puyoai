@@ -12,15 +12,15 @@ struct FrameResponse {
     FrameResponse() {}
     explicit FrameResponse(int frameId,
                            const Decision& decision = Decision(),
-                           const std::string& msg = std::string()) :
-        frameId(frameId), decision(decision), msg(msg) {}
+                           const std::string& message = std::string()) :
+        frameId(frameId), decision(decision), message(message) {}
 
     bool isValid() const;
     std::string toString() const;
 
     int frameId = -1;
     Decision decision;
-    std::string msg;
+    std::string message;
 
     // Mostly for HumanConnection.
     KeySet keySet;

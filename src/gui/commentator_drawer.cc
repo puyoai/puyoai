@@ -1,5 +1,6 @@
 #include "gui/commentator_drawer.h"
 
+#include "base/strings.h"
 #include "gui/screen.h"
 #include "gui/unique_sdl_surface.h"
 #include "gui/util.h"
@@ -161,8 +162,7 @@ void CommentatorDrawer::drawCommentSurface(Screen* screen, const CommentatorResu
 
     int offsetY = screen->mainBox().dy + 20;
     for (int pi = 0; pi < 2; ++pi) {
-        for (size_t i = 0; i < result.message[pi].size(); ++i) {
-            const string& s = result.message[pi][i];
+        for (const string& s : strings::split(result.message[pi], '\n')) {
             drawText(screen, s.c_str(), 20, offsetY);
             offsetY += LH;
         }
