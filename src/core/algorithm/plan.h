@@ -17,9 +17,12 @@ class Plan {
 public:
     Plan() {}
     Plan(const CoreField& field, const std::vector<Decision>& decisions,
-         const RensaResult& rensaResult, int numChigiri, int framesToIgnite, int lastDropFrames) :
+         const RensaResult& rensaResult, int numChigiri, int framesToIgnite, int lastDropFrames,
+         int fallenOjama, int fixedOjama, int pendingOjama, int ojamaCommittingFrameId, bool hasZenkeshi) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
-        numChigiri_(numChigiri), framesToIgnite_(framesToIgnite), lastDropFrames_(lastDropFrames)
+        numChigiri_(numChigiri), framesToIgnite_(framesToIgnite), lastDropFrames_(lastDropFrames),
+        fallenOjama_(fallenOjama), fixedOjama_(fixedOjama), pendingOjama_(pendingOjama),
+        ojamaCommittingFrameId_(ojamaCommittingFrameId), hasZenkeshi_(hasZenkeshi)
     {
     }
 
@@ -49,10 +52,15 @@ public:
 
     bool isRensaPlan() const { return rensaResult_.chains > 0; }
 
+    int fallenOjama() const { return fallenOjama_; }
+    int pendingOjama() const { return pendingOjama_; }
+    int fixedOjama() const { return fixedOjama_; }
+    int ojamaCommittingFrameId() const { return ojamaCommittingFrameId_; }
+    bool hasZenkeshi() const { return hasZenkeshi_; }
+
     std::string decisionText() const;
 
     friend bool operator==(const Plan& lhs, const Plan& rhs);
-
 private:
     CoreField field_;      // Future field (after the rensa has been finished).
     std::vector<Decision> decisions_;
@@ -60,6 +68,11 @@ private:
     int numChigiri_ = 0;
     int framesToIgnite_ = 0;
     int lastDropFrames_ = 0;
+    int fallenOjama_ = 0;
+    int fixedOjama_ = 0;
+    int pendingOjama_ = 0;
+    int ojamaCommittingFrameId_ = 0;
+    bool hasZenkeshi_ = 0;
 };
 
 // RefPlan is almost same as plan, but holding references so that field copy will not occur.
@@ -68,14 +81,19 @@ class RefPlan : noncopyable {
 public:
     explicit RefPlan(const Plan& plan) :
         field_(plan.field()), decisions_(plan.decisions()), rensaResult_(plan.rensaResult()),
-        numChigiri_(plan.numChigiri()), framesToIgnite_(plan.framesToIgnite()), lastDropFrames_(plan.lastDropFrames())
+        numChigiri_(plan.numChigiri()), framesToIgnite_(plan.framesToIgnite()), lastDropFrames_(plan.lastDropFrames()),
+        fallenOjama_(plan.fallenOjama()), fixedOjama_(plan.fixedOjama()), pendingOjama_(plan.pendingOjama()),
+        ojamaCommittingFrameId_(plan.ojamaCommittingFrameId()), hasZenkeshi_(plan.hasZenkeshi())
     {
     }
 
     RefPlan(const CoreField& field, const std::vector<Decision>& decisions,
-            const RensaResult& rensaResult, int numChigiri, int framesToIgnite, int lastDropFrames) :
+            const RensaResult& rensaResult, int numChigiri, int framesToIgnite, int lastDropFrames,
+            int fallenOjama, int fixedOjama, int pendingOjama, int ojamaCommittingFrameId, bool hasZenkeshi) :
         field_(field), decisions_(decisions), rensaResult_(rensaResult),
-        numChigiri_(numChigiri), framesToIgnite_(framesToIgnite), lastDropFrames_(lastDropFrames)
+        numChigiri_(numChigiri), framesToIgnite_(framesToIgnite), lastDropFrames_(lastDropFrames),
+        fallenOjama_(fallenOjama), fixedOjama_(fixedOjama), pendingOjama_(pendingOjama),
+        ojamaCommittingFrameId_(ojamaCommittingFrameId), hasZenkeshi_(hasZenkeshi)
     {
     }
 
@@ -95,7 +113,14 @@ public:
 
     bool isRensaPlan() const { return rensaResult_.chains > 0; }
 
-    Plan toPlan() const { return Plan(field_, decisions_, rensaResult_, numChigiri_, framesToIgnite_, lastDropFrames_); }
+    int fallenOjama() const { return fallenOjama_; }
+    int pendingOjama() const { return pendingOjama_; }
+    int fixedOjama() const { return fixedOjama_; }
+    int ojamaCommittingFrameId() const { return ojamaCommittingFrameId_; }
+    bool hasZenkeshi() const { return hasZenkeshi_; }
+
+    Plan toPlan() const { return Plan(field_, decisions_, rensaResult_, numChigiri_, framesToIgnite_, lastDropFrames_,
+                                      fallenOjama_, pendingOjama_, fixedOjama_, ojamaCommittingFrameId_, hasZenkeshi_); }
 
     std::string decisionText() const;
 
@@ -106,6 +131,11 @@ private:
     int numChigiri_;
     int framesToIgnite_;
     int lastDropFrames_;
+    int fallenOjama_;
+    int fixedOjama_;
+    int pendingOjama_;
+    int ojamaCommittingFrameId_;
+    bool hasZenkeshi_;
 };
 
 #endif

@@ -12,6 +12,18 @@ using namespace std;
 
 Unit unitMidEvaluator(const RefPlan&) { return Unit(); }
 
+template<typename Callback>
+void runTest(const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int maxDepth, Callback f)
+{
+    PlayerState me;
+    PlayerState enemy;
+    me.field = field;
+    me.seq = kumipuyoSeq;
+
+    DecisionPlanner<Unit> planner(unitMidEvaluator, f);
+    planner.iterate(100, field, kumipuyoSeq, me, enemy, maxDepth);
+}
+
 TEST(DecisionPlannerTest, iterate)
 {
     CoreField field("  YY  ");
@@ -36,9 +48,7 @@ TEST(DecisionPlannerTest, iterate)
         EXPECT_EQ(expectedDecisions, plan.decisions());
     };
 
-    DecisionPlanner<Unit> planner(unitMidEvaluator, f);
-    planner.iterate(field, kumipuyoSeq, 2);
-
+    runTest(field, kumipuyoSeq, 2, f);
     EXPECT_TRUE(found);
 }
 
@@ -68,8 +78,7 @@ TEST(DecisionPlannerTest, iterateWithRensa)
         EXPECT_EQ(0, plan.numChigiri());
     };
 
-    DecisionPlanner<Unit> planner(unitMidEvaluator, f);
-    planner.iterate(field, seq, 2);
+    runTest(field, seq, 2, f);
     EXPECT_TRUE(found);
 }
 
@@ -89,7 +98,6 @@ TEST(DecisionPlannerTest, numChigiri)
         EXPECT_EQ(2, plan.numChigiri());
     };
 
-    DecisionPlanner<Unit> planner(unitMidEvaluator, f);
-    planner.iterate(field, seq, 2);
+    runTest(field, seq, 2, f);
     EXPECT_TRUE(found);
 }

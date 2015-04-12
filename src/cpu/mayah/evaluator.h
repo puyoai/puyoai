@@ -142,6 +142,7 @@ public:
     void evalRidgeHeight(const CoreField&);
     void evalFieldUShape(const CoreField&, bool enemyHasZenkeshi);
     void evalUnreachableSpace(const CoreField&);
+    void evalFallenOjama(int fallenOjama);
 
     void evalMidEval(const MidEvalResult&);
 

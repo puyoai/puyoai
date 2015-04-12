@@ -1,6 +1,8 @@
 #ifndef CPU_MAYAH_DECISION_PLANNER_H_
 #define CPU_MAYAH_DECISION_PLANNER_H_
 
+// TODO(mayah): Move this to core/algorithm.
+
 #include <vector>
 
 #include "base/executor.h"
@@ -8,6 +10,7 @@
 #include "core/algorithm/plan.h"
 #include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
+#include "core/player_state.h"
 #include "core/puyo_controller.h"
 
 template<typename MidEvaluationResult>
@@ -33,16 +36,23 @@ public:
     // When decision sequence is specified, we consider only this decision sequence.
     void setSpecifiedDecisions(const std::vector<Decision>& decisions) { decisions_ = decisions; }
 
-    void iterate(const CoreField&, const KumipuyoSeq&, int maxDepth);
+    void iterate(int frameId, const CoreField& originalField, const KumipuyoSeq& kumipuyoSeq,
+                 const PlayerState& me, const PlayerState& enemy, int maxDepth);
 
 private:
-    void iterateRest(const CoreField& currentField,
+    void iterateRest(int initialFrameId,
+                     const CoreField& currentField,
                      const KumipuyoSeq& kumipuyoSeq,
                      const std::vector<Decision>& currentDecisions,
                      int currentNumChigiri,
                      int currentTotalFrames,
                      int currentDepth,
                      int maxDepth,
+                     int fallenOjama,
+                     int fixedOjama,
+                     int pendingOjama,
+                     int ojamaCommittingFrameId,
+                     bool hasZenkeshi,
                      const MidEvaluationResult& midEvaluationResult,
                      WaitGroup* wg);
 
@@ -60,6 +70,50 @@ private:
 
 // ----------------------------------------------------------------------
 
+inline int updateOjama(int currentFrameId, int generatedOjama, int* fixedOjama, int* pendingOjama, int* ojamaCommittingFrameId)
+{
+    if (generatedOjama > 0) {
+        if (*pendingOjama > generatedOjama) {
+            *pendingOjama -= generatedOjama;
+            generatedOjama = 0;
+        } else {
+            generatedOjama -= *pendingOjama;
+            *pendingOjama = 0;
+        }
+
+        if (*fixedOjama > generatedOjama) {
+            *fixedOjama -= generatedOjama;
+            generatedOjama = 0;
+        } else {
+            generatedOjama -= *fixedOjama;
+            *fixedOjama = 0;
+        }
+    }
+
+    if (*ojamaCommittingFrameId == 0)
+        return 0;
+
+    if (*ojamaCommittingFrameId <= currentFrameId) {
+        *fixedOjama += *pendingOjama;
+        *pendingOjama = 0;
+        *ojamaCommittingFrameId = 0;
+    }
+
+    int count = std::min(*fixedOjama, 30);
+    *fixedOjama -= count;
+
+    return count;
+}
+
+// Returns the number of frames for ojama falling.
+inline int fallOjama(CoreField* cf, int ojamaCount)
+{
+    int lines = (ojamaCount + 2) / 6;
+    if (lines > 5)
+        lines = 5;
+    return cf->fallOjama(lines);
+}
+
 template<typename MidEvaluationResult>
 template<typename Callback>
 void DecisionPlanner<MidEvaluationResult>::iterateKumipuyoDrop(int currentDepth,
@@ -75,6 +129,9 @@ void DecisionPlanner<MidEvaluationResult>::iterateKumipuyoDrop(int currentDepth,
         Decision(6, 3), Decision(1, 0), Decision(2, 0), Decision(3, 0),
         Decision(4, 0), Decision(5, 0), Decision(6, 0),
     };
+
+    DCHECK(isNormalColor(kumipuyo.axis)) << kumipuyo.axis;
+    DCHECK(isNormalColor(kumipuyo.child)) << kumipuyo.child;
 
     // Since copying CoreField is not so fast, we'd like to skip copying as many as possible.
     CoreField nextField(currentField);
@@ -107,13 +164,19 @@ void DecisionPlanner<MidEvaluationResult>::iterateKumipuyoDrop(int currentDepth,
 
 
 template<typename MidEvaluationResult>
-void DecisionPlanner<MidEvaluationResult>::iterateRest(const CoreField& currentField,
+void DecisionPlanner<MidEvaluationResult>::iterateRest(int initialFrameId,
+                                                       const CoreField& currentField,
                                                        const KumipuyoSeq& kumipuyoSeq,
                                                        const std::vector<Decision>& currentDecisions,
                                                        int currentNumChigiri,
                                                        int currentTotalFrames,
                                                        int currentDepth,
                                                        int maxDepth,
+                                                       int fallenOjama,
+                                                       int fixedOjama,
+                                                       int pendingOjama,
+                                                       int ojamaCommittingFrameId,
+                                                       bool hasZenkeshi,
                                                        const MidEvaluationResult& midEvaluationResult,
                                                        WaitGroup* wg)
 {
@@ -122,39 +185,59 @@ void DecisionPlanner<MidEvaluationResult>::iterateRest(const CoreField& currentF
         std::vector<Decision> decisions(currentDecisions);
         decisions.push_back(decision);
 
+        int newFixedOjama = fixedOjama;
+        int newPendingOjama = pendingOjama;
+        int newOjamaCommittingFrameId = ojamaCommittingFrameId;
+        bool newHasZenkeshi = hasZenkeshi;
+
         int numChigiri = currentNumChigiri + (isChigiri ? 1 : 0);
-        int framesToIgnite = currentTotalFrames;
+        int frameIdToIgnite = initialFrameId + currentTotalFrames;
+        // int framesToIgnite = currentTotalFrames;
 
         // --- When rensa will occur.
         if (fieldAfterDecision.rensaWillOccurWithContext(currentContext)) {
             CoreField cf(fieldAfterDecision);
             CoreField::SimulationContext context(currentContext);
             RensaResult rensaResult = cf.simulate(&context);
-            parallelEval(currentDepth, RefPlan(cf, decisions, rensaResult, numChigiri, framesToIgnite, dropFrames), midEvaluationResult, wg);
-            return;
-        }
-
-        // --- When rensa won't occur.
-        if (fieldAfterDecision.color(3, 12) != PuyoColor::EMPTY)
-            return;
-
-        if (currentDepth + 1 == maxDepth) {
-            parallelEval(currentDepth, RefPlan(fieldAfterDecision, decisions, RensaResult(), numChigiri, framesToIgnite, dropFrames),
+            int generatedOjama = rensaResult.score / 70 + (newHasZenkeshi ? 30 : 0);
+            newHasZenkeshi = false;
+            int newFallenOjama = updateOjama(frameIdToIgnite, generatedOjama, &newFixedOjama, &newPendingOjama, &newOjamaCommittingFrameId);
+            int ojamaDroppingFrames = fallOjama(&cf, newFallenOjama);
+            parallelEval(currentDepth, RefPlan(cf, decisions, rensaResult, numChigiri, currentTotalFrames, dropFrames + ojamaDroppingFrames,
+                                               newFallenOjama + fallenOjama, newFixedOjama, newPendingOjama, newOjamaCommittingFrameId, newHasZenkeshi),
                          midEvaluationResult, wg);
             return;
         }
 
-        int totalFrames = currentTotalFrames + dropFrames;
+        // --- When rensa won't occur.
+        CoreField cf(fieldAfterDecision);
+        int ojamaCount = updateOjama(frameIdToIgnite, 0, &newFixedOjama, &newPendingOjama, &newOjamaCommittingFrameId);
+        int ojamaDroppingFrames = fallOjama(&cf, ojamaCount);
+
+        if (cf.color(3, 12) != PuyoColor::EMPTY)
+            return;
+
+        if (currentDepth + 1 == maxDepth) {
+            parallelEval(currentDepth,
+                         RefPlan(cf, decisions, RensaResult(), numChigiri, currentTotalFrames, dropFrames + ojamaDroppingFrames,
+                                 ojamaCount + fallenOjama, newFixedOjama, newPendingOjama, newOjamaCommittingFrameId, newHasZenkeshi),
+                         midEvaluationResult, wg);
+            return;
+        }
+
+        int totalFrames = currentTotalFrames + dropFrames + ojamaDroppingFrames;
         if (executor_ && currentDepth <= 1) {
             wg->add(1);
             executor_->submit([=]() {
-                iterateRest(fieldAfterDecision, kumipuyoSeq, decisions, numChigiri, totalFrames,
-                            currentDepth + 1, maxDepth, midEvaluationResult, wg);
+                iterateRest(initialFrameId, cf, kumipuyoSeq, decisions, numChigiri, totalFrames, currentDepth + 1, maxDepth,
+                            fallenOjama + ojamaCount,
+                            newFixedOjama, newPendingOjama, newOjamaCommittingFrameId, newHasZenkeshi, midEvaluationResult, wg);
+
                 wg->done();
             });
         } else {
-            iterateRest(fieldAfterDecision, kumipuyoSeq, decisions, numChigiri, totalFrames,
-                        currentDepth + 1, maxDepth, midEvaluationResult, wg);
+            iterateRest(initialFrameId, cf, kumipuyoSeq, decisions, numChigiri, totalFrames, currentDepth + 1, maxDepth,
+                        fallenOjama + ojamaCount, newFixedOjama, newPendingOjama, newOjamaCommittingFrameId, newHasZenkeshi, midEvaluationResult, wg);
         }
     };
 
@@ -162,53 +245,77 @@ void DecisionPlanner<MidEvaluationResult>::iterateRest(const CoreField& currentF
 }
 
 template <typename MidEvaluationResult>
-void DecisionPlanner<MidEvaluationResult>::iterate(const CoreField& originalField,
+void DecisionPlanner<MidEvaluationResult>::iterate(int initialFrameId,
+                                                   const CoreField& originalField,
                                                    const KumipuyoSeq& kumipuyoSeq,
+                                                   const PlayerState& me,
+                                                   const PlayerState& enemy,
                                                    int maxDepth)
 {
+    const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
+
     DCHECK(maxDepth >= 2);
     DCHECK(kumipuyoSeq.size() >= maxDepth);
 
     WaitGroup wg;
 
-    std::vector<Decision> decisions;
-    decisions.reserve(maxDepth);
-
-    CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
     auto f = [&](const CoreField& fieldAfterDecision, const Decision& decision, bool isChigiri, int dropFrames) {
-        decisions.push_back(decision);
+        int pendingOjama = me.pendingOjama;
+        int fixedOjama = me.fixedOjama;
+        int ojamaCommittingFrameId = enemy.isRensaOngoing ? enemy.finishingRensaFrameId : 0;
+        bool hasZenkeshi = me.hasZenkeshi;
+
+        std::vector<Decision> decisions { decision };
 
         int numChigiri = isChigiri ? 1 : 0;
 
         if (fieldAfterDecision.rensaWillOccurWithContext(originalContext)) {
             // When rensa will occur.
-
             CoreField cf(fieldAfterDecision);
             CoreField::SimulationContext context(originalContext);
             RensaResult rensaResult(cf.simulate(&context));
-            parallelEval(0, RefPlan(cf, decisions, rensaResult, numChigiri, 0, dropFrames), MidEvaluationResult(), &wg);
 
-            // Continue the evaluation if erased.
-            MidEvaluationResult midEvaluationResult = midEval_(RefPlan(cf, decisions, rensaResult, numChigiri, 0, dropFrames));
-            iterateRest(cf, kumipuyoSeq, decisions, numChigiri, rensaResult.frames + dropFrames, 1, maxDepth, midEvaluationResult, &wg);
+            int generatedOjama = rensaResult.score / 70 + (hasZenkeshi ? 30 : 0);
+            hasZenkeshi = false;
+            int currentFrameId = initialFrameId + dropFrames + rensaResult.frames;
+            int ojamaCount = updateOjama(currentFrameId, generatedOjama, &fixedOjama, &pendingOjama, &ojamaCommittingFrameId);
+            int ojamaDroppingFrames = fallOjama(&cf, ojamaCount);
+
+            parallelEval(0, RefPlan(cf, decisions, rensaResult, numChigiri, 0, dropFrames + ojamaDroppingFrames,
+                                    ojamaCount, fixedOjama, pendingOjama, ojamaCommittingFrameId, hasZenkeshi),
+                         MidEvaluationResult(), &wg);
+
+            MidEvaluationResult midEvaluationResult =
+                midEval_(RefPlan(cf, decisions, rensaResult, numChigiri, 0, dropFrames + ojamaDroppingFrames,
+                                 ojamaCount, fixedOjama, pendingOjama, ojamaCommittingFrameId, hasZenkeshi));
+            iterateRest(initialFrameId, cf, kumipuyoSeq, decisions, numChigiri, rensaResult.frames + dropFrames + ojamaDroppingFrames,
+                        1, maxDepth, ojamaCount, fixedOjama, pendingOjama, ojamaCommittingFrameId, hasZenkeshi, midEvaluationResult, &wg);
 
             decisions.pop_back();
             return;
         }
 
         // When rensa doesn't occur.
-        if (fieldAfterDecision.color(3, 12) != PuyoColor::EMPTY) {
+        CoreField cf(fieldAfterDecision);
+        int currentFrameId = initialFrameId + dropFrames;
+        int ojamaCount = updateOjama(currentFrameId, 0, &fixedOjama, &pendingOjama, &ojamaCommittingFrameId);
+        int ojamaDroppingFrames = fallOjama(&cf, ojamaCount);
+
+        if (cf.color(3, 12) != PuyoColor::EMPTY) {
             decisions.pop_back();
             return;
         }
 
-        MidEvaluationResult midEvaluationResult = midEval_(RefPlan(fieldAfterDecision, decisions, RensaResult(), numChigiri, 0, dropFrames));
-        iterateRest(fieldAfterDecision, kumipuyoSeq, decisions, numChigiri, dropFrames, 1, maxDepth, midEvaluationResult, &wg);
-        decisions.pop_back();
+        MidEvaluationResult midEvaluationResult =
+            midEval_(RefPlan(cf, decisions, RensaResult(), numChigiri, 0, dropFrames + ojamaDroppingFrames,
+                             ojamaCount, fixedOjama, pendingOjama, ojamaCommittingFrameId, me.hasZenkeshi));
+
+        iterateRest(initialFrameId, cf, kumipuyoSeq, decisions, numChigiri, dropFrames + ojamaDroppingFrames, 1, maxDepth,
+                    ojamaCount, fixedOjama, pendingOjama, ojamaCommittingFrameId, hasZenkeshi, midEvaluationResult, &wg);
+
     };
 
     iterateKumipuyoDrop(0, originalField, kumipuyoSeq.get(0), f);
-
     wg.waitUntilDone();
 }
 

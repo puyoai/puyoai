@@ -51,7 +51,11 @@ bool operator==(const Plan& lhs, const Plan& rhs)
         lhs.rensaResult_ == rhs.rensaResult_ &&
         lhs.numChigiri_ == rhs.numChigiri_ &&
         lhs.framesToIgnite_ == rhs.framesToIgnite_ &&
-        lhs.lastDropFrames_ == rhs.lastDropFrames_;
+        lhs.lastDropFrames_ == rhs.lastDropFrames_ &&
+        lhs.fixedOjama_ == rhs.fixedOjama_ &&
+        lhs.pendingOjama_ == rhs.pendingOjama_ &&
+        lhs.ojamaCommittingFrameId_ == rhs.ojamaCommittingFrameId_ &&
+        lhs.hasZenkeshi_ == rhs.hasZenkeshi_;
 }
 
 std::string RefPlan::decisionText() const
@@ -157,12 +161,12 @@ void Plan::iterateAvailablePlans(const CoreField& field,
             RensaResult rensaResult = cf.simulate(&context);
             DCHECK_GT(rensaResult.chains, 0);
             if (cf.color(3, 12) == PuyoColor::EMPTY) {
-                callback(RefPlan(cf, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames));
+                callback(RefPlan(cf, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
             }
         } else {
             if (fieldBeforeRensa.color(3, 12) == PuyoColor::EMPTY) {
                 RensaResult rensaResult;
-                callback(RefPlan(fieldBeforeRensa, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames));
+                callback(RefPlan(fieldBeforeRensa, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
             }
         }
     };
