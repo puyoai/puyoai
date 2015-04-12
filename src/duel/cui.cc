@@ -131,7 +131,7 @@ void Cui::printNextPuyo(int playerId, const PlayerGameState& pgs)
     }
 }
 
-void Cui::printMessage(int playerId, const string& message)
+void Cui::printMessage(int playerId, const std::string& message)
 {
     if (message.empty())
         return;

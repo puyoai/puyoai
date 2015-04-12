@@ -2,27 +2,39 @@
 
 #include <cstddef>
 #include <sstream>
+#include <string>
 
 using namespace std;
 
-static string unescapeMessage(string str)
+static string unescapeMessage(const string& str)
 {
+    string result;
     for (size_t i = 0; i < str.size(); ++i) {
-        if (str[i] == '_')
-            str[i] = ' ';
+        if (str[i] == '_') {
+            result.push_back(' ');
+        } else if (str[i] == ',') {
+            result.push_back('\n');
+        } else {
+            result.push_back(str[i]);
+        }
     }
 
-    return str;
+    return result;
 }
 
-static string escapeMessage(string str)
+static string escapeMessage(const string& str)
 {
-    for (size_t i = 0; i < str.size(); ++i) {
-        if (str[i] == ' ')
-            str[i] = '_';
+    string result;
+    for (char c : str) {
+        if (c == ' ')
+            result.push_back('_');
+        else if (c == '\n')
+            result.push_back(',');
+        else
+            result.push_back(c);
     }
 
-    return str;
+    return result;
 }
 
 // static
@@ -44,7 +56,7 @@ FrameResponse FrameResponse::parse(const string& str)
             std::istringstream istr(tmp.c_str() + 2);
             istr >> data.decision.r;
         } else if (tmp.substr(0, 4) == "MSG=") {
-            data.msg = unescapeMessage(tmp.c_str() + 4);
+            data.message = unescapeMessage(tmp.c_str() + 4);
         } else if (tmp.substr(0, 3) == "MA=") {
             data.mawashiArea = tmp.c_str() + 3;
         }
@@ -66,8 +78,8 @@ std::string FrameResponse::toString() const
         ss << " X=" << decision.x
            << " R=" << decision.r;
     }
-    if (!msg.empty()) {
-        ss << " MSG=" << escapeMessage(msg);
+    if (!message.empty()) {
+        ss << " MSG=" << escapeMessage(message);
     }
 
     return ss.str();

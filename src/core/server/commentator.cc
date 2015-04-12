@@ -67,7 +67,7 @@ void Commentator::onUpdate(const GameState& gameState)
         }
 
         if (!pgs.message.empty())
-            message_[i] = strings::split(pgs.message, ',');
+            message_[i] = pgs.message;
     }
 }
 
@@ -235,13 +235,12 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
 void Commentator::reset()
 {
     lock_guard<mutex> lock(mu_);
-    needsUpdate_[0] = needsUpdate_[1] = false;
-    message_[0].clear();
-    message_[1].clear();
     for (int i = 0; i < 2; i++) {
+        needsUpdate_[i] = false;
         fireableMainChain_[i].reset();
         fireableTsubushiChain_[i].reset();
         firingChain_[i].reset();
+        message_[i].clear();
         events_[i].clear();
     }
 }
