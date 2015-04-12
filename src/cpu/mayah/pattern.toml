@@ -545,7 +545,8 @@ field = [
     "..AAAB",
 ]
 ignition = 3
-score = 9.9
+score = 7.0
+# This pattern often make the 3rd column AA separate, so score is a bit lower than others.
 
 [[pattern]]
 field = [
@@ -577,7 +578,8 @@ field = [
     "..AAAB",
 ]
 ignition = 3
-score = 9.4
+score = 7.0
+# This pattern often make the 3rd column AA separate, so score is a bit lower than others.
 
 [[pattern]]
 field = [
