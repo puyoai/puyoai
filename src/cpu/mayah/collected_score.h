@@ -10,6 +10,7 @@
 
 struct CollectedCoef {
     double coef(EvaluationMode mode) const { return coefMap[ordinal(mode)]; }
+    void setCoef(EvaluationMode mode, double x) { coefMap[ordinal(mode)] = x; }
 
     std::array<double, NUM_EVALUATION_MODES> coefMap {{}};
 };

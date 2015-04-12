@@ -22,13 +22,6 @@ public:
     {
     }
 
-    void setMode(EvaluationMode mode)
-    {
-        for (const auto& m : ALL_EVALUATION_MODES)
-            collectedCoef_.coefMap[ordinal(m)] = 0.0;
-        collectedCoef_.coefMap[ordinal(mode)] = 1.0;
-    }
-
     void addScore(EvaluationFeatureKey key, double v)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
@@ -49,7 +42,9 @@ public:
         }
     }
 
+    void setCoef(const CollectedCoef& coef) { collectedCoef_ = coef; }
     const CollectedCoef& collectedCoef() const { return collectedCoef_; }
+
     const CollectedSimpleScore& collectedScore() const { return collectedSimpleScore_; }
     const EvaluationParameterMap& evaluationParameterMap() const { return paramMap_; }
 
@@ -72,12 +67,6 @@ public:
     typedef CollectedFeatureScore CollectedScore;
 
     FeatureScoreCollector(const EvaluationParameterMap& paramMap) : paramMap_(paramMap) {}
-
-    void setMode(EvaluationMode mode) {
-        for (const auto& m : ALL_EVALUATION_MODES)
-            collectedCoef_.coefMap[ordinal(m)] = 0.0;
-        collectedCoef_.coefMap[ordinal(mode)] = 1.0;
-    }
 
     void addScore(EvaluationFeatureKey key, double v)
     {
@@ -116,6 +105,7 @@ public:
     void setBookName(const std::string& bookName) { collectedFeatureScore_.bookName = bookName; }
     const std::string& bookName() const { return collectedFeatureScore_.bookName; }
 
+    void setCoef(const CollectedCoef& coef) { collectedCoef_ = coef; }
     const CollectedCoef& collectedCoef() const { return collectedCoef_; }
     const CollectedFeatureScore& collectedScore() const { return collectedFeatureScore_; }
     const EvaluationParameterMap& evaluationParameterMap() const { return paramMap_; }

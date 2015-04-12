@@ -67,14 +67,6 @@ THIRD_COLUMN_HEIGHT = [
         0,     0,     0,     0,     0,     0,     0,   -70,   -80,  -200,
     -2000, -7000, -9000, -9000, -9000, -9000]
 
-[mode.early_middle]
-PATTERN_BOOK = 80
-NECESSARY_PUYOS_LINEAR = -60
-NECESSARY_PUYOS_SQUARE = -5.7
-THIRD_COLUMN_HEIGHT = [
-        0,     0,     0,     0,     0,     0,     0,   -70,   -80,  -200,
-    -2000, -7000, -9000, -9000, -9000, -9000]
-
 [mode.middle]
 NECESSARY_PUYOS_LINEAR = -80
 NECESSARY_PUYOS_SQUARE = -6

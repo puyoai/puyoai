@@ -531,24 +531,41 @@ void Evaluator<ScoreCollector>::evalMidEval(const MidEvalResult& midEvalResult)
 }
 
 template<typename ScoreCollector>
-EvaluationMode Evaluator<ScoreCollector>::calculateMode(const PlayerState& me, const PlayerState& enemy) const
+CollectedCoef Evaluator<ScoreCollector>::calculateDefaultCoef(const PlayerState& me, const PlayerState& enemy) const
 {
     const int EARLY_THRESHOLD = 24;
-    const int EARLY_MIDDLE_THRESHOLD = 36;
-    const int MIDDLE_THRESHOLD = 54;
+    const int MIDDLE_THRESHOLD = 36;
+    const int LATE_THRESHOLD = 54;
 
-    if (enemy.hasZenkeshi)
-        return EvaluationMode::ENEMY_HAS_ZENKESHI;
+    CollectedCoef coef;
+
+    if (enemy.hasZenkeshi) {
+        coef.setCoef(EvaluationMode::ENEMY_HAS_ZENKESHI, 1.0);
+        return coef;
+    }
 
     int count = me.field.countPuyos();
-    if (count <= EARLY_THRESHOLD)
-        return EvaluationMode::EARLY;
-    if (count <= EARLY_MIDDLE_THRESHOLD)
-        return EvaluationMode::EARLY_MIDDLE;
-    if (count <= MIDDLE_THRESHOLD)
-        return EvaluationMode::MIDDLE;
+    if (count <= EARLY_THRESHOLD) {
+        coef.setCoef(EvaluationMode::EARLY, 1.0);
+        return coef;
+    }
 
-    return EvaluationMode::LATE;
+    if (count <= MIDDLE_THRESHOLD) {
+        double ratio = (count - EARLY_THRESHOLD) / (MIDDLE_THRESHOLD - EARLY_THRESHOLD);
+        coef.setCoef(EvaluationMode::EARLY, 1 - ratio);
+        coef.setCoef(EvaluationMode::MIDDLE, ratio);
+        return coef;
+    }
+
+    if (count <= LATE_THRESHOLD) {
+        double ratio = (count - MIDDLE_THRESHOLD) / (LATE_THRESHOLD - MIDDLE_THRESHOLD);
+        coef.setCoef(EvaluationMode::MIDDLE, 1 - ratio);
+        coef.setCoef(EvaluationMode::LATE, ratio);
+        return coef;
+    }
+
+    coef.setCoef(EvaluationMode::LATE, 1.0);
+    return coef;
 }
 
 template<typename ScoreCollector>
@@ -560,10 +577,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
                                      const MidEvalResult& midEvalResult,
                                      const GazeResult& gazeResult)
 {
-    // TODO(mayah): Instead of setting mode here, we would like to set after all the evaluation
-    // has finished. We would like to postpone RensaScoreCollector.
-    const EvaluationMode mode = calculateMode(me, enemy);
-    sc_->setMode(mode);
+    CollectedCoef coef = calculateDefaultCoef(me, enemy);
+    sc_->setCoef(coef);
 
     const CoreField& fieldBeforeRensa = plan.field();
 
@@ -632,8 +647,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
 
         // TODO(mayah): need to set a better mode here.
         const typename ScoreCollector::CollectedScore& rensaCollectedScore = rensaScoreCollector->collectedScore();
-        if (rensaCollectedScore.score(mode) > maxRensa.score) {
-            maxRensa.score = rensaCollectedScore.score(mode);
+        if (rensaCollectedScore.score(coef) > maxRensa.score) {
+            maxRensa.score = rensaCollectedScore.score(coef);
             maxRensa.collectedScore = rensaCollectedScore;
             maxRensa.puyosToComplement = puyosToComplement;
             maxRensa.bookName = patternName;
