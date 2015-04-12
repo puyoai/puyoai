@@ -551,14 +551,14 @@ CollectedCoef Evaluator<ScoreCollector>::calculateDefaultCoef(const PlayerState&
     }
 
     if (count <= MIDDLE_THRESHOLD) {
-        double ratio = (count - EARLY_THRESHOLD) / (MIDDLE_THRESHOLD - EARLY_THRESHOLD);
+        double ratio = static_cast<double>(count - EARLY_THRESHOLD) / (MIDDLE_THRESHOLD - EARLY_THRESHOLD);
         coef.setCoef(EvaluationMode::EARLY, 1 - ratio);
         coef.setCoef(EvaluationMode::MIDDLE, ratio);
         return coef;
     }
 
     if (count <= LATE_THRESHOLD) {
-        double ratio = (count - MIDDLE_THRESHOLD) / (LATE_THRESHOLD - MIDDLE_THRESHOLD);
+        double ratio = static_cast<double>(count - MIDDLE_THRESHOLD) / (LATE_THRESHOLD - MIDDLE_THRESHOLD);
         coef.setCoef(EvaluationMode::MIDDLE, 1 - ratio);
         coef.setCoef(EvaluationMode::LATE, ratio);
         return coef;
