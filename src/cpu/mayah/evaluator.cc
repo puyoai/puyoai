@@ -260,6 +260,12 @@ void Evaluator<ScoreCollector>::evalUnreachableSpace(const CoreField& f)
     sc_->addScore(NUM_UNREACHABLE_SPACE, count);
 }
 
+template<typename ScoreCollector>
+void Evaluator<ScoreCollector>::evalFallenOjama(int fallenOjama)
+{
+    sc_->addScore(FALLEN_OJAMA, fallenOjama);
+}
+
 // Returns true If we don't need to evaluate other features.
 template<typename ScoreCollector>
 bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreField& currentField, int currentFrameId,
@@ -269,32 +275,8 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     if (!plan.isRensaPlan())
         return false;
 
-    bool inTime = false;
-    {
-        if (plan.decisions().size() == 1) {
-            // Sometimes, enemy.finishingRensaFrameId might be wrong.
-            // So, if plan.decisions.size() == 1, we always consider it's in time.
-            inTime = true;
-        } else if (me.fixedOjama > 0) {
-            // If fixedOjama > 0, after our first hand, ojama will be dropped.
-            // So it's not in time.
-            inTime = false;
-        } else if (!enemy.isRensaOngoing) {
-            // If enemy is not firing rensa, we can think in time.
-            inTime = true;
-        } else if (currentFrameId + plan.framesToIgnite() < enemy.finishingRensaFrameId) {
-            // If we can play before finishing enemy's rensa, it's in time.
-            inTime = true;
-        } else {
-            // Otherwise, it's not in time.
-            inTime = false;
-        }
-    }
-
-    // If not in time, we cannot fire a rensa. So considering firing rensa is meaning less.
-    if (!inTime) {
+    if (plan.fallenOjama() > 0)
         return false;
-    }
 
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
     int estimatedMaxScore = gazeResult.estimateMaxScore(rensaEndingFrameId, enemy);
@@ -310,13 +292,20 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
 
     // --- If the rensa is large enough, fire it.
     if (plan.score() >= estimatedMaxScore + scoreForOjama(60) && !enemy.isRensaOngoing) {
-        sc_->addScore(STRATEGY_LARGE_ENOUGH, 1);
+        sc_->addScore(STRATEGY_LARGE_ENOUGH, 1.0);
         return true;
     }
 
     if (enemy.isRensaOngoing && me.fixedOjama + me.pendingOjama >= 6) {
         if (plan.score() >= scoreForOjama(std::max(0, me.fixedOjama + me.pendingOjama - 3))) {
             sc_->addScore(STRATEGY_TAIOU, 1.0);
+            return false;
+        }
+    }
+
+    if (plan.fixedOjama() + plan.pendingOjama() >= 6) {
+        if (plan.score() >= scoreForOjama(std::max(0, plan.fixedOjama() + plan.pendingOjama() - 3))) {
+            sc_->addScore(STRATEGY_TAIOU, 0.9);
             return false;
         }
     }
@@ -333,13 +322,14 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
         return true;
     }
 
+    // not plan.hasZenekshi, since it's already consumed.
     if (me.hasZenkeshi && !enemy.hasZenkeshi) {
         if (!enemy.isRensaOngoing) {
             sc_->addScore(STRATEGY_SCORE, plan.score());
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
         }
-        if (me.pendingOjama + me.fixedOjama <= 36) {
+        if (plan.pendingOjama() + plan.fixedOjama() <= 36) {
             sc_->addScore(STRATEGY_SCORE, plan.score());
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
@@ -350,7 +340,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
 
     // If IBARA found, we always consider it.
     // TODO(mayah): Don't consider IBARA if we don't have enough puyos. Better not to fire IBARA in that case.
-    if (plan.chains() == 1 && plan.score() >= scoreForOjama(10) && me.pendingOjama + me.fixedOjama <= 10) {
+    if (plan.chains() == 1 && plan.score() >= scoreForOjama(10) && plan.pendingOjama() + plan.fixedOjama() <= 10) {
         sc_->addScore(STRATEGY_IBARA, 1);
         return false;
     }
@@ -358,12 +348,12 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     // If we can send 18>= ojamas, and opponent does not have any hand to cope with it, we can fire it.
     // TODO(mayah): We need to check if the enemy cannot fire his rensa after ojama is dropped.
     if (plan.chains() <= 3 && plan.score() >= scoreForOjama(15) &&
-        me.pendingOjama + me.fixedOjama <= 3 && estimatedMaxScore <= scoreForOjama(12)) {
+        plan.pendingOjama() + plan.fixedOjama() <= 3 && estimatedMaxScore <= scoreForOjama(12)) {
         sc_->addScore(STRATEGY_TSUBUSHI, 1);
         return true;
     }
 
-    if (plan.chains() <= 3 && me.pendingOjama + me.fixedOjama == 0 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
+    if (plan.chains() <= 3 && plan.pendingOjama() + plan.fixedOjama() == 0 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
         if (plan.score() >= scoreForOjama(30)) {
             sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_LARGE, 1);
         } else if (plan.score() >= scoreForOjama(18)) {
@@ -608,6 +598,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
     evalRidgeHeight(fieldBeforeRensa);
     evalFieldUShape(fieldBeforeRensa, enemy.hasZenkeshi);
     evalUnreachableSpace(fieldBeforeRensa);
+    evalFallenOjama(plan.fallenOjama());
 
     const int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
     int maxChainMaxChains = 0;

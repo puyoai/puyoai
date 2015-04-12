@@ -28,7 +28,7 @@ protected:
         int framesToIgnite = 10;
         int lastDropFrames = 10;
 
-        RefPlan plan(f, decisions, rensaResult, 0, framesToIgnite, lastDropFrames);
+        RefPlan plan(f, decisions, rensaResult, 0, framesToIgnite, lastDropFrames, 0, 0, 0, 0, false);
 
         PreEvalResult preEvalResult = PreEvaluator(patternBook).preEval(f);
         FeatureScoreCollector sc(evaluationParameterMap);

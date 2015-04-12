@@ -86,6 +86,10 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                                  const PlayerState& me, const PlayerState& enemy,
                                  int depth, int maxIteration, vector<Decision>* specifiedDecisions) const
 {
+    // TODO(mayah): Do we need field and kumipuyoSeq?
+    // CHECK(field, me.field);
+    // CHECK(kumipuyoSeq, me.kumipuyoSeq);
+
     double beginTime = currentTime();
 
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
@@ -107,7 +111,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
             cf.dropKumipuyo(d, kumipuyoSeq.front());
             vector<Decision> decisions { d };
 
-            ThoughtResult tr(Plan(cf, decisions, RensaResult(), 0, 0, 0),
+            ThoughtResult tr(Plan(cf, decisions, RensaResult(), 0, 0, 0, 0, 0, 0, 0, false),
                              0.0, 0.0, MidEvalResult(), "BY DECISION BOOK");
             return tr;
         }
@@ -164,11 +168,11 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     DecisionPlanner<MidEvalResult> planner(executor_, evalMidEval, evalRefPlan);
     if (specifiedDecisions)
         planner.setSpecifiedDecisions(*specifiedDecisions);
-    planner.iterate(field, kumipuyoSeq, depth);
+    planner.iterate(frameId, field, kumipuyoSeq, me, enemy, depth);
 
 
     double endTime = currentTime();
-    if (bestVirtualRensaScore < bestRensaScore) {
+    if (false && bestVirtualRensaScore < bestRensaScore) {
         std::string message = makeMessageFrom(frameId, field, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               preEvalResult, bestRensaMidEvalResult, gazeResult,
@@ -268,9 +272,9 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
     if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_LARGE) > 0) {
         ss << "SIDE CHAIN LARGE / ";
     } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM) > 0) {
-        ss << "SIDE_CHAIN MEDIUM / ";
+        ss << "SIDE CHAIN MEDIUM / ";
     } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_SMALL) > 0) {
-        ss << "SIDE_CHAIN SMALL / ";
+        ss << "SIDE CHAIN SMALL / ";
     }
     if (cf.feature(STRATEGY_TAIOU) > 0)
         ss << "TAIOU / ";
@@ -337,8 +341,11 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
            << " in " << (refPlan.totalFrames() + 200) << " / ";
     }
 
-    ss << "O = " << (myPlayerState().fixedOjama + myPlayerState().pendingOjama)
-       << "/" << (enemyPlayerState().fixedOjama + enemyPlayerState().pendingOjama) << " / ";
+    ss << "OJAMA = "
+       << plan.fallenOjama() << ":"
+       << plan.fixedOjama() << ":"
+       << plan.pendingOjama() << ":"
+       << plan.ojamaCommittingFrameId() << " / ";
 
     ss << (thoughtTimeInSeconds * 1000) << " [ms]";
 

@@ -53,7 +53,11 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         RensaYPositionTracker tracker;
 
         int score = cf.vanishDrop(&context, &tracker);
-        CHECK(score > 0) << score;
+        if (score == 0) {
+            CoreField tmp(originalField_);
+            tmp.dropPuyoListWithMaxHeight(cpl, maxHeight);
+            CHECK_GT(score, 0) << tmp.toDebugString();
+        }
         int restUnusedVariables = MAX_UNUSED_VARIABLES - complementResult.numFilledUnusedVariables;
         iteratePossibleRensasInternal(cf, context, tracker, 1, firePuyo, keyPuyos,
                                       maxIteration - 1, restUnusedVariables,
