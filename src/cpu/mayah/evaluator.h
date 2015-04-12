@@ -149,7 +149,7 @@ public:
     void evalCountPuyoFeature(const CoreField&);
 
 private:
-    EvaluationMode calculateMode(const PlayerState& me, const PlayerState& enemy) const;
+    CollectedCoef calculateDefaultCoef(const PlayerState& me, const PlayerState& enemy) const;
 
     ScoreCollector* sc_;
 };
