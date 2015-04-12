@@ -483,9 +483,20 @@ void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalPatternScore(double patternScore)
+void RensaEvaluator<ScoreCollector>::evalPatternScore(const ColumnPuyoList& cpl, double patternScore)
 {
     sc_->addScore(PATTERN_BOOK, patternScore);
+
+    int numPlaceHolders = 0;
+    for (int x = 1; x <= 6; ++x) {
+        int h = cpl.sizeOn(x);
+        for (int i = 0; i < h; ++i) {
+            if (!isNormalColor(cpl.get(x, i)))
+                ++numPlaceHolders;
+        }
+    }
+
+    sc_->addScore(NUM_PLACE_HOLDERS, numPlaceHolders);
 }
 
 template<typename ScoreCollector>
@@ -638,7 +649,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
         rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, trackResult, enemy.hasZenkeshi);
         rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyoSet);
         rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
-        rensaEvaluator.evalPatternScore(patternScore);
+        rensaEvaluator.evalPatternScore(puyosToComplement, patternScore);
         rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, trackResult); // fieldBeforeRensa is correct.
         rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
         rensaEvaluator.evalComplementationBias(puyosToComplement);
