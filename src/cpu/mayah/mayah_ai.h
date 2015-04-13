@@ -66,15 +66,15 @@ protected:
     MidEvalResult midEval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
                           const PlayerState& me, const PlayerState& enemy,
                           const PreEvalResult&, const GazeResult&) const;
-    EvalResult eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+    EvalResult eval(const RefPlan&, int currentFrameId, int maxIteration,
                     const PlayerState& me, const PlayerState& enemy,
                     const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
     CollectedFeatureCoefScore evalWithCollectingFeature(
-        const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+        const RefPlan&, int currentFrameId, int maxIteration,
         const PlayerState& me, const PlayerState& enemy,
         const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
 
-    std::string makeMessageFrom(int frameId, const CoreField&, const KumipuyoSeq&, int maxIteration,
+    std::string makeMessageFrom(int frameId, const KumipuyoSeq&, int maxIteration,
                                 const PlayerState& me, const PlayerState& enemy,
                                 const PreEvalResult&, const MidEvalResult&, const GazeResult&,
                                 const Plan& plan, double rensaScore, double virutalRensaScore,

@@ -268,7 +268,7 @@ void Evaluator<ScoreCollector>::evalFallenOjama(int fallenOjama)
 
 // Returns true If we don't need to evaluate other features.
 template<typename ScoreCollector>
-bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreField& currentField, int currentFrameId,
+bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFrameId,
                                              const PlayerState& me, const PlayerState& enemy, const GazeResult& gazeResult,
                                              const MidEvalResult& midEvalResult)
 {
@@ -311,12 +311,6 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, const CoreFiel
     }
 
     if (plan.field().isZenkeshi()) {
-        int puyoCount = plan.decisions().size() * 2 + currentField.countPuyos();
-        if (puyoCount <= 16) {
-            sc_->addScore(STRATEGY_SCORE, plan.score());
-            sc_->addScore(STRATEGY_INITIAL_ZENKESHI, 1);
-            return true;
-        }
         sc_->addScore(STRATEGY_SCORE, plan.score());
         sc_->addScore(STRATEGY_ZENKESHI, 1);
         return true;
@@ -534,6 +528,7 @@ void Evaluator<ScoreCollector>::evalMidEval(const MidEvalResult& midEvalResult)
 template<typename ScoreCollector>
 CollectedCoef Evaluator<ScoreCollector>::calculateDefaultCoef(const PlayerState& me, const PlayerState& enemy) const
 {
+    const int INITIAL_THRESHOLD = 16;
     const int EARLY_THRESHOLD = 24;
     const int MIDDLE_THRESHOLD = 36;
     const int LATE_THRESHOLD = 54;
@@ -546,6 +541,11 @@ CollectedCoef Evaluator<ScoreCollector>::calculateDefaultCoef(const PlayerState&
     }
 
     int count = me.field.countPuyos();
+    if (count <= INITIAL_THRESHOLD && me.hand <= 8) {
+        coef.setCoef(EvaluationMode::INITIAL, 1.0);
+        return coef;
+    }
+
     if (count <= EARLY_THRESHOLD) {
         coef.setCoef(EvaluationMode::EARLY, 1.0);
         return coef;
@@ -570,7 +570,7 @@ CollectedCoef Evaluator<ScoreCollector>::calculateDefaultCoef(const PlayerState&
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& currentField,
+void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                                      int currentFrameId, int maxIteration,
                                      const PlayerState& me,
                                      const PlayerState& enemy,
@@ -587,7 +587,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan, const CoreField& curre
     evalFrameFeature(plan.totalFrames(), plan.numChigiri());
     evalMidEval(midEvalResult);
 
-    if (evalStrategy(plan, currentField, currentFrameId, me, enemy, gazeResult, midEvalResult))
+    if (evalStrategy(plan, currentFrameId, me, enemy, gazeResult, midEvalResult))
         return;
 
     evalCountPuyoFeature(fieldBeforeRensa);

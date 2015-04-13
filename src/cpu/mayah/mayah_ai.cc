@@ -135,7 +135,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     mutex mu;
     auto evalRefPlan = [&, this, frameId, maxIteration](const RefPlan& plan, const MidEvalResult& midEvalResult) {
-        EvalResult evalResult = eval(plan, field, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
+        EvalResult evalResult = eval(plan,  frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
         VLOG(1) << toString(plan.decisions())
                 << ": eval=" << evalResult.score()
@@ -173,14 +173,14 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     double endTime = currentTime();
     if (false && bestVirtualRensaScore < bestRensaScore) {
-        std::string message = makeMessageFrom(frameId, field, kumipuyoSeq, maxIteration,
+        std::string message = makeMessageFrom(frameId, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               preEvalResult, bestRensaMidEvalResult, gazeResult,
                                               bestRensaPlan, bestRensaScore, bestVirtualRensaScore,
                                               true, endTime - beginTime);
         return ThoughtResult(bestRensaPlan, bestRensaScore, bestVirtualRensaScore, bestRensaMidEvalResult, message);
     } else {
-        std::string message = makeMessageFrom(frameId, field, kumipuyoSeq, maxIteration,
+        std::string message = makeMessageFrom(frameId, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               preEvalResult, bestMidEvalResult, gazeResult,
                                               bestPlan, bestRensaScore, bestVirtualRensaScore,
@@ -205,14 +205,14 @@ MidEvalResult MayahAI::midEval(const RefPlan& plan, const CoreField& currentFiel
 {
     SimpleScoreCollector sc(evaluationParameterMap_);
     Evaluator<SimpleScoreCollector> evaluator(patternBook_, &sc);
-    evaluator.eval(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), gazeResult);
+    evaluator.eval(plan, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), gazeResult);
 
     MidEvaluator midEvaluator(patternBook_);
     const CollectedSimpleScore& simpleScore = sc.collectedScore();
     return midEvaluator.eval(plan, currentField, simpleScore.score(sc.collectedCoef()));
 }
 
-EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
+EvalResult MayahAI::eval(const RefPlan& plan,
                          int currentFrameId, int maxIteration,
                          const PlayerState& me, const PlayerState& enemy,
                          const PreEvalResult& preEvalResult,
@@ -221,28 +221,29 @@ EvalResult MayahAI::eval(const RefPlan& plan, const CoreField& currentField,
 {
     SimpleScoreCollector sc(evaluationParameterMap_);
     Evaluator<SimpleScoreCollector> evaluator(patternBook_, &sc);
-    evaluator.eval(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
+    evaluator.eval(plan, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     const CollectedSimpleScore& simpleScore = sc.collectedScore();
     return EvalResult(simpleScore.score(sc.collectedCoef()), sc.estimatedRensaScore());
 }
 
-CollectedFeatureCoefScore MayahAI::evalWithCollectingFeature(const RefPlan& plan, const CoreField& currentField,
-                                                         int currentFrameId, int maxIteration,
-                                                         const PlayerState& me,
-                                                         const PlayerState& enemy,
-                                                         const PreEvalResult& preEvalResult,
-                                                         const MidEvalResult& midEvalResult,
-                                                         const GazeResult& gazeResult) const
+CollectedFeatureCoefScore MayahAI::evalWithCollectingFeature(const RefPlan& plan,
+                                                             int currentFrameId,
+                                                             int maxIteration,
+                                                             const PlayerState& me,
+                                                             const PlayerState& enemy,
+                                                             const PreEvalResult& preEvalResult,
+                                                             const MidEvalResult& midEvalResult,
+                                                             const GazeResult& gazeResult) const
 {
     FeatureScoreCollector sc(evaluationParameterMap_);
     Evaluator<FeatureScoreCollector> evaluator(patternBook_, &sc);
-    evaluator.eval(plan, currentField, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
+    evaluator.eval(plan, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     return CollectedFeatureCoefScore(sc.collectedCoef(), sc.collectedScore());
 }
 
-std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
+std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
                                      const PlayerState& me, const PlayerState& enemy,
                                      const PreEvalResult& preEvalResult, const MidEvalResult& midEvalResult,
                                      const GazeResult& gazeResult,
@@ -255,7 +256,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
         return string("give up :-(");
 
     RefPlan refPlan(plan);
-    CollectedFeatureCoefScore cf = evalWithCollectingFeature(refPlan, field, frameId, maxIteration,
+    CollectedFeatureCoefScore cf = evalWithCollectingFeature(refPlan, frameId, maxIteration,
                                                              me, enemy, preEvalResult, midEvalResult, gazeResult);
 
     stringstream ss;
@@ -265,7 +266,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const CoreField& field, const 
             ss << toString(mode) << "(" << cf.coef(mode) << ") ";
     }
     ss << "/ ";
-    if (cf.feature(STRATEGY_ZENKESHI) > 0 || cf.feature(STRATEGY_INITIAL_ZENKESHI) > 0)
+    if (cf.feature(STRATEGY_ZENKESHI) > 0)
         ss << "ZENKESHI / ";
     if (cf.feature(STRATEGY_KILL) > 0)
         ss << "KILL / ";
