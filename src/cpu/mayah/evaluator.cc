@@ -603,7 +603,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     const int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
     int maxChainMaxChains = 0;
     int sideChainMaxScore = 0;
-    int fastChainMaxScore = 0;
+    int fastChain6MaxScore = 0;
+    int fastChain10MaxScore = 0;
     int maxVirtualRensaResultScore = 0;
     int rensaCounts[20] {};
 
@@ -669,8 +670,11 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         }
 
         int nessesaryPuyos = TsumoPossibility::necessaryPuyos(necessaryPuyoSet, 0.5);
-        if (nessesaryPuyos <= 5 && fastChainMaxScore < rensaResult.score) {
-            fastChainMaxScore = rensaResult.score;
+        if (nessesaryPuyos <= 6 && fastChain6MaxScore < rensaResult.score) {
+            fastChain6MaxScore = rensaResult.score;
+        }
+        if (nessesaryPuyos <= 10 && fastChain10MaxScore < rensaResult.score) {
+            fastChain10MaxScore = rensaResult.score;
         }
     };
 
@@ -690,10 +694,11 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     }
 
     // fast chain
-    if (fastChainMaxScore >= scoreForOjama(30)) {
-        sc_->addScore(HOLDING_FAST_CHAIN_LARGE, 1);
-    } else if (fastChainMaxScore >= scoreForOjama(18)) {
-        sc_->addScore(HOLDING_FAST_CHAIN_MEDIUM, 1);
+    if (fastChain6MaxScore >= scoreForOjama(18)) {
+        sc_->addScore(KEEP_FAST_6_CHAIN, 1);
+    }
+    if (fastChain10MaxScore >= scoreForOjama(30)) {
+        sc_->addScore(KEEP_FAST_10_CHAIN, 1);
     }
 
     // finalize.

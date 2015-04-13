@@ -319,12 +319,15 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
     }
     ss << " / ";
 
-    if (cf.feature(HOLDING_FAST_CHAIN_MEDIUM) > 0) {
-        ss << "FAST=MEDIUM";
-    } else if (cf.feature(HOLDING_FAST_CHAIN_LARGE) > 0) {
-        ss << "FAST=LARGE";
+    if (cf.feature(KEEP_FAST_6_CHAIN) > 0) {
+        ss << "FAST6=OK / ";
     } else {
-        ss << "FAST=NONE";
+        ss << "FAST6=NG / ";
+    }
+    if (cf.feature(KEEP_FAST_10_CHAIN) > 0) {
+        ss << "FAST10=OK";
+    } else {
+        ss << "FAST10=NG";
     }
 
     ss << ",";
