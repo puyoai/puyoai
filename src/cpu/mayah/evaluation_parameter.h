@@ -14,6 +14,7 @@
 
 enum class EvaluationMode {
     DEFAULT,
+    INITIAL,
     EARLY,
     MIDDLE,
     LATE,
@@ -22,6 +23,7 @@ enum class EvaluationMode {
 
 const EvaluationMode ALL_EVALUATION_MODES[] = {
     EvaluationMode::DEFAULT,
+    EvaluationMode::INITIAL,
     EvaluationMode::EARLY,
     EvaluationMode::MIDDLE,
     EvaluationMode::LATE,

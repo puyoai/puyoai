@@ -125,13 +125,13 @@ public:
         EvaluatorBase(patternBook),
         sc_(sc) {}
 
-    void eval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+    void eval(const RefPlan&, int currentFrameId, int maxIteration,
               const PlayerState& me, const PlayerState& enemy,
               const PreEvalResult&, const MidEvalResult&, const GazeResult&);
 
     // ----------------------------------------------------------------------
 
-    bool evalStrategy(const RefPlan&, const CoreField& currentField, int currentFrameId,
+    bool evalStrategy(const RefPlan&, int currentFrameId,
                       const PlayerState& me, const PlayerState& enemy, const GazeResult&,
                       const MidEvalResult&);
 
