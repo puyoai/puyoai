@@ -1,5 +1,6 @@
 #include "capture/analyzer.h"
 
+#include <sstream>
 #include <queue>
 
 #include "core/constant.h"
