@@ -5,7 +5,8 @@
 #include "core/score.h"
 #include "core/rensa_tracker.h"
 
-// core_field_inl.h contains several the implementation of CoreField.
+// core_field_inl.h contains several method implementation of CoreField.
+// All methods should be inline or template.
 
 inline
 RensaResult CoreField::simulate(int initialChain)
