@@ -39,6 +39,45 @@ TEST(CoreFieldTest, color)
     EXPECT_EQ(PuyoColor::WALL, cf.color(7, 1));
 }
 
+TEST(CoreFieldTest, countColorPuyos1)
+{
+    CoreField cf;
+
+    EXPECT_EQ(0, cf.countColorPuyos());
+}
+
+TEST(CoreFieldTest, countColorPuyos2)
+{
+    CoreField cf(
+        "RRBBYY"
+        "OO&&OO"
+        "RRBBYY");
+
+    EXPECT_EQ(12, cf.countColorPuyos());
+}
+
+TEST(CoreFieldTest, countColorPuyos3)
+{
+    CoreField cf(
+        "RR.RRR" // 14
+        "RR.RRR" // 13
+        "RR.RRR" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    // Don't count 14th row.
+    EXPECT_EQ(10, cf.countColorPuyos());
+}
+
 TEST(CoreFieldTest, forceDrop)
 {
     CoreField cf(
