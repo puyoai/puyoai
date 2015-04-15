@@ -26,17 +26,22 @@ class Ai : public ::AI {
   virtual void onGameWillBegin(const FrameRequest& frame_request) override;
   virtual void onEnemyGrounded(const FrameRequest& frame_request) override;
 
-  static int PatternMatch(const RefPlan& plan, std::string* name);
-  static void Evaluate(const RefPlan& plan,
-                       Attack* attack,
-                       const RensaChainTrackResult& track,
-                       Control* control);
+  // Callback function to evaluate a controled state.
+  static void EvaluatePlan(const RefPlan& plan,
+                           Attack* attack,
+                           const RensaChainTrackResult& track,
+                           Control* control);
+
+  // Callback function to evaluate a rensa status.
+  // TODO: Rename to more descriptive name.
   static void EvaluateRensa(const CoreField& field,
                             const RensaResult& result,
                             const ColumnPuyoList& list,
                             const RensaChainTrackResult& track,
                             int* max_score,
                             RensaChainTrackResult* track_result);
+
+  static int PatternMatch(const RefPlan& plan, std::string* name);
 
   // Information about opponent's attacks.
   std::unique_ptr<Attack> attack_;
