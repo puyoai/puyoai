@@ -57,7 +57,7 @@ DropDecision Ai::think(int frame_id,
   // Look for plans.
   Control control;
   control.score = -10000;
-  auto evaluate = std::bind(Ai::Evaluate, _1, attack_.get(),
+  auto evaluate = std::bind(Ai::EvaluatePlan, _1, attack_.get(),
                             track_result, &control);
   Plan::iterateAvailablePlans(field, seq, 2, evaluate);
 
@@ -137,10 +137,10 @@ int FieldEvaluate(const CoreField& field) {
   return score;
 }
 
-void Ai::Evaluate(const RefPlan& plan,
-                  Attack* attack,
-                  const RensaChainTrackResult& track,
-                  Control* control) {
+void Ai::EvaluatePlan(const RefPlan& plan,
+                      Attack* attack,
+                      const RensaChainTrackResult& track,
+                      Control* control) {
   int score = 0;
   int value = 0;
   std::ostringstream oss;
@@ -173,33 +173,6 @@ void Ai::Evaluate(const RefPlan& plan,
     }
   }
 
-  // Expected future
-  {
-    using namespace std::placeholders;
-    RensaChainTrackResult track_result;
-    int max_score = 0;
-    auto rensa_callback = std::bind(Ai::EvaluateRensa, _1, _2, _3, _4,
-                                    &max_score, &track_result);
-    RensaDetector::iteratePossibleRensasIteratively(
-        plan.field(), 1, RensaDetectorStrategy::defaultFloatStrategy(),
-        rensa_callback);
-    int count = 0;
-    for (int x = 1; x <= PlainField::WIDTH; ++x) {
-      for (int y = 1; y <= PlainField::HEIGHT; ++y) {
-        if (track_result.erasedAt(x, y) == 0)
-          continue;
-        if (track_result.erasedAt(x, y) == track.erasedAt(x, y) + 1)
-          ++count;
-      }
-    }
-
-    if (count) {
-      int value = count * 20;
-      oss << "Planning(" << value << ")_";
-      score += value;
-    }
-  }
-
   value = FieldEvaluate(plan.field());
   oss << "Field(" << value << ")";
   score += value;
@@ -226,6 +199,31 @@ void Ai::Evaluate(const RefPlan& plan,
     if (plan.field().countPuyos() == 0) {
       value = ZENKESHI_BONUS;
       oss << "Zenkeshi(" << value << ")";
+      score += value;
+    }
+  } else {
+    // Expected future
+    using namespace std::placeholders;
+    RensaChainTrackResult track_result;
+    int max_score = 0;
+    auto rensa_callback = std::bind(Ai::EvaluateRensa, _1, _2, _3, _4,
+                                    &max_score, &track_result);
+    RensaDetector::iteratePossibleRensasIteratively(
+        plan.field(), 1, RensaDetectorStrategy::defaultFloatStrategy(),
+        rensa_callback);
+    int count = 0;
+    for (int x = 1; x <= PlainField::WIDTH; ++x) {
+      for (int y = 1; y <= PlainField::HEIGHT; ++y) {
+        if (track_result.erasedAt(x, y) == 0)
+          continue;
+        if (track_result.erasedAt(x, y) == track.erasedAt(x, y) + 1)
+          ++count;
+      }
+    }
+    
+    if (count) {
+      int value = count * 20;
+      oss << "Planning(" << value << ")_";
       score += value;
     }
   }
