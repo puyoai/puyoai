@@ -36,9 +36,9 @@ protected:
         return AI::isFieldInconsistent(lhs, rhs);
     }
 
-    static void mergeField(CoreField* ours, const PlainField& provided)
+    static void mergeField(CoreField* ours, const PlainField& provided, bool ojamaDropped)
     {
-        AI::mergeField(ours, provided);
+        AI::mergeField(ours, provided, ojamaDropped);
     }
 
     const PlayerState& myPlayerState() { return ai_.myPlayerState(); }
@@ -225,17 +225,17 @@ TEST_F(AITest, mergeFieldSimpleCase)
 
     {
         CoreField f = f1;
-        mergeField(&f, f2);
+        mergeField(&f, f2, false);
         EXPECT_EQ(f2, f);
     }
     {
         CoreField f = f1;
-        mergeField(&f, f3);
+        mergeField(&f, f3, false);
         EXPECT_EQ(f3, f);
     }
     {
         CoreField f = f2;
-        mergeField(&f, f3);
+        mergeField(&f, f3, false);
         EXPECT_EQ(f3, f);
     }
 }
@@ -302,17 +302,100 @@ TEST_F(AITest, mergeField)
 
     {
         CoreField f = f1;
-        mergeField(&f, f2);
+        mergeField(&f, f2, false);
         EXPECT_EQ(f1, f);
     }
     {
         CoreField f = f1;
-        mergeField(&f, f3);
+        mergeField(&f, f3, false);
         EXPECT_EQ(f3, f);
     }
     {
         CoreField f = f1;
-        mergeField(&f, f4);
+        mergeField(&f, f4, false);
         EXPECT_EQ(f3, f);
+    }
+}
+
+TEST_F(AITest, mergeFieldOjama)
+{
+    CoreField original(
+        "OO OOO" // 10
+        "OOOOOO" // 9
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    CoreField provided1(
+        "OO OOO" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    CoreField expected1(
+        "OO OOO" // 13
+        "OO OOO" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    CoreField provided2(
+        "OO OOO" // 12
+        "OO OOO"
+        "OOOOOO" // 10
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    CoreField expected2(
+        "OO OOO" // 12
+        "OO OOO" // 11
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    {
+        CoreField f(original);
+        mergeField(&f, provided1, true);
+        EXPECT_EQ(expected1, f) << f.toDebugString();
+    }
+    {
+        CoreField f(original);
+        mergeField(&f, provided2, true);
+        EXPECT_EQ(expected2, f) << f.toDebugString();
     }
 }
