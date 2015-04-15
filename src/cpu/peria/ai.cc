@@ -11,6 +11,7 @@
 
 #include "base/base.h"
 #include "core/algorithm/plan.h"
+#include "core/algorithm/rensa_detector.h"
 #include "core/constant.h"
 #include "core/frame_request.h"
 
@@ -45,9 +46,19 @@ DropDecision Ai::think(int frame_id,
   UNUSED_VARIABLE(fast);
   using namespace std::placeholders;
 
+  // Detect currently planning rensa.
+  RensaChainTrackResult track_result;
+  int _max_score = 0;
+  auto rensa_callback = std::bind(Ai::EvaluateRensa, _1, _2, _3, _4,
+                                  &_max_score, &track_result);
+  RensaDetector::iteratePossibleRensasIteratively(field, 1, RensaDetectorStrategy::defaultFloatStrategy(), rensa_callback);
+  
+
+  // Look for plans.
   Control control;
   control.score = -10000;
-  auto evaluate = std::bind(Ai::Evaluate, _1, attack_.get(), &control);
+  auto evaluate = std::bind(Ai::Evaluate, _1, attack_.get(),
+                            track_result, &control);
   Plan::iterateAvailablePlans(field, seq, 2, evaluate);
 
   DLOG(INFO) << control.message;
@@ -126,13 +137,16 @@ int FieldEvaluate(const CoreField& field) {
   return score;
 }
 
-void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
+void Ai::Evaluate(const RefPlan& plan,
+                  Attack* attack,
+                  const RensaChainTrackResult& track,
+                  Control* control) {
   int score = 0;
   int value = 0;
   std::ostringstream oss;
   std::string message;
 
-  // Future expectation
+  // Near future expectation
   {
     std::vector<int> expects;
     expects.clear();
@@ -154,7 +168,34 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
   {
     value = PatternMatch(plan, &message);
     if (value) {
-      oss << "Pattern(" << message << "," << value << ")_";
+      oss << "Pattern(" << message << "=" << value << ")_";
+      score += value;
+    }
+  }
+
+  // Expected future
+  {
+    using namespace std::placeholders;
+    RensaChainTrackResult track_result;
+    int max_score = 0;
+    auto rensa_callback = std::bind(Ai::EvaluateRensa, _1, _2, _3, _4,
+                                    &max_score, &track_result);
+    RensaDetector::iteratePossibleRensasIteratively(
+        plan.field(), 1, RensaDetectorStrategy::defaultFloatStrategy(),
+        rensa_callback);
+    int count = 0;
+    for (int x = 1; x <= PlainField::WIDTH; ++x) {
+      for (int y = 1; y <= PlainField::HEIGHT; ++y) {
+        if (track_result.erasedAt(x, y) == 0)
+          continue;
+        if (track_result.erasedAt(x, y) == track.erasedAt(x, y) + 1)
+          ++count;
+      }
+    }
+    
+    if (count) {
+      int value = count * 20;
+      oss << "Planning(" << value << ")_";
       score += value;
     }
   }
@@ -194,6 +235,22 @@ void Ai::Evaluate(const RefPlan& plan, Attack* attack, Control* control) {
     control->score = score;
     control->message = oss.str();
     control->decision = plan.decisions().front();
+  }
+}
+
+void Ai::EvaluateRensa(const CoreField& field,
+                       const RensaResult& result,
+                       const ColumnPuyoList& list,
+                       const RensaChainTrackResult& track,
+                       int* max_score,
+                       RensaChainTrackResult* track_result) {
+  UNUSED_VARIABLE(field);
+  UNUSED_VARIABLE(result);
+  UNUSED_VARIABLE(list);
+
+  if (result.score > *max_score) {
+    *max_score = result.score;
+    *track_result = track;
   }
 }
 
