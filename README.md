@@ -50,7 +50,7 @@ Macの場合、homebrewを使うと楽です。Xcode、コマンドラインツ�
 次のコマンドで必要なものが入るとおもいます。
 
     $ brew install pkg-config
-    $ brew install gflags glog sdl2 SDL2_ttf SDL2_image ffmpeg libusb libgcrypt
+    $ brew install cmake gflags glog sdl2 SDL2_ttf SDL2_image ffmpeg libusb libgcrypt
 
 ## 実行
 
