@@ -5,7 +5,7 @@ cpu_setup("peria")
 puyoai_add_cxx_flags("-Wall -Wextra")
 puyoai_add_cxx_flags("-Wno-error=unused-parameter -Wno-error=unused-variable")
 
-add_library(peria_lib ai.cc pattern.cc)
+add_library(peria_lib ai.cc pattern.cc evaluator.cc)
 
 function(peria_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})

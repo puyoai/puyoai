@@ -32,15 +32,6 @@ class Ai : public ::AI {
                            const RensaChainTrackResult& track,
                            Control* control);
 
-  // Callback function to evaluate a rensa status.
-  // TODO: Rename to more descriptive name.
-  static void EvaluateRensa(const CoreField& field,
-                            const RensaResult& result,
-                            const ColumnPuyoList& list,
-                            const RensaChainTrackResult& track,
-                            int* max_score,
-                            RensaChainTrackResult* track_result);
-
   static int PatternMatch(const RefPlan& plan, std::string* name);
 
   // Information about opponent's attacks.

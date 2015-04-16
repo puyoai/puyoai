@@ -15,7 +15,7 @@
 #include "core/constant.h"
 #include "core/frame_request.h"
 
-#include "cpu/peria/pattern.h"
+#include "cpu/peria/evaluator.h"
 
 namespace peria {
 
@@ -46,14 +46,21 @@ DropDecision Ai::think(int frame_id,
   UNUSED_VARIABLE(fast);
   using namespace std::placeholders;
 
-  // Detect currently planning rensa.
+  // Currently planning rensa.
   RensaChainTrackResult track_result;
-  int _max_score = 0;
-  auto rensa_callback = std::bind(Ai::EvaluateRensa, _1, _2, _3, _4,
-                                  &_max_score, &track_result);
-  RensaDetector::iteratePossibleRensasIteratively(field, 1, RensaDetectorStrategy::defaultFloatStrategy(), rensa_callback);
-
-
+  int max_score = 0;
+  RensaDetector::iteratePossibleRensasIteratively(
+      field, 1, RensaDetectorStrategy::defaultFloatStrategy(),
+      [&max_score, &track_result](const CoreField&,
+                                  const RensaResult& result,
+                                  const ColumnPuyoList&,
+                                  const RensaChainTrackResult& track) {
+        if (result.score > max_score) {
+          max_score = result.score;
+          track_result = track;
+        }
+      });
+  
   // Look for plans.
   Control control;
   control.score = -10000;
@@ -87,93 +94,34 @@ void Ai::onEnemyGrounded(const FrameRequest& frame_request) {
   attack_->end_frame_id = frame_request.frameId + result.frames;
 }
 
-int Ai::PatternMatch(const RefPlan& plan, std::string* name) {
-  const CoreField& field = plan.field();
-
-  int best = 0;
-  for (const Pattern& pattern : Pattern::GetAllPattern()) {
-    int score = pattern.Match(field);
-    if (score > best) {
-      best = score;
-
-      std::ostringstream oss;
-      oss << pattern.name() << "[" << score << "/" << pattern.score() << "]";
-      *name = oss.str();
-    }
-  }
-
-  return best;
-}
-
-int ScoreDiffHeight(int higher, int lower) {
-  int diff = higher - lower;
-  diff = diff * diff;
-  return ((higher > lower) ? 0 : -diff) * 50;
-}
-
-int FieldEvaluate(const CoreField& field) {
-  int score = 0;
-
-  int num_connect = 0;
-  for (int x = 1; x < PlainField::WIDTH; ++x) {
-    int height = field.height(x);
-    for (int y = 1; y <= height; ++y) {
-      PuyoColor c = field.color(x, y);
-      if (c == PuyoColor::OJAMA)
-        continue;
-      if (c == field.color(x + 1, y))
-        ++num_connect;
-      if (c == field.color(x, y + 1))
-        ++num_connect;
-    }
-  }
-  score += num_connect * 2;
-
-  score += ScoreDiffHeight(field.height(1), field.height(2));
-  score += ScoreDiffHeight(field.height(2), field.height(3));
-  score += ScoreDiffHeight(field.height(5), field.height(4));
-  score += ScoreDiffHeight(field.height(6), field.height(5));
-
-  return score;
-}
-
 void Ai::EvaluatePlan(const RefPlan& plan,
                       Attack* attack,
                       const RensaChainTrackResult& track,
                       Control* control) {
+  // Score in total.
   int score = 0;
-  int value = 0;
   std::ostringstream oss;
+
+  // Score and a message for a feature.
+  int value = 0;
   std::string message;
 
   // Near future expectation
-  {
-    std::vector<int> expects;
-    expects.clear();
-    Plan::iterateAvailablePlans(
-        plan.field(), KumipuyoSeq(), 1,
-        [&expects](const RefPlan& p) {
-          if (p.isRensaPlan())
-          expects.push_back(p.rensaResult().score);
-        });
-    value = std::accumulate(expects.begin(), expects.end(), 0);
-    if (expects.size()) {
-      value /= expects.size();
-      oss << "Future(" << value << ")_";
-      score += value;
-    }
+  value = Evaluator::Future(plan.field());
+  if (value) {
+    oss << "Future(" << value << ")_";
+    score += value;
   }
 
   // Pattern maching
-  {
-    value = PatternMatch(plan, &message);
-    if (value) {
-      oss << "Pattern(" << message << "=" << value << ")_";
-      score += value;
-    }
+  value = Evaluator::PatternMatch(plan.field(), &message);
+  if (value) {
+    oss << "Pattern(" << message << "=" << value << ")_";
+    score += value;
   }
 
-  value = FieldEvaluate(plan.field());
+  // Field statement
+  value = Evaluator::Field(plan.field());
   oss << "Field(" << value << ")";
   score += value;
 
@@ -202,27 +150,8 @@ void Ai::EvaluatePlan(const RefPlan& plan,
       score += value;
     }
   } else {
-    // Expected future
-    using namespace std::placeholders;
-    RensaChainTrackResult track_result;
-    int max_score = 0;
-    auto rensa_callback = std::bind(Ai::EvaluateRensa, _1, _2, _3, _4,
-                                    &max_score, &track_result);
-    RensaDetector::iteratePossibleRensasIteratively(
-        plan.field(), 1, RensaDetectorStrategy::defaultFloatStrategy(),
-        rensa_callback);
-    int count = 0;
-    for (int x = 1; x <= PlainField::WIDTH; ++x) {
-      for (int y = 1; y <= PlainField::HEIGHT; ++y) {
-        if (track_result.erasedAt(x, y) == 0)
-          continue;
-        if (track_result.erasedAt(x, y) == track.erasedAt(x, y) + 1)
-          ++count;
-      }
-    }
-    
-    if (count) {
-      int value = count * 20;
+    value = Evaluator::Plan(plan.field(), track);
+    if (value) {
       oss << "Planning(" << value << ")_";
       score += value;
     }
@@ -233,22 +162,6 @@ void Ai::EvaluatePlan(const RefPlan& plan,
     control->score = score;
     control->message = oss.str();
     control->decision = plan.decisions().front();
-  }
-}
-
-void Ai::EvaluateRensa(const CoreField& field,
-                       const RensaResult& result,
-                       const ColumnPuyoList& list,
-                       const RensaChainTrackResult& track,
-                       int* max_score,
-                       RensaChainTrackResult* track_result) {
-  UNUSED_VARIABLE(field);
-  UNUSED_VARIABLE(result);
-  UNUSED_VARIABLE(list);
-
-  if (result.score > *max_score) {
-    *max_score = result.score;
-    *track_result = track;
   }
 }
 
