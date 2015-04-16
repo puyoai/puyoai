@@ -18,7 +18,9 @@ find_package(Threads)
 
 find_package(PkgConfig)
 
-pkg_search_module(GFLAGS REQUIRED libgflags)
+# TODO(mayah): gflags does not provide pkg-config anymore?
+# pkg_search_module for libgflags doesn't work with Mac homebrew (2015-04-16).
+find_library(LIB_GFLAGS gflags)
 pkg_search_module(GLOG REQUIRED libglog)
 
 pkg_search_module(SDL2 sdl2)
@@ -77,8 +79,6 @@ add_subdirectory(third_party/jsoncpp)
 include_directories(third_party/jsoncpp)
 
 include_directories(third_party/tinytoml/include)
-
-include_directories(${GFLAGS_INCLUDE_DIRS})
 include_directories(${GLOG_INCLUDE_DIRS})
 
 if(USE_SDL2)
@@ -106,7 +106,7 @@ endif()
 
 function(puyoai_target_link_libraries target)
     target_link_libraries(${target} ${CMAKE_THREAD_LIBS_INIT})
-    target_link_libraries(${target} ${GFLAGS_LIBRARIES})
+    target_link_libraries(${target} ${LIB_GFLAGS})
     target_link_libraries(${target} ${GLOG_LIBRARIES})
 endfunction()
 
