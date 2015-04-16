@@ -21,7 +21,7 @@ class Ai : public ::AI {
                              const CoreField& field,
                              const KumipuyoSeq& seq,
                              const PlayerState& me,
-                             const PlayerState& enemy,
+                             const EnemyState& enemy,
                              bool fast) const override;
   virtual void onGameWillBegin(const FrameRequest& frame_request) override;
   virtual void onEnemyGrounded(const FrameRequest& frame_request) override;

@@ -41,7 +41,7 @@ public:
     int frameIdGazedAt() const { return frameIdGazedAt_; }
 
     // Returns the (expecting) possible max score by this frame.
-    int estimateMaxScore(int frameId, const PlayerState& enemy) const;
+    int estimateMaxScore(int frameId, const EnemyState& enemy) const;
 
     std::string toRensaInfoString() const;
 

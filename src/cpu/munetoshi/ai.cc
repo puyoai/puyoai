@@ -46,7 +46,7 @@ DropDecision munetoshi::AI::think(
         const CoreField& field,
         const KumipuyoSeq& seq,
         const PlayerState& my_state,
-        const PlayerState& opponent_state,
+        const EnemyState& opponent_state,
         bool) const {
     return think_internal(field, seq, my_state, opponent_state);
 }
@@ -55,7 +55,7 @@ DropDecision munetoshi::AI::think_internal(
         const CoreField& field,
         const KumipuyoSeq& seq,
         const PlayerState& my_state,
-        const PlayerState& opponent_state) const {
+        const EnemyState& opponent_state) const {
 
     std::string message;
     Decision best_chain_decision;
@@ -107,7 +107,7 @@ void munetoshi::AI::onEnemyGrounded(const FrameRequest& frame) {
 munetoshi::grade munetoshi::AI::evaluate(
         const CoreField& core_field,
         const PlayerState& my_state,
-        const PlayerState& opponent_state,
+        const EnemyState& opponent_state,
         const RefPlan *plan_ptr) const {
 
     grade optimal_grade = GRADE_MIN;

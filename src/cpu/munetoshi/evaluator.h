@@ -4,6 +4,7 @@
 
 #include "constants.h"
 
+struct EnemyState;
 struct PlayerState;
 struct RensaResult;
 
@@ -25,7 +26,7 @@ enum class TurnoverType {
 struct PlanResult {
     const CoreField& field;
     const PlayerState& my_state;
-    const PlayerState& opponent_state;
+    const EnemyState& opponent_state;
 
     const RefPlan* plan_ptr;
 };

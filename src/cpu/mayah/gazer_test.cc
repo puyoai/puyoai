@@ -59,7 +59,7 @@ TEST_F(GazerTest, feasibleRensas)
     GazeResult gazeResult = gazer_->gazeResult();
     // Gazer should find a rensa with the first BY.
     // 2280 = basic score of 4 rensa.
-    EXPECT_EQ(2280, gazeResult.estimateMaxScore(100, PlayerState())) << gazeResult.toRensaInfoString();
+    EXPECT_EQ(2280, gazeResult.estimateMaxScore(100, EnemyState())) << gazeResult.toRensaInfoString();
 }
 
 TEST_F(GazerTest, estimateMaxScoreUsingRensaIsOngoing)
@@ -68,7 +68,7 @@ TEST_F(GazerTest, estimateMaxScoreUsingRensaIsOngoing)
     KumipuyoSeq seq("BYRRGG");
     gazer_->gaze(100, f, seq);
 
-    PlayerState enemy;
+    EnemyState enemy;
     enemy.isRensaOngoing = true;
     enemy.finishingRensaFrameId = 400;
     enemy.ongoingRensaResult = RensaResult(10, 36840, 300, false);

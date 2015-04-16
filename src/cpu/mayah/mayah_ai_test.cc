@@ -33,8 +33,8 @@ TEST(MayahAITest, parallel)
     auto ai = makeAI();
     auto parallelAi = makeAI(executor.get());
 
-    ThoughtResult thoughtResult = ai->thinkPlan(2, f, seq, PlayerState(), PlayerState(), 2, 3);
-    ThoughtResult parallelThoughtResult = parallelAi->thinkPlan(2, f, seq, PlayerState(), PlayerState(), 2, 3);
+    ThoughtResult thoughtResult = ai->thinkPlan(2, f, seq, PlayerState(), EnemyState(), 2, 3);
+    ThoughtResult parallelThoughtResult = parallelAi->thinkPlan(2, f, seq, PlayerState(), EnemyState(), 2, 3);
 
     EXPECT_EQ(thoughtResult.plan, parallelThoughtResult.plan);
     EXPECT_EQ(thoughtResult.rensaScore, parallelThoughtResult.rensaScore);
@@ -83,7 +83,7 @@ TEST(MayahAITest, fromReal1)
     PlayerState me;
     me.pendingOjama = 67;
 
-    PlayerState enemy;
+    EnemyState enemy;
     enemy.isRensaOngoing = true;
     enemy.finishingRensaFrameId = 1346;
 
@@ -133,7 +133,7 @@ TEST(MayahAITest, fromReal2)
     PlayerState me;
     me.pendingOjama = 67;
 
-    PlayerState enemy;
+    EnemyState enemy;
     enemy.isRensaOngoing = true;
     enemy.finishingRensaFrameId = 1346;
 
@@ -159,7 +159,7 @@ TEST(MayahAITest, zenkeshi1)
     ai->gameWillBegin(req);
 
     PlayerState me;
-    PlayerState enemy;
+    EnemyState enemy;
 
     ThoughtResult thoughtResult = ai->thinkPlan(10, myField, mySeq, me, enemy, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
 
@@ -193,7 +193,7 @@ TEST(MayahAITest, DontCrash1)
     me.field = f;
     me.seq = seq;
 
-    PlayerState enemy;
+    EnemyState enemy;
 
     (void)ai->think(100, f, seq, me, enemy, false);
 }
@@ -226,7 +226,7 @@ TEST(MayahAITest, DontCrash2)
     me.field = f;
     me.seq = seq;
 
-    PlayerState enemy;
+    EnemyState enemy;
 
     (void)ai->think(100, f, seq, me, enemy, false);
 }
@@ -259,7 +259,7 @@ TEST(MayahAITest, DontCrash3)
     me.field = f;
     me.seq = seq;
 
-    PlayerState enemy;
+    EnemyState enemy;
 
     (void)ai->think(100, f, seq, me, enemy, false);
 }
