@@ -18,7 +18,7 @@ public:
             const CoreField& field,
             const KumipuyoSeq& seq,
             const PlayerState& me,
-            const PlayerState& enemy,
+            const EnemyState& enemy,
             bool fast) const override;
 
 protected:
@@ -32,14 +32,14 @@ protected:
             const CoreField& field,
             const KumipuyoSeq& seq,
             const PlayerState& my_state,
-            const PlayerState& opponent_state) const;
+            const EnemyState& opponent_state) const;
 
     virtual void onEnemyGrounded(const FrameRequest&) override;
 
     virtual grade evaluate(
             const CoreField& field,
             const PlayerState& my_state,
-            const PlayerState& opponent_state,
+            const EnemyState& opponent_state,
             const RefPlan* plan = nullptr) const;
 
     Strategy strategy;

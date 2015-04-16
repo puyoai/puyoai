@@ -48,7 +48,7 @@ public:
     virtual ~MayahAI();
 
     virtual DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
-                               const PlayerState& me, const PlayerState& enemy, bool fast) const override;
+                               const PlayerState& me, const EnemyState& enemy, bool fast) const override;
 
     virtual void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&) override;
 
@@ -57,25 +57,25 @@ public:
     // Use this directly in test. Otherwise, use via think.
     // When |specifiedDecisionsOnly| is specified, only that decision will be considered.
     ThoughtResult thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&,
-                            const PlayerState& me, const PlayerState& enemy,
+                            const PlayerState& me, const EnemyState& enemy,
                             int depth, int maxIteration,
                             std::vector<Decision>* specifiedDecisions = nullptr) const;
 
 protected:
     PreEvalResult preEval(const CoreField& currentField) const;
     MidEvalResult midEval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
-                          const PlayerState& me, const PlayerState& enemy,
+                          const PlayerState& me, const EnemyState& enemy,
                           const PreEvalResult&, const GazeResult&) const;
     EvalResult eval(const RefPlan&, int currentFrameId, int maxIteration,
-                    const PlayerState& me, const PlayerState& enemy,
+                    const PlayerState& me, const EnemyState& enemy,
                     const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
     CollectedFeatureCoefScore evalWithCollectingFeature(
         const RefPlan&, int currentFrameId, int maxIteration,
-        const PlayerState& me, const PlayerState& enemy,
+        const PlayerState& me, const EnemyState& enemy,
         const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
 
     std::string makeMessageFrom(int frameId, const KumipuyoSeq&, int maxIteration,
-                                const PlayerState& me, const PlayerState& enemy,
+                                const PlayerState& me, const EnemyState& enemy,
                                 const PreEvalResult&, const MidEvalResult&, const GazeResult&,
                                 const Plan& plan, double rensaScore, double virutalRensaScore,
                                 bool saturated,

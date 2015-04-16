@@ -16,7 +16,7 @@ template<typename Callback>
 void runTest(const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int maxDepth, Callback f)
 {
     PlayerState me;
-    PlayerState enemy;
+    EnemyState enemy;
     me.field = field;
     me.seq = kumipuyoSeq;
 

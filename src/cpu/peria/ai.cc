@@ -38,7 +38,7 @@ DropDecision Ai::think(int frame_id,
                        const CoreField& field,
                        const KumipuyoSeq& seq,
                        const PlayerState& me,
-                       const PlayerState& enemy,
+                       const EnemyState& enemy,
                        bool fast) const {
   UNUSED_VARIABLE(frame_id);
   UNUSED_VARIABLE(me);
@@ -52,7 +52,7 @@ DropDecision Ai::think(int frame_id,
   auto rensa_callback = std::bind(Ai::EvaluateRensa, _1, _2, _3, _4,
                                   &_max_score, &track_result);
   RensaDetector::iteratePossibleRensasIteratively(field, 1, RensaDetectorStrategy::defaultFloatStrategy(), rensa_callback);
-  
+
 
   // Look for plans.
   Control control;
@@ -133,7 +133,7 @@ int FieldEvaluate(const CoreField& field) {
   score += ScoreDiffHeight(field.height(2), field.height(3));
   score += ScoreDiffHeight(field.height(5), field.height(4));
   score += ScoreDiffHeight(field.height(6), field.height(5));
-  
+
   return score;
 }
 
@@ -192,7 +192,7 @@ void Ai::Evaluate(const RefPlan& plan,
           ++count;
       }
     }
-    
+
     if (count) {
       int value = count * 20;
       oss << "Planning(" << value << ")_";
@@ -222,7 +222,7 @@ void Ai::Evaluate(const RefPlan& plan,
     value = -plan.totalFrames() * 10;
     oss << "Time(" << value << ")_";
     score += value;
-    
+
     if (plan.field().countPuyos() == 0) {
       value = ZENKESHI_BONUS;
       oss << "Zenkeshi(" << value << ")";

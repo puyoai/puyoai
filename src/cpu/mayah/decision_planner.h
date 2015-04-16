@@ -37,7 +37,7 @@ public:
     void setSpecifiedDecisions(const std::vector<Decision>& decisions) { decisions_ = decisions; }
 
     void iterate(int frameId, const CoreField& originalField, const KumipuyoSeq& kumipuyoSeq,
-                 const PlayerState& me, const PlayerState& enemy, int maxDepth);
+                 const PlayerState& me, const EnemyState& enemy, int maxDepth);
 
 private:
     void iterateRest(int initialFrameId,
@@ -249,7 +249,7 @@ void DecisionPlanner<MidEvaluationResult>::iterate(int initialFrameId,
                                                    const CoreField& originalField,
                                                    const KumipuyoSeq& kumipuyoSeq,
                                                    const PlayerState& me,
-                                                   const PlayerState& enemy,
+                                                   const EnemyState& enemy,
                                                    int maxDepth)
 {
     const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));

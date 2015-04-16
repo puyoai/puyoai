@@ -18,7 +18,7 @@ struct Problem {
 
     std::string name;
     PlayerState myState;
-    PlayerState enemyState;
+    EnemyState enemyState;
     std::set<Decision> answers;
 };
 

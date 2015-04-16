@@ -15,7 +15,7 @@ DropDecision AI::think(int frame_id,
                        const CoreField& field,
                        const KumipuyoSeq& seq,
                        const PlayerState& me,
-                       const PlayerState& enemy,
+                       const EnemyState& enemy,
                        bool fast) const {
   UNUSED_VARIABLE(me);
   UNUSED_VARIABLE(enemy);

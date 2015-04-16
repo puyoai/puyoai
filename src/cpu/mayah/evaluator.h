@@ -15,6 +15,7 @@ class PuyoSet;
 class RefPlan;
 class RensaChainTrackResult;
 
+struct EnemyState;
 struct PlayerState;
 struct RensaResult;
 
@@ -112,7 +113,7 @@ public:
     void evalRensaFieldUShape(const CoreField&, bool enemyHasZenkeshi);
     void evalComplementationBias(const ColumnPuyoList&);
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList&,
-                           int currentFrameId, const PlayerState& me, const PlayerState& enemy);
+                           int currentFrameId, const PlayerState& me, const EnemyState& enemy);
 private:
     ScoreCollector* sc_;
 };
@@ -126,13 +127,13 @@ public:
         sc_(sc) {}
 
     void eval(const RefPlan&, int currentFrameId, int maxIteration,
-              const PlayerState& me, const PlayerState& enemy,
+              const PlayerState& me, const EnemyState& enemy,
               const PreEvalResult&, const MidEvalResult&, const GazeResult&);
 
     // ----------------------------------------------------------------------
 
     bool evalStrategy(const RefPlan&, int currentFrameId,
-                      const PlayerState& me, const PlayerState& enemy, const GazeResult&,
+                      const PlayerState& me, const EnemyState& enemy, const GazeResult&,
                       const MidEvalResult&);
 
     void evalFrameFeature(int totalFrames, int numChigiri);
@@ -150,7 +151,7 @@ public:
     void evalCountPuyoFeature(const CoreField&);
 
 private:
-    CollectedCoef calculateDefaultCoef(const PlayerState& me, const PlayerState& enemy) const;
+    CollectedCoef calculateDefaultCoef(const PlayerState& me, const EnemyState& enemy) const;
 
     ScoreCollector* sc_;
 };
