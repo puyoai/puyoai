@@ -25,6 +25,8 @@ struct Position;
 
 // CoreField represents a field. Without strong reason, this class should be used for
 // field implementation.
+// TODO(mayah): All puyos in CoreField should be grounded (14th row is exception).
+// For the field that might contain puyo in the air, it would be better to make another class.
 class CoreField : public PlainField {
 public:
     CoreField() : heights_{} {}
