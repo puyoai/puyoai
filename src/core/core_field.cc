@@ -23,18 +23,26 @@ CoreField::CoreField(const std::string& url) :
     PlainField(url)
 {
     heights_[0] = 0;
-    heights_[MAP_WIDTH - 1] = 0;
-    for (int x = 1; x <= WIDTH; ++x)
-        recalcHeightOn(x);
+    for (int x = 1; x <= WIDTH; ++x) {
+        heights_[x] = 0;
+        for (int y = 1; y <= 13; ++y) {
+            if (color(x, y) != PuyoColor::EMPTY)
+                heights_[x] = y;
+        }
+    }
 }
 
 CoreField::CoreField(const PlainField& f) :
     PlainField(f)
 {
     heights_[0] = 0;
-    heights_[MAP_WIDTH - 1] = 0;
-    for (int x = 1; x <= WIDTH; ++x)
-        recalcHeightOn(x);
+    for (int x = 1; x <= WIDTH; ++x) {
+        heights_[x] = 0;
+        for (int y = 1; y <= 13; ++y) {
+            if (color(x, y) != PuyoColor::EMPTY)
+                heights_[x] = y;
+        }
+    }
 }
 
 void CoreField::clear()
