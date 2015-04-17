@@ -202,7 +202,7 @@ TEST(CoreFieldTest, FramesTest) {
 TEST(CoreFieldTest, vanishWithIron)
 {
     CoreField cf(
-        ".@@.&&"
+        ".OO.&&"
         "RRRR&&");
 
     CoreField expected(
@@ -216,42 +216,42 @@ TEST(CoreFieldTest, vanishWithIron)
 
 TEST(CoreFieldTest, Height)
 {
-    CoreField f("004100"
-                "004040"
-                "004707"
-                "014040");
+    CoreField f("..O..."
+                "..O.O."
+                "..OOOO"
+                ".OOOOO");
 
     EXPECT_EQ(0, f.height(1));
     EXPECT_EQ(1, f.height(2));
     EXPECT_EQ(4, f.height(3));
-    EXPECT_EQ(4, f.height(4));
+    EXPECT_EQ(2, f.height(4));
     EXPECT_EQ(3, f.height(5));
     EXPECT_EQ(2, f.height(6));
 }
 
 TEST(CoreFieldTest, HeightShouldBeCopied)
 {
-    CoreField f("004100"
-                "004040"
-                "004707"
-                "014040");
+    CoreField f("..O..."
+                "..O.O."
+                "..OOOO"
+                ".OOOOO");
 
     CoreField g(f);
 
     EXPECT_EQ(0, g.height(1));
     EXPECT_EQ(1, g.height(2));
     EXPECT_EQ(4, g.height(3));
-    EXPECT_EQ(4, g.height(4));
+    EXPECT_EQ(2, g.height(4));
     EXPECT_EQ(3, g.height(5));
     EXPECT_EQ(2, g.height(6));
 }
 
 TEST(CoreFieldTest, HeightAfterSimulate)
 {
-    CoreField f("050005"
-                "050055"
-                "445644"
-                "445644");
+    CoreField f(".B...B"
+                ".B..BB"
+                "RRBYRR"
+                "RRBYRR");
 
     f.simulate();
 
@@ -265,9 +265,9 @@ TEST(CoreFieldTest, HeightAfterSimulate)
 
 TEST(CoreFieldTest, HeightAfterSimulate2)
 {
-    CoreField f("450005"
-                "445665"
-                "556455");
+    CoreField f("RG...Y"
+                "RRGBBY"
+                "GGBRYY");
 
     f.simulate();
 

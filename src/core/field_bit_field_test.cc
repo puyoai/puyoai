@@ -12,8 +12,8 @@ TEST(FieldBitFieldTest, initialize)
 
     for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
         for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
-            EXPECT_EQ(0, bitField.get(x, y));
-            EXPECT_EQ(0, bitField(x, y));
+            EXPECT_FALSE(bitField.get(x, y));
+            EXPECT_FALSE(bitField(x, y));
         }
     }
 }
@@ -25,9 +25,9 @@ TEST(FieldBitFieldTest, getAndSet)
     for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
         for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
             bitField.set(x, y);
-            EXPECT_EQ(1, bitField(x, y));
+            EXPECT_TRUE(bitField(x, y));
             bitField.clear(x, y);
-            EXPECT_EQ(0, bitField(x, y));
+            EXPECT_FALSE(bitField(x, y));
         }
     }
 }
