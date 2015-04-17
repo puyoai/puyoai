@@ -1,5 +1,6 @@
 #include "evaluator.h"
 
+#include <numeric>
 #include <sstream>
 
 #include "core/algorithm/plan.h"
@@ -53,7 +54,7 @@ int Evaluator::Field(const CoreField& field) {
   score += ScoreDiffHeight(field.height(2), field.height(3));
   score += ScoreDiffHeight(field.height(5), field.height(4));
   score += ScoreDiffHeight(field.height(6), field.height(5));
-  
+
   return score;
 }
 
@@ -98,7 +99,7 @@ int Evaluator::Plan(const CoreField& field,
         ++count;
     }
   }
-    
+
   return count * 20;
 }
 
