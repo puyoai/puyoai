@@ -15,12 +15,14 @@ public:
 
     bool isValid() const { return isNormalColor(axis) && isNormalColor(child); }
     constexpr Kumipuyo reverse() const { return Kumipuyo(child, axis); }
+    // Returns true if axis and child are the same.
     bool isRep() const { return axis == child; }
 
     friend bool operator==(const Kumipuyo& lhs, const Kumipuyo& rhs) { return lhs.axis == rhs.axis && lhs.child == rhs.child; }
     friend bool operator!=(const Kumipuyo& lhs, const Kumipuyo& rhs) { return !(lhs == rhs); }
 
     friend std::ostream& operator<<(std::ostream& os, const Kumipuyo& kp) { return os << kp.toString(); }
+
 public:
     PuyoColor axis;
     PuyoColor child;
