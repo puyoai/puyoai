@@ -214,7 +214,7 @@ TEST(CoreFieldTest, vanishWithIron)
     EXPECT_EQ(expected, cf) << cf.toDebugString();
 }
 
-TEST(CoreFieldTest, Height)
+TEST(CoreFieldTest, height)
 {
     CoreField f("..O..."
                 "..O.O."
@@ -229,7 +229,7 @@ TEST(CoreFieldTest, Height)
     EXPECT_EQ(2, f.height(6));
 }
 
-TEST(CoreFieldTest, HeightShouldBeCopied)
+TEST(CoreFieldTest, heightShouldBeCopied)
 {
     CoreField f("..O..."
                 "..O.O."
