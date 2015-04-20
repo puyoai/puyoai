@@ -133,6 +133,8 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     int bestVirtualRensaScore = 0;
 
+    bool ojamaFallen = false;
+
     mutex mu;
     auto evalRefPlan = [&, this, frameId, maxIteration](const RefPlan& plan, const MidEvalResult& midEvalResult) {
         EvalResult evalResult = eval(plan,  frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
@@ -143,6 +145,9 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                 << " vscore=" << evalResult.maxVirtualScore();
 
         lock_guard<mutex> lock(mu);
+
+        if (plan.fallenOjama() > 0)
+            ojamaFallen = true;
 
         if (bestScore < evalResult.score()) {
             bestScore = evalResult.score();
@@ -172,7 +177,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
 
     double endTime = currentTime();
-    if (false && bestVirtualRensaScore < bestRensaScore) {
+    if (!ojamaFallen && bestVirtualRensaScore < bestRensaScore) {
         std::string message = makeMessageFrom(frameId, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               preEvalResult, bestRensaMidEvalResult, gazeResult,
