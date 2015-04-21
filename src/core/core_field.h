@@ -66,8 +66,6 @@ public:
     int countConnectedPuyosMax4(int x, int y) const;
     // Returns true if color(x, y) is connected in some direction.
     bool isConnectedPuyo(int x, int y) const;
-    // Returns true if neighbor is empty.
-    bool hasEmptyNeighbor(int x, int y) const;
 
     // Inserts positions whose puyo color is the same as |c|, and connected to (x, y).
     // The checked cells will be marked in |checked|.
