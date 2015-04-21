@@ -202,15 +202,6 @@ bool CoreField::isConnectedPuyo(int x, int y) const
     return color(x, y - 1) == c || color(x, y + 1) == c || color(x - 1, y) == c || color(x + 1, y) == c;
 }
 
-bool CoreField::hasEmptyNeighbor(int x, int y) const
-{
-    DCHECK(color(x, y) != PuyoColor::EMPTY);
-    return color(x, y + 1) == PuyoColor::EMPTY ||
-           color(x, y - 1) == PuyoColor::EMPTY ||
-           color(x + 1, y) == PuyoColor::EMPTY ||
-           color(x - 1, y) == PuyoColor::EMPTY;
-}
-
 void CoreField::forceDrop()
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
