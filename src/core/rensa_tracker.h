@@ -3,6 +3,7 @@
 
 #include <glog/logging.h>
 
+#include "base/unit.h"
 #include "core/rensa_result.h"
 
 // RensaTracker tracks how rensa is vanished.
@@ -14,17 +15,19 @@
 // that calls the corresponding Tracker methods. If you'd like to add a new hook point,
 // you need to define a hook point in CoreField.
 
-// RensaNonTracker is a tracker that does not track anything.
-class RensaNonTracker {
-public:
+template<typename TrackResult>
+class RensaTracker;
+
+// RensaTracker<Unit> is a tracker that does not track anything.
+template<>
+class RensaTracker<Unit> {
+public:    
     void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) { }
     void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) { }
     void puyoIsDropped(int /*x*/, int /*fromY*/, int /*toY*/) { }
     void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
 };
-
-template<typename TrackResult>
-class RensaTracker;
+typedef RensaTracker<Unit> RensaNonTracker;
 
 // RensaTracker<RensaChainTrackResult> tracks in what-th rensa a puyo is vanished.
 template<>
