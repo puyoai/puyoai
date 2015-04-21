@@ -123,6 +123,9 @@ void makeProhibitArrayForExtend(const RensaResult& /*rensaResult*/, const RensaC
         prohibits[x] = (firePuyos.sizeOn(x) > 0);
 }
 
+// tryDropFire complements puyos in |originalField|, and fires a rensa.
+// The complemented puyos are always grounded (This is the different point of tryFloatFire).
+// For each detected rensa, |callback| is called.
 static inline
 void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
                  PurposeForFindingRensa purpose, int maxComplementPuyos, int maxPuyoHeight,

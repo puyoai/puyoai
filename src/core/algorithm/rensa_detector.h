@@ -74,6 +74,8 @@ public:
                                                      const ColumnPuyoList&,
                                                      const TrackResult&)>;
 
+    // TODO(mayah): Consider simplify these methods.
+
     // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
     static void iteratePossibleRensas(const CoreField&,
                                       int maxKeyPuyo,
