@@ -16,12 +16,16 @@ using namespace std;
 
 TEST(CoreFieldTest, constructor)
 {
-    CoreField f;
+    CoreField cf;
 
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        for (int y = 1; y <= CoreField::HEIGHT; ++y) {
-            EXPECT_EQ(PuyoColor::EMPTY, f.color(x, y)) << x << ' ' << y;
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
+            EXPECT_EQ(PuyoColor::EMPTY, cf.color(x, y)) << x << ' ' << y;
         }
+    }
+
+    for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
+        EXPECT_EQ(0, cf.height(x));
     }
 }
 

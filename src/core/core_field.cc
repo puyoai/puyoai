@@ -30,6 +30,7 @@ CoreField::CoreField(const std::string& url) :
                 heights_[x] = y;
         }
     }
+    heights_[MAP_WIDTH - 1] = 0;
 }
 
 CoreField::CoreField(const PlainField& f) :
@@ -43,6 +44,7 @@ CoreField::CoreField(const PlainField& f) :
                 heights_[x] = y;
         }
     }
+    heights_[MAP_WIDTH - 1] = 0;
 }
 
 void CoreField::clear()
