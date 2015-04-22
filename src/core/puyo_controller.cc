@@ -172,7 +172,7 @@ KeySetSeq findKeyStrokeFastpath31(const CoreField& field)
         return KeySetSeq("vA,v");
     if (field.height(4) <= 11)
         return KeySetSeq("A,v");
-    if (field.height(2) == 12 && field.height(4) == 12)
+    if (field.height(2) >= 12 && field.height(4) == 12)
         return KeySetSeq("B,,B,,B,v");
     return KeySetSeq();
 }
@@ -200,7 +200,7 @@ KeySetSeq findKeyStrokeFastpath33(const CoreField& field)
         return KeySetSeq("B,v");
     if (field.height(2) == 12 && field.height(3) == 11)
         return KeySetSeq("A,,A,,A,v");
-    if (field.height(2) == 12 && field.height(4) == 12)
+    if (field.height(2) == 12 && field.height(4) >= 12)
         return KeySetSeq("A,,A,,A,v");
     return KeySetSeq();
 }
@@ -211,6 +211,8 @@ KeySetSeq findKeyStrokeFastpath40(const CoreField& field)
         return KeySetSeq(">,v");
     if (field.height(2) == 12 && field.height(4) == 12)
         return KeySetSeq("A,,A,,A,>,A,v");
+    if (field.height(2) >= 13 && field.height(4) == 12)
+        return KeySetSeq("A,,A,,A,,A,,v");
     if (field.height(3) == 11 && field.height(4) == 12)
         return KeySetSeq("B,,B,,B,,>,B,v");
     return KeySetSeq();
@@ -224,6 +226,8 @@ KeySetSeq findKeyStrokeFastpath41(const CoreField& field)
         return KeySetSeq(">,B,,B,,B,v");
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(6) <= 12)
         return KeySetSeq("B,,B,,B,>,v");
+    if (field.height(2) >= 12 && field.height(4) == 12 && field.height(5) <= 12)
+        return KeySetSeq("A,,A,,B,,>,v");
     return KeySetSeq();
 }
 
@@ -245,6 +249,8 @@ KeySetSeq findKeyStrokeFastpath43(const CoreField& field)
         return KeySetSeq(">B,v");
     if (field.height(2) == 12 && field.height(4) == 12)
         return KeySetSeq("A,,A,,A,>,v");
+    if (field.height(2) == 13 && field.height(4) == 12)
+        return KeySetSeq("A,,A,,A,,v");
     if (field.height(3) == 11 && field.height(4) == 12)
         return KeySetSeq("B,,B,,A,,>,v");
     if (field.height(4) <= 11 && field.height(5) >= 12)
@@ -257,8 +263,14 @@ KeySetSeq findKeyStrokeFastpath50(const CoreField& field)
 {
     if (field.height(4) <= 11 && field.height(5) <= 11)
         return KeySetSeq(">,,>,v");
-    if (field.height(4) == 11 && field.height(5) == 12)
+    if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 11)
         return KeySetSeq(">B,>,>B,>,>B,>,,B,v");
+    if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) >= 12)
+        return KeySetSeq(">B,>,>B,>,>A,>,,A,v");
+    if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 12)
+        return KeySetSeq("A,,A,,A,>,A,>,,v");
+    if (field.height(2) >= 12 && field.height(4) == 12 && field.height(5) <= 12)
+        return KeySetSeq("A,,A,,A,,>,,A,v");
     return KeySetSeq();
 }
 
@@ -266,7 +278,6 @@ KeySetSeq findKeyStrokeFastpath51(const CoreField& field)
 {
     if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11)
         return KeySetSeq(">A,,>,v");
-
     if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12)
         return KeySetSeq(">B,>,>,>B,>,>,>,>B,>,v");
     if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 12)
@@ -279,53 +290,30 @@ KeySetSeq findKeyStrokeFastpath51(const CoreField& field)
 
 KeySetSeq findKeyStrokeFastpath52(const CoreField& field)
 {
-    if (field.height(4) <= 11 && field.height(5) <= 9 && field.height(6) <= 9) {
-        return KeySetSeq {
-            KeySet(Key::RIGHT, Key::RIGHT_TURN),
-            KeySet(),
-            KeySet(Key::RIGHT),
-            KeySet(Key::DOWN,Key::RIGHT_TURN),
-            KeySet(Key::DOWN)
-        };
-    }
-    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
-        return KeySetSeq {
-            KeySet(Key::RIGHT, Key::RIGHT_TURN),
-            KeySet(),
-            KeySet(Key::RIGHT),
-            KeySet(Key::RIGHT_TURN),
-            KeySet(),
-            KeySet(Key::DOWN)
-        };
-    }
-    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) >= 12) {
-        return KeySetSeq {
-            KeySet(Key::RIGHT, Key::LEFT_TURN),
-            KeySet(),
-            KeySet(Key::RIGHT),
-            KeySet(Key::LEFT_TURN),
-            KeySet(),
-            KeySet(Key::DOWN)
-        };
-    }
+    if (field.height(4) <= 11 && field.height(5) <= 9 && field.height(6) <= 9)
+        return KeySetSeq(">A,,>,vA,v");
+    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11)
+        return KeySetSeq(">A,,>,A,,v");
+    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) >= 12)
+        return KeySetSeq(">B,,>,B,,v");
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 11)
         return KeySetSeq("B,,B,,B,>,,>,A,v");
     if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 11 && field.height(6) <= 12)
         return KeySetSeq("B,,B,,A,>,A,>,A,,A,v");
+    if (field.height(2) >= 13 && field.height(4) == 12 && field.height(5) <= 11 && field.height(6) <= 12)
+        return KeySetSeq("A,,A,,A,,>,B,v");
 
     return KeySetSeq();
 }
 
 KeySetSeq findKeyStrokeFastpath53(const CoreField& field)
 {
-    if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11) {
-        return KeySetSeq {
-            KeySet(Key::RIGHT, Key::LEFT_TURN),
-            KeySet(),
-            KeySet(Key::RIGHT),
-            KeySet(Key::DOWN),
-        };
-    }
+    if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11)
+        return KeySetSeq(">B,,>,v");
+    if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 12)
+        return KeySetSeq("A,,A,,A,>,,>,,v");
+    if (field.height(2) >= 13 && field.height(4) == 12 && field.height(5) <= 12)
+        return KeySetSeq("A,,A,,A,,>,v");
     if (field.height(4) == 11 && field.height(5) == 12)
         return KeySetSeq(">B,,>B,,A,>,v");
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 11)
@@ -335,30 +323,10 @@ KeySetSeq findKeyStrokeFastpath53(const CoreField& field)
 
 KeySetSeq findKeyStrokeFastpath60(const CoreField& field)
 {
-    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
-        return KeySetSeq {
-            KeySet(Key::RIGHT),
-            KeySet(),
-            KeySet(Key::RIGHT),
-            KeySet(),
-            KeySet(Key::RIGHT),
-            KeySet(Key::DOWN)
-        };
-    }
-    if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12) {
-        return KeySetSeq {
-            KeySet(Key::RIGHT, Key::LEFT_TURN),
-            KeySet(Key::RIGHT),
-            KeySet(Key::RIGHT),
-            KeySet(Key::RIGHT, Key::LEFT_TURN),
-            KeySet(Key::RIGHT),
-            KeySet(Key::RIGHT, Key::RIGHT_TURN),
-            KeySet(Key::RIGHT),
-            KeySet(Key::RIGHT, Key::RIGHT_TURN),
-            KeySet(Key::RIGHT),
-            KeySet(Key::DOWN),
-        };
-    }
+    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11)
+        return KeySetSeq(">,,>,,>,v");
+    if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12)
+        return KeySetSeq(">B,>,>,>B,>,>A,>,>A,>,v");
     if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
         return KeySetSeq("A,,A,,A,>,,>,,>,A,v");
     if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 12)
@@ -370,7 +338,7 @@ KeySetSeq findKeyStrokeFastpath60(const CoreField& field)
 
 KeySetSeq findKeyStrokeFastpath61(const CoreField&)
 {
-    CHECK(false) << "shouldn't be callede";
+    CHECK(false) << "shouldn't be called";
     return KeySetSeq();
 }
 
@@ -391,30 +359,10 @@ KeySetSeq findKeyStrokeFastpath62(const CoreField& field)
 
 KeySetSeq findKeyStrokeFastpath63(const CoreField& field)
 {
-    if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11) {
-        return KeySetSeq {
-            KeySet(Key::RIGHT, Key::LEFT_TURN),
-            KeySet(),
-            KeySet(Key::RIGHT),
-            KeySet(),
-            KeySet(Key::RIGHT),
-            KeySet(Key::DOWN)
-        };
-    }
-    if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12) {
-        return KeySetSeq {
-            KeySet(Key::RIGHT, Key::LEFT_TURN),
-            KeySet(Key::RIGHT),
-            KeySet(Key::RIGHT),
-            KeySet(Key::RIGHT, Key::LEFT_TURN),
-            KeySet(Key::RIGHT),
-            KeySet(Key::RIGHT, Key::RIGHT_TURN),
-            KeySet(Key::RIGHT),
-            KeySet(Key::RIGHT),
-            KeySet(Key::RIGHT),
-            KeySet(Key::DOWN),
-        };
-    }
+    if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11)
+        return KeySetSeq(">B,,>,,>,v");
+    if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12)
+        return KeySetSeq(">B,>,>,>B,>,>A,>,>,>,v");
     if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
         return KeySetSeq("A,,A,,A,>,,>,,>,v");
     if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 12) {

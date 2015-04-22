@@ -437,10 +437,10 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField5)
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
     EXPECT_EQ("A,,A,,A,>,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
 
-    EXPECT_EQ("B,,B,,A,>,A,>,,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
+    EXPECT_EQ("A,,A,,A,>,A,>,,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
     EXPECT_EQ("B,,B,,B,>,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
     EXPECT_EQ("B,,B,,B,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ("B,,B,,A,>,,>,,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ("A,,A,,A,>,,>,,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
 
     EXPECT_EQ("A,,A,,A,>,,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
     EXPECT_EQ("A,,A,,A,>,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
@@ -504,14 +504,14 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField6)
     EXPECT_EQ("A,,A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
 
     EXPECT_EQ("A,,A,,A,>,A,v", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ("B,,B,,A,>,A,,A,v", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
+    EXPECT_EQ("A,,A,,B,,>,v", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
     EXPECT_EQ("A,,A,,A,>,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
 
-    EXPECT_EQ("B,,B,,A,>,A,>,,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
+    EXPECT_EQ("A,,A,,A,>,A,>,,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
     EXPECT_EQ("B,,B,,A,>,A,>,A,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
     EXPECT_EQ("B,,B,,A,>,A,>,A,,A,v", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ("B,,B,,A,>,A,>,B,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ("A,,A,,A,>,,>,,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
 
     EXPECT_EQ("A,,A,,A,>,,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
     EXPECT_EQ("A,,A,,A,>,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
@@ -706,23 +706,22 @@ TEST(PuyoControllerTest, findKeyStrokeHigherExhaustive)
 
     for (int i = 0; i < 4 * 4 * 4 * 4 * 4; ++i) {
         int heights[] = {
-            0,
-            (i >> 0) & 3,
-            (i >> 2) & 3,
-            0,
-            (i >> 4) & 3,
-            (i >> 6) & 3,
-            (i >> 8) & 3,
+            10,
+            10 + ((i >> 0) & 3),
+            10 + ((i >> 2) & 3),
+            10,
+            10 + ((i >> 4) & 3),
+            10 + ((i >> 6) & 3),
+            10 + ((i >> 8) & 3),
         };
 
         for (int x = 1; x <= 6; ++x) {
-            if (x == 3)
-                continue;
-            for (int j = 0; j < 4; ++j)
-                f.unsafeSet(x, 10 + j, PuyoColor::EMPTY);
-            for (int j = 0; j < heights[x]; ++j)
-                f.unsafeSet(x, 10 + j, PuyoColor::OJAMA);
-            f.recalcHeightOn(x);
+            int h = heights[x];
+            while (f.height(x) > h)
+                f.removeTopPuyoFrom(x);
+            while (f.height(x) < h)
+                f.dropPuyoOn(x, PuyoColor::OJAMA);
+            ASSERT_TRUE(f.height(x) == h);
         }
 
         for (int x = 1; x <= 6; ++x) {
