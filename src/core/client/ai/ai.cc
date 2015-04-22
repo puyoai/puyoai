@@ -160,7 +160,7 @@ void AI::runLoop()
             DCHECK(!frameRequest.myPlayerFrameRequest().event.decisionRequest)
                 << "decisionRequestAgain should not come with decisionRequest.";
             DropDecision dropDecision = think(frameRequest.frameId,
-                                              frameRequest.myPlayerFrameRequest().field,
+                                              CoreField(frameRequest.myPlayerFrameRequest().field),
                                               frameRequest.myPlayerFrameRequest().kumipuyoSeq,
                                               myPlayerState(),
                                               enemyPlayerState(),

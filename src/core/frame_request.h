@@ -11,7 +11,7 @@
 #include "core/user_event.h"
 
 struct PlayerFrameRequest {
-    CoreField field;
+    PlainField field;
     KumipuyoSeq kumipuyoSeq;
     KumipuyoPos kumipuyoPos;
     UserEvent event;
