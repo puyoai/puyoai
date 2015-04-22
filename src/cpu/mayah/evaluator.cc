@@ -99,7 +99,6 @@ template<typename ScoreCollector>
 static void calculateFieldUShape(ScoreCollector* sc,
                                  EvaluationFeatureKey linearKey,
                                  EvaluationFeatureKey squareKey,
-                                 EvaluationFeatureKey expKey,
                                  bool enemyHasZenkeshi,
                                  const CoreField& field)
 {
@@ -120,19 +119,16 @@ static void calculateFieldUShape(ScoreCollector* sc,
 
     double linearValue = 0;
     double squareValue = 0;
-    double expValue = 0;
 
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         int h = field.height(x) + diff[x];
         double coef = FIELD_USHAPE_HEIGHT_COEF[field.height(x)];
         linearValue += std::abs(h - average) * coef;
         squareValue += (h - average) * (h - average) * coef;
-        expValue += std::exp(std::abs(h - average)) * coef;
     }
 
     sc->addScore(linearKey, linearValue);
     sc->addScore(squareKey, squareValue);
-    sc->addScore(expKey, expValue);
 }
 
 // ----------------------------------------------------------------------
@@ -240,7 +236,6 @@ void Evaluator<ScoreCollector>::evalFieldUShape(const CoreField& field, bool ene
     calculateFieldUShape(sc_,
                          FIELD_USHAPE_LINEAR,
                          FIELD_USHAPE_SQUARE,
-                         FIELD_USHAPE_EXP,
                          enemyHasZenkeshi,
                          field);
 }
@@ -462,7 +457,6 @@ void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field
     calculateFieldUShape(sc_,
                          RENSA_FIELD_USHAPE_LINEAR,
                          RENSA_FIELD_USHAPE_SQUARE,
-                         RENSA_FIELD_USHAPE_EXP,
                          enemyHasZenkeshi,
                          field);
 }
