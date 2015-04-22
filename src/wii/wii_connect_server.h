@@ -41,6 +41,8 @@ public:
     bool start();
     void stop();
 
+    static KumipuyoPos calculateDropPosition(const PlainField&, const Decision&);
+
 private:
     void reset();
     void runLoop();
