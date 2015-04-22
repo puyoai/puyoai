@@ -23,7 +23,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
 
     setEnemyField(&req);
 
-    ai_->enemy_.field = req.playerFrameRequest[1].field;
+    ai_->enemy_.field = CoreField(req.playerFrameRequest[1].field);
     ai_->enemy_.seq = req.playerFrameRequest[1].kumipuyoSeq;
 
     vector<Decision> decisions;
@@ -40,7 +40,8 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
         ai_->next2Appeared(req);
         ai_->decisionRequested(req);
 
-        DropDecision dropDecision = ai_->think(req.frameId, req.myPlayerFrameRequest().field,
+        DropDecision dropDecision = ai_->think(req.frameId,
+                                               CoreField(req.myPlayerFrameRequest().field),
                                                req.myPlayerFrameRequest().kumipuyoSeq,
                                                ai_->myPlayerState(),
                                                ai_->enemyPlayerState(),

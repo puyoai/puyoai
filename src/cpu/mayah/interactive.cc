@@ -104,14 +104,14 @@ int main(int argc, char* argv[])
         // Call these callback for gazer.
         {
             double t1 = currentTime();
-            ai.gaze(frameId, req.playerFrameRequest[1].field, req.playerFrameRequest[1].kumipuyoSeq);
+            ai.gaze(frameId, CoreField(req.playerFrameRequest[1].field), req.playerFrameRequest[1].kumipuyoSeq);
             double t2 = currentTime();
             cout << "gazer time = " << (t2 - t1) << endl;
         }
 
         // Waits for user enter.
         while (true) {
-            const CoreField& currentField = req.playerFrameRequest[0].field;
+            CoreField currentField(req.playerFrameRequest[0].field);
             const KumipuyoSeq& seq = req.playerFrameRequest[0].kumipuyoSeq;
 
             FieldPrettyPrinter::printMultipleFields(
@@ -198,13 +198,13 @@ int main(int argc, char* argv[])
         }
 
         ThoughtResult thoughtResult = ai.thinkPlan(frameId,
-                                                   req.playerFrameRequest[0].field,
+                                                   CoreField(req.playerFrameRequest[0].field),
                                                    req.playerFrameRequest[0].kumipuyoSeq.subsequence(0, 2),
                                                    ai.myPlayerState(),
                                                    ai.enemyPlayerState(),
                                                    MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
         {
-            CoreField f = req.playerFrameRequest[0].field;
+            CoreField f(req.playerFrameRequest[0].field);
             f.dropKumipuyo(thoughtResult.plan.decisions().front(), req.playerFrameRequest[0].kumipuyoSeq.front());
             f.simulate();
             req.playerFrameRequest[0].field = f;
