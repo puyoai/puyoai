@@ -3,12 +3,12 @@
 
 #include <vector>
 
-#include "core/core_field.h"
 #include "core/decision.h"
 #include "core/key_set.h"
 #include "core/kumipuyo_moving_state.h"
 #include "core/kumipuyo_seq.h"
 #include "core/next_puyo.h"
+#include "core/plain_field.h"
 #include "core/user_event.h"
 
 // TODO(mayah): We need to do refactoring this. This class is really messy.
@@ -67,7 +67,7 @@ public:
     void commitOjama() { numFixedOjama_ += numPendingOjama_; numPendingOjama_ = 0; }
     std::vector<int> determineColumnOjamaAmount();
 
-    const CoreField& field() const { return field_; }
+    const PlainField& field() const { return field_; }
     const KumipuyoSeq& kumipuyoSeq() const { return kumipuyoSeq_; }
     // If NEXT2 is delaying, this does not contain NEXT2.
     KumipuyoSeq visibleKumipuyoSeq() const;
@@ -85,11 +85,12 @@ public:
     void skipPreparingNext();
     SimulationState simulationState() const { return simulationState_; }
     bool isSleeping() const { return sleepFor_ > 0; }
-    void forceSetField(const CoreField& cf) { field_ = cf; }
+    void forceSetField(const PlainField& pf) { field_ = pf; }
 
 private:
     void init();
 
+    int vanish(int currentChain);
     // Returns true if we need to drop more.
     bool drop1Frame();
 
@@ -111,7 +112,7 @@ private:
     SimulationState simulationState_ = SimulationState::STATE_LEVEL_SELECT;
     int sleepFor_ = 0;
 
-    CoreField field_;
+    PlainField field_; // Since there will be puyos in the air, CoreField cannot be used.
     KumipuyoSeq kumipuyoSeq_;
     UserEvent userEvent_;
     bool playable_;

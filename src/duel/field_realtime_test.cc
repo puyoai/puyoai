@@ -6,7 +6,9 @@
 #include <gtest/gtest.h>
 
 #include "core/constant.h"
+#include "core/core_field.h"
 #include "core/kumipuyo.h"
+#include "core/plain_field.h"
 #include "core/puyo_controller.h"
 #include "duel/field_realtime.h"
 #include "duel/frame_context.h"
@@ -73,7 +75,7 @@ TEST_F(FieldRealtimeTest, stateWithoutOjama)
 
 TEST_F(FieldRealtimeTest, zenkeshi)
 {
-    f_->forceSetField(CoreField("  RR  "));
+    f_->forceSetField(PlainField("  RR  "));
     f_->skipLevelSelect();
 
     // Waiting next (6) + reaching bottom (11) + dropping (1) + grounding (10)
@@ -176,7 +178,7 @@ TEST_F(FieldRealtimeTest, playOneFrameWithMultipleArrowKey2)
 
 TEST_F(FieldRealtimeTest, Move1)
 {
-    CoreField cf(
+    PlainField pf(
         "      " // 12
         "OOOOOO"
         "OOOOOO"
@@ -190,11 +192,11 @@ TEST_F(FieldRealtimeTest, Move1)
         "OOOOOO"
         "OOOOOO");
 
-    f_->forceSetField(cf);
+    f_->forceSetField(pf);
     f_->skipLevelSelect();
     f_->skipPreparingNext();
 
-    f_->setKeySetSeq(PuyoController::findKeyStrokeFrom(f_->field(), f_->kumipuyoMovingState(), Decision(5, 1)));
+    f_->setKeySetSeq(PuyoController::findKeyStrokeFrom(CoreField(f_->field()), f_->kumipuyoMovingState(), Decision(5, 1)));
     while (true) {
         FrameContext context;
         KeySet keySet = f_->frontKeySet();
@@ -203,7 +205,7 @@ TEST_F(FieldRealtimeTest, Move1)
             break;
     }
 
-    CoreField expected(
+    PlainField expected(
         "    RR" // 12
         "OOOOOO"
         "OOOOOO"
@@ -222,7 +224,7 @@ TEST_F(FieldRealtimeTest, Move1)
 
 TEST_F(FieldRealtimeTest, Move2)
 {
-    CoreField cf(
+    PlainField pf(
         "      " // 12
         "OOOOOO"
         "OOOOOO"
@@ -236,11 +238,11 @@ TEST_F(FieldRealtimeTest, Move2)
         "OOOOOO"
         "OOOOOO");
 
-    f_->forceSetField(cf);
+    f_->forceSetField(pf);
     f_->skipLevelSelect();
     f_->skipPreparingNext();
 
-    f_->setKeySetSeq(PuyoController::findKeyStrokeFrom(f_->field(), f_->kumipuyoMovingState(), Decision(6, 2)));
+    f_->setKeySetSeq(PuyoController::findKeyStrokeFrom(CoreField(f_->field()), f_->kumipuyoMovingState(), Decision(6, 2)));
     while (true) {
         FrameContext context;
         KeySet keySet = f_->frontKeySet();
@@ -249,7 +251,7 @@ TEST_F(FieldRealtimeTest, Move2)
             break;
     }
 
-    CoreField expected(
+    PlainField expected(
         "     R"
         "     R" // 12
         "OOOOOO"
@@ -269,7 +271,7 @@ TEST_F(FieldRealtimeTest, Move2)
 
 TEST_F(FieldRealtimeTest, Move3)
 {
-    CoreField cf(
+    PlainField pf(
         "      " // 12
         "OOOOOO"
         "OOOOOO"
@@ -283,11 +285,11 @@ TEST_F(FieldRealtimeTest, Move3)
         "OOOOOO"
         "OOOOOO");
 
-    f_->forceSetField(cf);
+    f_->forceSetField(pf);
     f_->skipLevelSelect();
     f_->skipPreparingNext();
 
-    f_->setKeySetSeq(PuyoController::findKeyStrokeFrom(f_->field(), f_->kumipuyoMovingState(), Decision(1, 2)));
+    f_->setKeySetSeq(PuyoController::findKeyStrokeFrom(CoreField(f_->field()), f_->kumipuyoMovingState(), Decision(1, 2)));
     while (true) {
         FrameContext context;
         KeySet keySet = f_->frontKeySet();
@@ -296,7 +298,7 @@ TEST_F(FieldRealtimeTest, Move3)
             break;
     }
 
-    CoreField expected(
+    PlainField expected(
         "R     "
         "R     " // 12
         "OOOOOO"
@@ -316,7 +318,7 @@ TEST_F(FieldRealtimeTest, Move3)
 
 TEST_F(FieldRealtimeTest, Move4)
 {
-    CoreField cf(
+    PlainField pf(
         "    OO" // 12
         "OOOOOO"
         "OOOOOO"
@@ -330,11 +332,11 @@ TEST_F(FieldRealtimeTest, Move4)
         "OOOOOO"
         "OOOOOO");
 
-    f_->forceSetField(cf);
+    f_->forceSetField(pf);
     f_->skipLevelSelect();
     f_->skipPreparingNext();
 
-    f_->setKeySetSeq(PuyoController::findKeyStrokeFrom(f_->field(), f_->kumipuyoMovingState(), Decision(6, 3)));
+    f_->setKeySetSeq(PuyoController::findKeyStrokeFrom(CoreField(f_->field()), f_->kumipuyoMovingState(), Decision(6, 3)));
     while (true) {
         FrameContext context;
         KeySet keySet = f_->frontKeySet();
@@ -343,7 +345,7 @@ TEST_F(FieldRealtimeTest, Move4)
             break;
     }
 
-    CoreField expected(
+    PlainField expected(
         "    RR" // 13
         "    OO" // 12
         "OOOOOO"

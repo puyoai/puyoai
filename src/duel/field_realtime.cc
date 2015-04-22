@@ -110,8 +110,8 @@ bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
         ++score_;
 
     if (kms_.grounded) {
-        field_.setPuyoAndHeight(kms_.pos.axisX(), kms_.pos.axisY(), kumipuyoSeq_.axis(0));
-        field_.setPuyoAndHeight(kms_.pos.childX(), kms_.pos.childY(), kumipuyoSeq_.child(0));
+        field_.unsafeSet(kms_.pos.axisX(), kms_.pos.axisY(), kumipuyoSeq_.axis(0));
+        field_.unsafeSet(kms_.pos.childX(), kms_.pos.childY(), kumipuyoSeq_.child(0));
         playable_ = false;
         userEvent_.grounded = true;
         dropVelocity_ = INITIAL_DROP_VELOCITY;
@@ -150,12 +150,7 @@ bool FieldRealtime::onStateGrounding()
 
 bool FieldRealtime::onStateVanish(FrameContext* context)
 {
-    // TODO(mayah): field_ looks inconsistent in some reason.
-    // Let's recalculate the height.
-    for (int x = 1; x <= CoreField::WIDTH; ++x)
-        field_.recalcHeightOn(x);
-
-    int score = field_.vanishOnly(current_chains_++);
+    int score = vanish(current_chains_++);
     if (score == 0) {
         if (context)
             context->commitOjama();
@@ -226,7 +221,7 @@ bool FieldRealtime::onStateOjamaDropping()
         for (int i = 0; i < 6; i++) {
             if (ojama_position_[i] > 0) {
                 if (field_.color(i + 1, 13) == PuyoColor::EMPTY) {
-                    field_.setPuyoAndHeight(i + 1, 13, PuyoColor::OJAMA);
+                    field_.unsafeSet(i + 1, 13, PuyoColor::OJAMA);
                     ojama_position_[i]--;
                 }
             }
@@ -340,6 +335,11 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
     return false;
 }
 
+int FieldRealtime::vanish(int currentChain)
+{
+    return field_.vanishSlow(currentChain);
+}
+
 bool FieldRealtime::drop1Frame()
 {
     double velocity = dropVelocity_;
@@ -356,7 +356,7 @@ bool FieldRealtime::drop1Frame()
     // Puyo in 14th row will not drop to 13th row. If there is a puyo on
     // 14th row, it'll stay there forever. This behavior is a famous bug in
     // Puyo2.
-    for (int x = 1; x <= CoreField::WIDTH; x++) {
+    for (int x = 1; x <= FieldConstant::WIDTH; x++) {
         for (int y = 1; y < 13; y++) {
             if (field_.color(x, y) != PuyoColor::EMPTY)
                 continue;
@@ -364,8 +364,8 @@ bool FieldRealtime::drop1Frame()
             if (field_.color(x, y + 1) != PuyoColor::EMPTY) {
                 stillDropping = true;
                 if (needToDrop) {
-                    field_.setPuyoAndHeight(x, y, field_.color(x, y + 1));
-                    field_.setPuyoAndHeight(x, y + 1, PuyoColor::EMPTY);
+                    field_.unsafeSet(x, y, field_.color(x, y + 1));
+                    field_.unsafeSet(x, y + 1, PuyoColor::EMPTY);
                 }
             }
         }
