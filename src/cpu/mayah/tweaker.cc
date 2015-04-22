@@ -336,16 +336,21 @@ int main(int argc, char* argv[])
     } else if (FLAGS_auto_count > 0) {
         runAutoTweaker(executor.get(), paramMap, FLAGS_auto_count);
     } else {
-        EvaluationParameter* parameter = paramMap.mutableDefaultParameter();
+        // EvaluationParameter* parameter = paramMap.mutableDefaultParameter();
+        EvaluationParameter* middle = paramMap.mutableParameter(EvaluationMode::MIDDLE);
+        EvaluationParameter* late = paramMap.mutableParameter(EvaluationMode::LATE);
 
-        map<double, RunResult> scoreMap;
-        for (double x = 30; x <= 70; x += 10) {
-            cout << "current x = " << x << endl;
-            parameter->setValue(COMPLEMENTATION_BIAS_MUCH, -x);
-            scoreMap[x] = run(executor.get(), paramMap);
+        map<pair<double, double>, RunResult> scoreMap;
+        for (double x = 10; x <= 140; x += 10) {
+            for (double y = 10; y <= x; y += 10) {
+                cout << "current (x, y) = " << x << ' ' << y << endl;
+                middle->setValue(PATTERN_BOOK, x);
+                late->setValue(PATTERN_BOOK, y);
+                scoreMap[make_pair(x, y)] = run(executor.get(), paramMap);
+            }
         }
         for (const auto& m : scoreMap) {
-            cout << setw(5) << m.first << " -> " << m.second.sumScore
+            cout << setw(5) << m.first.first << ' ' << m.first.second << " -> " << m.second.sumScore
                  << " / " << m.second.mainRensaCount
                  << " / " << m.second.aveMainRensaScore
                  << " / " << m.second.over40000Count
