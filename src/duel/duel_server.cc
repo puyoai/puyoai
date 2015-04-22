@@ -71,6 +71,8 @@ struct DuelServer::DuelState {
  */
 static int updateDecision(const vector<FrameResponse>& data, const FieldRealtime& field, Decision* decision)
 {
+    const CoreField cf(field.field());
+
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.
     for (unsigned int i = data.size(); i > 0;) {
@@ -87,7 +89,7 @@ static int updateDecision(const vector<FrameResponse>& data, const FieldRealtime
         if (!d.isValid())
             continue;
 
-        if (PuyoController::isReachableFrom(field.field(), field.kumipuyoMovingState(), d)) {
+        if (PuyoController::isReachableFrom(cf, field.kumipuyoMovingState(), d)) {
             *decision = d;
             return i;
         }
@@ -273,7 +275,7 @@ void DuelServer::play(DuelState* duelState, const vector<FrameResponse> data[2])
         // it's OK for now. However, this might cause future issues. Consider better way.
 
         if (accepted_index != -1) {
-            KeySetSeq kss = PuyoController::findKeyStrokeFrom(me->field(), me->kumipuyoMovingState(), duelState->decision[pi]);
+            KeySetSeq kss = PuyoController::findKeyStrokeFrom(CoreField(me->field()), me->kumipuyoMovingState(), duelState->decision[pi]);
             me->setKeySetSeq(kss);
         }
 

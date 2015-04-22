@@ -45,9 +45,6 @@ public:
 
     // Returns true if the field does not have any puyo. Valid only all puyos are dropped.
     bool isZenkeshi() const;
-    // Returns true if the field does not have any puyo. This will return valid value
-    // when some puyos are in the air.
-    bool isZenkeshiPrecise() const;
 
     // Counts the number of color puyos.
     int countColorPuyos() const;
@@ -66,11 +63,6 @@ public:
     int countConnectedPuyosMax4(int x, int y) const;
     // Returns true if color(x, y) is connected in some direction.
     bool isConnectedPuyo(int x, int y) const;
-
-    // Inserts positions whose puyo color is the same as |c|, and connected to (x, y).
-    // The checked cells will be marked in |checked|.
-    // PositionQueueHead should have enough capacity.
-    Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBitField* checked) const;
 
     // ----------------------------------------------------------------------
     // field manipulation
@@ -108,6 +100,7 @@ public:
     }
 
     // Drops all puyos if some puyos are in the air.
+    // TODO(mayah): Remove this.
     void forceDrop();
 
     // ----------------------------------------------------------------------
@@ -166,6 +159,7 @@ public:
     // Returns the length of the filled positions. The max length should be 72.
     // So, |Position*| must have 72 Position spaces.
     int fillErasingPuyoPositions(const SimulationContext&, Position*) const;
+    // TODO(mayah): Remove this.
     std::vector<Position> erasingPuyoPositions(const SimulationContext&) const;
 
     bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;
@@ -189,9 +183,6 @@ public:
     template<typename Tracker>
     int vanishDrop(SimulationContext*, Tracker*);
 
-    // Vanishes the connected puyos. Score will be returned.
-    int vanishOnly(int currentChain);
-
     // ----------------------------------------------------------------------
     // utility methods
 
@@ -205,6 +196,7 @@ public:
     // Sets puyo on arbitrary position. After setColor, you have to call recalcHeightOn.
     // Otherwise, the field will be broken.
     // Recalculates height on column |x|.
+    // TODO(mayah): Remove this.
     void recalcHeightOn(int x)
     {
         heights_[x] = 0;
@@ -214,6 +206,7 @@ public:
         }
     }
 
+    // TODO(mayah): Remove this.
     void setPuyoAndHeight(int x, int y, PuyoColor c)
     {
         unsafeSet(x, y, c);
@@ -221,7 +214,7 @@ public:
         recalcHeightOn(x);
     }
 
-protected:
+private:
     // Vanishes connected puyos and returns score. If score is 0, no puyos are vanished.
     template<typename Tracker>
     int vanish(SimulationContext*, Tracker*);

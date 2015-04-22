@@ -62,18 +62,6 @@ bool CoreField::isZenkeshi() const
     return true;
 }
 
-bool CoreField::isZenkeshiPrecise() const
-{
-    for (int x = 1; x <= WIDTH; ++x) {
-        for (int y = 1; y <= 13; ++y) {
-            if (color(x, y) != PuyoColor::EMPTY)
-                return false;
-        }
-    }
-
-    return true;
-}
-
 int CoreField::countPuyos() const
 {
     int count = 0;
@@ -364,51 +352,6 @@ bool CoreField::dropPuyoListWithMaxHeight(const ColumnPuyoList& cpl, int maxHeig
     }
 
     return true;
-}
-
-Position* CoreField::fillSameColorPosition(int x, int y, PuyoColor c,
-                                           Position* positionQueueHead, FieldBitField* checked) const
-{
-    DCHECK(!checked->get(x, y));
-
-    if (FieldConstant::HEIGHT < y)
-        return positionQueueHead;
-
-    Position* writeHead = positionQueueHead;
-    Position* readHead = positionQueueHead;
-
-    *writeHead++ = Position(x, y);
-    checked->set(x, y);
-
-    while (readHead != writeHead) {
-        Position p = *readHead++;
-
-        if (color(p.x + 1, p.y) == c && !checked->get(p.x + 1, p.y)) {
-            *writeHead++ = Position(p.x + 1, p.y);
-            checked->set(p.x + 1, p.y);
-        }
-        if (color(p.x - 1, p.y) == c && !checked->get(p.x - 1, p.y)) {
-            *writeHead++ = Position(p.x - 1, p.y);
-            checked->set(p.x - 1, p.y);
-        }
-        if (color(p.x, p.y + 1) == c && !checked->get(p.x, p.y + 1) && p.y + 1 <= FieldConstant::HEIGHT) {
-            *writeHead++ = Position(p.x, p.y + 1);
-            checked->set(p.x, p.y + 1);
-        }
-        if (color(p.x, p.y - 1) == c && !checked->get(p.x, p.y - 1)) {
-            *writeHead++ = Position(p.x, p.y - 1);
-            checked->set(p.x, p.y - 1);
-        }
-    }
-
-    return writeHead;
-}
-
-int CoreField::vanishOnly(int currentNthChain)
-{
-    SimulationContext context(currentNthChain);
-    RensaNonTracker nonTracker;
-    return vanish(&context, &nonTracker);
 }
 
 int CoreField::fillErasingPuyoPositions(const SimulationContext& context, Position* eraseQueue) const
