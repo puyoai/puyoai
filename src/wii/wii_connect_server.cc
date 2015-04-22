@@ -358,7 +358,6 @@ GameState WiiConnectServer::toGameState(int frameId, const AnalyzerResult& analy
             for (int y = 1; y <= 12; ++y) {
                 pgs->field.unsafeSet(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
             }
-            pgs->field.recalcHeightOn(x);
         }
 
         PuyoColor pcs[6] = {
@@ -386,7 +385,7 @@ GameState WiiConnectServer::toGameState(int frameId, const AnalyzerResult& analy
         pgs->fixedOjama = 0;
         if (pr->playable) {
             pgs->decision = lastDecision_[pi];
-            pgs->kumipuyoPos = pgs->field.dropPosition(lastDecision_[pi]);
+            pgs->kumipuyoPos = calculateDropPosition(pgs->field, lastDecision_[pi]);
         } else {
             pgs->decision = Decision();
             pgs->kumipuyoPos = KumipuyoPos();
@@ -474,4 +473,42 @@ unique_ptr<AnalyzerResult> WiiConnectServer::analyzerResult() const
         return unique_ptr<AnalyzerResult>();
 
     return analyzerResults_.front().get()->copy();
+}
+
+// static
+KumipuyoPos WiiConnectServer::calculateDropPosition(const PlainField& pf, const Decision& decision)
+{
+    int x1 = decision.axisX();
+    int x2 = decision.childX();
+
+    if (x1 == x2) {
+        for (int y = 1; y <= 13; ++y) {
+            if (pf.color(x1, y) == PuyoColor::EMPTY)
+                return KumipuyoPos(x1, y + 2, decision.rot());
+        }
+
+        // No position to drop?
+        return KumipuyoPos();
+    }
+
+    int h1 = 0;
+    for (int y = 1; y <= 14; ++y) {
+        if (pf.isEmpty(x1, y)) {
+            h1 = y;
+            break;
+        }
+    }
+    int h2 = 0;
+    for (int y = 1; y <= 14; ++y) {
+        if (pf.isEmpty(x2, y)) {
+            h2 = y;
+            break;
+        }
+    }
+
+    if (h1 == 0 || h2 == 0)
+        return KumipuyoPos();
+
+    int y = std::max(h1, h2);
+    return KumipuyoPos(x1, y, decision.rot());
 }

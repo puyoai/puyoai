@@ -7,17 +7,17 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
-#include "core/core_field.h"
 #include "core/decision.h"
 #include "core/kumipuyo_pos.h"
 #include "core/kumipuyo_seq.h"
 #include "core/frame_request.h"
 #include "core/game_result.h"
+#include "core/plain_field.h"
 
 struct PlayerGameState {
     int ojama() const { return pendingOjama + fixedOjama; }
 
-    CoreField field;
+    PlainField field;
     KumipuyoSeq kumipuyoSeq;
     KumipuyoPos kumipuyoPos;
     UserEvent event;

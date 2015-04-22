@@ -395,16 +395,6 @@ TEST(CoreFieldTest, dropPuyoOnWithMaxHeight)
     EXPECT_EQ(PuyoColor::GREEN, f.color(3, 4));
 }
 
-TEST(CoreFieldTest, dropPosition)
-{
-    CoreField f("..O..."
-                "..O..."
-                "..O...");
-
-    EXPECT_EQ(KumipuyoPos(3, 4, 1), f.dropPosition(Decision(3, 1)));
-    EXPECT_EQ(KumipuyoPos(4, 4, 3), f.dropPosition(Decision(4, 3)));
-}
-
 TEST(CoreFieldTest, RemoveTopPuyoFrom)
 {
     CoreField f("456756");
