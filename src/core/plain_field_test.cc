@@ -40,3 +40,21 @@ TEST(PlainFieldTest, isEmpty)
     EXPECT_TRUE(pf.isEmpty(1, 2));
     EXPECT_FALSE(pf.isEmpty(1, 1));
 }
+
+TEST(PlainFieldTest, drop)
+{
+    PlainField pf(
+        "RRRBBB"
+        "......"
+        "RRRBBB"
+        "......"
+        "RRRBBB");
+
+    PlainField expected(
+        "RRRBBB"
+        "RRRBBB"
+        "RRRBBB");
+
+    pf.drop();
+    EXPECT_TRUE(pf == expected);
+}

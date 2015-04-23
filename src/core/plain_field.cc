@@ -61,6 +61,21 @@ bool PlainField::isZenkeshiPrecise() const
     return true;
 }
 
+void PlainField::drop()
+{
+    for (int x = 1; x <= WIDTH; ++x) {
+        int h = 1;
+        for (int y = 1; y <= 13; ++y) {
+            if (isEmpty(x, y))
+                continue;
+            unsafeSet(x, h++, color(x, y));
+        }
+        for (; h <= 13; ++h) {
+            unsafeSet(x, h, PuyoColor::EMPTY);
+        }
+    }
+}
+
 Position* PlainField::fillSameColorPosition(int x, int y, PuyoColor c,
                                             Position* positionQueueHead, FieldBitField* checked) const
 {
