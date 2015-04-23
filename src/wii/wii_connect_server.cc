@@ -421,9 +421,8 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult,
                     if (af.field.get(x, y) == RealColor::RC_EMPTY)
                         break;
 
-                    field.unsafeSet(x, y, PuyoColor::OJAMA);
+                    field.dropPuyoOn(x, PuyoColor::OJAMA);
                 }
-                field.recalcHeightOn(x);
             }
 
             keySetSeq = PuyoController::findKeyStroke(field, d);
