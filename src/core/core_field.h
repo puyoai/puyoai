@@ -27,21 +27,37 @@ struct Position;
 // field implementation.
 // TODO(mayah): All puyos in CoreField should be grounded (14th row is exception).
 // For the field that might contain puyo in the air, it would be better to make another class.
-class CoreField : public PlainField {
+class CoreField : public FieldConstant {
 public:
     CoreField() : heights_{} {}
     explicit CoreField(const std::string& url);
     explicit CoreField(const PlainField&);
     CoreField(const CoreField&) = default;
 
+    // Gets a color of puyo at a specified position.
+    PuyoColor color(int x, int y) const { return field_.color(x, y); }
+    // TODO(mayah): Remove this.
+    void unsafeSet(int x, int y, PuyoColor c) { field_.unsafeSet(x, y, c); }
+
+    // Returns true if puyo on (x, y) is c.
+    bool isColor(int x, int y, PuyoColor c) const { return field_.isColor(x, y, c); }
+    // Returns true if puyo on (x, y) is empty.
+    bool isEmpty(int x, int y) const { return field_.isEmpty(x, y); }
+
     // Returns the height of the specified column.
     int height(int x) const { return heights_[x]; }
+
+    const PlainField& plainField() const { return field_; }
+    // TODO(mayah): Remove this?
+    operator const PlainField&() const { return field_; }
 
     // ----------------------------------------------------------------------
     // field utilities
 
     // Returns true if the field does not have any puyo. Valid only all puyos are dropped.
+    // TODO(mayah): Remove isZenkeshiPrecise() from CoreField when all the puyo is not in the air.
     bool isZenkeshi() const;
+    bool isZenkeshiPrecise() const { return field_.isZenkeshiPrecise(); }
 
     // Counts the number of color puyos.
     int countColorPuyos() const;
@@ -60,6 +76,8 @@ public:
     int countConnectedPuyosMax4(int x, int y) const;
     // Returns true if color(x, y) is connected in some direction.
     bool isConnectedPuyo(int x, int y) const;
+    // Returns true if there is an empty neighbor of (x, y).
+    bool hasEmptyNeighbor(int x, int y) const { return field_.hasEmptyNeighbor(x, y); }
 
     // ----------------------------------------------------------------------
     // field manipulation
@@ -152,6 +170,14 @@ public:
         }
     };
 
+    // Inserts positions whose puyo color is the same as |c|, and connected to (x, y).
+    // The checked cells will be marked in |checked|.
+    // PositionQueueHead should have enough capacity.
+    Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBitField* checked) const
+    {
+        return field_.fillSameColorPosition(x, y, c, positionQueueHead, checked);
+    }
+
     // Fills the positions where puyo is vanished in the 1-rensa.
     // Returns the length of the filled positions. The max length should be 72.
     // So, |Position*| must have 72 Position spaces.
@@ -225,6 +251,7 @@ private:
     template<typename Tracker>
     int dropAfterVanish(SimulationContext*, Tracker*);
 
+    PlainField field_;
     int heights_[MAP_WIDTH];
 };
 

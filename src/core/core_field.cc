@@ -20,7 +20,7 @@
 using namespace std;
 
 CoreField::CoreField(const std::string& url) :
-    PlainField(url)
+    field_(url)
 {
     heights_[0] = 0;
     for (int x = 1; x <= WIDTH; ++x) {
@@ -34,7 +34,7 @@ CoreField::CoreField(const std::string& url) :
 }
 
 CoreField::CoreField(const PlainField& f) :
-    PlainField(f)
+    field_(f)
 {
     heights_[0] = 0;
     for (int x = 1; x <= WIDTH; ++x) {
