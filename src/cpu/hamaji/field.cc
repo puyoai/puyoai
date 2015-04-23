@@ -12,6 +12,8 @@
 
 #include <glog/logging.h>
 
+#include "core/algorithm/rensa_detector.h"
+#include "core/column_puyo_list.h"
 #include "core/constant.h"
 #include "core/kumipuyo_seq.h"
 #include "core/puyo_controller.h"
@@ -228,103 +230,40 @@ int LF::getBestChainCount(int* ignition_puyo_cnt,
   int useful_chain_cnt = 0;
   int puyo_cnt_before = countColorPuyo();
 
-  if (ignition_puyo_cnt) {
+  if (ignition_puyo_cnt)
     *ignition_puyo_cnt = 0;
-  }
-  if (vanished_puyo_cnt) {
+  if (vanished_puyo_cnt)
     *vanished_puyo_cnt = 0;
-  }
 
-  bool has_checked[7][16];
-  memset(has_checked, 0, sizeof(has_checked));
+  auto callback = [&](const CoreField& nf, const RensaResult& rensa_result, const ColumnPuyoList& cpl) {
+    int chain = rensa_result.chains;
+    int n = 4 - cpl.size();
+    if (n < 0)
+      n = 0;
 
-  for (int x = 1; x <= 6; x++) {
-    for (int y = 1; y < 13; y++) {
-      if (has_checked[x][y])
-        continue;
-      PuyoColor c = Get(x, y);
-      if (c == PuyoColor::EMPTY)
-        break;
-      if (!isNormalColor(c))
-        continue;
-      if (Get(x + 1, y) != PuyoColor::EMPTY && Get(x - 1, y) != PuyoColor::EMPTY && Get(x, y + 1) != PuyoColor::EMPTY)
-        continue;
-
-      LF nf(*this);
-      int n = 0;
-#define SET_EMPTY(x, y)                         \
-      nf.Set(x, y, PuyoColor::EMPTY);           \
-      n++;                                      \
-      has_checked[x][y] = true;
-
-      SET_EMPTY(x, y);
-      if (nf.Get(x + 1, y) == c) {
-        SET_EMPTY(x + 1, y);
-        if (nf.Get(x + 2, y) == c) {
-          SET_EMPTY(x + 2, y);
-        } else if (nf.Get(x + 1, y + 1) == c) {
-          SET_EMPTY(x + 1, y + 1);
-        } else if (nf.Get(x + 1, y - 1) == c) {
-          SET_EMPTY(x + 1, y - 1);
-        }
+    if (best_chain < chain) {
+      best_chain = chain;
+      if (ignition_puyo_cnt) {
+        *ignition_puyo_cnt = n;
       }
-      if (nf.Get(x - 1, y) == c) {
-        SET_EMPTY(x - 1, y);
-        if (nf.Get(x - 2, y) == c) {
-          SET_EMPTY(x - 2, y);
-        } else if (nf.Get(x - 1, y + 1) == c) {
-          SET_EMPTY(x - 1, y + 1);
-        } else if (nf.Get(x - 1, y - 1) == c) {
-          SET_EMPTY(x - 1, y - 1);
-        }
+      if (vanished_puyo_cnt) {
+        *vanished_puyo_cnt = puyo_cnt_before - n - nf.countColorPuyos();
       }
-      if (nf.Get(x, y + 1) == c) {
-        SET_EMPTY(x, y + 1);
-        if (nf.Get(x, y + 2) == c) {
-          SET_EMPTY(x, y + 2);
-        } else if (nf.Get(x + 1, y + 1) == c) {
-          SET_EMPTY(x + 1, y + 1);
-        } else if (nf.Get(x - 1, y + 1) == c) {
-          SET_EMPTY(x - 1, y + 1);
-        }
+    } else if (best_chain == chain) {
+      if (ignition_puyo_cnt) {
+        *ignition_puyo_cnt = std::max(n, *ignition_puyo_cnt);
       }
-      if (nf.Get(x, y - 1) == c) {
-        SET_EMPTY(x, y - 1);
-        if (nf.Get(x, y - 2) == c) {
-          SET_EMPTY(x, y - 2);
-        } else if (nf.Get(x + 1, y - 1) == c) {
-          SET_EMPTY(x + 1, y - 1);
-        } else if (nf.Get(x - 1, y - 1) == c) {
-          SET_EMPTY(x - 1, y - 1);
-        }
-      }
-#undef SET_EMPTY
-
-      int chain, score, frame;
-      nf.forceDrop();
-      nf.SimulateFromChain(2, &chain, &score, &frame);
-      if (best_chain < chain) {
-        best_chain = chain;
-        if (ignition_puyo_cnt) {
-          *ignition_puyo_cnt = n;
-        }
-        if (vanished_puyo_cnt) {
-          *vanished_puyo_cnt = puyo_cnt_before - n - nf.countColorPuyo();
-        }
-      } else if (best_chain == chain) {
-        if (ignition_puyo_cnt) {
-          *ignition_puyo_cnt += n;
-        }
-        if (vanished_puyo_cnt) {
-          *vanished_puyo_cnt = min(*vanished_puyo_cnt,
-                                   puyo_cnt_before - n - nf.countColorPuyo());
-        }
-      }
-      if (score > 840) {
-        useful_chain_cnt++;
+      if (vanished_puyo_cnt) {
+        *vanished_puyo_cnt = min(*vanished_puyo_cnt,
+                                 puyo_cnt_before - n - nf.countColorPuyos());
       }
     }
-  }
+    if (rensa_result.score > 840) {
+      useful_chain_cnt++;
+    }
+  };
+  RensaDetector::iteratePossibleRensas(*this, 0, RensaDetectorStrategy::defaultFloatStrategy(), callback);
+
   if (useful_chain_cnt_out)
     *useful_chain_cnt_out = useful_chain_cnt;
   return best_chain;

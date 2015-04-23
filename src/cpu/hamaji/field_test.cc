@@ -12,7 +12,9 @@ TEST(FieldTest, getBestChainCount) {
     EXPECT_EQ(1, field.getBestChainCount());
   }
   {
-    LF field("http://www.inosendo.com/puyo/rensim/??500000450004455");
+    LF field("...B.."
+             "...RB."
+             "..RRBB");
     int ipc, ucc, vpc;
     EXPECT_EQ(2, field.getBestChainCount(&ipc, &ucc, &vpc));
     EXPECT_EQ(3, ipc);
@@ -24,14 +26,14 @@ TEST(FieldTest, getBestChainCount) {
     int ipc, ucc, vpc;
     EXPECT_EQ(3, field.getBestChainCount(&ipc, &ucc, &vpc));
     EXPECT_EQ(3, ipc);
-    EXPECT_EQ(1, ucc);
+    EXPECT_EQ(2, ucc);
     EXPECT_EQ(9, vpc);
   }
   {
     LF field("http://www.inosendo.com/puyo/rensim/??5000005000054000054");
     int ipc, ucc, vpc;
     EXPECT_EQ(1, field.getBestChainCount(&ipc, &ucc, &vpc));
-    EXPECT_EQ(4, ipc);
+    EXPECT_EQ(2, ipc);
     EXPECT_EQ(0, ucc);
     EXPECT_EQ(0, vpc);
   }
