@@ -47,11 +47,6 @@ CoreField::CoreField(const PlainField& f) :
     heights_[MAP_WIDTH - 1] = 0;
 }
 
-void CoreField::clear()
-{
-    *this = CoreField();
-}
-
 bool CoreField::isZenkeshi() const
 {
     for (int x = 1; x <= WIDTH; ++x) {
