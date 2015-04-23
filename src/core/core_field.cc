@@ -185,20 +185,6 @@ bool CoreField::isConnectedPuyo(int x, int y) const
     return color(x, y - 1) == c || color(x, y + 1) == c || color(x - 1, y) == c || color(x + 1, y) == c;
 }
 
-void CoreField::forceDrop()
-{
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        int writeYAt = 1;
-        for (int y = 1; y <= 13; ++y) {
-            if (color(x, y) != PuyoColor::EMPTY)
-                unsafeSet(x, writeYAt++, color(x, y));
-        }
-        for (int y = writeYAt; y <= 13; ++y)
-            unsafeSet(x, y, PuyoColor::EMPTY);
-        heights_[x] = writeYAt - 1;
-    }
-}
-
 bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
 {
     int x1 = decision.axisX();

@@ -34,6 +34,12 @@ public:
     explicit CoreField(const PlainField&);
     CoreField(const CoreField&) = default;
 
+    static CoreField fromPlainFieldWithDrop(const PlainField& pf) {
+        PlainField copied(pf);
+        copied.drop();
+        return CoreField(copied);
+    }
+
     // Gets a color of puyo at a specified position.
     PuyoColor color(int x, int y) const { return field_.color(x, y); }
     // TODO(mayah): Remove this.
@@ -113,10 +119,6 @@ public:
         if (height(x) > 0)
             unsafeSet(x, heights_[x]--, PuyoColor::EMPTY);
     }
-
-    // Drops all puyos if some puyos are in the air.
-    // TODO(mayah): Remove this.
-    void forceDrop();
 
     // ----------------------------------------------------------------------
     // simulation

@@ -47,8 +47,6 @@ class LF : public CoreField {
   // Get a color of puyo at a specified position.
   PuyoColor Get(int x, int y) const { return color(x, y); }
 
-  void SafeDrop() { forceDrop(); }
-
   // Simulate chains until the end, and returns chains, score, and frames before
   // finishing the chain.
   void Simulate();

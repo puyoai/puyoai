@@ -41,7 +41,6 @@ FrameResponse tick(Game* game) {
     int score;
     int frame_cnt;
 
-    game->p[1].f.SafeDrop();
     LF f(game->p[1].f);
     f.Simulate(&chain_cnt, &score, &frame_cnt);
     if (score) {

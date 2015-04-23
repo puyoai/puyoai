@@ -31,11 +31,11 @@ Game::Game()
 
 Game::Game(const Game& prev_game, const FrameRequest& request) {
   id = request.frameId;
-  p[0].f = LF(CoreField(request.myPlayerFrameRequest().field));
+  p[0].f = LF(CoreField::fromPlainFieldWithDrop(request.myPlayerFrameRequest().field));
   p[0].next = request.myPlayerFrameRequest().kumipuyoSeq;
   p[0].score = request.myPlayerFrameRequest().score;
   p[0].event = request.myPlayerFrameRequest().event;
-  p[1].f = LF(CoreField(request.enemyPlayerFrameRequest().field));
+  p[1].f = LF(CoreField::fromPlainFieldWithDrop(request.enemyPlayerFrameRequest().field));
   p[1].next = request.enemyPlayerFrameRequest().kumipuyoSeq;
   p[1].score = request.enemyPlayerFrameRequest().score;
   p[1].event = request.enemyPlayerFrameRequest().event;
