@@ -60,7 +60,7 @@ DropDecision Ai::think(int frame_id,
           track_result = track;
         }
       });
-  
+
   // Look for plans.
   Control control;
   control.score = -10000;
@@ -79,8 +79,7 @@ void Ai::onGameWillBegin(const FrameRequest& /*frame_request*/) {
 
 void Ai::onEnemyGrounded(const FrameRequest& frame_request) {
   const PlainField& enemy = frame_request.enemyPlayerFrameRequest().field;
-  CoreField field(enemy);
-  field.forceDrop();
+  CoreField field(CoreField::fromPlainFieldWithDrop(enemy));
   RensaResult result = field.simulate();
 
   if (result.chains == 0) {

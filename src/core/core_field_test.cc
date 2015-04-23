@@ -82,29 +82,6 @@ TEST(CoreFieldTest, countColorPuyos3)
     EXPECT_EQ(10, cf.countColorPuyos());
 }
 
-TEST(CoreFieldTest, forceDrop)
-{
-    CoreField cf(
-        "BRRBBB"
-        "      "
-        "RYRYRY"
-        "      ");
-
-    CoreField expected(
-        "BRRBBB"
-        "RYRYRY");
-
-    cf.forceDrop();
-
-    EXPECT_EQ(2, cf.height(1));
-    EXPECT_EQ(2, cf.height(2));
-    EXPECT_EQ(2, cf.height(3));
-    EXPECT_EQ(2, cf.height(4));
-    EXPECT_EQ(2, cf.height(5));
-    EXPECT_EQ(2, cf.height(6));
-    EXPECT_TRUE(expected == cf);
-}
-
 TEST(CoreFieldTest, simulate1)
 {
     CoreField cf("RRRR..");

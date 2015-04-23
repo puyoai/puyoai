@@ -96,8 +96,7 @@ DropDecision munetoshi::AI::think_internal(
 }
 
 void munetoshi::AI::onEnemyGrounded(const FrameRequest& frame) {
-    CoreField field(frame.enemyPlayerFrameRequest().field);
-    field.forceDrop();
+    CoreField field(CoreField::fromPlainFieldWithDrop(frame.enemyPlayerFrameRequest().field));
 
     if (field.simulate().chains > 1) {
         strategy = FIRE;

@@ -268,8 +268,7 @@ void AI::decisionRequested(const FrameRequest& frameRequest)
 
 void AI::grounded(const FrameRequest& frameRequest)
 {
-    CoreField field(frameRequest.myPlayerFrameRequest().field);
-    field.forceDrop();
+    CoreField field(CoreField::fromPlainFieldWithDrop(frameRequest.myPlayerFrameRequest().field));
     RensaResult rensaResult = field.simulate();
     if (rensaResult.chains > 0) {
         int ojamaCount = rensaResult.score / 70;;
@@ -341,8 +340,7 @@ void AI::enemyDecisionRequested(const FrameRequest& frameRequest)
     enemyDecisionRequestFrameId_ = frameRequest.frameId;
 
     enemy_.hand += 1;
-    enemy_.field = CoreField(frameRequest.enemyPlayerFrameRequest().field);
-    enemy_.field.forceDrop();
+    enemy_.field = CoreField::fromPlainFieldWithDrop(frameRequest.enemyPlayerFrameRequest().field);
 
     // Should this be here?
     if (me_.pendingOjama > 0) {
@@ -362,8 +360,7 @@ void AI::enemyDecisionRequested(const FrameRequest& frameRequest)
 
 void AI::enemyGrounded(const FrameRequest& frameRequest)
 {
-    CoreField field(frameRequest.enemyPlayerFrameRequest().field);
-    field.forceDrop();
+    CoreField field(CoreField::fromPlainFieldWithDrop(frameRequest.enemyPlayerFrameRequest().field));
 
     RensaResult rensaResult = field.simulate();
 

@@ -59,9 +59,8 @@ void Commentator::onUpdate(const GameState& gameState)
         const PlayerGameState& pgs = gameState.playerGameState(i);
         if (pgs.event.grounded) {
             frameId_[i] = gameState.frameId();
-            field_[i] = CoreField(pgs.field);
             // When chigiri is used, some puyo exists in the air. So we need to drop.
-            field_[i].forceDrop();
+            field_[i] = CoreField::fromPlainFieldWithDrop(pgs.field);
             kumipuyoSeq_[i] = pgs.kumipuyoSeq;
             needsUpdate_[i] = true;
         }
