@@ -28,6 +28,9 @@ public:
     // when some puyos are in the air.
     bool isZenkeshiPrecise() const;
 
+    // Drops all the puyos in the air. Puyos in the 14th row won't be dropped, though.
+    void drop();
+
     // Inserts positions whose puyo color is the same as |c|, and connected to (x, y).
     // The checked cells will be marked in |checked|.
     // PositionQueueHead should have enough capacity.
