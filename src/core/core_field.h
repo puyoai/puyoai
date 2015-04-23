@@ -34,9 +34,6 @@ public:
     explicit CoreField(const PlainField&);
     CoreField(const CoreField&) = default;
 
-    // Clears all puyos.
-    void clear();
-
     // Returns the height of the specified column.
     int height(int x) const { return heights_[x]; }
 
