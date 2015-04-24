@@ -24,11 +24,15 @@ CoreField::CoreField(const std::string& url) :
 {
     heights_[0] = 0;
     for (int x = 1; x <= WIDTH; ++x) {
-        heights_[x] = 0;
+        heights_[x] = 13;
         for (int y = 1; y <= 13; ++y) {
-            if (color(x, y) != PuyoColor::EMPTY)
-                heights_[x] = y;
+            if (color(x, y) == PuyoColor::EMPTY) {
+                heights_[x] = y - 1;
+                break;
+            }
         }
+        for (int y = heights_[x] + 1; y <= 13; ++y)
+            DCHECK(isEmpty(x, y));
     }
     heights_[MAP_WIDTH - 1] = 0;
 }
@@ -38,11 +42,15 @@ CoreField::CoreField(const PlainField& f) :
 {
     heights_[0] = 0;
     for (int x = 1; x <= WIDTH; ++x) {
-        heights_[x] = 0;
+        heights_[x] = 13;
         for (int y = 1; y <= 13; ++y) {
-            if (color(x, y) != PuyoColor::EMPTY)
-                heights_[x] = y;
+            if (color(x, y) == PuyoColor::EMPTY) {
+                heights_[x] = y - 1;
+                break;
+            }
         }
+        for (int y = heights_[x] + 1; y <= 13; ++y)
+            DCHECK(isEmpty(x, y));
     }
     heights_[MAP_WIDTH - 1] = 0;
 }
