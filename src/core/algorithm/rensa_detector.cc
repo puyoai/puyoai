@@ -210,7 +210,7 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                   const RensaDetector::SimulationCallback& callback)
 {
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
-        for (int y = originalField.height(x); y >= 1; --y) {
+        for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
             PuyoColor c = originalField.color(x, y);
 
             DCHECK_NE(c, PuyoColor::EMPTY);
@@ -221,56 +221,47 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
             if (necessaryPuyos > maxComplementPuyos)
                 continue;
 
-            int restPuyos = necessaryPuyos;
-            CoreField f(originalField);
-
-            int dx = x - 1;
             // float puyo col dx
-            for (; dx <= x + 1 && restPuyos > 0; ++dx) {
-                if (dx <= 0 || CoreField::WIDTH < dx) {
+            for (int dx = x - 1; dx <= x + 1; ++dx) {
+                if (dx <= 0 || CoreField::WIDTH < dx)
                     continue;
-                }
-
                 if (prohibits[dx])
                     continue;
+                if (x != dx && originalField.color(dx, y) != PuyoColor::EMPTY)
+                    continue;
 
-                // Check y
-                if (dx != x) {
-                    if (originalField.color(dx, y) != PuyoColor::EMPTY) {
-                        continue;
-                    } else { // restPuyos must be more than 0
-                        f.unsafeSet(dx, y, c);
-                        --restPuyos;
+                int restPuyos = necessaryPuyos;
+                CoreField f(originalField);
+                ColumnPuyoList cpl;
+
+                bool ok = true;
+                while (f.height(dx) + restPuyos < y) {
+                    if (!f.dropPuyoOnWithMaxHeight(dx, PuyoColor::OJAMA, maxPuyoHeight)) {
+                        ok = false;
+                        break;
+                    }
+                    if (!cpl.add(dx, PuyoColor::OJAMA)) {
+                        ok = false;
+                        break;
                     }
                 }
+                if (!ok)
+                    continue;
 
-                int dy_min = y - 1;
-                // Check under y
-                for (; restPuyos > 0 && dy_min > 0 && originalField.color(dx, dy_min) == PuyoColor::EMPTY;
-                     --dy_min) {
-                    f.unsafeSet(dx, dy_min, c);
-                    --restPuyos;
+                while (restPuyos-- > 0) {
+                    if (!f.dropPuyoOnWithMaxHeight(dx, c, maxPuyoHeight)) {
+                        ok = false;
+                        break;
+                    }
+                    if (!cpl.add(dx, c)) {
+                        ok = false;
+                        break;
+                    }
                 }
+                if (!ok)
+                    continue;
 
-                // Check over y
-                for (int dy = y + 1; restPuyos > 0 && dy <= maxPuyoHeight && originalField.color(dx, dy) == PuyoColor::EMPTY; ++dy) {
-                    f.unsafeSet(dx, dy, c);
-                    --restPuyos;
-                }
-
-                // Fill ojama
-                for(; dy_min > 0 && originalField.color(dx, dy_min) == PuyoColor::EMPTY; --dy_min) {
-                    f.unsafeSet(dx, dy_min, PuyoColor::OJAMA);
-                }
-
-                f.recalcHeightOn(dx);
-
-                if (restPuyos <= 0) {
-                    ColumnPuyoList cpl;
-                    if (!cpl.add(dx, c, necessaryPuyos))
-                        continue;
-                    callback(&f, cpl);
-                }
+                callback(&f, cpl);
             }
         }
     }
