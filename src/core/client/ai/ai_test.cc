@@ -36,9 +36,9 @@ protected:
         return AI::isFieldInconsistent(lhs, rhs);
     }
 
-    static void mergeField(CoreField* ours, const PlainField& provided, bool ojamaDropped)
+    static CoreField mergeField(const CoreField& ours, const PlainField& provided, bool ojamaDropped)
     {
-        AI::mergeField(ours, provided, ojamaDropped);
+        return AI::mergeField(ours, provided, ojamaDropped);
     }
 
     const PlayerState& myPlayerState() { return ai_.myPlayerState(); }
@@ -224,19 +224,16 @@ TEST_F(AITest, mergeFieldSimpleCase)
         "RRRGGG");
 
     {
-        CoreField f = f1;
-        mergeField(&f, f2, false);
-        EXPECT_EQ(f2, f);
+        CoreField cf = mergeField(f1, f2, false);
+        EXPECT_EQ(f2, cf) << cf.toDebugString();
     }
     {
-        CoreField f = f1;
-        mergeField(&f, f3, false);
-        EXPECT_EQ(f3, f);
+        CoreField cf = mergeField(f1, f3, false);
+        EXPECT_EQ(f3, cf) << cf.toDebugString();
     }
     {
-        CoreField f = f2;
-        mergeField(&f, f3, false);
-        EXPECT_EQ(f3, f);
+        CoreField cf = mergeField(f2, f3, false);
+        EXPECT_EQ(f3, cf) << cf.toDebugString();
     }
 }
 
@@ -301,19 +298,16 @@ TEST_F(AITest, mergeField)
         "OOOOOO");
 
     {
-        CoreField f = f1;
-        mergeField(&f, f2, false);
-        EXPECT_EQ(f1, f);
+        CoreField cf = mergeField(f1, f2, false);
+        EXPECT_EQ(f1, cf) << cf.toDebugString();
     }
     {
-        CoreField f = f1;
-        mergeField(&f, f3, false);
-        EXPECT_EQ(f3, f);
+        CoreField cf = mergeField(f1, f3, false);
+        EXPECT_EQ(f3, cf) << cf.toDebugString();
     }
     {
-        CoreField f = f1;
-        mergeField(&f, f4, false);
-        EXPECT_EQ(f3, f);
+        CoreField cf = mergeField(f1, f4, false);
+        EXPECT_EQ(f3, cf) << cf.toDebugString();
     }
 }
 
@@ -389,13 +383,11 @@ TEST_F(AITest, mergeFieldOjama)
         "OOOOOO");
 
     {
-        CoreField f(original);
-        mergeField(&f, provided1, true);
-        EXPECT_EQ(expected1, f) << f.toDebugString();
+        CoreField cf = mergeField(original, provided1, true);
+        EXPECT_EQ(expected1, cf) << cf.toDebugString();
     }
     {
-        CoreField f(original);
-        mergeField(&f, provided2, true);
-        EXPECT_EQ(expected2, f) << f.toDebugString();
+        CoreField cf = mergeField(original, provided2, true);
+        EXPECT_EQ(expected2, cf) << cf.toDebugString();
     }
 }

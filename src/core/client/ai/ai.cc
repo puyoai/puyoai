@@ -188,7 +188,7 @@ void AI::runLoop()
         if (next1.needsRethink || rethinkRequested_) {
             LOG(INFO) << "RETHINK";
 
-            mergeField(&me_.field, frameRequest.myPlayerFrameRequest().field, next1.ojamaDropped);
+            me_.field = mergeField(me_.field, frameRequest.myPlayerFrameRequest().field, next1.ojamaDropped);
             const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
 
             KumipuyoSeq seq = rememberedSequence(me_.hand);
@@ -449,36 +449,38 @@ bool AI::isFieldInconsistent(const PlainField& f, const PlainField& provided)
 }
 
 // static
-void AI::mergeField(CoreField* f, const PlainField& provided, bool ojamaDropped)
+CoreField AI::mergeField(const CoreField& cf, const PlainField& provided, bool ojamaDropped)
 {
+    CoreField result;
     bool unexpectedMismatch = false;
     int possibleMinOjamaHeight = 0;
     int possibleMaxOjamaHeight = 5;
     int ojamaHeights[FieldConstant::MAP_WIDTH] {};
 
     for (int x = 1; x <= 6; ++x) {
-        bool restIsEmpty = false;
         bool ojama12th = false;
         int ojamaHeight = 0;
-        int y;
-        for (y = 1; y <= 12; ++y) {
-            if (f->color(x, y) == provided.color(x, y))
-                continue;
-            if (f->color(x, y) == PuyoColor::EMPTY && provided.color(x, y) == PuyoColor::OJAMA) {
+        for (int y = 1; y <= 12; ++y) {
+            if (provided.isEmpty(x, y))
+                break;
+
+            if (cf.color(x, y) == provided.color(x, y)) {
+                result.dropPuyoOn(x, cf.color(x, y));
+            } else if (cf.color(x, y) == PuyoColor::EMPTY && provided.color(x, y) == PuyoColor::OJAMA) {
                 ++ojamaHeight;
                 if (y == 12)
                     ojama12th = true;
-                f->unsafeSet(x, y, provided.color(x, y));
-                continue;
+                result.dropPuyoOn(x, PuyoColor::OJAMA);
+            } else {
+                // Here, detected non-ojama mismatch.
+                unexpectedMismatch = true;
+                result.dropPuyoOn(x, provided.color(x, y));
             }
+        }
 
-            // Here, detected non-ojama mismatch.
-            unexpectedMismatch = true;
-            if (provided.color(x, y) == PuyoColor::EMPTY) {
-                restIsEmpty = true;
-                break;
-            }
-            f->unsafeSet(x, y, provided.color(x, y));
+        // Check 13th row.
+        if (!result.isEmpty(x, 12) && !cf.isEmpty(x, 13)) {
+            result.dropPuyoOn(x, cf.color(x, 13));
         }
 
         ojamaHeights[x] = ojamaHeight;
@@ -488,14 +490,6 @@ void AI::mergeField(CoreField* f, const PlainField& provided, bool ojamaDropped)
             possibleMinOjamaHeight = std::max(ojamaHeight, possibleMinOjamaHeight);
             possibleMaxOjamaHeight = std::min(ojamaHeight + 1, possibleMaxOjamaHeight);
         }
-
-        if (restIsEmpty) {
-            for (; y <= 13; ++y) {
-                DCHECK_EQ(PuyoColor::EMPTY, provided.color(x, y));
-                f->unsafeSet(x, y, PuyoColor::EMPTY);
-            }
-        }
-        f->recalcHeightOn(x);
     }
 
     // TODO(mayah): Is this right? Not 100% sure...
@@ -510,11 +504,13 @@ void AI::mergeField(CoreField* f, const PlainField& provided, bool ojamaDropped)
 
     if (ojamaDropped) {
         for (int x = 1; x <= 6; ++x) {
-            if (ojamaHeights[x] < possibleOjamaHeight && f->color(x, 12) == PuyoColor::OJAMA) {
-                f->dropPuyoOn(x, PuyoColor::OJAMA);
+            if (ojamaHeights[x] < possibleOjamaHeight && result.color(x, 12) == PuyoColor::OJAMA) {
+                result.dropPuyoOn(x, PuyoColor::OJAMA);
             }
         }
     }
+
+    return result;
 }
 
 KumipuyoSeq AI::rememberedSequence(int indexFrom) const

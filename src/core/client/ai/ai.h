@@ -106,7 +106,7 @@ private:
     friend class Solver;
 
     static bool isFieldInconsistent(const PlainField& ours, const PlainField& provided);
-    static void mergeField(CoreField* ours, const PlainField& provided, bool ojamaDropped);
+    static CoreField mergeField(const CoreField& ours, const PlainField& provided, bool ojamaDropped);
 
     KumipuyoSeq rememberedSequence(int indexFrom) const;
 
