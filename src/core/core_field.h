@@ -42,8 +42,6 @@ public:
 
     // Gets a color of puyo at a specified position.
     PuyoColor color(int x, int y) const { return field_.color(x, y); }
-    // TODO(mayah): Remove this.
-    void unsafeSet(int x, int y, PuyoColor c) { field_.unsafeSet(x, y, c); }
 
     // Returns true if puyo on (x, y) is c.
     bool isColor(int x, int y, PuyoColor c) const { return field_.isColor(x, y, c); }
@@ -218,12 +216,13 @@ public:
 
 public:
     // --- These methods should be carefully used.
-    // Sets puyo on arbitrary position. After setColor, you have to call recalcHeightOn.
-    // Otherwise, the field will be broken.
-    // Recalculates height on column |x|.
+
     // TODO(mayah): Remove this.
-    void recalcHeightOn(int x)
+    void setPuyoAndHeight(int x, int y, PuyoColor c)
     {
+        unsafeSet(x, y, c);
+
+        // Recalculate height.
         heights_[x] = 0;
         for (int y = 1; y <= 13; ++y) {
             if (color(x, y) != PuyoColor::EMPTY)
@@ -231,15 +230,9 @@ public:
         }
     }
 
-    // TODO(mayah): Remove this.
-    void setPuyoAndHeight(int x, int y, PuyoColor c)
-    {
-        unsafeSet(x, y, c);
-        // TODO(mayah): We should be able to skip some calculation of this recalc.
-        recalcHeightOn(x);
-    }
-
 private:
+    void unsafeSet(int x, int y, PuyoColor c) { field_.unsafeSet(x, y, c); }
+
     // Vanishes connected puyos and returns score. If score is 0, no puyos are vanished.
     template<typename Tracker>
     int vanish(SimulationContext*, Tracker*);
