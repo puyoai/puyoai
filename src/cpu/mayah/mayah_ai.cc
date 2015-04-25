@@ -311,7 +311,9 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
 
-    ss << "R/V SCORE=" << rensaScore << "/" << virtualRensaScore << " / ";
+    ss << "R/V SCORE=" << rensaScore << "/" << virtualRensaScore;
+
+    ss << ",";
 
     if (cf.feature(HOLDING_SIDE_CHAIN_SMALL) > 0) {
         ss << "SIDE=SMALL";
