@@ -619,8 +619,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                             double patternScore) {
         ++rensaCounts[rensaResult.chains];
 
-        std::unique_ptr<ScoreCollector> rensaScoreCollector(new ScoreCollector(sc_->evaluationParameterMap()));
-        RensaEvaluator<ScoreCollector> rensaEvaluator(patternBook(), rensaScoreCollector.get());
+        ScoreCollector rensaScoreCollector(sc_->evaluationParameterMap());
+        RensaEvaluator<ScoreCollector> rensaEvaluator(patternBook(), &rensaScoreCollector);
 
         CoreField complementedField(fieldBeforeRensa);
         if (!complementedField.dropPuyoList(puyosToComplement))
@@ -644,7 +644,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
 
         // TODO(mayah): need to set a better mode here.
-        const typename ScoreCollector::CollectedScore& rensaCollectedScore = rensaScoreCollector->collectedScore();
+        const typename ScoreCollector::CollectedScore& rensaCollectedScore = rensaScoreCollector.collectedScore();
         if (rensaCollectedScore.score(coef) > maxRensa.score) {
             maxRensa.score = rensaCollectedScore.score(coef);
             maxRensa.collectedScore = rensaCollectedScore;
