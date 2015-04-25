@@ -14,7 +14,7 @@
 // You can think this is a list of ColumnPuyo, however, the implementation is different.
 class ColumnPuyoList {
 public:
-    ColumnPuyoList() : size_{} {}
+    ColumnPuyoList() : size_{}, placeHolders_{} {}
 
     // Returns the size of column |x|.
     int sizeOn(int x) const
@@ -46,6 +46,8 @@ public:
         if (MAX_SIZE <= size_[x-1])
             return false;
         puyos_[x-1][size_[x-1]++] = c;
+        if (isPlaceHolder(c))
+            placeHolders_[x-1]++;
         return true;
     }
     bool add(int x, PuyoColor c, int n)
@@ -56,23 +58,41 @@ public:
         for (int i = 0; i < n; ++i)
             puyos_[x-1][size_[x-1] + i] = c;
         size_[x-1] += n;
+        if (isPlaceHolder(c))
+            placeHolders_[x-1] += n;
         return true;
     }
 
     // Appends |cpl|. If the result size exceeds the max size, false will be returned.
-    // When false is returned, the object does not change.
-    // TODO(mayah): This function should consider placeholders.
+    // When false is returned, the object might be corrupted.
     bool merge(const ColumnPuyoList& cpl)
     {
         for (int i = 0; i < 6; ++i) {
-            if (MAX_SIZE < size_[i] + cpl.size_[i])
+            if (MAX_SIZE < size_[i] + std::max(0, cpl.size_[i] - placeHolders_[i]))
                 return false;
         }
 
         for (int i = 0; i < 6; ++i) {
-            for (int j = 0; j < cpl.size_[i]; ++j)
-                puyos_[i][size_[i]++] = cpl.puyos_[i][j];
+            if (cpl.size_[i] < placeHolders_[i]) {
+                int offset = placeHolders_[i] - cpl.size_[i];
+                for (int j = 0; j < cpl.size_[i]; ++j)
+                    puyos_[i][j + offset] = cpl.puyos_[i][j];
+            } else {
+                int j = 0;
+                for (; j < placeHolders_[i]; ++j)
+                    puyos_[i][j] = cpl.puyos_[i][j];
+                for (; j < cpl.size_[i]; ++j)
+                    puyos_[i][size_[i]++] = cpl.puyos_[i][j];
+            }
+
+            int numPlaceHolders = 0;
+            for (int j = 0; j < size_[i]; ++j) {
+                if (isPlaceHolder(cpl.puyos_[i][j]))
+                    ++numPlaceHolders;
+            }
+            placeHolders_[i] = numPlaceHolders;
         }
+
         return true;
     }
 
@@ -80,6 +100,9 @@ public:
     {
         DCHECK(1 <= x && x <= 6);
         DCHECK_GT(sizeOn(x), 0);
+        PuyoColor c = puyos_[x-1][size_[x-1] - 1];
+        if (isPlaceHolder(c))
+            placeHolders_[x-1]--;
         size_[x-1] -= 1;
     }
 
@@ -115,9 +138,12 @@ public:
 private:
     static const int MAX_SIZE = 8;
 
+    static bool isPlaceHolder(PuyoColor c) { return c == PuyoColor::OJAMA || c == PuyoColor::IRON; }
+
     // We don't make this std::vector due to performance reason.
     int size_[6];
     PuyoColor puyos_[6][MAX_SIZE];
+    int placeHolders_[6];
 };
 
 namespace std {
