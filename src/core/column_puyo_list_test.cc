@@ -90,3 +90,24 @@ TEST(ColumnPuyoListTest, mergeWithPlaceHolders2)
     EXPECT_EQ(PuyoColor::RED, cpl1.get(3, 4));
     EXPECT_EQ(PuyoColor::RED, cpl1.get(3, 5));
 }
+
+TEST(ColumnPuyoListTest, mergeWithPlaceHolders3)
+{
+    ColumnPuyoList cpl1;
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
+
+    ColumnPuyoList cpl2;
+    ASSERT_TRUE(cpl2.add(3, PuyoColor::YELLOW));
+    ASSERT_TRUE(cpl2.add(3, PuyoColor::YELLOW));
+    ASSERT_TRUE(cpl2.add(3, PuyoColor::YELLOW));
+    ASSERT_TRUE(cpl2.add(3, PuyoColor::YELLOW));
+
+    EXPECT_FALSE(cpl1.merge(cpl2));
+}
