@@ -58,7 +58,7 @@ CoreField::CoreField(const PlainField& f) :
 bool CoreField::isZenkeshi() const
 {
     for (int x = 1; x <= WIDTH; ++x) {
-        if (color(x, 1) != PuyoColor::EMPTY)
+        if (height(x) > 0)
             return false;
     }
 
