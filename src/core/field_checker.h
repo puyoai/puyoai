@@ -1,17 +1,17 @@
-#ifndef CORE_FIELD_BIT_FIELD_H_
-#define CORE_FIELD_BIT_FIELD_H_
+#ifndef CORE_FIELD_CHECKER_H_
+#define CORE_FIELD_CHECKER_H_
 
 #include <glog/logging.h>
 
 #include "core/field_constant.h"
 
-// FieldBitField is a bitset whose size is the same as field.
+// FieldChecker is a bitset whose size is the same as field.
 //
 // For performance reason, this is an array of bool instead of std::bitset or something.
 // Converting a bit to bool is slow.
-class FieldBitField {
+class FieldChecker {
 public:
-    FieldBitField() : field_{} {}
+    FieldChecker() : field_{} {}
 
     bool get(int x, int y) const { return field_[index(x, y)]; }
     void set(int x, int y, bool flag = true) { field_[index(x, y)] = flag; }
@@ -30,4 +30,4 @@ private:
     bool field_[FieldConstant::MAP_HEIGHT * FieldConstant::MAP_WIDTH];
 };
 
-#endif
+#endif // CORE_FIELD_CHECKER_H_

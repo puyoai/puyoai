@@ -584,10 +584,10 @@ void Analyzer::analyzeFieldForLevelSelect(const DetectedField& detectedField, Pl
     }
 }
 
-int Analyzer::countVanishing(const RealColorField& field, const FieldBitField& vanishing)
+int Analyzer::countVanishing(const RealColorField& field, const FieldChecker& vanishing)
 {
     int result = 0;
-    FieldBitField visited;
+    FieldChecker visited;
 
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {

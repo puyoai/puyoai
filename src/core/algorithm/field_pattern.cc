@@ -10,7 +10,7 @@
 #include "core/algorithm/pattern_matcher.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 #include "core/position.h"
 #include "core/puyo_color.h"
 
@@ -247,7 +247,7 @@ PatternType FieldPattern::inferType(char c, PatternType typeForLowerCase)
     return PatternType::NONE;
 }
 
-Position* FieldPattern::fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldBitField* checked) const
+Position* FieldPattern::fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldChecker* checked) const
 {
     DCHECK(!checked->get(x, y));
 

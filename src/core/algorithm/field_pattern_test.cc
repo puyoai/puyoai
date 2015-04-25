@@ -9,7 +9,7 @@
 #include "core/column_puyo.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 #include "core/position.h"
 
 using namespace std;
@@ -99,7 +99,7 @@ TEST(FieldPatternTest, fillSameVariablePositions)
         "CCDAAA"
         "AAADDD");
 
-    FieldBitField checked;
+    FieldChecker checked;
     Position positionQueue[FieldConstant::WIDTH * FieldConstant::HEIGHT];
     Position* p = pattern.fillSameVariablePositions(1, 2, 'C', positionQueue, &checked);
     EXPECT_EQ(4, p - positionQueue);

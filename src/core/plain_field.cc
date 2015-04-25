@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 #include "core/position.h"
 #include "core/score.h"
 
@@ -77,7 +77,7 @@ void PlainField::drop()
 }
 
 Position* PlainField::fillSameColorPosition(int x, int y, PuyoColor c,
-                                            Position* positionQueueHead, FieldBitField* checked) const
+                                            Position* positionQueueHead, FieldChecker* checked) const
 {
     DCHECK(!checked->get(x, y));
 
@@ -116,7 +116,7 @@ Position* PlainField::fillSameColorPosition(int x, int y, PuyoColor c,
 
 int PlainField::vanishSlow(int currentChain)
 {
-    FieldBitField checked;
+    FieldChecker checked;
     Position eraseQueue[WIDTH * HEIGHT]; // All the positions of erased puyos will be stored here.
     Position* eraseQueueHead = eraseQueue;
 
@@ -272,11 +272,11 @@ int PlainField::countConnectedPuyosMax4(int x, int y) const
 
 int PlainField::countConnectedPuyos(int x, int y) const
 {
-    FieldBitField checked;
+    FieldChecker checked;
     return countConnectedPuyos(x, y, &checked);
 }
 
-int PlainField::countConnectedPuyos(int x, int y, FieldBitField* checked) const
+int PlainField::countConnectedPuyos(int x, int y, FieldChecker* checked) const
 {
     Position positions[WIDTH * HEIGHT];
 

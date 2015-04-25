@@ -11,7 +11,7 @@
 #include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/constant.h"
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 #include "core/kumipuyo_seq.h"
 #include "core/score.h"
 
@@ -173,7 +173,7 @@ void Gazer::gaze(int frameId, const CoreField& cf, const KumipuyoSeq& seq)
     updateFeasibleRensas(cf, seq);
     updatePossibleRensas(cf, seq);
 
-    FieldBitField checked;
+    FieldChecker checked;
     restEmptyField_ = cf.countConnectedPuyos(3, 12, &checked);
 }
 

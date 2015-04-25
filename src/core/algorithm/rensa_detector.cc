@@ -10,7 +10,7 @@
 #include "core/column_puyo.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 #include "core/position.h"
 #include "core/puyo_color.h"
 #include "core/rensa_result.h"
@@ -272,7 +272,7 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                    int maxComplementPuyos, int maxPuyoHeight,
                    const RensaDetector::SimulationCallback& callback)
 {
-    FieldBitField checked;
+    FieldChecker checked;
     Position positions[FieldConstant::HEIGHT * FieldConstant::WIDTH];
     int working[FieldConstant::HEIGHT * FieldConstant::WIDTH];
 

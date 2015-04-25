@@ -1,7 +1,7 @@
 #ifndef CORE_CORE_FIELD_INL_H_
 #define CORE_CORE_FIELD_INL_H_
 
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 #include "core/score.h"
 #include "core/rensa_tracker.h"
 
@@ -74,7 +74,7 @@ int CoreField::vanishDrop(SimulationContext* context, Tracker* tracker)
 template<typename Tracker>
 int CoreField::vanish(SimulationContext* context, Tracker* tracker)
 {
-    FieldBitField checked;
+    FieldChecker checked;
     Position eraseQueue[WIDTH * HEIGHT]; // All the positions of erased puyos will be stored here.
     Position* eraseQueueHead = eraseQueue;
 
