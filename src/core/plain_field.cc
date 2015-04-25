@@ -267,7 +267,7 @@ int PlainField::countConnectedPuyosMax4(int x, int y) const
         ++cnt;
     }
 
-    return (cnt >= 5) ? 4 : cnt;
+    return cnt;
 }
 
 int PlainField::countConnectedPuyos(int x, int y) const
