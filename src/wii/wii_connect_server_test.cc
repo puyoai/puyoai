@@ -12,6 +12,8 @@ TEST(WiiConnectorServerTest, calculateDropPosition)
                   "..O..."
                   "..O...");
 
+    EXPECT_EQ(KumipuyoPos(3, 4, 0), WiiConnectServer::calculateDropPosition(pf, Decision(3, 0)));
     EXPECT_EQ(KumipuyoPos(3, 4, 1), WiiConnectServer::calculateDropPosition(pf, Decision(3, 1)));
-    EXPECT_EQ(KumipuyoPos(4, 4, 3), WiiConnectServer::calculateDropPosition(pf, Decision(4, 3)));
+    EXPECT_EQ(KumipuyoPos(3, 5, 2), WiiConnectServer::calculateDropPosition(pf, Decision(3, 2)));
+    EXPECT_EQ(KumipuyoPos(3, 4, 3), WiiConnectServer::calculateDropPosition(pf, Decision(3, 3)));
 }
