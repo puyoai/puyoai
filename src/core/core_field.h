@@ -61,7 +61,6 @@ public:
     // Returns true if the field does not have any puyo. Valid only all puyos are dropped.
     // TODO(mayah): Remove isZenkeshiPrecise() from CoreField when all the puyo is not in the air.
     bool isZenkeshi() const;
-    bool isZenkeshiPrecise() const { return field_.isZenkeshiPrecise(); }
 
     // Counts the number of color puyos.
     int countColorPuyos() const;
