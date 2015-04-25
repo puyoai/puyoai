@@ -87,112 +87,6 @@ int CoreField::countColorPuyos() const
     return cnt;
 }
 
-int CoreField::countConnectedPuyos(int x, int y) const
-{
-    FieldBitField checked;
-    return countConnectedPuyos(x, y, &checked);
-}
-
-int CoreField::countConnectedPuyos(int x, int y, FieldBitField* checked) const
-{
-    Position positions[WIDTH * HEIGHT];
-
-    Position* filledHead = fillSameColorPosition(x, y, color(x, y), positions, checked);
-    return filledHead - positions;
-}
-
-int CoreField::countConnectedPuyosMax4(int x, int y) const
-{
-    bool leftUp = false, leftDown = false, rightUp = false, rightDown = false;
-    int cnt = 1;
-    PuyoColor c = color(x, y);
-
-    if (color(x - 1, y) == c) {
-        if (color(x - 2, y) == c) {
-            if (color(x - 3, y) == c || (color(x - 2, y + 1) == c && y + 1 <= 12) || color(x - 2, y - 1) == c)
-                return 4;
-            ++cnt;
-        }
-        if (color(x - 1, y + 1) == c && y + 1 <= 12) {
-            if (color(x - 2, y + 1) == c || (color(x - 1, y + 2) == c && y + 2 <= 12))
-                return 4;
-            ++cnt;
-            leftUp = true;
-        }
-        if (color(x - 1, y - 1) == c) {
-            if (color(x - 2, y - 1) == c || color(x - 1, y - 2) == c)
-                return 4;
-            ++cnt;
-            leftDown = true;
-        }
-        ++cnt;
-    }
-    if (color(x + 1, y) == c) {
-        if (color(x + 2, y) == c) {
-            if (color(x + 3, y) == c || (color(x + 2, y + 1) == c && y + 1 <= 12) || color(x + 2, y - 1) == c)
-                return 4;
-            ++cnt;
-        }
-        if (color(x + 1, y + 1) == c && y + 1 <= 12) {
-            if (color(x + 2, y + 1) == c || (color(x + 1, y + 2) == c && y + 2 <= 12))
-                return 4;
-            ++cnt;
-            rightUp = true;
-        }
-        if (color(x + 1, y - 1) == c) {
-            if (color(x + 2, y - 1) == c || color(x + 1, y - 2) == c)
-                return 4;
-            ++cnt;
-            rightDown = true;
-        }
-        ++cnt;
-    }
-    if (color(x, y - 1) == c) {
-        if (color(x, y - 2) == c) {
-            if (color(x, y - 3) == c || color(x - 1, y - 2) == c || color(x + 1, y - 2) == c)
-                return 4;
-            ++cnt;
-        }
-        if (color(x - 1, y - 1) == c && !leftDown) {
-            if (color(x - 2, y - 1) == c || color(x - 1, y - 2) == c)
-                return 4;
-            ++cnt;
-        }
-        if (color(x + 1, y - 1) == c && !rightDown) {
-            if (color(x + 2, y - 1) == c || color(x + 1, y - 2) == c)
-                return 4;
-            ++cnt;
-        }
-        ++cnt;
-    }
-    if (color(x, y + 1) == c && y + 1 <= 12) {
-        if (color(x, y + 2) == c && y + 2 <= 12) {
-            if ((color(x, y + 3) == c && y + 3 <= 12) || color(x - 1, y + 2) == c || color(x + 1, y + 2) == c)
-                return 4;
-            ++cnt;
-        }
-        if (color(x - 1, y + 1) == c && !leftUp) {
-            if (color(x - 2, y + 1) == c || (color(x - 1, y + 2) == c && y + 2 <= 12))
-                return 4;
-            ++cnt;
-        }
-        if (color(x + 1, y + 1) == c && !rightUp) {
-            if (color(x + 2, y + 1) == c || (color(x + 1, y + 2) == c && y + 2 <= 12))
-                return 4;
-            ++cnt;
-        }
-        ++cnt;
-    }
-
-    return (cnt >= 5) ? 4 : cnt;
-}
-
-bool CoreField::isConnectedPuyo(int x, int y) const
-{
-    PuyoColor c = color(x, y);
-    return color(x, y - 1) == c || color(x, y + 1) == c || color(x - 1, y) == c || color(x + 1, y) == c;
-}
-
 bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
 {
     int x1 = decision.axisX();
@@ -440,7 +334,7 @@ bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
         return false;
     }
 
-    if (countConnectedPuyos(p2.x, p2.y) >= 4)
+    if (countConnectedPuyosMax4(p2.x, p2.y) >= 4)
         return true;
 
     return false;

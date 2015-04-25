@@ -68,17 +68,17 @@ public:
     int countPuyos() const;
     // Returns the number of puyos connected to (x, y).
     // Actually you can use this if color(x, y) is EMPTY or OJAMA.
-    int countConnectedPuyos(int x, int y) const;
+    int countConnectedPuyos(int x, int y) const { return field_.countConnectedPuyos(x, y); }
     // Same as countConnectedPuyos(x, y), but with checking using |checked|.
-    int countConnectedPuyos(int x, int y, FieldBitField* checked) const;
+    int countConnectedPuyos(int x, int y, FieldBitField* checked) const { return field_.countConnectedPuyos(x, y, checked); }
     // Same as countConnectedPuyos(x, y).
     // If # of connected puyos is >= 4, the result is any value >= 4.
     // For example, if the actual number of connected is 6, result is 4, 5, or 6.
     // This is faster than countConnectedPuyos, so this will be useful when checking
     // puyo is vanished or not.
-    int countConnectedPuyosMax4(int x, int y) const;
+    int countConnectedPuyosMax4(int x, int y) const { return field_.countConnectedPuyosMax4(x, y); }
     // Returns true if color(x, y) is connected in some direction.
-    bool isConnectedPuyo(int x, int y) const;
+    bool isConnectedPuyo(int x, int y) const { return field_.isConnectedPuyo(x, y); }
     // Returns true if there is an empty neighbor of (x, y).
     bool hasEmptyNeighbor(int x, int y) const { return field_.hasEmptyNeighbor(x, y); }
 

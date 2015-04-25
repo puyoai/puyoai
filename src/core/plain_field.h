@@ -28,6 +28,21 @@ public:
     // when some puyos are in the air.
     bool isZenkeshiPrecise() const;
 
+    // Returns true if color(x, y) is connected in some direction.
+    bool isConnectedPuyo(int x, int y) const;
+
+    // Returns the number of puyos connected to (x, y).
+    // Actually you can use this if color(x, y) is EMPTY or OJAMA.
+    int countConnectedPuyos(int x, int y) const;
+    // Same as countConnectedPuyos(x, y), but with checking using |checked|.
+    int countConnectedPuyos(int x, int y, FieldBitField* checked) const;
+    // Same as countConnectedPuyos(x, y).
+    // If # of connected puyos is >= 4, the result is any value >= 4.
+    // For example, if the actual number of connected is 6, result is 4, 5, or 6.
+    // This is faster than countConnectedPuyos, so this will be useful when checking
+    // puyo is vanished or not.
+    int countConnectedPuyosMax4(int x, int y) const;
+
     // Drops all the puyos in the air. Puyos in the 14th row won't be dropped, though.
     void drop();
 
@@ -55,6 +70,12 @@ private:
 inline bool PlainField::hasEmptyNeighbor(int x, int y) const
 {
     return isEmpty(x, y + 1) || isEmpty(x, y - 1) || isEmpty(x + 1, y) || isEmpty(x - 1, y);
+}
+
+inline bool PlainField::isConnectedPuyo(int x, int y) const
+{
+    PuyoColor c = color(x, y);
+    return color(x, y - 1) == c || color(x, y + 1) == c || color(x - 1, y) == c || color(x + 1, y) == c;
 }
 
 #endif
