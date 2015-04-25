@@ -482,8 +482,13 @@ KumipuyoPos WiiConnectServer::calculateDropPosition(const PlainField& pf, const 
 
     if (x1 == x2) {
         for (int y = 1; y <= 13; ++y) {
-            if (pf.color(x1, y) == PuyoColor::EMPTY)
-                return KumipuyoPos(x1, y + 2, decision.rot());
+            if (pf.color(x1, y) == PuyoColor::EMPTY) {
+                if (decision.rot() == 0) {
+                    return KumipuyoPos(x1, y, 0);
+                } else {
+                    return KumipuyoPos(x1, y + 1, 2);
+                }
+            }
         }
 
         // No position to drop?
