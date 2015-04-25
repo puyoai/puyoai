@@ -14,7 +14,7 @@ class FieldBitField;
 class PatternMatcher;
 struct Position;
 
-enum class PatternType : std::uint8_t {
+enum class PatternType {
     NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR,
     ALLOW_FILLING_OJAMA, ALLOW_FILLING_IRON, WALL
 };
@@ -60,7 +60,7 @@ private:
     char vars_[MAP_WIDTH][MAP_HEIGHT];
     double scores_[MAP_WIDTH][MAP_HEIGHT];
     PatternType types_[MAP_WIDTH][MAP_HEIGHT];
-    std::int8_t heights_[MAP_WIDTH];
+    int heights_[MAP_WIDTH];
     int numVariables_;
 };
 
