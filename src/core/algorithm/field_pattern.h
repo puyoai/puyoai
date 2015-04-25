@@ -10,7 +10,7 @@
 
 class ColumnPuyoList;
 class CoreField;
-class FieldBitField;
+class FieldChecker;
 class PatternMatcher;
 struct Position;
 
@@ -43,7 +43,7 @@ public:
     double score(int x, int y) const { return scores_[x][y]; }
     PatternType type(int x, int y) const { return types_[x][y]; }
 
-    Position* fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldBitField*) const;
+    Position* fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldChecker*) const;
 
     FieldPattern mirror() const;
 

@@ -10,7 +10,7 @@
 #include "core/column_puyo_list.h"
 #include "core/constant.h"
 #include "core/decision.h"
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 #include "core/frame.h"
 #include "core/kumipuyo.h"
 #include "core/position.h"
@@ -242,7 +242,7 @@ int CoreField::fillErasingPuyoPositions(const SimulationContext& context, Positi
     Position* eraseQueueHead = eraseQueue;
 
     {
-        FieldBitField checked;
+        FieldChecker checked;
         for (int x = 1; x <= WIDTH; ++x) {
             int maxHeight = height(x);
             for (int y = context.minHeights[x]; y <= maxHeight; ++y) {
@@ -273,7 +273,7 @@ int CoreField::fillErasingPuyoPositions(const SimulationContext& context, Positi
 
     Position* colorEraseQueueHead = eraseQueueHead;
 
-    FieldBitField checked;
+    FieldChecker checked;
     for (Position* head = eraseQueue; head != colorEraseQueueHead; ++head) {
         int x = head->x;
         int y = head->y;

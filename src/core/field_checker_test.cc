@@ -1,4 +1,4 @@
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 
 #include <gtest/gtest.h>
 
@@ -6,9 +6,9 @@
 
 using namespace std;
 
-TEST(FieldBitFieldTest, initialize)
+TEST(FieldCheckerTest, initialize)
 {
-    FieldBitField bitField;
+    FieldChecker bitField;
 
     for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
         for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {
@@ -18,9 +18,9 @@ TEST(FieldBitFieldTest, initialize)
     }
 }
 
-TEST(FieldBitFieldTest, getAndSet)
+TEST(FieldCheckerTest, getAndSet)
 {
-    FieldBitField bitField;
+    FieldChecker bitField;
 
     for (int x = 0; x < CoreField::MAP_WIDTH; ++x) {
         for (int y = 0; y < CoreField::MAP_HEIGHT; ++y) {

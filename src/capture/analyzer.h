@@ -9,7 +9,7 @@
 
 #include <SDL.h>
 
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 #include "core/kumipuyo.h"
 #include "core/next_puyo.h"
 #include "core/real_color.h"
@@ -48,7 +48,7 @@ struct DetectedField {
     void setOjamaDropDetected(bool flag) { ojamaDropDetected = flag; }
 
     RealColorField field;
-    FieldBitField vanishing;
+    FieldChecker vanishing;
     RealColor nextPuyos[NUM_NEXT_PUYO_POSITION];
     bool ojamaDropDetected = false;
     bool next1AxisMoving = false;
@@ -67,7 +67,7 @@ struct AdjustedField {
     void setVanishing(int x, int y, bool flag) { vanishing.set(x, y, flag); }
 
     RealColorField field;
-    FieldBitField vanishing;
+    FieldChecker vanishing;
     RealColor nextPuyos[NUM_NEXT_PUYO_POSITION];
 };
 
@@ -188,7 +188,7 @@ private:
                       PlayerAnalyzerResult*);
     void analyzeFieldForLevelSelect(const DetectedField&, PlayerAnalyzerResult*);
 
-    int countVanishing(const RealColorField&, const FieldBitField& vanishing);
+    int countVanishing(const RealColorField&, const FieldChecker& vanishing);
 };
 
 #endif

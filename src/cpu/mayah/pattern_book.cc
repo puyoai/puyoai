@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 
 using namespace std;
 
@@ -13,7 +13,7 @@ vector<Position> findIgnitionPositions(const FieldPattern& pattern)
 {
     Position positions[FieldConstant::MAP_WIDTH * FieldConstant::MAP_HEIGHT];
 
-    FieldBitField checked;
+    FieldChecker checked;
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
             if (checked(x, y))

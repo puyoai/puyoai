@@ -7,7 +7,7 @@
 #include "core/puyo_color.h"
 
 struct Position;
-class FieldBitField;
+class FieldChecker;
 
 class PlainField : public FieldConstant {
 public:
@@ -35,7 +35,7 @@ public:
     // Actually you can use this if color(x, y) is EMPTY or OJAMA.
     int countConnectedPuyos(int x, int y) const;
     // Same as countConnectedPuyos(x, y), but with checking using |checked|.
-    int countConnectedPuyos(int x, int y, FieldBitField* checked) const;
+    int countConnectedPuyos(int x, int y, FieldChecker* checked) const;
     // Same as countConnectedPuyos(x, y).
     // If # of connected puyos is >= 4, the result is any value >= 4.
     // For example, if the actual number of connected is 6, result is 4, 5, or 6.
@@ -49,7 +49,7 @@ public:
     // Inserts positions whose puyo color is the same as |c|, and connected to (x, y).
     // The checked cells will be marked in |checked|.
     // PositionQueueHead should have enough capacity.
-    Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBitField* checked) const;
+    Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldChecker* checked) const;
 
     // Returns true if there is an empty neighbor of (x, y).
     bool hasEmptyNeighbor(int x, int y) const;

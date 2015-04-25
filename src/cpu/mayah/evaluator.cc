@@ -16,7 +16,7 @@
 #include "core/constant.h"
 #include "core/core_field.h"
 #include "core/decision.h"
-#include "core/field_bit_field.h"
+#include "core/field_checker.h"
 #include "core/position.h"
 #include "core/rensa_result.h"
 #include "core/score.h"
