@@ -275,12 +275,18 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
         ss << "ZENKESHI / ";
     if (cf.feature(STRATEGY_KILL) > 0)
         ss << "KILL / ";
-    if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_LARGE) > 0) {
-        ss << "SIDE CHAIN LARGE / ";
-    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM) > 0) {
-        ss << "SIDE CHAIN MEDIUM / ";
-    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_SMALL) > 0) {
-        ss << "SIDE CHAIN SMALL / ";
+    if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_2_LARGE) > 0) {
+        ss << "SIDE CHAIN LARGE (2) / ";
+    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_2_MEDIUM) > 0) {
+        ss << "SIDE CHAIN MEDIUM (2) / ";
+    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_2_SMALL) > 0) {
+        ss << "SIDE CHAIN SMALL (2) / ";
+    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_3_LARGE) > 0) {
+        ss << "SIDE CHAIN LARGE (3) / ";
+    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_3_MEDIUM) > 0) {
+        ss << "SIDE CHAIN MEDIUM (3) / ";
+    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_3_SMALL) > 0) {
+        ss << "SIDE CHAIN SMALL (3) / ";
     }
     if (cf.feature(STRATEGY_TAIOU) > 0)
         ss << "TAIOU / ";

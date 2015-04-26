@@ -343,13 +343,24 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFra
         return true;
     }
 
-    if (plan.chains() <= 3 && plan.pendingOjama() + plan.fixedOjama() == 0 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
-        if (plan.score() >= scoreForOjama(30)) {
-            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_LARGE, 1);
+    if (plan.chains() == 2 && plan.pendingOjama() + plan.fixedOjama() <= 3 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
+        if (plan.score() >= scoreForOjama(24)) {
+            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_2_LARGE, 1);
         } else if (plan.score() >= scoreForOjama(18)) {
-            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_MEDIUM, 1);
+            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_2_MEDIUM, 1);
         } else if (plan.score() >= scoreForOjama(15)) {
-            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_SMALL, 1);
+            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_2_SMALL, 1);
+        }
+        return false;
+    }
+
+    if (plan.chains() == 3 && plan.pendingOjama() + plan.fixedOjama() == 0 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
+        if (plan.score() >= scoreForOjama(30)) {
+            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_3_LARGE, 1);
+        } else if (plan.score() >= scoreForOjama(18)) {
+            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_3_MEDIUM, 1);
+        } else if (plan.score() >= scoreForOjama(15)) {
+            sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_3_SMALL, 1);
         }
         return false;
     }
