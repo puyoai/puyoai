@@ -64,7 +64,10 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field,
 }
 
 template<typename ScoreCollector>
-static void calculateValleyDepth(ScoreCollector* sc, EvaluationSparseFeatureKey key, const CoreField& field)
+static void calculateValleyDepth(ScoreCollector* sc,
+                                 EvaluationSparseFeatureKey key,
+                                 EvaluationSparseFeatureKey edgeKey,
+                                 const CoreField& field)
 {
     for (int x = 1; x <= 6; ++x) {
         int currentHeight = field.height(x);
@@ -75,7 +78,10 @@ static void calculateValleyDepth(ScoreCollector* sc, EvaluationSparseFeatureKey 
         int right = std::max(rightHeight - currentHeight, 0);
         int depth = std::min(left, right);
         DCHECK(0 <= depth && depth <= 14) << depth;
-        sc->addScore(key, depth, 1);
+        if (x == 1 || x == 6)
+            sc->addScore(edgeKey, depth, 1);
+        else
+            sc->addScore(key, depth, 1);
     }
 }
 
@@ -221,7 +227,7 @@ void Evaluator<ScoreCollector>::evalThirdColumnHeightFeature(const CoreField& fi
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::evalValleyDepth(const CoreField& field)
 {
-    calculateValleyDepth(sc_, VALLEY_DEPTH, field);
+    calculateValleyDepth(sc_, VALLEY_DEPTH, VALLEY_DEPTH_EDGE, field);
 }
 
 template<typename ScoreCollector>
@@ -459,7 +465,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaRidgeHeight(const CoreField& field
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaValleyDepth(const CoreField& field)
 {
-    calculateValleyDepth(sc_, RENSA_VALLEY_DEPTH, field);
+    calculateValleyDepth(sc_, RENSA_VALLEY_DEPTH, RENSA_VALLEY_DEPTH_EDGE, field);
 }
 
 template<typename ScoreCollector>
