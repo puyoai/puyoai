@@ -81,22 +81,21 @@ bool PatternMatcher::checkCell(char currentVar,
 
 bool PatternMatcher::fillUnusedVariableColors(const FieldPattern& pattern,
                                               const CoreField& field,
-                                              int pos,
-                                              const vector<char>& unusedVariables,
+                                              bool needsNeighborCheck,
+                                              SmallIntSet unusedVariables,
                                               ColumnPuyoList* cpl)
 {
-    if (pos == static_cast<int>(unusedVariables.size())) {
-        if (!unusedVariables.empty()) {
-            if (!checkNeighborsForCompletion(pattern, field))
-                return false;
-        }
+    if (unusedVariables.isEmpty()) {
+        if (needsNeighborCheck && !checkNeighborsForCompletion(pattern, field))
+            return false;
         return complementInternal(pattern, field, cpl);
     }
 
-    char c = unusedVariables[pos];
+    char c = unusedVariables.smallest() + 'A';
+    unusedVariables.removeSmallest();
     for (PuyoColor pc : NORMAL_PUYO_COLORS) {
         forceSet(c, pc);
-        if (fillUnusedVariableColors(pattern, field, pos + 1, unusedVariables, cpl))
+        if (fillUnusedVariableColors(pattern, field, needsNeighborCheck, unusedVariables, cpl))
             return true;
     }
     return false;
