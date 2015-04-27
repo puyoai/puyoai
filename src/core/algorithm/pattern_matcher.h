@@ -160,6 +160,10 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern,
                 continue;
             }
 
+            // place holder.
+            if (pc == PuyoColor::IRON)
+                continue;
+
             if (!isNormalColor(pc))
                 return PatternMatchResult();
 
