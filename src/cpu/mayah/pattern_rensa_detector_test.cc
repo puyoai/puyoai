@@ -10,7 +10,7 @@ field = [
     "A.....",
     "ABC...",
     "AABCC.",
-    "BBC@@.",
+    "BBC&&.",
 ]
 ignition = 1
 score = 72
@@ -24,7 +24,7 @@ field = [
     "AB....",
     "AAC...",
     "BBBC..",
-    "CCC@..",
+    "CCC&..",
 ]
 ignition = 1
 name = "NEWGTR"
@@ -57,7 +57,7 @@ field = [
     "A.....",
     "ABC...",
     "AABCC.",
-    "BBC@@.",
+    "BBC&&.",
 ]
 ignition = 1
 )";
@@ -100,7 +100,7 @@ field = [
     "A.....",
     "ABC...",
     "AABCCC",
-    "BBC@@@",
+    "BBC&&&",
 ]
 ignition = 1
 score = 72
@@ -130,7 +130,7 @@ TEST(PatternBookTest, pattern1)
     CoreField expected("G....."
                        "GYB..."
                        "GGYBB."
-                       "YYBOO.");
+                       "YYB&&.");
 
     bool found = false;
     auto callback = [&](const CoreField&,
@@ -166,11 +166,11 @@ TEST(PatternBookTest, pattern1_complement1)
     CoreField expected1("G....."
                         "GYB..."
                         "GGYBB."
-                        "YYBOO.");
+                        "YYB&&.");
     CoreField expected2("G....."
                         "GYR..."
                         "GGYRR."
-                        "YYROO.");
+                        "YYR&&.");
 
     bool found = false;
     auto callback = [&](const CoreField&,
@@ -273,7 +273,7 @@ TEST(PatternBookTest, pattern3)
                        "GG...."
                        "RYB..."
                        "RRYBB."
-                       "YYB@@.");
+                       "YYB&&.");
 
     bool found = false;
     auto callback = [&](const CoreField&,

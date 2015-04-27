@@ -207,13 +207,6 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
         scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
-    case PatternType::ALLOW_FILLING_OJAMA:
-        CHECK_EQ(variable, '@');
-        types_[x][y] = t;
-        vars_[x][y] = '@';
-        scores_[x][y] = score;
-        heights_[x] = std::max(height(x), y);
-        break;
     case PatternType::ALLOW_FILLING_IRON:
         CHECK_EQ(variable, '&');
         types_[x][y] = t;
@@ -235,8 +228,6 @@ PatternType FieldPattern::inferType(char c, PatternType typeForLowerCase)
         return PatternType::ANY;
     if (c == '_')
         return PatternType::MUST_EMPTY;
-    if (c == '@')
-        return PatternType::ALLOW_FILLING_OJAMA;
     if (c == '&')
         return PatternType::ALLOW_FILLING_IRON;
     if ('A' <= c && c <= 'Z')

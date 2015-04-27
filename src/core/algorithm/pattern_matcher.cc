@@ -58,7 +58,6 @@ bool PatternMatcher::checkCell(char currentVar,
 
     switch (neighborType) {
     case PatternType::NONE:
-    case PatternType::ALLOW_FILLING_OJAMA:
     case PatternType::ALLOW_FILLING_IRON:
         if (map(currentVar) == neighborColor)
             return false;
@@ -115,15 +114,6 @@ bool PatternMatcher::complementInternal(const FieldPattern& pattern,
     for (int x = 1; x <= 6; ++x) {
         int h = pattern.height(x);
         for (int y = 1; y <= h; ++y) {
-            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_OJAMA) {
-                if (!(field.isColor(x, y, PuyoColor::EMPTY) || field.isColor(x, y, PuyoColor::IRON)))
-                    continue;
-                if (!cpl->add(x, PuyoColor::OJAMA))
-                    return false;
-                ++currentHeights[x];
-                continue;
-            }
-
             if (pattern.type(x, y) == PatternType::ALLOW_FILLING_IRON) {
                 if (!(field.isColor(x, y, PuyoColor::EMPTY) || field.isColor(x, y, PuyoColor::IRON)))
                     continue;

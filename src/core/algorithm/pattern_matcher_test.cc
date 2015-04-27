@@ -331,9 +331,9 @@ TEST(PatternMatcherTest, complement5)
     FieldPattern pattern(
         "ABC..."
         "AABCC."
-        "BBC@@.");
+        "BBC&&.");
 
-    EXPECT_EQ(PatternType::ALLOW_FILLING_OJAMA, pattern.type(4, 1));
+    EXPECT_EQ(PatternType::ALLOW_FILLING_IRON, pattern.type(4, 1));
 
     CoreField cf(
         "Y....."
@@ -343,7 +343,7 @@ TEST(PatternMatcherTest, complement5)
     CoreField expected(
         "YGB..."
         "YYGBB."
-        "GGBOO.");
+        "GGB&&.");
 
     ColumnPuyoList cpl;
     PatternMatcher matcher;
@@ -357,9 +357,9 @@ TEST(PatternMatcherTest, complement6)
     FieldPattern pattern(
         "ABC..."
         "AABCC."
-        "BBC@@.");
+        "BBC&&.");
 
-    EXPECT_EQ(PatternType::ALLOW_FILLING_OJAMA, pattern.type(4, 1));
+    EXPECT_EQ(PatternType::ALLOW_FILLING_IRON, pattern.type(4, 1));
 
     CoreField cf(
         "Y....."
@@ -369,12 +369,12 @@ TEST(PatternMatcherTest, complement6)
     CoreField expected1(
         "YGB..."
         "YYGBB."
-        "GGBOO.");
+        "GGB&&.");
 
     CoreField expected2(
         "YGR..."
         "YYGRR."
-        "GGROO.");
+        "GGR&&.");
 
     ColumnPuyoList cpl;
     PatternMatcher matcher;

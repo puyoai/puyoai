@@ -138,7 +138,7 @@ public:
 private:
     static const int MAX_SIZE = 8;
 
-    static bool isPlaceHolder(PuyoColor c) { return c == PuyoColor::OJAMA || c == PuyoColor::IRON; }
+    static bool isPlaceHolder(PuyoColor c) { return c == PuyoColor::IRON; }
 
     // We don't make this std::vector due to performance reason.
     int size_[6];

@@ -16,7 +16,7 @@ struct Position;
 
 enum class PatternType {
     NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR,
-    ALLOW_FILLING_OJAMA, ALLOW_FILLING_IRON, WALL
+    ALLOW_FILLING_IRON, WALL
 };
 
 // FieldPattern is a field that holds characters.

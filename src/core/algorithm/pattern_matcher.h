@@ -190,8 +190,6 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern,
                 continue;
             if (pattern.type(x, y) == PatternType::ANY)
                 continue;
-            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_OJAMA)
-                continue;
             if (pattern.type(x, y) == PatternType::ALLOW_FILLING_IRON)
                 continue;
             if (pattern.type(x, y) == PatternType::ALLOW_VAR) {
