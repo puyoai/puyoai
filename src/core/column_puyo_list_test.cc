@@ -39,16 +39,16 @@ TEST(ColumnPuyoListTest, merge)
 TEST(ColumnPuyoListTest, mergeWithPlaceHolders1)
 {
     ColumnPuyoList cpl1;
-    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
-    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
-    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::IRON));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::IRON));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::IRON));
     ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
     ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
     ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
 
     ColumnPuyoList cpl2;
-    ASSERT_TRUE(cpl2.add(3, PuyoColor::OJAMA));
-    ASSERT_TRUE(cpl2.add(3, PuyoColor::OJAMA));
+    ASSERT_TRUE(cpl2.add(3, PuyoColor::IRON));
+    ASSERT_TRUE(cpl2.add(3, PuyoColor::IRON));
     ASSERT_TRUE(cpl2.add(3, PuyoColor::YELLOW));
     ASSERT_TRUE(cpl2.add(3, PuyoColor::YELLOW));
 
@@ -56,8 +56,8 @@ TEST(ColumnPuyoListTest, mergeWithPlaceHolders1)
 
     EXPECT_EQ(7, cpl1.size());
     EXPECT_EQ(7, cpl1.sizeOn(3));
-    EXPECT_EQ(PuyoColor::OJAMA, cpl1.get(3, 0));
-    EXPECT_EQ(PuyoColor::OJAMA, cpl1.get(3, 1));
+    EXPECT_EQ(PuyoColor::IRON, cpl1.get(3, 0));
+    EXPECT_EQ(PuyoColor::IRON, cpl1.get(3, 1));
     EXPECT_EQ(PuyoColor::YELLOW, cpl1.get(3, 2));
     EXPECT_EQ(PuyoColor::RED, cpl1.get(3, 3));
     EXPECT_EQ(PuyoColor::RED, cpl1.get(3, 4));
@@ -68,9 +68,9 @@ TEST(ColumnPuyoListTest, mergeWithPlaceHolders1)
 TEST(ColumnPuyoListTest, mergeWithPlaceHolders2)
 {
     ColumnPuyoList cpl1;
-    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
-    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
-    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::IRON));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::IRON));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::IRON));
     ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
     ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
     ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
@@ -83,7 +83,7 @@ TEST(ColumnPuyoListTest, mergeWithPlaceHolders2)
 
     EXPECT_EQ(6, cpl1.size());
     EXPECT_EQ(6, cpl1.sizeOn(3));
-    EXPECT_EQ(PuyoColor::OJAMA, cpl1.get(3, 0));
+    EXPECT_EQ(PuyoColor::IRON, cpl1.get(3, 0));
     EXPECT_EQ(PuyoColor::YELLOW, cpl1.get(3, 1));
     EXPECT_EQ(PuyoColor::YELLOW, cpl1.get(3, 2));
     EXPECT_EQ(PuyoColor::RED, cpl1.get(3, 3));
@@ -94,9 +94,9 @@ TEST(ColumnPuyoListTest, mergeWithPlaceHolders2)
 TEST(ColumnPuyoListTest, mergeWithPlaceHolders3)
 {
     ColumnPuyoList cpl1;
-    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
-    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
-    ASSERT_TRUE(cpl1.add(3, PuyoColor::OJAMA));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::IRON));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::IRON));
+    ASSERT_TRUE(cpl1.add(3, PuyoColor::IRON));
     ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
     ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
     ASSERT_TRUE(cpl1.add(3, PuyoColor::RED));
