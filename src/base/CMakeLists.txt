@@ -13,3 +13,4 @@ function(puyoai_base_add_test target)
 endfunction()
 
 puyoai_base_add_test(strings)
+puyoai_base_add_test(small_int_set)
