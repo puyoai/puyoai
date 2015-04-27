@@ -7,6 +7,7 @@
 #include <tuple>
 #include <vector>
 
+#include "base/small_int_set.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
 #include "core/puyo_color.h"
@@ -19,9 +20,9 @@ struct PatternMatchResult {
     PatternMatchResult(bool matched, double score, int count, int allowedCount) :
         matched(matched), score(score), count(count), allowedCount(allowedCount) {}
     PatternMatchResult(bool matched, double score, int count, int allowedCount,
-                       std::vector<char> unusedVariables) :
+                       SmallIntSet unusedVariables) :
         matched(matched), score(score), count(count), allowedCount(allowedCount),
-        unusedVariables(std::move(unusedVariables)) {}
+        unusedVariables(unusedVariables) {}
 
     friend bool operator==(const PatternMatchResult& lhs, const PatternMatchResult& rhs)
     {
@@ -33,7 +34,7 @@ struct PatternMatchResult {
     double score;
     int count;
     int allowedCount;
-    std::vector<char> unusedVariables;
+    SmallIntSet unusedVariables; // 'A' -> 0, 'B' -> 1, ...
 };
 
 struct ComplementResult {
@@ -115,8 +116,8 @@ private:
 
     bool fillUnusedVariableColors(const FieldPattern&,
                                   const CoreField&,
-                                  int pos,
-                                  const std::vector<char>& unusedVariables,
+                                  bool needsNeighborCheck,
+                                  SmallIntSet unusedVariables,
                                   ColumnPuyoList*);
     bool complementInternal(const FieldPattern&,
                             const CoreField&,
@@ -216,13 +217,13 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern,
         }
     }
 
-    std::vector<char> unusedVariables;
+    SmallIntSet unusedVariables;
     for (char c = 'A'; c <= 'Z'; ++c) {
         if (isSeen(c) && !isSet(c))
-            unusedVariables.push_back(c);
+            unusedVariables.set(c - 'A');
     }
 
-    return PatternMatchResult(true, matchScore, matchCount, matchAllowedCount, std::move(unusedVariables));
+    return PatternMatchResult(true, matchScore, matchCount, matchAllowedCount, unusedVariables);
 }
 
 template<typename ScoreCallback>
@@ -238,10 +239,10 @@ ComplementResult PatternMatcher::complement(const FieldPattern& pattern,
     if (!result.matched)
         return ComplementResult(false);
 
-    if (static_cast<int>(result.unusedVariables.size()) > numAllowingFillingUnusedVariables)
+    if (result.unusedVariables.size() > numAllowingFillingUnusedVariables)
         return ComplementResult(false);
 
-    bool ok = fillUnusedVariableColors(pattern, field, 0, result.unusedVariables, cpl);
+    bool ok = fillUnusedVariableColors(pattern, field, !result.unusedVariables.isEmpty(), result.unusedVariables, cpl);
     int filled = std::min(static_cast<int>(result.unusedVariables.size()),
                           numAllowingFillingUnusedVariables);
     return ComplementResult(ok, filled);
