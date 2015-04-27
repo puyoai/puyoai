@@ -116,7 +116,7 @@ bool PatternMatcher::complementInternal(const FieldPattern& pattern,
         int h = pattern.height(x);
         for (int y = 1; y <= h; ++y) {
             if (pattern.type(x, y) == PatternType::ALLOW_FILLING_OJAMA) {
-                if (field.color(x, y) != PuyoColor::EMPTY)
+                if (!(field.isColor(x, y, PuyoColor::EMPTY) || field.isColor(x, y, PuyoColor::IRON)))
                     continue;
                 if (!cpl->add(x, PuyoColor::OJAMA))
                     return false;
@@ -125,7 +125,7 @@ bool PatternMatcher::complementInternal(const FieldPattern& pattern,
             }
 
             if (pattern.type(x, y) == PatternType::ALLOW_FILLING_IRON) {
-                if (field.color(x, y) != PuyoColor::EMPTY)
+                if (!(field.isColor(x, y, PuyoColor::EMPTY) || field.isColor(x, y, PuyoColor::IRON)))
                     continue;
                 if (!cpl->add(x, PuyoColor::IRON))
                     return false;
@@ -137,9 +137,8 @@ bool PatternMatcher::complementInternal(const FieldPattern& pattern,
                 continue;
 
             if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR)) {
-                if (field.color(x, y) == PuyoColor::EMPTY) {
+                if (field.color(x, y) == PuyoColor::EMPTY)
                     return false;
-                }
                 continue;
             }
 
@@ -154,6 +153,9 @@ bool PatternMatcher::complementInternal(const FieldPattern& pattern,
                 if (!cpl->add(x, map(c)))
                     return false;
                 ++currentHeights[x];
+            } else if (field.color(x, y) == PuyoColor::IRON) {
+                if (!cpl->add(x, map(c)))
+                    return false;
             }
         }
     }

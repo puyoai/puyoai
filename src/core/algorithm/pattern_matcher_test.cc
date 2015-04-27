@@ -440,3 +440,22 @@ TEST(PatternMatcherTest, complementWithAllow2)
     EXPECT_TRUE(cf.dropPuyoList(cpl));
     EXPECT_TRUE(expected == cf);
 }
+
+TEST(PatternMatcherTest, complementWithPlaceholder1)
+{
+    FieldPattern pattern(
+        "...B.."
+        "AAABB.");
+
+    CoreField cf(
+        "......"
+        "GGG&B.");
+
+    ColumnPuyoList cpl;
+    PatternMatcher matcher;
+    EXPECT_TRUE(matcher.complement(pattern, cf, &cpl).success);
+
+    EXPECT_EQ(2, cpl.sizeOn(4));
+    EXPECT_EQ(PuyoColor::BLUE, cpl.get(4, 0));
+    EXPECT_EQ(PuyoColor::BLUE, cpl.get(4, 1));
+}
