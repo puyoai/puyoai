@@ -1900,7 +1900,7 @@ field = [
     "BAA...",
     "AAC...",
     "BBBCCC",
-    "&&&&&&"
+    "DDDEEE"
 ]
 ignition = 3
 score = 9.0
@@ -1911,7 +1911,7 @@ field = [
     "AB....",
     "AAC...",
     "BBBCCC",
-    "&&&&&&"
+    "DDDEEE"
 ]
 ignition = 1
 score = 8.5
@@ -1921,7 +1921,7 @@ field = [
     "......",
     "A.B.C.",
     "AAABBB",
-    "&&.CCC"
+    "DDDCCC"
 ]
 ignition = 1
 score = 8.0
@@ -1931,7 +1931,7 @@ field = [
     "......",
     "A.B..C",
     "AAABBB",
-    "&&.CCC"
+    "DDDCCC"
 ]
 ignition = 1
 score = 8.0
@@ -1941,7 +1941,7 @@ field = [
     "......",
     ".AB.C.",
     "AAABBB",
-    "&&.CCC"
+    "DDDCCC"
 ]
 ignition = 2
 score = 8.0
@@ -1951,7 +1951,7 @@ field = [
     "......",
     ".AB..C",
     "AAABBB",
-    "&&.CCC"
+    "DDDCCC"
 ]
 ignition = 2
 score = 8.0
