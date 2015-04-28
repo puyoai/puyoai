@@ -322,6 +322,7 @@ field = [
 BCAB = [1, 0]
 BCBC = [4, 1]
 BCCD = [4, 1]
+BCDD = [1, 0]
 CCCD = [5, 1]
 
 [[book]]
