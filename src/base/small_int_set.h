@@ -13,6 +13,12 @@ public:
         v_ |= (1 << x);
     }
 
+    void unset(int x)
+    {
+        DCHECK(0 <= x && x < 32) << x;
+        v_ &= ~(1 << x);
+    }
+
     bool isSet(int x) const
     {
         DCHECK(0 <= x && x < 32) << x;

@@ -11,10 +11,14 @@ TEST(SmallIntSetTest, basic)
     s.set(0);
     s.set(1);
     s.set(5);
+    s.set(8);
     s.set(16);
     s.set(31);
     s.set(31);
 
+    EXPECT_EQ(6, s.size());
+
+    s.unset(8);
     EXPECT_EQ(5, s.size());
 
     EXPECT_EQ(0, s.smallest());

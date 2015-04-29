@@ -110,8 +110,9 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     // TODO(mayah): making std::vector is too slow. call currentField.fillErasingPuyoPosition()?
     Position ignitionPositions[FieldConstant::WIDTH * FieldConstant::HEIGHT];
     int size = currentField.fillErasingPuyoPositions(currentFieldContext, ignitionPositions);
-    DCHECK_NE(size, 0) << size;
-    if (size == 0)
+
+    // because of PuyoColor::IRON, sometimes we might have valid erasing puyo.
+    if (size < 4)
         return;
 
     std::sort(ignitionPositions, ignitionPositions + size);
