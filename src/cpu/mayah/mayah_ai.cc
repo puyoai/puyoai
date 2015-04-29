@@ -319,7 +319,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
 
     ss << "R/V SCORE=" << rensaScore << "/" << virtualRensaScore;
 
-    ss << ",";
+    ss << "\n";
 
     if (cf.feature(HOLDING_SIDE_CHAIN_SMALL) > 0) {
         ss << "SIDE=SMALL";
@@ -343,7 +343,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
         ss << "FAST10=NG";
     }
 
-    ss << ",";
+    ss << "\n";
 
     if (enemy.isRensaOngoing) {
         ss << "Gazed (ongoing) : " << enemy.ongoingRensaResult.score
