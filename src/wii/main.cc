@@ -20,6 +20,7 @@
 #include "gui/commentator_drawer.h"
 #include "gui/decision_drawer.h"
 #include "gui/main_window.h"
+#include "gui/user_event_drawer.h"
 #include "wii/serial_key_sender.h"
 #include "wii/stdout_key_sender.h"
 #include "wii/wii_connect_server.h"
@@ -123,6 +124,9 @@ int main(int argc, char* argv[])
     if (FLAGS_draw_decision)
         decisionDrawer.reset(new DecisionDrawer);
 
+    unique_ptr<UserEventDrawer> userEventDrawer;
+    userEventDrawer.reset(new UserEventDrawer);
+
     unique_ptr<MovieSourceKeyListener> movieSourceKeyListener;
     // TODO(mayah): BAD! Don't check FLAGS_source here.
     if (FLAGS_fps == 0 && FLAGS_source != "somagic" && FLAGS_source != "syntek") {
@@ -157,6 +161,8 @@ int main(int argc, char* argv[])
 
     if (decisionDrawer.get())
         mainWindow->addDrawer(decisionDrawer.get());
+    if (userEventDrawer.get())
+        mainWindow->addDrawer(userEventDrawer.get());
 
 #if USE_AUDIO_COMMENTATOR
     unique_ptr<InternalSpeaker> internalSpeaker;
@@ -175,6 +181,8 @@ int main(int argc, char* argv[])
         server.addObserver(commentator.get());
     if (decisionDrawer.get())
         server.addObserver(decisionDrawer.get());
+    if (userEventDrawer.get())
+        server.addObserver(userEventDrawer.get());
 #if USE_AUDIO_COMMENTATOR
     if (audioCommentator.get())
         server.addObserver(audioCommentator.get());
