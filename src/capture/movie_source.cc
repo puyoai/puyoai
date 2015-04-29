@@ -54,13 +54,13 @@ MovieSource::MovieSource(const char* filename) :
         return;
     }
 
-    frame_ = avcodec_alloc_frame();
+    frame_ = av_frame_alloc();
     if (frame_ == NULL) {
         fprintf(stderr, "Couldn't allocate frame memory\n");
         return;
     }
 
-    frame_rgb_ = avcodec_alloc_frame();
+    frame_rgb_ = av_frame_alloc();
     if (frame_rgb_ == NULL) {
         fprintf(stderr, "Couldn't allocate frame_rgb memory\n");
         return;
@@ -71,14 +71,9 @@ MovieSource::MovieSource(const char* filename) :
     avpicture_fill((AVPicture*)frame_rgb_, buffer,
                    PIX_FMT_RGB24, width_, height_);
 
-#if 1
     SDL_Surface* surf = SDL_CreateRGBSurfaceFrom(frame_rgb_->data[0], width_, height_, 24,
                                                  buf_len / height_,
                                                  255, 255 << 8, 255 << 16, 0);
-#else
-    SDL_Surface* surf = SDL_CreateRGBSurface(SDL_SWSURFACE, width_, height_, 24,
-                                             255, 255 << 8, 255 << 16, 0);
-#endif
     surf_ = makeUniqueSDLSurface(surf);
 
     fprintf(stderr,"Parsed movie: width=%d height=%d pitch=%d\n",
@@ -114,15 +109,6 @@ UniqueSDLSurface MovieSource::getNextFrame()
                                             SWS_BICUBIC, NULL, NULL, NULL);
 
                 sws_scale(sws_, frame_->data, frame_->linesize, 0, height_, frame_rgb_->data, frame_rgb_->linesize);
-
-#if 0
-                for (int y = 0; y < height_; y++) {
-                    memcpy((char*)surf_->pixels + y * surf_->pitch,
-                           frame_rgb_->data[0] + y * frame_rgb_->linesize[0],
-                           frame_rgb_->linesize[0]);
-                }
-#endif
-
                 break;
             }
         }
@@ -141,8 +127,6 @@ UniqueSDLSurface MovieSource::getNextFrame()
     } else if (static_cast<int>(elapsed) < 1000 / fps_) {
         int d = 1000 / fps_ - elapsed;
         SDL_Delay(d);
-        Uint32 hoge = SDL_GetTicks();
-        cout << "waiting... " << d << "ms ... " << (hoge - currentTime) << endl;
     }
     lastTaken_ = SDL_GetTicks();
 
