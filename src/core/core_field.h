@@ -112,10 +112,9 @@ public:
     bool dropPuyoListWithMaxHeight(const ColumnPuyoList&, int maxHeight);
 
     // Removes the puyo from top of column |x|. If there is no puyo on column |x|, nothing will happen.
-    void removeTopPuyoFrom(int x) {
-        if (height(x) > 0)
-            unsafeSet(x, heights_[x]--, PuyoColor::EMPTY);
-    }
+    void removePuyoFrom(int x);
+    // Removes |n| puyos from top of column |x|.
+    void removePuyoFrom(int x, int n);
 
     // ----------------------------------------------------------------------
     // simulation

@@ -372,17 +372,28 @@ TEST(CoreFieldTest, dropPuyoOnWithMaxHeight)
     EXPECT_EQ(PuyoColor::GREEN, f.color(3, 4));
 }
 
-TEST(CoreFieldTest, RemoveTopPuyoFrom)
+TEST(CoreFieldTest, removePuyoFrom)
 {
-    CoreField f("456756");
+    CoreField cf(
+        "...OOO"
+        "OOOOOO");
 
-    f.removeTopPuyoFrom(1);
-    EXPECT_EQ(PuyoColor::EMPTY, f.color(1, 1));
-    EXPECT_EQ(0, f.height(1));
+    cf.removePuyoFrom(1);
+    cf.removePuyoFrom(2);
+    cf.removePuyoFrom(3);
+    EXPECT_EQ(PuyoColor::EMPTY, cf.color(1, 1));
+    EXPECT_EQ(PuyoColor::EMPTY, cf.color(2, 1));
+    EXPECT_EQ(PuyoColor::EMPTY, cf.color(3, 1));
+    EXPECT_EQ(0, cf.height(1));
+    EXPECT_EQ(0, cf.height(2));
+    EXPECT_EQ(0, cf.height(3));
 
-    f.removeTopPuyoFrom(1);
-    EXPECT_EQ(PuyoColor::EMPTY, f.color(1, 1));
-    EXPECT_EQ(0, f.height(1));
+    cf.removePuyoFrom(4, 1);
+    cf.removePuyoFrom(5, 2);
+    cf.removePuyoFrom(6, 2);
+    EXPECT_EQ(1, cf.height(4));
+    EXPECT_EQ(0, cf.height(5));
+    EXPECT_EQ(0, cf.height(6));
 }
 
 TEST(CoreFieldTest, TrackedCoreFieldSimulation)

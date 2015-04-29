@@ -194,4 +194,20 @@ int CoreField::dropAfterVanish(SimulationContext* context, Tracker* tracker)
     return maxDrops;
 }
 
+inline
+void CoreField::removePuyoFrom(int x)
+{
+    DCHECK_GE(height(x), 1);
+    unsafeSet(x, heights_[x]--, PuyoColor::EMPTY);
+}
+
+inline
+void CoreField::removePuyoFrom(int x, int n)
+{
+    DCHECK_GE(height(x), n);
+    for (int i = 0; i < n; ++i) {
+        unsafeSet(x, heights_[x]--, PuyoColor::EMPTY);
+    }
+}
+
 #endif

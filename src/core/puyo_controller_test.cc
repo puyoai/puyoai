@@ -718,7 +718,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherExhaustive)
         for (int x = 1; x <= 6; ++x) {
             int h = heights[x];
             while (f.height(x) > h)
-                f.removeTopPuyoFrom(x);
+                f.removePuyoFrom(x);
             while (f.height(x) < h)
                 f.dropPuyoOn(x, PuyoColor::OJAMA);
             ASSERT_TRUE(f.height(x) == h);
