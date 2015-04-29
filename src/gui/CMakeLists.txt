@@ -13,6 +13,7 @@ add_library(puyoai_gui
             main_window.cc
             screen.cc
             pixel_color.cc
+            user_event_drawer.cc
             util.cc)
 
 function(puyoai_gui_add_test target)

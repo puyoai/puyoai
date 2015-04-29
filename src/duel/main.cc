@@ -28,6 +28,7 @@
 #include "gui/fps_drawer.h"
 #include "gui/human_connector_key_listener.h"
 #include "gui/main_window.h"
+#include "gui/user_event_drawer.h"
 #endif
 
 #if USE_AUDIO_COMMENTATOR
@@ -155,6 +156,7 @@ int main(int argc, char* argv[])
     unique_ptr<Commentator> commentator;
     unique_ptr<CommentatorDrawer> commentatorDrawer;
     unique_ptr<FPSDrawer> fpsDrawer;
+    unique_ptr<UserEventDrawer> userEventDrawer;
     if (FLAGS_use_gui) {
         if (FLAGS_use_commentator)
             mainWindow.reset(new MainWindow(640 + 2 * 144, 490 + 176, Box(144, 40, 144 + 640, 40 + 490)));
@@ -173,6 +175,9 @@ int main(int argc, char* argv[])
 
         fpsDrawer.reset(new FPSDrawer);
         mainWindow->addDrawer(fpsDrawer.get());
+
+        userEventDrawer.reset(new UserEventDrawer);
+        mainWindow->addDrawer(userEventDrawer.get());
 
         for (int i = 0; i < 2; ++i) {
             Connector* c = manager.connector(i);
@@ -218,6 +223,8 @@ int main(int argc, char* argv[])
         duelServer.addObserver(fieldDrawer.get());
     if (commentator.get())
         duelServer.addObserver(commentator.get());
+    if (userEventDrawer.get())
+        duelServer.addObserver(userEventDrawer.get());
 #endif
 #if USE_HTTPD
     if (httpServer.get())
