@@ -36,6 +36,7 @@ using namespace std;
 DEFINE_bool(save_screenshot, false, "save screenshot");
 DEFINE_bool(draw_result, true, "draw analyzer result");
 DEFINE_bool(draw_decision, true, "draw decision");
+DEFINE_bool(draw_user_event, true, "draw user event");
 DEFINE_string(source, "somagic",
               "set image source. 'somagic' when using somagic video capture."
               " filename if you'd like to use movie.");
@@ -125,7 +126,8 @@ int main(int argc, char* argv[])
         decisionDrawer.reset(new DecisionDrawer);
 
     unique_ptr<UserEventDrawer> userEventDrawer;
-    userEventDrawer.reset(new UserEventDrawer);
+    if (FLAGS_draw_user_event)
+        userEventDrawer.reset(new UserEventDrawer);
 
     unique_ptr<MovieSourceKeyListener> movieSourceKeyListener;
     // TODO(mayah): BAD! Don't check FLAGS_source here.
