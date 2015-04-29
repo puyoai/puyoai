@@ -12,19 +12,19 @@ TEST(FieldPerformanceTest, Copy)
 {
     TimeStampCounterData tsc;
 
-    CoreField f("050745"
-                "574464"
-                "446676"
-                "456474"
-                "656476"
-                "657564"
-                "547564"
-                "747676"
-                "466766"
-                "747674"
-                "757644"
-                "657575"
-                "475755");
+    CoreField f(".G.BRG"
+                "GBRRYR"
+                "RRYYBY"
+                "RGYRBR"
+                "YGYRBY"
+                "YGBGYR"
+                "GRBGYR"
+                "BRBYBY"
+                "RYYBYY"
+                "BRBYBR"
+                "BGBYRR"
+                "YGBGBG"
+                "RBGBGG");
 
     for (int i = 0; i < 1000000; i++) {
         ScopedTimeStampCounter tsct(&tsc);
@@ -53,19 +53,19 @@ TEST(FieldPerformanceTest, Simulate_Filled)
     TimeStampCounterData tsc;
 
     for (int i = 0; i < 100000; i++) {
-        CoreField f("050745"
-                    "574464"
-                    "446676"
-                    "456474"
-                    "656476"
-                    "657564"
-                    "547564"
-                    "747676"
-                    "466766"
-                    "747674"
-                    "757644"
-                    "657575"
-                    "475755");
+        CoreField f(".G.BRG"
+                    "GBRRYR"
+                    "RRYYBY"
+                    "RGYRBR"
+                    "YGYRBY"
+                    "YGBGYR"
+                    "GRBGYR"
+                    "BRBYBY"
+                    "RYYBYY"
+                    "BRBYBR"
+                    "BGBYRR"
+                    "YGBGBG"
+                    "RBGBGG");
         ScopedTimeStampCounter tsct(&tsc);
         f.simulate();
     }
@@ -78,19 +78,20 @@ TEST(FieldPerformanceTest, Simulate_Filled_Track)
     TimeStampCounterData tsc;
 
     for (int i = 0; i < 100000; i++) {
-        CoreField f("050745"
-                    "574464"
-                    "446676"
-                    "456474"
-                    "656476"
-                    "657564"
-                    "547564"
-                    "747676"
-                    "466766"
-                    "747674"
-                    "757644"
-                    "657575"
-                    "475755");
+        CoreField f(".G.BRG"
+                    "GBRRYR"
+                    "RRYYBY"
+                    "RGYRBR"
+                    "YGYRBY"
+                    "YGBGYR"
+                    "GRBGYR"
+                    "BRBYBY"
+                    "RYYBYY"
+                    "BRBYBR"
+                    "BGBYRR"
+                    "YGBGBG"
+                    "RBGBGG");
+
 
         ScopedTimeStampCounter stsc(&tsc);
         RensaChainTracker tracker;
@@ -116,19 +117,19 @@ TEST(FieldPerformanceTest, countConnectedPuyosEmpty)
 
 TEST(FieldPerformanceTest, countConnectedPuyosFilled)
 {
-    CoreField f("050745"
-                "574464"
-                "446676"
-                "456474"
-                "656476"
-                "657564"
-                "547564"
-                "747676"
-                "466766"
-                "747674"
-                "757644"
-                "657575"
-                "475755");
+    CoreField f(".G.BRG"
+                "GBRRYR"
+                "RRYYBY"
+                "RGYRBR"
+                "YGYRBY"
+                "YGBGYR"
+                "GRBGYR"
+                "BRBYBY"
+                "RYYBYY"
+                "BRBYBR"
+                "BGBYRR"
+                "YGBGBG"
+                "RBGBGG");
 
     TimeStampCounterData tsc;
     for (int i = 0; i < 1000000; i++) {
@@ -141,24 +142,28 @@ TEST(FieldPerformanceTest, countConnectedPuyosFilled)
 
 TEST(FieldPerformanceTest, countConnectedPuyosMax4)
 {
-    CoreField f("050745"
-                "574464"
-                "446676"
-                "456474"
-                "656476"
-                "657564"
-                "547564"
-                "747676"
-                "466766"
-                "747674"
-                "757644"
-                "657575"
-                "475755");
+    CoreField f("OOOGGG"
+                "OOOGGG" // 12
+                "OOOOOO"
+                "ORRRRO"
+                "ORRRRO"
+                "OOOOOO" // 8
+                "BBBOBB"
+                "GGGOGG"
+                "RRRORR"
+                "OOOOOO" // 4
+                "RGBORO"
+                "RGBOGO"
+                "RGBOBO");
 
     TimeStampCounterData tsc;
     for (int i = 0; i < 1000000; i++) {
         ScopedTimeStampCounter stsc(&tsc);
-        EXPECT_EQ(3, f.countConnectedPuyosMax4(3, 2));
+        EXPECT_EQ(1, f.countConnectedPuyosMax4(5, 1));
+        EXPECT_EQ(2, f.countConnectedPuyosMax4(5, 5));
+        EXPECT_EQ(3, f.countConnectedPuyosMax4(1, 5));
+        EXPECT_EQ(3, f.countConnectedPuyosMax4(6, 12));
+        EXPECT_LE(4, f.countConnectedPuyosMax4(2, 9));
     }
 
     tsc.showStatistics();
