@@ -7,7 +7,8 @@
 
 #include <glog/logging.h>
 
-#include "column_puyo.h"
+#include "base/small_int_set.h"
+#include "core/column_puyo.h"
 #include "core/puyo_color.h"
 
 // ColumnPuyoList is a list of PuyoColor for each column.
@@ -45,9 +46,9 @@ public:
         DCHECK(1 <= x && x <= 6);
         if (MAX_SIZE <= size_[x-1])
             return false;
-        puyos_[x-1][size_[x-1]++] = c;
         if (isPlaceHolder(c))
-            placeHolders_[x-1]++;
+            placeHolders_[x-1].set(size_[x-1]);
+        puyos_[x-1][size_[x-1]++] = c;
         return true;
     }
     bool add(int x, PuyoColor c, int n)
@@ -55,11 +56,12 @@ public:
         DCHECK(1 <= x && x <= 6);
         if (MAX_SIZE < size_[x-1] + n)
             return false;
-        for (int i = 0; i < n; ++i)
+        for (int i = 0; i < n; ++i) {
+            if (isPlaceHolder(c))
+                placeHolders_[x-1].set(size_[x-1] + i);
             puyos_[x-1][size_[x-1] + i] = c;
+        }
         size_[x-1] += n;
-        if (isPlaceHolder(c))
-            placeHolders_[x-1] += n;
         return true;
     }
 
@@ -68,29 +70,39 @@ public:
     bool merge(const ColumnPuyoList& cpl)
     {
         for (int i = 0; i < 6; ++i) {
-            if (MAX_SIZE < size_[i] + std::max(0, cpl.size_[i] - placeHolders_[i]))
+            if (MAX_SIZE < size_[i] + std::max(0, cpl.size_[i] - placeHolders_[i].size()))
                 return false;
         }
 
         for (int i = 0; i < 6; ++i) {
-            if (cpl.size_[i] < placeHolders_[i]) {
-                int offset = placeHolders_[i] - cpl.size_[i];
-                for (int j = 0; j < cpl.size_[i]; ++j)
-                    puyos_[i][j + offset] = cpl.puyos_[i][j];
+            if (cpl.size_[i] < placeHolders_[i].size()) {
+                int discard = placeHolders_[i].size() - cpl.size_[i];
+                for (int j = 0; j < discard; ++j)
+                    placeHolders_[i].removeSmallest();
+                for (int j = 0; j < cpl.size_[i]; ++j) {
+                    int k = placeHolders_[i].smallest();
+                    placeHolders_[i].removeSmallest();
+                    puyos_[i][k] = cpl.puyos_[i][j];
+                }
             } else {
                 int j = 0;
-                for (; j < placeHolders_[i]; ++j)
-                    puyos_[i][j] = cpl.puyos_[i][j];
+                while (!placeHolders_[i].isEmpty()) {
+                    int k = placeHolders_[i].smallest();
+                    placeHolders_[i].removeSmallest();
+                    puyos_[i][k] = cpl.puyos_[i][j];
+                    ++j;
+                }
+
                 for (; j < cpl.size_[i]; ++j)
                     puyos_[i][size_[i]++] = cpl.puyos_[i][j];
             }
 
-            int numPlaceHolders = 0;
+            SmallIntSet newPlaceHolder;
             for (int j = 0; j < size_[i]; ++j) {
                 if (isPlaceHolder(cpl.puyos_[i][j]))
-                    ++numPlaceHolders;
+                    newPlaceHolder.set(j);
             }
-            placeHolders_[i] = numPlaceHolders;
+            placeHolders_[i] = newPlaceHolder;
         }
 
         return true;
@@ -102,7 +114,7 @@ public:
         DCHECK_GT(sizeOn(x), 0);
         PuyoColor c = puyos_[x-1][size_[x-1] - 1];
         if (isPlaceHolder(c))
-            placeHolders_[x-1]--;
+            placeHolders_[x-1].unset(size_[x-1] - 1);
         size_[x-1] -= 1;
     }
 
@@ -143,7 +155,7 @@ private:
     // We don't make this std::vector due to performance reason.
     int size_[6];
     PuyoColor puyos_[6][MAX_SIZE];
-    int placeHolders_[6];
+    SmallIntSet placeHolders_[6];
 };
 
 namespace std {
