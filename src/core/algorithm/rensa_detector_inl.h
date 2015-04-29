@@ -44,7 +44,7 @@ void RensaDetector::complementKeyPuyosInternal(CoreField& currentField,
             if (!currentField.dropPuyoOn(x, c))
                 continue;
             if (!currentKeyPuyos.add(x, c)) {
-                currentField.removeTopPuyoFrom(x);
+                currentField.removePuyoFrom(x);
                 continue;
             }
 
@@ -53,7 +53,7 @@ void RensaDetector::complementKeyPuyosInternal(CoreField& currentField,
                                            x, restAdded - 1, callback);
             }
 
-            currentField.removeTopPuyoFrom(x);
+            currentField.removePuyoFrom(x);
             currentKeyPuyos.removeTopFrom(x);
         }
     }

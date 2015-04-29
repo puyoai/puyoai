@@ -517,7 +517,7 @@ static void findPossibleRensasInternal(const CoreField& currentField,
             if (f.countConnectedPuyosMax4(x, f.height(x)) < 4)
                 findPossibleRensasInternal(f, puyoList, x, restAdded - 1, purpose, strategy, callback);
 
-            f.removeTopPuyoFrom(x);
+            f.removePuyoFrom(x);
             puyoList.removeTopFrom(x);
         }
     }

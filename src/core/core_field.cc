@@ -98,7 +98,7 @@ bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
         if (!dropPuyoOnWithMaxHeight(x2, c2, 14))
             return false;
         if (!dropPuyoOnWithMaxHeight(x1, c1, 13)) {
-            removeTopPuyoFrom(x2);
+            removePuyoFrom(x2);
             return false;
         }
         return true;
@@ -107,7 +107,7 @@ bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
     if (!dropPuyoOnWithMaxHeight(x1, c1, 13))
         return false;
     if (!dropPuyoOnWithMaxHeight(x2, c2, 14)) {
-        removeTopPuyoFrom(x1);
+        removePuyoFrom(x1);
         return false;
     }
     return true;
@@ -115,8 +115,8 @@ bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
 
 void CoreField::undoKumipuyo(const Decision& decision)
 {
-    removeTopPuyoFrom(decision.x);
-    removeTopPuyoFrom(decision.childX());
+    removePuyoFrom(decision.x);
+    removePuyoFrom(decision.childX());
 }
 
 int CoreField::framesToDropNext(const Decision& decision) const
