@@ -20,9 +20,22 @@ enum class PurposeForFindingRensa {
 
 // RensaDetector is a set of functions to find a rensa from the specified field.
 // Using iteratePossibleRensasIteratively() is recommended for most cases.
+// TODO(mayah): Simplify this class.
 class RensaDetector {
 public:
     typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
+    typedef std::function<void (const CoreField&,
+                                const RensaResult&,
+                                const ColumnPuyoList&)> RensaCallback;
+    template<typename TrackResult>
+    using TrackedRensaCallback = std::function<void (const CoreField&,
+                                                     const RensaResult&,
+                                                     const ColumnPuyoList&,
+                                                     const TrackResult&)>;
+    typedef TrackedRensaCallback<RensaChainTrackResult> TrackedPossibleRensaCallback;
+    typedef TrackedRensaCallback<RensaCoefResult> CoefPossibleRensaCallback;
+    typedef TrackedRensaCallback<RensaVanishingPositionResult> VanishingPositionPossibleRensaCallback;
+
     // Detects a rensa from the field. The ColumnPuyoList to fire a rensa will be passed to
     // |callback|. Note that invalid column puyo list might be passed to |callback|.
     // The field that puyo list is added is also passed to DetectionCallback.
@@ -32,16 +45,6 @@ public:
                        const bool prohibits[FieldConstant::MAP_WIDTH],
                        const SimulationCallback& callback);
 
-
-    typedef std::function<void (const CoreField&,
-                                const RensaResult&,
-                                const ColumnPuyoList&)> RensaCallback;
-    template<typename TrackResult>
-    using TrackedRensaCallback = std::function<void (const CoreField&,
-                                                     const RensaResult&,
-                                                     const ColumnPuyoList&,
-                                                     const TrackResult&)>;
-
     // TODO(mayah): Consider simplify these methods.
 
     // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
@@ -50,19 +53,16 @@ public:
                                       const RensaDetectorStrategy&,
                                       const RensaCallback&);
 
-    typedef TrackedRensaCallback<RensaChainTrackResult> TrackedPossibleRensaCallback;
     static void iteratePossibleRensasWithTracking(const CoreField&,
                                                   int maxKeyPuyos,
                                                   const RensaDetectorStrategy&,
                                                   const TrackedPossibleRensaCallback&);
 
-    typedef TrackedRensaCallback<RensaCoefResult> CoefPossibleRensaCallback;
     static void iteratePossibleRensasWithCoefTracking(const CoreField&,
                                                       int maxKeyPuyos,
                                                       const RensaDetectorStrategy&,
                                                       const CoefPossibleRensaCallback&);
 
-    typedef TrackedRensaCallback<RensaVanishingPositionResult> VanishingPositionPossibleRensaCallback;
     static void iteratePossibleRensasWithVanishingPositionTracking(const CoreField&,
                                                                    int maxKeyPuyos,
                                                                    const RensaDetectorStrategy&,
