@@ -216,24 +216,24 @@ TEST_F(AITest, mergeFieldSimpleCase)
         "RRRGGG");
 
     CoreField f2(
-        "   OOO"
+        "...OOO"
         "RRRGGG");
 
     CoreField f3(
-        "OOO"
+        "OOO..."
         "RRRGGG");
 
     {
         CoreField cf = mergeField(f1, f2, false);
-        EXPECT_EQ(f2, cf) << cf.toDebugString();
+        EXPECT_EQ(f2, cf);
     }
     {
         CoreField cf = mergeField(f1, f3, false);
-        EXPECT_EQ(f3, cf) << cf.toDebugString();
+        EXPECT_EQ(f3, cf);
     }
     {
         CoreField cf = mergeField(f2, f3, false);
-        EXPECT_EQ(f3, cf) << cf.toDebugString();
+        EXPECT_EQ(f3, cf);
     }
 }
 
@@ -299,15 +299,15 @@ TEST_F(AITest, mergeField)
 
     {
         CoreField cf = mergeField(f1, f2, false);
-        EXPECT_EQ(f1, cf) << cf.toDebugString();
+        EXPECT_EQ(f1, cf);
     }
     {
         CoreField cf = mergeField(f1, f3, false);
-        EXPECT_EQ(f3, cf) << cf.toDebugString();
+        EXPECT_EQ(f3, cf);
     }
     {
         CoreField cf = mergeField(f1, f4, false);
-        EXPECT_EQ(f3, cf) << cf.toDebugString();
+        EXPECT_EQ(f3, cf);
     }
 }
 
@@ -384,10 +384,10 @@ TEST_F(AITest, mergeFieldOjama)
 
     {
         CoreField cf = mergeField(original, provided1, true);
-        EXPECT_EQ(expected1, cf) << cf.toDebugString();
+        EXPECT_EQ(expected1, cf);
     }
     {
         CoreField cf = mergeField(original, provided2, true);
-        EXPECT_EQ(expected2, cf) << cf.toDebugString();
+        EXPECT_EQ(expected2, cf);
     }
 }

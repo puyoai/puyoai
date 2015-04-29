@@ -212,6 +212,7 @@ public:
 
     friend bool operator==(const CoreField&, const CoreField&);
     friend bool operator!=(const CoreField&, const CoreField&);
+    friend std::ostream& operator<<(std::ostream& os, const CoreField& cf) { return (os << cf.toDebugString()); }
 
 public:
     // --- These methods should be carefully used.
