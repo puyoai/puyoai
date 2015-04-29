@@ -26,6 +26,7 @@ public:
     int maxNumOfComplementPuyosForKey() const { return maxNumOfComplementPuyosForKey_; }
     int maxNumOfComplementPuyosForFire() const { return maxNumOfComplementPuyosForFire_; }
     bool allowsPuttingKeyPuyoOn13thRow() const { return allowsPuttingKeyPuyoOn13thRow_; }
+    int maxKeyPuyoHeight() const { return allowsPuttingKeyPuyoOn13thRow() ? 13 : 12; }
 
 private:
     Mode mode_;
