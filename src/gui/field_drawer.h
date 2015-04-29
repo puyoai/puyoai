@@ -20,7 +20,6 @@ class SDLCommentator;
 // FieldDrawer draws the current puyo field etc.
 class FieldDrawer : public Drawer, public GameStateObserver {
 public:
-    // Don't take ownership
     FieldDrawer();
     virtual ~FieldDrawer() override;
 
