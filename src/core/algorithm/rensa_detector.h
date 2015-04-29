@@ -28,10 +28,10 @@ public:
                                 const RensaResult&,
                                 const ColumnPuyoList&)> RensaCallback;
     template<typename TrackResult>
-    using TrackedRensaCallback = std::function<void (const CoreField&,
-                                                     const RensaResult&,
-                                                     const ColumnPuyoList&,
-                                                     const TrackResult&)>;
+    using TrackedRensaCallback = std::function<void (const CoreField& fieldAfterRensa,
+                                                     const RensaResult& rensaresult,
+                                                     const ColumnPuyoList& complementedPuyos,
+                                                     const TrackResult& trackResult)>;
     typedef TrackedRensaCallback<RensaChainTrackResult> TrackedPossibleRensaCallback;
     typedef TrackedRensaCallback<RensaCoefResult> CoefPossibleRensaCallback;
     typedef TrackedRensaCallback<RensaVanishingPositionResult> VanishingPositionPossibleRensaCallback;
