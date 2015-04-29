@@ -14,7 +14,7 @@ public:
     typedef std::function<void (const CoreField& fieldAfterRensa,
                                 const RensaResult& rensaResult,
                                 const ColumnPuyoList& puyosToComplement,
-                                PuyoColor firePuyosColor,
+                                PuyoColor firePuyoColor,
                                 const RensaChainTrackResult& chainTrackResult,
                                 const std::string& patternName,
                                 double patternScore)> Callback;
