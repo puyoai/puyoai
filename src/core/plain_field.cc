@@ -25,7 +25,7 @@ PlainField::PlainField(const string& url)
         int x = 6 - (counter % 6);
         int y = counter / 6 + 1;
         PuyoColor c = toPuyoColor(url[i]);
-        unsafeSet(x, y, c);
+        setColor(x, y, c);
         counter++;
     }
 }
@@ -35,21 +35,21 @@ void PlainField::initialize()
     // Initialize field information.
     for (int x = 0; x < MAP_WIDTH; ++x) {
         for (int y = 0; y < MAP_HEIGHT; ++y)
-            unsafeSet(x, y, PuyoColor::EMPTY);
+            setColor(x, y, PuyoColor::EMPTY);
     }
 
     for (int x = 0; x < MAP_WIDTH; ++x) {
-        unsafeSet(x, 0, PuyoColor::WALL);
-        unsafeSet(x, MAP_HEIGHT - 1, PuyoColor::WALL);
+        setColor(x, 0, PuyoColor::WALL);
+        setColor(x, MAP_HEIGHT - 1, PuyoColor::WALL);
     }
 
     for (int y = 0; y < MAP_HEIGHT; ++y) {
-        unsafeSet(0, y, PuyoColor::WALL);
-        unsafeSet(MAP_WIDTH - 1, y, PuyoColor::WALL);
+        setColor(0, y, PuyoColor::WALL);
+        setColor(MAP_WIDTH - 1, y, PuyoColor::WALL);
     }
 }
 
-bool PlainField::isZenkeshiPrecise() const
+bool PlainField::isZenkeshi() const
 {
     for (int x = 1; x <= WIDTH; ++x) {
         for (int y = 1; y <= 13; ++y) {
@@ -68,10 +68,10 @@ void PlainField::drop()
         for (int y = 1; y <= 13; ++y) {
             if (isEmpty(x, y))
                 continue;
-            unsafeSet(x, h++, color(x, y));
+            setColor(x, h++, color(x, y));
         }
         for (; h <= 13; ++h) {
-            unsafeSet(x, h, PuyoColor::EMPTY);
+            setColor(x, h, PuyoColor::EMPTY);
         }
     }
 }
@@ -114,7 +114,7 @@ Position* PlainField::fillSameColorPosition(int x, int y, PuyoColor c,
     return writeHead;
 }
 
-int PlainField::vanishSlow(int currentChain)
+int PlainField::vanish(int currentChain)
 {
     FieldChecker checked;
     Position eraseQueue[WIDTH * HEIGHT]; // All the positions of erased puyos will be stored here.
@@ -159,24 +159,24 @@ int PlainField::vanishSlow(int currentChain)
         int x = head->x;
         int y = head->y;
 
-        unsafeSet(x, y, PuyoColor::EMPTY);
+        setColor(x, y, PuyoColor::EMPTY);
 
         // Check OJAMA puyos erased
         if (color(x + 1, y) == PuyoColor::OJAMA) {
-            unsafeSet(x + 1, y, PuyoColor::EMPTY);
+            setColor(x + 1, y, PuyoColor::EMPTY);
         }
 
         if (color(x - 1, y) == PuyoColor::OJAMA) {
-            unsafeSet(x - 1, y, PuyoColor::EMPTY);
+            setColor(x - 1, y, PuyoColor::EMPTY);
         }
 
         // We don't need to update minHeights here.
         if (color(x, y + 1) == PuyoColor::OJAMA && y + 1 <= HEIGHT) {
-            unsafeSet(x, y + 1, PuyoColor::EMPTY);
+            setColor(x, y + 1, PuyoColor::EMPTY);
         }
 
         if (color(x, y - 1) == PuyoColor::OJAMA) {
-            unsafeSet(x, y - 1, PuyoColor::EMPTY);
+            setColor(x, y - 1, PuyoColor::EMPTY);
         }
     }
 

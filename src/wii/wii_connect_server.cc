@@ -298,7 +298,7 @@ FrameRequest WiiConnectServer::makeFrameRequestFor(int playerId, int frameId, co
 
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
-                pfr.field.unsafeSet(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
+                pfr.field.setColor(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
             }
         }
 
@@ -356,7 +356,7 @@ GameState WiiConnectServer::toGameState(int frameId, const AnalyzerResult& analy
 
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
-                pgs->field.unsafeSet(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
+                pgs->field.setColor(x, y, toPuyoColor(pr->adjustedField.field.get(x, y)));
             }
         }
 

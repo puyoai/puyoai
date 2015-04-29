@@ -231,7 +231,7 @@ public:
     }
 
 private:
-    void unsafeSet(int x, int y, PuyoColor c) { field_.unsafeSet(x, y, c); }
+    void unsafeSet(int x, int y, PuyoColor c) { field_.setColor(x, y, c); }
 
     // Vanishes connected puyos and returns score. If score is 0, no puyos are vanished.
     template<typename Tracker>
