@@ -34,8 +34,8 @@ string GameState::toJson() const
         if (playerGameState_[i].playable) {
             const KumipuyoPos& pos = playerGameState_[i].kumipuyoPos;
             const Kumipuyo& kp = playerGameState_[i].kumipuyoSeq.front();
-            f[i].unsafeSet(pos.axisX(), pos.axisY(), kp.axis);
-            f[i].unsafeSet(pos.childX(), pos.childY(), kp.child);
+            f[i].setColor(pos.axisX(), pos.axisY(), kp.axis);
+            f[i].setColor(pos.childX(), pos.childY(), kp.child);
         }
     }
 
@@ -63,8 +63,8 @@ string GameState::toDebugString() const
         if (playerGameState_[i].playable) {
             const KumipuyoPos& pos = playerGameState_[i].kumipuyoPos;
             const Kumipuyo& kp = playerGameState_[i].kumipuyoSeq.front();
-            f[i].unsafeSet(pos.axisX(), pos.axisY(), kp.axis);
-            f[i].unsafeSet(pos.childX(), pos.childY(), kp.child);
+            f[i].setColor(pos.axisX(), pos.axisY(), kp.axis);
+            f[i].setColor(pos.childX(), pos.childY(), kp.child);
         }
     }
 

@@ -110,8 +110,8 @@ bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
         ++score_;
 
     if (kms_.grounded) {
-        field_.unsafeSet(kms_.pos.axisX(), kms_.pos.axisY(), kumipuyoSeq_.axis(0));
-        field_.unsafeSet(kms_.pos.childX(), kms_.pos.childY(), kumipuyoSeq_.child(0));
+        field_.setColor(kms_.pos.axisX(), kms_.pos.axisY(), kumipuyoSeq_.axis(0));
+        field_.setColor(kms_.pos.childX(), kms_.pos.childY(), kumipuyoSeq_.child(0));
         playable_ = false;
         userEvent_.grounded = true;
         dropVelocity_ = INITIAL_DROP_VELOCITY;
@@ -177,7 +177,7 @@ bool FieldRealtime::onStateVanish(FrameContext* context)
     // After ojama is calculated, we add ZENKESHI score,
     // because score for ZENKESHI is added, but not used for ojama calculation.
     hasZenkeshi_ = false;
-    if (field_.isZenkeshiPrecise()) {
+    if (field_.isZenkeshi()) {
         score_ += ZENKESHI_BONUS;
         hasZenkeshi_ = true;
     }
@@ -221,7 +221,7 @@ bool FieldRealtime::onStateOjamaDropping()
         for (int i = 0; i < 6; i++) {
             if (ojama_position_[i] > 0) {
                 if (field_.color(i + 1, 13) == PuyoColor::EMPTY) {
-                    field_.unsafeSet(i + 1, 13, PuyoColor::OJAMA);
+                    field_.setColor(i + 1, 13, PuyoColor::OJAMA);
                     ojama_position_[i]--;
                 }
             }
@@ -337,7 +337,7 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
 
 int FieldRealtime::vanish(int currentChain)
 {
-    return field_.vanishSlow(currentChain);
+    return field_.vanish(currentChain);
 }
 
 bool FieldRealtime::drop1Frame()
@@ -364,8 +364,8 @@ bool FieldRealtime::drop1Frame()
             if (field_.color(x, y + 1) != PuyoColor::EMPTY) {
                 stillDropping = true;
                 if (needToDrop) {
-                    field_.unsafeSet(x, y, field_.color(x, y + 1));
-                    field_.unsafeSet(x, y + 1, PuyoColor::EMPTY);
+                    field_.setColor(x, y, field_.color(x, y + 1));
+                    field_.setColor(x, y + 1, PuyoColor::EMPTY);
                 }
             }
         }
