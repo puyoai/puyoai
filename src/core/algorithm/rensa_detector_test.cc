@@ -832,3 +832,33 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_DontCrash)
     };
     RensaDetector::iteratePossibleRensasIteratively(f, 2, RensaDetectorStrategy::defaultDropStrategy(), callback);
 }
+
+TEST(RensaDetectorTest, complementKeyPuyos)
+{
+    CoreField original("...RRR");
+
+    CoreField expected[] {
+        CoreField("...RRR"),
+        CoreField("..BRRR"),
+        CoreField("..YRRR"),
+        CoreField("..GRRR"),
+        CoreField("R..RRR")
+    };
+    bool found[ARRAY_SIZE(expected)] {};
+
+    auto callback = [&original, &expected, &found](const CoreField& cf, const ColumnPuyoList& cpl) {
+        for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
+            if (cf == expected[i]) {
+                found[i] = true;
+                CoreField f(original);
+                EXPECT_TRUE(f.dropPuyoList(cpl));
+                EXPECT_EQ(f, expected[i]);
+            }
+        }
+    };
+    RensaDetector::complementKeyPuyos(original, RensaDetectorStrategy::defaultDropStrategy(), 1, callback);
+
+    for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
+        EXPECT_TRUE(found[i]);
+    }
+}

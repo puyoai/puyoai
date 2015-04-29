@@ -529,7 +529,6 @@ void RensaDetector::iteratePossibleRensas(const CoreField& originalField,
                                           const RensaDetector::RensaCallback& callback)
 {
     const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-
     auto cb = [&originalContext, &callback](CoreField* cf, const ColumnPuyoList& cpl) {
         CoreField::SimulationContext context(originalContext);
         RensaResult rensaResult = cf->simulate(&context);

@@ -23,6 +23,9 @@ enum class PurposeForFindingRensa {
 // TODO(mayah): Simplify this class.
 class RensaDetector {
 public:
+    typedef std::function<void (const CoreField& complementedField,
+                                const ColumnPuyoList& complementedColumnPuyoList)> ComplementCallback;
+
     typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
     typedef std::function<void (const CoreField&,
                                 const RensaResult&,
@@ -68,6 +71,16 @@ public:
                                                                    const RensaDetectorStrategy&,
                                                                    const VanishingPositionPossibleRensaCallback&);
 
+    // Complements at most |maxKeyPuyos| key puyos.
+    // Callback is void callback(const CoreField&, const ColumnPuyoList&).
+    // The complemented field and complemented ColumnPuyoList are passed.
+    // Any puyo won't be erased when key puyos are complemented.
+    template<typename Callback>
+    static void complementKeyPuyos(const CoreField&,
+                                   const RensaDetectorStrategy& strategy,
+                                   int maxKeyPuyos,
+                                   Callback callback);
+
     // Finds a rensa from CoreField. TrackedPossibleRensaCallback is called for all detected rensas.
     // Algorithm is like the following (not accurate):
     // 1. Vanish puyos from CoreField.
@@ -80,11 +93,23 @@ public:
                                                  const RensaDetectorStrategy&,
                                                  const TrackedPossibleRensaCallback&);
 
+
     static void makeProhibitArray(const RensaResult&,
                                   const RensaChainTrackResult&,
                                   const CoreField& originalField,
                                   const ColumnPuyoList& firePuyos,
                                   bool prohibits[FieldConstant::MAP_WIDTH]);
+
+private:
+    template<typename Callback>
+    static void complementKeyPuyosInternal(CoreField& currentField,
+                                           ColumnPuyoList& currentKeyPuyos,
+                                           const RensaDetectorStrategy& strategy,
+                                           int leftX,
+                                           int restAdded,
+                                           Callback callback);
 };
 
-#endif
+#include "core/algorithm/rensa_detector_inl.h"
+
+#endif // CORE_ALGORITHM_RENSA_DETECTOR_H_
