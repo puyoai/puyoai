@@ -54,6 +54,12 @@ MovieSource::MovieSource(const char* filename) :
         return;
     }
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55, 28, 1)
+    // av_frame_alloc is introduced lavc 55.28.1
+    // In such env, using avcodec_alloc_frame() will show deprecated warning.
+    // However, on Ubuntu 14.04, av_frame_alloc() is not defined yet.
+    // c.f. http://stackoverflow.com/questions/24057248/ffmpeg-undefined-references-to-av-frame-alloc
+
     frame_ = av_frame_alloc();
     if (frame_ == NULL) {
         fprintf(stderr, "Couldn't allocate frame memory\n");
@@ -65,6 +71,19 @@ MovieSource::MovieSource(const char* filename) :
         fprintf(stderr, "Couldn't allocate frame_rgb memory\n");
         return;
     }
+#else
+    frame_ = avcodec_alloc_frame();
+    if (frame_ == NULL) {
+        fprintf(stderr, "Couldn't allocate frame memory\n");
+        return;
+    }
+
+    frame_rgb_ = avcodec_alloc_frame();
+    if (frame_rgb_ == NULL) {
+        fprintf(stderr, "Couldn't allocate frame_rgb memory\n");
+        return;
+    }
+#endif
 
     int buf_len = avpicture_get_size(PIX_FMT_RGB24, width_, height_);
     uint8_t* buffer = (uint8_t*)calloc(sizeof(uint8_t), buf_len);
