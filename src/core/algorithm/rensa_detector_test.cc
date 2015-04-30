@@ -52,10 +52,10 @@ TEST(RensaDetectorTest, detect1)
 
     bool found[5] {};
     bool unexpectedFound = false;
-    auto callback = [&](CoreField* cf, const ColumnPuyoList& firePuyos) {
+    auto callback = [&](const CoreField& complementedField, const ColumnPuyoList& firePuyos) {
         bool ok = false;
         for (int i = 0; i < 5; ++i) {
-            if (expected[i].first == *cf && expected[i].second == firePuyos) {
+            if (expected[i].first == complementedField && expected[i].second == firePuyos) {
                 found[i] = true;
                 ok = true;
                 break;

@@ -129,12 +129,15 @@ void makeProhibitArrayForExtend(const RensaResult& /*rensaResult*/, const RensaC
 static inline
 void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
                  PurposeForFindingRensa purpose, int maxComplementPuyos, int maxPuyoHeight,
-                 const RensaDetector::SimulationCallback& callback)
+                 const RensaDetector::ComplementCallback& callback)
 {
-    bool visited[CoreField::MAP_WIDTH][NUM_PUYO_COLORS] {};
+    bool visited[FieldConstant::MAP_WIDTH][NUM_PUYO_COLORS] {};
+    CoreField cf(originalField);
 
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         for (int y = originalField.height(x); y >= 1; --y) {
+            // Here, cf must be same as originalField.
+            DCHECK_EQ(originalField, cf);
             PuyoColor c = originalField.color(x, y);
 
             if (!isNormalColor(c))
@@ -171,12 +174,11 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 
                 visited[x + d][ordinal(c)] = true;
 
-                CoreField f(originalField);
                 int necessaryPuyos = 0;
 
                 bool ok = true;
                 while (true) {
-                    if (!f.dropPuyoOnWithMaxHeight(x + d, c, maxPuyoHeight)) {
+                    if (!cf.dropPuyoOnWithMaxHeight(x + d, c, maxPuyoHeight)) {
                         ok = false;
                         break;
                     }
@@ -187,18 +189,23 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                         ok = false;
                         break;
                     }
-                    if (f.countConnectedPuyosMax4(x + d, f.height(x + d)) >= 4)
+                    if (cf.countConnectedPuyosMax4(x + d, cf.height(x + d)) >= 4)
                         break;
                 }
 
-                if (!ok)
+                if (!ok) {
+                    cf.removePuyoFrom(x + d, necessaryPuyos);
                     continue;
+                }
 
                 ColumnPuyoList cpl;
-                if (!cpl.add(x + d, c, necessaryPuyos))
+                if (!cpl.add(x + d, c, necessaryPuyos)) {
+                    cf.removePuyoFrom(x + d, necessaryPuyos);
                     continue;
+                }
 
-                callback(&f, cpl);
+                callback(cf, cpl);
+                cf.removePuyoFrom(x + d, necessaryPuyos);
             }
         }
     }
@@ -207,10 +214,14 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
 static inline
 void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
                   int maxComplementPuyos, int maxPuyoHeight,
-                  const RensaDetector::SimulationCallback& callback)
+                  const RensaDetector::ComplementCallback& callback)
 {
+    CoreField cf(originalField);
+
     for (int x = 1; x <= CoreField::WIDTH; ++x) {
         for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
+            DCHECK_EQ(cf, originalField);
+
             PuyoColor c = originalField.color(x, y);
 
             DCHECK_NE(c, PuyoColor::EMPTY);
@@ -231,37 +242,43 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                     continue;
 
                 int restPuyos = necessaryPuyos;
-                CoreField f(originalField);
                 ColumnPuyoList cpl;
 
                 bool ok = true;
-                while (f.height(dx) + restPuyos < y) {
-                    if (!f.dropPuyoOnWithMaxHeight(dx, PuyoColor::OJAMA, maxPuyoHeight)) {
+                while (cf.height(dx) + restPuyos < y) {
+                    if (!cf.dropPuyoOnWithMaxHeight(dx, PuyoColor::OJAMA, maxPuyoHeight)) {
                         ok = false;
                         break;
                     }
                     if (!cpl.add(dx, PuyoColor::OJAMA)) {
                         ok = false;
+                        cf.removePuyoFrom(dx);
                         break;
                     }
                 }
-                if (!ok)
+                if (!ok) {
+                    cf.removePuyoFrom(dx, cpl.sizeOn(dx));
                     continue;
+                }
 
                 while (restPuyos-- > 0) {
-                    if (!f.dropPuyoOnWithMaxHeight(dx, c, maxPuyoHeight)) {
+                    if (!cf.dropPuyoOnWithMaxHeight(dx, c, maxPuyoHeight)) {
                         ok = false;
                         break;
                     }
                     if (!cpl.add(dx, c)) {
                         ok = false;
+                        cf.removePuyoFrom(dx);
                         break;
                     }
                 }
-                if (!ok)
+                if (!ok) {
+                    cf.removePuyoFrom(dx, cpl.sizeOn(dx));
                     continue;
+                }
 
-                callback(&f, cpl);
+                callback(cf, cpl);
+                cf.removePuyoFrom(dx, cpl.sizeOn(dx));
             }
         }
     }
@@ -270,14 +287,17 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
 static inline
 void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
                    int maxComplementPuyos, int maxPuyoHeight,
-                   const RensaDetector::SimulationCallback& callback)
+                   const RensaDetector::ComplementCallback& callback)
 {
     FieldChecker checked;
+    CoreField cf(originalField);
     Position positions[FieldConstant::HEIGHT * FieldConstant::WIDTH];
     int working[FieldConstant::HEIGHT * FieldConstant::WIDTH];
 
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
+            DCHECK_EQ(cf, originalField);
+
             PuyoColor c = originalField.color(x, y);
             if (!isNormalColor(c))
                 continue;
@@ -303,7 +323,6 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     if (!ok)
                         continue;
 
-                    CoreField cf(originalField);
                     ColumnPuyoList cpl;
                     for (int j = 0; j < 3; ++j) {
                         int xx = origin.x + EXTENTIONS[i][j][0];
@@ -323,16 +342,25 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                             ok = false;
                             break;
                         }
-                        cpl.add(xx, c);
+                        if (!cpl.add(xx, c)) {
+                            cf.removePuyoFrom(xx);
+                            ok = false;
+                            break;
+                        }
                     }
 
-                    if (!ok)
+                    if (!ok) {
+                        cf.remove(cpl);
                         continue;
+                    }
 
-                    if (maxComplementPuyos < cpl.size())
+                    if (maxComplementPuyos < cpl.size()) {
+                        cf.remove(cpl);
                         continue;
+                    }
 
-                    callback(&cf, cpl);
+                    callback(cf, cpl);
+                    cf.remove(cpl);
                 }
                 break;
             }
@@ -363,7 +391,6 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     if (!ok)
                         continue;
 
-                    CoreField cf(originalField);
                     ColumnPuyoList cpl;
                     for (int j = 0; j < 3; ++j) {
                         int xx = origin.x + EXTENTIONS[i][j][0];
@@ -383,16 +410,24 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                             ok = false;
                             break;
                         }
-                        cpl.add(xx, c);
+                        if (!cpl.add(xx, c)) {
+                            ok = false;
+                            break;
+                        }
                     }
 
-                    if (maxComplementPuyos < cpl.size())
+                    if (!ok) {
+                        cf.remove(cpl);
                         continue;
+                    }
 
-                    if (!ok)
+                    if (maxComplementPuyos < cpl.size()) {
+                        cf.remove(cpl);
                         continue;
+                    }
 
-                    callback(&cf, cpl);
+                    callback(cf, cpl);
+                    cf.remove(cpl);
                 }
                 break;
             }
@@ -414,15 +449,19 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     int xx = working[i];
                     if (prohibits[xx])
                         continue;
-                    CoreField cf(originalField);
                     if (!cf.dropPuyoOn(xx, c))
                         continue;
-                    if (maxPuyoHeight < cf.height(xx))
+                    if (maxPuyoHeight < cf.height(xx)) {
+                        cf.removePuyoFrom(xx);
                         continue;
+                    }
                     ColumnPuyoList cpl;
-                    if (!cpl.add(working[i], c))
+                    if (!cpl.add(working[i], c)) {
+                        cf.removePuyoFrom(xx);
                         continue;
-                    callback(&cf, cpl);
+                    }
+                    callback(cf, cpl);
+                    cf.removePuyoFrom(xx);
                 }
                 break;
             }
@@ -437,7 +476,7 @@ static inline void findRensas(const CoreField& field,
                               const RensaDetectorStrategy& strategy,
                               const bool prohibits[FieldConstant::MAP_WIDTH],
                               PurposeForFindingRensa purpose,
-                              const RensaDetector::SimulationCallback& callback)
+                              const RensaDetector::ComplementCallback& callback)
 {
     int maxPuyoHeight = 12;
     int complementPuyos;
@@ -473,7 +512,7 @@ void RensaDetector::detect(const CoreField& original,
                            const RensaDetectorStrategy& strategy,
                            PurposeForFindingRensa purpose,
                            const bool prohibits[FieldConstant::MAP_WIDTH],
-                           const RensaDetector::SimulationCallback& callback)
+                           const RensaDetector::ComplementCallback& callback)
 {
     findRensas(original, strategy, prohibits, purpose, callback);
 }
@@ -487,10 +526,10 @@ static void findPossibleRensasInternal(const CoreField& currentField,
                                        const RensaDetectorStrategy& strategy,
                                        const Callback& callback)
 {
-    auto findRensaCallback = [&currentField, &keyPuyos, &callback](CoreField* f, const ColumnPuyoList& firePuyos) {
+    auto findRensaCallback = [&](const CoreField& cf, const ColumnPuyoList& firePuyos) {
         ColumnPuyoList whole(keyPuyos);
         whole.merge(firePuyos);
-        callback(f, whole);
+        callback(cf, whole);
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
@@ -529,11 +568,12 @@ void RensaDetector::iteratePossibleRensas(const CoreField& originalField,
                                           const RensaDetector::RensaCallback& callback)
 {
     const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-    auto cb = [&originalContext, &callback](CoreField* cf, const ColumnPuyoList& cpl) {
+    auto cb = [&originalContext, &callback](const CoreField& complementedField, const ColumnPuyoList& cpl) {
         CoreField::SimulationContext context(originalContext);
-        RensaResult rensaResult = cf->simulate(&context);
+        CoreField cf(complementedField);
+        RensaResult rensaResult = cf.simulate(&context);
         if (rensaResult.chains > 0)
-            callback(*cf, rensaResult, cpl);
+            callback(cf, rensaResult, cpl);
     };
 
     ColumnPuyoList puyoList;
@@ -546,12 +586,13 @@ void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& originalF
                                                       const RensaDetector::TrackedPossibleRensaCallback& callback)
 {
     const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-    auto cb = [&originalContext, &callback](CoreField* cf, const ColumnPuyoList& cpl) {
+    auto cb = [&originalContext, &callback](const CoreField& complementedField, const ColumnPuyoList& cpl) {
         CoreField::SimulationContext context(originalContext);
+        CoreField cf(complementedField);
         RensaChainTracker tracker;
-        RensaResult rensaResult = cf->simulate(&context, &tracker);
+        RensaResult rensaResult = cf.simulate(&context, &tracker);
         if (rensaResult.chains > 0)
-            callback(*cf, rensaResult, cpl, tracker.result());
+            callback(cf, rensaResult, cpl, tracker.result());
     };
 
     ColumnPuyoList puyoList;
@@ -564,12 +605,13 @@ void RensaDetector::iteratePossibleRensasWithCoefTracking(const CoreField& origi
                                                           const RensaDetector::CoefPossibleRensaCallback& callback)
 {
     const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-    auto cb = [&originalContext, &callback](CoreField* cf, const ColumnPuyoList& cpl) {
+    auto cb = [&originalContext, &callback](const CoreField& complementedField, const ColumnPuyoList& cpl) {
         CoreField::SimulationContext context(originalContext);
         RensaCoefTracker tracker;
-        RensaResult rensaResult = cf->simulate(&context, &tracker);
+        CoreField cf(complementedField);
+        RensaResult rensaResult = cf.simulate(&context, &tracker);
         if (rensaResult.chains > 0)
-            callback(*cf, rensaResult, cpl, tracker.result());
+            callback(cf, rensaResult, cpl, tracker.result());
     };
 
     ColumnPuyoList puyoList;
@@ -582,12 +624,13 @@ void RensaDetector::iteratePossibleRensasWithVanishingPositionTracking(const Cor
                                                                        const RensaDetector::VanishingPositionPossibleRensaCallback& callback)
 {
     const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-    auto cb = [&originalContext, &callback](CoreField* cf, const ColumnPuyoList& cpl) {
+    auto cb = [&originalContext, &callback](const CoreField& complementedField, const ColumnPuyoList& cpl) {
         CoreField::SimulationContext context(originalContext);
         RensaVanishingPositionTracker tracker;
-        RensaResult rensaResult = cf->simulate(&context, &tracker);
+        CoreField cf(complementedField);
+        RensaResult rensaResult = cf.simulate(&context, &tracker);
         if (rensaResult.chains > 0)
-            callback(*cf, rensaResult, cpl, tracker.result());
+            callback(cf, rensaResult, cpl, tracker.result());
     };
 
     ColumnPuyoList puyoList;
@@ -611,11 +654,12 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& currentField,
     const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
     const CoreField::SimulationContext currentContext(CoreField::SimulationContext::fromField(currentField));
 
-    auto findRensaCallback = [&](CoreField* fieldComplemented, const ColumnPuyoList& currentFirePuyos) {
+    auto findRensaCallback = [&](const CoreField& fieldComplemented, const ColumnPuyoList& currentFirePuyos) {
         int additionalChains = 0;
         {
             CoreField::SimulationContext context(currentContext);
-            RensaResult rensaResult = fieldComplemented->simulate(&context);
+            CoreField cf(fieldComplemented);
+            RensaResult rensaResult = cf.simulate(&context);
             if (rensaResult.chains == 0)
                 return;
             additionalChains = rensaResult.chains;
@@ -688,15 +732,16 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
 
     const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
 
-    auto findRensaCallback = [&](CoreField* f, const ColumnPuyoList& firePuyos) {
+    auto findRensaCallback = [&](const CoreField& fieldComplemented, const ColumnPuyoList& firePuyos) {
         CoreField::SimulationContext context(originalContext);
         RensaChainTracker tracker;
-        RensaResult rensaResult = f->simulate(&context, &tracker);
+        CoreField cf(fieldComplemented);
+        RensaResult rensaResult = cf.simulate(&context, &tracker);
         if (rensaResult.chains == 0)
             return;
 
         const RensaChainTrackResult& trackResult = tracker.result();
-        callback(*f, rensaResult, firePuyos, trackResult);
+        callback(cf, rensaResult, firePuyos, trackResult);
 
         // Don't put key puyo on the column which fire puyo will be placed.
         bool prohibits[FieldConstant::MAP_WIDTH] {};
@@ -705,7 +750,7 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
         else
             makeProhibitArray(rensaResult, trackResult, originalField, firePuyos, prohibits);
 
-        iteratePossibleRensasIterativelyInternal(*f, originalField, maxIteration - 1,
+        iteratePossibleRensasIterativelyInternal(cf, originalField, maxIteration - 1,
                                                  ColumnPuyoList(), firePuyos, rensaResult.chains, prohibits, strategy, callback);
     };
 
