@@ -115,6 +115,8 @@ public:
     void removePuyoFrom(int x);
     // Removes |n| puyos from top of column |x|.
     void removePuyoFrom(int x, int n);
+    // Removes puyo list.
+    void remove(const ColumnPuyoList&);
 
     // ----------------------------------------------------------------------
     // simulation

@@ -25,11 +25,9 @@ class RensaDetector {
 public:
     typedef std::function<void (const CoreField& complementedField,
                                 const ColumnPuyoList& complementedColumnPuyoList)> ComplementCallback;
-
-    typedef std::function<void (CoreField*, const ColumnPuyoList&)> SimulationCallback;
-    typedef std::function<void (const CoreField&,
-                                const RensaResult&,
-                                const ColumnPuyoList&)> RensaCallback;
+    typedef std::function<void (const CoreField& fieldAfterRensa,
+                                const RensaResult& rensaResult,
+                                const ColumnPuyoList& complementedPuyoList)> RensaCallback;
     template<typename TrackResult>
     using TrackedRensaCallback = std::function<void (const CoreField& fieldAfterRensa,
                                                      const RensaResult& rensaresult,
@@ -46,7 +44,7 @@ public:
                        const RensaDetectorStrategy&,
                        PurposeForFindingRensa,
                        const bool prohibits[FieldConstant::MAP_WIDTH],
-                       const SimulationCallback& callback);
+                       const ComplementCallback& callback);
 
     // TODO(mayah): Consider simplify these methods.
 

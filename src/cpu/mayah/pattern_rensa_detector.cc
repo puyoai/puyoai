@@ -65,7 +65,7 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
     }
 
     // --- Iterate without complementing.
-    auto detectCallback = [&](CoreField* cf, const ColumnPuyoList& cpl) {
+    auto detectCallback = [&](const CoreField& complementedField, const ColumnPuyoList& cpl) {
         if (cpl.isEmpty())
             return;
 
@@ -84,7 +84,7 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
             return;
 
         RensaYPositionTracker tracker;
-        iteratePossibleRensasInternal(*cf, originalContext_, tracker, 0,
+        iteratePossibleRensasInternal(complementedField, originalContext_, tracker, 0,
                                       firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0.0, false);
     };
 
@@ -204,7 +204,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         return;
     if (restIteration <= 0)
         return;
-    auto detectCallback = [&](CoreField* cf2, const ColumnPuyoList& cpl) {
+    auto detectCallback = [&](const CoreField& cf2, const ColumnPuyoList& cpl) {
         if (cpl.size() == 0)
             return;
 
@@ -214,7 +214,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         if (!checkDup(firePuyo, keyPuyos))
             return;
 
-        iteratePossibleRensasInternal(*cf2, context, tracker, currentChains + 1,
+        iteratePossibleRensasInternal(cf2, context, tracker, currentChains + 1,
                                       firePuyo, keyPuyos, restIteration - 1, restUnusedVariables,
                                       patternName, currentPatternScore);
     };
