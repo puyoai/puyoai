@@ -122,7 +122,6 @@ public: // Make this private?
     bool hasDetectedPuyoErase_ = true;
     bool hasSentGrounded_ = true;
     bool hasSentOjamaDropped_ = true;
-    bool hasSentChainFinished_ = true;
     bool nextWillDisappearFast_ = false;
 };
 

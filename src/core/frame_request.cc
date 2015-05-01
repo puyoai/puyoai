@@ -65,7 +65,6 @@ static string formatEvent(const UserEvent& event)
     ss << (event.grounded             ? 'G' : '-');
     ss << (event.decisionRequest      ? 'D' : '-');
     ss << (event.decisionRequestAgain ? 'A' : '-');
-    ss << (event.chainFinished        ? 'C' : '-');
     ss << (event.ojamaDropped         ? 'O' : '-');
     ss << (event.puyoErased           ? 'E' : '-');
     return ss.str();
@@ -80,7 +79,6 @@ static UserEvent parseEvent(const string& s)
         case 'G': event.grounded = true; break;
         case 'D': event.decisionRequest = true; break;
         case 'A': event.decisionRequestAgain = true; break;
-        case 'C': event.chainFinished = true; break;
         case 'O': event.ojamaDropped = true; break;
         case 'E': event.puyoErased = true; break;
         }

@@ -86,7 +86,9 @@ Game::Game(const Game& prev_game, const FrameRequest& request) {
   p[1].expected_ojama = prev_game.p[1].expected_ojama;
   p[1].expected_frame = prev_game.p[1].expected_frame;
   p[1].spent_score = prev_game.p[1].spent_score;
-  if (request.enemyPlayerFrameRequest().event.chainFinished) {
+
+  // TODO(mayah): Is this right?
+  if (request.enemyPlayerFrameRequest().event.decisionRequest) {
     p[1].expected_ojama = 0;
   }
 }

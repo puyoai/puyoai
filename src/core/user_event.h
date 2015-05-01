@@ -12,7 +12,7 @@ struct UserEvent {
 
     bool hasEventState() const
     {
-        return wnextAppeared || grounded || decisionRequest || decisionRequestAgain || chainFinished || ojamaDropped || puyoErased;
+        return wnextAppeared || grounded || decisionRequest || decisionRequestAgain || ojamaDropped || puyoErased;
     }
 
     std::string toString() const;
@@ -21,7 +21,6 @@ struct UserEvent {
     bool grounded = false;
     bool decisionRequest = false;
     bool decisionRequestAgain = false;
-    bool chainFinished = false;
     bool ojamaDropped = false;
     bool puyoErased = false;
 };
