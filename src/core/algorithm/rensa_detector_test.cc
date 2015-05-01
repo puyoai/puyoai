@@ -862,3 +862,46 @@ TEST(RensaDetectorTest, complementKeyPuyos)
         EXPECT_TRUE(found[i]);
     }
 }
+
+TEST(RensaDetectorTest, complementKeyPuyosOn13thRow1)
+{
+    CoreField original;
+    bool called = false;
+    auto callback = [&called](const CoreField& cf, const ColumnPuyoList& cpl) {
+        called = true;
+        EXPECT_EQ(CoreField(), cf);
+        EXPECT_EQ(0, cpl.size());
+    };
+
+    bool allowsComplements[FieldConstant::MAP_WIDTH];
+    std::fill(allowsComplements, allowsComplements + FieldConstant::MAP_WIDTH, true);
+    RensaDetector::complementKeyPuyosOn13thRow(original, allowsComplements, callback);
+    EXPECT_TRUE(called);
+}
+
+TEST(RensaDetectorTest, complementKeyPuyosOn13thRow2)
+{
+    CoreField original(
+        "OO.OOO" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    int numCalled = 0;
+    auto callback = [&numCalled](const CoreField& /*cf*/, const ColumnPuyoList& /*cpl*/) {
+        ++numCalled;
+    };
+
+    bool allowsComplements[FieldConstant::MAP_WIDTH];
+    std::fill(allowsComplements, allowsComplements + FieldConstant::MAP_WIDTH, true);
+    RensaDetector::complementKeyPuyosOn13thRow(original, allowsComplements, callback);
+    EXPECT_EQ(5 * 5 * 5 * 5 * 5, numCalled);
+}
