@@ -87,15 +87,19 @@ protected:
 
     void decisionRequestedForMe(const FrameRequest&);
     void decisionRequestedForEnemy(const FrameRequest&);
+    static void decisionRequestedForCommon(PlayerState* p1, PlayerState* p2);
 
     void groundedForMe(const FrameRequest&);
     void groundedForEnemy(const FrameRequest&);
+    static void groundedForCommon(PlayerState* p1, PlayerState* p2, int frameId, const PlainField&);
 
     void ojamaDroppedForMe(const FrameRequest&);
     void ojamaDroppedForEnemy(const FrameRequest&);
+    static void ojamaDroppedForCommon(PlayerState*);
 
     void next2AppearedForMe(const FrameRequest&);
     void next2AppearedForEnemy(const FrameRequest&);
+    static void next2AppearedForCommon(PlayerState*, const KumipuyoSeq&);
 
     const PlayerState& myPlayerState() const { return me_; }
     const PlayerState& enemyPlayerState() const { return enemy_; }
