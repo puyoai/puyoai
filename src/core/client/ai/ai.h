@@ -21,6 +21,9 @@ public:
 
     void runLoop();
 
+    // Set AI's behavior. If true, you can rethink next decision when the enemy has started his rensa.
+    void setBehaviorRethinkAfterOpponentRensa(bool flag) { behaviorRethinkAfterOpponentRensa_ = flag; }
+
 protected:
     AI(int argc, char* argv[], const std::string& name);
     explicit AI(const std::string& name);
@@ -46,11 +49,6 @@ protected:
     // Since gaze might be called in the same frame as think(), you shouldn't consume
     // much time for gaze.
     virtual void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&);
-
-    // Set AI's behavior.
-    void setBehaviorDefensive(bool flag) { behaviorDefensive_ = flag; }
-    // Set AI's behavior. If true, you can rethink next decision when the enemy has started his rensa.
-    void setBehaviorRethinkAfterOpponentRensa(bool flag) { behaviorRethinkAfterOpponentRensa_ = flag; }
 
     // These callbacks will be called from the corresponding method.
     // i.e. onXXX() will be called from XXX().
@@ -96,7 +94,6 @@ protected:
     const PlayerState& myPlayerState() const { return me_; }
     const EnemyState& enemyPlayerState() const { return enemy_; }
 
-protected:
     PlayerState* mutableMyPlayerState() { return &me_; }
     EnemyState* mutableEnemyPlayerState() { return &enemy_; }
 
@@ -119,7 +116,6 @@ private:
     PlayerState me_;
     EnemyState enemy_;
 
-    bool behaviorDefensive_;
     bool behaviorRethinkAfterOpponentRensa_;
 };
 
