@@ -75,9 +75,21 @@ public:
     // Any puyo won't be erased when key puyos are complemented.
     template<typename Callback>
     static void complementKeyPuyos(const CoreField&,
-                                   const RensaDetectorStrategy& strategy,
+                                   const RensaDetectorStrategy&,
                                    int maxKeyPuyos,
-                                   Callback callback);
+                                   Callback);
+
+    // Complements at most |maxKeyPuyos| key puyos.
+    // Also, complements fire puyos.
+    // The complemented field and complemented ColumnPuyoList are passed.
+    // Any puyo won't be erased when key puyos are complemented.
+    // You need to fire your rensa.
+    // Callback should be convertible to ComplementCallback.
+    template<typename Callback>
+    static void detectWithAddingKeyPuyos(const CoreField&,
+                                         const RensaDetectorStrategy&,
+                                         int maxKeyPuyos,
+                                         Callback);
 
     // Finds a rensa from CoreField. TrackedPossibleRensaCallback is called for all detected rensas.
     // Algorithm is like the following (not accurate):

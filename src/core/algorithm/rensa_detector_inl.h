@@ -59,4 +59,25 @@ void RensaDetector::complementKeyPuyosInternal(CoreField& currentField,
     }
 }
 
+// static
+template<typename Callback>
+void RensaDetector::detectWithAddingKeyPuyos(const CoreField& originalField,
+                                             const RensaDetectorStrategy& strategy,
+                                             int maxKeyPuyos,
+                                             Callback callback)
+{
+    const bool prohibits[FieldConstant::MAP_WIDTH] {};
+    auto complementCallback = [&](const CoreField& complementedField, const ColumnPuyoList& keyPuyos) {
+        auto detectionCallback = [&](const CoreField& wholeComplementedField, const ColumnPuyoList& firePuyos) {
+            ColumnPuyoList cpl(keyPuyos);
+            if (!cpl.merge(firePuyos))
+                return;
+
+            callback(wholeComplementedField, cpl);
+        };
+        detect(complementedField, strategy, PurposeForFindingRensa::FOR_FIRE, prohibits, detectionCallback);
+    };
+    complementKeyPuyos(originalField, strategy, maxKeyPuyos, complementCallback);
+}
+
 #endif // CORE_ALGORITHM_RENSA_DETECTOR_INL_H_
