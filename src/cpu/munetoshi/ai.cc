@@ -95,7 +95,7 @@ DropDecision munetoshi::AI::think_internal(
             DropDecision(best_chain_decision, message);
 }
 
-void munetoshi::AI::onEnemyGrounded(const FrameRequest& frame) {
+void munetoshi::AI::onGroundedForEnemy(const FrameRequest& frame) {
     CoreField field(CoreField::fromPlainFieldWithDrop(frame.enemyPlayerFrameRequest().field));
 
     if (field.simulate().chains > 1) {

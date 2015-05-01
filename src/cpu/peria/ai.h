@@ -24,7 +24,7 @@ class Ai : public ::AI {
                              const PlayerState& enemy,
                              bool fast) const override;
   virtual void onGameWillBegin(const FrameRequest& frame_request) override;
-  virtual void onEnemyGrounded(const FrameRequest& frame_request) override;
+  virtual void onGroundedForEnemy(const FrameRequest& frame_request) override;
 
   // Callback function to evaluate a controled state.
   static void EvaluatePlan(const RefPlan& plan,

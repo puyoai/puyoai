@@ -37,8 +37,8 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
         ai_->gaze(req.frameId, CoreField(req.enemyPlayerFrameRequest().field), req.enemyPlayerFrameRequest().kumipuyoSeq);
 
         // think
-        ai_->next2Appeared(req);
-        ai_->decisionRequested(req);
+        ai_->next2AppearedForMe(req);
+        ai_->decisionRequestedForMe(req);
 
         DropDecision dropDecision = ai_->think(req.frameId,
                                                CoreField(req.myPlayerFrameRequest().field),
@@ -101,7 +101,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
         // Update the current field.
         ai_->me_.field = f;
 
-        ai_->grounded(req);
+        ai_->groundedForMe(req);
     }
 
     return EndlessResult {

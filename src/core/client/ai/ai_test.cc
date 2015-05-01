@@ -13,10 +13,10 @@ public:
     virtual ~TestAI() {}
 
     using AI::gameWillBegin;
-    using AI::decisionRequested;
-    using AI::grounded;
-    using AI::enemyGrounded;
-    using AI::enemyDecisionRequested;
+    using AI::decisionRequestedForMe;
+    using AI::groundedForMe;
+    using AI::groundedForEnemy;
+    using AI::decisionRequestedForEnemy;
 
 protected:
     virtual DropDecision think(int, const CoreField&, const KumipuyoSeq&,
@@ -60,44 +60,44 @@ TEST_F(AITest, zenkeshi)
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 2;
-    ai_.decisionRequested(req);
-    ai_.enemyDecisionRequested(req);
+    ai_.decisionRequestedForMe(req);
+    ai_.decisionRequestedForEnemy(req);
     EXPECT_FALSE(myPlayerState().hasZenkeshi);
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 3;
     req.playerFrameRequest[0].field = CoreField("  RR  ");
     req.playerFrameRequest[1].field = CoreField("  RR  ");
-    ai_.grounded(req);
-    ai_.enemyGrounded(req);
+    ai_.groundedForMe(req);
+    ai_.groundedForEnemy(req);
     EXPECT_FALSE(myPlayerState().hasZenkeshi);
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 4;
-    ai_.decisionRequested(req);
-    ai_.enemyDecisionRequested(req);
+    ai_.decisionRequestedForMe(req);
+    ai_.decisionRequestedForEnemy(req);
     EXPECT_FALSE(myPlayerState().hasZenkeshi);
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 5;
     req.playerFrameRequest[0].field = CoreField("  RRRR");
     req.playerFrameRequest[1].field = CoreField("  RRRR");
-    ai_.grounded(req);
-    ai_.enemyGrounded(req);
+    ai_.groundedForMe(req);
+    ai_.groundedForEnemy(req);
     EXPECT_TRUE(myPlayerState().hasZenkeshi);
     EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 6;
-    ai_.decisionRequested(req);
-    ai_.enemyDecisionRequested(req);
+    ai_.decisionRequestedForMe(req);
+    ai_.decisionRequestedForEnemy(req);
     EXPECT_TRUE(myPlayerState().hasZenkeshi);
     EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 7;
     req.playerFrameRequest[0].field = CoreField(" BRRRR");
     req.playerFrameRequest[1].field = CoreField(" BRRRR");
-    ai_.grounded(req);
-    ai_.enemyGrounded(req);
+    ai_.groundedForMe(req);
+    ai_.groundedForEnemy(req);
     EXPECT_FALSE(myPlayerState().hasZenkeshi);
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 }
@@ -117,8 +117,8 @@ TEST_F(AITest, ojamaCount)
     EXPECT_EQ(0, enemyPlayerState().pendingOjama);
 
     req.frameId = 2;
-    ai_.decisionRequested(req);
-    ai_.enemyDecisionRequested(req);
+    ai_.decisionRequestedForMe(req);
+    ai_.decisionRequestedForEnemy(req);
     EXPECT_EQ(0, myPlayerState().fixedOjama);
     EXPECT_EQ(0, myPlayerState().pendingOjama);
     EXPECT_EQ(0, enemyPlayerState().fixedOjama);
@@ -130,7 +130,7 @@ TEST_F(AITest, ojamaCount)
         "BRBR  "
         "BRBR  "
         "BRBRR ");
-    ai_.grounded(req);
+    ai_.groundedForMe(req);
     EXPECT_EQ(0, myPlayerState().fixedOjama);
     EXPECT_EQ(0, myPlayerState().pendingOjama);
     EXPECT_EQ(0, enemyPlayerState().fixedOjama);
@@ -142,7 +142,7 @@ TEST_F(AITest, ojamaCount)
         "BRBRB "
         "BRBRB "
         "BRBRBB");
-    ai_.enemyGrounded(req);
+    ai_.groundedForEnemy(req);
     EXPECT_EQ(0, myPlayerState().fixedOjama);
     EXPECT_EQ(37, myPlayerState().pendingOjama);
     EXPECT_EQ(0, enemyPlayerState().fixedOjama);
@@ -152,7 +152,7 @@ TEST_F(AITest, ojamaCount)
     req.playerFrameRequest[0].field = CoreField("R     ");
     req.playerFrameRequest[1].field = CoreField(" B    ");
     // don't call ai_.decisionRequested(req); here.
-    ai_.enemyDecisionRequested(req);
+    ai_.decisionRequestedForEnemy(req);
     EXPECT_EQ(37, myPlayerState().fixedOjama);
     EXPECT_EQ(0, myPlayerState().pendingOjama);
     EXPECT_EQ(0, enemyPlayerState().fixedOjama);
