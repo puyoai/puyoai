@@ -28,16 +28,18 @@ protected:
     AI(int argc, char* argv[], const std::string& name);
     explicit AI(const std::string& name);
 
-    // |think| will be called when AI should decide the next decision.
+    // think will be called when AI should decide the next decision.
     // Basically, this will be called when NEXT2 has appeared.
+    // |frameId| is the frameId that you will get to start moving your puyo.
+    // In other words, it's a kind of 'frameInitiated'.
     // |fast| will be true when AI should decide the next decision immeidately,
     // e.g. ojamas are dropped or the enemy has fired some rensa
-    // (if you set behavior). This might be called when field is inconsistent
+    // (if you set behavior). This might be also called when field is inconsistent
     // in wii_server.
     // If |fast| is true, you will have 30 ms to decide your hand.
     // Otherwise, you will have at least 300 ms to decide your hand.
-    // KumipuyoSeq will have at least 2 kumipuyos. When we know more Kumipuyo sequence,
-    // it might contain more.
+    // |KumipuyoSeq| will have at least 2 kumipuyos. When we know more Kumipuyo sequence,
+    // it might contain more. It's up to you if you will use >=3 kumipuyos.
     virtual DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
                                const PlayerState& me, const PlayerState& enemy, bool fast) const = 0;
 
@@ -51,13 +53,15 @@ protected:
     virtual void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&);
 
     // These callbacks will be called from the corresponding method.
-    // i.e. onXXX() will be called from XXX().
+    // i.e. onX() will be called from X().
     virtual void onGameWillBegin(const FrameRequest&) {}
     virtual void onGameHasEnded(const FrameRequest&) {}
+
     virtual void onDecisionRequested(const FrameRequest&) {}
     virtual void onGrounded(const FrameRequest&) {}
     virtual void onOjamaDropped(const FrameRequest&) {}
     virtual void onNext2Appeared(const FrameRequest&) {}
+
     virtual void onEnemyDecisionRequested(const FrameRequest&) {}
     virtual void onEnemyGrounded(const FrameRequest&) {}
     virtual void onEnemyOjamaDropped(const FrameRequest&) {}
