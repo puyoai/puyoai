@@ -245,186 +245,127 @@ void AI::gameHasEnded(const FrameRequest& frameRequest)
 
 void AI::decisionRequestedForMe(const FrameRequest& frameRequest)
 {
+    // Don't update me_.field here. Our field will be updated in runLoop().
     me_.hand += 1;
 
-    // our field will be updated in runLoop().
-
-    if (enemy_.pendingOjama > 0) {
-        enemy_.fixedOjama += enemy_.pendingOjama;
-        enemy_.pendingOjama = 0;
-    }
-
-    me_.isRensaOngoing = false;
-    me_.finishingRensaFrameId = 0;
-    me_.ongoingRensaResult = RensaResult();
-
-    if (!me_.hasOjamaDropped)
-        me_.fixedOjama = 0;
-    me_.hasOjamaDropped = false;
-
+    decisionRequestedForCommon(&me_, &enemy_);
     onDecisionRequestedForMe(frameRequest);
-}
-
-void AI::groundedForMe(const FrameRequest& frameRequest)
-{
-    CoreField field(CoreField::fromPlainFieldWithDrop(frameRequest.myPlayerFrameRequest().field));
-    RensaResult rensaResult = field.simulate();
-    if (rensaResult.chains > 0) {
-        int ojamaCount = rensaResult.score / 70;;
-        if (me_.hasZenkeshi) {
-            ojamaCount += 30;
-        }
-
-        if (me_.pendingOjama > 0) {
-            if (me_.pendingOjama > ojamaCount) {
-                me_.pendingOjama -= ojamaCount;
-                ojamaCount = 0;
-            } else {
-                ojamaCount -= me_.pendingOjama;
-                me_.pendingOjama = 0;
-            }
-        }
-        if (me_.fixedOjama > 0) {
-            if (me_.fixedOjama > ojamaCount) {
-                me_.fixedOjama -= ojamaCount;
-                ojamaCount = 0;
-            } else {
-                ojamaCount -= me_.fixedOjama;
-                me_.fixedOjama = 0;
-            }
-        }
-
-        enemy_.pendingOjama += ojamaCount;
-
-        me_.isRensaOngoing = true;
-        me_.ongoingRensaResult = rensaResult;
-        me_.finishingRensaFrameId = frameRequest.frameId + rensaResult.frames;
-        me_.hasZenkeshi = false;
-    }
-
-    // Don't check zenkeshi if me_.hand is 0.
-    if (me_.hand != 0 && field.isZenkeshi()) {
-        me_.hasZenkeshi = true;
-    }
-
-    onGroundedForMe(frameRequest);
-}
-
-void AI::ojamaDroppedForMe(const FrameRequest& frameRequest)
-{
-    me_.fixedOjama = std::max(me_.fixedOjama - 30, 0);
-    me_.hasOjamaDropped = true;
-    onOjamaDroppedForMe(frameRequest);
-}
-
-void AI::next2AppearedForMe(const FrameRequest& frameRequest)
-{
-    const KumipuyoSeq& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
-
-    for (int i = 0; i < 3; ++i) {
-        if (me_.hand + i < me_.seq.size()) {
-            CHECK_EQ(me_.seq.get(me_.hand + i), kumipuyoSeq.get(i))
-                << me_.hand << " " << i << " " << me_.seq.size()
-                << me_.seq.toString() << " " << kumipuyoSeq.toString();
-        } else {
-            me_.seq.add(kumipuyoSeq.get(i));
-        }
-    }
-
-    onNext2AppearedForMe(frameRequest);
 }
 
 void AI::decisionRequestedForEnemy(const FrameRequest& frameRequest)
 {
     enemyDecisionRequestFrameId_ = frameRequest.frameId;
-
     enemy_.hand += 1;
     enemy_.field = CoreField::fromPlainFieldWithDrop(frameRequest.enemyPlayerFrameRequest().field);
 
-    // Should this be here?
-    if (me_.pendingOjama > 0) {
-        me_.fixedOjama += me_.pendingOjama;
-        me_.pendingOjama = 0;
-    }
-    enemy_.isRensaOngoing = false;
-    enemy_.finishingRensaFrameId = 0;
-    enemy_.ongoingRensaResult = RensaResult();
-
-    if (!enemy_.hasOjamaDropped)
-        enemy_.fixedOjama = 0;
-    enemy_.hasOjamaDropped = false;
-
+    decisionRequestedForCommon(&enemy_, &me_);
     onDecisionRequestedForEnemy(frameRequest);
+}
+
+// static
+void AI::decisionRequestedForCommon(PlayerState* p1, PlayerState* p2)
+{
+    if (p2->pendingOjama > 0) {
+        p2->fixedOjama += p2->pendingOjama;
+        p2->pendingOjama = 0;
+    }
+
+    p1->isRensaOngoing = false;
+    p1->finishingRensaFrameId = 0;
+    p1->ongoingRensaResult = RensaResult();
+
+    if (!p1->hasOjamaDropped)
+        p1->fixedOjama = 0;
+    p1->hasOjamaDropped = false;
+}
+
+void AI::groundedForMe(const FrameRequest& frameRequest)
+{
+    groundedForCommon(&me_, &enemy_, frameRequest.frameId, frameRequest.myPlayerFrameRequest().field);
+    onGroundedForMe(frameRequest);
 }
 
 void AI::groundedForEnemy(const FrameRequest& frameRequest)
 {
-    CoreField field(CoreField::fromPlainFieldWithDrop(frameRequest.enemyPlayerFrameRequest().field));
+    groundedForCommon(&enemy_, &me_, frameRequest.frameId, frameRequest.enemyPlayerFrameRequest().field);
+    onGroundedForEnemy(frameRequest);
+}
 
-    RensaResult rensaResult = field.simulate();
+// static
+void AI::groundedForCommon(PlayerState* p1, PlayerState* p2, int frameId, const PlainField& provided)
+{
+    CoreField cf(CoreField::fromPlainFieldWithDrop(provided));
 
+    RensaResult rensaResult = cf.simulate();
     if (rensaResult.chains > 0) {
-        LOG(INFO) << "Detected the opponent has fired rensa: " << rensaResult.toString();
-        if (behaviorRethinkAfterOpponentRensa_)
-            requestRethink();
-
         int ojamaCount = rensaResult.score / 70;;
-        if (enemy_.hasZenkeshi) {
+        if (p1->hasZenkeshi) {
             ojamaCount += 30;
         }
 
-        if (enemy_.pendingOjama > 0) {
-            if (enemy_.pendingOjama > ojamaCount) {
-                enemy_.pendingOjama -= ojamaCount;
+        if (p1->pendingOjama > 0) {
+            if (p1->pendingOjama > ojamaCount) {
+                p1->pendingOjama -= ojamaCount;
                 ojamaCount = 0;
             } else {
-                ojamaCount -= enemy_.pendingOjama;
-                enemy_.pendingOjama = 0;
+                ojamaCount -= p1->pendingOjama;
+                p1->pendingOjama = 0;
             }
         }
-        if (enemy_.fixedOjama > 0) {
-            if (enemy_.fixedOjama > ojamaCount) {
-                enemy_.fixedOjama -= ojamaCount;
+        if (p1->fixedOjama > 0) {
+            if (p1->fixedOjama > ojamaCount) {
+                p1->fixedOjama -= ojamaCount;
                 ojamaCount = 0;
             } else {
-                ojamaCount -= enemy_.fixedOjama;
-                enemy_.fixedOjama = 0;
+                ojamaCount -= p1->fixedOjama;
+                p1->fixedOjama = 0;
             }
         }
 
-        me_.pendingOjama = ojamaCount;
+        p2->pendingOjama += ojamaCount;
 
-        enemy_.isRensaOngoing = true;
-        enemy_.ongoingRensaResult = rensaResult;
-        enemy_.finishingRensaFrameId = frameRequest.frameId + rensaResult.frames;
-        enemy_.hasZenkeshi = false;
+        p1->isRensaOngoing = true;
+        p1->ongoingRensaResult = rensaResult;
+        p1->finishingRensaFrameId = frameId + rensaResult.frames;
+        p1->hasZenkeshi = false;
     }
 
-    if (enemy_.hand != 0 && field.isZenkeshi()) {
-        enemy_.hasZenkeshi = true;
+    // Don't check zenkeshi if me_.hand is 0.
+    if (p1->hand != 0 && cf.isZenkeshi()) {
+        p1->hasZenkeshi = true;
     }
+}
 
-    onGroundedForEnemy(frameRequest);
+void AI::ojamaDroppedForMe(const FrameRequest& frameRequest)
+{
+    ojamaDroppedForCommon(&me_);
+    onOjamaDroppedForMe(frameRequest);
 }
 
 void AI::ojamaDroppedForEnemy(const FrameRequest& frameRequest)
 {
-    enemy_.fixedOjama = std::max(enemy_.fixedOjama - 30, 0);
-    enemy_.hasOjamaDropped = true;
+    ojamaDroppedForCommon(&enemy_);
     onOjamaDroppedForEnemy(frameRequest);
+}
+
+// static
+void AI::ojamaDroppedForCommon(PlayerState* state)
+{
+    state->fixedOjama = std::max(state->fixedOjama - 30, 0);
+    state->hasOjamaDropped = true;
+}
+
+void AI::next2AppearedForMe(const FrameRequest& frameRequest)
+{
+    const KumipuyoSeq& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
+    next2AppearedForCommon(&me_, kumipuyoSeq);
+    onNext2AppearedForMe(frameRequest);
 }
 
 void AI::next2AppearedForEnemy(const FrameRequest& frameRequest)
 {
     const KumipuyoSeq& kumipuyoSeq = frameRequest.enemyPlayerFrameRequest().kumipuyoSeq;
-
-    for (int i = 0; i < 3; ++i) {
-        if (enemy_.hand + i < enemy_.seq.size()) {
-            CHECK_EQ(enemy_.seq.get(enemy_.hand + i), kumipuyoSeq.get(i));
-        } else {
-            enemy_.seq.add(kumipuyoSeq.get(i));
-        }
-    }
+    next2AppearedForCommon(&enemy_, kumipuyoSeq);
 
     // When enemy_.hand == 0, rememberedSequence(0) contains PuyoColor::EMPTY.
     // So, don't gaze at that time.
@@ -432,6 +373,20 @@ void AI::next2AppearedForEnemy(const FrameRequest& frameRequest)
         gaze(enemyDecisionRequestFrameId_, enemy_.field, rememberedSequence(enemy_.hand));
 
     onNext2AppearedForEnemy(frameRequest);
+}
+
+// static
+void AI::next2AppearedForCommon(PlayerState* state, const KumipuyoSeq& kumipuyoSeq)
+{
+    for (int i = 0; i < 3; ++i) {
+        if (state->hand + i < state->seq.size()) {
+            CHECK_EQ(state->seq.get(state->hand + i), kumipuyoSeq.get(i))
+                << state->hand << " " << i << " " << state->seq.size()
+                << state->seq.toString() << " " << kumipuyoSeq.toString();
+        } else {
+            state->seq.add(kumipuyoSeq.get(i));
+        }
+    }
 }
 
 // static
