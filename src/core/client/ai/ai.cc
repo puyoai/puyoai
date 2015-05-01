@@ -97,18 +97,18 @@ void AI::runLoop()
 
         // Update enemy info if necessary.
         if (frameRequest.enemyPlayerFrameRequest().event.decisionRequest)
-            enemyDecisionRequested(frameRequest);
+            decisionRequestedForEnemy(frameRequest);
         if (frameRequest.enemyPlayerFrameRequest().event.ojamaDropped)
-            enemyOjamaDropped(frameRequest);
+            ojamaDroppedForEnemy(frameRequest);
         if (frameRequest.enemyPlayerFrameRequest().event.grounded)
-            enemyGrounded(frameRequest);
+            groundedForEnemy(frameRequest);
         if (frameRequest.enemyPlayerFrameRequest().event.wnextAppeared)
-            enemyNext2Appeared(frameRequest);
+            next2AppearedForEnemy(frameRequest);
 
         // STATE_YOU_GROUNDED and STATE_WNEXT_APPEARED might come out-of-order.
         bool shouldThink = false;
         if (frameRequest.myPlayerFrameRequest().event.wnextAppeared) {
-            next2Appeared(frameRequest);
+            next2AppearedForMe(frameRequest);
             shouldThink = true;
 
             // When hand == 0, nextThinkFrameId will be 0. We'd like to keep frameId is increasing.
@@ -142,15 +142,15 @@ void AI::runLoop()
             // We need to rethink the next1 decision.
             next1.needsRethink = true;
             next1.ojamaDropped = true;
-            ojamaDropped(frameRequest);
+            ojamaDroppedForMe(frameRequest);
         }
         if (frameRequest.myPlayerFrameRequest().event.grounded) {
-            grounded(frameRequest);
+            groundedForMe(frameRequest);
         }
         if (frameRequest.myPlayerFrameRequest().event.decisionRequest) {
             VLOG(1) << "REQUESTED";
             next1.requested = true;
-            decisionRequested(frameRequest);
+            decisionRequestedForMe(frameRequest);
         }
         if (frameRequest.myPlayerFrameRequest().event.decisionRequestAgain) {
             // We need to handle this specially. Since we've proceeded next1, we don't have any knowledge about this turn.
@@ -243,7 +243,7 @@ void AI::gameHasEnded(const FrameRequest& frameRequest)
     onGameHasEnded(frameRequest);
 }
 
-void AI::decisionRequested(const FrameRequest& frameRequest)
+void AI::decisionRequestedForMe(const FrameRequest& frameRequest)
 {
     me_.hand += 1;
 
@@ -262,10 +262,10 @@ void AI::decisionRequested(const FrameRequest& frameRequest)
         me_.fixedOjama = 0;
     me_.hasOjamaDropped = false;
 
-    onDecisionRequested(frameRequest);
+    onDecisionRequestedForMe(frameRequest);
 }
 
-void AI::grounded(const FrameRequest& frameRequest)
+void AI::groundedForMe(const FrameRequest& frameRequest)
 {
     CoreField field(CoreField::fromPlainFieldWithDrop(frameRequest.myPlayerFrameRequest().field));
     RensaResult rensaResult = field.simulate();
@@ -307,17 +307,17 @@ void AI::grounded(const FrameRequest& frameRequest)
         me_.hasZenkeshi = true;
     }
 
-    onGrounded(frameRequest);
+    onGroundedForMe(frameRequest);
 }
 
-void AI::ojamaDropped(const FrameRequest& frameRequest)
+void AI::ojamaDroppedForMe(const FrameRequest& frameRequest)
 {
     me_.fixedOjama = std::max(me_.fixedOjama - 30, 0);
     me_.hasOjamaDropped = true;
-    onOjamaDropped(frameRequest);
+    onOjamaDroppedForMe(frameRequest);
 }
 
-void AI::next2Appeared(const FrameRequest& frameRequest)
+void AI::next2AppearedForMe(const FrameRequest& frameRequest)
 {
     const KumipuyoSeq& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
 
@@ -331,10 +331,10 @@ void AI::next2Appeared(const FrameRequest& frameRequest)
         }
     }
 
-    onNext2Appeared(frameRequest);
+    onNext2AppearedForMe(frameRequest);
 }
 
-void AI::enemyDecisionRequested(const FrameRequest& frameRequest)
+void AI::decisionRequestedForEnemy(const FrameRequest& frameRequest)
 {
     enemyDecisionRequestFrameId_ = frameRequest.frameId;
 
@@ -354,10 +354,10 @@ void AI::enemyDecisionRequested(const FrameRequest& frameRequest)
         enemy_.fixedOjama = 0;
     enemy_.hasOjamaDropped = false;
 
-    onEnemyDecisionRequested(frameRequest);
+    onDecisionRequestedForEnemy(frameRequest);
 }
 
-void AI::enemyGrounded(const FrameRequest& frameRequest)
+void AI::groundedForEnemy(const FrameRequest& frameRequest)
 {
     CoreField field(CoreField::fromPlainFieldWithDrop(frameRequest.enemyPlayerFrameRequest().field));
 
@@ -404,17 +404,17 @@ void AI::enemyGrounded(const FrameRequest& frameRequest)
         enemy_.hasZenkeshi = true;
     }
 
-    onEnemyGrounded(frameRequest);
+    onGroundedForEnemy(frameRequest);
 }
 
-void AI::enemyOjamaDropped(const FrameRequest& frameRequest)
+void AI::ojamaDroppedForEnemy(const FrameRequest& frameRequest)
 {
     enemy_.fixedOjama = std::max(enemy_.fixedOjama - 30, 0);
     enemy_.hasOjamaDropped = true;
-    onEnemyOjamaDropped(frameRequest);
+    onOjamaDroppedForEnemy(frameRequest);
 }
 
-void AI::enemyNext2Appeared(const FrameRequest& frameRequest)
+void AI::next2AppearedForEnemy(const FrameRequest& frameRequest)
 {
     const KumipuyoSeq& kumipuyoSeq = frameRequest.enemyPlayerFrameRequest().kumipuyoSeq;
 
@@ -431,7 +431,7 @@ void AI::enemyNext2Appeared(const FrameRequest& frameRequest)
     if (enemy_.hand > 0)
         gaze(enemyDecisionRequestFrameId_, enemy_.field, rememberedSequence(enemy_.hand));
 
-    onEnemyNext2Appeared(frameRequest);
+    onNext2AppearedForEnemy(frameRequest);
 }
 
 // static

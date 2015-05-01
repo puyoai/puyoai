@@ -61,15 +61,15 @@ protected:
     virtual void onGameWillBegin(const FrameRequest&) {}
     virtual void onGameHasEnded(const FrameRequest&) {}
 
-    virtual void onDecisionRequested(const FrameRequest&) {}
-    virtual void onGrounded(const FrameRequest&) {}
-    virtual void onOjamaDropped(const FrameRequest&) {}
-    virtual void onNext2Appeared(const FrameRequest&) {}
+    virtual void onDecisionRequestedForMe(const FrameRequest&) {}
+    virtual void onGroundedForMe(const FrameRequest&) {}
+    virtual void onOjamaDroppedForMe(const FrameRequest&) {}
+    virtual void onNext2AppearedForMe(const FrameRequest&) {}
 
-    virtual void onEnemyDecisionRequested(const FrameRequest&) {}
-    virtual void onEnemyGrounded(const FrameRequest&) {}
-    virtual void onEnemyOjamaDropped(const FrameRequest&) {}
-    virtual void onEnemyNext2Appeared(const FrameRequest&) {}
+    virtual void onDecisionRequestedForEnemy(const FrameRequest&) {}
+    virtual void onGroundedForEnemy(const FrameRequest&) {}
+    virtual void onOjamaDroppedForEnemy(const FrameRequest&) {}
+    virtual void onNext2AppearedForEnemy(const FrameRequest&) {}
 
     // Should rethink just before sending next decision.
     void requestRethink() { rethinkRequested_ = true; }
@@ -85,22 +85,17 @@ protected:
     // |gameHasEnded| will be called just after a game has ended.
     void gameHasEnded(const FrameRequest&);
 
-    void decisionRequested(const FrameRequest&);
-    void grounded(const FrameRequest&);
-    void ojamaDropped(const FrameRequest&);
-    void next2Appeared(const FrameRequest&);
+    void decisionRequestedForMe(const FrameRequest&);
+    void decisionRequestedForEnemy(const FrameRequest&);
 
-    // When enemy will start to move puyo, this callback will be called.
-    void enemyDecisionRequested(const FrameRequest&);
+    void groundedForMe(const FrameRequest&);
+    void groundedForEnemy(const FrameRequest&);
 
-    // When enemy's puyo is grounded, this callback will be called.
-    // Enemy's rensa is automatically checked, so you don't need to do that. (Use AdditionalThoughtInfo)
-    void enemyGrounded(const FrameRequest&);
-    void enemyOjamaDropped(const FrameRequest&);
+    void ojamaDroppedForMe(const FrameRequest&);
+    void ojamaDroppedForEnemy(const FrameRequest&);
 
-    // When enemy's NEXT2 has appeared, this callback will be called.
-    // You can update the enemy information here.
-    void enemyNext2Appeared(const FrameRequest&);
+    void next2AppearedForMe(const FrameRequest&);
+    void next2AppearedForEnemy(const FrameRequest&);
 
     const PlayerState& myPlayerState() const { return me_; }
     const PlayerState& enemyPlayerState() const { return enemy_; }

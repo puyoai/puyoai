@@ -34,7 +34,7 @@ protected:
             const PlayerState& my_state,
             const PlayerState& opponent_state) const;
 
-    virtual void onEnemyGrounded(const FrameRequest&) override;
+    virtual void onGroundedForEnemy(const FrameRequest&) override;
 
     virtual grade evaluate(
             const CoreField& field,

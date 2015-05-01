@@ -78,7 +78,7 @@ void Ai::onGameWillBegin(const FrameRequest& /*frame_request*/) {
   attack_.reset();
 }
 
-void Ai::onEnemyGrounded(const FrameRequest& frame_request) {
+void Ai::onGroundedForEnemy(const FrameRequest& frame_request) {
   const PlainField& enemy = frame_request.enemyPlayerFrameRequest().field;
   CoreField field(CoreField::fromPlainFieldWithDrop(enemy));
   RensaResult result = field.simulate();

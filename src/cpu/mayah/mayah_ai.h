@@ -108,9 +108,9 @@ public:
 
     using MayahAI::gameWillBegin;
     using MayahAI::gameHasEnded;
-    using MayahAI::enemyNext2Appeared;
-    using MayahAI::enemyDecisionRequested;
-    using MayahAI::enemyGrounded;
+    using MayahAI::next2AppearedForEnemy;
+    using MayahAI::decisionRequestedForEnemy;
+    using MayahAI::groundedForEnemy;
 
     using MayahAI::myPlayerState;
     using MayahAI::enemyPlayerState;
