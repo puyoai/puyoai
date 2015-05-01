@@ -74,6 +74,13 @@ public:
                                    int maxKeyPuyos,
                                    Callback);
 
+    // Complements key puyos on 13th row.
+    // Callback is void callback(const CoreField&, const ColumnPuyoList&).
+    template<typename Callback>
+    static void complementKeyPuyosOn13thRow(const CoreField&,
+                                            const bool allowsComplements[FieldConstant::MAP_WIDTH],
+                                            Callback);
+
     // Complements at most |maxKeyPuyos| key puyos.
     // Also, complements fire puyos.
     // The complemented field and complemented ColumnPuyoList are passed.
@@ -113,6 +120,13 @@ private:
                                            int leftX,
                                            int restAdded,
                                            Callback callback);
+
+    template<typename Callback>
+    static void complementKeyPuyos13thRowInternal(CoreField& currentField,
+                                                  ColumnPuyoList& currentKeyPuyos,
+                                                  const bool allowsComplements[FieldConstant::MAP_WIDTH],
+                                                  int x,
+                                                  Callback callback);
 };
 
 #include "core/algorithm/rensa_detector_inl.h"

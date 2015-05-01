@@ -59,6 +59,48 @@ void RensaDetector::complementKeyPuyosInternal(CoreField& currentField,
     }
 }
 
+template<typename Callback>
+void RensaDetector::complementKeyPuyosOn13thRow(const CoreField& originalField,
+                                                const bool allowsComplements[FieldConstant::MAP_WIDTH],
+                                                Callback callback)
+{
+    CoreField cf(originalField);
+    ColumnPuyoList cpl;
+    complementKeyPuyos13thRowInternal(cf, cpl, allowsComplements, 1, callback);
+}
+
+template<typename Callback>
+void RensaDetector::complementKeyPuyos13thRowInternal(CoreField& currentField,
+                                                      ColumnPuyoList& currentKeyPuyos,
+                                                      const bool allowsComplements[FieldConstant::MAP_WIDTH],
+                                                      int x,
+                                                      Callback callback)
+{
+    if (x > 6) {
+        callback(const_cast<const CoreField&>(currentField),
+                 const_cast<const ColumnPuyoList&>(currentKeyPuyos));
+        return;
+    }
+
+    if (currentField.height(x) == 12 && allowsComplements[x]) {
+        for (PuyoColor c : NORMAL_PUYO_COLORS) {
+            if (!currentField.dropPuyoOn(x, c))
+                continue;
+            if (!currentKeyPuyos.add(x, c)) {
+                currentField.removePuyoFrom(x);
+                continue;
+            }
+
+            complementKeyPuyos13thRowInternal(currentField, currentKeyPuyos, allowsComplements, x + 1, callback);
+
+            currentField.removePuyoFrom(x);
+            currentKeyPuyos.removeTopFrom(x);
+        }
+    }
+
+    complementKeyPuyos13thRowInternal(currentField, currentKeyPuyos, allowsComplements, x + 1, callback);
+}
+
 // static
 template<typename Callback>
 void RensaDetector::detectWithAddingKeyPuyos(const CoreField& originalField,
