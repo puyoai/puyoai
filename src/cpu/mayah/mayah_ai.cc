@@ -54,7 +54,7 @@ bool MayahAI::loadEvaluationParameter()
 }
 
 DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& kumipuyoSeq,
-                            const PlayerState& me, const EnemyState& enemy, bool fast) const
+                            const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
     int depth;
     int iteration;
@@ -83,7 +83,7 @@ DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& 
 }
 
 ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
-                                 const PlayerState& me, const EnemyState& enemy,
+                                 const PlayerState& me, const PlayerState& enemy,
                                  int depth, int maxIteration, vector<Decision>* specifiedDecisions) const
 {
     // TODO(mayah): Do we need field and kumipuyoSeq?
@@ -203,7 +203,7 @@ PreEvalResult MayahAI::preEval(const CoreField& currentField) const
 MidEvalResult MayahAI::midEval(const RefPlan& plan, const CoreField& currentField,
                                int currentFrameId, int maxIteration,
                                const PlayerState& me,
-                               const EnemyState& enemy,
+                               const PlayerState& enemy,
                                const PreEvalResult& preEvalResult,
                                const GazeResult& gazeResult) const
 
@@ -219,7 +219,7 @@ MidEvalResult MayahAI::midEval(const RefPlan& plan, const CoreField& currentFiel
 
 EvalResult MayahAI::eval(const RefPlan& plan,
                          int currentFrameId, int maxIteration,
-                         const PlayerState& me, const EnemyState& enemy,
+                         const PlayerState& me, const PlayerState& enemy,
                          const PreEvalResult& preEvalResult,
                          const MidEvalResult& midEvalResult,
                          const GazeResult& gazeResult) const
@@ -236,7 +236,7 @@ CollectedFeatureCoefScore MayahAI::evalWithCollectingFeature(const RefPlan& plan
                                                              int currentFrameId,
                                                              int maxIteration,
                                                              const PlayerState& me,
-                                                             const EnemyState& enemy,
+                                                             const PlayerState& enemy,
                                                              const PreEvalResult& preEvalResult,
                                                              const MidEvalResult& midEvalResult,
                                                              const GazeResult& gazeResult) const
@@ -249,7 +249,7 @@ CollectedFeatureCoefScore MayahAI::evalWithCollectingFeature(const RefPlan& plan
 }
 
 std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
-                                     const PlayerState& me, const EnemyState& enemy,
+                                     const PlayerState& me, const PlayerState& enemy,
                                      const PreEvalResult& preEvalResult, const MidEvalResult& midEvalResult,
                                      const GazeResult& gazeResult,
                                      const Plan& plan, double rensaScore, double virtualRensaScore,

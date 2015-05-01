@@ -28,25 +28,6 @@ bool parsePlayerState(const toml::Value& value, PlayerState* state)
     return true;
 }
 
-bool parseEnemyState(const toml::Value& value, EnemyState* state)
-{
-    {
-        const toml::Value* field = value.find("field");
-        CHECK(field && field->is<toml::Array>());
-        string s;
-        for (const auto& v : field->as<toml::Array>())
-            s += v.as<string>();
-        state->field = CoreField(s);
-    }
-    {
-        const toml::Value* next = value.find("next");
-        CHECK(next && next->is<string>());
-        state->seq = KumipuyoSeq(next->as<string>());
-    }
-
-    return true;    
-}
-
 Problem Problem::readProblem(const string& filename)
 {
     toml::Value value;
@@ -81,7 +62,7 @@ Problem Problem::parse(const toml::Value& value)
     {
         const toml::Value* enemy = value.find("enemy");
         CHECK(enemy && enemy->is<toml::Table>());
-        CHECK(parseEnemyState(*enemy, &problem.enemyState));
+        CHECK(parsePlayerState(*enemy, &problem.enemyState));
     }
     {
         const toml::Value* answers = value.find("answer.answers");

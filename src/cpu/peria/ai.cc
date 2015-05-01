@@ -38,7 +38,7 @@ DropDecision Ai::think(int frame_id,
                        const CoreField& field,
                        const KumipuyoSeq& seq,
                        const PlayerState& me,
-                       const EnemyState& enemy,
+                       const PlayerState& enemy,
                        bool fast) const {
   UNUSED_VARIABLE(frame_id);
   UNUSED_VARIABLE(me);
@@ -48,6 +48,7 @@ DropDecision Ai::think(int frame_id,
 
   // Currently planning rensa.
   RensaChainTrackResult track_result;
+
   int max_score = 0;
   RensaDetector::iteratePossibleRensasIteratively(
       field, 1, RensaDetectorStrategy::defaultFloatStrategy(),

@@ -47,7 +47,7 @@ std::string EstimatedRensaInfo::toString() const
     return buf;
 }
 
-int GazeResult::estimateMaxScore(int frameId, const EnemyState& enemy) const
+int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
 {
     CHECK_LE(frameIdGazedAt_, frameId)
         << "Gazer is requested to check the past frame estimated score."

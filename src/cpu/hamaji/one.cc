@@ -25,7 +25,7 @@ class One : public AI {
                              const CoreField& f,
                              const KumipuyoSeq& seq,
                              const PlayerState& me,
-                             const EnemyState& enemy,
+                             const PlayerState& enemy,
                              bool fast) const override {
     UNUSED_VARIABLE(frameId);
     UNUSED_VARIABLE(me);

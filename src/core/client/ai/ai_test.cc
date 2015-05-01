@@ -20,7 +20,7 @@ public:
 
 protected:
     virtual DropDecision think(int, const CoreField&, const KumipuyoSeq&,
-                               const PlayerState&, const EnemyState&, bool) const override
+                               const PlayerState&, const PlayerState&, bool) const override
     {
         return DropDecision(Decision(3, 0), "test");
     }
@@ -42,7 +42,7 @@ protected:
     }
 
     const PlayerState& myPlayerState() { return ai_.myPlayerState(); }
-    const EnemyState& enemyPlayerState() { return ai_.enemyPlayerState(); }
+    const PlayerState& enemyPlayerState() { return ai_.enemyPlayerState(); }
 
     TestAI ai_;
 };
