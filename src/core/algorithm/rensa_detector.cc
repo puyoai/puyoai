@@ -568,16 +568,14 @@ void RensaDetector::iteratePossibleRensas(const CoreField& originalField,
                                           const RensaDetector::RensaCallback& callback)
 {
     const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-    auto cb = [&originalContext, &callback](const CoreField& complementedField, const ColumnPuyoList& cpl) {
+    const auto cb = [&](const CoreField& complementedField, const ColumnPuyoList& cpl) {
         CoreField::SimulationContext context(originalContext);
         CoreField cf(complementedField);
         RensaResult rensaResult = cf.simulate(&context);
         if (rensaResult.chains > 0)
             callback(cf, rensaResult, cpl);
     };
-
-    ColumnPuyoList puyoList;
-    findPossibleRensasInternal(originalField, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, cb);
+    detectWithAddingKeyPuyos(originalField, strategy, maxKeyPuyos, cb);
 }
 
 void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& originalField,
