@@ -52,8 +52,12 @@ protected:
     // much time for gaze.
     virtual void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&);
 
+    // ----------------------------------------------------------------------
+    // Callbacks. If you'd like to customize your AI, it is good if you could use
+    // the following hook methods.
     // These callbacks will be called from the corresponding method.
     // i.e. onX() will be called from X().
+
     virtual void onGameWillBegin(const FrameRequest&) {}
     virtual void onGameHasEnded(const FrameRequest&) {}
 
@@ -66,6 +70,9 @@ protected:
     virtual void onEnemyGrounded(const FrameRequest&) {}
     virtual void onEnemyOjamaDropped(const FrameRequest&) {}
     virtual void onEnemyNext2Appeared(const FrameRequest&) {}
+
+    // Should rethink just before sending next decision.
+    void requestRethink() { rethinkRequested_ = true; }
 
     // ----------------------------------------------------------------------
     // Usually, you don't need to care about methods below here.
@@ -94,9 +101,6 @@ protected:
     // When enemy's NEXT2 has appeared, this callback will be called.
     // You can update the enemy information here.
     void enemyNext2Appeared(const FrameRequest&);
-
-    // Should rethink just before sending next decision.
-    void requestRethink() { rethinkRequested_ = true; }
 
     const PlayerState& myPlayerState() const { return me_; }
     const PlayerState& enemyPlayerState() const { return enemy_; }
