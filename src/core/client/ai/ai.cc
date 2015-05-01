@@ -47,7 +47,6 @@ AI::AI(const string& name) :
     name_(name),
     rethinkRequested_(false),
     enemyDecisionRequestFrameId_(0),
-    behaviorDefensive_(false),
     behaviorRethinkAfterOpponentRensa_(false)
 {
 }
