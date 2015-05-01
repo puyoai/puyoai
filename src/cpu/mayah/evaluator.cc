@@ -270,8 +270,7 @@ void Evaluator<ScoreCollector>::evalFallenOjama(int fallenOjama)
 // Returns true If we don't need to evaluate other features.
 template<typename ScoreCollector>
 bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFrameId,
-                                             const PlayerState& me, const EnemyState& enemy,
-                                             const GazeResult& gazeResult,
+                                             const PlayerState& me, const PlayerState& enemy, const GazeResult& gazeResult,
                                              const MidEvalResult& midEvalResult)
 {
     if (!plan.isRensaPlan())
@@ -385,7 +384,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan,
                                                        const ColumnPuyoList& cpl,
                                                        int currentFrameId,
                                                        const PlayerState& me,
-                                                       const EnemyState& enemy)
+                                                       const PlayerState& enemy)
 {
     UNUSED_VARIABLE(currentFrameId);
     UNUSED_VARIABLE(me);
@@ -538,7 +537,7 @@ void Evaluator<ScoreCollector>::evalMidEval(const MidEvalResult& midEvalResult)
 }
 
 template<typename ScoreCollector>
-CollectedCoef Evaluator<ScoreCollector>::calculateDefaultCoef(const PlayerState& me, const EnemyState& enemy) const
+CollectedCoef Evaluator<ScoreCollector>::calculateDefaultCoef(const PlayerState& me, const PlayerState& enemy) const
 {
     const int INITIAL_THRESHOLD = 16;
     const int EARLY_THRESHOLD = 24;
@@ -585,7 +584,7 @@ template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                                      int currentFrameId, int maxIteration,
                                      const PlayerState& me,
-                                     const EnemyState& enemy,
+                                     const PlayerState& enemy,
                                      const PreEvalResult& preEvalResult,
                                      const MidEvalResult& midEvalResult,
                                      const GazeResult& gazeResult)

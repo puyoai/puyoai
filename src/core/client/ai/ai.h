@@ -39,7 +39,7 @@ protected:
     // KumipuyoSeq will have at least 2 kumipuyos. When we know more Kumipuyo sequence,
     // it might contain more.
     virtual DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
-                               const PlayerState& me, const EnemyState& enemy, bool fast) const = 0;
+                               const PlayerState& me, const PlayerState& enemy, bool fast) const = 0;
 
     // gaze will be called when AI should gaze the enemy's field.
     // |frameId| is the frameId where the enemy has started moving his puyo.
@@ -95,10 +95,10 @@ protected:
     void requestRethink() { rethinkRequested_ = true; }
 
     const PlayerState& myPlayerState() const { return me_; }
-    const EnemyState& enemyPlayerState() const { return enemy_; }
+    const PlayerState& enemyPlayerState() const { return enemy_; }
 
     PlayerState* mutableMyPlayerState() { return &me_; }
-    EnemyState* mutableEnemyPlayerState() { return &enemy_; }
+    PlayerState* mutableEnemyPlayerState() { return &enemy_; }
 
 private:
     friend class AITest;
@@ -117,7 +117,7 @@ private:
     int enemyDecisionRequestFrameId_;
 
     PlayerState me_;
-    EnemyState enemy_;
+    PlayerState enemy_;
 
     bool behaviorRethinkAfterOpponentRensa_;
 };

@@ -14,7 +14,7 @@ class AI final : public ::AI {
                      const CoreField& field,
                      const KumipuyoSeq& seq,
                      const PlayerState& me,
-                     const EnemyState& enemy,
+                     const PlayerState& enemy,
                      bool fast) const override;
 
  private:

@@ -33,7 +33,7 @@ protected:
         PreEvalResult preEvalResult = PreEvaluator(patternBook).preEval(f);
         FeatureScoreCollector sc(evaluationParameterMap);
         Evaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
-        evaluator.eval(plan, 1, numIteration, PlayerState(), EnemyState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
+        evaluator.eval(plan, 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), gazer.gazeResult());
         return sc.collectedScore();
     }
 

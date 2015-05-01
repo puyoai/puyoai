@@ -68,7 +68,7 @@ void runTest(int depth, int iteration, const CoreField& cf, const KumipuyoSeq& k
 
     for (int i = 0; i < 3; ++i) {
         ScopedTimeStampCounter stsc(&tsc);
-        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, PlayerState(), EnemyState(), depth, iteration);
+        (void)ai->thinkPlan(frameId, cf, kumipuyoSeq, PlayerState(), PlayerState(), depth, iteration);
     }
 
     tsc.showStatistics();
