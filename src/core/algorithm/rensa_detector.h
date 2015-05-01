@@ -64,11 +64,6 @@ public:
                                                       const RensaDetectorStrategy&,
                                                       const CoefPossibleRensaCallback&);
 
-    static void iteratePossibleRensasWithVanishingPositionTracking(const CoreField&,
-                                                                   int maxKeyPuyos,
-                                                                   const RensaDetectorStrategy&,
-                                                                   const VanishingPositionPossibleRensaCallback&);
-
     // Complements at most |maxKeyPuyos| key puyos.
     // Callback is void callback(const CoreField&, const ColumnPuyoList&).
     // The complemented field and complemented ColumnPuyoList are passed.
