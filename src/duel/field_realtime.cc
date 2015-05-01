@@ -157,7 +157,6 @@ bool FieldRealtime::onStateVanish(FrameContext* context)
         sleepFor_ = 0;
         drop_animation_ = false;
         simulationState_ = SimulationState::STATE_OJAMA_DROPPING;
-        userEvent_.chainFinished = true;
         return false;
     }
 

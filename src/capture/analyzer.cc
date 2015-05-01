@@ -79,7 +79,6 @@ void PlayerAnalyzerResult::resetCurrentPuyoState(bool state)
     hasDetectedPuyoErase_ = state;
     hasSentGrounded_ = state;
     hasSentOjamaDropped_ = state;
-    hasSentChainFinished_ = state;
 }
 
 string PlayerAnalyzerResult::toString() const
@@ -368,11 +367,6 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_CHILD, result->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD));
     result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS, RealColor::RC_EMPTY);
     result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, RealColor::RC_EMPTY);
-
-    if (result->hasDetectedRensaStart_ && !result->hasSentChainFinished_) {
-        result->userEvent.chainFinished = true;
-        result->hasSentChainFinished_ = true;
-    }
 }
 
 void Analyzer::analyzeNextForStateNext2WillDisappear(const DetectedField& detectedField, PlayerAnalyzerResult* result)

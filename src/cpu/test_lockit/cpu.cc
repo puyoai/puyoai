@@ -98,7 +98,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
         p1->act_on = event.decisionRequest || event.decisionRequestAgain;
         p1->nex_on = event.wnextAppeared;
         p1->set_puyo = event.grounded;
-        p1->rensa_end = event.chainFinished;
+        p1->rensa_end = event.puyoErased;
         p1->score = request.myPlayerFrameRequest().score;
     }
 
@@ -107,7 +107,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
         p2->act_on = event.decisionRequest || event.decisionRequestAgain;
         p2->nex_on = event.wnextAppeared;
         p2->set_puyo = event.grounded;
-        p2->rensa_end = event.chainFinished;
+        p2->rensa_end = event.puyoErased;
         p2->score = request.enemyPlayerFrameRequest().score;
     }
 
