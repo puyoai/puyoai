@@ -63,6 +63,9 @@ protected:
     virtual void onEnemyOjamaDropped(const FrameRequest&) {}
     virtual void onEnemyNext2Appeared(const FrameRequest&) {}
 
+    // ----------------------------------------------------------------------
+    // Usually, you don't need to care about methods below here.
+
     // |gameWillBegin| will be called just before a new game will begin.
     // FrameRequest might contain NEXT and NEXT2 puyos, but it's not guaranteed.
     // Please initialize your AI in this function.
