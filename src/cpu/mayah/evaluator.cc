@@ -282,9 +282,9 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFra
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
     int estimatedMaxScore = gazeResult.estimateMaxScore(rensaEndingFrameId, enemy);
 
-    if (!enemy.isRensaOngoing && plan.chains() <= 4) {
+    if (!enemy.isRensaOngoing() && plan.chains() <= 4) {
         int h = 12 - enemy.field.height(3);
-        if (plan.score() - estimatedMaxScore >= scoreForOjama(6 * h)) {
+        if (plan.score() >= estimatedMaxScore + scoreForOjama(6 * h + plan.totalOjama())) {
             sc_->addScore(STRATEGY_KILL, 1);
             sc_->addScore(STRATEGY_KILL_FRAME, plan.totalFrames());
             return true;
@@ -292,20 +292,22 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFra
     }
 
     // --- If the rensa is large enough, fire it.
-    if (plan.score() >= estimatedMaxScore + scoreForOjama(60) && !enemy.isRensaOngoing) {
-        sc_->addScore(STRATEGY_LARGE_ENOUGH, 1.0);
-        return true;
+    if (!enemy.isRensaOngoing()) {
+        if (plan.score() >= estimatedMaxScore + scoreForOjama(60 + plan.totalOjama())) {
+            sc_->addScore(STRATEGY_LARGE_ENOUGH, 1.0);
+            return true;
+        }
     }
 
-    if (enemy.isRensaOngoing && me.fixedOjama + me.pendingOjama >= 6) {
-        if (plan.score() >= scoreForOjama(std::max(0, me.fixedOjama + me.pendingOjama - 3))) {
+    if (enemy.isRensaOngoing() && me.totalOjama(enemy) >= 6) {
+        if (plan.score() >= scoreForOjama(std::max(0, me.totalOjama(enemy) - 3))) {
             sc_->addScore(STRATEGY_TAIOU, 1.0);
             return false;
         }
     }
 
-    if (plan.fixedOjama() + plan.pendingOjama() >= 6) {
-        if (plan.score() >= scoreForOjama(std::max(0, plan.fixedOjama() + plan.pendingOjama() - 3))) {
+    if (plan.totalOjama() >= 6) {
+        if (plan.score() >= scoreForOjama(std::max(0, plan.totalOjama() - 3))) {
             sc_->addScore(STRATEGY_TAIOU, 0.9);
             return false;
         }
@@ -319,7 +321,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFra
 
     // not plan.hasZenekshi, since it's already consumed.
     if (me.hasZenkeshi && !enemy.hasZenkeshi) {
-        if (!enemy.isRensaOngoing) {
+        if (!enemy.isRensaOngoing()) {
             sc_->addScore(STRATEGY_SCORE, plan.score());
             sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
             return false;
@@ -335,7 +337,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFra
 
     // If IBARA found, we always consider it.
     // TODO(mayah): Don't consider IBARA if we don't have enough puyos. Better not to fire IBARA in that case.
-    if (plan.chains() == 1 && plan.score() >= scoreForOjama(10) && plan.pendingOjama() + plan.fixedOjama() <= 10) {
+    if (plan.chains() == 1 && plan.score() >= scoreForOjama(10) && plan.totalOjama() <= 10) {
         sc_->addScore(STRATEGY_IBARA, 1);
         return false;
     }
@@ -343,12 +345,12 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFra
     // If we can send 18>= ojamas, and opponent does not have any hand to cope with it, we can fire it.
     // TODO(mayah): We need to check if the enemy cannot fire his rensa after ojama is dropped.
     if (plan.chains() <= 3 && plan.score() >= scoreForOjama(15) &&
-        plan.pendingOjama() + plan.fixedOjama() <= 3 && estimatedMaxScore <= scoreForOjama(12)) {
+        plan.totalOjama() <= 3 && estimatedMaxScore <= scoreForOjama(12)) {
         sc_->addScore(STRATEGY_TSUBUSHI, 1);
         return true;
     }
 
-    if (plan.chains() == 2 && plan.pendingOjama() + plan.fixedOjama() <= 3 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
+    if (plan.chains() == 2 && plan.totalOjama() <= 3 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
         if (plan.score() >= scoreForOjama(24)) {
             sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_2_LARGE, 1);
         } else if (plan.score() >= scoreForOjama(18)) {
@@ -359,7 +361,7 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFra
         return false;
     }
 
-    if (plan.chains() == 3 && plan.pendingOjama() + plan.fixedOjama() == 0 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
+    if (plan.chains() == 3 && plan.totalOjama() == 0 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
         if (plan.score() >= scoreForOjama(30)) {
             sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_3_LARGE, 1);
         } else if (plan.score() >= scoreForOjama(18)) {
@@ -391,7 +393,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan,
 
     if (plan.field().countPuyos() >= 36 && plan.score() >= scoreForOjama(15) &&
         plan.chains() <= 3 && rensaResult.chains >= 7 &&
-        cpl.size() <= 3 && !enemy.isRensaOngoing) {
+        cpl.size() <= 3 && !enemy.isRensaOngoing()) {
         sc_->addScore(STRATEGY_SAISOKU, 1);
     }
 }

@@ -97,9 +97,11 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
         VLOG(1) << "\n"
                 << "----------------------------------------------------------------------" << endl
                 << "think frameId = " << frameId << endl
-                << "my ojama: fixed = " << me.fixedOjama << " pending = " << me.pendingOjama << endl
-                << "enemy ojama: fixed = " << enemy.fixedOjama << " pending = " << enemy.pendingOjama << endl
-                << "enemy rensa: ending = " << (enemy.isRensaOngoing ? enemy.finishingRensaFrameId : 0) << endl
+                << "my ojama: fixed=" << me.fixedOjama << " pending=" << me.pendingOjama
+                << " total=" << me.totalOjama(enemy) << endl
+                << "enemy ojama: fixed = " << enemy.fixedOjama << " pending = " << enemy.pendingOjama
+                << " total=" << enemy.totalOjama(me) << endl
+                << "enemy rensa: ending = " << (enemy.isRensaOngoing() ? enemy.rensaFinishingFrameId() : 0) << endl
                 << gazer_.gazeResult().toRensaInfoString()
                 << "----------------------------------------------------------------------" << endl;
     }
@@ -345,9 +347,9 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
 
     ss << "\n";
 
-    if (enemy.isRensaOngoing) {
-        ss << "Gazed (ongoing) : " << enemy.ongoingRensaResult.score
-           << " in " << (enemy.finishingRensaFrameId - frameId) << " / ";
+    if (enemy.isRensaOngoing()) {
+        ss << "Gazed (ongoing) : " << enemy.currentRensaResult.score
+           << " in " << (enemy.rensaFinishingFrameId() - frameId) << " / ";
     } else {
         ss << "Gazed = "
            << gazeResult.estimateMaxScore(frameId + refPlan.totalFrames(), enemy)
@@ -358,11 +360,11 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
            << " in " << (refPlan.totalFrames() + 200) << " / ";
     }
 
-    ss << "OJAMA = "
-       << plan.fallenOjama() << ":"
-       << plan.fixedOjama() << ":"
-       << plan.pendingOjama() << ":"
-       << plan.ojamaCommittingFrameId() << " / ";
+    ss << "OJAMA: "
+       << "fixed=" << me.fixedOjama << " "
+       << "pending=" << me.pendingOjama << " "
+       << "total=" << me.totalOjama(enemy) << " "
+       << "frameId=" << me.rensaFinishingFrameId() << " / ";
 
     ss << (thoughtTimeInSeconds * 1000) << " [ms]";
 

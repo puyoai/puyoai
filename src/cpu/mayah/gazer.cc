@@ -54,8 +54,9 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
         << " frameId=" << frameId
         << " frameIdGazedAt=" << frameIdGazedAt_;
 
-    if (enemy.isRensaOngoing && frameId <= enemy.finishingRensaFrameId) {
-        return enemy.ongoingRensaResult.score;
+    // TODO(mayah): How to handle this?
+    if (enemy.isRensaOngoing() && frameId <= enemy.rensaFinishingFrameId()) {
+        return enemy.currentRensaResult.score;
     }
 
     int scoreByFeasibleRensas = estimateMaxScoreFromFeasibleRensas(frameId);

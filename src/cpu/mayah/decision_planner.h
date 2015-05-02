@@ -260,9 +260,11 @@ void DecisionPlanner<MidEvaluationResult>::iterate(int initialFrameId,
     WaitGroup wg;
 
     auto f = [&](const CoreField& fieldAfterDecision, const Decision& decision, bool isChigiri, int dropFrames) {
-        int pendingOjama = me.pendingOjama;
         int fixedOjama = me.fixedOjama;
-        int ojamaCommittingFrameId = enemy.isRensaOngoing ? enemy.finishingRensaFrameId : 0;
+        int pendingOjama = me.pendingOjama;
+        pendingOjama += (enemy.unusedScore + enemy.currentRensaResult.score) / 70;
+
+        int ojamaCommittingFrameId = enemy.isRensaOngoing() ? enemy.rensaFinishingFrameId() : 0;
         bool hasZenkeshi = me.hasZenkeshi;
 
         std::vector<Decision> decisions { decision };
