@@ -150,7 +150,9 @@ bool FieldRealtime::onStateGrounding()
 
 bool FieldRealtime::onStateVanish(FrameContext* context)
 {
-    int score = field_.vanish(++current_chains_);
+    // Don't vanish puyo here. Vanish it on onStateVanishing, to be consistent with wii_server.
+    PlainField field(field_);
+    int score = field.vanish(++current_chains_);
     if (score == 0) {
         if (context)
             context->commitOjama();
@@ -176,7 +178,7 @@ bool FieldRealtime::onStateVanish(FrameContext* context)
     // After ojama is calculated, we add ZENKESHI score,
     // because score for ZENKESHI is added, but not used for ojama calculation.
     hasZenkeshi_ = false;
-    if (field_.isZenkeshi()) {
+    if (field.isZenkeshi()) {
         score_ += ZENKESHI_BONUS;
         hasZenkeshi_ = true;
     }
@@ -191,6 +193,8 @@ bool FieldRealtime::onStateVanish(FrameContext* context)
 
 bool FieldRealtime::onStateVanishing()
 {
+    int score = field_.vanish(current_chains_);
+    DCHECK_GT(score, 0);
     simulationState_ = SimulationState::STATE_DROPPING;
     return false;
 }
