@@ -59,7 +59,7 @@ void FieldRealtime::init()
 
     ojama_position_ = vector<int>(6, 0);
     ojama_dropping_ = false;
-    current_chains_ = 1;
+    current_chains_ = 0;
     delayFramesWNextAppear_ = 0;
     sent_wnext_appeared_ = false;
     drop_animation_ = false;
@@ -100,7 +100,7 @@ bool FieldRealtime::onStatePreparingNext()
 bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
 {
     playable_ = true;
-    current_chains_ = 1;
+    current_chains_ = 0;
     // TODO(mayah): We're always accepting KeySet? Then do we need to take |accepted| here?
     *accepted = true;
 
@@ -150,7 +150,7 @@ bool FieldRealtime::onStateGrounding()
 
 bool FieldRealtime::onStateVanish(FrameContext* context)
 {
-    int score = field_.vanish(current_chains_++);
+    int score = field_.vanish(++current_chains_);
     if (score == 0) {
         if (context)
             context->commitOjama();
