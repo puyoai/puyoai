@@ -150,7 +150,7 @@ bool FieldRealtime::onStateGrounding()
 
 bool FieldRealtime::onStateVanish(FrameContext* context)
 {
-    int score = vanish(current_chains_++);
+    int score = field_.vanish(current_chains_++);
     if (score == 0) {
         if (context)
             context->commitOjama();
@@ -332,11 +332,6 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
 
     DCHECK(false) << "should not reached here.";
     return false;
-}
-
-int FieldRealtime::vanish(int currentChain)
-{
-    return field_.vanish(currentChain);
 }
 
 bool FieldRealtime::drop1Frame()

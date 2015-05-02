@@ -90,7 +90,6 @@ public:
 private:
     void init();
 
-    int vanish(int currentChain);
     // Returns true if we need to drop more.
     bool drop1Frame();
 
