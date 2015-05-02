@@ -5,7 +5,7 @@
 
 #include "core/constant.h"
 
-inline int scoreForOjama(int num)
+constexpr int scoreForOjama(int num)
 {
     return num * SCORE_FOR_OJAMA;
 }

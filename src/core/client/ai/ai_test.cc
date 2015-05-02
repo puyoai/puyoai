@@ -15,6 +15,8 @@ public:
     using AI::gameWillBegin;
     using AI::decisionRequestedForMe;
     using AI::groundedForMe;
+    using AI::puyoErasedForMe;
+    using AI::puyoErasedForEnemy;
     using AI::groundedForEnemy;
     using AI::decisionRequestedForEnemy;
 
@@ -88,22 +90,45 @@ TEST_F(AITest, zenkeshi)
     EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 6;
+    req.playerFrameRequest[0].field = CoreField("  RRRR");
+    req.playerFrameRequest[1].field = CoreField("  RRRR");
+    ai_.puyoErasedForMe(req);
+    ai_.puyoErasedForEnemy(req);
+    EXPECT_TRUE(myPlayerState().hasZenkeshi);
+    EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
+
+    req.frameId = 7;
     ai_.decisionRequestedForMe(req);
     ai_.decisionRequestedForEnemy(req);
     EXPECT_TRUE(myPlayerState().hasZenkeshi);
     EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
 
-    req.frameId = 7;
+    req.frameId = 8;
     req.playerFrameRequest[0].field = CoreField(" BRRRR");
     req.playerFrameRequest[1].field = CoreField(" BRRRR");
     ai_.groundedForMe(req);
     ai_.groundedForEnemy(req);
+    EXPECT_TRUE(myPlayerState().hasZenkeshi);
+    EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
+
+    req.frameId = 9;
+    req.playerFrameRequest[0].field = CoreField(" BRRRR");
+    req.playerFrameRequest[1].field = CoreField(" BRRRR");
+    ai_.puyoErasedForMe(req);
+    ai_.puyoErasedForEnemy(req);
     EXPECT_FALSE(myPlayerState().hasZenkeshi);
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 }
 
 TEST_F(AITest, ojamaCount)
 {
+    CoreField original(
+        "RBRB  "
+        "BRBR  "
+        "BRBR  "
+        "BRBRR ");
+    RensaResult originalRensaResult = original.simulate();
+
     KumipuyoSeq seq("RRRRBBGG");
 
     CoreField field;
@@ -134,28 +159,82 @@ TEST_F(AITest, ojamaCount)
     EXPECT_EQ(0, myPlayerState().fixedOjama);
     EXPECT_EQ(0, myPlayerState().pendingOjama);
     EXPECT_EQ(0, enemyPlayerState().fixedOjama);
-    EXPECT_EQ(32, enemyPlayerState().pendingOjama);
+    EXPECT_EQ(0, enemyPlayerState().pendingOjama);
 
+    // score = 40
     req.frameId = 4;
-    req.playerFrameRequest[1].field = CoreField(
-        "RBRBR "
-        "BRBRB "
-        "BRBRB "
-        "BRBRBB");
-    ai_.groundedForEnemy(req);
+    req.playerFrameRequest[0].field = CoreField(
+        "RBRB  "
+        "BRBR  "
+        "BRBR  "
+        "BRBRR ");
+    ai_.puyoErasedForMe(req);
     EXPECT_EQ(0, myPlayerState().fixedOjama);
-    EXPECT_EQ(37, myPlayerState().pendingOjama);
+    EXPECT_EQ(0, myPlayerState().pendingOjama);
+    EXPECT_EQ(40, myPlayerState().unusedScore);
+    originalRensaResult.score -= 40;
+    EXPECT_EQ(originalRensaResult, myPlayerState().currentRensaResult);
     EXPECT_EQ(0, enemyPlayerState().fixedOjama);
     EXPECT_EQ(0, enemyPlayerState().pendingOjama);
 
+    // score = 40 + 40 * 8 = 360
     req.frameId = 5;
-    req.playerFrameRequest[0].field = CoreField("R     ");
-    req.playerFrameRequest[1].field = CoreField(" B    ");
-    // don't call ai_.decisionRequested(req); here.
-    ai_.decisionRequestedForEnemy(req);
-    EXPECT_EQ(37, myPlayerState().fixedOjama);
+    req.playerFrameRequest[0].field = CoreField(
+        "RBR   "
+        "BRB   "
+        "BRB   "
+        "BRBB ");
+    ai_.puyoErasedForMe(req);
+    EXPECT_EQ(0, myPlayerState().fixedOjama);
     EXPECT_EQ(0, myPlayerState().pendingOjama);
+    originalRensaResult.score -= 320;
+    originalRensaResult.frames -= 3 + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
+    EXPECT_EQ(originalRensaResult, myPlayerState().currentRensaResult);
     EXPECT_EQ(0, enemyPlayerState().fixedOjama);
+    EXPECT_EQ(5, enemyPlayerState().pendingOjama);
+
+    // score = 360 + 40 * 16 = 1000
+    req.frameId = 6;
+    req.playerFrameRequest[0].field = CoreField(
+        "RB    "
+        "BR    "
+        "BR    "
+        "BRR   ");
+    ai_.puyoErasedForMe(req);
+    EXPECT_EQ(0, myPlayerState().fixedOjama);
+    EXPECT_EQ(0, myPlayerState().pendingOjama);
+    originalRensaResult.score -= 40 * 16;
+    originalRensaResult.frames -= 3 + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
+    EXPECT_EQ(originalRensaResult, myPlayerState().currentRensaResult);
+    EXPECT_EQ(0, enemyPlayerState().fixedOjama);
+    EXPECT_EQ(14, enemyPlayerState().pendingOjama);
+
+    // score = 1000 + 40 * 32 = 2280
+    req.frameId = 7;
+    req.playerFrameRequest[0].field = CoreField(
+        "R     "
+        "B     "
+        "B     "
+        "BB    ");
+    ai_.puyoErasedForMe(req);
+    EXPECT_EQ(0, myPlayerState().fixedOjama);
+    EXPECT_EQ(0, myPlayerState().pendingOjama);
+    originalRensaResult.score -= 40 * 32;
+    originalRensaResult.frames -= 3 + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
+    EXPECT_EQ(originalRensaResult, myPlayerState().currentRensaResult);
+    EXPECT_EQ(0, enemyPlayerState().fixedOjama);
+    EXPECT_EQ(32, enemyPlayerState().pendingOjama);
+
+    req.frameId = 8;
+    req.playerFrameRequest[0].field = CoreField(
+        "      "
+        "      "
+        "      "
+        "R     ");
+    ai_.decisionRequestedForMe(req);
+    EXPECT_EQ(0, myPlayerState().fixedOjama);
+    EXPECT_EQ(0, myPlayerState().pendingOjama);
+    EXPECT_EQ(32, enemyPlayerState().fixedOjama);
     EXPECT_EQ(0, enemyPlayerState().pendingOjama);
 }
 

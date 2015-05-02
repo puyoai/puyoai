@@ -63,11 +63,13 @@ protected:
 
     virtual void onDecisionRequestedForMe(const FrameRequest&) {}
     virtual void onGroundedForMe(const FrameRequest&) {}
+    virtual void onPuyoErasedForMe(const FrameRequest&) {}
     virtual void onOjamaDroppedForMe(const FrameRequest&) {}
     virtual void onNext2AppearedForMe(const FrameRequest&) {}
 
     virtual void onDecisionRequestedForEnemy(const FrameRequest&) {}
     virtual void onGroundedForEnemy(const FrameRequest&) {}
+    virtual void onPuyoErasedForEnemy(const FrameRequest&) {}
     virtual void onOjamaDroppedForEnemy(const FrameRequest&) {}
     virtual void onNext2AppearedForEnemy(const FrameRequest&) {}
 
@@ -91,7 +93,11 @@ protected:
 
     void groundedForMe(const FrameRequest&);
     void groundedForEnemy(const FrameRequest&);
-    static void groundedForCommon(PlayerState* p1, PlayerState* p2, int frameId, const PlainField&);
+    void groundedForCommon(PlayerState*, int frameId);
+
+    void puyoErasedForMe(const FrameRequest&);
+    void puyoErasedForEnemy(const FrameRequest&);
+    static void puyoErasedForCommon(PlayerState* p1, PlayerState* p2, int frameId, const PlainField& provided);
 
     void ojamaDroppedForMe(const FrameRequest&);
     void ojamaDroppedForEnemy(const FrameRequest&);

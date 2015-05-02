@@ -55,6 +55,7 @@ public:
     int fallenOjama() const { return fallenOjama_; }
     int pendingOjama() const { return pendingOjama_; }
     int fixedOjama() const { return fixedOjama_; }
+    int totalOjama() const { return pendingOjama_ + fixedOjama_; }
     int ojamaCommittingFrameId() const { return ojamaCommittingFrameId_; }
     bool hasZenkeshi() const { return hasZenkeshi_; }
 
@@ -116,6 +117,7 @@ public:
     int fallenOjama() const { return fallenOjama_; }
     int pendingOjama() const { return pendingOjama_; }
     int fixedOjama() const { return fixedOjama_; }
+    int totalOjama() const { return pendingOjama_ + fixedOjama_; }
     int ojamaCommittingFrameId() const { return ojamaCommittingFrameId_; }
     bool hasZenkeshi() const { return hasZenkeshi_; }
 

@@ -1,6 +1,7 @@
 #ifndef CORE_RENSA_RESULT_H_
 #define CORE_RENSA_RESULT_H_
 
+#include <ostream>
 #include <string>
 
 // RensaResult includes the result of rensa.
@@ -20,6 +21,13 @@ struct RensaResult {
     }
 
     friend bool operator!=(const RensaResult& lhs, const RensaResult& rhs) { return !(lhs == rhs); }
+    friend std::ostream& operator<<(std::ostream& os, const RensaResult& rensaResult) {
+        os << "chiains=" << rensaResult.chains << ' '
+           << "score=" << rensaResult.score << ' '
+           << "frames=" << rensaResult.frames << ' '
+           << "quick=" << rensaResult.quick;
+        return os;
+    }
 
     int chains;
     int score;

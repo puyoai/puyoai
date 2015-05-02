@@ -84,8 +84,9 @@ TEST(MayahAITest, fromReal1)
     me.pendingOjama = 67;
 
     PlayerState enemy;
-    enemy.isRensaOngoing = true;
-    enemy.finishingRensaFrameId = 1346;
+    enemy.currentChain = 5;
+    enemy.currentChainStartedFrameId = 1000;
+    enemy.currentRensaResult = RensaResult(5, 10000, 346, false);
 
     ThoughtResult thoughtResult = ai->thinkPlan(1328, myField, mySeq, me, enemy, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
 
@@ -134,8 +135,9 @@ TEST(MayahAITest, fromReal2)
     me.pendingOjama = 67;
 
     PlayerState enemy;
-    enemy.isRensaOngoing = true;
-    enemy.finishingRensaFrameId = 1346;
+    enemy.currentChain = 5;
+    enemy.currentChainStartedFrameId = 1000;
+    enemy.currentRensaResult = RensaResult(5, 10000, 346, false);
 
     ThoughtResult thoughtResult = ai->thinkPlan(1352, myField, mySeq, me, enemy, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
 

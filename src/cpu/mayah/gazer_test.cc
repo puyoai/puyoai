@@ -69,9 +69,9 @@ TEST_F(GazerTest, estimateMaxScoreUsingRensaIsOngoing)
     gazer_->gaze(100, f, seq);
 
     PlayerState enemy;
-    enemy.isRensaOngoing = true;
-    enemy.finishingRensaFrameId = 400;
-    enemy.ongoingRensaResult = RensaResult(10, 36840, 300, false);
+    enemy.currentChain = 1;
+    enemy.currentChainStartedFrameId = 100;
+    enemy.currentRensaResult = RensaResult(10, 36840, 300, false);
 
     GazeResult gazeResult = gazer_->gazeResult();
 

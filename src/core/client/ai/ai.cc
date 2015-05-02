@@ -102,6 +102,8 @@ void AI::runLoop()
             ojamaDroppedForEnemy(frameRequest);
         if (frameRequest.enemyPlayerFrameRequest().event.grounded)
             groundedForEnemy(frameRequest);
+        if (frameRequest.enemyPlayerFrameRequest().event.puyoErased)
+            puyoErasedForEnemy(frameRequest);
         if (frameRequest.enemyPlayerFrameRequest().event.wnextAppeared)
             next2AppearedForEnemy(frameRequest);
 
@@ -144,9 +146,10 @@ void AI::runLoop()
             next1.ojamaDropped = true;
             ojamaDroppedForMe(frameRequest);
         }
-        if (frameRequest.myPlayerFrameRequest().event.grounded) {
+        if (frameRequest.myPlayerFrameRequest().event.grounded)
             groundedForMe(frameRequest);
-        }
+        if (frameRequest.myPlayerFrameRequest().event.puyoErased)
+            puyoErasedForMe(frameRequest);
         if (frameRequest.myPlayerFrameRequest().event.decisionRequest) {
             VLOG(1) << "REQUESTED";
             next1.requested = true;
@@ -265,14 +268,15 @@ void AI::decisionRequestedForEnemy(const FrameRequest& frameRequest)
 // static
 void AI::decisionRequestedForCommon(PlayerState* p1, PlayerState* p2)
 {
+    // TODO(mayah): pending ojama should be committed when rensa is finished.
     if (p2->pendingOjama > 0) {
         p2->fixedOjama += p2->pendingOjama;
         p2->pendingOjama = 0;
     }
 
-    p1->isRensaOngoing = false;
-    p1->finishingRensaFrameId = 0;
-    p1->ongoingRensaResult = RensaResult();
+    p1->currentChain = 0;
+    p1->currentChainStartedFrameId = 0;
+    p1->currentRensaResult = RensaResult();
 
     if (!p1->hasOjamaDropped)
         p1->fixedOjama = 0;
@@ -281,59 +285,94 @@ void AI::decisionRequestedForCommon(PlayerState* p1, PlayerState* p2)
 
 void AI::groundedForMe(const FrameRequest& frameRequest)
 {
-    groundedForCommon(&me_, &enemy_, frameRequest.frameId, frameRequest.myPlayerFrameRequest().field);
+    // Should we take field from me_.field? It's more accurate than frameRequest?
+    me_.fieldWhenGrounded = CoreField::fromPlainFieldWithDrop(frameRequest.myPlayerFrameRequest().field);
+    groundedForCommon(&me_, frameRequest.frameId);
     onGroundedForMe(frameRequest);
 }
 
 void AI::groundedForEnemy(const FrameRequest& frameRequest)
 {
-    groundedForCommon(&enemy_, &me_, frameRequest.frameId, frameRequest.enemyPlayerFrameRequest().field);
+    enemy_.fieldWhenGrounded = CoreField::fromPlainFieldWithDrop(frameRequest.enemyPlayerFrameRequest().field);
+    groundedForCommon(&enemy_, frameRequest.frameId);
     onGroundedForEnemy(frameRequest);
 }
 
-// static
-void AI::groundedForCommon(PlayerState* p1, PlayerState* p2, int frameId, const PlainField& provided)
+void AI::groundedForCommon(PlayerState* state, int frameId)
 {
-    CoreField cf(CoreField::fromPlainFieldWithDrop(provided));
-
+    CoreField cf(CoreField::fromPlainFieldWithDrop(state->fieldWhenGrounded));
+    VLOG(1) << cf;
     RensaResult rensaResult = cf.simulate();
+
     if (rensaResult.chains > 0) {
-        int ojamaCount = rensaResult.score / 70;;
-        if (p1->hasZenkeshi) {
-            ojamaCount += 30;
-        }
+        state->currentChainStartedFrameId = frameId;
+    }
 
-        if (p1->pendingOjama > 0) {
-            if (p1->pendingOjama > ojamaCount) {
-                p1->pendingOjama -= ojamaCount;
-                ojamaCount = 0;
-            } else {
-                ojamaCount -= p1->pendingOjama;
-                p1->pendingOjama = 0;
-            }
-        }
-        if (p1->fixedOjama > 0) {
-            if (p1->fixedOjama > ojamaCount) {
-                p1->fixedOjama -= ojamaCount;
-                ojamaCount = 0;
-            } else {
-                ojamaCount -= p1->fixedOjama;
-                p1->fixedOjama = 0;
-            }
-        }
+    if (state->hand != 0 && cf.isZenkeshi()) {
+        state->hasZenkeshi = true;
+    }
+}
 
-        p2->pendingOjama += ojamaCount;
+void AI::puyoErasedForMe(const FrameRequest& frameRequest)
+{
+    puyoErasedForCommon(&me_, &enemy_, frameRequest.frameId, frameRequest.myPlayerFrameRequest().field);
+    onPuyoErasedForMe(frameRequest);
+}
 
-        p1->isRensaOngoing = true;
-        p1->ongoingRensaResult = rensaResult;
-        p1->finishingRensaFrameId = frameId + rensaResult.frames;
+void AI::puyoErasedForEnemy(const FrameRequest& frameRequest)
+{
+    puyoErasedForCommon(&enemy_, &me_, frameRequest.frameId, frameRequest.enemyPlayerFrameRequest().field);
+    onPuyoErasedForEnemy(frameRequest);
+}
+
+// static
+void AI::puyoErasedForCommon(PlayerState* p1, PlayerState* p2, int frameId, const PlainField& provided)
+{
+    p1->currentChain += 1;
+    p1->currentChainStartedFrameId = frameId;
+
+    CoreField cf(CoreField::fromPlainFieldWithDrop(provided));
+    CoreField::SimulationContext context(p1->currentChain);
+    int score = cf.vanishDrop(&context);
+
+    p1->unusedScore += score;
+    int ojamaCount = p1->unusedScore / 70;
+    p1->unusedScore %= 70;
+
+    if (p1->pendingOjama > 0) {
+        if (p1->pendingOjama > ojamaCount) {
+            p1->pendingOjama -= ojamaCount;
+            ojamaCount = 0;
+        } else {
+            ojamaCount -= p1->pendingOjama;
+            p1->pendingOjama = 0;
+        }
+    }
+    if (p1->fixedOjama > 0) {
+        if (p1->fixedOjama > ojamaCount) {
+            p1->fixedOjama -= ojamaCount;
+            ojamaCount = 0;
+        } else {
+            ojamaCount -= p1->fixedOjama;
+            p1->fixedOjama = 0;
+        }
+    }
+
+    p2->pendingOjama += ojamaCount;
+
+    if (cf.isZenkeshi()) {
+        // p1->hasZenkeshi is set in puyoErasedOnCommon.
+        p1->unusedScore += scoreForOjama(30);
+    } else {
         p1->hasZenkeshi = false;
     }
 
-    // Don't check zenkeshi if me_.hand is 0.
-    if (p1->hand != 0 && cf.isZenkeshi()) {
-        p1->hasZenkeshi = true;
-    }
+    // Estimate the rest of chains.
+    cf = CoreField::fromPlainFieldWithDrop(provided);
+    context = CoreField::SimulationContext(p1->currentChain);
+    p1->currentRensaResult = cf.simulate(&context);
+    // It's already used. We don't want to count it again.
+    p1->currentRensaResult.score -= score;
 }
 
 void AI::ojamaDroppedForMe(const FrameRequest& frameRequest)
