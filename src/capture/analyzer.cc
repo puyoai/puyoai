@@ -504,6 +504,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
 
         if (!result->hasDetectedPuyoErase_) {
             result->userEvent.puyoErased = true;
+            shouldUpdateField = true;
         }
         result->hasDetectedPuyoErase_ = true;
     } else {
