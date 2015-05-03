@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_wii
-            wii_connect_server.cc stdout_key_sender.cc serial_key_sender.cc)
+            wii_connect_server.cc
+            stdout_key_sender.cc
+            serial_key_sender.cc)
 
 function(puyoai_wii_add_executable exe)
     add_executable(${exe} ${ARGN})

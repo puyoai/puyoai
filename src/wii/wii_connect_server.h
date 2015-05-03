@@ -29,7 +29,8 @@ class Source;
 
 class WiiConnectServer : public Drawer, public AnalyzerResultRetriever {
 public:
-    WiiConnectServer(Source*, Analyzer*, KeySender*, const std::string& p1, const std::string& p2);
+    WiiConnectServer(Source*, Analyzer*, KeySender* p1KeySender, KeySender* p2KeySender,
+                     const std::string& p1, const std::string& p2);
     ~WiiConnectServer();
 
     // Dont' take the ownership.
@@ -72,7 +73,7 @@ private:
 
     Source* source_;
     Analyzer* analyzer_;
-    KeySender* keySender_;
+    KeySender* keySenders_[2];
 
     std::map<RealColor, PuyoColor> colorMap_;
     std::array<bool, 4> colorsUsed_;
