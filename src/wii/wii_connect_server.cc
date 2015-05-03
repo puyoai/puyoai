@@ -22,13 +22,14 @@
 
 using namespace std;
 
-WiiConnectServer::WiiConnectServer(Source* source, Analyzer* analyzer, KeySender* keySender,
+WiiConnectServer::WiiConnectServer(Source* source, Analyzer* analyzer,
+                                   KeySender* p1KeySender, KeySender* p2KeySender,
                                    const string& p1Program, const string& p2Program) :
     shouldStop_(false),
     surface_(emptyUniqueSDLSurface()),
     source_(source),
     analyzer_(analyzer),
-    keySender_(keySender)
+    keySenders_ { p1KeySender, p2KeySender }
 {
     isAi_[0] = (p1Program != "-");
     isAi_[1] = (p2Program != "-");
@@ -175,8 +176,10 @@ void WiiConnectServer::runLoop()
 
 bool WiiConnectServer::playForUnknown(int frameId)
 {
-    if (frameId % 10 == 0)
-        keySender_->sendKeySet(KeySet());
+    if (frameId % 10 == 0) {
+        for (int pi = 0; pi < 2; ++pi)
+            keySenders_[pi]->sendKeySet(KeySet());
+    }
 
     reset();
     return true;
@@ -185,9 +188,11 @@ bool WiiConnectServer::playForUnknown(int frameId)
 bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& analyzerResult)
 {
     if (frameId % 10 == 0) {
-        keySender_->sendKeySet(KeySet());
-        keySender_->sendKeySet(KeySet(Key::RIGHT_TURN));
-        keySender_->sendKeySet(KeySet());
+        for (int pi = 0; pi < 2; ++pi) {
+            keySenders_[pi]->sendKeySet(KeySet());
+            keySenders_[pi]->sendKeySet(KeySet(Key::RIGHT_TURN));
+            keySenders_[pi]->sendKeySet(KeySet());
+        }
     }
 
     // Sends an initialization message.
@@ -219,7 +224,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 
         if (analyzerResult.playerResult(pi)->userEvent.ojamaDropped ||
             analyzerResult.playerResult(pi)->userEvent.grounded) {
-            keySender_->sendKeySet(KeySet());
+            keySenders_[pi]->sendKeySet(KeySet());
         }
     }
 
@@ -262,9 +267,11 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
 bool WiiConnectServer::playForFinished(int frameId)
 {
     if (frameId % 10 == 0) {
-        keySender_->sendKeySet(KeySet());
-        keySender_->sendKeySet(KeySet(Key::START));
-        keySender_->sendKeySet(KeySet());
+        for (int pi = 0; pi < 2; ++pi) {
+            keySenders_[pi]->sendKeySet(KeySet());
+            keySenders_[pi]->sendKeySet(KeySet(Key::START));
+            keySenders_[pi]->sendKeySet(KeySet());
+        }
     }
 
     reset();
@@ -440,10 +447,10 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult,
             cout << duration << endl;
 
             // TODO(mayah): Maybe we need to wait using duration?
-            keySender_->sendWait(20);
+            keySenders_[pi]->sendWait(20);
         }
 
-        keySender_->sendKeySetSeq(keySetSeq);
+        keySenders_[pi]->sendKeySetSeq(keySetSeq);
         return;
     }
 }

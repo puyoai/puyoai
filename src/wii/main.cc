@@ -23,6 +23,7 @@
 #include "gui/user_event_drawer.h"
 #include "wii/serial_key_sender.h"
 #include "wii/stdout_key_sender.h"
+#include "wii/null_key_sender.h"
 #include "wii/wii_connect_server.h"
 
 #if USE_AUDIO_COMMENTATOR
@@ -88,7 +89,7 @@ int main(int argc, char* argv[])
         ignoreSIGPIPE();
 
     if (argc < 4) {
-        fprintf(stderr, "Usage: %s [option] <serial> <1p> <2p>\n", argv[0]);
+        fprintf(stderr, "       %s [option] <serial1p> <serial2p> <1p> <2p>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -100,12 +101,22 @@ int main(int argc, char* argv[])
     unique_ptr<Source> source = makeVideoSource();
     unique_ptr<Analyzer> analyzer = makeVideoAnalyzer();
 
-    unique_ptr<KeySender> keySender;
+    unique_ptr<KeySender> keySender[2];
     if (string(argv[1]) == "stdout") {
-        keySender.reset(new StdoutKeySender);
+        keySender[0].reset(new StdoutKeySender);
+    } else if (string(argv[2]) == "-") {
+        keySender[0].reset(new NullKeySender);
     } else {
-        keySender.reset(new SerialKeySender(argv[1]));
+        keySender[0].reset(new SerialKeySender(argv[1]));
     }
+    if (string(argv[2]) == "stdout") {
+        keySender[1].reset(new StdoutKeySender);
+    } else if (string(argv[2]) == "-") {
+        keySender[1].reset(new NullKeySender);
+    } else {
+        keySender[1].reset(new SerialKeySender(argv[2]));
+    }
+
     CHECK(source->ok());
 
     unique_ptr<ScreenShotSaver> saver;
@@ -115,7 +126,9 @@ int main(int argc, char* argv[])
         saver->setDrawsFrameId(true);
     }
 
-    WiiConnectServer server(source.get(), analyzer.get(), keySender.get(), argv[2], argv[3]);
+    WiiConnectServer server(source.get(), analyzer.get(),
+                            keySender[0].get(), keySender[1].get(),
+                            argv[3], argv[4]);
 
     unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;
     if (FLAGS_draw_result)
