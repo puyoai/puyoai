@@ -10,8 +10,6 @@
 template<typename T, std::size_t size>
 constexpr std::size_t ARRAY_SIZE(const T (&)[size]) { return size; }
 
-#define CLEAR_ARRAY(a) memset(a, 0, sizeof(a))
-
 #ifndef __has_feature
 #  define __has_feature(x) 0
 #endif

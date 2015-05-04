@@ -10,9 +10,9 @@
 using namespace std;
 
 FPSDrawer::FPSDrawer() :
-    frames_(0)
+    frames_(0),
+    ticks_ {}
 {
-    CLEAR_ARRAY(ticks_);
 }
 
 FPSDrawer::~FPSDrawer()
