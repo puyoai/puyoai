@@ -1,13 +1,16 @@
 #ifndef BASE_BASE_H_
 #define BASE_BASE_H_
 
-#define ARRAY_SIZE(a)                                   \
-    ((sizeof(a) / sizeof(*(a))) /                       \
-     static_cast<size_t>(!(sizeof(a) % sizeof(*(a)))))
-
-#define CLEAR_ARRAY(a) memset(a, 0, sizeof(a))
+#include <cstddef>
 
 #define UNUSED_VARIABLE(x) (void)(x)
+
+// C++11 allows us to implement code to take the array size.
+// If we pass non-array to this function, compile error will happen.
+template<typename T, std::size_t size>
+constexpr std::size_t ARRAY_SIZE(const T (&)[size]) { return size; }
+
+#define CLEAR_ARRAY(a) memset(a, 0, sizeof(a))
 
 #ifndef __has_feature
 #  define __has_feature(x) 0
