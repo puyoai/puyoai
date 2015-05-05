@@ -201,10 +201,10 @@ public:
     RensaResult simulate(SimulationContext*, Tracker*);
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
-    int vanishDrop(SimulationContext*);
+    RensaStepResult vanishDrop(SimulationContext*);
     // Vanishes the connected puyos with Tracker.
     template<typename Tracker>
-    int vanishDrop(SimulationContext*, Tracker*);
+    RensaStepResult vanishDrop(SimulationContext*, Tracker*);
 
     // ----------------------------------------------------------------------
     // utility methods

@@ -15,7 +15,14 @@ struct PlayerState {
 
     // totalOjama() returns fixed + pending + ongoing.
     int totalOjama(const PlayerState& enemy) const {
-        return fixedOjama + pendingOjama + (enemy.currentRensaResult.score + enemy.unusedScore) / 70;
+        int total = fixedOjama + pendingOjama;
+        // Add ongoing rensa.
+        total += (enemy.currentRensaResult.score + enemy.unusedScore) / 70;
+        // Subtract enemy's ojama, since enemy must SOUSAI these ojama.
+        total -= enemy.fixedOjama - enemy.pendingOjama;
+        if (total < 0)
+            return 0;
+        return total;
     }
 
     // noticedOjama() returns fixed + pending.

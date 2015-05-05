@@ -302,10 +302,12 @@ void AI::groundedForCommon(PlayerState* state, int frameId)
 {
     CoreField cf(CoreField::fromPlainFieldWithDrop(state->fieldWhenGrounded));
     VLOG(1) << cf;
-    RensaResult rensaResult = cf.simulate();
+    state->currentRensaResult = cf.simulate();
 
-    if (rensaResult.chains > 0) {
+    if (state->currentRensaResult.chains > 0) {
         state->currentChainStartedFrameId = frameId;
+    } else {
+        state->currentChainStartedFrameId = 0;
     }
 
     if (state->hand != 0 && cf.isZenkeshi()) {
@@ -333,9 +335,9 @@ void AI::puyoErasedForCommon(PlayerState* p1, PlayerState* p2, int frameId, cons
 
     CoreField cf(CoreField::fromPlainFieldWithDrop(provided));
     CoreField::SimulationContext context(p1->currentChain);
-    int score = cf.vanishDrop(&context);
+    RensaStepResult stepResult = cf.vanishDrop(&context);
 
-    p1->unusedScore += score;
+    p1->unusedScore += stepResult.score;
     int ojamaCount = p1->unusedScore / 70;
     p1->unusedScore %= 70;
 
@@ -372,7 +374,7 @@ void AI::puyoErasedForCommon(PlayerState* p1, PlayerState* p2, int frameId, cons
     context = CoreField::SimulationContext(p1->currentChain);
     p1->currentRensaResult = cf.simulate(&context);
     // It's already used. We don't want to count it again.
-    p1->currentRensaResult.score -= score;
+    p1->currentRensaResult.score -= stepResult.score;
 }
 
 void AI::ojamaDroppedForMe(const FrameRequest& frameRequest)

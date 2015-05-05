@@ -262,7 +262,12 @@ void DecisionPlanner<MidEvaluationResult>::iterate(int initialFrameId,
     auto f = [&](const CoreField& fieldAfterDecision, const Decision& decision, bool isChigiri, int dropFrames) {
         int fixedOjama = me.fixedOjama;
         int pendingOjama = me.pendingOjama;
+        // TODO(mayah): Is it good to add ongoing ojama as pending ojama?
+        // Add as pending ojama.
         pendingOjama += (enemy.unusedScore + enemy.currentRensaResult.score) / 70;
+        pendingOjama -= enemy.fixedOjama + enemy.pendingOjama;
+        if (pendingOjama < 0)
+            pendingOjama = 0;
 
         int ojamaCommittingFrameId = enemy.isRensaOngoing() ? enemy.rensaFinishingFrameId() : 0;
         bool hasZenkeshi = me.hasZenkeshi;
