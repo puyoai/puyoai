@@ -166,42 +166,6 @@ TEST_F(EvaluatorTest, connectionHorizontal)
     EXPECT_EQ(1, cfs.feature(CONNECTION_HORIZONTAL_CROSSED_3));
 }
 
-TEST_F(EvaluatorTest, NumUnreachableSpace1)
-{
-    CoreField f(
-        "OOOOOO"
-        "OOOOOO"
-        "OOOOOO");
-
-    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
-        evaluator->evalUnreachableSpace(f);
-    });
-
-    EXPECT_EQ(0, cfs.feature(NUM_UNREACHABLE_SPACE));
-}
-
-TEST_F(EvaluatorTest, NumUnreachableSpace2)
-{
-    CoreField f(
-        "    O " // 12
-        "    O "
-        "    O "
-        "    O "
-        "    O " // 8
-        "    O "
-        "    O "
-        "    O "
-        "    O " // 4
-        "    O "
-        "    O "
-        "    O ");
-
-    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
-        evaluator->evalUnreachableSpace(f);
-    });
-
-    EXPECT_EQ(12, cfs.feature(NUM_UNREACHABLE_SPACE));
-}
 
 TEST_F(EvaluatorTest, sideChain)
 {

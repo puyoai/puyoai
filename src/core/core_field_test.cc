@@ -82,6 +82,35 @@ TEST(CoreFieldTest, countColorPuyos3)
     EXPECT_EQ(10, cf.countColorPuyos());
 }
 
+TEST(CoreFieldTest, countUnreachableSpaces1)
+{
+    CoreField cf(
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    EXPECT_EQ(0, cf.countUnreachableSpaces());
+}
+
+TEST(CoreFieldTest, countUnreachableSpaces2)
+{
+    CoreField cf(
+        "    O " // 12
+        "    O "
+        "    O "
+        "    O "
+        "    O " // 8
+        "    O "
+        "    O "
+        "    O "
+        "    O " // 4
+        "    O "
+        "    O "
+        "    O ");
+
+    EXPECT_EQ(12, cf.countUnreachableSpaces());
+}
+
 TEST(CoreFieldTest, simulate1)
 {
     CoreField cf("RRRR..");

@@ -81,6 +81,8 @@ public:
     bool isConnectedPuyo(int x, int y) const { return field_.isConnectedPuyo(x, y); }
     // Returns true if there is an empty neighbor of (x, y).
     bool hasEmptyNeighbor(int x, int y) const { return field_.hasEmptyNeighbor(x, y); }
+    // Returns the number of empty unreachable spaces.
+    int countUnreachableSpaces() const;
 
     // ----------------------------------------------------------------------
     // field manipulation
