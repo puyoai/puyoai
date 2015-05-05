@@ -247,18 +247,9 @@ void Evaluator<ScoreCollector>::evalFieldUShape(const CoreField& field, bool ene
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalUnreachableSpace(const CoreField& f)
+void Evaluator<ScoreCollector>::evalUnreachableSpace(const CoreField& cf)
 {
-    int count = 0;
-
-    if (f.height(2) >= 12 && f.height(1) < 12)
-        count += 12 - f.height(1);
-    if (f.height(4) >= 12 && f.height(5) < 12)
-        count += 12 - f.height(5);
-    if ((f.height(4) >= 12 || f.height(5) >= 12) && f.height(6) < 12)
-        count += 12 - f.height(6);
-
-    sc_->addScore(NUM_UNREACHABLE_SPACE, count);
+    sc_->addScore(NUM_UNREACHABLE_SPACE, cf.countUnreachableSpaces());
 }
 
 template<typename ScoreCollector>
