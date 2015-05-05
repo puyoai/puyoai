@@ -131,7 +131,6 @@ TEST_F(AITest, ojamaCount)
 
     KumipuyoSeq seq("RRRRBBGG");
 
-    CoreField field;
     FrameRequest req;
 
     req.frameId = 1;
@@ -236,6 +235,102 @@ TEST_F(AITest, ojamaCount)
     EXPECT_EQ(0, myPlayerState().pendingOjama);
     EXPECT_EQ(32, enemyPlayerState().fixedOjama);
     EXPECT_EQ(0, enemyPlayerState().pendingOjama);
+}
+
+TEST_F(AITest, ojamaCountWithSOUSAI)
+{
+    RensaResult originalRensaResult1;
+    {
+        CoreField cf(
+            "R..R.G"
+            "BBBBBB"
+            "RRRORR");
+        originalRensaResult1 = cf.simulate();
+    }
+    RensaResult originalRensaResult2;
+    {
+        CoreField cf(
+            ".BBB.."
+            "RRRRBG");
+        originalRensaResult2 = cf.simulate();
+    }
+
+    FrameRequest req;
+
+    req.frameId = 1;
+    ai_.gameWillBegin(req);
+    EXPECT_EQ(0, myPlayerState().fixedOjama);
+    EXPECT_EQ(0, myPlayerState().pendingOjama);
+    EXPECT_EQ(0, enemyPlayerState().fixedOjama);
+    EXPECT_EQ(0, enemyPlayerState().pendingOjama);
+
+    req.frameId = 2;
+    ai_.decisionRequestedForMe(req);
+    ai_.decisionRequestedForEnemy(req);
+    EXPECT_EQ(0, myPlayerState().fixedOjama);
+    EXPECT_EQ(0, myPlayerState().pendingOjama);
+    EXPECT_EQ(0, enemyPlayerState().fixedOjama);
+    EXPECT_EQ(0, enemyPlayerState().pendingOjama);
+
+    req.frameId = 3;
+    req.playerFrameRequest[0].field = CoreField(
+        "R..R.G"
+        "BBBBBB"
+        "RRRORR");
+    req.playerFrameRequest[1].field = CoreField(
+        ".BBB.."
+        "RRRRBG");
+    ai_.groundedForMe(req);
+    ai_.groundedForEnemy(req);
+    EXPECT_EQ(0, myPlayerState().fixedOjama);
+    EXPECT_EQ(0, myPlayerState().pendingOjama);
+    EXPECT_EQ(originalRensaResult1, myPlayerState().currentRensaResult);
+    EXPECT_EQ(0, enemyPlayerState().fixedOjama);
+    EXPECT_EQ(0, enemyPlayerState().pendingOjama);
+    EXPECT_EQ(originalRensaResult2, enemyPlayerState().currentRensaResult);
+
+    req.frameId = 4;
+    req.playerFrameRequest[0].field = CoreField(
+        "R..R.G"
+        "BBBBBB"
+        "RRRORR");
+    req.playerFrameRequest[1].field = CoreField(
+        ".BBB.."
+        "RRRRBG");
+    ai_.puyoErasedForMe(req);
+    ai_.puyoErasedForEnemy(req);
+    EXPECT_EQ(0, myPlayerState().fixedOjama);
+    EXPECT_EQ(0, myPlayerState().pendingOjama);
+    EXPECT_EQ(40, myPlayerState().unusedScore);
+    originalRensaResult1.score -= 60 * 3; // 180
+    EXPECT_EQ(originalRensaResult1, myPlayerState().currentRensaResult);
+    EXPECT_EQ(0, enemyPlayerState().fixedOjama);
+    EXPECT_EQ(2, enemyPlayerState().pendingOjama);
+    EXPECT_EQ(40, enemyPlayerState().unusedScore);
+    originalRensaResult2.score -= 40;
+    EXPECT_EQ(originalRensaResult2, enemyPlayerState().currentRensaResult);
+
+    originalRensaResult1.frames -= 2 + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
+    originalRensaResult2.frames -= 1 + FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING;
+
+    req.frameId = 5;
+    req.playerFrameRequest[0].field = CoreField(
+        "R....G"
+        "RRRRRR");
+    req.playerFrameRequest[1].field = CoreField(
+        ".BBBBG");
+    ai_.puyoErasedForMe(req);
+    ai_.puyoErasedForEnemy(req);
+    EXPECT_EQ(0, myPlayerState().fixedOjama);
+    EXPECT_EQ(0, myPlayerState().pendingOjama);
+    EXPECT_EQ(40, myPlayerState().unusedScore);
+    originalRensaResult1.score -= 70 * (8 + 4);
+    EXPECT_EQ(originalRensaResult1, myPlayerState().currentRensaResult);
+    EXPECT_EQ(0, enemyPlayerState().fixedOjama);
+    EXPECT_EQ(9, enemyPlayerState().pendingOjama); // 2 + 12 - 5
+    EXPECT_EQ(10, enemyPlayerState().unusedScore);
+    originalRensaResult2.score -= 40 * 8;
+    EXPECT_EQ(originalRensaResult2, enemyPlayerState().currentRensaResult);
 }
 
 TEST_F(AITest, isFieldInconsistent)

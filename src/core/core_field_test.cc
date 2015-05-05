@@ -665,13 +665,33 @@ TEST(CoreFieldTest, vanishDrop)
         "RRRRBB");
     CoreField::SimulationContext context(2);
 
-    int score = cf.vanishDrop(&context);
+    RensaStepResult stepResult = cf.vanishDrop(&context);
 
     CoreField expected(
         "..BBBB");
 
     EXPECT_EQ(expected, cf);
-    EXPECT_EQ(40 * 8, score);
+    EXPECT_EQ(40 * 8, stepResult.score);
+    EXPECT_EQ(FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[1], stepResult.frames);
+    EXPECT_FALSE(stepResult.quick);
+}
+
+TEST(CoreFieldTest, vanishDrop_quick)
+{
+    CoreField cf(
+        "......"
+        "RRRRBB");
+    CoreField::SimulationContext context(2);
+
+    RensaStepResult stepResult = cf.vanishDrop(&context);
+
+    CoreField expected(
+        "....BB");
+
+    EXPECT_EQ(expected, cf);
+    EXPECT_EQ(40 * 8, stepResult.score);
+    EXPECT_EQ(FRAMES_VANISH_ANIMATION, stepResult.frames);
+    EXPECT_TRUE(stepResult.quick);
 }
 
 TEST(CoreFieldTest, erasingPuyoPositions1)

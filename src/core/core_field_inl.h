@@ -56,20 +56,30 @@ inline RensaResult CoreField::simulate(SimulationContext* context, Tracker* trac
 }
 
 inline
-int CoreField::vanishDrop(SimulationContext* context)
+RensaStepResult CoreField::vanishDrop(SimulationContext* context)
 {
     RensaNonTracker tracker;
     return vanishDrop(context, &tracker);
 }
 
 template<typename Tracker>
-int CoreField::vanishDrop(SimulationContext* context, Tracker* tracker)
+RensaStepResult CoreField::vanishDrop(SimulationContext* context, Tracker* tracker)
 {
     int score = vanish(context, tracker);
+    int maxDrops = 0;
+    int frames = FRAMES_VANISH_ANIMATION;
+    bool quick = false;
     if (score > 0)
-        dropAfterVanish(context, tracker);
+        maxDrops = dropAfterVanish(context, tracker);
 
-    return score;
+    if (maxDrops > 0) {
+        DCHECK(maxDrops < 14);
+        frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
+    } else {
+        quick = true;
+    }
+
+    return RensaStepResult(score, frames, quick);
 }
 
 template<typename Tracker>

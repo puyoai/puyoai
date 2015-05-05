@@ -35,6 +35,15 @@ struct RensaResult {
     bool quick; // True if the last vanishment does not drop any puyos.
 };
 
+struct RensaStepResult {
+    RensaStepResult() {}
+    RensaStepResult(int score, int frames, bool quick) : score(score), frames(frames), quick(quick) {}
+
+    int score = 0;
+    int frames = 0;
+    bool quick = false;
+};
+
 class IgnitionRensaResult {
 public:
     IgnitionRensaResult() {}

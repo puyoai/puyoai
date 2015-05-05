@@ -52,11 +52,11 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         CoreField::SimulationContext context(originalContext_);
         RensaYPositionTracker tracker;
 
-        int score = cf.vanishDrop(&context, &tracker);
-        if (score == 0) {
+        RensaStepResult stepResult = cf.vanishDrop(&context, &tracker);
+        if (stepResult.score == 0) {
             CoreField tmp(originalField_);
             tmp.dropPuyoListWithMaxHeight(cpl, maxHeight);
-            CHECK_GT(score, 0) << tmp.toDebugString();
+            CHECK_GT(stepResult.score, 0) << tmp.toDebugString();
         }
         int restUnusedVariables = MAX_UNUSED_VARIABLES - complementResult.numFilledUnusedVariables;
         iteratePossibleRensasInternal(cf, context, tracker, 1, firePuyo, keyPuyos,
@@ -144,8 +144,8 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
             CoreField cf(currentField);
             CoreField::SimulationContext context(currentFieldContext);
             RensaYPositionTracker tracker(currentFieldTracker);
-            int score = cf.vanishDrop(&context, &tracker);
-            CHECK(score > 0) << score;
+            RensaStepResult stepResult = cf.vanishDrop(&context, &tracker);
+            CHECK_GT(stepResult.score, 0);
 
             iteratePossibleRensasInternal(cf, context, tracker, currentChains + 1, firePuyo, originalKeyPuyos,
                                           restIteration, restUnusedVariables,
@@ -172,8 +172,8 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
 
         CoreField::SimulationContext context(currentFieldContext);
         RensaYPositionTracker tracker(currentFieldTracker);
-        int score = cf.vanishDrop(&context, &tracker);
-        CHECK(score > 0) << score;
+        RensaStepResult stepResult = cf.vanishDrop(&context, &tracker);
+        CHECK_GT(stepResult.score, 0);
 
         iteratePossibleRensasInternal(cf, context, tracker, currentChains + 1, firePuyo, keyPuyos,
                                       restIteration - 1,
@@ -189,7 +189,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     CoreField cf(currentField);
     CoreField::SimulationContext context(currentFieldContext);
     RensaYPositionTracker tracker(currentFieldTracker);
-    CHECK(cf.vanishDrop(&context, &tracker) > 0) << cf.toDebugString();
+    CHECK(cf.vanishDrop(&context, &tracker).score > 0) << cf.toDebugString();
 
     // If rensa continues, proceed to next.
     if (cf.rensaWillOccurWithContext(context)) {
