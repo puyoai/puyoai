@@ -45,15 +45,11 @@ bool PatternMatcher::checkCell(char currentVar,
 {
     DCHECK('A' <= currentVar && currentVar <= 'Z') << currentVar;
 
-    // If neighbor is '*', we don't care what color the cell has.
-    if (neighborType == PatternType::ANY)
+    // This case should be already processed.
+    if (currentVar == neighborVar)
         return true;
 
     if (neighborColor == PuyoColor::OJAMA || neighborColor == PuyoColor::WALL)
-        return true;
-
-    // This case should be already processed.
-    if (currentVar == neighborVar)
         return true;
 
     switch (neighborType) {
@@ -68,7 +64,8 @@ bool PatternMatcher::checkCell(char currentVar,
             return false;
         break;
     case PatternType::ANY:
-        CHECK(false) << "shoudn't be reached";
+        // If neighbor is '*', we don't care what color the cell has.
+        return true;
     default:
         if (map(currentVar) == map(neighborVar) && isSet(currentVar))
             return false;
