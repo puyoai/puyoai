@@ -605,19 +605,21 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     evalFallenOjama(plan.fallenOjama());
 
     const int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
-    int maxChainMaxChains = 0;
+    int maxChain = 0;
+    int rensaCounts[20] {};
+
     int sideChainMaxScore = 0;
     int fastChain6MaxScore = 0;
     int fastChain10MaxScore = 0;
     int maxVirtualRensaResultScore = 0;
-    int rensaCounts[20] {};
 
-    struct MaxRensaInfo {
+    struct MainRensaInfo {
         double score = -100000000;
         typename ScoreCollector::CollectedScore collectedScore;
         ColumnPuyoList puyosToComplement;
         string bookName;
-    } maxRensa;
+        int maxChains = 0;
+    } mainRensa;
 
     auto evalCallback = [&](const CoreField& fieldAfterRensa,
                             const RensaResult& rensaResult,
@@ -654,15 +656,15 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
         // TODO(mayah): need to set a better mode here.
         const typename ScoreCollector::CollectedScore& rensaCollectedScore = rensaScoreCollector.collectedScore();
-        if (rensaCollectedScore.score(coef) > maxRensa.score) {
-            maxRensa.score = rensaCollectedScore.score(coef);
-            maxRensa.collectedScore = rensaCollectedScore;
-            maxRensa.puyosToComplement = puyosToComplement;
-            maxRensa.bookName = patternName;
+        if (rensaCollectedScore.score(coef) > mainRensa.score) {
+            mainRensa.score = rensaCollectedScore.score(coef);
+            mainRensa.collectedScore = rensaCollectedScore;
+            mainRensa.puyosToComplement = puyosToComplement;
+            mainRensa.bookName = patternName;
         }
 
-        if (maxChainMaxChains < rensaResult.chains) {
-            maxChainMaxChains = rensaResult.chains;
+        if (maxChain < rensaResult.chains) {
+            maxChain = rensaResult.chains;
         }
 
         if (maxVirtualRensaResultScore < virtualRensaScore) {
@@ -686,7 +688,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     detector.iteratePossibleRensas(preEvalResult.matchablePatternIds(), maxIteration);
 
     // max chain
-    sc_->addScore(RENSA_KIND, rensaCounts[maxChainMaxChains]);
+    sc_->addScore(RENSA_KIND, rensaCounts[maxChain]);
 
     // side chain
     if (sideChainMaxScore >= scoreForOjama(21)) {
@@ -706,9 +708,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     }
 
     // finalize.
-    sc_->merge(maxRensa.collectedScore);
-    sc_->setBookName(maxRensa.bookName);
-    sc_->setPuyosToComplement(maxRensa.puyosToComplement);
+    sc_->merge(mainRensa.collectedScore);
+    sc_->setBookName(mainRensa.bookName);
+    sc_->setPuyosToComplement(mainRensa.puyosToComplement);
     sc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }
 
