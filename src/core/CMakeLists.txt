@@ -5,16 +5,18 @@ add_subdirectory(client)
 add_subdirectory(server)
 
 if(USE_HTTPD)
-  add_subdirectory(httpd)
+    add_subdirectory(httpd)
 endif()
 
 # ----------------------------------------------------------------------
 # library
 
 add_library(puyoai_core STATIC
+            bits_field.cc
             column_puyo_list.cc
             core_field.cc
             decision.cc
+            field_bits.cc
             field_pretty_printer.cc
             frame_request.cc
             frame_response.cc
