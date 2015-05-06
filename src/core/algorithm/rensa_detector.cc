@@ -151,7 +151,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                 if (visited[x + d][ordinal(c)])
                     continue;
 
-                if (x + d <= 0 || CoreField::WIDTH < x + d)
+                if (x + d <= 0 || FieldConstant::WIDTH < x + d)
                     continue;
                 if (d == 0) {
                     if (originalField.color(x, y + 1) != PuyoColor::EMPTY)
@@ -218,7 +218,7 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
 {
     CoreField cf(originalField);
 
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
             DCHECK_EQ(cf, originalField);
 
@@ -234,7 +234,7 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
 
             // float puyo col dx
             for (int dx = x - 1; dx <= x + 1; ++dx) {
-                if (dx <= 0 || CoreField::WIDTH < dx)
+                if (dx <= 0 || FieldConstant::WIDTH < dx)
                     continue;
                 if (prohibits[dx])
                     continue;
@@ -541,7 +541,7 @@ static void findPossibleRensasInternal(const CoreField& currentField,
     CoreField f(currentField);
     ColumnPuyoList puyoList(keyPuyos);
 
-    for (int x = leftX; x <= CoreField::WIDTH; ++x) {
+    for (int x = leftX; x <= FieldConstant::WIDTH; ++x) {
         if (f.height(x) >= 12)
             continue;
 

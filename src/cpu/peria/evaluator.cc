@@ -36,7 +36,7 @@ int Evaluator::Field(const CoreField& field) {
   int score = 0;
 
   int num_connect = 0;
-  for (int x = 1; x < PlainField::WIDTH; ++x) {
+  for (int x = 1; x < FieldConstant::WIDTH; ++x) {
     int height = field.height(x);
     for (int y = 1; y <= height; ++y) {
       PuyoColor c = field.color(x, y);
@@ -91,8 +91,8 @@ int Evaluator::Plan(const CoreField& field,
       });
 
   int count = 0;
-  for (int x = 1; x <= PlainField::WIDTH; ++x) {
-    for (int y = 1; y <= PlainField::HEIGHT; ++y) {
+  for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+    for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
       if (track_result.erasedAt(x, y) == 0)
         continue;
       if (track_result.erasedAt(x, y) == track.erasedAt(x, y) + 1)

@@ -88,9 +88,9 @@ int Pattern::Match(const CoreField& field) const {
   MatchingCounts matching1;  // Mirroring
   const int height = pattern_.size();
   for (int y = 1; y <= height; ++y) {
-    for (int x = 1; x <= PlainField::WIDTH; ++x) {
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
       const char c0 = pattern_[y - 1][x - 1];
-      const char c1 = pattern_[y - 1][PlainField::WIDTH - x];
+      const char c1 = pattern_[y - 1][FieldConstant::WIDTH - x];
       PuyoColor color = field.color(x, y);
       if (color != PuyoColor::OJAMA) {
         if (c0 != '.')
@@ -111,10 +111,10 @@ void Pattern::Optimize() {
 
   const int height = pattern_.size();
   for (int y0 = 0; y0 < height; ++y0) {
-    for (int x0 = 0; x0 < PlainField::WIDTH; ++x0) {
+    for (int x0 = 0; x0 < FieldConstant::WIDTH; ++x0) {
       for (int i = 0; i < 2; ++i) {
         int x1 = x0 + dx[i], y1 = y0 + dy[i];
-        if (x1 >= PlainField::WIDTH || y1 >= height)
+        if (x1 >= FieldConstant::WIDTH || y1 >= height)
           continue;
         char c0 = pattern_[y0][x0];
         char c1 = pattern_[y1][x1];
@@ -135,7 +135,7 @@ void Pattern::Optimize() {
 }
 
 void Pattern::AppendField(std::string line) {
-  DCHECK(line.size() == PlainField::WIDTH);
+  DCHECK(line.size() == FieldConstant::WIDTH);
 
   for (auto& c : line) {
     if (std::islower(c))

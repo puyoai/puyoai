@@ -95,8 +95,7 @@ template<typename ScoreCollector>
 class RensaEvaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    RensaEvaluator(const PatternBook& patternBook,
-                   ScoreCollector* sc) :
+    RensaEvaluator(const PatternBook& patternBook, ScoreCollector* sc) :
         EvaluatorBase(patternBook),
         sc_(sc) {}
 

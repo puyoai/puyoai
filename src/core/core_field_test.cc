@@ -506,15 +506,15 @@ TEST(CoreFieldTest, framesToDropNextWithoutChigiri)
     // TODO(mayah): We have to confirm this.
     CoreField f;
 
-    EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT] + FRAMES_GROUNDING,
+    EXPECT_EQ(FRAMES_TO_DROP_FAST[FieldConstant::HEIGHT] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(3, 0)));
-    EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT] + FRAMES_GROUNDING,
+    EXPECT_EQ(FRAMES_TO_DROP_FAST[FieldConstant::HEIGHT] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(3, 1)));
-    EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT - 1] + FRAMES_GROUNDING,
+    EXPECT_EQ(FRAMES_TO_DROP_FAST[FieldConstant::HEIGHT - 1] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(3, 2)));
-    EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT] + FRAMES_GROUNDING,
+    EXPECT_EQ(FRAMES_TO_DROP_FAST[FieldConstant::HEIGHT] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(3, 3)));
-    EXPECT_EQ(FRAMES_TO_MOVE_HORIZONTALLY[2] + FRAMES_TO_DROP_FAST[CoreField::HEIGHT] + FRAMES_GROUNDING,
+    EXPECT_EQ(FRAMES_TO_MOVE_HORIZONTALLY[2] + FRAMES_TO_DROP_FAST[FieldConstant::HEIGHT] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(1, 0)));
 }
 
@@ -525,7 +525,7 @@ TEST(CoreFieldTest, framesToDropNextWithChigiri)
                 "..O..."
                 "..O...");
 
-    EXPECT_EQ(FRAMES_TO_DROP_FAST[CoreField::HEIGHT - 4] + FRAMES_GROUNDING +
+    EXPECT_EQ(FRAMES_TO_DROP_FAST[FieldConstant::HEIGHT - 4] + FRAMES_GROUNDING +
               FRAMES_TO_DROP[4] + FRAMES_GROUNDING,
               f.framesToDropNext(Decision(3, 1)));
 }

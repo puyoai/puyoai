@@ -225,7 +225,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     possibleRensaInfos_.clear();
 
     double averageHeight = 0;
-    for (int x = 1; x <= CoreField::WIDTH; ++x)
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x)
         averageHeight += field.height(x) / 6.0;
 
     vector<EstimatedRensaInfo> results;
@@ -260,7 +260,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
             --necessaryHands;
 
         // Estimate the number of frames to initiate the rensa.
-        int heightMove = std::max(0, static_cast<int>(std::ceil(CoreField::HEIGHT - averageHeight)));
+        int heightMove = std::max(0, static_cast<int>(std::ceil(FieldConstant::HEIGHT - averageHeight)));
         int framesToIgnite = (FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * necessaryHands;
         int score = rensaResult.score;
         int chains = rensaResult.chains;
