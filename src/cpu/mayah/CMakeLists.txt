@@ -8,6 +8,7 @@ add_library(mayah_lib
             decision_planner.cc
             evaluator.cc
             evaluation_feature.cc
+            evaluation_mode.cc
             evaluation_parameter.cc
             gazer.cc
             mayah_ai.cc
