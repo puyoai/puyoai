@@ -44,7 +44,7 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field,
     int count3 = 0;
     int count2 = 0;
 
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         int height = field.height(x);
         for (int y = 1; y <= height; ++y) {
             if (!isNormalColor(field.color(x, y)))
@@ -108,7 +108,7 @@ static void calculateFieldUShape(ScoreCollector* sc,
                                  bool enemyHasZenkeshi,
                                  const CoreField& field)
 {
-    static const int DIFF[CoreField::MAP_WIDTH] = {
+    static const int DIFF[FieldConstant::MAP_WIDTH] = {
         0, -3, 0, 1, 1, 0, -3, 0,
     };
 
@@ -183,9 +183,9 @@ void Evaluator<ScoreCollector>::evalConnection(const CoreField& field)
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const CoreField& f)
 {
-    const int MAX_HEIGHT = 3; // instead of CoreField::HEIGHT
+    const int MAX_HEIGHT = 3; // instead of FieldConstant::HEIGHT
     for (int y = 1; y <= MAX_HEIGHT; ++y) {
-        for (int x = 1; x < CoreField::WIDTH; ++x) {
+        for (int x = 1; x < FieldConstant::WIDTH; ++x) {
             if (!isNormalColor(f.color(x, y)))
                 continue;
 
@@ -421,8 +421,8 @@ void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const CoreFi
 {
     auto key = enemyHasZenkeshi ? IGNITION_HEIGHT_ON_ENEMY_ZENKESHI : IGNITION_HEIGHT;
 
-    for (int y = CoreField::HEIGHT; y >= 1; --y) {
-        for (int x = 1; x <= CoreField::WIDTH; ++x) {
+    for (int y = FieldConstant::HEIGHT; y >= 1; --y) {
+        for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
             if (!isNormalColor(field.color(x, y)))
                 continue;
             if (trackResult.erasedAt(x, y) == 1) {

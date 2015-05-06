@@ -389,7 +389,7 @@ std::string CoreField::toDebugString() const
 // friend static
 bool operator==(const CoreField& lhs, const CoreField& rhs)
 {
-    for (int x = 1; x <= CoreField::WIDTH; ++x) {
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         if (lhs.height(x) != rhs.height(x))
             return false;
 
