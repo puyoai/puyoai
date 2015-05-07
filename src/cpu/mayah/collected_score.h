@@ -46,7 +46,9 @@ struct CollectedFeatureScore {
         if (it != collectedSparseFeatures.end())
             return it->second;
 
-        return emptyVector();
+        // This should be thread-safe in C++11.
+        static std::vector<int> emptyVector;
+        return emptyVector;
     }
 
     CollectedSimpleScore collectedSimpleScore;
@@ -54,13 +56,6 @@ struct CollectedFeatureScore {
     std::map<EvaluationFeatureKey, double> collectedFeatures;
     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures;
     ColumnPuyoList puyosToComplement;
-
-private:
-    static const std::vector<int>& emptyVector()
-    {
-        static std::vector<int> vs;
-        return vs;
-    }
 };
 
 struct CollectedFeatureCoefScore {
