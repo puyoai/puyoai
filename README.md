@@ -3,6 +3,8 @@ puyoai
 
 ぷよぷよのAIを書くためのフレームワークです。
 
+実際に動いているAIの例 http://www.nicovideo.jp/watch/sm26167419
+
 ## ビルド方法
 
 現状、Mac OS X(10.10 Yosemite) と Ubuntu Linux 14.04 でビルドできることを確認しています。
