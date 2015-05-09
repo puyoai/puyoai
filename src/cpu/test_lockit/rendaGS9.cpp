@@ -19,6 +19,7 @@ int takasa_point = 240;
 int ruiseki_point = 6;
 int renketu_bairitu = 1;
 bool is_2dub_cpu = false;
+bool uses_2x_hyouka = false;
 
 int main(int argc, char* argv[])
 {

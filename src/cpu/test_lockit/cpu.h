@@ -14,6 +14,7 @@ protected:
 
 private:
     COMAI_HI coma;
+    COMAI_HI coma2x;
     READ_P r_player[2];
 };
 

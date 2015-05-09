@@ -704,7 +704,7 @@ int COMAI_HI::hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int
                 kougeki_iryoku = score / 70;
                 kougeki_on = 1;
             }
-            if (((chain == 3) || (chain == 4)) && (aite_rensa_score_cc < 3)) {
+            if (chain == 3 && aite_rensa_score_cc < 3) {
                 hym[aa] += 72000 + score;
                 keschk = 1;
                 kougeki_iryoku = score / 70;
