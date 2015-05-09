@@ -34,6 +34,7 @@ TestLockitAI::TestLockitAI()
     r_player[0].ref();
     r_player[1].ref();
     coma.ref();
+    coma2x.ref();
 }
 
 void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI* coo)
@@ -138,7 +139,10 @@ FrameResponse sendmes(READ_P* p1, READ_P* /*p2*/, COMAI_HI* coo)
 
 FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
 {
-    int i, saidaiten, tmp;
+    int saidaiten, tmp;
+    int coma2x_sc[22] {};
+//    int field2x[6][18] {};
+
     parseRequest(request, &r_player[0], &r_player[1], &coma);
     //	  if(r_player[0].nex_on==1)checks=1;
     //	  if((r_player[0].rensa_end==1)&&(r_player[0].tsumo[0]!=0)&&(r_player[0].tsumo[4]==0))checks=1;
@@ -240,17 +244,52 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
             coma.hyouka(r_player[0].field, r_player[0].tsumo[0], r_player[0].tsumo[1], r_player[0].tsumo[2],
                         r_player[0].tsumo[3], r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi);
 
+            // 2x hyouka
+            int field_kosuu = 0;
+            for (int i = 0; i < 6; ++i) {
+                for (int j = 0; j < 18; ++j) {
+                    if (r_player[0].field[i][j] != 0) {
+                        ++field_kosuu;
+                    }
+                }
+            }
+            // If we don't use 2x-hyouka, set field_kosuu to 0 so that 2x-hyouka is not used.
+            if (!uses_2x_hyouka) {
+                field_kosuu = 0;
+            }
+
+            int field2x[6][18] {};
+            for (int i = 0; i < 6; ++i) {
+                for (int j = 0; j < 14; ++j) {
+                    field2x[i][j] = r_player[0].field[i][j+4];
+                }
+            }
+
+            if (field_kosuu > 24 && field_kosuu < 56) {
+ 				coma2x.hyouka(field2x, r_player[0].tsumo[0], r_player[0].tsumo[1], r_player[0].tsumo[2], r_player[0].tsumo[3], r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi);
+ 			}
+
             count_tsumo_2p++;
             tmp = 0;
             r_player[0].te_x = 0;
             r_player[0].te_r = 0;
             saidaiten = coma.para[0];
-            for (i = 1; i < 22; i++) {
-                if (saidaiten < coma.para[i]) {
-                    tmp = i;
-                    saidaiten = coma.para[i];
+
+            for (int i = 0; i < 22; i++) {
+                if ((field_kosuu>24) && (field_kosuu<56)){
+                    coma2x_sc[i] = coma2x.para[i] + coma.para[i];
+                } else {
+                    coma2x_sc[i] = coma.para[i];
                 }
             }
+            saidaiten = coma2x_sc[0];
+            for (int i = 1; i < 22; i++) {
+                if (saidaiten<coma2x_sc[i]){
+                    tmp = i;
+                    saidaiten = coma2x_sc[i];
+                }
+            }
+
             if (tmp < 6) {
                 r_player[0].te_x = tmp + 1;
                 r_player[0].te_r = 0;

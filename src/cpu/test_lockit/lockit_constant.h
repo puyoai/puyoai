@@ -30,5 +30,6 @@ extern int ruiseki_point;
 extern int renketu_bairitu;
 
 extern bool is_2dub_cpu;
+extern bool uses_2x_hyouka;
 
 #endif
