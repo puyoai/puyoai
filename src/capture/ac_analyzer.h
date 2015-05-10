@@ -41,6 +41,7 @@ private:
     bool isLevelSelect(const SDL_Surface*);
     bool isGameFinished(const SDL_Surface*);
 
+    bool isMatchEnd(const SDL_Surface*);
     bool isDead(int playerId, const SDL_Surface*);
 
     void drawBoxWithAnalysisResult(SDL_Surface*, const Box&);

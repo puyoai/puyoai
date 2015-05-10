@@ -14,3 +14,21 @@ TEST(FrameRequestTest, parse)
     EXPECT_TRUE(request.isValid());
     EXPECT_FALSE(request.hasGameEnd());
 }
+
+TEST(FrameRequestTest, parseMatchEnd_true)
+{
+    FrameRequest request = FrameRequest::parse("ID=1 MATCHEND=1");
+    EXPECT_TRUE(request.matchEnd);
+}
+
+TEST(FrameRequestTest, parseMatchEnd_false1)
+{
+    FrameRequest request = FrameRequest::parse("ID=1");
+    EXPECT_FALSE(request.matchEnd);
+}
+
+TEST(FrameRequestTest, parseMatchEnd_false2)
+{
+    FrameRequest request = FrameRequest::parse("ID=1 MATCHEND=0");
+    EXPECT_FALSE(request.matchEnd);
+}

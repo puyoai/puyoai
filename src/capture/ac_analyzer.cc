@@ -174,17 +174,27 @@ CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
         return CaptureGameState::LEVEL_SELECT;
 
     if (isGameFinished(surface)) {
+        bool matchEnd = isMatchEnd(surface);
         bool p1Dead = isDead(0, surface);
         bool p2Dead = isDead(1, surface);
-        if (p1Dead && p2Dead)
-            return CaptureGameState::FINISHED_WITH_DRAW;
-        if (p2Dead)
-            return CaptureGameState::FINISHED_WITH_1P_WIN;
-        if (p1Dead)
-            return CaptureGameState::FINISHED_WITH_2P_WIN;
+        if (matchEnd) {
+            if (p1Dead && p2Dead)
+                return CaptureGameState::MATCH_FINISHED_WITH_DRAW;
+            if (p2Dead)
+                return CaptureGameState::MATCH_FINISHED_WITH_1P_WIN;
+            if (p1Dead)
+                return CaptureGameState::MATCH_FINISHED_WITH_2P_WIN;
+        } else {
+            if (p1Dead && p2Dead)
+                return CaptureGameState::GAME_FINISHED_WITH_DRAW;
+            if (p2Dead)
+                return CaptureGameState::GAME_FINISHED_WITH_1P_WIN;
+            if (p1Dead)
+                return CaptureGameState::GAME_FINISHED_WITH_2P_WIN;
+        }
 
         LOG(ERROR) << "game finished, but no one is lost?";
-        return CaptureGameState::FINISHED_WITH_DRAW;
+        return CaptureGameState::GAME_FINISHED_WITH_DRAW;
     }
 
     return CaptureGameState::PLAYING;
@@ -344,6 +354,36 @@ bool ACAnalyzer::isDead(int playerId, const SDL_Surface* surface)
     BoxAnalyzeResult r2 = analyzeBox(surface, BoundingBox::instance().get(playerId, 2, 0));
 
     return r1.realColor != RealColor::RC_YELLOW && r2.realColor != RealColor::RC_YELLOW;
+}
+
+bool ACAnalyzer::isMatchEnd(const SDL_Surface* surface)
+{
+    Box b1 = BoundingBox::instance().get(0, 7, 2);
+    Box b2 = BoundingBox::instance().get(0, 12, 0);
+
+    int red = 0;
+    int blue = 0;
+
+    for (int x = b1.dx; x <= b2.dx; ++x) {
+        for (int y = b1.dy; y <= b2.dy; ++y) {
+            Uint32 c = getpixel(surface, x, y);
+            Uint8 r, g, b;
+            SDL_GetRGB(c, surface->format, &r, &g, &b);
+            RGB rgb(r, g, b);
+            HSV hsv = rgb.toHSV();
+
+            RealColor rc = toRealColor(hsv);
+            if (rc == RealColor::RC_RED)
+                ++red;
+            if (rc == RealColor::RC_BLUE)
+                ++blue;
+        }
+    }
+
+    if (red > 100 && blue > 100)
+        return true;
+
+    return false;
 }
 
 void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
