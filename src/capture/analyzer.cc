@@ -37,7 +37,9 @@ string toString(CaptureGameState cgs)
     case CaptureGameState::UNKNOWN:      return "unknown";
     case CaptureGameState::LEVEL_SELECT: return "level select";
     case CaptureGameState::PLAYING:      return "playing";
-    case CaptureGameState::FINISHED:     return "finished";
+    case CaptureGameState::FINISHED_WITH_1P_WIN: return "finished (1p win)";
+    case CaptureGameState::FINISHED_WITH_2P_WIN: return "finished (2p win)";
+    case CaptureGameState::FINISHED_WITH_DRAW: return "finished (draw)";
     }
 
     CHECK(false) << "Unknown CaptureGameState: "  << static_cast<int>(cgs);
@@ -163,7 +165,9 @@ std::unique_ptr<AnalyzerResult> Analyzer::analyze(const SDL_Surface* surface,
         auto player2Result = analyzePlayerField(*player2FieldResult, makePlayerOnlyResults(1, previousResults));
         return std::unique_ptr<AnalyzerResult>(new AnalyzerResult(gameState, move(player1Result), move(player2Result)));
     }
-    case CaptureGameState::FINISHED: {
+    case CaptureGameState::FINISHED_WITH_1P_WIN:
+    case CaptureGameState::FINISHED_WITH_2P_WIN:
+    case CaptureGameState::FINISHED_WITH_DRAW: {
         // After finished, we don't need to check each player gamestate.
         auto player1Result = unique_ptr<PlayerAnalyzerResult>();
         auto player2Result = unique_ptr<PlayerAnalyzerResult>();

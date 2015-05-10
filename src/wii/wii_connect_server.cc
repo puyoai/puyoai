@@ -116,10 +116,14 @@ void WiiConnectServer::runLoop()
             // TODO(mayah): For workaround, we make frameId = 1.
             // Server should send some event to initialize a game state.
             // Client should implement an initialization logic
-            {
+            if (!gameStarted) {
                 // TODO(mayah): initialization should be done after NEXT1/NEXT2 are stabilized?
                 lock_guard<mutex> lock(mu_);
-                if (!analyzerResults_.empty() && analyzerResults_.front()->state() != CaptureGameState::LEVEL_SELECT) {
+
+                // If the first surface is level select, analyzerResults_ might be empty.
+                // So, we need to allow analyzerResults_.empty() here.
+                if (analyzerResults_.empty() || analyzerResults_.front()->state() != CaptureGameState::LEVEL_SELECT) {
+                    cout << "New game started" << endl;
                     frameId = 1;
                     reset();
                     // The result might contain the previous game's result. We don't want to stabilize the result
@@ -145,13 +149,21 @@ void WiiConnectServer::runLoop()
                 observer->onUpdate(gameState);
             break;
         }
-        case CaptureGameState::FINISHED:
-            if (!playForFinished(frameId))
+        case CaptureGameState::FINISHED_WITH_DRAW:
+        case CaptureGameState::FINISHED_WITH_1P_WIN:
+        case CaptureGameState::FINISHED_WITH_2P_WIN:
+            cout << "game finished detected: started?=" << gameStarted << endl;
+            if (!playForFinished(frameId, gameStarted, *r))
                 shouldStop_ = true;
-            if (!gameStarted) {
+            if (gameStarted) {
+                GameResult gameResult = GameResult::DRAW;
+                if (r->state() == CaptureGameState::FINISHED_WITH_1P_WIN)
+                    gameResult = GameResult::P1_WIN;
+                if (r->state() == CaptureGameState::FINISHED_WITH_2P_WIN)
+                    gameResult = GameResult::P2_WIN;
                 for (auto observer : observers_) {
                     // TODO(mayah): This is not DRAW, of course.
-                    observer->gameHasDone(GameResult::DRAW);
+                    observer->gameHasDone(gameResult);
                 }
                 gameStarted = false;
             }
@@ -267,8 +279,19 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
     return true;
 }
 
-bool WiiConnectServer::playForFinished(int frameId)
+bool WiiConnectServer::playForFinished(int frameId, bool needsSendGameResult, const AnalyzerResult& analyzerResult)
 {
+    if (needsSendGameResult) {
+        for (int pi = 0; pi < 2; ++pi) {
+            if (!isAi_[pi])
+                continue;
+            connector_->connector(pi)->send(makeFrameRequestFor(pi, frameId, analyzerResult));
+        }
+
+        vector<FrameResponse> responses[2];
+        connector_->receive(frameId, responses);
+    }
+
     if (frameId % 10 == 0) {
         for (int pi = 0; pi < 2; ++pi) {
             keySenders_[pi]->sendKeySet(KeySet());
@@ -285,17 +308,29 @@ FrameRequest WiiConnectServer::makeFrameRequestFor(int playerId, int frameId, co
 {
     FrameRequest fr;
     fr.frameId = frameId;
-    if (re.state() == CaptureGameState::FINISHED) {
-        // TODO(mayah): Since we're not detecting which player has won, we send DRAW.
-        fr.gameResult = GameResult::DRAW;
-    } else {
+    switch (re.state()) {
+    case CaptureGameState::UNKNOWN:
+    case CaptureGameState::LEVEL_SELECT:
+    case CaptureGameState::PLAYING:
         fr.gameResult = GameResult::PLAYING;
+        break;
+    case CaptureGameState::FINISHED_WITH_1P_WIN:
+        fr.gameResult = (playerId == 0 ? GameResult::P1_WIN : GameResult::P2_WIN);
+        break;
+    case CaptureGameState::FINISHED_WITH_2P_WIN:
+        fr.gameResult = (playerId == 0 ? GameResult::P2_WIN : GameResult::P1_WIN);
+        break;
+    case CaptureGameState::FINISHED_WITH_DRAW:
+        fr.gameResult = GameResult::DRAW;
+        break;
     }
 
     for (int i = 0; i < 2; ++i) {
         int pi = playerId == 0 ? i : (1 - i);
         PlayerFrameRequest& pfr = fr.playerFrameRequest[i];
         const PlayerAnalyzerResult* pr = re.playerResult(pi);
+        if (!pr)
+            continue;
 
         pfr.kumipuyoSeq = KumipuyoSeq {
             Kumipuyo(toPuyoColor(pr->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS), true),

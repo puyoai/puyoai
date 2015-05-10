@@ -352,7 +352,7 @@ TEST_F(ACAnalyzerTest, GameFinished)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/game-finished1.png");
 
-    EXPECT_EQ(CaptureGameState::FINISHED, r->state());
+    EXPECT_EQ(CaptureGameState::FINISHED_WITH_1P_WIN, r->state());
 }
 
 TEST_F(ACAnalyzerTest, nextArrival)
