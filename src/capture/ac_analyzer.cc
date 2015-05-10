@@ -101,7 +101,8 @@ ACAnalyzer::ACAnalyzer()
 {
     // TODO(mayah): initializing here seems wrong.
     BoundingBox::instance().setGenerator(FLAGS_bb_x, FLAGS_bb_y, FLAGS_bb_w, FLAGS_bb_h);
-    BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT, Box(260, 256, 270, 280));
+    BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT_1P, Box(260, 256, 270, 280));
+    BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT_2P, Box(442, 256, 452, 280));
     BoundingBox::instance().setRegion(BoundingBox::Region::GAME_FINISHED, Box(292, 352, 420, 367));
 }
 
@@ -272,25 +273,33 @@ bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
 
 bool ACAnalyzer::isLevelSelect(const SDL_Surface* surface)
 {
-    Box b = BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT);
+    Box boxes[] {
+        BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_1P),
+        BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_2P),
+    };
 
-    int whiteCount = 0;
-    for (int bx = b.sx; bx <= b.dx; ++bx) {
-        for (int by = b.sy; by <= b.dy; ++by) {
-            Uint32 c = getpixel(surface, bx, by);
-            Uint8 r, g, b;
-            SDL_GetRGB(c, surface->format, &r, &g, &b);
+    for (const Box& b : boxes) {
+        int whiteCount = 0;
+        for (int bx = b.sx; bx <= b.dx; ++bx) {
+            for (int by = b.sy; by <= b.dy; ++by) {
+                Uint32 c = getpixel(surface, bx, by);
+                Uint8 r, g, b;
+                SDL_GetRGB(c, surface->format, &r, &g, &b);
 
-            RGB rgb(r, g, b);
-            HSV hsv = rgb.toHSV();
-            RealColor rc = toRealColor(hsv);
+                RGB rgb(r, g, b);
+                HSV hsv = rgb.toHSV();
+                RealColor rc = toRealColor(hsv);
 
-            if (rc == RealColor::RC_OJAMA)
-                ++whiteCount;
+                if (rc == RealColor::RC_OJAMA)
+                    ++whiteCount;
+            }
         }
+
+        if (whiteCount >= 40)
+            return true;
     }
 
-    return whiteCount >= 40;
+    return false;
 }
 
 bool ACAnalyzer::isGameFinished(const SDL_Surface* surface)
@@ -340,7 +349,8 @@ void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
         }
     }
 
-    drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT));
+    drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_1P));
+    drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_2P));
     drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::GAME_FINISHED));
 }
 
