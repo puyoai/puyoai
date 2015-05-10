@@ -26,5 +26,4 @@ inline GameResult fromRequestEnd(int end)
     return GameResult::PLAYING;
 }
 
-
 #endif

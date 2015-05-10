@@ -21,8 +21,10 @@
 enum class CaptureGameState {
     UNKNOWN,
     LEVEL_SELECT,  // Level select
-    PLAYING,       //
-    FINISHED,      // A game is finished.
+    PLAYING,
+    FINISHED_WITH_1P_WIN,      // A game is finished.
+    FINISHED_WITH_2P_WIN,
+    FINISHED_WITH_DRAW
 };
 std::string toString(CaptureGameState);
 
@@ -127,7 +129,9 @@ public: // Make this private?
 
 class AnalyzerResult {
 public:
-    AnalyzerResult(CaptureGameState, std::unique_ptr<PlayerAnalyzerResult> p1, std::unique_ptr<PlayerAnalyzerResult> p2);
+    AnalyzerResult(CaptureGameState,
+                   std::unique_ptr<PlayerAnalyzerResult> p1,
+                   std::unique_ptr<PlayerAnalyzerResult> p2);
     ~AnalyzerResult() {}
 
     CaptureGameState state() const { return gameState_; }

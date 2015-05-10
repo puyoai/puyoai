@@ -51,7 +51,7 @@ private:
     bool playForUnknown(int frameId);
     bool playForLevelSelect(int frameId, const AnalyzerResult&);
     bool playForPlaying(int frameId, const AnalyzerResult&);
-    bool playForFinished(int frameId);
+    bool playForFinished(int frameId, bool needsSendGameResult, const AnalyzerResult&);
 
     FrameRequest makeFrameRequestFor(int playerId, int frameId, const AnalyzerResult&);
     void outputKeys(int playerId, const AnalyzerResult&, const std::vector<FrameResponse>&, double beginTime);

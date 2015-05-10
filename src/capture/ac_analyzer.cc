@@ -173,8 +173,19 @@ CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
     if (isLevelSelect(surface))
         return CaptureGameState::LEVEL_SELECT;
 
-    if (isGameFinished(surface))
-        return CaptureGameState::FINISHED;
+    if (isGameFinished(surface)) {
+        bool p1Dead = isDead(0, surface);
+        bool p2Dead = isDead(1, surface);
+        if (p1Dead && p2Dead)
+            return CaptureGameState::FINISHED_WITH_DRAW;
+        if (p2Dead)
+            return CaptureGameState::FINISHED_WITH_1P_WIN;
+        if (p1Dead)
+            return CaptureGameState::FINISHED_WITH_2P_WIN;
+
+        LOG(ERROR) << "game finished, but no one is lost?";
+        return CaptureGameState::FINISHED_WITH_DRAW;
+    }
 
     return CaptureGameState::PLAYING;
 }
@@ -323,6 +334,16 @@ bool ACAnalyzer::isGameFinished(const SDL_Surface* surface)
     }
 
     return whiteCount >= 50;
+}
+
+bool ACAnalyzer::isDead(int playerId, const SDL_Surface* surface)
+{
+    // Since (3, 0)-(6, 0) of player2 field might contain 'FREE PLAY' string.
+    // So, we check only (1, 0) and (2, 0).
+    BoxAnalyzeResult r1 = analyzeBox(surface, BoundingBox::instance().get(playerId, 1, 0));
+    BoxAnalyzeResult r2 = analyzeBox(surface, BoundingBox::instance().get(playerId, 2, 0));
+
+    return r1.realColor != RealColor::RC_YELLOW && r2.realColor != RealColor::RC_YELLOW;
 }
 
 void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
