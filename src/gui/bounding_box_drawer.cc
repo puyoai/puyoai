@@ -41,11 +41,20 @@ void BoundingBoxDrawer::draw(Screen* screen)
         }
     }
 
-    Box b = BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT);
-    SDL_DrawLine(surface, b.sx, b.sy, b.dx, b.sy, color);
-    SDL_DrawLine(surface, b.sx, b.sy, b.sx, b.dy, color);
-    SDL_DrawLine(surface, b.dx, b.sy, b.dx, b.dy, color);
-    SDL_DrawLine(surface, b.sx, b.dy, b.dx, b.dy, color);
+    {
+        Box b = BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_1P);
+        SDL_DrawLine(surface, b.sx, b.sy, b.dx, b.sy, color);
+        SDL_DrawLine(surface, b.sx, b.sy, b.sx, b.dy, color);
+        SDL_DrawLine(surface, b.dx, b.sy, b.dx, b.dy, color);
+        SDL_DrawLine(surface, b.sx, b.dy, b.dx, b.dy, color);
+    }
+    {
+        Box b = BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_2P);
+        SDL_DrawLine(surface, b.sx, b.sy, b.dx, b.sy, color);
+        SDL_DrawLine(surface, b.sx, b.sy, b.sx, b.dy, color);
+        SDL_DrawLine(surface, b.dx, b.sy, b.dx, b.dy, color);
+        SDL_DrawLine(surface, b.sx, b.dy, b.dx, b.dy, color);
+    }
 
     SDL_UnlockSurface(surface);
 }

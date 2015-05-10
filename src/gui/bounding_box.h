@@ -10,7 +10,8 @@
 class BoundingBox : private noncopyable {
 public:
     enum class Region {
-        LEVEL_SELECT,
+        LEVEL_SELECT_1P,
+        LEVEL_SELECT_2P,
         GAME_FINISHED,
     };
 
