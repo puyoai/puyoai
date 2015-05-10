@@ -207,6 +207,9 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
             connector_->connector(pi)->send(makeFrameRequestFor(pi, frameId, analyzerResult));
     }
 
+    vector<FrameResponse> responses[2];
+    connector_->receive(frameId, responses);
+
     return true;
 }
 
