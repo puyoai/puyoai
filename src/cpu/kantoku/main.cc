@@ -12,6 +12,9 @@
 #include "core/frame_response.h"
 #include "core/server/connector/connector.h"
 
+DEFINE_bool(change_if_beated, true,
+            "If true, AI will be changed when beated. If false, AI will be changed by one game");
+
 using namespace std;
 
 class ChildAI {
@@ -43,8 +46,21 @@ public:
 
     FrameResponse playOneFrame(const FrameRequest& req) override
     {
+        // When this AI is beated, next AI should be chosen.
+        if (req.matchEnd) {
+            if (req.gameResult == GameResult::P2_WIN || req.gameResult == GameResult::P2_WIN_WITH_CONNECTION_ERROR)
+                shouldChooseAI_ = true;
+        }
+
         if (req.shouldInitialize()) {
-            chooseAI();
+            // Always change the ai.
+            if (!FLAGS_change_if_beated)
+                shouldChooseAI_ = true;
+
+            if (shouldChooseAI_) {
+                shouldChooseAI_ = false;
+                chooseAI();
+            }
         }
 
         current().connector().send(req);
@@ -68,6 +84,7 @@ private:
     }
 
     default_random_engine rnd_;
+    bool shouldChooseAI_ = false;
     int index_;
     vector<ChildAI> ais_;
 };
@@ -79,12 +96,12 @@ int main(int argc, char* argv[])
     google::InstallFailureSignalHandler();
 
     Kantoku kantoku;
-    kantoku.add("mayah-1", "../mayah/run_advanced.sh");
-    kantoku.add("mayah-2", "../mayah/run_advanced.sh");
-    kantoku.add("mayah-3", "../mayah/run_advanced.sh");
-    kantoku.add("nidub", "../../internal/cpu/test_lockit/nidub.sh");
-    kantoku.add("rendaS9", "../../internal/cpu/test_lockit/rendaS9.sh");
-    kantoku.add("rendaGS9", "../../internal/cpu/test_lockit/rendaGS9.sh");
+    kantoku.add("mayah-1", "../mayah/run.sh");
+    kantoku.add("mayah-2", "../mayah/run.sh");
+    kantoku.add("mayah-3", "../mayah/run.sh");
+    kantoku.add("nidub", "../test_lockit/nidub.sh");
+    kantoku.add("rendaS9", "../test_lockit/rendaS9.sh");
+    kantoku.add("rendaGS9", "../test_lockit/rendaGS9.sh");
 
     kantoku.runLoop();
 

@@ -10,3 +10,4 @@ target_link_libraries(kantoku puyoai_core)
 target_link_libraries(kantoku puyoai_base)
 
 cpu_add_runner(run.sh)
+cpu_add_runner(run_by_game.sh)
