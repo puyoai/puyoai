@@ -100,6 +100,14 @@ static GameResult parseEnd(const char* value)
     return GameResult::PLAYING;
 }
 
+static bool parseMatchEnd(const char* value)
+{
+    if (strncmp(value, "1", 1) == 0)
+        return true;
+
+    return false;
+}
+
 // static
 FrameRequest FrameRequest::parse(const std::string& line)
 {
@@ -117,6 +125,9 @@ FrameRequest FrameRequest::parse(const std::string& line)
             continue;
         } else if (strncmp(key, "END", 3) == 0) {
             req.gameResult = parseEnd(value);
+            continue;
+        } else if (strncmp(key, "MATCHEND", 8) == 0) {
+            req.matchEnd = parseMatchEnd(value);
             continue;
         }
 
@@ -183,19 +194,24 @@ string FrameRequest::toString() const
     KumipuyoPos pos0 = me.kumipuyoPos;
     KumipuyoPos pos1 = op.kumipuyoPos;
 
-    string win;
+    string winStr;
     switch (gameResult) {
     case GameResult::PLAYING:
         break;
     case GameResult::P1_WIN:
-        win = "END=1 ";
+        winStr = "END=1 ";
         break;
     case GameResult::P2_WIN:
-        win = "END=-1 ";
+        winStr = "END=-1 ";
         break;
     default:
-        win = "END=0 ";
+        winStr = "END=0 ";
         break;
+    }
+
+    string matchEndStr;
+    if (matchEnd) {
+        matchEndStr = "MATCHEND=1 ";
     }
 
     stringstream ss;
@@ -216,6 +232,7 @@ string FrameRequest::toString() const
        << "OO=" << ojama1 << " "
        << "YS=" << score0 << " "
        << "OS=" << score1 << " "
-       << win;
+       << winStr
+       << matchEndStr;
     return ss.str();
 }

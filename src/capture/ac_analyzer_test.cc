@@ -348,11 +348,28 @@ TEST_F(ACAnalyzerTest, LevelSelect2)
     EXPECT_EQ(CaptureGameState::LEVEL_SELECT, r->state());
 }
 
-TEST_F(ACAnalyzerTest, GameFinished)
+TEST_F(ACAnalyzerTest, GameFinished1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/game-finished1.png");
+    EXPECT_EQ(CaptureGameState::GAME_FINISHED_WITH_1P_WIN, r->state());
+}
 
-    EXPECT_EQ(CaptureGameState::FINISHED_WITH_1P_WIN, r->state());
+TEST_F(ACAnalyzerTest, GameFinished2)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/somagic/game-finished2.png");
+    EXPECT_EQ(CaptureGameState::MATCH_FINISHED_WITH_1P_WIN, r->state());
+}
+
+TEST_F(ACAnalyzerTest, GameFinished3)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/somagic/game-finished3.png");
+    EXPECT_EQ(CaptureGameState::GAME_FINISHED_WITH_2P_WIN, r->state());
+}
+
+TEST_F(ACAnalyzerTest, GameFinished4)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/somagic/game-finished4.png");
+    EXPECT_EQ(CaptureGameState::MATCH_FINISHED_WITH_1P_WIN, r->state());
 }
 
 TEST_F(ACAnalyzerTest, nextArrival)

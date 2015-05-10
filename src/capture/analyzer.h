@@ -22,9 +22,12 @@ enum class CaptureGameState {
     UNKNOWN,
     LEVEL_SELECT,  // Level select
     PLAYING,
-    FINISHED_WITH_1P_WIN,      // A game is finished.
-    FINISHED_WITH_2P_WIN,
-    FINISHED_WITH_DRAW
+    GAME_FINISHED_WITH_1P_WIN,      // A game is finished.
+    GAME_FINISHED_WITH_2P_WIN,
+    GAME_FINISHED_WITH_DRAW,
+    MATCH_FINISHED_WITH_1P_WIN,    // A match is finished.
+    MATCH_FINISHED_WITH_2P_WIN,
+    MATCH_FINISHED_WITH_DRAW,
 };
 std::string toString(CaptureGameState);
 

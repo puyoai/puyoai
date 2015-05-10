@@ -34,6 +34,7 @@ struct FrameRequest {
 
     int frameId = -1;
     GameResult gameResult = GameResult::PLAYING;
+    bool matchEnd = false;
     PlayerFrameRequest playerFrameRequest[NUM_PLAYERS];
 };
 

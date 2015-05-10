@@ -149,17 +149,20 @@ void WiiConnectServer::runLoop()
                 observer->onUpdate(gameState);
             break;
         }
-        case CaptureGameState::FINISHED_WITH_DRAW:
-        case CaptureGameState::FINISHED_WITH_1P_WIN:
-        case CaptureGameState::FINISHED_WITH_2P_WIN:
+        case CaptureGameState::MATCH_FINISHED_WITH_DRAW:
+        case CaptureGameState::MATCH_FINISHED_WITH_1P_WIN:
+        case CaptureGameState::MATCH_FINISHED_WITH_2P_WIN:
+        case CaptureGameState::GAME_FINISHED_WITH_DRAW:
+        case CaptureGameState::GAME_FINISHED_WITH_1P_WIN:
+        case CaptureGameState::GAME_FINISHED_WITH_2P_WIN:
             cout << "game finished detected: started?=" << gameStarted << endl;
             if (!playForFinished(frameId, gameStarted, *r))
                 shouldStop_ = true;
             if (gameStarted) {
                 GameResult gameResult = GameResult::DRAW;
-                if (r->state() == CaptureGameState::FINISHED_WITH_1P_WIN)
+                if (r->state() == CaptureGameState::GAME_FINISHED_WITH_1P_WIN || r->state() == CaptureGameState::MATCH_FINISHED_WITH_1P_WIN)
                     gameResult = GameResult::P1_WIN;
-                if (r->state() == CaptureGameState::FINISHED_WITH_2P_WIN)
+                if (r->state() == CaptureGameState::GAME_FINISHED_WITH_2P_WIN || r->state() == CaptureGameState::MATCH_FINISHED_WITH_2P_WIN)
                     gameResult = GameResult::P2_WIN;
                 for (auto observer : observers_) {
                     // TODO(mayah): This is not DRAW, of course.
@@ -314,13 +317,16 @@ FrameRequest WiiConnectServer::makeFrameRequestFor(int playerId, int frameId, co
     case CaptureGameState::PLAYING:
         fr.gameResult = GameResult::PLAYING;
         break;
-    case CaptureGameState::FINISHED_WITH_1P_WIN:
+    case CaptureGameState::MATCH_FINISHED_WITH_1P_WIN:
+    case CaptureGameState::GAME_FINISHED_WITH_1P_WIN:
         fr.gameResult = (playerId == 0 ? GameResult::P1_WIN : GameResult::P2_WIN);
         break;
-    case CaptureGameState::FINISHED_WITH_2P_WIN:
+    case CaptureGameState::MATCH_FINISHED_WITH_2P_WIN:
+    case CaptureGameState::GAME_FINISHED_WITH_2P_WIN:
         fr.gameResult = (playerId == 0 ? GameResult::P2_WIN : GameResult::P1_WIN);
         break;
-    case CaptureGameState::FINISHED_WITH_DRAW:
+    case CaptureGameState::MATCH_FINISHED_WITH_DRAW:
+    case CaptureGameState::GAME_FINISHED_WITH_DRAW:
         fr.gameResult = GameResult::DRAW;
         break;
     }
@@ -353,6 +359,13 @@ FrameRequest WiiConnectServer::makeFrameRequestFor(int playerId, int frameId, co
         pfr.kumipuyoPos = KumipuyoPos(3, 12, 0);
         pfr.score = 0;
         pfr.ojama = 0;
+    }
+
+    if (re.state() == CaptureGameState::MATCH_FINISHED_WITH_1P_WIN ||
+        re.state() == CaptureGameState::MATCH_FINISHED_WITH_2P_WIN ||
+        re.state() == CaptureGameState::MATCH_FINISHED_WITH_DRAW) {
+        fr.matchEnd = true;
+        cout << "match end" << endl;
     }
 
     return fr;
