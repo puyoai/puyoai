@@ -12,10 +12,40 @@
 #include "evaluation_feature.h"
 #include "evaluation_parameter.h"
 
+class SimpleRensaScoreCollector {
+public:
+    typedef CollectedSimpleRensaScore CollectedScore;
+    explicit SimpleRensaScoreCollector(const EvaluationParameterMap& paramMap) :
+        paramMap_(paramMap)
+    {
+    }
+
+    void addScore(EvaluationFeatureKey key, double v)
+    {
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            rensaScore_.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, v);
+        }
+    }
+
+    void addScore(EvaluationSparseFeatureKey key, int idx, int n)
+    {
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            rensaScore_.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
+        }
+    }
+
+    const CollectedScore& collectedScore() const { return rensaScore_; }
+
+private:
+    const EvaluationParameterMap& paramMap_;
+    CollectedSimpleRensaScore rensaScore_;
+};
+
 // This collector collects only score.
 class SimpleScoreCollector {
 public:
     typedef CollectedSimpleScore CollectedScore;
+    typedef SimpleRensaScoreCollector RensaScoreCollector;
 
     explicit SimpleScoreCollector(const EvaluationParameterMap& paramMap) :
         paramMap_(paramMap)
@@ -35,11 +65,10 @@ public:
             collectedSimpleScore_.moveScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
         }
     }
-    void merge(const CollectedSimpleScore& collectedSimpleScore)
+
+    void merge(const CollectedSimpleRensaScore& rensaScore)
     {
-        for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedSimpleScore_.rensaScore.scoreMap[ordinal(mode)] += collectedSimpleScore.score(mode);
-        }
+        collectedSimpleScore_.rensaScore = rensaScore;
     }
 
     void setCoef(const CollectedCoef& coef) { collectedCoef_ = coef; }
@@ -65,6 +94,7 @@ private:
 class FeatureScoreCollector {
 public:
     typedef CollectedFeatureScore CollectedScore;
+    typedef FeatureScoreCollector RensaScoreCollector;
 
     FeatureScoreCollector(const EvaluationParameterMap& paramMap) : paramMap_(paramMap) {}
 
