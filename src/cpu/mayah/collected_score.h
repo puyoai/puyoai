@@ -15,7 +15,7 @@ struct CollectedCoef {
     std::array<double, NUM_EVALUATION_MODES> coefMap {{}};
 };
 
-struct CollectedSimpleScore {
+struct CollectedSimpleSubScore {
     double score(EvaluationMode mode) const { return scoreMap[ordinal(mode)]; }
     double score(const CollectedCoef& coef) const
     {
@@ -28,22 +28,75 @@ struct CollectedSimpleScore {
     std::array<double, NUM_EVALUATION_MODES> scoreMap {{}};
 };
 
+typedef CollectedSimpleSubScore CollectedSimpleMoveScore;
+typedef CollectedSimpleSubScore CollectedSimpleRensaScore;
+
+struct CollectedSimpleScore {
+    double score(EvaluationMode mode) const { return moveScore.score(mode) + rensaScore.score(mode); }
+
+    double score(const CollectedCoef& coef) const
+    {
+        double s = 0.0;
+        for (const auto& mode : ALL_EVALUATION_MODES)
+            s += score(mode) * coef.coef(mode);
+        return s;
+    }
+
+    CollectedSimpleMoveScore moveScore;
+    CollectedSimpleRensaScore rensaScore;
+};
+
+struct CollectedFeatureMoveScore {
+    double score(EvaluationMode mode) const { return simpleScore.score(mode); }
+    double score(const CollectedCoef& coef) const { return simpleScore.score(coef); }
+
+    CollectedSimpleMoveScore simpleScore;
+    std::map<EvaluationFeatureKey, double> collectedFeatures;
+    std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures;
+};
+
+struct CollectedFeatureRensaScore {
+    double score(EvaluationMode mode) const { return simpleScore.score(mode); }
+    double score(const CollectedCoef& coef) const { return simpleScore.score(coef); }
+
+    CollectedSimpleRensaScore simpleScore;
+    std::map<EvaluationFeatureKey, double> collectedFeatures;
+    std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures;
+    std::string bookname;
+    ColumnPuyoList puyosToComplement;
+};
+
 struct CollectedFeatureScore {
-    double score(EvaluationMode mode) const { return collectedSimpleScore.score(mode); }
-    double score(const CollectedCoef& coef) const { return collectedSimpleScore.score(coef); }
+    double score(EvaluationMode mode) const
+    {
+        return moveScore.simpleScore.score(mode) + rensaScore.simpleScore.score(mode);
+    }
+    double score(const CollectedCoef& coef) const
+    {
+        return moveScore.simpleScore.score(coef) + rensaScore.simpleScore.score(coef);
+    }
 
     double feature(EvaluationFeatureKey key) const
     {
-        auto it = collectedFeatures.find(key);
-        if (it != collectedFeatures.end())
+        auto it = moveScore.collectedFeatures.find(key);
+        if (it != moveScore.collectedFeatures.end())
             return it->second;
+
+        it = rensaScore.collectedFeatures.find(key);
+        if (it != rensaScore.collectedFeatures.end())
+            return it->second;
+
         return 0.0;
     }
 
     const std::vector<int>& feature(EvaluationSparseFeatureKey key) const
     {
-        auto it = collectedSparseFeatures.find(key);
-        if (it != collectedSparseFeatures.end())
+        auto it = moveScore.collectedSparseFeatures.find(key);
+        if (it != moveScore.collectedSparseFeatures.end())
+            return it->second;
+
+        it = rensaScore.collectedSparseFeatures.find(key);
+        if (it != rensaScore.collectedSparseFeatures.end())
             return it->second;
 
         // This should be thread-safe in C++11.
@@ -51,11 +104,8 @@ struct CollectedFeatureScore {
         return emptyVector;
     }
 
-    CollectedSimpleScore collectedSimpleScore;
-    std::string bookName;
-    std::map<EvaluationFeatureKey, double> collectedFeatures;
-    std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures;
-    ColumnPuyoList puyosToComplement;
+    CollectedFeatureMoveScore moveScore;
+    CollectedFeatureRensaScore rensaScore;
 };
 
 struct CollectedFeatureCoefScore {
@@ -70,7 +120,7 @@ public:
     double coef(EvaluationMode mode) const { return collectedCoef_.coef(mode); }
     double feature(EvaluationFeatureKey key) const { return collectedFeatureScore_.feature(key); }
     const std::vector<int>& feature(EvaluationSparseFeatureKey key) const { return collectedFeatureScore_.feature(key); }
-    const std::string& bookName() const { return collectedFeatureScore_.bookName; }
+    const std::string& bookName() const { return collectedFeatureScore_.rensaScore.bookname; }
 
     double score() const { return collectedFeatureScore_.score(collectedCoef_); }
 
@@ -95,7 +145,7 @@ public:
         return s;
     }
 
-    const ColumnPuyoList& puyosToComplement() const { return collectedFeatureScore_.puyosToComplement; }
+    const ColumnPuyoList& puyosToComplement() const { return collectedFeatureScore_.rensaScore.puyosToComplement; }
 
     std::string toString() const;
     std::string toStringComparingWith(const CollectedFeatureCoefScore&, const EvaluationParameterMap&) const;
