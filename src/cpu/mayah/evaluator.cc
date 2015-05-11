@@ -582,6 +582,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                                      const MidEvalResult& midEvalResult,
                                      const GazeResult& gazeResult)
 {
+    typedef typename ScoreCollector::RensaScoreCollector RensaScoreCollector;
+    typedef typename RensaScoreCollector::CollectedScore RensaCollectedScore;
+
     CollectedCoef coef = calculateDefaultCoef(me, enemy);
     sc_->setCoef(coef);
 
@@ -615,7 +618,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
     struct MainRensaInfo {
         double score = -100000000;
-        typename ScoreCollector::CollectedScore collectedScore;
+        RensaCollectedScore collectedScore;
         ColumnPuyoList puyosToComplement;
         string bookname;
         int maxChains = 0;
@@ -628,10 +631,11 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                             const RensaChainTrackResult& trackResult,
                             const string& patternName,
                             double patternScore) {
+
         ++rensaCounts[rensaResult.chains];
 
-        ScoreCollector rensaScoreCollector(sc_->evaluationParameterMap());
-        RensaEvaluator<ScoreCollector> rensaEvaluator(patternBook(), &rensaScoreCollector);
+        RensaScoreCollector rensaScoreCollector(sc_->evaluationParameterMap());
+        RensaEvaluator<RensaScoreCollector> rensaEvaluator(patternBook(), &rensaScoreCollector);
 
         CoreField complementedField(fieldBeforeRensa);
         if (!complementedField.dropPuyoList(puyosToComplement))
@@ -655,7 +659,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
 
         // TODO(mayah): need to set a better mode here.
-        const typename ScoreCollector::CollectedScore& rensaCollectedScore = rensaScoreCollector.collectedScore();
+        const RensaCollectedScore& rensaCollectedScore = rensaScoreCollector.collectedScore();
         if (rensaCollectedScore.score(coef) > mainRensa.score) {
             mainRensa.score = rensaCollectedScore.score(coef);
             mainRensa.collectedScore = rensaCollectedScore;
