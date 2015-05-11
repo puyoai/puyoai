@@ -50,6 +50,8 @@ struct CollectedFeatureMoveScore {
     double score(EvaluationMode mode) const { return simpleScore.score(mode); }
     double score(const CollectedCoef& coef) const { return simpleScore.score(coef); }
 
+    std::string toString() const;
+
     CollectedSimpleMoveScore simpleScore;
     std::map<EvaluationFeatureKey, double> collectedFeatures;
     std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures;
@@ -58,6 +60,8 @@ struct CollectedFeatureMoveScore {
 struct CollectedFeatureRensaScore {
     double score(EvaluationMode mode) const { return simpleScore.score(mode); }
     double score(const CollectedCoef& coef) const { return simpleScore.score(coef); }
+
+    std::string toString() const;
 
     CollectedSimpleRensaScore simpleScore;
     std::map<EvaluationFeatureKey, double> collectedFeatures;

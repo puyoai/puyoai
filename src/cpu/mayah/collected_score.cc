@@ -7,30 +7,45 @@
 
 using namespace std;
 
+string CollectedFeatureMoveScore::toString() const
+{
+    stringstream ss;
+    for (const auto& entry : collectedFeatures) {
+        ss << EvaluationFeature::toFeature(entry.first).str() << "=" << to_string(entry.second) << endl;
+    }
+    for (const auto& entry : collectedSparseFeatures) {
+        ss << EvaluationSparseFeature::toFeature(entry.first).str() << "=";
+        for (int v : entry.second)
+            ss << v << ' ';
+        ss << endl;
+    }
+
+    return ss.str();
+}
+
+string CollectedFeatureRensaScore::toString() const
+{
+    stringstream ss;
+    for (const auto& entry : collectedFeatures) {
+        ss << EvaluationFeature::toFeature(entry.first).str() << "=" << to_string(entry.second) << endl;
+    }
+
+    for (const auto& entry : collectedSparseFeatures) {
+        ss << EvaluationSparseFeature::toFeature(entry.first).str() << "=";
+        for (int v : entry.second)
+            ss << v << ' ';
+        ss << endl;
+    }
+
+    return ss.str();
+}
+
 string CollectedFeatureCoefScore::toString() const
 {
     stringstream ss;
     ss << "score = " << score() << endl;
-
-    for (const auto& entry : collectedFeatureScore_.moveScore.collectedFeatures) {
-        ss << EvaluationFeature::toFeature(entry.first).str() << "=" << to_string(entry.second) << endl;
-    }
-    for (const auto& entry : collectedFeatureScore_.rensaScore.collectedFeatures) {
-        ss << EvaluationFeature::toFeature(entry.first).str() << "=" << to_string(entry.second) << endl;
-    }
-
-    for (const auto& entry : collectedFeatureScore_.moveScore.collectedSparseFeatures) {
-        ss << EvaluationSparseFeature::toFeature(entry.first).str() << "=";
-        for (int v : entry.second)
-            ss << v << ' ';
-        ss << endl;
-    }
-    for (const auto& entry : collectedFeatureScore_.rensaScore.collectedSparseFeatures) {
-        ss << EvaluationSparseFeature::toFeature(entry.first).str() << "=";
-        for (int v : entry.second)
-            ss << v << ' ';
-        ss << endl;
-    }
+    ss << collectedFeatureScore_.moveScore.toString() << endl;
+    ss << collectedFeatureScore_.rensaScore.toString() << endl;
 
     return ss.str();
 }
