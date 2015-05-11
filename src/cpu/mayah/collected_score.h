@@ -152,7 +152,10 @@ public:
     const ColumnPuyoList& puyosToComplement() const { return collectedFeatureScore_.rensaScore.puyosToComplement; }
 
     std::string toString() const;
-    std::string toStringComparingWith(const CollectedFeatureCoefScore&, const EvaluationParameterMap&) const;
+    static std::string scoreComparisionString(const CollectedFeatureCoefScore&,
+                                              const CollectedFeatureCoefScore&,
+                                              const EvaluationParameterMap&);
+
 
 private:
     CollectedCoef collectedCoef_;

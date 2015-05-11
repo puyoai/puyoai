@@ -50,11 +50,11 @@ string CollectedFeatureCoefScore::toString() const
     return ss.str();
 }
 
-string CollectedFeatureCoefScore::toStringComparingWith(const CollectedFeatureCoefScore& cf, const EvaluationParameterMap& paramMap) const
+// static
+string CollectedFeatureCoefScore::scoreComparisionString(const CollectedFeatureCoefScore& lhs,
+                                                         const CollectedFeatureCoefScore& rhs,
+                                                         const EvaluationParameterMap& paramMap)
 {
-    const CollectedFeatureCoefScore& lhs = *this;
-    const CollectedFeatureCoefScore& rhs = cf;
-
     set<EvaluationFeatureKey> moveScoreKeys;
     for (const auto& entry : lhs.collectedFeatureScore_.moveScore.collectedFeatures) {
         moveScoreKeys.insert(entry.first);
