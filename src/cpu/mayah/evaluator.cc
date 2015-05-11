@@ -617,7 +617,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         double score = -100000000;
         typename ScoreCollector::CollectedScore collectedScore;
         ColumnPuyoList puyosToComplement;
-        string bookName;
+        string bookname;
         int maxChains = 0;
     } mainRensa;
 
@@ -660,7 +660,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
             mainRensa.score = rensaCollectedScore.score(coef);
             mainRensa.collectedScore = rensaCollectedScore;
             mainRensa.puyosToComplement = puyosToComplement;
-            mainRensa.bookName = patternName;
+            mainRensa.bookname = patternName;
         }
 
         if (maxChain < rensaResult.chains) {
@@ -709,7 +709,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
     // finalize.
     sc_->merge(mainRensa.collectedScore);
-    sc_->setBookName(mainRensa.bookName);
+    sc_->setBookname(mainRensa.bookname);
     sc_->setPuyosToComplement(mainRensa.puyosToComplement);
     sc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }

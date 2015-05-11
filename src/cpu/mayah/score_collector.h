@@ -12,7 +12,7 @@
 #include "evaluation_feature.h"
 #include "evaluation_parameter.h"
 
-// This collector collects score and bookname.
+// This collector collects only score.
 class SimpleScoreCollector {
 public:
     typedef CollectedSimpleScore CollectedScore;
@@ -25,20 +25,20 @@ public:
     void addScore(EvaluationFeatureKey key, double v)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedSimpleScore_.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, v);
+            collectedSimpleScore_.moveScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, v);
         }
     }
 
     void addScore(EvaluationSparseFeatureKey key, int idx, int n)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedSimpleScore_.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
+            collectedSimpleScore_.moveScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
         }
     }
     void merge(const CollectedSimpleScore& collectedSimpleScore)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedSimpleScore_.scoreMap[ordinal(mode)] += collectedSimpleScore.score(mode);
+            collectedSimpleScore_.rensaScore.scoreMap[ordinal(mode)] += collectedSimpleScore.score(mode);
         }
     }
 
@@ -51,7 +51,7 @@ public:
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }
 
-    void setBookName(const std::string&) {}
+    void setBookname(const std::string&) {}
     void setPuyosToComplement(const ColumnPuyoList&) {}
 
 private:
@@ -71,39 +71,42 @@ public:
     void addScore(EvaluationFeatureKey key, double v)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedFeatureScore_.collectedSimpleScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, v);
+            collectedFeatureScore_.moveScore.simpleScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, v);
         }
-        collectedFeatureScore_.collectedFeatures[key] += v;
+        collectedFeatureScore_.moveScore.collectedFeatures[key] += v;
     }
 
     void addScore(EvaluationSparseFeatureKey key, int idx, int n)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedFeatureScore_.collectedSimpleScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
+            collectedFeatureScore_.moveScore.simpleScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
         }
         for (int i = 0; i < n; ++i)
-            collectedFeatureScore_.collectedSparseFeatures[key].push_back(idx);
+            collectedFeatureScore_.moveScore.collectedSparseFeatures[key].push_back(idx);
     }
 
     void merge(const CollectedFeatureScore& cfs)
     {
+        // TODO(mayah): Currently, we don't distinguish moveScore and rensaScore.
+        // merged score is merged into rensaScore, now.
+
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedFeatureScore_.collectedSimpleScore.scoreMap[ordinal(mode)] += cfs.collectedSimpleScore.score(mode);
+            collectedFeatureScore_.rensaScore.simpleScore.scoreMap[ordinal(mode)] += cfs.moveScore.score(mode);
         }
 
-        for (const auto& entry : cfs.collectedFeatures) {
-            collectedFeatureScore_.collectedFeatures[entry.first] = entry.second;
+        for (const auto& entry : cfs.moveScore.collectedFeatures) {
+            collectedFeatureScore_.rensaScore.collectedFeatures[entry.first] = entry.second;
         }
-        for (const auto& entry : cfs.collectedSparseFeatures) {
-            collectedFeatureScore_.collectedSparseFeatures[entry.first].insert(
-                collectedFeatureScore_.collectedSparseFeatures[entry.first].end(),
+        for (const auto& entry : cfs.moveScore.collectedSparseFeatures) {
+            collectedFeatureScore_.rensaScore.collectedSparseFeatures[entry.first].insert(
+                collectedFeatureScore_.rensaScore.collectedSparseFeatures[entry.first].end(),
                 entry.second.begin(),
                 entry.second.end());
         }
     }
 
-    void setBookName(const std::string& bookName) { collectedFeatureScore_.bookName = bookName; }
-    const std::string& bookName() const { return collectedFeatureScore_.bookName; }
+    void setBookname(const std::string& bookname) { collectedFeatureScore_.rensaScore.bookname = bookname; }
+    const std::string& bookname() const { return collectedFeatureScore_.rensaScore.bookname; }
 
     void setCoef(const CollectedCoef& coef) { collectedCoef_ = coef; }
     const CollectedCoef& collectedCoef() const { return collectedCoef_; }
@@ -113,7 +116,7 @@ public:
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }
 
-    void setPuyosToComplement(const ColumnPuyoList& cpl) { collectedFeatureScore_.puyosToComplement = cpl; }
+    void setPuyosToComplement(const ColumnPuyoList& cpl) { collectedFeatureScore_.rensaScore.puyosToComplement = cpl; }
 private:
     const EvaluationParameterMap& paramMap_;
     CollectedCoef collectedCoef_;
