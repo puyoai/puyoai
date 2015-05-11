@@ -273,48 +273,48 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
             ss << toString(mode) << "(" << cf.coef(mode) << ") ";
     }
     ss << "/ ";
-    if (cf.feature(STRATEGY_ZENKESHI) > 0)
+    if (cf.moveScore().feature(STRATEGY_ZENKESHI) > 0)
         ss << "ZENKESHI / ";
-    if (cf.feature(STRATEGY_KILL) > 0)
+    if (cf.moveScore().feature(STRATEGY_KILL) > 0)
         ss << "KILL / ";
-    if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_2_LARGE) > 0) {
+    if (cf.moveScore().feature(STRATEGY_FIRE_SIDE_CHAIN_2_LARGE) > 0) {
         ss << "SIDE CHAIN LARGE (2) / ";
-    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_2_MEDIUM) > 0) {
+    } else if (cf.moveScore().feature(STRATEGY_FIRE_SIDE_CHAIN_2_MEDIUM) > 0) {
         ss << "SIDE CHAIN MEDIUM (2) / ";
-    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_2_SMALL) > 0) {
+    } else if (cf.moveScore().feature(STRATEGY_FIRE_SIDE_CHAIN_2_SMALL) > 0) {
         ss << "SIDE CHAIN SMALL (2) / ";
-    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_3_LARGE) > 0) {
+    } else if (cf.moveScore().feature(STRATEGY_FIRE_SIDE_CHAIN_3_LARGE) > 0) {
         ss << "SIDE CHAIN LARGE (3) / ";
-    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_3_MEDIUM) > 0) {
+    } else if (cf.moveScore().feature(STRATEGY_FIRE_SIDE_CHAIN_3_MEDIUM) > 0) {
         ss << "SIDE CHAIN MEDIUM (3) / ";
-    } else if (cf.feature(STRATEGY_FIRE_SIDE_CHAIN_3_SMALL) > 0) {
+    } else if (cf.moveScore().feature(STRATEGY_FIRE_SIDE_CHAIN_3_SMALL) > 0) {
         ss << "SIDE CHAIN SMALL (3) / ";
     }
-    if (cf.feature(STRATEGY_TAIOU) > 0)
+    if (cf.moveScore().feature(STRATEGY_TAIOU) > 0)
         ss << "TAIOU / ";
-    if (cf.feature(STRATEGY_LARGE_ENOUGH) > 0)
+    if (cf.moveScore().feature(STRATEGY_LARGE_ENOUGH) > 0)
         ss << "LARGE_ENOUGH / ";
-    if (cf.feature(STRATEGY_TSUBUSHI) > 0)
+    if (cf.moveScore().feature(STRATEGY_TSUBUSHI) > 0)
         ss << "TSUBUSHI / ";
-    if (cf.feature(STRATEGY_SAISOKU) > 0)
+    if (cf.moveScore().feature(STRATEGY_SAISOKU) > 0)
         ss << "SAISOKU / ";
     else if (saturated)
         ss << "SATURATED / ";
-    else if (cf.feature(STRATEGY_SAKIUCHI) > 0)
+    else if (cf.moveScore().feature(STRATEGY_SAKIUCHI) > 0)
         ss << "SAKIUCHI / ";
-    if (cf.feature(STRATEGY_ZENKESHI_CONSUME) > 0)
+    if (cf.moveScore().feature(STRATEGY_ZENKESHI_CONSUME) > 0)
         ss << "USE_ZENKESHI / ";
-    if (cf.feature(STRATEGY_LAND_LEVELING) > 0)
+    if (cf.moveScore().feature(STRATEGY_LAND_LEVELING) > 0)
         ss << "LEVELING / ";
 
-    if (!cf.bookName().empty())
-        ss << cf.bookName() << " / ";
+    if (!cf.rensaScore().bookname.empty())
+        ss << cf.rensaScore().bookname << " / ";
 
     ss << "D/I = " << plan.decisions().size() << "/" << maxIteration << " / ";
     ss << "SCORE = " << cf.score() << " / ";
 
-    if (!cf.feature(MAX_CHAINS).empty()) {
-        const vector<int>& vs = cf.feature(MAX_CHAINS);
+    if (!cf.rensaScore().feature(MAX_CHAINS).empty()) {
+        const vector<int>& vs = cf.rensaScore().feature(MAX_CHAINS);
         for (size_t i = 0; i < vs.size(); ++i)
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }
@@ -323,23 +323,23 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
 
     ss << "\n";
 
-    if (cf.feature(HOLDING_SIDE_CHAIN_SMALL) > 0) {
+    if (cf.moveScore().feature(HOLDING_SIDE_CHAIN_SMALL) > 0) {
         ss << "SIDE=SMALL";
-    } else if (cf.feature(HOLDING_SIDE_CHAIN_MEDIUM) > 0) {
+    } else if (cf.moveScore().feature(HOLDING_SIDE_CHAIN_MEDIUM) > 0) {
         ss << "SIDE=MEDIUM";
-    } else if (cf.feature(HOLDING_SIDE_CHAIN_LARGE) > 0) {
+    } else if (cf.moveScore().feature(HOLDING_SIDE_CHAIN_LARGE) > 0) {
         ss << "SIDE=LARGE";
     } else {
         ss << "SIDE=NONE";
     }
     ss << " / ";
 
-    if (cf.feature(KEEP_FAST_6_CHAIN) > 0) {
+    if (cf.moveScore().feature(KEEP_FAST_6_CHAIN) > 0) {
         ss << "FAST6=OK / ";
     } else {
         ss << "FAST6=NG / ";
     }
-    if (cf.feature(KEEP_FAST_10_CHAIN) > 0) {
+    if (cf.moveScore().feature(KEEP_FAST_10_CHAIN) > 0) {
         ss << "FAST10=OK";
     } else {
         ss << "FAST10=NG";
