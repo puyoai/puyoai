@@ -76,16 +76,8 @@ string CollectedFeatureCoefScore::toStringComparingWith(const CollectedFeatureCo
     ss << setw(32) << "WHOLE SCORE" << " = "
        << setw(15) << fixed << setprecision(6) << lhs.score() << "          : "
        << setw(15) << fixed << setprecision(6) << rhs.score() << endl;
-    ss << "----------------------------------------------------------------------" << endl;
+    ss << "--------------------------------------------------------------------------------------" << endl;
     for (EvaluationFeatureKey key : moveScoreKeys) {
-        ss << setw(32) << EvaluationFeature::toFeature(key).str() << " = ";
-        ss << setw(12) << fixed << setprecision(3) << lhs.feature(key) << " ("
-           << setw(9) << fixed << setprecision(3) << lhs.scoreFor(key, paramMap) << ") : ";
-        ss << setw(12) << fixed << setprecision(3) << rhs.feature(key) << " ("
-           << setw(9) << fixed << setprecision(3) << rhs.scoreFor(key, paramMap) << ")";
-        ss << endl;
-    }
-    for (EvaluationFeatureKey key : rensaScoreKeys) {
         ss << setw(32) << EvaluationFeature::toFeature(key).str() << " = ";
         ss << setw(12) << fixed << setprecision(3) << lhs.feature(key) << " ("
            << setw(9) << fixed << setprecision(3) << lhs.scoreFor(key, paramMap) << ") : ";
@@ -112,6 +104,15 @@ string CollectedFeatureCoefScore::toStringComparingWith(const CollectedFeatureCo
             ss << setw(12) << st.str() << " ("
                << setw(9) << fixed << setprecision(3) << rhs.scoreFor(key, paramMap) << ")";
         }
+        ss << endl;
+    }
+    ss << "--------------------------------------------------------------------------------------" << endl;
+    for (EvaluationFeatureKey key : rensaScoreKeys) {
+        ss << setw(32) << EvaluationFeature::toFeature(key).str() << " = ";
+        ss << setw(12) << fixed << setprecision(3) << lhs.feature(key) << " ("
+           << setw(9) << fixed << setprecision(3) << lhs.scoreFor(key, paramMap) << ") : ";
+        ss << setw(12) << fixed << setprecision(3) << rhs.feature(key) << " ("
+           << setw(9) << fixed << setprecision(3) << rhs.scoreFor(key, paramMap) << ")";
         ss << endl;
     }
     for (EvaluationSparseFeatureKey key : rensaSparseScoreKeys) {
