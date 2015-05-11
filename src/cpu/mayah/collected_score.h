@@ -50,6 +50,52 @@ struct CollectedFeatureMoveScore {
     double score(EvaluationMode mode) const { return simpleScore.score(mode); }
     double score(const CollectedCoef& coef) const { return simpleScore.score(coef); }
 
+    double feature(EvaluationFeatureKey key) const
+    {
+        auto it = collectedFeatures.find(key);
+        if (it != collectedFeatures.end())
+            return it->second;
+
+        return 0.0;
+    }
+
+    const std::vector<int>& feature(EvaluationSparseFeatureKey key) const
+    {
+        auto it = collectedSparseFeatures.find(key);
+        if (it != collectedSparseFeatures.end())
+            return it->second;
+
+        // This should be thread-safe in C++11.
+        static std::vector<int> emptyVector;
+        return emptyVector;
+    }
+
+    double scoreFor(EvaluationFeatureKey key,
+                    const CollectedCoef& coef,
+                    const EvaluationParameterMap& paramMap) const
+    {
+        double s = 0;
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            const EvaluationParameter& param = paramMap.parameter(mode);
+            s += param.score(key, feature(key)) * coef.coef(mode);
+        }
+        return s;
+    }
+
+    double scoreFor(EvaluationSparseFeatureKey key,
+                    const CollectedCoef& coef,
+                    const EvaluationParameterMap& paramMap) const
+    {
+        double s = 0;
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            const EvaluationParameter& param = paramMap.parameter(mode);
+            for (int v : feature(key)) {
+                s += param.score(key, v, 1) * coef.coef(mode);
+            }
+        }
+        return s;
+    }
+
     std::string toString() const;
 
     CollectedSimpleMoveScore simpleScore;
@@ -60,6 +106,52 @@ struct CollectedFeatureMoveScore {
 struct CollectedFeatureRensaScore {
     double score(EvaluationMode mode) const { return simpleScore.score(mode); }
     double score(const CollectedCoef& coef) const { return simpleScore.score(coef); }
+
+    double feature(EvaluationFeatureKey key) const
+    {
+        auto it = collectedFeatures.find(key);
+        if (it != collectedFeatures.end())
+            return it->second;
+
+        return 0.0;
+    }
+
+    const std::vector<int>& feature(EvaluationSparseFeatureKey key) const
+    {
+        auto it = collectedSparseFeatures.find(key);
+        if (it != collectedSparseFeatures.end())
+            return it->second;
+
+        // This should be thread-safe in C++11.
+        static std::vector<int> emptyVector;
+        return emptyVector;
+    }
+
+    double scoreFor(EvaluationFeatureKey key,
+                    const CollectedCoef& coef,
+                    const EvaluationParameterMap& paramMap) const
+    {
+        double s = 0;
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            const EvaluationParameter& param = paramMap.parameter(mode);
+            s += param.score(key, feature(key)) * coef.coef(mode);
+        }
+        return s;
+    }
+
+    double scoreFor(EvaluationSparseFeatureKey key,
+                    const CollectedCoef& coef,
+                    const EvaluationParameterMap& paramMap) const
+    {
+        double s = 0;
+        for (const auto& mode : ALL_EVALUATION_MODES) {
+            const EvaluationParameter& param = paramMap.parameter(mode);
+            for (int v : feature(key)) {
+                s += param.score(key, v, 1) * coef.coef(mode);
+            }
+        }
+        return s;
+    }
 
     std::string toString() const;
 
@@ -80,34 +172,6 @@ struct CollectedFeatureScore {
         return moveScore.simpleScore.score(coef) + rensaScore.simpleScore.score(coef);
     }
 
-    double feature(EvaluationFeatureKey key) const
-    {
-        auto it = moveScore.collectedFeatures.find(key);
-        if (it != moveScore.collectedFeatures.end())
-            return it->second;
-
-        it = rensaScore.collectedFeatures.find(key);
-        if (it != rensaScore.collectedFeatures.end())
-            return it->second;
-
-        return 0.0;
-    }
-
-    const std::vector<int>& feature(EvaluationSparseFeatureKey key) const
-    {
-        auto it = moveScore.collectedSparseFeatures.find(key);
-        if (it != moveScore.collectedSparseFeatures.end())
-            return it->second;
-
-        it = rensaScore.collectedSparseFeatures.find(key);
-        if (it != rensaScore.collectedSparseFeatures.end())
-            return it->second;
-
-        // This should be thread-safe in C++11.
-        static std::vector<int> emptyVector;
-        return emptyVector;
-    }
-
     CollectedFeatureMoveScore moveScore;
     CollectedFeatureRensaScore rensaScore;
 };
@@ -121,35 +185,13 @@ public:
     {
     }
 
+    const CollectedCoef& coef() const { return collectedCoef_; }
     double coef(EvaluationMode mode) const { return collectedCoef_.coef(mode); }
-    double feature(EvaluationFeatureKey key) const { return collectedFeatureScore_.feature(key); }
-    const std::vector<int>& feature(EvaluationSparseFeatureKey key) const { return collectedFeatureScore_.feature(key); }
-    const std::string& bookName() const { return collectedFeatureScore_.rensaScore.bookname; }
+
+    const CollectedFeatureMoveScore& moveScore() const { return collectedFeatureScore_.moveScore; }
+    const CollectedFeatureRensaScore& rensaScore() const { return collectedFeatureScore_.rensaScore; }
 
     double score() const { return collectedFeatureScore_.score(collectedCoef_); }
-
-    double scoreFor(EvaluationFeatureKey key, const EvaluationParameterMap& paramMap) const
-    {
-        double s = 0;
-        for (const auto& mode : ALL_EVALUATION_MODES) {
-            const EvaluationParameter& param = paramMap.parameter(mode);
-            s += param.score(key, feature(key)) * coef(mode);
-        }
-        return s;
-    }
-    double scoreFor(EvaluationSparseFeatureKey key, const EvaluationParameterMap& paramMap) const
-    {
-        double s = 0;
-        for (const auto& mode : ALL_EVALUATION_MODES) {
-            const EvaluationParameter& param = paramMap.parameter(mode);
-            for (int v : feature(key)) {
-                s += param.score(key, v, 1) * coef(mode);
-            }
-        }
-        return s;
-    }
-
-    const ColumnPuyoList& puyosToComplement() const { return collectedFeatureScore_.rensaScore.puyosToComplement; }
 
     std::string toString() const;
     static std::string scoreComparisionString(const CollectedFeatureCoefScore&,
