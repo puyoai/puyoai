@@ -619,8 +619,6 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     struct MainRensaInfo {
         double score = -100000000;
         RensaCollectedScore collectedScore;
-        ColumnPuyoList puyosToComplement;
-        string bookname;
         int maxChains = 0;
     } mainRensa;
 
@@ -659,12 +657,11 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
 
         // TODO(mayah): need to set a better mode here.
-        const RensaCollectedScore& rensaCollectedScore = rensaScoreCollector.collectedScore();
-        if (rensaCollectedScore.score(coef) > mainRensa.score) {
-            mainRensa.score = rensaCollectedScore.score(coef);
-            mainRensa.collectedScore = rensaCollectedScore;
-            mainRensa.puyosToComplement = puyosToComplement;
-            mainRensa.bookname = patternName;
+        if (rensaScoreCollector.collectedScore().score(coef) > mainRensa.score) {
+            rensaScoreCollector.setBookname(patternName);
+            rensaScoreCollector.setPuyosToComplement(puyosToComplement);
+            mainRensa.score = rensaScoreCollector.collectedScore().score(coef);
+            mainRensa.collectedScore = rensaScoreCollector.collectedScore();
         }
 
         if (maxChain < rensaResult.chains) {
@@ -713,8 +710,6 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
     // finalize.
     sc_->merge(mainRensa.collectedScore);
-    sc_->setBookname(mainRensa.bookname);
-    sc_->setPuyosToComplement(mainRensa.puyosToComplement);
     sc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }
 
