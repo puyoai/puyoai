@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
                     { myThoughtResult.plan.field(), aiThoughtResult.plan.field(), myTargetField, aiTargetField },
                     { seqToShow, seqToShow, KumipuyoSeq(), KumipuyoSeq() });
 
-                cout << mycf.toStringComparingWith(aicf, ai.evaluationParameterMap()) << endl;
+                cout << CollectedFeatureCoefScore::scoreComparisionString(mycf, aicf, ai.evaluationParameterMap()) << endl;
                 cout << "MY: " << myThoughtResult.message << endl;
                 cout << "AI: " << aiThoughtResult.message << endl;
             }
