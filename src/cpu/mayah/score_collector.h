@@ -34,6 +34,9 @@ public:
         }
     }
 
+    void setBookname(const std::string&) {}
+    void setPuyosToComplement(const ColumnPuyoList&) {}
+
     const CollectedScore& collectedScore() const { return rensaScore_; }
 
 private:
@@ -79,9 +82,6 @@ public:
 
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }
-
-    void setBookname(const std::string&) {}
-    void setPuyosToComplement(const ColumnPuyoList&) {}
 
 private:
     const EvaluationParameterMap& paramMap_;
