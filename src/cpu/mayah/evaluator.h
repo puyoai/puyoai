@@ -104,7 +104,7 @@ public:
     void evalRensaChainFeature(const RensaResult&, const PuyoSet&);
     void evalRensaGarbage(const CoreField& fieldAfterRensa);
     void evalFirePointTabooFeature(const CoreField&, const RensaChainTrackResult&);
-    void evalRensaIgnitionHeightFeature(const CoreField&, const RensaChainTrackResult&, bool enemyHasZenkeshi);
+    void evalRensaIgnitionHeightFeature(const CoreField&, const RensaChainTrackResult&);
     void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
     void evalRensaRidgeHeight(const CoreField&);
     void evalRensaValleyDepth(const CoreField&);
