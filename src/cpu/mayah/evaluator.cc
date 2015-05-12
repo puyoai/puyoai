@@ -417,22 +417,20 @@ void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const CoreField& 
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const CoreField& field, const RensaChainTrackResult& trackResult, bool enemyHasZenkeshi)
+void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const CoreField& complementedField, const RensaChainTrackResult& trackResult)
 {
-    auto key = enemyHasZenkeshi ? IGNITION_HEIGHT_ON_ENEMY_ZENKESHI : IGNITION_HEIGHT;
-
     for (int y = FieldConstant::HEIGHT; y >= 1; --y) {
         for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-            if (!isNormalColor(field.color(x, y)))
+            if (!isNormalColor(complementedField.color(x, y)))
                 continue;
             if (trackResult.erasedAt(x, y) == 1) {
-                sc_->addScore(key, y, 1);
+                sc_->addScore(IGNITION_HEIGHT, y, 1);
                 return;
             }
         }
     }
 
-    sc_->addScore(key, 0, 1);
+    sc_->addScore(IGNITION_HEIGHT, 0, 1);
 }
 
 template<typename ScoreCollector>
@@ -646,7 +644,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
         rensaEvaluator.evalRensaFieldUShape(complementedField, enemy.hasZenkeshi);
-        rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, trackResult, enemy.hasZenkeshi);
+        rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, trackResult);
         rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyoSet);
         rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
         rensaEvaluator.evalPatternScore(puyosToComplement, patternScore);
