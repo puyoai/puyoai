@@ -296,7 +296,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
         ss << "LARGE_ENOUGH / ";
     if (cf.moveScore().feature(STRATEGY_TSUBUSHI) > 0)
         ss << "TSUBUSHI / ";
-    if (cf.moveScore().feature(STRATEGY_SAISOKU) > 0)
+    if (cf.rensaScore().feature(STRATEGY_SAISOKU) > 0)
         ss << "SAISOKU / ";
     else if (saturated)
         ss << "SATURATED / ";

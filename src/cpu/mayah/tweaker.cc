@@ -23,7 +23,9 @@ DECLARE_string(seq);
 DECLARE_int32(seed);
 
 DEFINE_bool(once, false, "true if running only once.");
+#if 0
 DEFINE_int32(auto_count, 0, "run auto tweaker for this count.");
+#endif
 DEFINE_bool(show_field, false, "show field after each hand.");
 DEFINE_int32(size, 100, "the number of case size.");
 DEFINE_int32(offset, 0, "offset for random seed");
@@ -51,6 +53,7 @@ struct RunResult {
     }
 };
 
+#if 0
 class ParameterTweaker {
 public:
     ParameterTweaker() : mt_(random_device()())
@@ -121,6 +124,7 @@ private:
     vector<EvaluationFeature> tweakableFeatures_;
     vector<EvaluationSparseFeature> tweakableSparseFeatures_;
 };
+#endif
 
 string makePuyopURL(const KumipuyoSeq& seq, const vector<Decision>& decisions)
 {
@@ -286,6 +290,7 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
             over40000Count, over60000Count, over70000Count, over80000Count, over100000Count };
 }
 
+#if 0
 void runAutoTweaker(Executor* executor, const EvaluationParameterMap& original, int num)
 {
     cout << "Run with the original parameter." << endl;
@@ -314,6 +319,7 @@ void runAutoTweaker(Executor* executor, const EvaluationParameterMap& original, 
         }
     }
 }
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -333,19 +339,19 @@ int main(int argc, char* argv[])
         runOnce(paramMap);
     } else if (FLAGS_once) {
         run(executor.get(), paramMap);
+#if 0
     } else if (FLAGS_auto_count > 0) {
         runAutoTweaker(executor.get(), paramMap, FLAGS_auto_count);
+#endif
     } else {
-        // EvaluationParameter* parameter = paramMap.mutableDefaultParameter();
-        EvaluationParameter* middle = paramMap.mutableParameter(EvaluationMode::MIDDLE);
-        EvaluationParameter* late = paramMap.mutableParameter(EvaluationMode::LATE);
-
         map<pair<double, double>, RunResult> scoreMap;
         for (double x = 10; x <= 140; x += 10) {
             for (double y = 10; y <= x; y += 10) {
                 cout << "current (x, y) = " << x << ' ' << y << endl;
-                middle->setValue(PATTERN_BOOK, x);
-                late->setValue(PATTERN_BOOK, y);
+
+                paramMap.mutableRensaParamSet()->setParam(EvaluationMode::MIDDLE, PATTERN_BOOK, x);
+                paramMap.mutableRensaParamSet()->setParam(EvaluationMode::LATE, PATTERN_BOOK, y);
+
                 scoreMap[make_pair(x, y)] = run(executor.get(), paramMap);
             }
         }

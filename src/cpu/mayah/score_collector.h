@@ -15,22 +15,22 @@
 class SimpleRensaScoreCollector {
 public:
     typedef CollectedSimpleRensaScore CollectedScore;
-    explicit SimpleRensaScoreCollector(const EvaluationParameterMap& paramMap) :
-        paramMap_(paramMap)
+    explicit SimpleRensaScoreCollector(const EvaluationRensaParameterSet& paramSet) :
+        paramSet_(paramSet)
     {
     }
 
-    void addScore(EvaluationFeatureKey key, double v)
+    void addScore(EvaluationRensaFeatureKey key, double v)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            rensaScore_.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, v);
+            rensaScore_.scoreMap[ordinal(mode)] += paramSet_.param(mode, key) * v;
         }
     }
 
-    void addScore(EvaluationSparseFeatureKey key, int idx, int n)
+    void addScore(EvaluationRensaSparseFeatureKey key, int idx, int n = 1)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            rensaScore_.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
+            rensaScore_.scoreMap[ordinal(mode)] += paramSet_.param(mode, key, idx) * n;
         }
     }
 
@@ -40,7 +40,7 @@ public:
     const CollectedScore& collectedScore() const { return rensaScore_; }
 
 private:
-    const EvaluationParameterMap& paramMap_;
+    const EvaluationRensaParameterSet& paramSet_;
     CollectedSimpleRensaScore rensaScore_;
 };
 
@@ -55,17 +55,17 @@ public:
     {
     }
 
-    void addScore(EvaluationFeatureKey key, double v)
+    void addScore(EvaluationMoveFeatureKey key, double v)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedSimpleScore_.moveScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, v);
+            collectedSimpleScore_.moveScore.scoreMap[ordinal(mode)] += moveParamSet().param(mode, key) * v;
         }
     }
 
-    void addScore(EvaluationSparseFeatureKey key, int idx, int n)
+    void addScore(EvaluationMoveSparseFeatureKey key, int idx, int n = 1)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedSimpleScore_.moveScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
+            collectedSimpleScore_.moveScore.scoreMap[ordinal(mode)] += moveParamSet().param(mode, key, idx) * n;
         }
     }
 
@@ -78,7 +78,9 @@ public:
     const CollectedCoef& collectedCoef() const { return collectedCoef_; }
 
     const CollectedSimpleScore& collectedScore() const { return collectedSimpleScore_; }
-    const EvaluationParameterMap& evaluationParameterMap() const { return paramMap_; }
+
+    const EvaluationMoveParameterSet& moveParamSet() const { return paramMap_.moveParamSet(); }
+    const EvaluationRensaParameterSet& rensaParamSet() const { return paramMap_.rensaParamSet(); }
 
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }
@@ -95,23 +97,23 @@ private:
 class FeatureRensaScoreCollector {
 public:
     typedef CollectedFeatureRensaScore CollectedScore;
-    explicit FeatureRensaScoreCollector(const EvaluationParameterMap& paramMap) :
-        paramMap_(paramMap)
+    explicit FeatureRensaScoreCollector(const EvaluationRensaParameterSet& paramSet) :
+        paramSet_(paramSet)
     {
     }
 
-    void addScore(EvaluationFeatureKey key, double v)
+    void addScore(EvaluationRensaFeatureKey key, double v)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            rensaScore_.simpleScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, v);
+            rensaScore_.simpleScore.scoreMap[ordinal(mode)] += paramSet_.param(mode, key) * v;
         }
         rensaScore_.collectedFeatures[key] += v;
     }
 
-    void addScore(EvaluationSparseFeatureKey key, int idx, int n)
+    void addScore(EvaluationRensaSparseFeatureKey key, int idx, int n = 1)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            rensaScore_.simpleScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
+            rensaScore_.simpleScore.scoreMap[ordinal(mode)] += paramSet_.param(mode, key, idx) * n;
         }
         for (int i = 0; i < n; ++i)
             rensaScore_.collectedSparseFeatures[key].push_back(idx);
@@ -123,7 +125,7 @@ public:
     const CollectedScore& collectedScore() const { return rensaScore_; }
 
 private:
-    const EvaluationParameterMap& paramMap_;
+    const EvaluationRensaParameterSet& paramSet_;
     CollectedFeatureRensaScore rensaScore_;
 };
 
@@ -133,20 +135,20 @@ public:
     typedef CollectedFeatureScore CollectedScore;
     typedef FeatureRensaScoreCollector RensaScoreCollector;
 
-    FeatureScoreCollector(const EvaluationParameterMap& paramMap) : paramMap_(paramMap) {}
+    explicit FeatureScoreCollector(const EvaluationParameterMap& paramMap) : paramMap_(paramMap) {}
 
-    void addScore(EvaluationFeatureKey key, double v)
+    void addScore(EvaluationMoveFeatureKey key, double v)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedFeatureScore_.moveScore.simpleScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, v);
+            collectedFeatureScore_.moveScore.simpleScore.scoreMap[ordinal(mode)] += moveParamSet().param(mode, key) * v;
         }
         collectedFeatureScore_.moveScore.collectedFeatures[key] += v;
     }
 
-    void addScore(EvaluationSparseFeatureKey key, int idx, int n)
+    void addScore(EvaluationMoveSparseFeatureKey key, int idx, int n = 1)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            collectedFeatureScore_.moveScore.simpleScore.scoreMap[ordinal(mode)] += paramMap_.parameter(mode).score(key, idx, n);
+            collectedFeatureScore_.moveScore.simpleScore.scoreMap[ordinal(mode)] += moveParamSet().param(mode, key, idx) * n;
         }
         for (int i = 0; i < n; ++i)
             collectedFeatureScore_.moveScore.collectedSparseFeatures[key].push_back(idx);
@@ -160,7 +162,9 @@ public:
     void setCoef(const CollectedCoef& coef) { collectedCoef_ = coef; }
     const CollectedCoef& collectedCoef() const { return collectedCoef_; }
     const CollectedFeatureScore& collectedScore() const { return collectedFeatureScore_; }
-    const EvaluationParameterMap& evaluationParameterMap() const { return paramMap_; }
+
+    const EvaluationMoveParameterSet& moveParamSet() const { return paramMap_.moveParamSet(); }
+    const EvaluationRensaParameterSet& rensaParamSet() const { return paramMap_.rensaParamSet(); }
 
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }

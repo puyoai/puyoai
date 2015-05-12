@@ -51,12 +51,12 @@ public:
 
 class MidEvalResult {
 public:
-    void add(EvaluationFeatureKey key, double value)
+    void add(EvaluationMoveFeatureKey key, double value)
     {
         collectedFeatures_[key] = value;
     }
 
-    double feature(EvaluationFeatureKey key) const
+    double feature(EvaluationMoveFeatureKey key) const
     {
         auto it = collectedFeatures_.find(key);
         if (it == collectedFeatures_.end())
@@ -65,10 +65,10 @@ public:
         return it->second;
     }
 
-    const std::map<EvaluationFeatureKey, double>& collectedFeatures() const { return collectedFeatures_; }
+    const std::map<EvaluationMoveFeatureKey, double>& collectedFeatures() const { return collectedFeatures_; }
 
 private:
-    std::map<EvaluationFeatureKey, double> collectedFeatures_;
+    std::map<EvaluationMoveFeatureKey, double> collectedFeatures_;
 };
 
 class MidEvaluator : public EvaluatorBase {

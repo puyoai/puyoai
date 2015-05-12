@@ -33,14 +33,7 @@ typedef CollectedSimpleSubScore CollectedSimpleRensaScore;
 
 struct CollectedSimpleScore {
     double score(EvaluationMode mode) const { return moveScore.score(mode) + rensaScore.score(mode); }
-
-    double score(const CollectedCoef& coef) const
-    {
-        double s = 0.0;
-        for (const auto& mode : ALL_EVALUATION_MODES)
-            s += score(mode) * coef.coef(mode);
-        return s;
-    }
+    double score(const CollectedCoef& coef) const { return moveScore.score(coef) + rensaScore.score(coef); }
 
     CollectedSimpleMoveScore moveScore;
     CollectedSimpleRensaScore rensaScore;
@@ -50,7 +43,7 @@ struct CollectedFeatureMoveScore {
     double score(EvaluationMode mode) const { return simpleScore.score(mode); }
     double score(const CollectedCoef& coef) const { return simpleScore.score(coef); }
 
-    double feature(EvaluationFeatureKey key) const
+    double feature(EvaluationMoveFeatureKey key) const
     {
         auto it = collectedFeatures.find(key);
         if (it != collectedFeatures.end())
@@ -59,7 +52,7 @@ struct CollectedFeatureMoveScore {
         return 0.0;
     }
 
-    const std::vector<int>& feature(EvaluationSparseFeatureKey key) const
+    const std::vector<int>& feature(EvaluationMoveSparseFeatureKey key) const
     {
         auto it = collectedSparseFeatures.find(key);
         if (it != collectedSparseFeatures.end())
@@ -70,27 +63,25 @@ struct CollectedFeatureMoveScore {
         return emptyVector;
     }
 
-    double scoreFor(EvaluationFeatureKey key,
+    double scoreFor(EvaluationMoveFeatureKey key,
                     const CollectedCoef& coef,
-                    const EvaluationParameterMap& paramMap) const
+                    const EvaluationMoveParameterSet& paramSet) const
     {
         double s = 0;
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            const EvaluationParameter& param = paramMap.parameter(mode);
-            s += param.score(key, feature(key)) * coef.coef(mode);
+            s += coef.coef(mode) * paramSet.param(mode, key) * feature(key);
         }
         return s;
     }
 
-    double scoreFor(EvaluationSparseFeatureKey key,
+    double scoreFor(EvaluationMoveSparseFeatureKey key,
                     const CollectedCoef& coef,
-                    const EvaluationParameterMap& paramMap) const
+                    const EvaluationMoveParameterSet& paramSet) const
     {
         double s = 0;
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            const EvaluationParameter& param = paramMap.parameter(mode);
             for (int v : feature(key)) {
-                s += param.score(key, v, 1) * coef.coef(mode);
+                s += coef.coef(mode) * paramSet.param(mode, key, v);
             }
         }
         return s;
@@ -99,15 +90,15 @@ struct CollectedFeatureMoveScore {
     std::string toString() const;
 
     CollectedSimpleMoveScore simpleScore;
-    std::map<EvaluationFeatureKey, double> collectedFeatures;
-    std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures;
+    std::map<EvaluationMoveFeatureKey, double> collectedFeatures;
+    std::map<EvaluationMoveSparseFeatureKey, std::vector<int>> collectedSparseFeatures;
 };
 
 struct CollectedFeatureRensaScore {
     double score(EvaluationMode mode) const { return simpleScore.score(mode); }
     double score(const CollectedCoef& coef) const { return simpleScore.score(coef); }
 
-    double feature(EvaluationFeatureKey key) const
+    double feature(EvaluationRensaFeatureKey key) const
     {
         auto it = collectedFeatures.find(key);
         if (it != collectedFeatures.end())
@@ -116,7 +107,7 @@ struct CollectedFeatureRensaScore {
         return 0.0;
     }
 
-    const std::vector<int>& feature(EvaluationSparseFeatureKey key) const
+    const std::vector<int>& feature(EvaluationRensaSparseFeatureKey key) const
     {
         auto it = collectedSparseFeatures.find(key);
         if (it != collectedSparseFeatures.end())
@@ -127,27 +118,25 @@ struct CollectedFeatureRensaScore {
         return emptyVector;
     }
 
-    double scoreFor(EvaluationFeatureKey key,
+    double scoreFor(EvaluationRensaFeatureKey key,
                     const CollectedCoef& coef,
-                    const EvaluationParameterMap& paramMap) const
+                    const EvaluationRensaParameterSet& paramSet) const
     {
         double s = 0;
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            const EvaluationParameter& param = paramMap.parameter(mode);
-            s += param.score(key, feature(key)) * coef.coef(mode);
+            s += coef.coef(mode) * paramSet.param(mode, key) * feature(key);
         }
         return s;
     }
 
-    double scoreFor(EvaluationSparseFeatureKey key,
+    double scoreFor(EvaluationRensaSparseFeatureKey key,
                     const CollectedCoef& coef,
-                    const EvaluationParameterMap& paramMap) const
+                    const EvaluationRensaParameterSet& paramSet) const
     {
         double s = 0;
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            const EvaluationParameter& param = paramMap.parameter(mode);
             for (int v : feature(key)) {
-                s += param.score(key, v, 1) * coef.coef(mode);
+                s += coef.coef(mode) * paramSet.param(mode, key, v);
             }
         }
         return s;
@@ -156,8 +145,8 @@ struct CollectedFeatureRensaScore {
     std::string toString() const;
 
     CollectedSimpleRensaScore simpleScore;
-    std::map<EvaluationFeatureKey, double> collectedFeatures;
-    std::map<EvaluationSparseFeatureKey, std::vector<int>> collectedSparseFeatures;
+    std::map<EvaluationRensaFeatureKey, double> collectedFeatures;
+    std::map<EvaluationRensaSparseFeatureKey, std::vector<int>> collectedSparseFeatures;
     std::string bookname;
     ColumnPuyoList puyosToComplement;
 };

@@ -37,9 +37,9 @@ const double FIELD_USHAPE_HEIGHT_COEF[15] = {
 
 }
 
-template<typename ScoreCollector>
+template<typename ScoreCollector, typename FeatureKey>
 static void calculateConnection(ScoreCollector* sc, const CoreField& field,
-                                EvaluationFeatureKey key2, EvaluationFeatureKey key3)
+                                FeatureKey key2, FeatureKey key3)
 {
     int count3 = 0;
     int count2 = 0;
@@ -63,10 +63,10 @@ static void calculateConnection(ScoreCollector* sc, const CoreField& field,
     sc->addScore(key2, count2 / 2);
 }
 
-template<typename ScoreCollector>
+template<typename ScoreCollector, typename SparseFeatureKey>
 static void calculateValleyDepth(ScoreCollector* sc,
-                                 EvaluationSparseFeatureKey key,
-                                 EvaluationSparseFeatureKey edgeKey,
+                                 SparseFeatureKey key,
+                                 SparseFeatureKey edgeKey,
                                  const CoreField& field)
 {
     for (int x = 1; x <= 6; ++x) {
@@ -85,8 +85,8 @@ static void calculateValleyDepth(ScoreCollector* sc,
     }
 }
 
-template<typename ScoreCollector>
-static void calculateRidgeHeight(ScoreCollector* sc, EvaluationSparseFeatureKey key, const CoreField& field)
+template<typename ScoreCollector, typename SparseFeatureKey>
+static void calculateRidgeHeight(ScoreCollector* sc, SparseFeatureKey key, const CoreField& field)
 {
     for (int x = 1; x <= 6; ++x) {
         int currentHeight = field.height(x);
@@ -101,10 +101,10 @@ static void calculateRidgeHeight(ScoreCollector* sc, EvaluationSparseFeatureKey 
     }
 }
 
-template<typename ScoreCollector>
+template<typename ScoreCollector, typename FeatureKey>
 static void calculateFieldUShape(ScoreCollector* sc,
-                                 EvaluationFeatureKey linearKey,
-                                 EvaluationFeatureKey squareKey,
+                                 FeatureKey linearKey,
+                                 FeatureKey squareKey,
                                  bool enemyHasZenkeshi,
                                  const CoreField& field)
 {
@@ -193,7 +193,7 @@ void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const 
             while (f.color(x, y) == f.color(x + len, y))
                 ++len;
 
-            EvaluationFeatureKey key;
+            EvaluationMoveFeatureKey key;
             if (len == 1) {
                 continue;
             } else if (len == 2) {
@@ -501,7 +501,7 @@ void RensaEvaluator<ScoreCollector>::evalComplementationBias(const ColumnPuyoLis
         if (ps.count() >= 4)
             sc_->addScore(COMPLEMENTATION_BIAS_MUCH, 1);
         if (ps.red() >= 3 || ps.blue() >= 3 || ps.yellow() >= 3 || ps.green() >= 3) {
-            EvaluationFeatureKey key = (x == 1 || x == 6) ? COMPLEMENTATION_BIAS_EDGE : COMPLEMENTATION_BIAS;
+            EvaluationRensaFeatureKey key = (x == 1 || x == 6) ? COMPLEMENTATION_BIAS_EDGE : COMPLEMENTATION_BIAS;
             sc_->addScore(key, 1);
         }
     }
@@ -632,7 +632,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
         ++rensaCounts[rensaResult.chains];
 
-        RensaScoreCollector rensaScoreCollector(sc_->evaluationParameterMap());
+        RensaScoreCollector rensaScoreCollector(sc_->rensaParamSet());
         RensaEvaluator<RensaScoreCollector> rensaEvaluator(patternBook(), &rensaScoreCollector);
 
         CoreField complementedField(fieldBeforeRensa);
@@ -715,5 +715,5 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
 template class Evaluator<FeatureScoreCollector>;
 template class Evaluator<SimpleScoreCollector>;
-template class RensaEvaluator<FeatureScoreCollector>;
-template class RensaEvaluator<SimpleScoreCollector>;
+template class RensaEvaluator<FeatureRensaScoreCollector>;
+template class RensaEvaluator<SimpleRensaScoreCollector>;
