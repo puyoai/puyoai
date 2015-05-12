@@ -108,7 +108,7 @@ public:
     void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
     void evalRensaRidgeHeight(const CoreField&);
     void evalRensaValleyDepth(const CoreField&);
-    void evalRensaFieldUShape(const CoreField&, bool enemyHasZenkeshi);
+    void evalRensaFieldUShape(const CoreField&);
     void evalComplementationBias(const ColumnPuyoList&);
     void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList&,
                            int currentFrameId, const PlayerState& me, const PlayerState& enemy);
@@ -139,7 +139,8 @@ public:
     void evalThirdColumnHeightFeature(const CoreField&);
     void evalValleyDepth(const CoreField&);
     void evalRidgeHeight(const CoreField&);
-    void evalFieldUShape(const CoreField&, bool enemyHasZenkeshi);
+    void evalFieldUShape(const CoreField&);
+    void evalFieldRightBias(const CoreField&);
     void evalUnreachableSpace(const CoreField&);
     void evalFallenOjama(int fallenOjama);
 
