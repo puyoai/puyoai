@@ -7,7 +7,6 @@ using namespace std;
 string toString(EvaluationMode mode)
 {
     switch (mode) {
-    case EvaluationMode::DEFAULT: return "";
     case EvaluationMode::INITIAL: return "initial";
     case EvaluationMode::EARLY: return "early";
     case EvaluationMode::MIDDLE: return "middle";

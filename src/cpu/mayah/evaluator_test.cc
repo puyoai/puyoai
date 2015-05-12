@@ -72,9 +72,9 @@ TEST_F(EvaluatorTest, evalRensaGarbage)
                 "R    R"
                 "YYYGGG");
 
-    EvaluationParameterMap paramMap;
+    EvaluationRensaParameterSet paramSet;
     PatternBook patternBook;
-    FeatureRensaScoreCollector sc(paramMap);
+    FeatureRensaScoreCollector sc(paramSet);
     RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
 
     evaluator.evalRensaGarbage(f);

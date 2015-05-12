@@ -45,14 +45,14 @@ public:
     static const int FAST_NUM_ITERATION = 2;
 
     MayahAI(int argc, char* argv[], Executor* executor = nullptr);
-    virtual ~MayahAI();
+    ~MayahAI() override;
 
-    virtual DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
-                               const PlayerState& me, const PlayerState& enemy, bool fast) const override;
+    DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
+                       const PlayerState& me, const PlayerState& enemy, bool fast) const override;
 
-    virtual void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&) override;
+    void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&) override;
 
-    virtual void onGameWillBegin(const FrameRequest&) override;
+    void onGameWillBegin(const FrameRequest&) override;
 
     // Use this directly in test. Otherwise, use via think.
     // When |specifiedDecisionsOnly| is specified, only that decision will be considered.
@@ -122,11 +122,8 @@ public:
     const Gazer& gazer() const { return gazer_; }
 
     void removeNontokopuyoParameter() { evaluationParameterMap_.removeNontokopuyoParameter(); }
+
     const EvaluationParameterMap& evaluationParameterMap() const { return evaluationParameterMap_; }
-    const EvaluationParameter& evaluationParameter(EvaluationMode mode) const
-    {
-        return evaluationParameterMap().parameter(mode);
-    }
     void setEvaluationParameterMap(const EvaluationParameterMap&);
 };
 

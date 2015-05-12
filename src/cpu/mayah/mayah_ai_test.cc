@@ -266,6 +266,7 @@ TEST(MayahAITest, DontCrash3)
     (void)ai->think(100, f, seq, me, enemy, false);
 }
 
+#if 0
 TEST(MayahAITest, setEvaluationParameter)
 {
     auto ai = makeAI();
@@ -278,6 +279,7 @@ TEST(MayahAITest, setEvaluationParameter)
     EXPECT_EQ(1.0, ai->evaluationParameter(EvaluationMode::DEFAULT).getValue(SCORE));
     EXPECT_EQ(1.0, ai->evaluationParameter(EvaluationMode::EARLY).getValue(SCORE));
 }
+#endif
 
 int main(int argc, char* argv[])
 {
