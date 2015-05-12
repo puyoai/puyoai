@@ -105,29 +105,22 @@ template<typename ScoreCollector, typename FeatureKey>
 static void calculateFieldUShape(ScoreCollector* sc,
                                  FeatureKey linearKey,
                                  FeatureKey squareKey,
-                                 bool enemyHasZenkeshi,
                                  const CoreField& field)
 {
     static const int DIFF[FieldConstant::MAP_WIDTH] = {
         0, -3, 0, 1, 1, 0, -3, 0,
     };
 
-    static const int DIFF_ON_ZENKESHI[FieldConstant::MAP_WIDTH] = {
-        0, 2, 2, 2, -8, -6, -6, 0
-    };
-
-    const int* diff = enemyHasZenkeshi ? DIFF_ON_ZENKESHI : DIFF;
-
     double average = 0;
     for (int x = 1; x <= 6; ++x)
-        average += (field.height(x) + diff[x]);
+        average += (field.height(x) + DIFF[x]);
     average /= 6;
 
     double linearValue = 0;
     double squareValue = 0;
 
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        int h = field.height(x) + diff[x];
+        int h = field.height(x) + DIFF[x];
         double coef = FIELD_USHAPE_HEIGHT_COEF[field.height(x)];
         linearValue += std::abs(h - average) * coef;
         squareValue += (h - average) * (h - average) * coef;
@@ -237,13 +230,34 @@ void Evaluator<ScoreCollector>::evalRidgeHeight(const CoreField& field)
 }
 
 template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalFieldUShape(const CoreField& field, bool enemyHasZenkeshi)
+void Evaluator<ScoreCollector>::evalFieldUShape(const CoreField& field)
 {
-    calculateFieldUShape(sc_,
-                         FIELD_USHAPE_LINEAR,
-                         FIELD_USHAPE_SQUARE,
-                         enemyHasZenkeshi,
-                         field);
+    calculateFieldUShape(sc_, FIELD_USHAPE_LINEAR, FIELD_USHAPE_SQUARE, field);
+}
+
+template<typename ScoreCollector>
+void Evaluator<ScoreCollector>::evalFieldRightBias(const CoreField& field)
+{
+    static const int DIFF[FieldConstant::MAP_WIDTH] = {
+        0, 2, 2, 2, -8, -6, -6, 0
+    };
+
+    double average = 0;
+    for (int x = 1; x <= 6; ++x)
+        average += (field.height(x) + DIFF[x]);
+    average /= 6;
+
+    double linearValue = 0;
+    double squareValue = 0;
+
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        int h = field.height(x) + DIFF[x];
+        linearValue += std::abs(h - average);
+        squareValue += (h - average) * (h - average);
+    }
+
+    sc_->addScore(FIELD_RIGHT_BIAS_LINEAR, linearValue);
+    sc_->addScore(FIELD_RIGHT_BIAS_SQUARE, squareValue);
 }
 
 template<typename ScoreCollector>
@@ -459,12 +473,11 @@ void RensaEvaluator<ScoreCollector>::evalRensaValleyDepth(const CoreField& field
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field, bool enemyHasZenkeshi)
+void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field)
 {
     calculateFieldUShape(sc_,
                          RENSA_FIELD_USHAPE_LINEAR,
                          RENSA_FIELD_USHAPE_SQUARE,
-                         enemyHasZenkeshi,
                          field);
 }
 
@@ -601,7 +614,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     evalThirdColumnHeightFeature(fieldBeforeRensa);
     evalValleyDepth(fieldBeforeRensa);
     evalRidgeHeight(fieldBeforeRensa);
-    evalFieldUShape(fieldBeforeRensa, enemy.hasZenkeshi);
+    evalFieldUShape(fieldBeforeRensa);
     evalUnreachableSpace(fieldBeforeRensa);
     evalFallenOjama(plan.fallenOjama());
 
@@ -643,7 +656,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
-        rensaEvaluator.evalRensaFieldUShape(complementedField, enemy.hasZenkeshi);
+        rensaEvaluator.evalRensaFieldUShape(complementedField);
         rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, trackResult);
         rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyoSet);
         rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
