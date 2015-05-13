@@ -32,11 +32,18 @@ typedef CollectedSimpleSubScore CollectedSimpleMoveScore;
 typedef CollectedSimpleSubScore CollectedSimpleRensaScore;
 
 struct CollectedSimpleScore {
-    double score(EvaluationMode mode) const { return moveScore.score(mode) + rensaScore.score(mode); }
-    double score(const CollectedCoef& coef) const { return moveScore.score(coef) + rensaScore.score(coef); }
+    double score(EvaluationMode mode) const
+    {
+        return moveScore.score(mode) + mainRensaScore.score(mode) + sideRensaScore.score(mode);
+    }
+    double score(const CollectedCoef& coef) const
+    {
+        return moveScore.score(coef) + mainRensaScore.score(coef) + sideRensaScore.score(coef);
+    }
 
     CollectedSimpleMoveScore moveScore;
-    CollectedSimpleRensaScore rensaScore;
+    CollectedSimpleRensaScore mainRensaScore;
+    CollectedSimpleRensaScore sideRensaScore;
 };
 
 struct CollectedFeatureMoveScore {
@@ -154,15 +161,20 @@ struct CollectedFeatureRensaScore {
 struct CollectedFeatureScore {
     double score(EvaluationMode mode) const
     {
-        return moveScore.simpleScore.score(mode) + rensaScore.simpleScore.score(mode);
+        return moveScore.simpleScore.score(mode) +
+            mainRensaScore.simpleScore.score(mode) +
+            sideRensaScore.simpleScore.score(mode);
     }
     double score(const CollectedCoef& coef) const
     {
-        return moveScore.simpleScore.score(coef) + rensaScore.simpleScore.score(coef);
+        return moveScore.simpleScore.score(coef) +
+            mainRensaScore.simpleScore.score(coef) +
+            sideRensaScore.simpleScore.score(coef);
     }
 
     CollectedFeatureMoveScore moveScore;
-    CollectedFeatureRensaScore rensaScore;
+    CollectedFeatureRensaScore mainRensaScore;
+    CollectedFeatureRensaScore sideRensaScore;
 };
 
 struct CollectedFeatureCoefScore {
@@ -178,7 +190,8 @@ public:
     double coef(EvaluationMode mode) const { return collectedCoef_.coef(mode); }
 
     const CollectedFeatureMoveScore& moveScore() const { return collectedFeatureScore_.moveScore; }
-    const CollectedFeatureRensaScore& rensaScore() const { return collectedFeatureScore_.rensaScore; }
+    const CollectedFeatureRensaScore& mainRensaScore() const { return collectedFeatureScore_.mainRensaScore; }
+    const CollectedFeatureRensaScore& sideRensaScore() const { return collectedFeatureScore_.sideRensaScore; }
 
     double score() const { return collectedFeatureScore_.score(collectedCoef_); }
 

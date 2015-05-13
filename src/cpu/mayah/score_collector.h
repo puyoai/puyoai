@@ -15,33 +15,40 @@
 class SimpleRensaScoreCollector {
 public:
     typedef CollectedSimpleRensaScore CollectedScore;
-    explicit SimpleRensaScoreCollector(const EvaluationRensaParameterSet& paramSet) :
-        paramSet_(paramSet)
+    explicit SimpleRensaScoreCollector(const EvaluationRensaParameterSet& mainRensaParamSet,
+                                       const EvaluationRensaParameterSet& sideRensaParamSet) :
+        mainRensaParamSet_(mainRensaParamSet),
+        sideRensaParamSet_(sideRensaParamSet)
     {
     }
 
     void addScore(EvaluationRensaFeatureKey key, double v)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            rensaScore_.scoreMap[ordinal(mode)] += paramSet_.param(mode, key) * v;
+            mainRensaScore_.scoreMap[ordinal(mode)] += mainRensaParamSet_.param(mode, key) * v;
+            sideRensaScore_.scoreMap[ordinal(mode)] += sideRensaParamSet_.param(mode, key) * v;
         }
     }
 
     void addScore(EvaluationRensaSparseFeatureKey key, int idx, int n = 1)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            rensaScore_.scoreMap[ordinal(mode)] += paramSet_.param(mode, key, idx) * n;
+            mainRensaScore_.scoreMap[ordinal(mode)] += mainRensaParamSet_.param(mode, key, idx) * n;
+            sideRensaScore_.scoreMap[ordinal(mode)] += sideRensaParamSet_.param(mode, key, idx) * n;
         }
     }
 
     void setBookname(const std::string&) {}
     void setPuyosToComplement(const ColumnPuyoList&) {}
 
-    const CollectedScore& collectedScore() const { return rensaScore_; }
+    const CollectedScore& mainRensaScore() const { return mainRensaScore_; }
+    const CollectedScore& sideRensaScore() const { return sideRensaScore_; }
 
 private:
-    const EvaluationRensaParameterSet& paramSet_;
-    CollectedSimpleRensaScore rensaScore_;
+    const EvaluationRensaParameterSet& mainRensaParamSet_;
+    const EvaluationRensaParameterSet& sideRensaParamSet_;
+    CollectedSimpleRensaScore mainRensaScore_;
+    CollectedSimpleRensaScore sideRensaScore_;
 };
 
 // This collector collects only score.
@@ -69,9 +76,13 @@ public:
         }
     }
 
-    void merge(const CollectedSimpleRensaScore& rensaScore)
+    void mergeMainRensaScore(const CollectedSimpleRensaScore& rensaScore)
     {
-        collectedSimpleScore_.rensaScore = rensaScore;
+        collectedSimpleScore_.mainRensaScore = rensaScore;
+    }
+    void mergeSideRensaScore(const CollectedSimpleRensaScore& rensaScore)
+    {
+        collectedSimpleScore_.sideRensaScore = rensaScore;
     }
 
     void setCoef(const CollectedCoef& coef) { collectedCoef_ = coef; }
@@ -80,7 +91,8 @@ public:
     const CollectedSimpleScore& collectedScore() const { return collectedSimpleScore_; }
 
     const EvaluationMoveParameterSet& moveParamSet() const { return paramMap_.moveParamSet(); }
-    const EvaluationRensaParameterSet& rensaParamSet() const { return paramMap_.rensaParamSet(); }
+    const EvaluationRensaParameterSet& mainRensaParamSet() const { return paramMap_.mainRensaParamSet(); }
+    const EvaluationRensaParameterSet& sideRensaParamSet() const { return paramMap_.sideRensaParamSet(); }
 
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }
@@ -97,36 +109,55 @@ private:
 class FeatureRensaScoreCollector {
 public:
     typedef CollectedFeatureRensaScore CollectedScore;
-    explicit FeatureRensaScoreCollector(const EvaluationRensaParameterSet& paramSet) :
-        paramSet_(paramSet)
+    explicit FeatureRensaScoreCollector(const EvaluationRensaParameterSet& mainRensaParamSet,
+                                        const EvaluationRensaParameterSet& sideRensaParamSet) :
+        mainRensaParamSet_(mainRensaParamSet),
+        sideRensaParamSet_(sideRensaParamSet)
     {
     }
 
     void addScore(EvaluationRensaFeatureKey key, double v)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            rensaScore_.simpleScore.scoreMap[ordinal(mode)] += paramSet_.param(mode, key) * v;
+            mainRensaScore_.simpleScore.scoreMap[ordinal(mode)] += mainRensaParamSet_.param(mode, key) * v;
+            sideRensaScore_.simpleScore.scoreMap[ordinal(mode)] += sideRensaParamSet_.param(mode, key) * v;
         }
-        rensaScore_.collectedFeatures[key] += v;
+
+        mainRensaScore_.collectedFeatures[key] += v;
+        sideRensaScore_.collectedFeatures[key] += v;
     }
 
     void addScore(EvaluationRensaSparseFeatureKey key, int idx, int n = 1)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            rensaScore_.simpleScore.scoreMap[ordinal(mode)] += paramSet_.param(mode, key, idx) * n;
+            mainRensaScore_.simpleScore.scoreMap[ordinal(mode)] += mainRensaParamSet_.param(mode, key, idx) * n;
+            sideRensaScore_.simpleScore.scoreMap[ordinal(mode)] += sideRensaParamSet_.param(mode, key, idx) * n;
         }
-        for (int i = 0; i < n; ++i)
-            rensaScore_.collectedSparseFeatures[key].push_back(idx);
+        for (int i = 0; i < n; ++i) {
+            mainRensaScore_.collectedSparseFeatures[key].push_back(idx);
+            sideRensaScore_.collectedSparseFeatures[key].push_back(idx);
+        }
     }
 
-    void setBookname(const std::string& bookname) { rensaScore_.bookname = bookname; }
-    void setPuyosToComplement(const ColumnPuyoList& cpl) { rensaScore_.puyosToComplement = cpl; }
+    void setBookname(const std::string& bookname)
+    {
+        mainRensaScore_.bookname = bookname;
+        sideRensaScore_.bookname = bookname;
+    }
+    void setPuyosToComplement(const ColumnPuyoList& cpl)
+    {
+        mainRensaScore_.puyosToComplement = cpl;
+        sideRensaScore_.puyosToComplement = cpl;
+    }
 
-    const CollectedScore& collectedScore() const { return rensaScore_; }
+    const CollectedScore& mainRensaScore() const { return mainRensaScore_; }
+    const CollectedScore& sideRensaScore() const { return sideRensaScore_; }
 
 private:
-    const EvaluationRensaParameterSet& paramSet_;
-    CollectedFeatureRensaScore rensaScore_;
+    const EvaluationRensaParameterSet& mainRensaParamSet_;
+    const EvaluationRensaParameterSet& sideRensaParamSet_;
+    CollectedFeatureRensaScore mainRensaScore_;
+    CollectedFeatureRensaScore sideRensaScore_;
 };
 
 // This collector collects all features.
@@ -154,9 +185,13 @@ public:
             collectedFeatureScore_.moveScore.collectedSparseFeatures[key].push_back(idx);
     }
 
-    void merge(const CollectedFeatureRensaScore& rensaScore)
+    void mergeMainRensaScore(const CollectedFeatureRensaScore& rensaScore)
     {
-        collectedFeatureScore_.rensaScore = rensaScore;
+        collectedFeatureScore_.mainRensaScore = rensaScore;
+    }
+    void mergeSideRensaScore(const CollectedFeatureRensaScore& rensaScore)
+    {
+        collectedFeatureScore_.sideRensaScore = rensaScore;
     }
 
     void setCoef(const CollectedCoef& coef) { collectedCoef_ = coef; }
@@ -164,7 +199,8 @@ public:
     const CollectedFeatureScore& collectedScore() const { return collectedFeatureScore_; }
 
     const EvaluationMoveParameterSet& moveParamSet() const { return paramMap_.moveParamSet(); }
-    const EvaluationRensaParameterSet& rensaParamSet() const { return paramMap_.rensaParamSet(); }
+    const EvaluationRensaParameterSet& mainRensaParamSet() const { return paramMap_.mainRensaParamSet(); }
+    const EvaluationRensaParameterSet& sideRensaParamSet() const { return paramMap_.sideRensaParamSet(); }
 
     void setEstimatedRensaScore(int s) { estimatedRensaScore_ = s; }
     int estimatedRensaScore() const { return estimatedRensaScore_; }

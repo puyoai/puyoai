@@ -45,7 +45,69 @@ string CollectedFeatureCoefScore::toString() const
     stringstream ss;
     ss << "score = " << score() << endl;
     ss << collectedFeatureScore_.moveScore.toString() << endl;
-    ss << collectedFeatureScore_.rensaScore.toString() << endl;
+    ss << collectedFeatureScore_.mainRensaScore.toString() << endl;
+    ss << collectedFeatureScore_.sideRensaScore.toString() << endl;
+
+    return ss.str();
+}
+
+template<typename FeatureSet, typename CollectedScore, typename ParameterSet>
+static string scoreComparisonStringSub(const CollectedScore& lhs,
+                                       const CollectedCoef& lhsCoef,
+                                       const CollectedScore& rhs,
+                                       const CollectedCoef& rhsCoef,
+                                       const ParameterSet& paramSet)
+{
+    typedef typename FeatureSet::FeatureKey FeatureKey;
+    typedef typename FeatureSet::SparseFeatureKey SparseFeatureKey;
+
+    set<FeatureKey> featureKeys;
+    for (const auto& entry : lhs.collectedFeatures) {
+        featureKeys.insert(entry.first);
+    }
+    for (const auto& entry : rhs.collectedFeatures) {
+        featureKeys.insert(entry.first);
+    }
+
+    set<SparseFeatureKey> sparseFeatureKeys;
+    for (const auto& entry : lhs.collectedSparseFeatures) {
+        sparseFeatureKeys.insert(entry.first);
+    }
+    for (const auto& entry : rhs.collectedSparseFeatures) {
+        sparseFeatureKeys.insert(entry.first);
+    }
+
+    stringstream ss;
+
+    for (const auto& key : featureKeys) {
+        ss << setw(32) << toFeature(key).name() << " = ";
+        ss << setw(12) << fixed << setprecision(3) << lhs.feature(key) << " ("
+           << setw(9) << fixed << setprecision(3) << lhs.scoreFor(key, lhsCoef, paramSet) << ") : ";
+        ss << setw(12) << fixed << setprecision(3) << rhs.feature(key) << " ("
+           << setw(9) << fixed << setprecision(3) << rhs.scoreFor(key, rhsCoef, paramSet) << ")";
+        ss << endl;
+    }
+    for (const auto& key : sparseFeatureKeys) {
+        ss << setw(32) << toFeature(key).name() << " = ";
+        {
+            stringstream st;
+            for (int v : lhs.feature(key)) {
+                st << " " << v;
+            }
+            ss << setw(12) << st.str() << " ("
+               << setw(9) << fixed << setprecision(3) << lhs.scoreFor(key, lhsCoef, paramSet) << ")";
+        }
+        ss << " : ";
+        {
+            stringstream st;
+            for (int v : rhs.feature(key)) {
+                st << " " << v;
+            }
+            ss << setw(12) << st.str() << " ("
+               << setw(9) << fixed << setprecision(3) << rhs.scoreFor(key, rhsCoef, paramSet) << ")";
+        }
+        ss << endl;
+    }
 
     return ss.str();
 }
@@ -55,101 +117,21 @@ string CollectedFeatureCoefScore::scoreComparisionString(const CollectedFeatureC
                                                          const CollectedFeatureCoefScore& rhs,
                                                          const EvaluationParameterMap& paramMap)
 {
-    set<EvaluationMoveFeatureKey> moveScoreKeys;
-    for (const auto& entry : lhs.collectedFeatureScore_.moveScore.collectedFeatures) {
-        moveScoreKeys.insert(entry.first);
-    }
-    for (const auto& entry : rhs.collectedFeatureScore_.moveScore.collectedFeatures) {
-        moveScoreKeys.insert(entry.first);
-    }
-
-    set<EvaluationMoveSparseFeatureKey> moveSparseScoreKeys;
-    for (const auto& entry : lhs.collectedFeatureScore_.moveScore.collectedSparseFeatures) {
-        moveSparseScoreKeys.insert(entry.first);
-    }
-    for (const auto& entry : rhs.collectedFeatureScore_.moveScore.collectedSparseFeatures) {
-        moveSparseScoreKeys.insert(entry.first);
-    }
-
-    set<EvaluationRensaFeatureKey> rensaScoreKeys;
-    for (const auto& entry : lhs.collectedFeatureScore_.rensaScore.collectedFeatures) {
-        rensaScoreKeys.insert(entry.first);
-    }
-    for (const auto& entry : rhs.collectedFeatureScore_.rensaScore.collectedFeatures) {
-        rensaScoreKeys.insert(entry.first);
-    }
-
-    set<EvaluationRensaSparseFeatureKey> rensaSparseScoreKeys;
-    for (const auto& entry : lhs.collectedFeatureScore_.rensaScore.collectedSparseFeatures) {
-        rensaSparseScoreKeys.insert(entry.first);
-    }
-    for (const auto& entry : rhs.collectedFeatureScore_.rensaScore.collectedSparseFeatures) {
-        rensaSparseScoreKeys.insert(entry.first);
-    }
-
     stringstream ss;
     ss << setw(32) << "WHOLE SCORE" << " = "
        << setw(15) << fixed << setprecision(6) << lhs.score() << "          : "
        << setw(15) << fixed << setprecision(6) << rhs.score() << endl;
     ss << "--------------------------------------------------------------------------------------" << endl;
-    for (EvaluationMoveFeatureKey key : moveScoreKeys) {
-        ss << setw(32) << toFeature(key).name() << " = ";
-        ss << setw(12) << fixed << setprecision(3) << lhs.moveScore().feature(key) << " ("
-           << setw(9) << fixed << setprecision(3) << lhs.moveScore().scoreFor(key, lhs.coef(), paramMap.moveParamSet()) << ") : ";
-        ss << setw(12) << fixed << setprecision(3) << rhs.moveScore().feature(key) << " ("
-           << setw(9) << fixed << setprecision(3) << rhs.moveScore().scoreFor(key, rhs.coef(), paramMap.moveParamSet()) << ")";
-        ss << endl;
-    }
-    for (EvaluationMoveSparseFeatureKey key : moveSparseScoreKeys) {
-        ss << setw(32) << toFeature(key).name() << " = ";
-        {
-            stringstream st;
-            for (int v : lhs.moveScore().feature(key)) {
-                st << " " << v;
-            }
-            ss << setw(12) << st.str() << " ("
-               << setw(9) << fixed << setprecision(3) << lhs.moveScore().scoreFor(key, lhs.coef(), paramMap.moveParamSet()) << ")";
-        }
-        ss << " : ";
-        {
-            stringstream st;
-            for (int v : rhs.moveScore().feature(key)) {
-                st << " " << v;
-            }
-            ss << setw(12) << st.str() << " ("
-               << setw(9) << fixed << setprecision(3) << rhs.moveScore().scoreFor(key, rhs.coef(), paramMap.moveParamSet()) << ")";
-        }
-        ss << endl;
-    }
+    ss << scoreComparisonStringSub<EvaluationMoveFeatureSet>(lhs.moveScore(), lhs.coef(),
+                                                             rhs.moveScore(), rhs.coef(),
+                                                             paramMap.moveParamSet());
     ss << "--------------------------------------------------------------------------------------" << endl;
-    for (EvaluationRensaFeatureKey key : rensaScoreKeys) {
-        ss << setw(32) << toFeature(key).name() << " = ";
-        ss << setw(12) << fixed << setprecision(3) << lhs.rensaScore().feature(key) << " ("
-           << setw(9) << fixed << setprecision(3) << lhs.rensaScore().scoreFor(key, lhs.coef(), paramMap.rensaParamSet()) << ") : ";
-        ss << setw(12) << fixed << setprecision(3) << rhs.rensaScore().feature(key) << " ("
-           << setw(9) << fixed << setprecision(3) << rhs.rensaScore().scoreFor(key, rhs.coef(), paramMap.rensaParamSet()) << ")";
-        ss << endl;
-    }
-    for (EvaluationRensaSparseFeatureKey key : rensaSparseScoreKeys) {
-        ss << setw(32) << toFeature(key).name() << " = ";
-        {
-            stringstream st;
-            for (int v : lhs.rensaScore().feature(key)) {
-                st << " " << v;
-            }
-            ss << setw(12) << st.str() << " ("
-               << setw(9) << fixed << setprecision(3) << lhs.rensaScore().scoreFor(key, lhs.coef(),paramMap.rensaParamSet()) << ")";
-        }
-        ss << " : ";
-        {
-            stringstream st;
-            for (int v : rhs.rensaScore().feature(key)) {
-                st << " " << v;
-            }
-            ss << setw(12) << st.str() << " ("
-               << setw(9) << fixed << setprecision(3) << rhs.rensaScore().scoreFor(key, rhs.coef(), paramMap.rensaParamSet()) << ")";
-        }
-        ss << endl;
-    }
+    ss << scoreComparisonStringSub<EvaluationRensaFeatureSet>(lhs.mainRensaScore(), lhs.coef(),
+                                                              rhs.mainRensaScore(), rhs.coef(),
+                                                              paramMap.mainRensaParamSet());
+    ss << "--------------------------------------------------------------------------------------" << endl;
+    ss << scoreComparisonStringSub<EvaluationRensaFeatureSet>(lhs.sideRensaScore(), lhs.coef(),
+                                                              rhs.sideRensaScore(), rhs.coef(),
+                                                              paramMap.sideRensaParamSet());
     return ss.str();
 }

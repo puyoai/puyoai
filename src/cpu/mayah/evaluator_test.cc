@@ -74,11 +74,11 @@ TEST_F(EvaluatorTest, evalRensaGarbage)
 
     EvaluationRensaParameterSet paramSet;
     PatternBook patternBook;
-    FeatureRensaScoreCollector sc(paramSet);
+    FeatureRensaScoreCollector sc(paramSet, paramSet);
     RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
 
     evaluator.evalRensaGarbage(f);
-    CollectedFeatureRensaScore cfs = sc.collectedScore();
+    CollectedFeatureRensaScore cfs = sc.mainRensaScore();
 
     EXPECT_EQ(10, cfs.feature(NUM_GARBAGE_PUYOS));
     EXPECT_EQ(6, cfs.feature(NUM_SIDE_GARBAGE_PUYOS));

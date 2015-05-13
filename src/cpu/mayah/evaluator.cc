@@ -634,6 +634,12 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         int maxChains = 0;
     } mainRensa;
 
+    // TODO(mayah): fill this.
+    struct SideRensaInfo {
+        double score = -100000000;
+        RensaCollectedScore collectedScore;
+    } sideRensa;
+
     auto evalCallback = [&](const CoreField& fieldAfterRensa,
                             const RensaResult& rensaResult,
                             const ColumnPuyoList& puyosToComplement,
@@ -641,18 +647,18 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                             const RensaChainTrackResult& trackResult,
                             const string& patternName,
                             double patternScore) {
-        ++rensaCounts[rensaResult.chains];
-
-        RensaScoreCollector rensaScoreCollector(sc_->rensaParamSet());
-        RensaEvaluator<RensaScoreCollector> rensaEvaluator(patternBook(), &rensaScoreCollector);
-
         CoreField complementedField(fieldBeforeRensa);
         if (!complementedField.dropPuyoList(puyosToComplement))
             return;
 
+        ++rensaCounts[rensaResult.chains];
+
         const PuyoSet necessaryPuyoSet(puyosToComplement);
         const double possibility = TsumoPossibility::possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
         const double virtualRensaScore = rensaResult.score * possibility;
+
+        RensaScoreCollector rensaScoreCollector(sc_->mainRensaParamSet(), sc_->sideRensaParamSet());
+        RensaEvaluator<RensaScoreCollector> rensaEvaluator(patternBook(), &rensaScoreCollector);
 
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
@@ -668,11 +674,17 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
 
         // TODO(mayah): need to set a better mode here.
-        if (rensaScoreCollector.collectedScore().score(coef) > mainRensa.score) {
+        if (mainRensa.score < rensaScoreCollector.mainRensaScore().score(coef)) {
             rensaScoreCollector.setBookname(patternName);
             rensaScoreCollector.setPuyosToComplement(puyosToComplement);
-            mainRensa.score = rensaScoreCollector.collectedScore().score(coef);
-            mainRensa.collectedScore = rensaScoreCollector.collectedScore();
+            mainRensa.score = rensaScoreCollector.mainRensaScore().score(coef);
+            mainRensa.collectedScore = rensaScoreCollector.mainRensaScore();
+        }
+
+        if (sideRensa.score < rensaScoreCollector.sideRensaScore().score(coef)) {
+            rensaScoreCollector.setPuyosToComplement(puyosToComplement);
+            sideRensa.score = rensaScoreCollector.sideRensaScore().score(coef);
+            sideRensa.collectedScore = rensaScoreCollector.sideRensaScore();
         }
 
         if (maxChain < rensaResult.chains) {
@@ -720,7 +732,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     }
 
     // finalize.
-    sc_->merge(mainRensa.collectedScore);
+    sc_->mergeMainRensaScore(mainRensa.collectedScore);
+    sc_->mergeSideRensaScore(sideRensa.collectedScore);
     sc_->setEstimatedRensaScore(maxVirtualRensaResultScore);
 }
 
