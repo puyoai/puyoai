@@ -1,5 +1,5 @@
-#ifndef MAYAH_AI_COLLECTED_SCORE_H_
-#define MAYAH_AI_COLLECTED_SCORE_H_
+#ifndef CPU_MAYAH_COLLECTED_SCORE_H_
+#define CPU_MAYAH_COLLECTED_SCORE_H_
 
 #include <array>
 
@@ -193,4 +193,4 @@ private:
     CollectedFeatureScore collectedFeatureScore_;
 };
 
-#endif
+#endif // CPU_MAYAH_COLLECTED_SCORE_H_

@@ -25,4 +25,4 @@ inline int ordinal(EvaluationMode mode) { return static_cast<int>(mode); }
 std::string toString(EvaluationMode);
 const int NUM_EVALUATION_MODES = ARRAY_SIZE(ALL_EVALUATION_MODES);
 
-#endif
+#endif // CPU_MAYAH_EVALUATION_MODE_H_

@@ -1,5 +1,5 @@
-#ifndef EVALUATION_FEATURE_H_
-#define EVALUATION_FEATURE_H_
+#ifndef CPU_MAYAH_EVALUATION_FEATURE_H_
+#define CPU_MAYAH_EVALUATION_FEATURE_H_
 
 #include <cstddef>
 #include <string>
@@ -190,4 +190,4 @@ public:
   static EvaluationRensaSparseFeatures sparseFeatures() { return EvaluationRensaSparseFeatures(); }
 };
 
-#endif // EVALUATION_FEATURE_H_
+#endif // CPU_MAYAH_EVALUATION_FEATURE_H_

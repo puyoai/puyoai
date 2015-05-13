@@ -48,4 +48,4 @@ private:
     std::vector<DecisionBookField> fields_;
 };
 
-#endif
+#endif // CPU_MAYAH_DECISION_BOOK_H_

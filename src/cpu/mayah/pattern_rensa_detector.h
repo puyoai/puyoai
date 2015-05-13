@@ -65,4 +65,4 @@ private:
     std::unordered_set<ColumnPuyoList> usedSet_;
 };
 
-#endif
+#endif // CPU_MAYAH_PATTERN_RENSA_DETECTOR_H_
