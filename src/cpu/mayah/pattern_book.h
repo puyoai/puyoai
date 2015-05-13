@@ -85,4 +85,4 @@ private:
     std::vector<std::unique_ptr<Position[]>> indexKeys_;
 };
 
-#endif
+#endif // CPU_MAYAH_PATTERN_BOOK_H_

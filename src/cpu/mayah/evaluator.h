@@ -1,5 +1,5 @@
-#ifndef EVALUATION_FEATURE_COLLECTOR_H_
-#define EVALUATION_FEATURE_COLLECTOR_H_
+#ifndef CPU_MAYAH_EVALUATOR_H_
+#define CPU_MAYAH_EVALUATOR_H_
 
 #include <map>
 #include <vector>
@@ -155,4 +155,4 @@ private:
     ScoreCollector* sc_;
 };
 
-#endif
+#endif // CPU_MAYAH_EVALUATOR_H_

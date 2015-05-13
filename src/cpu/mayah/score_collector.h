@@ -1,5 +1,5 @@
-#ifndef MAYAH_AI_SCORE_COLLECTOR_H_
-#define MAYAH_AI_SCORE_COLLECTOR_H_
+#ifndef CPU_MAYAH_SCORE_COLLECTOR_H_
+#define CPU_MAYAH_SCORE_COLLECTOR_H_
 
 #include <array>
 #include <map>
@@ -176,4 +176,4 @@ private:
     int estimatedRensaScore_ = 0;
 };
 
-#endif
+#endif // CPU_MAYAH_SCORE_COLLECTOR_H_

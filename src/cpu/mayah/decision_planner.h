@@ -344,4 +344,4 @@ void DecisionPlanner<MidEvaluationResult>::parallelEval(int currentDepth, const 
     }
 }
 
-#endif
+#endif // CPU_MAYAH_DECISION_PLANNER_H_

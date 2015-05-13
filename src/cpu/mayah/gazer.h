@@ -85,4 +85,4 @@ private:
     std::vector<EstimatedRensaInfo> possibleRensaInfos_;
 };
 
-#endif
+#endif // CPU_MAYAH_GAZER_H_

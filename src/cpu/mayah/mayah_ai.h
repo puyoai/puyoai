@@ -1,5 +1,5 @@
-#ifndef CLIENT_CPU_MAYAH_MAYAH_AI_H_
-#define CLIENT_CPU_MAYAH_MAYAH_AI_H_
+#ifndef CPU_MAYAH_MAYAH_AI_H_
+#define CPU_MAYAH_MAYAH_AI_H_
 
 #include <memory>
 #include <string>
@@ -127,4 +127,4 @@ public:
     void setEvaluationParameterMap(const EvaluationParameterMap&);
 };
 
-#endif
+#endif // CPU_MAYAH_MAYAH_AI_H_
