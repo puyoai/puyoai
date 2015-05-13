@@ -306,10 +306,13 @@ void AI::groundedForCommon(PlayerState* state, int frameId)
 
     if (state->currentRensaResult.chains > 0) {
         state->currentChainStartedFrameId = frameId;
+        // Consider ZENKESHI is consumed here.
+        state->hasZenkeshi = false;
     } else {
         state->currentChainStartedFrameId = 0;
     }
 
+    // We check ZENKESHI here, so that we can notice ZENKESHI earlier.
     if (state->hand != 0 && cf.isZenkeshi()) {
         state->hasZenkeshi = true;
     }
@@ -365,8 +368,6 @@ void AI::puyoErasedForCommon(PlayerState* p1, PlayerState* p2, int frameId, cons
     if (cf.isZenkeshi()) {
         // p1->hasZenkeshi is set in puyoErasedOnCommon.
         p1->unusedScore += scoreForOjama(30);
-    } else {
-        p1->hasZenkeshi = false;
     }
 
     // Estimate the rest of chains.

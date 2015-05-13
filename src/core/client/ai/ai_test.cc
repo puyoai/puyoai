@@ -49,11 +49,8 @@ protected:
     TestAI ai_;
 };
 
-TEST_F(AITest, zenkeshi)
+TEST_F(AITest, zenkeshi1)
 {
-    KumipuyoSeq seq("RRRRBBGG");
-
-    CoreField field;
     FrameRequest req;
 
     req.frameId = 1;
@@ -108,8 +105,9 @@ TEST_F(AITest, zenkeshi)
     req.playerFrameRequest[1].field = CoreField(" BRRRR");
     ai_.groundedForMe(req);
     ai_.groundedForEnemy(req);
-    EXPECT_TRUE(myPlayerState().hasZenkeshi);
-    EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
+    // ZENKESHI is consumed.
+    EXPECT_FALSE(myPlayerState().hasZenkeshi);
+    EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 9;
     req.playerFrameRequest[0].field = CoreField(" BRRRR");
@@ -118,6 +116,60 @@ TEST_F(AITest, zenkeshi)
     ai_.puyoErasedForEnemy(req);
     EXPECT_FALSE(myPlayerState().hasZenkeshi);
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
+}
+
+TEST_F(AITest, zenkeshi2)
+{
+    FrameRequest req;
+
+    req.frameId = 1;
+    ai_.gameWillBegin(req);
+    EXPECT_FALSE(myPlayerState().hasZenkeshi);
+    EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
+
+    req.frameId = 2;
+    ai_.decisionRequestedForMe(req);
+    ai_.decisionRequestedForEnemy(req);
+    EXPECT_FALSE(myPlayerState().hasZenkeshi);
+    EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
+
+    req.frameId = 3;
+    req.playerFrameRequest[0].field = CoreField(
+        ".BBB.."
+        "RRRRB.");
+    req.playerFrameRequest[1].field = CoreField(
+        ".BBB.."
+        "RRRRB.");
+    ai_.groundedForMe(req);
+    ai_.groundedForEnemy(req);
+    EXPECT_TRUE(myPlayerState().hasZenkeshi);
+    EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
+
+    req.frameId = 4;
+    ai_.puyoErasedForMe(req);
+    ai_.puyoErasedForEnemy(req);
+    EXPECT_TRUE(myPlayerState().hasZenkeshi);
+    EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
+
+    req.frameId = 5;
+    req.playerFrameRequest[0].field = CoreField(
+        ".BBBB.");
+    req.playerFrameRequest[1].field = CoreField(
+        ".BBBB.");
+    ai_.puyoErasedForMe(req);
+    ai_.puyoErasedForEnemy(req);
+    EXPECT_TRUE(myPlayerState().hasZenkeshi);
+    EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
+
+    req.frameId = 6;
+    req.playerFrameRequest[0].field = CoreField(
+        ".BBBB.");
+    req.playerFrameRequest[1].field = CoreField(
+        ".BBBB.");
+    ai_.decisionRequestedForMe(req);
+    ai_.decisionRequestedForEnemy(req);
+    EXPECT_TRUE(myPlayerState().hasZenkeshi);
+    EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
 }
 
 TEST_F(AITest, ojamaCount)
