@@ -627,6 +627,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     int fastChain10MaxScore = 0;
     int maxVirtualRensaResultScore = 0;
 
+    // TODO(mayah): MainRensaInfo should be array for each mode?
     struct MainRensaInfo {
         double score = -100000000;
         RensaCollectedScore collectedScore;
@@ -640,7 +641,6 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                             const RensaChainTrackResult& trackResult,
                             const string& patternName,
                             double patternScore) {
-
         ++rensaCounts[rensaResult.chains];
 
         RensaScoreCollector rensaScoreCollector(sc_->rensaParamSet());
