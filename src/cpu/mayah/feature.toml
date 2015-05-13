@@ -58,6 +58,8 @@ SCORE = 0
 VIRTUAL_SCORE = 0
 STRATEGY_SAISOKU = 8500
 
+[mode.default.side]
+
 [mode.initial.move]
 NUM_CHIGIRI = -100
 THIRD_COLUMN_HEIGHT = [

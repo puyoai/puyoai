@@ -296,7 +296,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
         ss << "LARGE_ENOUGH / ";
     if (cf.moveScore().feature(STRATEGY_TSUBUSHI) > 0)
         ss << "TSUBUSHI / ";
-    if (cf.rensaScore().feature(STRATEGY_SAISOKU) > 0)
+    if (cf.mainRensaScore().feature(STRATEGY_SAISOKU) > 0)
         ss << "SAISOKU / ";
     else if (saturated)
         ss << "SATURATED / ";
@@ -307,14 +307,14 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
     if (cf.moveScore().feature(STRATEGY_LAND_LEVELING) > 0)
         ss << "LEVELING / ";
 
-    if (!cf.rensaScore().bookname.empty())
-        ss << cf.rensaScore().bookname << " / ";
+    if (!cf.mainRensaScore().bookname.empty())
+        ss << cf.mainRensaScore().bookname << " / ";
 
     ss << "D/I = " << plan.decisions().size() << "/" << maxIteration << " / ";
     ss << "SCORE = " << cf.score() << " / ";
 
-    if (!cf.rensaScore().feature(MAX_CHAINS).empty()) {
-        const vector<int>& vs = cf.rensaScore().feature(MAX_CHAINS);
+    if (!cf.mainRensaScore().feature(MAX_CHAINS).empty()) {
+        const vector<int>& vs = cf.mainRensaScore().feature(MAX_CHAINS);
         for (size_t i = 0; i < vs.size(); ++i)
             ss << "MAX CHAIN = " << vs[i] << " / ";
     }

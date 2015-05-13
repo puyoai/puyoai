@@ -168,7 +168,6 @@ public:
         return true;
     }
 
-protected:
     void clear()
     {
         std::fill(param_.begin(), param_.end(), 0.0);
@@ -179,6 +178,7 @@ protected:
         std::fill(hasSparseParam_.begin(), hasSparseParam_.end(), false);
     }
 
+protected:
     std::vector<double> param_;
     std::vector<bool> hasParam_;
     std::vector<std::vector<double>> sparseParam_;
@@ -238,6 +238,14 @@ public:
         }
     }
 
+    void clear()
+    {
+        defaultParam_.clear();
+        for (auto& param : params_) {
+            param.clear();
+        }
+    }
+
     toml::Value toTomlValue() const
     {
         toml::Value value = defaultParam_.toTomlValue();
@@ -281,7 +289,7 @@ public:
         {
             std::string defaultKey = std::string("mode.default.") + anotherKey;
             const toml::Value* v = value.find(defaultKey);
-            CHECK(v != nullptr);
+            CHECK(v != nullptr) << defaultKey << "was not found.";
             if (!defaultParam_.loadValue(*v))
                 return false;
         }
@@ -300,10 +308,12 @@ typedef EvaluationParameterSet<EvaluationRensaParameter, EvaluationRensaFeatureS
 class EvaluationParameterMap {
 public:
     const EvaluationMoveParameterSet& moveParamSet() const { return moveParamSet_; }
-    const EvaluationRensaParameterSet& rensaParamSet() const { return rensaParamSet_; }
+    const EvaluationRensaParameterSet& mainRensaParamSet() const { return mainRensaParamSet_; }
+    const EvaluationRensaParameterSet& sideRensaParamSet() const { return sideRensaParamSet_; }
 
     EvaluationMoveParameterSet* mutableMoveParamSet() { return &moveParamSet_; }
-    EvaluationRensaParameterSet* mutableRensaParamSet() { return &rensaParamSet_; }
+    EvaluationRensaParameterSet* mutableMainRensaParamSet() { return &mainRensaParamSet_; }
+    EvaluationRensaParameterSet* mutableSideRensaParamSet() { return &sideRensaParamSet_; }
 
     std::string toString() const;
 
@@ -318,7 +328,8 @@ public:
 
 private:
     EvaluationMoveParameterSet moveParamSet_;
-    EvaluationRensaParameterSet rensaParamSet_;
+    EvaluationRensaParameterSet mainRensaParamSet_;
+    EvaluationRensaParameterSet sideRensaParamSet_;
 };
 
 #endif // CPU_MAYAH_FEATURE_PARAMETER_H_

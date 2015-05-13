@@ -60,7 +60,9 @@ bool EvaluationParameterMap::loadValue(const toml::Value& v)
 
     if (!moveParamSet_.loadValue(v, "move"))
         return false;
-    if (!rensaParamSet_.loadValue(v, "main"))
+    if (!mainRensaParamSet_.loadValue(v, "main"))
+        return false;
+    if (!sideRensaParamSet_.loadValue(v, "side"))
         return false;
 
     return true;
@@ -69,8 +71,10 @@ bool EvaluationParameterMap::loadValue(const toml::Value& v)
 toml::Value EvaluationParameterMap::toTomlValue() const
 {
     toml::Value v1 = moveParamSet_.toTomlValue();
-    toml::Value v2 = rensaParamSet_.toTomlValue();
+    toml::Value v2 = mainRensaParamSet_.toTomlValue();
+    toml::Value v3 = sideRensaParamSet_.toTomlValue();
     CHECK(v1.merge(v2));
+    CHECK(v1.merge(v3));
 
     return v1;
 }
@@ -85,5 +89,7 @@ string EvaluationParameterMap::toString() const
 void EvaluationParameterMap::removeNontokopuyoParameter()
 {
     moveParamSet_.removeNontokopuyoParameter();
-    rensaParamSet_.removeNontokopuyoParameter();
+    mainRensaParamSet_.removeNontokopuyoParameter();
+    // For tokopuyo, we don't think about side-rensa.
+    sideRensaParamSet_.clear();
 }

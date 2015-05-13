@@ -349,8 +349,8 @@ int main(int argc, char* argv[])
             for (double y = 10; y <= x; y += 10) {
                 cout << "current (x, y) = " << x << ' ' << y << endl;
 
-                paramMap.mutableRensaParamSet()->setParam(EvaluationMode::MIDDLE, PATTERN_BOOK, x);
-                paramMap.mutableRensaParamSet()->setParam(EvaluationMode::LATE, PATTERN_BOOK, y);
+                paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::MIDDLE, PATTERN_BOOK, x);
+                paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, PATTERN_BOOK, y);
 
                 scoreMap[make_pair(x, y)] = run(executor.get(), paramMap);
             }
