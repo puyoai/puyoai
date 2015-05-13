@@ -7,6 +7,7 @@
 using namespace std;
 
 namespace {
+const int MAX_UNUSED_VARIABLES_FOR_FIRST_PATTERN = 0;
 const int MAX_UNUSED_VARIABLES = 1;
 }
 
@@ -17,7 +18,7 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
 
     const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
 
-    // --- Iterate with complementing
+    // --- Iterate with complementing pattern.
     for (const int id : matchableIds) {
         const PatternBookField& pbf = patternBook_.patternBookField(id);
         int x = pbf.ignitionColumn();
@@ -31,9 +32,11 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         };
 
         ColumnPuyoList cpl;
-        ComplementResult complementResult = pbf.complement(originalField_, MAX_UNUSED_VARIABLES, &cpl, scoreCallback);
+        ComplementResult complementResult = pbf.complement(originalField_, MAX_UNUSED_VARIABLES_FOR_FIRST_PATTERN,
+                                                           &cpl, scoreCallback);
         if (!complementResult.success)
             continue;
+        // We don't allow unused variable for the first pattern.
         if (complementResult.numFilledUnusedVariables > 0)
             continue;
 
@@ -48,6 +51,8 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         ColumnPuyo firePuyo(x, cpl.get(x, cpl.sizeOn(x) - 1));
         ColumnPuyoList keyPuyos(cpl);
         keyPuyos.removeTopFrom(x);
+        if (!checkDup(firePuyo, keyPuyos))
+            continue;
 
         CoreField::SimulationContext context(originalContext_);
         RensaYPositionTracker tracker;
