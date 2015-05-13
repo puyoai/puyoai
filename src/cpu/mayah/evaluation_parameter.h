@@ -251,6 +251,7 @@ public:
         toml::Value value = defaultParam_.toTomlValue();
         for (const auto& mode : ALL_EVALUATION_MODES) {
             toml::Value* v = value.ensureTable(std::string("mode.") + ::toString(mode));
+            CHECK(v) << "ensureTable failed: value=" << value;
             *v = params_[ordinal(mode)].toTomlValue();
         }
 
