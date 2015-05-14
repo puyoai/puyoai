@@ -481,25 +481,27 @@ TEST(RensaDetectorTest, iteratePossibleRensaWithKeyPuyos)
 
 TEST(RensaDetectorTest, iteratePossibleRensasFloat)
 {
-    CoreField cf("y     "
-                 "b     "
-                 "r     "
-                 "b     "
-                 "b     "
-                 "b     "
-                 "y     "
-                 "y     "
-                 "y     ");
+    const CoreField cf(
+        "Y     "
+        "B     "
+        "R     "
+        "B     "
+        "B     "
+        "B     "
+        "Y     "
+        "Y     "
+        "Y     ");
 
-    CoreField expected("y     "
-                       "b     "
-                       "rr    "
-                       "br    "
-                       "br    "
-                       "bO    "
-                       "yO    "
-                       "yO    "
-                       "yO    ");
+    const CoreField expected(
+        "Y     "
+        "B     "
+        "RR    "
+        "BR    "
+        "BR    "
+        "BO    "
+        "YO    "
+        "YO    "
+        "YO    ");
 
     bool found = false;
     auto callback = [&](const CoreField& /*fieldAfterRensa*/, const RensaResult& /*rensaResult*/,
@@ -517,7 +519,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat)
 
 TEST(RensaDetectorTest, iteratePossibleRensasFloat2)
 {
-    CoreField cf(
+    const CoreField cf(
         ".....G"
         ".....R"
         ".....R"
@@ -527,7 +529,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat2)
         "....GR"
         "...GGR");
 
-    CoreField expected(
+    const CoreField expected(
         ".....G"
         ".....R"
         ".....R"
@@ -550,6 +552,57 @@ TEST(RensaDetectorTest, iteratePossibleRensasFloat2)
 
     RensaDetector::iteratePossibleRensas(cf, 0, RensaDetectorStrategy::defaultFloatStrategy(), callback);
     EXPECT_TRUE(found);
+}
+
+TEST(RensaDetectorTest, iteratePossibleRensasFloat3)
+{
+    CoreField original(
+        "....G."
+        "....R."
+        "....R."
+        "....G."
+        "....G."
+        "....R."
+        "...GR."
+        "..GGR.");
+
+    CoreField expected1(
+        "....G."
+        "....R."
+        "....R."
+        "....G."
+        "....GG"
+        "....RG"
+        "...GRO"
+        "..GGRO");
+
+    CoreField expected2(
+        "....G."
+        "....R."
+        "....R."
+        "....G."
+        "...GG."
+        "...GR."
+        "...GR."
+        "..GGR.");
+
+    bool found1 = false;
+    bool found2 = false;
+    auto callback = [&](const CoreField& /*fieldAfterRensa*/, const RensaResult& /*rensaResult*/,
+                        const ColumnPuyoList& cpl) {
+        CoreField actual(original);
+        if (!actual.dropPuyoList(cpl))
+           return;
+
+        if (actual == expected1)
+            found1 = true;
+        else if (actual == expected2)
+            found2 = true;
+    };
+
+    RensaDetector::iteratePossibleRensas(original, 0, RensaDetectorStrategy::defaultFloatStrategy(), callback);
+    EXPECT_TRUE(found1);
+    EXPECT_TRUE(found2);
 }
 
 TEST(RensaDetectorTest, iteratePossibleRensasExtend1)
