@@ -71,7 +71,8 @@ struct DuelServer::DuelState {
  */
 static int updateDecision(const vector<FrameResponse>& data, const FieldRealtime& field, Decision* decision)
 {
-    const CoreField cf(field.field());
+    // updateDecision is called when grounded. Chigiri-puyo might be in the air.
+    CoreField cf(CoreField::fromPlainFieldWithDrop(field.field()));
 
     // Try all commands from the newest one.
     // If we find a command we can use, we'll ignore older ones.
