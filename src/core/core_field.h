@@ -113,9 +113,11 @@ public:
     bool dropPuyoList(const ColumnPuyoList& cpl) { return dropPuyoListWithMaxHeight(cpl, 13); }
     bool dropPuyoListWithMaxHeight(const ColumnPuyoList&, int maxHeight);
 
-    // Removes the puyo from top of column |x|. If there is no puyo on column |x|, nothing will happen.
+    // Removes the puyo from top of column |x|.
+    // If there is no puyo on column |x|, behavior is undefined.
     void removePuyoFrom(int x);
     // Removes |n| puyos from top of column |x|.
+    // If there are not |n| puyos on column |x|, behavior is undefined.
     void removePuyoFrom(int x, int n);
     // Removes puyo list.
     void remove(const ColumnPuyoList&);
