@@ -81,6 +81,14 @@ public:
                                             const bool allowsComplements[FieldConstant::MAP_WIDTH],
                                             Callback);
 
+    // Complements one type key puyos. For each row, we put at most |maxPuyos| puyos.
+    // 1 + 6 * 4 * maxPuyos times.
+    // Callback is void callback(const CoreField&, const ColumnPuyoList&).
+    // This might be useful if you'd like to find 2-double or something.
+    template<typename Callback>
+    static void complementOneTypeKeyPuyos(const CoreField&, const RensaDetectorStrategy&,
+                                          int maxPuyos, Callback);
+
     // Complements at most |maxKeyPuyos| key puyos.
     // Also, complements fire puyos.
     // The complemented field and complemented ColumnPuyoList are passed.
@@ -119,6 +127,7 @@ private:
                                            const RensaDetectorStrategy& strategy,
                                            int leftX,
                                            int restAdded,
+                                           int maxPuyosAtOnce,
                                            Callback callback);
 
     template<typename Callback>

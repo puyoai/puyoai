@@ -863,6 +863,56 @@ TEST(RensaDetectorTest, complementKeyPuyos)
     }
 }
 
+TEST(RensaDetectorTest, complementOneTypeKeyPuyos)
+{
+    const CoreField original("...RRR");
+
+    const CoreField expected[] {
+        CoreField(
+            "...RRR"),
+        CoreField(
+            "......"
+            "..BRRR"),
+        CoreField(
+            "..B..."
+            "..BRRR"),
+        CoreField(
+            "......"
+            "R..RRR"),
+        CoreField(
+            "R....."
+            "R..RRR"),
+    };
+    const CoreField unexpected[] {
+        CoreField(
+            "..RRRR"),
+        CoreField(
+            "......"
+            ".YBRRR"),
+    };
+
+    bool found[ARRAY_SIZE(expected)] {};
+
+    auto callback = [&original, &expected, &unexpected, &found](const CoreField& cf, const ColumnPuyoList& cpl) {
+        for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
+            if (cf == expected[i]) {
+                found[i] = true;
+                CoreField f(original);
+                EXPECT_TRUE(f.dropPuyoList(cpl));
+                EXPECT_EQ(expected[i], f);
+            }
+        }
+        for (size_t i = 0; i < ARRAY_SIZE(unexpected); ++i) {
+            EXPECT_NE(unexpected[i], cf);
+        }
+    };
+    RensaDetector::complementOneTypeKeyPuyos(original, RensaDetectorStrategy::defaultDropStrategy(), 2, callback);
+
+    for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
+        EXPECT_TRUE(found[i]) << i;
+    }
+}
+
 TEST(RensaDetectorTest, complementKeyPuyosOn13thRow1)
 {
     CoreField original;

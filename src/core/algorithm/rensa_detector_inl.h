@@ -16,7 +16,7 @@ void RensaDetector::complementKeyPuyos(const CoreField& originalField,
 {
     CoreField cf(originalField);
     ColumnPuyoList cpl;
-    complementKeyPuyosInternal(cf, cpl, strategy, 1, maxKeyPuyos, callback);
+    complementKeyPuyosInternal(cf, cpl, strategy, 1, maxKeyPuyos, 1, callback);
 }
 
 // To avoid copying CoreField and ColumnPuyoList, we use one instance.
@@ -28,6 +28,7 @@ void RensaDetector::complementKeyPuyosInternal(CoreField& currentField,
                                                const RensaDetectorStrategy& strategy,
                                                int leftX,
                                                int restAdded,
+                                               int maxPuyosAtOnce,
                                                Callback callback)
 {
     callback(const_cast<const CoreField&>(currentField),
@@ -41,20 +42,28 @@ void RensaDetector::complementKeyPuyosInternal(CoreField& currentField,
             continue;
 
         for (PuyoColor c : NORMAL_PUYO_COLORS) {
-            if (!currentField.dropPuyoOn(x, c))
-                continue;
-            if (!currentKeyPuyos.add(x, c)) {
-                currentField.removePuyoFrom(x);
-                continue;
-            }
+            int numPuyoAdded = 0;
+            for (int i = 0; i < maxPuyosAtOnce; ++i) {
+                if (!currentField.dropPuyoOn(x, c))
+                    break;
+                if (!currentKeyPuyos.add(x, c)) {
+                    currentField.removePuyoFrom(x);
+                    break;
+                }
 
-            if (currentField.countConnectedPuyosMax4(x, currentField.height(x)) < 4) {
+                ++numPuyoAdded;
+
+                if (currentField.countConnectedPuyosMax4(x, currentField.height(x)) >= 4)
+                    break;
+
                 complementKeyPuyosInternal(currentField, currentKeyPuyos, strategy,
-                                           x, restAdded - 1, callback);
+                                           x, restAdded - 1, maxPuyosAtOnce, callback);
             }
 
-            currentField.removePuyoFrom(x);
-            currentKeyPuyos.removeTopFrom(x);
+            for (int i = 0; i < numPuyoAdded; ++i) {
+                currentField.removePuyoFrom(x);
+                currentKeyPuyos.removeTopFrom(x);
+            }
         }
     }
 }
@@ -99,6 +108,17 @@ void RensaDetector::complementKeyPuyos13thRowInternal(CoreField& currentField,
     }
 
     complementKeyPuyos13thRowInternal(currentField, currentKeyPuyos, allowsComplements, x + 1, callback);
+}
+
+template<typename Callback>
+void RensaDetector::complementOneTypeKeyPuyos(const CoreField& originalField,
+                                              const RensaDetectorStrategy& strategy,
+                                              int maxPuyos,
+                                              Callback callback)
+{
+    CoreField cf(originalField);
+    ColumnPuyoList cpl;
+    complementKeyPuyosInternal(cf, cpl, strategy, 1, 1, maxPuyos, callback);
 }
 
 // static

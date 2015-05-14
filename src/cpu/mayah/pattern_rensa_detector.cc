@@ -93,7 +93,7 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
                                       firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0.0, false);
     };
 
-    bool prohibits[FieldConstant::MAP_WIDTH] {};
+    const bool prohibits[FieldConstant::MAP_WIDTH] {};
     RensaDetector::detect(originalField_, strategy_, PurposeForFindingRensa::FOR_FIRE, prohibits, detectCallback);
 }
 
