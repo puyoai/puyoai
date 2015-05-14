@@ -4,6 +4,7 @@
 #include <string>
 
 #include "core/field_constant.h"
+#include "core/field_bits.h"
 #include "core/puyo_color.h"
 
 struct Position;
@@ -59,6 +60,9 @@ public:
     // Vanishes normal color puyos if 4 or more puyos are connected.
     // Score is returned.
     int vanish(int currentChain);
+
+    // Converts PlainField to FieldBits. Only takes color |c|.
+    FieldBits toFieldBits(PuyoColor c) const;
 
     friend bool operator==(const PlainField&, const PlainField&);
 
