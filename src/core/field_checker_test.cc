@@ -8,26 +8,35 @@ using namespace std;
 
 TEST(FieldCheckerTest, initialize)
 {
-    FieldChecker bitField;
+    FieldChecker checker;
 
     for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
         for (int y = 0; y < FieldConstant::MAP_HEIGHT; ++y) {
-            EXPECT_FALSE(bitField.get(x, y));
-            EXPECT_FALSE(bitField(x, y));
+            EXPECT_FALSE(checker.get(x, y));
+            EXPECT_FALSE(checker(x, y));
         }
     }
 }
 
 TEST(FieldCheckerTest, getAndSet)
 {
-    FieldChecker bitField;
+    FieldChecker checker;
 
     for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
         for (int y = 0; y < FieldConstant::MAP_HEIGHT; ++y) {
-            bitField.set(x, y);
-            EXPECT_TRUE(bitField(x, y));
-            bitField.clear(x, y);
-            EXPECT_FALSE(bitField(x, y));
+            checker.set(x, y);
+            EXPECT_TRUE(checker(x, y));
+            checker.clear(x, y);
+            EXPECT_FALSE(checker(x, y));
         }
     }
+}
+
+TEST(FieldCheckerTest, setBit)
+{
+    FieldChecker checker;
+    checker.setBit(1, 3, true);
+    EXPECT_TRUE(checker(1, 3));
+    checker.setBit(1, 3, false);
+    EXPECT_FALSE(checker(1, 3));
 }

@@ -213,7 +213,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
             BoxAnalyzeResult r = analyzeBox(surface, b);
 
             result->field.set(x, y, r.realColor);
-            result->vanishing.set(x, y, r.vanishing);
+            result->vanishing.setBit(x, y, r.vanishing);
         }
     }
 

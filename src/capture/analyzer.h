@@ -48,7 +48,7 @@ struct DetectedField {
     RealColor realColor(NextPuyoPosition npp) const { return nextPuyos[static_cast<int>(npp)]; }
 
     bool isVanishing(int x, int y) const { return vanishing.get(x, y); }
-    void setVanishing(int x, int y, bool flag) { vanishing.set(x, y, flag); }
+    void setVanishing(int x, int y, bool flag) { vanishing.setBit(x, y, flag); }
 
     void setOjamaDropDetected(bool flag) { ojamaDropDetected = flag; }
 
@@ -69,7 +69,7 @@ struct AdjustedField {
     RealColor realColor(NextPuyoPosition npp) const { return nextPuyos[static_cast<int>(npp)]; }
 
     bool isVanishing(int x, int y) const { return vanishing.get(x, y); }
-    void setVanishing(int x, int y, bool flag) { vanishing.set(x, y, flag); }
+    void setVanishing(int x, int y, bool flag) { vanishing.setBit(x, y, flag); }
 
     RealColorField field;
     FieldChecker vanishing;
