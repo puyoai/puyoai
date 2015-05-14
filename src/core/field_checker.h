@@ -19,14 +19,19 @@ public:
         return col_[x] & (1U << y);
     }
 
-    void set(int x, int y, bool flag = true)
+    void setBit(int x, int y, bool flag)
+    {
+        if (flag)
+            set(x, y);
+        else
+            clear(x, y);
+    }
+
+    void set(int x, int y)
     {
         DCHECK(0 <= x && x < FieldConstant::MAP_WIDTH) << x;
         DCHECK(0 <= y && y < FieldConstant::MAP_HEIGHT) << y;
-        if (flag)
-            col_[x] |= (1U << y);
-        else
-            col_[x] &= ~(1U << y);
+        col_[x] |= (1U << y);
     }
 
     void clear(int x, int y)

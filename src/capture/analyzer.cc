@@ -446,7 +446,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
             for (int y = 1; y <= 12; ++y) {
                 if (shouldEmpty) {
                     adjustedField.field.set(x, y, RealColor::RC_EMPTY);
-                    adjustedField.vanishing.set(x, y, false);
+                    adjustedField.vanishing.clear(x, y);
                     continue;
                 }
 
@@ -481,9 +481,9 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
                 adjustedField.field.set(x, y, rc);
                 if (rc == RealColor::RC_EMPTY) {
                     shouldEmpty = true;
-                    adjustedField.vanishing.set(x, y, false);
+                    adjustedField.vanishing.clear(x, y);
                 } else {
-                    adjustedField.vanishing.set(x, y, (framesContinuousVanishing > 2));
+                    adjustedField.vanishing.setBit(x, y, (framesContinuousVanishing > 2));
                 }
             }
         }
@@ -600,7 +600,7 @@ int Analyzer::countVanishing(const RealColorField& field, const FieldChecker& va
                 continue;
 
             if (!vanishing.get(x, y) || !isNormalColor(field.get(x, y))) {
-                visited.set(x, y, true);
+                visited.set(x, y);
                 continue;
             }
 
@@ -616,7 +616,7 @@ int Analyzer::countVanishing(const RealColorField& field, const FieldChecker& va
                 if (field.get(x, y) != field.get(xx, yy))
                     continue;
                 ++cnt;
-                visited.set(xx, yy, true);
+                visited.set(xx, yy);
                 q.push(make_pair(xx + 1, yy));
                 q.push(make_pair(xx - 1, yy));
                 q.push(make_pair(xx, yy + 1));
