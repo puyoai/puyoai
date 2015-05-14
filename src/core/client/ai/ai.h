@@ -105,7 +105,7 @@ protected:
 
     void next2AppearedForMe(const FrameRequest&);
     void next2AppearedForEnemy(const FrameRequest&);
-    static void next2AppearedForCommon(PlayerState*, const KumipuyoSeq&);
+    void next2AppearedForCommon(PlayerState*, const KumipuyoSeq&);
 
     const PlayerState& myPlayerState() const { return me_; }
     const PlayerState& enemyPlayerState() const { return enemy_; }
@@ -121,10 +121,13 @@ private:
     static bool isFieldInconsistent(const PlainField& ours, const PlainField& provided);
     static CoreField mergeField(const CoreField& ours, const PlainField& provided, bool ojamaDropped);
 
-    KumipuyoSeq rememberedSequence(int indexFrom) const;
+    // Returns the remembered sequence. If desynced, provided is returned as is.
+    KumipuyoSeq rememberedSequence(int indexFrom, const KumipuyoSeq& provided) const;
 
     std::string name_;
     ClientConnector connector_;
+
+    bool desynced_;
 
     bool rethinkRequested_;
     int enemyDecisionRequestFrameId_;
