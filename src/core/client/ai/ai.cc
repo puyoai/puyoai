@@ -45,6 +45,7 @@ AI::AI(int argc, char* argv[], const string& name) :
 
 AI::AI(const string& name) :
     name_(name),
+    desynced_(false),
     rethinkRequested_(false),
     enemyDecisionRequestFrameId_(0),
     behaviorRethinkAfterOpponentRensa_(false)
@@ -128,7 +129,7 @@ void AI::runLoop()
             LOG(INFO) << "STATE_WNEXT_APPEARED";
             VLOG(1) << '\n' << me_.field.toDebugString();
 
-            KumipuyoSeq seq = rememberedSequence(me_.hand + 1);
+            KumipuyoSeq seq = rememberedSequence(me_.hand + 1, kumipuyoSeq.subsequence(1));
             CHECK_EQ(kumipuyoSeq.get(1), seq.get(0));
             CHECK_EQ(kumipuyoSeq.get(2), seq.get(1));
 
@@ -193,7 +194,7 @@ void AI::runLoop()
             me_.field = mergeField(me_.field, frameRequest.myPlayerFrameRequest().field, next1.ojamaDropped);
             const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
 
-            KumipuyoSeq seq = rememberedSequence(me_.hand);
+            KumipuyoSeq seq = rememberedSequence(me_.hand, kumipuyoSeq);
             CHECK_EQ(kumipuyoSeq.get(0), seq.get(0));
             CHECK_EQ(kumipuyoSeq.get(1), seq.get(1));
 
@@ -234,6 +235,8 @@ void AI::gameWillBegin(const FrameRequest& frameRequest)
 {
     me_.clear();
     enemy_.clear();
+
+    desynced_ = false;
 
     rethinkRequested_ = false;
     enemyDecisionRequestFrameId_ = 0;
@@ -412,19 +415,20 @@ void AI::next2AppearedForEnemy(const FrameRequest& frameRequest)
     // When enemy_.hand == 0, rememberedSequence(0) contains PuyoColor::EMPTY.
     // So, don't gaze at that time.
     if (enemy_.hand > 0)
-        gaze(enemyDecisionRequestFrameId_, enemy_.field, rememberedSequence(enemy_.hand));
+        gaze(enemyDecisionRequestFrameId_, enemy_.field, rememberedSequence(enemy_.hand, kumipuyoSeq));
 
     onNext2AppearedForEnemy(frameRequest);
 }
 
-// static
 void AI::next2AppearedForCommon(PlayerState* state, const KumipuyoSeq& kumipuyoSeq)
 {
+    if (desynced_)
+        return;
+
     for (int i = 0; i < 3; ++i) {
         if (state->hand + i < state->seq.size()) {
-            CHECK_EQ(state->seq.get(state->hand + i), kumipuyoSeq.get(i))
-                << state->hand << " " << i << " " << state->seq.size()
-                << state->seq.toString() << " " << kumipuyoSeq.toString();
+            if (state->seq.get(state->hand + i) != kumipuyoSeq.get(i))
+                desynced_ = true;
         } else {
             state->seq.add(kumipuyoSeq.get(i));
         }
@@ -509,8 +513,11 @@ CoreField AI::mergeField(const CoreField& cf, const PlainField& provided, bool o
     return result;
 }
 
-KumipuyoSeq AI::rememberedSequence(int indexFrom) const
+KumipuyoSeq AI::rememberedSequence(int indexFrom, const KumipuyoSeq& provided) const
 {
+    if (desynced_)
+        return provided;
+
     if (me_.seq.size() < enemy_.seq.size())
         return enemy_.seq.subsequence(indexFrom);
     else
