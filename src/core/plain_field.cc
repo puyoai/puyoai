@@ -307,26 +307,3 @@ bool operator==(const PlainField& lhs, const PlainField& rhs)
 
     return true;
 }
-
-FieldBits PlainField::toFieldBits(PuyoColor c) const
-{
-    __m128i mask = _mm_set1_epi8(static_cast<char>(c));
-
-    // TODO(mayah): should we use _mm_set_epi16? Which is faster?
-
-    union {
-        __m128i m;
-        std::int16_t s[8];
-    } xmm;
-
-    xmm.s[0] = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_load_si128((const __m128i*) field_[0]), mask));
-    xmm.s[1] = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_load_si128((const __m128i*) field_[1]), mask));
-    xmm.s[2] = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_load_si128((const __m128i*) field_[2]), mask));
-    xmm.s[3] = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_load_si128((const __m128i*) field_[3]), mask));
-    xmm.s[4] = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_load_si128((const __m128i*) field_[4]), mask));
-    xmm.s[5] = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_load_si128((const __m128i*) field_[5]), mask));
-    xmm.s[6] = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_load_si128((const __m128i*) field_[6]), mask));
-    xmm.s[7] = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_load_si128((const __m128i*) field_[7]), mask));
-
-    return FieldBits(xmm.m);
-}
