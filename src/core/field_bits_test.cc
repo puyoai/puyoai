@@ -47,5 +47,51 @@ TEST(FieldBitsTest, unset)
     EXPECT_FALSE(bits.get(1, 1));
     EXPECT_FALSE(bits.get(1, 2));
     EXPECT_TRUE(bits.get(1, 3));
+}
 
+TEST(FieldBitsTest, popcount)
+{
+    FieldBits bits;
+    bits.set(1, 1);
+    bits.set(1, 2);
+    bits.set(1, 3);
+    bits.set(2, 4);
+    bits.set(3, 1);
+    bits.set(3, 2);
+    bits.set(3, 3);
+    bits.set(4, 3);
+    bits.set(6, 9);
+
+    EXPECT_EQ(9, bits.popcount());
+}
+
+TEST(FieldBitsTest, expand)
+{
+    FieldBits bits;
+    bits.set(1, 1);
+    bits.set(1, 2);
+    bits.set(1, 3);
+    bits.set(2, 4);
+    bits.set(3, 1);
+    bits.set(3, 2);
+    bits.set(3, 3);
+    bits.set(4, 3);
+
+    FieldBits connected = bits.expand(3, 1);
+
+    EXPECT_TRUE(connected.get(3, 1));
+    EXPECT_TRUE(connected.get(3, 2));
+    EXPECT_TRUE(connected.get(3, 3));
+    EXPECT_TRUE(connected.get(4, 3));
+
+    EXPECT_FALSE(connected.get(1, 1));
+    EXPECT_FALSE(connected.get(1, 2));
+    EXPECT_FALSE(connected.get(1, 3));
+    EXPECT_FALSE(connected.get(1, 4));
+    EXPECT_FALSE(connected.get(2, 1));
+    EXPECT_FALSE(connected.get(2, 2));
+    EXPECT_FALSE(connected.get(2, 3));
+    EXPECT_FALSE(connected.get(2, 4));
+    EXPECT_FALSE(connected.get(4, 1));
+    EXPECT_FALSE(connected.get(4, 2));
 }
