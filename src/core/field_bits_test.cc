@@ -14,6 +14,23 @@ TEST(FieldBitsTest, ctor)
     }
 }
 
+TEST(FieldBitsTest, ctor2)
+{
+    PlainField pf("YB...."
+                  "RYY..G"
+                  "GRRYGG");
+    FieldBits bits(pf, PuyoColor::RED);
+
+    EXPECT_TRUE(bits.get(1, 2));
+    EXPECT_TRUE(bits.get(2, 1));
+    EXPECT_TRUE(bits.get(3, 1));
+
+    EXPECT_FALSE(bits.get(1, 1));
+    EXPECT_FALSE(bits.get(1, 3));
+    EXPECT_FALSE(bits.get(2, 3));
+    EXPECT_FALSE(bits.get(4, 2));
+}
+
 TEST(FieldBitsTest, set)
 {
     FieldBits bits;

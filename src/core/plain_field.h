@@ -3,12 +3,10 @@
 
 #include <string>
 
-#include "core/field_bits.h"
 #include "core/field_constant.h"
 #include "core/puyo_color.h"
 
 struct Position;
-class FieldBits;
 class FieldChecker;
 
 class PlainField : public FieldConstant {
@@ -62,8 +60,8 @@ public:
     // Score is returned.
     int vanish(int currentChain);
 
-    // Converts PlainField to FieldBits for color |c|.
-    FieldBits toFieldBits(PuyoColor c) const;
+    // Returns the column data. The result pointer should be 16-byte aligned.
+    const PuyoColor* column(int x) const { return field_[x]; }
 
     friend bool operator==(const PlainField&, const PlainField&);
 
