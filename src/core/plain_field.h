@@ -5,10 +5,10 @@
 
 #include "core/field_bits.h"
 #include "core/field_constant.h"
-#include "core/field_bits.h"
 #include "core/puyo_color.h"
 
 struct Position;
+class FieldBits;
 class FieldChecker;
 
 class PlainField : public FieldConstant {
