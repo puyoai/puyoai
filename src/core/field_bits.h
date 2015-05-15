@@ -12,6 +12,7 @@
 class FieldBits {
 public:
     FieldBits() : m_(_mm_setzero_si128()) {}
+    FieldBits(__m128i m) : m_(m) {}
 
     __m128i& xmm() { return m_; }
 
