@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "core/field_bits.h"
 #include "core/field_constant.h"
 #include "core/field_bits.h"
 #include "core/puyo_color.h"
@@ -61,7 +62,7 @@ public:
     // Score is returned.
     int vanish(int currentChain);
 
-    // Converts PlainField to FieldBits. Only takes color |c|.
+    // Converts PlainField to FieldBits for color |c|.
     FieldBits toFieldBits(PuyoColor c) const;
 
     friend bool operator==(const PlainField&, const PlainField&);
@@ -69,7 +70,7 @@ public:
 private:
     void initialize();
 
-    PuyoColor field_[MAP_WIDTH][MAP_HEIGHT];
+    alignas(16) PuyoColor field_[MAP_WIDTH][MAP_HEIGHT];
 };
 
 inline bool PlainField::hasEmptyNeighbor(int x, int y) const

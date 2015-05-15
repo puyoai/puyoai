@@ -58,3 +58,20 @@ TEST(PlainFieldTest, drop)
     pf.drop();
     EXPECT_TRUE(pf == expected);
 }
+
+TEST(PlainFieldTest, toFieldBits)
+{
+    PlainField pf("YB...."
+                  "RYY..G"
+                  "GRRYGG");
+    FieldBits bits = pf.toFieldBits(PuyoColor::RED);
+
+    EXPECT_TRUE(bits.get(1, 2));
+    EXPECT_TRUE(bits.get(2, 1));
+    EXPECT_TRUE(bits.get(3, 1));
+
+    EXPECT_FALSE(bits.get(1, 1));
+    EXPECT_FALSE(bits.get(1, 3));
+    EXPECT_FALSE(bits.get(2, 3));
+    EXPECT_FALSE(bits.get(4, 2));
+}
