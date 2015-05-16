@@ -4,11 +4,12 @@
 
 #include "base/base.h"
 #include "base/time_stamp_counter.h"
+#include "core/field_bits.h"
 #include "core/rensa_result.h"
 
 using namespace std;
 
-TEST(FieldPerformanceTest, Copy)
+TEST(FieldPerformanceTest, copy)
 {
     TimeStampCounterData tsc;
 
@@ -35,7 +36,7 @@ TEST(FieldPerformanceTest, Copy)
     tsc.showStatistics();
 }
 
-TEST(FieldPerformanceTest, Simulate_Empty)
+TEST(FieldPerformanceTest, simulateEmpty)
 {
     TimeStampCounterData tsc;
 
@@ -48,7 +49,7 @@ TEST(FieldPerformanceTest, Simulate_Empty)
     tsc.showStatistics();
 }
 
-TEST(FieldPerformanceTest, Simulate_Filled)
+TEST(FieldPerformanceTest, simulateFilled)
 {
     TimeStampCounterData tsc;
 
@@ -73,7 +74,7 @@ TEST(FieldPerformanceTest, Simulate_Filled)
     tsc.showStatistics();
 }
 
-TEST(FieldPerformanceTest, Simulate_Filled_Track)
+TEST(FieldPerformanceTest, simulateFilledTracking)
 {
     TimeStampCounterData tsc;
 
@@ -101,70 +102,316 @@ TEST(FieldPerformanceTest, Simulate_Filled_Track)
     tsc.showStatistics();
 }
 
-TEST(FieldPerformanceTest, countConnectedPuyosEmpty)
+TEST(FieldPerformanceTest, countConnectedPuyos_empty)
 {
+    const PlainField f;
+
     TimeStampCounterData tsc;
+    TimeStampCounterData tscMax4;
+    TimeStampCounterData tscBits;
+    TimeStampCounterData tscPreBits;
 
-    for (int i = 0; i < 1000000; i++) {
-        CoreField f;
-
+    for (int i = 0; i < 10000000; i++) {
         ScopedTimeStampCounter stsc(&tsc);
-        EXPECT_EQ(f.countConnectedPuyos(3, 12), 72);
+        EXPECT_EQ(72, f.countConnectedPuyos(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscMax4);
+        EXPECT_LE(4, f.countConnectedPuyosMax4(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscBits);
+        FieldBits fb(f, PuyoColor::RED);
+        EXPECT_EQ(72, fb.expand(3, 1).popcount());
+    }
+
+    FieldBits fb(f, PuyoColor::RED);
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscPreBits);
+        EXPECT_EQ(72, fb.expand(3, 1).popcount());
     }
 
     tsc.showStatistics();
+    tscMax4.showStatistics();
+    tscBits.showStatistics();
+    tscPreBits.showStatistics();
 }
 
-TEST(FieldPerformanceTest, countConnectedPuyosFilled)
+TEST(FieldPerformanceTest, countConnectedPuyos_1)
 {
-    CoreField f(".G.BRG"
-                "GBRRYR"
-                "RRYYBY"
-                "RGYRBR"
-                "YGYRBY"
-                "YGBGYR"
-                "GRBGYR"
-                "BRBYBY"
-                "RYYBYY"
-                "BRBYBR"
-                "BGBYRR"
-                "YGBGBG"
-                "RBGBGG");
+    const PlainField f("..R...");
 
     TimeStampCounterData tsc;
-    for (int i = 0; i < 1000000; i++) {
+    TimeStampCounterData tscMax4;
+    TimeStampCounterData tscBits;
+    TimeStampCounterData tscPreBits;
+
+    for (int i = 0; i < 10000000; i++) {
         ScopedTimeStampCounter stsc(&tsc);
-        EXPECT_EQ(3, f.countConnectedPuyos(3, 2));
+        EXPECT_EQ(1, f.countConnectedPuyos(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscMax4);
+        EXPECT_EQ(1, f.countConnectedPuyosMax4(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscBits);
+        FieldBits fb(f, PuyoColor::RED);
+        EXPECT_EQ(1, fb.expand(3, 1).popcount());
+    }
+
+    FieldBits fb(f, PuyoColor::RED);
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscPreBits);
+        EXPECT_EQ(1, fb.expand(3, 1).popcount());
     }
 
     tsc.showStatistics();
+    tscMax4.showStatistics();
+    tscBits.showStatistics();
+    tscPreBits.showStatistics();
 }
 
-TEST(FieldPerformanceTest, countConnectedPuyosMax4)
+TEST(FieldPerformanceTest, countConnectedPuyos_2)
 {
-    CoreField f("OOOGGG"
-                "OOOGGG" // 12
-                "OOOOOO"
-                "ORRRRO"
-                "ORRRRO"
-                "OOOOOO" // 8
-                "BBBOBB"
-                "GGGOGG"
-                "RRRORR"
-                "OOOOOO" // 4
-                "RGBORO"
-                "RGBOGO"
-                "RGBOBO");
+    const PlainField f("..RR..");
 
     TimeStampCounterData tsc;
-    for (int i = 0; i < 1000000; i++) {
+    TimeStampCounterData tscMax4;
+    TimeStampCounterData tscBits;
+    TimeStampCounterData tscPreBits;
+
+    for (int i = 0; i < 10000000; i++) {
         ScopedTimeStampCounter stsc(&tsc);
-        EXPECT_EQ(1, f.countConnectedPuyosMax4(5, 1));
-        EXPECT_EQ(2, f.countConnectedPuyosMax4(5, 5));
-        EXPECT_EQ(3, f.countConnectedPuyosMax4(1, 5));
-        EXPECT_EQ(3, f.countConnectedPuyosMax4(6, 12));
-        EXPECT_LE(4, f.countConnectedPuyosMax4(2, 9));
+        EXPECT_EQ(2, f.countConnectedPuyos(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscMax4);
+        EXPECT_EQ(2, f.countConnectedPuyosMax4(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscBits);
+        FieldBits fb(f, PuyoColor::RED);
+        EXPECT_EQ(2, fb.expand(3, 1).popcount());
+    }
+
+    FieldBits fb(f, PuyoColor::RED);
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscPreBits);
+        EXPECT_EQ(2, fb.expand(3, 1).popcount());
     }
 
     tsc.showStatistics();
+    tscMax4.showStatistics();
+    tscBits.showStatistics();
+    tscPreBits.showStatistics();
+}
+
+TEST(FieldPerformanceTest, countConnectedPuyos_3)
+{
+    const PlainField f("..RRR.");
+
+    TimeStampCounterData tsc;
+    TimeStampCounterData tscMax4;
+    TimeStampCounterData tscBits;
+    TimeStampCounterData tscPreBits;
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(3, f.countConnectedPuyos(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscMax4);
+        EXPECT_EQ(3, f.countConnectedPuyosMax4(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscBits);
+        FieldBits fb(f, PuyoColor::RED);
+        EXPECT_EQ(3, fb.expand(3, 1).popcount());
+    }
+
+    FieldBits fb(f, PuyoColor::RED);
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscPreBits);
+        EXPECT_EQ(3, fb.expand(3, 1).popcount());
+    }
+
+    tsc.showStatistics();
+    tscMax4.showStatistics();
+    tscBits.showStatistics();
+    tscPreBits.showStatistics();
+}
+
+TEST(FieldPerformanceTest, countConnectedPuyos_4)
+{
+    const PlainField f("..RRRR");
+
+    TimeStampCounterData tsc;
+    TimeStampCounterData tscMax4;
+    TimeStampCounterData tscBits;
+    TimeStampCounterData tscPreBits;
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(4, f.countConnectedPuyos(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscMax4);
+        EXPECT_EQ(4, f.countConnectedPuyosMax4(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscBits);
+        FieldBits fb(f, PuyoColor::RED);
+        EXPECT_EQ(4, fb.expand(3, 1).popcount());
+    }
+
+    FieldBits fb(f, PuyoColor::RED);
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscPreBits);
+        EXPECT_EQ(4, fb.expand(3, 1).popcount());
+    }
+
+    tsc.showStatistics();
+    tscMax4.showStatistics();
+    tscBits.showStatistics();
+    tscPreBits.showStatistics();
+}
+
+TEST(FieldPerformanceTest, countConnectedPuyos_4_2)
+{
+    const PlainField f(
+        "..R..."
+        "..R..."
+        "..R..."
+        "..R...");
+
+    TimeStampCounterData tsc;
+    TimeStampCounterData tscMax4;
+    TimeStampCounterData tscBits;
+    TimeStampCounterData tscPreBits;
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(4, f.countConnectedPuyos(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscMax4);
+        EXPECT_EQ(4, f.countConnectedPuyosMax4(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscBits);
+        FieldBits fb(f, PuyoColor::RED);
+        EXPECT_EQ(4, fb.expand(3, 1).popcount());
+    }
+
+    FieldBits fb(f, PuyoColor::RED);
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscPreBits);
+        EXPECT_EQ(4, fb.expand(3, 1).popcount());
+    }
+
+    tsc.showStatistics();
+    tscMax4.showStatistics();
+    tscBits.showStatistics();
+    tscPreBits.showStatistics();
+}
+
+TEST(FieldPerformanceTest, countConnectedPuyos_4_3)
+{
+    const PlainField f(
+        "..RR.."
+        "..RR..");
+
+    TimeStampCounterData tsc;
+    TimeStampCounterData tscMax4;
+    TimeStampCounterData tscBits;
+    TimeStampCounterData tscPreBits;
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(4, f.countConnectedPuyos(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscMax4);
+        EXPECT_EQ(4, f.countConnectedPuyosMax4(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscBits);
+        FieldBits fb(f, PuyoColor::RED);
+        EXPECT_EQ(4, fb.expand(3, 1).popcount());
+    }
+
+    FieldBits fb(f, PuyoColor::RED);
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscPreBits);
+        EXPECT_EQ(4, fb.expand(3, 1).popcount());
+    }
+
+    tsc.showStatistics();
+    tscMax4.showStatistics();
+    tscBits.showStatistics();
+    tscPreBits.showStatistics();
+}
+
+TEST(FieldPerformanceTest, countConnectedPuyos_evil)
+{
+    const PlainField f(
+        "RRRRRR" // 12
+        "R....R"
+        "R..R.R"
+        "R.RR.R"
+        "R.R..R" // 8
+        "R.RR.R"
+        "R..R.R"
+        "R.RR.R"
+        "R.R..R" // 4
+        "R.RRRR"
+        "R....."
+        "RRRRRR");
+
+    TimeStampCounterData tsc;
+    TimeStampCounterData tscMax4;
+    TimeStampCounterData tscBits;
+    TimeStampCounterData tscPreBits;
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(4, f.countConnectedPuyos(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscMax4);
+        EXPECT_EQ(4, f.countConnectedPuyosMax4(3, 1));
+    }
+
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscBits);
+        FieldBits fb(f, PuyoColor::RED);
+        EXPECT_EQ(4, fb.expand(3, 1).popcount());
+    }
+
+    FieldBits fb(f, PuyoColor::RED);
+    for (int i = 0; i < 10000000; i++) {
+        ScopedTimeStampCounter stsc(&tscPreBits);
+        EXPECT_EQ(4, fb.expand(3, 1).popcount());
+    }
+
+    tsc.showStatistics();
+    tscMax4.showStatistics();
+    tscBits.showStatistics();
+    tscPreBits.showStatistics();
 }
