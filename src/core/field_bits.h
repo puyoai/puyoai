@@ -6,6 +6,7 @@
 
 #include "core/field_constant.h"
 #include "core/plain_field.h"
+#include "core/position.h"
 
 // FieldBits is a bitset whose size is the same as field.
 // Implemented using an xmm register.
@@ -24,12 +25,19 @@ public:
     void set(int x, int y) { m_ = _mm_or_si128(onebit(x, y), m_); }
     void unset(int x, int y) { m_ = _mm_andnot_si128(onebit(x, y), m_); }
 
+    void setAll(const FieldBits& fb) { m_ = _mm_or_si128(fb.m_, m_); }
+
     int popcount() const;
 
     // Returns connected bits from (x, y).
     FieldBits expand(int x, int y) const;
     // Returns connected bits from (x, y). Bit whose distance is >= 4 is not accurate.
     FieldBits expand4(int x, int y) const;
+
+    // Sets all the positions having 1 to |positions|.
+    // |positions| should have 72 spaces at least. In some case, you need 128 spaces.
+    // Returns length.
+    int toPositions(Position positions[]) const;
 
 private:
     static const __m128i s_table_[128];
@@ -118,6 +126,32 @@ FieldBits FieldBits::expand4(int x, int y) const
     connected = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(connected, 1), m_), connected);
 
     return FieldBits(connected);
+}
+
+inline
+int FieldBits::toPositions(Position ps[]) const
+{
+    int pos = 0;
+    alignas(16) std::int64_t vs[2];
+    _mm_store_si128(reinterpret_cast<__m128i*>(vs), m_);
+
+    while (vs[0]) {
+        int bit = __builtin_ctzll(vs[0]);
+        int x = bit >> 4;
+        int y = bit & 0xF;
+        ps[pos++] = Position(x, y);
+        vs[0] = vs[0] & (vs[0] - 1);
+    }
+
+    while (vs[1]) {
+        int bit = __builtin_ctzll(vs[1]);
+        int x = 4 + (bit >> 4);
+        int y = bit & 0xF;
+        ps[pos++] = Position(x, y);
+        vs[1] = vs[1] & (vs[1] - 1);
+    }
+
+    return pos;
 }
 
 #endif // CORE_FIELD_BITS_H_

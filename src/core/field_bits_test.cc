@@ -1,5 +1,7 @@
 #include "core/field_bits.h"
 
+#include "core/position.h"
+
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -176,4 +178,28 @@ TEST(FieldBitsTest, expand_exhaustive)
             }
         }
     }
+}
+
+TEST(FieldBitsTest, toPositions)
+{
+    FieldBits bits;
+    bits.set(1, 1);
+    bits.set(2, 2);
+    bits.set(3, 3);
+    bits.set(4, 4);
+    bits.set(5, 5);
+    bits.set(6, 6);
+
+    Position ps[128];
+    int len = bits.toPositions(ps);
+
+    EXPECT_EQ(6, len);
+    std::sort(ps, ps + len);
+
+    EXPECT_EQ(Position(1, 1), ps[0]);
+    EXPECT_EQ(Position(2, 2), ps[1]);
+    EXPECT_EQ(Position(3, 3), ps[2]);
+    EXPECT_EQ(Position(4, 4), ps[3]);
+    EXPECT_EQ(Position(5, 5), ps[4]);
+    EXPECT_EQ(Position(6, 6), ps[5]);
 }
