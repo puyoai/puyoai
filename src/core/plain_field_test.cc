@@ -112,7 +112,6 @@ TEST(PlainFieldTest, countConnectedPuyos)
                 EXPECT_EQ(4, f.countConnectedPuyos(x, y));
             }
         }
-
     }
 }
 
