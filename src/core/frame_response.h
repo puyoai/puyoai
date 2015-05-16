@@ -15,11 +15,13 @@ struct FrameResponse {
                            const std::string& message = std::string()) :
         frameId(frameId), decision(decision), message(message) {}
 
+    // TODO(mayah): Rename this method.
     bool isValid() const;
     std::string toString() const;
 
     int frameId = -1;
     Decision decision;
+    Decision preDecision;
     std::string message;
 
     // Mostly for HumanConnection.

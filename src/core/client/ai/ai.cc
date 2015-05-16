@@ -151,6 +151,8 @@ void AI::runLoop()
             groundedForMe(frameRequest);
         if (frameRequest.myPlayerFrameRequest().event.puyoErased)
             puyoErasedForMe(frameRequest);
+        if (frameRequest.myPlayerFrameRequest().event.preDecisionRequest)
+            preDecisionRequestedForMe(frameRequest);
         if (frameRequest.myPlayerFrameRequest().event.decisionRequest) {
             VLOG(1) << "REQUESTED";
             next1.requested = true;
@@ -173,7 +175,17 @@ void AI::runLoop()
         }
 
         if (!next1.requested || !next1.ready) {
-            connector_.send(FrameResponse(frameRequest.frameId));
+            FrameResponse resp(frameRequest.frameId);
+
+            const bool needsSendPreDecision = next1.ready &&
+                next1.dropDecision.decision().isValid() &&
+                frameRequest.myPlayerFrameRequest().event.preDecisionRequest;
+            // Sends pre decision.
+            if (needsSendPreDecision) {
+                resp.preDecision = next1.dropDecision.decision();
+            }
+
+            connector_.send(resp);
             continue;
         }
 
@@ -247,6 +259,12 @@ void AI::gameWillBegin(const FrameRequest& frameRequest)
 void AI::gameHasEnded(const FrameRequest& frameRequest)
 {
     onGameHasEnded(frameRequest);
+}
+
+void AI::preDecisionRequestedForMe(const FrameRequest& frameRequest)
+{
+    // Do nothing.
+    onPreDecisionRequestedForMe(frameRequest);
 }
 
 void AI::decisionRequestedForMe(const FrameRequest& frameRequest)
