@@ -4,6 +4,8 @@
 #include <ostream>
 #include <string>
 
+#include <glog/logging.h>
+
 enum class PuyoColor : uint8_t {
     EMPTY = 0,
     OJAMA = 1,
@@ -40,6 +42,12 @@ constexpr bool isNormalColor(PuyoColor color)
 inline std::ostream& operator<<(std::ostream& os, PuyoColor c)
 {
     return os << toChar(c);
+}
+
+inline int normalColorIndex(PuyoColor color)
+{
+    DCHECK(isNormalColor(color)) << color;
+    return ordinal(color) - 4;
 }
 
 #endif

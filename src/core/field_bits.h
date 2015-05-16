@@ -11,6 +11,8 @@
 // Implemented using an xmm register.
 class FieldBits {
 public:
+    static const __m128i FIELD_MASK;
+
     FieldBits() : m_(_mm_setzero_si128()) {}
     explicit FieldBits(__m128i m) : m_(m) {}
     FieldBits(const PlainField&, PuyoColor);
@@ -26,10 +28,10 @@ public:
 
     // Returns connected bits from (x, y).
     FieldBits expand(int x, int y) const;
+    // Returns connected bits from (x, y). Bit whose distance is >= 4 is not accurate.
     FieldBits expand4(int x, int y) const;
 
 private:
-    static const __m128i s_field_mask_;
     static const __m128i s_table_[128];
     static __m128i onebit(int x, int y)
     {
@@ -59,7 +61,7 @@ FieldBits::FieldBits(const PlainField& pf, PuyoColor c)
     }
     xmm.s[7] = 0;
 
-    m_ = _mm_and_si128(s_field_mask_, xmm.m);
+    m_ = _mm_and_si128(FIELD_MASK, xmm.m);
 }
 
 
