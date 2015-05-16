@@ -12,7 +12,7 @@ endif()
 # library
 
 add_library(puyoai_core STATIC
-            bits_field.cc
+            bit_field.cc
             column_puyo_list.cc
             core_field.cc
             decision.cc
@@ -50,6 +50,7 @@ function(puyoai_core_add_test target)
     endif()
 endfunction()
 
+puyoai_core_add_test(bit_field)
 puyoai_core_add_test(column_puyo_list)
 puyoai_core_add_test(core_field)
 puyoai_core_add_test(decision)
