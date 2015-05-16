@@ -23,6 +23,7 @@ add_library(puyoai_core STATIC
             game_result.cc
             key.cc
             key_set.cc
+            key_set_seq.cc
             kumipuyo.cc
             kumipuyo_moving_state.cc
             kumipuyo_pos.cc
@@ -59,6 +60,7 @@ puyoai_core_add_test(field_checker)
 puyoai_core_add_test(frame_response)
 puyoai_core_add_test(frame_request)
 puyoai_core_add_test(key_set)
+puyoai_core_add_test(key_set_seq)
 puyoai_core_add_test(kumipuyo)
 puyoai_core_add_test(kumipuyo_moving_state)
 puyoai_core_add_test(kumipuyo_pos)

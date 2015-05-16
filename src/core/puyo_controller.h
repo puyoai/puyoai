@@ -1,7 +1,7 @@
 #ifndef CORE_PUYO_CONTROLLER_H_
 #define CORE_PUYO_CONTROLLER_H_
 
-#include "core/key_set.h"
+#include "core/key_set_seq.h"
 
 class CoreField;
 class Decision;
