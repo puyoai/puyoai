@@ -14,6 +14,7 @@ private:
 };
 
 // Precision of this timer depends on the CPU clock of the machine running on.
+// Use rdtscp instead of rdtsc. rdtsc allows out-of-order execution, so time is not accurate.
 class ScopedTimeStampCounter {
 public:
     // Don't take the ownership of tsc
