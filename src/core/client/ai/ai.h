@@ -61,6 +61,7 @@ protected:
     virtual void onGameWillBegin(const FrameRequest&) {}
     virtual void onGameHasEnded(const FrameRequest&) {}
 
+    virtual void onPreDecisionRequestedForMe(const FrameRequest&) {}
     virtual void onDecisionRequestedForMe(const FrameRequest&) {}
     virtual void onGroundedForMe(const FrameRequest&) {}
     virtual void onPuyoErasedForMe(const FrameRequest&) {}
@@ -86,6 +87,8 @@ protected:
 
     // |gameHasEnded| will be called just after a game has ended.
     void gameHasEnded(const FrameRequest&);
+
+    void preDecisionRequestedForMe(const FrameRequest&);
 
     void decisionRequestedForMe(const FrameRequest&);
     void decisionRequestedForEnemy(const FrameRequest&);

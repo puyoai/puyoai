@@ -55,6 +55,12 @@ FrameResponse FrameResponse::parse(const string& str)
         } else if (tmp.substr(0, 2) == "R=") {
             std::istringstream istr(tmp.c_str() + 2);
             istr >> data.decision.r;
+        } else if (tmp.substr(0, 3) == "PX=") {
+            std::istringstream istr(tmp.c_str() + 3);
+            istr >> data.preDecision.x;
+        } else if (tmp.substr(0, 3) == "PR=") {
+            std::istringstream istr(tmp.c_str() + 3);
+            istr >> data.preDecision.r;
         } else if (tmp.substr(0, 4) == "MSG=") {
             data.message = unescapeMessage(tmp.c_str() + 4);
         } else if (tmp.substr(0, 3) == "MA=") {
@@ -77,6 +83,10 @@ std::string FrameResponse::toString() const
     if (decision.isValid()) {
         ss << " X=" << decision.x
            << " R=" << decision.r;
+    }
+    if (preDecision.isValid()) {
+        ss << " PX=" << preDecision.x
+           << " PR=" << preDecision.r;
     }
     if (!message.empty()) {
         ss << " MSG=" << escapeMessage(message);
