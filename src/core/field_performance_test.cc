@@ -13,6 +13,7 @@ static void runCountConnectedPuyosTest(const PlainField& f, int expected, int x,
 {
     const int N = 1000000;
 
+    TimeStampCounterData none;
     TimeStampCounterData tsc;
     TimeStampCounterData tscMax4;
     TimeStampCounterData tscBits;
@@ -21,6 +22,10 @@ static void runCountConnectedPuyosTest(const PlainField& f, int expected, int x,
     TimeStampCounterData tscPreBitsMax4;
 
     const int expected4 = expected >= 4 ? 4 : expected;
+
+    for (int i = 0; i < N; i++) {
+        ScopedTimeStampCounter stsc(&none);
+    }
 
     for (int i = 0; i < N; i++) {
         ScopedTimeStampCounter stsc(&tsc);
@@ -55,6 +60,8 @@ static void runCountConnectedPuyosTest(const PlainField& f, int expected, int x,
         EXPECT_LE(expected4, fb.expand4(x, y).popcount());
     }
 
+    cout << "overhead: " << endl;
+    none.showStatistics();
     cout << "normal: " << endl;
     tsc.showStatistics();
     cout << "max4: " << endl;
