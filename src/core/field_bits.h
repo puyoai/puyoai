@@ -22,9 +22,6 @@ public:
     void set(int x, int y) { m_ = _mm_or_si128(onebit(x, y), m_); }
     void unset(int x, int y) { m_ = _mm_andnot_si128(onebit(x, y), m_); }
 
-    // Masks visible (12x6) field.
-    FieldBits masked() const { return FieldBits(_mm_and_si128(s_field_mask_, m_)); }
-
     int popcount() const;
 
     // Returns connected bits from (x, y).
@@ -61,7 +58,7 @@ FieldBits::FieldBits(const PlainField& pf, PuyoColor c)
     }
     xmm.s[7] = 0;
 
-    m_ = xmm.m;
+    m_ = _mm_and_si128(s_field_mask_, xmm.m);
 }
 
 
