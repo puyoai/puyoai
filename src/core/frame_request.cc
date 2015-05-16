@@ -58,34 +58,6 @@ static string formatNext(const KumipuyoSeq& seq)
     return ss.str();
 }
 
-static string formatEvent(const UserEvent& event)
-{
-    stringstream ss;
-    ss << (event.wnextAppeared        ? 'W' : '-');
-    ss << (event.grounded             ? 'G' : '-');
-    ss << (event.decisionRequest      ? 'D' : '-');
-    ss << (event.decisionRequestAgain ? 'A' : '-');
-    ss << (event.ojamaDropped         ? 'O' : '-');
-    ss << (event.puyoErased           ? 'E' : '-');
-    return ss.str();
-}
-
-static UserEvent parseEvent(const string& s)
-{
-    UserEvent event;
-    for (const char c : s) {
-        switch (c) {
-        case 'W': event.wnextAppeared = true; break;
-        case 'G': event.grounded = true; break;
-        case 'D': event.decisionRequest = true; break;
-        case 'A': event.decisionRequestAgain = true; break;
-        case 'O': event.ojamaDropped = true; break;
-        case 'E': event.puyoErased = true; break;
-        }
-    }
-    return event;
-}
-
 static GameResult parseEnd(const char* value)
 {
     int x = std::atoi(value);
@@ -155,7 +127,7 @@ FrameRequest FrameRequest::parse(const std::string& line)
             pReq.ojama = std::atoi(value);
             break;
         case 'E':
-            pReq.event = parseEvent(string(value));
+            pReq.event = UserEvent(value);
             break;
         }
     }
@@ -185,8 +157,8 @@ string FrameRequest::toString() const
     std::string f1 = formatPlainField(op.field);
     std::string y0 = formatNext(me.kumipuyoSeq);
     std::string y1 = formatNext(op.kumipuyoSeq);
-    std::string e0 = formatEvent(me.event);
-    std::string e1 = formatEvent(op.event);
+    std::string e0 = me.event.toString();
+    std::string e1 = op.event.toString();
     int score0 = me.score;
     int score1 = op.score;
     int ojama0 = me.ojama;
