@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "core/decision.h"
-#include "core/key_set.h"
+#include "core/key_set_seq.h"
 #include "core/kumipuyo_moving_state.h"
 #include "core/kumipuyo_seq.h"
 #include "core/next_puyo.h"

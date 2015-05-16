@@ -1,7 +1,7 @@
 #ifndef WII_KEY_SENDER_H_
 #define WII_KEY_SENDER_H_
 
-#include "core/key_set.h"
+#include "core/key_set_seq.h"
 
 class KeySender {
 public:
