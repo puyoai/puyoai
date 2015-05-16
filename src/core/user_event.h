@@ -5,6 +5,9 @@
 
 // UserEvent is a set of events in user's field.
 struct UserEvent {
+    UserEvent() {}
+    explicit UserEvent(const std::string&);
+
     void clear()
     {
         *this = UserEvent();

@@ -2,6 +2,20 @@
 
 using namespace std;
 
+UserEvent::UserEvent(const string& s)
+{
+    for (const char c : s) {
+        switch (c) {
+        case 'W': wnextAppeared = true; break;
+        case 'G': grounded = true; break;
+        case 'D': decisionRequest = true; break;
+        case 'A': decisionRequestAgain = true; break;
+        case 'O': ojamaDropped = true; break;
+        case 'E': puyoErased = true; break;
+        }
+    }
+}
+
 string UserEvent::toString() const
 {
     std::string r;
