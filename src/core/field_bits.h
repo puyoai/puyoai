@@ -26,6 +26,7 @@ public:
 
     // Returns connected bits from (x, y).
     FieldBits expand(int x, int y) const;
+    FieldBits expand4(int x, int y) const;
 
 private:
     static const __m128i s_field_mask_;
@@ -90,6 +91,29 @@ FieldBits FieldBits::expand(int x, int y) const
 
         connected = newConnected;
     }
+
+    return FieldBits(connected);
+}
+
+inline
+FieldBits FieldBits::expand4(int x, int y) const
+{
+    __m128i connected = onebit(x, y);
+
+    connected = _mm_or_si128(_mm_and_si128(_mm_slli_si128(connected, 2), m_), connected);
+    connected = _mm_or_si128(_mm_and_si128(_mm_srli_si128(connected, 2), m_), connected);
+    connected = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(connected, 1), m_), connected);
+    connected = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(connected, 1), m_), connected);
+
+    connected = _mm_or_si128(_mm_and_si128(_mm_slli_si128(connected, 2), m_), connected);
+    connected = _mm_or_si128(_mm_and_si128(_mm_srli_si128(connected, 2), m_), connected);
+    connected = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(connected, 1), m_), connected);
+    connected = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(connected, 1), m_), connected);
+
+    connected = _mm_or_si128(_mm_and_si128(_mm_slli_si128(connected, 2), m_), connected);
+    connected = _mm_or_si128(_mm_and_si128(_mm_srli_si128(connected, 2), m_), connected);
+    connected = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(connected, 1), m_), connected);
+    connected = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(connected, 1), m_), connected);
 
     return FieldBits(connected);
 }

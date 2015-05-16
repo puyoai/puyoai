@@ -112,3 +112,68 @@ TEST(FieldBitsTest, expand)
     EXPECT_FALSE(connected.get(4, 1));
     EXPECT_FALSE(connected.get(4, 2));
 }
+
+TEST(FieldBitsTest, expand_exhaustive)
+{
+    // I O S Z L J T
+    PlainField fi(
+        "R....."
+        "R....."
+        "R....."
+        "R....."
+        "......"
+        "RRRR..");
+    PlainField fo(
+        "RR...."
+        "RR....");
+    PlainField fs(
+        "....R."
+        ".RR.RR"
+        "RR...R");
+    PlainField fz(
+        ".....R"
+        "RR..RR"
+        ".RR.R.");
+    PlainField fl(
+        "RR...."
+        ".R...R"
+        ".R.RRR"
+        "R....."
+        "R..RRR"
+        "RR.R..");
+    PlainField fj(
+        "RR...."
+        "R..R.."
+        "R..RRR"
+        ".R...."
+        ".R.RRR"
+        "RR...R");
+    PlainField ft(
+        ".R...."
+        "RR..R."
+        ".R.RRR"
+        "R....."
+        "RR.RRR"
+        "R...R.");
+
+    FieldBits bits[] {
+        FieldBits(fi, PuyoColor::RED),
+        FieldBits(fo, PuyoColor::RED),
+        FieldBits(fs, PuyoColor::RED),
+        FieldBits(fz, PuyoColor::RED),
+        FieldBits(fl, PuyoColor::RED),
+        FieldBits(fj, PuyoColor::RED),
+        FieldBits(ft, PuyoColor::RED),
+    };
+
+    for (const FieldBits& fb : bits) {
+        for (int x = 1; x <= 6; ++x) {
+            for (int y = 1; y <= 12; ++y) {
+                if (!fb.get(x, y))
+                    continue;
+                EXPECT_EQ(4, fb.expand(x, y).popcount());
+                EXPECT_EQ(4, fb.expand4(x, y).popcount());
+            }
+        }
+    }
+}
