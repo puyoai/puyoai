@@ -32,6 +32,8 @@ public:
             return thinkNohoho(frameId, f, seq);
         if (FLAGS_algorithm == "quickturn")
             return thinkQuickTurn(frameId, f, seq);
+        if (FLAGS_algorithm == "right")
+            return thinkRight(frameId, f, seq);
         return thinkFlat(frameId, f, seq);
     }
 
@@ -121,6 +123,20 @@ private:
         if (f.height(2) == 12 && f.height(4) == 13)
             return DropDecision(Decision(2, 3));
 
+        return DropDecision(Decision(3, 2));
+    }
+
+    DropDecision thinkRight(int frameId, const CoreField& f, const KumipuyoSeq& seq) const
+    {
+        UNUSED_VARIABLE(frameId);
+        UNUSED_VARIABLE(seq);
+
+        if (f.height(6) <= 10)
+            return DropDecision(Decision(6, 2));
+        if (f.height(5) <= 10)
+            return DropDecision(Decision(5, 2));
+        if (f.height(4) <= 10)
+            return DropDecision(Decision(4, 2));
         return DropDecision(Decision(3, 2));
     }
 
