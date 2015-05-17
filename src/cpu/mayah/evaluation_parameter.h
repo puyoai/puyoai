@@ -104,8 +104,10 @@ public:
         clear();
 
         std::set<std::string> keys;
-        for (const auto& entry : value.as<toml::Table>()) {
-            keys.insert(entry.first);
+        if (value.is<toml::Table>()) {
+            for (const auto& entry : value.as<toml::Table>()) {
+                keys.insert(entry.first);
+            }
         }
 
         for (const auto& ef : FeatureSet::features()) {
@@ -246,13 +248,16 @@ public:
         }
     }
 
-    toml::Value toTomlValue() const
+    toml::Value toTomlValue(const std::string& anotherKey) const
     {
-        toml::Value value = defaultParam_.toTomlValue();
+        toml::Value value;
+
+        value.set("mode.default." + anotherKey, defaultParam_.toTomlValue());
+
         for (const auto& mode : ALL_EVALUATION_MODES) {
-            toml::Value* v = value.ensureTable(std::string("mode.") + ::toString(mode));
-            CHECK(v) << "ensureTable failed: value=" << value;
-            *v = params_[ordinal(mode)].toTomlValue();
+            std::string key = std::string("mode.") + ::toString(mode) + std::string(".") + anotherKey;
+            toml::Value v = params_[ordinal(mode)].toTomlValue();
+            value.set(key, v);
         }
 
         return value;
