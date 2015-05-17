@@ -72,15 +72,15 @@ toml::Value EvaluationParameterMap::toTomlValue() const
 {
     toml::Value v = toml::Table();
 
-    toml::Value v1 = moveParamSet_.toTomlValue();
+    toml::Value v1 = moveParamSet_.toTomlValue("move");
     if (v1.valid())
         CHECK(v.merge(v1));
 
-    toml::Value v2 = mainRensaParamSet_.toTomlValue();
+    toml::Value v2 = mainRensaParamSet_.toTomlValue("main");
     if (v2.valid())
         CHECK(v.merge(v2));
 
-    toml::Value v3 = sideRensaParamSet_.toTomlValue();
+    toml::Value v3 = sideRensaParamSet_.toTomlValue("side");
     if (v3.valid())
         CHECK(v.merge(v3));
 
