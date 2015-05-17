@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include <glog/logging.h>
+
 #include "core/key.h"
 #include "core/key_set.h"
 
@@ -41,6 +43,33 @@ public:
 
 private:
     std::vector<KeySet> seq_;
+};
+
+class PrecedeKeySetSeq {
+public:
+    PrecedeKeySetSeq() {}
+    explicit PrecedeKeySetSeq(const KeySetSeq& seq) : seq_(seq), precedeSeq_(seq) {}
+    explicit PrecedeKeySetSeq(const std::string& seq) : seq_(seq), precedeSeq_(seq) {}
+    explicit PrecedeKeySetSeq(const std::string& seq, char precede, const std::string& precedeSeq) :
+        seq_(seq),
+        precede_(precede == ' ' ? KeySet() : KeySet(toKey(precede))),
+        precedeSeq_(precedeSeq)
+    {
+        DCHECK_EQ(seq_.empty(), precedeSeq_.empty()) << seq_.toString() << ' ' << precedeSeq_.toString();
+    }
+
+    // Key sequence without precede input.
+    const KeySetSeq& seq() const { return seq_; }
+    // Key sequence with precede input.
+    const KeySet& precede() const { return precede_; }
+    const KeySetSeq& precedeSeq() const { return precedeSeq_; }
+
+    bool empty() const { return seq_.empty(); }
+
+private:
+    const KeySetSeq seq_;
+    const KeySet precede_;
+    const KeySetSeq precedeSeq_;
 };
 
 #endif

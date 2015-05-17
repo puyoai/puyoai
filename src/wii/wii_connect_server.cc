@@ -483,7 +483,7 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult,
                 }
             }
 
-            keySetSeq = PuyoController::findKeyStroke(field, d);
+            keySetSeq = PuyoController::findKeyStroke(field, d).seq();
             if (keySetSeq.empty()) {
                 cout << "Cannot move?" << endl;
                 continue;
