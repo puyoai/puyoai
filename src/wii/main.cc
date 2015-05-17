@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
     unique_ptr<KeySender> keySender[2];
     if (string(argv[1]) == "stdout") {
         keySender[0].reset(new StdoutKeySender);
-    } else if (string(argv[2]) == "-") {
+    } else if (string(argv[1]) == "-") {
         keySender[0].reset(new NullKeySender);
     } else {
         keySender[0].reset(new SerialKeySender(argv[1]));
