@@ -17,33 +17,33 @@ TEST(PuyoControllerTest, findKeyStrokeOnEmptyField)
 {
     CoreField f;
 
-    EXPECT_EQ("<,,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).toString());
-    EXPECT_EQ("<A,,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).toString());
-    EXPECT_EQ("<A,,<,vA,v", PuyoController::findKeyStroke(f, Decision(1, 2)).toString());
+    EXPECT_EQ("<,,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).seq().toString());
+    EXPECT_EQ("<A,,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).seq().toString());
+    EXPECT_EQ("<A,,<,vA,v", PuyoController::findKeyStroke(f, Decision(1, 2)).seq().toString());
 
-    EXPECT_EQ("<,v", PuyoController::findKeyStroke(f, Decision(2, 0)).toString());
-    EXPECT_EQ("<A,v", PuyoController::findKeyStroke(f, Decision(2, 1)).toString());
-    EXPECT_EQ("<A,v,vA,v", PuyoController::findKeyStroke(f, Decision(2, 2)).toString());
-    EXPECT_EQ("<B,v", PuyoController::findKeyStroke(f, Decision(2, 3)).toString());
+    EXPECT_EQ("<,v", PuyoController::findKeyStroke(f, Decision(2, 0)).seq().toString());
+    EXPECT_EQ("<A,v", PuyoController::findKeyStroke(f, Decision(2, 1)).seq().toString());
+    EXPECT_EQ("<A,v,vA,v", PuyoController::findKeyStroke(f, Decision(2, 2)).seq().toString());
+    EXPECT_EQ("<B,v", PuyoController::findKeyStroke(f, Decision(2, 3)).seq().toString());
 
-    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).toString());
-    EXPECT_EQ("vA,v", PuyoController::findKeyStroke(f, Decision(3, 1)).toString());
-    EXPECT_EQ("vA,v,vA,v", PuyoController::findKeyStroke(f, Decision(3, 2)).toString());
-    EXPECT_EQ("vB,v", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
+    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).seq().toString());
+    EXPECT_EQ("vA,v", PuyoController::findKeyStroke(f, Decision(3, 1)).seq().toString());
+    EXPECT_EQ("vA,v,vA,v", PuyoController::findKeyStroke(f, Decision(3, 2)).seq().toString());
+    EXPECT_EQ("vB,v", PuyoController::findKeyStroke(f, Decision(3, 3)).seq().toString());
 
-    EXPECT_EQ(">,v", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ(">A,v", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
-    EXPECT_EQ(">A,v,vA,v", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
-    EXPECT_EQ(">B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
+    EXPECT_EQ(">,v", PuyoController::findKeyStroke(f, Decision(4, 0)).seq().toString());
+    EXPECT_EQ(">A,v", PuyoController::findKeyStroke(f, Decision(4, 1)).seq().toString());
+    EXPECT_EQ(">A,v,vA,v", PuyoController::findKeyStroke(f, Decision(4, 2)).seq().toString());
+    EXPECT_EQ(">B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).seq().toString());
 
-    EXPECT_EQ(">,,>,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ(">A,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
-    EXPECT_EQ(">A,,>,vA,v", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ(">,,>,v", PuyoController::findKeyStroke(f, Decision(5, 0)).seq().toString());
+    EXPECT_EQ(">A,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).seq().toString());
+    EXPECT_EQ(">A,,>,vA,v", PuyoController::findKeyStroke(f, Decision(5, 2)).seq().toString());
+    EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).seq().toString());
 
-    EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ(">B,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).seq().toString());
+    EXPECT_EQ(">B,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
+    EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r <= 3; ++r) {
@@ -52,7 +52,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnEmptyField)
                 continue;
             EXPECT_TRUE(PuyoController::isReachable(f, d));
             KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
-            KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+            KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             for (const auto& ks : kss)
                 kms.moveKumipuyo(f, ks);
             EXPECT_EQ(x, kms.pos.x);
@@ -79,33 +79,33 @@ TEST(PuyoControllerTest, findKeyStrokeOnFilledField)
 
     KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
 
-    EXPECT_EQ("<,,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).toString());
-    EXPECT_EQ("<A,,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).toString());
-    EXPECT_EQ("<A,,<,A,v", PuyoController::findKeyStroke(f, Decision(1, 2)).toString());
+    EXPECT_EQ("<,,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).seq().toString());
+    EXPECT_EQ("<A,,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).seq().toString());
+    EXPECT_EQ("<A,,<,A,v", PuyoController::findKeyStroke(f, Decision(1, 2)).seq().toString());
 
-    EXPECT_EQ("<,v", PuyoController::findKeyStroke(f, Decision(2, 0)).toString());
-    EXPECT_EQ("<A,v", PuyoController::findKeyStroke(f, Decision(2, 1)).toString());
-    EXPECT_EQ("<A,,A,v", PuyoController::findKeyStroke(f, Decision(2, 2)).toString());
-    EXPECT_EQ("<B,v", PuyoController::findKeyStroke(f, Decision(2, 3)).toString());
+    EXPECT_EQ("<,v", PuyoController::findKeyStroke(f, Decision(2, 0)).seq().toString());
+    EXPECT_EQ("<A,v", PuyoController::findKeyStroke(f, Decision(2, 1)).seq().toString());
+    EXPECT_EQ("<A,,A,v", PuyoController::findKeyStroke(f, Decision(2, 2)).seq().toString());
+    EXPECT_EQ("<B,v", PuyoController::findKeyStroke(f, Decision(2, 3)).seq().toString());
 
-    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).toString());
-    EXPECT_EQ("A,v", PuyoController::findKeyStroke(f, Decision(3, 1)).toString());
-    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).toString());
-    EXPECT_EQ("B,v", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
+    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).seq().toString());
+    EXPECT_EQ("A,v", PuyoController::findKeyStroke(f, Decision(3, 1)).seq().toString());
+    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).seq().toString());
+    EXPECT_EQ("B,v", PuyoController::findKeyStroke(f, Decision(3, 3)).seq().toString());
 
-    EXPECT_EQ(">,v", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ(">A,v", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
-    EXPECT_EQ(">A,,A,v", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
-    EXPECT_EQ(">B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
+    EXPECT_EQ(">,v", PuyoController::findKeyStroke(f, Decision(4, 0)).seq().toString());
+    EXPECT_EQ(">A,v", PuyoController::findKeyStroke(f, Decision(4, 1)).seq().toString());
+    EXPECT_EQ(">A,,A,v", PuyoController::findKeyStroke(f, Decision(4, 2)).seq().toString());
+    EXPECT_EQ(">B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).seq().toString());
 
-    EXPECT_EQ(">,,>,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ(">A,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
-    EXPECT_EQ(">A,,>,A,,v", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ(">,,>,v", PuyoController::findKeyStroke(f, Decision(5, 0)).seq().toString());
+    EXPECT_EQ(">A,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).seq().toString());
+    EXPECT_EQ(">A,,>,A,,v", PuyoController::findKeyStroke(f, Decision(5, 2)).seq().toString());
+    EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).seq().toString());
 
-    EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ(">B,,>,,>B,,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).seq().toString());
+    EXPECT_EQ(">B,,>,,>B,,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
+    EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r <= 3; ++r) {
@@ -114,7 +114,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnFilledField)
                 continue;
             EXPECT_TRUE(PuyoController::isReachable(f, d));
             KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
-            KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+            KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             for (const auto& ks : kss)
                 kms.moveKumipuyo(f, ks);
             EXPECT_EQ(x, kms.pos.x);
@@ -140,33 +140,33 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField1)
         "OOOOOO");
     KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
 
-    EXPECT_EQ("<,,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).toString());
-    EXPECT_EQ("<A,,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).toString());
-    EXPECT_EQ("<A,,<,vA,v", PuyoController::findKeyStroke(f, Decision(1, 2)).toString());
+    EXPECT_EQ("<,,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).seq().toString());
+    EXPECT_EQ("<A,,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).seq().toString());
+    EXPECT_EQ("<A,,<,vA,v", PuyoController::findKeyStroke(f, Decision(1, 2)).seq().toString());
 
-    EXPECT_EQ("<,v", PuyoController::findKeyStroke(f, Decision(2, 0)).toString());
-    EXPECT_EQ("<A,v", PuyoController::findKeyStroke(f, Decision(2, 1)).toString());
-    EXPECT_EQ("<A,v,vA,v", PuyoController::findKeyStroke(f, Decision(2, 2)).toString());
-    EXPECT_EQ("<B,v", PuyoController::findKeyStroke(f, Decision(2, 3)).toString());
+    EXPECT_EQ("<,v", PuyoController::findKeyStroke(f, Decision(2, 0)).seq().toString());
+    EXPECT_EQ("<A,v", PuyoController::findKeyStroke(f, Decision(2, 1)).seq().toString());
+    EXPECT_EQ("<A,v,vA,v", PuyoController::findKeyStroke(f, Decision(2, 2)).seq().toString());
+    EXPECT_EQ("<B,v", PuyoController::findKeyStroke(f, Decision(2, 3)).seq().toString());
 
-    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).toString());
-    EXPECT_EQ("vA,v", PuyoController::findKeyStroke(f, Decision(3, 1)).toString());
-    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).toString());
-    EXPECT_EQ("vB,v", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
+    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).seq().toString());
+    EXPECT_EQ("vA,v", PuyoController::findKeyStroke(f, Decision(3, 1)).seq().toString());
+    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).seq().toString());
+    EXPECT_EQ("vB,v", PuyoController::findKeyStroke(f, Decision(3, 3)).seq().toString());
 
-    EXPECT_EQ(">,v", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ(">A,v", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
-    EXPECT_EQ(">A,v,vA,v", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
-    EXPECT_EQ(">B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
+    EXPECT_EQ(">,v", PuyoController::findKeyStroke(f, Decision(4, 0)).seq().toString());
+    EXPECT_EQ(">A,v", PuyoController::findKeyStroke(f, Decision(4, 1)).seq().toString());
+    EXPECT_EQ(">A,v,vA,v", PuyoController::findKeyStroke(f, Decision(4, 2)).seq().toString());
+    EXPECT_EQ(">B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).seq().toString());
 
-    EXPECT_EQ(">,,>,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ(">A,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
-    EXPECT_EQ(">A,,>,A,,v", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ(">,,>,v", PuyoController::findKeyStroke(f, Decision(5, 0)).seq().toString());
+    EXPECT_EQ(">A,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).seq().toString());
+    EXPECT_EQ(">A,,>,A,,v", PuyoController::findKeyStroke(f, Decision(5, 2)).seq().toString());
+    EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).seq().toString());
 
-    EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ(">B,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ(">,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).seq().toString());
+    EXPECT_EQ(">B,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
+    EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
@@ -175,7 +175,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField1)
                 continue;
             EXPECT_TRUE(PuyoController::isReachable(f, d));
             KumipuyoMovingState kms(KumipuyoPos::initialPos());
-            KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+            KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
                 kms.moveKumipuyo(f, ks);
@@ -206,33 +206,33 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField2)
     unreachable.insert(Decision(1, 2));
     unreachable.insert(Decision(6, 2));
 
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<B,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).toString());
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 2)).toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<B,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).seq().toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 2)).seq().toString());
 
-    EXPECT_EQ("<,v", PuyoController::findKeyStroke(f, Decision(2, 0)).toString());
-    EXPECT_EQ("<A,v", PuyoController::findKeyStroke(f, Decision(2, 1)).toString());
-    EXPECT_EQ("<A,,A,v", PuyoController::findKeyStroke(f, Decision(2, 2)).toString());
-    EXPECT_EQ("<A,<,<A,<,<A,<,v", PuyoController::findKeyStroke(f, Decision(2, 3)).toString());
+    EXPECT_EQ("<,v", PuyoController::findKeyStroke(f, Decision(2, 0)).seq().toString());
+    EXPECT_EQ("<A,v", PuyoController::findKeyStroke(f, Decision(2, 1)).seq().toString());
+    EXPECT_EQ("<A,,A,v", PuyoController::findKeyStroke(f, Decision(2, 2)).seq().toString());
+    EXPECT_EQ("<A,<,<A,<,<A,<,v", PuyoController::findKeyStroke(f, Decision(2, 3)).seq().toString());
 
-    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).toString());
-    EXPECT_EQ("A,v", PuyoController::findKeyStroke(f, Decision(3, 1)).toString());
-    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).toString());
-    EXPECT_EQ("B,v", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
+    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).seq().toString());
+    EXPECT_EQ("A,v", PuyoController::findKeyStroke(f, Decision(3, 1)).seq().toString());
+    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).seq().toString());
+    EXPECT_EQ("B,v", PuyoController::findKeyStroke(f, Decision(3, 3)).seq().toString());
 
-    EXPECT_EQ(">,v", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ(">A,v", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
-    EXPECT_EQ(">A,,A,v", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
-    EXPECT_EQ(">B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
+    EXPECT_EQ(">,v", PuyoController::findKeyStroke(f, Decision(4, 0)).seq().toString());
+    EXPECT_EQ(">A,v", PuyoController::findKeyStroke(f, Decision(4, 1)).seq().toString());
+    EXPECT_EQ(">A,,A,v", PuyoController::findKeyStroke(f, Decision(4, 2)).seq().toString());
+    EXPECT_EQ(">B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).seq().toString());
 
-    EXPECT_EQ(">,,>,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ(">B,>,>,>B,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
-    EXPECT_EQ(">B,,>,B,,v", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ(">,,>,v", PuyoController::findKeyStroke(f, Decision(5, 0)).seq().toString());
+    EXPECT_EQ(">B,>,>,>B,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).seq().toString());
+    EXPECT_EQ(">B,,>,B,,v", PuyoController::findKeyStroke(f, Decision(5, 2)).seq().toString());
+    EXPECT_EQ(">B,,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).seq().toString());
 
-    EXPECT_EQ(">B,>,>,>B,>,>A,>,>A,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ(">B,>,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ(">B,>,>,>B,>,>A,>,>A,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
+    EXPECT_EQ(">B,>,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
@@ -246,7 +246,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField2)
             }
             EXPECT_TRUE(PuyoController::isReachable(f, d));
             KumipuyoMovingState kms(KumipuyoPos::initialPos());
-            KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+            KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
                 kms.moveKumipuyo(f, ks);
@@ -277,33 +277,33 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField3)
     unreachable.insert(Decision(2, 2));
     unreachable.insert(Decision(5, 2));
 
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<B,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).toString());
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).toString());
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<A,<,v", PuyoController::findKeyStroke(f, Decision(1, 2)).toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<B,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).seq().toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).seq().toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<A,<,v", PuyoController::findKeyStroke(f, Decision(1, 2)).seq().toString());
 
-    EXPECT_EQ("A,,A,,B,<,B,v", PuyoController::findKeyStroke(f, Decision(2, 0)).toString());
-    EXPECT_EQ("A,,A,,B,<,v", PuyoController::findKeyStroke(f, Decision(2, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 2)).toString());
-    EXPECT_EQ("A,,A,,A,<,v", PuyoController::findKeyStroke(f, Decision(2, 3)).toString());
+    EXPECT_EQ("A,,A,,B,<,B,v", PuyoController::findKeyStroke(f, Decision(2, 0)).seq().toString());
+    EXPECT_EQ("A,,A,,B,<,v", PuyoController::findKeyStroke(f, Decision(2, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,<,v", PuyoController::findKeyStroke(f, Decision(2, 3)).seq().toString());
 
-    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).toString());
-    EXPECT_EQ("A,v", PuyoController::findKeyStroke(f, Decision(3, 1)).toString());
-    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).toString());
-    EXPECT_EQ("A,,A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
+    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).seq().toString());
+    EXPECT_EQ("A,v", PuyoController::findKeyStroke(f, Decision(3, 1)).seq().toString());
+    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 3)).seq().toString());
 
-    EXPECT_EQ(">,v", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ(">,B,,B,,B,v", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
-    EXPECT_EQ(">,B,,B,v", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
-    EXPECT_EQ(">,B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
+    EXPECT_EQ(">,v", PuyoController::findKeyStroke(f, Decision(4, 0)).seq().toString());
+    EXPECT_EQ(">,B,,B,,B,v", PuyoController::findKeyStroke(f, Decision(4, 1)).seq().toString());
+    EXPECT_EQ(">,B,,B,v", PuyoController::findKeyStroke(f, Decision(4, 2)).seq().toString());
+    EXPECT_EQ(">,B,v", PuyoController::findKeyStroke(f, Decision(4, 3)).seq().toString());
 
-    EXPECT_EQ(">B,>,>B,>,>B,>,,B,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ(">B,>,>B,>,>B,>,>,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ(">B,,>B,,A,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ(">B,>,>B,>,>B,>,,B,v", PuyoController::findKeyStroke(f, Decision(5, 0)).seq().toString());
+    EXPECT_EQ(">B,>,>B,>,>B,>,>,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 2)).seq().toString());
+    EXPECT_EQ(">B,,>B,,A,>,v", PuyoController::findKeyStroke(f, Decision(5, 3)).seq().toString());
 
-    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>A,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ(">B,>,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>A,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).seq().toString());
+    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
+    EXPECT_EQ(">B,>,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
@@ -317,7 +317,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField3)
             }
             EXPECT_TRUE(PuyoController::isReachable(f, d));
             KumipuyoMovingState kms(KumipuyoPos::initialPos());
-            KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+            KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
                 kms.moveKumipuyo(f, ks);
@@ -347,33 +347,33 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField4)
     set<Decision> unreachable;
     unreachable.insert(Decision(4, 2));
 
-    EXPECT_EQ("<,,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).toString());
-    EXPECT_EQ("<A,,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).toString());
-    EXPECT_EQ("<A,,<,A,v", PuyoController::findKeyStroke(f, Decision(1, 2)).toString());
+    EXPECT_EQ("<,,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).seq().toString());
+    EXPECT_EQ("<A,,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).seq().toString());
+    EXPECT_EQ("<A,,<,A,v", PuyoController::findKeyStroke(f, Decision(1, 2)).seq().toString());
 
-    EXPECT_EQ("<,v", PuyoController::findKeyStroke(f, Decision(2, 0)).toString());
-    EXPECT_EQ("A,v", PuyoController::findKeyStroke(f, Decision(2, 1)).toString());
-    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(2, 2)).toString());
-    EXPECT_EQ("<B,v", PuyoController::findKeyStroke(f, Decision(2, 3)).toString());
+    EXPECT_EQ("<,v", PuyoController::findKeyStroke(f, Decision(2, 0)).seq().toString());
+    EXPECT_EQ("A,v", PuyoController::findKeyStroke(f, Decision(2, 1)).seq().toString());
+    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(2, 2)).seq().toString());
+    EXPECT_EQ("<B,v", PuyoController::findKeyStroke(f, Decision(2, 3)).seq().toString());
 
-    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).toString());
-    EXPECT_EQ("B,,B,,B,v", PuyoController::findKeyStroke(f, Decision(3, 1)).toString());
-    EXPECT_EQ("B,,B,v", PuyoController::findKeyStroke(f, Decision(3, 2)).toString());
-    EXPECT_EQ("B,v", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
+    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).seq().toString());
+    EXPECT_EQ("B,,B,,B,v", PuyoController::findKeyStroke(f, Decision(3, 1)).seq().toString());
+    EXPECT_EQ("B,,B,v", PuyoController::findKeyStroke(f, Decision(3, 2)).seq().toString());
+    EXPECT_EQ("B,v", PuyoController::findKeyStroke(f, Decision(3, 3)).seq().toString());
 
-    EXPECT_EQ("B,,B,,B,,>,B,v", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ("B,,B,,B,>,v", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
-    EXPECT_EQ("B,,B,,A,,>,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
+    EXPECT_EQ("B,,B,,B,,>,B,v", PuyoController::findKeyStroke(f, Decision(4, 0)).seq().toString());
+    EXPECT_EQ("B,,B,,B,>,v", PuyoController::findKeyStroke(f, Decision(4, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).seq().toString());
+    EXPECT_EQ("B,,B,,A,,>,v", PuyoController::findKeyStroke(f, Decision(4, 3)).seq().toString());
 
-    EXPECT_EQ("B,,B,,A,>,A,>,,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ("B,,B,,B,>,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
-    EXPECT_EQ("B,,B,,B,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ("B,,B,,A,>,,>,,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ("B,,B,,A,>,A,>,,v", PuyoController::findKeyStroke(f, Decision(5, 0)).seq().toString());
+    EXPECT_EQ("B,,B,,B,>,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).seq().toString());
+    EXPECT_EQ("B,,B,,B,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(5, 2)).seq().toString());
+    EXPECT_EQ("B,,B,,A,>,,>,,v", PuyoController::findKeyStroke(f, Decision(5, 3)).seq().toString());
 
-    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>A,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>A,>,v", PuyoController::findKeyStroke(f, Decision(6, 0)).seq().toString());
+    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
+    EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
@@ -387,7 +387,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField4)
             }
             EXPECT_TRUE(PuyoController::isReachable(f, d));
             KumipuyoMovingState kms(KumipuyoPos::initialPos());
-            KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+            KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
                 kms.moveKumipuyo(f, ks);
@@ -418,33 +418,33 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField5)
     unreachable.insert(Decision(2, 2));
     unreachable.insert(Decision(4, 2));
 
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<B,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).toString());
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).toString());
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<A,<,v", PuyoController::findKeyStroke(f, Decision(1, 2)).toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<B,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).seq().toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).seq().toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<A,<,v", PuyoController::findKeyStroke(f, Decision(1, 2)).seq().toString());
 
-    EXPECT_EQ("A,,A,,B,<,B,v", PuyoController::findKeyStroke(f, Decision(2, 0)).toString());
-    EXPECT_EQ("A,,A,,B,<,v", PuyoController::findKeyStroke(f, Decision(2, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 2)).toString());
-    EXPECT_EQ("A,,A,,A,<,v", PuyoController::findKeyStroke(f, Decision(2, 3)).toString());
+    EXPECT_EQ("A,,A,,B,<,B,v", PuyoController::findKeyStroke(f, Decision(2, 0)).seq().toString());
+    EXPECT_EQ("A,,A,,B,<,v", PuyoController::findKeyStroke(f, Decision(2, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,<,v", PuyoController::findKeyStroke(f, Decision(2, 3)).seq().toString());
 
-    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).toString());
-    EXPECT_EQ("B,,B,,B,v", PuyoController::findKeyStroke(f, Decision(3, 1)).toString());
-    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).toString());
-    EXPECT_EQ("A,,A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
+    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).seq().toString());
+    EXPECT_EQ("B,,B,,B,v", PuyoController::findKeyStroke(f, Decision(3, 1)).seq().toString());
+    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 3)).seq().toString());
 
-    EXPECT_EQ("A,,A,,A,>,A,v", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ("B,,B,,B,>,v", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
-    EXPECT_EQ("A,,A,,A,>,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
+    EXPECT_EQ("A,,A,,A,>,A,v", PuyoController::findKeyStroke(f, Decision(4, 0)).seq().toString());
+    EXPECT_EQ("B,,B,,B,>,v", PuyoController::findKeyStroke(f, Decision(4, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,>,v", PuyoController::findKeyStroke(f, Decision(4, 3)).seq().toString());
 
-    EXPECT_EQ("A,,A,,A,>,A,>,,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ("B,,B,,B,>,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
-    EXPECT_EQ("B,,B,,B,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ("A,,A,,A,>,,>,,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ("A,,A,,A,>,A,>,,v", PuyoController::findKeyStroke(f, Decision(5, 0)).seq().toString());
+    EXPECT_EQ("B,,B,,B,>,,>,v", PuyoController::findKeyStroke(f, Decision(5, 1)).seq().toString());
+    EXPECT_EQ("B,,B,,B,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(5, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,>,,>,,v", PuyoController::findKeyStroke(f, Decision(5, 3)).seq().toString());
 
-    EXPECT_EQ("A,,A,,A,>,,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ("A,,A,,A,>,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ("A,,A,,A,>,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ("A,,A,,A,>,,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(6, 0)).seq().toString());
+    EXPECT_EQ("A,,A,,A,>,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,>,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
@@ -458,7 +458,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField5)
             }
             EXPECT_TRUE(PuyoController::isReachable(f, d));
             KumipuyoMovingState kms(KumipuyoPos::initialPos());
-            KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+            KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
                 kms.moveKumipuyo(f, ks);
@@ -489,33 +489,33 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField6)
     unreachable.insert(Decision(2, 2));
     unreachable.insert(Decision(4, 2));
 
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<B,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).toString());
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).toString());
-    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<A,<,v", PuyoController::findKeyStroke(f, Decision(1, 2)).toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<B,<,v", PuyoController::findKeyStroke(f, Decision(1, 0)).seq().toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,v", PuyoController::findKeyStroke(f, Decision(1, 1)).seq().toString());
+    EXPECT_EQ("<A,<,<A,<,<B,<,<,<,<A,<,v", PuyoController::findKeyStroke(f, Decision(1, 2)).seq().toString());
 
-    EXPECT_EQ("A,,A,,B,<,B,v", PuyoController::findKeyStroke(f, Decision(2, 0)).toString());
-    EXPECT_EQ("A,,A,,B,<,v", PuyoController::findKeyStroke(f, Decision(2, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 2)).toString());
-    EXPECT_EQ("A,,A,,A,<,v", PuyoController::findKeyStroke(f, Decision(2, 3)).toString());
+    EXPECT_EQ("A,,A,,B,<,B,v", PuyoController::findKeyStroke(f, Decision(2, 0)).seq().toString());
+    EXPECT_EQ("A,,A,,B,<,v", PuyoController::findKeyStroke(f, Decision(2, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,<,v", PuyoController::findKeyStroke(f, Decision(2, 3)).seq().toString());
 
-    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).toString());
-    EXPECT_EQ("B,,B,,B,v", PuyoController::findKeyStroke(f, Decision(3, 1)).toString());
-    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).toString());
-    EXPECT_EQ("A,,A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
+    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).seq().toString());
+    EXPECT_EQ("B,,B,,B,v", PuyoController::findKeyStroke(f, Decision(3, 1)).seq().toString());
+    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 3)).seq().toString());
 
-    EXPECT_EQ("A,,A,,A,>,A,v", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ("A,,A,,B,,>,v", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
-    EXPECT_EQ("A,,A,,A,>,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
+    EXPECT_EQ("A,,A,,A,>,A,v", PuyoController::findKeyStroke(f, Decision(4, 0)).seq().toString());
+    EXPECT_EQ("A,,A,,B,,>,v", PuyoController::findKeyStroke(f, Decision(4, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,>,v", PuyoController::findKeyStroke(f, Decision(4, 3)).seq().toString());
 
-    EXPECT_EQ("A,,A,,A,>,A,>,,v", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ("B,,B,,A,>,A,>,A,v", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
-    EXPECT_EQ("B,,B,,A,>,A,>,A,,A,v", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ("A,,A,,A,>,,>,,v", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ("A,,A,,A,>,A,>,,v", PuyoController::findKeyStroke(f, Decision(5, 0)).seq().toString());
+    EXPECT_EQ("B,,B,,A,>,A,>,A,v", PuyoController::findKeyStroke(f, Decision(5, 1)).seq().toString());
+    EXPECT_EQ("B,,B,,A,>,A,>,A,,A,v", PuyoController::findKeyStroke(f, Decision(5, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,>,,>,,v", PuyoController::findKeyStroke(f, Decision(5, 3)).seq().toString());
 
-    EXPECT_EQ("A,,A,,A,>,,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ("A,,A,,A,>,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ("A,,A,,A,>,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ("A,,A,,A,>,,>,,>,A,v", PuyoController::findKeyStroke(f, Decision(6, 0)).seq().toString());
+    EXPECT_EQ("A,,A,,A,>,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,>,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
@@ -529,7 +529,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField6)
             }
             EXPECT_TRUE(PuyoController::isReachable(f, d)) << d.toString();
             KumipuyoMovingState kms(KumipuyoPos::initialPos());
-            KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+            KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty()) << d.toString();
             for (const auto& ks : kss)
                 kms.moveKumipuyo(f, ks);
@@ -561,33 +561,33 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField7)
     reachable.insert(Decision(3, 0));
     reachable.insert(Decision(3, 2));
 
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 2)).toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 2)).seq().toString());
 
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 2)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 3)).toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 2)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 3)).seq().toString());
 
-    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(3, 1)).toString());
-    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
+    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(3, 1)).seq().toString());
+    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(3, 3)).seq().toString());
 
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 3)).seq().toString());
 
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 2)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 3)).seq().toString());
 
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
@@ -596,13 +596,13 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField7)
                 continue;
             if (!reachable.count(d)) {
                 EXPECT_FALSE(PuyoController::isReachable(f, d))
-                    << d.toString() << " " << PuyoController::findKeyStroke(f, d).toString();
+                    << d.toString() << " " << PuyoController::findKeyStroke(f, d).seq().toString();
                 EXPECT_TRUE(PuyoController::findKeyStroke(f, d).empty()) << d.toString();
                 continue;
             }
             EXPECT_TRUE(PuyoController::isReachable(f, d));
             KumipuyoMovingState kms(KumipuyoPos::initialPos());
-            KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+            KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
                 kms.moveKumipuyo(f, ks);
@@ -640,33 +640,33 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField8)
     reachable.insert(Decision(4, 0));
     reachable.insert(Decision(4, 3));
 
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 2)).toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(1, 2)).seq().toString());
 
-    EXPECT_EQ("A,,A,,B,<,B,v", PuyoController::findKeyStroke(f, Decision(2, 0)).toString());
-    EXPECT_EQ("A,,A,,B,<,v", PuyoController::findKeyStroke(f, Decision(2, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 2)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 3)).toString());
+    EXPECT_EQ("A,,A,,B,<,B,v", PuyoController::findKeyStroke(f, Decision(2, 0)).seq().toString());
+    EXPECT_EQ("A,,A,,B,<,v", PuyoController::findKeyStroke(f, Decision(2, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 2)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(2, 3)).seq().toString());
 
-    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).toString());
-    EXPECT_EQ("B,,B,,B,v", PuyoController::findKeyStroke(f, Decision(3, 1)).toString());
-    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).toString());
-    EXPECT_EQ("A,,A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 3)).toString());
+    EXPECT_EQ("v", PuyoController::findKeyStroke(f, Decision(3, 0)).seq().toString());
+    EXPECT_EQ("B,,B,,B,v", PuyoController::findKeyStroke(f, Decision(3, 1)).seq().toString());
+    EXPECT_EQ("A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,v", PuyoController::findKeyStroke(f, Decision(3, 3)).seq().toString());
 
-    EXPECT_EQ("A,,A,,A,>,A,v", PuyoController::findKeyStroke(f, Decision(4, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).toString());
-    EXPECT_EQ("A,,A,,A,>,v", PuyoController::findKeyStroke(f, Decision(4, 3)).toString());
+    EXPECT_EQ("A,,A,,A,>,A,v", PuyoController::findKeyStroke(f, Decision(4, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(4, 2)).seq().toString());
+    EXPECT_EQ("A,,A,,A,>,v", PuyoController::findKeyStroke(f, Decision(4, 3)).seq().toString());
 
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 1)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 2)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 3)).toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 1)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 2)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(5, 3)).seq().toString());
 
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 0)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).toString());
-    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 3)).toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 0)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
+    EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
@@ -680,7 +680,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField8)
             }
             EXPECT_TRUE(PuyoController::isReachable(f, d));
             KumipuyoMovingState kms(KumipuyoPos::initialPos());
-            KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+            KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
                 kms.moveKumipuyo(f, ks);
@@ -732,7 +732,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherExhaustive)
                 bool reachable = PuyoController::isReachable(f, d);
 
                 KumipuyoMovingState kms(KumipuyoPos::initialPos());
-                KeySetSeq kss = PuyoController::findKeyStroke(f, d);
+                KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
                 if (!reachable) {
                     EXPECT_TRUE(kss.empty()) << f.toDebugString() << '\n' << d.toString();
                     continue;

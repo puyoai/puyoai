@@ -70,308 +70,314 @@ KeySetSeq expandButtonDistance(const KeySetSeq& seq)
     return result;
 }
 
-KeySetSeq findKeyStrokeFastpath10(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath10(const CoreField& field)
 {
     if (field.height(1) <= 11 && field.height(2) <= 11)
-        return KeySetSeq("<,,<,v");
+        return PrecedeKeySetSeq("<,,<,v", '<', "<,<,<,<,<,v");
     if (field.height(1) == 12 && field.height(2) == 11)
-        return KeySetSeq("<A,<,<A,<,<B,<,<,<,<B,<,v");
+        return PrecedeKeySetSeq("<A,<,<A,<,<B,<,<,<,<B,<,v", '<', "<A,<,<A,<,<B,<,<,<,<B,<,v");
     if (field.height(1) <= 12 && field.height(2) == 12 && (field.height(3) == 11 || field.height(4) == 12))
-        return KeySetSeq("<A,<,<A,<,<B,<,<,<,<B,<,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("<A,<,<A,<,<B,<,<,<,<B,<,v", '<', "<A,<,<A,<,<B,<,<,<,<B,<,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath11(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath11(const CoreField& field)
 {
     if (field.height(1) <= 11 && field.height(2) <= 11)
-        return KeySetSeq("<A,,<,v");
+        return PrecedeKeySetSeq("<A,,<,v", '<', "<A,<,<,<,<,v");
     if (field.height(1) == 12 && field.height(2) == 11)
-        return KeySetSeq("<A,<,<A,<,<B,<,<,<,v");
+        return PrecedeKeySetSeq("<A,<,<A,<,<B,<,<,<,v", '<', "<A,<,<A,<,<B,<,<,<,v");
     if (field.height(1) <= 12 && field.height(2) == 12 && field.height(4) == 12)
-        return KeySetSeq("<A,<,<A,<,<B,<,<,<,v");
+        return PrecedeKeySetSeq("<A,<,<A,<,<B,<,<,<,v", '<', "<A,<,<A,<,<B,<,<,<,v");
     if (field.height(1) <= 12 && field.height(2) == 12 && field.height(3) == 11)
-        return KeySetSeq("<A,<,<A,<,<B,<,<,<,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("<A,<,<A,<,<B,<,<,<,v", '<', "<A,<,<A,<,<B,<,<,<,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath12(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath12(const CoreField& field)
 {
     if (field.height(1) <= 9 && field.height(2) <= 9)
-        return KeySetSeq("<A,,<,vA,v");
+        return PrecedeKeySetSeq("<A,,<,vA,v", '<', "<A,<,<,<A,<,v");
     if (field.height(1) <= 11 && field.height(2) <= 11)
-        return KeySetSeq("<A,,<,A,v");
+        return PrecedeKeySetSeq("<A,,<,A,v", '<', "<A,<,<,<A,<,v");
     if (field.height(1) <= 11 && field.height(2) == 12 && field.height(4) == 12)
-        return KeySetSeq("<A,<,<A,<,<B,<,<,<,<A,<,v");
+        return PrecedeKeySetSeq("<A,<,<A,<,<B,<,<,<,<A,<,v", '<', "<A,<,<A,<,<B,<,<,<,<A,<,v");
     if (field.height(1) <= 11 && field.height(2) == 12 && field.height(3) == 11)
-        return KeySetSeq("<A,<,<A,<,<B,<,<,<,<A,<,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("<A,<,<A,<,<B,<,<,<,<A,<,v", '<', "<A,<,<A,<,<B,<,<,<,<A,<,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath13(const CoreField&)
+PrecedeKeySetSeq findKeyStrokeFastpath13(const CoreField&)
 {
     CHECK(false) << "shouldn't be called";
-    return KeySetSeq();
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath20(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath20(const CoreField& field)
 {
     if (field.height(2) <= 11)
-        return KeySetSeq("<,v");
+        return PrecedeKeySetSeq("<,v");
     if (field.height(2) == 12 && field.height(3) == 11 && field.height(1) <= 12)
-        return KeySetSeq("A,,A,,B,<,B,v");
+        return PrecedeKeySetSeq("A,,A,,B,<,B,v");
     if (field.height(2) == 12 && field.height(4) == 12)
-        return KeySetSeq("A,,A,,B,<,B,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("A,,A,,B,<,B,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath21(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath21(const CoreField& field)
 {
     if (field.height(2) <= 11 && field.height(4) <= 11)
-        return KeySetSeq("<A,v");
+        return PrecedeKeySetSeq("<A,v");
     if (field.height(2) <= 11 && field.height(4) >= 12)
-        return KeySetSeq("A,v");
+        return PrecedeKeySetSeq("A,v");
     if (field.height(2) == 12 && field.height(4) == 12)
-        return KeySetSeq("A,,A,,B,<,v");
+        return PrecedeKeySetSeq("A,,A,,B,<,v");
     if (field.height(2) == 12 && field.height(3) == 11 && field.height(4) <= 11)
-        return KeySetSeq("A,,A,,B,<,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("A,,A,,B,<,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath22(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath22(const CoreField& field)
 {
     if (field.height(2) <= 10 && field.height(3) <= 10 && field.height(4) <= 11)
-        return KeySetSeq("<A,v,vA,v");
+        return PrecedeKeySetSeq("<A,v,vA,v");
     if (field.height(2) <= 11 && field.height(4) <= 11)
-        return KeySetSeq("<A,,A,v");
+        return PrecedeKeySetSeq("<A,,A,v");
     if (field.height(2) <= 11 && field.height(4) >= 12)
-        return KeySetSeq("A,,A,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("A,,A,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath23(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath23(const CoreField& field)
 {
     if (field.height(1) <= 11 && field.height(2) <= 11)
-        return KeySetSeq("<B,v");
+        return PrecedeKeySetSeq("<B,v");
     if (field.height(1) == 12 && field.height(2) == 11)
-        return KeySetSeq("<A,<,<A,<,<A,<,v");
+        return PrecedeKeySetSeq("<A,<,<A,<,<A,<,v");
     if (field.height(1) <= 12 && field.height(2) == 12 && field.height(4) == 12)
-        return KeySetSeq("A,,A,,A,<,v");
+        return PrecedeKeySetSeq("A,,A,,A,<,v");
     if (field.height(1) <= 12 && field.height(2) == 12 && field.height(3) == 11 && field.height(4) <= 11)
-        return KeySetSeq("A,,A,,A,<,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("A,,A,,A,<,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath30(const CoreField&)
+PrecedeKeySetSeq findKeyStrokeFastpath30(const CoreField&)
 {
-    return KeySetSeq { KeySet(Key::DOWN) };
+    return PrecedeKeySetSeq("v", 'v', "v");
 }
 
-KeySetSeq findKeyStrokeFastpath31(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath31(const CoreField& field)
 {
     if (field.height(4) <= 9)
-        return KeySetSeq("vA,v");
+        return PrecedeKeySetSeq("vA,v", 'v', "vA,v");
     if (field.height(4) <= 11)
-        return KeySetSeq("A,v");
+        return PrecedeKeySetSeq("A,v");
     if (field.height(2) >= 12 && field.height(4) == 12)
-        return KeySetSeq("B,,B,,B,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("B,,B,,B,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath32(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath32(const CoreField& field)
 {
     if (field.height(4) <= 6)
-        return KeySetSeq("vA,v,vA,v");
+        return PrecedeKeySetSeq("vA,v,vA,v", 'v', "vA,v,vA,v");
     if (field.height(2) <= 6)
-        return KeySetSeq("vB,v,vB,v");
+        return PrecedeKeySetSeq("vB,v,vB,v", 'v', "vB,v,vB,v");
     if (field.height(4) <= 11)
-        return KeySetSeq("A,,A,v");
+        return PrecedeKeySetSeq("A,,A,v");
     if (field.height(2) <= 11)
-        return KeySetSeq("B,,B,v");
+        return PrecedeKeySetSeq("B,,B,v");
     if (field.height(2) >= 12 && field.height(4) >= 12)
-        return KeySetSeq("A,,A,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("A,,A,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath33(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath33(const CoreField& field)
 {
     if (field.height(2) <= 9)
-        return KeySetSeq("Bv,v");
+        return PrecedeKeySetSeq("Bv,v", 'v', "Bv,v");
     if (field.height(2) <= 11)
-        return KeySetSeq("B,v");
+        return PrecedeKeySetSeq("B,v");
     if (field.height(2) == 12 && field.height(3) == 11)
-        return KeySetSeq("A,,A,,A,v");
+        return PrecedeKeySetSeq("A,,A,,A,v");
     if (field.height(2) == 12 && field.height(4) >= 12)
-        return KeySetSeq("A,,A,,A,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("A,,A,,A,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath40(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath40(const CoreField& field)
 {
     if (field.height(4) <= 11)
-        return KeySetSeq(">,v");
+        return PrecedeKeySetSeq(">,v");
     if (field.height(2) == 12 && field.height(4) == 12)
-        return KeySetSeq("A,,A,,A,>,A,v");
+        return PrecedeKeySetSeq("A,,A,,A,>,A,v");
     if (field.height(2) >= 13 && field.height(4) == 12)
-        return KeySetSeq("A,,A,,A,,A,,v");
+        return PrecedeKeySetSeq("A,,A,,A,,A,,v");
     if (field.height(3) == 11 && field.height(4) == 12)
-        return KeySetSeq("B,,B,,B,,>,B,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("B,,B,,B,,>,B,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath41(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath41(const CoreField& field)
 {
     if (field.height(4) <= 11 && field.height(5) <= 11)
-        return KeySetSeq(">A,v");
+        return PrecedeKeySetSeq(">A,v");
     if (field.height(4) == 11 && field.height(5) == 12)
-        return KeySetSeq(">,B,,B,,B,v");
+        return PrecedeKeySetSeq(">,B,,B,,B,v");
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(6) <= 12)
-        return KeySetSeq("B,,B,,B,>,v");
+        return PrecedeKeySetSeq("B,,B,,B,>,v");
     if (field.height(2) >= 12 && field.height(4) == 12 && field.height(5) <= 12)
-        return KeySetSeq("A,,A,,B,,>,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("A,,A,,B,,>,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath42(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath42(const CoreField& field)
 {
     if (field.height(4) <= 9 && field.height(5) <= 9)
-        return KeySetSeq(">A,v,vA,v");
+        return PrecedeKeySetSeq(">A,v,vA,v");
     if (field.height(4) <= 11 && field.height(5) <= 11)
-        return KeySetSeq(">A,,A,v");
+        return PrecedeKeySetSeq(">A,,A,v");
     if (field.height(4) <= 11 && field.height(5) >= 12)
-        return KeySetSeq(">,B,,B,v");
+        return PrecedeKeySetSeq(">,B,,B,v");
 
-    return KeySetSeq();
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath43(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath43(const CoreField& field)
 {
     if (field.height(4) <= 11 && field.height(2) <= 11)
-        return KeySetSeq(">B,v");
+        return PrecedeKeySetSeq(">B,v");
     if (field.height(2) == 12 && field.height(4) == 12)
-        return KeySetSeq("A,,A,,A,>,v");
+        return PrecedeKeySetSeq("A,,A,,A,>,v");
     if (field.height(2) == 13 && field.height(4) == 12)
-        return KeySetSeq("A,,A,,A,,v");
+        return PrecedeKeySetSeq("A,,A,,A,,v");
     if (field.height(3) == 11 && field.height(4) == 12)
-        return KeySetSeq("B,,B,,A,,>,v");
+        return PrecedeKeySetSeq("B,,B,,A,,>,v");
     if (field.height(4) <= 11 && field.height(5) >= 12)
-        return KeySetSeq(">,B,v");
+        return PrecedeKeySetSeq(">,B,v");
 
-    return KeySetSeq();
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath50(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath50(const CoreField& field)
 {
+    if (field.height(4) <= 9 && field.height(5) <= 9 && field.height(6) <= 9)
+        return PrecedeKeySetSeq(">,,>,v", '>', ">A,>,>,>B,>,v");
+    if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) >= 12)
+        return PrecedeKeySetSeq(">,,>,v", '>', ">,>,>,>,>,v");
     if (field.height(4) <= 11 && field.height(5) <= 11)
-        return KeySetSeq(">,,>,v");
+        return PrecedeKeySetSeq(">,,>,v");
     if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 11)
-        return KeySetSeq(">B,>,>B,>,>B,>,,B,v");
+        return PrecedeKeySetSeq(">B,>,>B,>,>B,>,,B,v", '>', ">B,>,>B,>,>B,>,,B,v");
     if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) >= 12)
-        return KeySetSeq(">B,>,>B,>,>A,>,,A,v");
+        return PrecedeKeySetSeq(">B,>,>B,>,>A,>,,A,v", '>', ">B,>,>B,>,>A,>,,A,v");
     if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 12)
-        return KeySetSeq("A,,A,,A,>,A,>,,v");
+        return PrecedeKeySetSeq("A,,A,,A,>,A,>,,v");
     if (field.height(2) >= 12 && field.height(4) == 12 && field.height(5) <= 12)
-        return KeySetSeq("A,,A,,A,,>,,A,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("A,,A,,A,,>,,A,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath51(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath51(const CoreField& field)
 {
     if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11)
-        return KeySetSeq(">A,,>,v");
+        return PrecedeKeySetSeq(">A,,>,v", '>', ">A,>,>,>,>,v");
     if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12)
-        return KeySetSeq(">B,>,>,>B,>,>,>,>B,>,v");
+        return PrecedeKeySetSeq(">B,>,>,>B,>,>,>,>B,>,v", '>', ">B,>,>,>B,>,>,>,>B,>,v");
     if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 12)
-        return KeySetSeq(">B,>,>B,>,>B,>,>,>,v");
+        return PrecedeKeySetSeq(">B,>,>B,>,>B,>,>,>,v", '>', ">B,>,>B,>,>B,>,>,>,v");
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
-        return KeySetSeq("B,,B,,B,>,,>,v");
+        return PrecedeKeySetSeq("B,,B,,B,>,,>,v");
 
-    return KeySetSeq();
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath52(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath52(const CoreField& field)
 {
     if (field.height(4) <= 11 && field.height(5) <= 9 && field.height(6) <= 9)
-        return KeySetSeq(">A,,>,vA,v");
+        return PrecedeKeySetSeq(">A,,>,vA,v", '>', ">A,>,>,>,vA,v");
     if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11)
-        return KeySetSeq(">A,,>,A,,v");
+        return PrecedeKeySetSeq(">A,,>,A,,v");
     if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) >= 12)
-        return KeySetSeq(">B,,>,B,,v");
+        return PrecedeKeySetSeq(">B,,>,B,,v");
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 11)
-        return KeySetSeq("B,,B,,B,>,,>,A,v");
+        return PrecedeKeySetSeq("B,,B,,B,>,,>,A,v");
     if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 11 && field.height(6) <= 12)
-        return KeySetSeq("B,,B,,A,>,A,>,A,,A,v");
+        return PrecedeKeySetSeq("B,,B,,A,>,A,>,A,,A,v");
     if (field.height(2) >= 13 && field.height(4) == 12 && field.height(5) <= 11 && field.height(6) <= 12)
-        return KeySetSeq("A,,A,,A,,>,B,v");
+        return PrecedeKeySetSeq("A,,A,,A,,>,B,v");
 
-    return KeySetSeq();
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath53(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath53(const CoreField& field)
 {
+    if (field.height(4) <= 6 && field.height(5) <= 6 && field.height(6) <= 6)
+        return PrecedeKeySetSeq(">B,,>,v", '>', ">A,>,>,>,>,vA,v,vA,v");
     if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11)
-        return KeySetSeq(">B,,>,v");
+        return PrecedeKeySetSeq(">B,,>,v");
     if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 12)
-        return KeySetSeq("A,,A,,A,>,,>,,v");
+        return PrecedeKeySetSeq("A,,A,,A,>,,>,,v");
     if (field.height(2) >= 13 && field.height(4) == 12 && field.height(5) <= 12)
-        return KeySetSeq("A,,A,,A,,>,v");
+        return PrecedeKeySetSeq("A,,A,,A,,>,v");
     if (field.height(4) == 11 && field.height(5) == 12)
-        return KeySetSeq(">B,,>B,,A,>,v");
+        return PrecedeKeySetSeq(">B,,>B,,A,>,v");
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 11)
-        return KeySetSeq("B,,B,,A,>,,>,,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq("B,,B,,A,>,,>,,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath60(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath60(const CoreField& field)
 {
     if (field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11)
-        return KeySetSeq(">,,>,,>,v");
+        return PrecedeKeySetSeq(">,,>,,>,v", '>', ">,>,>,>,>,>,>,v");
     if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12)
-        return KeySetSeq(">B,>,>,>B,>,>A,>,>A,>,v");
+        return PrecedeKeySetSeq(">B,>,>,>B,>,>A,>,>A,>,v", '>', ">B,>,>,>B,>,>A,>,>A,>,v");
     if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
-        return KeySetSeq("A,,A,,A,>,,>,,>,A,v");
+        return PrecedeKeySetSeq("A,,A,,A,>,,>,,>,A,v");
     if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 12)
-        return KeySetSeq(">B,>,>B,>,>A,>,>,>,>A,>,v");
+        return PrecedeKeySetSeq(">B,>,>B,>,>A,>,>,>,>A,>,v", '>', ">B,>,>B,>,>A,>,>,>,>A,>,v");
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
-        return KeySetSeq(">B,>,>B,>,>A,>,>,>,>A,>,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq(">B,>,>B,>,>A,>,>,>,>A,>,v", '>', ">B,>,>B,>,>A,>,>,>,>A,>,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath61(const CoreField&)
+PrecedeKeySetSeq findKeyStrokeFastpath61(const CoreField&)
 {
     CHECK(false) << "shouldn't be called";
-    return KeySetSeq();
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath62(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath62(const CoreField& field)
 {
     if (field.height(4) <= 11 && field.height(5) <= 10 && field.height(6) <= 11)
-        return KeySetSeq(">B,,>,,>,B,v");
+        return PrecedeKeySetSeq(">B,,>,,>,B,v", '>', ">B,>,>,>,>,>B,v");
     if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) <= 11)
-        return KeySetSeq(">B,,>,,>B,,v");
+        return PrecedeKeySetSeq(">B,,>,,>B,,v", '>', ">B,>,>,>,>,>B,v");    
     if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 11)
-        return KeySetSeq("A,,A,,A,>,,>,,>,B,v");
+        return PrecedeKeySetSeq("A,,A,,A,>,,>,,>,B,v");
     if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 11)
-        return KeySetSeq(">B,>,>B,>,>A,>,>,>,>B,>,v");
+        return PrecedeKeySetSeq(">B,>,>B,>,>A,>,>,>,>B,>,v", '>', ">B,>,>B,>,>A,>,>,>,>B,>,v");
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 11)
-        return KeySetSeq(">B,>,>B,>,>A,>,>,>,>B,>,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq(">B,>,>B,>,>A,>,>,>,>B,>,v", '>', ">B,>,>B,>,>A,>,>,>,>B,>,v");
+    return PrecedeKeySetSeq();
 }
 
-KeySetSeq findKeyStrokeFastpath63(const CoreField& field)
+PrecedeKeySetSeq findKeyStrokeFastpath63(const CoreField& field)
 {
     if (field.height(2) <= 11 && field.height(4) <= 11 && field.height(5) <= 11 && field.height(6) <= 11)
-        return KeySetSeq(">B,,>,,>,v");
+        return PrecedeKeySetSeq(">B,,>,,>,v", '>', ">B,>,>,>,>,v");
     if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) == 12)
-        return KeySetSeq(">B,>,>,>B,>,>A,>,>,>,v");
+        return PrecedeKeySetSeq(">B,>,>,>B,>,>A,>,>,>,v", '>', ">B,>,>,>B,>,>A,>,>,>,v");
     if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
-        return KeySetSeq("A,,A,,A,>,,>,,>,v");
+        return PrecedeKeySetSeq("A,,A,,A,>,,>,,>,v");
     if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 12) {
         // if height(4) == 11, pressing B earlier will cause miscontrolling.
-        return KeySetSeq(">B,>,>,>B,>,>A,>,>,>,v");
+        return PrecedeKeySetSeq(">B,>,>,>B,>,>A,>,>,>,v", '>', ">B,>,>,>B,>,>A,>,>,>,v");
     }
     if (field.height(3) == 11 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 12)
-        return KeySetSeq(">B,>,>B,>,>A,>,>,>,>,>,v");
-    return KeySetSeq();
+        return PrecedeKeySetSeq(">B,>,>B,>,>A,>,>,>,>,>,v", '>', ">B,>,>B,>,>A,>,>,>,>,>,v");
+    return PrecedeKeySetSeq();
 }
 
 } // namespace anomymous
@@ -431,18 +437,19 @@ bool PuyoController::isReachableFrom(const CoreField& field, const KumipuyoMovin
     return !findKeyStrokeOnlineInternal(field, mks, decision).empty();
 }
 
-KeySetSeq PuyoController::findKeyStroke(const CoreField& field, const Decision& decision)
+PrecedeKeySetSeq PuyoController::findKeyStroke(const CoreField& field, const Decision& decision)
 {
-    KeySetSeq kss = findKeyStrokeFastpath(field, decision);
-    if (!kss.empty())
-        return kss;
-    return findKeyStrokeOnline(field, KumipuyoMovingState::initialState(), decision);
+    PrecedeKeySetSeq pkss = findKeyStrokeFastpath(field, decision);
+    if (!pkss.empty())
+        return pkss;
+
+    return PrecedeKeySetSeq(findKeyStrokeOnline(field, KumipuyoMovingState::initialState(), decision));
 }
 
 KeySetSeq PuyoController::findKeyStrokeFrom(const CoreField& field, const KumipuyoMovingState& mks, const Decision& decision)
 {
     if (mks.isInitialPosition())
-        return findKeyStroke(field, decision);
+        return findKeyStroke(field, decision).seq();
 
     if (!isReachableFrom(field, mks, decision))
         return KeySetSeq();
@@ -775,9 +782,9 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const CoreField& field, co
     return ret;
 }
 
-KeySetSeq PuyoController::findKeyStrokeFastpath(const CoreField& field, const Decision& decision)
+PrecedeKeySetSeq PuyoController::findKeyStrokeFastpath(const CoreField& field, const Decision& decision)
 {
-    typedef KeySetSeq (*func)(const CoreField&);
+    typedef PrecedeKeySetSeq (*func)(const CoreField&);
     static const func fs[6][4] = {
         { findKeyStrokeFastpath10, findKeyStrokeFastpath11, findKeyStrokeFastpath12, findKeyStrokeFastpath13, },
         { findKeyStrokeFastpath20, findKeyStrokeFastpath21, findKeyStrokeFastpath22, findKeyStrokeFastpath23, },
