@@ -19,8 +19,6 @@ public:
     FieldBits(int x, int y) : m_(onebit(x, y)) {}
     FieldBits(const PlainField&, PuyoColor);
 
-    __m128i& xmm() { return m_; }
-
     // These 3 methods are not so fast. Use only when necessary.
     bool get(int x, int y) const { return !_mm_testz_si128(onebit(x, y), m_); }
     void set(int x, int y) { m_ = _mm_or_si128(onebit(x, y), m_); }
@@ -34,6 +32,17 @@ public:
     FieldBits expand(FieldBits maskBits) const;
     // Returns connected bits. (more then 4 connected bits are not accurate.)
     FieldBits expand4(FieldBits maskBits) const;
+
+    // Returns the seed bits for connected more that 4.
+    // 1 connection might contain more than 1 seed.
+    // e.g.
+    // xxx...    .x....    .xx...
+    // .xx... -> ...... or ...... or ...
+    //
+    // xxx... -> ...... (x isn't erased, so no seed bit.)
+    //
+    // When seed is expanded, It should be the same as all vanishing bits.
+    FieldBits vanishingSeed() const;
 
     // Sets all the positions having 1 to |positions|.
     // |positions| should have 72 spaces at least. In some case, you need 128 spaces.

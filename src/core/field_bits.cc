@@ -134,3 +134,45 @@ const __m128i FieldBits::s_table_[128] = {
     _mm_set_epi32(0x40000000, 0x00000000, 0x00000000, 0x00000000),
     _mm_set_epi32(0x80000000, 0x00000000, 0x00000000, 0x00000000)
 };
+
+FieldBits FieldBits::vanishingSeed() const
+{
+    //  x
+    // xox              -- o is 3-connected
+    //
+    // xoox  ox   x oo
+    //      xo  xoo oo  -- o is 2-connected.
+    //
+    // So, one 3-connected piece or two 2-connected pieces are necessary and sufficient.
+
+    __m128i u = _mm_and_si128(_mm_slli_epi16(m_, 1), m_);
+    __m128i d = _mm_and_si128(_mm_srli_epi16(m_, 1), m_);
+    __m128i l = _mm_and_si128(_mm_slli_si128(m_, 2), m_);
+    __m128i r = _mm_and_si128(_mm_srli_si128(m_, 2), m_);
+
+    __m128i ud = _mm_and_si128(u, d);
+    __m128i ul = _mm_and_si128(u, l);
+    __m128i ur = _mm_and_si128(u, r);
+    __m128i dl = _mm_and_si128(d, l);
+    __m128i dr = _mm_and_si128(d, r);
+    __m128i lr = _mm_and_si128(l, r);
+
+    __m128i dlr = _mm_and_si128(lr, dl);
+    __m128i ulr = _mm_and_si128(lr, ur);
+    __m128i udr = _mm_and_si128(ur, ud);
+    __m128i udl = _mm_and_si128(ul, ud);
+
+    __m128i threes = _mm_or_si128(_mm_or_si128(dlr, ulr), _mm_or_si128(udr, udl));
+
+    __m128i twos = _mm_or_si128(_mm_or_si128(ud, ul),
+                                _mm_or_si128(_mm_or_si128(ur, dl),
+                                             _mm_or_si128(dr, lr)));
+
+    __m128i two_u = _mm_and_si128(_mm_slli_epi16(twos, 1), twos);
+    __m128i two_d = _mm_and_si128(_mm_srli_epi16(twos, 1), twos);
+    __m128i two_l = _mm_and_si128(_mm_slli_si128(twos, 2), twos);
+    __m128i two_r = _mm_and_si128(_mm_srli_si128(twos, 2), twos);
+    __m128i two_twos = _mm_or_si128(_mm_or_si128(two_u, two_d), _mm_or_si128(two_l, two_r));
+
+    return FieldBits(_mm_or_si128(threes, two_twos));
+}
