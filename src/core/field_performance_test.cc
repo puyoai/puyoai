@@ -40,24 +40,24 @@ static void runCountConnectedPuyosTest(const PlainField& f, int expected, int x,
     for (int i = 0; i < N; i++) {
         ScopedTimeStampCounter stsc(&tscBits);
         FieldBits fb(f, f.color(x, y));
-        EXPECT_EQ(expected, fb.expand(x, y).popcount());
+        EXPECT_EQ(expected, FieldBits(x, y).expand(fb).popcount());
     }
 
     for (int i = 0; i < N; i++) {
         ScopedTimeStampCounter stsc(&tscBitsMax4);
         FieldBits fb(f, f.color(x, y));
-        EXPECT_LE(expected4, fb.expand4(x, y).popcount());
+        EXPECT_LE(expected4, FieldBits(x, y).expand4(fb).popcount());
     }
 
     FieldBits fb(f, f.color(x, y));
     for (int i = 0; i < N; i++) {
         ScopedTimeStampCounter stsc(&tscPreBits);
-        EXPECT_EQ(expected, fb.expand(x, y).popcount());
+        EXPECT_EQ(expected, FieldBits(x, y).expand(fb).popcount());
     }
 
     for (int i = 0; i < N; i++) {
         ScopedTimeStampCounter stsc(&tscPreBitsMax4);
-        EXPECT_LE(expected4, fb.expand4(x, y).popcount());
+        EXPECT_LE(expected4, FieldBits(x, y).expand4(fb).popcount());
     }
 
     cout << "overhead: " << endl;

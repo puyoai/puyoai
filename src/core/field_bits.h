@@ -16,6 +16,7 @@ public:
 
     FieldBits() : m_(_mm_setzero_si128()) {}
     explicit FieldBits(__m128i m) : m_(m) {}
+    FieldBits(int x, int y) : m_(onebit(x, y)) {}
     FieldBits(const PlainField&, PuyoColor);
 
     __m128i& xmm() { return m_; }
@@ -29,10 +30,10 @@ public:
 
     int popcount() const;
 
-    // Returns connected bits from (x, y).
-    FieldBits expand(int x, int y) const;
-    // Returns connected bits from (x, y). Bit whose distance is >= 4 is not accurate.
-    FieldBits expand4(int x, int y) const;
+    // Returns connected bits.
+    FieldBits expand(FieldBits maskBits) const;
+    // Returns connected bits. (more then 4 connected bits are not accurate.)
+    FieldBits expand4(FieldBits maskBits) const;
 
     // Sets all the positions having 1 to |positions|.
     // |positions| should have 72 spaces at least. In some case, you need 128 spaces.
@@ -82,50 +83,52 @@ int FieldBits::popcount() const
 }
 
 inline
-FieldBits FieldBits::expand(int x, int y) const
+FieldBits FieldBits::expand(FieldBits maskBits) const
 {
-    __m128i connected = onebit(x, y);
+    const __m128i mask = maskBits.m_;
+    __m128i seed = m_;
 
     while (true) {
         // TODO(mayah): We need to use another xmm register?
         // Register renaming will work well? I'm not sure...
-        __m128i newConnected = connected;
-        newConnected = _mm_or_si128(_mm_slli_epi16(connected, 1), newConnected);
-        newConnected = _mm_or_si128(_mm_srli_epi16(connected, 1), newConnected);
-        newConnected = _mm_or_si128(_mm_slli_si128(connected, 2), newConnected);
-        newConnected = _mm_or_si128(_mm_srli_si128(connected, 2), newConnected);
-        newConnected = _mm_and_si128(m_, newConnected);
+        __m128i newSeed = seed;
+        newSeed = _mm_or_si128(_mm_slli_epi16(seed, 1), newSeed);
+        newSeed = _mm_or_si128(_mm_srli_epi16(seed, 1), newSeed);
+        newSeed = _mm_or_si128(_mm_slli_si128(seed, 2), newSeed);
+        newSeed = _mm_or_si128(_mm_srli_si128(seed, 2), newSeed);
+        newSeed = _mm_and_si128(mask, newSeed);
 
-        if (_mm_testc_si128(connected, newConnected))
-            return FieldBits(newConnected);
+        if (_mm_testc_si128(seed, newSeed))
+            return FieldBits(seed);
 
-        connected = newConnected;
+        seed = newSeed;
     }
 
-    return FieldBits(connected);
+    // NOT_REACHED.
 }
 
 inline
-FieldBits FieldBits::expand4(int x, int y) const
+FieldBits FieldBits::expand4(FieldBits maskBits) const
 {
-    __m128i connected = onebit(x, y);
+    const __m128i mask = maskBits.m_;
+    __m128i m = m_;
 
-    connected = _mm_or_si128(_mm_and_si128(_mm_slli_si128(connected, 2), m_), connected);
-    connected = _mm_or_si128(_mm_and_si128(_mm_srli_si128(connected, 2), m_), connected);
-    connected = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(connected, 1), m_), connected);
-    connected = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(connected, 1), m_), connected);
+    m = _mm_or_si128(_mm_and_si128(_mm_slli_si128(m, 2), mask), m);
+    m = _mm_or_si128(_mm_and_si128(_mm_srli_si128(m, 2), mask), m);
+    m = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(m, 1), mask), m);
+    m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
 
-    connected = _mm_or_si128(_mm_and_si128(_mm_slli_si128(connected, 2), m_), connected);
-    connected = _mm_or_si128(_mm_and_si128(_mm_srli_si128(connected, 2), m_), connected);
-    connected = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(connected, 1), m_), connected);
-    connected = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(connected, 1), m_), connected);
+    m = _mm_or_si128(_mm_and_si128(_mm_slli_si128(m, 2), mask), m);
+    m = _mm_or_si128(_mm_and_si128(_mm_srli_si128(m, 2), mask), m);
+    m = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(m, 1), mask), m);
+    m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
 
-    connected = _mm_or_si128(_mm_and_si128(_mm_slli_si128(connected, 2), m_), connected);
-    connected = _mm_or_si128(_mm_and_si128(_mm_srli_si128(connected, 2), m_), connected);
-    connected = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(connected, 1), m_), connected);
-    connected = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(connected, 1), m_), connected);
+    m = _mm_or_si128(_mm_and_si128(_mm_slli_si128(m, 2), mask), m);
+    m = _mm_or_si128(_mm_and_si128(_mm_srli_si128(m, 2), mask), m);
+    m = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(m, 1), mask), m);
+    m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
 
-    return FieldBits(connected);
+    return FieldBits(m);
 }
 
 inline
