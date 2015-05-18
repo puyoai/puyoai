@@ -182,6 +182,48 @@ TEST(FieldBitsTest, expand_exhaustive)
     }
 }
 
+TEST(FieldBitsTest, vanishingSeed1)
+{
+    PlainField f(
+        ".R...."
+        "RR..R."
+        ".R.RRR"
+        "R...R."
+        "RR.RRR"
+        "R...R.");
+    FieldBits fr(f, PuyoColor::RED);
+
+    FieldBits seed = fr.vanishingSeed();
+    FieldBits expanded = seed.expand(fr);
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            if (f.color(x, y) == PuyoColor::RED)
+                EXPECT_TRUE(expanded.get(x, y));
+            else
+                EXPECT_FALSE(expanded.get(x, y));
+        }
+    }
+}
+
+TEST(FieldBitsTest, vanishingSeed2)
+{
+    PlainField f(
+        ".RRR.."
+        "......"
+        ".R.RR.");
+    FieldBits fr(f, PuyoColor::RED);
+
+    FieldBits seed = fr.vanishingSeed();
+    FieldBits expanded = seed.expand(fr);
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            EXPECT_FALSE(expanded.get(x, y));
+        }
+    }
+}
+
 TEST(FieldBitsTest, toPositions)
 {
     FieldBits bits;
