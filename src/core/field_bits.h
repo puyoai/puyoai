@@ -24,6 +24,7 @@ public:
     void set(int x, int y) { m_ = _mm_or_si128(onebit(x, y), m_); }
     void unset(int x, int y) { m_ = _mm_andnot_si128(onebit(x, y), m_); }
 
+    FieldBits masked() const { return FieldBits(_mm_and_si128(FIELD_MASK, m_)); }
     void setAll(const FieldBits& fb) { m_ = _mm_or_si128(fb.m_, m_); }
 
     bool isEmpty() const;
@@ -91,7 +92,7 @@ FieldBits::FieldBits(const PlainField& pf, PuyoColor c)
     }
     xmm.s[7] = 0;
 
-    m_ = _mm_and_si128(FIELD_MASK, xmm.m);
+    m_ = xmm.m;
 }
 
 inline
