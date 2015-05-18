@@ -4,7 +4,14 @@
 
 using namespace std;
 
-TEST(BitFieldTest, ctor)
+class BitFieldTest : public testing::Test {
+protected:
+    int vanish(BitField* bf, int chain, FieldBits* erased) {
+        return bf->vanish(chain, erased);
+    }
+};
+
+TEST_F(BitFieldTest, ctor)
 {
     PlainField pf(
         "OOOOOO"
@@ -21,4 +28,18 @@ TEST(BitFieldTest, ctor)
             }
         }
     }
+}
+
+TEST_F(BitFieldTest, vanish)
+{
+    PlainField pf(
+        "RRBBBB"
+        "RGRRBB");
+    BitField bf(pf);
+
+    FieldBits erased;
+    int score = vanish(&bf, 2, &erased);
+
+    EXPECT_EQ(60 * 11, score);
+    EXPECT_EQ(FieldBits(pf, PuyoColor::BLUE), erased);
 }

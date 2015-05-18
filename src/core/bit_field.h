@@ -15,7 +15,12 @@ public:
     bool isColor(int x, int y, PuyoColor c) const { return bits(c).get(x, y); }
 
 private:
+    friend class BitFieldTest;
+
     static const FieldBits s_empty_;
+
+    // Vanishes puyos. Returns score. Erased puyos are put |erased|.
+    int vanish(int nthChain, FieldBits* erased);
 
     FieldBits colors_[NUM_PUYO_COLORS];
 };
