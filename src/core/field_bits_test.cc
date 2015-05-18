@@ -247,6 +247,28 @@ TEST(FieldBitsTest, vanishingSeed2)
     }
 }
 
+TEST(FieldBitsTest, iterate)
+{
+    FieldBits bits;
+    bits.set(1, 2);
+    bits.set(2, 3);
+    bits.set(3, 4);
+    bits.set(4, 5);
+    bits.set(5, 6);
+    bits.set(6, 7);
+
+    int count = 0;
+    FieldBits iterated;
+    bits.iterateBit([&iterated, &count](FieldBits x) {
+        iterated.setAll(x);
+        EXPECT_EQ(1, x.popcount());
+        ++count;
+    });
+
+    EXPECT_EQ(bits, iterated);
+    EXPECT_EQ(6, count);
+}
+
 TEST(FieldBitsTest, toPositions)
 {
     FieldBits bits;
