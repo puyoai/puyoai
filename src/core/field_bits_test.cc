@@ -70,6 +70,15 @@ TEST(FieldBitsTest, unset)
     EXPECT_TRUE(bits.get(1, 3));
 }
 
+TEST(FieldBitsTest, isEmpty)
+{
+    FieldBits bits;
+    EXPECT_TRUE(bits.isEmpty());
+
+    bits.set(1, 1);
+    EXPECT_FALSE(bits.isEmpty());
+}
+
 TEST(FieldBitsTest, popcount)
 {
     FieldBits bits;
@@ -84,6 +93,20 @@ TEST(FieldBitsTest, popcount)
     bits.set(6, 9);
 
     EXPECT_EQ(9, bits.popcount());
+}
+
+TEST(FieldBitsTest, operator_equal)
+{
+    FieldBits bf1;
+    bf1.set(1, 1);
+    FieldBits bf2;
+    bf2.set(1, 1);
+
+    EXPECT_EQ(bf1, bf2);
+
+    bf1.set(1, 2);
+
+    EXPECT_NE(bf1, bf2);
 }
 
 TEST(FieldBitsTest, expand)

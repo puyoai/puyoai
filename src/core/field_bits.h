@@ -26,6 +26,8 @@ public:
 
     void setAll(const FieldBits& fb) { m_ = _mm_or_si128(fb.m_, m_); }
 
+    bool isEmpty() const;
+
     int popcount() const;
 
     // Returns connected bits.
@@ -48,6 +50,12 @@ public:
     // |positions| should have 72 spaces at least. In some case, you need 128 spaces.
     // Returns length.
     int toPositions(Position positions[]) const;
+
+    friend bool operator==(FieldBits lhs, FieldBits rhs)
+    {
+        return FieldBits(_mm_xor_si128(lhs.m_, rhs.m_)).isEmpty();
+    }
+    friend bool operator!=(FieldBits lhs, FieldBits rhs) { return !(lhs == rhs); }
 
 private:
     static const __m128i s_table_[128];
@@ -82,6 +90,12 @@ FieldBits::FieldBits(const PlainField& pf, PuyoColor c)
     m_ = _mm_and_si128(FIELD_MASK, xmm.m);
 }
 
+inline
+bool FieldBits::isEmpty() const
+{
+    __m128i allzero = _mm_setzero_si128();
+    return _mm_testc_si128(allzero, m_);
+}
 
 inline
 int FieldBits::popcount() const
