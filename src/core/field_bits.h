@@ -19,6 +19,8 @@ public:
     FieldBits(int x, int y) : m_(onebit(x, y)) {}
     FieldBits(const PlainField&, PuyoColor);
 
+    __m128i xmm() const { return m_; }
+
     // These 3 methods are not so fast. Use only when necessary.
     bool get(int x, int y) const { return !_mm_testz_si128(onebit(x, y), m_); }
     void set(int x, int y) { m_ = _mm_or_si128(onebit(x, y), m_); }
@@ -26,8 +28,10 @@ public:
 
     FieldBits masked() const { return FieldBits(_mm_and_si128(FIELD_MASK, m_)); }
     void setAll(const FieldBits& fb) { m_ = _mm_or_si128(fb.m_, m_); }
+    void unsetAll(const FieldBits& fb) { m_ = _mm_andnot_si128(fb.m_, m_); }
 
     bool isEmpty() const;
+    bool testz(FieldBits bits) const { return _mm_testz_si128(m_, bits.m_); }
 
     int popcount() const;
 
