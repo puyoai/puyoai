@@ -88,17 +88,17 @@ TEST(FieldBitsTest, popcount)
 
 TEST(FieldBitsTest, expand)
 {
-    FieldBits bits;
-    bits.set(1, 1);
-    bits.set(1, 2);
-    bits.set(1, 3);
-    bits.set(2, 4);
-    bits.set(3, 1);
-    bits.set(3, 2);
-    bits.set(3, 3);
-    bits.set(4, 3);
+    FieldBits mask;
+    mask.set(1, 1);
+    mask.set(1, 2);
+    mask.set(1, 3);
+    mask.set(2, 4);
+    mask.set(3, 1);
+    mask.set(3, 2);
+    mask.set(3, 3);
+    mask.set(4, 3);
 
-    FieldBits connected = bits.expand(3, 1);
+    FieldBits connected = FieldBits(3, 1).expand(mask);
 
     EXPECT_TRUE(connected.get(3, 1));
     EXPECT_TRUE(connected.get(3, 2));
@@ -175,8 +175,8 @@ TEST(FieldBitsTest, expand_exhaustive)
             for (int y = 1; y <= 12; ++y) {
                 if (!fb.get(x, y))
                     continue;
-                EXPECT_EQ(4, fb.expand(x, y).popcount());
-                EXPECT_EQ(4, fb.expand4(x, y).popcount());
+                EXPECT_EQ(4, FieldBits(x, y).expand(fb).popcount());
+                EXPECT_EQ(4, FieldBits(x, y).expand4(fb).popcount());
             }
         }
     }
