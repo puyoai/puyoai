@@ -51,6 +51,10 @@ public:
     // Returns length.
     int toPositions(Position positions[]) const;
 
+    // Iterate all bits. Callback is void (FieldBits).
+    template<typename Callback>
+    void iterateBit(Callback) const;
+
     friend bool operator==(FieldBits lhs, FieldBits rhs)
     {
         return FieldBits(_mm_xor_si128(lhs.m_, rhs.m_)).isEmpty();
@@ -152,6 +156,34 @@ FieldBits FieldBits::expand4(FieldBits maskBits) const
     m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
 
     return FieldBits(m);
+}
+
+template<typename Callback>
+inline void FieldBits::iterateBit(Callback callback) const
+{
+    const __m128i zero = _mm_setzero_si128();
+    const __m128i downOnes = _mm_cvtsi64_si128(-1LL);
+    const __m128i upOnes = _mm_slli_si128(downOnes, 8);
+
+    __m128i current = m_;
+    // upper is zero?
+    while (!_mm_testz_si128(upOnes, current)) {
+        // y = x & (-x)
+        __m128i y = _mm_and_si128(current, _mm_sub_epi64(zero, current));
+        __m128i z = _mm_and_si128(upOnes, y);
+        callback(FieldBits(z));
+
+        current = _mm_xor_si128(current, z);
+    }
+
+    while (!_mm_testz_si128(downOnes, current)) {
+        // y = x & (-x)
+        __m128i y = _mm_and_si128(current, _mm_sub_epi64(zero, current));
+        __m128i z = _mm_and_si128(downOnes, y);
+        callback(FieldBits(z));
+
+        current = _mm_xor_si128(current, z);
+    }
 }
 
 inline
