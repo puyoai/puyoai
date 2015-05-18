@@ -1,5 +1,7 @@
 #include "core/field_bits.h"
 
+#include <algorithm>
+
 #include "core/position.h"
 
 #include <gtest/gtest.h>
