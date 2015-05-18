@@ -17,8 +17,7 @@ public:
 private:
     static const FieldBits s_empty_;
 
-    FieldBits colors_[4];
-    FieldBits ojama_;
+    FieldBits colors_[NUM_PUYO_COLORS];
 };
 
 inline
@@ -31,8 +30,13 @@ BitField::BitField(const PlainField& pf)
     __m128i m5 = _mm_load_si128(reinterpret_cast<const __m128i*>(pf.column(5)));
     __m128i m6 = _mm_load_si128(reinterpret_cast<const __m128i*>(pf.column(6)));
 
-    for (int i = 0; i < NUM_NORMAL_PUYO_COLORS; ++i) {
-        PuyoColor c = NORMAL_PUYO_COLORS[i];
+    for (int i = 0; i < NUM_PUYO_COLORS; ++i) {
+        PuyoColor c = static_cast<PuyoColor>(i);
+        if (c == PuyoColor::EMPTY || c == PuyoColor::WALL) {
+            colors_[ordinal(c)] = FieldBits();
+            continue;
+        }
+
         __m128i mask = _mm_set1_epi8(static_cast<char>(c));
 
         union {
@@ -49,47 +53,15 @@ BitField::BitField(const PlainField& pf)
         xmm.s[6] = _mm_movemask_epi8(_mm_cmpeq_epi8(m6, mask));
         xmm.s[7] = 0;
 
-        colors_[i] = FieldBits(_mm_and_si128(FieldBits::FIELD_MASK, xmm.m));
-    }
-
-    {
-        __m128i mask = _mm_set1_epi8(static_cast<char>(PuyoColor::OJAMA));
-
-        union {
-            __m128i m;
-            std::int16_t s[8];
-        } xmm;
-
-        xmm.s[0] = 0;
-        xmm.s[1] = _mm_movemask_epi8(_mm_cmpeq_epi8(m1, mask));
-        xmm.s[2] = _mm_movemask_epi8(_mm_cmpeq_epi8(m2, mask));
-        xmm.s[3] = _mm_movemask_epi8(_mm_cmpeq_epi8(m3, mask));
-        xmm.s[4] = _mm_movemask_epi8(_mm_cmpeq_epi8(m4, mask));
-        xmm.s[5] = _mm_movemask_epi8(_mm_cmpeq_epi8(m5, mask));
-        xmm.s[6] = _mm_movemask_epi8(_mm_cmpeq_epi8(m6, mask));
-        xmm.s[7] = 0;
-
-        ojama_ = FieldBits(_mm_and_si128(FieldBits::FIELD_MASK, xmm.m));
+        colors_[ordinal(c)] = FieldBits(_mm_and_si128(FieldBits::FIELD_MASK, xmm.m));
     }
 }
 
 inline
 const FieldBits& BitField::bits(PuyoColor c) const
 {
-    switch (c) {
-        case PuyoColor::RED:
-            return colors_[0];
-        case PuyoColor::BLUE:
-            return colors_[1];
-        case PuyoColor::YELLOW:
-            return colors_[2];
-        case PuyoColor::GREEN:
-            return colors_[3];
-        case PuyoColor::OJAMA:
-            return ojama_;
-        default:
-            return s_empty_;
-    }
+    DCHECK(c != PuyoColor::WALL && c != PuyoColor::EMPTY);
+    return colors_[ordinal(c)];
 }
 
 #endif // CORE_BIT_FIELD_H_
