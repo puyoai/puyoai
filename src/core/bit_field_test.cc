@@ -17,7 +17,7 @@ TEST(BitFieldTest, ctor)
         for (int y = 1; y <= 12; ++y) {
             PuyoColor c = pf.color(x, y);
             if (isNormalColor(c) || c == PuyoColor::OJAMA) {
-                EXPECT_TRUE(bf.isColor(x, y, c));
+                EXPECT_TRUE(bf.isColor(x, y, c)) << x << ' ' << y << ' ' << c;
             }
         }
     }
