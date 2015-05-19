@@ -11,7 +11,7 @@ class BitField {
 public:
     explicit BitField(const PlainField&);
 
-    const FieldBits& bits(PuyoColor c) const;
+    FieldBits bits(PuyoColor c) const;
 
     bool isColor(int x, int y, PuyoColor c) const { return bits(c).get(x, y); }
 
@@ -25,8 +25,7 @@ private:
     // Drops puyos. Returns max drops.
     int drop(FieldBits erased);
 
-    static const FieldBits s_empty_;
-    FieldBits colors_[NUM_PUYO_COLORS];
+    FieldBits m_[3];
 };
 
 inline
@@ -42,7 +41,6 @@ BitField::BitField(const PlainField& pf)
     for (int i = 0; i < NUM_PUYO_COLORS; ++i) {
         PuyoColor c = static_cast<PuyoColor>(i);
         if (c == PuyoColor::EMPTY || c == PuyoColor::WALL) {
-            colors_[ordinal(c)] = FieldBits();
             continue;
         }
 
@@ -62,15 +60,39 @@ BitField::BitField(const PlainField& pf)
         xmm.s[6] = _mm_movemask_epi8(_mm_cmpeq_epi8(m6, mask));
         xmm.s[7] = 0;
 
-        colors_[ordinal(c)] = FieldBits(xmm.m);
+        if (ordinal(c) & 1)
+            m_[0].setAll(FieldBits(xmm.m));
+        if (ordinal(c) & 2)
+            m_[1].setAll(FieldBits(xmm.m));
+        if (ordinal(c) & 4)
+            m_[2].setAll(FieldBits(xmm.m));
     }
 }
 
 inline
-const FieldBits& BitField::bits(PuyoColor c) const
+FieldBits BitField::bits(PuyoColor c) const
 {
-    DCHECK(c != PuyoColor::WALL && c != PuyoColor::EMPTY);
-    return colors_[ordinal(c)];
+    switch (c) {
+    case PuyoColor::EMPTY:  // = 0
+        return FieldBits();
+    case PuyoColor::OJAMA: // = 1   001
+        return FieldBits(_mm_andnot_si128(m_[2].xmm(), _mm_andnot_si128(m_[1].xmm(), m_[0].xmm())));
+    case PuyoColor::WALL:
+        return FieldBits();
+    case PuyoColor::IRON:  // = 3  011
+        return FieldBits(_mm_andnot_si128(m_[2].xmm(), _mm_and_si128(m_[1].xmm(), m_[0].xmm())));
+    case PuyoColor::RED:  // = 4  100
+        return FieldBits(_mm_andnot_si128(m_[0].xmm(), _mm_andnot_si128(m_[1].xmm(), m_[2].xmm())));
+    case PuyoColor::BLUE: // = 5   101
+        return FieldBits(_mm_and_si128(m_[0].xmm(), _mm_andnot_si128(m_[1].xmm(), m_[2].xmm())));
+    case PuyoColor::YELLOW: // = 6  110
+        return FieldBits(_mm_andnot_si128(m_[0].xmm(), _mm_and_si128(m_[1].xmm(), m_[2].xmm())));
+    case PuyoColor::GREEN: // =7  111
+        return FieldBits(_mm_and_si128(m_[0].xmm(), _mm_and_si128(m_[1].xmm(), m_[2].xmm())));
+    }
+
+    CHECK(false);
+    return FieldBits();
 }
 
 #endif // CORE_BIT_FIELD_H_
