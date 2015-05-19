@@ -280,25 +280,6 @@ TEST(FieldBitsTest, vanishingSeed2)
     }
 }
 
-TEST(FieldBitsTest, blenders)
-{
-    FieldBits bits;
-    bits.set(1, 1);
-    bits.set(3, 1);
-    bits.set(2, 2);
-    bits.set(5, 2);
-    bits.set(6, 3);
-
-    FieldBits blender[16] {};
-    bits.makeBlender(blender);
-
-    EXPECT_TRUE(blender[0].isEmpty());
-    EXPECT_EQ(FieldBits(_mm_setr_epi16(0, -1,  0, -1, 0,  0,  0, 0)), blender[1]);
-    EXPECT_EQ(FieldBits(_mm_setr_epi16(0,  0, -1,  0, 0, -1,  0, 0)), blender[2]);
-    EXPECT_EQ(FieldBits(_mm_setr_epi16(0,  0,  0,  0, 0,  0, -1, 0)), blender[3]);
-    EXPECT_TRUE(blender[4].isEmpty());
-}
-
 TEST(FieldBitsTest, iterate)
 {
     FieldBits bits;
