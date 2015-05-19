@@ -54,8 +54,6 @@ public:
     // When seed is expanded, It should be the same as all vanishing bits.
     FieldBits vanishingSeed() const;
 
-    void makeBlender(FieldBits blenders[16]) const;
-
     // Sets all the positions having 1 to |positions|.
     // |positions| should have 72 spaces at least. In some case, you need 128 spaces.
     // Returns length.

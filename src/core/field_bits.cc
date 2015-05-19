@@ -176,16 +176,3 @@ FieldBits FieldBits::vanishingSeed() const
 
     return FieldBits(_mm_or_si128(threes, two_twos));
 }
-
-void FieldBits::makeBlender(FieldBits blender[16]) const
-{
-    const __m128i zero = _mm_setzero_si128();
-    const __m128i ones = _mm_cmpeq_epi8(zero, zero);
-
-    for (int y = 1; y <= 12; ++y) {
-        __m128i v1 = _mm_and_si128(_mm_set1_epi16(1 << y), m_);
-        __m128i v2 = _mm_cmpeq_epi16(v1, zero);
-        __m128i v3 = _mm_xor_si128(v2, ones);
-        blender[y] = FieldBits(v3);
-    }
-}
