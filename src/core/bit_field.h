@@ -20,13 +20,12 @@ public:
 private:
     friend class BitFieldTest;
 
-    static const FieldBits s_empty_;
-
     // Vanishes puyos. Returns score. Erased puyos are put |erased|.
     int vanish(int nthChain, FieldBits* erased);
     // Drops puyos. Returns max drops.
     int drop(FieldBits erased);
 
+    static const FieldBits s_empty_;
     FieldBits colors_[NUM_PUYO_COLORS];
 };
 
