@@ -4,14 +4,6 @@
 
 #include "core/score.h"
 
-// static
-const FieldBits BitField::s_empty_;
-
-static const PuyoColor MOVABLE_COLORS[] = {
-    PuyoColor::RED, PuyoColor::BLUE, PuyoColor::YELLOW, PuyoColor::GREEN,
-    PuyoColor::OJAMA, PuyoColor::IRON
-};
-
 RensaResult BitField::simulate()
 {
     int currentChain = 1;
@@ -69,8 +61,9 @@ int BitField::vanish(int chain, FieldBits* erased)
     FieldBits ojama(erased->expand1(bits(PuyoColor::OJAMA)));
 
     erased->setAll(ojama);
-    for (PuyoColor c : MOVABLE_COLORS)
-        colors_[ordinal(c)].unsetAll(*erased);
+    m_[0].unsetAll(*erased);
+    m_[1].unsetAll(*erased);
+    m_[2].unsetAll(*erased);
 
     return 10 * numErased * calculateRensaBonusCoef(chainBonus(chain), longBonusCoef, colorBonus(numColors));
 }
@@ -97,15 +90,15 @@ int BitField::drop(FieldBits erased)
         const __m128i leftOnes = _mm_set1_epi16((1 << y) - 1);
         const __m128i rightOnes = _mm_set1_epi16(~((1 << (y + 1)) - 1));
 
-        for (PuyoColor c : MOVABLE_COLORS) {
-            __m128i m = colors_[ordinal(c)].xmm();
+        for (int i = 0; i < 3; ++i) {
+            __m128i m = m_[i].xmm();
             __m128i v1 = _mm_and_si128(leftOnes, m);
             __m128i v2 = _mm_and_si128(rightOnes, m);
             __m128i v3 = _mm_srli_epi16(v2, 1);
             __m128i v4 = _mm_or_si128(v1, v3);
             // _mm_blend_epi16 takes const int for parameter, so let's use blendv_epi8.
             m = _mm_blendv_epi8(m, v4, blender[y].xmm());
-            colors_[ordinal(c)] = FieldBits(m);
+            m_[i] = FieldBits(m);
         }
     }
 
