@@ -85,8 +85,12 @@ TEST_F(BitFieldTest, vanish3)
     int score = vanish(&bf, 1, &erased);
 
     EXPECT_EQ(40, score);
-    EXPECT_TRUE(bf.bits(PuyoColor::BLUE).isEmpty());
-    EXPECT_TRUE(bf.bits(PuyoColor::OJAMA).isEmpty());
+    EXPECT_TRUE(erased.get(1, 2));
+    EXPECT_TRUE(erased.get(2, 2));
+    EXPECT_TRUE(erased.get(3, 2));
+    EXPECT_TRUE(erased.get(4, 2));
+    EXPECT_TRUE(erased.get(5, 2));
+    EXPECT_TRUE(erased.get(6, 2));
 }
 
 TEST_F(BitFieldTest, vanish4)
@@ -111,8 +115,19 @@ TEST_F(BitFieldTest, vanish4)
     int score = vanish(&bf, 1, &erased);
     EXPECT_EQ(60 * 3, score);
 
-    EXPECT_FALSE(bf.isColor(1, 12, PuyoColor::RED));
-    EXPECT_TRUE(bf.isColor(1, 13, PuyoColor::RED));
+    EXPECT_TRUE(erased.get(1, 12));
+    EXPECT_TRUE(erased.get(2, 12));
+    EXPECT_TRUE(erased.get(3, 12));
+    EXPECT_TRUE(erased.get(4, 12));
+    EXPECT_TRUE(erased.get(5, 12));
+    EXPECT_TRUE(erased.get(6, 12));
+
+    EXPECT_FALSE(erased.get(1, 13));
+    EXPECT_FALSE(erased.get(2, 13));
+    EXPECT_FALSE(erased.get(3, 13));
+    EXPECT_FALSE(erased.get(4, 13));
+    EXPECT_FALSE(erased.get(5, 13));
+    EXPECT_FALSE(erased.get(6, 13));
 }
 
 TEST_F(BitFieldTest, vanishdrop1)

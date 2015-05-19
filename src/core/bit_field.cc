@@ -61,10 +61,6 @@ int BitField::vanish(int chain, FieldBits* erased)
     FieldBits ojama(erased->expand1(bits(PuyoColor::OJAMA)));
 
     erased->setAll(ojama);
-    m_[0].unsetAll(*erased);
-    m_[1].unsetAll(*erased);
-    m_[2].unsetAll(*erased);
-
     return 10 * numErased * calculateRensaBonusCoef(chainBonus(chain), longBonusCoef, colorBonus(numColors));
 }
 
