@@ -157,10 +157,10 @@ FieldBits FieldBits::vanishingSeed() const
     __m128i dr = _mm_and_si128(d, r);
     __m128i lr = _mm_and_si128(l, r);
 
-    __m128i dlr = _mm_and_si128(lr, dl);
-    __m128i ulr = _mm_and_si128(lr, ur);
-    __m128i udr = _mm_and_si128(ur, ud);
-    __m128i udl = _mm_and_si128(ul, ud);
+    __m128i udr = _mm_and_si128(ud, r);
+    __m128i udl = _mm_and_si128(ud, l);
+    __m128i dlr = _mm_and_si128(d, lr);
+    __m128i ulr = _mm_and_si128(u, lr);
 
     __m128i threes = _mm_or_si128(_mm_or_si128(dlr, ulr), _mm_or_si128(udr, udl));
 
@@ -175,4 +175,17 @@ FieldBits FieldBits::vanishingSeed() const
     __m128i two_twos = _mm_or_si128(_mm_or_si128(two_u, two_d), _mm_or_si128(two_l, two_r));
 
     return FieldBits(_mm_or_si128(threes, two_twos));
+}
+
+void FieldBits::makeBlender(FieldBits blender[16]) const
+{
+    const __m128i zero = _mm_setzero_si128();
+    const __m128i ones = _mm_cmpeq_epi8(zero, zero);
+
+    for (int y = 1; y <= 12; ++y) {
+        __m128i v1 = _mm_and_si128(_mm_set1_epi16(1 << y), m_);
+        __m128i v2 = _mm_cmpeq_epi16(v1, zero);
+        __m128i v3 = _mm_xor_si128(v2, ones);
+        blender[y] = FieldBits(v3);
+    }
 }

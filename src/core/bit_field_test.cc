@@ -9,6 +9,10 @@ protected:
     int vanish(BitField* bf, int chain, FieldBits* erased) {
         return bf->vanish(chain, erased);
     }
+
+    void drop(BitField* bf, const FieldBits& erased) {
+        bf->drop(erased);
+    }
 };
 
 TEST_F(BitFieldTest, ctor)
@@ -28,6 +32,18 @@ TEST_F(BitFieldTest, ctor)
             }
         }
     }
+}
+
+TEST_F(BitFieldTest, simulate)
+{
+    PlainField pf(".RBRB."
+                  "RBRBR."
+                  "RBRBR."
+                  "RBRBRR");
+    BitField bf(pf);
+    RensaResult rensaResult = bf.simulate();
+
+    EXPECT_EQ(5, rensaResult.chains);
 }
 
 TEST_F(BitFieldTest, vanish1)
@@ -93,6 +109,38 @@ TEST_F(BitFieldTest, vanish4)
 
     FieldBits erased;
     int score = vanish(&bf, 1, &erased);
-
     EXPECT_EQ(60 * 3, score);
+
+    EXPECT_FALSE(bf.isColor(1, 12, PuyoColor::RED));
+    EXPECT_TRUE(bf.isColor(1, 13, PuyoColor::RED));
+}
+
+TEST_F(BitFieldTest, vanishdrop1)
+{
+    PlainField pf(
+        "RGBBBB"
+        "BBBGRB"
+        "GRBBBB"
+        "BBBGRB");
+    BitField bf(pf);
+
+    FieldBits erased;
+    vanish(&bf, 2, &erased);
+    drop(&bf, erased);
+
+    FieldBits red = bf.bits(PuyoColor::RED);
+    EXPECT_TRUE(red.get(1, 2));
+    EXPECT_TRUE(red.get(2, 1));
+    EXPECT_TRUE(red.get(5, 1));
+    EXPECT_TRUE(red.get(5, 2));
+    EXPECT_FALSE(red.get(1, 1));
+    EXPECT_FALSE(red.get(1, 4));
+
+    FieldBits green = bf.bits(PuyoColor::GREEN);
+    EXPECT_TRUE(green.get(1, 1));
+    EXPECT_TRUE(green.get(2, 2));
+    EXPECT_TRUE(green.get(4, 1));
+    EXPECT_TRUE(green.get(4, 2));
+    EXPECT_FALSE(green.get(5, 1));
+    EXPECT_FALSE(green.get(6, 1));
 }
