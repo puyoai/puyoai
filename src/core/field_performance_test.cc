@@ -194,6 +194,35 @@ TEST(FieldPerformanceTest, simulate_filled)
     runSimulation(cf);
 }
 
+TEST(FieldPerformanceTest, bitfield_simulate_filled)
+{
+    const int N = 1000000;
+
+    TimeStampCounterData tsc;
+    CoreField cf(".G.BRG"
+                 "GBRRYR"
+                 "RRYYBY"
+                 "RGYRBR"
+                 "YGYRBY"
+                 "YGBGYR"
+                 "GRBGYR"
+                 "BRBYBY"
+                 "RYYBYY"
+                 "BRBYBR"
+                 "BGBYRR"
+                 "YGBGBG"
+                 "RBGBGG");
+    const BitField bfOriginal(cf);
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(bfOriginal);
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(19, bf.simulate().chains);
+    }
+
+    tsc.showStatistics();
+}
+
 TEST(FieldPerformanceTest, countConnectedPuyos_empty)
 {
     const PlainField f;
