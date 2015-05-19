@@ -3,6 +3,7 @@
 
 #include "core/field_bits.h"
 #include "core/puyo_color.h"
+#include "core/rensa_result.h"
 
 // BitsField is a field implementation that uses FieldBits.
 // TODO(mayah): Implement this.
@@ -14,6 +15,8 @@ public:
 
     bool isColor(int x, int y, PuyoColor c) const { return bits(c).get(x, y); }
 
+    RensaResult simulate();
+
 private:
     friend class BitFieldTest;
 
@@ -21,6 +24,8 @@ private:
 
     // Vanishes puyos. Returns score. Erased puyos are put |erased|.
     int vanish(int nthChain, FieldBits* erased);
+    // Drops puyos. Returns max drops.
+    int drop(FieldBits erased);
 
     FieldBits colors_[NUM_PUYO_COLORS];
 };
@@ -58,7 +63,7 @@ BitField::BitField(const PlainField& pf)
         xmm.s[6] = _mm_movemask_epi8(_mm_cmpeq_epi8(m6, mask));
         xmm.s[7] = 0;
 
-        colors_[ordinal(c)] = FieldBits(_mm_and_si128(FieldBits::FIELD_MASK, xmm.m));
+        colors_[ordinal(c)] = FieldBits(xmm.m);
     }
 }
 

@@ -19,7 +19,8 @@ public:
     FieldBits(int x, int y) : m_(onebit(x, y)) {}
     FieldBits(const PlainField&, PuyoColor);
 
-    __m128i xmm() const { return m_; }
+    __m128i& xmm() { return m_; }
+    const __m128i& xmm() const { return m_; }
 
     // These 3 methods are not so fast. Use only when necessary.
     bool get(int x, int y) const { return !_mm_testz_si128(onebit(x, y), m_); }
@@ -52,6 +53,8 @@ public:
     //
     // When seed is expanded, It should be the same as all vanishing bits.
     FieldBits vanishingSeed() const;
+
+    void makeBlender(FieldBits blenders[16]) const;
 
     // Sets all the positions having 1 to |positions|.
     // |positions| should have 72 spaces at least. In some case, you need 128 spaces.

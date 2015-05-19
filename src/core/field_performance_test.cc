@@ -4,6 +4,7 @@
 
 #include "base/base.h"
 #include "base/time_stamp_counter.h"
+#include "core/bit_field.h"
 #include "core/field_bits.h"
 #include "core/rensa_result.h"
 
@@ -77,6 +78,52 @@ static void runCountConnectedPuyosTest(const PlainField& f, int expected, int x,
     tscPreBitsMax4.showStatistics();
 }
 
+static void runSimulation(const CoreField& original)
+{
+    const int expectedChain = CoreField(original).simulate().chains;
+
+    BitField bitFieldOriginal(original.plainField());
+
+    const int N = 100000;
+
+    TimeStampCounterData none;
+    TimeStampCounterData tscCoreField;
+    TimeStampCounterData tscCoreFieldWithRensaChainTracker;
+    TimeStampCounterData tscBitField;
+
+    for (int i = 0; i < N; i++) {
+        ScopedTimeStampCounter stsc(&none);
+    }
+
+    for (int i = 0; i < N; i++) {
+        CoreField cf(original);
+        ScopedTimeStampCounter stsc(&tscCoreField);
+        EXPECT_EQ(expectedChain, cf.simulate().chains);
+    }
+
+    for (int i = 0; i < N; ++i) {
+        CoreField cf(original);
+        RensaChainTracker tracker;
+        ScopedTimeStampCounter stsc(&tscCoreFieldWithRensaChainTracker);
+        EXPECT_EQ(expectedChain, cf.simulate(&tracker).chains);
+    }
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(bitFieldOriginal);
+        ScopedTimeStampCounter stsc(&tscBitField);
+        EXPECT_EQ(expectedChain, bf.simulate().chains);
+    }
+
+    cout << "overhead: " << endl;
+    none.showStatistics();
+    cout << "CoreField: " << endl;
+    tscCoreField.showStatistics();
+    cout << "CoreField (RensaChainTracker): " << endl;
+    tscCoreFieldWithRensaChainTracker.showStatistics();
+    cout << "BitField: " << endl;
+    tscBitField.showStatistics();
+}
+
 TEST(FieldPerformanceTest, copy)
 {
     TimeStampCounterData tsc;
@@ -104,70 +151,47 @@ TEST(FieldPerformanceTest, copy)
     tsc.showStatistics();
 }
 
-TEST(FieldPerformanceTest, simulateEmpty)
+TEST(FieldPerformanceTest, simulate_empty)
 {
-    TimeStampCounterData tsc;
-
-    for (int i = 0; i < 1000000; i++) {
-        CoreField f;
-        ScopedTimeStampCounter tsct(&tsc);
-        f.simulate();
-    }
-
-    tsc.showStatistics();
+    CoreField cf;
+    runSimulation(cf);
 }
 
-TEST(FieldPerformanceTest, simulateFilled)
+TEST(FieldPerformanceTest, simulate_easy)
 {
-    TimeStampCounterData tsc;
-
-    for (int i = 0; i < 100000; i++) {
-        CoreField f(".G.BRG"
-                    "GBRRYR"
-                    "RRYYBY"
-                    "RGYRBR"
-                    "YGYRBY"
-                    "YGBGYR"
-                    "GRBGYR"
-                    "BRBYBY"
-                    "RYYBYY"
-                    "BRBYBR"
-                    "BGBYRR"
-                    "YGBGBG"
-                    "RBGBGG");
-        ScopedTimeStampCounter tsct(&tsc);
-        f.simulate();
-    }
-
-    tsc.showStatistics();
+    CoreField cf(".RBRB."
+                 "RBRBR."
+                 "RBRBR."
+                 "RBRBRR");
+    runSimulation(cf);
 }
 
-TEST(FieldPerformanceTest, simulateFilledTracking)
+TEST(FieldPerformanceTest, simulate_evil)
 {
-    TimeStampCounterData tsc;
+    CoreField cf("..BB.."
+                 "..GGB."
+                 ".GYYG."
+                 ".BBBYB"
+                 "RRRRBY");
+    runSimulation(cf);
+}
 
-    for (int i = 0; i < 100000; i++) {
-        CoreField f(".G.BRG"
-                    "GBRRYR"
-                    "RRYYBY"
-                    "RGYRBR"
-                    "YGYRBY"
-                    "YGBGYR"
-                    "GRBGYR"
-                    "BRBYBY"
-                    "RYYBYY"
-                    "BRBYBR"
-                    "BGBYRR"
-                    "YGBGBG"
-                    "RBGBGG");
-
-
-        ScopedTimeStampCounter stsc(&tsc);
-        RensaChainTracker tracker;
-        f.simulate(&tracker);
-    }
-
-    tsc.showStatistics();
+TEST(FieldPerformanceTest, simulate_filled)
+{
+    CoreField cf(".G.BRG"
+                 "GBRRYR"
+                 "RRYYBY"
+                 "RGYRBR"
+                 "YGYRBY"
+                 "YGBGYR"
+                 "GRBGYR"
+                 "BRBYBY"
+                 "RYYBYY"
+                 "BRBYBR"
+                 "BGBYRR"
+                 "YGBGBG"
+                 "RBGBGG");
+    runSimulation(cf);
 }
 
 TEST(FieldPerformanceTest, countConnectedPuyos_empty)
