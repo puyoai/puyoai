@@ -35,10 +35,12 @@ public:
 
     int popcount() const;
 
-    // Returns connected bits.
-    FieldBits expand(FieldBits maskBits) const;
+    // Returns all connected bits.
+    FieldBits expand(FieldBits mask) const;
+    // Returns connected bits (neighbor only).
+    FieldBits expand1(FieldBits mask) const;
     // Returns connected bits. (more then 4 connected bits are not accurate.)
-    FieldBits expand4(FieldBits maskBits) const;
+    FieldBits expand4(FieldBits mask) const;
 
     // Returns the seed bits for connected more that 4.
     // 1 connection might contain more than 1 seed.
@@ -115,28 +117,29 @@ int FieldBits::popcount() const
 }
 
 inline
-FieldBits FieldBits::expand(FieldBits maskBits) const
+FieldBits FieldBits::expand(FieldBits mask) const
 {
-    const __m128i mask = maskBits.m_;
-    __m128i seed = m_;
+    FieldBits seed = *this;
 
     while (true) {
-        // TODO(mayah): We need to use another xmm register?
-        // Register renaming will work well? I'm not sure...
-        __m128i newSeed = seed;
-        newSeed = _mm_or_si128(_mm_slli_epi16(seed, 1), newSeed);
-        newSeed = _mm_or_si128(_mm_srli_epi16(seed, 1), newSeed);
-        newSeed = _mm_or_si128(_mm_slli_si128(seed, 2), newSeed);
-        newSeed = _mm_or_si128(_mm_srli_si128(seed, 2), newSeed);
-        newSeed = _mm_and_si128(mask, newSeed);
-
-        if (_mm_testc_si128(seed, newSeed))
-            return FieldBits(seed);
-
-        seed = newSeed;
+        FieldBits expanded = seed.expand1(mask);
+        if (_mm_testc_si128(seed.xmm(), expanded.xmm()))
+            return expanded;
+        seed = expanded;
     }
 
     // NOT_REACHED.
+}
+
+inline
+FieldBits FieldBits::expand1(FieldBits maskBits) const
+{
+    __m128i m1 = m_;
+    __m128i m2 = _mm_or_si128(_mm_slli_epi16(m1, 1), m1);
+    m2 = _mm_or_si128(_mm_srli_epi16(m1, 1), m2);
+    m2 = _mm_or_si128(_mm_slli_si128(m1, 2), m2);
+    m2 = _mm_or_si128(_mm_srli_si128(m1, 2), m2);
+    return FieldBits(_mm_and_si128(maskBits.xmm(), m2));
 }
 
 inline

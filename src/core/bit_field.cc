@@ -37,12 +37,7 @@ int BitField::vanish(int chain, FieldBits* erased)
     }
 
     // Removes ojama.
-    __m128i expanded = erased->xmm();
-    expanded = _mm_or_si128(_mm_slli_epi16(erased->xmm(), 1), expanded);
-    expanded = _mm_or_si128(_mm_srli_epi16(erased->xmm(), 1), expanded);
-    expanded = _mm_or_si128(_mm_slli_si128(erased->xmm(), 2), expanded);
-    expanded = _mm_or_si128(_mm_srli_si128(erased->xmm(), 2), expanded);
-    FieldBits ojama(_mm_and_si128(bits(PuyoColor::OJAMA).xmm(), expanded));
+    FieldBits ojama(erased->expand1(bits(PuyoColor::OJAMA)));
 
     erased->setAll(ojama);
     for (auto& c : colors_)

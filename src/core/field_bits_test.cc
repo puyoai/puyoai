@@ -140,6 +140,39 @@ TEST(FieldBitsTest, expand)
     EXPECT_FALSE(connected.get(4, 2));
 }
 
+TEST(FieldBitsTest, expand1)
+{
+    // bit     mask
+    // ......  ..o...
+    // ..xx..  .o..oo
+    // ......  ..o...
+
+    FieldBits mask;
+    mask.set(2, 2);
+    mask.set(3, 1);
+    mask.set(3, 3);
+    mask.set(5, 2);
+    mask.set(6, 2);
+
+    FieldBits bits;
+    bits.set(3, 2);
+    bits.set(4, 2);
+
+    FieldBits expanded = bits.expand1(mask);
+
+    EXPECT_TRUE(expanded.get(2, 2));
+    EXPECT_TRUE(expanded.get(3, 1));
+    EXPECT_TRUE(expanded.get(3, 3));
+    EXPECT_TRUE(expanded.get(5, 2));
+
+    EXPECT_FALSE(expanded.get(3, 2));
+    EXPECT_FALSE(expanded.get(4, 2));
+    EXPECT_FALSE(expanded.get(4, 3));
+    EXPECT_FALSE(expanded.get(4, 1));
+
+    EXPECT_FALSE(expanded.get(6, 2));
+}
+
 TEST(FieldBitsTest, expand_exhaustive)
 {
     // I O S Z L J T
