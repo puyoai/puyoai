@@ -37,6 +37,8 @@ public:
 
     int popcount() const;
 
+    int horizontalOr16() const;
+
     // Returns all connected bits.
     FieldBits expand(FieldBits mask) const;
     // Returns connected bits (neighbor only).
@@ -118,6 +120,15 @@ int FieldBits::popcount() const
     alignas(16) std::int64_t x[2];
     _mm_store_si128(reinterpret_cast<__m128i*>(x), m_);
     return __builtin_popcountll(x[0]) + __builtin_popcountll(x[1]);
+}
+
+inline
+int FieldBits::horizontalOr16() const
+{
+    __m128i x = _mm_or_si128(_mm_srli_si128(m_, 8), m_);
+    x = _mm_or_si128(_mm_srli_si128(x, 4), x);
+    x = _mm_or_si128(_mm_srli_si128(x, 2), x);
+    return _mm_cvtsi128_si32(x) & 0xFFFF;
 }
 
 inline
