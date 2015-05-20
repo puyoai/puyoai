@@ -1,5 +1,7 @@
 #include "core/field_bits.h"
 
+#include <sstream>
+
 using namespace std;
 
 const __m128i FieldBits::FIELD_MASK = _mm_set_epi16(0, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0);
@@ -175,4 +177,17 @@ FieldBits FieldBits::vanishingSeed() const
     __m128i two_twos = _mm_or_si128(_mm_or_si128(two_u, two_d), _mm_or_si128(two_l, two_r));
 
     return FieldBits(_mm_or_si128(threes, two_twos));
+}
+
+std::string FieldBits::toString() const
+{
+    stringstream ss;
+    for (int y = 15; y >= 0; --y) {
+        for (int x = 0; x < 8; ++x) {
+            ss << (get(x, y) ? '1' : '0');
+        }
+        ss << endl;
+    }
+
+    return ss.str();
 }

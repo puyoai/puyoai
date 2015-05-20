@@ -3,6 +3,7 @@
 
 #include <glog/logging.h>
 #include <smmintrin.h>
+#include <string>
 
 #include "core/field_constant.h"
 #include "core/plain_field.h"
@@ -62,6 +63,8 @@ public:
     // Iterate all bits. Callback is void (FieldBits).
     template<typename Callback>
     void iterateBit(Callback) const;
+
+    std::string toString() const;
 
     friend bool operator==(FieldBits lhs, FieldBits rhs)
     {
