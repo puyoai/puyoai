@@ -75,19 +75,18 @@ int BitField::drop(FieldBits erased)
     //          (   1 ..  1  0  0 ..  0) = b15-b9 0-0
     // v3 = v2 >> 1 = 0 b15-b9 0-0
     // v4 = v1 | v3 = 0 b15-b9 b7-b0
-    // new bits = BLEND(bits, v4, blender[y])
+    // new bits = BLEND(bits, v4, blender)
     const __m128i zero = _mm_setzero_si128();
     const __m128i ones = _mm_cmpeq_epi8(zero, zero);
 
+    __m128i line = _mm_set1_epi16(1 << 13);
+
     for (int y = 12; y >= 1; --y) {
-        __m128i blender;
-        {
-            __m128i v1 = _mm_and_si128(_mm_set1_epi16(1 << y), erased.xmm());
-            __m128i v2 = _mm_cmpeq_epi16(v1, zero);
-            blender = _mm_xor_si128(v2, ones);
-        }
+        line = _mm_srli_epi16(line, 1);
+        __m128i blender = _mm_xor_si128(_mm_cmpeq_epi16(_mm_and_si128(line, erased.xmm()), zero), ones);
         if (FieldBits(blender).isEmpty())
             continue;
+
         const __m128i leftOnes = _mm_set1_epi16((1 << y) - 1);
         const __m128i rightOnes = _mm_set1_epi16(~((1 << (y + 1)) - 1));
 
