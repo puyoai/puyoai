@@ -51,7 +51,7 @@ int BitField::vanish(int chain, FieldBits* erased)
             if (mask.testz(x))
                 return;
 
-            FieldBits expanded = x.expand4(mask).expand(mask);
+            FieldBits expanded = x.expand(mask);
             int count = expanded.popcount();
             numErased += count;
             longBonusCoef += longBonus(count);
