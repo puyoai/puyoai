@@ -292,10 +292,12 @@ TEST(FieldBitsTest, iterate)
 
     int count = 0;
     FieldBits iterated;
-    bits.iterateBit([&iterated, &count](FieldBits x) {
+    bits.iterateBitWithMasking([&iterated, &count](FieldBits x) -> FieldBits {
         iterated.setAll(x);
         EXPECT_EQ(1, x.popcount());
         ++count;
+
+        return x;
     });
 
     EXPECT_EQ(bits, iterated);
