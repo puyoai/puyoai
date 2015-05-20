@@ -171,10 +171,8 @@ FieldBits FieldBits::vanishingSeed() const
                                              _mm_or_si128(dr, lr)));
 
     __m128i two_u = _mm_and_si128(_mm_slli_epi16(twos, 1), twos);
-    __m128i two_d = _mm_and_si128(_mm_srli_epi16(twos, 1), twos);
     __m128i two_l = _mm_and_si128(_mm_slli_si128(twos, 2), twos);
-    __m128i two_r = _mm_and_si128(_mm_srli_si128(twos, 2), twos);
-    __m128i two_twos = _mm_or_si128(_mm_or_si128(two_u, two_d), _mm_or_si128(two_l, two_r));
+    __m128i two_twos = _mm_or_si128(two_u, two_l);
 
     return FieldBits(_mm_or_si128(threes, two_twos));
 }
