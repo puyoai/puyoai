@@ -1,6 +1,7 @@
 #include "core/bit_field.h"
 
 #include <smmintrin.h>
+#include <glog/logging.h>
 
 #include "core/score.h"
 
@@ -109,8 +110,7 @@ int BitField::drop(FieldBits erased)
         leftOnes = _mm_srai_epi16(leftOnes, 1); // arigh shift.
 
         __m128i blender = _mm_xor_si128(_mm_cmpeq_epi16(_mm_and_si128(line, erased.xmm()), zero), ones);
-        if (FieldBits(blender).isEmpty())
-            continue;
+        DCHECK(!FieldBits(blender).isEmpty());
 
         for (int i = 0; i < 3; ++i) {
             __m128i m = m_[i].xmm();
