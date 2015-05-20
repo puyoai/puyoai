@@ -4,6 +4,8 @@
 
 #include "core/score.h"
 
+using namespace std;
+
 RensaResult BitField::simulate()
 {
     int currentChain = 1;
@@ -57,6 +59,9 @@ int BitField::vanish(int chain, FieldBits* erased)
         });
     }
 
+    if (numColors == 0)
+        return 0;
+
     // Removes ojama.
     FieldBits ojama(erased->expand1(bits(PuyoColor::OJAMA)));
 
@@ -79,16 +84,26 @@ int BitField::drop(FieldBits erased)
     const __m128i zero = _mm_setzero_si128();
     const __m128i ones = _mm_cmpeq_epi8(zero, zero);
 
+    int wholeErased = erased.horizontalOr16();
+    int maxY = 31 - __builtin_clz(wholeErased);
+    int minY = __builtin_ctz(wholeErased);
+
+    DCHECK_LE(1, minY) << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
+    DCHECK_LE(1, maxY) << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
+    DCHECK_LE(minY, 12) << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
+    DCHECK_LE(maxY, 12) << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
+    DCHECK_LE(minY, maxY) << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
+
     //        MSB      y      LSB
     // line  : 0 ... 0 1 0 ... 0
     // right : 0 ... 0 0 1 ... 1
     // left  : 1 ... 1 0 0 ... 0
 
-    __m128i line = _mm_set1_epi16(1 << 13);
-    __m128i rightOnes = _mm_set1_epi16((1 << 13) - 1);
-    __m128i leftOnes = _mm_set1_epi16(~((1 << (13 + 1)) - 1));
+    __m128i line = _mm_set1_epi16(1 << (maxY + 1));
+    __m128i rightOnes = _mm_set1_epi16((1 << (maxY + 1)) - 1);
+    __m128i leftOnes = _mm_set1_epi16(~((1 << ((maxY + 1) + 1)) - 1));
 
-    for (int y = 12; y >= 1; --y) {
+    for (int y = maxY; y >= minY; --y) {
         line = _mm_srli_epi16(line, 1);
         rightOnes = _mm_srai_epi16(rightOnes, 1); // arith shift
         leftOnes = _mm_srai_epi16(leftOnes, 1); // arigh shift.
@@ -96,7 +111,6 @@ int BitField::drop(FieldBits erased)
         __m128i blender = _mm_xor_si128(_mm_cmpeq_epi16(_mm_and_si128(line, erased.xmm()), zero), ones);
         if (FieldBits(blender).isEmpty())
             continue;
-
 
         for (int i = 0; i < 3; ++i) {
             __m128i m = m_[i].xmm();

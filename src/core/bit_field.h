@@ -75,19 +75,19 @@ FieldBits BitField::bits(PuyoColor c) const
     switch (c) {
     case PuyoColor::EMPTY:  // = 0
         return FieldBits();
-    case PuyoColor::OJAMA: // = 1   001
+    case PuyoColor::OJAMA:  // = 1  001
         return FieldBits(_mm_andnot_si128(m_[2].xmm(), _mm_andnot_si128(m_[1].xmm(), m_[0].xmm())));
     case PuyoColor::WALL:
         return FieldBits();
-    case PuyoColor::IRON:  // = 3  011
+    case PuyoColor::IRON:   // = 3  011
         return FieldBits(_mm_andnot_si128(m_[2].xmm(), _mm_and_si128(m_[1].xmm(), m_[0].xmm())));
-    case PuyoColor::RED:  // = 4  100
+    case PuyoColor::RED:    // = 4  100
         return FieldBits(_mm_andnot_si128(m_[0].xmm(), _mm_andnot_si128(m_[1].xmm(), m_[2].xmm())));
-    case PuyoColor::BLUE: // = 5   101
+    case PuyoColor::BLUE:   // = 5  101
         return FieldBits(_mm_and_si128(m_[0].xmm(), _mm_andnot_si128(m_[1].xmm(), m_[2].xmm())));
     case PuyoColor::YELLOW: // = 6  110
         return FieldBits(_mm_andnot_si128(m_[0].xmm(), _mm_and_si128(m_[1].xmm(), m_[2].xmm())));
-    case PuyoColor::GREEN: // =7  111
+    case PuyoColor::GREEN:  // = 7  111
         return FieldBits(_mm_and_si128(m_[0].xmm(), _mm_and_si128(m_[1].xmm(), m_[2].xmm())));
     }
 
