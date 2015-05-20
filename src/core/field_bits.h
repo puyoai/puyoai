@@ -63,9 +63,9 @@ public:
     // Returns length.
     int toPositions(Position positions[]) const;
 
-    // Iterate all bits. Callback is void (FieldBits).
+    // Iterate all bits. Callback is FieldBits (FieldBits).
     template<typename Callback>
-    void iterateBit(Callback) const;
+    void iterateBitWithMasking(Callback) const;
 
     std::string toString() const;
 
@@ -195,7 +195,7 @@ FieldBits FieldBits::expand4(FieldBits maskBits) const
 }
 
 template<typename Callback>
-inline void FieldBits::iterateBit(Callback callback) const
+inline void FieldBits::iterateBitWithMasking(Callback callback) const
 {
     const __m128i zero = _mm_setzero_si128();
     const __m128i downOnes = _mm_cvtsi64_si128(-1LL);
@@ -207,18 +207,16 @@ inline void FieldBits::iterateBit(Callback callback) const
         // y = x & (-x)
         __m128i y = _mm_and_si128(current, _mm_sub_epi64(zero, current));
         __m128i z = _mm_and_si128(upOnes, y);
-        callback(FieldBits(z));
-
-        current = _mm_xor_si128(current, z);
+        FieldBits mask = callback(FieldBits(z));
+        current = _mm_andnot_si128(mask.xmm(), current);
     }
 
     while (!_mm_testz_si128(downOnes, current)) {
         // y = x & (-x)
         __m128i y = _mm_and_si128(current, _mm_sub_epi64(zero, current));
         __m128i z = _mm_and_si128(downOnes, y);
-        callback(FieldBits(z));
-
-        current = _mm_xor_si128(current, z);
+        FieldBits mask = callback(FieldBits(z));
+        current = _mm_andnot_si128(mask.xmm(), current);
     }
 }
 

@@ -63,9 +63,9 @@ int BitField::vanish(int chain, FieldBits* erased)
         }
 
         // slow path...
-        seed.iterateBit([&](FieldBits x) {
+        seed.iterateBitWithMasking([&](FieldBits x) -> FieldBits {
             if (mask.testz(x))
-                return;
+                return x;
 
             FieldBits expanded = x.expand(mask);
             int count = expanded.popcount();
@@ -73,6 +73,7 @@ int BitField::vanish(int chain, FieldBits* erased)
             longBonusCoef += longBonus(count);
             erased->setAll(expanded);
             mask.unsetAll(expanded);
+            return expanded;
         });
     }
 
