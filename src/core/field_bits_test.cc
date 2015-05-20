@@ -302,6 +302,19 @@ TEST(FieldBitsTest, iterate)
     EXPECT_EQ(6, count);
 }
 
+TEST(FieldBitsTest, horizontalOr16)
+{
+    FieldBits bits;
+    bits.set(1, 1);
+    bits.set(2, 1);
+    bits.set(3, 3);
+    bits.set(3, 5);
+    bits.set(4, 12);
+
+    int x = bits.horizontalOr16();
+    EXPECT_EQ((1 << 1) | (1 << 3) | (1 << 5) | (1 << 12), x);
+}
+
 TEST(FieldBitsTest, toPositions)
 {
     FieldBits bits;
