@@ -1,6 +1,7 @@
 #include "core/bit_field.h"
 
 #include <gtest/gtest.h>
+#include "core/core_field.h"
 
 using namespace std;
 
@@ -34,16 +35,44 @@ TEST_F(BitFieldTest, ctor)
     }
 }
 
-TEST_F(BitFieldTest, simulate)
+TEST_F(BitFieldTest, simulate1)
 {
-    PlainField pf(".RBRB."
-                  "RBRBR."
-                  "RBRBR."
-                  "RBRBRR");
-    BitField bf(pf);
-    RensaResult rensaResult = bf.simulate();
+    CoreField cf(".RBRB."
+                 "RBRBR."
+                 "RBRBR."
+                 "RBRBRR");
+    BitField bf(cf);
 
-    EXPECT_EQ(5, rensaResult.chains);
+    RensaResult cfResult = cf.simulate();
+    RensaResult bfResult = bf.simulate();
+    EXPECT_EQ(cfResult, bfResult);
+}
+
+TEST_F(BitFieldTest, simulate2)
+{
+    CoreField cf(
+        ".YGGY."
+        "BBBBBB"
+        "GYBBYG"
+        "BBBBBB");
+    BitField bf(cf);
+
+    RensaResult cfResult = cf.simulate();
+    RensaResult bfResult = bf.simulate();
+    EXPECT_EQ(cfResult, bfResult);
+}
+
+TEST_F(BitFieldTest, simulate3)
+{
+    CoreField cf(
+        "BBBBBB"
+        "GYBBYG"
+        "BBBBYB");
+    BitField bf(cf);
+
+    RensaResult cfResult = cf.simulate();
+    RensaResult bfResult = bf.simulate();
+    EXPECT_EQ(cfResult, bfResult);
 }
 
 TEST_F(BitFieldTest, vanish1)

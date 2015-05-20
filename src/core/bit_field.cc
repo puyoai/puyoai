@@ -84,6 +84,7 @@ int BitField::drop(FieldBits erased)
     // new bits = BLEND(bits, v4, blender)
     const __m128i zero = _mm_setzero_si128();
     const __m128i ones = _mm_cmpeq_epi8(zero, zero);
+    const __m128i whole = _mm_andnot_si128(erased.xmm(), _mm_or_si128(m_[0].xmm(), _mm_or_si128(m_[1].xmm(), m_[2].xmm())));
 
     int wholeErased = erased.horizontalOr16();
     int maxY = 31 - __builtin_clz(wholeErased);
@@ -104,6 +105,10 @@ int BitField::drop(FieldBits erased)
     __m128i rightOnes = _mm_set1_epi16((1 << (maxY + 1)) - 1);
     __m128i leftOnes = _mm_set1_epi16(~((1 << ((maxY + 1) + 1)) - 1));
 
+    // if exists -> -1, others -> 0
+    __m128i dropAmount = zero;
+    __m128i exists = _mm_cmpeq_epi16(_mm_and_si128(line, whole), line);
+
     for (int y = maxY; y >= minY; --y) {
         line = _mm_srli_epi16(line, 1);
         rightOnes = _mm_srai_epi16(rightOnes, 1); // arith shift
@@ -122,8 +127,13 @@ int BitField::drop(FieldBits erased)
             m = _mm_blendv_epi8(m, v4, blender);
             m_[i] = FieldBits(m);
         }
+
+        __m128i adder = _mm_and_si128(blender, exists);
+        dropAmount = _mm_sub_epi16(dropAmount, adder);
+        exists = _mm_or_si128(exists, _mm_cmpeq_epi16(_mm_and_si128(line, whole), line));
     }
 
-    // TODO(mayah): Needs to return the max drop.
-    return 0;
+    // We have _mm_minpos_epu16, but not _mm_maxpos_epu16. So, taking xor 1.
+    int maxDropAmountNegative = _mm_cvtsi128_si32(_mm_minpos_epu16(_mm_xor_si128(ones, dropAmount)));
+    return ~maxDropAmountNegative & 0xFF;
 }
