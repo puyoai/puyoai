@@ -47,6 +47,22 @@ int BitField::vanish(int chain, FieldBits* erased)
             continue;
 
         ++numColors;
+
+        // fast path. In most cases, 8>= puyos won't be erased.
+        // When 7<= puyos are erased, it won't be separated.
+        {
+            FieldBits expanded = seed.expand(mask);
+            int popcount = expanded.popcount();
+            if (popcount <= 7) {
+                numErased += popcount;
+                longBonusCoef += longBonus(popcount);
+                erased->setAll(expanded);
+                mask.unsetAll(expanded);
+                continue;
+            }
+        }
+
+        // slow path...
         seed.iterateBit([&](FieldBits x) {
             if (mask.testz(x))
                 return;
