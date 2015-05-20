@@ -152,23 +152,17 @@ FieldBits FieldBits::vanishingSeed() const
     __m128i l = _mm_and_si128(_mm_slli_si128(m_, 2), m_);
     __m128i r = _mm_and_si128(_mm_srli_si128(m_, 2), m_);
 
-    __m128i ud = _mm_and_si128(u, d);
-    __m128i ul = _mm_and_si128(u, l);
-    __m128i ur = _mm_and_si128(u, r);
-    __m128i dl = _mm_and_si128(d, l);
-    __m128i dr = _mm_and_si128(d, r);
-    __m128i lr = _mm_and_si128(l, r);
+    __m128i ud_and = _mm_and_si128(u, d);
+    __m128i lr_and = _mm_and_si128(l, r);
+    __m128i ud_or = _mm_or_si128(u, d);
+    __m128i lr_or = _mm_or_si128(l, r);
 
-    __m128i udr = _mm_and_si128(ud, r);
-    __m128i udl = _mm_and_si128(ud, l);
-    __m128i dlr = _mm_and_si128(d, lr);
-    __m128i ulr = _mm_and_si128(u, lr);
+    __m128i threes = _mm_or_si128(
+        _mm_and_si128(ud_and, lr_or),
+        _mm_and_si128(lr_and, ud_or));
 
-    __m128i threes = _mm_or_si128(_mm_or_si128(dlr, ulr), _mm_or_si128(udr, udl));
-
-    __m128i twos = _mm_or_si128(_mm_or_si128(ud, ul),
-                                _mm_or_si128(_mm_or_si128(ur, dl),
-                                             _mm_or_si128(dr, lr)));
+    __m128i twos = _mm_or_si128(_mm_or_si128(
+        _mm_and_si128(ud_or, lr_or), ud_and), lr_and);
 
     __m128i two_u = _mm_and_si128(_mm_slli_epi16(twos, 1), twos);
     __m128i two_l = _mm_and_si128(_mm_slli_si128(twos, 2), twos);
