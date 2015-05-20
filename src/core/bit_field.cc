@@ -79,21 +79,29 @@ int BitField::drop(FieldBits erased)
     const __m128i zero = _mm_setzero_si128();
     const __m128i ones = _mm_cmpeq_epi8(zero, zero);
 
+    //        MSB      y      LSB
+    // line  : 0 ... 0 1 0 ... 0
+    // right : 0 ... 0 0 1 ... 1
+    // left  : 1 ... 1 0 0 ... 0
+
     __m128i line = _mm_set1_epi16(1 << 13);
+    __m128i rightOnes = _mm_set1_epi16((1 << 13) - 1);
+    __m128i leftOnes = _mm_set1_epi16(~((1 << (13 + 1)) - 1));
 
     for (int y = 12; y >= 1; --y) {
         line = _mm_srli_epi16(line, 1);
+        rightOnes = _mm_srai_epi16(rightOnes, 1); // arith shift
+        leftOnes = _mm_srai_epi16(leftOnes, 1); // arigh shift.
+
         __m128i blender = _mm_xor_si128(_mm_cmpeq_epi16(_mm_and_si128(line, erased.xmm()), zero), ones);
         if (FieldBits(blender).isEmpty())
             continue;
 
-        const __m128i leftOnes = _mm_set1_epi16((1 << y) - 1);
-        const __m128i rightOnes = _mm_set1_epi16(~((1 << (y + 1)) - 1));
 
         for (int i = 0; i < 3; ++i) {
             __m128i m = m_[i].xmm();
-            __m128i v1 = _mm_and_si128(leftOnes, m);
-            __m128i v2 = _mm_and_si128(rightOnes, m);
+            __m128i v1 = _mm_and_si128(rightOnes, m);
+            __m128i v2 = _mm_and_si128(leftOnes, m);
             __m128i v3 = _mm_srli_epi16(v2, 1);
             __m128i v4 = _mm_or_si128(v1, v3);
             // _mm_blend_epi16 takes const int for parameter, so let's use blendv_epi8.
