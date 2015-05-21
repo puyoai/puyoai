@@ -6,7 +6,6 @@
 #include "core/rensa_result.h"
 
 // BitsField is a field implementation that uses FieldBits.
-// TODO(mayah): Implement this.
 class BitField {
 public:
     explicit BitField(const PlainField&);
