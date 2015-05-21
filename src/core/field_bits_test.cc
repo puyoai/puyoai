@@ -6,9 +6,11 @@
 
 #include <gtest/gtest.h>
 
+#include <iostream>
+
 using namespace std;
 
-TEST(FieldBitsTest, ctor)
+TEST(FieldBitsTest, ctor1)
 {
     FieldBits bits;
     for (int x = 0; x < 8; ++x) {

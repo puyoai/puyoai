@@ -80,11 +80,10 @@ public:
     friend bool operator!=(FieldBits lhs, FieldBits rhs) { return !(lhs == rhs); }
 
 private:
-    static const __m128i s_table_[128];
     static __m128i onebit(int x, int y)
     {
         DCHECK(0 <= x && x < 8 && 0 <= y && y < 16) << "x=" << x << " y=" << y;
-        return s_table_[x * 16 + y];
+        return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, x);
     }
 
     __m128i m_;
