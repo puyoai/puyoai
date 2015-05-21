@@ -120,15 +120,16 @@ int BitField::drop(FieldBits erased)
     __m128i rightOnes = _mm_set1_epi16((1 << (maxY + 1)) - 1);
     __m128i leftOnes = _mm_set1_epi16(~((1 << ((maxY + 1) + 1)) - 1));
 
-    // if exists -> -1, others -> 0
     __m128i dropAmount = zero;
+    // For each line, -1 if there exists dropping puyo, 0 otherwise.
     __m128i exists = _mm_cmpeq_epi16(_mm_and_si128(line, whole), line);
 
     for (int y = maxY; y >= minY; --y) {
         line = _mm_srli_epi16(line, 1);
-        rightOnes = _mm_srai_epi16(rightOnes, 1); // arith shift
-        leftOnes = _mm_srai_epi16(leftOnes, 1); // arigh shift.
+        rightOnes = _mm_srai_epi16(rightOnes, 1);
+        leftOnes = _mm_srai_epi16(leftOnes, 1);   // needs arithmetic shift.
 
+        // for each line, -1 if drop, 0 otherwise.
         __m128i blender = _mm_xor_si128(_mm_cmpeq_epi16(_mm_and_si128(line, erased.xmm()), zero), ones);
         DCHECK(!FieldBits(blender).isEmpty());
 
@@ -143,8 +144,9 @@ int BitField::drop(FieldBits erased)
             m_[i] = FieldBits(m);
         }
 
-        __m128i adder = _mm_and_si128(blender, exists);
-        dropAmount = _mm_sub_epi16(dropAmount, adder);
+        // both blender and exists are -1, puyo will drop 1.
+        // -(-1) = +1
+        dropAmount = _mm_sub_epi16(dropAmount, _mm_and_si128(blender, exists));
         exists = _mm_or_si128(exists, _mm_cmpeq_epi16(_mm_and_si128(line, whole), line));
     }
 
