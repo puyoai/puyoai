@@ -99,7 +99,7 @@ public:
         EvaluatorBase(patternBook),
         sc_(sc) {}
 
-    void evalPatternScore(const ColumnPuyoList& puyosToComplement, double patternScore);
+    void evalPatternScore(const ColumnPuyoList& puyosToComplement, double patternScore, int chains);
     void evalRensaScore(double score, double virtualScore);
     void evalRensaChainFeature(const RensaResult&, const PuyoSet&);
     void evalRensaGarbage(const CoreField& fieldAfterRensa);

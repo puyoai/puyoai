@@ -106,7 +106,7 @@ ABAC = [1, 0]
 ABBB = [3, 0]
 ABCC = [1, 0] # [3, 0]?
 ABBC = [3, 0]
-CCAB = [5, 1]
+CCAB = [1, 2] # [5, 1]?
 CCAC = [1, 2]
 CCBC = [5, 1]
 CCCC = [1, 2]
@@ -363,6 +363,7 @@ field = [
     "AAA...",
 ]
 ABBC = [2, 3]
+ABBD = [4, 2] # other?
 ABAC = [2, 3]
 ADBB = [4, 2]
 ADBC = [4, 2]

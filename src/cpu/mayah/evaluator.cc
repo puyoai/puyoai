@@ -482,8 +482,10 @@ void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalPatternScore(const ColumnPuyoList& cpl, double patternScore)
+void RensaEvaluator<ScoreCollector>::evalPatternScore(const ColumnPuyoList& cpl, double patternScore, int chains)
 {
+    if (chains > 0)
+        sc_->addScore(PATTERN_BOOK_DIV_RENSA, patternScore / chains);
     sc_->addScore(PATTERN_BOOK, patternScore);
 
     int numPlaceHolders = 0;
@@ -666,7 +668,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, trackResult);
         rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyoSet);
         rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
-        rensaEvaluator.evalPatternScore(puyosToComplement, patternScore);
+        rensaEvaluator.evalPatternScore(puyosToComplement, patternScore, rensaResult.chains);
         rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, trackResult); // fieldBeforeRensa is correct.
         rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
         rensaEvaluator.evalComplementationBias(puyosToComplement);
