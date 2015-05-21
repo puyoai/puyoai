@@ -841,6 +841,26 @@ score = 8.0
 ignition = 2
 
 [[pattern]]
+name = "NEWGTR"
+field = [
+    ".ABC..",
+    "AAABCC",
+    "BBB.C&",
+]
+score = 8.5
+ignition = 2
+
+[[pattern]]
+name = "NEWGTR"
+field = [
+    "A.BC..",
+    "AAABCC",
+    "BBB.C&",
+]
+score = 8.5
+ignition = 1
+
+[[pattern]]
 field = [
     ".AB.C.",
     "AAABB.",
@@ -1120,7 +1140,7 @@ field = [
     ".....C",
     "...BCC",
     "..AABB",
-    "AAABC.",
+    "AAABC&",
 ]
 ignition = 3
 score = 9.0
@@ -1147,13 +1167,13 @@ score = 5.0
 
 [[pattern]]
 field = [
-    "...B.c",
+    "...B.C",
     "...B.C",
     "..AABB",
     "AAA.CC",
 ]
 ignition = 3
-score = 8.0
+score = 5.0
 
 # ----------------------------------------------------------------------
 # NEWGTR-TAIL-2

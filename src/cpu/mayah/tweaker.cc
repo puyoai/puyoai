@@ -344,19 +344,26 @@ int main(int argc, char* argv[])
         runAutoTweaker(executor.get(), paramMap, FLAGS_auto_count);
 #endif
     } else {
-        map<pair<double, double>, RunResult> scoreMap;
-        for (double x = 10; x <= 140; x += 10) {
-            for (double y = 10; y <= x; y += 10) {
-                cout << "current (x, y) = " << x << ' ' << y << endl;
+        typedef tuple<double, double, double> ScoreMapKey;
 
-                paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::MIDDLE, PATTERN_BOOK, x);
-                paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, PATTERN_BOOK, y);
+        map<ScoreMapKey, RunResult> scoreMap;
+        for (double x = 520; x <= 520; x += 30) {
+            for (double y = 320; y <= 320; y += 30) {
+                    for (double z = 60; z <= 160; z += 20) {
+                    cout << "current (x, y, z) = " << x << ' ' << y << ' ' << z << endl;
 
-                scoreMap[make_pair(x, y)] = run(executor.get(), paramMap);
+                    paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::INITIAL, PATTERN_BOOK_DIV_RENSA, x); // 520
+                    paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::EARLY, PATTERN_BOOK_DIV_RENSA, x); // 520
+                    paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::MIDDLE, PATTERN_BOOK_DIV_RENSA, y); // 320
+                    paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, PATTERN_BOOK_DIV_RENSA, z); // 80
+
+                    scoreMap[ScoreMapKey(x, y, z)] = run(executor.get(), paramMap);
+                }
             }
         }
         for (const auto& m : scoreMap) {
-            cout << setw(5) << m.first.first << ' ' << m.first.second << " -> " << m.second.sumScore
+            cout << setw(5) << get<0>(m.first) << ' ' << get<1>(m.first) << ' ' << get<2>(m.first)
+                 << " -> " << m.second.sumScore
                  << " / " << m.second.mainRensaCount
                  << " / " << m.second.aveMainRensaScore
                  << " / " << m.second.over40000Count
