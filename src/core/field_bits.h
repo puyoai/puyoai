@@ -28,7 +28,11 @@ public:
     void set(int x, int y) { m_ = _mm_or_si128(onebit(x, y), m_); }
     void unset(int x, int y) { m_ = _mm_andnot_si128(onebit(x, y), m_); }
 
-    FieldBits masked() const { return FieldBits(_mm_and_si128(FIELD_MASK, m_)); }
+    FieldBits masked() const
+    {
+        const auto mask = _mm_set_epi16(0, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0);
+        return FieldBits(_mm_and_si128(mask, m_));
+    }
     void setAll(const FieldBits& fb) { m_ = _mm_or_si128(fb.m_, m_); }
     void unsetAll(const FieldBits& fb) { m_ = _mm_andnot_si128(fb.m_, m_); }
 

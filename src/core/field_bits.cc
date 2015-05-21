@@ -4,8 +4,6 @@
 
 using namespace std;
 
-const __m128i FieldBits::FIELD_MASK = _mm_set_epi16(0, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0);
-
 const __m128i FieldBits::s_table_[128] = {
     _mm_set_epi32(0x00000000, 0x00000000, 0x00000000, 0x00000001),
     _mm_set_epi32(0x00000000, 0x00000000, 0x00000000, 0x00000002),
