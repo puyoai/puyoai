@@ -37,6 +37,76 @@ TEST_F(BitFieldTest, ctor)
 
 TEST_F(BitFieldTest, simulate1)
 {
+    CoreField cf(
+        ".BBBB.");
+    BitField bf(cf);
+
+    RensaResult result = bf.simulate();
+    EXPECT_EQ(1, result.chains);
+    EXPECT_EQ(40, result.score);
+    EXPECT_EQ(FRAMES_VANISH_ANIMATION, result.frames);
+    EXPECT_TRUE(result.quick);
+}
+
+TEST_F(BitFieldTest, simulate2)
+{
+    CoreField cf(
+        "BBBBBB");
+    BitField bf(cf);
+
+    RensaResult result = bf.simulate();
+    EXPECT_EQ(1, result.chains);
+    EXPECT_EQ(60 * 3, result.score);
+    EXPECT_EQ(FRAMES_VANISH_ANIMATION, result.frames);
+    EXPECT_TRUE(result.quick);
+}
+
+TEST_F(BitFieldTest, simulate3)
+{
+    CoreField cf(
+        "YYYY.."
+        "BBBB..");
+    BitField bf(cf);
+
+    RensaResult result = bf.simulate();
+    EXPECT_EQ(1, result.chains);
+    EXPECT_EQ(80 * 3, result.score);
+    EXPECT_EQ(FRAMES_VANISH_ANIMATION, result.frames);
+    EXPECT_TRUE(result.quick);
+}
+
+TEST_F(BitFieldTest, simulate4)
+{
+    CoreField cf(
+        "YYYYYY"
+        "BBBBBB");
+    BitField bf(cf);
+
+    RensaResult result = bf.simulate();
+    EXPECT_EQ(1, result.chains);
+    EXPECT_EQ(120 * (3 + 3 + 3), result.score);
+    EXPECT_EQ(FRAMES_VANISH_ANIMATION, result.frames);
+    EXPECT_TRUE(result.quick);
+}
+
+TEST_F(BitFieldTest, simulate5)
+{
+    CoreField cf(
+        ".YYYG."
+        "BBBBY.");
+    BitField bf(cf);
+
+    RensaResult result = bf.simulate();
+    EXPECT_EQ(2, result.chains);
+    EXPECT_EQ(40 + 40 * 8, result.score);
+    EXPECT_EQ(FRAMES_VANISH_ANIMATION * 2 +
+              FRAMES_TO_DROP_FAST[1] * 2 +
+              FRAMES_GROUNDING * 2, result.frames);
+    EXPECT_FALSE(result.quick);
+}
+
+TEST_F(BitFieldTest, simulate6)
+{
     CoreField cf(".RBRB."
                  "RBRBR."
                  "RBRBR."
@@ -48,7 +118,7 @@ TEST_F(BitFieldTest, simulate1)
     EXPECT_EQ(cfResult, bfResult);
 }
 
-TEST_F(BitFieldTest, simulate2)
+TEST_F(BitFieldTest, simulate7)
 {
     CoreField cf(
         ".YGGY."
@@ -62,7 +132,7 @@ TEST_F(BitFieldTest, simulate2)
     EXPECT_EQ(cfResult, bfResult);
 }
 
-TEST_F(BitFieldTest, simulate3)
+TEST_F(BitFieldTest, simulate8)
 {
     CoreField cf(
         "BBBBBB"
