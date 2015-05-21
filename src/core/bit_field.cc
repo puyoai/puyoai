@@ -101,17 +101,15 @@ int BitField::drop(FieldBits erased)
     // new bits = BLEND(bits, v4, blender)
     const __m128i zero = _mm_setzero_si128();
     const __m128i ones = _mm_cmpeq_epi8(zero, zero);
-    const __m128i whole = _mm_andnot_si128(erased.xmm(), _mm_or_si128(m_[0].xmm(), _mm_or_si128(m_[1].xmm(), m_[2].xmm())));
+    const __m128i whole = _mm_andnot_si128(erased.xmm(),
+        _mm_or_si128(m_[0].xmm(), _mm_or_si128(m_[1].xmm(), m_[2].xmm())));
 
     int wholeErased = erased.horizontalOr16();
     int maxY = 31 - __builtin_clz(wholeErased);
     int minY = __builtin_ctz(wholeErased);
 
-    DCHECK_LE(1, minY) << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
-    DCHECK_LE(1, maxY) << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
-    DCHECK_LE(minY, 12) << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
-    DCHECK_LE(maxY, 12) << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
-    DCHECK_LE(minY, maxY) << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
+    DCHECK(1 <= minY && minY <= maxY && maxY <= 12)
+        << "minY=" << minY << ' ' << "maxY=" << maxY << endl << erased.toString();
 
     //        MSB      y      LSB
     // line  : 0 ... 0 1 0 ... 0
