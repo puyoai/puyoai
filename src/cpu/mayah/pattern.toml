@@ -1816,7 +1816,7 @@ field = [
 ]
 name = "DAA"
 ignition = 1
-score = 7.8
+score = 6.0
 
 # ----------------------------------------------------------------------
 # DAA-HEAD-1
@@ -1831,7 +1831,7 @@ field = [
     "BCC..."
 ]
 ignition = 2
-score = 8.0
+score = 7.0
 
 [[pattern]]
 field = [
@@ -1844,7 +1844,7 @@ field = [
     "BCC..."
 ]
 ignition = 2
-score = 8.0
+score = 7.0
 
 # ----------------------------------------------------------------------
 # DAA-HEAD-3
@@ -1887,7 +1887,7 @@ field = [
     "ABBC.."
 ]
 ignition = 1
-score = 8.0
+score = 7.0
 
 [[pattern]]
 field = [
@@ -1896,7 +1896,7 @@ field = [
     "ABBCC."
 ]
 ignition = 1
-score = 7.8
+score = 6.8
 
 [[pattern]]
 field = [
@@ -1905,7 +1905,7 @@ field = [
     ".AABCC"
 ]
 ignition = 2
-score = 8.0
+score = 7.0
 
 [[pattern]]
 field = [
@@ -1923,7 +1923,7 @@ field = [
     ".AABBC"
 ]
 ignition = 2
-score = 8.0
+score = 7.0
 
 [[pattern]]
 field = [
