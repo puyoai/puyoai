@@ -1735,6 +1735,17 @@ name = "ZABUTONL"
 ignition = 1
 score = 8.8
 
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AA&CC.",
+    "BBBC&."
+]
+name = "ZABUTONL"
+ignition = 1
+score = 8.5
+
 # ----------------------------------------------------------------------
 # ZABUTONL-HEAD-1
 
@@ -1779,6 +1790,16 @@ field = [
     "..B.C.",
     ".A&BBC",
     "AAACBC"
+]
+ignition = 2
+score = 7.5
+
+[[pattern]]
+field = [
+    "......",
+    "..B.C.",
+    ".A&BBC",
+    "AAABCC"
 ]
 ignition = 2
 score = 7.5
