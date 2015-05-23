@@ -886,7 +886,7 @@ TEST(RensaDetectorTest, iteratePossibleRensasIteratively_DontCrash)
     RensaDetector::iteratePossibleRensasIteratively(f, 2, RensaDetectorStrategy::defaultDropStrategy(), callback);
 }
 
-TEST(RensaDetectorTest, complementKeyPuyos)
+TEST(RensaDetectorTest, complementKeyPuyos1)
 {
     CoreField original("...RRR");
 
@@ -909,14 +909,14 @@ TEST(RensaDetectorTest, complementKeyPuyos)
             }
         }
     };
-    RensaDetector::complementKeyPuyos(original, RensaDetectorStrategy::defaultDropStrategy(), 1, callback);
+    RensaDetector::complementKeyPuyos(original, RensaDetectorStrategy::defaultDropStrategy(), 1, 1, callback);
 
     for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
         EXPECT_TRUE(found[i]);
     }
 }
 
-TEST(RensaDetectorTest, complementOneTypeKeyPuyos)
+TEST(RensaDetectorTest, complementKeyPuyos2)
 {
     const CoreField original("...RRR");
 
@@ -959,7 +959,7 @@ TEST(RensaDetectorTest, complementOneTypeKeyPuyos)
             EXPECT_NE(unexpected[i], cf);
         }
     };
-    RensaDetector::complementOneTypeKeyPuyos(original, RensaDetectorStrategy::defaultDropStrategy(), 2, callback);
+    RensaDetector::complementKeyPuyos(original, RensaDetectorStrategy::defaultDropStrategy(), 1, 2, callback);
 
     for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
         EXPECT_TRUE(found[i]) << i;
