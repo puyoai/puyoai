@@ -14,6 +14,8 @@
 
 DEFINE_bool(change_if_beated, true,
             "If true, AI will be changed when beated. If false, AI will be changed by one game");
+DEFINE_bool(change_random, false,
+            "If true, AI will be changed randomly. Otherwise, sequencially selected.");
 
 using namespace std;
 
@@ -73,7 +75,11 @@ private:
     void chooseAI()
     {
         DCHECK_LT(0UL, ais_.size());
-        index_ = uniform_int_distribution<int>(0, ais_.size() - 1)(rnd_);
+        if (FLAGS_change_random) {
+            index_ = uniform_int_distribution<int>(0, ais_.size() - 1)(rnd_);
+        } else {
+            index_ = (index_ + 1) % ais_.size();
+        }
 
         LOG(INFO) << "Current CPU: " << current().name();
     }
@@ -97,10 +103,10 @@ int main(int argc, char* argv[])
 
     Kantoku kantoku;
     kantoku.add("mayah-1", "../mayah/run.sh");
-    kantoku.add("mayah-2", "../mayah/run.sh");
-    kantoku.add("mayah-3", "../mayah/run.sh");
     kantoku.add("nidub", "../test_lockit/nidub.sh");
+    kantoku.add("mayah-2", "../mayah/run.sh");
     kantoku.add("rendaS9", "../test_lockit/rendaS9.sh");
+    kantoku.add("mayah-3", "../mayah/run.sh");
     kantoku.add("rendaGS9", "../test_lockit/rendaGS9.sh");
 
     kantoku.runLoop();
