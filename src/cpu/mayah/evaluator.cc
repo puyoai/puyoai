@@ -328,14 +328,18 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFra
     if (me.hasZenkeshi && !enemy.hasZenkeshi) {
         if (!enemy.isRensaOngoing()) {
             sc_->addScore(STRATEGY_SCORE, plan.score());
-            sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
+            sc_->addScore(STRATEGY_SOLO_ZENKESHI_CONSUME, 1);
             return false;
         }
         if (plan.pendingOjama() + plan.fixedOjama() <= 36) {
             sc_->addScore(STRATEGY_SCORE, plan.score());
-            sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
+            sc_->addScore(STRATEGY_SOLO_ZENKESHI_CONSUME, 1);
             return false;
         }
+    }
+
+    if (me.hasZenkeshi && enemy.hasZenkeshi) {
+        sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
     }
 
     sc_->addScore(STRATEGY_SCORE, plan.score());
@@ -550,14 +554,18 @@ CollectedCoef Evaluator<ScoreCollector>::calculateDefaultCoef(const PlayerState&
     const int MIDDLE_THRESHOLD = 36;
     const int LATE_THRESHOLD = 54;
 
+    const int count = me.field.countPuyos();
+
     CollectedCoef coef;
 
     if (enemy.hasZenkeshi) {
-        coef.setCoef(EvaluationMode::ENEMY_HAS_ZENKESHI, 1.0);
+        if (count <= EARLY_THRESHOLD)
+            coef.setCoef(EvaluationMode::ENEMY_HAS_ZENKESHI, 1.0);
+        else
+            coef.setCoef(EvaluationMode::ENEMY_HAS_ZENKESHI_MIDDLE, 1.0);
         return coef;
     }
 
-    int count = me.field.countPuyos();
     if (count <= INITIAL_THRESHOLD && me.hand <= 8) {
         coef.setCoef(EvaluationMode::INITIAL, 1.0);
         return coef;
@@ -617,6 +625,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     evalValleyDepth(fieldBeforeRensa);
     evalRidgeHeight(fieldBeforeRensa);
     evalFieldUShape(fieldBeforeRensa);
+    evalFieldRightBias(fieldBeforeRensa);
     evalUnreachableSpace(fieldBeforeRensa);
     evalFallenOjama(plan.fallenOjama());
 
