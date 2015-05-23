@@ -575,7 +575,7 @@ void RensaDetector::iteratePossibleRensas(const CoreField& originalField,
         if (rensaResult.chains > 0)
             callback(cf, rensaResult, cpl);
     };
-    detectWithAddingKeyPuyos(originalField, strategy, maxKeyPuyos, cb);
+    detectWithAddingKeyPuyos(originalField, strategy, maxKeyPuyos, 1, cb);
 }
 
 void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& originalField,

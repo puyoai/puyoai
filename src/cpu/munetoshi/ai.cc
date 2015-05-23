@@ -173,6 +173,7 @@ munetoshi::grade munetoshi::AI::evaluate(
     RensaDetector::detectWithAddingKeyPuyos(core_field,
                                             RensaDetectorStrategy::defaultFloatStrategy(),
                                             1,
+                                            1,
                                             callback);
     return optimal_grade;
 }

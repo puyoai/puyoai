@@ -3,6 +3,7 @@
 
 #include <functional>
 
+#include "base/base.h"
 #include "core/algorithm/rensa_detector_strategy.h"
 #include "core/field_constant.h"
 
@@ -48,30 +49,16 @@ public:
 
     // TODO(mayah): Consider simplify these methods.
 
-    // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
-    static void iteratePossibleRensas(const CoreField&,
-                                      int maxKeyPuyo,
-                                      const RensaDetectorStrategy&,
-                                      const RensaCallback&);
-
-    static void iteratePossibleRensasWithTracking(const CoreField&,
-                                                  int maxKeyPuyos,
-                                                  const RensaDetectorStrategy&,
-                                                  const TrackedPossibleRensaCallback&);
-
-    static void iteratePossibleRensasWithCoefTracking(const CoreField&,
-                                                      int maxKeyPuyos,
-                                                      const RensaDetectorStrategy&,
-                                                      const CoefPossibleRensaCallback&);
-
-    // Complements at most |maxKeyPuyos| key puyos.
+    // Complements at most |maxIteration| key puyos.
+    // For each iteration the same |maxKeyPuyosAtOnce| puyo are complemented in the same column.
     // Callback is void callback(const CoreField&, const ColumnPuyoList&).
     // The complemented field and complemented ColumnPuyoList are passed.
     // Any puyo won't be erased when key puyos are complemented.
     template<typename Callback>
     static void complementKeyPuyos(const CoreField&,
                                    const RensaDetectorStrategy&,
-                                   int maxKeyPuyos,
+                                   int maxIteration,
+                                   int maxKeyPuyosAtOnce,
                                    Callback);
 
     // Complements key puyos on 13th row.
@@ -81,15 +68,7 @@ public:
                                             const bool allowsComplements[FieldConstant::MAP_WIDTH],
                                             Callback);
 
-    // Complements one type key puyos. For each row, we put at most |maxPuyos| puyos.
-    // 1 + 6 * 4 * maxPuyos times.
-    // Callback is void callback(const CoreField&, const ColumnPuyoList&).
-    // This might be useful if you'd like to find 2-double or something.
-    template<typename Callback>
-    static void complementOneTypeKeyPuyos(const CoreField&, const RensaDetectorStrategy&,
-                                          int maxPuyos, Callback);
-
-    // Complements at most |maxKeyPuyos| key puyos.
+    // Detects rensa after complementing key puyos.
     // Also, complements fire puyos.
     // The complemented field and complemented ColumnPuyoList are passed.
     // Any puyo won't be erased when key puyos are complemented.
@@ -98,7 +77,8 @@ public:
     template<typename Callback>
     static void detectWithAddingKeyPuyos(const CoreField&,
                                          const RensaDetectorStrategy&,
-                                         int maxKeyPuyos,
+                                         int maxIteration,
+                                         int maxKeyPuyosAtOnce,
                                          Callback);
 
     // Finds a rensa from CoreField. TrackedPossibleRensaCallback is called for all detected rensas.
@@ -112,6 +92,21 @@ public:
                                                  int maxIteration,
                                                  const RensaDetectorStrategy&,
                                                  const TrackedPossibleRensaCallback&);
+
+    // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
+    // TODO(mayah): Deprecates these 3 methods. Use detectWithAddingKeyPuyos instead.
+    static void iteratePossibleRensas(const CoreField&,
+                                      int maxKeyPuyo,
+                                      const RensaDetectorStrategy&,
+                                      const RensaCallback&);
+    static void iteratePossibleRensasWithTracking(const CoreField&,
+                                                  int maxKeyPuyos,
+                                                  const RensaDetectorStrategy&,
+                                                  const TrackedPossibleRensaCallback&);
+    static void iteratePossibleRensasWithCoefTracking(const CoreField&,
+                                                      int maxKeyPuyos,
+                                                      const RensaDetectorStrategy&,
+                                                      const CoefPossibleRensaCallback&);
 
 
     static void makeProhibitArray(const RensaResult&,

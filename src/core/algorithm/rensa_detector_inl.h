@@ -11,12 +11,13 @@
 template<typename Callback>
 void RensaDetector::complementKeyPuyos(const CoreField& originalField,
                                        const RensaDetectorStrategy& strategy,
-                                       int maxKeyPuyos,
+                                       int maxIteration,
+                                       int maxKeyPuyosAtOnce,
                                        Callback callback)
 {
     CoreField cf(originalField);
     ColumnPuyoList cpl;
-    complementKeyPuyosInternal(cf, cpl, strategy, 1, maxKeyPuyos, 1, callback);
+    complementKeyPuyosInternal(cf, cpl, strategy, 1, maxIteration, maxKeyPuyosAtOnce, callback);
 }
 
 // To avoid copying CoreField and ColumnPuyoList, we use one instance.
@@ -110,22 +111,12 @@ void RensaDetector::complementKeyPuyos13thRowInternal(CoreField& currentField,
     complementKeyPuyos13thRowInternal(currentField, currentKeyPuyos, allowsComplements, x + 1, callback);
 }
 
-template<typename Callback>
-void RensaDetector::complementOneTypeKeyPuyos(const CoreField& originalField,
-                                              const RensaDetectorStrategy& strategy,
-                                              int maxPuyos,
-                                              Callback callback)
-{
-    CoreField cf(originalField);
-    ColumnPuyoList cpl;
-    complementKeyPuyosInternal(cf, cpl, strategy, 1, 1, maxPuyos, callback);
-}
-
 // static
 template<typename Callback>
 void RensaDetector::detectWithAddingKeyPuyos(const CoreField& originalField,
                                              const RensaDetectorStrategy& strategy,
-                                             int maxKeyPuyos,
+                                             int maxIteration,
+                                             int maxKeyPuyosAtOnce,
                                              Callback callback)
 {
     const bool prohibits[FieldConstant::MAP_WIDTH] {};
@@ -139,7 +130,7 @@ void RensaDetector::detectWithAddingKeyPuyos(const CoreField& originalField,
         };
         detect(complementedField, strategy, PurposeForFindingRensa::FOR_FIRE, prohibits, detectionCallback);
     };
-    complementKeyPuyos(originalField, strategy, maxKeyPuyos, complementCallback);
+    complementKeyPuyos(originalField, strategy, maxIteration, maxKeyPuyosAtOnce, complementCallback);
 }
 
 #endif // CORE_ALGORITHM_RENSA_DETECTOR_INL_H_
