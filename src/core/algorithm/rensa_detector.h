@@ -93,6 +93,11 @@ public:
                                                  const RensaDetectorStrategy&,
                                                  const TrackedPossibleRensaCallback&);
 
+    // Finds 2-double (or more).
+    static void iterateSideChain(const CoreField&,
+                                 const RensaDetectorStrategy& strategy,
+                                 const TrackedPossibleRensaCallback& callback);
+
     // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
     // TODO(mayah): Deprecates these 3 methods. Use detectWithAddingKeyPuyos instead.
     static void iteratePossibleRensas(const CoreField&,

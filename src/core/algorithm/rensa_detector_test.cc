@@ -1008,3 +1008,36 @@ TEST(RensaDetectorTest, complementKeyPuyosOn13thRow2)
     RensaDetector::complementKeyPuyosOn13thRow(original, allowsComplements, callback);
     EXPECT_EQ(5 * 5 * 5 * 5 * 5, numCalled);
 }
+
+TEST(RensaDetectorTest, iterateSideChain)
+{
+    const CoreField original(
+        "B....."
+        "BY...."
+        "RR...."
+        "BYR..."
+        "BYR...");
+
+    const CoreField expected(
+        "BY...."
+        "BY...."
+        "RRR..."
+        "BYR..."
+        "BYR...");
+
+    bool found = false;
+    auto callback = [&](const CoreField& /*fieldAfterRensa*/,
+                        const RensaResult& /*rensaResult*/,
+                        const ColumnPuyoList& cpl,
+                        const RensaChainTrackResult& /*trackResult*/) {
+        CoreField cf(original);
+        cf.dropPuyoList(cpl);
+
+        if (cf == expected)
+            found = true;
+    };
+
+    RensaDetector::iterateSideChain(original, RensaDetectorStrategy::defaultDropStrategy(), callback);
+
+    EXPECT_TRUE(found);
+}
