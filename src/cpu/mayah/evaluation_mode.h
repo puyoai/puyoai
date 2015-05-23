@@ -11,6 +11,7 @@ enum class EvaluationMode {
     MIDDLE,
     LATE,
     ENEMY_HAS_ZENKESHI,
+    ENEMY_HAS_ZENKESHI_MIDDLE,
 };
 
 const EvaluationMode ALL_EVALUATION_MODES[] = {
@@ -19,6 +20,7 @@ const EvaluationMode ALL_EVALUATION_MODES[] = {
     EvaluationMode::MIDDLE,
     EvaluationMode::LATE,
     EvaluationMode::ENEMY_HAS_ZENKESHI,
+    EvaluationMode::ENEMY_HAS_ZENKESHI_MIDDLE,
 };
 
 inline int ordinal(EvaluationMode mode) { return static_cast<int>(mode); }
