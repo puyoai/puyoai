@@ -6,6 +6,8 @@
 
 using namespace std;
 
+DEFINE_bool(use_side_chain, false, "Use sidechain iteration");
+
 namespace {
 const int MAX_UNUSED_VARIABLES_FOR_FIRST_PATTERN = 0;
 const int MAX_UNUSED_VARIABLES = 1;
@@ -91,6 +93,19 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         RensaYPositionTracker tracker;
         iteratePossibleRensasInternal(complementedField, originalContext_, tracker, 0,
                                       firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0.0, false);
+
+        if (FLAGS_use_side_chain) {
+            auto sideChainEvalCallback = [&](const CoreField& fieldAfterRensa,
+                                             const RensaResult& rensaResult,
+                                             const ColumnPuyoList& puyosToComplement,
+                                             const RensaChainTrackResult& trackResult) {
+                // TODO(mayah): firePuyo should be accurate.
+                const PuyoColor firePuyoColor = PuyoColor::RED;
+                callback_(fieldAfterRensa, rensaResult, puyosToComplement, firePuyoColor, trackResult, "", 0.0);
+            };
+            RensaDetector::iterateSideChainFromDetectedField(
+                originalField_, originalContext_, complementedField, cpl, strategy_, sideChainEvalCallback);
+        }
     };
 
     const bool prohibits[FieldConstant::MAP_WIDTH] {};
