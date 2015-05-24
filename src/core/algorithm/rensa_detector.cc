@@ -745,50 +745,60 @@ void RensaDetector::iterateSideChain(const CoreField& originalField,
     const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
     const bool noProhibitedColumn[FieldConstant::MAP_WIDTH] {};
 
-    auto callbackFirst = [&](const CoreField& fireComplementedField, const ColumnPuyoList& firePuyos) {
-        CoreField fireCf(fireComplementedField);
-        CoreField::SimulationContext fireContext(originalContext);
-
-        for (int i = 0; i < 2; ++i) {
-            if (fireCf.vanishDrop(&fireContext).score == 0)
-                return;
-
-            bool prohibitedColumns[FieldConstant::MAP_WIDTH] {};
-            std::fill(prohibitedColumns, prohibitedColumns + FieldConstant::MAP_WIDTH, true);
-            for (int x = 1; x <= 6; ++x) {
-                if (fireComplementedField.height(x) == fireCf.height(x))
-                    continue;
-                prohibitedColumns[x] = false;
-                prohibitedColumns[x - 1] = false;
-                prohibitedColumns[x + 1] = false;
-            }
-            prohibitedColumns[0] = prohibitedColumns[FieldConstant::MAP_WIDTH - 1] = true;
-
-            auto callbackSecond = [&](const CoreField& complementedField, const ColumnPuyoList& keyPuyos) {
-                CoreField cf(complementedField);
-                CoreField::SimulationContext context(fireContext);
-                // Check we have 2-rensa.
-                if (cf.vanishDrop(&context).score == 0)
-                    return;
-                // Check we don't have 3-rensa.
-                if (cf.vanishDrop(&context).score > 0)
-                    return;
-
-                cf = originalField;
-                ColumnPuyoList cpl(keyPuyos);
-                cpl.merge(firePuyos);
-                cf.dropPuyoList(cpl);
-                context = originalContext;
-                RensaChainTracker tracker;
-                RensaResult rensaResult = cf.simulate(&context, &tracker);
-                const RensaChainTrackResult& trackResult = tracker.result();
-                callback(cf, rensaResult, cpl, trackResult);
-            };
-
-            // Finds 2-multi or 3-multi.
-            detect(fireCf, strategy, PurposeForFindingRensa::FOR_KEY, prohibitedColumns, callbackSecond);
-        }
+    auto callbackFirst = [&](const CoreField& fireComplementedField, const ColumnPuyoList& firePuyoList) {
+        iterateSideChainFromDetectedField(originalField, originalContext, fireComplementedField, firePuyoList, strategy, callback);
     };
 
     detect(originalField, strategy, PurposeForFindingRensa::FOR_FIRE, noProhibitedColumn, callbackFirst);
+}
+
+// static
+void RensaDetector::iterateSideChainFromDetectedField(const CoreField& originalField,
+                                                      const CoreField::SimulationContext& originalContext,
+                                                      const CoreField& fireDetectedField,
+                                                      const ColumnPuyoList& firePuyoList,
+                                                      const RensaDetectorStrategy& strategy,
+                                                      const TrackedPossibleRensaCallback& callback)
+{
+    CoreField detectedField(fireDetectedField);
+    CoreField::SimulationContext fireContext(originalContext);
+    for (int i = 0; i < 2; ++i) {
+        if (detectedField.vanishDrop(&fireContext).score == 0)
+            return;
+
+        bool prohibitedColumns[FieldConstant::MAP_WIDTH] {};
+        std::fill(prohibitedColumns, prohibitedColumns + FieldConstant::MAP_WIDTH, true);
+        for (int x = 1; x <= 6; ++x) {
+            if (detectedField.height(x) == fireDetectedField.height(x))
+                continue;
+            prohibitedColumns[x] = false;
+            prohibitedColumns[x - 1] = false;
+            prohibitedColumns[x + 1] = false;
+        }
+        prohibitedColumns[0] = prohibitedColumns[FieldConstant::MAP_WIDTH - 1] = true;
+
+        auto callbackSecond = [&](const CoreField& complementedField, const ColumnPuyoList& keyPuyos) {
+            CoreField cf(complementedField);
+            CoreField::SimulationContext context(fireContext);
+            // Check we have 2-rensa.
+            if (cf.vanishDrop(&context).score == 0)
+                return;
+            // Check we don't have 3-rensa.
+            if (cf.vanishDrop(&context).score > 0)
+                return;
+
+            cf = originalField;
+            ColumnPuyoList cpl(keyPuyos);
+            cpl.merge(firePuyoList);
+            cf.dropPuyoList(cpl);
+            context = originalContext;
+            RensaChainTracker tracker;
+            RensaResult rensaResult = cf.simulate(&context, &tracker);
+            const RensaChainTrackResult& trackResult = tracker.result();
+            callback(cf, rensaResult, cpl, trackResult);
+        };
+
+        // Finds 2-multi or 3-multi.
+        detect(detectedField, strategy, PurposeForFindingRensa::FOR_KEY, prohibitedColumns, callbackSecond);
+    }
 }
