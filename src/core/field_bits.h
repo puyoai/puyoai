@@ -16,10 +16,11 @@ public:
     static const __m128i FIELD_MASK;
 
     FieldBits() : m_(_mm_setzero_si128()) {}
-    explicit FieldBits(__m128i m) : m_(m) {}
+    FieldBits(__m128i m) : m_(m) {}
     FieldBits(int x, int y) : m_(onebit(x, y)) {}
     FieldBits(const PlainField&, PuyoColor);
 
+    operator __m128i&() { return m_; }
     __m128i& xmm() { return m_; }
     const __m128i& xmm() const { return m_; }
 
@@ -78,6 +79,9 @@ public:
         return FieldBits(_mm_xor_si128(lhs.m_, rhs.m_)).isEmpty();
     }
     friend bool operator!=(FieldBits lhs, FieldBits rhs) { return !(lhs == rhs); }
+
+    friend FieldBits operator&(FieldBits lhs, FieldBits rhs) { return _mm_and_si128(lhs, rhs); }
+    friend FieldBits operator|(FieldBits lhs, FieldBits rhs) { return _mm_or_si128(lhs, rhs); }
 
 private:
     static __m128i onebit(int x, int y)
