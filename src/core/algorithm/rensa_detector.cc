@@ -762,7 +762,7 @@ void RensaDetector::iterateSideChainFromDetectedField(const CoreField& originalF
 {
     CoreField detectedField(fireDetectedField);
     CoreField::SimulationContext fireContext(originalContext);
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < 1; ++i) {
         if (detectedField.vanishDrop(&fireContext).score == 0)
             return;
 
