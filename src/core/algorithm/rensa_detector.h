@@ -5,10 +5,10 @@
 
 #include "base/base.h"
 #include "core/algorithm/rensa_detector_strategy.h"
+#include "core/core_field.h"
 #include "core/field_constant.h"
 
 class ColumnPuyoList;
-class CoreField;
 class RensaChainTrackResult;
 class RensaCoefResult;
 class RensaVanishingPositionResult;
@@ -95,8 +95,14 @@ public:
 
     // Finds 2-double (or more).
     static void iterateSideChain(const CoreField&,
-                                 const RensaDetectorStrategy& strategy,
-                                 const TrackedPossibleRensaCallback& callback);
+                                 const RensaDetectorStrategy&,
+                                 const TrackedPossibleRensaCallback&);
+    static void iterateSideChainFromDetectedField(const CoreField& originalField,
+                                                  const CoreField::SimulationContext& originalContext,
+                                                  const CoreField& detectedField,
+                                                  const ColumnPuyoList& firePuyoList,
+                                                  const RensaDetectorStrategy&,
+                                                  const TrackedPossibleRensaCallback&);
 
     // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
     // TODO(mayah): Deprecates these 3 methods. Use detectWithAddingKeyPuyos instead.
