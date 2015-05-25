@@ -4,22 +4,9 @@ compiler:
   - clang
 
 before_script:
+  - sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu/ trusty main universe"
   - sudo apt-get update -qq
-  # google-gflags
-  - wget https://github.com/gflags/gflags/releases/download/v2.1.0/libgflags0_2.1.0-1_amd64.deb
-  - wget https://github.com/gflags/gflags/releases/download/v2.1.0/libgflags-dev_2.1.0-1_amd64.deb
-  - sudo dpkg -i libgflags0_2.1.0-1_amd64.deb
-  - sudo dpkg -i libgflags-dev_2.1.0-1_amd64.deb
-  # google-glog
-  - pushd $HOME
-  - git clone https://github.com/google/glog.git glog
-  - cd glog
-  - ./configure --prefix=/usr
-  - make -j4
-  - sudo make install
-  - popd
-  # build puyoai
-  - cd $HOME
+  - sudo apt-get install -y libgflags-dev libgoogle-glog-dev
   - mkdir -p out/Debug
   - cd out/Debug
   - cmake -DCMAKE_BUILD_TYPE=DEBUG ../../src
