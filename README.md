@@ -1,7 +1,8 @@
 puyoai
 ======
 
-https://travis-ci.org/puyoai/puyoai.svg?branch=master
+
+[![Build Status](https://travis-ci.org/puyoai/puyoai.svg?branch=master)](http://travis-ci.org/puyoai/puyoai)
 
 ぷよぷよ通のAIを書くためのフレームワークです。
 
