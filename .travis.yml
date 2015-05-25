@@ -13,4 +13,4 @@ before_script:
   - cmake -DCMAKE_BUILD_TYPE=DEBUG ../../src
 
 script:
-  - make && make test
+  - make -j4 && make test
