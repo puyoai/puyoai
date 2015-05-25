@@ -1,9 +1,11 @@
 puyoai
 ======
 
-ぷよぷよのAIを書くためのフレームワークです。
+https://travis-ci.org/puyoai/puyoai.svg?branch=master
 
-実際に動いているAIの例 http://www.nicovideo.jp/watch/sm26167419
+ぷよぷよ通のAIを書くためのフレームワークです。
+
+実際に動いているAIの例: http://www.nicovideo.jp/watch/sm26167419
 
 ## 前提環境
 
