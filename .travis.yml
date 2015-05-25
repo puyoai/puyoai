@@ -3,6 +3,8 @@ language: cpp
 compiler:
   - clang
 
+cache: apt
+
 before_script:
   - sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu/ trusty main universe"
   - sudo apt-get update -qq
