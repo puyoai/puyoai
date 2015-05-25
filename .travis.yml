@@ -6,7 +6,19 @@ compiler:
 
 before_script:
   - sudo apt-get update -qq
-  - sudo apt-get install -y libgflags-dev libgoogle-glog-dev
+  - sudo apt-get install -y libgflags-dev
+  # google-glog
+  - pushd $HOME
+  - svn checkout http://google-glog.googlecode.com/svn/trunk/ google-glog
+  - cd google-glog
+  - mkdir _build
+  - cd _build
+  - ../configure --prefix=/usr
+  - make -j4
+  - sudo make install
+  - popd
+  # build puyoai
+  - cd $HOME
   - mkdir -p out/Debug
   - cd out/Debug
   - cmake -DCMAKE_BUILD_TYPE=DEBUG ../../src
