@@ -1,12 +1,15 @@
 language: cpp
 
 compiler:
-  - gcc
   - clang
 
 before_script:
   - sudo apt-get update -qq
-  - sudo apt-get install -y libgflags-dev
+  # google-gflags
+  - wget https://github.com/gflags/gflags/releases/download/v2.1.0/libgflags0_2.1.0-1_amd64.deb
+  - wget https://github.com/gflags/gflags/releases/download/v2.1.0/libgflags-dev_2.1.0-1_amd64.deb
+  - sudo dpkg -i libgflags0_2.1.0-1_amd64.deb
+  - sudo dpkg -i libgflags-dev_2.1.0-1_amd64.deb
   # google-glog
   - pushd $HOME
   - svn checkout http://google-glog.googlecode.com/svn/trunk/ google-glog
