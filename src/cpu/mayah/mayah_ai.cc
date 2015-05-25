@@ -17,7 +17,7 @@
 #include "evaluator.h"
 #include "gazer.h"
 
-DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.toml", "the path to feature parameter");
+DEFINE_string(feature, "feature.toml", "the path to feature parameter");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
 DEFINE_bool(use_advanced_next, false, "Use enemy's NEXT sequence also");
@@ -50,7 +50,15 @@ bool MayahAI::saveEvaluationParameter() const
 
 bool MayahAI::loadEvaluationParameter()
 {
-    return evaluationParameterMap_.load(FLAGS_feature);
+    if (evaluationParameterMap_.load(FLAGS_feature))
+        return true;
+
+    // When not found, we try to load from the source directory.
+    std::string filename = string(SRC_DIR) + "/cpu/mayah/" + FLAGS_feature;
+    if (evaluationParameterMap_.load(filename))
+        return true;
+
+    return false;
 }
 
 DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& kumipuyoSeq,

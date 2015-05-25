@@ -22,6 +22,8 @@ bool EvaluationParameterMap::load(const string& filename)
 
     try {
         ifstream ifs(filename, ios::in);
+        if (!ifs)
+            return false;
         toml::Parser parser(ifs);
         value = parser.parse();
         if (!value.valid()) {
