@@ -30,6 +30,7 @@ TEST_F(BitFieldTest, ctor)
             PuyoColor c = pf.color(x, y);
             if (isNormalColor(c) || c == PuyoColor::OJAMA) {
                 EXPECT_TRUE(bf.isColor(x, y, c)) << x << ' ' << y << ' ' << c;
+                EXPECT_FALSE(bf.isEmpty(x, y));
             } else if (c == PuyoColor::EMPTY) {
                 EXPECT_TRUE(bf.isEmpty(x, y));
             }
