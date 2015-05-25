@@ -5,6 +5,8 @@ compiler:
   - clang
 
 before_script:
+  - sudo apt-get update -q
+  - sudo apt-get install libgflags-dev libgoogle-glog-dev
   - mkdir -p out/Debug
   - cd out/Debug
   - cmake -DCMAKE_BUILD_TYPE=DEBUG ../../src
