@@ -12,11 +12,9 @@ before_script:
   - sudo dpkg -i libgflags-dev_2.1.0-1_amd64.deb
   # google-glog
   - pushd $HOME
-  - svn checkout http://google-glog.googlecode.com/svn/trunk/ google-glog
-  - cd google-glog
-  - mkdir _build
-  - cd _build
-  - ../configure --prefix=/usr
+  - git clone https://github.com/google/glog.git glog
+  - cd glog
+  - ./configure --prefix=/usr
   - make -j4
   - sudo make install
   - popd
