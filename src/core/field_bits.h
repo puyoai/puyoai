@@ -13,8 +13,6 @@
 // Implemented using an xmm register.
 class FieldBits {
 public:
-    static const __m128i FIELD_MASK;
-
     FieldBits() : m_(_mm_setzero_si128()) {}
     FieldBits(__m128i m) : m_(m) {}
     FieldBits(int x, int y) : m_(onebit(x, y)) {}
