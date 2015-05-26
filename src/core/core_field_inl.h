@@ -3,6 +3,7 @@
 
 #include "core/column_puyo_list.h"
 #include "core/field_checker.h"
+#include "core/frame.h"
 #include "core/rensa_tracker.h"
 #include "core/score.h"
 

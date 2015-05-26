@@ -5,7 +5,6 @@
 #include <algorithm>
 
 #include "base/base.h"
-#include "core/constant.h"
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/field_pretty_printer.h"

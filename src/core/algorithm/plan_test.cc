@@ -1,7 +1,7 @@
 #include "core/algorithm/plan.h"
 
 #include <gtest/gtest.h>
-#include "core/constant.h"
+
 #include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
 

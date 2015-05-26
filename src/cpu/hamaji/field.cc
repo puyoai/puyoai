@@ -14,7 +14,6 @@
 
 #include "core/algorithm/rensa_detector.h"
 #include "core/column_puyo_list.h"
-#include "core/constant.h"
 #include "core/kumipuyo_seq.h"
 #include "core/puyo_controller.h"
 #include "core/rensa_result.h"
