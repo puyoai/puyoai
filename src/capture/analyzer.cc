@@ -3,8 +3,6 @@
 #include <sstream>
 #include <queue>
 
-#include "core/constant.h"
-
 using namespace std;
 
 namespace {

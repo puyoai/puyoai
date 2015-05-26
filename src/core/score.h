@@ -3,7 +3,9 @@
 
 #include <glog/logging.h>
 
-#include "core/constant.h"
+// TODO(mayah): We should consider that margin time has been expired.
+const int SCORE_FOR_OJAMA = 70;
+const int ZENKESHI_BONUS = SCORE_FOR_OJAMA * 6 * 5;
 
 constexpr int scoreForOjama(int num)
 {

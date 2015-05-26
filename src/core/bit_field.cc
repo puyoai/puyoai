@@ -3,6 +3,7 @@
 #include <smmintrin.h>
 #include <glog/logging.h>
 
+#include "core/frame.h"
 #include "core/score.h"
 
 using namespace std;

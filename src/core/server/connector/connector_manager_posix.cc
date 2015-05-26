@@ -13,7 +13,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "core/constant.h"
+#include "core/frame.h"
 #include "core/frame_response.h"
 #include "core/server/connector/connector.h"
 #include "core/player.h"

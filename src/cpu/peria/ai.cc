@@ -12,7 +12,6 @@
 #include "base/base.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
-#include "core/constant.h"
 #include "core/frame_request.h"
 
 #include "cpu/peria/evaluator.h"

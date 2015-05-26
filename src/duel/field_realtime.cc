@@ -9,9 +9,9 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "core/constant.h"
 #include "core/frame.h"
 #include "core/kumipuyo.h"
+#include "core/score.h"
 #include "duel/frame_context.h"
 
 using namespace std;

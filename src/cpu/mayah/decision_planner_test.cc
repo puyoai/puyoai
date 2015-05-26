@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 #include "base/unit.h"
-#include "core/constant.h"
 #include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
 

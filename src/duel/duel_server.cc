@@ -8,7 +8,6 @@
 
 #include <gflags/gflags.h>
 
-#include "core/constant.h"
 #include "core/decision.h"
 #include "core/frame_response.h"
 #include "core/puyo_controller.h"

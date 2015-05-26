@@ -8,10 +8,8 @@
 
 #include "core/column_puyo.h"
 #include "core/column_puyo_list.h"
-#include "core/constant.h"
 #include "core/decision.h"
 #include "core/field_checker.h"
-#include "core/frame.h"
 #include "core/kumipuyo.h"
 #include "core/position.h"
 #include "core/rensa_result.h"

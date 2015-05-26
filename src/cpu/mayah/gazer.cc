@@ -10,7 +10,6 @@
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/rensa_detector.h"
-#include "core/constant.h"
 #include "core/field_checker.h"
 #include "core/kumipuyo_seq.h"
 #include "core/score.h"

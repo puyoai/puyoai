@@ -1,7 +1,7 @@
 #ifndef CORE_KUMIPUYO_MOVING_STATE_H_
 #define CORE_KUMIPUYO_MOVING_STATE_H_
 
-#include "core/constant.h"
+#include "core/frame.h"
 #include "core/kumipuyo_pos.h"
 
 class PlainField;

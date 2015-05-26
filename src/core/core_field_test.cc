@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <string>
 
-#include "core/constant.h"
 #include "core/decision.h"
 #include "core/frame.h"
 #include "core/position.h"

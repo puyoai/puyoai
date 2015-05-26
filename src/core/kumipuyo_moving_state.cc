@@ -1,10 +1,8 @@
 #include "core/kumipuyo_moving_state.h"
 
 #include <glog/logging.h>
-
 #include <tuple>
 
-#include "core/constant.h"
 #include "core/key.h"
 #include "core/key_set.h"
 #include "core/plain_field.h"
