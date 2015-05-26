@@ -14,23 +14,21 @@ puyoai
 
 現状、Mac OS X(10.10 Yosemite) と Ubuntu Linux 14.04 でビルドできることを確認しています。
 
-古めの Linux (Ubuntu 12.04 など)では、gccやclangが古いので、もしかしたらコンパイルが通らない
-かもしれません。また、SDL 2.0がaptにありませんので、どこかから取ってくるか、自分でビルドしなければなりません。
+古めの Linux (Ubuntu 12.04 など)では、gcc や clang が古いので、もしかしたらコンパイルが通らないかもしれません。
 
-32bit環境では全くテストしていません。
+また、32bit環境では全くテストしていません。
 
 ### コンパイラ
 
-clang-3.4以降、もしくはgcc-4.7以降でのみテストしています。
+clang-3.4 以降、と gcc-4.7 以降でのみテストしています。
 
-基本的に-std=c++11で書かれているため、C++11の対応がが悪いコンパイラではコンパイルできないかもしれません。
-
-clang-3.4以降の方がgcc-4.7よりある程度若干高速なバイナリを吐けることがわかっています。
+基本的に C++11 で書かれているため、C++11 の対応がが悪いコンパイラではコンパイルできないかもしれません。
 
 ### ハードウェア (CPU)
 
-高速化のため、CPUにAVX命令が載っていることを前提にしている箇所があります。
-すなわち、2011年〜2012年以降のCPUのみを対象にしています。現状はAVX2は前提にしていません。
+高速化のため、CPU に AVX 命令が載っていることを前提にしている箇所があります。
+すなわち、2011 年〜 2012 年以降の CPU のみを対象にしています。
+現状は AVX2 は前提にしていません。
 
 ## ビルド方法
 
@@ -54,9 +52,9 @@ GUI を付与したい場合、さらに次のライブラリが必要です。
 
 ### make のしかた
 
-cmakeを用いてMakefileを生成し、makeすることを前提にしています。
+cmake を用いて Makefile を生成し、make することを前提にしています。
 
-outディレクトリを掘って、そこでビルドするようにしてください。
+out ディレクトリを掘って、そこでビルドするようにしてください。
 
     $ mkdir -p out/Release; cd out/Release
     $ cmake ../../src
@@ -70,21 +68,34 @@ outディレクトリを掘って、そこでビルドするようにしてく�
 build/ 以下にいくつかビルド用のスクリプトが置かれていますが、ninjaでビルドすることを前提にしています。
 より高速にビルドしたい場合、ninjaの使用も検討してください。
 
-### mac の場合
+### Mac OSX の場合
 
-Macの場合、homebrewを使うと楽です。Xcode、コマンドラインツール、homebrewをインストールしてください。デフォルトで/usr/local/includeなどを見ないようになっている可能性がありますが、xcode-select --installを叩いておくと解決します。
+Mac の場合、homebrew を使うと楽です。
+Xcode、コマンドラインツール、homebrew をインストールしてください。
+デフォルトで `/usr/local/include` などを見ないようになっている可能性がありますが、`xcode-select --install` を叩いておくと解決します。
 
 次のコマンドで必要なものが入るとおもいます。
 
     $ brew install pkg-config
     $ brew install cmake gflags glog sdl2 SDL2_ttf SDL2_image ffmpeg libusb libgcrypt
 
+### Linux (Ubuntu) の場合
+
+Debian 系 Linux の場合、apt を使うと楽です。
+次のコマンドで必要なものが入るとおもいます。
+
+    $ sudo apt-get install clang++ cmake
+    $ sudo apt-get install libgoogle-glog-dev libgflags-dev
+    $ sudo apt-get install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
+    $ sudo apt-get install libffms2-dev libusb-devlibcrypto++-dev
+
+
 ## 実行
 
     $ cd out/Release
-    $ ./duel/duel ./cpu/sample/sample ./cpu/sample/sample
+    $ ./duel/duel ./cpu/sample/sample ./cpu/sample_rensa/sample_rensa
 
-sample は、消せるところがあれば消し、そうでなければ左に積むだけのアルゴリズムで動いています。
+`duel` は対戦サーバで、筐体のような役割を果たします。1 つ目の引数 `sample` は 1P 側を担当する AI、2 つ目の引数 `sample_rensa` は 2P 側を担当する AI です。
 
 ## ディレクトリの説明
 
