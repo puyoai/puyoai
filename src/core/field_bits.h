@@ -69,19 +69,18 @@ public:
     int toPositions(Position positions[]) const;
 
     // Iterate all bits. Callback is FieldBits (FieldBits).
+    // The FieldBits the callback returned will be excluded from the iteration.
     template<typename Callback>
     void iterateBitWithMasking(Callback) const;
 
     std::string toString() const;
 
-    friend bool operator==(FieldBits lhs, FieldBits rhs)
-    {
-        return FieldBits(_mm_xor_si128(lhs.m_, rhs.m_)).isEmpty();
-    }
+    friend bool operator==(FieldBits lhs, FieldBits rhs) { return (lhs ^ rhs).isEmpty(); }
     friend bool operator!=(FieldBits lhs, FieldBits rhs) { return !(lhs == rhs); }
 
     friend FieldBits operator&(FieldBits lhs, FieldBits rhs) { return _mm_and_si128(lhs, rhs); }
     friend FieldBits operator|(FieldBits lhs, FieldBits rhs) { return _mm_or_si128(lhs, rhs); }
+    friend FieldBits operator^(FieldBits lhs, FieldBits rhs) { return _mm_xor_si128(lhs, rhs); }
 
 private:
     static __m128i onebit(int x, int y)
