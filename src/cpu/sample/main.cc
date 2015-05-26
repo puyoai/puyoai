@@ -7,13 +7,13 @@
 #include "core/core_field.h"
 #include "core/frame_request.h"
 
-class AIRoutine : public AI {
+class SampleAI : public AI {
 public:
-    AIRoutine(int argc, char* argv[]) : AI(argc, argv, "sample") {}
-    virtual ~AIRoutine() {}
+    SampleAI(int argc, char* argv[]) : AI(argc, argv, "sample") {}
+    ~SampleAI() override {}
 
-    virtual DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq,
-                               const PlayerState& me, const PlayerState& enemy, bool fast) const override
+    DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq,
+                       const PlayerState& me, const PlayerState& enemy, bool fast) const override
     {
         UNUSED_VARIABLE(frameId);
         UNUSED_VARIABLE(me);
@@ -48,6 +48,6 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    AIRoutine(argc, argv).runLoop();
+    SampleAI(argc, argv).runLoop();
     return 0;
 }
