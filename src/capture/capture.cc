@@ -59,6 +59,7 @@ void Capture::draw(Screen* screen)
 
     lock_guard<mutex> lock(mu_);
     SDL_BlitSurface(surface_.get(), nullptr, surface, nullptr);
+    surface->userdata = surface_->userdata;
 }
 
 unique_ptr<AnalyzerResult> Capture::analyzerResult() const
