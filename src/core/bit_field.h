@@ -16,15 +16,15 @@ public:
 
     FieldBits bits(PuyoColor c) const;
 
+    PuyoColor color(int x, int y) const;
     bool isColor(int x, int y, PuyoColor c) const { return bits(c).get(x, y); }
     bool isEmpty(int x, int y) const { return !(m_[0] | m_[1] | m_[2]).get(x, y); }
+    void setColor(int x, int y, PuyoColor c);
 
     RensaResult simulate();
 
 private:
     friend class BitFieldTest;
-
-    void setColor(int x, int y, PuyoColor c);
 
     // Vanishes puyos. Returns score. Erased puyos are put |erased|.
     int vanish(int nthChain, FieldBits* erased);

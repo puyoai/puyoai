@@ -64,6 +64,22 @@ TEST_F(BitFieldTest, constructor3)
     EXPECT_TRUE(bf.isColor(4, 3, PuyoColor::OJAMA));
 }
 
+TEST_F(BitFieldTest, setColor)
+{
+    static const PuyoColor colors[] = {
+        PuyoColor::RED, PuyoColor::BLUE, PuyoColor::YELLOW, PuyoColor::GREEN,
+        PuyoColor::OJAMA, PuyoColor::IRON
+    };
+
+    BitField bf;
+
+    for (PuyoColor c : colors) {
+        bf.setColor(1, 1, c);
+        EXPECT_EQ(c, bf.color(1, 1)) << c;
+        EXPECT_TRUE(bf.isColor(1, 1, c)) << c;
+    }
+}
+
 TEST_F(BitFieldTest, simulate1)
 {
     CoreField cf(
