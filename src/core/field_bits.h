@@ -81,11 +81,7 @@ public:
     friend FieldBits operator^(FieldBits lhs, FieldBits rhs) { return _mm_xor_si128(lhs, rhs); }
 
 private:
-    static __m128i onebit(int x, int y)
-    {
-        DCHECK(0 <= x && x < 8 && 0 <= y && y < 16) << "x=" << x << " y=" << y;
-        return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, x);
-    }
+    static __m128i onebit(int x, int y);
 
     __m128i m_;
 };
@@ -283,6 +279,31 @@ int FieldBits::toPositions(Position ps[]) const
     }
 
     return pos;
+}
+
+// static
+inline
+__m128i FieldBits::onebit(int x, int y)
+{
+    // NOTE: the 3rd argument of _mm_insert_epi16 should be an immediate.
+    // Mac clang and Linux gcc accepts non immediate value, however, it generates table jump code.
+    // cygwin environment does not accept non immediate value.
+    // So, we adopt switch case sentene here.
+
+    DCHECK(0 <= x && x < 8 && 0 <= y && y < 16) << "x=" << x << " y=" << y;
+    switch (x) {
+    case 0: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 0);
+    case 1: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 1);
+    case 2: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 2);
+    case 3: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 3);
+    case 4: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 4);
+    case 5: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 5);
+    case 6: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 6);
+    case 7: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 7);
+    default:
+        DCHECK(false);
+        return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 0);
+    }
 }
 
 #endif // CORE_FIELD_BITS_H_
