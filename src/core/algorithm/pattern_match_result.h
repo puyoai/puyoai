@@ -1,6 +1,8 @@
 #ifndef CORE_ALGORITHM_PATTERN_MATCH_RESULT_H_
 #define CORE_ALGORITHM_PATTERN_MATCH_RESULT_H_
 
+#include <tuple>
+
 #include "base/small_int_set.h"
 
 struct PatternMatchResult {
