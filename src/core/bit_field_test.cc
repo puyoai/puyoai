@@ -80,6 +80,18 @@ TEST_F(BitFieldTest, setColor)
     }
 }
 
+TEST_F(BitFieldTest, isZenkeshi)
+{
+    BitField bf1;
+    EXPECT_TRUE(bf1.isZenkeshi());
+
+    BitField bf2("..O...");
+    EXPECT_FALSE(bf2.isZenkeshi());
+
+    BitField bf3("..R...");
+    EXPECT_FALSE(bf3.isZenkeshi());
+}
+
 TEST_F(BitFieldTest, simulate1)
 {
     CoreField cf(

@@ -21,6 +21,8 @@ public:
     bool isEmpty(int x, int y) const { return !(m_[0] | m_[1] | m_[2]).get(x, y); }
     void setColor(int x, int y, PuyoColor c);
 
+    bool isZenkeshi() const { return FieldBits(m_[0] | m_[1] | m_[2]).isEmpty(); }
+
     RensaResult simulate();
 
 private:
