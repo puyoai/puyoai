@@ -10,6 +10,7 @@
 // BitsField is a field implementation that uses FieldBits.
 class BitField {
 public:
+    BitField() {}
     explicit BitField(const PlainField&);
     explicit BitField(const std::string&);
 
