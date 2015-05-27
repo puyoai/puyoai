@@ -111,6 +111,31 @@ TEST(FieldBitsTest, operator_equal)
     EXPECT_NE(bf1, bf2);
 }
 
+TEST(FieldBitsTest, maskedField)
+{
+    FieldBits bits;
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 16; ++y) {
+            bits.set(x, y);
+        }
+    }
+
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 16; ++y) {
+            if (1 <= x && x <= 6 && 1 <= y && y <= 12) {
+                EXPECT_TRUE(bits.maskedField12().get(x, y)) << x << ' ' << y;
+                EXPECT_TRUE(bits.maskedField13().get(x, y)) << x << ' ' << y;
+            } else if (1 <= x && x <= 6 && y == 13) {
+                EXPECT_FALSE(bits.maskedField12().get(x, y)) << x << ' ' << y;
+                EXPECT_TRUE(bits.maskedField13().get(x, y)) << x << ' ' << y;
+            } else {
+                EXPECT_FALSE(bits.maskedField12().get(x, y)) << x << ' ' << y;
+                EXPECT_FALSE(bits.maskedField13().get(x, y)) << x << ' ' << y;
+            }
+        }
+    }
+}
+
 TEST(FieldBitsTest, expand)
 {
     FieldBits mask;

@@ -41,17 +41,17 @@ static void runCountConnectedPuyosTest(const PlainField& f, int expected, int x,
     for (int i = 0; i < N; i++) {
         ScopedTimeStampCounter stsc(&tscBits);
         FieldBits fb(f, f.color(x, y));
-        EXPECT_EQ(expected, FieldBits(x, y).expand(fb.masked()).popcount());
+        EXPECT_EQ(expected, FieldBits(x, y).expand(fb.maskedField12()).popcount());
     }
 
     for (int i = 0; i < N; i++) {
         ScopedTimeStampCounter stsc(&tscBitsMax4);
         FieldBits fb(f, f.color(x, y));
-        EXPECT_LE(expected4, FieldBits(x, y).expand4(fb.masked()).popcount());
+        EXPECT_LE(expected4, FieldBits(x, y).expand4(fb.maskedField12()).popcount());
     }
 
     FieldBits fb(f, f.color(x, y));
-    fb = fb.masked();
+    fb = fb.maskedField12();
     for (int i = 0; i < N; i++) {
         ScopedTimeStampCounter stsc(&tscPreBits);
         EXPECT_EQ(expected, FieldBits(x, y).expand(fb).popcount());
