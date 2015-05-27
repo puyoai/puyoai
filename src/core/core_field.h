@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "core/bit_field.h"
 #include "core/decision.h"
 #include "core/field_constant.h"
 #include "core/kumipuyo_pos.h"
@@ -251,7 +252,11 @@ private:
     template<typename Tracker>
     int dropAfterVanish(SimulationContext*, Tracker*);
 
+#ifdef EXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD
+    BitField field_;
+#else
     PlainField field_;
+#endif
     int heights_[MAP_WIDTH];
 };
 
