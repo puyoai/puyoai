@@ -27,11 +27,6 @@ public:
     void set(int x, int y) { m_ = _mm_or_si128(onebit(x, y), m_); }
     void unset(int x, int y) { m_ = _mm_andnot_si128(onebit(x, y), m_); }
 
-    FieldBits masked() const
-    {
-        const auto mask = _mm_set_epi16(0, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0);
-        return FieldBits(_mm_and_si128(mask, m_));
-    }
     void setAll(const FieldBits& fb) { m_ = _mm_or_si128(fb.m_, m_); }
     void unsetAll(const FieldBits& fb) { m_ = _mm_andnot_si128(fb.m_, m_); }
 
@@ -39,8 +34,13 @@ public:
     bool testz(FieldBits bits) const { return _mm_testz_si128(m_, bits.m_); }
 
     int popcount() const;
-
+    // Returns the bit-wise or of 8x16bits.
     int horizontalOr16() const;
+
+    // Returns the masked FieldBits where the region of visible field is taken.
+    FieldBits maskedField12() const;
+    // Returns the masked FieldBits where the region of visible field + 13th row is taken.
+    FieldBits maskedField13() const;
 
     // Returns all connected bits.
     FieldBits expand(FieldBits mask) const;
@@ -130,6 +130,20 @@ int FieldBits::horizontalOr16() const
     x = _mm_or_si128(_mm_srli_si128(x, 4), x);
     x = _mm_or_si128(_mm_srli_si128(x, 2), x);
     return _mm_cvtsi128_si32(x) & 0xFFFF;
+}
+
+inline
+FieldBits FieldBits::maskedField12() const
+{
+    const auto mask = _mm_set_epi16(0, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0);
+    return FieldBits(_mm_and_si128(mask, m_));
+}
+
+inline
+FieldBits FieldBits::maskedField13() const
+{
+    const auto mask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
+    return FieldBits(_mm_and_si128(mask, m_));
 }
 
 inline
