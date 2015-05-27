@@ -56,6 +56,14 @@ int BitField::countConnectedPuyos(int x, int y) const
     return FieldBits(x, y).expand(colorBits).popcount();
 }
 
+int BitField::countConnectedPuyosMax4(int x, int y) const
+{
+    PuyoColor c = color(x, y);
+    DCHECK_NE(c, PuyoColor::EMPTY);
+    FieldBits colorBits = bits(color(x, y));
+    return FieldBits(x, y).expand4(colorBits).popcount();
+}
+
 RensaResult BitField::simulate()
 {
     int currentChain = 1;
