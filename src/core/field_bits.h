@@ -37,12 +37,15 @@ public:
     // Returns the bit-wise or of 8x16bits.
     int horizontalOr16() const;
 
-    FieldBits mask(const FieldBits& fb) { return m_ & fb.m_; }
-
     // Returns the masked FieldBits where the region of visible field is taken.
     FieldBits maskedField12() const;
     // Returns the masked FieldBits where the region of visible field + 13th row is taken.
     FieldBits maskedField13() const;
+
+    // Returns m_ & mask.
+    FieldBits mask(FieldBits mask) const { return m_ & mask; }
+    // Returns m_ & ~mask
+    FieldBits notmask(FieldBits mask) const { return _mm_andnot_si128(mask, m_); }
 
     // Returns all connected bits.
     FieldBits expand(FieldBits mask) const;
@@ -174,17 +177,6 @@ FieldBits FieldBits::expand(FieldBits mask) const
 }
 
 inline
-FieldBits FieldBits::expandEdge() const
-{
-    __m128i m1 = _mm_slli_epi16(m_, 1);
-    __m128i m2 = _mm_srli_epi16(m_, 1);
-    __m128i m3 = _mm_slli_si128(m_, 2);
-    __m128i m4 = _mm_srli_si128(m_, 2);
-
-    return _mm_or_si128(_mm_or_si128(m1, m2), _mm_or_si128(m3, m4));
-}
-
-inline
 FieldBits FieldBits::expand4(FieldBits maskBits) const
 {
     const __m128i mask = maskBits.m_;
@@ -206,6 +198,17 @@ FieldBits FieldBits::expand4(FieldBits maskBits) const
     m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
 
     return FieldBits(m);
+}
+
+inline
+FieldBits FieldBits::expandEdge() const
+{
+    __m128i m1 = _mm_slli_epi16(m_, 1);
+    __m128i m2 = _mm_srli_epi16(m_, 1);
+    __m128i m3 = _mm_slli_si128(m_, 2);
+    __m128i m4 = _mm_srli_si128(m_, 2);
+
+    return _mm_or_si128(_mm_or_si128(m1, m2), _mm_or_si128(m3, m4));
 }
 
 inline
