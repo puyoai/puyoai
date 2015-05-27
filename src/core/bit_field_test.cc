@@ -112,7 +112,8 @@ TEST_F(BitFieldTest, isConnectedPuyo)
 TEST_F(BitFieldTest, countConnectedPuyos)
 {
     BitField bf(
-        "B.B..Y"
+        "RRRRRR"
+        "BYBRRY"
         "RRRBBB");
 
     EXPECT_EQ(3, bf.countConnectedPuyos(1, 1));
@@ -120,6 +121,22 @@ TEST_F(BitFieldTest, countConnectedPuyos)
     EXPECT_EQ(1, bf.countConnectedPuyos(1, 2));
     EXPECT_EQ(1, bf.countConnectedPuyos(3, 2));
     EXPECT_EQ(1, bf.countConnectedPuyos(6, 2));
+    EXPECT_EQ(8, bf.countConnectedPuyos(4, 2));
+}
+
+TEST_F(BitFieldTest, countConnectedPuyosMax4)
+{
+    BitField bf(
+        "RRRRRR"
+        "BYBRRY"
+        "RRRBBB");
+
+    EXPECT_EQ(3, bf.countConnectedPuyosMax4(1, 1));
+    EXPECT_EQ(3, bf.countConnectedPuyosMax4(4, 1));
+    EXPECT_EQ(1, bf.countConnectedPuyosMax4(1, 2));
+    EXPECT_EQ(1, bf.countConnectedPuyosMax4(3, 2));
+    EXPECT_EQ(1, bf.countConnectedPuyosMax4(6, 2));
+    EXPECT_LE(4, bf.countConnectedPuyosMax4(4, 2));    
 }
 
 TEST_F(BitFieldTest, simulate1)
