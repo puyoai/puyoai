@@ -44,8 +44,6 @@ public:
 
     // Returns all connected bits.
     FieldBits expand(FieldBits mask) const;
-    // Returns connected bits (neighbor only).
-    FieldBits expand1(FieldBits mask) const;
     FieldBits expand1ForOjama(FieldBits mask) const;
     // Returns connected bits. (more then 4 connected bits are not accurate.)
     FieldBits expand4(FieldBits mask) const;
@@ -149,27 +147,21 @@ FieldBits FieldBits::maskedField13() const
 inline
 FieldBits FieldBits::expand(FieldBits mask) const
 {
-    FieldBits seed = *this;
+    __m128i seed = m_;
 
     while (true) {
-        FieldBits expanded = seed.expand1(mask);
-        if (_mm_testc_si128(seed.xmm(), expanded.xmm()))
+        __m128i expanded = _mm_or_si128(_mm_slli_epi16(seed, 1), seed);
+        expanded = _mm_or_si128(_mm_srli_epi16(seed, 1), expanded);
+        expanded = _mm_or_si128(_mm_slli_si128(seed, 2), expanded);
+        expanded = _mm_or_si128(_mm_srli_si128(seed, 2), expanded);
+        expanded = _mm_and_si128(mask, expanded);
+
+        if (_mm_testc_si128(seed, expanded))
             return expanded;
         seed = expanded;
     }
 
     // NOT_REACHED.
-}
-
-inline
-FieldBits FieldBits::expand1(FieldBits maskBits) const
-{
-    __m128i m1 = m_;
-    __m128i m2 = _mm_or_si128(_mm_slli_epi16(m1, 1), m1);
-    m2 = _mm_or_si128(_mm_srli_epi16(m1, 1), m2);
-    m2 = _mm_or_si128(_mm_slli_si128(m1, 2), m2);
-    m2 = _mm_or_si128(_mm_srli_si128(m1, 2), m2);
-    return FieldBits(_mm_and_si128(maskBits.xmm(), m2));
 }
 
 inline
