@@ -109,6 +109,19 @@ TEST_F(BitFieldTest, isConnectedPuyo)
     EXPECT_FALSE(bf.isConnectedPuyo(6, 2));
 }
 
+TEST_F(BitFieldTest, countConnectedPuyos)
+{
+    BitField bf(
+        "B.B..Y"
+        "RRRBBB");
+
+    EXPECT_EQ(3, bf.countConnectedPuyos(1, 1));
+    EXPECT_EQ(3, bf.countConnectedPuyos(4, 1));
+    EXPECT_EQ(1, bf.countConnectedPuyos(1, 2));
+    EXPECT_EQ(1, bf.countConnectedPuyos(3, 2));
+    EXPECT_EQ(1, bf.countConnectedPuyos(6, 2));
+}
+
 TEST_F(BitFieldTest, simulate1)
 {
     CoreField cf(
