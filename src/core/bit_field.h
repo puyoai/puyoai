@@ -23,6 +23,8 @@ public:
 
     bool isZenkeshi() const { return FieldBits(m_[0] | m_[1] | m_[2]).isEmpty(); }
 
+    bool isConnectedPuyo(int x, int y) const;
+
     RensaResult simulate();
 
 private:

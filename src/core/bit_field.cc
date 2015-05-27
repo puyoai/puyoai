@@ -40,6 +40,14 @@ void BitField::setColor(int x, int y, PuyoColor c)
     }
 }
 
+bool BitField::isConnectedPuyo(int x, int y) const
+{
+    PuyoColor c = color(x, y);
+    FieldBits colorBits = bits(c);
+    FieldBits single(x, y);
+    return !single.expandEdge().mask(colorBits).notmask(single).isEmpty();
+}
+
 RensaResult BitField::simulate()
 {
     int currentChain = 1;

@@ -92,6 +92,23 @@ TEST_F(BitFieldTest, isZenkeshi)
     EXPECT_FALSE(bf3.isZenkeshi());
 }
 
+TEST_F(BitFieldTest, isConnectedPuyo)
+{
+    BitField bf(
+        "B.B..Y"
+        "RRRBBB");
+
+    EXPECT_TRUE(bf.isConnectedPuyo(1, 1));
+    EXPECT_TRUE(bf.isConnectedPuyo(2, 1));
+    EXPECT_TRUE(bf.isConnectedPuyo(3, 1));
+    EXPECT_TRUE(bf.isConnectedPuyo(4, 1));
+    EXPECT_TRUE(bf.isConnectedPuyo(5, 1));
+    EXPECT_TRUE(bf.isConnectedPuyo(6, 1));
+    EXPECT_FALSE(bf.isConnectedPuyo(1, 2));
+    EXPECT_FALSE(bf.isConnectedPuyo(3, 2));
+    EXPECT_FALSE(bf.isConnectedPuyo(6, 2));
+}
+
 TEST_F(BitFieldTest, simulate1)
 {
     CoreField cf(
