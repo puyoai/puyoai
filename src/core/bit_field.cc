@@ -106,7 +106,7 @@ int BitField::vanish(int chain, FieldBits* erased)
         return 0;
 
     // Removes ojama.
-    FieldBits ojama(erased->expand1ForOjama(bits(PuyoColor::OJAMA)));
+    FieldBits ojama(erased->expandEdge().mask(bits(PuyoColor::OJAMA)));
 
     erased->setAll(ojama);
     return 10 * numErased * calculateRensaBonusCoef(chainBonus(chain), longBonusCoef, colorBonus(numColors));
