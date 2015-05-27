@@ -1,0 +1,153 @@
+# cygwin でのビルド方法
+
+ないよりはマシなので as is で入れておきます。@__roxion1377 さんに書いていただきました。
+
+cygwinで
+gcc-core
+gcc-g++
+git
+cmake
+make
+autoconf
+automake
+pkg-config
+wget
+ligpng-devel
+libjpeg-devel
+libtiff-devel
+libfreetype-devel
+をインストール
+clangはよくわからないのでgccを使う．
+
+glog のビルド
+$ git clone https://github.com/google/glog
+$ cd glog
+
+src/utilities.ccの267行目の
+#elif defined OS_WINDOWS || defined OS_CYGWIN
+を
+#elif defined OS_WINDOWS
+
+src/googletest.hの524行目と557行目の
+#if defined(OS_WINDOWS) || defined(OS_CYGWIN)
+を
+#if defined(OS_WINDOWS)
+にして
+
+$ ./configure --prefix=/usr
+$ make
+$ make install
+
+gflags
+$ git clone https://github.com/gflags/gflags
+$ cd gflags
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_INSTALL_PREFIX=/usr ../
+$ make
+$ make install
+
+SDL2
+$ wget https://www.libsdl.org/release/SDL2-2.0.3.tar.gz
+$ tar xf SDL2-2.0.3.tar.gz
+$ cd SDL2-2.0.3
+
+src/SDL.cの24行目の
+#include "core/windows/SDL_windows.h"
+を
+//#include "core/windows/SDL_windows.h"
+にする
+
+449行目の
+#if defined(__WIN32__)
+を
+#if defined(__WIN32__) && 0
+にする
+
+$ ./configure --prefix=/usr --disable-render-d3d
+$ make -j4
+$ make install
+
+SDL_image
+
+$ wget https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.0.tar.gz
+$ tar xf SDL2_image-2.0.0.tar.gz
+$ cd SDL2_image-2.0.0
+$ ./configure --prefix=/usr
+jpegとか読めないぞと脅されるけれどpngが読めれば良いので無視して良い
+$ make -j4
+$ make install
+
+SDL_ttf
+
+$ wget https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-2.0.12.tar.gz
+$ tar xf SDL2_ttf-2.0.12.tar.gz
+$ ./configure --prefix=/usr
+$ make -j4
+$ make install
+
+$ git clone --depth 1 https://github.com/puyoai/puyoai
+
+$ mkdir -p out/Release
+
+CMakeListsの64行目の
+puyoai_add_cxx_flags("-Wall -Wextra -std=c++11")
+を
+puyoai_add_cxx_flags("-Wall -Wextra -std=gnu++11")
+にする
+
+third_party/tinytoml/include/toml/toml.hに
+#include <cstdio>
+を追加
+
+core/server/commentator.c，
+cpu/mayah/collected_score.cc，
+cpu/mayah/interactive.cc，
+cpu/munetoshi/ai.cc，
+audio/autio_commentator.cc，
+gui/commentator_drawer.cc，
+gui/fps_drawer.cc，
+の上の方に
+namespace std
+{
+template <typename T>
+std::string to_string(const T& v)
+{
+    std::ostringstream ss; ss << v;
+    return ss.str();
+}
+}
+を追加．
+
+cpu/mayah/pattern_rensa_detector.cc，
+cpu/mayah/mayah_ai_situation_test.ccに
+#include <gflags/gflags.h>
+を追加
+
+duel/main.ccのmain関数の前に
+#undef main
+を追加
+
+gui/screen.ccの43行目の
+        string font_filename = string(p) + "/data/mikachan-p.ttf";
+を
+        string font_filename = "data/mikachan-p.ttf";
+に．
+
+gui/field_drawer.ccの32,33,34行目の
+    backgroundSurface_(makeUniqueSDLSurface(IMG_Load((FLAGS_data_dir + "/assets/background.png").c_str()))),
+    puyoSurface_(makeUniqueSDLSurface(IMG_Load((FLAGS_data_dir + "/assets/puyo.png").c_str()))),
+    ojamaSurface_(makeUniqueSDLSurface(IMG_Load((FLAGS_data_dir + "/assets/yokoku.png").c_str()))),
+を
+    backgroundSurface_(makeUniqueSDLSurface(IMG_Load(string("data/assets/background.png").c_str()))),
+    puyoSurface_(makeUniqueSDLSurface(IMG_Load(string("data/assets/puyo.png").c_str()))),
+    ojamaSurface_(makeUniqueSDLSurface(IMG_Load(string("data/assets/yokoku.png").c_str()))),
+に．
+
+$ CMAKE_LEGACY_CYGWIN_WIN32=1 cmake  ../../src/
+
+$ make -j4
+
+$ cp -r ../../data .
+
+$ ./duel/duel.exe cpu/mayah/run.sh cpu/test_lockit/rendaS9.sh
