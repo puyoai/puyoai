@@ -29,6 +29,7 @@ public:
     int countConnectedPuyos(int x, int y) const;
     int countConnectedPuyos(int x, int y, FieldBits* checked) const;
     int countConnectedPuyosMax4(int x, int y) const;
+    bool hasEmptyNeighbor(int x, int y) const;
 
     RensaResult simulate();
 

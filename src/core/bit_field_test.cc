@@ -158,6 +158,21 @@ TEST_F(BitFieldTest, countConnectedPuyosMax4)
     EXPECT_LE(4, bf.countConnectedPuyosMax4(4, 2));
 }
 
+TEST_F(BitFieldTest, hasEmptyNeighbor)
+{
+    BitField bf(
+        "RR..RR"
+        "BYBRRY"
+        "RRRBBB");
+
+    EXPECT_TRUE(bf.hasEmptyNeighbor(2, 3));
+    EXPECT_TRUE(bf.hasEmptyNeighbor(3, 2));
+
+    EXPECT_FALSE(bf.hasEmptyNeighbor(1, 1));
+    EXPECT_FALSE(bf.hasEmptyNeighbor(2, 1));
+    EXPECT_FALSE(bf.hasEmptyNeighbor(6, 1));
+}
+
 TEST_F(BitFieldTest, simulate1)
 {
     CoreField cf(

@@ -115,6 +115,19 @@ int BitField::countConnectedPuyosMax4(int x, int y) const
     return FieldBits(x, y).expand4(colorBits).popcount();
 }
 
+bool BitField::hasEmptyNeighbor(int x, int y) const
+{
+    if (x + 1 <= 6 && isEmpty(x + 1, y))
+        return true;
+    if (x - 1 >= 1 && isEmpty(x - 1, y))
+        return true;
+    if (y - 1 >= 1 && isEmpty(x, y - 1))
+        return true;
+    if (y + 1 <= 13 && isEmpty(x, y + 1))
+        return true;
+    return false;
+}
+
 RensaResult BitField::simulate()
 {
     int currentChain = 1;
