@@ -16,7 +16,18 @@ protected:
     }
 };
 
-TEST_F(BitFieldTest, contrustor1)
+TEST_F(BitFieldTest, constructor1)
+{
+    BitField bf;
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 14; ++y) {
+            EXPECT_TRUE(bf.isEmpty(x, y));
+        }
+    }
+}
+
+TEST_F(BitFieldTest, constructor2)
 {
     PlainField pf(
         "OOOOOO"
@@ -38,7 +49,7 @@ TEST_F(BitFieldTest, contrustor1)
     }
 }
 
-TEST_F(BitFieldTest, constructor2)
+TEST_F(BitFieldTest, constructor3)
 {
     BitField bf(
         "OOOOOO"
