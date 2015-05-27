@@ -28,7 +28,6 @@ void BitField::setColor(int x, int y, PuyoColor c)
             m_[i].set(x, y);
         else
             m_[i].unset(x, y);
-
     }
 }
 
