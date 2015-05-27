@@ -1,12 +1,10 @@
 #include "core/field_bits.h"
 
 #include <algorithm>
-
-#include "core/position.h"
-
 #include <gtest/gtest.h>
 
-#include <iostream>
+#include "core/plain_field.h"
+#include "core/position.h"
 
 using namespace std;
 
