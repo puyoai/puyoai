@@ -37,6 +37,8 @@ public:
     // Returns the bit-wise or of 8x16bits.
     int horizontalOr16() const;
 
+    FieldBits mask(const FieldBits& fb) { return m_ & fb.m_; }
+
     // Returns the masked FieldBits where the region of visible field is taken.
     FieldBits maskedField12() const;
     // Returns the masked FieldBits where the region of visible field + 13th row is taken.
@@ -44,9 +46,16 @@ public:
 
     // Returns all connected bits.
     FieldBits expand(FieldBits mask) const;
-    FieldBits expand1ForOjama(FieldBits mask) const;
     // Returns connected bits. (more then 4 connected bits are not accurate.)
     FieldBits expand4(FieldBits mask) const;
+
+    // Returns bits where edge is expanded.
+    // This might contain the original bits, so you'd like to take mask.
+    // e.g.
+    // ......      ..xx..    ..xx..
+    // ..xx..  --> .x..x. or .xxxx.
+    // ......      ..xx..    ..xx..
+    FieldBits expandEdge() const;
 
     // Returns the seed bits for connected more that 4.
     // 1 connection might contain more than 1 seed.
@@ -165,15 +174,14 @@ FieldBits FieldBits::expand(FieldBits mask) const
 }
 
 inline
-FieldBits FieldBits::expand1ForOjama(FieldBits maskBits) const
+FieldBits FieldBits::expandEdge() const
 {
     __m128i m1 = _mm_slli_epi16(m_, 1);
     __m128i m2 = _mm_srli_epi16(m_, 1);
     __m128i m3 = _mm_slli_si128(m_, 2);
     __m128i m4 = _mm_srli_si128(m_, 2);
 
-    __m128i edge = _mm_or_si128(_mm_or_si128(m1, m2), _mm_or_si128(m3, m4));
-    return FieldBits(_mm_and_si128(maskBits.xmm(), edge));
+    return _mm_or_si128(_mm_or_si128(m1, m2), _mm_or_si128(m3, m4));
 }
 
 inline
