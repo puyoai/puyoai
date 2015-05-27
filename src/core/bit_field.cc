@@ -48,6 +48,14 @@ bool BitField::isConnectedPuyo(int x, int y) const
     return !single.expandEdge().mask(colorBits).notmask(single).isEmpty();
 }
 
+int BitField::countConnectedPuyos(int x, int y) const
+{
+    PuyoColor c = color(x, y);
+    DCHECK_NE(c, PuyoColor::EMPTY);
+    FieldBits colorBits = bits(color(x, y));
+    return FieldBits(x, y).expand(colorBits).popcount();
+}
+
 RensaResult BitField::simulate()
 {
     int currentChain = 1;
