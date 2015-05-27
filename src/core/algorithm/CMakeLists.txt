@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_core_algorithm
             bijection_matcher.cc
+            bit_field_pattern.cc
+            bit_pattern_matcher.cc
             field_pattern.cc
             pattern_matcher.cc
             plan.cc
@@ -24,6 +26,7 @@ function(puyoai_core_algorithm_add_test target)
     endif()
 endfunction()
 
+puyoai_core_algorithm_add_test(bit_pattern_matcher)
 puyoai_core_algorithm_add_test(field_pattern)
 puyoai_core_algorithm_add_test(pattern_matcher)
 puyoai_core_algorithm_add_test(plan)
