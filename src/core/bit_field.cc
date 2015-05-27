@@ -8,6 +8,30 @@
 
 using namespace std;
 
+BitField::BitField(const string& str)
+{
+    int counter = 0;
+    for (int i = str.length() - 1; i >= 0; --i) {
+        int x = 6 - (counter % 6);
+        int y = counter / 6 + 1;
+        PuyoColor c = toPuyoColor(str[i]);
+        setColor(x, y, c);
+        counter++;
+    }
+}
+
+void BitField::setColor(int x, int y, PuyoColor c)
+{
+    int cc = static_cast<int>(c);
+    for (int i = 0; i < 3; ++i) {
+        if (cc & (1 << i))
+            m_[i].set(x, y);
+        else
+            m_[i].unset(x, y);
+
+    }
+}
+
 RensaResult BitField::simulate()
 {
     int currentChain = 1;

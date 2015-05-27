@@ -1,6 +1,8 @@
 #ifndef CORE_BITS_FIELD_H_
 #define CORE_BITS_FIELD_H_
 
+#include <string>
+
 #include "core/field_bits.h"
 #include "core/puyo_color.h"
 #include "core/rensa_result.h"
@@ -9,6 +11,7 @@
 class BitField {
 public:
     explicit BitField(const PlainField&);
+    explicit BitField(const std::string&);
 
     FieldBits bits(PuyoColor c) const;
 
@@ -19,6 +22,8 @@ public:
 
 private:
     friend class BitFieldTest;
+
+    void setColor(int x, int y, PuyoColor c);
 
     // Vanishes puyos. Returns score. Erased puyos are put |erased|.
     int vanish(int nthChain, FieldBits* erased);

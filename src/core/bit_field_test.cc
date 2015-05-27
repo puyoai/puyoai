@@ -16,7 +16,7 @@ protected:
     }
 };
 
-TEST_F(BitFieldTest, ctor)
+TEST_F(BitFieldTest, contrustor1)
 {
     PlainField pf(
         "OOOOOO"
@@ -36,6 +36,21 @@ TEST_F(BitFieldTest, ctor)
             }
         }
     }
+}
+
+TEST_F(BitFieldTest, constructor2)
+{
+    BitField bf(
+        "OOOOOO"
+        "GGGYYY"
+        "RRRBBB");
+
+    EXPECT_TRUE(bf.isColor(1, 1, PuyoColor::RED));
+    EXPECT_TRUE(bf.isColor(1, 2, PuyoColor::GREEN));
+    EXPECT_TRUE(bf.isColor(1, 3, PuyoColor::OJAMA));
+    EXPECT_TRUE(bf.isColor(4, 1, PuyoColor::BLUE));
+    EXPECT_TRUE(bf.isColor(4, 2, PuyoColor::YELLOW));
+    EXPECT_TRUE(bf.isColor(4, 3, PuyoColor::OJAMA));
 }
 
 TEST_F(BitFieldTest, simulate1)
