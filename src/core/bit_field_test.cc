@@ -173,6 +173,29 @@ TEST_F(BitFieldTest, hasEmptyNeighbor)
     EXPECT_FALSE(bf.hasEmptyNeighbor(6, 1));
 }
 
+TEST_F(BitFieldTest, fillSameColorPosition)
+{
+    BitField bf(
+        "RRRRRR"
+        "BYBRRY"
+        "RRRBBB");
+    Position ps[128];
+    FieldBits checked;
+    Position* head = bf.fillSameColorPosition(1, 3, PuyoColor::RED, ps, &checked);
+
+    std::sort(ps, head);
+    EXPECT_EQ(8, head - ps);
+
+    EXPECT_EQ(Position(1, 3), ps[0]);
+    EXPECT_EQ(Position(2, 3), ps[1]);
+    EXPECT_EQ(Position(3, 3), ps[2]);
+    EXPECT_EQ(Position(4, 2), ps[3]);
+    EXPECT_EQ(Position(4, 3), ps[4]);
+    EXPECT_EQ(Position(5, 2), ps[5]);
+    EXPECT_EQ(Position(5, 3), ps[6]);
+    EXPECT_EQ(Position(6, 3), ps[7]);
+}
+
 TEST_F(BitFieldTest, simulate1)
 {
     CoreField cf(

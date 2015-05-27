@@ -5,6 +5,7 @@
 
 #include "core/frame.h"
 #include "core/plain_field.h"
+#include "core/position.h"
 #include "core/score.h"
 
 using namespace std;
@@ -126,6 +127,15 @@ bool BitField::hasEmptyNeighbor(int x, int y) const
     if (y + 1 <= 13 && isEmpty(x, y + 1))
         return true;
     return false;
+}
+
+Position* BitField::fillSameColorPosition(int x, int y, PuyoColor c,
+                                          Position* positionQueueHead, FieldBits* checked) const
+{
+    FieldBits bs = FieldBits(x, y).expand(bits(c));
+    checked->setAll(bs);
+    int len = bs.toPositions(positionQueueHead);
+    return positionQueueHead + len;
 }
 
 RensaResult BitField::simulate()

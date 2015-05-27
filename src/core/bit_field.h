@@ -8,6 +8,7 @@
 #include "core/rensa_result.h"
 
 class PlainField;
+struct Position;
 
 // BitsField is a field implementation that uses FieldBits.
 class BitField {
@@ -30,6 +31,9 @@ public:
     int countConnectedPuyos(int x, int y, FieldBits* checked) const;
     int countConnectedPuyosMax4(int x, int y) const;
     bool hasEmptyNeighbor(int x, int y) const;
+
+    // TODO(mayah): This should be removed. This is for barkward compatibility.
+    Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBits* checked) const;
 
     RensaResult simulate();
 
