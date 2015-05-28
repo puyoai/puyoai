@@ -4,7 +4,6 @@
 #include <initializer_list>
 #include <string>
 
-class CoreField;
 class KumipuyoSeq;
 class PlainField;
 
@@ -13,7 +12,7 @@ public:
     static std::string toStringFromMultipleFields(std::initializer_list<PlainField>,
                                                   std::initializer_list<KumipuyoSeq>);
 
-    static void print(const CoreField&, const KumipuyoSeq&);
+    static void print(const PlainField&, const KumipuyoSeq&);
     static void printMultipleFields(std::initializer_list<PlainField>,
                                     std::initializer_list<KumipuyoSeq>);
 };

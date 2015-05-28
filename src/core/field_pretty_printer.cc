@@ -122,7 +122,7 @@ string FieldPrettyPrinter::toStringFromMultipleFields(initializer_list<PlainFiel
 }
 
 // static
-void FieldPrettyPrinter::print(const CoreField& f, const KumipuyoSeq& seq)
+void FieldPrettyPrinter::print(const PlainField& f, const KumipuyoSeq& seq)
 {
     writeTo(&cout, { f }, { seq }, CellType::FULL_WITH_COLOR);
 }
