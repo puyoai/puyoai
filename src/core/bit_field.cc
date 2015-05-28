@@ -10,7 +10,13 @@
 
 using namespace std;
 
-BitField::BitField(const PlainField& pf)
+BitField::BitField()
+{
+    // Sets WALL
+    m_[1].setAll(_mm_set_epi16(0xFFFF, 0x8001, 0x8001, 0x8001, 0x8001, 0x8001, 0x8001, 0xFFFF));
+}
+
+BitField::BitField(const PlainField& pf) : BitField()
 {
     __m128i m1 = _mm_load_si128(reinterpret_cast<const __m128i*>(pf.column(1)));
     __m128i m2 = _mm_load_si128(reinterpret_cast<const __m128i*>(pf.column(2)));
@@ -50,7 +56,7 @@ BitField::BitField(const PlainField& pf)
     }
 }
 
-BitField::BitField(const string& str)
+BitField::BitField(const string& str) : BitField()
 {
     int counter = 0;
     for (int i = str.length() - 1; i >= 0; --i) {
@@ -140,6 +146,8 @@ Position* BitField::fillSameColorPosition(int x, int y, PuyoColor c,
 
 RensaResult BitField::simulate()
 {
+    BitField escaped = escapeUnvisible();
+
     int currentChain = 1;
     int score = 0;
     int frames = 0;
@@ -159,6 +167,7 @@ RensaResult BitField::simulate()
         }
     }
 
+    recoverUnvisible(escaped);
     return RensaResult(currentChain - 1, score, frames, quick);
 }
 

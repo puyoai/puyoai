@@ -13,7 +13,7 @@ struct Position;
 // BitsField is a field implementation that uses FieldBits.
 class BitField {
 public:
-    BitField() {}
+    BitField();
     explicit BitField(const PlainField&);
     explicit BitField(const std::string&);
 
@@ -24,7 +24,7 @@ public:
     bool isEmpty(int x, int y) const { return !(m_[0] | m_[1] | m_[2]).get(x, y); }
     void setColor(int x, int y, PuyoColor c);
 
-    bool isZenkeshi() const { return FieldBits(m_[0] | m_[1] | m_[2]).isEmpty(); }
+    bool isZenkeshi() const { return FieldBits(m_[0] | m_[1] | m_[2]).maskedField13().isEmpty(); }
 
     bool isConnectedPuyo(int x, int y) const;
     int countConnectedPuyos(int x, int y) const;
@@ -40,6 +40,9 @@ public:
 private:
     friend class BitFieldTest;
 
+    BitField escapeUnvisible();
+    void recoverUnvisible(const BitField&);
+
     // Vanishes puyos. Returns score. Erased puyos are put |erased|.
     int vanish(int nthChain, FieldBits* erased);
     // Drops puyos. Returns max drops.
@@ -51,13 +54,15 @@ private:
 inline
 FieldBits BitField::bits(PuyoColor c) const
 {
+    const __m128i zero = _mm_setzero_si128();
+
     switch (c) {
-    case PuyoColor::EMPTY:  // = 0
-        return FieldBits();
+    case PuyoColor::EMPTY:  // = 0  000
+        return (m_[0] | m_[1] | m_[2]) ^ _mm_cmpeq_epi8(zero, zero);
     case PuyoColor::OJAMA:  // = 1  001
         return FieldBits(_mm_andnot_si128(m_[2].xmm(), _mm_andnot_si128(m_[1].xmm(), m_[0].xmm())));
-    case PuyoColor::WALL:
-        return FieldBits();
+    case PuyoColor::WALL:   // = 2  010
+        return FieldBits(_mm_andnot_si128(m_[2].xmm(), _mm_andnot_si128(m_[0].xmm(), m_[1].xmm())));
     case PuyoColor::IRON:   // = 3  011
         return FieldBits(_mm_andnot_si128(m_[2].xmm(), _mm_and_si128(m_[1].xmm(), m_[0].xmm())));
     case PuyoColor::RED:    // = 4  100
@@ -72,6 +77,27 @@ FieldBits BitField::bits(PuyoColor c) const
 
     CHECK(false);
     return FieldBits();
+}
+
+inline
+BitField BitField::escapeUnvisible()
+{
+    const FieldBits mask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
+    BitField escaped;
+    for (int i = 0; i < 3; ++i) {
+        escaped.m_[i] = m_[i].notmask(mask);
+        m_[i] = m_[i].mask(mask);
+    }
+
+    return escaped;
+}
+
+inline
+void BitField::recoverUnvisible(const BitField& bf)
+{
+    for (int i = 0; i < 3; ++i) {
+        m_[i].setAll(bf.m_[i]);
+    }
 }
 
 #endif // CORE_BIT_FIELD_H_
