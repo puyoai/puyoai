@@ -25,6 +25,9 @@ TEST_F(BitFieldTest, constructor1)
             EXPECT_TRUE(bf.isEmpty(x, y));
         }
     }
+
+    EXPECT_TRUE(bf.isColor(0, 0, PuyoColor::WALL));
+    EXPECT_TRUE(bf.isColor(7, 1, PuyoColor::WALL));
 }
 
 TEST_F(BitFieldTest, constructor2)
@@ -47,6 +50,9 @@ TEST_F(BitFieldTest, constructor2)
             }
         }
     }
+
+    EXPECT_TRUE(bf.isColor(0, 0, PuyoColor::WALL));
+    EXPECT_TRUE(bf.isColor(7, 1, PuyoColor::WALL));
 }
 
 TEST_F(BitFieldTest, constructor3)
@@ -62,6 +68,9 @@ TEST_F(BitFieldTest, constructor3)
     EXPECT_TRUE(bf.isColor(4, 1, PuyoColor::BLUE));
     EXPECT_TRUE(bf.isColor(4, 2, PuyoColor::YELLOW));
     EXPECT_TRUE(bf.isColor(4, 3, PuyoColor::OJAMA));
+
+    EXPECT_TRUE(bf.isColor(0, 0, PuyoColor::WALL));
+    EXPECT_TRUE(bf.isColor(7, 1, PuyoColor::WALL));
 }
 
 TEST_F(BitFieldTest, setColor)
@@ -198,15 +207,19 @@ TEST_F(BitFieldTest, fillSameColorPosition)
 
 TEST_F(BitFieldTest, simulate1)
 {
-    CoreField cf(
+    BitField bf(
         ".BBBB.");
-    BitField bf(cf);
 
     RensaResult result = bf.simulate();
     EXPECT_EQ(1, result.chains);
     EXPECT_EQ(40, result.score);
     EXPECT_EQ(FRAMES_VANISH_ANIMATION, result.frames);
     EXPECT_TRUE(result.quick);
+
+    for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
+        EXPECT_TRUE(bf.isColor(x, 0, PuyoColor::WALL));
+        EXPECT_TRUE(bf.isColor(x, 15, PuyoColor::WALL));
+    }
 }
 
 TEST_F(BitFieldTest, simulate2)
