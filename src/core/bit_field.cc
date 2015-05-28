@@ -229,7 +229,7 @@ int BitField::vanishForSimulation(int chain, FieldBits* erased)
 
 int BitField::dropAfterVanish(FieldBits erased)
 {
-    // TODO(mayah): If we can use AVX2, we have DPEP instruction.
+    // TODO(mayah): If we can use AVX2, we have PDEP instruction.
     // It would be really useful to improve this method, I believe.
 
     // bits   = b15 .. b9 b8 b7 .. b0
