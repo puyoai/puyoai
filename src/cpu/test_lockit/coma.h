@@ -27,17 +27,17 @@ public:
     COMAI_HI();
     ~COMAI_HI();
 
-    int saiki(int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_right(int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_left(int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_up(int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_down(int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki(const int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki_right(const int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki_left(const int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki_up(const int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki_down(const int[][TAT_SIZE], int[][12], int, int, int*, int);
 
-    int saiki_3(int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_3_right(int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_3_left(int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_3_up(int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_3_down(int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki_3(const int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki_3_right(const int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki_3_left(const int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki_3_up(const int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki_3_down(const int[][TAT_SIZE], int[][12], int, int, int*, int);
 
     int saiki_4(int[][TAT_SIZE], int, int, int*, int);
 
@@ -55,9 +55,9 @@ public:
 
     int setti_ojama(int[][TAT_SIZE], int);
 
-    int tobashi_hantei_a(int[][TAT_SIZE], int, int, int);
+    int tobashi_hantei_a(const int[][TAT_SIZE], int, int, int);
     int setti_puyo(int[][TAT_SIZE], int, int, int, int[]);
-    int tobashi_hantei_b(int[][TAT_SIZE], int);
+    int tobashi_hantei_b(const int[][TAT_SIZE], int);
     int chousei_syoukyo(int[][TAT_SIZE], int[]);
     int chousei_syoukyo_2(int[][TAT_SIZE], int[], int*, int[], int*, int*);
     int chousei_syoukyo_3(int[][TAT_SIZE], int[], int*, int*, int, int, int);
@@ -66,15 +66,15 @@ public:
     int hon_syoukyo_score(int[][TAT_SIZE], int*, int*);
 
     int setti_puyo_1(int[][TAT_SIZE], int, int);
-    int gtr(int[][TAT_SIZE]);
+    int gtr(const int[][TAT_SIZE]);
 
-    int aite_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2);
-    int pre_hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE],
+    int aite_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2);
+    int pre_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE],
                    int zenkesi_aite, int fast);
-    int hyouka(int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE],
+    int hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE],
                int zenkesi_aite);
-    int aite_attack_start(int ba3[6][TATE], int zenkesi_aite, int scos, int hakata);
-    int aite_attack_nokori(int ba3[6][TATE], int hakata);
+    int aite_attack_start(const int ba3[6][TATE], int zenkesi_aite, int scos, int hakata);
+    int aite_attack_nokori(const int ba3[6][TATE], int hakata);
     int aite_rensa_end();
     void ref();
 
