@@ -5,18 +5,7 @@
 
 using namespace std;
 
-class BitFieldTest : public testing::Test {
-protected:
-    int vanish(BitField* bf, int chain, FieldBits* erased) {
-        return bf->vanish(chain, erased);
-    }
-
-    void drop(BitField* bf, const FieldBits& erased) {
-        bf->drop(erased);
-    }
-};
-
-TEST_F(BitFieldTest, constructor1)
+TEST(BitFieldTest, constructor1)
 {
     BitField bf;
 
@@ -30,7 +19,7 @@ TEST_F(BitFieldTest, constructor1)
     EXPECT_TRUE(bf.isColor(7, 1, PuyoColor::WALL));
 }
 
-TEST_F(BitFieldTest, constructor2)
+TEST(BitFieldTest, constructor2)
 {
     PlainField pf(
         "OOOOOO"
@@ -55,7 +44,7 @@ TEST_F(BitFieldTest, constructor2)
     EXPECT_TRUE(bf.isColor(7, 1, PuyoColor::WALL));
 }
 
-TEST_F(BitFieldTest, constructor3)
+TEST(BitFieldTest, constructor3)
 {
     BitField bf(
         "OOOOOO"
@@ -73,7 +62,7 @@ TEST_F(BitFieldTest, constructor3)
     EXPECT_TRUE(bf.isColor(7, 1, PuyoColor::WALL));
 }
 
-TEST_F(BitFieldTest, setColor)
+TEST(BitFieldTest, setColor)
 {
     static const PuyoColor colors[] = {
         PuyoColor::RED, PuyoColor::BLUE, PuyoColor::YELLOW, PuyoColor::GREEN,
@@ -89,7 +78,7 @@ TEST_F(BitFieldTest, setColor)
     }
 }
 
-TEST_F(BitFieldTest, isZenkeshi)
+TEST(BitFieldTest, isZenkeshi)
 {
     BitField bf1;
     EXPECT_TRUE(bf1.isZenkeshi());
@@ -101,7 +90,7 @@ TEST_F(BitFieldTest, isZenkeshi)
     EXPECT_FALSE(bf3.isZenkeshi());
 }
 
-TEST_F(BitFieldTest, isConnectedPuyo)
+TEST(BitFieldTest, isConnectedPuyo)
 {
     BitField bf(
         "B.B..Y"
@@ -118,7 +107,7 @@ TEST_F(BitFieldTest, isConnectedPuyo)
     EXPECT_FALSE(bf.isConnectedPuyo(6, 2));
 }
 
-TEST_F(BitFieldTest, countConnectedPuyos)
+TEST(BitFieldTest, countConnectedPuyos)
 {
     BitField bf(
         "RRRRRR"
@@ -133,7 +122,7 @@ TEST_F(BitFieldTest, countConnectedPuyos)
     EXPECT_EQ(8, bf.countConnectedPuyos(4, 2));
 }
 
-TEST_F(BitFieldTest, countConnectedPuyosWithChecked)
+TEST(BitFieldTest, countConnectedPuyosWithChecked)
 {
     BitField bf(
         "RRRRRR"
@@ -152,7 +141,7 @@ TEST_F(BitFieldTest, countConnectedPuyosWithChecked)
     EXPECT_FALSE(checked.get(6, 2));
 }
 
-TEST_F(BitFieldTest, countConnectedPuyosMax4)
+TEST(BitFieldTest, countConnectedPuyosMax4)
 {
     BitField bf(
         "RRRRRR"
@@ -167,7 +156,7 @@ TEST_F(BitFieldTest, countConnectedPuyosMax4)
     EXPECT_LE(4, bf.countConnectedPuyosMax4(4, 2));
 }
 
-TEST_F(BitFieldTest, hasEmptyNeighbor)
+TEST(BitFieldTest, hasEmptyNeighbor)
 {
     BitField bf(
         "RR..RR"
@@ -182,7 +171,7 @@ TEST_F(BitFieldTest, hasEmptyNeighbor)
     EXPECT_FALSE(bf.hasEmptyNeighbor(6, 1));
 }
 
-TEST_F(BitFieldTest, fillSameColorPosition)
+TEST(BitFieldTest, fillSameColorPosition)
 {
     BitField bf(
         "RRRRRR"
@@ -205,7 +194,7 @@ TEST_F(BitFieldTest, fillSameColorPosition)
     EXPECT_EQ(Position(6, 3), ps[7]);
 }
 
-TEST_F(BitFieldTest, simulate1)
+TEST(BitFieldTest, simulate1)
 {
     BitField bf(
         ".BBBB.");
@@ -222,7 +211,7 @@ TEST_F(BitFieldTest, simulate1)
     }
 }
 
-TEST_F(BitFieldTest, simulate2)
+TEST(BitFieldTest, simulate2)
 {
     CoreField cf(
         "BBBBBB");
@@ -235,7 +224,7 @@ TEST_F(BitFieldTest, simulate2)
     EXPECT_TRUE(result.quick);
 }
 
-TEST_F(BitFieldTest, simulate3)
+TEST(BitFieldTest, simulate3)
 {
     CoreField cf(
         "YYYY.."
@@ -249,7 +238,7 @@ TEST_F(BitFieldTest, simulate3)
     EXPECT_TRUE(result.quick);
 }
 
-TEST_F(BitFieldTest, simulate4)
+TEST(BitFieldTest, simulate4)
 {
     CoreField cf(
         "YYYYYY"
@@ -263,7 +252,7 @@ TEST_F(BitFieldTest, simulate4)
     EXPECT_TRUE(result.quick);
 }
 
-TEST_F(BitFieldTest, simulate5)
+TEST(BitFieldTest, simulate5)
 {
     CoreField cf(
         ".YYYG."
@@ -279,7 +268,7 @@ TEST_F(BitFieldTest, simulate5)
     EXPECT_FALSE(result.quick);
 }
 
-TEST_F(BitFieldTest, simulate6)
+TEST(BitFieldTest, simulate6)
 {
     CoreField cf(".RBRB."
                  "RBRBR."
@@ -292,7 +281,7 @@ TEST_F(BitFieldTest, simulate6)
     EXPECT_EQ(cfResult, bfResult);
 }
 
-TEST_F(BitFieldTest, simulate7)
+TEST(BitFieldTest, simulate7)
 {
     CoreField cf(
         ".YGGY."
@@ -306,7 +295,7 @@ TEST_F(BitFieldTest, simulate7)
     EXPECT_EQ(cfResult, bfResult);
 }
 
-TEST_F(BitFieldTest, simulate8)
+TEST(BitFieldTest, simulate8)
 {
     CoreField cf(
         "BBBBBB"
@@ -319,56 +308,49 @@ TEST_F(BitFieldTest, simulate8)
     EXPECT_EQ(cfResult, bfResult);
 }
 
-TEST_F(BitFieldTest, vanish1)
+TEST(BitFieldTest, vanish1)
 {
-    PlainField pf(
+    BitField bf(
         "RRBBBB"
         "RGRRBB");
-    BitField bf(pf);
 
-    FieldBits erased;
-    int score = vanish(&bf, 2, &erased);
+    int score = bf.vanish(2);
 
     EXPECT_EQ(60 * 11, score);
-    EXPECT_EQ(FieldBits(pf, PuyoColor::BLUE), erased);
+    EXPECT_TRUE(bf.isEmpty(3, 2));
 }
 
-TEST_F(BitFieldTest, vanish2)
+TEST(BitFieldTest, vanish2)
 {
-    PlainField pf(
+    BitField bf(
         "RRBB.B"
         "RGRRBB");
-    BitField bf(pf);
 
-    FieldBits erased;
-    int score = vanish(&bf, 2, &erased);
-
+    int score = bf.vanish(2);
     EXPECT_EQ(0, score);
 }
 
-TEST_F(BitFieldTest, vanish3)
+TEST(BitFieldTest, vanish3)
 {
-    PlainField pf(
+    BitField bf(
         "ROOOOR"
         "OBBBBO"
         "ROOOOR");
-    BitField bf(pf);
 
-    FieldBits erased;
-    int score = vanish(&bf, 1, &erased);
+    int score = bf.vanish(1);
 
     EXPECT_EQ(40, score);
-    EXPECT_TRUE(erased.get(1, 2));
-    EXPECT_TRUE(erased.get(2, 2));
-    EXPECT_TRUE(erased.get(3, 2));
-    EXPECT_TRUE(erased.get(4, 2));
-    EXPECT_TRUE(erased.get(5, 2));
-    EXPECT_TRUE(erased.get(6, 2));
+    EXPECT_TRUE(bf.isEmpty(1, 2));
+    EXPECT_TRUE(bf.isEmpty(2, 2));
+    EXPECT_TRUE(bf.isEmpty(3, 2));
+    EXPECT_TRUE(bf.isEmpty(4, 2));
+    EXPECT_TRUE(bf.isEmpty(5, 2));
+    EXPECT_TRUE(bf.isEmpty(6, 2));
 }
 
-TEST_F(BitFieldTest, vanish4)
+TEST(BitFieldTest, vanish4)
 {
-    PlainField pf(
+    BitField bf(
         "RR.RRR" // 13
         "RRRRRR" // 12
         "OOOOOO"
@@ -382,53 +364,36 @@ TEST_F(BitFieldTest, vanish4)
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
-    BitField bf(pf);
 
-    FieldBits erased;
-    int score = vanish(&bf, 1, &erased);
+    int score = bf.vanish(1);
     EXPECT_EQ(60 * 3, score);
 
-    EXPECT_TRUE(erased.get(1, 12));
-    EXPECT_TRUE(erased.get(2, 12));
-    EXPECT_TRUE(erased.get(3, 12));
-    EXPECT_TRUE(erased.get(4, 12));
-    EXPECT_TRUE(erased.get(5, 12));
-    EXPECT_TRUE(erased.get(6, 12));
+    EXPECT_TRUE(bf.isEmpty(1, 12));
+    EXPECT_TRUE(bf.isEmpty(2, 12));
+    EXPECT_TRUE(bf.isEmpty(3, 12));
+    EXPECT_TRUE(bf.isEmpty(4, 12));
+    EXPECT_TRUE(bf.isEmpty(5, 12));
+    EXPECT_TRUE(bf.isEmpty(6, 12));
 
-    EXPECT_FALSE(erased.get(1, 13));
-    EXPECT_FALSE(erased.get(2, 13));
-    EXPECT_FALSE(erased.get(3, 13));
-    EXPECT_FALSE(erased.get(4, 13));
-    EXPECT_FALSE(erased.get(5, 13));
-    EXPECT_FALSE(erased.get(6, 13));
+    EXPECT_FALSE(bf.isEmpty(1, 13));
+    EXPECT_FALSE(bf.isEmpty(2, 13));
+    EXPECT_TRUE(bf.isEmpty(3, 13));
+    EXPECT_FALSE(bf.isEmpty(4, 13));
+    EXPECT_FALSE(bf.isEmpty(5, 13));
+    EXPECT_FALSE(bf.isEmpty(6, 13));
 }
 
-TEST_F(BitFieldTest, vanishdrop1)
+TEST(BitFieldTest, drop1)
 {
-    PlainField pf(
-        "RGBBBB"
-        "BBBGRB"
-        "GRBBBB"
-        "BBBGRB");
-    BitField bf(pf);
+    BitField bf(
+        "RG...."
+        "...G.."
+        "GR...."
+        "...GR.");
+    BitField expected(
+        "RG.G.."
+        "GR.GR.");
 
-    FieldBits erased;
-    vanish(&bf, 2, &erased);
-    drop(&bf, erased);
-
-    FieldBits red = bf.bits(PuyoColor::RED);
-    EXPECT_TRUE(red.get(1, 2));
-    EXPECT_TRUE(red.get(2, 1));
-    EXPECT_TRUE(red.get(5, 1));
-    EXPECT_TRUE(red.get(5, 2));
-    EXPECT_FALSE(red.get(1, 1));
-    EXPECT_FALSE(red.get(1, 4));
-
-    FieldBits green = bf.bits(PuyoColor::GREEN);
-    EXPECT_TRUE(green.get(1, 1));
-    EXPECT_TRUE(green.get(2, 2));
-    EXPECT_TRUE(green.get(4, 1));
-    EXPECT_TRUE(green.get(4, 2));
-    EXPECT_FALSE(green.get(5, 1));
-    EXPECT_FALSE(green.get(6, 1));
+    bf.drop();
+    EXPECT_EQ(expected, bf);
 }

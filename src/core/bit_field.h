@@ -32,10 +32,18 @@ public:
     int countConnectedPuyosMax4(int x, int y) const;
     bool hasEmptyNeighbor(int x, int y) const;
 
+    int vanish(int currentChain);
+    void drop();
+
     // TODO(mayah): This should be removed. This is for barkward compatibility.
     Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBits* checked) const;
 
     RensaResult simulate();
+
+    std::string toString(char charIfEmpty = ' ') const;
+
+    friend bool operator==(const BitField&, const BitField&);
+    friend std::ostream& operator<<(std::ostream&, const BitField&);
 
 private:
     friend class BitFieldTest;
@@ -44,9 +52,10 @@ private:
     void recoverUnvisible(const BitField&);
 
     // Vanishes puyos. Returns score. Erased puyos are put |erased|.
-    int vanish(int nthChain, FieldBits* erased);
+    // Actually puyo won't be vanished in this method, though...
+    int vanishForSimulation(int nthChain, FieldBits* erased);
     // Drops puyos. Returns max drops.
-    int drop(FieldBits erased);
+    int dropAfterVanish(FieldBits erased);
 
     FieldBits m_[3];
 };

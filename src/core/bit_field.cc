@@ -155,11 +155,11 @@ RensaResult BitField::simulate()
     bool quick = false;
     FieldBits erased;
 
-    while ((nthChainScore = vanish(currentChain, &erased)) > 0) {
+    while ((nthChainScore = vanishForSimulation(currentChain, &erased)) > 0) {
         currentChain += 1;
         score += nthChainScore;
         frames += FRAMES_VANISH_ANIMATION;
-        int maxDrops = drop(erased);
+        int maxDrops = dropAfterVanish(erased);
         if (maxDrops > 0) {
             frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
         } else {
@@ -171,7 +171,7 @@ RensaResult BitField::simulate()
     return RensaResult(currentChain - 1, score, frames, quick);
 }
 
-int BitField::vanish(int chain, FieldBits* erased)
+int BitField::vanishForSimulation(int chain, FieldBits* erased)
 {
     int numErased = 0;
     int numColors = 0;
@@ -227,8 +227,11 @@ int BitField::vanish(int chain, FieldBits* erased)
     return 10 * numErased * calculateRensaBonusCoef(chainBonus(chain), longBonusCoef, colorBonus(numColors));
 }
 
-int BitField::drop(FieldBits erased)
+int BitField::dropAfterVanish(FieldBits erased)
 {
+    // TODO(mayah): If we can use AVX2, we have DPEP instruction.
+    // It would be really useful to improve this method, I believe.
+
     // bits   = b15 .. b9 b8 b7 .. b0
 
     // Consider y = 8.
@@ -293,4 +296,54 @@ int BitField::drop(FieldBits erased)
     // We have _mm_minpos_epu16, but not _mm_maxpos_epu16. So, taking xor 1.
     int maxDropAmountNegative = _mm_cvtsi128_si32(_mm_minpos_epu16(_mm_xor_si128(ones, dropAmount)));
     return ~maxDropAmountNegative & 0xFF;
+}
+
+int BitField::vanish(int currentChain)
+{
+    FieldBits erased;
+    int score = vanishForSimulation(currentChain, &erased);
+    for (auto& m : m_)
+        m.unsetAll(erased);
+    return score;
+}
+
+void BitField::drop()
+{
+    // TODO(mayah): slow!
+    for (int x = 1; x <= 6; ++x) {
+        int h = 1;
+        for (int y = 1; y <= 13; ++y) {
+            if (isEmpty(x, y))
+                continue;
+            setColor(x, h++, color(x, y));
+        }
+        for (; h <= 13; ++h) {
+            setColor(x, h, PuyoColor::EMPTY);
+        }
+    }
+}
+
+std::string BitField::toString(char charIfEmpty) const
+{
+    ostringstream ss;
+    for (int y = 14; y >= 1; --y) {
+        for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+            ss << toChar(color(x, y), charIfEmpty);
+        }
+    }
+
+    return ss.str();
+}
+
+bool operator==(const BitField& lhs, const BitField& rhs)
+{
+    for (int i = 0; i < 3; ++i)
+        if (lhs.m_[i] != rhs.m_[i])
+            return false;
+    return true;
+}
+
+std::ostream& operator<<(std::ostream& os, const BitField& bf)
+{
+    return os << bf.toString();
 }
