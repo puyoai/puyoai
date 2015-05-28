@@ -45,6 +45,7 @@ add_subdirectory(peria)
 add_subdirectory(tzik)
 add_subdirectory(yamaguchi)
 add_subdirectory(test_lockit)
+add_subdirectory(yuricat)
 
 add_subdirectory(sample)
 add_subdirectory(sample_filler)
