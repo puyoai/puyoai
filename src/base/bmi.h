@@ -48,6 +48,20 @@ std::uint64_t depositBits(std::uint64_t x, std::uint64_t mask)
 #endif
 }
 
+// 4bit version of extractBits.
+//      x: DDDD CCCC BBBB AAAA
+//   mask:    0    1    0    1
+// result: 0000 0000 CCCC AAAA
+inline
+std::uint64_t extractBits4(std::uint64_t x, int mask)
+{
+    std::uint64_t m = depositBits(mask, 0x1111111111111111);
+    m = m | (m << 1);
+    m = m | (m << 2);
+
+    return extractBits(x, m);
+}
+
 } // namespace bmi
 
 #endif
