@@ -12,6 +12,7 @@ function(puyoai_base_add_test target)
     puyoai_target_link_libraries(${target}_test)
 endfunction()
 
+puyoai_base_add_test(bmi)
 puyoai_base_add_test(sse)
 puyoai_base_add_test(strings)
 puyoai_base_add_test(small_int_set)
