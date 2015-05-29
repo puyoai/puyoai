@@ -100,16 +100,12 @@ bool BitField::isConnectedPuyo(int x, int y) const
 
 int BitField::countConnectedPuyos(int x, int y) const
 {
-    PuyoColor c = color(x, y);
-    DCHECK_NE(c, PuyoColor::EMPTY);
     FieldBits colorBits = bits(color(x, y)).maskedField12();
     return FieldBits(x, y).expand(colorBits).popcount();
 }
 
 int BitField::countConnectedPuyos(int x, int y, FieldBits* checked) const
 {
-    PuyoColor c = color(x, y);
-    DCHECK_NE(c, PuyoColor::EMPTY);
     FieldBits colorBits = bits(color(x, y)).maskedField12();
     FieldBits connected = FieldBits(x, y).expand(colorBits);
     checked->setAll(connected);
@@ -118,8 +114,6 @@ int BitField::countConnectedPuyos(int x, int y, FieldBits* checked) const
 
 int BitField::countConnectedPuyosMax4(int x, int y) const
 {
-    PuyoColor c = color(x, y);
-    DCHECK_NE(c, PuyoColor::EMPTY);
     FieldBits colorBits = bits(color(x, y)).maskedField12();
     return FieldBits(x, y).expand4(colorBits).popcount();
 }
