@@ -22,11 +22,24 @@ const int saisoku_point = 1;
 // int saisoku_point = 0;
 
 class COMAI_HI {
-private:
 public:
     COMAI_HI();
     ~COMAI_HI();
 
+    int aite_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2);
+    int pre_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE], int zenkesi_aite, int fast);
+    int hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE], int zenkesi_aite);
+    int aite_attack_start(const int ba3[6][TATE], int zenkesi_aite, int scos, int hakata);
+    int aite_attack_nokori(const int ba3[6][TATE], int hakata);
+    int aite_rensa_end();
+    void ref();
+
+    int hukks;
+    int para[22];
+    int aite_hakka_nokori;
+    int aite_hakkaji_score;
+
+private:
     int saiki(const int[][TAT_SIZE], int[][12], int, int, int*, int);
     int saiki_right(const int[][TAT_SIZE], int[][12], int, int, int*, int);
     int saiki_left(const int[][TAT_SIZE], int[][12], int, int, int*, int);
@@ -68,36 +81,22 @@ public:
     int setti_puyo_1(int[][TAT_SIZE], int, int);
     int gtr(const int[][TAT_SIZE]);
 
-    int aite_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2);
-    int pre_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE],
-                   int zenkesi_aite, int fast);
-    int hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE],
-               int zenkesi_aite);
-    int aite_attack_start(const int ba3[6][TATE], int zenkesi_aite, int scos, int hakata);
-    int aite_attack_nokori(const int ba3[6][TATE], int hakata);
-    int aite_rensa_end();
-    void ref();
-
     int read_template();
 
     int cchai;
-    int hukks;
     int conaa, nexaa;
     int maxchais;
     int aite_rensa_score; // aite
     int aite_rensa_score_cc; // aite
-    int para[22];
     int myf_kosuu;
     int saisoku_flag;
     int aite_hakka_rensa;
-    int aite_hakka_nokori;
     int aite_hakka_zenkesi;
     int aite_hakka_kosuu;
     int nocc_aite_rensa_score;
     int max_ee;
     int key_ee;
 
-    int aite_hakkaji_score;
     int aite_hakka_jamako;
     int aite_hakka_honsen;
     int aite_hakka_quick;
