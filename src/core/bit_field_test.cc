@@ -276,8 +276,8 @@ TEST(BitFieldTest, fillSameColorPosition)
 TEST(BitFieldTest, fillSameColorPositionEdge)
 {
     BitField bf(
-        ".....R" // 13
-        "OOOOOR" // 12
+        "RRRRRR" // 13
+        "ROOOOR" // 12
         "OOOOOO"
         "OOOOOO"
         "OOOOOO"
