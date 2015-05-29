@@ -4,7 +4,6 @@
 #include "lockit_constant.h"
 
 class READ_P {
-private:
 public:
     READ_P();
     ~READ_P();
@@ -12,10 +11,27 @@ public:
     void ref();
     void fall();
     int setti_puyo();
-    int chousei_syoukyo();
     void setti_12();
     void field_kioku();
     int field_hikaku();
+
+    int field[6][18];
+    int yosou_field[6][18];
+    int tsumo[6];
+    int act_on;
+    int nex_on;
+    int set_puyo;
+    int set_puyo_once;
+    int rensa_end;
+    int score;
+    int keep_score;
+    int zenkesi;
+    int id;
+    int te_x;
+    int te_r;
+
+private:
+    int chousei_syoukyo();
 
     int saiki(int[][TATE], int[][12], int, int, int*, int);
     int saiki_right(int[][TATE], int[][12], int, int, int*, int);
@@ -28,24 +44,10 @@ public:
     int syou_up(int[][TATE], int, int, int, int[]);
     int syou_down(int[][TATE], int, int, int, int[]);
 
-    int field[6][18];
     int field12[6];
-    int yosou_field[6][18];
     int field_hoz[6][18];
-    int tsumo[6];
-    int act_on;
     int act_on_1st;
-    int nex_on;
-    int set_puyo;
-    int set_puyo_once;
-    int rensa_end;
     int rensa_end_once;
-    int score;
-    int keep_score;
-    int zenkesi;
-    int id;
-    int te_x;
-    int te_r;
     int setti_basyo[4];
 };
 
