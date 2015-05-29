@@ -186,6 +186,9 @@ int PlainField::vanish(int currentChain)
 
 int PlainField::countConnectedPuyosMax4(int x, int y) const
 {
+    if (y > FieldConstant::HEIGHT)
+      return 0;
+
     bool leftUp = false, leftDown = false, rightUp = false, rightDown = false;
     int cnt = 1;
     PuyoColor c = color(x, y);
