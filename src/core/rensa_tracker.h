@@ -3,6 +3,7 @@
 
 #include <glog/logging.h>
 
+#include "base/bmi.h"
 #include "base/unit.h"
 #include "core/rensa_result.h"
 #include "core/rensa_track_result.h"
@@ -175,6 +176,44 @@ public:
 
 private:
     int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
+};
+
+class BitRensaYPositionTracker {
+public:
+    BitRensaYPositionTracker() :
+        originalY_ {
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+        }
+    {
+    }
+
+    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/,
+               const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    {
+        const __m128i zero = _mm_setzero_si128();
+        const __m128i ones = _mm_cmpeq_epi8(zero, zero);
+        union {
+            std::uint16_t cols[FieldConstant::MAP_WIDTH];
+            __m128i m;
+        };
+        m = (vanishedColorPuyoBits | vanishedOjamaPuyoBits) ^ ones;
+
+        for (int x = 1; x <= 6; ++x) {
+            originalY_[x] = bmi::extractBits4(originalY_[x], cols[x]);
+        }
+    }
+
+    int originalY(int x, int y) const { return (originalY_[x] >> (4 * y)) & 0xF; }
+
+private:
+    std::uint64_t originalY_[FieldConstant::MAP_WIDTH];
 };
 
 #endif
