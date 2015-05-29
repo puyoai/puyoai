@@ -53,8 +53,8 @@ public:
 private:
     friend class BitFieldTest;
 
-    BitField escapeUnvisible();
-    void recoverUnvisible(const BitField&);
+    BitField escapeInvisible();
+    void recoverInvisible(const BitField&);
 
     // Vanishes puyos. Returns score. Erased puyos are put |erased|.
     // Actually puyo won't be vanished in this method, though...
@@ -95,7 +95,7 @@ FieldBits BitField::bits(PuyoColor c) const
 }
 
 inline
-BitField BitField::escapeUnvisible()
+BitField BitField::escapeInvisible()
 {
     const FieldBits mask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
     BitField escaped;
@@ -108,7 +108,7 @@ BitField BitField::escapeUnvisible()
 }
 
 inline
-void BitField::recoverUnvisible(const BitField& bf)
+void BitField::recoverInvisible(const BitField& bf)
 {
     for (int i = 0; i < 3; ++i) {
         m_[i].setAll(bf.m_[i]);
@@ -125,7 +125,7 @@ RensaResult BitField::simulate()
 template<typename Tracker>
 RensaResult BitField::simulate(Tracker* tracker)
 {
-    BitField escaped = escapeUnvisible();
+    BitField escaped = escapeInvisible();
 
     int currentChain = 1;
     int score = 0;
@@ -146,7 +146,7 @@ RensaResult BitField::simulate(Tracker* tracker)
         }
     }
 
-    recoverUnvisible(escaped);
+    recoverInvisible(escaped);
     return RensaResult(currentChain - 1, score, frames, quick);
 }
 
