@@ -237,7 +237,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
             // 2x hyouka
             int field_kosuu = 0;
             for (int i = 0; i < 6; ++i) {
-                for (int j = 0; j < 18; ++j) {
+                for (int j = 0; j < TATE; ++j) {
                     if (r_player[0].field[i][j] != 0) {
                         ++field_kosuu;
                     }
@@ -248,16 +248,16 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
                 field_kosuu = 0;
             }
 
-            int field2x[6][18] {};
+            int field2x[6][TATE] {};
             for (int i = 0; i < 6; ++i) {
                 for (int j = 0; j < 14; ++j) {
-                    field2x[i][j] = r_player[0].field[i][j+4];
+                    field2x[i][j] = (j + 4 < TATE) ? r_player[0].field[i][j+4] : 0;
                 }
             }
 
             if (field_kosuu > 24 && field_kosuu < 56) {
- 				coma2x.hyouka(field2x, r_player[0].tsumo[0], r_player[0].tsumo[1], r_player[0].tsumo[2], r_player[0].tsumo[3], r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi);
- 			}
+              coma2x.hyouka(field2x, r_player[0].tsumo[0], r_player[0].tsumo[1], r_player[0].tsumo[2], r_player[0].tsumo[3], r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi);
+            }
 
             count_tsumo_2p++;
             tmp = 0;
