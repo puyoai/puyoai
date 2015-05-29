@@ -315,6 +315,10 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     for (int j = 0; j < 3; ++j) {
                         int xx = origin.x + EXTENTIONS[i][j][0];
                         int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y) {
+                            ok = false;
+                            break;
+                        }
                         if (!(originalField.color(xx, yy) == PuyoColor::EMPTY || originalField.color(xx, yy) == c)) {
                             ok = false;
                             break;
@@ -327,6 +331,9 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     for (int j = 0; j < 3; ++j) {
                         int xx = origin.x + EXTENTIONS[i][j][0];
                         int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y) {
+                            continue;
+                        }
                         if (cf.color(xx, yy) == c)
                             continue;
                         DCHECK_EQ(originalField.color(xx, yy), PuyoColor::EMPTY);
@@ -380,6 +387,10 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     for (int j = 0; j < 3; ++j) {
                         int xx = origin.x + EXTENTIONS[i][j][0];
                         int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y) {
+                            ok = false;
+                            break;
+                        }
                         if (!(originalField.color(xx, yy) == PuyoColor::EMPTY || originalField.color(xx, yy) == c)) {
                             ok = false;
                             break;
@@ -395,6 +406,8 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     for (int j = 0; j < 3; ++j) {
                         int xx = origin.x + EXTENTIONS[i][j][0];
                         int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y)
+                            continue;
                         if (cf.color(xx, yy) == c)
                             continue;
                         DCHECK_EQ(originalField.color(xx, yy), PuyoColor::EMPTY);
