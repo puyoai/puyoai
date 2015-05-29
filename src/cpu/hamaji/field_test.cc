@@ -49,16 +49,6 @@ TEST(FieldTest, getBestChainCount) {
   }
 }
 
-void testUrl(string url, int expected_chains, int expected_score) {
-  LF f(url);
-  int chains;
-  int score;
-  int frames;
-  f.Simulate(&chains, &score, &frames);
-  EXPECT_EQ(expected_chains, chains);
-  EXPECT_EQ(expected_score, score);
-}
-
 TEST(FieldTest, getOjamaFilmHeightTest) {
   {
     LF f("111110456755445677556675");
