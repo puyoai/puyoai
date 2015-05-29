@@ -15,8 +15,8 @@ public:
     void field_kioku();
     int field_hikaku();
 
-    int field[6][18];
-    int yosou_field[6][18];
+    int field[6][TATE];
+    int yosou_field[6][TATE];
     int tsumo[6];
     int act_on;
     int nex_on;
@@ -45,7 +45,7 @@ private:
     int syou_down(int[][TATE], int, int, int, int[]);
 
     int field12[6];
-    int field_hoz[6][18];
+    int field_hoz[6][TATE];
     int act_on_1st;
     int rensa_end_once;
     int setti_basyo[4];

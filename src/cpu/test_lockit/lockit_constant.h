@@ -1,9 +1,9 @@
 #ifndef CPU_TEST_LOCKIT_CONSTANT_H_
 #define CPU_TEST_LOCKIT_CONSTANT_H_
 
-#define TAT_SIZE 16
+#define TAT_SIZE 14
 #define EE_SIZE 1
-#define TATE 18
+#define TATE 14
 
 #define TM_TMNMUM 40
 #define TM_COLNUM 20
