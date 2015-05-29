@@ -15,8 +15,18 @@ TEST(BitFieldTest, constructor1)
         }
     }
 
-    EXPECT_TRUE(bf.isColor(0, 0, PuyoColor::WALL));
-    EXPECT_TRUE(bf.isColor(7, 1, PuyoColor::WALL));
+    for (int y = 0; y < 16; ++y) {
+        EXPECT_TRUE(bf.isColor(0, y, PuyoColor::WALL));
+        EXPECT_TRUE(bf.isColor(7, y, PuyoColor::WALL));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(0, y));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(7, y));
+    }
+    for (int x = 0; x < 8; ++x) {
+        EXPECT_TRUE(bf.isColor(x, 0, PuyoColor::WALL));
+        EXPECT_TRUE(bf.isColor(x, 15, PuyoColor::WALL));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(x, 0));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(x, 15));
+    }
 }
 
 TEST(BitFieldTest, constructor2)
@@ -40,8 +50,18 @@ TEST(BitFieldTest, constructor2)
         }
     }
 
-    EXPECT_TRUE(bf.isColor(0, 0, PuyoColor::WALL));
-    EXPECT_TRUE(bf.isColor(7, 1, PuyoColor::WALL));
+    for (int y = 0; y < 16; ++y) {
+        EXPECT_TRUE(bf.isColor(0, y, PuyoColor::WALL));
+        EXPECT_TRUE(bf.isColor(7, y, PuyoColor::WALL));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(0, y));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(7, y));
+    }
+    for (int x = 0; x < 8; ++x) {
+        EXPECT_TRUE(bf.isColor(x, 0, PuyoColor::WALL));
+        EXPECT_TRUE(bf.isColor(x, 15, PuyoColor::WALL));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(x, 0));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(x, 15));
+    }
 }
 
 TEST(BitFieldTest, constructor3)
@@ -58,8 +78,18 @@ TEST(BitFieldTest, constructor3)
     EXPECT_TRUE(bf.isColor(4, 2, PuyoColor::YELLOW));
     EXPECT_TRUE(bf.isColor(4, 3, PuyoColor::OJAMA));
 
-    EXPECT_TRUE(bf.isColor(0, 0, PuyoColor::WALL));
-    EXPECT_TRUE(bf.isColor(7, 1, PuyoColor::WALL));
+    for (int y = 0; y < 16; ++y) {
+        EXPECT_TRUE(bf.isColor(0, y, PuyoColor::WALL));
+        EXPECT_TRUE(bf.isColor(7, y, PuyoColor::WALL));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(0, y));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(7, y));
+    }
+    for (int x = 0; x < 8; ++x) {
+        EXPECT_TRUE(bf.isColor(x, 0, PuyoColor::WALL));
+        EXPECT_TRUE(bf.isColor(x, 15, PuyoColor::WALL));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(x, 0));
+        EXPECT_EQ(PuyoColor::WALL, bf.color(x, 15));
+    }
 }
 
 TEST(BitFieldTest, setColor)
