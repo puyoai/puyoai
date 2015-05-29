@@ -3,6 +3,7 @@
 
 #include <glog/logging.h>
 
+#include "base/bmi.h"
 #include "base/unit.h"
 #include "core/rensa_result.h"
 #include "core/rensa_track_result.h"
@@ -35,33 +36,105 @@ public:
 };
 typedef RensaTracker<Unit> RensaNonTracker;
 
-// RensaTracker<RensaChainTrackResult> tracks in what-th rensa a puyo is vanished.
-template<>
-class RensaTracker<RensaChainTrackResult> {
+class RensaYPositionTracker {
 public:
-    RensaTracker() :
+    RensaYPositionTracker() :
         originalY_ {
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
         }
     {
     }
 
-    const RensaChainTrackResult& result() const { return result_; }
+    int originalY(int x, int y) const { return originalY_[x][y]; }
 
-    void colorPuyoIsVanished(int x, int y, int nthChain) { result_.setErasedAt(x, originalY_[x][y], nthChain); }
-    void ojamaPuyoIsVanished(int x, int y, int nthChain) { result_.setErasedAt(x, originalY_[x][y], nthChain); }
-    void puyoIsDropped(int x, int fromY, int toY) { originalY_[x][toY] = originalY_[x][fromY]; }
+    void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
+    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
+    void puyoIsDropped(int x, int fromY, int toY)
+    {
+        DCHECK_NE(fromY, toY);
+        originalY_[x][toY] = originalY_[x][fromY];
+        originalY_[x][fromY] = 0;
+    }
     void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
 
 private:
     int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
+};
+
+class BitRensaYPositionTracker {
+public:
+    BitRensaYPositionTracker() :
+        originalY_ {
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+            0xFEDCBA9876543210,
+        }
+    {
+    }
+
+    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/,
+               const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    {
+        const __m128i zero = _mm_setzero_si128();
+        const __m128i ones = _mm_cmpeq_epi8(zero, zero);
+        union {
+            std::uint16_t cols[FieldConstant::MAP_WIDTH];
+            __m128i m;
+        };
+        m = (vanishedColorPuyoBits | vanishedOjamaPuyoBits) ^ ones;
+
+        for (int x = 1; x <= 6; ++x) {
+            originalY_[x] = bmi::extractBits4(originalY_[x], cols[x]);
+        }
+    }
+
+    int originalY(int x, int y) const { return (originalY_[x] >> (4 * y)) & 0xF; }
+
+private:
+    std::uint64_t originalY_[FieldConstant::MAP_WIDTH];
+};
+
+// RensaTracker<RensaChainTrackResult> tracks in what-th rensa a puyo is vanished.
+template<>
+class RensaTracker<RensaChainTrackResult> {
+public:
+    RensaTracker() {}
+
+    const RensaChainTrackResult& result() const { return result_; }
+
+    void colorPuyoIsVanished(int x, int y, int nthChain)
+    {
+        yTracker_.colorPuyoIsVanished(x, y, nthChain);
+        result_.setErasedAt(x, yTracker_.originalY(x, y), nthChain);
+    }
+    void ojamaPuyoIsVanished(int x, int y, int nthChain)
+    {
+        yTracker_.ojamaPuyoIsVanished(x, y, nthChain);
+        result_.setErasedAt(x, yTracker_.originalY(x, y), nthChain);
+    }
+    void puyoIsDropped(int x, int fromY, int toY)
+    {
+        yTracker_.puyoIsDropped(x, fromY, toY);
+    }
+    void nthChainDone(int nthChain, int numErasedPuyo, int coef)
+    {
+        yTracker_.nthChainDone(nthChain, numErasedPuyo, coef);
+    }
+
+private:
+    RensaYPositionTracker yTracker_;
     RensaChainTrackResult result_;
 };
 typedef RensaTracker<RensaChainTrackResult> RensaChainTracker;
@@ -145,38 +218,6 @@ public:
 private:
     int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
     RensaChainTrackResult* result_;
-};
-
-class RensaYPositionTracker {
-public:
-    RensaYPositionTracker() :
-        originalY_ {
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-        }
-    {
-    }
-
-    int originalY(int x, int y) const { return originalY_[x][y]; }
-
-    void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
-    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
-    void puyoIsDropped(int x, int fromY, int toY)
-    {
-        DCHECK_NE(fromY, toY);
-        originalY_[x][toY] = originalY_[x][fromY];
-        originalY_[x][fromY] = 0;
-    }
-    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
-
-private:
-    int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
 };
 
 #endif
