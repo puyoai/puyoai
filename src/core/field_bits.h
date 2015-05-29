@@ -28,6 +28,9 @@ public:
     bool get(int x, int y) const { return !_mm_testz_si128(onebit(x, y), m_); }
     void set(int x, int y) { m_ = _mm_or_si128(onebit(x, y), m_); }
     void unset(int x, int y) { m_ = _mm_andnot_si128(onebit(x, y), m_); }
+    void clear(int x, int y) { unset(x, y); }
+
+    void setBit(int x, int y, bool b) { if (b) set(x, y); else unset(x, y); }
 
     void setAll(const FieldBits& fb) { m_ = _mm_or_si128(fb.m_, m_); }
     void unsetAll(const FieldBits& fb) { m_ = _mm_andnot_si128(fb.m_, m_); }

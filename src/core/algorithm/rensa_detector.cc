@@ -301,7 +301,7 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
             PuyoColor c = originalField.color(x, y);
             if (!isNormalColor(c))
                 continue;
-            if (checked(x, y))
+            if (checked.get(x, y))
                 continue;
             if (!originalField.hasEmptyNeighbor(x, y))
                 continue;

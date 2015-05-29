@@ -16,7 +16,7 @@ vector<Position> findIgnitionPositions(const FieldPattern& pattern)
     FieldChecker checked;
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            if (checked(x, y))
+            if (checked.get(x, y))
                 continue;
             if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
                 continue;

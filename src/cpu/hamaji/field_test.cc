@@ -32,7 +32,7 @@ TEST(FieldTest, getBestChainCount) {
     EXPECT_EQ(9, vpc);
   }
   {
-    LF field("http://www.inosendo.com/puyo/rensim/??5000005000054000054");
+    LF field("5000005000054000054");
     int ipc, ucc, vpc;
     EXPECT_EQ(1, field.getBestChainCount(&ipc, &ucc, &vpc));
     EXPECT_EQ(2, ipc);
@@ -40,7 +40,7 @@ TEST(FieldTest, getBestChainCount) {
     EXPECT_EQ(0, vpc);
   }
   {
-    LF field("http://www.inosendo.com/puyo/rensim/??50000050000540000540");
+    LF field("50000050000540000540");
     int ipc, ucc, vpc;
     EXPECT_EQ(2, field.getBestChainCount(&ipc, &ucc, &vpc));
     EXPECT_EQ(2, ipc);
@@ -59,58 +59,40 @@ void testUrl(string url, int expected_chains, int expected_score) {
   EXPECT_EQ(expected_score, score);
 }
 
-
-TEST(FieldTest, ChainAndScoreTest) {
-  testUrl("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755", 19, 175080);
-  testUrl("http://www.inosendo.com/puyo/rensim/??500467767675744454754657447767667644674545455767477644457474656455446775455646", 19, 175080);
-  testUrl("http://www.inosendo.com/puyo/rensim/??550050455045451045745074745074645067674067674056567056567515167444416555155", 2, 38540);
-  testUrl("http://www.inosendo.com/puyo/rensim/??50550040455075451075745064745064645067674057674747574776567675156644415555155", 3, 43260);
-  testUrl("http://www.inosendo.com/puyo/rensim/??550040455075451775745464745464645467674457674147574776567675156644415555155", 4, 50140);
-  testUrl("http://www.inosendo.com/puyo/rensim/??745550576455666451175745564745564745567674157674747574776566615156644415555155", 5, 68700);
-  testUrl("http://www.inosendo.com/puyo/rensim/??444411114141414114114111414144411114414111114414411114441114111141444141111141", 4, 4840);
-  testUrl("http://www.inosendo.com/puyo/rensim/??545544544454454545454545454545545454445544554455454545545454554544445455455445", 9, 49950);
-  testUrl("http://www.inosendo.com/puyo/rensim/??444446544611446164564441546166565615454551441444111111111111111111111111111111", 9, 32760);
-  testUrl("http://www.inosendo.com/puyo/rensim/??667547466555661677471475451447461666661547457477556446776555744646476466744555", 18, 155980);
-  testUrl("http://www.inosendo.com/puyo/rensim/??444044144414114144411411414144141414414141441414114411441144414141141414144144", 11, 47080);
-  testUrl("http://www.inosendo.com/puyo/rensim/??444444444444444444444444444444444444444444444444444444444444444444444444", 1, 7200);
-
-  testUrl("http://www.inosendo.com/puyo/rensim/??400005500005400005500004400", 2, 420);
-}
-
 TEST(FieldTest, getOjamaFilmHeightTest) {
   {
-    LF f("http://www.inosendo.com/puyo/rensim/??111110456755445677556675");
+    LF f("111110456755445677556675");
     EXPECT_EQ(0, f.getOjamaFilmHeight());
   }
   {
-    LF f("http://www.inosendo.com/puyo/rensim/??111111456755445677556675");
+    LF f("111111456755445677556675");
     EXPECT_EQ(1, f.getOjamaFilmHeight());
   }
   {
-    LF f("http://www.inosendo.com/puyo/rensim/??111111156755445677556675");
+    LF f("111111156755445677556675");
     EXPECT_EQ(1, f.getOjamaFilmHeight());
   }
   {
-    LF f("http://www.inosendo.com/puyo/rensim/??1100011116115411177551675");
+    LF f("1100011116115411177551675");
     EXPECT_EQ(2, f.getOjamaFilmHeight());
   }
   {
-    LF f("http://www.inosendo.com/puyo/rensim/??1110111116115411177551675");
+    LF f("1110111116115411177551675");
     EXPECT_EQ(2, f.getOjamaFilmHeight());
   }
   {
-    LF f("http://www.inosendo.com/puyo/rensim/??1111111116115411177551675");
+    LF f("1111111116115411177551675");
     EXPECT_EQ(1, f.getOjamaFilmHeight());
   }
   {
-    LF f("http://www.inosendo.com/puyo/rensim/??1100111106115411177511675");
+    LF f("1100111106115411177511675");
     EXPECT_EQ(1, f.getOjamaFilmHeight());
     int hcpc;
     EXPECT_EQ(1, f.getOjamaFilmHeight(&hcpc));
     EXPECT_EQ(8, hcpc);
   }
   {
-    LF f("http://www.inosendo.com/puyo/rensim/??1100111116115411577511675");
+    LF f("1100111116115411577511675");
     int hcpc;
     EXPECT_EQ(1, f.getOjamaFilmHeight(&hcpc));
     EXPECT_EQ(9, hcpc);
@@ -123,7 +105,7 @@ TEST(FieldTest, getProspectiveChains) {
   // ASSERT_EQ(69L, pchains.size());
 #if 0
   {
-    LF f("http://www.inosendo.com/puyo/rensim/??45600045600045600");
+    LF f("45600045600045600");
     vector<Chain*> pchains;
     f.getProspectiveChains(&pchains);
     ASSERT_EQ(3L, pchains.size());
