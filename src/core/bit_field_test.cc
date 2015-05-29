@@ -1,5 +1,6 @@
 #include "core/bit_field.h"
 
+#include <algorithm>
 #include <gtest/gtest.h>
 
 #include "core/plain_field.h"
