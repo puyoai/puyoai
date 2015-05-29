@@ -93,7 +93,7 @@ void BitField::setColor(int x, int y, PuyoColor c)
 bool BitField::isConnectedPuyo(int x, int y) const
 {
     PuyoColor c = color(x, y);
-    FieldBits colorBits = bits(c);
+    FieldBits colorBits = bits(c).maskedField12();
     FieldBits single(x, y);
     return !single.expandEdge().mask(colorBits).notmask(single).isEmpty();
 }
@@ -102,7 +102,7 @@ int BitField::countConnectedPuyos(int x, int y) const
 {
     PuyoColor c = color(x, y);
     DCHECK_NE(c, PuyoColor::EMPTY);
-    FieldBits colorBits = bits(color(x, y));
+    FieldBits colorBits = bits(color(x, y)).maskedField12();
     return FieldBits(x, y).expand(colorBits).popcount();
 }
 
@@ -110,7 +110,7 @@ int BitField::countConnectedPuyos(int x, int y, FieldBits* checked) const
 {
     PuyoColor c = color(x, y);
     DCHECK_NE(c, PuyoColor::EMPTY);
-    FieldBits colorBits = bits(color(x, y));
+    FieldBits colorBits = bits(color(x, y)).maskedField12();
     FieldBits connected = FieldBits(x, y).expand(colorBits);
     checked->setAll(connected);
     return connected.popcount();
@@ -120,7 +120,7 @@ int BitField::countConnectedPuyosMax4(int x, int y) const
 {
     PuyoColor c = color(x, y);
     DCHECK_NE(c, PuyoColor::EMPTY);
-    FieldBits colorBits = bits(color(x, y));
+    FieldBits colorBits = bits(color(x, y)).maskedField12();
     return FieldBits(x, y).expand4(colorBits).popcount();
 }
 
@@ -132,7 +132,7 @@ bool BitField::hasEmptyNeighbor(int x, int y) const
         return true;
     if (y - 1 >= 1 && isEmpty(x, y - 1))
         return true;
-    if (y + 1 <= 13 && isEmpty(x, y + 1))
+    if (y + 1 <= 12 && isEmpty(x, y + 1))
         return true;
     return false;
 }
@@ -140,7 +140,7 @@ bool BitField::hasEmptyNeighbor(int x, int y) const
 Position* BitField::fillSameColorPosition(int x, int y, PuyoColor c,
                                           Position* positionQueueHead, FieldBits* checked) const
 {
-    FieldBits bs = FieldBits(x, y).expand(bits(c));
+    FieldBits bs = FieldBits(x, y).expand(bits(c)).maskedField12();
     checked->setAll(bs);
     int len = bs.toPositions(positionQueueHead);
     return positionQueueHead + len;
