@@ -3,6 +3,8 @@
 #include <smmintrin.h>
 #include <glog/logging.h>
 
+#include <sstream>
+
 #include "core/frame.h"
 #include "core/plain_field.h"
 #include "core/position.h"
