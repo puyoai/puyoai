@@ -107,6 +107,26 @@ TEST(BitFieldTest, isConnectedPuyo)
     EXPECT_FALSE(bf.isConnectedPuyo(6, 2));
 }
 
+TEST(BitFieldTest, isConnectedPuyoEdge)
+{
+    BitField bf(
+        ".....R" // 13
+        "OOOOOR" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    EXPECT_FALSE(bf.isConnectedPuyo(6, 12));
+}
+
 TEST(BitFieldTest, countConnectedPuyos)
 {
     BitField bf(
@@ -120,6 +140,26 @@ TEST(BitFieldTest, countConnectedPuyos)
     EXPECT_EQ(1, bf.countConnectedPuyos(3, 2));
     EXPECT_EQ(1, bf.countConnectedPuyos(6, 2));
     EXPECT_EQ(8, bf.countConnectedPuyos(4, 2));
+}
+
+TEST(BitFieldTest, countConnectedPuyosEdge)
+{
+    BitField bf(
+        ".....R" // 13
+        "OOOOOR" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    EXPECT_EQ(1, bf.countConnectedPuyos(6, 12));
 }
 
 TEST(BitFieldTest, countConnectedPuyosWithChecked)
@@ -156,6 +196,26 @@ TEST(BitFieldTest, countConnectedPuyosMax4)
     EXPECT_LE(4, bf.countConnectedPuyosMax4(4, 2));
 }
 
+TEST(BitFieldTest, countConnectedPuyosMax4Edge)
+{
+    BitField bf(
+        ".....R" // 13
+        "OOOOOR" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    EXPECT_EQ(1, bf.countConnectedPuyosMax4(6, 12));
+}
+
 TEST(BitFieldTest, hasEmptyNeighbor)
 {
     BitField bf(
@@ -169,6 +229,25 @@ TEST(BitFieldTest, hasEmptyNeighbor)
     EXPECT_FALSE(bf.hasEmptyNeighbor(1, 1));
     EXPECT_FALSE(bf.hasEmptyNeighbor(2, 1));
     EXPECT_FALSE(bf.hasEmptyNeighbor(6, 1));
+}
+
+TEST(BitFieldTest, hasEmptyNeighborEdge)
+{
+    BitField bf(
+        "OOOOOR" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    EXPECT_FALSE(bf.hasEmptyNeighbor(6, 12));
 }
 
 TEST(BitFieldTest, fillSameColorPosition)
@@ -192,6 +271,31 @@ TEST(BitFieldTest, fillSameColorPosition)
     EXPECT_EQ(Position(5, 2), ps[5]);
     EXPECT_EQ(Position(5, 3), ps[6]);
     EXPECT_EQ(Position(6, 3), ps[7]);
+}
+
+TEST(BitFieldTest, fillSameColorPositionEdge)
+{
+    BitField bf(
+        ".....R" // 13
+        "OOOOOR" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    Position ps[128];
+    FieldBits checked;
+    Position* head = bf.fillSameColorPosition(6, 12, PuyoColor::RED, ps, &checked);
+
+    EXPECT_EQ(1, head - ps);
+    EXPECT_EQ(Position(6, 12), ps[0]);
 }
 
 TEST(BitFieldTest, simulate1)
