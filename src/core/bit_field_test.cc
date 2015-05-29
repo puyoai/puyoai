@@ -412,6 +412,19 @@ TEST(BitFieldTest, simulate8)
     EXPECT_EQ(cfResult, bfResult);
 }
 
+TEST(BitFieldTest, simulateWithTracker1)
+{
+    BitField bf(
+        "..RR.."
+        "BBBBRR");
+
+    BitRensaYPositionTracker tracker;
+    bf.simulate(&tracker);
+
+    EXPECT_EQ(2, tracker.originalY(1, 1));
+    EXPECT_EQ(3, tracker.originalY(3, 1));
+}
+
 TEST(BitFieldTest, vanish1)
 {
     BitField bf(
