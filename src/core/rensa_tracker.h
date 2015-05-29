@@ -190,19 +190,10 @@ typedef RensaTracker<RensaVanishingPositionResult> RensaVanishingPositionTracker
 
 // ----------------------------------------------------------------------
 
+// This is the same as RensaChainTracker, however, the result is passed as pointer.
 class RensaChainPointerTracker {
 public:
     explicit RensaChainPointerTracker(RensaChainTrackResult* trackResult) :
-        originalY_ {
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, },
-        },
         result_(trackResult)
     {
         // TODO(mayah): Assert trackResult is initialized?
@@ -210,13 +201,27 @@ public:
 
     const RensaChainTrackResult& result() const { return *result_; }
 
-    void colorPuyoIsVanished(int x, int y, int nthChain) { result_->setErasedAt(x, originalY_[x][y], nthChain); }
-    void ojamaPuyoIsVanished(int x, int y, int nthChain) { result_->setErasedAt(x, originalY_[x][y], nthChain); }
-    void puyoIsDropped(int x, int fromY, int toY) { originalY_[x][toY] = originalY_[x][fromY]; }
-    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) {}
+    void colorPuyoIsVanished(int x, int y, int nthChain)
+    {
+        yTracker_.colorPuyoIsVanished(x, y, nthChain);
+        result_->setErasedAt(x, yTracker_.originalY(x, y), nthChain);
+    }
+    void ojamaPuyoIsVanished(int x, int y, int nthChain)
+    {
+        yTracker_.ojamaPuyoIsVanished(x, y, nthChain);
+        result_->setErasedAt(x, yTracker_.originalY(x, y), nthChain);
+    }
+    void puyoIsDropped(int x, int fromY, int toY)
+    {
+        yTracker_.puyoIsDropped(x, fromY, toY);
+    }
+    void nthChainDone(int nthChain, int numErasedPuyo, int coef)
+    {
+        yTracker_.nthChainDone(nthChain, numErasedPuyo, coef);
+    }
 
 private:
-    int originalY_[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT];
+    RensaYPositionTracker yTracker_;
     RensaChainTrackResult* result_;
 };
 
