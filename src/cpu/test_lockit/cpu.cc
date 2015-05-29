@@ -8,25 +8,15 @@
 
 #include "color.h"
 #include "cpu.h"
+#include "util.h"
 
 using namespace std;
 
+namespace {
 int count_tsumo_2p = 0;
 
 int count_all[20] = { 0 };
 int checks = 0;
-
-TLColor toTLColor(PuyoColor pc)
-{
-    switch (pc) {
-    case PuyoColor::EMPTY:  return TLColor::TL_EMPTY;
-    case PuyoColor::OJAMA:  return TLColor::TL_OJAMA;
-    case PuyoColor::RED:    return TLColor::TL_RED;
-    case PuyoColor::BLUE:   return TLColor::TL_BLUE;
-    case PuyoColor::YELLOW: return TLColor::TL_YELLOW;
-    case PuyoColor::GREEN:  return TLColor::TL_OJAMA;
-    default: CHECK(false);
-    }
 }
 
 TestLockitAI::TestLockitAI()
