@@ -140,7 +140,7 @@ bool BitField::hasEmptyNeighbor(int x, int y) const
 Position* BitField::fillSameColorPosition(int x, int y, PuyoColor c,
                                           Position* positionQueueHead, FieldBits* checked) const
 {
-    FieldBits bs = FieldBits(x, y).expand(bits(c)).maskedField12();
+    FieldBits bs = FieldBits(x, y).expand(bits(c).maskedField12());
     checked->setAll(bs);
     int len = bs.toPositions(positionQueueHead);
     return positionQueueHead + len;
