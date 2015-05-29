@@ -9,6 +9,12 @@
 struct Position;
 class FieldChecker;
 
+#ifdef EXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD
+
+#include "core/bit_field.h"
+
+#else
+
 class PlainField : public FieldConstant {
 public:
     PlainField();
@@ -81,5 +87,7 @@ inline bool PlainField::isConnectedPuyo(int x, int y) const
     PuyoColor c = color(x, y);
     return color(x, y - 1) == c || color(x, y + 1) == c || color(x - 1, y) == c || color(x + 1, y) == c;
 }
+
+#endif
 
 #endif

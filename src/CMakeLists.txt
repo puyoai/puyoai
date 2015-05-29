@@ -72,7 +72,8 @@ puyoai_add_cxx_flags("-DTESTDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../testdata\\\"")
 puyoai_add_cxx_flags("-DDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../data\\\"")
 
 # experimental.
-# puyoai_add_cxx_flags("-DEXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD")
+puyoai_add_cxx_flags("-DEXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD")
+puyoai_add_cxx_flags("-DPlainField=BitField")
 
 include_directories(.)
 

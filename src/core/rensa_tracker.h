@@ -5,6 +5,9 @@
 
 #include "base/unit.h"
 #include "core/rensa_result.h"
+#include "core/rensa_track_result.h"
+
+class FieldBits;
 
 // RensaTracker tracks how rensa is vanished.
 // For example, a puyo is vanished in what-th chain, coefficient of each chain, etc.
@@ -21,7 +24,10 @@ class RensaTracker;
 // RensaTracker<Unit> is a tracker that does not track anything.
 template<>
 class RensaTracker<Unit> {
-public:    
+public:
+    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/,
+               const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
+
     void colorPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) { }
     void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) { }
     void puyoIsDropped(int /*x*/, int /*fromY*/, int /*toY*/) { }

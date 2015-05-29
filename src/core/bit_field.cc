@@ -18,6 +18,7 @@ BitField::BitField()
     m_[1].setAll(_mm_set_epi16(0xFFFF, 0x8001, 0x8001, 0x8001, 0x8001, 0x8001, 0x8001, 0xFFFF));
 }
 
+#ifndef EXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD
 BitField::BitField(const PlainField& pf) : BitField()
 {
     __m128i m1 = _mm_load_si128(reinterpret_cast<const __m128i*>(pf.column(1)));
@@ -57,6 +58,7 @@ BitField::BitField(const PlainField& pf) : BitField()
             m_[2].setAll(FieldBits(xmm.m));
     }
 }
+#endif
 
 BitField::BitField(const string& str) : BitField()
 {
@@ -92,8 +94,7 @@ void BitField::setColor(int x, int y, PuyoColor c)
 
 bool BitField::isConnectedPuyo(int x, int y) const
 {
-    PuyoColor c = color(x, y);
-    FieldBits colorBits = bits(c).maskedField12();
+    FieldBits colorBits = bits(color(x, y)).maskedField12();
     FieldBits single(x, y);
     return !single.expandEdge().mask(colorBits).notmask(single).isEmpty();
 }
@@ -144,89 +145,6 @@ Position* BitField::fillSameColorPosition(int x, int y, PuyoColor c,
     checked->setAll(bs);
     int len = bs.toPositions(positionQueueHead);
     return positionQueueHead + len;
-}
-
-RensaResult BitField::simulate()
-{
-    BitField escaped = escapeUnvisible();
-
-    int currentChain = 1;
-    int score = 0;
-    int frames = 0;
-    int nthChainScore;
-    bool quick = false;
-    FieldBits erased;
-
-    while ((nthChainScore = vanishForSimulation(currentChain, &erased)) > 0) {
-        currentChain += 1;
-        score += nthChainScore;
-        frames += FRAMES_VANISH_ANIMATION;
-        int maxDrops = dropAfterVanish(erased);
-        if (maxDrops > 0) {
-            frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
-        } else {
-            quick = true;
-        }
-    }
-
-    recoverUnvisible(escaped);
-    return RensaResult(currentChain - 1, score, frames, quick);
-}
-
-int BitField::vanishForSimulation(int chain, FieldBits* erased)
-{
-    int numErased = 0;
-    int numColors = 0;
-    int longBonusCoef = 0;
-
-    *erased = FieldBits();
-
-    for (PuyoColor c : NORMAL_PUYO_COLORS) {
-        FieldBits mask = bits(c).maskedField12();
-        FieldBits seed = mask.vanishingSeed();
-
-        if (seed.isEmpty())
-            continue;
-
-        ++numColors;
-
-        // fast path. In most cases, 8>= puyos won't be erased.
-        // When 7<= puyos are erased, it won't be separated.
-        {
-            FieldBits expanded = seed.expand(mask);
-            int popcount = expanded.popcount();
-            if (popcount <= 7) {
-                numErased += popcount;
-                longBonusCoef += longBonus(popcount);
-                erased->setAll(expanded);
-                mask.unsetAll(expanded);
-                continue;
-            }
-        }
-
-        // slow path...
-        seed.iterateBitWithMasking([&](FieldBits x) -> FieldBits {
-            if (mask.testz(x))
-                return x;
-
-            FieldBits expanded = x.expand(mask);
-            int count = expanded.popcount();
-            numErased += count;
-            longBonusCoef += longBonus(count);
-            erased->setAll(expanded);
-            mask.unsetAll(expanded);
-            return expanded;
-        });
-    }
-
-    if (numColors == 0)
-        return 0;
-
-    // Removes ojama.
-    FieldBits ojama(erased->expandEdge().mask(bits(PuyoColor::OJAMA)));
-
-    erased->setAll(ojama);
-    return 10 * numErased * calculateRensaBonusCoef(chainBonus(chain), longBonusCoef, colorBonus(numColors));
 }
 
 int BitField::dropAfterVanish(FieldBits erased)
@@ -303,7 +221,8 @@ int BitField::dropAfterVanish(FieldBits erased)
 int BitField::vanish(int currentChain)
 {
     FieldBits erased;
-    int score = vanishForSimulation(currentChain, &erased);
+    RensaNonTracker tracker;
+    int score = vanishForSimulation(currentChain, &erased, &tracker);
     for (auto& m : m_)
         m.unsetAll(erased);
     return score;

@@ -95,7 +95,7 @@ int CoreField::vanish(SimulationContext* context, Tracker* tracker)
     int longBonusCoef = 0;
 
     for (int x = 1; x <= WIDTH; ++x) {
-        int maxHeight = height(x);
+        int maxHeight = std::min(height(x), 12);
         for (int y = context->minHeights[x]; y <= maxHeight; ++y) {
             DCHECK_NE(color(x, y), PuyoColor::EMPTY)
                 << x << ' ' << y << ' ' << toChar(color(x, y)) << '\n'

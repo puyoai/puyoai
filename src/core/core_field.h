@@ -11,6 +11,7 @@
 
 #include "core/bit_field.h"
 #include "core/decision.h"
+#include "core/field_checker.h"
 #include "core/field_constant.h"
 #include "core/kumipuyo_pos.h"
 #include "core/puyo_color.h"
@@ -20,7 +21,6 @@
 #include "core/rensa_tracker.h"
 
 class ColumnPuyoList;
-class FieldChecker;
 class Kumipuyo;
 struct Position;
 

@@ -6,11 +6,12 @@
 #include <string>
 #include <vector>
 
+#include "core/field_checker.h"
 #include "core/field_constant.h"
 
 class ColumnPuyoList;
 class CoreField;
-class FieldChecker;
+// class FieldChecker;
 class PatternMatcher;
 struct Position;
 
