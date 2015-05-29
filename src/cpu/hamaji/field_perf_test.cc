@@ -10,7 +10,7 @@ using namespace std;
 TEST(PerformanceTest, Copy) {
   TimeStampCounterData tsc;
 
-  LF f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
+  LF f("50745574464446676456474656476657564547564747676466766747674757644657575475755");
   for (int i = 0; i < 10000000; i++) {
     ScopedTimeStampCounter stsc(&tsc);
     LF f2(f);
@@ -36,7 +36,7 @@ TEST(PerformanceTest, Simulate_Filled) {
 
   for (int i = 0; i < 100000; i++) {
     ScopedTimeStampCounter stsc(&tsc);
-    LF f("http://www.inosendo.com/puyo/rensim/??50745574464446676456474656476657564547564747676466766747674757644657575475755");
+    LF f("50745574464446676456474656476657564547564747676466766747674757644657575475755");
     int chains, score, frames;
     f.Simulate(&chains, &score, &frames);
   }
