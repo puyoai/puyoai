@@ -155,34 +155,37 @@ typedef RensaTracker<RensaCoefResult> RensaCoefTracker;
 template<>
 class RensaTracker<RensaVanishingPositionResult> {
 public:
-    RensaTracker()
-    {
-        resetY();
-    }
+    RensaTracker() {}
 
     const RensaVanishingPositionResult& result() const { return result_; }
 
     void colorPuyoIsVanished(int x, int y, int nthChain)
     {
-        if (yAtPrevRensa_[x][y] == 0) {
+        yTracker_.colorPuyoIsVanished(x, y, nthChain);
+        if (yTracker_.originalY(x, y) == y) {
             result_.setBasePuyo(x, y, nthChain);
         } else {
-            result_.setFallingPuyo(x, yAtPrevRensa_[x][y], y, nthChain);
+            result_.setFallingPuyo(x, yTracker_.originalY(x, y), y, nthChain);
         }
     }
 
-    void ojamaPuyoIsVanished(int /*x*/, int /*y*/, int /*nthChain*/) {}
-    void puyoIsDropped(int x, int fromY, int toY) { yAtPrevRensa_[x][toY] = fromY; }
-    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/) { resetY(); }
-
-private:
-    void resetY() {
-        constexpr std::array<int, FieldConstant::MAP_HEIGHT> ALL_ZERO {{}};
-        yAtPrevRensa_.fill(ALL_ZERO);
+    void ojamaPuyoIsVanished(int x, int y, int nthChain)
+    {
+        yTracker_.ojamaPuyoIsVanished(x, y, nthChain);
     }
 
+    void puyoIsDropped(int x, int fromY, int toY)
+    {
+        yTracker_.puyoIsDropped(x, fromY, toY);
+    }
+    void nthChainDone(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/)
+    {
+        yTracker_ = RensaYPositionTracker();
+    }
+
+private:
+    RensaYPositionTracker yTracker_;
     RensaVanishingPositionResult result_;
-    std::array<std::array<int, FieldConstant::MAP_HEIGHT>, FieldConstant::MAP_WIDTH> yAtPrevRensa_;
 };
 typedef RensaTracker<RensaVanishingPositionResult> RensaVanishingPositionTracker;
 
