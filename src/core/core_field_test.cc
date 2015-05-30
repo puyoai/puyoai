@@ -445,6 +445,26 @@ TEST(CoreFieldTest, TrackedCoreFieldSimulation)
     EXPECT_EQ(5, trackResult.erasedAt(5, 4));
 }
 
+TEST(CoreFieldTest, rensaChainTracker)
+{
+    CoreField cf(
+        "..BB.."
+        "RRRRBY"
+    );
+
+    RensaChainTracker tracker;
+    RensaResult rensaResult = cf.simulate(&tracker);
+
+    const RensaChainTrackResult& trackResult = tracker.result();
+
+    EXPECT_EQ(1, rensaResult.chains);
+    EXPECT_EQ(1, trackResult.erasedAt(1, 1));
+    EXPECT_EQ(1, trackResult.erasedAt(2, 1));
+    EXPECT_EQ(1, trackResult.erasedAt(3, 1));
+    EXPECT_EQ(1, trackResult.erasedAt(4, 1));
+    EXPECT_EQ(0, trackResult.erasedAt(1, 2));
+}
+
 TEST(CoreFieldTest, simualteWithRensaCoefResult)
 {
     CoreField f("R...RR"
@@ -710,17 +730,15 @@ TEST(CoreFieldTest, rensaWillOccurWithContext)
     CoreField cf5(
         "OOOO  ");
 
-    CoreField::SimulationContext context1(1, { 1, 1, 1, 1, 1, 1, 1, 1 });
-    CoreField::SimulationContext context2(1, { 1, 1, 1, 1, 1, 1, 1, 1 });
-    CoreField::SimulationContext context3(1, { 1, 2, 2, 2, 2, 1, 1, 1 });
-    CoreField::SimulationContext context4(1, { 1, 2, 2, 2, 2, 1, 1, 1 });
-    CoreField::SimulationContext context5(1, { 1, 1, 1, 1, 1, 1, 1, 1 });
+    CoreField::SimulationContext context1(1);
+    CoreField::SimulationContext context2(1);
+    CoreField::SimulationContext context3(1);
+    CoreField::SimulationContext context4(1);
+    CoreField::SimulationContext context5(1);
 
     EXPECT_TRUE(cf1.rensaWillOccurWithContext(context1));
     EXPECT_FALSE(cf2.rensaWillOccurWithContext(context2));
-    // 4Y is connected, but it won't be checked.
-    EXPECT_FALSE(cf3.rensaWillOccurWithContext(context3));
-    // 5Y is connected, and (5, 1) Y is checked, so it should be detected.
+    EXPECT_TRUE(cf3.rensaWillOccurWithContext(context3));
     EXPECT_TRUE(cf4.rensaWillOccurWithContext(context4));
     EXPECT_FALSE(cf5.rensaWillOccurWithContext(context5));
 }
@@ -766,9 +784,8 @@ TEST(CoreFieldTest, erasingPuyoPositions1)
     CoreField cf(
         "..BB.."
         "RRRRBB");
-    CoreField::SimulationContext context;
 
-    vector<Position> positions = cf.erasingPuyoPositions(context);
+    vector<Position> positions = cf.erasingPuyoPositions();
     std::sort(positions.begin(), positions.end());
 
     vector<Position> expected = {
@@ -786,9 +803,8 @@ TEST(CoreFieldTest, erasingPuyoPositions2)
     CoreField cf(
         ".OBBOO"
         "RRRRBB");
-    CoreField::SimulationContext context;
 
-    vector<Position> positions = cf.erasingPuyoPositions(context);
+    vector<Position> positions = cf.erasingPuyoPositions();
     std::sort(positions.begin(), positions.end());
 
     vector<Position> expected = {

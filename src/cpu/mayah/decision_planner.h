@@ -180,7 +180,6 @@ void DecisionPlanner<MidEvaluationResult>::iterateRest(int initialFrameId,
                                                        const MidEvaluationResult& midEvaluationResult,
                                                        WaitGroup* wg)
 {
-    const CoreField::SimulationContext currentContext(CoreField::SimulationContext::fromField(currentField));
     auto f = [&](const CoreField& fieldAfterDecision, const Decision& decision, bool isChigiri, int dropFrames) {
         std::vector<Decision> decisions(currentDecisions);
         decisions.push_back(decision);
@@ -195,10 +194,9 @@ void DecisionPlanner<MidEvaluationResult>::iterateRest(int initialFrameId,
         // int framesToIgnite = currentTotalFrames;
 
         // --- When rensa will occur.
-        if (fieldAfterDecision.rensaWillOccurWithContext(currentContext)) {
+        if (fieldAfterDecision.rensaWillOccur()) {
             CoreField cf(fieldAfterDecision);
-            CoreField::SimulationContext context(currentContext);
-            RensaResult rensaResult = cf.simulate(&context);
+            RensaResult rensaResult = cf.simulate();
             int generatedOjama = rensaResult.score / 70 + (newHasZenkeshi ? 30 : 0);
             newHasZenkeshi = false;
             int newFallenOjama = updateOjama(frameIdToIgnite, generatedOjama, &newFixedOjama, &newPendingOjama, &newOjamaCommittingFrameId);
@@ -252,8 +250,6 @@ void DecisionPlanner<MidEvaluationResult>::iterate(int initialFrameId,
                                                    const PlayerState& enemy,
                                                    int maxDepth)
 {
-    const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-
     DCHECK(maxDepth >= 2);
     DCHECK(kumipuyoSeq.size() >= maxDepth);
 
@@ -276,11 +272,10 @@ void DecisionPlanner<MidEvaluationResult>::iterate(int initialFrameId,
 
         int numChigiri = isChigiri ? 1 : 0;
 
-        if (fieldAfterDecision.rensaWillOccurWithContext(originalContext)) {
+        if (fieldAfterDecision.rensaWillOccur()) {
             // When rensa will occur.
             CoreField cf(fieldAfterDecision);
-            CoreField::SimulationContext context(originalContext);
-            RensaResult rensaResult(cf.simulate(&context));
+            RensaResult rensaResult(cf.simulate());
 
             int generatedOjama = rensaResult.score / 70 + (hasZenkeshi ? 30 : 0);
             hasZenkeshi = false;

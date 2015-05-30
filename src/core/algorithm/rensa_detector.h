@@ -98,7 +98,6 @@ public:
                                  const RensaDetectorStrategy&,
                                  const TrackedPossibleRensaCallback&);
     static void iterateSideChainFromDetectedField(const CoreField& originalField,
-                                                  const CoreField::SimulationContext& originalContext,
                                                   const CoreField& detectedField,
                                                   const ColumnPuyoList& firePuyoList,
                                                   const RensaDetectorStrategy&,

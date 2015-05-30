@@ -52,27 +52,31 @@ public:
     template<typename Tracker>
     RensaStepResult vanishDrop(SimulationContext*, Tracker*);
 
+    void calculateHeight(std::uint16_t heights[FieldConstant::MAP_WIDTH]) const;
+
     std::string toString(char charIfEmpty = ' ') const;
 
     int vanish(int currentChain);
     void drop();
 
+    bool rensaWillOccur() const;
+
     // TODO(mayah): This should be removed. This is for barkward compatibility.
     Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBits* checked) const;
+    // TODO(mayah): This should be removed. This is for backward compatibility.
+    int fillErasingPuyoPositions(Position* eraseQueue) const;
 
     friend bool operator==(const BitField&, const BitField&);
     friend std::ostream& operator<<(std::ostream&, const BitField&);
 
 private:
-    friend class BitFieldTest;
-
     BitField escapeInvisible();
     void recoverInvisible(const BitField&);
 
     // Vanishes puyos. Returns score. Erased puyos are put |erased|.
     // Actually puyo won't be vanished in this method, though...
     template<typename Tracker>
-    int vanishForSimulation(int nthChain, FieldBits* erased, Tracker* tracker);
+    int vanishForSimulation(int nthChain, FieldBits* erased, Tracker* tracker) const;
     // Drops puyos. Returns max drops.
     int dropAfterVanish(FieldBits erased);
 
@@ -211,7 +215,7 @@ RensaStepResult BitField::vanishDrop(SimulationContext* context, Tracker* tracke
 }
 
 template<typename Tracker>
-int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* tracker)
+int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* tracker) const
 {
     int numErasedPuyos = 0;
     int numColors = 0;
@@ -269,5 +273,25 @@ int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* 
     erased->setAll(ojamaErased);
     return 10 * numErasedPuyos * rensaBonusCoef;
 }
+
+inline
+void BitField::calculateHeight(std::uint16_t heights[FieldConstant::MAP_WIDTH]) const
+{
+    __m128i whole = (m_[0] | m_[1] | m_[2]).maskedField13();
+
+    const __m128i mask4 = _mm_set1_epi8(0x0F);
+    const __m128i lookup = _mm_setr_epi8(0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4);
+
+   __m128i low = _mm_and_si128(mask4, whole);
+   __m128i high = _mm_and_si128(mask4, _mm_srli_epi16(whole, 4));
+
+   __m128i lowCount = _mm_shuffle_epi8(lookup, low);
+   __m128i highCount = _mm_shuffle_epi8(lookup, high);
+   __m128i count8 = _mm_add_epi8(lowCount, highCount);
+
+   __m128i count16 = _mm_add_epi8(count8, _mm_srli_epi16(count8, 8));
+   _mm_store_si128(reinterpret_cast<__m128i*>(heights), count16);
+}
+
 
 #endif // CORE_BIT_FIELD_H_

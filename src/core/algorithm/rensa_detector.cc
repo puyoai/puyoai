@@ -580,11 +580,9 @@ void RensaDetector::iteratePossibleRensas(const CoreField& originalField,
                                           const RensaDetectorStrategy& strategy,
                                           const RensaDetector::RensaCallback& callback)
 {
-    const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
     const auto cb = [&](const CoreField& complementedField, const ColumnPuyoList& cpl) {
-        CoreField::SimulationContext context(originalContext);
         CoreField cf(complementedField);
-        RensaResult rensaResult = cf.simulate(&context);
+        RensaResult rensaResult = cf.simulate();
         if (rensaResult.chains > 0)
             callback(cf, rensaResult, cpl);
     };
@@ -596,12 +594,10 @@ void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& originalF
                                                       const RensaDetectorStrategy& strategy,
                                                       const RensaDetector::TrackedPossibleRensaCallback& callback)
 {
-    const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-    auto cb = [&originalContext, &callback](const CoreField& complementedField, const ColumnPuyoList& cpl) {
-        CoreField::SimulationContext context(originalContext);
+    auto cb = [&callback](const CoreField& complementedField, const ColumnPuyoList& cpl) {
         CoreField cf(complementedField);
         RensaChainTracker tracker;
-        RensaResult rensaResult = cf.simulate(&context, &tracker);
+        RensaResult rensaResult = cf.simulate(&tracker);
         if (rensaResult.chains > 0)
             callback(cf, rensaResult, cpl, tracker.result());
     };
@@ -615,12 +611,10 @@ void RensaDetector::iteratePossibleRensasWithCoefTracking(const CoreField& origi
                                                           const RensaDetectorStrategy& strategy,
                                                           const RensaDetector::CoefPossibleRensaCallback& callback)
 {
-    const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-    auto cb = [&originalContext, &callback](const CoreField& complementedField, const ColumnPuyoList& cpl) {
-        CoreField::SimulationContext context(originalContext);
+    auto cb = [&callback](const CoreField& complementedField, const ColumnPuyoList& cpl) {
         RensaCoefTracker tracker;
         CoreField cf(complementedField);
-        RensaResult rensaResult = cf.simulate(&context, &tracker);
+        RensaResult rensaResult = cf.simulate(&tracker);
         if (rensaResult.chains > 0)
             callback(cf, rensaResult, cpl, tracker.result());
     };
@@ -643,15 +637,11 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& currentField,
     if (restIterations <= 0)
         return;
 
-    const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-    const CoreField::SimulationContext currentContext(CoreField::SimulationContext::fromField(currentField));
-
     auto findRensaCallback = [&](const CoreField& fieldComplemented, const ColumnPuyoList& currentFirePuyos) {
         int additionalChains = 0;
         {
-            CoreField::SimulationContext context(currentContext);
             CoreField cf(fieldComplemented);
-            RensaResult rensaResult = cf.simulate(&context);
+            RensaResult rensaResult = cf.simulate();
             if (rensaResult.chains == 0)
                 return;
             additionalChains = rensaResult.chains;
@@ -669,18 +659,15 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& currentField,
             return;
 
         // Check putting key puyo does not fire a rensa. Rensa should not start when we add key puyos.
-        if (cf.rensaWillOccurWithContext(originalContext))
+        if (cf.rensaWillOccur())
             return;
-
-        // Since key puyo does not fire a rensa, we can safely include the key puyos in context.
-        CoreField::SimulationContext context = CoreField::SimulationContext::fromField(cf);
 
         // Then, fire a rensa.
         if (!cf.dropPuyoListWithMaxHeight(firstRensaFirePuyos, maxHeight))
             return;
 
         RensaChainTracker tracker;
-        RensaResult combinedRensaResult = cf.simulate(&context, &tracker);
+        RensaResult combinedRensaResult = cf.simulate(&tracker);
         const RensaChainTrackResult& combinedTrackResult = tracker.result();
 
         if (combinedRensaResult.chains != currentTotalChains + additionalChains) {
@@ -722,13 +709,10 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
 {
     DCHECK_LE(1, maxIteration);
 
-    const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
-
     auto findRensaCallback = [&](const CoreField& fieldComplemented, const ColumnPuyoList& firePuyos) {
-        CoreField::SimulationContext context(originalContext);
         RensaChainTracker tracker;
         CoreField cf(fieldComplemented);
-        RensaResult rensaResult = cf.simulate(&context, &tracker);
+        RensaResult rensaResult = cf.simulate(&tracker);
         if (rensaResult.chains == 0)
             return;
 
@@ -755,11 +739,10 @@ void RensaDetector::iterateSideChain(const CoreField& originalField,
                                      const RensaDetectorStrategy& strategy,
                                      const TrackedPossibleRensaCallback& callback)
 {
-    const CoreField::SimulationContext originalContext(CoreField::SimulationContext::fromField(originalField));
     const bool noProhibitedColumn[FieldConstant::MAP_WIDTH] {};
 
     auto callbackFirst = [&](const CoreField& fireComplementedField, const ColumnPuyoList& firePuyoList) {
-        iterateSideChainFromDetectedField(originalField, originalContext, fireComplementedField, firePuyoList, strategy, callback);
+        iterateSideChainFromDetectedField(originalField, fireComplementedField, firePuyoList, strategy, callback);
     };
 
     detect(originalField, strategy, PurposeForFindingRensa::FOR_FIRE, noProhibitedColumn, callbackFirst);
@@ -767,16 +750,14 @@ void RensaDetector::iterateSideChain(const CoreField& originalField,
 
 // static
 void RensaDetector::iterateSideChainFromDetectedField(const CoreField& originalField,
-                                                      const CoreField::SimulationContext& originalContext,
                                                       const CoreField& fireDetectedField,
                                                       const ColumnPuyoList& firePuyoList,
                                                       const RensaDetectorStrategy& strategy,
                                                       const TrackedPossibleRensaCallback& callback)
 {
     CoreField detectedField(fireDetectedField);
-    CoreField::SimulationContext fireContext(originalContext);
     for (int i = 0; i < 1; ++i) {
-        if (detectedField.vanishDrop(&fireContext).score == 0)
+        if (detectedField.vanishDrop().score == 0)
             return;
 
         bool prohibitedColumns[FieldConstant::MAP_WIDTH] {};
@@ -792,21 +773,19 @@ void RensaDetector::iterateSideChainFromDetectedField(const CoreField& originalF
 
         auto callbackSecond = [&](const CoreField& complementedField, const ColumnPuyoList& keyPuyos) {
             CoreField cf(complementedField);
-            CoreField::SimulationContext context(fireContext);
             // Check we have 2-rensa.
-            if (cf.vanishDrop(&context).score == 0)
+            if (cf.vanishDrop().score == 0)
                 return;
             // Check we don't have 3-rensa.
-            if (cf.vanishDrop(&context).score > 0)
+            if (cf.vanishDrop().score > 0)
                 return;
 
             cf = originalField;
             ColumnPuyoList cpl(keyPuyos);
             cpl.merge(firePuyoList);
             cf.dropPuyoList(cpl);
-            context = originalContext;
             RensaChainTracker tracker;
-            RensaResult rensaResult = cf.simulate(&context, &tracker);
+            RensaResult rensaResult = cf.simulate(&tracker);
             const RensaChainTrackResult& trackResult = tracker.result();
             callback(cf, rensaResult, cpl, trackResult);
         };
