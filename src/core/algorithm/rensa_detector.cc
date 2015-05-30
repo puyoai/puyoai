@@ -138,10 +138,10 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
         for (int y = originalField.height(x); y >= 1; --y) {
             // Here, cf must be same as originalField.
             DCHECK_EQ(originalField, cf);
-            PuyoColor c = originalField.color(x, y);
-
-            if (!isNormalColor(c))
+            if (!originalField.isNormalColor(x, y))
                 continue;
+
+            PuyoColor c = originalField.color(x, y);
 
             // Drop puyo on
             for (int d = -1; d <= 1; ++d) {
