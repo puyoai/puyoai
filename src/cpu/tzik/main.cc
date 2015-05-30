@@ -24,14 +24,14 @@ DropDecision AI::think(int frame_id,
 }
 
 DropDecision AI::think_sample(int frame_id,
-                              const PlainField& field,
+                              const CoreField& field,
                               const KumipuyoSeq& seq) const {
   UNUSED_VARIABLE(frame_id);
 
   Decision best;
   int score = -1;
 
-  Plan::iterateAvailablePlans(CoreField(field), seq, 2,
+  Plan::iterateAvailablePlans(field, seq, 2,
                               [&](const RefPlan& plan) {
     int s = 0;
     if (plan.isRensaPlan()) {

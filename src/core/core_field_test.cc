@@ -601,6 +601,28 @@ TEST(CoreFieldTest, countConnectedPuyosEmptyCase2)
     EXPECT_EQ(48, f.countConnectedPuyos(3, 12));
 }
 
+TEST(CoreFieldTest, countConnectedPuyosInvisibleCase)
+{
+    CoreField f(
+        "B     "  // 13
+        "BY    "  // 12
+        "BB    "
+        "YY    "
+        "YB R  "
+        "GYBY  "  //  8
+        "RGYG  "
+        "BGGRR "
+        "BBRGR "
+        "RYRYYY"  //  4
+        "RRBGRR"
+        "YYYBGG"
+        "RBBRGR");
+
+    EXPECT_EQ(3, f.countConnectedPuyos(1, 11));
+    EXPECT_EQ(3, f.countConnectedPuyos(1, 12));
+    EXPECT_EQ(0, f.countConnectedPuyos(1, 13));
+}
+
 TEST(CoreFieldTest, countConnectedPuyosMax4)
 {
     CoreField f(" YYY Y"
@@ -630,12 +652,10 @@ TEST(CoreFieldTest, countConnectedPuyosMax4EdgeCase)
       "OOOOOO"
       "OOOOOO");
 
-    EXPECT_EQ(3, f.countConnectedPuyosMax4(1, 12));
-    EXPECT_EQ(3, f.countConnectedPuyosMax4(2, 12));
-    EXPECT_EQ(3, f.countConnectedPuyosMax4(3, 12));
-    EXPECT_EQ(3, f.countConnectedPuyosMax4(4, 12));
-    EXPECT_EQ(3, f.countConnectedPuyosMax4(5, 12));
-    EXPECT_EQ(3, f.countConnectedPuyosMax4(6, 12));
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        EXPECT_EQ(3, f.countConnectedPuyosMax4(x, FieldConstant::HEIGHT));
+        EXPECT_EQ(0, f.countConnectedPuyosMax4(x, FieldConstant::HEIGHT + 1));
+    }
 }
 
 TEST(CoreFieldTest, isChigiriDecision1)
@@ -654,6 +674,25 @@ TEST(CoreFieldTest, isChigiriDecision2)
     EXPECT_TRUE(cf.isChigiriDecision(Decision(3, 1)));
     EXPECT_FALSE(cf.isChigiriDecision(Decision(3, 2)));
     EXPECT_TRUE(cf.isChigiriDecision(Decision(3, 3)));
+}
+
+TEST(CoreFieldTest, rensaWillOccurWhenLastDecisionIs)
+{
+  CoreField cf(
+               "     G"  // 13
+               "    GG"  // 12
+               "    GY"
+               "BGY BG"
+               "YYGBBG"
+               "GRRYRG"  //  8
+               "BBBYRR"
+               "YYYRBG"
+               "BGGBGG"
+               "BBGBRB"  //  4
+               "GYYBRG"
+               "BBBRBY"
+               "YRRGGG");
+  EXPECT_FALSE(cf.rensaWillOccurWhenLastDecisionIs(Decision(5, 1)));
 }
 
 TEST(CoreFieldTest, rensaWillOccurWithContext)

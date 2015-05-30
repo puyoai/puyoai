@@ -10,7 +10,7 @@ using namespace std;
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoWithOnlyArrowKey)
 {
-    CoreField f;
+    PlainField f;
     KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
     bool downAccepted = false;
 
@@ -74,7 +74,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithOnlyArrowKey)
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoWithOnlyArrowKey_Right)
 {
-    CoreField f;
+    PlainField f;
     bool downAccepted = false;
 
     {
@@ -117,7 +117,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithOnlyArrowKey_Right)
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoWithOnlyArrowKey_Left)
 {
-    CoreField f;
+    PlainField f;
     bool downAccepted = false;
 
     {
@@ -160,7 +160,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithOnlyArrowKey_Left)
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoFreefall)
 {
-    CoreField f;
+    PlainField f;
     KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
     kms.restFramesForFreefall = 2;
     bool downAccepted = false;
@@ -206,7 +206,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoFreefall)
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoWithTurnKey)
 {
-    CoreField f;
+    PlainField f;
     KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
     bool downAccepted = false;
 
@@ -237,7 +237,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithTurnKey)
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoMultipleKeys)
 {
-    CoreField f;
+    PlainField f;
     KumipuyoMovingState kms(KumipuyoPos(1, 12, 0));
     bool downAccepted = false;
 
@@ -252,7 +252,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoMultipleKeys)
 
 TEST(KumipuyoMovingStateTest, wontGrounding)
 {
-    CoreField f;
+    PlainField f;
     KumipuyoMovingState kms(KumipuyoPos(3, 2, 1));
     kms.restFramesForFreefall = FRAMES_FREE_FALL;
     bool downAccepted = false;
@@ -270,7 +270,7 @@ TEST(KumipuyoMovingStateTest, wontGrounding)
 
 TEST(KumipuyoMovingStateTest, grounding)
 {
-    CoreField f;
+    PlainField f;
     KumipuyoMovingState kms(KumipuyoPos(3, 2, 1));
     kms.restFramesForFreefall = FRAMES_FREE_FALL / 2;
     bool downAccepted = false;
@@ -288,7 +288,7 @@ TEST(KumipuyoMovingStateTest, grounding)
 
 TEST(KumipuyoMovingStateTest, fixAfterEightGrouding)
 {
-    CoreField f;
+    PlainField f;
     KumipuyoMovingState kms(KumipuyoPos(3, 2, 1));
     bool downAccepted = false;
 
@@ -328,7 +328,7 @@ TEST(KumipuyoMovingStateTest, fixAfterEightGrouding)
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis_RightTurn)
 {
-    CoreField f;
+    PlainField f;
     bool downAccepted = false;
 
     KumipuyoMovingState kms(KumipuyoPos(3, 1, 1));
@@ -352,7 +352,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis_RightTurn)
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis_LeftTurn)
 {
-    CoreField f;
+    PlainField f;
     bool downAccepted = false;
 
     KumipuyoMovingState kms(KumipuyoPos(3, 1, 3));
@@ -376,7 +376,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis_LeftTurn)
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis12)
 {
-    CoreField f(
+    PlainField f(
         "OOOOOO" // 11
         "OOOOOO"
         "OOOOOO"
@@ -412,7 +412,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis12)
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis13)
 {
-    CoreField f(
+    PlainField f(
         "   OOO" // 12
         "OOOOOO" // 11
         "OOOOOO"
@@ -446,7 +446,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis13)
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoQuickTurn)
 {
-    CoreField f(
+    PlainField f(
         " O O  " // 12
         " O O  "
         " O O  "
@@ -497,7 +497,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoQuickTurn)
 
 TEST(KumipuyoMovingStateTest, moveForWii)
 {
-    CoreField f;
+    PlainField f;
     KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
     bool downAccepted = false;
 

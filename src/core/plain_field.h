@@ -61,6 +61,7 @@ public:
     bool hasEmptyNeighbor(int x, int y) const;
 
     std::string toString(char charIfEmpty = ' ') const;
+    std::string toDebugString() const;
 
     // Vanishes normal color puyos if 4 or more puyos are connected.
     // Score is returned.

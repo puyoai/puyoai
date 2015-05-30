@@ -1,5 +1,6 @@
 #include "core/plain_field.h"
 
+#include <iomanip>
 #include <sstream>
 
 #include "core/field_checker.h"
@@ -188,6 +189,9 @@ int PlainField::vanish(int currentChain)
 
 int PlainField::countConnectedPuyosMax4(int x, int y) const
 {
+    if (y > FieldConstant::HEIGHT)
+      return 0;
+
     bool leftUp = false, leftDown = false, rightUp = false, rightDown = false;
     int cnt = 1;
     PuyoColor c = color(x, y);
@@ -296,6 +300,18 @@ string PlainField::toString(char charIfEmpty) const
     }
 
     return ss.str();
+}
+
+string PlainField::toDebugString() const
+{
+    std::ostringstream s;
+    for (int y = MAP_HEIGHT - 1; y >= 0; y--) {
+        for (int x = 0; x < MAP_WIDTH; x++) {
+            s << toChar(color(x, y)) << ' ';
+        }
+        s << std::endl;
+    }
+    return s.str();
 }
 
 bool operator==(const PlainField& lhs, const PlainField& rhs)

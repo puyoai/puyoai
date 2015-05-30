@@ -16,6 +16,12 @@ struct Position;
 // BitsField is a field implementation that uses FieldBits.
 class BitField {
 public:
+    struct SimulationContext {
+        explicit SimulationContext(int currentChain = 1) : currentChain(currentChain) {}
+
+        int currentChain = 1;
+    };
+
     BitField();
 #ifndef EXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD
     explicit BitField(const PlainField&);
@@ -37,17 +43,24 @@ public:
     int countConnectedPuyosMax4(int x, int y) const;
     bool hasEmptyNeighbor(int x, int y) const;
 
+    RensaResult simulate(int initialChain = 1);
+    RensaResult simulate(SimulationContext*);
+    template<typename Tracker> RensaResult simulate(Tracker*);
+    template<typename Tracker> RensaResult simulate(SimulationContext*, Tracker*);
+
+    // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
+    RensaStepResult vanishDrop(SimulationContext*);
+    // Vanishes the connected puyos with Tracker.
+    template<typename Tracker>
+    RensaStepResult vanishDrop(SimulationContext*, Tracker*);
+
+    std::string toString(char charIfEmpty = ' ') const;
+
     int vanish(int currentChain);
     void drop();
 
     // TODO(mayah): This should be removed. This is for barkward compatibility.
     Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBits* checked) const;
-
-    RensaResult simulate();
-    template<typename Tracker>
-    RensaResult simulate(Tracker*);
-
-    std::string toString(char charIfEmpty = ' ') const;
 
     friend bool operator==(const BitField&, const BitField&);
     friend std::ostream& operator<<(std::ostream&, const BitField&);
@@ -55,8 +68,8 @@ public:
 private:
     friend class BitFieldTest;
 
-    BitField escapeUnvisible();
-    void recoverUnvisible(const BitField&);
+    BitField escapeInvisible();
+    void recoverInvisible(const BitField&);
 
     // Vanishes puyos. Returns score. Erased puyos are put |erased|.
     // Actually puyo won't be vanished in this method, though...
@@ -97,7 +110,7 @@ FieldBits BitField::bits(PuyoColor c) const
 }
 
 inline
-BitField BitField::escapeUnvisible()
+BitField BitField::escapeInvisible()
 {
     const FieldBits mask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
     BitField escaped;
@@ -110,7 +123,7 @@ BitField BitField::escapeUnvisible()
 }
 
 inline
-void BitField::recoverUnvisible(const BitField& bf)
+void BitField::recoverInvisible(const BitField& bf)
 {
     for (int i = 0; i < 3; ++i) {
         m_[i].setAll(bf.m_[i]);
@@ -118,26 +131,40 @@ void BitField::recoverUnvisible(const BitField& bf)
 }
 
 inline
-RensaResult BitField::simulate()
+RensaResult BitField::simulate(int initialChain)
 {
     RensaNonTracker tracker;
-    return simulate(&tracker);
+    SimulationContext context(initialChain);
+    return simulate(&context, &tracker);
+}
+
+inline
+RensaResult BitField::simulate(SimulationContext* context)
+{
+    RensaNonTracker tracker;
+    return simulate(context, &tracker);
 }
 
 template<typename Tracker>
 RensaResult BitField::simulate(Tracker* tracker)
 {
-    BitField escaped = escapeUnvisible();
+    SimulationContext context(1);
+    return simulate(&context, tracker);
+}
 
-    int currentChain = 1;
+template<typename Tracker>
+RensaResult BitField::simulate(SimulationContext* context, Tracker* tracker)
+{
+    BitField escaped = escapeInvisible();
+
     int score = 0;
     int frames = 0;
     int nthChainScore;
     bool quick = false;
     FieldBits erased;
 
-    while ((nthChainScore = vanishForSimulation(currentChain, &erased, tracker)) > 0) {
-        currentChain += 1;
+    while ((nthChainScore = vanishForSimulation(context->currentChain, &erased, tracker)) > 0) {
+        context->currentChain += 1;
         score += nthChainScore;
         frames += FRAMES_VANISH_ANIMATION;
         int maxDrops = dropAfterVanish(erased);
@@ -148,8 +175,41 @@ RensaResult BitField::simulate(Tracker* tracker)
         }
     }
 
-    recoverUnvisible(escaped);
-    return RensaResult(currentChain - 1, score, frames, quick);
+    recoverInvisible(escaped);
+    return RensaResult(context->currentChain - 1, score, frames, quick);
+}
+
+inline
+RensaStepResult BitField::vanishDrop(BitField::SimulationContext* context)
+{
+    RensaNonTracker tracker;
+    return vanishDrop(context, &tracker);
+}
+
+template<typename Tracker>
+RensaStepResult BitField::vanishDrop(SimulationContext* context, Tracker* tracker)
+{
+    BitField escaped = escapeInvisible();
+
+    FieldBits erased;
+    int score = vanishForSimulation(context->currentChain, &erased, tracker);
+    int maxDrops = 0;
+    int frames = FRAMES_VANISH_ANIMATION;
+    bool quick = false;
+    if (score > 0) {
+        maxDrops = dropAfterVanish(erased);
+        context->currentChain += 1;
+    }
+
+    if (maxDrops > 0) {
+        DCHECK(maxDrops < 14);
+        frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
+    } else {
+        quick = true;
+    }
+
+    recoverInvisible(escaped);
+    return RensaStepResult(score, frames, quick);
 }
 
 template<typename Tracker>
