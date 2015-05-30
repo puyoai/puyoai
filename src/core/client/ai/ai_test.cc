@@ -65,8 +65,8 @@ TEST_F(AITest, zenkeshi1)
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 3;
-    req.playerFrameRequest[0].field = CoreField("  RR  ");
-    req.playerFrameRequest[1].field = CoreField("  RR  ");
+    req.playerFrameRequest[0].field = PlainField("  RR  ");
+    req.playerFrameRequest[1].field = PlainField("  RR  ");
     ai_.groundedForMe(req);
     ai_.groundedForEnemy(req);
     EXPECT_FALSE(myPlayerState().hasZenkeshi);
@@ -79,16 +79,16 @@ TEST_F(AITest, zenkeshi1)
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 5;
-    req.playerFrameRequest[0].field = CoreField("  RRRR");
-    req.playerFrameRequest[1].field = CoreField("  RRRR");
+    req.playerFrameRequest[0].field = PlainField("  RRRR");
+    req.playerFrameRequest[1].field = PlainField("  RRRR");
     ai_.groundedForMe(req);
     ai_.groundedForEnemy(req);
     EXPECT_TRUE(myPlayerState().hasZenkeshi);
     EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 6;
-    req.playerFrameRequest[0].field = CoreField("  RRRR");
-    req.playerFrameRequest[1].field = CoreField("  RRRR");
+    req.playerFrameRequest[0].field = PlainField("  RRRR");
+    req.playerFrameRequest[1].field = PlainField("  RRRR");
     ai_.puyoErasedForMe(req);
     ai_.puyoErasedForEnemy(req);
     EXPECT_TRUE(myPlayerState().hasZenkeshi);
@@ -101,8 +101,8 @@ TEST_F(AITest, zenkeshi1)
     EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 8;
-    req.playerFrameRequest[0].field = CoreField(" BRRRR");
-    req.playerFrameRequest[1].field = CoreField(" BRRRR");
+    req.playerFrameRequest[0].field = PlainField(" BRRRR");
+    req.playerFrameRequest[1].field = PlainField(" BRRRR");
     ai_.groundedForMe(req);
     ai_.groundedForEnemy(req);
     // ZENKESHI is consumed.
@@ -110,8 +110,8 @@ TEST_F(AITest, zenkeshi1)
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 9;
-    req.playerFrameRequest[0].field = CoreField(" BRRRR");
-    req.playerFrameRequest[1].field = CoreField(" BRRRR");
+    req.playerFrameRequest[0].field = PlainField(" BRRRR");
+    req.playerFrameRequest[1].field = PlainField(" BRRRR");
     ai_.puyoErasedForMe(req);
     ai_.puyoErasedForEnemy(req);
     EXPECT_FALSE(myPlayerState().hasZenkeshi);
@@ -134,10 +134,10 @@ TEST_F(AITest, zenkeshi2)
     EXPECT_FALSE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 3;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         ".BBB.."
         "RRRRB.");
-    req.playerFrameRequest[1].field = CoreField(
+    req.playerFrameRequest[1].field = PlainField(
         ".BBB.."
         "RRRRB.");
     ai_.groundedForMe(req);
@@ -152,9 +152,9 @@ TEST_F(AITest, zenkeshi2)
     EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 5;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         ".BBBB.");
-    req.playerFrameRequest[1].field = CoreField(
+    req.playerFrameRequest[1].field = PlainField(
         ".BBBB.");
     ai_.puyoErasedForMe(req);
     ai_.puyoErasedForEnemy(req);
@@ -162,9 +162,9 @@ TEST_F(AITest, zenkeshi2)
     EXPECT_TRUE(enemyPlayerState().hasZenkeshi);
 
     req.frameId = 6;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         ".BBBB.");
-    req.playerFrameRequest[1].field = CoreField(
+    req.playerFrameRequest[1].field = PlainField(
         ".BBBB.");
     ai_.decisionRequestedForMe(req);
     ai_.decisionRequestedForEnemy(req);
@@ -201,7 +201,7 @@ TEST_F(AITest, ojamaCount)
     EXPECT_EQ(0, enemyPlayerState().pendingOjama);
 
     req.frameId = 3;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         "RBRB  "
         "BRBR  "
         "BRBR  "
@@ -214,7 +214,7 @@ TEST_F(AITest, ojamaCount)
 
     // score = 40
     req.frameId = 4;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         "RBRB  "
         "BRBR  "
         "BRBR  "
@@ -230,7 +230,7 @@ TEST_F(AITest, ojamaCount)
 
     // score = 40 + 40 * 8 = 360
     req.frameId = 5;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         "RBR   "
         "BRB   "
         "BRB   "
@@ -246,7 +246,7 @@ TEST_F(AITest, ojamaCount)
 
     // score = 360 + 40 * 16 = 1000
     req.frameId = 6;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         "RB    "
         "BR    "
         "BR    "
@@ -262,7 +262,7 @@ TEST_F(AITest, ojamaCount)
 
     // score = 1000 + 40 * 32 = 2280
     req.frameId = 7;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         "R     "
         "B     "
         "B     "
@@ -277,7 +277,7 @@ TEST_F(AITest, ojamaCount)
     EXPECT_EQ(32, enemyPlayerState().pendingOjama);
 
     req.frameId = 8;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         "      "
         "      "
         "      "
@@ -325,11 +325,11 @@ TEST_F(AITest, ojamaCountWithSOUSAI)
     EXPECT_EQ(0, enemyPlayerState().pendingOjama);
 
     req.frameId = 3;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         "R..R.G"
         "BBBBBB"
         "RRRORR");
-    req.playerFrameRequest[1].field = CoreField(
+    req.playerFrameRequest[1].field = PlainField(
         ".BBB.."
         "RRRRBG");
     ai_.groundedForMe(req);
@@ -342,11 +342,11 @@ TEST_F(AITest, ojamaCountWithSOUSAI)
     EXPECT_EQ(originalRensaResult2, enemyPlayerState().currentRensaResult);
 
     req.frameId = 4;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         "R..R.G"
         "BBBBBB"
         "RRRORR");
-    req.playerFrameRequest[1].field = CoreField(
+    req.playerFrameRequest[1].field = PlainField(
         ".BBB.."
         "RRRRBG");
     ai_.puyoErasedForMe(req);
@@ -366,10 +366,10 @@ TEST_F(AITest, ojamaCountWithSOUSAI)
     originalRensaResult2.frames -= 1 + FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING;
 
     req.frameId = 5;
-    req.playerFrameRequest[0].field = CoreField(
+    req.playerFrameRequest[0].field = PlainField(
         "R....G"
         "RRRRRR");
-    req.playerFrameRequest[1].field = CoreField(
+    req.playerFrameRequest[1].field = PlainField(
         ".BBBBG");
     ai_.puyoErasedForMe(req);
     ai_.puyoErasedForEnemy(req);
@@ -449,18 +449,9 @@ TEST_F(AITest, mergeFieldSimpleCase)
         "OOO..."
         "RRRGGG");
 
-    {
-        CoreField cf = mergeField(f1, f2, false);
-        EXPECT_EQ(f2, cf);
-    }
-    {
-        CoreField cf = mergeField(f1, f3, false);
-        EXPECT_EQ(f3, cf);
-    }
-    {
-        CoreField cf = mergeField(f2, f3, false);
-        EXPECT_EQ(f3, cf);
-    }
+    EXPECT_EQ(f2, mergeField(f1, f2.plainField(), false));
+    EXPECT_EQ(f3, mergeField(f1, f3.plainField(), false));
+    EXPECT_EQ(f3, mergeField(f2, f3.plainField(), false));
 }
 
 TEST_F(AITest, mergeField)
@@ -523,18 +514,9 @@ TEST_F(AITest, mergeField)
         "OOOOOO"
         "OOOOOO");
 
-    {
-        CoreField cf = mergeField(f1, f2, false);
-        EXPECT_EQ(f1, cf);
-    }
-    {
-        CoreField cf = mergeField(f1, f3, false);
-        EXPECT_EQ(f3, cf);
-    }
-    {
-        CoreField cf = mergeField(f1, f4, false);
-        EXPECT_EQ(f3, cf);
-    }
+    EXPECT_EQ(f1, mergeField(f1, f2.plainField(), false));
+    EXPECT_EQ(f3, mergeField(f1, f3.plainField(), false));
+    EXPECT_EQ(f3, mergeField(f1, f4.plainField(), false));
 }
 
 TEST_F(AITest, mergeFieldOjama)
@@ -551,7 +533,7 @@ TEST_F(AITest, mergeFieldOjama)
         "OOOOOO"
         "OOOOOO");
 
-    CoreField provided1(
+    PlainField provided1(
         "OO OOO" // 12
         "OOOOOO"
         "OOOOOO"
@@ -580,7 +562,7 @@ TEST_F(AITest, mergeFieldOjama)
         "OOOOOO"
         "OOOOOO");
 
-    CoreField provided2(
+    PlainField provided2(
         "OO OOO" // 12
         "OO OOO"
         "OOOOOO" // 10
@@ -608,12 +590,6 @@ TEST_F(AITest, mergeFieldOjama)
         "OOOOOO"
         "OOOOOO");
 
-    {
-        CoreField cf = mergeField(original, provided1, true);
-        EXPECT_EQ(expected1, cf);
-    }
-    {
-        CoreField cf = mergeField(original, provided2, true);
-        EXPECT_EQ(expected2, cf);
-    }
+    EXPECT_EQ(expected1, mergeField(original, provided1, true));
+    EXPECT_EQ(expected2, mergeField(original, provided2, true));
 }

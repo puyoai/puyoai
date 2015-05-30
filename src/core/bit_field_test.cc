@@ -1,7 +1,9 @@
 #include "core/bit_field.h"
 
+#include <algorithm>
 #include <gtest/gtest.h>
-#include "core/core_field.h"
+
+#include "core/plain_field.h"
 
 using namespace std;
 
@@ -347,9 +349,8 @@ TEST(BitFieldTest, simulate1)
 
 TEST(BitFieldTest, simulate2)
 {
-    CoreField cf(
+    BitField bf(
         "BBBBBB");
-    BitField bf(cf);
 
     RensaResult result = bf.simulate();
     EXPECT_EQ(1, result.chains);
@@ -360,10 +361,9 @@ TEST(BitFieldTest, simulate2)
 
 TEST(BitFieldTest, simulate3)
 {
-    CoreField cf(
+    BitField bf(
         "YYYY.."
         "BBBB..");
-    BitField bf(cf);
 
     RensaResult result = bf.simulate();
     EXPECT_EQ(1, result.chains);
@@ -374,10 +374,9 @@ TEST(BitFieldTest, simulate3)
 
 TEST(BitFieldTest, simulate4)
 {
-    CoreField cf(
+    BitField bf(
         "YYYYYY"
         "BBBBBB");
-    BitField bf(cf);
 
     RensaResult result = bf.simulate();
     EXPECT_EQ(1, result.chains);
@@ -388,10 +387,9 @@ TEST(BitFieldTest, simulate4)
 
 TEST(BitFieldTest, simulate5)
 {
-    CoreField cf(
+    BitField bf(
         ".YYYG."
         "BBBBY.");
-    BitField bf(cf);
 
     RensaResult result = bf.simulate();
     EXPECT_EQ(2, result.chains);
@@ -404,42 +402,52 @@ TEST(BitFieldTest, simulate5)
 
 TEST(BitFieldTest, simulate6)
 {
-    CoreField cf(".RBRB."
-                 "RBRBR."
-                 "RBRBR."
-                 "RBRBRR");
-    BitField bf(cf);
+    BitField bf(
+        ".RBRB."
+        "RBRBR."
+        "RBRBR."
+        "RBRBRR");
 
-    RensaResult cfResult = cf.simulate();
-    RensaResult bfResult = bf.simulate();
-    EXPECT_EQ(cfResult, bfResult);
+    RensaResult result = bf.simulate();
+    EXPECT_EQ(5, result.chains);
+    EXPECT_EQ(40 + 40 * 8 + 40 * 16 + 40 * 32 + 40 * 64, result.score);
+    EXPECT_EQ(FRAMES_VANISH_ANIMATION * 5 +
+              FRAMES_TO_DROP_FAST[3] * 4 +
+              FRAMES_GROUNDING * 4, result.frames);
+    EXPECT_TRUE(result.quick);
 }
 
 TEST(BitFieldTest, simulate7)
 {
-    CoreField cf(
+    BitField bf(
         ".YGGY."
         "BBBBBB"
         "GYBBYG"
         "BBBBBB");
-    BitField bf(cf);
 
-    RensaResult cfResult = cf.simulate();
-    RensaResult bfResult = bf.simulate();
-    EXPECT_EQ(cfResult, bfResult);
+    RensaResult result = bf.simulate();
+    EXPECT_EQ(1, result.chains);
+    EXPECT_EQ(140 * 10, result.score);
+    EXPECT_EQ(FRAMES_VANISH_ANIMATION +
+              FRAMES_TO_DROP_FAST[3] +
+              FRAMES_GROUNDING, result.frames);
+    EXPECT_FALSE(result.quick);
 }
 
 TEST(BitFieldTest, simulate8)
 {
-    CoreField cf(
+    BitField bf(
         "BBBBBB"
         "GYBBYG"
         "BBBBYB");
-    BitField bf(cf);
 
-    RensaResult cfResult = cf.simulate();
-    RensaResult bfResult = bf.simulate();
-    EXPECT_EQ(cfResult, bfResult);
+    RensaResult result = bf.simulate();
+    EXPECT_EQ(1, result.chains);
+    EXPECT_EQ(120 * 10, result.score);
+    EXPECT_EQ(FRAMES_VANISH_ANIMATION +
+              FRAMES_TO_DROP_FAST[1] +
+              FRAMES_GROUNDING, result.frames);
+    EXPECT_FALSE(result.quick);
 }
 
 TEST(BitFieldTest, simulateWithTracker1)
@@ -453,6 +461,47 @@ TEST(BitFieldTest, simulateWithTracker1)
 
     EXPECT_EQ(2, tracker.originalY(1, 1));
     EXPECT_EQ(3, tracker.originalY(3, 1));
+}
+
+TEST(BitFieldTest, vanishDrop1)
+{
+    BitField bf(
+        "..RR.."
+        "BBBBRR");
+
+    BitRensaYPositionTracker tracker;
+    BitField::SimulationContext context;
+    RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
+
+    EXPECT_EQ(40, stepResult.score);
+
+    BitField expected(
+        "..RRRR");
+
+    EXPECT_EQ(expected, bf);
+    EXPECT_EQ(2, context.currentChain);
+    EXPECT_EQ(2, tracker.originalY(1, 1));
+    EXPECT_EQ(2, tracker.originalY(3, 1));
+    EXPECT_EQ(1, tracker.originalY(6, 1));
+}
+
+TEST(BitFieldTest, vanishDrop2)
+{
+    BitField bf("....YY");
+
+    BitRensaYPositionTracker tracker;
+    BitField::SimulationContext context;
+    RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
+
+    EXPECT_EQ(0, stepResult.score);
+
+    BitField expected("....YY");
+
+    EXPECT_EQ(expected, bf);
+    EXPECT_EQ(1, context.currentChain);
+    EXPECT_EQ(1, tracker.originalY(1, 1));
+    EXPECT_EQ(1, tracker.originalY(3, 1));
+    EXPECT_EQ(1, tracker.originalY(6, 1));
 }
 
 TEST(BitFieldTest, vanish1)

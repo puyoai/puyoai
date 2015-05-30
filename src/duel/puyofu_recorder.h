@@ -29,7 +29,7 @@ public:
     void setMode(Mode mode) { mode_ = mode; }
 
 private:
-    void addMove(int pi, const CoreField&, const KumipuyoSeq&, int time);
+    void addMove(int pi, const PlainField&, const KumipuyoSeq&, int time);
 
     void emitLog(FILE* fp, int pi) const;
     void emitTransitionLog(FILE* fp, int pi) const;

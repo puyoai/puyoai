@@ -23,12 +23,14 @@ void PuyofuRecorder::onUpdate(const GameState& gameState)
         // TODO(mayah): Why not passing usec here instead of passing 0?
         // Or, do we really need usec?
         if (pgs.event.grounded) {
-            CoreField f(CoreField::fromPlainFieldWithDrop(pgs.field));
             KumipuyoSeq seq = pgs.kumipuyoSeq;
             if (seq.size() >= 4) {
                 seq.resize(3);
             }
-            addMove(pi, f, seq, 0);
+
+            PlainField pf = pgs.field;
+            pf.drop();
+            addMove(pi, pf, seq, 0);
         }
     }
 }
@@ -54,7 +56,7 @@ void PuyofuRecorder::gameHasDone(GameResult)
     clear();
 }
 
-void PuyofuRecorder::addMove(int pi, const CoreField& field, const KumipuyoSeq& kumipuyoSeq, int time)
+void PuyofuRecorder::addMove(int pi, const PlainField& field, const KumipuyoSeq& kumipuyoSeq, int time)
 {
     moves_.push_back(unique_ptr<Move>(new Move(pi, field, kumipuyoSeq, time)));
 }

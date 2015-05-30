@@ -353,7 +353,7 @@ PrecedeKeySetSeq findKeyStrokeFastpath62(const CoreField& field)
     if (field.height(4) <= 11 && field.height(5) <= 10 && field.height(6) <= 11)
         return PrecedeKeySetSeq(">B,,>,,>,B,v", '>', ">B,>,>,>,>,>B,v");
     if (field.height(4) <= 11 && field.height(5) == 11 && field.height(6) <= 11)
-        return PrecedeKeySetSeq(">B,,>,,>B,,v", '>', ">B,>,>,>,>,>B,v");    
+        return PrecedeKeySetSeq(">B,,>,,>B,,v", '>', ">B,>,>,>,>,>B,v");
     if (field.height(2) == 12 && field.height(4) == 12 && field.height(5) <= 12 && field.height(6) <= 11)
         return PrecedeKeySetSeq("A,,A,,A,>,,>,,>,B,v");
     if (field.height(4) == 11 && field.height(5) == 12 && field.height(6) <= 11)
@@ -514,6 +514,8 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const CoreField& field, const 
     };
     static const int KEY_CANDIDATES_SIZE_WITHOUT_TURN_OR_ARROW = ARRAY_SIZE(KEY_CANDIDATES_WITHOUT_TURN_OR_ARROW);
 
+    const PlainField& plainField = field.plainField();
+
     Potential pot;
     priority_queue<Edge, Edges, greater<Edge> > Q;
 
@@ -570,7 +572,7 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const CoreField& field, const 
         for (int i = 0; i < size; ++i) {
             const pair<KeySet, double>& candidate = candidates[i];
             KumipuyoMovingState mks(p);
-            mks.moveKumipuyo(field, candidate.first);
+            mks.moveKumipuyo(plainField, candidate.first);
 
             if (pot.count(mks))
                 continue;
