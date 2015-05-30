@@ -86,6 +86,10 @@ public:
     template<typename Callback>
     void iterateBitWithMasking(Callback) const;
 
+    // Iterate all bit positions. Callback is void (int x, int y).
+    template<typename Callback>
+    void iterateBitPositions(Callback) const;
+
     std::string toString() const;
 
     friend bool operator==(FieldBits lhs, FieldBits rhs) { return (lhs ^ rhs).isEmpty(); }
@@ -255,10 +259,9 @@ inline void FieldBits::iterateBitWithMasking(Callback callback) const
     }
 }
 
-inline
-int FieldBits::toPositions(Position ps[]) const
+template<typename Callback>
+void FieldBits::iterateBitPositions(Callback callback) const
 {
-    int pos = 0;
     alignas(16) std::int64_t vs[2];
     _mm_store_si128(reinterpret_cast<__m128i*>(vs), m_);
 
@@ -266,7 +269,7 @@ int FieldBits::toPositions(Position ps[]) const
         int bit = __builtin_ctzll(vs[0]);
         int x = bit >> 4;
         int y = bit & 0xF;
-        ps[pos++] = Position(x, y);
+        callback(x, y);
         vs[0] = vs[0] & (vs[0] - 1);
     }
 
@@ -274,10 +277,18 @@ int FieldBits::toPositions(Position ps[]) const
         int bit = __builtin_ctzll(vs[1]);
         int x = 4 + (bit >> 4);
         int y = bit & 0xF;
-        ps[pos++] = Position(x, y);
+        callback(x, y);
         vs[1] = vs[1] & (vs[1] - 1);
     }
+}
 
+inline
+int FieldBits::toPositions(Position ps[]) const
+{
+    int pos = 0;
+    iterateBitPositions([&](int x, int y) {
+        ps[pos++] = Position(x, y);
+    });
     return pos;
 }
 

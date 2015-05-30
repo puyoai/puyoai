@@ -126,53 +126,7 @@ public:
     // simulation
 
     // SimulationContext can be used when we continue simulation from the intermediate points.
-    // SimulationContext has the current chain and the minimam height to check the rensa.
-    // We check only the (x, y) puyos where minHeights[x] <= y <= height(x) to reduce
-    // the number of puyos to check.
-    struct SimulationContext {
-        explicit SimulationContext(int currentChain = 1) : currentChain(currentChain) {}
-        SimulationContext(int currentChain, std::initializer_list<int> list) :
-            currentChain(currentChain)
-        {
-            DCHECK_EQ(list.size(), 8UL) << list.size();
-            std::copy(list.begin(), list.end(), minHeights);
-        }
-
-        void updateFromField(const CoreField& cf)
-        {
-            for (int x = 1; x <= 6; ++x)
-                minHeights[x] = cf.height(x) + 1;
-        }
-
-        static SimulationContext fromLastDecision(const CoreField&, const Decision& lastDecision);
-        static SimulationContext fromField(const CoreField&);
-
-        friend std::ostream& operator<<(std::ostream& os, const SimulationContext& context)
-        {
-            os << "chain = " << context.currentChain << " / "
-               << "heights=["
-               << context.minHeights[1] << ", "
-               << context.minHeights[2] << ", "
-               << context.minHeights[3] << ", "
-               << context.minHeights[4] << ", "
-               << context.minHeights[5] << ", "
-               << context.minHeights[6] << "]";
-            return os;
-        }
-
-        int currentChain = 1;
-        int minHeights[FieldConstant::MAP_WIDTH] = { 1, 1, 1, 1, 1, 1, 1, 1 };
-
-    private:
-        SimulationContext(int currentChain, const CoreField& cf) :
-            currentChain(currentChain),
-            minHeights {
-                1, cf.height(1) + 1, cf.height(2) + 1, cf.height(3) + 1,
-                cf.height(4) + 1, cf.height(5) + 1, cf.height(6) + 1, 1
-            }
-        {
-        }
-    };
+    typedef BitField::SimulationContext SimulationContext;
 
     // Inserts positions whose puyo color is the same as |c|, and connected to (x, y).
     // The checked cells will be marked in |checked|.
@@ -185,12 +139,15 @@ public:
     // Fills the positions where puyo is vanished in the 1-rensa.
     // Returns the length of the filled positions. The max length should be 72.
     // So, |Position*| must have 72 Position spaces.
-    int fillErasingPuyoPositions(const SimulationContext&, Position*) const;
+    int fillErasingPuyoPositions(Position*) const;
     // TODO(mayah): Remove this.
-    std::vector<Position> erasingPuyoPositions(const SimulationContext&) const;
+    std::vector<Position> erasingPuyoPositions() const;
 
+    // TODO(mayah): Remove this.
     bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;
+    // TODO(mayah): Remove this.
     bool rensaWillOccurWithContext(const SimulationContext&) const;
+    bool rensaWillOccur() const { return field_.rensaWillOccur(); }
 
     // Simulates chains. Returns RensaResult.
     RensaResult simulate(int initialChain = 1);
@@ -205,8 +162,11 @@ public:
     RensaResult simulate(SimulationContext*, Tracker*);
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
+    RensaStepResult vanishDrop();
     RensaStepResult vanishDrop(SimulationContext*);
     // Vanishes the connected puyos with Tracker.
+    template<typename Tracker>
+    RensaStepResult vanishDrop(Tracker*);
     template<typename Tracker>
     RensaStepResult vanishDrop(SimulationContext*, Tracker*);
 
@@ -238,40 +198,9 @@ public:
 private:
     void unsafeSet(int x, int y, PuyoColor c) { field_.setColor(x, y, c); }
 
-    // Vanishes connected puyos and returns score. If score is 0, no puyos are vanished.
-    template<typename Tracker>
-    int vanish(SimulationContext*, Tracker*);
-
-    // Erases puyos in queue.
-    template<typename Tracker>
-    void eraseQueuedPuyos(SimulationContext*, Position* eraseQueue, Position* eraseQueueHead, Tracker*);
-
-    // Drops puyos in the air after vanishment.
-    // Returns the max drop height.
-    template<typename Tracker>
-    int dropAfterVanish(SimulationContext*, Tracker*);
-
     BitField field_;
-    int heights_[MAP_WIDTH];
+    alignas(16) std::uint16_t heights_[MAP_WIDTH];
 };
-
-// static
-inline CoreField::SimulationContext
-CoreField::SimulationContext::fromField(const CoreField& cf)
-{
-    return CoreField::SimulationContext(1, cf);
-}
-
-// static
-inline CoreField::SimulationContext
-CoreField::SimulationContext::fromLastDecision(const CoreField& cf,
-                                               const Decision& decision)
-{
-    CoreField::SimulationContext context = fromField(cf);
-    context.minHeights[decision.axisX()]--;
-    context.minHeights[decision.childX()]--;
-    return context;
-}
 
 #include "core/core_field_inl.h"
 

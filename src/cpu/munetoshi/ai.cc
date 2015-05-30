@@ -133,13 +133,11 @@ munetoshi::grade munetoshi::AI::evaluate(
     EVALUATOR_TYPES::_NIL_TYPE>
     ::evaluate_all(&plan_result, plan_grade_vect_setter);
 
-    const CoreField::SimulationContext original_context(CoreField::SimulationContext::fromField(core_field));
     auto callback = [&](const CoreField& complemented_field,
                         const ColumnPuyoList& puyos_to_complement) {
         CoreField field_after_chain(complemented_field);
         RensaVanishingPositionTracker tracker;
-        CoreField::SimulationContext context(original_context);
-        const RensaResult rensa_result = field_after_chain.simulate(&context, &tracker);
+        const RensaResult rensa_result = field_after_chain.simulate(&tracker);
         const RensaVanishingPositionResult& position_result = tracker.result();
 
         PossibleChainResult possible_chain_result = {

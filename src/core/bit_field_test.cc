@@ -456,7 +456,7 @@ TEST(BitFieldTest, simulateWithTracker1)
         "..RR.."
         "BBBBRR");
 
-    BitRensaYPositionTracker tracker;
+    RensaYPositionTracker tracker;
     bf.simulate(&tracker);
 
     EXPECT_EQ(2, tracker.originalY(1, 1));
@@ -469,7 +469,7 @@ TEST(BitFieldTest, vanishDrop1)
         "..RR.."
         "BBBBRR");
 
-    BitRensaYPositionTracker tracker;
+    RensaYPositionTracker tracker;
     BitField::SimulationContext context;
     RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
 
@@ -489,7 +489,7 @@ TEST(BitFieldTest, vanishDrop2)
 {
     BitField bf("....YY");
 
-    BitRensaYPositionTracker tracker;
+    RensaYPositionTracker tracker;
     BitField::SimulationContext context;
     RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
 

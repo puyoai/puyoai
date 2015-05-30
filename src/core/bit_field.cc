@@ -151,6 +151,30 @@ Position* BitField::fillSameColorPosition(int x, int y, PuyoColor c,
     return positionQueueHead + len;
 }
 
+int BitField::fillErasingPuyoPositions(Position* eraseQueue) const
+{
+    FieldBits bits;
+    RensaNonTracker tracker;
+    int score = vanishForSimulation(1, &bits, &tracker);
+    if (score == 0)
+        return 0;
+
+    return bits.toPositions(eraseQueue);
+}
+
+bool BitField::rensaWillOccur() const
+{
+    for (PuyoColor c : NORMAL_PUYO_COLORS) {
+        FieldBits mask = bits(c).maskedField12();
+        FieldBits seed = mask.vanishingSeed();
+
+        if (!seed.isEmpty())
+            return true;
+    }
+
+    return false;
+}
+
 int BitField::dropAfterVanish(FieldBits erased)
 {
     // TODO(mayah): If we can use AVX2, we have PDEP, PEXT instruction.
