@@ -11,13 +11,9 @@
 
 class YuriCatAI : public AI {
 public:
-<<<<<<< HEAD
     YuriCatAI(int argc, char* argv[]) : AI(argc, argv, "yuricat") {}
     ~YuriCatAI() override {}
-=======
-    SampleAI(int argc, char* argv[]) : AI(argc, argv, "yuricat") {}
-    ~SampleAI() override {}
->>>>>>> 3d2ae2084b6e849451b596907c825107c3a62ed9
+    
     
     DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq,
                        const PlayerState& me, const PlayerState& enemy, bool fast) const override
