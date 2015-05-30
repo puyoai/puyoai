@@ -214,7 +214,6 @@ int BitField::dropAfterVanish(FieldBits erased)
 
         // for each line, -1 if drop, 0 otherwise.
         __m128i blender = _mm_xor_si128(_mm_cmpeq_epi16(_mm_and_si128(line, erased.xmm()), zero), ones);
-        DCHECK(!FieldBits(blender).isEmpty()) << "y=" << y << '\n' << toDebugString();
 
         for (int i = 0; i < 3; ++i) {
             __m128i m = m_[i].xmm();
