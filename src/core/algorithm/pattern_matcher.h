@@ -141,8 +141,8 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern,
                 return PatternMatchResult();
 
             matchCount += 1;
-            matchScore += pattern.score(x, y);
-            scoreCallback(x, y, pattern.score(x, y));
+            matchScore += pattern.score();
+            scoreCallback(x, y, pattern.score());
 
             if (!isSet(c)) {
                 set(c, pc);
