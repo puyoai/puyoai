@@ -260,6 +260,31 @@ TEST(BitFieldTest, countConnectedPuyosMax4Edge)
     EXPECT_EQ(1, bf.countConnectedPuyosMax4(6, 12));
 }
 
+TEST(BitFieldTest, countConnection)
+{
+    BitField bf(
+        "R...GG" // 13
+        "RROOOG" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "YYGGYY"
+        "RRRBBB"
+    );
+
+    int count2, count3;
+    bf.countConnection(&count2, &count3);
+
+    EXPECT_EQ(4, count2);
+    EXPECT_EQ(2, count3);
+}
+
 TEST(BitFieldTest, hasEmptyNeighbor)
 {
     BitField bf(

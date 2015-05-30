@@ -86,6 +86,8 @@ public:
     // Returns the number of empty unreachable spaces.
     int countUnreachableSpaces() const;
 
+    void countConnection(int* count2, int* count3) const { return field_.countConnection(count2, count3); }
+
     // ----------------------------------------------------------------------
     // field manipulation
 

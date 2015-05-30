@@ -40,26 +40,10 @@ template<typename ScoreCollector, typename FeatureKey>
 static void calculateConnection(ScoreCollector* sc, const CoreField& field,
                                 FeatureKey key2, FeatureKey key3)
 {
-    int count3 = 0;
-    int count2 = 0;
-
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        int height = field.height(x);
-        for (int y = 1; y <= height; ++y) {
-            if (!isNormalColor(field.color(x, y)))
-                continue;
-
-            int numConnected = field.countConnectedPuyosMax4(x, y);
-            if (numConnected >= 3) {
-                ++count3;
-            } else if (numConnected >= 2) {
-                ++count2;
-            }
-        }
-    }
-
-    sc->addScore(key3, count3 / 3);
-    sc->addScore(key2, count2 / 2);
+    int count2, count3;
+    field.countConnection(&count2, &count3);
+    sc->addScore(key2, count2);
+    sc->addScore(key3, count3);
 }
 
 template<typename ScoreCollector, typename SparseFeatureKey>

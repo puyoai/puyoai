@@ -42,6 +42,8 @@ public:
     int countConnectedPuyosMax4(int x, int y) const;
     bool hasEmptyNeighbor(int x, int y) const;
 
+    void countConnection(int* count2, int* count3) const;
+
     RensaResult simulate(int initialChain = 1);
     RensaResult simulate(SimulationContext*);
     template<typename Tracker> RensaResult simulate(Tracker*);
