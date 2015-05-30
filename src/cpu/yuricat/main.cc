@@ -9,9 +9,9 @@
 #include "core/core_field.h"
 #include "core/frame_request.h"
 
-class SampleAI : public AI {
+class YuriCatAI : public AI {
 public:
-    SampleAI(int argc, char* argv[]) : AI(argc, argv, "sample") {}
+    SampleAI(int argc, char* argv[]) : AI(argc, argv, "yuricat") {}
     ~SampleAI() override {}
 
     DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq,
@@ -52,6 +52,6 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    SampleAI(argc, argv).runLoop();
+    YuriCatAI(argc, argv).runLoop();
     return 0;
 }
