@@ -78,17 +78,6 @@ TEST(FieldPatternTest, varCount)
     EXPECT_EQ(3, pattern1.numVariables());
     EXPECT_EQ(4, pattern2.numVariables());
     EXPECT_EQ(4, pattern3.numVariables()); // We don't count *
-
-    {
-        FieldPattern pattern;
-        ASSERT_TRUE(FieldPattern::merge(pattern1, pattern2, &pattern));
-        EXPECT_EQ(6, pattern.numVariables());
-    }
-    {
-        FieldPattern pattern;
-        ASSERT_TRUE(FieldPattern::merge(pattern1, pattern2, &pattern));
-        EXPECT_EQ(6, pattern.numVariables());
-    }
 }
 
 TEST(FieldPatternTest, fillSameVariablePositions)
@@ -110,4 +99,3 @@ TEST(FieldPatternTest, fillSameVariablePositions)
     EXPECT_EQ(Position(1, 4), positionQueue[2]);
     EXPECT_EQ(Position(2, 2), positionQueue[3]);
 }
-
