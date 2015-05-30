@@ -228,8 +228,8 @@ int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* 
 
         ++numColors;
 
-        // fast path. In most cases, 8>= puyos won't be erased.
-        // When 7<= puyos are erased, it won't be separated.
+        // fast path. In most cases, >= 8 puyos won't be erased.
+        // When <= 7 puyos are erased, it won't be separated.
         {
             FieldBits expanded = seed.expand(mask);
             int popcount = expanded.popcount();
