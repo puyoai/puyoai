@@ -44,10 +44,12 @@ public:
     // Gets a color of puyo at a specified position.
     PuyoColor color(int x, int y) const { return field_.color(x, y); }
 
-    // Returns true if puyo on (x, y) is c.
+    // Returns true if puyo on (x, y) is |c|.
     bool isColor(int x, int y, PuyoColor c) const { return field_.isColor(x, y, c); }
     // Returns true if puyo on (x, y) is empty.
     bool isEmpty(int x, int y) const { return field_.isEmpty(x, y); }
+    // Returns true if puyo on (x, y) is a normal color.
+    bool isNormalColor(int x, int y) const { return field_.isNormalColor(x, y); }
 
     // Returns the height of the specified column.
     int height(int x) const { return heights_[x]; }

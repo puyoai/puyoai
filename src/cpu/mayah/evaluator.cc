@@ -438,7 +438,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const CoreFi
 {
     for (int y = FieldConstant::HEIGHT; y >= 1; --y) {
         for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-            if (!isNormalColor(complementedField.color(x, y)))
+            if (!complementedField.isNormalColor(x, y))
                 continue;
             if (trackResult.erasedAt(x, y) == 1) {
                 sc_->addScore(IGNITION_HEIGHT, y, 1);

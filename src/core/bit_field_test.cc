@@ -94,6 +94,18 @@ TEST(BitFieldTest, constructor3)
     }
 }
 
+TEST(BitFieldTest, isNormalColor)
+{
+    BitField bf("RBYGO.");
+
+    EXPECT_TRUE(bf.isNormalColor(1, 1));
+    EXPECT_TRUE(bf.isNormalColor(2, 1));
+    EXPECT_TRUE(bf.isNormalColor(3, 1));
+    EXPECT_TRUE(bf.isNormalColor(4, 1));
+    EXPECT_FALSE(bf.isNormalColor(5, 1));
+    EXPECT_FALSE(bf.isNormalColor(6, 1));
+}
+
 TEST(BitFieldTest, setColor)
 {
     static const PuyoColor colors[] = {
