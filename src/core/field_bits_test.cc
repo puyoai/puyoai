@@ -309,6 +309,33 @@ TEST(FieldBitsTest, horizontalOr16)
     EXPECT_EQ((1 << 1) | (1 << 3) | (1 << 5) | (1 << 12), x);
 }
 
+TEST(FieldBitsTest, countConnection)
+{
+    PlainField pf(
+        "R...GG" // 13
+        "RROOOG" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "YYGGYY"
+        "RRRBBB"
+    );
+
+    FieldBits bits(pf, PuyoColor::RED);
+
+    int count2, count3;
+    bits.countConnection(&count2, &count3);
+
+    EXPECT_EQ(1, count2);
+    EXPECT_EQ(1, count3);
+}
+
 TEST(FieldBitsTest, toPositions)
 {
     FieldBits bits;

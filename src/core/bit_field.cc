@@ -122,6 +122,18 @@ bool BitField::hasEmptyNeighbor(int x, int y) const
     return false;
 }
 
+void BitField::countConnection(int* count2, int* count3) const
+{
+    *count2 = *count3 = 0;
+
+    for (PuyoColor c : NORMAL_PUYO_COLORS) {
+        int cnt2, cnt3;
+        bits(c).countConnection(&cnt2, &cnt3);
+        *count2 += cnt2;
+        *count3 += cnt3;
+    }
+}
+
 Position* BitField::fillSameColorPosition(int x, int y, PuyoColor c,
                                           Position* positionQueueHead, FieldBits* checked) const
 {

@@ -42,6 +42,8 @@ public:
     // Returns the bit-wise or of 8x16bits.
     int horizontalOr16() const;
 
+    void countConnection(int* count2, int* count3) const;
+
     // Returns the masked FieldBits where the region of visible field is taken.
     FieldBits maskedField12() const;
     // Returns the masked FieldBits where the region of visible field + 13th row is taken.
@@ -231,6 +233,28 @@ FieldBits FieldBits::vanishingSeed() const
     __m128i two_twos = _mm_or_si128(two_u, two_l);
 
     return FieldBits(_mm_or_si128(threes, two_twos));
+}
+
+inline
+void FieldBits::countConnection(int* count2, int* count3) const
+{
+    FieldBits mask = maskedField12();
+
+    FieldBits u = _mm_and_si128(_mm_slli_epi16(mask, 1), mask);
+    FieldBits d = _mm_and_si128(_mm_srli_epi16(mask, 1), mask);
+    FieldBits l = _mm_and_si128(_mm_slli_si128(mask, 2), mask);
+    FieldBits r = _mm_and_si128(_mm_srli_si128(mask, 2), mask);
+
+    FieldBits ud_and = u & d;
+    FieldBits lr_and = l & r;
+    FieldBits ud_or = u | d;
+    FieldBits lr_or = l | r;
+
+    FieldBits three = (ud_or & lr_or) | ud_and | lr_and;
+    FieldBits two = (u | l).notmask(three.expand(mask));
+
+    *count2 = two.popcount();
+    *count3 = three.popcount();
 }
 
 template<typename Callback>
