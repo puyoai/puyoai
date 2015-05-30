@@ -166,27 +166,29 @@ FieldBits FieldBits::expand(FieldBits mask) const
 }
 
 inline
-FieldBits FieldBits::expand4(FieldBits maskBits) const
+FieldBits FieldBits::expand4(FieldBits mask) const
 {
-    const __m128i mask = maskBits.m_;
-    __m128i m = m_;
+    FieldBits m = m_;
 
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(m, 1), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
+    FieldBits v1 = _mm_slli_si128(m, 2);
+    FieldBits v2 = _mm_srli_si128(m, 2);
+    FieldBits v3 = _mm_slli_epi16(m, 1);
+    FieldBits v4 = _mm_srli_epi16(m, 1);
+    m = (((v1 | v2) | (v3 | v4)) & mask) | m;
 
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(m, 1), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
+    v1 = _mm_slli_si128(m, 2);
+    v2 = _mm_srli_si128(m, 2);
+    v3 = _mm_slli_epi16(m, 1);
+    v4 = _mm_srli_epi16(m, 1);
+    m = (((v1 | v2) | (v3 | v4)) & mask) | m;
 
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(m, 1), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
+    v1 = _mm_slli_si128(m, 2);
+    v2 = _mm_srli_si128(m, 2);
+    v3 = _mm_slli_epi16(m, 1);
+    v4 = _mm_srli_epi16(m, 1);
+    m = (((v1 | v2) | (v3 | v4)) & mask) | m;
 
-    return FieldBits(m);
+    return m;
 }
 
 inline
