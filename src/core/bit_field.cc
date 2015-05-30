@@ -70,26 +70,6 @@ BitField::BitField(const string& str) : BitField()
     }
 }
 
-PuyoColor BitField::color(int x, int y) const
-{
-    int b0 = m_[0].get(x, y) ? 1 : 0;
-    int b1 = m_[1].get(x, y) ? 2 : 0;
-    int b2 = m_[2].get(x, y) ? 4 : 0;
-
-    return static_cast<PuyoColor>(b0 | b1 | b2);
-}
-
-void BitField::setColor(int x, int y, PuyoColor c)
-{
-    int cc = static_cast<int>(c);
-    for (int i = 0; i < 3; ++i) {
-        if (cc & (1 << i))
-            m_[i].set(x, y);
-        else
-            m_[i].unset(x, y);
-    }
-}
-
 bool BitField::isConnectedPuyo(int x, int y) const
 {
     if (y > FieldConstant::HEIGHT)
