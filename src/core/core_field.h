@@ -53,8 +53,6 @@ public:
     int height(int x) const { return heights_[x]; }
 
     const PlainField& plainField() const { return field_; }
-    // TODO(mayah): Remove this?
-    operator const PlainField&() const { return field_; }
 
     // ----------------------------------------------------------------------
     // field utilities

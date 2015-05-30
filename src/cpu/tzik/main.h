@@ -19,7 +19,7 @@ class AI final : public ::AI {
 
  private:
   DropDecision think_sample(int frame_id,
-                            const PlainField& field,
+                            const CoreField& field,
                             const KumipuyoSeq& seq) const;
 
   AI(const AI&) = delete;

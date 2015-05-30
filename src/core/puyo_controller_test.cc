@@ -45,6 +45,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnEmptyField)
     EXPECT_EQ(">B,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
+    PlainField pf = f.plainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r <= 3; ++r) {
             Decision d(x, r);
@@ -54,7 +55,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnEmptyField)
             KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             for (const auto& ks : kss)
-                kms.moveKumipuyo(f, ks);
+                kms.moveKumipuyo(pf, ks);
             EXPECT_EQ(x, kms.pos.x);
             EXPECT_EQ(r, kms.pos.r);
         }
@@ -107,6 +108,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnFilledField)
     EXPECT_EQ(">B,,>,,>B,,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
+    PlainField pf = f.plainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r <= 3; ++r) {
             Decision d(x, r);
@@ -116,7 +118,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnFilledField)
             KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             for (const auto& ks : kss)
-                kms.moveKumipuyo(f, ks);
+                kms.moveKumipuyo(pf, ks);
             EXPECT_EQ(x, kms.pos.x);
             EXPECT_EQ(r, kms.pos.r);
         }
@@ -168,6 +170,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField1)
     EXPECT_EQ(">B,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
+    PlainField pf = f.plainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -178,7 +181,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField1)
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
-                kms.moveKumipuyo(f, ks);
+                kms.moveKumipuyo(pf, ks);
             EXPECT_EQ(x, kms.pos.x);
             EXPECT_EQ(r, kms.pos.r);
         }
@@ -234,6 +237,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField2)
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,>,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
+    PlainField pf = f.plainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -249,7 +253,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField2)
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
-                kms.moveKumipuyo(f, ks);
+                kms.moveKumipuyo(pf, ks);
             EXPECT_EQ(x, kms.pos.x);
             EXPECT_EQ(r, kms.pos.r);
         }
@@ -305,6 +309,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField3)
     EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,>,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
+    PlainField pf = f.plainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -320,7 +325,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField3)
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
-                kms.moveKumipuyo(f, ks);
+                kms.moveKumipuyo(pf, ks);
             EXPECT_EQ(x, kms.pos.x);
             EXPECT_EQ(r, kms.pos.r);
         }
@@ -375,6 +380,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField4)
     EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
+    PlainField pf = f.plainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -390,7 +396,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField4)
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
-                kms.moveKumipuyo(f, ks);
+                kms.moveKumipuyo(pf, ks);
             EXPECT_EQ(x, kms.pos.x) << d.toString();
             EXPECT_EQ(r, kms.pos.r);
         }
@@ -446,6 +452,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField5)
     EXPECT_EQ("A,,A,,A,>,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ("A,,A,,A,>,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
+    PlainField pf = f.plainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -461,7 +468,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField5)
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
-                kms.moveKumipuyo(f, ks);
+                kms.moveKumipuyo(pf, ks);
             EXPECT_EQ(x, kms.pos.x);
             EXPECT_EQ(r, kms.pos.r);
         }
@@ -517,6 +524,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField6)
     EXPECT_EQ("A,,A,,A,>,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ("A,,A,,A,>,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
+    PlainField pf = f.plainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -532,7 +540,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField6)
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty()) << d.toString();
             for (const auto& ks : kss)
-                kms.moveKumipuyo(f, ks);
+                kms.moveKumipuyo(pf, ks);
             EXPECT_EQ(x, kms.pos.x) << d.toString();
             EXPECT_EQ(r, kms.pos.r) << d.toString();
         }
@@ -589,6 +597,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField7)
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
+    PlainField pf = f.plainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -605,7 +614,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField7)
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
-                kms.moveKumipuyo(f, ks);
+                kms.moveKumipuyo(pf, ks);
             EXPECT_EQ(x, kms.pos.x);
             EXPECT_EQ(r, kms.pos.r);
         }
@@ -668,6 +677,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField8)
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
+    PlainField pf = f.plainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -683,7 +693,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField8)
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             EXPECT_FALSE(kss.empty());
             for (const auto& ks : kss)
-                kms.moveKumipuyo(f, ks);
+                kms.moveKumipuyo(pf, ks);
             EXPECT_EQ(x, kms.pos.x);
             EXPECT_EQ(r, kms.pos.r);
         }
@@ -724,6 +734,8 @@ TEST(PuyoControllerTest, findKeyStrokeHigherExhaustive)
             ASSERT_TRUE(f.height(x) == h);
         }
 
+        PlainField pf = f.plainField();
+
         for (int x = 1; x <= 6; ++x) {
             for (int r = 0; r < 4; ++r) {
                 Decision d(x, r);
@@ -740,9 +752,9 @@ TEST(PuyoControllerTest, findKeyStrokeHigherExhaustive)
 
                 EXPECT_FALSE(kss.empty());
                 for (const auto& ks : kss)
-                    kms.moveKumipuyo(f, ks);
-                EXPECT_EQ(x, kms.pos.x) << f.toDebugString() << '\n' << d.toString() << ' ' << kss.toString();
-                EXPECT_EQ(r, kms.pos.r) << f.toDebugString() << '\n' << d.toString() << ' ' << kss.toString();
+                    kms.moveKumipuyo(pf, ks);
+                EXPECT_EQ(x, kms.pos.x) << pf.toDebugString() << '\n' << d.toString() << ' ' << kss.toString();
+                EXPECT_EQ(r, kms.pos.r) << pf.toDebugString() << '\n' << d.toString() << ' ' << kss.toString();
             }
         }
     }

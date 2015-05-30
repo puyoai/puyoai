@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
     ai.gameWillBegin(req);
 
     req.frameId = 2;
-    req.playerFrameRequest[0].field = problem.myState.field;
-    req.playerFrameRequest[1].field = problem.enemyState.field;
+    req.playerFrameRequest[0].field = problem.myState.field.plainField();
+    req.playerFrameRequest[1].field = problem.enemyState.field.plainField();
     req.playerFrameRequest[0].kumipuyoSeq = problem.myState.seq;
     req.playerFrameRequest[1].kumipuyoSeq = problem.enemyState.seq;
 
@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
             const KumipuyoSeq& seq = req.playerFrameRequest[0].kumipuyoSeq;
 
             FieldPrettyPrinter::printMultipleFields(
-                { currentField, req.playerFrameRequest[1].field },
+                { currentField.plainField(), req.playerFrameRequest[1].field },
                 { seq.subsequence(0, 2), req.playerFrameRequest[1].kumipuyoSeq });
             double t1 = currentTime();
             ThoughtResult aiThoughtResult = ai.thinkPlan(frameId, currentField, seq.subsequence(0, 2),
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
 
                 KumipuyoSeq seqToShow { seq.get(2), seq.get(3) };
                 FieldPrettyPrinter::printMultipleFields(
-                    { myThoughtResult.plan.field(), aiThoughtResult.plan.field(), myTargetField, aiTargetField },
+                    { myThoughtResult.plan.field().plainField(), aiThoughtResult.plan.field().plainField(), myTargetField.plainField(), aiTargetField.plainField() },
                     { seqToShow, seqToShow, KumipuyoSeq(), KumipuyoSeq() });
 
                 cout << CollectedFeatureCoefScore::scoreComparisionString(mycf, aicf, ai.evaluationParameterMap()) << endl;
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
             CoreField f(req.playerFrameRequest[0].field);
             f.dropKumipuyo(thoughtResult.plan.decisions().front(), req.playerFrameRequest[0].kumipuyoSeq.front());
             f.simulate();
-            req.playerFrameRequest[0].field = f;
+            req.playerFrameRequest[0].field = f.plainField();
         }
         req.playerFrameRequest[0].kumipuyoSeq.dropFront();
     }
