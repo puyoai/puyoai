@@ -320,12 +320,18 @@ int FieldBits::toPositions(Position ps[]) const
 inline
 __m128i FieldBits::onebit(int x, int y)
 {
+    DCHECK(0 <= x && x < 8 && 0 <= y && y < 16) << "x=" << x << " y=" << y;
+
+#if 1
+    int shift = ((x << 4) | y) & 0x3F;
+    std::uint64_t hi = x >> 2;
+    std::uint64_t lo = hi ^ 1;
+    return _mm_set_epi64x(hi << shift, lo << shift);
+#else
     // NOTE: the 3rd argument of _mm_insert_epi16 should be an immediate.
     // Mac clang and Linux gcc accepts non immediate value, however, it generates table jump code.
     // cygwin environment does not accept non immediate value.
     // So, we adopt switch case sentene here.
-
-    DCHECK(0 <= x && x < 8 && 0 <= y && y < 16) << "x=" << x << " y=" << y;
     switch (x) {
     case 0: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 0);
     case 1: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 1);
@@ -339,6 +345,7 @@ __m128i FieldBits::onebit(int x, int y)
         DCHECK(false);
         return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 0);
     }
+#endif
 }
 
 #endif // CORE_FIELD_BITS_H_
