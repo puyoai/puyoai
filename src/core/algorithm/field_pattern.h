@@ -33,8 +33,6 @@ public:
 
     bool isMatchable(const CoreField&) const;
 
-    void setPattern(int x, int y, PatternType t, char variable);
-
     int numVariables() const { return numVariables_; }
     double score() const { return score_; }
 
@@ -48,11 +46,13 @@ public:
 
     std::string toDebugString() const;
 
-    void setMustVar(int x, int y) { types_[x][y] = PatternType::MUST_VAR; } 
+    void setMustVar(int x, int y) { types_[x][y] = PatternType::MUST_VAR; }
 
 private:
     static PatternType inferType(char c);
     int countVariables() const;
+
+    void setPattern(int x, int y, PatternType t, char variable);
 
     double score_;
     char vars_[MAP_WIDTH][MAP_HEIGHT];
