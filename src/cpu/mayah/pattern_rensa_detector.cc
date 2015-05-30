@@ -29,7 +29,7 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
 
         double patternScore = 0.0;
         auto scoreCallback = [this, &patternScore, &pbf](int x, int y, double score) {
-            if (isNormalColor(originalField_.color(x, y)))
+            if (originalField_.isNormalColor(x, y))
                 patternScore += score / pbf.numVariables();
         };
 
@@ -142,7 +142,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         double patternScore = currentPatternScore;
         auto addScoreCallback = [this, &patternScore, &pbf, &currentFieldTracker](int x, int y, double score) {
             int actualY = currentFieldTracker.originalY(x, y);
-            if (isNormalColor(originalField_.color(x, actualY)))
+            if (originalField_.isNormalColor(x, actualY))
                 patternScore += score / pbf.numVariables();
         };
         auto dontAddScoreCallback = [](int, int, double) {};
