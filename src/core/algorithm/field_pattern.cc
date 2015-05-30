@@ -17,13 +17,13 @@
 using namespace std;
 
 FieldPattern::FieldPattern(double defaultScore) :
+    score_(defaultScore),
     heights_{},
     numVariables_(0)
 {
     for (int x = 0; x < MAP_WIDTH; ++x) {
         for (int y = 0; y < MAP_HEIGHT; ++y) {
             vars_[x][y] = ' ';
-            scores_[x][y] = defaultScore;
             types_[x][y] = PatternType::NONE;
         }
     }
@@ -54,7 +54,7 @@ FieldPattern::FieldPattern(const std::string& field, double defaultScore) :
         counter++;
 
         PatternType t = inferType(c);
-        setPattern(x, y, t, c, defaultScore);
+        setPattern(x, y, t, c);
     }
 
     numVariables_ = countVariables();
@@ -70,7 +70,7 @@ FieldPattern::FieldPattern(const vector<string>& field, double defaultScore) :
         for (int x = 1; x <= 6; ++x) {
             char c = field[i][x - 1];
             PatternType t = inferType(c);
-            setPattern(x, y, t, c, defaultScore);
+            setPattern(x, y, t, c);
         }
     }
 
@@ -83,7 +83,7 @@ bool FieldPattern::isMatchable(const CoreField& field) const
     return matcher.match(*this, field).matched;
 }
 
-void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double score)
+void FieldPattern::setPattern(int x, int y, PatternType t, char variable)
 {
     switch (t) {
     case PatternType::NONE:
@@ -91,7 +91,6 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
     case PatternType::ANY:
         types_[x][y] = t;
         vars_[x][y] = '*';
-        scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
     case PatternType::VAR:
@@ -99,21 +98,18 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
         CHECK('A' <= variable && variable <= 'Z');
         types_[x][y] = t;
         vars_[x][y] = variable;
-        scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
     case PatternType::ALLOW_VAR:
         CHECK(('A' <= variable && variable <= 'Z') || ('a' <= variable && variable <= 'z'));
         types_[x][y] = t;
         vars_[x][y] = std::toupper(variable);
-        scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
     case PatternType::ALLOW_FILLING_IRON:
         CHECK_EQ(variable, '&');
         types_[x][y] = t;
         vars_[x][y] = '&';
-        scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
     default:
@@ -122,7 +118,7 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
 }
 
 // static
-PatternType FieldPattern::inferType(char c, PatternType typeForLowerCase)
+PatternType FieldPattern::inferType(char c)
 {
     if (c == ' ' || c == '.')
         return PatternType::NONE;
@@ -133,7 +129,7 @@ PatternType FieldPattern::inferType(char c, PatternType typeForLowerCase)
     if ('A' <= c && c <= 'Z')
         return PatternType::VAR;
     if ('a' <= c && c <= 'z')
-        return typeForLowerCase;
+        return PatternType::ALLOW_VAR;
 
     return PatternType::NONE;
 }
@@ -183,7 +179,6 @@ FieldPattern FieldPattern::mirror() const
         for (int y = 1; y < MAP_HEIGHT; ++y) {
             std::swap(pf.vars_[x][y], pf.vars_[7 - x][y]);
             std::swap(pf.types_[x][y], pf.types_[7 - x][y]);
-            std::swap(pf.scores_[x][y], pf.scores_[7 - x][y]);
         }
     }
 

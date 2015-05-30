@@ -123,7 +123,7 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
                 int x = cp.get<int>(0);
                 int y = cp.get<int>(1);
                 CHECK(pbf.pattern().type(x, y) == PatternType::VAR);
-                pbf.mutablePattern()->setType(x, y, PatternType::MUST_VAR);
+                pbf.mutablePattern()->setMustVar(x, y);
             }
         }
 
