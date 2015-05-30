@@ -8,9 +8,6 @@ using namespace std;
 
 FieldBits::FieldBits(const PlainField& pf, PuyoColor c)
 {
-#ifdef EXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD
-    m_ = pf.bits(c);
-#else
     __m128i mask = _mm_set1_epi8(static_cast<char>(c));
 
     // TODO(mayah): should we use _mm_set_epi16? Which is faster?
@@ -28,7 +25,6 @@ FieldBits::FieldBits(const PlainField& pf, PuyoColor c)
     xmm.s[7] = 0;
 
     m_ = xmm.m;
-#endif
 }
 
 std::string FieldBits::toString() const

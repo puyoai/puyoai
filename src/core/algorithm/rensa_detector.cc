@@ -289,7 +289,7 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                    int maxComplementPuyos, int maxPuyoHeight,
                    const RensaDetector::ComplementCallback& callback)
 {
-    FieldChecker checked;
+    FieldBits checked;
     CoreField cf(originalField);
     Position positions[FieldConstant::HEIGHT * FieldConstant::WIDTH];
     int working[FieldConstant::HEIGHT * FieldConstant::WIDTH];

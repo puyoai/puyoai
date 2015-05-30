@@ -173,7 +173,7 @@ void Gazer::gaze(int frameId, const CoreField& cf, const KumipuyoSeq& seq)
     updateFeasibleRensas(cf, seq);
     updatePossibleRensas(cf, seq);
 
-    FieldChecker checked;
+    FieldBits checked;
     restEmptyField_ = cf.countConnectedPuyos(3, 12, &checked);
 }
 
