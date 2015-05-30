@@ -214,7 +214,7 @@ int BitField::dropAfterVanish(FieldBits erased)
 
         // for each line, -1 if drop, 0 otherwise.
         __m128i blender = _mm_xor_si128(_mm_cmpeq_epi16(_mm_and_si128(line, erased.xmm()), zero), ones);
-        DCHECK(!FieldBits(blender).isEmpty());
+        DCHECK(!FieldBits(blender).isEmpty()) << "y=" << y << '\n' << toDebugString();
 
         for (int i = 0; i < 3; ++i) {
             __m128i m = m_[i].xmm();
@@ -271,6 +271,19 @@ std::string BitField::toString(char charIfEmpty) const
         for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
             ss << toChar(color(x, y), charIfEmpty);
         }
+    }
+
+    return ss.str();
+}
+
+std::string BitField::toDebugString(char charIfEmpty) const
+{
+    ostringstream ss;
+    for (int y = FieldConstant::MAP_HEIGHT - 1; y >= 0; --y) {
+        for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
+            ss << toChar(color(x, y), charIfEmpty);
+        }
+        ss << '\n';
     }
 
     return ss.str();

@@ -58,6 +58,7 @@ public:
     void calculateHeight(std::uint16_t heights[FieldConstant::MAP_WIDTH]) const;
 
     std::string toString(char charIfEmpty = ' ') const;
+    std::string toDebugString(char charIfEmpty = ' ') const;
 
     int vanish(int currentChain);
     void drop();
