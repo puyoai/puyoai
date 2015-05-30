@@ -26,4 +26,8 @@ constexpr std::size_t ARRAY_SIZE(const T (&)[size]) { return size; }
 #  define DEPRECATED
 #endif
 
+#ifndef NOINLINE_UNLESS_RELEASE
+#define NOINLINE_UNLESS_RELEASE __attribute__ ((noinline))
+#endif
+
 #endif  // BASE_BASE_H_
