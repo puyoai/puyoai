@@ -73,7 +73,7 @@ puyoai_add_cxx_flags("-DDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../data\\\"")
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" build_type)
 if(${build_type} MATCHES release)
-    puyoai_add_cxx_flags("-DNOINLINE_UNLESS_RELEASE")
+    puyoai_add_cxx_flags("-DNOINLINE_UNLESS_RELEASE=")
 endif()
 
 # experimental.
