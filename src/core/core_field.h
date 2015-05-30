@@ -52,7 +52,8 @@ public:
     // Returns the height of the specified column.
     int height(int x) const { return heights_[x]; }
 
-    const PlainField& plainField() const { return field_; }
+    PlainField toPlainField() const;
+    PlainField plainField() const { return toPlainField(); }
 
     // ----------------------------------------------------------------------
     // field utilities
@@ -69,7 +70,7 @@ public:
     // Actually you can use this if color(x, y) is EMPTY or OJAMA.
     int countConnectedPuyos(int x, int y) const { return field_.countConnectedPuyos(x, y); }
     // Same as countConnectedPuyos(x, y), but with checking using |checked|.
-    int countConnectedPuyos(int x, int y, FieldChecker* checked) const { return field_.countConnectedPuyos(x, y, checked); }
+    int countConnectedPuyos(int x, int y, FieldBits* checked) const { return field_.countConnectedPuyos(x, y, checked); }
     // Same as countConnectedPuyos(x, y).
     // If # of connected puyos is >= 4, the result is any value >= 4.
     // For example, if the actual number of connected is 6, result is 4, 5, or 6.
@@ -176,7 +177,7 @@ public:
     // Inserts positions whose puyo color is the same as |c|, and connected to (x, y).
     // The checked cells will be marked in |checked|.
     // PositionQueueHead should have enough capacity.
-    Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldChecker* checked) const
+    Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBits* checked) const
     {
         return field_.fillSameColorPosition(x, y, c, positionQueueHead, checked);
     }
@@ -250,11 +251,7 @@ private:
     template<typename Tracker>
     int dropAfterVanish(SimulationContext*, Tracker*);
 
-#ifdef EXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD
     BitField field_;
-#else
-    PlainField field_;
-#endif
     int heights_[MAP_WIDTH];
 };
 

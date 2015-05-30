@@ -23,9 +23,7 @@ public:
     };
 
     BitField();
-#ifndef EXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD
     explicit BitField(const PlainField&);
-#endif
     explicit BitField(const std::string&);
 
     FieldBits bits(PuyoColor c) const;

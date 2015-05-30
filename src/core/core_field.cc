@@ -53,6 +53,19 @@ CoreField::CoreField(const PlainField& f) :
     heights_[MAP_WIDTH - 1] = 0;
 }
 
+PlainField CoreField::toPlainField() const
+{
+    PlainField pf;
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 14; ++y) {
+            pf.setColor(x, y, color(x, y));
+        }
+    }
+
+    return pf;
+}
+
 bool CoreField::isZenkeshi() const
 {
     for (int x = 1; x <= WIDTH; ++x) {
@@ -254,7 +267,7 @@ int CoreField::fillErasingPuyoPositions(const SimulationContext& context, Positi
     Position* eraseQueueHead = eraseQueue;
 
     {
-        FieldChecker checked;
+        FieldBits checked;
         for (int x = 1; x <= WIDTH; ++x) {
             int maxHeight = height(x);
             for (int y = context.minHeights[x]; y <= maxHeight; ++y) {

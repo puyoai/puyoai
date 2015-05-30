@@ -9,8 +9,6 @@
 
 using namespace std;
 
-#ifndef EXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD
-
 PlainField::PlainField()
 {
     initialize();
@@ -325,5 +323,3 @@ bool operator==(const PlainField& lhs, const PlainField& rhs)
 
     return true;
 }
-
-#endif

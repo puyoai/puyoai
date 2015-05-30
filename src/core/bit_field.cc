@@ -18,7 +18,6 @@ BitField::BitField()
     m_[1].setAll(_mm_set_epi16(0xFFFF, 0x8001, 0x8001, 0x8001, 0x8001, 0x8001, 0x8001, 0xFFFF));
 }
 
-#ifndef EXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD
 BitField::BitField(const PlainField& pf) : BitField()
 {
     __m128i m1 = _mm_load_si128(reinterpret_cast<const __m128i*>(pf.column(1)));
@@ -58,7 +57,6 @@ BitField::BitField(const PlainField& pf) : BitField()
             m_[2].setAll(FieldBits(xmm.m));
     }
 }
-#endif
 
 BitField::BitField(const string& str) : BitField()
 {
@@ -94,6 +92,9 @@ void BitField::setColor(int x, int y, PuyoColor c)
 
 bool BitField::isConnectedPuyo(int x, int y) const
 {
+    if (y > FieldConstant::HEIGHT)
+        return false;
+
     FieldBits colorBits = bits(color(x, y)).maskedField12();
     FieldBits single(x, y);
     return !single.expandEdge().mask(colorBits).notmask(single).isEmpty();
@@ -101,12 +102,18 @@ bool BitField::isConnectedPuyo(int x, int y) const
 
 int BitField::countConnectedPuyos(int x, int y) const
 {
+    if (y > FieldConstant::HEIGHT)
+        return 0;
+
     FieldBits colorBits = bits(color(x, y)).maskedField12();
     return FieldBits(x, y).expand(colorBits).popcount();
 }
 
 int BitField::countConnectedPuyos(int x, int y, FieldBits* checked) const
 {
+    if (y > FieldConstant::HEIGHT)
+        return false;
+
     FieldBits colorBits = bits(color(x, y)).maskedField12();
     FieldBits connected = FieldBits(x, y).expand(colorBits);
     checked->setAll(connected);
@@ -115,6 +122,9 @@ int BitField::countConnectedPuyos(int x, int y, FieldBits* checked) const
 
 int BitField::countConnectedPuyosMax4(int x, int y) const
 {
+    if (y > FieldConstant::HEIGHT)
+        return false;
+
     FieldBits colorBits = bits(color(x, y)).maskedField12();
     return FieldBits(x, y).expand4(colorBits).popcount();
 }

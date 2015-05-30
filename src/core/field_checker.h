@@ -7,11 +7,6 @@
 
 #include "core/field_constant.h"
 
-#ifdef EXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD
-#include "core/field_bits.h"
-#define FieldChecker FieldBits
-#else
-
 // FieldChecker is a bitset whose size is the same as field.
 class FieldChecker {
 public:
@@ -51,6 +46,5 @@ public:
 private:
     std::uint16_t col_[8];
 };
-#endif
 
 #endif // CORE_FIELD_CHECKER_H_

@@ -86,7 +86,7 @@ RensaStepResult CoreField::vanishDrop(SimulationContext* context, Tracker* track
 template<typename Tracker>
 int CoreField::vanish(SimulationContext* context, Tracker* tracker)
 {
-    FieldChecker checked;
+    FieldBits checked;
     Position eraseQueue[WIDTH * HEIGHT]; // All the positions of erased puyos will be stored here.
     Position* eraseQueueHead = eraseQueue;
 
