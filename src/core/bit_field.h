@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "base/base.h"
 #include "core/field_bits.h"
 #include "core/frame.h"
 #include "core/puyo_color.h"
@@ -47,13 +48,13 @@ public:
     RensaResult simulate(int initialChain = 1);
     RensaResult simulate(SimulationContext*);
     template<typename Tracker> RensaResult simulate(Tracker*);
-    template<typename Tracker> RensaResult simulate(SimulationContext*, Tracker*);
+    template<typename Tracker> RensaResult simulate(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
     RensaStepResult vanishDrop(SimulationContext*);
     // Vanishes the connected puyos with Tracker.
     template<typename Tracker>
-    RensaStepResult vanishDrop(SimulationContext*, Tracker*);
+    RensaStepResult vanishDrop(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
 
     void calculateHeight(std::uint16_t heights[FieldConstant::MAP_WIDTH]) const;
 
