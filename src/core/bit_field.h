@@ -316,7 +316,8 @@ void BitField::calculateHeight(std::uint16_t heights[FieldConstant::MAP_WIDTH]) 
    __m128i count8 = _mm_add_epi8(lowCount, highCount);
 
    __m128i count16 = _mm_add_epi8(count8, _mm_srli_epi16(count8, 8));
-   _mm_store_si128(reinterpret_cast<__m128i*>(heights), count16);
+   __m128i count = _mm_and_si128(count16, _mm_set1_epi16(0x0F));
+   _mm_store_si128(reinterpret_cast<__m128i*>(heights), count);
 }
 
 

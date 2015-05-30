@@ -630,3 +630,33 @@ TEST(BitFieldTest, drop1)
     bf.drop();
     EXPECT_EQ(expected, bf);
 }
+
+TEST(BitFieldTest, calculateHeight)
+{
+    alignas(16) std::uint16_t heights[FieldConstant::MAP_WIDTH];
+
+    BitField bf(
+        ".....O" // 14
+        "....OO"
+        "...OOO" // 12
+        "..OOOO"
+        ".OOOOO"
+        ".OOOOO"
+        ".OOOOO" // 8
+        ".OOOOO"
+        ".OOOOO"
+        ".OOOOO"
+        ".OOOOO" // 4
+        ".OOOOO"
+        ".OOOOO"
+        ".OOOOO"
+    );
+    bf.calculateHeight(heights);
+
+    EXPECT_EQ(0, heights[1]);
+    EXPECT_EQ(10, heights[2]);
+    EXPECT_EQ(11, heights[3]);
+    EXPECT_EQ(12, heights[4]);
+    EXPECT_EQ(13, heights[5]);
+    EXPECT_EQ(13, heights[6]); // not 14, but 13.
+}
