@@ -94,12 +94,6 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
         scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
-    case PatternType::MUST_EMPTY:
-        types_[x][y] = t;
-        vars_[x][y] = '_';
-        scores_[x][y] = score;
-        heights_[x] = std::max(height(x), y);
-        break;
     case PatternType::VAR:
     case PatternType::MUST_VAR:
         CHECK('A' <= variable && variable <= 'Z');
@@ -109,7 +103,6 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
         heights_[x] = std::max(height(x), y);
         break;
     case PatternType::ALLOW_VAR:
-    case PatternType::NOT_VAR:
         CHECK(('A' <= variable && variable <= 'Z') || ('a' <= variable && variable <= 'z'));
         types_[x][y] = t;
         vars_[x][y] = std::toupper(variable);
@@ -135,8 +128,6 @@ PatternType FieldPattern::inferType(char c, PatternType typeForLowerCase)
         return PatternType::NONE;
     if (c == '*')
         return PatternType::ANY;
-    if (c == '_')
-        return PatternType::MUST_EMPTY;
     if (c == '&')
         return PatternType::ALLOW_FILLING_IRON;
     if ('A' <= c && c <= 'Z')

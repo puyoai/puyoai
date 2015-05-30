@@ -16,7 +16,7 @@ class PatternMatcher;
 struct Position;
 
 enum class PatternType {
-    NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR,
+    NONE, ANY, VAR, MUST_VAR, ALLOW_VAR,
     ALLOW_FILLING_IRON, WALL
 };
 

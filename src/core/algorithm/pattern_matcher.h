@@ -123,12 +123,6 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern,
         for (int y = 1; y <= h; ++y) {
             char c = pattern.variable(x, y);
 
-            if (pattern.type(x, y) == PatternType::MUST_EMPTY) {
-                if (cf.color(x, y) != PuyoColor::EMPTY)
-                    return PatternMatchResult();
-                continue;
-            }
-
             if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
                 continue;
 
