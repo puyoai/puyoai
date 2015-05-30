@@ -71,7 +71,8 @@ puyoai_add_cxx_flags("-DSRC_DIR=\\\"${CMAKE_SOURCE_DIR}\\\"")
 puyoai_add_cxx_flags("-DTESTDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../testdata\\\"")
 puyoai_add_cxx_flags("-DDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../data\\\"")
 
-if(${CMAKE_BUILD_TYPE} MATCHES "Release")
+string(TOLOWER "${CMAKE_BUILD_TYPE}" build_type)
+if(${build_type} MATCHES release)
     puyoai_add_cxx_flags("-DNOINLINE_UNLESS_RELEASE")
 endif()
 
