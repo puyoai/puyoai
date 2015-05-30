@@ -218,16 +218,20 @@ TEST(FieldBitsTest, expand_exhaustive)
         FieldBits(ft, PuyoColor::RED),
     };
 
+    int countTestCases = 0;
     for (const FieldBits& fb : bits) {
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
                 if (!fb.get(x, y))
                     continue;
+                ++countTestCases;
                 EXPECT_EQ(4, FieldBits(x, y).expand(fb).popcount());
                 EXPECT_EQ(4, FieldBits(x, y).expand4(fb).popcount());
             }
         }
     }
+
+    EXPECT_EQ(19 * 4, countTestCases);
 }
 
 TEST(FieldBitsTest, vanishingSeed1)
