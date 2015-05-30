@@ -223,6 +223,36 @@ TEST(FieldPerformanceTest, bitfield_simulate_filled)
     tsc.showStatistics();
 }
 
+TEST(FieldPerformanceTest, simulate_filled_tracker)
+{
+    const int N = 100000;
+
+    TimeStampCounterData tsc;
+    BitField bfOriginal(
+        ".G.BRG"
+        "GBRRYR"
+        "RRYYBY"
+        "RGYRBR"
+        "YGYRBY"
+        "YGBGYR"
+        "GRBGYR"
+        "BRBYBY"
+        "RYYBYY"
+        "BRBYBR"
+        "BGBYRR"
+        "YGBGBG"
+        "RBGBGG");
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(bfOriginal);
+        RensaChainTracker tracker;
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(19, bf.simulate(&tracker).chains);
+    }
+
+    tsc.showStatistics();
+}
+
 TEST(FieldPerformanceTest, countConnectedPuyos_empty)
 {
     const PlainField f;
