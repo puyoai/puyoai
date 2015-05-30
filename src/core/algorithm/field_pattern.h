@@ -30,8 +30,6 @@ public:
     explicit FieldPattern(const std::string&, double defaultScore = 1);
     explicit FieldPattern(const std::vector<std::string>&, double defaultScore = 1);
 
-    static bool merge(const FieldPattern&, const FieldPattern&, FieldPattern*);
-
     bool isMatchable(const CoreField&) const;
 
     void setPattern(int x, int y, PatternType t, char variable, double score);
