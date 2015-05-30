@@ -7,6 +7,7 @@
 #include <tuple>
 #include <vector>
 
+#include "base/base.h"
 #include "core/algorithm/field_pattern.h"
 #include "core/algorithm/pattern_match_result.h"
 #include "core/column_puyo_list.h"
@@ -30,7 +31,7 @@ public:
     // If |ignoreMustVar| is true, don't check the existence.
     template<typename ScoreCallback>
     PatternMatchResult match(const FieldPattern&, const CoreField&,
-                             bool ignoresMustVar, ScoreCallback callback);
+                             bool ignoresMustVar, ScoreCallback callback) NOINLINE_UNLESS_RELEASE;
 
     PatternMatchResult match(const FieldPattern& pattern, const CoreField& field, bool ignoresMustVar = false)
     {
@@ -43,7 +44,7 @@ public:
                                 const CoreField&,
                                 int numAllowingFillingUnusedVariables,
                                 ColumnPuyoList*,
-                                ScoreCallback callback);
+                                ScoreCallback callback) NOINLINE_UNLESS_RELEASE;
 
     ComplementResult complement(const FieldPattern& fp, const CoreField& cf, int numAllowingFillingUnusedVariables,  ColumnPuyoList* cpl)
     {
