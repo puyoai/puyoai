@@ -71,6 +71,10 @@ puyoai_add_cxx_flags("-DSRC_DIR=\\\"${CMAKE_SOURCE_DIR}\\\"")
 puyoai_add_cxx_flags("-DTESTDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../testdata\\\"")
 puyoai_add_cxx_flags("-DDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../data\\\"")
 
+if(${CMAKE_BUILD_TYPE} MATCHES "Release")
+    puyoai_add_cxx_flags("-DNOINLINE_UNLESS_RELEASE")
+endif()
+
 # experimental.
 # puyoai_add_cxx_flags("-DEXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD")
 

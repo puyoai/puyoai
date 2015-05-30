@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "base/base.h"
 #include "core/bit_field.h"
 #include "core/decision.h"
 #include "core/field_constant.h"
@@ -201,13 +202,13 @@ public:
     RensaResult simulate(Tracker*);
     // Simualtes chains with SimulationContext and Tracker.
     template<typename Tracker>
-    RensaResult simulate(SimulationContext*, Tracker*);
+    RensaResult simulate(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
     RensaStepResult vanishDrop(SimulationContext*);
     // Vanishes the connected puyos with Tracker.
     template<typename Tracker>
-    RensaStepResult vanishDrop(SimulationContext*, Tracker*);
+    RensaStepResult vanishDrop(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
 
     // ----------------------------------------------------------------------
     // utility methods
