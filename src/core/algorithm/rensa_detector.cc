@@ -108,8 +108,10 @@ void RensaDetector::makeProhibitArray(const RensaResult& rensaResult, const Rens
         }
     }
 
-    for (int x = 1; x <= 6; ++x)
-        prohibits[x] = (firePuyos.sizeOn(x) > 0);
+    for (int x = 1; x <= 6; ++x) {
+        if (firePuyos.sizeOn(x) > 0)
+            prohibits[x] = true;
+    }
 }
 
 // TODO(mayah): Consider to improve this.
