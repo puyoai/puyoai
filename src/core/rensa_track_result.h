@@ -6,10 +6,22 @@
 #include <string>
 #include <vector>
 
+#include "core/field_bits.h"
 #include "core/field_constant.h"
 #include "core/position.h"
 
 class RensaNonTrackResult {
+};
+
+class RensaExistingPositionTrackResult {
+public:
+    RensaExistingPositionTrackResult() {}
+
+    void setExistingBits(FieldBits bits) { existingBits_ = bits; }
+    FieldBits existingBits() const { return existingBits_; }
+
+private:
+    FieldBits existingBits_;
 };
 
 // RensaChainTrackResult represents in what-th chain puyo is erased.

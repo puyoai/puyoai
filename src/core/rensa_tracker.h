@@ -5,6 +5,7 @@
 
 #include "base/bmi.h"
 #include "base/unit.h"
+#include "core/field_bits.h"
 #include "core/rensa_result.h"
 #include "core/rensa_track_result.h"
 
@@ -19,20 +20,31 @@ class FieldBits;
 // that calls the corresponding Tracker methods. If you'd like to add a new hook point,
 // you need to define a hook point in CoreField.
 
-template<typename TrackResult>
-class RensaTracker;
-
-// RensaTracker<Unit> is a tracker that does not track anything.
-template<>
-class RensaTracker<Unit> {
+class RensaTrackerBase {
 public:
     void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/,
                const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
 
+    void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
+};
+
+// ----------------------------------------------------------------------
+
+template<typename TrackResult>
+class RensaTracker;
+
+// ----------------------------------------------------------------------
+
+// RensaTracker<Unit> is a tracker that does not track anything.
+template<>
+class RensaTracker<Unit> : public RensaTrackerBase {
+public:
 };
 typedef RensaTracker<Unit> RensaNonTracker;
 
-class RensaYPositionTracker {
+// ----------------------------------------------------------------------
+
+class RensaYPositionTracker : public RensaTrackerBase {
 public:
     RensaYPositionTracker() :
         originalY_ {
@@ -70,9 +82,38 @@ private:
     std::uint64_t originalY_[FieldConstant::MAP_WIDTH];
 };
 
+// ----------------------------------------------------------------------
+
+template<>
+class RensaTracker<RensaExistingPositionTrackResult> : public RensaTrackerBase {
+public:
+    void setExistingBits(FieldBits bits) { result_.setExistingBits(bits); }
+
+    const RensaExistingPositionTrackResult& result() const { return result_; }
+
+    void trackDrop(FieldBits blender, FieldBits leftOnes, FieldBits rightOnes)
+    {
+        FieldBits m = result_.existingBits();
+
+        __m128i v1 = _mm_and_si128(rightOnes, m);
+        __m128i v2 = _mm_and_si128(leftOnes, m);
+        __m128i v3 = _mm_srli_epi16(v2, 1);
+        __m128i v4 = _mm_or_si128(v1, v3);
+        m = _mm_blendv_epi8(m, v4, blender);
+
+        result_.setExistingBits(m);
+    }
+
+private:
+    RensaExistingPositionTrackResult result_;
+};
+typedef RensaTracker<RensaExistingPositionTrackResult> RensaExistingPositionTracker;
+
+// ----------------------------------------------------------------------
+
 // RensaTracker<RensaChainTrackResult> tracks in what-th rensa a puyo is vanished.
 template<>
-class RensaTracker<RensaChainTrackResult> {
+class RensaTracker<RensaChainTrackResult> : public RensaTrackerBase {
 public:
     RensaTracker() {}
 
@@ -95,8 +136,10 @@ private:
 };
 typedef RensaTracker<RensaChainTrackResult> RensaChainTracker;
 
+// ----------------------------------------------------------------------
+
 template<>
-class RensaTracker<RensaCoefResult> {
+class RensaTracker<RensaCoefResult> : public RensaTrackerBase {
 public:
     const RensaCoefResult& result() const { return result_; }
 
@@ -111,8 +154,10 @@ private:
 };
 typedef RensaTracker<RensaCoefResult> RensaCoefTracker;
 
+// ----------------------------------------------------------------------
+
 template<>
-class RensaTracker<RensaVanishingPositionResult> {
+class RensaTracker<RensaVanishingPositionResult> : public RensaTrackerBase {
 public:
     RensaTracker() {}
 
@@ -142,7 +187,7 @@ typedef RensaTracker<RensaVanishingPositionResult> RensaVanishingPositionTracker
 // ----------------------------------------------------------------------
 
 // This is the same as RensaChainTracker, however, the result is passed as pointer.
-class RensaChainPointerTracker {
+class RensaChainPointerTracker : public RensaTrackerBase {
 public:
     explicit RensaChainPointerTracker(RensaChainTrackResult* trackResult) :
         result_(trackResult)

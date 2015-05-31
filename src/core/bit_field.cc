@@ -182,7 +182,7 @@ RensaResult BitField::simulate(SimulationContext* context, Tracker* tracker)
         context->currentChain += 1;
         score += nthChainScore;
         frames += FRAMES_VANISH_ANIMATION;
-        int maxDrops = dropAfterVanish(erased);
+        int maxDrops = dropAfterVanish(erased, tracker);
         if (maxDrops > 0) {
             frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
         } else {
@@ -205,7 +205,7 @@ RensaStepResult BitField::vanishDrop(SimulationContext* context, Tracker* tracke
     int frames = FRAMES_VANISH_ANIMATION;
     bool quick = false;
     if (score > 0) {
-        maxDrops = dropAfterVanish(erased);
+        maxDrops = dropAfterVanish(erased, tracker);
         context->currentChain += 1;
     }
 
@@ -280,7 +280,8 @@ int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* 
     return 10 * numErasedPuyos * rensaBonusCoef;
 }
 
-int BitField::dropAfterVanish(FieldBits erased)
+template<typename Tracker>
+int BitField::dropAfterVanish(FieldBits erased, Tracker* tracker)
 {
     // TODO(mayah): If we can use AVX2, we have PDEP, PEXT instruction.
     // It would be really useful to improve this method, I believe.
@@ -327,6 +328,8 @@ int BitField::dropAfterVanish(FieldBits erased)
 
         // for each line, -1 if drop, 0 otherwise.
         __m128i blender = _mm_xor_si128(_mm_cmpeq_epi16(_mm_and_si128(line, erased.xmm()), zero), ones);
+
+        tracker->trackDrop(blender, leftOnes, rightOnes);
 
         for (int i = 0; i < 3; ++i) {
             __m128i m = m_[i].xmm();
@@ -415,6 +418,7 @@ std::ostream& operator<<(std::ostream& os, const BitField& bf)
 }
 
 template RensaResult BitField::simulate(SimulationContext*, RensaNonTracker*);
+template RensaResult BitField::simulate(SimulationContext*, RensaExistingPositionTracker*);
 template RensaResult BitField::simulate(SimulationContext*, RensaCoefTracker*);
 template RensaResult BitField::simulate(SimulationContext*, RensaYPositionTracker*);
 template RensaResult BitField::simulate(SimulationContext*, RensaChainTracker*);
@@ -422,6 +426,7 @@ template RensaResult BitField::simulate(SimulationContext*, RensaVanishingPositi
 template RensaResult BitField::simulate(SimulationContext*, RensaChainPointerTracker*);
 
 template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaNonTracker*);
+template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaExistingPositionTracker*);
 template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaCoefTracker*);
 template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaYPositionTracker*);
 template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaChainTracker*);
