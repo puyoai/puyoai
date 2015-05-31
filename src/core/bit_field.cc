@@ -167,6 +167,119 @@ bool BitField::rensaWillOccur() const
     return false;
 }
 
+template<typename Tracker>
+RensaResult BitField::simulate(SimulationContext* context, Tracker* tracker)
+{
+    BitField escaped = escapeInvisible();
+
+    int score = 0;
+    int frames = 0;
+    int nthChainScore;
+    bool quick = false;
+    FieldBits erased;
+
+    while ((nthChainScore = vanishForSimulation(context->currentChain, &erased, tracker)) > 0) {
+        context->currentChain += 1;
+        score += nthChainScore;
+        frames += FRAMES_VANISH_ANIMATION;
+        int maxDrops = dropAfterVanish(erased);
+        if (maxDrops > 0) {
+            frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
+        } else {
+            quick = true;
+        }
+    }
+
+    recoverInvisible(escaped);
+    return RensaResult(context->currentChain - 1, score, frames, quick);
+}
+
+template<typename Tracker>
+RensaStepResult BitField::vanishDrop(SimulationContext* context, Tracker* tracker)
+{
+    BitField escaped = escapeInvisible();
+
+    FieldBits erased;
+    int score = vanishForSimulation(context->currentChain, &erased, tracker);
+    int maxDrops = 0;
+    int frames = FRAMES_VANISH_ANIMATION;
+    bool quick = false;
+    if (score > 0) {
+        maxDrops = dropAfterVanish(erased);
+        context->currentChain += 1;
+    }
+
+    if (maxDrops > 0) {
+        DCHECK(maxDrops < 14);
+        frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
+    } else {
+        quick = true;
+    }
+
+    recoverInvisible(escaped);
+    return RensaStepResult(score, frames, quick);
+}
+
+template<typename Tracker>
+int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* tracker) const
+{
+    int numErasedPuyos = 0;
+    int numColors = 0;
+    int longBonusCoef = 0;
+
+    *erased = FieldBits();
+
+    for (PuyoColor c : NORMAL_PUYO_COLORS) {
+        FieldBits mask = bits(c).maskedField12();
+        FieldBits seed = mask.vanishingSeed();
+
+        if (seed.isEmpty())
+            continue;
+
+        ++numColors;
+
+        // fast path. In most cases, >= 8 puyos won't be erased.
+        // When <= 7 puyos are erased, it won't be separated.
+        {
+            FieldBits expanded = seed.expand(mask);
+            int popcount = expanded.popcount();
+            if (popcount <= 7) {
+                numErasedPuyos += popcount;
+                longBonusCoef += longBonus(popcount);
+                erased->setAll(expanded);
+                mask.unsetAll(expanded);
+                continue;
+            }
+        }
+
+        // slow path...
+        seed.iterateBitWithMasking([&](FieldBits x) -> FieldBits {
+            if (mask.testz(x))
+                return x;
+
+            FieldBits expanded = x.expand(mask);
+            int count = expanded.popcount();
+            numErasedPuyos += count;
+            longBonusCoef += longBonus(count);
+            erased->setAll(expanded);
+            mask.unsetAll(expanded);
+            return expanded;
+        });
+    }
+
+    if (numColors == 0)
+        return 0;
+
+    int rensaBonusCoef = calculateRensaBonusCoef(chainBonus(currentChain), longBonusCoef, colorBonus(numColors));
+
+    // Removes ojama.
+    FieldBits ojamaErased(erased->expandEdge().mask(bits(PuyoColor::OJAMA).maskedField12()));
+    tracker->track(currentChain, numErasedPuyos, rensaBonusCoef, *erased, ojamaErased);
+
+    erased->setAll(ojamaErased);
+    return 10 * numErasedPuyos * rensaBonusCoef;
+}
+
 int BitField::dropAfterVanish(FieldBits erased)
 {
     // TODO(mayah): If we can use AVX2, we have PDEP, PEXT instruction.
@@ -300,3 +413,17 @@ std::ostream& operator<<(std::ostream& os, const BitField& bf)
 {
     return os << bf.toString();
 }
+
+template RensaResult BitField::simulate(SimulationContext*, RensaNonTracker*);
+template RensaResult BitField::simulate(SimulationContext*, RensaCoefTracker*);
+template RensaResult BitField::simulate(SimulationContext*, RensaYPositionTracker*);
+template RensaResult BitField::simulate(SimulationContext*, RensaChainTracker*);
+template RensaResult BitField::simulate(SimulationContext*, RensaVanishingPositionTracker*);
+template RensaResult BitField::simulate(SimulationContext*, RensaChainPointerTracker*);
+
+template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaNonTracker*);
+template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaCoefTracker*);
+template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaYPositionTracker*);
+template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaChainTracker*);
+template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaVanishingPositionTracker*);
+template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaChainPointerTracker*);
