@@ -669,6 +669,20 @@ TEST(BitFieldTest, drop1)
     EXPECT_EQ(expected, bf);
 }
 
+TEST(BitFieldTest, ignitionPuyoBits)
+{
+    BitField bf(
+        "..YY.."
+        "GGGGYY"
+        "RRRROY");
+
+    FieldBits bits(
+        "1111.."
+        "11111.");
+
+    EXPECT_EQ(bits, bf.ignitionPuyoBits());
+}
+
 TEST(BitFieldTest, calculateHeight)
 {
     alignas(16) std::uint16_t heights[FieldConstant::MAP_WIDTH];

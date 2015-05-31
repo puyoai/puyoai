@@ -27,6 +27,20 @@ FieldBits::FieldBits(const PlainField& pf, PuyoColor c)
     m_ = xmm.m;
 }
 
+FieldBits::FieldBits(const std::string& str) :
+    FieldBits()
+{
+    int counter = 0;
+    for (int i = str.length() - 1; i >= 0; --i) {
+        int x = 6 - (counter % 6);
+        int y = counter / 6 + 1;
+
+        if (str[i] == '1')
+            set(x, y);
+        counter++;
+    }
+}
+
 std::string FieldBits::toString() const
 {
     stringstream ss;

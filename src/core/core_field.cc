@@ -262,6 +262,11 @@ bool CoreField::dropPuyoListWithMaxHeight(const ColumnPuyoList& cpl, int maxHeig
     return true;
 }
 
+FieldBits CoreField::ignitionPuyoBits() const
+{
+    return field_.ignitionPuyoBits();
+}
+
 int CoreField::fillErasingPuyoPositions(Position* eraseQueue) const
 {
     return field_.fillErasingPuyoPositions(eraseQueue);
