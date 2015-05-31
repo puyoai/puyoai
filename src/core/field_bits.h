@@ -19,6 +19,7 @@ public:
     FieldBits(__m128i m) : m_(m) {}
     FieldBits(int x, int y) : m_(onebit(x, y)) {}
     FieldBits(const PlainField&, PuyoColor);
+    explicit FieldBits(const std::string&);
 
     operator __m128i&() { return m_; }
     __m128i& xmm() { return m_; }

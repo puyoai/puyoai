@@ -35,6 +35,28 @@ TEST(FieldBitsTest, ctor2)
     EXPECT_FALSE(bits.get(4, 2));
 }
 
+TEST(FieldBitsTest, ctor3)
+{
+    FieldBits bits("11...."
+                   "111..1"
+                   "111111");
+
+    EXPECT_TRUE(bits.get(1, 1));
+    EXPECT_TRUE(bits.get(1, 2));
+    EXPECT_TRUE(bits.get(1, 3));
+    EXPECT_FALSE(bits.get(1, 4));
+
+    EXPECT_TRUE(bits.get(4, 1));
+    EXPECT_FALSE(bits.get(4, 2));
+    EXPECT_FALSE(bits.get(4, 3));
+    EXPECT_FALSE(bits.get(4, 4));
+
+    EXPECT_TRUE(bits.get(5, 1));
+    EXPECT_FALSE(bits.get(5, 2));
+    EXPECT_FALSE(bits.get(5, 3));
+    EXPECT_FALSE(bits.get(5, 4));
+}
+
 TEST(FieldBitsTest, set)
 {
     FieldBits bits;
