@@ -9,12 +9,13 @@
 
 using namespace std;
 
-bool BitPatternMatcher::match(const BitFieldPattern& bitFieldPattern, const BitField& field)
+BitPatternMatchResult BitPatternMatcher::match(const BitFieldPattern& bitFieldPattern,
+                                               const BitField& field,
+                                               bool /*ignoresMustVar*/)
 {
-    PuyoColor envs[26];
     SmallIntSet unusedVariables;
 
-    int matchCount = 0;
+    FieldBits matchedBits;
 
     // First, create a env (char -> PuyoColor)
     for (size_t i = 0; i < bitFieldPattern.patterns().size(); ++i) {
@@ -26,17 +27,18 @@ bool BitPatternMatcher::match(const BitFieldPattern& bitFieldPattern, const BitF
                 continue;
             if (found != PuyoColor::EMPTY) {
                 // found multiple colors for one variable.
-                return false;
+                return BitPatternMatchResult();
             }
-            matchCount += bits.popcount();
+
+            matchedBits.setAll(bits);
             found = c;
         }
 
         // OJAMA is matched?  (OK for IRON, since it's a place holder.)
         if (!FieldBits(pat.varBits & field.bits(PuyoColor::OJAMA)).isEmpty())
-            return false;
+            return BitPatternMatchResult();
 
-        envs[i] = found;
+        envs_[i] = found;
         if (found == PuyoColor::EMPTY) {
             DCHECK('A' <= pat.var && pat.var <= 'Z') << pat.var;
             unusedVariables.set(pat.var - 'A');
@@ -45,16 +47,18 @@ bool BitPatternMatcher::match(const BitFieldPattern& bitFieldPattern, const BitF
 
     // Check the neighbors.
     // If the neighbor of pattern has the same color
-    int allowMatchCount = 0;
+    FieldBits allowedMatchedBits;
     for (size_t i = 0; i < bitFieldPattern.patterns().size(); ++i) {
-        if (envs[i] == PuyoColor::EMPTY)
+        if (envs_[i] == PuyoColor::EMPTY)
             continue;
         const BitFieldPattern::Pattern& pat = bitFieldPattern.pattern(i);
-        FieldBits edge = pat.varBits.expandEdge().notmask(pat.varBits) & field.bits(envs[i]);
+        FieldBits edge = pat.varBits.expandEdge().notmask(pat.varBits) & field.bits(envs_[i]);
         if (!edge.notmask(pat.allowVarBits).notmask(bitFieldPattern.anyPatternBits()).isEmpty())
-            return false;
-        allowMatchCount += edge.mask(pat.allowVarBits).popcount();
+            return BitPatternMatchResult();
+
+        FieldBits matched = edge.mask(pat.allowVarBits);
+        allowedMatchedBits.setAll(matched);
     }
 
-    return true;
+    return BitPatternMatchResult(true, matchedBits, allowedMatchedBits, unusedVariables);
 }

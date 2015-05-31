@@ -58,6 +58,8 @@ public:
 
     bool checkNeighborsForCompletion(const FieldPattern&, const CoreField&) const;
 
+
+private:
     PuyoColor map(char var) const
     {
         DCHECK('A' <= var && var <= 'Z') << var;
@@ -76,7 +78,6 @@ public:
         map_[var - 'A'] = pc;
     }
 
-private:
     PuyoColor set(char var, PuyoColor pc)
     {
         DCHECK('A' <= var && var <= 'Z') << var;
