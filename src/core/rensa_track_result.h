@@ -24,6 +24,14 @@ private:
     FieldBits existingBits_;
 };
 
+class RensaLastVanishedPositionTrackResult {
+public:
+    void setLastVanishedPositionBits(FieldBits bits) { lastVanishedPositionBits_ = bits; }
+    FieldBits lastVanishedPositionBits() const { return lastVanishedPositionBits_; }
+private:
+    FieldBits lastVanishedPositionBits_;
+};
+
 // RensaChainTrackResult represents in what-th chain puyo is erased.
 class RensaChainTrackResult {
 public:
