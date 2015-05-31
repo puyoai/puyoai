@@ -35,6 +35,9 @@ public:
     bool isEmpty(int x, int y) const { return !(m_[0] | m_[1] | m_[2]).get(x, y); }
     void setColor(int x, int y, PuyoColor c);
 
+    void setAll(FieldBits, PuyoColor);
+    void setAllIfEmpty(FieldBits, PuyoColor);
+
     bool isZenkeshi() const { return FieldBits(m_[0] | m_[1] | m_[2]).maskedField13().isEmpty(); }
 
     bool isConnectedPuyo(int x, int y) const;

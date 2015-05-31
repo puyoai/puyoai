@@ -122,6 +122,44 @@ TEST(BitFieldTest, setColor)
     }
 }
 
+TEST(BitFieldTest, setAll)
+{
+    FieldBits bits;
+    for (int i = 1; i <= 6; ++i)
+        bits.set(i, i);
+
+    BitField bf;
+    bf.setAll(bits, PuyoColor::RED);
+    for (int i = 1; i <= 6; ++i)
+        EXPECT_EQ(PuyoColor::RED, bf.color(i, i));
+    bf.setAll(bits, PuyoColor::OJAMA);
+    for (int i = 1; i <= 6; ++i)
+        EXPECT_EQ(PuyoColor::OJAMA, bf.color(i, i));
+    bf.setAll(bits, PuyoColor::EMPTY);
+    for (int i = 1; i <= 6; ++i)
+        EXPECT_EQ(PuyoColor::EMPTY, bf.color(i, i));
+}
+
+TEST(BitFieldTest, setAllIfEmpty)
+{
+    FieldBits bits;
+    for (int i = 1; i <= 6; ++i)
+        bits.set(i, i);
+
+    BitField bf;
+    bf.setColor(1, 1, PuyoColor::RED);
+    bf.setColor(2, 2, PuyoColor::OJAMA);
+
+    bf.setAllIfEmpty(bits, PuyoColor::BLUE);
+
+    EXPECT_EQ(PuyoColor::RED, bf.color(1, 1));
+    EXPECT_EQ(PuyoColor::OJAMA, bf.color(2, 2));
+    EXPECT_EQ(PuyoColor::BLUE, bf.color(3, 3));
+    EXPECT_EQ(PuyoColor::BLUE, bf.color(4, 4));
+    EXPECT_EQ(PuyoColor::BLUE, bf.color(5, 5));
+    EXPECT_EQ(PuyoColor::BLUE, bf.color(6, 6));
+}
+
 TEST(BitFieldTest, isZenkeshi)
 {
     BitField bf1;
