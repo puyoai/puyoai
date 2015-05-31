@@ -39,7 +39,7 @@ vector<Position> findIgnitionPositions(const FieldPattern& pattern)
 const vector<int> PatternBook::s_emptyVector;
 
 PatternBookField::PatternBookField(const string& field, const string& name, int ignitionColumn, double score) :
-    pattern_(field, score),
+    pattern_(field),
     name_(name),
     ignitionColumn_(ignitionColumn),
     score_(score),

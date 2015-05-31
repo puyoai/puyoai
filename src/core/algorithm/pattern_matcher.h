@@ -4,24 +4,58 @@
 #include <glog/logging.h>
 
 #include <algorithm>
-#include <tuple>
 #include <vector>
 
 #include "base/base.h"
+#include "base/small_int_set.h"
 #include "core/algorithm/field_pattern.h"
-#include "core/algorithm/pattern_match_result.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
 #include "core/puyo_color.h"
 
-class CoreField;
+struct PatternMatchResult {
+    PatternMatchResult() : matched(false) {}
+    PatternMatchResult(bool matched, FieldBits matchedBits, FieldBits allowedMatchedBits,
+                       SmallIntSet unusedVariables) :
+        matched(matched),
+        matchedBits(matchedBits),
+        allowedMatchedBits(allowedMatchedBits),
+        unusedVariables(unusedVariables) {}
 
-struct ComplementResult {
-    explicit ComplementResult(bool success, int filled = 0) :
-        success(success), numFilledUnusedVariables(filled) {}
+    friend bool operator==(const PatternMatchResult& lhs, const PatternMatchResult& rhs)
+    {
+        if (lhs.matched != rhs.matched)
+            return false;
+        if (lhs.matchedBits != rhs.matchedBits)
+            return false;
+        if (lhs.allowedMatchedBits != rhs.allowedMatchedBits)
+            return false;
+        if (lhs.unusedVariables != rhs.unusedVariables)
+            return false;
+        return true;
+    }
+
+    bool matched;
+    FieldBits matchedBits;
+    FieldBits allowedMatchedBits;
+    SmallIntSet unusedVariables; // 'A' -> 0, 'B' -> 1, ...
+};
+
+struct ComplementResult{
+    ComplementResult() {}
+    ComplementResult(bool success,
+                     const PatternMatchResult matchedResult,
+                     int numFilledUnusedVariables,
+                     const ColumnPuyoList& cpl) :
+        success(success),
+        matchedResult(matchedResult),
+        numFilledUnusedVariables(numFilledUnusedVariables),
+        complementedPuyoList(cpl) {}
 
     bool success = false;
+    PatternMatchResult matchedResult;
     int numFilledUnusedVariables = 0;
+    ColumnPuyoList complementedPuyoList;
 };
 
 class PatternMatcher {
@@ -29,35 +63,10 @@ public:
     PatternMatcher();
 
     // If |ignoreMustVar| is true, don't check the existence.
-    template<typename ScoreCallback>
-    PatternMatchResult match(const FieldPattern&, const CoreField&,
-                             bool ignoresMustVar, ScoreCallback callback) NOINLINE_UNLESS_RELEASE;
+    PatternMatchResult match(const FieldPattern&, const CoreField&, bool ignoresMustVar = false);
 
-    PatternMatchResult match(const FieldPattern& pattern, const CoreField& field, bool ignoresMustVar = false)
-    {
-        return match(pattern, field, ignoresMustVar, [](int /*x*/, int /*y*/, int /*score*/){});
-    }
-
-    // ScoreCallback must be a function-like: void f(int x, int y, double score).
-    template<typename ScoreCallback>
-    ComplementResult complement(const FieldPattern&,
-                                const CoreField&,
-                                int numAllowingFillingUnusedVariables,
-                                ColumnPuyoList*,
-                                ScoreCallback callback) NOINLINE_UNLESS_RELEASE;
-
-    ComplementResult complement(const FieldPattern& fp, const CoreField& cf, int numAllowingFillingUnusedVariables,  ColumnPuyoList* cpl)
-    {
-        return complement(fp, cf, numAllowingFillingUnusedVariables, cpl, [](int /*x*/, int /*y*/, double /*score*/){});
-    }
-
-    ComplementResult complement(const FieldPattern& fp, const CoreField& cf, ColumnPuyoList* cpl)
-    {
-        return complement(fp, cf, 0, cpl, [](int /*x*/, int /*y*/, double /*score*/){});
-    }
-
-    bool checkNeighborsForCompletion(const FieldPattern&, const CoreField&) const;
-
+    ComplementResult complement(const FieldPattern&, const CoreField&,
+                                int numAllowingFillingUnusedVariables = 0);
 
 private:
     PuyoColor map(char var) const
@@ -93,7 +102,7 @@ private:
     }
 
     bool checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor) const;
-
+    bool checkNeighborsForCompletion(const FieldPattern&, const CoreField&) const;
     bool fillUnusedVariableColors(const FieldPattern&,
                                   const CoreField&,
                                   bool needsNeighborCheck,
@@ -106,122 +115,5 @@ private:
     PuyoColor map_[26];
     bool seen_[26];
 };
-
-template<typename ScoreCallback>
-PatternMatchResult PatternMatcher::match(const FieldPattern& pattern,
-                                         const CoreField& cf,
-                                         bool ignoresMustVar,
-                                         ScoreCallback scoreCallback)
-{
-    // First, make a map from char to PuyoColor.
-    int matchCount = 0;
-    int matchAllowedCount = 0;
-    double matchScore = 0;
-
-    // First, create a env (char -> PuyoColor)
-    for (int x = 1; x <= 6; ++x) {
-        int h = cf.height(x);
-        for (int y = 1; y <= h; ++y) {
-            char c = pattern.variable(x, y);
-
-            if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
-                continue;
-
-            PuyoColor pc = cf.color(x, y);
-            if (pc == PuyoColor::EMPTY) {
-                if (!ignoresMustVar && pattern.type(x, y) == PatternType::MUST_VAR)
-                    return PatternMatchResult();
-                continue;
-            }
-
-            // place holder.
-            if (pc == PuyoColor::IRON)
-                continue;
-
-            if (!isNormalColor(pc))
-                return PatternMatchResult();
-
-            matchCount += 1;
-            matchScore += pattern.score();
-            scoreCallback(x, y, pattern.score());
-
-            if (!isSet(c)) {
-                set(c, pc);
-                continue;
-            }
-
-            if (map(c) != pc)
-                return PatternMatchResult();
-        }
-    }
-
-    // Check the neighbors.
-    for (int x = 1; x <= 6; ++x) {
-        int h = pattern.height(x);
-        for (int y = 1; y <= h; ++y) {
-            char c = pattern.variable(x, y);
-            if (pattern.type(x, y) == PatternType::NONE)
-                continue;
-            if (pattern.type(x, y) == PatternType::ANY)
-                continue;
-            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_IRON)
-                continue;
-            if (pattern.type(x, y) == PatternType::ALLOW_VAR) {
-                char uv = std::toupper(pattern.variable(x, y));
-                if (isSet(uv) && map(uv) == cf.color(x, y)) {
-                    ++matchAllowedCount;
-                }
-                continue;
-            }
-
-            setSeen(c);
-
-            if (!ignoresMustVar && pattern.type(x, y) == PatternType::MUST_VAR && cf.color(x, y) == PuyoColor::EMPTY)
-                return PatternMatchResult();
-
-            DCHECK(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR);
-
-            // Check neighbors.
-            if (!checkCell(c, pattern.type(x, y + 1), pattern.variable(x, y + 1), cf.color(x, y + 1)))
-                return PatternMatchResult();
-            if (!checkCell(c, pattern.type(x, y - 1), pattern.variable(x, y - 1), cf.color(x, y - 1)))
-                return PatternMatchResult();
-            if (!checkCell(c, pattern.type(x + 1, y), pattern.variable(x + 1, y), cf.color(x + 1, y)))
-                return PatternMatchResult();
-            if (!checkCell(c, pattern.type(x - 1, y), pattern.variable(x - 1, y), cf.color(x - 1, y)))
-                return PatternMatchResult();
-        }
-    }
-
-    SmallIntSet unusedVariables;
-    for (char c = 'A'; c <= 'Z'; ++c) {
-        if (isSeen(c) && !isSet(c))
-            unusedVariables.set(c - 'A');
-    }
-
-    return PatternMatchResult(true, matchScore, matchCount, matchAllowedCount, unusedVariables);
-}
-
-template<typename ScoreCallback>
-ComplementResult PatternMatcher::complement(const FieldPattern& pattern,
-                                            const CoreField& field,
-                                            int numAllowingFillingUnusedVariables,
-                                            ColumnPuyoList* cpl,
-                                            ScoreCallback scoreCallback)
-{
-    DCHECK_EQ(cpl->size(), 0) << "result must be empty";
-
-    PatternMatchResult result = match(pattern, field, false, std::move(scoreCallback));
-    if (!result.matched)
-        return ComplementResult(false);
-
-    if (result.unusedVariables.size() > numAllowingFillingUnusedVariables)
-        return ComplementResult(false);
-
-    bool ok = fillUnusedVariableColors(pattern, field, !result.unusedVariables.isEmpty(), result.unusedVariables, cpl);
-    int filled = std::min(static_cast<int>(result.unusedVariables.size()),
-                          numAllowingFillingUnusedVariables);
-    return ComplementResult(ok, filled);
-}
 
 #endif

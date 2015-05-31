@@ -27,14 +27,13 @@ enum class PatternType {
 // ' ' or '.'  represents empty.
 class FieldPattern : FieldConstant {
 public:
-    explicit FieldPattern(double defaultScore = 1);
-    explicit FieldPattern(const std::string&, double defaultScore = 1);
-    explicit FieldPattern(const std::vector<std::string>&, double defaultScore = 1);
+    FieldPattern();
+    explicit FieldPattern(const std::string&);
+    explicit FieldPattern(const std::vector<std::string>&);
 
     bool isMatchable(const CoreField&) const;
 
     int numVariables() const { return numVariables_; }
-    double score() const { return score_; }
 
     int height(int x) const { return heights_[x]; }
     char variable(int x, int y) const { return vars_[x][y]; }
@@ -54,7 +53,6 @@ private:
 
     void setPattern(int x, int y, PatternType t, char variable);
 
-    double score_;
     char vars_[MAP_WIDTH][MAP_HEIGHT];
     PatternType types_[MAP_WIDTH][MAP_HEIGHT];
     int heights_[MAP_WIDTH];

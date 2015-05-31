@@ -1,7 +1,6 @@
 #ifndef CORE_ALGORITHM_BIT_PATTERN_MATCHER_H_
 #define CORE_ALGORITHM_BIT_PATTERN_MATCHER_H_
 
-#include "core/algorithm/pattern_match_result.h"
 #include "core/column_puyo_list.h"
 #include "core/field_bits.h"
 
@@ -37,14 +36,6 @@ struct BitComplementResult {
     bool matched = false;
     int numFilledUnusedVariables = 0;
     ColumnPuyoList complementedPuyoList;
-};
-
-struct ComplementResult {
-    explicit ComplementResult(bool success, int filled = 0) :
-        success(success), numFilledUnusedVariables(filled) {}
-
-    bool success = false;
-    int numFilledUnusedVariables = 0;
 };
 
 class BitPatternMatcher {

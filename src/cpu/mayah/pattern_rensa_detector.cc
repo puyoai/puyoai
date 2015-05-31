@@ -27,23 +27,18 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         if (x == 0)
             continue;
 
-        double patternScore = 0.0;
-        auto scoreCallback = [this, &patternScore, &pbf](int x, int y, double score) {
-            if (originalField_.isNormalColor(x, y))
-                patternScore += score / pbf.numVariables();
-        };
+        ComplementResult complementResult = pbf.complement(originalField_, MAX_UNUSED_VARIABLES_FOR_FIRST_PATTERN);
 
-        ColumnPuyoList cpl;
-        ComplementResult complementResult = pbf.complement(originalField_, MAX_UNUSED_VARIABLES_FOR_FIRST_PATTERN,
-                                                           &cpl, scoreCallback);
         if (!complementResult.success)
             continue;
         // We don't allow unused variable for the first pattern.
         if (complementResult.numFilledUnusedVariables > 0)
             continue;
 
+        const ColumnPuyoList& cpl = complementResult.complementedPuyoList;
+
         // No ignition puyo.
-        if (cpl.sizeOn(x) == 0)
+        if (complementResult.complementedPuyoList.sizeOn(x) == 0)
             continue;
 
         CoreField cf(originalField_);
@@ -63,6 +58,8 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
             tmp.dropPuyoListWithMaxHeight(cpl, maxHeight);
             CHECK_GT(stepResult.score, 0) << tmp.toDebugString();
         }
+
+        double patternScore = pbf.score() * complementResult.matchedResult.matchedBits.popcount() / pbf.numVariables();
         int restUnusedVariables = MAX_UNUSED_VARIABLES - complementResult.numFilledUnusedVariables;
         iteratePossibleRensasInternal(cf, tracker, 1, firePuyo, keyPuyos,
                                       maxIteration - 1, restUnusedVariables,
@@ -138,21 +135,15 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     for (PatternBook::IndexIterator it = p.first; it != p.second; ++it) {
         const PatternBookField& pbf = patternBook_.patternBookField(*it);
 
-        double patternScore = currentPatternScore;
-        auto addScoreCallback = [this, &patternScore, &pbf, &currentFieldTracker](int x, int y, double score) {
-            if (currentFieldTracker.result().existingBits().get(x, y))
-                patternScore += score / pbf.numVariables();
-        };
-        auto dontAddScoreCallback = [](int, int, double) {};
-
-        ColumnPuyoList cpl;
-        ComplementResult complementResult = addsPatternScore ?
-            pbf.complement(currentField, restUnusedVariables, &cpl, addScoreCallback) :
-            pbf.complement(currentField, restUnusedVariables, &cpl, dontAddScoreCallback);
-
+        ComplementResult complementResult = pbf.complement(currentField, restUnusedVariables);
         if (!complementResult.success)
             continue;
 
+        double patternScore = 0.0;
+        if (addsPatternScore)
+            patternScore = pbf.score() * complementResult.matchedResult.matchedBits.popcount() / pbf.numVariables();
+
+        const ColumnPuyoList& cpl = complementResult.complementedPuyoList;
         if (cpl.size() == 0) {
             needsToProceedWithoutComplement = false;
 
