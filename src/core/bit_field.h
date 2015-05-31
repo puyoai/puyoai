@@ -83,7 +83,8 @@ private:
     template<typename Tracker>
     int vanishForSimulation(int nthChain, FieldBits* erased, Tracker* tracker) const;
     // Drops puyos. Returns max drops.
-    int dropAfterVanish(FieldBits erased);
+    template<typename Tracker>
+    int dropAfterVanish(FieldBits erased, Tracker* tracker);
 
     FieldBits m_[3];
 };
