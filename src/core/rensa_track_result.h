@@ -15,7 +15,7 @@ class RensaNonTrackResult {
 
 class RensaExistingPositionTrackResult {
 public:
-    RensaExistingPositionTrackResult() {}
+    explicit RensaExistingPositionTrackResult(FieldBits bits) : existingBits_(bits) {}
 
     void setExistingBits(FieldBits bits) { existingBits_ = bits; }
     FieldBits existingBits() const { return existingBits_; }

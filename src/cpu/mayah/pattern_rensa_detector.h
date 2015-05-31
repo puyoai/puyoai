@@ -34,7 +34,7 @@ public:
 
 private:
     void iteratePossibleRensasInternal(const CoreField& currentField,
-                                       const RensaYPositionTracker& currentFieldTracker,
+                                       const RensaExistingPositionTracker& currentFieldTracker,
                                        int currentChains,
                                        const ColumnPuyo& firePuyo,
                                        const ColumnPuyoList& keyPuyos,
