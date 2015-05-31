@@ -71,6 +71,7 @@ public:
     Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBits* checked) const;
     // TODO(mayah): This should be removed. This is for backward compatibility.
     int fillErasingPuyoPositions(Position* eraseQueue) const;
+    FieldBits ignitionPuyoBits() const;
 
     friend bool operator==(const BitField&, const BitField&);
     friend std::ostream& operator<<(std::ostream&, const BitField&);

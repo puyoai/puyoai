@@ -112,6 +112,31 @@ void RensaDetector::makeProhibitArray(const RensaResult& rensaResult, const Rens
         prohibits[x] = (firePuyos.sizeOn(x) > 0);
 }
 
+// static
+void RensaDetector::makeProhibitArray(const RensaResult& /*rensaResult*/,
+                                      const RensaLastVanishedPositionTrackResult& trackResult,
+                                      const CoreField& originalField,
+                                      const ColumnPuyoList& firePuyos,
+                                      bool prohibits[FieldConstant::MAP_WIDTH])
+{
+    std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, true);
+
+    trackResult.lastVanishedPositionBits().iterateBitPositions([&originalField, &prohibits](int x, int y) {
+        if (originalField.isEmpty(x, y + 1)) {
+            prohibits[x] = false;
+        } else {
+            prohibits[x - 1] = false;
+            prohibits[x] = false;
+            prohibits[x + 1] = false;
+        }
+    });
+
+    for (int x = 1; x <= 6; ++x) {
+        if (firePuyos.sizeOn(x) > 0)
+            prohibits[x] = true;
+    }
+}
+
 // TODO(mayah): Consider to improve this.
 static inline
 void makeProhibitArrayForExtend(const RensaResult& /*rensaResult*/, const RensaChainTrackResult& /*trackResult*/,
@@ -737,7 +762,7 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
 // static
 void RensaDetector::iterateSideChain(const CoreField& originalField,
                                      const RensaDetectorStrategy& strategy,
-                                     const TrackedPossibleRensaCallback& callback)
+                                     const RensaCallback& callback)
 {
     const bool noProhibitedColumn[FieldConstant::MAP_WIDTH] {};
 
@@ -753,7 +778,7 @@ void RensaDetector::iterateSideChainFromDetectedField(const CoreField& originalF
                                                       const CoreField& fireDetectedField,
                                                       const ColumnPuyoList& firePuyoList,
                                                       const RensaDetectorStrategy& strategy,
-                                                      const TrackedPossibleRensaCallback& callback)
+                                                      const RensaCallback& callback)
 {
     CoreField detectedField(fireDetectedField);
     for (int i = 0; i < 1; ++i) {
@@ -784,10 +809,9 @@ void RensaDetector::iterateSideChainFromDetectedField(const CoreField& originalF
             ColumnPuyoList cpl(keyPuyos);
             cpl.merge(firePuyoList);
             cf.dropPuyoList(cpl);
-            RensaChainTracker tracker;
-            RensaResult rensaResult = cf.simulate(&tracker);
-            const RensaChainTrackResult& trackResult = tracker.result();
-            callback(cf, rensaResult, cpl, trackResult);
+
+            RensaResult rensaResult = cf.simulate();
+            callback(cf, rensaResult, cpl);
         };
 
         // Finds 2-multi or 3-multi.

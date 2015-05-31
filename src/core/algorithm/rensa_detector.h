@@ -96,12 +96,12 @@ public:
     // Finds 2-double (or more).
     static void iterateSideChain(const CoreField&,
                                  const RensaDetectorStrategy&,
-                                 const TrackedPossibleRensaCallback&);
+                                 const RensaCallback&);
     static void iterateSideChainFromDetectedField(const CoreField& originalField,
                                                   const CoreField& detectedField,
                                                   const ColumnPuyoList& firePuyoList,
                                                   const RensaDetectorStrategy&,
-                                                  const TrackedPossibleRensaCallback&);
+                                                  const RensaCallback&);
 
     // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
     // TODO(mayah): Deprecates these 3 methods. Use detectWithAddingKeyPuyos instead.
@@ -121,6 +121,11 @@ public:
 
     static void makeProhibitArray(const RensaResult&,
                                   const RensaChainTrackResult&,
+                                  const CoreField& originalField,
+                                  const ColumnPuyoList& firePuyos,
+                                  bool prohibits[FieldConstant::MAP_WIDTH]);
+    static void makeProhibitArray(const RensaResult&,
+                                  const RensaLastVanishedPositionTrackResult&,
                                   const CoreField& originalField,
                                   const ColumnPuyoList& firePuyos,
                                   bool prohibits[FieldConstant::MAP_WIDTH]);

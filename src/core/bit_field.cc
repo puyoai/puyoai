@@ -143,6 +143,15 @@ Position* BitField::fillSameColorPosition(int x, int y, PuyoColor c,
     return positionQueueHead + len;
 }
 
+FieldBits BitField::ignitionPuyoBits() const
+{
+    FieldBits bits;
+    RensaNonTracker tracker;
+    (void)vanishForSimulation(1, &bits, &tracker);
+
+    return bits;
+}
+
 int BitField::fillErasingPuyoPositions(Position* eraseQueue) const
 {
     FieldBits bits;
