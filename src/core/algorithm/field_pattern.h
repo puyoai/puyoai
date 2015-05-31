@@ -6,16 +6,17 @@
 #include <string>
 #include <vector>
 
+#include "core/field_checker.h"
 #include "core/field_constant.h"
 
 class ColumnPuyoList;
 class CoreField;
-class FieldChecker;
+// class FieldChecker;
 class PatternMatcher;
 struct Position;
 
 enum class PatternType {
-    NONE, ANY, MUST_EMPTY, VAR, MUST_VAR, ALLOW_VAR, NOT_VAR,
+    NONE, ANY, VAR, MUST_VAR, ALLOW_VAR,
     ALLOW_FILLING_IRON, WALL
 };
 
@@ -30,17 +31,13 @@ public:
     explicit FieldPattern(const std::string&, double defaultScore = 1);
     explicit FieldPattern(const std::vector<std::string>&, double defaultScore = 1);
 
-    static bool merge(const FieldPattern&, const FieldPattern&, FieldPattern*);
-
     bool isMatchable(const CoreField&) const;
 
-    void setPattern(int x, int y, PatternType t, char variable, double score);
-
     int numVariables() const { return numVariables_; }
+    double score() const { return score_; }
 
     int height(int x) const { return heights_[x]; }
     char variable(int x, int y) const { return vars_[x][y]; }
-    double score(int x, int y) const { return scores_[x][y]; }
     PatternType type(int x, int y) const { return types_[x][y]; }
 
     Position* fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldChecker*) const;
@@ -49,16 +46,16 @@ public:
 
     std::string toDebugString() const;
 
-    void setScore(int x, int y, double d) { scores_[x][y] = d; }
-    void setType(int x, int y, PatternType t) { types_[x][y] = t; }
-    void setVariable(int x, int y, char c) { vars_[x][y] = c; }
+    void setMustVar(int x, int y) { types_[x][y] = PatternType::MUST_VAR; }
 
 private:
-    static PatternType inferType(char c, PatternType typeForLowerCase = PatternType::ALLOW_VAR);
+    static PatternType inferType(char c);
     int countVariables() const;
 
+    void setPattern(int x, int y, PatternType t, char variable);
+
+    double score_;
     char vars_[MAP_WIDTH][MAP_HEIGHT];
-    double scores_[MAP_WIDTH][MAP_HEIGHT];
     PatternType types_[MAP_WIDTH][MAP_HEIGHT];
     int heights_[MAP_WIDTH];
     int numVariables_;

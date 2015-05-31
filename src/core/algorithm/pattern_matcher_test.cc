@@ -144,8 +144,8 @@ TEST(PatternMatcherTest, matchWithAllowing)
 TEST(PatternMatcherTest, matchWithMust)
 {
     FieldPattern pattern("AAABBB");
-    pattern.setType(1, 1, PatternType::MUST_VAR);
-    pattern.setType(6, 1, PatternType::MUST_VAR);
+    pattern.setMustVar(1, 1);
+    pattern.setMustVar(6, 1);
 
     CoreField f0;
     CoreField f1(

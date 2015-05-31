@@ -40,6 +40,7 @@ public:
     }
 
     friend bool operator==(SmallIntSet lhs, SmallIntSet rhs) { return lhs.v_ == rhs.v_; }
+    friend bool operator!=(SmallIntSet lhs, SmallIntSet rhs) { return lhs.v_ != rhs.v_; }
 
 private:
     std::uint32_t v_ = 0;

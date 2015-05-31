@@ -94,6 +94,18 @@ TEST(BitFieldTest, constructor3)
     }
 }
 
+TEST(BitFieldTest, isNormalColor)
+{
+    BitField bf("RBYGO.");
+
+    EXPECT_TRUE(bf.isNormalColor(1, 1));
+    EXPECT_TRUE(bf.isNormalColor(2, 1));
+    EXPECT_TRUE(bf.isNormalColor(3, 1));
+    EXPECT_TRUE(bf.isNormalColor(4, 1));
+    EXPECT_FALSE(bf.isNormalColor(5, 1));
+    EXPECT_FALSE(bf.isNormalColor(6, 1));
+}
+
 TEST(BitFieldTest, setColor)
 {
     static const PuyoColor colors[] = {
@@ -108,6 +120,44 @@ TEST(BitFieldTest, setColor)
         EXPECT_EQ(c, bf.color(1, 1)) << c;
         EXPECT_TRUE(bf.isColor(1, 1, c)) << c;
     }
+}
+
+TEST(BitFieldTest, setAll)
+{
+    FieldBits bits;
+    for (int i = 1; i <= 6; ++i)
+        bits.set(i, i);
+
+    BitField bf;
+    bf.setAll(bits, PuyoColor::RED);
+    for (int i = 1; i <= 6; ++i)
+        EXPECT_EQ(PuyoColor::RED, bf.color(i, i));
+    bf.setAll(bits, PuyoColor::OJAMA);
+    for (int i = 1; i <= 6; ++i)
+        EXPECT_EQ(PuyoColor::OJAMA, bf.color(i, i));
+    bf.setAll(bits, PuyoColor::EMPTY);
+    for (int i = 1; i <= 6; ++i)
+        EXPECT_EQ(PuyoColor::EMPTY, bf.color(i, i));
+}
+
+TEST(BitFieldTest, setAllIfEmpty)
+{
+    FieldBits bits;
+    for (int i = 1; i <= 6; ++i)
+        bits.set(i, i);
+
+    BitField bf;
+    bf.setColor(1, 1, PuyoColor::RED);
+    bf.setColor(2, 2, PuyoColor::OJAMA);
+
+    bf.setAllIfEmpty(bits, PuyoColor::BLUE);
+
+    EXPECT_EQ(PuyoColor::RED, bf.color(1, 1));
+    EXPECT_EQ(PuyoColor::OJAMA, bf.color(2, 2));
+    EXPECT_EQ(PuyoColor::BLUE, bf.color(3, 3));
+    EXPECT_EQ(PuyoColor::BLUE, bf.color(4, 4));
+    EXPECT_EQ(PuyoColor::BLUE, bf.color(5, 5));
+    EXPECT_EQ(PuyoColor::BLUE, bf.color(6, 6));
 }
 
 TEST(BitFieldTest, isZenkeshi)
@@ -246,6 +296,31 @@ TEST(BitFieldTest, countConnectedPuyosMax4Edge)
         "OOOOOO");
 
     EXPECT_EQ(1, bf.countConnectedPuyosMax4(6, 12));
+}
+
+TEST(BitFieldTest, countConnection)
+{
+    BitField bf(
+        "R...GG" // 13
+        "RROOOG" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "YYGGYY"
+        "RRRBBB"
+    );
+
+    int count2, count3;
+    bf.countConnection(&count2, &count3);
+
+    EXPECT_EQ(4, count2);
+    EXPECT_EQ(2, count3);
 }
 
 TEST(BitFieldTest, hasEmptyNeighbor)
@@ -456,7 +531,7 @@ TEST(BitFieldTest, simulateWithTracker1)
         "..RR.."
         "BBBBRR");
 
-    BitRensaYPositionTracker tracker;
+    RensaYPositionTracker tracker;
     bf.simulate(&tracker);
 
     EXPECT_EQ(2, tracker.originalY(1, 1));
@@ -469,7 +544,7 @@ TEST(BitFieldTest, vanishDrop1)
         "..RR.."
         "BBBBRR");
 
-    BitRensaYPositionTracker tracker;
+    RensaYPositionTracker tracker;
     BitField::SimulationContext context;
     RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
 
@@ -489,7 +564,7 @@ TEST(BitFieldTest, vanishDrop2)
 {
     BitField bf("....YY");
 
-    BitRensaYPositionTracker tracker;
+    RensaYPositionTracker tracker;
     BitField::SimulationContext context;
     RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
 
@@ -592,4 +667,48 @@ TEST(BitFieldTest, drop1)
 
     bf.drop();
     EXPECT_EQ(expected, bf);
+}
+
+TEST(BitFieldTest, ignitionPuyoBits)
+{
+    BitField bf(
+        "..YY.."
+        "GGGGYY"
+        "RRRROY");
+
+    FieldBits bits(
+        "1111.."
+        "11111.");
+
+    EXPECT_EQ(bits, bf.ignitionPuyoBits());
+}
+
+TEST(BitFieldTest, calculateHeight)
+{
+    alignas(16) std::uint16_t heights[FieldConstant::MAP_WIDTH];
+
+    BitField bf(
+        ".....O" // 14
+        "....OO"
+        "...OOO" // 12
+        "..OOOO"
+        ".OOOOO"
+        ".OOOOO"
+        ".OOOOO" // 8
+        ".OOOOO"
+        ".OOOOO"
+        ".OOOOO"
+        ".OOOOO" // 4
+        ".OOOOO"
+        ".OOOOO"
+        ".OOOOO"
+    );
+    bf.calculateHeight(heights);
+
+    EXPECT_EQ(0, heights[1]);
+    EXPECT_EQ(10, heights[2]);
+    EXPECT_EQ(11, heights[3]);
+    EXPECT_EQ(12, heights[4]);
+    EXPECT_EQ(13, heights[5]);
+    EXPECT_EQ(13, heights[6]); // not 14, but 13.
 }

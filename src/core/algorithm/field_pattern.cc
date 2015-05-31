@@ -17,13 +17,13 @@
 using namespace std;
 
 FieldPattern::FieldPattern(double defaultScore) :
+    score_(defaultScore),
     heights_{},
     numVariables_(0)
 {
     for (int x = 0; x < MAP_WIDTH; ++x) {
         for (int y = 0; y < MAP_HEIGHT; ++y) {
             vars_[x][y] = ' ';
-            scores_[x][y] = defaultScore;
             types_[x][y] = PatternType::NONE;
         }
     }
@@ -54,7 +54,7 @@ FieldPattern::FieldPattern(const std::string& field, double defaultScore) :
         counter++;
 
         PatternType t = inferType(c);
-        setPattern(x, y, t, c, defaultScore);
+        setPattern(x, y, t, c);
     }
 
     numVariables_ = countVariables();
@@ -70,102 +70,11 @@ FieldPattern::FieldPattern(const vector<string>& field, double defaultScore) :
         for (int x = 1; x <= 6; ++x) {
             char c = field[i][x - 1];
             PatternType t = inferType(c);
-            setPattern(x, y, t, c, defaultScore);
+            setPattern(x, y, t, c);
         }
     }
 
     numVariables_ = countVariables();
-}
-
-// static
-bool FieldPattern::merge(const FieldPattern& pf1, const FieldPattern& pf2, FieldPattern* pf)
-{
-    for (int x = 1; x <= 6; ++x) {
-        for (int y = 1; y <= 12; ++y) {
-            PatternType pt1 = pf1.type(x, y);
-            PatternType pt2 = pf2.type(x, y);
-            if (pt1 == PatternType::NONE) {
-                pf->setPattern(x, y, pf2.type(x, y), pf2.variable(x, y), pf2.score(x, y));
-                continue;
-            } else if (pt2 == PatternType::NONE) {
-                pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), pf1.score(x, y));
-                continue;
-            }
-
-            if (pt1 == PatternType::ANY) {
-                if (pt2 == PatternType::MUST_EMPTY)
-                    return false;
-                pf->setPattern(x, y, pf2.type(x, y), pf2.variable(x, y), pf2.score(x, y));
-                continue;
-            }
-            if (pt2 == PatternType::ANY) {
-                if (pt1 == PatternType::MUST_EMPTY)
-                    return false;
-                pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), pf1.score(x, y));
-                continue;
-            }
-
-            if (pt1 == PatternType::MUST_EMPTY) {
-                if (pt2 != PatternType::MUST_EMPTY)
-                    return false;
-                pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), pf1.score(x, y));
-                continue;
-            }
-            if (pt2 == PatternType::MUST_EMPTY) {
-                if (pt1 != PatternType::MUST_EMPTY)
-                    return false;
-                pf->setPattern(x, y, pf2.type(x, y), pf2.variable(x, y), pf2.score(x, y));
-                continue;
-            }
-
-            if (pt1 == PatternType::MUST_VAR && pt2 == PatternType::MUST_VAR) {
-                if (pf1.variable(x, y) != pf2.variable(x, y))
-                    return false;
-            }
-            if (pt1 == PatternType::MUST_VAR) {
-                if (pt2 != PatternType::VAR)
-                    return false;
-                if (pf1.variable(x, y) != pf2.variable(x, y))
-                    return false;
-                pf->setPattern(x, y, pt1, pf1.variable(x, y), std::max(pf1.score(x, y), pf2.score(x, y)));
-                continue;
-            }
-            if (pt2 == PatternType::MUST_VAR) {
-                if (pt1 != PatternType::VAR)
-                    return false;
-                if (pf2.variable(x, y) != pf1.variable(x, y))
-                    return false;
-                pf->setPattern(x, y, pt2, pf2.variable(x, y), std::max(pf1.score(x, y), pf2.score(x, y)));
-                continue;
-            }
-
-            if (pt1 == PatternType::VAR && pt2 == PatternType::VAR) {
-                if (pf1.variable(x, y) != pf2.variable(x, y))
-                    return false;
-                pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), std::max(pf1.score(x, y), pf2.score(x, y)));
-                continue;
-            }
-            if (pt1 == PatternType::VAR) {
-                if (pt2 == PatternType::ALLOW_VAR || pt2 == PatternType::NOT_VAR) {
-                    pf->setPattern(x, y, pf1.type(x, y), pf1.variable(x, y), pf1.score(x, y));
-                    continue;
-                }
-                return false;
-            }
-            if (pt2 == PatternType::VAR) {
-                if (pt1 == PatternType::ALLOW_VAR || pt1 == PatternType::NOT_VAR) {
-                    pf->setPattern(x, y, pf2.type(x, y), pf2.variable(x, y), pf2.score(x, y));
-                    continue;
-                }
-                return false;
-            }
-
-            return false;
-        }
-    }
-
-    pf->numVariables_ = pf->countVariables();
-    return true;
 }
 
 bool FieldPattern::isMatchable(const CoreField& field) const
@@ -174,7 +83,7 @@ bool FieldPattern::isMatchable(const CoreField& field) const
     return matcher.match(*this, field).matched;
 }
 
-void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double score)
+void FieldPattern::setPattern(int x, int y, PatternType t, char variable)
 {
     switch (t) {
     case PatternType::NONE:
@@ -182,13 +91,6 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
     case PatternType::ANY:
         types_[x][y] = t;
         vars_[x][y] = '*';
-        scores_[x][y] = score;
-        heights_[x] = std::max(height(x), y);
-        break;
-    case PatternType::MUST_EMPTY:
-        types_[x][y] = t;
-        vars_[x][y] = '_';
-        scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
     case PatternType::VAR:
@@ -196,22 +98,18 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
         CHECK('A' <= variable && variable <= 'Z');
         types_[x][y] = t;
         vars_[x][y] = variable;
-        scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
     case PatternType::ALLOW_VAR:
-    case PatternType::NOT_VAR:
         CHECK(('A' <= variable && variable <= 'Z') || ('a' <= variable && variable <= 'z'));
         types_[x][y] = t;
         vars_[x][y] = std::toupper(variable);
-        scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
     case PatternType::ALLOW_FILLING_IRON:
         CHECK_EQ(variable, '&');
         types_[x][y] = t;
         vars_[x][y] = '&';
-        scores_[x][y] = score;
         heights_[x] = std::max(height(x), y);
         break;
     default:
@@ -220,20 +118,18 @@ void FieldPattern::setPattern(int x, int y, PatternType t, char variable, double
 }
 
 // static
-PatternType FieldPattern::inferType(char c, PatternType typeForLowerCase)
+PatternType FieldPattern::inferType(char c)
 {
     if (c == ' ' || c == '.')
         return PatternType::NONE;
     if (c == '*')
         return PatternType::ANY;
-    if (c == '_')
-        return PatternType::MUST_EMPTY;
     if (c == '&')
         return PatternType::ALLOW_FILLING_IRON;
     if ('A' <= c && c <= 'Z')
         return PatternType::VAR;
     if ('a' <= c && c <= 'z')
-        return typeForLowerCase;
+        return PatternType::ALLOW_VAR;
 
     return PatternType::NONE;
 }
@@ -283,7 +179,6 @@ FieldPattern FieldPattern::mirror() const
         for (int y = 1; y < MAP_HEIGHT; ++y) {
             std::swap(pf.vars_[x][y], pf.vars_[7 - x][y]);
             std::swap(pf.types_[x][y], pf.types_[7 - x][y]);
-            std::swap(pf.scores_[x][y], pf.scores_[7 - x][y]);
         }
     }
 

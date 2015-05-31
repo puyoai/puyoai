@@ -35,6 +35,28 @@ TEST(FieldBitsTest, ctor2)
     EXPECT_FALSE(bits.get(4, 2));
 }
 
+TEST(FieldBitsTest, ctor3)
+{
+    FieldBits bits("11...."
+                   "111..1"
+                   "111111");
+
+    EXPECT_TRUE(bits.get(1, 1));
+    EXPECT_TRUE(bits.get(1, 2));
+    EXPECT_TRUE(bits.get(1, 3));
+    EXPECT_FALSE(bits.get(1, 4));
+
+    EXPECT_TRUE(bits.get(4, 1));
+    EXPECT_FALSE(bits.get(4, 2));
+    EXPECT_FALSE(bits.get(4, 3));
+    EXPECT_FALSE(bits.get(4, 4));
+
+    EXPECT_TRUE(bits.get(5, 1));
+    EXPECT_FALSE(bits.get(5, 2));
+    EXPECT_FALSE(bits.get(5, 3));
+    EXPECT_FALSE(bits.get(5, 4));
+}
+
 TEST(FieldBitsTest, set)
 {
     FieldBits bits;
@@ -218,16 +240,20 @@ TEST(FieldBitsTest, expand_exhaustive)
         FieldBits(ft, PuyoColor::RED),
     };
 
+    int countTestCases = 0;
     for (const FieldBits& fb : bits) {
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
                 if (!fb.get(x, y))
                     continue;
+                ++countTestCases;
                 EXPECT_EQ(4, FieldBits(x, y).expand(fb).popcount());
                 EXPECT_EQ(4, FieldBits(x, y).expand4(fb).popcount());
             }
         }
     }
+
+    EXPECT_EQ(19 * 4, countTestCases);
 }
 
 TEST(FieldBitsTest, vanishingSeed1)
@@ -307,6 +333,33 @@ TEST(FieldBitsTest, horizontalOr16)
 
     int x = bits.horizontalOr16();
     EXPECT_EQ((1 << 1) | (1 << 3) | (1 << 5) | (1 << 12), x);
+}
+
+TEST(FieldBitsTest, countConnection)
+{
+    PlainField pf(
+        "R...GG" // 13
+        "RROOOG" // 12
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "YYGGYY"
+        "RRRBBB"
+    );
+
+    FieldBits bits(pf, PuyoColor::RED);
+
+    int count2, count3;
+    bits.countConnection(&count2, &count3);
+
+    EXPECT_EQ(1, count2);
+    EXPECT_EQ(1, count3);
 }
 
 TEST(FieldBitsTest, toPositions)

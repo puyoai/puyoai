@@ -1028,8 +1028,7 @@ TEST(RensaDetectorTest, iterateSideChain)
     bool found = false;
     auto callback = [&](const CoreField& /*fieldAfterRensa*/,
                         const RensaResult& /*rensaResult*/,
-                        const ColumnPuyoList& cpl,
-                        const RensaChainTrackResult& /*trackResult*/) {
+                        const ColumnPuyoList& cpl) {
         CoreField cf(original);
         cf.dropPuyoList(cpl);
 

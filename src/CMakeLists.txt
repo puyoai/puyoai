@@ -76,9 +76,6 @@ if(${build_type} MATCHES release)
     puyoai_add_cxx_flags("-DNOINLINE_UNLESS_RELEASE=")
 endif()
 
-# experimental.
-# puyoai_add_cxx_flags("-DEXPERIMENTAL_CORE_FIELD_USES_BIT_FIELD")
-
 include_directories(.)
 
 add_subdirectory(third_party/gtest-1.7.0)
