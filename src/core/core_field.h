@@ -150,6 +150,7 @@ public:
     int fillErasingPuyoPositions(Position*) const;
     // TODO(mayah): Remove this.
     std::vector<Position> erasingPuyoPositions() const;
+    FieldBits ignitionPuyoBits() const;
 
     // TODO(mayah): Remove this.
     bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;

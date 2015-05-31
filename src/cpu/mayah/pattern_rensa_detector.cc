@@ -95,11 +95,10 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         if (FLAGS_use_side_chain) {
             auto sideChainEvalCallback = [&](const CoreField& fieldAfterRensa,
                                              const RensaResult& rensaResult,
-                                             const ColumnPuyoList& puyosToComplement,
-                                             const RensaChainTrackResult& trackResult) {
+                                             const ColumnPuyoList& puyosToComplement) {
                 // TODO(mayah): firePuyo should be accurate.
                 const PuyoColor firePuyoColor = PuyoColor::RED;
-                callback_(fieldAfterRensa, rensaResult, puyosToComplement, firePuyoColor, trackResult, "", 0.0);
+                callback_(fieldAfterRensa, rensaResult, puyosToComplement, firePuyoColor, "", 0.0);
             };
             RensaDetector::iterateSideChainFromDetectedField(
                 originalField_, complementedField, cpl, strategy_, sideChainEvalCallback);
@@ -266,7 +265,7 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     if (!cf.dropPuyoOn(firePuyo.x, firePuyo.color))
         return false;
 
-    RensaChainTracker tracker;
+    RensaLastVanishedPositionTracker tracker;
     RensaResult rensaResult = cf.simulate(&tracker);
     if (rensaResult.chains != currentChains)
         return false;
@@ -275,7 +274,7 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     if (!puyosToComplement.add(firePuyo))
         return false;
 
-    callback_(cf, rensaResult, puyosToComplement, firePuyo.color, tracker.result(), patternName, patternScore);
+    callback_(cf, rensaResult, puyosToComplement, firePuyo.color, patternName, patternScore);
 
     // TODO(mayah): Making ColumnPuyoList here is time-consuming a bit.
     ColumnPuyoList firePuyos;
