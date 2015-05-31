@@ -16,8 +16,7 @@
 
 using namespace std;
 
-FieldPattern::FieldPattern(double defaultScore) :
-    score_(defaultScore),
+FieldPattern::FieldPattern() :
     heights_{},
     numVariables_(0)
 {
@@ -43,8 +42,8 @@ FieldPattern::FieldPattern(double defaultScore) :
     }
 }
 
-FieldPattern::FieldPattern(const std::string& field, double defaultScore) :
-    FieldPattern(defaultScore)
+FieldPattern::FieldPattern(const std::string& field) :
+    FieldPattern()
 {
     int counter = 0;
     for (int i = field.length() - 1; i >= 0; --i) {
@@ -60,8 +59,8 @@ FieldPattern::FieldPattern(const std::string& field, double defaultScore) :
     numVariables_ = countVariables();
 }
 
-FieldPattern::FieldPattern(const vector<string>& field, double defaultScore) :
-    FieldPattern(defaultScore)
+FieldPattern::FieldPattern(const vector<string>& field) :
+    FieldPattern()
 {
     for (size_t i = 0; i < field.size(); ++i) {
         CHECK_EQ(field[i].size(), 6U);

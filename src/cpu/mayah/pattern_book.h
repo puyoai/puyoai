@@ -34,13 +34,11 @@ public:
     int numVariables() const { return pattern_.numVariables(); }
 
     bool isMatchable(const CoreField& cf) const { return pattern_.isMatchable(cf); }
-    template<typename ScoreCallback>
+
     ComplementResult complement(const CoreField& cf,
-                                int numAllowingFillingUnusedVariables,
-                                ColumnPuyoList* cpl,
-                                ScoreCallback scoreCallback) const
+                                int numAllowingFillingUnusedVariables) const
     {
-        return PatternMatcher().complement(pattern_, cf, numAllowingFillingUnusedVariables, cpl, std::move(scoreCallback));
+        return PatternMatcher().complement(pattern_, cf, numAllowingFillingUnusedVariables);
     }
 
     PatternBookField mirror() const

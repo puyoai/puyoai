@@ -35,10 +35,10 @@ TEST(PatternMatcherTest, match1)
     CoreField f2("R     ");
     CoreField f3("R R   ");
 
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0, toSmallIntSet({'A'})), match(pattern, f0));
-    EXPECT_EQ(PatternMatchResult(true, 3, 3, 0), match(pattern, f1));
-    EXPECT_EQ(PatternMatchResult(true, 1, 1, 0), match(pattern, f2));
-    EXPECT_EQ(PatternMatchResult(true, 2, 2, 0), match(pattern, f3));
+    EXPECT_EQ(PatternMatchResult(true, FieldBits("......"), FieldBits("......"), toSmallIntSet({'A'})), match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(true, FieldBits("111..."), FieldBits("......"), toSmallIntSet({})), match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(true, FieldBits("1....."), FieldBits("......"), toSmallIntSet({})), match(pattern, f2));
+    EXPECT_EQ(PatternMatchResult(true, FieldBits("1.1..."), FieldBits("......"), toSmallIntSet({})), match(pattern, f3));
 }
 
 TEST(PatternMatcherTest, match2)
@@ -60,9 +60,25 @@ TEST(PatternMatcherTest, match2)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0, toSmallIntSet({'A', 'B', 'C', 'D', 'X'})), match(pattern, f0));
-    EXPECT_EQ(PatternMatchResult(true, 16, 16, 0), match(pattern, f1));
-    EXPECT_EQ(PatternMatchResult(true, 16, 16, 0), match(pattern, f2));
+    EXPECT_EQ(PatternMatchResult(true, FieldBits("......"), FieldBits("......"),
+                                 toSmallIntSet({'A', 'B', 'C', 'D', 'X'})),
+              match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits(
+                                     "111.1."
+                                     "111111"
+                                     "111111"),
+                                 FieldBits("......"),
+                                 toSmallIntSet({})),
+              match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits(
+                                     "111.1."
+                                     "111111"
+                                     "111111"),
+                                 FieldBits("......"),
+                                 toSmallIntSet({})),
+              match(pattern, f2));
 }
 
 TEST(PatternMatcherTest, match3)
@@ -79,7 +95,13 @@ TEST(PatternMatcherTest, match3)
         "R..B.B"
         "YYBB.B");
 
-    EXPECT_EQ(PatternMatchResult(true, 8, 8, 0, toSmallIntSet({'D', 'E', 'X', 'Z'})), match(pattern, f));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits(
+                                     "1..1.1"
+                                     "1111.1"),
+                                 FieldBits("......"),
+                                 toSmallIntSet({'D', 'E', 'X', 'Z'})),
+              match(pattern, f));
 }
 
 TEST(PatternMatcherTest, matchWithStar)
@@ -103,10 +125,32 @@ TEST(PatternMatcherTest, matchWithStar)
         ".GGGYY"
         ".RRBBB");
 
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0, toSmallIntSet({'A', 'B', 'C'})), match(pattern, f0));
-    EXPECT_EQ(PatternMatchResult(true, 7, 7, 0), match(pattern, f1));
-    EXPECT_EQ(PatternMatchResult(true, 7, 7, 0), match(pattern, f2));
-    EXPECT_EQ(PatternMatchResult(true, 7, 7, 0), match(pattern, f3));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits("......"),
+                                 FieldBits("......"),
+                                 toSmallIntSet({'A', 'B', 'C'})),
+              match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits(
+                                     "....11"
+                                     ".11111"),
+                                 FieldBits("......"),
+                                 toSmallIntSet({})),
+              match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits(
+                                     "....11"
+                                     ".11111"),
+                                 FieldBits("......"),
+                                 toSmallIntSet({})),
+              match(pattern, f2));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits(
+                                     "....11"
+                                     ".11111"),
+                                 FieldBits("......"),
+                                 toSmallIntSet({})),
+              match(pattern, f3));
 }
 
 TEST(PatternMatcherTest, matchWithAllowing)
@@ -118,26 +162,45 @@ TEST(PatternMatcherTest, matchWithAllowing)
     CoreField f0;
 
     CoreField f1(
-        "RRBBB.");
-
-    CoreField f2(
         "RRRBB.");
 
-    CoreField f3(
+    CoreField f2(
         "R.RBB.");
 
-    CoreField f4(
+    CoreField f3(
         "..R..."
         "RRYRR.");
+
+    CoreField f4(
+        "RRBBB.");
 
     CoreField f5(
         "RRRRR.");
 
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0, toSmallIntSet({'A', 'B', 'C'})), match(pattern, f0));
-    EXPECT_EQ(PatternMatchResult(), match(pattern, f1));
-    EXPECT_EQ(PatternMatchResult(true, 4, 4, 1, toSmallIntSet({'C'})), match(pattern, f2));
-    EXPECT_EQ(PatternMatchResult(true, 3, 3, 1, toSmallIntSet({'C'})), match(pattern, f3));
-    EXPECT_EQ(PatternMatchResult(true, 5, 5, 0), match(pattern, f4));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits("......"),
+                                 FieldBits("......"),
+                                 toSmallIntSet({'A', 'B', 'C'})),
+              match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits("11.11."),
+                                 FieldBits("..1..."),
+                                 toSmallIntSet({'C'})),
+              match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits("1..11."),
+                                 FieldBits("..1..."),
+                                 toSmallIntSet({'C'})),
+              match(pattern, f2));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits(
+                                     "..1..."
+                                     "11.11."),
+                                 FieldBits("......"),
+                                 toSmallIntSet({})),
+              match(pattern, f3));
+
+    EXPECT_EQ(PatternMatchResult(), match(pattern, f4));
     EXPECT_EQ(PatternMatchResult(), match(pattern, f5));
 }
 
@@ -147,32 +210,26 @@ TEST(PatternMatcherTest, matchWithMust)
     pattern.setMustVar(1, 1);
     pattern.setMustVar(6, 1);
 
-    CoreField f0;
-    CoreField f1(
-        "RRRBBB");
-    CoreField f2(
-        "RRRBB.");
-    CoreField f3(
-        "R.RB.B");
-    CoreField f4(
-        "R....."
-        "RR.BBB");
-    CoreField f5(
-        "RRRRRR");
+    CoreField f0("RRRBBB");
+    CoreField f1("RRRBB.");
 
-    EXPECT_EQ(PatternMatchResult(), match(pattern, f0));
-    EXPECT_EQ(PatternMatchResult(true, 6, 6, 0), match(pattern, f1));
-    EXPECT_EQ(PatternMatchResult(), match(pattern, f2));
-    EXPECT_EQ(PatternMatchResult(true, 4, 4, 0), match(pattern, f3));
-    EXPECT_EQ(PatternMatchResult(), match(pattern, f4));
-    EXPECT_EQ(PatternMatchResult(), match(pattern, f5));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits("111111"),
+                                 FieldBits("......"),
+                                 toSmallIntSet({})),
+              match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits("111111"),
+                                 FieldBits("......"),
+                                 toSmallIntSet({})),
+              match(pattern, f0, true));
 
-    EXPECT_EQ(PatternMatchResult(true, 0, 0, 0, toSmallIntSet({'A', 'B'})), match(pattern, f0, true));
-    EXPECT_EQ(PatternMatchResult(true, 6, 6, 0), match(pattern, f1, true));
-    EXPECT_EQ(PatternMatchResult(true, 5, 5, 0), match(pattern, f2, true));
-    EXPECT_EQ(PatternMatchResult(true, 4, 4, 0), match(pattern, f3, true));
-    EXPECT_EQ(PatternMatchResult(), match(pattern, f4, true));
-    EXPECT_EQ(PatternMatchResult(), match(pattern, f5, true));
+    EXPECT_EQ(PatternMatchResult(), match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(true,
+                                 FieldBits("11111."),
+                                 FieldBits("......"),
+                                 toSmallIntSet({})),
+              match(pattern, f1, true));
 }
 
 TEST(PatternMatcherTest, unmatch1)
@@ -246,26 +303,27 @@ TEST(PatternMatcherTest, unusedVariables)
 
 TEST(PatternMatcherTest, complement1)
 {
-    FieldPattern pattern(
+    const FieldPattern pattern(
         "..BC.."
         "AAAB.."
         "BBBCCC");
 
-    CoreField cf(
+    const CoreField original(
         "......"
         "..YB.."
         "BBBG..");
 
-    CoreField expected(
+    const CoreField expected(
         "..BG.."
         "YYYB.."
         "BBBGGG");
 
-    ColumnPuyoList cpl;
-    PatternMatcher matcher;
-    EXPECT_TRUE(matcher.complement(pattern, cf, &cpl).success);
-    EXPECT_TRUE(cf.dropPuyoList(cpl));
-    EXPECT_EQ(expected, cf) << cf.toDebugString();
+    ComplementResult result = PatternMatcher().complement(pattern, original);
+    EXPECT_TRUE(result.success);
+
+    CoreField cf(original);
+    ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
+    EXPECT_EQ(expected, cf);
 }
 
 TEST(PatternMatcherTest, complement2)
@@ -282,10 +340,9 @@ TEST(PatternMatcherTest, complement2)
         "YYB..."
         "BBGGG.");
 
-    // Since we cannot complement (3, 3), so this pattern should not match.
-    ColumnPuyoList cpl;
+    // Since we cannot complement (3, 3), this pattern should not match.
     PatternMatcher matcher;
-    EXPECT_FALSE(matcher.complement(pattern, cf, &cpl).success);
+    EXPECT_FALSE(matcher.complement(pattern, cf).success);
 }
 
 TEST(PatternMatcherTest, complement3)
@@ -302,9 +359,8 @@ TEST(PatternMatcherTest, complement3)
         "YY BBB"
         "RRRGGG");
 
-    ColumnPuyoList cpl;
     PatternMatcher matcher;
-    EXPECT_FALSE(matcher.complement(pattern, cf, &cpl).success);
+    EXPECT_FALSE(matcher.complement(pattern, cf).success);
 }
 
 TEST(PatternMatcherTest, complement4)
@@ -321,141 +377,143 @@ TEST(PatternMatcherTest, complement4)
         "Y..RRB"
         "GG.YYY");
 
-    ColumnPuyoList cpl;
     PatternMatcher matcher;
-    EXPECT_TRUE(matcher.complement(pattern, cf, &cpl).success);
+    EXPECT_TRUE(matcher.complement(pattern, cf).success);
 }
 
 TEST(PatternMatcherTest, complement5)
 {
-    FieldPattern pattern(
+    const FieldPattern pattern(
         "ABC..."
         "AABCC."
         "BBC&&.");
 
-    EXPECT_EQ(PatternType::ALLOW_FILLING_IRON, pattern.type(4, 1));
-
-    CoreField cf(
+    const CoreField original(
         "Y....."
         "Y....."
         "GGB...");
 
-    CoreField expected(
+    const CoreField expected(
         "YGB..."
         "YYGBB."
         "GGB&&.");
 
-    ColumnPuyoList cpl;
-    PatternMatcher matcher;
-    EXPECT_TRUE(matcher.complement(pattern, cf, &cpl).success);
-    EXPECT_TRUE(cf.dropPuyoList(cpl));
-    EXPECT_EQ(expected, cf) << expected.toDebugString() << '\n' << cf.toDebugString();
+    ComplementResult result = PatternMatcher().complement(pattern, original);
+    EXPECT_TRUE(result.success);
+
+    CoreField cf(original);
+    ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
+    EXPECT_EQ(expected, cf);
 }
 
 TEST(PatternMatcherTest, complement6)
 {
-    FieldPattern pattern(
+    const FieldPattern pattern(
         "ABC..."
         "AABCC."
         "BBC&&.");
 
-    EXPECT_EQ(PatternType::ALLOW_FILLING_IRON, pattern.type(4, 1));
-
-    CoreField cf(
+    const CoreField original(
         "Y....."
         "Y....."
         "GG....");
 
-    CoreField expected1(
+    const CoreField expected1(
         "YGB..."
         "YYGBB."
         "GGB&&.");
 
-    CoreField expected2(
+    const CoreField expected2(
         "YGR..."
         "YYGRR."
         "GGR&&.");
 
-    ColumnPuyoList cpl;
-    PatternMatcher matcher;
-    EXPECT_TRUE(matcher.complement(pattern, cf, 1, &cpl).success);
-    EXPECT_TRUE(cf.dropPuyoList(cpl));
-    EXPECT_TRUE(cf == expected1 || cf == expected2) << cf.toDebugString();
+    ComplementResult result = PatternMatcher().complement(pattern, original, 1);
+    EXPECT_TRUE(result.success);
+
+    CoreField cf(original);
+    ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
+    EXPECT_TRUE(cf == expected1 || cf == expected2);
 }
 
 TEST(PatternMatcherTest, complementWithAllow1)
 {
-    FieldPattern pattern(
+    const FieldPattern pattern(
         ".ab..."
         ".AB..."
         "ABC..."
         "ABC..."
         "ABCC..");
 
-    CoreField cf(
+    const CoreField original(
         "YGB..."
         "YGB..."
         "YGB...");
 
-    CoreField expected(
+    const CoreField expected(
         ".YG..."
         "YGB..."
         "YGB..."
         "YGBB..");
 
-    ColumnPuyoList cpl;
-    PatternMatcher matcher;
-    EXPECT_TRUE(matcher.complement(pattern, cf, 1, &cpl).success);
-    EXPECT_TRUE(cf.dropPuyoList(cpl));
-    EXPECT_TRUE(expected == cf);
+    ComplementResult result = PatternMatcher().complement(pattern, original, 1);
+    EXPECT_TRUE(result.success);
+
+    CoreField cf(original);
+    ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
+    EXPECT_EQ(expected, cf);
 }
 
 TEST(PatternMatcherTest, complementWithAllow2)
 {
-    FieldPattern pattern(
+    const FieldPattern pattern(
         ".ab..."
         ".AB..."
         "ABC..."
         "ABC..."
         "ABCC..");
 
-    CoreField cf(
+    const CoreField original(
         ".Y...."
         ".Y...."
         "YGB..."
         "YGB..."
         "YGB...");
 
-    CoreField expected(
+    const CoreField expected(
         ".Y...."
         ".YG..."
         "YGB..."
         "YGB..."
         "YGBB..");
 
+    ComplementResult result = PatternMatcher().complement(pattern, original, 1);
+    EXPECT_TRUE(result.success);
 
-    ColumnPuyoList cpl;
-    PatternMatcher matcher;
-    EXPECT_TRUE(matcher.complement(pattern, cf, 1, &cpl).success);
-    EXPECT_TRUE(cf.dropPuyoList(cpl));
-    EXPECT_TRUE(expected == cf);
+    CoreField cf(original);
+    ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
+    EXPECT_EQ(expected, cf);
 }
 
 TEST(PatternMatcherTest, complementWithPlaceholder1)
 {
-    FieldPattern pattern(
+    const FieldPattern pattern(
         "...B.."
         "AAABB.");
 
-    CoreField cf(
+    const CoreField original(
         "......"
         "GGG&B.");
 
-    ColumnPuyoList cpl;
-    PatternMatcher matcher;
-    EXPECT_TRUE(matcher.complement(pattern, cf, &cpl).success);
+    const CoreField expected(
+        "...B.."
+        "GGGBB.");
 
-    EXPECT_EQ(2, cpl.sizeOn(4));
-    EXPECT_EQ(PuyoColor::BLUE, cpl.get(4, 0));
-    EXPECT_EQ(PuyoColor::BLUE, cpl.get(4, 1));
+    ComplementResult result = PatternMatcher().complement(pattern, original);
+    EXPECT_TRUE(result.success);
+
+    CoreField cf(original);
+    cf.removePuyoFrom(4);
+    ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
+    EXPECT_EQ(expected, cf);
 }
