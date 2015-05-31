@@ -28,6 +28,7 @@ public:
     explicit BitField(const std::string&);
 
     FieldBits bits(PuyoColor c) const;
+    FieldBits normalColorBits() const { return m_[2]; }
 
     PuyoColor color(int x, int y) const;
     bool isColor(int x, int y, PuyoColor c) const { return bits(c).get(x, y); }

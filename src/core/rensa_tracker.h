@@ -87,7 +87,7 @@ private:
 template<>
 class RensaTracker<RensaExistingPositionTrackResult> : public RensaTrackerBase {
 public:
-    void setExistingBits(FieldBits bits) { result_.setExistingBits(bits); }
+    RensaTracker(FieldBits bits) : result_(bits) {}
 
     const RensaExistingPositionTrackResult& result() const { return result_; }
 

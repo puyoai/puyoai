@@ -55,7 +55,10 @@ public:
     // Returns the height of the specified column.
     int height(int x) const { return heights_[x]; }
 
+    const BitField& bitField() const { return field_; }
     PlainField toPlainField() const;
+
+    // TODO(mayah): Remove plainField(). Use toPlainField() everywhere.
     PlainField plainField() const { return toPlainField(); }
 
     // ----------------------------------------------------------------------

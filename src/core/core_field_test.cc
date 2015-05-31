@@ -539,8 +539,7 @@ TEST(CoreFieldTest, simualteWithRensaExistingPositionTracker)
     FieldBits expected2(
         "..11..");
 
-    RensaExistingPositionTracker tracker;
-    tracker.setExistingBits(bits);
+    RensaExistingPositionTracker tracker(bits);
 
     f.vanishDrop(&tracker);
     EXPECT_EQ(expected1, tracker.result().existingBits());
