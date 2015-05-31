@@ -111,6 +111,24 @@ typedef RensaTracker<RensaExistingPositionTrackResult> RensaExistingPositionTrac
 
 // ----------------------------------------------------------------------
 
+template<>
+class RensaTracker<RensaLastVanishedPositionTrackResult> : public RensaTrackerBase {
+public:
+    const RensaLastVanishedPositionTrackResult& result() const { return result_; }
+
+    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/,
+               const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    {
+        result_.setLastVanishedPositionBits(vanishedColorPuyoBits | vanishedOjamaPuyoBits);
+    }
+
+private:
+    RensaLastVanishedPositionTrackResult result_;
+};
+typedef RensaTracker<RensaLastVanishedPositionTrackResult> RensaLastVanishedPositionTracker;
+
+// ----------------------------------------------------------------------
+
 // RensaTracker<RensaChainTrackResult> tracks in what-th rensa a puyo is vanished.
 template<>
 class RensaTracker<RensaChainTrackResult> : public RensaTrackerBase {

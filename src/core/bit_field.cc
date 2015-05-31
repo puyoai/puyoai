@@ -423,6 +423,7 @@ template RensaResult BitField::simulate(SimulationContext*, RensaCoefTracker*);
 template RensaResult BitField::simulate(SimulationContext*, RensaYPositionTracker*);
 template RensaResult BitField::simulate(SimulationContext*, RensaChainTracker*);
 template RensaResult BitField::simulate(SimulationContext*, RensaVanishingPositionTracker*);
+template RensaResult BitField::simulate(SimulationContext*, RensaLastVanishedPositionTracker*);
 template RensaResult BitField::simulate(SimulationContext*, RensaChainPointerTracker*);
 
 template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaNonTracker*);
@@ -431,4 +432,5 @@ template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaCoefTrack
 template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaYPositionTracker*);
 template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaChainTracker*);
 template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaVanishingPositionTracker*);
+template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaLastVanishedPositionTracker*);
 template RensaStepResult BitField::vanishDrop(SimulationContext*, RensaChainPointerTracker*);

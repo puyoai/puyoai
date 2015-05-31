@@ -548,6 +548,22 @@ TEST(CoreFieldTest, simualteWithRensaExistingPositionTracker)
     EXPECT_EQ(expected2, tracker.result().existingBits());
 }
 
+TEST(CoreFieldTest, simualteWithLastVanishedPositionTracker)
+{
+    CoreField f(
+        "..YY.."
+        "..GGY."
+        "RRRRGG");
+
+    FieldBits expected(
+        "..1111");
+
+    RensaLastVanishedPositionTracker tracker;
+
+    f.simulate(&tracker);
+    EXPECT_EQ(expected, tracker.result().lastVanishedPositionBits());
+}
+
 TEST(CoreFieldTest, framesToDropNextWithoutChigiri)
 {
     // TODO(mayah): We have to confirm this.
