@@ -56,7 +56,7 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         if (!checkDup(firePuyo, keyPuyos))
             continue;
 
-        RensaYPositionTracker tracker;
+        RensaExistingPositionTracker tracker(originalField_.bitField().normalColorBits());
         RensaStepResult stepResult = cf.vanishDrop(&tracker);
         if (stepResult.score == 0) {
             CoreField tmp(originalField_);
@@ -88,18 +88,17 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         if (!checkDup(firePuyo, keyPuyos))
             return;
 
-        RensaYPositionTracker tracker;
+        RensaExistingPositionTracker tracker(originalField_.bitField().normalColorBits());
         iteratePossibleRensasInternal(complementedField, tracker, 0,
                                       firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0.0, false);
 
         if (FLAGS_use_side_chain) {
             auto sideChainEvalCallback = [&](const CoreField& fieldAfterRensa,
                                              const RensaResult& rensaResult,
-                                             const ColumnPuyoList& puyosToComplement,
-                                             const RensaChainTrackResult& trackResult) {
+                                             const ColumnPuyoList& puyosToComplement) {
                 // TODO(mayah): firePuyo should be accurate.
                 const PuyoColor firePuyoColor = PuyoColor::RED;
-                callback_(fieldAfterRensa, rensaResult, puyosToComplement, firePuyoColor, trackResult, "", 0.0);
+                callback_(fieldAfterRensa, rensaResult, puyosToComplement, firePuyoColor, "", 0.0);
             };
             RensaDetector::iterateSideChainFromDetectedField(
                 originalField_, complementedField, cpl, strategy_, sideChainEvalCallback);
@@ -111,7 +110,7 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
 }
 
 void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& currentField,
-                                                         const RensaYPositionTracker& currentFieldTracker,
+                                                         const RensaExistingPositionTracker& currentFieldTracker,
                                                          int currentChains,
                                                          const ColumnPuyo& firePuyo,
                                                          const ColumnPuyoList& originalKeyPuyos,
@@ -141,8 +140,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
 
         double patternScore = currentPatternScore;
         auto addScoreCallback = [this, &patternScore, &pbf, &currentFieldTracker](int x, int y, double score) {
-            int actualY = currentFieldTracker.originalY(x, y);
-            if (originalField_.isNormalColor(x, actualY))
+            if (currentFieldTracker.result().existingBits().get(x, y))
                 patternScore += score / pbf.numVariables();
         };
         auto dontAddScoreCallback = [](int, int, double) {};
@@ -159,7 +157,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
             needsToProceedWithoutComplement = false;
 
             CoreField cf(currentField);
-            RensaYPositionTracker tracker(currentFieldTracker);
+            RensaExistingPositionTracker tracker(currentFieldTracker);
             RensaStepResult stepResult = cf.vanishDrop(&tracker);
             CHECK_GT(stepResult.score, 0);
 
@@ -186,7 +184,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
             continue;
 
-        RensaYPositionTracker tracker(currentFieldTracker);
+        RensaExistingPositionTracker tracker(currentFieldTracker);
         RensaStepResult stepResult = cf.vanishDrop(&tracker);
         CHECK_GT(stepResult.score, 0);
 
@@ -202,7 +200,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
 
     // proceed one without complementing.
     CoreField cf(currentField);
-    RensaYPositionTracker tracker(currentFieldTracker);
+    RensaExistingPositionTracker tracker(currentFieldTracker);
     CHECK(cf.vanishDrop(&tracker).score > 0) << cf.toDebugString();
 
     // If rensa continues, proceed to next.
@@ -267,7 +265,7 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     if (!cf.dropPuyoOn(firePuyo.x, firePuyo.color))
         return false;
 
-    RensaChainTracker tracker;
+    RensaLastVanishedPositionTracker tracker;
     RensaResult rensaResult = cf.simulate(&tracker);
     if (rensaResult.chains != currentChains)
         return false;
@@ -276,7 +274,7 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     if (!puyosToComplement.add(firePuyo))
         return false;
 
-    callback_(cf, rensaResult, puyosToComplement, firePuyo.color, tracker.result(), patternName, patternScore);
+    callback_(cf, rensaResult, puyosToComplement, firePuyo.color, patternName, patternScore);
 
     // TODO(mayah): Making ColumnPuyoList here is time-consuming a bit.
     ColumnPuyoList firePuyos;

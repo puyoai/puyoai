@@ -55,7 +55,10 @@ public:
     // Returns the height of the specified column.
     int height(int x) const { return heights_[x]; }
 
+    const BitField& bitField() const { return field_; }
     PlainField toPlainField() const;
+
+    // TODO(mayah): Remove plainField(). Use toPlainField() everywhere.
     PlainField plainField() const { return toPlainField(); }
 
     // ----------------------------------------------------------------------
@@ -147,6 +150,7 @@ public:
     int fillErasingPuyoPositions(Position*) const;
     // TODO(mayah): Remove this.
     std::vector<Position> erasingPuyoPositions() const;
+    FieldBits ignitionPuyoBits() const;
 
     // TODO(mayah): Remove this.
     bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;

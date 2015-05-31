@@ -28,6 +28,7 @@ public:
     explicit BitField(const std::string&);
 
     FieldBits bits(PuyoColor c) const;
+    FieldBits normalColorBits() const { return m_[2]; }
 
     PuyoColor color(int x, int y) const;
     bool isColor(int x, int y, PuyoColor c) const { return bits(c).get(x, y); }
@@ -73,6 +74,7 @@ public:
     Position* fillSameColorPosition(int x, int y, PuyoColor c, Position* positionQueueHead, FieldBits* checked) const;
     // TODO(mayah): This should be removed. This is for backward compatibility.
     int fillErasingPuyoPositions(Position* eraseQueue) const;
+    FieldBits ignitionPuyoBits() const;
 
     friend bool operator==(const BitField&, const BitField&);
     friend std::ostream& operator<<(std::ostream&, const BitField&);
@@ -86,7 +88,8 @@ private:
     template<typename Tracker>
     int vanishForSimulation(int nthChain, FieldBits* erased, Tracker* tracker) const;
     // Drops puyos. Returns max drops.
-    int dropAfterVanish(FieldBits erased);
+    template<typename Tracker>
+    int dropAfterVanish(FieldBits erased, Tracker* tracker);
 
     FieldBits m_[3];
 };
@@ -184,124 +187,11 @@ RensaResult BitField::simulate(Tracker* tracker)
     return simulate(&context, tracker);
 }
 
-template<typename Tracker>
-RensaResult BitField::simulate(SimulationContext* context, Tracker* tracker)
-{
-    BitField escaped = escapeInvisible();
-
-    int score = 0;
-    int frames = 0;
-    int nthChainScore;
-    bool quick = false;
-    FieldBits erased;
-
-    while ((nthChainScore = vanishForSimulation(context->currentChain, &erased, tracker)) > 0) {
-        context->currentChain += 1;
-        score += nthChainScore;
-        frames += FRAMES_VANISH_ANIMATION;
-        int maxDrops = dropAfterVanish(erased);
-        if (maxDrops > 0) {
-            frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
-        } else {
-            quick = true;
-        }
-    }
-
-    recoverInvisible(escaped);
-    return RensaResult(context->currentChain - 1, score, frames, quick);
-}
-
 inline
 RensaStepResult BitField::vanishDrop(BitField::SimulationContext* context)
 {
     RensaNonTracker tracker;
     return vanishDrop(context, &tracker);
-}
-
-template<typename Tracker>
-RensaStepResult BitField::vanishDrop(SimulationContext* context, Tracker* tracker)
-{
-    BitField escaped = escapeInvisible();
-
-    FieldBits erased;
-    int score = vanishForSimulation(context->currentChain, &erased, tracker);
-    int maxDrops = 0;
-    int frames = FRAMES_VANISH_ANIMATION;
-    bool quick = false;
-    if (score > 0) {
-        maxDrops = dropAfterVanish(erased);
-        context->currentChain += 1;
-    }
-
-    if (maxDrops > 0) {
-        DCHECK(maxDrops < 14);
-        frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
-    } else {
-        quick = true;
-    }
-
-    recoverInvisible(escaped);
-    return RensaStepResult(score, frames, quick);
-}
-
-template<typename Tracker>
-int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* tracker) const
-{
-    int numErasedPuyos = 0;
-    int numColors = 0;
-    int longBonusCoef = 0;
-
-    *erased = FieldBits();
-
-    for (PuyoColor c : NORMAL_PUYO_COLORS) {
-        FieldBits mask = bits(c).maskedField12();
-        FieldBits seed = mask.vanishingSeed();
-
-        if (seed.isEmpty())
-            continue;
-
-        ++numColors;
-
-        // fast path. In most cases, >= 8 puyos won't be erased.
-        // When <= 7 puyos are erased, it won't be separated.
-        {
-            FieldBits expanded = seed.expand(mask);
-            int popcount = expanded.popcount();
-            if (popcount <= 7) {
-                numErasedPuyos += popcount;
-                longBonusCoef += longBonus(popcount);
-                erased->setAll(expanded);
-                mask.unsetAll(expanded);
-                continue;
-            }
-        }
-
-        // slow path...
-        seed.iterateBitWithMasking([&](FieldBits x) -> FieldBits {
-            if (mask.testz(x))
-                return x;
-
-            FieldBits expanded = x.expand(mask);
-            int count = expanded.popcount();
-            numErasedPuyos += count;
-            longBonusCoef += longBonus(count);
-            erased->setAll(expanded);
-            mask.unsetAll(expanded);
-            return expanded;
-        });
-    }
-
-    if (numColors == 0)
-        return 0;
-
-    int rensaBonusCoef = calculateRensaBonusCoef(chainBonus(currentChain), longBonusCoef, colorBonus(numColors));
-
-    // Removes ojama.
-    FieldBits ojamaErased(erased->expandEdge().mask(bits(PuyoColor::OJAMA).maskedField12()));
-    tracker->track(currentChain, numErasedPuyos, rensaBonusCoef, *erased, ojamaErased);
-
-    erased->setAll(ojamaErased);
-    return 10 * numErasedPuyos * rensaBonusCoef;
 }
 
 inline
