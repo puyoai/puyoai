@@ -58,6 +58,8 @@ public:
 
     bool checkNeighborsForCompletion(const FieldPattern&, const CoreField&) const;
 
+
+private:
     PuyoColor map(char var) const
     {
         DCHECK('A' <= var && var <= 'Z') << var;
@@ -76,7 +78,6 @@ public:
         map_[var - 'A'] = pc;
     }
 
-private:
     PuyoColor set(char var, PuyoColor pc)
     {
         DCHECK('A' <= var && var <= 'Z') << var;
@@ -123,12 +124,6 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern,
         for (int y = 1; y <= h; ++y) {
             char c = pattern.variable(x, y);
 
-            if (pattern.type(x, y) == PatternType::MUST_EMPTY) {
-                if (cf.color(x, y) != PuyoColor::EMPTY)
-                    return PatternMatchResult();
-                continue;
-            }
-
             if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
                 continue;
 
@@ -147,8 +142,8 @@ PatternMatchResult PatternMatcher::match(const FieldPattern& pattern,
                 return PatternMatchResult();
 
             matchCount += 1;
-            matchScore += pattern.score(x, y);
-            scoreCallback(x, y, pattern.score(x, y));
+            matchScore += pattern.score();
+            scoreCallback(x, y, pattern.score());
 
             if (!isSet(c)) {
                 set(c, pc);

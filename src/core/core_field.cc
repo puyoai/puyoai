@@ -53,6 +53,19 @@ CoreField::CoreField(const PlainField& f) :
     heights_[MAP_WIDTH - 1] = 0;
 }
 
+PlainField CoreField::toPlainField() const
+{
+    PlainField pf;
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 14; ++y) {
+            pf.setColor(x, y, color(x, y));
+        }
+    }
+
+    return pf;
+}
+
 bool CoreField::isZenkeshi() const
 {
     for (int x = 1; x <= WIDTH; ++x) {
@@ -77,7 +90,7 @@ int CoreField::countColorPuyos() const
     int cnt = 0;
     for (int x = 1; x <= WIDTH; ++x) {
         for (int y = 1; y <= height(x); ++y) {
-            if (isNormalColor(color(x, y)))
+            if (isNormalColor(x, y))
                 ++cnt;
         }
     }
@@ -249,77 +262,21 @@ bool CoreField::dropPuyoListWithMaxHeight(const ColumnPuyoList& cpl, int maxHeig
     return true;
 }
 
-int CoreField::fillErasingPuyoPositions(const SimulationContext& context, Position* eraseQueue) const
+FieldBits CoreField::ignitionPuyoBits() const
 {
-    Position* eraseQueueHead = eraseQueue;
-
-    {
-        FieldChecker checked;
-        for (int x = 1; x <= WIDTH; ++x) {
-            int maxHeight = height(x);
-            for (int y = context.minHeights[x]; y <= maxHeight; ++y) {
-                DCHECK_NE(color(x, y), PuyoColor::EMPTY)
-                    << x << ' ' << y << ' ' << toChar(color(x, y)) << '\n'
-                    << toDebugString();
-
-                if (checked.get(x, y))
-                    continue;
-                if (!isNormalColor(color(x, y)))
-                    continue;
-
-                PuyoColor c = color(x, y);
-                Position* head = fillSameColorPosition(x, y, c, eraseQueueHead, &checked);
-
-                int connectedPuyoNum = head - eraseQueueHead;
-                if (connectedPuyoNum < PUYO_ERASE_NUM)
-                    continue;
-
-                eraseQueueHead = head;
-            }
-        }
-    }
-
-    int numErasedPuyos = eraseQueueHead - eraseQueue;
-    if (numErasedPuyos == 0)
-        return 0;
-
-    Position* colorEraseQueueHead = eraseQueueHead;
-
-    FieldChecker checked;
-    for (Position* head = eraseQueue; head != colorEraseQueueHead; ++head) {
-        int x = head->x;
-        int y = head->y;
-
-        // Check OJAMA puyos erased
-        if (color(x + 1, y) == PuyoColor::OJAMA && !checked.get(x + 1, y)) {
-            checked.set(x + 1, y);
-            *eraseQueueHead++ = Position(x + 1, y);
-        }
-
-        if (color(x - 1, y) == PuyoColor::OJAMA && !checked.get(x - 1, y)) {
-            checked.set(x - 1, y);
-            *eraseQueueHead++ = Position(x + 1, y);
-        }
-
-        if (color(x, y + 1) == PuyoColor::OJAMA && y + 1 <= HEIGHT && !checked.get(x, y + 1)) {
-            checked.set(x, y + 1);
-            *eraseQueueHead++ = Position(x, y + 1);
-        }
-
-        if (color(x, y - 1) == PuyoColor::OJAMA && !checked.get(x, y - 1)) {
-            checked.set(x, y - 1);
-            *eraseQueueHead++ = Position(x, y - 1);
-        }
-    }
-
-    return eraseQueueHead - eraseQueue;
+    return field_.ignitionPuyoBits();
 }
 
-vector<Position> CoreField::erasingPuyoPositions(const SimulationContext& context) const
+int CoreField::fillErasingPuyoPositions(Position* eraseQueue) const
+{
+    return field_.fillErasingPuyoPositions(eraseQueue);
+}
+
+vector<Position> CoreField::erasingPuyoPositions() const
 {
     // All the positions of erased puyos will be stored here.
     Position eraseQueue[MAP_WIDTH * MAP_HEIGHT];
-    int n = fillErasingPuyoPositions(context, eraseQueue);
+    int n = fillErasingPuyoPositions(eraseQueue);
     return vector<Position>(eraseQueue, eraseQueue + n);
 }
 
@@ -352,20 +309,9 @@ bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
     return false;
 }
 
-bool CoreField::rensaWillOccurWithContext(const SimulationContext& context) const
+bool CoreField::rensaWillOccurWithContext(const SimulationContext& /*context*/) const
 {
-    for (int x = 1; x <= WIDTH; ++x) {
-        int h = height(x);
-        for (int y = context.minHeights[x]; y <= h; ++y) {
-            if (!isNormalColor(color(x, y)))
-                continue;
-
-            if (countConnectedPuyosMax4(x, y) >= 4)
-                return true;
-        }
-    }
-
-    return false;
+    return field_.rensaWillOccur();
 }
 
 std::string CoreField::toDebugString() const
@@ -405,9 +351,3 @@ bool operator!=(const CoreField& lhs, const CoreField& rhs)
 {
     return !(lhs == rhs);
 }
-
-// instantiate CoreField::simulate().
-template RensaResult CoreField::simulate(SimulationContext*, RensaNonTracker*);
-template RensaResult CoreField::simulate(SimulationContext*, RensaChainTracker*);
-template RensaResult CoreField::simulate(SimulationContext*, RensaCoefTracker*);
-template RensaResult CoreField::simulate(SimulationContext*, RensaVanishingPositionTracker*);

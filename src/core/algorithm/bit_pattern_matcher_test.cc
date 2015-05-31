@@ -14,7 +14,7 @@ TEST(BitPatternMatcherTest, match1)
     BitField bf("RRRBBB");
 
     BitPatternMatcher matcher;
-    EXPECT_TRUE(matcher.match(pattern, bf));
+    EXPECT_TRUE(matcher.match(pattern, bf).matched);
 }
 
 TEST(BitPatternMatcherTest, match2)
@@ -34,9 +34,9 @@ TEST(BitPatternMatcherTest, match2)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, bf0));
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, bf1));
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, bf2));
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, bf0).matched);
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, bf1).matched);
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, bf2).matched);
 }
 
 TEST(BitPatternMatcherTest, match3)
@@ -53,7 +53,7 @@ TEST(BitPatternMatcherTest, match3)
         "R..B.B"
         "YYBB.B");
 
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, bf));
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, bf).matched);
 }
 
 TEST(BitPatternMatcherTest, match4)
@@ -80,13 +80,13 @@ TEST(BitPatternMatcherTest, match4)
     BitField f5(
         "RRRRR.");
 
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, f0));
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, f2));
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, f3));
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, f4));
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, f0).matched);
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, f2).matched);
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, f3).matched);
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, f4).matched);
 
-    EXPECT_FALSE(BitPatternMatcher().match(pattern, f1));
-    EXPECT_FALSE(BitPatternMatcher().match(pattern, f5));
+    EXPECT_FALSE(BitPatternMatcher().match(pattern, f1).matched);
+    EXPECT_FALSE(BitPatternMatcher().match(pattern, f5).matched);
 }
 
 TEST(BitPatternMatcherTest, matchWithStar)
@@ -110,10 +110,10 @@ TEST(BitPatternMatcherTest, matchWithStar)
         ".GGGYY"
         ".RRBBB");
 
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, f0));
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, f1));
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, f2));
-    EXPECT_TRUE(BitPatternMatcher().match(pattern, f3));
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, f0).matched);
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, f1).matched);
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, f2).matched);
+    EXPECT_TRUE(BitPatternMatcher().match(pattern, f3).matched);
 }
 
 TEST(BitPatternMatcherTest, unmatch2)
@@ -123,5 +123,5 @@ TEST(BitPatternMatcherTest, unmatch2)
 
     BitField f1(" B B  ");
 
-    EXPECT_FALSE(BitPatternMatcher().match(pattern, f1));
+    EXPECT_FALSE(BitPatternMatcher().match(pattern, f1).matched);
 }

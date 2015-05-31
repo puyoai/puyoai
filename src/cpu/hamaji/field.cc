@@ -196,10 +196,9 @@ int LF::countColorPuyo() const {
   int n = 0;
   for (int x = 1; x <= 6; x++) {
     for (int y = 1; y <= 13; y++) {
-      PuyoColor c = Get(x, y);
-      if (c == PuyoColor::EMPTY)
+      if (isEmpty(x, y))
         break;
-      if (isNormalColor(c))
+      if (isNormalColor(x, y))
         n++;
     }
   }

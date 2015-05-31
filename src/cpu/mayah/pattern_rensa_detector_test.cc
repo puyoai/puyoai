@@ -137,7 +137,6 @@ TEST(PatternBookTest, pattern1)
                         const RensaResult&,
                         const ColumnPuyoList& cpl,
                         PuyoColor,
-                        const RensaChainTrackResult&,
                         const std::string& patternName,
                         double patternScore) {
         CoreField cf(field);
@@ -177,7 +176,6 @@ TEST(PatternBookTest, pattern1_complement1)
                         const RensaResult&,
                         const ColumnPuyoList& cpl,
                         PuyoColor,
-                        const RensaChainTrackResult&,
                         const std::string& patternName,
                         double patternScore) {
         CoreField cf(field);
@@ -211,7 +209,6 @@ TEST(PatternBookTest, pattern1_complement2)
                         const RensaResult&,
                         const ColumnPuyoList&,
                         PuyoColor,
-                        const RensaChainTrackResult&,
                         const std::string&,
                         double patternScore) {
         if (patternScore > 0)
@@ -242,7 +239,6 @@ TEST(PatternBookTest, pattern2)
                         const RensaResult&,
                         const ColumnPuyoList& cpl,
                         PuyoColor,
-                        const RensaChainTrackResult&,
                         const std::string& patternName,
                         double /*patternScore*/) {
         CoreField cf(field);
@@ -280,7 +276,6 @@ TEST(PatternBookTest, pattern3)
                         const RensaResult&,
                         const ColumnPuyoList& cpl,
                         PuyoColor,
-                        const RensaChainTrackResult&,
                         const std::string&,
                         double /*patternScore*/) {
         CoreField cf(field);
@@ -323,7 +318,6 @@ TEST(PatternBookTest, pattern4)
                         const RensaResult&,
                         const ColumnPuyoList& cpl,
                         PuyoColor,
-                        const RensaChainTrackResult&,
                         const std::string&,
                         double /*patternScore*/) {
         CoreField cf(field);
@@ -358,7 +352,6 @@ TEST(PatternBookTest, pattern5)
                         const RensaResult&,
                         const ColumnPuyoList&,
                         PuyoColor,
-                        const RensaChainTrackResult&,
                         const std::string&,
                         double patternScore) {
         if (patternScore > 0)
@@ -389,7 +382,6 @@ TEST(PatternBookTest, pattern6)
                         const RensaResult&,
                         const ColumnPuyoList&,
                         PuyoColor,
-                        const RensaChainTrackResult&,
                         const std::string&,
                         double patternScore) {
         if (patternScore > 0)

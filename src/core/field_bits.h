@@ -19,6 +19,7 @@ public:
     FieldBits(__m128i m) : m_(m) {}
     FieldBits(int x, int y) : m_(onebit(x, y)) {}
     FieldBits(const PlainField&, PuyoColor);
+    explicit FieldBits(const std::string&);
 
     operator __m128i&() { return m_; }
     __m128i& xmm() { return m_; }
@@ -28,6 +29,9 @@ public:
     bool get(int x, int y) const { return !_mm_testz_si128(onebit(x, y), m_); }
     void set(int x, int y) { m_ = _mm_or_si128(onebit(x, y), m_); }
     void unset(int x, int y) { m_ = _mm_andnot_si128(onebit(x, y), m_); }
+    void clear(int x, int y) { unset(x, y); }
+
+    void setBit(int x, int y, bool b) { if (b) set(x, y); else unset(x, y); }
 
     void setAll(const FieldBits& fb) { m_ = _mm_or_si128(fb.m_, m_); }
     void unsetAll(const FieldBits& fb) { m_ = _mm_andnot_si128(fb.m_, m_); }
@@ -38,6 +42,8 @@ public:
     int popcount() const;
     // Returns the bit-wise or of 8x16bits.
     int horizontalOr16() const;
+
+    void countConnection(int* count2, int* count3) const;
 
     // Returns the masked FieldBits where the region of visible field is taken.
     FieldBits maskedField12() const;
@@ -82,6 +88,10 @@ public:
     // The FieldBits the callback returned will be excluded from the iteration.
     template<typename Callback>
     void iterateBitWithMasking(Callback) const;
+
+    // Iterate all bit positions. Callback is void (int x, int y).
+    template<typename Callback>
+    void iterateBitPositions(Callback) const;
 
     std::string toString() const;
 
@@ -157,27 +167,29 @@ FieldBits FieldBits::expand(FieldBits mask) const
 }
 
 inline
-FieldBits FieldBits::expand4(FieldBits maskBits) const
+FieldBits FieldBits::expand4(FieldBits mask) const
 {
-    const __m128i mask = maskBits.m_;
-    __m128i m = m_;
+    FieldBits m = m_;
 
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(m, 1), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
+    FieldBits v1 = _mm_slli_si128(m, 2);
+    FieldBits v2 = _mm_srli_si128(m, 2);
+    FieldBits v3 = _mm_slli_epi16(m, 1);
+    FieldBits v4 = _mm_srli_epi16(m, 1);
+    m = (((v1 | v2) | (v3 | v4)) & mask) | m;
 
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(m, 1), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
+    v1 = _mm_slli_si128(m, 2);
+    v2 = _mm_srli_si128(m, 2);
+    v3 = _mm_slli_epi16(m, 1);
+    v4 = _mm_srli_epi16(m, 1);
+    m = (((v1 | v2) | (v3 | v4)) & mask) | m;
 
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_si128(m, 2), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_slli_epi16(m, 1), mask), m);
-    m = _mm_or_si128(_mm_and_si128(_mm_srli_epi16(m, 1), mask), m);
+    v1 = _mm_slli_si128(m, 2);
+    v2 = _mm_srli_si128(m, 2);
+    v3 = _mm_slli_epi16(m, 1);
+    v4 = _mm_srli_epi16(m, 1);
+    m = (((v1 | v2) | (v3 | v4)) & mask) | m;
 
-    return FieldBits(m);
+    return m;
 }
 
 inline
@@ -226,6 +238,28 @@ FieldBits FieldBits::vanishingSeed() const
     return FieldBits(_mm_or_si128(threes, two_twos));
 }
 
+inline
+void FieldBits::countConnection(int* count2, int* count3) const
+{
+    FieldBits mask = maskedField12();
+
+    FieldBits u = _mm_and_si128(_mm_slli_epi16(mask, 1), mask);
+    FieldBits d = _mm_and_si128(_mm_srli_epi16(mask, 1), mask);
+    FieldBits l = _mm_and_si128(_mm_slli_si128(mask, 2), mask);
+    FieldBits r = _mm_and_si128(_mm_srli_si128(mask, 2), mask);
+
+    FieldBits ud_and = u & d;
+    FieldBits lr_and = l & r;
+    FieldBits ud_or = u | d;
+    FieldBits lr_or = l | r;
+
+    FieldBits three = (ud_or & lr_or) | ud_and | lr_and;
+    FieldBits two = (u | l).notmask(three.expand(mask));
+
+    *count2 = two.popcount();
+    *count3 = three.popcount();
+}
+
 template<typename Callback>
 inline void FieldBits::iterateBitWithMasking(Callback callback) const
 {
@@ -252,10 +286,9 @@ inline void FieldBits::iterateBitWithMasking(Callback callback) const
     }
 }
 
-inline
-int FieldBits::toPositions(Position ps[]) const
+template<typename Callback>
+void FieldBits::iterateBitPositions(Callback callback) const
 {
-    int pos = 0;
     alignas(16) std::int64_t vs[2];
     _mm_store_si128(reinterpret_cast<__m128i*>(vs), m_);
 
@@ -263,7 +296,7 @@ int FieldBits::toPositions(Position ps[]) const
         int bit = __builtin_ctzll(vs[0]);
         int x = bit >> 4;
         int y = bit & 0xF;
-        ps[pos++] = Position(x, y);
+        callback(x, y);
         vs[0] = vs[0] & (vs[0] - 1);
     }
 
@@ -271,10 +304,18 @@ int FieldBits::toPositions(Position ps[]) const
         int bit = __builtin_ctzll(vs[1]);
         int x = 4 + (bit >> 4);
         int y = bit & 0xF;
-        ps[pos++] = Position(x, y);
+        callback(x, y);
         vs[1] = vs[1] & (vs[1] - 1);
     }
+}
 
+inline
+int FieldBits::toPositions(Position ps[]) const
+{
+    int pos = 0;
+    iterateBitPositions([&](int x, int y) {
+        ps[pos++] = Position(x, y);
+    });
     return pos;
 }
 
@@ -282,12 +323,18 @@ int FieldBits::toPositions(Position ps[]) const
 inline
 __m128i FieldBits::onebit(int x, int y)
 {
+    DCHECK(0 <= x && x < 8 && 0 <= y && y < 16) << "x=" << x << " y=" << y;
+
+#if 1
+    int shift = ((x << 4) | y) & 0x3F;
+    std::uint64_t hi = x >> 2;
+    std::uint64_t lo = hi ^ 1;
+    return _mm_set_epi64x(hi << shift, lo << shift);
+#else
     // NOTE: the 3rd argument of _mm_insert_epi16 should be an immediate.
     // Mac clang and Linux gcc accepts non immediate value, however, it generates table jump code.
     // cygwin environment does not accept non immediate value.
     // So, we adopt switch case sentene here.
-
-    DCHECK(0 <= x && x < 8 && 0 <= y && y < 16) << "x=" << x << " y=" << y;
     switch (x) {
     case 0: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 0);
     case 1: return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 1);
@@ -301,6 +348,7 @@ __m128i FieldBits::onebit(int x, int y)
         DCHECK(false);
         return _mm_insert_epi16(_mm_setzero_si128(), 1 << y, 0);
     }
+#endif
 }
 
 #endif // CORE_FIELD_BITS_H_

@@ -25,7 +25,6 @@ public:
     const FieldBits& ironPatternBits() const { return ironPatternBits_; }
 
 private:
-
     double score_;
     FieldBits anyPatternBits_;
     FieldBits ironPatternBits_;

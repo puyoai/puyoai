@@ -445,6 +445,26 @@ TEST(CoreFieldTest, TrackedCoreFieldSimulation)
     EXPECT_EQ(5, trackResult.erasedAt(5, 4));
 }
 
+TEST(CoreFieldTest, rensaChainTracker)
+{
+    CoreField cf(
+        "..BB.."
+        "RRRRBY"
+    );
+
+    RensaChainTracker tracker;
+    RensaResult rensaResult = cf.simulate(&tracker);
+
+    const RensaChainTrackResult& trackResult = tracker.result();
+
+    EXPECT_EQ(1, rensaResult.chains);
+    EXPECT_EQ(1, trackResult.erasedAt(1, 1));
+    EXPECT_EQ(1, trackResult.erasedAt(2, 1));
+    EXPECT_EQ(1, trackResult.erasedAt(3, 1));
+    EXPECT_EQ(1, trackResult.erasedAt(4, 1));
+    EXPECT_EQ(0, trackResult.erasedAt(1, 2));
+}
+
 TEST(CoreFieldTest, simualteWithRensaCoefResult)
 {
     CoreField f("R...RR"
@@ -498,6 +518,50 @@ TEST(CoreFieldTest, simualteWithRensaVanishingPositionResult)
     EXPECT_EQ(3U, positionResult.getReferenceBasePuyosAt(4).size());
     EXPECT_EQ(2, positionResult.getReferenceFallingPuyosAt(4)[0].x);
     EXPECT_EQ(3, positionResult.getReferenceFallingPuyosAt(4)[0].y);
+}
+
+TEST(CoreFieldTest, simualteWithRensaExistingPositionTracker)
+{
+    CoreField f(
+        "..YY.."
+        "..GGY."
+        "RRRRGG");
+
+    FieldBits bits(
+        "..11.."
+        "..11.."
+        "...111");
+
+    FieldBits expected1(
+        "..11.."
+        "..1111");
+
+    FieldBits expected2(
+        "..11..");
+
+    RensaExistingPositionTracker tracker(bits);
+
+    f.vanishDrop(&tracker);
+    EXPECT_EQ(expected1, tracker.result().existingBits());
+
+    f.vanishDrop(&tracker);
+    EXPECT_EQ(expected2, tracker.result().existingBits());
+}
+
+TEST(CoreFieldTest, simualteWithLastVanishedPositionTracker)
+{
+    CoreField f(
+        "..YY.."
+        "..GGY."
+        "RRRRGG");
+
+    FieldBits expected(
+        "..1111");
+
+    RensaLastVanishedPositionTracker tracker;
+
+    f.simulate(&tracker);
+    EXPECT_EQ(expected, tracker.result().lastVanishedPositionBits());
 }
 
 TEST(CoreFieldTest, framesToDropNextWithoutChigiri)
@@ -710,17 +774,15 @@ TEST(CoreFieldTest, rensaWillOccurWithContext)
     CoreField cf5(
         "OOOO  ");
 
-    CoreField::SimulationContext context1(1, { 1, 1, 1, 1, 1, 1, 1, 1 });
-    CoreField::SimulationContext context2(1, { 1, 1, 1, 1, 1, 1, 1, 1 });
-    CoreField::SimulationContext context3(1, { 1, 2, 2, 2, 2, 1, 1, 1 });
-    CoreField::SimulationContext context4(1, { 1, 2, 2, 2, 2, 1, 1, 1 });
-    CoreField::SimulationContext context5(1, { 1, 1, 1, 1, 1, 1, 1, 1 });
+    CoreField::SimulationContext context1(1);
+    CoreField::SimulationContext context2(1);
+    CoreField::SimulationContext context3(1);
+    CoreField::SimulationContext context4(1);
+    CoreField::SimulationContext context5(1);
 
     EXPECT_TRUE(cf1.rensaWillOccurWithContext(context1));
     EXPECT_FALSE(cf2.rensaWillOccurWithContext(context2));
-    // 4Y is connected, but it won't be checked.
-    EXPECT_FALSE(cf3.rensaWillOccurWithContext(context3));
-    // 5Y is connected, and (5, 1) Y is checked, so it should be detected.
+    EXPECT_TRUE(cf3.rensaWillOccurWithContext(context3));
     EXPECT_TRUE(cf4.rensaWillOccurWithContext(context4));
     EXPECT_FALSE(cf5.rensaWillOccurWithContext(context5));
 }
@@ -766,9 +828,8 @@ TEST(CoreFieldTest, erasingPuyoPositions1)
     CoreField cf(
         "..BB.."
         "RRRRBB");
-    CoreField::SimulationContext context;
 
-    vector<Position> positions = cf.erasingPuyoPositions(context);
+    vector<Position> positions = cf.erasingPuyoPositions();
     std::sort(positions.begin(), positions.end());
 
     vector<Position> expected = {
@@ -786,9 +847,8 @@ TEST(CoreFieldTest, erasingPuyoPositions2)
     CoreField cf(
         ".OBBOO"
         "RRRRBB");
-    CoreField::SimulationContext context;
 
-    vector<Position> positions = cf.erasingPuyoPositions(context);
+    vector<Position> positions = cf.erasingPuyoPositions();
     std::sort(positions.begin(), positions.end());
 
     vector<Position> expected = {

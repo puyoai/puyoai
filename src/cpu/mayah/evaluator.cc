@@ -40,26 +40,10 @@ template<typename ScoreCollector, typename FeatureKey>
 static void calculateConnection(ScoreCollector* sc, const CoreField& field,
                                 FeatureKey key2, FeatureKey key3)
 {
-    int count3 = 0;
-    int count2 = 0;
-
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        int height = field.height(x);
-        for (int y = 1; y <= height; ++y) {
-            if (!isNormalColor(field.color(x, y)))
-                continue;
-
-            int numConnected = field.countConnectedPuyosMax4(x, y);
-            if (numConnected >= 3) {
-                ++count3;
-            } else if (numConnected >= 2) {
-                ++count2;
-            }
-        }
-    }
-
-    sc->addScore(key3, count3 / 3);
-    sc->addScore(key2, count2 / 2);
+    int count2, count3;
+    field.countConnection(&count2, &count3);
+    sc->addScore(key2, count2);
+    sc->addScore(key3, count3);
 }
 
 template<typename ScoreCollector, typename SparseFeatureKey>
@@ -418,12 +402,13 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& re
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const CoreField& field, const RensaChainTrackResult& trackResult)
+void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const CoreField& field,
+                                                               const FieldBits& ignitionPuyoBits)
 {
     // A_A is taboo generally. Allow this from x == 1 or x == 4.
     for (int x = 2; x <= 3; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            if (trackResult.erasedAt(x, y) != 1 || trackResult.erasedAt(x + 1, y) != 1 || trackResult.erasedAt(x + 2, y) != 1)
+            if (!ignitionPuyoBits.get(x, y) || !ignitionPuyoBits.get(x + 1, y) || !ignitionPuyoBits.get(x + 2, y))
                 continue;
 
             if (isNormalColor(field.color(x, y)) && field.color(x, y) == field.color(x + 2, y) && field.color(x + 1, y) == PuyoColor::EMPTY) {
@@ -434,13 +419,14 @@ void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const CoreField& 
 }
 
 template<typename ScoreCollector>
-void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const CoreField& complementedField, const RensaChainTrackResult& trackResult)
+void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const CoreField& complementedField,
+                                                                    const FieldBits& ignitionPuyoBits)
 {
     for (int y = FieldConstant::HEIGHT; y >= 1; --y) {
         for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-            if (!isNormalColor(complementedField.color(x, y)))
+            if (!complementedField.isNormalColor(x, y))
                 continue;
-            if (trackResult.erasedAt(x, y) == 1) {
+            if (ignitionPuyoBits.get(x, y)) {
                 sc_->addScore(IGNITION_HEIGHT, y, 1);
                 return;
             }
@@ -654,12 +640,13 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                             const RensaResult& rensaResult,
                             const ColumnPuyoList& puyosToComplement,
                             PuyoColor /*firePuyoColor*/,
-                            const RensaChainTrackResult& trackResult,
                             const string& patternName,
                             double patternScore) {
         CoreField complementedField(fieldBeforeRensa);
         if (!complementedField.dropPuyoList(puyosToComplement))
             return;
+
+        FieldBits ignitionPuyoBits = complementedField.ignitionPuyoBits();
 
         ++rensaCounts[rensaResult.chains];
 
@@ -673,11 +660,11 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
         rensaEvaluator.evalRensaFieldUShape(complementedField);
-        rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, trackResult);
+        rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, ignitionPuyoBits);
         rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyoSet);
         rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
         rensaEvaluator.evalPatternScore(puyosToComplement, patternScore, rensaResult.chains);
-        rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, trackResult); // fieldBeforeRensa is correct.
+        rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, ignitionPuyoBits); // fieldBeforeRensa is correct.
         rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
         rensaEvaluator.evalComplementationBias(puyosToComplement);
         rensaEvaluator.evalRensaScore(rensaResult.score, virtualRensaScore);

@@ -15,7 +15,6 @@ public:
                                 const RensaResult& rensaResult,
                                 const ColumnPuyoList& puyosToComplement,
                                 PuyoColor firePuyoColor,
-                                const RensaChainTrackResult& chainTrackResult,
                                 const std::string& patternName,
                                 double patternScore)> Callback;
 
@@ -25,7 +24,6 @@ public:
         patternBook_(patternBook),
         originalField_(originalField),
         callback_(std::move(callback)),
-        originalContext_(CoreField::SimulationContext::fromField(originalField)),
         strategy_(RensaDetectorStrategy(RensaDetectorStrategy::Mode::DROP, 2, 2, false))
     {
     }
@@ -35,8 +33,7 @@ public:
 
 private:
     void iteratePossibleRensasInternal(const CoreField& currentField,
-                                       const CoreField::SimulationContext& currentFieldContext,
-                                       const RensaYPositionTracker& currentFieldTracker,
+                                       const RensaExistingPositionTracker& currentFieldTracker,
                                        int currentChains,
                                        const ColumnPuyo& firePuyo,
                                        const ColumnPuyoList& keyPuyos,
@@ -59,7 +56,6 @@ private:
     const PatternBook& patternBook_;
     const CoreField& originalField_;
     Callback callback_;
-    const CoreField::SimulationContext originalContext_;
     const RensaDetectorStrategy strategy_;
 
     std::unordered_set<ColumnPuyoList> usedSet_;
