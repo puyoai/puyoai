@@ -48,8 +48,9 @@ add_subdirectory(test_lockit)
 add_subdirectory(yuricat)
 
 add_subdirectory(sample)
-add_subdirectory(sample_filler)
 add_subdirectory(sample_suicide)
 add_subdirectory(sample_rensa)
+
+add_subdirectory(control_tester)
 
 add_subdirectory(kantoku)
