@@ -7,252 +7,142 @@
 
 using namespace std;
 
-PatternMatcher::PatternMatcher() :
-    seen_ {}
+PatternMatcher::PatternMatcher()
 {
-    for (int i = 0; i < 26; ++i) {
-        map_[i] = PuyoColor::WALL;
-    }
 }
 
-bool PatternMatcher::checkNeighborsForCompletion(const FieldPattern& pattern, const CoreField& cf) const
+PatternMatchResult PatternMatcher::matchInternal(const FieldPattern& fieldPattern,
+                                                 const CoreField& field,
+                                                 bool ignoresMustVar,
+                                                 BitField* complementedField,
+                                                 PuyoColor envs[])
 {
-    // Check the neighbors.
-    for (int x = 1; x <= 6; ++x) {
-        int h = pattern.height(x);
-        for (int y = 1; y <= h; ++y) {
-            char c = pattern.variable(x, y);
-            if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
-                continue;
-            if (!checkCell(c, pattern.type(x, y + 1), pattern.variable(x, y + 1), cf.color(x, y + 1)))
-                return false;
-            if (!checkCell(c, pattern.type(x, y - 1), pattern.variable(x, y - 1), cf.color(x, y - 1)))
-                return false;
-            if (!checkCell(c, pattern.type(x + 1, y), pattern.variable(x + 1, y), cf.color(x + 1, y)))
-                return false;
-            if (!checkCell(c, pattern.type(x - 1, y), pattern.variable(x - 1, y), cf.color(x - 1, y)))
-                return false;
-        }
+    if (!ignoresMustVar) {
+        FieldBits emptyBits = field.bitField().bits(PuyoColor::EMPTY);
+        if (!(fieldPattern.mustPatternBits() & emptyBits).isEmpty())
+            return PatternMatchResult();
     }
 
-    return true;
-}
-
-bool PatternMatcher::checkCell(char currentVar,
-                               PatternType neighborType,
-                               char neighborVar,
-                               PuyoColor neighborColor) const
-{
-    DCHECK('A' <= currentVar && currentVar <= 'Z') << currentVar;
-
-    // This case should be already processed.
-    if (currentVar == neighborVar)
-        return true;
-
-    if (neighborColor == PuyoColor::OJAMA || neighborColor == PuyoColor::WALL)
-        return true;
-
-    switch (neighborType) {
-    case PatternType::NONE:
-    case PatternType::ALLOW_FILLING_IRON:
-        if (map(currentVar) == neighborColor)
-            return false;
-        break;
-    case PatternType::ALLOW_VAR:
-        DCHECK('A' <= neighborVar && neighborVar <= 'Z');
-        if (currentVar != neighborVar && map(currentVar) == neighborColor)
-            return false;
-        break;
-    case PatternType::ANY:
-        // If neighbor is '*', we don't care what color the cell has.
-        return true;
-    default:
-        if (map(currentVar) == map(neighborVar) && isSet(currentVar))
-            return false;
-        break;
-    }
-
-    return true;
-}
-
-bool PatternMatcher::fillUnusedVariableColors(const FieldPattern& pattern,
-                                              const CoreField& field,
-                                              bool needsNeighborCheck,
-                                              SmallIntSet unusedVariables,
-                                              ColumnPuyoList* cpl)
-{
-    if (unusedVariables.isEmpty()) {
-        if (needsNeighborCheck && !checkNeighborsForCompletion(pattern, field))
-            return false;
-        return complementInternal(pattern, field, cpl);
-    }
-
-    char c = unusedVariables.smallest() + 'A';
-    unusedVariables.removeSmallest();
-    for (PuyoColor pc : NORMAL_PUYO_COLORS) {
-        forceSet(c, pc);
-        if (fillUnusedVariableColors(pattern, field, needsNeighborCheck, unusedVariables, cpl))
-            return true;
-    }
-    return false;
-}
-
-bool PatternMatcher::complementInternal(const FieldPattern& pattern,
-                                        const CoreField& field,
-                                        ColumnPuyoList* cpl)
-{
-    cpl->clear();
-
-    int currentHeights[FieldConstant::MAP_WIDTH] {
-        0, field.height(1), field.height(2), field.height(3),
-        field.height(4), field.height(5), field.height(6), 0
-    };
-
-    for (int x = 1; x <= 6; ++x) {
-        int h = pattern.height(x);
-        for (int y = 1; y <= h; ++y) {
-            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_IRON) {
-                if (!(field.isColor(x, y, PuyoColor::EMPTY) || field.isColor(x, y, PuyoColor::IRON)))
-                    continue;
-                if (!cpl->add(x, PuyoColor::IRON))
-                    return false;
-                ++currentHeights[x];
-                continue;
-            }
-
-            if (pattern.type(x, y) == PatternType::ALLOW_VAR)
-                continue;
-
-            if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR)) {
-                if (field.color(x, y) == PuyoColor::EMPTY)
-                    return false;
-                continue;
-            }
-
-            char c = pattern.variable(x, y);
-            if (!isSet(c))
-                return false;
-            if (pattern.type(x, y) == PatternType::MUST_VAR) {
-                if (!isNormalColor(field.color(x, y)))
-                    return false;
-            }
-            if (field.color(x, y) == PuyoColor::EMPTY && currentHeights[x] + 1 == y) {
-                if (!cpl->add(x, map(c)))
-                    return false;
-                ++currentHeights[x];
-            } else if (field.color(x, y) == PuyoColor::IRON) {
-                if (!cpl->add(x, map(c)))
-                    return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-PatternMatchResult PatternMatcher::match(const FieldPattern& pattern,
-                                         const CoreField& cf,
-                                         bool ignoresMustVar)
-{
-    // First, make a map from char to PuyoColor.
-    FieldBits matchedBits;
-    FieldBits allowedMatchedBits;
-
-    // First, create a env (char -> PuyoColor)
-    for (int x = 1; x <= 6; ++x) {
-        int h = cf.height(x);
-        for (int y = 1; y <= h; ++y) {
-            char c = pattern.variable(x, y);
-
-            if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
-                continue;
-
-            PuyoColor pc = cf.color(x, y);
-            if (pc == PuyoColor::EMPTY) {
-                if (!ignoresMustVar && pattern.type(x, y) == PatternType::MUST_VAR)
-                    return PatternMatchResult();
-                continue;
-            }
-
-            // place holder.
-            if (pc == PuyoColor::IRON)
-                continue;
-
-            if (!isNormalColor(pc))
-                return PatternMatchResult();
-
-            matchedBits.set(x, y);
-
-            if (!isSet(c)) {
-                set(c, pc);
-                continue;
-            }
-
-            if (map(c) != pc)
-                return PatternMatchResult();
-        }
-    }
-
-    // Check the neighbors.
-    for (int x = 1; x <= 6; ++x) {
-        int h = pattern.height(x);
-        for (int y = 1; y <= h; ++y) {
-            char c = pattern.variable(x, y);
-            if (pattern.type(x, y) == PatternType::NONE)
-                continue;
-            if (pattern.type(x, y) == PatternType::ANY)
-                continue;
-            if (pattern.type(x, y) == PatternType::ALLOW_FILLING_IRON)
-                continue;
-            if (pattern.type(x, y) == PatternType::ALLOW_VAR) {
-                char uv = std::toupper(pattern.variable(x, y));
-                if (isSet(uv) && map(uv) == cf.color(x, y))
-                    allowedMatchedBits.set(x, y);
-                continue;
-            }
-
-            setSeen(c);
-
-            if (!ignoresMustVar && pattern.type(x, y) == PatternType::MUST_VAR && cf.color(x, y) == PuyoColor::EMPTY)
-                return PatternMatchResult();
-
-            DCHECK(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR);
-
-            // Check neighbors.
-            if (!checkCell(c, pattern.type(x, y + 1), pattern.variable(x, y + 1), cf.color(x, y + 1)))
-                return PatternMatchResult();
-            if (!checkCell(c, pattern.type(x, y - 1), pattern.variable(x, y - 1), cf.color(x, y - 1)))
-                return PatternMatchResult();
-            if (!checkCell(c, pattern.type(x + 1, y), pattern.variable(x + 1, y), cf.color(x + 1, y)))
-                return PatternMatchResult();
-            if (!checkCell(c, pattern.type(x - 1, y), pattern.variable(x - 1, y), cf.color(x - 1, y)))
-                return PatternMatchResult();
-        }
-    }
 
     SmallIntSet unusedVariables;
-    for (char c = 'A'; c <= 'Z'; ++c) {
-        if (isSeen(c) && !isSet(c))
-            unusedVariables.set(c - 'A');
+
+    FieldBits matchedBits;
+
+    // First, create a env (char -> PuyoColor)
+    for (size_t i = 0; i < fieldPattern.patterns().size(); ++i) {
+        const FieldPattern::Pattern& pat = fieldPattern.pattern(i);
+        PuyoColor found = PuyoColor::EMPTY;
+        for (PuyoColor c : NORMAL_PUYO_COLORS) {
+            FieldBits bits = pat.varBits & field.bitField().bits(c);
+            if (bits.isEmpty())
+                continue;
+            if (found != PuyoColor::EMPTY) {
+                // found multiple colors for one variable.
+                return PatternMatchResult();
+            }
+
+            matchedBits.setAll(bits);
+            complementedField->setAll(pat.varBits, c);
+            found = c;
+        }
+
+        // OJAMA is matched?  (OK for IRON, since it's a place holder.)
+        if (!FieldBits(pat.varBits & field.bitField().bits(PuyoColor::OJAMA)).isEmpty())
+            return PatternMatchResult();
+
+        envs[i] = found;
+        if (found == PuyoColor::EMPTY) {
+            DCHECK('A' <= pat.var && pat.var <= 'Z') << pat.var;
+            unusedVariables.set(pat.var - 'A');
+        }
+    }
+
+    // Check the neighbors.
+    // If the neighbor of pattern has the same color
+    FieldBits allowedMatchedBits;
+    for (size_t i = 0; i < fieldPattern.patterns().size(); ++i) {
+        if (envs[i] == PuyoColor::EMPTY)
+            continue;
+        const FieldPattern::Pattern& pat = fieldPattern.pattern(i);
+        FieldBits edge = pat.varBits.expandEdge().notmask(pat.varBits) & complementedField->bits(envs[i]);
+        if (!edge.notmask(pat.allowVarBits).notmask(fieldPattern.anyPatternBits()).isEmpty())
+            return PatternMatchResult();
+
+        FieldBits matched = edge.mask(pat.allowVarBits);
+        allowedMatchedBits.setAll(matched);
     }
 
     return PatternMatchResult(true, matchedBits, allowedMatchedBits, unusedVariables);
 }
 
-ComplementResult PatternMatcher::complement(const FieldPattern& pattern,
+PatternMatchResult PatternMatcher::match(const FieldPattern& fieldPattern,
+                                         const CoreField& field,
+                                         bool ignoresMustVar)
+{
+    BitField complementedField(field.bitField());
+    PuyoColor envs[26] {};
+    return matchInternal(fieldPattern, field, ignoresMustVar, &complementedField, envs);
+}
+
+ComplementResult PatternMatcher::complement(const FieldPattern& fieldPattern,
                                             const CoreField& field,
                                             int numAllowingFillingUnusedVariables)
 {
-    PatternMatchResult result = match(pattern, field, false);
+    DCHECK_LE(numAllowingFillingUnusedVariables, 1) << "Not supported";
+
+    BitField complementedField(field.bitField());
+    PuyoColor envs[26] {};
+
+    PatternMatchResult result = matchInternal(fieldPattern, field, false, &complementedField, envs);
     if (!result.matched)
         return ComplementResult();
 
     if (result.unusedVariables.size() > numAllowingFillingUnusedVariables)
         return ComplementResult();
 
+    // Complement unused variables.
+    if (numAllowingFillingUnusedVariables > 0 && result.unusedVariables.size() > 0) {
+        for (size_t i = 0; i < fieldPattern.patterns().size(); ++i) {
+            if (envs[i] != PuyoColor::EMPTY)
+                continue;
+
+            bool ok = false;
+            const FieldPattern::Pattern& pat = fieldPattern.pattern(i);
+            for (PuyoColor c : NORMAL_PUYO_COLORS) {
+                envs[i] = c;
+                complementedField.setAll(pat.varBits, c);
+
+                // Check neighbors.
+                FieldBits edge = pat.varBits.expandEdge().notmask(pat.varBits) & complementedField.bits(envs[i]);
+                if (!edge.notmask(pat.allowVarBits).notmask(fieldPattern.anyPatternBits()).isEmpty())
+                    continue;
+
+                ok = true;
+                break;
+            }
+
+            if (!ok)
+                return ComplementResult();
+        }
+    }
+
+    // Complement IRON.
+    complementedField.setAllIfEmpty(fieldPattern.ironPatternBits(), PuyoColor::IRON);
+    FieldBits complementedBits = complementedField.differentBits(field.bitField());
+
+    // If there are empty space below the complemented cell, it's not ok.
+    if (!(_mm_srli_epi16(complementedBits, 1) & complementedField.bits(PuyoColor::EMPTY)).isEmpty())
+        return ComplementResult();
+
     ColumnPuyoList cpl;
-    bool ok = fillUnusedVariableColors(pattern, field, !result.unusedVariables.isEmpty(), result.unusedVariables, &cpl);
-    int filled = std::min(static_cast<int>(result.unusedVariables.size()),
-                          numAllowingFillingUnusedVariables);
-    return ComplementResult(ok, result, filled, cpl);
+    bool ok = true;
+    complementedBits.iterateBitPositions([&](int x, int y) {
+        if (!cpl.add(x, complementedField.color(x, y)))
+            ok = false;
+    });
+
+    if (!ok)
+        return ComplementResult();
+
+    return ComplementResult(true, result, result.unusedVariables.size(), CoreField(complementedField), cpl);
 }

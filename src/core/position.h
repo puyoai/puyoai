@@ -34,27 +34,4 @@ struct Position {
     int y;
 };
 
-namespace std {
-
-template<>
-struct hash<Position>
-{
-    size_t operator()(const Position& p) const { return p.x * 16 + p.y; }
-};
-
-template<>
-struct hash<Slice<Position>>
-{
-    size_t operator()(const Slice<Position>& vs) const
-    {
-        size_t h = 0;
-        for (const auto& p : vs) {
-            h = h * 37 + hash<Position>()(p);
-        }
-        return h;
-    }
-};
-
-}
-
 #endif

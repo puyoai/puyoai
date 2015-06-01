@@ -16,35 +16,28 @@
 
 using namespace std;
 
-FieldPattern::FieldPattern() :
-    heights_{},
-    numVariables_(0)
-{
-    for (int x = 0; x < MAP_WIDTH; ++x) {
-        for (int y = 0; y < MAP_HEIGHT; ++y) {
-            vars_[x][y] = ' ';
-            types_[x][y] = PatternType::NONE;
-        }
-    }
+namespace {
 
-    for (int y = 0; y < MAP_HEIGHT; ++y) {
-        vars_[0][y] = '\0';
-        types_[0][y] = PatternType::WALL;
-        vars_[MAP_WIDTH - 1][y] = '\0';
-        types_[MAP_WIDTH - 1][y] = PatternType::WALL;
-    }
+FieldBits mirror(FieldBits bits) {
+    union {
+        std::uint16_t xs[8];
+        __m128i m;
+    };
+    m = bits;
 
-    for (int x = 0; x < MAP_WIDTH; ++x) {
-        vars_[x][0] = '\0';
-        types_[x][0] = PatternType::WALL;
-        vars_[x][MAP_HEIGHT - 1] = '\0';
-        types_[x][MAP_HEIGHT - 1] = PatternType::WALL;
-    }
+    for (int i = 0; i < 4; ++i)
+        std::swap(xs[i], xs[7 - i]);
+
+    return m;
 }
 
-FieldPattern::FieldPattern(const std::string& field) :
-    FieldPattern()
+}
+
+FieldPattern::FieldPattern(const string& field)
 {
+    int varCount = 0;
+    Pattern pats[26];
+
     int counter = 0;
     for (int i = field.length() - 1; i >= 0; --i) {
         char c = field[i];
@@ -52,28 +45,36 @@ FieldPattern::FieldPattern(const std::string& field) :
         int y = counter / 6 + 1;
         counter++;
 
-        PatternType t = inferType(c);
-        setPattern(x, y, t, c);
-    }
-
-    numVariables_ = countVariables();
-}
-
-FieldPattern::FieldPattern(const vector<string>& field) :
-    FieldPattern()
-{
-    for (size_t i = 0; i < field.size(); ++i) {
-        CHECK_EQ(field[i].size(), 6U);
-
-        int y = static_cast<int>(field.size()) - i;
-        for (int x = 1; x <= 6; ++x) {
-            char c = field[i][x - 1];
-            PatternType t = inferType(c);
-            setPattern(x, y, t, c);
+        if (c == '.') {
+            continue;
+        } else if (c == '*') {
+            anyPatternBits_.set(x, y);
+        } else if (c == '&') {
+            ironPatternBits_.set(x, y);
+        } else if ('A' <= c && c <= 'Z') {
+            pats[c - 'A'].varBits.set(x, y);
+            ++varCount;
+        } else if ('a' <= c && c <= 'z') {
+            pats[c - 'a'].allowVarBits.set(x, y);
+        } else {
+            CHECK(false) << "Unacceptable variable " << c << " at (" << x << ", " << y << ")";
         }
     }
 
-    numVariables_ = countVariables();
+    for (int i = 0; i < 26; ++i) {
+        pats[i].var = ('A' + i);
+
+        if (pats[i].varBits.isEmpty()) {
+            CHECK(pats[i].allowVarBits.isEmpty())
+                << "Var " << pats[i].var << " is not used, but allow-var "
+                << pats[i].var << " is used.";
+            continue;
+        }
+
+        patterns_.push_back(pats[i]);
+    }
+
+    numVariables_ = varCount;
 }
 
 bool FieldPattern::isMatchable(const CoreField& field) const
@@ -82,103 +83,40 @@ bool FieldPattern::isMatchable(const CoreField& field) const
     return matcher.match(*this, field).matched;
 }
 
-void FieldPattern::setPattern(int x, int y, PatternType t, char variable)
+bool FieldPattern::isBijectionMatchable() const
 {
-    switch (t) {
-    case PatternType::NONE:
-        break;
-    case PatternType::ANY:
-        types_[x][y] = t;
-        vars_[x][y] = '*';
-        heights_[x] = std::max(height(x), y);
-        break;
-    case PatternType::VAR:
-    case PatternType::MUST_VAR:
-        CHECK('A' <= variable && variable <= 'Z');
-        types_[x][y] = t;
-        vars_[x][y] = variable;
-        heights_[x] = std::max(height(x), y);
-        break;
-    case PatternType::ALLOW_VAR:
-        CHECK(('A' <= variable && variable <= 'Z') || ('a' <= variable && variable <= 'z'));
-        types_[x][y] = t;
-        vars_[x][y] = std::toupper(variable);
-        heights_[x] = std::max(height(x), y);
-        break;
-    case PatternType::ALLOW_FILLING_IRON:
-        CHECK_EQ(variable, '&');
-        types_[x][y] = t;
-        vars_[x][y] = '&';
-        heights_[x] = std::max(height(x), y);
-        break;
-    default:
-        CHECK(false);
-    }
-}
+    if (!anyPatternBits_.isEmpty())
+        return false;
 
-// static
-PatternType FieldPattern::inferType(char c)
-{
-    if (c == ' ' || c == '.')
-        return PatternType::NONE;
-    if (c == '*')
-        return PatternType::ANY;
-    if (c == '&')
-        return PatternType::ALLOW_FILLING_IRON;
-    if ('A' <= c && c <= 'Z')
-        return PatternType::VAR;
-    if ('a' <= c && c <= 'z')
-        return PatternType::ALLOW_VAR;
-
-    return PatternType::NONE;
-}
-
-Position* FieldPattern::fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldChecker* checked) const
-{
-    DCHECK(!checked->get(x, y));
-
-    if (FieldConstant::HEIGHT < y)
-        return positionQueueHead;
-
-    Position* writeHead = positionQueueHead;
-    Position* readHead = positionQueueHead;
-
-    *writeHead++ = Position(x, y);
-    checked->set(x, y);
-
-    while (readHead != writeHead) {
-        Position p = *readHead++;
-
-        if (variable(p.x + 1, p.y) == c && !checked->get(p.x + 1, p.y)) {
-            *writeHead++ = Position(p.x + 1, p.y);
-            checked->set(p.x + 1, p.y);
-        }
-        if (variable(p.x - 1, p.y) == c && !checked->get(p.x - 1, p.y)) {
-            *writeHead++ = Position(p.x - 1, p.y);
-            checked->set(p.x - 1, p.y);
-        }
-        if (variable(p.x, p.y + 1) == c && !checked->get(p.x, p.y + 1) && p.y + 1 <= FieldConstant::HEIGHT) {
-            *writeHead++ = Position(p.x, p.y + 1);
-            checked->set(p.x, p.y + 1);
-        }
-        if (variable(p.x, p.y - 1) == c && !checked->get(p.x, p.y - 1)) {
-            *writeHead++ = Position(p.x, p.y - 1);
-            checked->set(p.x, p.y - 1);
-        }
+    for (const Pattern& pattern : patterns_) {
+        if (!pattern.allowVarBits.isEmpty())
+            return false;
     }
 
-    return writeHead;
+    return true;
+}
+
+FieldBits FieldPattern::patternBits() const
+{
+    FieldBits bits;
+    for (const Pattern& pattern : patterns_) {
+        bits.setAll(pattern.varBits);
+    }
+
+    return bits;
 }
 
 FieldPattern FieldPattern::mirror() const
 {
     FieldPattern pf(*this);
-    for (int x = 1; x <= 3; ++x) {
-        std::swap(pf.heights_[x], pf.heights_[7 - x]);
-        for (int y = 1; y < MAP_HEIGHT; ++y) {
-            std::swap(pf.vars_[x][y], pf.vars_[7 - x][y]);
-            std::swap(pf.types_[x][y], pf.types_[7 - x][y]);
-        }
+
+    pf.mustPatternBits_ = ::mirror(pf.mustPatternBits_);
+    pf.anyPatternBits_ = ::mirror(pf.anyPatternBits_);
+    pf.ironPatternBits_ = ::mirror(pf.ironPatternBits_);
+
+    for (Pattern& pat : pf.patterns_) {
+        pat.varBits = ::mirror(pat.varBits);
+        pat.allowVarBits = ::mirror(pat.allowVarBits);
     }
 
     return pf;
@@ -186,25 +124,34 @@ FieldPattern FieldPattern::mirror() const
 
 std::string FieldPattern::toDebugString() const
 {
+    char buf[FieldConstant::MAP_WIDTH][FieldConstant::MAP_HEIGHT] {};
+    for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
+        for (int y = 0; y < FieldConstant::HEIGHT; ++y) {
+            buf[x][y] = ' ';
+        }
+    }
+
+    anyPatternBits().iterateBitPositions([&buf](int x, int y) {
+        buf[x][y] = '*';
+    });
+    ironPatternBits().iterateBitPositions([&buf](int x, int y) {
+        buf[x][y] = '&';
+    });
+    for (const Pattern& pattern : patterns()) {
+        pattern.varBits.iterateBitPositions([&](int x, int y) {
+            buf[x][y] = pattern.var;
+        });
+        pattern.allowVarBits.iterateBitPositions([&](int x, int y) {
+            buf[x][y] = std::tolower(pattern.var);
+        });
+    }
+
     std::stringstream ss;
     for (int y = 12; y >= 1; --y) {
         for (int x = 1; x <= 6; ++x) {
-            ss << variable(x, y);
+            ss << buf[x][y];
         }
         ss << endl;
     }
     return ss.str();
-}
-
-int FieldPattern::countVariables() const
-{
-    int count = 0;
-    for (int x = 1; x <= WIDTH; ++x) {
-        for (int y = 1; y <= HEIGHT; ++y) {
-            if ('A' <= variable(x, y) && variable(x, y) <= 'Z')
-                ++count;
-        }
-    }
-
-    return count;
 }

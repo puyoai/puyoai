@@ -15,16 +15,21 @@ BijectionMatcher::BijectionMatcher()
 
 bool BijectionMatcher::match(const FieldPattern& pattern, const CoreField& cf)
 {
-    // Check heights first, since this is fast.
-    for (int x = 1; x <= 6; ++x) {
-        if (cf.height(x) != pattern.height(x))
-            return false;
-    }
+    FieldBits puyoBits = cf.bitField().puyoBits();
+    FieldBits patternBits = pattern.patternBits();
 
-    for (int x = 1; x <= 6; ++x) {
-        int h = pattern.height(x);
-        for (int y = 1; y <= h; ++y) {
-            if (!match(pattern.variable(x, y), cf.color(x, y)))
+    if (puyoBits != patternBits)
+        return false;
+
+    for (const auto& pat : pattern.patterns()) {
+        bool found = false;
+        for (PuyoColor c : NORMAL_PUYO_COLORS) {
+            if ((pat.varBits & cf.bitField().bits(c)).isEmpty())
+                continue;
+            if (found)
+                return false;
+            found = true;
+            if (!match(pat.var, c))
                 return false;
         }
     }
@@ -48,4 +53,3 @@ bool BijectionMatcher::match(char v, PuyoColor c)
 
     return false;
 }
-

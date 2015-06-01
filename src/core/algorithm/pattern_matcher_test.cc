@@ -321,6 +321,8 @@ TEST(PatternMatcherTest, complement1)
     ComplementResult result = PatternMatcher().complement(pattern, original);
     EXPECT_TRUE(result.success);
 
+    EXPECT_EQ(expected, result.complementedField);
+
     CoreField cf(original);
     ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
     EXPECT_EQ(expected, cf);
@@ -401,6 +403,8 @@ TEST(PatternMatcherTest, complement5)
     ComplementResult result = PatternMatcher().complement(pattern, original);
     EXPECT_TRUE(result.success);
 
+    EXPECT_EQ(expected, result.complementedField);
+
     CoreField cf(original);
     ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
     EXPECT_EQ(expected, cf);
@@ -431,6 +435,8 @@ TEST(PatternMatcherTest, complement6)
     ComplementResult result = PatternMatcher().complement(pattern, original, 1);
     EXPECT_TRUE(result.success);
 
+    EXPECT_TRUE(expected1 == result.complementedField || expected2 == result.complementedField);
+
     CoreField cf(original);
     ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
     EXPECT_TRUE(cf == expected1 || cf == expected2);
@@ -458,6 +464,8 @@ TEST(PatternMatcherTest, complementWithAllow1)
 
     ComplementResult result = PatternMatcher().complement(pattern, original, 1);
     EXPECT_TRUE(result.success);
+
+    EXPECT_EQ(expected, result.complementedField);
 
     CoreField cf(original);
     ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
@@ -490,6 +498,8 @@ TEST(PatternMatcherTest, complementWithAllow2)
     ComplementResult result = PatternMatcher().complement(pattern, original, 1);
     EXPECT_TRUE(result.success);
 
+    EXPECT_EQ(expected, result.complementedField);
+
     CoreField cf(original);
     ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
     EXPECT_EQ(expected, cf);
@@ -511,6 +521,8 @@ TEST(PatternMatcherTest, complementWithPlaceholder1)
 
     ComplementResult result = PatternMatcher().complement(pattern, original);
     EXPECT_TRUE(result.success);
+
+    EXPECT_EQ(expected, result.complementedField);
 
     CoreField cf(original);
     cf.removePuyoFrom(4);

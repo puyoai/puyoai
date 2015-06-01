@@ -3,60 +3,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include "core/field_checker.h"
-
 using namespace std;
-
-namespace {
-
-vector<Position> findIgnitionPositions(const FieldPattern& pattern)
-{
-    Position positions[FieldConstant::MAP_WIDTH * FieldConstant::MAP_HEIGHT];
-
-    FieldChecker checked;
-    for (int x = 1; x <= 6; ++x) {
-        for (int y = 1; y <= 12; ++y) {
-            if (checked.get(x, y))
-                continue;
-            if (!(pattern.type(x, y) == PatternType::VAR || pattern.type(x, y) == PatternType::MUST_VAR))
-                continue;
-            char c = pattern.variable(x, y);
-            CHECK('A' <= c && c <= 'Z');
-            Position* p = pattern.fillSameVariablePositions(x, y, c, positions, &checked);
-            if (p - positions >= 4) {
-                std::sort(positions, p);
-                return vector<Position>(positions, p);
-            }
-        }
-    }
-
-    CHECK(false) << "there is no 4-connected variables." << pattern.toDebugString();
-    return vector<Position>();
-}
-
-} // anonymous namespace
-
-const vector<int> PatternBook::s_emptyVector;
-
-PatternBookField::PatternBookField(const string& field, const string& name, int ignitionColumn, double score) :
-    pattern_(field),
-    name_(name),
-    ignitionColumn_(ignitionColumn),
-    score_(score),
-    ignitionPositions_(findIgnitionPositions(pattern_))
-{
-    DCHECK(0 <= ignitionColumn && ignitionColumn <= 6);
-}
-
-PatternBookField::PatternBookField(const FieldPattern& pattern, const string& name, int ignitionColumn, double score) :
-    pattern_(pattern),
-    name_(name),
-    ignitionColumn_(ignitionColumn),
-    score_(score),
-    ignitionPositions_(findIgnitionPositions(pattern_))
-{
-    DCHECK(0 <= ignitionColumn && ignitionColumn <= 6);
-}
 
 bool PatternBook::load(const string& filename)
 {
@@ -122,7 +69,6 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
             for (const auto& cp : p->as<toml::Array>()) {
                 int x = cp.get<int>(0);
                 int y = cp.get<int>(1);
-                CHECK(pbf.pattern().type(x, y) == PatternType::VAR);
                 pbf.mutablePattern()->setMustVar(x, y);
             }
         }
@@ -132,31 +78,28 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
     }
 
     for (int i = 0; i < static_cast<int>(fields_.size()); ++i) {
-        const vector<Position>& ps = fields_[i].ignitionPositions();
-        Slice<Position> slice(ps.data(), ps.size());
-
-        auto it = index_.find(slice);
+        FieldBits ignitionPositions = fields_[i].ignitionPositions();
+        auto it = index_.find(ignitionPositions);
         if (it != index_.end()) {
             it->second.push_back(i);
             continue;
         }
 
         // No such key.
-        unique_ptr<Position[]> newKey(new Position[ps.size()]);
-        std::copy(ps.begin(), ps.end(), newKey.get());
-        index_.emplace(Slice<Position>(newKey.get(), ps.size()), vector<int>{i});
-        indexKeys_.push_back(std::move(newKey));
+        index_.emplace(ignitionPositions, vector<int>{i});
+        indexKeys_.push_back(ignitionPositions);
     }
 
     return true;
 }
 
 pair<PatternBook::IndexIterator, PatternBook::IndexIterator>
-PatternBook::find(Slice<Position> ignitionPositions) const
+PatternBook::find(FieldBits ignitionPositions) const
 {
     auto it = index_.find(ignitionPositions);
     if (it != index_.end())
         return make_pair(it->second.begin(), it->second.end());
 
+    static const vector<int> s_emptyVector;
     return make_pair(s_emptyVector.begin(), s_emptyVector.end());
 }

@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace std;
+
 TEST(StringsTest, contains)
 {
     EXPECT_TRUE(strings::contains("foo", "oo"));
@@ -26,4 +28,13 @@ TEST(StringsTest, isSuffix)
     EXPECT_FALSE(strings::isSuffix("foo", "fo"));
     EXPECT_FALSE(strings::isSuffix("foo", "hoge"));
     EXPECT_FALSE(strings::isSuffix("foo", "barfoo"));
+}
+
+TEST(StringsTest, join)
+{
+    vector<string> ss {
+        "foo", "bar", "foobar"
+    };
+
+    EXPECT_EQ("foo,bar,foobar", strings::join(ss, ","));
 }

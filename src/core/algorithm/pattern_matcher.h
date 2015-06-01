@@ -46,15 +46,18 @@ struct ComplementResult{
     ComplementResult(bool success,
                      const PatternMatchResult matchedResult,
                      int numFilledUnusedVariables,
+                     const CoreField& complementedField,
                      const ColumnPuyoList& cpl) :
         success(success),
         matchedResult(matchedResult),
         numFilledUnusedVariables(numFilledUnusedVariables),
+        complementedField(complementedField),
         complementedPuyoList(cpl) {}
 
     bool success = false;
     PatternMatchResult matchedResult;
     int numFilledUnusedVariables = 0;
+    CoreField complementedField;
     ColumnPuyoList complementedPuyoList;
 };
 
@@ -69,51 +72,11 @@ public:
                                 int numAllowingFillingUnusedVariables = 0);
 
 private:
-    PuyoColor map(char var) const
-    {
-        DCHECK('A' <= var && var <= 'Z') << var;
-        return map_[var - 'A'];
-    }
-
-    bool isSet(char var) const
-    {
-        DCHECK('A' <= var && var <= 'Z') << var;
-        return map_[var - 'A'] != PuyoColor::WALL;
-    }
-
-    void forceSet(char var, PuyoColor pc)
-    {
-        DCHECK('A' <= var && var <= 'Z') << var;
-        map_[var - 'A'] = pc;
-    }
-
-    PuyoColor set(char var, PuyoColor pc)
-    {
-        DCHECK('A' <= var && var <= 'Z') << var;
-        return map_[var - 'A'] = pc;
-    }
-
-    bool isSeen(char var) const { return seen_[var - 'A']; }
-
-    void setSeen(char var)
-    {
-        DCHECK('A' <= var && var <= 'Z') << var;
-        seen_[var - 'A'] = true;
-    }
-
-    bool checkCell(char currentVar, PatternType neighborType, char neighborVar, PuyoColor neighborColor) const;
-    bool checkNeighborsForCompletion(const FieldPattern&, const CoreField&) const;
-    bool fillUnusedVariableColors(const FieldPattern&,
-                                  const CoreField&,
-                                  bool needsNeighborCheck,
-                                  SmallIntSet unusedVariables,
-                                  ColumnPuyoList*);
-    bool complementInternal(const FieldPattern&,
-                            const CoreField&,
-                            ColumnPuyoList*);
-
-    PuyoColor map_[26];
-    bool seen_[26];
+    PatternMatchResult matchInternal(const FieldPattern& fieldPattern,
+                                     const CoreField& field,
+                                     bool ignoresMustVar,
+                                     BitField* complemented,
+                                     PuyoColor env[]);
 };
 
 #endif

@@ -25,7 +25,7 @@ public:
     __m128i& xmm() { return m_; }
     const __m128i& xmm() const { return m_; }
 
-    // These 3 methods are not so fast. Use only when necessary.
+    // These 4 methods are not so fast. Use only when necessary.
     bool get(int x, int y) const { return !_mm_testz_si128(onebit(x, y), m_); }
     void set(int x, int y) { m_ = _mm_or_si128(onebit(x, y), m_); }
     void unset(int x, int y) { m_ = _mm_andnot_si128(onebit(x, y), m_); }
@@ -107,6 +107,25 @@ private:
 
     __m128i m_;
 };
+
+namespace std {
+
+template<>
+struct hash<FieldBits>
+{
+    size_t operator()(const FieldBits& bits) const
+    {
+        union {
+            __m128i m;
+            uint64_t xs[2];
+        };
+        m = bits.xmm();
+
+        return xs[0] + (xs[1] * 33);
+    }
+};
+
+}
 
 inline
 bool FieldBits::isEmpty() const

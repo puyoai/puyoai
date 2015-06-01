@@ -18,6 +18,8 @@ std::string trim(const std::string& s);
 
 std::vector<std::string> split(const std::string& s, char separator);
 
+std::string join(const std::vector<std::string>&, const std::string& sep);
+
 }
 
 #endif
