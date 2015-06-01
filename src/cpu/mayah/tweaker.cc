@@ -332,7 +332,11 @@ int main(int argc, char* argv[])
     unique_ptr<Executor> executor = Executor::makeDefaultExecutor();
 
     EvaluationParameterMap paramMap;
-    CHECK(paramMap.load(FLAGS_feature));
+    if (!paramMap.load(FLAGS_feature)) {
+        std::string filename = string(SRC_DIR) + "/cpu/mayah/" + FLAGS_feature;
+        if (!paramMap.load(filename))
+            CHECK(false) << "parameter cannot be loaded correctly.";
+    }
     paramMap.removeNontokopuyoParameter();
 
     if (!FLAGS_seq.empty() || FLAGS_seed >= 0) {
