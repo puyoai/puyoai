@@ -45,10 +45,16 @@ GUI を付与したい場合、さらに次のライブラリが必要です。
 * SDL_ttf (2.0)
 * SDL_image (2.0)
 
+似非 GUI として http サーバとして動かす場合は次のライブラリが必要です。
+* microhttpd
+
 ビデオキャプチャーをしたい場合、さらに次のライブラリが必要です。
 
 * gcrypt
 * lib-usb1.0
+
+その他、ライブラリではないですがビルドツールとして `cmake` `make` が必要です。
+また `ninja` を使えるとより利便性が上がるかもしれません。
 
 #### Mac OSX の場合
 
@@ -66,11 +72,12 @@ Xcode、コマンドラインツール、homebrew をインストールしてく
 Debian 系 Linux の場合、apt を使うと楽です。
 次のコマンドで必要なものが入るとおもいます。
 
-    $ sudo apt-get install git
-    $ sudo apt-get install clang cmake
+    $ sudo apt-get install git clang++ cmake
     $ sudo apt-get install libgoogle-glog-dev libgflags-dev
     $ sudo apt-get install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
+    $ sudo apt-get install libmicrohttpd-dev
     $ sudo apt-get install libffms2-dev libusb-dev libcrypto++-dev
+    $ sudo apt-get install ninja-build
 
 ### make のしかた
 
@@ -106,12 +113,11 @@ out ディレクトリを掘って、そこでビルドするようにしてく�
 
 最終的に実行したい場合は、リリースビルドでビルドしたものを使うと良いでしょう。最も高速です。
 
-* gflags と glog が cmake に発見されなかった場合、cmake が成功しません。
-* SDL と SDL_ttf がない場合、cmakeは成功しますが、GUIがつきません。
-* capture/ ディレクトリについては、 capture/README を参照してください。
+* `gflags` と `glog` が `cmake` に発見されなかった場合、`cmake` が成功しません。
+* SDL と SDL_ttf がない場合、`cmake` は成功しますが、GUIがつきません。
+* キャプチャ関連については、[capture/README.md](https://github.com/puyoai/puyoai/tree/master/src/capture) を参照してください。
 
-build/ 以下にいくつかビルド用のスクリプトが置かれていますが、ninjaでビルドすることを前提にしています。
-より高速にビルドしたい場合、ninjaの使用も検討してください。
+[build/](https://github.com/puyoai/puyoai/tree/master/build) 以下にいくつかビルド用のスクリプトが置かれていますが、`ninja` でビルドすることを前提にしています。
 
 ## 実行
 
@@ -119,13 +125,19 @@ build/ 以下にいくつかビルド用のスクリプトが置かれていま�
     $ ./duel/duel ./cpu/sample/sample ./cpu/sample_rensa/sample_rensa
 
 `duel` は対戦サーバで、筐体のような役割を果たします。1 つ目の引数 `sample` は 1P 側を担当する AI、2 つ目の引数 `sample_rensa` は 2P 側を担当する AI です。
+`duel` にオプションを渡すことで対戦速度を上げたり、ぷよの色を指定できたり、といろんな機能を引き出すことができます。ドキュメント化されていないものもありますが、
+
+    $ ./duel/duel --help
+
+とすると実装されている機能と必要なオプションが全部出てくるのでとりあえずはそちらを参照してください。
 
 ## ディレクトリの説明
 
 * src/ 主なプログラムのソース。
 * build/ ビルド関連のスクリプトなど。意味のわかる方のみ使ってください。
-* arduino/ Wii実機と接続する際に使う、arduino関連のソース。
+* arduino/ Wii 実機やアーケード基板と接続する際に使う、arduino関連のソース。
 * data/    フォントとか画像とか。
 * testdata/ キャプチャー用のテストデータ。
-* tools/ いろいろなツール類。
-* deprecated/ 過去のソース。今ほどモジュールに分かれていない。
+* tools/ いろいろなツール類。なぜ src/ 以下じゃないのか？
+* deprecated/ 過去のソース。必要な物をサルベージしたら消される運命にあります。参照用。
+
