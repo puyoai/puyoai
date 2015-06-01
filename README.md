@@ -72,7 +72,7 @@ Xcode、コマンドラインツール、homebrew をインストールしてく
 Debian 系 Linux の場合、apt を使うと楽です。
 次のコマンドで必要なものが入るとおもいます。
 
-    $ sudo apt-get install git clang++ cmake
+    $ sudo apt-get install git clang cmake
     $ sudo apt-get install libgoogle-glog-dev libgflags-dev
     $ sudo apt-get install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
     $ sudo apt-get install libmicrohttpd-dev
