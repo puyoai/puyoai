@@ -50,25 +50,7 @@ GUI を付与したい場合、さらに次のライブラリが必要です。
 * gcrypt
 * lib-usb1.0
 
-### make のしかた
-
-cmake を用いて Makefile を生成し、make することを前提にしています。
-
-out ディレクトリを掘って、そこでビルドするようにしてください。
-
-    $ mkdir -p out/Release; cd out/Release
-    $ cmake ../../src
-    $ make -j8
-    $ make test
-
-* gflags と glog が cmake に発見されなかった場合、cmake が成功しません。
-* SDL と SDL_ttf がない場合、cmakeは成功しますが、GUIがつきません。
-* capture/ ディレクトリについては、 capture/README を参照してください。
-
-build/ 以下にいくつかビルド用のスクリプトが置かれていますが、ninjaでビルドすることを前提にしています。
-より高速にビルドしたい場合、ninjaの使用も検討してください。
-
-### Mac OSX の場合
+#### Mac OSX の場合
 
 Mac の場合、homebrew を使うと楽です。
 Xcode、コマンドラインツール、homebrew をインストールしてください。
@@ -79,7 +61,7 @@ Xcode、コマンドラインツール、homebrew をインストールしてく
     $ brew install pkg-config
     $ brew install cmake gflags glog sdl2 SDL2_ttf SDL2_image ffmpeg libusb libgcrypt
 
-### Linux (Ubuntu) の場合
+#### Linux (Ubuntu) の場合
 
 Debian 系 Linux の場合、apt を使うと楽です。
 次のコマンドで必要なものが入るとおもいます。
@@ -87,8 +69,49 @@ Debian 系 Linux の場合、apt を使うと楽です。
     $ sudo apt-get install clang++ cmake
     $ sudo apt-get install libgoogle-glog-dev libgflags-dev
     $ sudo apt-get install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
-    $ sudo apt-get install libffms2-dev libusb-devlibcrypto++-dev
+    $ sudo apt-get install libffms2-dev libusb-dev libcrypto++-dev
 
+### make のしかた
+
+cmake を用いて Makefile を生成し、make することを前提にしています。
+
+out ディレクトリを掘って、そこでビルドするようにしてください。ビルドの種類によって、ディレクトリを分けると楽かもしれません。
+
+デフォルトビルド (-O2, -g)
+
+    $ mkdir -p out/Default; cd out/Default
+    $ cmake ../../src
+    $ make -j8
+    $ make test
+
+デフォルトビルドは、実行が高速であり、クラッシュ時にシンボルが取れるので、AIの開発中にオススメです。
+
+デバッグビルド (-g)
+
+    $ mkdir -p out/Debug; cd out/Debug
+    $ cmake -DCMAKE_BUILD_TYPE=Debug ../../src
+    $ make -j8
+    $ make test
+
+デバッグビルドでは、DCHECK が有効になり、より多くのチェックが実行時に行なわれます。
+なにか新しい機能を作ってテストしている最中などはデバッグビルドが最もオススメです。
+ユニットテストを走らせるときは
+
+リリースビルド (-O3)
+
+    $ mkdir -p out/Release; cd out/Release
+    $ cmake -DCMAKE_BUILD_TYPE=Release ../../src
+    $ make -j8
+    $ make test
+
+最終的に実行したい場合は、リリースビルドでビルドしたものを使うと良いでしょう。最も高速です。
+
+* gflags と glog が cmake に発見されなかった場合、cmake が成功しません。
+* SDL と SDL_ttf がない場合、cmakeは成功しますが、GUIがつきません。
+* capture/ ディレクトリについては、 capture/README を参照してください。
+
+build/ 以下にいくつかビルド用のスクリプトが置かれていますが、ninjaでビルドすることを前提にしています。
+より高速にビルドしたい場合、ninjaの使用も検討してください。
 
 ## 実行
 
