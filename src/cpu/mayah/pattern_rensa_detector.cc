@@ -139,9 +139,9 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         if (!complementResult.success)
             continue;
 
-        double patternScore = 0.0;
+        double patternScore = currentPatternScore;
         if (addsPatternScore)
-            patternScore = pbf.score() * complementResult.matchedResult.matchedBits.popcount() / pbf.numVariables();
+            patternScore += pbf.score() * complementResult.matchedResult.matchedBits.popcount() / pbf.numVariables();
 
         const ColumnPuyoList& cpl = complementResult.complementedPuyoList;
         if (cpl.size() == 0) {
