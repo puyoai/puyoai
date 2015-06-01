@@ -34,6 +34,7 @@ public:
     CoreField() : heights_{} {}
     explicit CoreField(const std::string& url);
     explicit CoreField(const PlainField&);
+    explicit CoreField(const BitField&);
     CoreField(const CoreField&) = default;
 
     static CoreField fromPlainFieldWithDrop(const PlainField& pf) {

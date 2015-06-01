@@ -1,5 +1,7 @@
 #include "base/strings.h"
 
+#include <sstream>
+
 using namespace std;
 
 namespace strings {
@@ -49,5 +51,17 @@ vector<string> split(const string& s, char separator)
     return result;
 }
 
-} // namespace strings
+string join(const vector<string>& strs, const string& sep)
+{
+    if (strs.size() == 0)
+        return string();
 
+    ostringstream os;
+    os << strs[0];
+    for (size_t i = 1; i < strs.size(); ++i) {
+        os << sep << strs[i];
+    }
+    return os.str();
+}
+
+} // namespace strings

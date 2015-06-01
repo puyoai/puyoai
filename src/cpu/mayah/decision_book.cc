@@ -7,6 +7,7 @@
 #include <fstream>
 #include <utility>
 
+#include "base/strings.h"
 #include "core/algorithm/bijection_matcher.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_seq.h"
@@ -26,7 +27,7 @@ Decision makeDecision(const toml::Value& v)
 } // namespace anonymous
 
 DecisionBookField::DecisionBookField(const vector<string>& field, map<string, Decision>&& decisions) :
-    pattern_(field),
+    pattern_(strings::join(field, "")),
     decisions_(move(decisions))
 {
 }

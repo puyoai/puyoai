@@ -1,62 +1,49 @@
 #ifndef CORE_ALGORITHM_PATTERN_FIELD_H_
 #define CORE_ALGORITHM_PATTERN_FIELD_H_
 
-#include <cstdint>
-#include <functional>
 #include <string>
 #include <vector>
 
-#include "core/field_checker.h"
+#include "core/field_bits.h"
 #include "core/field_constant.h"
 
-class ColumnPuyoList;
 class CoreField;
-// class FieldChecker;
-class PatternMatcher;
-struct Position;
 
-enum class PatternType {
-    NONE, ANY, VAR, MUST_VAR, ALLOW_VAR,
-    ALLOW_FILLING_IRON, WALL
-};
-
-// FieldPattern is a field that holds characters.
-// This would be useful if you want to write an algorithm to do pattern-match.
-//
-// Generally we use 'A' to 'Z' for representing variables.
-// ' ' or '.'  represents empty.
-class FieldPattern : FieldConstant {
+class FieldPattern {
 public:
-    FieldPattern();
+    struct Pattern {
+        char var;
+        FieldBits varBits;
+        FieldBits allowVarBits;
+    };
+
     explicit FieldPattern(const std::string&);
-    explicit FieldPattern(const std::vector<std::string>&);
+
+    bool isBijectionMatchable() const;
+    // 'A' - 'Z' is 1, the others are 0.
+    FieldBits patternBits() const;
 
     bool isMatchable(const CoreField&) const;
 
     int numVariables() const { return numVariables_; }
+    void setMustVar(int x, int y) { mustPatternBits_.set(x, y); }
 
-    int height(int x) const { return heights_[x]; }
-    char variable(int x, int y) const { return vars_[x][y]; }
-    PatternType type(int x, int y) const { return types_[x][y]; }
+    const std::vector<Pattern>& patterns() const { return patterns_; }
+    const Pattern& pattern(size_t idx) const { return patterns_[idx]; }
 
-    Position* fillSameVariablePositions(int x, int y, char c, Position* positionQueueHead, FieldChecker*) const;
+    const FieldBits& mustPatternBits() const { return mustPatternBits_; }
+    const FieldBits& anyPatternBits() const { return anyPatternBits_; }
+    const FieldBits& ironPatternBits() const { return ironPatternBits_; }
 
     FieldPattern mirror() const;
-
     std::string toDebugString() const;
 
-    void setMustVar(int x, int y) { types_[x][y] = PatternType::MUST_VAR; }
-
 private:
-    static PatternType inferType(char c);
-    int countVariables() const;
-
-    void setPattern(int x, int y, PatternType t, char variable);
-
-    char vars_[MAP_WIDTH][MAP_HEIGHT];
-    PatternType types_[MAP_WIDTH][MAP_HEIGHT];
-    int heights_[MAP_WIDTH];
     int numVariables_;
+    FieldBits mustPatternBits_;
+    FieldBits anyPatternBits_;
+    FieldBits ironPatternBits_;
+    std::vector<Pattern> patterns_;
 };
 
 #endif // CORE_ALGORITHM_PATTERN_FIELD_H_

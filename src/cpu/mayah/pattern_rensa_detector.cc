@@ -121,16 +121,13 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
 
     // With complement.
     // TODO(mayah): making std::vector is too slow. call currentField.fillErasingPuyoPosition()?
-    Position ignitionPositions[FieldConstant::WIDTH * FieldConstant::HEIGHT];
-    int size = currentField.fillErasingPuyoPositions(ignitionPositions);
+    FieldBits ignitionPosition = currentField.ignitionPuyoBits();
 
     // because of PuyoColor::IRON, sometimes we might have valid erasing puyo.
-    if (size < 4)
+    if (ignitionPosition.isEmpty())
         return;
 
-    std::sort(ignitionPositions, ignitionPositions + size);
-    Slice<Position> slice(ignitionPositions, size);
-    std::pair<PatternBook::IndexIterator, PatternBook::IndexIterator> p = patternBook_.find(slice);
+    std::pair<PatternBook::IndexIterator, PatternBook::IndexIterator> p = patternBook_.find(ignitionPosition);
     bool needsToProceedWithoutComplement = true;
     for (PatternBook::IndexIterator it = p.first; it != p.second; ++it) {
         const PatternBookField& pbf = patternBook_.patternBookField(*it);
