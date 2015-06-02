@@ -14,10 +14,10 @@ using namespace std;
 
 DEFINE_string(algorithm, "", "Choose algorithm: flat, peak, or nohoho");
 
-class SampleFillerAI : public AI {
+class ControlTesterAI : public AI {
 public:
-    SampleFillerAI(int argc, char* argv[]) : AI(argc, argv, "sample-filler") {}
-    virtual ~SampleFillerAI() {}
+    ControlTesterAI(int argc, char* argv[]) : AI(argc, argv, "control-tester") {}
+    virtual ~ControlTesterAI() {}
 
     virtual DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq,
                                const PlayerState& me, const PlayerState& enemy, bool fast) const override
@@ -168,6 +168,6 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    SampleFillerAI(argc, argv).runLoop();
+    ControlTesterAI(argc, argv).runLoop();
     return 0;
 }
