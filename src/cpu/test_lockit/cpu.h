@@ -5,6 +5,8 @@
 #include "read.h"
 #include "coma.h"
 
+namespace test_lockit {
+
 class TestLockitAI : public RawAI {
 public:
     TestLockitAI();
@@ -17,5 +19,7 @@ private:
     COMAI_HI coma2x;
     READ_P r_player[2];
 };
+
+}  // namespace test_lockit
 
 #endif

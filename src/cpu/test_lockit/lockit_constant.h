@@ -1,17 +1,18 @@
 #ifndef CPU_TEST_LOCKIT_CONSTANT_H_
 #define CPU_TEST_LOCKIT_CONSTANT_H_
 
-#define TAT_SIZE 14
-#define EE_SIZE 1
-#define TATE 14
+namespace test_lockit {
 
-#define TM_TMNMUM 40
-#define TM_COLNUM 20
-#define TM_COLPER 8
-#define TM_KINPT 30
-#define TM_JAKKINPT 10
-#define TM_TANKINPT 10
-#define TM_OBJE 10
+const int kHeight = 16;
+const int EE_SIZE = 1;
+
+const int TM_TMNMUM = 40;
+const int TM_COLNUM = 20;
+const int TM_COLPER = 8;
+const int TM_KINPT = 30;
+const int TM_JAKKINPT = 10;
+const int TM_TANKINPT = 10;
+const int TM_OBJE = 10;
 
 extern int q_t;
 extern int w_t;
@@ -31,5 +32,7 @@ extern int renketu_bairitu;
 
 extern bool is_2dub_cpu;
 extern bool uses_2x_hyouka;
+
+}  // namespace test_lockit
 
 #endif

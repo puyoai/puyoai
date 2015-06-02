@@ -9,6 +9,8 @@
 
 #include "coma.h"
 
+namespace test_lockit {
+
 int chainhyk[22][22][221][EE_SIZE], poihyo[22][22][221][EE_SIZE];
 int score_hukasa[22][22][221] {};
 
@@ -103,9 +105,9 @@ COMAI_HI::~COMAI_HI()
 {
 }
 
-int COMAI_HI::aite_attack_start(const int ba3[6][TATE], int zenkesi_aite, int scos, int hakata)
+int COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
 {
-    int ba[6][TAT_SIZE] {};
+    int ba[6][kHeight] {};
     int i, j;
     int kosuu_mae = 0, kosuu_ato = 0;
     int score = 0;
@@ -150,7 +152,7 @@ int COMAI_HI::aite_attack_start(const int ba3[6][TATE], int zenkesi_aite, int sc
     return ret_keshi;
 }
 
-int COMAI_HI::aite_attack_nokori(const int [6][TATE], int hakata)
+int COMAI_HI::aite_attack_nokori(const int [6][kHeight], int hakata)
 {
     aite_hakka_nokori = aite_hakka_rensa - (hakata - hakkatime + 30) / 40;
     return 0;
@@ -170,13 +172,13 @@ int COMAI_HI::aite_rensa_end()
     return 0;
 }
 
-int COMAI_HI::aite_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2)
+int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx, int nnx2)
 {
-    int ba2[6][TAT_SIZE] {};
-    int ba[6][TAT_SIZE] {};
-    int ba_a[6][TAT_SIZE] {};
-    int ba_b[6][TAT_SIZE] {};
-    int ba_d[6][TAT_SIZE] {};
+    int ba2[6][kHeight] {};
+    int ba[6][kHeight] {};
+    int ba_a[6][kHeight] {};
+    int ba_b[6][kHeight] {};
+    int ba_d[6][kHeight] {};
     int point[6][12];
     int i, j;
     int num;
@@ -403,12 +405,12 @@ int COMAI_HI::aite_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, in
     return 0;
 }
 
-int COMAI_HI::hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE],
+int COMAI_HI::hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][kHeight],
                      int zenkesi_aite)
 {
-    int ba[6][TAT_SIZE] {};
-    int ba_a[6][TAT_SIZE] {};
-    int ba2[6][TAT_SIZE] {};
+    int ba[6][kHeight] {};
+    int ba_a[6][kHeight] {};
+    int ba2[6][kHeight] {};
     int point[6][12];
     int i, j;
     int num = 0;
@@ -436,7 +438,7 @@ int COMAI_HI::hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx
     int ichiren_kesi = 0;
 
     int ee;
-    int ba_ee[6][TAT_SIZE];
+    int ba_ee[6][kHeight];
     int keshiko_aa, keshiko_bb;
     int syuusoku = 0;
 
@@ -1129,7 +1131,7 @@ int COMAI_HI::hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx
     return 0;
 }
 
-int COMAI_HI::saiki(const int ba[][TAT_SIZE], int point[][12], int x, int y, int* num, int incol)
+int COMAI_HI::saiki(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -1143,7 +1145,7 @@ int COMAI_HI::saiki(const int ba[][TAT_SIZE], int point[][12], int x, int y, int
         saiki_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int COMAI_HI::saiki_right(const int ba[][TAT_SIZE], int point[][12], int x, int y, int* num, int incol)
+int COMAI_HI::saiki_right(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -1155,7 +1157,7 @@ int COMAI_HI::saiki_right(const int ba[][TAT_SIZE], int point[][12], int x, int 
         saiki_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int COMAI_HI::saiki_left(const int ba[][TAT_SIZE], int point[][12], int x, int y, int* num, int incol)
+int COMAI_HI::saiki_left(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -1167,7 +1169,7 @@ int COMAI_HI::saiki_left(const int ba[][TAT_SIZE], int point[][12], int x, int y
         saiki_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int COMAI_HI::saiki_up(const int ba[][TAT_SIZE], int point[][12], int x, int y, int* num, int incol)
+int COMAI_HI::saiki_up(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -1179,7 +1181,7 @@ int COMAI_HI::saiki_up(const int ba[][TAT_SIZE], int point[][12], int x, int y, 
         saiki_right(ba, point, x + 1, y, num, incol);
     return 0;
 }
-int COMAI_HI::saiki_down(const int ba[][TAT_SIZE], int point[][12], int x, int y, int* num, int incol)
+int COMAI_HI::saiki_down(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -1191,7 +1193,7 @@ int COMAI_HI::saiki_down(const int ba[][TAT_SIZE], int point[][12], int x, int y
         saiki_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int COMAI_HI::syou(int ba[][TAT_SIZE], int x, int y, int incol, int flg[])
+int COMAI_HI::syou(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
     ba[x][y] = 0;
     flg[x] = 1;
@@ -1217,7 +1219,7 @@ int COMAI_HI::syou(int ba[][TAT_SIZE], int x, int y, int incol, int flg[])
         ba[x][y - 1] = 0;
     return 0;
 }
-int COMAI_HI::syou_right(int ba[][TAT_SIZE], int x, int y, int incol, int flg[])
+int COMAI_HI::syou_right(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
     ba[x][y] = 0;
     flg[x] = 1;
@@ -1237,7 +1239,7 @@ int COMAI_HI::syou_right(int ba[][TAT_SIZE], int x, int y, int incol, int flg[])
         ba[x][y - 1] = 0;
     return 0;
 }
-int COMAI_HI::syou_left(int ba[][TAT_SIZE], int x, int y, int incol, int flg[])
+int COMAI_HI::syou_left(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
     ba[x][y] = 0;
     flg[x] = 1;
@@ -1257,7 +1259,7 @@ int COMAI_HI::syou_left(int ba[][TAT_SIZE], int x, int y, int incol, int flg[])
         ba[x][y - 1] = 0;
     return 0;
 }
-int COMAI_HI::syou_up(int ba[][TAT_SIZE], int x, int y, int incol, int flg[])
+int COMAI_HI::syou_up(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
     ba[x][y] = 0;
     if ((x != 0) && (ba[x - 1][y] == incol))
@@ -1278,7 +1280,7 @@ int COMAI_HI::syou_up(int ba[][TAT_SIZE], int x, int y, int incol, int flg[])
     }
     return 0;
 }
-int COMAI_HI::syou_down(int ba[][TAT_SIZE], int x, int y, int incol, int flg[])
+int COMAI_HI::syou_down(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
     ba[x][y] = 0;
     if ((x != 0) && (ba[x - 1][y] == incol))
@@ -1299,7 +1301,7 @@ int COMAI_HI::syou_down(int ba[][TAT_SIZE], int x, int y, int incol, int flg[])
         ba[x][y - 1] = 0;
     return 0;
 }
-int COMAI_HI::syou_downx(int ba[][TAT_SIZE], int x, int y, int incol, int flg[], int* num)
+int COMAI_HI::syou_downx(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
 {
     *num += 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
@@ -1320,7 +1322,7 @@ int COMAI_HI::syou_downx(int ba[][TAT_SIZE], int x, int y, int incol, int flg[],
         ba[x][y - 1] = 0;
     return 0;
 }
-int COMAI_HI::syou_right_num(int ba[][TAT_SIZE], int x, int y, int incol, int flg[], int* num)
+int COMAI_HI::syou_right_num(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
 {
     ba[x][y] = 0;
     flg[x] = 1;
@@ -1340,7 +1342,7 @@ int COMAI_HI::syou_right_num(int ba[][TAT_SIZE], int x, int y, int incol, int fl
         ba[x][y - 1] = 0;
     return 0;
 }
-int COMAI_HI::syou_left_num(int ba[][TAT_SIZE], int x, int y, int incol, int flg[], int* num)
+int COMAI_HI::syou_left_num(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
 {
     ba[x][y] = 0;
     flg[x] = 1;
@@ -1360,7 +1362,7 @@ int COMAI_HI::syou_left_num(int ba[][TAT_SIZE], int x, int y, int incol, int flg
         ba[x][y - 1] = 0;
     return 0;
 }
-int COMAI_HI::syou_up_num(int ba[][TAT_SIZE], int x, int y, int incol, int flg[], int* num)
+int COMAI_HI::syou_up_num(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
 {
     ba[x][y] = 0;
     if ((x != 0) && (ba[x - 1][y] == incol))
@@ -1381,7 +1383,7 @@ int COMAI_HI::syou_up_num(int ba[][TAT_SIZE], int x, int y, int incol, int flg[]
     }
     return 0;
 }
-int COMAI_HI::syou_down_num(int ba[][TAT_SIZE], int x, int y, int incol, int flg[], int* num)
+int COMAI_HI::syou_down_num(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
 {
     ba[x][y] = 0;
     if ((x != 0) && (ba[x - 1][y] == incol))
@@ -1403,7 +1405,7 @@ int COMAI_HI::syou_down_num(int ba[][TAT_SIZE], int x, int y, int incol, int flg
     return 0;
 }
 
-int COMAI_HI::saiki_3(const int ba[][TAT_SIZE], int point[][12], int x, int y, int* num, int incol)
+int COMAI_HI::saiki_3(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -1417,7 +1419,7 @@ int COMAI_HI::saiki_3(const int ba[][TAT_SIZE], int point[][12], int x, int y, i
         saiki_3_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int COMAI_HI::saiki_3_right(const int ba[][TAT_SIZE], int point[][12], int x, int y, int* num, int incol)
+int COMAI_HI::saiki_3_right(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -1429,7 +1431,7 @@ int COMAI_HI::saiki_3_right(const int ba[][TAT_SIZE], int point[][12], int x, in
         saiki_3_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int COMAI_HI::saiki_3_left(const int ba[][TAT_SIZE], int point[][12], int x, int y, int* num, int incol)
+int COMAI_HI::saiki_3_left(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -1441,7 +1443,7 @@ int COMAI_HI::saiki_3_left(const int ba[][TAT_SIZE], int point[][12], int x, int
         saiki_3_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int COMAI_HI::saiki_3_up(const int ba[][TAT_SIZE], int point[][12], int x, int y, int* num, int incol)
+int COMAI_HI::saiki_3_up(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -1453,7 +1455,7 @@ int COMAI_HI::saiki_3_up(const int ba[][TAT_SIZE], int point[][12], int x, int y
         saiki_3_right(ba, point, x + 1, y, num, incol);
     return 0;
 }
-int COMAI_HI::saiki_3_down(const int ba[][TAT_SIZE], int point[][12], int x, int y, int* num, int incol)
+int COMAI_HI::saiki_3_down(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -1466,7 +1468,7 @@ int COMAI_HI::saiki_3_down(const int ba[][TAT_SIZE], int point[][12], int x, int
     return 0;
 }
 
-int COMAI_HI::syou_2(int ba[][TAT_SIZE], int x, int y, int incol)
+int COMAI_HI::syou_2(int ba[][kHeight], int x, int y, int incol)
 {
     ba[x][y] = 0;
     if ((x != 0) && (ba[x - 1][y] == incol))
@@ -1488,7 +1490,7 @@ int COMAI_HI::syou_2(int ba[][TAT_SIZE], int x, int y, int incol)
     return 0;
 }
 
-int COMAI_HI::tobashi_hantei_a(const int ba2[][TAT_SIZE], int aa, int nx1, int nx2)
+int COMAI_HI::tobashi_hantei_a(const int ba2[][kHeight], int aa, int nx1, int nx2)
 {
     if (nx1 == nx2) {
         if (((aa > 5) && (aa < 12)) || ((aa > 13) && (aa < 19)))
@@ -1525,7 +1527,7 @@ int COMAI_HI::tobashi_hantei_a(const int ba2[][TAT_SIZE], int aa, int nx1, int n
     return 0;
 }
 
-int COMAI_HI::setti_puyo(int ba[][TAT_SIZE], int aa, int nx1, int nx2, int setti_basyo[])
+int COMAI_HI::setti_puyo(int ba[][kHeight], int aa, int nx1, int nx2, int setti_basyo[])
 {
     int j;
     if (aa < 6) {
@@ -1590,7 +1592,7 @@ int COMAI_HI::setti_puyo(int ba[][TAT_SIZE], int aa, int nx1, int nx2, int setti
     return 0;
 }
 
-int COMAI_HI::tobashi_hantei_b(const int ba2[][TAT_SIZE], int aa)
+int COMAI_HI::tobashi_hantei_b(const int ba2[][kHeight], int aa)
 {
     if (ba2[0][11] != 0) {
         if ((aa == 0) || (aa == 6) || (aa == 12) || (aa == 17))
@@ -1623,7 +1625,7 @@ int COMAI_HI::tobashi_hantei_b(const int ba2[][TAT_SIZE], int aa)
     return 0;
 }
 
-int COMAI_HI::chousei_syoukyo(int ba[][TAT_SIZE], int setti_basyo[])
+int COMAI_HI::chousei_syoukyo(int ba[][kHeight], int setti_basyo[])
 {
     int num = 0;
     int numa = 0;
@@ -1724,7 +1726,7 @@ int COMAI_HI::chousei_syoukyo(int ba[][TAT_SIZE], int setti_basyo[])
     return keshiko;
 }
 
-int COMAI_HI::hon_syoukyo(int ba[][TAT_SIZE])
+int COMAI_HI::hon_syoukyo(int ba[][kHeight])
 {
     int num = 0;
     int point[6][12] {};
@@ -1782,7 +1784,7 @@ int COMAI_HI::hon_syoukyo(int ba[][TAT_SIZE])
     return chain;
 }
 
-int COMAI_HI::hon_syoukyo_score(int ba[][TAT_SIZE], int* score, int* quick)
+int COMAI_HI::hon_syoukyo_score(int ba[][kHeight], int* score, int* quick)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };
@@ -1875,7 +1877,7 @@ int COMAI_HI::hon_syoukyo_score(int ba[][TAT_SIZE], int* score, int* quick)
     return chain;
 }
 
-int COMAI_HI::setti_puyo_1(int ba[][TAT_SIZE], int eex, int eecol)
+int COMAI_HI::setti_puyo_1(int ba[][kHeight], int eex, int eecol)
 {
     int j;
     int oita = 0;
@@ -1897,7 +1899,7 @@ int COMAI_HI::setti_puyo_1(int ba[][TAT_SIZE], int eex, int eecol)
 
     return 0;
 }
-int COMAI_HI::saiki_4(int ba[][TAT_SIZE], int x, int y, int* num, int incol)
+int COMAI_HI::saiki_4(int ba[][kHeight], int x, int y, int* num, int incol)
 {
     ba[x][y] = 0;
     *num += 1;
@@ -1917,7 +1919,7 @@ int COMAI_HI::saiki_4(int ba[][TAT_SIZE], int x, int y, int* num, int incol)
     return 0;
 }
 
-int COMAI_HI::chousei_syoukyo_2(int ba[][TAT_SIZE], int setti_basyo[], int* chain, int dabuchk[], int* ichiren_kesi, int* score)
+int COMAI_HI::chousei_syoukyo_2(int ba[][kHeight], int setti_basyo[], int* chain, int dabuchk[], int* ichiren_kesi, int* score)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };
@@ -2065,7 +2067,7 @@ int COMAI_HI::chousei_syoukyo_2(int ba[][TAT_SIZE], int setti_basyo[], int* chai
     return keshiko;
 }
 
-int COMAI_HI::chousei_syoukyo_sc(int ba[][TAT_SIZE], int setti_basyo[], int* score)
+int COMAI_HI::chousei_syoukyo_sc(int ba[][kHeight], int setti_basyo[], int* score)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };
@@ -2209,7 +2211,7 @@ int COMAI_HI::chousei_syoukyo_sc(int ba[][TAT_SIZE], int setti_basyo[], int* sco
     return keshiko;
 }
 
-int COMAI_HI::chousei_syoukyo_3(int bass[][TAT_SIZE], int[], int* poi2s, int* score, int tokus, int i2, int j2)
+int COMAI_HI::chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };
@@ -2346,7 +2348,7 @@ int COMAI_HI::chousei_syoukyo_3(int bass[][TAT_SIZE], int[], int* poi2s, int* sc
     return chain;
 }
 
-int COMAI_HI::gtr(const int f[][TAT_SIZE])
+int COMAI_HI::gtr(const int f[][kHeight])
 {
     int sc = 0;
 
@@ -2441,7 +2443,7 @@ int COMAI_HI::gtr(const int f[][TAT_SIZE])
     return sc;
 }
 
-int COMAI_HI::setti_ojama(int f[][TAT_SIZE], int ojamako)
+int COMAI_HI::setti_ojama(int f[][kHeight], int ojamako)
 {
     int i, j;
     int cnt;
@@ -2573,13 +2575,13 @@ int COMAI_HI::read_template()
     return numg;
 }
 
-int COMAI_HI::pre_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE],
+int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][kHeight],
                          int zenkesi_aite, int fast)
 {
-    int ba[6][TAT_SIZE] {};
-    int ba_a[6][TAT_SIZE] {};
-    int ba2[6][TAT_SIZE] {};
-    int bass[6][TAT_SIZE];
+    int ba[6][kHeight] {};
+    int ba_a[6][kHeight] {};
+    int ba2[6][kHeight] {};
+    int bass[6][kHeight];
     int point[6][12];
     int point2[6][12] = {
         {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}, {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
@@ -2613,7 +2615,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int
     int ichiren_kesi = 0;
 
     int ee, eex, eecol;
-    int ba_ee[6][TAT_SIZE];
+    int ba_ee[6][kHeight];
     int keshiko_aa, keshiko_bb, keshiko_dd;
 
     int ccolor, cplace, coita, cyy = 0;
@@ -3452,3 +3454,5 @@ int COMAI_HI::pre_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int
     } // dd
     return 0;
 }
+
+}  // namespace test_lockit

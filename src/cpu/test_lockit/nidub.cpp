@@ -3,6 +3,8 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+namespace test_lockit {
+
 int q_t = 1;
 int w_t = 1;
 int e_t = 1;
@@ -21,12 +23,15 @@ int renketu_bairitu = 4; // S
 bool is_2dub_cpu = true;
 bool uses_2x_hyouka = false;
 
+}  // namespace test_lockit
+
 int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    TestLockitAI().runLoop();
+    test_lockit::TestLockitAI().runLoop();
+
     return 0;
 }
