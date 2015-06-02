@@ -12,6 +12,8 @@
 
 using namespace std;
 
+namespace test_lockit {
+
 namespace {
 int count_tsumo_2p = 0;
 
@@ -237,7 +239,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
             // 2x hyouka
             int field_kosuu = 0;
             for (int i = 0; i < 6; ++i) {
-                for (int j = 0; j < TATE; ++j) {
+                for (int j = 0; j < kHeight; ++j) {
                     if (r_player[0].field[i][j] != 0) {
                         ++field_kosuu;
                     }
@@ -248,10 +250,10 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
                 field_kosuu = 0;
             }
 
-            int field2x[6][TATE] {};
+            int field2x[6][kHeight] {};
             for (int i = 0; i < 6; ++i) {
                 for (int j = 0; j < 14; ++j) {
-                    field2x[i][j] = (j + 4 < TATE) ? r_player[0].field[i][j+4] : 0;
+                    field2x[i][j] = (j + 4 < kHeight) ? r_player[0].field[i][j+4] : 0;
                 }
             }
 
@@ -334,3 +336,6 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
 
     return response;
 }
+
+}  // namespace test_lockit
+

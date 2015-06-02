@@ -5,6 +5,8 @@
 
 #include "color.h"
 
+namespace test_lockit {
+
 TLColor toTLColor(PuyoColor pc)
 {
     switch (pc) {
@@ -37,7 +39,7 @@ CoreField toCoreField(int f[6][18]) {
     for (int j = 0; j < 14; ++j) {
       if (f[i][j] == TL_EMPTY)
 	break;
-      cf.dropPuyoOn(i + 1, toPuyoColor(f[i][j]));
+      cf.dropPuyoOn(i + 1, toPuyoColor(TLColor(f[i][j])));
     }
   }
   return cf;
@@ -53,3 +55,5 @@ void toTLField(const CoreField& cf, int f[6][18]) {
     }
   }
 }
+
+}  // namespace test_lockit

@@ -4,6 +4,8 @@
 
 using namespace std;
 
+namespace test_lockit {
+
 void READ_P::ref()
 {
     int i, j;
@@ -286,7 +288,7 @@ int READ_P::chousei_syoukyo()
     return 1;
 }
 
-int READ_P::saiki(int ba[][TATE], int point[][12], int x, int y, int* num, int incol)
+int READ_P::saiki(int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -300,7 +302,7 @@ int READ_P::saiki(int ba[][TATE], int point[][12], int x, int y, int* num, int i
         saiki_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int READ_P::saiki_right(int ba[][TATE], int point[][12], int x, int y, int* num, int incol)
+int READ_P::saiki_right(int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -312,7 +314,7 @@ int READ_P::saiki_right(int ba[][TATE], int point[][12], int x, int y, int* num,
         saiki_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int READ_P::saiki_left(int ba[][TATE], int point[][12], int x, int y, int* num, int incol)
+int READ_P::saiki_left(int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -324,7 +326,7 @@ int READ_P::saiki_left(int ba[][TATE], int point[][12], int x, int y, int* num, 
         saiki_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int READ_P::saiki_up(int ba[][TATE], int point[][12], int x, int y, int* num, int incol)
+int READ_P::saiki_up(int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -336,7 +338,7 @@ int READ_P::saiki_up(int ba[][TATE], int point[][12], int x, int y, int* num, in
         saiki_right(ba, point, x + 1, y, num, incol);
     return 0;
 }
-int READ_P::saiki_down(int ba[][TATE], int point[][12], int x, int y, int* num, int incol)
+int READ_P::saiki_down(int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -348,7 +350,7 @@ int READ_P::saiki_down(int ba[][TATE], int point[][12], int x, int y, int* num, 
         saiki_down(ba, point, x, y - 1, num, incol);
     return 0;
 }
-int READ_P::syou(int ba[][TATE], int x, int y, int incol, int flg[])
+int READ_P::syou(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
     ba[x][y] = 0;
     flg[x] = 1;
@@ -374,7 +376,7 @@ int READ_P::syou(int ba[][TATE], int x, int y, int incol, int flg[])
         ba[x][y - 1] = 0;
     return 0;
 }
-int READ_P::syou_right(int ba[][TATE], int x, int y, int incol, int flg[])
+int READ_P::syou_right(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
     ba[x][y] = 0;
     flg[x] = 1;
@@ -394,7 +396,7 @@ int READ_P::syou_right(int ba[][TATE], int x, int y, int incol, int flg[])
         ba[x][y - 1] = 0;
     return 0;
 }
-int READ_P::syou_left(int ba[][TATE], int x, int y, int incol, int flg[])
+int READ_P::syou_left(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
     ba[x][y] = 0;
     flg[x] = 1;
@@ -414,7 +416,7 @@ int READ_P::syou_left(int ba[][TATE], int x, int y, int incol, int flg[])
         ba[x][y - 1] = 0;
     return 0;
 }
-int READ_P::syou_up(int ba[][TATE], int x, int y, int incol, int flg[])
+int READ_P::syou_up(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
     ba[x][y] = 0;
     flg[x] = 1;
@@ -436,7 +438,7 @@ int READ_P::syou_up(int ba[][TATE], int x, int y, int incol, int flg[])
     }
     return 0;
 }
-int READ_P::syou_down(int ba[][TATE], int x, int y, int incol, int flg[])
+int READ_P::syou_down(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
     ba[x][y] = 0;
     flg[x] = 1;
@@ -458,3 +460,6 @@ int READ_P::syou_down(int ba[][TATE], int x, int y, int incol, int flg[])
         ba[x][y - 1] = 0;
     return 0;
 }
+
+}  // namespace test_lockit
+

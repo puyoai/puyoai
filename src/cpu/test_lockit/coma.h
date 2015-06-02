@@ -3,6 +3,8 @@
 
 #include "lockit_constant.h"
 
+namespace test_lockit {
+
 /* for TAIOU TYPE?
 int q_t=1;
 int w_t=1;
@@ -26,11 +28,11 @@ public:
     COMAI_HI();
     ~COMAI_HI();
 
-    int aite_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2);
-    int pre_hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE], int zenkesi_aite, int fast);
-    int hyouka(const int ba3[6][TATE], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][TATE], int zenkesi_aite);
-    int aite_attack_start(const int ba3[6][TATE], int zenkesi_aite, int scos, int hakata);
-    int aite_attack_nokori(const int ba3[6][TATE], int hakata);
+    int aite_hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx, int nnx2);
+    int pre_hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][kHeight], int zenkesi_aite, int fast);
+    int hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][kHeight], int zenkesi_aite);
+    int aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int scos, int hakata);
+    int aite_attack_nokori(const int ba3[6][kHeight], int hakata);
     int aite_rensa_end();
     void ref();
 
@@ -40,46 +42,46 @@ public:
     int aite_hakkaji_score;
 
 private:
-    int saiki(const int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_right(const int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_left(const int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_up(const int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_down(const int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki(const int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_right(const int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_left(const int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_up(const int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_down(const int[][kHeight], int[][12], int, int, int*, int);
 
-    int saiki_3(const int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_3_right(const int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_3_left(const int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_3_up(const int[][TAT_SIZE], int[][12], int, int, int*, int);
-    int saiki_3_down(const int[][TAT_SIZE], int[][12], int, int, int*, int);
+    int saiki_3(const int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_3_right(const int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_3_left(const int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_3_up(const int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_3_down(const int[][kHeight], int[][12], int, int, int*, int);
 
-    int saiki_4(int[][TAT_SIZE], int, int, int*, int);
+    int saiki_4(int[][kHeight], int, int, int*, int);
 
-    int syou(int[][TAT_SIZE], int, int, int, int[]);
-    int syou_right(int[][TAT_SIZE], int, int, int, int[]);
-    int syou_left(int[][TAT_SIZE], int, int, int, int[]);
-    int syou_up(int[][TAT_SIZE], int, int, int, int[]);
-    int syou_down(int[][TAT_SIZE], int, int, int, int[]);
-    int syou_downx(int[][TAT_SIZE], int, int, int, int[], int*);
-    int syou_right_num(int[][TAT_SIZE], int, int, int, int[], int*);
-    int syou_left_num(int[][TAT_SIZE], int, int, int, int[], int*);
-    int syou_up_num(int[][TAT_SIZE], int, int, int, int[], int*);
-    int syou_down_num(int[][TAT_SIZE], int, int, int, int[], int*);
-    int syou_2(int[][TAT_SIZE], int, int, int);
+    int syou(int[][kHeight], int, int, int, int[]);
+    int syou_right(int[][kHeight], int, int, int, int[]);
+    int syou_left(int[][kHeight], int, int, int, int[]);
+    int syou_up(int[][kHeight], int, int, int, int[]);
+    int syou_down(int[][kHeight], int, int, int, int[]);
+    int syou_downx(int[][kHeight], int, int, int, int[], int*);
+    int syou_right_num(int[][kHeight], int, int, int, int[], int*);
+    int syou_left_num(int[][kHeight], int, int, int, int[], int*);
+    int syou_up_num(int[][kHeight], int, int, int, int[], int*);
+    int syou_down_num(int[][kHeight], int, int, int, int[], int*);
+    int syou_2(int[][kHeight], int, int, int);
 
-    int setti_ojama(int[][TAT_SIZE], int);
+    int setti_ojama(int[][kHeight], int);
 
-    int tobashi_hantei_a(const int[][TAT_SIZE], int, int, int);
-    int setti_puyo(int[][TAT_SIZE], int, int, int, int[]);
-    int tobashi_hantei_b(const int[][TAT_SIZE], int);
-    int chousei_syoukyo(int[][TAT_SIZE], int[]);
-    int chousei_syoukyo_2(int[][TAT_SIZE], int[], int*, int[], int*, int*);
-    int chousei_syoukyo_3(int[][TAT_SIZE], int[], int*, int*, int, int, int);
-    int chousei_syoukyo_sc(int[][TAT_SIZE], int[], int*);
-    int hon_syoukyo(int[][TAT_SIZE]);
-    int hon_syoukyo_score(int[][TAT_SIZE], int*, int*);
+    int tobashi_hantei_a(const int[][kHeight], int, int, int);
+    int setti_puyo(int[][kHeight], int, int, int, int[]);
+    int tobashi_hantei_b(const int[][kHeight], int);
+    int chousei_syoukyo(int[][kHeight], int[]);
+    int chousei_syoukyo_2(int[][kHeight], int[], int*, int[], int*, int*);
+    int chousei_syoukyo_3(int[][kHeight], int[], int*, int*, int, int, int);
+    int chousei_syoukyo_sc(int[][kHeight], int[], int*);
+    int hon_syoukyo(int[][kHeight]);
+    int hon_syoukyo_score(int[][kHeight], int*, int*);
 
-    int setti_puyo_1(int[][TAT_SIZE], int, int);
-    int gtr(const int[][TAT_SIZE]);
+    int setti_puyo_1(int[][kHeight], int, int);
+    int gtr(const int[][kHeight]);
 
     int read_template();
 
@@ -135,5 +137,7 @@ private:
     int aa_max_score;
     int hakkatime;
 };
+
+}  // namespace test_lockit
 
 #endif

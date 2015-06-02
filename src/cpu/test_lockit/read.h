@@ -3,6 +3,8 @@
 
 #include "lockit_constant.h"
 
+namespace test_lockit {
+
 class READ_P {
 public:
     READ_P();
@@ -15,8 +17,8 @@ public:
     void field_kioku();
     int field_hikaku();
 
-    int field[6][TATE];
-    int yosou_field[6][TATE];
+    int field[6][kHeight];
+    int yosou_field[6][kHeight];
     int tsumo[6];
     int act_on;
     int nex_on;
@@ -33,22 +35,24 @@ public:
 private:
     int chousei_syoukyo();
 
-    int saiki(int[][TATE], int[][12], int, int, int*, int);
-    int saiki_right(int[][TATE], int[][12], int, int, int*, int);
-    int saiki_left(int[][TATE], int[][12], int, int, int*, int);
-    int saiki_up(int[][TATE], int[][12], int, int, int*, int);
-    int saiki_down(int[][TATE], int[][12], int, int, int*, int);
-    int syou(int[][TATE], int, int, int, int[]);
-    int syou_right(int[][TATE], int, int, int, int[]);
-    int syou_left(int[][TATE], int, int, int, int[]);
-    int syou_up(int[][TATE], int, int, int, int[]);
-    int syou_down(int[][TATE], int, int, int, int[]);
+    int saiki(int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_right(int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_left(int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_up(int[][kHeight], int[][12], int, int, int*, int);
+    int saiki_down(int[][kHeight], int[][12], int, int, int*, int);
+    int syou(int[][kHeight], int, int, int, int[]);
+    int syou_right(int[][kHeight], int, int, int, int[]);
+    int syou_left(int[][kHeight], int, int, int, int[]);
+    int syou_up(int[][kHeight], int, int, int, int[]);
+    int syou_down(int[][kHeight], int, int, int, int[]);
 
     int field12[6];
-    int field_hoz[6][TATE];
+    int field_hoz[6][kHeight];
     int act_on_1st;
     int rensa_end_once;
     int setti_basyo[4];
 };
+
+}  // namespace test_lockit
 
 #endif
