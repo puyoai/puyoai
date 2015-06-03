@@ -14,6 +14,19 @@ using namespace std;
 
 namespace test_lockit {
 
+namespace {
+
+bool IsTLFieldEmpty(const int field[6][kHeight]) {
+  for (int i = 0; i < 6; ++i) {
+    if (field[i][0] != TL_EMPTY) {
+      return false;
+    }
+  }
+  return true;
+}
+
+}  // namespace
+
 TestLockitAI::TestLockitAI()
 {
     r_player[0].ref();
@@ -41,8 +54,9 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
             p1->tsumo[4] = toTLColor(seq.axis(2));
             p1->tsumo[5] = toTLColor(seq.child(2));
         } else {
-            p1->tsumo[4] = TLColor::TL_EMPTY;
-            p1->tsumo[5] = TLColor::TL_EMPTY;
+            // Assume R-R is the next tsumo.
+            p1->tsumo[4] = TLColor::TL_RED;
+            p1->tsumo[5] = TLColor::TL_RED;
         }
     }
     {
@@ -55,8 +69,9 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
             p2->tsumo[4] = toTLColor(seq.axis(2));
             p2->tsumo[5] = toTLColor(seq.child(2));
         } else {
-            p2->tsumo[4] = 0;
-            p2->tsumo[5] = 0;
+            // Assume R-R is the next tsumo.
+            p2->tsumo[4] = TLColor::TL_RED;
+            p2->tsumo[5] = TLColor::TL_RED;
         }
     }
 
@@ -121,66 +136,42 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
 
     FrameResponse response(request.frameId);
 
-    if (r_player[1].set_puyo == 1) { //相手攻撃判断
+    // 相手攻撃判断
+    if (r_player[1].set_puyo == 1) {
         r_player[1].set_puyo_once = 1;
         r_player[1].fall();
         r_player[1].keep_score = r_player[1].score;
-        if (coma.aite_attack_start(r_player[1].field, r_player[1].zenkesi, coma.aite_hakkaji_score, r_player[0].id)) { //スコア取得バグ
+        if (coma.aite_attack_start(r_player[1].field, r_player[1].zenkesi, coma.aite_hakkaji_score, r_player[0].id)) {
             r_player[1].zenkesi = 0;
         }
     }
-    if (r_player[1].rensa_end == 1) { //相手全消し,全消し消化判断
-        if ((r_player[1].field[0][0] == 0) && (r_player[1].field[1][0] == 0) && (r_player[1].field[2][0] == 0)
-            && (r_player[1].field[3][0] == 0) && (r_player[1].field[4][0] == 0)
-            && (r_player[1].field[5][0] == 0)) {
-            r_player[1].zenkesi = 1; //得点系のため一旦out
-        }
+
+    // 相手全消し,全消し消化判断
+    if (r_player[1].rensa_end == 1 && IsTLFieldEmpty(r_player[1].field)) {
+        r_player[1].zenkesi = 1;
     }
-    if ((r_player[1].act_on == 1) && (r_player[1].set_puyo_once == 1)) { //相手凝視
+
+    // 相手凝視
+    if ((r_player[1].act_on == 1) && (r_player[1].set_puyo_once == 1)) {
         r_player[1].set_puyo_once = 0;
         coma.aite_rensa_end();
-        if (r_player[1].tsumo[0] == 0) {
-            r_player[1].tsumo[0] = 1;
-        }
-        if (r_player[1].tsumo[1] == 0) {
-            r_player[1].tsumo[1] = 1;
-        }
-        if (r_player[1].tsumo[2] == 0) {
-            r_player[1].tsumo[2] = 1;
-        }
-        if (r_player[1].tsumo[3] == 0) {
-            r_player[1].tsumo[3] = 1;
-        }
         coma.aite_hyouka(r_player[1].field, r_player[1].tsumo[0], r_player[1].tsumo[1], r_player[1].tsumo[2], r_player[1].tsumo[3]);
     }
     if (r_player[0].set_puyo == 1) {
         r_player[0].set_puyo_once = 1;
         r_player[0].keep_score = r_player[0].score;
     }
-    if (r_player[0].rensa_end == 1) { //全消し,全消し消化判断
+    if (r_player[0].rensa_end == 1) { // 全消し,全消し消化判断
         r_player[0].field_kioku();
-        if ((r_player[0].field[0][0] == 0) && (r_player[0].field[1][0] == 0) && (r_player[0].field[2][0] == 0)
-            && (r_player[0].field[3][0] == 0) && (r_player[0].field[4][0] == 0)
-            && (r_player[0].field[5][0] == 0)) {
-            r_player[0].zenkesi = 1; //得点系のため一旦out
+        if (IsTLFieldEmpty(r_player[0].field)) {
+            r_player[0].zenkesi = 1; // 得点系のため一旦out
         }
     }
-    if ((r_player[0].act_on == 1) && (r_player[0].set_puyo_once == 1)) {
+
+    if (r_player[0].act_on == 1 && r_player[0].set_puyo_once == 1) {
         r_player[0].set_puyo_once = 0;
         r_player[0].setti_12();
-        if (r_player[0].tsumo[0] == 0) {
-            r_player[0].tsumo[0] = 1;
-        }
-        if (r_player[0].tsumo[1] == 0) {
-            r_player[0].tsumo[1] = 1;
-        }
-        if (r_player[0].tsumo[2] == 0) {
-            r_player[0].tsumo[2] = 1;
-        }
-        if (r_player[0].tsumo[3] == 0) {
-            r_player[0].tsumo[3] = 1;
-        }
-        if ((coma.hukks == 0) || (r_player[0].field_hikaku() > 0)) { // 開幕のhukks==0では思考を短くする？
+        if (coma.hukks == 0 || r_player[0].field_hikaku() > 0) { // 開幕のhukks==0では思考を短くする？
             coma.pre_hyouka(r_player[0].field, r_player[0].tsumo[0], r_player[0].tsumo[1], r_player[0].tsumo[2],
                             r_player[0].tsumo[3], r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi, 1);
         }
@@ -252,25 +243,13 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         response = sendmes(&r_player[0], &r_player[1], &coma);
     } // p1 act_once
 
-    if (r_player[0].nex_on == 1) { //事前手決めスタート
-        if (r_player[0].tsumo[2] == 0) {
-            r_player[0].tsumo[2] = 1;
-        }
-        if (r_player[0].tsumo[3] == 0) {
-            r_player[0].tsumo[3] = 1;
-        }
-        if (r_player[0].tsumo[4] == 0) {
-            r_player[0].tsumo[4] = 1;
-        }
-        if (r_player[0].tsumo[5] == 0) {
-            r_player[0].tsumo[5] = 1;
-        }
+    if (r_player[0].nex_on == 1) { // 事前手決めスタート
         if (coma.hukks != 0) {
             coma.pre_hyouka(r_player[0].yosou_field, r_player[0].tsumo[2], r_player[0].tsumo[3],
                             r_player[0].tsumo[4], r_player[0].tsumo[5], r_player[0].zenkesi, r_player[1].field,
                             r_player[1].zenkesi, 0);
         }
-    } //開幕のhukks==0はこちらはひっかからない？
+    } // 開幕のhukks==0はこちらはひっかからない？
 
     return response;
 }
