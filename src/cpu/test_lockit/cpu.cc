@@ -338,4 +338,3 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
 }
 
 }  // namespace test_lockit
-
