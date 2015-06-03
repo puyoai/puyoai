@@ -1,3 +1,5 @@
+#include "coma.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -7,7 +9,7 @@
 #include <sstream>
 #include <string>
 
-#include "coma.h"
+#include "field.h"
 
 namespace test_lockit {
 
@@ -105,7 +107,7 @@ COMAI_HI::~COMAI_HI()
 {
 }
 
-int COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
+bool COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
 {
     int ba[6][kHeight] {};
     int i, j;
@@ -113,19 +115,22 @@ int COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int
     int score = 0;
     int jamako_sabun;
     int quick = 0;
-    int ret_keshi = 0;
+    bool ret_keshi = false;
+
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
-            ba[i][j] = ba3[i][j];
-            if ((ba3[i][j] != 0) && (ba3[i][j] < 6))
+            int c = ba3[i][j];
+            ba[i][j] = c;
+            if (IsColorPuyo(c))
                 kosuu_mae++;
         }
     }
+
     aite_hakka_rensa = hon_syoukyo_score(ba, &score, &quick);
     aite_hakka_nokori = aite_hakka_rensa;
     hakkatime = hakata;
     if (aite_hakka_rensa > 0) {
-        ret_keshi = 1;
+        ret_keshi = true;
         aite_hakka_zenkesi = zenkesi_aite;
         jamako_sabun = aite_hakkaji_score / 70;
         aite_hakkaji_score = scos + score;
@@ -142,13 +147,15 @@ int COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int
 
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
-            if ((ba[i][j] != 0) && (ba[i][j] < 6))
+            if (IsColorPuyo(ba[i][j]))
                 kosuu_ato++;
         }
     }
+
     aite_hakka_kosuu = kosuu_mae - kosuu_ato;
     if (aite_hakka_kosuu * 2 > kosuu_mae)
         aite_hakka_honsen = 1;
+
     return ret_keshi;
 }
 
