@@ -1,3 +1,5 @@
+#include "cpu.h"
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -7,25 +9,12 @@
 #include "core/frame_response.h"
 
 #include "color.h"
-#include "cpu.h"
+#include "field.h"
 #include "util.h"
 
 using namespace std;
 
 namespace test_lockit {
-
-namespace {
-
-bool IsTLFieldEmpty(const int field[6][kHeight]) {
-  for (int i = 0; i < 6; ++i) {
-    if (field[i][0] != TL_EMPTY) {
-      return false;
-    }
-  }
-  return true;
-}
-
-}  // namespace
 
 TestLockitAI::TestLockitAI()
 {

@@ -6,7 +6,8 @@ add_library(test_lockit_lib
             coma.cc
             cpu.cc
             read.cc
-	    util.cc)
+	    util.cc
+	    field.cc)
 
 function(test_lockit_add_executable exe)
     cpu_add_executable(${exe} ${ARGN})
