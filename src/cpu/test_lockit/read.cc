@@ -10,7 +10,7 @@ void READ_P::ref()
 {
     int i, j;
     for (i = 0; i < 6; i++) {
-        for (j = 0; j < 18; j++) {
+        for (j = 0; j < kHeight; j++) {
             field[i][j] = 0;
             yosou_field[i][j] = 0;
         }
@@ -36,7 +36,7 @@ READ_P::READ_P()
 {
     int i, j;
     for (i = 0; i < 6; i++) {
-        for (j = 0; j < 18; j++) {
+        for (j = 0; j < kHeight; j++) {
             field[i][j] = 0;
             yosou_field[i][j] = 0;
         }
@@ -186,7 +186,7 @@ int READ_P::setti_puyo()
     modori = chousei_syoukyo();
     for (i = 0; i < 6; i++) {
         field12[i] = field[i][12];
-        for (j = 0; j < 18; j++) {
+        for (j = 0; j < kHeight; j++) {
             yosou_field[i][j] = field[i][j];
         }
     }
@@ -462,4 +462,3 @@ int READ_P::syou_down(int ba[][kHeight], int x, int y, int incol, int flg[])
 }
 
 }  // namespace test_lockit
-
