@@ -759,7 +759,7 @@ TEST(CoreFieldTest, rensaWillOccurWhenLastDecisionIs)
   EXPECT_FALSE(cf.rensaWillOccurWhenLastDecisionIs(Decision(5, 1)));
 }
 
-TEST(CoreFieldTest, rensaWillOccurWithContext)
+TEST(CoreFieldTest, rensaWillOccur)
 {
     CoreField cf1(
         "YYYY  ");
@@ -774,17 +774,11 @@ TEST(CoreFieldTest, rensaWillOccurWithContext)
     CoreField cf5(
         "OOOO  ");
 
-    CoreField::SimulationContext context1(1);
-    CoreField::SimulationContext context2(1);
-    CoreField::SimulationContext context3(1);
-    CoreField::SimulationContext context4(1);
-    CoreField::SimulationContext context5(1);
-
-    EXPECT_TRUE(cf1.rensaWillOccurWithContext(context1));
-    EXPECT_FALSE(cf2.rensaWillOccurWithContext(context2));
-    EXPECT_TRUE(cf3.rensaWillOccurWithContext(context3));
-    EXPECT_TRUE(cf4.rensaWillOccurWithContext(context4));
-    EXPECT_FALSE(cf5.rensaWillOccurWithContext(context5));
+    EXPECT_TRUE(cf1.rensaWillOccur());
+    EXPECT_FALSE(cf2.rensaWillOccur());
+    EXPECT_TRUE(cf3.rensaWillOccur());
+    EXPECT_TRUE(cf4.rensaWillOccur());
+    EXPECT_FALSE(cf5.rensaWillOccur());
 }
 
 TEST(CoreFieldTest, vanishDrop)

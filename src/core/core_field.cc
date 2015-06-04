@@ -327,11 +327,6 @@ bool CoreField::rensaWillOccurWhenLastDecisionIs(const Decision& decision) const
     return false;
 }
 
-bool CoreField::rensaWillOccurWithContext(const SimulationContext& /*context*/) const
-{
-    return field_.rensaWillOccur();
-}
-
 std::string CoreField::toDebugString() const
 {
     std::ostringstream s;
