@@ -189,10 +189,10 @@ void AI::runLoop()
         }
 
         // Check field inconsistency. We only check when me_hand >= 3, since we cannot trust the field in 3 hands.
-        if (me_.hand >= 3 && isFieldInconsistent(next1.fieldBeforeThink.plainField(), frameRequest.myPlayerFrameRequest().field)) {
+        if (me_.hand >= 3 && isFieldInconsistent(next1.fieldBeforeThink.toPlainField(), frameRequest.myPlayerFrameRequest().field)) {
             LOG(INFO) << "FIELD INCONSISTENCY DETECTED: hand=" << me_.hand;
             VLOG(1) << '\n' << FieldPrettyPrinter::toStringFromMultipleFields(
-                { next1.fieldBeforeThink.plainField(), frameRequest.myPlayerFrameRequest().field },
+                { next1.fieldBeforeThink.toPlainField(), frameRequest.myPlayerFrameRequest().field },
                 { frameRequest.myPlayerFrameRequest().kumipuyoSeq, frameRequest.myPlayerFrameRequest().kumipuyoSeq });
 
             next1.needsRethink = true;

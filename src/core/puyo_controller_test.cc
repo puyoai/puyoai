@@ -45,7 +45,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnEmptyField)
     EXPECT_EQ(">B,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
-    PlainField pf = f.plainField();
+    PlainField pf = f.toPlainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r <= 3; ++r) {
             Decision d(x, r);
@@ -108,7 +108,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnFilledField)
     EXPECT_EQ(">B,,>,,>B,,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
-    PlainField pf = f.plainField();
+    PlainField pf = f.toPlainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r <= 3; ++r) {
             Decision d(x, r);
@@ -170,7 +170,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField1)
     EXPECT_EQ(">B,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
-    PlainField pf = f.plainField();
+    PlainField pf = f.toPlainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -237,7 +237,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField2)
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,>,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
-    PlainField pf = f.plainField();
+    PlainField pf = f.toPlainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -309,7 +309,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField3)
     EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,>,>,>B,>,>A,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
-    PlainField pf = f.plainField();
+    PlainField pf = f.toPlainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -380,7 +380,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField4)
     EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>B,>,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ(">B,>,>B,>,>A,>,>,>,>,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
-    PlainField pf = f.plainField();
+    PlainField pf = f.toPlainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -452,7 +452,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField5)
     EXPECT_EQ("A,,A,,A,>,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ("A,,A,,A,>,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
-    PlainField pf = f.plainField();
+    PlainField pf = f.toPlainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -524,7 +524,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField6)
     EXPECT_EQ("A,,A,,A,>,,>,,>,B,v", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ("A,,A,,A,>,,>,,>,v", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
-    PlainField pf = f.plainField();
+    PlainField pf = f.toPlainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -597,7 +597,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField7)
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
-    PlainField pf = f.plainField();
+    PlainField pf = f.toPlainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -677,7 +677,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField8)
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 2)).seq().toString());
     EXPECT_EQ("", PuyoController::findKeyStroke(f, Decision(6, 3)).seq().toString());
 
-    PlainField pf = f.plainField();
+    PlainField pf = f.toPlainField();
     for (int x = 1; x <= 6; ++x) {
         for (int r = 0; r < 4; ++r) {
             Decision d(x, r);
@@ -734,7 +734,7 @@ TEST(PuyoControllerTest, findKeyStrokeHigherExhaustive)
             ASSERT_TRUE(f.height(x) == h);
         }
 
-        PlainField pf = f.plainField();
+        PlainField pf = f.toPlainField();
 
         for (int x = 1; x <= 6; ++x) {
             for (int r = 0; r < 4; ++r) {
