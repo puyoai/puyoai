@@ -122,20 +122,20 @@ TEST(BitFieldTest, setColor)
     }
 }
 
-TEST(BitFieldTest, setAll)
+TEST(BitFieldTest, setColorAll)
 {
     FieldBits bits;
     for (int i = 1; i <= 6; ++i)
         bits.set(i, i);
 
     BitField bf;
-    bf.setAll(bits, PuyoColor::RED);
+    bf.setColorAll(bits, PuyoColor::RED);
     for (int i = 1; i <= 6; ++i)
         EXPECT_EQ(PuyoColor::RED, bf.color(i, i));
-    bf.setAll(bits, PuyoColor::OJAMA);
+    bf.setColorAll(bits, PuyoColor::OJAMA);
     for (int i = 1; i <= 6; ++i)
         EXPECT_EQ(PuyoColor::OJAMA, bf.color(i, i));
-    bf.setAll(bits, PuyoColor::EMPTY);
+    bf.setColorAll(bits, PuyoColor::EMPTY);
     for (int i = 1; i <= 6; ++i)
         EXPECT_EQ(PuyoColor::EMPTY, bf.color(i, i));
 }
@@ -150,7 +150,7 @@ TEST(BitFieldTest, setAllIfEmpty)
     bf.setColor(1, 1, PuyoColor::RED);
     bf.setColor(2, 2, PuyoColor::OJAMA);
 
-    bf.setAllIfEmpty(bits, PuyoColor::BLUE);
+    bf.setColorAllIfEmpty(bits, PuyoColor::BLUE);
 
     EXPECT_EQ(PuyoColor::RED, bf.color(1, 1));
     EXPECT_EQ(PuyoColor::OJAMA, bf.color(2, 2));

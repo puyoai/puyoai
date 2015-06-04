@@ -70,7 +70,7 @@ BitField::BitField(const string& str) : BitField()
     }
 }
 
-void BitField::setAll(FieldBits bits, PuyoColor c)
+void BitField::setColorAll(FieldBits bits, PuyoColor c)
 {
     for (int i = 0; i < 3; ++i) {
         if (static_cast<int>(c) & (1 << i)) {
@@ -81,12 +81,12 @@ void BitField::setAll(FieldBits bits, PuyoColor c)
     }
 }
 
-void BitField::setAllIfEmpty(FieldBits bits, PuyoColor c)
+void BitField::setColorAllIfEmpty(FieldBits bits, PuyoColor c)
 {
     FieldBits nonEmpty = (m_[0] | m_[1] | m_[2]);
     bits = bits.notmask(nonEmpty);
 
-    setAll(bits, c);
+    setColorAll(bits, c);
 }
 
 bool BitField::isConnectedPuyo(int x, int y) const

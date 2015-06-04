@@ -39,10 +39,10 @@ public:
     bool isColor(int x, int y, PuyoColor c) const { return bits(c).get(x, y); }
     bool isNormalColor(int x, int y) const { return m_[2].get(x, y); }
     bool isEmpty(int x, int y) const { return !(m_[0] | m_[1] | m_[2]).get(x, y); }
-    void setColor(int x, int y, PuyoColor c);
 
-    void setAll(FieldBits, PuyoColor);
-    void setAllIfEmpty(FieldBits, PuyoColor);
+    void setColor(int x, int y, PuyoColor c);
+    void setColorAll(FieldBits, PuyoColor);
+    void setColorAllIfEmpty(FieldBits, PuyoColor);
 
     bool isZenkeshi() const { return FieldBits(m_[0] | m_[1] | m_[2]).maskedField13().isEmpty(); }
 
