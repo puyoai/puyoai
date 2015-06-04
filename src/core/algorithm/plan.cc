@@ -92,16 +92,12 @@ void iterateAvailablePlansInternal(const CoreField& field,
         n = 10;
     }
 
-    // Since copying Field is slow, we'd like to skip copying as many as possible.
-    CoreField nextField(field);
-
     for (int i = 0; i < n; ++i) {
         const Kumipuyo& kumipuyo = ptr[i];
         int num_decisions = (kumipuyo.axis == kumipuyo.child) ? 11 : 22;
 
         for (int j = 0; j < num_decisions; j++) {
-            DCHECK(nextField == field);
-
+            CoreField nextField(field);
             const Decision& decision = DECISIONS[j];
             if (!PuyoController::isReachable(field, decision))
                 continue;
@@ -120,10 +116,8 @@ void iterateAvailablePlansInternal(const CoreField& field,
                 decisions.push_back(decision);
                 callback(nextField, decisions, currentNumChigiri + isChigiri, totalFrames, dropFrames, true);
                 decisions.pop_back();
-                nextField.undoKumipuyo(decision);
             } else {
                 if (nextField.color(3, 12) != PuyoColor::EMPTY) {
-                    nextField.undoKumipuyo(decision);
                     continue;
                 }
 
@@ -135,7 +129,6 @@ void iterateAvailablePlansInternal(const CoreField& field,
                                                   currentNumChigiri + isChigiri, totalFrames + dropFrames, callback);
                 }
                 decisions.pop_back();
-                nextField.undoKumipuyo(decision);
             }
         }
     }
