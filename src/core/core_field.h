@@ -153,8 +153,6 @@ public:
 
     // TODO(mayah): Remove this.
     bool rensaWillOccurWhenLastDecisionIs(const Decision&) const;
-    // TODO(mayah): Remove this.
-    bool rensaWillOccurWithContext(const SimulationContext&) const;
     bool rensaWillOccur() const { return field_.rensaWillOccur(); }
 
     // Simulates chains. Returns RensaResult.
