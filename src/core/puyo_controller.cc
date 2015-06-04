@@ -514,7 +514,7 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const CoreField& field, const 
     };
     static const int KEY_CANDIDATES_SIZE_WITHOUT_TURN_OR_ARROW = ARRAY_SIZE(KEY_CANDIDATES_WITHOUT_TURN_OR_ARROW);
 
-    const PlainField& plainField = field.plainField();
+    PlainField plainField = field.toPlainField();
 
     Potential pot;
     priority_queue<Edge, Edges, greater<Edge> > Q;

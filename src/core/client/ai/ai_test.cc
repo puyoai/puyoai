@@ -449,9 +449,9 @@ TEST_F(AITest, mergeFieldSimpleCase)
         "OOO..."
         "RRRGGG");
 
-    EXPECT_EQ(f2, mergeField(f1, f2.plainField(), false));
-    EXPECT_EQ(f3, mergeField(f1, f3.plainField(), false));
-    EXPECT_EQ(f3, mergeField(f2, f3.plainField(), false));
+    EXPECT_EQ(f2, mergeField(f1, f2.toPlainField(), false));
+    EXPECT_EQ(f3, mergeField(f1, f3.toPlainField(), false));
+    EXPECT_EQ(f3, mergeField(f2, f3.toPlainField(), false));
 }
 
 TEST_F(AITest, mergeField)
@@ -514,9 +514,9 @@ TEST_F(AITest, mergeField)
         "OOOOOO"
         "OOOOOO");
 
-    EXPECT_EQ(f1, mergeField(f1, f2.plainField(), false));
-    EXPECT_EQ(f3, mergeField(f1, f3.plainField(), false));
-    EXPECT_EQ(f3, mergeField(f1, f4.plainField(), false));
+    EXPECT_EQ(f1, mergeField(f1, f2.toPlainField(), false));
+    EXPECT_EQ(f3, mergeField(f1, f3.toPlainField(), false));
+    EXPECT_EQ(f3, mergeField(f1, f4.toPlainField(), false));
 }
 
 TEST_F(AITest, mergeFieldOjama)

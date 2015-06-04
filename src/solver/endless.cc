@@ -54,7 +54,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
         }
 
         if (verbose_) {
-            FieldPrettyPrinter::print(f.plainField(), req.playerFrameRequest[0].kumipuyoSeq.subsequence(1));
+            FieldPrettyPrinter::print(f.toPlainField(), req.playerFrameRequest[0].kumipuyoSeq.subsequence(1));
         }
 
         decisions.push_back(dropDecision.decision());
@@ -94,7 +94,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
             };
         }
 
-        req.playerFrameRequest[0].field = f.plainField();
+        req.playerFrameRequest[0].field = f.toPlainField();
         req.playerFrameRequest[0].kumipuyoSeq.dropFront();
         req.playerFrameRequest[1].kumipuyoSeq.dropFront();
 

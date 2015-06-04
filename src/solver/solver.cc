@@ -18,8 +18,8 @@ Decision Solver::solve(const Problem& problem)
     ai_->gameWillBegin(req);
 
     req.frameId = 2;
-    req.playerFrameRequest[0].field = problem.myState.field.plainField();
-    req.playerFrameRequest[1].field = problem.enemyState.field.plainField();
+    req.playerFrameRequest[0].field = problem.myState.field.toPlainField();
+    req.playerFrameRequest[1].field = problem.enemyState.field.toPlainField();
     req.playerFrameRequest[0].kumipuyoSeq = problem.myState.seq;
     req.playerFrameRequest[1].kumipuyoSeq = problem.enemyState.seq;
 

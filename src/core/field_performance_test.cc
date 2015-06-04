@@ -82,7 +82,7 @@ static void runSimulation(const CoreField& original)
 {
     const int expectedChain = CoreField(original).simulate().chains;
 
-    BitField bitFieldOriginal(original.plainField());
+    BitField bitFieldOriginal(original.bitField());
 
     const int N = 100000;
 
