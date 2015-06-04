@@ -42,7 +42,7 @@ PatternMatchResult PatternMatcher::matchInternal(const FieldPattern& fieldPatter
             }
 
             matchedBits.setAll(bits);
-            complementedField->setAll(pat.varBits, c);
+            complementedField->setColorAll(pat.varBits, c);
             found = c;
         }
 
@@ -110,7 +110,7 @@ ComplementResult PatternMatcher::complement(const FieldPattern& fieldPattern,
             const FieldPattern::Pattern& pat = fieldPattern.pattern(i);
             for (PuyoColor c : NORMAL_PUYO_COLORS) {
                 envs[i] = c;
-                complementedField.setAll(pat.varBits, c);
+                complementedField.setColorAll(pat.varBits, c);
 
                 // Check neighbors.
                 FieldBits edge = pat.varBits.expandEdge().notmask(pat.varBits) & complementedField.bits(envs[i]);
@@ -127,7 +127,7 @@ ComplementResult PatternMatcher::complement(const FieldPattern& fieldPattern,
     }
 
     // Complement IRON.
-    complementedField.setAllIfEmpty(fieldPattern.ironPatternBits(), PuyoColor::IRON);
+    complementedField.setColorAllIfEmpty(fieldPattern.ironPatternBits(), PuyoColor::IRON);
     FieldBits complementedBits = complementedField.differentBits(field.bitField());
 
     // If there are empty space below the complemented cell, it's not ok.
