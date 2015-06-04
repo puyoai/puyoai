@@ -29,7 +29,7 @@ public:
 
     FieldBits bits(PuyoColor c) const;
     FieldBits normalColorBits() const { return m_[2]; }
-    FieldBits puyoBits() const { return (m_[0] | m_[1] | m_[2]).maskedField13(); }
+    FieldBits field13Bits() const { return (m_[0] | m_[1] | m_[2]).maskedField13(); }
 
     FieldBits differentBits(const BitField& bf) const {
         return (m_[0] ^ bf.m_[0]) | (m_[1] ^ bf.m_[1]) | (m_[2] ^ bf.m_[2]);

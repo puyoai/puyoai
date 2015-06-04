@@ -15,10 +15,10 @@ BijectionMatcher::BijectionMatcher()
 
 bool BijectionMatcher::match(const FieldPattern& pattern, const CoreField& cf)
 {
-    FieldBits puyoBits = cf.bitField().puyoBits();
+    FieldBits field13Bits = cf.bitField().field13Bits();
     FieldBits patternBits = pattern.patternBits();
 
-    if (puyoBits != patternBits)
+    if (field13Bits != patternBits)
         return false;
 
     for (const auto& pat : pattern.patterns()) {
