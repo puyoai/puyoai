@@ -201,6 +201,27 @@ RensaStepResult BitField::vanishDrop(BitField::SimulationContext* context)
 }
 
 inline
+void BitField::setColorAll(FieldBits bits, PuyoColor c)
+{
+    for (int i = 0; i < 3; ++i) {
+        if (static_cast<int>(c) & (1 << i)) {
+            m_[i].setAll(bits);
+        } else {
+            m_[i].unsetAll(bits);
+        }
+    }
+}
+
+inline
+void BitField::setColorAllIfEmpty(FieldBits bits, PuyoColor c)
+{
+    FieldBits nonEmpty = (m_[0] | m_[1] | m_[2]);
+    bits = bits.notmask(nonEmpty);
+
+    setColorAll(bits, c);
+}
+
+inline
 void BitField::calculateHeight(int heights[FieldConstant::MAP_WIDTH]) const
 {
     const __m128i zero = _mm_setzero_si128();
