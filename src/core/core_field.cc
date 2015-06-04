@@ -53,24 +53,6 @@ CoreField::CoreField(const PlainField& f) :
     heights_[MAP_WIDTH - 1] = 0;
 }
 
-CoreField::CoreField(const BitField& f) :
-    field_(f)
-{
-    heights_[0] = 0;
-    for (int x = 1; x <= WIDTH; ++x) {
-        heights_[x] = 13;
-        for (int y = 1; y <= 13; ++y) {
-            if (color(x, y) == PuyoColor::EMPTY) {
-                heights_[x] = y - 1;
-                break;
-            }
-        }
-        for (int y = heights_[x] + 1; y <= 13; ++y)
-            DCHECK(isEmpty(x, y));
-    }
-    heights_[MAP_WIDTH - 1] = 0;
-}
-
 PlainField CoreField::toPlainField() const
 {
     PlainField pf;
