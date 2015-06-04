@@ -335,6 +335,23 @@ TEST(FieldBitsTest, horizontalOr16)
     EXPECT_EQ((1 << 1) | (1 << 3) | (1 << 5) | (1 << 12), x);
 }
 
+TEST(FieldBitsTest, highestHeight)
+{
+    FieldBits bits;
+
+    EXPECT_EQ(-1, bits.highestHeight());
+
+    for (int y = 0; y < 16; ++y) {
+        bits.set(1, y);
+        EXPECT_EQ(y, bits.highestHeight());
+    }
+
+    for (int y = 0; y < 16; ++y) {
+        bits.set(2, y);
+        EXPECT_EQ(15, bits.highestHeight());
+    }
+}
+
 TEST(FieldBitsTest, countConnection)
 {
     PlainField pf(

@@ -42,6 +42,9 @@ public:
     int popcount() const;
     // Returns the bit-wise or of 8x16bits.
     int horizontalOr16() const;
+    // Returns the Y of heightest bit.
+    // If isEmpty(), -1 will be returned.
+    int highestHeight() const;
 
     void countConnection(int* count2, int* count3) const;
 
@@ -149,6 +152,16 @@ int FieldBits::horizontalOr16() const
     x = _mm_or_si128(_mm_srli_si128(x, 4), x);
     x = _mm_or_si128(_mm_srli_si128(x, 2), x);
     return _mm_cvtsi128_si32(x) & 0xFFFF;
+}
+
+inline
+int FieldBits::highestHeight() const
+{
+    int or16 = horizontalOr16();
+    if (or16 == 0)
+        return -1;
+
+    return 31 - __builtin_clz(or16);
 }
 
 inline
