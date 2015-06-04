@@ -65,7 +65,8 @@ public:
     template<typename Tracker>
     RensaStepResult vanishDrop(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
 
-    void calculateHeight(std::uint16_t heights[FieldConstant::MAP_WIDTH]) const;
+    // Caution: heights must be aligned to 16.
+    void calculateHeight(int heights[FieldConstant::MAP_WIDTH]) const;
 
     std::string toString(char charIfEmpty = ' ') const;
     std::string toDebugString(char charIfEmpty = ' ') const;
@@ -200,8 +201,9 @@ RensaStepResult BitField::vanishDrop(BitField::SimulationContext* context)
 }
 
 inline
-void BitField::calculateHeight(std::uint16_t heights[FieldConstant::MAP_WIDTH]) const
+void BitField::calculateHeight(int heights[FieldConstant::MAP_WIDTH]) const
 {
+    const __m128i zero = _mm_setzero_si128();
     __m128i whole = (m_[0] | m_[1] | m_[2]).maskedField13();
 
     const __m128i mask4 = _mm_set1_epi8(0x0F);
@@ -216,7 +218,9 @@ void BitField::calculateHeight(std::uint16_t heights[FieldConstant::MAP_WIDTH]) 
 
    __m128i count16 = _mm_add_epi8(count8, _mm_srli_epi16(count8, 8));
    __m128i count = _mm_and_si128(count16, _mm_set1_epi16(0x0F));
-   _mm_store_si128(reinterpret_cast<__m128i*>(heights), count);
+
+   _mm_store_si128(reinterpret_cast<__m128i*>(heights), _mm_unpacklo_epi16(count, zero));
+   _mm_store_si128(reinterpret_cast<__m128i*>(heights + 4), _mm_unpackhi_epi16(count, zero));
 }
 
 

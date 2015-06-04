@@ -685,7 +685,7 @@ TEST(BitFieldTest, ignitionPuyoBits)
 
 TEST(BitFieldTest, calculateHeight)
 {
-    alignas(16) std::uint16_t heights[FieldConstant::MAP_WIDTH];
+    alignas(16) int heights[FieldConstant::MAP_WIDTH];
 
     BitField bf(
         ".....O" // 14
