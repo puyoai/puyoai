@@ -148,6 +148,7 @@ void Plan::iterateAvailablePlans(const CoreField& field,
                                  framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
             }
         } else {
+            DCHECK(fieldBeforeRensa.isEmpty(3, 12));
             RensaResult rensaResult;
             callback(RefPlan(fieldBeforeRensa, decisions, rensaResult, numChigiri,
                              framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
