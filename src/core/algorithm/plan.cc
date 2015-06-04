@@ -162,10 +162,8 @@ void Plan::iterateAvailablePlans(const CoreField& field,
                 callback(RefPlan(cf, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
             }
         } else {
-            if (fieldBeforeRensa.color(3, 12) == PuyoColor::EMPTY) {
-                RensaResult rensaResult;
-                callback(RefPlan(fieldBeforeRensa, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
-            }
+            RensaResult rensaResult;
+            callback(RefPlan(fieldBeforeRensa, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
         }
     };
 
