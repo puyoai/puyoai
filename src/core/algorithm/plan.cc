@@ -111,14 +111,9 @@ void iterateAvailablePlansInternal(const CoreField& field,
             if (!nextField.dropKumipuyo(decision, kumipuyo))
                 continue;
 
-            // CoreField::simulate is slow. So, if the last decision does not invoke any rensa,
-            // we'd like to skip simulate.
-            // Even using simulateWhenLastDecisionIs, it looks checking rensaWillOccurWhenLastDecisionIs
-            // is 7~8 % faster.
             bool doRensa = nextField.rensaWillOccurWhenLastDecisionIs(decision);
-            if (!doRensa && nextField.color(3, 12) != PuyoColor::EMPTY) {
+            if (!doRensa && !nextField.isEmpty(3, 12))
                 continue;
-            }
 
             if (currentDepth + 1 == maxDepth || doRensa) {
                 callback(nextField, decisions, currentNumChigiri + isChigiri, totalFrames, dropFrames, doRensa);
@@ -148,12 +143,14 @@ void Plan::iterateAvailablePlans(const CoreField& field,
             CoreField cf(fieldBeforeRensa);
             RensaResult rensaResult = cf.simulate();
             DCHECK_GT(rensaResult.chains, 0);
-            if (cf.color(3, 12) == PuyoColor::EMPTY) {
-                callback(RefPlan(cf, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
+            if (cf.isEmpty(3, 12)) {
+                callback(RefPlan(cf, decisions, rensaResult, numChigiri,
+                                 framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
             }
         } else {
             RensaResult rensaResult;
-            callback(RefPlan(fieldBeforeRensa, decisions, rensaResult, numChigiri, framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
+            callback(RefPlan(fieldBeforeRensa, decisions, rensaResult, numChigiri,
+                             framesToIgnite, lastDropFrames, 0, 0, 0, 0, false));
         }
     };
 
