@@ -111,12 +111,12 @@ void iterateAvailablePlansInternal(const CoreField& field,
             if (!nextField.dropKumipuyo(decision, kumipuyo))
                 continue;
 
-            bool doRensa = nextField.rensaWillOccurWhenLastDecisionIs(decision);
-            if (!doRensa && !nextField.isEmpty(3, 12))
+            bool shouldFire = nextField.rensaWillOccurWhenLastDecisionIs(decision);
+            if (!shouldFire && !nextField.isEmpty(3, 12))
                 continue;
 
-            if (currentDepth + 1 == maxDepth || doRensa) {
-                callback(nextField, decisions, currentNumChigiri + isChigiri, totalFrames, dropFrames, doRensa);
+            if (currentDepth + 1 == maxDepth || shouldFire) {
+                callback(nextField, decisions, currentNumChigiri + isChigiri, totalFrames, dropFrames, shouldFire);
             } else {
                 iterateAvailablePlansInternal(nextField, kumipuyoSeq, decisions, currentDepth + 1, maxDepth,
                                               currentNumChigiri + isChigiri, totalFrames + dropFrames, callback);
