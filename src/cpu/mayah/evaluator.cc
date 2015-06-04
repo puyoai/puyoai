@@ -422,18 +422,10 @@ template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const CoreField& complementedField,
                                                                     const FieldBits& ignitionPuyoBits)
 {
-    for (int y = FieldConstant::HEIGHT; y >= 1; --y) {
-        for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-            if (!complementedField.isNormalColor(x, y))
-                continue;
-            if (ignitionPuyoBits.get(x, y)) {
-                sc_->addScore(IGNITION_HEIGHT, y, 1);
-                return;
-            }
-        }
-    }
-
-    sc_->addScore(IGNITION_HEIGHT, 0, 1);
+    FieldBits ignition = ignitionPuyoBits & complementedField.bitField().normalColorBits();
+    int height = ignition.highestHeight();
+    if (height >= 0)
+        sc_->addScore(IGNITION_HEIGHT, height, 1);
 }
 
 template<typename ScoreCollector>
