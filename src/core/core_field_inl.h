@@ -11,6 +11,13 @@
 // All methods should be inline or template.
 
 inline
+CoreField::CoreField(const BitField& f) :
+    field_(f)
+{
+    f.calculateHeight(heights_);
+}
+
+inline
 RensaResult CoreField::simulate(int initialChain)
 {
     SimulationContext context(initialChain);
