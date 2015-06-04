@@ -27,7 +27,16 @@ TEST(PlanPerformanceTest, Empty44)
 TEST(PlanPerformanceTest, Filled44)
 {
     TimeStampCounterData tsc;
-    CoreField f("http://www.inosendo.com/puyo/rensim/??500000400000500000400000540000540000564560456456456456456456");
+    CoreField f("B....."
+                "R....."
+                "B....."
+                "R....."
+                "BR...."
+                "BR...."
+                "BYRBY."
+                "RBYRBY"
+                "RBYRBY"
+                "RBYRBY");
     KumipuyoSeq seq("RRGGYYBB");
 
     // Since seq has 4 kumipuyo, this won't test all kumipuyo possibilities.
@@ -57,7 +66,16 @@ TEST(PlanPerformanceTest, Empty23)
 TEST(PlanPerformanceTest, Filled23)
 {
     TimeStampCounterData tsc;
-    CoreField f("http://www.inosendo.com/puyo/rensim/??500000400000500000400000540000540000564560456456456456456456");
+    CoreField f("B....."
+                "R....."
+                "B....."
+                "R....."
+                "BR...."
+                "BR...."
+                "BYRBY."
+                "RBYRBY"
+                "RBYRBY"
+                "RBYRBY");
     KumipuyoSeq seq("BBGG");
 
     // Since seq has 2 kumipuyo, this won't test all kumipuyo possibilities.
@@ -87,7 +105,16 @@ TEST(PlanPerformanceTest, Empty24)
 TEST(PlanPerformanceTest, Filled24)
 {
     TimeStampCounterData tsc;
-    CoreField f("http://www.inosendo.com/puyo/rensim/??500000400000500000400000540000540000564560456456456456456456");
+    CoreField f("B....."
+                "R....."
+                "B....."
+                "R....."
+                "BR...."
+                "BR...."
+                "BYRBY."
+                "RBYRBY"
+                "RBYRBY"
+                "RBYRBY");
     KumipuyoSeq seq("BBGG");
 
     // Since seq has 4 kumipuyo, this won't test all kumipuyo possibilities.
