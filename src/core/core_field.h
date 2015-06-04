@@ -209,7 +209,7 @@ private:
     void unsafeSet(int x, int y, PuyoColor c) { field_.setColor(x, y, c); }
 
     BitField field_;
-    alignas(16) std::uint16_t heights_[MAP_WIDTH];
+    alignas(16) int heights_[MAP_WIDTH];
 };
 
 #include "core/core_field_inl.h"
