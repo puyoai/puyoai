@@ -92,45 +92,42 @@ void iterateAvailablePlansInternal(const CoreField& field,
         n = 10;
     }
 
-    for (int i = 0; i < n; ++i) {
-        const Kumipuyo& kumipuyo = ptr[i];
-        int num_decisions = (kumipuyo.axis == kumipuyo.child) ? 11 : 22;
+    for (int j = 0; j < 22; j++) {
+        const Decision& decision = DECISIONS[j];
+        if (!PuyoController::isReachable(field, decision))
+            continue;
 
-        for (int j = 0; j < num_decisions; j++) {
-            CoreField nextField(field);
-            const Decision& decision = DECISIONS[j];
-            if (!PuyoController::isReachable(field, decision))
+        bool isChigiri = field.isChigiriDecision(decision);
+        int dropFrames = field.framesToDropNext(decision);
+
+        decisions.push_back(decision);
+        for (int i = 0; i < n; ++i) {
+            const Kumipuyo& kumipuyo = ptr[i];
+            int num_decisions = (kumipuyo.axis == kumipuyo.child) ? 11 : 22;
+            if (j >= num_decisions)
                 continue;
 
+            CoreField nextField(field);
             if (!nextField.dropKumipuyo(decision, kumipuyo))
                 continue;
-
-            bool isChigiri = field.isChigiriDecision(decision);
-            int dropFrames = field.framesToDropNext(decision);
 
             // CoreField::simulate is slow. So, if the last decision does not invoke any rensa,
             // we'd like to skip simulate.
             // Even using simulateWhenLastDecisionIs, it looks checking rensaWillOccurWhenLastDecisionIs
             // is 7~8 % faster.
-            if (nextField.rensaWillOccurWhenLastDecisionIs(decision)) {
-                decisions.push_back(decision);
-                callback(nextField, decisions, currentNumChigiri + isChigiri, totalFrames, dropFrames, true);
-                decisions.pop_back();
-            } else {
-                if (nextField.color(3, 12) != PuyoColor::EMPTY) {
-                    continue;
-                }
+            bool doRensa = nextField.rensaWillOccurWhenLastDecisionIs(decision);
+            if (!doRensa && nextField.color(3, 12) != PuyoColor::EMPTY) {
+                continue;
+            }
 
-                decisions.push_back(decision);
-                if (currentDepth + 1 == maxDepth) {
-                    callback(nextField, decisions, currentNumChigiri + isChigiri, totalFrames, dropFrames, false);
-                } else {
-                    iterateAvailablePlansInternal(nextField, kumipuyoSeq, decisions, currentDepth + 1, maxDepth,
-                                                  currentNumChigiri + isChigiri, totalFrames + dropFrames, callback);
-                }
-                decisions.pop_back();
+            if (currentDepth + 1 == maxDepth || doRensa) {
+                callback(nextField, decisions, currentNumChigiri + isChigiri, totalFrames, dropFrames, doRensa);
+            } else {
+                iterateAvailablePlansInternal(nextField, kumipuyoSeq, decisions, currentDepth + 1, maxDepth,
+                                              currentNumChigiri + isChigiri, totalFrames + dropFrames, callback);
             }
         }
+        decisions.pop_back();
     }
 }
 
