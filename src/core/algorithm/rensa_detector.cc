@@ -159,12 +159,10 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                  const RensaDetector::ComplementCallback& callback)
 {
     bool visited[FieldConstant::MAP_WIDTH][NUM_PUYO_COLORS] {};
-    CoreField cf(originalField);
+
 
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         for (int y = originalField.height(x); y >= 1; --y) {
-            // Here, cf must be same as originalField.
-            DCHECK_EQ(originalField, cf);
             if (!originalField.isNormalColor(x, y))
                 continue;
 
@@ -204,6 +202,7 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                 int necessaryPuyos = 0;
 
                 bool ok = true;
+                CoreField cf(originalField);
                 while (true) {
                     if (!cf.dropPuyoOnWithMaxHeight(x + d, c, maxPuyoHeight)) {
                         ok = false;
@@ -220,19 +219,14 @@ void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConst
                         break;
                 }
 
-                if (!ok) {
-                    cf.removePuyoFrom(x + d, necessaryPuyos);
+                if (!ok)
                     continue;
-                }
 
                 ColumnPuyoList cpl;
-                if (!cpl.add(x + d, c, necessaryPuyos)) {
-                    cf.removePuyoFrom(x + d, necessaryPuyos);
+                if (!cpl.add(x + d, c, necessaryPuyos))
                     continue;
-                }
 
                 callback(cf, cpl);
-                cf.removePuyoFrom(x + d, necessaryPuyos);
             }
         }
     }
