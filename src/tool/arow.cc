@@ -1,10 +1,14 @@
 #include <algorithm>
 #include <vector>
 
+#include <dirent.h>
+
 #include <gflags/gflags.h>
+#include <glog/logging.h>
 #include <gtest/gtest.h>
 #include <SDL_image.h>
 
+#include "base/strings.h"
 #include "capture/color.h"
 #include "core/real_color.h"
 #include "gui/unique_sdl_surface.h"
@@ -113,9 +117,7 @@ int main()
         make_pair((FLAGS_testdata_dir + "/image/green-shaded.png"), RealColor::RC_GREEN),
         make_pair((FLAGS_testdata_dir + "/image/ojama-shaded.png"), RealColor::RC_OJAMA),
         make_pair((FLAGS_testdata_dir + "/image/purple-shaded.png"), RealColor::RC_PURPLE),
-    };
 
-    const pair<string, RealColor> validation_testcases[] = {
         make_pair((FLAGS_testdata_dir + "/image/empty-blur.png"), RealColor::RC_EMPTY),
         make_pair((FLAGS_testdata_dir + "/image/red-blur.png"), RealColor::RC_RED),
         make_pair((FLAGS_testdata_dir + "/image/blue-blur.png"), RealColor::RC_BLUE),
@@ -174,6 +176,68 @@ int main()
 
     int num = 0;
     int failed = 0;
+
+    string dirname = FLAGS_testdata_dir + "/image/actual-data";
+    DIR* dir = opendir(dirname.c_str());
+    PCHECK(dir);
+
+    struct dirent* ent;
+    while ((ent = readdir(dir)) != nullptr) {
+        string path = dirname + "/" + ent->d_name;
+        if (!strings::isSuffix(path, ".png"))
+            continue;
+
+        RealColor color = toRealColor(ent->d_name[0]);
+
+        UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(path.c_str())));
+        CHECK(surf.get()) << path.c_str();
+
+        int pos = 0;
+        vector<Feature> features(32 * 32 * 3);
+        for (int x = 0; x < 32; ++x) {
+            for (int y = 0; y < 32; ++y) {
+                std::uint32_t c = getpixel(surf.get(), x, y);
+                std::uint8_t r, g, b;
+                SDL_GetRGB(c, surf->format, &r, &g, &b);
+                features[pos] = Feature(pos, r);
+                ++pos;
+                features[pos] = Feature(pos, g);
+                ++pos;
+                features[pos] = Feature(pos, b);
+                ++pos;
+            }
+        }
+
+        static const RealColor colors[] = {
+            RealColor::RC_EMPTY, RealColor::RC_OJAMA, RealColor::RC_RED,
+            RealColor::RC_BLUE, RealColor::RC_YELLOW, RealColor::RC_GREEN, RealColor::RC_PURPLE
+        };
+
+        double margins[] = {
+            empty.margin(features), ojama.margin(features), red.margin(features),
+            blue.margin(features), yellow.margin(features), green.margin(features), purple.margin(features)
+        };
+
+        ++num;
+
+        int idx = max_element(margins, margins + 7) - margins;
+        if (color != colors[idx]) {
+            cout << "FAILED: " << color << " -> " << colors[idx] << " : " << path << endl;
+            for (int i = 0; i < 7; ++i) {
+                cout << colors[i] << " :-> " << margins[i] << endl;
+            }
+            ++failed;
+        }
+    }
+    closedir(dir);
+
+    cout << "num = " << num << endl;
+    cout << "failed =" << failed << endl;
+    cout << double(num - failed) / num << endl;
+
+#if 0
+    int num = 0;
+    int failed = 0;
     for (const auto& testcase : validation_testcases) {
         const string& filename = testcase.first;
         const RealColor color = testcase.second;
@@ -224,4 +288,5 @@ int main()
     cout << "num = " << num << endl;
     cout << "failed =" << failed << endl;
     cout << double(num - failed) / num << endl;
+#endif
 }
