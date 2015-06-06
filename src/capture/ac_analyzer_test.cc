@@ -307,26 +307,32 @@ TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
         make_pair((FLAGS_testdata_dir + "/image/empty.png"), RealColor::RC_EMPTY),
         make_pair((FLAGS_testdata_dir + "/image/empty-noised.png"), RealColor::RC_EMPTY),
         make_pair((FLAGS_testdata_dir + "/image/empty-shaded.png"), RealColor::RC_EMPTY),
+        make_pair((FLAGS_testdata_dir + "/image/empty-blur.png"), RealColor::RC_EMPTY),
 
         make_pair((FLAGS_testdata_dir + "/image/red.png"), RealColor::RC_RED),
         make_pair((FLAGS_testdata_dir + "/image/red-noised.png"), RealColor::RC_RED),
         make_pair((FLAGS_testdata_dir + "/image/red-shaded.png"), RealColor::RC_RED),
+        make_pair((FLAGS_testdata_dir + "/image/red-blur.png"), RealColor::RC_RED),
 
         make_pair((FLAGS_testdata_dir + "/image/blue.png"), RealColor::RC_BLUE),
         make_pair((FLAGS_testdata_dir + "/image/blue-noised.png"), RealColor::RC_BLUE),
         make_pair((FLAGS_testdata_dir + "/image/blue-shaded.png"), RealColor::RC_BLUE),
+        make_pair((FLAGS_testdata_dir + "/image/blue-blur.png"), RealColor::RC_BLUE),
 
         make_pair((FLAGS_testdata_dir + "/image/yellow.png"), RealColor::RC_YELLOW),
         make_pair((FLAGS_testdata_dir + "/image/yellow-noised.png"), RealColor::RC_YELLOW),
         make_pair((FLAGS_testdata_dir + "/image/yellow-shaded.png"), RealColor::RC_YELLOW),
+        make_pair((FLAGS_testdata_dir + "/image/yellow-blur.png"), RealColor::RC_YELLOW),
 
         make_pair((FLAGS_testdata_dir + "/image/green.png"), RealColor::RC_GREEN),
         make_pair((FLAGS_testdata_dir + "/image/green-noised.png"), RealColor::RC_GREEN),
         make_pair((FLAGS_testdata_dir + "/image/green-shaded.png"), RealColor::RC_GREEN),
+        make_pair((FLAGS_testdata_dir + "/image/green-blur.png"), RealColor::RC_GREEN),
 
         make_pair((FLAGS_testdata_dir + "/image/purple.png"), RealColor::RC_PURPLE),
         make_pair((FLAGS_testdata_dir + "/image/purple-noised.png"), RealColor::RC_PURPLE),
         make_pair((FLAGS_testdata_dir + "/image/purple-shaded.png"), RealColor::RC_PURPLE),
+        make_pair((FLAGS_testdata_dir + "/image/purple-blur.png"), RealColor::RC_PURPLE),
     };
 
     ACAnalyzer analyzer;
