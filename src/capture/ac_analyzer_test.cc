@@ -309,6 +309,11 @@ TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
         make_pair((FLAGS_testdata_dir + "/image/empty-shaded.png"), RealColor::RC_EMPTY),
         make_pair((FLAGS_testdata_dir + "/image/empty-blur.png"), RealColor::RC_EMPTY),
 
+        make_pair((FLAGS_testdata_dir + "/image/ojama.png"), RealColor::RC_OJAMA),
+        make_pair((FLAGS_testdata_dir + "/image/ojama-noised.png"), RealColor::RC_OJAMA),
+        make_pair((FLAGS_testdata_dir + "/image/ojama-shaded.png"), RealColor::RC_OJAMA),
+        make_pair((FLAGS_testdata_dir + "/image/ojama-blur.png"), RealColor::RC_OJAMA),
+
         make_pair((FLAGS_testdata_dir + "/image/red.png"), RealColor::RC_RED),
         make_pair((FLAGS_testdata_dir + "/image/red-noised.png"), RealColor::RC_RED),
         make_pair((FLAGS_testdata_dir + "/image/red-shaded.png"), RealColor::RC_RED),
