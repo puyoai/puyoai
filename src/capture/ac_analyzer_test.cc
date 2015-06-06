@@ -298,6 +298,63 @@ TEST_F(ACAnalyzerTest, OjamaDetectionCase4)
     EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
 }
 
+TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
+{
+    UniqueSDLSurface foreground(makeUniqueSDLSurface(IMG_Load((FLAGS_testdata_dir + "/image/foreground.png").c_str())));
+    UniqueSDLSurface background(makeUniqueSDLSurface(IMG_Load((FLAGS_testdata_dir + "/image/background.png").c_str())));
+    ASSERT_TRUE(foreground.get());
+    ASSERT_TRUE(background.get());
+
+    ACAnalyzer analyzer;
+
+    const int WIDTH = 32;
+    const int HEIGHT = 32;
+    const int NUM_BACKGROUND_HORIZONTAL = 7;
+    const int NUM_BACKGROUND_VERTICAL = 3;
+
+    pair<RealColor, int> colors[] = {
+        make_pair(RealColor::RC_RED, 23),
+        make_pair(RealColor::RC_BLUE, 21),
+        make_pair(RealColor::RC_YELLOW, 23),
+        make_pair(RealColor::RC_GREEN, 22),
+        make_pair(RealColor::RC_PURPLE, 25),
+        make_pair(RealColor::RC_OJAMA, 3)
+    };
+
+    for (int testColor = 0; testColor < static_cast<int>(ARRAY_SIZE(colors)); ++testColor) {
+        const RealColor color = colors[testColor].first;
+        const int numTest = colors[testColor].second;
+        for (int i = 0; i < numTest; ++i) {
+            UniqueSDLSurface surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, WIDTH * 7, HEIGHT * 3, 32, 0, 0, 0, 0)));
+            SDL_BlitSurface(background.get(), nullptr, surf.get(), nullptr);
+            const SDL_Rect srcRect { WIDTH * i, HEIGHT * testColor, WIDTH, HEIGHT };
+            for (int x = 0; x < NUM_BACKGROUND_HORIZONTAL; ++x) {
+                for (int y = 0; y < NUM_BACKGROUND_VERTICAL; ++y) {
+                    SDL_Rect destRect { x * WIDTH, y * HEIGHT, WIDTH, HEIGHT };
+                    SDL_BlitSurface(foreground.get(), &srcRect, surf.get(), &destRect);
+                }
+            }
+
+            for (int x = 0; x < NUM_BACKGROUND_HORIZONTAL; ++x) {
+                for (int y = 0; y < NUM_BACKGROUND_VERTICAL; ++y) {
+                    Box b(x * WIDTH, y * HEIGHT, (x + 1) * WIDTH, (y + 1) * HEIGHT);
+                    BoxAnalyzeResult result = analyzer.analyzeBox(surf.get(), b);
+                    EXPECT_EQ(color, result.realColor);
+                }
+            }
+        }
+    }
+
+    // EMPTY case
+    for (int x = 0; x < NUM_BACKGROUND_HORIZONTAL; ++x) {
+        for (int y = 0; y < NUM_BACKGROUND_VERTICAL; ++y) {
+            Box b(x * WIDTH, y * HEIGHT, (x + 1) * WIDTH, (y + 1) * HEIGHT);
+            BoxAnalyzeResult result = analyzer.analyzeBox(background.get(), b);
+            EXPECT_EQ(RealColor::RC_EMPTY, result.realColor);
+        }
+    }
+}
+
 TEST_F(ACAnalyzerTest, WnextDetection)
 {
     struct Testcase {
