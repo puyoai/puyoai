@@ -12,3 +12,5 @@ function(tool_add_executable exe)
 endfunction()
 
 tool_add_executable(exhaustive_test_generator exhaustive_test_generator.cc)
+
+tool_add_executable(arow arow.cc)
