@@ -312,7 +312,7 @@ TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
     const int NUM_BACKGROUND_HORIZONTAL = 7;
     const int NUM_BACKGROUND_VERTICAL = 3;
 
-    pair<RealColor, int> colors[] = {
+    const pair<RealColor, int> colors[] = {
         make_pair(RealColor::RC_RED, 23),
         make_pair(RealColor::RC_BLUE, 21),
         make_pair(RealColor::RC_YELLOW, 23),
