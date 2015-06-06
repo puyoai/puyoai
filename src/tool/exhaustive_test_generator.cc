@@ -9,8 +9,6 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-#include "capture/capture.h"
-#include "capture/color.h"
 #include "gui/bounding_box.h"
 #include "gui/main_window.h"
 #include "gui/unique_sdl_surface.h"
