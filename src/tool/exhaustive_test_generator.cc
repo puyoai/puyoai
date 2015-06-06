@@ -20,6 +20,8 @@ DECLARE_string(testdata_dir);
 
 using namespace std;
 
+// this program makes test patterns from foreground.png and background.png.
+
 int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
