@@ -121,6 +121,7 @@ add_subdirectory(core)
 add_subdirectory(cpu)
 add_subdirectory(duel)
 add_subdirectory(solver)
+add_subdirectory(tool)
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/internal AND IS_DIRECTORY ${CMAKE_SOURCE_DIR}/internal)
     add_subdirectory(internal)
