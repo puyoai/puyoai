@@ -11,6 +11,8 @@ using std::cout;
 
 namespace {
 
+const int kMaxMessageLines = 6;
+
 const char C_RED[] = "\x1b[41m";
 const char C_BLUE[] = "\x1b[44m";
 const char C_GREEN[] = "\x1b[42m";
@@ -136,7 +138,17 @@ void Cui::printMessage(int playerId, const std::string& message)
     if (message.empty())
         return;
 
-    printText(locate(1, 1 + FieldConstant::MAP_HEIGHT + 3 + playerId) + CLEAR_LINE, message);
+    int baseRow = 1 + FieldConstant::MAP_HEIGHT + 3;
+
+    std::ostringstream ss;
+    // Clear |kMaxMessageLines| lines.
+    ss << locate(1, baseRow + playerId * kMaxMessageLines);
+    for (int i = 0; i < kMaxMessageLines; ++i) {
+        ss << CLEAR_LINE << "\n";
+    }
+    // Reset location of the cursor.
+    ss << locate(1, baseRow + playerId * kMaxMessageLines);
+    printText(ss.str(), message);
 }
 
 void Cui::print(int playerId, const PlayerGameState& pgs)
