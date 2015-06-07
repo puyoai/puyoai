@@ -128,28 +128,38 @@ void Ai::EvaluatePlan(const RefPlan& plan,
   oss << "Field(" << value << ")";
   score += value;
 
+  int num_puyos_to_fire = 0;
+  // TODO: Move this routine into Evaluator::Field()
   // Simulate plan to see where to start.
-  Position start(0, 0);
-  auto callback = [&start](const CoreField&,
-                           const RensaResult&,
-                           const ColumnPuyoList&,
-                           const RensaChainTrackResult& result) {
+  int start_height = 0;
+  auto callback = [&start_height, &num_puyos_to_fire](
+      const CoreField&, const RensaResult&, const ColumnPuyoList& completedPuyos,
+      const RensaChainTrackResult& result) {
+    int num_fire = 0;
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
       for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
         if (result.erasedAt(x, y) == 1) {
-          start = Position(x, y);
-          break;
+          start_height += y;
+          ++num_fire;
         }
       }
     }
+    if (num_fire)
+      start_height /= num_fire;
+    num_puyos_to_fire = completedPuyos.size();
   };
   RensaDetector::iteratePossibleRensasWithTracking(
       plan.field(), 0, RensaDetectorStrategy::defaultDropStrategy(), callback);
   {
-    value = start.y * 100;
+    value = start_height * 100;
     oss << "Starting(" << value << ")_";
     score += value;
-  }      
+  }
+  {
+    value = - (num_puyos_to_fire - 1) * 400;
+    oss << "NeedToFire(" << value << ")_";
+    score += value;
+  }
 
   if (plan.isRensaPlan()) {
     const int kAcceptablePuyo = 6;
