@@ -12,7 +12,9 @@
 #include "base/base.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
+#include "core/core_field.h"
 #include "core/frame_request.h"
+#include "core/player_state.h"
 
 #include "cpu/peria/evaluator.h"
 
@@ -26,6 +28,7 @@ struct Ai::Attack {
 struct Ai::Control {
   std::string message;
   int score = 0;
+  CoreField field;
   Decision decision;
 };
 
@@ -40,8 +43,6 @@ DropDecision Ai::think(int frame_id,
                        const PlayerState& enemy,
                        bool fast) const {
   UNUSED_VARIABLE(frame_id);
-  UNUSED_VARIABLE(me);
-  UNUSED_VARIABLE(enemy);
   UNUSED_VARIABLE(fast);
   using namespace std::placeholders;
 
@@ -64,37 +65,40 @@ DropDecision Ai::think(int frame_id,
   // Look for plans.
   Control control;
   control.score = -10000;
-  auto evaluate = std::bind(Ai::EvaluatePlan, _1, attack_.get(),
-                            track_result, &control);
+  auto evaluate = std::bind(Ai::EvaluatePlan, _1, me, enemy, track_result, &control);
   Plan::iterateAvailablePlans(field, seq, 2, evaluate);
 
-  DLOG(INFO) << control.message;
-  DLOG(INFO) << field.toDebugString();
+  // Simulate plan to see where to start.
+  Position start(0, 0);
+  auto callback = [&start](const CoreField&,
+                           const RensaResult&,
+                           const ColumnPuyoList&,
+                           const RensaChainTrackResult& result) {
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+      for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
+        if (result.erasedAt(x, y) == 1) {
+          start = Position(x, y);
+          break;
+        }
+      }
+    }
+  };
+  RensaDetector::iteratePossibleRensasWithTracking(
+      control.field, 0, RensaDetectorStrategy::defaultDropStrategy(), callback);
+
+  if (start.x) {
+    std::ostringstream oss;
+    oss << "," << "StartFrom(" << toChar(field.color(start.x, start.y))
+        << "@" << start.x << "-" << start.y << ")";
+    control.message += oss.str();
+  }
+  
   return DropDecision(control.decision, control.message);
 }
 
-void Ai::onGameWillBegin(const FrameRequest& /*frame_request*/) {
-  attack_.reset();
-}
-
-void Ai::onGroundedForEnemy(const FrameRequest& frame_request) {
-  const PlainField& enemy = frame_request.enemyPlayerFrameRequest().field;
-  CoreField field(CoreField::fromPlainFieldWithDrop(enemy));
-  RensaResult result = field.simulate();
-
-  if (result.chains == 0) {
-    // TODO: Check required puyos to start RENSA.
-    attack_.reset();
-    return;
-  }
-
-  attack_.reset(new Attack);
-  attack_->score = result.score;
-  attack_->end_frame_id = frame_request.frameId + result.frames;
-}
-
 void Ai::EvaluatePlan(const RefPlan& plan,
-                      Attack* attack,
+                      const PlayerState& me,
+                      const PlayerState& enemy,
                       const RensaChainTrackResult& track,
                       Control* control) {
   // Score in total.
@@ -124,17 +128,44 @@ void Ai::EvaluatePlan(const RefPlan& plan,
   oss << "Field(" << value << ")";
   score += value;
 
+  // Simulate plan to see where to start.
+  Position start(0, 0);
+  auto callback = [&start](const CoreField&,
+                           const RensaResult&,
+                           const ColumnPuyoList&,
+                           const RensaChainTrackResult& result) {
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+      for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
+        if (result.erasedAt(x, y) == 1) {
+          start = Position(x, y);
+          break;
+        }
+      }
+    }
+  };
+  RensaDetector::iteratePossibleRensasWithTracking(
+      plan.field(), 0, RensaDetectorStrategy::defaultDropStrategy(), callback);
+  {
+    value = start.y * 100;
+    oss << "Starting(" << value << ")_";
+    score += value;
+  }      
+
   if (plan.isRensaPlan()) {
     const int kAcceptablePuyo = 6;
-    if (attack &&
-        attack->score >= SCORE_FOR_OJAMA * kAcceptablePuyo &&
-        attack->score < plan.score()) {
+    int my_score = plan.rensaResult().score;
+    if (me.hasZenkeshi)
+      my_score += SCORE_FOR_OJAMA * ZENKESHI_BONUS;
+
+    if (enemy.isRensaOngoing() &&
+        enemy.currentRensaResult.score >= SCORE_FOR_OJAMA * kAcceptablePuyo &&
+        enemy.currentRensaResult.score < my_score) {
       value = plan.score();
       oss << "Counter(" << value << ")_";
       score += value;
     }
 
-    value = plan.rensaResult().score;
+    value = my_score;
     oss << "Current(" << value << ")_";
     score += value;
 
@@ -145,7 +176,7 @@ void Ai::EvaluatePlan(const RefPlan& plan,
 
     if (plan.field().countPuyos() == 0) {
       value = ZENKESHI_BONUS;
-      oss << "Zenkeshi(" << value << ")";
+      oss << "Zenkeshi(" << value << ")_";
       score += value;
     }
   } else {
@@ -158,6 +189,7 @@ void Ai::EvaluatePlan(const RefPlan& plan,
 
   LOG(INFO) << score << " " << oss.str();
   if (score > control->score) {
+    control->field = plan.field();
     control->score = score;
     control->message = oss.str();
     control->decision = plan.decisions().front();

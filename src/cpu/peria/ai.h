@@ -23,19 +23,15 @@ class Ai : public ::AI {
                              const PlayerState& me,
                              const PlayerState& enemy,
                              bool fast) const override;
-  virtual void onGameWillBegin(const FrameRequest& frame_request) override;
-  virtual void onGroundedForEnemy(const FrameRequest& frame_request) override;
 
   // Callback function to evaluate a controled state.
   static void EvaluatePlan(const RefPlan& plan,
-                           Attack* attack,
+                           const PlayerState& me,
+                           const PlayerState& enemy,
                            const RensaChainTrackResult& track,
                            Control* control);
 
   static int PatternMatch(const RefPlan& plan, std::string* name);
-
-  // Information about opponent's attacks.
-  std::unique_ptr<Attack> attack_;
 };
 
 }  // namespace peria
