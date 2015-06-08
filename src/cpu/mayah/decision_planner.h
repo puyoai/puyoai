@@ -134,7 +134,6 @@ void DecisionPlanner<MidEvaluationResult>::iterateKumipuyoDrop(int currentDepth,
     DCHECK(isNormalColor(kumipuyo.child)) << kumipuyo.child;
 
     // Since copying CoreField is not so fast, we'd like to skip copying as many as possible.
-    CoreField nextField(currentField);
     int numDecisions = kumipuyo.axis == kumipuyo.child ? 11 : 22;
     const Decision* decisionsHead = DECISIONS;
 
@@ -145,11 +144,12 @@ void DecisionPlanner<MidEvaluationResult>::iterateKumipuyoDrop(int currentDepth,
     }
 
     for (int i = 0; i < numDecisions; ++i) {
-        DCHECK(nextField == currentField);
         const Decision& decision = decisionsHead[i];
 
         if (!PuyoController::isReachable(currentField, decision))
             continue;
+
+        CoreField nextField(currentField);
 
         if (!nextField.dropKumipuyo(decision, kumipuyo))
             continue;
@@ -158,7 +158,6 @@ void DecisionPlanner<MidEvaluationResult>::iterateKumipuyoDrop(int currentDepth,
         int dropFrames = currentField.framesToDropNext(decision);
 
         callback(nextField, decision, isChigiri, dropFrames);
-        nextField.undoKumipuyo(decision);
     }
 }
 

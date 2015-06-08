@@ -97,9 +97,6 @@ public:
     // Drop kumipuyo with decision.
     bool dropKumipuyo(const Decision&, const Kumipuyo&);
 
-    // Remove puyos.
-    void undoKumipuyo(const Decision&);
-
     // Returns #frame to drop the next KumiPuyo with decision. This function does not drop the puyo.
     int framesToDropNext(const Decision&) const;
 

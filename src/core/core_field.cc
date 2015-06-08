@@ -138,12 +138,6 @@ bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
     return true;
 }
 
-void CoreField::undoKumipuyo(const Decision& decision)
-{
-    removePuyoFrom(decision.x);
-    removePuyoFrom(decision.childX());
-}
-
 int CoreField::framesToDropNext(const Decision& decision) const
 {
     // TODO(mayah): This calculation should be more accurate. We need to compare this with
