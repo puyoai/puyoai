@@ -18,40 +18,32 @@ DECLARE_string(testdata_dir);
 
 using namespace std;
 
-struct Feature {
-    Feature() : index(-1), weight(0.0) {}
-    Feature(int index, double weight) : index(index), weight(weight) {}
-    int index;
-    double weight;
-};
-
 class Arow {
 public:
-    Arow() :
-        F(32 * 32 * 3), r(0.1), mean(F), cov(F)
+    Arow() : SIZE(32 * 32 * 3), RATE(0.1), mean(SIZE), cov(SIZE)
     {
         std::fill(cov.begin(), cov.end(), 1.0);
     }
 
-    double margin(const vector<Feature>& features) const
+    double margin(const vector<double>& features) const
     {
         double result = 0.0;
-        for (const auto& f : features) {
-            result += mean[f.index] * f.weight;
+        for (int i = 0; i < SIZE; ++i) {
+            result += mean[i] * features[i];
         }
         return result;
     }
 
-    double confidence(const vector<Feature>& features) const
+    double confidence(const vector<double>& features) const
     {
         double result = 0.0;
-        for (const auto& f : features) {
-            result += cov[f.index] * f.weight * f.weight;
+        for (int i = 0; i < SIZE; ++i) {
+            result += cov[i] * features[i] * features[i];
         }
         return result;
     }
 
-    int update(const vector<Feature>& features, int label)
+    int update(const vector<double>& features, int label)
     {
         double m = margin(features);
         int loss = m * label < 0 ? 1 : 0;
@@ -59,29 +51,31 @@ public:
             return 0;
 
         double v = confidence(features);
-        double beta = 1.0 / (v + r);
+        double beta = 1.0 / (v + RATE);
         double alpha = (1.0 - label * m) * beta;
 
         // update mean
-        for (const auto& f : features)
-            mean[f.index] += alpha * label * cov[f.index] * f.weight;
+        for (int i = 0; i < SIZE; ++i) {
+            mean[i] += alpha * label * cov[i] * features[i];
+        }
 
         // update covariance
-        for (const auto& f : features)
-            cov[f.index] = 1.0 / ((1.0 / cov[f.index]) + f.weight * f.weight / r);
+        for (int i = 0; i < SIZE; ++i) {
+            cov[i] = 1.0 / ((1.0 / cov[i]) + features[i] * features[i] / RATE);
+        }
 
         return loss;
     }
 
-    int predict(const vector<Feature>& features) const
+    int predict(const vector<double>& features) const
     {
         double m = margin(features);
         return m > 0 ? 1 : -1;
     }
 
 private:
-    const int F;
-    double r;
+    const int SIZE;
+    const double RATE;
     vector<double> mean;
     vector<double> cov;
 };
@@ -135,7 +129,8 @@ int main()
     Arow ojama;
     Arow empty;
 
-    for (int i = 0; i < 40; ++i) {
+    for (int i = 0; i < 100; ++i) {
+        int countFailure = 0;
         for (const auto& testcase : training_testcases) {
             const string& filename = testcase.first;
             const RealColor color = testcase.second;
@@ -145,33 +140,41 @@ int main()
             for (int x = 0; (x + 1) * WIDTH <= surf->w; ++x) {
                 for (int y = 0; (y + 1) * HEIGHT <= surf->h; ++y) {
                     int pos = 0;
-                    vector<Feature> features(32 * 32 * 3);
+                    vector<double> features(32 * 32 * 3);
                     for (int xx = 0; xx < 32; ++xx) {
                         for (int yy = 0; yy < 32; ++yy) {
                             std::uint32_t c = getpixel(surf.get(), x * WIDTH + xx, y * HEIGHT + yy);
                             std::uint8_t r, g, b;
                             SDL_GetRGB(c, surf->format, &r, &g, &b);
-                            features[pos] = Feature(pos, r);
-                            ++pos;
-                            features[pos] = Feature(pos, g);
-                            ++pos;
-                            features[pos] = Feature(pos, b);
-                            ++pos;
+                            features[pos++] = r;
+                            features[pos++] = g;
+                            features[pos++] = b;
                         }
                     }
 
-                    empty.update(features, color == RealColor::RC_EMPTY ? 1 : -1);
-                    ojama.update(features, color == RealColor::RC_OJAMA ? 1 : -1);
-                    red.update(features, color == RealColor::RC_RED ? 1 : -1);
-                    blue.update(features, color == RealColor::RC_BLUE ? 1 : -1);
-                    yellow.update(features, color == RealColor::RC_YELLOW ? 1 : -1);
-                    green.update(features, color == RealColor::RC_GREEN ? 1 : -1);
-                    purple.update(features, color == RealColor::RC_PURPLE ? 1 : -1);
+                    CHECK(pos == 32 * 32 * 3);
+
+                    if (empty.update(features, color == RealColor::RC_EMPTY ? 1 : -1) != 0)
+                        ++countFailure;
+                    if (ojama.update(features, color == RealColor::RC_OJAMA ? 1 : -1) != 0)
+                        ++countFailure;
+                    if (red.update(features, color == RealColor::RC_RED ? 1 : -1) != 0)
+                        ++countFailure;
+                    if (blue.update(features, color == RealColor::RC_BLUE ? 1 : -1) != 0)
+                        ++countFailure;
+                    if (yellow.update(features, color == RealColor::RC_YELLOW ? 1 : -1) != 0)
+                        ++countFailure;
+                    if (green.update(features, color == RealColor::RC_GREEN ? 1 : -1) != 0)
+                        ++countFailure;
+                    if (purple.update(features, color == RealColor::RC_PURPLE ? 1 : -1) != 0)
+                        ++countFailure;
                 }
             }
-
-            cout << "done" << endl;
         }
+
+        cout << "done: " << i << " failure=" << countFailure << endl;
+        if (countFailure == 0)
+            break;
     }
 
     int num = 0;
@@ -193,20 +196,19 @@ int main()
         CHECK(surf.get()) << path.c_str();
 
         int pos = 0;
-        vector<Feature> features(32 * 32 * 3);
+        vector<double> features(32 * 32 * 3);
         for (int x = 0; x < 32; ++x) {
             for (int y = 0; y < 32; ++y) {
                 std::uint32_t c = getpixel(surf.get(), x, y);
                 std::uint8_t r, g, b;
                 SDL_GetRGB(c, surf->format, &r, &g, &b);
-                features[pos] = Feature(pos, r);
-                ++pos;
-                features[pos] = Feature(pos, g);
-                ++pos;
-                features[pos] = Feature(pos, b);
-                ++pos;
+                features[pos++] = r;
+                features[pos++] = g;
+                features[pos++] = b;
             }
         }
+
+        CHECK(pos == 32 * 32 * 3);
 
         static const RealColor colors[] = {
             RealColor::RC_EMPTY, RealColor::RC_OJAMA, RealColor::RC_RED,
@@ -234,59 +236,4 @@ int main()
     cout << "num = " << num << endl;
     cout << "failed =" << failed << endl;
     cout << double(num - failed) / num << endl;
-
-#if 0
-    int num = 0;
-    int failed = 0;
-    for (const auto& testcase : validation_testcases) {
-        const string& filename = testcase.first;
-        const RealColor color = testcase.second;
-
-        UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(filename.c_str())));
-
-        for (int x = 0; (x + 1) * WIDTH <= surf->w; ++x) {
-            for (int y = 0; (y + 1) * HEIGHT <= surf->h; ++y) {
-                int pos = 0;
-                vector<Feature> features(32 * 32 * 3);
-                for (int xx = 0; xx < 32; ++xx) {
-                    for (int yy = 0; yy < 32; ++yy) {
-                        std::uint32_t c = getpixel(surf.get(), x * WIDTH + xx, y * HEIGHT + yy);
-                        std::uint8_t r, g, b;
-                        SDL_GetRGB(c, surf->format, &r, &g, &b);
-                        features[pos] = Feature(pos, r);
-                        ++pos;
-                        features[pos] = Feature(pos, g);
-                        ++pos;
-                        features[pos] = Feature(pos, b);
-                        ++pos;
-                    }
-                }
-
-                static const RealColor colors[] = {
-                    RealColor::RC_EMPTY, RealColor::RC_OJAMA, RealColor::RC_RED,
-                    RealColor::RC_BLUE, RealColor::RC_YELLOW, RealColor::RC_GREEN, RealColor::RC_PURPLE
-                };
-
-                double margins[] = {
-                    empty.margin(features), ojama.margin(features), red.margin(features),
-                    blue.margin(features), yellow.margin(features), green.margin(features), purple.margin(features)
-                };
-
-                ++num;
-
-                int idx = max_element(margins, margins + 7) - margins;
-                if (color != colors[idx]) {
-                    cout << "FAILED: " << color << " -> " << colors[idx] << endl;
-                    ++failed;
-                }
-            }
-        }
-
-        cout << "done" << endl;
-    }
-
-    cout << "num = " << num << endl;
-    cout << "failed =" << failed << endl;
-    cout << double(num - failed) / num << endl;
-#endif
 }
