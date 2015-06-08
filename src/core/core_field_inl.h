@@ -83,24 +83,4 @@ void CoreField::removePuyoFrom(int x)
     unsafeSet(x, heights_[x]--, PuyoColor::EMPTY);
 }
 
-inline
-void CoreField::removePuyoFrom(int x, int n)
-{
-    DCHECK_GE(height(x), n);
-    for (int i = 0; i < n; ++i) {
-        unsafeSet(x, heights_[x]--, PuyoColor::EMPTY);
-    }
-}
-
-inline
-void CoreField::remove(const ColumnPuyoList& cpl)
-{
-    for (int x = 1; x <= 6; ++x) {
-        for (int i = cpl.sizeOn(x); i > 0; --i) {
-            DCHECK_EQ(color(x, height(x)), cpl.get(x, i - 1));
-            removePuyoFrom(x);
-        }
-    }
-}
-
 #endif
