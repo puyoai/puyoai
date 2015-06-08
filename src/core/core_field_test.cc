@@ -415,13 +415,6 @@ TEST(CoreFieldTest, removePuyoFrom)
     EXPECT_EQ(0, cf.height(1));
     EXPECT_EQ(0, cf.height(2));
     EXPECT_EQ(0, cf.height(3));
-
-    cf.removePuyoFrom(4, 1);
-    cf.removePuyoFrom(5, 2);
-    cf.removePuyoFrom(6, 2);
-    EXPECT_EQ(1, cf.height(4));
-    EXPECT_EQ(0, cf.height(5));
-    EXPECT_EQ(0, cf.height(6));
 }
 
 TEST(CoreFieldTest, TrackedCoreFieldSimulation)

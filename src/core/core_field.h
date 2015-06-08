@@ -120,11 +120,6 @@ public:
     // Removes the puyo from top of column |x|.
     // If there is no puyo on column |x|, behavior is undefined.
     void removePuyoFrom(int x);
-    // Removes |n| puyos from top of column |x|.
-    // If there are not |n| puyos on column |x|, behavior is undefined.
-    void removePuyoFrom(int x, int n);
-    // Removes puyo list.
-    void remove(const ColumnPuyoList&);
 
     // ----------------------------------------------------------------------
     // simulation

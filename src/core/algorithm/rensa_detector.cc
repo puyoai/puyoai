@@ -237,12 +237,8 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                   int maxComplementPuyos, int maxPuyoHeight,
                   const RensaDetector::ComplementCallback& callback)
 {
-    CoreField cf(originalField);
-
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
-            DCHECK_EQ(cf, originalField);
-
             PuyoColor c = originalField.color(x, y);
 
             DCHECK_NE(c, PuyoColor::EMPTY);
@@ -262,6 +258,8 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                 if (x != dx && originalField.color(dx, y) != PuyoColor::EMPTY)
                     continue;
 
+                CoreField cf(originalField);
+
                 int restPuyos = necessaryPuyos;
                 ColumnPuyoList cpl;
 
@@ -273,12 +271,10 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                     }
                     if (!cpl.add(dx, PuyoColor::OJAMA)) {
                         ok = false;
-                        cf.removePuyoFrom(dx);
                         break;
                     }
                 }
                 if (!ok) {
-                    cf.removePuyoFrom(dx, cpl.sizeOn(dx));
                     continue;
                 }
 
@@ -289,17 +285,14 @@ void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldCons
                     }
                     if (!cpl.add(dx, c)) {
                         ok = false;
-                        cf.removePuyoFrom(dx);
                         break;
                     }
                 }
                 if (!ok) {
-                    cf.removePuyoFrom(dx, cpl.sizeOn(dx));
                     continue;
                 }
 
                 callback(cf, cpl);
-                cf.removePuyoFrom(dx, cpl.sizeOn(dx));
             }
         }
     }
@@ -311,13 +304,11 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                    const RensaDetector::ComplementCallback& callback)
 {
     FieldBits checked;
-    CoreField cf(originalField);
     Position positions[FieldConstant::HEIGHT * FieldConstant::WIDTH];
     int working[FieldConstant::HEIGHT * FieldConstant::WIDTH];
 
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
-            DCHECK_EQ(cf, originalField);
 
             PuyoColor c = originalField.color(x, y);
             if (!isNormalColor(c))
@@ -348,6 +339,7 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     if (!ok)
                         continue;
 
+                    CoreField cf(originalField);
                     ColumnPuyoList cpl;
                     for (int j = 0; j < 3; ++j) {
                         int xx = origin.x + EXTENTIONS[i][j][0];
@@ -378,17 +370,14 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     }
 
                     if (!ok) {
-                        cf.remove(cpl);
                         continue;
                     }
 
                     if (maxComplementPuyos < cpl.size()) {
-                        cf.remove(cpl);
                         continue;
                     }
 
                     callback(cf, cpl);
-                    cf.remove(cpl);
                 }
                 break;
             }
@@ -423,6 +412,7 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     if (!ok)
                         continue;
 
+                    CoreField cf(originalField);
                     ColumnPuyoList cpl;
                     for (int j = 0; j < 3; ++j) {
                         int xx = origin.x + EXTENTIONS[i][j][0];
@@ -451,17 +441,14 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     }
 
                     if (!ok) {
-                        cf.remove(cpl);
                         continue;
                     }
 
                     if (maxComplementPuyos < cpl.size()) {
-                        cf.remove(cpl);
                         continue;
                     }
 
                     callback(cf, cpl);
-                    cf.remove(cpl);
                 }
                 break;
             }
@@ -483,6 +470,7 @@ void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldCon
                     int xx = working[i];
                     if (prohibits[xx])
                         continue;
+                    CoreField cf(originalField);
                     if (!cf.dropPuyoOn(xx, c))
                         continue;
                     if (maxPuyoHeight < cf.height(xx)) {
