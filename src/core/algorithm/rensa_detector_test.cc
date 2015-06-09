@@ -15,115 +15,180 @@
 
 using namespace std;
 
-TEST(RensaDetectorTest, detect1)
+TEST(RensaDetectorTest, detectByDropStrategy1)
 {
-    CoreField f(
-        "..RRR.");
-
-    pair<CoreField, ColumnPuyoList> expected[5];
-    {
-        expected[0].first = CoreField(
-            ".RRRR.");
-        expected[0].second.add(2, PuyoColor::RED, 1);
-    }
-    {
-        expected[1].first = CoreField(
-            "..R..."
-            "..RRR.");
-        expected[1].second.add(3, PuyoColor::RED, 1);
-    }
-    {
-        expected[2].first = CoreField(
-            "...R.."
-            "..RRR.");
-        expected[2].second.add(4, PuyoColor::RED, 1);
-    }
-    {
-        expected[3].first = CoreField(
-            "....R."
-            "..RRR.");
-        expected[3].second.add(5, PuyoColor::RED, 1);
-    }
-    {
-        expected[4].first = CoreField(
-            "..RRRR");
-        expected[4].second.add(6, PuyoColor::RED, 1);
-    }
-
-    bool found[5] {};
-    bool unexpectedFound = false;
-    auto callback = [&](const CoreField& complementedField, const ColumnPuyoList& firePuyos) {
-        bool ok = false;
-        for (int i = 0; i < 5; ++i) {
-            if (expected[i].first == complementedField && expected[i].second == firePuyos) {
-                found[i] = true;
-                ok = true;
-                break;
-            }
-        }
-
-        if (!ok)
-            unexpectedFound = true;
-    };
-
-    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 1, false);
-    static const bool nonProhibits[FieldConstant::MAP_WIDTH] {};
-    RensaDetector::detect(f, strategy, PurposeForFindingRensa::FOR_FIRE, nonProhibits, callback);
-    EXPECT_FALSE(unexpectedFound);
-    EXPECT_TRUE(found[0]);
-    EXPECT_TRUE(found[1]);
-    EXPECT_TRUE(found[2]);
-    EXPECT_TRUE(found[3]);
-    EXPECT_TRUE(found[4]);
-}
-
-TEST(RensaDetectorTest, detectDrop1)
-{
-    CoreField f(
-        ".R...."
-        "RB...."
-        "RB...."
-        "RB...."
-        "BR...."
-        "BR...."
-        "BRGYG."
+    const CoreField original(
+        ".RGYG."
         "RGYGB."
         "RGYGB."
         "RGYGB.");
 
-    CoreField expected(
-        ".R...."
-        "RB...."
-        "RB...."
-        "RB...."
-        "BR...."
-        "BRR..."
-        "BRGYG."
+    const CoreField expected(
+        ".RGYG."
         "RGYGB."
         "RGYGB."
-        "RGYGB.");
+        "RGYGBB");
 
     bool found = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
-        CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(cpl));
+    auto callback = [&](const CoreField& actual, const ColumnPuyoList& cpl) {
+        if (actual != expected)
+            return;
+        EXPECT_FALSE(found);
+        found = true;
 
-        if (actual == expected) {
-            found = true;
-        }
+        CoreField cf(original);
+        EXPECT_TRUE(cf.dropPuyoList(cpl));
+        EXPECT_EQ(expected, cf);
     };
 
-    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::DROP, 2, 2, false);
-    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
+    const bool noProhibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detectByDropStrategy(original, noProhibits, PurposeForFindingRensa::FOR_FIRE, 1, 12, callback);
+
     EXPECT_TRUE(found);
 }
 
-TEST(RensaDetectorTest, detectExtend1)
+TEST(RensaDetectorTest, detectByFloatStrategy1)
 {
-    CoreField f(
+    const CoreField original(
+        "Y     "
+        "B     "
+        "R     "
+        "B     "
+        "B     "
+        "B     "
+        "Y     "
+        "Y     "
+        "Y     ");
+
+    const CoreField expected(
+        "Y     "
+        "B     "
+        "RR    "
+        "BR    "
+        "BR    "
+        "BO    "
+        "YO    "
+        "YO    "
+        "YO    ");
+
+    bool found = false;
+    auto callback = [&](const CoreField& actual, const ColumnPuyoList& cpl) {
+        if (actual != expected)
+            return;
+        EXPECT_FALSE(found);
+        found = true;
+
+        CoreField cf(original);
+        EXPECT_TRUE(cf.dropPuyoList(cpl));
+        EXPECT_EQ(expected, cf);
+    };
+
+    const bool noProhibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detectByFloatStrategy(original, noProhibits, 3, 12, callback);
+
+    EXPECT_TRUE(found);
+}
+
+TEST(RensaDetectorTest, detectByFloatStrategy2)
+{
+    const CoreField original(
+        ".....G"
+        ".....R"
+        ".....R"
+        ".....G"
+        ".....G"
+        ".....R"
+        "....GR"
+        "...GGR");
+
+    const CoreField expected(
+        ".....G"
+        ".....R"
+        ".....R"
+        ".....G"
+        "....GG"
+        "....GR"
+        "....GR"
+        "...GGR");
+
+    bool found = false;
+    auto callback = [&](const CoreField& actual, const ColumnPuyoList& cpl) {
+        if (actual != expected)
+            return;
+        EXPECT_FALSE(found);
+        found = true;
+
+        CoreField cf(original);
+        EXPECT_TRUE(cf.dropPuyoList(cpl));
+        EXPECT_EQ(expected, cf);
+    };
+
+    const bool noProhibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detectByFloatStrategy(original, noProhibits, 3, 12, callback);
+
+    EXPECT_TRUE(found);
+}
+
+TEST(RensaDetectorTest, detectByFloatStrategy3)
+{
+    CoreField original(
+        "....G."
+        "....R."
+        "....R."
+        "....G."
+        "....G."
+        "....R."
+        "...GR."
+        "..GGR.");
+
+    const CoreField expected[] {
+        CoreField(
+            "....G."
+            "....R."
+            "....R."
+            "....G."
+            "....GG"
+            "....RG"
+            "...GRO"
+            "..GGRO"),
+        CoreField(
+            "....G."
+            "....R."
+            "....R."
+            "....G."
+            "...GG."
+            "...GR."
+            "...GR."
+            "..GGR."),
+    };
+
+    bool found[ARRAY_SIZE(expected)] {};
+    auto callback = [&](const CoreField& actual, const ColumnPuyoList& cpl) {
+        for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
+            if (expected[i] != actual)
+                continue;
+            EXPECT_FALSE(found[i]);
+            found[i] = true;
+
+            CoreField cf(original);
+            EXPECT_TRUE(cf.dropPuyoList(cpl));
+            EXPECT_EQ(expected[i], cf);
+        }
+    };
+
+    const bool noProhibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detectByFloatStrategy(original, noProhibits, 3, 12, callback);
+
+    for (size_t i = 0; i < ARRAY_SIZE(expected); ++i)
+        EXPECT_TRUE(found[i]);
+}
+
+TEST(RensaDetectorTest, detectByExtendStrategy1)
+{
+    const CoreField original(
         "..RRR.");
 
-    CoreField expected[] {
+    const CoreField expected[] {
         CoreField(
             ".RRRR."),
         CoreField(
@@ -139,42 +204,42 @@ TEST(RensaDetectorTest, detectExtend1)
             "..RRRR")
     };
 
-    bool found[5] {};
+    bool found[ARRAY_SIZE(expected)] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
-        CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(cpl));
-
+    auto callback = [&](const CoreField& actual, const ColumnPuyoList& cpl) {
         bool ok = false;
-        for (int i = 0; i < 5; ++i) {
-            if (expected[i] == actual) {
-                found[i] = true;
-                ok = true;
-                break;
-            }
+        for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
+            if (expected[i] != actual)
+                continue;
+            EXPECT_FALSE(found[i]);
+            found[i] = true;
+
+            CoreField cf(original);
+            EXPECT_TRUE(cf.dropPuyoList(cpl));
+            EXPECT_EQ(expected[i], cf);
+            ok = true;
+            break;
         }
 
         if (!ok)
             unexpectedFound = true;
     };
 
-    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 1, false);
-    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
+    const bool noProhibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detectByExtendStrategy(original, noProhibits, 1, 12, callback);
+
+    for (size_t i = 0; i < ARRAY_SIZE(expected); ++i)
+        EXPECT_TRUE(found[i]);
     EXPECT_FALSE(unexpectedFound);
-    EXPECT_TRUE(found[0]);
-    EXPECT_TRUE(found[1]);
-    EXPECT_TRUE(found[2]);
-    EXPECT_TRUE(found[3]);
-    EXPECT_TRUE(found[4]);
 }
 
-TEST(RensaDetectorTest, detectExtend2)
+TEST(RensaDetectorTest, detectByExtendStrategy2)
 {
-    CoreField f(
+    const CoreField original(
         "...R.."
         "..RR..");
 
-    CoreField expected[] {
+    const CoreField expected[] {
         CoreField(
             "...R.."
             ".RRR.."),
@@ -190,42 +255,44 @@ TEST(RensaDetectorTest, detectExtend2)
             "..RRR."),
     };
 
-    bool found[4] {};
+    bool found[ARRAY_SIZE(expected)] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
-        CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(cpl));
-
+    auto callback = [&](const CoreField& actual, const ColumnPuyoList& cpl) {
         bool ok = false;
-        for (int i = 0; i < 4; ++i) {
-            if (expected[i] == actual) {
-                found[i] = true;
-                ok = true;
-                break;
-            }
+        for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
+            if (expected[i] != actual)
+                continue;
+            EXPECT_FALSE(found[i]);
+            found[i] = true;
+
+            CoreField cf(original);
+            EXPECT_TRUE(cf.dropPuyoList(cpl));
+            EXPECT_EQ(expected[i], cf);
+            ok = true;
+            break;
         }
 
         if (!ok)
             unexpectedFound = true;
     };
 
-    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 1, false);
-    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
+    const bool noProhibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detectByExtendStrategy(original, noProhibits, 1, 12, callback);
+
+    for (size_t i = 0; i < ARRAY_SIZE(expected); ++i)
+        EXPECT_TRUE(found[i]);
     EXPECT_FALSE(unexpectedFound);
-    EXPECT_TRUE(found[0]);
-    EXPECT_TRUE(found[1]);
-    EXPECT_TRUE(found[2]);
-    EXPECT_TRUE(found[3]);
+
 }
 
-TEST(RensaDetectorTest, detectExtend3)
+TEST(RensaDetectorTest, detectByExtendStrategy3)
 {
-    CoreField f(
+    const CoreField original(
         "...R.."
         "..RR.."
         "..OO..");
 
-    CoreField expected[] {
+    const CoreField expected[] {
         CoreField(
             "..RR.."
             "..RR.."
@@ -237,39 +304,44 @@ TEST(RensaDetectorTest, detectExtend3)
             "..OO.."),
     };
 
-    bool found[2] {};
+    bool found[ARRAY_SIZE(expected)] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
-        CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(cpl));
-
+    auto callback = [&](const CoreField& actual, const ColumnPuyoList& cpl) {
         bool ok = false;
-        for (int i = 0; i < 2; ++i) {
-            if (expected[i] == actual) {
-                found[i] = true;
-                ok = true;
-                break;
-            }
+        for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
+            if (expected[i] != actual)
+                continue;
+            EXPECT_FALSE(found[i]);
+            found[i] = true;
+
+            CoreField cf(original);
+            EXPECT_TRUE(cf.dropPuyoList(cpl));
+            EXPECT_EQ(expected[i], cf);
+            ok = true;
+            break;
         }
 
-        if (!ok)
+        if (!ok) {
             unexpectedFound = true;
+            FAIL() << actual;
+        }
     };
 
-    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 1, false);
-    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
+    const bool noProhibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detectByExtendStrategy(original, noProhibits, 1, 12, callback);
+
+    for (size_t i = 0; i < ARRAY_SIZE(expected); ++i)
+        EXPECT_TRUE(found[i]);
     EXPECT_FALSE(unexpectedFound);
-    EXPECT_TRUE(found[0]);
-    EXPECT_TRUE(found[1]);
 }
 
-TEST(RensaDetectorTest, detectExtend4)
+TEST(RensaDetectorTest, detectByExtendStrategy4)
 {
-    CoreField f(
+    const CoreField original(
         "..RR.."
         "..OO..");
 
-    CoreField expected[] {
+    const CoreField expected[] {
         CoreField(
             "..RR.."
             "..RR.."
@@ -292,41 +364,42 @@ TEST(RensaDetectorTest, detectExtend4)
             ".ROO.."),
     };
 
-    const size_t N = ARRAY_SIZE(expected);
-
-    bool found[N] {};
+    bool found[ARRAY_SIZE(expected)] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
-        CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(cpl));
-
+    auto callback = [&](const CoreField& actual, const ColumnPuyoList& cpl) {
         bool ok = false;
-        for (size_t i = 0; i < N; ++i) {
-            if (expected[i] == actual) {
-                found[i] = true;
-                ok = true;
-                break;
-            }
+        for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
+            if (expected[i] != actual)
+                continue;
+            EXPECT_FALSE(found[i]);
+            found[i] = true;
+
+            CoreField cf(original);
+            EXPECT_TRUE(cf.dropPuyoList(cpl));
+            EXPECT_EQ(expected[i], cf);
+            ok = true;
+            break;
         }
 
         if (!ok)
             unexpectedFound = true;
     };
 
-    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 2, false);
-    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
+    const bool noProhibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detectByExtendStrategy(original, noProhibits, 2, 12, callback);
+
+    for (size_t i = 0; i < ARRAY_SIZE(expected); ++i)
+        EXPECT_TRUE(found[i]);
     EXPECT_FALSE(unexpectedFound);
-    for (size_t i = 0; i < N; ++i)
-        EXPECT_TRUE(found[i]) << i;
 }
 
-TEST(RensaDetectorTest, detectExtend5)
+TEST(RensaDetectorTest, detectByExtendStrategy5)
 {
-    CoreField f(
+    const CoreField original(
         "..R..."
         "..OO..");
 
-    CoreField expected[] {
+    const CoreField expected[] {
         CoreField(
             "..R..."
             "..R..."
@@ -366,34 +439,33 @@ TEST(RensaDetectorTest, detectExtend5)
             ".ROO.."),
     };
 
-    const size_t N = ARRAY_SIZE(expected);
-
-    bool found[N] {};
+    bool found[ARRAY_SIZE(expected)] {};
     bool unexpectedFound = false;
-    auto callback = [&](const CoreField&, const RensaResult&, const ColumnPuyoList& cpl) {
-        CoreField actual(f);
-        EXPECT_TRUE(actual.dropPuyoList(cpl));
-
+    auto callback = [&](const CoreField& actual, const ColumnPuyoList& cpl) {
         bool ok = false;
-        for (size_t i = 0; i < N; ++i) {
-            if (expected[i] == actual) {
-                found[i] = true;
-                ok = true;
-                break;
-            }
+        for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
+            if (expected[i] != actual)
+                continue;
+            EXPECT_FALSE(found[i]);
+            found[i] = true;
+
+            CoreField cf(original);
+            EXPECT_TRUE(cf.dropPuyoList(cpl));
+            EXPECT_EQ(expected[i], cf);
+            ok = true;
+            break;
         }
 
-        if (!ok) {
-            cout << actual.toDebugString() << endl;
+        if (!ok)
             unexpectedFound = true;
-        }
     };
 
-    RensaDetectorStrategy strategy(RensaDetectorStrategy::Mode::EXTEND, 0, 3, false);
-    RensaDetector::iteratePossibleRensas(f, 0, strategy, callback);
+    const bool noProhibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detectByExtendStrategy(original, noProhibits, 3, 12, callback);
+
+    for (size_t i = 0; i < ARRAY_SIZE(expected); ++i)
+        EXPECT_TRUE(found[i]);
     EXPECT_FALSE(unexpectedFound);
-    for (size_t i = 0; i < N; ++i)
-        EXPECT_TRUE(found[i]) << i;
 }
 
 TEST(RensaDetectorTest, iteratePossibleRensa)
@@ -477,132 +549,6 @@ TEST(RensaDetectorTest, iteratePossibleRensaWithKeyPuyos)
     EXPECT_TRUE(found[1]);
     EXPECT_TRUE(found[2]);
     EXPECT_TRUE(found[3]);
-}
-
-TEST(RensaDetectorTest, iteratePossibleRensasFloat)
-{
-    const CoreField cf(
-        "Y     "
-        "B     "
-        "R     "
-        "B     "
-        "B     "
-        "B     "
-        "Y     "
-        "Y     "
-        "Y     ");
-
-    const CoreField expected(
-        "Y     "
-        "B     "
-        "RR    "
-        "BR    "
-        "BR    "
-        "BO    "
-        "YO    "
-        "YO    "
-        "YO    ");
-
-    bool found = false;
-    auto callback = [&](const CoreField& /*fieldAfterRensa*/, const RensaResult& /*rensaResult*/,
-                        const ColumnPuyoList& cpl) {
-        CoreField actual(cf);
-        if (!actual.dropPuyoList(cpl))
-            return;
-        if (actual == expected)
-            found = true;
-    };
-
-    RensaDetector::iteratePossibleRensas(cf, 0, RensaDetectorStrategy::defaultFloatStrategy(), callback);
-    EXPECT_TRUE(found);
-}
-
-TEST(RensaDetectorTest, iteratePossibleRensasFloat2)
-{
-    const CoreField cf(
-        ".....G"
-        ".....R"
-        ".....R"
-        ".....G"
-        ".....G"
-        ".....R"
-        "....GR"
-        "...GGR");
-
-    const CoreField expected(
-        ".....G"
-        ".....R"
-        ".....R"
-        ".....G"
-        "....GG"
-        "....GR"
-        "....GR"
-        "...GGR");
-
-    bool found = false;
-    auto callback = [&](const CoreField& /*fieldAfterRensa*/, const RensaResult& /*rensaResult*/,
-                        const ColumnPuyoList& cpl) {
-        CoreField actual(cf);
-        if (!actual.dropPuyoList(cpl))
-            return;
-        if (actual == expected)
-            found = true;
-    };
-
-
-    RensaDetector::iteratePossibleRensas(cf, 0, RensaDetectorStrategy::defaultFloatStrategy(), callback);
-    EXPECT_TRUE(found);
-}
-
-TEST(RensaDetectorTest, iteratePossibleRensasFloat3)
-{
-    CoreField original(
-        "....G."
-        "....R."
-        "....R."
-        "....G."
-        "....G."
-        "....R."
-        "...GR."
-        "..GGR.");
-
-    CoreField expected1(
-        "....G."
-        "....R."
-        "....R."
-        "....G."
-        "....GG"
-        "....RG"
-        "...GRO"
-        "..GGRO");
-
-    CoreField expected2(
-        "....G."
-        "....R."
-        "....R."
-        "....G."
-        "...GG."
-        "...GR."
-        "...GR."
-        "..GGR.");
-
-    bool found1 = false;
-    bool found2 = false;
-    auto callback = [&](const CoreField& /*fieldAfterRensa*/, const RensaResult& /*rensaResult*/,
-                        const ColumnPuyoList& cpl) {
-        CoreField actual(original);
-        if (!actual.dropPuyoList(cpl))
-           return;
-
-        if (actual == expected1)
-            found1 = true;
-        else if (actual == expected2)
-            found2 = true;
-    };
-
-    RensaDetector::iteratePossibleRensas(original, 0, RensaDetectorStrategy::defaultFloatStrategy(), callback);
-    EXPECT_TRUE(found1);
-    EXPECT_TRUE(found2);
 }
 
 TEST(RensaDetectorTest, iteratePossibleRensasExtend1)
