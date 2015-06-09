@@ -24,7 +24,7 @@ enum class PurposeForFindingRensa {
 // TODO(mayah): Simplify this class.
 class RensaDetector {
 public:
-    typedef std::function<void (const CoreField& complementedField,
+    typedef std::function<void (CoreField&& complementedField,
                                 const ColumnPuyoList& complementedColumnPuyoList)> ComplementCallback;
     typedef std::function<void (const CoreField& fieldAfterRensa,
                                 const RensaResult& rensaResult,
@@ -38,6 +38,26 @@ public:
     typedef TrackedRensaCallback<RensaCoefResult> CoefPossibleRensaCallback;
     typedef TrackedRensaCallback<RensaVanishingPositionResult> VanishingPositionPossibleRensaCallback;
 
+    // Detects rensa by DROP strategy.
+    static void detectByDropStrategy(const CoreField&,
+                                     const bool prohibits[FieldConstant::MAP_WIDTH],
+                                     PurposeForFindingRensa,
+                                     int maxComplementPuyos,
+                                     int maxPuyoHeight,
+                                     const ComplementCallback&);
+    // Detects rensa by FLOAT strategy.
+    static void detectByFloatStrategy(const CoreField&,
+                                      const bool prohibits[FieldConstant::MAP_WIDTH],
+                                      int maxComplementPuyos,
+                                      int maxPuyoHeight,
+                                      const ComplementCallback&);
+    // Detects rensa by EXTEND strategy.
+    static void detectByExtendStrategy(const CoreField&,
+                                       const bool prohibits[FieldConstant::MAP_WIDTH],
+                                       int maxComplementPuyos,
+                                       int maxPuyoHeight,
+                                       const RensaDetector::ComplementCallback&);
+
     // Detects a rensa from the field. The ColumnPuyoList to fire a rensa will be passed to
     // |callback|. Note that invalid column puyo list might be passed to |callback|.
     // The field that puyo list is added is also passed to DetectionCallback.
@@ -45,7 +65,7 @@ public:
                        const RensaDetectorStrategy&,
                        PurposeForFindingRensa,
                        const bool prohibits[FieldConstant::MAP_WIDTH],
-                       const ComplementCallback& callback);
+                       const ComplementCallback&);
 
     // TODO(mayah): Consider simplify these methods.
 

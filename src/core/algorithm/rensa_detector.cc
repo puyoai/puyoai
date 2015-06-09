@@ -78,6 +78,384 @@ const int EXTENTIONS[][3][2] = {
 
 }  // namespace anomymous
 
+// tryDropFire complements puyos in |originalField|, and fires a rensa.
+// The complemented puyos are always grounded (This is the different point of tryFloatFire).
+// For each detected rensa, |callback| is called.
+// static
+void RensaDetector::detectByDropStrategy(const CoreField& originalField,
+                                         const bool prohibits[FieldConstant::MAP_WIDTH],
+                                         PurposeForFindingRensa purpose,
+                                         int maxComplementPuyos,
+                                         int maxPuyoHeight,
+                                         const RensaDetector::ComplementCallback& callback)
+{
+    bool visited[FieldConstant::MAP_WIDTH][NUM_PUYO_COLORS] {};
+
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        for (int y = originalField.height(x); y >= 1; --y) {
+            if (!originalField.isNormalColor(x, y))
+                continue;
+
+            PuyoColor c = originalField.color(x, y);
+
+            // Drop puyo on
+            for (int d = -1; d <= 1; ++d) {
+                if (prohibits[x + d])
+                    continue;
+
+                if (visited[x + d][ordinal(c)])
+                    continue;
+
+                if (x + d <= 0 || FieldConstant::WIDTH < x + d)
+                    continue;
+                if (d == 0) {
+                    if (originalField.color(x, y + 1) != PuyoColor::EMPTY)
+                        continue;
+
+                    // If the first rensa is this, any rensa won't continue.
+                    // This is like erasing the following X.
+                    // ......
+                    // .YXY..
+                    // BZZZBB
+                    // CAAACC
+                    //
+                    // So, we should be able to skip this.
+                    if (purpose == PurposeForFindingRensa::FOR_FIRE && !originalField.isConnectedPuyo(x, y))
+                        continue;
+                } else {
+                    if (originalField.color(x + d, y) != PuyoColor::EMPTY)
+                        continue;
+                }
+
+                visited[x + d][ordinal(c)] = true;
+
+                int necessaryPuyos = 0;
+
+                bool ok = true;
+                CoreField cf(originalField);
+                while (true) {
+                    if (!cf.dropPuyoOnWithMaxHeight(x + d, c, maxPuyoHeight)) {
+                        ok = false;
+                        break;
+                    }
+
+                    ++necessaryPuyos;
+
+                    if (maxComplementPuyos < necessaryPuyos) {
+                        ok = false;
+                        break;
+                    }
+                    if (cf.countConnectedPuyosMax4(x + d, cf.height(x + d)) >= 4)
+                        break;
+                }
+
+                if (!ok)
+                    continue;
+
+                ColumnPuyoList cpl;
+                if (!cpl.add(x + d, c, necessaryPuyos))
+                    continue;
+
+                callback(std::move(cf), cpl);
+            }
+        }
+    }
+}
+
+// static
+void RensaDetector::detectByFloatStrategy(const CoreField& originalField,
+                                          const bool prohibits[FieldConstant::MAP_WIDTH],
+                                          int maxComplementPuyos,
+                                          int maxPuyoHeight,
+                                          const RensaDetector::ComplementCallback& callback)
+{
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
+            PuyoColor c = originalField.color(x, y);
+
+            DCHECK_NE(c, PuyoColor::EMPTY);
+            if (c == PuyoColor::OJAMA)
+                continue;
+
+            int necessaryPuyos = 4 - originalField.countConnectedPuyosMax4(x, y);
+            if (necessaryPuyos > maxComplementPuyos)
+                continue;
+
+            // float puyo col dx
+            for (int dx = x - 1; dx <= x + 1; ++dx) {
+                if (dx <= 0 || FieldConstant::WIDTH < dx)
+                    continue;
+                if (prohibits[dx])
+                    continue;
+                if (x != dx && originalField.color(dx, y) != PuyoColor::EMPTY)
+                    continue;
+
+                CoreField cf(originalField);
+
+                int restPuyos = necessaryPuyos;
+                ColumnPuyoList cpl;
+
+                bool ok = true;
+                while (cf.height(dx) + restPuyos < y) {
+                    if (!cf.dropPuyoOnWithMaxHeight(dx, PuyoColor::OJAMA, maxPuyoHeight)) {
+                        ok = false;
+                        break;
+                    }
+                    if (!cpl.add(dx, PuyoColor::OJAMA)) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (!ok) {
+                    continue;
+                }
+
+                while (restPuyos-- > 0) {
+                    if (!cf.dropPuyoOnWithMaxHeight(dx, c, maxPuyoHeight)) {
+                        ok = false;
+                        break;
+                    }
+                    if (!cpl.add(dx, c)) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (!ok) {
+                    continue;
+                }
+
+                callback(std::move(cf), cpl);
+            }
+        }
+    }
+}
+
+// static
+void RensaDetector::detectByExtendStrategy(const CoreField& originalField,
+                                           const bool prohibits[FieldConstant::MAP_WIDTH],
+                                           int maxComplementPuyos,
+                                           int maxPuyoHeight,
+                                           const RensaDetector::ComplementCallback& callback)
+{
+    FieldBits checked;
+    Position positions[FieldConstant::HEIGHT * FieldConstant::WIDTH];
+    int working[FieldConstant::HEIGHT * FieldConstant::WIDTH];
+
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
+
+            PuyoColor c = originalField.color(x, y);
+            if (!isNormalColor(c))
+                continue;
+            if (checked.get(x, y))
+                continue;
+            if (!originalField.hasEmptyNeighbor(x, y))
+                continue;
+            Position* const head = originalField.fillSameColorPosition(x, y, c, positions, &checked);
+            int size = head - positions;
+            switch (size) {
+            case 1: {
+                Position origin = positions[0];
+                for (size_t i = 0; i < ARRAY_SIZE(EXTENTIONS); ++i) {
+                    bool ok = true;
+                    for (int j = 0; j < 3; ++j) {
+                        int xx = origin.x + EXTENTIONS[i][j][0];
+                        int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y) {
+                            ok = false;
+                            break;
+                        }
+                        if (!(originalField.color(xx, yy) == PuyoColor::EMPTY || originalField.color(xx, yy) == c)) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (!ok)
+                        continue;
+
+                    CoreField cf(originalField);
+                    ColumnPuyoList cpl;
+                    for (int j = 0; j < 3; ++j) {
+                        int xx = origin.x + EXTENTIONS[i][j][0];
+                        int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y) {
+                            continue;
+                        }
+                        if (cf.color(xx, yy) == c)
+                            continue;
+                        DCHECK_EQ(originalField.color(xx, yy), PuyoColor::EMPTY);
+                        if (cf.color(xx, yy - 1) == PuyoColor::EMPTY) {
+                            ok = false;
+                            break;
+                        }
+                        if (prohibits[xx]) {
+                            ok = false;
+                            break;
+                        }
+                        if (!cf.dropPuyoOnWithMaxHeight(xx, c, maxPuyoHeight)) {
+                            ok = false;
+                            break;
+                        }
+                        if (!cpl.add(xx, c)) {
+                            ok = false;
+                            break;
+                        }
+                    }
+
+                    if (!ok)
+                        continue;
+                    if (maxComplementPuyos < cpl.size())
+                        continue;
+
+                    callback(std::move(cf), cpl);
+                }
+                break;
+            }
+            case 2: {
+                Position origin;
+                Position mustPosition;
+                if (positions[0].x == positions[1].x) {
+                    origin = Position(positions[0].x, std::min(positions[0].y, positions[1].y));
+                    mustPosition = Position(positions[0].x, std::max(positions[0].y, positions[1].y));
+                } else {
+                    origin = Position(positions[0]);
+                    mustPosition = Position(positions[1]);
+                }
+
+                for (size_t i = 0; i < ARRAY_SIZE(EXTENTIONS); ++i) {
+                    bool ok = false;
+                    for (int j = 0; j < 3; ++j) {
+                        int xx = origin.x + EXTENTIONS[i][j][0];
+                        int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y) {
+                            ok = false;
+                            break;
+                        }
+                        if (!(originalField.color(xx, yy) == PuyoColor::EMPTY || originalField.color(xx, yy) == c)) {
+                            ok = false;
+                            break;
+                        }
+                        if (Position(xx, yy) == mustPosition)
+                            ok = true;
+                    }
+
+                    if (!ok)
+                        continue;
+
+                    CoreField cf(originalField);
+                    ColumnPuyoList cpl;
+                    for (int j = 0; j < 3; ++j) {
+                        int xx = origin.x + EXTENTIONS[i][j][0];
+                        int yy = origin.y + EXTENTIONS[i][j][1];
+                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y)
+                            continue;
+                        if (cf.color(xx, yy) == c)
+                            continue;
+                        DCHECK_EQ(originalField.color(xx, yy), PuyoColor::EMPTY);
+                        if (cf.color(xx, yy - 1) == PuyoColor::EMPTY) {
+                            ok = false;
+                            break;
+                        }
+                        if (prohibits[xx]) {
+                            ok = false;
+                            break;
+                        }
+                        if (!cf.dropPuyoOnWithMaxHeight(xx, c, maxPuyoHeight)) {
+                            ok = false;
+                            break;
+                        }
+                        if (!cpl.add(xx, c)) {
+                            ok = false;
+                            break;
+                        }
+                    }
+
+                    if (!ok) {
+                        continue;
+                    }
+
+                    if (maxComplementPuyos < cpl.size()) {
+                        continue;
+                    }
+
+                    callback(std::move(cf), cpl);
+                }
+                break;
+            }
+            case 3: {
+                int pos = 0;
+                for (Position* p = positions; p != head; ++p) {
+                    if (originalField.isEmpty(p->x + 1, p->y) && !originalField.isEmpty(p->x + 1, p->y - 1))
+                        working[pos++] = p->x + 1;
+                    if (originalField.isEmpty(p->x - 1, p->y) && !originalField.isEmpty(p->x - 1, p->y - 1))
+                        working[pos++] = p->x - 1;
+                    if (originalField.isEmpty(p->x, p->y + 1) && !originalField.isEmpty(p->x, p->y))
+                        working[pos++] = p->x;
+                    if (originalField.isEmpty(p->x, p->y - 1) && !originalField.isEmpty(p->x, p->y - 2))
+                        working[pos++] = p->x;
+                }
+                std::sort(working, working + pos);
+                int* endX = std::unique(working, working + pos);
+                for (int i = 0; i < endX - working; ++i) {
+                    int xx = working[i];
+                    if (prohibits[xx])
+                        continue;
+                    CoreField cf(originalField);
+                    if (!cf.dropPuyoOn(xx, c))
+                        continue;
+                    if (maxPuyoHeight < cf.height(xx))
+                        continue;
+                    ColumnPuyoList cpl;
+                    if (!cpl.add(working[i], c))
+                        continue;
+                    callback(std::move(cf), cpl);
+                }
+                break;
+            }
+            default:
+                CHECK(false) << size << '\n' << originalField.toDebugString();
+            }
+        }
+    }
+}
+
+// static
+void RensaDetector::detect(const CoreField& originalField,
+                           const RensaDetectorStrategy& strategy,
+                           PurposeForFindingRensa purpose,
+                           const bool prohibits[FieldConstant::MAP_WIDTH],
+                           const RensaDetector::ComplementCallback& callback)
+{
+    int maxPuyoHeight = 12;
+    int complementPuyos;
+    switch (purpose) {
+    case PurposeForFindingRensa::FOR_KEY:
+        complementPuyos = strategy.maxNumOfComplementPuyosForKey();
+        if (strategy.allowsPuttingKeyPuyoOn13thRow())
+            maxPuyoHeight = 13;
+        break;
+    case PurposeForFindingRensa::FOR_FIRE:
+        complementPuyos = strategy.maxNumOfComplementPuyosForFire();
+        break;
+    default:
+        CHECK(false);
+    }
+
+    switch (strategy.mode()) {
+    case RensaDetectorStrategy::Mode::DROP:
+        detectByDropStrategy(originalField, prohibits, purpose, complementPuyos, maxPuyoHeight, callback);
+        break;
+    case RensaDetectorStrategy::Mode::FLOAT:
+        detectByFloatStrategy(originalField, prohibits, complementPuyos, maxPuyoHeight, callback);
+        break;
+    case RensaDetectorStrategy::Mode::EXTEND:
+        detectByExtendStrategy(originalField, prohibits, complementPuyos, maxPuyoHeight, callback);
+        break;
+    default:
+        CHECK(false) << "Unknown mode : " << static_cast<int>(strategy.mode());
+    }
+}
+
 // static
 void RensaDetector::makeProhibitArray(const RensaResult& rensaResult, const RensaChainTrackResult& trackResult,
                                       const CoreField& originalField, const ColumnPuyoList& firePuyos,
@@ -150,395 +528,6 @@ void makeProhibitArrayForExtend(const RensaResult& /*rensaResult*/, const RensaC
         prohibits[x] = (firePuyos.sizeOn(x) > 0);
 }
 
-// tryDropFire complements puyos in |originalField|, and fires a rensa.
-// The complemented puyos are always grounded (This is the different point of tryFloatFire).
-// For each detected rensa, |callback| is called.
-static inline
-void tryDropFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                 PurposeForFindingRensa purpose, int maxComplementPuyos, int maxPuyoHeight,
-                 const RensaDetector::ComplementCallback& callback)
-{
-    bool visited[FieldConstant::MAP_WIDTH][NUM_PUYO_COLORS] {};
-
-
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        for (int y = originalField.height(x); y >= 1; --y) {
-            if (!originalField.isNormalColor(x, y))
-                continue;
-
-            PuyoColor c = originalField.color(x, y);
-
-            // Drop puyo on
-            for (int d = -1; d <= 1; ++d) {
-                if (prohibits[x + d])
-                    continue;
-
-                if (visited[x + d][ordinal(c)])
-                    continue;
-
-                if (x + d <= 0 || FieldConstant::WIDTH < x + d)
-                    continue;
-                if (d == 0) {
-                    if (originalField.color(x, y + 1) != PuyoColor::EMPTY)
-                        continue;
-
-                    // If the first rensa is this, any rensa won't continue.
-                    // This is like erasing the following X.
-                    // ......
-                    // .YXY..
-                    // BZZZBB
-                    // CAAACC
-                    //
-                    // So, we should be able to skip this.
-                    if (purpose == PurposeForFindingRensa::FOR_FIRE && !originalField.isConnectedPuyo(x, y))
-                        continue;
-                } else {
-                    if (originalField.color(x + d, y) != PuyoColor::EMPTY)
-                        continue;
-                }
-
-                visited[x + d][ordinal(c)] = true;
-
-                int necessaryPuyos = 0;
-
-                bool ok = true;
-                CoreField cf(originalField);
-                while (true) {
-                    if (!cf.dropPuyoOnWithMaxHeight(x + d, c, maxPuyoHeight)) {
-                        ok = false;
-                        break;
-                    }
-
-                    ++necessaryPuyos;
-
-                    if (maxComplementPuyos < necessaryPuyos) {
-                        ok = false;
-                        break;
-                    }
-                    if (cf.countConnectedPuyosMax4(x + d, cf.height(x + d)) >= 4)
-                        break;
-                }
-
-                if (!ok)
-                    continue;
-
-                ColumnPuyoList cpl;
-                if (!cpl.add(x + d, c, necessaryPuyos))
-                    continue;
-
-                callback(cf, cpl);
-            }
-        }
-    }
-}
-
-static inline
-void tryFloatFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                  int maxComplementPuyos, int maxPuyoHeight,
-                  const RensaDetector::ComplementCallback& callback)
-{
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
-            PuyoColor c = originalField.color(x, y);
-
-            DCHECK_NE(c, PuyoColor::EMPTY);
-            if (c == PuyoColor::OJAMA)
-                continue;
-
-            int necessaryPuyos = 4 - originalField.countConnectedPuyosMax4(x, y);
-            if (necessaryPuyos > maxComplementPuyos)
-                continue;
-
-            // float puyo col dx
-            for (int dx = x - 1; dx <= x + 1; ++dx) {
-                if (dx <= 0 || FieldConstant::WIDTH < dx)
-                    continue;
-                if (prohibits[dx])
-                    continue;
-                if (x != dx && originalField.color(dx, y) != PuyoColor::EMPTY)
-                    continue;
-
-                CoreField cf(originalField);
-
-                int restPuyos = necessaryPuyos;
-                ColumnPuyoList cpl;
-
-                bool ok = true;
-                while (cf.height(dx) + restPuyos < y) {
-                    if (!cf.dropPuyoOnWithMaxHeight(dx, PuyoColor::OJAMA, maxPuyoHeight)) {
-                        ok = false;
-                        break;
-                    }
-                    if (!cpl.add(dx, PuyoColor::OJAMA)) {
-                        ok = false;
-                        break;
-                    }
-                }
-                if (!ok) {
-                    continue;
-                }
-
-                while (restPuyos-- > 0) {
-                    if (!cf.dropPuyoOnWithMaxHeight(dx, c, maxPuyoHeight)) {
-                        ok = false;
-                        break;
-                    }
-                    if (!cpl.add(dx, c)) {
-                        ok = false;
-                        break;
-                    }
-                }
-                if (!ok) {
-                    continue;
-                }
-
-                callback(cf, cpl);
-            }
-        }
-    }
-}
-
-static inline
-void tryExtendFire(const CoreField& originalField, const bool prohibits[FieldConstant::MAP_WIDTH],
-                   int maxComplementPuyos, int maxPuyoHeight,
-                   const RensaDetector::ComplementCallback& callback)
-{
-    FieldBits checked;
-    Position positions[FieldConstant::HEIGHT * FieldConstant::WIDTH];
-    int working[FieldConstant::HEIGHT * FieldConstant::WIDTH];
-
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
-
-            PuyoColor c = originalField.color(x, y);
-            if (!isNormalColor(c))
-                continue;
-            if (checked.get(x, y))
-                continue;
-            if (!originalField.hasEmptyNeighbor(x, y))
-                continue;
-            Position* const head = originalField.fillSameColorPosition(x, y, c, positions, &checked);
-            int size = head - positions;
-            switch (size) {
-            case 1: {
-                Position origin = positions[0];
-                for (size_t i = 0; i < ARRAY_SIZE(EXTENTIONS); ++i) {
-                    bool ok = true;
-                    for (int j = 0; j < 3; ++j) {
-                        int xx = origin.x + EXTENTIONS[i][j][0];
-                        int yy = origin.y + EXTENTIONS[i][j][1];
-                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y) {
-                            ok = false;
-                            break;
-                        }
-                        if (!(originalField.color(xx, yy) == PuyoColor::EMPTY || originalField.color(xx, yy) == c)) {
-                            ok = false;
-                            break;
-                        }
-                    }
-                    if (!ok)
-                        continue;
-
-                    CoreField cf(originalField);
-                    ColumnPuyoList cpl;
-                    for (int j = 0; j < 3; ++j) {
-                        int xx = origin.x + EXTENTIONS[i][j][0];
-                        int yy = origin.y + EXTENTIONS[i][j][1];
-                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y) {
-                            continue;
-                        }
-                        if (cf.color(xx, yy) == c)
-                            continue;
-                        DCHECK_EQ(originalField.color(xx, yy), PuyoColor::EMPTY);
-                        if (cf.color(xx, yy - 1) == PuyoColor::EMPTY) {
-                            ok = false;
-                            break;
-                        }
-                        if (prohibits[xx]) {
-                            ok = false;
-                            break;
-                        }
-                        if (!cf.dropPuyoOnWithMaxHeight(xx, c, maxPuyoHeight)) {
-                            ok = false;
-                            break;
-                        }
-                        if (!cpl.add(xx, c)) {
-                            cf.removePuyoFrom(xx);
-                            ok = false;
-                            break;
-                        }
-                    }
-
-                    if (!ok) {
-                        continue;
-                    }
-
-                    if (maxComplementPuyos < cpl.size()) {
-                        continue;
-                    }
-
-                    callback(cf, cpl);
-                }
-                break;
-            }
-            case 2: {
-                Position origin;
-                Position mustPosition;
-                if (positions[0].x == positions[1].x) {
-                    origin = Position(positions[0].x, std::min(positions[0].y, positions[1].y));
-                    mustPosition = Position(positions[0].x, std::max(positions[0].y, positions[1].y));
-                } else {
-                    origin = Position(positions[0]);
-                    mustPosition = Position(positions[1]);
-                }
-
-                for (size_t i = 0; i < ARRAY_SIZE(EXTENTIONS); ++i) {
-                    bool ok = false;
-                    for (int j = 0; j < 3; ++j) {
-                        int xx = origin.x + EXTENTIONS[i][j][0];
-                        int yy = origin.y + EXTENTIONS[i][j][1];
-                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y) {
-                            ok = false;
-                            break;
-                        }
-                        if (!(originalField.color(xx, yy) == PuyoColor::EMPTY || originalField.color(xx, yy) == c)) {
-                            ok = false;
-                            break;
-                        }
-                        if (Position(xx, yy) == mustPosition)
-                            ok = true;
-                    }
-
-                    if (!ok)
-                        continue;
-
-                    CoreField cf(originalField);
-                    ColumnPuyoList cpl;
-                    for (int j = 0; j < 3; ++j) {
-                        int xx = origin.x + EXTENTIONS[i][j][0];
-                        int yy = origin.y + EXTENTIONS[i][j][1];
-                        if (xx < 1 || FieldConstant::WIDTH < x || yy < 1 || FieldConstant::HEIGHT < y)
-                            continue;
-                        if (cf.color(xx, yy) == c)
-                            continue;
-                        DCHECK_EQ(originalField.color(xx, yy), PuyoColor::EMPTY);
-                        if (cf.color(xx, yy - 1) == PuyoColor::EMPTY) {
-                            ok = false;
-                            break;
-                        }
-                        if (prohibits[xx]) {
-                            ok = false;
-                            break;
-                        }
-                        if (!cf.dropPuyoOnWithMaxHeight(xx, c, maxPuyoHeight)) {
-                            ok = false;
-                            break;
-                        }
-                        if (!cpl.add(xx, c)) {
-                            ok = false;
-                            break;
-                        }
-                    }
-
-                    if (!ok) {
-                        continue;
-                    }
-
-                    if (maxComplementPuyos < cpl.size()) {
-                        continue;
-                    }
-
-                    callback(cf, cpl);
-                }
-                break;
-            }
-            case 3: {
-                int pos = 0;
-                for (Position* p = positions; p != head; ++p) {
-                    if (originalField.color(p->x + 1, p->y) == PuyoColor::EMPTY)
-                        working[pos++] = p->x + 1;
-                    if (originalField.color(p->x - 1, p->y) == PuyoColor::EMPTY)
-                        working[pos++] = p->x - 1;
-                    if (originalField.color(p->x, p->y + 1) == PuyoColor::EMPTY)
-                        working[pos++] = p->x;
-                    if (originalField.color(p->x, p->y - 1) == PuyoColor::EMPTY)
-                        working[pos++] = p->x;
-                }
-                std::sort(working, working + pos);
-                int* endX = std::unique(working, working + pos);
-                for (int i = 0; i < endX - working; ++i) {
-                    int xx = working[i];
-                    if (prohibits[xx])
-                        continue;
-                    CoreField cf(originalField);
-                    if (!cf.dropPuyoOn(xx, c))
-                        continue;
-                    if (maxPuyoHeight < cf.height(xx)) {
-                        cf.removePuyoFrom(xx);
-                        continue;
-                    }
-                    ColumnPuyoList cpl;
-                    if (!cpl.add(working[i], c)) {
-                        cf.removePuyoFrom(xx);
-                        continue;
-                    }
-                    callback(cf, cpl);
-                    cf.removePuyoFrom(xx);
-                }
-                break;
-            }
-            default:
-                CHECK(false) << size << '\n' << originalField.toDebugString();
-            }
-        }
-    }
-}
-
-static inline void findRensas(const CoreField& field,
-                              const RensaDetectorStrategy& strategy,
-                              const bool prohibits[FieldConstant::MAP_WIDTH],
-                              PurposeForFindingRensa purpose,
-                              const RensaDetector::ComplementCallback& callback)
-{
-    int maxPuyoHeight = 12;
-    int complementPuyos;
-    switch (purpose) {
-    case PurposeForFindingRensa::FOR_KEY:
-        complementPuyos = strategy.maxNumOfComplementPuyosForKey();
-        if (strategy.allowsPuttingKeyPuyoOn13thRow())
-            maxPuyoHeight = 13;
-        break;
-    case PurposeForFindingRensa::FOR_FIRE:
-        complementPuyos = strategy.maxNumOfComplementPuyosForFire();
-        break;
-    default:
-        CHECK(false);
-    }
-
-    switch (strategy.mode()) {
-    case RensaDetectorStrategy::Mode::DROP:
-        tryDropFire(field, prohibits, purpose, complementPuyos, maxPuyoHeight, callback);
-        break;
-    case RensaDetectorStrategy::Mode::FLOAT:
-        tryFloatFire(field, prohibits, complementPuyos, maxPuyoHeight, callback);
-        break;
-    case RensaDetectorStrategy::Mode::EXTEND:
-        tryExtendFire(field, prohibits, complementPuyos, maxPuyoHeight, callback);
-        break;
-    default:
-        CHECK(false) << "Unknown mode : " << static_cast<int>(strategy.mode());
-    }
-}
-
-void RensaDetector::detect(const CoreField& original,
-                           const RensaDetectorStrategy& strategy,
-                           PurposeForFindingRensa purpose,
-                           const bool prohibits[FieldConstant::MAP_WIDTH],
-                           const RensaDetector::ComplementCallback& callback)
-{
-    findRensas(original, strategy, prohibits, purpose, callback);
-}
-
 template<typename Callback>
 static void findPossibleRensasInternal(const CoreField& currentField,
                                        const ColumnPuyoList& keyPuyos,
@@ -555,7 +544,7 @@ static void findPossibleRensasInternal(const CoreField& currentField,
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(currentField, strategy, prohibits, purpose, findRensaCallback);
+    RensaDetector::detect(currentField, strategy, purpose, prohibits, findRensaCallback);
 
     if (restAdded <= 0)
         return;
@@ -701,7 +690,7 @@ void iteratePossibleRensasIterativelyInternal(const CoreField& currentField,
                                                  strategy, callback);
     };
 
-    findRensas(currentField, strategy, prohibits, PurposeForFindingRensa::FOR_KEY, findRensaCallback);
+    RensaDetector::detect(currentField, strategy, PurposeForFindingRensa::FOR_KEY, prohibits, findRensaCallback);
 }
 
 // iteratePossibleRensasIteratively finds rensa with the following algorithm.
@@ -740,7 +729,7 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
-    findRensas(originalField, strategy, prohibits, PurposeForFindingRensa::FOR_FIRE, findRensaCallback);
+    detect(originalField, strategy, PurposeForFindingRensa::FOR_FIRE, prohibits, findRensaCallback);
 }
 
 // static
