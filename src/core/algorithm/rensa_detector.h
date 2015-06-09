@@ -26,17 +26,6 @@ class RensaDetector {
 public:
     typedef std::function<void (CoreField&& complementedField,
                                 const ColumnPuyoList& complementedColumnPuyoList)> ComplementCallback;
-    typedef std::function<void (const CoreField& fieldAfterRensa,
-                                const RensaResult& rensaResult,
-                                const ColumnPuyoList& complementedPuyoList)> RensaCallback;
-    template<typename TrackResult>
-    using TrackedRensaCallback = std::function<void (const CoreField& fieldAfterRensa,
-                                                     const RensaResult& rensaresult,
-                                                     const ColumnPuyoList& complementedPuyos,
-                                                     const TrackResult& trackResult)>;
-    typedef TrackedRensaCallback<RensaChainTrackResult> TrackedPossibleRensaCallback;
-    typedef TrackedRensaCallback<RensaCoefResult> CoefPossibleRensaCallback;
-    typedef TrackedRensaCallback<RensaVanishingPositionResult> VanishingPositionPossibleRensaCallback;
 
     // Detects rensa by DROP strategy.
     static void detectByDropStrategy(const CoreField&,
@@ -67,7 +56,27 @@ public:
                        const bool prohibits[FieldConstant::MAP_WIDTH],
                        const ComplementCallback&);
 
+    // Creates prohibit array from the specified result.
+    // prohibit array is used for pruning. If prohibits[x] is true, detect() won't add any puyo on column x.
+    static void makeProhibitArray(const RensaResult&,
+                                  const RensaLastVanishedPositionTrackResult&,
+                                  const CoreField& originalField,
+                                  const ColumnPuyoList& firePuyos,
+                                  bool prohibits[FieldConstant::MAP_WIDTH]);
+
+    // ----------------------------------------------------------------------
     // TODO(mayah): Consider simplify these methods.
+    typedef std::function<void (const CoreField& fieldAfterRensa,
+                                const RensaResult& rensaResult,
+                                const ColumnPuyoList& complementedPuyoList)> RensaCallback;
+    template<typename TrackResult>
+    using TrackedRensaCallback = std::function<void (const CoreField& fieldAfterRensa,
+                                                     const RensaResult& rensaresult,
+                                                     const ColumnPuyoList& complementedPuyos,
+                                                     const TrackResult& trackResult)>;
+    typedef TrackedRensaCallback<RensaChainTrackResult> TrackedPossibleRensaCallback;
+    typedef TrackedRensaCallback<RensaCoefResult> CoefPossibleRensaCallback;
+    typedef TrackedRensaCallback<RensaVanishingPositionResult> VanishingPositionPossibleRensaCallback;
 
     // Complements at most |maxIteration| key puyos.
     // For each iteration the same |maxKeyPuyosAtOnce| puyo are complemented in the same column.
@@ -141,11 +150,6 @@ public:
 
     static void makeProhibitArray(const RensaResult&,
                                   const RensaChainTrackResult&,
-                                  const CoreField& originalField,
-                                  const ColumnPuyoList& firePuyos,
-                                  bool prohibits[FieldConstant::MAP_WIDTH]);
-    static void makeProhibitArray(const RensaResult&,
-                                  const RensaLastVanishedPositionTrackResult&,
                                   const CoreField& originalField,
                                   const ColumnPuyoList& firePuyos,
                                   bool prohibits[FieldConstant::MAP_WIDTH]);
