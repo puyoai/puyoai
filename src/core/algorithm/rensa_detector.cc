@@ -579,6 +579,45 @@ void RensaDetector::makeProhibitArray(const CoreField& originalField,
     }
 }
 
+void RensaDetector::complementKeyPuyosOn13thRow(const CoreField& originalField,
+                                                const bool allowsComplements[FieldConstant::MAP_WIDTH],
+                                                const ComplementCallback& callback)
+{
+    CoreField cf(originalField);
+    ColumnPuyoList cpl;
+    complementKeyPuyos13thRowInternal(cf, cpl, allowsComplements, 1, callback);
+}
+
+void RensaDetector::complementKeyPuyos13thRowInternal(CoreField& currentField,
+                                                      ColumnPuyoList& currentKeyPuyos,
+                                                      const bool allowsComplements[FieldConstant::MAP_WIDTH],
+                                                      int x,
+                                                      const ComplementCallback& callback)
+{
+    if (x > 6) {
+        callback(CoreField(currentField), const_cast<const ColumnPuyoList&>(currentKeyPuyos));
+        return;
+    }
+
+    if (currentField.height(x) == 12 && allowsComplements[x]) {
+        for (PuyoColor c : NORMAL_PUYO_COLORS) {
+            if (!currentField.dropPuyoOn(x, c))
+                continue;
+            if (!currentKeyPuyos.add(x, c)) {
+                currentField.removePuyoFrom(x);
+                continue;
+            }
+
+            complementKeyPuyos13thRowInternal(currentField, currentKeyPuyos, allowsComplements, x + 1, callback);
+
+            currentField.removePuyoFrom(x);
+            currentKeyPuyos.removeTopFrom(x);
+        }
+    }
+
+    complementKeyPuyos13thRowInternal(currentField, currentKeyPuyos, allowsComplements, x + 1, callback);
+}
+
 // static
 void RensaDetector::makeProhibitArray(const RensaResult& rensaResult, const RensaChainTrackResult& trackResult,
                                       const CoreField& originalField, const ColumnPuyoList& firePuyos,
