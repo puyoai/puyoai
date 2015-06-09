@@ -267,7 +267,7 @@ bool PatternRensaDetector::checkRensa(int currentChains,
     // TODO(mayah): Making ColumnPuyoList here is time-consuming a bit.
     ColumnPuyoList firePuyos;
     firePuyos.add(firePuyo);
-    RensaDetector::makeProhibitArray(rensaResult, tracker.result(), originalField_, firePuyos, prohibits);
+    RensaDetector::makeProhibitArray(originalField_, strategy_, tracker.result(), firePuyos, prohibits);
 
     return true;
 }

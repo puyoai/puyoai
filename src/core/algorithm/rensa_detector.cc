@@ -457,6 +457,129 @@ void RensaDetector::detect(const CoreField& originalField,
 }
 
 // static
+void RensaDetector::detectIteratively(const CoreField& originalField,
+                                      const RensaDetectorStrategy& strategy,
+                                      int maxIteration,
+                                      const RensaSimulationCallback& callback)
+{
+    DCHECK_LE(1, maxIteration);
+
+    auto detectCallback = [&](CoreField&& complementedField, const ColumnPuyoList& firePuyos) {
+        CoreField cf(complementedField);
+        RensaLastVanishedPositionTracker tracker;
+        RensaResult rensaResult = cf.simulate(&tracker);
+        if (rensaResult.chains == 0)
+            return;
+
+        (void)callback(std::move(complementedField), firePuyos);
+
+        // Don't put key puyo on the column which fire puyo will be placed.
+        bool prohibits[FieldConstant::MAP_WIDTH] {};
+        makeProhibitArray(originalField, strategy, tracker.result(), firePuyos, prohibits);
+        detectIterativelyInternal(originalField, strategy, cf, maxIteration - 1,
+                                  ColumnPuyoList(), firePuyos, rensaResult.chains, prohibits, callback);
+    };
+
+    bool prohibits[FieldConstant::MAP_WIDTH] {};
+    detect(originalField, strategy, PurposeForFindingRensa::FOR_FIRE, prohibits, detectCallback);
+}
+
+// static
+void RensaDetector::detectIterativelyInternal(const CoreField& originalField,
+                                              const RensaDetectorStrategy& strategy,
+                                              const CoreField& currentField,
+                                              int restIterations,
+                                              const ColumnPuyoList& accumulatedKeyPuyos,
+                                              const ColumnPuyoList& firstRensaFirePuyos,
+                                              int currentTotalChains,
+                                              const bool prohibits[FieldConstant::MAP_WIDTH],
+                                              const RensaSimulationCallback& callback)
+{
+    if (restIterations <= 0)
+        return;
+
+    auto detectCallback = [&](CoreField&& complementedField, const ColumnPuyoList& currentFirePuyos) {
+        RensaLastVanishedPositionTracker tracker;
+        RensaResult partialResult = complementedField.simulate(&tracker);
+        if (partialResult.chains == 0)
+            return;
+
+        int additionalChains = partialResult.chains;
+        RensaLastVanishedPositionTrackResult trackResult = tracker.result();
+
+        ColumnPuyoList combinedKeyPuyos(accumulatedKeyPuyos);
+        if (!combinedKeyPuyos.merge(currentFirePuyos))
+            return;
+
+        int maxHeight = strategy.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
+
+        // Here, try to fire the combined rensa.
+        CoreField cf(originalField);
+        if (!cf.dropPuyoListWithMaxHeight(combinedKeyPuyos, maxHeight))
+            return;
+
+        // Check putting key puyo does not fire a rensa. Rensa should not start when we add key puyos.
+        if (cf.rensaWillOccur())
+            return;
+
+        // Then, fire a rensa.
+        if (!cf.dropPuyoListWithMaxHeight(firstRensaFirePuyos, maxHeight))
+            return;
+
+        ColumnPuyoList allComplemented(combinedKeyPuyos);
+        allComplemented.merge(firstRensaFirePuyos);
+
+        RensaResult combinedRensaResult = callback(std::move(cf), allComplemented);
+        if (combinedRensaResult.chains != currentTotalChains + additionalChains) {
+            // Rensa looks broken. We don't count such rensa.
+            return;
+        }
+
+        // Don't put key puyo on the column which fire puyo will be placed.
+        bool newProhibits[FieldConstant::MAP_WIDTH];
+        makeProhibitArray(originalField, strategy, trackResult, firstRensaFirePuyos, newProhibits);
+
+        detectIterativelyInternal(originalField, strategy, complementedField,
+                                  restIterations - 1, combinedKeyPuyos, firstRensaFirePuyos,
+                                  combinedRensaResult.chains, newProhibits, callback);
+    };
+
+    detect(currentField, strategy, PurposeForFindingRensa::FOR_KEY, prohibits, detectCallback);
+}
+
+// static
+void RensaDetector::makeProhibitArray(const CoreField& originalField,
+                                      const RensaDetectorStrategy& strategy,
+                                      const RensaLastVanishedPositionTrackResult& trackResult,
+                                      const ColumnPuyoList& firePuyos,
+                                      bool prohibits[FieldConstant::MAP_WIDTH])
+{
+    if (strategy.mode() == RensaDetectorStrategy::Mode::EXTEND) {
+        std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, false);
+        for (int x = 1; x <= 6; ++x)
+            prohibits[x] = (firePuyos.sizeOn(x) > 0);
+        return;
+    }
+
+    std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, true);
+
+    trackResult.lastVanishedPositionBits().iterateBitPositions([&originalField, &prohibits](int x, int y) {
+        if (originalField.isEmpty(x, y + 1)) {
+            prohibits[x] = false;
+        } else {
+            prohibits[x - 1] = false;
+            prohibits[x] = false;
+            prohibits[x + 1] = false;
+        }
+    });
+
+    for (int x = 1; x <= 6; ++x) {
+        if (firePuyos.sizeOn(x) > 0)
+            prohibits[x] = true;
+    }
+}
+
+// static
 void RensaDetector::makeProhibitArray(const RensaResult& rensaResult, const RensaChainTrackResult& trackResult,
                                       const CoreField& originalField, const ColumnPuyoList& firePuyos,
                                       bool prohibits[FieldConstant::MAP_WIDTH])
@@ -485,31 +608,6 @@ void RensaDetector::makeProhibitArray(const RensaResult& rensaResult, const Rens
             }
         }
     }
-
-    for (int x = 1; x <= 6; ++x) {
-        if (firePuyos.sizeOn(x) > 0)
-            prohibits[x] = true;
-    }
-}
-
-// static
-void RensaDetector::makeProhibitArray(const RensaResult& /*rensaResult*/,
-                                      const RensaLastVanishedPositionTrackResult& trackResult,
-                                      const CoreField& originalField,
-                                      const ColumnPuyoList& firePuyos,
-                                      bool prohibits[FieldConstant::MAP_WIDTH])
-{
-    std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, true);
-
-    trackResult.lastVanishedPositionBits().iterateBitPositions([&originalField, &prohibits](int x, int y) {
-        if (originalField.isEmpty(x, y + 1)) {
-            prohibits[x] = false;
-        } else {
-            prohibits[x - 1] = false;
-            prohibits[x] = false;
-            prohibits[x + 1] = false;
-        }
-    });
 
     for (int x = 1; x <= 6; ++x) {
         if (firePuyos.sizeOn(x) > 0)
