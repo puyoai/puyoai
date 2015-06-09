@@ -71,6 +71,12 @@ public:
                                   int maxIteration,
                                   const RensaSimulationCallback&);
 
+    // Complements key puyos on 13th row.
+    // Callback is void callback(const CoreField&, const ColumnPuyoList&).
+    static void complementKeyPuyosOn13thRow(const CoreField&,
+                                            const bool allowsComplements[FieldConstant::MAP_WIDTH],
+                                            const ComplementCallback&);
+
     // Creates prohibit array from the specified result.
     // prohibit array is used for pruning. If prohibits[x] is true, detect() won't add any puyo on column x.
     static void makeProhibitArray(const CoreField& originalField,
@@ -89,6 +95,12 @@ private:
                                           int currentTotalChains,
                                           const bool prohibits[FieldConstant::MAP_WIDTH],
                                           const RensaSimulationCallback&);
+
+    static void complementKeyPuyos13thRowInternal(CoreField& currentField,
+                                                  ColumnPuyoList& currentKeyPuyos,
+                                                  const bool allowsComplements[FieldConstant::MAP_WIDTH],
+                                                  int x,
+                                                  const ComplementCallback&);
 
 public:
     // ----------------------------------------------------------------------
@@ -116,13 +128,6 @@ public:
                                    int maxIteration,
                                    int maxKeyPuyosAtOnce,
                                    Callback);
-
-    // Complements key puyos on 13th row.
-    // Callback is void callback(const CoreField&, const ColumnPuyoList&).
-    template<typename Callback>
-    static void complementKeyPuyosOn13thRow(const CoreField&,
-                                            const bool allowsComplements[FieldConstant::MAP_WIDTH],
-                                            Callback);
 
     // Detects rensa after complementing key puyos.
     // Also, complements fire puyos.
@@ -190,13 +195,6 @@ private:
                                            int restAdded,
                                            int maxPuyosAtOnce,
                                            Callback callback);
-
-    template<typename Callback>
-    static void complementKeyPuyos13thRowInternal(CoreField& currentField,
-                                                  ColumnPuyoList& currentKeyPuyos,
-                                                  const bool allowsComplements[FieldConstant::MAP_WIDTH],
-                                                  int x,
-                                                  Callback callback);
 };
 
 #include "core/algorithm/rensa_detector_inl.h"
