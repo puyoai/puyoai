@@ -171,65 +171,64 @@ void RensaDetector::detectByFloatStrategy(const CoreField& originalField,
                                           int maxPuyoHeight,
                                           const RensaDetector::ComplementCallback& callback)
 {
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        for (int y = std::min(12, originalField.height(x)); y >= 1; --y) {
-            PuyoColor c = originalField.color(x, y);
+    FieldBits normalColorBits = originalField.bitField().normalColorBits();
+    FieldBits emptyBits = originalField.bitField().bits(PuyoColor::EMPTY);
 
-            DCHECK_NE(c, PuyoColor::EMPTY);
-            if (c == PuyoColor::OJAMA)
+    FieldBits edgeBits = (normalColorBits & emptyBits.expandEdge()).maskedField12();
+
+    edgeBits.iterateBitPositions([&](int x, int y) {
+        DCHECK(originalField.isNormalColor(x, y));
+
+        int necessaryPuyos = 4 - originalField.countConnectedPuyosMax4(x, y);
+        if (necessaryPuyos > maxComplementPuyos)
+            return;
+
+        PuyoColor c = originalField.color(x, y);
+
+        // float puyo col dx
+        for (int dx = x - 1; dx <= x + 1; ++dx) {
+            if (dx <= 0 || FieldConstant::WIDTH < dx)
+                continue;
+            if (prohibits[dx])
+                continue;
+            if (x != dx && !originalField.isEmpty(dx, y))
                 continue;
 
-            int necessaryPuyos = 4 - originalField.countConnectedPuyosMax4(x, y);
-            if (necessaryPuyos > maxComplementPuyos)
-                continue;
+            CoreField cf(originalField);
 
-            // float puyo col dx
-            for (int dx = x - 1; dx <= x + 1; ++dx) {
-                if (dx <= 0 || FieldConstant::WIDTH < dx)
-                    continue;
-                if (prohibits[dx])
-                    continue;
-                if (x != dx && originalField.color(dx, y) != PuyoColor::EMPTY)
-                    continue;
+            int restPuyos = necessaryPuyos;
+            ColumnPuyoList cpl;
 
-                CoreField cf(originalField);
-
-                int restPuyos = necessaryPuyos;
-                ColumnPuyoList cpl;
-
-                bool ok = true;
-                while (cf.height(dx) + restPuyos < y) {
-                    if (!cf.dropPuyoOnWithMaxHeight(dx, PuyoColor::OJAMA, maxPuyoHeight)) {
-                        ok = false;
-                        break;
-                    }
-                    if (!cpl.add(dx, PuyoColor::OJAMA)) {
-                        ok = false;
-                        break;
-                    }
+            bool ok = true;
+            while (cf.height(dx) + restPuyos < y) {
+                if (!cf.dropPuyoOnWithMaxHeight(dx, PuyoColor::OJAMA, maxPuyoHeight)) {
+                    ok = false;
+                    break;
                 }
-                if (!ok) {
-                    continue;
+                if (!cpl.add(dx, PuyoColor::OJAMA)) {
+                    ok = false;
+                    break;
                 }
-
-                while (restPuyos-- > 0) {
-                    if (!cf.dropPuyoOnWithMaxHeight(dx, c, maxPuyoHeight)) {
-                        ok = false;
-                        break;
-                    }
-                    if (!cpl.add(dx, c)) {
-                        ok = false;
-                        break;
-                    }
-                }
-                if (!ok) {
-                    continue;
-                }
-
-                callback(std::move(cf), cpl);
             }
+            if (!ok)
+                continue;
+
+            while (restPuyos-- > 0) {
+                if (!cf.dropPuyoOnWithMaxHeight(dx, c, maxPuyoHeight)) {
+                    ok = false;
+                    break;
+                }
+                if (!cpl.add(dx, c)) {
+                    ok = false;
+                    break;
+                }
+            }
+            if (!ok)
+                continue;
+
+            callback(std::move(cf), cpl);
         }
-    }
+    });
 }
 
 // static
