@@ -91,75 +91,77 @@ void RensaDetector::detectByDropStrategy(const CoreField& originalField,
 {
     bool visited[FieldConstant::MAP_WIDTH][NUM_PUYO_COLORS] {};
 
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        for (int y = originalField.height(x); y >= 1; --y) {
-            if (!originalField.isNormalColor(x, y))
+    FieldBits normalColorBits = originalField.bitField().normalColorBits();
+    FieldBits emptyBits = originalField.bitField().bits(PuyoColor::EMPTY);
+
+    FieldBits edgeBits = (normalColorBits & emptyBits.expandEdge()).maskedField12();
+
+    edgeBits.iterateBitPositions([&](int x, int y) {
+        DCHECK(originalField.isNormalColor(x, y));
+
+        PuyoColor c = originalField.color(x, y);
+
+        // Drop puyo on
+        for (int d = -1; d <= 1; ++d) {
+            if (prohibits[x + d])
                 continue;
 
-            PuyoColor c = originalField.color(x, y);
+            if (visited[x + d][ordinal(c)])
+                continue;
 
-            // Drop puyo on
-            for (int d = -1; d <= 1; ++d) {
-                if (prohibits[x + d])
+            if (x + d <= 0 || FieldConstant::WIDTH < x + d)
+                continue;
+            if (d == 0) {
+                if (!originalField.isEmpty(x, y + 1))
                     continue;
 
-                if (visited[x + d][ordinal(c)])
+                // If the first rensa is this, any rensa won't continue.
+                // This is like erasing the following X.
+                // ......
+                // .YXY..
+                // BZZZBB
+                // CAAACC
+                //
+                // So, we should be able to skip this.
+                if (purpose == PurposeForFindingRensa::FOR_FIRE && !originalField.isConnectedPuyo(x, y))
                     continue;
-
-                if (x + d <= 0 || FieldConstant::WIDTH < x + d)
+            } else {
+                if (!originalField.isEmpty(x + d, y))
                     continue;
-                if (d == 0) {
-                    if (originalField.color(x, y + 1) != PuyoColor::EMPTY)
-                        continue;
-
-                    // If the first rensa is this, any rensa won't continue.
-                    // This is like erasing the following X.
-                    // ......
-                    // .YXY..
-                    // BZZZBB
-                    // CAAACC
-                    //
-                    // So, we should be able to skip this.
-                    if (purpose == PurposeForFindingRensa::FOR_FIRE && !originalField.isConnectedPuyo(x, y))
-                        continue;
-                } else {
-                    if (originalField.color(x + d, y) != PuyoColor::EMPTY)
-                        continue;
-                }
-
-                visited[x + d][ordinal(c)] = true;
-
-                int necessaryPuyos = 0;
-
-                bool ok = true;
-                CoreField cf(originalField);
-                while (true) {
-                    if (!cf.dropPuyoOnWithMaxHeight(x + d, c, maxPuyoHeight)) {
-                        ok = false;
-                        break;
-                    }
-
-                    ++necessaryPuyos;
-
-                    if (maxComplementPuyos < necessaryPuyos) {
-                        ok = false;
-                        break;
-                    }
-                    if (cf.countConnectedPuyosMax4(x + d, cf.height(x + d)) >= 4)
-                        break;
-                }
-
-                if (!ok)
-                    continue;
-
-                ColumnPuyoList cpl;
-                if (!cpl.add(x + d, c, necessaryPuyos))
-                    continue;
-
-                callback(std::move(cf), cpl);
             }
+
+            visited[x + d][ordinal(c)] = true;
+
+            int necessaryPuyos = 0;
+
+            bool ok = true;
+            CoreField cf(originalField);
+            while (true) {
+                if (!cf.dropPuyoOnWithMaxHeight(x + d, c, maxPuyoHeight)) {
+                    ok = false;
+                    break;
+                }
+
+                ++necessaryPuyos;
+
+                if (maxComplementPuyos < necessaryPuyos) {
+                    ok = false;
+                    break;
+                }
+                if (cf.countConnectedPuyosMax4(x + d, cf.height(x + d)) >= 4)
+                    break;
+            }
+
+            if (!ok)
+                continue;
+
+            ColumnPuyoList cpl;
+            if (!cpl.add(x + d, c, necessaryPuyos))
+                continue;
+
+            callback(std::move(cf), cpl);
         }
-    }
+    });
 }
 
 // static
