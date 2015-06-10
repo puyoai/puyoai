@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/client/ai/ai.h"
+#include "cpu/peria/player.h"
 
 #include <memory>  // available with C++11
 
@@ -14,9 +15,6 @@ class Ai : public ::AI {
   virtual ~Ai();
 
  protected:
-  struct Attack;
-  struct Control;
-
   virtual DropDecision think(int frame_id,
                              const CoreField& field,
                              const KumipuyoSeq& seq,
@@ -24,14 +22,9 @@ class Ai : public ::AI {
                              const PlayerState& enemy,
                              bool fast) const override;
 
-  // Callback function to evaluate a controled state.
-  static void EvaluatePlan(const RefPlan& plan,
-                           const PlayerState& me,
-                           const PlayerState& enemy,
-                           const RensaChainTrackResult& track,
-                           Control* control);
-
   static int PatternMatch(const RefPlan& plan, std::string* name);
+
+  Player enemy_;
 };
 
 }  // namespace peria
