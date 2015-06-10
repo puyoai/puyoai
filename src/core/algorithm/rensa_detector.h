@@ -71,6 +71,16 @@ public:
                                   int maxIteration,
                                   const RensaSimulationCallback&);
 
+    // Finds 2-double (or more).
+    static void detectSideChain(const CoreField&,
+                                const RensaDetectorStrategy&,
+                                const ComplementCallback&);
+    static void detectSideChainFromDetectedField(const CoreField& originalField,
+                                                 const CoreField& detectedField,
+                                                 const RensaDetectorStrategy&,
+                                                 const ColumnPuyoList& firePuyoList,
+                                                 const ComplementCallback&);
+
     // Complements key puyos on 13th row.
     // Callback is void callback(const CoreField&, const ColumnPuyoList&).
     static void complementKeyPuyosOn13thRow(const CoreField&,
@@ -153,16 +163,6 @@ public:
                                                  int maxIteration,
                                                  const RensaDetectorStrategy&,
                                                  const TrackedPossibleRensaCallback&);
-
-    // Finds 2-double (or more).
-    static void iterateSideChain(const CoreField&,
-                                 const RensaDetectorStrategy&,
-                                 const RensaCallback&);
-    static void iterateSideChainFromDetectedField(const CoreField& originalField,
-                                                  const CoreField& detectedField,
-                                                  const ColumnPuyoList& firePuyoList,
-                                                  const RensaDetectorStrategy&,
-                                                  const RensaCallback&);
 
     // Finds rensa from the specified field. We put |maxKeyPuyo| puyos as key puyo.
     // TODO(mayah): Deprecates these 3 methods. Use detectWithAddingKeyPuyos instead.
