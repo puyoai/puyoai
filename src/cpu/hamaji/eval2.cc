@@ -51,9 +51,9 @@ static double getConnectionScore(const LF& field) {
 double hoge(const CoreField& cf) {
   //int puyo_num = cf.countPuyos();
   double score = 0.0;
-  auto callback = [&](const CoreField& f,
-                      const RensaResult& rensa_result,
-                      const ColumnPuyoList& fire_puyos) {
+  auto callback = [&](CoreField&& f, const ColumnPuyoList& fire_puyos) -> RensaResult {
+    RensaResult rensa_result = f.simulate();
+
     double y_avg = 0;
     for (int x = 1; x <= 6; ++x) {
         int h = fire_puyos.sizeOn(x);
@@ -66,10 +66,11 @@ double hoge(const CoreField& cf) {
       //score = max<double>(score, rensa_result.score);
       score = max(score, rensa_result.chains * 1.0);
     }
+
+    return rensa_result;
   };
-  RensaDetector::iteratePossibleRensas(
-      cf, 1, RensaDetectorStrategy::defaultFloatStrategy(), callback);
-      //cf, 1, RensaDetectorStrategy::defaultDropStrategy(), callback);
+
+  RensaDetector::detectIteratively(cf, RensaDetectorStrategy::defaultFloatStrategy(), 2, callback);
   return score;
 }
 

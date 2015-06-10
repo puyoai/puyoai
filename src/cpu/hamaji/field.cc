@@ -233,7 +233,8 @@ int LF::getBestChainCount(int* ignition_puyo_cnt,
   if (vanished_puyo_cnt)
     *vanished_puyo_cnt = 0;
 
-  auto callback = [&](const CoreField& nf, const RensaResult& rensa_result, const ColumnPuyoList& cpl) {
+  auto callback = [&](CoreField&& nf, const ColumnPuyoList& cpl) {
+    RensaResult rensa_result = nf.simulate();
     int chain = rensa_result.chains;
     int n = 4 - cpl.size();
     if (n < 0)
@@ -260,7 +261,7 @@ int LF::getBestChainCount(int* ignition_puyo_cnt,
       useful_chain_cnt++;
     }
   };
-  RensaDetector::iteratePossibleRensas(*this, 0, RensaDetectorStrategy::defaultFloatStrategy(), callback);
+  RensaDetector::detectSingle(*this, RensaDetectorStrategy::defaultFloatStrategy(), callback);
 
   if (useful_chain_cnt_out)
     *useful_chain_cnt_out = useful_chain_cnt;
