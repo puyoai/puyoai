@@ -50,16 +50,16 @@ DropDecision Ai::think(int frame_id,
   RensaChainTrackResult track_result;
 
   int max_score = 0;
-  RensaDetector::iteratePossibleRensasIteratively(
-      field, 1, RensaDetectorStrategy::defaultFloatStrategy(),
-      [&max_score, &track_result](const CoreField&,
-                                  const RensaResult& result,
-                                  const ColumnPuyoList&,
-                                  const RensaChainTrackResult& track) {
+  RensaDetector::detectIteratively(
+      field, RensaDetectorStrategy::defaultFloatStrategy(), 2,
+      [&max_score, &track_result](CoreField&& cf, const ColumnPuyoList&) -> RensaResult {
+        RensaChainTracker tracker;
+        RensaResult result = cf.simulate(&tracker);
         if (result.score > max_score) {
           max_score = result.score;
-          track_result = track;
+          track_result = tracker.result();
         }
+        return result;
       });
 
   // Look for plans.

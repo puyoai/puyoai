@@ -133,11 +133,10 @@ munetoshi::grade munetoshi::AI::evaluate(
     EVALUATOR_TYPES::_NIL_TYPE>
     ::evaluate_all(&plan_result, plan_grade_vect_setter);
 
-    auto callback = [&](const CoreField& complemented_field,
-                        const ColumnPuyoList& puyos_to_complement) {
-        CoreField field_after_chain(complemented_field);
+    auto callback = [&](CoreField&& complemented_field,
+                        const ColumnPuyoList& puyos_to_complement) -> RensaResult {
         RensaVanishingPositionTracker tracker;
-        const RensaResult rensa_result = field_after_chain.simulate(&tracker);
+        const RensaResult rensa_result = complemented_field.simulate(&tracker);
         const RensaVanishingPositionResult& position_result = tracker.result();
 
         PossibleChainResult possible_chain_result = {
@@ -166,13 +165,11 @@ munetoshi::grade munetoshi::AI::evaluate(
         optimal_grade = std::max(
                 inner_product<NUM_EVALUATOR_TYPES>(possible_chain_grade_vect, GRADE_WEIGHT_GROW),
                 optimal_grade);
+
+        return rensa_result;
     };
 
-    RensaDetector::detectWithAddingKeyPuyos(core_field,
-                                            RensaDetectorStrategy::defaultFloatStrategy(),
-                                            1,
-                                            1,
-                                            callback);
+    RensaDetector::detectIteratively(core_field, RensaDetectorStrategy::defaultFloatStrategy(), 2, callback);
     return optimal_grade;
 }
 
