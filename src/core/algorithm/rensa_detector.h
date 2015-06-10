@@ -114,7 +114,9 @@ private:
 
 public:
     // ----------------------------------------------------------------------
-    // TODO(mayah): Consider simplify these methods.
+    // TODO(mayah): All the below methods will be removed soon
+    // ----------------------------------------------------------------------
+    .
     typedef std::function<void (const CoreField& fieldAfterRensa,
                                 const RensaResult& rensaResult,
                                 const ColumnPuyoList& complementedPuyoList)> RensaCallback;
