@@ -90,15 +90,14 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
                                       firePuyo, keyPuyos, maxIteration - 1, 0, string(), 0.0, false);
 
         if (FLAGS_use_side_chain) {
-            auto sideChainEvalCallback = [&](const CoreField& fieldAfterRensa,
-                                             const RensaResult& rensaResult,
-                                             const ColumnPuyoList& puyosToComplement) {
+            auto sideChainCallback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) {
+                const RensaResult rensaResult = cf.simulate();
                 // TODO(mayah): firePuyo should be accurate.
                 const PuyoColor firePuyoColor = PuyoColor::RED;
-                callback_(fieldAfterRensa, rensaResult, puyosToComplement, firePuyoColor, "", 0.0);
+                callback_(cf, rensaResult, puyosToComplement, firePuyoColor, "", 0.0);
             };
-            RensaDetector::iterateSideChainFromDetectedField(
-                originalField_, complementedField, cpl, strategy_, sideChainEvalCallback);
+            RensaDetector::detectSideChainFromDetectedField(
+                originalField_, complementedField, strategy_, cpl, sideChainCallback);
         }
     };
 

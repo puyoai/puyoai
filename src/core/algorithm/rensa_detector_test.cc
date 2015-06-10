@@ -753,6 +753,33 @@ TEST(RensaDetectorTest, complementKeyPuyosOn13thRow2)
     RensaDetector::complementKeyPuyosOn13thRow(original, allowsComplements, callback);
     EXPECT_EQ(5 * 5 * 5 * 5 * 5, numCalled);
 }
+
+TEST(RensaDetectorTest, detectSideChain)
+{
+    const CoreField original(
+        "B....."
+        "BY...."
+        "RR...."
+        "BYR..."
+        "BYR...");
+
+    const CoreField expected(
+        "BY...."
+        "BY...."
+        "RRR..."
+        "BYR..."
+        "BYR...");
+
+    bool found = false;
+    auto callback = [&](CoreField&& cf, const ColumnPuyoList& cpl) {
+        if (cf == expected)
+            found = true;
+    };
+
+    RensaDetector::detectSideChain(original, RensaDetectorStrategy::defaultDropStrategy(), callback);
+    EXPECT_TRUE(found);
+}
+
 // ----------------------------------------------------------------------
 
 TEST(RensaDetectorTest, iteratePossibleRensa)
@@ -956,36 +983,4 @@ TEST(RensaDetectorTest, complementKeyPuyos2)
     for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
         EXPECT_TRUE(found[i]) << i;
     }
-}
-
-TEST(RensaDetectorTest, iterateSideChain)
-{
-    const CoreField original(
-        "B....."
-        "BY...."
-        "RR...."
-        "BYR..."
-        "BYR...");
-
-    const CoreField expected(
-        "BY...."
-        "BY...."
-        "RRR..."
-        "BYR..."
-        "BYR...");
-
-    bool found = false;
-    auto callback = [&](const CoreField& /*fieldAfterRensa*/,
-                        const RensaResult& /*rensaResult*/,
-                        const ColumnPuyoList& cpl) {
-        CoreField cf(original);
-        cf.dropPuyoList(cpl);
-
-        if (cf == expected)
-            found = true;
-    };
-
-    RensaDetector::iterateSideChain(original, RensaDetectorStrategy::defaultDropStrategy(), callback);
-
-    EXPECT_TRUE(found);
 }

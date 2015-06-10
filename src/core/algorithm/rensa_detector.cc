@@ -548,34 +548,60 @@ void RensaDetector::detectIterativelyInternal(const CoreField& originalField,
 }
 
 // static
-void RensaDetector::makeProhibitArray(const CoreField& originalField,
-                                      const RensaDetectorStrategy& strategy,
-                                      const RensaLastVanishedPositionTrackResult& trackResult,
-                                      const ColumnPuyoList& firePuyos,
-                                      bool prohibits[FieldConstant::MAP_WIDTH])
+void RensaDetector::detectSideChain(const CoreField& originalField,
+                                    const RensaDetectorStrategy& strategy,
+                                    const ComplementCallback& callback)
 {
-    if (strategy.mode() == RensaDetectorStrategy::Mode::EXTEND) {
-        std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, false);
-        for (int x = 1; x <= 6; ++x)
-            prohibits[x] = (firePuyos.sizeOn(x) > 0);
-        return;
-    }
+    const bool noProhibitedColumn[FieldConstant::MAP_WIDTH] {};
 
-    std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, true);
+    auto detectCallback = [&](CoreField&& complementedField, const ColumnPuyoList& firePuyoList) {
+        detectSideChainFromDetectedField(originalField, complementedField, strategy, firePuyoList, callback);
+    };
 
-    trackResult.lastVanishedPositionBits().iterateBitPositions([&originalField, &prohibits](int x, int y) {
-        if (originalField.isEmpty(x, y + 1)) {
-            prohibits[x] = false;
-        } else {
-            prohibits[x - 1] = false;
-            prohibits[x] = false;
-            prohibits[x + 1] = false;
+    detect(originalField, strategy, PurposeForFindingRensa::FOR_FIRE, noProhibitedColumn, detectCallback);
+}
+
+// static
+void RensaDetector::detectSideChainFromDetectedField(const CoreField& originalField,
+                                                     const CoreField& fireDetectedField,
+                                                     const RensaDetectorStrategy& strategy,
+                                                     const ColumnPuyoList& firePuyoList,
+                                                     const ComplementCallback& callback)
+{
+    CoreField detectedField(fireDetectedField);
+    for (int i = 0; i < 2; ++i) {
+        if (detectedField.vanishDrop().score == 0)
+            return;
+
+        bool prohibitedColumns[FieldConstant::MAP_WIDTH] {};
+        std::fill(prohibitedColumns, prohibitedColumns + FieldConstant::MAP_WIDTH, true);
+        for (int x = 1; x <= 6; ++x) {
+            if (detectedField.height(x) == fireDetectedField.height(x))
+                continue;
+            prohibitedColumns[x] = false;
+            prohibitedColumns[x - 1] = false;
+            prohibitedColumns[x + 1] = false;
         }
-    });
+        prohibitedColumns[0] = prohibitedColumns[FieldConstant::MAP_WIDTH - 1] = true;
 
-    for (int x = 1; x <= 6; ++x) {
-        if (firePuyos.sizeOn(x) > 0)
-            prohibits[x] = true;
+        auto detectCallback = [&](CoreField&& complementedField, const ColumnPuyoList& keyPuyos) {
+            // Check we have 2-rensa.
+            if (complementedField.vanishDrop().score == 0)
+                return;
+            // Check we don't have 3-rensa.
+            if (complementedField.vanishDrop().score > 0)
+                return;
+
+            ColumnPuyoList cpl(keyPuyos);
+            cpl.merge(firePuyoList);
+            CoreField cf(originalField);
+            cf.dropPuyoList(cpl);
+
+            callback(std::move(cf), cpl);
+        };
+
+        // Finds 2-multi or 3-multi.
+        detect(detectedField, strategy, PurposeForFindingRensa::FOR_KEY, prohibitedColumns, detectCallback);
     }
 }
 
@@ -616,6 +642,38 @@ void RensaDetector::complementKeyPuyos13thRowInternal(CoreField& currentField,
     }
 
     complementKeyPuyos13thRowInternal(currentField, currentKeyPuyos, allowsComplements, x + 1, callback);
+}
+
+// static
+void RensaDetector::makeProhibitArray(const CoreField& originalField,
+                                      const RensaDetectorStrategy& strategy,
+                                      const RensaLastVanishedPositionTrackResult& trackResult,
+                                      const ColumnPuyoList& firePuyos,
+                                      bool prohibits[FieldConstant::MAP_WIDTH])
+{
+    if (strategy.mode() == RensaDetectorStrategy::Mode::EXTEND) {
+        std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, false);
+        for (int x = 1; x <= 6; ++x)
+            prohibits[x] = (firePuyos.sizeOn(x) > 0);
+        return;
+    }
+
+    std::fill(prohibits, prohibits + FieldConstant::MAP_WIDTH, true);
+
+    trackResult.lastVanishedPositionBits().iterateBitPositions([&originalField, &prohibits](int x, int y) {
+        if (originalField.isEmpty(x, y + 1)) {
+            prohibits[x] = false;
+        } else {
+            prohibits[x - 1] = false;
+            prohibits[x] = false;
+            prohibits[x + 1] = false;
+        }
+    });
+
+    for (int x = 1; x <= 6; ++x) {
+        if (firePuyos.sizeOn(x) > 0)
+            prohibits[x] = true;
+    }
 }
 
 // static
@@ -867,64 +925,4 @@ void RensaDetector::iteratePossibleRensasIteratively(const CoreField& originalFi
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
     detect(originalField, strategy, PurposeForFindingRensa::FOR_FIRE, prohibits, findRensaCallback);
-}
-
-// static
-void RensaDetector::iterateSideChain(const CoreField& originalField,
-                                     const RensaDetectorStrategy& strategy,
-                                     const RensaCallback& callback)
-{
-    const bool noProhibitedColumn[FieldConstant::MAP_WIDTH] {};
-
-    auto callbackFirst = [&](const CoreField& fireComplementedField, const ColumnPuyoList& firePuyoList) {
-        iterateSideChainFromDetectedField(originalField, fireComplementedField, firePuyoList, strategy, callback);
-    };
-
-    detect(originalField, strategy, PurposeForFindingRensa::FOR_FIRE, noProhibitedColumn, callbackFirst);
-}
-
-// static
-void RensaDetector::iterateSideChainFromDetectedField(const CoreField& originalField,
-                                                      const CoreField& fireDetectedField,
-                                                      const ColumnPuyoList& firePuyoList,
-                                                      const RensaDetectorStrategy& strategy,
-                                                      const RensaCallback& callback)
-{
-    CoreField detectedField(fireDetectedField);
-    for (int i = 0; i < 1; ++i) {
-        if (detectedField.vanishDrop().score == 0)
-            return;
-
-        bool prohibitedColumns[FieldConstant::MAP_WIDTH] {};
-        std::fill(prohibitedColumns, prohibitedColumns + FieldConstant::MAP_WIDTH, true);
-        for (int x = 1; x <= 6; ++x) {
-            if (detectedField.height(x) == fireDetectedField.height(x))
-                continue;
-            prohibitedColumns[x] = false;
-            prohibitedColumns[x - 1] = false;
-            prohibitedColumns[x + 1] = false;
-        }
-        prohibitedColumns[0] = prohibitedColumns[FieldConstant::MAP_WIDTH - 1] = true;
-
-        auto callbackSecond = [&](const CoreField& complementedField, const ColumnPuyoList& keyPuyos) {
-            CoreField cf(complementedField);
-            // Check we have 2-rensa.
-            if (cf.vanishDrop().score == 0)
-                return;
-            // Check we don't have 3-rensa.
-            if (cf.vanishDrop().score > 0)
-                return;
-
-            cf = originalField;
-            ColumnPuyoList cpl(keyPuyos);
-            cpl.merge(firePuyoList);
-            cf.dropPuyoList(cpl);
-
-            RensaResult rensaResult = cf.simulate();
-            callback(cf, rensaResult, cpl);
-        };
-
-        // Finds 2-multi or 3-multi.
-        detect(detectedField, strategy, PurposeForFindingRensa::FOR_KEY, prohibitedColumns, callbackSecond);
-    }
 }
