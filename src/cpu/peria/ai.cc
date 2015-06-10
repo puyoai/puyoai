@@ -70,21 +70,22 @@ DropDecision Ai::think(int frame_id,
 
   // Simulate plan to see where to start.
   Position start(0, 0);
-  auto callback = [&start](const CoreField&,
-                           const RensaResult&,
-                           const ColumnPuyoList&,
-                           const RensaChainTrackResult& result) {
+  auto callback = [&start](CoreField&& cf, const ColumnPuyoList&) -> RensaResult {
+    RensaChainTracker tracker;
+    RensaResult rensa_result = cf.simulate(&tracker);
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
       for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
-        if (result.erasedAt(x, y) == 1) {
+        if (tracker.result().erasedAt(x, y) == 1) {
           start = Position(x, y);
           break;
         }
       }
     }
+
+    return rensa_result;
   };
-  RensaDetector::iteratePossibleRensasWithTracking(
-      control.field, 0, RensaDetectorStrategy::defaultDropStrategy(), callback);
+  RensaDetector::detectIteratively(
+      control.field, RensaDetectorStrategy::defaultDropStrategy(), 1, callback);
 
   if (start.x) {
     std::ostringstream oss;
@@ -92,7 +93,7 @@ DropDecision Ai::think(int frame_id,
         << "@" << start.x << "-" << start.y << ")";
     control.message += oss.str();
   }
-  
+
   return DropDecision(control.decision, control.message);
 }
 
@@ -133,12 +134,13 @@ void Ai::EvaluatePlan(const RefPlan& plan,
   // Simulate plan to see where to start.
   int start_height = 0;
   auto callback = [&start_height, &num_puyos_to_fire](
-      const CoreField&, const RensaResult&, const ColumnPuyoList& completedPuyos,
-      const RensaChainTrackResult& result) {
+      CoreField&& cf, const ColumnPuyoList& completedPuyos) -> RensaResult {
+    RensaChainTracker tracker;
+    RensaResult rensa_result = cf.simulate(&tracker);
     int num_fire = 0;
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
       for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
-        if (result.erasedAt(x, y) == 1) {
+        if (tracker.result().erasedAt(x, y) == 1) {
           start_height += y;
           ++num_fire;
         }
@@ -147,9 +149,10 @@ void Ai::EvaluatePlan(const RefPlan& plan,
     if (num_fire)
       start_height /= num_fire;
     num_puyos_to_fire = completedPuyos.size();
+    return rensa_result;
   };
-  RensaDetector::iteratePossibleRensasWithTracking(
-      plan.field(), 0, RensaDetectorStrategy::defaultDropStrategy(), callback);
+  RensaDetector::detectIteratively(
+      plan.field(), RensaDetectorStrategy::defaultDropStrategy(), 1, callback);
   {
     value = start_height * 100;
     oss << "Starting(" << value << ")_";
