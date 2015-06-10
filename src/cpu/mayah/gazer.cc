@@ -229,12 +229,13 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
 
     vector<EstimatedRensaInfo> results;
     results.reserve(20000);
-    auto callback = [&](const CoreField&, const RensaResult& rensaResult,
-                        const ColumnPuyoList& puyosToComplement,
-                        const RensaCoefResult& coefResult) {
+    auto callback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
+        RensaCoefTracker tracker;
+        RensaResult rensaResult = cf.simulate(&tracker);
+
         // Ignore rensa whose power is really small.
         if (rensaResult.score < 70)
-            return;
+            return rensaResult;
 
         PuyoSet puyoSet;
         puyoSet.add(puyosToComplement);
@@ -263,12 +264,12 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         int framesToIgnite = (FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * necessaryHands;
         int score = rensaResult.score;
         int chains = rensaResult.chains;
-        results.emplace_back(chains, score, framesToIgnite, coefResult);
+        results.emplace_back(chains, score, framesToIgnite, tracker.result());
+
+        return rensaResult;
     };
 
-    RensaDetector::iteratePossibleRensasWithCoefTracking(field, 3,
-                                                         RensaDetectorStrategy::defaultFloatStrategy(),
-                                                         callback);
+    RensaDetector::detectIteratively(field, RensaDetectorStrategy::defaultFloatStrategy(), 3, callback);
     if (results.empty())
         return;
 
