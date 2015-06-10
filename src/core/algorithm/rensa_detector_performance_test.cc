@@ -14,39 +14,46 @@ struct RensaResult;
 
 using namespace std;
 
-TEST(RensaDetectorPerformanceTest, iteratePossibleRensas)
+TEST(RensaDetectorPerformanceTest, detectIteratively_Drop)
 {
-    TimeStampCounterData tsc1;
-    TimeStampCounterData tsc2;
+    TimeStampCounterData tsc;
 
-    CoreField f(
+    const CoreField original(
         "  R G "
         "R GRBG"
         "RBGRBG"
         "RBGRBG");
 
-    size_t size1 = 0;
-    size_t size2 = 0;
-    auto callback1 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&) {
-        ++size1;
-    };
-    auto callback2 = [&](const CoreField&, const RensaResult&, const ColumnPuyoList&, const RensaChainTrackResult&) {
-        ++size2;
+    auto callback = [&](CoreField&& cf, const ColumnPuyoList&) -> RensaResult {
+        return cf.simulate();
     };
 
     for (int i = 0; i < 10000; ++i) {
-        ScopedTimeStampCounter scts(&tsc1);
-        RensaDetector::iteratePossibleRensas(f, 1, RensaDetectorStrategy::defaultDropStrategy(), callback1);
+        ScopedTimeStampCounter stsc(&tsc);
+        RensaDetector::detectIteratively(original, RensaDetectorStrategy::defaultDropStrategy(), 3, callback);
     }
+
+    tsc.showStatistics();
+}
+
+TEST(RensaDetectorPerformanceTest, detectIteratively_Float)
+{
+    TimeStampCounterData tsc;
+
+    const CoreField original(
+        "  R G "
+        "R GRBG"
+        "RBGRBG"
+        "RBGRBG");
+
+    auto callback = [&](CoreField&& cf, const ColumnPuyoList&) -> RensaResult {
+        return cf.simulate();
+    };
 
     for (int i = 0; i < 10000; ++i) {
-        ScopedTimeStampCounter scts(&tsc2);
-        RensaDetector::iteratePossibleRensasWithTracking(f, 1, RensaDetectorStrategy::defaultDropStrategy(), callback2);
+        ScopedTimeStampCounter stsc(&tsc);
+        RensaDetector::detectIteratively(original, RensaDetectorStrategy::defaultFloatStrategy(), 3, callback);
     }
 
-    cout << size1 << endl;
-    cout << size2 << endl;
-    tsc1.showStatistics();
-    cout << endl;
-    tsc2.showStatistics();
+    tsc.showStatistics();
 }

@@ -59,14 +59,13 @@ class One : public AI {
     Plan::iterateAvailablePlans(
         f, seq, 2, [&best, &score](const RefPlan& plan) {
           int s = -1;
-          auto callback = [&](const CoreField&,
-                              const RensaResult& rensa_result,
-                              const ColumnPuyoList&,
-                              const RensaChainTrackResult&) {
+          auto callback = [&](CoreField&& cf, const ColumnPuyoList&) -> RensaResult {
+            RensaResult rensa_result = cf.simulate();
             s = max(s, rensa_result.score);
+            return rensa_result;
           };
-          RensaDetector::iteratePossibleRensasWithTracking(
-              plan.field(), 1, RensaDetectorStrategy::defaultFloatStrategy(), callback);
+          RensaDetector::detectIteratively(
+              plan.field(), RensaDetectorStrategy::defaultFloatStrategy(), 2, callback);
 
           if (plan.isRensaPlan()) {
             if (plan.decisions().size() == 1) {

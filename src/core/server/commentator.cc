@@ -212,17 +212,18 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
     {
         int bestScore = 0;
         unique_ptr<TrackedPossibleRensaInfo> bestRensa;
-        auto callback = [&](const CoreField&,
-                            const RensaResult& rensaResult,
-                            const ColumnPuyoList& puyosToComplement,
-                            const RensaChainTrackResult& trackResult) {
+        auto callback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
+            RensaChainTracker tracker;
+            RensaResult rensaResult = cf.simulate(&tracker);
             if (bestScore < rensaResult.score) {
                 bestScore = rensaResult.score;
-                bestRensa.reset(new TrackedPossibleRensaInfo(rensaResult, puyosToComplement, trackResult));
+                bestRensa.reset(new TrackedPossibleRensaInfo(rensaResult, puyosToComplement, tracker.result()));
             }
+
+            return rensaResult;
         };
 
-        RensaDetector::iteratePossibleRensasWithTracking(field, 3, RensaDetectorStrategy::defaultFloatStrategy(), callback);
+        RensaDetector::detectIteratively(field, RensaDetectorStrategy::defaultFloatStrategy(), 3, callback);
 
         if (bestRensa != nullptr) {
             lock_guard<mutex> lock(mu_);
