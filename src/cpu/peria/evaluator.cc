@@ -6,7 +6,10 @@
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/kumipuyo_seq.h"
+#include "cpu/peria/control.h"
+#include "cpu/peria/evaluator.h"
 #include "cpu/peria/pattern.h"
+#include "cpu/peria/player.h"
 
 namespace peria {
 
@@ -14,6 +17,26 @@ int ScoreDiffHeight(int higher, int lower) {
   int diff = higher - lower;
   diff = diff * diff;
   return ((higher > lower) ? 0 : -diff) * 50;
+}
+
+void Evaluator::EvalPlan(const RefPlan& plan, const PlayerState& me, const Player& enemy, Control* control) {
+  UNUSED_VARIABLE(enemy);
+  UNUSED_VARIABLE(me);
+
+  int score = plan.score();
+
+  // Evaluate field
+  // - pattern matching
+  // - possible future rensa
+  // - UKE : assume 1, 2 lines of ojama. 5 lines in case of ZENKESHI, and eval again.
+  // Evaluate rensa (if rensa_plan)
+  // - TSUBUSHI : how quickly rensa ends. 2 or more lines.
+  // - TAIOU : how small rensa is firable.
+
+  if (control->score < score) {
+    control->decision = plan.decisions().front();
+    control->score = score;
+  }
 }
 
 int Evaluator::PatternMatch(const CoreField& field, std::string* name) {
