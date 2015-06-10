@@ -799,23 +799,6 @@ void RensaDetector::iteratePossibleRensasWithTracking(const CoreField& originalF
     findPossibleRensasInternal(originalField, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, cb);
 }
 
-void RensaDetector::iteratePossibleRensasWithCoefTracking(const CoreField& originalField,
-                                                          int maxKeyPuyos,
-                                                          const RensaDetectorStrategy& strategy,
-                                                          const RensaDetector::CoefPossibleRensaCallback& callback)
-{
-    auto cb = [&callback](const CoreField& complementedField, const ColumnPuyoList& cpl) {
-        RensaCoefTracker tracker;
-        CoreField cf(complementedField);
-        RensaResult rensaResult = cf.simulate(&tracker);
-        if (rensaResult.chains > 0)
-            callback(cf, rensaResult, cpl, tracker.result());
-    };
-
-    ColumnPuyoList puyoList;
-    findPossibleRensasInternal(originalField, puyoList, 1, maxKeyPuyos, PurposeForFindingRensa::FOR_FIRE, strategy, cb);
-}
-
 static
 void iteratePossibleRensasIterativelyInternal(const CoreField& currentField,
                                               const CoreField& originalField,

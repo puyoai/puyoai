@@ -176,10 +176,6 @@ public:
                                                   int maxKeyPuyos,
                                                   const RensaDetectorStrategy&,
                                                   const TrackedPossibleRensaCallback&);
-    static void iteratePossibleRensasWithCoefTracking(const CoreField&,
-                                                      int maxKeyPuyos,
-                                                      const RensaDetectorStrategy&,
-                                                      const CoefPossibleRensaCallback&);
 
 
     static void makeProhibitArray(const RensaResult&,

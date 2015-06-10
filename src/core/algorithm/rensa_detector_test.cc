@@ -771,7 +771,7 @@ TEST(RensaDetectorTest, detectSideChain)
         "BYR...");
 
     bool found = false;
-    auto callback = [&](CoreField&& cf, const ColumnPuyoList& cpl) {
+    auto callback = [&](CoreField&& cf, const ColumnPuyoList& /*cpl*/) {
         if (cf == expected)
             found = true;
     };
