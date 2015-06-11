@@ -18,12 +18,12 @@ const int FRAMES_CONTINUOUS_ARROW_PROHIBITED = 3;
 
 // dropping after chigiri or dropping ojama puyo.
 static const int FRAMES_TO_DROP[] = {
-    0, 10, 16, 22, 24, 28, 32, 34, 36, 40, 42, 44, 46, 48, 50
+    0, 10, 16, 22, 24, 28, 32, 34, 36, 40, 42, 44, 46, 48, 50, 52
 };
 
 // Pressing DOWN, or dropping after rensa.
 static const int FRAMES_TO_DROP_FAST[] = {
-    0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28
+    0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30
 };
 
 //
@@ -70,12 +70,12 @@ const int FRAMES_CONTINUOUS_ARROW_PROHIBITED = 1;
 
 // dropping after chigiri or dropping ojama puyo.
 static const int FRAMES_TO_DROP[] = {
-    0, 5, 8, 11, 12, 14, 16, 17, 18, 20, 21, 22, 23, 24, 25
+    0, 5, 8, 11, 12, 14, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26
 };
 
 // Pressing DOWN, or dropping after rensa.
 static const int FRAMES_TO_DROP_FAST[] = {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 };
 
 //

@@ -16,11 +16,6 @@ class FrameContext;
 
 class FieldRealtime {
 public:
-    const double INITIAL_DROP_VELOCITY = 3.0;
-    const double MAX_DROP_VELOCITY = 32.0;
-    const double DROP_ACCELARATION_PER_FRAME = 1.2;
-    const double DROP_1BLOCK_THRESHOLD = 32.0;
-
     enum class SimulationState {
         STATE_LEVEL_SELECT,   // initial state
         STATE_PREPARING_NEXT,
@@ -126,8 +121,10 @@ private:
     int numPendingOjama_ = 0;
 
     int ojamaDroppingAmount_ = 0;
-    double dropVelocity_ = 0.0;
-    double dropAmount_ = 0.0;
+
+    bool dropFast_ = false;
+    int dropFrameIndex_ = 0;
+    int dropRestFrames_ = 0;
 
     bool allowsQuick_ = false;
 

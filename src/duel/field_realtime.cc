@@ -114,8 +114,9 @@ bool FieldRealtime::onStatePlayable(const KeySet& keySet, bool* accepted)
         field_.setColor(kms_.pos.childX(), kms_.pos.childY(), kumipuyoSeq_.child(0));
         playable_ = false;
         userEvent_.grounded = true;
-        dropVelocity_ = INITIAL_DROP_VELOCITY;
-        dropAmount_ = 0.0;
+        dropFast_ = false;
+        dropFrameIndex_ = 0;
+        dropRestFrames_ = 0;
         drop_animation_ = false;
         sleepFor_ = 0;
         simulationState_ = SimulationState::STATE_DROPPING;
@@ -184,8 +185,11 @@ bool FieldRealtime::onStateVanish(FrameContext* context)
     }
 
     simulationState_ = SimulationState::STATE_VANISHING;
-    dropVelocity_ = MAX_DROP_VELOCITY;
-    dropAmount_ = 0.0;
+
+    dropFast_ = true;
+    dropFrameIndex_ = 0;
+    dropRestFrames_ = 0;
+
     sleepFor_ = FRAMES_VANISH_ANIMATION;
     allowsQuick_ = true;
     return false;
@@ -215,8 +219,9 @@ bool FieldRealtime::onStateOjamaDropping()
             ojamaAmount += ojama_position_[i];
 
         ojamaDroppingAmount_ = ojamaAmount;
-        dropVelocity_ = INITIAL_DROP_VELOCITY;
-        dropAmount_ = 0.0;
+        dropFast_ = false;
+        dropFrameIndex_ = 0;
+        dropRestFrames_ = 0;
     }
 
     bool ojamaWasDropping = ojama_dropping_;
@@ -340,14 +345,9 @@ bool FieldRealtime::playOneFrame(const KeySet& keySet, FrameContext* context)
 
 bool FieldRealtime::drop1Frame()
 {
-    double velocity = dropVelocity_;
-    dropVelocity_ = min(dropVelocity_ + DROP_ACCELARATION_PER_FRAME, MAX_DROP_VELOCITY);
-
-    bool needToDrop = false;
-    dropAmount_ += velocity;
-    if (dropAmount_ >= DROP_1BLOCK_THRESHOLD) {
-        dropAmount_ -= DROP_1BLOCK_THRESHOLD;
-        needToDrop = true;
+    if (dropRestFrames_ > 0) {
+        dropRestFrames_ -= 1;
+        return true;
     }
 
     bool stillDropping = false;
@@ -361,12 +361,19 @@ bool FieldRealtime::drop1Frame()
 
             if (field_.color(x, y + 1) != PuyoColor::EMPTY) {
                 stillDropping = true;
-                if (needToDrop) {
-                    field_.setColor(x, y, field_.color(x, y + 1));
-                    field_.setColor(x, y + 1, PuyoColor::EMPTY);
-                }
+                field_.setColor(x, y, field_.color(x, y + 1));
+                field_.setColor(x, y + 1, PuyoColor::EMPTY);
             }
         }
+    }
+
+    if (stillDropping) {
+        if (dropFast_) {
+            dropRestFrames_ = FRAMES_TO_DROP_FAST[dropFrameIndex_ + 1] - FRAMES_TO_DROP_FAST[dropFrameIndex_];
+        } else {
+            dropRestFrames_ = FRAMES_TO_DROP[dropFrameIndex_ + 1] - FRAMES_TO_DROP[dropFrameIndex_];
+        }
+        dropFrameIndex_ += 1;
     }
 
     return stillDropping;
