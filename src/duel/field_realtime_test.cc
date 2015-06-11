@@ -42,7 +42,7 @@ TEST_F(FieldRealtimeTest, stateWithoutOjama)
     }
 
     // It needs 12 frames to reach the bottom.
-    for (int i = 0; i < FRAMES_TO_DROP_FAST[12]; ++i) {
+    for (int i = 0; i < FRAMES_TO_DROP_FAST[12] - 1; ++i) {
         FrameContext context;
         f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_PLAYABLE, f_->simulationState());
@@ -78,7 +78,7 @@ TEST_F(FieldRealtimeTest, zenkeshi)
     f_->skipLevelSelect();
 
     // Waiting next (6) + reaching bottom (11) + dropping (1) + grounding (10)
-    for (int i = 0; i < 6 + 11 + 1 + 10; ++i) {
+    for (int i = 0; i < FRAMES_PREPARING_NEXT + FRAMES_TO_DROP_FAST[11] + FRAMES_GROUNDING; ++i) {
         FrameContext context;
         f_->playOneFrame(KeySet(Key::DOWN), &context);
         cout << (int)f_->simulationState() << endl;
@@ -90,7 +90,7 @@ TEST_F(FieldRealtimeTest, zenkeshi)
     EXPECT_TRUE(f_->hasZenkeshi());
     EXPECT_EQ(0, context.numSentOjama());
 
-    for (int i = 0; i < 24; ++i) {
+    for (int i = 0; i < FRAMES_VANISH_ANIMATION - 1; ++i) {
         FrameContext context;
         f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_VANISHING, f_->simulationState());
