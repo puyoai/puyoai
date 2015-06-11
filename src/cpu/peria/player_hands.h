@@ -7,9 +7,7 @@
 
 namespace peria {
 
-struct Player {
-  PlayerState state;
-
+struct PlayerHands {
   // Rensa which needs key puyos to fill.
   std::vector<PossibleRensa> need_keys;
 
