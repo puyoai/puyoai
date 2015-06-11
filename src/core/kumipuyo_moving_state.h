@@ -21,14 +21,14 @@ public:
     friend bool operator<(const KumipuyoMovingState& lhs, const KumipuyoMovingState& rhs);
     friend bool operator>(const KumipuyoMovingState& lhs, const KumipuyoMovingState& rhs) { return rhs < lhs; }
 
-    void moveKumipuyo(const PlainField&, const KeySet&, bool* downAccepted = nullptr);
+    void moveKumipuyo(const PlainField&, const KeySet&, bool* downAccepted);
 
 public:
     // TODO(mayah): Make this private.
 
     // Move kumipuyo using only arrow key. |downAccepted| gets true when DOWN is accepted.
     void moveKumipuyoByArrowKey(const PlainField&, const KeySet&, bool* downAccepted);
-    void moveKumipuyoByTurnKey(const PlainField&, const KeySet&, bool* needsFreefallProcess);
+    void moveKumipuyoByTurnKey(const PlainField&, const KeySet&);
     void moveKumipuyoByFreefall(const PlainField&);
 
     KumipuyoPos pos;
