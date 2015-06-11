@@ -55,7 +55,7 @@ FieldRealtime::FieldRealtime(int playerId, const KumipuyoSeq& seq) :
 void FieldRealtime::init()
 {
     playable_ = false;
-    sleepFor_ = 30;
+    sleepFor_ = FPS;
 
     ojama_position_ = vector<int>(6, 0);
     ojama_dropping_ = false;

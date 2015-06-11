@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "core/core_field.h"
+#include "core/frame.h"
 #include "core/key.h"
 #include "core/key_set.h"
 
@@ -14,24 +15,39 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithOnlyArrowKey)
     KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
     bool downAccepted = false;
 
+    int frame = 0;
+
     kms.moveKumipuyo(f, KeySet(Key::RIGHT), &downAccepted);
+    ++frame;
+
     EXPECT_EQ(KumipuyoPos(4, 12, 0), kms.pos);
     EXPECT_EQ(0, kms.restFramesTurnProhibited);
     EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL - 1, kms.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - frame, kms.restFramesForFreefall);
     EXPECT_FALSE(kms.grounded);
 
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_ARROW_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+        ++frame;
+    }
+
     kms.moveKumipuyo(f, KeySet(Key::LEFT), &downAccepted);
+    ++frame;
+
     EXPECT_EQ(KumipuyoPos(3, 12, 0), kms.pos);
     EXPECT_EQ(0, kms.restFramesTurnProhibited);
     EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL - 3, kms.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - frame, kms.restFramesForFreefall);
     EXPECT_FALSE(kms.grounded);
 
-    // TODO(mayah): Should we accept Key::DOWN here?
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_ARROW_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+        ++frame;
+    }
+
     kms.moveKumipuyo(f, KeySet(Key::DOWN), &downAccepted);
+    ++frame;
+
     EXPECT_EQ(KumipuyoPos(3, 12, 0), kms.pos);
     EXPECT_EQ(0, kms.restFramesTurnProhibited);
     EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
@@ -286,7 +302,7 @@ TEST(KumipuyoMovingStateTest, grounding)
     EXPECT_TRUE(kms.grounding);
 }
 
-TEST(KumipuyoMovingStateTest, fixAfterEightGrouding)
+TEST(KumipuyoMovingStateTest, fixAfterEightGrounding)
 {
     PlainField f;
     KumipuyoMovingState kms(KumipuyoPos(3, 2, 1));
@@ -303,20 +319,24 @@ TEST(KumipuyoMovingStateTest, fixAfterEightGrouding)
         EXPECT_EQ(i + 1, kms.numGrounded) << i;
         EXPECT_TRUE(kms.grounding);
 
-        kms.moveKumipuyo(f, KeySet(), &downAccepted);
-        EXPECT_EQ(1, kms.pos.childY());
-        EXPECT_EQ(i + 1, kms.numGrounded) << i;
-        EXPECT_TRUE(kms.grounding);
+        for (int j = 0; j < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++j) {
+            kms.moveKumipuyo(f, KeySet(), &downAccepted);
+            EXPECT_EQ(1, kms.pos.childY());
+            EXPECT_EQ(i + 1, kms.numGrounded) << i;
+            EXPECT_TRUE(kms.grounding);
+        }
 
         kms.moveKumipuyo(f, KeySet(Key::LEFT_TURN), &downAccepted);
         EXPECT_EQ(2, kms.pos.childY());
         EXPECT_EQ(i + 1, kms.numGrounded) << i;
         EXPECT_FALSE(kms.grounding);
 
-        kms.moveKumipuyo(f, KeySet(), &downAccepted);
-        EXPECT_EQ(2, kms.pos.childY());
-        EXPECT_EQ(i + 1, kms.numGrounded) << i;
-        EXPECT_FALSE(kms.grounding);
+        for (int j = 0; j < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++j) {
+            kms.moveKumipuyo(f, KeySet(), &downAccepted);
+            EXPECT_EQ(2, kms.pos.childY());
+            EXPECT_EQ(i + 1, kms.numGrounded) << i;
+            EXPECT_FALSE(kms.grounding);
+        }
     }
 
     // After 8th grounding, kumipuyo should be fixed.
@@ -336,16 +356,24 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis_RightTurn)
 
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 2, 2), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 2, 3), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 2, 0), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 1, 1), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 2, 2), kms.pos);
 }
@@ -360,16 +388,24 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis_LeftTurn)
 
     kms.moveKumipuyo(f, KeySet(Key::LEFT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 2, 2), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::LEFT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 2, 1), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::LEFT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 2, 0), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::LEFT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 1, 3), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::LEFT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 2, 2), kms.pos);
 }
@@ -396,16 +432,24 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithLiftingAxis12)
 
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 13, 2), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 13, 3), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 13, 0), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 12, 1), kms.pos);
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    }
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 13, 2), kms.pos);
 }
@@ -463,21 +507,27 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoQuickTurn)
     KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
     bool downAccepted = false;
 
+    int frame = 0;
+
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
+    ++frame;
     EXPECT_EQ(KumipuyoPos(3, 12, 0), kms.pos);
     EXPECT_EQ(FRAMES_CONTINUOUS_TURN_PROHIBITED, kms.restFramesTurnProhibited);
     EXPECT_EQ(FRAMES_QUICKTURN, kms.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL - 1, kms.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - frame, kms.restFramesForFreefall);
     EXPECT_FALSE(kms.grounded);
     EXPECT_FALSE(downAccepted);
 
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
-    EXPECT_EQ(KumipuyoPos(3, 12, 0), kms.pos);
-    EXPECT_EQ(FRAMES_CONTINUOUS_TURN_PROHIBITED - 1, kms.restFramesTurnProhibited);
-    EXPECT_EQ(FRAMES_QUICKTURN - 1, kms.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL - 2, kms.restFramesForFreefall);
-    EXPECT_FALSE(kms.grounded);
-    EXPECT_FALSE(downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+        ++frame;
+        EXPECT_EQ(KumipuyoPos(3, 12, 0), kms.pos);
+        EXPECT_EQ(FRAMES_CONTINUOUS_TURN_PROHIBITED - i - 1, kms.restFramesTurnProhibited);
+        EXPECT_EQ(FRAMES_QUICKTURN - frame + 1, kms.restFramesToAcceptQuickTurn);
+        EXPECT_EQ(FRAMES_FREE_FALL - frame, kms.restFramesForFreefall);
+        EXPECT_FALSE(kms.grounded);
+        EXPECT_FALSE(downAccepted);
+    }
 
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(3, 13, 2), kms.pos);
@@ -487,10 +537,17 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoQuickTurn)
     EXPECT_FALSE(kms.grounded);
     EXPECT_FALSE(downAccepted);
 
-    kms.moveKumipuyo(f, KeySet(), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i)
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+
     kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
-    kms.moveKumipuyo(f, KeySet(Key::RIGHT), &downAccepted);
-    kms.moveKumipuyo(f, KeySet(Key::RIGHT_TURN), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i)
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+
+    kms.moveKumipuyo(f, KeySet(Key::RIGHT, Key::RIGHT_TURN), &downAccepted);
+    for (int i = 0; i < FRAMES_CONTINUOUS_TURN_PROHIBITED; ++i)
+        kms.moveKumipuyo(f, KeySet(), &downAccepted);
+
     kms.moveKumipuyo(f, KeySet(Key::DOWN), &downAccepted);
     EXPECT_EQ(KumipuyoPos(4, 13, 0), kms.pos);
 }
@@ -501,37 +558,48 @@ TEST(KumipuyoMovingStateTest, moveForWii)
     KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
     bool downAccepted = false;
 
+    int frame = 0;
+
     kms.moveKumipuyo(f, KeySet(Key::RIGHT), &downAccepted);
+    ++frame;
+
     EXPECT_EQ(KumipuyoPos(4, 12, 0), kms.pos);
     EXPECT_EQ(0, kms.restFramesTurnProhibited);
-    EXPECT_EQ(1, kms.restFramesArrowProhibited);
+    EXPECT_EQ(FRAMES_CONTINUOUS_ARROW_PROHIBITED, kms.restFramesArrowProhibited);
     EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL - 1, kms.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - frame, kms.restFramesForFreefall);
     EXPECT_FALSE(kms.grounded);
 
     // This should be ignored.
-    kms.moveKumipuyo(f, KeySet(Key::RIGHT), &downAccepted);
-    EXPECT_EQ(KumipuyoPos(4, 12, 0), kms.pos);
-    EXPECT_EQ(0, kms.restFramesTurnProhibited);
-    EXPECT_EQ(0, kms.restFramesArrowProhibited);
-    EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL - 2, kms.restFramesForFreefall);
-    EXPECT_FALSE(kms.grounded);
+    for (int i = 0; i < FRAMES_CONTINUOUS_ARROW_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(Key::RIGHT), &downAccepted);
+        ++frame;
+        EXPECT_EQ(KumipuyoPos(4, 12, 0), kms.pos);
+        EXPECT_EQ(0, kms.restFramesTurnProhibited);
+        EXPECT_EQ(FRAMES_CONTINUOUS_ARROW_PROHIBITED - i - 1, kms.restFramesArrowProhibited);
+        EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
+        EXPECT_EQ(FRAMES_FREE_FALL - frame, kms.restFramesForFreefall);
+        EXPECT_FALSE(kms.grounded);
+    }
 
     kms.moveKumipuyo(f, KeySet(Key::RIGHT), &downAccepted);
+    ++frame;
     EXPECT_EQ(KumipuyoPos(5, 12, 0), kms.pos);
     EXPECT_EQ(0, kms.restFramesTurnProhibited);
-    EXPECT_EQ(1, kms.restFramesArrowProhibited);
+    EXPECT_EQ(FRAMES_CONTINUOUS_ARROW_PROHIBITED, kms.restFramesArrowProhibited);
     EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL - 3, kms.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL - frame, kms.restFramesForFreefall);
     EXPECT_FALSE(kms.grounded);
 
     // This should be ignored.
-    kms.moveKumipuyo(f, KeySet(Key::LEFT), &downAccepted);
-    EXPECT_EQ(KumipuyoPos(5, 12, 0), kms.pos);
-    EXPECT_EQ(0, kms.restFramesTurnProhibited);
-    EXPECT_EQ(0, kms.restFramesArrowProhibited);
-    EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL - 4, kms.restFramesForFreefall);
-    EXPECT_FALSE(kms.grounded);
+    for (int i = 0; i < FRAMES_CONTINUOUS_ARROW_PROHIBITED; ++i) {
+        kms.moveKumipuyo(f, KeySet(Key::LEFT), &downAccepted);
+        ++frame;
+        EXPECT_EQ(KumipuyoPos(5, 12, 0), kms.pos);
+        EXPECT_EQ(0, kms.restFramesTurnProhibited);
+        EXPECT_EQ(FRAMES_CONTINUOUS_ARROW_PROHIBITED - i - 1, kms.restFramesArrowProhibited);
+        EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
+        EXPECT_EQ(FRAMES_FREE_FALL - frame, kms.restFramesForFreefall);
+        EXPECT_FALSE(kms.grounded);
+    }
 }
