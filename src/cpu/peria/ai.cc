@@ -33,13 +33,10 @@ DropDecision Ai::think(int frame_id,
                        bool fast) const {
   UNUSED_VARIABLE(frame_id);
   UNUSED_VARIABLE(fast);
-  UNUSED_VARIABLE(enemy_state);
   using namespace std::placeholders;
 
-  //enemy_.state = enemy_state;
-
   Control control;
-  Evaluator evaluator(my_state, enemy_, &control);
+  Evaluator evaluator(my_state, enemy_state, enemy_hands_, &control);
   Plan::iterateAvailablePlans(field, seq, 2, [&evaluator](const RefPlan& plan) { evaluator.EvalPlan(plan); });
 
   return DropDecision(control.decision, control.message);

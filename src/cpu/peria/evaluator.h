@@ -10,12 +10,12 @@ struct PlayerState;
 namespace peria {
 
 struct Control;
-struct Player;
+struct PlayerHands;
 
 // Evaluator evaluates something.
 class Evaluator {
  public:
-  Evaluator(const PlayerState&, const Player&, Control*);
+  Evaluator(const PlayerState&, const PlayerState&, const PlayerHands&, Control*);
   void EvalPlan(const RefPlan& plan);
   
  private:
@@ -25,7 +25,8 @@ class Evaluator {
   int Plan(const CoreField& field, const RensaChainTrackResult& track);
 
   const PlayerState& me;
-  const Player& enemy;
+  const PlayerState& enemy;
+  const PlayerHands& enemy_hands;
   Control* control;
 };
 

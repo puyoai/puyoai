@@ -9,7 +9,7 @@
 #include "cpu/peria/control.h"
 #include "cpu/peria/evaluator.h"
 #include "cpu/peria/pattern.h"
-#include "cpu/peria/player.h"
+#include "cpu/peria/player_hands.h"
 
 namespace peria {
 
@@ -19,7 +19,8 @@ int ScoreDiffHeight(int higher, int lower) {
   return ((higher > lower) ? 0 : -diff) * 50;
 }
 
-Evaluator::Evaluator(const PlayerState& m, const Player& e, Control* c) : me(m), enemy(e), control(c) {}
+Evaluator::Evaluator(const PlayerState& m, const PlayerState& e, const PlayerHands& eh, Control* c)
+  : me(m), enemy(e), enemy_hands(eh), control(c) {}
 
 void Evaluator::EvalPlan(const RefPlan& plan) {
   int score = plan.score();

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/client/ai/ai.h"
-#include "cpu/peria/player.h"
+#include "cpu/peria/player_hands.h"
 
 #include <memory>  // available with C++11
 
@@ -24,7 +24,7 @@ class Ai : public ::AI {
 
   static int PatternMatch(const RefPlan& plan, std::string* name);
 
-  Player enemy_;
+  PlayerHands enemy_hands_;
 };
 
 }  // namespace peria
