@@ -41,6 +41,8 @@ public:
 
     std::string toString() const;
 
+    friend bool operator==(const KeySetSeq& lhs, const KeySetSeq& rhs) { return lhs.seq_ == rhs.seq_; }
+
 private:
     std::vector<KeySet> seq_;
 };
