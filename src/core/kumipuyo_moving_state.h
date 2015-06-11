@@ -9,9 +9,6 @@ class KeySet;
 
 class KumipuyoMovingState {
 public:
-    static const int FRAMES_CONTINUOUS_TURN_PROHIBITED = 1;
-    static const int FRAMES_CONTINUOUS_ARROW_PROHIBITED = 1;
-
     constexpr KumipuyoMovingState() : pos(KumipuyoPos()) {}
     constexpr explicit KumipuyoMovingState(const KumipuyoPos& pos) : pos(pos) {}
 
