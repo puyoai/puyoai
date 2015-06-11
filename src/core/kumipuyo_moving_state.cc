@@ -8,10 +8,6 @@
 #include "core/plain_field.h"
 #include "core/puyo_color.h"
 
-// TODO(mayah): Why these definitions are required for gtest?
-const int KumipuyoMovingState::FRAMES_CONTINUOUS_TURN_PROHIBITED;
-const int KumipuyoMovingState::FRAMES_CONTINUOUS_ARROW_PROHIBITED;
-
 bool operator==(const KumipuyoMovingState& lhs, const KumipuyoMovingState& rhs)
 {
     return std::tie(lhs.pos,

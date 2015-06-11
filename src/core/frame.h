@@ -18,6 +18,9 @@ const int FRAMES_NEXT2_DELAY = 8;
 const int FRAMES_FREE_FALL = 8;
 const int FRAMES_QUICKTURN = 10;
 
+const int FRAMES_CONTINUOUS_TURN_PROHIBITED = 1;
+const int FRAMES_CONTINUOUS_ARROW_PROHIBITED = 1;
+
 // dropping after chigiri or dropping ojama puyo.
 static const int FRAMES_TO_DROP[] = {
     0, 5, 8, 11, 12, 14, 16, 17, 18, 20, 21, 22, 23, 24, 25
