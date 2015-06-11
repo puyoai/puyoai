@@ -4,6 +4,7 @@
 #include <bitset>
 #include <cstddef>
 #include <initializer_list>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -42,6 +43,7 @@ public:
     std::string toString() const;
 
     friend bool operator==(const KeySetSeq& lhs, const KeySetSeq& rhs) { return lhs.seq_ == rhs.seq_; }
+    friend std::ostream& operator<<(std::ostream& os, const KeySetSeq& kss) { return (os << kss.toString()); }
 
 private:
     std::vector<KeySet> seq_;
