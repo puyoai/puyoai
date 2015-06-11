@@ -12,7 +12,7 @@ public:
     constexpr KumipuyoMovingState() : pos(KumipuyoPos()) {}
     constexpr explicit KumipuyoMovingState(const KumipuyoPos& pos) : pos(pos) {}
 
-    static constexpr KumipuyoMovingState initialState() { return KumipuyoMovingState(KumipuyoPos::initialPos()); }
+    static KumipuyoMovingState initialState() { return KumipuyoMovingState(KumipuyoPos::initialPos()); }
 
     bool isInitialPosition() const { return pos.x == 3 && pos.y == 12 && pos.r == 0; }
 
