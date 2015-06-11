@@ -123,7 +123,6 @@ void KumipuyoMovingState::moveKumipuyoByArrowKey(const PlainField& field, const 
         return;
     }
 
-
     if (keySet.hasKey(Key::DOWN)) {
         // For DOWN key, we don't set restFramesArrowProhibited.
         if (downAccepted)
