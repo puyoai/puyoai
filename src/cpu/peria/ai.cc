@@ -39,8 +39,8 @@ DropDecision Ai::think(int frame_id,
   //enemy_.state = enemy_state;
 
   Control control;
-  auto evaluate = std::bind(Evaluator::EvalPlan, _1, my_state, enemy_, &control);
-  Plan::iterateAvailablePlans(field, seq, 2, evaluate);
+  Evaluator evaluator(my_state, enemy_, &control);
+  Plan::iterateAvailablePlans(field, seq, 2, [&evaluator](const RefPlan& plan) { evaluator.EvalPlan(plan); });
 
   return DropDecision(control.decision, control.message);
 }

@@ -12,18 +12,21 @@ namespace peria {
 struct Control;
 struct Player;
 
-// Evaluator is a namespace to evaluate something.
+// Evaluator evaluates something.
 class Evaluator {
  public:
-  static void EvalPlan(const RefPlan& plan, const PlayerState& me, const Player& enemy, Control* control);
+  Evaluator(const PlayerState&, const Player&, Control*);
+  void EvalPlan(const RefPlan& plan);
   
-  static int PatternMatch(const CoreField& field, std::string* message);
+ private:
+  int PatternMatch(const CoreField& field, std::string* message);
+  int Field(const CoreField& field);
+  int Future(const CoreField& field);
+  int Plan(const CoreField& field, const RensaChainTrackResult& track);
 
-  static int Field(const CoreField& field);
-
-  static int Future(const CoreField& field);
-
-  static int Plan(const CoreField& field, const RensaChainTrackResult& track);
+  const PlayerState& me;
+  const Player& enemy;
+  Control* control;
 };
 
 }  // namespace peria

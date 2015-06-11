@@ -19,12 +19,11 @@ int ScoreDiffHeight(int higher, int lower) {
   return ((higher > lower) ? 0 : -diff) * 50;
 }
 
-void Evaluator::EvalPlan(const RefPlan& plan, const PlayerState& me, const Player& enemy, Control* control) {
-  UNUSED_VARIABLE(enemy);
-  UNUSED_VARIABLE(me);
+Evaluator::Evaluator(const PlayerState& m, const Player& e, Control* c) : me(m), enemy(e), control(c) {}
 
+void Evaluator::EvalPlan(const RefPlan& plan) {
   int score = plan.score();
-
+  
   // Evaluate field
   // - pattern matching
   // - possible future rensa
