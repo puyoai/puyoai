@@ -66,6 +66,7 @@ function(capture_add_executable exe)
 endfunction()
 
 capture_add_executable(split_image)
+capture_add_executable(split_movie)
 
 capture_add_executable(parse_bmp)
 capture_add_executable(parse_box)
