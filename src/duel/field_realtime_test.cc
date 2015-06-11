@@ -35,14 +35,14 @@ TEST_F(FieldRealtimeTest, stateWithoutOjama)
     f_->skipLevelSelect();
 
     // Waiting next.
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < FRAMES_PREPARING_NEXT; ++i) {
         FrameContext context;
         f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_PREPARING_NEXT, f_->simulationState());
     }
 
     // It needs 12 frames to reach the bottom.
-    for (int i = 0; i < 12; ++i) {
+    for (int i = 0; i < FRAMES_TO_DROP_FAST[12]; ++i) {
         FrameContext context;
         f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_PLAYABLE, f_->simulationState());
@@ -57,7 +57,7 @@ TEST_F(FieldRealtimeTest, stateWithoutOjama)
     }
 
     // Then, 10 frames ground animation.
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < FRAMES_GROUNDING; ++i) {
         FrameContext context;
         f_->playOneFrame(KeySet(Key::DOWN), &context);
         EXPECT_EQ(FieldRealtime::SimulationState::STATE_GROUNDING, f_->simulationState());
