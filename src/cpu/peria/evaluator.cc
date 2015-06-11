@@ -20,23 +20,55 @@ int ScoreDiffHeight(int higher, int lower) {
 }
 
 Evaluator::Evaluator(const PlayerState& m, const PlayerState& e, const PlayerHands& eh, Control* c)
-  : me(m), enemy(e), enemy_hands(eh), control(c) {}
+  : me(m), enemy(e), enemy_hands(eh), control(c) {
+  UNUSED_VARIABLE(me);
+  UNUSED_VARIABLE(enemy);
+  UNUSED_VARIABLE(enemy_hands);
+}
 
 void Evaluator::EvalPlan(const RefPlan& plan) {
-  int score = plan.score();
-  
-  // Evaluate field
-  // - pattern matching
-  // - possible future rensa
-  // - UKE : assume 1, 2 lines of ojama. 5 lines in case of ZENKESHI, and eval again.
-  // Evaluate rensa (if rensa_plan)
-  // - TSUBUSHI : how quickly rensa ends. 2 or more lines.
-  // - TAIOU : how small rensa is firable.
+  std::string message_field;
+  std::string message_rensa;
 
+  int score = EvalField(plan.field(), &message_field);
+  score += EvalRensa(plan, &message_rensa);
+
+  std::string message;
+  message += "Field : " + message_field;
+  if (!message_rensa.empty())
+    message += ",Rensa : " + message_rensa;
+  
   if (control->score < score) {
     control->decision = plan.decisions().front();
     control->score = score;
+    control->message = message;
   }
+}
+
+int Evaluator::EvalField(const CoreField& field, std::string* message) {
+  // Evaluate field
+  // o pattern matching
+  // o possible future rensa
+  // - UKE : assume 1, 2 lines of ojama. 5 lines in case of ZENKESHI, and eval again.
+
+  int score = 0;
+  score += PatternMatch(field, message);
+  score += Field(field);
+  score += Future(field);
+  return score;
+}
+
+int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
+  // Evaluate rensa
+  // - TSUBUSHI : how quickly rensa ends. 2 or more lines.
+  // - TAIOU : how small rensa is firable.
+
+  int score = 0;
+  score += plan.score();
+  std::ostringstream oss;
+  oss << "Rensa(" << score << ")";
+  *message = oss.str();
+  return score;
 }
 
 int Evaluator::PatternMatch(const CoreField& field, std::string* name) {
@@ -94,36 +126,6 @@ int Evaluator::Future(const CoreField& field) {
     value /= expects.size();
   }
   return value;
-}
-
-int Evaluator::Plan(const CoreField& field,
-                    const RensaChainTrackResult& track) {
-  using namespace std::placeholders;
-  RensaChainTrackResult track_result;
-  int max_score = 0;
-  RensaDetector::detectIteratively(
-      field, RensaDetectorStrategy::defaultFloatStrategy(), 2,
-      [&max_score, &track_result](CoreField&& cf, const ColumnPuyoList&) -> RensaResult {
-        RensaChainTracker tracker;
-        RensaResult result = cf.simulate(&tracker);
-        if (result.score > max_score) {
-          max_score = result.score;
-          track_result = tracker.result();
-        }
-        return result;
-      });
-
-  int count = 0;
-  for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-    for (int y = 1; y <= FieldConstant::HEIGHT; ++y) {
-      if (track_result.erasedAt(x, y) == 0)
-        continue;
-      if (track_result.erasedAt(x, y) == track.erasedAt(x, y) + 1)
-        ++count;
-    }
-  }
-
-  return count * 20;
 }
 
 }  // namespace peria

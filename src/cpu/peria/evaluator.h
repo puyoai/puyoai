@@ -19,10 +19,12 @@ class Evaluator {
   void EvalPlan(const RefPlan& plan);
   
  private:
+  int EvalField(const CoreField& field, std::string* message);
+  int EvalRensa(const RefPlan& plan, std::string* message);
+  
   int PatternMatch(const CoreField& field, std::string* message);
   int Field(const CoreField& field);
   int Future(const CoreField& field);
-  int Plan(const CoreField& field, const RensaChainTrackResult& track);
 
   const PlayerState& me;
   const PlayerState& enemy;
