@@ -15,7 +15,7 @@ void BoundingBoxDrawer::draw(Screen* screen)
     for (int pi = 0; pi < 2; ++pi) {
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
-                Box b = BoundingBox::instance().get(pi, x, y);
+                Box b = BoundingBox::boxForDraw(pi, x, y);
                 SDL_DrawLine(surface, b.sx, b.sy, b.dx, b.sy, color);
                 SDL_DrawLine(surface, b.sx, b.sy, b.sx, b.dy, color);
                 SDL_DrawLine(surface, b.dx, b.sy, b.dx, b.dy, color);
@@ -26,10 +26,10 @@ void BoundingBoxDrawer::draw(Screen* screen)
 
     for (int pi = 0; pi < 2; ++pi) {
         Box bs[4] = {
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_AXIS),
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_CHILD),
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT2_AXIS),
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT2_CHILD),
+            BoundingBox::boxForDraw(pi, NextPuyoPosition::NEXT1_AXIS),
+            BoundingBox::boxForDraw(pi, NextPuyoPosition::NEXT1_CHILD),
+            BoundingBox::boxForDraw(pi, NextPuyoPosition::NEXT2_AXIS),
+            BoundingBox::boxForDraw(pi, NextPuyoPosition::NEXT2_CHILD),
         };
 
         for (int i = 0; i < 4; ++i) {
@@ -42,14 +42,14 @@ void BoundingBoxDrawer::draw(Screen* screen)
     }
 
     {
-        Box b = BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_1P);
+        Box b = BoundingBox::boxForDraw(BoundingBox::Region::LEVEL_SELECT_1P);
         SDL_DrawLine(surface, b.sx, b.sy, b.dx, b.sy, color);
         SDL_DrawLine(surface, b.sx, b.sy, b.sx, b.dy, color);
         SDL_DrawLine(surface, b.dx, b.sy, b.dx, b.dy, color);
         SDL_DrawLine(surface, b.sx, b.dy, b.dx, b.dy, color);
     }
     {
-        Box b = BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_2P);
+        Box b = BoundingBox::boxForDraw(BoundingBox::Region::LEVEL_SELECT_2P);
         SDL_DrawLine(surface, b.sx, b.sy, b.dx, b.sy, color);
         SDL_DrawLine(surface, b.sx, b.sy, b.sx, b.dy, color);
         SDL_DrawLine(surface, b.dx, b.sy, b.dx, b.dy, color);

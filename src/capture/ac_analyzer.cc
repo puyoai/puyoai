@@ -11,21 +11,11 @@
 
 using namespace std;
 
-DEFINE_double(bb_x, 69, "bouding box x");
-DEFINE_double(bb_y, 80, "bouding box y");
-DEFINE_double(bb_w, 32, "bouding box w");
-DEFINE_double(bb_h, 32, "bouding box h");
-
-// TODO(mayah): initializing here seems wrong.
-//BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT_1P, Box(260, 256, 270, 280));
-//BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT_2P, Box(442, 256, 452, 280));
-//BoundingBox::instance().setRegion(BoundingBox::Region::GAME_FINISHED, Box(292, 352, 420, 367));
-
 namespace {
-const int BOX_THRESHOLD = 70;
-const int BOX_THRESHOLD_HALF = 50;
-const int SMALLER_BOX_THRESHOLD = 20;
-const int SMALLER_BOX_THRESHOLD_HALF = 15;
+const int BOX_THRESHOLD = 40;
+const int BOX_THRESHOLD_HALF = 25;
+const int SMALLER_BOX_THRESHOLD = 15;
+const int SMALLER_BOX_THRESHOLD_HALF = 10;
 }
 
 static RealColor toRealColor(const HSV& hsv)
@@ -209,7 +199,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
     // detect field
     for (int y = 1; y <= 12; ++y) {
         for (int x = 1; x <= 6; ++x) {
-            Box b = BoundingBox::instance().get(pi, x, y);
+            Box b = BoundingBox::boxForAnalysis(pi, x, y);
             BoxAnalyzeResult r = analyzeBox(surface, b);
 
             result->field.set(x, y, r.realColor);
@@ -227,7 +217,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
         };
 
         for (int i = 0; i < 4; ++i) {
-            Box b = BoundingBox::instance().get(pi, np[i]);
+            Box b = BoundingBox::boxForAnalysis(pi, np[i]);
             BoxAnalyzeResult r = analyzeBox(surface, b, ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
             result->setRealColor(np[i], r.realColor);
         }
@@ -235,7 +225,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
 
     // detect next1 move
     {
-        Box b = BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_AXIS);
+        Box b = BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT1_AXIS);
         b = Box(b.sx, b.sy + b.h() / 2, b.dx, b.dy);
         BoxAnalyzeResult r = analyzeBox(surface, b, ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
         result->next1AxisMoving = (r.realColor == RealColor::RC_EMPTY);
@@ -243,8 +233,8 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
 
     // detect ojama
     {
-        Box left = BoundingBox::instance().get(pi, 1, 0);
-        Box right = BoundingBox::instance().get(pi, 6, 0);
+        Box left = BoundingBox::boxForAnalysis(pi, 1, 0);
+        Box right = BoundingBox::boxForAnalysis(pi, 6, 0);
         Box b = Box(left.sx, left.sy, right.dx, right.dy);
         result->setOjamaDropDetected(detectOjamaDrop(surface, prevSurface, b));
     }
@@ -295,8 +285,8 @@ bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
 bool ACAnalyzer::isLevelSelect(const SDL_Surface* surface)
 {
     Box boxes[] {
-        BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_1P),
-        BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_2P),
+        BoundingBox::boxForAnalysis(BoundingBox::Region::LEVEL_SELECT_1P),
+        BoundingBox::boxForAnalysis(BoundingBox::Region::LEVEL_SELECT_2P),
     };
 
     for (const Box& b : boxes) {
@@ -325,7 +315,7 @@ bool ACAnalyzer::isLevelSelect(const SDL_Surface* surface)
 
 bool ACAnalyzer::isGameFinished(const SDL_Surface* surface)
 {
-    Box b = BoundingBox::instance().getBy(BoundingBox::Region::GAME_FINISHED);
+    Box b = BoundingBox::boxForAnalysis(BoundingBox::Region::GAME_FINISHED);
 
     int whiteCount = 0;
     for (int bx = b.sx; bx <= b.dx; ++bx) {
@@ -350,16 +340,16 @@ bool ACAnalyzer::isDead(int playerId, const SDL_Surface* surface)
 {
     // Since (3, 0)-(6, 0) of player2 field might contain 'FREE PLAY' string.
     // So, we check only (1, 0) and (2, 0).
-    BoxAnalyzeResult r1 = analyzeBox(surface, BoundingBox::instance().get(playerId, 1, 0));
-    BoxAnalyzeResult r2 = analyzeBox(surface, BoundingBox::instance().get(playerId, 2, 0));
+    BoxAnalyzeResult r1 = analyzeBox(surface, BoundingBox::boxForAnalysis(playerId, 1, 0));
+    BoxAnalyzeResult r2 = analyzeBox(surface, BoundingBox::boxForAnalysis(playerId, 2, 0));
 
     return r1.realColor != RealColor::RC_YELLOW && r2.realColor != RealColor::RC_YELLOW;
 }
 
 bool ACAnalyzer::isMatchEnd(const SDL_Surface* surface)
 {
-    Box b1 = BoundingBox::instance().get(0, 7, 2);
-    Box b2 = BoundingBox::instance().get(0, 12, 0);
+    Box b1 = BoundingBox::boxForAnalysis(0, 7, 2);
+    Box b2 = BoundingBox::boxForAnalysis(0, 12, 0);
 
     int red = 0;
     int blue = 0;
@@ -391,7 +381,7 @@ void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
     for (int pi = 0; pi < 2; ++pi) {
         for (int y = 1; y <= 12; ++y) {
             for (int x = 1; x <= 6; ++x) {
-                Box box = BoundingBox::instance().get(pi, x, y);
+                Box box = BoundingBox::boxForAnalysis(pi, x, y);
                 drawBoxWithAnalysisResult(surface, box);
             }
         }
@@ -399,10 +389,10 @@ void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
 
     for (int pi = 0; pi < 2; ++pi) {
         Box bs[4] = {
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_AXIS),
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_CHILD),
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT2_AXIS),
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT2_CHILD)
+            BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT1_AXIS),
+            BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT1_CHILD),
+            BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT2_AXIS),
+            BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT2_CHILD)
         };
 
         for (int i = 0; i < 4; ++i) {
@@ -410,9 +400,9 @@ void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
         }
     }
 
-    drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_1P));
-    drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_2P));
-    drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::GAME_FINISHED));
+    drawBoxWithAnalysisResult(surface, BoundingBox::boxForAnalysis(BoundingBox::Region::LEVEL_SELECT_1P));
+    drawBoxWithAnalysisResult(surface, BoundingBox::boxForAnalysis(BoundingBox::Region::LEVEL_SELECT_2P));
+    drawBoxWithAnalysisResult(surface, BoundingBox::boxForAnalysis(BoundingBox::Region::GAME_FINISHED));
 }
 
 void ACAnalyzer::drawBoxWithAnalysisResult(SDL_Surface* surface, const Box& box)
