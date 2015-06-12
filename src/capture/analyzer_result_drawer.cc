@@ -35,7 +35,7 @@ void AnalyzerResultDrawer::draw(Screen* screen)
 
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
-                Box b = BoundingBox::instance().get(pi, x, y);
+                Box b = BoundingBox::boxForDraw(pi, x, y);
                 b.moveOffset(rect.x, rect.y);
                 RealColor rc = par->adjustedField.realColor(x, y);
                 Uint32 color = toPixelColor(surface, rc);
@@ -60,7 +60,7 @@ void AnalyzerResultDrawer::draw(Screen* screen)
             continue;
 
         for (int i = 0; i < 4; ++i) {
-            Box b = BoundingBox::instance().get(pi, npp[i]);
+            Box b = BoundingBox::boxForDraw(pi, npp[i]);
             b.moveOffset(rect.x, rect.y);
             RealColor rc = par->adjustedField.realColor(npp[i]);
             Uint32 color = toPixelColor(surface, rc);

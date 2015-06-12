@@ -87,9 +87,9 @@ int main(int argc, char* argv[])
     // this should be called after |analyzer| is created.
     Box b;
     if (usesNextPuyoPosition) {
-        b = BoundingBox::instance().get(playerId - 1, npp);
+        b = BoundingBox::boxForAnalysis(playerId - 1, npp);
     } else {
-        b = BoundingBox::instance().get(playerId - 1, x, y);
+        b = BoundingBox::boxForAnalysis(playerId - 1, x, y);
     }
     if (half) {
         b.sy += b.h() / 2;

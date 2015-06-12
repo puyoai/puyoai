@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
         for (int pi = 0; pi < 2; ++pi) {
             for (int y = 12; y >= 1; --y) {
                 for (int x = 1; x <= 6; ++x) {
-                    Box b = BoundingBox::instance().get(pi, x, y);
+                    Box b = BoundingBox::boxForAnalysis(pi, x, y);
                     BoxAnalyzeResult result = analyzer.analyzeBox(surf.get(), b);
 
                     const SDL_Rect rect = b.toSDLRect();
