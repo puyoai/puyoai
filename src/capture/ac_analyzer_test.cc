@@ -108,6 +108,7 @@ TEST_F(ACAnalyzerTest, estimateRealColor)
     }
 }
 
+#if 0
 TEST_F(ACAnalyzerTest, analyzeNormalField1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal1.png");
@@ -690,6 +691,7 @@ TEST_F(ACAnalyzerTest, gameStart)
             << "Player 1: Frame" << i << ": NEXT1_CHILD";
     }
 }
+#endif
 
 int main(int argc, char* argv[])
 {
