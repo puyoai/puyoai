@@ -7,9 +7,14 @@
 class RealColorField : public FieldConstant {
 public:
     RealColorField();
+    explicit RealColorField(const std::string&);
 
+    // TODO(mayah): Remove these methods.
     RealColor get(int x, int y) const { return field_[x][y]; }
     void set(int x, int y, RealColor rc) { field_[x][y] = rc; }
+
+    RealColor color(int x, int y) const { return field_[x][y]; }
+    void setColor(int x, int y, RealColor rc) { field_[x][y] = rc; }
 
 private:
     RealColor field_[MAP_WIDTH][MAP_HEIGHT];

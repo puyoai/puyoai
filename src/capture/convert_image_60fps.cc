@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     ACAnalyzer analyzer;
 
     const int IMAGE_OFFSET_Y = 80 - 32 - 32;
-    const int IMAGE_OFFSET_X = 70 - 32;
+    const int IMAGE_OFFSET_X = 71 - 32;
     const int IMAGE_WIDTH = 32 * 20;
     // const int IMAGE_HEIGHT = 32 * 14;
 
