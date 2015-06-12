@@ -107,9 +107,6 @@ if(USE_INTERNAL AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     puyoai_add_cxx_flags("-DUSE_AUDIO_COMMENTATOR=1")
 endif()
 
-# Enable this if you'd like to use 60fps mode. (Note: broken yet.)
-puyoai_add_cxx_flags("-DUSE_FPS_60=1")
-
 # ----------------------------------------------------------------------
 # Add subdirectories
 
