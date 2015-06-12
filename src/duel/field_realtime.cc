@@ -67,16 +67,12 @@ void FieldRealtime::init()
 
 void FieldRealtime::setKeySetSeq(const KeySetSeq& kss)
 {
-#ifdef USE_FPS_60
     KeySetSeq expanded;
     for (const auto& ks : kss) {
         expanded.add(ks);
         expanded.add(ks);
     }
     keySetSeq_ = expanded;
-#else
-    keySetSeq_ = kss;
-#endif
 }
 
 bool FieldRealtime::onStateLevelSelect()

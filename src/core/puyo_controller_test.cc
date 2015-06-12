@@ -18,9 +18,7 @@ void moveKumipuyo(KumipuyoMovingState* kms, const KeySetSeq& kss, const PlainFie
     bool downAccepted;
     for (const auto& ks : kss) {
         kms->moveKumipuyo(pf, ks, &downAccepted);
-#ifdef USE_FPS_60
         kms->moveKumipuyo(pf, ks, &downAccepted);
-#endif
     }
 }
 
