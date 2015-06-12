@@ -108,53 +108,67 @@ TEST_F(ACAnalyzerTest, estimateRealColor)
     }
 }
 
-TEST_F(ACAnalyzerTest, analyzeNormalField1)
+TEST_F(ACAnalyzerTest, analyzeField1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/images/field-recognition/field1.png");
 
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(1, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(3, 1));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(4, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(5, 1));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 1));
+    RealColorField field(
+        ".P...."
+        "GG...."
+        "GY...."
+        "YBY..."
+        "YPP..."
+        "BBBPB.");
 
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(1, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(2, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(3, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(5, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 2));
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y));
+        }
+    }
+}
 
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(1, 3));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(2, 3));
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(3, 3));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 3));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(5, 3));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 3));
+TEST_F(ACAnalyzerTest, analyzeField2)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/images/field-recognition/field2.png");
 
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(1, 4));
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(2, 4));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(3, 4));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 4));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(5, 4));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 4));
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(1, 5));
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(2, 5));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(3, 5));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 5));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(5, 5));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 5));
+    RealColorField field1(
+        "...G.."  // 12
+        "...R.."
+        "...R.."
+        "...G.."
+        "...G.."  // 8
+        "..GP.."
+        "..YY.."
+        "..YY.."
+        "..GP.."  // 4
+        "..GP.."
+        "..GP.."
+        "ORRR..");
 
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(1, 6));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(2, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(3, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(5, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 6));
+    RealColorField field2(
+        "...P.."  // 12
+        "O..Y.."
+        "O..Y.."
+        "OO.P.."
+        "RO.P.."  // 8
+        "RP.G.G"
+        "YRRG.R"
+        "PYOPGG"
+        "YPRYRO"  // 4
+        "PYYRRO"
+        "PRPOOR"
+        "PRGGYY");
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            EXPECT_EQ(field1.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y));
+            EXPECT_EQ(field2.color(x, y), r->playerResult(1)->adjustedField.realColor(x, y));
+        }
+    }
 }
 
 #if 0
