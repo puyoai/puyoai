@@ -22,8 +22,8 @@ class Ai : public ::AI {
                              const PlayerState& enemy,
                              bool fast) const override;
 
-  static int PatternMatch(const RefPlan& plan, std::string* name);
-
+  virtual void onGroundedForEnemy(const FrameRequest& frame_request) override;
+  
   PlayerHands enemy_hands_;
 };
 
