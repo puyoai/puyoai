@@ -46,7 +46,7 @@ DropDecision Ai::think(int frame_id,
 
 void Ai::onGroundedForEnemy(const FrameRequest& frame_request) {
   const PlayerFrameRequest& enemy = frame_request.enemyPlayerFrameRequest();
-  CoreField cf(enemy.field);
+  CoreField cf(CoreField::fromPlainFieldWithDrop(enemy.field));
 
   std::vector<PossibleRensa>& hands = enemy_hands_.firables;
   hands.clear();
