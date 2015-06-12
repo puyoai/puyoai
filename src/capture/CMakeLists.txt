@@ -65,6 +65,7 @@ function(capture_add_executable exe)
     endif()
 endfunction()
 
+capture_add_executable(convert_image_60fps)
 capture_add_executable(split_image)
 capture_add_executable(split_movie)
 
