@@ -17,7 +17,6 @@ public:
 
     static BoundingBox& instance();
 
-    void setGenerator(double offsetX, double offsetY, double bbWidth, double bbHeight);
     Box get(int pi, int x, int y) const;
     Box get(int pi, NextPuyoPosition n) const;
 

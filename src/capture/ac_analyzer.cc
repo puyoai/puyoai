@@ -16,6 +16,11 @@ DEFINE_double(bb_y, 80, "bouding box y");
 DEFINE_double(bb_w, 32, "bouding box w");
 DEFINE_double(bb_h, 32, "bouding box h");
 
+// TODO(mayah): initializing here seems wrong.
+//BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT_1P, Box(260, 256, 270, 280));
+//BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT_2P, Box(442, 256, 452, 280));
+//BoundingBox::instance().setRegion(BoundingBox::Region::GAME_FINISHED, Box(292, 352, 420, 367));
+
 namespace {
 const int BOX_THRESHOLD = 70;
 const int BOX_THRESHOLD_HALF = 50;
@@ -99,11 +104,6 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
 
 ACAnalyzer::ACAnalyzer()
 {
-    // TODO(mayah): initializing here seems wrong.
-    BoundingBox::instance().setGenerator(FLAGS_bb_x, FLAGS_bb_y, FLAGS_bb_w, FLAGS_bb_h);
-    BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT_1P, Box(260, 256, 270, 280));
-    BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT_2P, Box(442, 256, 452, 280));
-    BoundingBox::instance().setRegion(BoundingBox::Region::GAME_FINISHED, Box(292, 352, 420, 367));
 }
 
 ACAnalyzer::~ACAnalyzer()

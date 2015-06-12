@@ -26,7 +26,7 @@ static const string kEnglishBdfName = "/12x24.bdf";
 static const int kBdfSize = 24;
 
 static const int PUYO_W = 32;
-static const int PUYO_H = 35;
+static const int PUYO_H = 32;
 
 FieldDrawer::FieldDrawer() :
     backgroundSurface_(makeUniqueSDLSurface(IMG_Load((FLAGS_data_dir + "/assets/background.png").c_str()))),
@@ -45,7 +45,6 @@ FieldDrawer::~FieldDrawer()
 
 void FieldDrawer::onInit()
 {
-    BoundingBox::instance().setGenerator(PUYO_W, 2 * PUYO_H, PUYO_W, PUYO_H);
 }
 
 void FieldDrawer::onUpdate(const GameState& gameState)
