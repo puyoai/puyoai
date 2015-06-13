@@ -47,13 +47,9 @@ struct DetectedField {
     RealColor realColor(int x, int y) const { return field.get(x, y); }
     RealColor realColor(NextPuyoPosition npp) const { return nextPuyos[static_cast<int>(npp)]; }
 
-    bool isVanishing(int x, int y) const { return vanishing.get(x, y); }
-    void setVanishing(int x, int y, bool flag) { vanishing.setBit(x, y, flag); }
-
     void setOjamaDropDetected(bool flag) { ojamaDropDetected = flag; }
 
     RealColorField field;
-    FieldChecker vanishing;
     RealColor nextPuyos[NUM_NEXT_PUYO_POSITION];
     bool ojamaDropDetected = false;
     bool next1AxisMoving = false;
@@ -165,6 +161,7 @@ public:
     // Analyzes the specified frame. previousResults.front() should be the most recent results.
     std::unique_ptr<AnalyzerResult> analyze(const SDL_Surface* current,
                                             const SDL_Surface* prev,
+                                            const SDL_Surface* prev2,
                                             const std::deque<std::unique_ptr<AnalyzerResult>>& previousResults);
 
 protected:
@@ -172,8 +169,7 @@ protected:
     virtual CaptureGameState detectGameState(const SDL_Surface*) = 0;
     virtual std::unique_ptr<DetectedField> detectField(int pi,
                                                        const SDL_Surface* current,
-                                                       const SDL_Surface* prev,
-                                                       const DetectedField* prevField) = 0;
+                                                       const SDL_Surface* prev2) = 0;
 
 private:
     std::unique_ptr<PlayerAnalyzerResult>

@@ -89,6 +89,7 @@ void WiiConnectServer::runLoop()
     int noSurfaceCount = 0;
     int frameId = 0;
     UniqueSDLSurface prevSurface(emptyUniqueSDLSurface());
+    UniqueSDLSurface prev2Surface(emptyUniqueSDLSurface());
 
     while (!shouldStop_) {
         UniqueSDLSurface surface(source_->getNextFrame());
@@ -104,7 +105,7 @@ void WiiConnectServer::runLoop()
             continue;
         }
 
-        unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), prevSurface.get(),  analyzerResults_);
+        unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), prevSurface.get(), prev2Surface.get(), analyzerResults_);
         LOG(INFO) << r->toString();
 
         switch (r->state()) {
@@ -178,6 +179,7 @@ void WiiConnectServer::runLoop()
 
         {
             lock_guard<mutex> lock(mu_);
+            prev2Surface = move(prevSurface);
             prevSurface = move(surface_);
             surface_ = move(surface);
             analyzerResults_.push_front(move(r));
