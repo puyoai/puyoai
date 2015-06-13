@@ -67,6 +67,8 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
 
     for (int i = 0; i < 5; ++i) {
         int cnt = colorCount[static_cast<int>(colors[i])];
+        if (colors[i] == RealColor::RC_YELLOW)
+            cnt = cnt * 4 / 5;
         if (cnt > threshold && cnt > maxCount) {
             result = colors[i];
             maxCount = cnt;
