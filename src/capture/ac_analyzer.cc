@@ -14,8 +14,8 @@ using namespace std;
 namespace {
 const int BOX_THRESHOLD = 20;
 const int BOX_THRESHOLD_HALF = 15;
-const int SMALLER_BOX_THRESHOLD = 15;
-const int SMALLER_BOX_THRESHOLD_HALF = 10;
+const int SMALLER_BOX_THRESHOLD = 10;
+const int SMALLER_BOX_THRESHOLD_HALF = 7;
 }
 
 static RealColor toRealColor(const HSV& hsv)
