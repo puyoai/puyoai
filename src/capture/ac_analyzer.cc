@@ -13,9 +13,7 @@ using namespace std;
 
 namespace {
 const int BOX_THRESHOLD = 20;
-const int BOX_THRESHOLD_HALF = 15;
 const int SMALLER_BOX_THRESHOLD = 7;
-const int SMALLER_BOX_THRESHOLD_HALF = 6;
 }
 
 static RealColor toRealColor(const HSV& hsv)
@@ -103,10 +101,10 @@ ACAnalyzer::~ACAnalyzer()
 {
 }
 
-BoxAnalyzeResult ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
-                                        ACAnalyzer::AllowOjama allowOjama, bool showsColor) const
+RealColor ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
+                                 ACAnalyzer::AllowOjama allowOjama, bool showsColor) const
 {
-    int colorCount[3][NUM_REAL_COLORS] = { { 0 } };
+    int colorCount[NUM_REAL_COLORS] {};
 
     // We'd like to take padding 1 pixel.
     for (int by = b.sy; by < b.dy; ++by) {
@@ -129,8 +127,7 @@ BoxAnalyzeResult ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b
                 cout << buf << endl;
             }
 
-            colorCount[0][static_cast<int>(rc)]++;
-            colorCount[(by % 2) + 1][static_cast<int>(rc)]++;
+            colorCount[static_cast<int>(rc)]++;
         }
     }
 
@@ -138,7 +135,7 @@ BoxAnalyzeResult ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b
         cout << "Color count:" << endl;
         for (int i = 0; i < NUM_REAL_COLORS; ++i) {
             RealColor rc = intToRealColor(i);
-            cout << toString(rc) << " : " << colorCount[0][i] << endl;
+            cout << toString(rc) << " : " << colorCount[i] << endl;
         }
     }
 
@@ -147,18 +144,9 @@ BoxAnalyzeResult ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b
     // WNEXT2 will have smaller area.
     int area = b.w() * b.h();
     int threshold = (area >= 16 * 14) ? BOX_THRESHOLD : SMALLER_BOX_THRESHOLD;
-    int halfThreshold = (area >= 16 * 14) ? BOX_THRESHOLD_HALF : SMALLER_BOX_THRESHOLD_HALF;
 
-    RealColor rc[3] = {
-        estimateRealColorFromColorCount(colorCount[0], threshold, allowOjama),
-        estimateRealColorFromColorCount(colorCount[1], halfThreshold, allowOjama),
-        estimateRealColorFromColorCount(colorCount[2], halfThreshold, allowOjama),
-    };
+    return estimateRealColorFromColorCount(colorCount, threshold, allowOjama);
 
-    bool vanishing = rc[1] != rc[2] && (rc[1] == RealColor::RC_EMPTY || rc[2] == RealColor::RC_EMPTY);
-    RealColor prc = vanishing ? (rc[1] != RealColor::RC_EMPTY ? rc[1] : rc[2]) : rc[0];
-
-    return BoxAnalyzeResult(prc, vanishing);
 }
 
 CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
@@ -195,7 +183,8 @@ CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
 
 unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
                                                   const SDL_Surface* surface,
-                                                  const SDL_Surface* prevSurface)
+                                                  const SDL_Surface* prevSurface,
+                                                  const DetectedField* prevDetectedField)
 {
     unique_ptr<DetectedField> result(new DetectedField);
 
@@ -203,10 +192,27 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
     for (int y = 1; y <= 12; ++y) {
         for (int x = 1; x <= 6; ++x) {
             Box b = BoundingBox::boxForAnalysis(pi, x, y).shrink(1);
-            BoxAnalyzeResult r = analyzeBox(surface, b);
+            RealColor rc = analyzeBox(surface, b);
 
-            result->field.set(x, y, r.realColor);
-            result->vanishing.setBit(x, y, r.vanishing);
+            if (prevDetectedField) {
+                RealColor prev = prevDetectedField->realColor(x, y);
+                if (rc == prev) {
+                    result->field.set(x, y, rc);
+                    result->vanishing.setBit(x, y, false);
+                } else if (rc == RealColor::RC_EMPTY) {
+                    result->field.set(x, y, prev);
+                    result->vanishing.setBit(x, y, true);
+                } else if (prev == RealColor::RC_EMPTY) {
+                    result->field.set(x, y, rc);
+                    result->vanishing.setBit(x, y, true);
+                } else {
+                    result->field.set(x, y, rc);
+                    result->vanishing.setBit(x, y, false);
+                }
+            } else {
+                result->field.set(x, y, rc);
+                result->vanishing.setBit(x, y, false);
+            }
         }
     }
 
@@ -224,8 +230,8 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
             if (i == 0 || i == 1) { // only 1p.
                  b.dx -= 1;
             }
-            BoxAnalyzeResult r = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
-            result->setRealColor(np[i], r.realColor);
+            RealColor rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
+            result->setRealColor(np[i], rc);
         }
     }
 
@@ -233,8 +239,8 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
     {
         Box b = BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT1_AXIS);
         b = Box(b.sx, b.sy + b.h() / 2, b.dx, b.dy);
-        BoxAnalyzeResult r = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
-        result->next1AxisMoving = (r.realColor == RealColor::RC_EMPTY);
+        RealColor rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
+        result->next1AxisMoving = (rc == RealColor::RC_EMPTY);
     }
 
     // detect ojama
@@ -346,10 +352,10 @@ bool ACAnalyzer::isDead(int playerId, const SDL_Surface* surface)
 {
     // Since (3, 0)-(6, 0) of player2 field might contain 'FREE PLAY' string.
     // So, we check only (1, 0) and (2, 0).
-    BoxAnalyzeResult r1 = analyzeBox(surface, BoundingBox::boxForAnalysis(playerId, 1, 0));
-    BoxAnalyzeResult r2 = analyzeBox(surface, BoundingBox::boxForAnalysis(playerId, 2, 0));
+    RealColor rc1 = analyzeBox(surface, BoundingBox::boxForAnalysis(playerId, 1, 0));
+    RealColor rc2 = analyzeBox(surface, BoundingBox::boxForAnalysis(playerId, 2, 0));
 
-    return r1.realColor != RealColor::RC_YELLOW && r2.realColor != RealColor::RC_YELLOW;
+    return rc1 != RealColor::RC_YELLOW && rc2 != RealColor::RC_YELLOW;
 }
 
 bool ACAnalyzer::isMatchEnd(const SDL_Surface* surface)
