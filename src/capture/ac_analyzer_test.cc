@@ -321,31 +321,26 @@ TEST_F(ACAnalyzerTest, levelSelect)
     }
 }
 
+TEST_F(ACAnalyzerTest, gameFinished)
+{
+    struct TestCase {
+        const char* filename;
+        CaptureGameState expectedState;
+    };
+    const TestCase testcases[] = {
+        { "/images/game-finished/game-finished1.png", CaptureGameState::GAME_FINISHED_WITH_1P_WIN },
+        { "/images/game-finished/game-finished2.png", CaptureGameState::MATCH_FINISHED_WITH_1P_WIN },
+        { "/images/game-finished/game-finished3.png", CaptureGameState::GAME_FINISHED_WITH_2P_WIN },
+        { "/images/game-finished/game-finished4.png", CaptureGameState::MATCH_FINISHED_WITH_1P_WIN }
+    };
+
+    for (const auto& testcase : testcases) {
+        unique_ptr<AnalyzerResult> r = analyze(testcase.filename);
+        EXPECT_EQ(testcase.expectedState, r->state());
+    }
+}
+
 #if 0
-
-TEST_F(ACAnalyzerTest, GameFinished1)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/game-finished1.png");
-    EXPECT_EQ(CaptureGameState::GAME_FINISHED_WITH_1P_WIN, r->state());
-}
-
-TEST_F(ACAnalyzerTest, GameFinished2)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/game-finished2.png");
-    EXPECT_EQ(CaptureGameState::MATCH_FINISHED_WITH_1P_WIN, r->state());
-}
-
-TEST_F(ACAnalyzerTest, GameFinished3)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/game-finished3.png");
-    EXPECT_EQ(CaptureGameState::GAME_FINISHED_WITH_2P_WIN, r->state());
-}
-
-TEST_F(ACAnalyzerTest, GameFinished4)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/game-finished4.png");
-    EXPECT_EQ(CaptureGameState::MATCH_FINISHED_WITH_1P_WIN, r->state());
-}
 
 TEST_F(ACAnalyzerTest, nextArrival)
 {
