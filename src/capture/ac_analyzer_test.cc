@@ -265,8 +265,8 @@ TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
             for (int y = 0; (y + 1) * HEIGHT <= surf->h; ++y) {
                 Box b(x * WIDTH, y * HEIGHT, (x + 1) * WIDTH, (y + 1) * HEIGHT);
 
-                BoxAnalyzeResult result = analyzer.analyzeBox(surf.get(), b);
-                EXPECT_EQ(color, result.realColor) << "filename=" << filename << " x=" << x << " y=" << y;
+                RealColor rc = analyzer.analyzeBox(surf.get(), b);
+                EXPECT_EQ(color, rc) << "filename=" << filename << " x=" << x << " y=" << y;
             }
         }
     }

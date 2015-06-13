@@ -9,24 +9,13 @@ struct Box;
 struct HSV;
 struct RGB;
 
-struct BoxAnalyzeResult {
-    BoxAnalyzeResult(RealColor rc, bool vanishing)
-    {
-        this->realColor = rc;
-        this->vanishing = vanishing;
-    }
-
-    RealColor realColor;
-    bool vanishing;
-};
-
 class ACAnalyzer : public Analyzer {
 public:
     ACAnalyzer();
     virtual ~ACAnalyzer();
 
     enum class AllowOjama { DONT_ALLOW_OJAMA, ALLOW_OJAMA };
-    BoxAnalyzeResult analyzeBox(const SDL_Surface* surface, const Box& b, AllowOjama = AllowOjama::ALLOW_OJAMA, bool showsColor = false) const;
+    RealColor analyzeBox(const SDL_Surface* surface, const Box& b, AllowOjama = AllowOjama::ALLOW_OJAMA, bool showsColor = false) const;
 
     // Draw each pixel of |surface| with RealColor. This is helpful for image analyzing test.
     void drawWithAnalysisResult(SDL_Surface*);
@@ -34,8 +23,11 @@ public:
     static RealColor estimateRealColor(const HSV&);
 
 private:
-    virtual CaptureGameState detectGameState(const SDL_Surface*) override;
-    virtual std::unique_ptr<DetectedField> detectField(int pi, const SDL_Surface* current, const SDL_Surface* prev) override;
+    CaptureGameState detectGameState(const SDL_Surface*) override;
+    std::unique_ptr<DetectedField> detectField(int pi,
+                                               const SDL_Surface* current,
+                                               const SDL_Surface* prev,
+                                               const DetectedField* prevDetectedField) override;
     bool detectOjamaDrop(const SDL_Surface* current, const SDL_Surface* prev, const Box&);
 
     bool isLevelSelect(const SDL_Surface*);

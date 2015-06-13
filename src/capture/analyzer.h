@@ -170,7 +170,10 @@ public:
 protected:
     // These methods should be implemented in the derived class.
     virtual CaptureGameState detectGameState(const SDL_Surface*) = 0;
-    virtual std::unique_ptr<DetectedField> detectField(int pi, const SDL_Surface* current, const SDL_Surface* prev) = 0;
+    virtual std::unique_ptr<DetectedField> detectField(int pi,
+                                                       const SDL_Surface* current,
+                                                       const SDL_Surface* prev,
+                                                       const DetectedField* prevField) = 0;
 
 private:
     std::unique_ptr<PlayerAnalyzerResult>

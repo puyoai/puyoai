@@ -48,14 +48,14 @@ int main(int argc, char* argv[])
     for (int y = 12; y >= 1; --y) {
         for (int x = 1; x <= 6; ++x) {
             Box b = BoundingBox::boxForAnalysis(0, x, y);
-            BoxAnalyzeResult result = analyzer.analyzeBox(surf.get(), b);
+            RealColor rc = analyzer.analyzeBox(surf.get(), b);
 
             const SDL_Rect rect = b.toSDLRect();
             UniqueSDLSurface dest(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0, 0, 0, 0)));
             SDL_BlitSurface(surf.get(), &rect, dest.get(), nullptr);
 
             ostringstream filename;
-            switch (result.realColor) {
+            switch (rc) {
             case RealColor::RC_EMPTY:  filename << 'E'; break;
             case RealColor::RC_WALL:   filename << 'W'; break;
             case RealColor::RC_OJAMA:  filename << 'O'; break;
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
             filename << "-" << x << "-" << y << ".bmp";
             SDL_SaveBMP(dest.get(), filename.str().c_str());
 
-            cout << toChar(result.realColor);
+            cout << toChar(rc);
         }
         cout << endl;
     }

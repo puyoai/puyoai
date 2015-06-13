@@ -95,9 +95,8 @@ int main(int argc, char* argv[])
         b.sy += b.h() / 2;
     }
 
-    BoxAnalyzeResult r = analyzer.analyzeBox(surf.get(), b, allowOjama, true);
-    cout << "Color: " << toString(r.realColor) << endl;
-    cout << "Vanishing: " << r.vanishing << endl;
+    RealColor rc = analyzer.analyzeBox(surf.get(), b, allowOjama, true);
+    cout << "Color: " << rc << endl;
 
     analyzer.drawWithAnalysisResult(surf.get());
     SDL_SaveBMP(surf.get(), "output.bmp");
