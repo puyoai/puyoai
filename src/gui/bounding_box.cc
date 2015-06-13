@@ -73,9 +73,9 @@ Box BoundingBox::boxForDraw(int pi, NextPuyoPosition np)
 Box BoundingBox::boxForDraw(Region region)
 {
     switch (region) {
-    case Region::LEVEL_SELECT_1P: return Box(223, 256, 233, 280);
-    case Region::LEVEL_SELECT_2P: return Box(405, 256, 415, 280);
-    case Region::GAME_FINISHED:   return Box(255, 352, 383, 367);
+    case Region::LEVEL_SELECT_1P: return Box(224, 240, 240, 272);
+    case Region::LEVEL_SELECT_2P: return Box(400, 240, 416, 272);
+    case Region::GAME_FINISHED:   return Box(255, 336, 383, 350);
     default: return Box(0, 0, 0, 0);
     }
 }
