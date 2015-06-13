@@ -114,7 +114,7 @@ TEST_F(ACAnalyzerTest, analyzeField1)
 
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
-    RealColorField field(
+    const RealColorField field(
         ".P...."
         "GG...."
         "GY...."
@@ -135,7 +135,7 @@ TEST_F(ACAnalyzerTest, analyzeField2)
 
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
-    RealColorField field1(
+    const RealColorField field1(
         "...G.."  // 12
         "...R.."
         "...R.."
@@ -149,7 +149,7 @@ TEST_F(ACAnalyzerTest, analyzeField2)
         "..GP.."
         "ORRR..");
 
-    RealColorField field2(
+    const RealColorField field2(
         "...P.."  // 12
         "O..Y.."
         "O..Y.."
@@ -167,6 +167,33 @@ TEST_F(ACAnalyzerTest, analyzeField2)
         for (int y = 1; y <= 12; ++y) {
             EXPECT_EQ(field1.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y));
             EXPECT_EQ(field2.color(x, y), r->playerResult(1)->adjustedField.realColor(x, y));
+        }
+    }
+}
+
+TEST_F(ACAnalyzerTest, analyzeField3)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/images/field/field3.png");
+
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    const RealColorField field(
+        "PO...."  // 12
+        "BRPRBB"
+        "PPGRGB"
+        "BRBPRG"
+        "RPBPBG"  // 8
+        "BGROBG"
+        "PGBOGB"
+        "GPOGGR"
+        "GRBBPP"  // 4
+        "BRPPOO"
+        "GRBRRP"
+        "PBGPPB");
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y));
         }
     }
 }
