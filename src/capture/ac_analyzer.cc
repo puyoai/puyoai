@@ -284,7 +284,7 @@ bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
 
 bool ACAnalyzer::isLevelSelect(const SDL_Surface* surface)
 {
-    Box boxes[] {
+    const Box boxes[] {
         BoundingBox::boxForAnalysis(BoundingBox::Region::LEVEL_SELECT_1P),
         BoundingBox::boxForAnalysis(BoundingBox::Region::LEVEL_SELECT_2P),
     };
@@ -306,7 +306,7 @@ bool ACAnalyzer::isLevelSelect(const SDL_Surface* surface)
             }
         }
 
-        if (whiteCount >= 40)
+        if (whiteCount >= 20)
             return true;
     }
 
