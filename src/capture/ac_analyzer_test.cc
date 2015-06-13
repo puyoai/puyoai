@@ -228,8 +228,8 @@ TEST_F(ACAnalyzerTest, analyzeFieldOjama)
 
 TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
 {
-    const int WIDTH = 32;
-    const int HEIGHT = 32;
+    const int WIDTH = 16;
+    const int HEIGHT = 16;
 
     const pair<string, RealColor> testcases[] = {
         make_pair((FLAGS_testdata_dir + "/images/puyo/empty.png"), RealColor::RC_EMPTY),
@@ -308,20 +308,20 @@ TEST_F(ACAnalyzerTest, DISABLED_wnextDetection)
     }
 }
 
+TEST_F(ACAnalyzerTest, levelSelect)
+{
+    const char* testcases[] = {
+        "/images/level-select/level-select1.png",
+        "/images/level-select/level-select2.png",
+    };
+
+    for (const auto& testcase : testcases) {
+        unique_ptr<AnalyzerResult> r = analyze(testcase);
+        EXPECT_EQ(CaptureGameState::LEVEL_SELECT, r->state());
+    }
+}
+
 #if 0
-TEST_F(ACAnalyzerTest, LevelSelect1)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/level-select1.png");
-
-    EXPECT_EQ(CaptureGameState::LEVEL_SELECT, r->state());
-}
-
-TEST_F(ACAnalyzerTest, LevelSelect2)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/level-select2.png");
-
-    EXPECT_EQ(CaptureGameState::LEVEL_SELECT, r->state());
-}
 
 TEST_F(ACAnalyzerTest, GameFinished1)
 {
