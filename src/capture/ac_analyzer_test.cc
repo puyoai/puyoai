@@ -272,7 +272,7 @@ TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
     }
 }
 
-TEST_F(ACAnalyzerTest, DISABLED_wnextDetection)
+TEST_F(ACAnalyzerTest, wnextDetection)
 {
     struct Testcase {
         int playerId;
@@ -301,7 +301,7 @@ TEST_F(ACAnalyzerTest, DISABLED_wnextDetection)
             unique_ptr<AnalyzerResult> r = analyze(buf);
 
             EXPECT_EQ(testcases[i].rc, r->playerResult(testcases[i].playerId)->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS))
-                << " Player " << testcases[i].playerId
+                << " Player " << (testcases[i].playerId + 1)
                 << " Testcase " << testcases[i].name
                 << " Case " << id;
         }

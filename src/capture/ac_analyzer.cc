@@ -14,8 +14,8 @@ using namespace std;
 namespace {
 const int BOX_THRESHOLD = 20;
 const int BOX_THRESHOLD_HALF = 15;
-const int SMALLER_BOX_THRESHOLD = 10;
-const int SMALLER_BOX_THRESHOLD_HALF = 7;
+const int SMALLER_BOX_THRESHOLD = 7;
+const int SMALLER_BOX_THRESHOLD_HALF = 6;
 }
 
 static RealColor toRealColor(const HSV& hsv)
@@ -27,7 +27,7 @@ static RealColor toRealColor(const HSV& hsv)
         return RealColor::RC_OJAMA;
 
     // The other colors are relatively easier. A bit tight range for now.
-    if ((hsv.h <= 15 || 350 < hsv.h) && 70 < hsv.v)
+    if (hsv.h <= 15 && 70 < hsv.v)
         return RealColor::RC_RED;
     if (35 <= hsv.h && hsv.h <= 75 && 90 < hsv.v)
         return RealColor::RC_YELLOW;
@@ -41,7 +41,7 @@ static RealColor toRealColor(const HSV& hsv)
         return RealColor::RC_PURPLE;
 
     // Hard to distinguish RED and PURPLE.
-    if (340 <= hsv.h && hsv.h <= 350) {
+    if (340 <= hsv.h && hsv.h <= 360) {
         if (160 < hsv.s + hsv.v)
             return RealColor::RC_RED;
         if (65 < hsv.v)
@@ -51,7 +51,8 @@ static RealColor toRealColor(const HSV& hsv)
     return RealColor::RC_EMPTY;
 }
 
-static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS], int threshold,
+static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS],
+                                                 int threshold,
                                                  ACAnalyzer::AllowOjama allowOjama = ACAnalyzer::AllowOjama::ALLOW_OJAMA)
 {
     static const RealColor colors[] = {
@@ -69,7 +70,7 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
         int cnt = colorCount[static_cast<int>(colors[i])];
         if (colors[i] == RealColor::RC_YELLOW)
             cnt = cnt * 4 / 5;
-        if (cnt > threshold && cnt > maxCount) {
+        if (cnt >= threshold && cnt > maxCount) {
             result = colors[i];
             maxCount = cnt;
         }
@@ -108,8 +109,8 @@ BoxAnalyzeResult ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b
     int colorCount[3][NUM_REAL_COLORS] = { { 0 } };
 
     // We'd like to take padding 1 pixel.
-    for (int by = b.sy + 1; by <= b.dy - 1; ++by) {
-        for (int bx = b.sx + 1; bx <= b.dx - 1; ++bx) {
+    for (int by = b.sy; by < b.dy; ++by) {
+        for (int bx = b.sx; bx < b.dx; ++bx) {
             Uint32 c = getpixel(surface, bx, by);
             Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
@@ -201,7 +202,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
     // detect field
     for (int y = 1; y <= 12; ++y) {
         for (int x = 1; x <= 6; ++x) {
-            Box b = BoundingBox::boxForAnalysis(pi, x, y);
+            Box b = BoundingBox::boxForAnalysis(pi, x, y).shrink(1);
             BoxAnalyzeResult r = analyzeBox(surface, b);
 
             result->field.set(x, y, r.realColor);
@@ -220,7 +221,10 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
 
         for (int i = 0; i < 4; ++i) {
             Box b = BoundingBox::boxForAnalysis(pi, np[i]);
-            BoxAnalyzeResult r = analyzeBox(surface, b, ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
+            if (i == 0 || i == 1) { // only 1p.
+                 b.dx -= 1;
+            }
+            BoxAnalyzeResult r = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
             result->setRealColor(np[i], r.realColor);
         }
     }
@@ -229,7 +233,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
     {
         Box b = BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT1_AXIS);
         b = Box(b.sx, b.sy + b.h() / 2, b.dx, b.dy);
-        BoxAnalyzeResult r = analyzeBox(surface, b, ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
+        BoxAnalyzeResult r = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
         result->next1AxisMoving = (r.realColor == RealColor::RC_EMPTY);
     }
 
