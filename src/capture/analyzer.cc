@@ -96,7 +96,7 @@ string PlayerAnalyzerResult::toString() const
     for (int y = 12; y >= 1; --y) {
         ss << '#';
         for (int x = 1; x <= 6; ++x) {
-            ss << toChar(detectedField.field.get(x, y), !detectedField.vanishing.get(x, y));
+            ss << toChar(detectedField.field.get(x, y));
         }
         ss << "#          #";
         for (int x = 1; x <= 6; ++x) {
@@ -142,7 +142,8 @@ unique_ptr<AnalyzerResult> AnalyzerResult::copy() const
 }
 
 std::unique_ptr<AnalyzerResult> Analyzer::analyze(const SDL_Surface* surface,
-                                                  const SDL_Surface* prevSurface,
+                                                  const SDL_Surface* /*prevSurface*/,
+                                                  const SDL_Surface* prev2Surface,
                                                   const deque<unique_ptr<AnalyzerResult>>& previousResults)
 {
     auto gameState = detectGameState(surface);
@@ -153,8 +154,8 @@ std::unique_ptr<AnalyzerResult> Analyzer::analyze(const SDL_Surface* surface,
         prevDetectedField2 = &previousResults.front()->playerResult(1)->detectedField;
     }
 
-    auto player1FieldResult = detectField(0, surface, prevSurface, prevDetectedField1);
-    auto player2FieldResult = detectField(1, surface, prevSurface, prevDetectedField2);
+    auto player1FieldResult = detectField(0, surface, prev2Surface);
+    auto player2FieldResult = detectField(1, surface, prev2Surface);
 
     switch (gameState) {
     case CaptureGameState::UNKNOWN: {
@@ -432,7 +433,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
                 result->adjustedField.setRealColor(x, y, detectedField.realColor(x, y));
-                result->adjustedField.setVanishing(x, y, detectedField.isVanishing(x, y));
+                result->adjustedField.setVanishing(x, y, false);
             }
         }
 
@@ -461,15 +462,15 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
                     cnt[previousResults[i]->detectedField.realColor(x, y)]++;
                 }
 
-                int framesContinuousVanishing = 0;
-                if (detectedField.isVanishing(x, y)) {
-                    framesContinuousVanishing = 1;
-                    for (size_t i = 0; i < NUM_FRAMES_TO_SEE_FOR_FIELD && i < previousResults.size(); ++i) {
-                        if (previousResults[i]->detectedField.isVanishing(x, y)) {
-                            framesContinuousVanishing += 1;
-                        } else {
-                            break;
-                        }
+                bool vanishing = false;
+                if (previousResults.size() >= 3U) {
+                    RealColor c1 = detectedField.realColor(x, y);
+                    RealColor c2 = previousResults[0]->detectedField.realColor(x, y);
+                    RealColor c3 = previousResults[1]->detectedField.realColor(x, y);
+                    RealColor c4 = previousResults[2]->detectedField.realColor(x, y);
+
+                    if (c1 == c3 && c2 == c4 && ((c1 == RealColor::RC_EMPTY) ^ (c2 == RealColor::RC_EMPTY))) {
+                        vanishing = true;
                     }
                 }
 
@@ -477,6 +478,9 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
                 RealColor rc = RealColor::RC_EMPTY;
                 int maxCount = 0;
                 for (const auto& entry : cnt) {
+                    if (vanishing && entry.first == RealColor::RC_EMPTY)
+                        continue;
+
                     if (maxCount < entry.second) {
                         rc = entry.first;
                         maxCount = entry.second;
@@ -488,7 +492,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
                     shouldEmpty = true;
                     adjustedField.vanishing.clear(x, y);
                 } else {
-                    adjustedField.vanishing.setBit(x, y, (framesContinuousVanishing > 2));
+                    adjustedField.vanishing.setBit(x, y, vanishing);
                 }
             }
         }

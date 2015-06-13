@@ -25,7 +25,7 @@ protected:
         CHECK(surf.get()) << "Failed to load " << filename;
 
         ACAnalyzer analyzer;
-        return analyzer.analyze(surf.get(), nullptr, deque<unique_ptr<AnalyzerResult>>());
+        return analyzer.analyze(surf.get(), nullptr, nullptr, deque<unique_ptr<AnalyzerResult>>());
     }
 
     deque<unique_ptr<AnalyzerResult>> analyzeMultipleFrames(const vector<string>& imgFilenames,
@@ -36,18 +36,20 @@ protected:
         ACAnalyzer analyzer;
         bool firstResult = true;
         UniqueSDLSurface prev(emptyUniqueSDLSurface());
+        UniqueSDLSurface prev2(emptyUniqueSDLSurface());
 
         for (const auto& imgFilename : imgFilenames) {
             string filename = FLAGS_testdata_dir + imgFilename;
             auto surface = makeUniqueSDLSurface(IMG_Load(filename.c_str()));
             CHECK(surface.get()) << "Failed to load "<< filename;
-            auto r = analyzer.analyze(surface.get(), prev.get(), results);
+            auto r = analyzer.analyze(surface.get(), prev.get(), prev2.get(), results);
             if (firstResult) {
                 r->mutablePlayerResult(0)->playable = userPlayable[0];
                 r->mutablePlayerResult(1)->playable = userPlayable[1];
                 firstResult = false;
             }
             results.push_front(move(r));
+            prev2 = move(prev);
             prev = move(surface);
         }
 
@@ -361,10 +363,12 @@ TEST_F(ACAnalyzerTest, vanishing)
     }
 
     // vanishing should be detected here.
-    EXPECT_FALSE(rs[30]->playerResult(0)->playable);
-    EXPECT_TRUE(rs[30]->playerResult(0)->userEvent.grounded);
-    EXPECT_FALSE(rs[31]->playerResult(0)->playable);
-    EXPECT_TRUE(rs[31]->playerResult(0)->userEvent.grounded);
+    EXPECT_TRUE(rs[29]->playerResult(0)->adjustedField.vanishing(2, 4));
+    EXPECT_TRUE(rs[30]->playerResult(0)->adjustedField.vanishing(2, 4));
+    EXPECT_TRUE(rs[31]->playerResult(0)->adjustedField.vanishing(2, 4));
+
+    EXPECT_FALSE(rs[29]->playerResult(0)->playable);
+    EXPECT_TRUE(rs[29]->playerResult(0)->userEvent.grounded);
 }
 
 

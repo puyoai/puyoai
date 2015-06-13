@@ -183,8 +183,7 @@ CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
 
 unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
                                                   const SDL_Surface* surface,
-                                                  const SDL_Surface* prevSurface,
-                                                  const DetectedField* prevDetectedField)
+                                                  const SDL_Surface* prev2Surface)
 {
     unique_ptr<DetectedField> result(new DetectedField);
 
@@ -193,26 +192,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
         for (int x = 1; x <= 6; ++x) {
             Box b = BoundingBox::boxForAnalysis(pi, x, y).shrink(1);
             RealColor rc = analyzeBox(surface, b);
-
-            if (prevDetectedField) {
-                RealColor prev = prevDetectedField->realColor(x, y);
-                if (rc == prev) {
-                    result->field.set(x, y, rc);
-                    result->vanishing.setBit(x, y, false);
-                } else if (rc == RealColor::RC_EMPTY) {
-                    result->field.set(x, y, prev);
-                    result->vanishing.setBit(x, y, true);
-                } else if (prev == RealColor::RC_EMPTY) {
-                    result->field.set(x, y, rc);
-                    result->vanishing.setBit(x, y, true);
-                } else {
-                    result->field.set(x, y, rc);
-                    result->vanishing.setBit(x, y, false);
-                }
-            } else {
-                result->field.set(x, y, rc);
-                result->vanishing.setBit(x, y, false);
-            }
+            result->field.set(x, y, rc);
         }
     }
 
@@ -243,23 +223,23 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
         result->next1AxisMoving = (rc == RealColor::RC_EMPTY);
     }
 
-    // detect ojama
+    // detect ojama. Comparing with prev2.
     {
         Box left = BoundingBox::boxForAnalysis(pi, 1, 0);
         Box right = BoundingBox::boxForAnalysis(pi, 6, 0);
         Box b = Box(left.sx, left.sy, right.dx, right.dy);
-        result->setOjamaDropDetected(detectOjamaDrop(surface, prevSurface, b));
+        result->setOjamaDropDetected(detectOjamaDrop(surface, prev2Surface, b));
     }
 
     return result;
 }
 
 bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
-                                 const SDL_Surface* prevSurface,
+                                 const SDL_Surface* prev2Surface,
                                  const Box& box)
 {
     // When prevSurface is NULL, we always think ojama is not dropped yet.
-    if (!prevSurface)
+    if (!prev2Surface)
         return false;
 
     int area = 0;
@@ -275,9 +255,9 @@ bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
             if (rc == RealColor::RC_RED || rc == RealColor::RC_GREEN)
                 continue;
 
-            Uint32 c2 = getpixel(prevSurface, bx, by);
+            Uint32 c2 = getpixel(prev2Surface, bx, by);
             Uint8 r2, g2, b2;
-            SDL_GetRGB(c2, prevSurface->format, &r2, &g2, &b2);
+            SDL_GetRGB(c2, prev2Surface->format, &r2, &g2, &b2);
 
             double diff = sqrt((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2));
             diffSum += diff;
