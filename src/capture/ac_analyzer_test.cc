@@ -171,121 +171,36 @@ TEST_F(ACAnalyzerTest, analyzeField2)
     }
 }
 
+TEST_F(ACAnalyzerTest, analyzeFieldOjama)
+{
+    const RealColorField field(
+        "...P.O"
+        "OOYP.O"
+        "OOOO.O"
+        "OOOOBO"
+        "OOOOOR"
+        "YYOOOP"
+        "BBOYOY"
+        "BYBYOY");
+
+    for (int caseNo = 1; caseNo <= 5; ++caseNo) {
+        char filename[80];
+        sprintf(filename, "/images/field-recognition/field-ojama%d.png", caseNo);
+        unique_ptr<AnalyzerResult> r = analyze(filename);
+        EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+        for (int x = 1; x <= 6; ++x) {
+            for (int y = 1; y <= 12; ++y) {
+                EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y))
+                    << caseNo << ' ' << x << ' ' << y;
+            }
+        }
+
+    }
+
+}
+
 #if 0
 
-TEST_F(ACAnalyzerTest, analyzeFieldNormal6)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal6.png");
-
-    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
-
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(1, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(3, 1));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 1));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(5, 1));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 1));
-
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(1, 2));
-    EXPECT_EQ(RealColor::RC_BLUE,   r->playerResult(0)->adjustedField.realColor(2, 2));
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(3, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(4, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(5, 2));
-    EXPECT_EQ(RealColor::RC_EMPTY,  r->playerResult(0)->adjustedField.realColor(6, 2));
-}
-
-TEST_F(ACAnalyzerTest, analyzeFieldNormal7)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal7.png");
-
-    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
-
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 7));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 8));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(2, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(2, 3));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(3, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(3, 6));
-}
-
-TEST_F(ACAnalyzerTest, analyzeFieldNormal8)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal8.png");
-
-    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
-
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 4));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 7));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(6, 4));
-}
-
-TEST_F(ACAnalyzerTest, analyzeFieldNormal9)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-normal8.png");
-
-    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
-
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 4));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 7));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(6, 4));
-}
-
-TEST_F(ACAnalyzerTest, AnalyzeAnotherField1)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-another1.png");
-
-    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
-
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(1, 1));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(1, 2));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(2, 2));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(2, 3));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(3, 3));
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(3, 1));
-    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(0)->adjustedField.realColor(3, 2));
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(3, 4));
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(4, 1));
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(4, 2));
-    EXPECT_EQ(RealColor::RC_GREEN,  r->playerResult(0)->adjustedField.realColor(4, 3));
-
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(1, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(2, 3));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(3, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(4, 1));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(5, 1));
-}
-
-TEST_F(ACAnalyzerTest, AnalyzeAnotherField2)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/field-another2.png");
-
-    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
-
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(3, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 10));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(0)->adjustedField.realColor(4, 11));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(4, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(4, 3));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(4, 4));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->adjustedField.realColor(4, 7));
-
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(2, 1));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(2, 2));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(4, 3));
-    EXPECT_EQ(RealColor::RC_RED,    r->playerResult(1)->adjustedField.realColor(6, 6));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(1, 1));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(1, 2));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(1, 3));
-    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->adjustedField.realColor(2, 4));
-}
 
 TEST_F(ACAnalyzerTest, OjamaDetectionCase1)
 {

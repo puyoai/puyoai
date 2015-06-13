@@ -12,8 +12,8 @@
 using namespace std;
 
 namespace {
-const int BOX_THRESHOLD = 40;
-const int BOX_THRESHOLD_HALF = 25;
+const int BOX_THRESHOLD = 20;
+const int BOX_THRESHOLD_HALF = 15;
 const int SMALLER_BOX_THRESHOLD = 15;
 const int SMALLER_BOX_THRESHOLD_HALF = 10;
 }
@@ -23,7 +23,7 @@ static RealColor toRealColor(const HSV& hsv)
     if (hsv.v < 38)
         return RealColor::RC_EMPTY;
 
-    if (hsv.s < 50 && 130 < hsv.v)
+    if (hsv.s < 50 && 120 < hsv.v)
         return RealColor::RC_OJAMA;
 
     // The other colors are relatively easier. A bit tight range for now.
@@ -140,11 +140,11 @@ BoxAnalyzeResult ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b
     }
 
     // TODO(mayah): This is a bit cryptic.
-    // whole puyo will be 32 x 32 (or 31x31?, anyway 31x31 > 32x30)
+    // whole puyo will be 16 x 16 (or 15x15?, anyway 15x15 > 16x14)
     // WNEXT2 will have smaller area.
     int area = b.w() * b.h();
-    int threshold = (area >= 30 * 32) ? BOX_THRESHOLD : SMALLER_BOX_THRESHOLD;
-    int halfThreshold = (area >= 30 * 32) ? BOX_THRESHOLD_HALF : SMALLER_BOX_THRESHOLD_HALF;
+    int threshold = (area >= 16 * 14) ? BOX_THRESHOLD : SMALLER_BOX_THRESHOLD;
+    int halfThreshold = (area >= 16 * 14) ? BOX_THRESHOLD_HALF : SMALLER_BOX_THRESHOLD_HALF;
 
     RealColor rc[3] = {
         estimateRealColorFromColorCount(colorCount[0], threshold, allowOjama),
