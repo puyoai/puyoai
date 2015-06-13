@@ -200,56 +200,6 @@ TEST_F(ACAnalyzerTest, analyzeFieldOjama)
 }
 
 #if 0
-
-
-TEST_F(ACAnalyzerTest, OjamaDetectionCase1)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case1.png");
-
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(1, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(2, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(3, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->adjustedField.realColor(5, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
-}
-
-TEST_F(ACAnalyzerTest, OjamaDetectionCase2)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case2.png");
-
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(1, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(2, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(3, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->adjustedField.realColor(5, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
-}
-
-TEST_F(ACAnalyzerTest, OjamaDetectionCase3)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case3.png");
-
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(1, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(2, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(3, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->adjustedField.realColor(5, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
-}
-
-TEST_F(ACAnalyzerTest, OjamaDetectionCase4)
-{
-    unique_ptr<AnalyzerResult> r = analyze("/somagic/ojama-detection/case4.png");
-
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(1, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(2, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(3, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(4, 6));
-    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->adjustedField.realColor(5, 6));
-    EXPECT_EQ(RealColor::RC_OJAMA, r->playerResult(0)->adjustedField.realColor(6, 6));
-}
-
 TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
 {
     const int WIDTH = 32;
@@ -309,8 +259,9 @@ TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
         }
     }
 }
+#endif
 
-TEST_F(ACAnalyzerTest, WnextDetection)
+TEST_F(ACAnalyzerTest, DISABLED_wnextDetection)
 {
     struct Testcase {
         int playerId;
@@ -320,22 +271,22 @@ TEST_F(ACAnalyzerTest, WnextDetection)
     };
 
     vector<Testcase> testcases = {
-        { 0, RealColor::RC_BLUE,   "blue",   8 },
-        { 0, RealColor::RC_GREEN,  "green",  8 },
-        { 0, RealColor::RC_PURPLE, "purple", 6 },
-        { 0, RealColor::RC_RED,    "red",    8 },
-        { 0, RealColor::RC_YELLOW, "yellow", 7 },
-        { 1, RealColor::RC_BLUE,   "blue",   6 },
-        { 1, RealColor::RC_GREEN,  "green",  8 },
-        { 1, RealColor::RC_PURPLE, "purple", 8 },
-        { 1, RealColor::RC_RED,    "red",    9 },
-        { 1, RealColor::RC_YELLOW, "yellow", 8 },
+        { 0, RealColor::RC_BLUE,   "blue",   16 },
+        { 0, RealColor::RC_GREEN,  "green",  16 },
+        { 0, RealColor::RC_PURPLE, "purple", 12 },
+        { 0, RealColor::RC_RED,    "red",    16 },
+        { 0, RealColor::RC_YELLOW, "yellow", 14 },
+        { 1, RealColor::RC_BLUE,   "blue",   12 },
+        { 1, RealColor::RC_GREEN,  "green",  16 },
+        { 1, RealColor::RC_PURPLE, "purple", 16 },
+        { 1, RealColor::RC_RED,    "red",    18 },
+        { 1, RealColor::RC_YELLOW, "yellow", 16 },
     };
 
     for (size_t i = 0; i < testcases.size(); ++i) {
         for (int id = 1; id <= testcases[i].maxFrame; ++id) {
             char buf[80];
-            sprintf(buf, "/somagic/wnext/%s-%dp-case%d.png", testcases[i].name, testcases[i].playerId + 1, id);
+            sprintf(buf, "/images/wnext/%s-%dp-case%02d.png", testcases[i].name, testcases[i].playerId + 1, id);
             unique_ptr<AnalyzerResult> r = analyze(buf);
 
             EXPECT_EQ(testcases[i].rc, r->playerResult(testcases[i].playerId)->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS))
@@ -346,6 +297,7 @@ TEST_F(ACAnalyzerTest, WnextDetection)
     }
 }
 
+#if 0
 TEST_F(ACAnalyzerTest, LevelSelect1)
 {
     unique_ptr<AnalyzerResult> r = analyze("/somagic/level-select1.png");
