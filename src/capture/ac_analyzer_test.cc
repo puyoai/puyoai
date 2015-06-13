@@ -451,38 +451,12 @@ TEST_F(ACAnalyzerTest, nextArrivalIrregular)
     EXPECT_TRUE(rs[78]->playerResult(1)->userEvent.decisionRequestAgain);
 }
 
-#if 0
-
-TEST_F(ACAnalyzerTest, decisionRequest)
-{
-    vector<string> images;
-    for (int i = 0; i <= 33; ++i) {
-        char buf[80];
-        sprintf(buf, "/somagic/nonfastmove/frame%02d.png", i);
-        string s = buf;
-        images.push_back(s);
-    }
-
-    bool pgs[2] = { true, true };
-    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
-
-    for (const auto& r : rs) {
-        EXPECT_EQ(CaptureGameState::PLAYING, r->state());
-    }
-
-    // Since this is not fast move, we should not request decision in
-    // frame26 or frame27.
-    EXPECT_FALSE(rs[25]->playerResult(1)->userEvent.decisionRequest);
-    EXPECT_FALSE(rs[26]->playerResult(1)->userEvent.decisionRequest);
-    EXPECT_FALSE(rs[27]->playerResult(1)->userEvent.decisionRequest);
-}
-
 TEST_F(ACAnalyzerTest, gameStart)
 {
     vector<string> images;
-    for (int i = 0; i <= 61; ++i) {
+    for (int i = 0; i < 120; ++i) {
         char buf[80];
-        sprintf(buf, "/somagic/game-start/frame%02d.png", i);
+        sprintf(buf, "/images/game-start/frame%03d.png", i);
         string s = buf;
         images.push_back(s);
     }
@@ -490,119 +464,64 @@ TEST_F(ACAnalyzerTest, gameStart)
     bool pgs[2] = { false, false };
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
-    // Frame 0-2 should be considered as LEVEL_SELECT.
-    for (int i = 0; i <= 2; ++i)
+    // Frame 0-5 should be considered as LEVEL_SELECT.
+    for (int i = 0; i < 6; ++i)
         EXPECT_EQ(CaptureGameState::LEVEL_SELECT, rs[i]->state());
-    // At least frame 8, game state should be PLAYING.
-    for (int i = 8; i <= 61; ++i)
+    // At least frame 16, game state should be PLAYING.
+    for (int i = 16; i < 120; ++i)
         EXPECT_EQ(CaptureGameState::PLAYING, rs[i]->state());
 
-    struct {
-        int frame;
+    const struct {
+        int frameBegin;
+        int frameEnd;
         const char* player1;
         const char* player2;
     } expectations[] = {
-        {  0, "  ----", "  ----" },  // Frame 0-2 are level select. On level select, current puyo should be empty.
-        {  1, "  ----", "  ----" },  // Also, we will use several frames to make NEXT stabilize.
-        {  2, "  ----", "  ----" },
-        {  3, "  BBPP", "  BBPP" },
-        {  4, "  BBPP", "  BBPP" },
-        {  5, "  BBPP", "  BBPP" },
-        {  6, "  BBPP", "  BBPP" },
-        {  7, "  BBPP", "  BBPP" },
-        {  8, "  BBPP", "  BBPP" },
-        {  9, "  BBPP", "  BBPP" },
-        { 10, "  BBPP", "  BBPP" },
-        { 11, "  BBPP", "  BBPP" },  // Player2: Green character is on NEXT2, however, analyzer should say NEXT2 is still PP.
-        { 12, "  BBPP", "  BBPP" },
-        { 13, "  BBPP", "  BBPP" },
-        { 14, "  BBPP", "  BBPP" },
-        { 15, "  BBPP", "  BBPP" },
-        { 16, "  BBPP", "  BBPP" },
-        { 17, "  BBPP", "  BBPP" },
-        { 18, "  BBPP", "  BBPP" },
-        { 19, "  BBPP", "  BBPP" },
-        { 20, "  BBPP", "  BBPP" },
-        { 21, "BBPP  ", "BBPP  " },  // Because of fastDecision, we would be able to detect NEXT moving here.
-        { 22, "BBPP  ", "BBPP  " },
-        { 23, "BBPP  ", "BBPP  " },
-        { 24, "BBPP  ", "BBPP  " },
-        { 25, "BBPP  ", "BBPP  " },
-        { 26, "BBPP  ", "BBPP  " },
-        { 27, "BBPP  ", "BBPP  " },
-        { 28, "BBPP  ", "BBPP  " },
-        { 29, "BBPP  ", "BBPP  " },
-        { 30, "BBPP  ", "BBPP  " },
-        { 31, "BBPP--", "BBPP--" },  // Player 2, frame 31: Since some stars are located on NEXT2_AXIS,
-        { 32, "BBPP--", "BBPP--" },  // analyzer might consider the axis color is YELLOW.
-        { 33, "BBPPBB", "BBPP--" },  // However, we should fix in frame33 at least.
-        { 34, "BBPPBB", "BBPPBB" },
-        { 35, "BBPPBB", "BBPPBB" },
-        { 36, "BBPPBB", "BBPPBB" },
-        { 37, "BBPPBB", "BBPPBB" },
-        { 38, "BBPPBB", "BBPPBB" },
-        { 39, "BBPPBB", "BBPPBB" },
-        { 40, "BBPPBB", "BBPPBB" },
-        { 41, "BBPPBB", "BBPPBB" },
-        { 42, "BBPPBB", "BBPPBB" },
-        { 43, "BBPPBB", "BBPPBB" },
-        { 44, "BBPPBB", "BBPPBB" },
-        { 45, "BBPPBB", "BBPPBB" },
-        { 46, "BBPPBB", "BBPPBB" },
-        { 47, "PPBB  ", "BBPPBB" },  // Player 1, frame 47: next1 will disappear. so next2 is moved to next1 on that time.
-        { 48, "PPBB  ", "BBPPBB" },
-        { 49, "PPBB  ", "BBPPBB" },
-        { 50, "PPBB  ", "BBPPBB" },
-        { 51, "PPBB  ", "BBPPBB" },
-        { 52, "PPBB  ", "BBPPBB" },
-        { 53, "PPBB  ", "BBPPBB" },
-        { 54, "PPBB  ", "BBPPBB" },
-        { 55, "PPBB  ", "BBPPBB" },
-        { 56, "PPBB  ", "BBPPBB" },
-        { 57, "PPBB  ", "BBPPBB" },
-        { 58, "PPBB  ", "BBPPBB" },
-        { 59, "PPBB  ", "BBPPBB" },
-        { 60, "PPBB--", "BBPPBB" },  // Player 1, frame 60: Yellow will appeaer. But we will need 3 frames to detect it.
-        { 61, "PPBB--", "BBPPBB" },
+        // Frame 0-5 are level select. On level select, current puyo should be empty.
+        // Also, we will use several frames to make NEXT stabilize.
+        {   0,   6, "  ----", "  ----" },
+        // On frame 18-,
+        // Player2: Green character is on NEXT2, however, analyzer should say NEXT2 is still PP.
+        {   6,  42, "  BBPP", "  BBPP" },
+        // Because of animation, the decisionRequest might be sent in different frame. :-(
+        {  42,  43, "  BBPP", "BBPP  " },
+        // Because of fastDecision, we would be able to detect NEXT moving here.
+        {  43,  60, "BBPP  ", "BBPP  " },
+        // Player 2, frame 31: Since some stars are located on NEXT2_AXIS,
+        // analyzer might consider the axis color is YELLOW.
+        // However, we should fix in frame33 at least.
+        {  60,  64, "BBPP--", "BBPP--" },
+        {  64,  66, "BBPPBB", "BBPP--" },
+        {  66,  95, "BBPPBB", "BBPPBB" },
+        // Player 1, frame 95: next1 will disappear. so next2 is moved to next1 on that time.
+        {  95, 118, "PPBB  ", "BBPPBB" },
+        // Player 1, frame 120: Yellow will appeaer. But we will need 3 frames to detect it.
+        { 118, 120, "PPBB--", "BBPPBB" },
     };
 
-    for (size_t i = 0; i < sizeof(expectations) / sizeof(expectations[0]); ++i) {
-        const PlayerAnalyzerResult* p1 = rs[expectations[i].frame]->playerResult(0);
-        const PlayerAnalyzerResult* p2 = rs[expectations[i].frame]->playerResult(1);
-        const char* c1 = expectations[i].player1;
-        const char* c2 = expectations[i].player2;
+    for (const auto& expectation : expectations) {
+        for (int i = expectation.frameBegin; i < expectation.frameEnd; ++i) {
+            const PlayerAnalyzerResult* p1 = rs[i]->playerResult(0);
+            const PlayerAnalyzerResult* p2 = rs[i]->playerResult(1);
+            const char* c1 = expectation.player1;
+            const char* c2 = expectation.player2;
 
-        if (c1[0] != '-') EXPECT_EQ(toRealColor(c1[0]), p1->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[1] != '-') EXPECT_EQ(toRealColor(c1[1]), p1->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[2] != '-') EXPECT_EQ(toRealColor(c1[2]), p1->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[3] != '-') EXPECT_EQ(toRealColor(c1[3]), p1->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[4] != '-') EXPECT_EQ(toRealColor(c1[4]), p1->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player1 : Frame " << expectations[i].frame;
-        if (c1[5] != '-') EXPECT_EQ(toRealColor(c1[5]), p1->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player1 : Frame " << expectations[i].frame;
+            if (c1[0] != '-') EXPECT_EQ(toRealColor(c1[0]), p1->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player1 : Frame " << i;
+            if (c1[1] != '-') EXPECT_EQ(toRealColor(c1[1]), p1->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player1 : Frame " << i;
+            if (c1[2] != '-') EXPECT_EQ(toRealColor(c1[2]), p1->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player1 : Frame " << i;
+            if (c1[3] != '-') EXPECT_EQ(toRealColor(c1[3]), p1->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player1 : Frame " << i;
+            if (c1[4] != '-') EXPECT_EQ(toRealColor(c1[4]), p1->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player1 : Frame " << i;
+            if (c1[5] != '-') EXPECT_EQ(toRealColor(c1[5]), p1->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player1 : Frame " << i;
 
-        if (c2[0] != '-') EXPECT_EQ(toRealColor(c2[0]), p2->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[1] != '-') EXPECT_EQ(toRealColor(c2[1]), p2->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[2] != '-') EXPECT_EQ(toRealColor(c2[2]), p2->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[3] != '-') EXPECT_EQ(toRealColor(c2[3]), p2->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[4] != '-') EXPECT_EQ(toRealColor(c2[4]), p2->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player2 : Frame " << expectations[i].frame;
-        if (c2[5] != '-') EXPECT_EQ(toRealColor(c2[5]), p2->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player2 : Frame " << expectations[i].frame;
-    }
-
-    // ----------------------------------------------------------------------
-
-    for (int i = 21; i <= 31; ++i) {
-        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS))
-            << "Player 1: Frame" << i << ": NEXT1_AXIS";
-        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD))
-            << "Player 1: Frame" << i << ": NEXT1_CHILD";
-    }
-    for (int i = 45; i <= 59; ++i) {
-        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS))
-            << "Player 1: Frame" << i << ": NEXT1_AXIS";
-        EXPECT_NE(RealColor::RC_EMPTY, rs[i]->playerResult(0)->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD))
-            << "Player 1: Frame" << i << ": NEXT1_CHILD";
+            if (c2[0] != '-') EXPECT_EQ(toRealColor(c2[0]), p2->adjustedField.realColor(NextPuyoPosition::CURRENT_AXIS)) << "Player2 : Frame " << i;
+            if (c2[1] != '-') EXPECT_EQ(toRealColor(c2[1]), p2->adjustedField.realColor(NextPuyoPosition::CURRENT_CHILD)) << "Player2 : Frame " << i;
+            if (c2[2] != '-') EXPECT_EQ(toRealColor(c2[2]), p2->adjustedField.realColor(NextPuyoPosition::NEXT1_AXIS)) << "Player2 : Frame " << i;
+            if (c2[3] != '-') EXPECT_EQ(toRealColor(c2[3]), p2->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player2 : Frame " << i;
+            if (c2[4] != '-') EXPECT_EQ(toRealColor(c2[4]), p2->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player2 : Frame " << i;
+            if (c2[5] != '-') EXPECT_EQ(toRealColor(c2[5]), p2->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player2 : Frame " << i;
+        }
     }
 }
-#endif
 
 int main(int argc, char* argv[])
 {
