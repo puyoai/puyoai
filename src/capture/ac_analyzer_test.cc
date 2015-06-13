@@ -418,13 +418,12 @@ TEST_F(ACAnalyzerTest, nextArrival)
     EXPECT_TRUE(rs[32]->playerResult(0)->playable);
 }
 
-#if 0
 TEST_F(ACAnalyzerTest, nextArrivalSousai)
 {
     vector<string> images;
-    for (int i = 0; i <= 12; ++i) {
+    for (int i = 0; i < 26; ++i) {
         char buf[80];
-        sprintf(buf, "/somagic/next-arrival-sousai/frame%02d.png", i);
+        sprintf(buf, "/images/next-arrival-sousai/frame%02d.png", i);
         string s = buf;
         images.push_back(s);
     }
@@ -432,9 +431,12 @@ TEST_F(ACAnalyzerTest, nextArrivalSousai)
     bool pgs[2] = { true, true };
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
-    EXPECT_TRUE(rs[9]->playerResult(1)->userEvent.decisionRequest || rs[10]->playerResult(1)->userEvent.decisionRequest);
-    EXPECT_TRUE(rs[9]->playerResult(1)->userEvent.grounded || rs[10]->playerResult(1)->userEvent.grounded);
+    EXPECT_TRUE(rs[18]->playerResult(1)->userEvent.decisionRequest);
+    EXPECT_TRUE(rs[18]->playerResult(1)->userEvent.grounded);
 }
+
+#if 0
+
 
 TEST_F(ACAnalyzerTest, irregularNextArrival)
 {
