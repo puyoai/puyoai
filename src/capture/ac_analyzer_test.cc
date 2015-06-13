@@ -340,8 +340,35 @@ TEST_F(ACAnalyzerTest, gameFinished)
     }
 }
 
-#if 0
+TEST_F(ACAnalyzerTest, vanishing)
+{
+    vector<string> images;
+    for (int i = 0; i < 32; ++i) {
+        char buf[80];
+        sprintf(buf, "/images/vanishing/frame%02d.png", i);
+        images.push_back(buf);
+    }
 
+    bool pgs[2] = { true, true };
+    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
+
+    for (const auto& r : rs) {
+        EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+    }
+
+    for (int i = 0; i <= 24; ++i) {
+        EXPECT_TRUE(rs[i]->playerResult(0)->playable) << i;
+    }
+
+    // vanishing should be detected here.
+    EXPECT_FALSE(rs[30]->playerResult(0)->playable);
+    EXPECT_TRUE(rs[30]->playerResult(0)->userEvent.grounded);
+    EXPECT_FALSE(rs[31]->playerResult(0)->playable);
+    EXPECT_TRUE(rs[31]->playerResult(0)->userEvent.grounded);
+}
+
+
+#if 0
 TEST_F(ACAnalyzerTest, nextArrival)
 {
     vector<string> images;
@@ -395,34 +422,6 @@ TEST_F(ACAnalyzerTest, irregularNextArrival)
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
     EXPECT_TRUE(rs[38]->playerResult(1)->userEvent.decisionRequestAgain || rs[39]->playerResult(1)->userEvent.decisionRequestAgain || rs[40]->playerResult(1)->userEvent.decisionRequestAgain);
-}
-
-TEST_F(ACAnalyzerTest, vanishing)
-{
-    vector<string> images;
-    for (int i = 0; i <= 15; ++i) {
-        char buf[80];
-        sprintf(buf, "/somagic/vanishing/frame%02d.png", i);
-        string s = buf;
-        images.push_back(s);
-    }
-
-    bool pgs[2] = { true, true };
-    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
-
-    for (const auto& r : rs) {
-        EXPECT_EQ(CaptureGameState::PLAYING, r->state());
-    }
-
-    for (int i = 0; i <= 12; ++i) {
-        EXPECT_TRUE(rs[i]->playerResult(0)->playable) << i;
-    }
-
-    // vanishing should be detected here.
-    // TODO(mayah): We might be able to detect in the previous frame?
-    EXPECT_FALSE(rs[15]->playerResult(0)->playable);
-    // Since we've detected vanishing, "grounded" event should come here.
-    EXPECT_TRUE(rs[15]->playerResult(0)->userEvent.grounded);
 }
 
 TEST_F(ACAnalyzerTest, nonfastmove)
