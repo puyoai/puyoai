@@ -233,38 +233,24 @@ TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
 
     const pair<string, RealColor> testcases[] = {
         make_pair((FLAGS_testdata_dir + "/images/puyo/empty.png"), RealColor::RC_EMPTY),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/empty-noised.png"), RealColor::RC_EMPTY),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/empty-shaded.png"), RealColor::RC_EMPTY),
         make_pair((FLAGS_testdata_dir + "/images/puyo/empty-blur.png"), RealColor::RC_EMPTY),
 
         make_pair((FLAGS_testdata_dir + "/images/puyo/ojama.png"), RealColor::RC_OJAMA),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama-noised.png"), RealColor::RC_OJAMA),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama-shaded.png"), RealColor::RC_OJAMA),
         make_pair((FLAGS_testdata_dir + "/images/puyo/ojama-blur.png"), RealColor::RC_OJAMA),
 
         make_pair((FLAGS_testdata_dir + "/images/puyo/red.png"), RealColor::RC_RED),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/red-noised.png"), RealColor::RC_RED),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/red-shaded.png"), RealColor::RC_RED),
         make_pair((FLAGS_testdata_dir + "/images/puyo/red-blur.png"), RealColor::RC_RED),
 
         make_pair((FLAGS_testdata_dir + "/images/puyo/blue.png"), RealColor::RC_BLUE),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/blue-noised.png"), RealColor::RC_BLUE),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/blue-shaded.png"), RealColor::RC_BLUE),
         make_pair((FLAGS_testdata_dir + "/images/puyo/blue-blur.png"), RealColor::RC_BLUE),
 
         make_pair((FLAGS_testdata_dir + "/images/puyo/yellow.png"), RealColor::RC_YELLOW),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow-noised.png"), RealColor::RC_YELLOW),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow-shaded.png"), RealColor::RC_YELLOW),
         make_pair((FLAGS_testdata_dir + "/images/puyo/yellow-blur.png"), RealColor::RC_YELLOW),
 
         make_pair((FLAGS_testdata_dir + "/images/puyo/green.png"), RealColor::RC_GREEN),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/green-noised.png"), RealColor::RC_GREEN),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/green-shaded.png"), RealColor::RC_GREEN),
         make_pair((FLAGS_testdata_dir + "/images/puyo/green-blur.png"), RealColor::RC_GREEN),
 
         make_pair((FLAGS_testdata_dir + "/images/puyo/purple.png"), RealColor::RC_PURPLE),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/purple-noised.png"), RealColor::RC_PURPLE),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/purple-shaded.png"), RealColor::RC_PURPLE),
         make_pair((FLAGS_testdata_dir + "/images/puyo/purple-blur.png"), RealColor::RC_PURPLE),
     };
 
