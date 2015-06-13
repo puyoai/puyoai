@@ -435,15 +435,12 @@ TEST_F(ACAnalyzerTest, nextArrivalSousai)
     EXPECT_TRUE(rs[18]->playerResult(1)->userEvent.grounded);
 }
 
-#if 0
-
-
-TEST_F(ACAnalyzerTest, irregularNextArrival)
+TEST_F(ACAnalyzerTest, nextArrivalIrregular)
 {
     vector<string> images;
-    for (int i = 0; i <= 45; ++i) {
+    for (int i = 0; i < 92; ++i) {
         char buf[80];
-        sprintf(buf, "/somagic/next-arrival-irregular/frame%02d.png", i);
+        sprintf(buf, "/images/next-arrival-irregular/frame%02d.png", i);
         string s = buf;
         images.push_back(s);
     }
@@ -451,8 +448,10 @@ TEST_F(ACAnalyzerTest, irregularNextArrival)
     bool pgs[2] = { true, true };
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
-    EXPECT_TRUE(rs[38]->playerResult(1)->userEvent.decisionRequestAgain || rs[39]->playerResult(1)->userEvent.decisionRequestAgain || rs[40]->playerResult(1)->userEvent.decisionRequestAgain);
+    EXPECT_TRUE(rs[78]->playerResult(1)->userEvent.decisionRequestAgain);
 }
+
+#if 0
 
 TEST_F(ACAnalyzerTest, decisionRequest)
 {
