@@ -40,7 +40,7 @@ RensaResult CoreField::simulate(Tracker* tracker)
 }
 
 template<typename Tracker>
-inline RensaResult CoreField::simulate(SimulationContext* context, Tracker* tracker)
+RensaResult CoreField::simulate(SimulationContext* context, Tracker* tracker)
 {
     RensaResult result = field_.simulate(context, tracker);
     field_.calculateHeight(heights_);
