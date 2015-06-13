@@ -397,13 +397,12 @@ TEST_F(ACAnalyzerTest, ojamaDrop)
     EXPECT_TRUE(rs[72]->playerResult(1)->playable);
 }
 
-#if 0
 TEST_F(ACAnalyzerTest, nextArrival)
 {
     vector<string> images;
-    for (int i = 0; i <= 24; ++i) {
+    for (int i = 0; i < 50; ++i) {
         char buf[80];
-        sprintf(buf, "/somagic/next-arrival/frame%02d.png", i);
+        sprintf(buf, "/images/next-arrival/frame%02d.png", i);
         string s = buf;
         images.push_back(s);
     }
@@ -413,13 +412,13 @@ TEST_F(ACAnalyzerTest, nextArrival)
 
     EXPECT_TRUE(rs[0]->playerResult(0)->playable);
     // Next disappears here. After detecting next disappearing. we'd like to make userEvent playable.
-    EXPECT_FALSE(rs[13]->playerResult(0)->playable);
-    EXPECT_TRUE(rs[13]->playerResult(0)->userEvent.decisionRequest);
-    EXPECT_TRUE(rs[14]->playerResult(0)->playable);
+    EXPECT_FALSE(rs[26]->playerResult(0)->playable);
+    EXPECT_TRUE(rs[26]->playerResult(0)->userEvent.decisionRequest);
     // Then controllable now.
-    EXPECT_TRUE(rs[16]->playerResult(0)->playable);
+    EXPECT_TRUE(rs[32]->playerResult(0)->playable);
 }
 
+#if 0
 TEST_F(ACAnalyzerTest, nextArrivalSousai)
 {
     vector<string> images;
@@ -453,7 +452,7 @@ TEST_F(ACAnalyzerTest, irregularNextArrival)
     EXPECT_TRUE(rs[38]->playerResult(1)->userEvent.decisionRequestAgain || rs[39]->playerResult(1)->userEvent.decisionRequestAgain || rs[40]->playerResult(1)->userEvent.decisionRequestAgain);
 }
 
-TEST_F(ACAnalyzerTest, nonfastmove)
+TEST_F(ACAnalyzerTest, decisionRequest)
 {
     vector<string> images;
     for (int i = 0; i <= 33; ++i) {
