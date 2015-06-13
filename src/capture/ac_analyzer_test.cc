@@ -371,6 +371,31 @@ TEST_F(ACAnalyzerTest, vanishing)
     EXPECT_TRUE(rs[29]->playerResult(0)->userEvent.grounded);
 }
 
+TEST_F(ACAnalyzerTest, ojamaDrop)
+{
+    vector<string> images;
+    for (int i = 0; i < 78; ++i) {
+        char buf[80];
+        sprintf(buf, "/images/ojama-drop/frame%02d.png", i);
+        string s = buf;
+        images.push_back(s);
+    }
+
+    bool pgs[2] = { true, true };
+    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
+
+    for (const auto& r : rs) {
+        EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+    }
+
+    for (int i = 0; i <= 56; ++i)
+        EXPECT_TRUE(rs[i]->playerResult(1)->playable);
+    // Around here, analyzer can detect ojama puyo is dropped.
+    EXPECT_FALSE(rs[60]->playerResult(1)->playable);
+    EXPECT_FALSE(rs[62]->playerResult(1)->playable);
+    // Then, next puyo will disappear.
+    EXPECT_TRUE(rs[72]->playerResult(1)->playable);
+}
 
 #if 0
 TEST_F(ACAnalyzerTest, nextArrival)
@@ -450,32 +475,6 @@ TEST_F(ACAnalyzerTest, nonfastmove)
     EXPECT_FALSE(rs[25]->playerResult(1)->userEvent.decisionRequest);
     EXPECT_FALSE(rs[26]->playerResult(1)->userEvent.decisionRequest);
     EXPECT_FALSE(rs[27]->playerResult(1)->userEvent.decisionRequest);
-}
-
-TEST_F(ACAnalyzerTest, ojamaDrop)
-{
-    vector<string> images;
-    for (int i = 0; i <= 38; ++i) {
-        char buf[80];
-        sprintf(buf, "/somagic/ojama-drop-2p/frame%02d.png", i);
-        string s = buf;
-        images.push_back(s);
-    }
-
-    bool pgs[2] = { true, true };
-    deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
-
-    for (const auto& r : rs) {
-        EXPECT_EQ(CaptureGameState::PLAYING, r->state());
-    }
-
-    for (int i = 0; i <= 28; ++i)
-        EXPECT_TRUE(rs[i]->playerResult(1)->playable);
-    // Around here, analyzer can detect ojama puyo is dropped.
-    EXPECT_FALSE(rs[30]->playerResult(1)->playable);
-    EXPECT_FALSE(rs[31]->playerResult(1)->playable);
-    // Then, next puyo will disappear.
-    EXPECT_TRUE(rs[37]->playerResult(1)->playable);
 }
 
 TEST_F(ACAnalyzerTest, gameStart)
