@@ -110,7 +110,7 @@ TEST_F(ACAnalyzerTest, estimateRealColor)
 
 TEST_F(ACAnalyzerTest, analyzeField1)
 {
-    unique_ptr<AnalyzerResult> r = analyze("/images/field-recognition/field1.png");
+    unique_ptr<AnalyzerResult> r = analyze("/images/field/field1.png");
 
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
@@ -131,7 +131,7 @@ TEST_F(ACAnalyzerTest, analyzeField1)
 
 TEST_F(ACAnalyzerTest, analyzeField2)
 {
-    unique_ptr<AnalyzerResult> r = analyze("/images/field-recognition/field2.png");
+    unique_ptr<AnalyzerResult> r = analyze("/images/field/field2.png");
 
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
@@ -185,7 +185,7 @@ TEST_F(ACAnalyzerTest, analyzeFieldOjama)
 
     for (int caseNo = 1; caseNo <= 5; ++caseNo) {
         char filename[80];
-        sprintf(filename, "/images/field-recognition/field-ojama%d.png", caseNo);
+        sprintf(filename, "/images/field/field-ojama%d.png", caseNo);
         unique_ptr<AnalyzerResult> r = analyze(filename);
         EXPECT_EQ(CaptureGameState::PLAYING, r->state());
         for (int x = 1; x <= 6; ++x) {
