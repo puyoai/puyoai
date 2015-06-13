@@ -54,8 +54,8 @@ int main(int argc, char* argv[])
         if (!surf.get())
             break;
 
-        const int WIDTH = 32;
-        const int HEIGHT = 32;
+        const int WIDTH = 16;
+        const int HEIGHT = 16;
 
         for (int pi = 0; pi < 2; ++pi) {
             for (int y = 12; y >= 1; --y) {
