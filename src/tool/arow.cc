@@ -20,7 +20,7 @@ using namespace std;
 
 class Arow {
 public:
-    Arow() : SIZE(32 * 32 * 3), RATE(0.1), mean(SIZE), cov(SIZE)
+    Arow() : SIZE(16 * 16 * 3), RATE(0.1), mean(SIZE), cov(SIZE)
     {
         std::fill(cov.begin(), cov.end(), 1.0);
     }
@@ -84,41 +84,25 @@ private:
 
 int main()
 {
-    const int WIDTH = 32;
-    const int HEIGHT = 32;
+    const int WIDTH = 16;
+    const int HEIGHT = 16;
 
     const pair<string, RealColor> training_testcases[] = {
-        make_pair((FLAGS_testdata_dir + "/image/empty.png"), RealColor::RC_EMPTY),
-        make_pair((FLAGS_testdata_dir + "/image/red.png"), RealColor::RC_RED),
-        make_pair((FLAGS_testdata_dir + "/image/blue.png"), RealColor::RC_BLUE),
-        make_pair((FLAGS_testdata_dir + "/image/yellow.png"), RealColor::RC_YELLOW),
-        make_pair((FLAGS_testdata_dir + "/image/green.png"), RealColor::RC_GREEN),
-        make_pair((FLAGS_testdata_dir + "/image/ojama.png"), RealColor::RC_OJAMA),
-        make_pair((FLAGS_testdata_dir + "/image/purple.png"), RealColor::RC_PURPLE),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/empty.png"), RealColor::RC_EMPTY),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/red.png"), RealColor::RC_RED),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/blue.png"), RealColor::RC_BLUE),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow.png"), RealColor::RC_YELLOW),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/green.png"), RealColor::RC_GREEN),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama.png"), RealColor::RC_OJAMA),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/purple.png"), RealColor::RC_PURPLE),
 
-        make_pair((FLAGS_testdata_dir + "/image/empty-noised.png"), RealColor::RC_EMPTY),
-        make_pair((FLAGS_testdata_dir + "/image/red-noised.png"), RealColor::RC_RED),
-        make_pair((FLAGS_testdata_dir + "/image/blue-noised.png"), RealColor::RC_BLUE),
-        make_pair((FLAGS_testdata_dir + "/image/yellow-noised.png"), RealColor::RC_YELLOW),
-        make_pair((FLAGS_testdata_dir + "/image/green-noised.png"), RealColor::RC_GREEN),
-        make_pair((FLAGS_testdata_dir + "/image/ojama-noised.png"), RealColor::RC_OJAMA),
-        make_pair((FLAGS_testdata_dir + "/image/purple-noised.png"), RealColor::RC_PURPLE),
-
-        make_pair((FLAGS_testdata_dir + "/image/empty-shaded.png"), RealColor::RC_EMPTY),
-        make_pair((FLAGS_testdata_dir + "/image/red-shaded.png"), RealColor::RC_RED),
-        make_pair((FLAGS_testdata_dir + "/image/blue-shaded.png"), RealColor::RC_BLUE),
-        make_pair((FLAGS_testdata_dir + "/image/yellow-shaded.png"), RealColor::RC_YELLOW),
-        make_pair((FLAGS_testdata_dir + "/image/green-shaded.png"), RealColor::RC_GREEN),
-        make_pair((FLAGS_testdata_dir + "/image/ojama-shaded.png"), RealColor::RC_OJAMA),
-        make_pair((FLAGS_testdata_dir + "/image/purple-shaded.png"), RealColor::RC_PURPLE),
-
-        make_pair((FLAGS_testdata_dir + "/image/empty-blur.png"), RealColor::RC_EMPTY),
-        make_pair((FLAGS_testdata_dir + "/image/red-blur.png"), RealColor::RC_RED),
-        make_pair((FLAGS_testdata_dir + "/image/blue-blur.png"), RealColor::RC_BLUE),
-        make_pair((FLAGS_testdata_dir + "/image/yellow-blur.png"), RealColor::RC_YELLOW),
-        make_pair((FLAGS_testdata_dir + "/image/green-blur.png"), RealColor::RC_GREEN),
-        make_pair((FLAGS_testdata_dir + "/image/ojama-blur.png"), RealColor::RC_OJAMA),
-        make_pair((FLAGS_testdata_dir + "/image/purple-blur.png"), RealColor::RC_PURPLE),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/empty-blur.png"), RealColor::RC_EMPTY),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/red-blur.png"), RealColor::RC_RED),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/blue-blur.png"), RealColor::RC_BLUE),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow-blur.png"), RealColor::RC_YELLOW),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/green-blur.png"), RealColor::RC_GREEN),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama-blur.png"), RealColor::RC_OJAMA),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/purple-blur.png"), RealColor::RC_PURPLE),
     };
 
     Arow red;
@@ -196,9 +180,9 @@ int main()
         CHECK(surf.get()) << path.c_str();
 
         int pos = 0;
-        vector<double> features(32 * 32 * 3);
-        for (int x = 0; x < 32; ++x) {
-            for (int y = 0; y < 32; ++y) {
+        vector<double> features(WIDTH * HEIGHT * 3);
+        for (int x = 0; x < WIDTH; ++x) {
+            for (int y = 0; y < HEIGHT; ++y) {
                 std::uint32_t c = getpixel(surf.get(), x, y);
                 std::uint8_t r, g, b;
                 SDL_GetRGB(c, surf->format, &r, &g, &b);
@@ -208,7 +192,7 @@ int main()
             }
         }
 
-        CHECK(pos == 32 * 32 * 3);
+        CHECK_EQ(pos, WIDTH * HEIGHT * 3);
 
         static const RealColor colors[] = {
             RealColor::RC_EMPTY, RealColor::RC_OJAMA, RealColor::RC_RED,
