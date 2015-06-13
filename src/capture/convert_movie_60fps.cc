@@ -76,9 +76,9 @@ int main(int argc, char* argv[])
         }
 
         char buf[80];
-        sprintf(buf, "orig-%05d.bmp", num++);
+        sprintf(buf, "orig-%05d.bmp", ++num);
         SDL_SaveBMP(up.get(), buf);
-        sprintf(buf, "orig-%05d.bmp", num++);
+        sprintf(buf, "orig-%05d.bmp", ++num);
         SDL_SaveBMP(down.get(), buf);
     }
 

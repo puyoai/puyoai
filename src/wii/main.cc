@@ -41,7 +41,7 @@ DEFINE_bool(draw_user_event, true, "draw user event");
 DEFINE_string(source, "somagic",
               "set image source. 'somagic' when using somagic video capture."
               " filename if you'd like to use movie.");
-DEFINE_int32(fps, 30, "FPS");
+DEFINE_int32(fps, 60, "FPS");
 DEFINE_bool(ignore_sigpipe, false, "ignore SIGPIPE");
 DEFINE_bool(use_commentator, false, "use commentator");
 
@@ -154,9 +154,9 @@ int main(int argc, char* argv[])
     unique_ptr<CommentatorDrawer> commentatorDrawer;
 
     if (FLAGS_use_commentator) {
-        mainWindow.reset(new MainWindow(720 + 2 * 144, 480 + 176, Box(144, 40, 144 + 720, 40 + 480)));
+        mainWindow.reset(new MainWindow(640 + 2 * 144, 448 + 176, Box(144, 40, 144 + 640, 40 + 448)));
     } else {
-        mainWindow.reset(new MainWindow(720, 480, Box(0, 0, 720, 480)));
+        mainWindow.reset(new MainWindow(640, 448, Box(0, 0, 640, 448)));
     }
 
     mainWindow->addDrawer(&server);
