@@ -73,12 +73,35 @@ public:
         return m > 0 ? 1 : -1;
     }
 
+    void save(const char* filename) const
+    {
+        FILE* fp = fopen(filename, "wb");
+        PCHECK(fp);
+
+        fwrite(&mean[0], sizeof(double), SIZE, fp);
+        fwrite(&cov[0], sizeof(double), SIZE, fp);
+
+        fclose(fp);
+    }
+
 private:
     const int SIZE;
     const double RATE;
     vector<double> mean;
     vector<double> cov;
 };
+
+enum class RecognitionColor {
+    RED,
+    BLUE,
+    YELLOW,
+    GREEN,
+    PURPLE,
+    EMPTY,
+    OJAMA,
+    ZENKESHI
+};
+const int NUM_RECOGNITION = 8;
 
 // ----------------------------------------------------------------------
 
@@ -87,137 +110,164 @@ int main()
     const int WIDTH = 16;
     const int HEIGHT = 16;
 
-    const pair<string, RealColor> training_testcases[] = {
-        make_pair((FLAGS_testdata_dir + "/images/puyo/empty.png"), RealColor::RC_EMPTY),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/red.png"), RealColor::RC_RED),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/blue.png"), RealColor::RC_BLUE),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow.png"), RealColor::RC_YELLOW),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/green.png"), RealColor::RC_GREEN),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama.png"), RealColor::RC_OJAMA),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/purple.png"), RealColor::RC_PURPLE),
+    Arow arows[NUM_RECOGNITION];
+    vector<vector<double>> features[NUM_RECOGNITION];
 
-        make_pair((FLAGS_testdata_dir + "/images/puyo/empty-blur.png"), RealColor::RC_EMPTY),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/red-blur.png"), RealColor::RC_RED),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/blue-blur.png"), RealColor::RC_BLUE),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow-blur.png"), RealColor::RC_YELLOW),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/green-blur.png"), RealColor::RC_GREEN),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama-blur.png"), RealColor::RC_OJAMA),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/purple-blur.png"), RealColor::RC_PURPLE),
+    const pair<string, RecognitionColor> testcases[] = {
+        make_pair((FLAGS_testdata_dir + "/images/recognition/R"), RecognitionColor::RED),
+        make_pair((FLAGS_testdata_dir + "/images/recognition/B"), RecognitionColor::BLUE),
+        make_pair((FLAGS_testdata_dir + "/images/recognition/G"), RecognitionColor::GREEN),
+        make_pair((FLAGS_testdata_dir + "/images/recognition/Y"), RecognitionColor::YELLOW),
+        make_pair((FLAGS_testdata_dir + "/images/recognition/P"), RecognitionColor::PURPLE),
+        make_pair((FLAGS_testdata_dir + "/images/recognition/E"), RecognitionColor::EMPTY),
+        make_pair((FLAGS_testdata_dir + "/images/recognition/O"), RecognitionColor::OJAMA),
+        make_pair((FLAGS_testdata_dir + "/images/recognition/Z"), RecognitionColor::ZENKESHI),
     };
 
-    Arow red;
-    Arow blue;
-    Arow yellow;
-    Arow green;
-    Arow purple;
-    Arow ojama;
-    Arow empty;
+    // Read training data (2)
+    for (const auto& testcase : testcases) {
+        string dirname = testcase.first;
+        RecognitionColor color = testcase.second;
 
-    for (int i = 0; i < 100; ++i) {
-        int countFailure = 0;
-        for (const auto& testcase : training_testcases) {
-            const string& filename = testcase.first;
-            const RealColor color = testcase.second;
+        DIR* dir = opendir(dirname.c_str());
+        PCHECK(dir) << dirname.c_str();
 
-            UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(filename.c_str())));
+        struct dirent* ent;
+        while ((ent = readdir(dir)) != nullptr) {
+            string path = dirname + "/" + ent->d_name;
+            if (!strings::isSuffix(path, ".bmp"))
+                continue;
 
-            for (int x = 0; (x + 1) * WIDTH <= surf->w; ++x) {
-                for (int y = 0; (y + 1) * HEIGHT <= surf->h; ++y) {
-                    int pos = 0;
-                    vector<double> features(32 * 32 * 3);
-                    for (int xx = 0; xx < 32; ++xx) {
-                        for (int yy = 0; yy < 32; ++yy) {
-                            std::uint32_t c = getpixel(surf.get(), x * WIDTH + xx, y * HEIGHT + yy);
-                            std::uint8_t r, g, b;
-                            SDL_GetRGB(c, surf->format, &r, &g, &b);
-                            features[pos++] = r;
-                            features[pos++] = g;
-                            features[pos++] = b;
-                        }
+            UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(path.c_str())));
+            CHECK(surf.get()) << path.c_str();
+
+            int pos = 0;
+            vector<double> fs(WIDTH * HEIGHT * 3);
+            for (int x = 0; x < WIDTH; ++x) {
+                for (int y = 0; y < HEIGHT; ++y) {
+                    std::uint32_t c = getpixel(surf.get(), x, y);
+                    std::uint8_t r, g, b;
+                    SDL_GetRGB(c, surf->format, &r, &g, &b);
+                    fs[pos++] = r;
+                    fs[pos++] = g;
+                    fs[pos++] = b;
+                }
+            }
+
+            CHECK_EQ(pos, WIDTH * HEIGHT * 3);
+
+            features[static_cast<int>(color)].push_back(std::move(fs));
+        }
+        closedir(dir);
+    }
+
+    const pair<string, RecognitionColor> training_testcases[] = {
+        make_pair((FLAGS_testdata_dir + "/images/puyo/empty.png"), RecognitionColor::EMPTY),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/red.png"), RecognitionColor::RED),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/blue.png"), RecognitionColor::BLUE),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow.png"), RecognitionColor::YELLOW),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/green.png"), RecognitionColor::GREEN),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama.png"), RecognitionColor::OJAMA),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/purple.png"), RecognitionColor::PURPLE),
+
+        make_pair((FLAGS_testdata_dir + "/images/puyo/empty-blur.png"), RecognitionColor::EMPTY),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/red-blur.png"), RecognitionColor::RED),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/blue-blur.png"), RecognitionColor::BLUE),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow-blur.png"), RecognitionColor::YELLOW),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/green-blur.png"), RecognitionColor::GREEN),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama-blur.png"), RecognitionColor::OJAMA),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/purple-blur.png"), RecognitionColor::PURPLE),
+    };
+
+    // Read training testcases.
+    for (const auto& testcase: training_testcases) {
+        const string& filename = testcase.first;
+        const RecognitionColor color = testcase.second;
+
+        UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(filename.c_str())));
+
+        for (int x = 0; (x + 1) * WIDTH <= surf->w; ++x) {
+            for (int y = 0; (y + 1) * HEIGHT <= surf->h; ++y) {
+                int pos = 0;
+                vector<double> fs(WIDTH * HEIGHT * 3);
+                for (int xx = 0; xx < WIDTH; ++xx) {
+                    for (int yy = 0; yy < HEIGHT; ++yy) {
+                        std::uint32_t c = getpixel(surf.get(), x * WIDTH + xx, y * HEIGHT + yy);
+                        std::uint8_t r, g, b;
+                        SDL_GetRGB(c, surf->format, &r, &g, &b);
+                        fs[pos++] = r;
+                        fs[pos++] = g;
+                        fs[pos++] = b;
                     }
+                }
 
-                    CHECK(pos == 32 * 32 * 3);
+                CHECK(pos == WIDTH * HEIGHT * 3);
+                if (color == RecognitionColor::EMPTY) {
+                    if (x == 6) {
+                        features[static_cast<int>(RecognitionColor::EMPTY)].push_back(std::move(fs));
+                    } else {
+                        features[static_cast<int>(RecognitionColor::ZENKESHI)].push_back(std::move(fs));
+                    }
+                } else {
+                    features[static_cast<int>(color)].push_back(std::move(fs));
+                }
+            }
+        }
+    }
 
-                    if (empty.update(features, color == RealColor::RC_EMPTY ? 1 : -1) != 0)
-                        ++countFailure;
-                    if (ojama.update(features, color == RealColor::RC_OJAMA ? 1 : -1) != 0)
-                        ++countFailure;
-                    if (red.update(features, color == RealColor::RC_RED ? 1 : -1) != 0)
-                        ++countFailure;
-                    if (blue.update(features, color == RealColor::RC_BLUE ? 1 : -1) != 0)
-                        ++countFailure;
-                    if (yellow.update(features, color == RealColor::RC_YELLOW ? 1 : -1) != 0)
-                        ++countFailure;
-                    if (green.update(features, color == RealColor::RC_GREEN ? 1 : -1) != 0)
-                        ++countFailure;
-                    if (purple.update(features, color == RealColor::RC_PURPLE ? 1 : -1) != 0)
-                        ++countFailure;
+    for (const auto& f : features) {
+        cout << "SIZE = " << f.size() << endl;
+    }
+
+    // training
+    for (int times = 0; times < 200; ++times) {
+        for (int i = 0; i < NUM_RECOGNITION; ++i) {
+            for (int j = 0; j < static_cast<int>(features[i].size()); ++j) {
+                if ((j & 0xF) == 0)
+                    continue;
+
+                for (int k = 0; k < NUM_RECOGNITION; ++k) {
+                    arows[k].update(features[i][j], i == k ? 1 : -1);
                 }
             }
         }
 
-        cout << "done: " << i << " failure=" << countFailure << endl;
-        if (countFailure == 0)
-            break;
+        cout << "training " << times << ": done" << endl;
     }
 
+    // test by all
     int num = 0;
-    int failed = 0;
-
-    string dirname = FLAGS_testdata_dir + "/image/actual-data";
-    DIR* dir = opendir(dirname.c_str());
-    PCHECK(dir);
-
-    struct dirent* ent;
-    while ((ent = readdir(dir)) != nullptr) {
-        string path = dirname + "/" + ent->d_name;
-        if (!strings::isSuffix(path, ".png"))
-            continue;
-
-        RealColor color = toRealColor(ent->d_name[0]);
-
-        UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(path.c_str())));
-        CHECK(surf.get()) << path.c_str();
-
-        int pos = 0;
-        vector<double> features(WIDTH * HEIGHT * 3);
-        for (int x = 0; x < WIDTH; ++x) {
-            for (int y = 0; y < HEIGHT; ++y) {
-                std::uint32_t c = getpixel(surf.get(), x, y);
-                std::uint8_t r, g, b;
-                SDL_GetRGB(c, surf->format, &r, &g, &b);
-                features[pos++] = r;
-                features[pos++] = g;
-                features[pos++] = b;
+    int fail = 0;
+    for (int i = 0; i < NUM_RECOGNITION; ++i) {
+        for (int j = 0; j < static_cast<int>(features[i].size()); ++j) {
+            ++num;
+            double vs[NUM_RECOGNITION] {};
+            for (int k = 0; k < NUM_RECOGNITION; ++k) {
+                vs[k] = arows[k].margin(features[i][j]);
             }
-        }
 
-        CHECK_EQ(pos, WIDTH * HEIGHT * 3);
-
-        static const RealColor colors[] = {
-            RealColor::RC_EMPTY, RealColor::RC_OJAMA, RealColor::RC_RED,
-            RealColor::RC_BLUE, RealColor::RC_YELLOW, RealColor::RC_GREEN, RealColor::RC_PURPLE
-        };
-
-        double margins[] = {
-            empty.margin(features), ojama.margin(features), red.margin(features),
-            blue.margin(features), yellow.margin(features), green.margin(features), purple.margin(features)
-        };
-
-        ++num;
-
-        int idx = max_element(margins, margins + 7) - margins;
-        if (color != colors[idx]) {
-            cout << "FAILED: " << color << " -> " << colors[idx] << " : " << path << endl;
-            for (int i = 0; i < 7; ++i) {
-                cout << colors[i] << " :-> " << margins[i] << endl;
+            int result = std::max_element(vs, vs + NUM_RECOGNITION) - vs;
+            if (i != result) {
+                cout << "fail: " << i << " " << j << " -> " << result << endl;
+                for (int k = 0; k < NUM_RECOGNITION; ++k)
+                    cout << vs[k] << ' ';
+                cout << endl;
+                ++fail;
             }
-            ++failed;
         }
     }
-    closedir(dir);
 
     cout << "num = " << num << endl;
-    cout << "failed =" << failed << endl;
-    cout << double(num - failed) / num << endl;
+    cout << "fail = " << fail << endl;
+
+    arows[0].save("red.arow");
+    arows[1].save("blue.arow");
+    arows[2].save("yellow.arow");
+    arows[3].save("green.arow");
+    arows[4].save("purple.arow");
+    arows[5].save("empty.arow");
+    arows[6].save("ojama.arow");
+    arows[7].save("zenkeshi.arow");
+
+    return 0;
 }
