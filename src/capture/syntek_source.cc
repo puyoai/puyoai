@@ -9,17 +9,23 @@
 
 using namespace std;
 
-SyntekSource::SyntekSource()
+SyntekSource::SyntekSource() :
+    currentSurface_(emptyUniqueSDLSurface())
 {
-    width_ = 720;
-    height_ = 480;
+    width_ = 640;
+    height_ = 448;
     ok_ = false;
 
     driver_ = SyntekDriver::open();
     if (driver_) {
-        currentPixelData_.reset(new int[height() * width()]);
+        currentSurface_.reset(SDL_CreateRGBSurface(0, 720, 240, 32, 0, 0, 0, 0));
         ok_ = true;
     }
+}
+
+SyntekSource::~SyntekSource()
+{
+
 }
 
 bool SyntekSource::start()
@@ -27,37 +33,30 @@ bool SyntekSource::start()
     if (!ok())
         return false;
 
-    auto callback = [this](const unsigned char* higher,
-                           const unsigned char* lower,
+    auto callback = [this](const unsigned char* buffer,
+                           bool /*isHigh*/,
                            int bytesPerRow,
                            int numRowsPerBuffer) {
         lock_guard<mutex> lock(mu_);
+        CHECK_EQ(SDL_LockSurface(currentSurface_.get()), 0);
+
+        int* pixels = static_cast<int*>(currentSurface_->pixels);
 
         // Copy to the current pixel data.
         int pos = 0;
         for (int y = 0; y < numRowsPerBuffer; ++y) {
-            // For higher
             for (int i = 0; i < bytesPerRow; i += 4) {
-                int u = higher[0], y1 = higher[1], v = higher[2], y2 = higher[3];
+                int u = buffer[0], y1 = buffer[1], v = buffer[2], y2 = buffer[3];
                 int r, g, b;
                 convertUVY2RGBA(u, v, y1, &r, &g, &b);
-                currentPixelData_[pos++] = b + (g << 8) + (r << 16);
+                pixels[pos++] = b + (g << 8) + (r << 16);
                 convertUVY2RGBA(u, v, y2, &r, &g, &b);
-                currentPixelData_[pos++] = b + (g << 8) + (r << 16);
-                higher += 4;
-            }
-            // For lower
-            for (int i = 0; i < bytesPerRow; i += 4) {
-                int u = lower[0], y1 = lower[1], v = lower[2], y2 = lower[3];
-                int r, g, b;
-                convertUVY2RGBA(u, v, y1, &r, &g, &b);
-                currentPixelData_[pos++] = b + (g << 8) + (r << 16);
-                convertUVY2RGBA(u, v, y2, &r, &g, &b);
-                currentPixelData_[pos++] = b + (g << 8) + (r << 16);
-                lower += 4;
+                pixels[pos++] = b + (g << 8) + (r << 16);
+                buffer += 4;
             }
         }
 
+        SDL_UnlockSurface(currentSurface_.get());
         cond_.notify_one();
     };
 
@@ -71,17 +70,20 @@ bool SyntekSource::start()
 
 UniqueSDLSurface SyntekSource::getNextFrame()
 {
-    if (!currentPixelData_)
+    if (!currentSurface_.get())
         return makeUniqueSDLSurface(nullptr);
 
-    SDL_Surface* surface = SDL_CreateRGBSurface(0, width(), height(), 32, 0, 0, 0, 0);
     unique_lock<mutex> lock(mu_);
     cond_.wait(lock);
 
-    CHECK_EQ(SDL_LockSurface(surface), 0);
-    memmove(surface->pixels, currentPixelData_.get(), width() * height() * sizeof(int));
-    SDL_UnlockSurface(surface);
-    return makeUniqueSDLSurface(surface);
+    UniqueSDLSurface surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, 640, 224, 32, 0, 0, 0, 0)));
+    CHECK_EQ(SDL_LockSurface(currentSurface_.get()), 0);
+    // 720x240 -> 640x224
+    const SDL_Rect srcRect { 40, 8, 640, 224 };
+    SDL_BlitScaled(currentSurface_.get(), &srcRect, surf.get(), nullptr);
+    SDL_UnlockSurface(currentSurface_.get());
+
+    return std::move(surf);
 }
 
 void SyntekSource::runLoop()
