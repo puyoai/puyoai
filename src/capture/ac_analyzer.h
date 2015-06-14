@@ -4,6 +4,7 @@
 #include "base/base.h"
 #include "capture/analyzer.h"
 #include "gui/bounding_box.h"  // TODO(mayah): Consider removing this
+#include "recognition/recognizer.h"
 
 struct Box;
 struct HSV;
@@ -15,7 +16,14 @@ public:
     virtual ~ACAnalyzer();
 
     enum class AllowOjama { DONT_ALLOW_OJAMA, ALLOW_OJAMA };
-    RealColor analyzeBox(const SDL_Surface* surface, const Box& b, AllowOjama = AllowOjama::ALLOW_OJAMA, bool showsColor = false) const;
+    enum class ShowDebugMessage { DONT_SHOW_DEBUG, SHOW_DEBUG_MESSAGE };
+
+    RealColor analyzeBox(const SDL_Surface*,
+                         const Box&,
+                         AllowOjama = AllowOjama::ALLOW_OJAMA,
+                         ShowDebugMessage = ShowDebugMessage::DONT_SHOW_DEBUG) const;
+
+    RealColor analyzeBoxWithRecognizer(const SDL_Surface*, const Box&) const;
 
     // Draw each pixel of |surface| with RealColor. This is helpful for image analyzing test.
     void drawWithAnalysisResult(SDL_Surface*);
@@ -36,6 +44,8 @@ private:
     bool isDead(int playerId, const SDL_Surface*);
 
     void drawBoxWithAnalysisResult(SDL_Surface*, const Box&);
+
+    Recognizer recognizer_;
 };
 
 #endif
