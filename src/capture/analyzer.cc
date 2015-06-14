@@ -288,7 +288,7 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
 
         if (isNormalColor(axisColor) && isNormalColor(childColor)) {
             int k = ++result->next1Puyos[make_pair(axisColor, childColor)];
-            if (k >= 3) {
+            if (k >= 5) {
                 result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_AXIS, axisColor);
                 result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_CHILD, childColor);
                 result->next1Puyos.clear();
@@ -393,7 +393,7 @@ void Analyzer::analyzeNextForStateNext2WillDisappear(const DetectedField& detect
 
     if (axisColor == RealColor::RC_EMPTY || childColor == RealColor::RC_EMPTY) {
         result->framesWhileNext2Disappearing += 1;
-        if (result->framesWhileNext2Disappearing >= 2) {
+        if (result->framesWhileNext2Disappearing >= 6) {
             result->nextPuyoState = NextPuyoState::NEXT2_WILL_APPEAR;
             result->framesWhileNext2Disappearing = 0;
             return;
@@ -562,7 +562,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
             result->framesAfterFloorGetsStable_++;
         }
 
-        if (result->framesAfterFloorGetsStable_ > 3) {
+        if (result->framesAfterFloorGetsStable_ > 6) {
             shouldUpdateField = true;
             shouldResetCurrentState = true;
             result->userEvent.decisionRequestAgain = true;

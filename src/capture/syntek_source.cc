@@ -12,8 +12,8 @@ using namespace std;
 SyntekSource::SyntekSource() :
     currentSurface_(emptyUniqueSDLSurface())
 {
-    width_ = 640;
-    height_ = 448;
+    width_ = 320;
+    height_ = 224;
     ok_ = false;
 
     driver_ = SyntekDriver::open();
@@ -38,7 +38,7 @@ bool SyntekSource::start()
                            int bytesPerRow,
                            int numRowsPerBuffer) {
         lock_guard<mutex> lock(mu_);
-        CHECK_EQ(SDL_LockSurface(currentSurface_.get()), 0);
+        // CHECK_EQ(SDL_LockSurface(currentSurface_.get()), 0);
 
         int* pixels = static_cast<int*>(currentSurface_->pixels);
 
@@ -56,7 +56,7 @@ bool SyntekSource::start()
             }
         }
 
-        SDL_UnlockSurface(currentSurface_.get());
+        // SDL_UnlockSurface(currentSurface_.get());
         cond_.notify_one();
     };
 
@@ -76,12 +76,13 @@ UniqueSDLSurface SyntekSource::getNextFrame()
     unique_lock<mutex> lock(mu_);
     cond_.wait(lock);
 
-    UniqueSDLSurface surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, 640, 224, 32, 0, 0, 0, 0)));
-    CHECK_EQ(SDL_LockSurface(currentSurface_.get()), 0);
+    UniqueSDLSurface surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, 320, 224, 32, 0, 0, 0, 0)));
+    // CHECK_EQ(SDL_LockSurface(currentSurface_.get()), 0);
     // 720x240 -> 640x224
-    const SDL_Rect srcRect { 40, 8, 640, 224 };
+    const SDL_Rect srcRect { 37, 8, 640, 224 };
     SDL_BlitScaled(currentSurface_.get(), &srcRect, surf.get(), nullptr);
-    SDL_UnlockSurface(currentSurface_.get());
+    // SDL_BlitSurface(currentSurface_.get(), nullptr, surf.get(), nullptr);
+    // SDL_UnlockSurface(currentSurface_.get());
 
     return std::move(surf);
 }

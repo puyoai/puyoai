@@ -58,10 +58,17 @@ void Capture::runLoop()
 void Capture::draw(Screen* screen)
 {
     SDL_Surface* surface = screen->surface();
+    if (!surface)
+        return;
 
     lock_guard<mutex> lock(mu_);
-    SDL_BlitSurface(surface_.get(), nullptr, surface, nullptr);
+
+    if (!surface_.get())
+        return;
+
     surface->userdata = surface_->userdata;
+    SDL_Rect dstRect = screen->mainBox().toSDLRect();
+    SDL_BlitScaled(surface_.get(), nullptr, surface, &dstRect);
 }
 
 unique_ptr<AnalyzerResult> Capture::analyzerResult() const

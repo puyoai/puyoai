@@ -520,8 +520,8 @@ void WiiConnectServer::draw(Screen* screen)
         return;
 
     surface->userdata = surface_->userdata;
-    SDL_Rect rect = screen->mainBox().toSDLRect();
-    SDL_BlitScaled(surface_.get(), nullptr, surface, &rect);
+    SDL_Rect dstRect = screen->mainBox().toSDLRect();
+    SDL_BlitScaled(surface_.get(), nullptr, surface, &dstRect);
 }
 
 unique_ptr<AnalyzerResult> WiiConnectServer::analyzerResult() const

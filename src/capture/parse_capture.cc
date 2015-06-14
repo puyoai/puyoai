@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 
     unique_ptr<FPSDrawer> fpsDrawer(new FPSDrawer);
 
-    MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
+    MainWindow mainWindow(640, 448, Box(0, 0, 640, 448));
     mainWindow.addDrawer(&capture);
     if (saver.get())
         mainWindow.addDrawer(saver.get());
