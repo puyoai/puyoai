@@ -21,10 +21,14 @@ class Evaluator {
  private:
   int EvalField(const CoreField& field, std::string* message);
   int EvalRensa(const RefPlan& plan, std::string* message);
-  
+
+  // Field related eval functions
   int PatternMatch(const CoreField& field, std::string* message);
   int Field(const CoreField& field);
   int Future(const CoreField& field);
+
+  // Eval functions for Rensa.
+  int EvalTsubushi(const RefPlan& plan);
 
   const PlayerState& me;
   const PlayerState& enemy;
