@@ -92,7 +92,7 @@ void WiiConnectServer::runLoop()
     UniqueSDLSurface prev2Surface(emptyUniqueSDLSurface());
 
     while (!shouldStop_) {
-        UniqueSDLSurface surface(source_->getNextFrame());
+        UniqueSDLSurface surface(source_->nextFrame());
         if (!surface.get()) {
             ++noSurfaceCount;
             LOG(INFO) << "No surface?: count=" << noSurfaceCount << endl;

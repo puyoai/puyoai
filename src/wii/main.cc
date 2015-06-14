@@ -11,7 +11,6 @@
 
 #include "capture/ac_analyzer.h"
 #include "capture/capture.h"
-#include "capture/screen_shot_saver.h"
 #include "capture/somagic_source.h"
 #include "capture/syntek_source.h"
 #include "capture/movie_source.h"
@@ -119,11 +118,9 @@ int main(int argc, char* argv[])
 
     CHECK(source->ok());
 
-    unique_ptr<ScreenShotSaver> saver;
     if (FLAGS_save_screenshot) {
+        source->setSavesScreenShot(true);
         cout << "save screenshot: on" << endl;
-        saver.reset(new ScreenShotSaver);
-        saver->setDrawsFrameId(true);
     }
 
     WiiConnectServer server(source.get(), analyzer.get(),
@@ -160,8 +157,6 @@ int main(int argc, char* argv[])
     }
 
     mainWindow->addDrawer(&server);
-    if (saver.get())
-        mainWindow->addDrawer(saver.get());
     if (analyzerResultDrawer.get())
         mainWindow->addDrawer(analyzerResultDrawer.get());
     if (movieSourceKeyListener.get())

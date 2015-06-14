@@ -12,7 +12,6 @@ add_library(puyoai_capture
             movie_source.cc
             movie_source_key_listener.cc
             real_color_field.cc
-            screen_shot_saver.cc
             source.cc
             usb_device.cc)
 
