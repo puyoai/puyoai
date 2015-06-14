@@ -11,6 +11,8 @@
 
 using namespace std;
 
+DEFINE_string(recognition_dir, RECOGNITION_DIR, "the directory path to recognition dir.");
+
 namespace {
 const int BOX_THRESHOLD = 20;
 const int SMALLER_BOX_THRESHOLD = 7;
@@ -93,7 +95,8 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
     return result;
 }
 
-ACAnalyzer::ACAnalyzer()
+ACAnalyzer::ACAnalyzer() :
+    recognizer_(FLAGS_recognition_dir)
 {
 }
 
@@ -102,7 +105,7 @@ ACAnalyzer::~ACAnalyzer()
 }
 
 RealColor ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
-                                 ACAnalyzer::AllowOjama allowOjama, bool showsColor) const
+                                 AllowOjama allowOjama, ShowDebugMessage showsColor) const
 {
     int colorCount[NUM_REAL_COLORS] {};
 
@@ -118,7 +121,7 @@ RealColor ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
 
             RealColor rc = toRealColor(hsv);
 
-            if (showsColor) {
+            if (showsColor == ShowDebugMessage::SHOW_DEBUG_MESSAGE) {
                 // TODO(mayah): stringstream?
                 char buf[240];
                 sprintf(buf, "%3d %3d : %3d %3d %3d : %7.3f %7.3f %7.3f : %s",
@@ -131,7 +134,7 @@ RealColor ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
         }
     }
 
-    if (showsColor) {
+    if (showsColor == ShowDebugMessage::SHOW_DEBUG_MESSAGE) {
         cout << "Color count:" << endl;
         for (int i = 0; i < NUM_REAL_COLORS; ++i) {
             RealColor rc = intToRealColor(i);
@@ -146,7 +149,28 @@ RealColor ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
     int threshold = (area >= 16 * 14) ? BOX_THRESHOLD : SMALLER_BOX_THRESHOLD;
 
     return estimateRealColorFromColorCount(colorCount, threshold, allowOjama);
+}
 
+RealColor ACAnalyzer::analyzeBoxWithRecognizer(const SDL_Surface* surface, const Box& b) const
+{
+    CHECK_EQ(16, b.dx - b.sx);
+    CHECK_EQ(16, b.dy - b.sy);
+
+    int pos = 0;
+    double features[16 * 16 * 3];
+    for (int by = b.sy; by < b.dy; ++by) {
+        for (int bx = b.sx; bx < b.dx; ++bx) {
+            Uint32 c = getpixel(surface, bx, by);
+            Uint8 r, g, b;
+            SDL_GetRGB(c, surface->format, &r, &g, &b);
+
+            features[pos++] = r;
+            features[pos++] = g;
+            features[pos++] = b;
+        }
+    }
+    CHECK_EQ(16 * 16 * 3, pos);
+    return recognizer_.recognize(features);
 }
 
 CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
@@ -190,8 +214,13 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
     // detect field
     for (int y = 1; y <= 12; ++y) {
         for (int x = 1; x <= 6; ++x) {
-            Box b = BoundingBox::boxForAnalysis(pi, x, y).shrink(1);
-            RealColor rc = analyzeBox(surface, b);
+            Box b = BoundingBox::boxForAnalysis(pi, x, y);
+            RealColor rc = analyzeBox(surface, b.shrink(1), AllowOjama::ALLOW_OJAMA);
+
+            if (rc == RealColor::RC_YELLOW) {
+                rc = analyzeBoxWithRecognizer(surface, b);
+            }
+
             result->field.set(x, y, rc);
         }
     }

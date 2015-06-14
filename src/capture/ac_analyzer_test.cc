@@ -228,52 +228,6 @@ TEST_F(ACAnalyzerTest, analyzeFieldOjama)
 
 }
 
-TEST_F(ACAnalyzerTest, DISABLED_exhaustivePuyoDetection)
-{
-    const int WIDTH = 16;
-    const int HEIGHT = 16;
-
-    const pair<string, RealColor> testcases[] = {
-        make_pair((FLAGS_testdata_dir + "/images/puyo/empty.png"), RealColor::RC_EMPTY),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/empty-blur.png"), RealColor::RC_EMPTY),
-
-        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama.png"), RealColor::RC_OJAMA),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama-blur.png"), RealColor::RC_OJAMA),
-
-        make_pair((FLAGS_testdata_dir + "/images/puyo/red.png"), RealColor::RC_RED),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/red-blur.png"), RealColor::RC_RED),
-
-        make_pair((FLAGS_testdata_dir + "/images/puyo/blue.png"), RealColor::RC_BLUE),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/blue-blur.png"), RealColor::RC_BLUE),
-
-        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow.png"), RealColor::RC_YELLOW),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow-blur.png"), RealColor::RC_YELLOW),
-
-        make_pair((FLAGS_testdata_dir + "/images/puyo/green.png"), RealColor::RC_GREEN),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/green-blur.png"), RealColor::RC_GREEN),
-
-        make_pair((FLAGS_testdata_dir + "/images/puyo/purple.png"), RealColor::RC_PURPLE),
-        make_pair((FLAGS_testdata_dir + "/images/puyo/purple-blur.png"), RealColor::RC_PURPLE),
-    };
-
-    ACAnalyzer analyzer;
-    for (const auto& testcase : testcases) {
-        const string& filename = testcase.first;
-        const RealColor color = testcase.second;
-
-        UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(filename.c_str())));
-
-        for (int x = 0; (x + 1) * WIDTH <= surf->w; ++x) {
-            for (int y = 0; (y + 1) * HEIGHT <= surf->h; ++y) {
-                Box b(x * WIDTH, y * HEIGHT, (x + 1) * WIDTH, (y + 1) * HEIGHT);
-
-                RealColor rc = analyzer.analyzeBox(surf.get(), b);
-                EXPECT_EQ(color, rc) << "filename=" << filename << " x=" << x << " y=" << y;
-            }
-        }
-    }
-}
-
 TEST_F(ACAnalyzerTest, wnextDetection)
 {
     struct Testcase {
@@ -519,6 +473,53 @@ TEST_F(ACAnalyzerTest, gameStart)
             if (c2[3] != '-') EXPECT_EQ(toRealColor(c2[3]), p2->adjustedField.realColor(NextPuyoPosition::NEXT1_CHILD)) << "Player2 : Frame " << i;
             if (c2[4] != '-') EXPECT_EQ(toRealColor(c2[4]), p2->adjustedField.realColor(NextPuyoPosition::NEXT2_AXIS)) << "Player2 : Frame " << i;
             if (c2[5] != '-') EXPECT_EQ(toRealColor(c2[5]), p2->adjustedField.realColor(NextPuyoPosition::NEXT2_CHILD)) << "Player2 : Frame " << i;
+        }
+    }
+}
+
+TEST_F(ACAnalyzerTest, exhaustivePuyoDetection)
+{
+    const int WIDTH = 16;
+    const int HEIGHT = 16;
+
+    const pair<string, RealColor> testcases[] = {
+        make_pair((FLAGS_testdata_dir + "/images/puyo/empty.png"), RealColor::RC_EMPTY),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/empty-blur.png"), RealColor::RC_EMPTY),
+
+        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama.png"), RealColor::RC_OJAMA),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/ojama-blur.png"), RealColor::RC_OJAMA),
+
+        make_pair((FLAGS_testdata_dir + "/images/puyo/red.png"), RealColor::RC_RED),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/red-blur.png"), RealColor::RC_RED),
+
+        make_pair((FLAGS_testdata_dir + "/images/puyo/blue.png"), RealColor::RC_BLUE),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/blue-blur.png"), RealColor::RC_BLUE),
+
+        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow.png"), RealColor::RC_YELLOW),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/yellow-blur.png"), RealColor::RC_YELLOW),
+
+        make_pair((FLAGS_testdata_dir + "/images/puyo/green.png"), RealColor::RC_GREEN),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/green-blur.png"), RealColor::RC_GREEN),
+
+        make_pair((FLAGS_testdata_dir + "/images/puyo/purple.png"), RealColor::RC_PURPLE),
+        make_pair((FLAGS_testdata_dir + "/images/puyo/purple-blur.png"), RealColor::RC_PURPLE),
+    };
+
+    ACAnalyzer analyzer;
+    for (const auto& testcase : testcases) {
+        const string& filename = testcase.first;
+        const RealColor color = testcase.second;
+
+        UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(filename.c_str())));
+        ASSERT_TRUE(surf.get());
+
+        for (int x = 0; (x + 1) * WIDTH <= surf->w; ++x) {
+            for (int y = 0; (y + 1) * HEIGHT <= surf->h; ++y) {
+                Box b(x * WIDTH, y * HEIGHT, (x + 1) * WIDTH, (y + 1) * HEIGHT);
+
+                RealColor rc = analyzer.analyzeBoxWithRecognizer(surf.get(), b);
+                EXPECT_EQ(color, rc) << "filename=" << filename << " x=" << x << " y=" << y;
+            }
         }
     }
 }

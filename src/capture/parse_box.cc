@@ -95,7 +95,8 @@ int main(int argc, char* argv[])
         b.sy += b.h() / 2;
     }
 
-    RealColor rc = analyzer.analyzeBox(surf.get(), b, allowOjama, true);
+    const ACAnalyzer::ShowDebugMessage showsDebugMessage = ACAnalyzer::ShowDebugMessage::SHOW_DEBUG_MESSAGE;
+    RealColor rc = analyzer.analyzeBox(surf.get(), b, allowOjama, showsDebugMessage);
     cout << "Color: " << rc << endl;
 
     analyzer.drawWithAnalysisResult(surf.get());

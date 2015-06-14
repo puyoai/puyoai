@@ -13,95 +13,15 @@
 #include "core/real_color.h"
 #include "gui/unique_sdl_surface.h"
 #include "gui/util.h"
+#include "recognition/arow.h"
 
 DECLARE_string(testdata_dir);
 
 using namespace std;
 
-class Arow {
-public:
-    Arow() : SIZE(16 * 16 * 3), RATE(0.1), mean(SIZE), cov(SIZE)
-    {
-        std::fill(cov.begin(), cov.end(), 1.0);
-    }
-
-    double margin(const vector<double>& features) const
-    {
-        double result = 0.0;
-        for (int i = 0; i < SIZE; ++i) {
-            result += mean[i] * features[i];
-        }
-        return result;
-    }
-
-    double confidence(const vector<double>& features) const
-    {
-        double result = 0.0;
-        for (int i = 0; i < SIZE; ++i) {
-            result += cov[i] * features[i] * features[i];
-        }
-        return result;
-    }
-
-    int update(const vector<double>& features, int label)
-    {
-        double m = margin(features);
-        int loss = m * label < 0 ? 1 : 0;
-        if (m * label >= 1)
-            return 0;
-
-        double v = confidence(features);
-        double beta = 1.0 / (v + RATE);
-        double alpha = (1.0 - label * m) * beta;
-
-        // update mean
-        for (int i = 0; i < SIZE; ++i) {
-            mean[i] += alpha * label * cov[i] * features[i];
-        }
-
-        // update covariance
-        for (int i = 0; i < SIZE; ++i) {
-            cov[i] = 1.0 / ((1.0 / cov[i]) + features[i] * features[i] / RATE);
-        }
-
-        return loss;
-    }
-
-    int predict(const vector<double>& features) const
-    {
-        double m = margin(features);
-        return m > 0 ? 1 : -1;
-    }
-
-    void save(const char* filename) const
-    {
-        FILE* fp = fopen(filename, "wb");
-        PCHECK(fp);
-
-        fwrite(&mean[0], sizeof(double), SIZE, fp);
-        fwrite(&cov[0], sizeof(double), SIZE, fp);
-
-        fclose(fp);
-    }
-
-private:
-    const int SIZE;
-    const double RATE;
-    vector<double> mean;
-    vector<double> cov;
-};
-
-enum class RecognitionColor {
-    RED,
-    BLUE,
-    YELLOW,
-    GREEN,
-    PURPLE,
-    EMPTY,
-    OJAMA,
-    ZENKESHI
-};
-const int NUM_RECOGNITION = 8;
+// Before running this trainer, run
+// $ tar zxvf recognition.tgz
+// in testdata/images directory.
 
 // ----------------------------------------------------------------------
 
@@ -143,8 +63,8 @@ int main()
 
             int pos = 0;
             vector<double> fs(WIDTH * HEIGHT * 3);
-            for (int x = 0; x < WIDTH; ++x) {
-                for (int y = 0; y < HEIGHT; ++y) {
+            for (int y = 0; y < HEIGHT; ++y) {
+                for (int x = 0; x < WIDTH; ++x) {
                     std::uint32_t c = getpixel(surf.get(), x, y);
                     std::uint8_t r, g, b;
                     SDL_GetRGB(c, surf->format, &r, &g, &b);
@@ -190,8 +110,8 @@ int main()
             for (int y = 0; (y + 1) * HEIGHT <= surf->h; ++y) {
                 int pos = 0;
                 vector<double> fs(WIDTH * HEIGHT * 3);
-                for (int xx = 0; xx < WIDTH; ++xx) {
-                    for (int yy = 0; yy < HEIGHT; ++yy) {
+                for (int yy = 0; yy < HEIGHT; ++yy) {
+                    for (int xx = 0; xx < WIDTH; ++xx) {
                         std::uint32_t c = getpixel(surf.get(), x * WIDTH + xx, y * HEIGHT + yy);
                         std::uint8_t r, g, b;
                         SDL_GetRGB(c, surf->format, &r, &g, &b);
