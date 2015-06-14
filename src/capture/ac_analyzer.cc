@@ -14,7 +14,7 @@ using namespace std;
 DEFINE_string(recognition_dir, RECOGNITION_DIR, "the directory path to recognition dir.");
 
 namespace {
-const int BOX_THRESHOLD = 20;
+const int BOX_THRESHOLD = 15;
 const int SMALLER_BOX_THRESHOLD = 7;
 }
 
