@@ -52,22 +52,73 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
   // - UKE : assume 1, 2 lines of ojama. 5 lines in case of ZENKESHI, and eval again.
 
   int score = 0;
+  std::ostringstream oss;
+
   score += PatternMatch(field, message);
   score += Field(field);
-  score += Future(field);
+
+  {  // Evaluate possible rensa.
+    int value = Future(field);
+    if (value > 0) {
+      oss << "Future(" << value << ")_";
+      score += value;
+    }
+  }
+
+  *message = oss.str();
   return score;
 }
 
 int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
-  // Evaluate rensa
-  // - TSUBUSHI : how quickly rensa ends. 2 or more lines.
-  // - TAIOU : how small rensa is firable.
+  if (!plan.isRensaPlan())
+    return 0;
 
+  // Evaluate rensa
+  // o TSUBUSHI : how quickly rensa ends. 2 or more lines.
+  // - TAIOU : how small rensa is firable.
   int score = 0;
-  score += plan.score();
   std::ostringstream oss;
-  oss << "Rensa(" << score << ")";
+
+  {  // Basic rensa plan
+    int value = plan.score();
+    if (value > 0) {
+      oss << "Rensa(" << value << ")_";
+      score += value;
+    }
+  }
+
+  {  // Zenkeshi
+    int value = (plan.field().countPuyos() == 0) ? ZENKESHI_BONUS : 0;
+    if (value > 0) {
+      oss << "Zenkeshi(" << value << ")_";
+      score += value;
+    }
+  }
+
+  {  // TSUBUSHI : how quickly rensa ends. 2 or more lines.
+    int value = EvalTsubushi(plan);
+    if (value > 0) {
+      oss << "Tsubushi(" << value << ")_";
+      score += value;
+    }
+  }
+
   *message = oss.str();
+  return score;
+}
+
+int Evaluator::EvalTsubushi(const RefPlan& plan) {
+  int score = 0;
+
+  static const int kLines = 2;
+  if (enemy_hands.firables.size() == 0
+      && plan.score() >= kLines * FieldConstant::WIDTH * SCORE_FOR_OJAMA
+      && plan.chains() <= 2) {
+    score += plan.score();
+    if (plan.decisions().size() == 1)
+      score *= 2;
+  }
+
   return score;
 }
 
@@ -117,9 +168,9 @@ int Evaluator::Future(const CoreField& field) {
   std::vector<int> expects;
   Plan::iterateAvailablePlans(
       field, KumipuyoSeq(), 1,
-      [&expects](const RefPlan& p) {
-        if (p.isRensaPlan())
-          expects.push_back(p.rensaResult().score);
+      [&expects](const RefPlan& plan) {
+        if (plan.isRensaPlan())
+          expects.push_back(plan.score());
       });
   int value = std::accumulate(expects.begin(), expects.end(), 0);
   if (expects.size()) {
