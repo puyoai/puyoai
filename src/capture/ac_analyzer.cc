@@ -273,8 +273,8 @@ bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
 
     int area = 0;
     double diffSum = 0;
-    for (int by = box.sy; by <= box.dy; ++by) {
-        for (int bx = box.sx; bx <= box.dx; ++bx) {
+    for (int by = box.sy; by < box.dy; ++by) {
+        for (int bx = box.sx; bx <  box.dx; ++bx) {
             Uint32 c1 = getpixel(currentSurface, bx, by);
             Uint8 r1, g1, b1;
             SDL_GetRGB(c1, currentSurface->format, &r1, &g1, &b1);
@@ -312,8 +312,8 @@ bool ACAnalyzer::isLevelSelect(const SDL_Surface* surface)
 
     for (const Box& b : boxes) {
         int whiteCount = 0;
-        for (int bx = b.sx; bx <= b.dx; ++bx) {
-            for (int by = b.sy; by <= b.dy; ++by) {
+        for (int bx = b.sx; bx < b.dx; ++bx) {
+            for (int by = b.sy; by < b.dy; ++by) {
                 Uint32 c = getpixel(surface, bx, by);
                 Uint8 r, g, b;
                 SDL_GetRGB(c, surface->format, &r, &g, &b);
@@ -339,8 +339,8 @@ bool ACAnalyzer::isGameFinished(const SDL_Surface* surface)
     Box b = BoundingBox::boxForAnalysis(BoundingBox::Region::GAME_FINISHED);
 
     int whiteCount = 0;
-    for (int bx = b.sx; bx <= b.dx; ++bx) {
-        for (int by = b.sy; by <= b.dy; ++by) {
+    for (int bx = b.sx; bx < b.dx; ++bx) {
+        for (int by = b.sy; by < b.dy; ++by) {
             Uint32 c = getpixel(surface, bx, by);
             Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
@@ -375,8 +375,8 @@ bool ACAnalyzer::isMatchEnd(const SDL_Surface* surface)
     int red = 0;
     int blue = 0;
 
-    for (int x = b1.dx; x <= b2.dx; ++x) {
-        for (int y = b1.dy; y <= b2.dy; ++y) {
+    for (int x = b1.dx; x < b2.dx; ++x) {
+        for (int y = b1.dy; y < b2.dy; ++y) {
             Uint32 c = getpixel(surface, x, y);
             Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
@@ -428,8 +428,8 @@ void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
 
 void ACAnalyzer::drawBoxWithAnalysisResult(SDL_Surface* surface, const Box& box)
 {
-    for (int by = box.sy; by <= box.dy; ++by) {
-        for (int bx = box.sx; bx <= box.dx; ++bx) {
+    for (int by = box.sy; by < box.dy; ++by) {
+        for (int bx = box.sx; bx < box.dx; ++bx) {
             Uint32 c = getpixel(surface, bx, by);
             Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
