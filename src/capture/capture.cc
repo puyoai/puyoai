@@ -37,7 +37,7 @@ void Capture::runLoop()
     UniqueSDLSurface prev2Surface(emptyUniqueSDLSurface());
 
     while (!shouldStop_) {
-        UniqueSDLSurface surface(source_->getNextFrame());
+        UniqueSDLSurface surface(source_->nextFrame());
         if (!surface.get())
             continue;
 

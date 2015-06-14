@@ -3,7 +3,6 @@
 
 #include "capture/ac_analyzer.h"
 #include "capture/capture.h"
-#include "capture/screen_shot_saver.h"
 #include "capture/movie_source.h"
 #include "capture/movie_source_key_listener.h"
 #include "gui/bounding_box_drawer.h"
@@ -40,16 +39,15 @@ int main(int argc, char* argv[])
     }
     source.setFPS(FLAGS_fps);
 
+    if (FLAGS_save_screenshot)
+        source.setSavesScreenShot(true);
+
     ACAnalyzer analyzer;
     Capture capture(&source, &analyzer);
 
     unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;
     if (FLAGS_draw_result)
         analyzerResultDrawer.reset(new AnalyzerResultDrawer(&capture));
-
-    unique_ptr<ScreenShotSaver> saver;
-    if (FLAGS_save_screenshot)
-        saver.reset(new ScreenShotSaver);
 
     unique_ptr<MovieSourceKeyListener> movieSourceKeyListener;
     if (FLAGS_fps == 0) {
@@ -58,8 +56,6 @@ int main(int argc, char* argv[])
 
     MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
     mainWindow.addDrawer(&capture);
-    if (saver.get())
-        mainWindow.addDrawer(saver.get());
     if (analyzerResultDrawer.get())
         mainWindow.addDrawer(analyzerResultDrawer.get());
     if (movieSourceKeyListener.get())

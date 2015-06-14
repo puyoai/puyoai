@@ -4,7 +4,6 @@
 
 #include "capture/ac_analyzer.h"
 #include "capture/capture.h"
-#include "capture/screen_shot_saver.h"
 #include "capture/somagic_source.h"
 #include "capture/syntek_source.h"
 #include "gui/bounding_box_drawer.h"
@@ -51,16 +50,13 @@ int main(int argc, char* argv[])
     if (FLAGS_draw_result)
         analyzerResultDrawer.reset(new AnalyzerResultDrawer(&capture));
 
-    unique_ptr<ScreenShotSaver> saver;
     if (FLAGS_save_screenshot)
-        saver.reset(new ScreenShotSaver);
+        source->setSavesScreenShot(true);
 
     unique_ptr<FPSDrawer> fpsDrawer(new FPSDrawer);
 
     MainWindow mainWindow(640, 448, Box(0, 0, 640, 448));
     mainWindow.addDrawer(&capture);
-    if (saver.get())
-        mainWindow.addDrawer(saver.get());
     if (analyzerResultDrawer.get())
         mainWindow.addDrawer(analyzerResultDrawer.get());
     if (fpsDrawer.get())

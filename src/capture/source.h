@@ -10,7 +10,7 @@ class Source {
 public:
     virtual ~Source() {}
 
-    virtual UniqueSDLSurface getNextFrame() = 0;
+    UniqueSDLSurface nextFrame();
 
     virtual void handleEvent(const SDL_Event&) {}
     virtual void handleKeys() {}
@@ -24,11 +24,16 @@ public:
     int width() const { return width_; }
     int height() const { return height_; }
 
+    void setSavesScreenShot(bool b) { savesScreenShot_ = b; }
+
 protected:
     Source();
 
+    virtual UniqueSDLSurface getNextFrame() = 0;
+
     bool ok_;
     bool done_;
+    bool savesScreenShot_ = false;
     int width_;
     int height_;
 };
