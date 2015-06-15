@@ -73,7 +73,7 @@ public:
     }
 
     virtual void onUpdate(const GameState& gameState) override {
-        lock_guard<mutex> lock(mu_);
+
         gameState_.reset(new GameState(gameState));
     }
 
@@ -92,6 +92,10 @@ static void ignoreSIGPIPE()
 
     CHECK(sigaction(SIGPIPE, &act, 0) == 0);
 }
+
+#if defined(__CYGWIN__) && defined(main)
+#undef main
+#endif
 
 int main(int argc, char* argv[])
 {

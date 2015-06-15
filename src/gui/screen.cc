@@ -40,7 +40,11 @@ void Screen::init()
 
     char* p = buf;
     while (true) {
+#ifdef __CYGWIN__
+        string font_filename = "data/mikachan-p.ttf";
+#else
         string font_filename = string(p) + "/data/mikachan-p.ttf";
+#endif
         if (access(font_filename.c_str(), R_OK) == 0) {
             font_ = TTF_OpenFont(font_filename.c_str(), 16);
             if (!font_) {

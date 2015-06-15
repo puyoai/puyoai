@@ -6,6 +6,7 @@
 #include <tuple>
 #include <vector>
 
+#include "base/strings.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/core_field.h"
