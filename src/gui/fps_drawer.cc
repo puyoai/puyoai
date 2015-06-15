@@ -4,6 +4,8 @@
 
 #include <SDL_ttf.h>
 
+#include "base/strings.h"
+
 #include "gui/screen.h"
 #include "gui/unique_sdl_surface.h"
 

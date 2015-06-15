@@ -22,4 +22,22 @@ std::string join(const std::vector<std::string>&, const std::string& sep);
 
 }
 
+#ifdef __CYGWIN__
+
+#include <sstream>
+
+namespace std {
+
+template <typename T>
+std::string to_string(const T& v)
+{
+  std::ostringstream ss;
+  ss << v;
+  return ss.str();
+}
+
+}
+
+#endif
+
 #endif
