@@ -12,6 +12,10 @@
 
 #include <glog/logging.h>
 
+#ifdef __CYGWIN__
+#include <Windows.h>
+#endif
+
 #include "base/base.h"
 #include "gui/util.h"
 
@@ -35,16 +39,17 @@ void Screen::init()
     }
 
     char buf[PATH_MAX+1];
+#ifdef __CYGWIN__
+    if (!GetCurrentDirectory(PATH_MAX, buf))
+        PLOG(FATAL) << "buffer is too small for getcwd";
+#else
     if (!getcwd(buf, PATH_MAX))
         PLOG(FATAL) << "buffer is too small for getcwd";
+#endif
 
     char* p = buf;
     while (true) {
-#ifdef __CYGWIN__
-        string font_filename = "data/mikachan-p.ttf";
-#else
         string font_filename = string(p) + "/data/mikachan-p.ttf";
-#endif
         if (access(font_filename.c_str(), R_OK) == 0) {
             font_ = TTF_OpenFont(font_filename.c_str(), 16);
             if (!font_) {
