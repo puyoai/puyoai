@@ -52,7 +52,8 @@ string GameState::toJson() const
     root["n2"] = playerGameState_[1].kumipuyoSeq.toString();
     root["m2"] = playerGameState_[1].message;
 
-    return root.asString();
+    Json::StyledWriter writer;
+    return writer.write(root);
 }
 
 string GameState::toDebugString() const
