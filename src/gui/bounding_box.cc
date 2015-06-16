@@ -28,10 +28,16 @@ Box BoundingBox::boxForDraw(int pi, NextPuyoPosition np)
         case NextPuyoPosition::CURRENT_AXIS:
         case NextPuyoPosition::CURRENT_CHILD:
             return Box(0, 0, 0, 0);
-        case NextPuyoPosition::NEXT1_AXIS:
-            return boxForDraw(0, 8, 9);
-        case NextPuyoPosition::NEXT1_CHILD:
-            return boxForDraw(0, 8, 10);
+        case NextPuyoPosition::NEXT1_AXIS: {
+            Box b = boxForDraw(0, 8, 9);
+            b.moveOffset(-1, 0);
+            return b;
+        }
+        case NextPuyoPosition::NEXT1_CHILD: {
+            Box b =  boxForDraw(0, 8, 10);
+            b.moveOffset(-1, 0);
+            return b;
+        }
         case NextPuyoPosition::NEXT2_AXIS: {
             Box b = boxForDraw(0, 9, 8);
             b.dx = (b.sx + b.dx) / 2;
@@ -48,10 +54,16 @@ Box BoundingBox::boxForDraw(int pi, NextPuyoPosition np)
         case NextPuyoPosition::CURRENT_AXIS:
         case NextPuyoPosition::CURRENT_CHILD:
             return Box(0, 0, 0, 0);
-        case NextPuyoPosition::NEXT1_AXIS:
-            return boxForDraw(1, -1, 9);
-        case NextPuyoPosition::NEXT1_CHILD:
-            return boxForDraw(1, -1, 10);
+        case NextPuyoPosition::NEXT1_AXIS: {
+            Box b = boxForDraw(1, -1, 9);
+            b.moveOffset(1, 0);
+            return b;
+        }
+        case NextPuyoPosition::NEXT1_CHILD: {
+            Box b = boxForDraw(1, -1, 10);
+            b.moveOffset(1, 0);
+            return b;
+        }
         case NextPuyoPosition::NEXT2_AXIS: {
             Box b = boxForDraw(1, -2, 8);
             b.sx = (b.sx + b.dx) / 2;

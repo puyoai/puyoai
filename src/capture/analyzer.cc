@@ -303,7 +303,7 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
 
         if (isNormalColor(axisColor) && isNormalColor(childColor)) {
             int k = ++result->next2Puyos[make_pair(axisColor, childColor)];
-            if (k >= 3) {
+            if (k >= 6) {
                 result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
                 result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
                 // TODO(mayah): Need to check NEXT1 has been found?
@@ -412,7 +412,7 @@ void Analyzer::analyzeNextForStateNext2WillAppear(const DetectedField& detectedF
     if (isNormalColor(axisColor) && isNormalColor(childColor)) {
         pair<RealColor, RealColor> kp(axisColor, childColor);
         result->next2Puyos[kp]++;
-        if (result->next2Puyos[kp] >= 3) {
+        if (result->next2Puyos[kp] >= 6) {
             result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
             result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
             result->nextPuyoState = NextPuyoState::STABLE;
