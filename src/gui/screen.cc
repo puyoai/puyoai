@@ -5,16 +5,15 @@
 #include <limits.h>
 #include <math.h>
 #include <unistd.h>
+#ifdef __CYGWIN__
+#include <Windows.h>
+#endif
 
 #include <iostream>
 #include <sstream>
 #include <string>
 
 #include <glog/logging.h>
-
-#ifdef __CYGWIN__
-#include <Windows.h>
-#endif
 
 #include "base/base.h"
 #include "gui/util.h"
