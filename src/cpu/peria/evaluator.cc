@@ -53,6 +53,7 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
 
   int score = 0;
   std::ostringstream oss;
+  oss << "_";
 
   score += PatternMatch(field, message);
   score += Field(field);
@@ -65,7 +66,7 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
     }
   }
 
-  *message += "_" + oss.str();
+  *message += oss.str();
   return score;
 }
 
@@ -98,7 +99,7 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
   {  // penalty for using too many puyos
     int remained_puyos = me.field.countPuyos() - plan.field().countPuyos();
     int wasted_puyos = std::max(remained_puyos - 4 * plan.chains() - 4, 0);
-    int value = -100 * wasted_puyos * plan.chains() * plan.chains();
+    int value = -200 * plan.chains() * plan.chains() * wasted_puyos;
     if (value < 0) {
       oss << "Waste(" << value << ")_";
       score += value;
