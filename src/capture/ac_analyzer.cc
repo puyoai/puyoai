@@ -37,14 +37,14 @@ static RealColor toRealColor(const HSV& hsv)
     if (180 <= hsv.h && hsv.h <= 255 && 60 < hsv.v)
         return RealColor::RC_BLUE;
     // Detecting purple is really hard. We'd like to have relaxed margin for purple.
-    if (290 <= hsv.h && hsv.h < 340 && 65 < hsv.v)
+    if (290 <= hsv.h && hsv.h < 340 && 50 < hsv.v)
         return RealColor::RC_PURPLE;
 
     // Hard to distinguish RED and PURPLE.
     if (340 <= hsv.h && hsv.h <= 360) {
         if (160 < hsv.s + hsv.v)
             return RealColor::RC_RED;
-        if (65 < hsv.v)
+        if (50 < hsv.v)
             return RealColor::RC_PURPLE;
     }
 
@@ -215,12 +215,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
     for (int y = 1; y <= 12; ++y) {
         for (int x = 1; x <= 6; ++x) {
             Box b = BoundingBox::boxForAnalysis(pi, x, y);
-            RealColor rc = analyzeBox(surface, b.shrink(1), AllowOjama::ALLOW_OJAMA);
-
-            if (rc == RealColor::RC_YELLOW) {
-                rc = analyzeBoxWithRecognizer(surface, b);
-            }
-
+            RealColor rc = analyzeBoxWithRecognizer(surface, b);
             result->field.set(x, y, rc);
         }
     }
@@ -236,10 +231,19 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
 
         for (int i = 0; i < 4; ++i) {
             Box b = BoundingBox::boxForAnalysis(pi, np[i]);
-            if (i == 0 || i == 1) { // only 1p.
-                 b.dx -= 1;
+            if (pi == 0) { // only 1p.
+                // b.moveOffset(-1, 0);
             }
-            RealColor rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
+
+            RealColor rc;
+            if (i == 0 || i == 1) {
+                rc = analyzeBoxWithRecognizer(surface, b);
+                if (rc == RealColor::RC_OJAMA)
+                    rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
+            } else {
+                rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
+            }
+
             result->setRealColor(np[i], rc);
         }
     }
@@ -274,7 +278,7 @@ bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
     int area = 0;
     double diffSum = 0;
     for (int by = box.sy; by < box.dy; ++by) {
-        for (int bx = box.sx; bx <  box.dx; ++bx) {
+        for (int bx = box.sx; bx < box.dx; ++bx) {
             Uint32 c1 = getpixel(currentSurface, bx, by);
             Uint8 r1, g1, b1;
             SDL_GetRGB(c1, currentSurface->format, &r1, &g1, &b1);
@@ -297,8 +301,8 @@ bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
     if (area == 0)
         return false;
 
-    // Usually, (diffSum / area) is around 5. When ojama is dropped, it will be over 20.
-    if (diffSum / area >= 17)
+    // Usually, (diffSum / area) is around 20. When ojama is dropped, it will be over 50.
+    if (diffSum / area >= 40)
         return true;
     return false;
 }
