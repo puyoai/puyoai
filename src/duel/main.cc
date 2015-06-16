@@ -73,7 +73,7 @@ public:
     }
 
     virtual void onUpdate(const GameState& gameState) override {
-
+        lock_guard<mutex> lock(mu_);
         gameState_.reset(new GameState(gameState));
     }
 

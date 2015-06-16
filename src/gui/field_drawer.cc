@@ -29,15 +29,9 @@ static const int PUYO_W = 32;
 static const int PUYO_H = 35;
 
 FieldDrawer::FieldDrawer() :
-#ifdef __CYGWIN__
-    backgroundSurface_(makeUniqueSDLSurface(IMG_Load(string("data/assets/background.png").c_str()))),
-    puyoSurface_(makeUniqueSDLSurface(IMG_Load(string("data/assets/puyo.png").c_str()))),
-    ojamaSurface_(makeUniqueSDLSurface(IMG_Load(string("data/assets/yokoku.png").c_str()))),
-#else
     backgroundSurface_(makeUniqueSDLSurface(IMG_Load((FLAGS_data_dir + "/assets/background.png").c_str()))),
     puyoSurface_(makeUniqueSDLSurface(IMG_Load((FLAGS_data_dir + "/assets/puyo.png").c_str()))),
     ojamaSurface_(makeUniqueSDLSurface(IMG_Load((FLAGS_data_dir + "/assets/yokoku.png").c_str()))),
-#endif
     font_(nullptr)
 {
     font_ = Kanji_OpenFont((FLAGS_data_dir + kJapaneseBdfName).c_str(), kBdfSize);
