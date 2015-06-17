@@ -93,6 +93,7 @@ static void ignoreSIGPIPE()
     CHECK(sigaction(SIGPIPE, &act, 0) == 0);
 }
 
+// TODO(uaua): Without this, we cannot link to libSDLmain.a
 #if defined(__CYGWIN__) && defined(main)
 #undef main
 #endif
