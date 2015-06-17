@@ -28,14 +28,21 @@
     $ cd glog
 
 src/utilities.ccの267行目の
+
     #elif defined OS_WINDOWS || defined OS_CYGWIN
+
 を
+
     #elif defined OS_WINDOWS
 
 src/googletest.hの524行目と557行目の
+
     #if defined(OS_WINDOWS) || defined(OS_CYGWIN)
+
 を
+
     #if defined(OS_WINDOWS)
+
 にして
 
     $ ./configure --prefix=/usr
