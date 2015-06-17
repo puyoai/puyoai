@@ -61,7 +61,7 @@ function(puyoai_add_cxx_flags flags)
     endif()
 endfunction()
 
-if( CYGWIN AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU") )
+if(CYGWIN AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
     puyoai_add_cxx_flags("-Wall -Wextra -std=gnu++11")
 else()
     puyoai_add_cxx_flags("-Wall -Wextra -std=c++11")
