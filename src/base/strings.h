@@ -1,6 +1,9 @@
 #ifndef BASE_STRINGS_H_
 #define BASE_STRINGS_H_
 
+#ifdef __CYGWIN__
+#include <sstream>
+#endif
 #include <string>
 #include <vector>
 
@@ -23,8 +26,6 @@ std::string join(const std::vector<std::string>&, const std::string& sep);
 }
 
 #ifdef __CYGWIN__
-
-#include <sstream>
 
 namespace std {
 
