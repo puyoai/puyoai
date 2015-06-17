@@ -1,11 +1,12 @@
 #ifndef BASE_STRINGS_H_
 #define BASE_STRINGS_H_
 
+#include <string>
+#include <vector>
+
 #ifdef __CYGWIN__
 #include <sstream>
 #endif
-#include <string>
-#include <vector>
 
 namespace strings {
 
@@ -29,12 +30,13 @@ std::string join(const std::vector<std::string>&, const std::string& sep);
 
 namespace std {
 
+// Since cygwin does not have std::to_stirng, we define it here.
 template <typename T>
 std::string to_string(const T& v)
 {
-  std::ostringstream ss;
-  ss << v;
-  return ss.str();
+    std::ostringstream ss;
+    ss << v;
+    return ss.str();
 }
 
 }

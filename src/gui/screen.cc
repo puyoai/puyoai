@@ -5,9 +5,6 @@
 #include <limits.h>
 #include <math.h>
 #include <unistd.h>
-#ifdef __CYGWIN__
-#include <Windows.h>
-#endif
 
 #include <iostream>
 #include <sstream>
@@ -17,6 +14,10 @@
 
 #include "base/base.h"
 #include "gui/util.h"
+
+#ifdef __CYGWIN__
+#include <Windows.h>
+#endif
 
 using namespace std;
 
