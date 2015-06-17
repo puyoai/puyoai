@@ -1,5 +1,6 @@
 #include "pattern_rensa_detector.h"
 
+#include <gflags/gflags.h>
 #include <algorithm>
 
 #include "base/slice.h"

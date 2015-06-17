@@ -82,6 +82,10 @@ private:
 
 // ----------------------------------------------------------------------
 
+#if defined(__CYGWIN__) && defined(main)
+#undef main
+#endif
+
 int main()
 {
     const int WIDTH = 32;

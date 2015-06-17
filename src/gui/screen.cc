@@ -5,6 +5,9 @@
 #include <limits.h>
 #include <math.h>
 #include <unistd.h>
+#ifdef __CYGWIN__
+#include <Windows.h>
+#endif
 
 #include <iostream>
 #include <sstream>
@@ -35,8 +38,13 @@ void Screen::init()
     }
 
     char buf[PATH_MAX+1];
+#ifdef __CYGWIN__
+    if (!GetCurrentDirectory(PATH_MAX, buf))
+        PLOG(FATAL) << "buffer is too small for getcwd";
+#else
     if (!getcwd(buf, PATH_MAX))
         PLOG(FATAL) << "buffer is too small for getcwd";
+#endif
 
     char* p = buf;
     while (true) {

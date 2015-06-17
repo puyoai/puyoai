@@ -93,6 +93,10 @@ static void ignoreSIGPIPE()
     CHECK(sigaction(SIGPIPE, &act, 0) == 0);
 }
 
+#if defined(__CYGWIN__) && defined(main)
+#undef main
+#endif
+
 int main(int argc, char* argv[])
 {
     google::InitGoogleLogging(argv[0]);
