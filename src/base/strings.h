@@ -30,7 +30,7 @@ std::string join(const std::vector<std::string>&, const std::string& sep);
 
 namespace std {
 
-// Since cygwin does not have std::to_stirng, we define it here.
+// Since cygwin does not have std::to_string, we define it here.
 template <typename T>
 std::string to_string(const T& v)
 {
