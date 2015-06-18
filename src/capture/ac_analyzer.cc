@@ -215,7 +215,9 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
     for (int y = 1; y <= 12; ++y) {
         for (int x = 1; x <= 6; ++x) {
             Box b = BoundingBox::boxForAnalysis(pi, x, y);
-            RealColor rc = analyzeBoxWithRecognizer(surface, b);
+            RealColor rc = analyzeBox(surface, b);
+            if (rc == RealColor::RC_YELLOW || rc == RealColor::RC_PURPLE || rc == RealColor::RC_OJAMA)
+                rc = analyzeBoxWithRecognizer(surface, b);
             result->field.set(x, y, rc);
         }
     }
