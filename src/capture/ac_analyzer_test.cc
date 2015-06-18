@@ -126,7 +126,8 @@ TEST_F(ACAnalyzerTest, analyzeField1)
 
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y));
+            EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y))
+                << "x=" << x << " y=" << y;
         }
     }
 }
@@ -167,8 +168,10 @@ TEST_F(ACAnalyzerTest, analyzeField2)
 
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            EXPECT_EQ(field1.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y));
-            EXPECT_EQ(field2.color(x, y), r->playerResult(1)->adjustedField.realColor(x, y));
+            EXPECT_EQ(field1.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y))
+                << "x=" << x << " y=" << y;
+            EXPECT_EQ(field2.color(x, y), r->playerResult(1)->adjustedField.realColor(x, y))
+                << "x=" << x << " y=" << y;
         }
     }
 }
@@ -195,7 +198,8 @@ TEST_F(ACAnalyzerTest, analyzeField3)
 
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y));
+            EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y))
+                << "x=" << x << " y=" << y;
         }
     }
 }
@@ -215,7 +219,8 @@ TEST_F(ACAnalyzerTest, analyzeField4)
 
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y));
+            EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y))
+                << "x=" << x << " y=" << y;
         }
     }
 }
