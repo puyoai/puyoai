@@ -146,16 +146,9 @@ std::unique_ptr<AnalyzerResult> Analyzer::analyze(const SDL_Surface* surface,
                                                   const SDL_Surface* prev2Surface,
                                                   const deque<unique_ptr<AnalyzerResult>>& previousResults)
 {
-    auto gameState = detectGameState(surface);
-    const DetectedField* prevDetectedField1 = nullptr;
-    const DetectedField* prevDetectedField2 = nullptr;
-    if (!previousResults.empty()) {
-        prevDetectedField1 = &previousResults.front()->playerResult(0)->detectedField;
-        prevDetectedField2 = &previousResults.front()->playerResult(1)->detectedField;
-    }
-
-    auto player1FieldResult = detectField(0, surface, prev2Surface);
-    auto player2FieldResult = detectField(1, surface, prev2Surface);
+    CaptureGameState gameState = detectGameState(surface);
+    unique_ptr<DetectedField> player1FieldResult = detectField(0, surface, prev2Surface);
+    unique_ptr<DetectedField> player2FieldResult = detectField(1, surface, prev2Surface);
 
     switch (gameState) {
     case CaptureGameState::UNKNOWN: {
