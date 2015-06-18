@@ -215,6 +215,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
     for (int y = 1; y <= 12; ++y) {
         for (int x = 1; x <= 6; ++x) {
             Box b = BoundingBox::boxForAnalysis(pi, x, y);
+            // TODO(mayah): Consider more robust way.
             RealColor rc = analyzeBox(surface, b);
             if (rc == RealColor::RC_YELLOW || rc == RealColor::RC_PURPLE || rc == RealColor::RC_OJAMA)
                 rc = analyzeBoxWithRecognizer(surface, b);
@@ -233,14 +234,11 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
 
         for (int i = 0; i < 4; ++i) {
             Box b = BoundingBox::boxForAnalysis(pi, np[i]);
-            if (pi == 0) { // only 1p.
-                // b.moveOffset(-1, 0);
-            }
-
             RealColor rc;
             if (i == 0 || i == 1) {
+                // TODO(mayah): Consider more robust way.
                 rc = analyzeBoxWithRecognizer(surface, b);
-                if (rc == RealColor::RC_OJAMA)
+                if (rc == RealColor::RC_OJAMA || rc == RealColor::RC_EMPTY)
                     rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
             } else {
                 rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
