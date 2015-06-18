@@ -15,10 +15,6 @@
 #include "base/base.h"
 #include "gui/util.h"
 
-#ifdef __CYGWIN__
-#include <Windows.h>
-#endif
-
 using namespace std;
 
 Screen::Screen(int width, int height, const Box& mainBox) :
@@ -39,13 +35,8 @@ void Screen::init()
     }
 
     char buf[PATH_MAX+1];
-#ifdef __CYGWIN__
-    if (!GetCurrentDirectory(PATH_MAX, buf))
-        PLOG(FATAL) << "buffer is too small for getcwd";
-#else
     if (!getcwd(buf, PATH_MAX))
         PLOG(FATAL) << "buffer is too small for getcwd";
-#endif
 
     char* p = buf;
     while (true) {
