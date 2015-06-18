@@ -427,7 +427,7 @@ TEST_F(ACAnalyzerTest, nextArrivalIrregular)
     bool pgs[2] = { true, true };
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
-    EXPECT_TRUE(rs[78]->playerResult(1)->userEvent.decisionRequestAgain);
+    EXPECT_TRUE(rs[79]->playerResult(1)->userEvent.decisionRequestAgain);
 }
 
 TEST_F(ACAnalyzerTest, gameStart)
