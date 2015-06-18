@@ -7,8 +7,8 @@ using namespace std;
 
 namespace {
 
-// TODO(mayah): Should we make this 3, since we've seen puyo miscontrolling?
-// However, even 3, I've seen puyo miscontrolling.
+// TODO(mayah): Should we make this 6, since we've seen puyo miscontrolling?
+// However, even 6, I've seen puyo miscontrolling.
 const int NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING = 4;
 
 const int NUM_FRAMES_TO_SEE_FOR_FIELD = 6;
