@@ -14,7 +14,7 @@ const int NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING = 4;
 const int NUM_FRAMES_TO_SEE_FOR_FIELD = 6;
 const int NUM_FRAMES_BEFORE_USER_CAN_PLAY = 4;
 
-const int NUM_FRAMES_DECISION_REQUEST_AGAIN_AFTER_FLOOR_STABLED = 9;
+const int NUM_FRAMES_DECISION_REQUEST_AGAIN_AFTER_FLOOR_STABLED = 6;
 
 // The pointer will be alive while previousResults are alive.
 vector<const PlayerAnalyzerResult*> makePlayerOnlyResults(int pi, const deque<unique_ptr<AnalyzerResult>>& previousResults)

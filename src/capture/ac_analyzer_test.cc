@@ -370,8 +370,7 @@ TEST_F(ACAnalyzerTest, ojamaDrop)
     for (int i = 0; i <= 56; ++i)
         EXPECT_TRUE(rs[i]->playerResult(1)->playable);
     // Around here, analyzer can detect ojama puyo is dropped.
-    EXPECT_FALSE(rs[60]->playerResult(1)->playable);
-    EXPECT_FALSE(rs[62]->playerResult(1)->playable);
+    EXPECT_FALSE(rs[58]->playerResult(1)->playable);
     // Then, next puyo will disappear.
     EXPECT_TRUE(rs[72]->playerResult(1)->playable);
 }
@@ -426,6 +425,12 @@ TEST_F(ACAnalyzerTest, nextArrivalIrregular)
 
     bool pgs[2] = { true, true };
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
+
+#if 0
+    for (int i = 0; i < 92; ++i) {
+      cout << i << " " << rs[i]->playerResult(1)->userEvent.decisionRequestAgain << endl;
+    }
+#endif
 
     EXPECT_TRUE(rs[79]->playerResult(1)->userEvent.decisionRequestAgain);
 }

@@ -301,8 +301,12 @@ bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
     if (area == 0)
         return false;
 
+#if 0
+    cout << "diffSum=" << diffSum << " area=" << area << " ratio=" << (diffSum / area) << endl;
+#endif
+
     // Usually, (diffSum / area) is around 20. When ojama is dropped, it will be over 50.
-    if (diffSum / area >= 40)
+    if (diffSum / area >= 30)
         return true;
     return false;
 }
