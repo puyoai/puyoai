@@ -466,14 +466,12 @@ TEST_F(ACAnalyzerTest, gameStart)
         {  42,  43, "  BBPP", "BBPP  " },
         // Because of fastDecision, we would be able to detect NEXT moving here.
         {  43,  60, "BBPP  ", "BBPP  " },
-        // Player 2, frame 31: Since some stars are located on NEXT2_AXIS,
+        // Player 2, frame 60: Since some stars are located on NEXT2_AXIS,
         // analyzer might consider the axis color is YELLOW.
-        // However, we should fix in frame33 at least.
-        {  60,  64, "BBPP--", "BBPP--" },
-        {  64,  66, "BBPPBB", "BBPP--" },
-        {  66,  95, "BBPPBB", "BBPPBB" },
+        {  60,  67, "BBPP--", "BBPP--" },
+        {  67,  96, "BBPPBB", "BBPPBB" },
         // Player 1, frame 95: next1 will disappear. so next2 is moved to next1 on that time.
-        {  95, 118, "PPBB  ", "BBPPBB" },
+        {  96, 118, "PPBB  ", "BBPPBB" },
         // Player 1, frame 120: Yellow will appeaer. But we will need 3 frames to detect it.
         { 118, 120, "PPBB--", "BBPPBB" },
     };
