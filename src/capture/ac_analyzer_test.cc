@@ -200,6 +200,26 @@ TEST_F(ACAnalyzerTest, analyzeField3)
     }
 }
 
+TEST_F(ACAnalyzerTest, analyzeField4)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/images/field/field4.png");
+
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    const RealColorField field(
+        ".P.G.."
+        ".G.GR."
+        "PRPGR."
+        "RRRPG."
+        "PPPGR.");
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y));
+        }
+    }
+}
+
 TEST_F(ACAnalyzerTest, analyzeFieldOjama)
 {
     const RealColorField field(
