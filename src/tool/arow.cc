@@ -82,11 +82,6 @@ private:
 
 // ----------------------------------------------------------------------
 
-// TODO(uaua): Without this, we cannot link to libSDLMain.a.
-#if defined(__CYGWIN__) && defined(main)
-#undef main
-#endif
-
 int main()
 {
     const int WIDTH = 32;
