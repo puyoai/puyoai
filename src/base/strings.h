@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 
+#ifdef __CYGWIN__
+#include <sstream>
+#endif
+
 namespace strings {
 
 // When |s|'s prefix is prefix, true will be returned.
@@ -21,5 +25,22 @@ std::vector<std::string> split(const std::string& s, char separator);
 std::string join(const std::vector<std::string>&, const std::string& sep);
 
 }
+
+#ifdef __CYGWIN__
+
+namespace std {
+
+// Since cygwin does not have std::to_string, we define it here.
+template <typename T>
+std::string to_string(const T& v)
+{
+    std::ostringstream ss;
+    ss << v;
+    return ss.str();
+}
+
+}
+
+#endif
 
 #endif

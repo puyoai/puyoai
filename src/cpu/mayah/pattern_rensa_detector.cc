@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <gflags/gflags.h>
+
 #include "base/slice.h"
 
 using namespace std;

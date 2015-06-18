@@ -50,29 +50,32 @@ void Ai::onGroundedForEnemy(const FrameRequest& frame_request) {
 
   std::vector<PossibleRensa>& hands = enemy_hands_.firables;
   hands.clear();
-  Plan::iterateAvailablePlans(cf, enemy.kumipuyoSeq, 2,
-                              [&hands](const RefPlan& plan) {
-                                if (plan.chains()) {
-                                  PossibleRensa rensa;
-                                  rensa.frames = plan.totalFrames();
-                                  rensa.score = plan.score();
-                                  rensa.num_required_puyos = 0;
-                                  hands.push_back(rensa);
-                                }
-                              });
+  Plan::iterateAvailablePlans(
+      cf, enemy.kumipuyoSeq, 2,
+      [&frame_request, &hands](const RefPlan& plan) {
+        if (plan.chains()) {
+          PossibleRensa rensa;
+          auto& enemy = frame_request.enemyPlayerFrameRequest();
+          rensa.frames = plan.totalFrames();
+          rensa.score = plan.score() + ((enemy.field.isZenkeshi() && enemy.score >= 40) ? ZENKESHI_BONUS : 0);
+          rensa.num_required_puyos = 0;
+          hands.push_back(rensa);
+        }
+      });
 
   std::vector<PossibleRensa>& possible = enemy_hands_.need_keys;
   possible.clear();
-  RensaDetector::detectIteratively(cf, RensaDetectorStrategy::defaultFloatStrategy(), 2,
-                                   [&possible](CoreField&& cf, const ColumnPuyoList& list) -> RensaResult {
-                                     PossibleRensa rensa;
-                                     RensaResult result = cf.simulate();
-                                     rensa.frames = result.frames;
-                                     rensa.score = result.score;
-                                     rensa.num_required_puyos = list.size();
-                                     possible.push_back(rensa);
-                                     return result;
-                                   });
+  RensaDetector::detectIteratively(
+      cf, RensaDetectorStrategy::defaultFloatStrategy(), 2,
+      [&possible](CoreField&& cf, const ColumnPuyoList& list) -> RensaResult {
+        PossibleRensa rensa;
+        RensaResult result = cf.simulate();
+        rensa.frames = result.frames;
+        rensa.score = result.score;
+        rensa.num_required_puyos = list.size();
+        possible.push_back(rensa);
+        return result;
+      });
 }
 
 }  // namespace peria
