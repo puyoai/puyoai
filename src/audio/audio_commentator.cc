@@ -5,6 +5,7 @@
 #include "glog/logging.h"
 
 #include "audio/audio_server.h"
+#include "base/strings.h"
 #include "core/server/commentator.h"
 #include "core/server/game_state.h"
 

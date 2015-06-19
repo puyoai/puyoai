@@ -7,6 +7,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "base/strings.h"
 #include "base/time.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/plan.h"
