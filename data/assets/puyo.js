@@ -22,7 +22,7 @@ function setPuyoColor(elem, colorName) {
         elem.style.backgroundPosition = "-160px 0px";
         break;
     case ' ':
-        elem.style.backgroundPosition = "-160px -210px";
+        elem.style.backgroundPosition = "-160px -192px";
         break;
     }
 }
@@ -94,7 +94,7 @@ function setMessage(elem, message) {
 
 function init() {
     var kPW = 32;
-    var kPH = 35;
+    var kPH = 32;
 
     var kFieldOffsetX = [1, 1 + kPW * 12];
     var kFieldOffsetY = [kPH * 13, kPH * 13];

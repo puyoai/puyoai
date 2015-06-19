@@ -15,31 +15,16 @@ public:
         GAME_FINISHED,
     };
 
-    static BoundingBox& instance();
+    static Box boxForDraw(int pi, int x, int y);
+    static Box boxForDraw(int pi, NextPuyoPosition);
+    static Box boxForDraw(Region region);
 
-    void setGenerator(double offsetX, double offsetY, double bbWidth, double bbHeight);
-    Box get(int pi, int x, int y) const;
-    Box get(int pi, NextPuyoPosition n) const;
-
-    void setRegion(Region region, const Box& box) { regionBox_[region] = box; }
-    Box getBy(Region region) const {
-        auto it = regionBox_.find(region);
-        if (it != regionBox_.end())
-            return it->second;
-
-        return Box(0, 0, 0, 0);
-    }
-
+    static Box boxForAnalysis(int pi, int x, int y);
+    static Box boxForAnalysis(int pi, NextPuyoPosition);
+    static Box boxForAnalysis(Region region);
 private:
-    BoundingBox();
-    ~BoundingBox();
-
-    double offsetX_;
-    double offsetY_;
-    double bbWidth_;
-    double bbHeight_;
-
-    std::map<Region, Box> regionBox_;
+    BoundingBox() = delete;
+    ~BoundingBox() = delete;
 };
 
 #endif

@@ -65,6 +65,16 @@ void FieldRealtime::init()
     drop_animation_ = false;
 }
 
+void FieldRealtime::setKeySetSeq(const KeySetSeq& kss)
+{
+    KeySetSeq expanded;
+    for (const auto& ks : kss) {
+        expanded.add(ks);
+        expanded.add(ks);
+    }
+    keySetSeq_ = expanded;
+}
+
 bool FieldRealtime::onStateLevelSelect()
 {
     transitToStatePreparingNext();

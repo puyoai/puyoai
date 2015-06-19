@@ -67,7 +67,7 @@ static void drawTrace(Screen* screen, int pi, const RensaChainTrackResult& resul
             if (!n)
                 continue;
 
-            Box b = BoundingBox::instance().get(pi, x, y);
+            Box b = BoundingBox::boxForDraw(pi, x, y);
             b.moveOffset(screen->mainBox().sx, screen->mainBox().sy);
             drawNumber(screen, b, n);
         }

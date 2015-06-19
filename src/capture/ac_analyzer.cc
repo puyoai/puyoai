@@ -11,16 +11,11 @@
 
 using namespace std;
 
-DEFINE_double(bb_x, 69, "bouding box x");
-DEFINE_double(bb_y, 80, "bouding box y");
-DEFINE_double(bb_w, 32, "bouding box w");
-DEFINE_double(bb_h, 32, "bouding box h");
+DEFINE_string(recognition_dir, RECOGNITION_DIR, "the directory path to recognition dir.");
 
 namespace {
-const int BOX_THRESHOLD = 70;
-const int BOX_THRESHOLD_HALF = 50;
-const int SMALLER_BOX_THRESHOLD = 20;
-const int SMALLER_BOX_THRESHOLD_HALF = 15;
+const int BOX_THRESHOLD = 15;
+const int SMALLER_BOX_THRESHOLD = 7;
 }
 
 static RealColor toRealColor(const HSV& hsv)
@@ -28,11 +23,11 @@ static RealColor toRealColor(const HSV& hsv)
     if (hsv.v < 38)
         return RealColor::RC_EMPTY;
 
-    if (hsv.s < 50 && 130 < hsv.v)
+    if (hsv.s < 50 && 120 < hsv.v)
         return RealColor::RC_OJAMA;
 
     // The other colors are relatively easier. A bit tight range for now.
-    if ((hsv.h <= 15 || 350 < hsv.h) && 70 < hsv.v)
+    if (hsv.h <= 15 && 70 < hsv.v)
         return RealColor::RC_RED;
     if (35 <= hsv.h && hsv.h <= 75 && 90 < hsv.v)
         return RealColor::RC_YELLOW;
@@ -42,21 +37,22 @@ static RealColor toRealColor(const HSV& hsv)
     if (180 <= hsv.h && hsv.h <= 255 && 60 < hsv.v)
         return RealColor::RC_BLUE;
     // Detecting purple is really hard. We'd like to have relaxed margin for purple.
-    if (290 <= hsv.h && hsv.h < 340 && 65 < hsv.v)
+    if (290 <= hsv.h && hsv.h < 340 && 50 < hsv.v)
         return RealColor::RC_PURPLE;
 
     // Hard to distinguish RED and PURPLE.
-    if (340 <= hsv.h && hsv.h <= 350) {
+    if (340 <= hsv.h && hsv.h <= 360) {
         if (160 < hsv.s + hsv.v)
             return RealColor::RC_RED;
-        if (65 < hsv.v)
+        if (50 < hsv.v)
             return RealColor::RC_PURPLE;
     }
 
     return RealColor::RC_EMPTY;
 }
 
-static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS], int threshold,
+static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS],
+                                                 int threshold,
                                                  ACAnalyzer::AllowOjama allowOjama = ACAnalyzer::AllowOjama::ALLOW_OJAMA)
 {
     static const RealColor colors[] = {
@@ -72,7 +68,9 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
 
     for (int i = 0; i < 5; ++i) {
         int cnt = colorCount[static_cast<int>(colors[i])];
-        if (cnt > threshold && cnt > maxCount) {
+        if (colors[i] == RealColor::RC_YELLOW)
+            cnt = cnt * 4 / 5;
+        if (cnt >= threshold && cnt > maxCount) {
             result = colors[i];
             maxCount = cnt;
         }
@@ -97,27 +95,23 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
     return result;
 }
 
-ACAnalyzer::ACAnalyzer()
+ACAnalyzer::ACAnalyzer() :
+    recognizer_(FLAGS_recognition_dir)
 {
-    // TODO(mayah): initializing here seems wrong.
-    BoundingBox::instance().setGenerator(FLAGS_bb_x, FLAGS_bb_y, FLAGS_bb_w, FLAGS_bb_h);
-    BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT_1P, Box(260, 256, 270, 280));
-    BoundingBox::instance().setRegion(BoundingBox::Region::LEVEL_SELECT_2P, Box(442, 256, 452, 280));
-    BoundingBox::instance().setRegion(BoundingBox::Region::GAME_FINISHED, Box(292, 352, 420, 367));
 }
 
 ACAnalyzer::~ACAnalyzer()
 {
 }
 
-BoxAnalyzeResult ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
-                                        ACAnalyzer::AllowOjama allowOjama, bool showsColor) const
+RealColor ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
+                                 AllowOjama allowOjama, ShowDebugMessage showsColor) const
 {
-    int colorCount[3][NUM_REAL_COLORS] = { { 0 } };
+    int colorCount[NUM_REAL_COLORS] {};
 
     // We'd like to take padding 1 pixel.
-    for (int by = b.sy + 1; by <= b.dy - 1; ++by) {
-        for (int bx = b.sx + 1; bx <= b.dx - 1; ++bx) {
+    for (int by = b.sy; by < b.dy; ++by) {
+        for (int bx = b.sx; bx < b.dx; ++bx) {
             Uint32 c = getpixel(surface, bx, by);
             Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
@@ -127,7 +121,7 @@ BoxAnalyzeResult ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b
 
             RealColor rc = toRealColor(hsv);
 
-            if (showsColor) {
+            if (showsColor == ShowDebugMessage::SHOW_DEBUG_MESSAGE) {
                 // TODO(mayah): stringstream?
                 char buf[240];
                 sprintf(buf, "%3d %3d : %3d %3d %3d : %7.3f %7.3f %7.3f : %s",
@@ -136,36 +130,76 @@ BoxAnalyzeResult ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b
                 cout << buf << endl;
             }
 
-            colorCount[0][static_cast<int>(rc)]++;
-            colorCount[(by % 2) + 1][static_cast<int>(rc)]++;
+            colorCount[static_cast<int>(rc)]++;
         }
     }
 
-    if (showsColor) {
+    if (showsColor == ShowDebugMessage::SHOW_DEBUG_MESSAGE) {
         cout << "Color count:" << endl;
         for (int i = 0; i < NUM_REAL_COLORS; ++i) {
             RealColor rc = intToRealColor(i);
-            cout << toString(rc) << " : " << colorCount[0][i] << endl;
+            cout << toString(rc) << " : " << colorCount[i] << endl;
         }
     }
 
     // TODO(mayah): This is a bit cryptic.
-    // whole puyo will be 32 x 32 (or 31x31?, anyway 31x31 > 32x30)
+    // whole puyo will be 16 x 16 (or 15x15?, anyway 15x15 > 16x14)
     // WNEXT2 will have smaller area.
     int area = b.w() * b.h();
-    int threshold = (area >= 30 * 32) ? BOX_THRESHOLD : SMALLER_BOX_THRESHOLD;
-    int halfThreshold = (area >= 30 * 32) ? BOX_THRESHOLD_HALF : SMALLER_BOX_THRESHOLD_HALF;
+    int threshold = (area >= 16 * 14) ? BOX_THRESHOLD : SMALLER_BOX_THRESHOLD;
 
-    RealColor rc[3] = {
-        estimateRealColorFromColorCount(colorCount[0], threshold, allowOjama),
-        estimateRealColorFromColorCount(colorCount[1], halfThreshold, allowOjama),
-        estimateRealColorFromColorCount(colorCount[2], halfThreshold, allowOjama),
-    };
+    return estimateRealColorFromColorCount(colorCount, threshold, allowOjama);
+}
 
-    bool vanishing = rc[1] != rc[2] && (rc[1] == RealColor::RC_EMPTY || rc[2] == RealColor::RC_EMPTY);
-    RealColor prc = vanishing ? (rc[1] != RealColor::RC_EMPTY ? rc[1] : rc[2]) : rc[0];
+RealColor ACAnalyzer::analyzeBoxWithRecognizer(const SDL_Surface* surface, const Box& b) const
+{
+    CHECK_EQ(16, b.dx - b.sx);
+    CHECK_EQ(16, b.dy - b.sy);
 
-    return BoxAnalyzeResult(prc, vanishing);
+    int pos = 0;
+    double features[16 * 16 * 3];
+    for (int by = b.sy; by < b.dy; ++by) {
+        for (int bx = b.sx; bx < b.dx; ++bx) {
+            Uint32 c = getpixel(surface, bx, by);
+            Uint8 r, g, b;
+            SDL_GetRGB(c, surface->format, &r, &g, &b);
+
+            features[pos++] = r;
+            features[pos++] = g;
+            features[pos++] = b;
+        }
+    }
+    CHECK_EQ(16 * 16 * 3, pos);
+    return recognizer_.recognize(features);
+}
+
+RealColor ACAnalyzer::analyzeBoxInField(const SDL_Surface* surface, const Box& b) const
+{
+    RealColor rc = analyzeBox(surface, b);
+    switch (rc) {
+    case RealColor::RC_GREEN: {
+        RealColor rc2 = analyzeBoxWithRecognizer(surface, b);
+        if (rc2 == RealColor::RC_EMPTY)
+            rc = rc2;
+        break;
+    }
+    case RealColor::RC_YELLOW: {
+        RealColor rc2 = analyzeBoxWithRecognizer(surface, b);
+        if (rc2 == RealColor::RC_EMPTY || rc2 == RealColor::RC_PURPLE || rc2 == RealColor::RC_OJAMA)
+            rc = rc2;
+        break;
+    }
+    case RealColor::RC_OJAMA: {
+        RealColor rc2 = analyzeBoxWithRecognizer(surface, b);
+        if (rc2 == RealColor::RC_PURPLE)
+            rc = rc2;
+        break;
+    }
+    default:
+        break;
+    }
+
+    return rc;
 }
 
 CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
@@ -202,18 +236,16 @@ CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
 
 unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
                                                   const SDL_Surface* surface,
-                                                  const SDL_Surface* prevSurface)
+                                                  const SDL_Surface* prev2Surface)
 {
     unique_ptr<DetectedField> result(new DetectedField);
 
     // detect field
     for (int y = 1; y <= 12; ++y) {
         for (int x = 1; x <= 6; ++x) {
-            Box b = BoundingBox::instance().get(pi, x, y);
-            BoxAnalyzeResult r = analyzeBox(surface, b);
-
-            result->field.set(x, y, r.realColor);
-            result->vanishing.setBit(x, y, r.vanishing);
+            Box b = BoundingBox::boxForAnalysis(pi, x, y);
+            RealColor rc = analyzeBoxInField(surface, b);
+            result->field.set(x, y, rc);
         }
     }
 
@@ -227,43 +259,43 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
         };
 
         for (int i = 0; i < 4; ++i) {
-            Box b = BoundingBox::instance().get(pi, np[i]);
-            BoxAnalyzeResult r = analyzeBox(surface, b, ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
-            result->setRealColor(np[i], r.realColor);
+            Box b = BoundingBox::boxForAnalysis(pi, np[i]);
+            RealColor rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
+            result->setRealColor(np[i], rc);
         }
     }
 
     // detect next1 move
     {
-        Box b = BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_AXIS);
+        Box b = BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT1_AXIS);
         b = Box(b.sx, b.sy + b.h() / 2, b.dx, b.dy);
-        BoxAnalyzeResult r = analyzeBox(surface, b, ACAnalyzer::AllowOjama::DONT_ALLOW_OJAMA);
-        result->next1AxisMoving = (r.realColor == RealColor::RC_EMPTY);
+        RealColor rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
+        result->next1AxisMoving = (rc == RealColor::RC_EMPTY);
     }
 
-    // detect ojama
+    // detect ojama. Comparing with prev2.
     {
-        Box left = BoundingBox::instance().get(pi, 1, 0);
-        Box right = BoundingBox::instance().get(pi, 6, 0);
+        Box left = BoundingBox::boxForAnalysis(pi, 1, 0);
+        Box right = BoundingBox::boxForAnalysis(pi, 6, 0);
         Box b = Box(left.sx, left.sy, right.dx, right.dy);
-        result->setOjamaDropDetected(detectOjamaDrop(surface, prevSurface, b));
+        result->setOjamaDropDetected(detectOjamaDrop(surface, prev2Surface, b));
     }
 
     return result;
 }
 
 bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
-                                 const SDL_Surface* prevSurface,
+                                 const SDL_Surface* prev2Surface,
                                  const Box& box)
 {
     // When prevSurface is NULL, we always think ojama is not dropped yet.
-    if (!prevSurface)
+    if (!prev2Surface)
         return false;
 
     int area = 0;
     double diffSum = 0;
-    for (int by = box.sy; by <= box.dy; ++by) {
-        for (int bx = box.sx; bx <= box.dx; ++bx) {
+    for (int by = box.sy; by < box.dy; ++by) {
+        for (int bx = box.sx; bx < box.dx; ++bx) {
             Uint32 c1 = getpixel(currentSurface, bx, by);
             Uint8 r1, g1, b1;
             SDL_GetRGB(c1, currentSurface->format, &r1, &g1, &b1);
@@ -273,9 +305,9 @@ bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
             if (rc == RealColor::RC_RED || rc == RealColor::RC_GREEN)
                 continue;
 
-            Uint32 c2 = getpixel(prevSurface, bx, by);
+            Uint32 c2 = getpixel(prev2Surface, bx, by);
             Uint8 r2, g2, b2;
-            SDL_GetRGB(c2, prevSurface->format, &r2, &g2, &b2);
+            SDL_GetRGB(c2, prev2Surface->format, &r2, &g2, &b2);
 
             double diff = sqrt((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2));
             diffSum += diff;
@@ -286,23 +318,27 @@ bool ACAnalyzer::detectOjamaDrop(const SDL_Surface* currentSurface,
     if (area == 0)
         return false;
 
-    // Usually, (diffSum / area) is around 5. When ojama is dropped, it will be over 20.
-    if (diffSum / area >= 17)
+#if 0
+    cout << "diffSum=" << diffSum << " area=" << area << " ratio=" << (diffSum / area) << endl;
+#endif
+
+    // Usually, (diffSum / area) is around 20. When ojama is dropped, it will be over 50.
+    if (diffSum / area >= 30)
         return true;
     return false;
 }
 
 bool ACAnalyzer::isLevelSelect(const SDL_Surface* surface)
 {
-    Box boxes[] {
-        BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_1P),
-        BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_2P),
+    const Box boxes[] {
+        BoundingBox::boxForAnalysis(BoundingBox::Region::LEVEL_SELECT_1P),
+        BoundingBox::boxForAnalysis(BoundingBox::Region::LEVEL_SELECT_2P),
     };
 
     for (const Box& b : boxes) {
         int whiteCount = 0;
-        for (int bx = b.sx; bx <= b.dx; ++bx) {
-            for (int by = b.sy; by <= b.dy; ++by) {
+        for (int bx = b.sx; bx < b.dx; ++bx) {
+            for (int by = b.sy; by < b.dy; ++by) {
                 Uint32 c = getpixel(surface, bx, by);
                 Uint8 r, g, b;
                 SDL_GetRGB(c, surface->format, &r, &g, &b);
@@ -316,7 +352,7 @@ bool ACAnalyzer::isLevelSelect(const SDL_Surface* surface)
             }
         }
 
-        if (whiteCount >= 40)
+        if (whiteCount >= 20)
             return true;
     }
 
@@ -325,11 +361,11 @@ bool ACAnalyzer::isLevelSelect(const SDL_Surface* surface)
 
 bool ACAnalyzer::isGameFinished(const SDL_Surface* surface)
 {
-    Box b = BoundingBox::instance().getBy(BoundingBox::Region::GAME_FINISHED);
+    Box b = BoundingBox::boxForAnalysis(BoundingBox::Region::GAME_FINISHED);
 
     int whiteCount = 0;
-    for (int bx = b.sx; bx <= b.dx; ++bx) {
-        for (int by = b.sy; by <= b.dy; ++by) {
+    for (int bx = b.sx; bx < b.dx; ++bx) {
+        for (int by = b.sy; by < b.dy; ++by) {
             Uint32 c = getpixel(surface, bx, by);
             Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
@@ -350,22 +386,22 @@ bool ACAnalyzer::isDead(int playerId, const SDL_Surface* surface)
 {
     // Since (3, 0)-(6, 0) of player2 field might contain 'FREE PLAY' string.
     // So, we check only (1, 0) and (2, 0).
-    BoxAnalyzeResult r1 = analyzeBox(surface, BoundingBox::instance().get(playerId, 1, 0));
-    BoxAnalyzeResult r2 = analyzeBox(surface, BoundingBox::instance().get(playerId, 2, 0));
+    RealColor rc1 = analyzeBox(surface, BoundingBox::boxForAnalysis(playerId, 1, 0));
+    RealColor rc2 = analyzeBox(surface, BoundingBox::boxForAnalysis(playerId, 2, 0));
 
-    return r1.realColor != RealColor::RC_YELLOW && r2.realColor != RealColor::RC_YELLOW;
+    return rc1 != RealColor::RC_YELLOW && rc2 != RealColor::RC_YELLOW;
 }
 
 bool ACAnalyzer::isMatchEnd(const SDL_Surface* surface)
 {
-    Box b1 = BoundingBox::instance().get(0, 7, 2);
-    Box b2 = BoundingBox::instance().get(0, 12, 0);
+    Box b1 = BoundingBox::boxForAnalysis(0, 7, 2);
+    Box b2 = BoundingBox::boxForAnalysis(0, 12, 0);
 
     int red = 0;
     int blue = 0;
 
-    for (int x = b1.dx; x <= b2.dx; ++x) {
-        for (int y = b1.dy; y <= b2.dy; ++y) {
+    for (int x = b1.dx; x < b2.dx; ++x) {
+        for (int y = b1.dy; y < b2.dy; ++y) {
             Uint32 c = getpixel(surface, x, y);
             Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
@@ -391,7 +427,7 @@ void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
     for (int pi = 0; pi < 2; ++pi) {
         for (int y = 1; y <= 12; ++y) {
             for (int x = 1; x <= 6; ++x) {
-                Box box = BoundingBox::instance().get(pi, x, y);
+                Box box = BoundingBox::boxForAnalysis(pi, x, y);
                 drawBoxWithAnalysisResult(surface, box);
             }
         }
@@ -399,10 +435,10 @@ void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
 
     for (int pi = 0; pi < 2; ++pi) {
         Box bs[4] = {
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_AXIS),
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT1_CHILD),
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT2_AXIS),
-            BoundingBox::instance().get(pi, NextPuyoPosition::NEXT2_CHILD)
+            BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT1_AXIS),
+            BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT1_CHILD),
+            BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT2_AXIS),
+            BoundingBox::boxForAnalysis(pi, NextPuyoPosition::NEXT2_CHILD)
         };
 
         for (int i = 0; i < 4; ++i) {
@@ -410,15 +446,15 @@ void ACAnalyzer::drawWithAnalysisResult(SDL_Surface* surface)
         }
     }
 
-    drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_1P));
-    drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::LEVEL_SELECT_2P));
-    drawBoxWithAnalysisResult(surface, BoundingBox::instance().getBy(BoundingBox::Region::GAME_FINISHED));
+    drawBoxWithAnalysisResult(surface, BoundingBox::boxForAnalysis(BoundingBox::Region::LEVEL_SELECT_1P));
+    drawBoxWithAnalysisResult(surface, BoundingBox::boxForAnalysis(BoundingBox::Region::LEVEL_SELECT_2P));
+    drawBoxWithAnalysisResult(surface, BoundingBox::boxForAnalysis(BoundingBox::Region::GAME_FINISHED));
 }
 
 void ACAnalyzer::drawBoxWithAnalysisResult(SDL_Surface* surface, const Box& box)
 {
-    for (int by = box.sy; by <= box.dy; ++by) {
-        for (int bx = box.sx; bx <= box.dx; ++bx) {
+    for (int by = box.sy; by < box.dy; ++by) {
+        for (int bx = box.sx; bx < box.dx; ++bx) {
             Uint32 c = getpixel(surface, bx, by);
             Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);

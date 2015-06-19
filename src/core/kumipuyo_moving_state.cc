@@ -54,25 +54,27 @@ void KumipuyoMovingState::moveKumipuyo(const PlainField& field, const KeySet& ke
         restFramesToAcceptQuickTurn--;
 
     // It looks turn key is consumed before arrow key.
-
-    bool needsFreefallProcess = true;
     if (restFramesTurnProhibited > 0) {
         restFramesTurnProhibited--;
     } else {
-        moveKumipuyoByTurnKey(field, keySet, &needsFreefallProcess);
+        moveKumipuyoByTurnKey(field, keySet);
     }
-
-    if (!keySet.hasKey(Key::DOWN) && needsFreefallProcess)
-        moveKumipuyoByFreefall(field);
 
     if (grounded)
         return;
 
+    *downAccepted = false;
     if (restFramesArrowProhibited > 0) {
         restFramesArrowProhibited--;
     } else {
         moveKumipuyoByArrowKey(field, keySet, downAccepted);
     }
+
+    if (!*downAccepted)
+        moveKumipuyoByFreefall(field);
+
+    if (grounded)
+        return;
 
     bool tmpGrounding = grounding;
     if (field.color(pos.axisX(), pos.axisY() - 1) != PuyoColor::EMPTY ||
@@ -123,36 +125,22 @@ void KumipuyoMovingState::moveKumipuyoByArrowKey(const PlainField& field, const 
         return;
     }
 
-    if (keySet.hasKey(Key::DOWN)) {
+    if (keySet.hasKey(Key::DOWN) && restFramesForFreefall > 0) {
         // For DOWN key, we don't set restFramesArrowProhibited.
-        if (downAccepted)
-            *downAccepted = true;
-
         if (grounding) {
             restFramesForFreefall = 0;
+            *downAccepted = true;
             grounded = true;
             return;
         }
 
-        if (restFramesForFreefall > 0) {
-            restFramesForFreefall = 0;
-            return;
-        }
-
         restFramesForFreefall = 0;
-        if (field.color(pos.axisX(), pos.axisY() - 1) == PuyoColor::EMPTY &&
-            field.color(pos.childX(), pos.childY() - 1) == PuyoColor::EMPTY) {
-            pos.y--;
-            return;
-        }
-
-        // Grounded.
-        grounded = true;
+        *downAccepted = true;
         return;
     }
 }
 
-void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet, bool* needsFreefallProcess)
+void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const KeySet& keySet)
 {
     DCHECK_EQ(0, restFramesTurnProhibited) << restFramesTurnProhibited;
 
@@ -177,7 +165,6 @@ void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const K
                 pos.y++;
                 restFramesToAcceptQuickTurn = 0;
                 restFramesForFreefall = FRAMES_FREE_FALL / 2;
-                *needsFreefallProcess = false;
                 return;
             }
 
@@ -193,7 +180,6 @@ void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const K
                 pos.r = (pos.r + 1) % 4;
                 pos.y++;
                 restFramesForFreefall = FRAMES_FREE_FALL / 2;
-                *needsFreefallProcess = false;
                 return;
             }
 
@@ -253,7 +239,6 @@ void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const K
                 pos.y++;
                 restFramesToAcceptQuickTurn = 0;
                 restFramesForFreefall = FRAMES_FREE_FALL / 2;
-                *needsFreefallProcess = false;
                 return;
             }
 
@@ -295,7 +280,6 @@ void KumipuyoMovingState::moveKumipuyoByTurnKey(const PlainField& field, const K
                 pos.r = (pos.r + 3) % 4;
                 pos.y++;
                 restFramesForFreefall = FRAMES_FREE_FALL / 2;
-                *needsFreefallProcess = false;
                 return;
             }
 

@@ -7,7 +7,9 @@ using namespace std;
 RealColor toRealColor(char c)
 {
     switch (c) {
-    case ' ': case 'E': return RealColor::RC_EMPTY;
+    case ' ':
+    case '.':
+    case 'E': return RealColor::RC_EMPTY;
     case '#': return RealColor::RC_WALL;
     case 'O': return RealColor::RC_OJAMA;
     case 'R': return RealColor::RC_RED;

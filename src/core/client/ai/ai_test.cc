@@ -239,7 +239,7 @@ TEST_F(AITest, ojamaCount)
     EXPECT_EQ(0, myPlayerState().fixedOjama);
     EXPECT_EQ(0, myPlayerState().pendingOjama);
     originalRensaResult.score -= 320;
-    originalRensaResult.frames -= 3 + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
+    originalRensaResult.frames -= FRAMES_TO_DROP_FAST[3] + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
     EXPECT_EQ(originalRensaResult, myPlayerState().currentRensaResult);
     EXPECT_EQ(0, enemyPlayerState().fixedOjama);
     EXPECT_EQ(5, enemyPlayerState().pendingOjama);
@@ -255,7 +255,7 @@ TEST_F(AITest, ojamaCount)
     EXPECT_EQ(0, myPlayerState().fixedOjama);
     EXPECT_EQ(0, myPlayerState().pendingOjama);
     originalRensaResult.score -= 40 * 16;
-    originalRensaResult.frames -= 3 + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
+    originalRensaResult.frames -= FRAMES_TO_DROP_FAST[3] + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
     EXPECT_EQ(originalRensaResult, myPlayerState().currentRensaResult);
     EXPECT_EQ(0, enemyPlayerState().fixedOjama);
     EXPECT_EQ(14, enemyPlayerState().pendingOjama);
@@ -271,7 +271,7 @@ TEST_F(AITest, ojamaCount)
     EXPECT_EQ(0, myPlayerState().fixedOjama);
     EXPECT_EQ(0, myPlayerState().pendingOjama);
     originalRensaResult.score -= 40 * 32;
-    originalRensaResult.frames -= 3 + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
+    originalRensaResult.frames -= FRAMES_TO_DROP_FAST[3] + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
     EXPECT_EQ(originalRensaResult, myPlayerState().currentRensaResult);
     EXPECT_EQ(0, enemyPlayerState().fixedOjama);
     EXPECT_EQ(32, enemyPlayerState().pendingOjama);
@@ -362,8 +362,8 @@ TEST_F(AITest, ojamaCountWithSOUSAI)
     originalRensaResult2.score -= 40;
     EXPECT_EQ(originalRensaResult2, enemyPlayerState().currentRensaResult);
 
-    originalRensaResult1.frames -= 2 + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
-    originalRensaResult2.frames -= 1 + FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING;
+    originalRensaResult1.frames -= FRAMES_TO_DROP_FAST[2] + FRAMES_GROUNDING + FRAMES_VANISH_ANIMATION;
+    originalRensaResult2.frames -= FRAMES_TO_DROP_FAST[1] + FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING;
 
     req.frameId = 5;
     req.playerFrameRequest[0].field = PlainField(

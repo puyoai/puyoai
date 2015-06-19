@@ -40,7 +40,7 @@ public:
     UserEvent userEvent() const { return userEvent_; }
     bool playable() const { return playable_; }
 
-    void setKeySetSeq(const KeySetSeq& kss) { keySetSeq_ = kss; }
+    void setKeySetSeq(const KeySetSeq&);
     KeySet frontKeySet() const { return keySetSeq_.empty() ? KeySet() : keySetSeq_.front(); }
     void dropFrontKeySet()
     {

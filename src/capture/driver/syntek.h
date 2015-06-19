@@ -18,8 +18,8 @@ public:
     static SyntekDriver* open();
     bool close();
 
-    typedef std::function<void (const unsigned char* higher,
-                                const unsigned char* lower,
+    typedef std::function<void (const unsigned char* buffer,
+                                bool isHigh,
                                 int bytesPerRow,
                                 int numRowsPerBuffer)> ImageReceivedCallback;
     void setImageReceivedCallback(ImageReceivedCallback callback) { imageReceivedCallback_ = callback; }

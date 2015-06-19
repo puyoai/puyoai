@@ -87,17 +87,19 @@ int main(int argc, char* argv[])
     // this should be called after |analyzer| is created.
     Box b;
     if (usesNextPuyoPosition) {
-        b = BoundingBox::instance().get(playerId - 1, npp);
+        b = BoundingBox::boxForAnalysis(playerId - 1, npp);
     } else {
-        b = BoundingBox::instance().get(playerId - 1, x, y);
+        b = BoundingBox::boxForAnalysis(playerId - 1, x, y);
     }
     if (half) {
         b.sy += b.h() / 2;
     }
 
-    BoxAnalyzeResult r = analyzer.analyzeBox(surf.get(), b, allowOjama, true);
-    cout << "Color: " << toString(r.realColor) << endl;
-    cout << "Vanishing: " << r.vanishing << endl;
+    const ACAnalyzer::ShowDebugMessage showsDebugMessage = ACAnalyzer::ShowDebugMessage::SHOW_DEBUG_MESSAGE;
+    RealColor rc = analyzer.analyzeBox(surf.get(), b, allowOjama, showsDebugMessage);
+    cout << "Color: " << rc << endl;
+
+    cout << "analyzed with AROW: " << analyzer.analyzeBoxWithRecognizer(surf.get(), b) << endl;
 
     analyzer.drawWithAnalysisResult(surf.get());
     SDL_SaveBMP(surf.get(), "output.bmp");

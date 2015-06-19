@@ -34,7 +34,7 @@ public:
 private:
     const char* filename_;
 
-    int fps_ = 30;
+    int fps_ = 60;
     Uint32 lastTaken_ = 0;
     // Default must be true to show the first image.
     std::atomic<bool> waitUntilTrue_;

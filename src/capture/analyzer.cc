@@ -7,12 +7,14 @@ using namespace std;
 
 namespace {
 
-// TODO(mayah): Should we make this 3, since we've seen puyo miscontrolling?
-// However, even 3, I've seen puyo miscontrolling.
-const int NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING = 2;
+// TODO(mayah): Should we make this 6, since we've seen puyo miscontrolling?
+// However, even 6, I've seen puyo miscontrolling.
+const int NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING = 4;
 
-const int NUM_FRAMES_TO_SEE_FOR_FIELD = 5;
-const int NUM_FRAMES_BEFORE_USER_CAN_PLAY = 2;
+const int NUM_FRAMES_TO_SEE_FOR_FIELD = 6;
+const int NUM_FRAMES_BEFORE_USER_CAN_PLAY = 4;
+
+const int NUM_FRAMES_DECISION_REQUEST_AGAIN_AFTER_FLOOR_STABLED = 6;
 
 // The pointer will be alive while previousResults are alive.
 vector<const PlayerAnalyzerResult*> makePlayerOnlyResults(int pi, const deque<unique_ptr<AnalyzerResult>>& previousResults)
@@ -96,7 +98,7 @@ string PlayerAnalyzerResult::toString() const
     for (int y = 12; y >= 1; --y) {
         ss << '#';
         for (int x = 1; x <= 6; ++x) {
-            ss << toChar(detectedField.field.get(x, y), !detectedField.vanishing.get(x, y));
+            ss << toChar(detectedField.field.get(x, y));
         }
         ss << "#          #";
         for (int x = 1; x <= 6; ++x) {
@@ -142,12 +144,13 @@ unique_ptr<AnalyzerResult> AnalyzerResult::copy() const
 }
 
 std::unique_ptr<AnalyzerResult> Analyzer::analyze(const SDL_Surface* surface,
-                                                  const SDL_Surface* prevSurface,
+                                                  const SDL_Surface* /*prevSurface*/,
+                                                  const SDL_Surface* prev2Surface,
                                                   const deque<unique_ptr<AnalyzerResult>>& previousResults)
 {
-    auto gameState = detectGameState(surface);
-    auto player1FieldResult = detectField(0, surface, prevSurface);
-    auto player2FieldResult = detectField(1, surface, prevSurface);
+    CaptureGameState gameState = detectGameState(surface);
+    unique_ptr<DetectedField> player1FieldResult = detectField(0, surface, prev2Surface);
+    unique_ptr<DetectedField> player2FieldResult = detectField(1, surface, prev2Surface);
 
     switch (gameState) {
     case CaptureGameState::UNKNOWN: {
@@ -280,7 +283,7 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
 
         if (isNormalColor(axisColor) && isNormalColor(childColor)) {
             int k = ++result->next1Puyos[make_pair(axisColor, childColor)];
-            if (k >= 3) {
+            if (k >= 5) {
                 result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_AXIS, axisColor);
                 result->adjustedField.setRealColor(NextPuyoPosition::NEXT1_CHILD, childColor);
                 result->next1Puyos.clear();
@@ -295,7 +298,7 @@ void Analyzer::analyzeNextForLevelSelect(const DetectedField& detectedField, Pla
 
         if (isNormalColor(axisColor) && isNormalColor(childColor)) {
             int k = ++result->next2Puyos[make_pair(axisColor, childColor)];
-            if (k >= 3) {
+            if (k >= 6) {
                 result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
                 result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
                 // TODO(mayah): Need to check NEXT1 has been found?
@@ -385,7 +388,7 @@ void Analyzer::analyzeNextForStateNext2WillDisappear(const DetectedField& detect
 
     if (axisColor == RealColor::RC_EMPTY || childColor == RealColor::RC_EMPTY) {
         result->framesWhileNext2Disappearing += 1;
-        if (result->framesWhileNext2Disappearing >= 2) {
+        if (result->framesWhileNext2Disappearing >= 6) {
             result->nextPuyoState = NextPuyoState::NEXT2_WILL_APPEAR;
             result->framesWhileNext2Disappearing = 0;
             return;
@@ -404,7 +407,7 @@ void Analyzer::analyzeNextForStateNext2WillAppear(const DetectedField& detectedF
     if (isNormalColor(axisColor) && isNormalColor(childColor)) {
         pair<RealColor, RealColor> kp(axisColor, childColor);
         result->next2Puyos[kp]++;
-        if (result->next2Puyos[kp] >= 3) {
+        if (result->next2Puyos[kp] >= 6) {
             result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_AXIS, axisColor);
             result->adjustedField.setRealColor(NextPuyoPosition::NEXT2_CHILD, childColor);
             result->nextPuyoState = NextPuyoState::STABLE;
@@ -425,7 +428,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
         for (int x = 1; x <= 6; ++x) {
             for (int y = 1; y <= 12; ++y) {
                 result->adjustedField.setRealColor(x, y, detectedField.realColor(x, y));
-                result->adjustedField.setVanishing(x, y, detectedField.isVanishing(x, y));
+                result->adjustedField.setVanishing(x, y, false);
             }
         }
 
@@ -454,15 +457,15 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
                     cnt[previousResults[i]->detectedField.realColor(x, y)]++;
                 }
 
-                int framesContinuousVanishing = 0;
-                if (detectedField.isVanishing(x, y)) {
-                    framesContinuousVanishing = 1;
-                    for (size_t i = 0; i < NUM_FRAMES_TO_SEE_FOR_FIELD && i < previousResults.size(); ++i) {
-                        if (previousResults[i]->detectedField.isVanishing(x, y)) {
-                            framesContinuousVanishing += 1;
-                        } else {
-                            break;
-                        }
+                bool vanishing = false;
+                if (previousResults.size() >= 3U) {
+                    RealColor c1 = detectedField.realColor(x, y);
+                    RealColor c2 = previousResults[0]->detectedField.realColor(x, y);
+                    RealColor c3 = previousResults[1]->detectedField.realColor(x, y);
+                    RealColor c4 = previousResults[2]->detectedField.realColor(x, y);
+
+                    if (c1 == c3 && c2 == c4 && ((c1 == RealColor::RC_EMPTY) ^ (c2 == RealColor::RC_EMPTY))) {
+                        vanishing = true;
                     }
                 }
 
@@ -470,6 +473,9 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
                 RealColor rc = RealColor::RC_EMPTY;
                 int maxCount = 0;
                 for (const auto& entry : cnt) {
+                    if (vanishing && entry.first == RealColor::RC_EMPTY)
+                        continue;
+
                     if (maxCount < entry.second) {
                         rc = entry.first;
                         maxCount = entry.second;
@@ -481,7 +487,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
                     shouldEmpty = true;
                     adjustedField.vanishing.clear(x, y);
                 } else {
-                    adjustedField.vanishing.setBit(x, y, (framesContinuousVanishing > 2));
+                    adjustedField.vanishing.setBit(x, y, vanishing);
                 }
             }
         }
@@ -551,7 +557,7 @@ void Analyzer::analyzeField(const DetectedField& detectedField,
             result->framesAfterFloorGetsStable_++;
         }
 
-        if (result->framesAfterFloorGetsStable_ > 3) {
+        if (result->framesAfterFloorGetsStable_ >= NUM_FRAMES_DECISION_REQUEST_AGAIN_AFTER_FLOOR_STABLED) {
             shouldUpdateField = true;
             shouldResetCurrentState = true;
             result->userEvent.decisionRequestAgain = true;

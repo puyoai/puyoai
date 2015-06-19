@@ -89,9 +89,10 @@ void WiiConnectServer::runLoop()
     int noSurfaceCount = 0;
     int frameId = 0;
     UniqueSDLSurface prevSurface(emptyUniqueSDLSurface());
+    UniqueSDLSurface prev2Surface(emptyUniqueSDLSurface());
 
     while (!shouldStop_) {
-        UniqueSDLSurface surface(source_->getNextFrame());
+        UniqueSDLSurface surface(source_->nextFrame());
         if (!surface.get()) {
             ++noSurfaceCount;
             LOG(INFO) << "No surface?: count=" << noSurfaceCount << endl;
@@ -104,7 +105,7 @@ void WiiConnectServer::runLoop()
             continue;
         }
 
-        unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), prevSurface.get(),  analyzerResults_);
+        unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), prevSurface.get(), prev2Surface.get(), analyzerResults_);
         LOG(INFO) << r->toString();
 
         switch (r->state()) {
@@ -178,6 +179,7 @@ void WiiConnectServer::runLoop()
 
         {
             lock_guard<mutex> lock(mu_);
+            prev2Surface = move(prevSurface);
             prevSurface = move(surface_);
             surface_ = move(surface);
             analyzerResults_.push_front(move(r));
@@ -518,8 +520,8 @@ void WiiConnectServer::draw(Screen* screen)
         return;
 
     surface->userdata = surface_->userdata;
-    SDL_Rect rect = screen->mainBox().toSDLRect();
-    SDL_BlitSurface(surface_.get(), nullptr, surface, &rect);
+    SDL_Rect dstRect = screen->mainBox().toSDLRect();
+    SDL_BlitScaled(surface_.get(), nullptr, surface, &dstRect);
 }
 
 unique_ptr<AnalyzerResult> WiiConnectServer::analyzerResult() const

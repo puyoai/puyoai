@@ -11,7 +11,6 @@
 
 #include "capture/ac_analyzer.h"
 #include "capture/capture.h"
-#include "capture/screen_shot_saver.h"
 #include "capture/somagic_source.h"
 #include "capture/syntek_source.h"
 #include "capture/movie_source.h"
@@ -41,7 +40,7 @@ DEFINE_bool(draw_user_event, true, "draw user event");
 DEFINE_string(source, "somagic",
               "set image source. 'somagic' when using somagic video capture."
               " filename if you'd like to use movie.");
-DEFINE_int32(fps, 30, "FPS");
+DEFINE_int32(fps, 60, "FPS");
 DEFINE_bool(ignore_sigpipe, false, "ignore SIGPIPE");
 DEFINE_bool(use_commentator, false, "use commentator");
 
@@ -119,11 +118,9 @@ int main(int argc, char* argv[])
 
     CHECK(source->ok());
 
-    unique_ptr<ScreenShotSaver> saver;
     if (FLAGS_save_screenshot) {
+        source->setSavesScreenShot(true);
         cout << "save screenshot: on" << endl;
-        saver.reset(new ScreenShotSaver);
-        saver->setDrawsFrameId(true);
     }
 
     WiiConnectServer server(source.get(), analyzer.get(),
@@ -154,14 +151,12 @@ int main(int argc, char* argv[])
     unique_ptr<CommentatorDrawer> commentatorDrawer;
 
     if (FLAGS_use_commentator) {
-        mainWindow.reset(new MainWindow(720 + 2 * 144, 480 + 176, Box(144, 40, 144 + 720, 40 + 480)));
+        mainWindow.reset(new MainWindow(640 + 2 * 144, 448 + 176, Box(144, 40, 144 + 640, 40 + 448)));
     } else {
-        mainWindow.reset(new MainWindow(720, 480, Box(0, 0, 720, 480)));
+        mainWindow.reset(new MainWindow(640, 448, Box(0, 0, 640, 448)));
     }
 
     mainWindow->addDrawer(&server);
-    if (saver.get())
-        mainWindow->addDrawer(saver.get());
     if (analyzerResultDrawer.get())
         mainWindow->addDrawer(analyzerResultDrawer.get());
     if (movieSourceKeyListener.get())

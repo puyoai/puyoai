@@ -20,6 +20,8 @@ struct Box {
         dy += y;
     }
 
+    Box shrink(int d) const { return Box(sx + d, sy + d, dx - d, dy - d); }
+
     int sx, sy, dx, dy;
   };
 
