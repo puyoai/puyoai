@@ -174,6 +174,8 @@ PrecedeKeySetSeq findKeyStrokeFastpath31(const CoreField& field)
         return PrecedeKeySetSeq("A,v");
     if (field.height(2) >= 12 && field.height(4) == 12)
         return PrecedeKeySetSeq("B,,B,,B,v");
+    if (field.height(3) == 11 && field.height(4) == 12)
+        return PrecedeKeySetSeq("B,,B,,B,v");
     return PrecedeKeySetSeq();
 }
 
@@ -572,7 +574,8 @@ KeySetSeq PuyoController::findKeyStrokeByDijkstra(const CoreField& field, const 
         for (int i = 0; i < size; ++i) {
             const pair<KeySet, double>& candidate = candidates[i];
             KumipuyoMovingState mks(p);
-            mks.moveKumipuyo(plainField, candidate.first);
+            bool downAccepted;
+            mks.moveKumipuyo(plainField, candidate.first, &downAccepted);
 
             if (pot.count(mks))
                 continue;

@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
     }
 
     ACAnalyzer analyzer;
-    unique_ptr<AnalyzerResult> result(analyzer.analyze(surf.get(), nullptr, deque<unique_ptr<AnalyzerResult>>()));
+    unique_ptr<AnalyzerResult> result(analyzer.analyze(surf.get(), nullptr, nullptr, deque<unique_ptr<AnalyzerResult>>()));
 
     analyzer.drawWithAnalysisResult(surf.get());
     SDL_SaveBMP(surf.get(), "output.bmp");

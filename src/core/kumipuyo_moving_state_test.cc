@@ -60,9 +60,10 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithOnlyArrowKey)
     EXPECT_EQ(KumipuyoPos(3, 11, 0), kms.pos);
     EXPECT_EQ(0, kms.restFramesTurnProhibited);
     EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(0, kms.restFramesForFreefall);
+    EXPECT_EQ(FRAMES_FREE_FALL, kms.restFramesForFreefall);
+
     EXPECT_FALSE(kms.grounded);
-    EXPECT_TRUE(downAccepted);
+    EXPECT_FALSE(downAccepted);
 
     kms.pos = KumipuyoPos(3, 1, 0);
     kms.grounding = false;
@@ -172,6 +173,36 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoWithOnlyArrowKey_Left)
         EXPECT_EQ(FRAMES_FREE_FALL - 1, kms.restFramesForFreefall);
         EXPECT_FALSE(kms.grounded);
     }
+}
+
+TEST(KumipuyoMovingStateTest, moveKumipuyoWithOnlyArrowKey_Down)
+{
+    PlainField f;
+    bool downAccepted = false;
+
+    KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
+
+    kms.moveKumipuyo(f, KeySet(Key::DOWN), &downAccepted);
+    EXPECT_EQ(KumipuyoPos(3, 12, 0), kms.pos);
+    EXPECT_EQ(0, kms.restFramesTurnProhibited);
+    EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
+    EXPECT_EQ(0, kms.restFramesForFreefall);
+    EXPECT_FALSE(kms.grounded);
+
+    kms.moveKumipuyo(f, KeySet(Key::DOWN), &downAccepted);
+    EXPECT_EQ(KumipuyoPos(3, 11, 0), kms.pos);
+    EXPECT_EQ(0, kms.restFramesTurnProhibited);
+    EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
+    EXPECT_EQ(FRAMES_FREE_FALL, kms.restFramesForFreefall);
+    EXPECT_FALSE(kms.grounded);
+
+    kms.moveKumipuyo(f, KeySet(Key::DOWN), &downAccepted);
+    EXPECT_EQ(KumipuyoPos(3, 11, 0), kms.pos);
+    EXPECT_EQ(0, kms.restFramesTurnProhibited);
+    EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
+    EXPECT_EQ(0, kms.restFramesForFreefall);
+    EXPECT_FALSE(kms.grounded);
+
 }
 
 TEST(KumipuyoMovingStateTest, moveKumipuyoFreefall)
@@ -533,7 +564,7 @@ TEST(KumipuyoMovingStateTest, moveKumipuyoQuickTurn)
     EXPECT_EQ(KumipuyoPos(3, 13, 2), kms.pos);
     EXPECT_EQ(FRAMES_CONTINUOUS_TURN_PROHIBITED, kms.restFramesTurnProhibited);
     EXPECT_EQ(0, kms.restFramesToAcceptQuickTurn);
-    EXPECT_EQ(FRAMES_FREE_FALL / 2, kms.restFramesForFreefall); // After lifted, frames free fall should be an initial value / 2.
+    EXPECT_EQ(FRAMES_FREE_FALL / 2 - 1, kms.restFramesForFreefall); // After lifted, frames free fall should be an initial value / 2.
     EXPECT_FALSE(kms.grounded);
     EXPECT_FALSE(downAccepted);
 

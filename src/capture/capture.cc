@@ -34,9 +34,10 @@ void Capture::runLoop()
 {
     int frameId = 0;
     UniqueSDLSurface prevSurface(emptyUniqueSDLSurface());
+    UniqueSDLSurface prev2Surface(emptyUniqueSDLSurface());
 
     while (!shouldStop_) {
-        UniqueSDLSurface surface(source_->getNextFrame());
+        UniqueSDLSurface surface(source_->nextFrame());
         if (!surface.get())
             continue;
 
@@ -44,7 +45,8 @@ void Capture::runLoop()
         surface->userdata = reinterpret_cast<void*>(static_cast<uintptr_t>(++frameId));
 
         lock_guard<mutex> lock(mu_);
-        unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), prevSurface.get(), results_);
+        unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), prevSurface.get(), prev2Surface.get(), results_);
+        prev2Surface = move(prevSurface);
         prevSurface = move(surface_);
         surface_ = move(surface);
         results_.push_front(move(r));
@@ -56,10 +58,17 @@ void Capture::runLoop()
 void Capture::draw(Screen* screen)
 {
     SDL_Surface* surface = screen->surface();
+    if (!surface)
+        return;
 
     lock_guard<mutex> lock(mu_);
-    SDL_BlitSurface(surface_.get(), nullptr, surface, nullptr);
+
+    if (!surface_.get())
+        return;
+
     surface->userdata = surface_->userdata;
+    SDL_Rect dstRect = screen->mainBox().toSDLRect();
+    SDL_BlitScaled(surface_.get(), nullptr, surface, &dstRect);
 }
 
 unique_ptr<AnalyzerResult> Capture::analyzerResult() const

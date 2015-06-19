@@ -666,9 +666,14 @@ void SyntekDriver::dataReceived(libusb_transfer* transfer)
 
         if (data[0] & ECVSTK1160NewImageFlag) {
             *offset = 0;
-            if (isHigh && imageReceivedCallback_) {
-                const int bytesPerRow = 720 * 2;
-                imageReceivedCallback_(highBuffer_, lowBuffer_, bytesPerRow, 240);
+
+            const int bytesPerRow = 720 * 2;
+            if (imageReceivedCallback_) {
+                if (isHigh) {
+                    imageReceivedCallback_(lowBuffer_, false, bytesPerRow, 240);
+                } else {
+                    imageReceivedCallback_(highBuffer_, true, bytesPerRow, 240);
+                }
             }
         }
 

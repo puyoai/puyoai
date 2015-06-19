@@ -23,6 +23,9 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+    const int WIDTH = 16;
+    const int HEIGHT = 16;
+
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
 
@@ -42,15 +45,15 @@ int main(int argc, char* argv[])
     UniqueSDLSurface background(makeUniqueSDLSurface(IMG_Load((FLAGS_testdata_dir + "/image/background.png").c_str())));
 
     for (int i = 0; i < 6; ++i) {
-        UniqueSDLSurface surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, 32 * 7, 32 * 3 * colors[i].second, 32, 0, 0, 0, 0)));
+        UniqueSDLSurface surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, WIDTH * 7, HEIGHT * 3 * colors[i].second, 32, 0, 0, 0, 0)));
         for (int j = 0; j < colors[i].second; ++j) {
-            SDL_Rect rect { 0, 32 * 3 * j, 32 * 7, 32 * 3};
+            SDL_Rect rect { 0, HEIGHT * 3 * j, WIDTH * 7, HEIGHT * 3};
             SDL_BlitSurface(background.get(), nullptr, surf.get(), &rect);
 
-            SDL_Rect srcRect { j * 32, i * 32, 32, 32 };
+            SDL_Rect srcRect { j * WIDTH, i * HEIGHT, WIDTH, HEIGHT };
             for (int x = 0; x < 7; ++x) {
                 for (int y = 0; y < 3; ++y) {
-                    SDL_Rect dstRect { 32 * x, 32 * 3 * j + 32 * y, 32, 32 };
+                    SDL_Rect dstRect { WIDTH * x, HEIGHT * (3 * j + y), WIDTH, HEIGHT };
                     SDL_BlitSurface(foreground.get(), &srcRect, surf.get(), &dstRect);
                 }
             }

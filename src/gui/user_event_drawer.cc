@@ -27,8 +27,8 @@ void UserEventDrawer::draw(Screen* screen)
         if (!surf.get())
             continue;
 
-        Box b1 = BoundingBox::instance().get(i, 1, 12);
-        Box b2 = BoundingBox::instance().get(i, 6, 12);
+        Box b1 = BoundingBox::boxForDraw(i, 1, 12);
+        Box b2 = BoundingBox::boxForDraw(i, 6, 12);
         Box b(b1.sx, b1.sy, b2.dx, b2.dy);
         b.moveOffset(screen->mainBox().sx, screen->mainBox().sy);
 

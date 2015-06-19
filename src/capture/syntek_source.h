@@ -19,7 +19,7 @@ class Screen;
 class SyntekSource : public Source {
 public:
     SyntekSource();
-    virtual ~SyntekSource() {}
+    virtual ~SyntekSource();
 
     virtual UniqueSDLSurface getNextFrame() override;
     virtual bool start() override;
@@ -32,7 +32,7 @@ private:
     std::condition_variable cond_;
 
     SyntekDriver* driver_;
-    std::unique_ptr<int[]> currentPixelData_;
+    UniqueSDLSurface currentSurface_;
 };
 
 #endif

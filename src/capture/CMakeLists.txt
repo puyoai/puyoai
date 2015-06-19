@@ -12,7 +12,6 @@ add_library(puyoai_capture
             movie_source.cc
             movie_source_key_listener.cc
             real_color_field.cc
-            screen_shot_saver.cc
             source.cc
             usb_device.cc)
 
@@ -45,6 +44,7 @@ function(capture_add_executable exe)
         target_link_libraries(${exe} puyoai_capture_viddev)
     endif()
     target_link_libraries(${exe} puyoai_capture)
+    target_link_libraries(${exe} puyoai_recognition)
     target_link_libraries(${exe} puyoai_gui)
     target_link_libraries(${exe} puyoai_core)
     target_link_libraries(${exe} puyoai_duel)
@@ -65,6 +65,8 @@ function(capture_add_executable exe)
     endif()
 endfunction()
 
+capture_add_executable(convert_image_60fps)
+capture_add_executable(convert_movie_60fps)
 capture_add_executable(split_image)
 capture_add_executable(split_movie)
 

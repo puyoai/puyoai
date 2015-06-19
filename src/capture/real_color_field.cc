@@ -18,3 +18,16 @@ RealColorField::RealColorField()
         set(MAP_WIDTH - 1, y, RealColor::RC_WALL);
     }
 }
+
+RealColorField::RealColorField(const std::string& url) :
+    RealColorField()
+{
+    int counter = 0;
+    for (int i = url.length() - 1; i >= 0; --i) {
+        int x = 6 - (counter % 6);
+        int y = counter / 6 + 1;
+        RealColor rc = toRealColor(url[i]);
+        setColor(x, y, rc);
+        counter++;
+    }
+}

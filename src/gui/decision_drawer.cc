@@ -41,7 +41,7 @@ void DecisionDrawer::draw(Screen* screen)
         if (!pos[pi].isValid() || !kumipuyo[pi].isValid())
             continue;
 
-        Box b1 = BoundingBox::instance().get(pi, pos[pi].axisX(), pos[pi].axisY());
+        Box b1 = BoundingBox::boxForDraw(pi, pos[pi].axisX(), pos[pi].axisY());
         b1.moveOffset(screen->mainBox().sx, screen->mainBox().sy);
         if (isNormalColor(kumipuyo[pi].axis)) {
             int xx = (b1.sx + b1.dx) / 2;
@@ -52,7 +52,7 @@ void DecisionDrawer::draw(Screen* screen)
             SDL_DrawCircle(surface, xx, yy, r, c);
         }
 
-        Box b2 = BoundingBox::instance().get(pi, pos[pi].childX(), pos[pi].childY());
+        Box b2 = BoundingBox::boxForDraw(pi, pos[pi].childX(), pos[pi].childY());
         b2.moveOffset(screen->mainBox().sx, screen->mainBox().sy);
         if (isNormalColor(kumipuyo[pi].child)) {
             int xx = (b2.sx + b2.dx) / 2;

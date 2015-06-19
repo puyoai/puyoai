@@ -159,9 +159,9 @@ int main(int argc, char* argv[])
     unique_ptr<UserEventDrawer> userEventDrawer;
     if (FLAGS_use_gui) {
         if (FLAGS_use_commentator)
-            mainWindow.reset(new MainWindow(640 + 2 * 144, 490 + 176, Box(144, 40, 144 + 640, 40 + 490)));
+            mainWindow.reset(new MainWindow(640 + 2 * 144, 448 + 176, Box(144, 40, 144 + 640, 40 + 448)));
         else
-            mainWindow.reset(new MainWindow(640, 490, Box(0, 0, 640, 490)));
+            mainWindow.reset(new MainWindow(640, 448, Box(0, 0, 640, 448)));
 
         fieldDrawer.reset(new FieldDrawer);
         mainWindow->addDrawer(fieldDrawer.get());

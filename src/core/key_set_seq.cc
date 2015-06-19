@@ -10,8 +10,9 @@ KeySetSeq::KeySetSeq(const string& str)
 {
     for (const auto& s : strings::split(str, ',')) {
         KeySet ks;
-        for (const auto& c : s)
+        for (const auto& c : s) {
             ks.setKey(toKey(c));
+        }
         seq_.push_back(ks);
     }
 }
