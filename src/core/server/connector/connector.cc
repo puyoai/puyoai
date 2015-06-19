@@ -6,7 +6,6 @@
 
 #include <cerrno>
 #include <cstring>
-#include <sstream>
 #include <string>
 
 #include <glog/logging.h>
@@ -89,11 +88,14 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
     close(fd_cpu_error[0]);
     close(fd_cpu_error[1]);
 
-    stringstream ss;
-    ss << "Player" << playerId;
-    const string filename = ss.str();
+    const char* playerNamePrefix = "Player"; 
+    char filename[strlen(playerNamePrefix) + 1 + 1];
+    if (playerId >= 10) {
+      LOG(FATAL) << "playerId should be between 0 and 9.";
+    }
+    sprintf(filename, "%s%d", playerNamePrefix, playerId);
 
-    if (execl(programName.c_str(), programName.c_str(), filename.c_str(), nullptr) < 0)
+    if (execl(programName.c_str(), programName.c_str(), filename, nullptr) < 0)
         PLOG(FATAL) << "Failed to start a child process. ";
 
     LOG(FATAL) << "should not be reached.";
