@@ -173,6 +173,35 @@ RealColor ACAnalyzer::analyzeBoxWithRecognizer(const SDL_Surface* surface, const
     return recognizer_.recognize(features);
 }
 
+RealColor ACAnalyzer::analyzeBoxInField(const SDL_Surface* surface, const Box& b) const
+{
+    RealColor rc = analyzeBox(surface, b);
+    switch (rc) {
+    case RealColor::RC_GREEN: {
+        RealColor rc2 = analyzeBoxWithRecognizer(surface, b);
+        if (rc2 == RealColor::RC_EMPTY)
+            rc = rc2;
+        break;
+    }
+    case RealColor::RC_YELLOW: {
+        RealColor rc2 = analyzeBoxWithRecognizer(surface, b);
+        if (rc2 == RealColor::RC_EMPTY || rc2 == RealColor::RC_PURPLE || rc2 == RealColor::RC_OJAMA)
+            rc = rc2;
+        break;
+    }
+    case RealColor::RC_OJAMA: {
+        RealColor rc2 = analyzeBoxWithRecognizer(surface, b);
+        if (rc2 == RealColor::RC_PURPLE)
+            rc = rc2;
+        break;
+    }
+    default:
+        break;
+    }
+
+    return rc;
+}
+
 CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
 {
     if (isLevelSelect(surface))
@@ -215,10 +244,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
     for (int y = 1; y <= 12; ++y) {
         for (int x = 1; x <= 6; ++x) {
             Box b = BoundingBox::boxForAnalysis(pi, x, y);
-            // TODO(mayah): Consider more robust way.
-            RealColor rc = analyzeBox(surface, b);
-            if (rc == RealColor::RC_YELLOW || rc == RealColor::RC_PURPLE || rc == RealColor::RC_OJAMA)
-                rc = analyzeBoxWithRecognizer(surface, b);
+            RealColor rc = analyzeBoxInField(surface, b);
             result->field.set(x, y, rc);
         }
     }
@@ -234,16 +260,7 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
 
         for (int i = 0; i < 4; ++i) {
             Box b = BoundingBox::boxForAnalysis(pi, np[i]);
-            RealColor rc;
-            if (i == 0 || i == 1) {
-                // TODO(mayah): Consider more robust way.
-                rc = analyzeBoxWithRecognizer(surface, b);
-                if (rc == RealColor::RC_OJAMA || rc == RealColor::RC_EMPTY)
-                    rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
-            } else {
-                rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
-            }
-
+            RealColor rc = analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA);
             result->setRealColor(np[i], rc);
         }
     }

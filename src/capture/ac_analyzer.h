@@ -25,6 +25,8 @@ public:
 
     RealColor analyzeBoxWithRecognizer(const SDL_Surface*, const Box&) const;
 
+    RealColor analyzeBoxInField(const SDL_Surface*, const Box&) const;
+
     // Draw each pixel of |surface| with RealColor. This is helpful for image analyzing test.
     void drawWithAnalysisResult(SDL_Surface*);
 
