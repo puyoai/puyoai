@@ -5,6 +5,8 @@
 #include <set>
 #include <sstream>
 
+#include "base/strings.h"
+
 using namespace std;
 
 string CollectedFeatureMoveScore::toString() const

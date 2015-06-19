@@ -53,6 +53,7 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
 
   int score = 0;
   std::ostringstream oss;
+  oss << "_";
 
   score += PatternMatch(field, message);
   score += Field(field);
@@ -65,7 +66,7 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
     }
   }
 
-  *message = oss.str();
+  *message += oss.str();
   return score;
 }
 
@@ -80,17 +81,27 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
   std::ostringstream oss;
 
   {  // Basic rensa plan
-    int value = plan.score();
+    int value = plan.score() + (me.hasZenkeshi ? ZENKESHI_BONUS : 0);
     if (value > 0) {
       oss << "Rensa(" << value << ")_";
       score += value;
     }
   }
 
-  {  // Zenkeshi
+  {  // will be Zenkeshi
     int value = (plan.field().countPuyos() == 0) ? ZENKESHI_BONUS : 0;
     if (value > 0) {
       oss << "Zenkeshi(" << value << ")_";
+      score += value;
+    }
+  }
+
+  {  // penalty for using too many puyos
+    int remained_puyos = me.field.countPuyos() - plan.field().countPuyos();
+    int wasted_puyos = std::max(remained_puyos - 4 * plan.chains() - 4, 0);
+    int value = -200 * plan.chains() * plan.chains() * wasted_puyos;
+    if (value < 0) {
+      oss << "Waste(" << value << ")_";
       score += value;
     }
   }
@@ -173,8 +184,8 @@ int Evaluator::Future(const CoreField& field) {
           expects.push_back(plan.score());
       });
   int value = std::accumulate(expects.begin(), expects.end(), 0);
-  if (expects.size()) {
-    value /= expects.size();
+  if (expects.size() > 2) {
+    value /= (expects.size() - 1);
   }
   return value;
 }

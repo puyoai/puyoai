@@ -1175,6 +1175,26 @@ field = [
 ignition = 3
 score = 5.0
 
+[[pattern]]
+field = [
+    "....C.",
+    "...CBC",
+    "..AAAC",
+    "AAABBB",
+]
+ignition = 3
+score = 5.8
+
+[[pattern]]
+field = [
+    "....CC",
+    "...CBC",
+    "..AAAA",
+    "AAABBB",
+]
+ignition = 3
+score = 6.5
+
 # ----------------------------------------------------------------------
 # NEWGTR-TAIL-2
 
@@ -1852,7 +1872,7 @@ field = [
     "BCC..."
 ]
 ignition = 2
-score = 7.0
+score = 6.0
 
 [[pattern]]
 field = [
@@ -1865,7 +1885,7 @@ field = [
     "BCC..."
 ]
 ignition = 2
-score = 7.0
+score = 6.0
 
 # ----------------------------------------------------------------------
 # DAA-HEAD-3
@@ -1882,7 +1902,7 @@ field = [
     "C....."
 ]
 ignition = 2
-score = 9.5
+score = 6.0
 
 [[pattern]]
 field = [
@@ -1896,7 +1916,20 @@ field = [
     "C....."
 ]
 ignition = 2
-score = 9.5
+score = 6.0
+
+[[pattern]]
+field = [
+    "C.....",
+    "BA....",
+    "AA....",
+    "BA....",
+    "BB....",
+    "CC....",
+    "C....."
+]
+ignition = 2
+score = 6.0
 
 # ----------------------------------------------------------------------
 # DAA-TAIL
@@ -1908,7 +1941,7 @@ field = [
     "ABBC.."
 ]
 ignition = 1
-score = 7.0
+score = 6.0
 
 [[pattern]]
 field = [
@@ -1917,7 +1950,7 @@ field = [
     "ABBCC."
 ]
 ignition = 1
-score = 6.8
+score = 5.8
 
 [[pattern]]
 field = [
@@ -1926,7 +1959,7 @@ field = [
     ".AABCC"
 ]
 ignition = 2
-score = 7.0
+score = 6.2
 
 [[pattern]]
 field = [
@@ -1935,7 +1968,7 @@ field = [
     ".AABCC"
 ]
 ignition = 2
-score = 8.0
+score = 6.0
 
 [[pattern]]
 field = [
@@ -1944,7 +1977,7 @@ field = [
     ".AABBC"
 ]
 ignition = 2
-score = 7.0
+score = 6.0
 
 [[pattern]]
 field = [
@@ -1963,7 +1996,7 @@ field = [
     "AAABCC"
 ]
 ignition = 1
-score = 8.0
+score = 6.2
 
 # ----------------------------------------------------------------------
 # YAYOI
