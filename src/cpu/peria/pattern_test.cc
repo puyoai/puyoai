@@ -54,7 +54,7 @@ TEST_F(PatternTest, ParseBook) {
   }
 }
 
-TEST_F(PatternTest, ReadBook) {
+TEST_F(PatternTest, DISABLED_ReadBook) {
   const std::string book_str("NAME: Test\n" "SCORE: 1000\n" "MAX: 8\n"
                              ".AA...\n" ".BB...\n----\n");
   std::istringstream iss(book_str + book_str + book_str);
