@@ -2008,8 +2008,9 @@ field = [
     "BBBCCC",
     "DDDEEE"
 ]
+name = "YAYOI"
 ignition = 3
-score = 9.0
+score = 6.0
 
 [[pattern]]
 field = [
@@ -2019,8 +2020,9 @@ field = [
     "BBBCCC",
     "DDDEEE"
 ]
+name = "YAYOI"
 ignition = 1
-score = 8.5
+score = 5.5
 
 [[pattern]]
 field = [
@@ -2029,8 +2031,9 @@ field = [
     "AAABBB",
     "DDDCCC"
 ]
+name = "YAYOI"
 ignition = 1
-score = 8.0
+score = 5.0
 
 [[pattern]]
 field = [
@@ -2039,8 +2042,9 @@ field = [
     "AAABBB",
     "DDDCCC"
 ]
+name = "YAYOI"
 ignition = 1
-score = 8.0
+score = 5.0
 
 [[pattern]]
 field = [
@@ -2049,8 +2053,9 @@ field = [
     "AAABBB",
     "DDDCCC"
 ]
+name = "YAYOI"
 ignition = 2
-score = 8.0
+score = 5.0
 
 [[pattern]]
 field = [
@@ -2060,7 +2065,10 @@ field = [
     "DDDCCC"
 ]
 ignition = 2
-score = 8.0
+score = 5.0
+
+# ----------------------------------------------------------------------
+# YAYOI-TAIL
 
 [[pattern]]
 field = [
@@ -2070,7 +2078,7 @@ field = [
     "CCCBBB"
 ]
 ignition = 3
-score = 8.0
+score = 7.0
 
 [[pattern]]
 field = [
@@ -2080,7 +2088,7 @@ field = [
     "CCCBBB"
 ]
 ignition = 3
-score = 8.0
+score = 7.0
 
 # ----------------------------------------------------------------------
 # NAMEKUJI
