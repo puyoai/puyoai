@@ -40,6 +40,16 @@ void Pattern::ReadBook(std::istream& is) {
       break;
     g_patterns.push_back(pattern);
   }
+
+  // Make combination
+  int n = g_patterns.size();
+  for (int i = 0; i < n; ++i) {
+    for (int j = i + 1; j < n; ++j) {
+      Pattern pattern(g_patterns[i]);
+      if (pattern.MergeWith(g_patterns[j]))
+        g_patterns.push_back(pattern);
+    }
+  }
 }
 
 const std::vector<Pattern>& Pattern::GetAllPattern() {
@@ -103,6 +113,66 @@ int Pattern::Match(const CoreField& field) const {
 
   int score = std::max(GetScore(matching0), GetScore(matching1));
   return score;
+}
+
+bool Pattern::MergeWith(const Pattern& a) {
+  static const char kNonDetermLine[] = "......";
+  while (pattern_.size() < a.pattern_.size())
+    pattern_.push_back(kNonDetermLine);
+
+  int offset = '\0';
+  for (const std::string& l : pattern_) {
+    for (char c : l) {
+      if (isupper(c) && c > offset)
+        offset = c;
+    }
+  }
+  if (isupper(offset))
+    offset -= 'A';
+  else
+    offset = 0;
+
+  std::deque<std::string> pat1(pattern_);  // as-is
+  std::deque<std::string> pat2(pattern_);  // mirror right-left
+  for (auto& l : pat2) {
+    reverse(l.begin(), l.end());
+  }
+
+  bool merge1 = true, merge2 = true;
+  for (size_t i = 0; i < a.pattern_.size(); ++i) {
+    for (int j = 0; j < FieldConstant::WIDTH; ++j) {
+      if (a.pattern_[i][j] == '.')
+        continue;
+
+      if (pat1[i][j] == '.')
+        pat1[i][j] = a.pattern_[i][j] + offset;
+      else
+        merge1 = false;
+
+      if (pat2[i][j] == '.')
+        pat2[i][j] = a.pattern_[i][j] + offset;
+      else
+        merge2 = false;
+    }
+  }
+
+  if (merge1) {
+    pattern_ = pat1;
+  } else if (merge2) {
+    pattern_ = pat2;
+  } else {
+    return false; // There are conflicts
+  }
+
+  name_ += "+" + a.name_;
+  score_ += a.score_ - 100;
+  for (auto& n : a.neighbors_) {
+    neighbors_.insert(Neighbor(n.first + offset, n.second + offset));
+  }
+  num_puyos_ += a.num_puyos_;
+  Optimize();
+  
+  return true;
 }
 
 void Pattern::Optimize() {

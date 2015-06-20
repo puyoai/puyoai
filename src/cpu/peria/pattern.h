@@ -11,8 +11,6 @@
 namespace peria {
 
 class Pattern {
-  typedef std::pair<char, char> Neighbor;
-
  public:
   typedef std::map<char, std::map<PuyoColor, int> > MatchingCounts;
 
@@ -23,7 +21,11 @@ class Pattern {
   const std::string& name() const { return name_; }
   int score() const { return score_; }
 
+  bool MergeWith(const Pattern& pattern);
+
  protected:
+  typedef std::pair<char, char> Neighbor;
+
   bool ParseBook(std::istream& is);
   void Optimize();
   void AppendField(std::string line);
