@@ -18,6 +18,8 @@ using namespace std;
 // static
 unique_ptr<Connector> Connector::create(int playerId, const string& programName)
 {
+    CHECK(0 <= playerId && playerId < 10) << playerId;
+
     if (programName == "-")
         return unique_ptr<Connector>(new HumanConnector());
 
@@ -43,20 +45,16 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
     int fd_command[2];
     int fd_cpu_error[2];
 
-    if (pipe(fd_field_status)) {
-        LOG(FATAL) << "Pipe error. " << strerror(errno);
-    }
-    if (pipe(fd_command)) {
-        LOG(FATAL) << "Pipe error. " << strerror(errno);
-    }
-    if (pipe(fd_cpu_error)) {
-        LOG(FATAL) << "Pipe error. " << strerror(errno);
-    }
+    if (pipe(fd_field_status) < 0)
+        PLOG(FATAL) << "Pipe error. ";
+    if (pipe(fd_command) < 0)
+        PLOG(FATAL) << "Pipe error. ";
+    if (pipe(fd_cpu_error) < 0)
+        PLOG(FATAL) << "Pipe error. ";
 
     pid_t pid = fork();
-    if (pid < 0) {
-        LOG(FATAL) << "Failed to fork. " << strerror(errno);
-    }
+    if (pid < 0)
+        PLOG(FATAL) << "Failed to fork. ";
 
     if (pid > 0) {
         // Server.
@@ -71,15 +69,12 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
     }
 
     // Client.
-    if (dup2(fd_field_status[0], STDIN_FILENO) == -1) {
-        LOG(FATAL) << "Failed to dup2. " << strerror(errno);
-    }
-    if (dup2(fd_command[1], STDOUT_FILENO) == -1) {
-        LOG(FATAL) << "Failed to dup2. " << strerror(errno);
-    }
-    if (dup2(fd_cpu_error[1], STDERR_FILENO) == -1) {
-        LOG(FATAL) << "Failed to dup2. " << strerror(errno);
-    }
+    if (dup2(fd_field_status[0], STDIN_FILENO) < 0)
+        PLOG(FATAL) << "Failed to dup2. ";
+    if (dup2(fd_command[1], STDOUT_FILENO) < 0)
+        PLOG(FATAL) << "Failed to dup2. ";
+    if (dup2(fd_cpu_error[1], STDERR_FILENO) < 0)
+        PLOG(FATAL) << "Failed to dup2. ";
 
     close(fd_field_status[0]);
     close(fd_field_status[1]);
@@ -88,12 +83,8 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
     close(fd_cpu_error[0]);
     close(fd_cpu_error[1]);
 
-    const char* playerNamePrefix = "Player"; 
-    char filename[strlen(playerNamePrefix) + 1 + 1];
-    if (playerId >= 10) {
-      LOG(FATAL) << "playerId should be between 0 and 9.";
-    }
-    sprintf(filename, "%s%d", playerNamePrefix, playerId);
+    char filename[] = "Player_";
+    filename[6] = '1' + playerId;
 
     if (execl(programName.c_str(), programName.c_str(), filename, nullptr) < 0)
         PLOG(FATAL) << "Failed to start a child process. ";
