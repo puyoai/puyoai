@@ -37,7 +37,7 @@ DropDecision Ai::think(int frame_id,
   using namespace std::placeholders;
 
   Control control;
-  Evaluator evaluator(my_state, enemy_state, enemy_hands_, &control);
+  Evaluator evaluator(frame_id, my_state, enemy_state, enemy_hands_, &control);
   Plan::iterateAvailablePlans(field, seq, 2,
                               [&evaluator](const RefPlan& plan) { evaluator.EvalPlan(plan); });
 

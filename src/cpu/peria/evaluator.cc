@@ -19,8 +19,9 @@ int ScoreDiffHeight(int higher, int lower) {
   return ((higher > lower) ? 0 : -diff) * 50;
 }
 
-Evaluator::Evaluator(const PlayerState& m, const PlayerState& e, const PlayerHands& eh, Control* c)
-  : me(m), enemy(e), enemy_hands(eh), control(c) {
+Evaluator::Evaluator(int id, const PlayerState& m, const PlayerState& e, const PlayerHands& eh, Control* c)
+  : frame_id(id), me(m), enemy(e), enemy_hands(eh), control(c) {
+  UNUSED_VARIABLE(frame_id);
   UNUSED_VARIABLE(me);
   UNUSED_VARIABLE(enemy);
   UNUSED_VARIABLE(enemy_hands);
@@ -29,14 +30,18 @@ Evaluator::Evaluator(const PlayerState& m, const PlayerState& e, const PlayerHan
 void Evaluator::EvalPlan(const RefPlan& plan) {
   std::string message_field;
   std::string message_rensa;
+  std::string message_time;
 
   int score = EvalField(plan.field(), &message_field);
   score += EvalRensa(plan, &message_rensa);
+  score += EvalTime(plan, &message_time);
 
   std::string message;
   message += "Field : " + message_field;
   if (!message_rensa.empty())
     message += ",Rensa : " + message_rensa;
+  if (!message_time.empty())
+    message += ",Time : " + message_time;
   
   if (control->score < score) {
     control->decision = plan.decisions().front();
@@ -53,12 +58,25 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
 
   int score = 0;
   std::ostringstream oss;
-  oss << "_";
 
-  score += PatternMatch(field, message);
-  score += Field(field);
+  if (true) {
+    std::string name;
+    int value = PatternMatch(field, &name);
+    if (value > 0) {
+      oss << "Pattern(" << name << ")_";
+      score += value;
+    }
+  }
 
-  {  // Evaluate possible rensa.
+  if (false) {
+    int value = Field(field);
+    if (value > 0) {
+      oss << "Flat(" << value << ")_";
+      score += value;
+    }
+  }
+
+  if (false) {  // Evaluate possible rensa.
     int value = Future(field);
     if (value > 0) {
       oss << "Future(" << value << ")_";
@@ -96,7 +114,7 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
     }
   }
 
-  {  // penalty for using too many puyos
+  if (false) {  // penalty for using too many puyos
     int remained_puyos = me.field.countPuyos() - plan.field().countPuyos();
     int wasted_puyos = std::max(remained_puyos - 4 * plan.chains() - 4, 0);
     int value = -200 * plan.chains() * plan.chains() * wasted_puyos;
@@ -106,10 +124,40 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
     }
   }
 
-  {  // TSUBUSHI : how quickly rensa ends. 2 or more lines.
+  if (false) {  // TSUBUSHI : how quickly rensa ends. 2 or more lines.
     int value = EvalTsubushi(plan);
     if (value > 0) {
       oss << "Tsubushi(" << value << ")_";
+      score += value;
+    }
+  }
+
+  if (false) {  // TAIOU : how smartly (need definition)
+    ;
+  }
+
+  *message = oss.str();
+  return score;
+}
+
+int Evaluator::EvalTime(const RefPlan& plan, std::string* message) {
+  // Evaluate time to control puyos and rensa.
+  int score = 0;
+  std::ostringstream oss;
+
+  if (true) {  // Penalty : Time to set puyos, including time for rensa.
+    int value = -plan.totalFrames() * 5;
+    oss << "Base(" << value << ")_";
+    score += value;
+  }
+
+  if (true) { // TAIOU : If enemy's rensa is going, fire my rensa in time.
+    int value = 0;
+    if (enemy.isRensaOngoing() && plan.isRensaPlan()
+        && me.totalOjama(enemy) * 70 < plan.score())
+      value = plan.score();
+    if (value > 0) {
+      oss << "Taiou(" << value << ")_";
       score += value;
     }
   }
@@ -134,6 +182,7 @@ int Evaluator::EvalTsubushi(const RefPlan& plan) {
 }
 
 int Evaluator::PatternMatch(const CoreField& field, std::string* name) {
+  // TODO: Apply some templates' combinations.
   int best = 0;
   for (const Pattern& pattern : Pattern::GetAllPattern()) {
     int score = pattern.Match(field);
@@ -176,18 +225,21 @@ int Evaluator::Field(const CoreField& field) {
 }
 
 int Evaluator::Future(const CoreField& field) {
-  std::vector<int> expects;
-  Plan::iterateAvailablePlans(
-      field, KumipuyoSeq(), 1,
-      [&expects](const RefPlan& plan) {
-        if (plan.isRensaPlan())
-          expects.push_back(plan.score());
+  std::vector<int> expects(10, -1);
+  RensaDetector::detectIteratively(
+      field, RensaDetectorStrategy::defaultDropStrategy(), 1,
+      [&expects](CoreField&& cf, const ColumnPuyoList& puyo_to_add) -> RensaResult {
+        int num = puyo_to_add.size();
+        RensaResult result = cf.simulate();
+        expects[num] = std::max(expects[num], result.score);
+        return result;
       });
-  int value = std::accumulate(expects.begin(), expects.end(), 0);
-  if (expects.size() > 2) {
-    value /= (expects.size() - 1);
+
+  for (size_t i = 0; i < expects.size(); ++i) {
+    if (expects[i] >= 0)
+      return expects[i];
   }
-  return value;
+  return 0;
 }
 
 }  // namespace peria
