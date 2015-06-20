@@ -458,6 +458,15 @@ void RensaDetector::detect(const CoreField& originalField,
 }
 
 // static
+void RensaDetector::detectSingle(const CoreField& cf,
+                                 const RensaDetectorStrategy& strategy,
+                                 const ComplementCallback& callback)
+{
+    const bool noProhibits[FieldConstant::MAP_WIDTH] {};
+    detect(cf, strategy, PurposeForFindingRensa::FOR_FIRE, noProhibits, callback);
+}
+
+// static
 void RensaDetector::detectIteratively(const CoreField& originalField,
                                       const RensaDetectorStrategy& strategy,
                                       int maxIteration,
