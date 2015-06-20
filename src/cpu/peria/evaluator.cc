@@ -19,12 +19,8 @@ int ScoreDiffHeight(int higher, int lower) {
   return ((higher > lower) ? 0 : -diff) * 50;
 }
 
-Evaluator::Evaluator(int id, const PlayerState& m, const PlayerState& e, const PlayerHands& eh, Control* c)
-  : frame_id(id), me(m), enemy(e), enemy_hands(eh), control(c) {
+Evaluator::Evaluator(int id, const PlayerState& m, const PlayerState& e, const PlayerHands& eh, Control* c) : frame_id(id), me(m), enemy(e), enemy_hands(eh), control(c) {
   UNUSED_VARIABLE(frame_id);
-  UNUSED_VARIABLE(me);
-  UNUSED_VARIABLE(enemy);
-  UNUSED_VARIABLE(enemy_hands);
 }
 
 void Evaluator::EvalPlan(const RefPlan& plan) {
@@ -42,7 +38,7 @@ void Evaluator::EvalPlan(const RefPlan& plan) {
     message += ",Rensa : " + message_rensa;
   if (!message_time.empty())
     message += ",Time : " + message_time;
-  
+
   if (control->score < score) {
     control->decision = plan.decisions().front();
     control->score = score;
@@ -146,15 +142,14 @@ int Evaluator::EvalTime(const RefPlan& plan, std::string* message) {
   std::ostringstream oss;
 
   if (true) {  // Penalty : Time to set puyos, including time for rensa.
-    int value = -plan.totalFrames() * 5;
+    int value = -plan.totalFrames();
     oss << "Base(" << value << ")_";
     score += value;
   }
 
   if (true) { // TAIOU : If enemy's rensa is going, fire my rensa in time.
     int value = 0;
-    if (enemy.isRensaOngoing() && plan.isRensaPlan()
-        && me.totalOjama(enemy) * 70 < plan.score())
+    if (enemy.isRensaOngoing() && plan.isRensaPlan() && me.totalOjama(enemy) * 70 < plan.score())
       value = plan.score();
     if (value > 0) {
       oss << "Taiou(" << value << ")_";

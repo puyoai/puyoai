@@ -116,6 +116,7 @@ int Pattern::Match(const CoreField& field) const {
 }
 
 bool Pattern::MergeWith(const Pattern& a) {
+  // TODO: Need a flag to avoid merging some pairs.
   static const char kNonDetermLine[] = "......";
   while (pattern_.size() < a.pattern_.size())
     pattern_.push_back(kNonDetermLine);
@@ -128,7 +129,7 @@ bool Pattern::MergeWith(const Pattern& a) {
     }
   }
   if (isupper(offset))
-    offset -= 'A';
+    offset = offset - 'A' + 1;
   else
     offset = 0;
 
@@ -165,7 +166,7 @@ bool Pattern::MergeWith(const Pattern& a) {
   }
 
   name_ += "+" + a.name_;
-  score_ += a.score_ - 100;
+  score_ += a.score_ - 200;
   for (auto& n : a.neighbors_) {
     neighbors_.insert(Neighbor(n.first + offset, n.second + offset));
   }
