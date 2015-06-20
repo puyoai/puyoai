@@ -1,6 +1,6 @@
 # Template book
 # '#' 以降はコメント
-# Basic score = (# of puyos) * 100 + 100
+# Basic score = (# of puyos) * 100 + (# of _) + 100
 
 NAME: GTR    # テンプレ名. テンプレ内の最初の行にすること.
 SCORE: 800   # テンプレのスコア
@@ -10,7 +10,7 @@ THRESH: 3    # この個数以上合わないと評価しない
 ....BB       # '.' や小文字は任意. '_'は強制空白.
 ----
 NAME: GTR-Ready
-SCORE: 700
+SCORE: 650
 .....A
 ...B_A
 ....BB
@@ -37,7 +37,7 @@ SCORE: 500
 .BB...
 ----
 NAME: Begin2
-SCORE: 700
+SCORE: 600
 DIFF: AC
 __C...
 ABB...
