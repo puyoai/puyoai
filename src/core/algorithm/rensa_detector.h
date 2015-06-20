@@ -21,7 +21,6 @@ enum class PurposeForFindingRensa {
 
 // RensaDetector is a set of functions to find a rensa from the specified field.
 // Using detectIteratively() is recommended for most cases.
-// TODO(mayah): Simplify this class.
 class RensaDetector {
 public:
     typedef std::function<void (CoreField&& complementedField,
@@ -29,6 +28,30 @@ public:
 
     typedef std::function<RensaResult (CoreField&& complementedField,
                                        const ColumnPuyoList& complementedColumnPuyoList)> RensaSimulationCallback;
+
+    // Detects a rensa from the field with the specified strategy.
+    static void detectSingle(const CoreField&,
+                             const RensaDetectorStrategy&,
+                             const ComplementCallback&);
+
+    // Detects a rensa iteratively from CoreField.
+    // Algorithm is like the following (not accurate):
+    // 1. Detects a rensa.
+    // 2. Try to detect another rensa after the field where the previous rensa is finished.
+    // 3. Complement 2's ColumnPuyoList, and 1's ColumnPuyoList, and check the size of rensa.
+    // Do (2)-(3) |maxIteration - 1| times.
+    static void detectIteratively(const CoreField&,
+                                  const RensaDetectorStrategy&,
+                                  int maxIteration,
+                                  const RensaSimulationCallback&);
+
+    // Finds 2-double (or more).
+    static void detectSideChain(const CoreField&,
+                                const RensaDetectorStrategy&,
+                                const ComplementCallback&);
+
+    // ----------------------------------------------------------------------
+    // Don't use the following functions without understanding the algorithm.
 
     // Detects rensa by DROP strategy.
     static void detectByDropStrategy(const CoreField&,
@@ -52,37 +75,12 @@ public:
 
     // Detects a rensa from the field. The ColumnPuyoList to fire a rensa will be passed to
     // |callback|. Note that invalid column puyo list might be passed to |callback|.
-    // The field that puyo list is added is also passed to DetectionCallback.
     static void detect(const CoreField&,
                        const RensaDetectorStrategy&,
                        PurposeForFindingRensa,
                        const bool prohibits[FieldConstant::MAP_WIDTH],
                        const ComplementCallback&);
 
-    static void detectSingle(const CoreField& cf,
-                             const RensaDetectorStrategy& strategy,
-                             const ComplementCallback& callback)
-    {
-        const bool noProhibits[FieldConstant::MAP_WIDTH] {};
-        detect(cf, strategy, PurposeForFindingRensa::FOR_FIRE, noProhibits, callback);
-    }
-
-    // Detects a rensa from CoreField.
-    // Algorithm is like the following (not accurate):
-    // 1. Vanish puyos from CoreField.
-    // 2. After (1), Also vanish puyos from CoreField. The complemneted puyos to fire this rensa are considered
-    //    as key puyos. Iterate this (maxIteration - 1) times.
-    // 3. Complement all puyos for (1) and (2), and call callback.
-    // 4. If the rensa is not corrupted, proceed.
-    static void detectIteratively(const CoreField&,
-                                  const RensaDetectorStrategy&,
-                                  int maxIteration,
-                                  const RensaSimulationCallback&);
-
-    // Finds 2-double (or more).
-    static void detectSideChain(const CoreField&,
-                                const RensaDetectorStrategy&,
-                                const ComplementCallback&);
     static void detectSideChainFromDetectedField(const CoreField& originalField,
                                                  const CoreField& detectedField,
                                                  const RensaDetectorStrategy&,
