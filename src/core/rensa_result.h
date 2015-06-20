@@ -55,8 +55,10 @@ public:
 
     int score() const { return rensaResult_.score; }
     int chains() const { return rensaResult_.chains; }
-    int totalFrames() const { return rensaResult_.frames + framesToIgnite(); }
     int framesToIgnite() const { return framesToIgnite_; }
+    int rensaFrames() const { return rensaResult_.frames; }
+
+    int totalFrames() const { return rensaResult_.frames + framesToIgnite(); }
 
 private:
     RensaResult rensaResult_;
