@@ -13,16 +13,21 @@ class KumipuyoSeq;
 
 struct EstimatedRensaInfo {
     EstimatedRensaInfo() {}
-    EstimatedRensaInfo(int chains, int score, int framesToIgnite, const RensaCoefResult& coefResult) :
-        chains(chains), score(score), framesToIgnite(framesToIgnite), coefResult(coefResult)
+    EstimatedRensaInfo(const IgnitionRensaResult& ignitionRensaResult, const RensaCoefResult& coefResult) :
+        ignitionRensaResult(ignitionRensaResult), coefResult(coefResult)
     {
     }
 
+    int chains() const { return ignitionRensaResult.chains(); }
+    int score() const { return ignitionRensaResult.score(); }
+    int rensaFrames() const { return ignitionRensaResult.rensaFrames(); }
+    int framesToIgnite() const { return ignitionRensaResult.framesToIgnite(); }
+
+    int totalFrames() const { return ignitionRensaResult.totalFrames(); }
+
     std::string toString() const;
 
-    int chains;
-    int score;
-    int framesToIgnite;
+    IgnitionRensaResult ignitionRensaResult;
     RensaCoefResult coefResult;
 };
 

@@ -27,22 +27,26 @@ static const int ACCUMULATED_RENSA_SCORE[] = {
 struct SortByFrames {
     bool operator()(const EstimatedRensaInfo& lhs, const EstimatedRensaInfo& rhs) const
     {
-        if (lhs.framesToIgnite != rhs.framesToIgnite)
-            return lhs.framesToIgnite < rhs.framesToIgnite;
+        if (lhs.framesToIgnite() != rhs.framesToIgnite())
+            return lhs.framesToIgnite() < rhs.framesToIgnite();
 
         // The rest of '>' is intentional.
-        if (lhs.score != rhs.score)
-            return lhs.score > rhs.score;
-        if (lhs.chains != rhs.chains)
-            return lhs.score > rhs.chains;
-        return lhs.coefResult.coef(lhs.chains) > rhs.coefResult.coef(rhs.chains);
+        if (lhs.score() != rhs.score())
+            return lhs.score() > rhs.score();
+        if (lhs.chains() != rhs.chains())
+            return lhs.score() > rhs.chains();
+
+        if (lhs.rensaFrames() != rhs.rensaFrames())
+            return lhs.rensaFrames() < rhs.rensaFrames();
+
+        return lhs.coefResult.coef(lhs.chains()) > rhs.coefResult.coef(rhs.chains());
     }
 };
 
 std::string EstimatedRensaInfo::toString() const
 {
     char buf[80];
-    sprintf(buf, "frames, chains, score = %d, %d, %d", framesToIgnite, chains, score);
+    sprintf(buf, "framesToIgnite, chains, score, totalFrames = %d, %d, %d, %d", framesToIgnite(), chains(), score(), totalFrames());
     return buf;
 }
 
@@ -70,7 +74,7 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
 
     int maxScore = -1;
     for (auto it = possibleRensaInfos_.begin(); it != possibleRensaInfos_.end(); ++it) {
-        int restFrames = frameId - (it->framesToIgnite + frameIdGazedAt());
+        int restFrames = frameId - (it->framesToIgnite() + frameIdGazedAt());
         int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT));
         // At max, enemy will be able ot puyo restEmptyField. We have counted the puyos for possibleRensaInfos,
         // we substract 6 from restEmptyField_.
@@ -80,8 +84,8 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
         // TODO(mayah): newChains should not be negative. restFrames is negative?
         if (newAdditionalChains < 0)
             newAdditionalChains = 0;
-        if (newAdditionalChains + it->chains > 19)
-            newAdditionalChains = 19 - it->chains;
+        if (newAdditionalChains + it->chains() > 19)
+            newAdditionalChains = 19 - it->chains();
 
         int rensaCoef[20] {};
         int rensaNumErased[20] {};
@@ -91,13 +95,13 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
                 rensaCoef[i] = 1;
             rensaNumErased[i] = 4;
         }
-        for (int i = 1; i <= it->chains; ++i) {
+        for (int i = 1; i <= it->chains(); ++i) {
             int j = i + newAdditionalChains;
             rensaCoef[j] = it->coefResult.coef(i) - chainBonus(i) + chainBonus(j);
             rensaNumErased[j] = it->coefResult.numErased(i);
         }
         int score = 0;
-        for (int i = 1; i <= newAdditionalChains + it->chains; ++i)
+        for (int i = 1; i <= newAdditionalChains + it->chains(); ++i)
             score += rensaCoef[i] * rensaNumErased[i] * 10;
 
         maxScore = std::max(maxScore, score);
@@ -132,12 +136,12 @@ int GazeResult::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInf
     if (rensaInfos.empty())
         return -1;
 
-    if (rensaInfos.back().framesToIgnite + frameIdGazedAt() < frameId)
+    if (rensaInfos.back().framesToIgnite() + frameIdGazedAt() < frameId)
         return -1;
 
     for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (frameId <= it->framesToIgnite + frameIdGazedAt())
-            return it->score;
+        if (frameId <= it->framesToIgnite() + frameIdGazedAt())
+            return it->score();
     }
 
     return -1;
@@ -195,7 +199,7 @@ void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         CoreField copied(cf);
         RensaCoefTracker tracker;
         RensaResult rensaResult = copied.simulate(&tracker);
-        results.emplace_back(rensaResult.chains, rensaResult.score, framesToIgnite, tracker.result());
+        results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite), tracker.result());
     };
     Plan::iterateAvailablePlansWithoutFiring(field, seq, seq.size(), f);
 
@@ -206,14 +210,14 @@ void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     feasibleRensaInfos_.push_back(results.front());
 
     for (const auto& info : results) {
-        if (info.score <= feasibleRensaInfos_.back().score)
+        if (info.score() <= feasibleRensaInfos_.back().score())
             continue;
 
-        DCHECK(feasibleRensaInfos_.back().framesToIgnite < info.framesToIgnite)
-            << "feasible frames = " << feasibleRensaInfos_.back().framesToIgnite
-            << " initiating frames = " << info.framesToIgnite
-            << " score(1) = " << feasibleRensaInfos_.back().score
-            << " score(2) = " << info.score << endl;
+        DCHECK(feasibleRensaInfos_.back().framesToIgnite() < info.framesToIgnite())
+            << "feasible frames = " << feasibleRensaInfos_.back().framesToIgnite()
+            << " initiating frames = " << info.framesToIgnite()
+            << " score(1) = " << feasibleRensaInfos_.back().score()
+            << " score(2) = " << info.score() << endl;
 
         feasibleRensaInfos_.push_back(info);
     }
@@ -262,9 +266,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         // Estimate the number of frames to initiate the rensa.
         int heightMove = std::max(0, static_cast<int>(std::ceil(FieldConstant::HEIGHT - averageHeight)));
         int framesToIgnite = (FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * necessaryHands;
-        int score = rensaResult.score;
-        int chains = rensaResult.chains;
-        results.emplace_back(chains, score, framesToIgnite, tracker.result());
+        results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite), tracker.result());
 
         return rensaResult;
     };
@@ -277,10 +279,10 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     possibleRensaInfos_.push_back(results.front());
 
     for (const auto& info : results) {
-        if (info.score <= possibleRensaInfos_.back().score)
+        if (info.score() <= possibleRensaInfos_.back().score())
             continue;
 
-        DCHECK(possibleRensaInfos_.back().framesToIgnite < info.framesToIgnite);
+        DCHECK(possibleRensaInfos_.back().framesToIgnite() < info.framesToIgnite());
         possibleRensaInfos_.push_back(info);
     }
 }
