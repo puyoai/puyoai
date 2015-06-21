@@ -30,7 +30,7 @@ public:
 
     int aite_hyouka(const int ba3[6][kHeight], int tsumo[]);
     int pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, int aite_ba[6][kHeight], int zenkesi_aite, int fast);
-    int hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][kHeight], int zenkesi_aite);
+    int hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, int aite_ba[6][kHeight], int zenkesi_aite);
     bool aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int scos, int hakata);
     int aite_attack_nokori(const int ba3[6][kHeight], int hakata);
     int aite_rensa_end();

@@ -164,8 +164,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
             coma.pre_hyouka(r_player[0].field, r_player[0].tsumo, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi, 1);
         }
         coma.aite_attack_nokori(r_player[1].field, r_player[0].id); // 情報が更新されないため、現構成ではうまく機能しない
-        coma.hyouka(r_player[0].field, r_player[0].tsumo[0], r_player[0].tsumo[1], r_player[0].tsumo[2],
-                    r_player[0].tsumo[3], r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi);
+        coma.hyouka(r_player[0].field, r_player[0].tsumo, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi);
 
         // 2x hyouka
         int field_kosuu = 0;
@@ -189,7 +188,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         }
 
         if (field_kosuu > 24 && field_kosuu < 56) {
-            coma2x.hyouka(field2x, r_player[0].tsumo[0], r_player[0].tsumo[1], r_player[0].tsumo[2], r_player[0].tsumo[3], r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi);
+            coma2x.hyouka(field2x, r_player[0].tsumo, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi);
         }
 
         tmp = 0;
