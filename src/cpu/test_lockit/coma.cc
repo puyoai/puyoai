@@ -3209,6 +3209,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     } // 110604
                 } // dd220
 
+                // Penalty for CHIGIRI
                 if (aite_hakka_honsen == 0) {
                     if (p_t == 4)
                         score_hukasa[aa][bb][dd] -= (chig_aa * 3 + chig_bb * 2 + chig_dd * 1) * 400;
@@ -3228,6 +3229,8 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     if (p_t == 1)
                         score_hukasa[aa][bb][dd] -= (chig_aa * 1 + chig_bb * 1 + chig_dd * 1);
                 }
+
+                // Penalty for field like 'U'
                 if (ba_ee[2][10] != 0)
                     score_hukasa[aa][bb][dd] -= 1200;
                 if (ba_ee[3][10] != 0)
@@ -3256,11 +3259,13 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     }
                 }
 
+                // GTR-check
                 if ((zenkesi_own != 1) && (zenkesi_aite != 1) && (o_t)) {
                     if (hukks < 10)
                         score_hukasa[aa][bb][dd] += gtr(ba_ee);
                 }
 
+                // Balanced field
                 for (i = 0; i < 6; i++) {
                     for (j = 0; j < 14; j++) {
                         if (ba_ee[i][j] == 0) {
@@ -3297,15 +3302,16 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     score_hukasa[aa][bb][dd] -= teimen[5] * 10;
                 }
 
+                // Tanpatsu
                 tanpatu_on = keshiko_aa * 2 + keshiko_bb;
-                if ((keshiko_aa < 5) && (keshiko_bb < 5))
+                if (keshiko_aa < 5 && keshiko_bb < 5)
                     tanpatu_on = 0;
-                if ((keshiko_aa > 7) || (keshiko_bb > 7))
+                if (keshiko_aa > 7 || keshiko_bb > 7)
                     tanpatu_on = 0;
-                if ((tanpatu_on > 0) && (myf_kosuu_iro > aite_kosuu_iro + 1) && (myf_kosuu_iro > 23) && (one_tanpatu)
-                    && (aite_hakka_kosuu == 0) && (aite_hakka_rensa == 0))
+                if (tanpatu_on > 0 && myf_kosuu_iro > aite_kosuu_iro + 1 && myf_kosuu_iro > 23 && one_tanpatu && aite_hakka_kosuu == 0 && aite_hakka_rensa == 0)
                     score_hukasa[aa][bb][dd] += tanpatu_on * 120;
 
+                // TODO(peria): what ee means?
                 for (ee = 0; ee < EE_SIZE; ee++) {
                     if ((key_ee == 0) && (ee > 0))
                         break; // t2
