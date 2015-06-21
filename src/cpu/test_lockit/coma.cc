@@ -2692,8 +2692,8 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
 
     nx1 = tsumo[0];
     nx2 = tsumo[1];
-    nn1 = tsumo[2];
-    nn2 = tsumo[3];
+    nn1 = (tsumo[2] == TL_UNKNOWN ? TL_RED : tsumo[2]);
+    nn2 = (tsumo[3] == TL_UNKNOWN ? TL_RED : tsumo[3]);
     nk1 = TL_RED;
     nk2 = TL_RED;
     for (i = 0; i < 6; i++) {

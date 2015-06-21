@@ -12,6 +12,8 @@ enum TLColor {
     TL_YELLOW = 3,
     TL_GREEN = 4,
     TL_OJAMA = 9,
+
+    TL_UNKNOWN = 10,
 };
 
 }  // namespace test_lockit
