@@ -18,6 +18,35 @@ int chainhyk[22][22][221][EE_SIZE] {};
 int poihyo[22][22][221][EE_SIZE] {};
 int score_hukasa[22][22][221] {};
 
+namespace {
+
+bool IsMatchIndexAndColors(int id, int color[]) {
+  static const int expect_colors[][2] = {
+    {TL_RED, TL_RED},
+    {TL_RED, TL_BLUE},
+    {TL_RED, TL_YELLOW},
+    {TL_RED, TL_GREEN},
+    {TL_BLUE, TL_BLUE},
+    {TL_BLUE, TL_YELLOW},
+    {TL_BLUE, TL_GREEN},
+    {TL_YELLOW, TL_YELLOW},
+    {TL_YELLOW, TL_GREEN},
+    {TL_GREEN, TL_GREEN},
+  };
+
+  if (color[0] == TL_UNKNOWN || color[1] == TL_UNKNOWN)
+    return true;
+  if (id == 220)
+    return true;
+  if (id >= 221 || id < 0)
+    return false;
+
+  id /= 22;
+  return expect_colors[id][0] == color[0] && expect_colors[id][1] == color[1];
+}
+
+}  // namespace
+
 void COMAI_HI::ref()
 {
     cchai = 0;
@@ -957,6 +986,8 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
         for (bb = 0; bb < 22; bb++) {
             for (dd = 0; dd < 221; dd++) {
                 // TODO(peria): Skip some cases if next2 tsumo is known.
+                if (!IsMatchIndexAndColors(dd, &tsumo[4]))
+                    continue;
                 for (ee = 0; ee < EE_SIZE; ee++) {
                     if ((key_ee == 0) && (ee > 0))
                         break; // t2
