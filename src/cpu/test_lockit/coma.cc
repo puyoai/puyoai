@@ -518,6 +518,8 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
     // aaaaaaaaaaaaaaaaaaaaaa
     int maxpont[TM_TMNMUM][22] {};
     int maxp_matome[22] = { 0 };
+    // TODO(peria): What |adubpt| means?
+    // bool?
     int adubpt[22][22][22] {};
     int apos[22] = { 0 };
 
@@ -890,6 +892,7 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
         if ((myf_kosuu_iro - keshiko_aa + 8) < cchai * 4)
             continue;
         if (ba_a[2][11] != 0) {
+            // In case the 1st control leads to die, do not score following controls.
             for (bb = 0; bb < 22; bb++) {
                 for (dd = 0; dd < 221; dd++) {
                     for (ee = 0; ee < EE_SIZE; ee++) {
@@ -952,6 +955,7 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
     for (aa = 0; aa < 22; aa++) {
         for (bb = 0; bb < 22; bb++) {
             for (dd = 0; dd < 221; dd++) {
+                // TODO(peria): Skip some cases if next2 tsumo is known.
                 for (ee = 0; ee < EE_SIZE; ee++) {
                     if ((key_ee == 0) && (ee > 0))
                         break; // t2
