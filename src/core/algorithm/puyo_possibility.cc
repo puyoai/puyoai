@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "core/kumipuyo_seq.h"
+
 using namespace std;
 
 bool PuyoPossibility::s_initialized = false;
@@ -114,4 +116,19 @@ void PuyoPossibility::initialize()
 
     delete[] p;
     delete[] q;
+}
+
+// static
+int PuyoPossibility::necessaryPuyos(const PuyoSet& puyoSet, const KumipuyoSeq& seq, double threshold)
+{
+    PuyoSet ps(puyoSet);
+
+    for (int i = 0; i < seq.size(); ++i) {
+        if (ps.isEmpty())
+            return i * 2;
+        ps.sub(seq.axis(i));
+        ps.sub(seq.child(i));
+    }
+
+    return seq.size() * 2 + necessaryPuyos(ps, threshold);
 }

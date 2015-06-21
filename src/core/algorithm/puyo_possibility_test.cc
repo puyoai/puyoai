@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "core/kumipuyo_seq.h"
+
 TEST(PuyoPossibilityTest, possibility)
 {
     PuyoPossibility::initialize();
@@ -77,4 +79,18 @@ TEST(PuyoPossibilityTest, necessaryPuyos)
     EXPECT_EQ(16, PuyoPossibility::necessaryPuyos(PuyoSet(3, 0, 0, 0), 0.8));
     EXPECT_EQ(8, PuyoPossibility::necessaryPuyos(PuyoSet(1, 1, 0, 0), 0.8));
     EXPECT_EQ(14, PuyoPossibility::necessaryPuyos(PuyoSet(2, 2, 0, 0), 0.8));
+}
+
+TEST(PuyoPossibilityTest, necessaryPuyosWithKumipuyoSeq)
+{
+    PuyoPossibility::initialize();
+
+    EXPECT_EQ(0, PuyoPossibility::necessaryPuyos(PuyoSet(0, 0, 0, 0), KumipuyoSeq("RR"), 1.0));
+
+    EXPECT_EQ(2, PuyoPossibility::necessaryPuyos(PuyoSet(1, 0, 0, 0), KumipuyoSeq("RR"), 0.25));
+    EXPECT_EQ(2, PuyoPossibility::necessaryPuyos(PuyoSet(1, 0, 0, 0), KumipuyoSeq("RR"), 1.0));
+
+    EXPECT_EQ(2, PuyoPossibility::necessaryPuyos(PuyoSet(2, 0, 0, 0), KumipuyoSeq("RR"), 1.0));
+
+    EXPECT_EQ(9, PuyoPossibility::necessaryPuyos(PuyoSet(2, 0, 0, 0), KumipuyoSeq("GG"), 0.5));
 }
