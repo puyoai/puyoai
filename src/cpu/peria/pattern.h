@@ -16,6 +16,9 @@ class Pattern {
 
   static void ReadBook(std::istream& is);
   static const std::vector<Pattern>& GetAllPattern();
+  // TODO: Make a Book class which has Pattern's, and this method should be
+  // in that class.
+  static void BuildCombination();
 
   int Match(const CoreField& field) const;
   const std::string& name() const { return name_; }
