@@ -14,7 +14,8 @@
 
 namespace test_lockit {
 
-int chainhyk[22][22][221][EE_SIZE], poihyo[22][22][221][EE_SIZE];
+int chainhyk[22][22][221][EE_SIZE] {};
+int poihyo[22][22][221][EE_SIZE] {};
 int score_hukasa[22][22][221] {};
 
 void COMAI_HI::ref()
