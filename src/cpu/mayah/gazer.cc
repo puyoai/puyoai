@@ -243,23 +243,10 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
 
         PuyoSet puyoSet;
         puyoSet.add(puyosToComplement);
+        int necessaryPuyos = PuyoPossibility::necessaryPuyos(puyoSet, kumipuyoSeq, 0.3);
+        int necessaryHands = (necessaryPuyos + 1) / 2;
 
-        int necessaryHands = kumipuyoSeq.size();
-        for (int i = 0; i < kumipuyoSeq.size(); ++i) {
-            puyoSet.sub(kumipuyoSeq.axis(i));
-            puyoSet.sub(kumipuyoSeq.child(i));
-            if (puyoSet.isEmpty()) {
-                necessaryHands = i + 1;
-                break;
-            }
-        }
-
-        // When the enemy took |k| hands, enemy will be able to fire the rensa in 30%.
-        if (!puyoSet.isEmpty()) {
-            necessaryHands += (PuyoPossibility::necessaryPuyos(puyoSet, 0.3) + 1) / 2;
-        }
-
-        // We need to remove last hand frames.
+        // We need to remove last hand frames, since we'd like to calculate framesToIgnite.
         if (necessaryHands > 1)
             --necessaryHands;
 
