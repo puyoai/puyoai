@@ -3022,19 +3022,20 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
             nk1 = 0;
             nk2 = 0;
         }
-        if ((nk1 == 1) && (nk1 == 1)) {
+
+        if ((nk1 == 1) && (nk2 == 1)) {
             if (((dd > 5) && (dd < 12)) || ((dd > 13) && (dd < 19)))
                 continue;
         }
-        if ((nk1 == 2) && (nk1 == 2)) {
+        if ((nk1 == 2) && (nk2 == 2)) {
             if (((dd > 5 + 88) && (dd < 12 + 88)) || ((dd > 13 + 88) && (dd < 19 + 88)))
                 continue;
         }
-        if ((nk1 == 3) && (nk1 == 3)) {
+        if ((nk1 == 3) && (nk2 == 3)) {
             if (((dd > 5 + 154) && (dd < 12 + 154)) || ((dd > 13 + 154) && (dd < 19 + 154)))
                 continue;
         }
-        if ((nk1 == 4) && (nk1 == 4)) {
+        if ((nk1 == 4) && (nk2 == 4)) {
             if (((dd > 5 + 198) && (dd < 12 + 198)) || ((dd > 13 + 198) && (dd < 19 + 198)))
                 continue;
         }
