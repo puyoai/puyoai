@@ -179,7 +179,7 @@ int COMAI_HI::aite_rensa_end()
     return 0;
 }
 
-int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx, int nnx2)
+int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
 {
     int ba2[6][kHeight] {};
     int ba[6][kHeight] {};
@@ -219,10 +219,10 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx,
     aite_rensa_score_cc = 0;
     nocc_aite_rensa_score = 0;
 
-    nx1 = nex;
-    nx2 = nex2;
-    nn1 = nnx;
-    nn2 = nnx2;
+    nx1 = tsumo[0];
+    nx2 = tsumo[1];
+    nn1 = tsumo[2];
+    nn2 = tsumo[3];
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
             ba2[i][j] = ba3[i][j];
