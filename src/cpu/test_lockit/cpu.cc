@@ -144,7 +144,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
     if ((r_player[1].act_on == 1) && (r_player[1].set_puyo_once == 1)) {
         r_player[1].set_puyo_once = 0;
         coma.aite_rensa_end();
-        coma.aite_hyouka(r_player[1].field, r_player[1].tsumo[0], r_player[1].tsumo[1], r_player[1].tsumo[2], r_player[1].tsumo[3]);
+        coma.aite_hyouka(r_player[1].field, r_player[1].tsumo);
     }
     if (r_player[0].set_puyo == 1) {
         r_player[0].set_puyo_once = 1;
