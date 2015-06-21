@@ -50,6 +50,14 @@ std::string EstimatedRensaInfo::toString() const
     return buf;
 }
 
+void GazeResult::reset(int frameId, int numReachableSpaces)
+{
+    frameIdGazedAt_ = frameId;
+    numReachableSpaces_ = numReachableSpaces;
+    feasibleRensaInfos_.clear();
+    possibleRensaInfos_.clear();
+}
+
 int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
 {
     CHECK_LE(frameIdGazedAt_, frameId)
@@ -78,7 +86,7 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
         int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT));
         // At max, enemy will be able ot puyo restEmptyField. We have counted the puyos for possibleRensaInfos,
         // we substract 6 from restEmptyField_.
-        numPossiblePuyos = max(0, min(restEmptyField_ - 6, numPossiblePuyos));
+        numPossiblePuyos = max(0, min(numReachableSpaces_ - 6, numPossiblePuyos));
         int newAdditionalChains = min(numPossiblePuyos / 4, 19);
 
         // TODO(mayah): newChains should not be negative. restFrames is negative?
@@ -113,7 +121,7 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
     // When there is not possible rensa.
     int restFrames = frameId - frameIdGazedAt();
     int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING));
-    numPossiblePuyos = max(0, min(restEmptyField_ - 6, numPossiblePuyos));
+    numPossiblePuyos = max(0, min(numReachableSpaces_ - 6, numPossiblePuyos));
     int newChains = min((numPossiblePuyos / 4), 19);
     // TODO(mayah): newChains should not be negative. restFrames is negative?
     if (newChains < 0)
@@ -165,116 +173,116 @@ string GazeResult::toRensaInfoString() const
 
 void Gazer::initialize(int frameIdGameWillBegin)
 {
-    frameIdGazedAt_ = frameIdGameWillBegin;
-    restEmptyField_ = 72;
-    feasibleRensaInfos_.clear();
-    possibleRensaInfos_.clear();
+    gazeResult_.reset(frameIdGameWillBegin, 72);
 }
 
 void Gazer::gaze(int frameId, const CoreField& cf, const KumipuyoSeq& seq)
 {
-    setFrameIdGazedAt(frameId);
+    int numReachableSpaces = cf.countConnectedPuyos(3, 12);
+    gazeResult_.reset(frameId, numReachableSpaces);
+
     updateFeasibleRensas(cf, seq);
     updatePossibleRensas(cf, seq);
-
-    FieldBits checked;
-    restEmptyField_ = cf.countConnectedPuyos(3, 12, &checked);
 }
 
 void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
 {
-    feasibleRensaInfos_.clear();
-
     // It might take long time if size() >= 4. Consider only size <= 3.
     KumipuyoSeq seq(kumipuyoSeq);
     if (seq.size() >= 4)
         seq = seq.subsequence(0, 3);
 
     std::vector<EstimatedRensaInfo> results;
-    auto f = [&results](const CoreField& cf, const std::vector<Decision>& /*decisions*/,
-                        int /*numChigiri*/, int framesToIgnite, int /*lastDropFrames*/, bool shouldFire) {
-        if (!shouldFire)
+    {
+        auto f = [&results](const CoreField& cf, const std::vector<Decision>& /*decisions*/,
+                            int /*numChigiri*/, int framesToIgnite, int /*lastDropFrames*/, bool shouldFire) {
+            if (!shouldFire)
+                return;
+
+            CoreField copied(cf);
+            RensaCoefTracker tracker;
+            RensaResult rensaResult = copied.simulate(&tracker);
+            results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite), tracker.result());
+        };
+        Plan::iterateAvailablePlansWithoutFiring(field, seq, seq.size(), f);
+
+        if (results.empty())
             return;
 
-        CoreField copied(cf);
-        RensaCoefTracker tracker;
-        RensaResult rensaResult = copied.simulate(&tracker);
-        results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite), tracker.result());
-    };
-    Plan::iterateAvailablePlansWithoutFiring(field, seq, seq.size(), f);
+        sort(results.begin(), results.end(), SortByFrames());
+    }
 
-    if (results.empty())
-        return;
+    std::vector<EstimatedRensaInfo> feasibleRensaInfos;
 
-    sort(results.begin(), results.end(), SortByFrames());
-    feasibleRensaInfos_.push_back(results.front());
+    feasibleRensaInfos.push_back(results.front());
 
     for (const auto& info : results) {
-        if (info.score() <= feasibleRensaInfos_.back().score())
+        if (info.score() <= feasibleRensaInfos.back().score())
             continue;
 
-        DCHECK(feasibleRensaInfos_.back().framesToIgnite() < info.framesToIgnite())
-            << "feasible frames = " << feasibleRensaInfos_.back().framesToIgnite()
+        DCHECK(feasibleRensaInfos.back().framesToIgnite() < info.framesToIgnite())
+            << "feasible frames = " << feasibleRensaInfos.back().framesToIgnite()
             << " initiating frames = " << info.framesToIgnite()
-            << " score(1) = " << feasibleRensaInfos_.back().score()
+            << " score(1) = " << feasibleRensaInfos.back().score()
             << " score(2) = " << info.score() << endl;
 
-        feasibleRensaInfos_.push_back(info);
+        feasibleRensaInfos.push_back(info);
     }
+
+    gazeResult_.setFeasibleRensaInfo(std::move(feasibleRensaInfos));
 }
 
 void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
 {
-    possibleRensaInfos_.clear();
-
     double averageHeight = 0;
     for (int x = 1; x <= FieldConstant::WIDTH; ++x)
         averageHeight += field.height(x) / 6.0;
 
     vector<EstimatedRensaInfo> results;
-    results.reserve(20000);
-    auto callback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
-        RensaCoefTracker tracker;
-        RensaResult rensaResult = cf.simulate(&tracker);
+    {
+        results.reserve(20000);
+        auto callback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
+            RensaCoefTracker tracker;
+            RensaResult rensaResult = cf.simulate(&tracker);
 
-        // Ignore rensa whose power is really small.
-        if (rensaResult.score < 70)
+            // Ignore rensa whose power is really small.
+            if (rensaResult.score < 70)
+                return rensaResult;
+
+            PuyoSet puyoSet;
+            puyoSet.add(puyosToComplement);
+            int necessaryPuyos = PuyoPossibility::necessaryPuyos(puyoSet, kumipuyoSeq, 0.3);
+            int necessaryHands = (necessaryPuyos + 1) / 2;
+
+            // We need to remove last hand frames, since we'd like to calculate framesToIgnite.
+            if (necessaryHands > 1)
+                --necessaryHands;
+
+            // Estimate the number of frames to initiate the rensa.
+            int heightMove = std::max(0, static_cast<int>(std::ceil(FieldConstant::HEIGHT - averageHeight)));
+            int framesToIgnite = (FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * necessaryHands;
+            results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite), tracker.result());
+
             return rensaResult;
+        };
 
-        PuyoSet puyoSet;
-        puyoSet.add(puyosToComplement);
-        int necessaryPuyos = PuyoPossibility::necessaryPuyos(puyoSet, kumipuyoSeq, 0.3);
-        int necessaryHands = (necessaryPuyos + 1) / 2;
+        RensaDetector::detectIteratively(field, RensaDetectorStrategy::defaultFloatStrategy(), 3, callback);
+        if (results.empty())
+            return;
 
-        // We need to remove last hand frames, since we'd like to calculate framesToIgnite.
-        if (necessaryHands > 1)
-            --necessaryHands;
+        sort(results.begin(), results.end(), SortByFrames());
+    }
 
-        // Estimate the number of frames to initiate the rensa.
-        int heightMove = std::max(0, static_cast<int>(std::ceil(FieldConstant::HEIGHT - averageHeight)));
-        int framesToIgnite = (FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * necessaryHands;
-        results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite), tracker.result());
-
-        return rensaResult;
-    };
-
-    RensaDetector::detectIteratively(field, RensaDetectorStrategy::defaultFloatStrategy(), 3, callback);
-    if (results.empty())
-        return;
-
-    sort(results.begin(), results.end(), SortByFrames());
-    possibleRensaInfos_.push_back(results.front());
+    vector<EstimatedRensaInfo> possibleRensaInfos;
+    possibleRensaInfos.push_back(results.front());
 
     for (const auto& info : results) {
-        if (info.score() <= possibleRensaInfos_.back().score())
+        if (info.score() <= possibleRensaInfos.back().score())
             continue;
 
-        DCHECK(possibleRensaInfos_.back().framesToIgnite() < info.framesToIgnite());
-        possibleRensaInfos_.push_back(info);
+        DCHECK(possibleRensaInfos.back().framesToIgnite() < info.framesToIgnite());
+        possibleRensaInfos.push_back(info);
     }
-}
 
-GazeResult Gazer::gazeResult() const
-{
-    return GazeResult(frameIdGazedAt_, restEmptyField_, feasibleRensaInfos_, possibleRensaInfos_);
+    gazeResult_.setPossibleRensaInfo(std::move(possibleRensaInfos));
 }
