@@ -104,7 +104,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
     }
 }
 
-FrameResponse sendmes(READ_P* p1, READ_P* /*p2*/, COMAI_HI* coo)
+FrameResponse sendmes(READ_P* p1, COMAI_HI* coo)
 {
     stringstream ss;
     ss << "you="
@@ -225,7 +225,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         if (r_player[0].setti_puyo()) {
             r_player[0].zenkesi = 0;
         }
-        response = sendmes(&r_player[0], &r_player[1], &coma);
+        response = sendmes(&r_player[0], &coma);
     } // p1 act_once
 
     if (r_player[0].nex_on == 1) { // 事前手決めスタート
