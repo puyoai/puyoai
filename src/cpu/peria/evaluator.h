@@ -25,7 +25,7 @@ class Evaluator {
 
   // Field related eval functions
   int PatternMatch(const CoreField& field, std::string* message);
-  int Field(const CoreField& field);
+  int Flat(const CoreField& field);
   int Future(const CoreField& field);
 
   // Eval functions for Rensa.
