@@ -161,8 +161,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         r_player[0].set_puyo_once = 0;
         r_player[0].setti_12();
         if (coma.hukks == 0 || r_player[0].field_hikaku() > 0) { // 開幕のhukks==0では思考を短くする？
-            coma.pre_hyouka(r_player[0].field, r_player[0].tsumo[0], r_player[0].tsumo[1], r_player[0].tsumo[2],
-                            r_player[0].tsumo[3], r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi, 1);
+            coma.pre_hyouka(r_player[0].field, r_player[0].tsumo, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi, 1);
         }
         coma.aite_attack_nokori(r_player[1].field, r_player[0].id); // 情報が更新されないため、現構成ではうまく機能しない
         coma.hyouka(r_player[0].field, r_player[0].tsumo[0], r_player[0].tsumo[1], r_player[0].tsumo[2],
@@ -234,9 +233,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
 
     if (r_player[0].nex_on == 1) { // 事前手決めスタート
         if (coma.hukks != 0) {
-            coma.pre_hyouka(r_player[0].yosou_field, r_player[0].tsumo[2], r_player[0].tsumo[3],
-                            r_player[0].tsumo[4], r_player[0].tsumo[5], r_player[0].zenkesi, r_player[1].field,
-                            r_player[1].zenkesi, 0);
+            coma.pre_hyouka(r_player[0].yosou_field, r_player[0].tsumo + 2, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi, 0);
         }
     } // 開幕のhukks==0はこちらはひっかからない？
 

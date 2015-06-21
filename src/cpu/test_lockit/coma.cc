@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 
+#include "color.h"
 #include "field.h"
 
 namespace test_lockit {
@@ -2582,7 +2583,7 @@ int COMAI_HI::read_template()
     return numg;
 }
 
-int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx, int nnx2, int zenkesi_own, int aite_ba[6][kHeight],
+int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, int aite_ba[6][kHeight],
                          int zenkesi_aite, int fast)
 {
     int ba[6][kHeight] {};
@@ -2690,12 +2691,12 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int nex, int nex2, int nnx, 
         kes2 = 0;
     }
 
-    nx1 = nex;
-    nx2 = nex2;
-    nn1 = nnx;
-    nn2 = nnx2;
-    nk1 = 1;
-    nk2 = 1;
+    nx1 = tsumo[0];
+    nx2 = tsumo[1];
+    nn1 = tsumo[2];
+    nn2 = tsumo[3];
+    nk1 = TL_RED;
+    nk2 = TL_RED;
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
             ba2[i][j] = ba3[i][j];
