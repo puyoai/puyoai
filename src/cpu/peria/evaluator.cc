@@ -13,12 +13,6 @@
 
 namespace peria {
 
-int ScoreDiffHeight(int higher, int lower) {
-  int diff = higher - lower;
-  diff = diff * diff;
-  return ((higher > lower) ? 0 : -diff) * 50;
-}
-
 Evaluator::Evaluator(int id, const PlayerState& m, const PlayerState& e, const PlayerHands& eh, Control* c) : frame_id(id), me(m), enemy(e), enemy_hands(eh), control(c) {
   UNUSED_VARIABLE(frame_id);
 }
@@ -64,8 +58,8 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
     }
   }
 
-  if (false) {
-    int value = Field(field);
+  if (true) {
+    int value = Flat(field);
     if (value > 0) {
       oss << "Flat(" << value << ")_";
       score += value;
@@ -193,28 +187,15 @@ int Evaluator::PatternMatch(const CoreField& field, std::string* name) {
   return best;
 }
 
-int Evaluator::Field(const CoreField& field) {
+int Evaluator::Flat(const CoreField& field) {
   int score = 0;
 
-  int num_connect = 0;
   for (int x = 1; x < FieldConstant::WIDTH; ++x) {
-    int height = field.height(x);
-    for (int y = 1; y <= height; ++y) {
-      PuyoColor c = field.color(x, y);
-      if (c == PuyoColor::OJAMA)
-        continue;
-      if (c == field.color(x + 1, y))
-        ++num_connect;
-      if (c == field.color(x, y + 1))
-        ++num_connect;
-    }
+    if (x > 1 && field.height(x) < field.height(x - 1))
+      score -= 300;
+    if (x < FieldConstant::WIDTH && field.height(x) < field.height(x + 1))
+      score -= 300;
   }
-  score += num_connect * 2;
-
-  score += ScoreDiffHeight(field.height(1), field.height(2));
-  score += ScoreDiffHeight(field.height(2), field.height(3));
-  score += ScoreDiffHeight(field.height(5), field.height(4));
-  score += ScoreDiffHeight(field.height(6), field.height(5));
 
   return score;
 }
