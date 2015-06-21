@@ -3023,6 +3023,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
             nk2 = 0;
         }
 
+        // Skip some conditions, assuming same colors
         if ((nk1 == 1) && (nk2 == 1)) {
             if (((dd > 5) && (dd < 12)) || ((dd > 13) && (dd < 19)))
                 continue;
@@ -3119,6 +3120,8 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     }
                     continue;
                 } // 110604
+
+                // NOTE: In case dd==220, we assume the 3rd Tsumo is (EMPTY,EMPTY).
                 if (dd < 220) {
                     if (tobashi_hantei_b(ba_ee, dd % 22))
                         continue;
