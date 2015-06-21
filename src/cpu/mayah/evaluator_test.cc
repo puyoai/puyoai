@@ -15,7 +15,7 @@ class EvaluatorTest : public testing::Test {
 protected:
     CollectedFeatureScore eval(const CoreField& f, int numIteration = 1)
     {
-        TsumoPossibility::initialize();
+        PuyoPossibility::initialize();
 
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
@@ -39,7 +39,7 @@ protected:
 
     template<typename F>
     CollectedFeatureScore withEvaluator(F f) {
-        TsumoPossibility::initialize();
+        PuyoPossibility::initialize();
 
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
@@ -53,7 +53,7 @@ protected:
 
     template<typename F>
     CollectedFeatureScore withRensaEvaluator(F f) {
-        TsumoPossibility::initialize();
+        PuyoPossibility::initialize();
 
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;

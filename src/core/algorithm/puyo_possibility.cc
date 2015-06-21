@@ -4,10 +4,10 @@
 
 using namespace std;
 
-bool TsumoPossibility::s_initialized = false;
-double TsumoPossibility::s_possibility[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
+bool PuyoPossibility::s_initialized = false;
+double PuyoPossibility::s_possibility[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
 
-void TsumoPossibility::initialize()
+void PuyoPossibility::initialize()
 {
     if (s_initialized)
         return;
