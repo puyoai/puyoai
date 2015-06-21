@@ -16,7 +16,8 @@ public:
 
     // Returns the possibility that when there are randomly |k| puyos,
     // that set will contain |puyoSet|.
-    static double possibility(const PuyoSet& puyoSet, int k) {
+    static double possibility(const PuyoSet& puyoSet, int k)
+    {
         int a = std::min(MAX_N - 1, puyoSet.red());
         int b = std::min(MAX_N - 1, puyoSet.blue());
         int c = std::min(MAX_N - 1, puyoSet.yellow());
@@ -27,7 +28,8 @@ public:
     }
 
     // Returns how many puyos are required to get |puyoSet| with possibility |threshold|?
-    static int necessaryPuyos(const PuyoSet& puyoSet, double threshold) {
+    static int necessaryPuyos(const PuyoSet& puyoSet, double threshold)
+    {
         DCHECK(s_initialized) << "TsumoPossibility is not initialized.";
         DCHECK(0 <= threshold && threshold <= 1.0);
 
