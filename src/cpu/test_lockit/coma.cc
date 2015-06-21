@@ -2989,16 +2989,16 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
         if ((fast != 0) && (dd < 220))
             continue;
         if (dd < 22) {
-            nk1 = 1;
-            nk2 = 1;
+            nk1 = TL_RED;
+            nk2 = TL_RED;
         } else if (dd < 22 * 2) {
-            nk1 = 1;
+            nk1 = TL_RED;
             nk2 = 2;
         } else if (dd < 22 * 3) {
-            nk1 = 1;
+            nk1 = TL_RED;
             nk2 = 3;
         } else if (dd < 22 * 4) {
-            nk1 = 1;
+            nk1 = TL_RED;
             nk2 = 4;
         } else if (dd < 22 * 5) {
             nk1 = 2;
