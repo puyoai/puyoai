@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     testing::InitGoogleTest(&argc, argv);
     google::ParseCommandLineFlags(&argc, &argv, true);
 
-    TsumoPossibility::initialize();
+    PuyoPossibility::initialize();
 
     return RUN_ALL_TESTS();
 }

@@ -12,7 +12,7 @@ class GazerTest : public testing::Test {
 protected:
     virtual void SetUp() override
     {
-        TsumoPossibility::initialize();
+        PuyoPossibility::initialize();
         gazer_.reset(new Gazer());
         gazer_->initialize(100);
     }

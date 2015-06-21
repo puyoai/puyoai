@@ -7,7 +7,7 @@
 
 #include "core/algorithm/puyo_set.h"
 
-class TsumoPossibility {
+class PuyoPossibility {
 public:
     static const int MAX_K = 32;
     static const int MAX_N = 16;

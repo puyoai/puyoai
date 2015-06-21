@@ -396,7 +396,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& re
 {
     sc_->addScore(MAX_CHAINS, rensaResult.chains, 1);
 
-    int totalNecessaryPuyos = TsumoPossibility::necessaryPuyos(totalPuyoSet, 0.5);
+    int totalNecessaryPuyos = PuyoPossibility::necessaryPuyos(totalPuyoSet, 0.5);
     sc_->addScore(NECESSARY_PUYOS_LINEAR, totalNecessaryPuyos);
     sc_->addScore(NECESSARY_PUYOS_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
 }
@@ -643,7 +643,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         ++rensaCounts[rensaResult.chains];
 
         const PuyoSet necessaryPuyoSet(puyosToComplement);
-        const double possibility = TsumoPossibility::possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
+        const double possibility = PuyoPossibility::possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
         const double virtualRensaScore = rensaResult.score * possibility;
 
         RensaScoreCollector rensaScoreCollector(sc_->mainRensaParamSet(), sc_->sideRensaParamSet());
@@ -688,7 +688,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
             sideChainMaxScore = std::max(sideChainMaxScore, rensaResult.score);
         }
 
-        int nessesaryPuyos = TsumoPossibility::necessaryPuyos(necessaryPuyoSet, 0.5);
+        int nessesaryPuyos = PuyoPossibility::necessaryPuyos(necessaryPuyoSet, 0.5);
         if (nessesaryPuyos <= 6 && fastChain6MaxScore < rensaResult.score) {
             fastChain6MaxScore = rensaResult.score;
         }

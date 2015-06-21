@@ -256,7 +256,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
 
         // When the enemy took |k| hands, enemy will be able to fire the rensa in 30%.
         if (!puyoSet.isEmpty()) {
-            necessaryHands += (TsumoPossibility::necessaryPuyos(puyoSet, 0.3) + 1) / 2;
+            necessaryHands += (PuyoPossibility::necessaryPuyos(puyoSet, 0.3) + 1) / 2;
         }
 
         // We need to remove last hand frames.

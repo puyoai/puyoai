@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
-    TsumoPossibility::initialize();
+    PuyoPossibility::initialize();
 
     InteractiveAI ai(argc, argv);
     if (FLAGS_tokopuyo) {
