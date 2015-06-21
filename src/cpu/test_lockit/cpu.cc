@@ -43,9 +43,8 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
             p1->tsumo[4] = toTLColor(seq.axis(2));
             p1->tsumo[5] = toTLColor(seq.child(2));
         } else {
-            // Assume R-R is the next tsumo.
-            p1->tsumo[4] = TLColor::TL_RED;
-            p1->tsumo[5] = TLColor::TL_RED;
+            p1->tsumo[4] = TLColor::TL_UNKNOWN;
+            p1->tsumo[5] = TLColor::TL_UNKNOWN;
         }
     }
     {
@@ -58,9 +57,8 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
             p2->tsumo[4] = toTLColor(seq.axis(2));
             p2->tsumo[5] = toTLColor(seq.child(2));
         } else {
-            // Assume R-R is the next tsumo.
-            p2->tsumo[4] = TLColor::TL_RED;
-            p2->tsumo[5] = TLColor::TL_RED;
+            p2->tsumo[4] = TLColor::TL_UNKNOWN;
+            p2->tsumo[5] = TLColor::TL_UNKNOWN;
         }
     }
 
