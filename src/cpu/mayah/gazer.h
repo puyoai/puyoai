@@ -33,15 +33,21 @@ struct EstimatedRensaInfo {
 
 class GazeResult {
 public:
-    GazeResult(int frameIdGazedAt, int restEmptyField,
+    GazeResult() {}
+    GazeResult(int frameIdGazedAt,
+               int numReachableSpaces,
                const std::vector<EstimatedRensaInfo>& feasible,
                const std::vector<EstimatedRensaInfo>& possible) :
         frameIdGazedAt_(frameIdGazedAt),
-        restEmptyField_(restEmptyField),
+        numReachableSpaces_(numReachableSpaces),
         feasibleRensaInfos_(feasible),
         possibleRensaInfos_(possible)
     {
     }
+
+    void reset(int frameId, int numReachableSpaces);
+    void setFeasibleRensaInfo(std::vector<EstimatedRensaInfo> infos) { feasibleRensaInfos_ = std::move(infos); }
+    void setPossibleRensaInfo(std::vector<EstimatedRensaInfo> infos) { possibleRensaInfos_ = std::move(infos); }
 
     int frameIdGazedAt() const { return frameIdGazedAt_; }
 
@@ -55,10 +61,11 @@ private:
     int estimateMaxScoreFromPossibleRensas(int frameId) const;
     int estimateMaxScoreFrom(int frameId, const std::vector<EstimatedRensaInfo>& rensaInfos) const;
 
-    int frameIdGazedAt_;
-    int restEmptyField_;
-
+    int frameIdGazedAt_ = -1;
+    int numReachableSpaces_ = 72;
+    // FiesibleRensa is the rensa that the enemy can really fire in current/next/nextnext tsumo.
     std::vector<EstimatedRensaInfo> feasibleRensaInfos_;
+    // PossibleRensa is the rensa the enemy will build in future.
     std::vector<EstimatedRensaInfo> possibleRensaInfos_;
 };
 
@@ -66,28 +73,15 @@ class Gazer : noncopyable {
 public:
     void initialize(int frameIdGameWillBegin);
 
-    void setFrameIdGazedAt(int frameId) { frameIdGazedAt_ = frameId; }
-    int frameIdGazedAt() const { return frameIdGazedAt_; }
-
     void gaze(int frameId, const CoreField&, const KumipuyoSeq&);
 
-    GazeResult gazeResult() const;
+    const GazeResult& gazeResult() const { return gazeResult_; }
 
 private:
     void updateFeasibleRensas(const CoreField&, const KumipuyoSeq&);
     void updatePossibleRensas(const CoreField&, const KumipuyoSeq&);
 
-    const std::vector<EstimatedRensaInfo>& possibleRensaInfos() const { return possibleRensaInfos_; }
-    const std::vector<EstimatedRensaInfo>& feasibleRensaInfos() const { return feasibleRensaInfos_; }
-
-    int frameIdGazedAt_ = -1;
-    int restEmptyField_ = -1;
-
-    // --- For these rensaInfos, frames means the framesToIgnite.
-    // Fiesible Rensa is the Rensa the enemy can really fire in current/next/nextnext tsumo.
-    std::vector<EstimatedRensaInfo> feasibleRensaInfos_;
-    // Possible Rensa is the Rensa the enemy will build in future.
-    std::vector<EstimatedRensaInfo> possibleRensaInfos_;
+    GazeResult gazeResult_;
 };
 
 #endif // CPU_MAYAH_GAZER_H_
