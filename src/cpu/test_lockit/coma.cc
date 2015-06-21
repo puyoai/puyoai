@@ -2999,7 +2999,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
             nk2 = TL_YELLOW;
         } else if (dd < 22 * 4) {
             nk1 = TL_RED;
-            nk2 = 4;
+            nk2 = TL_GREEN;
         } else if (dd < 22 * 5) {
             nk1 = TL_BLUE;
             nk2 = TL_BLUE;
@@ -3008,16 +3008,16 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
             nk2 = TL_YELLOW;
         } else if (dd < 22 * 7) {
             nk1 = TL_BLUE;
-            nk2 = 4;
+            nk2 = TL_GREEN;
         } else if (dd < 22 * 8) {
             nk1 = TL_YELLOW;
             nk2 = TL_YELLOW;
         } else if (dd < 22 * 9) {
             nk1 = TL_YELLOW;
-            nk2 = 4;
+            nk2 = TL_GREEN;
         } else if (dd < 22 * 10) {
-            nk1 = 4;
-            nk2 = 4;
+            nk1 = TL_GREEN;
+            nk2 = TL_GREEN;
         } else {
             nk1 = 0;
             nk2 = 0;
