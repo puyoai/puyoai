@@ -40,8 +40,9 @@ void Pattern::ReadBook(std::istream& is) {
       break;
     g_patterns.push_back(pattern);
   }
+}
 
-  // Make combination
+void Pattern::BuildCombination() {
   int n = g_patterns.size();
   for (int i = 0; i < n; ++i) {
     for (int j = i + 1; j < n; ++j) {
