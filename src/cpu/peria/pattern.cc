@@ -136,40 +136,24 @@ bool Pattern::MergeWith(const Pattern& a) {
   else
     offset = 0;
 
-  std::deque<std::string> pat1(pattern_);  // as-is
-  std::deque<std::string> pat2(pattern_);  // mirror right-left
-  for (auto& l : pat2) {
-    reverse(l.begin(), l.end());
-  }
-
-  bool merge1 = true, merge2 = true;
+  bool merge = true;
   for (size_t i = 0; i < a.pattern_.size(); ++i) {
     for (int j = 0; j < FieldConstant::WIDTH; ++j) {
       if (a.pattern_[i][j] == '.')
         continue;
 
-      if (pat1[i][j] == '.')
-        pat1[i][j] = a.pattern_[i][j] + offset;
+      if (pattern_[i][j] == '.')
+        pattern_[i][j] = a.pattern_[i][j] + offset;
       else
-        merge1 = false;
-
-      if (pat2[i][j] == '.')
-        pat2[i][j] = a.pattern_[i][j] + offset;
-      else
-        merge2 = false;
+        merge = false;
     }
   }
 
-  if (merge1) {
-    pattern_ = pat1;
-  } else if (merge2) {
-    pattern_ = pat2;
-  } else {
+  if (!merge)
     return false; // There are conflicts
-  }
 
   name_ += "+" + a.name_;
-  score_ += a.score_ - 200;
+  score_ += a.score_ - 50;
   for (auto& n : a.neighbors_) {
     neighbors_.insert(Neighbor(n.first + offset, n.second + offset));
   }
