@@ -1,5 +1,5 @@
-#ifndef CORE_BITS_FIELD_H_
-#define CORE_BITS_FIELD_H_
+#ifndef CORE_BIT_FIELD_H_
+#define CORE_BIT_FIELD_H_
 
 #include <string>
 
@@ -244,5 +244,6 @@ void BitField::calculateHeight(int heights[FieldConstant::MAP_WIDTH]) const
    _mm_store_si128(reinterpret_cast<__m128i*>(heights + 4), _mm_unpackhi_epi16(count, zero));
 }
 
+#include "bit_field_inl.h"
 
 #endif // CORE_BIT_FIELD_H_
