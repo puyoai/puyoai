@@ -63,14 +63,16 @@ public:
 
 protected:
     PreEvalResult preEval(const CoreField& currentField) const;
-    MidEvalResult midEval(const RefPlan&, const CoreField& currentField, int currentFrameId, int maxIteration,
+    MidEvalResult midEval(const RefPlan&, const CoreField& currentField,
+                          const KumipuyoSeq& restSeq,
+                          int currentFrameId, int maxIteration,
                           const PlayerState& me, const PlayerState& enemy,
                           const PreEvalResult&, const GazeResult&) const;
-    EvalResult eval(const RefPlan&, int currentFrameId, int maxIteration,
+    EvalResult eval(const RefPlan&, const KumipuyoSeq& restSeq, int currentFrameId, int maxIteration,
                     const PlayerState& me, const PlayerState& enemy,
                     const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
     CollectedFeatureCoefScore evalWithCollectingFeature(
-        const RefPlan&, int currentFrameId, int maxIteration,
+        const RefPlan&, const KumipuyoSeq& restSeq, int currentFrameId, int maxIteration,
         const PlayerState& me, const PlayerState& enemy,
         const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
 
