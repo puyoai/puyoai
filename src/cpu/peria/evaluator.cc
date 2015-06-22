@@ -60,10 +60,8 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
 
   if (true) {
     int value = Flat(field);
-    if (value > 0) {
-      oss << "Flat(" << value << ")_";
-      score += value;
-    }
+    oss << "Flat(" << value << ")_";
+    score += value;
   }
 
   if (false) {  // Evaluate possible rensa.
@@ -189,13 +187,17 @@ int Evaluator::PatternMatch(const CoreField& field, std::string* name) {
 
 int Evaluator::Flat(const CoreField& field) {
   int score = 0;
+  const int kPenalty = 100;
 
   for (int x = 1; x < FieldConstant::WIDTH; ++x) {
-    if (x > 1 && field.height(x) < field.height(x - 1))
-      score -= 300;
-    if (x < FieldConstant::WIDTH && field.height(x) < field.height(x + 1))
-      score -= 300;
+    if ((x > 1 && field.height(x) < field.height(x - 1)) ||
+        (x < FieldConstant::WIDTH && field.height(x) < field.height(x + 1)))
+      score -= kPenalty;
   }
+  if (field.height(1) < field.height(2))
+    score -= kPenalty;
+  if (field.height(FieldConstant::WIDTH) < field.height(FieldConstant::WIDTH - 1))
+    score -= kPenalty;
 
   return score;
 }
