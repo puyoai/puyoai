@@ -1,29 +1,29 @@
 # Template book
 # '#' 以降はコメント
-# Basic score = (# of puyos) * 100 + (# of _) + 100
+# Basic score = (# of puyos) * 100 + (# of _) + 50
 
 NAME: GTR    # テンプレ名. テンプレ内の最初の行にすること.
-SCORE: 800   # テンプレのスコア
+SCORE: 750   # テンプレのスコア
 THRESH: 3    # この個数以上合わないと評価しない
 ....BA       # ':' がない行がフィールド.
 ...BAA       # 大文字が評価対象ぷよ.
 ....BB       # '.' や小文字は任意. '_'は強制空白.
 ----
 NAME: GTR-Ready
-SCORE: 650
+SCORE: 600
 .....A
 ...B_A
 ....BB
 ----
 NAME: GTR-Head
-SCORE: 1300
+SCORE: 1250
 ....DD
 ...CBA
 ..CBAA
 ...CBB
 ----
 NAME: GTR-Head2
-SCORE: 1400
+SCORE: 1350
 .....A
 .....D
 .....D
@@ -32,28 +32,28 @@ SCORE: 1400
 ...CBB
 ----
 NAME: Begin1
-SCORE: 500
+SCORE: 450
 .AA...
 .BB...
 ----
 NAME: Begin2
-SCORE: 600
+SCORE: 550
 DIFF: AC
 __C...
 ABB...
 ----
 NAME: Begin3
-SCORE: 700
+SCORE: 650
 CAA...
 CBB...
 ----
 NAME: Begin4
-SCORE: 500
+SCORE: 450
 CA....
 CB....
 ----
 NAME: Shin-GTR
-SCORE: 1400
+SCORE: 1350
 DIFF: D A
 A.....
 CD....
@@ -62,7 +62,7 @@ AAAB..
 BBB...
 ----
 NAME: Shin-GTR2
-SCORE: 1400
+SCORE: 1350
 DIFF: D A
 D.....
 CA....
@@ -71,7 +71,7 @@ AAAB..
 BBB...
 ----
 NAME: GTR-Tail
-SCORE: 1500
+SCORE: 1350
 .CC...
 CBCA..
 AAAD..
