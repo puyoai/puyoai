@@ -573,7 +573,9 @@ CollectedCoef Evaluator<ScoreCollector>::calculateDefaultCoef(const PlayerState&
 
 template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
-                                     int currentFrameId, int maxIteration,
+                                     const KumipuyoSeq& restSeq,
+                                     int currentFrameId,
+                                     int maxIteration,
                                      const PlayerState& me,
                                      const PlayerState& enemy,
                                      const PreEvalResult& preEvalResult,
@@ -688,7 +690,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
             sideChainMaxScore = std::max(sideChainMaxScore, rensaResult.score);
         }
 
-        int nessesaryPuyos = PuyoPossibility::necessaryPuyos(necessaryPuyoSet, 0.5);
+        int nessesaryPuyos = PuyoPossibility::necessaryPuyos(necessaryPuyoSet, restSeq, 0.5);
         if (nessesaryPuyos <= 6 && fastChain6MaxScore < rensaResult.score) {
             fastChain6MaxScore = rensaResult.score;
         }

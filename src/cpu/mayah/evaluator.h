@@ -11,6 +11,7 @@
 class ColumnPuyoList;
 class CoreField;
 class GazeResult;
+class KumipuyoSeq;
 class PuyoSet;
 class RefPlan;
 
@@ -123,7 +124,9 @@ public:
         EvaluatorBase(patternBook),
         sc_(sc) {}
 
-    void eval(const RefPlan&, int currentFrameId, int maxIteration,
+    void eval(const RefPlan&,
+              const KumipuyoSeq& restSeq,
+              int currentFrameId, int maxIteration,
               const PlayerState& me, const PlayerState& enemy,
               const PreEvalResult&, const MidEvalResult&, const GazeResult&);
 
