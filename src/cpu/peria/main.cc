@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
   if (pattern_file.is_open()) {
     LOG(INFO) << "Leading " << FLAGS_pattern << " for pattern mathcing";
     peria::Pattern::ReadBook(pattern_file);
+    peria::Pattern::BuildCombination();
   } else {
     LOG(INFO) << "Failed in loading " << FLAGS_pattern;
   }
