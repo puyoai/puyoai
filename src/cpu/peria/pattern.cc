@@ -43,6 +43,7 @@ void Pattern::ReadBook(std::istream& is) {
 }
 
 void Pattern::BuildCombination() {
+  // TODO: Do not combine a template with a disabled flag.
   int n = g_patterns.size();
   for (int i = 0; i < n; ++i) {
     for (int j = i + 1; j < n; ++j) {
@@ -117,12 +118,13 @@ int Pattern::Match(const CoreField& field) const {
 }
 
 bool Pattern::MergeWith(const Pattern& a) {
-  // TODO: Need a flag to avoid merging some pairs.
   static const char kNonDetermLine[] = "......";
   while (pattern_.size() < a.pattern_.size())
     pattern_.push_back(kNonDetermLine);
 
-  int offset = '\0';
+  // TODO: If conflicted characters can be same
+  // we should merge them.
+  int offset = 0;
   for (const std::string& l : pattern_) {
     for (char c : l) {
       if (isupper(c) && c > offset)
