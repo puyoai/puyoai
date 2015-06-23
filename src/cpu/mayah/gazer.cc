@@ -95,24 +95,7 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
         if (newAdditionalChains + it->chains() > 19)
             newAdditionalChains = 19 - it->chains();
 
-        int rensaCoef[20] {};
-        int rensaNumErased[20] {};
-        for (int i = 1; i <= newAdditionalChains; ++i) {
-            rensaCoef[i] = chainBonus(i);
-            if (rensaCoef[i] == 0)
-                rensaCoef[i] = 1;
-            rensaNumErased[i] = 4;
-        }
-        for (int i = 1; i <= it->chains(); ++i) {
-            int j = i + newAdditionalChains;
-            rensaCoef[j] = it->coefResult.coef(i) - chainBonus(i) + chainBonus(j);
-            rensaNumErased[j] = it->coefResult.numErased(i);
-        }
-        int score = 0;
-        for (int i = 1; i <= newAdditionalChains + it->chains(); ++i)
-            score += rensaCoef[i] * rensaNumErased[i] * 10;
-
-        maxScore = std::max(maxScore, score);
+        maxScore = std::max(maxScore, it->coefResult.score(newAdditionalChains));
     }
 
     if (maxScore >= 0)
