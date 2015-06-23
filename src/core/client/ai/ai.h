@@ -41,7 +41,7 @@ protected:
     // |KumipuyoSeq| will have at least 2 kumipuyos. When we know more Kumipuyo sequence,
     // it might contain more. It's up to you if you will use >=3 kumipuyos.
     virtual DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
-                               const PlayerState& me, const PlayerState& enemy, bool fast) = 0;
+                               const PlayerState& me, const PlayerState& enemy, bool fast) const = 0;
 
     // gaze will be called when AI should gaze the enemy's field.
     // |frameId| is the frameId where the enemy has started moving his puyo.

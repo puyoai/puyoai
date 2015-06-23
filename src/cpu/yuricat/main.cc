@@ -16,7 +16,7 @@ public:
     
     
     DropDecision think(int frameId, const CoreField& f, const KumipuyoSeq& seq,
-                       const PlayerState& me, const PlayerState& enemy, bool fast) override
+                       const PlayerState& me, const PlayerState& enemy, bool fast) const override
     {
         UNUSED_VARIABLE(frameId);
         UNUSED_VARIABLE(me);
