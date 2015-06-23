@@ -14,6 +14,8 @@
 #include "core/kumipuyo_seq.h"
 #include "core/score.h"
 
+#include "hand_tree.h"
+
 using namespace std;
 
 struct SortByFrames {
@@ -73,7 +75,6 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
         // we substract 6 from restEmptyField_.
         numPossiblePuyos = max(0, min(numReachableSpaces_ - 6, numPossiblePuyos));
         int newAdditionalChains = min(numPossiblePuyos / 4, 19);
-
         // TODO(mayah): newChains should not be negative. restFrames is negative?
         if (newAdditionalChains < 0)
             newAdditionalChains = 0;
@@ -151,6 +152,15 @@ void Gazer::gaze(int frameId, const CoreField& cf, const KumipuyoSeq& seq)
 
     updateFeasibleRensas(cf, seq);
     updatePossibleRensas(cf, seq);
+
+    std::vector<EstimatedRensaInfoTree> tree = HandTree::makeTree(3, cf, PuyoSet(), 0, seq);
+
+    ostringstream os;
+    for (const auto& t : tree)
+        t.dumpTo(0, &os);
+    LOG(INFO) << "HandTreeResult\n" << os.str();
+
+    gazeResult_.setPossibleRensaInfoTree(std::move(tree));
 }
 
 void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
@@ -209,7 +219,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     vector<EstimatedRensaInfo> results;
     {
         results.reserve(20000);
-        auto callback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
+        auto simulationCallback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
             RensaCoefTracker tracker;
             RensaResult rensaResult = cf.simulate(&tracker);
 
@@ -234,7 +244,13 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
             return rensaResult;
         };
 
-        RensaDetector::detectIteratively(field, RensaDetectorStrategy::defaultFloatStrategy(), 3, callback);
+        auto complementCallback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) {
+            (void)simulationCallback(std::move(cf), puyosToComplement);
+        };
+
+        RensaDetector::detectIteratively(field, RensaDetectorStrategy::defaultFloatStrategy(), 3, simulationCallback);
+        RensaDetector::detectSideChain(field, RensaDetectorStrategy::defaultFloatStrategy(), complementCallback);
+
         if (results.empty())
             return;
 

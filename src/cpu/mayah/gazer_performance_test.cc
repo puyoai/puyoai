@@ -40,6 +40,22 @@ TEST(GazerPerformanceTest, pattern1)
     runTest(f, seq);
 }
 
+TEST(GazerPerformanceTest, pattern2)
+{
+    CoreField cf(
+        "B....."
+        "YY...."
+        "BRY..."
+        "BRY..."
+        "BGRB.."
+        "RBGRBG"
+        "RBGRBG"
+        "RBGRBG");
+    KumipuyoSeq seq("RBRGRYYG");
+
+    runTest(cf, seq);
+}
+
 int main(int argc, char* argv[])
 {
     google::InitGoogleLogging(argv[0]);

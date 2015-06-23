@@ -6,6 +6,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "core/score.h"
+
 using namespace std;
 
 RensaChainTrackResult::RensaChainTrackResult() :
