@@ -56,4 +56,12 @@ inline int calculateRensaBonusCoef(int chainBonusCoef, int longBonusCoef, int co
     return coef;
 }
 
+static const int ACCUMULATED_RENSA_SCORE[] = {
+    1,
+    40, 360, 1000, 2280, 4840,
+    8680, 13800, 20200, 27880, 36840,
+    47080, 58600, 71400, 85480, 100840,
+    117480, 135400, 154600, 175080,
+};
+
 #endif  // CORE_SCORE_H_
