@@ -56,12 +56,6 @@ TEST(HandTreeTest, eval_actual1)
     PuyoPossibility::initialize();
 
     const CoreField cf1(
-        ".RBYG."
-        "RBYGR."
-        "RBYGR."
-        "RBYGR.");
-
-    const CoreField cf2(
         ".....R"
         "....GR"
         "G..YYY"
@@ -70,9 +64,18 @@ TEST(HandTreeTest, eval_actual1)
         "GGRBBB"
         "RRBYYY");
 
+    const CoreField cf2(
+        ".RBYG."
+        "RBYGR."
+        "RBYGR."
+        "RBYGR.");
+
     std::vector<EstimatedRensaInfoTree> myTree = HandTree::makeTree(2, cf1, PuyoSet(), 0, KumipuyoSeq("YYYY"));
     std::vector<EstimatedRensaInfoTree> enemyTree = HandTree::makeTree(2, cf2, PuyoSet(), 0, KumipuyoSeq("YYGG"));
 
+    EXPECT_LT(0, HandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0));
+
+#if 0
     for (const auto& t : myTree)
         t.dump(0);
     cout << "----------------------------------------------------------------------" << endl;
@@ -82,6 +85,7 @@ TEST(HandTreeTest, eval_actual1)
 
     cout << HandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0) << endl;
     cout << HandTree::eval(enemyTree, 0, 0, 0, myTree, 0, 0, 0) << endl;
+#endif
 }
 
 TEST(HandTreeTest, eval_actual2)
@@ -115,45 +119,15 @@ TEST(HandTreeTest, eval_actual2)
     std::vector<EstimatedRensaInfoTree> myTree = HandTree::makeTree(2, cf1, PuyoSet(), 0, KumipuyoSeq());
     std::vector<EstimatedRensaInfoTree> enemyTree = HandTree::makeTree(2, cf2, PuyoSet(), 0, KumipuyoSeq());
 
-    for (const auto& t : myTree)
-        t.dump(0);
-    cout << "----------------------------------------------------------------------" << endl;
-    for (const auto& t : enemyTree)
-        t.dump(0);
-    cout << "----------------------------------------------------------------------" << endl;
-
     EXPECT_LT(0, HandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0));
-}
 
-TEST(HandTreeTest, eval_actual)
-{
-    PuyoPossibility::initialize();
-
-    const CoreField cf1(
-        ".RBYG."
-        "RBYGR."
-        "RBYGR."
-        "RBYGR.");
-
-    const CoreField cf2(
-        ".....R"
-        "....GR"
-        "G..YYY"
-        "YYYGGR"
-        "GRBGYR"
-        "GGRBBB"
-        "RRBYYY");
-
-    std::vector<EstimatedRensaInfoTree> myTree = HandTree::makeTree(2, cf1, PuyoSet(), 0, KumipuyoSeq("YYYY"));
-    std::vector<EstimatedRensaInfoTree> enemyTree = HandTree::makeTree(2, cf2, PuyoSet(), 0, KumipuyoSeq("YYGG"));
-
+#if 0
     for (const auto& t : myTree)
         t.dump(0);
     cout << "----------------------------------------------------------------------" << endl;
     for (const auto& t : enemyTree)
         t.dump(0);
     cout << "----------------------------------------------------------------------" << endl;
-
     cout << HandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0) << endl;
-    cout << HandTree::eval(enemyTree, 0, 0, 0, myTree, 0, 0, 0) << endl;
+#endif
 }
