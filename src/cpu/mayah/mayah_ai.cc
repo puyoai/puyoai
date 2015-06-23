@@ -82,7 +82,7 @@ DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& 
         iteration = MayahAI::DEFAULT_NUM_ITERATION;
     }
 
-    ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, me, enemy, depth, iteration);
+    ThoughtResult thoughtResult = thinkPlan(frameId, f, kumipuyoSeq, me, enemy, depth, iteration, fast);
 
     const Plan& plan = thoughtResult.plan;
     if (plan.decisions().empty())
@@ -92,7 +92,8 @@ DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& 
 
 ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const KumipuyoSeq& kumipuyoSeq,
                                  const PlayerState& me, const PlayerState& enemy,
-                                 int depth, int maxIteration, vector<Decision>* specifiedDecisions) const
+                                 int depth, int maxIteration, bool fast,
+                                 vector<Decision>* specifiedDecisions) const
 {
     // TODO(mayah): Do we need field and kumipuyoSeq?
     // CHECK(field, me.field);
@@ -147,7 +148,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     mutex mu;
     auto evalRefPlan = [&, this, frameId, maxIteration](const RefPlan& plan, const MidEvalResult& midEvalResult) {
-        EvalResult evalResult = eval(plan, kumipuyoSeq.subsequence(plan.decisions().size()), frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
+        EvalResult evalResult = eval(plan, kumipuyoSeq.subsequence(plan.decisions().size()), frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
 
         VLOG(1) << toString(plan.decisions())
                 << ": eval=" << evalResult.score()
@@ -193,14 +194,14 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                                               me, enemy,
                                               preEvalResult, bestRensaMidEvalResult, gazeResult,
                                               bestRensaPlan, bestRensaScore, bestVirtualRensaScore,
-                                              true, endTime - beginTime);
+                                              true, fast, endTime - beginTime);
         return ThoughtResult(bestRensaPlan, bestRensaScore, bestVirtualRensaScore, bestRensaMidEvalResult, message);
     } else {
         std::string message = makeMessageFrom(frameId, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               preEvalResult, bestMidEvalResult, gazeResult,
                                               bestPlan, bestRensaScore, bestVirtualRensaScore,
-                                              false, endTime - beginTime);
+                                              false, fast, endTime - beginTime);
         return ThoughtResult(bestPlan, bestRensaScore, bestVirtualRensaScore, bestMidEvalResult, message);
     }
 }
@@ -224,7 +225,8 @@ MidEvalResult MayahAI::midEval(const RefPlan& plan,
     SimpleScoreCollector sc(evaluationParameterMap_);
     Evaluator<SimpleScoreCollector> evaluator(patternBook_, &sc);
 
-    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), gazeResult);
+    // MidEval always sets 'fast'.
+    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), true, gazeResult);
 
     MidEvaluator midEvaluator(patternBook_);
     const CollectedSimpleScore& simpleScore = sc.collectedScore();
@@ -237,11 +239,12 @@ EvalResult MayahAI::eval(const RefPlan& plan,
                          const PlayerState& me, const PlayerState& enemy,
                          const PreEvalResult& preEvalResult,
                          const MidEvalResult& midEvalResult,
+                         bool fast,
                          const GazeResult& gazeResult) const
 {
     SimpleScoreCollector sc(evaluationParameterMap_);
     Evaluator<SimpleScoreCollector> evaluator(patternBook_, &sc);
-    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
+    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
 
     const CollectedSimpleScore& simpleScore = sc.collectedScore();
     return EvalResult(simpleScore.score(sc.collectedCoef()), sc.estimatedRensaScore());
@@ -255,11 +258,12 @@ CollectedFeatureCoefScore MayahAI::evalWithCollectingFeature(const RefPlan& plan
                                                              const PlayerState& enemy,
                                                              const PreEvalResult& preEvalResult,
                                                              const MidEvalResult& midEvalResult,
+                                                             bool fast,
                                                              const GazeResult& gazeResult) const
 {
     FeatureScoreCollector sc(evaluationParameterMap_);
     Evaluator<FeatureScoreCollector> evaluator(patternBook_, &sc);
-    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
+    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
 
     return CollectedFeatureCoefScore(sc.collectedCoef(), sc.collectedScore());
 }
@@ -269,7 +273,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
                                      const PreEvalResult& preEvalResult, const MidEvalResult& midEvalResult,
                                      const GazeResult& gazeResult,
                                      const Plan& plan, double rensaScore, double virtualRensaScore,
-                                     bool saturated, double thoughtTimeInSeconds) const
+                                     bool saturated, bool fast, double thoughtTimeInSeconds) const
 {
     UNUSED_VARIABLE(kumipuyoSeq);
 
@@ -279,7 +283,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
     RefPlan refPlan(plan);
     CollectedFeatureCoefScore cf =
         evalWithCollectingFeature(refPlan, kumipuyoSeq.subsequence(refPlan.decisions().size()),
-                                  frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, gazeResult);
+                                  frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
 
 
     stringstream ss;

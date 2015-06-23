@@ -124,11 +124,9 @@ public:
         EvaluatorBase(patternBook),
         sc_(sc) {}
 
-    void eval(const RefPlan&,
-              const KumipuyoSeq& restSeq,
-              int currentFrameId, int maxIteration,
+    void eval(const RefPlan&, const KumipuyoSeq&, int currentFrameId, int maxIteration,
               const PlayerState& me, const PlayerState& enemy,
-              const PreEvalResult&, const MidEvalResult&, const GazeResult&);
+              const PreEvalResult&, const MidEvalResult&, bool fast, const GazeResult&);
 
     // ----------------------------------------------------------------------
 

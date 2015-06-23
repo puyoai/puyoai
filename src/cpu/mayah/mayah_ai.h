@@ -58,7 +58,7 @@ public:
     // When |specifiedDecisionsOnly| is specified, only that decision will be considered.
     ThoughtResult thinkPlan(int frameId, const CoreField&, const KumipuyoSeq&,
                             const PlayerState& me, const PlayerState& enemy,
-                            int depth, int maxIteration,
+                            int depth, int maxIteration, bool fast = false,
                             std::vector<Decision>* specifiedDecisions = nullptr) const;
 
 protected:
@@ -70,17 +70,17 @@ protected:
                           const PreEvalResult&, const GazeResult&) const;
     EvalResult eval(const RefPlan&, const KumipuyoSeq& restSeq, int currentFrameId, int maxIteration,
                     const PlayerState& me, const PlayerState& enemy,
-                    const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
+                    const PreEvalResult&, const MidEvalResult&, bool fast, const GazeResult&) const;
     CollectedFeatureCoefScore evalWithCollectingFeature(
         const RefPlan&, const KumipuyoSeq& restSeq, int currentFrameId, int maxIteration,
         const PlayerState& me, const PlayerState& enemy,
-        const PreEvalResult&, const MidEvalResult&, const GazeResult&) const;
+        const PreEvalResult&, const MidEvalResult&, bool fast, const GazeResult&) const;
 
     std::string makeMessageFrom(int frameId, const KumipuyoSeq&, int maxIteration,
                                 const PlayerState& me, const PlayerState& enemy,
                                 const PreEvalResult&, const MidEvalResult&, const GazeResult&,
                                 const Plan& plan, double rensaScore, double virutalRensaScore,
-                                bool saturated,
+                                bool saturated, bool fast,
                                 double thoughtTimeInSeconds) const;
 
     bool saveEvaluationParameter() const;
