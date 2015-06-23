@@ -19,7 +19,7 @@ public:
             const KumipuyoSeq& seq,
             const PlayerState& me,
             const PlayerState& enemy,
-            bool fast) const override;
+            bool fast) override;
 
 protected:
     enum Strategy {

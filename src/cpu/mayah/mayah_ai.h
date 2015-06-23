@@ -48,7 +48,7 @@ public:
     ~MayahAI() override;
 
     DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
-                       const PlayerState& me, const PlayerState& enemy, bool fast) const override;
+                       const PlayerState& me, const PlayerState& enemy, bool fast) override;
 
     void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&) override;
 
