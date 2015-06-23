@@ -16,14 +16,6 @@
 
 using namespace std;
 
-static const int ACCUMULATED_RENSA_SCORE[] = {
-    1,
-    40, 360, 1000, 2280, 4840,
-    8680, 13800, 20200, 27880, 36840,
-    47080, 58600, 71400, 85480, 100840,
-    117480, 135400, 154600, 175080,
-};
-
 struct SortByFrames {
     bool operator()(const EstimatedRensaInfo& lhs, const EstimatedRensaInfo& rhs) const
     {
@@ -42,13 +34,6 @@ struct SortByFrames {
         return lhs.coefResult.coef(lhs.chains()) > rhs.coefResult.coef(rhs.chains());
     }
 };
-
-std::string EstimatedRensaInfo::toString() const
-{
-    char buf[80];
-    sprintf(buf, "framesToIgnite, chains, score, totalFrames = %d, %d, %d, %d", framesToIgnite(), chains(), score(), totalFrames());
-    return buf;
-}
 
 void GazeResult::reset(int frameId, int numReachableSpaces)
 {

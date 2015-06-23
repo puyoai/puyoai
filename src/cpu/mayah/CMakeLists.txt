@@ -5,11 +5,13 @@ cpu_setup("mayah")
 add_library(mayah_lib
             collected_score.cc
             decision_book.cc
+            estimated_rensa_info.cc
             evaluator.cc
             evaluation_feature.cc
             evaluation_mode.cc
             evaluation_parameter.cc
             gazer.cc
+            hand_tree.cc
             mayah_ai.cc
             pattern_book.cc
             pattern_book_field.cc
@@ -45,6 +47,7 @@ mayah_add_test(decision_planner_test)
 mayah_add_test(evaluator_test)
 mayah_add_test(evaluation_parameter_test)
 mayah_add_test(gazer_test)
+mayah_add_test(hand_tree_test)
 mayah_add_test(mayah_ai_test)
 mayah_add_test(mayah_ai_situation_test)
 mayah_add_test(pattern_book_field_test)
@@ -54,3 +57,4 @@ mayah_add_test(score_collector_test)
 
 mayah_add_test(mayah_ai_performance_test 1)
 mayah_add_test(gazer_performance_test 1)
+mayah_add_test(hand_tree_performance_test 1)
