@@ -48,7 +48,7 @@ DropDecision munetoshi::AI::think(
         const KumipuyoSeq& seq,
         const PlayerState& my_state,
         const PlayerState& opponent_state,
-        bool) {
+        bool) const {
     return think_internal(field, seq, my_state, opponent_state);
 }
 
