@@ -9,6 +9,7 @@
 #include "core/field_bits.h"
 #include "core/field_constant.h"
 #include "core/position.h"
+#include "core/score.h"
 
 class RensaNonTrackResult {
 };
@@ -55,20 +56,32 @@ private:
 //  - the coefficient in each chain.
 class RensaCoefResult {
 public:
-    RensaCoefResult() : numErased_{}, coef_{} {}
+    RensaCoefResult() : numErased_{}, longBonusCoef_{}, colorBonusCoef_{}
+    {
+    }
 
-    void setCoef(int nth, int numErased, int coef)
+    void setCoef(int nth, int numErased, int longBonusCoef, int colorBonusCoef)
     {
         numErased_[nth] = numErased;
-        coef_[nth] = coef;
+        longBonusCoef_[nth] = longBonusCoef;
+        colorBonusCoef_[nth] = colorBonusCoef;
     }
 
     int numErased(int nth) const { return numErased_[nth]; }
-    int coef(int nth) const { return coef_[nth]; }
+    int longBonusCoef(int nth) const { return longBonusCoef_[nth]; }
+    int colorBonusCoef(int nth) const { return colorBonusCoef_[nth]; }
+
+    int coef(int nth) const
+    {
+        return calculateRensaBonusCoef(chainBonus(nth), this->longBonusCoef(nth), this->colorBonusCoef(nth));
+    }
+
+    int score(int additionalChain) const;
 
 private:
     int numErased_[20]; // numErased does not contain ojama puyos.
-    int coef_[20];
+    int longBonusCoef_[20];
+    int colorBonusCoef_[20];
 };
 
 // This tracks puyo position at "n-1"-th chain, where the puyo vanishes at n-th chain.

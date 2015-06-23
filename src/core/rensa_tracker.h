@@ -22,7 +22,7 @@ class FieldBits;
 
 class RensaTrackerBase {
 public:
-    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/,
+    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/,
                const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
 
     void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
@@ -60,7 +60,7 @@ public:
     {
     }
 
-    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/,
+    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/,
                const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
         const __m128i zero = _mm_setzero_si128();
@@ -116,7 +116,7 @@ class RensaTracker<RensaLastVanishedPositionTrackResult> : public RensaTrackerBa
 public:
     const RensaLastVanishedPositionTrackResult& result() const { return result_; }
 
-    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*coef*/,
+    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/,
                const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
         result_.setLastVanishedPositionBits(vanishedColorPuyoBits | vanishedOjamaPuyoBits);
@@ -137,7 +137,7 @@ public:
 
     const RensaChainTrackResult& result() const { return result_; }
 
-    void track(int nthChain, int numErasedPuyo, int coef,
+    void track(int nthChain, int numErasedPuyo, int longBonusCoef, int colorBonusCoef,
                const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
         FieldBits m = (vanishedColorPuyoBits | vanishedOjamaPuyoBits);
@@ -145,7 +145,7 @@ public:
             result_.setErasedAt(x, yTracker_.originalY(x, y), nthChain);
         });
 
-        yTracker_.track(nthChain, numErasedPuyo, coef, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+        yTracker_.track(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
     }
 
 private:
@@ -161,10 +161,10 @@ class RensaTracker<RensaCoefResult> : public RensaTrackerBase {
 public:
     const RensaCoefResult& result() const { return result_; }
 
-    void track(int nthChain, int numErasedPuyo, int coef,
+    void track(int nthChain, int numErasedPuyo, int longBonusCoef, int colorBonusCoef,
                const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/)
     {
-        result_.setCoef(nthChain, numErasedPuyo, coef);
+        result_.setCoef(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef);
     }
 
 private:
@@ -181,7 +181,7 @@ public:
 
     const RensaVanishingPositionResult& result() const { return result_; }
 
-    void track(int nthChain, int numErasedPuyo, int coef,
+    void track(int nthChain, int numErasedPuyo, int longBonusCoef, int colorBonusCoef,
                const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
         vanishedColorPuyoBits.iterateBitPositions([&](int x, int y) {
@@ -193,7 +193,7 @@ public:
         });
 
         yTracker_ = RensaYPositionTracker();
-        yTracker_.track(nthChain, numErasedPuyo, coef, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+        yTracker_.track(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
     }
 
 private:
@@ -215,7 +215,7 @@ public:
 
     const RensaChainTrackResult& result() const { return *result_; }
 
-    void track(int nthChain, int numErasedPuyo, int coef,
+    void track(int nthChain, int numErasedPuyo, int longBonusCoef, int colorBonusCoef,
                const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
         FieldBits m = (vanishedColorPuyoBits | vanishedOjamaPuyoBits);
@@ -223,7 +223,7 @@ public:
             result_->setErasedAt(x, yTracker_.originalY(x, y), nthChain);
         });
 
-        yTracker_.track(nthChain, numErasedPuyo, coef, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+        yTracker_.track(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
     }
 
 private:

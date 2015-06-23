@@ -26,3 +26,14 @@ TEST(RensaChainTrackResult, constructor)
     EXPECT_EQ(11, rtr.erasedAt(2, 2));
     EXPECT_EQ(0, rtr.erasedAt(3, 1));
 }
+
+TEST(RensaCoefTrackResult, score)
+{
+    RensaCoefResult result;
+    result.setCoef(1, 4, 0, 0);
+    result.setCoef(2, 4, 0, 0);
+    result.setCoef(3, 4, 0, 0);
+
+    EXPECT_EQ(40 * (1 + 8 + 16), result.score(0));
+    EXPECT_EQ(40 * (1 + 8 + 16 + 32 + 64), result.score(2));
+}
