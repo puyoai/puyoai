@@ -27,14 +27,18 @@ public:
     {
     }
 
-    void reset(int frameId, int numReachableSpaces);
-    void setFeasibleRensaInfo(std::vector<EstimatedRensaInfo> infos) { feasibleRensaInfos_ = std::move(infos); }
-    void setPossibleRensaInfo(std::vector<EstimatedRensaInfo> infos) { possibleRensaInfos_ = std::move(infos); }
-
     int frameIdGazedAt() const { return frameIdGazedAt_; }
 
     // Returns the (expecting) possible max score by this frame.
     int estimateMaxScore(int frameId, const PlayerState& enemy) const;
+    const std::vector<EstimatedRensaInfo>& feasibleRensaInfos() const { return feasibleRensaInfos_; }
+
+    const std::vector<EstimatedRensaInfoTree>& rensaTree() const { return possibleRensaTree_; }
+
+    void reset(int frameId, int numReachableSpaces);
+    void setFeasibleRensaInfo(std::vector<EstimatedRensaInfo> infos) { feasibleRensaInfos_ = std::move(infos); }
+    void setPossibleRensaInfo(std::vector<EstimatedRensaInfo> infos) { possibleRensaInfos_ = std::move(infos); }
+    void setPossibleRensaInfoTree(std::vector<EstimatedRensaInfoTree> tree) { possibleRensaTree_ = std::move(tree); }
 
     std::string toRensaInfoString() const;
 
@@ -49,6 +53,7 @@ private:
     std::vector<EstimatedRensaInfo> feasibleRensaInfos_;
     // PossibleRensa is the rensa the enemy will build in future.
     std::vector<EstimatedRensaInfo> possibleRensaInfos_;
+    std::vector<EstimatedRensaInfoTree> possibleRensaTree_;
 };
 
 class Gazer : noncopyable {
