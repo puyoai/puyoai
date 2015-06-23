@@ -15,7 +15,7 @@ class AI final : public ::AI {
                      const KumipuyoSeq& seq,
                      const PlayerState& me,
                      const PlayerState& enemy,
-                     bool fast) const override;
+                     bool fast) override;
 
  private:
   DropDecision think_sample(int frame_id,

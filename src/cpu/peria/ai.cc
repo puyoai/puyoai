@@ -31,7 +31,7 @@ DropDecision Ai::think(int frame_id,
                        const KumipuyoSeq& seq,
                        const PlayerState& my_state,
                        const PlayerState& enemy_state,
-                       bool fast) const {
+                       bool fast) {
   UNUSED_VARIABLE(frame_id);
   UNUSED_VARIABLE(fast);
   using namespace std::placeholders;

@@ -62,7 +62,7 @@ bool MayahAI::loadEvaluationParameter()
 }
 
 DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& kumipuyoSeq,
-                            const PlayerState& me, const PlayerState& enemy, bool fast) const
+                            const PlayerState& me, const PlayerState& enemy, bool fast)
 {
     int depth;
     int iteration;
