@@ -6,30 +6,12 @@
 #include <vector>
 
 #include "base/noncopyable.h"
+#include "core/algorithm/puyo_set.h"
 #include "core/client/ai/ai.h"
-#include "core/rensa_result.h"
+
+#include "estimated_rensa_info.h"
 
 class KumipuyoSeq;
-
-struct EstimatedRensaInfo {
-    EstimatedRensaInfo() {}
-    EstimatedRensaInfo(const IgnitionRensaResult& ignitionRensaResult, const RensaCoefResult& coefResult) :
-        ignitionRensaResult(ignitionRensaResult), coefResult(coefResult)
-    {
-    }
-
-    int chains() const { return ignitionRensaResult.chains(); }
-    int score() const { return ignitionRensaResult.score(); }
-    int rensaFrames() const { return ignitionRensaResult.rensaFrames(); }
-    int framesToIgnite() const { return ignitionRensaResult.framesToIgnite(); }
-
-    int totalFrames() const { return ignitionRensaResult.totalFrames(); }
-
-    std::string toString() const;
-
-    IgnitionRensaResult ignitionRensaResult;
-    RensaCoefResult coefResult;
-};
 
 class GazeResult {
 public:

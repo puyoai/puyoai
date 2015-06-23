@@ -169,20 +169,20 @@ int main(int argc, char* argv[])
 
                 ThoughtResult myThoughtResult = ai.thinkPlan(frameId, currentField,  seq.subsequence(0, 2),
                                                              ai.myPlayerState(), ai.enemyPlayerState(),
-                                                             MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, &decisions);
+                                                             MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, false, &decisions);
 
                 const PreEvalResult preEvalResult = ai.preEval(currentField);
                 CollectedFeatureCoefScore mycf = ai.evalWithCollectingFeature(
                     RefPlan(myThoughtResult.plan),
                     seq.subsequence(0, 2).subsequence(myThoughtResult.plan.decisions().size()),
                     frameId, MayahAI::DEFAULT_NUM_ITERATION,
-                    ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, myThoughtResult.midEvalResult,
+                    ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, myThoughtResult.midEvalResult, false,
                     ai.gazer().gazeResult());
                 CollectedFeatureCoefScore aicf = ai.evalWithCollectingFeature(
                     RefPlan(aiThoughtResult.plan),
                     seq.subsequence(0, 2).subsequence(aiThoughtResult.plan.decisions().size()),
                     frameId, MayahAI::DEFAULT_NUM_ITERATION,
-                    ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, aiThoughtResult.midEvalResult,
+                    ai.myPlayerState(), ai.enemyPlayerState(), preEvalResult, aiThoughtResult.midEvalResult, false,
                     ai.gazer().gazeResult());
 
                 CoreField myTargetField(myThoughtResult.plan.field());

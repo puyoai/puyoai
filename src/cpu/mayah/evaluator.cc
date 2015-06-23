@@ -257,8 +257,11 @@ void Evaluator<ScoreCollector>::evalFallenOjama(int fallenOjama)
 
 // Returns true If we don't need to evaluate other features.
 template<typename ScoreCollector>
-bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan, int currentFrameId,
-                                             const PlayerState& me, const PlayerState& enemy, const GazeResult& gazeResult,
+bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
+                                             int currentFrameId,
+                                             const PlayerState& me,
+                                             const PlayerState& enemy,
+                                             const GazeResult& gazeResult,
                                              const MidEvalResult& midEvalResult)
 {
     if (!plan.isRensaPlan())
@@ -580,8 +583,11 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                                      const PlayerState& enemy,
                                      const PreEvalResult& preEvalResult,
                                      const MidEvalResult& midEvalResult,
+                                     bool fast,
                                      const GazeResult& gazeResult)
 {
+    UNUSED_VARIABLE(fast);
+
     typedef typename ScoreCollector::RensaScoreCollector RensaScoreCollector;
     typedef typename RensaScoreCollector::CollectedScore RensaCollectedScore;
 
