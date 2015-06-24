@@ -37,10 +37,11 @@ struct RensaHand {
     RensaCoefResult coefResult;
 };
 
-struct RensaHandTree {
+class RensaHandTree {
+public:
     RensaHandTree() {}
-    RensaHandTree(const RensaHand& info, std::vector<RensaHandTree> tree) :
-        rensaHand(info), children(std::move(tree)) {}
+    RensaHandTree(const RensaHand& rensaHand, std::vector<RensaHandTree> tree) :
+        rensaHand_(rensaHand), children_(std::move(tree)) {}
 
     static std::vector<RensaHandTree> makeTree(int restIteration,
                                                const CoreField& currentField,
@@ -57,12 +58,16 @@ struct RensaHandTree {
                     int enemyNumOjama,
                     int enemyOjamaCommittingFrameId);
 
+    const RensaHand& rensaHand() const { return rensaHand_; }
+    const std::vector<RensaHandTree>& children() const { return children_; }
+
     std::string toString() const;
     void dump(int depth) const;
     void dumpTo(int depth, std::ostream* os) const;
 
-    RensaHand rensaHand;
-    std::vector<RensaHandTree> children;
+private:
+    RensaHand rensaHand_;
+    std::vector<RensaHandTree> children_;
 };
 
 class RensaHandTreeMaker {
