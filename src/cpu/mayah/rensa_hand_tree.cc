@@ -297,10 +297,10 @@ vector<RensaHandTree> RensaHandTreeMaker::makeSummary()
 
 //
 vector<RensaHandTree> RensaHandTree::makeTree(int restIteration,
-                                                       const CoreField& currentField,
-                                                       const PuyoSet& usedPuyoSet,
-                                                       int usedPuyoMoveFrames,
-                                                       const KumipuyoSeq& wholeKumipuyoSeq)
+                                              const CoreField& currentField,
+                                              const PuyoSet& usedPuyoSet,
+                                              int usedPuyoMoveFrames,
+                                              const KumipuyoSeq& wholeKumipuyoSeq)
 {
     if (restIteration <= 0)
         return vector<RensaHandTree>();
