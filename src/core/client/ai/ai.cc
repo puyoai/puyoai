@@ -347,6 +347,18 @@ void AI::puyoErasedForMe(const FrameRequest& frameRequest)
 void AI::puyoErasedForEnemy(const FrameRequest& frameRequest)
 {
     puyoErasedForCommon(&enemy_, &me_, frameRequest.frameId, frameRequest.enemyPlayerFrameRequest().field);
+
+    // Every time enemy puyo is erased, we need to gaze again.
+    // This is almost because our 13th row estimation might be wrong.
+    // Check kumipuyoSeq is empty for testing purpose. KumipuyoSeq might be empty in test.
+    const KumipuyoSeq& kumipuyoSeq = frameRequest.enemyPlayerFrameRequest().kumipuyoSeq;
+    if (!kumipuyoSeq.isEmpty()) {
+        CoreField cf(CoreField::fromPlainFieldWithDrop(frameRequest.enemyPlayerFrameRequest().field));
+        RensaResult rensaResult = cf.simulate();
+        int enemyStartingFrameId = frameRequest.frameId + rensaResult.frames;
+        gaze(enemyStartingFrameId, cf, rememberedSequence(enemy_.hand + 1, kumipuyoSeq));
+    }
+
     onPuyoErasedForEnemy(frameRequest);
 }
 
@@ -429,9 +441,10 @@ void AI::next2AppearedForEnemy(const FrameRequest& frameRequest)
     const KumipuyoSeq& kumipuyoSeq = frameRequest.enemyPlayerFrameRequest().kumipuyoSeq;
     next2AppearedForCommon(&enemy_, kumipuyoSeq);
 
+    // Don't call gaze() here when rensa is ongoing. gaze() will be called when puyoErasedForEnemy also.
     // When enemy_.hand == 0, rememberedSequence(0) contains PuyoColor::EMPTY.
     // So, don't gaze at that time.
-    if (enemy_.hand > 0)
+    if (!enemy_.isRensaOngoing() && enemy_.hand > 0)
         gaze(enemyDecisionRequestFrameId_, enemy_.field, rememberedSequence(enemy_.hand, kumipuyoSeq));
 
     onNext2AppearedForEnemy(frameRequest);
