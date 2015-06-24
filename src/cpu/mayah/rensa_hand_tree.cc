@@ -51,7 +51,7 @@ struct SortByTotalFrames {
         if (lhs.score() != rhs.score())
             return lhs.score() > rhs.score();
         if (lhs.chains() != rhs.chains())
-            return lhs.score() > rhs.chains();
+            return lhs.chains() > rhs.chains();
 
         if (lhs.framesToIgnite() != rhs.framesToIgnite())
             return lhs.framesToIgnite() < rhs.framesToIgnite();
