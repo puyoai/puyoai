@@ -1,5 +1,7 @@
 #include "hand_tree.h"
 
+#include <iostream>
+
 #include "core/algorithm/puyo_set.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/rensa_detector.h"
@@ -57,6 +59,36 @@ struct SortByTotalFrames {
         return lhs.coefResult.coef(lhs.chains()) > rhs.coefResult.coef(rhs.chains());
     }
 };
+
+string EstimatedRensaInfo::toString() const
+{
+    char buf[80];
+    sprintf(buf, "totalFrames, chains, score, framesToIgnite = %d, %d, %d, %d", totalFrames(), chains(), score(), framesToIgnite());
+    return buf;
+}
+
+string EstimatedRensaInfoTree::toString() const
+{
+    ostringstream oss;
+    dumpTo(0, &oss);
+
+    return oss.str();
+}
+
+void EstimatedRensaInfoTree::dump(int depth) const
+{
+    dumpTo(depth, &cout);
+}
+
+void EstimatedRensaInfoTree::dumpTo(int depth, ostream* os) const
+{
+    for (int i = 0; i < depth * 2; ++i)
+        *os << ' ';
+    *os << estimatedRensaInfo.toString() << endl;
+
+    for (const auto& t : children)
+        t.dumpTo(depth + 1, os);
+}
 
 HandTreeMaker::HandTreeMaker(int restIteration, const KumipuyoSeq& kumipuyoSeq) :
     restIteration_(restIteration),
