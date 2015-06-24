@@ -51,6 +51,38 @@ TEST(RensaHandTreeTest, eval_5rensa)
     EXPECT_EQ(5 - 69, RensaHandTree::eval(enemyTree, 0, 0, 0, myTree, 0, 0, 0));
 }
 
+TEST(RensaHandTreeTest, eval_saisoku)
+{
+    const int NUM_FRAMES_OF_ONE_RENSA = FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING + FRAMES_TO_DROP_FAST[1];
+
+    // 1P. has 10 rensa.
+    RensaCoefResult coefResult;
+    for (int i = 1; i <= 10; ++i)
+        coefResult.setCoef(i, 4, 0, 0);
+    RensaHand tenRensa(IgnitionRensaResult(RensaResult(10, ACCUMULATED_RENSA_SCORE[10], 10 * NUM_FRAMES_OF_ONE_RENSA, false),
+                                           0),
+                       coefResult);
+    const std::vector<RensaHandTree> myTree {
+        RensaHandTree(tenRensa, std::vector<RensaHandTree>()),
+    };
+
+    // 2P. has 11 rensa.
+    coefResult.setCoef(11, 4, 0, 0);
+    RensaHand elevenRensa(IgnitionRensaResult(RensaResult(11, ACCUMULATED_RENSA_SCORE[11], 11 * NUM_FRAMES_OF_ONE_RENSA, false),
+                                              0),
+                          coefResult);
+    const std::vector<RensaHandTree> enemyTree {
+        RensaHandTree(elevenRensa, std::vector<RensaHandTree>()),
+    };
+
+    // Eval after 1P has fired 2-double.
+    int s = RensaHandTree::eval(myTree, 2 * NUM_FRAMES_OF_ONE_RENSA, 0, 0,
+                                enemyTree, 0, 15, 2 * NUM_FRAMES_OF_ONE_RENSA);
+
+    // TODO(mayah): Is this correct?
+    EXPECT_EQ(15, s);
+}
+
 TEST(RensaHandTreeTest, eval_actual1)
 {
     PuyoPossibility::initialize();
