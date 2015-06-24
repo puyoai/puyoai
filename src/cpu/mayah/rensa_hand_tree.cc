@@ -1,4 +1,4 @@
-#include "hand_tree.h"
+#include "rensa_hand_tree.h"
 
 #include <iostream>
 
@@ -10,13 +10,13 @@
 
 using namespace std;
 
-struct DetailEstimatedRensaInfo {
-    DetailEstimatedRensaInfo() {}
-    DetailEstimatedRensaInfo(const IgnitionRensaResult& ignitionRensaResult,
-                             const CoreField& fieldAfterRensa,
-                             const PuyoSet& puyoSet,
-                             int wholeFramesToIgnite,
-                             const RensaCoefResult& coefResult) :
+struct RensaHandCandidate {
+    RensaHandCandidate() {}
+    RensaHandCandidate(const IgnitionRensaResult& ignitionRensaResult,
+                       const CoreField& fieldAfterRensa,
+                       const PuyoSet& puyoSet,
+                       int wholeFramesToIgnite,
+                       const RensaCoefResult& coefResult) :
         ignitionRensaResult(ignitionRensaResult),
         fieldAfterRensa(fieldAfterRensa),
         puyoSet(puyoSet),
@@ -42,7 +42,7 @@ struct DetailEstimatedRensaInfo {
 };
 
 struct SortByTotalFrames {
-    bool operator()(const DetailEstimatedRensaInfo& lhs, const DetailEstimatedRensaInfo& rhs) const
+    bool operator()(const RensaHandCandidate& lhs, const RensaHandCandidate& rhs) const
     {
         if (lhs.totalFrames() != rhs.totalFrames())
             return lhs.totalFrames() < rhs.totalFrames();
@@ -60,14 +60,14 @@ struct SortByTotalFrames {
     }
 };
 
-string EstimatedRensaInfo::toString() const
+string RensaHand::toString() const
 {
     char buf[80];
     sprintf(buf, "totalFrames, chains, score, framesToIgnite = %d, %d, %d, %d", totalFrames(), chains(), score(), framesToIgnite());
     return buf;
 }
 
-string EstimatedRensaInfoTree::toString() const
+string RensaHandTree::toString() const
 {
     ostringstream oss;
     dumpTo(0, &oss);
@@ -75,41 +75,41 @@ string EstimatedRensaInfoTree::toString() const
     return oss.str();
 }
 
-void EstimatedRensaInfoTree::dump(int depth) const
+void RensaHandTree::dump(int depth) const
 {
     dumpTo(depth, &cout);
 }
 
-void EstimatedRensaInfoTree::dumpTo(int depth, ostream* os) const
+void RensaHandTree::dumpTo(int depth, ostream* os) const
 {
     for (int i = 0; i < depth * 2; ++i)
         *os << ' ';
-    *os << estimatedRensaInfo.toString() << endl;
+    *os << rensaHand.toString() << endl;
 
     for (const auto& t : children)
         t.dumpTo(depth + 1, os);
 }
 
-HandTreeMaker::HandTreeMaker(int restIteration, const KumipuyoSeq& kumipuyoSeq) :
+RensaHandTreeMaker::RensaHandTreeMaker(int restIteration, const KumipuyoSeq& kumipuyoSeq) :
     restIteration_(restIteration),
     kumipuyoSeq_(kumipuyoSeq)
 {
 }
 
-HandTreeMaker::~HandTreeMaker()
+RensaHandTreeMaker::~RensaHandTreeMaker()
 {
 }
 
 // TODO(mayah): buggy.
 // static
-int HandTree::eval(const vector<EstimatedRensaInfoTree>& myTree,
-                   int myStartingFrameId,
-                   int myNumOjama,
-                   int myOjamaCommittingFrameId,
-                   const vector<EstimatedRensaInfoTree>& enemyTree,
-                   int enemyStartingFrameId,
-                   int enemyNumOjama,
-                   int enemyOjamaCommittingFrameId)
+int RensaHandTree::eval(const vector<RensaHandTree>& myTree,
+                        int myStartingFrameId,
+                        int myNumOjama,
+                        int myOjamaCommittingFrameId,
+                        const vector<RensaHandTree>& enemyTree,
+                        int enemyStartingFrameId,
+                        int enemyNumOjama,
+                        int enemyOjamaCommittingFrameId)
 {
     // TODO(mayah): This definition is also there in HandTree.
     // Should we have some function to make this?
@@ -141,32 +141,32 @@ int HandTree::eval(const vector<EstimatedRensaInfoTree>& myTree,
 
         int best = -myNumOjama;
         for (size_t i = 0; i < myTree.size(); ++i) {
-            const EstimatedRensaInfoTree& chosen = myTree[i];
-            if (myOjamaCommittingFrameId < myStartingFrameId + chosen.estimatedRensaInfo.framesToIgnite()) {
+            const RensaHandTree& chosen = myTree[i];
+            if (myOjamaCommittingFrameId < myStartingFrameId + chosen.rensaHand.framesToIgnite()) {
                 // In this case, we cannot fire this rensa.
                 continue;
             }
 
             // Fire this immediately?
-            if (myNumOjama < chosen.estimatedRensaInfo.score() / 70) {
-                int s = eval(chosen.children, myStartingFrameId + chosen.estimatedRensaInfo.totalFrames(), 0, 0,
-                                      enemyTree, enemyStartingFrameId, enemyNumOjama + chosen.estimatedRensaInfo.score() / 70, myStartingFrameId + chosen.estimatedRensaInfo.totalFrames());
+            if (myNumOjama < chosen.rensaHand.score() / 70) {
+                int s = eval(chosen.children, myStartingFrameId + chosen.rensaHand.totalFrames(), 0, 0,
+                                      enemyTree, enemyStartingFrameId, enemyNumOjama + chosen.rensaHand.score() / 70, myStartingFrameId + chosen.rensaHand.totalFrames());
                 if (best < s)
                     best = s;
             } else {
                 // in short...
                 // TODO(mayah): Should we think enemy's OIUCHI when enemyTree is not empty?
-                int s = chosen.estimatedRensaInfo.score() / 70 - myNumOjama;
+                int s = chosen.rensaHand.score() / 70 - myNumOjama;
                 if (best < s)
                     best = s;
             }
 
             // Fire this by making this large?
             if (plusRensa > 0) {
-                int score = chosen.estimatedRensaInfo.coefResult.score(plusRensa);
+                int score = chosen.rensaHand.coefResult.score(plusRensa);
                 if (myNumOjama < score / 70) {
-                    int s = eval(chosen.children, myStartingFrameId + restFrames + chosen.estimatedRensaInfo.totalFrames(), 0, 0,
-                                          enemyTree, enemyStartingFrameId, enemyNumOjama + score / 70, myStartingFrameId + restFrames + chosen.estimatedRensaInfo.totalFrames());
+                    int s = eval(chosen.children, myStartingFrameId + restFrames + chosen.rensaHand.totalFrames(), 0, 0,
+                                          enemyTree, enemyStartingFrameId, enemyNumOjama + score / 70, myStartingFrameId + restFrames + chosen.rensaHand.totalFrames());
                     if (best < s)
                         best = s;
                 }
@@ -203,18 +203,18 @@ int HandTree::eval(const vector<EstimatedRensaInfoTree>& myTree,
 
         // choose the best hand from my hand.
         for (size_t i = 0; i < myTree.size(); ++i) {
-            const EstimatedRensaInfoTree& chosen = myTree[i];
-            int s = eval(chosen.children, myStartingFrameId + chosen.estimatedRensaInfo.totalFrames(), 0, 0,
-                         enemyTree, enemyStartingFrameId, chosen.estimatedRensaInfo.score() / 70, myStartingFrameId + chosen.estimatedRensaInfo.totalFrames());
+            const RensaHandTree& chosen = myTree[i];
+            int s = eval(chosen.children, myStartingFrameId + chosen.rensaHand.totalFrames(), 0, 0,
+                         enemyTree, enemyStartingFrameId, chosen.rensaHand.score() / 70, myStartingFrameId + chosen.rensaHand.totalFrames());
             if (best < s)
                 best = s;
         }
 
         // enemy will choose the worst one for me.
         for (size_t i = 0; i < enemyTree.size(); ++i) {
-            const EstimatedRensaInfoTree& chosen = enemyTree[i];
-            int s = eval(myTree, myStartingFrameId, chosen.estimatedRensaInfo.score() / 70, enemyStartingFrameId + chosen.estimatedRensaInfo.totalFrames(),
-                         chosen.children, enemyStartingFrameId + chosen.estimatedRensaInfo.totalFrames(), 0, 0);
+            const RensaHandTree& chosen = enemyTree[i];
+            int s = eval(myTree, myStartingFrameId, chosen.rensaHand.score() / 70, enemyStartingFrameId + chosen.rensaHand.totalFrames(),
+                         chosen.children, enemyStartingFrameId + chosen.rensaHand.totalFrames(), 0, 0);
             if (s < worst)
                 worst = s;
         }
@@ -226,10 +226,10 @@ int HandTree::eval(const vector<EstimatedRensaInfoTree>& myTree,
     return 0;
 }
 
-RensaResult HandTreeMaker::add(CoreField&& cf,
-                               const ColumnPuyoList& puyosToComplement,
-                               int usedPuyoMoveFrames,
-                               const PuyoSet& usedPuyoSet)
+RensaResult RensaHandTreeMaker::add(CoreField&& cf,
+                                    const ColumnPuyoList& puyosToComplement,
+                                    int usedPuyoMoveFrames,
+                                    const PuyoSet& usedPuyoSet)
 {
     const int NUM_FRAMES_OF_ONE_HAND = FRAMES_TO_DROP_FAST[8] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT;
 
@@ -260,33 +260,33 @@ RensaResult HandTreeMaker::add(CoreField&& cf,
     return rensaResult;
 }
 
-vector<EstimatedRensaInfoTree> HandTreeMaker::makeSummary()
+vector<RensaHandTree> RensaHandTreeMaker::makeSummary()
 {
     if (data_.empty())
-        return vector<EstimatedRensaInfoTree>();
+        return vector<RensaHandTree>();
 
     sort(data_.begin(), data_.end(), SortByTotalFrames());
 
-    vector<EstimatedRensaInfoTree> tree;
+    vector<RensaHandTree> tree;
     {
         {
-            const DetailEstimatedRensaInfo& info = data_.front();
-            EstimatedRensaInfoTree t {
-                EstimatedRensaInfo(info.ignitionRensaResult, info.coefResult),
-                HandTree::makeTree(restIteration() - 1, info.fieldAfterRensa, info.puyoSet, info.wholeFramesToIgnite, kumipuyoSeq_),
+            const RensaHandCandidate& info = data_.front();
+            RensaHandTree t {
+                RensaHand(info.ignitionRensaResult, info.coefResult),
+                RensaHandTree::makeTree(restIteration() - 1, info.fieldAfterRensa, info.puyoSet, info.wholeFramesToIgnite, kumipuyoSeq_),
             };
             tree.push_back(t);
         }
 
-        for (const DetailEstimatedRensaInfo& info : data_) {
+        for (const RensaHandCandidate& info : data_) {
             // Don't consider if chain side is too close.
-            if (info.score() <= tree.back().estimatedRensaInfo.score() + 140)
+            if (info.score() <= tree.back().rensaHand.score() + 140)
                 continue;
 
-            DCHECK(tree.back().estimatedRensaInfo.totalFrames() < info.totalFrames());
-            EstimatedRensaInfoTree t {
-                EstimatedRensaInfo(info.ignitionRensaResult, info.coefResult),
-                HandTree::makeTree(restIteration() - 1, info.fieldAfterRensa, info.puyoSet, info.wholeFramesToIgnite, kumipuyoSeq_),
+            DCHECK(tree.back().rensaHand.totalFrames() < info.totalFrames());
+            RensaHandTree t {
+                RensaHand(info.ignitionRensaResult, info.coefResult),
+                RensaHandTree::makeTree(restIteration() - 1, info.fieldAfterRensa, info.puyoSet, info.wholeFramesToIgnite, kumipuyoSeq_),
             };
             tree.push_back(t);
         }
@@ -296,16 +296,16 @@ vector<EstimatedRensaInfoTree> HandTreeMaker::makeSummary()
 }
 
 //
-vector<EstimatedRensaInfoTree> HandTree::makeTree(int restIteration,
-                                                  const CoreField& currentField,
-                                                  const PuyoSet& usedPuyoSet,
-                                                  int usedPuyoMoveFrames,
-                                                  const KumipuyoSeq& wholeKumipuyoSeq)
+vector<RensaHandTree> RensaHandTree::makeTree(int restIteration,
+                                                       const CoreField& currentField,
+                                                       const PuyoSet& usedPuyoSet,
+                                                       int usedPuyoMoveFrames,
+                                                       const KumipuyoSeq& wholeKumipuyoSeq)
 {
     if (restIteration <= 0)
-        return vector<EstimatedRensaInfoTree>();
+        return vector<RensaHandTree>();
 
-    HandTreeMaker maker(restIteration, wholeKumipuyoSeq);
+    RensaHandTreeMaker maker(restIteration, wholeKumipuyoSeq);
     auto callback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
         return maker.add(std::move(cf), puyosToComplement, usedPuyoMoveFrames, usedPuyoSet);
     };

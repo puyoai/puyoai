@@ -14,12 +14,10 @@
 #include "core/kumipuyo_seq.h"
 #include "core/score.h"
 
-#include "hand_tree.h"
-
 using namespace std;
 
 struct SortByFrames {
-    bool operator()(const EstimatedRensaInfo& lhs, const EstimatedRensaInfo& rhs) const
+    bool operator()(const RensaHand& lhs, const RensaHand& rhs) const
     {
         if (lhs.framesToIgnite() != rhs.framesToIgnite())
             return lhs.framesToIgnite() < rhs.framesToIgnite();
@@ -108,7 +106,7 @@ int GazeResult::estimateMaxScoreFromPossibleRensas(int frameId) const
     return estimateMaxScoreFrom(frameId, possibleRensaInfos_);
 }
 
-int GazeResult::estimateMaxScoreFrom(int frameId, const vector<EstimatedRensaInfo>& rensaInfos) const
+int GazeResult::estimateMaxScoreFrom(int frameId, const vector<RensaHand>& rensaInfos) const
 {
     if (rensaInfos.empty())
         return -1;
@@ -153,7 +151,7 @@ void Gazer::gaze(int frameId, const CoreField& cf, const KumipuyoSeq& seq)
     updateFeasibleRensas(cf, seq);
     updatePossibleRensas(cf, seq);
 
-    std::vector<EstimatedRensaInfoTree> tree = HandTree::makeTree(3, cf, PuyoSet(), 0, seq);
+    std::vector<RensaHandTree> tree = RensaHandTree::makeTree(3, cf, PuyoSet(), 0, seq);
 
     ostringstream os;
     for (const auto& t : tree)
@@ -170,7 +168,7 @@ void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     if (seq.size() >= 4)
         seq = seq.subsequence(0, 3);
 
-    std::vector<EstimatedRensaInfo> results;
+    std::vector<RensaHand> results;
     {
         auto f = [&results](const CoreField& cf, const std::vector<Decision>& /*decisions*/,
                             int /*numChigiri*/, int framesToIgnite, int /*lastDropFrames*/, bool shouldFire) {
@@ -190,7 +188,7 @@ void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         sort(results.begin(), results.end(), SortByFrames());
     }
 
-    std::vector<EstimatedRensaInfo> feasibleRensaInfos;
+    std::vector<RensaHand> feasibleRensaInfos;
 
     feasibleRensaInfos.push_back(results.front());
 
@@ -216,7 +214,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     for (int x = 1; x <= FieldConstant::WIDTH; ++x)
         averageHeight += field.height(x) / 6.0;
 
-    vector<EstimatedRensaInfo> results;
+    vector<RensaHand> results;
     {
         results.reserve(20000);
         auto simulationCallback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
@@ -257,7 +255,7 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
         sort(results.begin(), results.end(), SortByFrames());
     }
 
-    vector<EstimatedRensaInfo> possibleRensaInfos;
+    vector<RensaHand> possibleRensaInfos;
     possibleRensaInfos.push_back(results.front());
 
     for (const auto& info : results) {
