@@ -9,7 +9,7 @@
 #include "core/algorithm/puyo_set.h"
 #include "core/client/ai/ai.h"
 
-#include "hand_tree.h"
+#include "rensa_hand_tree.h"
 
 class KumipuyoSeq;
 
@@ -18,8 +18,8 @@ public:
     GazeResult() {}
     GazeResult(int frameIdGazedAt,
                int numReachableSpaces,
-               const std::vector<EstimatedRensaInfo>& feasible,
-               const std::vector<EstimatedRensaInfo>& possible) :
+               const std::vector<RensaHand>& feasible,
+               const std::vector<RensaHand>& possible) :
         frameIdGazedAt_(frameIdGazedAt),
         numReachableSpaces_(numReachableSpaces),
         feasibleRensaInfos_(feasible),
@@ -31,29 +31,29 @@ public:
 
     // Returns the (expecting) possible max score by this frame.
     int estimateMaxScore(int frameId, const PlayerState& enemy) const;
-    const std::vector<EstimatedRensaInfo>& feasibleRensaInfos() const { return feasibleRensaInfos_; }
+    const std::vector<RensaHand>& feasibleRensaInfos() const { return feasibleRensaInfos_; }
 
-    const std::vector<EstimatedRensaInfoTree>& rensaTree() const { return possibleRensaTree_; }
+    const std::vector<RensaHandTree>& rensaTree() const { return possibleRensaTree_; }
 
     void reset(int frameId, int numReachableSpaces);
-    void setFeasibleRensaInfo(std::vector<EstimatedRensaInfo> infos) { feasibleRensaInfos_ = std::move(infos); }
-    void setPossibleRensaInfo(std::vector<EstimatedRensaInfo> infos) { possibleRensaInfos_ = std::move(infos); }
-    void setPossibleRensaInfoTree(std::vector<EstimatedRensaInfoTree> tree) { possibleRensaTree_ = std::move(tree); }
+    void setFeasibleRensaInfo(std::vector<RensaHand> infos) { feasibleRensaInfos_ = std::move(infos); }
+    void setPossibleRensaInfo(std::vector<RensaHand> infos) { possibleRensaInfos_ = std::move(infos); }
+    void setPossibleRensaInfoTree(std::vector<RensaHandTree> tree) { possibleRensaTree_ = std::move(tree); }
 
     std::string toRensaInfoString() const;
 
 private:
     int estimateMaxScoreFromFeasibleRensas(int frameId) const;
     int estimateMaxScoreFromPossibleRensas(int frameId) const;
-    int estimateMaxScoreFrom(int frameId, const std::vector<EstimatedRensaInfo>& rensaInfos) const;
+    int estimateMaxScoreFrom(int frameId, const std::vector<RensaHand>& rensaInfos) const;
 
     int frameIdGazedAt_ = -1;
     int numReachableSpaces_ = 72;
     // FiesibleRensa is the rensa that the enemy can really fire in current/next/nextnext tsumo.
-    std::vector<EstimatedRensaInfo> feasibleRensaInfos_;
+    std::vector<RensaHand> feasibleRensaInfos_;
     // PossibleRensa is the rensa the enemy will build in future.
-    std::vector<EstimatedRensaInfo> possibleRensaInfos_;
-    std::vector<EstimatedRensaInfoTree> possibleRensaTree_;
+    std::vector<RensaHand> possibleRensaInfos_;
+    std::vector<RensaHandTree> possibleRensaTree_;
 };
 
 class Gazer : noncopyable {

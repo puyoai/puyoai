@@ -1,4 +1,4 @@
-#include "hand_tree.h"
+#include "rensa_hand_tree.h"
 
 #include <iostream>
 
@@ -11,21 +11,21 @@
 
 using namespace std;
 
-class HandTreeTest : public testing::Test {
+class RensaHandTreeTest : public testing::Test {
 public:
-    HandTreeTest()
+    RensaHandTreeTest()
     {
         PuyoPossibility::initialize();
     }
 };
 
-TEST(HandTreeTest, eval_empty)
+TEST(RensaHandTreeTest, eval_empty)
 {
-    const std::vector<EstimatedRensaInfoTree> empty;
-    EXPECT_EQ(0, HandTree::eval(empty, 0, 0, 0, empty, 0, 0, 0));
+    const std::vector<RensaHandTree> empty;
+    EXPECT_EQ(0, RensaHandTree::eval(empty, 0, 0, 0, empty, 0, 0, 0));
 }
 
-TEST(HandTreeTest, eval_5rensa)
+TEST(RensaHandTreeTest, eval_5rensa)
 {
     const int NUM_FRAMES_OF_ONE_RENSA = FRAMES_PREPARING_NEXT + FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING + FRAMES_TO_DROP_FAST[1];
 
@@ -36,22 +36,22 @@ TEST(HandTreeTest, eval_5rensa)
     coefResult.setCoef(4, 4, 0, 0);
     coefResult.setCoef(5, 4, 0, 0);
 
-    EstimatedRensaInfo fiveRensa(IgnitionRensaResult(RensaResult(5, 40 * (1 + 8 + 16 + 32 + 64), 5 * NUM_FRAMES_OF_ONE_RENSA, false),
-                                                     0),
-                                 coefResult);
+    RensaHand fiveRensa(IgnitionRensaResult(RensaResult(5, 40 * (1 + 8 + 16 + 32 + 64), 5 * NUM_FRAMES_OF_ONE_RENSA, false),
+                                            0),
+                        coefResult);
 
-    const std::vector<EstimatedRensaInfoTree> myTree {
-        EstimatedRensaInfoTree(fiveRensa, std::vector<EstimatedRensaInfoTree>()),
+    const std::vector<RensaHandTree> myTree {
+        RensaHandTree(fiveRensa, std::vector<RensaHandTree>()),
     };
 
-    const std::vector<EstimatedRensaInfoTree> enemyTree;
+    const std::vector<RensaHandTree> enemyTree;
 
     // 5rensa = 69, 3rensa = 14
-    EXPECT_EQ(69 - 14, HandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0));
-    EXPECT_EQ(14 - 69, HandTree::eval(enemyTree, 0, 0, 0, myTree, 0, 0, 0));
+    EXPECT_EQ(69 - 14, RensaHandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0));
+    EXPECT_EQ(14 - 69, RensaHandTree::eval(enemyTree, 0, 0, 0, myTree, 0, 0, 0));
 }
 
-TEST(HandTreeTest, eval_actual1)
+TEST(RensaHandTreeTest, eval_actual1)
 {
     PuyoPossibility::initialize();
 
@@ -70,10 +70,10 @@ TEST(HandTreeTest, eval_actual1)
         "RBYGR."
         "RBYGR.");
 
-    std::vector<EstimatedRensaInfoTree> myTree = HandTree::makeTree(2, cf1, PuyoSet(), 0, KumipuyoSeq("YYYY"));
-    std::vector<EstimatedRensaInfoTree> enemyTree = HandTree::makeTree(2, cf2, PuyoSet(), 0, KumipuyoSeq("YYGG"));
+    std::vector<RensaHandTree> myTree = RensaHandTree::makeTree(2, cf1, PuyoSet(), 0, KumipuyoSeq("YYYY"));
+    std::vector<RensaHandTree> enemyTree = RensaHandTree::makeTree(2, cf2, PuyoSet(), 0, KumipuyoSeq("YYGG"));
 
-    EXPECT_LT(0, HandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0));
+    EXPECT_LT(0, RensaHandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0));
 
 #if 0
     for (const auto& t : myTree)
@@ -83,12 +83,12 @@ TEST(HandTreeTest, eval_actual1)
         t.dump(0);
     cout << "----------------------------------------------------------------------" << endl;
 
-    cout << HandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0) << endl;
-    cout << HandTree::eval(enemyTree, 0, 0, 0, myTree, 0, 0, 0) << endl;
+    cout << RensaHandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0) << endl;
+    cout << RensaHandTree::eval(enemyTree, 0, 0, 0, myTree, 0, 0, 0) << endl;
 #endif
 }
 
-TEST(HandTreeTest, eval_actual2)
+TEST(RensaHandTreeTest, eval_actual2)
 {
     PuyoPossibility::initialize();
 
@@ -116,10 +116,10 @@ TEST(HandTreeTest, eval_actual2)
         "RBYGRB"
         "RBYGRB");
 
-    std::vector<EstimatedRensaInfoTree> myTree = HandTree::makeTree(2, cf1, PuyoSet(), 0, KumipuyoSeq());
-    std::vector<EstimatedRensaInfoTree> enemyTree = HandTree::makeTree(2, cf2, PuyoSet(), 0, KumipuyoSeq());
+    std::vector<RensaHandTree> myTree = RensaHandTree::makeTree(2, cf1, PuyoSet(), 0, KumipuyoSeq());
+    std::vector<RensaHandTree> enemyTree = RensaHandTree::makeTree(2, cf2, PuyoSet(), 0, KumipuyoSeq());
 
-    EXPECT_LT(0, HandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0));
+    EXPECT_LT(0, RensaHandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0));
 
 #if 0
     for (const auto& t : myTree)
@@ -128,6 +128,6 @@ TEST(HandTreeTest, eval_actual2)
     for (const auto& t : enemyTree)
         t.dump(0);
     cout << "----------------------------------------------------------------------" << endl;
-    cout << HandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0) << endl;
+    cout << RensaHandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0) << endl;
 #endif
 }

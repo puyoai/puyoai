@@ -1,4 +1,4 @@
-#include "hand_tree.h"
+#include "rensa_hand_tree.h"
 
 #include <iostream>
 
@@ -11,15 +11,15 @@
 
 using namespace std;
 
-class HandTreePerformanceTest : public testing::Test {
+class RensaHandTreePerformanceTest : public testing::Test {
 public:
-    HandTreePerformanceTest()
+    RensaHandTreePerformanceTest()
     {
         PuyoPossibility::initialize();
     }
 };
 
-TEST(HandTreePerformanceTest, pattern1_depth1)
+TEST(RensaHandTreePerformanceTest, pattern1_depth1)
 {
     CoreField cf(
         "    RB"
@@ -34,12 +34,12 @@ TEST(HandTreePerformanceTest, pattern1_depth1)
     KumipuyoSeq seq("RBRGRYYG");
 
     for (int i = 0; i < 1000; ++i) {
-        std::vector<EstimatedRensaInfoTree> tree = HandTree::makeTree(1, cf, PuyoSet(), 0, seq);
+        std::vector<RensaHandTree> tree = RensaHandTree::makeTree(1, cf, PuyoSet(), 0, seq);
         UNUSED_VARIABLE(tree);
     }
 }
 
-TEST(HandTreePerformanceTest, pattern1_depth2)
+TEST(RensaHandTreePerformanceTest, pattern1_depth2)
 {
     CoreField cf(
         "    RB"
@@ -54,12 +54,12 @@ TEST(HandTreePerformanceTest, pattern1_depth2)
     KumipuyoSeq seq("RBRGRYYG");
 
     for (int i = 0; i < 1000; ++i) {
-        std::vector<EstimatedRensaInfoTree> tree = HandTree::makeTree(2, cf, PuyoSet(), 0, seq);
+        std::vector<RensaHandTree> tree = RensaHandTree::makeTree(2, cf, PuyoSet(), 0, seq);
         UNUSED_VARIABLE(tree);
     }
 }
 
-TEST(HandTreePerformanceTest, pattern1_depth3)
+TEST(RensaHandTreePerformanceTest, pattern1_depth3)
 {
     CoreField cf(
         "    RB"
@@ -74,7 +74,7 @@ TEST(HandTreePerformanceTest, pattern1_depth3)
     KumipuyoSeq seq("RBRGRYYG");
 
     for (int i = 0; i < 1000; ++i) {
-        std::vector<EstimatedRensaInfoTree> tree = HandTree::makeTree(3, cf, PuyoSet(), 0, seq);
+        std::vector<RensaHandTree> tree = RensaHandTree::makeTree(3, cf, PuyoSet(), 0, seq);
         UNUSED_VARIABLE(tree);
     }
 }

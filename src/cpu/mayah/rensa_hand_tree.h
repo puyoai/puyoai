@@ -9,17 +9,16 @@
 #include "core/rensa_result.h"
 #include "core/rensa_track_result.h"
 
-
 class ColumnPuyoList;
 class CoreField;
-struct DetailEstimatedRensaInfo;
 class KumipuyoSeq;
 class PuyoSet;
+struct RensaHandCandidate;
 
-struct EstimatedRensaInfo {
-    EstimatedRensaInfo() {}
-    EstimatedRensaInfo(const IgnitionRensaResult& ignitionRensaResult,
-                       const RensaCoefResult& coefResult) :
+struct RensaHand {
+    RensaHand() {}
+    RensaHand(const IgnitionRensaResult& ignitionRensaResult,
+              const RensaCoefResult& coefResult) :
         ignitionRensaResult(ignitionRensaResult),
         coefResult(coefResult)
     {
@@ -38,41 +37,38 @@ struct EstimatedRensaInfo {
     RensaCoefResult coefResult;
 };
 
-struct EstimatedRensaInfoTree {
-    EstimatedRensaInfoTree() {}
-    EstimatedRensaInfoTree(const EstimatedRensaInfo& info, std::vector<EstimatedRensaInfoTree> tree) :
-        estimatedRensaInfo(info), children(std::move(tree)) {}
+struct RensaHandTree {
+    RensaHandTree() {}
+    RensaHandTree(const RensaHand& info, std::vector<RensaHandTree> tree) :
+        rensaHand(info), children(std::move(tree)) {}
+
+    static std::vector<RensaHandTree> makeTree(int restIteration,
+                                               const CoreField& currentField,
+                                               const PuyoSet& usedPuyoSet,
+                                               int usedPuyoMoveFrames,
+                                               const KumipuyoSeq& wholeKumipuyoSeq);
+
+    static int eval(const std::vector<RensaHandTree>& myTree,
+                    int myStartingFrameId,
+                    int myNumOjama,
+                    int myOjamaCommittingFrameId,
+                    const std::vector<RensaHandTree>& enemyTree,
+                    int enemyStartingFrameId,
+                    int enemyNumOjama,
+                    int enemyOjamaCommittingFrameId);
 
     std::string toString() const;
     void dump(int depth) const;
     void dumpTo(int depth, std::ostream* os) const;
 
-    EstimatedRensaInfo estimatedRensaInfo;
-    std::vector<EstimatedRensaInfoTree> children;
+    RensaHand rensaHand;
+    std::vector<RensaHandTree> children;
 };
 
-class HandTree {
+class RensaHandTreeMaker {
 public:
-    static std::vector<EstimatedRensaInfoTree> makeTree(int restIteration,
-                                                        const CoreField& currentField,
-                                                        const PuyoSet& usedPuyoSet,
-                                                        int usedPuyoMoveFrames,
-                                                        const KumipuyoSeq& wholeKumipuyoSeq);
-
-    static int eval(const std::vector<EstimatedRensaInfoTree>& myTree,
-                    int myStartingFrameId,
-                    int myNumOjama,
-                    int myOjamaCommittingFrameId,
-                    const std::vector<EstimatedRensaInfoTree>& enemyTree,
-                    int enemyStartingFrameId,
-                    int enemyNumOjama,
-                    int enemyOjamaCommittingFrameId);
-};
-
-class HandTreeMaker {
-public:
-    HandTreeMaker(int restIteration, const KumipuyoSeq& kumipuyoSeq);
-    ~HandTreeMaker();
+    RensaHandTreeMaker(int restIteration, const KumipuyoSeq& kumipuyoSeq);
+    ~RensaHandTreeMaker();
 
     int restIteration() const { return restIteration_; }
 
@@ -81,12 +77,12 @@ public:
                     int usedPuyoMoveFrames,
                     const PuyoSet& usedPuyoSet);
 
-    std::vector<EstimatedRensaInfoTree> makeSummary();
+    std::vector<RensaHandTree> makeSummary();
 
 private:
     const int restIteration_;
     const KumipuyoSeq kumipuyoSeq_;
-    std::vector<DetailEstimatedRensaInfo> data_;
+    std::vector<RensaHandCandidate> data_;
 };
 
 #endif // CPU_MAYAH_HAND_TREE_H_
