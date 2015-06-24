@@ -9,7 +9,7 @@
 #include "core/algorithm/puyo_set.h"
 #include "core/client/ai/ai.h"
 
-#include "estimated_rensa_info.h"
+#include "hand_tree.h"
 
 class KumipuyoSeq;
 

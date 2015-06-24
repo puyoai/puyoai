@@ -1,15 +1,55 @@
 #ifndef CPU_MAYAH_HAND_TREE_H_
 #define CPU_MAYAH_HAND_TREE_H_
 
+#include <ostream>
+#include <string>
 #include <vector>
 
 #include "core/kumipuyo_seq.h"
+#include "core/rensa_result.h"
+#include "core/rensa_track_result.h"
 
-#include "estimated_rensa_info.h"
 
 class ColumnPuyoList;
+class CoreField;
 struct DetailEstimatedRensaInfo;
+class KumipuyoSeq;
 class PuyoSet;
+
+struct EstimatedRensaInfo {
+    EstimatedRensaInfo() {}
+    EstimatedRensaInfo(const IgnitionRensaResult& ignitionRensaResult,
+                       const RensaCoefResult& coefResult) :
+        ignitionRensaResult(ignitionRensaResult),
+        coefResult(coefResult)
+    {
+    }
+
+    int chains() const { return ignitionRensaResult.chains(); }
+    int score() const { return ignitionRensaResult.score(); }
+    int rensaFrames() const { return ignitionRensaResult.rensaFrames(); }
+    int framesToIgnite() const { return ignitionRensaResult.framesToIgnite(); }
+
+    int totalFrames() const { return ignitionRensaResult.totalFrames(); }
+
+    std::string toString() const;
+
+    IgnitionRensaResult ignitionRensaResult;
+    RensaCoefResult coefResult;
+};
+
+struct EstimatedRensaInfoTree {
+    EstimatedRensaInfoTree() {}
+    EstimatedRensaInfoTree(const EstimatedRensaInfo& info, std::vector<EstimatedRensaInfoTree> tree) :
+        estimatedRensaInfo(info), children(std::move(tree)) {}
+
+    std::string toString() const;
+    void dump(int depth) const;
+    void dumpTo(int depth, std::ostream* os) const;
+
+    EstimatedRensaInfo estimatedRensaInfo;
+    std::vector<EstimatedRensaInfoTree> children;
+};
 
 class HandTree {
 public:

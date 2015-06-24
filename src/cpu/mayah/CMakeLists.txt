@@ -5,7 +5,6 @@ cpu_setup("mayah")
 add_library(mayah_lib
             collected_score.cc
             decision_book.cc
-            estimated_rensa_info.cc
             evaluator.cc
             evaluation_feature.cc
             evaluation_mode.cc
