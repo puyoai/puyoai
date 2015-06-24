@@ -27,7 +27,7 @@ TEST(RensaHandTreeTest, eval_empty)
 
 TEST(RensaHandTreeTest, eval_5rensa)
 {
-    const int NUM_FRAMES_OF_ONE_RENSA = FRAMES_PREPARING_NEXT + FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING + FRAMES_TO_DROP_FAST[1];
+    const int NUM_FRAMES_OF_ONE_RENSA = FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING + FRAMES_TO_DROP_FAST[1];
 
     RensaCoefResult coefResult;
     coefResult.setCoef(1, 4, 0, 0);
@@ -46,9 +46,9 @@ TEST(RensaHandTreeTest, eval_5rensa)
 
     const std::vector<RensaHandTree> enemyTree;
 
-    // 5rensa = 69, 3rensa = 14
-    EXPECT_EQ(69 - 14, RensaHandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0));
-    EXPECT_EQ(14 - 69, RensaHandTree::eval(enemyTree, 0, 0, 0, myTree, 0, 0, 0));
+    // 5rensa = 69, 3rensa = 14, 2rensa = 5
+    EXPECT_EQ(69 - 5, RensaHandTree::eval(myTree, 0, 0, 0, enemyTree, 0, 0, 0));
+    EXPECT_EQ(5 - 69, RensaHandTree::eval(enemyTree, 0, 0, 0, myTree, 0, 0, 0));
 }
 
 TEST(RensaHandTreeTest, eval_actual1)
