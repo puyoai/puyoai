@@ -114,7 +114,7 @@ int RensaHandTree::eval(const vector<RensaHandTree>& myTree,
     // TODO(mayah): This definition is also there in HandTree.
     // Should we have some function to make this?
     const int NUM_FRAMES_OF_ONE_HAND = FRAMES_TO_DROP_FAST[8] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT;
-    const int NUM_FRAMES_OF_ONE_RENSA = FRAMES_PREPARING_NEXT + FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING + FRAMES_TO_DROP_FAST[1];
+    const int NUM_FRAMES_OF_ONE_RENSA = FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING + FRAMES_TO_DROP_FAST[1];
 
     if (myNumOjama > 0 && enemyNumOjama > 0) {
         if (myNumOjama >= enemyNumOjama) {
