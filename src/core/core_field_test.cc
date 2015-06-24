@@ -400,6 +400,26 @@ TEST(CoreFieldTest, dropPuyoOnWithMaxHeight)
     EXPECT_EQ(PuyoColor::GREEN, f.color(3, 4));
 }
 
+TEST(CoreFieldTest, dropPuyoOnWithMaxHeightEdgeCase)
+{
+    CoreField cf("OO.OOO"
+                 "O....." // 13
+                 "OOOOOO" // 12
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO" // 8
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO" // 4
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO");
+
+    EXPECT_FALSE(cf.dropPuyoOnWithMaxHeight(1, PuyoColor::RED, 14));
+}
+
 TEST(CoreFieldTest, removePuyoFrom)
 {
     CoreField cf(

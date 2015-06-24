@@ -226,10 +226,13 @@ bool CoreField::dropPuyoOnWithMaxHeight(int x, PuyoColor c, int maxHeight)
     DCHECK_NE(c, PuyoColor::EMPTY) << toDebugString();
     DCHECK_LE(maxHeight, 14);
 
-    if (height(x) >= maxHeight)
+    if (height(x) >= std::min(13, maxHeight))
         return false;
 
-    DCHECK_EQ(color(x, height(x) + 1), PuyoColor::EMPTY);
+    DCHECK_EQ(color(x, height(x) + 1), PuyoColor::EMPTY)
+        << "maxHeight=" << maxHeight << '\n'
+        << toDebugString();
+
     unsafeSet(x, ++heights_[x], c);
     return true;
 }
