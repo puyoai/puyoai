@@ -45,15 +45,17 @@ void GazeResult::reset(int frameId, int numReachableSpaces)
 
 int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
 {
-    CHECK_LE(frameIdGazedAt_, frameId)
-        << "Gazer is requested to check the past frame estimated score."
-        << " frameId=" << frameId
-        << " frameIdGazedAt=" << frameIdGazedAt_;
-
     // TODO(mayah): How to handle this?
     if (enemy.isRensaOngoing() && frameId <= enemy.rensaFinishingFrameId()) {
         return enemy.currentRensaResult.score;
     }
+
+    // We need to check this after checking enemy.isRensaOngoing().
+    // Since gaze frameId will be the time just after the rensa is finished.
+    CHECK_LE(frameIdGazedAt_, frameId)
+        << "Gazer is requested to check the past frame estimated score."
+        << " frameId=" << frameId
+        << " frameIdGazedAt=" << frameIdGazedAt_;
 
     int scoreByFeasibleRensas = estimateMaxScoreFromFeasibleRensas(frameId);
     if (scoreByFeasibleRensas >= 0)
