@@ -87,15 +87,7 @@ int CoreField::countPuyos() const
 
 int CoreField::countColorPuyos() const
 {
-    int cnt = 0;
-    for (int x = 1; x <= WIDTH; ++x) {
-        for (int y = 1; y <= height(x); ++y) {
-            if (isNormalColor(x, y))
-                ++cnt;
-        }
-    }
-
-    return cnt;
+    return bitField().normalColorBits().maskedField13().popcount();
 }
 
 int CoreField::countUnreachableSpaces() const
