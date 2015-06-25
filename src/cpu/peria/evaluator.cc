@@ -186,19 +186,23 @@ int Evaluator::PatternMatch(const CoreField& field, std::string* name) {
 }
 
 int Evaluator::Flat(const CoreField& field) {
-  int score = 0;
-  const int kPenalty = 100;
+  const int kEdgePenalty = 20;
+  const int kPenalty = 10;
 
-  for (int x = 1; x < FieldConstant::WIDTH; ++x) {
-    if ((x > 1 && field.height(x) < field.height(x - 1)) ||
-        (x < FieldConstant::WIDTH && field.height(x) < field.height(x + 1)))
-      score -= kPenalty;
-  }
-  if (field.height(1) < field.height(2))
-    score -= kPenalty;
-  if (field.height(FieldConstant::WIDTH) < field.height(FieldConstant::WIDTH - 1))
-    score -= kPenalty;
+  // Field should be like 'U'
+  int diff12 = std::max(field.height(2) - field.height(1), 0);
+  int diff23 = std::max(field.height(3) - field.height(2), 0);
+  int diff34 = std::abs(field.height(3) - field.height(4));
+  int diff45 = std::max(field.height(4) - field.height(5), 0);
+  int diff56 = std::max(field.height(5) - field.height(6), 0);
 
+  int score =
+    - diff12 * std::max(field.height(2), field.height(1)) * kEdgePenalty
+    - diff23 * std::max(field.height(3), field.height(2)) * kPenalty
+    - diff34 * std::max(field.height(3), field.height(4)) * kPenalty
+    - diff45 * std::max(field.height(4), field.height(5)) * kPenalty
+    - diff56 * std::max(field.height(5), field.height(6)) * kEdgePenalty;
+  
   return score;
 }
 
