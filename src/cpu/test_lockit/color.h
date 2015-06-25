@@ -1,6 +1,8 @@
 #ifndef TEST_LOCKIT_COLOR_H_
 #define TEST_LOCKIT_COLOR_H_
 
+#include "core/puyo_color.h"
+
 namespace test_lockit {
 
 // PuyoColor for test_lockit. When all puyo color is converted to this enum,
@@ -15,6 +17,10 @@ enum TLColor {
 
     TL_UNKNOWN = 10,
 };
+
+// Color coverter
+TLColor toTLColor(PuyoColor pc);
+PuyoColor toPuyoColor(TLColor c);
 
 }  // namespace test_lockit
 
