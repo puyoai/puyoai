@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 cpu_setup("test_lockit")
 
 add_library(test_lockit_lib
+            color.cc
             coma.cc
             cpu.cc
             read.cc

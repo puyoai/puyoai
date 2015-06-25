@@ -9,10 +9,6 @@ class CoreField;
 
 namespace test_lockit {
 
-// Color coverter
-TLColor toTLColor(PuyoColor pc);
-PuyoColor toPuyoColor(TLColor c);
-
 // TODO: Remove following functions.
 // Field converter
 CoreField toCoreField(int[6][18]);
