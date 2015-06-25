@@ -1,6 +1,7 @@
 #include "rensa_hand_tree.h"
 
 #include <iostream>
+#include <sstream>
 
 #include "core/algorithm/puyo_set.h"
 #include "core/algorithm/puyo_possibility.h"
