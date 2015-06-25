@@ -28,10 +28,8 @@ void Evaluator::EvalPlan(const RefPlan& plan) {
 
   std::string message;
   message += "Field : " + message_field;
-  if (!message_rensa.empty())
-    message += ",Rensa : " + message_rensa;
-  if (!message_time.empty())
-    message += ",Time : " + message_time;
+  message += ",Rensa : " + message_rensa;
+  message += ",Time : " + message_time;
 
   if (control->score < score) {
     control->decision = plan.decisions().front();
