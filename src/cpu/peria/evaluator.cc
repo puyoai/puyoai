@@ -186,7 +186,7 @@ int Evaluator::PatternMatch(const CoreField& field, std::string* name) {
 }
 
 int Evaluator::Flat(const CoreField& field) {
-  const int kEdgePenalty = 20;
+  const int kEdgePenalty = 40;
   const int kPenalty = 10;
 
   // Field should be like 'U'
