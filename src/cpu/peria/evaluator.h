@@ -19,6 +19,12 @@ class Evaluator {
   void EvalPlan(const RefPlan& plan);
   
  private:
+  struct Genre {
+    std::string name;
+    int score;
+    std::string message;
+  };
+
   int EvalField(const CoreField& field, std::string* message);
   int EvalRensa(const RefPlan& plan, std::string* message);
   int EvalTime(const RefPlan& plan, std::string* message);
