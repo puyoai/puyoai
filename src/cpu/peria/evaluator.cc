@@ -200,7 +200,7 @@ int Evaluator::Flat(const CoreField& field) {
     - diff34 * std::max(field.height(3), field.height(4)) * kPenalty
     - diff45 * std::max(field.height(4), field.height(5)) * kPenalty
     - diff56 * std::max(field.height(5), field.height(6)) * kEdgePenalty;
-  
+
   return score;
 }
 
@@ -212,9 +212,9 @@ int Evaluator::Future(const CoreField& field) {
   RensaDetector::detectIteratively(
       field, RensaDetectorStrategy::defaultDropStrategy(), 1,
       [&expects](CoreField&& cf, const ColumnPuyoList& puyo_to_add) -> RensaResult {
-        int num = puyo_to_add.size();
+        size_t num = puyo_to_add.size();
+        RensaResult result = cf.simulate();
         if (num < expects.size()) {
-          RensaResult result = cf.simulate();
           expects[num] = std::max(expects[num], result.score);
         }
         return result;
