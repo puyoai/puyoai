@@ -1,13 +1,20 @@
 #include "capture/syntek_source.h"
 
 #include <memory>
+
 #include <glog/logging.h>
+#include <gflags/gflags.h>
 
 #include "capture/driver/syntek.h"
 
 #include <iostream>
 
 using namespace std;
+
+DEFINE_int32(capture_offset_x, 37, "The x offset to crop captured image.");
+DEFINE_int32(capture_offset_y, 8, "The y offset to crop captured image.");
+DEFINE_int32(capture_width, 640, "The cropped captured image width.");
+DEFINE_int32(capture_height, 224, "The cropped captured image height.");
 
 SyntekSource::SyntekSource() :
     currentSurface_(emptyUniqueSDLSurface())
@@ -77,13 +84,11 @@ UniqueSDLSurface SyntekSource::getNextFrame()
     cond_.wait(lock);
 
     UniqueSDLSurface surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, 320, 224, 32, 0, 0, 0, 0)));
-    // CHECK_EQ(SDL_LockSurface(currentSurface_.get()), 0);
-    // 720x240 -> 640x224
-    const SDL_Rect srcRect { 37, 8, 640, 224 };
+    // Convert 720x240 to 640x224.
+    const SDL_Rect srcRect {
+        FLAGS_capture_offset_x, FLAGS_capture_offset_y,
+        FLAGS_capture_width, FLAGS_capture_height };
     SDL_BlitScaled(currentSurface_.get(), &srcRect, surf.get(), nullptr);
-    // SDL_BlitSurface(currentSurface_.get(), nullptr, surf.get(), nullptr);
-    // SDL_UnlockSurface(currentSurface_.get());
-
     return std::move(surf);
 }
 
