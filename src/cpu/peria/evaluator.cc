@@ -19,15 +19,23 @@ Evaluator::Evaluator(int id, const PlayerState& m, const PlayerState& e, const P
 
 void Evaluator::EvalPlan(const RefPlan& plan) {
   std::string message_field;
+  std::string message_uke_field;
   std::string message_rensa;
   std::string message_time;
 
-  int score = EvalField(plan.field(), &message_field);
+  CoreField uke_field = plan.field();
+  // Assume 1 or 5 line(s) of Ojama puyo
+  uke_field.fallOjama(enemy.hasZenkeshi ? 5 : 1);
+  
+  int score = 0;
+  score += EvalField(plan.field(), &message_field);
+  score += EvalField(uke_field, &message_uke_field) / 2;
   score += EvalRensa(plan, &message_rensa);
   score += EvalTime(plan, &message_time);
 
   std::string message;
   message += "Field : " + message_field;
+  message += ",Uke-Field : " + message_uke_field;
   message += ",Rensa : " + message_rensa;
   message += ",Time : " + message_time;
 
