@@ -6,9 +6,10 @@
 
 #include <libusb-1.0/libusb.h>
 
-// TODO(mayah): noncopyable
+#include "base/noncopyable.h"
+
 // This class is not thread-safe.
-class SyntekDriver {
+class SyntekDriver : noncopyable {
 public:
     ~SyntekDriver() {}
 
@@ -26,7 +27,7 @@ public:
 
     void runRead();
 
-private: // make this private.
+private:
     SyntekDriver() {}
 
     static void release(int = 0);
