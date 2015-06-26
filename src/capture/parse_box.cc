@@ -98,8 +98,8 @@ int main(int argc, char* argv[])
     const ACAnalyzer::ShowDebugMessage showsDebugMessage = ACAnalyzer::ShowDebugMessage::SHOW_DEBUG_MESSAGE;
     RealColor rc = analyzer.analyzeBox(surf.get(), b, allowOjama, showsDebugMessage);
     cout << "Color: " << rc << endl;
-
-    cout << "analyzed with AROW: " << analyzer.analyzeBoxWithRecognizer(surf.get(), b) << endl;
+    if (surf->w == 16 && surf->h == 16)
+        cout << "analyzed with AROW: " << analyzer.analyzeBoxWithRecognizer(surf.get(), b) << endl;
 
     analyzer.drawWithAnalysisResult(surf.get());
     SDL_SaveBMP(surf.get(), "output.bmp");
