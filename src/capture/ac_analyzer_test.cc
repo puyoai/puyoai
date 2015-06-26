@@ -390,8 +390,8 @@ TEST_F(ACAnalyzerTest, nextArrival)
 
     EXPECT_TRUE(rs[0]->playerResult(0)->playable);
     // Next disappears here. After detecting next disappearing. we'd like to make userEvent playable.
-    EXPECT_FALSE(rs[26]->playerResult(0)->playable);
-    EXPECT_TRUE(rs[26]->playerResult(0)->userEvent.decisionRequest);
+    EXPECT_FALSE(rs[27]->playerResult(0)->playable);
+    EXPECT_TRUE(rs[27]->playerResult(0)->userEvent.decisionRequest);
     // Then controllable now.
     EXPECT_TRUE(rs[32]->playerResult(0)->playable);
 }
@@ -409,8 +409,8 @@ TEST_F(ACAnalyzerTest, nextArrivalSousai)
     bool pgs[2] = { true, true };
     deque<unique_ptr<AnalyzerResult>> rs = analyzeMultipleFrames(images, pgs);
 
-    EXPECT_TRUE(rs[18]->playerResult(1)->userEvent.decisionRequest);
-    EXPECT_TRUE(rs[18]->playerResult(1)->userEvent.grounded);
+    EXPECT_TRUE(rs[19]->playerResult(1)->userEvent.decisionRequest);
+    EXPECT_TRUE(rs[19]->playerResult(1)->userEvent.grounded);
 }
 
 TEST_F(ACAnalyzerTest, nextArrivalIrregular)
@@ -474,9 +474,9 @@ TEST_F(ACAnalyzerTest, gameStart)
         // Player 2, frame 60: Since some stars are located on NEXT2_AXIS,
         // analyzer might consider the axis color is YELLOW.
         {  60,  67, "BBPP--", "BBPP--" },
-        {  67,  96, "BBPPBB", "BBPPBB" },
+        {  67,  97, "BBPPBB", "BBPPBB" },
         // Player 1, frame 95: next1 will disappear. so next2 is moved to next1 on that time.
-        {  96, 118, "PPBB  ", "BBPPBB" },
+        {  97, 118, "PPBB  ", "BBPPBB" },
         // Player 1, frame 120: Yellow will appeaer. But we will need 3 frames to detect it.
         { 118, 120, "PPBB--", "BBPPBB" },
     };
