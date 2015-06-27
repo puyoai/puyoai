@@ -18,6 +18,19 @@ enum TLColor {
     TL_UNKNOWN = 10,
 };
 
+inline bool isNormalTLColor(TLColor color)
+{
+    switch (color) {
+    case TL_RED:
+    case TL_BLUE:
+    case TL_YELLOW:
+    case TL_GREEN:
+        return true;
+    default:
+        return false;
+    }
+}
+
 // Color coverter
 TLColor toTLColor(PuyoColor pc);
 PuyoColor toPuyoColor(TLColor c);

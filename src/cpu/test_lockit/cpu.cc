@@ -35,30 +35,38 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
 
     {
         const KumipuyoSeq& seq = request.myPlayerFrameRequest().kumipuyoSeq;
-        p1->tsumo[0] = toTLColor(seq.axis(0));
-        p1->tsumo[1] = toTLColor(seq.child(0));
-        p1->tsumo[2] = toTLColor(seq.axis(1));
-        p1->tsumo[3] = toTLColor(seq.child(1));
+        for (int i = 0; i < 6; ++i) {
+            p1->tsumo[i] = TLColor::TL_UNKNOWN;
+        }
+        if (seq.size() >= 1) {
+            p1->tsumo[0] = toTLColor(seq.axis(0));
+            p1->tsumo[1] = toTLColor(seq.child(0));
+        }
+        if (seq.size() >= 2) {
+            p1->tsumo[2] = toTLColor(seq.axis(1));
+            p1->tsumo[3] = toTLColor(seq.child(1));
+        }
         if (seq.size() >= 3) {
             p1->tsumo[4] = toTLColor(seq.axis(2));
             p1->tsumo[5] = toTLColor(seq.child(2));
-        } else {
-            p1->tsumo[4] = TLColor::TL_UNKNOWN;
-            p1->tsumo[5] = TLColor::TL_UNKNOWN;
         }
     }
     {
         const KumipuyoSeq& seq = request.enemyPlayerFrameRequest().kumipuyoSeq;
-        p2->tsumo[0] = toTLColor(seq.axis(0));
-        p2->tsumo[1] = toTLColor(seq.child(0));
-        p2->tsumo[2] = toTLColor(seq.axis(1));
-        p2->tsumo[3] = toTLColor(seq.child(1));
+        for (int i = 0; i < 6; ++i) {
+            p2->tsumo[i] = TLColor::TL_UNKNOWN;
+        }
+        if (seq.size() >= 1) {
+            p2->tsumo[0] = toTLColor(seq.axis(0));
+            p2->tsumo[1] = toTLColor(seq.child(0));
+        }
+        if (seq.size() >= 2) {
+            p2->tsumo[2] = toTLColor(seq.axis(1));
+            p2->tsumo[3] = toTLColor(seq.child(1));
+        }
         if (seq.size() >= 3) {
             p2->tsumo[4] = toTLColor(seq.axis(2));
             p2->tsumo[5] = toTLColor(seq.child(2));
-        } else {
-            p2->tsumo[4] = TLColor::TL_UNKNOWN;
-            p2->tsumo[5] = TLColor::TL_UNKNOWN;
         }
     }
 
@@ -114,12 +122,28 @@ FrameResponse sendmes(READ_P* p1, COMAI_HI* coo)
     return FrameResponse(p1->id, Decision(p1->te_x, p1->te_r), ss.str());
 }
 
+bool isTsumoValid(int tsumo[6])
+{
+    // Check only [0, 4).
+    for (int i = 0; i < 4; ++i) {
+        TLColor c = static_cast<TLColor>(tsumo[i]);
+        if (!isNormalTLColor(c))
+            return false;
+    }
+
+    return true;
+}
+
 FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
 {
     int saidaiten, tmp;
     int coma2x_sc[22] {};
 
     parseRequest(request, &r_player[0], &r_player[1], &coma);
+
+    if (!isTsumoValid(r_player[0].tsumo) || !isTsumoValid(r_player[1].tsumo)) {
+        return FrameResponse(request.frameId);
+    }
 
     FrameResponse response(request.frameId);
 
