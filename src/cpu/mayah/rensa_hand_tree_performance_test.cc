@@ -19,7 +19,7 @@ public:
     }
 };
 
-TEST(RensaHandTreePerformanceTest, pattern1_depth1)
+TEST_F(RensaHandTreePerformanceTest, pattern1_depth1)
 {
     CoreField cf(
         "    RB"
@@ -33,13 +33,13 @@ TEST(RensaHandTreePerformanceTest, pattern1_depth1)
         "YYBBBR");
     KumipuyoSeq seq("RBRGRYYG");
 
-    for (int i = 0; i < 1000; ++i) {
-        std::vector<RensaHandTree> tree = RensaHandTree::makeTree(1, cf, PuyoSet(), 0, seq);
+    for (int i = 0; i < 100; ++i) {
+        RensaHandTree tree = RensaHandTree::makeTree(1, cf, PuyoSet(), 0, seq);
         UNUSED_VARIABLE(tree);
     }
 }
 
-TEST(RensaHandTreePerformanceTest, pattern1_depth2)
+TEST_F(RensaHandTreePerformanceTest, pattern1_depth2)
 {
     CoreField cf(
         "    RB"
@@ -53,13 +53,13 @@ TEST(RensaHandTreePerformanceTest, pattern1_depth2)
         "YYBBBR");
     KumipuyoSeq seq("RBRGRYYG");
 
-    for (int i = 0; i < 1000; ++i) {
-        std::vector<RensaHandTree> tree = RensaHandTree::makeTree(2, cf, PuyoSet(), 0, seq);
+    for (int i = 0; i < 100; ++i) {
+        RensaHandTree tree = RensaHandTree::makeTree(2, cf, PuyoSet(), 0, seq);
         UNUSED_VARIABLE(tree);
     }
 }
 
-TEST(RensaHandTreePerformanceTest, pattern1_depth3)
+TEST_F(RensaHandTreePerformanceTest, pattern1_depth3)
 {
     CoreField cf(
         "    RB"
@@ -73,8 +73,8 @@ TEST(RensaHandTreePerformanceTest, pattern1_depth3)
         "YYBBBR");
     KumipuyoSeq seq("RBRGRYYG");
 
-    for (int i = 0; i < 1000; ++i) {
-        std::vector<RensaHandTree> tree = RensaHandTree::makeTree(3, cf, PuyoSet(), 0, seq);
+    for (int i = 0; i < 100; ++i) {
+        RensaHandTree tree = RensaHandTree::makeTree(3, cf, PuyoSet(), 0, seq);
         UNUSED_VARIABLE(tree);
     }
 }

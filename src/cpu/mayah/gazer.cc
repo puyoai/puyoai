@@ -153,14 +153,10 @@ void Gazer::gaze(int frameId, const CoreField& cf, const KumipuyoSeq& seq)
     updateFeasibleRensas(cf, seq);
     updatePossibleRensas(cf, seq);
 
-    std::vector<RensaHandTree> tree = RensaHandTree::makeTree(3, cf, PuyoSet(), 0, seq);
+    RensaHandTree tree = RensaHandTree::makeTree(3, cf, PuyoSet(), 0, seq);
+    LOG(INFO) << tree.toString();
 
-    ostringstream os;
-    for (const auto& t : tree)
-        t.dumpTo(0, &os);
-    LOG(INFO) << "HandTreeResult\n" << os.str();
-
-    gazeResult_.setPossibleRensaInfoTree(std::move(tree));
+    gazeResult_.setPossibleRensaHandTree(std::move(tree));
 }
 
 void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)

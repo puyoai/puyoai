@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "core/frame.h"
 #include "core/kumipuyo_seq.h"
 #include "core/rensa_result.h"
 #include "core/rensa_track_result.h"
@@ -13,7 +14,15 @@ class ColumnPuyoList;
 class CoreField;
 class KumipuyoSeq;
 class PuyoSet;
+
 struct RensaHandCandidate;
+class RensaHandEdge;
+class RensaHandNode;
+class RensaHandTree;
+
+// These values are arbitrary chosen.
+const int NUM_FRAMES_OF_ONE_HAND = FRAMES_TO_DROP_FAST[8] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT;
+const int NUM_FRAMES_OF_ONE_RENSA = FRAMES_VANISH_ANIMATION + FRAMES_GROUNDING + FRAMES_TO_DROP_FAST[1];
 
 struct RensaHand {
     RensaHand() {}
@@ -40,40 +49,69 @@ struct RensaHand {
 class RensaHandTree {
 public:
     RensaHandTree() {}
-    RensaHandTree(const RensaHand& rensaHand, std::vector<RensaHandTree> tree) :
-        rensaHand_(rensaHand), children_(std::move(tree)) {}
+    explicit RensaHandTree(std::vector<RensaHandNode> nodes) :
+        nodes_(nodes) {}
 
-    static std::vector<RensaHandTree> makeTree(int restIteration,
-                                               const CoreField& currentField,
-                                               const PuyoSet& usedPuyoSet,
-                                               int usedPuyoMoveFrames,
-                                               const KumipuyoSeq& wholeKumipuyoSeq);
+    static RensaHandTree makeTree(int restIteration,
+                                  const CoreField& currentField,
+                                  const PuyoSet& usedPuyoSet,
+                                  int usedPuyoMoveFrames,
+                                  const KumipuyoSeq& wholeKumipuyoSeq);
 
-    static int eval(const std::vector<RensaHandTree>& myTree,
+    static int eval(const RensaHandTree& myTree,
                     int myStartingFrameId,
+                    int myOjamaIndex,
                     int myNumOjama,
                     int myOjamaCommittingFrameId,
-                    const std::vector<RensaHandTree>& enemyTree,
+                    const RensaHandTree& enemyTree,
                     int enemyStartingFrameId,
+                    int enemyOjamaIndex,
                     int enemyNumOjama,
                     int enemyOjamaCommittingFrameId);
 
-    const RensaHand& rensaHand() const { return rensaHand_; }
-    const std::vector<RensaHandTree>& children() const { return children_; }
+    const std::vector<RensaHandNode>& nodes() const { return nodes_; }
+    const RensaHandNode& node(int index) const { return nodes_[index]; }
 
     std::string toString() const;
     void dump(int depth) const;
     void dumpTo(int depth, std::ostream* os) const;
 
 private:
-    RensaHand rensaHand_;
-    std::vector<RensaHandTree> children_;
+    std::vector<RensaHandNode> nodes_;  // by ojama lines
 };
 
-class RensaHandTreeMaker {
+class RensaHandEdge {
 public:
-    RensaHandTreeMaker(int restIteration, const KumipuyoSeq& kumipuyoSeq);
-    ~RensaHandTreeMaker();
+    RensaHandEdge(const RensaHand& rensaHand, const RensaHandTree& tree) :
+        rensaHand_(rensaHand),
+        tree_(tree)
+    {
+    }
+
+    const RensaHand& rensaHand() const { return rensaHand_; }
+    const RensaHandTree& tree() const { return tree_; }
+
+private:
+    RensaHand rensaHand_;
+    RensaHandTree tree_;
+};
+
+class RensaHandNode {
+public:
+    RensaHandNode() {}
+    explicit RensaHandNode(std::vector<RensaHandEdge> edges) :
+        edges_(std::move(edges)) {}
+
+    const std::vector<RensaHandEdge>& edges() const { return edges_; }
+
+private:
+    std::vector<RensaHandEdge> edges_;
+};
+
+class RensaHandNodeMaker {
+public:
+    RensaHandNodeMaker(int restIteration, const KumipuyoSeq& kumipuyoSeq);
+    ~RensaHandNodeMaker();
 
     int restIteration() const { return restIteration_; }
 
@@ -82,7 +120,7 @@ public:
                     int usedPuyoMoveFrames,
                     const PuyoSet& usedPuyoSet);
 
-    std::vector<RensaHandTree> makeSummary();
+    RensaHandNode makeNode();
 
 private:
     const int restIteration_;
