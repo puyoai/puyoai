@@ -33,12 +33,12 @@ public:
     int estimateMaxScore(int frameId, const PlayerState& enemy) const;
     const std::vector<RensaHand>& feasibleRensaInfos() const { return feasibleRensaInfos_; }
 
-    const std::vector<RensaHandTree>& rensaTree() const { return possibleRensaTree_; }
+    const RensaHandTree& rensaHandTree() const { return possibleRensaHandTree_; }
 
     void reset(int frameId, int numReachableSpaces);
     void setFeasibleRensaInfo(std::vector<RensaHand> infos) { feasibleRensaInfos_ = std::move(infos); }
     void setPossibleRensaInfo(std::vector<RensaHand> infos) { possibleRensaInfos_ = std::move(infos); }
-    void setPossibleRensaInfoTree(std::vector<RensaHandTree> tree) { possibleRensaTree_ = std::move(tree); }
+    void setPossibleRensaHandTree(RensaHandTree tree) { possibleRensaHandTree_ = std::move(tree); }
 
     std::string toRensaInfoString() const;
 
@@ -53,7 +53,8 @@ private:
     std::vector<RensaHand> feasibleRensaInfos_;
     // PossibleRensa is the rensa the enemy will build in future.
     std::vector<RensaHand> possibleRensaInfos_;
-    std::vector<RensaHandTree> possibleRensaTree_;
+
+    RensaHandTree possibleRensaHandTree_;
 };
 
 class Gazer : noncopyable {
