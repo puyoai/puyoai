@@ -26,6 +26,9 @@ static RealColor toRealColor(const HSV& hsv)
     if (hsv.s < 50 && 120 < hsv.v)
         return RealColor::RC_OJAMA;
 
+    if (hsv.s < 10)
+        return RealColor::RC_EMPTY;
+
     // The other colors are relatively easier. A bit tight range for now.
     if (hsv.h <= 15 && 70 < hsv.v)
         return RealColor::RC_RED;
