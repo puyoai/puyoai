@@ -41,6 +41,12 @@ DropDecision Ai::think(int frame_id,
   Plan::iterateAvailablePlans(field, seq, 2,
                               [&evaluator](const RefPlan& plan) { evaluator.EvalPlan(plan); });
 
+
+  if (enemy_state.isRensaOngoing()) {
+    std::ostringstream oss;
+    const RensaResult& result = enemy_state.currentRensaResult;
+    oss << ",Enemy:_Going(" << result.score << "_in_" << result.frames << ")";
+  }
   return DropDecision(control.decision, control.message);
 }
 
