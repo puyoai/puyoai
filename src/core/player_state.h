@@ -13,13 +13,18 @@ struct PlayerState {
         return currentChainStartedFrameId + currentRensaResult.frames;
     }
 
-    // totalOjama() returns fixed + pending + ongoing.
+    // totalOjama() returns how many ojama is sent to this player.
+    // total = fixed + pending + enemy ongoing - my ongoing.
+    // If the result is less than 0, it should be 0.
     int totalOjama(const PlayerState& enemy) const {
         int total = fixedOjama + pendingOjama;
-        // Add ongoing rensa.
+        // Add enemy ongoing rensa.
         total += (enemy.currentRensaResult.score + enemy.unusedScore) / 70;
+        // Subtract my ongoing rensa.
+        total -= (currentRensaResult.score + unusedScore) / 70;
         // Subtract enemy's ojama, since enemy must SOUSAI these ojama.
-        total -= enemy.fixedOjama - enemy.pendingOjama;
+        total -= enemy.fixedOjama + enemy.pendingOjama;
+
         if (total < 0)
             return 0;
         return total;
