@@ -47,8 +47,8 @@ struct RensaStepResult {
 class IgnitionRensaResult {
 public:
     IgnitionRensaResult() {}
-    IgnitionRensaResult(const RensaResult& rensaResult, int framesToIgnite) :
-        rensaResult_(rensaResult), framesToIgnite_(framesToIgnite)
+    IgnitionRensaResult(const RensaResult& rensaResult, int framesToIgnite, int lastDropFrames) :
+        rensaResult_(rensaResult), framesToIgnite_(framesToIgnite), lastDropFrames_(lastDropFrames)
     {}
 
     const RensaResult& rensaResult() const { return rensaResult_; }
@@ -58,11 +58,12 @@ public:
     int framesToIgnite() const { return framesToIgnite_; }
     int rensaFrames() const { return rensaResult_.frames; }
 
-    int totalFrames() const { return rensaResult_.frames + framesToIgnite(); }
+    int totalFrames() const { return rensaResult_.frames + framesToIgnite() + lastDropFrames_; }
 
 private:
     RensaResult rensaResult_;
     int framesToIgnite_;
+    int lastDropFrames_;
 };
 
 #endif

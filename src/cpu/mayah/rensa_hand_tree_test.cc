@@ -23,7 +23,7 @@ RensaHand makePlainRensaHand(int chains)
         coefResult.setCoef(i, 4, 0, 0);
     }
 
-    return RensaHand(IgnitionRensaResult(rensaResult, 0), coefResult);
+    return RensaHand(IgnitionRensaResult(rensaResult, 0, NUM_FRAMES_OF_ONE_HAND), coefResult);
 }
 
 class RensaHandTreeTest : public testing::Test {
@@ -52,7 +52,7 @@ TEST(RensaHandTreeTest, eval_5rensa)
     cout << s << endl;
 
     // 5rensa = 69, 3rensa = 14, 2rensa = 5
-    // 64 instead of 69? 
+    // 64 instead of 69?
     EXPECT_EQ(69, RensaHandTree::eval(myTree, 0, 0, 0, 0, enemyTree, 0, 0, 0, 0));
 }
 
