@@ -65,8 +65,8 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
   }
 
   if (true) {
-    int value = Flat(field);
-    oss << "Flat(" << value << ")_";
+    int value = Valley(field);
+    oss << "Valley(" << value << ")_";
     score += value;
   }
 
@@ -150,7 +150,7 @@ int Evaluator::EvalTime(const RefPlan& plan, std::string* message) {
     if (enemy.isRensaOngoing() && plan.isRensaPlan() && me.totalOjama(enemy) * 70 < plan.score())
       value = plan.score();
     if (value > 0) {
-      oss << "Taiou(" << value << ")_";
+      oss << "Taiou(" << value << "-->" << enemy.currentRensaResult.score << ")_";
       score += value;
     }
   }
@@ -162,9 +162,12 @@ int Evaluator::EvalTime(const RefPlan& plan, std::string* message) {
 int Evaluator::EvalTsubushi(const RefPlan& plan) {
   int score = 0;
 
-  static const int kLines = 2;
+  int lines = 2;
+  if (enemy.field.height(3) > 9)
+    lines = 13 - enemy.field.height(3);
+
   if (enemy_hands.firables.size() == 0
-      && plan.score() >= kLines * FieldConstant::WIDTH * SCORE_FOR_OJAMA
+      && plan.score() >= lines * FieldConstant::WIDTH * SCORE_FOR_OJAMA
       && plan.chains() <= 2) {
     score += plan.score();
     if (plan.decisions().size() == 1)
@@ -191,7 +194,7 @@ int Evaluator::PatternMatch(const CoreField& field, std::string* name) {
   return best;
 }
 
-int Evaluator::Flat(const CoreField& field) {
+int Evaluator::Valley(const CoreField& field) {
   const int kEdgePenalty = 40;
   const int kPenalty = 10;
 
@@ -208,6 +211,10 @@ int Evaluator::Flat(const CoreField& field) {
     - diff34 * std::max(field.height(3), field.height(4)) * kPenalty
     - diff45 * std::max(field.height(4), field.height(5)) * kPenalty
     - diff56 * std::max(field.height(5), field.height(6)) * kEdgePenalty;
+
+  // If (3, 11) is filled, add a large penalty for 1/6 risk.
+  if (!field.isEmpty(FieldConstant::WIDTH / 2, FieldConstant::HEIGHT - 1))
+    score -= 500;
 
   return score;
 }
