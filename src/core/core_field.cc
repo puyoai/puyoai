@@ -104,6 +104,32 @@ int CoreField::countUnreachableSpaces() const
     return count;
 }
 
+int CoreField::countReachableSpaces() const
+{
+    if (height(3) >= 12)
+        return 0;
+
+    int count = 12 - height(3);
+    if (height(2) < 12) {
+        count += 12 - height(2);
+        if (height(1) < 12) {
+            count += 12 - height(1);
+        }
+    }
+
+    if (height(4) < 12) {
+        count += 12 - height(4);
+        if (height(5) < 12) {
+            count += 12 - height(5);
+            if (height(6) < 12) {
+                count += 12 - height(6);
+            }
+        }
+    }
+
+    return count;
+}
+
 bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
 {
     int x1 = decision.axisX();
