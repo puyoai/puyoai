@@ -132,7 +132,7 @@ TEST(CoreFieldTest, countReachableSpaces1)
         "OOOOOO"
         "OOOOOO");
 
-    EXPECTEQ(1, cf.countReachableSpaces());
+    EXPECT_EQ(1, cf.countReachableSpaces());
 }
 
 TEST(CoreFieldTest, countReachableSpaces2)
@@ -151,7 +151,7 @@ TEST(CoreFieldTest, countReachableSpaces2)
         "OOOOOO"
         "OOOOOO");
 
-    EXPECTEQ(6, cf.countReachableSpaces());
+    EXPECT_EQ(6, cf.countReachableSpaces());
 }
 
 TEST(CoreFieldTest, simulate1)
