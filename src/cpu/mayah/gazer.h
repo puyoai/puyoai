@@ -16,18 +16,18 @@ class KumipuyoSeq;
 class GazeResult {
 public:
     GazeResult() {}
-    GazeResult(int frameIdGazedAt,
+    GazeResult(int frameIdToStartNextMove,
                int numReachableSpaces,
                const std::vector<RensaHand>& feasible,
                const std::vector<RensaHand>& possible) :
-        frameIdGazedAt_(frameIdGazedAt),
+        frameIdToStartNextMove_(frameIdToStartNextMove),
         numReachableSpaces_(numReachableSpaces),
         feasibleRensaInfos_(feasible),
         possibleRensaInfos_(possible)
     {
     }
 
-    int frameIdGazedAt() const { return frameIdGazedAt_; }
+    int frameIdToStartNextMove() const { return frameIdToStartNextMove_; }
 
     // Returns the (expecting) possible max score by this frame.
     int estimateMaxScore(int frameId, const PlayerState& enemy) const;
@@ -35,7 +35,7 @@ public:
 
     const RensaHandTree& rensaHandTree() const { return possibleRensaHandTree_; }
 
-    void reset(int frameId, int numReachableSpaces);
+    void reset(int frameIdToStartNextMove, int numReachableSpaces);
     void setFeasibleRensaInfo(std::vector<RensaHand> infos) { feasibleRensaInfos_ = std::move(infos); }
     void setPossibleRensaInfo(std::vector<RensaHand> infos) { possibleRensaInfos_ = std::move(infos); }
     void setPossibleRensaHandTree(RensaHandTree tree) { possibleRensaHandTree_ = std::move(tree); }
@@ -47,7 +47,7 @@ private:
     int estimateMaxScoreFromPossibleRensas(int frameId) const;
     int estimateMaxScoreFrom(int frameId, const std::vector<RensaHand>& rensaInfos) const;
 
-    int frameIdGazedAt_ = -1;
+    int frameIdToStartNextMove_ = -1;
     int numReachableSpaces_ = 72;
     // FiesibleRensa is the rensa that the enemy can really fire in current/next/nextnext tsumo.
     std::vector<RensaHand> feasibleRensaInfos_;
