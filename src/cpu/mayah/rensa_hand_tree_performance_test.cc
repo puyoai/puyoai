@@ -78,3 +78,20 @@ TEST_F(RensaHandTreePerformanceTest, pattern1_depth3)
         UNUSED_VARIABLE(tree);
     }
 }
+
+TEST_F(RensaHandTreePerformanceTest, pattern2_depth2)
+{
+    const CoreField cf(
+        "..BG.."
+        "..RYYY"
+        "RRGRRR"
+        "RYRBYB"
+        "BBBYBB"
+        "YYYBYY");
+    KumipuyoSeq seq("RGRY");
+
+    for (int i = 0; i < 100; ++i) {
+        RensaHandTree tree = RensaHandTree::makeTree(2, cf, PuyoSet(), 0, seq);
+        UNUSED_VARIABLE(tree);
+    }
+}
