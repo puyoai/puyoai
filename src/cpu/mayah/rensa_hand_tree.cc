@@ -28,15 +28,15 @@ static const int FRAMES_TO_DIG[6] = {
 struct RensaHandCandidate {
     RensaHandCandidate() {}
     RensaHandCandidate(const IgnitionRensaResult& ignitionRensaResult,
+                       const RensaCoefResult& coefResult,
                        const CoreField& fieldAfterRensa,
-                       const PuyoSet& puyoSet,
-                       int wholeFramesToIgnite,
-                       const RensaCoefResult& coefResult) :
+                       const PuyoSet& alreadyUsedPuyoSet,
+                       int alreadyConsumedFramesToMovePuyo) :
         ignitionRensaResult(ignitionRensaResult),
+        coefResult(coefResult),
         fieldAfterRensa(fieldAfterRensa),
-        puyoSet(puyoSet),
-        wholeFramesToIgnite(wholeFramesToIgnite),
-        coefResult(coefResult)
+        alreadyUsedPuyoSet(alreadyUsedPuyoSet),
+        alreadyConsumedFramesToMovePuyo(alreadyConsumedFramesToMovePuyo)
     {
     }
 
@@ -50,10 +50,10 @@ struct RensaHandCandidate {
     std::string toString() const;
 
     IgnitionRensaResult ignitionRensaResult;
-    CoreField fieldAfterRensa;
-    PuyoSet puyoSet;
-    int wholeFramesToIgnite;
     RensaCoefResult coefResult;
+    CoreField fieldAfterRensa;
+    PuyoSet alreadyUsedPuyoSet;
+    int alreadyConsumedFramesToMovePuyo;
 };
 
 struct SortByTotalFrames {
@@ -382,7 +382,7 @@ RensaHandNodeMaker::~RensaHandNodeMaker()
 
 RensaResult RensaHandNodeMaker::add(CoreField&& cf,
                                     const ColumnPuyoList& puyosToComplement,
-                                    int usedPuyoMoveFrames,
+                                    int usedFramesToMovePuyo,
                                     const PuyoSet& usedPuyoSet)
 {
     RensaCoefTracker tracker;
@@ -392,21 +392,20 @@ RensaResult RensaHandNodeMaker::add(CoreField&& cf,
     if (rensaResult.score < 70)
         return rensaResult;
 
-    PuyoSet wholePuyoSet(usedPuyoSet);
-    wholePuyoSet.add(puyosToComplement);
+    PuyoSet wholeUsedPuyoSet(usedPuyoSet);
+    wholeUsedPuyoSet.add(puyosToComplement);
 
-    int necessaryPuyos = PuyoPossibility::necessaryPuyos(wholePuyoSet, kumipuyoSeq_, 0.5);
+    int necessaryPuyos = PuyoPossibility::necessaryPuyos(wholeUsedPuyoSet, kumipuyoSeq_, 0.5);
     int necessaryHands = (necessaryPuyos + 1) / 2;
-    // We need to remove last hand frames, since we'd like to calculate framesToIgnite.
-    if (necessaryHands > 1)
-        necessaryHands -= 1;
 
     // Estimate the number of frames to initiate this rensa.
     int wholeFramesToIgnite = NUM_FRAMES_OF_ONE_HAND * necessaryHands;
-    int framesToIgnite = wholeFramesToIgnite - usedPuyoMoveFrames;
-    if (framesToIgnite < NUM_FRAMES_OF_ONE_HAND)
-        framesToIgnite = NUM_FRAMES_OF_ONE_HAND;
-    data_.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite, NUM_FRAMES_OF_ONE_HAND), cf, wholePuyoSet, wholeFramesToIgnite, tracker.result());
+    int framesToIgnite = wholeFramesToIgnite - usedFramesToMovePuyo - NUM_FRAMES_OF_ONE_HAND;
+    if (framesToIgnite < 0)
+        framesToIgnite = 0;
+    data_.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite, NUM_FRAMES_OF_ONE_HAND),
+                       tracker.result(), cf, wholeUsedPuyoSet, wholeFramesToIgnite);
+
 
     return rensaResult;
 }
@@ -428,8 +427,8 @@ RensaHandNode RensaHandNodeMaker::makeNode()
         edges.emplace_back(RensaHand(info.ignitionRensaResult, info.coefResult),
                            RensaHandTree::makeTree(restIteration() - 1,
                                                    info.fieldAfterRensa,
-                                                   info.puyoSet,
-                                                   info.wholeFramesToIgnite,
+                                                   info.alreadyUsedPuyoSet,
+                                                   info.alreadyConsumedFramesToMovePuyo,
                                                    kumipuyoSeq_));
     }
     return RensaHandNode(std::move(edges));

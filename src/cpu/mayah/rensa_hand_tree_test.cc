@@ -73,11 +73,8 @@ TEST(RensaHandTreeTest, eval_saisoku)
                                 enemyTree, 0, 0, 15, 2 * NUM_FRAMES_OF_ONE_RENSA);
 
     // TODO(mayah): Is this correct?
-    EXPECT_LE(15, s);
-
-#if 0
     cout << s << endl;
-#endif
+    EXPECT_LE(15, s);
 }
 
 TEST(RensaHandTreeTest, eval_actual1)
@@ -107,11 +104,12 @@ TEST(RensaHandTreeTest, eval_actual1)
     cout << "----------------------------------------------------------------------" << endl;
     enemyTree.dump(0);
     cout << "----------------------------------------------------------------------" << endl;
-
-    cout << RensaHandTree::eval(myTree, 0, 0, 0, 0, enemyTree, 0, 0, 0, 0) << endl;
 #endif
 
-    EXPECT_LT(0, RensaHandTree::eval(myTree, 0, 0, 0, 0, enemyTree, 0, 0, 0, 0));
+    int s = RensaHandTree::eval(myTree, 0, 0, 0, 0, enemyTree, 0, 0, 0, 0);
+    cout << s << endl;
+
+    EXPECT_LT(0, s) << endl;
 }
 
 TEST(RensaHandTreeTest, eval_actual2)
@@ -145,13 +143,15 @@ TEST(RensaHandTreeTest, eval_actual2)
     RensaHandTree myTree = RensaHandTree::makeTree(2, cf1, PuyoSet(), 0, KumipuyoSeq("BB"));
     RensaHandTree enemyTree = RensaHandTree::makeTree(2, cf2, PuyoSet(), 0, KumipuyoSeq());
 
-    EXPECT_LT(0, RensaHandTree::eval(myTree, 0, 0, 0, 0, enemyTree, 0, 0, 0, 0));
-
 #if 0
     myTree.dump(0);
     cout << "----------------------------------------------------------------------" << endl;
     enemyTree.dump(0);
     cout << "----------------------------------------------------------------------" << endl;
-    cout << RensaHandTree::eval(myTree, 0, 0, 0, 0, enemyTree, 0, 0, 0, 0) << endl;
 #endif
+
+    int s = RensaHandTree::eval(myTree, 0, 0, 0, 0, enemyTree, 0, 0, 0, 0);
+    cout << s << endl;
+
+    EXPECT_LT(0, s) << endl;
 }
