@@ -406,7 +406,7 @@ RensaResult RensaHandNodeMaker::add(CoreField&& cf,
     int framesToIgnite = wholeFramesToIgnite - usedPuyoMoveFrames;
     if (framesToIgnite < NUM_FRAMES_OF_ONE_HAND)
         framesToIgnite = NUM_FRAMES_OF_ONE_HAND;
-    data_.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite), cf, wholePuyoSet, wholeFramesToIgnite, tracker.result());
+    data_.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite, NUM_FRAMES_OF_ONE_HAND), cf, wholePuyoSet, wholeFramesToIgnite, tracker.result());
 
     return rensaResult;
 }

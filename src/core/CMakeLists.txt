@@ -68,6 +68,7 @@ puyoai_core_add_test(kumipuyo_seq)
 puyoai_core_add_test(plain_field)
 puyoai_core_add_test(puyo_color)
 puyoai_core_add_test(puyo_controller)
+puyoai_core_add_test(rensa_result)
 puyoai_core_add_test(rensa_track_result)
 puyoai_core_add_test(sequence_generator)
 

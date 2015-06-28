@@ -169,14 +169,14 @@ void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumi
     std::vector<RensaHand> results;
     {
         auto f = [&results](const CoreField& cf, const std::vector<Decision>& /*decisions*/,
-                            int /*numChigiri*/, int framesToIgnite, int /*lastDropFrames*/, bool shouldFire) {
+                            int /*numChigiri*/, int framesToIgnite, int lastDropFrames, bool shouldFire) {
             if (!shouldFire)
                 return;
 
             CoreField copied(cf);
             RensaCoefTracker tracker;
             RensaResult rensaResult = copied.simulate(&tracker);
-            results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite), tracker.result());
+            results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite, lastDropFrames), tracker.result());
         };
         Plan::iterateAvailablePlansWithoutFiring(field, seq, seq.size(), f);
 
@@ -229,13 +229,14 @@ void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumi
             int necessaryHands = (necessaryPuyos + 1) / 2;
 
             // We need to remove last hand frames, since we'd like to calculate framesToIgnite.
-            if (necessaryHands > 1)
+            if (necessaryHands > 0)
                 --necessaryHands;
 
             // Estimate the number of frames to initiate the rensa.
             int heightMove = std::max(0, static_cast<int>(std::ceil(FieldConstant::HEIGHT - averageHeight)));
-            int framesToIgnite = (FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT) * necessaryHands;
-            results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite), tracker.result());
+            const int oneHandFrame = FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT;
+            int framesToIgnite = oneHandFrame * necessaryHands;
+            results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite, oneHandFrame), tracker.result());
 
             return rensaResult;
         };
