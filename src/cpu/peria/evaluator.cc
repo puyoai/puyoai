@@ -51,7 +51,6 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
   // Evaluate field
   // o pattern matching
   // o possible future rensa
-  // - UKE : assume 1, 2 lines of ojama. 5 lines in case of ZENKESHI, and eval again.
 
   int score = 0;
   std::ostringstream oss;
