@@ -110,6 +110,50 @@ TEST(CoreFieldTest, countUnreachableSpaces2)
     EXPECT_EQ(12, cf.countUnreachableSpaces());
 }
 
+TEST(CoreFieldTest, countReachableSpaces_empty)
+{
+    const CoreField cf;
+    EXPECT_EQ(72, cf.countReachableSpaces());
+}
+
+TEST(CoreFieldTest, countReachableSpaces1)
+{
+    const CoreField cf(
+        ".O.O.." // 12
+        ".OOO.."
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    EXPECTEQ(1, cf.countReachableSpaces());
+}
+
+TEST(CoreFieldTest, countReachableSpaces2)
+{
+    const CoreField cf(
+        ".O...." // 12
+        ".OOO.."
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 8
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO" // 4
+        "OOOOOO"
+        "OOOOOO"
+        "OOOOOO");
+
+    EXPECTEQ(6, cf.countReachableSpaces());
+}
+
 TEST(CoreFieldTest, simulate1)
 {
     CoreField cf("RRRR..");
