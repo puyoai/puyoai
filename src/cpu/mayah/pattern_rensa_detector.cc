@@ -61,7 +61,9 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
             CHECK_GT(stepResult.score, 0) << tmp.toDebugString();
         }
 
-        double patternScore = pbf.score() * complementResult.matchedResult.matchedBits.popcount() / pbf.numVariables();
+        // For here, we don't need to make AND to RensaExistingPositionTracker.
+        FieldBits matchedBits = complementResult.matchedResult.matchedBits;
+        double patternScore = pbf.score() * matchedBits.popcount() / pbf.numVariables();
         int restUnusedVariables = MAX_UNUSED_VARIABLES - complementResult.numFilledUnusedVariables;
         iteratePossibleRensasInternal(cf, tracker, 1, firePuyo, keyPuyos,
                                       maxIteration - 1, restUnusedVariables,
@@ -138,8 +140,10 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
             continue;
 
         double patternScore = currentPatternScore;
-        if (addsPatternScore)
-            patternScore += pbf.score() * complementResult.matchedResult.matchedBits.popcount() / pbf.numVariables();
+        if (addsPatternScore) {
+            FieldBits matchedBits = complementResult.matchedResult.matchedBits & currentFieldTracker.result().existingBits();
+            patternScore += pbf.score() * matchedBits.popcount() / pbf.numVariables();
+        }
 
         const ColumnPuyoList& cpl = complementResult.complementedPuyoList;
         if (cpl.size() == 0) {
