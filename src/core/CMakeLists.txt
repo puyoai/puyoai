@@ -71,6 +71,7 @@ puyoai_core_add_test(puyo_color)
 puyoai_core_add_test(puyo_controller)
 puyoai_core_add_test(rensa_result)
 puyoai_core_add_test(rensa_track_result)
+puyoai_core_add_test(rensa_tracker)
 puyoai_core_add_test(sequence_generator)
 
 puyoai_core_add_test(field_performance 1)

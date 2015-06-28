@@ -204,6 +204,36 @@ typedef RensaTracker<RensaVanishingPositionResult> RensaVanishingPositionTracker
 
 // ----------------------------------------------------------------------
 
+template<typename Tracker1, typename Tracker2>
+class CompositeRensaTracker : public RensaTrackerBase {
+public:
+    CompositeRensaTracker(Tracker1* tracker1, Tracker2* tracker2) :
+        tracker1_(tracker1), tracker2_(tracker2)
+    {
+    }
+
+    void track(int nthChain, int numErasedPuyo, int longBonusCoef, int colorBonusCoef,
+               const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    {
+        tracker1_->track(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef,
+                         vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+        tracker2_->track(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef,
+                         vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+    }
+
+    void trackDrop(FieldBits blender, FieldBits leftOnes, FieldBits rightOnes)
+    {
+        tracker1_->trackDrop(blender, leftOnes, rightOnes);
+        tracker2_->trackDrop(blender, leftOnes, rightOnes);
+    }
+
+private:
+    Tracker1* tracker1_;
+    Tracker2* tracker2_;
+};
+
+// ----------------------------------------------------------------------
+
 // This is the same as RensaChainTracker, however, the result is passed as pointer.
 class RensaChainPointerTracker : public RensaTrackerBase {
 public:
