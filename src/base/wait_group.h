@@ -4,6 +4,8 @@
 #include <condition_variable>
 #include <mutex>
 
+// WaitGroup provides a simple synchronization mechanism.
+// The usage is the same as WaitGroup in golang. c.f. http://golang.org/pkg/sync/#WaitGroup
 class WaitGroup {
 public:
     WaitGroup();
@@ -19,4 +21,4 @@ private:
     int num_;
 };
 
-#endif
+#endif // BASE_WAITGROUP_H_
