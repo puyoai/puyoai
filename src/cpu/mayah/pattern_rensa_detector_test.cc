@@ -118,6 +118,28 @@ ignition = 2
 score = 72
 )";
 
+static const char TEST_BOOK7[] = R"(
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AABCC.",
+    "BBC...",
+]
+ignition = 1
+score = 10
+
+[[pattern]]
+field = [
+    "......",
+    "..B.C.",
+    ".AABB.",
+    "AABCCC",
+]
+ignition = 2
+score = 9
+)";
+
 TEST(PatternBookTest, pattern1)
 {
     PatternBook patternBook;
@@ -390,4 +412,30 @@ TEST(PatternBookTest, pattern6)
 
     PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0, 1}, 3);
     EXPECT_EQ(score, 0.0);
+}
+
+TEST(PatternBookTest, pattern7)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK7));
+
+    CoreField field("......"
+                    ".GBRR."
+                    ".BRYY.");
+
+    double score = 0;
+    auto callback = [&](const CoreField&,
+                        const RensaResult&,
+                        const ColumnPuyoList&,
+                        PuyoColor,
+                        const std::string&,
+                        double patternScore) {
+        if (score < patternScore)
+            score = patternScore;
+    };
+
+    double expected = 10.0 * (6.0 / 12.0) + 9.0 * (7.0 / 12.0);
+
+    PatternRensaDetector(patternBook, field, callback).iteratePossibleRensas({0, 1}, 3);
+    EXPECT_EQ(expected, score);
 }
