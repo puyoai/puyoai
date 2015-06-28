@@ -36,9 +36,17 @@ public:
     int aite_rensa_end();
     void ref();
 
+    // Index of TSUMOs in the game.
     int hukks;
+
+    // ???
     int para[22];
+
+    // Enemy's running rensa will end in |aite_hakka_nokori| rensas.
+    // NOTE: Estimation of this value seems wrong.
     int aite_hakka_nokori;
+
+    // ???
     int aite_hakkaji_score;
 
 private:
