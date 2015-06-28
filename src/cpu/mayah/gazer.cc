@@ -35,9 +35,9 @@ struct SortByFrames {
     }
 };
 
-void GazeResult::reset(int frameId, int numReachableSpaces)
+void GazeResult::reset(int frameIdToStartNextMove, int numReachableSpaces)
 {
-    frameIdGazedAt_ = frameId;
+    frameIdToStartNextMove_ = frameIdToStartNextMove;
     numReachableSpaces_ = numReachableSpaces;
     feasibleRensaInfos_.clear();
     possibleRensaInfos_.clear();
@@ -52,10 +52,10 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
 
     // We need to check this after checking enemy.isRensaOngoing().
     // Since gaze frameId will be the time just after the rensa is finished.
-    CHECK_LE(frameIdGazedAt_, frameId)
+    CHECK_LE(frameIdToStartNextMove(), frameId)
         << "Gazer is requested to check the past frame estimated score."
         << " frameId=" << frameId
-        << " frameIdGazedAt=" << frameIdGazedAt_;
+        << " frameIdToStartNextMove=" << frameIdToStartNextMove();
 
     int scoreByFeasibleRensas = estimateMaxScoreFromFeasibleRensas(frameId);
     if (scoreByFeasibleRensas >= 0)
@@ -69,7 +69,7 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
 
     int maxScore = -1;
     for (auto it = possibleRensaInfos_.begin(); it != possibleRensaInfos_.end(); ++it) {
-        int restFrames = frameId - (it->framesToIgnite() + frameIdGazedAt());
+        int restFrames = frameId - (it->framesToIgnite() + frameIdToStartNextMove());
         int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT));
         // At max, enemy will be able ot puyo restEmptyField. We have counted the puyos for possibleRensaInfos,
         // we substract 6 from restEmptyField_.
@@ -88,7 +88,7 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
         return maxScore;
 
     // When there is not possible rensa.
-    int restFrames = frameId - frameIdGazedAt();
+    int restFrames = frameId - frameIdToStartNextMove();
     int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING));
     numPossiblePuyos = max(0, min(numReachableSpaces_ - 6, numPossiblePuyos));
     int newChains = min((numPossiblePuyos / 4), 19);
@@ -113,11 +113,11 @@ int GazeResult::estimateMaxScoreFrom(int frameId, const vector<RensaHand>& rensa
     if (rensaInfos.empty())
         return -1;
 
-    if (rensaInfos.back().framesToIgnite() + frameIdGazedAt() < frameId)
+    if (rensaInfos.back().framesToIgnite() + frameIdToStartNextMove() < frameId)
         return -1;
 
     for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (frameId <= it->framesToIgnite() + frameIdGazedAt())
+        if (frameId <= it->framesToIgnite() + frameIdToStartNextMove())
             return it->score();
     }
 
@@ -127,7 +127,7 @@ int GazeResult::estimateMaxScoreFrom(int frameId, const vector<RensaHand>& rensa
 string GazeResult::toRensaInfoString() const
 {
     stringstream ss;
-    ss << "gazed at frameId: " << frameIdGazedAt_ << endl;
+    ss << "next move frameId: " << frameIdToStartNextMove_ << endl;
     ss << "Possible rensa infos: " << endl;
     for (const auto& info : possibleRensaInfos_)
         ss << info.toString() << endl;
