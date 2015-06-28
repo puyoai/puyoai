@@ -367,6 +367,15 @@ score = 8.0
 field = [
     "..BCC.",
     ".AABBC",
+    "AAB&C&",
+]
+ignition = 2
+score = 5.0
+
+[[pattern]]
+field = [
+    "..BCC.",
+    ".AABBC",
     "AAB&&C",
 ]
 ignition = 2
@@ -454,6 +463,26 @@ field = [
 ]
 ignition = 3
 score = 6.0
+
+[[pattern]]
+field = [
+    "....CC",
+    "....BC",
+    "..AAAB",
+    "..ABBC",
+]
+ignition = 3
+score = 6.0
+
+[[pattern]]
+field = [
+    "....C.",
+    "...BBC",
+    "..AAAB",
+    "..ACBC",
+]
+ignition = 2
+score = 5.0
 
 [[pattern]]
 field = [
