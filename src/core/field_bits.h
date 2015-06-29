@@ -1,9 +1,12 @@
 #ifndef CORE_FIELD_BITS_H_
 #define CORE_FIELD_BITS_H_
 
-#include <glog/logging.h>
 #include <smmintrin.h>
+
+#include <ostream>
 #include <string>
+
+#include <glog/logging.h>
 
 #include "core/field_constant.h"
 #include "core/position.h"
@@ -100,6 +103,8 @@ public:
 
     friend bool operator==(FieldBits lhs, FieldBits rhs) { return (lhs ^ rhs).isEmpty(); }
     friend bool operator!=(FieldBits lhs, FieldBits rhs) { return !(lhs == rhs); }
+
+    friend std::ostream& operator<<(std::ostream& os, const FieldBits& bits) { return os << bits.toString(); }
 
     friend FieldBits operator&(FieldBits lhs, FieldBits rhs) { return _mm_and_si128(lhs, rhs); }
     friend FieldBits operator|(FieldBits lhs, FieldBits rhs) { return _mm_or_si128(lhs, rhs); }
