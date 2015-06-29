@@ -25,6 +25,42 @@ TEST(FieldPatternTest, varCount)
     EXPECT_EQ(4, pattern3.numVariables()); // We don't count *
 }
 
+TEST(FieldPatternTest, notVars)
+{
+    const char* vars =
+        "A*...."
+        "ABC..."
+        "AABCC*"
+        "BBC...";
+    const char* notVars =
+        "..A..."
+        "......"
+        "......"
+        "......";
+    const FieldPattern pattern(vars, notVars);
+
+    EXPECT_EQ(FieldBits(
+        "1....."
+        "..1..."
+        ".1...."
+        "..1..."
+        "11...."), pattern.pattern(0).notVarBits);
+
+    EXPECT_EQ(FieldBits(
+        "......"
+        "......"
+        "1.1..."
+        "11.1.."
+        "..1..."), pattern.pattern(1).notVarBits);
+
+    EXPECT_EQ(FieldBits(
+        "......"
+        "..1..."
+        ".1.11."
+        "..1..."
+        ".1.11."), pattern.pattern(2).notVarBits);
+}
+
 TEST(FieldPatternTest, mirror)
 {
     FieldPattern pattern("Aa*...");
@@ -44,6 +80,10 @@ TEST(FieldPatternTest, mirror)
     EXPECT_EQ(FieldBits("1....."), pattern.pattern(0).varBits);
     EXPECT_EQ(FieldBits(".....1"), mirror.pattern(0).varBits);
 
-    EXPECT_EQ(FieldBits(".1...."), pattern.pattern(0).allowVarBits);
-    EXPECT_EQ(FieldBits("....1."), mirror.pattern(0).allowVarBits);
+    EXPECT_EQ(FieldBits(
+        "1....."
+        "......"), pattern.pattern(0).notVarBits);
+    EXPECT_EQ(FieldBits(
+        ".....1"
+        "......"), mirror.pattern(0).notVarBits);
 }
