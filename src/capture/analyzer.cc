@@ -342,7 +342,9 @@ void Analyzer::analyzeNextForStateStable(const DetectedField& detectedField, Pla
     if (result->nextWillDisappearFast_ && detectedField.next1AxisMoving) {
         // In this case, we think NEXT1 has disappeared.
         // Otherwise, it will take a few frames to move puyo correctly.
-        result->framesWhileNext1Disappearing = NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING - 1;
+        result->framesWhileNext1Disappearing =
+            std::max(result->framesWhileNext1Disappearing, NUM_FRAMES_TO_MOVE_AFTER_NEXT1_DISAPPEARING - 2);
+
     } else {
         RealColor axisColor = detectedField.realColor(NextPuyoPosition::NEXT1_AXIS);
         RealColor childColor = detectedField.realColor(NextPuyoPosition::NEXT1_CHILD);
