@@ -332,6 +332,11 @@ field = [
     ".AABBB",
     "AABCCC",
 ]
+not_field = [
+    "A.....",
+    "......",
+    "......",
+]
 ignition = 2
 score = 9.0
 
@@ -341,6 +346,11 @@ field = [
     ".AABB.",
     "AABCCC",
 ]
+not_field = [
+    "A.....",
+    "......",
+    "......",
+]
 ignition = 2
 score = 9.0
 
@@ -349,6 +359,11 @@ field = [
     "..BCC.",
     ".AABB.",
     "AAB.CC",
+]
+not_field = [
+    "A.....",
+    "......",
+    "......",
 ]
 ignition = 2
 score = 7.0
@@ -360,6 +375,11 @@ field = [
     ".AABBC",
     "AAB&&C",
 ]
+not_field = [
+    "A.....",
+    "......",
+    "......",
+]
 ignition = 2
 score = 8.0
 
@@ -369,6 +389,11 @@ field = [
     ".AABBC",
     "AAB&C&",
 ]
+not_field = [
+    "A.....",
+    "......",
+    "......",
+]
 ignition = 2
 score = 5.0
 
@@ -377,6 +402,11 @@ field = [
     "..BCC.",
     ".AABBC",
     "AAB&&C",
+]
+not_field = [
+    "A.....",
+    "......",
+    "......",
 ]
 ignition = 2
 score = 8.0
@@ -388,6 +418,11 @@ field = [
     ".AABCC",
     "AABC&&",
 ]
+not_field = [
+    "A.....",
+    "......",
+    "......",
+]
 ignition = 2
 score = 7.0
 
@@ -397,6 +432,11 @@ field = [
     "..BC..",
     ".AABC.",
     "AABC&.",
+]
+not_field = [
+    "A.....",
+    "......",
+    "......",
 ]
 ignition = 2
 score = 6.0
@@ -408,6 +448,11 @@ field = [
     ".AABBC",
     "AAB&&C",
 ]
+not_field = [
+    "A.....",
+    "......",
+    "......",
+]
 ignition = 2
 score = 4.1
 
@@ -417,6 +462,11 @@ field = [
     "..BBC.",
     ".AABC.",
     "AABC&.",
+]
+not_field = [
+    "A.....",
+    "......",
+    "......",
 ]
 ignition = 2
 score = 4.0
@@ -431,6 +481,10 @@ field = [
     "..AAAC",
     "..ABBB",
 ]
+not_field = [
+    "A.....",
+    "A.....",
+]
 ignition = 3
 score = 9.7
 
@@ -440,6 +494,10 @@ field = [
     "...BBC",
     "..AAAB",
     "..ACCB",
+]
+not_field = [
+    "A.....",
+    "A.....",
 ]
 ignition = 3
 score = 9.9
@@ -451,6 +509,10 @@ field = [
     "..AAAB",
     "..ACCC",
 ]
+not_field = [
+    "A.....",
+    "A.....",
+]
 ignition = 3
 score = 8.0
 
@@ -460,6 +522,10 @@ field = [
     "...BBC",
     "..AAAC",
     "..ACBB",
+]
+not_field = [
+    "A.....",
+    "A.....",
 ]
 ignition = 3
 score = 6.0
@@ -471,6 +537,10 @@ field = [
     "..AAAB",
     "..ABBC",
 ]
+not_field = [
+    "A.....",
+    "A.....",
+]
 ignition = 3
 score = 6.0
 
@@ -480,6 +550,10 @@ field = [
     "...BBC",
     "..AAAB",
     "..ACBC",
+]
+not_field = [
+    "A.....",
+    "A.....",
 ]
 ignition = 2
 score = 5.0
@@ -491,6 +565,10 @@ field = [
     "..AAAA",
     "..ABBB",
 ]
+not_field = [
+    "A.....",
+    "A.....",
+]
 ignition = 3
 score = 9.8
 
@@ -500,6 +578,10 @@ field = [
     "...BBB",
     "..AAAA",
     "..ACCB",
+]
+not_field = [
+    "A.....",
+    "A.....",
 ]
 ignition = 3
 score = 9.8
@@ -511,6 +593,10 @@ field = [
     "...BBB",
     "..AAAA",
     "..ACCB",
+]
+not_field = [
+    "A.....",
+    "A.....",
 ]
 ignition = 3
 score = 9.8
@@ -523,6 +609,10 @@ field = [
     "..AAAA",
     "..ACCB",
 ]
+not_field = [
+    "A.....",
+    "A.....",
+]
 ignition = 3
 score = 9.8
 
@@ -532,6 +622,10 @@ field = [
     "...BBB",
     "..AAAA",
     "..ACBC",
+]
+not_field = [
+    "A.....",
+    "A.....",
 ]
 ignition = 3
 score = 7.8

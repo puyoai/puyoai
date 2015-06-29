@@ -42,6 +42,12 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
         for (const auto& s : v.get<toml::Array>("field"))
             str += s.as<string>();
 
+        string notStr;
+        if (const toml::Value* p = v.find("not_field")) {
+            for (const auto& s : p->as<toml::Array>())
+                notStr += s.as<string>();
+        }
+
         string name;
         if (const toml::Value* p = v.find("name")) {
             name = p->as<string>();
@@ -63,7 +69,7 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
                 CHECK(false);
         }
 
-        PatternBookField pbf(str, name, ignitionColumn, score);
+        PatternBookField pbf(name, str, notStr, ignitionColumn, score);
 
         if (const toml::Value* p = v.find("precondition")) {
             for (const auto& cp : p->as<toml::Array>()) {

@@ -26,9 +26,9 @@ FieldBits findIgnitionPositions(const FieldPattern& pattern)
 
 } // anonymous namespace
 
-PatternBookField::PatternBookField(const string& field, const string& name, int ignitionColumn, double score) :
-    pattern_(field),
+PatternBookField::PatternBookField(const string& name, const string& field, const string& notField, int ignitionColumn, double score) :
     name_(name),
+    pattern_(field, notField),
     ignitionColumn_(ignitionColumn),
     score_(score),
     ignitionPositions_(findIgnitionPositions(pattern_))
@@ -36,9 +36,9 @@ PatternBookField::PatternBookField(const string& field, const string& name, int 
     DCHECK(0 <= ignitionColumn && ignitionColumn <= 6);
 }
 
-PatternBookField::PatternBookField(const FieldPattern& pattern, const string& name, int ignitionColumn, double score) :
-    pattern_(pattern),
+PatternBookField::PatternBookField(const string& name, const FieldPattern& pattern, int ignitionColumn, double score) :
     name_(name),
+    pattern_(pattern),
     ignitionColumn_(ignitionColumn),
     score_(score),
     ignitionPositions_(findIgnitionPositions(pattern_))
