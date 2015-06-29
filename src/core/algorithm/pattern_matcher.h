@@ -15,11 +15,9 @@
 
 struct PatternMatchResult {
     PatternMatchResult() : matched(false) {}
-    PatternMatchResult(bool matched, FieldBits matchedBits, FieldBits allowedMatchedBits,
-                       SmallIntSet unusedVariables) :
+    PatternMatchResult(bool matched, FieldBits matchedBits, SmallIntSet unusedVariables) :
         matched(matched),
         matchedBits(matchedBits),
-        allowedMatchedBits(allowedMatchedBits),
         unusedVariables(unusedVariables) {}
 
     friend bool operator==(const PatternMatchResult& lhs, const PatternMatchResult& rhs)
@@ -28,8 +26,6 @@ struct PatternMatchResult {
             return false;
         if (lhs.matchedBits != rhs.matchedBits)
             return false;
-        if (lhs.allowedMatchedBits != rhs.allowedMatchedBits)
-            return false;
         if (lhs.unusedVariables != rhs.unusedVariables)
             return false;
         return true;
@@ -37,7 +33,6 @@ struct PatternMatchResult {
 
     bool matched;
     FieldBits matchedBits;
-    FieldBits allowedMatchedBits;
     SmallIntSet unusedVariables; // 'A' -> 0, 'B' -> 1, ...
 };
 

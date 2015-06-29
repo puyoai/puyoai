@@ -14,10 +14,10 @@ public:
     struct Pattern {
         char var;
         FieldBits varBits;
-        FieldBits allowVarBits;
+        FieldBits notVarBits;
     };
 
-    explicit FieldPattern(const std::string&);
+    explicit FieldPattern(const std::string&, const std::string& notPatternField = std::string());
 
     bool isBijectionMatchable() const;
     // 'A' - 'Z' is 1, the others are 0.

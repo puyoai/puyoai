@@ -35,10 +35,10 @@ TEST(PatternMatcherTest, match1)
     CoreField f2("R     ");
     CoreField f3("R R   ");
 
-    EXPECT_EQ(PatternMatchResult(true, FieldBits("......"), FieldBits("......"), toSmallIntSet({'A'})), match(pattern, f0));
-    EXPECT_EQ(PatternMatchResult(true, FieldBits("111..."), FieldBits("......"), toSmallIntSet({})), match(pattern, f1));
-    EXPECT_EQ(PatternMatchResult(true, FieldBits("1....."), FieldBits("......"), toSmallIntSet({})), match(pattern, f2));
-    EXPECT_EQ(PatternMatchResult(true, FieldBits("1.1..."), FieldBits("......"), toSmallIntSet({})), match(pattern, f3));
+    EXPECT_EQ(PatternMatchResult(true, FieldBits("......"), toSmallIntSet({'A'})), match(pattern, f0));
+    EXPECT_EQ(PatternMatchResult(true, FieldBits("111..."), toSmallIntSet({})), match(pattern, f1));
+    EXPECT_EQ(PatternMatchResult(true, FieldBits("1....."), toSmallIntSet({})), match(pattern, f2));
+    EXPECT_EQ(PatternMatchResult(true, FieldBits("1.1..."), toSmallIntSet({})), match(pattern, f3));
 }
 
 TEST(PatternMatcherTest, match2)
@@ -60,7 +60,7 @@ TEST(PatternMatcherTest, match2)
         "BBYBBB"
         "YYRRRG");
 
-    EXPECT_EQ(PatternMatchResult(true, FieldBits("......"), FieldBits("......"),
+    EXPECT_EQ(PatternMatchResult(true, FieldBits("......"),
                                  toSmallIntSet({'A', 'B', 'C', 'D', 'X'})),
               match(pattern, f0));
     EXPECT_EQ(PatternMatchResult(true,
@@ -68,7 +68,6 @@ TEST(PatternMatcherTest, match2)
                                      "111.1."
                                      "111111"
                                      "111111"),
-                                 FieldBits("......"),
                                  toSmallIntSet({})),
               match(pattern, f1));
     EXPECT_EQ(PatternMatchResult(true,
@@ -76,7 +75,6 @@ TEST(PatternMatcherTest, match2)
                                      "111.1."
                                      "111111"
                                      "111111"),
-                                 FieldBits("......"),
                                  toSmallIntSet({})),
               match(pattern, f2));
 }
@@ -99,7 +97,6 @@ TEST(PatternMatcherTest, match3)
                                  FieldBits(
                                      "1..1.1"
                                      "1111.1"),
-                                 FieldBits("......"),
                                  toSmallIntSet({'D', 'E', 'X', 'Z'})),
               match(pattern, f));
 }
@@ -127,28 +124,24 @@ TEST(PatternMatcherTest, matchWithStar)
 
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits("......"),
-                                 FieldBits("......"),
                                  toSmallIntSet({'A', 'B', 'C'})),
               match(pattern, f0));
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits(
                                      "....11"
                                      ".11111"),
-                                 FieldBits("......"),
                                  toSmallIntSet({})),
               match(pattern, f1));
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits(
                                      "....11"
                                      ".11111"),
-                                 FieldBits("......"),
                                  toSmallIntSet({})),
               match(pattern, f2));
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits(
                                      "....11"
                                      ".11111"),
-                                 FieldBits("......"),
                                  toSmallIntSet({})),
               match(pattern, f3));
 }
@@ -179,24 +172,20 @@ TEST(PatternMatcherTest, matchWithAllowing)
 
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits("......"),
-                                 FieldBits("......"),
                                  toSmallIntSet({'A', 'B', 'C'})),
               match(pattern, f0));
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits("11.11."),
-                                 FieldBits("..1..."),
                                  toSmallIntSet({'C'})),
               match(pattern, f1));
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits("1..11."),
-                                 FieldBits("..1..."),
                                  toSmallIntSet({'C'})),
               match(pattern, f2));
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits(
                                      "..1..."
                                      "11.11."),
-                                 FieldBits("......"),
                                  toSmallIntSet({})),
               match(pattern, f3));
 
@@ -215,19 +204,16 @@ TEST(PatternMatcherTest, matchWithMust)
 
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits("111111"),
-                                 FieldBits("......"),
                                  toSmallIntSet({})),
               match(pattern, f0));
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits("111111"),
-                                 FieldBits("......"),
                                  toSmallIntSet({})),
               match(pattern, f0, true));
 
     EXPECT_EQ(PatternMatchResult(), match(pattern, f1));
     EXPECT_EQ(PatternMatchResult(true,
                                  FieldBits("11111."),
-                                 FieldBits("......"),
                                  toSmallIntSet({})),
               match(pattern, f1, true));
 }

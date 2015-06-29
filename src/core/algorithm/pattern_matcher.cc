@@ -57,22 +57,16 @@ PatternMatchResult PatternMatcher::matchInternal(const FieldPattern& fieldPatter
         }
     }
 
-    // Check the neighbors.
-    // If the neighbor of pattern has the same color
-    FieldBits allowedMatchedBits;
+    // Check notVarBits.
     for (size_t i = 0; i < fieldPattern.patterns().size(); ++i) {
         if (envs[i] == PuyoColor::EMPTY)
             continue;
         const FieldPattern::Pattern& pat = fieldPattern.pattern(i);
-        FieldBits edge = pat.varBits.expandEdge().notmask(pat.varBits) & complementedField->bits(envs[i]);
-        if (!edge.notmask(pat.allowVarBits).notmask(fieldPattern.anyPatternBits()).isEmpty())
+        if (!(complementedField->bits(envs[i]) & pat.notVarBits).isEmpty())
             return PatternMatchResult();
-
-        FieldBits matched = edge.mask(pat.allowVarBits);
-        allowedMatchedBits.setAll(matched);
     }
 
-    return PatternMatchResult(true, matchedBits, allowedMatchedBits, unusedVariables);
+    return PatternMatchResult(true, matchedBits, unusedVariables);
 }
 
 PatternMatchResult PatternMatcher::match(const FieldPattern& fieldPattern,
@@ -113,8 +107,7 @@ ComplementResult PatternMatcher::complement(const FieldPattern& fieldPattern,
                 complementedField.setColorAll(pat.varBits, c);
 
                 // Check neighbors.
-                FieldBits edge = pat.varBits.expandEdge().notmask(pat.varBits) & complementedField.bits(envs[i]);
-                if (!edge.notmask(pat.allowVarBits).notmask(fieldPattern.anyPatternBits()).isEmpty())
+                if (!(complementedField.bits(envs[i]) & pat.notVarBits).isEmpty())
                     continue;
 
                 ok = true;
