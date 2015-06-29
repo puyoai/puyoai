@@ -4,11 +4,11 @@
 
 TEST(PatternBookFieldTest, ignitionPositions)
 {
-    PatternBookField pbf(
+    PatternBookField pbf("name",
         "A....."
         "ABC..."
         "AAB..."
-        "BBCCC.", "name", 3, 1.0);
+        "BBCCC.", "", 3, 1.0);
 
     FieldBits expected(
         "1....."

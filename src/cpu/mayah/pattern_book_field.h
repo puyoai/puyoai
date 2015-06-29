@@ -20,7 +20,11 @@
 class PatternBookField {
 public:
     // If ignitionColumn is 0, we ignore ignitionColumn when detecting rensa.
-    PatternBookField(const std::string& field, const std::string& name, int ignitionColumn, double score);
+    PatternBookField(const std::string& name,
+                     const std::string& field,
+                     const std::string& notField,
+                     int ignitionColumn,
+                     double score);
 
     const std::string& name() const { return name_; }
     double score() const { return score_; }
@@ -43,14 +47,14 @@ public:
     PatternBookField mirror() const
     {
         int mirroredIgnitionColumn = ignitionColumn() == 0 ? 0 : 7 - ignitionColumn();
-        return PatternBookField(pattern_.mirror(), name(), mirroredIgnitionColumn, score());
+        return PatternBookField(name(), pattern_.mirror(), mirroredIgnitionColumn, score());
     }
 
 private:
-    PatternBookField(const FieldPattern&, const std::string& name, int ignitionColumn, double score);
+    PatternBookField(const std::string& name, const FieldPattern&, int ignitionColumn, double score);
 
-    FieldPattern pattern_;
     std::string name_;
+    FieldPattern pattern_;
     int ignitionColumn_;
     double score_;
     FieldBits ignitionPositions_;
