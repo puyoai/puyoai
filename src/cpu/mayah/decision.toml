@@ -154,6 +154,7 @@ field = [
 AAAC = [5, 1]  # TODO: [2, 3] ?
 AACC = [5, 1]  # TODO: [2, 3] ?
 ABAB = [1, 0]  # [2, 2] is faster, but if AB comes again, taking 1-rensa double is big.
+ABAC = [1, 0]
 ABBC = [1, 0]
 ACAB = [4, 2]
 ACAC = [4, 2]
@@ -211,6 +212,7 @@ ACAB = [4, 2]
 ACAC = [4, 2]
 ACAD = [4, 2]
 ACBB = [4, 2]
+ACBC = [4, 2]
 ACBD = [4, 2]
 ACCC = [4, 2]
 ACDD = [4, 2]
@@ -417,6 +419,13 @@ ABAB = [4, 2]
 
 [[book]]
 field = [
+    "CC....",
+    "AA.BB."
+]
+ACCD = [3, 0]
+
+[[book]]
+field = [
     "C.....",
     "B.B...",
     "AAA..."
@@ -572,3 +581,4 @@ field = [
     "ABB..."
 ]
 ABAC = [2, 3]  # For ZENKESHI
+DDAC = [5, 1]
