@@ -38,27 +38,31 @@ public:
     }
 
 private:
-    DropDecision thinkFlat(int frameId, const CoreField& f, const KumipuyoSeq& seq) const
+    DropDecision thinkFlat(int frameId, const CoreField& field, const KumipuyoSeq& seq) const
     {
         UNUSED_VARIABLE(frameId);
 
         pair<int, int> heights[] = {
-            make_pair(f.height(1), 1),
-            make_pair(f.height(6), 6),
-            make_pair(f.height(2), 2),
-            make_pair(f.height(5), 5),
-            make_pair(f.height(4), 4),
-            make_pair(f.height(3), 3),
+            make_pair(field.height(1), 1),
+            make_pair(field.height(6), 6),
+            make_pair(field.height(2), 2),
+            make_pair(field.height(5), 5),
+            make_pair(field.height(4), 4),
+            make_pair(field.height(3), 3),
         };
 
         sort(heights, heights + 6);
         for (int i = 0; i < 6; ++i) {
-            CoreField cf(f);
             int x = heights[i].second;
+            if (!PuyoController::isReachable(field, Decision(x, 2)))
+                continue;
+
+            CoreField cf(field);
             cf.dropKumipuyo(Decision(x, 2), seq.get(0));
-            RensaResult rr = cf.simulate();
-            if (rr.score == 0)
-                return DropDecision(Decision(x, 2));
+            if (!cf.rensaWillOccur())
+                continue;
+
+            return DropDecision(Decision(x, 2));
         }
 
         return DropDecision(Decision(3, 2));
