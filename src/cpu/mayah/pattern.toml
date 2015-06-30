@@ -471,6 +471,21 @@ not_field = [
 ignition = 2
 score = 4.0
 
+[[pattern]]
+field = [
+    "......",
+    "..BCC.",
+    ".AA&&C",
+    "AABBBC",
+]
+not_field = [
+    "A.....",
+    "......",
+    "......",
+]
+ignition = 2
+score = 6.0
+
 # ----------------------------------------------------------------------
 # GTR-TAIL-2
 
@@ -680,7 +695,30 @@ field = [
     "...ACB",
 ]
 ignition = 4
-score = 8.9
+score = 8.0
+
+[[pattern]]
+field = [
+    ".....C",
+    "....BC",
+    "...ACB",
+    "...AAB",
+    "...ACB",
+]
+ignition = 4
+score = 7.5
+
+[[pattern]]
+field = [
+    ".....C",
+    ".....C",
+    "....B.",
+    "...ACB",
+    "...AAB",
+    "...ACB",
+]
+ignition = 4
+score = 7.5
 
 [[pattern]]
 field = [
@@ -883,6 +921,18 @@ field = [
     "...ABB",
 ]
 score = 6.0
+
+[[pattern]]
+field = [
+    ".....C",
+    ".....B",
+    "....CB",
+    "....CC",
+    "....AA",
+    "....BA",
+    "....BA",
+]
+score = 4.0
 
 # ----------------------------------------------------------------------
 # GTR-AIR
