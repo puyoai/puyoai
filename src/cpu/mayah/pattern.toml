@@ -1870,6 +1870,20 @@ field = [
 ignition = 3
 score = 6.0
 
+[[pattern]]
+field = [
+    "....C.",
+    "...CBC",
+    "..AAAC",
+    ".AABBB",
+]
+not_field = [
+    "A.....",
+    "A.....",
+]
+ignition = 3
+score = 6.0
+
 # ----------------------------------------------------------------------
 # ZABUTONL-CORE
 
@@ -1939,6 +1953,17 @@ name = "ZABUTONL"
 ignition = 1
 score = 8.5
 
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AAC...",
+    "BBBCC."
+]
+name = "ZABUTONL"
+ignition = 1
+score = 8.5
+
 # ----------------------------------------------------------------------
 # ZABUTONL-HEAD-1
 
@@ -1957,6 +1982,18 @@ score = 8.0
 field = [
     ".A....",
     "BA....",
+    "AA....",
+    "BC....",
+    "BB....",
+    "CCC..."
+]
+ignition = 2
+score = 7.8
+
+[[pattern]]
+field = [
+    "B.....",
+    "AA....",
     "AA....",
     "BC....",
     "BB....",
