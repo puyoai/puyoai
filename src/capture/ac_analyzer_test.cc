@@ -466,11 +466,11 @@ TEST_F(ACAnalyzerTest, gameStart)
         {   0,   6, "  ----", "  ----" },
         // On frame 18-,
         // Player2: Green character is on NEXT2, however, analyzer should say NEXT2 is still PP.
-        {   6,  42, "  BBPP", "  BBPP" },
+        {   6,  43, "  BBPP", "  BBPP" },
         // Because of animation, the decisionRequest might be sent in different frame. :-(
-        {  42,  43, "  BBPP", "BBPP  " },
+        {  43,  44, "  BBPP", "BBPP  " },
         // Because of fastDecision, we would be able to detect NEXT moving here.
-        {  43,  60, "BBPP  ", "BBPP  " },
+        {  44,  60, "BBPP  ", "BBPP  " },
         // Player 2, frame 60: Since some stars are located on NEXT2_AXIS,
         // analyzer might consider the axis color is YELLOW.
         {  60,  67, "BBPP--", "BBPP--" },
