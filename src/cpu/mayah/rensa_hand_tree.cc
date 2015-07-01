@@ -25,56 +25,6 @@ static const int FRAMES_TO_DIG[6] = {
 
 } // namespace
 
-struct RensaHandCandidate {
-    RensaHandCandidate() {}
-    RensaHandCandidate(const IgnitionRensaResult& ignitionRensaResult,
-                       const RensaCoefResult& coefResult,
-                       const CoreField& fieldAfterRensa,
-                       const PuyoSet& alreadyUsedPuyoSet,
-                       int alreadyConsumedFramesToMovePuyo) :
-        ignitionRensaResult(ignitionRensaResult),
-        coefResult(coefResult),
-        fieldAfterRensa(fieldAfterRensa),
-        alreadyUsedPuyoSet(alreadyUsedPuyoSet),
-        alreadyConsumedFramesToMovePuyo(alreadyConsumedFramesToMovePuyo)
-    {
-    }
-
-    int chains() const { return ignitionRensaResult.chains(); }
-    int score() const { return ignitionRensaResult.score(); }
-    int rensaFrames() const { return ignitionRensaResult.rensaFrames(); }
-    int framesToIgnite() const { return ignitionRensaResult.framesToIgnite(); }
-
-    int totalFrames() const { return ignitionRensaResult.totalFrames(); }
-
-    std::string toString() const;
-
-    IgnitionRensaResult ignitionRensaResult;
-    RensaCoefResult coefResult;
-    CoreField fieldAfterRensa;
-    PuyoSet alreadyUsedPuyoSet;
-    int alreadyConsumedFramesToMovePuyo;
-};
-
-struct SortByTotalFrames {
-    bool operator()(const RensaHandCandidate& lhs, const RensaHandCandidate& rhs) const
-    {
-        if (lhs.totalFrames() != rhs.totalFrames())
-            return lhs.totalFrames() < rhs.totalFrames();
-
-        // The rest of '>' is intentional.
-        if (lhs.score() != rhs.score())
-            return lhs.score() > rhs.score();
-        if (lhs.chains() != rhs.chains())
-            return lhs.chains() > rhs.chains();
-
-        if (lhs.framesToIgnite() != rhs.framesToIgnite())
-            return lhs.framesToIgnite() < rhs.framesToIgnite();
-
-        return lhs.coefResult.coef(lhs.chains()) > rhs.coefResult.coef(rhs.chains());
-    }
-};
-
 string RensaHand::toString() const
 {
     char buf[80];
@@ -405,7 +355,6 @@ RensaResult RensaHandNodeMaker::add(CoreField&& cf,
         framesToIgnite = 0;
     data_.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite, NUM_FRAMES_OF_ONE_HAND),
                        tracker.result(), cf, wholeUsedPuyoSet, wholeFramesToIgnite);
-
 
     return rensaResult;
 }
