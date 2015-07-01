@@ -214,7 +214,7 @@ int Evaluator::Valley(const CoreField& field) {
 
   // If (3, 11) is filled, add a large penalty for 1/6 risk.
   if (!field.isEmpty(FieldConstant::WIDTH / 2, FieldConstant::HEIGHT - 1))
-    score -= 500;
+    score -= 1000;
 
   return score;
 }
@@ -222,7 +222,7 @@ int Evaluator::Valley(const CoreField& field) {
 int Evaluator::Future(const CoreField& field) {
   // |expects[i]| figures the maximum point of the RENSA, which
   // can be fired with |i| additional puyos.
-  std::vector<int> expects(10, -1);
+  std::vector<int> expects(4, -1);
 
   RensaDetector::detectIteratively(
       field, RensaDetectorStrategy::defaultDropStrategy(), 1,
@@ -230,14 +230,14 @@ int Evaluator::Future(const CoreField& field) {
         size_t num = puyo_to_add.size();
         RensaResult result = cf.simulate();
         if (num < expects.size()) {
-          expects[num] = std::max(expects[num], result.score);
+          expects[num] = std::max(expects[num], result.chains);
         }
         return result;
       });
 
   for (size_t i = 0; i < expects.size(); ++i) {
     if (expects[i] >= 0)
-      return expects[i];
+      return expects[i] * expects[i] * 500;
   }
   return 0;
 }
