@@ -145,16 +145,53 @@ void Gazer::initialize(int frameIdGameWillBegin)
     gazeResult_.reset(frameIdGameWillBegin, 72);
 }
 
-void Gazer::gaze(int frameId, const CoreField& cf, const KumipuyoSeq& seq)
+void Gazer::gaze(int frameId, const CoreField& originalField, const KumipuyoSeq& kumipuyoSeq)
 {
-    int numReachableSpaces = cf.countConnectedPuyos(3, 12);
+    int numReachableSpaces = originalField.countConnectedPuyos(3, 12);
     gazeResult_.reset(frameId, numReachableSpaces);
 
-    updateFeasibleRensas(cf, seq);
-    updatePossibleRensas(cf, seq);
+    updateFeasibleRensas(originalField, kumipuyoSeq);
+    updatePossibleRensas(originalField, kumipuyoSeq);
 
-    RensaHandTree tree = RensaHandTree::makeTree(3, cf, PuyoSet(), 0, seq);
-    LOG(INFO) << tree.toString();
+    // FeasibleRensaHandTree.
+    {
+        RensaHandNodeMaker maker(2, kumipuyoSeq);
+        //vector<RensaHandEdge> edges;
+        auto callback = [&](const CoreField& field, const std::vector<Decision>& decisions,
+                            int /*numChigiri*/, int framesToIgnite, int lastDropFrames, bool shouldFire) {
+            if (!shouldFire)
+                return;
+
+            CoreField cf(field);
+            RensaCoefTracker tracker;
+            RensaResult rensaResult = cf.simulate(&tracker);
+
+            if (rensaResult.score < 70)
+                return;
+
+            IgnitionRensaResult ignitionRensaResult(rensaResult, framesToIgnite, lastDropFrames);
+
+            PuyoSet usedPuyoSet;
+            for (size_t i = 0; i < decisions.size(); ++i) {
+                usedPuyoSet.add(kumipuyoSeq.axis(i));
+                usedPuyoSet.add(kumipuyoSeq.child(i));
+            }
+
+            RensaHandCandidate candidate(ignitionRensaResult, tracker.result(), cf, usedPuyoSet, 0);
+            maker.addCandidate(candidate);
+        };
+
+        int maxDepth = std::min<int>(3, kumipuyoSeq.size());
+        Plan::iterateAvailablePlansWithoutFiring(originalField, kumipuyoSeq, maxDepth, callback);
+
+        RensaHandTree tree = RensaHandTree(std::vector<RensaHandNode> { maker.makeNode() });
+        LOG(INFO) << "Feasible: " << endl << tree.toString();
+        gazeResult_.setFeasibleRensaHandTree(std::move(tree));
+    }
+
+    // PossibleRensaHandTree.
+    RensaHandTree tree = RensaHandTree::makeTree(3, originalField, PuyoSet(), 0, kumipuyoSeq);
+    LOG(INFO) << "Possible:" << endl << tree.toString();
 
     gazeResult_.setPossibleRensaHandTree(std::move(tree));
 }

@@ -38,6 +38,8 @@ public:
     void reset(int frameIdToStartNextMove, int numReachableSpaces);
     void setFeasibleRensaInfo(std::vector<RensaHand> infos) { feasibleRensaInfos_ = std::move(infos); }
     void setPossibleRensaInfo(std::vector<RensaHand> infos) { possibleRensaInfos_ = std::move(infos); }
+
+    void setFeasibleRensaHandTree(RensaHandTree tree) { feasibleRensaHandTree_ = std::move(tree); }
     void setPossibleRensaHandTree(RensaHandTree tree) { possibleRensaHandTree_ = std::move(tree); }
 
     std::string toRensaInfoString() const;
@@ -54,6 +56,7 @@ private:
     // PossibleRensa is the rensa the enemy will build in future.
     std::vector<RensaHand> possibleRensaInfos_;
 
+    RensaHandTree feasibleRensaHandTree_;
     RensaHandTree possibleRensaHandTree_;
 };
 
