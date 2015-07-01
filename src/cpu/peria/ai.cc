@@ -46,6 +46,7 @@ DropDecision Ai::think(int frame_id,
     std::ostringstream oss;
     const RensaResult& result = enemy_state.currentRensaResult;
     oss << ",Enemy:_Going(" << result.score << "_in_" << result.frames << ")";
+    control.message += oss.str();
   }
   return DropDecision(control.decision, control.message);
 }
