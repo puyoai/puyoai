@@ -321,7 +321,7 @@ void AI::groundedForEnemy(const FrameRequest& frameRequest)
 void AI::groundedForCommon(PlayerState* state, int frameId)
 {
     CoreField cf(state->fieldWhenGrounded);
-    VLOG(1) << cf;
+    VLOG(1) << "Grounded:\n" << cf;
     state->currentRensaResult = cf.simulate();
 
     if (state->currentRensaResult.chains > 0) {

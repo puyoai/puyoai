@@ -26,7 +26,7 @@ bool ClientConnector::receive(FrameRequest* frameRequest)
             break;
     }
 
-    LOG(INFO) << line;
+    LOG(INFO) << "RECEIVED: " << line;
     *frameRequest = FrameRequest::parse(line);
     return true;
 }
@@ -35,5 +35,5 @@ void ClientConnector::send(const FrameResponse& resp)
 {
     string s = resp.toString();
     cout << s << endl;
-    LOG(INFO) << s;
+    LOG(INFO) << "SEND: " << s;
 }
