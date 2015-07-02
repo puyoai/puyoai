@@ -515,6 +515,7 @@ template<typename ScoreCollector>
 void Evaluator<ScoreCollector>::evalCountPuyoFeature(const CoreField& field)
 {
     sc_->addScore(NUM_COUNT_PUYOS, field.countColorPuyos(), 1);
+    sc_->addScore(NUM_COUNT_OJAMA, field.countColor(PuyoColor::OJAMA));
 }
 
 template<typename ScoreCollector>
