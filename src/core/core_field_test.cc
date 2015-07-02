@@ -81,6 +81,34 @@ TEST(CoreFieldTest, countColorPuyos3)
     EXPECT_EQ(10, cf.countColorPuyos());
 }
 
+TEST(CoreFieldTest, countColor)
+{
+    CoreField cf(
+        "O....." // 14
+        "O....."
+        "O....." // 12
+        "O....."
+        "O....."
+        "O....."
+        "O....." // 8
+        "O....."
+        "O....Y"
+        "OYBB.B"
+        "OYYRBB" // 4
+        "OBRR&&"
+        "OBBYYY"
+        "RRRGGG"
+    );
+
+    EXPECT_EQ(6, cf.countColor(PuyoColor::RED));
+    EXPECT_EQ(8, cf.countColor(PuyoColor::BLUE));
+    EXPECT_EQ(7, cf.countColor(PuyoColor::YELLOW));
+    EXPECT_EQ(3, cf.countColor(PuyoColor::GREEN));
+    EXPECT_EQ(12, cf.countColor(PuyoColor::OJAMA)); // don't contain 14th row.
+    EXPECT_EQ(40, cf.countColor(PuyoColor::EMPTY));
+    EXPECT_EQ(2, cf.countColor(PuyoColor::IRON));
+}
+
 TEST(CoreFieldTest, countUnreachableSpaces1)
 {
     CoreField cf(

@@ -90,6 +90,11 @@ int CoreField::countColorPuyos() const
     return bitField().normalColorBits().maskedField13().popcount();
 }
 
+int CoreField::countColor(PuyoColor c) const
+{
+    return bitField().bits(c).maskedField13().popcount();
+}
+
 int CoreField::countUnreachableSpaces() const
 {
     int count = 0;
