@@ -74,6 +74,9 @@ public:
     int countColorPuyos() const;
     // Counts the all puyos (including ojama).
     int countPuyos() const;
+    // Counts the specified color.
+    int countColor(PuyoColor) const;
+
     // Returns the number of puyos connected to (x, y).
     // Actually you can use this if color(x, y) is EMPTY or OJAMA.
     int countConnectedPuyos(int x, int y) const { return field_.countConnectedPuyos(x, y); }
