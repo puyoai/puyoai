@@ -31,6 +31,8 @@ private:
     std::mutex mu_;
     std::condition_variable cond_;
 
+    int discarded_;
+
     SyntekDriver* driver_;
     UniqueSDLSurface currentSurface_;
 };

@@ -11,12 +11,14 @@
 
 using namespace std;
 
+DEFINE_int32(initial_discards, 5, "Discards several initial frames.");
 DEFINE_int32(capture_offset_x, 37, "The x offset to crop captured image.");
 DEFINE_int32(capture_offset_y, 8, "The y offset to crop captured image.");
 DEFINE_int32(capture_width, 640, "The cropped captured image width.");
 DEFINE_int32(capture_height, 224, "The cropped captured image height.");
 
 SyntekSource::SyntekSource() :
+    discarded_(0),
     currentSurface_(emptyUniqueSDLSurface())
 {
     width_ = 320;
@@ -47,6 +49,11 @@ bool SyntekSource::start()
         lock_guard<mutex> lock(mu_);
         // CHECK_EQ(SDL_LockSurface(currentSurface_.get()), 0);
 
+        if (discarded_ < FLAGS_initial_discards) {
+            ++discarded_;
+            return;
+        }
+
         int* pixels = static_cast<int*>(currentSurface_->pixels);
 
         // Copy to the current pixel data.
@@ -63,7 +70,6 @@ bool SyntekSource::start()
             }
         }
 
-        // SDL_UnlockSurface(currentSurface_.get());
         cond_.notify_one();
     };
 
