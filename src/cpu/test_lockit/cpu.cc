@@ -122,28 +122,12 @@ FrameResponse sendmes(READ_P* p1, COMAI_HI* coo)
     return FrameResponse(p1->id, Decision(p1->te_x, p1->te_r), ss.str());
 }
 
-bool isTsumoValid(int tsumo[6])
-{
-    // Check only [0, 4).
-    for (int i = 0; i < 4; ++i) {
-        TLColor c = static_cast<TLColor>(tsumo[i]);
-        if (!isNormalTLColor(c))
-            return false;
-    }
-
-    return true;
-}
-
 FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
 {
     int saidaiten, tmp;
     int coma2x_sc[22] {};
 
     parseRequest(request, &r_player[0], &r_player[1], &coma);
-
-    if (!isTsumoValid(r_player[0].tsumo) || !isTsumoValid(r_player[1].tsumo)) {
-        return FrameResponse(request.frameId);
-    }
 
     FrameResponse response(request.frameId);
 
