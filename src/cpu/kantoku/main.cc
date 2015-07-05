@@ -3,6 +3,7 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -55,13 +56,17 @@ public:
         }
 
         if (req.shouldInitialize()) {
-            // Always change the ai.
-            if (!FLAGS_change_if_beated)
-                shouldChooseAI_ = true;
+            if (chooseDelay_) {
+                chooseDelay_ = false;
+            } else {
+                // Always change the ai.
+                if (!FLAGS_change_if_beated)
+                    shouldChooseAI_ = true;
 
-            if (shouldChooseAI_) {
-                shouldChooseAI_ = false;
-                chooseAI();
+                if (shouldChooseAI_) {
+                    shouldChooseAI_ = false;
+                    chooseAI();
+                }
             }
         }
 
@@ -69,6 +74,15 @@ public:
         FrameResponse response;
         CHECK(current().connector().receive(&response));
         return response;
+    }
+
+    void readIndex()
+    {
+        ifstream fs("current-cpu.txt");
+        if (fs) {
+            fs >> index_;
+            // index_ = index_ % ais_.size();
+        }
     }
 
 private:
@@ -82,6 +96,7 @@ private:
         }
 
         LOG(INFO) << "Current CPU: " << current().name();
+        writeIndex();
     }
 
     ChildAI& current()
@@ -89,8 +104,17 @@ private:
         return ais_[index_];
     }
 
+    void writeIndex()
+    {
+        ofstream fs("current-cpu.txt");
+        if (fs) {
+            fs << index_;
+        }
+    }
+
     default_random_engine rnd_;
     bool shouldChooseAI_ = false;
+    bool chooseDelay_ = true;
     int index_;
     vector<ChildAI> ais_;
 };
@@ -102,12 +126,19 @@ int main(int argc, char* argv[])
     google::InstallFailureSignalHandler();
 
     Kantoku kantoku;
-    kantoku.add("mayah-1", "../mayah/run.sh");
+    //kantoku.add("shinh", "../hamaji/lps-fast.sh");
+    //kantoku.add("peria", "../peria/run.sh");
     kantoku.add("nidub", "../test_lockit/nidub.sh");
-    kantoku.add("mayah-2", "../mayah/run.sh");
-    kantoku.add("rendaS9", "../test_lockit/rendaS9.sh");
-    kantoku.add("mayah-3", "../mayah/run.sh");
-    kantoku.add("rendaGS9", "../test_lockit/rendaGS9.sh");
+    //kantoku.add("nidub", "../test_lockit/rendaS9.sh");
+    kantoku.add("mayah", "../mayah/run.sh");
+
+    // kantoku.add("mayah-2", "../mayah/run.sh");
+    // kantoku.add("rendaS9", "../test_lockit/rendaS9.sh");
+    // kantoku.add("mayah-3", "../mayah/run.sh");
+    // kantoku.add("rendaGS9", "../test_lockit/rendaGS9.sh");
+
+    kantoku.readIndex();
+
 
     kantoku.runLoop();
 
