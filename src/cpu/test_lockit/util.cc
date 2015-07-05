@@ -7,27 +7,24 @@
 
 namespace test_lockit {
 
-CoreField toCoreField(int f[6][18]) {
-  CoreField cf;
-  for (int i = 0; i < 6; ++i) {
-    for (int j = 0; j < 14; ++j) {
-      if (f[i][j] == TL_EMPTY)
-	break;
-      cf.dropPuyoOn(i + 1, toPuyoColor(TLColor(f[i][j])));
+CoreField toCoreField(int f[6][kHeight]) {
+    CoreField cf;
+    for (int i = 0; i < 6; ++i) {
+        for (int j = 0; j < kHeight; ++j) {
+            if (f[i][j] == TL_EMPTY)
+                break;
+            cf.dropPuyoOn(i + 1, toPuyoColor(TLColor(f[i][j])));
+        }
     }
-  }
-  return cf;
+    return cf;
 }
 
-void toTLField(const CoreField& cf, int f[6][18]) {
-  for (int i = 0; i < 6; ++i) {
-    for (int j = 0; j < 14; ++j) {
-      f[i][j] = toTLColor(cf.color(i + 1, j + 1));
+void toTLField(const CoreField& cf, int f[6][kHeight]) {
+    for (int i = 0; i < 6; ++i) {
+        for (int j = 0; j < kHeight; ++j) {
+            f[i][j] = toTLColor(cf.color(i + 1, j + 1));
+        }
     }
-    for (int j = 14; j < 18; ++j) {
-      f[i][j] = TL_EMPTY;
-    }
-  }
 }
 
 }  // namespace test_lockit
