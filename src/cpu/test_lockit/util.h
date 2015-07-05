@@ -4,6 +4,7 @@
 #include "core/puyo_color.h"
 
 #include "color.h"
+#include "lockit_constant.h"
 
 class CoreField;
 
@@ -11,8 +12,8 @@ namespace test_lockit {
 
 // TODO: Remove following functions.
 // Field converter
-CoreField toCoreField(int[6][18]);
-void toTLField(const CoreField&, int[6][18]);
+CoreField toCoreField(int[6][kHeight]);
+void toTLField(const CoreField&, int[6][kHeight]);
 
 }  // namespace test_lockit
 
