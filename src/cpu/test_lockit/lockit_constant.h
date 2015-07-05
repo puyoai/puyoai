@@ -3,7 +3,7 @@
 
 namespace test_lockit {
 
-const int kHeight = 16;
+const int kHeight = 14;
 const int EE_SIZE = 1;
 
 const int TM_TMNMUM = 40;
