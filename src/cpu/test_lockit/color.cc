@@ -30,6 +30,7 @@ PuyoColor toPuyoColor(TLColor c)
 
 TLColor toValidTLColor(TLColor c)
 {
+    // HACK(peria): Convert TL_UNKNOWN to RED to avoid out-of-range in color index.
     if (c == TLColor::TL_UNKNOWN)
         return TLColor::TL_RED;
     return c;
