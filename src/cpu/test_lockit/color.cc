@@ -28,4 +28,13 @@ PuyoColor toPuyoColor(TLColor c)
     }
 }
 
+TLColor toValidTLColor(TLColor c)
+{
+    // HACK(peria): Convert TL_UNKNOWN to RED to avoid out-of-range.
+    // NOTE: We can use other colors insted, but use only RED to keep code simple.
+    if (c == TLColor::TL_UNKNOWN)
+        return TLColor::TL_RED;
+    return c;
+}
+
 } // namespace test_lockit

@@ -35,6 +35,8 @@ inline bool isNormalTLColor(TLColor color)
 TLColor toTLColor(PuyoColor pc);
 PuyoColor toPuyoColor(TLColor c);
 
+TLColor toValidTLColor(TLColor c);
+
 }  // namespace test_lockit
 
 #endif
