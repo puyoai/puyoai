@@ -1945,7 +1945,8 @@ int COMAI_HI::hon_syoukyo_score(int ba[][kHeight], int* score, int* quick)
             colnum += (renketsu[i][j] != 0);
             renketsunum += renketsu[i][j];
         }
-        rate = color_rate[colnum - 1] + renketsubonus[i] + rensa_rate[i];
+        if (colnum > 0)
+            rate = color_rate[colnum - 1] + renketsubonus[i] + rensa_rate[i];
         if (rate == 0)
             rate = 1;
         *score += renketsunum * rate * 10;
