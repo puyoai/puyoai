@@ -28,4 +28,11 @@ PuyoColor toPuyoColor(TLColor c)
     }
 }
 
+TLColor toValidTLColor(TLColor c)
+{
+    if (c == TLColor::TL_UNKNOWN)
+        return TLColor::TL_RED;
+    return c;
+}
+
 } // namespace test_lockit
