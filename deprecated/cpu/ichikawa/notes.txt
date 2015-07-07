@@ -1,4 +1,0 @@
-gtr9 vs gtr12: 10 vs 3
-gtr9 vs gtr11: 10 vs 4
-gtr9 vs gtr10: 10 vs 9
-gtr8 vs gtr9: 6 vs 10
