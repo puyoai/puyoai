@@ -11,7 +11,6 @@
 
 #include "capture/ac_analyzer.h"
 #include "capture/capture.h"
-#include "capture/somagic_source.h"
 #include "capture/syntek_source.h"
 #include "capture/movie_source.h"
 #include "capture/movie_source_key_listener.h"
@@ -37,8 +36,8 @@ DEFINE_bool(save_screenshot, false, "save screenshot");
 DEFINE_bool(draw_result, true, "draw analyzer result");
 DEFINE_bool(draw_decision, true, "draw decision");
 DEFINE_bool(draw_user_event, true, "draw user event");
-DEFINE_string(source, "somagic",
-              "set image source. 'somagic' when using somagic video capture."
+DEFINE_string(source, "syntek",
+              "set image source. 'syntek' when using syntek video capture."
               " filename if you'd like to use movie.");
 DEFINE_int32(fps, 60, "FPS");
 DEFINE_bool(ignore_sigpipe, false, "ignore SIGPIPE");
@@ -50,8 +49,6 @@ DEFINE_bool(use_audio, false, "use audio commentator");
 
 static unique_ptr<Source> makeVideoSource()
 {
-    if (FLAGS_source == "somagic")
-        return unique_ptr<Source>(new SomagicSource("connect"));
     if (FLAGS_source == "syntek")
         return unique_ptr<Source>(new SyntekSource);
 
@@ -141,7 +138,7 @@ int main(int argc, char* argv[])
 
     unique_ptr<MovieSourceKeyListener> movieSourceKeyListener;
     // TODO(mayah): BAD! Don't check FLAGS_source here.
-    if (FLAGS_fps == 0 && FLAGS_source != "somagic" && FLAGS_source != "syntek") {
+    if (FLAGS_fps == 0 && FLAGS_source != "syntek") {
         MovieSource* movieSource = static_cast<MovieSource*>(source.get());
         movieSourceKeyListener.reset(new MovieSourceKeyListener(movieSource));
     }

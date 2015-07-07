@@ -4,7 +4,6 @@
 
 #include "capture/ac_analyzer.h"
 #include "capture/capture.h"
-#include "capture/somagic_source.h"
 #include "capture/syntek_source.h"
 #include "gui/bounding_box_drawer.h"
 #include "gui/box.h"
@@ -17,12 +16,10 @@
 
 DEFINE_bool(save_screenshot, false, "save screenshot");
 DEFINE_bool(draw_result, true, "draw analyzer result");
-DEFINE_string(source, "somagic", "set image source");
+DEFINE_string(source, "syntek", "set image source");
 
 static unique_ptr<Source> makeVideoSource()
 {
-    if (FLAGS_source == "somagic")
-        return unique_ptr<Source>(new SomagicSource("connect"));
     if (FLAGS_source == "syntek")
         return unique_ptr<Source>(new SyntekSource);
 

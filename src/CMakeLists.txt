@@ -42,8 +42,7 @@ endif()
 
 # TODO(mayah): Why not use pkg_search_module?
 find_library(LIB_USB NAMES usb-1.0)
-find_library(LIB_GCRYPT NAMES gcrypt)
-if(LIB_USB AND LIB_GCRYPT AND USE_SDL2 AND FFMPEG_FOUND)
+if(LIB_USB AND USE_SDL2 AND FFMPEG_FOUND)
   set(BUILD_CAPTURE 1)
 endif()
 

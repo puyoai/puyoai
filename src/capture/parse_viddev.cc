@@ -3,7 +3,6 @@
 
 #include "capture/capture.h"
 #include "capture/screen_shot_saver.h"
-#include "capture/somagic_analyzer.h"
 #include "capture/viddev_source.h"
 #include "gui/bounding_box_drawer.h"
 #include "gui/box.h"
@@ -37,7 +36,7 @@ int main(int argc, char* argv[])
 
     // TODO(mayah): Needs to implement ViddevAnalyzer.
     // VidDevAnalyzer analyzer;
-    SomagicAnalyzer analyzer;
+    ACAnalyzer analyzer;
     Capture capture(&source, &analyzer);
 
     unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;

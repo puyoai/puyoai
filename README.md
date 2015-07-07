@@ -50,7 +50,6 @@ GUI を付与したい場合、さらに次のライブラリが必要です。
 
 ビデオキャプチャーをしたい場合、さらに次のライブラリが必要です。
 
-* gcrypt
 * lib-usb1.0
 
 その他、ライブラリではないですがビルドツールとして `cmake` `make` が必要です。
@@ -65,7 +64,7 @@ Xcode、コマンドラインツール、homebrew をインストールしてく
 次のコマンドで必要なものが入るとおもいます。
 
     $ brew install pkg-config
-    $ brew install cmake gflags glog sdl2 SDL2_ttf SDL2_image ffmpeg libusb libgcrypt
+    $ brew install cmake gflags glog sdl2 SDL2_ttf SDL2_image ffmpeg libusb
 
 #### Linux (Ubuntu) の場合
 
