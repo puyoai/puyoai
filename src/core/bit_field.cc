@@ -176,32 +176,6 @@ bool BitField::rensaWillOccur() const
     return false;
 }
 
-int BitField::vanish(int currentChain)
-{
-    FieldBits erased;
-    RensaNonTracker tracker;
-    int score = vanishForSimulation(currentChain, &erased, &tracker);
-    for (auto& m : m_)
-        m.unsetAll(erased);
-    return score;
-}
-
-void BitField::drop()
-{
-    // TODO(mayah): slow!
-    for (int x = 1; x <= 6; ++x) {
-        int h = 1;
-        for (int y = 1; y <= 13; ++y) {
-            if (isEmpty(x, y))
-                continue;
-            setColor(x, h++, color(x, y));
-        }
-        for (; h <= 13; ++h) {
-            setColor(x, h, PuyoColor::EMPTY);
-        }
-    }
-}
-
 std::string BitField::toString(char charIfEmpty) const
 {
     ostringstream ss;
