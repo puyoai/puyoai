@@ -74,8 +74,8 @@ void Arow::save(const string& filename) const
     FILE* fp = fopen(filename.c_str(), "wb");
     PCHECK(fp);
 
-    fwrite(&mean[0], sizeof(double), SIZE, fp);
-    fwrite(&cov[0], sizeof(double), SIZE, fp);
+    CHECK_EQ(fwrite(&mean[0], sizeof(double), SIZE, fp), SIZE);
+    CHECK_EQ(fwrite(&cov[0], sizeof(double), SIZE, fp), SIZE);
 
     fclose(fp);
 }
@@ -85,8 +85,8 @@ void Arow::load(const string& filename)
     FILE* fp = fopen(filename.c_str(), "rb");
     PCHECK(fp);
 
-    fread(&mean[0], sizeof(double), SIZE, fp);
-    fread(&cov[0], sizeof(double), SIZE, fp);
+    CHECK_EQ(fread(&mean[0], sizeof(double), SIZE, fp), SIZE);
+    CHECK_EQ(fread(&cov[0], sizeof(double), SIZE, fp), SIZE);
 
     fclose(fp);
 }
