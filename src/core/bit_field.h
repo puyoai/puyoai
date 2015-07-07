@@ -71,9 +71,6 @@ public:
     std::string toString(char charIfEmpty = ' ') const;
     std::string toDebugString(char charIfEmpty = ' ') const;
 
-    int vanish(int currentChain);
-    void drop();
-
     bool rensaWillOccur() const;
 
     // TODO(mayah): This should be removed. This is for barkward compatibility.
