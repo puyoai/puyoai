@@ -22,8 +22,7 @@ int score_hukasa[22][22][221] {};
 
 namespace {
 
-bool IsMatchIndexAndColors(int id, int color[]) {
-  static const int expect_colors[][2] = {
+const TLColor kTsumoPatterns[][2] = {
     {TLColor::RED, TLColor::RED},
     {TLColor::RED, TLColor::BLUE},
     {TLColor::RED, TLColor::YELLOW},
@@ -34,8 +33,9 @@ bool IsMatchIndexAndColors(int id, int color[]) {
     {TLColor::YELLOW, TLColor::YELLOW},
     {TLColor::YELLOW, TLColor::GREEN},
     {TLColor::GREEN, TLColor::GREEN},
-  };
+};
 
+bool IsMatchIndexAndColors(int id, int color[]) {
   if (color[0] == TLColor::UNKNOWN || color[1] == TLColor::UNKNOWN)
     return true;
   if (id == 220)
@@ -44,7 +44,7 @@ bool IsMatchIndexAndColors(int id, int color[]) {
     return false;
 
   id /= 22;
-  return expect_colors[id][0] == color[0] && expect_colors[id][1] == color[1];
+  return kTsumoPatterns[id][0] == color[0] && kTsumoPatterns[id][1] == color[1];
 }
 
 }  // namespace
@@ -3056,51 +3056,19 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
     chig_dd = 0;
 
     for (dd = 0; dd < 221; dd++) {
-        if ((fast != 0) && (dd < 220))
+        if (dd < 220 && fast)
             continue;
-        if (dd < 22) {
-            nk1 = TLColor::RED;
-            nk2 = TLColor::RED;
-        } else if (dd < 22 * 2) {
-            nk1 = TLColor::RED;
-            nk2 = TLColor::BLUE;
-        } else if (dd < 22 * 3) {
-            nk1 = TLColor::RED;
-            nk2 = TLColor::YELLOW;
-        } else if (dd < 22 * 4) {
-            nk1 = TLColor::RED;
-            nk2 = TLColor::GREEN;
-        } else if (dd < 22 * 5) {
-            nk1 = TLColor::BLUE;
-            nk2 = TLColor::BLUE;
-        } else if (dd < 22 * 6) {
-            nk1 = TLColor::BLUE;
-            nk2 = TLColor::YELLOW;
-        } else if (dd < 22 * 7) {
-            nk1 = TLColor::BLUE;
-            nk2 = TLColor::GREEN;
-        } else if (dd < 22 * 8) {
-            nk1 = TLColor::YELLOW;
-            nk2 = TLColor::YELLOW;
-        } else if (dd < 22 * 9) {
-            nk1 = TLColor::YELLOW;
-            nk2 = TLColor::GREEN;
-        } else if (dd < 22 * 10) {
-            nk1 = TLColor::GREEN;
-            nk2 = TLColor::GREEN;
-        } else {
+
+        int color = dd / 22;
+        int hand = dd % 22;
+        if (dd < 22 * 10) {
+            nk1 = kTsumoPatterns[color][0];
+            nk2 = kTsumoPatterns[color][1];
+        } else {  // dd == 220
             nk1 = TLColor::EMPTY;
             nk2 = TLColor::EMPTY;
         }
-
-        // Skip some conditions, assuming same colors
-        if ((dd > 5 && dd < 12) || (dd > 13 && dd < 19))
-            continue;
-        if ((dd > 5 + 88 && dd < 12 + 88) || (dd > 13 + 88 && dd < 19 + 88))
-            continue;
-        if ((dd > 5 + 154 && dd < 12 + 154) || (dd > 13 + 154 && dd < 19 + 154))
-            continue;
-        if ((dd > 5 + 198 && dd < 12 + 198) || (dd > 13 + 198 && dd < 19 + 198))
+        if (nk1 == nk2 && 5 < hand && hand < 12)
             continue;
 
         for (aa = 0; aa < 22; aa++) {
