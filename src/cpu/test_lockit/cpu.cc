@@ -36,7 +36,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
     {
         const KumipuyoSeq& seq = request.myPlayerFrameRequest().kumipuyoSeq;
         for (int i = 0; i < 6; ++i) {
-            p1->tsumo[i] = TLColor::TL_UNKNOWN;
+            p1->tsumo[i] = TLColor::UNKNOWN;
         }
         if (seq.size() >= 1) {
             p1->tsumo[0] = toTLColor(seq.axis(0));
@@ -54,7 +54,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
     {
         const KumipuyoSeq& seq = request.enemyPlayerFrameRequest().kumipuyoSeq;
         for (int i = 0; i < 6; ++i) {
-            p2->tsumo[i] = TLColor::TL_UNKNOWN;
+            p2->tsumo[i] = TLColor::UNKNOWN;
         }
         if (seq.size() >= 1) {
             p2->tsumo[0] = toTLColor(seq.axis(0));

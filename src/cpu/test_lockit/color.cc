@@ -5,12 +5,12 @@ namespace test_lockit {
 TLColor toTLColor(PuyoColor pc)
 {
     switch (pc) {
-    case PuyoColor::EMPTY:  return TLColor::TL_EMPTY;
-    case PuyoColor::OJAMA:  return TLColor::TL_OJAMA;
-    case PuyoColor::RED:    return TLColor::TL_RED;
-    case PuyoColor::BLUE:   return TLColor::TL_BLUE;
-    case PuyoColor::YELLOW: return TLColor::TL_YELLOW;
-    case PuyoColor::GREEN:  return TLColor::TL_GREEN;
+    case PuyoColor::EMPTY:  return TLColor::EMPTY;
+    case PuyoColor::OJAMA:  return TLColor::OJAMA;
+    case PuyoColor::RED:    return TLColor::RED;
+    case PuyoColor::BLUE:   return TLColor::BLUE;
+    case PuyoColor::YELLOW: return TLColor::YELLOW;
+    case PuyoColor::GREEN:  return TLColor::GREEN;
     default: CHECK(false);
     }
 }
@@ -18,12 +18,12 @@ TLColor toTLColor(PuyoColor pc)
 PuyoColor toPuyoColor(TLColor c)
 {
     switch (c) {
-    case TLColor::TL_EMPTY:  return PuyoColor::EMPTY;
-    case TLColor::TL_OJAMA:  return PuyoColor::OJAMA;
-    case TLColor::TL_RED:    return PuyoColor::RED;
-    case TLColor::TL_BLUE:   return PuyoColor::BLUE;
-    case TLColor::TL_YELLOW: return PuyoColor::YELLOW;
-    case TLColor::TL_GREEN:  return PuyoColor::GREEN;
+    case TLColor::EMPTY:  return PuyoColor::EMPTY;
+    case TLColor::OJAMA:  return PuyoColor::OJAMA;
+    case TLColor::RED:    return PuyoColor::RED;
+    case TLColor::BLUE:   return PuyoColor::BLUE;
+    case TLColor::YELLOW: return PuyoColor::YELLOW;
+    case TLColor::GREEN:  return PuyoColor::GREEN;
     default: CHECK(false);
     }
 }
@@ -32,8 +32,8 @@ TLColor toValidTLColor(TLColor c)
 {
     // HACK(peria): Convert TL_UNKNOWN to RED to avoid out-of-range.
     // NOTE: We can use other colors insted, but use only RED to keep code simple.
-    if (c == TLColor::TL_UNKNOWN)
-        return TLColor::TL_RED;
+    if (c == TLColor::UNKNOWN)
+        return TLColor::RED;
     return c;
 }
 
