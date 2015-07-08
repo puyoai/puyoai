@@ -129,16 +129,9 @@ int main(int argc, char* argv[])
     //kantoku.add("shinh", "../hamaji/lps-fast.sh");
     //kantoku.add("peria", "../peria/run.sh");
     kantoku.add("nidub", "../test_lockit/nidub.sh");
-    //kantoku.add("nidub", "../test_lockit/rendaS9.sh");
     kantoku.add("mayah", "../mayah/run.sh");
 
-    // kantoku.add("mayah-2", "../mayah/run.sh");
-    // kantoku.add("rendaS9", "../test_lockit/rendaS9.sh");
-    // kantoku.add("mayah-3", "../mayah/run.sh");
-    // kantoku.add("rendaGS9", "../test_lockit/rendaGS9.sh");
-
     kantoku.readIndex();
-
 
     kantoku.runLoop();
 
