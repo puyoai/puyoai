@@ -210,7 +210,7 @@ TEST(MayahAIPerformanceTest, slow_pattern_from_real_4)
                 "BRRYRR");
     KumipuyoSeq seq("GBBYRB");
 
-    runTest(3, 2, f, seq);
+    runTest(MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, f, seq);
 }
 
 TEST(MayahAIPerformanceTest, slow_pattern_from_real_5)
@@ -225,7 +225,25 @@ TEST(MayahAIPerformanceTest, slow_pattern_from_real_5)
                 "BBBRRR");
     KumipuyoSeq seq("GBGBRGBB");
 
-    runTest(3, 2, f, seq);
+    runTest(MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, f, seq);
+}
+
+TEST(MayahAIPerformanceTest, slow_pattern_from_real_6)
+{
+    CoreField cf("    B "
+                 "Y   R "
+                 "Y   G "
+                 "G   BY"
+                 "G   YY"
+                 "G   RB"
+                 "Y   RB"
+                 "BG RBR"
+                 "GG BBR"
+                 "BBBRYY"
+                 "RRRYRR");
+
+    KumipuyoSeq seq("BRGY");
+    runTest(MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, cf, seq);
 }
 
 int main(int argc, char* argv[])
