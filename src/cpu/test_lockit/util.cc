@@ -11,7 +11,7 @@ CoreField toCoreField(int f[6][kHeight]) {
     CoreField cf;
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < kHeight; ++j) {
-            if (f[i][j] == TL_EMPTY)
+            if (f[i][j] == TLColor::EMPTY)
                 break;
             cf.dropPuyoOn(i + 1, toPuyoColor(TLColor(f[i][j])));
         }

@@ -24,19 +24,19 @@ namespace {
 
 bool IsMatchIndexAndColors(int id, int color[]) {
   static const int expect_colors[][2] = {
-    {TL_RED, TL_RED},
-    {TL_RED, TL_BLUE},
-    {TL_RED, TL_YELLOW},
-    {TL_RED, TL_GREEN},
-    {TL_BLUE, TL_BLUE},
-    {TL_BLUE, TL_YELLOW},
-    {TL_BLUE, TL_GREEN},
-    {TL_YELLOW, TL_YELLOW},
-    {TL_YELLOW, TL_GREEN},
-    {TL_GREEN, TL_GREEN},
+    {TLColor::RED, TLColor::RED},
+    {TLColor::RED, TLColor::BLUE},
+    {TLColor::RED, TLColor::YELLOW},
+    {TLColor::RED, TLColor::GREEN},
+    {TLColor::BLUE, TLColor::BLUE},
+    {TLColor::BLUE, TLColor::YELLOW},
+    {TLColor::BLUE, TLColor::GREEN},
+    {TLColor::YELLOW, TLColor::YELLOW},
+    {TLColor::YELLOW, TLColor::GREEN},
+    {TLColor::GREEN, TLColor::GREEN},
   };
 
-  if (color[0] == TL_UNKNOWN || color[1] == TL_UNKNOWN)
+  if (color[0] == TLColor::UNKNOWN || color[1] == TLColor::UNKNOWN)
     return true;
   if (id == 220)
     return true;
@@ -154,7 +154,7 @@ bool COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, in
         for (j = 0; j < 13; j++) {
             int c = ba3[i][j];
             ba[i][j] = c;
-            if (IsColorPuyo(c))
+            if (isNormalTLColor(TLColor(c)))
                 kosuu_mae++;
         }
     }
@@ -180,7 +180,7 @@ bool COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, in
 
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
-            if (IsColorPuyo(ba[i][j]))
+            if (isNormalTLColor(TLColor(ba[i][j])))
                 kosuu_ato++;
         }
     }
@@ -1580,7 +1580,7 @@ bool COMAI_HI::setti_puyo(int ba[][kHeight], int aa, int nx1, int nx2, int setti
         setti_basyo[2] = aa;
         setti_basyo[3] = -1;
         for (int j = 0; j < 13; j++) {
-            if (ba[aa][j] == TL_EMPTY) {
+            if (ba[aa][j] == TLColor::EMPTY) {
                 ba[aa][j] = nx1;
                 ba[aa][j + 1] = nx2;
                 setti_basyo[1] = j;
@@ -1598,7 +1598,7 @@ bool COMAI_HI::setti_puyo(int ba[][kHeight], int aa, int nx1, int nx2, int setti
         setti_basyo[2] = aa - 6;
         setti_basyo[3] = -1;
         for (int j = 0; j < 13; j++) {
-            if (ba[aa - 6][j] == TL_EMPTY) {
+            if (ba[aa - 6][j] == TLColor::EMPTY) {
                 ba[aa - 6][j] = nx2;
                 ba[aa - 6][j + 1] = nx1;
                 setti_basyo[1] = j;
@@ -1616,13 +1616,13 @@ bool COMAI_HI::setti_puyo(int ba[][kHeight], int aa, int nx1, int nx2, int setti
         setti_basyo[2] = aa - 12;
         setti_basyo[3] = -1;
         for (int j = 0; j < 13; j++) {
-            if (ba[aa - 11][j] == TL_EMPTY) {
+            if (ba[aa - 11][j] == TLColor::EMPTY) {
                 setti_basyo[1] = j;
                 break;
             }
         }
         for (int j = 0; j < 13; j++) {
-            if (ba[aa - 12][j] == TL_EMPTY) {
+            if (ba[aa - 12][j] == TLColor::EMPTY) {
                 setti_basyo[3] = j;
                 break;
             }
@@ -1643,13 +1643,13 @@ bool COMAI_HI::setti_puyo(int ba[][kHeight], int aa, int nx1, int nx2, int setti
         setti_basyo[2] = aa - 16;
         setti_basyo[3] = -1;
         for (int j = 0; j < 13; j++) {
-            if (ba[aa - 17][j] == TL_EMPTY) {
+            if (ba[aa - 17][j] == TLColor::EMPTY) {
                 setti_basyo[1] = j;
                 break;
             }
         }
         for (int j = 0; j < 13; j++) {
-            if (ba[aa - 16][j] == TL_EMPTY) {
+            if (ba[aa - 16][j] == TLColor::EMPTY) {
                 setti_basyo[3] = j;
                 break;
             }
@@ -2764,8 +2764,8 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
     nx2 = toValidTLColor(TLColor(tsumo[1]));
     nn1 = toValidTLColor(TLColor(tsumo[2]));
     nn2 = toValidTLColor(TLColor(tsumo[3]));
-    nk1 = TL_RED;
-    nk2 = TL_RED;
+    nk1 = TLColor::RED;
+    nk2 = TLColor::RED;
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
             ba2[i][j] = ba3[i][j];
@@ -3059,57 +3059,49 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
         if ((fast != 0) && (dd < 220))
             continue;
         if (dd < 22) {
-            nk1 = TL_RED;
-            nk2 = TL_RED;
+            nk1 = TLColor::RED;
+            nk2 = TLColor::RED;
         } else if (dd < 22 * 2) {
-            nk1 = TL_RED;
-            nk2 = TL_BLUE;
+            nk1 = TLColor::RED;
+            nk2 = TLColor::BLUE;
         } else if (dd < 22 * 3) {
-            nk1 = TL_RED;
-            nk2 = TL_YELLOW;
+            nk1 = TLColor::RED;
+            nk2 = TLColor::YELLOW;
         } else if (dd < 22 * 4) {
-            nk1 = TL_RED;
-            nk2 = TL_GREEN;
+            nk1 = TLColor::RED;
+            nk2 = TLColor::GREEN;
         } else if (dd < 22 * 5) {
-            nk1 = TL_BLUE;
-            nk2 = TL_BLUE;
+            nk1 = TLColor::BLUE;
+            nk2 = TLColor::BLUE;
         } else if (dd < 22 * 6) {
-            nk1 = TL_BLUE;
-            nk2 = TL_YELLOW;
+            nk1 = TLColor::BLUE;
+            nk2 = TLColor::YELLOW;
         } else if (dd < 22 * 7) {
-            nk1 = TL_BLUE;
-            nk2 = TL_GREEN;
+            nk1 = TLColor::BLUE;
+            nk2 = TLColor::GREEN;
         } else if (dd < 22 * 8) {
-            nk1 = TL_YELLOW;
-            nk2 = TL_YELLOW;
+            nk1 = TLColor::YELLOW;
+            nk2 = TLColor::YELLOW;
         } else if (dd < 22 * 9) {
-            nk1 = TL_YELLOW;
-            nk2 = TL_GREEN;
+            nk1 = TLColor::YELLOW;
+            nk2 = TLColor::GREEN;
         } else if (dd < 22 * 10) {
-            nk1 = TL_GREEN;
-            nk2 = TL_GREEN;
+            nk1 = TLColor::GREEN;
+            nk2 = TLColor::GREEN;
         } else {
-            nk1 = 0;
-            nk2 = 0;
+            nk1 = TLColor::EMPTY;
+            nk2 = TLColor::EMPTY;
         }
 
         // Skip some conditions, assuming same colors
-        if ((nk1 == 1) && (nk2 == 1)) {
-            if (((dd > 5) && (dd < 12)) || ((dd > 13) && (dd < 19)))
-                continue;
-        }
-        if ((nk1 == 2) && (nk2 == 2)) {
-            if (((dd > 5 + 88) && (dd < 12 + 88)) || ((dd > 13 + 88) && (dd < 19 + 88)))
-                continue;
-        }
-        if ((nk1 == 3) && (nk2 == 3)) {
-            if (((dd > 5 + 154) && (dd < 12 + 154)) || ((dd > 13 + 154) && (dd < 19 + 154)))
-                continue;
-        }
-        if ((nk1 == 4) && (nk2 == 4)) {
-            if (((dd > 5 + 198) && (dd < 12 + 198)) || ((dd > 13 + 198) && (dd < 19 + 198)))
-                continue;
-        }
+        if ((dd > 5 && dd < 12) || (dd > 13 && dd < 19))
+            continue;
+        if ((dd > 5 + 88 && dd < 12 + 88) || (dd > 13 + 88 && dd < 19 + 88))
+            continue;
+        if ((dd > 5 + 154 && dd < 12 + 154) || (dd > 13 + 154 && dd < 19 + 154))
+            continue;
+        if ((dd > 5 + 198 && dd < 12 + 198) || (dd > 13 + 198 && dd < 19 + 198))
+            continue;
 
         for (aa = 0; aa < 22; aa++) {
             if (tobashi_hantei_a(ba2, aa, nx1, nx2))

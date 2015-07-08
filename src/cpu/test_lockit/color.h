@@ -8,23 +8,24 @@ namespace test_lockit {
 // PuyoColor for test_lockit. When all puyo color is converted to this enum,
 // the real PuyoColor should be used.
 enum TLColor {
-    TL_EMPTY = 0,
-    TL_RED = 1,
-    TL_BLUE = 2,
-    TL_YELLOW = 3,
-    TL_GREEN = 4,
-    TL_OJAMA = 9,
+    EMPTY = 0,
+    RED = 1,
+    BLUE = 2,
+    YELLOW = 3,
+    GREEN = 4,
+    OJAMA = 9,
 
-    TL_UNKNOWN = 10,
+    // TODO(peria): Drop this item.
+    UNKNOWN = 10,
 };
 
 inline bool isNormalTLColor(TLColor color)
 {
     switch (color) {
-    case TL_RED:
-    case TL_BLUE:
-    case TL_YELLOW:
-    case TL_GREEN:
+    case TLColor::RED:
+    case TLColor::BLUE:
+    case TLColor::YELLOW:
+    case TLColor::GREEN:
         return true;
     default:
         return false;
