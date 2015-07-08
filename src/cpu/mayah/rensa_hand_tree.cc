@@ -312,7 +312,6 @@ int RensaHandTree::eval(const RensaHandTree& myTree,
             }
         }
 
-
         // Choose the best hand.
         return std::max(best, worst);
     }

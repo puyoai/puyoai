@@ -23,6 +23,7 @@
 #include "evaluation_parameter.h"
 #include "gazer.h"
 #include "pattern_rensa_detector.h"
+#include "rensa_hand_tree.h"
 
 using namespace std;
 
@@ -257,18 +258,25 @@ void Evaluator<ScoreCollector>::evalFallenOjama(int fallenOjama)
 
 // Returns true If we don't need to evaluate other features.
 template<typename ScoreCollector>
-bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
+void Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
                                              int currentFrameId,
+                                             int rensaTreeValue,
                                              const PlayerState& me,
                                              const PlayerState& enemy,
                                              const GazeResult& gazeResult,
                                              const MidEvalResult& midEvalResult)
 {
-    if (!plan.isRensaPlan())
-        return false;
+    sc_->addScore(STRATEGY_RENSA_TREE, rensaTreeValue);
+    if (rensaTreeValue < 0)
+        sc_->addScore(STRATEGY_RENSA_TREE_NEGATIVE, rensaTreeValue);
 
+    if (!plan.isRensaPlan())
+        return;
+
+#if 0
     if (plan.fallenOjama() > 0)
-        return false;
+        return;
+#endif
 
     int rensaEndingFrameId = currentFrameId + plan.totalFrames();
     int estimatedMaxScore = gazeResult.estimateMaxScore(rensaEndingFrameId, enemy);
@@ -277,8 +285,8 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
         int h = 12 - enemy.field.height(3);
         if (plan.score() >= estimatedMaxScore + scoreForOjama(6 * h + plan.totalOjama())) {
             sc_->addScore(STRATEGY_KILL, 1);
-            sc_->addScore(STRATEGY_KILL_FRAME, plan.totalFrames());
-            return true;
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
         }
     }
 
@@ -286,28 +294,60 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
     if (!enemy.isRensaOngoing()) {
         if (plan.score() >= estimatedMaxScore + scoreForOjama(60 + plan.totalOjama())) {
             sc_->addScore(STRATEGY_LARGE_ENOUGH, 1.0);
-            return true;
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
         }
     }
 
-    if (enemy.isRensaOngoing() && me.totalOjama(enemy) >= 6) {
+#if 0
+    // TAIOU
+    if (me.totalOjama(enemy) > 0 && rensaTreeValue >= 6) {
+        if (plan.totalOjama() == 0) {
+            sc_->addScore(STRATEGY_TAIOU, 1);
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
+        } else if (plan.totalOjama() < 3) {
+            sc_->addScore(STRATEGY_TAIOU, 0.9);
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
+        }
+    }
+
+    if (me.totalOjama(enemy) >= 9 && rensaTreeValue < 0) {
+        if (plan.totalOjama() == 0) {
+            sc_->addScore(STRATEGY_TAIOU_RELUCTANT, 1);
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
+        } else if (plan.totalOjama() < 3) {
+            sc_->addScore(STRATEGY_TAIOU_RELUCTANT, 0.9);
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
+        }
+    }
+
+#else
+    if (me.totalOjama(enemy) >= 3) {
         if (plan.score() >= scoreForOjama(std::max(0, me.totalOjama(enemy) - 3))) {
             sc_->addScore(STRATEGY_TAIOU, 1.0);
-            return false;
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
         }
     }
 
     if (plan.totalOjama() >= 6) {
         if (plan.score() >= scoreForOjama(std::max(0, plan.totalOjama() - 3))) {
             sc_->addScore(STRATEGY_TAIOU, 0.9);
-            return false;
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
         }
     }
+#endif
 
     if (plan.field().isZenkeshi()) {
         sc_->addScore(STRATEGY_SCORE, plan.score());
         sc_->addScore(STRATEGY_ZENKESHI, 1);
-        return true;
+        // Don't consider frames.
+        return;
     }
 
     // not plan.hasZenekshi, since it's already consumed.
@@ -315,37 +355,19 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
         if (!enemy.isRensaOngoing()) {
             sc_->addScore(STRATEGY_SCORE, plan.score());
             sc_->addScore(STRATEGY_SOLO_ZENKESHI_CONSUME, 1);
-            return false;
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
         }
         if (plan.pendingOjama() + plan.fixedOjama() <= 36) {
             sc_->addScore(STRATEGY_SCORE, plan.score());
             sc_->addScore(STRATEGY_SOLO_ZENKESHI_CONSUME, 1);
-            return false;
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
         }
     }
 
-    if (me.hasZenkeshi && enemy.hasZenkeshi) {
-        sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
-    }
-
-    sc_->addScore(STRATEGY_SCORE, plan.score());
-
-    // If IBARA found, we always consider it.
-    // TODO(mayah): Don't consider IBARA if we don't have enough puyos. Better not to fire IBARA in that case.
-    if (plan.chains() == 1 && plan.score() >= scoreForOjama(10) && plan.totalOjama() <= 10) {
-        sc_->addScore(STRATEGY_IBARA, 1);
-        return false;
-    }
-
-    // If we can send 18>= ojamas, and opponent does not have any hand to cope with it, we can fire it.
-    // TODO(mayah): We need to check if the enemy cannot fire his rensa after ojama is dropped.
-    if (plan.chains() <= 3 && plan.score() >= scoreForOjama(15) &&
-        plan.totalOjama() <= 3 && estimatedMaxScore <= scoreForOjama(12)) {
-        sc_->addScore(STRATEGY_TSUBUSHI, 1);
-        return true;
-    }
-
-    if (plan.chains() == 2 && plan.totalOjama() <= 3 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
+#if 1
+    if (plan.chains() == 2 && plan.totalOjama() <= 3 && midEvalResult.feature(MIDEVAL_ERASE) == 0 && rensaTreeValue > 0) {
         if (plan.score() >= scoreForOjama(24)) {
             sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_2_LARGE, 1);
         } else if (plan.score() >= scoreForOjama(18)) {
@@ -353,10 +375,10 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
         } else if (plan.score() >= scoreForOjama(15)) {
             sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_2_SMALL, 1);
         }
-        return false;
+        return ;
     }
 
-    if (plan.chains() == 3 && plan.totalOjama() == 0 && midEvalResult.feature(MIDEVAL_ERASE) == 0) {
+    if (plan.chains() == 3 && plan.totalOjama() == 0 && midEvalResult.feature(MIDEVAL_ERASE) == 0 && rensaTreeValue > 0) {
         if (plan.score() >= scoreForOjama(30)) {
             sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_3_LARGE, 1);
         } else if (plan.score() >= scoreForOjama(18)) {
@@ -364,7 +386,37 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
         } else if (plan.score() >= scoreForOjama(15)) {
             sc_->addScore(STRATEGY_FIRE_SIDE_CHAIN_3_SMALL, 1);
         }
-        return false;
+        return ;
+    }
+#endif
+
+    // If IBARA found, we always consider it.
+    // TODO(mayah): Don't consider IBARA if we don't have enough puyos. Better not to fire IBARA in that case.
+    if (plan.chains() == 1 && plan.score() >= scoreForOjama(10) && rensaTreeValue >= 10) {
+        sc_->addScore(STRATEGY_IBARA, 1);
+        sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+        return;
+    }
+
+    // TSUBUSHI / SAISOKU
+    if (!enemy.isRensaOngoing()) {
+        if (plan.chains() <= 3 && plan.score() >= scoreForOjama(15) && rensaTreeValue >= 5) {
+            sc_->addScore(STRATEGY_TSUBUSHI, 1);
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
+        }
+
+        if (plan.chains() == 2 && plan.score() >= scoreForOjama(15) && rensaTreeValue >= -5) {
+            sc_->addScore(STRATEGY_TSUBUSHI, 1);
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
+        }
+    }
+
+    if (me.hasZenkeshi && enemy.hasZenkeshi) {
+        sc_->addScore(STRATEGY_ZENKESHI_CONSUME, 1);
+        sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+        return;
     }
 
     sc_->addScore(STRATEGY_SAKIUCHI, 1.0);
@@ -372,7 +424,6 @@ bool Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
     // TODO(mayah): Check land leveling.
     // TODO(mayah): OIUCHI?
     // TODO(mayah): KILL when enemy has a lot of puyos?
-    return false;
 }
 
 template<typename ScoreCollector>
@@ -587,8 +638,6 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                                      bool fast,
                                      const GazeResult& gazeResult)
 {
-    UNUSED_VARIABLE(fast);
-
     typedef typename ScoreCollector::RensaScoreCollector RensaScoreCollector;
     typedef typename RensaScoreCollector::CollectedScore RensaCollectedScore;
 
@@ -600,9 +649,6 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     // We'd like to evaluate frame feature always.
     evalFrameFeature(plan.totalFrames(), plan.numChigiri());
     evalMidEval(midEvalResult);
-
-    if (evalStrategy(plan, currentFrameId, me, enemy, gazeResult, midEvalResult))
-        return;
 
     evalCountPuyoFeature(fieldBeforeRensa);
     evalConnection(fieldBeforeRensa);
@@ -637,6 +683,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         RensaCollectedScore collectedScore;
     } sideRensa;
 
+    RensaHandNodeMaker handTreeMaker(2, restSeq);
     auto evalCallback = [&](const CoreField& fieldAfterRensa,
                             const RensaResult& rensaResult,
                             const ColumnPuyoList& puyosToComplement,
@@ -693,9 +740,20 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
             maxVirtualRensaResultScore = virtualRensaScore;
         }
 
-        if (puyosToComplement.size() <= 2 && rensaResult.chains == 2) {
-            sideChainMaxScore = std::max(sideChainMaxScore, rensaResult.score);
+        if (puyosToComplement.size() <= 1 && rensaResult.chains == 2) {
+            sideChainMaxScore = std::max<int>(sideChainMaxScore, rensaResult.score);
         }
+        if (puyosToComplement.size() <= 2 && rensaResult.chains == 2) {
+            sideChainMaxScore = std::max<int>(sideChainMaxScore, rensaResult.score * 0.9);
+        }
+#if 0
+        if (puyosToComplement.size() <= 3 && rensaResult.chains == 2) {
+            sideChainMaxScore = std::max<int>(sideChainMaxScore, rensaResult.score * 0.8);
+        }
+        if (puyosToComplement.size() <= 4 && rensaResult.chains == 2) {
+            sideChainMaxScore = std::max<int>(sideChainMaxScore, rensaResult.score * 0.75);
+        }
+#endif
 
         int nessesaryPuyos = PuyoPossibility::necessaryPuyos(necessaryPuyoSet, restSeq, 0.5);
         if (nessesaryPuyos <= 6 && fastChain6MaxScore < rensaResult.score) {
@@ -704,14 +762,107 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         if (nessesaryPuyos <= 10 && fastChain10MaxScore < rensaResult.score) {
             fastChain10MaxScore = rensaResult.score;
         }
+
+        // Now, we can simulate complementedField.
+        if (!fast) {
+            handTreeMaker.add(std::move(complementedField), puyosToComplement, 0, PuyoSet());
+        }
     };
 
     PatternRensaDetector detector(patternBook(), fieldBeforeRensa, evalCallback);
     detector.iteratePossibleRensas(preEvalResult.matchablePatternIds(), maxIteration);
 
+    RensaDetector::detectSideChain(fieldBeforeRensa, RensaDetectorStrategy::defaultDropStrategy(),
+                                   [&](CoreField&& cf, const ColumnPuyoList& cpl) {
+        // TODO(mayah): fireColor is not PuyoColor::EMPTY.
+        RensaResult rensaResult = cf.simulate();
+        evalCallback(cf, rensaResult, cpl, PuyoColor::EMPTY, string(), 0.0);
+    });
+
+    int rensaHandValue = 0;
+    if (!fast) {
+        RensaHandTree myRensaTree(vector<RensaHandNode>{ handTreeMaker.makeNode() });
+        // TODO(mayah): num ojama is correct? frame id is correct? not sure...
+        int myOjama = plan.totalOjama();
+        int myOjamaCommittingFrameId = plan.ojamaCommittingFrameId();
+        int enemyOjama = 0;
+        int enemyOjamaCommittingFrameId = 0;
+        if (plan.isRensaPlan()) {
+            int ojama = plan.rensaResult().score / 70;
+            if (me.totalOjama(enemy) - ojama > 0) {
+                myOjama = me.totalOjama(enemy) - ojama;
+                myOjamaCommittingFrameId = plan.ojamaCommittingFrameId();
+                enemyOjama = 0;
+                enemyOjamaCommittingFrameId = 0;
+            } else {
+                int restOjama = ojama - me.totalOjama(enemy);
+                myOjama = 0;
+                myOjamaCommittingFrameId = 0;
+                enemyOjama = enemy.totalOjama(me) + restOjama;
+                if (enemyOjama > 0)
+                    enemyOjamaCommittingFrameId = currentFrameId + plan.totalFrames();
+            }
+        } else {
+            myOjama = plan.totalOjama();
+            if (myOjama > 0)
+                myOjamaCommittingFrameId = plan.ojamaCommittingFrameId();
+            enemyOjama = enemy.totalOjama(me);
+            if (enemyOjama > 0)
+                enemyOjamaCommittingFrameId = currentFrameId;
+        }
+
+        double feasibleBeginTime = currentTime();
+        int feasibleRensaHandValue =
+            RensaHandTree::eval(myRensaTree, currentFrameId + plan.totalFrames(), 0, myOjama, myOjamaCommittingFrameId,
+                                gazeResult.feasibleRensaHandTree(), gazeResult.frameIdToStartNextMove(), 0,
+                                enemyOjama, enemyOjamaCommittingFrameId);
+        double feasibleEndTime = currentTime();
+
+        int possibleBeginTime = currentTime();
+        int possibleRensaHandValue =
+            RensaHandTree::eval(myRensaTree, currentFrameId + plan.totalFrames(), 0, myOjama, myOjamaCommittingFrameId,
+                                gazeResult.possibleRensaHandTree(), gazeResult.frameIdToStartNextMove(), 0, enemyOjama, enemyOjamaCommittingFrameId);
+        int possibleEndTime = currentTime();
+
+        VLOG_IF(1, !sc_->isSimple())
+            << "######################################################################\n"
+            << fieldBeforeRensa.toDebugString()
+            << restSeq.toString();
+
+        VLOG(1) << "RensaHandTree::eval"
+                << " feasible_score=" << feasibleRensaHandValue
+                << " possible_score=" << possibleRensaHandValue
+                << " myFrameId=" << currentFrameId + plan.totalFrames()
+                << " myOjama=" << plan.totalOjama()
+                << " myOjamaCommittingFrameId=" << myOjamaCommittingFrameId
+                << " enemyFrameId=" << gazeResult.frameIdToStartNextMove()
+                << " enemyOjama=" << enemyOjama
+                << " enemyOjamaCommittingFrameId=" << enemyOjamaCommittingFrameId
+                << " feasible_time=" << (1000 * (feasibleEndTime - feasibleBeginTime))
+                << " possible_time=" << (1000 * (possibleEndTime - possibleBeginTime));
+
+        VLOG_IF(1, !sc_->isSimple()) << "RensaHandTree trees:\n"
+            << " feasible_score=" << feasibleRensaHandValue << "\n"
+            << " possible_score=" << possibleRensaHandValue << "\n"
+            << "MyTree:\n"
+            << myRensaTree.toString()
+            << "----------------------------------------------------------------------\n"
+            << "Feasible EnemyTree:\n"
+            << gazeResult.feasibleRensaHandTree().toString()
+            << "----------------------------------------------------------------------\n"
+            << "Possible EnemyTree:\n"
+            << gazeResult.possibleRensaHandTree().toString()
+            << "----------------------------------------------------------------------\n";
+
+        rensaHandValue = std::min(feasibleRensaHandValue, possibleRensaHandValue);
+    }
+
+    evalStrategy(plan, currentFrameId, rensaHandValue, me, enemy, gazeResult, midEvalResult);
+
     // max chain
     sc_->addScore(RENSA_KIND, rensaCounts[maxChain]);
 
+#if 0
     // side chain
     if (sideChainMaxScore >= scoreForOjama(21)) {
         sc_->addScore(HOLDING_SIDE_CHAIN_LARGE, 1);
@@ -720,7 +871,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     } else if (sideChainMaxScore >= scoreForOjama(12)) {
         sc_->addScore(HOLDING_SIDE_CHAIN_SMALL, 1);
     }
+#endif
 
+#if 1
     // fast chain
     if (fastChain6MaxScore >= scoreForOjama(18)) {
         sc_->addScore(KEEP_FAST_6_CHAIN, 1);
@@ -728,6 +881,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     if (fastChain10MaxScore >= scoreForOjama(30)) {
         sc_->addScore(KEEP_FAST_10_CHAIN, 1);
     }
+#endif
 
     // finalize.
     sc_->mergeMainRensaScore(mainRensa.collectedScore);

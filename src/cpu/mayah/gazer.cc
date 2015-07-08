@@ -39,8 +39,6 @@ void GazeResult::reset(int frameIdToStartNextMove, int numReachableSpaces)
 {
     frameIdToStartNextMove_ = frameIdToStartNextMove;
     numReachableSpaces_ = numReachableSpaces;
-    feasibleRensaInfos_.clear();
-    possibleRensaInfos_.clear();
 }
 
 int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
@@ -65,11 +63,41 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
     if (scoreByPossibleRensas >= 0)
         return scoreByPossibleRensas;
 
-    // We cannot estimate the score using feasible rensas and possible rensas.
+    return 0;
+}
+
+int GazeResult::estimateMaxScoreFromFeasibleRensas(int frameId) const
+{
+    if (feasibleRensaHandTree_.nodes().empty())
+        return -1;
 
     int maxScore = -1;
-    for (auto it = possibleRensaInfos_.begin(); it != possibleRensaInfos_.end(); ++it) {
-        int restFrames = frameId - (it->framesToIgnite() + frameIdToStartNextMove());
+    const RensaHandNode& node = feasibleRensaHandTree_.node(0);
+    for (const auto& edge : node.edges()) {
+        if (frameId <= frameIdToStartNextMove() + edge.rensaHand().framesToIgnite()) {
+            maxScore = std::max(maxScore, edge.rensaHand().score());
+        }
+    }
+
+    return maxScore;
+}
+
+int GazeResult::estimateMaxScoreFromPossibleRensas(int frameId) const
+{
+    if (possibleRensaHandTree_.nodes().empty())
+        return -1;
+
+    int maxScore = -1;
+    const RensaHandNode& node = possibleRensaHandTree_.node(0);
+    for (const auto& edge : node.edges()) {
+        int restFrames = frameId - frameIdToStartNextMove() + edge.rensaHand().framesToIgnite();
+        if (restFrames < 0)
+            continue;
+
+        // Fire immediately?
+        maxScore = std::max(maxScore, edge.rensaHand().score());
+
+        // Fire by making this large?
         int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT));
         // At max, enemy will be able ot puyo restEmptyField. We have counted the puyos for possibleRensaInfos,
         // we substract 6 from restEmptyField_.
@@ -78,62 +106,36 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
         // TODO(mayah): newChains should not be negative. restFrames is negative?
         if (newAdditionalChains < 0)
             newAdditionalChains = 0;
-        if (newAdditionalChains + it->chains() > 19)
-            newAdditionalChains = 19 - it->chains();
+        if (newAdditionalChains + edge.rensaHand().chains() > 19)
+            newAdditionalChains = 19 - edge.rensaHand().chains();
 
-        maxScore = std::max(maxScore, it->coefResult.score(newAdditionalChains));
+        maxScore = std::max(maxScore, edge.rensaHand().coefResult.score(newAdditionalChains));
     }
 
-    if (maxScore >= 0)
-        return maxScore;
+    {
+        // When there is not possible rensa.
+        int restFrames = frameId - frameIdToStartNextMove();
+        int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING));
+        numPossiblePuyos = max(0, min(numReachableSpaces_ - 6, numPossiblePuyos));
+        int newChains = min((numPossiblePuyos / 4), 19);
+        // TODO(mayah): newChains should not be negative. restFrames is negative?
+        if (newChains < 0)
+            newChains = 0;
 
-    // When there is not possible rensa.
-    int restFrames = frameId - frameIdToStartNextMove();
-    int numPossiblePuyos = 2 * (restFrames / (FRAMES_TO_DROP_FAST[10] + FRAMES_TO_MOVE_HORIZONTALLY[1] + FRAMES_GROUNDING));
-    numPossiblePuyos = max(0, min(numReachableSpaces_ - 6, numPossiblePuyos));
-    int newChains = min((numPossiblePuyos / 4), 19);
-    // TODO(mayah): newChains should not be negative. restFrames is negative?
-    if (newChains < 0)
-        newChains = 0;
-    return ACCUMULATED_RENSA_SCORE[newChains];
-}
-
-int GazeResult::estimateMaxScoreFromFeasibleRensas(int frameId) const
-{
-    return estimateMaxScoreFrom(frameId, feasibleRensaInfos_);
-}
-
-int GazeResult::estimateMaxScoreFromPossibleRensas(int frameId) const
-{
-    return estimateMaxScoreFrom(frameId, possibleRensaInfos_);
-}
-
-int GazeResult::estimateMaxScoreFrom(int frameId, const vector<RensaHand>& rensaInfos) const
-{
-    if (rensaInfos.empty())
-        return -1;
-
-    if (rensaInfos.back().framesToIgnite() + frameIdToStartNextMove() < frameId)
-        return -1;
-
-    for (auto it = rensaInfos.begin(); it != rensaInfos.end(); ++it) {
-        if (frameId <= it->framesToIgnite() + frameIdToStartNextMove())
-            return it->score();
+        maxScore = std::max(maxScore, ACCUMULATED_RENSA_SCORE[newChains]);
     }
 
-    return -1;
+    return maxScore;
 }
 
 string GazeResult::toRensaInfoString() const
 {
     stringstream ss;
     ss << "next move frameId: " << frameIdToStartNextMove_ << endl;
-    ss << "Possible rensa infos: " << endl;
-    for (const auto& info : possibleRensaInfos_)
-        ss << info.toString() << endl;
-    ss << "Feasible rensa infos: " << endl;
-    for (const auto& info : feasibleRensaInfos_)
-        ss << info.toString() << endl;
+    ss << "FeasibleRensaTree:" << endl;
+    ss << feasibleRensaHandTree_.toString();
+    ss << "PossibleRensaTree:" << endl;
+    ss << possibleRensaHandTree_.toString();
 
     return ss.str();
 }
@@ -147,11 +149,10 @@ void Gazer::initialize(int frameIdGameWillBegin)
 
 void Gazer::gaze(int frameId, const CoreField& originalField, const KumipuyoSeq& kumipuyoSeq)
 {
+    LOG(INFO) << "Gaze: \n" << originalField.toDebugString() << "\nSeq: " << kumipuyoSeq.toString();
+
     int numReachableSpaces = originalField.countConnectedPuyos(3, 12);
     gazeResult_.reset(frameId, numReachableSpaces);
-
-    updateFeasibleRensas(originalField, kumipuyoSeq);
-    updatePossibleRensas(originalField, kumipuyoSeq);
 
     // FeasibleRensaHandTree.
     {
@@ -190,117 +191,9 @@ void Gazer::gaze(int frameId, const CoreField& originalField, const KumipuyoSeq&
     }
 
     // PossibleRensaHandTree.
-    RensaHandTree tree = RensaHandTree::makeTree(3, originalField, PuyoSet(), 0, kumipuyoSeq);
+    // We'd like make the depth 3, but eval() gets really slow (2~3 ms each hand.)
+    RensaHandTree tree = RensaHandTree::makeTree(2, originalField, PuyoSet(), 0, kumipuyoSeq);
     LOG(INFO) << "Possible:" << endl << tree.toString();
 
     gazeResult_.setPossibleRensaHandTree(std::move(tree));
-}
-
-void Gazer::updateFeasibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
-{
-    // It might take long time if size() >= 4. Consider only size <= 3.
-    KumipuyoSeq seq(kumipuyoSeq);
-    if (seq.size() >= 4)
-        seq = seq.subsequence(0, 3);
-
-    std::vector<RensaHand> results;
-    {
-        auto f = [&results](const CoreField& cf, const std::vector<Decision>& /*decisions*/,
-                            int /*numChigiri*/, int framesToIgnite, int lastDropFrames, bool shouldFire) {
-            if (!shouldFire)
-                return;
-
-            CoreField copied(cf);
-            RensaCoefTracker tracker;
-            RensaResult rensaResult = copied.simulate(&tracker);
-            results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite, lastDropFrames), tracker.result());
-        };
-        Plan::iterateAvailablePlansWithoutFiring(field, seq, seq.size(), f);
-
-        if (results.empty())
-            return;
-
-        sort(results.begin(), results.end(), SortByFrames());
-    }
-
-    std::vector<RensaHand> feasibleRensaInfos;
-
-    feasibleRensaInfos.push_back(results.front());
-
-    for (const auto& info : results) {
-        if (info.score() <= feasibleRensaInfos.back().score())
-            continue;
-
-        DCHECK(feasibleRensaInfos.back().framesToIgnite() < info.framesToIgnite())
-            << "feasible frames = " << feasibleRensaInfos.back().framesToIgnite()
-            << " initiating frames = " << info.framesToIgnite()
-            << " score(1) = " << feasibleRensaInfos.back().score()
-            << " score(2) = " << info.score() << endl;
-
-        feasibleRensaInfos.push_back(info);
-    }
-
-    gazeResult_.setFeasibleRensaInfo(std::move(feasibleRensaInfos));
-}
-
-void Gazer::updatePossibleRensas(const CoreField& field, const KumipuyoSeq& kumipuyoSeq)
-{
-    double averageHeight = 0;
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x)
-        averageHeight += field.height(x) / 6.0;
-
-    vector<RensaHand> results;
-    {
-        results.reserve(20000);
-        auto simulationCallback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
-            RensaCoefTracker tracker;
-            RensaResult rensaResult = cf.simulate(&tracker);
-
-            // Ignore rensa whose power is really small.
-            if (rensaResult.score < 70)
-                return rensaResult;
-
-            PuyoSet puyoSet;
-            puyoSet.add(puyosToComplement);
-            int necessaryPuyos = PuyoPossibility::necessaryPuyos(puyoSet, kumipuyoSeq, 0.3);
-            int necessaryHands = (necessaryPuyos + 1) / 2;
-
-            // We need to remove last hand frames, since we'd like to calculate framesToIgnite.
-            if (necessaryHands > 0)
-                --necessaryHands;
-
-            // Estimate the number of frames to initiate the rensa.
-            int heightMove = std::max(0, static_cast<int>(std::ceil(FieldConstant::HEIGHT - averageHeight)));
-            const int oneHandFrame = FRAMES_TO_DROP_FAST[heightMove] + FRAMES_GROUNDING + FRAMES_PREPARING_NEXT;
-            int framesToIgnite = oneHandFrame * necessaryHands;
-            results.emplace_back(IgnitionRensaResult(rensaResult, framesToIgnite, oneHandFrame), tracker.result());
-
-            return rensaResult;
-        };
-
-        auto complementCallback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) {
-            (void)simulationCallback(std::move(cf), puyosToComplement);
-        };
-
-        RensaDetector::detectIteratively(field, RensaDetectorStrategy::defaultFloatStrategy(), 3, simulationCallback);
-        RensaDetector::detectSideChain(field, RensaDetectorStrategy::defaultFloatStrategy(), complementCallback);
-
-        if (results.empty())
-            return;
-
-        sort(results.begin(), results.end(), SortByFrames());
-    }
-
-    vector<RensaHand> possibleRensaInfos;
-    possibleRensaInfos.push_back(results.front());
-
-    for (const auto& info : results) {
-        if (info.score() <= possibleRensaInfos.back().score())
-            continue;
-
-        DCHECK(possibleRensaInfos.back().framesToIgnite() < info.framesToIgnite());
-        possibleRensaInfos.push_back(info);
-    }
-
-    gazeResult_.setPossibleRensaInfo(std::move(possibleRensaInfos));
 }

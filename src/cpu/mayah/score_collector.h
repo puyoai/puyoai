@@ -62,6 +62,8 @@ public:
     {
     }
 
+    bool isSimple() const { return true; }
+
     void addScore(EvaluationMoveFeatureKey key, double v)
     {
         for (const auto& mode : ALL_EVALUATION_MODES) {
@@ -167,6 +169,8 @@ public:
     typedef FeatureRensaScoreCollector RensaScoreCollector;
 
     explicit FeatureScoreCollector(const EvaluationParameterMap& paramMap) : paramMap_(paramMap) {}
+
+    bool isSimple() const { return false; }
 
     void addScore(EvaluationMoveFeatureKey key, double v)
     {

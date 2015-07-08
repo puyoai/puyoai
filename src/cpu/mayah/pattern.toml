@@ -261,7 +261,7 @@ field = [
     "......",
 ]
 ignition = 2
-score = 8.0
+score = 6.0
 
 [[pattern]]
 field = [
@@ -276,7 +276,7 @@ field = [
     "......",
 ]
 ignition = 2
-score = 9.0
+score = 6.0
 
 [[pattern]]
 field = [
@@ -291,7 +291,7 @@ field = [
     "......",
 ]
 ignition = 2
-score = 8.0
+score = 6.0
 
 [[pattern]]
 field = [
@@ -761,7 +761,7 @@ field = [
     "..ACCB",
 ]
 ignition = 3
-score = 9.4
+score = 6.0
 
 [[pattern]]
 field = [
@@ -771,7 +771,7 @@ field = [
     "..CCCB",
 ]
 ignition = 3
-score = 9.5
+score = 6.0
 
 [[pattern]]
 field = [
@@ -781,7 +781,7 @@ field = [
     "..BBBC",
 ]
 ignition = 3
-score = 9.5
+score = 6.0
 
 [[pattern]]
 field = [
@@ -791,7 +791,7 @@ field = [
     "...ACB",
 ]
 ignition = 3
-score = 9.5
+score = 6.0
 
 [[pattern]]
 field = [
@@ -802,7 +802,7 @@ field = [
     "...ACB",
 ]
 ignition = 3
-score = 9.5
+score = 6.0
 
 [[pattern]]
 field = [
@@ -812,7 +812,7 @@ field = [
     "...AAB",
 ]
 ignition = 3
-score = 8.5
+score = 6.0
 
 [[pattern]]
 field = [
@@ -822,7 +822,7 @@ field = [
     "..AAAB",
 ]
 ignition = 3
-score = 8.0
+score = 6.0
 
 [[pattern]]
 field = [
@@ -847,7 +847,7 @@ field = [
     "...BBA",
     "...AAA",
 ]
-score = 4.0
+score = 0.0
 
 [[pattern]]
 field = [
@@ -857,7 +857,7 @@ field = [
     "...BAB",
     "...AAA",
 ]
-score = 4.0
+score = 0.0
 
 [[pattern]]
 field = [
@@ -867,7 +867,7 @@ field = [
     "...CAB",
     "...AAA",
 ]
-score = 4.0
+score = 0.0
 
 [[pattern]]
 field = [
@@ -878,7 +878,7 @@ field = [
     "...CBA",
     "...BAA",
 ]
-score = 4.0
+score = 0.0
 
 [[pattern]]
 field = [

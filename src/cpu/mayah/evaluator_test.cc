@@ -166,25 +166,6 @@ TEST_F(EvaluatorTest, connectionHorizontal)
     EXPECT_EQ(1, cfs.moveScore.feature(CONNECTION_HORIZONTAL_CROSSED_3));
 }
 
-
-TEST_F(EvaluatorTest, sideChain)
-{
-    CoreField f(
-        ".R...."
-        "RB...."
-        "RB...."
-        "RB...."
-        "BR...."
-        "BR...."
-        "BRGYG."
-        "RGYGB."
-        "RGYGB."
-        "RGYGB.");
-
-    CollectedFeatureScore cfs = eval(f, 1);
-    EXPECT_EQ(1.0, cfs.moveScore.feature(HOLDING_SIDE_CHAIN_MEDIUM));
-}
-
 TEST_F(EvaluatorTest, DontCrash1)
 {
     CoreField f(
