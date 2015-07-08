@@ -20,7 +20,6 @@
 DEFINE_string(feature, "feature.toml", "the path to feature parameter");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
-DEFINE_bool(use_advanced_next, false, "Use enemy's NEXT sequence also");
 
 using namespace std;
 
@@ -28,7 +27,7 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
     AI(argc, argv, "mayah"),
     executor_(executor)
 {
-    setBehaviorRethinkAfterOpponentRensa(true);
+    // setBehaviorRethinkAfterOpponentRensa(true);
 
     loadEvaluationParameter();
     CHECK(decisionBook_.load(FLAGS_decision_book));
@@ -69,14 +68,6 @@ DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& 
     if (fast) {
       depth = MayahAI::FAST_DEPTH;
       iteration = MayahAI::FAST_NUM_ITERATION;
-    } else if (FLAGS_use_advanced_next) {
-        if (kumipuyoSeq.size() >= 3) {
-            depth = DEEP_DEPTH;
-            iteration = DEEP_NUM_ITERATION;
-        } else {
-            depth = MayahAI::DEFAULT_DEPTH;
-            iteration = MayahAI::DEFAULT_NUM_ITERATION;
-        }
     } else {
         depth = MayahAI::DEFAULT_DEPTH;
         iteration = MayahAI::DEFAULT_NUM_ITERATION;
@@ -108,10 +99,10 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                 << "think frameId = " << frameId << endl
                 << "my ojama: fixed=" << me.fixedOjama << " pending=" << me.pendingOjama
                 << " total=" << me.totalOjama(enemy) << endl
-                << "enemy ojama: fixed = " << enemy.fixedOjama << " pending = " << enemy.pendingOjama
+                << "enemy ojama: fixed=" << enemy.fixedOjama << " pending=" << enemy.pendingOjama
                 << " total=" << enemy.totalOjama(me) << endl
                 << "enemy rensa: ending = " << (enemy.isRensaOngoing() ? enemy.rensaFinishingFrameId() : 0) << endl
-                << gazer_.gazeResult().toRensaInfoString()
+                << "enemy gaze result: " << gazer_.gazeResult().toRensaInfoString()
                 << "----------------------------------------------------------------------" << endl;
     }
 
@@ -128,7 +119,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
         }
     }
 
-    const GazeResult gazeResult = gazer_.gazeResult();
+    const GazeResult& gazeResult = gazer_.gazeResult();
 
     // Before evaling, check Book.
     const PreEvalResult preEvalResult = preEval(field);
@@ -148,7 +139,46 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     mutex mu;
     auto evalRefPlan = [&, this, frameId, maxIteration](const RefPlan& plan, const MidEvalResult& midEvalResult) {
-        EvalResult evalResult = eval(plan, kumipuyoSeq.subsequence(plan.decisions().size()), frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
+        KumipuyoSeq restSeq(kumipuyoSeq.subsequence(plan.decisions().size()));
+        // Here, we iterate enemy's possible rensa.
+        EvalResult evalResult = eval(plan, restSeq, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
+        Plan evaledPlan = plan.toPlan();
+
+        // Hmm, it looks weaker if we search this...
+#if 0
+        if (!gazeResult.feasibleRensaHandTree().nodes().empty()) {
+            const RensaHandNode& node = gazeResult.feasibleRensaHandTree().node(0);
+            for (const auto& edge : node.edges()) {
+                int frameIdRensaFinished = gazeResult.frameIdToStartNextMove() + edge.rensaHand().totalFrames();
+                if (plan.framesToIgnite() < frameIdRensaFinished)
+                    continue;
+
+                int numOjama = edge.rensaHand().score() / 70;
+                numOjama -= enemy.totalOjama(me);
+                if (numOjama < 0)
+                    continue;
+
+                int lines = std::min(5, (me.totalOjama(enemy) + numOjama + 4) / 6);
+                if (lines == 0)
+                    continue;
+
+                // TODO(mayah): p must be more correct.
+                // When enemy has ZENKESHI, p should consider it.
+                // Enemy PlayerState should also be updated.
+
+                Plan p = plan.toPlan();
+                int ojamaFrames = p.mutableField()->fallOjama(lines);
+                p.setLastDropFrames(p.lastDropFrames() + ojamaFrames);
+
+                // TODO(mayah): Instead of gazeResult, we need to use edge.tree().
+                EvalResult result = eval(RefPlan(p), restSeq, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
+                if (result.score() < evalResult.score()) {
+                    evalResult = result;
+                    evaledPlan = p;
+                }
+            }
+        }
+#endif
 
         VLOG(1) << toString(plan.decisions())
                 << ": eval=" << evalResult.score()
@@ -157,12 +187,12 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
         lock_guard<mutex> lock(mu);
 
-        if (plan.fallenOjama() > 0)
+        if (evaledPlan.fallenOjama() > 0)
             ojamaFallen = true;
 
         if (bestScore < evalResult.score()) {
             bestScore = evalResult.score();
-            bestPlan = plan.toPlan();
+            bestPlan = evaledPlan;
             bestMidEvalResult = midEvalResult;
         }
 
@@ -170,10 +200,10 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
             bestVirtualRensaScore = evalResult.maxVirtualScore();
         }
 
-        if (bestRensaScore < plan.score() || (bestRensaScore == plan.score() && bestRensaFrames > plan.totalFrames())) {
-            bestRensaScore = plan.score();
-            bestRensaFrames = plan.totalFrames();
-            bestRensaPlan = plan.toPlan();
+        if (bestRensaScore < evaledPlan.score() || (bestRensaScore == evaledPlan.score() && bestRensaFrames > evaledPlan.totalFrames())) {
+            bestRensaScore = evaledPlan.score();
+            bestRensaFrames = evaledPlan.totalFrames();
+            bestRensaPlan = evaledPlan;
             bestRensaMidEvalResult = midEvalResult;
         }
     };
@@ -312,6 +342,8 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
     }
     if (cf.moveScore().feature(STRATEGY_TAIOU) > 0)
         ss << "TAIOU / ";
+    if (cf.moveScore().feature(STRATEGY_TAIOU_RELUCTANT) > 0)
+        ss << "TAIOU (RELUCTANT) / ";
     if (cf.moveScore().feature(STRATEGY_LARGE_ENOUGH) > 0)
         ss << "LARGE_ENOUGH / ";
     if (cf.moveScore().feature(STRATEGY_TSUBUSHI) > 0)
@@ -360,10 +392,12 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
         ss << "FAST6=NG / ";
     }
     if (cf.moveScore().feature(KEEP_FAST_10_CHAIN) > 0) {
-        ss << "FAST10=OK";
+        ss << "FAST10=OK / ";
     } else {
-        ss << "FAST10=NG";
+        ss << "FAST10=NG / ";
     }
+
+    ss << "HAND_TREE=" << cf.moveScore().feature(STRATEGY_RENSA_TREE);
 
     ss << "\n";
 

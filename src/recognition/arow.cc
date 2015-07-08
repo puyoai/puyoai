@@ -15,7 +15,7 @@ Arow::Arow()
 double Arow::margin(const vector<double>& features) const
 {
     double result = 0.0;
-    for (int i = 0; i < SIZE; ++i) {
+    for (size_t i = 0; i < SIZE; ++i) {
         result += mean[i] * features[i];
     }
     return result;
@@ -24,7 +24,7 @@ double Arow::margin(const vector<double>& features) const
 double Arow::margin(const double features[SIZE]) const
 {
     double result = 0.0;
-    for (int i = 0; i < SIZE; ++i) {
+    for (size_t i = 0; i < SIZE; ++i) {
         result += mean[i] * features[i];
     }
     return result;
@@ -33,7 +33,7 @@ double Arow::margin(const double features[SIZE]) const
 double Arow::confidence(const vector<double>& features) const
 {
     double result = 0.0;
-    for (int i = 0; i < SIZE; ++i) {
+    for (size_t i = 0; i < SIZE; ++i) {
         result += cov[i] * features[i] * features[i];
     }
     return result;
@@ -51,12 +51,12 @@ int Arow::update(const vector<double>& features, int label)
     double alpha = (1.0 - label * m) * beta;
 
     // update mean
-    for (int i = 0; i < SIZE; ++i) {
+    for (size_t i = 0; i < SIZE; ++i) {
         mean[i] += alpha * label * cov[i] * features[i];
     }
 
     // update covariance
-    for (int i = 0; i < SIZE; ++i) {
+    for (size_t i = 0; i < SIZE; ++i) {
         cov[i] = 1.0 / ((1.0 / cov[i]) + features[i] * features[i] / RATE);
     }
 

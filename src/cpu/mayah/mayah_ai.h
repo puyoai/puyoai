@@ -39,8 +39,6 @@ class MayahAI : public AI {
 public:
     static const int DEFAULT_DEPTH = 2;
     static const int DEFAULT_NUM_ITERATION = 3;
-    static const int DEEP_DEPTH = 3;
-    static const int DEEP_NUM_ITERATION = 2;
     static const int FAST_DEPTH = 2;
     static const int FAST_NUM_ITERATION = 2;
 

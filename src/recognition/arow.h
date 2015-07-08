@@ -8,7 +8,7 @@
 
 class Arow {
 public:
-    static const int SIZE = 16 * 16 * 3;
+    static const size_t SIZE = 16 * 16 * 3;
     static constexpr double RATE = 0.1;
 
     Arow();

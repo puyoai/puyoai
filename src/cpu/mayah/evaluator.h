@@ -130,7 +130,7 @@ public:
 
     // ----------------------------------------------------------------------
 
-    bool evalStrategy(const RefPlan&, int currentFrameId,
+    void evalStrategy(const RefPlan&, int currentFrameId, int rensaTreeValue,
                       const PlayerState& me, const PlayerState& enemy, const GazeResult&,
                       const MidEvalResult&);
 
