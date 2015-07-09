@@ -1388,69 +1388,6 @@ int COMAI_HI::syou_down_num(int ba[][kHeight], int x, int y, int incol, int flg[
     return 0;
 }
 
-int COMAI_HI::saiki_3(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
-{
-    point[x][y] = 1;
-    *num += 1;
-    if ((x != 0) && (incol == ba[x - 1][y]) && (point[x - 1][y] != 1))
-        saiki_3_left(ba, point, x - 1, y, num, incol);
-    if ((y != 11) && (incol == ba[x][y + 1]) && (point[x][y + 1] != 1))
-        saiki_3_up(ba, point, x, y + 1, num, incol);
-    if ((x != 5) && (incol == ba[x + 1][y]) && (point[x + 1][y] != 1))
-        saiki_3_right(ba, point, x + 1, y, num, incol);
-    if ((y != 0) && (incol == ba[x][y - 1]) && (point[x][y - 1] != 1))
-        saiki_3_down(ba, point, x, y - 1, num, incol);
-    return 0;
-}
-int COMAI_HI::saiki_3_right(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
-{
-    point[x][y] = 1;
-    *num += 1;
-    if ((y != 11) && (incol == ba[x][y + 1]) && (point[x][y + 1] != 1))
-        saiki_3_up(ba, point, x, y + 1, num, incol);
-    if ((x != 5) && (incol == ba[x + 1][y]) && (point[x + 1][y] != 1))
-        saiki_3_right(ba, point, x + 1, y, num, incol);
-    if ((y != 0) && (incol == ba[x][y - 1]) && (point[x][y - 1] != 1))
-        saiki_3_down(ba, point, x, y - 1, num, incol);
-    return 0;
-}
-int COMAI_HI::saiki_3_left(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
-{
-    point[x][y] = 1;
-    *num += 1;
-    if ((x != 0) && (incol == ba[x - 1][y]) && (point[x - 1][y] != 1))
-        saiki_3_left(ba, point, x - 1, y, num, incol);
-    if ((y != 11) && (incol == ba[x][y + 1]) && (point[x][y + 1] != 1))
-        saiki_3_up(ba, point, x, y + 1, num, incol);
-    if ((y != 0) && (incol == ba[x][y - 1]) && (point[x][y - 1] != 1))
-        saiki_3_down(ba, point, x, y - 1, num, incol);
-    return 0;
-}
-int COMAI_HI::saiki_3_up(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
-{
-    point[x][y] = 1;
-    *num += 1;
-    if ((x != 0) && (incol == ba[x - 1][y]) && (point[x - 1][y] != 1))
-        saiki_3_left(ba, point, x - 1, y, num, incol);
-    if ((y != 11) && (incol == ba[x][y + 1]) && (point[x][y + 1] != 1))
-        saiki_3_up(ba, point, x, y + 1, num, incol);
-    if ((x != 5) && (incol == ba[x + 1][y]) && (point[x + 1][y] != 1))
-        saiki_3_right(ba, point, x + 1, y, num, incol);
-    return 0;
-}
-int COMAI_HI::saiki_3_down(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
-{
-    point[x][y] = 1;
-    *num += 1;
-    if ((x != 0) && (incol == ba[x - 1][y]) && (point[x - 1][y] != 1))
-        saiki_3_left(ba, point, x - 1, y, num, incol);
-    if ((x != 5) && (incol == ba[x + 1][y]) && (point[x + 1][y] != 1))
-        saiki_3_right(ba, point, x + 1, y, num, incol);
-    if ((y != 0) && (incol == ba[x][y - 1]) && (point[x][y - 1] != 1))
-        saiki_3_down(ba, point, x, y - 1, num, incol);
-    return 0;
-}
-
 int COMAI_HI::syou_2(int ba[][kHeight], int x, int y, int incol)
 {
     ba[x][y] = 0;
@@ -1912,25 +1849,6 @@ int COMAI_HI::setti_puyo_1(int ba[][kHeight], int eex, int eecol)
     if (num > 3)
         return 1;
 
-    return 0;
-}
-int COMAI_HI::saiki_4(int ba[][kHeight], int x, int y, int* num, int incol)
-{
-    ba[x][y] = 0;
-    *num += 1;
-    if (*num > 3) {
-        ba[x][y] = incol;
-        return 0;
-    }
-    if ((x != 0) && (incol == ba[x - 1][y]))
-        saiki_4(ba, x - 1, y, num, incol);
-    if ((y != 11) && (incol == ba[x][y + 1]))
-        saiki_4(ba, x, y + 1, num, incol);
-    if ((x != 5) && (incol == ba[x + 1][y]))
-        saiki_4(ba, x + 1, y, num, incol);
-    if ((y != 0) && (incol == ba[x][y - 1]))
-        saiki_4(ba, x, y - 1, num, incol);
-    ba[x][y] = incol;
     return 0;
 }
 
