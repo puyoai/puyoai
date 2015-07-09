@@ -1163,15 +1163,9 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
         }
     }
 
+    static const int bias[] = {4,4,4,4,4,4, 3,3,3,3,3,3, 2,2,2,2,2, 1,1,1,1,1};
     for (aa = 0; aa < 22; aa++) {
-        if (aa < 6)
-            m_para[aa] = hym[aa] * 10 + 4;
-        else if (aa < 12)
-            m_para[aa + 5] = hym[aa] * 10 + 3;
-        else if (aa < 17)
-            m_para[aa + 5] = hym[aa] * 10 + 2;
-        else if (aa < 22)
-            m_para[aa - 11] = hym[aa] * 10 + 1;
+        m_para[aa] = hym[aa] * 10 + bias[aa];
     }
     return 0;
 }
