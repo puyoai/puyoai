@@ -50,14 +50,6 @@ public:
     int aite_hakkaji_score;
 
 private:
-    int saiki_3(const int[][kHeight], int[][12], int, int, int*, int);
-    int saiki_3_right(const int[][kHeight], int[][12], int, int, int*, int);
-    int saiki_3_left(const int[][kHeight], int[][12], int, int, int*, int);
-    int saiki_3_up(const int[][kHeight], int[][12], int, int, int*, int);
-    int saiki_3_down(const int[][kHeight], int[][12], int, int, int*, int);
-
-    int saiki_4(int[][kHeight], int, int, int*, int);
-
     int syou(int[][kHeight], int, int, int, int[]);
     int syou_right(int[][kHeight], int, int, int, int[]);
     int syou_left(int[][kHeight], int, int, int, int[]);
