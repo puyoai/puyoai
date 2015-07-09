@@ -93,57 +93,60 @@ private:
 
     int read_template();
 
-    int cchai;
-    int conaa, nexaa;
-    int maxchais;
-    int aite_rensa_score; // aite
-    int aite_rensa_score_cc; // aite
-    int myf_kosuu;
-    int saisoku_flag;
-    int aite_hakka_rensa;
-    int aite_hakka_zenkesi;
-    int aite_hakka_kosuu;
-    int nocc_aite_rensa_score;
-    int max_ee;
-    int key_ee;
+    int m_cchai;
+    int m_conaa;
+    int m_nexaa;
+    int m_maxchais;
+    int m_aite_rensa_score; // aite
+    int m_aite_rensa_score_cc; // aite
+    int m_myf_kosuu;
+    int m_saisoku_flag;
+    int m_aite_hakka_rensa;
+    int m_aite_hakka_zenkesi;
+    int m_aite_hakka_kosuu;
+    int m_nocc_aite_rensa_score;
+    int m_max_ee;
+    int m_key_ee;
 
-    int aite_hakka_jamako;
-    int aite_hakka_honsen;
-    int aite_hakka_quick;
-    int moni_kesiko[3];
-    int moni_iroko[3];
-    int aite_puyo_uki;
-    int kuraichk_mon;
-    int score_mon;
-    int tesuu_mon;
-    int kougeki_on;
-    int kougeki_edge;
-    int kougeki_iryoku;
+    int m_aite_hakka_jamako;
+    int m_aite_hakka_honsen;
+    int m_aite_hakka_quick;
+    int m_moni_kesiko[3];
+    int m_moni_iroko[3];
+    int m_aite_puyo_uki;
+    int m_kuraichk_mon;
+    int m_score_mon;
+    int m_tesuu_mon;
+    int m_kougeki_on;
+    int m_kougeki_edge;
+    int m_kougeki_iryoku;
 
-    int numg;
-    int katax[TM_TMNMUM][TM_COLNUM][TM_COLPER];
-    int katay[TM_TMNMUM][TM_COLNUM][TM_COLPER];
-    int kko[TM_TMNMUM][TM_COLNUM];
-    int colko[TM_TMNMUM];
-    int colscore[TM_TMNMUM][TM_COLNUM];
-    int kinko[TM_TMNMUM];
-    int kinsi_a[TM_TMNMUM][TM_KINPT], kinsi_b[TM_TMNMUM][TM_KINPT];
-    int jakkinko[TM_TMNMUM];
-    int jakkin_a[TM_TMNMUM][TM_JAKKINPT], jakkin_b[TM_TMNMUM][TM_JAKKINPT];
-    int tankinx[TM_TMNMUM][TM_TANKINPT];
-    int tankiny[TM_TMNMUM][TM_TANKINPT];
-    int tankinko[TM_TMNMUM];
-    int jatax[TM_TMNMUM][TM_OBJE];
-    int jatay[TM_TMNMUM][TM_OBJE];
-    int jatako[TM_TMNMUM];
-    int tm_turn[TM_TMNMUM];
-    int tm_moni;
-    int one_tanpatu;
-    int score_max;
-    int mmmax;
-    int score_aa;
-    int aa_max_score;
-    int hakkatime;
+    int m_numg;
+    int m_katax[TM_TMNMUM][TM_COLNUM][TM_COLPER];
+    int m_katay[TM_TMNMUM][TM_COLNUM][TM_COLPER];
+    int m_kko[TM_TMNMUM][TM_COLNUM];
+    int m_colko[TM_TMNMUM];
+    int m_colscore[TM_TMNMUM][TM_COLNUM];
+    int m_kinko[TM_TMNMUM];
+    int m_kinsi_a[TM_TMNMUM][TM_KINPT];
+    int m_kinsi_b[TM_TMNMUM][TM_KINPT];
+    int m_jakkinko[TM_TMNMUM];
+    int m_jakkin_a[TM_TMNMUM][TM_JAKKINPT];
+    int m_jakkin_b[TM_TMNMUM][TM_JAKKINPT];
+    int m_tankinx[TM_TMNMUM][TM_TANKINPT];
+    int m_tankiny[TM_TMNMUM][TM_TANKINPT];
+    int m_tankinko[TM_TMNMUM];
+    int m_jatax[TM_TMNMUM][TM_OBJE];
+    int m_jatay[TM_TMNMUM][TM_OBJE];
+    int m_jatako[TM_TMNMUM];
+    int m_tm_turn[TM_TMNMUM];
+    int m_tm_moni;
+    int m_one_tanpatu;
+    int m_score_max;
+    int m_mmmax;
+    int m_score_aa;
+    int m_aa_max_score;
+    int m_hakkatime;
 };
 
 }  // namespace test_lockit
