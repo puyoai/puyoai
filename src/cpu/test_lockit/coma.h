@@ -37,17 +37,17 @@ public:
     void ref();
 
     // Index of TSUMOs in the game.
-    int hukks;
+    int m_hukks;
 
     // ???
-    int para[22];
+    int m_para[22];
 
     // Enemy's running rensa will end in |aite_hakka_nokori| rensas.
     // NOTE: Estimation of this value seems wrong.
-    int aite_hakka_nokori;
+    int m_aite_hakka_nokori;
 
     // ???
-    int aite_hakkaji_score;
+    int m_aite_hakkaji_score;
 
 private:
     int saiki(const int[][kHeight], int[][12], int, int, int*, int);
