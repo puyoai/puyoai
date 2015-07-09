@@ -238,15 +238,15 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         if (tmp < 6) {
             r_player[0].te_x = tmp + 1;
             r_player[0].te_r = 0;
-        } else if (tmp < 11) {
-            r_player[0].te_x = tmp - 5;
-            r_player[0].te_r = 1;
-        } else if (tmp < 17) {
-            r_player[0].te_x = tmp - 10;
+        } else if (tmp < 12) {
+            r_player[0].te_x = tmp - 6 + 1;
             r_player[0].te_r = 2;
-        } else if (tmp < 22) {
-            r_player[0].te_x = tmp - 15;
+        } else if (tmp < 17) {
+            r_player[0].te_x = tmp - 12 + 1;
             r_player[0].te_r = 3;
+        } else if (tmp < 22) {
+            r_player[0].te_x = tmp - 17 + 1;
+            r_player[0].te_r = 1;
         }
         if (r_player[0].setti_puyo()) {
             r_player[0].zenkesi = 0;
