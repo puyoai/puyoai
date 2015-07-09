@@ -117,7 +117,7 @@ FrameResponse sendmes(READ_P* p1, COMAI_HI* coo)
     stringstream ss;
     ss << "you="
        << "x-r:" << p1->te_x << p1->te_r << " "
-       << "nok:" << coo->aite_hakka_nokori;
+       << "nok:" << coo->m_aite_hakka_nokori;
 
     return FrameResponse(p1->id, Decision(p1->te_x, p1->te_r), ss.str());
 }
@@ -154,7 +154,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         r_player[1].set_puyo_once = 1;
         r_player[1].fall();
         r_player[1].keep_score = r_player[1].score;
-        if (coma.aite_attack_start(r_player[1].field, r_player[1].zenkesi, coma.aite_hakkaji_score, r_player[0].id)) {
+        if (coma.aite_attack_start(r_player[1].field, r_player[1].zenkesi, coma.m_aite_hakkaji_score, r_player[0].id)) {
             r_player[1].zenkesi = 0;
         }
     }
@@ -184,7 +184,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
     if (r_player[0].act_on == 1 && r_player[0].set_puyo_once == 1) {
         r_player[0].set_puyo_once = 0;
         r_player[0].setti_12();
-        if (coma.hukks == 0 || r_player[0].field_hikaku() > 0) { // 開幕のhukks==0では思考を短くする？
+        if (coma.m_hukks == 0 || r_player[0].field_hikaku() > 0) { // 開幕のm_hukks==0では思考を短くする？
             coma.pre_hyouka(r_player[0].field, r_player[0].tsumo, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi, 1);
         }
         coma.aite_attack_nokori(r_player[1].field, r_player[0].id); // 情報が更新されないため、現構成ではうまく機能しない
@@ -218,13 +218,13 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         tmp = 0;
         r_player[0].te_x = 0;
         r_player[0].te_r = 0;
-        saidaiten = coma.para[0];
+        saidaiten = coma.m_para[0];
 
         for (int i = 0; i < 22; i++) {
             if ((field_kosuu>24) && (field_kosuu<56)){
-                coma2x_sc[i] = coma2x.para[i] + coma.para[i];
+                coma2x_sc[i] = coma2x.m_para[i] + coma.m_para[i];
             } else {
-                coma2x_sc[i] = coma.para[i];
+                coma2x_sc[i] = coma.m_para[i];
             }
         }
         saidaiten = coma2x_sc[0];
@@ -255,10 +255,10 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
     } // p1 act_once
 
     if (r_player[0].nex_on == 1) { // 事前手決めスタート
-        if (coma.hukks != 0) {
+        if (coma.m_hukks != 0) {
             coma.pre_hyouka(r_player[0].yosou_field, r_player[0].tsumo + 2, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi, 0);
         }
-    } // 開幕のhukks==0はこちらはひっかからない？
+    } // 開幕のm_hukks==0はこちらはひっかからない？
 
     return response;
 }
