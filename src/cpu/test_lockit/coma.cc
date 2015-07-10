@@ -1281,24 +1281,9 @@ int COMAI_HI::syou_down(int ba[][kHeight], int x, int y, int incol, int flg[])
 int COMAI_HI::syou_downx(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
 {
     *num += 1;
-    if ((x != 0) && (ba[x - 1][y] == incol))
-        syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == 6)) {
-        ba[x - 1][y] = 0;
-        flg[x - 1] = 1;
-    }
-    if ((x != 5) && (ba[x + 1][y] == incol))
-        syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == 6)) {
-        ba[x + 1][y] = 0;
-        flg[x + 1] = 1;
-    }
-    if ((y != 0) && (ba[x][y - 1] == incol))
-        syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == 6))
-        ba[x][y - 1] = 0;
-    return 0;
+    return syou_down_num(ba, x, y, incol, flg, num);
 }
+
 int COMAI_HI::syou_right_num(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
 {
     ba[x][y] = 0;
