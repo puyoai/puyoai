@@ -11,6 +11,8 @@ void saiki(const int field[][kHeight], int point[][12], int x, int y, int* num, 
 void saiki_3(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol);
 void saiki_4(int ba[][kHeight], int x, int y, int* num, int incol);
 
+void syou(int ba[][kHeight], int x, int y, int incol, int flg[]);
+
 }  // namespace test_lockit
 
 #endif  // CPU_TEST_LOCKIT_FIELD_H_
