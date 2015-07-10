@@ -35,17 +35,6 @@ public:
 private:
     int chousei_syoukyo();
 
-    int saiki(int[][kHeight], int[][12], int, int, int*, int);
-    int saiki_right(int[][kHeight], int[][12], int, int, int*, int);
-    int saiki_left(int[][kHeight], int[][12], int, int, int*, int);
-    int saiki_up(int[][kHeight], int[][12], int, int, int*, int);
-    int saiki_down(int[][kHeight], int[][12], int, int, int*, int);
-    int syou(int[][kHeight], int, int, int, int[]);
-    int syou_right(int[][kHeight], int, int, int, int[]);
-    int syou_left(int[][kHeight], int, int, int, int[]);
-    int syou_up(int[][kHeight], int, int, int, int[]);
-    int syou_down(int[][kHeight], int, int, int, int[]);
-
     int field12[6];
     int field_hoz[6][kHeight];
     int act_on_1st;
