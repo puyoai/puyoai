@@ -14,6 +14,11 @@ void saiki_3_left(const int[][test_lockit::kHeight], int[][12], int, int, int*, 
 void saiki_3_up(const int[][test_lockit::kHeight], int[][12], int, int, int*, int);
 void saiki_3_down(const int[][test_lockit::kHeight], int[][12], int, int, int*, int);
 
+void syou_right(int[][test_lockit::kHeight], int, int, int, int[]);
+void syou_left(int[][test_lockit::kHeight], int, int, int, int[]);
+void syou_up(int[][test_lockit::kHeight], int, int, int, int[]);
+void syou_down(int[][test_lockit::kHeight], int, int, int, int[]);
+
 void saiki_right(const int ba[][test_lockit::kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     point[x][y] = 1;
@@ -110,6 +115,88 @@ void saiki_3_down(const int ba[][test_lockit::kHeight], int point[][12], int x, 
         saiki_3_down(ba, point, x, y - 1, num, incol);
 }
 
+void syou_right(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
+{
+    ba[x][y] = 0;
+    flg[x] = 1;
+    if ((y != 11) && (ba[x][y + 1] == incol))
+        syou_up(ba, x, y + 1, incol, flg);
+    if ((y != 11) && (ba[x][y + 1] == 6))
+        ba[x][y + 1] = 0;
+    if ((x != 5) && (ba[x + 1][y] == incol))
+        syou_right(ba, x + 1, y, incol, flg);
+    if ((x != 5) && (ba[x + 1][y] == 6)) {
+        ba[x + 1][y] = 0;
+        flg[x + 1] = 1;
+    }
+    if ((y != 0) && (ba[x][y - 1] == incol))
+        syou_down(ba, x, y - 1, incol, flg);
+    if ((y != 0) && (ba[x][y - 1] == 6))
+        ba[x][y - 1] = 0;
+}
+
+void syou_left(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
+{
+    ba[x][y] = 0;
+    flg[x] = 1;
+    if ((x != 0) && (ba[x - 1][y] == incol))
+        syou_left(ba, x - 1, y, incol, flg);
+    if ((x != 0) && (ba[x - 1][y] == 6)) {
+        ba[x - 1][y] = 0;
+        flg[x - 1] = 1;
+    }
+    if ((y != 11) && (ba[x][y + 1] == incol))
+        syou_up(ba, x, y + 1, incol, flg);
+    if ((y != 11) && (ba[x][y + 1] == 6))
+        ba[x][y + 1] = 0;
+    if ((y != 0) && (ba[x][y - 1] == incol))
+        syou_down(ba, x, y - 1, incol, flg);
+    if ((y != 0) && (ba[x][y - 1] == 6))
+        ba[x][y - 1] = 0;
+}
+
+void syou_up(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
+{
+    ba[x][y] = 0;
+    if ((x != 0) && (ba[x - 1][y] == incol))
+        syou_left(ba, x - 1, y, incol, flg);
+    if ((x != 0) && (ba[x - 1][y] == 6)) {
+        ba[x - 1][y] = 0;
+        flg[x - 1] = 1;
+    }
+    if ((y != 11) && (ba[x][y + 1] == incol))
+        syou_up(ba, x, y + 1, incol, flg);
+    if ((y != 11) && (ba[x][y + 1] == 6))
+        ba[x][y + 1] = 0;
+    if ((x != 5) && (ba[x + 1][y] == incol))
+        syou_right(ba, x + 1, y, incol, flg);
+    if ((x != 5) && (ba[x + 1][y] == 6)) {
+        ba[x + 1][y] = 0;
+        flg[x + 1] = 1;
+    }
+}
+
+void syou_down(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
+{
+    ba[x][y] = 0;
+    if ((x != 0) && (ba[x - 1][y] == incol))
+        syou_left(ba, x - 1, y, incol, flg);
+    if ((x != 0) && (ba[x - 1][y] == 6)) {
+        ba[x - 1][y] = 0;
+        flg[x - 1] = 1;
+    }
+    if ((x != 5) && (ba[x + 1][y] == incol))
+        syou_right(ba, x + 1, y, incol, flg);
+    if ((x != 5) && (ba[x + 1][y] == 6)) {
+        ba[x + 1][y] = 0;
+        flg[x + 1] = 1;
+    }
+    if ((y != 0) && (ba[x][y - 1] == incol))
+        syou_down(ba, x, y - 1, incol, flg);
+    if ((y != 0) && (ba[x][y - 1] == 6))
+        ba[x][y - 1] = 0;
+}
+
 } // namespace anonymous
 
 namespace test_lockit {
@@ -169,6 +256,32 @@ void saiki_4(int ba[][kHeight], int x, int y, int* num, int incol)
     if ((y != 0) && (incol == ba[x][y - 1]))
         saiki_4(ba, x, y - 1, num, incol);
     ba[x][y] = incol;
+}
+
+void syou(int ba[][kHeight], int x, int y, int incol, int flg[])
+{
+    ba[x][y] = 0;
+    flg[x] = 1;
+    if ((x != 0) && (ba[x - 1][y] == incol))
+        syou_left(ba, x - 1, y, incol, flg);
+    if ((x != 0) && (ba[x - 1][y] == 6)) {
+        ba[x - 1][y] = 0;
+        flg[x - 1] = 1;
+    }
+    if ((y != 11) && (ba[x][y + 1] == incol))
+        syou_up(ba, x, y + 1, incol, flg);
+    if ((y != 11) && (ba[x][y + 1] == 6))
+        ba[x][y + 1] = 0;
+    if ((x != 5) && (ba[x + 1][y] == incol))
+        syou_right(ba, x + 1, y, incol, flg);
+    if ((x != 5) && (ba[x + 1][y] == 6)) {
+        ba[x + 1][y] = 0;
+        flg[x + 1] = 1;
+    }
+    if ((y != 0) && (ba[x][y - 1] == incol))
+        syou_down(ba, x, y - 1, incol, flg);
+    if ((y != 0) && (ba[x][y - 1] == 6))
+        ba[x][y - 1] = 0;
 }
 
 }  // namespace test_lockit
