@@ -12,6 +12,7 @@ void saiki_3(const int ba[][kHeight], int point[][12], int x, int y, int* num, i
 void saiki_4(int ba[][kHeight], int x, int y, int* num, int incol);
 
 void syou(int ba[][kHeight], int x, int y, int incol, int flg[]);
+void syou_downx(int ba[][kHeight], int x, int y, int incol, int flg[], int* num);
 
 }  // namespace test_lockit
 
