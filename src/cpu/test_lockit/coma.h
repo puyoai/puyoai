@@ -50,12 +50,6 @@ public:
     int m_aite_hakkaji_score;
 
 private:
-    int syou_downx(int[][kHeight], int, int, int, int[], int*);
-    int syou_right_num(int[][kHeight], int, int, int, int[], int*);
-    int syou_left_num(int[][kHeight], int, int, int, int[], int*);
-    int syou_up_num(int[][kHeight], int, int, int, int[], int*);
-    int syou_down_num(int[][kHeight], int, int, int, int[], int*);
-
     int setti_ojama(int[][kHeight], int);
 
     int tobashi_hantei_a(const int[][kHeight], int, int, int);
