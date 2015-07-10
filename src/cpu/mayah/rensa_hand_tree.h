@@ -51,7 +51,7 @@ class RensaHandTree {
 public:
     RensaHandTree() {}
     explicit RensaHandTree(std::vector<RensaHandNode> nodes) :
-        nodes_(nodes) {}
+        nodes_(std::move(nodes)) {}
 
     static RensaHandTree makeTree(int restIteration,
                                   const CoreField& currentField,
