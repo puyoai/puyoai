@@ -1274,28 +1274,6 @@ int COMAI_HI::syou_down_num(int ba[][kHeight], int x, int y, int incol, int flg[
     return 0;
 }
 
-int COMAI_HI::syou_2(int ba[][kHeight], int x, int y, int incol)
-{
-    ba[x][y] = 0;
-    if ((x != 0) && (ba[x - 1][y] == incol))
-        syou_2(ba, x - 1, y, incol);
-    if ((x != 0) && (ba[x - 1][y] == 6))
-        ba[x - 1][y] = 0;
-    if ((y != 11) && (ba[x][y + 1] == incol))
-        syou_2(ba, x, y + 1, incol);
-    if ((y != 11) && (ba[x][y + 1] == 6))
-        ba[x][y + 1] = 0;
-    if ((x != 5) && (ba[x + 1][y] == incol))
-        syou_2(ba, x + 1, y, incol);
-    if ((x != 5) && (ba[x + 1][y] == 6))
-        ba[x + 1][y] = 0;
-    if ((y != 0) && (ba[x][y - 1] == incol))
-        syou_2(ba, x, y - 1, incol);
-    if ((y != 0) && (ba[x][y - 1] == 6))
-        ba[x][y - 1] = 0;
-    return 0;
-}
-
 int COMAI_HI::tobashi_hantei_a(const int ba2[][kHeight], int aa, int nx1, int nx2)
 {
     if (nx1 == nx2) {

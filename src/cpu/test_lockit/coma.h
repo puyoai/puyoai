@@ -55,7 +55,6 @@ private:
     int syou_left_num(int[][kHeight], int, int, int, int[], int*);
     int syou_up_num(int[][kHeight], int, int, int, int[], int*);
     int syou_down_num(int[][kHeight], int, int, int, int[], int*);
-    int syou_2(int[][kHeight], int, int, int);
 
     int setti_ojama(int[][kHeight], int);
 
