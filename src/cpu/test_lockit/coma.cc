@@ -1207,102 +1207,6 @@ int COMAI_HI::tobashi_hantei_a(const int ba2[][kHeight], int aa, int nx1, int nx
     return 0;
 }
 
-bool COMAI_HI::setti_puyo(int ba[][kHeight], int aa, int nx1, int nx2, int setti_basyo[])
-{
-    if (aa < 6) {
-        setti_basyo[0] = aa;
-        setti_basyo[1] = -1;
-        setti_basyo[2] = aa;
-        setti_basyo[3] = -1;
-        for (int j = 0; j < 13; j++) {
-            if (ba[aa][j] == TLColor::EMPTY) {
-                ba[aa][j] = nx1;
-                ba[aa][j + 1] = nx2;
-                setti_basyo[1] = j;
-                setti_basyo[3] = j + 1;
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    if (aa < 12) {
-        setti_basyo[0] = aa - 6;
-        setti_basyo[1] = -1;
-        setti_basyo[2] = aa - 6;
-        setti_basyo[3] = -1;
-        for (int j = 0; j < 13; j++) {
-            if (ba[aa - 6][j] == TLColor::EMPTY) {
-                ba[aa - 6][j] = nx2;
-                ba[aa - 6][j + 1] = nx1;
-                setti_basyo[1] = j;
-                setti_basyo[3] = j + 1;
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    if (aa < 17) {
-        setti_basyo[0] = aa - 11;
-        setti_basyo[1] = -1;
-        setti_basyo[2] = aa - 12;
-        setti_basyo[3] = -1;
-        for (int j = 0; j < 13; j++) {
-            if (ba[aa - 11][j] == TLColor::EMPTY) {
-                setti_basyo[1] = j;
-                break;
-            }
-        }
-        for (int j = 0; j < 13; j++) {
-            if (ba[aa - 12][j] == TLColor::EMPTY) {
-                setti_basyo[3] = j;
-                break;
-            }
-        }
-
-        if (setti_basyo[1] >= 0 && setti_basyo[3] >= 0) {
-            ba[aa - 11][setti_basyo[1]] = nx1;
-            ba[aa - 12][setti_basyo[3]] = nx2;
-            return true;
-        }
-
-        return false;
-    }
-
-    if (aa < 22) {
-        setti_basyo[0] = aa - 17;
-        setti_basyo[1] = -1;
-        setti_basyo[2] = aa - 16;
-        setti_basyo[3] = -1;
-        for (int j = 0; j < 13; j++) {
-            if (ba[aa - 17][j] == TLColor::EMPTY) {
-                setti_basyo[1] = j;
-                break;
-            }
-        }
-        for (int j = 0; j < 13; j++) {
-            if (ba[aa - 16][j] == TLColor::EMPTY) {
-                setti_basyo[3] = j;
-                break;
-            }
-        }
-
-        if (setti_basyo[1] >= 0 && setti_basyo[3] >= 0) {
-            ba[aa - 17][setti_basyo[1]] = nx1;
-            ba[aa - 16][setti_basyo[3]] = nx2;
-            return true;
-        }
-
-        return false;
-    }
-
-    CHECK(false) << "Invalid aa=" << aa;
-    return false;
-}
-
 int COMAI_HI::tobashi_hantei_b(const int ba2[][kHeight], int aa)
 {
     if (ba2[0][11] != 0) {
@@ -1587,29 +1491,6 @@ int COMAI_HI::hon_syoukyo_score(int ba[][kHeight], int* score, int* quick)
         *score += renketsunum * rate * 10;
     }
     return chain;
-}
-
-int COMAI_HI::setti_puyo_1(int ba[][kHeight], int eex, int eecol)
-{
-    int j;
-    int oita = 0;
-    int num = 0;
-    int setti_basyoy;
-    for (j = 0; j < 12; j++) {
-        if (ba[eex][j] == 0) {
-            ba[eex][j] = eecol;
-            setti_basyoy = j;
-            oita = 1;
-            break;
-        }
-    }
-    if (oita == 0)
-        return 1;
-    saiki_4(ba, eex, setti_basyoy, &num, eecol);
-    if (num > 3)
-        return 1;
-
-    return 0;
 }
 
 int COMAI_HI::chousei_syoukyo_2(int ba[][kHeight], int setti_basyo[], int* chain, int dabuchk[], int* ichiren_kesi, int* score)

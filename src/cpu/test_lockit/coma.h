@@ -53,7 +53,6 @@ private:
     int setti_ojama(int[][kHeight], int);
 
     int tobashi_hantei_a(const int[][kHeight], int, int, int);
-    bool setti_puyo(int[][kHeight], int, int, int, int[]);
     int tobashi_hantei_b(const int[][kHeight], int);
     int chousei_syoukyo(int[][kHeight], int[]);
     int chousei_syoukyo_2(int[][kHeight], int[], int*, int[], int*, int*);
@@ -62,7 +61,6 @@ private:
     int hon_syoukyo(int[][kHeight]);
     int hon_syoukyo_score(int[][kHeight], int*, int*);
 
-    int setti_puyo_1(int[][kHeight], int, int);
     int gtr(const int[][kHeight]);
 
     int read_template();
