@@ -6,8 +6,8 @@ add_library(test_lockit_lib
             color.cc
             coma.cc
             cpu.cc
-            read.cc
             field.cc
+            read.cc
             template.cc
             util.cc)
 
