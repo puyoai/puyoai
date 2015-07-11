@@ -123,16 +123,6 @@ COMAI_HI::COMAI_HI()
     m_aa_max_score = 0;
     m_hakkatime = 0;
     m_numg = 0;
-
-    memset(m_katax, 0, sizeof(m_katax));
-    memset(m_katay, 0, sizeof(m_katay));
-    memset(m_kko, 0, sizeof(m_kko));
-    memset(m_kinsi_a, 0, sizeof(m_kinsi_a));
-    memset(m_kinsi_b, 0, sizeof(m_kinsi_b));
-    memset(m_jakkin_a, 0, sizeof(m_jakkin_a));
-    memset(m_jakkin_b, 0, sizeof(m_jakkin_b));
-    memset(m_tankinko, 0, sizeof(m_tankinko));
-    memset(m_jatako, 0, sizeof(m_jatako));
 }
 
 COMAI_HI::~COMAI_HI()
