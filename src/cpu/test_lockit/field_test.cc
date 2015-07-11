@@ -33,16 +33,18 @@ TEST(FieldTest, Saiki) {
         {1, 11, 2}, {2, 11, 2}
     };
 
+    int field[6][kHeight];
+    toTLField(cf, field);
+
+    int expect_points = 0;
     // We can re-use |point| array.
     int point[6][12] {};
     for (const TestData& data : data_set) {
-        int field[6][kHeight];
-
         int num = 0;
-        toTLField(cf, field);
         saiki(field, point, data.x, data.y, &num, field[data.x][data.y]);
 
         EXPECT_EQ(data.expect_num, num);
+        expect_points += data.expect_num;
     }
 
     int count_point = 0;
@@ -52,7 +54,7 @@ TEST(FieldTest, Saiki) {
                 ++count_point;
         }
     }
-    EXPECT_EQ(26, count_point);
+    EXPECT_EQ(expect_points, count_point);
 }
 
 }  // namespace test_lockit
