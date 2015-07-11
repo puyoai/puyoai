@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    struct test_lockit::Configuration config;
+    struct test_lockit::cpu::Configuration config;
     config.q_t = 1;
     config.w_t = 1;
     config.e_t = 1;

@@ -2,6 +2,7 @@
 #define CPU_TEST_LOCKIT_CPU_CONFIGURATION_H_
 
 namespace test_lockit {
+namespace cpu {
 
 struct Configuration {
     int q_t;
@@ -37,6 +38,7 @@ int o_t=0;
 int p_t=3;
 int a_t=1;*/
 
+} // namespace cpu
 } // namespace test_lockit
 
 #endif // CPU_TEST_LOCKIT_CPU_CONFIGURATION_H_

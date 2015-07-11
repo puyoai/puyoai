@@ -16,7 +16,7 @@ using namespace std;
 
 namespace test_lockit {
 
-TestLockitAI::TestLockitAI(const Configuration& config) :
+TestLockitAI::TestLockitAI(const cpu::Configuration& config) :
     config(config),
     coma(config),
     coma2x(config)
