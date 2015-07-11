@@ -54,12 +54,6 @@ private:
 
     int tobashi_hantei_a(const int[][kHeight], int, int, int);
     int tobashi_hantei_b(const int[][kHeight], int);
-    int chousei_syoukyo(int[][kHeight], int[]);
-    int chousei_syoukyo_2(int[][kHeight], int[], int*, int[], int*, int*);
-    int chousei_syoukyo_3(int[][kHeight], int[], int*, int*, int, int, int);
-    int chousei_syoukyo_sc(int[][kHeight], int[], int*);
-    int hon_syoukyo(int[][kHeight]);
-    int hon_syoukyo_score(int[][kHeight], int*, int*);
 
     int gtr(const int[][kHeight]);
 
