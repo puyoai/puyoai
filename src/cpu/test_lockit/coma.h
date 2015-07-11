@@ -55,8 +55,6 @@ private:
     int tobashi_hantei_a(const int[][kHeight], int, int, int);
     int tobashi_hantei_b(const int[][kHeight], int);
 
-    int gtr(const int[][kHeight]);
-
     int m_cchai;
     int m_conaa;
     int m_nexaa;
