@@ -50,8 +50,6 @@ public:
     int m_aite_hakkaji_score;
 
 private:
-    int setti_ojama(int[][kHeight], int);
-
     int tobashi_hantei_a(const int[][kHeight], int, int, int);
     int tobashi_hantei_b(const int[][kHeight], int);
 

@@ -24,6 +24,8 @@ int chousei_syoukyo_sc(int ba[][kHeight], int setti_basyo[], int* score);
 int hon_syoukyo(int ba[][kHeight]);
 int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick);
 
+int setti_ojama(int f[][kHeight], int ojamako);
+
 }  // namespace test_lockit
 
 #endif  // CPU_TEST_LOCKIT_FIELD_H_
