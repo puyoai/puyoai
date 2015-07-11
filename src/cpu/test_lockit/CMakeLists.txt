@@ -25,14 +25,11 @@ function(test_lockit_add_test exe)
   endif()
 endfunction()
 
-test_lockit_add_executable(nidub nidub.cpp)
-test_lockit_add_executable(rendaS9 rendaS9.cpp)
-test_lockit_add_executable(rendaGS9 rendaGS9.cpp)
-test_lockit_add_executable(rendaGS9a rendaGS9a.cpp)
+test_lockit_add_executable(niina niina.cpp)
 
 cpu_add_runner(nidub.sh)
 cpu_add_runner(rendaS9.sh)
 cpu_add_runner(rendaGS9.sh)
-cpu_add_runner(rendaGS9.sh)
+cpu_add_runner(rendaGS9a.sh)
 
 test_lockit_add_test(field_test)
