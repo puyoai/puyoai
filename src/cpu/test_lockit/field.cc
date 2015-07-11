@@ -760,7 +760,7 @@ int chousei_syoukyo_2(int ba[][kHeight], int setti_basyo[], int* chain, int dabu
     return keshiko;
 }
 
-int chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2)
+int chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };

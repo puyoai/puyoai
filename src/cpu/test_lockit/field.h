@@ -19,7 +19,7 @@ int setti_puyo_1(int ba[][kHeight], int eex, int eecol);
 
 int chousei_syoukyo(int ba[][kHeight], int setti_basyo[]);
 int chousei_syoukyo_2(int ba[][kHeight], int setti_basyo[], int* chain, int dabuchk[], int* ichiren_kesi, int* score);
-int chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2);
+int chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point);
 int chousei_syoukyo_sc(int ba[][kHeight], int setti_basyo[], int* score);
 int hon_syoukyo(int ba[][kHeight]);
 int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick);
