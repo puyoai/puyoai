@@ -86,15 +86,6 @@ private:
     int m_kougeki_iryoku;
 
     int m_numg;
-    int m_katax[TM_TMNMUM][TM_COLNUM][TM_COLPER];
-    int m_katay[TM_TMNMUM][TM_COLNUM][TM_COLPER];
-    int m_kko[TM_TMNMUM][TM_COLNUM];
-    int m_kinsi_a[TM_TMNMUM][TM_KINPT];
-    int m_kinsi_b[TM_TMNMUM][TM_KINPT];
-    int m_jakkin_a[TM_TMNMUM][TM_JAKKINPT];
-    int m_jakkin_b[TM_TMNMUM][TM_JAKKINPT];
-    int m_tankinko[TM_TMNMUM];
-    int m_jatako[TM_TMNMUM];
     int m_tm_moni;
     int m_one_tanpatu;
     int m_score_max;
