@@ -545,8 +545,6 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
     int adubpt[22][22][22] {};
     int apos[22] = { 0 };
 
-    m_tm_moni = 0;
-
     if (m_hukks < 255) {
         for (aa = 0; aa < 22; aa++) {
             if (tobashi_hantei_a(ba2, aa, nx1, nx2))

@@ -84,7 +84,6 @@ private:
     int m_kougeki_iryoku;
 
     int m_numg;
-    int m_tm_moni;
     int m_one_tanpatu;
     int m_score_max;
     int m_mmmax;
