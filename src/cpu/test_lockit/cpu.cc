@@ -16,7 +16,10 @@ using namespace std;
 
 namespace test_lockit {
 
-TestLockitAI::TestLockitAI()
+TestLockitAI::TestLockitAI(const Configuration& config) :
+    config(config),
+    coma(config),
+    coma2x(config)
 {
     r_player[0].ref();
     r_player[1].ref();
@@ -200,7 +203,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
             }
         }
         // If we don't use 2x-hyouka, set field_kosuu to 0 so that 2x-hyouka is not used.
-        if (!uses_2x_hyouka) {
+        if (!config.uses_2x_hyouka) {
             field_kosuu = 0;
         }
 

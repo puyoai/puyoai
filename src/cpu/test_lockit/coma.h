@@ -1,22 +1,10 @@
 #ifndef CPU_TEST_LOCKIT_COMA_H_
 #define CPU_TEST_LOCKIT_COMA_H_
 
+#include "cpu_configuration.h"
 #include "lockit_constant.h"
 
 namespace test_lockit {
-
-/* for TAIOU TYPE?
-int q_t=1;
-int w_t=1;
-int e_t=0;
-int r_t=1;
-int t_t=1;
-int y_t=3;
-int u_t=1;
-int i_t=0;
-int o_t=0;
-int p_t=3;
-int a_t=1;*/
 
 const int tubushiturn = 13;
 // int tubushiturn = 99999;
@@ -25,7 +13,7 @@ const int saisoku_point = 1;
 
 class COMAI_HI {
 public:
-    COMAI_HI();
+    explicit COMAI_HI(const Configuration& config);
     ~COMAI_HI();
 
     int aite_hyouka(const int ba3[6][kHeight], int tsumo[]);
@@ -52,6 +40,8 @@ public:
 private:
     int tobashi_hantei_a(const int[][kHeight], int, int, int);
     int tobashi_hantei_b(const int[][kHeight], int);
+
+    const Configuration config;
 
     int m_cchai;
     int m_conaa;

@@ -3,35 +3,32 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-namespace test_lockit {
-
-int q_t = 1;
-int w_t = 1;
-int e_t = 1;
-int r_t = 1;
-int t_t = 1;
-int y_t = 3;
-int u_t = 1;
-int i_t = 0;
-int o_t = 0;
-int p_t = 4;
-int a_t = 1;
-
-int takasa_point = 240; // G,S
-int ruiseki_point = 0; // T,S
-int renketu_bairitu = 4; // S
-bool is_2dub_cpu = false;
-bool uses_2x_hyouka = false;
-
-}  // namespace test_lockit
-
 int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    test_lockit::TestLockitAI().runLoop();
+    struct test_lockit::Configuration config;
+    config.q_t = 1;
+    config.w_t = 1;
+    config.e_t = 1;
+    config.r_t = 1;
+    config.t_t = 1;
+    config.y_t = 3;
+    config.u_t = 1;
+    config.i_t = 0;
+    config.o_t = 0;
+    config.p_t = 4;
+    config.a_t = 1;
+
+    config.takasa_point = 240;
+    config.ruiseki_point = 0;
+    config.renketu_bairitu = 4;
+    config.is_2dub_cpu = false;
+    config.uses_2x_hyouka = false;
+
+    test_lockit::TestLockitAI(config).runLoop();
 
     return 0;
 }
