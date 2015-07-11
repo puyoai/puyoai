@@ -11,13 +11,13 @@ namespace test_lockit {
 
 class TestLockitAI : public RawAI {
 public:
-    explicit TestLockitAI(const Configuration& configuration);
+    explicit TestLockitAI(const cpu::Configuration& configuration);
 
 protected:
     FrameResponse playOneFrame(const FrameRequest&) override;
 
 private:
-    const Configuration config;
+    const cpu::Configuration config;
     COMAI_HI coma;
     COMAI_HI coma2x;
     READ_P r_player[2];

@@ -13,7 +13,7 @@ const int saisoku_point = 1;
 
 class COMAI_HI {
 public:
-    explicit COMAI_HI(const Configuration& config);
+    explicit COMAI_HI(const cpu::Configuration& config);
     ~COMAI_HI();
 
     int aite_hyouka(const int ba3[6][kHeight], int tsumo[]);
@@ -41,7 +41,7 @@ private:
     int tobashi_hantei_a(const int[][kHeight], int, int, int);
     int tobashi_hantei_b(const int[][kHeight], int);
 
-    const Configuration config;
+    const cpu::Configuration config;
 
     int m_cchai;
     int m_conaa;

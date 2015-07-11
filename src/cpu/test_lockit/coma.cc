@@ -88,7 +88,7 @@ void COMAI_HI::ref()
     m_numg = 0;
 }
 
-COMAI_HI::COMAI_HI(const Configuration& config) :
+COMAI_HI::COMAI_HI(const cpu::Configuration& config) :
     config(config)
 {
     int i;
