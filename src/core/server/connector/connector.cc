@@ -43,13 +43,10 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
     // File descriptors.
     int fd_field_status[2];
     int fd_command[2];
-    int fd_cpu_error[2];
 
     if (pipe(fd_field_status) < 0)
         PLOG(FATAL) << "Pipe error. ";
     if (pipe(fd_command) < 0)
-        PLOG(FATAL) << "Pipe error. ";
-    if (pipe(fd_cpu_error) < 0)
         PLOG(FATAL) << "Pipe error. ";
 
     pid_t pid = fork();
@@ -63,7 +60,6 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
         unique_ptr<Connector> connector(new PipeConnector(fd_field_status[1], fd_command[0]));
         close(fd_field_status[0]);
         close(fd_command[1]);
-        close(fd_cpu_error[1]);
 
         return connector;
     }
@@ -73,15 +69,11 @@ unique_ptr<Connector> Connector::create(int playerId, const string& programName)
         PLOG(FATAL) << "Failed to dup2. ";
     if (dup2(fd_command[1], STDOUT_FILENO) < 0)
         PLOG(FATAL) << "Failed to dup2. ";
-    if (dup2(fd_cpu_error[1], STDERR_FILENO) < 0)
-        PLOG(FATAL) << "Failed to dup2. ";
 
     close(fd_field_status[0]);
     close(fd_field_status[1]);
     close(fd_command[0]);
     close(fd_command[1]);
-    close(fd_cpu_error[0]);
-    close(fd_cpu_error[1]);
 
     char filename[] = "Player_";
     filename[6] = '1' + playerId;
