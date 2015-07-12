@@ -125,166 +125,166 @@ void saiki_3_down(const int ba[][test_lockit::kHeight], int point[][12], int x, 
 
 void syou_right(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
 {
-    ba[x][y] = 0;
+    ba[x][y] = test_lockit::TLColor::EMPTY;
     flg[x] = 1;
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == 6))
-        ba[x][y + 1] = 0;
+    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == 6)) {
-        ba[x + 1][y] = 0;
+    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == 6))
-        ba[x][y - 1] = 0;
+    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
 }
 
 void syou_left(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
 {
-    ba[x][y] = 0;
+    ba[x][y] = test_lockit::TLColor::EMPTY;
     flg[x] = 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == 6)) {
-        ba[x - 1][y] = 0;
+    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == 6))
-        ba[x][y + 1] = 0;
+    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == 6))
-        ba[x][y - 1] = 0;
+    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
 }
 
 void syou_up(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
 {
-    ba[x][y] = 0;
+    ba[x][y] = test_lockit::TLColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == 6)) {
-        ba[x - 1][y] = 0;
+    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == 6))
-        ba[x][y + 1] = 0;
+    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == 6)) {
-        ba[x + 1][y] = 0;
+    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
         flg[x + 1] = 1;
     }
 }
 
 void syou_down(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
 {
-    ba[x][y] = 0;
+    ba[x][y] = test_lockit::TLColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == 6)) {
-        ba[x - 1][y] = 0;
+    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == 6)) {
-        ba[x + 1][y] = 0;
+    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == 6))
-        ba[x][y - 1] = 0;
+    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
 }
 
 void syou_right_num(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[], int* num)
 {
-    ba[x][y] = 0;
+    ba[x][y] = test_lockit::TLColor::EMPTY;
     flg[x] = 1;
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up_num(ba, x, y + 1, incol, flg, num);
-    if ((y != 11) && (ba[x][y + 1] == 6))
-        ba[x][y + 1] = 0;
+    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == 6)) {
-        ba[x + 1][y] = 0;
+    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == 6))
-        ba[x][y - 1] = 0;
+    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
 }
 
 void syou_left_num(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[], int* num)
 {
-    ba[x][y] = 0;
+    ba[x][y] = test_lockit::TLColor::EMPTY;
     flg[x] = 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == 6)) {
-        ba[x - 1][y] = 0;
+    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up_num(ba, x, y + 1, incol, flg, num);
-    if ((y != 11) && (ba[x][y + 1] == 6))
-        ba[x][y + 1] = 0;
+    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == 6))
-        ba[x][y - 1] = 0;
+    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
 }
 
 void syou_up_num(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[], int* num)
 {
-    ba[x][y] = 0;
+    ba[x][y] = test_lockit::TLColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == 6)) {
-        ba[x - 1][y] = 0;
+    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up_num(ba, x, y + 1, incol, flg, num);
-    if ((y != 11) && (ba[x][y + 1] == 6))
-        ba[x][y + 1] = 0;
+    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == 6)) {
-        ba[x + 1][y] = 0;
+    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
         flg[x + 1] = 1;
     }
 }
 
 void syou_down_num(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[], int* num)
 {
-    ba[x][y] = 0;
+    ba[x][y] = test_lockit::TLColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == 6)) {
-        ba[x - 1][y] = 0;
+    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == 6)) {
-        ba[x + 1][y] = 0;
+    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
+        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == 6))
-        ba[x][y - 1] = 0;
+    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
+        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
 }
 
 } // namespace anonymous
@@ -333,7 +333,7 @@ void saiki_3(const int ba[][kHeight], int point[][12], int x, int y, int* num, i
 
 void saiki_4(int ba[][kHeight], int x, int y, int* num, int incol)
 {
-    ba[x][y] = 0;
+    ba[x][y] = TLColor::EMPTY;
     *num += 1;
     if (*num > 3) {
         ba[x][y] = incol;
@@ -352,28 +352,28 @@ void saiki_4(int ba[][kHeight], int x, int y, int* num, int incol)
 
 void syou(int ba[][kHeight], int x, int y, int incol, int flg[])
 {
-    ba[x][y] = 0;
+    ba[x][y] = TLColor::EMPTY;
     flg[x] = 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == 6)) {
-        ba[x - 1][y] = 0;
+    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
+        ba[x - 1][y] = TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == 6))
-        ba[x][y + 1] = 0;
+    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
+        ba[x][y + 1] = TLColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == 6)) {
-        ba[x + 1][y] = 0;
+    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
+        ba[x + 1][y] = TLColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == 6))
-        ba[x][y - 1] = 0;
+    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
+        ba[x][y - 1] = TLColor::EMPTY;
 }
 
 void syou_downx(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
@@ -381,20 +381,20 @@ void syou_downx(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
     *num += 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == 6)) {
-        ba[x - 1][y] = 0;
+    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
+        ba[x - 1][y] = TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == 6)) {
-        ba[x + 1][y] = 0;
+    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
+        ba[x + 1][y] = TLColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == 6))
-        ba[x][y - 1] = 0;
+    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
+        ba[x][y - 1] = TLColor::EMPTY;
 }
 
 bool setti_puyo(int ba[][kHeight], int aa, int nx1, int nx2, int setti_basyo[])
@@ -500,7 +500,7 @@ int setti_puyo_1(int ba[][kHeight], int eex, int eecol)
     int num = 0;
     int setti_basyoy;
     for (j = 0; j < 12; j++) {
-        if (ba[eex][j] == 0) {
+        if (ba[eex][j] == TLColor::EMPTY) {
             ba[eex][j] = eecol;
             setti_basyoy = j;
             oita = 1;
@@ -558,13 +558,13 @@ int chousei_syoukyo(int ba[][kHeight], int setti_basyo[])
         if (rakkaflg[i] == 1) {
             n = 0;
             for (j = 0; j < 13; j++) {
-                if (ba[i][j] == 0) {
+                if (ba[i][j] == TLColor::EMPTY) {
                     if (n == 0)
                         kiept[i] = j;
                     n++;
                 } else if (n != 0) {
                     ba[i][j - n] = ba[i][j];
-                    ba[i][j] = 0;
+                    ba[i][j] = TLColor::EMPTY;
                 }
             }
         }
@@ -601,13 +601,13 @@ int chousei_syoukyo(int ba[][kHeight], int setti_basyo[])
             if (rakkaflg[i] == 1) {
                 n = 0;
                 for (j = 0; j < 13; j++) {
-                    if (ba[i][j] == 0) {
+                    if (ba[i][j] == TLColor::EMPTY) {
                         if (n == 0)
                             kiept[i] = j;
                         n++;
                     } else if (n != 0) {
                         ba[i][j - n] = ba[i][j];
-                        ba[i][j] = 0;
+                        ba[i][j] = TLColor::EMPTY;
                     }
                 }
             }
@@ -686,13 +686,13 @@ int chousei_syoukyo_2(int ba[][kHeight], int setti_basyo[], int* chain, int dabu
         if (rakkaflg[i] == 1) {
             n = 0;
             for (j = 0; j < 13; j++) {
-                if (ba[i][j] == 0) {
+                if (ba[i][j] == TLColor::EMPTY) {
                     if (n == 0)
                         kiept[i] = j;
                     n++;
                 } else if (n != 0) {
                     ba[i][j - n] = ba[i][j];
-                    ba[i][j] = 0;
+                    ba[i][j] = TLColor::EMPTY;
                 }
             }
         }
@@ -710,9 +710,9 @@ int chousei_syoukyo_2(int ba[][kHeight], int setti_basyo[], int* chain, int dabu
         rakkaflg[5] = 0;
         for (i = 0; i < 6; i++) {
             for (j = kiept[i]; j < 12; j++) {
-                if (ba[i][j] == 0)
+                if (ba[i][j] == TLColor::EMPTY)
                     continue;
-                if ((point[i][j] != 1) && (ba[i][j] != 6)) {
+                if ((point[i][j] != 1) && (ba[i][j] != TLColor::OJAMA)) {
                     saiki(ba, point, i, j, &num, ba[i][j]);
                     if (num > 3) {
                         syo = 1;
@@ -735,13 +735,13 @@ int chousei_syoukyo_2(int ba[][kHeight], int setti_basyo[], int* chain, int dabu
             if (rakkaflg[i] == 1) {
                 n = 0;
                 for (j = 0; j < 13; j++) {
-                    if (ba[i][j] == 0) {
+                    if (ba[i][j] == TLColor::EMPTY) {
                         if (n == 0)
                             kiept[i] = j;
                         n++;
                     } else if (n != 0) {
                         ba[i][j - n] = ba[i][j];
-                        ba[i][j] = 0;
+                        ba[i][j] = TLColor::EMPTY;
                     }
                 }
             }
@@ -968,13 +968,13 @@ int chousei_syoukyo_sc(int ba[][kHeight], int setti_basyo[], int* score)
         if (rakkaflg[i] == 1) {
             n = 0;
             for (j = 0; j < 13; j++) {
-                if (ba[i][j] == 0) {
+                if (ba[i][j] == TLColor::EMPTY) {
                     if (n == 0)
                         kiept[i] = j;
                     n++;
                 } else if (n != 0) {
                     ba[i][j - n] = ba[i][j];
-                    ba[i][j] = 0;
+                    ba[i][j] = TLColor::EMPTY;
                 }
             }
         }
@@ -992,9 +992,9 @@ int chousei_syoukyo_sc(int ba[][kHeight], int setti_basyo[], int* score)
         rakkaflg[5] = 0;
         for (i = 0; i < 6; i++) {
             for (j = kiept[i]; j < 12; j++) {
-                if (ba[i][j] == 0)
+                if (ba[i][j] == TLColor::EMPTY)
                     continue;
-                if ((point[i][j] != 1) && (ba[i][j] != 6)) {
+                if ((point[i][j] != 1) && (ba[i][j] != TLColor::OJAMA)) {
                     saiki(ba, point, i, j, &num, ba[i][j]);
                     if (num > 3) {
                         syo = 1;
@@ -1016,13 +1016,13 @@ int chousei_syoukyo_sc(int ba[][kHeight], int setti_basyo[], int* score)
             if (rakkaflg[i] == 1) {
                 n = 0;
                 for (j = 0; j < 13; j++) {
-                    if (ba[i][j] == 0) {
+                    if (ba[i][j] == TLColor::EMPTY) {
                         if (n == 0)
                             kiept[i] = j;
                         n++;
                     } else if (n != 0) {
                         ba[i][j - n] = ba[i][j];
-                        ba[i][j] = 0;
+                        ba[i][j] = TLColor::EMPTY;
                     }
                 }
             }
@@ -1070,9 +1070,9 @@ int hon_syoukyo(int ba[][kHeight])
             for (j = kiept[i]; j < 12; j++) {
                 if (point[i][j] != 0)
                     continue;
-                if (ba[i][j] == 0)
+                if (ba[i][j] == TLColor::EMPTY)
                     break;
-                if (ba[i][j] != 6) {
+                if (ba[i][j] != TLColor::OJAMA) {
                     saiki(ba, point, i, j, &num, ba[i][j]);
                     if (num > 3) {
                         syo = 1;
@@ -1087,13 +1087,13 @@ int hon_syoukyo(int ba[][kHeight])
             if (rakkaflg[i] == 1) {
                 n = 0;
                 for (j = 0; j < 13; j++) {
-                    if (ba[i][j] == 0) {
+                    if (ba[i][j] == TLColor::EMPTY) {
                         if (n == 0)
                             kiept[i] = j;
                         n++;
                     } else if (n != 0) {
                         ba[i][j - n] = ba[i][j];
-                        ba[i][j] = 0;
+                        ba[i][j] = TLColor::EMPTY;
                     }
                 }
             }
@@ -1139,9 +1139,9 @@ int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick)
             for (j = kiept[i]; j < 12; j++) {
                 if (point[i][j] != 0)
                     continue;
-                if (ba[i][j] == 0)
+                if (ba[i][j] == TLColor::EMPTY)
                     break;
-                if (ba[i][j] != 6) {
+                if (ba[i][j] != TLColor::OJAMA) {
                     saiki(ba, point, i, j, &num, ba[i][j]);
                     if (num > 3) {
                         syo = 1;
@@ -1164,13 +1164,13 @@ int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick)
             if (rakkaflg[i] == 1) {
                 n = 0;
                 for (j = 0; j < 13; j++) {
-                    if (ba[i][j] == 0) {
+                    if (ba[i][j] == TLColor::EMPTY) {
                         if (n == 0)
                             kiept[i] = j;
                         n++;
                     } else if (n != 0) {
                         ba[i][j - n] = ba[i][j];
-                        ba[i][j] = 0;
+                        ba[i][j] = TLColor::EMPTY;
                         (*quick) = 0;
                     }
                 }
