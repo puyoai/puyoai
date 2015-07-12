@@ -134,19 +134,16 @@ COMAI_HI::~COMAI_HI()
 bool COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
 {
     int ba[6][kHeight] {};
-    int i, j;
-    int kosuu_mae = 0, kosuu_ato = 0;
     int score = 0;
     int jamako_sabun;
     int quick = 0;
     bool ret_keshi = false;
 
-    for (i = 0; i < 6; i++) {
-        for (j = 0; j < 13; j++) {
-            int c = ba3[i][j];
-            ba[i][j] = c;
-            if (isNormalTLColor(TLColor(c)))
-                kosuu_mae++;
+    int kosuu_mae = countNormalColor13(ba3);
+
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 13; j++) {
+            ba[i][j] = ba3[i][j];
         }
     }
 
@@ -169,12 +166,7 @@ bool COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, in
     }
     m_kougeki_edge = 0;
 
-    for (i = 0; i < 6; i++) {
-        for (j = 0; j < 13; j++) {
-            if (isNormalTLColor(TLColor(ba[i][j])))
-                kosuu_ato++;
-        }
-    }
+    int kosuu_ato = countNormalColor13(ba);
 
     m_aite_hakka_kosuu = kosuu_mae - kosuu_ato;
     if (m_aite_hakka_kosuu * 2 > kosuu_mae)

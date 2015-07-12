@@ -26,6 +26,8 @@ int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick);
 
 int setti_ojama(int f[][kHeight], int ojamako);
 
+int countNormalColor13(const int f[][kHeight]);
+
 }  // namespace test_lockit
 
 #endif  // CPU_TEST_LOCKIT_FIELD_H_
