@@ -304,7 +304,7 @@ bool IsTLFieldEmpty(const int field[6][kHeight])
 void saiki(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     DCHECK(isNormalTLColor(TLColor(incol)));
-    
+
     point[x][y] = 1;
     *num += 1;
     if ((x != 0) && (incol == ba[x - 1][y]) && (point[x - 1][y] == 0))
@@ -1218,6 +1218,19 @@ int setti_ojama(int f[][kHeight], int ojamako)
         }
     }
     return 0;
+}
+
+int countNormalColor13(const int f[][kHeight])
+{
+    int n = 0;
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 13; j++) {
+            if (isNormalTLColor(TLColor(f[i][j])))
+                ++n;
+        }
+    }
+
+    return n;
 }
 
 }  // namespace test_lockit
