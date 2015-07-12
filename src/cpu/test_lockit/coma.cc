@@ -209,7 +209,7 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
             ba2[i][j] = ba3[i][j];
-            if ((ba3[i][j] > 0) && (ba3[i][j] < 6))
+            if (isNormalTLColor(TLColor(ba3[i][j])))
                 irokosuu++;
         }
     }
@@ -344,9 +344,9 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
                     memset(point, 0, sizeof(point));
                     for (i = 0; i < 6; i++) {
                         for (j = kiept[i]; j < 12; j++) {
-                            if (ba[i][j] == 0)
+                            if (ba[i][j] == TLColor::EMPTY)
                                 break;
-                            if ((point[i][j] != 1) && (ba[i][j] != 6)) {
+                            if (point[i][j] != 1 && isNormalTLColor(TLColor(ba[i][j]))) {
                                 saiki(ba, point, i, j, &num, ba[i][j]);
                                 point[i][j] = num;
                                 num = 0;
@@ -372,7 +372,7 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
                         if (rakkaflg[i] == 1) {
                             n = 0;
                             for (j = 0; j < 13; j++) {
-                                if (ba[i][j] == 0) {
+                                if (ba[i][j] == TLColor::EMPTY) {
                                     if (n == 0)
                                         kiept[i] = j;
                                     n++;
@@ -455,10 +455,10 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
     m_myf_kosuu = 0;
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
-            if (ba3[i][j] != 0) {
+            if (ba3[i][j] != TLColor::EMPTY) {
                 m_myf_kosuu++;
             }
-            if ((ba3[i][j] != 0) && (ba3[i][j] < 6)) {
+            if (isNormalTLColor(TLColor(ba3[i][j]))) {
                 myf_kosuu_iro++;
             }
         }
@@ -470,10 +470,10 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
 
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
-            if ((aite_ba[i][j] != 0) && (aite_ba[i][j] < 6)) {
+            if (isNormalTLColor(TLColor(aite_ba[i][j]))) {
                 aite_kosuu_iro++;
             }
-            if ((aite_ba[i][j] != 0)) {
+            if (aite_ba[i][j] != TLColor::EMPTY) {
                 aite_ojama++;
             }
         }
@@ -710,7 +710,7 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
         myf_kosuu_kesi = 0;
         for (i = 0; i < 6; i++) {
             for (j = 0; j < 13; j++) {
-                if ((ba[i][j] != 0) && (ba[i][j] < 6)) {
+                if (isNormalTLColor(TLColor(ba[i][j]))) {
                     myf_kosuu_kesi++;
                 }
             }
@@ -980,7 +980,7 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
     for (i = 0; i < 6; i++) {
         n = 0;
         for (j = 0; j < 13; j++) {
-            if (ba2[i][j] == 0)
+            if (ba2[i][j] == TLColor::EMPTY)
                 n++;
         }
         hym[i] += n * 2;
@@ -1081,9 +1081,9 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
             num = 0;
             for (i = 0; i < 6; i++) {
                 for (j = 0; j < 12; j++) {
-                    if (ba[i][j] == 0)
+                    if (ba[i][j] == TLColor::EMPTY)
                         break;
-                    if ((point[i][j] != 1) && (ba[i][j] != 6)) {
+                    if (point[i][j] != 1 && isNormalTLColor(TLColor(ba[i][j]))) {
                         saiki(ba, point, i, j, &num, ba[i][j]);
                         if (num != 0) {
                             if (num == 2)
@@ -1264,10 +1264,10 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
     m_myf_kosuu = 0;
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
-            if (ba3[i][j] != 0) {
+            if (ba3[i][j] != TLColor::EMPTY) {
                 m_myf_kosuu++;
             }
-            if ((ba3[i][j] != 0) && (ba3[i][j] < 6)) {
+            if (isNormalTLColor(TLColor(ba3[i][j]))) {
                 myf_kosuu_iro++;
             }
         }
@@ -1279,10 +1279,10 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
 
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
-            if ((aite_ba[i][j] != 0) && (aite_ba[i][j] < 6)) {
+            if (isNormalTLColor(TLColor(aite_ba[i][j]))) {
                 aite_kosuu_iro++;
             }
-            if ((aite_ba[i][j] != 0)) {
+            if (aite_ba[i][j] != TLColor::EMPTY) {
                 aite_ojama++;
             }
         }
@@ -1458,7 +1458,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
         myf_kosuu_kesi = 0;
         for (i = 0; i < 6; i++) {
             for (j = 0; j < 13; j++) {
-                if ((ba[i][j] != 0) && (ba[i][j] < 6)) {
+                if (isNormalTLColor(TLColor(ba[i][j]))) {
                     myf_kosuu_kesi++;
                 }
             }
@@ -1774,7 +1774,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 }
                 for (i = 1; i < 5; i++) {
                     for (j = 0; j < 9; j++) {
-                        if (ba_ee[i][j] == 0) {
+                        if (ba_ee[i][j] == TLColor::EMPTY) {
                             if ((ba_ee[i - 1][j + 1] != 0) && (ba_ee[i + 1][j + 1] != 0))
                                 g_score_hukasa[aa][bb][dd] -= 300;
                             break;
@@ -1798,7 +1798,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 // Balanced field
                 for (i = 0; i < 6; i++) {
                     for (j = 0; j < 14; j++) {
-                        if (ba_ee[i][j] == 0) {
+                        if (ba_ee[i][j] == TLColor::EMPTY) {
                             teimen[i] = j;
                             break;
                         }
@@ -1903,7 +1903,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     for (i = 0; i < 6; i++) {
                         for (j = 0; j < 12; j++) {
                             point2[i][j] = 8;
-                            if (ba[i][j] != 0 && ba[i][j] != 6) {
+                            if (isNormalTLColor(TLColor(ba[i][j]))) {
                                 if (i != 5 && ba[i][j + 1] == 0 && ba[i + 1][j] == 0) {
                                     if (j != 11 && (i != 4 || ba[3][11] == 0)) {
                                         point2[i][j] = 2;
@@ -1995,9 +1995,9 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                                 num = 0;
                                 for (i = 0; i < 6; i++) {
                                     for (j = 0; j < 12; j++) {
-                                        if (bass[i][j] == 0)
+                                        if (bass[i][j] == TLColor::EMPTY)
                                             break;
-                                        if ((point[i][j] != 1) && (bass[i][j] != 6)) {
+                                        if (point[i][j] != 1 && isNormalTLColor(TLColor(bass[i][j]))) {
                                             saiki(bass, point, i, j, &num, bass[i][j]);
                                             pois = pois + num * num * num;
                                             num = 0;
@@ -2008,7 +2008,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                             if (chain > m_cchai - 3) {
                                 for (i = 0; i < 5; i++) {
                                     for (j = 0; j < yokotate; j++) {
-                                        if ((bass[i][j] != 0) && (bass[i][j] != 6)) {
+                                        if (isNormalTLColor(TLColor(bass[i][j]))) {
                                             if (bass[i][j] == bass[i + 1][j])
                                                 pois += yokopoint;
                                         }
