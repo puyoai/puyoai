@@ -127,14 +127,12 @@ bool Pattern::MergeWith(const Pattern& a) {
   int offset = 0;
   for (const std::string& l : pattern_) {
     for (char c : l) {
-      if (isupper(c) && c > offset)
+      if (std::isupper(c) && c > offset)
         offset = c;
     }
   }
-  if (isupper(offset))
+  if (std::isupper(offset))
     offset = offset - 'A' + 1;
-  else
-    offset = 0;
 
   bool merge = true;
   for (size_t i = 0; i < a.pattern_.size(); ++i) {
@@ -142,10 +140,15 @@ bool Pattern::MergeWith(const Pattern& a) {
       if (a.pattern_[i][j] == '.')
         continue;
 
-      if (pattern_[i][j] == '.')
-        pattern_[i][j] = a.pattern_[i][j] + offset;
-      else
+      if (pattern_[i][j] != '.') {
         merge = false;
+        break;
+      }
+
+      if (a.pattern_[i][j] == '_')
+        pattern_[i][j] = a.pattern_[i][j];
+      else
+        pattern_[i][j] = a.pattern_[i][j] + offset;
     }
   }
 
@@ -159,7 +162,7 @@ bool Pattern::MergeWith(const Pattern& a) {
   }
   num_puyos_ += a.num_puyos_;
   Optimize();
-  
+
   return true;
 }
 
@@ -210,7 +213,7 @@ int Pattern::GetScore(MatchingCounts& matching) const {
   matching.erase('_');
 
   for (auto& matching_itr : matching) {
-    DCHECK(std::isupper(matching_itr.first));
+    DCHECK(std::isupper(matching_itr.first)) << name_ << ":" << matching_itr.first;
     auto& color_map = matching_itr.second;
     color_map.erase(PuyoColor::EMPTY);
     if (color_map.size() > 1)
