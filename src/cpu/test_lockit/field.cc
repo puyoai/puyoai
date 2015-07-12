@@ -303,7 +303,8 @@ bool IsTLFieldEmpty(const int field[6][kHeight])
 
 void saiki(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
-    DCHECK(isNormalTLColor(TLColor(incol)));
+    DCHECK(isNormalTLColor(TLColor(incol)))
+            << "saiki(x=" << x << ",y=" << y << ",incol=" << incol << ")";
 
     point[x][y] = 1;
     *num += 1;
