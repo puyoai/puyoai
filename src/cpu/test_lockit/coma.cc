@@ -50,6 +50,16 @@ bool IsMatchIndexAndColors(int id, int color[]) {
 
 }  // namespace
 
+COMAI_HI::COMAI_HI(const cpu::Configuration& config) :
+    config(config)
+{
+    ref();
+}
+
+COMAI_HI::~COMAI_HI()
+{
+}
+
 void COMAI_HI::ref()
 {
     m_cchai = 0;
@@ -86,49 +96,6 @@ void COMAI_HI::ref()
     m_aa_max_score = 0;
     m_hakkatime = 0;
     m_numg = 0;
-}
-
-COMAI_HI::COMAI_HI(const cpu::Configuration& config) :
-    config(config)
-{
-    int i;
-    m_cchai = 0;
-    m_hukks = 0;
-    m_conaa = 0;
-    m_nexaa = 0;
-    m_maxchais = 0;
-    for (i = 0; i < 22; i++) {
-        m_para[i] = 0;
-    }
-    m_myf_kosuu = 0;
-    m_saisoku_flag = saisoku_point;
-    m_aite_hakka_rensa = 0;
-    m_aite_hakka_nokori = 0;
-    m_aite_hakka_zenkesi = 0;
-    m_aite_hakka_kosuu = 0;
-    m_nocc_aite_rensa_score = 0;
-    m_aite_rensa_score = 0;
-    m_aite_rensa_score_cc = 0;
-    m_key_ee = 1;
-    m_aite_hakkaji_score = 0;
-    m_aite_hakka_jamako = 0;
-    m_aite_hakka_honsen = 0;
-    m_aite_puyo_uki = 0;
-    m_aite_hakka_quick = 0;
-    m_kougeki_on = 0;
-    m_kougeki_edge = 0;
-    m_kougeki_iryoku = 0;
-    m_one_tanpatu = 1;
-    m_score_max = 0;
-    m_mmmax = -1;
-    m_score_aa = -10;
-    m_aa_max_score = 0;
-    m_hakkatime = 0;
-    m_numg = 0;
-}
-
-COMAI_HI::~COMAI_HI()
-{
 }
 
 bool COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
