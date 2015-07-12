@@ -17,11 +17,11 @@
 
 namespace test_lockit {
 
+namespace {
+
 int g_chainhyk[22][22][221][EE_SIZE] {};
 int g_poihyo[22][22][221][EE_SIZE] {};
 int g_score_hukasa[22][22][221] {};
-
-namespace {
 
 const TLColor kTsumoPatterns[][2] = {
     {TLColor::RED, TLColor::RED},
