@@ -57,4 +57,29 @@ TEST(FieldTest, Saiki) {
     EXPECT_EQ(expect_points, count_point);
 }
 
+TEST(FieldTest, countNormalColor13)
+{
+    CoreField cf(
+        "G....." // 14
+        "R....." // 13
+        "Y....." // 12
+        "B....."
+        "G....."
+        "R....."
+        "Y....." // 8
+        "B....."
+        "G....."
+        "R....."
+        "Y....." // 4
+        "B....."
+        "G....."
+        "R.OOO."
+    );
+
+    int field[6][kHeight];
+    toTLField(cf, field);
+
+    EXPECT_EQ(13, countNormalColor13(field));
+}
+
 }  // namespace test_lockit
