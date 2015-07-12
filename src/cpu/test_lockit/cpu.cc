@@ -245,9 +245,11 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
             r_player[0].te_x = tmp - 6 + 1;
             r_player[0].te_r = 2;
         } else if (tmp < 17) {
-            r_player[0].te_x = tmp - 12 + 1;
+            // In case r=3, we use 2 <= x <= 6.
+            r_player[0].te_x = tmp - 12 + 2;
             r_player[0].te_r = 3;
         } else if (tmp < 22) {
+            // In case r=1, we use 1 <= x <= 5.
             r_player[0].te_x = tmp - 17 + 1;
             r_player[0].te_r = 1;
         }
