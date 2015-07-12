@@ -17,11 +17,11 @@
 
 namespace test_lockit {
 
-int chainhyk[22][22][221][EE_SIZE] {};
-int poihyo[22][22][221][EE_SIZE] {};
-int score_hukasa[22][22][221] {};
-
 namespace {
+
+int g_chainhyk[22][22][221][EE_SIZE] {};
+int g_poihyo[22][22][221][EE_SIZE] {};
+int g_score_hukasa[22][22][221] {};
 
 const TLColor kTsumoPatterns[][2] = {
     {TLColor::RED, TLColor::RED},
@@ -876,8 +876,8 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
             for (bb = 0; bb < 22; bb++) {
                 for (dd = 0; dd < 221; dd++) {
                     for (ee = 0; ee < EE_SIZE; ee++) {
-                        chainhyk[aa][bb][dd][ee] = 0;
-                        poihyo[aa][bb][dd][ee] = -3000;
+                        g_chainhyk[aa][bb][dd][ee] = 0;
+                        g_poihyo[aa][bb][dd][ee] = -3000;
                     }
                 }
             }
@@ -923,8 +923,8 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
             if (ba_ee[2][11] != 0) {
                 for (ee = 0; ee < EE_SIZE; ee++) {
                     for (dd = 0; dd < 221; dd++) {
-                        chainhyk[aa][bb][dd][ee] = 0;
-                        poihyo[aa][bb][dd][ee] = -3000;
+                        g_chainhyk[aa][bb][dd][ee] = 0;
+                        g_poihyo[aa][bb][dd][ee] = -3000;
                     }
                 }
                 continue;
@@ -941,8 +941,8 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
                 for (ee = 0; ee < EE_SIZE; ee++) {
                     if ((m_key_ee == 0) && (ee > 0))
                         break; // t2
-                    hyktmp = chainhyk[aa][bb][dd][ee] * 1000 + poihyo[aa][bb][dd][ee]
-                             + (((m_myf_kosuu > 40) || syuusoku) * (ee == 0) * 300) + score_hukasa[aa][bb][dd];
+                    hyktmp = g_chainhyk[aa][bb][dd][ee] * 1000 + g_poihyo[aa][bb][dd][ee]
+                             + (((m_myf_kosuu > 40) || syuusoku) * (ee == 0) * 300) + g_score_hukasa[aa][bb][dd];
                     if (hym[aa] < hyktmp) {
                         hym[aa] = hyktmp;
                         m_max_ee = ee;
@@ -1311,10 +1311,10 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
     for (dd = 0; dd < 221; dd++) {
         for (aa = 0; aa < 22; aa++) {
             for (bb = 0; bb < 22; bb++) {
-                score_hukasa[aa][bb][dd] = 3000;
+                g_score_hukasa[aa][bb][dd] = 3000;
                 for (ee = 0; ee < EE_SIZE; ee++) {
-                    chainhyk[aa][bb][dd][ee] = 0;
-                    poihyo[aa][bb][dd][ee] = -2000;
+                    g_chainhyk[aa][bb][dd][ee] = 0;
+                    g_poihyo[aa][bb][dd][ee] = -2000;
                 }
             }
         }
@@ -1635,8 +1635,8 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
             if (ba_a[2][11] != 0) {
                 for (bb = 0; bb < 22; bb++) {
                     for (ee = 0; ee < EE_SIZE; ee++) {
-                        chainhyk[aa][bb][dd][ee] = 0;
-                        poihyo[aa][bb][dd][ee] = -3000;
+                        g_chainhyk[aa][bb][dd][ee] = 0;
+                        g_poihyo[aa][bb][dd][ee] = -3000;
                     }
                 }
                 continue;
@@ -1681,8 +1681,8 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     continue;
                 if (ba_ee[2][11] != 0) {
                     for (ee = 0; ee < EE_SIZE; ee++) {
-                        chainhyk[aa][bb][dd][ee] = 0;
-                        poihyo[aa][bb][dd][ee] = -3000;
+                        g_chainhyk[aa][bb][dd][ee] = 0;
+                        g_poihyo[aa][bb][dd][ee] = -3000;
                     }
                     continue;
                 } // 110604
@@ -1732,8 +1732,8 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                         continue;
                     if (ba_ee[2][11] != 0) {
                         for (ee = 0; ee < EE_SIZE; ee++) {
-                            chainhyk[aa][bb][dd][ee] = 0;
-                            poihyo[aa][bb][dd][ee] = -3000;
+                            g_chainhyk[aa][bb][dd][ee] = 0;
+                            g_poihyo[aa][bb][dd][ee] = -3000;
                         }
                         continue;
                     } // 110604
@@ -1742,33 +1742,33 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 // Penalty for CHIGIRI
                 if (m_aite_hakka_honsen == 0) {
                     if (config.p_t == 4)
-                        score_hukasa[aa][bb][dd] -= (chig_aa * 3 + chig_bb * 2 + chig_dd * 1) * 400;
+                        g_score_hukasa[aa][bb][dd] -= (chig_aa * 3 + chig_bb * 2 + chig_dd * 1) * 400;
                     if (config.p_t == 3)
-                        score_hukasa[aa][bb][dd] -= (chig_aa * 3 + chig_bb * 2 + chig_dd * 1) * 30;
+                        g_score_hukasa[aa][bb][dd] -= (chig_aa * 3 + chig_bb * 2 + chig_dd * 1) * 30;
                     if (config.p_t == 2)
-                        score_hukasa[aa][bb][dd] -= (chig_aa * 2 + chig_bb * 1 + chig_dd * 1);
+                        g_score_hukasa[aa][bb][dd] -= (chig_aa * 2 + chig_bb * 1 + chig_dd * 1);
                     if (config.p_t == 1)
-                        score_hukasa[aa][bb][dd] -= (chig_aa * 1 + chig_bb * 1 + chig_dd * 1);
+                        g_score_hukasa[aa][bb][dd] -= (chig_aa * 1 + chig_bb * 1 + chig_dd * 1);
                 } else {
                     if (config.p_t == 4)
-                        score_hukasa[aa][bb][dd] -= (chig_aa * 2 + chig_bb * 1 + chig_dd * 1);
+                        g_score_hukasa[aa][bb][dd] -= (chig_aa * 2 + chig_bb * 1 + chig_dd * 1);
                     if (config.p_t == 3)
-                        score_hukasa[aa][bb][dd] -= (chig_aa * 2 + chig_bb * 1 + chig_dd * 1);
+                        g_score_hukasa[aa][bb][dd] -= (chig_aa * 2 + chig_bb * 1 + chig_dd * 1);
                     if (config.p_t == 2)
-                        score_hukasa[aa][bb][dd] -= (chig_aa * 2 + chig_bb * 1 + chig_dd * 1);
+                        g_score_hukasa[aa][bb][dd] -= (chig_aa * 2 + chig_bb * 1 + chig_dd * 1);
                     if (config.p_t == 1)
-                        score_hukasa[aa][bb][dd] -= (chig_aa * 1 + chig_bb * 1 + chig_dd * 1);
+                        g_score_hukasa[aa][bb][dd] -= (chig_aa * 1 + chig_bb * 1 + chig_dd * 1);
                 }
 
                 // Penalty for field like 'U'
                 if (ba_ee[2][10] != 0)
-                    score_hukasa[aa][bb][dd] -= 1200;
+                    g_score_hukasa[aa][bb][dd] -= 1200;
                 if (ba_ee[3][10] != 0)
-                    score_hukasa[aa][bb][dd] -= 1200;
+                    g_score_hukasa[aa][bb][dd] -= 1200;
                 for (j = 0; j < 9; j++) {
                     if (ba_ee[0][j] == 0) {
                         if (ba_ee[1][j + 1] != 0)
-                            score_hukasa[aa][bb][dd] -= 300;
+                            g_score_hukasa[aa][bb][dd] -= 300;
                         break;
                     }
                 }
@@ -1776,7 +1776,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     for (j = 0; j < 9; j++) {
                         if (ba_ee[i][j] == 0) {
                             if ((ba_ee[i - 1][j + 1] != 0) && (ba_ee[i + 1][j + 1] != 0))
-                                score_hukasa[aa][bb][dd] -= 300;
+                                g_score_hukasa[aa][bb][dd] -= 300;
                             break;
                         }
                     }
@@ -1784,7 +1784,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 for (j = 0; j < 9; j++) {
                     if (ba_ee[5][j] == 0) {
                         if (ba_ee[4][j + 1] != 0)
-                            score_hukasa[aa][bb][dd] -= 300;
+                            g_score_hukasa[aa][bb][dd] -= 300;
                         break;
                     }
                 }
@@ -1792,7 +1792,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 // GTR-check
                 if ((zenkesi_own != 1) && (zenkesi_aite != 1) && (config.o_t)) {
                     if (m_hukks < 10)
-                        score_hukasa[aa][bb][dd] += gtr(ba_ee);
+                        g_score_hukasa[aa][bb][dd] += gtr(ba_ee);
                 }
 
                 // Balanced field
@@ -1809,27 +1809,27 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     teimen[0] = (teimen[0] - 3) * 6 - aveteimen;
                     if (teimen[0] < 0)
                         teimen[0] = teimen[0] * (-1);
-                    score_hukasa[aa][bb][dd] -= teimen[0] * 10;
+                    g_score_hukasa[aa][bb][dd] -= teimen[0] * 10;
                     teimen[1] = (teimen[1]) * 6 - aveteimen;
                     if (teimen[1] < 0)
                         teimen[1] = teimen[1] * (-1);
-                    score_hukasa[aa][bb][dd] -= teimen[1] * 10;
+                    g_score_hukasa[aa][bb][dd] -= teimen[1] * 10;
                     teimen[2] = (teimen[2] + 1) * 6 - aveteimen;
                     if (teimen[2] < 0)
                         teimen[2] = teimen[2] * (-1);
-                    score_hukasa[aa][bb][dd] -= teimen[2] * 10;
+                    g_score_hukasa[aa][bb][dd] -= teimen[2] * 10;
                     teimen[3] = (teimen[3] + 1) * 6 - aveteimen;
                     if (teimen[3] < 0)
                         teimen[3] = teimen[3] * (-1);
-                    score_hukasa[aa][bb][dd] -= teimen[3] * 10;
+                    g_score_hukasa[aa][bb][dd] -= teimen[3] * 10;
                     teimen[4] = (teimen[4]) * 6 - aveteimen;
                     if (teimen[4] < 0)
                         teimen[4] = teimen[4] * (-1);
-                    score_hukasa[aa][bb][dd] -= teimen[4] * 10;
+                    g_score_hukasa[aa][bb][dd] -= teimen[4] * 10;
                     teimen[5] = (teimen[5] - 3) * 6 - aveteimen;
                     if (teimen[5] < 0)
                         teimen[5] = teimen[5] * (-1);
-                    score_hukasa[aa][bb][dd] -= teimen[5] * 10;
+                    g_score_hukasa[aa][bb][dd] -= teimen[5] * 10;
                 }
 
                 // Tanpatsu
@@ -1839,7 +1839,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 if (keshiko_aa > 7 || keshiko_bb > 7)
                     tanpatu_on = 0;
                 if (tanpatu_on > 0 && myf_kosuu_iro > aite_kosuu_iro + 1 && myf_kosuu_iro > 23 && m_one_tanpatu && m_aite_hakka_kosuu == 0 && m_aite_hakka_rensa == 0)
-                    score_hukasa[aa][bb][dd] += tanpatu_on * 120;
+                    g_score_hukasa[aa][bb][dd] += tanpatu_on * 120;
 
                 // TODO(peria): what ee means?
                 for (ee = 0; ee < EE_SIZE; ee++) {
@@ -1881,23 +1881,23 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     }
 
                     if (ba[2][11] != 0) {
-                        chainhyk[aa][bb][dd][ee] = 0;
-                        poihyo[aa][bb][dd][ee] = -3000;
+                        g_chainhyk[aa][bb][dd][ee] = 0;
+                        g_poihyo[aa][bb][dd][ee] = -3000;
                         continue;
                     }
                     if ((ba[0][10] == 0) && (ba[1][11] != 0) && (ba2[1][11] == 0)) {
-                        chainhyk[aa][bb][dd][ee] = 0;
-                        poihyo[aa][bb][dd][ee] = -2000;
+                        g_chainhyk[aa][bb][dd][ee] = 0;
+                        g_poihyo[aa][bb][dd][ee] = -2000;
                         continue;
                     }
                     if (((ba[5][10] == 0) || (ba[4][10] == 0)) && (ba[3][11] != 0) && (ba2[3][11] == 0)) {
-                        chainhyk[aa][bb][dd][ee] = 0;
-                        poihyo[aa][bb][dd][ee] = -2000;
+                        g_chainhyk[aa][bb][dd][ee] = 0;
+                        g_poihyo[aa][bb][dd][ee] = -2000;
                         continue;
                     }
                     if ((ba[5][10] == 0) && (ba[4][11] != 0) && (ba2[4][11] == 0)) {
-                        chainhyk[aa][bb][dd][ee] = 0;
-                        poihyo[aa][bb][dd][ee] = -2000;
+                        g_chainhyk[aa][bb][dd][ee] = 0;
+                        g_poihyo[aa][bb][dd][ee] = -2000;
                         continue;
                     }
                     for (i = 0; i < 6; i++) {
@@ -2015,12 +2015,12 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                                     }
                                 } // 12-2
                             }
-                            if (chainhyk[aa][bb][dd][ee] < chain) {
-                                chainhyk[aa][bb][dd][ee] = chain;
-                                poihyo[aa][bb][dd][ee] = (pois + poi2s);
-                            } else if (chainhyk[aa][bb][dd][ee] == chain) {
-                                if (poihyo[aa][bb][dd][ee] < (pois + poi2s)) {
-                                    poihyo[aa][bb][dd][ee] = (pois + poi2s);
+                            if (g_chainhyk[aa][bb][dd][ee] < chain) {
+                                g_chainhyk[aa][bb][dd][ee] = chain;
+                                g_poihyo[aa][bb][dd][ee] = (pois + poi2s);
+                            } else if (g_chainhyk[aa][bb][dd][ee] == chain) {
+                                if (g_poihyo[aa][bb][dd][ee] < (pois + poi2s)) {
+                                    g_poihyo[aa][bb][dd][ee] = (pois + poi2s);
                                 }
                             }
                             if (kuraichk == 1)
