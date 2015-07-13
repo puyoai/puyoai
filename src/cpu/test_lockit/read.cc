@@ -14,11 +14,11 @@ void READ_P::ref()
     int i, j;
     for (i = 0; i < 6; i++) {
         for (j = 0; j < kHeight; j++) {
-            field[i][j] = 0;
-            yosou_field[i][j] = 0;
+            field[i][j] = TLColor::EMPTY;
+            yosou_field[i][j] = TLColor::EMPTY;
         }
-        tsumo[i] = 1;
-        field12[i] = 0;
+        tsumo[i] = TLColor::RED; // Why RED here?
+        field12[i] = TLColor::EMPTY;
     }
     act_on = 0;
     act_on_1st = 0;
@@ -40,11 +40,11 @@ READ_P::READ_P()
     int i, j;
     for (i = 0; i < 6; i++) {
         for (j = 0; j < kHeight; j++) {
-            field[i][j] = 0;
-            yosou_field[i][j] = 0;
+            field[i][j] = TLColor::EMPTY;
+            yosou_field[i][j] = TLColor::EMPTY;
         }
-        tsumo[i] = 1;
-        field12[i] = 0;
+        tsumo[i] = TLColor::RED;
+        field12[i] = TLColor::EMPTY;
     }
     act_on = 0;
     act_on_1st = 0;
@@ -71,11 +71,11 @@ void READ_P::fall()
     for (i = 0; i < 6; i++) {
         n = 0;
         for (j = 0; j < 13; j++) {
-            if (field[i][j] == 0) {
+            if (field[i][j] == TLColor::EMPTY) {
                 n++;
             } else if (n != 0) {
                 field[i][j - n] = field[i][j];
-                field[i][j] = 0;
+                field[i][j] = TLColor::EMPTY;
             }
         }
     }
@@ -129,7 +129,7 @@ int READ_P::setti_puyo()
     nx2 = tsumo[1];
     if (aa < 6) {
         for (j = 0; j < 13; j++) {
-            if (field[aa][j] == 0) {
+            if (field[aa][j] == TLColor::EMPTY) {
                 field[aa][j] = nx1;
                 field[aa][j + 1] = nx2;
                 setti_basyo[0] = aa;
@@ -141,7 +141,7 @@ int READ_P::setti_puyo()
         }
     } else if (aa < 12) {
         for (j = 0; j < 13; j++) {
-            if (field[aa - 6][j] == 0) {
+            if (field[aa - 6][j] == TLColor::EMPTY) {
                 field[aa - 6][j] = nx2;
                 field[aa - 6][j + 1] = nx1;
                 setti_basyo[0] = aa - 6;
@@ -153,7 +153,7 @@ int READ_P::setti_puyo()
         }
     } else if (aa < 17) {
         for (j = 0; j < 13; j++) {
-            if (field[aa - 11][j] == 0) {
+            if (field[aa - 11][j] == TLColor::EMPTY) {
                 field[aa - 11][j] = nx1;
                 setti_basyo[0] = aa - 11;
                 setti_basyo[1] = j;
@@ -161,7 +161,7 @@ int READ_P::setti_puyo()
             }
         }
         for (j = 0; j < 13; j++) {
-            if (field[aa - 12][j] == 0) {
+            if (field[aa - 12][j] == TLColor::EMPTY) {
                 field[aa - 12][j] = nx2;
                 setti_basyo[2] = aa - 12;
                 setti_basyo[3] = j;
@@ -170,7 +170,7 @@ int READ_P::setti_puyo()
         }
     } else if (aa < 22) {
         for (j = 0; j < 13; j++) {
-            if (field[aa - 17][j] == 0) {
+            if (field[aa - 17][j] == TLColor::EMPTY) {
                 field[aa - 17][j] = nx1;
                 setti_basyo[0] = aa - 17;
                 setti_basyo[1] = j;
@@ -178,7 +178,7 @@ int READ_P::setti_puyo()
             }
         }
         for (j = 0; j < 13; j++) {
-            if (field[aa - 16][j] == 0) {
+            if (field[aa - 16][j] == TLColor::EMPTY) {
                 field[aa - 16][j] = nx2;
                 setti_basyo[2] = aa - 16;
                 setti_basyo[3] = j;
@@ -236,13 +236,13 @@ int READ_P::chousei_syoukyo()
         if (rakkaflg[i] == 1) {
             n = 0;
             for (j = 0; j < 13; j++) {
-                if (field[i][j] == 0) {
+                if (field[i][j] == TLColor::EMPTY) {
                     if (n == 0)
                         kiept[i] = j;
                     n++;
                 } else if (n != 0) {
                     field[i][j - n] = field[i][j];
-                    field[i][j] = 0;
+                    field[i][j] = TLColor::EMPTY;
                 }
             }
         }
@@ -282,7 +282,7 @@ int READ_P::chousei_syoukyo()
                         n++;
                     } else if (n != 0) {
                         field[i][j - n] = field[i][j];
-                        field[i][j] = 0;
+                        field[i][j] = TLColor::EMPTY;
                     }
                 }
             }
