@@ -208,7 +208,7 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
         memcpy(ba_a, ba3, sizeof(ba));
         setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
         keshiko_aa = chousei_syoukyo_2(ba_a, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_aa);
-        if (ba_a[2][11] != 0)
+        if (ba_a[2][11] != TLColor::EMPTY)
             continue;
         for (bb = 0; bb < 22; bb++) {
             if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
@@ -216,7 +216,7 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
             memcpy(ba_b, ba_a, sizeof(ba));
             setti_puyo(ba_b, bb, nn1, nn2, setti_basyo);
             keshiko_bb = chousei_syoukyo_2(ba_b, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_bb);
-            if (ba_b[2][11] != 0)
+            if (ba_b[2][11] != TLColor::EMPTY)
                 continue;
 
             for (cc = 1; cc < 5; cc++) {
@@ -228,7 +228,7 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
                     memcpy(ba_d, ba_b, sizeof(ba));
                     setti_puyo(ba_d, dd, nk1, nk2, setti_basyo);
                     keshiko_dd = chousei_syoukyo_2(ba_d, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_dd);
-                    if (ba_d[2][11] != 0)
+                    if (ba_d[2][11] != TLColor::EMPTY)
                         continue;
 
                     scores = score_aa;
@@ -366,7 +366,7 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
                                     n++;
                                 } else if (n != 0) {
                                     ba[i][j - n] = ba[i][j];
-                                    ba[i][j] = 0;
+                                    ba[i][j] = TLColor::EMPTY;
                                 }
                             }
                         }
