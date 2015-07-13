@@ -27,6 +27,7 @@ int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick);
 int setti_ojama(int f[][kHeight], int ojamako);
 
 int countNormalColor13(const int f[][kHeight]);
+void copyField(const int src[][kHeight], int dst[][kHeight]);
 
 }  // namespace test_lockit
 
