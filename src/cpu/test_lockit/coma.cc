@@ -107,12 +107,7 @@ bool COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, in
     bool ret_keshi = false;
 
     int kosuu_mae = countNormalColor13(ba3);
-
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 13; j++) {
-            ba[i][j] = ba3[i][j];
-        }
-    }
+    copyField(ba3, ba);
 
     m_aite_hakka_rensa = hon_syoukyo_score(ba, &score, &quick);
     m_aite_hakka_nokori = m_aite_hakka_rensa;
@@ -193,7 +188,6 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
     int score_bb = 0;
     int score_dd = 0;
     int scores = 0;
-    int irokosuu = 0;
 
     int cc;
     int chain2 = 0;
@@ -206,13 +200,8 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
     nx2 = toValidTLColor(TLColor(tsumo[1]));
     nn1 = toValidTLColor(TLColor(tsumo[2]));
     nn2 = toValidTLColor(TLColor(tsumo[3]));
-    for (i = 0; i < 6; i++) {
-        for (j = 0; j < 13; j++) {
-            ba2[i][j] = ba3[i][j];
-            if (isNormalTLColor(TLColor(ba3[i][j])))
-                irokosuu++;
-        }
-    }
+    copyField(ba3, ba2);
+    int irokosuu = countNormalColor13(ba3);
 
     for (aa = 0; aa < 22; aa++) {
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
