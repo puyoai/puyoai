@@ -586,7 +586,7 @@ int chousei_syoukyo(int ba[][kHeight], int setti_basyo[])
                     continue;
                 if (ba[i][j] == 0)
                     break;
-                if (ba[i][j] != 6) {
+                if (ba[i][j] != TLColor::OJAMA) {
                     saiki(ba, point, i, j, &num, ba[i][j]);
                     if (num > 3) {
                         syo = 1;
@@ -848,7 +848,7 @@ int chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int to
                     continue;
                 if (bass[i][j] == 0)
                     break;
-                if (bass[i][j] != 6) {
+                if (bass[i][j] != TLColor::OJAMA) {
                     saiki(bass, point, i, j, &num, bass[i][j]);
                     if (num > 3) {
                         syo = 1;
@@ -1211,7 +1211,7 @@ int setti_ojama(int f[][kHeight], int ojamako)
         cnt = 0;
         for (j = 0; j < 13; j++) {
             if (f[i][j] == 0) {
-                f[i][j] = 6;
+                f[i][j] = TLColor::OJAMA;
                 cnt++;
             }
             if (cnt == okiko)

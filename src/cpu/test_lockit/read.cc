@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include "color.h"
 #include "field.h"
 
 using namespace std;
@@ -260,7 +261,7 @@ int READ_P::chousei_syoukyo()
             for (j = kiept[i]; j < 12; j++) {
                 if (field[i][j] == 0)
                     continue;
-                if ((point[i][j] != 1) && (field[i][j] != 6)) {
+                if ((point[i][j] != 1) && (field[i][j] != TLColor::OJAMA)) {
                     saiki(field, point, i, j, &num, field[i][j]);
                     if (num > 3) {
                         syo = 1;
