@@ -606,6 +606,9 @@ KeySetSeq PuyoController::findKeyStrokeOnlineInternal(const CoreField& field, co
             break;
         }
 
+        DCHECK(current.isValid()) << field.toDebugString() << '\n'
+                                  << current.toDebugString();
+
         // for simplicity, direct child-puyo upwards
         // TODO(yamaguchi): eliminate unnecessary moves
         if (current.r == 1) {
