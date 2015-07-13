@@ -159,7 +159,6 @@ int COMAI_HI::aite_rensa_end()
 
 int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
 {
-    int ba2[6][kHeight] {};
     int ba[6][kHeight] {};
     int ba_a[6][kHeight] {};
     int ba_b[6][kHeight] {};
@@ -200,13 +199,12 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
     nx2 = toValidTLColor(TLColor(tsumo[1]));
     nn1 = toValidTLColor(TLColor(tsumo[2]));
     nn2 = toValidTLColor(TLColor(tsumo[3]));
-    copyField(ba3, ba2);
     int irokosuu = countNormalColor13(ba3);
 
     for (aa = 0; aa < 22; aa++) {
-        if (tobashi_hantei_a(ba2, aa, nx1, nx2))
+        if (tobashi_hantei_a(ba3, aa, nx1, nx2))
             continue;
-        memcpy(ba_a, ba2, sizeof(ba));
+        memcpy(ba_a, ba3, sizeof(ba));
         setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
         keshiko_aa = chousei_syoukyo_2(ba_a, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_aa);
         if (ba_a[2][11] != 0)
@@ -267,53 +265,53 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
                     continue;
                 } else if (cc < 7) {
                     for (j = 0; j < 13; j++) {
-                        if (ba[cc - 1][j] == 0) {
-                            ba[cc - 1][j] = 1;
-                            ba[cc - 1][j + 1] = 1;
+                        if (ba[cc - 1][j] == TLColor::EMPTY) {
+                            ba[cc - 1][j] = TLColor::RED;
+                            ba[cc - 1][j + 1] = TLColor::RED;
                             break;
                         }
                     }
                 } else if (cc < 13) {
                     for (j = 0; j < 13; j++) {
-                        if (ba[cc - 7][j] == 0) {
-                            ba[cc - 7][j] = 2;
-                            ba[cc - 7][j + 1] = 2;
+                        if (ba[cc - 7][j] == TLColor::EMPTY) {
+                            ba[cc - 7][j] = TLColor::BLUE;
+                            ba[cc - 7][j + 1] = TLColor::BLUE;
                             break;
                         }
                     }
                 } else if (cc < 19) {
                     for (j = 0; j < 13; j++) {
-                        if (ba[cc - 13][j] == 0) {
-                            ba[cc - 13][j] = 3;
-                            ba[cc - 13][j + 1] = 3;
+                        if (ba[cc - 13][j] == TLColor::EMPTY) {
+                            ba[cc - 13][j] = TLColor::YELLOW;
+                            ba[cc - 13][j + 1] = TLColor::YELLOW;
                             break;
                         }
                     }
                 } else if (cc < 25) {
                     for (j = 0; j < 13; j++) {
-                        if (ba[cc - 19][j] == 0) {
-                            ba[cc - 19][j] = 4;
-                            ba[cc - 19][j + 1] = 4;
+                        if (ba[cc - 19][j] == TLColor::EMPTY) {
+                            ba[cc - 19][j] = TLColor::GREEN;
+                            ba[cc - 19][j + 1] = GREEN;
                             break;
                         }
                     }
                 }
 
-                if (ba[1][11] != 0) {
+                if (ba[1][11] != TLColor::EMPTY) {
                     if ((cc % 6) == 1)
                         continue;
                 }
-                if (ba[2][11] != 0) {
+                if (ba[2][11] != TLColor::EMPTY) {
                     if ((cc % 6) != 3)
                         continue;
                 }
-                if (ba[3][11] != 0) {
+                if (ba[3][11] != TLColor::EMPTY) {
                     if ((cc % 6) == 5)
                         continue;
                     if (((cc % 6) == 0) && (cc != 0))
                         continue;
                 }
-                if (ba[4][11] != 0) {
+                if (ba[4][11] != TLColor::EMPTY) {
                     if (((cc % 6) == 0) && (cc != 0))
                         continue;
                 }
