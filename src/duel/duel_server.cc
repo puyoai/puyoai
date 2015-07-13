@@ -68,7 +68,7 @@ struct DuelServer::DuelState {
  *   else:
  *     -1
  */
-static int updateDecision(const vector<FrameResponse>& data, const FieldRealtime& field, Decision* decision)
+static int updateDecision(int frameId, const vector<FrameResponse>& data, const FieldRealtime& field, Decision* decision)
 {
     // updateDecision is called when grounded. Chigiri-puyo might be in the air.
     CoreField cf(CoreField::fromPlainFieldWithDrop(field.field()));
@@ -77,6 +77,12 @@ static int updateDecision(const vector<FrameResponse>& data, const FieldRealtime
     // If we find a command we can use, we'll ignore older ones.
     for (unsigned int i = data.size(); i > 0;) {
         i--;
+
+        // Probably we got the previous game's response. We should ignore it.
+        if (data[i].frameId > frameId) {
+            LOG(WARNING) << "Get previous game response? frameId=" << frameId << " response=" << data[i].toString();
+            continue;
+        }
 
         // When data contains key, it should be from HumanConnector.
         // In that case we accept it.
@@ -268,7 +274,7 @@ void DuelServer::play(DuelState* duelState, const vector<FrameResponse> data[2])
         FieldRealtime* me = &duelState->field[pi];
         FieldRealtime* opponent = &duelState->field[1 - pi];
 
-        int accepted_index = updateDecision(data[pi], *me, &duelState->decision[pi]);
+        int accepted_index = updateDecision(duelState->frameId, data[pi], *me, &duelState->decision[pi]);
 
         // TODO(mayah): ReceivedData from HumanConnector does not have any decision.
         // So, all data will be marked as NACK. Since the HumanConnector does not see ACK/NACK,
