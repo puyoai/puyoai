@@ -1123,17 +1123,17 @@ int COMAI_HI::tobashi_hantei_a(const int ba2[][kHeight], int aa, int nx1, int nx
         if (((aa > 5) && (aa < 12)) || ((aa > 13) && (aa < 19)))
             return 1;
     }
-    if (ba2[0][11] != 0) {
+    if (ba2[0][11] != TLColor::EMPTY) {
         if ((aa == 0) || (aa == 6) || (aa == 12) || (aa == 17))
             return 1;
     }
-    if (ba2[1][11] != 0) {
+    if (ba2[1][11] != TLColor::EMPTY) {
         if ((aa == 0) || (aa == 6) || (aa == 12) || (aa == 17))
             return 1;
         if ((aa == 1) || (aa == 7) || (aa == 13) || (aa == 18))
             return 1;
     }
-    if (ba2[3][11] != 0) {
+    if (ba2[3][11] != TLColor::EMPTY) {
         if ((aa == 3) || (aa == 9) || (aa == 14) || (aa == 19))
             return 1;
         if ((aa == 4) || (aa == 10) || (aa == 15) || (aa == 20))
@@ -1141,13 +1141,13 @@ int COMAI_HI::tobashi_hantei_a(const int ba2[][kHeight], int aa, int nx1, int nx
         if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
             return 1;
     }
-    if (ba2[4][11] != 0) {
+    if (ba2[4][11] != TLColor::EMPTY) {
         if ((aa == 4) || (aa == 10) || (aa == 15) || (aa == 20))
             return 1;
         if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
             return 1;
     }
-    if (ba2[5][11] != 0) {
+    if (ba2[5][11] != TLColor::EMPTY) {
         if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
             return 1;
     }
@@ -1156,17 +1156,17 @@ int COMAI_HI::tobashi_hantei_a(const int ba2[][kHeight], int aa, int nx1, int nx
 
 int COMAI_HI::tobashi_hantei_b(const int ba2[][kHeight], int aa)
 {
-    if (ba2[0][11] != 0) {
+    if (ba2[0][11] != TLColor::EMPTY) {
         if ((aa == 0) || (aa == 6) || (aa == 12) || (aa == 17))
             return 1;
     }
-    if (ba2[1][11] != 0) {
+    if (ba2[1][11] != TLColor::EMPTY) {
         if ((aa == 0) || (aa == 6) || (aa == 12) || (aa == 17))
             return 1;
         if ((aa == 1) || (aa == 7) || (aa == 13) || (aa == 18))
             return 1;
     }
-    if (ba2[3][11] != 0) {
+    if (ba2[3][11] != TLColor::EMPTY) {
         if ((aa == 3) || (aa == 9) || (aa == 14) || (aa == 19))
             return 1;
         if ((aa == 4) || (aa == 10) || (aa == 15) || (aa == 20))
@@ -1174,13 +1174,13 @@ int COMAI_HI::tobashi_hantei_b(const int ba2[][kHeight], int aa)
         if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
             return 1;
     }
-    if (ba2[4][11] != 0) {
+    if (ba2[4][11] != TLColor::EMPTY) {
         if ((aa == 4) || (aa == 10) || (aa == 15) || (aa == 20))
             return 1;
         if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
             return 1;
     }
-    if (ba2[5][11] != 0) {
+    if (ba2[5][11] != TLColor::EMPTY) {
         if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
             return 1;
     }
