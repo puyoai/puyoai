@@ -679,6 +679,11 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
         chain = hon_syoukyo_score(ba, &score, &quick);
 
         // つぶし
+        // 次の条件で潰しを打つ。
+        // 1. 相手の発火が4連鎖未満
+        // 2. こちらの連鎖が2連鎖
+        // 3. こちらの連鎖が相手より260点超大きい
+        // 4. こちらの連鎖のスコアが1600を上回る
         if ((config.e_t) && (m_aite_hakka_rensa < 4)) {
             if ((chain == 2) && (score > m_aite_rensa_score + 260) && (score > 1600)) {
                 hym[aa] += 77000 + score;
@@ -688,6 +693,12 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
             }
         }
 
+        // つぶし
+        // 1. 現在のターン数が tubushiturn を超え
+        // 2. 相手の発火が4連鎖未満かつ、相手の色個数が12を超え
+        // 3. 次の条件のうちいずれかを満たす。
+        //  3a. 自分の連鎖が2連鎖、相手の発火より260点を超えて上回り、スコアが690を超えている。
+        //  3b. 自分の連鎖が3連鎖、相手の連鎖が3連鎖未満 (?)
         if ((m_hukks > tubushiturn) && (m_aite_hakka_rensa < 4) && (aite_kosuu_iro > 12)) {
             if ((chain == 2) && (score > m_aite_rensa_score + 260) && (score > 690)) {
                 hym[aa] += 77000 + score;
