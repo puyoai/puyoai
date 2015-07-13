@@ -12,8 +12,8 @@ namespace test_lockit {
 
 // TODO: Remove following functions.
 // Field converter
-CoreField toCoreField(int[6][kHeight]);
-void toTLField(const CoreField&, int[6][kHeight]);
+CoreField toCoreField(TLColor[6][kHeight]);
+void toTLField(const CoreField&, TLColor[6][kHeight]);
 
 }  // namespace test_lockit
 

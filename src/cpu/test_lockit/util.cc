@@ -7,7 +7,7 @@
 
 namespace test_lockit {
 
-CoreField toCoreField(int f[6][kHeight]) {
+CoreField toCoreField(TLColor f[6][kHeight]) {
     CoreField cf;
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < kHeight; ++j) {
@@ -19,7 +19,7 @@ CoreField toCoreField(int f[6][kHeight]) {
     return cf;
 }
 
-void toTLField(const CoreField& cf, int f[6][kHeight]) {
+void toTLField(const CoreField& cf, TLColor f[6][kHeight]) {
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < kHeight; ++j) {
             f[i][j] = toTLColor(cf.color(i + 1, j + 1));
