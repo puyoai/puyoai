@@ -301,6 +301,15 @@ bool IsTLFieldEmpty(const int field[6][kHeight])
     return true;
 }
 
+void copyField(const int src[][kHeight], int dst[][kHeight])
+{
+    for (int i = 0; i < 6; ++i) {
+        for (int j = 0; j < kHeight; ++j) {
+            dst[i][j] = src[i][j];
+        }
+    }
+}
+
 void saiki(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
 {
     DCHECK(isNormalTLColor(TLColor(incol)))
