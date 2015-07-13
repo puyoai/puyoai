@@ -5,29 +5,31 @@
 #include "color.h"
 #include "core/field_constant.h"
 
+using namespace test_lockit;
+
 namespace {
 
-void saiki_right(const int[][test_lockit::kHeight], int[][12], int, int, int*, int);
-void saiki_left(const int[][test_lockit::kHeight], int[][12], int, int, int*, int);
-void saiki_up(const int[][test_lockit::kHeight], int[][12], int, int, int*, int);
-void saiki_down(const int[][test_lockit::kHeight], int[][12], int, int, int*, int);
+void saiki_right(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
+void saiki_left(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
+void saiki_up(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
+void saiki_down(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
 
-void saiki_3_right(const int[][test_lockit::kHeight], int[][12], int, int, int*, int);
-void saiki_3_left(const int[][test_lockit::kHeight], int[][12], int, int, int*, int);
-void saiki_3_up(const int[][test_lockit::kHeight], int[][12], int, int, int*, int);
-void saiki_3_down(const int[][test_lockit::kHeight], int[][12], int, int, int*, int);
+void saiki_3_right(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
+void saiki_3_left(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
+void saiki_3_up(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
+void saiki_3_down(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
 
-void syou_right(int[][test_lockit::kHeight], int, int, int, int[]);
-void syou_left(int[][test_lockit::kHeight], int, int, int, int[]);
-void syou_up(int[][test_lockit::kHeight], int, int, int, int[]);
-void syou_down(int[][test_lockit::kHeight], int, int, int, int[]);
+void syou_right(TLColor[][kHeight], int, int, TLColor, int[]);
+void syou_left(TLColor[][kHeight], int, int, TLColor, int[]);
+void syou_up(TLColor[][kHeight], int, int, TLColor, int[]);
+void syou_down(TLColor[][kHeight], int, int, TLColor, int[]);
 
-void syou_right_num(int[][test_lockit::kHeight], int, int, int, int[], int*);
-void syou_left_num(int[][test_lockit::kHeight], int, int, int, int[], int*);
-void syou_up_num(int[][test_lockit::kHeight], int, int, int, int[], int*);
-void syou_down_num(int[][test_lockit::kHeight], int, int, int, int[], int*);
+void syou_right_num(TLColor[][kHeight], int, int, TLColor, int[], int*);
+void syou_left_num(TLColor[][kHeight], int, int, TLColor, int[], int*);
+void syou_up_num(TLColor[][kHeight], int, int, TLColor, int[], int*);
+void syou_down_num(TLColor[][kHeight], int, int, TLColor, int[], int*);
 
-void saiki_right(const int ba[][test_lockit::kHeight], int point[][12], int x, int y, int* num, int incol)
+void saiki_right(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -39,7 +41,7 @@ void saiki_right(const int ba[][test_lockit::kHeight], int point[][12], int x, i
         saiki_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_left(const int ba[][test_lockit::kHeight], int point[][12], int x, int y, int* num, int incol)
+void saiki_left(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -51,7 +53,7 @@ void saiki_left(const int ba[][test_lockit::kHeight], int point[][12], int x, in
         saiki_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_up(const int ba[][test_lockit::kHeight], int point[][12], int x, int y, int* num, int incol)
+void saiki_up(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -63,7 +65,7 @@ void saiki_up(const int ba[][test_lockit::kHeight], int point[][12], int x, int 
         saiki_right(ba, point, x + 1, y, num, incol);
 }
 
-void saiki_down(const int ba[][test_lockit::kHeight], int point[][12], int x, int y, int* num, int incol)
+void saiki_down(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -75,7 +77,7 @@ void saiki_down(const int ba[][test_lockit::kHeight], int point[][12], int x, in
         saiki_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_3_right(const int ba[][test_lockit::kHeight], int point[][12], int x, int y, int* num, int incol)
+void saiki_3_right(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -87,7 +89,7 @@ void saiki_3_right(const int ba[][test_lockit::kHeight], int point[][12], int x,
         saiki_3_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_3_left(const int ba[][test_lockit::kHeight], int point[][12], int x, int y, int* num, int incol)
+void saiki_3_left(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -99,7 +101,7 @@ void saiki_3_left(const int ba[][test_lockit::kHeight], int point[][12], int x, 
         saiki_3_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_3_up(const int ba[][test_lockit::kHeight], int point[][12], int x, int y, int* num, int incol)
+void saiki_3_up(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -111,7 +113,7 @@ void saiki_3_up(const int ba[][test_lockit::kHeight], int point[][12], int x, in
         saiki_3_right(ba, point, x + 1, y, num, incol);
 }
 
-void saiki_3_down(const int ba[][test_lockit::kHeight], int point[][12], int x, int y, int* num, int incol)
+void saiki_3_down(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -123,175 +125,175 @@ void saiki_3_down(const int ba[][test_lockit::kHeight], int point[][12], int x, 
         saiki_3_down(ba, point, x, y - 1, num, incol);
 }
 
-void syou_right(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
+void syou_right(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[])
 {
-    ba[x][y] = test_lockit::TLColor::EMPTY;
+    ba[x][y] = TLColor::EMPTY;
     flg[x] = 1;
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
+        ba[x][y + 1] = TLColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
+        ba[x + 1][y] = TLColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
+        ba[x][y - 1] = TLColor::EMPTY;
 }
 
-void syou_left(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
+void syou_left(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[])
 {
-    ba[x][y] = test_lockit::TLColor::EMPTY;
+    ba[x][y] = TLColor::EMPTY;
     flg[x] = 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
+        ba[x - 1][y] = TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
+        ba[x][y + 1] = TLColor::EMPTY;
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
+        ba[x][y - 1] = TLColor::EMPTY;
 }
 
-void syou_up(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
+void syou_up(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[])
 {
-    ba[x][y] = test_lockit::TLColor::EMPTY;
+    ba[x][y] = TLColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
+        ba[x - 1][y] = TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
+        ba[x][y + 1] = TLColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
+        ba[x + 1][y] = TLColor::EMPTY;
         flg[x + 1] = 1;
     }
 }
 
-void syou_down(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[])
+void syou_down(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[])
 {
-    ba[x][y] = test_lockit::TLColor::EMPTY;
+    ba[x][y] = TLColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
+        ba[x - 1][y] = TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
+        ba[x + 1][y] = TLColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
+        ba[x][y - 1] = TLColor::EMPTY;
 }
 
-void syou_right_num(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[], int* num)
+void syou_right_num(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num)
 {
-    ba[x][y] = test_lockit::TLColor::EMPTY;
+    ba[x][y] = TLColor::EMPTY;
     flg[x] = 1;
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up_num(ba, x, y + 1, incol, flg, num);
-    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
+        ba[x][y + 1] = TLColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
+        ba[x + 1][y] = TLColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
+        ba[x][y - 1] = TLColor::EMPTY;
 }
 
-void syou_left_num(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[], int* num)
+void syou_left_num(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num)
 {
-    ba[x][y] = test_lockit::TLColor::EMPTY;
+    ba[x][y] = TLColor::EMPTY;
     flg[x] = 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
+        ba[x - 1][y] = TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up_num(ba, x, y + 1, incol, flg, num);
-    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
+        ba[x][y + 1] = TLColor::EMPTY;
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
+        ba[x][y - 1] = TLColor::EMPTY;
 }
 
-void syou_up_num(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[], int* num)
+void syou_up_num(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num)
 {
-    ba[x][y] = test_lockit::TLColor::EMPTY;
+    ba[x][y] = TLColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
+        ba[x - 1][y] = TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up_num(ba, x, y + 1, incol, flg, num);
-    if ((y != 11) && (ba[x][y + 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y + 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
+        ba[x][y + 1] = TLColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
+        ba[x + 1][y] = TLColor::EMPTY;
         flg[x + 1] = 1;
     }
 }
 
-void syou_down_num(int ba[][test_lockit::kHeight], int x, int y, int incol, int flg[], int* num)
+void syou_down_num(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num)
 {
-    ba[x][y] = test_lockit::TLColor::EMPTY;
+    ba[x][y] = TLColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x - 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
+        ba[x - 1][y] = TLColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == test_lockit::TLColor::OJAMA)) {
-        ba[x + 1][y] = test_lockit::TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
+        ba[x + 1][y] = TLColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == test_lockit::TLColor::OJAMA))
-        ba[x][y - 1] = test_lockit::TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
+        ba[x][y - 1] = TLColor::EMPTY;
 }
 
 } // namespace anonymous
 
 namespace test_lockit {
 
-bool IsTLFieldEmpty(const int field[6][kHeight])
+bool IsTLFieldEmpty(const TLColor field[6][kHeight])
 {
     for (int i = 0; i < 6; ++i) {
         if (field[i][0] != TLColor::EMPTY) {
@@ -301,7 +303,7 @@ bool IsTLFieldEmpty(const int field[6][kHeight])
     return true;
 }
 
-void copyField(const int src[][kHeight], int dst[][kHeight])
+void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight])
 {
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < kHeight; ++j) {
@@ -310,7 +312,7 @@ void copyField(const int src[][kHeight], int dst[][kHeight])
     }
 }
 
-void saiki(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
+void saiki(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
     DCHECK(isNormalTLColor(TLColor(incol)))
             << "saiki(x=" << x << ",y=" << y << ",incol=" << incol << ")";
@@ -327,7 +329,7 @@ void saiki(const int ba[][kHeight], int point[][12], int x, int y, int* num, int
         saiki_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_3(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol)
+void saiki_3(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -341,7 +343,7 @@ void saiki_3(const int ba[][kHeight], int point[][12], int x, int y, int* num, i
         saiki_3_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_4(int ba[][kHeight], int x, int y, int* num, int incol)
+void saiki_4(TLColor ba[][kHeight], int x, int y, int* num, TLColor incol)
 {
     ba[x][y] = TLColor::EMPTY;
     *num += 1;
@@ -360,7 +362,7 @@ void saiki_4(int ba[][kHeight], int x, int y, int* num, int incol)
     ba[x][y] = incol;
 }
 
-void syou(int ba[][kHeight], int x, int y, int incol, int flg[])
+void syou(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[])
 {
     ba[x][y] = TLColor::EMPTY;
     flg[x] = 1;
@@ -386,7 +388,7 @@ void syou(int ba[][kHeight], int x, int y, int incol, int flg[])
         ba[x][y - 1] = TLColor::EMPTY;
 }
 
-void syou_downx(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
+void syou_downx(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num)
 {
     *num += 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
@@ -407,7 +409,7 @@ void syou_downx(int ba[][kHeight], int x, int y, int incol, int flg[], int* num)
         ba[x][y - 1] = TLColor::EMPTY;
 }
 
-bool setti_puyo(int ba[][kHeight], int aa, int nx1, int nx2, int setti_basyo[])
+bool setti_puyo(TLColor ba[][kHeight], int aa, TLColor nx1, TLColor nx2, int setti_basyo[])
 {
     if (aa < 6) {
         setti_basyo[0] = aa;
@@ -503,7 +505,7 @@ bool setti_puyo(int ba[][kHeight], int aa, int nx1, int nx2, int setti_basyo[])
     return false;
 }
 
-int setti_puyo_1(int ba[][kHeight], int eex, int eecol)
+int setti_puyo_1(TLColor ba[][kHeight], int eex, TLColor eecol)
 {
     int j;
     int oita = 0;
@@ -526,7 +528,7 @@ int setti_puyo_1(int ba[][kHeight], int eex, int eecol)
     return 0;
 }
 
-int chousei_syoukyo(int ba[][kHeight], int setti_basyo[])
+int chousei_syoukyo(TLColor ba[][kHeight], int setti_basyo[])
 {
     int num = 0;
     int numa = 0;
@@ -627,7 +629,7 @@ int chousei_syoukyo(int ba[][kHeight], int setti_basyo[])
     return keshiko;
 }
 
-int chousei_syoukyo_2(int ba[][kHeight], int setti_basyo[], int* chain, int dabuchk[], int* ichiren_kesi, int* score)
+int chousei_syoukyo_2(TLColor ba[][kHeight], int setti_basyo[], int* chain, int dabuchk[], int* ichiren_kesi, int* score)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };
@@ -775,7 +777,7 @@ int chousei_syoukyo_2(int ba[][kHeight], int setti_basyo[], int* chain, int dabu
     return keshiko;
 }
 
-int chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point)
+int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };
@@ -835,7 +837,7 @@ int chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int to
                     n++;
                 } else if (n != 0) {
                     bass[i][j - n] = bass[i][j];
-                    bass[i][j] = 0;
+                    bass[i][j] = TLColor::EMPTY;
                 }
             }
             rakka_ruiseki += n;
@@ -885,7 +887,7 @@ int chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int to
                         n++;
                     } else if (n != 0) {
                         bass[i][j - n] = bass[i][j];
-                        bass[i][j] = 0;
+                        bass[i][j] = TLColor::EMPTY;
                     }
                 }
                 rakka_ruiseki += n;
@@ -912,7 +914,7 @@ int chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int to
     return chain;
 }
 
-int chousei_syoukyo_sc(int ba[][kHeight], int setti_basyo[], int* score)
+int chousei_syoukyo_sc(TLColor ba[][kHeight], int setti_basyo[], int* score)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };
@@ -1056,7 +1058,7 @@ int chousei_syoukyo_sc(int ba[][kHeight], int setti_basyo[], int* score)
     return keshiko;
 }
 
-int hon_syoukyo(int ba[][kHeight])
+int hon_syoukyo(TLColor ba[][kHeight])
 {
     int num = 0;
     int point[6][12] {};
@@ -1114,7 +1116,7 @@ int hon_syoukyo(int ba[][kHeight])
     return chain;
 }
 
-int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick)
+int hon_syoukyo_score(TLColor ba[][kHeight], int* score, int* quick)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };
@@ -1208,7 +1210,7 @@ int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick)
     return chain;
 }
 
-void setti_ojama(int f[][kHeight], int numOjama)
+void setti_ojama(TLColor f[][kHeight], int numOjama)
 {
     int lines = (numOjama + 3) / 6;
 
@@ -1226,7 +1228,7 @@ void setti_ojama(int f[][kHeight], int numOjama)
     }
 }
 
-int countNormalColor13(const int f[][kHeight])
+int countNormalColor13(const TLColor f[][kHeight])
 {
     int n = 0;
     for (int i = 0; i < 6; i++) {

@@ -36,7 +36,7 @@ const TLColor kTsumoPatterns[][2] = {
     {TLColor::GREEN, TLColor::GREEN},
 };
 
-bool IsMatchIndexAndColors(int id, int color[]) {
+bool IsMatchIndexAndColors(int id, TLColor color[]) {
   if (color[0] == TLColor::UNKNOWN || color[1] == TLColor::UNKNOWN)
     return true;
   if (id == 220)
@@ -99,9 +99,9 @@ void COMAI_HI::ref()
     m_numg = 0;
 }
 
-bool COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
+bool COMAI_HI::aite_attack_start(const TLColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
 {
-    int ba[6][kHeight] {};
+    TLColor ba[6][kHeight] {};
     int score = 0;
     int jamako_sabun;
     int quick = 0;
@@ -138,7 +138,7 @@ bool COMAI_HI::aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, in
     return ret_keshi;
 }
 
-int COMAI_HI::aite_attack_nokori(const int [6][kHeight], int hakata)
+int COMAI_HI::aite_attack_nokori(const TLColor [6][kHeight], int hakata)
 {
     m_aite_hakka_nokori = m_aite_hakka_rensa - (hakata - m_hakkatime + 30) / 40;
     return 0;
@@ -158,20 +158,20 @@ int COMAI_HI::aite_rensa_end()
     return 0;
 }
 
-int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
+int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
 {
-    int ba[6][kHeight] {};
-    int ba_a[6][kHeight] {};
-    int ba_b[6][kHeight] {};
-    int ba_d[6][kHeight] {};
+    TLColor ba[6][kHeight] {};
+    TLColor ba_a[6][kHeight] {};
+    TLColor ba_b[6][kHeight] {};
+    TLColor ba_d[6][kHeight] {};
     int point[6][12];
     int i, j;
     int num;
     int n;
     int syo;
     int chain;
-    int nx1, nx2, nn1, nn2;
-    int nk1, nk2;
+    TLColor nx1, nx2, nn1, nn2;
+    TLColor nk1, nk2;
 
     int aa, bb, dd;
     int rakkaflg[6];
@@ -220,8 +220,8 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
                 continue;
 
             for (cc = 1; cc < 5; cc++) {
-                nk1 = cc;
-                nk2 = cc;
+                nk1 = static_cast<TLColor>(cc);
+                nk2 = static_cast<TLColor>(cc);
                 for (dd = 0; dd < 6; dd++) {
                     if (tobashi_hantei_a(ba_b, dd, nk1, nk2))
                         continue;
@@ -383,17 +383,17 @@ int COMAI_HI::aite_hyouka(const int ba3[6][kHeight], int tsumo[])
     return 0;
 }
 
-int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, int aite_ba[6][kHeight], int zenkesi_aite)
+int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi_own, TLColor aite_ba[6][kHeight], int zenkesi_aite)
 {
-    int ba[6][kHeight] {};
-    int ba_a[6][kHeight] {};
-    int ba2[6][kHeight] {};
+    TLColor ba[6][kHeight] {};
+    TLColor ba_a[6][kHeight] {};
+    TLColor ba2[6][kHeight] {};
     int point[6][12];
     int i, j;
     int num = 0;
     int n;
     int chain;
-    int nx1, nx2, nn1, nn2;
+    TLColor nx1, nx2, nn1, nn2;
     int aa, bb;
     int hym[22] {};
     int zenchk;
@@ -415,7 +415,7 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
     int ichiren_kesi = 0;
 
     int ee;
-    int ba_ee[6][kHeight];
+    TLColor ba_ee[6][kHeight];
     int keshiko_aa, keshiko_bb;
     int syuusoku = 0;
 
@@ -811,7 +811,7 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
                             coita = 0;
                             for (j = 0; j < (12 - cyy); j++) {
                                 if (ba[cplace][j + cyy] == TLColor::EMPTY) {
-                                    ba[cplace][j + cyy] = ccolor;
+                                    ba[cplace][j + cyy] = static_cast<TLColor>(ccolor);
                                     coita = 1;
                                     setti_basyo[0] = cplace;
                                     setti_basyo[1] = j + cyy;
@@ -1117,7 +1117,7 @@ int COMAI_HI::hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, in
     return 0;
 }
 
-int COMAI_HI::tobashi_hantei_a(const int ba2[][kHeight], int aa, int nx1, int nx2)
+int COMAI_HI::tobashi_hantei_a(const TLColor ba2[][kHeight], int aa, TLColor nx1, TLColor nx2)
 {
     if (nx1 == nx2) {
         if (((aa > 5) && (aa < 12)) || ((aa > 13) && (aa < 19)))
@@ -1154,7 +1154,7 @@ int COMAI_HI::tobashi_hantei_a(const int ba2[][kHeight], int aa, int nx1, int nx
     return 0;
 }
 
-int COMAI_HI::tobashi_hantei_b(const int ba2[][kHeight], int aa)
+int COMAI_HI::tobashi_hantei_b(const TLColor ba2[][kHeight], int aa)
 {
     if (ba2[0][11] != TLColor::EMPTY) {
         if ((aa == 0) || (aa == 6) || (aa == 12) || (aa == 17))
@@ -1187,13 +1187,13 @@ int COMAI_HI::tobashi_hantei_b(const int ba2[][kHeight], int aa)
     return 0;
 }
 
-int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, int aite_ba[6][kHeight],
+int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi_own, TLColor aite_ba[6][kHeight],
                          int zenkesi_aite, int fast)
 {
-    int ba[6][kHeight] {};
-    int ba_a[6][kHeight] {};
-    int ba2[6][kHeight] {};
-    int bass[6][kHeight];
+    TLColor ba[6][kHeight] {};
+    TLColor ba_a[6][kHeight] {};
+    TLColor ba2[6][kHeight] {};
+    TLColor bass[6][kHeight];
     int point[6][12];
     int point2[6][12] = {
         {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}, {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
@@ -1202,7 +1202,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
     int i, j;
     int num = 0;
     int chain;
-    int nx1, nx2, nn1, nn2;
+    TLColor nx1, nx2, nn1, nn2;
     int aa, bb;
     int pois, poi2s;
     int hym[22];
@@ -1210,7 +1210,8 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
     int zenchain;
     int dabuchk[20];
     int i2, j2;
-    int dd, nk1, nk2, num2;
+    int dd, num2;
+    TLColor nk1, nk2;
     int keschk = 0;
     int maxch = 0, maxach;
     int tokus;
@@ -1226,8 +1227,9 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
     int yokopoint = 200;
     int ichiren_kesi = 0;
 
-    int ee, eex, eecol;
-    int ba_ee[6][kHeight];
+    int ee, eex;
+    TLColor eecol;
+    TLColor ba_ee[6][kHeight];
     int keshiko_aa, keshiko_bb, keshiko_dd;
 
     int ccolor, cplace, coita, cyy = 0;
@@ -1560,7 +1562,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                             coita = 0;
                             for (j = 0; j < (12 - cyy); j++) {
                                 if (ba[cplace][j + cyy] == TLColor::EMPTY) {
-                                    ba[cplace][j + cyy] = ccolor;
+                                    ba[cplace][j + cyy] = static_cast<TLColor>(ccolor);
                                     coita = 1;
                                     setti_basyo[0] = cplace;
                                     setti_basyo[1] = j + cyy;
@@ -1846,10 +1848,10 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                         break; // t2
                     if (ee == 0) {
                         eex = 0;
-                        eecol = 0;
+                        eecol = TLColor::EMPTY;
                     } else {
                         eex = (ee - 1) % 6;
-                        eecol = (ee - 1) / 6 + 1;
+                        eecol = static_cast<TLColor>((ee - 1) / 6 + 1);
                         if ((eex == 2) || (eex == 3))
                             continue;
                         if (ba_ee[0][11] != TLColor::EMPTY) {

@@ -1,6 +1,7 @@
 #ifndef CPU_TEST_LOCKIT_READ_H_
 #define CPU_TEST_LOCKIT_READ_H_
 
+#include "color.h"
 #include "lockit_constant.h"
 
 namespace test_lockit {
@@ -17,9 +18,9 @@ public:
     void field_kioku();
     int field_hikaku();
 
-    int field[6][kHeight];
-    int yosou_field[6][kHeight];
-    int tsumo[6];
+    TLColor field[6][kHeight];
+    TLColor yosou_field[6][kHeight];
+    TLColor tsumo[6];
     int act_on;
     int nex_on;
     int set_puyo;
@@ -35,8 +36,8 @@ public:
 private:
     int chousei_syoukyo();
 
-    int field12[6];
-    int field_hoz[6][kHeight];
+    TLColor field12[6];
+    TLColor field_hoz[6][kHeight];
     int act_on_1st;
     int rensa_end_once;
     int setti_basyo[4];
