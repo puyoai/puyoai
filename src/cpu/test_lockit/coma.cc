@@ -1363,8 +1363,8 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 else
                     chig_aa = 0;
                 hon_syoukyo_score(ba_a, &score, &quick);
-                if ((ba_a[0][0] == 0) && (ba_a[1][0] == 0) && (ba_a[2][0] == 0) && (ba_a[3][0] == 0)
-                    && (ba_a[4][0] == 0) && (ba_a[5][0] == 0)) {
+                if ((ba_a[0][0] == TLColor::EMPTY) && (ba_a[1][0] == TLColor::EMPTY) && (ba_a[2][0] == TLColor::EMPTY) && (ba_a[3][0] == TLColor::EMPTY)
+                    && (ba_a[4][0] == TLColor::EMPTY) && (ba_a[5][0] == TLColor::EMPTY)) {
                     for (bb = 0; bb < 22; bb++) {
                         for (dd = 0; dd < 22; dd++) {
                             zenkes[aa][bb][dd] += score + 2100 - chig_aa * 3;
@@ -1381,8 +1381,8 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                         else
                             chig_bb = 0;
                         hon_syoukyo_score(ba_ee, &score, &quick);
-                        if ((ba_ee[0][0] == 0) && (ba_ee[1][0] == 0) && (ba_ee[2][0] == 0) && (ba_ee[3][0] == 0)
-                            && (ba_ee[4][0] == 0) && (ba_ee[5][0] == 0)) {
+                        if ((ba_ee[0][0] == TLColor::EMPTY) && (ba_ee[1][0] == TLColor::EMPTY) && (ba_ee[2][0] == TLColor::EMPTY) && (ba_ee[3][0] == TLColor::EMPTY)
+                            && (ba_ee[4][0] == TLColor::EMPTY) && (ba_ee[5][0] == TLColor::EMPTY)) {
                             for (dd = 0; dd < 22; dd++) {
                                 zenkes[aa][bb][dd] += score + 2100 - (chig_aa + chig_bb) * 3;
                             }
@@ -1534,23 +1534,23 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 if (chousei_syoukyo(ba_a, setti_basyo) != 0)
                     continue;
                 for (cplace = 0; cplace < 6; cplace++) {
-                    if (ba_a[0][11] != 0) {
+                    if (ba_a[0][11] != TLColor::EMPTY) {
                         if (cplace == 0)
                             continue;
                     }
-                    if (ba_a[1][11] != 0) {
+                    if (ba_a[1][11] != TLColor::EMPTY) {
                         if ((cplace == 0) || (cplace == 1))
                             continue;
                     }
-                    if (ba_a[3][11] != 0) {
+                    if (ba_a[3][11] != TLColor::EMPTY) {
                         if ((cplace == 3) || (cplace == 4) || (cplace == 5))
                             continue;
                     }
-                    if (ba_a[4][11] != 0) {
+                    if (ba_a[4][11] != TLColor::EMPTY) {
                         if ((cplace == 4) || (cplace == 5))
                             continue;
                     }
-                    if (ba_a[5][11] != 0) {
+                    if (ba_a[5][11] != TLColor::EMPTY) {
                         if (cplace == 5)
                             continue;
                     }
@@ -1559,7 +1559,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                             memcpy(ba, ba_a, sizeof(ba));
                             coita = 0;
                             for (j = 0; j < (12 - cyy); j++) {
-                                if (ba[cplace][j + cyy] == 0) {
+                                if (ba[cplace][j + cyy] == TLColor::EMPTY) {
                                     ba[cplace][j + cyy] = ccolor;
                                     coita = 1;
                                     setti_basyo[0] = cplace;
@@ -1618,12 +1618,12 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
             keshiko_aa = chousei_syoukyo_sc(ba_a, setti_basyo, &score_tmp);
             score_aonly = score_tmp; // only
             score_tmp2 = score_tmp;
-            if ((ba_a[2][11] == 0) && (score_tmp > m_score_aa)) {
+            if ((ba_a[2][11] == TLColor::EMPTY) && (score_tmp > m_score_aa)) {
                 m_score_aa = score_tmp;
                 m_aa_max_score = aa;
                 m_tesuu_mon = 1;
             }
-            if ((ba_a[2][11] == 0) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
+            if ((ba_a[2][11] == TLColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
                 && (m_aite_hakka_jamako * 70 > score_tmp2 - 1400) && (score_tmp2 + 150 > m_aite_hakka_jamako * 70)) {
                 if ((myf_kosuu_iro - 1 > keshiko_aa * 2) || (config.i_t)) {
                     score_tai = score_tmp2;
@@ -1631,7 +1631,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
             }
             if ((myf_kosuu_iro - keshiko_aa + 8) < m_cchai * 4)
                 continue;
-            if (ba_a[2][11] != 0) {
+            if (ba_a[2][11] != TLColor::EMPTY) {
                 for (bb = 0; bb < 22; bb++) {
                     for (ee = 0; ee < EE_SIZE; ee++) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
@@ -1659,7 +1659,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     && ((m_aite_hakka_nokori < 1)
                         || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
                     score_tmp = 0; // 0225
-                if ((ba_ee[2][11] == 0) && (score_tmp > m_score_aa)) {
+                if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp > m_score_aa)) {
                     m_score_aa = score_tmp;
                     m_aa_max_score = aa;
                     m_tesuu_mon = 2;
@@ -1670,7 +1670,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     && ((m_aite_hakka_nokori < 1)
                         || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
                     score_tmp2 = 0; // 0225
-                if ((ba_ee[2][11] == 0) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
+                if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
                     && (m_aite_hakka_jamako * 70 > score_tmp2 - 1400) && (score_tmp2 + 150 > m_aite_hakka_jamako * 70)) {
                     if ((myf_kosuu_iro + 1 > (keshiko_aa + keshiko_bb) * 2) || (config.i_t)) {
                         score_tai = score_tmp2;
@@ -1678,7 +1678,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 }
                 if ((myf_kosuu_iro - keshiko_aa - keshiko_bb + 8) < m_cchai * 4)
                     continue;
-                if (ba_ee[2][11] != 0) {
+                if (ba_ee[2][11] != TLColor::EMPTY) {
                     for (ee = 0; ee < EE_SIZE; ee++) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
                         g_poihyo[aa][bb][dd][ee] = -3000;
@@ -1703,25 +1703,25 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                         score_tmp = 0;
 
                     if (m_myf_kosuu < 56) {
-                        if ((ba_ee[2][11] == 0) && (score_tmp > m_score_aa)) {
+                        if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp > m_score_aa)) {
                             m_score_aa = score_tmp;
                             m_aa_max_score = aa;
                             m_tesuu_mon = 3;
                         }
                     } else if (m_myf_kosuu < 62) {
-                        if ((ba_ee[2][11] == 0) && (score_tmp * 6 / 7 > m_score_aa)) {
+                        if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp * 6 / 7 > m_score_aa)) {
                             m_score_aa = score_tmp * 6 / 7;
                             m_aa_max_score = aa;
                             m_tesuu_mon = 3;
                         }
                     } else if (m_myf_kosuu < 64) {
-                        if ((ba_ee[2][11] == 0) && (score_tmp * 3 / 4 > m_score_aa)) {
+                        if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp * 3 / 4 > m_score_aa)) {
                             m_score_aa = score_tmp * 3 / 4;
                             m_aa_max_score = aa;
                             m_tesuu_mon = 3;
                         }
                     } else {
-                        if ((ba_ee[2][11] == 0) && (score_tmp * 1 / 2 > m_score_aa)) {
+                        if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp * 1 / 2 > m_score_aa)) {
                             m_score_aa = score_tmp * 1 / 2;
                             m_aa_max_score = aa;
                             m_tesuu_mon = 3;
@@ -1729,7 +1729,7 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                     }
                     if ((myf_kosuu_iro - keshiko_aa - keshiko_bb - keshiko_dd + 8) < m_cchai * 4)
                         continue;
-                    if (ba_ee[2][11] != 0) {
+                    if (ba_ee[2][11] != TLColor::EMPTY) {
                         for (ee = 0; ee < EE_SIZE; ee++) {
                             g_chainhyk[aa][bb][dd][ee] = 0;
                             g_poihyo[aa][bb][dd][ee] = -3000;
@@ -1760,13 +1760,13 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 }
 
                 // Penalty for field like 'U'
-                if (ba_ee[2][10] != 0)
+                if (ba_ee[2][10] != TLColor::EMPTY)
                     g_score_hukasa[aa][bb][dd] -= 1200;
-                if (ba_ee[3][10] != 0)
+                if (ba_ee[3][10] != TLColor::EMPTY)
                     g_score_hukasa[aa][bb][dd] -= 1200;
                 for (j = 0; j < 9; j++) {
-                    if (ba_ee[0][j] == 0) {
-                        if (ba_ee[1][j + 1] != 0)
+                    if (ba_ee[0][j] == TLColor::EMPTY) {
+                        if (ba_ee[1][j + 1] != TLColor::EMPTY)
                             g_score_hukasa[aa][bb][dd] -= 300;
                         break;
                     }
@@ -1774,15 +1774,15 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                 for (i = 1; i < 5; i++) {
                     for (j = 0; j < 9; j++) {
                         if (ba_ee[i][j] == TLColor::EMPTY) {
-                            if ((ba_ee[i - 1][j + 1] != 0) && (ba_ee[i + 1][j + 1] != 0))
+                            if ((ba_ee[i - 1][j + 1] != TLColor::EMPTY) && (ba_ee[i + 1][j + 1] != TLColor::EMPTY))
                                 g_score_hukasa[aa][bb][dd] -= 300;
                             break;
                         }
                     }
                 }
                 for (j = 0; j < 9; j++) {
-                    if (ba_ee[5][j] == 0) {
-                        if (ba_ee[4][j + 1] != 0)
+                    if (ba_ee[5][j] == TLColor::EMPTY) {
+                        if (ba_ee[4][j + 1] != TLColor::EMPTY)
                             g_score_hukasa[aa][bb][dd] -= 300;
                         break;
                     }
@@ -1852,23 +1852,23 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                         eecol = (ee - 1) / 6 + 1;
                         if ((eex == 2) || (eex == 3))
                             continue;
-                        if (ba_ee[0][11] != 0) {
+                        if (ba_ee[0][11] != TLColor::EMPTY) {
                             if (eex == 0)
                                 continue;
                         }
-                        if (ba_ee[1][11] != 0) {
+                        if (ba_ee[1][11] != TLColor::EMPTY) {
                             if ((eex == 0) || (eex == 1))
                                 continue;
                         }
-                        if (ba_ee[3][11] != 0) {
+                        if (ba_ee[3][11] != TLColor::EMPTY) {
                             if ((eex == 4) || (eex == 5))
                                 continue;
                         }
-                        if (ba_ee[4][11] != 0) {
+                        if (ba_ee[4][11] != TLColor::EMPTY) {
                             if ((eex == 4) || (eex == 5))
                                 continue;
                         }
-                        if (ba_ee[5][11] != 0) {
+                        if (ba_ee[5][11] != TLColor::EMPTY) {
                             if (eex == 5)
                                 continue;
                         }
@@ -1879,22 +1879,22 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                             continue;
                     }
 
-                    if (ba[2][11] != 0) {
+                    if (ba[2][11] != TLColor::EMPTY) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
                         g_poihyo[aa][bb][dd][ee] = -3000;
                         continue;
                     }
-                    if ((ba[0][10] == 0) && (ba[1][11] != 0) && (ba2[1][11] == 0)) {
+                    if ((ba[0][10] == TLColor::EMPTY) && (ba[1][11] != TLColor::EMPTY) && (ba2[1][11] == TLColor::EMPTY)) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
                         g_poihyo[aa][bb][dd][ee] = -2000;
                         continue;
                     }
-                    if (((ba[5][10] == 0) || (ba[4][10] == 0)) && (ba[3][11] != 0) && (ba2[3][11] == 0)) {
+                    if (((ba[5][10] == TLColor::EMPTY) || (ba[4][10] == TLColor::EMPTY)) && (ba[3][11] != TLColor::EMPTY) && (ba2[3][11] == TLColor::EMPTY)) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
                         g_poihyo[aa][bb][dd][ee] = -2000;
                         continue;
                     }
-                    if ((ba[5][10] == 0) && (ba[4][11] != 0) && (ba2[4][11] == 0)) {
+                    if ((ba[5][10] == TLColor::EMPTY) && (ba[4][11] != TLColor::EMPTY) && (ba2[4][11] == TLColor::EMPTY)) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
                         g_poihyo[aa][bb][dd][ee] = -2000;
                         continue;
@@ -1903,43 +1903,43 @@ int COMAI_HI::pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own
                         for (j = 0; j < 12; j++) {
                             point2[i][j] = 8;
                             if (isNormalTLColor(TLColor(ba[i][j]))) {
-                                if (i != 5 && ba[i][j + 1] == 0 && ba[i + 1][j] == 0) {
-                                    if (j != 11 && (i != 4 || ba[3][11] == 0)) {
+                                if (i != 5 && ba[i][j + 1] == TLColor::EMPTY && ba[i + 1][j] == TLColor::EMPTY) {
+                                    if (j != 11 && (i != 4 || ba[3][11] == TLColor::EMPTY)) {
                                         point2[i][j] = 2;
                                         point2[i][j + 1] = 9;
                                         break;
                                     }
                                 }
-                                if (i != 0 && ba[i][j + 1] == 0 && ba[i - 1][j] == 0) {
-                                    if (j != 11 && (i != 5 || ba[3][11] == 0)) {
+                                if (i != 0 && ba[i][j + 1] == TLColor::EMPTY && ba[i - 1][j] == TLColor::EMPTY) {
+                                    if (j != 11 && (i != 5 || ba[3][11] == TLColor::EMPTY)) {
                                         point2[i][j] = 3;
                                         point2[i][j + 1] = 9;
                                         break;
                                     }
                                 }
-                                if (ba[i][j + 1] == 0) {
-                                    if (j != 11 &&  (i != 0 || ba[1][11] == 0) && (i != 4 || ba[3][11] == 0)
-                                        && (i != 5 || (ba[3][11] == 0 && ba[4][11] == 0))) {
+                                if (ba[i][j + 1] == TLColor::EMPTY) {
+                                    if (j != 11 &&  (i != 0 || ba[1][11] == TLColor::EMPTY) && (i != 4 || ba[3][11] == TLColor::EMPTY)
+                                        && (i != 5 || (ba[3][11] == TLColor::EMPTY && ba[4][11] == TLColor::EMPTY))) {
                                         point2[i][j] = 4;
                                         point2[i][j + 1] = 9;
                                         break;
                                     }
                                 }
-                                if ((i !=  5 && ba[i + 1][j] == 0) && (i != 0 && ba[i - 1][j] == 0)) {
-                                    if (ba[i][11] == 0) {
+                                if ((i !=  5 && ba[i + 1][j] == TLColor::EMPTY) && (i != 0 && ba[i - 1][j] == TLColor::EMPTY)) {
+                                    if (ba[i][11] == TLColor::EMPTY) {
                                         point2[i][j] = 5;
                                         continue;
                                     }
                                 }
-                                if (i != 5 && ba[i + 1][j] == 0) {
-                                    if (((i != 4) || ((ba[3][11] == 0) && (ba[4][11] == 0)))
-                                        && ((i != 3) || (ba[3][11] == 0))) {
+                                if (i != 5 && ba[i + 1][j] == TLColor::EMPTY) {
+                                    if (((i != 4) || ((ba[3][11] == TLColor::EMPTY) && (ba[4][11] == TLColor::EMPTY)))
+                                        && ((i != 3) || (ba[3][11] == TLColor::EMPTY))) {
                                         point2[i][j] = 6;
                                         continue;
                                     }
                                 }
-                                if (i != 0 && ba[i - 1][j] == 0) {
-                                    if (((i != 1) || (ba[1][11] == 0)) && ((i != 5) || (ba[3][11] == 0))) {
+                                if (i != 0 && ba[i - 1][j] == TLColor::EMPTY) {
+                                    if (((i != 1) || (ba[1][11] == TLColor::EMPTY)) && ((i != 5) || (ba[3][11] == TLColor::EMPTY))) {
                                         point2[i][j] = 7;
                                         continue;
                                     }
