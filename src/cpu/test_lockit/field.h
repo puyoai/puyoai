@@ -24,7 +24,7 @@ int chousei_syoukyo_sc(int ba[][kHeight], int setti_basyo[], int* score);
 int hon_syoukyo(int ba[][kHeight]);
 int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick);
 
-int setti_ojama(int f[][kHeight], int ojamako);
+void setti_ojama(int f[][kHeight], int numOjama);
 
 int countNormalColor13(const int f[][kHeight]);
 

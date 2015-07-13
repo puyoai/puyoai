@@ -1199,26 +1199,22 @@ int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick)
     return chain;
 }
 
-int setti_ojama(int f[][kHeight], int ojamako)
+void setti_ojama(int f[][kHeight], int numOjama)
 {
-    int i, j;
-    int cnt;
-    int okiko;
+    int lines = (numOjama + 3) / 6;
 
-    okiko = (ojamako + 3) / 6;
-
-    for (i = 0; i < 6; i++) {
-        cnt = 0;
-        for (j = 0; j < 13; j++) {
-            if (f[i][j] == 0) {
+    for (int i = 0; i < 6; i++) {
+        int cnt = 0;
+        for (int j = 0; j < 13; j++) {
+            if (f[i][j] == TLColor::EMPTY) {
                 f[i][j] = TLColor::OJAMA;
                 cnt++;
             }
-            if (cnt == okiko)
+
+            if (cnt == lines)
                 break;
         }
     }
-    return 0;
 }
 
 int countNormalColor13(const int f[][kHeight])
