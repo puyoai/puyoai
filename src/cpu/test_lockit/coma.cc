@@ -70,7 +70,8 @@ void COMAI_HI::ref()
     for (int i = 0; i < 22; i++) {
         m_para[i] = 0;
     }
-    m_para[13] = 1;
+    // NOTE(peria): [8] means (x,r)=(3,2)
+    m_para[8] = 1;
     m_myf_kosuu = 0;
     m_saisoku_flag = saisoku_point;
     m_aite_hakka_rensa = 0;
