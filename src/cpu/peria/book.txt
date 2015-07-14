@@ -1,97 +1,46 @@
 # Template book
 # '#' 以降はコメント
-# Basic score = (# of puyos) * 100 + (# of _) + 100
 
 # Basic format:
 # NAME:  テンプレ名. テンプレ内の最初の行にすること.
-# SCORE: テンプレのスコア
+# SCORE: テンプレのスコア. 無い場合はデフォルトスコア
 # THERSH: この個数以上合わないと評価しない
 # ......   ':' がない行がフィールド.
 # ......   大文字が評価対象ぷよ.
 # ......   '.' や小文字は任意. '_'は強制空白.
 
 NAME: GTR
-SCORE: 800
 THRESH: 3
 ....BA
 ...BAA
 ....BB
 ----
 NAME: GTR-Ready
-SCORE: 650
 .....A
 ...B_A
 ....BB
 ----
 NAME: GTR-Head
-SCORE: 1300
-....DD
-...CBA
-.CCBAA
-...CBB
+.F...D
+FHFCBA
+FCCBAA
+HHHCBB
 ----
 NAME: GTR-Head2
-SCORE: 1400
-.....A
-.....D
-.....D
-...CBA
-.CCBAA
-...CBB
-----
-NAME: GTR-Head3
-SCORE: 1400
-....DD
-...CBA
-..CBAA
-..CCBB
-----
-NAME: GTR-Head2
-SCORE: 1500
-.....A
-.....D
-.....D
-...CBA
-..CBAA
-..CCBB
-----
-NAME: Begin1
-SCORE: 500
-.AA...
-.BB...
-----
-NAME: Begin2
-SCORE: 600
-DIFF: AC
-__C...
-ABB...
-----
-NAME: Begin3
-SCORE: 700
-CAA...
-CBB...
-----
-NAME: Begin3-2
-SCORE: 500
-C.....
-CBB...
-----
-NAME: Begin4
-SCORE: 500
-CA....
-CB....
+II...D
+IEICBA
+CCCBAA
+EEECBB
 ----
 NAME: Shin-GTR
-SCORE: 1400
 DIFF: D A
-A.....
-CD....
+AC....
+CDD...
 CCB...
 AAAB..
 BBB...
 ----
 NAME: Shin-GTR2
-SCORE: 1400
 DIFF: D A
 D.....
 CA....
@@ -99,8 +48,10 @@ CCB...
 AAAB..
 BBB...
 ----
+NAME: Zenkeshi
+______
+----
 NAME: GTR-Tail
-SCORE: 100
 .CC...
 CBCA..
 AAAD..
