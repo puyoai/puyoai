@@ -32,6 +32,13 @@ inline bool isNormalTLColor(TLColor color)
     }
 }
 
+const TLColor NORMAL_TLCOLORS[] = {
+    TLColor::RED,
+    TLColor::BLUE,
+    TLColor::YELLOW,
+    TLColor::GREEN,
+};
+
 // Color coverter
 TLColor toTLColor(PuyoColor pc);
 PuyoColor toPuyoColor(TLColor c);
