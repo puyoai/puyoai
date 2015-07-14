@@ -14,6 +14,9 @@ namespace peria {
 
 namespace {
 
+const int kScoreBias = 100;
+const int kScorePerPuyo = 300;
+
 std::vector<Pattern> g_patterns;
 
 std::string Trim(std::string line) {
@@ -156,7 +159,7 @@ bool Pattern::MergeWith(const Pattern& a) {
     return false; // There are conflicts
 
   name_ += "+" + a.name_;
-  score_ += a.score_ - 50;
+  score_ += a.score_ - kScoreBias;
   for (auto& n : a.neighbors_) {
     neighbors_.insert(Neighbor(n.first + offset, n.second + offset));
   }
@@ -192,6 +195,10 @@ void Pattern::Optimize() {
       if (c != '.')
         ++num_puyos_;
     }
+  }
+ 
+  if (score_ == 0) {
+    score_ = num_puyos_ * kScorePerPuyo + kScoreBias;
   }
 }
 
