@@ -4,36 +4,51 @@
 # Basic format:
 # NAME:  テンプレ名. テンプレ内の最初の行にすること.
 # SCORE: テンプレのスコア. 無い場合はデフォルトスコア
-# THERSH: この個数以上合わないと評価しない
 # ......   ':' がない行がフィールド.
 # ......   大文字が評価対象ぷよ.
 # ......   '.' や小文字は任意. '_'は強制空白.
 
-NAME: GTR
-THRESH: 3
-....BA
-...BAA
-....BB
+NAME: Zenkeshi
+______
 ----
 NAME: GTR-Ready
 .....A
 ...B_A
 ....BB
 ----
+NAME: GTR
+....BA
+...BAA
+....BB
+----
 NAME: GTR-Head
-.F...D
-FHFCBA
-FCCBAA
-HHHCBB
+.....A
+....DD
+...CBA
+.CCBAA
+...CBB
 ----
 NAME: GTR-Head2
-II...D
-IEICBA
-CCCBAA
-EEECBB
+.....A
+.....D
+.....D
+...CBA
+.CCBAA
+...CBB
+----
+NAME: GTR-Tail
+.A....
+ABA...
+A.....
+BBB...
+----
+NAME: GTR-Tail2
+AA....
+ABA...
+......
+BBB...
 ----
 NAME: Shin-GTR
-DIFF: D A
 AC....
 CDD...
 CCB...
@@ -47,13 +62,4 @@ CA....
 CCB...
 AAAB..
 BBB...
-----
-NAME: Zenkeshi
-______
-----
-NAME: GTR-Tail
-.CC...
-CBCA..
-AAAD..
-BBBA..
 ----
