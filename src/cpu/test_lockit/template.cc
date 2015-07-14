@@ -8,36 +8,37 @@ int gtr(const TLColor field[][kHeight])
 {
     int score = 0;
 
-    int expect_same[][4] = {
+    static const struct {
+        int x0, y0, x1, y1;
+    } expect_same[] = {
         {0, 0, 1, 0}, {0, 0, 1, 2}, {0, 0, 2, 1},
         {1, 0, 1, 2}, {1, 0, 2, 1}, {1, 2, 2, 1},
         {0, 1, 0, 2}, {0, 1, 1, 1}, {1, 1, 0, 2},
     };
-    for (auto& xy : expect_same) {
-        int x0 = xy[0], y0 = xy[1];
-        int x1 = xy[2], y1 = xy[3];
-        if (field[x0][y0] == TLColor::EMPTY || field[x1][y1] == TLColor::EMPTY)
+    for (const auto& same : expect_same) {
+        TLColor c0 = field[same.x0][same.y0];
+        TLColor c1 = field[same.x1][same.y1];
+        if (c0 == TLColor::EMPTY || c1 == TLColor::EMPTY)
             continue;
-        if (field[x0][y0] == field[x1][y1])
+        if (c0 == c1)
             score += 1000;
         else
             score -= 1000;
     }
 
-    int expect_diff[][5] = {
+    static const struct {
+        int x0, y0, x1, y1;
+        int penalty;
+    } expect_diff[] = {
         {0, 2, 0, 3, 2000},
         {1, 2, 1, 3, 500}, {1, 2, 2, 2, 500}, {2, 1, 2, 2, 500},
         {1, 0, 2, 0, 1000}, {2, 1, 2, 0, 1000},
     };
-    for (auto& xy : expect_diff) {
-        int x0 = xy[0], y0 = xy[1];
-        int x1 = xy[2], y1 = xy[3];
-        int penalty = xy[4];
-
-        if (field[x0][y0] == TLColor::EMPTY || field[x1][y1] == TLColor::EMPTY)
-            continue;
-        if (field[x0][y0] == field[x1][y1])
-            score -= penalty;
+    for (const auto& diff : expect_diff) {
+        TLColor c0 = field[diff.x0][diff.y0];
+        TLColor c1 = field[diff.x1][diff.y1];
+        if (c0 != TLColor::EMPTY && c0 == c1)
+            score -= diff.penalty;
     }
 
     return score;
