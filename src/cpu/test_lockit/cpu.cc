@@ -125,13 +125,13 @@ FrameResponse sendmes(READ_P* p1, COMAI_HI* coo)
     return FrameResponse(p1->id, Decision(p1->te_x, p1->te_r), ss.str());
 }
 
-bool isTsumoValid(int tsumo[6])
+bool isTsumoValid(TLColor tsumo[6])
 {
     // HACK(mayah): Check only [2, 4).
     // [0, 2) might be EMPTY before the game has started.
     // [4, 6) might be EMPTY before WNEXT come.
     for (int i = 2; i < 4; ++i) {
-        TLColor c = static_cast<TLColor>(tsumo[i]);
+        TLColor c = tsumo[i];
         if (!isNormalTLColor(c))
             return false;
     }
@@ -207,10 +207,10 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
             field_kosuu = 0;
         }
 
-        int field2x[6][kHeight] {};
+        TLColor field2x[6][kHeight] {};
         for (int i = 0; i < 6; ++i) {
             for (int j = 0; j < 14; ++j) {
-                field2x[i][j] = (j + 4 < kHeight) ? r_player[0].field[i][j+4] : 0;
+                field2x[i][j] = (j + 4 < kHeight) ? r_player[0].field[i][j+4] : TLColor::EMPTY;
             }
         }
 

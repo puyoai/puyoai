@@ -110,7 +110,7 @@ int READ_P::setti_puyo()
 {
     int i, j;
     int aa = 0;
-    int nx1, nx2;
+    TLColor nx1, nx2;
     int modori = 0;
     setti_basyo[0] = -1;
     setti_basyo[1] = -1;

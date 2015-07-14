@@ -4,7 +4,7 @@
 
 namespace test_lockit {
 
-int gtr(const int f[][kHeight])
+int gtr(const TLColor f[][kHeight])
 {
     int sc = 0;
 
