@@ -4,18 +4,19 @@
 #include <glog/logging.h>
 
 #include <climits>
+#include <cstdint>
 #include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "base/base.h"
+#include "base/time.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/core_field.h"
 #include "core/frame_request.h"
 #include "core/player_state.h"
-
 #include "cpu/peria/control.h"
 #include "cpu/peria/evaluator.h"
 #include "cpu/peria/player_hands.h"
@@ -36,18 +37,22 @@ DropDecision Ai::think(int frame_id,
   UNUSED_VARIABLE(fast);
   using namespace std::placeholders;
 
+  std::int64_t start_ms = currentTimeInMillis();
+  
   Control control;
   Evaluator evaluator(frame_id, my_state, enemy_state, enemy_hands_, &control);
   Plan::iterateAvailablePlans(field, seq, 2,
                               [&evaluator](const RefPlan& plan) { evaluator.EvalPlan(plan); });
 
+  std::int64_t end_ms = currentTimeInMillis();
 
+  std::ostringstream oss;
+  oss << ",ThinkTime:_" << (end_ms - start_ms) << "ms";
   if (enemy_state.isRensaOngoing()) {
-    std::ostringstream oss;
     const RensaResult& result = enemy_state.currentRensaResult;
     oss << ",Enemy:_Going(" << result.score << "_in_" << result.frames << ")";
-    control.message += oss.str();
   }
+  control.message += oss.str();
   return DropDecision(control.decision, control.message);
 }
 
