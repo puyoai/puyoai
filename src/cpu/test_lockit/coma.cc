@@ -606,8 +606,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 else
                     chig_aa = 0;
                 hon_syoukyo_score(ba_a, &score, &quick);
-                if ((ba_a[0][0] == TLColor::EMPTY) && (ba_a[1][0] == TLColor::EMPTY) && (ba_a[2][0] == TLColor::EMPTY) && (ba_a[3][0] == TLColor::EMPTY)
-                    && (ba_a[4][0] == TLColor::EMPTY) && (ba_a[5][0] == TLColor::EMPTY)) {
+                if (isTLFieldEmpty(ba_a)) {
                     for (bb = 0; bb < 22; bb++) {
                         for (dd = 0; dd < 22; dd++) {
                             zenkes[aa][bb][dd] += score + 2100 - chig_aa * 3;
@@ -624,8 +623,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                         else
                             chig_bb = 0;
                         hon_syoukyo_score(ba_ee, &score, &quick);
-                        if ((ba_ee[0][0] == TLColor::EMPTY) && (ba_ee[1][0] == TLColor::EMPTY) && (ba_ee[2][0] == TLColor::EMPTY) && (ba_ee[3][0] == TLColor::EMPTY)
-                            && (ba_ee[4][0] == TLColor::EMPTY) && (ba_ee[5][0] == TLColor::EMPTY)) {
+                        if (isTLFieldEmpty(ba_ee)) {
                             for (dd = 0; dd < 22; dd++) {
                                 zenkes[aa][bb][dd] += score + 2100 - (chig_aa + chig_bb) * 3;
                             }
@@ -1365,8 +1363,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                 else
                     chig_aa = 0;
                 hon_syoukyo_score(ba_a, &score, &quick);
-                if ((ba_a[0][0] == TLColor::EMPTY) && (ba_a[1][0] == TLColor::EMPTY) && (ba_a[2][0] == TLColor::EMPTY) && (ba_a[3][0] == TLColor::EMPTY)
-                    && (ba_a[4][0] == TLColor::EMPTY) && (ba_a[5][0] == TLColor::EMPTY)) {
+                if (isTLFieldEmpty(ba_a)) {
                     for (bb = 0; bb < 22; bb++) {
                         for (dd = 0; dd < 22; dd++) {
                             zenkes[aa][bb][dd] += score + 2100 - chig_aa * 3;
@@ -1383,8 +1380,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                         else
                             chig_bb = 0;
                         hon_syoukyo_score(ba_ee, &score, &quick);
-                        if ((ba_ee[0][0] == TLColor::EMPTY) && (ba_ee[1][0] == TLColor::EMPTY) && (ba_ee[2][0] == TLColor::EMPTY) && (ba_ee[3][0] == TLColor::EMPTY)
-                            && (ba_ee[4][0] == TLColor::EMPTY) && (ba_ee[5][0] == TLColor::EMPTY)) {
+                        if (isTLFieldEmpty(ba_ee)) {
                             for (dd = 0; dd < 22; dd++) {
                                 zenkes[aa][bb][dd] += score + 2100 - (chig_aa + chig_bb) * 3;
                             }
