@@ -70,7 +70,7 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
     score += value;
   }
 
-  if (true) {  // Evaluate possible rensa.
+  if (false) {  // Evaluate possible rensa.
     int value = Future(field);
     if (value > 0) {
       oss << "Future(" << value << ")_";
@@ -220,25 +220,7 @@ int Evaluator::Valley(const CoreField& field) {
 }
 
 int Evaluator::Future(const CoreField& field) {
-  // |expects[i]| figures the maximum point of the RENSA, which
-  // can be fired with |i| additional puyos.
-  std::vector<int> expects(4, -1);
-
-  RensaDetector::detectIteratively(
-      field, RensaDetectorStrategy::defaultDropStrategy(), 1,
-      [&expects](CoreField&& cf, const ColumnPuyoList& puyo_to_add) -> RensaResult {
-        size_t num = puyo_to_add.size();
-        RensaResult result = cf.simulate();
-        if (num < expects.size()) {
-          expects[num] = std::max(expects[num], result.chains);
-        }
-        return result;
-      });
-
-  for (size_t i = 0; i < expects.size(); ++i) {
-    if (expects[i] >= 0)
-      return expects[i] * expects[i] * 500;
-  }
+  // TODO: assume putting a puyo and check if it fires rensa.
   return 0;
 }
 
