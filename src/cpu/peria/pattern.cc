@@ -15,7 +15,7 @@ namespace peria {
 namespace {
 
 const int kScoreBias = 100;
-const int kScorePerPuyo = 300;
+const int kScorePerPuyo = 400;
 
 std::vector<Pattern> g_patterns;
 
