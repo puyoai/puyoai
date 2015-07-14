@@ -312,7 +312,7 @@ void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight])
 
 void saiki(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
 {
-    DCHECK(isNormalTLColor(TLColor(incol)))
+    DCHECK(isNormalTLColor(incol))
             << "saiki(x=" << x << ",y=" << y << ",incol=" << incol << ")";
 
     point[x][y] = 1;
@@ -1231,7 +1231,7 @@ int countNormalColor13(const TLColor f[][kHeight])
     int n = 0;
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
-            if (isNormalTLColor(TLColor(f[i][j])))
+            if (isNormalTLColor(f[i][j]))
                 ++n;
         }
     }

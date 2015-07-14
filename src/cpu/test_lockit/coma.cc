@@ -11,6 +11,8 @@
 
 #include <glog/logging.h>
 
+#include "base/base.h"
+
 #include "color.h"
 #include "field.h"
 #include "template.h"
@@ -196,10 +198,10 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
     m_aite_rensa_score_cc = 0;
     m_nocc_aite_rensa_score = 0;
 
-    nx1 = toValidTLColor(TLColor(tsumo[0]));
-    nx2 = toValidTLColor(TLColor(tsumo[1]));
-    nn1 = toValidTLColor(TLColor(tsumo[2]));
-    nn2 = toValidTLColor(TLColor(tsumo[3]));
+    nx1 = toValidTLColor(tsumo[0]);
+    nx2 = toValidTLColor(tsumo[1]);
+    nn1 = toValidTLColor(tsumo[2]);
+    nn2 = toValidTLColor(tsumo[3]);
     int irokosuu = countNormalColor13(ba3);
 
     for (aa = 0; aa < 22; aa++) {
@@ -220,8 +222,8 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
                 continue;
 
             for (cc = 1; cc < 5; cc++) {
-                nk1 = static_cast<TLColor>(cc);
-                nk2 = static_cast<TLColor>(cc);
+                nk1 = NORMAL_TLCOLORS[cc - 1];
+                nk2 = NORMAL_TLCOLORS[cc - 1];
                 for (dd = 0; dd < 6; dd++) {
                     if (tobashi_hantei_a(ba_b, dd, nk1, nk2))
                         continue;
@@ -334,7 +336,7 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
                         for (j = kiept[i]; j < 12; j++) {
                             if (ba[i][j] == TLColor::EMPTY)
                                 break;
-                            if (point[i][j] != 1 && isNormalTLColor(TLColor(ba[i][j]))) {
+                            if (point[i][j] != 1 && isNormalTLColor(ba[i][j])) {
                                 saiki(ba, point, i, j, &num, ba[i][j]);
                                 point[i][j] = num;
                                 num = 0;
@@ -446,7 +448,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             if (ba3[i][j] != TLColor::EMPTY) {
                 m_myf_kosuu++;
             }
-            if (isNormalTLColor(TLColor(ba3[i][j]))) {
+            if (isNormalTLColor(ba3[i][j])) {
                 myf_kosuu_iro++;
             }
         }
@@ -458,7 +460,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
 
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
-            if (isNormalTLColor(TLColor(aite_ba[i][j]))) {
+            if (isNormalTLColor(aite_ba[i][j])) {
                 aite_kosuu_iro++;
             }
             if (aite_ba[i][j] != TLColor::EMPTY) {
@@ -475,10 +477,10 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         kes2 = 0;
     }
 
-    nx1 = toValidTLColor(TLColor(tsumo[0]));
-    nx2 = toValidTLColor(TLColor(tsumo[1]));
-    nn1 = toValidTLColor(TLColor(tsumo[2]));
-    nn2 = toValidTLColor(TLColor(tsumo[3]));
+    nx1 = toValidTLColor(tsumo[0]);
+    nx2 = toValidTLColor(tsumo[1]);
+    nn1 = toValidTLColor(tsumo[2]);
+    nn2 = toValidTLColor(tsumo[3]);
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
             ba2[i][j] = ba3[i][j];
@@ -707,7 +709,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         myf_kosuu_kesi = 0;
         for (i = 0; i < 6; i++) {
             for (j = 0; j < 13; j++) {
-                if (isNormalTLColor(TLColor(ba[i][j]))) {
+                if (isNormalTLColor(ba[i][j])) {
                     myf_kosuu_kesi++;
                 }
             }
@@ -809,7 +811,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                             coita = 0;
                             for (j = 0; j < (12 - cyy); j++) {
                                 if (ba[cplace][j + cyy] == TLColor::EMPTY) {
-                                    ba[cplace][j + cyy] = static_cast<TLColor>(ccolor);
+                                    ba[cplace][j + cyy] = NORMAL_TLCOLORS[ccolor - 1];
                                     coita = 1;
                                     setti_basyo[0] = cplace;
                                     setti_basyo[1] = j + cyy;
@@ -1080,7 +1082,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 for (j = 0; j < 12; j++) {
                     if (ba[i][j] == TLColor::EMPTY)
                         break;
-                    if (point[i][j] != 1 && isNormalTLColor(TLColor(ba[i][j]))) {
+                    if (point[i][j] != 1 && isNormalTLColor(ba[i][j])) {
                         saiki(ba, point, i, j, &num, ba[i][j]);
                         if (num != 0) {
                             if (num == 2)
@@ -1266,7 +1268,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
             if (ba3[i][j] != TLColor::EMPTY) {
                 m_myf_kosuu++;
             }
-            if (isNormalTLColor(TLColor(ba3[i][j]))) {
+            if (isNormalTLColor(ba3[i][j])) {
                 myf_kosuu_iro++;
             }
         }
@@ -1278,7 +1280,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
 
     for (i = 0; i < 6; i++) {
         for (j = 0; j < 13; j++) {
-            if (isNormalTLColor(TLColor(aite_ba[i][j]))) {
+            if (isNormalTLColor(aite_ba[i][j])) {
                 aite_kosuu_iro++;
             }
             if (aite_ba[i][j] != TLColor::EMPTY) {
@@ -1295,10 +1297,10 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
         kes2 = 0;
     }
 
-    nx1 = toValidTLColor(TLColor(tsumo[0]));
-    nx2 = toValidTLColor(TLColor(tsumo[1]));
-    nn1 = toValidTLColor(TLColor(tsumo[2]));
-    nn2 = toValidTLColor(TLColor(tsumo[3]));
+    nx1 = toValidTLColor(tsumo[0]);
+    nx2 = toValidTLColor(tsumo[1]);
+    nn1 = toValidTLColor(tsumo[2]);
+    nn2 = toValidTLColor(tsumo[3]);
     nk1 = TLColor::RED;
     nk2 = TLColor::RED;
     for (i = 0; i < 6; i++) {
@@ -1455,7 +1457,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
         myf_kosuu_kesi = 0;
         for (i = 0; i < 6; i++) {
             for (j = 0; j < 13; j++) {
-                if (isNormalTLColor(TLColor(ba[i][j]))) {
+                if (isNormalTLColor(ba[i][j])) {
                     myf_kosuu_kesi++;
                 }
             }
@@ -1558,7 +1560,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                             coita = 0;
                             for (j = 0; j < (12 - cyy); j++) {
                                 if (ba[cplace][j + cyy] == TLColor::EMPTY) {
-                                    ba[cplace][j + cyy] = static_cast<TLColor>(ccolor);
+                                    ba[cplace][j + cyy] = NORMAL_TLCOLORS[ccolor - 1];
                                     coita = 1;
                                     setti_basyo[0] = cplace;
                                     setti_basyo[1] = j + cyy;
@@ -1847,7 +1849,9 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                         eecol = TLColor::EMPTY;
                     } else {
                         eex = (ee - 1) % 6;
-                        eecol = static_cast<TLColor>((ee - 1) / 6 + 1);
+                        int index = (ee - 1) / 6;
+                        DCHECK(0 <= index && index < ARRAY_SIZE(NORMAL_TLCOLORS)) << index;
+                        eecol = NORMAL_TLCOLORS[index];
                         if ((eex == 2) || (eex == 3))
                             continue;
                         if (ba_ee[0][11] != TLColor::EMPTY) {
@@ -1900,7 +1904,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                     for (i = 0; i < 6; i++) {
                         for (j = 0; j < 12; j++) {
                             point2[i][j] = 8;
-                            if (isNormalTLColor(TLColor(ba[i][j]))) {
+                            if (isNormalTLColor(ba[i][j])) {
                                 if (i != 5 && ba[i][j + 1] == TLColor::EMPTY && ba[i + 1][j] == TLColor::EMPTY) {
                                     if (j != 11 && (i != 4 || ba[3][11] == TLColor::EMPTY)) {
                                         point2[i][j] = 2;
@@ -1994,7 +1998,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                                     for (j = 0; j < 12; j++) {
                                         if (bass[i][j] == TLColor::EMPTY)
                                             break;
-                                        if (point[i][j] != 1 && isNormalTLColor(TLColor(bass[i][j]))) {
+                                        if (point[i][j] != 1 && isNormalTLColor(bass[i][j])) {
                                             saiki(bass, point, i, j, &num, bass[i][j]);
                                             pois = pois + num * num * num;
                                             num = 0;
@@ -2005,7 +2009,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                             if (chain > m_cchai - 3) {
                                 for (i = 0; i < 5; i++) {
                                     for (j = 0; j < yokotate; j++) {
-                                        if (isNormalTLColor(TLColor(bass[i][j]))) {
+                                        if (isNormalTLColor(bass[i][j])) {
                                             if (bass[i][j] == bass[i + 1][j])
                                                 pois += yokopoint;
                                         }

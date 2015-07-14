@@ -105,19 +105,19 @@ TEST(FieldTest, settiOjama)
 
     setti_ojama(field, 18);
 
-    EXPECT_EQ(TLColor::OJAMA, TLColor(field[0][12]));
-    EXPECT_EQ(TLColor::OJAMA, TLColor(field[1][12]));
-    EXPECT_EQ(TLColor::OJAMA, TLColor(field[2][12]));
-    EXPECT_EQ(TLColor::OJAMA, TLColor(field[3][12]));
-    EXPECT_EQ(TLColor::EMPTY, TLColor(field[4][12]));
-    EXPECT_EQ(TLColor::EMPTY, TLColor(field[5][12]));
+    EXPECT_EQ(TLColor::OJAMA, field[0][12]);
+    EXPECT_EQ(TLColor::OJAMA, field[1][12]);
+    EXPECT_EQ(TLColor::OJAMA, field[2][12]);
+    EXPECT_EQ(TLColor::OJAMA, field[3][12]);
+    EXPECT_EQ(TLColor::EMPTY, field[4][12]);
+    EXPECT_EQ(TLColor::EMPTY, field[5][12]);
 
-    EXPECT_EQ(TLColor::EMPTY, TLColor(field[0][13]));
-    EXPECT_EQ(TLColor::EMPTY, TLColor(field[1][13]));
-    EXPECT_EQ(TLColor::EMPTY, TLColor(field[2][13]));
-    EXPECT_EQ(TLColor::EMPTY, TLColor(field[3][13]));
-    EXPECT_EQ(TLColor::EMPTY, TLColor(field[4][13]));
-    EXPECT_EQ(TLColor::EMPTY, TLColor(field[5][13]));
+    EXPECT_EQ(TLColor::EMPTY, field[0][13]);
+    EXPECT_EQ(TLColor::EMPTY, field[1][13]);
+    EXPECT_EQ(TLColor::EMPTY, field[2][13]);
+    EXPECT_EQ(TLColor::EMPTY, field[3][13]);
+    EXPECT_EQ(TLColor::EMPTY, field[4][13]);
+    EXPECT_EQ(TLColor::EMPTY, field[5][13]);
 }
 
 }  // namespace test_lockit
