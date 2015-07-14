@@ -293,7 +293,7 @@ void syou_down_num(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[]
 
 namespace test_lockit {
 
-bool IsTLFieldEmpty(const TLColor field[6][kHeight])
+bool isTLFieldEmpty(const TLColor field[6][kHeight])
 {
     for (int i = 0; i < 6; ++i) {
         if (field[i][0] != TLColor::EMPTY) {

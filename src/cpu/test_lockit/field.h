@@ -6,7 +6,7 @@
 
 namespace test_lockit {
 
-bool IsTLFieldEmpty(const TLColor field[6][kHeight]);
+bool isTLFieldEmpty(const TLColor field[6][kHeight]);
 
 void saiki(const TLColor field[][kHeight], int point[][12], int x, int y, int* num, TLColor incol);
 void saiki_3(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol);
