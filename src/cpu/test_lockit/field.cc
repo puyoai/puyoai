@@ -5,7 +5,7 @@
 #include "color.h"
 #include "core/field_constant.h"
 
-using namespace test_lockit;
+namespace test_lockit {
 
 namespace {
 
@@ -289,9 +289,7 @@ void syou_down_num(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[]
         ba[x][y - 1] = TLColor::EMPTY;
 }
 
-} // namespace anonymous
-
-namespace test_lockit {
+} // namespace
 
 bool isTLFieldEmpty(const TLColor field[6][kHeight])
 {
