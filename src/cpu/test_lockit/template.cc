@@ -4,99 +4,43 @@
 
 namespace test_lockit {
 
-int gtr(const TLColor f[][kHeight])
+int gtr(const TLColor field[][kHeight])
 {
-    int sc = 0;
+    int score = 0;
 
-    if ((f[0][0] != TLColor::EMPTY) && (f[1][0] != TLColor::EMPTY)) {
-        if (f[0][0] == f[1][0]) {
-            sc += 1000;
-        } else
-            sc -= 1000;
-    }
-    if ((f[0][0] != TLColor::EMPTY) && (f[1][2] != TLColor::EMPTY)) {
-        if (f[0][0] == f[1][2]) {
-            sc += 1000;
-        } else
-            sc -= 1000;
-    }
-    if ((f[0][0] != TLColor::EMPTY) && (f[2][1] != TLColor::EMPTY)) {
-        if (f[0][0] == f[2][1]) {
-            sc += 1000;
-        } else
-            sc -= 1000;
-    }
-    if ((f[1][0] != TLColor::EMPTY) && (f[1][2] != TLColor::EMPTY)) {
-        if (f[1][0] == f[1][2]) {
-            sc += 1000;
-        } else
-            sc -= 1000;
-    }
-    if ((f[1][0] != TLColor::EMPTY) && (f[2][1] != TLColor::EMPTY)) {
-        if (f[1][0] == f[2][1]) {
-            sc += 1000;
-        } else
-            sc -= 1000;
-    }
-    if ((f[2][0] != TLColor::EMPTY) && (f[2][1] != TLColor::EMPTY)) {
-        if (f[1][2] == f[2][1]) {
-            sc += 1000;
-        } else
-            sc -= 1000;
+    int expect_same[][4] = {
+        {0, 0, 1, 0}, {0, 0, 1, 2}, {0, 0, 2, 1},
+        {1, 0, 1, 2}, {1, 0, 2, 1}, {1, 2, 2, 1},
+        {0, 1, 0, 2}, {0, 1, 1, 1}, {1, 1, 0, 2},
+    };
+    for (auto& xy : expect_same) {
+        int x0 = xy[0], y0 = xy[1];
+        int x1 = xy[2], y1 = xy[3];
+        if (field[x0][y0] == TLColor::EMPTY || field[x1][y1] == TLColor::EMPTY)
+            continue;
+        if (field[x0][y0] == field[x1][y1])
+            score += 1000;
+        else
+            score -= 1000;
     }
 
-    if ((f[0][1] != TLColor::EMPTY) && (f[0][2] != TLColor::EMPTY)) {
-        if (f[0][1] == f[0][2]) {
-            sc += 1000;
-        } else
-            sc -= 1000;
-    }
-    if ((f[0][1] != TLColor::EMPTY) && (f[1][1] != TLColor::EMPTY)) {
-        if (f[0][1] == f[1][1]) {
-            sc += 1000;
-        } else
-            sc -= 1000;
-    }
-    if ((f[1][1] != TLColor::EMPTY) && (f[0][2] != TLColor::EMPTY)) {
-        if (f[1][1] == f[0][2]) {
-            sc += 1000;
-        } else
-            sc -= 1000;
+    int expect_diff[][5] = {
+        {0, 2, 0, 3, 2000},
+        {1, 2, 1, 3, 500}, {1, 2, 2, 2, 500}, {2, 1, 2, 2, 500},
+        {1, 0, 2, 0, 1000}, {2, 1, 2, 0, 1000},
+    };
+    for (auto& xy : expect_diff) {
+        int x0 = xy[0], y0 = xy[1];
+        int x1 = xy[2], y1 = xy[3];
+        int penalty = xy[4];
+
+        if (field[x0][y0] == TLColor::EMPTY || field[x1][y1] == TLColor::EMPTY)
+            continue;
+        if (field[x0][y0] == field[x1][y1])
+            score -= penalty;
     }
 
-    if ((f[0][2] != TLColor::EMPTY) && (f[1][3] != TLColor::EMPTY)) {
-        if (f[0][2] == f[0][3]) {
-            sc -= 2000;
-        }
-    }
-
-    if ((f[1][2] != TLColor::EMPTY) && (f[1][3] != TLColor::EMPTY)) {
-        if (f[1][2] == f[1][3]) {
-            sc -= 500;
-        }
-    }
-    if ((f[1][2] != TLColor::EMPTY) && (f[2][2] != TLColor::EMPTY)) {
-        if (f[1][2] == f[2][2]) {
-            sc -= 500;
-        }
-    }
-    if ((f[1][0] != TLColor::EMPTY) && (f[2][0] != TLColor::EMPTY)) {
-        if (f[1][0] == f[2][0]) {
-            sc -= 1000;
-        }
-    }
-    if ((f[2][1] != TLColor::EMPTY) && (f[2][0] != TLColor::EMPTY)) {
-        if (f[2][1] == f[2][0]) {
-            sc -= 1000;
-        }
-    }
-    if ((f[2][1] != TLColor::EMPTY) && (f[2][2] != TLColor::EMPTY)) {
-        if (f[2][1] == f[2][2]) {
-            sc -= 500;
-        }
-    }
-
-    return sc;
+    return score;
 }
 
 }  // namespace test_lockit
