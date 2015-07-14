@@ -163,7 +163,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
     }
 
     // 相手全消し,全消し消化判断
-    if (r_player[1].rensa_end == 1 && IsTLFieldEmpty(r_player[1].field)) {
+    if (r_player[1].rensa_end == 1 && isTLFieldEmpty(r_player[1].field)) {
         r_player[1].zenkesi = 1;
     }
 
@@ -179,7 +179,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
     }
     if (r_player[0].rensa_end == 1) { // 全消し,全消し消化判断
         r_player[0].field_kioku();
-        if (IsTLFieldEmpty(r_player[0].field)) {
+        if (isTLFieldEmpty(r_player[0].field)) {
             r_player[0].zenkesi = 1; // 得点系のため一旦out
         }
     }

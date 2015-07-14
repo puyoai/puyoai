@@ -36,7 +36,7 @@ const TLColor kTsumoPatterns[][2] = {
     {TLColor::GREEN, TLColor::GREEN},
 };
 
-bool IsMatchIndexAndColors(int id, TLColor color[]) {
+bool isMatchIndexAndColors(int id, TLColor color[]) {
   if (color[0] == TLColor::UNKNOWN || color[1] == TLColor::UNKNOWN)
     return true;
   if (id == 220)
@@ -935,7 +935,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         for (bb = 0; bb < 22; bb++) {
             for (dd = 0; dd < 221; dd++) {
                 // TODO(peria): Skip some cases if next2 tsumo is known.
-                if (!IsMatchIndexAndColors(dd, &tsumo[4]))
+                if (!isMatchIndexAndColors(dd, &tsumo[4]))
                     continue;
                 for (ee = 0; ee < EE_SIZE; ee++) {
                     if ((m_key_ee == 0) && (ee > 0))
