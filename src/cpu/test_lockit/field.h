@@ -1,33 +1,34 @@
 #ifndef CPU_TEST_LOCKIT_FIELD_H_
 #define CPU_TEST_LOCKIT_FIELD_H_
 
+#include "color.h"
 #include "lockit_constant.h"
 
 namespace test_lockit {
 
-bool IsTLFieldEmpty(const int field[6][kHeight]);
+bool IsTLFieldEmpty(const TLColor field[6][kHeight]);
 
-void saiki(const int field[][kHeight], int point[][12], int x, int y, int* num, int incol);
-void saiki_3(const int ba[][kHeight], int point[][12], int x, int y, int* num, int incol);
-void saiki_4(int ba[][kHeight], int x, int y, int* num, int incol);
+void saiki(const TLColor field[][kHeight], int point[][12], int x, int y, int* num, TLColor incol);
+void saiki_3(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol);
+void saiki_4(TLColor ba[][kHeight], int x, int y, int* num, TLColor incol);
 
-void syou(int ba[][kHeight], int x, int y, int incol, int flg[]);
-void syou_downx(int ba[][kHeight], int x, int y, int incol, int flg[], int* num);
+void syou(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[]);
+void syou_downx(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num);
 
-bool setti_puyo(int ba[][kHeight], int aa, int nx1, int nx2, int setti_basyo[]);
-int setti_puyo_1(int ba[][kHeight], int eex, int eecol);
+bool setti_puyo(TLColor ba[][kHeight], int aa, TLColor nx1, TLColor nx2, int setti_basyo[]);
+int setti_puyo_1(TLColor ba[][kHeight], int eex, TLColor eecol);
 
-int chousei_syoukyo(int ba[][kHeight], int setti_basyo[]);
-int chousei_syoukyo_2(int ba[][kHeight], int setti_basyo[], int* chain, int dabuchk[], int* ichiren_kesi, int* score);
-int chousei_syoukyo_3(int bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point);
-int chousei_syoukyo_sc(int ba[][kHeight], int setti_basyo[], int* score);
-int hon_syoukyo(int ba[][kHeight]);
-int hon_syoukyo_score(int ba[][kHeight], int* score, int* quick);
+int chousei_syoukyo(TLColor ba[][kHeight], int setti_basyo[]);
+int chousei_syoukyo_2(TLColor ba[][kHeight], int setti_basyo[], int* chain, int dabuchk[], int* ichiren_kesi, int* score);
+int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point);
+int chousei_syoukyo_sc(TLColor ba[][kHeight], int setti_basyo[], int* score);
+int hon_syoukyo(TLColor ba[][kHeight]);
+int hon_syoukyo_score(TLColor ba[][kHeight], int* score, int* quick);
 
-void setti_ojama(int f[][kHeight], int numOjama);
+void setti_ojama(TLColor f[][kHeight], int numOjama);
 
-int countNormalColor13(const int f[][kHeight]);
-void copyField(const int src[][kHeight], int dst[][kHeight]);
+int countNormalColor13(const TLColor f[][kHeight]);
+void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight]);
 
 }  // namespace test_lockit
 

@@ -33,7 +33,7 @@ TEST(FieldTest, Saiki) {
         {1, 11, 2}, {2, 11, 2}
     };
 
-    int field[6][kHeight];
+    TLColor field[6][kHeight];
     toTLField(cf, field);
 
     int expect_points = 0;
@@ -76,7 +76,7 @@ TEST(FieldTest, countNormalColor13)
         "R.OOO."
     );
 
-    int field[6][kHeight];
+    TLColor field[6][kHeight];
     toTLField(cf, field);
 
     EXPECT_EQ(13, countNormalColor13(field));
@@ -100,7 +100,7 @@ TEST(FieldTest, settiOjama)
         "OOOOOO"
     );
 
-    int field[6][kHeight];
+    TLColor field[6][kHeight];
     toTLField(cf, field);
 
     setti_ojama(field, 18);

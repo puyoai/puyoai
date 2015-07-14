@@ -1,6 +1,7 @@
 #ifndef CPU_TEST_LOCKIT_COMA_H_
 #define CPU_TEST_LOCKIT_COMA_H_
 
+#include "color.h"
 #include "cpu_configuration.h"
 #include "lockit_constant.h"
 
@@ -16,11 +17,11 @@ public:
     explicit COMAI_HI(const cpu::Configuration& config);
     ~COMAI_HI();
 
-    int aite_hyouka(const int ba3[6][kHeight], int tsumo[]);
-    int pre_hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, int aite_ba[6][kHeight], int zenkesi_aite, int fast);
-    int hyouka(const int ba3[6][kHeight], int tsumo[], int zenkesi_own, int aite_ba[6][kHeight], int zenkesi_aite);
-    bool aite_attack_start(const int ba3[6][kHeight], int zenkesi_aite, int scos, int hakata);
-    int aite_attack_nokori(const int ba3[6][kHeight], int hakata);
+    int aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[]);
+    int pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi_own, TLColor aite_ba[6][kHeight], int zenkesi_aite, int fast);
+    int hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi_own, TLColor aite_ba[6][kHeight], int zenkesi_aite);
+    bool aite_attack_start(const TLColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata);
+    int aite_attack_nokori(const TLColor ba3[6][kHeight], int hakata);
     int aite_rensa_end();
     void ref();
 
@@ -38,8 +39,8 @@ public:
     int m_aite_hakkaji_score;
 
 private:
-    int tobashi_hantei_a(const int[][kHeight], int, int, int);
-    int tobashi_hantei_b(const int[][kHeight], int);
+    int tobashi_hantei_a(const TLColor[][kHeight], int, TLColor, TLColor);
+    int tobashi_hantei_b(const TLColor[][kHeight], int);
 
     const cpu::Configuration config;
 
