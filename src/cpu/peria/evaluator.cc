@@ -220,6 +220,7 @@ int Evaluator::Valley(const CoreField& field) {
 }
 
 int Evaluator::Future(const CoreField& field) {
+  UNUSED_VARIABLE(field);
   // TODO: assume putting a puyo and check if it fires rensa.
   return 0;
 }
