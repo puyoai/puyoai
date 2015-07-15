@@ -281,6 +281,13 @@ bool SyntekDriver::claimInterface()
     }
     libusb_unref_device(dev);
 
+    if (libusb_kernel_driver_active(deviceHandle_, 0) == 1) {
+        LOG(INFO) << "Kernel driver is attached. Needs to detach.";
+        if (libusb_detach_kernel_driver(deviceHandle_, 0) != 0) {
+            LOG(ERROR) << "Failed to detach kernel driver.";
+        }
+    }
+
     // TODO(mayah): Don't use signal, but use sigaction.
     signal(SIGTERM, SyntekDriver::release);
     int ret = libusb_claim_interface(deviceHandle_, 0);
