@@ -100,7 +100,9 @@ struct PlayerAnalyzerResult {
 
     std::string toString() const;
 
-public: // Make this private?
+public:
+    // TODO(mayah): Make these private.
+
     UserEvent userEvent;
     bool playable = false;
     DetectedField detectedField;
@@ -172,10 +174,12 @@ protected:
                                                        const SDL_Surface* prev2) = 0;
 
 private:
-    std::unique_ptr<PlayerAnalyzerResult>
-    analyzePlayerField(const DetectedField&, const std::vector<const PlayerAnalyzerResult*>& previousResults);
-    std::unique_ptr<PlayerAnalyzerResult>
-    analyzePlayerFieldOnLevelSelect(const DetectedField&, const std::vector<const PlayerAnalyzerResult*>& previousResults);
+    std::unique_ptr<PlayerAnalyzerResult> analyzePlayerField(
+        const DetectedField&,
+        const std::vector<const PlayerAnalyzerResult*>& previousResults);
+    std::unique_ptr<PlayerAnalyzerResult> analyzePlayerFieldOnLevelSelect(
+        const DetectedField&,
+        const std::vector<const PlayerAnalyzerResult*>& previousResults);
 
     void analyzeNext(const DetectedField&,
                      const std::vector<const PlayerAnalyzerResult*>& previousResults,
