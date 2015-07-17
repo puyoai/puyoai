@@ -301,6 +301,19 @@ bool isTLFieldEmpty(const TLColor field[6][kHeight])
     return true;
 }
 
+int countNormalColor13(const TLColor f[][kHeight])
+{
+    int n = 0;
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 13; j++) {
+            if (isNormalTLColor(f[i][j]))
+                ++n;
+        }
+    }
+
+    return n;
+}
+
 void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight])
 {
     for (int i = 0; i < 6; ++i) {
@@ -1224,19 +1237,6 @@ void setti_ojama(TLColor f[][kHeight], int numOjama)
                 break;
         }
     }
-}
-
-int countNormalColor13(const TLColor f[][kHeight])
-{
-    int n = 0;
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 13; j++) {
-            if (isNormalTLColor(f[i][j]))
-                ++n;
-        }
-    }
-
-    return n;
 }
 
 }  // namespace test_lockit
