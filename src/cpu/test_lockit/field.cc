@@ -606,7 +606,7 @@ int chousei_syoukyo(TLColor ba[][kHeight], int setti_basyo[])
             for (j = kiept[i]; j < 12; j++) {
                 if (point[i][j] != 0)
                     continue;
-                if (ba[i][j] == 0)
+                if (ba[i][j] == TLColor::EMPTY)
                     break;
                 if (ba[i][j] != TLColor::OJAMA) {
                     saiki(ba, point, i, j, &num, ba[i][j]);
@@ -868,7 +868,7 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
             for (j = kiept[i]; j < 12; j++) {
                 if (point[i][j] != 0)
                     continue;
-                if (bass[i][j] == 0)
+                if (bass[i][j] == TLColor::EMPTY)
                     break;
                 if (bass[i][j] != TLColor::OJAMA) {
                     saiki(bass, point, i, j, &num, bass[i][j]);
@@ -892,7 +892,7 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
             if (rakkaflg[i] == 1) {
                 n = 0;
                 for (j = 0; j < 13; j++) {
-                    if (bass[i][j] == 0) {
+                    if (bass[i][j] == TLColor::EMPTY) {
                         if (n == 0)
                             kiept[i] = j;
                         n++;
