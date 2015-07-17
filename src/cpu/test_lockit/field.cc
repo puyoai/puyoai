@@ -1,9 +1,12 @@
 #include "field.h"
 
 #include <glog/logging.h>
+#include <set>
 
 #include "color.h"
 #include "core/field_constant.h"
+#include "core/score.h"
+#include "rensa_result.h"
 
 namespace test_lockit {
 
@@ -321,6 +324,100 @@ void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight])
             dst[i][j] = src[i][j];
         }
     }
+}
+
+TLRensaResult simulate(TLColor field[][kHeight])
+{
+    // Assume all puyos are grounded.
+    // TODO: add DCHECK to check it.
+
+    int point[6][12] {};
+    int bottom[6] {};
+
+    // parameters necessary to compute score
+    int chain = 0;
+    int long_bonus[TLRensaResult::MAX_RENSA] {};
+    int num_colors[TLRensaResult::MAX_RENSA] {};
+    int num_connected[TLRensaResult::MAX_RENSA] {};   // # of connected puyos
+    int num_connections[TLRensaResult::MAX_RENSA] {};  // # of groups
+    bool quick = false;
+    
+    bool cont = true;
+    while (cont) {
+        cont = false;
+        memset(point, 0, sizeof(point));
+        int rakkaflg[6] {};
+
+        std::set<TLColor> used_colors;
+        // check connections and vanish
+        for (int i = 0; i < 6; ++i) {
+            for (int j = bottom[i]; j < 12; ++j) {
+                TLColor color = field[i][j];
+                if (color == TLColor::EMPTY)
+                    break;
+                if (point[i][j] != 1 && isNormalTLColor(color)) {
+                    int num = 0;
+                    saiki(field, point, i, j, &num, color);
+                    if (num >= 4) {
+                        cont = true;
+                        syou(field, i, j, color, rakkaflg);
+
+                        long_bonus[chain] += longBonus(num);
+                        num_connected[chain] += num;
+                        used_colors.insert(color);
+                        num_connections[chain]++;
+                    }
+                }
+            }
+        }
+        num_colors[chain] = used_colors.size();
+        if (!cont)
+            break;
+        ++chain;
+
+        // drop puyos
+        quick = true;
+        for (int i = 0; i < 6; ++i) {
+            bottom[i] = 12;
+            if (rakkaflg[i]) {
+                int n = 0;
+                for (int j = 0; j < 13; ++j) {
+                    if (field[i][j] == TLColor::EMPTY) {
+                        if (n == 0)
+                            bottom[i] = j;
+                        n++;
+                        quick = false;
+                    } else if (n != 0) {
+                        field[i][j - n] = field[i][j];
+                        field[i][j] = TLColor::EMPTY;
+                    }
+                }
+            }
+        }
+    }
+
+    int score = 0;
+    int num_vanished = 0;
+    for (int i = 0; i < chain; ++i) {
+        int chain_bonus = chainBonus(i + 1);
+        int color_bonus = colorBonus(num_colors[i]);
+        int rate = calculateRensaBonusCoef(chain_bonus, long_bonus[i], color_bonus);
+        if (rate == 0)
+            rate = 1;
+        score += num_connected[i] * rate * 10;
+        num_vanished += num_connected[i];
+    }
+
+    TLRensaResult result;
+    result.chains = chain;
+    result.score = score;
+    result.quick = quick;
+    result.num_vanished = num_vanished;
+    for (int i = 0; i < chain; ++i) {
+        result.num_connections[i] = num_connections[i];
+    }
+    
+    return result;
 }
 
 void saiki(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
