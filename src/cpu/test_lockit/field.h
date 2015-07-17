@@ -7,6 +7,10 @@
 namespace test_lockit {
 
 bool isTLFieldEmpty(const TLColor field[6][kHeight]);
+int countNormalColor13(const TLColor f[][kHeight]);
+void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight]);
+
+// --------------------------------------------------------------------
 
 void saiki(const TLColor field[][kHeight], int point[][12], int x, int y, int* num, TLColor incol);
 void saiki_3(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol);
@@ -26,9 +30,6 @@ int hon_syoukyo(TLColor ba[][kHeight]);
 int hon_syoukyo_score(TLColor ba[][kHeight], int* score, int* quick);
 
 void setti_ojama(TLColor f[][kHeight], int numOjama);
-
-int countNormalColor13(const TLColor f[][kHeight]);
-void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight]);
 
 }  // namespace test_lockit
 
