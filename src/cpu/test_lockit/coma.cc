@@ -1851,7 +1851,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                         eex = (ee - 1) % 6;
                         int index = (ee - 1) / 6;
                         DCHECK_LE(0, index);
-                        DCHECK_LT(index, ARRAY_SIZE(NORMAL_TLCOLORS));
+                        DCHECK_LT(index, static_cast<int>(ARRAY_SIZE(NORMAL_TLCOLORS)));
                         eecol = NORMAL_TLCOLORS[index];
                         if ((eex == 2) || (eex == 3))
                             continue;
