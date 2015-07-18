@@ -153,6 +153,22 @@ TEST(FieldTest, simulate_chain)
     EXPECT_EQ(1, result.num_connections[1]);
 }
 
+TEST(FieldTest, simulate_1_duouble)
+{
+    CoreField cf(
+        "..BBBB"
+        "RRRRRR");
+    TLColor field[6][kHeight];
+    toTLField(cf, field);
+
+    TLRensaResult result = simulate(field);
+    EXPECT_EQ(1, result.chains);
+    EXPECT_EQ(600, result.score);
+    EXPECT_EQ(10, result.num_vanished);
+    EXPECT_TRUE(result.quick);
+    EXPECT_EQ(2, result.num_connections[0]);
+}
+
 TEST(FieldTest, simulate_2_double)
 {
     CoreField cf(

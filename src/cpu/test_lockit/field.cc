@@ -352,7 +352,7 @@ TLRensaResult simulate(TLColor field[][kHeight])
             for (int j = bottom[i]; j < 12; ++j) {
                 TLColor color = field[i][j];
                 if (color == TLColor::EMPTY)
-                    break;
+                    continue;
                 if (point[i][j] != 1 && isNormalTLColor(color)) {
                     int num = 0;
                     saiki(field, point, i, j, &num, color);
