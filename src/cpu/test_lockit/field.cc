@@ -384,10 +384,10 @@ TLRensaResult simulate(TLColor field[][kHeight])
                         if (n == 0)
                             bottom[i] = j;
                         n++;
-                        quick = false;
                     } else if (n != 0) {
                         field[i][j - n] = field[i][j];
                         field[i][j] = TLColor::EMPTY;
+                        quick = false;
                     }
                 }
             }
