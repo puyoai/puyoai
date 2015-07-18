@@ -6,9 +6,15 @@
 
 namespace test_lockit {
 
+struct TLRensaResult;
+
 bool isTLFieldEmpty(const TLColor field[6][kHeight]);
 int countNormalColor13(const TLColor f[][kHeight]);
 void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight]);
+
+// simulates a 連鎖 and returns its result.  The argument |field| will be updated
+// to be state of field after the 連鎖.
+TLRensaResult simulate(TLColor field[][kHeight]);
 
 // --------------------------------------------------------------------
 
