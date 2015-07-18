@@ -4,6 +4,7 @@
 
 #include "core/core_field.h"
 #include "lockit_constant.h"
+#include "rensa_result.h"
 #include "util.h"
 
 namespace test_lockit {
@@ -118,6 +119,73 @@ TEST(FieldTest, settiOjama)
     EXPECT_EQ(TLColor::EMPTY, field[3][13]);
     EXPECT_EQ(TLColor::EMPTY, field[4][13]);
     EXPECT_EQ(TLColor::EMPTY, field[5][13]);
+}
+
+TEST(FieldTest, simulate_basic)
+{
+    CoreField cf("RRRR..");
+    TLColor field[6][kHeight];
+    toTLField(cf, field);
+    
+    TLRensaResult result = simulate(field);
+    EXPECT_EQ(1, result.chains);
+    EXPECT_EQ(40, result.score);
+    EXPECT_EQ(4, result.num_vanished);
+    EXPECT_TRUE(result.quick);
+    EXPECT_EQ(1, result.num_connections[0]);
+}
+
+TEST(FieldTest, simulate_chain)
+{
+    CoreField cf(
+        "..B..."
+        "..BBYB"
+        "RRRRBB");
+    TLColor field[6][kHeight];
+    toTLField(cf, field);
+
+    TLRensaResult result = simulate(field);
+    EXPECT_EQ(2, result.chains);
+    EXPECT_EQ(700, result.score);
+    EXPECT_EQ(10, result.num_vanished);
+    EXPECT_FALSE(result.quick);
+    EXPECT_EQ(1, result.num_connections[0]);
+    EXPECT_EQ(1, result.num_connections[1]);
+}
+
+TEST(FieldTest, simulate_1_duouble)
+{
+    CoreField cf(
+        "..BBBB"
+        "RRRRRR");
+    TLColor field[6][kHeight];
+    toTLField(cf, field);
+
+    TLRensaResult result = simulate(field);
+    EXPECT_EQ(1, result.chains);
+    EXPECT_EQ(600, result.score);
+    EXPECT_EQ(10, result.num_vanished);
+    EXPECT_TRUE(result.quick);
+    EXPECT_EQ(2, result.num_connections[0]);
+}
+
+TEST(FieldTest, simulate_2_double)
+{
+    CoreField cf(
+        ".R...."
+        ".R...."
+        ".RYR.R"
+        "RYYYRR");
+    TLColor field[6][kHeight];
+    toTLField(cf, field);
+
+    TLRensaResult result = simulate(field);
+    EXPECT_EQ(2, result.chains);
+    EXPECT_EQ(680, result.score);
+    EXPECT_EQ(12, result.num_vanished);
+    EXPECT_TRUE(result.quick);
+    EXPECT_EQ(1, result.num_connections[0]);
+    EXPECT_EQ(2, result.num_connections[1]);
 }
 
 }  // namespace test_lockit
