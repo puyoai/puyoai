@@ -1,8 +1,8 @@
 #include "field.h"
 
 #include <glog/logging.h>
-#include <set>
 
+#include "base/small_int_set.h"
 #include "color.h"
 #include "core/field_constant.h"
 #include "core/score.h"
@@ -331,9 +331,6 @@ TLRensaResult simulate(TLColor field[][kHeight])
     // Assume all puyos are grounded.
     // TODO: add DCHECK to check it.
 
-    int point[6][12] {};
-    int bottom[6] {};
-
     // parameters necessary to compute score
     int chain = 0;
     int long_bonus[TLRensaResult::MAX_RENSA] {};
@@ -342,13 +339,14 @@ TLRensaResult simulate(TLColor field[][kHeight])
     int num_connections[TLRensaResult::MAX_RENSA] {};  // # of groups
     bool quick = false;
     
+    int bottom[6] {};
     bool cont = true;
     while (cont) {
         cont = false;
-        memset(point, 0, sizeof(point));
+        int point[6][12] {};
         int rakkaflg[6] {};
 
-        std::set<TLColor> used_colors;
+        SmallIntSet used_colors;
         // check connections and vanish
         for (int i = 0; i < 6; ++i) {
             for (int j = bottom[i]; j < 12; ++j) {
@@ -364,7 +362,7 @@ TLRensaResult simulate(TLColor field[][kHeight])
 
                         long_bonus[chain] += longBonus(num);
                         num_connected[chain] += num;
-                        used_colors.insert(color);
+                        used_colors.set(color);
                         num_connections[chain]++;
                     }
                 }
@@ -402,8 +400,6 @@ TLRensaResult simulate(TLColor field[][kHeight])
         int chain_bonus = chainBonus(i + 1);
         int color_bonus = colorBonus(num_colors[i]);
         int rate = calculateRensaBonusCoef(chain_bonus, long_bonus[i], color_bonus);
-        if (rate == 0)
-            rate = 1;
         score += num_connected[i] * rate * 10;
         num_vanished += num_connected[i];
     }

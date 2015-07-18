@@ -8,16 +8,16 @@ struct TLRensaResult {
 
     int chains = 0;
 
-    // total score in a contiguous chains
+    // total score in a continuous chains
     int score = 0;
 
-    // total colored puyos vanshed in a continguous chains
+    // total colored puyos vanished in a continuous chains
     int num_vanished = 0;
 
     // true if the last vanishment drops no puyos
     bool quick = false;
 
-    // the number of vanishing groups in each 連鎖 step.  The values of
+    // the number of vanishing groups in each chain step.  The values of
     // num_connections[i] for i >= chains are not defined
     int num_connections[MAX_RENSA] {};
 };
