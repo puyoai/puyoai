@@ -196,7 +196,7 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
             if (ba_b[2][11] != TLColor::EMPTY)
                 continue;
 
-            for (TLColor nk :NORMAL_TLCOLORS) {
+            for (TLColor nk : NORMAL_TLCOLORS) {
                 for (int dd = 0; dd < 6; ++dd) {
                     if (tobashi_hantei_a(ba_b, dd, nk, nk))
                         continue;
@@ -253,7 +253,7 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
                         continue;
                     if (ba[4][11] != TLColor::EMPTY && x == 5)
                         continue;
-                        
+
                     TLRensaResult result = simulate(ba);
                     if (m_aite_rensa_score_cc < result.chains) {
                         m_aite_rensa_score_cc = result.chains;
