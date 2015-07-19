@@ -15,6 +15,7 @@
 
 #include "color.h"
 #include "field.h"
+#include "rensa_result.h"
 #include "template.h"
 
 namespace test_lockit {
@@ -166,220 +167,99 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
     TLColor ba_a[6][kHeight] {};
     TLColor ba_b[6][kHeight] {};
     TLColor ba_d[6][kHeight] {};
-    int point[6][12];
-    int i, j;
-    int num;
-    int n;
-    int syo;
-    int chain;
-    TLColor nx1, nx2, nn1, nn2;
-    TLColor nk1, nk2;
-
-    int aa, bb, dd;
-    int rakkaflg[6];
-    int kiept[6];
-    int keshiko_aa = 0;
-    int keshiko_bb = 0;
-    int keshiko_dd = 0;
-    int keshikos;
-
-    int setti_basyo[4];
-    int dabuchk[20];
-    int ichiren_kesi;
-    int score_aa = 0;
-    int score_bb = 0;
-    int score_dd = 0;
-    int scores = 0;
-
-    int cc;
-    int chain2 = 0;
 
     m_aite_rensa_score = 0;
     m_aite_rensa_score_cc = 0;
     m_nocc_aite_rensa_score = 0;
 
-    nx1 = toValidTLColor(tsumo[0]);
-    nx2 = toValidTLColor(tsumo[1]);
-    nn1 = toValidTLColor(tsumo[2]);
-    nn2 = toValidTLColor(tsumo[3]);
+    TLColor nx1 = toValidTLColor(tsumo[0]);
+    TLColor nx2 = toValidTLColor(tsumo[1]);
+    TLColor nn1 = toValidTLColor(tsumo[2]);
+    TLColor nn2 = toValidTLColor(tsumo[3]);
     int irokosuu = countNormalColor13(ba3);
 
-    for (aa = 0; aa < 22; aa++) {
+    int unused_values[4];
+    for (int aa = 0; aa < 22; ++aa) {
         if (tobashi_hantei_a(ba3, aa, nx1, nx2))
             continue;
-        memcpy(ba_a, ba3, sizeof(ba));
-        setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
-        keshiko_aa = chousei_syoukyo_2(ba_a, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_aa);
+        copyField(ba3, ba_a);
+        setti_puyo(ba_a, aa, nx1, nx2, unused_values);
+        TLRensaResult result_aa = simulate(ba_a);
         if (ba_a[2][11] != TLColor::EMPTY)
             continue;
-        for (bb = 0; bb < 22; bb++) {
+        for (int bb = 0; bb < 22; ++bb) {
             if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
                 continue;
-            memcpy(ba_b, ba_a, sizeof(ba));
-            setti_puyo(ba_b, bb, nn1, nn2, setti_basyo);
-            keshiko_bb = chousei_syoukyo_2(ba_b, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_bb);
+            copyField(ba_a, ba_b);
+            setti_puyo(ba_b, bb, nn1, nn2, unused_values);
+            TLRensaResult result_bb = simulate(ba_b);
             if (ba_b[2][11] != TLColor::EMPTY)
                 continue;
 
-            for (cc = 1; cc < 5; cc++) {
-                nk1 = NORMAL_TLCOLORS[cc - 1];
-                nk2 = NORMAL_TLCOLORS[cc - 1];
-                for (dd = 0; dd < 6; dd++) {
-                    if (tobashi_hantei_a(ba_b, dd, nk1, nk2))
+            for (TLColor nk : NORMAL_TLCOLORS) {
+                for (int dd = 0; dd < 6; ++dd) {
+                    if (tobashi_hantei_a(ba_b, dd, nk, nk))
                         continue;
-                    memcpy(ba_d, ba_b, sizeof(ba));
-                    setti_puyo(ba_d, dd, nk1, nk2, setti_basyo);
-                    keshiko_dd = chousei_syoukyo_2(ba_d, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_dd);
+                    copyField(ba_b, ba_d);
+                    setti_puyo(ba_d, dd, nk, nk, unused_values);
+                    TLRensaResult result_dd = simulate(ba_d);
                     if (ba_d[2][11] != TLColor::EMPTY)
                         continue;
 
-                    scores = score_aa;
-                    keshikos = keshiko_aa;
-                    if (scores < score_bb) {
-                        scores = score_bb;
-                        keshikos = keshiko_bb;
+                    int scores = result_aa.score;
+                    int keshikos = result_aa.num_vanished;
+                    if (scores < result_bb.score) {
+                        scores = result_bb.score;
+                        keshikos = result_bb.num_vanished;
                     }
-                    if (scores < score_dd) {
-                        scores = score_dd;
-                        keshikos = keshiko_dd;
+                    if (scores < result_dd.score) {
+                        scores = result_dd.score;
+                        keshikos = result_dd.num_vanished;
                     }
 
                     if (m_aite_rensa_score < scores) {
                         m_aite_rensa_score = scores;
                     }
-                    if (keshikos * 2 < irokosuu) {
-                        if (m_nocc_aite_rensa_score < scores) {
-                            m_nocc_aite_rensa_score = scores;
-                            m_moni_kesiko[0] = keshiko_aa;
-                            m_moni_iroko[0] = score_aa;
-                            m_moni_kesiko[1] = keshiko_bb;
-                            m_moni_iroko[1] = score_bb;
-                            m_moni_kesiko[2] = keshiko_dd;
-                            m_moni_iroko[2] = score_dd;
-                        }
+                    if (keshikos * 2 < irokosuu && m_nocc_aite_rensa_score < scores) {
+                        m_nocc_aite_rensa_score = scores;
+                        m_moni_kesiko[0] = result_aa.num_vanished;
+                        m_moni_iroko[0] = result_aa.score;
+                        m_moni_kesiko[1] = result_bb.num_vanished;
+                        m_moni_iroko[1] = result_bb.score;
+                        m_moni_kesiko[2] = result_dd.num_vanished;
+                        m_moni_iroko[2] = result_dd.score;
                     }
-                } // dd
-            } // cc
+                }
+            }
 
-            // aaaaaaaa 111119
-            for (cc = 0; cc < 25; cc++) {
-                memcpy(ba, ba_b, sizeof(ba));
-                if (cc == 0) {
-                    continue;
-                } else if (cc < 7) {
-                    for (j = 0; j < 13; j++) {
-                        if (ba[cc - 1][j] == TLColor::EMPTY) {
-                            ba[cc - 1][j] = TLColor::RED;
-                            ba[cc - 1][j + 1] = TLColor::RED;
+            // Assume putting 2 same puyos vertically.
+            for (int x = 0; x < 6; ++x) {
+                for (TLColor color : NORMAL_TLCOLORS) {
+                    copyField(ba_b, ba);
+                    for (int j = 0; j < 13; j++) {
+                        if (ba[x][j] == TLColor::EMPTY) {
+                            ba[x][j] = color;
+                            ba[x][j + 1] = color;
                             break;
                         }
                     }
-                } else if (cc < 13) {
-                    for (j = 0; j < 13; j++) {
-                        if (ba[cc - 7][j] == TLColor::EMPTY) {
-                            ba[cc - 7][j] = TLColor::BLUE;
-                            ba[cc - 7][j + 1] = TLColor::BLUE;
-                            break;
-                        }
-                    }
-                } else if (cc < 19) {
-                    for (j = 0; j < 13; j++) {
-                        if (ba[cc - 13][j] == TLColor::EMPTY) {
-                            ba[cc - 13][j] = TLColor::YELLOW;
-                            ba[cc - 13][j + 1] = TLColor::YELLOW;
-                            break;
-                        }
-                    }
-                } else if (cc < 25) {
-                    for (j = 0; j < 13; j++) {
-                        if (ba[cc - 19][j] == TLColor::EMPTY) {
-                            ba[cc - 19][j] = TLColor::GREEN;
-                            ba[cc - 19][j + 1] = GREEN;
-                            break;
-                        }
-                    }
-                }
 
-                if (ba[1][11] != TLColor::EMPTY) {
-                    if ((cc % 6) == 1)
+                    // Skip if the destination is unreachable.
+                    if (ba[1][11] != TLColor::EMPTY && x == 0)
                         continue;
-                }
-                if (ba[2][11] != TLColor::EMPTY) {
-                    if ((cc % 6) != 3)
+                    if (ba[2][11] != TLColor::EMPTY && x != 2)  // game over
                         continue;
-                }
-                if (ba[3][11] != TLColor::EMPTY) {
-                    if ((cc % 6) == 5)
+                    if (ba[3][11] != TLColor::EMPTY && x > 3)
                         continue;
-                    if (((cc % 6) == 0) && (cc != 0))
+                    if (ba[4][11] != TLColor::EMPTY && x == 5)
                         continue;
-                }
-                if (ba[4][11] != TLColor::EMPTY) {
-                    if (((cc % 6) == 0) && (cc != 0))
-                        continue;
-                }
 
-                syo = 1;
-                chain2 = 0;
-                num = 0;
-
-                kiept[0] = 0;
-                kiept[1] = 0;
-                kiept[2] = 0;
-                kiept[3] = 0;
-                kiept[4] = 0;
-                kiept[5] = 0;
-                while (syo) {
-                    syo = 0;
-                    memset(point, 0, sizeof(point));
-                    for (i = 0; i < 6; i++) {
-                        for (j = kiept[i]; j < 12; j++) {
-                            if (ba[i][j] == TLColor::EMPTY)
-                                break;
-                            if (point[i][j] != 1 && isNormalTLColor(ba[i][j])) {
-                                saiki(ba, point, i, j, &num, ba[i][j]);
-                                point[i][j] = num;
-                                num = 0;
-                            }
-                        }
+                    TLRensaResult result = simulate(ba);
+                    if (m_aite_rensa_score_cc < result.chains) {
+                        m_aite_rensa_score_cc = result.chains;
                     }
-                    rakkaflg[0] = 0;
-                    rakkaflg[1] = 0;
-                    rakkaflg[2] = 0;
-                    rakkaflg[3] = 0;
-                    rakkaflg[4] = 0;
-                    rakkaflg[5] = 0;
-                    for (i = 0; i < 6; i++) {
-                        for (j = kiept[i]; j < 12; j++) {
-                            if (point[i][j] > 3) {
-                                syo = 1;
-                                syou(ba, i, j, ba[i][j], rakkaflg);
-                            }
-                        }
-                    }
-                    for (i = 0; i < 6; i++) {
-                        kiept[i] = 12;
-                        if (rakkaflg[i] == 1) {
-                            n = 0;
-                            for (j = 0; j < 13; j++) {
-                                if (ba[i][j] == TLColor::EMPTY) {
-                                    if (n == 0)
-                                        kiept[i] = j;
-                                    n++;
-                                } else if (n != 0) {
-                                    ba[i][j - n] = ba[i][j];
-                                    ba[i][j] = TLColor::EMPTY;
-                                }
-                            }
-                        }
-                    }
-                    if (syo == 1)
-                        chain2++;
-                } // while
-                if (m_aite_rensa_score_cc < chain2) {
-                    m_aite_rensa_score_cc = chain2;
                 }
-            } // cc
+            }
         } // bb
     } // aa
     return 0;
