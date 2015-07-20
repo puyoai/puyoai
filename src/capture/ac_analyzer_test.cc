@@ -98,6 +98,7 @@ TEST_F(ACAnalyzerTest, estimateRealColor)
         { RealColor::RC_PURPLE, RGB( 77,  23,  35) },
         { RealColor::RC_PURPLE, RGB( 84,  45,  52) },
         { RealColor::RC_PURPLE, RGB(135,  34, 142) },
+        { RealColor::RC_PURPLE, RGB(121,  72, 142) },
     };
     int size = ARRAY_SIZE(testcases);
 
@@ -220,6 +221,34 @@ TEST_F(ACAnalyzerTest, analyzeField4)
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
             EXPECT_EQ(field.color(x, y), r->playerResult(0)->adjustedField.realColor(x, y))
+                << "x=" << x << " y=" << y;
+        }
+    }
+}
+
+TEST_F(ACAnalyzerTest, analyzeField5)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/images/field/field5.png");
+
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    const RealColorField field(
+        "..P..."  // 12
+        "P....."
+        "G....."
+        "Y....."
+        "PR...."  // 8
+        "PR...."
+        "RYYPGP"
+        "PRPPRP"
+        "PRGRGY"  // 4
+        "YPGRPY"
+        "YYPGRR"
+        "PPGRPY");
+
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            EXPECT_EQ(field.color(x, y), r->playerResult(0)->detectedField.realColor(x, y))
                 << "x=" << x << " y=" << y;
         }
     }
