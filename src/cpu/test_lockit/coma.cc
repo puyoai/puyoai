@@ -106,7 +106,6 @@ void COMAI_HI::ref()
     m_score_aa = -10;
     m_aa_max_score = 0;
     m_hakkatime = 0;
-    m_numg = 0;
 }
 
 bool COMAI_HI::aite_attack_start(const TLColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
@@ -375,8 +374,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     }
 
     // aaaaaaaaaaaaaaaaaaaaaa
-    int maxpont[TM_TMNMUM][22] {};
-    int maxp_matome[22] = { 0 };
     // TODO(peria): What |adubpt| means?
     // bool?
     int adubpt[22][22][22] {};
@@ -422,12 +419,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         }
     } // m_hukks
 
-    for (aa = 0; aa < 22; aa++) {
-        for (i = 0; i < m_numg; i++) {
-            if (maxp_matome[aa] < maxpont[i][aa])
-                maxp_matome[aa] = maxpont[i][aa];
-        }
-    }
     for (aa = 0; aa < 22; aa++) {
         for (bb = 0; bb < 22; bb++) {
             for (dd = 0; dd < 22; dd++) {
