@@ -40,7 +40,7 @@ static RealColor toRealColor(const HSV& hsv)
     if (180 <= hsv.h && hsv.h <= 255 && 60 < hsv.v)
         return RealColor::RC_BLUE;
     // Detecting purple is really hard. We'd like to have relaxed margin for purple.
-    if (290 <= hsv.h && hsv.h < 340 && 50 < hsv.v)
+    if (280 <= hsv.h && hsv.h < 340 && 50 < hsv.v)
         return RealColor::RC_PURPLE;
 
     // Hard to distinguish RED and PURPLE.
