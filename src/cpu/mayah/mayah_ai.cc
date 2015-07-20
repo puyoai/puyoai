@@ -106,6 +106,11 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                 << "----------------------------------------------------------------------" << endl;
     }
 
+    if (kumipuyoSeq.size() < 2) {
+        LOG(ERROR) << "The size of kumipuyoSeq is " << kumipuyoSeq.size() << ", which is < 2.";
+        // This shouldn't happen.
+    }
+
     if (usesDecisionBook_ && !enemy.hasZenkeshi) {
         Decision d = decisionBook_.nextDecision(field, kumipuyoSeq);
         if (d.isValid()) {

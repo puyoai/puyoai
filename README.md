@@ -75,7 +75,7 @@ Debian 系 Linux の場合、apt を使うと楽です。
     $ sudo apt-get install libgoogle-glog-dev libgflags-dev
     $ sudo apt-get install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
     $ sudo apt-get install libmicrohttpd-dev
-    $ sudo apt-get install libffms2-dev libusb-dev libcrypto++-dev
+    $ sudo apt-get install libffms2-dev libusb-1.0-0-dev
     $ sudo apt-get install ninja-build
 
 ### make のしかた

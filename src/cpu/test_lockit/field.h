@@ -6,7 +6,17 @@
 
 namespace test_lockit {
 
+struct TLRensaResult;
+
 bool isTLFieldEmpty(const TLColor field[6][kHeight]);
+int countNormalColor13(const TLColor f[][kHeight]);
+void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight]);
+
+// simulates a 連鎖 and returns its result.  The argument |field| will be updated
+// to be state of field after the 連鎖.
+TLRensaResult simulate(TLColor field[][kHeight]);
+
+// --------------------------------------------------------------------
 
 void saiki(const TLColor field[][kHeight], int point[][12], int x, int y, int* num, TLColor incol);
 void saiki_3(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol);
@@ -26,9 +36,6 @@ int hon_syoukyo(TLColor ba[][kHeight]);
 int hon_syoukyo_score(TLColor ba[][kHeight], int* score, int* quick);
 
 void setti_ojama(TLColor f[][kHeight], int numOjama);
-
-int countNormalColor13(const TLColor f[][kHeight]);
-void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight]);
 
 }  // namespace test_lockit
 

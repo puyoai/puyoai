@@ -2,8 +2,11 @@
 
 #include <glog/logging.h>
 
+#include "base/small_int_set.h"
 #include "color.h"
 #include "core/field_constant.h"
+#include "core/score.h"
+#include "rensa_result.h"
 
 namespace test_lockit {
 
@@ -301,6 +304,19 @@ bool isTLFieldEmpty(const TLColor field[6][kHeight])
     return true;
 }
 
+int countNormalColor13(const TLColor f[][kHeight])
+{
+    int n = 0;
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 13; j++) {
+            if (isNormalTLColor(f[i][j]))
+                ++n;
+        }
+    }
+
+    return n;
+}
+
 void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight])
 {
     for (int i = 0; i < 6; ++i) {
@@ -308,6 +324,96 @@ void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight])
             dst[i][j] = src[i][j];
         }
     }
+}
+
+TLRensaResult simulate(TLColor field[][kHeight])
+{
+    // Assume all puyos are grounded.
+    // TODO: add DCHECK to check it.
+
+    // parameters necessary to compute score
+    int chain = 0;
+    int long_bonus[TLRensaResult::MAX_RENSA] {};
+    int num_colors[TLRensaResult::MAX_RENSA] {};
+    int num_connected[TLRensaResult::MAX_RENSA] {};   // # of connected puyos
+    int num_connections[TLRensaResult::MAX_RENSA] {};  // # of groups
+    bool quick = false;
+    
+    int bottom[6] {};
+    bool cont = true;
+    while (cont) {
+        cont = false;
+        int point[6][12] {};
+        int rakkaflg[6] {};
+
+        SmallIntSet used_colors;
+        // check connections and vanish
+        for (int i = 0; i < 6; ++i) {
+            for (int j = bottom[i]; j < 12; ++j) {
+                TLColor color = field[i][j];
+                if (color == TLColor::EMPTY)
+                    continue;
+                if (point[i][j] != 1 && isNormalTLColor(color)) {
+                    int num = 0;
+                    saiki(field, point, i, j, &num, color);
+                    if (num >= 4) {
+                        cont = true;
+                        syou(field, i, j, color, rakkaflg);
+
+                        long_bonus[chain] += longBonus(num);
+                        num_connected[chain] += num;
+                        used_colors.set(color);
+                        num_connections[chain]++;
+                    }
+                }
+            }
+        }
+        num_colors[chain] = used_colors.size();
+        if (!cont)
+            break;
+        ++chain;
+
+        // drop puyos
+        quick = true;
+        for (int i = 0; i < 6; ++i) {
+            bottom[i] = 12;
+            if (rakkaflg[i]) {
+                int n = 0;
+                for (int j = 0; j < 13; ++j) {
+                    if (field[i][j] == TLColor::EMPTY) {
+                        if (n == 0)
+                            bottom[i] = j;
+                        n++;
+                    } else if (n != 0) {
+                        field[i][j - n] = field[i][j];
+                        field[i][j] = TLColor::EMPTY;
+                        quick = false;
+                    }
+                }
+            }
+        }
+    }
+
+    int score = 0;
+    int num_vanished = 0;
+    for (int i = 0; i < chain; ++i) {
+        int chain_bonus = chainBonus(i + 1);
+        int color_bonus = colorBonus(num_colors[i]);
+        int rate = calculateRensaBonusCoef(chain_bonus, long_bonus[i], color_bonus);
+        score += num_connected[i] * rate * 10;
+        num_vanished += num_connected[i];
+    }
+
+    TLRensaResult result;
+    result.chains = chain;
+    result.score = score;
+    result.quick = quick;
+    result.num_vanished = num_vanished;
+    for (int i = 0; i < chain; ++i) {
+        result.num_connections[i] = num_connections[i];
+    }
+    
+    return result;
 }
 
 void saiki(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
@@ -526,253 +632,20 @@ int setti_puyo_1(TLColor ba[][kHeight], int eex, TLColor eecol)
     return 0;
 }
 
-int chousei_syoukyo(TLColor ba[][kHeight], int setti_basyo[])
+int chousei_syoukyo(TLColor ba[][kHeight], int[])
 {
-    int num = 0;
-    int numa = 0;
-    int numb = 0;
-    int point[6][12] {};
-    int i, j;
-    int syo = 1;
-    int kiept[6] = { 0 };
-    int rakkaflg[6] = { 0 };
-    int n;
-    int a, b, c, d;
-    int keshiko = 0;
-
-    a = setti_basyo[0];
-    b = setti_basyo[1];
-    c = setti_basyo[2];
-    d = setti_basyo[3];
-    if ((b < 12) && (b >= 0)) {
-        saiki(ba, point, a, b, &numa, ba[a][b]);
-    }
-    if ((d < 12) && (d >= 0)) {
-        if (point[c][d] == 0) {
-            saiki(ba, point, c, d, &numb, ba[c][d]);
-        }
-    }
-    if ((numa < 4) && (numb < 4))
-        return 0;
-    if (numa > 3) {
-        syou(ba, a, b, ba[a][b], rakkaflg);
-        keshiko += numa;
-    }
-    if (numb > 3) {
-        syou(ba, c, d, ba[c][d], rakkaflg);
-        keshiko += numb;
-    }
-
-    for (i = 0; i < 6; i++) {
-        kiept[i] = 12;
-        if (rakkaflg[i] == 1) {
-            n = 0;
-            for (j = 0; j < 13; j++) {
-                if (ba[i][j] == TLColor::EMPTY) {
-                    if (n == 0)
-                        kiept[i] = j;
-                    n++;
-                } else if (n != 0) {
-                    ba[i][j - n] = ba[i][j];
-                    ba[i][j] = TLColor::EMPTY;
-                }
-            }
-        }
-    }
-
-    while (syo) {
-        syo = 0;
-        memset(point, 0, sizeof(point));
-        rakkaflg[0] = 0;
-        rakkaflg[1] = 0;
-        rakkaflg[2] = 0;
-        rakkaflg[3] = 0;
-        rakkaflg[4] = 0;
-        rakkaflg[5] = 0;
-        for (i = 0; i < 6; i++) {
-            for (j = kiept[i]; j < 12; j++) {
-                if (point[i][j] != 0)
-                    continue;
-                if (ba[i][j] == 0)
-                    break;
-                if (ba[i][j] != TLColor::OJAMA) {
-                    saiki(ba, point, i, j, &num, ba[i][j]);
-                    if (num > 3) {
-                        syo = 1;
-                        syou(ba, i, j, ba[i][j], rakkaflg);
-                        keshiko += num;
-                    }
-                    num = 0;
-                }
-            }
-        }
-        for (i = 0; i < 6; i++) {
-            kiept[i] = 12;
-            if (rakkaflg[i] == 1) {
-                n = 0;
-                for (j = 0; j < 13; j++) {
-                    if (ba[i][j] == TLColor::EMPTY) {
-                        if (n == 0)
-                            kiept[i] = j;
-                        n++;
-                    } else if (n != 0) {
-                        ba[i][j - n] = ba[i][j];
-                        ba[i][j] = TLColor::EMPTY;
-                    }
-                }
-            }
-        }
-    }
-
-    return keshiko;
+    TLRensaResult result = simulate(ba);
+    return result.num_vanished;
 }
 
-int chousei_syoukyo_2(TLColor ba[][kHeight], int setti_basyo[], int* chain, int dabuchk[], int* ichiren_kesi, int* score)
+int chousei_syoukyo_2(TLColor ba[][kHeight], int[], int* chain, int dabuchk[], int*, int* score)
 {
-    int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
-    int color_rate[5] = { 0, 3, 6, 12, 24 };
-    int renketsu[19][5] {};
-    int colnum;
-    int renketsunum;
-    int renketsubonus[19] = { 0 };
-    int rate;
-    int color;
-
-    int num = 0;
-    int numa = 0;
-    int numb = 0;
-    int point[6][12] {};
-    int i, j;
-    int syo = 1;
-    int kiept[6] = { 0 };
-    int rakkaflg[6] = { 0 };
-    int n;
-    int a, b, c, d;
-    int keshiko = 0;
-    for (i = 0; i < 20; i++) {
-        dabuchk[i] = 0;
-    }
-    (*ichiren_kesi) = 0;
-    *score = 0;
-
-    a = setti_basyo[0];
-    b = setti_basyo[1];
-    c = setti_basyo[2];
-    d = setti_basyo[3];
-    if ((b < 12) && (b >= 0)) {
-        saiki(ba, point, a, b, &numa, ba[a][b]);
-    }
-    if ((d < 12) && (d >= 0)) {
-        if (point[c][d] == 0) {
-            saiki(ba, point, c, d, &numb, ba[c][d]);
-        }
-    }
-    (*chain) = 0;
-    if ((numa < 4) && (numb < 4))
-        return 0;
-    if (numa > 3) {
-        color = ba[a][b];
-        renketsu[*chain][color - 1] += numa;
-        if (numa > 10)
-            renketsubonus[*chain] += 10; // bugggggg 111102
-        else if (numa > 4)
-            renketsubonus[*chain] += numa - 3;
-        syou(ba, a, b, ba[a][b], rakkaflg);
-        keshiko += numa;
-    }
-    if (numb > 3) {
-        color = ba[c][d];
-        renketsu[*chain][color - 1] += numb;
-        if (numb > 10)
-            renketsubonus[*chain] += 10; // bugggggg 111102
-        else if (numb > 4)
-            renketsubonus[*chain] += numb - 3;
-        syou(ba, c, d, ba[c][d], rakkaflg);
-        keshiko += numb;
-    }
-
-    for (i = 0; i < 6; i++) {
-        kiept[i] = 12;
-        if (rakkaflg[i] == 1) {
-            n = 0;
-            for (j = 0; j < 13; j++) {
-                if (ba[i][j] == TLColor::EMPTY) {
-                    if (n == 0)
-                        kiept[i] = j;
-                    n++;
-                } else if (n != 0) {
-                    ba[i][j - n] = ba[i][j];
-                    ba[i][j] = TLColor::EMPTY;
-                }
-            }
-        }
-    }
-    (*chain) = 1;
-
-    while (syo) {
-        syo = 0;
-        memset(point, 0, sizeof(point));
-        rakkaflg[0] = 0;
-        rakkaflg[1] = 0;
-        rakkaflg[2] = 0;
-        rakkaflg[3] = 0;
-        rakkaflg[4] = 0;
-        rakkaflg[5] = 0;
-        for (i = 0; i < 6; i++) {
-            for (j = kiept[i]; j < 12; j++) {
-                if (ba[i][j] == TLColor::EMPTY)
-                    continue;
-                if ((point[i][j] != 1) && (ba[i][j] != TLColor::OJAMA)) {
-                    saiki(ba, point, i, j, &num, ba[i][j]);
-                    if (num > 3) {
-                        syo = 1;
-                        color = ba[i][j];
-                        renketsu[*chain][color - 1] += num;
-                        if (num > 10)
-                            renketsubonus[*chain] += 10; // bugggggg 111102
-                        else if (num > 4)
-                            renketsubonus[*chain] += num - 3;
-                        syou(ba, i, j, ba[i][j], rakkaflg);
-                        keshiko += num;
-                        dabuchk[*chain]++;
-                    }
-                    num = 0;
-                }
-            }
-        }
-        for (i = 0; i < 6; i++) {
-            kiept[i] = 12;
-            if (rakkaflg[i] == 1) {
-                n = 0;
-                for (j = 0; j < 13; j++) {
-                    if (ba[i][j] == TLColor::EMPTY) {
-                        if (n == 0)
-                            kiept[i] = j;
-                        n++;
-                    } else if (n != 0) {
-                        ba[i][j - n] = ba[i][j];
-                        ba[i][j] = TLColor::EMPTY;
-                    }
-                }
-            }
-        }
-        if (syo == 1)
-            *chain += 1;
-    }
-    for (i = 0; i < (*chain); i++) {
-        rate = 0;
-        colnum = 0;
-        renketsunum = 0;
-        for (j = 0; j < 5; j++) {
-            colnum += (renketsu[i][j] != 0);
-            renketsunum += renketsu[i][j];
-        }
-        rate = color_rate[colnum - 1] + renketsubonus[i] + rensa_rate[i];
-        if (rate == 0)
-            rate = 1;
-        *score += renketsunum * rate * 10;
-    }
-    return keshiko;
+    TLRensaResult result = simulate(ba);
+    *chain = result.chains;
+    for (int i = 0; i < result.chains; ++i)
+        dabuchk[i] = result.num_connections[i];
+    *score = result.score;
+    return result.num_vanished;
 }
 
 int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point)
@@ -855,7 +728,7 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
             for (j = kiept[i]; j < 12; j++) {
                 if (point[i][j] != 0)
                     continue;
-                if (bass[i][j] == 0)
+                if (bass[i][j] == TLColor::EMPTY)
                     break;
                 if (bass[i][j] != TLColor::OJAMA) {
                     saiki(bass, point, i, j, &num, bass[i][j]);
@@ -879,7 +752,7 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
             if (rakkaflg[i] == 1) {
                 n = 0;
                 for (j = 0; j < 13; j++) {
-                    if (bass[i][j] == 0) {
+                    if (bass[i][j] == TLColor::EMPTY) {
                         if (n == 0)
                             kiept[i] = j;
                         n++;
@@ -912,300 +785,25 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
     return chain;
 }
 
-int chousei_syoukyo_sc(TLColor ba[][kHeight], int setti_basyo[], int* score)
+int chousei_syoukyo_sc(TLColor field[][kHeight], int[], int* score)
 {
-    int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
-    int color_rate[5] = { 0, 3, 6, 12, 24 };
-    int renketsu[19][5] {};
-    int colnum;
-    int renketsunum;
-    int renketsubonus[19] = { 0 };
-    int rate;
-    int color;
-
-    int num = 0;
-    int numa = 0;
-    int numb = 0;
-    int point[6][12] {};
-    int i, j;
-    int syo = 1;
-    int kiept[6] = { 0 };
-    int rakkaflg[6] = { 0 };
-    int n;
-    int a, b, c, d;
-    int keshiko = 0;
-    int chain;
-    *score = 0;
-
-    a = setti_basyo[0];
-    b = setti_basyo[1];
-    c = setti_basyo[2];
-    d = setti_basyo[3];
-    if ((b < 12) && (b >= 0)) {
-        saiki(ba, point, a, b, &numa, ba[a][b]);
-    }
-    if ((d < 12) && (d >= 0)) {
-        if (point[c][d] == 0) {
-            saiki(ba, point, c, d, &numb, ba[c][d]);
-        }
-    }
-    (chain) = 0;
-    if ((numa < 4) && (numb < 4))
-        return 0;
-    if (numa > 3) {
-        color = ba[a][b];
-        renketsu[chain][color - 1] += numa;
-        if (numa > 10)
-            renketsubonus[chain] += 10; // bugggggg 111102
-        else if (numa > 4)
-            renketsubonus[chain] += numa - 3;
-        syou(ba, a, b, ba[a][b], rakkaflg);
-        keshiko += numa;
-    }
-    if (numb > 3) {
-        color = ba[c][d];
-        renketsu[chain][color - 1] += numb;
-        if (numb > 10)
-            renketsubonus[chain] += 10; // bugggggg 111102
-        else if (numb > 4)
-            renketsubonus[chain] += numb - 3;
-        syou(ba, c, d, ba[c][d], rakkaflg);
-        keshiko += numb;
-    }
-
-    for (i = 0; i < 6; i++) {
-        kiept[i] = 12;
-        if (rakkaflg[i] == 1) {
-            n = 0;
-            for (j = 0; j < 13; j++) {
-                if (ba[i][j] == TLColor::EMPTY) {
-                    if (n == 0)
-                        kiept[i] = j;
-                    n++;
-                } else if (n != 0) {
-                    ba[i][j - n] = ba[i][j];
-                    ba[i][j] = TLColor::EMPTY;
-                }
-            }
-        }
-    }
-    (chain) = 1;
-
-    while (syo) {
-        syo = 0;
-        memset(point, 0, sizeof(point));
-        rakkaflg[0] = 0;
-        rakkaflg[1] = 0;
-        rakkaflg[2] = 0;
-        rakkaflg[3] = 0;
-        rakkaflg[4] = 0;
-        rakkaflg[5] = 0;
-        for (i = 0; i < 6; i++) {
-            for (j = kiept[i]; j < 12; j++) {
-                if (ba[i][j] == TLColor::EMPTY)
-                    continue;
-                if ((point[i][j] != 1) && (ba[i][j] != TLColor::OJAMA)) {
-                    saiki(ba, point, i, j, &num, ba[i][j]);
-                    if (num > 3) {
-                        syo = 1;
-                        color = ba[i][j];
-                        renketsu[chain][color - 1] += num;
-                        if (num > 10)
-                            renketsubonus[chain] += 10; // bugggggg 111102
-                        else if (num > 4)
-                            renketsubonus[chain] += num - 3;
-                        syou(ba, i, j, ba[i][j], rakkaflg);
-                        keshiko += num;
-                    }
-                    num = 0;
-                }
-            }
-        }
-        for (i = 0; i < 6; i++) {
-            kiept[i] = 12;
-            if (rakkaflg[i] == 1) {
-                n = 0;
-                for (j = 0; j < 13; j++) {
-                    if (ba[i][j] == TLColor::EMPTY) {
-                        if (n == 0)
-                            kiept[i] = j;
-                        n++;
-                    } else if (n != 0) {
-                        ba[i][j - n] = ba[i][j];
-                        ba[i][j] = TLColor::EMPTY;
-                    }
-                }
-            }
-        }
-        if (syo == 1)
-            chain += 1;
-    }
-    for (i = 0; i < (chain); i++) {
-        rate = 0;
-        colnum = 0;
-        renketsunum = 0;
-        for (j = 0; j < 5; j++) {
-            colnum += (renketsu[i][j] != 0);
-            renketsunum += renketsu[i][j];
-        }
-        rate = color_rate[colnum - 1] + renketsubonus[i] + rensa_rate[i];
-        if (rate == 0)
-            rate = 1;
-        *score += renketsunum * rate * 10;
-    }
-    return keshiko;
+    TLRensaResult result = simulate(field);
+    *score = result.score;
+    return result.num_vanished;
 }
 
-int hon_syoukyo(TLColor ba[][kHeight])
+int hon_syoukyo(TLColor field[][kHeight])
 {
-    int num = 0;
-    int point[6][12] {};
-    int i, j;
-    int syo = 1;
-    int kiept[6] = { 0 };
-    int rakkaflg[6];
-    int n;
-    int chain = 0;
-
-    while (syo) {
-        syo = 0;
-        memset(point, 0, sizeof(point));
-        rakkaflg[0] = 0;
-        rakkaflg[1] = 0;
-        rakkaflg[2] = 0;
-        rakkaflg[3] = 0;
-        rakkaflg[4] = 0;
-        rakkaflg[5] = 0;
-        for (i = 0; i < 6; i++) {
-            for (j = kiept[i]; j < 12; j++) {
-                if (point[i][j] != 0)
-                    continue;
-                if (ba[i][j] == TLColor::EMPTY)
-                    break;
-                if (ba[i][j] != TLColor::OJAMA) {
-                    saiki(ba, point, i, j, &num, ba[i][j]);
-                    if (num > 3) {
-                        syo = 1;
-                        syou(ba, i, j, ba[i][j], rakkaflg);
-                    }
-                    num = 0;
-                }
-            }
-        }
-        for (i = 0; i < 6; i++) {
-            kiept[i] = 12;
-            if (rakkaflg[i] == 1) {
-                n = 0;
-                for (j = 0; j < 13; j++) {
-                    if (ba[i][j] == TLColor::EMPTY) {
-                        if (n == 0)
-                            kiept[i] = j;
-                        n++;
-                    } else if (n != 0) {
-                        ba[i][j - n] = ba[i][j];
-                        ba[i][j] = TLColor::EMPTY;
-                    }
-                }
-            }
-        }
-        if (syo == 1)
-            chain++;
-    }
-    return chain;
+    TLRensaResult result = simulate(field);
+    return result.chains;
 }
 
-int hon_syoukyo_score(TLColor ba[][kHeight], int* score, int* quick)
+int hon_syoukyo_score(TLColor field[][kHeight], int* score, int* quick)
 {
-    int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
-    int color_rate[5] = { 0, 3, 6, 12, 24 };
-    int renketsu[19][5] {};
-    int colnum;
-    int renketsunum;
-    int renketsubonus[19] = { 0 };
-    int rate;
-    int color;
-
-    int num = 0;
-    int point[6][12] {};
-    int i, j;
-    int syo = 1;
-    int kiept[6] = { 0 };
-    int rakkaflg[6];
-    int n;
-    int chain = 0;
-
-    (*quick) = 1;
-
-    while (syo) {
-        syo = 0;
-        memset(point, 0, sizeof(point));
-        rakkaflg[0] = 0;
-        rakkaflg[1] = 0;
-        rakkaflg[2] = 0;
-        rakkaflg[3] = 0;
-        rakkaflg[4] = 0;
-        rakkaflg[5] = 0;
-        for (i = 0; i < 6; i++) {
-            for (j = kiept[i]; j < 12; j++) {
-                if (point[i][j] != 0)
-                    continue;
-                if (ba[i][j] == TLColor::EMPTY)
-                    break;
-                if (ba[i][j] != TLColor::OJAMA) {
-                    saiki(ba, point, i, j, &num, ba[i][j]);
-                    if (num > 3) {
-                        syo = 1;
-                        color = ba[i][j];
-                        renketsu[chain][color - 1] += num;
-                        if (num > 10)
-                            renketsubonus[chain] += 10; // bugggggg 111102
-                        else if (num > 4)
-                            renketsubonus[chain] += num - 3;
-                        syou(ba, i, j, ba[i][j], rakkaflg);
-                    }
-                    num = 0;
-                }
-            }
-        }
-        if (syo == 1)
-            (*quick) = 1;
-        for (i = 0; i < 6; i++) {
-            kiept[i] = 12;
-            if (rakkaflg[i] == 1) {
-                n = 0;
-                for (j = 0; j < 13; j++) {
-                    if (ba[i][j] == TLColor::EMPTY) {
-                        if (n == 0)
-                            kiept[i] = j;
-                        n++;
-                    } else if (n != 0) {
-                        ba[i][j - n] = ba[i][j];
-                        ba[i][j] = TLColor::EMPTY;
-                        (*quick) = 0;
-                    }
-                }
-            }
-        }
-        if (syo == 1)
-            chain++;
-    }
-
-    *score = 0;
-    for (i = 0; i < chain; i++) {
-        rate = 0;
-        colnum = 0;
-        renketsunum = 0;
-        for (j = 0; j < 5; j++) {
-            colnum += (renketsu[i][j] != 0);
-            renketsunum += renketsu[i][j];
-        }
-        if (colnum > 0)
-            rate = color_rate[colnum - 1] + renketsubonus[i] + rensa_rate[i];
-        if (rate == 0)
-            rate = 1;
-        *score += renketsunum * rate * 10;
-    }
-    return chain;
+    TLRensaResult result = simulate(field);
+    *score = result.score;
+    *quick = result.quick ? 1 : 0;
+    return result.chains;
 }
 
 void setti_ojama(TLColor f[][kHeight], int numOjama)
@@ -1224,19 +822,6 @@ void setti_ojama(TLColor f[][kHeight], int numOjama)
                 break;
         }
     }
-}
-
-int countNormalColor13(const TLColor f[][kHeight])
-{
-    int n = 0;
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 13; j++) {
-            if (isNormalTLColor(f[i][j]))
-                ++n;
-        }
-    }
-
-    return n;
 }
 
 }  // namespace test_lockit
