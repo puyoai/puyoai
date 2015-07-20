@@ -29,7 +29,7 @@ void Evaluator::EvalPlan(const RefPlan& plan) {
   uke_field.fallOjama(enemy.hasZenkeshi ? 5 : 1);
   
   genres[0].score = EvalField(plan.field(), &genres[0].message);
-  genres[1].score = EvalField(uke_field, &genres[1].message) / 3;
+  //genres[1].score = EvalField(uke_field, &genres[1].message) / 3;
   genres[2].score = EvalRensa(plan, &genres[2].message);
   genres[3].score = EvalTime(plan, &genres[3].message);
 
@@ -70,12 +70,10 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
     score += value;
   }
 
-  if (false) {  // Evaluate possible rensa.
+  if (true) {  // Evaluate possible rensa.
     int value = Future(field);
-    if (value > 0) {
-      oss << "Future(" << value << ")_";
-      score += value;
-    }
+    oss << "Future(" << value << ")_";
+    score += value;
   }
 
   *message += oss.str();
@@ -222,7 +220,14 @@ int Evaluator::Valley(const CoreField& field) {
 int Evaluator::Future(const CoreField& field) {
   UNUSED_VARIABLE(field);
   // TODO: assume putting a puyo and check if it fires rensa.
-  return 0;
+  int num_to_fire = 5;
+  RensaDetector::detectSingle(
+      field, RensaDetectorStrategy::defaultDropStrategy(),
+      [&num_to_fire](CoreField&&, const ColumnPuyoList& complementedColumnPuyoList) {
+        if (num_to_fire > complementedColumnPuyoList.size())
+          num_to_fire = complementedColumnPuyoList.size();
+      });
+  return -500 * num_to_fire;
 }
 
 }  // namespace peria
