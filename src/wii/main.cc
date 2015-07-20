@@ -17,6 +17,7 @@
 #include "core/server/commentator.h"
 #include "gui/commentator_drawer.h"
 #include "gui/decision_drawer.h"
+#include "gui/frame_number_drawer.h"
 #include "gui/main_window.h"
 #include "gui/user_event_drawer.h"
 #include "wii/serial_key_sender.h"
@@ -36,6 +37,7 @@ DEFINE_bool(save_screenshot, false, "save screenshot");
 DEFINE_bool(draw_result, true, "draw analyzer result");
 DEFINE_bool(draw_decision, true, "draw decision");
 DEFINE_bool(draw_user_event, true, "draw user event");
+DEFINE_bool(draw_frame_number, true, "draw frame number");
 DEFINE_string(source, "syntek",
               "set image source. 'syntek' when using syntek video capture."
               " filename if you'd like to use movie.");
@@ -136,6 +138,10 @@ int main(int argc, char* argv[])
     if (FLAGS_draw_user_event)
         userEventDrawer.reset(new UserEventDrawer);
 
+    unique_ptr<FrameNumberDrawer> frameNumberDrawer;
+    if (FLAGS_draw_frame_number)
+        frameNumberDrawer.reset(new FrameNumberDrawer);
+
     unique_ptr<MovieSourceKeyListener> movieSourceKeyListener;
     // TODO(mayah): BAD! Don't check FLAGS_source here.
     if (FLAGS_fps == 0 && FLAGS_source != "syntek") {
@@ -170,6 +176,8 @@ int main(int argc, char* argv[])
         mainWindow->addDrawer(decisionDrawer.get());
     if (userEventDrawer.get())
         mainWindow->addDrawer(userEventDrawer.get());
+    if (frameNumberDrawer.get())
+        mainWindow->addDrawer(frameNumberDrawer.get());
 
 #if USE_AUDIO_COMMENTATOR
     unique_ptr<InternalSpeaker> internalSpeaker;
