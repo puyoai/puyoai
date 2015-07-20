@@ -51,6 +51,13 @@ bool isMatchIndexAndColors(int id, TLColor color[]) {
   return kTsumoPatterns[id][0] == color[0] && kTsumoPatterns[id][1] == color[1];
 }
 
+int isChigiri(int cells[]) {
+    if (cells[0] != cells[2] && cells[1] != cells[3])
+        return 1;
+    else
+        return 0;
+}
+
 }  // namespace
 
 COMAI_HI::COMAI_HI(const cpu::Configuration& config) :
@@ -381,10 +388,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 continue;
             memcpy(ba_a, ba2, sizeof(ba));
             setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
-            if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-                chig_aa = 1;
-            else
-                chig_aa = 0;
+            chig_aa = isChigiri(setti_basyo);
             keshiko_aa = chousei_syoukyo_2(ba_a, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_tmp);
             if ((chain == 2) && (dabuchk[1] > 1)) {
                 for (bb = 0; bb < 22; bb++) {
@@ -403,10 +407,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                     continue;
                 memcpy(ba_ee, ba_a, sizeof(ba));
                 setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
-                if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-                    chig_bb = 1;
-                else
-                    chig_bb = 0;
+                chig_bb = isChigiri(setti_basyo);
                 keshiko_bb = chousei_syoukyo_2(ba_ee, setti_basyo, &chain, dabuchk, &ichiren_kesi, &score_tmp);
                 if ((chain == 2) && (dabuchk[1] > 1)) {
                     for (dd = 0; dd < 22; dd++) {
@@ -483,10 +484,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             for (aa = 0; aa < 22; aa++) {
                 memcpy(ba_a, ba2, sizeof(ba_a));
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
-                if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-                    chig_aa = 1;
-                else
-                    chig_aa = 0;
+                chig_aa = isChigiri(setti_basyo);
                 hon_syoukyo_score(ba_a, &score, &quick);
                 if (isTLFieldEmpty(ba_a)) {
                     for (bb = 0; bb < 22; bb++) {
@@ -500,10 +498,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                     for (bb = 0; bb < 22; bb++) {
                         memcpy(ba_ee, ba_a, sizeof(ba_ee));
                         setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
-                        if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-                            chig_bb = 1;
-                        else
-                            chig_bb = 0;
+                        chig_aa = isChigiri(setti_basyo);
                         hon_syoukyo_score(ba_ee, &score, &quick);
                         if (isTLFieldEmpty(ba_ee)) {
                             for (dd = 0; dd < 22; dd++) {
@@ -729,10 +724,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             continue;
         memcpy(ba_a, ba2, sizeof(ba));
         setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
-        if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-            chig_aa = 1;
-        else
-            chig_aa = 0;
+        chig_aa = isChigiri(setti_basyo);
         keshiko_aa = chousei_syoukyo_sc(ba_a, setti_basyo, &score_tmp);
         score_aonly = score_tmp; // only
         score_tmp2 = score_tmp;
@@ -768,10 +760,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 continue;
             memcpy(ba_ee, ba_a, sizeof(ba));
             setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
-            if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-                chig_bb = 1;
-            else
-                chig_bb = 0;
+            chig_bb = isChigiri(setti_basyo);
             keshiko_bb = chousei_syoukyo_sc(ba_ee, setti_basyo, &score_tmp);
             score_tmp2 = score_tmp;
             if ((kuraichk == 1) && (m_aite_hakka_nokori < 2) && (score_aonly > 0))
@@ -1240,10 +1229,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
             for (aa = 0; aa < 22; aa++) {
                 memcpy(ba_a, ba2, sizeof(ba_a));
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
-                if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-                    chig_aa = 1;
-                else
-                    chig_aa = 0;
+                chig_aa = isChigiri(setti_basyo);
                 hon_syoukyo_score(ba_a, &score, &quick);
                 if (isTLFieldEmpty(ba_a)) {
                     for (bb = 0; bb < 22; bb++) {
@@ -1257,10 +1243,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                     for (bb = 0; bb < 22; bb++) {
                         memcpy(ba_ee, ba_a, sizeof(ba_ee));
                         setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
-                        if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-                            chig_bb = 1;
-                        else
-                            chig_bb = 0;
+                        chig_bb = isChigiri(setti_basyo);
                         hon_syoukyo_score(ba_ee, &score, &quick);
                         if (isTLFieldEmpty(ba_ee)) {
                             for (dd = 0; dd < 22; dd++) {
@@ -1491,10 +1474,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                 continue;
             memcpy(ba_a, ba2, sizeof(ba));
             setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
-            if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-                chig_aa = 1;
-            else
-                chig_aa = 0;
+            chig_aa = isChigiri(setti_basyo);
             keshiko_aa = chousei_syoukyo_sc(ba_a, setti_basyo, &score_tmp);
             score_aonly = score_tmp; // only
             score_tmp2 = score_tmp;
@@ -1526,10 +1506,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                     continue;
                 memcpy(ba_ee, ba_a, sizeof(ba));
                 setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
-                if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-                    chig_bb = 1;
-                else
-                    chig_bb = 0;
+                chig_bb = isChigiri(setti_basyo);
                 keshiko_bb = chousei_syoukyo_sc(ba_ee, setti_basyo, &score_tmp);
                 score_bonly = score_tmp; // only
                 score_tmp2 = score_tmp;
@@ -1571,10 +1548,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                     if (tobashi_hantei_b(ba_ee, dd % 22))
                         continue;
                     setti_puyo(ba_ee, dd % 22, nk1, nk2, setti_basyo);
-                    if ((setti_basyo[0] != setti_basyo[2]) && (setti_basyo[1] != setti_basyo[3]))
-                        chig_dd = 1;
-                    else
-                        chig_dd = 0;
+                    chig_dd = isChigiri(setti_basyo);
                     keshiko_dd = chousei_syoukyo_sc(ba_ee, setti_basyo, &score_tmp);
                     score_tmp2 = score_tmp;
                     if ((kuraichk == 1) && ((score_aonly > 0) || (score_bonly > 0)))
