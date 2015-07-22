@@ -23,10 +23,10 @@ RealColor toRealColor(char c)
     return RealColor::RC_EMPTY;
 }
 
-char toChar(RealColor rc, bool usesCapital)
+char toChar(RealColor rc, bool usesCapital, char charIfEmpty)
 {
     switch (rc) {
-    case RealColor::RC_EMPTY:  return ' ';
+    case RealColor::RC_EMPTY:  return charIfEmpty;
     case RealColor::RC_WALL:   return '#';
     case RealColor::RC_OJAMA:  return usesCapital ? 'O' : 'o';
     case RealColor::RC_RED:    return usesCapital ? 'R' : 'r';
