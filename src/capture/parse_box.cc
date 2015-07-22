@@ -97,9 +97,15 @@ int main(int argc, char* argv[])
 
     const ACAnalyzer::ShowDebugMessage showsDebugMessage = ACAnalyzer::ShowDebugMessage::SHOW_DEBUG_MESSAGE;
     RealColor rc = analyzer.analyzeBox(surf.get(), b, allowOjama, showsDebugMessage);
+
     cout << "Color: " << rc << endl;
     if (surf->w == 16 && surf->h == 16)
         cout << "analyzed with AROW: " << analyzer.analyzeBoxWithRecognizer(surf.get(), b) << endl;
+
+    if (usesNextPuyoPosition && ((npp == NextPuyoPosition::NEXT2_AXIS) || (npp == NextPuyoPosition::NEXT2_CHILD))) {
+        RealColor rc = analyzer.analyzeBoxNext2(surf.get(), b);
+        cout << "analyzed with NEXT2: " << rc << endl;
+    }
 
     analyzer.drawWithAnalysisResult(surf.get());
     SDL_SaveBMP(surf.get(), "output.bmp");

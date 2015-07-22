@@ -89,6 +89,8 @@ TEST_F(ACAnalyzerTest, estimateRealColor)
         { RealColor::RC_BLUE,   RGB(114, 200, 235) },
         { RealColor::RC_BLUE,   RGB( 43,  71,  71) },
         { RealColor::RC_BLUE,   RGB( 52,  76,  76) },
+        { RealColor::RC_BLUE,   RGB( 69, 101,  92) },
+        { RealColor::RC_BLUE,   RGB( 16,  45,  51) },
         { RealColor::RC_YELLOW, RGB(255, 255,   0) },
         { RealColor::RC_YELLOW, RGB(177, 154,  64) },
         { RealColor::RC_YELLOW, RGB(200, 153,  53) },
@@ -252,6 +254,29 @@ TEST_F(ACAnalyzerTest, analyzeField5)
                 << "x=" << x << " y=" << y;
         }
     }
+}
+
+TEST_F(ACAnalyzerTest, DISABLED_analyzeField6)
+{
+    unique_ptr<AnalyzerResult> r = analyze("/images/field/field6.png");
+
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    // TODO(mayah): Hard to distinguish ...
+    // Analyze NEXT puyos here.
+    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->detectedField.realColor(NextPuyoPosition::CURRENT_AXIS));
+    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(0)->detectedField.realColor(NextPuyoPosition::CURRENT_CHILD));
+    EXPECT_EQ(RealColor::RC_GREEN, r->playerResult(0)->detectedField.realColor(NextPuyoPosition::NEXT1_AXIS));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(0)->detectedField.realColor(NextPuyoPosition::NEXT1_CHILD));
+    EXPECT_EQ(RealColor::RC_BLUE, r->playerResult(0)->detectedField.realColor(NextPuyoPosition::NEXT2_AXIS));
+    EXPECT_EQ(RealColor::RC_BLUE, r->playerResult(0)->detectedField.realColor(NextPuyoPosition::NEXT2_CHILD));
+
+    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::CURRENT_AXIS));
+    EXPECT_EQ(RealColor::RC_EMPTY, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::CURRENT_CHILD));
+    EXPECT_EQ(RealColor::RC_GREEN, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT1_AXIS));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT1_CHILD));
+    EXPECT_EQ(RealColor::RC_BLUE, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT2_AXIS));
+    EXPECT_EQ(RealColor::RC_BLUE, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT2_CHILD));
 }
 
 TEST_F(ACAnalyzerTest, analyzeFieldOjama)
@@ -495,9 +520,7 @@ TEST_F(ACAnalyzerTest, gameStart)
         {   0,   6, "  ----", "  ----" },
         // On frame 18-,
         // Player2: Green character is on NEXT2, however, analyzer should say NEXT2 is still PP.
-        {   6,  43, "  BBPP", "  BBPP" },
-        // Because of animation, the decisionRequest might be sent in different frame. :-(
-        {  43,  44, "  BBPP", "BBPP  " },
+        {   6,  44, "  BBPP", "  BBPP" },
         // Because of fastDecision, we would be able to detect NEXT moving here.
         {  44,  60, "BBPP  ", "BBPP  " },
         // Player 2, frame 60: Since some stars are located on NEXT2_AXIS,
