@@ -37,7 +37,7 @@ static RealColor toRealColor(const HSV& hsv)
     if (85 <= hsv.h && hsv.h <= 135 && 70 < hsv.v)
         return RealColor::RC_GREEN;
     // Detecting blue is relatively hard. Let's have a relaxed margin.
-    if (180 <= hsv.h && hsv.h <= 255 && 60 < hsv.v)
+    if (160 <= hsv.h && hsv.h <= 255 && 50 < hsv.v)
         return RealColor::RC_BLUE;
     // Detecting purple is really hard. We'd like to have relaxed margin for purple.
     if (280 <= hsv.h && hsv.h < 340 && 50 < hsv.v)
@@ -56,26 +56,47 @@ static RealColor toRealColor(const HSV& hsv)
 
 static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS],
                                                  int threshold,
-                                                 ACAnalyzer::AllowOjama allowOjama = ACAnalyzer::AllowOjama::ALLOW_OJAMA)
+                                                 ACAnalyzer::AllowOjama allowOjama = ACAnalyzer::AllowOjama::ALLOW_OJAMA,
+                                                 ACAnalyzer::AnalyzeBoxFunc analyzeBoxFunc = ACAnalyzer::AnalyzeBoxFunc::NORMAL)
 {
     static const RealColor colors[] = {
         RealColor::RC_RED,
-        RealColor::RC_PURPLE,
         RealColor::RC_BLUE,
-        RealColor::RC_YELLOW,
-        RealColor::RC_GREEN
+        RealColor::RC_GREEN,
+        RealColor::RC_PURPLE,
+        RealColor::RC_YELLOW, // YELLOW must be the last.
     };
 
     int maxCount = 0;
     RealColor result = RealColor::RC_EMPTY;
 
-    for (int i = 0; i < 5; ++i) {
-        int cnt = colorCount[static_cast<int>(colors[i])];
-        if (colors[i] == RealColor::RC_YELLOW)
-            cnt = cnt * 4 / 5;
-        if (cnt >= threshold && cnt > maxCount) {
-            result = colors[i];
-            maxCount = cnt;
+    if (analyzeBoxFunc == ACAnalyzer::AnalyzeBoxFunc::NEXT2) {
+        for (int i = 0; i < 5; ++i) {
+            int cnt = colorCount[ordinal(colors[i])];
+            if (cnt < threshold)
+                continue;
+
+            if (colors[i] != RealColor::RC_YELLOW) {
+                if (cnt > maxCount) {
+                    maxCount = cnt;
+                    result = colors[i];
+                }
+            } else {
+                if (maxCount == 0) {
+                    maxCount = cnt;
+                    result = colors[i];
+                }
+            }
+        }
+    } else {
+        for (int i = 0; i < 5; ++i) {
+            int cnt = colorCount[static_cast<int>(colors[i])];
+            if (colors[i] == RealColor::RC_YELLOW)
+                cnt = cnt * 4 / 5;
+            if (cnt >= threshold && cnt > maxCount) {
+                result = colors[i];
+                maxCount = cnt;
+            }
         }
     }
 
@@ -108,11 +129,12 @@ ACAnalyzer::~ACAnalyzer()
 }
 
 RealColor ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
-                                 AllowOjama allowOjama, ShowDebugMessage showsColor) const
+                                 AllowOjama allowOjama,
+                                 ShowDebugMessage showsColor,
+                                 AnalyzeBoxFunc analyzeBoxFunc) const
 {
     int colorCount[NUM_REAL_COLORS] {};
 
-    // We'd like to take padding 1 pixel.
     for (int by = b.sy; by < b.dy; ++by) {
         for (int bx = b.sx; bx < b.dx; ++bx) {
             Uint32 c = getpixel(surface, bx, by);
@@ -151,7 +173,7 @@ RealColor ACAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
     int area = b.w() * b.h();
     int threshold = (area >= 16 * 14) ? BOX_THRESHOLD : SMALLER_BOX_THRESHOLD;
 
-    return estimateRealColorFromColorCount(colorCount, threshold, allowOjama);
+    return estimateRealColorFromColorCount(colorCount, threshold, allowOjama, analyzeBoxFunc);
 }
 
 RealColor ACAnalyzer::analyzeBoxWithRecognizer(const SDL_Surface* surface, const Box& b) const
@@ -203,6 +225,11 @@ RealColor ACAnalyzer::analyzeBoxInField(const SDL_Surface* surface, const Box& b
     }
 
     return rc;
+}
+
+RealColor ACAnalyzer::analyzeBoxNext2(const SDL_Surface* surface, const Box& b) const
+{
+    return analyzeBox(surface, b, AllowOjama::DONT_ALLOW_OJAMA, ShowDebugMessage::DONT_SHOW_DEBUG, AnalyzeBoxFunc::NEXT2);
 }
 
 CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)

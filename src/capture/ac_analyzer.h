@@ -17,15 +17,18 @@ public:
 
     enum class AllowOjama { DONT_ALLOW_OJAMA, ALLOW_OJAMA };
     enum class ShowDebugMessage { DONT_SHOW_DEBUG, SHOW_DEBUG_MESSAGE };
+    enum class AnalyzeBoxFunc { NORMAL, NEXT2 };
 
     RealColor analyzeBox(const SDL_Surface*,
                          const Box&,
                          AllowOjama = AllowOjama::ALLOW_OJAMA,
-                         ShowDebugMessage = ShowDebugMessage::DONT_SHOW_DEBUG) const;
+                         ShowDebugMessage = ShowDebugMessage::DONT_SHOW_DEBUG,
+                         AnalyzeBoxFunc = AnalyzeBoxFunc::NORMAL) const;
 
     RealColor analyzeBoxWithRecognizer(const SDL_Surface*, const Box&) const;
 
     RealColor analyzeBoxInField(const SDL_Surface*, const Box&) const;
+    RealColor analyzeBoxNext2(const SDL_Surface*, const Box&) const;
 
     // Draw each pixel of |surface| with RealColor. This is helpful for image analyzing test.
     void drawWithAnalysisResult(SDL_Surface*);
