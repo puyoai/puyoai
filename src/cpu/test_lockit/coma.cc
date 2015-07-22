@@ -300,7 +300,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     int taiouchk = 0;
     int kurai_mini = 0;
     int score_tai = -10, tai_max_score = 0;
-    int wariko_taiou = 0;
     int aite_ojama = 0;
 
     int zenchk = 0;
@@ -441,16 +440,16 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         }
     }
 
-    wariko_taiou = 0;
+    bool shouldClearWariko = false;
     if ((((m_aite_hakka_rensa > 3) || (m_aite_hakka_kosuu > 15)) && (m_aite_hakka_jamako > 4))
         || ((m_aite_hakka_zenkesi == 1) && (zenkesi_own != 1))) {
-        wariko_taiou = 1;
+        shouldClearWariko = true;
     } else if ((m_aite_hakka_kosuu > 12) && (m_aite_hakka_jamako > 4)) {
-        wariko_taiou = 1;
+        shouldClearWariko = true;
     } else if ((m_aite_hakka_kosuu > 8) && (m_aite_hakka_jamako > 4)) {
-        wariko_taiou = 1;
+        shouldClearWariko = true;
     } else if ((m_aite_hakka_jamako > 3)) {
-        wariko_taiou = 1;
+        shouldClearWariko = true;
     }
 
     if (m_aite_hakka_rensa < 5) {
@@ -602,11 +601,8 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             keschk = 1;
         }
     }
-    if ((wariko_taiou == 1) && (m_aite_hakka_honsen == 0) && (keschk == 0)) {
-        wariko_taiou = 1;
-    } else {
-        wariko_taiou = 0;
-    }
+    if (m_aite_hakka_honsen > 0 || keschk)
+        shouldClearWariko = false;
 
     if (((kurai_mini == 1) || (kurai_small == 1) || (kurai_middle == 1) || (kurai_large == 1))
         && (m_aite_hakka_honsen == 0) && (keschk == 0)) {
@@ -684,7 +680,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     } // m_aite_hakka_honsen==0
 
     if (config.a_t == 0)
-        wariko_taiou = taiouchk;
+        shouldClearWariko = taiouchk;
 
     m_cchai = 0;
 
@@ -740,12 +736,12 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 m_aa_max_score = aa;
                 m_tesuu_mon = 2;
             }
-            if ((wariko_taiou == 1) && (m_aite_hakka_nokori < 2) && (score_aonly > 0))
-                score_tmp2 = 0; // only
-            if ((wariko_taiou == 1)
-                && ((m_aite_hakka_nokori < 1)
-                    || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
-                score_tmp2 = 0; // 0225
+            if (shouldClearWariko) {
+                if ((m_aite_hakka_nokori < 1)
+                    || (m_aite_hakka_nokori < 2 && score_aonly > 0)
+                    || (m_aite_hakka_nokori < 2 && m_aite_puyo_uki == 0 && m_aite_hakka_quick == 1))
+                    score_tmp2 = 0; // 0225
+            }
             if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
                 && (m_aite_hakka_jamako * 70 > score_tmp2 - 1400) && (score_tmp2 + 150 > m_aite_hakka_jamako * 70)) {
                 if ((myf_kosuu_iro + 1 > (keshiko_aa + keshiko_bb) * 2) || (config.i_t)) {
@@ -804,8 +800,8 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         m_score_mon = m_score_aa;
     }
     if (config.u_t == 1) {
-        if ((wariko_taiou == 1) && (((score_tai > 270) && ((m_myf_kosuu > 36) || (ba2[2][10] != TLColor::EMPTY)
-                                                           || (m_aite_hakka_zenkesi == 1))) || (score_tai > 840))) {
+        if (shouldClearWariko && (((score_tai > 270) && ((m_myf_kosuu > 36) || (ba2[2][10] != TLColor::EMPTY)
+                                                         || (m_aite_hakka_zenkesi == 1))) || (score_tai > 840))) {
             hym[tai_max_score] += 140000;
             m_score_mon = score_tai;
         }
