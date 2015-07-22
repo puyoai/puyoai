@@ -284,7 +284,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     int hyktmp;
     int keschk = 0;
     int maxch = 0, maxach = 0;
-    int zenkes[22][22][22] {};
     int zenke[22] {};
     int setti_basyo[4];
     int myf_kosuu_kesi = 0, myf_kosuu_iro = 0;
@@ -299,9 +298,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     int kurai_mini = 0;
     int score_tai = -10, tai_max_score = 0;
     int aite_ojama = 0;
-
-    int zenchk = 0;
-    int zenchain = 0;
 
     if (m_kougeki_on == 1) {
         m_kougeki_on = 0;
@@ -421,6 +417,9 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         shouldClearWariko = true;
     }
 
+    // Check Zenkeshi
+    int zenchk = 0;
+    int zenchain = 0;
     if (m_aite_hakka_rensa < 5) {
         if (m_myf_kosuu < 15) {
             for (int aa = 0; aa < 22; aa++) {
@@ -430,10 +429,10 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 TLRensaResult result_aa = simulate(ba_a);
                 int score = result_aa.score;
                 if (isTLFieldEmpty(ba_a)) {
-                    for (int bb = 0; bb < 22; bb++) {
-                        for (int dd = 0; dd < 22; dd++) {
-                            zenkes[aa][bb][dd] += score + 2100 - chig_aa * 3;
-                        }
+                    int zenkes = score + 2100 - chig_aa * 3;
+                    if (zenchain <= zenkes) {
+                        zenchain = zenkes;
+                        zenchk = aa;
                     }
                 }
 
@@ -445,8 +444,10 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                         TLRensaResult result_bb = simulate(ba_ee);
                         int score = result_bb.score;
                         if (isTLFieldEmpty(ba_ee)) {
-                            for (int dd = 0; dd < 22; dd++) {
-                                zenkes[aa][bb][dd] += score + 2100 - (chig_aa + chig_bb) * 3;
+                            int zenkes = score + 2100 - (chig_aa + chig_bb) * 3;
+                            if (zenchain <= zenkes) {
+                                zenchain = zenkes;
+                                zenchk = aa;
                             }
                         }
                     }
@@ -455,16 +456,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         } // p<7
     }
 
-    for (int aa = 0; aa < 22; aa++) {
-        for (int bb = 0; bb < 22; bb++) {
-            for (int dd = 0; dd < 22; dd++) {
-                if (zenchain <= zenkes[aa][bb][dd]) {
-                    zenchain = zenkes[aa][bb][dd];
-                    zenchk = aa;
-                }
-            }
-        }
-    }
     if (zenchain > 2100)
         zenke[zenchk] += 120000;
 
