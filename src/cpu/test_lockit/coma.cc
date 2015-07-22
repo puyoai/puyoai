@@ -292,7 +292,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     int aite_kosuu_iro = 0, kes2;
     int yokoyose = 2;
     int syuusoku = 0;
-    int nidub_point_a[22] = { 0 };
+    int nidub_point_a[22] {};
     int score = 0, maxscore = 0;
     int score_tmp;
     int kuraichk = 0;
@@ -326,7 +326,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         m_saisoku_flag = 0;
 
     bool shouldVanish = (m_myf_kosuu >= 55);
-    bool shouldSaisoku = (m_saisoku_flag) && (m_myf_kosuu >= 38);
+    bool shouldSaisoku = m_saisoku_flag && (m_myf_kosuu >= 38);
 
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
@@ -910,7 +910,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             }
 
             int num = 0;
-            int point[6][12];
+            int point[6][12] {};
             for (int i = 0; i < 6; i++) {
                 for (int j = 0; j < 12; j++) {
                     if (ba[i][j] == TLColor::EMPTY)
