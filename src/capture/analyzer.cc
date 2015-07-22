@@ -109,6 +109,18 @@ string PlayerAnalyzerResult::toString() const
     }
     ss << "########          ########" << endl;
 
+    ss << "Detected Next Puyos: ";
+    for (int i = 0; i < NUM_NEXT_PUYO_POSITION; ++i) {
+        ss << toChar(detectedField.nextPuyos[i], true, '.');
+    }
+    ss << endl;
+
+    ss << "Adjusted Next Puyos: ";
+    for (int i = 0; i < NUM_NEXT_PUYO_POSITION; ++i) {
+        ss << toChar(adjustedField.nextPuyos[i], true, '.');
+    }
+    ss << endl;
+
     return ss.str();
 }
 
