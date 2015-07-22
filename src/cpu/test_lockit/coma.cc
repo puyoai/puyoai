@@ -294,9 +294,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     int syuusoku = 0;
     int nidub_point_a[22] {};
     int score = 0, maxscore = 0;
-    int score_tmp;
     int kuraichk = 0;
-    int quick = 0;
     int taiouchk = 0;
     int kurai_mini = 0;
     int score_tai = -10, tai_max_score = 0;
@@ -356,28 +354,24 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         }
     }
 
-    // aaaaaaaaaaaaaaaaaaaaaa
-    // TODO(peria): What |adubpt| means?
-    // bool?
+    // Check 2-double
     int adubpt[22][22][22] {};
-    int apos[22] = { 0 };
-
+    int apos[22] {};
     if (m_hukks < 255) {
         for (int aa = 0; aa < 22; aa++) {
             if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                 continue;
-            int not_used = 0;
             copyField(ba2, ba_a);
             setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
-            int keshiko_aa = chousei_syoukyo_2(ba_a, setti_basyo, &chain, dabuchk, &not_used, &score_tmp);
-            if ((chain == 2) && (dabuchk[1] > 1)) {
-                for (int bb = 0; bb < 22; bb++) {
-                    for (int dd = 0; dd < 22; dd++) {
+            TLRensaResult result_aa = simulate(ba_a);
+            if (result_aa.chains == 2 && result_aa.num_connections[1] >= 2) {
+                for (int bb = 0; bb < 22; ++bb) {
+                    for (int dd = 0; dd < 22; ++dd) {
                         adubpt[aa][bb][dd] = 1;
                     }
                 }
             }
-            if (keshiko_aa != 0)
+            if (result_aa.num_vanished != 0)
                 continue;
             if (ba_a[2][11] != TLColor::EMPTY)
                 continue;
@@ -387,29 +381,25 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                     continue;
                 copyField(ba_a, ba_ee);
                 setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
-                int keshiko_bb = chousei_syoukyo_2(ba_ee, setti_basyo, &chain, dabuchk, &not_used, &score_tmp);
-                if ((chain == 2) && (dabuchk[1] > 1)) {
-                    for (int dd = 0; dd < 22; dd++) {
+                TLRensaResult result_bb = simulate(ba_ee);
+                if (result_bb.chains == 2 && result_bb.num_connections[1] >= 2) {
+                    for (int dd = 0; dd < 22; ++dd) {
                         adubpt[aa][bb][dd] = 1;
                     }
                 }
-                if (keshiko_bb != 0)
-                    continue;
-                if (ba_ee[2][11] != TLColor::EMPTY)
-                    continue;
             }
         }
-    } // m_hukks
+    }
 
-    for (int aa = 0; aa < 22; aa++) {
-        for (int bb = 0; bb < 22; bb++) {
-            for (int dd = 0; dd < 22; dd++) {
+    for (int aa = 0; aa < 22; ++aa) {
+        for (int bb = 0; bb < 22; ++bb) {
+            for (int dd = 0; dd < 22; ++dd) {
                 if (adubpt[aa][bb][dd] == 1)
                     apos[aa] = 1;
             }
         }
     }
-    // aaaaaaaaaaaaaaaaaaaaaa
+    
 
     for (int aa = 0; aa < 22; aa++) {
         hym[aa] = -10000;
@@ -458,7 +448,8 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 copyField(ba2, ba_a);
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
                 int chig_aa = isChigiri(setti_basyo);
-                hon_syoukyo_score(ba_a, &score, &quick);
+                TLRensaResult result_aa = simulate(ba_a);
+                int score = result_aa.score;
                 if (isTLFieldEmpty(ba_a)) {
                     for (int bb = 0; bb < 22; bb++) {
                         for (int dd = 0; dd < 22; dd++) {
@@ -472,7 +463,8 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                         copyField(ba_a, ba_ee);
                         setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
                         int chig_bb = isChigiri(setti_basyo);
-                        hon_syoukyo_score(ba_ee, &score, &quick);
+                        TLRensaResult result_bb = simulate(ba_ee);
+                        int score = result_bb.score;
                         if (isTLFieldEmpty(ba_ee)) {
                             for (int dd = 0; dd < 22; dd++) {
                                 zenkes[aa][bb][dd] += score + 2100 - (chig_aa + chig_bb) * 3;
@@ -507,7 +499,9 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         chain = 0;
         copyField(ba2, ba);
         setti_puyo(ba, aa, nx1, nx2, setti_basyo);
-        int chain = hon_syoukyo_score(ba, &score, &quick);
+        TLRensaResult result_aa = simulate(ba);
+        int chain = result_aa.chains;
+        int score = result_aa.score;
 
         // つぶし
         // 次の条件で潰しを打つ。
@@ -621,7 +615,8 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                     continue;
                 copyField(ba2, ba_a);
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
-                if (chousei_syoukyo(ba_a, setti_basyo) != 0)
+                TLRensaResult result_aa = simulate(ba_a);
+                if (result_aa.num_vanished != 0)
                     continue;
                 for (int cplace = 0; cplace < 6; cplace++) {
                     if (ba_a[0][11] != TLColor::EMPTY) {
@@ -689,7 +684,9 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             continue;
         copyField(ba2, ba_a);
         setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
-        int keshiko_aa = chousei_syoukyo_sc(ba_a, setti_basyo, &score_tmp);
+        TLRensaResult result_aa = simulate(ba_a);
+        int keshiko_aa = result_aa.num_vanished;
+        int score_tmp = result_aa.score;
         int score_aonly = score_tmp; // only
         int score_tmp2 = score_tmp;
         if ((ba_a[2][11] == TLColor::EMPTY) && (score_tmp > m_score_aa)) {
@@ -724,7 +721,9 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 continue;
             copyField(ba_a, ba_ee);
             setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
-            int keshiko_bb = chousei_syoukyo_sc(ba_ee, setti_basyo, &score_tmp);
+            TLRensaResult result_bb = simulate(ba_ee);
+            int keshiko_bb = result_bb.num_vanished;
+            int score_tmp = result_bb.score;
             int score_tmp2 = score_tmp;
             if ((kuraichk == 1) && (m_aite_hakka_nokori < 2) && (score_aonly > 0))
                 score_tmp = 0; // only
