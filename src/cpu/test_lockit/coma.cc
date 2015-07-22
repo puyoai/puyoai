@@ -106,7 +106,6 @@ void COMAI_HI::ref()
     m_score_aa = -10;
     m_aa_max_score = 0;
     m_hakkatime = 0;
-    m_numg = 0;
 }
 
 bool COMAI_HI::aite_attack_start(const TLColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
@@ -375,8 +374,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     }
 
     // aaaaaaaaaaaaaaaaaaaaaa
-    int maxpont[TM_TMNMUM][22] {};
-    int maxp_matome[22] = { 0 };
     // TODO(peria): What |adubpt| means?
     // bool?
     int adubpt[22][22][22] {};
@@ -422,12 +419,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         }
     } // m_hukks
 
-    for (aa = 0; aa < 22; aa++) {
-        for (i = 0; i < m_numg; i++) {
-            if (maxp_matome[aa] < maxpont[i][aa])
-                maxp_matome[aa] = maxpont[i][aa];
-        }
-    }
     for (aa = 0; aa < 22; aa++) {
         for (bb = 0; bb < 22; bb++) {
             for (dd = 0; dd < 22; dd++) {
@@ -986,41 +977,13 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     return 0;
 }
 
-int COMAI_HI::tobashi_hantei_a(const TLColor ba2[][kHeight], int aa, TLColor nx1, TLColor nx2)
+int COMAI_HI::tobashi_hantei_a(const TLColor ba[][kHeight], int aa, TLColor nx1, TLColor nx2)
 {
     if (nx1 == nx2) {
-        if (((aa > 5) && (aa < 12)) || ((aa > 13) && (aa < 19)))
+        if ((aa > 5 && aa < 12) || (aa > 13 && aa < 19))
             return 1;
     }
-    if (ba2[0][11] != TLColor::EMPTY) {
-        if ((aa == 0) || (aa == 6) || (aa == 12) || (aa == 17))
-            return 1;
-    }
-    if (ba2[1][11] != TLColor::EMPTY) {
-        if ((aa == 0) || (aa == 6) || (aa == 12) || (aa == 17))
-            return 1;
-        if ((aa == 1) || (aa == 7) || (aa == 13) || (aa == 18))
-            return 1;
-    }
-    if (ba2[3][11] != TLColor::EMPTY) {
-        if ((aa == 3) || (aa == 9) || (aa == 14) || (aa == 19))
-            return 1;
-        if ((aa == 4) || (aa == 10) || (aa == 15) || (aa == 20))
-            return 1;
-        if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
-            return 1;
-    }
-    if (ba2[4][11] != TLColor::EMPTY) {
-        if ((aa == 4) || (aa == 10) || (aa == 15) || (aa == 20))
-            return 1;
-        if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
-            return 1;
-    }
-    if (ba2[5][11] != TLColor::EMPTY) {
-        if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
-            return 1;
-    }
-    return 0;
+    return tobashi_hantei_b(ba, aa);
 }
 
 int COMAI_HI::tobashi_hantei_b(const TLColor ba2[][kHeight], int aa)
