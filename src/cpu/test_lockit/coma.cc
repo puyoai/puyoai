@@ -356,7 +356,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     }
 
     // Check 2-double
-    int adubpt[22][22][22] {};
     int apos[22] {};
     if (m_hukks < 255) {
         for (int aa = 0; aa < 22; aa++) {
@@ -365,16 +364,9 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             copyField(ba2, ba_a);
             setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
             TLRensaResult result_aa = simulate(ba_a);
-            if (result_aa.chains == 2 && result_aa.num_connections[1] >= 2) {
-                for (int bb = 0; bb < 22; ++bb) {
-                    for (int dd = 0; dd < 22; ++dd) {
-                        adubpt[aa][bb][dd] = 1;
-                    }
-                }
-            }
-            if (result_aa.num_vanished != 0)
-                continue;
-            if (ba_a[2][11] != TLColor::EMPTY)
+            if (result_aa.chains == 2 && result_aa.num_connections[1] >= 2)
+                apos[aa] = 1;
+            if (result_aa.num_vanished > 0 || ba_a[2][11] != TLColor::EMPTY)
                 continue;
 
             for (int bb = 0; bb < 22; bb++) {
@@ -383,24 +375,11 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 copyField(ba_a, ba_ee);
                 setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
                 TLRensaResult result_bb = simulate(ba_ee);
-                if (result_bb.chains == 2 && result_bb.num_connections[1] >= 2) {
-                    for (int dd = 0; dd < 22; ++dd) {
-                        adubpt[aa][bb][dd] = 1;
-                    }
-                }
-            }
-        }
-    }
-
-    for (int aa = 0; aa < 22; ++aa) {
-        for (int bb = 0; bb < 22; ++bb) {
-            for (int dd = 0; dd < 22; ++dd) {
-                if (adubpt[aa][bb][dd] == 1)
+                if (result_bb.chains == 2 && result_bb.num_connections[1] >= 2)
                     apos[aa] = 1;
             }
         }
     }
-    
 
     for (int aa = 0; aa < 22; aa++) {
         hym[aa] = -10000;
