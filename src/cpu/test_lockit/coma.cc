@@ -280,7 +280,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
 
     int chain;
     int hym[22] {};
-    int dabuchk[20] {};
     int hyktmp;
     int keschk = 0;
     int maxch = 0, maxach = 0;
@@ -292,7 +291,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     int yokoyose = 2;
     int syuusoku = 0;
     int nidub_point_a[22] {};
-    int score = 0, maxscore = 0;
+    int maxscore = 0;
     int kuraichk = 0;
     int taiouchk = 0;
     int kurai_mini = 0;
@@ -460,9 +459,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         zenke[zenchk] += 120000;
 
     for (int aa = 0; aa < 22; aa++) {
-        for (int i = 0; i < 20; i++) {
-            dabuchk[i] = 0;
-        }
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
             continue;
 
@@ -610,12 +606,12 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                             continue;
                     }
                     for (int cyy = 0; cyy < 2; cyy++) {
-                        for (int ccolor = 1; ccolor < 5; ccolor++) {
+                        for (TLColor ccolor : NORMAL_TLCOLORS) {
                             copyField(ba_a, ba);
                             int coita = 0;
                             for (int j = 0; j < (12 - cyy); j++) {
                                 if (ba[cplace][j + cyy] == TLColor::EMPTY) {
-                                    ba[cplace][j + cyy] = NORMAL_TLCOLORS[ccolor - 1];
+                                    ba[cplace][j + cyy] = ccolor;
                                     coita = 1;
                                     setti_basyo[0] = cplace;
                                     setti_basyo[1] = j + cyy;
@@ -626,14 +622,13 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                             }
                             if (coita == 0)
                                 continue;
-                            int chain = 0;
-                            int not_used = 0;
-                            chousei_syoukyo_2(ba, setti_basyo, &chain, dabuchk, &not_used, &score);
+                            TLRensaResult result = simulate(ba);
+                            int chain = result.chains;
                             if (config.is_2dub_cpu) {
-                                if ((m_myf_kosuu < 46) && (chain == 2) && (dabuchk[1] > 1))
+                                if ((m_myf_kosuu < 46) && (chain == 2) && (result.num_connections[1] > 1))
                                     nidub_point_a[aa] = 3000;
                             } else {
-                                if ((m_myf_kosuu < 46) && (chain == 2) && (dabuchk[1] > 1))
+                                if ((m_myf_kosuu < 46) && (chain == 2) && (result.num_connections[1] > 1))
                                     nidub_point_a[aa] = 1200;
                             }
                         }
