@@ -1,13 +1,13 @@
 #player-fields {
     position: relative;
     width: 640px;
-    height: 490px;
+    height: 448px;
 }
 
 .background-image {
     position: absolute;
     width: 640px;
-    height: 490px;
+    height: 448px;
 }
 
 .puyo {
