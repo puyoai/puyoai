@@ -289,7 +289,6 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     int myf_kosuu_kesi = 0, myf_kosuu_iro = 0;
     int kurai_large, kurai_middle, kurai_small;
     int aite_kosuu_iro = 0, kes2;
-    int yokoyose = 2;
     int syuusoku = 0;
     int nidub_point_a[22] {};
     int score = 0, maxscore = 0;
@@ -777,6 +776,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     }
 
     // 低い場所
+    const int yokoyose = 2;
     for (int i = 0; i < 6; i++) {
         int n = 0;
         for (int j = 0; j < 13; j++) {
