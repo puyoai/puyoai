@@ -1,4 +1,8 @@
 #ifndef BASE_BMI_H_
+#define BASE_BMI_H_
+
+// bmi implements "bit manipulation instructions".
+// If possible, CPU instruction is used. Otherwise, emulated.
 
 #include <cstdint>
 
