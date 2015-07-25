@@ -1,5 +1,7 @@
 #include "color.h"
 
+#include <glog/logging.h>
+
 namespace test_lockit {
 
 TLColor toTLColor(PuyoColor pc)
@@ -49,7 +51,8 @@ std::ostream& operator<<(std::ostream& os, TLColor c)
     case TLColor::UNKNOWN:return (os << '?');
     }
 
-    return (os << '?');
+    CHECK(false) << "Invalid color: " << static_cast<int>(c);
+    return os;
 }
 
 } // namespace test_lockit
