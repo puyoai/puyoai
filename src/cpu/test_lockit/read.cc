@@ -259,7 +259,7 @@ int READ_P::chousei_syoukyo()
         rakkaflg[5] = 0;
         for (i = 0; i < 6; i++) {
             for (j = kiept[i]; j < 12; j++) {
-                if (field[i][j] == 0)
+                if (field[i][j] == TLColor::EMPTY)
                     continue;
                 if ((point[i][j] != 1) && (field[i][j] != TLColor::OJAMA)) {
                     saiki(field, point, i, j, &num, field[i][j]);
@@ -276,7 +276,7 @@ int READ_P::chousei_syoukyo()
             if (rakkaflg[i] == 1) {
                 n = 0;
                 for (j = 0; j < 13; j++) {
-                    if (field[i][j] == 0) {
+                    if (field[i][j] == TLColor::EMPTY) {
                         if (n == 0)
                             kiept[i] = j;
                         n++;
