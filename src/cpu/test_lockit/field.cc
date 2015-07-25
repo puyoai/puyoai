@@ -338,7 +338,7 @@ TLRensaResult simulate(TLColor field[][kHeight])
     int num_connected[TLRensaResult::MAX_RENSA] {};   // # of connected puyos
     int num_connections[TLRensaResult::MAX_RENSA] {};  // # of groups
     bool quick = false;
-    
+
     int bottom[6] {};
     bool cont = true;
     while (cont) {
@@ -362,7 +362,7 @@ TLRensaResult simulate(TLColor field[][kHeight])
 
                         long_bonus[chain] += longBonus(num);
                         num_connected[chain] += num;
-                        used_colors.set(color);
+                        used_colors.set(ordinal(color));
                         num_connections[chain]++;
                     }
                 }
@@ -412,7 +412,7 @@ TLRensaResult simulate(TLColor field[][kHeight])
     for (int i = 0; i < chain; ++i) {
         result.num_connections[i] = num_connections[i];
     }
-    
+
     return result;
 }
 
@@ -657,7 +657,6 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
     int renketsunum;
     int renketsubonus[19] = { 0 };
     int rate;
-    int color;
 
     int num = 0;
     int point[6][12] {};
@@ -675,7 +674,7 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
     rakkaflg[3] = 0;
     rakkaflg[4] = 0;
     rakkaflg[5] = 0;
-    color = bass[i2][j2];
+    TLColor color = bass[i2][j2];
     if (tokus < 5) {
         syou_downx(bass, i2, j2 + 1, bass[i2][j2], rakkaflg, &num);
     } else if (tokus < 7) {
@@ -683,7 +682,7 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
     } else if (tokus == 7) {
         syou_downx(bass, i2 - 1, j2, bass[i2][j2], rakkaflg, &num);
     }
-    renketsu[0][color - 1] = num;
+    renketsu[0][ordinal(color) - 1] = num;
     if (num > 10)
         renketsubonus[0] += 10; // bugggggg 111102
     else if (num > 4)
@@ -702,7 +701,7 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
         if (rakkaflg[i] == 1) {
             n = 0;
             for (j = 0; j < 13; j++) {
-                if (bass[i][j] == 0) {
+                if (bass[i][j] == TLColor::EMPTY) {
                     if (n == 0)
                         kiept[i] = j;
                     n++;
@@ -735,7 +734,7 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
                     if (num > 3) {
                         syo = 1;
                         color = bass[i][j];
-                        renketsu[chain][color - 1] += num;
+                        renketsu[chain][ordinal(color) - 1] += num;
                         if (num > 10)
                             renketsubonus[chain] += 10; // bugggggg 111102
                         else if (num > 4)

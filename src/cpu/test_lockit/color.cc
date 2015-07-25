@@ -1,5 +1,7 @@
 #include "color.h"
 
+#include <glog/logging.h>
+
 namespace test_lockit {
 
 TLColor toTLColor(PuyoColor pc)
@@ -35,6 +37,22 @@ TLColor toValidTLColor(TLColor c)
     if (c == TLColor::UNKNOWN)
         return TLColor::RED;
     return c;
+}
+
+std::ostream& operator<<(std::ostream& os, TLColor c)
+{
+    switch (c) {
+    case TLColor::EMPTY:  return (os << '.');
+    case TLColor::RED:    return (os << 'R');
+    case TLColor::BLUE:   return (os << 'B');
+    case TLColor::YELLOW: return (os << 'Y');
+    case TLColor::GREEN:  return (os << 'G');
+    case TLColor::OJAMA:  return (os << 'O');
+    case TLColor::UNKNOWN:return (os << '?');
+    }
+
+    CHECK(false) << "Invalid color: " << static_cast<int>(c);
+    return os;
 }
 
 } // namespace test_lockit
