@@ -37,4 +37,19 @@ TLColor toValidTLColor(TLColor c)
     return c;
 }
 
+std::ostream& operator<<(std::ostream& os, TLColor c)
+{
+    switch (c) {
+    case TLColor::EMPTY:  return (os << '.');
+    case TLColor::RED:    return (os << 'R');
+    case TLColor::BLUE:   return (os << 'B');
+    case TLColor::YELLOW: return (os << 'Y');
+    case TLColor::GREEN:  return (os << 'G');
+    case TLColor::OJAMA:  return (os << 'O');
+    case TLColor::UNKNOWN:return (os << '?');
+    }
+
+    return (os << '?');
+}
+
 } // namespace test_lockit
