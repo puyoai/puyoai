@@ -197,7 +197,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         int field_kosuu = 0;
         for (int i = 0; i < 6; ++i) {
             for (int j = 0; j < kHeight; ++j) {
-                if (r_player[0].field[i][j] != 0) {
+                if (r_player[0].field[i][j] != TLColor::EMPTY) {
                     ++field_kosuu;
                 }
             }
