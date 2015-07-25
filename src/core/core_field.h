@@ -30,8 +30,6 @@ struct Position;
 
 // CoreField represents a field. Without strong reason, this class should be used for
 // field implementation.
-// TODO(mayah): All puyos in CoreField should be grounded (14th row is exception).
-// For the field that might contain puyo in the air, it would be better to make another class.
 class CoreField : public FieldConstant {
 public:
     CoreField() : heights_{} {}
@@ -67,7 +65,6 @@ public:
     // field utilities
 
     // Returns true if the field does not have any puyo. Valid only all puyos are dropped.
-    // TODO(mayah): Remove isZenkeshiPrecise() from CoreField when all the puyo is not in the air.
     bool isZenkeshi() const;
 
     // Counts the number of color puyos.
