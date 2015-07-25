@@ -11,6 +11,7 @@
 
 #include "base/noncopyable.h"
 
+// Executor is an implementation of thread pool.
 class Executor : noncopyable {
 public:
     typedef std::function<void (void)> Func;

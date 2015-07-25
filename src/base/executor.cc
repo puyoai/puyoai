@@ -60,7 +60,7 @@ void Executor::submit(Executor::Func f)
     CHECK(f) << "function should be callable";
 
     unique_lock<mutex> lock(mu_);
-    tasks_.push_back(f);
+    tasks_.push_back(std::move(f));
     condVar_.notify_one();
 }
 
