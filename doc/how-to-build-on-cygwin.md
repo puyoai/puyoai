@@ -20,7 +20,6 @@
 * libSDL2_ttf-devel
 * libSDL2_image2.0_0
 * libSDL2_image-devel
-をインストール
 
 ## glog のビルド・インストール
 
