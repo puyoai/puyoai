@@ -78,6 +78,10 @@ Debian 系 Linux の場合、apt を使うと楽です。
     $ sudo apt-get install libffms2-dev libusb-1.0-0-dev
     $ sudo apt-get install ninja-build
 
+#### Windows の場合
+
+cygwin で一応 build できることが確認されています。詳しくは、[cygwin でのビルド方法](doc/how-to-build-on-cygwin.md)を参照してください。
+
 ### make のしかた
 
 cmake を用いて Makefile を生成し、make することを前提にしています。
