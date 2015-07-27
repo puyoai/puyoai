@@ -110,13 +110,13 @@ void COMAI_HI::ref()
 
 bool COMAI_HI::aite_attack_start(const TLColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
 {
-    TLColor ba[6][kHeight] {};
     int score = 0;
     int jamako_sabun;
     int quick = 0;
     bool ret_keshi = false;
 
     int kosuu_mae = countNormalColor13(ba3);
+    TLColor ba[6][kHeight] {};
     copyField(ba3, ba);
 
     m_aite_hakka_rensa = hon_syoukyo_score(ba, &score, &quick);
@@ -169,11 +169,6 @@ int COMAI_HI::aite_rensa_end()
 
 int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
 {
-    TLColor ba[6][kHeight] {};
-    TLColor ba_a[6][kHeight] {};
-    TLColor ba_b[6][kHeight] {};
-    TLColor ba_d[6][kHeight] {};
-
     m_aite_rensa_score = 0;
     m_aite_rensa_score_cc = 0;
     m_nocc_aite_rensa_score = 0;
@@ -188,6 +183,7 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
     for (int aa = 0; aa < 22; ++aa) {
         if (tobashi_hantei_a(ba3, aa, nx1, nx2))
             continue;
+        TLColor ba_a[6][kHeight] {};
         copyField(ba3, ba_a);
         setti_puyo(ba_a, aa, nx1, nx2, unused_values);
         TLRensaResult result_aa = simulate(ba_a);
@@ -196,6 +192,7 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
         for (int bb = 0; bb < 22; ++bb) {
             if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
                 continue;
+            TLColor ba_b[6][kHeight] {};
             copyField(ba_a, ba_b);
             setti_puyo(ba_b, bb, nn1, nn2, unused_values);
             TLRensaResult result_bb = simulate(ba_b);
@@ -206,6 +203,7 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
                 for (int dd = 0; dd < 6; ++dd) {
                     if (tobashi_hantei_a(ba_b, dd, nk, nk))
                         continue;
+                    TLColor ba_d[6][kHeight] {};
                     copyField(ba_b, ba_d);
                     setti_puyo(ba_d, dd, nk, nk, unused_values);
                     TLRensaResult result_dd = simulate(ba_d);
@@ -241,6 +239,7 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
             // Assume putting 2 same puyos vertically.
             for (int x = 0; x < 6; ++x) {
                 for (TLColor color : NORMAL_TLCOLORS) {
+                    TLColor ba[6][kHeight] {};
                     copyField(ba_b, ba);
                     for (int j = 0; j < 13; j++) {
                         if (ba[x][j] == TLColor::EMPTY) {
@@ -273,12 +272,6 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
 
 int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi_own, TLColor aite_ba[6][kHeight], int zenkesi_aite)
 {
-    TLColor ba[6][kHeight] {};
-    TLColor ba2[6][kHeight] {};
-    TLColor ba_ee[6][kHeight];
-    TLColor ba_a[6][kHeight] {};
-
-    int chain;
     int hym[22] {};
     int hyktmp;
     int keschk = 0;
@@ -342,6 +335,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     TLColor nx2 = toValidTLColor(tsumo[1]);
     TLColor nn1 = toValidTLColor(tsumo[2]);
     TLColor nn2 = toValidTLColor(tsumo[3]);
+    TLColor ba2[6][kHeight] {};
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
             ba2[i][j] = ba3[i][j];
@@ -354,6 +348,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         for (int aa = 0; aa < 22; aa++) {
             if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                 continue;
+            TLColor ba_a[6][kHeight] {};
             copyField(ba2, ba_a);
             setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
             TLRensaResult result_aa = simulate(ba_a);
@@ -365,6 +360,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             for (int bb = 0; bb < 22; bb++) {
                 if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
                     continue;
+                TLColor ba_ee[6][kHeight];
                 copyField(ba_a, ba_ee);
                 setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
                 TLRensaResult result_bb = simulate(ba_ee);
@@ -421,6 +417,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     if (m_aite_hakka_rensa < 5) {
         if (m_myf_kosuu < 15) {
             for (int aa = 0; aa < 22; aa++) {
+                TLColor ba_a[6][kHeight] {};
                 copyField(ba2, ba_a);
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
                 int chig_aa = isChigiri(setti_basyo);
@@ -436,6 +433,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
 
                 if (m_myf_kosuu < 13) {
                     for (int bb = 0; bb < 22; bb++) {
+                        TLColor ba_ee[6][kHeight];
                         copyField(ba_a, ba_ee);
                         setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
                         int chig_bb = isChigiri(setti_basyo);
@@ -461,7 +459,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
             continue;
 
-        chain = 0;
+        TLColor ba[6][kHeight] {};
         copyField(ba2, ba);
         setti_puyo(ba, aa, nx1, nx2, setti_basyo);
         TLRensaResult result_aa = simulate(ba);
@@ -578,6 +576,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             for (int aa = 0; aa < 22; aa++) {
                 if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                     continue;
+                TLColor ba_a[6][kHeight] {};
                 copyField(ba2, ba_a);
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
                 TLRensaResult result_aa = simulate(ba_a);
@@ -606,6 +605,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                     }
                     for (int cyy = 0; cyy < 2; cyy++) {
                         for (TLColor ccolor : NORMAL_TLCOLORS) {
+                            TLColor ba[6][kHeight] {};
                             copyField(ba_a, ba);
                             int coita = 0;
                             for (int j = 0; j < (12 - cyy); j++) {
@@ -646,6 +646,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     for (int aa = 0; aa < 22; aa++) {
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
             continue;
+        TLColor ba_a[6][kHeight] {};
         copyField(ba2, ba_a);
         setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
         TLRensaResult result_aa = simulate(ba_a);
@@ -683,6 +684,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         for (int bb = 0; bb < 22; bb++) {
             if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
                 continue;
+            TLColor ba_ee[6][kHeight];
             copyField(ba_a, ba_ee);
             setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
             TLRensaResult result_bb = simulate(ba_ee);
@@ -824,6 +826,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     // chigiri
     if (((zenkesi_own == 1) && (zenkesi_aite != 1)) || ((m_aite_hakka_honsen == 0) && (config.w_t)) || (zenkesi_aite == 1)) {
         for (int aa = 0; aa < 22; aa++) {
+            TLColor ba[6][kHeight] {};
             copyField(ba2, ba);
             if (aa < 6) {
                 for (int j = 0; j < 13; j++) {
@@ -955,16 +958,13 @@ int COMAI_HI::tobashi_hantei_b(const TLColor ba2[][kHeight], int aa)
 int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi_own, TLColor aite_ba[6][kHeight],
                          int zenkesi_aite, int fast)
 {
-    TLColor ba[6][kHeight] {};
     TLColor ba_a[6][kHeight] {};
     TLColor ba2[6][kHeight] {};
-    TLColor bass[6][kHeight];
     int point2[6][12] = {
         {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}, {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
         {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}, {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
         {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}, {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}};
     int hym[22];
-    int num2;
     int keschk = 0;
     int maxch = 0, maxach;
     int teimen[6];
@@ -1148,6 +1148,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
     for (int aa = 0; aa < 22; aa++) {
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
             continue;
+        TLColor ba[6][kHeight] {};
         copyField(ba2, ba);
         setti_puyo(ba, aa, nx1, nx2, setti_basyo);
         TLRensaResult result = simulate(ba);
@@ -1545,6 +1546,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                                 continue;
                         }
                     }
+                    TLColor ba[6][kHeight] {};
                     copyField(ba_ee, ba);
                     if (ee != 0) {
                         if (setti_puyo_1(ba, eex, eecol))
@@ -1620,7 +1622,8 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                         }
                     }
 
-                    num2 = 3;
+                    TLColor bass[6][kHeight] {};
+                    int num2 = 3;
                     for (int i2 = 0; i2 < 6; i2++) {
                         hakkatakasa = 0;
                         for (int j2 = 0; j2 < 12; j2++) {
@@ -1634,31 +1637,30 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                                 continue;
                             if ((num2 > 2))
                                 copyField(ba, bass);
-                            int chain = 0;
                             int num2 = 0;
                             int poi2s = 0;
+                            int chain = 0;
                             int tokus = point2[i2][j2];
                             saiki_3(bass, point2, i2, j2, &num2, bass[i2][j2]);
-                            if ((num2 < 3))
-                                goto POSS;
-                            poi2s = j2 * config.takasa_point;
-                            if (j2 > 5)
-                                poi2s += config.takasa_point;
-                            if ((tokus > 1) && (tokus < 5))
-                                poi2s += 100 * config.t_t;
-                            if (zenkesi_aite == 1)
-                                poi2s = hakkatakasa * 300;
+                            if (num2 >= 3) {
+                                poi2s = j2 * config.takasa_point;
+                                if (j2 > 5)
+                                    poi2s += config.takasa_point;
+                                if ((tokus > 1) && (tokus < 5))
+                                    poi2s += 100 * config.t_t;
+                                if (zenkesi_aite == 1)
+                                    poi2s = hakkatakasa * 300;
 
-                            chain = chousei_syoukyo_3(bass, setti_basyo, &poi2s, &score_mm, tokus, i2, j2, config.ruiseki_point);
+                                chain = chousei_syoukyo_3(bass, setti_basyo, &poi2s, &score_mm, tokus, i2, j2, config.ruiseki_point);
 
-                            if ((dd < 220) && (m_myf_kosuu > 63))
-                                score_mm = score_mm * 1 / 2;
-                            else if ((dd < 220) && (m_myf_kosuu > 61))
-                                score_mm = score_mm * 3 / 4;
-                            else if ((dd < 220) && (m_myf_kosuu > 55))
-                                score_mm = score_mm * 6 / 7;
+                                if ((dd < 220) && (m_myf_kosuu > 63))
+                                    score_mm = score_mm * 1 / 2;
+                                else if ((dd < 220) && (m_myf_kosuu > 61))
+                                    score_mm = score_mm * 3 / 4;
+                                else if ((dd < 220) && (m_myf_kosuu > 55))
+                                    score_mm = score_mm * 6 / 7;
 
-                        POSS:
+                            }
                             int pois = 0;
                             if (m_cchai <= chain) {
                                 m_cchai = chain;
