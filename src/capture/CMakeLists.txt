@@ -15,10 +15,10 @@ add_library(puyoai_capture
             source.cc
             usb_device.cc)
 
-if(V4L2_LIBRARY)
-    puyoai_add_cxx_flags("-DUSE_V4L2")
-    add_library(puyoai_capture_viddev viddev_source.cc)
-endif()
+#if(V4L2_LIBRARY)
+#    puyoai_add_cxx_flags("-DUSE_V4L2")
+#    add_library(puyoai_capture_viddev viddev_source.cc)
+#endif()
 
 if(LIB_USB)
     add_library(puyoai_capture_syntek syntek_source.cc)
