@@ -40,7 +40,7 @@ void Evaluator::EvalPlan(const RefPlan& plan) {
     score += genre.score;
   }
 
-  if (control->score < score) {
+  if (control->score < score - 70 || exp(control->score - score) < rand() * (1.0 / 0x7fffffff)) {
     control->decision = plan.decisions().front();
     control->score = score;
     control->message = oss.str().substr(1);  // remove first ','
@@ -219,21 +219,16 @@ int Evaluator::Valley(const CoreField& field) {
 
 int Evaluator::Future(const CoreField& field) {
   UNUSED_VARIABLE(field);
-  // TODO: assume putting a puyo and check if it fires rensa.
-  int num_to_fire = 5;
-  int score = 0;
-  RensaDetector::detectSingle(
-      field, RensaDetectorStrategy::defaultDropStrategy(),
-      [&num_to_fire, &score](CoreField&& cf, const ColumnPuyoList& complementedColumnPuyoList) {
-        RensaResult result = cf.simulate();
-        if (result.score < score + 100)
-          return;
-        if (num_to_fire > complementedColumnPuyoList.size()) {
-          num_to_fire = complementedColumnPuyoList.size();
-          score = result.score;
-        }
-      });
-  return -500 * num_to_fire;
+  std::vector<int> scores;
+  if (field.countPuyos() < 60) {
+    Plan::iterateAvailablePlans(
+        field, KumipuyoSeq(), 1,
+        [&scores](const RefPlan& plan) {
+          if (plan.isRensaPlan())
+            scores.push_back(plan.rensaResult().score);
+        });
+  }
+  return std::accumulate(scores.begin(), scores.end(), 0) / 40;
 }
 
 }  // namespace peria
