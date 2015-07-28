@@ -1,5 +1,6 @@
 #include "evaluator.h"
 
+#include <algorithm>
 #include <numeric>
 #include <sstream>
 
@@ -128,6 +129,15 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
     ;
   }
 
+  // TODO: use this feature to judge if I should fire the main chain.
+  if (true) {  // penalty for enemy's plans
+    int value = EvalEnemyPlan();
+    if (value < 0) {
+      oss << "Enemy(" << value << ")_";
+      score += value;
+    }
+  }
+
   *message = oss.str();
   return score;
 }
@@ -173,6 +183,22 @@ int Evaluator::EvalTsubushi(const RefPlan& plan) {
   }
 
   return score;
+}
+
+int Evaluator::EvalEnemyPlan() {
+  PossibleRensa max_firable;
+  for (const auto& firable : enemy_hands.firables) {
+    if (max_firable.score < firable.score)
+      max_firable = firable;
+  }
+
+  PossibleRensa max_possible;
+  for (const auto& possible : enemy_hands.need_keys) {
+    if (max_possible.eval() < possible.eval())
+      max_possible = possible;
+  }
+
+  return -std::max(max_firable.score * 0.5, max_possible.score * 0.3);
 }
 
 int Evaluator::PatternMatch(const CoreField& field, std::string* name) {
