@@ -37,7 +37,9 @@ endif()
 
 if(PKG_CONFIG_FOUND)
     pkg_check_modules(FFMPEG libswscale libavformat libavcodec libavutil)
-    find_library(V4L2_LIBRARY v4l2)
+
+    # We don't support V4L2 yet.
+    # find_library(V4L2_LIBRARY v4l2)
 endif()
 
 # TODO(mayah): Why not use pkg_search_module?
