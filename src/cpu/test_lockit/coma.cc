@@ -26,21 +26,22 @@ int g_chainhyk[22][22][221][EE_SIZE] {};
 int g_poihyo[22][22][221][EE_SIZE] {};
 int g_score_hukasa[22][22][221] {};
 
-const TLColor kTsumoPatterns[][2] = {
-    {TLColor::RED, TLColor::RED},
-    {TLColor::RED, TLColor::BLUE},
-    {TLColor::RED, TLColor::YELLOW},
-    {TLColor::RED, TLColor::GREEN},
-    {TLColor::BLUE, TLColor::BLUE},
-    {TLColor::BLUE, TLColor::YELLOW},
-    {TLColor::BLUE, TLColor::GREEN},
-    {TLColor::YELLOW, TLColor::YELLOW},
-    {TLColor::YELLOW, TLColor::GREEN},
-    {TLColor::GREEN, TLColor::GREEN},
+const PuyoColor kTsumoPatterns[][2] = {
+    {PuyoColor::RED, PuyoColor::RED},
+    {PuyoColor::RED, PuyoColor::BLUE},
+    {PuyoColor::RED, PuyoColor::YELLOW},
+    {PuyoColor::RED, PuyoColor::GREEN},
+    {PuyoColor::BLUE, PuyoColor::BLUE},
+    {PuyoColor::BLUE, PuyoColor::YELLOW},
+    {PuyoColor::BLUE, PuyoColor::GREEN},
+    {PuyoColor::YELLOW, PuyoColor::YELLOW},
+    {PuyoColor::YELLOW, PuyoColor::GREEN},
+    {PuyoColor::GREEN, PuyoColor::GREEN},
 };
 
-bool isMatchIndexAndColors(int id, TLColor color[]) {
-  if (color[0] == TLColor::UNKNOWN || color[1] == TLColor::UNKNOWN)
+bool isMatchIndexAndColors(int id, PuyoColor color[]) {
+  // PuyoColor::IRON is used for a place holder.
+  if (color[0] == PuyoColor::IRON || color[1] == PuyoColor::IRON)
     return true;
   if (id == 220)
     return true;
@@ -108,7 +109,7 @@ void COMAI_HI::ref()
     m_hakkatime = 0;
 }
 
-bool COMAI_HI::aite_attack_start(const TLColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
+bool COMAI_HI::aite_attack_start(const PuyoColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
 {
     int score = 0;
     int jamako_sabun;
@@ -116,7 +117,7 @@ bool COMAI_HI::aite_attack_start(const TLColor ba3[6][kHeight], int zenkesi_aite
     bool ret_keshi = false;
 
     int kosuu_mae = countNormalColor13(ba3);
-    TLColor ba[6][kHeight] {};
+    PuyoColor ba[6][kHeight] {};
     copyField(ba3, ba);
 
     m_aite_hakka_rensa = hon_syoukyo_score(ba, &score, &quick);
@@ -147,7 +148,7 @@ bool COMAI_HI::aite_attack_start(const TLColor ba3[6][kHeight], int zenkesi_aite
     return ret_keshi;
 }
 
-int COMAI_HI::aite_attack_nokori(const TLColor [6][kHeight], int hakata)
+int COMAI_HI::aite_attack_nokori(const PuyoColor [6][kHeight], int hakata)
 {
     m_aite_hakka_nokori = m_aite_hakka_rensa - (hakata - m_hakkatime + 30) / 40;
     return 0;
@@ -167,47 +168,47 @@ int COMAI_HI::aite_rensa_end()
     return 0;
 }
 
-int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
+int COMAI_HI::aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[])
 {
     m_aite_rensa_score = 0;
     m_aite_rensa_score_cc = 0;
     m_nocc_aite_rensa_score = 0;
 
-    TLColor nx1 = toValidTLColor(tsumo[0]);
-    TLColor nx2 = toValidTLColor(tsumo[1]);
-    TLColor nn1 = toValidTLColor(tsumo[2]);
-    TLColor nn2 = toValidTLColor(tsumo[3]);
+    PuyoColor nx1 = toValidPuyoColor(tsumo[0]);
+    PuyoColor nx2 = toValidPuyoColor(tsumo[1]);
+    PuyoColor nn1 = toValidPuyoColor(tsumo[2]);
+    PuyoColor nn2 = toValidPuyoColor(tsumo[3]);
     int irokosuu = countNormalColor13(ba3);
 
     int unused_values[4];
     for (int aa = 0; aa < 22; ++aa) {
         if (tobashi_hantei_a(ba3, aa, nx1, nx2))
             continue;
-        TLColor ba_a[6][kHeight] {};
+        PuyoColor ba_a[6][kHeight] {};
         copyField(ba3, ba_a);
         setti_puyo(ba_a, aa, nx1, nx2, unused_values);
         TLRensaResult result_aa = simulate(ba_a);
-        if (ba_a[2][11] != TLColor::EMPTY)
+        if (ba_a[2][11] != PuyoColor::EMPTY)
             continue;
         for (int bb = 0; bb < 22; ++bb) {
             if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
                 continue;
-            TLColor ba_b[6][kHeight] {};
+            PuyoColor ba_b[6][kHeight] {};
             copyField(ba_a, ba_b);
             setti_puyo(ba_b, bb, nn1, nn2, unused_values);
             TLRensaResult result_bb = simulate(ba_b);
-            if (ba_b[2][11] != TLColor::EMPTY)
+            if (ba_b[2][11] != PuyoColor::EMPTY)
                 continue;
 
-            for (TLColor nk : NORMAL_TLCOLORS) {
+            for (PuyoColor nk : NORMAL_PUYO_COLORS) {
                 for (int dd = 0; dd < 6; ++dd) {
                     if (tobashi_hantei_a(ba_b, dd, nk, nk))
                         continue;
-                    TLColor ba_d[6][kHeight] {};
+                    PuyoColor ba_d[6][kHeight] {};
                     copyField(ba_b, ba_d);
                     setti_puyo(ba_d, dd, nk, nk, unused_values);
                     TLRensaResult result_dd = simulate(ba_d);
-                    if (ba_d[2][11] != TLColor::EMPTY)
+                    if (ba_d[2][11] != PuyoColor::EMPTY)
                         continue;
 
                     int scores = result_aa.score;
@@ -238,11 +239,11 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
 
             // Assume putting 2 same puyos vertically.
             for (int x = 0; x < 6; ++x) {
-                for (TLColor color : NORMAL_TLCOLORS) {
-                    TLColor ba[6][kHeight] {};
+                for (PuyoColor color : NORMAL_PUYO_COLORS) {
+                    PuyoColor ba[6][kHeight] {};
                     copyField(ba_b, ba);
                     for (int j = 0; j < 13; j++) {
-                        if (ba[x][j] == TLColor::EMPTY) {
+                        if (ba[x][j] == PuyoColor::EMPTY) {
                             ba[x][j] = color;
                             ba[x][j + 1] = color;
                             break;
@@ -250,13 +251,13 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
                     }
 
                     // Skip if the destination is unreachable.
-                    if (ba[1][11] != TLColor::EMPTY && x == 0)
+                    if (ba[1][11] != PuyoColor::EMPTY && x == 0)
                         continue;
-                    if (ba[2][11] != TLColor::EMPTY && x != 2)  // game over
+                    if (ba[2][11] != PuyoColor::EMPTY && x != 2)  // game over
                         continue;
-                    if (ba[3][11] != TLColor::EMPTY && x > 3)
+                    if (ba[3][11] != PuyoColor::EMPTY && x > 3)
                         continue;
-                    if (ba[4][11] != TLColor::EMPTY && x == 5)
+                    if (ba[4][11] != PuyoColor::EMPTY && x == 5)
                         continue;
 
                     TLRensaResult result = simulate(ba);
@@ -270,7 +271,7 @@ int COMAI_HI::aite_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[])
     return 0;
 }
 
-int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi_own, TLColor aite_ba[6][kHeight], int zenkesi_aite)
+int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight], int zenkesi_aite)
 {
     int hym[22] {};
     int hyktmp;
@@ -298,10 +299,10 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     m_myf_kosuu = 0;
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
-            if (ba3[i][j] != TLColor::EMPTY) {
+            if (ba3[i][j] != PuyoColor::EMPTY) {
                 m_myf_kosuu++;
             }
-            if (isNormalTLColor(ba3[i][j])) {
+            if (isNormalColor(ba3[i][j])) {
                 myf_kosuu_iro++;
             }
         }
@@ -314,10 +315,10 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
 
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
-            if (isNormalTLColor(aite_ba[i][j])) {
+            if (isNormalColor(aite_ba[i][j])) {
                 aite_kosuu_iro++;
             }
-            if (aite_ba[i][j] != TLColor::EMPTY) {
+            if (aite_ba[i][j] != PuyoColor::EMPTY) {
                 aite_ojama++;
             }
         }
@@ -331,11 +332,11 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         kes2 = 0;
     }
 
-    TLColor nx1 = toValidTLColor(tsumo[0]);
-    TLColor nx2 = toValidTLColor(tsumo[1]);
-    TLColor nn1 = toValidTLColor(tsumo[2]);
-    TLColor nn2 = toValidTLColor(tsumo[3]);
-    TLColor ba2[6][kHeight] {};
+    PuyoColor nx1 = toValidPuyoColor(tsumo[0]);
+    PuyoColor nx2 = toValidPuyoColor(tsumo[1]);
+    PuyoColor nn1 = toValidPuyoColor(tsumo[2]);
+    PuyoColor nn2 = toValidPuyoColor(tsumo[3]);
+    PuyoColor ba2[6][kHeight] {};
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
             ba2[i][j] = ba3[i][j];
@@ -348,19 +349,19 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         for (int aa = 0; aa < 22; aa++) {
             if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                 continue;
-            TLColor ba_a[6][kHeight] {};
+            PuyoColor ba_a[6][kHeight] {};
             copyField(ba2, ba_a);
             setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
             TLRensaResult result_aa = simulate(ba_a);
             if (result_aa.chains == 2 && result_aa.num_connections[1] >= 2)
                 apos[aa] = 1;
-            if (result_aa.num_vanished > 0 || ba_a[2][11] != TLColor::EMPTY)
+            if (result_aa.num_vanished > 0 || ba_a[2][11] != PuyoColor::EMPTY)
                 continue;
 
             for (int bb = 0; bb < 22; bb++) {
                 if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
                     continue;
-                TLColor ba_ee[6][kHeight];
+                PuyoColor ba_ee[6][kHeight];
                 copyField(ba_a, ba_ee);
                 setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
                 TLRensaResult result_bb = simulate(ba_ee);
@@ -417,7 +418,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     if (m_aite_hakka_rensa < 5) {
         if (m_myf_kosuu < 15) {
             for (int aa = 0; aa < 22; aa++) {
-                TLColor ba_a[6][kHeight] {};
+                PuyoColor ba_a[6][kHeight] {};
                 copyField(ba2, ba_a);
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
                 int chig_aa = isChigiri(setti_basyo);
@@ -433,7 +434,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
 
                 if (m_myf_kosuu < 13) {
                     for (int bb = 0; bb < 22; bb++) {
-                        TLColor ba_ee[6][kHeight];
+                        PuyoColor ba_ee[6][kHeight];
                         copyField(ba_a, ba_ee);
                         setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
                         int chig_bb = isChigiri(setti_basyo);
@@ -459,7 +460,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
             continue;
 
-        TLColor ba[6][kHeight] {};
+        PuyoColor ba[6][kHeight] {};
         copyField(ba2, ba);
         setti_puyo(ba, aa, nx1, nx2, setti_basyo);
         TLRensaResult result_aa = simulate(ba);
@@ -509,7 +510,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         myf_kosuu_kesi = 0;
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 13; j++) {
-                if (isNormalTLColor(ba[i][j])) {
+                if (isNormalColor(ba[i][j])) {
                     myf_kosuu_kesi++;
                 }
             }
@@ -576,40 +577,40 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             for (int aa = 0; aa < 22; aa++) {
                 if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                     continue;
-                TLColor ba_a[6][kHeight] {};
+                PuyoColor ba_a[6][kHeight] {};
                 copyField(ba2, ba_a);
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
                 TLRensaResult result_aa = simulate(ba_a);
                 if (result_aa.num_vanished != 0)
                     continue;
                 for (int cplace = 0; cplace < 6; cplace++) {
-                    if (ba_a[0][11] != TLColor::EMPTY) {
+                    if (ba_a[0][11] != PuyoColor::EMPTY) {
                         if (cplace == 0)
                             continue;
                     }
-                    if (ba_a[1][11] != TLColor::EMPTY) {
+                    if (ba_a[1][11] != PuyoColor::EMPTY) {
                         if ((cplace == 0) || (cplace == 1))
                             continue;
                     }
-                    if (ba_a[3][11] != TLColor::EMPTY) {
+                    if (ba_a[3][11] != PuyoColor::EMPTY) {
                         if ((cplace == 3) || (cplace == 4) || (cplace == 5))
                             continue;
                     }
-                    if (ba_a[4][11] != TLColor::EMPTY) {
+                    if (ba_a[4][11] != PuyoColor::EMPTY) {
                         if ((cplace == 4) || (cplace == 5))
                             continue;
                     }
-                    if (ba_a[5][11] != TLColor::EMPTY) {
+                    if (ba_a[5][11] != PuyoColor::EMPTY) {
                         if (cplace == 5)
                             continue;
                     }
                     for (int cyy = 0; cyy < 2; cyy++) {
-                        for (TLColor ccolor : NORMAL_TLCOLORS) {
-                            TLColor ba[6][kHeight] {};
+                        for (PuyoColor ccolor : NORMAL_PUYO_COLORS) {
+                            PuyoColor ba[6][kHeight] {};
                             copyField(ba_a, ba);
                             int coita = 0;
                             for (int j = 0; j < (12 - cyy); j++) {
-                                if (ba[cplace][j + cyy] == TLColor::EMPTY) {
+                                if (ba[cplace][j + cyy] == PuyoColor::EMPTY) {
                                     ba[cplace][j + cyy] = ccolor;
                                     coita = 1;
                                     setti_basyo[0] = cplace;
@@ -646,7 +647,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     for (int aa = 0; aa < 22; aa++) {
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
             continue;
-        TLColor ba_a[6][kHeight] {};
+        PuyoColor ba_a[6][kHeight] {};
         copyField(ba2, ba_a);
         setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
         TLRensaResult result_aa = simulate(ba_a);
@@ -654,12 +655,12 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         int score_tmp = result_aa.score;
         int score_aonly = score_tmp; // only
         int score_tmp2 = score_tmp;
-        if ((ba_a[2][11] == TLColor::EMPTY) && (score_tmp > m_score_aa)) {
+        if ((ba_a[2][11] == PuyoColor::EMPTY) && (score_tmp > m_score_aa)) {
             m_score_aa = score_tmp;
             m_aa_max_score = aa;
             m_tesuu_mon = 1;
         }
-        if ((ba_a[2][11] == TLColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
+        if ((ba_a[2][11] == PuyoColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
             && (m_aite_hakka_jamako * 70 > score_tmp2 - 1400) && (score_tmp2 + 150 > m_aite_hakka_jamako * 70)) {
             if ((myf_kosuu_iro - 1 > keshiko_aa * 2) || (config.i_t)) {
                 score_tai = score_tmp2;
@@ -668,7 +669,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         }
         if ((myf_kosuu_iro - keshiko_aa + 8) < m_cchai * 4)
             continue;
-        if (ba_a[2][11] != TLColor::EMPTY) {
+        if (ba_a[2][11] != PuyoColor::EMPTY) {
             // In case the 1st control leads to die, do not score following controls.
             for (int bb = 0; bb < 22; bb++) {
                 for (int dd = 0; dd < 221; dd++) {
@@ -684,7 +685,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         for (int bb = 0; bb < 22; bb++) {
             if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
                 continue;
-            TLColor ba_ee[6][kHeight];
+            PuyoColor ba_ee[6][kHeight];
             copyField(ba_a, ba_ee);
             setti_puyo(ba_ee, bb, nn1, nn2, setti_basyo);
             TLRensaResult result_bb = simulate(ba_ee);
@@ -696,7 +697,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             if ((kuraichk == 1) && ((m_aite_hakka_nokori < 1)
                                     || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
                 score_tmp = 0; // 0225
-            if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp > m_score_aa)) {
+            if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp > m_score_aa)) {
                 m_score_aa = score_tmp;
                 m_aa_max_score = aa;
                 m_tesuu_mon = 2;
@@ -707,7 +708,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                     || (m_aite_hakka_nokori < 2 && m_aite_puyo_uki == 0 && m_aite_hakka_quick == 1))
                     score_tmp2 = 0; // 0225
             }
-            if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
+            if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
                 && (m_aite_hakka_jamako * 70 > score_tmp2 - 1400) && (score_tmp2 + 150 > m_aite_hakka_jamako * 70)) {
                 if ((myf_kosuu_iro + 1 > (keshiko_aa + keshiko_bb) * 2) || (config.i_t)) {
                     score_tai = score_tmp2;
@@ -716,7 +717,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             }
             if ((myf_kosuu_iro - keshiko_aa - keshiko_bb + 8) < m_cchai * 4)
                 continue;
-            if (ba_ee[2][11] != TLColor::EMPTY) {
+            if (ba_ee[2][11] != PuyoColor::EMPTY) {
                 for (int ee = 0; ee < EE_SIZE; ee++) {
                     for (int dd = 0; dd < 221; dd++) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
@@ -765,7 +766,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
         m_score_mon = m_score_aa;
     }
     if (config.u_t == 1) {
-        if (shouldClearWariko && (((score_tai > 270) && ((m_myf_kosuu > 36) || (ba2[2][10] != TLColor::EMPTY)
+        if (shouldClearWariko && (((score_tai > 270) && ((m_myf_kosuu > 36) || (ba2[2][10] != PuyoColor::EMPTY)
                                                          || (m_aite_hakka_zenkesi == 1))) || (score_tai > 840))) {
             hym[tai_max_score] += 140000;
             m_score_mon = score_tai;
@@ -777,7 +778,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     for (int i = 0; i < 6; i++) {
         int n = 0;
         for (int j = 0; j < 13; j++) {
-            if (ba2[i][j] == TLColor::EMPTY)
+            if (ba2[i][j] == PuyoColor::EMPTY)
                 n++;
         }
         hym[i] += n * 2;
@@ -826,11 +827,11 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     // chigiri
     if (((zenkesi_own == 1) && (zenkesi_aite != 1)) || ((m_aite_hakka_honsen == 0) && (config.w_t)) || (zenkesi_aite == 1)) {
         for (int aa = 0; aa < 22; aa++) {
-            TLColor ba[6][kHeight] {};
+            PuyoColor ba[6][kHeight] {};
             copyField(ba2, ba);
             if (aa < 6) {
                 for (int j = 0; j < 13; j++) {
-                    if (ba[aa][j] == TLColor::EMPTY) {
+                    if (ba[aa][j] == PuyoColor::EMPTY) {
                         ba[aa][j] = nx1;
                         ba[aa][j + 1] = nx2;
                         break;
@@ -838,7 +839,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 }
             } else if (aa < 12) {
                 for (int j = 0; j < 13; j++) {
-                    if (ba[aa - 6][j] == TLColor::EMPTY) {
+                    if (ba[aa - 6][j] == PuyoColor::EMPTY) {
                         ba[aa - 6][j] = nx2;
                         ba[aa - 6][j + 1] = nx1;
                         break;
@@ -846,26 +847,26 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
                 }
             } else if (aa < 17) {
                 for (int j = 0; j < 13; j++) {
-                    if (ba[aa - 11][j] == TLColor::EMPTY) {
+                    if (ba[aa - 11][j] == PuyoColor::EMPTY) {
                         ba[aa - 11][j] = nx1;
                         break;
                     }
                 }
                 for (int j = 0; j < 13; j++) {
-                    if (ba[aa - 12][j] == TLColor::EMPTY) {
+                    if (ba[aa - 12][j] == PuyoColor::EMPTY) {
                         ba[aa - 12][j] = nx2;
                         break;
                     }
                 }
             } else if (aa < 22) {
                 for (int j = 0; j < 13; j++) {
-                    if (ba[aa - 17][j] == TLColor::EMPTY) {
+                    if (ba[aa - 17][j] == PuyoColor::EMPTY) {
                         ba[aa - 17][j] = nx1;
                         break;
                     }
                 }
                 for (int j = 0; j < 13; j++) {
-                    if (ba[aa - 16][j] == TLColor::EMPTY) {
+                    if (ba[aa - 16][j] == PuyoColor::EMPTY) {
                         ba[aa - 16][j] = nx2;
                         break;
                     }
@@ -876,9 +877,9 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
             int point[6][12] {};
             for (int i = 0; i < 6; i++) {
                 for (int j = 0; j < 12; j++) {
-                    if (ba[i][j] == TLColor::EMPTY)
+                    if (ba[i][j] == PuyoColor::EMPTY)
                         break;
-                    if (point[i][j] != 1 && isNormalTLColor(ba[i][j])) {
+                    if (point[i][j] != 1 && isNormalColor(ba[i][j])) {
                         saiki(ba, point, i, j, &num, ba[i][j]);
                         if (num != 0) {
                             if (num == 2)
@@ -913,7 +914,7 @@ int COMAI_HI::hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi
     return 0;
 }
 
-int COMAI_HI::tobashi_hantei_a(const TLColor ba[][kHeight], int aa, TLColor nx1, TLColor nx2)
+int COMAI_HI::tobashi_hantei_a(const PuyoColor ba[][kHeight], int aa, PuyoColor nx1, PuyoColor nx2)
 {
     if (nx1 == nx2) {
         if ((aa > 5 && aa < 12) || (aa > 13 && aa < 19))
@@ -922,19 +923,19 @@ int COMAI_HI::tobashi_hantei_a(const TLColor ba[][kHeight], int aa, TLColor nx1,
     return tobashi_hantei_b(ba, aa);
 }
 
-int COMAI_HI::tobashi_hantei_b(const TLColor ba2[][kHeight], int aa)
+int COMAI_HI::tobashi_hantei_b(const PuyoColor ba2[][kHeight], int aa)
 {
-    if (ba2[0][11] != TLColor::EMPTY) {
+    if (ba2[0][11] != PuyoColor::EMPTY) {
         if ((aa == 0) || (aa == 6) || (aa == 12) || (aa == 17))
             return 1;
     }
-    if (ba2[1][11] != TLColor::EMPTY) {
+    if (ba2[1][11] != PuyoColor::EMPTY) {
         if ((aa == 0) || (aa == 6) || (aa == 12) || (aa == 17))
             return 1;
         if ((aa == 1) || (aa == 7) || (aa == 13) || (aa == 18))
             return 1;
     }
-    if (ba2[3][11] != TLColor::EMPTY) {
+    if (ba2[3][11] != PuyoColor::EMPTY) {
         if ((aa == 3) || (aa == 9) || (aa == 14) || (aa == 19))
             return 1;
         if ((aa == 4) || (aa == 10) || (aa == 15) || (aa == 20))
@@ -942,24 +943,24 @@ int COMAI_HI::tobashi_hantei_b(const TLColor ba2[][kHeight], int aa)
         if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
             return 1;
     }
-    if (ba2[4][11] != TLColor::EMPTY) {
+    if (ba2[4][11] != PuyoColor::EMPTY) {
         if ((aa == 4) || (aa == 10) || (aa == 15) || (aa == 20))
             return 1;
         if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
             return 1;
     }
-    if (ba2[5][11] != TLColor::EMPTY) {
+    if (ba2[5][11] != PuyoColor::EMPTY) {
         if ((aa == 5) || (aa == 11) || (aa == 16) || (aa == 21))
             return 1;
     }
     return 0;
 }
 
-int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zenkesi_own, TLColor aite_ba[6][kHeight],
+int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight],
                          int zenkesi_aite, int fast)
 {
-    TLColor ba_a[6][kHeight] {};
-    TLColor ba2[6][kHeight] {};
+    PuyoColor ba_a[6][kHeight] {};
+    PuyoColor ba2[6][kHeight] {};
     int point2[6][12] = {
         {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}, {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
         {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}, {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
@@ -973,8 +974,8 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
     int setti_basyo[4];
     int myf_kosuu_kesi = 0, myf_kosuu_iro = 0;
 
-    TLColor eecol;
-    TLColor ba_ee[6][kHeight];
+    PuyoColor eecol;
+    PuyoColor ba_ee[6][kHeight];
     int keshiko_dd;
 
     int maxscore = 0;
@@ -1003,10 +1004,10 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
     m_myf_kosuu = 0;
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
-            if (ba3[i][j] != TLColor::EMPTY) {
+            if (ba3[i][j] != PuyoColor::EMPTY) {
                 m_myf_kosuu++;
             }
-            if (isNormalTLColor(ba3[i][j])) {
+            if (isNormalColor(ba3[i][j])) {
                 myf_kosuu_iro++;
             }
         }
@@ -1020,10 +1021,10 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
     int aite_ojama = 0;
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
-            if (isNormalTLColor(aite_ba[i][j])) {
+            if (isNormalColor(aite_ba[i][j])) {
                 aite_kosuu_iro++;
             }
-            if (aite_ba[i][j] != TLColor::EMPTY) {
+            if (aite_ba[i][j] != PuyoColor::EMPTY) {
                 aite_ojama++;
             }
         }
@@ -1036,12 +1037,12 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
     if ((myf_kosuu_iro >= aite_kosuu_iro * 2) && (m_cchai > 6) && (m_aite_hakka_rensa < 4))
         kes2 = 1;
 
-    TLColor nx1 = toValidTLColor(tsumo[0]);
-    TLColor nx2 = toValidTLColor(tsumo[1]);
-    TLColor nn1 = toValidTLColor(tsumo[2]);
-    TLColor nn2 = toValidTLColor(tsumo[3]);
-    TLColor nk1 = TLColor::RED;
-    TLColor nk2 = TLColor::RED;
+    PuyoColor nx1 = toValidPuyoColor(tsumo[0]);
+    PuyoColor nx2 = toValidPuyoColor(tsumo[1]);
+    PuyoColor nn1 = toValidPuyoColor(tsumo[2]);
+    PuyoColor nn2 = toValidPuyoColor(tsumo[3]);
+    PuyoColor nk1 = PuyoColor::RED;
+    PuyoColor nk2 = PuyoColor::RED;
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
             ba2[i][j] = ba3[i][j];
@@ -1148,7 +1149,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
     for (int aa = 0; aa < 22; aa++) {
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
             continue;
-        TLColor ba[6][kHeight] {};
+        PuyoColor ba[6][kHeight] {};
         copyField(ba2, ba);
         setti_puyo(ba, aa, nx1, nx2, setti_basyo);
         TLRensaResult result = simulate(ba);
@@ -1187,7 +1188,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
         myf_kosuu_kesi = 0;
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 13; j++) {
-                if (isNormalTLColor(ba[i][j])) {
+                if (isNormalColor(ba[i][j])) {
                     myf_kosuu_kesi++;
                 }
             }
@@ -1274,8 +1275,8 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
             nk1 = kTsumoPatterns[color][0];
             nk2 = kTsumoPatterns[color][1];
         } else {  // dd == 220
-            nk1 = TLColor::EMPTY;
-            nk2 = TLColor::EMPTY;
+            nk1 = PuyoColor::EMPTY;
+            nk2 = PuyoColor::EMPTY;
         }
         if (nk1 == nk2 && 5 < hand && hand < 12)
             continue;
@@ -1291,12 +1292,12 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
             int score_tmp = result_aa.score;
             int score_aonly = score_tmp; // only
             int score_tmp2 = score_tmp;
-            if ((ba_a[2][11] == TLColor::EMPTY) && (score_tmp > m_score_aa)) {
+            if ((ba_a[2][11] == PuyoColor::EMPTY) && (score_tmp > m_score_aa)) {
                 m_score_aa = score_tmp;
                 m_aa_max_score = aa;
                 m_tesuu_mon = 1;
             }
-            if ((ba_a[2][11] == TLColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
+            if ((ba_a[2][11] == PuyoColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
                 && (m_aite_hakka_jamako * 70 > score_tmp2 - 1400) && (score_tmp2 + 150 > m_aite_hakka_jamako * 70)) {
                 if ((myf_kosuu_iro - 1 > keshiko_aa * 2) || (config.i_t)) {
                     score_tai = score_tmp2;
@@ -1304,7 +1305,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
             }
             if ((myf_kosuu_iro - keshiko_aa + 8) < m_cchai * 4)
                 continue;
-            if (ba_a[2][11] != TLColor::EMPTY) {
+            if (ba_a[2][11] != PuyoColor::EMPTY) {
                 for (int bb = 0; bb < 22; bb++) {
                     for (int ee = 0; ee < EE_SIZE; ee++) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
@@ -1331,7 +1332,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                     && ((m_aite_hakka_nokori < 1)
                         || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
                     score_tmp = 0; // 0225
-                if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp > m_score_aa)) {
+                if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp > m_score_aa)) {
                     m_score_aa = score_tmp;
                     m_aa_max_score = aa;
                     m_tesuu_mon = 2;
@@ -1342,7 +1343,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                     && ((m_aite_hakka_nokori < 1)
                         || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
                     score_tmp2 = 0; // 0225
-                if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
+                if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
                     && (m_aite_hakka_jamako * 70 > score_tmp2 - 1400) && (score_tmp2 + 150 > m_aite_hakka_jamako * 70)) {
                     if ((myf_kosuu_iro + 1 > (keshiko_aa + keshiko_bb) * 2) || (config.i_t)) {
                         score_tai = score_tmp2;
@@ -1350,7 +1351,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                 }
                 if ((myf_kosuu_iro - keshiko_aa - keshiko_bb + 8) < m_cchai * 4)
                     continue;
-                if (ba_ee[2][11] != TLColor::EMPTY) {
+                if (ba_ee[2][11] != PuyoColor::EMPTY) {
                     for (int ee = 0; ee < EE_SIZE; ee++) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
                         g_poihyo[aa][bb][dd][ee] = -3000;
@@ -1372,25 +1373,25 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                         score_tmp = 0;
 
                     if (m_myf_kosuu < 56) {
-                        if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp > m_score_aa)) {
+                        if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp > m_score_aa)) {
                             m_score_aa = score_tmp;
                             m_aa_max_score = aa;
                             m_tesuu_mon = 3;
                         }
                     } else if (m_myf_kosuu < 62) {
-                        if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp * 6 / 7 > m_score_aa)) {
+                        if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp * 6 / 7 > m_score_aa)) {
                             m_score_aa = score_tmp * 6 / 7;
                             m_aa_max_score = aa;
                             m_tesuu_mon = 3;
                         }
                     } else if (m_myf_kosuu < 64) {
-                        if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp * 3 / 4 > m_score_aa)) {
+                        if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp * 3 / 4 > m_score_aa)) {
                             m_score_aa = score_tmp * 3 / 4;
                             m_aa_max_score = aa;
                             m_tesuu_mon = 3;
                         }
                     } else {
-                        if ((ba_ee[2][11] == TLColor::EMPTY) && (score_tmp * 1 / 2 > m_score_aa)) {
+                        if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp * 1 / 2 > m_score_aa)) {
                             m_score_aa = score_tmp * 1 / 2;
                             m_aa_max_score = aa;
                             m_tesuu_mon = 3;
@@ -1398,7 +1399,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                     }
                     if ((myf_kosuu_iro - keshiko_aa - keshiko_bb - keshiko_dd + 8) < m_cchai * 4)
                         continue;
-                    if (ba_ee[2][11] != TLColor::EMPTY) {
+                    if (ba_ee[2][11] != PuyoColor::EMPTY) {
                         for (int ee = 0; ee < EE_SIZE; ee++) {
                             g_chainhyk[aa][bb][dd][ee] = 0;
                             g_poihyo[aa][bb][dd][ee] = -3000;
@@ -1429,29 +1430,29 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                 }
 
                 // Penalty for field like 'U'
-                if (ba_ee[2][10] != TLColor::EMPTY)
+                if (ba_ee[2][10] != PuyoColor::EMPTY)
                     g_score_hukasa[aa][bb][dd] -= 1200;
-                if (ba_ee[3][10] != TLColor::EMPTY)
+                if (ba_ee[3][10] != PuyoColor::EMPTY)
                     g_score_hukasa[aa][bb][dd] -= 1200;
                 for (int j = 0; j < 9; j++) {
-                    if (ba_ee[0][j] == TLColor::EMPTY) {
-                        if (ba_ee[1][j + 1] != TLColor::EMPTY)
+                    if (ba_ee[0][j] == PuyoColor::EMPTY) {
+                        if (ba_ee[1][j + 1] != PuyoColor::EMPTY)
                             g_score_hukasa[aa][bb][dd] -= 300;
                         break;
                     }
                 }
                 for (int i = 1; i < 5; i++) {
                     for (int j = 0; j < 9; j++) {
-                        if (ba_ee[i][j] == TLColor::EMPTY) {
-                            if ((ba_ee[i - 1][j + 1] != TLColor::EMPTY) && (ba_ee[i + 1][j + 1] != TLColor::EMPTY))
+                        if (ba_ee[i][j] == PuyoColor::EMPTY) {
+                            if ((ba_ee[i - 1][j + 1] != PuyoColor::EMPTY) && (ba_ee[i + 1][j + 1] != PuyoColor::EMPTY))
                                 g_score_hukasa[aa][bb][dd] -= 300;
                             break;
                         }
                     }
                 }
                 for (int j = 0; j < 9; j++) {
-                    if (ba_ee[5][j] == TLColor::EMPTY) {
-                        if (ba_ee[4][j + 1] != TLColor::EMPTY)
+                    if (ba_ee[5][j] == PuyoColor::EMPTY) {
+                        if (ba_ee[4][j + 1] != PuyoColor::EMPTY)
                             g_score_hukasa[aa][bb][dd] -= 300;
                         break;
                     }
@@ -1466,7 +1467,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                 // Balanced field
                 for (int i = 0; i < 6; i++) {
                     for (int j = 0; j < 14; j++) {
-                        if (ba_ee[i][j] == TLColor::EMPTY) {
+                        if (ba_ee[i][j] == PuyoColor::EMPTY) {
                             teimen[i] = j;
                             break;
                         }
@@ -1516,59 +1517,59 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                     int eex = 0;
                     if (ee == 0) {
                         eex = 0;
-                        eecol = TLColor::EMPTY;
+                        eecol = PuyoColor::EMPTY;
                     } else {
                         eex = (ee - 1) % 6;
                         int index = (ee - 1) / 6;
                         DCHECK_LE(0, index);
-                        DCHECK_LT(index, static_cast<int>(ARRAY_SIZE(NORMAL_TLCOLORS)));
-                        eecol = NORMAL_TLCOLORS[index];
+                        DCHECK_LT(index, static_cast<int>(ARRAY_SIZE(NORMAL_PUYO_COLORS)));
+                        eecol = NORMAL_PUYO_COLORS[index];
                         if ((eex == 2) || (eex == 3))
                             continue;
-                        if (ba_ee[0][11] != TLColor::EMPTY) {
+                        if (ba_ee[0][11] != PuyoColor::EMPTY) {
                             if (eex == 0)
                                 continue;
                         }
-                        if (ba_ee[1][11] != TLColor::EMPTY) {
+                        if (ba_ee[1][11] != PuyoColor::EMPTY) {
                             if ((eex == 0) || (eex == 1))
                                 continue;
                         }
-                        if (ba_ee[3][11] != TLColor::EMPTY) {
+                        if (ba_ee[3][11] != PuyoColor::EMPTY) {
                             if ((eex == 4) || (eex == 5))
                                 continue;
                         }
-                        if (ba_ee[4][11] != TLColor::EMPTY) {
+                        if (ba_ee[4][11] != PuyoColor::EMPTY) {
                             if ((eex == 4) || (eex == 5))
                                 continue;
                         }
-                        if (ba_ee[5][11] != TLColor::EMPTY) {
+                        if (ba_ee[5][11] != PuyoColor::EMPTY) {
                             if (eex == 5)
                                 continue;
                         }
                     }
-                    TLColor ba[6][kHeight] {};
+                    PuyoColor ba[6][kHeight] {};
                     copyField(ba_ee, ba);
                     if (ee != 0) {
                         if (setti_puyo_1(ba, eex, eecol))
                             continue;
                     }
 
-                    if (ba[2][11] != TLColor::EMPTY) {
+                    if (ba[2][11] != PuyoColor::EMPTY) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
                         g_poihyo[aa][bb][dd][ee] = -3000;
                         continue;
                     }
-                    if ((ba[0][10] == TLColor::EMPTY) && (ba[1][11] != TLColor::EMPTY) && (ba2[1][11] == TLColor::EMPTY)) {
+                    if ((ba[0][10] == PuyoColor::EMPTY) && (ba[1][11] != PuyoColor::EMPTY) && (ba2[1][11] == PuyoColor::EMPTY)) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
                         g_poihyo[aa][bb][dd][ee] = -2000;
                         continue;
                     }
-                    if (((ba[5][10] == TLColor::EMPTY) || (ba[4][10] == TLColor::EMPTY)) && (ba[3][11] != TLColor::EMPTY) && (ba2[3][11] == TLColor::EMPTY)) {
+                    if (((ba[5][10] == PuyoColor::EMPTY) || (ba[4][10] == PuyoColor::EMPTY)) && (ba[3][11] != PuyoColor::EMPTY) && (ba2[3][11] == PuyoColor::EMPTY)) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
                         g_poihyo[aa][bb][dd][ee] = -2000;
                         continue;
                     }
-                    if ((ba[5][10] == TLColor::EMPTY) && (ba[4][11] != TLColor::EMPTY) && (ba2[4][11] == TLColor::EMPTY)) {
+                    if ((ba[5][10] == PuyoColor::EMPTY) && (ba[4][11] != PuyoColor::EMPTY) && (ba2[4][11] == PuyoColor::EMPTY)) {
                         g_chainhyk[aa][bb][dd][ee] = 0;
                         g_poihyo[aa][bb][dd][ee] = -2000;
                         continue;
@@ -1576,44 +1577,44 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                     for (int i = 0; i < 6; i++) {
                         for (int j = 0; j < 12; j++) {
                             point2[i][j] = 8;
-                            if (isNormalTLColor(ba[i][j])) {
-                                if (i != 5 && ba[i][j + 1] == TLColor::EMPTY && ba[i + 1][j] == TLColor::EMPTY) {
-                                    if (j != 11 && (i != 4 || ba[3][11] == TLColor::EMPTY)) {
+                            if (isNormalColor(ba[i][j])) {
+                                if (i != 5 && ba[i][j + 1] == PuyoColor::EMPTY && ba[i + 1][j] == PuyoColor::EMPTY) {
+                                    if (j != 11 && (i != 4 || ba[3][11] == PuyoColor::EMPTY)) {
                                         point2[i][j] = 2;
                                         point2[i][j + 1] = 9;
                                         break;
                                     }
                                 }
-                                if (i != 0 && ba[i][j + 1] == TLColor::EMPTY && ba[i - 1][j] == TLColor::EMPTY) {
-                                    if (j != 11 && (i != 5 || ba[3][11] == TLColor::EMPTY)) {
+                                if (i != 0 && ba[i][j + 1] == PuyoColor::EMPTY && ba[i - 1][j] == PuyoColor::EMPTY) {
+                                    if (j != 11 && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
                                         point2[i][j] = 3;
                                         point2[i][j + 1] = 9;
                                         break;
                                     }
                                 }
-                                if (ba[i][j + 1] == TLColor::EMPTY) {
-                                    if (j != 11 &&  (i != 0 || ba[1][11] == TLColor::EMPTY) && (i != 4 || ba[3][11] == TLColor::EMPTY)
-                                        && (i != 5 || (ba[3][11] == TLColor::EMPTY && ba[4][11] == TLColor::EMPTY))) {
+                                if (ba[i][j + 1] == PuyoColor::EMPTY) {
+                                    if (j != 11 &&  (i != 0 || ba[1][11] == PuyoColor::EMPTY) && (i != 4 || ba[3][11] == PuyoColor::EMPTY)
+                                        && (i != 5 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))) {
                                         point2[i][j] = 4;
                                         point2[i][j + 1] = 9;
                                         break;
                                     }
                                 }
-                                if ((i !=  5 && ba[i + 1][j] == TLColor::EMPTY) && (i != 0 && ba[i - 1][j] == TLColor::EMPTY)) {
-                                    if (ba[i][11] == TLColor::EMPTY) {
+                                if ((i !=  5 && ba[i + 1][j] == PuyoColor::EMPTY) && (i != 0 && ba[i - 1][j] == PuyoColor::EMPTY)) {
+                                    if (ba[i][11] == PuyoColor::EMPTY) {
                                         point2[i][j] = 5;
                                         continue;
                                     }
                                 }
-                                if (i != 5 && ba[i + 1][j] == TLColor::EMPTY) {
-                                    if (((i != 4) || ((ba[3][11] == TLColor::EMPTY) && (ba[4][11] == TLColor::EMPTY)))
-                                        && ((i != 3) || (ba[3][11] == TLColor::EMPTY))) {
+                                if (i != 5 && ba[i + 1][j] == PuyoColor::EMPTY) {
+                                    if (((i != 4) || ((ba[3][11] == PuyoColor::EMPTY) && (ba[4][11] == PuyoColor::EMPTY)))
+                                        && ((i != 3) || (ba[3][11] == PuyoColor::EMPTY))) {
                                         point2[i][j] = 6;
                                         continue;
                                     }
                                 }
-                                if (i != 0 && ba[i - 1][j] == TLColor::EMPTY) {
-                                    if (((i != 1) || (ba[1][11] == TLColor::EMPTY)) && ((i != 5) || (ba[3][11] == TLColor::EMPTY))) {
+                                if (i != 0 && ba[i - 1][j] == PuyoColor::EMPTY) {
+                                    if (((i != 1) || (ba[1][11] == PuyoColor::EMPTY)) && ((i != 5) || (ba[3][11] == PuyoColor::EMPTY))) {
                                         point2[i][j] = 7;
                                         continue;
                                     }
@@ -1622,7 +1623,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                         }
                     }
 
-                    TLColor bass[6][kHeight] {};
+                    PuyoColor bass[6][kHeight] {};
                     int num2 = 3;
                     for (int i2 = 0; i2 < 6; i2++) {
                         hakkatakasa = 0;
@@ -1668,9 +1669,9 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                                 num = 0;
                                 for (int i = 0; i < 6; i++) {
                                     for (int j = 0; j < 12; j++) {
-                                        if (bass[i][j] == TLColor::EMPTY)
+                                        if (bass[i][j] == PuyoColor::EMPTY)
                                             break;
-                                        if (point[i][j] != 1 && isNormalTLColor(bass[i][j])) {
+                                        if (point[i][j] != 1 && isNormalColor(bass[i][j])) {
                                             saiki(bass, point, i, j, &num, bass[i][j]);
                                             pois = pois + num * num * num;
                                             num = 0;
@@ -1684,7 +1685,7 @@ int COMAI_HI::pre_hyouka(const TLColor ba3[6][kHeight], TLColor tsumo[], int zen
                             if (chain > m_cchai - 3) {
                                 for (int i = 0; i < 5; i++) {
                                     for (int j = 0; j < yokotate; j++) {
-                                        if (isNormalTLColor(bass[i][j])) {
+                                        if (isNormalColor(bass[i][j])) {
                                             if (bass[i][j] == bass[i + 1][j])
                                                 pois += yokopoint;
                                         }
