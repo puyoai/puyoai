@@ -4,7 +4,7 @@
 
 namespace test_lockit {
 
-int gtr(const TLColor field[][kHeight])
+int gtr(const PuyoColor field[][kHeight])
 {
     int score = 0;
 
@@ -16,9 +16,9 @@ int gtr(const TLColor field[][kHeight])
         {0, 1, 0, 2}, {0, 1, 1, 1}, {1, 1, 0, 2},
     };
     for (const auto& same : expect_same) {
-        TLColor c0 = field[same.x0][same.y0];
-        TLColor c1 = field[same.x1][same.y1];
-        if (c0 == TLColor::EMPTY || c1 == TLColor::EMPTY)
+        PuyoColor c0 = field[same.x0][same.y0];
+        PuyoColor c1 = field[same.x1][same.y1];
+        if (c0 == PuyoColor::EMPTY || c1 == PuyoColor::EMPTY)
             continue;
         if (c0 == c1)
             score += 1000;
@@ -35,9 +35,9 @@ int gtr(const TLColor field[][kHeight])
         {1, 0, 2, 0, 1000}, {2, 1, 2, 0, 1000},
     };
     for (const auto& diff : expect_diff) {
-        TLColor c0 = field[diff.x0][diff.y0];
-        TLColor c1 = field[diff.x1][diff.y1];
-        if (c0 != TLColor::EMPTY && c0 == c1)
+        PuyoColor c0 = field[diff.x0][diff.y0];
+        PuyoColor c1 = field[diff.x1][diff.y1];
+        if (c0 != PuyoColor::EMPTY && c0 == c1)
             score -= diff.penalty;
     }
 

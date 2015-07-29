@@ -34,7 +34,7 @@ TEST(FieldTest, Saiki) {
         {1, 11, 2}, {2, 11, 2}
     };
 
-    TLColor field[6][kHeight];
+    PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
     int expect_points = 0;
@@ -77,7 +77,7 @@ TEST(FieldTest, countNormalColor13)
         "R.OOO."
     );
 
-    TLColor field[6][kHeight];
+    PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
     EXPECT_EQ(13, countNormalColor13(field));
@@ -101,30 +101,30 @@ TEST(FieldTest, settiOjama)
         "OOOOOO"
     );
 
-    TLColor field[6][kHeight];
+    PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
     setti_ojama(field, 18);
 
-    EXPECT_EQ(TLColor::OJAMA, field[0][12]);
-    EXPECT_EQ(TLColor::OJAMA, field[1][12]);
-    EXPECT_EQ(TLColor::OJAMA, field[2][12]);
-    EXPECT_EQ(TLColor::OJAMA, field[3][12]);
-    EXPECT_EQ(TLColor::EMPTY, field[4][12]);
-    EXPECT_EQ(TLColor::EMPTY, field[5][12]);
+    EXPECT_EQ(PuyoColor::OJAMA, field[0][12]);
+    EXPECT_EQ(PuyoColor::OJAMA, field[1][12]);
+    EXPECT_EQ(PuyoColor::OJAMA, field[2][12]);
+    EXPECT_EQ(PuyoColor::OJAMA, field[3][12]);
+    EXPECT_EQ(PuyoColor::EMPTY, field[4][12]);
+    EXPECT_EQ(PuyoColor::EMPTY, field[5][12]);
 
-    EXPECT_EQ(TLColor::EMPTY, field[0][13]);
-    EXPECT_EQ(TLColor::EMPTY, field[1][13]);
-    EXPECT_EQ(TLColor::EMPTY, field[2][13]);
-    EXPECT_EQ(TLColor::EMPTY, field[3][13]);
-    EXPECT_EQ(TLColor::EMPTY, field[4][13]);
-    EXPECT_EQ(TLColor::EMPTY, field[5][13]);
+    EXPECT_EQ(PuyoColor::EMPTY, field[0][13]);
+    EXPECT_EQ(PuyoColor::EMPTY, field[1][13]);
+    EXPECT_EQ(PuyoColor::EMPTY, field[2][13]);
+    EXPECT_EQ(PuyoColor::EMPTY, field[3][13]);
+    EXPECT_EQ(PuyoColor::EMPTY, field[4][13]);
+    EXPECT_EQ(PuyoColor::EMPTY, field[5][13]);
 }
 
 TEST(FieldTest, simulate_basic)
 {
     CoreField cf("RRRR..");
-    TLColor field[6][kHeight];
+    PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
     TLRensaResult result = simulate(field);
@@ -141,7 +141,7 @@ TEST(FieldTest, simulate_chain)
         "..B..."
         "..BBYB"
         "RRRRBB");
-    TLColor field[6][kHeight];
+    PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
     TLRensaResult result = simulate(field);
@@ -158,7 +158,7 @@ TEST(FieldTest, simulate_1_double)
     CoreField cf(
         "..BBBB"
         "RRRRRR");
-    TLColor field[6][kHeight];
+    PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
     TLRensaResult result = simulate(field);
@@ -192,7 +192,7 @@ TEST(FieldTest, simulate_2_double)
         ".R...."
         ".RYR.R"
         "RYYYRR");
-    TLColor field[6][kHeight];
+    PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
     TLRensaResult result = simulate(field);

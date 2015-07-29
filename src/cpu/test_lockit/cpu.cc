@@ -39,37 +39,37 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
     {
         const KumipuyoSeq& seq = request.myPlayerFrameRequest().kumipuyoSeq;
         for (int i = 0; i < 6; ++i) {
-            p1->tsumo[i] = TLColor::UNKNOWN;
+            p1->tsumo[i] = PuyoColor::IRON;
         }
         if (seq.size() >= 1) {
-            p1->tsumo[0] = toTLColor(seq.axis(0));
-            p1->tsumo[1] = toTLColor(seq.child(0));
+            p1->tsumo[0] = seq.axis(0);
+            p1->tsumo[1] = seq.child(0);
         }
         if (seq.size() >= 2) {
-            p1->tsumo[2] = toTLColor(seq.axis(1));
-            p1->tsumo[3] = toTLColor(seq.child(1));
+            p1->tsumo[2] = seq.axis(1);
+            p1->tsumo[3] = seq.child(1);
         }
         if (seq.size() >= 3) {
-            p1->tsumo[4] = toTLColor(seq.axis(2));
-            p1->tsumo[5] = toTLColor(seq.child(2));
+            p1->tsumo[4] = seq.axis(2);
+            p1->tsumo[5] = seq.child(2);
         }
     }
     {
         const KumipuyoSeq& seq = request.enemyPlayerFrameRequest().kumipuyoSeq;
         for (int i = 0; i < 6; ++i) {
-            p2->tsumo[i] = TLColor::UNKNOWN;
+            p2->tsumo[i] = PuyoColor::IRON;
         }
         if (seq.size() >= 1) {
-            p2->tsumo[0] = toTLColor(seq.axis(0));
-            p2->tsumo[1] = toTLColor(seq.child(0));
+            p2->tsumo[0] = seq.axis(0);
+            p2->tsumo[1] = seq.child(0);
         }
         if (seq.size() >= 2) {
-            p2->tsumo[2] = toTLColor(seq.axis(1));
-            p2->tsumo[3] = toTLColor(seq.child(1));
+            p2->tsumo[2] = seq.axis(1);
+            p2->tsumo[3] = seq.child(1);
         }
         if (seq.size() >= 3) {
-            p2->tsumo[4] = toTLColor(seq.axis(2));
-            p2->tsumo[5] = toTLColor(seq.child(2));
+            p2->tsumo[4] = seq.axis(2);
+            p2->tsumo[5] = seq.child(2);
         }
     }
 
@@ -77,7 +77,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
         const PlainField& pf = request.myPlayerFrameRequest().field;
         for (int x = 0; x < 6; ++x) {
             for (int y = 0; y < 14; ++y) {
-                p1->field[x][y] = toTLColor(pf.color(x + 1, y + 1));
+                p1->field[x][y] = pf.color(x + 1, y + 1);
             }
         }
     }
@@ -85,7 +85,7 @@ void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI*
         const PlainField& pf = request.enemyPlayerFrameRequest().field;
         for (int x = 0; x < 6; ++x) {
             for (int y = 0; y < 14; ++y) {
-                p2->field[x][y] = toTLColor(pf.color(x + 1, y + 1));
+                p2->field[x][y] = pf.color(x + 1, y + 1);
             }
         }
     }
@@ -125,14 +125,14 @@ FrameResponse sendmes(READ_P* p1, COMAI_HI* coo)
     return FrameResponse(p1->id, Decision(p1->te_x, p1->te_r), ss.str());
 }
 
-bool isTsumoValid(TLColor tsumo[6])
+bool isTsumoValid(PuyoColor tsumo[6])
 {
     // HACK(mayah): Check only [2, 4).
     // [0, 2) might be EMPTY before the game has started.
     // [4, 6) might be EMPTY before WNEXT come.
     for (int i = 2; i < 4; ++i) {
-        TLColor c = tsumo[i];
-        if (!isNormalTLColor(c))
+        PuyoColor c = tsumo[i];
+        if (!isNormalColor(c))
             return false;
     }
 
@@ -197,7 +197,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         int field_kosuu = 0;
         for (int i = 0; i < 6; ++i) {
             for (int j = 0; j < kHeight; ++j) {
-                if (r_player[0].field[i][j] != TLColor::EMPTY) {
+                if (r_player[0].field[i][j] != PuyoColor::EMPTY) {
                     ++field_kosuu;
                 }
             }
@@ -207,10 +207,10 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
             field_kosuu = 0;
         }
 
-        TLColor field2x[6][kHeight] {};
+        PuyoColor field2x[6][kHeight] {};
         for (int i = 0; i < 6; ++i) {
             for (int j = 0; j < 14; ++j) {
-                field2x[i][j] = (j + 4 < kHeight) ? r_player[0].field[i][j+4] : TLColor::EMPTY;
+                field2x[i][j] = (j + 4 < kHeight) ? r_player[0].field[i][j+4] : PuyoColor::EMPTY;
             }
         }
 
