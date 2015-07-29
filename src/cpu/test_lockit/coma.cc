@@ -12,8 +12,8 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
+#include "core/puyo_color.h"
 
-#include "color.h"
 #include "field.h"
 #include "rensa_result.h"
 #include "template.h"
@@ -57,6 +57,15 @@ int isChigiri(int cells[]) {
         return 1;
     else
         return 0;
+}
+
+PuyoColor toValidPuyoColor(PuyoColor c)
+{
+    // HACK(peria): Convert an unknown color to RED to avoid out-of-range.
+    // NOTE: We can use other colors insted, but use only RED to keep code simple.
+    if (c == PuyoColor::IRON)
+        return PuyoColor::RED;
+    return c;
 }
 
 }  // namespace

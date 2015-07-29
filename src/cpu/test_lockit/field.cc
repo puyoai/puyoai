@@ -3,7 +3,7 @@
 #include <glog/logging.h>
 
 #include "base/small_int_set.h"
-#include "color.h"
+#include "core/puyo_color.h"
 #include "core/field_constant.h"
 #include "core/score.h"
 #include "rensa_result.h"

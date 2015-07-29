@@ -1,6 +1,7 @@
 #include "template.h"
 
-#include "color.h"
+#include "core/puyo_color.h"
+#include "lockit_constant.h"
 
 namespace test_lockit {
 

@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-#include "color.h"
+#include "core/puyo_color.h"
 #include "field.h"
 
 using namespace std;
