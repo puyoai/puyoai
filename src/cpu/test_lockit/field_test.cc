@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "core/core_field.h"
+#include "core/puyo_color.h"
 #include "lockit_constant.h"
 #include "rensa_result.h"
 #include "util.h"
@@ -174,7 +175,7 @@ TEST(FieldTest, simulate_double_cornercase)
     CoreField cf(
         "BB..BB"
         "BB..BB");
-    TLColor field[6][kHeight];
+    PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
     TLRensaResult result = simulate(field);
