@@ -6,7 +6,7 @@
 
 namespace test_lockit {
 
-int gtr(const TLColor f[][kHeight]);
+int gtr(const PuyoColor f[][kHeight]);
 
 }  // namespace test_lockit
 
