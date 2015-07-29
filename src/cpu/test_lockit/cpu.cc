@@ -7,8 +7,6 @@
 #include "core/puyo_color.h"
 #include "core/frame_request.h"
 #include "core/frame_response.h"
-
-#include "color.h"
 #include "field.h"
 #include "util.h"
 

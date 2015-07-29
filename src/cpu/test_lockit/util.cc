@@ -3,8 +3,6 @@
 #include "core/core_field.h"
 #include "core/puyo_color.h"
 
-#include "color.h"
-
 namespace test_lockit {
 
 CoreField toCoreField(PuyoColor f[6][kHeight]) {

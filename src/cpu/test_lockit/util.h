@@ -2,8 +2,6 @@
 #define CPU_TEST_LOCKIT_UTIL_H_
 
 #include "core/puyo_color.h"
-
-#include "color.h"
 #include "lockit_constant.h"
 
 class CoreField;
