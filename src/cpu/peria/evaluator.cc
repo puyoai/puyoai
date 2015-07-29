@@ -1,6 +1,7 @@
 #include "evaluator.h"
 
 #include <cmath>
+#include <cstdlib>
 #include <algorithm>
 #include <numeric>
 #include <sstream>
@@ -42,7 +43,8 @@ void Evaluator::EvalPlan(const RefPlan& plan) {
     score += genre.score;
   }
 
-  if (control->score < score - 70 || exp(control->score - score) < rand() * (1.0 / 0x7fffffff)) {
+  // TODO: Use better randomness.
+  if (control->score < score - 70 || std::exp(control->score - score) < rand() * (1.0 / 0x7fffffff)) {
     control->decision = plan.decisions().front();
     control->score = score;
     control->message = oss.str().substr(1);  // remove first ','
