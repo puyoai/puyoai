@@ -7,22 +7,22 @@
 
 namespace test_lockit {
 
-CoreField toCoreField(TLColor f[6][kHeight]) {
+CoreField toCoreField(PuyoColor f[6][kHeight]) {
     CoreField cf;
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < kHeight; ++j) {
-            if (f[i][j] == TLColor::EMPTY)
+            if (f[i][j] == PuyoColor::EMPTY)
                 break;
-            cf.dropPuyoOn(i + 1, toPuyoColor(TLColor(f[i][j])));
+            cf.dropPuyoOn(i + 1, f[i][j]);
         }
     }
     return cf;
 }
 
-void toTLField(const CoreField& cf, TLColor f[6][kHeight]) {
+void toTLField(const CoreField& cf, PuyoColor f[6][kHeight]) {
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < kHeight; ++j) {
-            f[i][j] = toTLColor(cf.color(i + 1, j + 1));
+            f[i][j] = cf.color(i + 1, j + 1);
         }
     }
 }

@@ -7,48 +7,7 @@
 
 namespace test_lockit {
 
-// PuyoColor for test_lockit. When all puyo color is converted to this enum,
-// the real PuyoColor should be used.
-enum class TLColor {
-    EMPTY = 0,
-    RED = 1,
-    BLUE = 2,
-    YELLOW = 3,
-    GREEN = 4,
-    OJAMA = 9,
-
-    // TODO(peria): Drop this item.
-    UNKNOWN = 10,
-};
-
-inline int ordinal(TLColor c) { return static_cast<int>(c); }
-std::ostream& operator<<(std::ostream&, TLColor c);
-
-inline bool isNormalTLColor(TLColor color)
-{
-    switch (color) {
-    case TLColor::RED:
-    case TLColor::BLUE:
-    case TLColor::YELLOW:
-    case TLColor::GREEN:
-        return true;
-    default:
-        return false;
-    }
-}
-
-const TLColor NORMAL_TLCOLORS[] = {
-    TLColor::RED,
-    TLColor::BLUE,
-    TLColor::YELLOW,
-    TLColor::GREEN,
-};
-
-// Color coverter
-TLColor toTLColor(PuyoColor pc);
-PuyoColor toPuyoColor(TLColor c);
-
-TLColor toValidTLColor(TLColor c);
+PuyoColor toValidPuyoColor(PuyoColor c);
 
 }  // namespace test_lockit
 

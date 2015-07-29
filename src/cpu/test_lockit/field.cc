@@ -12,27 +12,27 @@ namespace test_lockit {
 
 namespace {
 
-void saiki_right(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
-void saiki_left(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
-void saiki_up(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
-void saiki_down(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
+void saiki_right(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
+void saiki_left(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
+void saiki_up(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
+void saiki_down(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
 
-void saiki_3_right(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
-void saiki_3_left(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
-void saiki_3_up(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
-void saiki_3_down(const TLColor[][kHeight], int[][12], int, int, int*, TLColor);
+void saiki_3_right(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
+void saiki_3_left(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
+void saiki_3_up(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
+void saiki_3_down(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
 
-void syou_right(TLColor[][kHeight], int, int, TLColor, int[]);
-void syou_left(TLColor[][kHeight], int, int, TLColor, int[]);
-void syou_up(TLColor[][kHeight], int, int, TLColor, int[]);
-void syou_down(TLColor[][kHeight], int, int, TLColor, int[]);
+void syou_right(PuyoColor[][kHeight], int, int, PuyoColor, int[]);
+void syou_left(PuyoColor[][kHeight], int, int, PuyoColor, int[]);
+void syou_up(PuyoColor[][kHeight], int, int, PuyoColor, int[]);
+void syou_down(PuyoColor[][kHeight], int, int, PuyoColor, int[]);
 
-void syou_right_num(TLColor[][kHeight], int, int, TLColor, int[], int*);
-void syou_left_num(TLColor[][kHeight], int, int, TLColor, int[], int*);
-void syou_up_num(TLColor[][kHeight], int, int, TLColor, int[], int*);
-void syou_down_num(TLColor[][kHeight], int, int, TLColor, int[], int*);
+void syou_right_num(PuyoColor[][kHeight], int, int, PuyoColor, int[], int*);
+void syou_left_num(PuyoColor[][kHeight], int, int, PuyoColor, int[], int*);
+void syou_up_num(PuyoColor[][kHeight], int, int, PuyoColor, int[], int*);
+void syou_down_num(PuyoColor[][kHeight], int, int, PuyoColor, int[], int*);
 
-void saiki_right(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
+void saiki_right(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -44,7 +44,7 @@ void saiki_right(const TLColor ba[][kHeight], int point[][12], int x, int y, int
         saiki_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_left(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
+void saiki_left(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -56,7 +56,7 @@ void saiki_left(const TLColor ba[][kHeight], int point[][12], int x, int y, int*
         saiki_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_up(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
+void saiki_up(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -68,7 +68,7 @@ void saiki_up(const TLColor ba[][kHeight], int point[][12], int x, int y, int* n
         saiki_right(ba, point, x + 1, y, num, incol);
 }
 
-void saiki_down(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
+void saiki_down(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -80,7 +80,7 @@ void saiki_down(const TLColor ba[][kHeight], int point[][12], int x, int y, int*
         saiki_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_3_right(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
+void saiki_3_right(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -92,7 +92,7 @@ void saiki_3_right(const TLColor ba[][kHeight], int point[][12], int x, int y, i
         saiki_3_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_3_left(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
+void saiki_3_left(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -104,7 +104,7 @@ void saiki_3_left(const TLColor ba[][kHeight], int point[][12], int x, int y, in
         saiki_3_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_3_up(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
+void saiki_3_up(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -116,7 +116,7 @@ void saiki_3_up(const TLColor ba[][kHeight], int point[][12], int x, int y, int*
         saiki_3_right(ba, point, x + 1, y, num, incol);
 }
 
-void saiki_3_down(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
+void saiki_3_down(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -128,188 +128,188 @@ void saiki_3_down(const TLColor ba[][kHeight], int point[][12], int x, int y, in
         saiki_3_down(ba, point, x, y - 1, num, incol);
 }
 
-void syou_right(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[])
+void syou_right(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[])
 {
-    ba[x][y] = TLColor::EMPTY;
+    ba[x][y] = PuyoColor::EMPTY;
     flg[x] = 1;
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
-        ba[x][y + 1] = TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == PuyoColor::OJAMA))
+        ba[x][y + 1] = PuyoColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
-        ba[x + 1][y] = TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == PuyoColor::OJAMA)) {
+        ba[x + 1][y] = PuyoColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
-        ba[x][y - 1] = TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == PuyoColor::OJAMA))
+        ba[x][y - 1] = PuyoColor::EMPTY;
 }
 
-void syou_left(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[])
+void syou_left(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[])
 {
-    ba[x][y] = TLColor::EMPTY;
+    ba[x][y] = PuyoColor::EMPTY;
     flg[x] = 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
-        ba[x - 1][y] = TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == PuyoColor::OJAMA)) {
+        ba[x - 1][y] = PuyoColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
-        ba[x][y + 1] = TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == PuyoColor::OJAMA))
+        ba[x][y + 1] = PuyoColor::EMPTY;
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
-        ba[x][y - 1] = TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == PuyoColor::OJAMA))
+        ba[x][y - 1] = PuyoColor::EMPTY;
 }
 
-void syou_up(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[])
+void syou_up(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[])
 {
-    ba[x][y] = TLColor::EMPTY;
+    ba[x][y] = PuyoColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
-        ba[x - 1][y] = TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == PuyoColor::OJAMA)) {
+        ba[x - 1][y] = PuyoColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
-        ba[x][y + 1] = TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == PuyoColor::OJAMA))
+        ba[x][y + 1] = PuyoColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
-        ba[x + 1][y] = TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == PuyoColor::OJAMA)) {
+        ba[x + 1][y] = PuyoColor::EMPTY;
         flg[x + 1] = 1;
     }
 }
 
-void syou_down(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[])
+void syou_down(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[])
 {
-    ba[x][y] = TLColor::EMPTY;
+    ba[x][y] = PuyoColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
-        ba[x - 1][y] = TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == PuyoColor::OJAMA)) {
+        ba[x - 1][y] = PuyoColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
-        ba[x + 1][y] = TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == PuyoColor::OJAMA)) {
+        ba[x + 1][y] = PuyoColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
-        ba[x][y - 1] = TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == PuyoColor::OJAMA))
+        ba[x][y - 1] = PuyoColor::EMPTY;
 }
 
-void syou_right_num(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num)
+void syou_right_num(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[], int* num)
 {
-    ba[x][y] = TLColor::EMPTY;
+    ba[x][y] = PuyoColor::EMPTY;
     flg[x] = 1;
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up_num(ba, x, y + 1, incol, flg, num);
-    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
-        ba[x][y + 1] = TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == PuyoColor::OJAMA))
+        ba[x][y + 1] = PuyoColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
-        ba[x + 1][y] = TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == PuyoColor::OJAMA)) {
+        ba[x + 1][y] = PuyoColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
-        ba[x][y - 1] = TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == PuyoColor::OJAMA))
+        ba[x][y - 1] = PuyoColor::EMPTY;
 }
 
-void syou_left_num(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num)
+void syou_left_num(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[], int* num)
 {
-    ba[x][y] = TLColor::EMPTY;
+    ba[x][y] = PuyoColor::EMPTY;
     flg[x] = 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
-        ba[x - 1][y] = TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == PuyoColor::OJAMA)) {
+        ba[x - 1][y] = PuyoColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up_num(ba, x, y + 1, incol, flg, num);
-    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
-        ba[x][y + 1] = TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == PuyoColor::OJAMA))
+        ba[x][y + 1] = PuyoColor::EMPTY;
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
-        ba[x][y - 1] = TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == PuyoColor::OJAMA))
+        ba[x][y - 1] = PuyoColor::EMPTY;
 }
 
-void syou_up_num(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num)
+void syou_up_num(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[], int* num)
 {
-    ba[x][y] = TLColor::EMPTY;
+    ba[x][y] = PuyoColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
-        ba[x - 1][y] = TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == PuyoColor::OJAMA)) {
+        ba[x - 1][y] = PuyoColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up_num(ba, x, y + 1, incol, flg, num);
-    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
-        ba[x][y + 1] = TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == PuyoColor::OJAMA))
+        ba[x][y + 1] = PuyoColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
-        ba[x + 1][y] = TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == PuyoColor::OJAMA)) {
+        ba[x + 1][y] = PuyoColor::EMPTY;
         flg[x + 1] = 1;
     }
 }
 
-void syou_down_num(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num)
+void syou_down_num(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[], int* num)
 {
-    ba[x][y] = TLColor::EMPTY;
+    ba[x][y] = PuyoColor::EMPTY;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
-        ba[x - 1][y] = TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == PuyoColor::OJAMA)) {
+        ba[x - 1][y] = PuyoColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
-        ba[x + 1][y] = TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == PuyoColor::OJAMA)) {
+        ba[x + 1][y] = PuyoColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
-        ba[x][y - 1] = TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == PuyoColor::OJAMA))
+        ba[x][y - 1] = PuyoColor::EMPTY;
 }
 
 } // namespace
 
-bool isTLFieldEmpty(const TLColor field[6][kHeight])
+bool isTLFieldEmpty(const PuyoColor field[6][kHeight])
 {
     for (int i = 0; i < 6; ++i) {
-        if (field[i][0] != TLColor::EMPTY) {
+        if (field[i][0] != PuyoColor::EMPTY) {
             return false;
         }
     }
     return true;
 }
 
-int countNormalColor13(const TLColor f[][kHeight])
+int countNormalColor13(const PuyoColor f[][kHeight])
 {
     int n = 0;
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
-            if (isNormalTLColor(f[i][j]))
+            if (isNormalColor(f[i][j]))
                 ++n;
         }
     }
@@ -317,7 +317,7 @@ int countNormalColor13(const TLColor f[][kHeight])
     return n;
 }
 
-void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight])
+void copyField(const PuyoColor src[][kHeight], PuyoColor dst[][kHeight])
 {
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < kHeight; ++j) {
@@ -326,7 +326,7 @@ void copyField(const TLColor src[][kHeight], TLColor dst[][kHeight])
     }
 }
 
-TLRensaResult simulate(TLColor field[][kHeight])
+TLRensaResult simulate(PuyoColor field[][kHeight])
 {
     // Assume all puyos are grounded.
     // TODO: add DCHECK to check it.
@@ -350,10 +350,10 @@ TLRensaResult simulate(TLColor field[][kHeight])
         // check connections and vanish
         for (int i = 0; i < 6; ++i) {
             for (int j = bottom[i]; j < 12; ++j) {
-                TLColor color = field[i][j];
-                if (color == TLColor::EMPTY)
+                PuyoColor color = field[i][j];
+                if (color == PuyoColor::EMPTY)
                     continue;
-                if (point[i][j] != 1 && isNormalTLColor(color)) {
+                if (point[i][j] != 1 && isNormalColor(color)) {
                     int num = 0;
                     saiki(field, point, i, j, &num, color);
                     if (num >= 4) {
@@ -380,13 +380,13 @@ TLRensaResult simulate(TLColor field[][kHeight])
             if (rakkaflg[i]) {
                 int n = 0;
                 for (int j = 0; j < 13; ++j) {
-                    if (field[i][j] == TLColor::EMPTY) {
+                    if (field[i][j] == PuyoColor::EMPTY) {
                         if (n == 0)
                             bottom[i] = j;
                         n++;
                     } else if (n != 0) {
                         field[i][j - n] = field[i][j];
-                        field[i][j] = TLColor::EMPTY;
+                        field[i][j] = PuyoColor::EMPTY;
                         quick = false;
                     }
                 }
@@ -416,9 +416,9 @@ TLRensaResult simulate(TLColor field[][kHeight])
     return result;
 }
 
-void saiki(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
+void saiki(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
-    DCHECK(isNormalTLColor(incol))
+    DCHECK(isNormalColor(incol))
             << "saiki(x=" << x << ",y=" << y << ",incol=" << incol << ")";
 
     point[x][y] = 1;
@@ -433,7 +433,7 @@ void saiki(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num,
         saiki_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_3(const TLColor ba[][kHeight], int point[][12], int x, int y, int* num, TLColor incol)
+void saiki_3(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
     point[x][y] = 1;
     *num += 1;
@@ -447,9 +447,9 @@ void saiki_3(const TLColor ba[][kHeight], int point[][12], int x, int y, int* nu
         saiki_3_down(ba, point, x, y - 1, num, incol);
 }
 
-void saiki_4(TLColor ba[][kHeight], int x, int y, int* num, TLColor incol)
+void saiki_4(PuyoColor ba[][kHeight], int x, int y, int* num, PuyoColor incol)
 {
-    ba[x][y] = TLColor::EMPTY;
+    ba[x][y] = PuyoColor::EMPTY;
     *num += 1;
     if (*num > 3) {
         ba[x][y] = incol;
@@ -466,54 +466,54 @@ void saiki_4(TLColor ba[][kHeight], int x, int y, int* num, TLColor incol)
     ba[x][y] = incol;
 }
 
-void syou(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[])
+void syou(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[])
 {
-    ba[x][y] = TLColor::EMPTY;
+    ba[x][y] = PuyoColor::EMPTY;
     flg[x] = 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left(ba, x - 1, y, incol, flg);
-    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
-        ba[x - 1][y] = TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == PuyoColor::OJAMA)) {
+        ba[x - 1][y] = PuyoColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((y != 11) && (ba[x][y + 1] == incol))
         syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == TLColor::OJAMA))
-        ba[x][y + 1] = TLColor::EMPTY;
+    if ((y != 11) && (ba[x][y + 1] == PuyoColor::OJAMA))
+        ba[x][y + 1] = PuyoColor::EMPTY;
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
-        ba[x + 1][y] = TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == PuyoColor::OJAMA)) {
+        ba[x + 1][y] = PuyoColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
-        ba[x][y - 1] = TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == PuyoColor::OJAMA))
+        ba[x][y - 1] = PuyoColor::EMPTY;
 }
 
-void syou_downx(TLColor ba[][kHeight], int x, int y, TLColor incol, int flg[], int* num)
+void syou_downx(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[], int* num)
 {
     *num += 1;
     if ((x != 0) && (ba[x - 1][y] == incol))
         syou_left_num(ba, x - 1, y, incol, flg, num);
-    if ((x != 0) && (ba[x - 1][y] == TLColor::OJAMA)) {
-        ba[x - 1][y] = TLColor::EMPTY;
+    if ((x != 0) && (ba[x - 1][y] == PuyoColor::OJAMA)) {
+        ba[x - 1][y] = PuyoColor::EMPTY;
         flg[x - 1] = 1;
     }
     if ((x != 5) && (ba[x + 1][y] == incol))
         syou_right_num(ba, x + 1, y, incol, flg, num);
-    if ((x != 5) && (ba[x + 1][y] == TLColor::OJAMA)) {
-        ba[x + 1][y] = TLColor::EMPTY;
+    if ((x != 5) && (ba[x + 1][y] == PuyoColor::OJAMA)) {
+        ba[x + 1][y] = PuyoColor::EMPTY;
         flg[x + 1] = 1;
     }
     if ((y != 0) && (ba[x][y - 1] == incol))
         syou_down_num(ba, x, y - 1, incol, flg, num);
-    if ((y != 0) && (ba[x][y - 1] == TLColor::OJAMA))
-        ba[x][y - 1] = TLColor::EMPTY;
+    if ((y != 0) && (ba[x][y - 1] == PuyoColor::OJAMA))
+        ba[x][y - 1] = PuyoColor::EMPTY;
 }
 
-bool setti_puyo(TLColor ba[][kHeight], int aa, TLColor nx1, TLColor nx2, int setti_basyo[])
+bool setti_puyo(PuyoColor ba[][kHeight], int aa, PuyoColor nx1, PuyoColor nx2, int setti_basyo[])
 {
     if (aa < 6) {
         setti_basyo[0] = aa;
@@ -521,7 +521,7 @@ bool setti_puyo(TLColor ba[][kHeight], int aa, TLColor nx1, TLColor nx2, int set
         setti_basyo[2] = aa;
         setti_basyo[3] = -1;
         for (int j = 0; j < 13; j++) {
-            if (ba[aa][j] == TLColor::EMPTY) {
+            if (ba[aa][j] == PuyoColor::EMPTY) {
                 ba[aa][j] = nx1;
                 ba[aa][j + 1] = nx2;
                 setti_basyo[1] = j;
@@ -539,7 +539,7 @@ bool setti_puyo(TLColor ba[][kHeight], int aa, TLColor nx1, TLColor nx2, int set
         setti_basyo[2] = aa - 6;
         setti_basyo[3] = -1;
         for (int j = 0; j < 13; j++) {
-            if (ba[aa - 6][j] == TLColor::EMPTY) {
+            if (ba[aa - 6][j] == PuyoColor::EMPTY) {
                 ba[aa - 6][j] = nx2;
                 ba[aa - 6][j + 1] = nx1;
                 setti_basyo[1] = j;
@@ -557,13 +557,13 @@ bool setti_puyo(TLColor ba[][kHeight], int aa, TLColor nx1, TLColor nx2, int set
         setti_basyo[2] = aa - 12;
         setti_basyo[3] = -1;
         for (int j = 0; j < 13; j++) {
-            if (ba[aa - 11][j] == TLColor::EMPTY) {
+            if (ba[aa - 11][j] == PuyoColor::EMPTY) {
                 setti_basyo[1] = j;
                 break;
             }
         }
         for (int j = 0; j < 13; j++) {
-            if (ba[aa - 12][j] == TLColor::EMPTY) {
+            if (ba[aa - 12][j] == PuyoColor::EMPTY) {
                 setti_basyo[3] = j;
                 break;
             }
@@ -584,13 +584,13 @@ bool setti_puyo(TLColor ba[][kHeight], int aa, TLColor nx1, TLColor nx2, int set
         setti_basyo[2] = aa - 16;
         setti_basyo[3] = -1;
         for (int j = 0; j < 13; j++) {
-            if (ba[aa - 17][j] == TLColor::EMPTY) {
+            if (ba[aa - 17][j] == PuyoColor::EMPTY) {
                 setti_basyo[1] = j;
                 break;
             }
         }
         for (int j = 0; j < 13; j++) {
-            if (ba[aa - 16][j] == TLColor::EMPTY) {
+            if (ba[aa - 16][j] == PuyoColor::EMPTY) {
                 setti_basyo[3] = j;
                 break;
             }
@@ -609,14 +609,14 @@ bool setti_puyo(TLColor ba[][kHeight], int aa, TLColor nx1, TLColor nx2, int set
     return false;
 }
 
-int setti_puyo_1(TLColor ba[][kHeight], int eex, TLColor eecol)
+int setti_puyo_1(PuyoColor ba[][kHeight], int eex, PuyoColor eecol)
 {
     int j;
     int oita = 0;
     int num = 0;
     int setti_basyoy;
     for (j = 0; j < 12; j++) {
-        if (ba[eex][j] == TLColor::EMPTY) {
+        if (ba[eex][j] == PuyoColor::EMPTY) {
             ba[eex][j] = eecol;
             setti_basyoy = j;
             oita = 1;
@@ -632,13 +632,13 @@ int setti_puyo_1(TLColor ba[][kHeight], int eex, TLColor eecol)
     return 0;
 }
 
-int chousei_syoukyo(TLColor ba[][kHeight], int[])
+int chousei_syoukyo(PuyoColor ba[][kHeight], int[])
 {
     TLRensaResult result = simulate(ba);
     return result.num_vanished;
 }
 
-int chousei_syoukyo_2(TLColor ba[][kHeight], int[], int* chain, int dabuchk[], int*, int* score)
+int chousei_syoukyo_2(PuyoColor ba[][kHeight], int[], int* chain, int dabuchk[], int*, int* score)
 {
     TLRensaResult result = simulate(ba);
     *chain = result.chains;
@@ -648,7 +648,7 @@ int chousei_syoukyo_2(TLColor ba[][kHeight], int[], int* chain, int dabuchk[], i
     return result.num_vanished;
 }
 
-int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point)
+int chousei_syoukyo_3(PuyoColor bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };
@@ -674,7 +674,7 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
     rakkaflg[3] = 0;
     rakkaflg[4] = 0;
     rakkaflg[5] = 0;
-    TLColor color = bass[i2][j2];
+    PuyoColor color = bass[i2][j2];
     if (tokus < 5) {
         syou_downx(bass, i2, j2 + 1, bass[i2][j2], rakkaflg, &num);
     } else if (tokus < 7) {
@@ -701,13 +701,13 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
         if (rakkaflg[i] == 1) {
             n = 0;
             for (j = 0; j < 13; j++) {
-                if (bass[i][j] == TLColor::EMPTY) {
+                if (bass[i][j] == PuyoColor::EMPTY) {
                     if (n == 0)
                         kiept[i] = j;
                     n++;
                 } else if (n != 0) {
                     bass[i][j - n] = bass[i][j];
-                    bass[i][j] = TLColor::EMPTY;
+                    bass[i][j] = PuyoColor::EMPTY;
                 }
             }
             rakka_ruiseki += n;
@@ -727,9 +727,9 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
             for (j = kiept[i]; j < 12; j++) {
                 if (point[i][j] != 0)
                     continue;
-                if (bass[i][j] == TLColor::EMPTY)
+                if (bass[i][j] == PuyoColor::EMPTY)
                     break;
-                if (bass[i][j] != TLColor::OJAMA) {
+                if (bass[i][j] != PuyoColor::OJAMA) {
                     saiki(bass, point, i, j, &num, bass[i][j]);
                     if (num > 3) {
                         syo = 1;
@@ -751,13 +751,13 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
             if (rakkaflg[i] == 1) {
                 n = 0;
                 for (j = 0; j < 13; j++) {
-                    if (bass[i][j] == TLColor::EMPTY) {
+                    if (bass[i][j] == PuyoColor::EMPTY) {
                         if (n == 0)
                             kiept[i] = j;
                         n++;
                     } else if (n != 0) {
                         bass[i][j - n] = bass[i][j];
-                        bass[i][j] = TLColor::EMPTY;
+                        bass[i][j] = PuyoColor::EMPTY;
                     }
                 }
                 rakka_ruiseki += n;
@@ -784,20 +784,20 @@ int chousei_syoukyo_3(TLColor bass[][kHeight], int[], int* poi2s, int* score, in
     return chain;
 }
 
-int chousei_syoukyo_sc(TLColor field[][kHeight], int[], int* score)
+int chousei_syoukyo_sc(PuyoColor field[][kHeight], int[], int* score)
 {
     TLRensaResult result = simulate(field);
     *score = result.score;
     return result.num_vanished;
 }
 
-int hon_syoukyo(TLColor field[][kHeight])
+int hon_syoukyo(PuyoColor field[][kHeight])
 {
     TLRensaResult result = simulate(field);
     return result.chains;
 }
 
-int hon_syoukyo_score(TLColor field[][kHeight], int* score, int* quick)
+int hon_syoukyo_score(PuyoColor field[][kHeight], int* score, int* quick)
 {
     TLRensaResult result = simulate(field);
     *score = result.score;
@@ -805,15 +805,15 @@ int hon_syoukyo_score(TLColor field[][kHeight], int* score, int* quick)
     return result.chains;
 }
 
-void setti_ojama(TLColor f[][kHeight], int numOjama)
+void setti_ojama(PuyoColor f[][kHeight], int numOjama)
 {
     int lines = (numOjama + 3) / 6;
 
     for (int i = 0; i < 6; i++) {
         int cnt = 0;
         for (int j = 0; j < 13; j++) {
-            if (f[i][j] == TLColor::EMPTY) {
-                f[i][j] = TLColor::OJAMA;
+            if (f[i][j] == PuyoColor::EMPTY) {
+                f[i][j] = PuyoColor::OJAMA;
                 cnt++;
             }
 
