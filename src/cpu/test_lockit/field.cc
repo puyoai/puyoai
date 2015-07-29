@@ -652,7 +652,7 @@ int chousei_syoukyo_3(PuyoColor bass[][kHeight], int[], int* poi2s, int* score, 
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
     int color_rate[5] = { 0, 3, 6, 12, 24 };
-    int renketsu[19][5] {};
+    int renketsu[19][NUM_PUYO_COLORS] {};
     int colnum;
     int renketsunum;
     int renketsubonus[19] = { 0 };
@@ -682,7 +682,7 @@ int chousei_syoukyo_3(PuyoColor bass[][kHeight], int[], int* poi2s, int* score, 
     } else if (tokus == 7) {
         syou_downx(bass, i2 - 1, j2, bass[i2][j2], rakkaflg, &num);
     }
-    renketsu[0][ordinal(color) - 1] = num;
+    renketsu[0][ordinal(color)] = num;
     if (num > 10)
         renketsubonus[0] += 10; // bugggggg 111102
     else if (num > 4)
@@ -734,7 +734,7 @@ int chousei_syoukyo_3(PuyoColor bass[][kHeight], int[], int* poi2s, int* score, 
                     if (num > 3) {
                         syo = 1;
                         color = bass[i][j];
-                        renketsu[chain][ordinal(color) - 1] += num;
+                        renketsu[chain][ordinal(color)] += num;
                         if (num > 10)
                             renketsubonus[chain] += 10; // bugggggg 111102
                         else if (num > 4)
