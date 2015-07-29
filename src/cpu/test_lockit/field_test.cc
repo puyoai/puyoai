@@ -126,7 +126,7 @@ TEST(FieldTest, simulate_basic)
     CoreField cf("RRRR..");
     TLColor field[6][kHeight];
     toTLField(cf, field);
-    
+
     TLRensaResult result = simulate(field);
     EXPECT_EQ(1, result.chains);
     EXPECT_EQ(40, result.score);
@@ -153,7 +153,7 @@ TEST(FieldTest, simulate_chain)
     EXPECT_EQ(1, result.num_connections[1]);
 }
 
-TEST(FieldTest, simulate_1_duouble)
+TEST(FieldTest, simulate_1_double)
 {
     CoreField cf(
         "..BBBB"
@@ -165,6 +165,22 @@ TEST(FieldTest, simulate_1_duouble)
     EXPECT_EQ(1, result.chains);
     EXPECT_EQ(600, result.score);
     EXPECT_EQ(10, result.num_vanished);
+    EXPECT_TRUE(result.quick);
+    EXPECT_EQ(2, result.num_connections[0]);
+}
+
+TEST(FieldTest, simulate_double_cornercase)
+{
+    CoreField cf(
+        "BB..BB"
+        "BB..BB");
+    TLColor field[6][kHeight];
+    toTLField(cf, field);
+
+    TLRensaResult result = simulate(field);
+    EXPECT_EQ(1, result.chains);
+    EXPECT_EQ(80, result.score);
+    EXPECT_EQ(8, result.num_vanished);
     EXPECT_TRUE(result.quick);
     EXPECT_EQ(2, result.num_connections[0]);
 }
