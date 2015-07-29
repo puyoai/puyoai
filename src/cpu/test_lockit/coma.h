@@ -1,7 +1,7 @@
 #ifndef CPU_TEST_LOCKIT_COMA_H_
 #define CPU_TEST_LOCKIT_COMA_H_
 
-#include "color.h"
+#include "core/puyo_color.h"
 #include "cpu_configuration.h"
 #include "lockit_constant.h"
 

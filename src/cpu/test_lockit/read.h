@@ -1,7 +1,7 @@
 #ifndef CPU_TEST_LOCKIT_READ_H_
 #define CPU_TEST_LOCKIT_READ_H_
 
-#include "color.h"
+#include "core/puyo_color.h"
 #include "lockit_constant.h"
 
 namespace test_lockit {
