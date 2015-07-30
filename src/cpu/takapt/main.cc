@@ -116,9 +116,8 @@ struct State
     }
 };
 
-std::vector<State> next_states(const State& current_state, const Kumipuyo& kumipuyo, const int good_chains, unordered_set<int64_t>& visited)
+void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int good_chains, unordered_set<int64_t>& visited, int qi, vector<State>& state_q, vector<State>& fired)
 {
-    std::vector<State> nexts;
     auto drop_callback = [&](const RefPlan& plan)
     {
         DCHECK(plan.decisions().size() == 1);
@@ -147,9 +146,10 @@ std::vector<State> next_states(const State& current_state, const Kumipuyo& kumip
                 .dropped_frames = current_state.dropped_frames,
                 .decision = plan.decision(0),
                 .first_decision = current_state.prev_q_index == -1 ? plan.decision(0) : current_state.first_decision,
-                .prev_q_index = -1
+                .prev_q_index = qi
             };
-            nexts.push_back(next);
+            fired.push_back(next);
+
             if (rensa_result.chains >= good_chains)
                 return;
         }
@@ -220,12 +220,11 @@ std::vector<State> next_states(const State& current_state, const Kumipuyo& kumip
             .dropped_frames = current_state.dropped_frames,
             .decision = plan.decision(0),
             .first_decision = current_state.prev_q_index == -1 ? plan.decision(0) : current_state.first_decision,
-            .prev_q_index = -1
+            .prev_q_index = qi
         };
-        nexts.push_back(next);
+        state_q.push_back(next);
     };
     Plan::iterateAvailablePlans(current_state.field, {kumipuyo}, 1, drop_callback);
-    return std::move(nexts);
 }
 
 struct BeamSearchResult
@@ -278,23 +277,20 @@ BeamSearchResult beamsearch(const CoreField& start_field, const KumipuyoSeq& seq
     for (int turn = 0; turn < turns; ++turn)
     {
         unordered_set<int64_t> visited;
+        state_q[turn + 1].reserve(state_q[turn].size() * 11);
+        fired[turn + 1].reserve(state_q[turn].size());
+
         for (int qi = 0; qi < (int)state_q[turn].size(); ++qi)
         {
-            const State& state = state_q[turn][qi];
-            for (State& next : next_states(state, seq.get(turn), good_chains, visited))
+            next_states(state_q[turn][qi], seq.get(turn), good_chains, visited, qi, state_q[turn + 1], fired[turn + 1]);
+        }
+
+        for (auto& state : fired[turn + 1])
+        {
+            if (state.fired_chains > max_chains)
             {
-                next.prev_q_index = qi;
-                if (next.fired_main_chain())
-                {
-                    fired[turn + 1].push_back(next);
-                    if (next.fired_chains > max_chains)
-                    {
-                        max_chains = next.fired_chains;
-                        first_decision_for_max_chains = next.first_decision;
-                    }
-                }
-                else
-                    state_q[turn + 1].push_back(next);
+                max_chains = state.fired_chains;
+                first_decision_for_max_chains = state.first_decision;
             }
         }
 
