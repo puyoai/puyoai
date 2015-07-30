@@ -1,8 +1,8 @@
-#include "core/algorithm/bijection_matcher.h"
+#include "core/pattern/bijection_matcher.h"
 
 #include <glog/logging.h>
 
-#include "core/algorithm/field_pattern.h"
+#include "core/pattern/field_pattern.h"
 #include "core/core_field.h"
 
 BijectionMatcher::BijectionMatcher()

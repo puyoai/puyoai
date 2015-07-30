@@ -1,5 +1,5 @@
-#ifndef CORE_ALGORITHM_BIJECTION_MATCHER_H_
-#define CORE_ALGORITHM_BIJECTION_MATCHER_H_
+#ifndef CORE_PATTERN_BIJECTION_MATCHER_H_
+#define CORE_PATTERN_BIJECTION_MATCHER_H_
 
 #include "core/puyo_color.h"
 
@@ -21,4 +21,4 @@ private:
     char chars_[NUM_PUYO_COLORS];
 };
 
-#endif
+#endif // CORE_PATTERN_PATTERN_MATCHER_H_
