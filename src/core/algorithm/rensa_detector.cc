@@ -78,7 +78,7 @@ const int EXTENTIONS[][3][2] = {
 
 }  // namespace anomymous
 
-// tryDropFire complements puyos in |originalField|, and fires a rensa.
+// detectByDropStrategy complements puyos in |originalField|, and fires a rensa.
 // The complemented puyos are always grounded (This is the different point of tryFloatFire).
 // For each detected rensa, |callback| is called.
 // static
