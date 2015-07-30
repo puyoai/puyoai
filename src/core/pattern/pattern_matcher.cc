@@ -1,9 +1,9 @@
-#include "core/algorithm/pattern_matcher.h"
+#include "core/pattern/pattern_matcher.h"
 
 #include <cctype>
 
-#include "core/algorithm/field_pattern.h"
 #include "core/core_field.h"
+#include "core/pattern/field_pattern.h"
 
 using namespace std;
 

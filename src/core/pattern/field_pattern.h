@@ -1,5 +1,5 @@
-#ifndef CORE_ALGORITHM_PATTERN_FIELD_H_
-#define CORE_ALGORITHM_PATTERN_FIELD_H_
+#ifndef CORE_PATTERN_PATTERN_FIELD_H_
+#define CORE_PATTERN_PATTERN_FIELD_H_
 
 #include <string>
 #include <vector>
@@ -46,4 +46,4 @@ private:
     std::vector<Pattern> patterns_;
 };
 
-#endif // CORE_ALGORITHM_PATTERN_FIELD_H_
+#endif // CORE_PATTERN_PATTERN_FIELD_H_

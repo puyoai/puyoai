@@ -1,5 +1,5 @@
-#ifndef CORE_ALGORITHM_PATTERN_MATCHER_H_
-#define CORE_ALGORITHM_PATTERN_MATCHER_H_
+#ifndef CORE_PATTERN_PATTERN_MATCHER_H_
+#define CORE_PATTERN_PATTERN_MATCHER_H_
 
 #include <glog/logging.h>
 
@@ -8,9 +8,9 @@
 
 #include "base/base.h"
 #include "base/small_int_set.h"
-#include "core/algorithm/field_pattern.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
+#include "core/pattern/field_pattern.h"
 #include "core/puyo_color.h"
 
 struct PatternMatchResult {
@@ -74,4 +74,4 @@ private:
                                      PuyoColor env[]);
 };
 
-#endif
+#endif // CORE_PATTERN_PATTERN_MATCHER_H_

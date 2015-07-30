@@ -9,11 +9,11 @@
 #include <toml/toml.h>
 
 #include "base/noncopyable.h"
-#include "core/algorithm/field_pattern.h"
-#include "core/algorithm/pattern_matcher.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
+#include "core/pattern/field_pattern.h"
+#include "core/pattern/pattern_matcher.h"
 #include "core/position.h"
 
 class PatternBookField {

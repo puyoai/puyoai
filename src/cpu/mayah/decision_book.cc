@@ -8,9 +8,9 @@
 #include <utility>
 
 #include "base/strings.h"
-#include "core/algorithm/bijection_matcher.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_seq.h"
+#include "core/pattern/bijection_matcher.h"
 
 using namespace std;
 

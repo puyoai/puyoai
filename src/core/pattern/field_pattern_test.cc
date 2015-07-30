@@ -1,4 +1,4 @@
-#include "core/algorithm/field_pattern.h"
+#include "core/pattern/field_pattern.h"
 
 #include <algorithm>
 #include <string>

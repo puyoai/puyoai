@@ -1,11 +1,11 @@
-#include "core/algorithm/pattern_matcher.h"
+#include "core/pattern/pattern_matcher.h"
 
 #include <string>
 
 #include <gtest/gtest.h>
 
 #include "core/core_field.h"
-#include "core/algorithm/field_pattern.h"
+#include "core/pattern/field_pattern.h"
 
 using namespace std;
 

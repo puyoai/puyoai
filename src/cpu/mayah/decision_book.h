@@ -8,8 +8,8 @@
 #include <vector>
 
 #include "base/noncopyable.h"
-#include "core/algorithm/field_pattern.h"
 #include "core/decision.h"
+#include "core/pattern/field_pattern.h"
 
 class BijectionMatcher;
 class CoreField;

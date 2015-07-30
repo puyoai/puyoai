@@ -6,6 +6,7 @@ endfunction()
 
 function(cpu_target_link_common_libraries target)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_solver)
+  target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_pattern)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_algorithm)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_client_ai)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_client_connector)
