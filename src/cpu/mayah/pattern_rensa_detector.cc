@@ -4,8 +4,6 @@
 
 #include <gflags/gflags.h>
 
-#include "base/slice.h"
-
 using namespace std;
 
 DEFINE_bool(use_side_chain, false, "Use sidechain iteration");

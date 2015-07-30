@@ -3,8 +3,6 @@
 
 #include <ostream>
 
-#include "base/slice.h"
-
 // Position is used to represent puyo position.
 struct Position {
     Position() {}

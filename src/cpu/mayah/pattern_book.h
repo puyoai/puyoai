@@ -10,7 +10,6 @@
 #include <toml/toml.h>
 
 #include "base/noncopyable.h"
-#include "base/slice.h"
 #include "core/algorithm/field_pattern.h"
 #include "core/algorithm/pattern_matcher.h"
 #include "core/algorithm/rensa_detector.h"
