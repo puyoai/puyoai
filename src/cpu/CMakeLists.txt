@@ -47,6 +47,7 @@ add_subdirectory(yamaguchi)
 add_subdirectory(test_lockit)
 add_subdirectory(yuricat)
 add_subdirectory(ryumas)
+add_subdirectory(takapt)
 
 add_subdirectory(sample)
 add_subdirectory(sample_suicide)
