@@ -4,6 +4,7 @@ add_library(puyoai_base
             executor.cc
             flags.cc
             file.cc
+	    random.cc
             time.cc
             time_stamp_counter.cc
             strings.cc
