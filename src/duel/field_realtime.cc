@@ -440,9 +440,12 @@ vector<int> FieldRealtime::determineColumnOjamaAmount()
 
 KumipuyoSeq FieldRealtime::visibleKumipuyoSeq() const
 {
-    return KumipuyoSeq {
-        kumipuyo(0), kumipuyo(1), kumipuyo(2)
-    };
+    KumipuyoSeq seq;
+    seq.add(kumipuyo(0));
+    seq.add(kumipuyo(1));
+    if (kumipuyo(2).isValid())
+        seq.add(kumipuyo(2));
+    return seq;
 }
 
 Kumipuyo FieldRealtime::kumipuyo(int nth) const
