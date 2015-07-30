@@ -78,24 +78,15 @@ string makePuyopURL(const KumipuyoSeq& seq, const vector<Decision>& decisions)
 }
 
 
-namespace std
+int64_t make_hash(const CoreField& field)
 {
-template<>
-struct hash<CoreField>
-{
-    size_t operator()(const CoreField& field) const
-    {
-        static const uint64_t base = 1000000009;
-        uint64_t h = 0;
-        for (int y = 1; y <= 13; ++y)
-            for (int x = 1; x <= 6; ++x)
-                h = h * base + (uint64_t)field.color(x, y);
-        return h;
-    }
-};
-
+    static const uint64_t base = 1000000009;
+    uint64_t h = 0;
+    for (int y = 1; y <= 13; ++y)
+        for (int x = 1; x <= 6; ++x)
+            h = h * base + (uint64_t)field.color(x, y);
+    return h;
 }
-
 
 struct State
 {
@@ -125,7 +116,7 @@ struct State
     }
 };
 
-std::vector<State> next_states(const State& current_state, const Kumipuyo& kumipuyo, const int good_chains, unordered_set<CoreField>& visited)
+std::vector<State> next_states(const State& current_state, const Kumipuyo& kumipuyo, const int good_chains, unordered_set<int64_t>& visited)
 {
     std::vector<State> nexts;
     auto drop_callback = [&](const RefPlan& plan)
@@ -135,9 +126,10 @@ std::vector<State> next_states(const State& current_state, const Kumipuyo& kumip
         CoreField field = plan.field();
         RensaResult rensa_result = plan.rensaResult();
 
-        if (visited.count(plan.field()))
+        const int64_t field_hash = make_hash(plan.field());
+        if (visited.count(field_hash))
             return;
-        visited.insert(plan.field());
+        visited.insert(field_hash);
 
         int frames = current_state.frames + plan.totalFrames() + rensa_result.frames;
         int pending_enemy_score = current_state.pending_enemy_score;
@@ -285,7 +277,7 @@ BeamSearchResult beamsearch(const CoreField& start_field, const KumipuyoSeq& seq
     int max_chains = 0;
     for (int turn = 0; turn < turns; ++turn)
     {
-        unordered_set<CoreField> visited;
+        unordered_set<int64_t> visited;
         for (int qi = 0; qi < (int)state_q[turn].size(); ++qi)
         {
             const State& state = state_q[turn][qi];
