@@ -14,6 +14,19 @@ TEST(PuyoColorTest, isColorPuyo)
     EXPECT_TRUE(isNormalColor(PuyoColor::GREEN));
 }
 
+TEST(PuyoColorTest, toPuyoColor)
+{
+    EXPECT_EQ(PuyoColor::EMPTY, toPuyoColor(' '));
+    EXPECT_EQ(PuyoColor::EMPTY, toPuyoColor('.'));
+    EXPECT_EQ(PuyoColor::IRON, toPuyoColor('&'));
+    EXPECT_EQ(PuyoColor::WALL, toPuyoColor('#'));
+    EXPECT_EQ(PuyoColor::OJAMA, toPuyoColor('O'));
+    EXPECT_EQ(PuyoColor::RED, toPuyoColor('R'));
+    EXPECT_EQ(PuyoColor::BLUE, toPuyoColor('B'));
+    EXPECT_EQ(PuyoColor::YELLOW, toPuyoColor('Y'));
+    EXPECT_EQ(PuyoColor::GREEN, toPuyoColor('G'));
+}
+
 TEST(PuyoColorTest, toChar)
 {
     EXPECT_EQ(toChar(PuyoColor::EMPTY), ' ');

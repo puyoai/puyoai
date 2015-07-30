@@ -7,6 +7,7 @@ PuyoColor toPuyoColor(char c)
     switch (c) {
     case '0':
     case ' ':
+    case '.':
         return PuyoColor::EMPTY;
     case '1':
     case 'O': // not zero but Oh
@@ -35,17 +36,9 @@ PuyoColor toPuyoColor(char c)
     case 'g':
         return PuyoColor::GREEN;
     default:
-        ;
+        // No match.
+        return PuyoColor::EMPTY;
     }
-
-    // Unfortunately, some code uses 0 <= c <= 7.
-    // TODO(mayah): Remove this code once all codes are safe!
-    if (0 <= c && c <= static_cast<int>(PuyoColor::GREEN)) {
-        return static_cast<PuyoColor>(c);
-    }
-
-    // No match.
-    return PuyoColor::EMPTY;
 }
 
 char toChar(PuyoColor c, char charIfEmpty)
@@ -70,11 +63,11 @@ std::string toString(PuyoColor c)
     case PuyoColor::EMPTY: return "";
     case PuyoColor::OJAMA: return "";
     case PuyoColor::WALL: return "";
-    case PuyoColor::IRON: return "鉄";
-    case PuyoColor::RED: return "赤";
-    case PuyoColor::BLUE: return "青";
-    case PuyoColor::YELLOW: return "黄";
-    case PuyoColor::GREEN: return "緑";
+    case PuyoColor::IRON: return "IRON";
+    case PuyoColor::RED: return "RED";
+    case PuyoColor::BLUE: return "BLUE";
+    case PuyoColor::YELLOW: return "YELLOW";
+    case PuyoColor::GREEN: return "GREEN";
     }
 
     return "";
