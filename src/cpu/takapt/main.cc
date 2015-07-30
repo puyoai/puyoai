@@ -162,7 +162,7 @@ std::vector<State> next_states(const State& current_state, const Kumipuyo& kumip
                 return;
         }
 
-        if (current_state.has_pending_ojama())
+        if (current_state.has_pending_ojama() && frames >= current_state.dropped_frames)
         {
             frames += field.fallOjama(pending_enemy_score / SCORE_FOR_OJAMA / 6);
             pending_enemy_score = 0;
