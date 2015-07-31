@@ -7,11 +7,11 @@ struct PossibleRensa {
     return score - num_required_puyos * 1000;
   }
 
-  int frames;
-  int score;
+  int frames = 0;
+  int score = 0;
 
   // The number of required but invisible puyos.
-  int num_required_puyos;
+  int num_required_puyos = 0;
 };
 
 }  // namespace peria
