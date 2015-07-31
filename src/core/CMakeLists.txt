@@ -19,6 +19,7 @@ add_library(puyoai_core STATIC
             decision.cc
             field_bits.cc
             field_pretty_printer.cc
+            flags.cc
             frame_request.cc
             frame_response.cc
             game_result.cc
