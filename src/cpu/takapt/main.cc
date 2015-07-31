@@ -2,6 +2,8 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
+#include "base/executor.h"
+#include "base/time.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/client/ai/ai.h"
@@ -9,9 +11,8 @@
 #include "core/frame_request.h"
 #include "core/sequence_generator.h"
 #include "core/score.h"
-#include "base/executor.h"
-#include "base/time.h"
 #include "solver/endless.h"
+#include "solver/puyop.h"
 
 #include <unordered_set>
 #include <unordered_map>
@@ -20,63 +21,6 @@
 #include <iostream>
 
 using namespace std;
-
-
-string makePuyopURL(const KumipuyoSeq& seq, const vector<Decision>& decisions)
-{
-    static const char ENCODER[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ[]";
-    stringstream ss;
-
-    ss << "http://www.puyop.com/s/_";
-
-    for (size_t i = 0; i < decisions.size(); ++i) {
-        const Kumipuyo& kp = seq.get(i);
-        int d = 0;
-        switch (kp.axis) {
-        case PuyoColor::RED:
-            d += 0;
-            break;
-        case PuyoColor::GREEN:
-            d += 1 * 5;
-            break;
-        case PuyoColor::BLUE:
-            d += 2 * 5;
-            break;
-        case PuyoColor::YELLOW:
-            d += 3 * 5;
-            break;
-        default:
-            CHECK(false);
-        }
-
-        switch (kp.child) {
-        case PuyoColor::RED:
-            d += 0;
-            break;
-        case PuyoColor::GREEN:
-            d += 1;
-            break;
-        case PuyoColor::BLUE:
-            d += 2;
-            break;
-        case PuyoColor::YELLOW:
-            d += 3;
-            break;
-        default:
-            CHECK(false);
-        }
-
-        if (i < decisions.size()) {
-            int h = (decisions[i].x << 2) + decisions[i].r;
-            d |= h << 7;
-        }
-
-        ss << ENCODER[d & 0x3F] << ENCODER[(d >> 6) & 0x3F];
-    }
-
-    return ss.str();
-}
-
 
 namespace std
 {
@@ -540,7 +484,7 @@ void run_loop(int num, const int start_seed, bool print_info)
     vector<promise<RunResult>> promise_results(num);
     for (int i = 0; i < num; ++i)
     {
-        executor->submit(std::move([i, start_seed, &promise_results]() { 
+        executor->submit(std::move([i, start_seed, &promise_results]() {
                 promise_results[i].set_value(run(start_seed + i));
                 cout << "done: " << i << endl;
         }));
