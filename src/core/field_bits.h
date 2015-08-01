@@ -173,14 +173,14 @@ inline
 FieldBits FieldBits::maskedField12() const
 {
     const auto mask = _mm_set_epi16(0, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0);
-    return FieldBits(_mm_and_si128(mask, m_));
+    return mask & m_;
 }
 
 inline
 FieldBits FieldBits::maskedField13() const
 {
     const auto mask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
-    return FieldBits(_mm_and_si128(mask, m_));
+    return mask & m_;
 }
 
 inline
