@@ -1,8 +1,8 @@
 #include "evaluator.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
-#include <algorithm>
 #include <numeric>
 #include <sstream>
 
@@ -138,6 +138,15 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
     if (value < 0) {
       oss << "Enemy(" << value << ")_";
       score += value;
+    }
+  }
+
+  if (true) {  // 2-double
+    const RensaResult& result = plan.rensaResult();
+    bool is_2dub = (result.chains == 2 && result.score >= 920);
+    if (is_2dub) {
+      oss << "NiDub(" << result.score << ")_";
+      score += result.score * 2;
     }
   }
 
