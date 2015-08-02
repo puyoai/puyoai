@@ -5,7 +5,7 @@
 
 DEFINE_string(type, "nidub", "Type of niina. nidub, rendaS9, rendaGS9, or rendaGS9a, is valid.");
 
-test_lockit::cpu::Configuration rendaGS9Configuration()
+test_lockit::cpu::Configuration makeRendaGS9Configuration()
 {
     struct test_lockit::cpu::Configuration config;
     config.q_t = 1;
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 
     test_lockit::cpu::Configuration config;
     if (FLAGS_type == "rendaGS9") {
-        config = makeRendaGS9aConfiguration();
+        config = makeRendaGS9Configuration();
     } else if (FLAGS_type == "rendaGS9a") {
         config = makeRendaGS9aConfiguration();
     } else if (FLAGS_type == "rendaS9") {
