@@ -94,16 +94,6 @@ TEST(MayahAIPerformanceTest, seq2_depth2_iter3_fulfilled)
     runTest(2, 3, fulfilledField(), defaultKumipuyoSeq(2));
 }
 
-TEST(MayahAIPerformanceTest, seq2_depth3_iter1)
-{
-    runTest(3, 1, CoreField(), defaultKumipuyoSeq(2));
-}
-
-TEST(MayahAIPerformanceTest, seq2_depth3_iter1_fulfilled)
-{
-    runTest(3, 1, fulfilledField(), defaultKumipuyoSeq(2));
-}
-
 TEST(MayahAIPerformanceTest, seq3_depth3_iter1)
 {
     runTest(3, 1, CoreField(), defaultKumipuyoSeq(3));
