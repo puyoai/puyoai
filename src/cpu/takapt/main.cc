@@ -108,7 +108,7 @@ void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int
         if (!field.isEmpty(3, 12))
             return;
 
-        int max_chains = current_state.max_chains_until;
+        int max_chains = 0;//current_state.max_chains_until;
         int highest_ignition_y = current_state.ignition_y;
         bool prohibits[FieldConstant::MAP_WIDTH]{};
         auto complement_callback = [&max_chains, &highest_ignition_y](CoreField&& complemented_field, const ColumnPuyoList& puyo_list)
@@ -134,19 +134,20 @@ void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int
         if (max_chains >= 2)
             score += max_chains * 1000;
 
-        for (int x = 1; x < 6; ++x)
-        {
-            int diff_height = std::abs(field.height(x + 1) - field.height(x));
-            score -= diff_height;
-        }
+        double ave_height = 0;
+        for (int x = 1; x <= 6; ++x)
+            ave_height += field.height(x);
+        ave_height /= 6;
 
-        score += highest_ignition_y;
-
+        double u_score = 0;
         for (int x = 1; x <= 6; ++x)
         {
-            static const double coef[] = { 0, 2, 2, 0, 0, 2, 2, 0 };
-            score += coef[x] * !field.isEmpty(x, 1);
+            static const int good_diff[] = { 0, 2, 0, -2, -2, 0, 2, 0 };
+            u_score -= abs((field.height(x) - ave_height) - good_diff[x]);
         }
+        score += 60 * u_score;
+
+        score += 10 * (highest_ignition_y - ave_height);
 
         for (int x = 1; x <= 6; ++x)
         {
