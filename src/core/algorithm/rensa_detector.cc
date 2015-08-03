@@ -148,7 +148,7 @@ void RensaDetector::detectByDropStrategy(const CoreField& originalField,
                     ok = false;
                     break;
                 }
-                if (cf.countConnectedPuyosMax4(x + d, cf.height(x + d)) >= 4)
+                if (cf.countConnectedPuyosMax4(x + d, cf.height(x + d), c) >= 4)
                     break;
             }
 

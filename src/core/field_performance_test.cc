@@ -15,12 +15,12 @@ static void runCountConnectedPuyosTest(const PlainField& f, int expected, int x,
     const int N = 1000000;
 
     TimeStampCounterData none;
-    TimeStampCounterData tsc;
-    TimeStampCounterData tscMax4;
-    TimeStampCounterData tscBits;
-    TimeStampCounterData tscBitsMax4;
-    TimeStampCounterData tscPreBits;
-    TimeStampCounterData tscPreBitsMax4;
+    TimeStampCounterData tscPlainField;
+    TimeStampCounterData tscPlainFieldMax4;
+    TimeStampCounterData tscBitField;
+    TimeStampCounterData tscBitFieldMax4;
+    TimeStampCounterData tscBitFieldWithColor;
+    TimeStampCounterData tscBitFieldMax4WithColor;
 
     const int expected4 = expected >= 4 ? 4 : expected;
 
@@ -29,53 +29,53 @@ static void runCountConnectedPuyosTest(const PlainField& f, int expected, int x,
     }
 
     for (int i = 0; i < N; i++) {
-        ScopedTimeStampCounter stsc(&tsc);
+        ScopedTimeStampCounter stsc(&tscPlainField);
         EXPECT_EQ(expected, f.countConnectedPuyos(x, y));
     }
 
     for (int i = 0; i < N; i++) {
-        ScopedTimeStampCounter stsc(&tscMax4);
+        ScopedTimeStampCounter stsc(&tscPlainFieldMax4);
         EXPECT_LE(expected4, f.countConnectedPuyosMax4(x, y));
     }
 
+    BitField bf(f);
+
     for (int i = 0; i < N; i++) {
-        ScopedTimeStampCounter stsc(&tscBits);
-        FieldBits fb(f, f.color(x, y));
-        EXPECT_EQ(expected, FieldBits(x, y).expand(fb.maskedField12()).popcount());
+        ScopedTimeStampCounter stsc(&tscBitField);
+        EXPECT_EQ(expected, bf.countConnectedPuyos(x, y));
     }
 
     for (int i = 0; i < N; i++) {
-        ScopedTimeStampCounter stsc(&tscBitsMax4);
-        FieldBits fb(f, f.color(x, y));
-        EXPECT_LE(expected4, FieldBits(x, y).expand4(fb.maskedField12()).popcount());
+        ScopedTimeStampCounter stsc(&tscBitFieldMax4);
+        EXPECT_LE(expected4, bf.countConnectedPuyosMax4(x, y));
     }
 
-    FieldBits fb(f, f.color(x, y));
-    fb = fb.maskedField12();
+    PuyoColor c = bf.color(x, y);
+
     for (int i = 0; i < N; i++) {
-        ScopedTimeStampCounter stsc(&tscPreBits);
-        EXPECT_EQ(expected, FieldBits(x, y).expand(fb).popcount());
+        ScopedTimeStampCounter stsc(&tscBitFieldWithColor);
+        EXPECT_EQ(expected, bf.countConnectedPuyos(x, y, c));
     }
 
     for (int i = 0; i < N; i++) {
-        ScopedTimeStampCounter stsc(&tscPreBitsMax4);
-        EXPECT_LE(expected4, FieldBits(x, y).expand4(fb).popcount());
+        ScopedTimeStampCounter stsc(&tscBitFieldMax4WithColor);
+        EXPECT_LE(expected4, bf.countConnectedPuyosMax4(x, y, c));
     }
 
     cout << "overhead: " << endl;
     none.showStatistics();
-    cout << "normal: " << endl;
-    tsc.showStatistics();
-    cout << "max4: " << endl;
-    tscMax4.showStatistics();
-    cout << "bits normal: " << endl;
-    tscBits.showStatistics();
-    cout << "bits max4: " << endl;
-    tscBitsMax4.showStatistics();
-    cout << "prebits normal: " << endl;
-    tscPreBits.showStatistics();
-    cout << "prebits max4: " << endl;
-    tscPreBitsMax4.showStatistics();
+    cout << "PlainField::countConnectedPuyos: " << endl;
+    tscPlainField.showStatistics();
+    cout << "PlainField::countConnectedPuyosMax4: " << endl;
+    tscPlainFieldMax4.showStatistics();
+    cout << "FieldBits::countConnectedField: " << endl;
+    tscBitField.showStatistics();
+    cout << "FieldBits::countConnectedFieldMax4: " << endl;
+    tscBitFieldMax4.showStatistics();
+    cout << "FieldBits::countConnectedField (with color): " << endl;
+    tscBitFieldWithColor.showStatistics();
+    cout << "FieldBits::countConnectedFieldMax4 (with color): " << endl;
+    tscBitFieldMax4WithColor.showStatistics();
 }
 
 static void runSimulation(const CoreField& original)

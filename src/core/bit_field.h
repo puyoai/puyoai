@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <glog/logging.h>
+
 #include "base/base.h"
 #include "core/field_bits.h"
 #include "core/frame.h"
@@ -46,10 +48,14 @@ public:
 
     bool isZenkeshi() const { return FieldBits(m_[0] | m_[1] | m_[2]).maskedField13().isEmpty(); }
 
-    bool isConnectedPuyo(int x, int y) const;
-    int countConnectedPuyos(int x, int y) const;
-    int countConnectedPuyos(int x, int y, FieldBits* checked) const;
-    int countConnectedPuyosMax4(int x, int y) const;
+    bool isConnectedPuyo(int x, int y) const { return isConnectedPuyo(x, y, color(x, y)); }
+    bool isConnectedPuyo(int x, int y, PuyoColor c) const;
+    int countConnectedPuyos(int x, int y) const { return countConnectedPuyos(x, y, color(x, y)); }
+    int countConnectedPuyos(int x, int y, PuyoColor c) const;
+    int countConnectedPuyos(int x, int y, FieldBits* checked) const { return countConnectedPuyos(x, y, color(x, y), checked); }
+    int countConnectedPuyos(int x, int y, PuyoColor c, FieldBits* checked) const;
+    int countConnectedPuyosMax4(int x, int y) const { return countConnectedPuyosMax4(x, y, color(x, y)); }
+    int countConnectedPuyosMax4(int x, int y, PuyoColor c) const;
     bool hasEmptyNeighbor(int x, int y) const;
 
     void countConnection(int* count2, int* count3) const;
@@ -216,6 +222,57 @@ void BitField::setColorAllIfEmpty(FieldBits bits, PuyoColor c)
     bits = bits.notmask(nonEmpty);
 
     setColorAll(bits, c);
+}
+
+inline
+bool BitField::isConnectedPuyo(int x, int y, PuyoColor c) const
+{
+    DCHECK_EQ(c, color(x, y));
+
+    if (y > FieldConstant::HEIGHT)
+        return false;
+
+    FieldBits colorBits = bits(c).maskedField12();
+    FieldBits single(x, y);
+    return !single.expandEdge().mask(colorBits).notmask(single).isEmpty();
+}
+
+inline
+int BitField::countConnectedPuyos(int x, int y, PuyoColor c) const
+{
+    DCHECK_EQ(c, color(x, y));
+
+    if (y > FieldConstant::HEIGHT)
+        return 0;
+
+    FieldBits colorBits = bits(c).maskedField12();
+    return FieldBits(x, y).expand(colorBits).popcount();
+}
+
+inline
+int BitField::countConnectedPuyos(int x, int y, PuyoColor c, FieldBits* checked) const
+{
+    DCHECK_EQ(c, color(x, y));
+
+    if (y > FieldConstant::HEIGHT)
+        return false;
+
+    FieldBits colorBits = bits(c).maskedField12();
+    FieldBits connected = FieldBits(x, y).expand(colorBits);
+    checked->setAll(connected);
+    return connected.popcount();
+}
+
+inline
+int BitField::countConnectedPuyosMax4(int x, int y, PuyoColor c) const
+{
+    DCHECK_EQ(c, color(x, y));
+
+    if (y > FieldConstant::HEIGHT)
+        return false;
+
+    FieldBits colorBits = bits(c).maskedField12();
+    return FieldBits(x, y).expand4(colorBits).popcount();
 }
 
 inline
