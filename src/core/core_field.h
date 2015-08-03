@@ -85,8 +85,10 @@ public:
     // This is faster than countConnectedPuyos, so this will be useful when checking
     // puyo is vanished or not.
     int countConnectedPuyosMax4(int x, int y) const { return field_.countConnectedPuyosMax4(x, y); }
+    int countConnectedPuyosMax4(int x, int y, PuyoColor c) const { return field_.countConnectedPuyosMax4(x, y, c); }
     // Returns true if color(x, y) is connected in some direction.
-    bool isConnectedPuyo(int x, int y) const { return field_.isConnectedPuyo(x, y); }
+    bool isConnectedPuyo(int x, int y) const { return field_.isConnectedPuyo(x, y, color(x, y)); }
+    bool isConnectedPuyo(int x, int y, PuyoColor c) const { return field_.isConnectedPuyo(x, y, c); }
     // Returns true if there is an empty neighbor of (x, y).
     bool hasEmptyNeighbor(int x, int y) const { return field_.hasEmptyNeighbor(x, y); }
     // Returns the number of empty unreachable spaces.

@@ -70,45 +70,6 @@ BitField::BitField(const string& str) : BitField()
     }
 }
 
-bool BitField::isConnectedPuyo(int x, int y) const
-{
-    if (y > FieldConstant::HEIGHT)
-        return false;
-
-    FieldBits colorBits = bits(color(x, y)).maskedField12();
-    FieldBits single(x, y);
-    return !single.expandEdge().mask(colorBits).notmask(single).isEmpty();
-}
-
-int BitField::countConnectedPuyos(int x, int y) const
-{
-    if (y > FieldConstant::HEIGHT)
-        return 0;
-
-    FieldBits colorBits = bits(color(x, y)).maskedField12();
-    return FieldBits(x, y).expand(colorBits).popcount();
-}
-
-int BitField::countConnectedPuyos(int x, int y, FieldBits* checked) const
-{
-    if (y > FieldConstant::HEIGHT)
-        return false;
-
-    FieldBits colorBits = bits(color(x, y)).maskedField12();
-    FieldBits connected = FieldBits(x, y).expand(colorBits);
-    checked->setAll(connected);
-    return connected.popcount();
-}
-
-int BitField::countConnectedPuyosMax4(int x, int y) const
-{
-    if (y > FieldConstant::HEIGHT)
-        return false;
-
-    FieldBits colorBits = bits(color(x, y)).maskedField12();
-    return FieldBits(x, y).expand4(colorBits).popcount();
-}
-
 bool BitField::hasEmptyNeighbor(int x, int y) const
 {
     if (x + 1 <= 6 && isEmpty(x + 1, y))
