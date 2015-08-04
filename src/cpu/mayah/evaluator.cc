@@ -461,6 +461,10 @@ void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const CoreField& 
                                                                const FieldBits& ignitionPuyoBits)
 {
     // A_A is taboo generally. Allow this from x == 1 or x == 4.
+    // TODO(mayah):
+    // ..A...
+    // A_A... should be taboo?
+
     for (int x = 2; x <= 3; ++x) {
         for (int y = 1; y <= 12; ++y) {
             if (!ignitionPuyoBits.get(x, y) || !ignitionPuyoBits.get(x + 1, y) || !ignitionPuyoBits.get(x + 2, y))
