@@ -29,11 +29,6 @@ using namespace std;
 
 namespace {
 
-const double FIELD_USHAPE_HEIGHT_COEF[15] = {
-    0.0, 0.1, 0.1, 0.3, 0.3,
-    0.5, 0.5, 0.7, 0.7, 1.0,
-    1.0, 1.0, 1.0, 1.0, 1.0,
-};
 
 }
 
@@ -93,6 +88,12 @@ static void calculateFieldUShape(ScoreCollector* sc,
 {
     static const int DIFF[FieldConstant::MAP_WIDTH] = {
         0, -3, 0, 1, 1, 0, -3, 0,
+    };
+
+    static const double FIELD_USHAPE_HEIGHT_COEF[15] = {
+        0.0, 0.1, 0.1, 0.3, 0.3,
+        0.5, 0.5, 0.7, 0.7, 1.0,
+        1.0, 1.0, 1.0, 1.0, 1.0,
     };
 
     double average = 0;
