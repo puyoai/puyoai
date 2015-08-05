@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
         movieSourceKeyListener.reset(new MovieSourceKeyListener(&source));
     }
 
-    MainWindow mainWindow(720, 480, Box(0, 0, 720, 480));
+    MainWindow mainWindow(640, 448, Box(0, 0, 640, 448));
     mainWindow.addDrawer(&capture);
     if (analyzerResultDrawer.get())
         mainWindow.addDrawer(analyzerResultDrawer.get());
