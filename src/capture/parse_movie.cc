@@ -15,7 +15,7 @@
 
 DEFINE_bool(save_screenshot, false, "save screenshot");
 DEFINE_bool(draw_result, true, "draw analyzer result");
-DEFINE_int32(fps, 30, "FPS. When 0, hitting space will go next step.");
+DEFINE_int32(fps, 60, "FPS. When 0, hitting space will go next step.");
 
 int main(int argc, char* argv[])
 {
