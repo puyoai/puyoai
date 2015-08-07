@@ -67,6 +67,7 @@ public:
 
     // TODO(mayah): Add simulateFast(), which is the faster version of simulate.
     // It will return only the number of chains. Don't count drop amount, score etc.
+    int simulateFast();
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
     RensaStepResult vanishDrop(SimulationContext*);

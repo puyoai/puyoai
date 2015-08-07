@@ -28,6 +28,13 @@ RensaResult BitField::simulate(SimulationContext* context, Tracker* tracker)
     return RensaResult(context->currentChain - 1, score, frames, quick);
 }
 
+inline
+int BitField::simulateFast()
+{
+    // TODO(mayah): Write this.
+    return simulate().chains;
+}
+
 template<typename Tracker>
 RensaStepResult BitField::vanishDrop(SimulationContext* context, Tracker* tracker)
 {
