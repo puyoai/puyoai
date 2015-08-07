@@ -90,6 +90,7 @@ static void runSimulation(const CoreField& original)
     TimeStampCounterData tscCoreField;
     TimeStampCounterData tscCoreFieldWithRensaChainTracker;
     TimeStampCounterData tscBitField;
+    TimeStampCounterData tscBitFieldFast;
 
     for (int i = 0; i < N; i++) {
         ScopedTimeStampCounter stsc(&none);
@@ -114,6 +115,12 @@ static void runSimulation(const CoreField& original)
         EXPECT_EQ(expectedChain, bf.simulate().chains);
     }
 
+    for (int i = 0; i < N; i++) {
+        BitField bf(bitFieldOriginal);
+        ScopedTimeStampCounter stsc(&tscBitFieldFast);
+        EXPECT_EQ(expectedChain, bf.simulateFast());
+    }
+
     cout << "overhead: " << endl;
     none.showStatistics();
     cout << "CoreField: " << endl;
@@ -122,6 +129,8 @@ static void runSimulation(const CoreField& original)
     tscCoreFieldWithRensaChainTracker.showStatistics();
     cout << "BitField: " << endl;
     tscBitField.showStatistics();
+    cout << "BitField (fast): " << endl;
+    tscBitFieldFast.showStatistics();
 }
 
 TEST(FieldPerformanceTest, copy)

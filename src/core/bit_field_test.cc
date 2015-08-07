@@ -538,6 +538,24 @@ TEST(BitFieldTest, simulateWithTracker1)
     EXPECT_EQ(3, tracker.originalY(3, 1));
 }
 
+TEST(BitFieldTest, simulateFast1)
+{
+    BitField bf(
+        "..RR.."
+        "BBBBRR");
+
+    EXPECT_EQ(2, bf.simulateFast());
+}
+
+TEST(BitFieldTest, simulateFast2)
+{
+    BitField bf(
+        "RRRR.."
+        "BBBB..");
+
+    EXPECT_EQ(1, bf.simulateFast());
+}
+
 TEST(BitFieldTest, vanishDrop1)
 {
     BitField bf(
