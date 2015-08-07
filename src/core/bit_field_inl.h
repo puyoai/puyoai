@@ -31,8 +31,19 @@ RensaResult BitField::simulate(SimulationContext* context, Tracker* tracker)
 inline
 int BitField::simulateFast()
 {
-    // TODO(mayah): Write this.
-    return simulate().chains;
+    BitField escaped = escapeInvisible();
+    int currentChain = 1;
+
+    FieldBits erased;
+    RensaNonTracker tracker;
+    while (vanishFast(currentChain, &erased, &tracker)) {
+        currentChain += 1;
+        // TODO: implemnet dropFastAfterVanish.
+        dropAfterVanish(erased, &tracker);
+    }
+
+    recoverInvisible(escaped);
+    return currentChain - 1;
 }
 
 template<typename Tracker>
@@ -115,6 +126,36 @@ int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* 
 
     erased->setAll(ojamaErased);
     return 10 * numErasedPuyos * rensaBonusCoef;
+}
+
+template<typename Tracker>
+bool BitField::vanishFast(int currentChain, FieldBits* erased, Tracker* tracker) const
+{
+    *erased = FieldBits();
+
+    bool didErase = false;
+    for (PuyoColor c : NORMAL_PUYO_COLORS) {
+        FieldBits mask = bits(c).maskedField12();
+        FieldBits seed = mask.vanishingSeed();
+
+        if (seed.isEmpty())
+            continue;
+
+        FieldBits expanded = seed.expand(mask);
+        erased->setAll(expanded);
+        didErase = true;
+    }
+
+    if (!didErase)
+        return false;
+
+    // Removes ojama.
+    FieldBits ojamaErased(erased->expandEdge().mask(bits(PuyoColor::OJAMA).maskedField12()));
+    erased->setAll(ojamaErased);
+
+    tracker->track(currentChain, *erased, ojamaErased);
+
+    return true;
 }
 
 template<typename Tracker>
