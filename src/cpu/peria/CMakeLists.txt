@@ -24,6 +24,7 @@ endfunction()
 peria_add_executable(peria main.cc)
 
 cpu_add_runner(run.sh)
+cpu_add_runner(quick.sh)
 cpu_add_runner(book.txt)
 
 include_directories(${gtest_SOURCE_DIR}/include
@@ -33,3 +34,6 @@ peria_add_test(pattern_test)
 #peria_add_test(field_test)
 #peria_add_test(player_test)
 
+# ---------------------
+cpu_add_executable(quick_full quick_full.cc)
+cpu_target_link_common_libraries(quick_full)
