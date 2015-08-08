@@ -21,21 +21,21 @@ DEFINE_bool(delay_wnext, true, "Delay wnext appear");
 // (n) means frames to transit to the next state.
 //
 // STATE_LEVEL_SELECT
-//  v (6)
+//  v (12)
 // STATE_PREPARING_NEXT <--------+
 //  v (0)                        |
 // STATE_PLAYABLE (?)            |
 //  v (0)                        |
 // STATE_DROPPING (?) <--+       |
-//  v (10 or 0 if quick) |       |
+//  v (20 or 0 if quick) |       |
 // STATE_GROUNDING       |       |
 //  v (0)                |       |
 // STATE_VANISH          |       |
-//  v  v (25)            | (0)   |
+//  v  v (50)            | (0)   |
 //  v  STATE_VANISHING --+       |
 //  v (0)                        |
 // STATE_OJAMA_DROPPING          |
-//  v (10 or 0 if no ojama)      | (6)
+//  v (20 or 0 if no ojama)      | (12)
 // STATE_OJAMA_GROUNDING --------+
 //  v
 // STATE_DEAD
