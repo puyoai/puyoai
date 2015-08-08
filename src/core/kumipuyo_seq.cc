@@ -27,7 +27,7 @@ PuyoColor KumipuyoSeq::color(NextPuyoPosition npp) const
     case NextPuyoPosition::CURRENT_AXIS:
         return axis(0);
     case NextPuyoPosition::CURRENT_CHILD:
-        return child(1);
+        return child(0);
     case NextPuyoPosition::NEXT1_AXIS:
         return axis(1);
     case NextPuyoPosition::NEXT1_CHILD:
