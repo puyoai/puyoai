@@ -107,6 +107,8 @@ private:
     // Drops puyos. Returns max drops.
     template<typename Tracker>
     int dropAfterVanish(FieldBits erased, Tracker* tracker);
+    template<typename Tracker>
+    void dropFastAfterVanish(FieldBits erased, Tracker* tracker);
 
     FieldBits m_[3];
 };

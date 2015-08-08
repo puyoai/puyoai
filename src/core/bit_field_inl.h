@@ -38,8 +38,7 @@ int BitField::simulateFast()
     RensaNonTracker tracker;
     while (vanishFast(currentChain, &erased, &tracker)) {
         currentChain += 1;
-        // TODO: implemnet dropFastAfterVanish.
-        dropAfterVanish(erased, &tracker);
+        dropFastAfterVanish(erased, &tracker);
     }
 
     recoverInvisible(escaped);
@@ -229,6 +228,46 @@ int BitField::dropAfterVanish(FieldBits erased, Tracker* tracker)
     // We have _mm_minpos_epu16, but not _mm_maxpos_epu16. So, taking xor 1.
     int maxDropAmountNegative = _mm_cvtsi128_si32(_mm_minpos_epu16(_mm_xor_si128(ones, dropAmount)));
     return ~maxDropAmountNegative & 0xFF;
+}
+
+template<typename Tracker>
+void BitField::dropFastAfterVanish(FieldBits erased, Tracker* tracker)
+{
+    const __m128i zero = _mm_setzero_si128();
+    const __m128i ones = _mm_cmpeq_epi8(zero, zero);
+
+    int wholeErased = erased.horizontalOr16();
+    int maxY = 31 - __builtin_clz(wholeErased);
+    int minY = __builtin_ctz(wholeErased);
+
+    DCHECK(1 <= minY && minY <= maxY && maxY <= 12)
+        << "minY=" << minY << ' ' << "maxY=" << maxY << std::endl << erased.toString();
+
+    __m128i line = _mm_set1_epi16(1 << (maxY + 1));
+    __m128i rightOnes = _mm_set1_epi16((1 << (maxY + 1)) - 1);
+    __m128i leftOnes = _mm_set1_epi16(~((1 << ((maxY + 1) + 1)) - 1));
+
+    for (int y = maxY; y >= minY; --y) {
+        line = _mm_srli_epi16(line, 1);
+        rightOnes = _mm_srai_epi16(rightOnes, 1);
+        leftOnes = _mm_srai_epi16(leftOnes, 1);   // needs arithmetic shift.
+
+        // for each line, -1 if drop, 0 otherwise.
+        __m128i blender = _mm_xor_si128(_mm_cmpeq_epi16(_mm_and_si128(line, erased.xmm()), zero), ones);
+
+        tracker->trackDrop(blender, leftOnes, rightOnes);
+
+        for (int i = 0; i < 3; ++i) {
+            __m128i m = m_[i].xmm();
+            __m128i v1 = _mm_and_si128(rightOnes, m);
+            __m128i v2 = _mm_and_si128(leftOnes, m);
+            __m128i v3 = _mm_srli_epi16(v2, 1);
+            __m128i v4 = _mm_or_si128(v1, v3);
+            // _mm_blend_epi16 takes const int for parameter, so let's use blendv_epi8.
+            m = _mm_blendv_epi8(m, v4, blender);
+            m_[i] = FieldBits(m);
+        }
+    }
 }
 
 #endif // CORE_BIT_FIELD_INL_H_
