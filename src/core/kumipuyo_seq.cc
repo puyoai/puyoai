@@ -25,17 +25,17 @@ PuyoColor KumipuyoSeq::color(NextPuyoPosition npp) const
 {
     switch (npp) {
     case NextPuyoPosition::CURRENT_AXIS:
-        return axis(0);
+        return size() > 0 ? axis(0) : PuyoColor::EMPTY;
     case NextPuyoPosition::CURRENT_CHILD:
-        return child(0);
+        return size() > 0 ? child(0) : PuyoColor::EMPTY;
     case NextPuyoPosition::NEXT1_AXIS:
-        return axis(1);
+        return size() > 1 ? axis(1) : PuyoColor::EMPTY;
     case NextPuyoPosition::NEXT1_CHILD:
-        return child(1);
+        return size() > 1 ? child(1) : PuyoColor::EMPTY;
     case NextPuyoPosition::NEXT2_AXIS:
-        return axis(2);
+        return size() > 2 ? axis(2) : PuyoColor::EMPTY;
     case NextPuyoPosition::NEXT2_CHILD:
-        return child(2);
+        return size() > 2 ? child(2) : PuyoColor::EMPTY;
     }
 
     CHECK(false) << "Unknown NextPuyoPosition: " << static_cast<int>(npp);
