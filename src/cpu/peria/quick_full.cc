@@ -27,17 +27,6 @@ using uint64 = std::uint64_t;
 
 namespace {
 
-uint64 hashField(const CoreField& f) {
-  static const uint64 p = 1000000009;  // 10^9+9
-  uint64 h = 0;
-  for (int x = 1; x <= 6; ++x) {
-    for (int y = 1; y <= 13; ++y) {
-      h = h * p + ordinal(f.color(x, y));
-    }
-  }
-  return h;
-}
-
 struct State {
   CoreField field;
   int ojama;
@@ -60,7 +49,7 @@ void generateNextStates(const State& state, const Kumipuyo& kumi, int from,
     const CoreField field = plan.field();
     RensaResult result = plan.rensaResult();
 
-    uint64 h = hashField(field);
+    uint64 h = field.hash();
     if (!visited.insert(h).second)
       return;
 
@@ -164,7 +153,7 @@ SearchResult search(CoreField field, const KumipuyoSeq& vseq, int search_turns) 
       }
     }
   }
-  
+
   return result;
 }
 
@@ -240,4 +229,3 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-
