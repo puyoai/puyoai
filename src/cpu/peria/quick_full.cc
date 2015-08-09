@@ -43,6 +43,7 @@ struct State {
   int ojama;
   int expect;
   int from;
+  int frames;
   Decision first_decision;
 };
 
@@ -50,6 +51,7 @@ struct SearchResult {
   Decision decision;
   int ojama;
   int expect;
+  int frames;
 };
 
 void generateNextStates(const State& state, const Kumipuyo& kumi, int from,
@@ -62,6 +64,9 @@ void generateNextStates(const State& state, const Kumipuyo& kumi, int from,
     if (!visited.insert(h).second)
       return;
 
+    // Add expected frames to control puyos
+    int frames = state.frames + plan.totalFrames();
+
     if (plan.isRensaPlan()) {
       // Latter 70 means this RENSA has enough power to fill enemy's field.
       int ojama = std::min(result.score / 70, FLAGS_min_ojama);
@@ -70,6 +75,7 @@ void generateNextStates(const State& state, const Kumipuyo& kumi, int from,
         .ojama = ojama,
         .expect = 0,
         .from = from,
+        .frames = frames,
         .first_decision = (from < 0) ? plan.decision(0) : state.first_decision
       };
       states.push_back(next);
@@ -81,7 +87,7 @@ void generateNextStates(const State& state, const Kumipuyo& kumi, int from,
     int expect = 0;
     auto detect_callback = [&expect](CoreField&& f, const ColumnPuyoList&) {
       RensaResult r = f.simulate();
-      expect = std::max(expect, r.score);
+      expect = std::max(expect, r.score / 40);
     };
     bool prohibits[FieldConstant::MAP_WIDTH] {};
     RensaDetector::detectByDropStrategy(field, prohibits,
@@ -93,6 +99,7 @@ void generateNextStates(const State& state, const Kumipuyo& kumi, int from,
       .ojama = 0,
       .expect = expect,
       .from = from,
+      .frames = frames,
       .first_decision = (from < 0) ? plan.decision(0) : state.first_decision
     };
     states.push_back(next);
@@ -109,6 +116,7 @@ SearchResult search(CoreField field, const KumipuyoSeq& vseq, int search_turns) 
     .field = field,
     .ojama = 0,
     .from = -1,
+    .frames = 0,
     .first_decision = Decision(0, 0)
   };
   q_states[0].push_back(init_state);
@@ -123,8 +131,11 @@ SearchResult search(CoreField field, const KumipuyoSeq& vseq, int search_turns) 
       break;
     std::sort(next_states.begin(), next_states.end(),
               [](const State& a, const State& b) {
-                if (a.ojama == b.ojama)
+                if (a.ojama == b.ojama) {
+                  if (a.expect == b.expect)
+                    return a.frames < b.frames;
                   return a.expect > b.expect;
+                }
                 return a.ojama > b.ojama;
               });
     if (static_cast<int>(next_states.size()) >= FLAGS_beam_width)
@@ -145,10 +156,11 @@ SearchResult search(CoreField field, const KumipuyoSeq& vseq, int search_turns) 
   };
   for (int t = 0; t < search_turns; ++t) {
     for (const auto& s : q_states[t]) {
-      if (s.ojama > result.ojama || (s.ojama == result.ojama && s.expect > result.expect)) {
+      if (s.ojama > result.ojama || (s.ojama == result.ojama && s.frames < result.frames)) {
         result.decision = s.first_decision;
         result.ojama = s.ojama;
         result.expect = s.expect;
+        result.frames = s.frames;
       }
     }
   }
@@ -212,9 +224,9 @@ class QuickFullAI : public AI {
 
     // TODO: make a message to display
     std::ostringstream oss;
-    oss << "Time:_" << (end_time - start_time) << "[ms],"
-        << "Decision:_" << best_decision.x << "-" << best_decision.r << ","
-        << "Expect:_" << best_expect;
+    oss << "Time:" << (end_time - start_time) << "[ms]_/_"
+        << "Simulates:" << num_simulate << "_/_"
+        << "ExpectOjama:" << best_expect;
     return DropDecision(best_decision, oss.str());
   }
 };
