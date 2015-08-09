@@ -176,7 +176,7 @@ class QuickFullAI : public AI {
         break;
 
       KumipuyoSeq vseq = seq;  // 'v' stands for "virtual"
-      vseq.append(generateRandomSequenceWithSeed(frame_id + num_simulate));
+      vseq.append(generateRandomSequenceWithSeed(frame_id + num_simulate).subsequence(3));
       int search_turns = std::max((FLAGS_max_puyos - field.countPuyos()) / 2,
                                   FLAGS_min_turn);
       ++num_simulate;
