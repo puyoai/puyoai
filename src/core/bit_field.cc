@@ -162,6 +162,19 @@ std::string BitField::toDebugString(char charIfEmpty) const
     return ss.str();
 }
 
+size_t BitField::hash() const
+{
+    static const size_t p = 1000000009;  // 10^9+9
+    size_t h = 0;
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 13; ++y) {
+            h = h * p + ordinal(color(x, y));
+        }
+    }
+
+    return h;
+}
+
 bool operator==(const BitField& lhs, const BitField& rhs)
 {
     for (int i = 0; i < 3; ++i)

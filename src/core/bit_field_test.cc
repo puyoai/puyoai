@@ -1,6 +1,8 @@
 #include "core/bit_field.h"
 
 #include <algorithm>
+#include <map>
+
 #include <gtest/gtest.h>
 
 #include "core/plain_field.h"
@@ -639,4 +641,46 @@ TEST(BitFieldTest, calculateHeight)
     EXPECT_EQ(12, heights[4]);
     EXPECT_EQ(13, heights[5]);
     EXPECT_EQ(13, heights[6]); // not 14, but 13.
+}
+
+TEST(BitFieldTest, hash)
+{
+    // Check hash collisiton does not occur in this implementation.
+    static const PuyoColor COLORS[] = {
+        PuyoColor::RED, PuyoColor::BLUE, PuyoColor::YELLOW, PuyoColor::GREEN,
+        PuyoColor::OJAMA, PuyoColor::IRON
+    };
+
+    std::map<size_t, BitField> visited;
+
+    visited.insert(make_pair(BitField().hash(), BitField()));
+
+    for (int x = 1; x <= 6; ++x) {
+        for (PuyoColor c : COLORS) {
+            BitField bf;
+            bf.setColor(x, 1, c);
+
+            EXPECT_TRUE(visited.emplace(bf.hash(), bf).second)
+                << "Hash collision detected:\n"
+                << "existing:\n" << visited[bf.hash()].toDebugString()
+                << "ours:\n" << bf.toDebugString();
+        }
+    }
+
+    for (int x1 = 1; x1 <= 6; ++x1) {
+        for (PuyoColor c1 : COLORS) {
+            for (int x2 = x1; x2 <= 6; ++x2) {
+                for (PuyoColor c2 : COLORS) {
+                    BitField bf;
+                    bf.setColor(x1, 1, c1);
+                    bf.setColor(x2, x1 == x2 ? 2 : 1, c2);
+
+                    EXPECT_TRUE(visited.emplace(bf.hash(), bf).second)
+                        << "Hash collision detected:\n"
+                        << "existing:\n" << visited[bf.hash()].toDebugString()
+                        << "ours:\n" << bf.toDebugString();
+                }
+            }
+        }
+    }
 }

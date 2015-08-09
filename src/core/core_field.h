@@ -178,6 +178,8 @@ public:
     // ----------------------------------------------------------------------
     // utility methods
 
+    size_t hash() const { return field_.hash(); } 
+
     std::string toDebugString() const;
 
     friend bool operator==(const CoreField&, const CoreField&);

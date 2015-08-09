@@ -89,6 +89,8 @@ public:
     int fillErasingPuyoPositions(Position* eraseQueue) const;
     FieldBits ignitionPuyoBits() const;
 
+    size_t hash() const;
+
     friend bool operator==(const BitField&, const BitField&);
     friend std::ostream& operator<<(std::ostream&, const BitField&);
 
