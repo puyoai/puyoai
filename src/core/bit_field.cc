@@ -164,15 +164,21 @@ std::string BitField::toDebugString(char charIfEmpty) const
 
 size_t BitField::hash() const
 {
-    static const size_t p = 1000000009;  // 10^9+9
-    size_t h = 0;
-    for (int x = 1; x <= 6; ++x) {
-        for (int y = 1; y <= 13; ++y) {
-            h = h * p + ordinal(color(x, y));
-        }
-    }
+    static_assert(sizeof(std::uint64_t) == sizeof(size_t), "assumed 64bit");
 
-    return h;
+    union {
+        std::uint64_t v[6];
+        __m128i m[3];
+    };
+
+    for (int i = 0; i < 3; ++i)
+        m[i] = m_[i].xmm();
+
+    size_t r = 0;
+    for (int i = 0; i < 6; ++i)
+        r = r * 33 + v[i];
+
+    return r;
 }
 
 bool operator==(const BitField& lhs, const BitField& rhs)
