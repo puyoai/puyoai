@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_core_pattern
             bijection_matcher.cc
+            decision_book.cc
             field_pattern.cc
             pattern_matcher.cc)
 
@@ -20,5 +21,6 @@ function(puyoai_core_pattern_add_test target)
     endif()
 endfunction()
 
+puyoai_core_pattern_add_test(decision_book)
 puyoai_core_pattern_add_test(field_pattern)
 puyoai_core_pattern_add_test(pattern_matcher)
