@@ -76,5 +76,6 @@ puyoai_core_add_test(rensa_track_result)
 puyoai_core_add_test(rensa_tracker)
 puyoai_core_add_test(sequence_generator)
 
+puyoai_core_add_test(bit_field_performance 1)
 puyoai_core_add_test(field_performance 1)
 puyoai_core_add_test(puyo_controller_performance 1)
