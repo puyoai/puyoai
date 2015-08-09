@@ -14,6 +14,7 @@ public:
     FieldBits256(FieldBits high, FieldBits low)
     {
         // TODO(mayah): We should have better algorithm here.
+        // See http://lists.cs.uiuc.edu/pipermail/cfe-commits/Week-of-Mon-20150518/129492.html
         m_ = _mm256_setzero_si256();
         m_ = _mm256_inserti128_si256(m_, low, 0);
         m_ = _mm256_inserti128_si256(m_, high, 1);
@@ -23,8 +24,8 @@ public:
 
     bool get(HighLow highlow, int x, int y) const { return !_mm256_testz_si256(onebit(highlow, x, y), m_); }
 
-    FieldBits lowBits128() const { return _mm256_extracti128_si256(m_, 0); }
-    FieldBits highBits128() const { return _mm256_extracti128_si256(m_, 1); }
+    FieldBits low() const { return _mm256_extracti128_si256(m_, 0); }
+    FieldBits high() const { return _mm256_extracti128_si256(m_, 1); }
 
 private:
     static __m256i onebit(HighLow highlow, int x, int y);
