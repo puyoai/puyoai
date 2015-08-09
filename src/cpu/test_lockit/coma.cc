@@ -120,16 +120,17 @@ void COMAI_HI::ref()
 
 bool COMAI_HI::aite_attack_start(const PuyoColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
 {
-    int score = 0;
     int jamako_sabun;
-    int quick = 0;
     bool ret_keshi = false;
 
     int kosuu_mae = countNormalColor13(ba3);
     PuyoColor ba[6][kHeight] {};
     copyField(ba3, ba);
 
-    m_aite_hakka_rensa = hon_syoukyo_score(ba, &score, &quick);
+    TLRensaResult result = simulate(ba);
+    int score = result.score;
+    int quick = result.quick;
+    m_aite_hakka_rensa = result.chains;
     m_aite_hakka_nokori = m_aite_hakka_rensa;
     m_hakkatime = hakata;
     if (m_aite_hakka_rensa > 0) {
