@@ -22,18 +22,6 @@
 
 using namespace std;
 
-
-
-int64_t make_hash(const CoreField& field)
-{
-    static const uint64_t base = 1000000009;
-    uint64_t h = 0;
-    for (int y = 1; y <= 13; ++y)
-        for (int x = 1; x <= 6; ++x)
-            h = h * base + (uint64_t)field.color(x, y);
-    return h;
-}
-
 struct State
 {
     CoreField field;
@@ -71,7 +59,7 @@ void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int
         CoreField field = plan.field();
         RensaResult rensa_result = plan.rensaResult();
 
-        const int64_t field_hash = make_hash(plan.field());
+        const int64_t field_hash = plan.field().hash();
         if (visited.count(field_hash))
             return;
         visited.insert(field_hash);
@@ -475,7 +463,7 @@ void run_loop(int num, const int start_seed, bool print_info)
     vector<promise<RunResult>> promise_results(num);
     for (int i = 0; i < num; ++i)
     {
-        executor->submit(std::move([i, start_seed, &promise_results]() { 
+        executor->submit(std::move([i, start_seed, &promise_results]() {
                 promise_results[i].set_value(run(start_seed + i));
                 cout << "done: " << i << endl;
         }));
