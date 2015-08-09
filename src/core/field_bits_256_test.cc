@@ -24,7 +24,7 @@ TEST(FieldBits256Test, ctor2)
     high.set(2, 4);
     high.set(5, 9);
 
-    FieldBits256 fb256(low, high);
+    FieldBits256 fb256(high, low);
 
     EXPECT_TRUE(fb256.get(FieldBits256::HighLow::LOW, 1, 3));
     EXPECT_TRUE(fb256.get(FieldBits256::HighLow::LOW, 4, 8));

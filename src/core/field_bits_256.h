@@ -11,7 +11,7 @@ public:
     enum class HighLow { LOW, HIGH };
 
     FieldBits256() : m_(_mm256_setzero_si256()) {}
-    FieldBits256(FieldBits low, FieldBits high)
+    FieldBits256(FieldBits high, FieldBits low)
     {
         // TODO(mayah): We should have better algorithm here.
         m_ = _mm256_setzero_si256();
