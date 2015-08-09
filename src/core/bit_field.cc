@@ -164,6 +164,9 @@ std::string BitField::toDebugString(char charIfEmpty) const
 
 size_t BitField::hash() const
 {
+    // Using a small P is not good.
+    // See https://github.com/puyoai/puyoai/issues/190
+    static const size_t p = 1000000009; // 10^9+9
     static_assert(sizeof(std::uint64_t) == sizeof(size_t), "assumed 64bit");
 
     union {
@@ -176,7 +179,7 @@ size_t BitField::hash() const
 
     size_t r = 0;
     for (int i = 0; i < 6; ++i)
-        r = r * 33 + v[i];
+        r = r * p + v[i];
 
     return r;
 }
