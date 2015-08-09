@@ -16,7 +16,7 @@
 #include "core/field_pretty_printer.h"
 #include "core/frame_request.h"
 #include "core/kumipuyo.h"
-#include "core/sequence_generator.h"
+#include "core/kumipuyo_seq_generator.h"
 #include "solver/problem.h"
 
 #include "evaluator.h"
@@ -34,7 +34,7 @@ public:
 
 Problem makeProblem()
 {
-    KumipuyoSeq generated = generateSequence();
+    KumipuyoSeq generated = KumipuyoSeqGenerator::generateACPuyo2Sequence();
     LOG(INFO) << "seq=" << generated.toString();
 
     Problem problem;

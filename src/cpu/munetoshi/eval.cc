@@ -8,7 +8,7 @@
 
 #include "ai.h"
 
-#include "core/sequence_generator.h"
+#include "core/kumipuyo_seq_generator.h"
 #include "solver/endless.h"
 
 constexpr int TEST_TIMES = 500;
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     int runout_count = 0;
 
     for (int i = 0; i < TEST_TIMES; ++i) {
-        KumipuyoSeq seq = generateRandomSequenceWithSeed(i);
+        KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2SequenceWithSeed(i);
         EndlessResult result = endless.run(seq);
 
         std::cout << i << ": " << "type = " << static_cast<int>(result.type) << ", score = " << result.score << ", chain = " << result.maxRensa << std::endl;

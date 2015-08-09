@@ -10,12 +10,12 @@
 
 #include "core/decision.h"
 #include "core/frame_response.h"
+#include "core/kumipuyo_seq_generator.h"
 #include "core/puyo_controller.h"
 #include "core/server/connector/connector.h"
 #include "core/server/connector/connector_manager.h"
 #include "core/server/game_state.h"
 #include "core/server/game_state_observer.h"
-#include "core/sequence_generator.h"
 #include "duel/field_realtime.h"
 #include "duel/frame_context.h"
 
@@ -201,7 +201,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
     for (auto observer : observers_)
         observer->newGameWillStart();
 
-    KumipuyoSeq kumipuyoSeq = generateSequence();
+    KumipuyoSeq kumipuyoSeq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
 
     LOG(INFO) << "Puyo sequence=" << kumipuyoSeq.toString();
 
