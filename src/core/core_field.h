@@ -282,4 +282,17 @@ void CoreField::removePuyoFrom(int x)
     unsafeSet(x, heights_[x]--, PuyoColor::EMPTY);
 }
 
+namespace std {
+
+template<>
+struct hash<CoreField>
+{
+    size_t operator()(const CoreField& cf) const
+    {
+        return cf.hash();
+    }
+};
+
+}
+
 #endif

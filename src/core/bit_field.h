@@ -310,6 +310,19 @@ void BitField::calculateHeight(int heights[FieldConstant::MAP_WIDTH]) const
    _mm_store_si128(reinterpret_cast<__m128i*>(heights + 4), _mm_unpackhi_epi16(count, zero));
 }
 
+namespace std {
+
+template<>
+struct hash<BitField>
+{
+    size_t operator()(const BitField& bf) const
+    {
+        return bf.hash();
+    }
+};
+
+}
+
 #include "bit_field_inl.h"
 
 #endif // CORE_BIT_FIELD_H_
