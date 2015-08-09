@@ -164,8 +164,10 @@ std::string BitField::toDebugString(char charIfEmpty) const
 
 size_t BitField::hash() const
 {
-    // Using a small P is not good.
+    // Using a small P (e.g. 33) is not good. It causes a lot of collisions.
+    // TODO(mayah): We will have a few collisions. Probably we should consider better algorithm here.
     // See https://github.com/puyoai/puyoai/issues/190
+
     static const size_t p = 1000000009; // 10^9+9
     static_assert(sizeof(std::uint64_t) == sizeof(size_t), "assumed 64bit");
 
