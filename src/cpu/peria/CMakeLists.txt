@@ -24,7 +24,9 @@ endfunction()
 peria_add_executable(peria main.cc)
 
 cpu_add_runner(run.sh)
-cpu_add_runner(quick.sh)
+cpu_add_runner(quick_full.sh)
+cpu_add_runner(quick_2dub.sh)
+
 cpu_add_runner(book.txt)
 
 include_directories(${gtest_SOURCE_DIR}/include
@@ -37,3 +39,5 @@ peria_add_test(pattern_test)
 # ---------------------
 cpu_add_executable(quick_full quick_full.cc)
 cpu_target_link_common_libraries(quick_full)
+cpu_add_executable(quick_2dub quick_2dub.cc)
+cpu_target_link_common_libraries(quick_2dub)
