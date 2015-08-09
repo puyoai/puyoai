@@ -18,6 +18,7 @@ add_library(puyoai_core STATIC
             core_field.cc
             decision.cc
             field_bits.cc
+            field_bits_256.cc
             field_pretty_printer.cc
             flags.cc
             frame_request.cc
@@ -59,6 +60,7 @@ puyoai_core_add_test(column_puyo_list)
 puyoai_core_add_test(core_field)
 puyoai_core_add_test(decision)
 puyoai_core_add_test(field_bits)
+puyoai_core_add_test(field_bits_256)
 puyoai_core_add_test(field_checker)
 puyoai_core_add_test(frame_response)
 puyoai_core_add_test(frame_request)
