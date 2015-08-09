@@ -13,7 +13,7 @@ public:
     FieldBits256() : m_(_mm256_setzero_si256()) {}
     FieldBits256(FieldBits low, FieldBits high)
     {
-        // TODO(mayah): We should have more better algorithm here.
+        // TODO(mayah): We should have better algorithm here.
         m_ = _mm256_setzero_si256();
         m_ = _mm256_inserti128_si256(m_, low, 0);
         m_ = _mm256_inserti128_si256(m_, high, 1);
@@ -51,7 +51,6 @@ inline __m256i FieldBits256::onebit(FieldBits256::HighLow highlow, int x, int y)
 
     return m;
 }
-
 
 #endif // __AVX2__
 #endif // CORE_FIELD_BITS_256_H_
