@@ -12,7 +12,7 @@
 #include "core/algorithm/rensa_detector.h"
 #include "core/client/ai/ai.h"
 #include "core/core_field.h"
-#include "core/sequence_generator.h"
+#include "core/kumipuyo_seq_generator.h"
 
 DEFINE_int32(max_simulate, 5, "The maximum number to iterate simulations.");
 DEFINE_int32(max_puyos, 30, "Expectedly minimum number of reqruied puyos to send 70 Ojama.");
@@ -176,12 +176,12 @@ class QuickFullAI : public AI {
       if (now >= start_time + FLAGS_time_limit)
         break;
 
-      KumipuyoSeq vseq = seq;  // 'v' stands for "virtual"
-      vseq.append(generateRandomSequenceWithSeed(frame_id + num_simulate).subsequence(3));
       int search_turns = std::max((FLAGS_max_puyos - field.countPuyos()) / 2,
                                   FLAGS_min_turn);
-      ++num_simulate;
+      KumipuyoSeq vseq = seq;  // 'v' stands for "virtual"
+      vseq.append(KumipuyoSeqGenerator::generateRandomSequenceWithSeed(search_turns - seq.size(), frame_id + num_simulate));
       SearchResult result = search(field, vseq, search_turns);
+      ++num_simulate;
       if (result.ojama < 0)
         continue;
 
