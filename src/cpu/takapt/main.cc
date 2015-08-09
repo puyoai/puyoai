@@ -28,8 +28,6 @@ struct State
 
     double score;
     int frames;
-    int max_chains_until;
-    int ignition_y;
     int fired_chains;
 
     int pending_enemy_score;
@@ -73,8 +71,6 @@ void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int
                 .field = field,
                 .score = (double)rensa_result.score,
                 .frames = frames,
-                .max_chains_until = current_state.max_chains_until,
-                .ignition_y = -1,
                 .fired_chains = rensa_result.chains,
                 .pending_enemy_score = current_state.pending_enemy_score,
                 .dropped_frames = current_state.dropped_frames,
@@ -96,8 +92,8 @@ void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int
         if (!field.isEmpty(3, 12))
             return;
 
-        int max_chains = 0;//current_state.max_chains_until;
-        int highest_ignition_y = current_state.ignition_y;
+        int max_chains = 0;
+        int highest_ignition_y = 0;
         bool prohibits[FieldConstant::MAP_WIDTH]{};
         auto complement_callback = [&max_chains, &highest_ignition_y](CoreField&& complemented_field, const ColumnPuyoList& puyo_list)
         {
@@ -148,8 +144,6 @@ void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int
             .field = field,
             .score = score,
             .frames = frames,
-            .max_chains_until = max_chains,
-            .ignition_y = highest_ignition_y,
             .fired_chains = 0,
             .pending_enemy_score = pending_enemy_score,
             .dropped_frames = current_state.dropped_frames,
@@ -196,8 +190,6 @@ BeamSearchResult beamsearch(const CoreField& start_field, const KumipuyoSeq& seq
         .field = start_field,
         .score = 0,
         .frames= 0,
-        .max_chains_until = 0,
-        .ignition_y = -1,
         .fired_chains = 0,
         .pending_enemy_score = enemy.isRensaOngoing() ? scoreForOjama(me.totalOjama(enemy)) : 0,
         .dropped_frames = enemy.isRensaOngoing() ? enemy.rensaFinishingFrameId() - frame_id : 100000000,
@@ -323,7 +315,6 @@ public:
     void onGameWillBegin(const FrameRequest&) override
     {
         current_turn = 0;
-        last_turn = -1;
     }
 
     void onDecisionRequestedForMe(const FrameRequest&) override
@@ -366,10 +357,10 @@ private:
         }
 
         int missed_search = 0;
-        int good_chains = min(13, count_color_puyos_connected_from_start(f) / 5 + 4);
-        vector<int> chains[8][4];
+        int good_chains = min(14, count_color_puyos_connected_from_start(f) / 5 + 4);
+        vector<int> chains[7][4];
         int simu_i;
-        for (simu_i = 0; ((simu_i < SIMULATIONS && good_chains > 0) || currentTimeInMillis() - start_time < RETRY_TL) && currentTimeInMillis() - start_time < TL; ++simu_i)
+        for (simu_i = 0; ((simu_i < SIMULATIONS && good_chains > 0) || currentTimeInMillis() - start_time < RETRY_TL) && currentTimeInMillis() - start_time < TL; )
         {
             const int search_turns = min(FLAGS_max_turns - current_turn,
                     max(max(10, nexts.size()), min(50, ((6 * 13) - f.countPuyos()) / 2 + 4)));
@@ -378,7 +369,9 @@ private:
             seq.append(KumipuyoSeqGenerator::generateRandomSequenceWithSeed(search_turns, frame_id + simu_i));
 
             BeamSearchResult result = beamsearch(f, seq, frame_id, me, enemy, search_turns, good_chains);
-            if (result.chains == -1 || result.chains + 2 < good_chains)
+            ++simu_i;
+
+            if (result.chains == -1)
             {
                 ++missed_search;
                 good_chains = max(good_chains - 1, 1);
@@ -391,7 +384,6 @@ private:
                 chains[first_decision.axisX()][first_decision.rot()].push_back(result.chains);
                 if ((int)chains[first_decision.axisX()][first_decision.rot()].size() >= (SIMULATIONS + 1) / 2 && currentTimeInMillis() - start_time > RETRY_TL)
                 {
-                    ++simu_i;
                     break;
                 }
             }
@@ -429,7 +421,6 @@ private:
     }
 
     int current_turn = -1;
-    int last_turn = -1;
 };
 
 
