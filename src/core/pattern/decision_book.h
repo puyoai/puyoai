@@ -1,5 +1,5 @@
-#ifndef CPU_MAYAH_DECISION_BOOK_H_
-#define CPU_MAYAH_DECISION_BOOK_H_
+#ifndef CORE_PATTERN_DECISION_BOOK_H_
+#define CORE_PATTERN_DECISION_BOOK_H_
 
 #include <toml/toml.h>
 
@@ -30,6 +30,8 @@ private:
     std::map<std::string, Decision> decisions_;
 };
 
+// DecisionBook is a book to return a fixed Decision from the given field and kumipuyo sequence.
+// It is useful to make a book in the very early phase.
 class DecisionBook : noncopyable {
 public:
     DecisionBook();

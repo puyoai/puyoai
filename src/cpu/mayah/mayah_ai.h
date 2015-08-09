@@ -6,10 +6,10 @@
 #include <vector>
 
 #include "base/executor.h"
-#include "core/client/ai/ai.h"
 #include "core/algorithm/plan.h"
+#include "core/client/ai/ai.h"
+#include "core/pattern/decision_book.h"
 
-#include "decision_book.h"
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
