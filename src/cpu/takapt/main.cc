@@ -9,7 +9,7 @@
 #include "core/client/ai/ai.h"
 #include "core/core_field.h"
 #include "core/frame_request.h"
-#include "core/sequence_generator.h"
+#include "core/kumipuyo_seq_generator.h"
 #include "core/score.h"
 #include "solver/endless.h"
 #include "solver/puyop.h"
@@ -371,11 +371,12 @@ private:
         int simu_i;
         for (simu_i = 0; ((simu_i < SIMULATIONS && good_chains > 0) || currentTimeInMillis() - start_time < RETRY_TL) && currentTimeInMillis() - start_time < TL; ++simu_i)
         {
-            KumipuyoSeq seq = nexts;
-            seq.append(generateRandomSequenceWithSeed(frame_id + simu_i).subsequence(3));
-
             const int search_turns = min(FLAGS_max_turns - current_turn,
                     max(max(10, nexts.size()), min(50, ((6 * 13) - f.countPuyos()) / 2 + 4)));
+
+            KumipuyoSeq seq = nexts;
+            seq.append(KumipuyoSeqGenerator::generateRandomSequenceWithSeed(search_turns, frame_id + simu_i));
+
             BeamSearchResult result = beamsearch(f, seq, frame_id, me, enemy, search_turns, good_chains);
             if (result.chains == -1 || result.chains + 2 < good_chains)
             {
@@ -444,7 +445,7 @@ RunResult run(int seed)
     Endless endless(std::move(std::unique_ptr<AI>(ai)));
 //     endless.setVerbose(FLAGS_show_field);
 
-    KumipuyoSeq seq = generateRandomSequenceWithSeed(seed);
+    KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2SequenceWithSeed(seed);
     EndlessResult result = endless.run(seq);
 
     stringstream ss;
