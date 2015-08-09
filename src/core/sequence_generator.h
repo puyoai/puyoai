@@ -3,12 +3,12 @@
 
 #include <random>
 
+#include "base/base.h"
 #include "core/kumipuyo_seq.h"
 
-KumipuyoSeq generateSequence();
-
-KumipuyoSeq generateRandomSequence();
-KumipuyoSeq generateRandomSequenceWithSeed(int seed);
-KumipuyoSeq generateRandomSequenceWithMt19937(std::mt19937);
+KumipuyoSeq generateSequence() DEPRECATED_MSG("Use KumipuyoSeqGenerator instead");
+KumipuyoSeq generateRandomSequence() DEPRECATED_MSG("Use KumipuyoSeqGenerator instead");
+KumipuyoSeq generateRandomSequenceWithSeed(int seed) DEPRECATED_MSG("Use KumipuyoSeqGenerator instead");
+KumipuyoSeq generateRandomSequenceWithMt19937(std::mt19937) DEPRECATED_MSG("Use KumipuyoSeqGenerator instead");
 
 #endif
