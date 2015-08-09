@@ -30,6 +30,7 @@ add_library(puyoai_core STATIC
             kumipuyo_moving_state.cc
             kumipuyo_pos.cc
             kumipuyo_seq.cc
+            kumipuyo_seq_generator.cc
             plain_field.cc
             puyo_color.cc
             puyo_controller.cc
@@ -67,6 +68,7 @@ puyoai_core_add_test(kumipuyo)
 puyoai_core_add_test(kumipuyo_moving_state)
 puyoai_core_add_test(kumipuyo_pos)
 puyoai_core_add_test(kumipuyo_seq)
+puyoai_core_add_test(kumipuyo_seq_generator)
 puyoai_core_add_test(plain_field)
 puyoai_core_add_test(player_state)
 puyoai_core_add_test(puyo_color)
