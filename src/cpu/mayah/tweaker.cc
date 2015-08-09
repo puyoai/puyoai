@@ -13,7 +13,7 @@
 
 #include "base/executor.h"
 #include "core/algorithm/puyo_possibility.h"
-#include "core/sequence_generator.h"
+#include "core/kumipuyo_seq_generator.h"
 #include "solver/endless.h"
 #include "solver/puyop.h"
 
@@ -135,7 +135,7 @@ void runOnce(const EvaluationParameterMap& paramMap)
     Endless endless(std::move(std::unique_ptr<AI>(ai)));
     endless.setVerbose(FLAGS_show_field);
 
-    KumipuyoSeq seq = generateSequence();
+    KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
     EndlessResult result = endless.run(seq);
 
     cout << seq.toString() << endl;
@@ -158,7 +158,7 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
 
             Endless endless(std::move(std::unique_ptr<AI>(ai)));
             stringstream ss;
-            KumipuyoSeq seq = generateRandomSequenceWithSeed(i + FLAGS_offset);
+            KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2SequenceWithSeed(i + FLAGS_offset);
             EndlessResult result = endless.run(seq);
             ss << "case " << setw(2) << i << ": "
                << "score=" << setw(6) << result.score << " rensa=" << setw(2) << result.maxRensa;
