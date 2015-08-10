@@ -40,6 +40,34 @@ TEST(FieldBits256Test, ctor2)
     EXPECT_FALSE(fb256.get(FieldBits256::HighLow::LOW, 5, 9));
 }
 
+TEST(FieldBits256Test, expand)
+{
+    FieldBits maskHigh(
+        "..1..."
+        "..1.11"
+        "111.11");
+    FieldBits maskLow(
+        "111111"
+        ".....1"
+        "111111"
+        "1....."
+        "111111");
+
+    FieldBits256 mask(maskHigh, maskLow);
+
+    FieldBits256 bit;
+    bit.setHigh(3, 1);
+    bit.setLow(6, 1);
+
+    FieldBits256 expanded = bit.expand(mask);
+
+    FieldBits highExpected = FieldBits(3, 1).expand(maskHigh);
+    FieldBits lowExpected = FieldBits(6, 1).expand(maskLow);
+
+    EXPECT_EQ(highExpected, expanded.high());
+    EXPECT_EQ(lowExpected, expanded.low());
+}
+
 TEST(FieldBits256Test, vanishingSeed)
 {
     BitField bf(
