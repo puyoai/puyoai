@@ -28,12 +28,8 @@ void syou_downx(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[
 bool setti_puyo(PuyoColor ba[][kHeight], int aa, PuyoColor nx1, PuyoColor nx2, int setti_basyo[]);
 int setti_puyo_1(PuyoColor ba[][kHeight], int eex, PuyoColor eecol);
 
-int chousei_syoukyo(PuyoColor ba[][kHeight], int setti_basyo[]);
-int chousei_syoukyo_2(PuyoColor ba[][kHeight], int setti_basyo[], int* chain, int dabuchk[], int* ichiren_kesi, int* score);
 int chousei_syoukyo_3(PuyoColor bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point);
 int chousei_syoukyo_sc(PuyoColor ba[][kHeight], int setti_basyo[], int* score);
-int hon_syoukyo(PuyoColor ba[][kHeight]);
-int hon_syoukyo_score(PuyoColor ba[][kHeight], int* score, int* quick);
 
 void setti_ojama(PuyoColor f[][kHeight], int numOjama);
 
