@@ -105,8 +105,7 @@ SearchResult search(CoreField field, const KumipuyoSeq& vseq, int search_turns) 
     .field = field,
     .ojama = 0,
     .from = -1,
-    .frames = 0,
-    .first_decision = Decision(0, 0)
+    .frames = 0
   };
   q_states[0].push_back(init_state);
   for (int t = 0; t < search_turns; ++t) {
