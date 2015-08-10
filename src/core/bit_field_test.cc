@@ -9,6 +9,77 @@
 
 using namespace std;
 
+namespace {
+
+struct SimulationTestCase {
+    BitField field;
+    int chains;
+    int score;
+    int frames;
+    bool quick;
+} SIMULATION_TEST_CASES[] = {
+    {
+        BitField(".BBBB."),
+        1, 40, FRAMES_VANISH_ANIMATION, true
+    },
+    {
+        BitField("BBBBBB"),
+        1, 60 * 3, FRAMES_VANISH_ANIMATION, true
+    },
+    {
+        BitField("YYYY.."
+                 "BBBB.."),
+        1, 80 * 3, FRAMES_VANISH_ANIMATION, true
+    },
+    {
+        BitField("YYYYYY"
+                 "BBBBBB"),
+        1, 120 * (3 + 3 + 3), FRAMES_VANISH_ANIMATION, true
+    },
+    {
+        BitField(".YYYG."
+                 "BBBBY."),
+        2,
+        40 + 40 * 8,
+        FRAMES_VANISH_ANIMATION * 2 + FRAMES_TO_DROP_FAST[1] * 2 + FRAMES_GROUNDING * 2,
+        false
+    },
+    {
+        BitField(".RBRB."
+                 "RBRBR."
+                 "RBRBR."
+                 "RBRBRR"),
+        5,
+        40 + 40 * 8 + 40 * 16 + 40 * 32 + 40 * 64,
+        FRAMES_VANISH_ANIMATION * 5 + FRAMES_TO_DROP_FAST[3] * 4 + FRAMES_GROUNDING * 4,
+        true
+    },
+    {
+        BitField(".YGGY."
+                 "BBBBBB"
+                 "GYBBYG"
+                 "BBBBBB"),
+        1,
+        140 * 10,
+        FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[3] + FRAMES_GROUNDING,
+        false
+    },
+    {
+        BitField("BBBBBB"
+                 "GYBBYG"
+                 "BBBBYB"),
+        1,
+        120 * 10,
+        FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[1] + FRAMES_GROUNDING,
+        false
+    },
+
+
+
+};
+
+} // anonymous namespace
+
 TEST(BitFieldTest, constructor1)
 {
     BitField bf;
@@ -407,124 +478,27 @@ TEST(BitFieldTest, fillSameColorPositionEdge)
     EXPECT_EQ(Position(6, 12), ps[0]);
 }
 
-TEST(BitFieldTest, simulate1)
+TEST(BitFieldTest, simulate)
 {
-    BitField bf(
-        ".BBBB.");
+    for (const auto& testcase : SIMULATION_TEST_CASES) {
+        BitField bf(testcase.field);
+        RensaResult result = bf.simulate();
 
-    RensaResult result = bf.simulate();
-    EXPECT_EQ(1, result.chains);
-    EXPECT_EQ(40, result.score);
-    EXPECT_EQ(FRAMES_VANISH_ANIMATION, result.frames);
-    EXPECT_TRUE(result.quick);
-
-    for (int x = 0; x < FieldConstant::MAP_WIDTH; ++x) {
-        EXPECT_TRUE(bf.isColor(x, 0, PuyoColor::WALL));
-        EXPECT_TRUE(bf.isColor(x, 15, PuyoColor::WALL));
+        EXPECT_EQ(testcase.chains, result.chains) << testcase.field.toDebugString();
+        EXPECT_EQ(testcase.score, result.score) << testcase.field.toDebugString();
+        EXPECT_EQ(testcase.frames, result.frames) << testcase.field.toDebugString();
+        EXPECT_EQ(testcase.quick, result.quick) << testcase.field.toDebugString();
     }
 }
 
-TEST(BitFieldTest, simulate2)
+TEST(BitFieldTest, simulateFast)
 {
-    BitField bf(
-        "BBBBBB");
+    for (const auto& testcase : SIMULATION_TEST_CASES) {
+        BitField bf(testcase.field);
+        int chains = bf.simulateFast();
 
-    RensaResult result = bf.simulate();
-    EXPECT_EQ(1, result.chains);
-    EXPECT_EQ(60 * 3, result.score);
-    EXPECT_EQ(FRAMES_VANISH_ANIMATION, result.frames);
-    EXPECT_TRUE(result.quick);
-}
-
-TEST(BitFieldTest, simulate3)
-{
-    BitField bf(
-        "YYYY.."
-        "BBBB..");
-
-    RensaResult result = bf.simulate();
-    EXPECT_EQ(1, result.chains);
-    EXPECT_EQ(80 * 3, result.score);
-    EXPECT_EQ(FRAMES_VANISH_ANIMATION, result.frames);
-    EXPECT_TRUE(result.quick);
-}
-
-TEST(BitFieldTest, simulate4)
-{
-    BitField bf(
-        "YYYYYY"
-        "BBBBBB");
-
-    RensaResult result = bf.simulate();
-    EXPECT_EQ(1, result.chains);
-    EXPECT_EQ(120 * (3 + 3 + 3), result.score);
-    EXPECT_EQ(FRAMES_VANISH_ANIMATION, result.frames);
-    EXPECT_TRUE(result.quick);
-}
-
-TEST(BitFieldTest, simulate5)
-{
-    BitField bf(
-        ".YYYG."
-        "BBBBY.");
-
-    RensaResult result = bf.simulate();
-    EXPECT_EQ(2, result.chains);
-    EXPECT_EQ(40 + 40 * 8, result.score);
-    EXPECT_EQ(FRAMES_VANISH_ANIMATION * 2 +
-              FRAMES_TO_DROP_FAST[1] * 2 +
-              FRAMES_GROUNDING * 2, result.frames);
-    EXPECT_FALSE(result.quick);
-}
-
-TEST(BitFieldTest, simulate6)
-{
-    BitField bf(
-        ".RBRB."
-        "RBRBR."
-        "RBRBR."
-        "RBRBRR");
-
-    RensaResult result = bf.simulate();
-    EXPECT_EQ(5, result.chains);
-    EXPECT_EQ(40 + 40 * 8 + 40 * 16 + 40 * 32 + 40 * 64, result.score);
-    EXPECT_EQ(FRAMES_VANISH_ANIMATION * 5 +
-              FRAMES_TO_DROP_FAST[3] * 4 +
-              FRAMES_GROUNDING * 4, result.frames);
-    EXPECT_TRUE(result.quick);
-}
-
-TEST(BitFieldTest, simulate7)
-{
-    BitField bf(
-        ".YGGY."
-        "BBBBBB"
-        "GYBBYG"
-        "BBBBBB");
-
-    RensaResult result = bf.simulate();
-    EXPECT_EQ(1, result.chains);
-    EXPECT_EQ(140 * 10, result.score);
-    EXPECT_EQ(FRAMES_VANISH_ANIMATION +
-              FRAMES_TO_DROP_FAST[3] +
-              FRAMES_GROUNDING, result.frames);
-    EXPECT_FALSE(result.quick);
-}
-
-TEST(BitFieldTest, simulate8)
-{
-    BitField bf(
-        "BBBBBB"
-        "GYBBYG"
-        "BBBBYB");
-
-    RensaResult result = bf.simulate();
-    EXPECT_EQ(1, result.chains);
-    EXPECT_EQ(120 * 10, result.score);
-    EXPECT_EQ(FRAMES_VANISH_ANIMATION +
-              FRAMES_TO_DROP_FAST[1] +
-              FRAMES_GROUNDING, result.frames);
-    EXPECT_FALSE(result.quick);
+        EXPECT_EQ(testcase.chains, chains) << testcase.field.toDebugString();
+    }
 }
 
 TEST(BitFieldTest, simulateWithTracker1)
@@ -538,24 +512,6 @@ TEST(BitFieldTest, simulateWithTracker1)
 
     EXPECT_EQ(2, tracker.originalY(1, 1));
     EXPECT_EQ(3, tracker.originalY(3, 1));
-}
-
-TEST(BitFieldTest, simulateFast1)
-{
-    BitField bf(
-        "..RR.."
-        "BBBBRR");
-
-    EXPECT_EQ(2, bf.simulateFast());
-}
-
-TEST(BitFieldTest, simulateFast2)
-{
-    BitField bf(
-        "RRRR.."
-        "BBBB..");
-
-    EXPECT_EQ(1, bf.simulateFast());
 }
 
 TEST(BitFieldTest, vanishDrop1)
