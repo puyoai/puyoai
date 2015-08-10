@@ -335,7 +335,7 @@ struct hash<BitField>
 #include "bit_field_inl.h"
 
 #ifdef __AVX2__
-#include "bit_field_inl_256.h"
+#include "bit_field_avx2_inl.h"
 #endif
 
 #endif // CORE_BIT_FIELD_H_
