@@ -2,6 +2,8 @@
 #define CORE_FIELD_BITS_256_H_
 #ifdef __AVX2__
 
+#include <string>
+
 #include <immintrin.h>
 
 #include "core/field_bits.h"
@@ -11,6 +13,7 @@ public:
     enum class HighLow { LOW, HIGH };
 
     FieldBits256() : m_(_mm256_setzero_si256()) {}
+    FieldBits256(__m256i m) : m_(m) {}
     FieldBits256(FieldBits high, FieldBits low)
     {
         // TODO(mayah): We should have better algorithm here.
@@ -26,6 +29,20 @@ public:
 
     FieldBits low() const { return _mm256_extracti128_si256(m_, 0); }
     FieldBits high() const { return _mm256_extracti128_si256(m_, 1); }
+
+    bool isEmpty() const { return _mm256_testc_si256(_mm256_setzero_si256(), m_); }
+    std::string toString() const; 
+
+    __m256i& ymm() { return m_; }
+
+    friend bool operator==(FieldBits256 lhs, FieldBits256 rhs) { return (lhs ^ rhs).isEmpty(); }
+    friend bool operator!=(FieldBits256 lhs, FieldBits256 rhs) { return !(lhs == rhs); }
+
+    friend FieldBits256 operator&(FieldBits256 lhs, FieldBits256 rhs) { return _mm256_and_si256(lhs.ymm(), rhs.ymm()); }
+    friend FieldBits256 operator|(FieldBits256 lhs, FieldBits256 rhs) { return _mm256_or_si256(lhs.ymm(), rhs.ymm()); }
+    friend FieldBits256 operator^(FieldBits256 lhs, FieldBits256 rhs) { return _mm256_xor_si256(lhs.ymm(), rhs.ymm()); }
+
+    friend std::ostream& operator<<(std::ostream& os, const FieldBits256& bits) { return os << bits.toString(); }
 
 private:
     static __m256i onebit(HighLow highlow, int x, int y);
