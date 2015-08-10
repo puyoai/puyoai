@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace std;
+
 TEST(FieldBits256Test, ctor1)
 {
     FieldBits256 bits;
