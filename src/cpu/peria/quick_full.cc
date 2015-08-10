@@ -104,8 +104,10 @@ SearchResult search(CoreField field, const KumipuyoSeq& vseq, int search_turns) 
   const State init_state = State {
     .field = field,
     .ojama = 0,
+    .expect = 0,
     .from = -1,
-    .frames = 0
+    .frames = 0,
+    .first_decision = Decision(0, 0),
   };
   q_states[0].push_back(init_state);
   for (int t = 0; t < search_turns; ++t) {
@@ -140,7 +142,8 @@ SearchResult search(CoreField field, const KumipuyoSeq& vseq, int search_turns) 
   SearchResult result = SearchResult {
     .decision = Decision(0, 0),
     .ojama = -1,
-    .expect = -1
+    .expect = -1,
+    .frames = -1,
   };
   for (int t = 0; t < search_turns; ++t) {
     for (const auto& s : q_states[t]) {
