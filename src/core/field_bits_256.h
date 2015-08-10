@@ -25,15 +25,18 @@ public:
 
     FieldBits256(HighLow highlow, int x, int y) : m_(onebit(highlow, x, y)) {}
 
+    __m256i& ymm() { return m_; }
+    const __m256i& ymm() const { return m_; }
+
     bool get(HighLow highlow, int x, int y) const { return !_mm256_testz_si256(onebit(highlow, x, y), m_); }
 
     FieldBits low() const { return _mm256_extracti128_si256(m_, 0); }
     FieldBits high() const { return _mm256_extracti128_si256(m_, 1); }
 
-    bool isEmpty() const { return _mm256_testc_si256(_mm256_setzero_si256(), m_); }
-    std::string toString() const; 
+    FieldBits256 vanishingSeed() const;
 
-    __m256i& ymm() { return m_; }
+    bool isEmpty() const { return _mm256_testc_si256(_mm256_setzero_si256(), m_); }
+    std::string toString() const;
 
     friend bool operator==(FieldBits256 lhs, FieldBits256 rhs) { return (lhs ^ rhs).isEmpty(); }
     friend bool operator!=(FieldBits256 lhs, FieldBits256 rhs) { return !(lhs == rhs); }

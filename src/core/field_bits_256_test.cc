@@ -1,8 +1,9 @@
 #ifdef __AVX2__
 
-#include "core/field_bits_256.h"
-
 #include <gtest/gtest.h>
+
+#include "core/bit_field.h"
+#include "core/field_bits_256.h"
 
 using namespace std;
 
@@ -37,6 +38,27 @@ TEST(FieldBits256Test, ctor2)
     EXPECT_FALSE(fb256.get(FieldBits256::HighLow::HIGH, 4, 8));
     EXPECT_FALSE(fb256.get(FieldBits256::HighLow::LOW, 2, 4));
     EXPECT_FALSE(fb256.get(FieldBits256::HighLow::LOW, 5, 9));
+}
+
+TEST(FieldBits256Test, vanishingSeed)
+{
+    BitField bf(
+        ".....R"
+        ".RR..R"
+        "YYRBBR"
+        "RYYBBG"
+        "RRRGGG");
+
+    FieldBits red = bf.bits(PuyoColor::RED);
+    FieldBits blue = bf.bits(PuyoColor::BLUE);
+    FieldBits yellow = bf.bits(PuyoColor::YELLOW);
+    FieldBits green = bf.bits(PuyoColor::GREEN);
+
+    FieldBits256 redBlueSeed = FieldBits256(red, blue).vanishingSeed();
+    FieldBits256 yellowGreenSeed = FieldBits256(yellow, green).vanishingSeed();
+
+    EXPECT_EQ(FieldBits256(red.vanishingSeed(), blue.vanishingSeed()), redBlueSeed);
+    EXPECT_EQ(FieldBits256(yellow.vanishingSeed(), green.vanishingSeed()), yellowGreenSeed);
 }
 
 #endif // __AVX2__
