@@ -632,22 +632,6 @@ int setti_puyo_1(PuyoColor ba[][kHeight], int eex, PuyoColor eecol)
     return 0;
 }
 
-int chousei_syoukyo(PuyoColor ba[][kHeight], int[])
-{
-    TLRensaResult result = simulate(ba);
-    return result.num_vanished;
-}
-
-int chousei_syoukyo_2(PuyoColor ba[][kHeight], int[], int* chain, int dabuchk[], int*, int* score)
-{
-    TLRensaResult result = simulate(ba);
-    *chain = result.chains;
-    for (int i = 0; i < result.chains; ++i)
-        dabuchk[i] = result.num_connections[i];
-    *score = result.score;
-    return result.num_vanished;
-}
-
 int chousei_syoukyo_3(PuyoColor bass[][kHeight], int[], int* poi2s, int* score, int tokus, int i2, int j2, int ruiseki_point)
 {
     int rensa_rate[19] = { 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512 };
@@ -789,20 +773,6 @@ int chousei_syoukyo_sc(PuyoColor field[][kHeight], int[], int* score)
     TLRensaResult result = simulate(field);
     *score = result.score;
     return result.num_vanished;
-}
-
-int hon_syoukyo(PuyoColor field[][kHeight])
-{
-    TLRensaResult result = simulate(field);
-    return result.chains;
-}
-
-int hon_syoukyo_score(PuyoColor field[][kHeight], int* score, int* quick)
-{
-    TLRensaResult result = simulate(field);
-    *score = result.score;
-    *quick = result.quick ? 1 : 0;
-    return result.chains;
 }
 
 void setti_ojama(PuyoColor f[][kHeight], int numOjama)
