@@ -28,8 +28,7 @@ RensaResult BitField::simulate(SimulationContext* context, Tracker* tracker)
     return RensaResult(context->currentChain - 1, score, frames, quick);
 }
 
-inline
-int BitField::simulateFast()
+inline int BitField::simulateFast()
 {
     BitField escaped = escapeInvisible();
     int currentChain = 1;

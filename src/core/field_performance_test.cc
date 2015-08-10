@@ -121,6 +121,15 @@ static void runSimulation(const CoreField& original)
         EXPECT_EQ(expectedChain, bf.simulateFast());
     }
 
+#ifdef __AVX2__
+    TimeStampCounterData tscBitFieldFastAVX2;
+    for (int i = 0; i < N; ++i) {
+        BitField bf(bitFieldOriginal);
+        ScopedTimeStampCounter stsc(&tscBitFieldFastAVX2);
+        EXPECT_EQ(expectedChain, bf.simulateFastAVX2());
+    }
+#endif
+
     cout << "overhead: " << endl;
     none.showStatistics();
     cout << "CoreField: " << endl;
@@ -131,6 +140,11 @@ static void runSimulation(const CoreField& original)
     tscBitField.showStatistics();
     cout << "BitField (fast): " << endl;
     tscBitFieldFast.showStatistics();
+
+#ifdef __AVX2__
+    cout << "BitField (fast) AVX2: " << endl;
+    tscBitFieldFastAVX2.showStatistics();
+#endif
 }
 
 TEST(FieldPerformanceTest, copy)
