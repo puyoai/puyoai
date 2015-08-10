@@ -38,7 +38,6 @@ add_library(puyoai_core STATIC
             real_color.cc
             rensa_result.cc
             rensa_track_result.cc
-            sequence_generator.cc
             user_event.cc)
 
 # ----------------------------------------------------------------------
@@ -78,7 +77,6 @@ puyoai_core_add_test(puyo_controller)
 puyoai_core_add_test(rensa_result)
 puyoai_core_add_test(rensa_track_result)
 puyoai_core_add_test(rensa_tracker)
-puyoai_core_add_test(sequence_generator)
 
 puyoai_core_add_test(bit_field_performance 1)
 puyoai_core_add_test(field_performance 1)
