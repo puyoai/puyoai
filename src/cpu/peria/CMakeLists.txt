@@ -37,7 +37,5 @@ peria_add_test(pattern_test)
 #peria_add_test(player_test)
 
 # ---------------------
-cpu_add_executable(quick_full quick_full.cc)
-cpu_target_link_common_libraries(quick_full)
-cpu_add_executable(quick_2dub quick_2dub.cc)
-cpu_target_link_common_libraries(quick_2dub)
+cpu_add_executable(beam_search_ai beam_search_ai.cc)
+cpu_target_link_common_libraries(beam_search_ai)
