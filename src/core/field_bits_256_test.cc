@@ -66,6 +66,7 @@ TEST(FieldBits256Test, expand)
 
     EXPECT_EQ(highExpected, expanded.high());
     EXPECT_EQ(lowExpected, expanded.low());
+    EXPECT_EQ(maskLow, expanded.low());
 }
 
 TEST(FieldBits256Test, vanishingSeed)
