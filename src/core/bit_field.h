@@ -65,8 +65,7 @@ public:
     template<typename Tracker> RensaResult simulate(Tracker*);
     template<typename Tracker> RensaResult simulate(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
 
-    // TODO(mayah): Add simulateFast(), which is the faster version of simulate.
-    // It will return only the number of chains. Don't count drop amount, score etc.
+    // Faster version of simulate(). Returns the number of chains.
     int simulateFast();
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
