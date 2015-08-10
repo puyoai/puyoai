@@ -68,6 +68,11 @@ public:
     // Faster version of simulate(). Returns the number of chains.
     int simulateFast();
 
+#ifdef __AVX2__
+    // Faster version of simulate() that uses AVX2 instruction set.
+    int simulateFastAVX2();
+#endif
+
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
     RensaStepResult vanishDrop(SimulationContext*);
     // Vanishes the connected puyos with Tracker.
@@ -110,6 +115,11 @@ private:
     int dropAfterVanish(FieldBits erased, Tracker* tracker);
     template<typename Tracker>
     void dropFastAfterVanish(FieldBits erased, Tracker* tracker);
+
+#ifdef __AVX2__
+    template<typename Tracker>
+    bool vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const;
+#endif
 
     FieldBits m_[3];
 };
@@ -323,5 +333,9 @@ struct hash<BitField>
 }
 
 #include "bit_field_inl.h"
+
+#ifdef __AVX2__
+#include "bit_field_inl_256.h"
+#endif
 
 #endif // CORE_BIT_FIELD_H_
