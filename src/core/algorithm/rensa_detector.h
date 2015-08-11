@@ -7,6 +7,7 @@
 #include "core/algorithm/rensa_detector_strategy.h"
 #include "core/core_field.h"
 #include "core/field_constant.h"
+#include "core/rensa_tracker/rensa_tracker.h"
 
 class ColumnPuyoList;
 class RensaChainTrackResult;

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 add_subdirectory(algorithm)
 add_subdirectory(client)
 add_subdirectory(pattern)
+add_subdirectory(rensa_tracker)
 add_subdirectory(server)
 
 if(USE_HTTPD)
@@ -36,8 +37,6 @@ add_library(puyoai_core STATIC
             puyo_color.cc
             puyo_controller.cc
             real_color.cc
-            rensa_result.cc
-            rensa_track_result.cc
             user_event.cc)
 
 # ----------------------------------------------------------------------
@@ -75,8 +74,6 @@ puyoai_core_add_test(player_state)
 puyoai_core_add_test(puyo_color)
 puyoai_core_add_test(puyo_controller)
 puyoai_core_add_test(rensa_result)
-puyoai_core_add_test(rensa_track_result)
-puyoai_core_add_test(rensa_tracker)
 
 puyoai_core_add_test(bit_field_performance 1)
 puyoai_core_add_test(field_performance 1)
