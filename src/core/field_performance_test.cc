@@ -88,7 +88,6 @@ static void runSimulation(const CoreField& original)
 
     TimeStampCounterData none;
     TimeStampCounterData tscCoreField;
-    TimeStampCounterData tscCoreFieldWithRensaChainTracker;
     TimeStampCounterData tscBitField;
     TimeStampCounterData tscBitFieldFast;
 
@@ -100,13 +99,6 @@ static void runSimulation(const CoreField& original)
         CoreField cf(original);
         ScopedTimeStampCounter stsc(&tscCoreField);
         EXPECT_EQ(expectedChain, cf.simulate().chains);
-    }
-
-    for (int i = 0; i < N; ++i) {
-        CoreField cf(original);
-        RensaChainTracker tracker;
-        ScopedTimeStampCounter stsc(&tscCoreFieldWithRensaChainTracker);
-        EXPECT_EQ(expectedChain, cf.simulate(&tracker).chains);
     }
 
     for (int i = 0; i < N; i++) {
@@ -134,8 +126,6 @@ static void runSimulation(const CoreField& original)
     none.showStatistics();
     cout << "CoreField: " << endl;
     tscCoreField.showStatistics();
-    cout << "CoreField (RensaChainTracker): " << endl;
-    tscCoreFieldWithRensaChainTracker.showStatistics();
     cout << "BitField: " << endl;
     tscBitField.showStatistics();
     cout << "BitField (fast): " << endl;
@@ -241,36 +231,6 @@ TEST(FieldPerformanceTest, bitfield_simulate_filled)
         BitField bf(bfOriginal);
         ScopedTimeStampCounter stsc(&tsc);
         EXPECT_EQ(19, bf.simulate().chains);
-    }
-
-    tsc.showStatistics();
-}
-
-TEST(FieldPerformanceTest, simulate_filled_tracker)
-{
-    const int N = 100000;
-
-    TimeStampCounterData tsc;
-    BitField bfOriginal(
-        ".G.BRG"
-        "GBRRYR"
-        "RRYYBY"
-        "RGYRBR"
-        "YGYRBY"
-        "YGBGYR"
-        "GRBGYR"
-        "BRBYBY"
-        "RYYBYY"
-        "BRBYBR"
-        "BGBYRR"
-        "YGBGBG"
-        "RBGBGG");
-
-    for (int i = 0; i < N; i++) {
-        BitField bf(bfOriginal);
-        RensaChainTracker tracker;
-        ScopedTimeStampCounter stsc(&tsc);
-        EXPECT_EQ(19, bf.simulate(&tracker).chains);
     }
 
     tsc.showStatistics();

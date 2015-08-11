@@ -1,5 +1,5 @@
-#ifndef CORE_RENSA_TRACK_RESULT_H_
-#define CORE_RENSA_TRACK_RESULT_H_
+#ifndef CORE_RENSA_TRACKER_RENSA_TRACK_RESULT_H_
+#define CORE_RENSA_TRACKER_RENSA_TRACK_RESULT_H_
 
 #include <array>
 #include <cstdint>
@@ -120,4 +120,4 @@ private:
     void maybeResize(int nthChain);
 };
 
-#endif
+#endif // CORE_RENSA_TRACKER_RENSA_TRACK_RESULT_H_

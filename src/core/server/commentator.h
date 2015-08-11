@@ -14,6 +14,7 @@
 #include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
 #include "core/rensa_result.h"
+#include "core/rensa_tracker/rensa_tracker.h"
 #include "core/server/game_state_observer.h"
 
 struct TrackedPossibleRensaInfo {

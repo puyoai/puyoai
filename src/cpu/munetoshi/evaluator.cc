@@ -6,6 +6,7 @@
 #include "core/algorithm/plan.h"
 #include "core/column_puyo_list.h"
 #include "core/rensa_result.h"
+#include "core/rensa_tracker/rensa_tracker.h"
 
 namespace munetoshi {
 
