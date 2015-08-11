@@ -73,9 +73,25 @@ struct SimulationTestCase {
         FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[1] + FRAMES_GROUNDING,
         false
     },
-
-
-
+    {
+        BitField("OOOOOR"
+                 "OORRRR" // 12
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO" // 8
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO" // 4
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO"),
+        1,
+        40,
+        FRAMES_VANISH_ANIMATION + FRAMES_TO_DROP_FAST[2] + FRAMES_GROUNDING,
+        false
+    },
 };
 
 } // anonymous namespace
