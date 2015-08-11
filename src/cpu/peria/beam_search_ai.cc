@@ -26,6 +26,7 @@ namespace sample {
 struct SearchState {
   CoreField field;
   Decision decision;
+  int from;
   std::array<int, 3> features;
   // Fill: [0: # of ojama, 1: expected score, 2: -frames]
   // 2Dub: [0: # of 2dub, 1: # of ojama, 2: expected score]
@@ -40,25 +41,27 @@ private:
     return false;
   }
 
-  SearchState generateNextRensaState(const CoreField& field, const SearchState& state, const RefPlan& plan) const override {
+  SearchState generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const override {
     int ojama = std::min(plan.score() / 70, 60);
     int frame = state.features[2] - plan.totalFrames();
 
     SearchState ret;
     ret.field = field;
     ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
+    ret.from = from;
     ret.features[0] = ojama;
     ret.features[1] = 0;
     ret.features[2] = frame;
     return ret;
   }
 
-  SearchState generateNextNonRensaState(const CoreField& field, const SearchState& state, const RefPlan& plan, int expect) const override {
+  SearchState generateNextNonRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan, int expect) const override {
     int frame = state.features[2] - plan.totalFrames();
 
     SearchState ret;
     ret.field = field;
     ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
+    ret.from = from;
     ret.features[0] = 0;
     ret.features[1] = expect;
     ret.features[2] = frame;
@@ -83,21 +86,23 @@ private:
     return result.chains > 2 || result.score < 680;
   }
 
-  SearchState generateNextRensaState(const CoreField& field, const SearchState& state, const RefPlan& plan) const override {
+  SearchState generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const override {
     int ojama = plan.score() / 70;
     SearchState ret;
     ret.field = field;
     ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
+    ret.from = from;
     ret.features[0] = state.features[0] + 1;
     ret.features[1] = ojama;
     ret.features[2] = 0;
     return ret;
   }
 
-  SearchState generateNextNonRensaState(const CoreField& field, const SearchState& state, const RefPlan& plan, int expect) const override {
+  SearchState generateNextNonRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan, int expect) const override {
     SearchState ret;
     ret.field = field;
     ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
+    ret.from = from;
     ret.features[0] = state.features[0];
     ret.features[1] = 0;
     ret.features[2] = expect;
@@ -119,7 +124,7 @@ DropDecision BeamSearchAI::think(
   int64 start_time = currentTimeInMillis();
   int64 now = start_time;
 
-  std::vector<int> ojamas[7][4];  // [1<=x<=6][0<=r<4]
+  std::vector<int> features[7][4];  // [1<=x<=6][0<=r<4]
 
   int num_simulate = 0;
   for (num_simulate = 0; num_simulate < FLAGS_max_simulate; now = currentTimeInMillis()) {
@@ -135,36 +140,39 @@ DropDecision BeamSearchAI::think(
       continue;
 
     const Decision& decision = state.decision;
-    auto& list = ojamas[decision.axisX()][decision.rot()];
+    auto& list = features[decision.axisX()][decision.rot()];
     list.push_back(state.features[0]);
     if (static_cast<int>(list.size()) >= (FLAGS_max_simulate + 1) / 2)
       break;
   }
 
-  double best_expect = 0;
-  Decision best_decision(3, 0);
+  std::vector<std::pair<Decision, double>> decisions;
   for (int x = 1; x <= 6; ++x) {
     for (int r = 0; r < 4; ++r) {
-      if (ojamas[x][r].empty())
+      if (features[x][r].empty())
         continue;
-      const auto& list = ojamas[x][r];
+      const auto& list = features[x][r];
       double sum = std::accumulate(list.begin(), list.end(), 0);
       double expect = sum / list.size();
-      if (best_expect < expect) {
-        best_expect = expect;
-        best_decision.x = x;
-        best_decision.r = r;
-      }
+      decisions.push_back(std::make_pair(Decision(x, r), expect));
     }
   }
+  std::sort(decisions.begin(), decisions.end(),
+            [](const std::pair<Decision, double>& a, const std::pair<Decision, double>& b) {
+              return a.second > b.second;
+            });
 
   int64 end_time = currentTimeInMillis();
 
   std::ostringstream oss;
   oss << "Time:" << (end_time - start_time) << "[ms]_/_"
-      << "Simulates:" << num_simulate << "_/_"
-      << "ExpectOjama:" << best_expect;
-  return DropDecision(best_decision, oss.str());
+      << "Simulates:" << num_simulate << ",";
+  for (auto& dd : decisions) {
+    oss << "(" << dd.first.x << "-" << dd.first.r << ":" << dd.second << ")";
+  }
+  Decision best = (decisions.empty()) ? Decision(6, 0) : (decisions.begin()->first);
+  
+  return DropDecision(best, oss.str());
 }
 
 SearchState BeamSearchAI::search(
@@ -186,7 +194,7 @@ SearchState BeamSearchAI::search(
     const auto& que = q_states[t];
     std::vector<SearchState>& next_states = q_states[t + 1];
     for (size_t i = 0; i < que.size(); ++i)
-      generateNextStates(que[i], vseq.get(t), visited, next_states);
+      generateNextStates(que[i], i, vseq.get(t), visited, next_states);
 
     if (next_states.empty())
       break;
@@ -222,10 +230,10 @@ SearchState BeamSearchAI::search(
 }
 
 void BeamSearchAI::generateNextStates(
-    const SearchState& state, const Kumipuyo& kumi,
+    const SearchState& state, int from, const Kumipuyo& kumi,
     std::unordered_set<uint64>& visited, std::vector<SearchState>& states) const {
   const BeamSearchAI* th = this;
-  auto callback = [&th, &state, &visited, &states](const RefPlan& plan) {
+  auto callback = [&th, &state, &from, &visited, &states](const RefPlan& plan) {
     const CoreField field = plan.field();
     RensaResult result = plan.rensaResult();
 
@@ -237,7 +245,7 @@ void BeamSearchAI::generateNextStates(
       if (th->skipRensaPlan(result))
         return;
 
-      SearchState next = th->generateNextRensaState(field, state, plan);
+      SearchState next = th->generateNextRensaState(field, from, state, plan);
       states.push_back(next);
 
       return;
@@ -254,7 +262,7 @@ void BeamSearchAI::generateNextStates(
                                         PurposeForFindingRensa::FOR_FIRE, 2, 13,
                                         detect_callback);
 
-    SearchState next = th->generateNextNonRensaState(field, state, plan, expect);
+    SearchState next = th->generateNextNonRensaState(field, from, state, plan, expect);
     states.push_back(next);
   };
 

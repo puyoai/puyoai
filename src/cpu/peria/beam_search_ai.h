@@ -27,13 +27,13 @@ class BeamSearchAI : public AI {
  private:
   SearchState search(const CoreField& field, const KumipuyoSeq& vseq, int search_turns) const;
 
-  void generateNextStates(const SearchState& state, const Kumipuyo& kumi,
+  void generateNextStates(const SearchState& state, int from, const Kumipuyo& kumi,
                           std::unordered_set<uint64>& visited,
                           std::vector<SearchState>& states) const;
 
   virtual bool skipRensaPlan(const RensaResult& result) const = 0;
-  virtual SearchState generateNextRensaState(const CoreField& field, const SearchState& state, const RefPlan& plan) const = 0;
-  virtual SearchState generateNextNonRensaState(const CoreField& field, const SearchState& state, const RefPlan& plan, int expect) const = 0;
+  virtual SearchState generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const = 0;
+  virtual SearchState generateNextNonRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan, int expect) const = 0;
   virtual bool shouldUpdateState(const SearchState& orig, const SearchState& res) const = 0;
 };
 
