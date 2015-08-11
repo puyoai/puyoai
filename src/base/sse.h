@@ -34,6 +34,25 @@ __m128i inverseMovemask(int mask)
     return _mm_cmpeq_epi8(vmask, _mm_set1_epi8(-1));
 }
 
+// popcount 8 x 16bits
+inline __m128i mm_popcnt_epi16(__m128i x)
+{
+    const __m128i mask4 = _mm_set1_epi8(0x0F);
+    const __m128i lookup = _mm_setr_epi8(0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4);
+
+    __m128i low = _mm_and_si128(mask4, x);
+    __m128i high = _mm_and_si128(mask4, _mm_srli_epi16(x, 4));
+
+    __m128i lowCount = _mm_shuffle_epi8(lookup, low);
+    __m128i highCount = _mm_shuffle_epi8(lookup, high);
+    __m128i count8 = _mm_add_epi8(lowCount, highCount);
+
+    __m128i count16 = _mm_add_epi8(count8, _mm_srli_epi16(count8, 8));
+    __m128i count = _mm_and_si128(count16, _mm_set1_epi16(0x0F));
+
+    return count;
+}
+
 }
 
 #endif // BASE_SSE_H_
