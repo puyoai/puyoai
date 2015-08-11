@@ -10,7 +10,7 @@
 #include "core/frame.h"
 #include "core/kumipuyo_seq.h"
 #include "core/rensa_result.h"
-#include "core/rensa_tracker/rensa_track_result.h"
+#include "core/rensa_tracker/rensa_coef_tracker.h"
 
 class ColumnPuyoList;
 class CoreField;

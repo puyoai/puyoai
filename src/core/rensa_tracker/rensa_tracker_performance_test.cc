@@ -1,5 +1,3 @@
-#include "core/rensa_tracker/rensa_tracker.h"
-
 #include <iostream>
 
 #include <gtest/gtest.h>
@@ -7,6 +5,7 @@
 #include "base/base.h"
 #include "base/time_stamp_counter.h"
 #include "core/core_field.h"
+#include "core/rensa_tracker/rensa_chain_tracker.h"
 
 using namespace std;
 
