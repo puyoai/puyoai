@@ -6,6 +6,7 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
+#include "base/sse.h"
 #include "core/field_bits.h"
 #include "core/frame.h"
 #include "core/puyo_color.h"
@@ -302,18 +303,7 @@ void BitField::calculateHeight(int heights[FieldConstant::MAP_WIDTH]) const
     const __m128i zero = _mm_setzero_si128();
     __m128i whole = (m_[0] | m_[1] | m_[2]).maskedField13();
 
-    const __m128i mask4 = _mm_set1_epi8(0x0F);
-    const __m128i lookup = _mm_setr_epi8(0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4);
-
-   __m128i low = _mm_and_si128(mask4, whole);
-   __m128i high = _mm_and_si128(mask4, _mm_srli_epi16(whole, 4));
-
-   __m128i lowCount = _mm_shuffle_epi8(lookup, low);
-   __m128i highCount = _mm_shuffle_epi8(lookup, high);
-   __m128i count8 = _mm_add_epi8(lowCount, highCount);
-
-   __m128i count16 = _mm_add_epi8(count8, _mm_srli_epi16(count8, 8));
-   __m128i count = _mm_and_si128(count16, _mm_set1_epi16(0x0F));
+   __m128i count = sse::mm_popcnt_epi16(whole);
 
    _mm_store_si128(reinterpret_cast<__m128i*>(heights), _mm_unpacklo_epi16(count, zero));
    _mm_store_si128(reinterpret_cast<__m128i*>(heights + 4), _mm_unpackhi_epi16(count, zero));
