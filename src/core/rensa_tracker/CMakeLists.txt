@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_core_rensa_tracker
-            rensa_track_result.cc)
+            rensa_chain_tracker.cc
+            rensa_coef_tracker.cc
+            rensa_vanishing_position_tracker.cc)
 
 # ----------------------------------------------------------------------
 # test
@@ -18,7 +20,11 @@ function(puyoai_core_rensa_tracker_add_test target)
     endif()
 endfunction()
 
-puyoai_core_rensa_tracker_add_test(rensa_track_result)
-puyoai_core_rensa_tracker_add_test(rensa_tracker)
+puyoai_core_rensa_tracker_add_test(rensa_chain_tracker)
+puyoai_core_rensa_tracker_add_test(rensa_coef_tracker)
+puyoai_core_rensa_tracker_add_test(rensa_composite_tracker)
+puyoai_core_rensa_tracker_add_test(rensa_existing_position_tracker)
+puyoai_core_rensa_tracker_add_test(rensa_vanishing_position_tracker)
+puyoai_core_rensa_tracker_add_test(rensa_last_vanished_position_tracker)
 
 puyoai_core_rensa_tracker_add_test(rensa_tracker_performance 1)

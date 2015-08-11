@@ -12,6 +12,7 @@
 #include "core/core_field.h"
 #include "core/frame_request.h"
 #include "core/rensa_result.h"
+#include "core/rensa_tracker/rensa_vanishing_position_tracker.h"
 
 #include "evaluator.h"
 

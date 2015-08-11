@@ -7,12 +7,9 @@
 #include "core/algorithm/rensa_detector_strategy.h"
 #include "core/core_field.h"
 #include "core/field_constant.h"
-#include "core/rensa_tracker/rensa_tracker.h"
+#include "core/rensa_tracker/rensa_last_vanished_position_tracker.h"
 
 class ColumnPuyoList;
-class RensaChainTrackResult;
-class RensaCoefResult;
-class RensaVanishingPositionResult;
 struct RensaResult;
 
 enum class PurposeForFindingRensa {
