@@ -33,7 +33,7 @@ bool BitField::vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* trac
     // RED & BLUE
     {
         // TODO(mayah): This can be improved.
-        FieldBits256 mask(bits(PuyoColor::RED).maskField12(), bits(PuyoColor::BLUE).maskField12());
+        FieldBits256 mask(bits(PuyoColor::RED).maskedField12(), bits(PuyoColor::BLUE).maskedField12());
         FieldBits256 seed = mask.vanishingSeed();
         if (!seed.isEmpty()) {
             FieldBits256 expanded = seed.expand(mask);
@@ -47,7 +47,7 @@ bool BitField::vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* trac
     // YELLOW & GREEN
     {
         // TODO(mayah): This can be improved.
-        FieldBits256 mask(bits(PuyoColor::YELLOW).maskField12(), bits(PuyoColor::GREEN).maskField12());
+        FieldBits256 mask(bits(PuyoColor::YELLOW).maskedField12(), bits(PuyoColor::GREEN).maskedField12());
         FieldBits256 seed = mask.vanishingSeed();
         if (!seed.isEmpty()) {
             FieldBits256 expanded = seed.expand(mask);
