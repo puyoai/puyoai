@@ -20,8 +20,6 @@
 #include "core/puyo_color.h"
 #include "core/plain_field.h"
 #include "core/rensa_result.h"
-#include "core/rensa_track_result.h"
-#include "core/rensa_tracker.h"
 #include "core/score.h"
 
 class ColumnPuyoList;
@@ -178,7 +176,7 @@ public:
     // ----------------------------------------------------------------------
     // utility methods
 
-    size_t hash() const { return field_.hash(); } 
+    size_t hash() const { return field_.hash(); }
 
     std::string toDebugString() const;
 

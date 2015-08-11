@@ -13,7 +13,6 @@
 #include "core/kumipuyo.h"
 #include "core/position.h"
 #include "core/rensa_result.h"
-#include "core/rensa_tracker.h"
 
 using namespace std;
 

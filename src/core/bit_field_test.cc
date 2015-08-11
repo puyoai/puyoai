@@ -501,28 +501,14 @@ TEST(BitFieldTest, simulateFast)
     }
 }
 
-TEST(BitFieldTest, simulateWithTracker1)
-{
-    BitField bf(
-        "..RR.."
-        "BBBBRR");
-
-    RensaYPositionTracker tracker;
-    bf.simulate(&tracker);
-
-    EXPECT_EQ(2, tracker.originalY(1, 1));
-    EXPECT_EQ(3, tracker.originalY(3, 1));
-}
-
 TEST(BitFieldTest, vanishDrop1)
 {
     BitField bf(
         "..RR.."
         "BBBBRR");
 
-    RensaYPositionTracker tracker;
     BitField::SimulationContext context;
-    RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
+    RensaStepResult stepResult = bf.vanishDrop(&context);
 
     EXPECT_EQ(40, stepResult.score);
 
@@ -531,18 +517,14 @@ TEST(BitFieldTest, vanishDrop1)
 
     EXPECT_EQ(expected, bf);
     EXPECT_EQ(2, context.currentChain);
-    EXPECT_EQ(2, tracker.originalY(1, 1));
-    EXPECT_EQ(2, tracker.originalY(3, 1));
-    EXPECT_EQ(1, tracker.originalY(6, 1));
 }
 
 TEST(BitFieldTest, vanishDrop2)
 {
     BitField bf("....YY");
 
-    RensaYPositionTracker tracker;
     BitField::SimulationContext context;
-    RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
+    RensaStepResult stepResult = bf.vanishDrop(&context);
 
     EXPECT_EQ(0, stepResult.score);
 
@@ -550,9 +532,6 @@ TEST(BitFieldTest, vanishDrop2)
 
     EXPECT_EQ(expected, bf);
     EXPECT_EQ(1, context.currentChain);
-    EXPECT_EQ(1, tracker.originalY(1, 1));
-    EXPECT_EQ(1, tracker.originalY(3, 1));
-    EXPECT_EQ(1, tracker.originalY(6, 1));
 }
 
 TEST(BitFieldTest, ignitionPuyoBits)
