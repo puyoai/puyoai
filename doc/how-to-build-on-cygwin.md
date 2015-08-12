@@ -64,8 +64,6 @@ src/googletest.hの524行目と557行目の
     $ mkdir -p out/Default
     $ CMAKE_LEGACY_CYGWIN_WIN32=1 cmake ../../src
     $ make -j4
-    $ ./duel/duel.exe --use_cui=true --use_gui=false cpu/mayah/run_fast.sh cpu/test_lockit/rendaS9.sh
+    $ ./duel/duel.exe --use_cui=true --use_gui=false cpu/mayah/run.sh cpu/test_lockit/rendaS9.sh
 
-NOTE:
-cpu/mayah/run.sh is not working as the author intended.
-Try cpu/mayah/run_fast.sh instead of cpu/mayah/run.sh
+NOTE: cpu/mayah/run.sh は計算リソースを大変使うので、遅いマシンではちゃんと動きません。
