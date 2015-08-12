@@ -1,5 +1,7 @@
 #include "core/httpd/http_server.h"
 
+#include <cstdlib>
+
 #include <string>
 #include <fstream>
 
