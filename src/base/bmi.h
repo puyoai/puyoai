@@ -3,6 +3,7 @@
 
 // bmi implements "bit manipulation instructions".
 // If possible, CPU instruction is used. Otherwise, emulated.
+// The emulation could be slow.
 
 #include <cstdint>
 
