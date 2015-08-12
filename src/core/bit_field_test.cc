@@ -517,6 +517,18 @@ TEST(BitFieldTest, simulateFast)
     }
 }
 
+#ifdef __AVX2__
+TEST(BitFieldTest, simulateFastAVX2)
+{
+    for (const auto& testcase : SIMULATION_TEST_CASES) {
+        BitField bf(testcase.field);
+        int chains = bf.simulateFastAVX2();
+
+        EXPECT_EQ(testcase.chains, chains) << testcase.field.toDebugString();
+    }
+}
+#endif
+
 TEST(BitFieldTest, vanishDrop1)
 {
     BitField bf(

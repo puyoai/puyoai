@@ -118,8 +118,10 @@ private:
     void dropFastAfterVanish(FieldBits erased, Tracker* tracker);
 
 #ifdef __AVX2__
-    template<typename Tracker>
-    bool vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const;
+    bool vanishFastAVX2(int currentChain, FieldBits* erased) const;
+#endif
+#ifdef __BMI2__
+    void dropFastAfterVanishBMI2(FieldBits erased);
 #endif
 
     FieldBits m_[3];
@@ -326,6 +328,9 @@ struct hash<BitField>
 
 #ifdef __AVX2__
 #include "bit_field_avx2_inl.h"
+#endif
+#ifdef __BMI2__
+#include "bit_field_bmi2_inl.h"
 #endif
 
 #endif // CORE_BIT_FIELD_H_
