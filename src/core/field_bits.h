@@ -24,6 +24,7 @@ public:
     FieldBits(const PlainField&, PuyoColor);
     explicit FieldBits(const std::string&);
 
+    operator const __m128i&() const { return m_; }
     operator __m128i&() { return m_; }
     __m128i& xmm() { return m_; }
     const __m128i& xmm() const { return m_; }
@@ -42,6 +43,7 @@ public:
     bool isEmpty() const;
     bool testz(FieldBits bits) const { return _mm_testz_si128(m_, bits.m_); }
 
+    // Returns the number of 1 bits in this FieldBits.
     int popcount() const;
     // Returns the bit-wise or of 8x16bits.
     int horizontalOr16() const;
@@ -129,7 +131,7 @@ struct hash<FieldBits>
         };
         m = bits.xmm();
 
-        return xs[0] + (xs[1] * 33);
+        return xs[0] + (xs[1] * 100000009);
     }
 };
 
