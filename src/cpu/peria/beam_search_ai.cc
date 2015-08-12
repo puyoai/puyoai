@@ -1,6 +1,7 @@
 #include "cpu/peria/beam_search_ai.h"
 
 #include <array>
+#include <limits>
 #include <sstream>
 #include <vector>
 
@@ -13,6 +14,12 @@
 #include "core/algorithm/rensa_detector.h"
 #include "core/core_field.h"
 #include "core/kumipuyo_seq_generator.h"
+
+#define RECORD_RANK_LOG 0
+
+#if RECORD_RANK_LOG
+#include <iostream>
+#endif
 
 DEFINE_int32(max_simulate, 5, "The maximum number to iterate simulations.");
 DEFINE_int32(search_turns, 20, "Maximum turns to search in a simulation");
@@ -43,7 +50,7 @@ private:
 
   SearchState generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const override {
     int ojama = std::min(plan.score() / 70, 60);
-    int frame = state.features[2] - plan.totalFrames();
+    int neg_frame = state.features[2] - plan.totalFrames();
 
     SearchState ret;
     ret.field = field;
@@ -51,12 +58,12 @@ private:
     ret.from = from;
     ret.features[0] = ojama;
     ret.features[1] = 0;
-    ret.features[2] = frame;
+    ret.features[2] = neg_frame;
     return ret;
   }
 
   SearchState generateNextNonRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan, int expect) const override {
-    int frame = state.features[2] - plan.totalFrames();
+    int neg_frame = state.features[2] - plan.totalFrames();
 
     SearchState ret;
     ret.field = field;
@@ -64,7 +71,7 @@ private:
     ret.from = from;
     ret.features[0] = 0;
     ret.features[1] = expect;
-    ret.features[2] = frame;
+    ret.features[2] = neg_frame;
     return ret;
   }
 
@@ -93,7 +100,7 @@ private:
     ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
     ret.from = from;
     ret.features[0] = state.features[0] + 1;
-    ret.features[1] = ojama;
+    ret.features[1] = state.features[1] + ojama;
     ret.features[2] = 0;
     return ret;
   }
@@ -104,7 +111,7 @@ private:
     ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
     ret.from = from;
     ret.features[0] = state.features[0];
-    ret.features[1] = 0;
+    ret.features[1] = state.features[1];
     ret.features[2] = expect;
     return ret;
   }
@@ -165,8 +172,7 @@ DropDecision BeamSearchAI::think(
   int64 end_time = currentTimeInMillis();
 
   std::ostringstream oss;
-  oss << "Time:" << (end_time - start_time) << "[ms]_/_"
-      << "Simulates:" << num_simulate << ",";
+  oss << "Time:" << (end_time - start_time) << "[ms]_/_" << "Simulates:" << num_simulate << ",";
   for (auto& dd : decisions) {
     oss << "(" << dd.first.x << "-" << dd.first.r << ":" << dd.second << ")";
   }
@@ -186,7 +192,7 @@ SearchState BeamSearchAI::search(
   init_state.decision = Decision(0, 0);
   init_state.features[0] = 0;
   init_state.features[1] = 0;
-  init_state.features[2] = 0;
+  init_state.features[2] = std::numeric_limits<int>::min();
 
   q_states[0].push_back(init_state);
   for (int t = 0; t < search_turns; ++t) {
@@ -218,13 +224,37 @@ SearchState BeamSearchAI::search(
     }
   }
 
+#if RECORD_RANK_LOG
+  int bt = 0;
+  int bi = 0;
+#endif
   SearchState result = q_states[0][0];
   for (int t = 0; t < search_turns; ++t) {
-    for (const auto& s : q_states[t]) {
-      if (shouldUpdateState(result, s))
+    for (size_t i = 0; i < q_states[t].size(); ++i) {
+      const auto& s = q_states[t][i];
+      if (shouldUpdateState(result, s)) {
+#if RECORD_RANK_LOG
+        bt = t;
+        bi = i;
+#endif
         result = s;
+      }
     }
   }
+
+#if RECORD_RANK_LOG
+  // Record how the best hand's rank changed.
+  std::vector<int> ranks;
+  for (int t = bt; t > 0; --t) {
+    ranks.push_back(bi);
+    bi = q_states[t][bi].from;
+  }
+  std::reverse(ranks.begin(), ranks.end());
+  std::ostringstream oss;
+  for (int r : ranks)
+    oss << " " << r;
+  std::cerr << "[" << ranks.size() << "]" << oss.str() << "\n";
+#endif
 
   return result;
 }
