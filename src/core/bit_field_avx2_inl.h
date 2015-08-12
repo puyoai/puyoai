@@ -1,5 +1,5 @@
-#ifndef CORE_BIT_FIELD_INL_256_H_
-#define CORE_BIT_FIELD_INL_256_H_
+#ifndef CORE_BIT_FIELD_AVX2_INL_256_H_
+#define CORE_BIT_FIELD_AVX2_INL_256_H_
 
 #ifndef __AVX2__
 # error "Needs AVX2 to use this header."
@@ -13,18 +13,22 @@ inline int BitField::simulateFastAVX2()
     int currentChain = 1;
 
     FieldBits erased;
-    RensaNonTracker tracker;
-    while (vanishFastAVX2(currentChain, &erased, &tracker)) {
+    while (vanishFastAVX2(currentChain, &erased)) {
         currentChain += 1;
+#ifdef __BMI2__
+        dropFastAfterVanishBMI2(erased);
+#else
+        RensaNonTracker tracker;
         dropFastAfterVanish(erased, &tracker);
+#endif
     }
 
     recoverInvisible(escaped);
     return currentChain - 1;
 }
 
-template<typename Tracker>
-bool BitField::vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const
+inline
+bool BitField::vanishFastAVX2(int /*currentChain*/, FieldBits* erased) const
 {
     *erased = FieldBits();
 
@@ -65,9 +69,7 @@ bool BitField::vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* trac
     FieldBits ojamaErased(erased->expandEdge().mask(bits(PuyoColor::OJAMA).maskedField12()));
     erased->setAll(ojamaErased);
 
-    tracker->track(currentChain, *erased, ojamaErased);
-
     return true;
 }
 
-#endif // CORE_BIT_FIELD_INL_256_H_
+#endif // CORE_BIT_FIELD_AVX2_INL_256_H_
