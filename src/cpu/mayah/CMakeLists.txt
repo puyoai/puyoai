@@ -37,8 +37,6 @@ mayah_add_executable(tweaker tweaker.cc)
 
 cpu_add_runner(run.sh)
 cpu_add_runner(run_v.sh)
-cpu_add_runner(run_fast.sh)
-cpu_add_runner(run_without_joseki.sh)
 
 mayah_add_test(decision_planner_test)
 mayah_add_test(evaluator_test)
