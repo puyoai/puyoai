@@ -4,13 +4,14 @@
 #include <gtest/gtest.h>
 
 #include "base/base.h"
+#include "base/time.h"
 #include "base/time_stamp_counter.h"
 #include "core/field_bits.h"
 
 using namespace std;
 
 // popcount 8 x 16bits
-NOINLINE_UNLESS_RELEASE __m128i f1(__m128i x)
+__m128i f1(__m128i x)
 {
     const __m128i mask4 = _mm_set1_epi8(0x0F);
     const __m128i lookup = _mm_setr_epi8(0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4);
@@ -50,26 +51,150 @@ __m128i f2(__m128i x)
     return _mm_and_si128(count16, _mm_set1_epi16(0xFF));
 }
 
-TEST(Popcount, experimental)
+__m128i f3(__m128i value)
 {
-    const int N = 10000;
-    const FieldBits x = _mm_set_epi16(0x0, 0x1101, 0x1011, 0x0111, 0xFF00, 0x00FF, 0x0F0F, 0xFFFF);
-    const FieldBits expected = _mm_set_epi16(0, 3, 3, 3, 8, 8, 8, 16);
+    union {
+        std::uint16_t v[8];
+        __m128i m;
+    };
 
-    TimeStampCounterData d1;
-    TimeStampCounterData d2;
+    m = value;
 
+    for (int x = 1; x <= 6; ++x) {
+        v[x] = __builtin_popcount(v[x]);
+    }
+
+    return m;
+}
+
+__m128i f4(__m128i value)
+{
+    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 1)), 1);
+    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 2)), 2);
+    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 3)), 3);
+    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 4)), 4);
+    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 5)), 5);
+    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 6)), 6);
+
+    return value;
+}
+
+__m128i f5(__m128i value)
+{
+    int v1 = __builtin_popcount(_mm_extract_epi16(value, 1));
+    int v2 = __builtin_popcount(_mm_extract_epi16(value, 2));
+    int v3 = __builtin_popcount(_mm_extract_epi16(value, 3));
+    int v4 = __builtin_popcount(_mm_extract_epi16(value, 4));
+    int v5 = __builtin_popcount(_mm_extract_epi16(value, 5));
+    int v6 = __builtin_popcount(_mm_extract_epi16(value, 6));
+
+    return _mm_set_epi16(0, v6, v5, v4, v3, v2, v1, 0);
+}
+
+__m128i f6(__m128i value)
+{
+    int v1 = __builtin_popcount(_mm_extract_epi16(value, 1));
+    int v2 = __builtin_popcount(_mm_extract_epi16(value, 2));
+    int v3 = __builtin_popcount(_mm_extract_epi16(value, 3));
+    int v4 = __builtin_popcount(_mm_extract_epi16(value, 4));
+    int v5 = __builtin_popcount(_mm_extract_epi16(value, 5));
+    int v6 = __builtin_popcount(_mm_extract_epi16(value, 6));
+
+    value = _mm_insert_epi16(value, v1, 1);
+    value = _mm_insert_epi16(value, v2, 2);
+    value = _mm_insert_epi16(value, v3, 3);
+    value = _mm_insert_epi16(value, v4, 4);
+    value = _mm_insert_epi16(value, v5, 5);
+    value = _mm_insert_epi16(value, v6, 6);
+    return value;
+}
+
+TEST(Popcount, experimental_f1)
+{
+    const int N = 10000000;
+    const FieldBits x = _mm_set_epi16(0x0, 0x1101, 0x1011, 0x0111, 0xFF00, 0x00FF, 0xFFFF, 0);
+    const FieldBits expected = _mm_set_epi16(0, 3, 3, 3, 8, 8, 16, 0);
+
+    TimeStampCounterData d;
     for (int i = 0; i < N; ++i) {
-        ScopedTimeStampCounter stsc(&d1);
+        ScopedTimeStampCounter stsc(&d);
         EXPECT_EQ(expected, FieldBits(f1(x)));
     }
+
+    d.showStatistics();
+}
+
+TEST(Popcount, experimental_f2)
+{
+    const int N = 10000000;
+    const FieldBits x = _mm_set_epi16(0x0, 0x1101, 0x1011, 0x0111, 0xFF00, 0x00FF, 0xFFFF, 0);
+    const FieldBits expected = _mm_set_epi16(0, 3, 3, 3, 8, 8, 16, 0);
+
+    TimeStampCounterData d;
     for (int i = 0; i < N; ++i) {
-        ScopedTimeStampCounter stsc(&d2);
+        ScopedTimeStampCounter stsc(&d);
         EXPECT_EQ(expected, FieldBits(f2(x)));
     }
 
-    cout << "f1" << endl;
-    d1.showStatistics();
-    cout << "f2" << endl;
-    d2.showStatistics();
+    d.showStatistics();
+}
+
+TEST(Popcount, experimental_f3)
+{
+    const int N = 10000000;
+    const FieldBits x = _mm_set_epi16(0x0, 0x1101, 0x1011, 0x0111, 0xFF00, 0x00FF, 0xFFFF, 0);
+    const FieldBits expected = _mm_set_epi16(0, 3, 3, 3, 8, 8, 16, 0);
+
+    TimeStampCounterData d;
+    for (int i = 0; i < N; ++i) {
+        ScopedTimeStampCounter stsc(&d);
+        EXPECT_EQ(expected, FieldBits(f3(x)));
+    }
+
+    d.showStatistics();
+}
+
+TEST(Popcount, experimental_f4)
+{
+    const int N = 10000000;
+    const FieldBits x = _mm_set_epi16(0x0, 0x1101, 0x1011, 0x0111, 0xFF00, 0x00FF, 0xFFFF, 0);
+    const FieldBits expected = _mm_set_epi16(0, 3, 3, 3, 8, 8, 16, 0);
+
+    TimeStampCounterData d;
+    for (int i = 0; i < N; ++i) {
+        ScopedTimeStampCounter stsc(&d);
+        EXPECT_EQ(expected, FieldBits(f4(x)));
+    }
+
+    d.showStatistics();
+}
+
+TEST(Popcount, experimental_f5)
+{
+    const int N = 10000000;
+    const FieldBits x = _mm_set_epi16(0x0, 0x1101, 0x1011, 0x0111, 0xFF00, 0x00FF, 0xFFFF, 0);
+    const FieldBits expected = _mm_set_epi16(0, 3, 3, 3, 8, 8, 16, 0);
+
+    TimeStampCounterData d;
+    for (int i = 0; i < N; ++i) {
+        ScopedTimeStampCounter stsc(&d);
+        EXPECT_EQ(expected, FieldBits(f5(x)));
+    }
+
+    d.showStatistics();
+}
+
+TEST(Popcount, experimental_f6)
+{
+    const int N = 10000000;
+    const FieldBits x = _mm_set_epi16(0x0, 0x1101, 0x1011, 0x0111, 0xFF00, 0x00FF, 0xFFFF, 0);
+    const FieldBits expected = _mm_set_epi16(0, 3, 3, 3, 8, 8, 16, 0);
+
+    TimeStampCounterData d;
+    for (int i = 0; i < N; ++i) {
+        ScopedTimeStampCounter stsc(&d);
+        EXPECT_EQ(expected, FieldBits(f6(x)));
+    }
+
+    d.showStatistics();
 }
