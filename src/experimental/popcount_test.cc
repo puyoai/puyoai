@@ -109,6 +109,21 @@ __m128i f6(__m128i value)
     return value;
 }
 
+TEST(Popcount, experimental_warmup)
+{
+    const int N = 100000;
+    const FieldBits x = _mm_set_epi16(0x0, 0x1101, 0x1011, 0x0111, 0xFF00, 0x00FF, 0xFFFF, 0);
+    const FieldBits expected = _mm_set_epi16(0, 3, 3, 3, 8, 8, 16, 0);
+
+    TimeStampCounterData d;
+    for (int i = 0; i < N; ++i) {
+        ScopedTimeStampCounter stsc(&d);
+        EXPECT_EQ(expected, FieldBits(f1(x)));
+    }
+
+    d.showStatistics();
+}
+
 TEST(Popcount, experimental_f1)
 {
     const int N = 10000000;
