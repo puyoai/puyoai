@@ -126,6 +126,7 @@ add_subdirectory(base)
 add_subdirectory(core)
 add_subdirectory(cpu)
 add_subdirectory(duel)
+add_subdirectory(experimental)
 add_subdirectory(recognition)
 add_subdirectory(solver)
 
