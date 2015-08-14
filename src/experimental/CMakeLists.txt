@@ -8,4 +8,5 @@ function(puyoai_experimental_add_test target)
     puyoai_target_link_libraries(${target}_test)
 endfunction()
 
+puyoai_experimental_add_test(drop)
 puyoai_experimental_add_test(popcount)
