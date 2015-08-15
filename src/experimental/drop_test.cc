@@ -28,7 +28,7 @@ void f1(FieldBits m_[3], FieldBits erased)
         __m128i m;
     };
 
-    const FieldBits fieldMask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
+    const FieldBits fieldMask = FieldBits::FIELD_MASK_13;
     const FieldBits leftBits = fieldMask.notmask(erased);
     Decomposer64 x;
     x.m = leftBits;
@@ -65,7 +65,7 @@ void f1(FieldBits m_[3], FieldBits erased)
 
 void f2(FieldBits m_[3], FieldBits erased)
 {
-    const FieldBits fieldMask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
+    const FieldBits fieldMask = FieldBits::FIELD_MASK_13;
     const FieldBits leftBits = fieldMask.notmask(erased);
 
     int column1 = _mm_extract_epi16(leftBits, 1);
@@ -107,7 +107,7 @@ void f2(FieldBits m_[3], FieldBits erased)
 
 void f3(FieldBits m_[3], FieldBits erased)
 {
-    const FieldBits fieldMask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
+    const FieldBits fieldMask = FieldBits::FIELD_MASK_13;
     const FieldBits leftBits = fieldMask.notmask(erased);
 
     int column1 = _mm_extract_epi16(leftBits, 1);
@@ -128,6 +128,33 @@ void f3(FieldBits m_[3], FieldBits erased)
         vs[6] = _pext_u64(_mm_extract_epi16(m_[i], 6), column6) << 1;
 
         m_[i] = _mm_set_epi16(0, vs[6], vs[5], vs[4], vs[3], vs[2], vs[1], 0);
+    }
+}
+
+void f4(FieldBits m_[3], FieldBits erased)
+{
+    const FieldBits fieldMask = FieldBits::FIELD_MASK_13;
+    const FieldBits leftBits = fieldMask.notmask(erased);
+
+    int column1 = _mm_extract_epi16(leftBits, 1);
+    int column2 = _mm_extract_epi16(leftBits, 2);
+    int column3 = _mm_extract_epi16(leftBits, 3);
+    int column4 = _mm_extract_epi16(leftBits, 4);
+    int column5 = _mm_extract_epi16(leftBits, 5);
+    int column6 = _mm_extract_epi16(leftBits, 6);
+
+    uint16_t vs[8] {};
+
+    for (int i = 0; i < 3; ++i) {
+        vs[1] = _pext_u64(_mm_extract_epi16(m_[i], 1), column1);
+        vs[2] = _pext_u64(_mm_extract_epi16(m_[i], 2), column2);
+        vs[3] = _pext_u64(_mm_extract_epi16(m_[i], 3), column3);
+        vs[4] = _pext_u64(_mm_extract_epi16(m_[i], 4), column4);
+        vs[5] = _pext_u64(_mm_extract_epi16(m_[i], 5), column5);
+        vs[6] = _pext_u64(_mm_extract_epi16(m_[i], 6), column6);
+
+        m_[i] = _mm_set_epi16(0, vs[6], vs[5], vs[4], vs[3], vs[2], vs[1], 0);
+        m_[i] = _mm_add_epi16(m_[i], m_[i]);
     }
 }
 
@@ -218,7 +245,30 @@ TEST(DropTest, test3)
 
     for (int i = 0; i < N; ++i) {
         FieldBits bits[3] = { fb, fb, fb };
-        f2(bits, erased);
+        f3(bits, erased);
+        EXPECT_EQ(expected, bits[0]);
+    }
+}
+
+TEST(DropTest, test4)
+{
+    const int N = 10000000;
+
+    const FieldBits fb(
+        "111111"
+        "111111");
+    const FieldBits expected(
+        ".....1"
+        "1111.1");
+
+    const FieldBits erased(
+        "....1."
+        "11111."
+    );
+
+    for (int i = 0; i < N; ++i) {
+        FieldBits bits[3] = { fb, fb, fb };
+        f4(bits, erased);
         EXPECT_EQ(expected, bits[0]);
     }
 }
