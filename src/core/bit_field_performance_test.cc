@@ -24,3 +24,92 @@ TEST(BitFieldPerformanceTest, hash)
 
     tscd.showStatistics();
 }
+
+TEST(BitFieldPerformanceTest, bitfield_simulate_fast_filled)
+{
+    const int N = 1000000;
+
+    TimeStampCounterData tsc;
+    BitField bfOriginal(
+        ".G.BRG"
+        "GBRRYR"
+        "RRYYBY"
+        "RGYRBR"
+        "YGYRBY"
+        "YGBGYR"
+        "GRBGYR"
+        "BRBYBY"
+        "RYYBYY"
+        "BRBYBR"
+        "BGBYRR"
+        "YGBGBG"
+        "RBGBGG");
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(bfOriginal);
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(19, bf.simulateFast());
+    }
+
+    tsc.showStatistics();
+}
+
+#if defined(__AVX2__) && defined(__BMI2__)
+TEST(BitFieldPerformanceTest, bitfield_simulate_fast_avx2_filled)
+{
+    const int N = 1000000;
+
+    TimeStampCounterData tsc;
+    BitField bfOriginal(
+        ".G.BRG"
+        "GBRRYR"
+        "RRYYBY"
+        "RGYRBR"
+        "YGYRBY"
+        "YGBGYR"
+        "GRBGYR"
+        "BRBYBY"
+        "RYYBYY"
+        "BRBYBR"
+        "BGBYRR"
+        "YGBGBG"
+        "RBGBGG");
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(bfOriginal);
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(19, bf.simulateFastAVX2());
+    }
+
+    tsc.showStatistics();
+}
+#endif // defined(__AVX2__) && defined(__BMI2__)
+
+TEST(BitFieldPerformanceTest, bitfield_simulate_filled)
+{
+    const int N = 1000000;
+
+    TimeStampCounterData tsc;
+    BitField bfOriginal(
+        ".G.BRG"
+        "GBRRYR"
+        "RRYYBY"
+        "RGYRBR"
+        "YGYRBY"
+        "YGBGYR"
+        "GRBGYR"
+        "BRBYBY"
+        "RYYBYY"
+        "BRBYBR"
+        "BGBYRR"
+        "YGBGBG"
+        "RBGBGG");
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(bfOriginal);
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(19, bf.simulate().chains);
+    }
+
+    tsc.showStatistics();
+}
