@@ -6,6 +6,9 @@
 
 using namespace std;
 
+const FieldBits FieldBits::FIELD_MASK_13 = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
+const FieldBits FieldBits::FIELD_MASK_12 = _mm_set_epi16(0, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0);
+
 FieldBits::FieldBits(const PlainField& pf, PuyoColor c)
 {
     __m128i mask = _mm_set1_epi8(static_cast<char>(c));

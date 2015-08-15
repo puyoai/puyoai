@@ -112,6 +112,9 @@ public:
     friend FieldBits operator|(FieldBits lhs, FieldBits rhs) { return _mm_or_si128(lhs, rhs); }
     friend FieldBits operator^(FieldBits lhs, FieldBits rhs) { return _mm_xor_si128(lhs, rhs); }
 
+    const static FieldBits FIELD_MASK_13;
+    const static FieldBits FIELD_MASK_12;
+
 private:
     static __m128i onebit(int x, int y);
 
@@ -174,15 +177,13 @@ int FieldBits::highestHeight() const
 inline
 FieldBits FieldBits::maskedField12() const
 {
-    const auto mask = _mm_set_epi16(0, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0x1FFE, 0);
-    return mask & m_;
+    return FIELD_MASK_12 & m_;
 }
 
 inline
 FieldBits FieldBits::maskedField13() const
 {
-    const auto mask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
-    return mask & m_;
+    return FIELD_MASK_13 & m_;
 }
 
 inline

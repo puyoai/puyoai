@@ -158,11 +158,10 @@ FieldBits BitField::bits(PuyoColor c) const
 inline
 BitField BitField::escapeInvisible()
 {
-    const FieldBits mask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
     BitField escaped;
     for (int i = 0; i < 3; ++i) {
-        escaped.m_[i] = m_[i].notmask(mask);
-        m_[i] = m_[i].mask(mask);
+        escaped.m_[i] = m_[i].notmask(FieldBits::FIELD_MASK_13);
+        m_[i] = m_[i].mask(FieldBits::FIELD_MASK_13);
     }
 
     return escaped;
