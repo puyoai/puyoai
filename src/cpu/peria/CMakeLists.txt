@@ -22,6 +22,7 @@ function(peria_add_test exe)
 endfunction()
 
 peria_add_executable(peria main.cc)
+peria_add_executable(tokopuyo tokopuyo.cc)
 
 cpu_add_runner(run.sh)
 cpu_add_runner(quick_full.sh)
