@@ -1,13 +1,19 @@
-#ifndef CAPTURE_VIDDEV_H_
-#define CAPTURE_VIDDEV_H_
+#ifndef CAPTURE_VIDDEV_SOURCE_H_
+#define CAPTURE_VIDDEV_SOURCE_H_
+
+#ifndef USE_V4L2
+# error "USE_V4L2 must be defined to include viddev_source.h"
+#endif
+
+#include <string>
 
 #include <SDL.h>
 
-#include "source.h"
+#include "capture/source.h"
 
 class VidDevSource : public Source {
 public:
-    explicit VidDevSource(const char* dev);
+    explicit VidDevSource(const std::string& dev);
     virtual ~VidDevSource();
 
     virtual UniqueSDLSurface getNextFrame() override;
@@ -24,7 +30,7 @@ private:
 
     void quit();
 
-    const char* dev_;
+    const std::string dev_;
     int fd_;
     Buffer* buffers_;
     size_t buf_cnt_;
