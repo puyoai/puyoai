@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+DEFINE_string(pattern, "book.txt", "Figures a template file name.");
+
 namespace peria {
 
 namespace {

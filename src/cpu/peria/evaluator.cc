@@ -68,7 +68,7 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
     }
   }
 
-  if (true) {
+  if (false) {
     int value = Valley(field);
     oss << "Valley(" << value << ")_";
     score += value;
@@ -94,7 +94,7 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
   int score = 0;
   std::ostringstream oss;
 
-  {  // Basic rensa plan
+  if (true) {  // Basic rensa plan
     int value = plan.score() + (me.hasZenkeshi ? ZENKESHI_BONUS : 0);
     if (value > 0) {
       oss << "Rensa(" << value << ")_";
@@ -102,7 +102,7 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
     }
   }
 
-  {  // will be Zenkeshi
+  if (false) {  // will be Zenkeshi
     int value = (plan.field().countPuyos() == 0) ? ZENKESHI_BONUS : 0;
     if (value > 0) {
       oss << "Zenkeshi(" << value << ")_";
@@ -133,7 +133,7 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
   }
 
   // TODO: use this feature to judge if I should fire the main chain.
-  if (true) {  // penalty for enemy's plans
+  if (false) {  // penalty for enemy's plans
     int value = EvalEnemyPlan();
     if (value < 0) {
       oss << "Enemy(" << value << ")_";
@@ -141,7 +141,7 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
     }
   }
 
-  if (true) {  // 2-double
+  if (false) {  // 2-double
     const RensaResult& result = plan.rensaResult();
     bool is_2dub = (result.chains == 2 && result.score >= 920);
     if (is_2dub) {
@@ -159,13 +159,13 @@ int Evaluator::EvalTime(const RefPlan& plan, std::string* message) {
   int score = 0;
   std::ostringstream oss;
 
-  if (true) {  // Penalty : Time to set puyos, including time for rensa.
+  if (false) {  // Penalty : Time to set puyos, including time for rensa.
     int value = -plan.totalFrames();
     oss << "Base(" << value << ")_";
     score += value;
   }
 
-  if (true) { // TAIOU : If enemy's rensa is going, fire my rensa in time.
+  if (false) { // TAIOU : If enemy's rensa is going, fire my rensa in time.
     int value = 0;
     if (enemy.isRensaOngoing() && plan.isRensaPlan() && me.totalOjama(enemy) * 70 < plan.score())
       value = plan.score();
@@ -266,7 +266,7 @@ int Evaluator::Future(const CoreField& field) {
             scores.push_back(plan.rensaResult().score);
         });
   }
-  return std::accumulate(scores.begin(), scores.end(), 0) / 40;
+  return std::accumulate(scores.begin(), scores.end(), 0) / 15;
 }
 
 }  // namespace peria
