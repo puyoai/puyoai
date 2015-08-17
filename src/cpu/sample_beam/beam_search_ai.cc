@@ -1,4 +1,4 @@
-#include "cpu/peria/beam_search_ai.h"
+#include "cpu/sample_beam/beam_search_ai.h"
 
 #include <array>
 #include <limits>
@@ -39,91 +39,87 @@ struct SearchState {
   // 2Dub: [0: # of 2dub, 1: # of ojama, 2: expected score]
 };
 
-class QuickFullAI final : public BeamSearchAI {
-public:
-  QuickFullAI() : BeamSearchAI("QuickFull") {}
+BeamFullAI::BeamFullAI() : BeamSearchAI("Full") {}
   
-private:
-  bool skipRensaPlan(const RensaResult&) const override {
-    return false;
-  }
+bool BeamFullAI::skipRensaPlan(const RensaResult&) const {
+  return false;
+}
 
-  SearchState generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const override {
-    int ojama = std::min(plan.score() / 70, 60);
-    int neg_frame = state.features[2] - plan.totalFrames();
+SearchState BeamFullAI::generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const {
+  int ojama = std::min(plan.score() / 70, 60);
+  int neg_frame = state.features[2] - plan.totalFrames();
 
-    SearchState ret;
-    ret.field = field;
-    ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
-    ret.from = from;
-    ret.features[0] = ojama;
-    ret.features[1] = 0;
-    ret.features[2] = neg_frame;
-    return ret;
-  }
+  SearchState ret;
+  ret.field = field;
+  ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
+  ret.from = from;
+  ret.features[0] = ojama;
+  ret.features[1] = 0;
+  ret.features[2] = neg_frame;
+  return ret;
+}
 
-  SearchState generateNextNonRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan, int expect) const override {
-    int neg_frame = state.features[2] - plan.totalFrames();
+SearchState BeamFullAI::generateNextNonRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan, int expect) const {
+  int neg_frame = state.features[2] - plan.totalFrames();
 
-    SearchState ret;
-    ret.field = field;
-    ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
-    ret.from = from;
-    ret.features[0] = 0;
-    ret.features[1] = expect;
-    ret.features[2] = neg_frame;
-    return ret;
-  }
+  SearchState ret;
+  ret.field = field;
+  ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
+  ret.from = from;
+  ret.features[0] = 0;
+  ret.features[1] = expect;
+  ret.features[2] = neg_frame;
+  return ret;
+}
 
-  bool shouldUpdateState(const SearchState& orig, const SearchState& res) const override {
-    if (res.features[0] > orig.features[0])
-      return true;
-    if (res.features[0] == orig.features[0] && res.features[2] > orig.features[2])
-      return true;
-    return false;
-  }
-};
+bool BeamFullAI::shouldUpdateState(const SearchState& orig, const SearchState& res) const {
+  if (res.features[0] > orig.features[0])
+    return true;
+  if (res.features[0] == orig.features[0] && res.features[2] > orig.features[2])
+    return true;
+  return false;
+}
 
-class Quick2DubAI final : public BeamSearchAI {
-public:
-  Quick2DubAI() : BeamSearchAI("Quick2Dub") {}
+// -------------------------------------------------------------------
 
-private:
-  bool skipRensaPlan(const RensaResult& result) const override {
-    return result.chains > 2 || result.score < 680;
-  }
+Beam2DubAI::Beam2DubAI() : BeamSearchAI("2Dub") {}
 
-  SearchState generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const override {
-    int ojama = plan.score() / 70;
-    SearchState ret;
-    ret.field = field;
-    ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
-    ret.from = from;
-    ret.features[0] = state.features[0] + 1;
-    ret.features[1] = state.features[1] + ojama;
-    ret.features[2] = 0;
-    return ret;
-  }
+bool Beam2DubAI::skipRensaPlan(const RensaResult& result) const {
+  return result.chains > 2 || result.score < 680;
+}
 
-  SearchState generateNextNonRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan, int expect) const override {
-    SearchState ret;
-    ret.field = field;
-    ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
-    ret.from = from;
-    ret.features[0] = state.features[0];
-    ret.features[1] = state.features[1];
-    ret.features[2] = expect;
-    return ret;
-  }
+SearchState Beam2DubAI::generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const {
+  int ojama = plan.score() / 70;
+  SearchState ret;
+  ret.field = field;
+  ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
+  ret.from = from;
+  ret.features[0] = state.features[0] + 1;
+  ret.features[1] = state.features[1] + ojama;
+  ret.features[2] = 0;
+  return ret;
+}
 
-  bool shouldUpdateState(const SearchState& orig, const SearchState& res) const override {
-    if (res.features[0] > orig.features[0])
-      return true;
-    if (res.features[0] == orig.features[0] && res.features[1] > orig.features[1])
-      return true;
-    return false;
-  }
-};
+SearchState Beam2DubAI::generateNextNonRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan, int expect) const {
+  SearchState ret;
+  ret.field = field;
+  ret.decision = (state.decision.x == 0) ? plan.decision(0) : state.decision;
+  ret.from = from;
+  ret.features[0] = state.features[0];
+  ret.features[1] = state.features[1];
+  ret.features[2] = expect;
+  return ret;
+}
+
+bool Beam2DubAI::shouldUpdateState(const SearchState& orig, const SearchState& res) const {
+  if (res.features[0] > orig.features[0])
+    return true;
+  if (res.features[0] == orig.features[0] && res.features[1] > orig.features[1])
+    return true;
+  return false;
+}
+
+// ===================================================================
 
 DropDecision BeamSearchAI::think(
     int frame_id, const CoreField& field, const KumipuyoSeq& seq,
@@ -300,20 +296,3 @@ void BeamSearchAI::generateNextStates(
 }
 
 }  // namespace sample
-
-
-int main(int argc, char* argv[]) {
-  google::ParseCommandLineFlags(&argc, &argv, true);
-  google::InitGoogleLogging(argv[0]);
-  google::InstallFailureSignalHandler();
-
-  if (FLAGS_type == "2dub") {
-    sample::Quick2DubAI().runLoop();
-  } else if (FLAGS_type == "full") {
-    sample::QuickFullAI().runLoop();
-  } else {
-    CHECK(false) << "Unknown type: " << FLAGS_type;
-  }
-
-  return 0;
-}
