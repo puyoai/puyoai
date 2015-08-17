@@ -5,7 +5,7 @@
 #include "cpu/peria/ai.h"
 #include "cpu/peria/pattern.h"
 
-DEFINE_string(pattern, "", "Figures a template file name.");
+DECLARE_string(pattern);
 
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
