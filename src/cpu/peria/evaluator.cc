@@ -68,7 +68,7 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
     }
   }
 
-  if (false) {
+  if (true) {
     int value = Valley(field);
     oss << "Valley(" << value << ")_";
     score += value;
@@ -231,6 +231,8 @@ int Evaluator::PatternMatch(const CoreField& field, std::string* name) {
 }
 
 int Evaluator::Valley(const CoreField& field) {
+  int score = 0;
+
   const int kEdgePenalty = 40;
   const int kPenalty = 10;
 
@@ -241,12 +243,11 @@ int Evaluator::Valley(const CoreField& field) {
   int diff45 = std::max(field.height(4) - field.height(5), 0);
   int diff56 = std::max(field.height(5) - field.height(6), 0);
 
-  int score =
-    - diff12 * std::max(field.height(2), field.height(1)) * kEdgePenalty
-    - diff23 * std::max(field.height(3), field.height(2)) * kPenalty
-    - diff34 * std::max(field.height(3), field.height(4)) * kPenalty
-    - diff45 * std::max(field.height(4), field.height(5)) * kPenalty
-    - diff56 * std::max(field.height(5), field.height(6)) * kEdgePenalty;
+  score -= diff12 * std::max(field.height(2), field.height(1)) * kEdgePenalty
+      + diff23 * std::max(field.height(3), field.height(2)) * kPenalty
+      + diff34 * std::max(field.height(3), field.height(4)) * kPenalty
+      + diff45 * std::max(field.height(4), field.height(5)) * kPenalty
+      + diff56 * std::max(field.height(5), field.height(6)) * kEdgePenalty;
 
   // If (3, 11) is filled, add a large penalty for 1/6 risk.
   if (!field.isEmpty(FieldConstant::WIDTH / 2, FieldConstant::HEIGHT - 1))
