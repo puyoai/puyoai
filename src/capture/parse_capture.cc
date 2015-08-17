@@ -2,6 +2,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "base/strings.h"
 #include "capture/ac_analyzer.h"
 #include "capture/capture.h"
 #include "capture/syntek_source.h"
@@ -9,8 +10,11 @@
 #include "gui/box.h"
 #include "gui/fps_drawer.h"
 #include "gui/main_window.h"
-
 #include "gui/screen.h"
+
+#ifdef USE_V4L2
+#include "capture/viddev_source.h"
+#endif
 
 #include <iostream>
 
@@ -22,6 +26,14 @@ static unique_ptr<Source> makeVideoSource()
 {
     if (FLAGS_source == "syntek")
         return unique_ptr<Source>(new SyntekSource);
+
+#if USE_V4L2
+    if (strings::isPrefix(FLAGS_source, "v4l2:")) {
+        std::string deviceName = FLAGS_source.substr(5);
+        cout << "V4L2 device name: " << deviceName << endl;
+        return unique_ptr<Source>(new VidDevSource(deviceName));
+    }
+#endif
 
     return unique_ptr<Source>(nullptr);
 }
