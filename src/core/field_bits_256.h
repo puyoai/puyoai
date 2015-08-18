@@ -33,7 +33,7 @@ public:
 
     FieldBits256 vanishingSeed() const;
 
-    bool isEmpty() const { return _mm256_testc_si256(_mm256_setzero_si256(), m_); }
+    bool isEmpty() const { return _mm256_testz_si256(m_, m_); }
     std::string toString() const;
 
     friend bool operator==(FieldBits256 lhs, FieldBits256 rhs) { return (lhs ^ rhs).isEmpty(); }
