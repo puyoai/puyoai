@@ -97,8 +97,12 @@ TEST(FieldBitsTest, isEmpty)
     FieldBits bits;
     EXPECT_TRUE(bits.isEmpty());
 
-    bits.set(1, 1);
-    EXPECT_FALSE(bits.isEmpty());
+    for (int x = 0; x < 8; ++x) {
+        for (int y = 0; y < 16; ++y) {
+            FieldBits bits(x, y);
+            EXPECT_FALSE(bits.isEmpty());
+        }
+    }
 }
 
 TEST(FieldBitsTest, popcount)

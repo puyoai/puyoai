@@ -40,7 +40,7 @@ public:
     void setAll(const FieldBits& fb) { m_ = _mm_or_si128(fb.m_, m_); }
     void unsetAll(const FieldBits& fb) { m_ = _mm_andnot_si128(fb.m_, m_); }
 
-    bool isEmpty() const;
+    bool isEmpty() const { return _mm_testz_si128(m_, m_); }
     bool testz(FieldBits bits) const { return _mm_testz_si128(m_, bits.m_); }
 
     // Returns the number of 1 bits in this FieldBits.
@@ -138,13 +138,6 @@ struct hash<FieldBits>
     }
 };
 
-}
-
-inline
-bool FieldBits::isEmpty() const
-{
-    __m128i allzero = _mm_setzero_si128();
-    return _mm_testc_si128(allzero, m_);
 }
 
 inline
