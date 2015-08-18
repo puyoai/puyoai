@@ -26,6 +26,7 @@ class Evaluator {
   };
 
   int EvalField(const CoreField& field, std::string* message);
+  int EvalUke(const CoreField& field, std::string* message);
   int EvalRensa(const RefPlan& plan, std::string* message);
   int EvalTime(const RefPlan& plan, std::string* message);
 

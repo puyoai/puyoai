@@ -27,12 +27,8 @@ void Evaluator::EvalPlan(const RefPlan& plan) {
     {"Rensa", 0, ""},
     {"Time", 0, ""}};
 
-  CoreField uke_field = plan.field();
-  // Assume 1 or 5 line(s) of Ojama puyo
-  uke_field.fallOjama(enemy.hasZenkeshi ? 5 : 1);
-
   genres[0].score = EvalField(plan.field(), &genres[0].message);
-  genres[1].score = EvalField(uke_field, &genres[1].message) / 3;
+  genres[1].score = EvalUke(plan.field(), &genres[1].message);
   genres[2].score = EvalRensa(plan, &genres[2].message);
   genres[3].score = EvalTime(plan, &genres[3].message);
 
@@ -75,7 +71,28 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
   }
 
   if (true) {  // Evaluate possible rensa.
-    int value = Future(field);
+    int value = Future(field) / 10;
+    oss << "Future(" << value << ")_";
+    score += value;
+  }
+
+  *message += oss.str();
+  return score;
+}
+
+int Evaluator::EvalUke(const CoreField& field, std::string* message) {
+  // Evaluate field assuming some Ojama puyo fall.
+  // x possible future rensa
+  // x counter for zenkeshi
+
+  int score = 0;
+  std::ostringstream oss;
+
+  if (false) {
+    CoreField cf = field;
+    // Assume 1 or 5 line(s) of Ojama puyo
+    cf.fallOjama(enemy.hasZenkeshi ? 5 : 1);
+    int value = Future(cf) / 20;
     oss << "Future(" << value << ")_";
     score += value;
   }
@@ -102,25 +119,34 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
     }
   }
 
-  if (false) {  // will be Zenkeshi
-    int value = (plan.field().countPuyos() == 0) ? ZENKESHI_BONUS : 0;
-    if (value > 0) {
-      oss << "Zenkeshi(" << value << ")_";
-      score += value;
-    }
+  if (false) {  // Evaluate possible rensa.
+    int value = Future(plan.field()) / 100;
+    oss << "Future(" << value << ")_";
+    score += value;
   }
 
   if (false) {  // penalty for using too many puyos
     int remained_puyos = me.field.countPuyos() - plan.field().countPuyos();
     int wasted_puyos = std::max(remained_puyos - 4 * plan.chains() - 4, 0);
-    int value = -200 * plan.chains() * plan.chains() * wasted_puyos;
+    int value = -5 * plan.chains() * wasted_puyos;
     if (value < 0) {
       oss << "Waste(" << value << ")_";
       score += value;
     }
   }
 
-  if (false) {  // TSUBUSHI : how quickly rensa ends. 2 or more lines.
+  if (false) {  // bonus to use many puyos, only for the main fire
+    int value = 0;
+    if (me.field.countPuyos() > plan.field().countPuyos() * 2) {
+      value = plan.score() / 500;
+    }
+    if (value > 0) {
+      oss << "UseAll(" << value << ")_";
+      score += value;
+    }
+  }
+
+  if (true) {  // TSUBUSHI : how quickly rensa ends. 2 or more lines.
     int value = EvalTsubushi(plan);
     if (value > 0) {
       oss << "Tsubushi(" << value << ")_";
@@ -267,7 +293,7 @@ int Evaluator::Future(const CoreField& field) {
             scores.push_back(plan.rensaResult().score);
         });
   }
-  return std::accumulate(scores.begin(), scores.end(), 0) / 15;
+  return std::accumulate(scores.begin(), scores.end(), 0);
 }
 
 }  // namespace peria
