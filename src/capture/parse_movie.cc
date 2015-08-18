@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
@@ -5,14 +7,15 @@
 #include "capture/capture.h"
 #include "capture/movie_source.h"
 #include "capture/movie_source_key_listener.h"
-#include "capture/viddev_source.h"
 #include "gui/bounding_box_drawer.h"
 #include "gui/box.h"
 #include "gui/main_window.h"
-
 #include "gui/screen.h"
 
-#include <iostream>
+#ifdef USE_V4L2
+# include "capture/viddev_source.h"
+#endif
+
 
 DEFINE_bool(draw_result, true, "draw analyzer result");
 DEFINE_int32(fps, 60, "FPS. When 0, hitting space will go next step.");
