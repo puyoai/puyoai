@@ -191,6 +191,29 @@ TEST(FieldBitsTest, expand)
     EXPECT_FALSE(connected.get(4, 2));
 }
 
+TEST(FieldBitsTest, expand1)
+{
+    FieldBits mask(
+        "111111"
+        "111111"
+        "111111"
+    );
+
+    FieldBits fb(
+        "......"
+        "1...1."
+        "......"
+    );
+
+    FieldBits expected(
+        "1...1."
+        "11.111"
+        "1...1."
+    );
+
+    EXPECT_EQ(expected, fb.expand1(mask));
+}
+
 TEST(FieldBitsTest, expand_exhaustive)
 {
     // I O S Z L J T
