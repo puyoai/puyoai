@@ -88,6 +88,10 @@ public:
     // When seed is expanded, It should be the same as all vanishing bits.
     FieldBits vanishingSeed() const;
 
+    // Returns true if there are 4-connected bits.
+    // Such bits are copied to |bits|.
+    bool findVanishingBits(FieldBits* bits) const;
+
     // Sets all the positions having 1 to |positions|.
     // |positions| should have 72 spaces at least. In some case, you need 128 spaces.
     // Returns length.
@@ -264,6 +268,43 @@ FieldBits FieldBits::vanishingSeed() const
     FieldBits two_twos = two_u | two_l;
 
     return threes | two_twos;
+}
+
+inline
+bool FieldBits::findVanishingBits(FieldBits* bits) const
+{
+    //  x
+    // xox              -- o is 3-connected
+    //
+    // xoox  ox   x oo
+    //      xo  xoo oo  -- o is 2-connected.
+    //
+    // So, one 3-connected piece or two 2-connected pieces are necessary and sufficient.
+
+    FieldBits u = _mm_slli_epi16(m_, 1) & m_;
+    FieldBits d = _mm_srli_epi16(m_, 1) & m_;
+    FieldBits l = _mm_slli_si128(m_, 2) & m_;
+    FieldBits r = _mm_srli_si128(m_, 2) & m_;
+
+    FieldBits ud_and = u & d;
+    FieldBits lr_and = l & r;
+    FieldBits ud_or = u | d;
+    FieldBits lr_or = l | r;
+
+    FieldBits threes = (ud_and & lr_or) | (lr_and & ud_or);
+    FieldBits twos = ud_and | lr_and | (ud_or & lr_or);
+
+    FieldBits two_u = _mm_slli_epi16(twos, 1) & twos;
+    FieldBits two_l = _mm_slli_si128(twos, 2) & twos;
+    *bits = threes | two_u | two_l;
+    if (bits->isEmpty())
+        return false;
+
+    FieldBits two_d = _mm_srli_epi16(twos, 1) & twos;
+    FieldBits two_r = _mm_srli_si128(twos, 2) & twos;
+    *bits = *bits | two_d | two_r;
+    *bits = bits->expand1(m_);
+    return true;
 }
 
 inline

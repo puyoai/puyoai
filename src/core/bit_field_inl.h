@@ -134,13 +134,11 @@ bool BitField::vanishFast(int currentChain, FieldBits* erased, Tracker* tracker)
     bool didErase = false;
     for (PuyoColor c : NORMAL_PUYO_COLORS) {
         FieldBits mask = bits(c).maskedField12();
-        FieldBits seed = mask.vanishingSeed();
-
-        if (seed.isEmpty())
+        FieldBits vanishing;
+        if (!mask.findVanishingBits(&vanishing))
             continue;
 
-        FieldBits expanded = seed.expand(mask);
-        erased->setAll(expanded);
+        erased->setAll(vanishing);
         didErase = true;
     }
 
