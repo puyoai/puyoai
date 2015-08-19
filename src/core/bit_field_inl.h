@@ -81,9 +81,8 @@ int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* 
 
     for (PuyoColor c : NORMAL_PUYO_COLORS) {
         FieldBits mask = bits(c).maskedField12();
-        FieldBits seed = mask.vanishingSeed();
-
-        if (seed.isEmpty())
+        FieldBits vanishing;
+        if (!mask.findVanishingBits(&vanishing))
             continue;
 
         ++numColors;
@@ -91,18 +90,17 @@ int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* 
         // fast path. In most cases, >= 8 puyos won't be erased.
         // When <= 7 puyos are erased, it won't be separated.
         {
-            FieldBits expanded = seed.expand(mask);
-            int popcount = expanded.popcount();
+            int popcount = vanishing.popcount();
             if (popcount <= 7) {
                 numErasedPuyos += popcount;
                 longBonusCoef += longBonus(popcount);
-                erased->setAll(expanded);
+                erased->setAll(vanishing);
                 continue;
             }
         }
 
         // slow path...
-        seed.iterateBitWithMasking([&](FieldBits x) -> FieldBits {
+        vanishing.iterateBitWithMasking([&](FieldBits x) -> FieldBits {
             FieldBits expanded = x.expand(mask);
             int count = expanded.popcount();
             numErasedPuyos += count;
