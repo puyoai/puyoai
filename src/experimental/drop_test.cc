@@ -158,6 +158,76 @@ void f4(FieldBits m_[3], FieldBits erased)
     }
 }
 
+void f5(FieldBits m_[3], FieldBits erased)
+{
+    union Decomposer64 {
+        std::uint64_t v[2];
+        __m128i m;
+    };
+
+    union Decomposer16 {
+        std::uint16_t v[8];
+        __m128i m;
+    };
+
+    union Decomposer256_32 {
+        std::uint32_t v[8];
+        __m256i m;
+    };
+
+    union Decomposer256_64 {
+        std::uint64_t v[4];
+        __m256i m;
+    };
+
+    const FieldBits fieldMask = FieldBits::FIELD_MASK_13;
+    const FieldBits leftBits = fieldMask.notmask(erased);
+    Decomposer64 x;
+    x.m = leftBits;
+    const std::uint64_t oldLowBits = x.v[0];
+    const std::uint64_t oldHighBits = x.v[1];
+
+    const __m256i ones = _mm256_set_epi32(0, 1, 1, 1, 1, 1, 1, 0);
+    __m256i height = _mm256_cvtepi16_epi32(sse::mm_popcnt_epi16(leftBits));
+    height = _mm256_sllv_epi32(ones, height);
+    height = _mm256_sub_epi32(height, ones);
+    height = _mm256_slli_epi32(height, 1);
+
+    if (false) {
+        Decomposer256_64 z;
+        z.m = height;
+        for (int i = 0; i < 8; ++i)
+            cout << hex << z.v[i] << ' ';
+        cout << endl;
+    }
+
+    height = _mm256_packs_epi32(height, height);
+    Decomposer256_64 y;
+    y.m = height;
+    const std::uint64_t newLowBits = y.v[0];
+    const std::uint64_t newHighBits = y.v[2];
+
+    if (false) {
+        cout << "low: "  << hex << newLowBits << endl;
+        cout << "high: " << hex << newHighBits << endl;
+    }
+
+    for (int i = 0; i < 3; ++i) {
+        Decomposer64 d;
+        d.m = m_[i];
+
+        std::uint64_t extLow = _pext_u64(d.v[0], oldLowBits);
+        std::uint64_t depLow = _pdep_u64(extLow, newLowBits);
+
+        std::uint64_t extHigh = _pext_u64(d.v[1], oldHighBits);
+        std::uint64_t depHigh = _pdep_u64(extHigh, newHighBits);
+
+        d.v[0] = depLow;
+        d.v[1] = depHigh;
+        m_[i] = d.m;
+    }
+}
+
 TEST(DropTest, warmup)
 {
     const int N = 10000000;
@@ -269,6 +339,29 @@ TEST(DropTest, test4)
     for (int i = 0; i < N; ++i) {
         FieldBits bits[3] = { fb, fb, fb };
         f4(bits, erased);
+        EXPECT_EQ(expected, bits[0]);
+    }
+}
+
+TEST(DropTest, test5)
+{
+    const int N = 10000000;
+
+    const FieldBits fb(
+        "111111"
+        "111111");
+    const FieldBits expected(
+        ".....1"
+        "1111.1");
+
+    const FieldBits erased(
+        "....1."
+        "11111."
+    );
+
+    for (int i = 0; i < N; ++i) {
+        FieldBits bits[3] = { fb, fb, fb };
+        f5(bits, erased);
         EXPECT_EQ(expected, bits[0]);
     }
 }
