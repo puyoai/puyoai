@@ -128,9 +128,7 @@ bool BitField::rensaWillOccur() const
 {
     for (PuyoColor c : NORMAL_PUYO_COLORS) {
         FieldBits mask = bits(c).maskedField12();
-        FieldBits seed = mask.vanishingSeed();
-
-        if (!seed.isEmpty())
+        if (mask.findVanishingBits(nullptr))
             return true;
     }
 
