@@ -30,40 +30,40 @@ inline int BitField::simulateFastAVX2()
 inline
 bool BitField::vanishFastAVX2(int /*currentChain*/, FieldBits* erased) const
 {
-    *erased = FieldBits();
+    FieldBits256 erased256;
 
     bool didErase = false;
 
-    // RED & BLUE
+    // RED (100) & BLUE (101)
     {
-        // TODO(mayah): This can be improved.
-        FieldBits256 mask(bits(PuyoColor::RED).maskedField12(), bits(PuyoColor::BLUE).maskedField12());
-        FieldBits256 seed = mask.vanishingSeed();
-        if (!seed.isEmpty()) {
-            FieldBits256 expanded = seed.expand(mask);
-            // TODO(mayah): This can be improved.
-            erased->setAll(expanded.low());
-            erased->setAll(expanded.high());
+        FieldBits t = _mm_andnot_si128(m_[1], m_[2]);
+        t = t.maskedField12();
+        FieldBits256 mask(m_[0] & t, _mm_andnot_si128(m_[0], t));
+        FieldBits256 vanishing;
+        if (mask.findVanishingBits(&vanishing)) {
+            erased256.setAll(vanishing);
             didErase = true;
         }
     }
 
-    // YELLOW & GREEN
+    // YELLOW (110) & GREEN (111)
     {
-        // TODO(mayah): This can be improved.
-        FieldBits256 mask(bits(PuyoColor::YELLOW).maskedField12(), bits(PuyoColor::GREEN).maskedField12());
-        FieldBits256 seed = mask.vanishingSeed();
-        if (!seed.isEmpty()) {
-            FieldBits256 expanded = seed.expand(mask);
-            // TODO(mayah): This can be improved.
-            erased->setAll(expanded.low());
-            erased->setAll(expanded.high());
+        FieldBits t = m_[2] & m_[1];
+        t = t.maskedField12();
+        FieldBits256 mask(m_[0] & t, _mm_andnot_si128(m_[0], t));
+        FieldBits256 vanishing;
+        if (mask.findVanishingBits(&vanishing)) {
+            erased256.setAll(vanishing);
             didErase = true;
         }
     }
 
-    if (!didErase)
+    if (!didErase) {
+        *erased = FieldBits();
         return false;
+    }
+
+    *erased = erased256.low() | erased256.high();
 
     // Removes ojama.
     FieldBits ojamaErased(erased->expandEdge().mask(bits(PuyoColor::OJAMA).maskedField12()));

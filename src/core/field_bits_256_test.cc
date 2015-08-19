@@ -69,8 +69,7 @@ TEST(FieldBits256Test, expand)
     EXPECT_EQ(maskLow, expanded.low());
 }
 
-#if 0
-TEST(FieldBits256Test, vanishingSeed)
+TEST(FieldBits256Test, findVanishingBits)
 {
     BitField bf(
         ".....R"
@@ -84,12 +83,23 @@ TEST(FieldBits256Test, vanishingSeed)
     FieldBits yellow = bf.bits(PuyoColor::YELLOW);
     FieldBits green = bf.bits(PuyoColor::GREEN);
 
-    FieldBits256 redBlueSeed = FieldBits256(red, blue).vanishingSeed();
-    FieldBits256 yellowGreenSeed = FieldBits256(yellow, green).vanishingSeed();
+    FieldBits256 redBlueVanishing;
+    FieldBits256 yellowGreenVanishing;
+    EXPECT_TRUE(FieldBits256(red, blue).findVanishingBits(&redBlueVanishing));
+    EXPECT_TRUE(FieldBits256(yellow, green).findVanishingBits(&yellowGreenVanishing));
 
-    EXPECT_EQ(FieldBits256(red.vanishingSeed(), blue.vanishingSeed()), redBlueSeed);
-    EXPECT_EQ(FieldBits256(yellow.vanishingSeed(), green.vanishingSeed()), yellowGreenSeed);
+    FieldBits redVanishing;
+    FieldBits blueVanishing;
+    FieldBits yellowVanishing;
+    FieldBits greenVanishing;
+
+    EXPECT_TRUE(red.findVanishingBits(&redVanishing));
+    EXPECT_TRUE(blue.findVanishingBits(&blueVanishing));
+    EXPECT_TRUE(yellow.findVanishingBits(&yellowVanishing));
+    EXPECT_TRUE(green.findVanishingBits(&greenVanishing));
+
+    EXPECT_EQ(FieldBits256(redVanishing, blueVanishing), redBlueVanishing);
+    EXPECT_EQ(FieldBits256(yellowVanishing, greenVanishing), yellowGreenVanishing);
 }
-#endif
 
 #endif // __AVX2__
