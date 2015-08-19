@@ -283,7 +283,7 @@ TEST(FieldBitsTest, expand_exhaustive)
     EXPECT_EQ(19 * 4, countTestCases);
 }
 
-TEST(FieldBitsTest, vanishingSeed1)
+TEST(FieldBitsTest, findVanishingBits1)
 {
     PlainField f(
         ".R...."
@@ -294,20 +294,20 @@ TEST(FieldBitsTest, vanishingSeed1)
         "R...R.");
     FieldBits fr(f, PuyoColor::RED);
 
-    FieldBits seed = fr.vanishingSeed();
-    FieldBits expanded = seed.expand(fr);
+    FieldBits vanishing;
+    EXPECT_TRUE(fr.findVanishingBits(&vanishing));
 
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
             if (f.color(x, y) == PuyoColor::RED)
-                EXPECT_TRUE(expanded.get(x, y));
+                EXPECT_TRUE(vanishing.get(x, y));
             else
-                EXPECT_FALSE(expanded.get(x, y));
+                EXPECT_FALSE(vanishing.get(x, y));
         }
     }
 }
 
-TEST(FieldBitsTest, vanishingSeed2)
+TEST(FieldBitsTest, findVanishingBits2)
 {
     PlainField f(
         ".RRR.."
@@ -315,12 +315,12 @@ TEST(FieldBitsTest, vanishingSeed2)
         ".R.RR.");
     FieldBits fr(f, PuyoColor::RED);
 
-    FieldBits seed = fr.vanishingSeed();
-    FieldBits expanded = seed.expand(fr);
+    FieldBits vanishing;
+    EXPECT_FALSE(fr.findVanishingBits(&vanishing));
 
     for (int x = 1; x <= 6; ++x) {
         for (int y = 1; y <= 12; ++y) {
-            EXPECT_FALSE(expanded.get(x, y));
+            EXPECT_FALSE(vanishing.get(x, y));
         }
     }
 }

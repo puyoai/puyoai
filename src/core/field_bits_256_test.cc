@@ -69,6 +69,7 @@ TEST(FieldBits256Test, expand)
     EXPECT_EQ(maskLow, expanded.low());
 }
 
+#if 0
 TEST(FieldBits256Test, vanishingSeed)
 {
     BitField bf(
@@ -89,5 +90,6 @@ TEST(FieldBits256Test, vanishingSeed)
     EXPECT_EQ(FieldBits256(red.vanishingSeed(), blue.vanishingSeed()), redBlueSeed);
     EXPECT_EQ(FieldBits256(yellow.vanishingSeed(), green.vanishingSeed()), yellowGreenSeed);
 }
+#endif
 
 #endif // __AVX2__

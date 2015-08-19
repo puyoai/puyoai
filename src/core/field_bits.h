@@ -77,17 +77,6 @@ public:
     // ......      ..xx..    ..xx..
     FieldBits expandEdge() const;
 
-    // Returns the seed bits for connected more that 4.
-    // 1 connection might contain more than 1 seed.
-    // e.g.
-    // xxx...    .x....    .xx...
-    // .xx... -> ...... or ...... or ...
-    //
-    // xxx... -> ...... (x isn't erased, so no seed bit.)
-    //
-    // When seed is expanded, It should be the same as all vanishing bits.
-    FieldBits vanishingSeed() const;
-
     // Returns true if there are 4-connected bits.
     // Such bits are copied to |bits|.
     bool findVanishingBits(FieldBits* bits) const;
@@ -240,37 +229,6 @@ FieldBits FieldBits::expandEdge() const
 }
 
 inline
-FieldBits FieldBits::vanishingSeed() const
-{
-    //  x
-    // xox              -- o is 3-connected
-    //
-    // xoox  ox   x oo
-    //      xo  xoo oo  -- o is 2-connected.
-    //
-    // So, one 3-connected piece or two 2-connected pieces are necessary and sufficient.
-
-    FieldBits u = _mm_slli_epi16(m_, 1) & m_;
-    FieldBits d = _mm_srli_epi16(m_, 1) & m_;
-    FieldBits l = _mm_slli_si128(m_, 2) & m_;
-    FieldBits r = _mm_srli_si128(m_, 2) & m_;
-
-    FieldBits ud_and = u & d;
-    FieldBits lr_and = l & r;
-    FieldBits ud_or = u | d;
-    FieldBits lr_or = l | r;
-
-    FieldBits threes = (ud_and & lr_or) | (lr_and & ud_or);
-    FieldBits twos = ud_and | lr_and | (ud_or & lr_or);
-
-    FieldBits two_u = _mm_slli_epi16(twos, 1) & twos;
-    FieldBits two_l = _mm_slli_si128(twos, 2) & twos;
-    FieldBits two_twos = two_u | two_l;
-
-    return threes | two_twos;
-}
-
-inline
 bool FieldBits::findVanishingBits(FieldBits* bits) const
 {
     //  x
@@ -280,6 +238,9 @@ bool FieldBits::findVanishingBits(FieldBits* bits) const
     //      xo  xoo oo  -- o is 2-connected.
     //
     // So, one 3-connected piece or two 2-connected pieces are necessary and sufficient.
+    //
+    // Also, 1-connected won't be connected to each other in vanishing case.
+    // So, after this, expand1() should be enough.
 
     FieldBits u = _mm_slli_epi16(m_, 1) & m_;
     FieldBits d = _mm_srli_epi16(m_, 1) & m_;
@@ -296,14 +257,19 @@ bool FieldBits::findVanishingBits(FieldBits* bits) const
 
     FieldBits two_u = _mm_slli_epi16(twos, 1) & twos;
     FieldBits two_l = _mm_slli_si128(twos, 2) & twos;
-    *bits = threes | two_u | two_l;
-    if (bits->isEmpty())
+
+    FieldBits vanishing = threes | two_u | two_l;
+
+    if (bits == nullptr)
+        return !vanishing.isEmpty();
+
+    if (vanishing.isEmpty())
         return false;
 
     FieldBits two_d = _mm_srli_epi16(twos, 1) & twos;
     FieldBits two_r = _mm_srli_si128(twos, 2) & twos;
-    *bits = *bits | two_d | two_r;
-    *bits = bits->expand1(m_);
+    vanishing = vanishing | two_d | two_r;
+    *bits = vanishing.expand1(m_);
     return true;
 }
 
