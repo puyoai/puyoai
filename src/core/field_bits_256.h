@@ -53,11 +53,8 @@ private:
 
 inline FieldBits256::FieldBits256(FieldBits high, FieldBits low)
 {
-    // TODO(mayah): We should have better algorithm here.
     // See http://lists.cs.uiuc.edu/pipermail/cfe-commits/Week-of-Mon-20150518/129492.html
-    m_ = _mm256_setzero_si256();
-    m_ = _mm256_inserti128_si256(m_, low, 0);
-    m_ = _mm256_inserti128_si256(m_, high, 1);
+    m_ = (__m256i) __builtin_shufflevector((__m128)low.xmm(), (__m128)high.xmm(), 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 inline FieldBits256 FieldBits256::expand(FieldBits256 mask) const
