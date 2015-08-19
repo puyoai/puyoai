@@ -82,16 +82,17 @@ inline FieldBits256 FieldBits256::expand(FieldBits256 mask) const
 
 inline FieldBits256 FieldBits256::expand1(FieldBits256 mask) const
 {
-    FieldBits256 expanded = m_;
-    expanded = _mm256_slli_epi16(m_, 1) | expanded;
-    expanded = _mm256_srli_epi16(m_, 1) | expanded;
-    expanded = _mm256_slli_si256(m_, 2) | expanded;
-    expanded = _mm256_srli_si256(m_, 2) | expanded;
-    return mask & expanded;
+    FieldBits256 v1 = _mm256_slli_si256(m_, 2);
+    FieldBits256 v2 = _mm256_srli_si256(m_, 2);
+    FieldBits256 v3 = _mm256_slli_epi16(m_, 1);
+    FieldBits256 v4 = _mm256_srli_epi16(m_, 1);
+    return ((m_ | v1) | (v2 | v3) | v4) & mask;
 }
 
-inline bool FieldBits256::findVanishingBits(FieldBits256* bits) const
+inline bool FieldBits256::findVanishingBits(FieldBits256* vanishing) const
 {
+    DCHECK(vanishing) << "vanishing should not be nullptr";
+
     // See FieldBits::findVanishingSeed for the implementation details.
 
     __m256i u = _mm256_and_si256(_mm256_slli_epi16(m_, 1), m_);
@@ -104,23 +105,18 @@ inline bool FieldBits256::findVanishingBits(FieldBits256* bits) const
     __m256i ud_or = u | d;
     __m256i lr_or = l | r;
 
-    __m256i threes = (ud_and & lr_or) | (lr_and & ud_or);
     __m256i twos = lr_and | ud_and | (ud_or & lr_or);
-
     __m256i two_u = _mm256_slli_epi16(twos, 1) & twos;
     __m256i two_l = _mm256_slli_si256(twos, 2) & twos;
-    FieldBits256 vanishing = two_u | two_l | threes;
+    __m256i threes = (ud_and & lr_or) | (lr_and & ud_or);
+    *vanishing = two_u | two_l | threes;
 
-    if (bits == nullptr)
-        return !vanishing.isEmpty();
-
-    if (vanishing.isEmpty())
+    if (vanishing->isEmpty())
         return false;
 
     __m256i two_d = _mm256_srli_epi16(twos, 1) & twos;
     __m256i two_r = _mm256_srli_si256(twos, 2) & twos;
-    vanishing = vanishing | two_d | two_r;
-    *bits = vanishing.expand1(m_);
+    *vanishing = (*vanishing | two_d | two_r).expand1(m_);
     return true;
 }
 

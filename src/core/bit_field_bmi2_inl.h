@@ -10,37 +10,34 @@
 inline
 void BitField::dropFastAfterVanishBMI2(FieldBits erased)
 {
-    // TODO(mayah): This method is not so optimized yet. We might have a large room to
-    // improve this function.
-
     union Decomposer64 {
         std::uint64_t v[2];
         __m128i m;
     };
 
-    union Decomposer16 {
-        std::uint16_t v[8];
-        __m128i m;
+    union Decomposer256_64 {
+        std::uint64_t v[4];
+        __m256i m;
     };
 
-    const FieldBits fieldMask = _mm_set_epi16(0, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0x3FFE, 0);
+    const FieldBits fieldMask = FieldBits::FIELD_MASK_13;
     const FieldBits leftBits = fieldMask.notmask(erased);
     Decomposer64 x;
     x.m = leftBits;
     const std::uint64_t oldLowBits = x.v[0];
     const std::uint64_t oldHighBits = x.v[1];
 
-    Decomposer16 height;
-    height.m = sse::mm_popcnt_epi16(leftBits);
+    const __m256i ones = _mm256_set_epi32(0, 1, 1, 1, 1, 1, 1, 0);
+    __m256i height = _mm256_cvtepi16_epi32(sse::mm_popcnt_epi16(leftBits));
+    height = _mm256_sllv_epi32(ones, height);
+    height = _mm256_sub_epi32(height, ones);
+    height = _mm256_slli_epi32(height, 1);
 
-    const std::uint64_t newLowBits =
-        (((1ULL << height.v[1]) - 1) << 17) |
-        (((1ULL << height.v[2]) - 1) << 33) |
-        (((1ULL << height.v[3]) - 1) << 49);
-    const std::uint64_t newHighBits =
-        (((1ULL << height.v[4]) - 1) << 1) |
-        (((1ULL << height.v[5]) - 1) << 17) |
-        (((1ULL << height.v[6]) - 1) << 33);
+    height = _mm256_packs_epi32(height, height);
+    Decomposer256_64 y;
+    y.m = height;
+    const std::uint64_t newLowBits = y.v[0];
+    const std::uint64_t newHighBits = y.v[2];
 
     for (int i = 0; i < 3; ++i) {
         Decomposer64 d;
