@@ -78,8 +78,11 @@ public:
     FieldBits expandEdge() const;
 
     // Returns true if there are 4-connected bits.
-    // Such bits are copied to |bits|.
-    bool findVanishingBits(FieldBits* bits) const;
+    // Such bits are copied to |vanishing|.
+    // |vanishing| must not be nullptr.
+    bool findVanishingBits(FieldBits* vanishing) const;
+
+    bool hasVanishingBits() const;
 
     // Sets all the positions having 1 to |positions|.
     // |positions| should have 72 spaces at least. In some case, you need 128 spaces.
@@ -195,13 +198,15 @@ FieldBits FieldBits::expand(FieldBits mask) const
 
 inline FieldBits FieldBits::expand1(FieldBits mask) const
 {
-    FieldBits m = m_;
+    FieldBits v1 = _mm_slli_si128(m_, 2);
+    FieldBits v2 = _mm_srli_si128(m_, 2);
+    FieldBits v3 = _mm_slli_epi16(m_, 1);
+    FieldBits v4 = _mm_srli_epi16(m_, 1);
 
-    FieldBits v1 = _mm_slli_si128(m, 2);
-    FieldBits v2 = _mm_srli_si128(m, 2);
-    FieldBits v3 = _mm_slli_epi16(m, 1);
-    FieldBits v4 = _mm_srli_epi16(m, 1);
-    return (v1 | v2 | v3 | v4 | m) & mask;
+    // NOTE: clang++ (3.4) emits an assembly that looks
+    // parallelly executable. But g++ (4.8.4) does not.
+    // Anyway, out-of-order execution will hide this difference.
+    return ((m_ | v1) | (v2 | v3) | v4) & mask;
 }
 
 inline
@@ -225,11 +230,11 @@ FieldBits FieldBits::expandEdge() const
     __m128i m3 = _mm_slli_si128(m_, 2);
     __m128i m4 = _mm_srli_si128(m_, 2);
 
-    return _mm_or_si128(_mm_or_si128(m1, m2), _mm_or_si128(m3, m4));
+    return (m1 | m2) | (m3 | m4);
 }
 
 inline
-bool FieldBits::findVanishingBits(FieldBits* bits) const
+bool FieldBits::findVanishingBits(FieldBits* vanishing) const
 {
     //  x
     // xox              -- o is 3-connected
@@ -242,6 +247,38 @@ bool FieldBits::findVanishingBits(FieldBits* bits) const
     // Also, 1-connected won't be connected to each other in vanishing case.
     // So, after this, expand1() should be enough.
 
+    DCHECK(vanishing) << "bits must not be nullptr";
+
+    FieldBits u = _mm_slli_epi16(m_, 1) & m_;
+    FieldBits d = _mm_srli_epi16(m_, 1) & m_;
+    FieldBits l = _mm_slli_si128(m_, 2) & m_;
+    FieldBits r = _mm_srli_si128(m_, 2) & m_;
+
+    FieldBits ud_and = u & d;
+    FieldBits lr_and = l & r;
+    FieldBits ud_or = u | d;
+    FieldBits lr_or = l | r;
+
+    FieldBits threes = (ud_and & lr_or) | (lr_and & ud_or);
+    FieldBits twos = ud_and | lr_and | (ud_or & lr_or);
+
+    FieldBits two_u = _mm_slli_epi16(twos, 1) & twos;
+    FieldBits two_l = _mm_slli_si128(twos, 2) & twos;
+
+    *vanishing = threes | two_u | two_l;
+
+    if (vanishing->isEmpty())
+        return false;
+
+    FieldBits two_d = _mm_srli_epi16(twos, 1) & twos;
+    FieldBits two_r = _mm_srli_si128(twos, 2) & twos;
+    *vanishing = (*vanishing | two_d | two_r).expand1(m_);
+    return true;
+}
+
+inline
+bool FieldBits::hasVanishingBits() const
+{
     FieldBits u = _mm_slli_epi16(m_, 1) & m_;
     FieldBits d = _mm_srli_epi16(m_, 1) & m_;
     FieldBits l = _mm_slli_si128(m_, 2) & m_;
@@ -260,17 +297,7 @@ bool FieldBits::findVanishingBits(FieldBits* bits) const
 
     FieldBits vanishing = threes | two_u | two_l;
 
-    if (bits == nullptr)
-        return !vanishing.isEmpty();
-
-    if (vanishing.isEmpty())
-        return false;
-
-    FieldBits two_d = _mm_srli_epi16(twos, 1) & twos;
-    FieldBits two_r = _mm_srli_si128(twos, 2) & twos;
-    vanishing = vanishing | two_d | two_r;
-    *bits = vanishing.expand1(m_);
-    return true;
+    return !vanishing.isEmpty();
 }
 
 inline
