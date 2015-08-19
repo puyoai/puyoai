@@ -57,6 +57,32 @@ TEST(Plan, iterateAvailablePlansWithRensa)
     EXPECT_EQ(0, plan.framesToIgnite());
 }
 
+TEST(Plan, iterateAvailablePlansWithEvents)
+{
+    CoreField field;
+    KumipuyoSeq seq("BBBB");
+    bool found = false;
+
+    auto callback = [&found](const RefPlan& p) {
+        if (p.isRensaPlan())
+            found = true;
+    };
+
+    // With |events|, 2 rows of Ojama will fall just after 1st control,
+    // so we cannot vanish puyos, because of ojama wall.
+    std::vector<Plan::Event> events = {Plan::Event {1, 2, Plan::Event::Type::FALL_OJAMA_ROWS}};
+    found = false;
+    Plan::iterateAvailablePlansWithEvents(field, seq, 2, events, callback);
+    EXPECT_FALSE(found);
+
+    // With |lateEvents|, Ojama will fall 1000 frames later.  It means we can control
+    // 2 Kumipuyos before Ojama fall, and we can vanish puyos.
+    std::vector<Plan::Event> lateEvents = {Plan::Event {1000, 2, Plan::Event::Type::FALL_OJAMA_ROWS}};
+    found = false;
+    Plan::iterateAvailablePlansWithEvents(field, seq, 2, lateEvents, callback);
+    EXPECT_TRUE(found);
+}
+
 TEST(Plan, numChigiri)
 {
     CoreField cf("  O   ");
