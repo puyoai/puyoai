@@ -65,6 +65,7 @@ public:
 
     // Returns all connected bits.
     FieldBits expand(FieldBits mask) const;
+    FieldBits expand1(FieldBits mask) const;
     // Returns connected bits. (more then 4 connected bits are not accurate.)
     FieldBits expand4(FieldBits mask) const;
 
@@ -199,8 +200,7 @@ FieldBits FieldBits::expand(FieldBits mask) const
     // NOT_REACHED.
 }
 
-inline
-FieldBits FieldBits::expand4(FieldBits mask) const
+inline FieldBits FieldBits::expand1(FieldBits mask) const
 {
     FieldBits m = m_;
 
@@ -208,19 +208,18 @@ FieldBits FieldBits::expand4(FieldBits mask) const
     FieldBits v2 = _mm_srli_si128(m, 2);
     FieldBits v3 = _mm_slli_epi16(m, 1);
     FieldBits v4 = _mm_srli_epi16(m, 1);
-    m = (((v1 | v2) | (v3 | v4)) & mask) | m;
+    return (v1 | v2 | v3 | v4 | m) & mask;
+}
 
-    v1 = _mm_slli_si128(m, 2);
-    v2 = _mm_srli_si128(m, 2);
-    v3 = _mm_slli_epi16(m, 1);
-    v4 = _mm_srli_epi16(m, 1);
-    m = (((v1 | v2) | (v3 | v4)) & mask) | m;
+inline
+FieldBits FieldBits::expand4(FieldBits mask) const
+{
+    FieldBits m = m_;
 
-    v1 = _mm_slli_si128(m, 2);
-    v2 = _mm_srli_si128(m, 2);
-    v3 = _mm_slli_epi16(m, 1);
-    v4 = _mm_srli_epi16(m, 1);
-    m = (((v1 | v2) | (v3 | v4)) & mask) | m;
+    // 3 times, not 4 times.
+    m = m.expand1(mask);
+    m = m.expand1(mask);
+    m = m.expand1(mask);
 
     return m;
 }
