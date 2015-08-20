@@ -12,7 +12,7 @@ RensaResult BitField::simulate(SimulationContext* context, Tracker* tracker)
     bool quick = false;
     FieldBits erased;
 
-    while ((nthChainScore = vanishForSimulation(context->currentChain, &erased, tracker)) > 0) {
+    while ((nthChainScore = vanish(context->currentChain, &erased, tracker)) > 0) {
         context->currentChain += 1;
         score += nthChainScore;
         frames += FRAMES_VANISH_ANIMATION;
@@ -50,7 +50,7 @@ RensaStepResult BitField::vanishDrop(SimulationContext* context, Tracker* tracke
     BitField escaped = escapeInvisible();
 
     FieldBits erased;
-    int score = vanishForSimulation(context->currentChain, &erased, tracker);
+    int score = vanish(context->currentChain, &erased, tracker);
     int maxDrops = 0;
     int frames = FRAMES_VANISH_ANIMATION;
     bool quick = false;
@@ -71,7 +71,7 @@ RensaStepResult BitField::vanishDrop(SimulationContext* context, Tracker* tracke
 }
 
 template<typename Tracker>
-int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* tracker) const
+int BitField::vanish(int currentChain, FieldBits* erased, Tracker* tracker) const
 {
     int numErasedPuyos = 0;
     int numColors = 0;

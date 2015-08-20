@@ -108,7 +108,7 @@ FieldBits BitField::ignitionPuyoBits() const
 {
     FieldBits bits;
     RensaNonTracker tracker;
-    (void)vanishForSimulation(1, &bits, &tracker);
+    (void)vanishFast(1, &bits, &tracker);
 
     return bits;
 }
@@ -117,8 +117,7 @@ int BitField::fillErasingPuyoPositions(Position* eraseQueue) const
 {
     FieldBits bits;
     RensaNonTracker tracker;
-    int score = vanishForSimulation(1, &bits, &tracker);
-    if (score == 0)
+    if (!vanishFast(1, &bits, &tracker))
         return 0;
 
     return bits.toPositions(eraseQueue);

@@ -106,7 +106,7 @@ private:
     // Vanishes puyos. Returns score. Erased puyos are put |erased|.
     // Actually puyo won't be vanished in this method, though...
     template<typename Tracker>
-    int vanishForSimulation(int currentChain, FieldBits* erased, Tracker* tracker) const;
+    int vanish(int currentChain, FieldBits* erased, Tracker* tracker) const;
     // Vanishes puyos. Returns true if something will be erased.
     template<typename Tracker>
     bool vanishFast(int currentChain, FieldBits* erased, Tracker* tracker) const;
