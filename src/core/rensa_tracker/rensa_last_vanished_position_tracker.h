@@ -12,15 +12,17 @@ private:
 };
 
 template<>
-class RensaTracker<RensaLastVanishedPositionTrackResult> : public RensaTrackerBase {
+class RensaTracker<RensaLastVanishedPositionTrackResult> {
 public:
     const RensaLastVanishedPositionTrackResult& result() const { return result_; }
 
-    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/,
-               const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    void trackVanish(int /*nthChain*/, const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
         result_.setLastVanishedPositionBits(vanishedColorPuyoBits | vanishedOjamaPuyoBits);
     }
+
+    void trackCoef(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/) {}
+    void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
 
 private:
     RensaLastVanishedPositionTrackResult result_;

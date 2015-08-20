@@ -4,20 +4,23 @@
 #include "core/rensa_tracker.h"
 
 template<typename Tracker1, typename Tracker2>
-class RensaCompositeTracker : public RensaTrackerBase {
+class RensaCompositeTracker {
 public:
     RensaCompositeTracker(Tracker1* tracker1, Tracker2* tracker2) :
         tracker1_(tracker1), tracker2_(tracker2)
     {
     }
 
-    void track(int nthChain, int numErasedPuyo, int longBonusCoef, int colorBonusCoef,
-               const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    void trackCoef(int nthChain, int numErasedPuyo, int longBonusCoef, int colorBonusCoef)
     {
-        tracker1_->track(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef,
-                         vanishedColorPuyoBits, vanishedOjamaPuyoBits);
-        tracker2_->track(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef,
-                         vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+        tracker1_->trackCoef(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef);
+        tracker2_->trackCoef(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef);
+    }
+
+    void trackVanish(int nthChain, const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    {
+        tracker1_->trackVanish(nthChain, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+        tracker2_->trackVanish(nthChain, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
     }
 
     void trackDrop(FieldBits blender, FieldBits leftOnes, FieldBits rightOnes)

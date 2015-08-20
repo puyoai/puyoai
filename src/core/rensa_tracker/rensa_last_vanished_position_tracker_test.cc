@@ -7,12 +7,13 @@
 TEST(RensaLastVanishedPositionTrackerTest, simualteWithLastVanishedPositionTracker)
 {
     CoreField f(
-        "..YY.."
-        "..GGY."
-        "RRRRGG");
+        "..GGYB"
+        "..YYGG"
+        "RRRRBB");
 
     FieldBits expected(
-        "..1111");
+        "..1111"
+        "......");
 
     RensaLastVanishedPositionTracker tracker;
 

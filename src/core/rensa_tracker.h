@@ -15,15 +15,6 @@
 //
 // Here, we define only RensaNonTracker. The other implementations are located on core/rensa_tracker/.
 
-class RensaTrackerBase {
-public:
-    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/,
-               const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
-    void track(int /*nthChain*/, const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
-
-    void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
-};
-
 // ----------------------------------------------------------------------
 
 template<typename TrackResult>
@@ -33,8 +24,11 @@ class RensaTracker;
 
 // RensaTracker<Unit> is a tracker that does not track anything.
 template<>
-class RensaTracker<Unit> : public RensaTrackerBase {
+class RensaTracker<Unit> {
 public:
+  void trackCoef(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/) {}
+  void trackVanish(int /*nthChain*/, const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
+  void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
 };
 typedef RensaTracker<Unit> RensaNonTracker;
 

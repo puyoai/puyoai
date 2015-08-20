@@ -5,7 +5,7 @@
 #include "core/field_constant.h"
 #include "core/rensa_tracker.h"
 
-class RensaYPositionTracker : public RensaTrackerBase {
+class RensaYPositionTracker {
 public:
     RensaYPositionTracker() :
         originalY_ {
@@ -21,8 +21,11 @@ public:
     {
     }
 
-    void track(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/,
-               const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    int originalY(int x, int y) const { return (originalY_[x] >> (4 * y)) & 0xF; }
+
+    void trackCoef(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/) {}
+
+    void trackVanish(int /*nthChain*/, const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
         const __m128i zero = _mm_setzero_si128();
         const __m128i ones = _mm_cmpeq_epi8(zero, zero);
@@ -37,7 +40,8 @@ public:
         }
     }
 
-    int originalY(int x, int y) const { return (originalY_[x] >> (4 * y)) & 0xF; }
+    void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
+
 
 private:
     std::uint64_t originalY_[FieldConstant::MAP_WIDTH];

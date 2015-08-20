@@ -38,15 +38,17 @@ private:
 };
 
 template<>
-class RensaTracker<RensaCoefResult> : public RensaTrackerBase {
+class RensaTracker<RensaCoefResult> {
 public:
     const RensaCoefResult& result() const { return result_; }
 
-    void track(int nthChain, int numErasedPuyo, int longBonusCoef, int colorBonusCoef,
-               const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/)
+    void trackCoef(int nthChain, int numErasedPuyo, int longBonusCoef, int colorBonusCoef)
     {
         result_.setCoef(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef);
     }
+
+    void trackVanish(int /*nthChain*/, const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
+    void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
 
 private:
     RensaCoefResult result_;

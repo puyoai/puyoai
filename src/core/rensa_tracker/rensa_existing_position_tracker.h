@@ -15,11 +15,14 @@ private:
 };
 
 template<>
-class RensaTracker<RensaExistingPositionTrackResult> : public RensaTrackerBase {
+class RensaTracker<RensaExistingPositionTrackResult> {
 public:
     RensaTracker(FieldBits bits) : result_(bits) {}
 
     const RensaExistingPositionTrackResult& result() const { return result_; }
+
+    void trackCoef(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/) {}
+    void trackVanish(int /*nthChain*/, const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
 
     void trackDrop(FieldBits blender, FieldBits leftOnes, FieldBits rightOnes)
     {

@@ -17,13 +17,13 @@ TEST(RensaCoefTrackResult, score)
 
 TEST(RensaCoefTrackerTest, simualteWithRensaCoefResult)
 {
-    CoreField f("R...RR"
-                "RGBRYR"
-                "RRGBBY"
-                "GGBYYR");
+    CoreField cf("R...RR"
+                 "RGBRYR"
+                 "RRGBBY"
+                 "GGBYYR");
 
     RensaCoefTracker tracker;
-    RensaResult rensaResult = f.simulate(&tracker);
+    RensaResult rensaResult = cf.simulate(&tracker);
 
     const RensaCoefResult& coefResult = tracker.result();
 
