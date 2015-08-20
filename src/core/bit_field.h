@@ -69,16 +69,15 @@ public:
     // Faster version of simulate(). Returns the number of chains.
     int simulateFast();
 
-#ifdef __AVX2__
-    // Faster version of simulate() that uses AVX2 instruction set.
-    int simulateFastAVX2();
-#endif
-
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
     RensaStepResult vanishDrop(SimulationContext*);
     // Vanishes the connected puyos with Tracker.
     template<typename Tracker>
     RensaStepResult vanishDrop(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
+
+    bool vanishDropFast(SimulationContext*);
+    template<typename Tracker>
+    bool vanishDropFast(SimulationContext*, Tracker*);
 
     // Caution: heights must be aligned to 16.
     void calculateHeight(int heights[FieldConstant::MAP_WIDTH]) const;
@@ -99,6 +98,11 @@ public:
     friend bool operator==(const BitField&, const BitField&);
     friend std::ostream& operator<<(std::ostream&, const BitField&);
 
+#ifdef __AVX2__
+    // Faster version of simulate() that uses AVX2 instruction set.
+    int simulateFastAVX2();
+#endif
+
 private:
     BitField escapeInvisible();
     void recoverInvisible(const BitField&);
@@ -115,7 +119,7 @@ private:
     template<typename Tracker>
     int dropAfterVanish(FieldBits erased, Tracker* tracker);
     template<typename Tracker>
-    void dropFastAfterVanish(FieldBits erased, Tracker* tracker);
+    void dropAfterVanishFast(FieldBits erased, Tracker* tracker);
 
 #ifdef __AVX2__
     bool vanishFastAVX2(int currentChain, FieldBits* erased) const;
@@ -224,6 +228,13 @@ RensaStepResult BitField::vanishDrop(BitField::SimulationContext* context)
 {
     RensaNonTracker tracker;
     return vanishDrop(context, &tracker);
+}
+
+inline
+bool BitField::vanishDropFast(BitField::SimulationContext* context)
+{
+    RensaNonTracker tracker;
+    return vanishDropFast(context, &tracker);
 }
 
 inline
