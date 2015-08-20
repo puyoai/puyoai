@@ -37,7 +37,7 @@ inline int BitField::simulateFast()
     RensaNonTracker tracker;
     while (vanishFast(currentChain, &erased, &tracker)) {
         currentChain += 1;
-        dropFastAfterVanish(erased, &tracker);
+        dropAfterVanishFast(erased, &tracker);
     }
 
     recoverInvisible(escaped);
@@ -68,6 +68,23 @@ RensaStepResult BitField::vanishDrop(SimulationContext* context, Tracker* tracke
 
     recoverInvisible(escaped);
     return RensaStepResult(score, frames, quick);
+}
+
+template<typename Tracker>
+bool BitField::vanishDropFast(SimulationContext* context, Tracker* tracker)
+{
+    BitField escaped = escapeInvisible();
+
+    bool vanished = false;
+    FieldBits erased;
+    if (vanishFast(context->currentChain, &erased, tracker)) {
+        dropAfterVanishFast(erased, tracker);
+        context->currentChain += 1;
+        vanished = true;
+    }
+
+    recoverInvisible(escaped);
+    return vanished;
 }
 
 template<typename Tracker>
@@ -227,7 +244,7 @@ int BitField::dropAfterVanish(FieldBits erased, Tracker* tracker)
 }
 
 template<typename Tracker>
-void BitField::dropFastAfterVanish(FieldBits erased, Tracker* tracker)
+void BitField::dropAfterVanishFast(FieldBits erased, Tracker* tracker)
 {
     const __m128i zero = _mm_setzero_si128();
     const __m128i ones = _mm_cmpeq_epi8(zero, zero);

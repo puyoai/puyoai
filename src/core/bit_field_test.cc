@@ -562,6 +562,22 @@ TEST(BitFieldTest, vanishDrop2)
     EXPECT_EQ(1, context.currentChain);
 }
 
+TEST(BitFieldTest, vanishDropFast1)
+{
+    BitField bf(
+        "..RR.."
+        "BBBBRR");
+
+    BitField::SimulationContext context;
+    EXPECT_TRUE(bf.vanishDropFast(&context));
+
+    BitField expected(
+        "..RRRR");
+
+    EXPECT_EQ(expected, bf);
+    EXPECT_EQ(2, context.currentChain);
+}
+
 TEST(BitFieldTest, ignitionPuyoBits)
 {
     BitField bf(
