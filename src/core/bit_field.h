@@ -68,16 +68,15 @@ public:
 
     // Faster version of simulate(). Returns the number of chains.
     int simulateFast();
+    template<typename Tracker> int simulateFast(Tracker*);
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
     RensaStepResult vanishDrop(SimulationContext*);
     // Vanishes the connected puyos with Tracker.
-    template<typename Tracker>
-    RensaStepResult vanishDrop(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
+    template<typename Tracker> RensaStepResult vanishDrop(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
 
     bool vanishDropFast(SimulationContext*);
-    template<typename Tracker>
-    bool vanishDropFast(SimulationContext*, Tracker*);
+    template<typename Tracker> bool vanishDropFast(SimulationContext*, Tracker*);
 
     // Caution: heights must be aligned to 16.
     void calculateHeight(int heights[FieldConstant::MAP_WIDTH]) const;
@@ -219,6 +218,13 @@ RensaResult BitField::simulate(Tracker* tracker)
 {
     SimulationContext context(1);
     return simulate(&context, tracker);
+}
+
+inline
+int BitField::simulateFast()
+{
+    RensaNonTracker tracker;
+    return simulateFast(&tracker);
 }
 
 inline

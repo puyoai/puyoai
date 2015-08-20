@@ -28,16 +28,16 @@ RensaResult BitField::simulate(SimulationContext* context, Tracker* tracker)
     return RensaResult(context->currentChain - 1, score, frames, quick);
 }
 
-inline int BitField::simulateFast()
+template<typename Tracker>
+int BitField::simulateFast(Tracker* tracker)
 {
     BitField escaped = escapeInvisible();
     int currentChain = 1;
 
     FieldBits erased;
-    RensaNonTracker tracker;
-    while (vanishFast(currentChain, &erased, &tracker)) {
+    while (vanishFast(currentChain, &erased, tracker)) {
         currentChain += 1;
-        dropAfterVanishFast(erased, &tracker);
+        dropAfterVanishFast(erased, tracker);
     }
 
     recoverInvisible(escaped);
