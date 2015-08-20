@@ -16,10 +16,10 @@ inline int BitField::simulateFastAVX2()
     while (vanishFastAVX2(currentChain, &erased)) {
         currentChain += 1;
 #ifdef __BMI2__
-        dropFastAfterVanishBMI2(erased);
+        dropAfterVanishFastBMI2(erased);
 #else
         RensaNonTracker tracker;
-        dropFastAfterVanish(erased, &tracker);
+        dropAfterVanishFast(erased, &tracker);
 #endif
     }
 
