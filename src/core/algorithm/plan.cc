@@ -95,12 +95,21 @@ void iterateAvailablePlansInternal(CoreField field,
         n = 10;
     }
 
-    if (eventIndex < events.size()) {
-        const Plan::Event& event = events[eventIndex];
-        if (event.type == Plan::Event::Type::FALL_OJAMA_ROWS && event.frames < totalFrames) {
-            totalFrames += field.fallOjama(event.value);
-            ++eventIndex;
+    {
+        // Now we work only for FALL_OJAMA_PUYOS events.
+        int ojama_rows = 0;
+        for (; eventIndex < events.size() && events[eventIndex].frames < totalFrames; ++eventIndex) {
+            const Plan::Event& event = events[eventIndex];
+            switch (event.type) {
+            case Plan::Event::Type::FALL_OJAMA_ROWS:
+                ojama_rows += event.value;
+                break;
+            default:
+                CHECK(false) << "Unknown event type";
+            }
         }
+        if (ojama_rows)
+            totalFrames += field.fallOjama(ojama_rows);
         if (!field.isEmpty(3, 12))
             return;
     }
