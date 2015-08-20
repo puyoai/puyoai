@@ -98,7 +98,7 @@ public:
     friend bool operator==(const BitField&, const BitField&);
     friend std::ostream& operator<<(std::ostream&, const BitField&);
 
-#ifdef __AVX2__
+#if defined(__AVX2__) && defined(__BMI2__)
     // Faster version of simulate() that uses AVX2 instruction set.
     int simulateFastAVX2();
 #endif
@@ -121,10 +121,8 @@ private:
     template<typename Tracker>
     void dropAfterVanishFast(FieldBits erased, Tracker* tracker);
 
-#ifdef __AVX2__
+#if defined(__AVX2__) && defined(__BMI2__)
     bool vanishFastAVX2(int currentChain, FieldBits* erased) const;
-#endif
-#ifdef __BMI2__
     void dropAfterVanishFastBMI2(FieldBits erased);
 #endif
 
@@ -336,11 +334,8 @@ struct hash<BitField>
 
 #include "bit_field_inl.h"
 
-#ifdef __AVX2__
+#if defined(__AVX2__) and defined(__BMI2__)
 #include "bit_field_avx2_inl.h"
-#endif
-#ifdef __BMI2__
-#include "bit_field_bmi2_inl.h"
 #endif
 
 #endif // CORE_BIT_FIELD_H_
