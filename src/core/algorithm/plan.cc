@@ -96,7 +96,8 @@ void iterateAvailablePlansInternal(CoreField field,
     }
 
     {
-        // Now we work only for FALL_OJAMA_PUYOS events.
+        // Multiple fall-ojama events are merged if they are unused and their frame's are past.
+        // TODO: At most 5 rows of Ojama fall at once.  Remained ojama will fall later.
         int ojama_rows = 0;
         for (; eventIndex < events.size() && events[eventIndex].frames < totalFrames; ++eventIndex) {
             const Plan::Event& event = events[eventIndex];
