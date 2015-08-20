@@ -44,14 +44,14 @@ private:
 };
 
 template<>
-class RensaTracker<RensaVanishingPositionResult> : public RensaTrackerBase {
+class RensaTracker<RensaVanishingPositionResult> {
 public:
     RensaTracker() {}
 
     const RensaVanishingPositionResult& result() const { return result_; }
 
-    void track(int nthChain, int numErasedPuyo, int longBonusCoef, int colorBonusCoef,
-               const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    void trackCoef(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/) {}
+    void trackVanish(int nthChain, const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
         vanishedColorPuyoBits.iterateBitPositions([&](int x, int y) {
             if (yTracker_.originalY(x, y) == y) {
@@ -62,8 +62,10 @@ public:
         });
 
         yTracker_ = RensaYPositionTracker();
-        yTracker_.track(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+        yTracker_.trackVanish(nthChain, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
     }
+
+    void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
 
 private:
     RensaVanishingPositionResult result_;

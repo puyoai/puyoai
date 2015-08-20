@@ -27,28 +27,32 @@ TEST(RensaChainTrackResult, constructor)
     EXPECT_EQ(0, rtr.erasedAt(3, 1));
 }
 
-TEST(RensaChainTrackerTest, TrackedCoreFieldSimulation)
+TEST(RensaChainTrackerTest, simulate1)
 {
-    CoreField f("400040"
-                "456474"
-                "445667"
-                "556774");
+    CoreField cf("R...R."
+                 "RBYRGR"
+                 "RRBYYG"
+                 "BBYGGR");
 
+    RensaChainTrackResult expected(
+        "1...5."
+        "123545"
+        "112334"
+        "223445");
 
     RensaChainTracker tracker;
-    RensaResult basicRensaResult = f.simulate(&tracker);
+    RensaResult rensaResult = cf.simulate(&tracker);
+    EXPECT_EQ(5, rensaResult.chains);
 
     const RensaChainTrackResult& trackResult = tracker.result();
-
-    EXPECT_EQ(5, basicRensaResult.chains);
-    EXPECT_EQ(1, trackResult.erasedAt(1, 2));
-    EXPECT_EQ(2, trackResult.erasedAt(1, 1));
-    EXPECT_EQ(3, trackResult.erasedAt(3, 3));
-    EXPECT_EQ(4, trackResult.erasedAt(5, 3));
-    EXPECT_EQ(5, trackResult.erasedAt(5, 4));
+    for (int x = 1; x <= 6; ++x) {
+        for (int y = 1; y <= 12; ++y) {
+            EXPECT_EQ(expected.erasedAt(x, y), trackResult.erasedAt(x, y)) << "x=" << x << " y=" << y;
+        }
+    }
 }
 
-TEST(RensaChainTrackerTest, rensaChainTracker)
+TEST(RensaChainTrackerTest, simulate2)
 {
     CoreField cf(
         "..BB.."
@@ -66,4 +70,8 @@ TEST(RensaChainTrackerTest, rensaChainTracker)
     EXPECT_EQ(1, trackResult.erasedAt(3, 1));
     EXPECT_EQ(1, trackResult.erasedAt(4, 1));
     EXPECT_EQ(0, trackResult.erasedAt(1, 2));
+    EXPECT_EQ(0, trackResult.erasedAt(2, 2));
+    EXPECT_EQ(0, trackResult.erasedAt(3, 2));
+    EXPECT_EQ(0, trackResult.erasedAt(4, 2));
+    EXPECT_EQ(0, trackResult.erasedAt(6, 1));
 }

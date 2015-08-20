@@ -115,12 +115,13 @@ int BitField::vanishForSimulation(int currentChain, FieldBits* erased, Tracker* 
 
     int colorBonusCoef = colorBonus(numColors);
     int rensaBonusCoef = calculateRensaBonusCoef(chainBonus(currentChain), longBonusCoef, colorBonusCoef);
+    tracker->trackCoef(currentChain, numErasedPuyos, longBonusCoef, colorBonusCoef);
 
     // Removes ojama.
     FieldBits ojamaErased(erased->expandEdge().mask(bits(PuyoColor::OJAMA).maskedField12()));
-    tracker->track(currentChain, numErasedPuyos, longBonusCoef, colorBonusCoef, *erased, ojamaErased);
-
     erased->setAll(ojamaErased);
+    tracker->trackVanish(currentChain, *erased, ojamaErased);
+
     return 10 * numErasedPuyos * rensaBonusCoef;
 }
 
@@ -147,7 +148,7 @@ bool BitField::vanishFast(int currentChain, FieldBits* erased, Tracker* tracker)
     FieldBits ojamaErased(erased->expandEdge().mask(bits(PuyoColor::OJAMA).maskedField12()));
     erased->setAll(ojamaErased);
 
-    tracker->track(currentChain, *erased, ojamaErased);
+    tracker->trackVanish(currentChain, *erased, ojamaErased);
 
     return true;
 }
