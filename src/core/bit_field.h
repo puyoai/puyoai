@@ -125,7 +125,7 @@ private:
     bool vanishFastAVX2(int currentChain, FieldBits* erased) const;
 #endif
 #ifdef __BMI2__
-    void dropFastAfterVanishBMI2(FieldBits erased);
+    void dropAfterVanishFastBMI2(FieldBits erased);
 #endif
 
     FieldBits m_[3];

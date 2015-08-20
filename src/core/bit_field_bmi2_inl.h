@@ -8,7 +8,7 @@
 #include "field_bits_256.h"
 
 inline
-void BitField::dropFastAfterVanishBMI2(FieldBits erased)
+void BitField::dropAfterVanishFastBMI2(FieldBits erased)
 {
     union Decomposer64 {
         std::uint64_t v[2];
