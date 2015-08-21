@@ -81,9 +81,6 @@ static void runCountConnectedPuyosTest(const PlainField& f, int expected, int x,
 static void runSimulation(const CoreField& original)
 {
     const int expectedChain = CoreField(original).simulate().chains;
-
-    BitField bitFieldOriginal(original.bitField());
-
     const int N = 100000;
 
     TimeStampCounterData none;
@@ -102,13 +99,13 @@ static void runSimulation(const CoreField& original)
     }
 
     for (int i = 0; i < N; i++) {
-        BitField bf(bitFieldOriginal);
+        BitField bf(original.bitField());
         ScopedTimeStampCounter stsc(&tscBitField);
         EXPECT_EQ(expectedChain, bf.simulate().chains);
     }
 
     for (int i = 0; i < N; i++) {
-        BitField bf(bitFieldOriginal);
+        BitField bf(original.bitField());
         RensaNonTracker tracker;
         ScopedTimeStampCounter stsc(&tscBitFieldFast);
         EXPECT_EQ(expectedChain, bf.simulateFast(&tracker));
@@ -116,20 +113,112 @@ static void runSimulation(const CoreField& original)
 
 #if defined(__AVX2__) and defined(__BMI2__)
     TimeStampCounterData tscBitFieldAVX2;
+    TimeStampCounterData tscBitFieldFastAVX2;
+
     for (int i = 0; i < N; ++i) {
-        BitField bf(bitFieldOriginal);
+        BitField bf(original.bitField());
         BitField::SimulationContext context;
         RensaNonTracker tracker;
         ScopedTimeStampCounter stsc(&tscBitFieldAVX2);
         EXPECT_EQ(expectedChain, bf.simulateAVX2(&context, &tracker).chains);
     }
 
-    TimeStampCounterData tscBitFieldFastAVX2;
     for (int i = 0; i < N; ++i) {
-        BitField bf(bitFieldOriginal);
+        BitField bf(original.bitField());
         RensaNonTracker tracker;
         ScopedTimeStampCounter stsc(&tscBitFieldFastAVX2);
         EXPECT_EQ(expectedChain, bf.simulateFastAVX2(&tracker));
+    }
+#endif // __AVX2__ and __BMI2__
+
+    cout << "overhead: " << endl;
+    none.showStatistics();
+    cout << "CoreField: " << endl;
+    tscCoreField.showStatistics();
+    cout << "BitField: " << endl;
+    tscBitField.showStatistics();
+    cout << "BitField (fast): " << endl;
+    tscBitFieldFast.showStatistics();
+
+#ifdef __AVX2__
+    cout << "BitField AVX2: " << endl;
+    tscBitFieldAVX2.showStatistics();
+    cout << "BitField (fast) AVX2: " << endl;
+    tscBitFieldFastAVX2.showStatistics();
+#endif
+}
+
+static void runVanishDrop(const CoreField& original)
+{
+    const int expectedChain = CoreField(original).simulate().chains;
+    const int N = 100000;
+
+    TimeStampCounterData none;
+    TimeStampCounterData tscCoreField;
+    TimeStampCounterData tscBitField;
+    TimeStampCounterData tscBitFieldFast;
+
+    for (int i = 0; i < N; i++) {
+        ScopedTimeStampCounter stsc(&none);
+    }
+
+    for (int i = 0; i < N; i++) {
+        CoreField cf(original);
+        CoreField::SimulationContext context;
+        RensaNonTracker tracker;
+        ScopedTimeStampCounter stsc(&tscCoreField);
+        while (cf.vanishDrop(&context, &tracker).score > 0) {
+            // do nothing.
+        }
+        EXPECT_EQ(expectedChain, context.currentChain - 1);
+    }
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(original.bitField());
+        BitField::SimulationContext context;
+        RensaNonTracker tracker;
+        ScopedTimeStampCounter stsc(&tscBitField);
+        while (bf.vanishDrop(&context, &tracker).score > 0) {
+            // do nothing.
+        }
+        EXPECT_EQ(expectedChain, context.currentChain - 1);
+    }
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(original.bitField());
+        BitField::SimulationContext context;
+        RensaNonTracker tracker;
+        ScopedTimeStampCounter stsc(&tscBitFieldFast);
+        while (bf.vanishDropFast(&context, &tracker)) {
+            // do nothing.
+        }
+        EXPECT_EQ(expectedChain, context.currentChain - 1);
+    }
+
+#if defined(__AVX2__) and defined(__BMI2__)
+    TimeStampCounterData tscBitFieldAVX2;
+    TimeStampCounterData tscBitFieldFastAVX2;
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(original.bitField());
+        BitField::SimulationContext context;
+        RensaNonTracker tracker;
+        ScopedTimeStampCounter stsc(&tscBitFieldAVX2);
+        while (bf.vanishDropAVX2(&context, &tracker).score > 0) {
+            // do nothing.
+        }
+        EXPECT_EQ(expectedChain, context.currentChain - 1);
+    }
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(original.bitField());
+        BitField::SimulationContext context;
+        RensaNonTracker tracker;
+        ScopedTimeStampCounter stsc(&tscBitFieldFastAVX2);
+        while (bf.vanishDropFastAVX2(&context, &tracker)) {
+            // do nothing.
+        }
+        EXPECT_EQ(expectedChain, context.currentChain - 1);
     }
 #endif // __AVX2__ and __BMI2__
 
@@ -218,6 +307,24 @@ TEST(FieldPerformanceTest, simulate_filled)
                  "YGBGBG"
                  "RBGBGG");
     runSimulation(cf);
+}
+
+TEST(FieldPerformanceTest, vanishDrop_filled)
+{
+    CoreField cf(".G.BRG"
+                 "GBRRYR"
+                 "RRYYBY"
+                 "RGYRBR"
+                 "YGYRBY"
+                 "YGBGYR"
+                 "GRBGYR"
+                 "BRBYBY"
+                 "RYYBYY"
+                 "BRBYBR"
+                 "BGBYRR"
+                 "YGBGBG"
+                 "RBGBGG");
+    runVanishDrop(cf);
 }
 
 TEST(FieldPerformanceTest, countConnectedPuyos_empty)
