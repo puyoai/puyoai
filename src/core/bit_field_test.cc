@@ -582,6 +582,25 @@ TEST(BitFieldTest, vanishDropFast1)
     EXPECT_EQ(2, context.currentChain);
 }
 
+#if defined(__AVX2__) && defined(__BMI2__)
+TEST(BitFieldTest, vanishDropFastAVX2_1)
+{
+    BitField bf(
+        "..RR.."
+        "BBBBRR");
+
+    BitField::SimulationContext context;
+    RensaNonTracker tracker;
+    EXPECT_TRUE(bf.vanishDropFastAVX2(&context, &tracker));
+
+    BitField expected(
+        "..RRRR");
+
+    EXPECT_EQ(expected, bf);
+    EXPECT_EQ(2, context.currentChain);
+}
+#endif
+
 TEST(BitFieldTest, ignitionPuyoBits)
 {
     BitField bf(

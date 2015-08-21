@@ -24,6 +24,23 @@ int BitField::simulateFastAVX2(Tracker* tracker)
 }
 
 template<typename Tracker>
+bool BitField::vanishDropFastAVX2(SimulationContext* context, Tracker* tracker)
+{
+    BitField escaped = escapeInvisible();
+
+    bool vanished = false;
+    FieldBits erased;
+    if (vanishFastAVX2(context->currentChain, &erased, tracker)) {
+        dropAfterVanishFastBMI2(erased, tracker);
+        context->currentChain += 1;
+        vanished = true;
+    }
+
+    recoverInvisible(escaped);
+    return vanished;
+}
+
+template<typename Tracker>
 bool BitField::vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const
 {
     FieldBits256 erased256;

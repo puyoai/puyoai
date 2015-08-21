@@ -92,6 +92,7 @@ public:
 #if defined(__AVX2__) && defined(__BMI2__)
     // Faster version of simulate() that uses AVX2 instruction set.
     template<typename Tracker> int simulateFastAVX2(Tracker*);
+    template<typename Tracker> bool vanishDropFastAVX2(SimulationContext*, Tracker*);
 #endif
 
 private:
