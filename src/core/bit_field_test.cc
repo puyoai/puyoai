@@ -511,18 +511,19 @@ TEST(BitFieldTest, simulateFast)
 {
     for (const auto& testcase : SIMULATION_TEST_CASES) {
         BitField bf(testcase.field);
-        int chains = bf.simulateFast();
-
+        RensaNonTracker tracker;
+        int chains = bf.simulateFast(&tracker);
         EXPECT_EQ(testcase.chains, chains) << testcase.field.toDebugString();
     }
 }
 
-#ifdef __AVX2__
+#if defined(__AVX2__) && defined(__BMI2__)
 TEST(BitFieldTest, simulateFastAVX2)
 {
     for (const auto& testcase : SIMULATION_TEST_CASES) {
         BitField bf(testcase.field);
-        int chains = bf.simulateFastAVX2();
+        RensaNonTracker tracker;
+        int chains = bf.simulateFastAVX2(&tracker);
 
         EXPECT_EQ(testcase.chains, chains) << testcase.field.toDebugString();
     }
@@ -536,7 +537,8 @@ TEST(BitFieldTest, vanishDrop1)
         "BBBBRR");
 
     BitField::SimulationContext context;
-    RensaStepResult stepResult = bf.vanishDrop(&context);
+    RensaNonTracker tracker;
+    RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
 
     EXPECT_EQ(40, stepResult.score);
 
@@ -552,7 +554,8 @@ TEST(BitFieldTest, vanishDrop2)
     BitField bf("....YY");
 
     BitField::SimulationContext context;
-    RensaStepResult stepResult = bf.vanishDrop(&context);
+    RensaNonTracker tracker;
+    RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
 
     EXPECT_EQ(0, stepResult.score);
 
@@ -569,7 +572,8 @@ TEST(BitFieldTest, vanishDropFast1)
         "BBBBRR");
 
     BitField::SimulationContext context;
-    EXPECT_TRUE(bf.vanishDropFast(&context));
+    RensaNonTracker tracker;
+    EXPECT_TRUE(bf.vanishDropFast(&context, &tracker));
 
     BitField expected(
         "..RRRR");

@@ -62,20 +62,12 @@ public:
     void countConnection(int* count2, int* count3) const;
 
     RensaResult simulate(int initialChain = 1);
-    RensaResult simulate(SimulationContext*);
-    template<typename Tracker> RensaResult simulate(Tracker*);
     template<typename Tracker> RensaResult simulate(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
 
     // Faster version of simulate(). Returns the number of chains.
-    int simulateFast();
     template<typename Tracker> int simulateFast(Tracker*);
-
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
-    RensaStepResult vanishDrop(SimulationContext*);
-    // Vanishes the connected puyos with Tracker.
     template<typename Tracker> RensaStepResult vanishDrop(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
-
-    bool vanishDropFast(SimulationContext*);
     template<typename Tracker> bool vanishDropFast(SimulationContext*, Tracker*);
 
     // Caution: heights must be aligned to 16.
@@ -99,7 +91,6 @@ public:
 
 #if defined(__AVX2__) && defined(__BMI2__)
     // Faster version of simulate() that uses AVX2 instruction set.
-    int simulateFastAVX2();
     template<typename Tracker> int simulateFastAVX2(Tracker*);
 #endif
 
@@ -207,41 +198,6 @@ RensaResult BitField::simulate(int initialChain)
     RensaNonTracker tracker;
     SimulationContext context(initialChain);
     return simulate(&context, &tracker);
-}
-
-inline
-RensaResult BitField::simulate(SimulationContext* context)
-{
-    RensaNonTracker tracker;
-    return simulate(context, &tracker);
-}
-
-template<typename Tracker>
-RensaResult BitField::simulate(Tracker* tracker)
-{
-    SimulationContext context(1);
-    return simulate(&context, tracker);
-}
-
-inline
-int BitField::simulateFast()
-{
-    RensaNonTracker tracker;
-    return simulateFast(&tracker);
-}
-
-inline
-RensaStepResult BitField::vanishDrop(BitField::SimulationContext* context)
-{
-    RensaNonTracker tracker;
-    return vanishDrop(context, &tracker);
-}
-
-inline
-bool BitField::vanishDropFast(BitField::SimulationContext* context)
-{
-    RensaNonTracker tracker;
-    return vanishDropFast(context, &tracker);
 }
 
 inline
