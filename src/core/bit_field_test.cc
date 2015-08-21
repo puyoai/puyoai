@@ -11,7 +11,7 @@ using namespace std;
 
 namespace {
 
-struct SimulationTestCase {
+const struct SimulationTestCase {
     BitField field;
     int chains;
     int score;
@@ -518,6 +518,21 @@ TEST(BitFieldTest, simulateFast)
 }
 
 #if defined(__AVX2__) && defined(__BMI2__)
+TEST(BitFieldTest, simulateAVX2)
+{
+    for (const auto& testcase : SIMULATION_TEST_CASES) {
+        BitField bf(testcase.field);
+        BitField::SimulationContext context;
+        RensaNonTracker tracker;
+        RensaResult result = bf.simulateAVX2(&context, &tracker);
+
+        EXPECT_EQ(testcase.chains, result.chains) << testcase.field.toDebugString();
+        EXPECT_EQ(testcase.score, result.score) << testcase.field.toDebugString();
+        EXPECT_EQ(testcase.frames, result.frames) << testcase.field.toDebugString();
+        EXPECT_EQ(testcase.quick, result.quick) << testcase.field.toDebugString();
+    }
+}
+
 TEST(BitFieldTest, simulateFastAVX2)
 {
     for (const auto& testcase : SIMULATION_TEST_CASES) {
@@ -530,74 +545,81 @@ TEST(BitFieldTest, simulateFastAVX2)
 }
 #endif
 
-TEST(BitFieldTest, vanishDrop1)
+TEST(BitFieldTest, vanishDrop)
 {
-    BitField bf(
-        "..RR.."
-        "BBBBRR");
+    for (const auto& testcase : SIMULATION_TEST_CASES) {
+        BitField bf(testcase.field);
+        RensaNonTracker tracker;
+        BitField::SimulationContext context;
 
-    BitField::SimulationContext context;
-    RensaNonTracker tracker;
-    RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
+        int sumScore = 0;
+        for (int i = 0; i < testcase.chains; ++i) {
+            RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
+            EXPECT_LT(0, stepResult.score);
 
-    EXPECT_EQ(40, stepResult.score);
+            sumScore += stepResult.score;
+        }
 
-    BitField expected(
-        "..RRRR");
+        EXPECT_EQ(testcase.score, sumScore);
 
-    EXPECT_EQ(expected, bf);
-    EXPECT_EQ(2, context.currentChain);
+        // This should not exist a rensa anymore.
+        RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
+        EXPECT_EQ(0, stepResult.score);
+    }
 }
 
-TEST(BitFieldTest, vanishDrop2)
+TEST(BitFieldTest, vanishDropFast)
 {
-    BitField bf("....YY");
+    for (const auto& testcase : SIMULATION_TEST_CASES) {
+        BitField bf(testcase.field);
+        RensaNonTracker tracker;
+        BitField::SimulationContext context;
 
-    BitField::SimulationContext context;
-    RensaNonTracker tracker;
-    RensaStepResult stepResult = bf.vanishDrop(&context, &tracker);
+        for (int i = 0; i < testcase.chains; ++i) {
+            EXPECT_TRUE(bf.vanishDropFast(&context, &tracker));
+        }
 
-    EXPECT_EQ(0, stepResult.score);
-
-    BitField expected("....YY");
-
-    EXPECT_EQ(expected, bf);
-    EXPECT_EQ(1, context.currentChain);
-}
-
-TEST(BitFieldTest, vanishDropFast1)
-{
-    BitField bf(
-        "..RR.."
-        "BBBBRR");
-
-    BitField::SimulationContext context;
-    RensaNonTracker tracker;
-    EXPECT_TRUE(bf.vanishDropFast(&context, &tracker));
-
-    BitField expected(
-        "..RRRR");
-
-    EXPECT_EQ(expected, bf);
-    EXPECT_EQ(2, context.currentChain);
+        EXPECT_FALSE(bf.vanishDropFast(&context, &tracker));
+    }
 }
 
 #if defined(__AVX2__) && defined(__BMI2__)
-TEST(BitFieldTest, vanishDropFastAVX2_1)
+TEST(BitFieldTest, vanishDropAVX2)
 {
-    BitField bf(
-        "..RR.."
-        "BBBBRR");
+    for (const auto& testcase : SIMULATION_TEST_CASES) {
+        BitField bf(testcase.field);
+        RensaNonTracker tracker;
+        BitField::SimulationContext context;
 
-    BitField::SimulationContext context;
-    RensaNonTracker tracker;
-    EXPECT_TRUE(bf.vanishDropFastAVX2(&context, &tracker));
+        int sumScore = 0;
+        for (int i = 0; i < testcase.chains; ++i) {
+            RensaStepResult stepResult = bf.vanishDropAVX2(&context, &tracker);
+            EXPECT_LT(0, stepResult.score);
 
-    BitField expected(
-        "..RRRR");
+            sumScore += stepResult.score;
+        }
 
-    EXPECT_EQ(expected, bf);
-    EXPECT_EQ(2, context.currentChain);
+        EXPECT_EQ(testcase.score, sumScore);
+
+        // This should not exist a rensa anymore.
+        RensaStepResult stepResult = bf.vanishDropAVX2(&context, &tracker);
+        EXPECT_EQ(0, stepResult.score);
+    }
+}
+
+TEST(BitFieldTest, vanishDropFastAVX2)
+{
+    for (const auto& testcase : SIMULATION_TEST_CASES) {
+        BitField bf(testcase.field);
+        RensaNonTracker tracker;
+        BitField::SimulationContext context;
+
+        for (int i = 0; i < testcase.chains; ++i) {
+            EXPECT_TRUE(bf.vanishDropFastAVX2(&context, &tracker));
+        }
+
+        EXPECT_FALSE(bf.vanishDropFastAVX2(&context, &tracker));
+    }
 }
 #endif
 

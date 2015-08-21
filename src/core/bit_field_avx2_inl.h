@@ -8,6 +8,13 @@
 #include "field_bits_256.h"
 
 template<typename Tracker>
+RensaResult BitField::simulateAVX2(SimulationContext* context, Tracker* tracker)
+{
+    // TODO(mayah): Write this.
+    return simulate(context, tracker);
+}
+
+template<typename Tracker>
 int BitField::simulateFastAVX2(Tracker* tracker)
 {
     BitField escaped = escapeInvisible();
@@ -21,6 +28,13 @@ int BitField::simulateFastAVX2(Tracker* tracker)
 
     recoverInvisible(escaped);
     return currentChain - 1;
+}
+
+template<typename Tracker>
+RensaStepResult BitField::vanishDropAVX2(SimulationContext* context, Tracker* tracker)
+{
+    // TODO(mayah): Write this.
+    return vanishDrop(context, tracker);
 }
 
 template<typename Tracker>
