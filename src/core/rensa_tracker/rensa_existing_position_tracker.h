@@ -1,6 +1,8 @@
 #ifndef CORE_RENSA_TRACKER_RENSA_EXISTING_POSITION_TRACKER_H_
 #define CORE_RENSA_TRACKER_RENSA_EXISTING_POSITION_TRACKER_H_
 
+#include <x86intrin.h>
+
 #include "core/rensa_tracker.h"
 
 class RensaExistingPositionTrackResult {
@@ -36,6 +38,22 @@ public:
 
         result_.setExistingBits(m);
     }
+
+#ifdef __BMI2__
+    void trackDropBMI2(std::uint64_t oldLowBits, std::uint64_t oldHighBits, std::uint64_t newLowBits, std::uint64_t newHighBits)
+    {
+        union {
+            std::uint64_t v[2];
+            __m128i m;
+        };
+
+        m = result_.existingBits();
+        v[0] = _pdep_u64(_pext_u64(v[0], oldLowBits), newLowBits);
+        v[1] = _pdep_u64(_pext_u64(v[1], oldHighBits), newHighBits);
+        result_.setExistingBits(m);
+    }
+
+#endif
 
 private:
     RensaExistingPositionTrackResult result_;

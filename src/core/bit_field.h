@@ -100,6 +100,7 @@ public:
 #if defined(__AVX2__) && defined(__BMI2__)
     // Faster version of simulate() that uses AVX2 instruction set.
     int simulateFastAVX2();
+    template<typename Tracker> int simulateFastAVX2(Tracker*);
 #endif
 
 private:
@@ -121,8 +122,10 @@ private:
     void dropAfterVanishFast(FieldBits erased, Tracker* tracker);
 
 #if defined(__AVX2__) && defined(__BMI2__)
-    bool vanishFastAVX2(int currentChain, FieldBits* erased) const;
-    void dropAfterVanishFastBMI2(FieldBits erased);
+    template<typename Tracker>
+    bool vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const;
+    template<typename Tracker>
+    void dropAfterVanishFastBMI2(FieldBits erased, Tracker* tracker);
 #endif
 
     FieldBits m_[3];

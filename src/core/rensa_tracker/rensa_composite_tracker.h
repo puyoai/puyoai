@@ -29,6 +29,14 @@ public:
         tracker2_->trackDrop(blender, leftOnes, rightOnes);
     }
 
+#ifdef __BMI2__
+    void trackDropBMI2(std::uint64_t oldLowBits, std::uint64_t oldHighBits, std::uint64_t newLowBits, std::uint64_t newHighBits)
+    {
+        tracker1_->trackDropBMI2(oldLowBits, oldHighBits, newLowBits, newHighBits);
+        tracker2_->trackDropBMI2(oldLowBits, oldHighBits, newLowBits, newHighBits);
+    }
+#endif
+
 private:
     Tracker1* tracker1_;
     Tracker2* tracker2_;
