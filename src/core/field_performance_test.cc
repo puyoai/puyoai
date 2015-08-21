@@ -114,7 +114,16 @@ static void runSimulation(const CoreField& original)
         EXPECT_EQ(expectedChain, bf.simulateFast(&tracker));
     }
 
-#ifdef __AVX2__
+#if defined(__AVX2__) and defined(__BMI2__)
+    TimeStampCounterData tscBitFieldAVX2;
+    for (int i = 0; i < N; ++i) {
+        BitField bf(bitFieldOriginal);
+        BitField::SimulationContext context;
+        RensaNonTracker tracker;
+        ScopedTimeStampCounter stsc(&tscBitFieldAVX2);
+        EXPECT_EQ(expectedChain, bf.simulateAVX2(&context, &tracker).chains);
+    }
+
     TimeStampCounterData tscBitFieldFastAVX2;
     for (int i = 0; i < N; ++i) {
         BitField bf(bitFieldOriginal);
@@ -122,7 +131,7 @@ static void runSimulation(const CoreField& original)
         ScopedTimeStampCounter stsc(&tscBitFieldFastAVX2);
         EXPECT_EQ(expectedChain, bf.simulateFastAVX2(&tracker));
     }
-#endif
+#endif // __AVX2__ and __BMI2__
 
     cout << "overhead: " << endl;
     none.showStatistics();
@@ -134,6 +143,8 @@ static void runSimulation(const CoreField& original)
     tscBitFieldFast.showStatistics();
 
 #ifdef __AVX2__
+    cout << "BitField AVX2: " << endl;
+    tscBitFieldAVX2.showStatistics();
     cout << "BitField (fast) AVX2: " << endl;
     tscBitFieldFastAVX2.showStatistics();
 #endif
