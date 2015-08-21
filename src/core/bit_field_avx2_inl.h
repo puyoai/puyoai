@@ -9,21 +9,28 @@
 
 inline int BitField::simulateFastAVX2()
 {
+    RensaNonTracker tracker;
+    return simulateFastAVX2(&tracker);
+}
+
+template<typename Tracker>
+int BitField::simulateFastAVX2(Tracker* tracker)
+{
     BitField escaped = escapeInvisible();
     int currentChain = 1;
 
     FieldBits erased;
-    while (vanishFastAVX2(currentChain, &erased)) {
+    while (vanishFastAVX2(currentChain, &erased, tracker)) {
         currentChain += 1;
-        dropAfterVanishFastBMI2(erased);
+        dropAfterVanishFastBMI2(erased, tracker);
     }
 
     recoverInvisible(escaped);
     return currentChain - 1;
 }
 
-inline
-bool BitField::vanishFastAVX2(int /*currentChain*/, FieldBits* erased) const
+template<typename Tracker>
+bool BitField::vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const
 {
     FieldBits256 erased256;
 
@@ -64,11 +71,13 @@ bool BitField::vanishFastAVX2(int /*currentChain*/, FieldBits* erased) const
     FieldBits ojamaErased(erased->expandEdge().mask(bits(PuyoColor::OJAMA).maskedField12()));
     erased->setAll(ojamaErased);
 
+    tracker->trackVanish(currentChain, *erased, ojamaErased);
+
     return true;
 }
 
-inline
-void BitField::dropAfterVanishFastBMI2(FieldBits erased)
+template<typename Tracker>
+void BitField::dropAfterVanishFastBMI2(FieldBits erased, Tracker* tracker)
 {
     union Decomposer64 {
         std::uint64_t v[2];
@@ -113,6 +122,8 @@ void BitField::dropAfterVanishFastBMI2(FieldBits erased)
         d.v[1] = depHigh;
         m_[i] = d.m;
     }
+
+    tracker->trackDropBMI2(oldLowBits, oldHighBits, newLowBits, newHighBits);
 }
 
 #endif // CORE_BIT_FIELD_AVX2_INL_256_H_

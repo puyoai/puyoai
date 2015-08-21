@@ -158,20 +158,16 @@ public:
     RensaResult simulate(SimulationContext*);
     // Simulates chains with Tracker. Tracker can track various rensa information.
     // Several trackers are defined in core/rensa_trackers.h. You can define your own Tracker.
-    template<typename Tracker>
-    RensaResult simulate(Tracker*);
+    template<typename Tracker> RensaResult simulate(Tracker*);
     // Simualtes chains with SimulationContext and Tracker.
-    template<typename Tracker>
-    RensaResult simulate(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
+    template<typename Tracker> RensaResult simulate(SimulationContext*, Tracker*);
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
     RensaStepResult vanishDrop();
     RensaStepResult vanishDrop(SimulationContext*);
     // Vanishes the connected puyos with Tracker.
-    template<typename Tracker>
-    RensaStepResult vanishDrop(Tracker*);
-    template<typename Tracker>
-    RensaStepResult vanishDrop(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
+    template<typename Tracker> RensaStepResult vanishDrop(Tracker*);
+    template<typename Tracker> RensaStepResult vanishDrop(SimulationContext*, Tracker*);
 
     // ----------------------------------------------------------------------
     // utility methods
