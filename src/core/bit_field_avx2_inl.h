@@ -7,12 +7,6 @@
 
 #include "field_bits_256.h"
 
-inline int BitField::simulateFastAVX2()
-{
-    RensaNonTracker tracker;
-    return simulateFastAVX2(&tracker);
-}
-
 template<typename Tracker>
 int BitField::simulateFastAVX2(Tracker* tracker)
 {

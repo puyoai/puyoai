@@ -47,8 +47,9 @@ TEST(BitFieldPerformanceTest, bitfield_simulate_fast_filled)
 
     for (int i = 0; i < N; i++) {
         BitField bf(bfOriginal);
+        RensaNonTracker tracker;
         ScopedTimeStampCounter stsc(&tsc);
-        EXPECT_EQ(19, bf.simulateFast());
+        EXPECT_EQ(19, bf.simulateFast(&tracker));
     }
 
     tsc.showStatistics();
@@ -77,8 +78,9 @@ TEST(BitFieldPerformanceTest, bitfield_simulate_fast_avx2_filled)
 
     for (int i = 0; i < N; i++) {
         BitField bf(bfOriginal);
+        RensaNonTracker tracker;
         ScopedTimeStampCounter stsc(&tsc);
-        EXPECT_EQ(19, bf.simulateFastAVX2());
+        EXPECT_EQ(19, bf.simulateFastAVX2(&tracker));
     }
 
     tsc.showStatistics();

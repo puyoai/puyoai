@@ -109,16 +109,18 @@ static void runSimulation(const CoreField& original)
 
     for (int i = 0; i < N; i++) {
         BitField bf(bitFieldOriginal);
+        RensaNonTracker tracker;
         ScopedTimeStampCounter stsc(&tscBitFieldFast);
-        EXPECT_EQ(expectedChain, bf.simulateFast());
+        EXPECT_EQ(expectedChain, bf.simulateFast(&tracker));
     }
 
 #ifdef __AVX2__
     TimeStampCounterData tscBitFieldFastAVX2;
     for (int i = 0; i < N; ++i) {
         BitField bf(bitFieldOriginal);
+        RensaNonTracker tracker;
         ScopedTimeStampCounter stsc(&tscBitFieldFastAVX2);
-        EXPECT_EQ(expectedChain, bf.simulateFastAVX2());
+        EXPECT_EQ(expectedChain, bf.simulateFastAVX2(&tracker));
     }
 #endif
 
