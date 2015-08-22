@@ -2,8 +2,17 @@
 #define BASE_SSE_H_
 
 #include <smmintrin.h>
+#include <cstdint>
 
 namespace sse {
+
+union Decomposer {
+    __m128i m;
+    std::uint64_t ui64[2];
+    std::uint32_t ui32[4];
+    std::uint16_t ui16[8];
+    std::uint8_t ui8[16];
+};
 
 // Makes __m128i x s.t. mask = _mm_movemask_epi8(x).
 inline
