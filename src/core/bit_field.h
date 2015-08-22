@@ -116,9 +116,13 @@ private:
 
 #if defined(__AVX2__) && defined(__BMI2__)
     template<typename Tracker>
+    int vanishAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const;
+    template<typename Tracker>
     bool vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const;
     template<typename Tracker>
-    void dropAfterVanishFastBMI2(FieldBits erased, Tracker* tracker);
+    int dropAfterVanishAVX2(FieldBits erased, Tracker* tracker);
+    template<typename Tracker>
+    void dropAfterVanishFastAVX2(FieldBits erased, Tracker* tracker);
 #endif
 
     FieldBits m_[3];
