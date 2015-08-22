@@ -193,8 +193,11 @@ int f6(FieldBits m_[3], FieldBits erased)
     int maxDrops = 0;
     t.m = (m_[0] | m_[1] | m_[2]).notmask(erased);
     for (int x = 1; x <= 6; ++x) {
+        if (t.ui16[x] == 0)
+            continue;
         int h = 31 - __builtin_clz(t.ui16[x]);
         int p = __builtin_popcount(t.ui16[x] ^ (((1 << h) - 1) << 1));
+        cout << p << endl;
         maxDrops = std::max(p, maxDrops);
     }
 
@@ -365,20 +368,20 @@ TEST(DropTest, test5)
 
 TEST(DropTest, test6)
 {
-    const int N = 10000000;
+    const int N = 1;
 
     const FieldBits fb(
         "111111"
         "111111"
         "111111");
     const FieldBits expected(
-        "..11.."
-        ".11111"
-        "111111");
+        "......"
+        "....11"
+        "11..11");
     const FieldBits erased(
-        ".....1"
-        "11..1."
-        "1....."
+        "111111"
+        "..11.."
+        "1111.."
     );
 
     for (int i = 0; i < N; ++i) {
