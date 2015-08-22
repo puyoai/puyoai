@@ -10,8 +10,28 @@
 template<typename Tracker>
 RensaResult BitField::simulateAVX2(SimulationContext* context, Tracker* tracker)
 {
-    // TODO(mayah): Write this.
-    return simulate(context, tracker);
+    BitField escaped = escapeInvisible();
+
+    int score = 0;
+    int frames = 0;
+    int nthChainScore;
+    bool quick = false;
+    FieldBits erased;
+
+    while ((nthChainScore = vanishAVX2(context->currentChain, &erased, tracker)) > 0) {
+        context->currentChain += 1;
+        score += nthChainScore;
+        frames += FRAMES_VANISH_ANIMATION;
+        int maxDrops = dropAfterVanishAVX2(erased, tracker);
+        if (maxDrops > 0) {
+            frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
+        } else {
+            quick = true;
+        }
+    }
+
+    recoverInvisible(escaped);
+    return RensaResult(context->currentChain - 1, score, frames, quick);
 }
 
 template<typename Tracker>
@@ -23,7 +43,7 @@ int BitField::simulateFastAVX2(Tracker* tracker)
     FieldBits erased;
     while (vanishFastAVX2(currentChain, &erased, tracker)) {
         currentChain += 1;
-        dropAfterVanishFastBMI2(erased, tracker);
+        dropAfterVanishFastAVX2(erased, tracker);
     }
 
     recoverInvisible(escaped);
@@ -33,8 +53,27 @@ int BitField::simulateFastAVX2(Tracker* tracker)
 template<typename Tracker>
 RensaStepResult BitField::vanishDropAVX2(SimulationContext* context, Tracker* tracker)
 {
-    // TODO(mayah): Write this.
-    return vanishDrop(context, tracker);
+    BitField escaped = escapeInvisible();
+
+    FieldBits erased;
+    int score = vanishAVX2(context->currentChain, &erased, tracker);
+    int maxDrops = 0;
+    int frames = FRAMES_VANISH_ANIMATION;
+    bool quick = false;
+    if (score > 0) {
+        maxDrops = dropAfterVanishAVX2(erased, tracker);
+        context->currentChain += 1;
+    }
+
+    if (maxDrops > 0) {
+        DCHECK(maxDrops < 14);
+        frames += FRAMES_TO_DROP_FAST[maxDrops] + FRAMES_GROUNDING;
+    } else {
+        quick = true;
+    }
+
+    recoverInvisible(escaped);
+    return RensaStepResult(score, frames, quick);
 }
 
 template<typename Tracker>
@@ -52,6 +91,13 @@ bool BitField::vanishDropFastAVX2(SimulationContext* context, Tracker* tracker)
 
     recoverInvisible(escaped);
     return vanished;
+}
+
+template<typename Tracker>
+int BitField::vanishAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const
+{
+    // TODO(mayah): write this.
+    return vanish(currentChain, erased, tracker);
 }
 
 template<typename Tracker>
@@ -102,7 +148,14 @@ bool BitField::vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* trac
 }
 
 template<typename Tracker>
-void BitField::dropAfterVanishFastBMI2(FieldBits erased, Tracker* tracker)
+int BitField::dropAfterVanishAVX2(FieldBits erased, Tracker* tracker)
+{
+    // TODO(mayah): Write this.
+    return dropAfterVanish(erased, tracker);
+}
+
+template<typename Tracker>
+void BitField::dropAfterVanishFastAVX2(FieldBits erased, Tracker* tracker)
 {
     union Decomposer64 {
         std::uint64_t v[2];
