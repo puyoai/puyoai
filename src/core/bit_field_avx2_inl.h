@@ -5,6 +5,8 @@
 # error "Needs AVX2 and BMI2 to use this header."
 #endif
 
+#include "base/avx.h"
+#include "base/sse.h"
 #include "field_bits_256.h"
 
 template<typename Tracker>
@@ -84,7 +86,7 @@ bool BitField::vanishDropFastAVX2(SimulationContext* context, Tracker* tracker)
     bool vanished = false;
     FieldBits erased;
     if (vanishFastAVX2(context->currentChain, &erased, tracker)) {
-        dropAfterVanishFastBMI2(erased, tracker);
+        dropAfterVanishFastAVX2(erased, tracker);
         context->currentChain += 1;
         vanished = true;
     }
@@ -150,29 +152,24 @@ bool BitField::vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* trac
 template<typename Tracker>
 int BitField::dropAfterVanishAVX2(FieldBits erased, Tracker* tracker)
 {
-    // TODO(mayah): Write this.
-    return dropAfterVanish(erased, tracker);
-}
-
-template<typename Tracker>
-void BitField::dropAfterVanishFastAVX2(FieldBits erased, Tracker* tracker)
-{
-    union Decomposer64 {
-        std::uint64_t v[2];
-        __m128i m;
-    };
-
-    union Decomposer256_64 {
-        std::uint64_t v[4];
-        __m256i m;
-    };
-
     const FieldBits fieldMask = FieldBits::FIELD_MASK_13;
     const FieldBits leftBits = fieldMask.notmask(erased);
-    Decomposer64 x;
-    x.m = leftBits;
-    const std::uint64_t oldLowBits = x.v[0];
-    const std::uint64_t oldHighBits = x.v[1];
+
+    sse::Decomposer t;
+
+    int maxDrops = 0;
+    t.m = (m_[0] | m_[1] | m_[2]).notmask(erased);
+    for (int x = 1; x <= 6; ++x) {
+        if (t.ui16[x] == 0)
+            continue;
+        int h = 31 - __builtin_clz(t.ui16[x]);
+        int p = __builtin_popcount(t.ui16[x] ^ (((1 << h) - 1) << 1));
+        maxDrops = std::max(p, maxDrops);
+    }
+
+    t.m = leftBits;
+    const std::uint64_t oldLowBits = t.ui64[0];
+    const std::uint64_t oldHighBits = t.ui64[1];
 
     const __m256i ones = _mm256_set_epi32(0, 1, 1, 1, 1, 1, 1, 0);
     __m256i height = _mm256_cvtepi16_epi32(sse::mm_popcnt_epi16(leftBits));
@@ -181,23 +178,52 @@ void BitField::dropAfterVanishFastAVX2(FieldBits erased, Tracker* tracker)
     height = _mm256_slli_epi32(height, 1);
 
     height = _mm256_packs_epi32(height, height);
-    Decomposer256_64 y;
+    avx::Decomposer256 y;
     y.m = height;
-    const std::uint64_t newLowBits = y.v[0];
-    const std::uint64_t newHighBits = y.v[2];
+    const std::uint64_t newLowBits = y.ui64[0];
+    const std::uint64_t newHighBits = y.ui64[2];
 
     for (int i = 0; i < 3; ++i) {
-        Decomposer64 d;
+        sse::Decomposer d;
         d.m = m_[i];
+        d.ui64[0] = _pdep_u64(_pext_u64(d.ui64[0], oldLowBits), newLowBits);
+        d.ui64[1] = _pdep_u64(_pext_u64(d.ui64[1], oldHighBits), newHighBits);
+        m_[i] = d.m;
+    }
 
-        std::uint64_t extLow = _pext_u64(d.v[0], oldLowBits);
-        std::uint64_t depLow = _pdep_u64(extLow, newLowBits);
+    tracker->trackDropBMI2(oldLowBits, oldHighBits, newLowBits, newHighBits);
 
-        std::uint64_t extHigh = _pext_u64(d.v[1], oldHighBits);
-        std::uint64_t depHigh = _pdep_u64(extHigh, newHighBits);
+    return maxDrops;
+}
 
-        d.v[0] = depLow;
-        d.v[1] = depHigh;
+template<typename Tracker>
+void BitField::dropAfterVanishFastAVX2(FieldBits erased, Tracker* tracker)
+{
+    const FieldBits fieldMask = FieldBits::FIELD_MASK_13;
+    const FieldBits leftBits = fieldMask.notmask(erased);
+
+    sse::Decomposer t;
+    t.m = leftBits;
+    const std::uint64_t oldLowBits = t.ui64[0];
+    const std::uint64_t oldHighBits = t.ui64[1];
+
+    const __m256i ones = _mm256_set_epi32(0, 1, 1, 1, 1, 1, 1, 0);
+    __m256i height = _mm256_cvtepi16_epi32(sse::mm_popcnt_epi16(leftBits));
+    height = _mm256_sllv_epi32(ones, height);
+    height = _mm256_sub_epi32(height, ones);
+    height = _mm256_slli_epi32(height, 1);
+
+    height = _mm256_packs_epi32(height, height);
+    avx::Decomposer256 y;
+    y.m = height;
+    const std::uint64_t newLowBits = y.ui64[0];
+    const std::uint64_t newHighBits = y.ui64[2];
+
+    for (int i = 0; i < 3; ++i) {
+        sse::Decomposer d;
+        d.m = m_[i];
+        d.ui64[0] = _pdep_u64(_pext_u64(d.ui64[0], oldLowBits), newLowBits);
+        d.ui64[1] = _pdep_u64(_pext_u64(d.ui64[1], oldHighBits), newHighBits);
         m_[i] = d.m;
     }
 
