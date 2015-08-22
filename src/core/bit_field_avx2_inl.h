@@ -98,8 +98,80 @@ bool BitField::vanishDropFastAVX2(SimulationContext* context, Tracker* tracker)
 template<typename Tracker>
 int BitField::vanishAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const
 {
-    // TODO(mayah): write this.
-    return vanish(currentChain, erased, tracker);
+    FieldBits256 erased256;
+    int numErasedPuyos = 0;
+    int numColors = 0;
+    int longBonusCoef = 0;
+
+    bool didErase = false;
+
+    for (int i = 0; i < 2; ++i) {
+        FieldBits t = (i == 0) ? FieldBits(_mm_andnot_si128(m_[1], m_[2])) : m_[2] & m_[1];
+        t = t.maskedField12();
+
+        FieldBits highMask = m_[0] & t;
+        FieldBits lowMask = _mm_andnot_si128(m_[0], t);
+
+        FieldBits256 mask(highMask, lowMask);
+        FieldBits256 vanishing;
+        if (!mask.findVanishingBits(&vanishing))
+            continue;
+        erased256.setAll(vanishing);
+        didErase = true;
+
+        std::pair<int, int> pc = vanishing.popcountHighLow();
+        int highCount = pc.first;
+        int lowCount = pc.second;
+
+        if (highCount > 0) {
+            ++numColors;
+            numErasedPuyos += highCount;
+            if (highCount <= 7) {
+                longBonusCoef += longBonus(highCount);
+            } else {
+                FieldBits high = vanishing.high();
+                // slowpath
+                high.iterateBitWithMasking([&](FieldBits x) -> FieldBits {
+                    FieldBits expanded = x.expand(highMask);
+                    longBonusCoef += longBonus(expanded.popcount());
+                    return expanded;
+                });
+            }
+        }
+
+        if (lowCount > 0) {
+            ++numColors;
+            numErasedPuyos += lowCount;
+            if (lowCount <= 7) {
+                longBonusCoef += longBonus(lowCount);
+            } else {
+                FieldBits low = vanishing.low();
+                low.iterateBitWithMasking([&](FieldBits x) -> FieldBits {
+                    FieldBits expanded = x.expand(lowMask);
+                    longBonusCoef += longBonus(expanded.popcount());
+                    return expanded;
+                });
+            }
+        }
+    }
+
+    if (!didErase) {
+        *erased = FieldBits();
+        return false;
+    }
+
+    *erased = erased256.low() | erased256.high();
+
+    int colorBonusCoef = colorBonus(numColors);
+    int rensaBonusCoef = calculateRensaBonusCoef(chainBonus(currentChain), longBonusCoef, colorBonusCoef);
+    tracker->trackCoef(currentChain, numErasedPuyos, longBonusCoef, colorBonusCoef);
+
+    // Removes ojama.
+    FieldBits ojamaErased(erased->expandEdge().mask(bits(PuyoColor::OJAMA).maskedField12()));
+    erased->setAll(ojamaErased);
+    tracker->trackVanish(currentChain, *erased, ojamaErased);
+
+    return 10 * numErasedPuyos * rensaBonusCoef;
 }
 
 template<typename Tracker>

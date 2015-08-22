@@ -3,9 +3,11 @@
 #ifdef __AVX2__
 
 #include <string>
+#include <utility>
 
 #include <immintrin.h>
 
+#include "base/avx.h"
 #include "core/field_bits.h"
 
 class FieldBits256 {
@@ -27,6 +29,8 @@ public:
     void setLow(int x, int y) { m_ = m_ | onebit(HighLow::LOW, x, y); }
 
     void setAll(FieldBits256 m) { m_ = m_ | m; }
+
+    std::pair<int, int> popcountHighLow() const;
 
     FieldBits low() const { return _mm256_extracti128_si256(m_, 0); }
     FieldBits high() const { return _mm256_extracti128_si256(m_, 1); }
@@ -87,6 +91,18 @@ inline FieldBits256 FieldBits256::expand1(FieldBits256 mask) const
     FieldBits256 v3 = _mm256_slli_epi16(m_, 1);
     FieldBits256 v4 = _mm256_srli_epi16(m_, 1);
     return ((m_ | v1) | (v2 | v3) | v4) & mask;
+}
+
+inline
+std::pair<int, int> FieldBits256::popcountHighLow() const
+{
+    avx::Decomposer256 d;
+    d.m = m_;
+
+    int low = __builtin_popcountll(d.ui64[0]) + __builtin_popcountll(d.ui64[1]);
+    int high = __builtin_popcountll(d.ui64[2]) + __builtin_popcountll(d.ui64[3]);
+
+    return std::make_pair(high, low);
 }
 
 inline bool FieldBits256::findVanishingBits(FieldBits256* vanishing) const
