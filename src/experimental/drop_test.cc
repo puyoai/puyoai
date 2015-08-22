@@ -183,6 +183,48 @@ void f5(FieldBits m_[3], FieldBits erased)
     }
 }
 
+int f6(FieldBits m_[3], FieldBits erased)
+{
+    const FieldBits fieldMask = FieldBits::FIELD_MASK_13;
+    const FieldBits leftBits = fieldMask.notmask(erased);
+
+    sse::Decomposer t;
+
+    int maxDrops = 0;
+    t.m = (m_[0] | m_[1] | m_[2]).notmask(erased);
+    for (int x = 1; x <= 6; ++x) {
+        int h = 31 - __builtin_clz(t.ui16[x]);
+        int p = __builtin_popcount(t.ui16[x] ^ (((1 << h) - 1) << 1));
+        maxDrops = std::max(p, maxDrops);
+    }
+
+    t.m = leftBits;
+    const std::uint64_t oldLowBits = t.ui64[0];
+    const std::uint64_t oldHighBits = t.ui64[1];
+
+    const __m256i ones = _mm256_set_epi32(0, 1, 1, 1, 1, 1, 1, 0);
+    __m256i height = _mm256_cvtepi16_epi32(sse::mm_popcnt_epi16(leftBits));
+    height = _mm256_sllv_epi32(ones, height);
+    height = _mm256_sub_epi32(height, ones);
+    height = _mm256_slli_epi32(height, 1);
+
+    height = _mm256_packs_epi32(height, height);
+    avx::Decomposer256 y;
+    y.m = height;
+    const std::uint64_t newLowBits = y.ui64[0];
+    const std::uint64_t newHighBits = y.ui64[2];
+
+    for (int i = 0; i < 3; ++i) {
+        sse::Decomposer d;
+        d.m = m_[i];
+        d.ui64[0] = _pdep_u64(_pext_u64(d.ui64[0], oldLowBits), newLowBits);
+        d.ui64[1] = _pdep_u64(_pext_u64(d.ui64[1], oldHighBits), newHighBits);
+        m_[i] = d.m;
+    }
+
+    return maxDrops;
+}
+
 TEST(DropTest, warmup)
 {
     const int N = 10000000;
@@ -317,6 +359,31 @@ TEST(DropTest, test5)
     for (int i = 0; i < N; ++i) {
         FieldBits bits[3] = { fb, fb, fb };
         f5(bits, erased);
+        EXPECT_EQ(expected, bits[0]);
+    }
+}
+
+TEST(DropTest, test6)
+{
+    const int N = 10000000;
+
+    const FieldBits fb(
+        "111111"
+        "111111"
+        "111111");
+    const FieldBits expected(
+        "..11.."
+        ".11111"
+        "111111");
+    const FieldBits erased(
+        ".....1"
+        "11..1."
+        "1....."
+    );
+
+    for (int i = 0; i < N; ++i) {
+        FieldBits bits[3] = { fb, fb, fb };
+        f6(bits, erased);
         EXPECT_EQ(expected, bits[0]);
     }
 }
