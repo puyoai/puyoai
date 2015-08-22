@@ -25,6 +25,37 @@ TEST(BitFieldPerformanceTest, hash)
     tscd.showStatistics();
 }
 
+TEST(BitFieldPerformanceTest, bitfield_simulate_filled)
+{
+    const int N = 1000000;
+
+    TimeStampCounterData tsc;
+    BitField bfOriginal(
+        ".G.BRG"
+        "GBRRYR"
+        "RRYYBY"
+        "RGYRBR"
+        "YGYRBY"
+        "YGBGYR"
+        "GRBGYR"
+        "BRBYBY"
+        "RYYBYY"
+        "BRBYBR"
+        "BGBYRR"
+        "YGBGBG"
+        "RBGBGG");
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(bfOriginal);
+        BitField::SimulationContext context;
+        RensaNonTracker tracker;
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(19, bf.simulate(&context, &tracker).chains);
+    }
+
+    tsc.showStatistics();
+}
+
 TEST(BitFieldPerformanceTest, bitfield_simulate_fast_filled)
 {
     const int N = 1000000;
@@ -56,6 +87,37 @@ TEST(BitFieldPerformanceTest, bitfield_simulate_fast_filled)
 }
 
 #if defined(__AVX2__) && defined(__BMI2__)
+TEST(BitFieldPerformanceTest, bitfield_simulate_avx2_filled)
+{
+    const int N = 1000000;
+
+    TimeStampCounterData tsc;
+    BitField bfOriginal(
+        ".G.BRG"
+        "GBRRYR"
+        "RRYYBY"
+        "RGYRBR"
+        "YGYRBY"
+        "YGBGYR"
+        "GRBGYR"
+        "BRBYBY"
+        "RYYBYY"
+        "BRBYBR"
+        "BGBYRR"
+        "YGBGBG"
+        "RBGBGG");
+
+    for (int i = 0; i < N; i++) {
+        BitField bf(bfOriginal);
+        BitField::SimulationContext context;
+        RensaNonTracker tracker;
+        ScopedTimeStampCounter stsc(&tsc);
+        EXPECT_EQ(19, bf.simulateAVX2(&context, &tracker).chains);
+    }
+
+    tsc.showStatistics();
+}
+
 TEST(BitFieldPerformanceTest, bitfield_simulate_fast_avx2_filled)
 {
     const int N = 1000000;
@@ -86,32 +148,3 @@ TEST(BitFieldPerformanceTest, bitfield_simulate_fast_avx2_filled)
     tsc.showStatistics();
 }
 #endif // defined(__AVX2__) && defined(__BMI2__)
-
-TEST(BitFieldPerformanceTest, bitfield_simulate_filled)
-{
-    const int N = 1000000;
-
-    TimeStampCounterData tsc;
-    BitField bfOriginal(
-        ".G.BRG"
-        "GBRRYR"
-        "RRYYBY"
-        "RGYRBR"
-        "YGYRBY"
-        "YGBGYR"
-        "GRBGYR"
-        "BRBYBY"
-        "RYYBYY"
-        "BRBYBR"
-        "BGBYRR"
-        "YGBGBG"
-        "RBGBGG");
-
-    for (int i = 0; i < N; i++) {
-        BitField bf(bfOriginal);
-        ScopedTimeStampCounter stsc(&tsc);
-        EXPECT_EQ(19, bf.simulate().chains);
-    }
-
-    tsc.showStatistics();
-}
