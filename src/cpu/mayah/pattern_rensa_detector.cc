@@ -52,11 +52,10 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
             continue;
 
         RensaExistingPositionTracker tracker(originalField_.bitField().normalColorBits());
-        RensaStepResult stepResult = cf.vanishDrop(&tracker);
-        if (stepResult.score == 0) {
+        if (!cf.vanishDropFast(&tracker)) {
             CoreField tmp(originalField_);
             tmp.dropPuyoListWithMaxHeight(cpl, maxHeight);
-            CHECK_GT(stepResult.score, 0) << tmp.toDebugString();
+            CHECK(false) << tmp.toDebugString();
         }
 
         // For here, we don't need to make AND to RensaExistingPositionTracker.
@@ -149,8 +148,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
 
             CoreField cf(currentField);
             RensaExistingPositionTracker tracker(currentFieldTracker);
-            RensaStepResult stepResult = cf.vanishDrop(&tracker);
-            CHECK_GT(stepResult.score, 0);
+            CHECK(cf.vanishDropFast(&tracker));
 
             iteratePossibleRensasInternal(cf, tracker, currentChains + 1, firePuyo, originalKeyPuyos,
                                           restIteration, restUnusedVariables,
@@ -176,8 +174,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
             continue;
 
         RensaExistingPositionTracker tracker(currentFieldTracker);
-        RensaStepResult stepResult = cf.vanishDrop(&tracker);
-        CHECK_GT(stepResult.score, 0);
+        CHECK(cf.vanishDropFast(&tracker));
 
         iteratePossibleRensasInternal(cf, tracker, currentChains + 1, firePuyo, keyPuyos,
                                       restIteration - 1,
@@ -192,7 +189,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     // proceed one without complementing.
     CoreField cf(currentField);
     RensaExistingPositionTracker tracker(currentFieldTracker);
-    CHECK(cf.vanishDrop(&tracker).score > 0) << cf.toDebugString();
+    CHECK(cf.vanishDropFast(&tracker)) << cf.toDebugString();
 
     // If rensa continues, proceed to next.
     if (cf.rensaWillOccur()) {
