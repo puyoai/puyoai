@@ -171,6 +171,7 @@ public:
     template<typename Tracker> RensaStepResult vanishDrop(Tracker*);
     template<typename Tracker> RensaStepResult vanishDrop(SimulationContext*, Tracker*);
 
+    template<typename Tracker> bool vanishDropFast(Tracker*);
     template<typename Tracker> bool vanishDropFast(SimulationContext*, Tracker*);
 
     // ----------------------------------------------------------------------
@@ -294,6 +295,13 @@ RensaStepResult CoreField::vanishDrop(SimulationContext* context, Tracker* track
 
     field_.calculateHeight(heights_);
     return result;
+}
+
+template<typename Tracker>
+bool CoreField::vanishDropFast(Tracker* tracker)
+{
+    CoreField::SimulationContext context;
+    return vanishDropFast(&context, tracker);
 }
 
 template<typename Tracker>
