@@ -477,8 +477,9 @@ void RensaDetector::detectIteratively(const CoreField& originalField,
     auto detectCallback = [&](CoreField&& complementedField, const ColumnPuyoList& firePuyos) {
         CoreField cf(complementedField);
         RensaLastVanishedPositionTracker tracker;
-        RensaResult rensaResult = cf.simulate(&tracker);
-        if (rensaResult.chains == 0)
+
+        int chains = cf.simulateFast(&tracker);
+        if (chains == 0)
             return;
 
         (void)callback(std::move(complementedField), firePuyos);
@@ -487,7 +488,7 @@ void RensaDetector::detectIteratively(const CoreField& originalField,
         bool prohibits[FieldConstant::MAP_WIDTH] {};
         makeProhibitArray(originalField, strategy, tracker.result(), firePuyos, prohibits);
         detectIterativelyInternal(originalField, strategy, cf, maxIteration - 1,
-                                  ColumnPuyoList(), firePuyos, rensaResult.chains, prohibits, callback);
+                                  ColumnPuyoList(), firePuyos, chains, prohibits, callback);
     };
 
     bool prohibits[FieldConstant::MAP_WIDTH] {};
@@ -510,11 +511,10 @@ void RensaDetector::detectIterativelyInternal(const CoreField& originalField,
 
     auto detectCallback = [&](CoreField&& complementedField, const ColumnPuyoList& currentFirePuyos) {
         RensaLastVanishedPositionTracker tracker;
-        RensaResult partialResult = complementedField.simulate(&tracker);
-        if (partialResult.chains == 0)
+        int partialChains = complementedField.simulateFast(&tracker);
+        if (partialChains == 0)
             return;
 
-        int additionalChains = partialResult.chains;
         RensaLastVanishedPositionTrackResult trackResult = tracker.result();
 
         ColumnPuyoList combinedKeyPuyos(accumulatedKeyPuyos);
@@ -540,7 +540,7 @@ void RensaDetector::detectIterativelyInternal(const CoreField& originalField,
         allComplemented.merge(firstRensaFirePuyos);
 
         RensaResult combinedRensaResult = callback(std::move(cf), allComplemented);
-        if (combinedRensaResult.chains != currentTotalChains + additionalChains) {
+        if (combinedRensaResult.chains != currentTotalChains + partialChains) {
             // Rensa looks broken. We don't count such rensa.
             return;
         }
