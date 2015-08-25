@@ -86,7 +86,6 @@ public:
                                                  const ComplementCallback&);
 
     // Complements key puyos on 13th row.
-    // Callback is void callback(const CoreField&, const ColumnPuyoList&).
     static void complementKeyPuyosOn13thRow(const CoreField&,
                                             const bool allowsComplements[FieldConstant::MAP_WIDTH],
                                             const ComplementCallback&);
