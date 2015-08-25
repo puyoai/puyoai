@@ -158,11 +158,12 @@ unique_ptr<AnalyzerResult> AnalyzerResult::copy() const
 std::unique_ptr<AnalyzerResult> Analyzer::analyze(const SDL_Surface* surface,
                                                   const SDL_Surface* /*prevSurface*/,
                                                   const SDL_Surface* prev2Surface,
+                                                  const SDL_Surface* prev3Surface,
                                                   const deque<unique_ptr<AnalyzerResult>>& previousResults)
 {
     CaptureGameState gameState = detectGameState(surface);
-    unique_ptr<DetectedField> player1FieldResult = detectField(0, surface, prev2Surface);
-    unique_ptr<DetectedField> player2FieldResult = detectField(1, surface, prev2Surface);
+    unique_ptr<DetectedField> player1FieldResult = detectField(0, surface, prev2Surface, prev3Surface);
+    unique_ptr<DetectedField> player2FieldResult = detectField(1, surface, prev2Surface, prev3Surface);
 
     switch (gameState) {
     case CaptureGameState::UNKNOWN: {

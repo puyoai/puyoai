@@ -25,7 +25,7 @@ protected:
         CHECK(surf.get()) << "Failed to load " << filename;
 
         ACAnalyzer analyzer;
-        return analyzer.analyze(surf.get(), nullptr, nullptr, deque<unique_ptr<AnalyzerResult>>());
+        return analyzer.analyze(surf.get(), nullptr, nullptr, nullptr, deque<unique_ptr<AnalyzerResult>>());
     }
 
     deque<unique_ptr<AnalyzerResult>> analyzeMultipleFrames(const vector<string>& imgFilenames,
@@ -37,18 +37,20 @@ protected:
         bool firstResult = true;
         UniqueSDLSurface prev(emptyUniqueSDLSurface());
         UniqueSDLSurface prev2(emptyUniqueSDLSurface());
+        UniqueSDLSurface prev3(emptyUniqueSDLSurface());
 
         for (const auto& imgFilename : imgFilenames) {
             string filename = FLAGS_testdata_dir + imgFilename;
             auto surface = makeUniqueSDLSurface(IMG_Load(filename.c_str()));
             CHECK(surface.get()) << "Failed to load "<< filename;
-            auto r = analyzer.analyze(surface.get(), prev.get(), prev2.get(), results);
+            auto r = analyzer.analyze(surface.get(), prev.get(), prev2.get(), prev3.get(), results);
             if (firstResult) {
                 r->mutablePlayerResult(0)->playable = userPlayable[0];
                 r->mutablePlayerResult(1)->playable = userPlayable[1];
                 firstResult = false;
             }
             results.push_front(move(r));
+            prev3 = move(prev2);
             prev2 = move(prev);
             prev = move(surface);
         }

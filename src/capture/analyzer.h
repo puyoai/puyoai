@@ -164,6 +164,7 @@ public:
     std::unique_ptr<AnalyzerResult> analyze(const SDL_Surface* current,
                                             const SDL_Surface* prev,
                                             const SDL_Surface* prev2,
+                                            const SDL_Surface* prev3,
                                             const std::deque<std::unique_ptr<AnalyzerResult>>& previousResults);
 
 protected:
@@ -171,7 +172,9 @@ protected:
     virtual CaptureGameState detectGameState(const SDL_Surface*) = 0;
     virtual std::unique_ptr<DetectedField> detectField(int pi,
                                                        const SDL_Surface* current,
-                                                       const SDL_Surface* prev2) = 0;
+                                                       const SDL_Surface* prev2,
+                                                       const SDL_Surface* prev3) = 0;
+
 
 private:
     std::unique_ptr<PlayerAnalyzerResult> analyzePlayerField(

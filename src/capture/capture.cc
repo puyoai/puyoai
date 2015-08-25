@@ -35,6 +35,7 @@ void Capture::runLoop()
     int frameId = 0;
     UniqueSDLSurface prevSurface(emptyUniqueSDLSurface());
     UniqueSDLSurface prev2Surface(emptyUniqueSDLSurface());
+    UniqueSDLSurface prev3Surface(emptyUniqueSDLSurface());
 
     while (!shouldStop_) {
         UniqueSDLSurface surface(source_->nextFrame());
@@ -45,7 +46,10 @@ void Capture::runLoop()
         surface->userdata = reinterpret_cast<void*>(static_cast<uintptr_t>(++frameId));
 
         lock_guard<mutex> lock(mu_);
-        unique_ptr<AnalyzerResult> r = analyzer_->analyze(surface.get(), prevSurface.get(), prev2Surface.get(), results_);
+        unique_ptr<AnalyzerResult> r =
+            analyzer_->analyze(surface.get(), prevSurface.get(), prev2Surface.get(), prev3Surface.get(), results_);
+
+        prev3Surface = move(prev2Surface);
         prev2Surface = move(prevSurface);
         prevSurface = move(surface_);
         surface_ = move(surface);
