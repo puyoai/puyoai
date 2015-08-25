@@ -39,7 +39,8 @@ private:
     CaptureGameState detectGameState(const SDL_Surface*) override;
     std::unique_ptr<DetectedField> detectField(int pi,
                                                const SDL_Surface* current,
-                                               const SDL_Surface* prev2) override;
+                                               const SDL_Surface* prev2,
+                                               const SDL_Surface* prev3) override;
     bool detectOjamaDrop(const SDL_Surface* current, const SDL_Surface* prev, const Box&);
 
     bool isLevelSelect(const SDL_Surface*);

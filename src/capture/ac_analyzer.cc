@@ -266,7 +266,8 @@ CaptureGameState ACAnalyzer::detectGameState(const SDL_Surface* surface)
 
 unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
                                                   const SDL_Surface* surface,
-                                                  const SDL_Surface* prev2Surface)
+                                                  const SDL_Surface* prev2Surface,
+                                                  const SDL_Surface* prev3Surface)
 {
     unique_ptr<DetectedField> result(new DetectedField);
 
@@ -303,12 +304,14 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
         result->next1AxisMoving = (rc == RealColor::RC_EMPTY);
     }
 
-    // detect ojama. Comparing with prev2.
+    // detect ojama. Comparing with prev2 and prev3.
+    // We don't use prev1, because if the field is gradually changed, we cannot detect it.
     {
         Box left = BoundingBox::boxForAnalysis(pi, 1, 0);
         Box right = BoundingBox::boxForAnalysis(pi, 6, 0);
         Box b = Box(left.sx, left.sy, right.dx, right.dy);
-        result->setOjamaDropDetected(detectOjamaDrop(surface, prev2Surface, b));
+        bool detected = detectOjamaDrop(surface, prev2Surface, b) && detectOjamaDrop(surface, prev3Surface, b);
+        result->setOjamaDropDetected(detected);
     }
 
     return result;
