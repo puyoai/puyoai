@@ -32,7 +32,7 @@ public:
 
     std::pair<int, int> popcountHighLow() const;
 
-    FieldBits low() const { return _mm256_extracti128_si256(m_, 0); }
+    FieldBits low() const { return _mm256_castsi256_si128(m_); }
     FieldBits high() const { return _mm256_extracti128_si256(m_, 1); }
 
     FieldBits256 expand(FieldBits256 mask) const;
@@ -61,7 +61,10 @@ private:
 inline FieldBits256::FieldBits256(FieldBits high, FieldBits low)
 {
     // See http://lists.cs.uiuc.edu/pipermail/cfe-commits/Week-of-Mon-20150518/129492.html
-    m_ = (__m256i) __builtin_shufflevector((__m128)low.xmm(), (__m128)high.xmm(), 0, 1, 2, 3, 4, 5, 6, 7);
+    // This works only in clang.
+    // m_ = (__m256i) __builtin_shufflevector((__m128)low.xmm(), (__m128)high.xmm(), 0, 1, 2, 3, 4, 5, 6, 7);
+    //
+    m_ = _mm256_inserti128_si256(_mm256_castsi128_si256(low.xmm()), high.xmm(), 1);
 }
 
 inline FieldBits256 FieldBits256::expand(FieldBits256 mask) const
