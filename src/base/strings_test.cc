@@ -17,17 +17,30 @@ TEST(StringsTest, contains)
     EXPECT_FALSE(strings::contains("foo", "hoge"));
 }
 
-TEST(StringsTest, isSuffix)
+TEST(StringsTest, hasPrefix)
 {
-    EXPECT_TRUE(strings::isSuffix("foo", ""));
-    EXPECT_TRUE(strings::isSuffix("foo", "o"));
-    EXPECT_TRUE(strings::isSuffix("foo", "oo"));
-    EXPECT_TRUE(strings::isSuffix("foo", "foo"));
+    EXPECT_TRUE(strings::hasPrefix("foo", ""));
+    EXPECT_TRUE(strings::hasPrefix("foo", "f"));
+    EXPECT_TRUE(strings::hasPrefix("foo", "fo"));
+    EXPECT_TRUE(strings::hasPrefix("foo", "foo"));
 
-    EXPECT_FALSE(strings::isSuffix("foo", "f"));
-    EXPECT_FALSE(strings::isSuffix("foo", "fo"));
-    EXPECT_FALSE(strings::isSuffix("foo", "hoge"));
-    EXPECT_FALSE(strings::isSuffix("foo", "barfoo"));
+    EXPECT_FALSE(strings::hasPrefix("foo", "o"));
+    EXPECT_FALSE(strings::hasPrefix("foo", "oo"));
+    EXPECT_FALSE(strings::hasPrefix("foo", "hoge"));
+    EXPECT_FALSE(strings::hasPrefix("foo", "barfoo"));
+}
+
+TEST(StringsTest, hasSuffix)
+{
+    EXPECT_TRUE(strings::hasSuffix("foo", ""));
+    EXPECT_TRUE(strings::hasSuffix("foo", "o"));
+    EXPECT_TRUE(strings::hasSuffix("foo", "oo"));
+    EXPECT_TRUE(strings::hasSuffix("foo", "foo"));
+
+    EXPECT_FALSE(strings::hasSuffix("foo", "f"));
+    EXPECT_FALSE(strings::hasSuffix("foo", "fo"));
+    EXPECT_FALSE(strings::hasSuffix("foo", "hoge"));
+    EXPECT_FALSE(strings::hasSuffix("foo", "barfoo"));
 }
 
 TEST(StringsTest, join)

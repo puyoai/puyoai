@@ -31,7 +31,7 @@ static vector<std::string> listTestcases()
 
     vector<string> testcases;
     for (const auto& f : files) {
-        if (!strings::isSuffix(f, ".toml"))
+        if (!strings::hasSuffix(f, ".toml"))
             continue;
 
         testcases.push_back(file::joinPath(problemDir, f));

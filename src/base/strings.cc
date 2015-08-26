@@ -6,7 +6,7 @@ using namespace std;
 
 namespace strings {
 
-bool isPrefix(const string& s, const string& prefix)
+bool hasPrefix(const string& s, const string& prefix)
 {
     if (s.size() < prefix.size())
         return false;
@@ -14,7 +14,7 @@ bool isPrefix(const string& s, const string& prefix)
     return s.substr(0, prefix.size()) == prefix;
 }
 
-bool isSuffix(const string& s, const string& suffix)
+bool hasSuffix(const string& s, const string& suffix)
 {
     if (s.size() < suffix.size())
         return false;
