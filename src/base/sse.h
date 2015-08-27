@@ -56,10 +56,8 @@ inline __m128i mm_popcnt_epi16(__m128i x)
     __m128i highCount = _mm_shuffle_epi8(lookup, high);
     __m128i count8 = _mm_add_epi8(lowCount, highCount);
 
-    __m128i count16 = _mm_add_epi8(count8, _mm_srli_epi16(count8, 8));
-    __m128i count = _mm_and_si128(count16, _mm_set1_epi16(0xFF));
-
-    return count;
+    __m128i count16 = _mm_add_epi8(count8, _mm_slli_epi16(count8, 8));
+    return _mm_srli_epi16(count16, 8);
 }
 
 }
