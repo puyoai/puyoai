@@ -43,6 +43,38 @@ __m128i inverseMovemask(int mask)
     return _mm_cmpeq_epi8(vmask, _mm_set1_epi8(-1));
 }
 
+// Returns __m128i where all bits are set to 1.
+inline __m128i mm_setone_si128()
+{
+    __m128i zeros = _mm_setzero_si128();
+    return _mm_cmpeq_epi64(zeros, zeros);
+}
+
+// Bit-wise not for __m128i.
+inline __m128i mm_not_si128(__m128i x)
+{
+    return _mm_xor_si128(mm_setone_si128(), x);
+}
+
+// Parallel bit-wise or operation for each 16 bits.
+inline __m128i mm_porr_epi16(__m128i x)
+{
+    x = _mm_or_si128(x, _mm_srli_epi16(x, 1));
+    x = _mm_or_si128(x, _mm_srli_epi16(x, 2));
+    x = _mm_or_si128(x, _mm_srli_epi16(x, 4));
+    x = _mm_or_si128(x, _mm_srli_epi16(x, 8));
+    return x;
+}
+
+// Returns the max value for each 16-bit values.
+inline int mm_hmax_epu16(__m128i x)
+{
+    // Unfortunately, there is no _mm_maxpos_epu16 builtin API.
+    // Instead, use _mm_minpos_epu16 with negating the bits.
+    __m128i not_maxpos = _mm_minpos_epu16(mm_not_si128(x));
+    return (~_mm_cvtsi128_si32(not_maxpos)) & 0xFF;
+}
+
 // popcount 8 x 16bits
 inline __m128i mm_popcnt_epi16(__m128i x)
 {
