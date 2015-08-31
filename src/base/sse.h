@@ -72,7 +72,7 @@ inline int mm_hmax_epu16(__m128i x)
     // Unfortunately, there is no _mm_maxpos_epu16 builtin API.
     // Instead, use _mm_minpos_epu16 with negating the bits.
     __m128i not_maxpos = _mm_minpos_epu16(mm_not_si128(x));
-    return (~_mm_cvtsi128_si32(not_maxpos)) & 0xFF;
+    return (~_mm_cvtsi128_si32(not_maxpos)) & 0xFFFF;
 }
 
 // popcount 8 x 16bits
