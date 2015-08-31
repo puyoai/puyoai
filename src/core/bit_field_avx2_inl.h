@@ -5,7 +5,10 @@
 # error "Needs AVX2 and BMI2 to use this header."
 #endif
 
+#include <x86intrin.h>
+
 #include "base/avx.h"
+#include "base/bmi.h"
 #include "base/sse.h"
 #include "field_bits_256.h"
 
@@ -243,33 +246,47 @@ int BitField::dropAfterVanishAVX2(FieldBits erased, Tracker* tracker)
 template<typename Tracker>
 void BitField::dropAfterVanishFastAVX2(FieldBits erased, Tracker* tracker)
 {
-    const FieldBits fieldMask = FieldBits::FIELD_MASK_13;
-    const FieldBits leftBits = fieldMask.notmask(erased);
+    const __m128i ones = sse::mm_setone_si128();
 
     sse::Decomposer t;
-    t.m = leftBits;
+    t.m = _mm_xor_si128(erased, ones);
     const std::uint64_t oldLowBits = t.ui64[0];
     const std::uint64_t oldHighBits = t.ui64[1];
 
-    const __m256i ones = _mm256_set_epi32(0, 1, 1, 1, 1, 1, 1, 0);
-    __m256i height = _mm256_cvtepi16_epi32(sse::mm_popcnt_epi16(leftBits));
-    height = _mm256_sllv_epi32(ones, height);
-    height = _mm256_sub_epi32(height, ones);
-    height = _mm256_slli_epi32(height, 1);
+    __m256i shift = _mm256_cvtepu16_epi32(sse::mm_popcnt_epi16(erased));
+    __m256i halfOnes = _mm256_cvtepu16_epi32(ones);
+    __m256i shifted = _mm256_srlv_epi32(halfOnes, shift);
+    shifted = _mm256_packus_epi32(shifted, shifted);
 
-    height = _mm256_packs_epi32(height, height);
     avx::Decomposer256 y;
-    y.m = height;
+    y.m = shifted;
     const std::uint64_t newLowBits = y.ui64[0];
     const std::uint64_t newHighBits = y.ui64[2];
 
-    for (int i = 0; i < 3; ++i) {
-        sse::Decomposer d;
-        d.m = m_[i];
-        d.ui64[0] = _pdep_u64(_pext_u64(d.ui64[0], oldLowBits), newLowBits);
-        d.ui64[1] = _pdep_u64(_pext_u64(d.ui64[1], oldHighBits), newHighBits);
-        m_[i] = d.m;
+    sse::Decomposer d[3];
+    d[0].m = m_[0];
+    d[1].m = m_[1];
+    d[2].m = m_[2];
+
+    if (newLowBits != 0xFFFFFFFFFFFFFFFFULL) {
+        d[0].ui64[0] = _pdep_u64(_pext_u64(d[0].ui64[0], oldLowBits), newLowBits);
+        d[1].ui64[0] = _pdep_u64(_pext_u64(d[1].ui64[0], oldLowBits), newLowBits);
+        d[2].ui64[0] = _pdep_u64(_pext_u64(d[2].ui64[0], oldLowBits), newLowBits);
+
+        if (newHighBits != 0xFFFFFFFFFFFFFFFFULL) {
+            d[0].ui64[1] = _pdep_u64(_pext_u64(d[0].ui64[1], oldHighBits), newHighBits);
+            d[1].ui64[1] = _pdep_u64(_pext_u64(d[1].ui64[1], oldHighBits), newHighBits);
+            d[2].ui64[1] = _pdep_u64(_pext_u64(d[2].ui64[1], oldHighBits), newHighBits);
+        }
+    } else {
+        d[0].ui64[1] = _pdep_u64(_pext_u64(d[0].ui64[1], oldHighBits), newHighBits);
+        d[1].ui64[1] = _pdep_u64(_pext_u64(d[1].ui64[1], oldHighBits), newHighBits);
+        d[2].ui64[1] = _pdep_u64(_pext_u64(d[2].ui64[1], oldHighBits), newHighBits);
     }
+
+    m_[0] = d[0].m;
+    m_[1] = d[1].m;
+    m_[2] = d[2].m;
 
     tracker->trackDropBMI2(oldLowBits, oldHighBits, newLowBits, newHighBits);
 }
