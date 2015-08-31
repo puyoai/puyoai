@@ -224,17 +224,16 @@ bool BitField::vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* trac
 template<typename Tracker>
 int BitField::dropAfterVanishAVX2(FieldBits erased, Tracker* tracker)
 {
-    int maxDrops = 0;
+    // Set 1 at non-empty position.
+    __m128i nonempty = (m_[0] | m_[1] | m_[2]).xmm();
+    // Remove 1 bits from the positions where they are  erased.
+    nonempty = _mm_andnot_si128(erased, nonempty);
 
-    sse::Decomposer t;
-    t.m = (m_[0] | m_[1] | m_[2]).notmask(erased);
-    for (int x = 1; x <= 6; ++x) {
-        if (t.ui16[x] == 0)
-            continue;
-        int h = 31 - __builtin_clz(t.ui16[x]);
-        int p = __builtin_popcount(t.ui16[x] ^ (((1 << h) - 1) << 1));
-        maxDrops = std::max(p, maxDrops);
-    }
+    // Find the holes. The number of holes for each column is the number of
+    // drops of the column.
+    __m128i holes = _mm_and_si128(sse::mm_porr_epi16(nonempty), erased);
+    __m128i num_holes = sse::mm_popcnt_epi16(holes);
+    int maxDrops = sse::mm_hmax_epu16(num_holes);
 
     dropAfterVanishFastAVX2(erased, tracker);
 
