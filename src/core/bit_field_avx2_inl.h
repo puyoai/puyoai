@@ -179,7 +179,6 @@ int BitField::vanishAVX2(int currentChain, FieldBits* erased, Tracker* tracker) 
 }
 
 template<typename Tracker>
-CLANG_ALWAYS_INLINE
 bool BitField::vanishFastAVX2(int currentChain, FieldBits* erased, Tracker* tracker) const
 {
     FieldBits256 erased256;
@@ -247,7 +246,6 @@ int BitField::dropAfterVanishAVX2(FieldBits erased, Tracker* tracker)
 }
 
 template<typename Tracker>
-CLANG_ALWAYS_INLINE
 void BitField::dropAfterVanishFastAVX2(FieldBits erased, Tracker* tracker)
 {
     const __m128i ones = sse::mm_setone_si128();
