@@ -249,8 +249,8 @@ bool FieldBits::findVanishingBits(FieldBits* vanishing) const
 
     DCHECK(vanishing) << "bits must not be nullptr";
 
-    FieldBits u = _mm_slli_epi16(m_, 1) & m_;
-    FieldBits d = _mm_srli_epi16(m_, 1) & m_;
+    FieldBits u = _mm_srli_epi16(m_, 1) & m_;
+    FieldBits d = _mm_slli_epi16(m_, 1) & m_;
     FieldBits l = _mm_slli_si128(m_, 2) & m_;
     FieldBits r = _mm_srli_si128(m_, 2) & m_;
 
@@ -262,25 +262,25 @@ bool FieldBits::findVanishingBits(FieldBits* vanishing) const
     FieldBits threes = (ud_and & lr_or) | (lr_and & ud_or);
     FieldBits twos = ud_and | lr_and | (ud_or & lr_or);
 
-    FieldBits two_u = _mm_slli_epi16(twos, 1) & twos;
+    FieldBits two_d = _mm_slli_epi16(twos, 1) & twos;
     FieldBits two_l = _mm_slli_si128(twos, 2) & twos;
 
-    *vanishing = threes | two_u | two_l;
+    *vanishing = threes | two_d | two_l;
 
     if (vanishing->isEmpty())
         return false;
 
-    FieldBits two_d = _mm_srli_epi16(twos, 1) & twos;
+    FieldBits two_u = _mm_srli_epi16(twos, 1) & twos;
     FieldBits two_r = _mm_srli_si128(twos, 2) & twos;
-    *vanishing = (*vanishing | two_d | two_r).expand1(m_);
+    *vanishing = (*vanishing | two_u | two_r).expand1(m_);
     return true;
 }
 
 inline
 bool FieldBits::hasVanishingBits() const
 {
-    FieldBits u = _mm_slli_epi16(m_, 1) & m_;
-    FieldBits d = _mm_srli_epi16(m_, 1) & m_;
+    FieldBits u = _mm_srli_epi16(m_, 1) & m_;
+    FieldBits d = _mm_slli_epi16(m_, 1) & m_;
     FieldBits l = _mm_slli_si128(m_, 2) & m_;
     FieldBits r = _mm_srli_si128(m_, 2) & m_;
 
@@ -292,10 +292,10 @@ bool FieldBits::hasVanishingBits() const
     FieldBits threes = (ud_and & lr_or) | (lr_and & ud_or);
     FieldBits twos = ud_and | lr_and | (ud_or & lr_or);
 
-    FieldBits two_u = _mm_slli_epi16(twos, 1) & twos;
+    FieldBits two_d = _mm_slli_epi16(twos, 1) & twos;
     FieldBits two_l = _mm_slli_si128(twos, 2) & twos;
 
-    FieldBits vanishing = threes | two_u | two_l;
+    FieldBits vanishing = threes | two_d | two_l;
 
     return !vanishing.isEmpty();
 }
@@ -305,8 +305,8 @@ void FieldBits::countConnection(int* count2, int* count3) const
 {
     FieldBits mask = maskedField12();
 
-    FieldBits u = _mm_and_si128(_mm_slli_epi16(mask, 1), mask);
-    FieldBits d = _mm_and_si128(_mm_srli_epi16(mask, 1), mask);
+    FieldBits u = _mm_and_si128(_mm_srli_epi16(mask, 1), mask);
+    FieldBits d = _mm_and_si128(_mm_slli_epi16(mask, 1), mask);
     FieldBits l = _mm_and_si128(_mm_slli_si128(mask, 2), mask);
     FieldBits r = _mm_and_si128(_mm_srli_si128(mask, 2), mask);
 
