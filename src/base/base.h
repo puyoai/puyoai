@@ -31,4 +31,11 @@ constexpr std::size_t ARRAY_SIZE(const T (&)[size]) { return size; }
 #define NOINLINE_UNLESS_RELEASE __attribute__ ((noinline))
 #endif
 
+// CLANG_ALWAYS_INLINE sets __attribute__((always_inline)) only when clang is used.
+#ifdef __clang__
+#define CLANG_ALWAYS_INLINE __attribute__((always_inline))
+#else
+#define CLANG_ALWAYS_INLINE
+#endif
+
 #endif  // BASE_BASE_H_
