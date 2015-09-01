@@ -14,6 +14,7 @@ add_library(puyoai_gui
             main_window.cc
             screen.cc
             pixel_color.cc
+            player_ui.cc
             user_event_drawer.cc
             util.cc)
 
