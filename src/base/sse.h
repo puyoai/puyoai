@@ -57,6 +57,7 @@ inline __m128i mm_not_si128(__m128i x)
 }
 
 // Parallel bit-wise or operation for each 16 bits.
+// 0001xxxxxxxxxxxx --> 0001111111111111
 inline __m128i mm_porr_epi16(__m128i x)
 {
     x = _mm_or_si128(x, _mm_srli_epi16(x, 1));
