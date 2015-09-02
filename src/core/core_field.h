@@ -95,6 +95,10 @@ public:
     int countReachableSpaces() const;
 
     void countConnection(int* count2, int* count3) const { return field_.countConnection(count2, count3); }
+    // Returns the ridge height of column |x|.
+    int ridgeHeight(int x) const;
+    // Returns the vallye depth of column |x|.
+    int valleyDepth(int x) const;
 
     // ----------------------------------------------------------------------
     // field manipulation
