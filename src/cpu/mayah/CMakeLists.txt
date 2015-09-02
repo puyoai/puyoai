@@ -10,6 +10,7 @@ add_library(mayah_lib
             evaluation_parameter.cc
             gazer.cc
             mayah_ai.cc
+            move_evaluator.cc
             pattern_book.cc
             pattern_book_field.cc
             pattern_rensa_detector.cc

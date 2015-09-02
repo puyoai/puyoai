@@ -22,6 +22,7 @@
 
 #include "evaluation_parameter.h"
 #include "gazer.h"
+#include "move_evaluator.h"
 #include "pattern_rensa_detector.h"
 #include "rensa_hand_tree.h"
 
@@ -138,13 +139,6 @@ MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentFi
 
     result.add(MIDEVAL_RESULT, score);
     return result;
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalFrameFeature(int totalFrames, int numChigiri)
-{
-    sc_->addScore(TOTAL_FRAMES, totalFrames);
-    sc_->addScore(NUM_CHIGIRI, numChigiri);
 }
 
 template<typename ScoreCollector>
@@ -646,8 +640,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
     const CoreField& fieldBeforeRensa = plan.field();
 
+    MoveEvaluator<ScoreCollector>(sc_).eval(plan);
+
     // We'd like to evaluate frame feature always.
-    evalFrameFeature(plan.totalFrames(), plan.numChigiri());
     evalMidEval(midEvalResult);
 
     evalCountPuyoFeature(fieldBeforeRensa);

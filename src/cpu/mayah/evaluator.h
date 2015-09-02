@@ -134,7 +134,6 @@ public:
                       const PlayerState& me, const PlayerState& enemy, const GazeResult&,
                       const MidEvalResult&);
 
-    void evalFrameFeature(int totalFrames, int numChigiri);
     void evalRestrictedConnectionHorizontalFeature(const CoreField&);
     void evalThirdColumnHeightFeature(const CoreField&);
     void evalValleyDepth(const CoreField&);
