@@ -162,6 +162,7 @@ public:
     // Simualtes chains with SimulationContext and Tracker.
     template<typename Tracker> RensaResult simulate(SimulationContext*, Tracker*);
 
+    int simulateFast();
     template<typename Tracker> int simulateFast(Tracker*);
 
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
@@ -248,6 +249,13 @@ RensaResult CoreField::simulate(SimulationContext* context, Tracker* tracker)
 
     field_.calculateHeight(heights_);
     return result;
+}
+
+inline
+int CoreField::simulateFast()
+{
+    RensaNonTracker tracker;
+    return simulateFast(&tracker);
 }
 
 template<typename Tracker>
