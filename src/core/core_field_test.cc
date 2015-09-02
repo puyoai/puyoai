@@ -182,6 +182,93 @@ TEST(CoreFieldTest, countReachableSpaces2)
     EXPECT_EQ(6, cf.countReachableSpaces());
 }
 
+TEST(CoreFieldTest, ridgeHeight1)
+{
+    CoreField cf(
+        "  O   "
+        "  O   "
+        "  O   "
+        "  O  O"
+        "OOOOOO");
+
+    EXPECT_EQ(0, cf.ridgeHeight(1));
+    EXPECT_EQ(0, cf.ridgeHeight(2));
+    EXPECT_EQ(4, cf.ridgeHeight(3));
+    EXPECT_EQ(0, cf.ridgeHeight(4));
+    EXPECT_EQ(0, cf.ridgeHeight(5));
+    EXPECT_EQ(0, cf.ridgeHeight(6));
+}
+
+TEST(CoreFieldTest, ridgeHeight2)
+{
+    CoreField cf(
+        "  O   "
+        "  O   "
+        "  OO  "
+        " OOO O"
+        "OOOOOO");
+
+    EXPECT_EQ(0, cf.ridgeHeight(1));
+    EXPECT_EQ(0, cf.ridgeHeight(2));
+    EXPECT_EQ(2, cf.ridgeHeight(3));
+    EXPECT_EQ(0, cf.ridgeHeight(4));
+    EXPECT_EQ(0, cf.ridgeHeight(5));
+    EXPECT_EQ(0, cf.ridgeHeight(6));
+}
+
+TEST(CoreFieldTest, ridgeHeight3)
+{
+    CoreField cf(
+        "O O   "
+        "OOO   "
+        "OOO   "
+        "OOOO O"
+        "OOOOOO");
+
+    EXPECT_EQ(0, cf.ridgeHeight(1));
+    EXPECT_EQ(0, cf.ridgeHeight(2));
+    EXPECT_EQ(1, cf.ridgeHeight(3));
+    EXPECT_EQ(0, cf.ridgeHeight(4));
+    EXPECT_EQ(0, cf.ridgeHeight(5));
+    EXPECT_EQ(0, cf.ridgeHeight(6));
+}
+
+TEST(CoreFieldTest, valleyDepth1)
+{
+    CoreField cf(
+        "OO...."
+        "OO.OOO"
+        "OO.OOO"
+        "OO.OOO"
+        "OO.OOO"
+        "OOOOOO");
+
+    EXPECT_EQ(0, cf.valleyDepth(1));
+    EXPECT_EQ(0, cf.valleyDepth(2));
+    EXPECT_EQ(4, cf.valleyDepth(3));
+    EXPECT_EQ(0, cf.valleyDepth(4));
+    EXPECT_EQ(0, cf.valleyDepth(5));
+    EXPECT_EQ(0, cf.valleyDepth(6));
+}
+
+TEST(CoreFieldTest, valleyDepth2)
+{
+    CoreField cf(
+        ".O...."
+        ".O.O.."
+        "OO.O.."
+        "OO.O.O"
+        "OO.OOO"
+        "OOOOOO");
+
+    EXPECT_EQ(2, cf.valleyDepth(1));
+    EXPECT_EQ(0, cf.valleyDepth(2));
+    EXPECT_EQ(4, cf.valleyDepth(3));
+    EXPECT_EQ(0, cf.valleyDepth(4));
+    EXPECT_EQ(1, cf.valleyDepth(5));
+    EXPECT_EQ(0, cf.valleyDepth(6));
+}
+
 TEST(CoreFieldTest, simulate1)
 {
     CoreField cf("RRRR..");

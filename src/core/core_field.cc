@@ -134,6 +134,28 @@ int CoreField::countReachableSpaces() const
     return count;
 }
 
+int CoreField::ridgeHeight(int x) const
+{
+    int currentHeight = height(x);
+    int leftHeight = (x == 1) ? 14 : height(x - 1);
+    int rightHeight = (x == 6) ? 14 : height(x + 1);
+
+    int left = std::max(currentHeight - leftHeight, 0);
+    int right = std::max(currentHeight - rightHeight, 0);
+    return std::min(left, right);
+}
+
+int CoreField::valleyDepth(int x) const
+{
+    int currentHeight = height(x);
+    int leftHeight = (x == 1) ? 14 : height(x - 1);
+    int rightHeight = (x == 6) ? 14 : height(x + 1);
+
+    int left = std::max(leftHeight - currentHeight, 0);
+    int right = std::max(rightHeight - currentHeight, 0);
+    return std::min(left, right);
+}
+
 bool CoreField::dropKumipuyo(const Decision& decision, const Kumipuyo& kumiPuyo)
 {
     int x1 = decision.axisX();
