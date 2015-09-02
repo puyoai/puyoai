@@ -27,11 +27,6 @@
 
 using namespace std;
 
-namespace {
-
-
-}
-
 template<typename ScoreCollector, typename FeatureKey>
 static void calculateConnection(ScoreCollector* sc, const CoreField& field,
                                 FeatureKey key2, FeatureKey key3)
