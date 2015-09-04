@@ -5,8 +5,8 @@
 
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
-#include "core/decision.h"
 #include "core/core_field.h"
+#include "core/decision.h"
 #include "gazer.h"
 
 using namespace std;
@@ -82,88 +82,6 @@ TEST_F(EvaluatorTest, evalRensaGarbage)
 
     EXPECT_EQ(10, cfs.feature(NUM_GARBAGE_PUYOS));
     EXPECT_EQ(6, cfs.feature(NUM_SIDE_GARBAGE_PUYOS));
-}
-
-TEST_F(EvaluatorTest, RidgeHeight1)
-{
-    CoreField f(
-        "  O   "
-        "  O   "
-        "  O   "
-        "  O  O"
-        "OOOOOO");
-
-    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
-        evaluator->evalRidgeHeight(f);
-    });
-
-    const vector<int>& vs = cfs.moveScore.feature(RIDGE_HEIGHT);
-    EXPECT_TRUE(find(vs.begin(), vs.end(), 4) != vs.end());
-}
-
-TEST_F(EvaluatorTest, RidgeHeight2)
-{
-    CoreField f(
-        "  O   "
-        "  O   "
-        "  OO  "
-        " OOO O"
-        "OOOOOO");
-
-    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
-        evaluator->evalRidgeHeight(f);
-    });
-
-    const vector<int>& vs = cfs.moveScore.feature(RIDGE_HEIGHT);
-    EXPECT_TRUE(find(vs.begin(), vs.end(), 2) != vs.end());
-}
-
-TEST_F(EvaluatorTest, RidgeHeight3)
-{
-    CoreField f(
-        "  O   "
-        " OO   "
-        " OO   "
-        " OOO O"
-        "OOOOOO");
-
-    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
-        evaluator->evalRidgeHeight(f);
-    });
-
-    const vector<int>& vs = cfs.moveScore.feature(RIDGE_HEIGHT);
-    EXPECT_TRUE(find(vs.begin(), vs.end(), 1) != vs.end());
-}
-
-TEST_F(EvaluatorTest, connection)
-{
-    CoreField f("BBBYYY"
-                "OOOOGO"
-                "BBYYGO");
-
-    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
-        evaluator->evalConnection(f);
-    });
-
-    EXPECT_EQ(2, cfs.moveScore.feature(CONNECTION_3));
-    EXPECT_EQ(3, cfs.moveScore.feature(CONNECTION_2));
-}
-
-TEST_F(EvaluatorTest, connectionHorizontal)
-{
-    CoreField f(
-        "OGGGOO"
-        "OOYYOO"
-        "RRROGG");
-
-    CollectedFeatureScore cfs = withEvaluator([&f](Evaluator<FeatureScoreCollector>* evaluator) {
-        evaluator->evalRestrictedConnectionHorizontalFeature(f);
-    });
-
-    EXPECT_EQ(1, cfs.moveScore.feature(CONNECTION_HORIZONTAL_2));
-    EXPECT_EQ(1, cfs.moveScore.feature(CONNECTION_HORIZONTAL_3));
-    EXPECT_EQ(1, cfs.moveScore.feature(CONNECTION_HORIZONTAL_CROSSED_2));
-    EXPECT_EQ(1, cfs.moveScore.feature(CONNECTION_HORIZONTAL_CROSSED_3));
 }
 
 TEST_F(EvaluatorTest, DontCrash1)

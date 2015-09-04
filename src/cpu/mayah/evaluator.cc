@@ -25,56 +25,9 @@
 #include "move_evaluator.h"
 #include "pattern_rensa_detector.h"
 #include "rensa_hand_tree.h"
+#include "shape_evaluator.h"
 
 using namespace std;
-
-template<typename ScoreCollector, typename FeatureKey>
-static void calculateConnection(ScoreCollector* sc, const CoreField& field,
-                                FeatureKey key2, FeatureKey key3)
-{
-    int count2, count3;
-    field.countConnection(&count2, &count3);
-    sc->addScore(key2, count2);
-    sc->addScore(key3, count3);
-}
-
-template<typename ScoreCollector, typename SparseFeatureKey>
-static void calculateValleyDepth(ScoreCollector* sc,
-                                 SparseFeatureKey key,
-                                 SparseFeatureKey edgeKey,
-                                 const CoreField& field)
-{
-    for (int x = 1; x <= 6; ++x) {
-        int currentHeight = field.height(x);
-        int leftHeight = (x == 1) ? 14 : field.height(x - 1);
-        int rightHeight = (x == 6) ? 14 : field.height(x + 1);
-
-        int left = std::max(leftHeight - currentHeight, 0);
-        int right = std::max(rightHeight - currentHeight, 0);
-        int depth = std::min(left, right);
-        DCHECK(0 <= depth && depth <= 14) << depth;
-        if (x == 1 || x == 6)
-            sc->addScore(edgeKey, depth, 1);
-        else
-            sc->addScore(key, depth, 1);
-    }
-}
-
-template<typename ScoreCollector, typename SparseFeatureKey>
-static void calculateRidgeHeight(ScoreCollector* sc, SparseFeatureKey key, const CoreField& field)
-{
-    for (int x = 1; x <= 6; ++x) {
-        int currentHeight = field.height(x);
-        int leftHeight = (x == 1) ? 14 : field.height(x - 1);
-        int rightHeight = (x == 6) ? 14 : field.height(x + 1);
-
-        int left = std::max(currentHeight - leftHeight, 0);
-        int right = std::max(currentHeight - rightHeight, 0);
-        int height = std::min(left, right);
-        DCHECK(0 <= height && height <= 14) << height;
-        sc->addScore(key, height, 1);
-    }
-}
 
 template<typename ScoreCollector, typename FeatureKey>
 static void calculateFieldUShape(ScoreCollector* sc,
@@ -139,105 +92,6 @@ MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentFi
 
     result.add(MIDEVAL_RESULT, score);
     return result;
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalConnection(const CoreField& field)
-{
-    calculateConnection(sc_, field, CONNECTION_2, CONNECTION_3);
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalRestrictedConnectionHorizontalFeature(const CoreField& f)
-{
-    const int MAX_HEIGHT = 3; // instead of FieldConstant::HEIGHT
-    for (int y = 1; y <= MAX_HEIGHT; ++y) {
-        for (int x = 1; x < FieldConstant::WIDTH; ++x) {
-            if (!isNormalColor(f.color(x, y)))
-                continue;
-
-            int len = 1;
-            while (f.color(x, y) == f.color(x + len, y))
-                ++len;
-
-            EvaluationMoveFeatureKey key;
-            if (len == 1) {
-                continue;
-            } else if (len == 2) {
-                if (x <= 3 && 4 < x + len) {
-                    key = CONNECTION_HORIZONTAL_CROSSED_2;
-                } else {
-                    key = CONNECTION_HORIZONTAL_2;
-                }
-            } else if (len == 3) {
-                if (x <= 3 && 4 < x + len) {
-                    key = CONNECTION_HORIZONTAL_CROSSED_3;
-                } else {
-                    key = CONNECTION_HORIZONTAL_3;
-                }
-            } else {
-                CHECK(false) << "shouldn't happen: " << len;
-            }
-
-            sc_->addScore(key, 1);
-            x += len - 1;
-        }
-    }
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalThirdColumnHeightFeature(const CoreField& field)
-{
-    sc_->addScore(THIRD_COLUMN_HEIGHT, field.height(3), 1);
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalValleyDepth(const CoreField& field)
-{
-    calculateValleyDepth(sc_, VALLEY_DEPTH, VALLEY_DEPTH_EDGE, field);
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalRidgeHeight(const CoreField& field)
-{
-    calculateRidgeHeight(sc_, RIDGE_HEIGHT, field);
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalFieldUShape(const CoreField& field)
-{
-    calculateFieldUShape(sc_, FIELD_USHAPE_LINEAR, FIELD_USHAPE_SQUARE, field);
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalFieldRightBias(const CoreField& field)
-{
-    static const int DIFF[FieldConstant::MAP_WIDTH] = {
-        0, 2, 2, 2, -8, -6, -6, 0
-    };
-
-    double average = 0;
-    for (int x = 1; x <= 6; ++x)
-        average += (field.height(x) + DIFF[x]);
-    average /= 6;
-
-    double linearValue = 0;
-    double squareValue = 0;
-
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        int h = field.height(x) + DIFF[x];
-        linearValue += std::abs(h - average);
-        squareValue += (h - average) * (h - average);
-    }
-
-    sc_->addScore(FIELD_RIGHT_BIAS_LINEAR, linearValue);
-    sc_->addScore(FIELD_RIGHT_BIAS_SQUARE, squareValue);
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalUnreachableSpace(const CoreField& cf)
-{
-    sc_->addScore(NUM_UNREACHABLE_SPACE, cf.countUnreachableSpaces());
 }
 
 template<typename ScoreCollector>
@@ -479,7 +333,10 @@ void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const CoreFi
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaConnectionFeature(const CoreField& fieldAfterDrop)
 {
-    calculateConnection(sc_, fieldAfterDrop, CONNECTION_AFTER_DROP_2, CONNECTION_AFTER_DROP_3);
+    int count2, count3;
+    fieldAfterDrop.countConnection(&count2, &count3);
+    sc_->addScore(CONNECTION_AFTER_DROP_2, count2);
+    sc_->addScore(CONNECTION_AFTER_DROP_3, count3);
 }
 
 template<typename ScoreCollector>
@@ -492,13 +349,20 @@ void RensaEvaluator<ScoreCollector>::evalRensaScore(double score, double virtual
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaRidgeHeight(const CoreField& field)
 {
-    calculateRidgeHeight(sc_, RENSA_RIDGE_HEIGHT, field);
+    for (int x = 1; x <= 6; ++x) {
+        sc_->addScore(RENSA_RIDGE_HEIGHT, field.ridgeHeight(x), 1);
+    }
 }
 
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaValleyDepth(const CoreField& field)
 {
-    calculateValleyDepth(sc_, RENSA_VALLEY_DEPTH, RENSA_VALLEY_DEPTH_EDGE, field);
+    for (int x = 1; x <= 6; ++x) {
+        if (x == 1 || x == 6)
+            sc_->addScore(RENSA_VALLEY_DEPTH_EDGE, field.valleyDepth(x), 1);
+        else
+            sc_->addScore(RENSA_VALLEY_DEPTH, field.valleyDepth(x), 1);
+    }
 }
 
 template<typename ScoreCollector>
@@ -554,13 +418,6 @@ void RensaEvaluator<ScoreCollector>::evalRensaGarbage(const CoreField& fieldAfte
 {
     sc_->addScore(NUM_GARBAGE_PUYOS, fieldAfterDrop.countPuyos());
     sc_->addScore(NUM_SIDE_GARBAGE_PUYOS, fieldAfterDrop.height(1) + fieldAfterDrop.height(6));
-}
-
-template<typename ScoreCollector>
-void Evaluator<ScoreCollector>::evalCountPuyoFeature(const CoreField& field)
-{
-    sc_->addScore(NUM_COUNT_PUYOS, field.countColorPuyos(), 1);
-    sc_->addScore(NUM_COUNT_OJAMA, field.countColor(PuyoColor::OJAMA));
 }
 
 template<typename ScoreCollector>
@@ -641,19 +498,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     const CoreField& fieldBeforeRensa = plan.field();
 
     MoveEvaluator<ScoreCollector>(sc_).eval(plan);
+    ShapeEvaluator<ScoreCollector>(sc_).eval(plan.field());
 
-    // We'd like to evaluate frame feature always.
     evalMidEval(midEvalResult);
-
-    evalCountPuyoFeature(fieldBeforeRensa);
-    evalConnection(fieldBeforeRensa);
-    evalRestrictedConnectionHorizontalFeature(fieldBeforeRensa);
-    evalThirdColumnHeightFeature(fieldBeforeRensa);
-    evalValleyDepth(fieldBeforeRensa);
-    evalRidgeHeight(fieldBeforeRensa);
-    evalFieldUShape(fieldBeforeRensa);
-    evalFieldRightBias(fieldBeforeRensa);
-    evalUnreachableSpace(fieldBeforeRensa);
     evalFallenOjama(plan.fallenOjama());
 
     const int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);

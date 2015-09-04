@@ -14,7 +14,8 @@ add_library(mayah_lib
             pattern_book.cc
             pattern_book_field.cc
             pattern_rensa_detector.cc
-            rensa_hand_tree.cc)
+            rensa_hand_tree.cc
+            shape_evaluator.cc)
 
 function(mayah_add_executable exe)
     cpu_add_executable(${exe} ${ARGN})
@@ -50,6 +51,7 @@ mayah_add_test(pattern_book_test)
 mayah_add_test(pattern_rensa_detector_test)
 mayah_add_test(rensa_hand_tree_test)
 mayah_add_test(score_collector_test)
+mayah_add_test(shape_evaluator_test)
 
 mayah_add_test(mayah_ai_performance_test 1)
 mayah_add_test(gazer_performance_test 1)
