@@ -134,19 +134,9 @@ public:
                       const PlayerState& me, const PlayerState& enemy, const GazeResult&,
                       const MidEvalResult&);
 
-    void evalRestrictedConnectionHorizontalFeature(const CoreField&);
-    void evalThirdColumnHeightFeature(const CoreField&);
-    void evalValleyDepth(const CoreField&);
-    void evalRidgeHeight(const CoreField&);
-    void evalFieldUShape(const CoreField&);
-    void evalFieldRightBias(const CoreField&);
-    void evalUnreachableSpace(const CoreField&);
     void evalFallenOjama(int fallenOjama);
 
     void evalMidEval(const MidEvalResult&);
-
-    void evalConnection(const CoreField&);
-    void evalCountPuyoFeature(const CoreField&);
 
 private:
     CollectedCoef calculateDefaultCoef(const PlayerState& me, const PlayerState& enemy) const;
