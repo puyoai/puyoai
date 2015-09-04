@@ -1,6 +1,7 @@
 #ifndef CORE_DECISION_H_
 #define CORE_DECISION_H_
 
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -39,6 +40,8 @@ public:
     {
         return std::make_pair(lhs.x, lhs.r) < std::make_pair(rhs.x, rhs.r);
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const Decision& d) { return os << d.toString(); }
 
 public:
     // X of the JIKU-PUYO. (1<=x<=6)
