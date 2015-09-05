@@ -29,41 +29,6 @@
 
 using namespace std;
 
-template<typename ScoreCollector, typename FeatureKey>
-static void calculateFieldUShape(ScoreCollector* sc,
-                                 FeatureKey linearKey,
-                                 FeatureKey squareKey,
-                                 const CoreField& field)
-{
-    static const int DIFF[FieldConstant::MAP_WIDTH] = {
-        0, -3, 0, 1, 1, 0, -3, 0,
-    };
-
-    static const double FIELD_USHAPE_HEIGHT_COEF[15] = {
-        0.0, 0.1, 0.1, 0.3, 0.3,
-        0.5, 0.5, 0.7, 0.7, 1.0,
-        1.0, 1.0, 1.0, 1.0, 1.0,
-    };
-
-    double average = 0;
-    for (int x = 1; x <= 6; ++x)
-        average += (field.height(x) + DIFF[x]);
-    average /= 6;
-
-    double linearValue = 0;
-    double squareValue = 0;
-
-    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
-        int h = field.height(x) + DIFF[x];
-        double coef = FIELD_USHAPE_HEIGHT_COEF[field.height(x)];
-        linearValue += std::abs(h - average) * coef;
-        squareValue += (h - average) * (h - average) * coef;
-    }
-
-    sc->addScore(linearKey, linearValue);
-    sc->addScore(squareKey, squareValue);
-}
-
 // ----------------------------------------------------------------------
 
 PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
@@ -368,10 +333,33 @@ void RensaEvaluator<ScoreCollector>::evalRensaValleyDepth(const CoreField& field
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field)
 {
-    calculateFieldUShape(sc_,
-                         RENSA_FIELD_USHAPE_LINEAR,
-                         RENSA_FIELD_USHAPE_SQUARE,
-                         field);
+    static const int DIFF[FieldConstant::MAP_WIDTH] = {
+        0, -3, 0, 1, 1, 0, -3, 0,
+    };
+
+    static const double FIELD_USHAPE_HEIGHT_COEF[15] = {
+        0.0, 0.1, 0.1, 0.3, 0.3,
+        0.5, 0.5, 0.7, 0.7, 1.0,
+        1.0, 1.0, 1.0, 1.0, 1.0,
+    };
+
+    double average = 0;
+    for (int x = 1; x <= 6; ++x)
+        average += (field.height(x) + DIFF[x]);
+    average /= 6;
+
+    double linearValue = 0;
+    double squareValue = 0;
+
+    for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
+        int h = field.height(x) + DIFF[x];
+        double coef = FIELD_USHAPE_HEIGHT_COEF[field.height(x)];
+        linearValue += std::abs(h - average) * coef;
+        squareValue += (h - average) * (h - average) * coef;
+    }
+
+    sc_->addScore(RENSA_FIELD_USHAPE_LINEAR, linearValue);
+    sc_->addScore(RENSA_FIELD_USHAPE_SQUARE, squareValue);
 }
 
 template<typename ScoreCollector>
