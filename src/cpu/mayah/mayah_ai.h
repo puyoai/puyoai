@@ -89,6 +89,7 @@ protected:
     PatternBook patternBook_;
 
     bool usesDecisionBook_ = true;
+    bool usesRensaHandTree_ = true;
 
     Executor* executor_;
 
@@ -120,6 +121,8 @@ public:
     using MayahAI::mutableEnemyPlayerState;
 
     const Gazer& gazer() const { return gazer_; }
+
+    void setUsesRensaHandTree(bool flag) { usesRensaHandTree_ = flag; }
 
     void removeNontokopuyoParameter() { evaluationParameterMap_.removeNontokopuyoParameter(); }
 

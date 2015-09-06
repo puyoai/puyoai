@@ -495,6 +495,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                                      const PreEvalResult& preEvalResult,
                                      const MidEvalResult& midEvalResult,
                                      bool fast,
+                                     bool usesRensaHandTree,
                                      const GazeResult& gazeResult)
 {
     typedef typename ScoreCollector::RensaScoreCollector RensaScoreCollector;
@@ -614,7 +615,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         }
 
         // Now, we can simulate complementedField.
-        if (!fast) {
+        if (!fast && usesRensaHandTree) {
             handTreeMaker.add(std::move(complementedField), puyosToComplement, 0, PuyoSet());
         }
     };
@@ -630,7 +631,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     });
 
     int rensaHandValue = 0;
-    if (!fast) {
+    if (!fast && usesRensaHandTree) {
         RensaHandTree myRensaTree(vector<RensaHandNode>{ handTreeMaker.makeNode() });
         // TODO(mayah): num ojama is correct? frame id is correct? not sure...
         int myOjama = plan.totalOjama();
