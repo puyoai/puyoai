@@ -261,7 +261,7 @@ MidEvalResult MayahAI::midEval(const RefPlan& plan,
     Evaluator<SimpleScoreCollector> evaluator(patternBook_, &sc);
 
     // MidEval always sets 'fast'.
-    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), true, gazeResult);
+    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), true, usesRensaHandTree_, gazeResult);
 
     MidEvaluator midEvaluator(patternBook_);
     const CollectedSimpleScore& simpleScore = sc.collectedScore();
@@ -279,7 +279,7 @@ EvalResult MayahAI::eval(const RefPlan& plan,
 {
     SimpleScoreCollector sc(evaluationParameterMap_);
     Evaluator<SimpleScoreCollector> evaluator(patternBook_, &sc);
-    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
+    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, usesRensaHandTree_, gazeResult);
 
     const CollectedSimpleScore& simpleScore = sc.collectedScore();
     return EvalResult(simpleScore.score(sc.collectedCoef()), sc.estimatedRensaScore());
@@ -298,7 +298,7 @@ CollectedFeatureCoefScore MayahAI::evalWithCollectingFeature(const RefPlan& plan
 {
     FeatureScoreCollector sc(evaluationParameterMap_);
     Evaluator<FeatureScoreCollector> evaluator(patternBook_, &sc);
-    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
+    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, usesRensaHandTree_, gazeResult);
 
     return CollectedFeatureCoefScore(sc.collectedCoef(), sc.collectedScore());
 }

@@ -130,6 +130,7 @@ private:
 void runOnce(const EvaluationParameterMap& paramMap)
 {
     auto ai = new DebuggableMayahAI;
+    ai->setUsesRensaHandTree(false);
     ai->setEvaluationParameterMap(paramMap);
 
     Endless endless(std::move(std::unique_ptr<AI>(ai)));
@@ -154,6 +155,7 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
     for (int i = 0; i < N; ++i) {
         auto f = [i, &paramMap, &ps]() {
             auto ai = new DebuggableMayahAI;
+            ai->setUsesRensaHandTree(false);
             ai->setEvaluationParameterMap(paramMap);
 
             Endless endless(std::move(std::unique_ptr<AI>(ai)));
