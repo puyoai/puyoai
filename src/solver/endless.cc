@@ -1,7 +1,9 @@
 #include "solver/endless.h"
 
 #include <algorithm>
+#include <iostream>
 
+#include "base/time.h"
 #include "core/frame_request.h"
 #include "core/field_pretty_printer.h"
 
@@ -40,12 +42,16 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
         ai_->next2AppearedForMe(req);
         ai_->decisionRequestedForMe(req);
 
+        double beginTime = currentTime();
+
         DropDecision dropDecision = ai_->think(req.frameId,
                                                CoreField(req.myPlayerFrameRequest().field),
                                                req.myPlayerFrameRequest().kumipuyoSeq,
                                                ai_->myPlayerState(),
                                                ai_->enemyPlayerState(),
                                                false);
+
+        double endTime = currentTime();
 
         CoreField f(req.myPlayerFrameRequest().field);
         if (!f.dropKumipuyo(dropDecision.decision(), req.myPlayerFrameRequest().kumipuyoSeq.front())) {
@@ -55,6 +61,7 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
 
         if (verbose_) {
             FieldPrettyPrinter::print(f.toPlainField(), req.playerFrameRequest[0].kumipuyoSeq.subsequence(1));
+            cout << "time=" << (endTime - beginTime) << endl;
         }
 
         decisions.push_back(dropDecision.decision());
