@@ -84,6 +84,103 @@ TEST_F(EvaluatorTest, evalRensaGarbage)
     EXPECT_EQ(6, cfs.feature(NUM_SIDE_GARBAGE_PUYOS));
 }
 
+TEST_F(EvaluatorTest, evalFirePointTabooFeature1)
+{
+    CoreField cf("RR.R..");
+    FieldBits ignitionBits(
+        "1111..");
+
+    EvaluationRensaParameterSet paramSet;
+    PatternBook patternBook;
+    FeatureRensaScoreCollector sc(paramSet, paramSet);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+
+    evaluator.evalFirePointTabooFeature(cf, ignitionBits);
+    CollectedFeatureRensaScore cfs = sc.mainRensaScore();
+
+    EXPECT_EQ(1, cfs.feature(FIRE_POINT_TABOO));
+}
+
+TEST_F(EvaluatorTest, evalFirePointTabooFeature2)
+{
+    CoreField cf(
+        "R....."
+        "R.R...");
+    FieldBits ignitionBits(
+        "1....."
+        "111...");
+
+    EvaluationRensaParameterSet paramSet;
+    PatternBook patternBook;
+    FeatureRensaScoreCollector sc(paramSet, paramSet);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+
+    evaluator.evalFirePointTabooFeature(cf, ignitionBits);
+    CollectedFeatureRensaScore cfs = sc.mainRensaScore();
+
+    EXPECT_EQ(1, cfs.feature(FIRE_POINT_TABOO));
+}
+
+TEST_F(EvaluatorTest, evalFirePointTabooFeature3)
+{
+    CoreField cf(
+        "..R..."
+        "R.R...");
+    FieldBits ignitionBits(
+        "..1..."
+        "111...");
+
+    EvaluationRensaParameterSet paramSet;
+    PatternBook patternBook;
+    FeatureRensaScoreCollector sc(paramSet, paramSet);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+
+    evaluator.evalFirePointTabooFeature(cf, ignitionBits);
+    CollectedFeatureRensaScore cfs = sc.mainRensaScore();
+
+    EXPECT_EQ(1, cfs.feature(FIRE_POINT_TABOO));
+}
+
+TEST_F(EvaluatorTest, evalFirePointTabooFeature4)
+{
+    CoreField cf(
+        "...R.."
+        ".R.R..");
+    FieldBits ignitionBits(
+        "...1.."
+        ".111..");
+
+    EvaluationRensaParameterSet paramSet;
+    PatternBook patternBook;
+    FeatureRensaScoreCollector sc(paramSet, paramSet);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+
+    evaluator.evalFirePointTabooFeature(cf, ignitionBits);
+    CollectedFeatureRensaScore cfs = sc.mainRensaScore();
+
+    EXPECT_EQ(1, cfs.feature(FIRE_POINT_TABOO));
+}
+
+TEST_F(EvaluatorTest, evalFirePointTabooFeature5)
+{
+    CoreField cf(
+        "......"
+        "R.R...");
+    FieldBits ignitionBits(
+        "..1..."
+        "111...");
+
+    EvaluationRensaParameterSet paramSet;
+    PatternBook patternBook;
+    FeatureRensaScoreCollector sc(paramSet, paramSet);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+
+    evaluator.evalFirePointTabooFeature(cf, ignitionBits);
+    CollectedFeatureRensaScore cfs = sc.mainRensaScore();
+
+    EXPECT_EQ(0, cfs.feature(FIRE_POINT_TABOO));
+}
+
 TEST_F(EvaluatorTest, DontCrash1)
 {
     CoreField f(

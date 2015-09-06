@@ -268,18 +268,38 @@ template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalFirePointTabooFeature(const CoreField& field,
                                                                const FieldBits& ignitionPuyoBits)
 {
+    // A_A is taboo (unless x == 1 or x == 4)
+    //
+    //      A
+    // A_AA A_A are also taboo (including x == 1 and x == 4).
+
     // A_A is taboo generally. Allow this from x == 1 or x == 4.
     // TODO(mayah):
     // ..A...
     // A_A... should be taboo?
+    //
 
-    for (int x = 2; x <= 3; ++x) {
+    for (int x = 1; x <= 4; ++x) {
         for (int y = 1; y <= 12; ++y) {
             if (!ignitionPuyoBits.get(x, y) || !ignitionPuyoBits.get(x + 1, y) || !ignitionPuyoBits.get(x + 2, y))
                 continue;
 
-            if (isNormalColor(field.color(x, y)) && field.color(x, y) == field.color(x + 2, y) && field.color(x + 1, y) == PuyoColor::EMPTY) {
+            if (!field.isEmpty(x + 1, y))
+                continue;
+            if (!field.isNormalColor(x, y))
+                continue;
+            if (field.color(x, y) != field.color(x + 2, y))
+                continue;
+
+            if (x != 1 && x != 4) {
                 sc_->addScore(FIRE_POINT_TABOO, 1);
+                return;
+            }
+
+            if (field.color(x, y) == field.color(x, y + 1) || field.color(x, y) == field.color(x + 2, y + 1) ||
+                field.color(x, y) == field.color(x - 1, y) || field.color(x, y) == field.color(x + 3, y)) {
+                sc_->addScore(FIRE_POINT_TABOO, 1);
+                return;
             }
         }
     }
