@@ -47,7 +47,7 @@ public:
         result_.setCoef(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef);
     }
 
-    void trackVanish(int /*nthChain*/, const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
+    void trackVanish(int /*nthChain*/, const FieldBits& /*vanishedPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
     void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
 #ifdef __BMI2__
     void trackDropBMI2(std::uint64_t /*oldLowBits*/, std::uint64_t /*oldHighBits*/, std::uint64_t /*newLowBits*/, std::uint64_t /*newHighBits*/) {}

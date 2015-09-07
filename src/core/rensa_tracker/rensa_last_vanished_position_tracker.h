@@ -16,9 +16,9 @@ class RensaTracker<RensaLastVanishedPositionTrackResult> {
 public:
     const RensaLastVanishedPositionTrackResult& result() const { return result_; }
 
-    void trackVanish(int /*nthChain*/, const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    void trackVanish(int /*nthChain*/, const FieldBits& vanishedPuyoBits, const FieldBits& /*vanishedOjamaPuyoBits*/)
     {
-        result_.setLastVanishedPositionBits(vanishedColorPuyoBits | vanishedOjamaPuyoBits);
+        result_.setLastVanishedPositionBits(vanishedPuyoBits);
     }
 
     void trackCoef(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/) {}

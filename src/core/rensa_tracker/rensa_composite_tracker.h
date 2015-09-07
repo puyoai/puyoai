@@ -17,10 +17,10 @@ public:
         tracker2_->trackCoef(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef);
     }
 
-    void trackVanish(int nthChain, const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    void trackVanish(int nthChain, const FieldBits& vanishedPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
-        tracker1_->trackVanish(nthChain, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
-        tracker2_->trackVanish(nthChain, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+        tracker1_->trackVanish(nthChain, vanishedPuyoBits, vanishedOjamaPuyoBits);
+        tracker2_->trackVanish(nthChain, vanishedPuyoBits, vanishedOjamaPuyoBits);
     }
 
     void trackDrop(FieldBits blender, FieldBits leftOnes, FieldBits rightOnes)

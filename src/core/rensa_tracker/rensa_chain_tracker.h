@@ -38,14 +38,13 @@ public:
         yTracker_.trackCoef(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef);
     }
 
-    void trackVanish(int nthChain, const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    void trackVanish(int nthChain, const FieldBits& vanishedPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
-        FieldBits m = (vanishedColorPuyoBits | vanishedOjamaPuyoBits);
-        m.iterateBitPositions([&](int x, int y) {
+        vanishedPuyoBits.iterateBitPositions([&](int x, int y) {
             result_.setErasedAt(x, yTracker_.originalY(x, y), nthChain);
         });
 
-        yTracker_.trackVanish(nthChain, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+        yTracker_.trackVanish(nthChain, vanishedPuyoBits, vanishedOjamaPuyoBits);
     }
 
     void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
@@ -75,14 +74,13 @@ public:
         yTracker_.trackCoef(nthChain, numErasedPuyo, longBonusCoef, colorBonusCoef);
     }
 
-    void trackVanish(int nthChain, const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    void trackVanish(int nthChain, const FieldBits& vanishedPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
-        FieldBits m = (vanishedColorPuyoBits | vanishedOjamaPuyoBits);
-        m.iterateBitPositions([&](int x, int y) {
+        vanishedPuyoBits.iterateBitPositions([&](int x, int y) {
             result_->setErasedAt(x, yTracker_.originalY(x, y), nthChain);
         });
 
-        yTracker_.trackVanish(nthChain, vanishedColorPuyoBits, vanishedOjamaPuyoBits);
+        yTracker_.trackVanish(nthChain, vanishedPuyoBits, vanishedOjamaPuyoBits);
     }
 
     void trackDrop(FieldBits /*blender*/, FieldBits /*leftOnes*/, FieldBits /*rightOnes*/) {}
