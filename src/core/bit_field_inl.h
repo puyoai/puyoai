@@ -104,25 +104,23 @@ int BitField::vanish(int currentChain, FieldBits* erased, Tracker* tracker) cons
 
         ++numColors;
 
+        erased->setAll(vanishing);
+
         // fast path. In most cases, >= 8 puyos won't be erased.
         // When <= 7 puyos are erased, it won't be separated.
-        {
-            int popcount = vanishing.popcount();
-            if (popcount <= 7) {
-                numErasedPuyos += popcount;
-                longBonusCoef += longBonus(popcount);
-                erased->setAll(vanishing);
-                continue;
-            }
+        int popcount = vanishing.popcount();
+        numErasedPuyos += popcount;
+
+        if (popcount <= 7) {
+            longBonusCoef += longBonus(popcount);
+            continue;
         }
 
         // slow path...
         vanishing.iterateBitWithMasking([&](FieldBits x) -> FieldBits {
             FieldBits expanded = x.expand(mask);
             int count = expanded.popcount();
-            numErasedPuyos += count;
             longBonusCoef += longBonus(count);
-            erased->setAll(expanded);
             return expanded;
         });
     }
