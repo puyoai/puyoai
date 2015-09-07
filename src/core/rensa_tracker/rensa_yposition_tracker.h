@@ -25,7 +25,7 @@ public:
 
     void trackCoef(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/) {}
 
-    void trackVanish(int /*nthChain*/, const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    void trackVanish(int /*nthChain*/, const FieldBits& vanishedPuyoBits, const FieldBits& /*vanishedOjamaPuyoBits*/)
     {
         const __m128i zero = _mm_setzero_si128();
         const __m128i ones = _mm_cmpeq_epi8(zero, zero);
@@ -33,7 +33,7 @@ public:
             std::uint16_t cols[FieldConstant::MAP_WIDTH];
             __m128i m;
         };
-        m = (vanishedColorPuyoBits | vanishedOjamaPuyoBits) ^ ones;
+        m = vanishedPuyoBits ^ ones;
 
         for (int x = 1; x <= 6; ++x) {
             originalY_[x] = bmi::extractBits4(originalY_[x], cols[x]);

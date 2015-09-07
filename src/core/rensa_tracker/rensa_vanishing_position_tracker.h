@@ -51,8 +51,9 @@ public:
     const RensaVanishingPositionResult& result() const { return result_; }
 
     void trackCoef(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/) {}
-    void trackVanish(int nthChain, const FieldBits& vanishedColorPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
+    void trackVanish(int nthChain, const FieldBits& vanishedPuyoBits, const FieldBits& vanishedOjamaPuyoBits)
     {
+        FieldBits vanishedColorPuyoBits = vanishedPuyoBits.notmask(vanishedOjamaPuyoBits);
         vanishedColorPuyoBits.iterateBitPositions([&](int x, int y) {
             if (yTracker_.originalY(x, y) == y) {
                 result_.setBasePuyo(x, y, nthChain);

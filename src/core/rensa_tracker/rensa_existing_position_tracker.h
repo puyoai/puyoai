@@ -24,7 +24,7 @@ public:
     const RensaExistingPositionTrackResult& result() const { return result_; }
 
     void trackCoef(int /*nthChain*/, int /*numErasedPuyo*/, int /*longBonusCoef*/, int /*colorBonusCoef*/) {}
-    void trackVanish(int /*nthChain*/, const FieldBits& /*vanishedColorPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
+    void trackVanish(int /*nthChain*/, const FieldBits& /*vanishedPuyoBits*/, const FieldBits& /*vanishedOjamaPuyoBits*/) {}
 
     void trackDrop(FieldBits blender, FieldBits leftOnes, FieldBits rightOnes)
     {
