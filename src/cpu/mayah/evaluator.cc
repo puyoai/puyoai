@@ -259,6 +259,8 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& re
 {
     sc_->addScore(MAX_CHAINS, rensaResult.chains, 1);
 
+    // TODO(mayah): I think this calculation is wrong. Maybe we need more accurate one.
+    // This might cause more SUKI than necessary.
     int totalNecessaryPuyos = PuyoPossibility::necessaryPuyos(totalPuyoSet, 0.5);
     sc_->addScore(NECESSARY_PUYOS_LINEAR, totalNecessaryPuyos);
     sc_->addScore(NECESSARY_PUYOS_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
