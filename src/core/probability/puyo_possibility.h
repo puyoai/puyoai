@@ -1,11 +1,11 @@
-#ifndef CORE_ALGORITHM_PUYO_POSSIBILITY_H_
-#define CORE_ALGORITHM_PUYO_POSSIBILITY_H_
+#ifndef CORE_PROBABILITY_PUYO_POSSIBILITY_H_
+#define CORE_PROBABILITY_PUYO_POSSIBILITY_H_
 
 #include <glog/logging.h>
 
 #include <algorithm>
 
-#include "core/algorithm/puyo_set.h"
+#include "core/probability/puyo_set.h"
 
 class KumipuyoSeq;
 
@@ -59,4 +59,4 @@ private:
     static double s_possibility[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
 };
 
-#endif
+#endif // CORE_PROBABILITY_PUYO_POSSIBILITY_H_

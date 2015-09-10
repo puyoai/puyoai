@@ -6,7 +6,7 @@
 
 #include "base/file.h"
 #include "base/strings.h"
-#include "core/algorithm/puyo_possibility.h"
+#include "core/probability/puyo_possibility.h"
 #include "solver/problem.h"
 #include "solver/solver.h"
 

@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "base/noncopyable.h"
-#include "core/algorithm/puyo_set.h"
 #include "core/client/ai/ai.h"
+#include "core/probability/puyo_set.h"
 
 #include "rensa_hand_tree.h"
 

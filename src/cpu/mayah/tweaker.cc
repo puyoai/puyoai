@@ -12,8 +12,8 @@
 #include <glog/logging.h>
 
 #include "base/executor.h"
-#include "core/algorithm/puyo_possibility.h"
 #include "core/kumipuyo_seq_generator.h"
+#include "core/probability/puyo_possibility.h"
 #include "solver/endless.h"
 #include "solver/puyop.h"
 

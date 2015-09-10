@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 2.8)
 
-add_library(puyoai_core_algorithm
-            plan.cc
-            rensa_detector.cc)
+add_library(puyoai_core_probability
+            puyo_possibility.cc
+            puyo_set.cc)
 
 # ----------------------------------------------------------------------
 # test
 
-function(puyoai_core_algorithm_add_test target)
+function(puyoai_core_probability_add_test target)
     add_executable(${target}_test ${target}_test.cc)
     target_link_libraries(${target}_test gtest gtest_main)
-    target_link_libraries(${target}_test puyoai_core_algorithm)
+    target_link_libraries(${target}_test puyoai_core_probability)
     target_link_libraries(${target}_test puyoai_core)
     target_link_libraries(${target}_test puyoai_base)
     puyoai_target_link_libraries(${target}_test)
@@ -19,8 +19,5 @@ function(puyoai_core_algorithm_add_test target)
     endif()
 endfunction()
 
-puyoai_core_algorithm_add_test(plan)
-puyoai_core_algorithm_add_test(rensa_detector)
-
-puyoai_core_algorithm_add_test(plan_performance 1)
-puyoai_core_algorithm_add_test(rensa_detector_performance 1)
+puyoai_core_probability_add_test(puyo_possibility)
+puyoai_core_probability_add_test(puyo_set)

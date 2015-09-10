@@ -11,12 +11,12 @@
 
 #include "base/time.h"
 #include "core/algorithm/plan.h"
-#include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/field_checker.h"
 #include "core/position.h"
+#include "core/probability/puyo_possibility.h"
 #include "core/rensa_result.h"
 #include "core/score.h"
 

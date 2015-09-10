@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 
 #include "base/executor.h"
-#include "core/algorithm/puyo_possibility.h"
 #include "core/frame_request.h"
 #include "core/kumipuyo_seq.h"
+#include "core/probability/puyo_possibility.h"
 
 using namespace std;
 

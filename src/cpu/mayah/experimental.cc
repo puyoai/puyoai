@@ -7,7 +7,6 @@
 #include "base/executor.h"
 #include "base/wait_group.h"
 #include "core/algorithm/plan.h"
-#include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/client/ai/ai.h"
 #include "core/core_field.h"
@@ -16,6 +15,7 @@
 #include "core/field_pretty_printer.h"
 #include "core/kumipuyo_seq_generator.h"
 #include "core/pattern/decision_book.h"
+#include "core/probability/puyo_possibility.h"
 #include "solver/endless.h"
 #include "solver/puyop.h"
 
