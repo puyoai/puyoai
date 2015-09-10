@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "core/algorithm/puyo_set.h"
 #include "core/core_field.h"
 #include "core/frame.h"
 #include "core/kumipuyo_seq.h"
+#include "core/probability/puyo_set.h"
 #include "core/rensa_result.h"
 #include "core/rensa_tracker/rensa_coef_tracker.h"
 

@@ -1,5 +1,5 @@
-#ifndef CORE_ALGORITHM_PUYO_SET_H_
-#define CORE_ALGORITHM_PUYO_SET_H_
+#ifndef CORE_PROBABILITY_PUYO_SET_H_
+#define CORE_PROBABILITY_PUYO_SET_H_
 
 #include <stdio.h>
 #include <string>
@@ -136,4 +136,4 @@ private:
     int green_ = 0;
 };
 
-#endif
+#endif // CORE_PROBABILITY_PUYO_SET_H_

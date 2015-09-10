@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 add_subdirectory(algorithm)
 add_subdirectory(client)
 add_subdirectory(pattern)
+add_subdirectory(probability)
 add_subdirectory(rensa_tracker)
 add_subdirectory(server)
 

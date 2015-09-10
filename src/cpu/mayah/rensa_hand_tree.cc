@@ -3,11 +3,11 @@
 #include <iostream>
 #include <sstream>
 
-#include "core/algorithm/puyo_set.h"
-#include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/core_field.h"
 #include "core/frame.h"
+#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set.h"
 
 using namespace std;
 

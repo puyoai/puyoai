@@ -9,7 +9,6 @@
 
 #include "base/strings.h"
 #include "base/time.h"
-#include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/rensa_detector.h"
 #include "core/core_field.h"
@@ -17,6 +16,7 @@
 #include "core/frame_request.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_seq_generator.h"
+#include "core/probability/puyo_possibility.h"
 #include "solver/problem.h"
 
 #include "evaluator.h"

@@ -9,8 +9,8 @@
 #include "base/time.h"
 #include "base/wait_group.h"
 #include "core/algorithm/plan.h"
-#include "core/algorithm/puyo_possibility.h"
 #include "core/frame_request.h"
+#include "core/probability/puyo_possibility.h"
 
 #include "decision_planner.h"
 #include "evaluation_parameter.h"

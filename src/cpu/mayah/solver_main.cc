@@ -5,7 +5,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "core/algorithm/puyo_possibility.h"
+#include "core/probability/puyo_possibility.h"
 #include "solver/solver.h"
 
 using namespace std;

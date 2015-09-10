@@ -1,4 +1,4 @@
-#include "core/algorithm/puyo_set.h"
+#include "core/probability/puyo_set.h"
 
 #include <gtest/gtest.h>
 

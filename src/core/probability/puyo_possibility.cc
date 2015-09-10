@@ -1,4 +1,4 @@
-#include "core/algorithm/puyo_possibility.h"
+#include "core/probability/puyo_possibility.h"
 
 #include <algorithm>
 

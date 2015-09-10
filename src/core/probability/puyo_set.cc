@@ -1,4 +1,4 @@
-#include "core/algorithm/puyo_set.h"
+#include "core/probability/puyo_set.h"
 
 #include "core/column_puyo_list.h"
 #include "core/column_puyo.h"
