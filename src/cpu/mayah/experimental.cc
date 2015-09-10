@@ -4,15 +4,20 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "base/executor.h"
+#include "base/wait_group.h"
 #include "core/algorithm/plan.h"
 #include "core/algorithm/puyo_possibility.h"
 #include "core/algorithm/rensa_detector.h"
+#include "core/client/ai/ai.h"
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/field_constant.h"
 #include "core/field_pretty_printer.h"
 #include "core/kumipuyo_seq_generator.h"
 #include "core/pattern/decision_book.h"
+#include "solver/endless.h"
+#include "solver/puyop.h"
 
 #include "evaluator.h"
 #include "pattern_book.h"
@@ -24,9 +29,12 @@ DEFINE_string(feature, "feature.toml", "the path to feature parameter");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
 
-using namespace std;
+DEFINE_int32(initial_beam_width, 100, "");
+DEFINE_int32(beam_width, 100, "beam width");
+DEFINE_int32(beam_depth, 10, "beam depth");
+DEFINE_int32(beam_num, 8, "beam iteration number");
 
-const int BEAM_WIDTH = 1000;
+using namespace std;
 
 struct State {
     State(const CoreField& field, const Decision& firstDecision, double stateScore, int maxChains) :
@@ -41,19 +49,30 @@ struct State {
     int maxChains = 0;
 };
 
-class BeamMayahAI {
-public:
-    BeamMayahAI();
+struct SearchResult {
+    set<Decision> firstDecisions;
+    int maxChains = 0;
+};
 
-    int run(const KumipuyoSeq&);
+class BeamMayahAI : public AI {
+public:
+    BeamMayahAI(int argc, char* argv[]);
+
+    DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
+                       const PlayerState& me, const PlayerState& enemy, bool fast) const override;
+
+    SearchResult run(const CoreField&, const KumipuyoSeq&) const;
 
 private:
     EvaluationParameterMap evaluationParameterMap_;
     DecisionBook decisionBook_;
     PatternBook patternBook_;
+    unique_ptr<Executor> executor_;
 };
 
-BeamMayahAI::BeamMayahAI()
+BeamMayahAI::BeamMayahAI(int argc, char* argv[]) :
+    AI(argc, argv, "mayah-beam"),
+    executor_(Executor::makeDefaultExecutor())
 {
     CHECK(decisionBook_.load(FLAGS_decision_book));
     CHECK(patternBook_.load(FLAGS_pattern_book));
@@ -67,20 +86,57 @@ BeamMayahAI::BeamMayahAI()
         return;
 }
 
-int BeamMayahAI::run(const KumipuyoSeq& originalSeq)
+DropDecision BeamMayahAI::think(int /*frameId*/, const CoreField& field, const KumipuyoSeq& seq,
+                                const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
-    int overallMaxFiredRensa = 0;
+    // Decision -> max chains
+    map<Decision, int> score;
+
+    WaitGroup wg;
+    mutex mu;
+
+    for (int k = 0; k < FLAGS_beam_num; ++k) {
+        wg.add(1);
+        executor_->submit([&]() {
+            SearchResult searchResult = run(field, seq);
+
+            lock_guard<mutex> lk(mu);
+            for (const auto& d : searchResult.firstDecisions) {
+                score[d] += searchResult.maxChains;
+            }
+            wg.done();
+        });
+    }
+
+    wg.waitUntilDone();
+
+    Decision d;
+    int s = 0;
+    for (const auto& entry : score) {
+        if (s < entry.second) {
+            s = entry.second;
+            d = entry.first;
+        }
+    }
+
+    return DropDecision(d, "");
+}
+
+SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq& originalSeq) const
+{
+    SearchResult result;
 
     KumipuyoSeq seq(originalSeq);
+    seq.append(KumipuyoSeqGenerator::generateRandomSequence(40));
 
     vector<State> currentStates;
-    Plan::iterateAvailablePlans(CoreField(), seq, 1, [&](const RefPlan& plan) {
+    Plan::iterateAvailablePlans(originalField, seq, 1, [&](const RefPlan& plan) {
         currentStates.emplace_back(plan.field(), plan.firstDecision(), 0, 0);
     });
 
     vector<State> nextStates;
     nextStates.reserve(100000);
-    for (int turn = 1; turn < 40; ++turn) {
+    for (int turn = 1; turn < FLAGS_beam_depth; ++turn) {
         seq.dropFront();
 
         unordered_set<size_t> visited;
@@ -89,7 +145,6 @@ int BeamMayahAI::run(const KumipuyoSeq& originalSeq)
         int maxFiredRensa = 0;
 
         for (const State& s : currentStates) {
-
             vector<int> matchablePatternIds;
             for (size_t i = 0; i < patternBook_.size(); ++i) {
                 const PatternBookField& pbf = patternBook_.patternBookField(i);
@@ -108,7 +163,15 @@ int BeamMayahAI::run(const KumipuyoSeq& originalSeq)
                 if (plan.isRensaPlan()) {
                     maxFiredScore = std::max(maxFiredScore, plan.rensaResult().score);
                     maxFiredRensa = std::max(maxFiredRensa, plan.rensaResult().chains);
-                    overallMaxFiredRensa = std::max(overallMaxFiredRensa, plan.rensaResult().chains);
+#if 0
+                    if (maxFiredRensa > result.maxChains) {
+                        result.maxChains = maxFiredRensa;
+                        result.firstDecisions.clear();
+                        result.firstDecisions.insert(s.firstDecision);
+                    } else if (maxFiredRensa == result.maxChains) {
+                        result.firstDecisions.insert(s.firstDecision);
+                    }
+#endif
                     nextStates.emplace_back(field, s.firstDecision, plan.rensaResult().chains, plan.rensaResult().chains);
                     return;
                 }
@@ -168,15 +231,23 @@ int BeamMayahAI::run(const KumipuyoSeq& originalSeq)
         }
 
         std::sort(nextStates.begin(), nextStates.end(), std::greater<State>());
-        if (nextStates.size() > BEAM_WIDTH) {
-            nextStates.erase(nextStates.begin() + BEAM_WIDTH, nextStates.end());
+
+        int beamWidth = FLAGS_beam_width;
+        if (turn <= 2) {
+            beamWidth = FLAGS_initial_beam_width;
+        }
+
+        if (nextStates.size() > static_cast<size_t>(beamWidth)) {
+            nextStates.erase(nextStates.begin() + beamWidth, nextStates.end());
         }
         std::swap(currentStates, nextStates);
         nextStates.clear();
 
+#if 0
         cout << "turn=" << turn
              << " score=" << currentStates.front().stateScore
              << " chains=" << currentStates.front().maxChains
+             << " first=" << currentStates.front().firstDecision
              << " : fired_score=" << maxFiredScore
              << " fired_rensa=" << maxFiredRensa
              << endl;
@@ -189,13 +260,17 @@ int BeamMayahAI::run(const KumipuyoSeq& originalSeq)
         for (const auto& entry : m) {
             cout << entry.first << " " << entry.second << endl;
         }
+#endif
 
-#if 1
+#if 0
         FieldPrettyPrinter::print(currentStates.front().field.toPlainField(), KumipuyoSeq());
 #endif
+
     }
 
-    return overallMaxFiredRensa;
+    result.maxChains = 1;
+    result.firstDecisions.insert(currentStates.front().firstDecision);
+    return result;
 }
 
 int main(int argc, char* argv[])
@@ -205,19 +280,20 @@ int main(int argc, char* argv[])
     google::InstallFailureSignalHandler();
     PuyoPossibility::initialize();
 
-    BeamMayahAI ai;
-    map<int, int> rensa;
-    for (int i = 0; i < 100; ++i) {
-        KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
-        int r = ai.run(seq);
-        rensa[r] += 1;
+    unique_ptr<BeamMayahAI> ai(new BeamMayahAI(argc, argv));
+    Endless endless(std::move(ai));
+    endless.setVerbose(true);
+    //endless.setVerbose(FLAGS_show_field);
 
-        cout << "MAX FIRED RENSA : " << r << endl;
-    }
+    KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
+    EndlessResult result = endless.run(seq);
 
-    for (const auto& entry : rensa) {
-        cout << entry.first << " -> " << entry.second << endl;
-    }
+    cout << seq.toString() << endl;
+    cout << makePuyopURL(seq, result.decisions) << endl;
+    cout << "score = " << result.score << " rensa = " << result.maxRensa;
+    if (result.zenkeshi)
+        cout << " / ZENKESHI";
+    cout << endl;
 
     return 0;
 }
