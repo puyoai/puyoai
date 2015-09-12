@@ -87,7 +87,7 @@ BeamMayahAI::BeamMayahAI(int argc, char* argv[]) :
 }
 
 DropDecision BeamMayahAI::think(int /*frameId*/, const CoreField& field, const KumipuyoSeq& seq,
-                                const PlayerState& me, const PlayerState& enemy, bool fast) const
+                                const PlayerState& /*me*/, const PlayerState& /*enemy*/, bool /*fast*/) const
 {
     // Decision -> max chains
     map<Decision, int> score;
