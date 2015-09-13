@@ -14,6 +14,9 @@ public:
     static const int MAX_K = 32;
     static const int MAX_N = 16;
 
+    // Before using this class, you should call this.
+    static void initialize();
+
     // Returns the possibility that when there are randomly |k| puyos,
     // that set will contain |puyoSet|.
     static double possibility(const PuyoSet& puyoSet, int k)
@@ -51,8 +54,6 @@ public:
     // Returns the number of puyos to get |PuyoSet| with possibility |threshold|.
     // Some of kumipuyo seq is provided.
     static int necessaryPuyos(const PuyoSet&, const KumipuyoSeq&, double threshold);
-
-    static void initialize();
 
 private:
     static bool s_initialized;
