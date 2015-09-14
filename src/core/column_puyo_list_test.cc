@@ -9,6 +9,24 @@ TEST(ColumnPuyoListTest, constructor)
     EXPECT_TRUE(cpl.isEmpty());
 }
 
+TEST(ColumnPuyoListTest, copy)
+{
+    ColumnPuyoList cpl;
+    cpl.add(1, PuyoColor::RED);
+    cpl.add(1, PuyoColor::BLUE);
+    cpl.add(3, PuyoColor::RED);
+    cpl.add(3, PuyoColor::RED);
+
+    ColumnPuyoList copied(cpl);
+
+    for (int x = 1; x <= 6; ++x) {
+        EXPECT_EQ(cpl.sizeOn(x), copied.sizeOn(x));
+        for (int i = 0; i < cpl.sizeOn(x); ++i) {
+            EXPECT_EQ(cpl.get(x, i), copied.get(x, i));
+        }
+    }
+}
+
 TEST(ColumnPuyoListTest, add)
 {
     ColumnPuyoList cpl;
