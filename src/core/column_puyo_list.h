@@ -32,6 +32,13 @@ public:
         return puyos_[x-1][i];
     }
 
+    PuyoColor top(int x) const
+    {
+        DCHECK(1 <= x && x <= 6) << x;
+        DCHECK(sizeOn(x) >= 1) << sizeOn(x);
+        return get(x, sizeOn(x) - 1);
+    }
+
     bool isEmpty() const { return size() == 0; }
     int size() const { return size_[0] + size_[1] + size_[2] + size_[3] + size_[4] + size_[5]; }
     void clear() { std::fill(size_, size_ + 6, 0); }
