@@ -132,6 +132,26 @@ void PuyoPossibility::initializePuyoSetProbability()
 void PuyoPossibility::initializeColumnPuyoListProbability()
 {
     s_m[ColumnPuyoList()] = 0;
+
+    std::function<void (ColumnPuyoList& cpl, int, int)> f;
+    f = [&](ColumnPuyoList& cpl, int leftX, int rest) {
+        if (rest == 0)
+            return;
+
+        for (int x = leftX; x <= 6; ++x) {
+            for (PuyoColor c : NORMAL_PUYO_COLORS) {
+                cpl.add(x, c);
+                necessaryPuyos(cpl);
+                f(cpl, x, rest - 1);
+                cpl.removeTopFrom(x);
+            }
+        }
+    };
+
+    // TODO(mayah): slow. We'd like to have rest = 6 for cache, but it takes about 7 seconds
+    // to calculate now.
+    ColumnPuyoList cpl;
+    f(cpl, 1, 3);
 }
 
 // static
