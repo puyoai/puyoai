@@ -9,12 +9,22 @@ using namespace std;
 bool PuyoPossibility::s_initialized = false;
 double PuyoPossibility::s_possibility[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
 
+std::unordered_map<ColumnPuyoList, double> PuyoPossibility::s_m;
+
+// static
 void PuyoPossibility::initialize()
 {
     if (s_initialized)
         return;
 
     s_initialized = true;
+    initializePuyoSetProbability();
+    initializeColumnPuyoListProbability();
+}
+
+// static
+void PuyoPossibility::initializePuyoSetProbability()
+{
     auto p = new double[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
     auto q = new double[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
 
@@ -119,6 +129,12 @@ void PuyoPossibility::initialize()
 }
 
 // static
+void PuyoPossibility::initializeColumnPuyoListProbability()
+{
+    s_m[ColumnPuyoList()] = 0;
+}
+
+// static
 int PuyoPossibility::necessaryPuyos(const PuyoSet& puyoSet, const KumipuyoSeq& seq, double threshold)
 {
     PuyoSet ps(puyoSet);
@@ -131,4 +147,137 @@ int PuyoPossibility::necessaryPuyos(const PuyoSet& puyoSet, const KumipuyoSeq& s
     }
 
     return seq.size() * 2 + necessaryPuyos(ps, threshold);
+}
+
+// static
+double PuyoPossibility::necessaryPuyos(const ColumnPuyoList& cpl)
+{
+    ColumnPuyoList cplReverse;
+    for (int x = 1; x <= 6; ++x) {
+        for (int j = cpl.sizeOn(x) - 1; j >= 0; --j) {
+            cplReverse.add(x, cpl.get(x, j));
+        }
+    }
+
+    return necessaryPuyosReverse(cplReverse);
+}
+
+// static
+double PuyoPossibility::necessaryPuyosReverse(const ColumnPuyoList& cpl)
+{
+    // for child state i:
+    // transition possibility: p_i
+    // the necessary puyos: s_i
+    //
+    // s = (1 + \sum p_i s_i) / \sum p_i
+
+    auto it = s_m.find(cpl);
+    if (it != s_m.end())
+        return it->second;
+
+    static const Kumipuyo kumipuyos[] = {
+        Kumipuyo(PuyoColor::RED, PuyoColor::RED),
+        Kumipuyo(PuyoColor::RED, PuyoColor::BLUE),
+        Kumipuyo(PuyoColor::RED, PuyoColor::YELLOW),
+        Kumipuyo(PuyoColor::RED, PuyoColor::GREEN),
+        Kumipuyo(PuyoColor::BLUE, PuyoColor::RED),
+        Kumipuyo(PuyoColor::BLUE, PuyoColor::BLUE),
+        Kumipuyo(PuyoColor::BLUE, PuyoColor::YELLOW),
+        Kumipuyo(PuyoColor::BLUE, PuyoColor::GREEN),
+        Kumipuyo(PuyoColor::YELLOW, PuyoColor::RED),
+        Kumipuyo(PuyoColor::YELLOW, PuyoColor::BLUE),
+        Kumipuyo(PuyoColor::YELLOW, PuyoColor::YELLOW),
+        Kumipuyo(PuyoColor::YELLOW, PuyoColor::GREEN),
+        Kumipuyo(PuyoColor::GREEN, PuyoColor::RED),
+        Kumipuyo(PuyoColor::GREEN, PuyoColor::BLUE),
+        Kumipuyo(PuyoColor::GREEN, PuyoColor::YELLOW),
+        Kumipuyo(PuyoColor::GREEN, PuyoColor::GREEN),
+    };
+
+    double s = 16;
+    int puttableCount = 0;
+    for (const auto& kp : kumipuyos) {
+
+        double p = numeric_limits<double>::infinity();
+        bool puttable = false;
+        bool used = false;
+
+        // put vertically
+        for (int x = 1; x <= 6; ++x) {
+            if (cpl.sizeOn(x) >= 2) {
+                if ((cpl.get(x, cpl.sizeOn(x) - 1) == kp.axis && cpl.get(x, cpl.sizeOn(x) - 2) == kp.child) ||
+                    (cpl.get(x, cpl.sizeOn(x) - 1) == kp.child && cpl.get(x, cpl.sizeOn(x) - 2) == kp.axis)) {
+                    // ok
+                    puttable = true;
+                    used = true;
+
+                    ColumnPuyoList tmp(cpl);
+                    tmp.removeTopFrom(x);
+                    tmp.removeTopFrom(x);
+                    p = std::min(p, necessaryPuyosReverse(tmp));
+                }
+            } else if (cpl.sizeOn(x) == 1) {
+                if (cpl.top(x) == kp.axis || cpl.top(x) == kp.child) {
+                    // ok
+                    puttable = true;
+                    used = true;
+
+                    ColumnPuyoList tmp(cpl);
+                    tmp.removeTopFrom(x);
+                    p = std::min(p, necessaryPuyosReverse(tmp));
+                }
+            } else {
+                // ok, but not used.
+                puttable = true;
+            }
+        }
+
+        // put horizontally
+        for (int x = 1; x <= 5; ++x) {
+            if (cpl.sizeOn(x) >= 1 && cpl.sizeOn(x + 1) >= 1) {
+                if ((cpl.top(x) == kp.axis && cpl.top(x + 1) == kp.child) || (cpl.top(x) == kp.child && cpl.top(x + 1) == kp.axis)) {
+                    puttable = true;
+                    used = true;
+
+                    ColumnPuyoList tmp(cpl);
+                    tmp.removeTopFrom(x);
+                    tmp.removeTopFrom(x + 1);
+                    p = std::min(p, necessaryPuyosReverse(tmp));
+                }
+            } else if (cpl.sizeOn(x) >= 1 && cpl.sizeOn(x + 1) == 0) {
+                if (cpl.top(x) == kp.axis || cpl.top(x) == kp.child) {
+                    puttable = true;
+                    used = true;
+
+                    ColumnPuyoList tmp(cpl);
+                    tmp.removeTopFrom(x);
+                    p = std::min(p, necessaryPuyosReverse(tmp));
+                }
+            }
+        }
+
+        if (cpl.sizeOn(5) == 0 && cpl.sizeOn(6) >= 1) {
+            if (cpl.top(6) == kp.axis || cpl.top(6) == kp.child) {
+                puttable = true;
+                used = true;
+
+                ColumnPuyoList tmp(cpl);
+                tmp.removeTopFrom(6);
+                p = std::min(p, necessaryPuyosReverse(tmp));
+            }
+        }
+
+        if (!puttable) {
+            return numeric_limits<double>::infinity();
+        }
+
+        if (used) {
+            s += p;
+            puttableCount += 1;
+        }
+    }
+
+    double p = s / puttableCount;
+    s_m[cpl] = p;
+    return p;
 }

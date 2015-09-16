@@ -4,7 +4,9 @@
 #include <glog/logging.h>
 
 #include <algorithm>
+#include <unordered_map>
 
+#include "core/column_puyo_list.h"
 #include "core/probability/puyo_set.h"
 
 class KumipuyoSeq;
@@ -51,13 +53,23 @@ public:
         return MAX_K;
     }
 
+    // Returns the expected numbef of kumipuyos to fill ColumnPuyoList.
+    // NOTE: currently this is not thread-safe.
+    static double necessaryPuyos(const ColumnPuyoList&);
+
     // Returns the number of puyos to get |PuyoSet| with possibility |threshold|.
     // Some of kumipuyo seq is provided.
     static int necessaryPuyos(const PuyoSet&, const KumipuyoSeq&, double threshold);
 
 private:
+    static void initializePuyoSetProbability();
+    static void initializeColumnPuyoListProbability();
+
+    static double necessaryPuyosReverse(const ColumnPuyoList&);
+
     static bool s_initialized;
     static double s_possibility[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
+    static std::unordered_map<ColumnPuyoList, double> s_m;
 };
 
 #endif // CORE_PROBABILITY_PUYO_POSSIBILITY_H_
