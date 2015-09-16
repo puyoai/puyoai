@@ -4,6 +4,8 @@
 
 #include "core/kumipuyo_seq.h"
 
+using namespace std;
+
 TEST(PuyoPossibilityTest, possibility)
 {
     PuyoPossibility::initialize();
@@ -93,4 +95,18 @@ TEST(PuyoPossibilityTest, necessaryPuyosWithKumipuyoSeq)
     EXPECT_EQ(2, PuyoPossibility::necessaryPuyos(PuyoSet(2, 0, 0, 0), KumipuyoSeq("RR"), 1.0));
 
     EXPECT_EQ(9, PuyoPossibility::necessaryPuyos(PuyoSet(2, 0, 0, 0), KumipuyoSeq("GG"), 0.5));
+}
+
+TEST(PuyoPossibilityTest, necessaryPuyosWithColumnPuyoList)
+{
+    PuyoPossibility::initialize();
+
+    ColumnPuyoList cpl;
+    EXPECT_DOUBLE_EQ(0, PuyoPossibility::necessaryPuyos(cpl));
+
+    cpl.add(1, PuyoColor::RED);
+    EXPECT_DOUBLE_EQ(16.0 / 7, PuyoPossibility::necessaryPuyos(cpl));
+
+    cpl.add(2, PuyoColor::RED);
+    EXPECT_DOUBLE_EQ(13.0 * 16 / 49, PuyoPossibility::necessaryPuyos(cpl));
 }
