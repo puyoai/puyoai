@@ -7,5 +7,10 @@ struct noncopyable {
     noncopyable& operator=(const noncopyable&) = delete;
 };
 
-#endif
+struct nonmovable {
+    nonmovable() = default;
+    nonmovable(nonmovable&&) = delete;
+    nonmovable& operator=(nonmovable&&) = delete;
+};
 
+#endif
