@@ -13,14 +13,18 @@ namespace file {
 
 string joinPath(const string& lhs, const string& rhs)
 {
-    string s = lhs + "/" + rhs;
-    char* x = realpath(s.c_str(), nullptr);
-    if (!x)
-        return string();
+    if (lhs.empty())
+        return rhs;
+    if (rhs.empty())
+        return lhs;
 
-    string result(x);
-    free(x);
-    return result;
+    if (lhs.back() == '/' && rhs.front() == '/')
+        return lhs + rhs.substr(1);
+
+    if (lhs.back() != '/' && rhs.front() != '/')
+        return lhs + "/" + rhs;
+
+    return lhs + rhs;
 }
 
 string joinPath(const string& p1, const string& p2, const string& p3)
