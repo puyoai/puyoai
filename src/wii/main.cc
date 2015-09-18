@@ -15,6 +15,7 @@
 #include "capture/movie_source.h"
 #include "capture/movie_source_key_listener.h"
 #include "core/server/commentator.h"
+#include "core/server/game_state_recorder.h"
 #include "gui/commentator_drawer.h"
 #include "gui/decision_drawer.h"
 #include "gui/frame_number_drawer.h"
@@ -44,6 +45,7 @@ DEFINE_string(source, "syntek",
 DEFINE_int32(fps, 60, "FPS");
 DEFINE_bool(ignore_sigpipe, false, "ignore SIGPIPE");
 DEFINE_bool(use_commentator, false, "use commentator");
+DEFINE_bool(use_game_state_recorder, true, "use game state recorder");
 
 #if USE_AUDIO_COMMENTATOR
 DEFINE_bool(use_audio, false, "use audio commentator");
@@ -204,6 +206,13 @@ int main(int argc, char* argv[])
     if (audioServer.get())
         audioServer->start();
 #endif
+
+    unique_ptr<GameStateRecorder> gameStateRecorder;
+    if (FLAGS_use_game_state_recorder) {
+        gameStateRecorder.reset(new GameStateRecorder("/tmp"));
+    }
+    if (gameStateRecorder.get())
+        server.addObserver(gameStateRecorder.get());
 
     source->start();
     server.start();
