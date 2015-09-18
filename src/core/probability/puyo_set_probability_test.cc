@@ -96,17 +96,3 @@ TEST(PuyoSetProbabilityTest, necessaryPuyosWithKumipuyoSeq)
 
     EXPECT_EQ(9, PuyoSetProbability::necessaryPuyos(PuyoSet(2, 0, 0, 0), KumipuyoSeq("GG"), 0.5));
 }
-
-TEST(PuyoSetProbabilityTest, necessaryPuyosWithColumnPuyoList)
-{
-    PuyoSetProbability::initialize();
-
-    ColumnPuyoList cpl;
-    EXPECT_DOUBLE_EQ(0, PuyoSetProbability::necessaryPuyos(cpl));
-
-    cpl.add(1, PuyoColor::RED);
-    EXPECT_DOUBLE_EQ(16.0 / 7, PuyoSetProbability::necessaryPuyos(cpl));
-
-    cpl.add(2, PuyoColor::RED);
-    EXPECT_DOUBLE_EQ(13.0 * 16 / 49, PuyoSetProbability::necessaryPuyos(cpl));
-}
