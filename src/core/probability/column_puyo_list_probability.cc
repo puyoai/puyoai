@@ -1,6 +1,8 @@
 #include "core/probability/column_puyo_list_probability.h"
 
+#include <fstream>
 #include <limits>
+#include <iostream>
 
 #include "core/kumipuyo.h"
 
@@ -105,6 +107,7 @@ static double necessaryPuyosReverse(const ColumnPuyoList& cpl, unordered_map<Col
         }
 
         if (!puttable) {
+            (*m)[cpl] = numeric_limits<double>::infinity();
             return numeric_limits<double>::infinity();
         }
 
@@ -124,26 +127,86 @@ static double necessaryPuyosReverse(const ColumnPuyoList& cpl, unordered_map<Col
     return p;
 }
 
-static void iter(int n, int leftX, ColumnPuyoList& cpl, unordered_map<ColumnPuyoList, double>* m)
+static void iter(int n, int leftX, ColumnPuyoList* cpl, unordered_map<ColumnPuyoList, double>* m)
 {
-    necessaryPuyosReverse(cpl, m);
+    necessaryPuyosReverse(*cpl, m);
 
     for (int x = leftX; x <= 6; ++x) {
         for (PuyoColor c : NORMAL_PUYO_COLORS) {
-            cpl.add(x, c);
+            cpl->add(x, c);
             if (n > 0)
                 iter(n - 1, x, cpl, m);
-            cpl.removeTopFrom(x);
+            cpl->removeTopFrom(x);
+        }
+    }
+}
+
+static void iterForSave(int n, int leftX, ColumnPuyoList* cpl, const unordered_map<ColumnPuyoList, double>& m,
+                        vector<double>* vs, size_t* index)
+{
+    auto it = m.find(*cpl);
+    CHECK(it != m.end()) << cpl->toString();
+    (*vs)[*index] = it->second;
+    *index += 1;
+
+    for (int x = leftX; x <= 6; ++x) {
+        for (PuyoColor c : NORMAL_PUYO_COLORS) {
+            cpl->add(x, c);
+            if (n > 0)
+                iterForSave(n - 1, x, cpl, m, vs, index);
+            cpl->removeTopFrom(x);
+        }
+    }
+}
+
+static void iterForLoad(int n, int leftX, ColumnPuyoList* cpl, unordered_map<ColumnPuyoList, double>* m,
+                        const vector<double>& vs, size_t* index)
+{
+    (*m)[*cpl] = vs[*index];
+    *index += 1;
+
+    for (int x = leftX; x <= 6; ++x) {
+        for (PuyoColor c : NORMAL_PUYO_COLORS) {
+            cpl->add(x, c);
+            if (n > 0)
+                iterForLoad(n - 1, x, cpl, m, vs, index);
+            cpl->removeTopFrom(x);
         }
     }
 }
 
 ColumnPuyoListProbability::ColumnPuyoListProbability()
 {
+    const int N = 6;
+    const string filename = "column-puyo-possibility-" + std::to_string(N) + ".dat";
+
+    // try to read
+
+    ifstream ifs(filename);
+    if (ifs) {
+        ifstream::pos_type begin = ifs.tellg();
+        ifs.seekg(0, fstream::end);
+        ifstream::pos_type end = ifs.tellg();
+        ifs.seekg(0, fstream::beg);
+        ifs.clear();
+
+        size_t size = end - begin;
+        vector<double> vs(size / sizeof(double));
+        ifs.read(reinterpret_cast<char*>(vs.data()), size);
+
+        size_t index = 0;
+        ColumnPuyoList initial;
+        iterForLoad(N, 1, &initial, &m_, vs, &index);
+
+        return;
+    }
+
     unordered_map<ColumnPuyoList, double> reverseMap;
     ColumnPuyoList initial;
     reverseMap[initial] = 0.0;
-    iter(5, 1, initial, &reverseMap);
+    iter(N, 1, &initial, &reverseMap);
+
+    CHECK(initial.size() == 0);
 
     //
     for (const auto& entry : reverseMap) {
@@ -156,6 +219,16 @@ ColumnPuyoListProbability::ColumnPuyoListProbability()
 
         m_[cpl] = entry.second;
     }
+
+    vector<double> vs(m_.size());
+    size_t index = 0;
+    iterForSave(N, 1, &initial, m_, &vs, &index);
+    CHECK(initial.size() == 0);
+
+    CHECK_EQ(vs.size(), index);
+
+    ofstream ofs(filename);
+    ofs.write(reinterpret_cast<char*>(vs.data()), sizeof(double) * vs.size());
 }
 
 // static

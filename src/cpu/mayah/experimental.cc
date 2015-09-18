@@ -209,7 +209,7 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
                     rensaEvaluator.evalRensaValleyDepth(complementedField);
                     rensaEvaluator.evalRensaFieldUShape(complementedField);
                     rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, ignitionPuyoBits);
-                    rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyoSet);
+                    rensaEvaluator.evalRensaChainFeature(rensaResult, puyosToComplement);
                     rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
                     rensaEvaluator.evalPatternScore(puyosToComplement, patternScore, rensaResult.chains);
                     rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, ignitionPuyoBits); // fieldBeforeRensa is correct.

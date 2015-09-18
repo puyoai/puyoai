@@ -6,6 +6,7 @@
 #include <glog/logging.h>
 
 #include "core/probability/puyo_set_probability.h"
+#include "core/probability/column_puyo_list_probability.h"
 
 using namespace std;
 
@@ -18,6 +19,8 @@ int main(int argc, char* argv[])
     google::InstallFailureSignalHandler();
 
     PuyoSetProbability::initialize();
+    // initialize ColumnPuyoListProbability here.
+    (void)ColumnPuyoListProbability::instanceSlow();
 
     LOG(INFO) << "num_threads = " << FLAGS_num_threads;
 

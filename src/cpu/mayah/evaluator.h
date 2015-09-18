@@ -12,7 +12,6 @@ class ColumnPuyoList;
 class CoreField;
 class GazeResult;
 class KumipuyoSeq;
-class PuyoSet;
 class RefPlan;
 
 struct PlayerState;
@@ -101,7 +100,7 @@ public:
 
     void evalPatternScore(const ColumnPuyoList& puyosToComplement, double patternScore, int chains);
     void evalRensaScore(double score, double virtualScore);
-    void evalRensaChainFeature(const RensaResult&, const PuyoSet&);
+    void evalRensaChainFeature(const RensaResult&, const ColumnPuyoList&);
     void evalRensaGarbage(const CoreField& fieldAfterRensa);
     void evalFirePointTabooFeature(const CoreField&, const FieldBits& ignitionPuyoBits);
     void evalRensaIgnitionHeightFeature(const CoreField&, const FieldBits& ignitionPuyoBits);
