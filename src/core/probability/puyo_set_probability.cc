@@ -200,17 +200,17 @@ double PuyoSetProbability::necessaryPuyosReverse(const ColumnPuyoList& cpl)
         Kumipuyo(PuyoColor::RED, PuyoColor::BLUE),
         Kumipuyo(PuyoColor::RED, PuyoColor::YELLOW),
         Kumipuyo(PuyoColor::RED, PuyoColor::GREEN),
-        Kumipuyo(PuyoColor::BLUE, PuyoColor::RED),
+        // Kumipuyo(PuyoColor::BLUE, PuyoColor::RED),
         Kumipuyo(PuyoColor::BLUE, PuyoColor::BLUE),
         Kumipuyo(PuyoColor::BLUE, PuyoColor::YELLOW),
         Kumipuyo(PuyoColor::BLUE, PuyoColor::GREEN),
-        Kumipuyo(PuyoColor::YELLOW, PuyoColor::RED),
-        Kumipuyo(PuyoColor::YELLOW, PuyoColor::BLUE),
+        // Kumipuyo(PuyoColor::YELLOW, PuyoColor::RED),
+        // Kumipuyo(PuyoColor::YELLOW, PuyoColor::BLUE),
         Kumipuyo(PuyoColor::YELLOW, PuyoColor::YELLOW),
         Kumipuyo(PuyoColor::YELLOW, PuyoColor::GREEN),
-        Kumipuyo(PuyoColor::GREEN, PuyoColor::RED),
-        Kumipuyo(PuyoColor::GREEN, PuyoColor::BLUE),
-        Kumipuyo(PuyoColor::GREEN, PuyoColor::YELLOW),
+        //Kumipuyo(PuyoColor::GREEN, PuyoColor::RED),
+        //Kumipuyo(PuyoColor::GREEN, PuyoColor::BLUE),
+        //Kumipuyo(PuyoColor::GREEN, PuyoColor::YELLOW),
         Kumipuyo(PuyoColor::GREEN, PuyoColor::GREEN),
     };
 
@@ -292,8 +292,13 @@ double PuyoSetProbability::necessaryPuyosReverse(const ColumnPuyoList& cpl)
         }
 
         if (used) {
-            s += p;
-            puttableCount += 1;
+            if (kp.axis == kp.child) {
+                s += p;
+                puttableCount += 1;
+            } else {
+                s += p * 2;
+                puttableCount += 2;
+            }
         }
     }
 
