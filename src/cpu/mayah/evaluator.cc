@@ -16,6 +16,7 @@
 #include "core/decision.h"
 #include "core/field_checker.h"
 #include "core/position.h"
+#include "core/probability/column_puyo_list_probability.h"
 #include "core/probability/puyo_set_probability.h"
 #include "core/rensa_result.h"
 #include "core/score.h"
@@ -255,15 +256,16 @@ void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan,
 
 template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& rensaResult,
-                                                           const PuyoSet& totalPuyoSet)
+                                                           const ColumnPuyoList& cplToComplement)
 {
     sc_->addScore(MAX_CHAINS, rensaResult.chains, 1);
 
     // TODO(mayah): I think this calculation is wrong. Maybe we need more accurate one.
     // This might cause more SUKI than necessary.
-    int totalNecessaryPuyos = PuyoSetProbability::necessaryPuyos(totalPuyoSet, 0.5);
-    sc_->addScore(NECESSARY_PUYOS_LINEAR, totalNecessaryPuyos);
-    sc_->addScore(NECESSARY_PUYOS_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
+    double numKumipuyos = ColumnPuyoListProbability::instanceSlow()->necessaryKumipuyos(cplToComplement);
+    double numPuyos = numKumipuyos * 2;
+    sc_->addScore(NECESSARY_PUYOS_LINEAR, numPuyos);
+    sc_->addScore(NECESSARY_PUYOS_SQUARE, numPuyos * numPuyos);
 }
 
 template<typename ScoreCollector>
@@ -562,7 +564,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         rensaEvaluator.evalRensaValleyDepth(complementedField);
         rensaEvaluator.evalRensaFieldUShape(complementedField);
         rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, ignitionPuyoBits);
-        rensaEvaluator.evalRensaChainFeature(rensaResult, necessaryPuyoSet);
+        rensaEvaluator.evalRensaChainFeature(rensaResult, puyosToComplement);
         rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
         rensaEvaluator.evalPatternScore(puyosToComplement, patternScore, rensaResult.chains);
         rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, ignitionPuyoBits); // fieldBeforeRensa is correct.
