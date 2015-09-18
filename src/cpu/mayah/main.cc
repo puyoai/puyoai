@@ -5,7 +5,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 
 using namespace std;
 
@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    PuyoPossibility::initialize();
+    PuyoSetProbability::initialize();
 
     LOG(INFO) << "num_threads = " << FLAGS_num_threads;
 

@@ -7,7 +7,7 @@
 
 #include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 
 using namespace std;
 
@@ -15,7 +15,7 @@ class RensaHandTreePerformanceTest : public testing::Test {
 public:
     RensaHandTreePerformanceTest()
     {
-        PuyoPossibility::initialize();
+        PuyoSetProbability::initialize();
     }
 };
 

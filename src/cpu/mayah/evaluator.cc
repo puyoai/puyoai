@@ -16,7 +16,7 @@
 #include "core/decision.h"
 #include "core/field_checker.h"
 #include "core/position.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 #include "core/rensa_result.h"
 #include "core/score.h"
 
@@ -261,7 +261,7 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& re
 
     // TODO(mayah): I think this calculation is wrong. Maybe we need more accurate one.
     // This might cause more SUKI than necessary.
-    int totalNecessaryPuyos = PuyoPossibility::necessaryPuyos(totalPuyoSet, 0.5);
+    int totalNecessaryPuyos = PuyoSetProbability::necessaryPuyos(totalPuyoSet, 0.5);
     sc_->addScore(NECESSARY_PUYOS_LINEAR, totalNecessaryPuyos);
     sc_->addScore(NECESSARY_PUYOS_SQUARE, totalNecessaryPuyos * totalNecessaryPuyos);
 }
@@ -552,7 +552,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         ++rensaCounts[rensaResult.chains];
 
         const PuyoSet necessaryPuyoSet(puyosToComplement);
-        const double possibility = PuyoPossibility::possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
+        const double possibility = PuyoSetProbability::possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
         const double virtualRensaScore = rensaResult.score * possibility;
 
         RensaScoreCollector rensaScoreCollector(sc_->mainRensaParamSet(), sc_->sideRensaParamSet());
@@ -608,7 +608,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         }
 #endif
 
-        int nessesaryPuyos = PuyoPossibility::necessaryPuyos(necessaryPuyoSet, restSeq, 0.5);
+        int nessesaryPuyos = PuyoSetProbability::necessaryPuyos(necessaryPuyoSet, restSeq, 0.5);
         if (nessesaryPuyos <= 6 && fastChain6MaxScore < rensaResult.score) {
             fastChain6MaxScore = rensaResult.score;
         }

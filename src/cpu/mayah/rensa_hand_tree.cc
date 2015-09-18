@@ -6,7 +6,7 @@
 #include "core/algorithm/rensa_detector.h"
 #include "core/core_field.h"
 #include "core/frame.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 #include "core/probability/puyo_set.h"
 
 using namespace std;
@@ -344,7 +344,7 @@ RensaResult RensaHandNodeMaker::add(CoreField&& cf,
     PuyoSet wholeUsedPuyoSet(usedPuyoSet);
     wholeUsedPuyoSet.add(puyosToComplement);
 
-    int necessaryPuyos = PuyoPossibility::necessaryPuyos(wholeUsedPuyoSet, kumipuyoSeq_, 0.5);
+    int necessaryPuyos = PuyoSetProbability::necessaryPuyos(wholeUsedPuyoSet, kumipuyoSeq_, 0.5);
     int necessaryHands = (necessaryPuyos + 1) / 2;
 
     // Estimate the number of frames to initiate this rensa.

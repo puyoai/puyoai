@@ -13,7 +13,7 @@
 
 #include "base/executor.h"
 #include "core/kumipuyo_seq_generator.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 #include "solver/endless.h"
 #include "solver/puyop.h"
 
@@ -275,7 +275,7 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    PuyoPossibility::initialize();
+    PuyoSetProbability::initialize();
 
     unique_ptr<Executor> executor = Executor::makeDefaultExecutor();
 

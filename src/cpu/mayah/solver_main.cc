@@ -5,7 +5,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 #include "solver/solver.h"
 
 using namespace std;
@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    PuyoPossibility::initialize();
+    PuyoSetProbability::initialize();
 
     if (argc < 2) {
         cerr << "Usage: " << argv[0] << " <problem>" << endl;

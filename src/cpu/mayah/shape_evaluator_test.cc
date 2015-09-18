@@ -8,7 +8,7 @@
 #include "core/algorithm/plan.h"
 #include "core/core_field.h"
 #include "core/decision.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 
 #include "evaluation_parameter.h"
 #include "score_collector.h"
@@ -19,7 +19,7 @@ class ShapeEvaluatorTest : public testing::Test {
 protected:
     template<typename F>
     CollectedFeatureScore withEvaluator(F f) {
-        PuyoPossibility::initialize();
+        PuyoSetProbability::initialize();
 
         EvaluationParameterMap evaluationParameterMap;
         FeatureScoreCollector sc(evaluationParameterMap);

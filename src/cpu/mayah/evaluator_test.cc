@@ -6,7 +6,7 @@
 #include "core/algorithm/plan.h"
 #include "core/core_field.h"
 #include "core/decision.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 #include "gazer.h"
 
 using namespace std;
@@ -15,7 +15,7 @@ class EvaluatorTest : public testing::Test {
 protected:
     CollectedFeatureScore eval(const CoreField& f, int numIteration = 1)
     {
-        PuyoPossibility::initialize();
+        PuyoSetProbability::initialize();
 
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
@@ -39,7 +39,7 @@ protected:
 
     template<typename F>
     CollectedFeatureScore withEvaluator(F f) {
-        PuyoPossibility::initialize();
+        PuyoSetProbability::initialize();
 
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
@@ -53,7 +53,7 @@ protected:
 
     template<typename F>
     CollectedFeatureScore withRensaEvaluator(F f) {
-        PuyoPossibility::initialize();
+        PuyoSetProbability::initialize();
 
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
