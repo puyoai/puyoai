@@ -3,7 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 add_subdirectory(connector)
 
 add_library(puyoai_core_server
-            commentator.cc game_state.cc)
+            commentator.cc
+            game_state.cc
+            game_state_recorder.cc)
 
 function(puyoai_core_server_add_test target)
     add_executable(${target}_test ${target}_test.cc)
