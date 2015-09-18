@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_core_probability
-            puyo_possibility.cc
+            puyo_set_probability.cc
             puyo_set.cc)
 
 # ----------------------------------------------------------------------
@@ -19,5 +19,5 @@ function(puyoai_core_probability_add_test target)
     endif()
 endfunction()
 
-puyoai_core_probability_add_test(puyo_possibility)
+puyoai_core_probability_add_test(puyo_set_probability)
 puyoai_core_probability_add_test(puyo_set)

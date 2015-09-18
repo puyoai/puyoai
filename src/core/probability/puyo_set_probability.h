@@ -11,7 +11,7 @@
 
 class KumipuyoSeq;
 
-class PuyoPossibility {
+class PuyoSetProbability {
 public:
     static const int MAX_K = 32;
     static const int MAX_N = 16;

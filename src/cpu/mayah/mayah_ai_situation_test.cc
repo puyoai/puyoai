@@ -6,7 +6,7 @@
 
 #include "base/file.h"
 #include "base/strings.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 #include "solver/problem.h"
 #include "solver/solver.h"
 
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
     testing::InitGoogleTest(&argc, argv);
     google::ParseCommandLineFlags(&argc, &argv, true);
 
-    PuyoPossibility::initialize();
+    PuyoSetProbability::initialize();
 
     return RUN_ALL_TESTS();
 }

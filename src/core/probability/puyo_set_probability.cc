@@ -1,4 +1,4 @@
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 
 #include <algorithm>
 
@@ -6,13 +6,13 @@
 
 using namespace std;
 
-bool PuyoPossibility::s_initialized = false;
-double PuyoPossibility::s_possibility[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
+bool PuyoSetProbability::s_initialized = false;
+double PuyoSetProbability::s_possibility[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
 
-std::unordered_map<ColumnPuyoList, double> PuyoPossibility::s_m;
+std::unordered_map<ColumnPuyoList, double> PuyoSetProbability::s_m;
 
 // static
-void PuyoPossibility::initialize()
+void PuyoSetProbability::initialize()
 {
     if (s_initialized)
         return;
@@ -23,7 +23,7 @@ void PuyoPossibility::initialize()
 }
 
 // static
-void PuyoPossibility::initializePuyoSetProbability()
+void PuyoSetProbability::initializePuyoSetProbability()
 {
     auto p = new double[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
     auto q = new double[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
@@ -129,7 +129,7 @@ void PuyoPossibility::initializePuyoSetProbability()
 }
 
 // static
-void PuyoPossibility::initializeColumnPuyoListProbability()
+void PuyoSetProbability::initializeColumnPuyoListProbability()
 {
     s_m[ColumnPuyoList()] = 0;
 
@@ -155,7 +155,7 @@ void PuyoPossibility::initializeColumnPuyoListProbability()
 }
 
 // static
-int PuyoPossibility::necessaryPuyos(const PuyoSet& puyoSet, const KumipuyoSeq& seq, double threshold)
+int PuyoSetProbability::necessaryPuyos(const PuyoSet& puyoSet, const KumipuyoSeq& seq, double threshold)
 {
     PuyoSet ps(puyoSet);
 
@@ -170,7 +170,7 @@ int PuyoPossibility::necessaryPuyos(const PuyoSet& puyoSet, const KumipuyoSeq& s
 }
 
 // static
-double PuyoPossibility::necessaryPuyos(const ColumnPuyoList& cpl)
+double PuyoSetProbability::necessaryPuyos(const ColumnPuyoList& cpl)
 {
     ColumnPuyoList cplReverse;
     for (int x = 1; x <= 6; ++x) {
@@ -183,7 +183,7 @@ double PuyoPossibility::necessaryPuyos(const ColumnPuyoList& cpl)
 }
 
 // static
-double PuyoPossibility::necessaryPuyosReverse(const ColumnPuyoList& cpl)
+double PuyoSetProbability::necessaryPuyosReverse(const ColumnPuyoList& cpl)
 {
     // for child state i:
     // transition possibility: p_i

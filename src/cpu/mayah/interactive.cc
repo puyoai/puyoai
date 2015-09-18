@@ -16,7 +16,7 @@
 #include "core/frame_request.h"
 #include "core/kumipuyo.h"
 #include "core/kumipuyo_seq_generator.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 #include "solver/problem.h"
 
 #include "evaluator.h"
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
-    PuyoPossibility::initialize();
+    PuyoSetProbability::initialize();
 
     InteractiveAI ai(argc, argv);
     if (FLAGS_tokopuyo) {

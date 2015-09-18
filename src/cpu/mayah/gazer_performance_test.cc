@@ -10,7 +10,7 @@
 #include "core/core_field.h"
 #include "core/frame_request.h"
 #include "core/kumipuyo_seq.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 
 #include "mayah_ai.h"
 
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
     testing::InitGoogleTest(&argc, argv);
     google::ParseCommandLineFlags(&argc, &argv, true);
 
-    PuyoPossibility::initialize();
+    PuyoSetProbability::initialize();
 
     return RUN_ALL_TESTS();
 }

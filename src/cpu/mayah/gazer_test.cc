@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "core/kumipuyo_seq.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 
 using namespace std;
 
@@ -12,7 +12,7 @@ class GazerTest : public testing::Test {
 protected:
     virtual void SetUp() override
     {
-        PuyoPossibility::initialize();
+        PuyoSetProbability::initialize();
         gazer_.reset(new Gazer());
         gazer_->initialize(100);
     }

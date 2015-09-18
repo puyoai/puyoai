@@ -7,7 +7,7 @@
 
 #include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ class RensaHandTreeTest : public testing::Test {
 public:
     RensaHandTreeTest()
     {
-        PuyoPossibility::initialize();
+        PuyoSetProbability::initialize();
     }
 };
 
@@ -79,7 +79,7 @@ TEST(RensaHandTreeTest, eval_saisoku)
 
 TEST(RensaHandTreeTest, eval_actual1)
 {
-    PuyoPossibility::initialize();
+    PuyoSetProbability::initialize();
 
     const CoreField cf1(
         ".....R"
@@ -114,7 +114,7 @@ TEST(RensaHandTreeTest, eval_actual1)
 
 TEST(RensaHandTreeTest, eval_actual2)
 {
-    PuyoPossibility::initialize();
+    PuyoSetProbability::initialize();
 
     const CoreField cf1(
         "......"

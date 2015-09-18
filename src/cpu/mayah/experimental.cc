@@ -15,7 +15,7 @@
 #include "core/field_pretty_printer.h"
 #include "core/kumipuyo_seq_generator.h"
 #include "core/pattern/decision_book.h"
-#include "core/probability/puyo_possibility.h"
+#include "core/probability/puyo_set_probability.h"
 #include "solver/endless.h"
 #include "solver/puyop.h"
 
@@ -199,7 +199,7 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
                     FieldBits ignitionPuyoBits = complementedField.ignitionPuyoBits();
 
                     const PuyoSet necessaryPuyoSet(puyosToComplement);
-                    const double possibility = PuyoPossibility::possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
+                    const double possibility = PuyoSetProbability::possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
                     const double virtualRensaScore = rensaResult.score * possibility;
 
                     SimpleRensaScoreCollector rensaScoreCollector(sc.mainRensaParamSet(), sc.sideRensaParamSet());
@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
-    PuyoPossibility::initialize();
+    PuyoSetProbability::initialize();
 
     unique_ptr<BeamMayahAI> ai(new BeamMayahAI(argc, argv));
     Endless endless(std::move(ai));
