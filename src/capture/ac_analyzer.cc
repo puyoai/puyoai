@@ -12,6 +12,7 @@
 using namespace std;
 
 DEFINE_string(recognition_dir, RECOGNITION_DIR, "the directory path to recognition dir.");
+DEFINE_bool(strict_ojama_recognition, true, "use strict ojama recognition.");
 
 namespace {
 const int BOX_THRESHOLD = 15;
@@ -310,7 +311,15 @@ unique_ptr<DetectedField> ACAnalyzer::detectField(int pi,
         Box left = BoundingBox::boxForAnalysis(pi, 1, 0);
         Box right = BoundingBox::boxForAnalysis(pi, 6, 0);
         Box b = Box(left.sx, left.sy, right.dx, right.dy);
-        bool detected = detectOjamaDrop(surface, prev2Surface, b) && detectOjamaDrop(surface, prev3Surface, b);
+
+        bool detected = false;
+        if (FLAGS_strict_ojama_recognition) {
+            detected = detectOjamaDrop(surface, prev2Surface, b) && detectOjamaDrop(surface, prev3Surface, b);
+        } else {
+            detected = detectOjamaDrop(surface, prev2Surface, b);
+        }
+
+
         result->setOjamaDropDetected(detected);
     }
 
