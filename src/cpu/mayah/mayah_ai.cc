@@ -108,7 +108,14 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     if (kumipuyoSeq.size() < 2) {
         LOG(ERROR) << "The size of kumipuyoSeq is " << kumipuyoSeq.size() << ", which is < 2.";
-        // This shouldn't happen.
+        // TODO(mayah): This shouldn't happen. However, this happens on wii.
+        CoreField cf(field);
+        Decision d(1, 1);
+        vector<Decision> decisions { d };
+
+        ThoughtResult tr(Plan(cf, decisions, RensaResult(), 0, 0, 0, 0, 0, 0, 0, false),
+                         0.0, 0.0, MidEvalResult(), "Invalid KumipuyoSeq.");
+        return tr;
     }
 
     if (usesDecisionBook_ && !enemy.hasZenkeshi) {
