@@ -180,8 +180,9 @@ ColumnPuyoListProbability::ColumnPuyoListProbability()
     const int N = 6;
     const string filename = "column-puyo-possibility-" + std::to_string(N) + ".dat";
 
-    // try to read
+    m_.reserve(1000000);
 
+    // try to read from the file.
     ifstream ifs(filename);
     if (ifs) {
         ifstream::pos_type begin = ifs.tellg();
@@ -202,6 +203,7 @@ ColumnPuyoListProbability::ColumnPuyoListProbability()
     }
 
     unordered_map<ColumnPuyoList, double> reverseMap;
+    reverseMap.reserve(1000000);
     ColumnPuyoList initial;
     reverseMap[initial] = 0.0;
     iter(N, 1, &initial, &reverseMap);
