@@ -55,7 +55,10 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
         if (!cf.vanishDropFast(&tracker)) {
             CoreField tmp(originalField_);
             tmp.dropPuyoListWithMaxHeight(cpl, maxHeight);
-            CHECK(false) << tmp.toDebugString();
+
+            // TODO(mayah): This shouldn't happen. However, this sometimes triggered now.
+            LOG(ERROR) << tmp.toDebugString();
+            continue;
         }
 
         // For here, we don't need to make AND to RensaExistingPositionTracker.
