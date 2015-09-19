@@ -177,7 +177,10 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
             continue;
 
         RensaExistingPositionTracker tracker(currentFieldTracker);
-        CHECK(cf.vanishDropFast(&tracker));
+        if (!cf.vanishDropFast(&tracker)) {
+            LOG(ERROR) << cf.toDebugString();
+            continue;
+        }
 
         iteratePossibleRensasInternal(cf, tracker, currentChains + 1, firePuyo, keyPuyos,
                                       restIteration - 1,
