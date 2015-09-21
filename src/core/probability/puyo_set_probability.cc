@@ -1,6 +1,7 @@
 #include "core/probability/puyo_set_probability.h"
 
 #include <algorithm>
+#include <memory>
 
 #include "core/kumipuyo_seq.h"
 
