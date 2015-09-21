@@ -19,8 +19,6 @@ class ShapeEvaluatorTest : public testing::Test {
 protected:
     template<typename F>
     CollectedFeatureScore withEvaluator(F f) {
-        PuyoSetProbability::initialize();
-
         EvaluationParameterMap evaluationParameterMap;
         FeatureScoreCollector sc(evaluationParameterMap);
         ShapeEvaluator<FeatureScoreCollector> evaluator(&sc);

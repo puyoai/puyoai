@@ -26,14 +26,6 @@ RensaHand makePlainRensaHand(int chains)
     return RensaHand(IgnitionRensaResult(rensaResult, 0, NUM_FRAMES_OF_ONE_HAND), coefResult);
 }
 
-class RensaHandTreeTest : public testing::Test {
-public:
-    RensaHandTreeTest()
-    {
-        PuyoSetProbability::initialize();
-    }
-};
-
 TEST(RensaHandTreeTest, eval_empty)
 {
     RensaHandTree empty;
@@ -79,8 +71,6 @@ TEST(RensaHandTreeTest, eval_saisoku)
 
 TEST(RensaHandTreeTest, eval_actual1)
 {
-    PuyoSetProbability::initialize();
-
     const CoreField cf1(
         ".....R"
         "....GR"
@@ -114,8 +104,6 @@ TEST(RensaHandTreeTest, eval_actual1)
 
 TEST(RensaHandTreeTest, eval_actual2)
 {
-    PuyoSetProbability::initialize();
-
     const CoreField cf1(
         "......"
         "......"

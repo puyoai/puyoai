@@ -6,22 +6,22 @@
 #include <algorithm>
 #include <unordered_map>
 
+#include "base/noncopyable.h"
 #include "core/column_puyo_list.h"
 #include "core/probability/puyo_set.h"
 
 class KumipuyoSeq;
 
-class PuyoSetProbability {
+class PuyoSetProbability : noncopyable, nonmovable {
 public:
-    static const int MAX_K = 32;
-    static const int MAX_N = 16;
+    // Returns PuyoSetProbability instance. This might take time.
+    static const PuyoSetProbability* instanceSlow();
 
-    // Before using this class, you should call this.
-    static void initialize();
+    PuyoSetProbability();
 
     // Returns the possibility that when there are randomly |k| puyos,
     // that set will contain |puyoSet|.
-    static double possibility(const PuyoSet& puyoSet, int k)
+    double possibility(const PuyoSet& puyoSet, int k) const
     {
         int a = std::min(MAX_N - 1, puyoSet.red());
         int b = std::min(MAX_N - 1, puyoSet.blue());
@@ -29,21 +29,20 @@ public:
         int d = std::min(MAX_N - 1, puyoSet.green());
         int kk = std::min(MAX_K - 1, k);
 
-        return s_possibility[a][b][c][d][kk];
+        return p_[a][b][c][d][kk];
     }
 
     // Returns how many puyos are required to get |puyoSet| with possibility |threshold|?
-    static int necessaryPuyos(const PuyoSet& puyoSet, double threshold)
+    int necessaryPuyos(const PuyoSet& puyoSet, double threshold) const
     {
-        DCHECK(s_initialized) << "TsumoPossibility is not initialized.";
-        DCHECK(0 <= threshold && threshold <= 1.0);
+        DCHECK(0 <= threshold && threshold <= 1.0) << threshold;
 
         int a = std::min(MAX_N - 1, puyoSet.red());
         int b = std::min(MAX_N - 1, puyoSet.blue());
         int c = std::min(MAX_N - 1, puyoSet.yellow());
         int d = std::min(MAX_N - 1, puyoSet.green());
 
-        double* p = s_possibility[a][b][c][d];
+        const double* p = p_[a][b][c][d];
 
         for (int k = 0; k < MAX_K; ++k) {
             if (p[k] >= threshold)
@@ -55,16 +54,13 @@ public:
 
     // Returns the number of puyos to get |PuyoSet| with possibility |threshold|.
     // Some of kumipuyo seq is provided.
-    static int necessaryPuyos(const PuyoSet&, const KumipuyoSeq&, double threshold);
+    int necessaryPuyos(const PuyoSet&, const KumipuyoSeq&, double threshold) const;
 
 private:
-    static void initializePuyoSetProbability();
+    static const int MAX_N = 16;
+    static const int MAX_K = 32;
 
-    static double necessaryPuyosReverse(const ColumnPuyoList&);
-
-    static bool s_initialized;
-    static double s_possibility[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
-    static std::unordered_map<ColumnPuyoList, double> s_m;
+    double p_[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
 };
 
 #endif // CORE_PROBABILITY_PUYO_POSSIBILITY_H_

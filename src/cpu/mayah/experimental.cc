@@ -199,7 +199,7 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
                     FieldBits ignitionPuyoBits = complementedField.ignitionPuyoBits();
 
                     const PuyoSet necessaryPuyoSet(puyosToComplement);
-                    const double possibility = PuyoSetProbability::possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
+                    const double possibility = PuyoSetProbability::instanceSlow()->possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
                     const double virtualRensaScore = rensaResult.score * possibility;
 
                     SimpleRensaScoreCollector rensaScoreCollector(sc.mainRensaParamSet(), sc.sideRensaParamSet());
@@ -278,7 +278,6 @@ int main(int argc, char* argv[])
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
-    PuyoSetProbability::initialize();
 
     unique_ptr<BeamMayahAI> ai(new BeamMayahAI(argc, argv));
     Endless endless(std::move(ai));

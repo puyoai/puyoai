@@ -16,8 +16,6 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    PuyoSetProbability::initialize();
-
     if (argc < 2) {
         cerr << "Usage: " << argv[0] << " <problem>" << endl;
         return 1;

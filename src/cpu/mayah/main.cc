@@ -18,8 +18,8 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
-    PuyoSetProbability::initialize();
-    // initialize ColumnPuyoListProbability here.
+    // initialize PuyoSetProbability and ColumnPuyoListProbability here.
+    (void)PuyoSetProbability::instanceSlow();
     (void)ColumnPuyoListProbability::instanceSlow();
 
     LOG(INFO) << "num_threads = " << FLAGS_num_threads;

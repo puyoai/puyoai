@@ -12,7 +12,6 @@ class GazerTest : public testing::Test {
 protected:
     virtual void SetUp() override
     {
-        PuyoSetProbability::initialize();
         gazer_.reset(new Gazer());
         gazer_->initialize(100);
     }
