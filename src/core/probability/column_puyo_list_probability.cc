@@ -236,7 +236,7 @@ ColumnPuyoListProbability::ColumnPuyoListProbability()
 // static
 const ColumnPuyoListProbability* ColumnPuyoListProbability::instanceSlow()
 {
-    static std::unique_ptr<ColumnPuyoListProbability> s_instance(new ColumnPuyoListProbability());
+    static std::unique_ptr<ColumnPuyoListProbability> s_instance(new ColumnPuyoListProbability);
     return s_instance.get();
 }
 

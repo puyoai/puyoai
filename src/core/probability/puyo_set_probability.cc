@@ -6,21 +6,7 @@
 
 using namespace std;
 
-bool PuyoSetProbability::s_initialized = false;
-double PuyoSetProbability::s_possibility[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
-
-// static
-void PuyoSetProbability::initialize()
-{
-    if (s_initialized)
-        return;
-
-    s_initialized = true;
-    initializePuyoSetProbability();
-}
-
-// static
-void PuyoSetProbability::initializePuyoSetProbability()
+PuyoSetProbability::PuyoSetProbability()
 {
     auto p = new double[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
     auto q = new double[MAX_N][MAX_N][MAX_N][MAX_N][MAX_K];
@@ -114,7 +100,7 @@ void PuyoSetProbability::initializePuyoSetProbability()
             for (int c = 0; c < MAX_N; ++c) {
                 for (int d = 0; d < MAX_N; ++d) {
                     for (int k = 0; k < MAX_K; ++k) {
-                        s_possibility[a][b][c][d][k] = p[a][b][c][d][k];
+                        p_[a][b][c][d][k] = p[a][b][c][d][k];
                     }
                 }
             }
@@ -125,8 +111,13 @@ void PuyoSetProbability::initializePuyoSetProbability()
     delete[] q;
 }
 
-// static
-int PuyoSetProbability::necessaryPuyos(const PuyoSet& puyoSet, const KumipuyoSeq& seq, double threshold)
+const PuyoSetProbability* PuyoSetProbability::instanceSlow()
+{
+    static std::unique_ptr<PuyoSetProbability> s_instance(new PuyoSetProbability);
+    return s_instance.get();
+}
+
+int PuyoSetProbability::necessaryPuyos(const PuyoSet& puyoSet, const KumipuyoSeq& seq, double threshold) const
 {
     PuyoSet ps(puyoSet);
 

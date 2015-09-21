@@ -15,8 +15,6 @@ class EvaluatorTest : public testing::Test {
 protected:
     CollectedFeatureScore eval(const CoreField& f, int numIteration = 1)
     {
-        PuyoSetProbability::initialize();
-
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
         Gazer gazer;
@@ -39,8 +37,6 @@ protected:
 
     template<typename F>
     CollectedFeatureScore withEvaluator(F f) {
-        PuyoSetProbability::initialize();
-
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
         FeatureScoreCollector sc(evaluationParameterMap);
@@ -53,8 +49,6 @@ protected:
 
     template<typename F>
     CollectedFeatureScore withRensaEvaluator(F f) {
-        PuyoSetProbability::initialize();
-
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
         FeatureScoreCollector sc(evaluationParameterMap);

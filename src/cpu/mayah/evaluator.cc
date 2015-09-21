@@ -554,7 +554,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         ++rensaCounts[rensaResult.chains];
 
         const PuyoSet necessaryPuyoSet(puyosToComplement);
-        const double possibility = PuyoSetProbability::possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
+        const PuyoSetProbability* psp = PuyoSetProbability::instanceSlow();
+        const double possibility = psp->possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
         const double virtualRensaScore = rensaResult.score * possibility;
 
         RensaScoreCollector rensaScoreCollector(sc_->mainRensaParamSet(), sc_->sideRensaParamSet());
@@ -610,11 +611,12 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         }
 #endif
 
-        int nessesaryPuyos = PuyoSetProbability::necessaryPuyos(necessaryPuyoSet, restSeq, 0.5);
-        if (nessesaryPuyos <= 6 && fastChain6MaxScore < rensaResult.score) {
+        const ColumnPuyoListProbability* cplp = ColumnPuyoListProbability::instanceSlow();
+        int necessaryKumipuyos = cplp->necessaryKumipuyos(puyosToComplement);
+        if (necessaryKumipuyos <= 3 && fastChain6MaxScore < rensaResult.score) {
             fastChain6MaxScore = rensaResult.score;
         }
-        if (nessesaryPuyos <= 10 && fastChain10MaxScore < rensaResult.score) {
+        if (necessaryKumipuyos <= 5 && fastChain10MaxScore < rensaResult.score) {
             fastChain10MaxScore = rensaResult.score;
         }
 
