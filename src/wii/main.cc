@@ -46,6 +46,7 @@ DEFINE_int32(fps, 60, "FPS");
 DEFINE_bool(ignore_sigpipe, false, "ignore SIGPIPE");
 DEFINE_bool(use_commentator, false, "use commentator");
 DEFINE_bool(use_game_state_recorder, true, "use game state recorder");
+DEFINE_string(record_dir, ".", "directory where game state is recorded");
 
 #if USE_AUDIO_COMMENTATOR
 DEFINE_bool(use_audio, false, "use audio commentator");
@@ -209,7 +210,7 @@ int main(int argc, char* argv[])
 
     unique_ptr<GameStateRecorder> gameStateRecorder;
     if (FLAGS_use_game_state_recorder) {
-        gameStateRecorder.reset(new GameStateRecorder("/tmp"));
+        gameStateRecorder.reset(new GameStateRecorder(FLAGS_record_dir));
     }
     if (gameStateRecorder.get())
         server.addObserver(gameStateRecorder.get());
