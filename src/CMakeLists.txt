@@ -73,7 +73,7 @@ puyoai_add_cxx_flags("-Wno-error=sign-compare")
 puyoai_add_cxx_flags("-march=native")
 
 puyoai_add_cxx_flags("-DSRC_DIR=\\\"${CMAKE_SOURCE_DIR}\\\"")
-puyoai_add_cxx_flags("-DTESTDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../testdata\\\"")
+puyoai_add_cxx_flags("-DTESTDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../test_resources\\\"")
 puyoai_add_cxx_flags("-DDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../data\\\"")
 puyoai_add_cxx_flags("-DRECOGNITION_DIR=\\\"${CMAKE_SOURCE_DIR}/../recognition\\\"")
 
