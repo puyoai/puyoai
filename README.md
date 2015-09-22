@@ -82,9 +82,14 @@ Debian 系 Linux の場合、apt を使うと楽です。
 
 cygwin で一応 build できることが確認されています。詳しくは、[cygwin でのビルド方法](doc/how-to-build-on-cygwin.md)を参照してください。
 
-### make のしかた
+### ビルドのしかた
 
-cmake を用いて Makefile を生成し、make することを前提にしています。
+一部のライブラリはsubmoduleを用いて管理しています。そこで、レポジトリをcloneした後で、submodule のアップデートが必要となります。ビルド前にまず次のコマンドを実行してください。
+
+    $ git submodule init
+    $ git submodule update
+
+ビルドでは、cmake を用いて Makefile を生成し、make することを前提にしています。
 
 out ディレクトリを掘って、そこでビルドするようにしてください。ビルドの種類によって、ディレクトリを分けると楽です。
 
@@ -120,7 +125,7 @@ out ディレクトリを掘って、そこでビルドするようにしてく�
 * SDL と SDL_ttf がない場合、`cmake` は成功しますが、GUIがつきません。
 * キャプチャ関連については、[capture/README.md](https://github.com/puyoai/puyoai/tree/master/src/capture) を参照してください。
 
-[build/](https://github.com/puyoai/puyoai/tree/master/build) 以下にいくつかビルド用のスクリプトが置かれていますが、`ninja` でビルドすることを前提にしています。
+[build/](https://github.com/puyoai/puyoai/tree/master/build) 以下にいくつかビルド用のスクリプトが置かれていますが、`ninja` でビルドすることを前提にしています。`ninja`の方が`make`よりもビルドが若干高速です。
 
 ### エラーがでた
 
