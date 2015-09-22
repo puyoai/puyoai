@@ -6,8 +6,8 @@
 #include <numeric>
 #include <sstream>
 
-#include "core/algorithm/plan.h"
-#include "core/algorithm/rensa_detector.h"
+#include "core/plan/plan.h"
+#include "core/rensa/rensa_detector.h"
 #include "core/kumipuyo_seq.h"
 #include "cpu/peria/control.h"
 #include "cpu/peria/evaluator.h"

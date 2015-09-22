@@ -1,5 +1,5 @@
-#ifndef CORE_ALGORITHM_RENSA_DETECTOR_STRATEGY_H_
-#define CORE_ALGORITHM_RENSA_DETECTOR_STRATEGY_H_
+#ifndef CORE_RENSA_RENSA_DETECTOR_STRATEGY_H_
+#define CORE_RENSA_RENSA_DETECTOR_STRATEGY_H_
 
 class RensaDetectorStrategy {
 public:
@@ -35,4 +35,4 @@ private:
     bool allowsPuttingKeyPuyoOn13thRow_;
 };
 
-#endif
+#endif // CORE_RENSA_RENSA_DETECTOR_STRATEGY_H_

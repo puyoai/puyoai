@@ -1,4 +1,4 @@
-#include "core/algorithm/plan.h"
+#include "core/plan/plan.h"
 
 #include <gtest/gtest.h>
 

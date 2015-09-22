@@ -1,10 +1,10 @@
-#ifndef CORE_ALGORITHM_RENSA_DETECTOR_H_
-#define CORE_ALGORITHM_RENSA_DETECTOR_H_
+#ifndef CORE_RENSA_RENSA_DETECTOR_H_
+#define CORE_RENSA_RENSA_DETECTOR_H_
 
 #include <functional>
 
 #include "base/base.h"
-#include "core/algorithm/rensa_detector_strategy.h"
+#include "core/rensa/rensa_detector_strategy.h"
 #include "core/core_field.h"
 #include "core/field_constant.h"
 #include "core/rensa_tracker/rensa_last_vanished_position_tracker.h"
@@ -116,4 +116,4 @@ private:
                                                   const ComplementCallback&);
 };
 
-#endif // CORE_ALGORITHM_RENSA_DETECTOR_H_
+#endif // CORE_RENSA_RENSA_DETECTOR_H_

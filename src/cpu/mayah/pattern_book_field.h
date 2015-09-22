@@ -9,7 +9,7 @@
 #include <toml/toml.h>
 
 #include "base/noncopyable.h"
-#include "core/algorithm/rensa_detector.h"
+#include "core/rensa/rensa_detector.h"
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
 #include "core/pattern/field_pattern.h"

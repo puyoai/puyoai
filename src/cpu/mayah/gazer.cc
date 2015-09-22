@@ -7,8 +7,8 @@
 
 #include <glog/logging.h>
 
-#include "core/algorithm/plan.h"
-#include "core/algorithm/rensa_detector.h"
+#include "core/plan/plan.h"
+#include "core/rensa/rensa_detector.h"
 #include "core/field_checker.h"
 #include "core/kumipuyo_seq.h"
 #include "core/probability/puyo_set_probability.h"

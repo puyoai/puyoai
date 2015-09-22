@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <array>
 
-#include "core/algorithm/plan.h"
+#include "core/plan/plan.h"
 #include "core/column_puyo_list.h"
 #include "core/rensa_result.h"
 #include "core/rensa_tracker/rensa_vanishing_position_tracker.h"

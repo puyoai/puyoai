@@ -1,5 +1,5 @@
-#ifndef CORE_ALGORITHM_PLAN_H_
-#define CORE_ALGORITHM_PLAN_H_
+#ifndef CORE_PLAN_PLAN_H_
+#define CORE_PLAN_PLAN_H_
 
 #include <functional>
 #include <string>
@@ -168,4 +168,4 @@ private:
     bool hasZenkeshi_;
 };
 
-#endif
+#endif // CORE_PLAN_PLAN_H_
