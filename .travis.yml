@@ -11,10 +11,6 @@ before_script:
   - sudo apt-get install -y libgflags-dev libgoogle-glog-dev
   - sudo apt-get install -y libstdc++-4.8-dev
   - sudo apt-get install -y ninja-build
-  - mkdir -p out/Debug
-  - cd out/Debug
-  - cmake -DCMAKE_BUILD_TYPE=DEBUG ../../src
-  - cd -
 
 script:
   - ./build/travis.sh
