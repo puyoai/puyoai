@@ -7,7 +7,7 @@
 
 #include "base/executor.h"
 #include "base/wait_group.h"
-#include "core/algorithm/plan.h"
+#include "core/plan/plan.h"
 #include "core/core_field.h"
 #include "core/kumipuyo_seq.h"
 #include "core/player_state.h"

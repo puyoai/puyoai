@@ -1,6 +1,6 @@
 #include "move_evaluator.h"
 
-#include "core/algorithm/plan.h"
+#include "core/plan/plan.h"
 
 #include "evaluation_parameter.h"
 #include "score_collector.h"

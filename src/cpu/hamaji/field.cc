@@ -12,7 +12,7 @@
 
 #include <glog/logging.h>
 
-#include "core/algorithm/rensa_detector.h"
+#include "core/rensa/rensa_detector.h"
 #include "core/column_puyo_list.h"
 #include "core/kumipuyo_seq.h"
 #include "core/puyo_controller.h"

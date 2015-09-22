@@ -3,7 +3,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "core/algorithm/rensa_detector.h"
+#include "core/rensa/rensa_detector.h"
 #include "core/core_field.h"
 #include "core/frame.h"
 #include "core/probability/column_puyo_list_probability.h"

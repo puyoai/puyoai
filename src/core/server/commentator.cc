@@ -18,8 +18,8 @@
 
 #include "base/base.h"
 #include "base/strings.h"
-#include "core/algorithm/plan.h"
-#include "core/algorithm/rensa_detector.h"
+#include "core/plan/plan.h"
+#include "core/rensa/rensa_detector.h"
 #include "core/server/game_state.h"
 
 using namespace std;

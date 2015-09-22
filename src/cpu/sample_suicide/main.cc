@@ -2,7 +2,7 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
-#include "core/algorithm/plan.h"
+#include "core/plan/plan.h"
 #include "core/client/ai/ai.h"
 #include "core/core_field.h"
 

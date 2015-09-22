@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 
-#include "core/algorithm/plan.h"
+#include "core/plan/plan.h"
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/probability/puyo_set_probability.h"

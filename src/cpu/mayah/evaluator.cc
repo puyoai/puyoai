@@ -10,8 +10,8 @@
 #include <glog/logging.h>
 
 #include "base/time.h"
-#include "core/algorithm/plan.h"
-#include "core/algorithm/rensa_detector.h"
+#include "core/plan/plan.h"
+#include "core/rensa/rensa_detector.h"
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/field_checker.h"

@@ -1,4 +1,4 @@
-#include "core/algorithm/plan.h"
+#include "core/plan/plan.h"
 
 #include <glog/logging.h>
 #include <iostream>

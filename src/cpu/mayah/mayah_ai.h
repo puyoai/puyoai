@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "base/executor.h"
-#include "core/algorithm/plan.h"
+#include "core/plan/plan.h"
 #include "core/client/ai/ai.h"
 #include "core/pattern/decision_book.h"
 

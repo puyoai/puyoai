@@ -6,8 +6,8 @@
 
 #include "base/executor.h"
 #include "base/wait_group.h"
-#include "core/algorithm/plan.h"
-#include "core/algorithm/rensa_detector.h"
+#include "core/plan/plan.h"
+#include "core/rensa/rensa_detector.h"
 #include "core/client/ai/ai.h"
 #include "core/core_field.h"
 #include "core/decision.h"

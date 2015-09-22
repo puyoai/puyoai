@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "core/algorithm/plan.h"
+#include "core/plan/plan.h"
 #include "core/core_field.h"
 
 #include "evaluation_parameter.h"

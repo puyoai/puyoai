@@ -1,4 +1,4 @@
-#include "core/algorithm/rensa_detector.h"
+#include "core/rensa/rensa_detector.h"
 
 #include <gtest/gtest.h>
 
