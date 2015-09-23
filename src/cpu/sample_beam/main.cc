@@ -5,7 +5,7 @@
 // #include <sstream>
 // #include <vector>
 
-// #include <gflags/gflags.h>
+#include <gflags/gflags.h>
 // #include <glog/logging.h>
 
 // #include "base/base.h"

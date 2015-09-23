@@ -4,6 +4,7 @@
 #include <limits>
 #include <iostream>
 
+#include "base/strings.h"
 #include "core/kumipuyo.h"
 
 using namespace std;
