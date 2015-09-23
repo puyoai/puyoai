@@ -9,6 +9,7 @@ public:
 
     constexpr KumipuyoPos() : x(0), y(0), r(0) {}
     constexpr KumipuyoPos(int x, int y, int r) : x(x), y(y), r(r) {}
+    KumipuyoPos(const std::string&);
 
     constexpr int axisX() const { return x; }
     constexpr int axisY() const { return y; }
@@ -31,6 +32,8 @@ public:
         return lhs.r < rhs.r;
     }
     friend bool operator>(const KumipuyoPos& lhs, const KumipuyoPos& rhs) { return rhs < lhs; }
+
+    std::string toString() const;
 
 public:
     // TODO(mayah): Make these private?
