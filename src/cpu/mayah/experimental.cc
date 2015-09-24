@@ -107,6 +107,7 @@ DropDecision BeamMayahAI::think(int /*frameId*/, const CoreField& field, const K
                     score[d] += searchResult.maxChains;
                 }
             }
+            // wg.done() should be called after releasing mu, because of deadlock.
             wg.done();
         });
     }
