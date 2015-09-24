@@ -62,6 +62,7 @@ public:
                        const PlayerState& me, const PlayerState& enemy, bool fast) const override;
 
     SearchResult run(const CoreField&, const KumipuyoSeq&) const;
+    pair<double, int> eval(const CoreField& fieldBeforeRensa, const vector<int>&) const;
 
 private:
     EvaluationParameterMap evaluationParameterMap_;
@@ -100,9 +101,11 @@ DropDecision BeamMayahAI::think(int /*frameId*/, const CoreField& field, const K
         executor_->submit([&]() {
             SearchResult searchResult = run(field, seq);
 
-            lock_guard<mutex> lk(mu);
-            for (const auto& d : searchResult.firstDecisions) {
-                score[d] += searchResult.maxChains;
+            {
+                lock_guard<mutex> lk(mu);
+                for (const auto& d : searchResult.firstDecisions) {
+                    score[d] += searchResult.maxChains;
+                }
             }
             wg.done();
         });
@@ -156,75 +159,19 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
 
             Plan::iterateAvailablePlans(s.field, seq, 1, [&](const RefPlan& plan) {
                 const CoreField& fieldBeforeRensa = plan.field();
-                const CoreField& field = plan.field();
-                if (!visited.insert(field.hash()).second)
+                if (!visited.insert(fieldBeforeRensa.hash()).second)
                     return;
 
                 if (plan.isRensaPlan()) {
                     maxFiredScore = std::max(maxFiredScore, plan.rensaResult().score);
                     maxFiredRensa = std::max(maxFiredRensa, plan.rensaResult().chains);
-#if 0
-                    if (maxFiredRensa > result.maxChains) {
-                        result.maxChains = maxFiredRensa;
-                        result.firstDecisions.clear();
-                        result.firstDecisions.insert(s.firstDecision);
-                    } else if (maxFiredRensa == result.maxChains) {
-                        result.firstDecisions.insert(s.firstDecision);
-                    }
-#endif
-                    nextStates.emplace_back(field, s.firstDecision, plan.rensaResult().chains, plan.rensaResult().chains);
+                    nextStates.emplace_back(fieldBeforeRensa, s.firstDecision, plan.rensaResult().chains, plan.rensaResult().chains);
                     return;
                 }
 
-                SimpleScoreCollector sc(evaluationParameterMap_);
-                ShapeEvaluator<SimpleScoreCollector>(&sc).eval(field);
-                const double shapeScore = sc.collectedScore().score(EvaluationMode::MIDDLE);
-
-                const int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
-
-                double maxScore = 0;
-                int maxChains = 0;
-                auto callback = [&](const CoreField& fieldAfterRensa,
-                                    const RensaResult& rensaResult,
-                                    const ColumnPuyoList& puyosToComplement,
-                                    PuyoColor /*firePuyoColor*/,
-                                    const std::string& /*patternName*/,
-                                    double patternScore) {
-                    maxChains = std::max(maxChains, rensaResult.chains);
-
-                    CoreField complementedField(fieldBeforeRensa);
-                    if (!complementedField.dropPuyoList(puyosToComplement))
-                        return;
-
-                    FieldBits ignitionPuyoBits = complementedField.ignitionPuyoBits();
-
-                    const PuyoSet necessaryPuyoSet(puyosToComplement);
-                    const double possibility = PuyoSetProbability::instanceSlow()->possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
-                    const double virtualRensaScore = rensaResult.score * possibility;
-
-                    SimpleRensaScoreCollector rensaScoreCollector(sc.mainRensaParamSet(), sc.sideRensaParamSet());
-                    RensaEvaluator<SimpleRensaScoreCollector> rensaEvaluator(patternBook_, &rensaScoreCollector);
-
-                    rensaEvaluator.evalRensaRidgeHeight(complementedField);
-                    rensaEvaluator.evalRensaValleyDepth(complementedField);
-                    rensaEvaluator.evalRensaFieldUShape(complementedField);
-                    rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, ignitionPuyoBits);
-                    rensaEvaluator.evalRensaChainFeature(rensaResult, puyosToComplement);
-                    rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
-                    rensaEvaluator.evalPatternScore(puyosToComplement, patternScore, rensaResult.chains);
-                    rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, ignitionPuyoBits); // fieldBeforeRensa is correct.
-                    rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
-                    rensaEvaluator.evalComplementationBias(puyosToComplement);
-                    rensaEvaluator.evalRensaScore(rensaResult.score, virtualRensaScore);
-                    // rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
-
-                    const double rensaScore = rensaScoreCollector.mainRensaScore().score(EvaluationMode::MIDDLE);
-
-                    double score = rensaScore + shapeScore;
-                    maxScore = std::max(maxScore, score);
-
-                };
-                PatternRensaDetector(patternBook_, field, callback).iteratePossibleRensas(matchablePatternIds, 2);
+                double maxScore;
+                int maxChains;
+                std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds);
 
                 nextStates.emplace_back(plan.field(), s.firstDecision, maxScore, maxChains);
             });
@@ -271,6 +218,61 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
     result.maxChains = 1;
     result.firstDecisions.insert(currentStates.front().firstDecision);
     return result;
+}
+
+pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const
+{
+    SimpleScoreCollector sc(evaluationParameterMap_);
+    ShapeEvaluator<SimpleScoreCollector>(&sc).eval(fieldBeforeRensa);
+    const double shapeScore = sc.collectedScore().score(EvaluationMode::MIDDLE);
+
+    const int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
+
+    double maxScore = 0;
+    int maxChains = 0;
+    auto callback = [&](const CoreField& fieldAfterRensa,
+                        const RensaResult& rensaResult,
+                        const ColumnPuyoList& puyosToComplement,
+                        PuyoColor /*firePuyoColor*/,
+                        const std::string& /*patternName*/,
+                        double patternScore) {
+        maxChains = std::max(maxChains, rensaResult.chains);
+
+        CoreField complementedField(fieldBeforeRensa);
+        if (!complementedField.dropPuyoList(puyosToComplement))
+            return;
+
+        FieldBits ignitionPuyoBits = complementedField.ignitionPuyoBits();
+
+        const PuyoSet necessaryPuyoSet(puyosToComplement);
+        const double possibility = PuyoSetProbability::instanceSlow()->possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
+        const double virtualRensaScore = rensaResult.score * possibility;
+
+        SimpleRensaScoreCollector rensaScoreCollector(sc.mainRensaParamSet(), sc.sideRensaParamSet());
+        RensaEvaluator<SimpleRensaScoreCollector> rensaEvaluator(patternBook_, &rensaScoreCollector);
+
+        rensaEvaluator.evalRensaRidgeHeight(complementedField);
+        rensaEvaluator.evalRensaValleyDepth(complementedField);
+        rensaEvaluator.evalRensaFieldUShape(complementedField);
+        rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, ignitionPuyoBits);
+        rensaEvaluator.evalRensaChainFeature(rensaResult, puyosToComplement);
+        rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
+        rensaEvaluator.evalPatternScore(puyosToComplement, patternScore, rensaResult.chains);
+        rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, ignitionPuyoBits); // fieldBeforeRensa is correct.
+        rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
+        rensaEvaluator.evalComplementationBias(puyosToComplement);
+        rensaEvaluator.evalRensaScore(rensaResult.score, virtualRensaScore);
+        // rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
+
+        const double rensaScore = rensaScoreCollector.mainRensaScore().score(EvaluationMode::MIDDLE);
+
+        double score = rensaScore + shapeScore;
+        maxScore = std::max(maxScore, score);
+
+    };
+    PatternRensaDetector(patternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, 2);
+
+    return make_pair(maxScore, maxChains);
 }
 
 int main(int argc, char* argv[])
