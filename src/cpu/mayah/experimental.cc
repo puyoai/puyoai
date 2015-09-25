@@ -31,7 +31,7 @@ DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to patt
 
 DEFINE_int32(initial_beam_width, 100, "");
 DEFINE_int32(beam_width, 100, "beam width");
-DEFINE_int32(beam_depth, 10, "beam depth");
+DEFINE_int32(beam_depth, 40, "beam depth");
 DEFINE_int32(beam_num, 8, "beam iteration number");
 
 using namespace std;
@@ -62,7 +62,9 @@ public:
                        const PlayerState& me, const PlayerState& enemy, bool fast) const override;
 
     SearchResult run(const CoreField&, const KumipuyoSeq&) const;
-    pair<double, int> eval(const CoreField& fieldBeforeRensa, const vector<int>&) const;
+    pair<double, int> eval(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const;
+
+    pair<double, int> evalLight(const CoreField& fieldBeforeRensa) const;
 
 private:
     EvaluationParameterMap evaluationParameterMap_;
@@ -150,12 +152,14 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
 
         for (const State& s : currentStates) {
             vector<int> matchablePatternIds;
-            for (size_t i = 0; i < patternBook_.size(); ++i) {
-                const PatternBookField& pbf = patternBook_.patternBookField(i);
-                if (pbf.ignitionColumn() == 0)
-                    continue;
-                if (pbf.isMatchable(s.field))
-                    matchablePatternIds.push_back(static_cast<int>(i));
+            if (turn >= 5) {
+                for (size_t i = 0; i < patternBook_.size(); ++i) {
+                    const PatternBookField& pbf = patternBook_.patternBookField(i);
+                    if (pbf.ignitionColumn() == 0)
+                        continue;
+                    if (pbf.isMatchable(s.field))
+                        matchablePatternIds.push_back(static_cast<int>(i));
+                }
             }
 
             Plan::iterateAvailablePlans(s.field, seq, 1, [&](const RefPlan& plan) {
@@ -172,7 +176,11 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
 
                 double maxScore;
                 int maxChains;
-                std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds);
+                if (turn >= 5) {
+                    std::tie(maxScore, maxChains) = evalLight(fieldBeforeRensa);
+                } else {
+                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds);
+                }
 
                 nextStates.emplace_back(plan.field(), s.firstDecision, maxScore, maxChains);
             });
@@ -219,6 +227,34 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
     result.maxChains = 1;
     result.firstDecisions.insert(currentStates.front().firstDecision);
     return result;
+}
+
+pair<double, int> BeamMayahAI::evalLight(const CoreField& fieldBeforeRensa) const
+{
+    static const bool prohibits[FieldConstant::MAP_WIDTH] {};
+
+    int maxChains = 0;
+    auto callback = [&maxChains](CoreField&& complementedField, const ColumnPuyoList& /*cpl*/) {
+        maxChains = std::max(maxChains, complementedField.simulateFast());
+    };
+    RensaDetector::detectByDropStrategy(fieldBeforeRensa, prohibits, PurposeForFindingRensa::FOR_FIRE, 2, 13, callback);
+
+    double maxScore = 0;
+    maxScore += maxChains * 1000;
+
+    double averageHeight = 0;
+    for (int x = 1; x <= 6; ++x)
+        averageHeight += fieldBeforeRensa.height(x);
+    averageHeight /= 6;
+
+    double ushapeScore = 0;
+    for (int x = 1; x <= 6; ++x) {
+        static const int DIFF[] = { 0, 2, 0, -2, -2, 0, 2, 0 };
+        ushapeScore -= std::abs((fieldBeforeRensa.height(x) - averageHeight) - DIFF[x]);
+    }
+    maxScore += 60 * ushapeScore;
+
+    return make_pair(maxScore, maxChains);
 }
 
 pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const
