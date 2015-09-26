@@ -74,9 +74,10 @@ int main(int argc, char* argv[])
     InteractiveAI ai(argc, argv);
     if (FLAGS_tokopuyo) {
         ai.removeNontokopuyoParameter();
-        cout << "CAUTION --- tokopuyo parameter is used. --- CAUTION" << endl;
+        ai.setUsesRensaHandTree(false);
+        cout << "tokopuyo mode: Enemy hand won't be considered." << endl;
     } else {
-        cout << "Non tokopuyo parameter is used." << endl;
+        cout << "NON TOKOPUYO MODE: Enemy hand will be considered. Use --tokopuyo if you want to use tokopuyo mode." << endl;
     }
 
     Problem problem = makeProblem();
