@@ -260,12 +260,9 @@ void RensaEvaluator<ScoreCollector>::evalRensaChainFeature(const RensaResult& re
 {
     sc_->addScore(MAX_CHAINS, rensaResult.chains, 1);
 
-    // TODO(mayah): I think this calculation is wrong. Maybe we need more accurate one.
-    // This might cause more SUKI than necessary.
     double numKumipuyos = ColumnPuyoListProbability::instanceSlow()->necessaryKumipuyos(cplToComplement);
-    double numPuyos = numKumipuyos * 2;
-    sc_->addScore(NECESSARY_PUYOS_LINEAR, numPuyos);
-    sc_->addScore(NECESSARY_PUYOS_SQUARE, numPuyos * numPuyos);
+    sc_->addScore(NECESSARY_PUYOS_LINEAR, numKumipuyos);
+    sc_->addScore(NECESSARY_PUYOS_SQUARE, numKumipuyos * numKumipuyos);
 }
 
 template<typename ScoreCollector>
