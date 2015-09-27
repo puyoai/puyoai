@@ -5,6 +5,7 @@
 #include <glog/logging.h>
 
 #include "base/executor.h"
+#include "base/time.h"
 #include "base/wait_group.h"
 #include "core/plan/plan.h"
 #include "core/rensa/rensa_detector.h"
@@ -15,6 +16,7 @@
 #include "core/field_pretty_printer.h"
 #include "core/kumipuyo_seq_generator.h"
 #include "core/pattern/decision_book.h"
+#include "core/probability/column_puyo_list_probability.h"
 #include "core/probability/puyo_set_probability.h"
 #include "solver/endless.h"
 #include "solver/puyop.h"
@@ -29,8 +31,8 @@ DEFINE_string(feature, "feature.toml", "the path to feature parameter");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
 
-DEFINE_int32(initial_beam_width, 100, "");
-DEFINE_int32(beam_width, 100, "beam width");
+DEFINE_int32(initial_beam_width, 400, "");
+DEFINE_int32(beam_width, 400, "beam width");
 DEFINE_int32(beam_depth, 40, "beam depth");
 DEFINE_int32(beam_num, 8, "beam iteration number");
 
@@ -62,9 +64,10 @@ public:
                        const PlayerState& me, const PlayerState& enemy, bool fast) const override;
 
     SearchResult run(const CoreField&, const KumipuyoSeq&) const;
-    pair<double, int> eval(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const;
+    pair<double, int> eval(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds, int depth) const;
 
     pair<double, int> evalLight(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const;
+    pair<double, int> evalSuperLight(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const;
 
 private:
     EvaluationParameterMap evaluationParameterMap_;
@@ -130,6 +133,8 @@ DropDecision BeamMayahAI::think(int /*frameId*/, const CoreField& field, const K
 
 SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq& originalSeq) const
 {
+    double beginTime = currentTime();
+
     SearchResult result;
 
     KumipuyoSeq seq(originalSeq);
@@ -140,9 +145,29 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
         currentStates.emplace_back(plan.field(), plan.firstDecision(), 0, 0);
     });
 
+    int maxOverallFiredChains = 0;
+    int maxOverallFiredScore = 0;
+
     vector<State> nextStates;
     nextStates.reserve(100000);
     for (int turn = 1; turn < FLAGS_beam_depth; ++turn) {
+
+#if 0
+        {
+            bool found = false;
+            Decision fd = currentStates.front().firstDecision;
+            for (const auto& s : currentStates) {
+                if (s.firstDecision != fd) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+                break;
+        }
+
+#endif
         seq.dropFront();
 
         unordered_set<size_t> visited;
@@ -166,6 +191,9 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
                     return;
 
                 if (plan.isRensaPlan()) {
+                    maxOverallFiredScore = std::max(maxOverallFiredScore, plan.rensaResult().score);
+                    maxOverallFiredChains = std::max(maxOverallFiredChains, plan.rensaResult().chains);
+
                     maxFiredScore = std::max(maxFiredScore, plan.rensaResult().score);
                     maxFiredRensa = std::max(maxFiredRensa, plan.rensaResult().chains);
                     nextStates.emplace_back(fieldBeforeRensa, s.firstDecision, plan.rensaResult().chains, plan.rensaResult().chains);
@@ -174,11 +202,16 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
 
                 double maxScore;
                 int maxChains;
-                if (turn >= 5) {
-                    std::tie(maxScore, maxChains) = evalLight(fieldBeforeRensa, matchablePatternIds);
-                } else {
-                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds);
-                }
+                if (turn >= 4) {
+                    std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa, matchablePatternIds);
+                } else if (turn >= 2) {
+                    // std::tie(maxScore, maxChains) = evalLight(fieldBeforeRensa, matchablePatternIds);
+                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds, 1);
+                } else /*if (turn >= 3)*/ {
+                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds, 2);
+                } /*else {
+                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds, 3);
+                }*/
 
                 nextStates.emplace_back(plan.field(), s.firstDecision, maxScore, maxChains);
             });
@@ -187,7 +220,9 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
         std::sort(nextStates.begin(), nextStates.end(), std::greater<State>());
 
         int beamWidth = FLAGS_beam_width;
-        if (turn <= 2) {
+        if (turn == 4 || turn == 2) {
+            beamWidth = 22 * 22;
+        } else if (turn <= 2) {
             beamWidth = FLAGS_initial_beam_width;
         }
 
@@ -197,7 +232,7 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
         std::swap(currentStates, nextStates);
         nextStates.clear();
 
-#if 1
+#if 0
         cout << "turn=" << turn
              << " score=" << currentStates.front().stateScore
              << " chains=" << currentStates.front().maxChains
@@ -214,15 +249,19 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
         for (const auto& entry : m) {
             cout << entry.first << " " << entry.second << endl;
         }
-#endif
 
-#if 1
         FieldPrettyPrinter::print(currentStates.front().field.toPlainField(), KumipuyoSeq());
 #endif
 
     }
 
-    result.maxChains = 1;
+    double endTime = currentTime();
+
+    cout << "FIRED_CHAINS=" << maxOverallFiredChains
+         << " FIRED_SCORE=" << maxOverallFiredScore
+         << " TIME=" << (endTime - beginTime) << endl;
+
+    result.maxChains = maxOverallFiredChains;
     result.firstDecisions.insert(currentStates.front().firstDecision);
     return result;
 }
@@ -230,15 +269,6 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
 pair<double, int> BeamMayahAI::evalLight(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const
 {
     int maxChains = 0;
-#if 0
-    auto callback = [&maxChains](CoreField&& complementedField, const ColumnPuyoList& /*cpl*/) {
-        maxChains = std::max(maxChains, complementedField.simulateFast());
-    };
-    static const bool prohibits[FieldConstant::MAP_WIDTH] {};
-    RensaDetector::detectByDropStrategy(fieldBeforeRensa, prohibits, PurposeForFindingRensa::FOR_FIRE, 2, 13, callback);
-#endif
-
-#if 1
     auto callback = [&](const CoreField& /*fieldAfterRensa*/,
                         const RensaResult& rensaResult,
                         const ColumnPuyoList& /*puyosToComplement*/,
@@ -248,7 +278,6 @@ pair<double, int> BeamMayahAI::evalLight(const CoreField& fieldBeforeRensa, cons
         maxChains = std::max(maxChains, rensaResult.chains);
     };
     PatternRensaDetector(patternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, 1);
-#endif
 
     double maxScore = 0;
     maxScore += maxChains * 1000;
@@ -268,11 +297,56 @@ pair<double, int> BeamMayahAI::evalLight(const CoreField& fieldBeforeRensa, cons
     return make_pair(maxScore, maxChains);
 }
 
-pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const
+pair<double, int> BeamMayahAI::evalSuperLight(const CoreField& fieldBeforeRensa, const vector<int>& /*matchablePatternIds*/) const
+{
+    int maxChains = 0;
+    auto callback = [&maxChains](CoreField&& complementedField, const ColumnPuyoList& /*cpl*/) {
+        maxChains = std::max(maxChains, complementedField.simulateFast());
+    };
+    static const bool prohibits[FieldConstant::MAP_WIDTH] {};
+    RensaDetector::detectByDropStrategy(fieldBeforeRensa, prohibits, PurposeForFindingRensa::FOR_FIRE, 2, 13, callback);
+
+    double maxScore = 0;
+    maxScore += maxChains * 1000;
+
+    double averageHeight = 0;
+    for (int x = 1; x <= 6; ++x)
+        averageHeight += fieldBeforeRensa.height(x);
+    averageHeight /= 6;
+
+    double ushapeScore = 0;
+    for (int x = 1; x <= 6; ++x) {
+        static const int DIFF[] = { 0, 2, 0, -2, -2, 0, 2, 0 };
+        ushapeScore -= std::abs((fieldBeforeRensa.height(x) - averageHeight) - DIFF[x]);
+    }
+    maxScore += 60 * ushapeScore;
+
+    return make_pair(maxScore, maxChains);
+}
+
+pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds, int depth) const
 {
     SimpleScoreCollector sc(evaluationParameterMap_);
     ShapeEvaluator<SimpleScoreCollector>(&sc).eval(fieldBeforeRensa);
-    const double shapeScore = sc.collectedScore().score(EvaluationMode::MIDDLE);
+
+    EvaluationMode mode = EvaluationMode::MIDDLE;
+    {
+        // const int INITIAL_THRESHOLD = 16;
+        const int EARLY_THRESHOLD = 24;
+        const int MIDDLE_THRESHOLD = 36;
+        // const int LATE_THRESHOLD = 54;
+
+        int cnt = fieldBeforeRensa.countPuyos();
+        if (cnt <= EARLY_THRESHOLD) {
+            mode = EvaluationMode::EARLY;
+        } else if (cnt <= MIDDLE_THRESHOLD) {
+            mode = EvaluationMode::MIDDLE;
+        } else {
+            mode = EvaluationMode::LATE;
+        }
+    }
+
+    const double shapeScore = sc.collectedScore().score(mode);
 
     const int numReachableSpace = fieldBeforeRensa.countConnectedPuyos(3, 12);
 
@@ -317,7 +391,7 @@ pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vec
         double score = rensaScore + shapeScore;
         maxScore = std::max(maxScore, score);
     };
-    PatternRensaDetector(patternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, 2);
+    PatternRensaDetector(patternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, depth);
 
     return make_pair(maxScore, maxChains);
 }
@@ -328,11 +402,16 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
     google::InstallFailureSignalHandler();
 
+    (void)PuyoSetProbability::instanceSlow();
+    (void)ColumnPuyoListProbability::instanceSlow();
+
     unique_ptr<BeamMayahAI> ai(new BeamMayahAI(argc, argv));
 
 #if 1
-    KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
-    ai->run(CoreField(), seq);
+    for (int i = 0; i < 50; ++i) {
+        KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
+        ai->run(CoreField(), seq);
+    }
 #else
     Endless endless(std::move(ai));
     endless.setVerbose(true);
