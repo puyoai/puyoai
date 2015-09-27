@@ -13,15 +13,18 @@ Endless::Endless(unique_ptr<AI> ai) : ai_(std::move(ai))
 {
 }
 
-EndlessResult Endless::run(const KumipuyoSeq& seq)
+EndlessResult Endless::run(const KumipuyoSeq& originalSeq)
 {
     // Initialize ai.
     FrameRequest req;
     req.frameId = 1;
     ai_->gameWillBegin(req);
 
-    req.playerFrameRequest[0].kumipuyoSeq = seq;
-    req.playerFrameRequest[1].kumipuyoSeq = seq;
+    {
+        KumipuyoSeq seq = originalSeq.subsequence(0, 2);
+        req.playerFrameRequest[0].kumipuyoSeq = seq;
+        req.playerFrameRequest[1].kumipuyoSeq = seq;
+    }
 
     setEnemyField(&req);
 
@@ -34,6 +37,8 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
     int maxRensa = 0;
     for (int i = 0; i < 50; ++i) {
         req.frameId = i + 2;
+        req.playerFrameRequest[0].kumipuyoSeq = originalSeq.subsequence(i, 2);
+        req.playerFrameRequest[1].kumipuyoSeq = originalSeq.subsequence(i, 2);
 
         // For gazing.
         ai_->gaze(req.frameId, CoreField(req.enemyPlayerFrameRequest().field), req.enemyPlayerFrameRequest().kumipuyoSeq);
@@ -102,8 +107,6 @@ EndlessResult Endless::run(const KumipuyoSeq& seq)
         }
 
         req.playerFrameRequest[0].field = f.toPlainField();
-        req.playerFrameRequest[0].kumipuyoSeq.dropFront();
-        req.playerFrameRequest[1].kumipuyoSeq.dropFront();
 
         // Update the current field.
         ai_->me_.field = f;
