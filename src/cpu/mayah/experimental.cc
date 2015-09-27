@@ -95,6 +95,17 @@ BeamMayahAI::BeamMayahAI(int argc, char* argv[]) :
 DropDecision BeamMayahAI::think(int /*frameId*/, const CoreField& field, const KumipuyoSeq& seq,
                                 const PlayerState& /*me*/, const PlayerState& /*enemy*/, bool /*fast*/) const
 {
+    if (true) {
+        Decision tmpd;
+        Plan::iterateAvailablePlans(field, seq, 2, [&](const RefPlan& plan) {
+            if (plan.isRensaPlan() && plan.rensaResult().chains >= 14)
+                tmpd = plan.firstDecision();
+        });
+        if (tmpd.isValid()) {
+            return DropDecision(tmpd);
+        }
+    }
+
     // Decision -> max chains
     map<Decision, int> score;
 
@@ -150,7 +161,11 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
 
     vector<State> nextStates;
     nextStates.reserve(100000);
-    for (int turn = 1; turn < FLAGS_beam_depth; ++turn) {
+
+    const int maxSearchTurns = min(FLAGS_beam_depth, std::max(originalSeq.size(), (72 - originalField.countPuyos()) / 2));
+    cout << "maxSearchTurns = " << maxSearchTurns << endl;
+
+    for (int turn = 1; turn < maxSearchTurns; ++turn) {
 
 #if 0
         {
@@ -202,9 +217,9 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
 
                 double maxScore;
                 int maxChains;
-                if (turn >= 4) {
+                if (turn >= 6) {
                     std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa, matchablePatternIds);
-                } else if (turn >= 2) {
+                } else if (turn >= 3) {
                     // std::tie(maxScore, maxChains) = evalLight(fieldBeforeRensa, matchablePatternIds);
                     std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds, 1);
                 } else /*if (turn >= 3)*/ {
@@ -220,7 +235,7 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
         std::sort(nextStates.begin(), nextStates.end(), std::greater<State>());
 
         int beamWidth = FLAGS_beam_width;
-        if (turn == 4 || turn == 2) {
+        if (turn == 6 || turn == 3) {
             beamWidth = 22 * 22;
         } else if (turn <= 2) {
             beamWidth = FLAGS_initial_beam_width;
@@ -407,7 +422,7 @@ int main(int argc, char* argv[])
 
     unique_ptr<BeamMayahAI> ai(new BeamMayahAI(argc, argv));
 
-#if 1
+#if 0
     for (int i = 0; i < 50; ++i) {
         KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
         ai->run(CoreField(), seq);
