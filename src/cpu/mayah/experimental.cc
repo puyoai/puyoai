@@ -31,7 +31,6 @@ DEFINE_string(feature, "feature.toml", "the path to feature parameter");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
 
-DEFINE_int32(initial_beam_width, 400, "");
 DEFINE_int32(beam_width, 400, "beam width");
 DEFINE_int32(beam_depth, 40, "beam depth");
 DEFINE_int32(beam_num, 8, "beam iteration number");
@@ -63,7 +62,7 @@ public:
     DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
                        const PlayerState& me, const PlayerState& enemy, bool fast) const override;
 
-    SearchResult run(const CoreField&, const KumipuyoSeq&) const;
+    SearchResult run(const vector<State>& initialStates, KumipuyoSeq, int maxSearchTurns) const;
     pair<double, int> eval(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds, int depth) const;
 
     pair<double, int> evalLight(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const;
@@ -106,16 +105,37 @@ DropDecision BeamMayahAI::think(int /*frameId*/, const CoreField& field, const K
         }
     }
 
+    // Make initial states.
+    vector<State> currentStates;
+    Plan::iterateAvailablePlans(field, seq, 1, [&](const RefPlan& plan) {
+        currentStates.emplace_back(plan.field(), plan.firstDecision(), 0, 0);
+    });
+
+    vector<State> nextStates;
+    KumipuyoSeq subSeq = seq.subsequence(1);
+    for (const auto& s : currentStates) {
+        Plan::iterateAvailablePlans(s.field, subSeq, 1, [&](const RefPlan& plan) {
+            nextStates.emplace_back(plan.field(), s.firstDecision, 0, 0);
+        });
+    }
+
     // Decision -> max chains
     map<Decision, int> score;
 
     WaitGroup wg;
     mutex mu;
 
+    const int maxSearchTurns = min(FLAGS_beam_depth, std::max(seq.size(), (72 - field.countPuyos()) / 2));
+    cout << "maxSearchTurns = " << maxSearchTurns << endl;
+
     for (int k = 0; k < FLAGS_beam_num; ++k) {
         wg.add(1);
+
         executor_->submit([&]() {
-            SearchResult searchResult = run(field, seq);
+            KumipuyoSeq tmpSeq(seq.subsequence(2));
+            tmpSeq.append(KumipuyoSeqGenerator::generateRandomSequence(40));
+
+            SearchResult searchResult = run(nextStates, tmpSeq, maxSearchTurns);
 
             {
                 lock_guard<mutex> lk(mu);
@@ -142,19 +162,13 @@ DropDecision BeamMayahAI::think(int /*frameId*/, const CoreField& field, const K
     return DropDecision(d, "");
 }
 
-SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq& originalSeq) const
+SearchResult BeamMayahAI::run(const vector<State>& initialStates, KumipuyoSeq seq, int maxSearchTurns) const
 {
     double beginTime = currentTime();
 
     SearchResult result;
 
-    KumipuyoSeq seq(originalSeq);
-    seq.append(KumipuyoSeqGenerator::generateRandomSequence(40));
-
-    vector<State> currentStates;
-    Plan::iterateAvailablePlans(originalField, seq, 1, [&](const RefPlan& plan) {
-        currentStates.emplace_back(plan.field(), plan.firstDecision(), 0, 0);
-    });
+    vector<State> currentStates(initialStates);
 
     int maxOverallFiredChains = 0;
     int maxOverallFiredScore = 0;
@@ -162,10 +176,7 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
     vector<State> nextStates;
     nextStates.reserve(100000);
 
-    const int maxSearchTurns = min(FLAGS_beam_depth, std::max(originalSeq.size(), (72 - originalField.countPuyos()) / 2));
-    cout << "maxSearchTurns = " << maxSearchTurns << endl;
-
-    for (int turn = 1; turn < maxSearchTurns; ++turn) {
+    for (int turn = 3; turn < maxSearchTurns; ++turn) {
 
 #if 0
         {
@@ -219,14 +230,11 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
                 int maxChains;
                 if (turn >= 6) {
                     std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa, matchablePatternIds);
-                } else if (turn >= 3) {
-                    // std::tie(maxScore, maxChains) = evalLight(fieldBeforeRensa, matchablePatternIds);
+                } else if (turn >= 4) {
                     std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds, 1);
-                } else /*if (turn >= 3)*/ {
+                } else {
                     std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds, 2);
-                } /*else {
-                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds, 3);
-                }*/
+                }
 
                 nextStates.emplace_back(plan.field(), s.firstDecision, maxScore, maxChains);
             });
@@ -235,10 +243,8 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
         std::sort(nextStates.begin(), nextStates.end(), std::greater<State>());
 
         int beamWidth = FLAGS_beam_width;
-        if (turn == 6 || turn == 3) {
+        if (turn <= 6) {
             beamWidth = 22 * 22;
-        } else if (turn <= 2) {
-            beamWidth = FLAGS_initial_beam_width;
         }
 
         if (nextStates.size() > static_cast<size_t>(beamWidth)) {
