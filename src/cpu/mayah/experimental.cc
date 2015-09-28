@@ -274,6 +274,7 @@ SearchResult BeamMayahAI::run(const CoreField& originalField, const KumipuyoSeq&
 
     cout << "FIRED_CHAINS=" << maxOverallFiredChains
          << " FIRED_SCORE=" << maxOverallFiredScore
+         << " DECISION=" << currentStates.front().firstDecision
          << " TIME=" << (endTime - beginTime) << endl;
 
     result.maxChains = maxOverallFiredChains;
