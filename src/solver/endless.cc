@@ -40,6 +40,10 @@ EndlessResult Endless::run(const KumipuyoSeq& originalSeq)
         req.playerFrameRequest[0].kumipuyoSeq = originalSeq.subsequence(i, 2);
         req.playerFrameRequest[1].kumipuyoSeq = originalSeq.subsequence(i, 2);
 
+        if (verbose_) {
+            FieldPrettyPrinter::print(req.myPlayerFrameRequest().field, req.playerFrameRequest[0].kumipuyoSeq);
+        }
+
         // For gazing.
         ai_->gaze(req.frameId, CoreField(req.enemyPlayerFrameRequest().field), req.enemyPlayerFrameRequest().kumipuyoSeq);
 
@@ -65,7 +69,6 @@ EndlessResult Endless::run(const KumipuyoSeq& originalSeq)
         }
 
         if (verbose_) {
-            FieldPrettyPrinter::print(f.toPlainField(), req.playerFrameRequest[0].kumipuyoSeq.subsequence(1));
             cout << "time=" << (endTime - beginTime) << endl;
         }
 
