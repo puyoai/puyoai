@@ -43,6 +43,9 @@ public:
     int size() const { return size_[0] + size_[1] + size_[2] + size_[3] + size_[4] + size_[5]; }
     void clear() { std::fill(size_, size_ + 6, 0); }
 
+    // Returns true if |this| contains a placeholder.
+    bool hasPlaceHolder() const;
+
     bool add(const ColumnPuyo& cp) { return add(cp.x, cp.color); }
 
     // Adds PuyoColor |c| to column |x|. Returns false if failed.
@@ -173,6 +176,16 @@ struct hash<ColumnPuyoList>
     size_t operator()(const ColumnPuyoList& cpl) const { return cpl.hash(); }
 };
 
+}
+
+inline bool ColumnPuyoList::hasPlaceHolder() const
+{
+    for (int i = 0; i < 6; ++i) {
+        if (!placeHolders_[i].isEmpty())
+            return true;
+    }
+
+    return false;
 }
 
 #endif

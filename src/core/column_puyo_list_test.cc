@@ -27,6 +27,21 @@ TEST(ColumnPuyoListTest, copy)
     }
 }
 
+TEST(ColumnPuyoListTest, hasPlaceHolder)
+{
+    ColumnPuyoList cpl;
+    EXPECT_FALSE(cpl.hasPlaceHolder());
+
+    cpl.add(1, PuyoColor::RED);
+    EXPECT_FALSE(cpl.hasPlaceHolder());
+
+    cpl.add(1, PuyoColor::IRON);
+    EXPECT_TRUE(cpl.hasPlaceHolder());
+
+    cpl.removeTopFrom(1);
+    EXPECT_FALSE(cpl.hasPlaceHolder());
+}
+
 TEST(ColumnPuyoListTest, add)
 {
     ColumnPuyoList cpl;
