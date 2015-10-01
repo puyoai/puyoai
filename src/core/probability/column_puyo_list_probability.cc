@@ -6,6 +6,7 @@
 
 #include "base/strings.h"
 #include "core/kumipuyo.h"
+#include "core/probability/puyo_set_probability.h"
 
 using namespace std;
 
@@ -244,8 +245,11 @@ const ColumnPuyoListProbability* ColumnPuyoListProbability::instanceSlow()
 double ColumnPuyoListProbability::necessaryKumipuyos(const ColumnPuyoList& cpl) const
 {
     auto it = m_.find(cpl);
-    if (it == m_.end())
-        return std::numeric_limits<double>::infinity();
+    if (it != m_.end())
+        return it->second;
 
-    return it->second;
+    // TODO(mayah): This is not accurate, but better than returning infinity.
+    PuyoSet ps(cpl);
+    int necessary = PuyoSetProbability::instanceSlow()->necessaryPuyos(ps, 0.5);
+    return necessary / 2 * 1.2;
 }
