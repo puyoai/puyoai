@@ -70,6 +70,17 @@ ignition = 1
 [[pattern]]
 field = [
     "A.....",
+    "ABC...",
+    "AABCC.",
+    "BB.C..",
+]
+name = "GTR"
+score = 9.1
+ignition = 1
+
+[[pattern]]
+field = [
+    "A.....",
     "ABC.C.",
     "AABCC.",
     "BB.&&.",
