@@ -30,7 +30,7 @@ FieldBits::FieldBits(const PlainField& pf, PuyoColor c)
     m_ = xmm.m;
 }
 
-FieldBits::FieldBits(const std::string& str) :
+FieldBits::FieldBits(const std::string& str, char c) :
     FieldBits()
 {
     int counter = 0;
@@ -38,7 +38,7 @@ FieldBits::FieldBits(const std::string& str) :
         int x = 6 - (counter % 6);
         int y = counter / 6 + 1;
 
-        if (str[i] == '1')
+        if (str[i] == c)
             set(x, y);
         counter++;
     }
