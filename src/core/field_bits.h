@@ -98,6 +98,7 @@ public:
     template<typename Callback>
     void iterateBitPositions(Callback) const;
 
+    size_t hash() const;
     std::string toString() const;
 
     friend bool operator==(FieldBits lhs, FieldBits rhs) { return (lhs ^ rhs).isEmpty(); }
@@ -123,18 +124,20 @@ namespace std {
 template<>
 struct hash<FieldBits>
 {
-    size_t operator()(const FieldBits& bits) const
-    {
-        union {
-            __m128i m;
-            uint64_t xs[2];
-        };
-        m = bits.xmm();
-
-        return xs[0] + (xs[1] * 100000009);
-    }
+    size_t operator()(const FieldBits& bits) const { return bits.hash(); }
 };
 
+}
+
+inline size_t FieldBits::hash() const
+{
+    union {
+        __m128i m;
+        uint64_t xs[2];
+    };
+    m = xmm();
+
+    return xs[0] + (xs[1] * 100000009);
 }
 
 inline
