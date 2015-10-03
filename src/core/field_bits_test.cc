@@ -434,6 +434,20 @@ TEST(FieldBitsTest, countConnection)
     EXPECT_EQ(1, count3);
 }
 
+TEST(FieldBitsTest, mirror)
+{
+    FieldBits fb(
+        "1....."
+        "11...."
+        "111...");
+    FieldBits expected(
+        ".....1"
+        "....11"
+        "...111");
+
+    EXPECT_EQ(expected, fb.mirror());
+}
+
 TEST(FieldBitsTest, toPositions)
 {
     FieldBits bits;

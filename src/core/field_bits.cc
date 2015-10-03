@@ -30,6 +30,22 @@ FieldBits::FieldBits(const PlainField& pf, PuyoColor c)
     m_ = xmm.m;
 }
 
+FieldBits FieldBits::mirror() const
+{
+    // TODO(mayah): Use shuffle for better performance.
+
+    union {
+        std::uint16_t xs[8];
+        __m128i m;
+    };
+    m = m_;
+
+    for (int i = 0; i < 4; ++i)
+        std::swap(xs[i], xs[7 - i]);
+
+    return m;
+}
+
 FieldBits::FieldBits(const std::string& str, char c) :
     FieldBits()
 {

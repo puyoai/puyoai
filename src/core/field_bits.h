@@ -85,6 +85,8 @@ public:
 
     bool hasVanishingBits() const;
 
+    FieldBits mirror() const;
+
     // Sets all the positions having 1 to |positions|.
     // |positions| should have 72 spaces at least. In some case, you need 128 spaces.
     // Returns length.
