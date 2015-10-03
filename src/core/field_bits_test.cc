@@ -57,6 +57,34 @@ TEST(FieldBitsTest, ctor3)
     EXPECT_FALSE(bits.get(5, 4));
 }
 
+TEST(FieldBitsTest, ctor4)
+{
+    string s =
+        "A....."
+        "ABC..."
+        "AABCCC"
+        "BBC...";
+
+    FieldBits a(s, 'A');
+    EXPECT_TRUE(a.get(1, 2));
+    EXPECT_TRUE(a.get(1, 3));
+    EXPECT_TRUE(a.get(1, 4));
+    EXPECT_TRUE(a.get(2, 2));
+
+    EXPECT_FALSE(a.get(1, 1));
+    EXPECT_FALSE(a.get(2, 1));
+    EXPECT_FALSE(a.get(3, 1));
+    EXPECT_FALSE(a.get(4, 1));
+    EXPECT_FALSE(a.get(5, 1));
+    EXPECT_FALSE(a.get(6, 1));
+
+    FieldBits b(s, 'B');
+    EXPECT_TRUE(b.get(1, 1));
+    EXPECT_TRUE(b.get(2, 1));
+    EXPECT_TRUE(b.get(3, 2));
+    EXPECT_TRUE(b.get(2, 3));
+}
+
 TEST(FieldBitsTest, set)
 {
     FieldBits bits;

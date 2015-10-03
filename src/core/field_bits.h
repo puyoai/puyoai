@@ -22,7 +22,8 @@ public:
     FieldBits(__m128i m) : m_(m) {}
     FieldBits(int x, int y) : m_(onebit(x, y)) {}
     FieldBits(const PlainField&, PuyoColor);
-    explicit FieldBits(const std::string&);
+    // The position that has |c| character will become '1'.
+    explicit FieldBits(const std::string&, char c = '1');
 
     operator const __m128i&() const { return m_; }
     operator __m128i&() { return m_; }
