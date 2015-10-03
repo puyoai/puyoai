@@ -16,23 +16,6 @@
 
 using namespace std;
 
-namespace {
-
-FieldBits mirror(FieldBits bits) {
-    union {
-        std::uint16_t xs[8];
-        __m128i m;
-    };
-    m = bits;
-
-    for (int i = 0; i < 4; ++i)
-        std::swap(xs[i], xs[7 - i]);
-
-    return m;
-}
-
-}
-
 FieldPattern::FieldPattern(const string& field, const string& notPatternField)
 {
     int varCount = 0;
@@ -139,13 +122,13 @@ FieldPattern FieldPattern::mirror() const
 {
     FieldPattern pf(*this);
 
-    pf.mustPatternBits_ = ::mirror(pf.mustPatternBits_);
-    pf.anyPatternBits_ = ::mirror(pf.anyPatternBits_);
-    pf.ironPatternBits_ = ::mirror(pf.ironPatternBits_);
+    pf.mustPatternBits_ = pf.mustPatternBits_.mirror();
+    pf.anyPatternBits_ = pf.anyPatternBits_.mirror();
+    pf.ironPatternBits_ = pf.ironPatternBits_.mirror();
 
     for (Pattern& pat : pf.patterns_) {
-        pat.varBits = ::mirror(pat.varBits);
-        pat.notVarBits = ::mirror(pat.notVarBits);
+        pat.varBits = pat.varBits.mirror();
+        pat.notVarBits = pat.notVarBits.mirror();
     }
 
     return pf;
