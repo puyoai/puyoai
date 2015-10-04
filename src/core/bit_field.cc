@@ -95,6 +95,16 @@ void BitField::countConnection(int* count2, int* count3) const
     }
 }
 
+bool BitField::hasFloatingPuyo() const
+{
+    const __m128i zero = _mm_setzero_si128();
+    FieldBits existing = m_[0] | m_[1] | m_[2];
+    FieldBits empty = existing ^ _mm_cmpeq_epi8(zero, zero);
+
+    FieldBits b = existing & _mm_slli_epi16(empty, 1);
+    return !b.maskedField13().isEmpty();
+}
+
 Position* BitField::fillSameColorPosition(int x, int y, PuyoColor c,
                                           Position* positionQueueHead, FieldBits* checked) const
 {

@@ -412,6 +412,29 @@ TEST(BitFieldTest, countConnection)
     EXPECT_EQ(2, count3);
 }
 
+TEST(BitFieldTest, hasFloatingPuyo)
+{
+    BitField empty;
+    BitField bf1(
+        "OOOOOO");
+    BitField bf2(
+        "O....."
+        "......");
+
+    BitField bf13;
+    bf13.setColor(1, 13, PuyoColor::OJAMA);
+
+    BitField bf14;
+    bf14.setColor(1, 14, PuyoColor::OJAMA);
+
+    EXPECT_FALSE(empty.hasFloatingPuyo());
+    EXPECT_FALSE(bf1.hasFloatingPuyo());
+    EXPECT_FALSE(bf14.hasFloatingPuyo());
+
+    EXPECT_TRUE(bf2.hasFloatingPuyo());
+    EXPECT_TRUE(bf13.hasFloatingPuyo());
+}
+
 TEST(BitFieldTest, hasEmptyNeighbor)
 {
     BitField bf(
