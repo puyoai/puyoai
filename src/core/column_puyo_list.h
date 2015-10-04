@@ -3,6 +3,7 @@
 
 #include <array>
 #include <iterator>
+#include <ostream>
 #include <string>
 
 #include <glog/logging.h>
@@ -143,6 +144,7 @@ public:
     std::string toString() const;
 
     friend bool operator==(const ColumnPuyoList&, const ColumnPuyoList&);
+    friend std::ostream& operator<<(std::ostream& os, const ColumnPuyoList& cpl) { return os << cpl.toString(); }
 
     size_t hash() const
     {
