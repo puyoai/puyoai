@@ -61,6 +61,9 @@ public:
 
     void countConnection(int* count2, int* count3) const;
 
+    // Returns true if there are floating puyos.
+    bool hasFloatingPuyo() const;
+
     RensaResult simulate(int initialChain = 1);
     template<typename Tracker> RensaResult simulate(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
     // Faster version of simulate(). Returns the number of chains.
