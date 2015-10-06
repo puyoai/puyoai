@@ -120,8 +120,6 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
                                                          double currentPatternScore,
                                                          bool addsPatternScore)
 {
-    const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
-
     // With complement.
     // TODO(mayah): making std::vector is too slow. call currentField.fillErasingPuyoPosition()?
     FieldBits ignitionPosition = currentField.ignitionPuyoBits();
@@ -130,8 +128,11 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     if (ignitionPosition.isEmpty())
         return;
 
-    std::pair<PatternBook::IndexIterator, PatternBook::IndexIterator> p = patternBook_.find(ignitionPosition);
     bool needsToProceedWithoutComplement = true;
+#if 0
+    const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
+    std::pair<PatternBook::IndexIterator, PatternBook::IndexIterator> p = patternBook_.find(ignitionPosition);
+
     for (PatternBook::IndexIterator it = p.first; it != p.second; ++it) {
         const PatternBookField& pbf = patternBook_.patternBookField(*it);
 
@@ -188,6 +189,56 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
                                       patternName.empty() ? pbf.name() : patternName,
                                       patternScore);
     }
+#else
+
+    auto callback = [&](CoreField&& complementedField, const ColumnPuyoList& cpl,
+                        int numFilledUnusedVariables, const FieldBits& matchedBits,
+                        const NewPatternBookField& pbf) {
+        double patternScore = currentPatternScore;
+        if (addsPatternScore) {
+            FieldBits currentMatchedBits = matchedBits & currentFieldTracker.result().existingBits();
+            patternScore += pbf.score() * currentMatchedBits.popcount() / pbf.numVariables();
+        }
+
+        if (cpl.size() == 0) {
+            needsToProceedWithoutComplement = false;
+
+            RensaExistingPositionTracker tracker(currentFieldTracker);
+            CHECK(complementedField.vanishDropFast(&tracker));
+
+            iteratePossibleRensasInternal(complementedField, tracker, currentChains + 1, firePuyo, originalKeyPuyos,
+                                          restIteration, restUnusedVariables,
+                                          patternName.empty() ? pbf.name() : patternName,
+                                          patternScore);
+            return;
+        }
+
+        if (restIteration <= 0)
+            return;
+
+        if (cpl.sizeOn(firePuyo.x) > 0)
+            return;
+
+        ColumnPuyoList keyPuyos(originalKeyPuyos);
+        if (!keyPuyos.merge(cpl))
+            return;
+        if (!checkDup(firePuyo, keyPuyos))
+            return;
+
+        RensaExistingPositionTracker tracker(currentFieldTracker);
+        if (!complementedField.vanishDropFast(&tracker)) {
+            LOG(ERROR) << complementedField.toDebugString();
+            return;
+        }
+
+        iteratePossibleRensasInternal(complementedField, tracker, currentChains + 1, firePuyo, keyPuyos,
+                                      restIteration - 1,
+                                      restUnusedVariables - numFilledUnusedVariables,
+                                      patternName.empty() ? pbf.name() : patternName,
+                                      patternScore);
+    };
+    newPatternBook_.complement(currentField, ignitionPosition, restUnusedVariables, callback);
+#endif
 
     if (!needsToProceedWithoutComplement)
         return;

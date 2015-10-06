@@ -556,7 +556,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         const double virtualRensaScore = rensaResult.score * possibility;
 
         RensaScoreCollector rensaScoreCollector(sc_->mainRensaParamSet(), sc_->sideRensaParamSet());
-        RensaEvaluator<RensaScoreCollector> rensaEvaluator(patternBook(), &rensaScoreCollector);
+        RensaEvaluator<RensaScoreCollector> rensaEvaluator(patternBook(), newPatternBook(), &rensaScoreCollector);
 
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
@@ -623,7 +623,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         }
     };
 
-    PatternRensaDetector detector(patternBook(), fieldBeforeRensa, evalCallback);
+    PatternRensaDetector detector(patternBook(), newPatternBook(), fieldBeforeRensa, evalCallback);
     detector.iteratePossibleRensas(preEvalResult.matchablePatternIds(), maxIteration);
 
     RensaDetector::detectSideChain(fieldBeforeRensa, RensaDetectorStrategy::defaultDropStrategy(),

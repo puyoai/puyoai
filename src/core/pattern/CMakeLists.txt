@@ -4,7 +4,6 @@ add_library(puyoai_core_pattern
             bijection_matcher.cc
             decision_book.cc
             field_pattern.cc
-            pattern_bit.cc
             pattern_matcher.cc)
 
 # ----------------------------------------------------------------------
@@ -24,5 +23,4 @@ endfunction()
 
 puyoai_core_pattern_add_test(decision_book)
 puyoai_core_pattern_add_test(field_pattern)
-puyoai_core_pattern_add_test(pattern_bit)
 puyoai_core_pattern_add_test(pattern_matcher)

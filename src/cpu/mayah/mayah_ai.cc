@@ -32,6 +32,7 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
     loadEvaluationParameter();
     CHECK(decisionBook_.load(FLAGS_decision_book));
     CHECK(patternBook_.load(FLAGS_pattern_book));
+    CHECK(newPatternBook_.load(FLAGS_pattern_book));
 
     VLOG(1) << evaluationParameterMap_.toString();
 
@@ -250,7 +251,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
 PreEvalResult MayahAI::preEval(const CoreField& currentField) const
 {
-    PreEvaluator preEvaluator(patternBook_);
+    PreEvaluator preEvaluator(patternBook_, newPatternBook_);
     return preEvaluator.preEval(currentField);
 }
 
@@ -265,12 +266,12 @@ MidEvalResult MayahAI::midEval(const RefPlan& plan,
 
 {
     SimpleScoreCollector sc(evaluationParameterMap_);
-    Evaluator<SimpleScoreCollector> evaluator(patternBook_, &sc);
+    Evaluator<SimpleScoreCollector> evaluator(patternBook_, newPatternBook_, &sc);
 
     // MidEval always sets 'fast'.
     evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), true, usesRensaHandTree_, gazeResult);
 
-    MidEvaluator midEvaluator(patternBook_);
+    MidEvaluator midEvaluator(patternBook_, newPatternBook_);
     const CollectedSimpleScore& simpleScore = sc.collectedScore();
     return midEvaluator.eval(plan, currentField, simpleScore.score(sc.collectedCoef()));
 }
@@ -285,7 +286,7 @@ EvalResult MayahAI::eval(const RefPlan& plan,
                          const GazeResult& gazeResult) const
 {
     SimpleScoreCollector sc(evaluationParameterMap_);
-    Evaluator<SimpleScoreCollector> evaluator(patternBook_, &sc);
+    Evaluator<SimpleScoreCollector> evaluator(patternBook_, newPatternBook_, &sc);
     evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, usesRensaHandTree_, gazeResult);
 
     const CollectedSimpleScore& simpleScore = sc.collectedScore();
@@ -304,7 +305,7 @@ CollectedFeatureCoefScore MayahAI::evalWithCollectingFeature(const RefPlan& plan
                                                              const GazeResult& gazeResult) const
 {
     FeatureScoreCollector sc(evaluationParameterMap_);
-    Evaluator<FeatureScoreCollector> evaluator(patternBook_, &sc);
+    Evaluator<FeatureScoreCollector> evaluator(patternBook_, newPatternBook_, &sc);
     evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, usesRensaHandTree_, gazeResult);
 
     return CollectedFeatureCoefScore(sc.collectedCoef(), sc.collectedScore());
