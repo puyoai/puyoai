@@ -19,12 +19,10 @@ public:
                                 const std::string& patternName,
                                 double patternScore)> Callback;
 
-    PatternRensaDetector(const PatternBook& patternBook,
-                         const NewPatternBook& newPatternBook,
+    PatternRensaDetector(const NewPatternBook& patternBook,
                          const CoreField& originalField,
                          Callback callback) :
         patternBook_(patternBook),
-        newPatternBook_(newPatternBook),
         originalField_(originalField),
         callback_(std::move(callback)),
         strategy_(RensaDetectorStrategy(RensaDetectorStrategy::Mode::DROP, 2, 2, false))
@@ -56,8 +54,7 @@ private:
                     const std::string& patternName,
                     bool prohibits[FieldConstant::MAP_WIDTH]);
 
-    const PatternBook& patternBook_;
-    const NewPatternBook& newPatternBook_;
+    const NewPatternBook& patternBook_;
     const CoreField& originalField_;
     Callback callback_;
     const RensaDetectorStrategy strategy_;

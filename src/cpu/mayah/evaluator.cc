@@ -623,7 +623,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         }
     };
 
-    PatternRensaDetector detector(patternBook(), newPatternBook(), fieldBeforeRensa, evalCallback);
+    PatternRensaDetector detector(newPatternBook(), fieldBeforeRensa, evalCallback);
     detector.iteratePossibleRensas(preEvalResult.matchablePatternIds(), maxIteration);
 
     RensaDetector::detectSideChain(fieldBeforeRensa, RensaDetectorStrategy::defaultDropStrategy(),
