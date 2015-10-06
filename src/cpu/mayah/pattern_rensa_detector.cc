@@ -13,7 +13,7 @@ const int MAX_UNUSED_VARIABLES_FOR_FIRST_PATTERN = 0;
 const int MAX_UNUSED_VARIABLES = 1;
 }
 
-void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds,
+void PatternRensaDetector::iteratePossibleRensas(const vector<int>& /*matchableIds*/,
                                                  int maxIteration)
 {
     DCHECK_GE(maxIteration, 1);
@@ -21,54 +21,45 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& matchableIds
     const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
 
     // --- Iterate with complementing pattern.
-    for (const int id : matchableIds) {
-        const PatternBookField& pbf = patternBook_.patternBookField(id);
+    auto callback = [&](CoreField&& complementedField, const ColumnPuyoList& cpl,
+                        int numFilledUnusedVariables, const FieldBits& matchedBits,
+                        const NewPatternBookField& pbf) {
         int x = pbf.ignitionColumn();
         if (x == 0)
-            continue;
+            return;
 
-        ComplementResult complementResult = pbf.complement(originalField_, MAX_UNUSED_VARIABLES_FOR_FIRST_PATTERN);
-
-        if (!complementResult.success)
-            continue;
         // We don't allow unused variable for the first pattern.
-        if (complementResult.numFilledUnusedVariables > 0)
-            continue;
-
-        const ColumnPuyoList& cpl = complementResult.complementedPuyoList;
+        if (numFilledUnusedVariables > 0)
+            return;
 
         // No ignition puyo.
-        if (complementResult.complementedPuyoList.sizeOn(x) == 0)
-            continue;
-
-        CoreField cf(originalField_);
-        if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
-            continue;
+        if (cpl.sizeOn(x) == 0)
+            return;
 
         ColumnPuyo firePuyo(x, cpl.get(x, cpl.sizeOn(x) - 1));
         ColumnPuyoList keyPuyos(cpl);
         keyPuyos.removeTopFrom(x);
         if (!checkDup(firePuyo, keyPuyos))
-            continue;
+            return;
 
         RensaExistingPositionTracker tracker(originalField_.bitField().normalColorBits());
-        if (!cf.vanishDropFast(&tracker)) {
+        if (!complementedField.vanishDropFast(&tracker)) {
             CoreField tmp(originalField_);
             tmp.dropPuyoListWithMaxHeight(cpl, maxHeight);
 
             // TODO(mayah): This shouldn't happen. However, this sometimes triggered now.
             LOG(ERROR) << tmp.toDebugString();
-            continue;
+            return;
         }
 
         // For here, we don't need to make AND to RensaExistingPositionTracker.
-        FieldBits matchedBits = complementResult.matchedResult.matchedBits;
         double patternScore = pbf.score() * matchedBits.popcount() / pbf.numVariables();
-        int restUnusedVariables = MAX_UNUSED_VARIABLES - complementResult.numFilledUnusedVariables;
-        iteratePossibleRensasInternal(cf, tracker, 1, firePuyo, keyPuyos,
+        int restUnusedVariables = MAX_UNUSED_VARIABLES - numFilledUnusedVariables;
+        iteratePossibleRensasInternal(complementedField, tracker, 1, firePuyo, keyPuyos,
                                       maxIteration - 1, restUnusedVariables,
                                       pbf.name(), patternScore);
-    }
+    };
+    patternBook_.complement(originalField_, MAX_UNUSED_VARIABLES_FOR_FIRST_PATTERN, callback);
 
     // --- Iterate without complementing.
     auto detectCallback = [&](const CoreField& complementedField, const ColumnPuyoList& cpl) {
@@ -129,68 +120,6 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
         return;
 
     bool needsToProceedWithoutComplement = true;
-#if 0
-    const int maxHeight = strategy_.allowsPuttingKeyPuyoOn13thRow() ? 13 : 12;
-    std::pair<PatternBook::IndexIterator, PatternBook::IndexIterator> p = patternBook_.find(ignitionPosition);
-
-    for (PatternBook::IndexIterator it = p.first; it != p.second; ++it) {
-        const PatternBookField& pbf = patternBook_.patternBookField(*it);
-
-        ComplementResult complementResult = pbf.complement(currentField, restUnusedVariables);
-        if (!complementResult.success)
-            continue;
-
-        double patternScore = currentPatternScore;
-        if (addsPatternScore) {
-            FieldBits matchedBits = complementResult.matchedResult.matchedBits & currentFieldTracker.result().existingBits();
-            patternScore += pbf.score() * matchedBits.popcount() / pbf.numVariables();
-        }
-
-        const ColumnPuyoList& cpl = complementResult.complementedPuyoList;
-        if (cpl.size() == 0) {
-            needsToProceedWithoutComplement = false;
-
-            CoreField cf(currentField);
-            RensaExistingPositionTracker tracker(currentFieldTracker);
-            CHECK(cf.vanishDropFast(&tracker));
-
-            iteratePossibleRensasInternal(cf, tracker, currentChains + 1, firePuyo, originalKeyPuyos,
-                                          restIteration, restUnusedVariables,
-                                          patternName.empty() ? pbf.name() : patternName,
-                                          patternScore);
-            continue;
-        }
-
-        if (restIteration <= 0)
-            continue;
-
-        if (cpl.sizeOn(firePuyo.x) > 0)
-            continue;
-
-        ColumnPuyoList keyPuyos(originalKeyPuyos);
-        if (!keyPuyos.merge(cpl))
-            continue;
-        if (!checkDup(firePuyo, keyPuyos))
-            continue;
-
-        CoreField cf(currentField);
-        if (!cf.dropPuyoListWithMaxHeight(cpl, maxHeight))
-            continue;
-
-        RensaExistingPositionTracker tracker(currentFieldTracker);
-        if (!cf.vanishDropFast(&tracker)) {
-            LOG(ERROR) << cf.toDebugString();
-            continue;
-        }
-
-        iteratePossibleRensasInternal(cf, tracker, currentChains + 1, firePuyo, keyPuyos,
-                                      restIteration - 1,
-                                      restUnusedVariables - complementResult.numFilledUnusedVariables,
-                                      patternName.empty() ? pbf.name() : patternName,
-                                      patternScore);
-    }
-#else
-
     auto callback = [&](CoreField&& complementedField, const ColumnPuyoList& cpl,
                         int numFilledUnusedVariables, const FieldBits& matchedBits,
                         const NewPatternBookField& pbf) {
@@ -237,8 +166,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
                                       patternName.empty() ? pbf.name() : patternName,
                                       patternScore);
     };
-    newPatternBook_.complement(currentField, ignitionPosition, restUnusedVariables, callback);
-#endif
+    patternBook_.complement(currentField, ignitionPosition, restUnusedVariables, callback);
 
     if (!needsToProceedWithoutComplement)
         return;

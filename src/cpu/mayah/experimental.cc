@@ -301,7 +301,7 @@ pair<double, int> BeamMayahAI::evalLight(const CoreField& fieldBeforeRensa, cons
                         double /*patternScore*/) {
         maxChains = std::max(maxChains, rensaResult.chains);
     };
-    PatternRensaDetector(patternBook_, newPatternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, 1);
+    PatternRensaDetector(newPatternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, 1);
 
     double maxScore = 0;
     maxScore += maxChains * 1000;
@@ -415,7 +415,7 @@ pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vec
         double score = rensaScore + shapeScore;
         maxScore = std::max(maxScore, score);
     };
-    PatternRensaDetector(patternBook_, newPatternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, depth);
+    PatternRensaDetector(newPatternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, depth);
 
     return make_pair(maxScore, maxChains);
 }

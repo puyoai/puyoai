@@ -142,9 +142,7 @@ score = 9
 
 TEST(PatternBookTest, pattern1)
 {
-    PatternBook patternBook;
     NewPatternBook newPatternBook;
-    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK));
     ASSERT_TRUE(newPatternBook.loadFromString(TEST_BOOK));
 
     CoreField field("G....."
@@ -173,15 +171,13 @@ TEST(PatternBookTest, pattern1)
         }
     };
 
-    PatternRensaDetector(patternBook, newPatternBook, field, callback).iteratePossibleRensas({0}, 1);
+    PatternRensaDetector(newPatternBook, field, callback).iteratePossibleRensas({0}, 1);
     EXPECT_TRUE(found);
 }
 
 TEST(PatternBookTest, pattern1_complement1)
 {
-    PatternBook patternBook;
     NewPatternBook newPatternBook;
-    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK));
     ASSERT_TRUE(newPatternBook.loadFromString(TEST_BOOK));
 
     CoreField field("G....."
@@ -214,15 +210,13 @@ TEST(PatternBookTest, pattern1_complement1)
         }
     };
 
-    PatternRensaDetector(patternBook, newPatternBook, field, callback).iteratePossibleRensas({0}, 1);
+    PatternRensaDetector(newPatternBook, field, callback).iteratePossibleRensas({0}, 1);
     EXPECT_TRUE(found);
 }
 
 TEST(PatternBookTest, pattern1_complement2)
 {
-    PatternBook patternBook;
     NewPatternBook newPatternBook;
-    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK));
     ASSERT_TRUE(newPatternBook.loadFromString(TEST_BOOK));
 
     CoreField field(
@@ -243,15 +237,13 @@ TEST(PatternBookTest, pattern1_complement2)
             found = true;
     };
 
-    PatternRensaDetector(patternBook, newPatternBook, field, callback).iteratePossibleRensas({}, 3);
+    PatternRensaDetector(newPatternBook, field, callback).iteratePossibleRensas({}, 3);
     EXPECT_TRUE(found);
 }
 
 TEST(PatternBookTest, pattern2)
 {
-    PatternBook patternBook;
     NewPatternBook newPatternBook;
-    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK2));
     ASSERT_TRUE(newPatternBook.loadFromString(TEST_BOOK2));
 
     CoreField field("G....."
@@ -280,15 +272,13 @@ TEST(PatternBookTest, pattern2)
         }
     };
 
-    PatternRensaDetector(patternBook, newPatternBook, field, callback).iteratePossibleRensas({0, 1}, 2);
+    PatternRensaDetector(newPatternBook, field, callback).iteratePossibleRensas({0, 1}, 2);
     EXPECT_TRUE(found);
 }
 
 TEST(PatternBookTest, pattern3)
 {
-    PatternBook patternBook;
     NewPatternBook newPatternBook;
-    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK3));
     ASSERT_TRUE(newPatternBook.loadFromString(TEST_BOOK3));
 
     CoreField field("G....."
@@ -317,15 +307,13 @@ TEST(PatternBookTest, pattern3)
             found = true;
     };
 
-    PatternRensaDetector(patternBook, newPatternBook, field, callback).iteratePossibleRensas({0, 1}, 2);
+    PatternRensaDetector(newPatternBook, field, callback).iteratePossibleRensas({0, 1}, 2);
     EXPECT_TRUE(found);
 }
 
 TEST(PatternBookTest, pattern4)
 {
-    PatternBook patternBook;
     NewPatternBook newPatternBook;
-    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK4));
     ASSERT_TRUE(newPatternBook.loadFromString(TEST_BOOK4));
 
     CoreField field("G....."
@@ -361,15 +349,13 @@ TEST(PatternBookTest, pattern4)
             found = true;
     };
 
-    PatternRensaDetector(patternBook, newPatternBook, field, callback).iteratePossibleRensas({0, 1, 2}, 3);
+    PatternRensaDetector(newPatternBook, field, callback).iteratePossibleRensas({0, 1, 2}, 3);
     EXPECT_TRUE(found);
 }
 
 TEST(PatternBookTest, pattern5)
 {
-    PatternBook patternBook;
     NewPatternBook newPatternBook;
-    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK5));
     ASSERT_TRUE(newPatternBook.loadFromString(TEST_BOOK5));
 
     CoreField field1("......"
@@ -395,9 +381,9 @@ TEST(PatternBookTest, pattern5)
     };
 
     score = &score1;
-    PatternRensaDetector(patternBook, newPatternBook, field1, callback).iteratePossibleRensas({0, 1}, 3);
+    PatternRensaDetector(newPatternBook, field1, callback).iteratePossibleRensas({0, 1}, 3);
     score = &score2;
-    PatternRensaDetector(patternBook, newPatternBook, field2, callback).iteratePossibleRensas({0, 1}, 3);
+    PatternRensaDetector(newPatternBook, field2, callback).iteratePossibleRensas({0, 1}, 3);
 
     EXPECT_GT(score1, 0.0);
     EXPECT_GT(score2, 0.0);
@@ -406,9 +392,7 @@ TEST(PatternBookTest, pattern5)
 
 TEST(PatternBookTest, pattern6)
 {
-    PatternBook patternBook;
     NewPatternBook newPatternBook;
-    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK6));
     ASSERT_TRUE(newPatternBook.loadFromString(TEST_BOOK6));
 
     CoreField field("......"
@@ -426,15 +410,13 @@ TEST(PatternBookTest, pattern6)
             score = patternScore;
     };
 
-    PatternRensaDetector(patternBook, newPatternBook, field, callback).iteratePossibleRensas({0, 1}, 3);
+    PatternRensaDetector(newPatternBook, field, callback).iteratePossibleRensas({0, 1}, 3);
     EXPECT_EQ(score, 0.0);
 }
 
 TEST(PatternBookTest, pattern7)
 {
-    PatternBook patternBook;
     NewPatternBook newPatternBook;
-    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK7));
     ASSERT_TRUE(newPatternBook.loadFromString(TEST_BOOK7));
 
     CoreField field("......"
@@ -454,6 +436,6 @@ TEST(PatternBookTest, pattern7)
 
     double expected = 10.0 * (6.0 / 12.0) + 9.0 * (7.0 / 12.0);
 
-    PatternRensaDetector(patternBook, newPatternBook, field, callback).iteratePossibleRensas({0, 1}, 3);
+    PatternRensaDetector(newPatternBook, field, callback).iteratePossibleRensas({0, 1}, 3);
     EXPECT_EQ(expected, score);
 }
