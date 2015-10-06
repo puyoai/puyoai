@@ -19,13 +19,15 @@ struct RensaResult;
 
 class EvaluatorBase {
 protected:
-    EvaluatorBase(const PatternBook& patternBook) :
-        patternBook_(patternBook) {}
+    EvaluatorBase(const PatternBook& patternBook, const NewPatternBook& newPatternBook) :
+        patternBook_(patternBook), newPatternBook_(newPatternBook) {}
 
     const PatternBook& patternBook() const { return patternBook_; }
+    const NewPatternBook& newPatternBook() const { return newPatternBook_; }
 
 private:
     const PatternBook& patternBook_;
+    const NewPatternBook& newPatternBook_;
 };
 
 class PreEvalResult {
@@ -42,8 +44,8 @@ private:
 
 class PreEvaluator : public EvaluatorBase {
 public:
-    PreEvaluator(const PatternBook& patternBook) :
-        EvaluatorBase(patternBook) {}
+    PreEvaluator(const PatternBook& patternBook, const NewPatternBook& newPatternBook) :
+        EvaluatorBase(patternBook, newPatternBook) {}
 
     PreEvalResult preEval(const CoreField& currentField);
 };
@@ -72,8 +74,8 @@ private:
 
 class MidEvaluator : public EvaluatorBase {
 public:
-    MidEvaluator(const PatternBook& patternBook) :
-        EvaluatorBase(patternBook) {}
+    MidEvaluator(const PatternBook& patternBook, const NewPatternBook& newPatternBook) :
+        EvaluatorBase(patternBook, newPatternBook) {}
 
     MidEvalResult eval(const RefPlan&, const CoreField& currentField, double score);
 };
@@ -94,8 +96,8 @@ template<typename ScoreCollector>
 class RensaEvaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    RensaEvaluator(const PatternBook& patternBook, ScoreCollector* sc) :
-        EvaluatorBase(patternBook),
+    RensaEvaluator(const PatternBook& patternBook, const NewPatternBook& newPatternBook, ScoreCollector* sc) :
+        EvaluatorBase(patternBook, newPatternBook),
         sc_(sc) {}
 
     void evalPatternScore(const ColumnPuyoList& puyosToComplement, double patternScore, int chains);
@@ -119,8 +121,8 @@ template<typename ScoreCollector>
 class Evaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.
-    Evaluator(const PatternBook& patternBook, ScoreCollector* sc) :
-        EvaluatorBase(patternBook),
+    Evaluator(const PatternBook& patternBook, const NewPatternBook& newPatternBook, ScoreCollector* sc) :
+        EvaluatorBase(patternBook, newPatternBook),
         sc_(sc) {}
 
     void eval(const RefPlan&, const KumipuyoSeq&, int currentFrameId, int maxIteration,

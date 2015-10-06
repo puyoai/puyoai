@@ -17,6 +17,7 @@ protected:
     {
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
+        NewPatternBook newPatternBook;
         Gazer gazer;
 
         gazer.initialize(100);
@@ -28,9 +29,9 @@ protected:
 
         RefPlan plan(f, decisions, rensaResult, 0, framesToIgnite, lastDropFrames, 0, 0, 0, 0, false);
 
-        PreEvalResult preEvalResult = PreEvaluator(patternBook).preEval(f);
+        PreEvalResult preEvalResult = PreEvaluator(patternBook, newPatternBook).preEval(f);
         FeatureScoreCollector sc(evaluationParameterMap);
-        Evaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
+        Evaluator<FeatureScoreCollector> evaluator(patternBook, newPatternBook, &sc);
         evaluator.eval(plan, KumipuyoSeq(), 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), false, false, gazer.gazeResult());
         return sc.collectedScore();
     }
@@ -39,8 +40,9 @@ protected:
     CollectedFeatureScore withEvaluator(F f) {
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
+        NewPatternBook newPatternBook;
         FeatureScoreCollector sc(evaluationParameterMap);
-        Evaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
+        Evaluator<FeatureScoreCollector> evaluator(patternBook, newPatternBook, &sc);
 
         f(&evaluator);
 
@@ -51,8 +53,9 @@ protected:
     CollectedFeatureScore withRensaEvaluator(F f) {
         EvaluationParameterMap evaluationParameterMap;
         PatternBook patternBook;
+        NewPatternBook newPatternBook;
         FeatureScoreCollector sc(evaluationParameterMap);
-        RensaEvaluator<FeatureScoreCollector> rensaEvaluator(patternBook, &sc);
+        RensaEvaluator<FeatureScoreCollector> rensaEvaluator(patternBook, newPatternBook, &sc);
 
         f(&rensaEvaluator);
 
@@ -68,8 +71,9 @@ TEST_F(EvaluatorTest, evalRensaGarbage)
 
     EvaluationRensaParameterSet paramSet;
     PatternBook patternBook;
+    NewPatternBook newPatternBook;
     FeatureRensaScoreCollector sc(paramSet, paramSet);
-    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, newPatternBook, &sc);
 
     evaluator.evalRensaGarbage(f);
     CollectedFeatureRensaScore cfs = sc.mainRensaScore();
@@ -86,8 +90,9 @@ TEST_F(EvaluatorTest, evalFirePointTabooFeature1)
 
     EvaluationRensaParameterSet paramSet;
     PatternBook patternBook;
+    NewPatternBook newPatternBook;
     FeatureRensaScoreCollector sc(paramSet, paramSet);
-    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, newPatternBook, &sc);
 
     evaluator.evalFirePointTabooFeature(cf, ignitionBits);
     CollectedFeatureRensaScore cfs = sc.mainRensaScore();
@@ -106,8 +111,9 @@ TEST_F(EvaluatorTest, evalFirePointTabooFeature2)
 
     EvaluationRensaParameterSet paramSet;
     PatternBook patternBook;
+    NewPatternBook newPatternBook;
     FeatureRensaScoreCollector sc(paramSet, paramSet);
-    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, newPatternBook, &sc);
 
     evaluator.evalFirePointTabooFeature(cf, ignitionBits);
     CollectedFeatureRensaScore cfs = sc.mainRensaScore();
@@ -126,8 +132,9 @@ TEST_F(EvaluatorTest, evalFirePointTabooFeature3)
 
     EvaluationRensaParameterSet paramSet;
     PatternBook patternBook;
+    NewPatternBook newPatternBook;
     FeatureRensaScoreCollector sc(paramSet, paramSet);
-    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, newPatternBook, &sc);
 
     evaluator.evalFirePointTabooFeature(cf, ignitionBits);
     CollectedFeatureRensaScore cfs = sc.mainRensaScore();
@@ -146,8 +153,9 @@ TEST_F(EvaluatorTest, evalFirePointTabooFeature4)
 
     EvaluationRensaParameterSet paramSet;
     PatternBook patternBook;
+    NewPatternBook newPatternBook;
     FeatureRensaScoreCollector sc(paramSet, paramSet);
-    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, newPatternBook, &sc);
 
     evaluator.evalFirePointTabooFeature(cf, ignitionBits);
     CollectedFeatureRensaScore cfs = sc.mainRensaScore();
@@ -166,8 +174,9 @@ TEST_F(EvaluatorTest, evalFirePointTabooFeature5)
 
     EvaluationRensaParameterSet paramSet;
     PatternBook patternBook;
+    NewPatternBook newPatternBook;
     FeatureRensaScoreCollector sc(paramSet, paramSet);
-    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, &sc);
+    RensaEvaluator<FeatureRensaScoreCollector> evaluator(patternBook, newPatternBook, &sc);
 
     evaluator.evalFirePointTabooFeature(cf, ignitionBits);
     CollectedFeatureRensaScore cfs = sc.mainRensaScore();

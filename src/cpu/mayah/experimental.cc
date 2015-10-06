@@ -72,6 +72,7 @@ private:
     EvaluationParameterMap evaluationParameterMap_;
     DecisionBook decisionBook_;
     PatternBook patternBook_;
+    NewPatternBook newPatternBook_;
     unique_ptr<Executor> executor_;
 };
 
@@ -81,6 +82,7 @@ BeamMayahAI::BeamMayahAI(int argc, char* argv[]) :
 {
     CHECK(decisionBook_.load(FLAGS_decision_book));
     CHECK(patternBook_.load(FLAGS_pattern_book));
+    CHECK(newPatternBook_.load(FLAGS_pattern_book));
 
     if (evaluationParameterMap_.load(FLAGS_feature))
         return;
@@ -299,7 +301,7 @@ pair<double, int> BeamMayahAI::evalLight(const CoreField& fieldBeforeRensa, cons
                         double /*patternScore*/) {
         maxChains = std::max(maxChains, rensaResult.chains);
     };
-    PatternRensaDetector(patternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, 1);
+    PatternRensaDetector(patternBook_, newPatternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, 1);
 
     double maxScore = 0;
     maxScore += maxChains * 1000;
@@ -393,7 +395,7 @@ pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vec
         const double virtualRensaScore = rensaResult.score * possibility;
 
         SimpleRensaScoreCollector rensaScoreCollector(sc.mainRensaParamSet(), sc.sideRensaParamSet());
-        RensaEvaluator<SimpleRensaScoreCollector> rensaEvaluator(patternBook_, &rensaScoreCollector);
+        RensaEvaluator<SimpleRensaScoreCollector> rensaEvaluator(patternBook_, newPatternBook_, &rensaScoreCollector);
 
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
@@ -413,7 +415,7 @@ pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vec
         double score = rensaScore + shapeScore;
         maxScore = std::max(maxScore, score);
     };
-    PatternRensaDetector(patternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, depth);
+    PatternRensaDetector(patternBook_, newPatternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, depth);
 
     return make_pair(maxScore, maxChains);
 }
