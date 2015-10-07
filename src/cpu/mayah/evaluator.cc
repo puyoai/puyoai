@@ -32,19 +32,9 @@ using namespace std;
 
 // ----------------------------------------------------------------------
 
-PreEvalResult PreEvaluator::preEval(const CoreField& currentField)
+PreEvalResult PreEvaluator::preEval(const CoreField& /*currentField*/)
 {
     PreEvalResult preEvalResult;
-
-    auto matchablePatternIds = preEvalResult.mutableMatchablePatternIds();
-    for (size_t i = 0; i < patternBook().size(); ++i) {
-        const PatternBookField& pbf = patternBook().patternBookField(i);
-        if (pbf.ignitionColumn() == 0)
-            continue;
-        if (pbf.isMatchable(currentField))
-            matchablePatternIds->push_back(static_cast<int>(i));
-    }
-
     return preEvalResult;
 }
 
@@ -493,7 +483,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                                      int maxIteration,
                                      const PlayerState& me,
                                      const PlayerState& enemy,
-                                     const PreEvalResult& preEvalResult,
+                                     const PreEvalResult& /*preEvalResult*/,
                                      const MidEvalResult& midEvalResult,
                                      bool fast,
                                      bool usesRensaHandTree,
@@ -556,7 +546,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         const double virtualRensaScore = rensaResult.score * possibility;
 
         RensaScoreCollector rensaScoreCollector(sc_->mainRensaParamSet(), sc_->sideRensaParamSet());
-        RensaEvaluator<RensaScoreCollector> rensaEvaluator(patternBook(), newPatternBook(), &rensaScoreCollector);
+        RensaEvaluator<RensaScoreCollector> rensaEvaluator(patternBook(), &rensaScoreCollector);
 
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
@@ -623,8 +613,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         }
     };
 
-    PatternRensaDetector detector(newPatternBook(), fieldBeforeRensa, evalCallback);
-    detector.iteratePossibleRensas(preEvalResult.matchablePatternIds(), maxIteration);
+    PatternRensaDetector detector(patternBook(), fieldBeforeRensa, evalCallback);
+    detector.iteratePossibleRensas(maxIteration);
 
     RensaDetector::detectSideChain(fieldBeforeRensa, RensaDetectorStrategy::defaultDropStrategy(),
                                    [&](CoreField&& cf, const ColumnPuyoList& cpl) {

@@ -7,7 +7,76 @@
 
 using namespace std;
 
-static const char TEST_BOOK[] = R"(
+namespace {
+
+void testMatch(const char* book, const CoreField& original)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(book));
+
+    bool found = false;
+    auto callback = [&](CoreField&& /*cf*/, const ColumnPuyoList& /*cpl*/,
+                        int /*numFilledUnusedVariables*/, const FieldBits& /*matchedBits*/,
+                        const PatternBookField& /*patternBookField*/) {
+        found = true;
+    };
+
+    patternBook.complement(original, callback);
+    EXPECT_TRUE(found);
+}
+
+void testUnmatch(const char* book, const CoreField& original)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(book));
+
+    bool found = false;
+    CoreField foundField;
+    auto callback = [&](CoreField&& cf, const ColumnPuyoList& /*cpl*/,
+                        int /*numFilledUnusedVariables*/, const FieldBits& /*matchedBits*/,
+                        const PatternBookField& /*patternBookField*/) {
+        found = true;
+        foundField = cf;
+    };
+
+    patternBook.complement(original, callback);
+    EXPECT_FALSE(found) << foundField;
+}
+
+void testComplement(const char* book, const CoreField& original,
+                    const CoreField expected[], size_t size,
+                    bool allowsUnexpected)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(book));
+
+    vector<bool> found(size);
+    auto callback = [&](CoreField&& cf, const ColumnPuyoList& /*cpl*/,
+                        int /*numFilledUnusedVariables*/, const FieldBits& /*matchedBits*/,
+                        const PatternBookField& /*patternBookField*/) {
+        bool expectedFound = false;
+        for (size_t i = 0; i < size; ++i) {
+            if (expected[i] == cf) {
+                found[i] = true;
+                expectedFound = true;
+            }
+        }
+
+        if (!allowsUnexpected) {
+            EXPECT_TRUE(expectedFound) << cf.toDebugString();
+        }
+    };
+    patternBook.complement(original, callback);
+
+    for (size_t i = 0; i < size; ++i)
+        EXPECT_TRUE(found[i]) << i;
+}
+
+} // namespace anonymous
+
+TEST(PatternBookTest, complement)
+{
+    static const char BOOK[] = R"(
 [[pattern]]
 field = [
     "A.....",
@@ -31,31 +100,8 @@ score = 72
 name = "GTR"
 )";
 
-TEST(PatternBookTest, ignitionPositions)
-{
     PatternBook patternBook;
-    ASSERT_TRUE(patternBook.loadFromString(TEST_BOOK));
-
-    FieldBits bits(
-        ".....1"
-        ".....1"
-        "....11"
-        "......");
-
-    auto itPair = patternBook.find(bits);
-
-    int count = 0;
-    for (auto it = itPair.first; it != itPair.second; ++it) {
-        ++count;
-    }
-
-    EXPECT_EQ(2, count);
-}
-
-TEST(PatternBookTest, complement)
-{
-    NewPatternBook patternBook;
-    patternBook.loadFromString(TEST_BOOK);
+    ASSERT_TRUE(patternBook.loadFromString(BOOK));
 
     CoreField original(
         "......"
@@ -99,7 +145,7 @@ TEST(PatternBookTest, complement)
 
     auto callback = [&](CoreField&& cf, const ColumnPuyoList& cpl,
                         int numFilledUnusedVariables, const FieldBits& matchedBits,
-                        const NewPatternBookField& patternBookField) {
+                        const PatternBookField& patternBookField) {
         for (size_t i = 0; i < ARRAY_SIZE(expected); ++i) {
             if (expected[i] != cf)
                 continue;
@@ -116,6 +162,67 @@ TEST(PatternBookTest, complement)
     patternBook.complement(original, callback);
     for (size_t i = 0; i < ARRAY_SIZE(expected); ++i)
         EXPECT_TRUE(found[i]) << i;
+}
+
+TEST(PatternBookTest, complement1)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    "A.BC..",
+    "AAAB..",
+    "BBBCCC",
+]
+ignition = 1
+)";
+
+    const CoreField original1(
+        "......"
+        "..YB.."
+        "BBBG..");
+    const CoreField original2(
+        "..BG.."
+        "YYYB.."
+        "BBBGGG");
+
+    const CoreField expected[] {
+        CoreField(
+            "Y.BG.."
+            "YYYB.."
+            "BBBGGG")
+    };
+
+    testComplement(BOOK, original1, expected, ARRAY_SIZE(expected), false);
+    testComplement(BOOK, original2, expected, ARRAY_SIZE(expected), false);
+}
+
+TEST(PatternBookTest, complement2)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    "A...De",
+    "ABCDDE",
+    "AABCCD",
+    "BBCEEE",
+]
+ignition = 1
+)";
+
+    const CoreField original(
+        ".....Y"
+        "Y....Y"
+        "Y..RRB"
+        "GG.YYY");
+    const CoreField expected[] {
+        CoreField(
+            "Y...BY"
+            "YGRBBY"
+            "YYGRRB"
+            "GGRYYY")
+    };
+
+    testComplement(BOOK, original, expected, ARRAY_SIZE(expected), false);
 }
 
 TEST(PatternBookTest, complementWithIgnitionBits)
@@ -144,8 +251,8 @@ score = 72
 name = "GTR"
     )";
 
-    NewPatternBook patternBook;
-    patternBook.loadFromString(BOOK);
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(BOOK));
 
     CoreField original(
         "R....."
@@ -164,7 +271,7 @@ name = "GTR"
 
     auto callback = [&](CoreField&& cf, const ColumnPuyoList& /*cpl*/,
                         int /*numFilledUnusedVariables*/, const FieldBits& /*matchedBits*/,
-                        const NewPatternBookField& /*patternBookField*/) {
+                        const PatternBookField& /*patternBookField*/) {
 
         if (expected != cf) {
             foundUnexpected = true;
@@ -178,4 +285,121 @@ name = "GTR"
 
     EXPECT_TRUE(found);
     EXPECT_FALSE(foundUnexpected);
+}
+
+
+TEST(PatternBookTest, unmatch1)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    "A.....",
+    "ABC.D.",
+    "AABCCC",
+    "BBDDD.",
+]
+ignition = 1
+score = 1.0
+)";
+
+    CoreField f1(
+        "BYGBRB"
+        "BBYGGG"
+        "YYRRRB");
+
+    CoreField f2(
+        "....R."
+        "BYB.R."
+        "BBYBBB"
+        "YYRRRG");
+
+    CoreField f3(
+        "BYO.R."
+        "BBYOOO"
+        "YYRRRY");
+
+    CoreField f4(
+        "BRB.R."
+        "BBRBBB"
+        "RRRRRY");
+
+    testMatch(BOOK, f1);
+    testUnmatch(BOOK, f2);
+    testUnmatch(BOOK, f3);
+    testUnmatch(BOOK, f4);
+}
+
+TEST(PatternBookTest, unmatch2)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    ".AAAAA",
+]
+ignition = 6
+)";
+
+    CoreField original("B..B.B");
+    testUnmatch(BOOK, original);
+}
+
+TEST(PatternBookTest, unmatch3)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    "A....B",
+    "AAABBB",
+]
+ignition = 6
+)";
+
+    CoreField original("Y....Y");
+
+    testUnmatch(BOOK, original);
+}
+
+TEST(PatternBookTest, unmatch4)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    "BA....",
+    "AAA...",
+    "BC....",
+    "BBC...",
+    "CC....",
+]
+ignition = 2
+)";
+
+    CoreField original(
+        "YB...."
+        "YYB..."
+        "BBGGG.");
+
+    // Since we cannot complement (3, 3), this pattern should not match.
+    testUnmatch(BOOK, original);
+}
+
+TEST(PatternMatcherTest, unmatch5)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    "BA....",
+    "AAA...",
+    "BC....",
+    "BBC...",
+    "CC....",
+]
+ignition = 2
+)";
+
+    CoreField original(
+        ".R...."
+        "YY.BBB"
+        "RRRGGG");
+
+    testUnmatch(BOOK, original);
 }

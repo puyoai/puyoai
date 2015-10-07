@@ -19,7 +19,7 @@ public:
                                 const std::string& patternName,
                                 double patternScore)> Callback;
 
-    PatternRensaDetector(const NewPatternBook& patternBook,
+    PatternRensaDetector(const PatternBook& patternBook,
                          const CoreField& originalField,
                          Callback callback) :
         patternBook_(patternBook),
@@ -29,8 +29,8 @@ public:
     {
     }
 
-    void iteratePossibleRensas(const std::vector<int>& matchableIds,
-                               int maxIteration);
+    void iteratePossibleRensas(int maxIteration);
+
 
 private:
     void iteratePossibleRensasInternal(const CoreField& currentField,
@@ -54,7 +54,7 @@ private:
                     const std::string& patternName,
                     bool prohibits[FieldConstant::MAP_WIDTH]);
 
-    const NewPatternBook& patternBook_;
+    const PatternBook& patternBook_;
     const CoreField& originalField_;
     Callback callback_;
     const RensaDetectorStrategy strategy_;

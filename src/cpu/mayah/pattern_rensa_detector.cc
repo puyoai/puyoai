@@ -13,8 +13,7 @@ const int MAX_UNUSED_VARIABLES_FOR_FIRST_PATTERN = 0;
 const int MAX_UNUSED_VARIABLES = 1;
 }
 
-void PatternRensaDetector::iteratePossibleRensas(const vector<int>& /*matchableIds*/,
-                                                 int maxIteration)
+void PatternRensaDetector::iteratePossibleRensas(int maxIteration)
 {
     DCHECK_GE(maxIteration, 1);
 
@@ -23,7 +22,7 @@ void PatternRensaDetector::iteratePossibleRensas(const vector<int>& /*matchableI
     // --- Iterate with complementing pattern.
     auto callback = [&](CoreField&& complementedField, const ColumnPuyoList& cpl,
                         int numFilledUnusedVariables, const FieldBits& matchedBits,
-                        const NewPatternBookField& pbf) {
+                        const PatternBookField& pbf) {
         int x = pbf.ignitionColumn();
         if (x == 0)
             return;
@@ -122,7 +121,7 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
     bool needsToProceedWithoutComplement = true;
     auto callback = [&](CoreField&& complementedField, const ColumnPuyoList& cpl,
                         int numFilledUnusedVariables, const FieldBits& matchedBits,
-                        const NewPatternBookField& pbf) {
+                        const PatternBookField& pbf) {
         double patternScore = currentPatternScore;
         if (addsPatternScore) {
             FieldBits currentMatchedBits = matchedBits & currentFieldTracker.result().existingBits();
