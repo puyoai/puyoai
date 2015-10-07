@@ -87,7 +87,6 @@ protected:
     EvaluationParameterMap evaluationParameterMap_;
     DecisionBook decisionBook_;
     PatternBook patternBook_;
-    NewPatternBook newPatternBook_;
 
     bool usesDecisionBook_ = true;
     bool usesRensaHandTree_ = true;

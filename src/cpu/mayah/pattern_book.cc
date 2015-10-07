@@ -25,7 +25,60 @@ ColumnPuyoList diff(const CoreField& before, const BitField& after)
 
 } // namespace anonymous
 
-bool PatternBook::load(const string& filename)
+class PatternBook::PatternTree {
+public:
+    PatternTree() {}
+
+    bool isLeaf() const { return patternBookField_.get() != nullptr; }
+    const PatternBookField& patternBookField() const { return *patternBookField_; }
+
+    // Returns a node.
+    PatternTree* put(const PatternBit&);
+    bool setLeaf(const std::string& name, const FieldBits& ironPatternBits, int ignitionColumn, int numVariables, double score);
+
+private:
+    friend class PatternBook;
+
+    // If leaf, this is not empty.
+    unique_ptr<PatternBookField> patternBookField_;
+    std::vector<std::pair<PatternBit, unique_ptr<PatternTree>>> children_;
+};
+
+PatternBook::PatternBook() :
+    root_(new PatternTree())
+{
+}
+
+PatternBook::~PatternBook()
+{
+}
+
+PatternBook::PatternTree* PatternBook::PatternTree::put(const PatternBit& patternBit)
+{
+    for (auto& entry : children_) {
+        if (entry.first == patternBit)
+            return entry.second.get();
+    }
+
+    children_.emplace_back(patternBit, unique_ptr<PatternTree>(new PatternTree()));
+    return children_.back().second.get();
+}
+
+bool PatternBook::PatternTree::setLeaf(const std::string& name,
+                                          const FieldBits& ironBits,
+                                          int ignitionColumn,
+                                          int numVariables,
+                                          double score)
+{
+    CHECK(0 <= ignitionColumn && ignitionColumn <= 6);
+    if (patternBookField_.get())
+        return false;
+
+    patternBookField_.reset(new PatternBookField(name, ironBits, ignitionColumn, numVariables, score));
+    return true;
+}
+
+bool PatternBook::PatternBook::load(const string& filename)
 {
     ifstream ifs(filename);
     toml::Parser parser(ifs);
@@ -52,185 +105,6 @@ bool PatternBook::loadFromString(const string& str)
 }
 
 bool PatternBook::loadFromValue(const toml::Value& patterns)
-{
-    CHECK(fields_.empty());
-    CHECK(index_.empty());
-
-    const toml::Array& vs = patterns.find("pattern")->as<toml::Array>();
-    for (const toml::Value& v : vs) {
-        string str;
-        for (const auto& s : v.get<toml::Array>("field"))
-            str += s.as<string>();
-
-        string notStr;
-        if (const toml::Value* p = v.find("not_field")) {
-            for (const auto& s : p->as<toml::Array>())
-                notStr += s.as<string>();
-        }
-
-        string name;
-        if (const toml::Value* p = v.find("name")) {
-            name = p->as<string>();
-        }
-
-        int ignitionColumn = 0;
-        if (const toml::Value* p = v.find("ignition")) {
-            ignitionColumn = p->as<int>();
-            CHECK(1 <= ignitionColumn && ignitionColumn <= 6) << ignitionColumn;
-        }
-
-        double score = 0;
-        if (const toml::Value* p = v.find("score")) {
-            if (p->is<int>())
-                score = p->as<int>();
-            else if (p->is<double>())
-                score = p->as<double>();
-            else
-                CHECK(false);
-        }
-
-        PatternBookField pbf(name, str, notStr, ignitionColumn, score);
-
-        if (const toml::Value* p = v.find("precondition")) {
-            for (const auto& cp : p->as<toml::Array>()) {
-                int x = cp.get<int>(0);
-                int y = cp.get<int>(1);
-                pbf.mutablePattern()->setMustVar(x, y);
-            }
-        }
-
-        fields_.push_back(pbf);
-        fields_.push_back(pbf.mirror());
-
-#if 1
-        // +4
-        str += "......" "......" "......" "......";
-        notStr += "......" "......" "......" "......";
-        name = "";
-
-        PatternBookField upperPbf(name, str, notStr, ignitionColumn, score / 3);
-        if (const toml::Value* p = v.find("precondition")) {
-            for (const auto& cp : p->as<toml::Array>()) {
-                int x = cp.get<int>(0);
-                int y = cp.get<int>(1) + 4;
-                upperPbf.mutablePattern()->setMustVar(x, y);
-            }
-        }
-
-        fields_.push_back(upperPbf);
-        fields_.push_back(upperPbf.mirror());
-#endif
-    }
-
-    for (int i = 0; i < static_cast<int>(fields_.size()); ++i) {
-        FieldBits ignitionPositions = fields_[i].ignitionPositions();
-        auto it = index_.find(ignitionPositions);
-        if (it != index_.end()) {
-            it->second.push_back(i);
-            continue;
-        }
-
-        // No such key.
-        index_.emplace(ignitionPositions, vector<int>{i});
-        indexKeys_.push_back(ignitionPositions);
-    }
-
-    return true;
-}
-
-pair<PatternBook::IndexIterator, PatternBook::IndexIterator>
-PatternBook::find(FieldBits ignitionPositions) const
-{
-    auto it = index_.find(ignitionPositions);
-    if (it != index_.end())
-        return make_pair(it->second.begin(), it->second.end());
-
-    static const vector<int> s_emptyVector;
-    return make_pair(s_emptyVector.begin(), s_emptyVector.end());
-}
-
-// ----------------------------------------------------------------------
-
-class NewPatternBook::PatternTree {
-public:
-    PatternTree() {}
-
-    bool isLeaf() const { return patternBookField_.get() != nullptr; }
-    const NewPatternBookField& patternBookField() const { return *patternBookField_; }
-
-    // Returns a node.
-    PatternTree* put(const PatternBit&);
-    bool setLeaf(const std::string& name, const FieldBits& ironPatternBits, int ignitionColumn, int numVariables, double score);
-
-private:
-    friend class NewPatternBook;
-
-    // If leaf, this is not empty.
-    unique_ptr<NewPatternBookField> patternBookField_;
-    std::vector<std::pair<PatternBit, unique_ptr<PatternTree>>> children_;
-};
-
-NewPatternBook::NewPatternBook() :
-    root_(new PatternTree())
-{
-}
-
-NewPatternBook::~NewPatternBook()
-{
-}
-
-NewPatternBook::PatternTree* NewPatternBook::PatternTree::put(const PatternBit& patternBit)
-{
-    for (auto& entry : children_) {
-        if (entry.first == patternBit)
-            return entry.second.get();
-    }
-
-    children_.emplace_back(patternBit, unique_ptr<PatternTree>(new PatternTree()));
-    return children_.back().second.get();
-}
-
-bool NewPatternBook::PatternTree::setLeaf(const std::string& name,
-                                          const FieldBits& ironBits,
-                                          int ignitionColumn,
-                                          int numVariables,
-                                          double score)
-{
-    CHECK(0 <= ignitionColumn && ignitionColumn <= 6);
-    if (patternBookField_.get())
-        return false;
-
-    patternBookField_.reset(new NewPatternBookField(name, ironBits, ignitionColumn, numVariables, score));
-    return true;
-}
-
-bool NewPatternBook::NewPatternBook::load(const string& filename)
-{
-    ifstream ifs(filename);
-    toml::Parser parser(ifs);
-    toml::Value v = parser.parse();
-    if (!v.valid()) {
-        LOG(ERROR) << parser.errorReason();
-        return false;
-    }
-
-    return loadFromValue(std::move(v));
-}
-
-bool NewPatternBook::loadFromString(const string& str)
-{
-    istringstream ss(str);
-    toml::Parser parser(ss);
-    toml::Value v = parser.parse();
-    if (!v.valid()) {
-        LOG(ERROR) << parser.errorReason();
-        return false;
-    }
-
-    return loadFromValue(v);
-}
-
-bool NewPatternBook::loadFromValue(const toml::Value& patterns)
 {
     const toml::Array& vs = patterns.find("pattern")->as<toml::Array>();
     for (const toml::Value& v : vs) {
@@ -312,20 +186,20 @@ bool NewPatternBook::loadFromValue(const toml::Value& patterns)
     return true;
 }
 
-void NewPatternBook::complement(const CoreField& originalField,
-                                const NewPatternBook::ComplementCallback& callback) const
+void PatternBook::complement(const CoreField& originalField,
+                                const PatternBook::ComplementCallback& callback) const
 {
     complement(originalField, 0, callback);
 }
 
-void NewPatternBook::complement(const CoreField& originalField,
+void PatternBook::complement(const CoreField& originalField,
                                 int allowedNumUnusedVariables,
                                 const ComplementCallback& callback) const
 {
     iterate(*root_, originalField, originalField.bitField(), FieldBits(), allowedNumUnusedVariables, 0, callback);
 }
 
-void NewPatternBook::complement(const CoreField& originalField,
+void PatternBook::complement(const CoreField& originalField,
                                 const FieldBits& ignitionBits,
                                 int allowedNumUnusedVariables,
                                 const ComplementCallback& callback) const
@@ -340,7 +214,7 @@ void NewPatternBook::complement(const CoreField& originalField,
     }
 }
 
-void NewPatternBook::iterate(const NewPatternBook::PatternTree& tree,
+void PatternBook::iterate(const PatternBook::PatternTree& tree,
                              const CoreField& originalField,
                              const BitField& currentField,
                              const FieldBits& matchedBits,

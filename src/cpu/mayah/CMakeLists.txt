@@ -12,7 +12,6 @@ add_library(mayah_lib
             mayah_ai.cc
             move_evaluator.cc
             pattern_book.cc
-            pattern_book_field.cc
             pattern_rensa_detector.cc
             rensa_hand_tree.cc
             shape_evaluator.cc)
@@ -48,7 +47,6 @@ mayah_add_test(evaluation_parameter_test)
 mayah_add_test(gazer_test)
 mayah_add_test(mayah_ai_test)
 mayah_add_test(mayah_ai_situation_test)
-mayah_add_test(pattern_book_field_test)
 mayah_add_test(pattern_book_test)
 mayah_add_test(pattern_rensa_detector_test)
 mayah_add_test(rensa_hand_tree_test)

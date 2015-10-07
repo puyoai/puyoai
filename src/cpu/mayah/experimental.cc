@@ -63,16 +63,14 @@ public:
                        const PlayerState& me, const PlayerState& enemy, bool fast) const override;
 
     SearchResult run(const vector<State>& initialStates, KumipuyoSeq, int maxSearchTurns) const;
-    pair<double, int> eval(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds, int depth) const;
-
-    pair<double, int> evalLight(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const;
-    pair<double, int> evalSuperLight(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const;
+    pair<double, int> eval(const CoreField& fieldBeforeRensa, int depth) const;
+    pair<double, int> evalLight(const CoreField& fieldBeforeRensa) const;
+    pair<double, int> evalSuperLight(const CoreField& fieldBeforeRensa) const;
 
 private:
     EvaluationParameterMap evaluationParameterMap_;
     DecisionBook decisionBook_;
     PatternBook patternBook_;
-    NewPatternBook newPatternBook_;
     unique_ptr<Executor> executor_;
 };
 
@@ -82,7 +80,6 @@ BeamMayahAI::BeamMayahAI(int argc, char* argv[]) :
 {
     CHECK(decisionBook_.load(FLAGS_decision_book));
     CHECK(patternBook_.load(FLAGS_pattern_book));
-    CHECK(newPatternBook_.load(FLAGS_pattern_book));
 
     if (evaluationParameterMap_.load(FLAGS_feature))
         return;
@@ -204,15 +201,6 @@ SearchResult BeamMayahAI::run(const vector<State>& initialStates, KumipuyoSeq se
         int maxFiredRensa = 0;
 
         for (const State& s : currentStates) {
-            vector<int> matchablePatternIds;
-            for (size_t i = 0; i < patternBook_.size(); ++i) {
-                const PatternBookField& pbf = patternBook_.patternBookField(i);
-                if (pbf.ignitionColumn() == 0)
-                    continue;
-                if (pbf.isMatchable(s.field))
-                    matchablePatternIds.push_back(static_cast<int>(i));
-            }
-
             Plan::iterateAvailablePlans(s.field, seq, 1, [&](const RefPlan& plan) {
                 const CoreField& fieldBeforeRensa = plan.field();
                 if (!visited.insert(fieldBeforeRensa.hash()).second)
@@ -231,11 +219,11 @@ SearchResult BeamMayahAI::run(const vector<State>& initialStates, KumipuyoSeq se
                 double maxScore;
                 int maxChains;
                 if (turn >= 6) {
-                    std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa, matchablePatternIds);
+                    std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa);
                 } else if (turn >= 4) {
-                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds, 1);
+                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, 1);
                 } else {
-                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, matchablePatternIds, 2);
+                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, 2);
                 }
 
                 nextStates.emplace_back(plan.field(), s.firstDecision, maxScore, maxChains);
@@ -290,7 +278,7 @@ SearchResult BeamMayahAI::run(const vector<State>& initialStates, KumipuyoSeq se
     return result;
 }
 
-pair<double, int> BeamMayahAI::evalLight(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds) const
+pair<double, int> BeamMayahAI::evalLight(const CoreField& fieldBeforeRensa) const
 {
     int maxChains = 0;
     auto callback = [&](const CoreField& /*fieldAfterRensa*/,
@@ -301,7 +289,7 @@ pair<double, int> BeamMayahAI::evalLight(const CoreField& fieldBeforeRensa, cons
                         double /*patternScore*/) {
         maxChains = std::max(maxChains, rensaResult.chains);
     };
-    PatternRensaDetector(newPatternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, 1);
+    PatternRensaDetector(patternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(1);
 
     double maxScore = 0;
     maxScore += maxChains * 1000;
@@ -321,7 +309,7 @@ pair<double, int> BeamMayahAI::evalLight(const CoreField& fieldBeforeRensa, cons
     return make_pair(maxScore, maxChains);
 }
 
-pair<double, int> BeamMayahAI::evalSuperLight(const CoreField& fieldBeforeRensa, const vector<int>& /*matchablePatternIds*/) const
+pair<double, int> BeamMayahAI::evalSuperLight(const CoreField& fieldBeforeRensa) const
 {
     int maxChains = 0;
     auto callback = [&maxChains](CoreField&& complementedField, const ColumnPuyoList& /*cpl*/) {
@@ -348,7 +336,7 @@ pair<double, int> BeamMayahAI::evalSuperLight(const CoreField& fieldBeforeRensa,
     return make_pair(maxScore, maxChains);
 }
 
-pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vector<int>& matchablePatternIds, int depth) const
+pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, int depth) const
 {
     SimpleScoreCollector sc(evaluationParameterMap_);
     ShapeEvaluator<SimpleScoreCollector>(&sc).eval(fieldBeforeRensa);
@@ -395,7 +383,7 @@ pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vec
         const double virtualRensaScore = rensaResult.score * possibility;
 
         SimpleRensaScoreCollector rensaScoreCollector(sc.mainRensaParamSet(), sc.sideRensaParamSet());
-        RensaEvaluator<SimpleRensaScoreCollector> rensaEvaluator(patternBook_, newPatternBook_, &rensaScoreCollector);
+        RensaEvaluator<SimpleRensaScoreCollector> rensaEvaluator(patternBook_, &rensaScoreCollector);
 
         rensaEvaluator.evalRensaRidgeHeight(complementedField);
         rensaEvaluator.evalRensaValleyDepth(complementedField);
@@ -415,7 +403,7 @@ pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, const vec
         double score = rensaScore + shapeScore;
         maxScore = std::max(maxScore, score);
     };
-    PatternRensaDetector(newPatternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(matchablePatternIds, depth);
+    PatternRensaDetector(patternBook_, fieldBeforeRensa, callback).iteratePossibleRensas(depth);
 
     return make_pair(maxScore, maxChains);
 }
