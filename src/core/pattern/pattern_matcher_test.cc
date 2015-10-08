@@ -291,69 +291,6 @@ TEST(PatternMatcherTest, complement6)
     EXPECT_TRUE(cf == expected1 || cf == expected2);
 }
 
-TEST(PatternMatcherTest, complementWithAllow1)
-{
-    const FieldPattern pattern(
-        ".ab..."
-        ".AB..."
-        "ABC..."
-        "ABC..."
-        "ABCC..");
-
-    const CoreField original(
-        "YGB..."
-        "YGB..."
-        "YGB...");
-
-    const CoreField expected(
-        ".YG..."
-        "YGB..."
-        "YGB..."
-        "YGBB..");
-
-    ComplementResult result = PatternMatcher().complement(pattern, original, 1);
-    EXPECT_TRUE(result.success);
-
-    EXPECT_EQ(expected, result.complementedField);
-
-    CoreField cf(original);
-    ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
-    EXPECT_EQ(expected, cf);
-}
-
-TEST(PatternMatcherTest, complementWithAllow2)
-{
-    const FieldPattern pattern(
-        ".ab..."
-        ".AB..."
-        "ABC..."
-        "ABC..."
-        "ABCC..");
-
-    const CoreField original(
-        ".Y...."
-        ".Y...."
-        "YGB..."
-        "YGB..."
-        "YGB...");
-
-    const CoreField expected(
-        ".Y...."
-        ".YG..."
-        "YGB..."
-        "YGB..."
-        "YGBB..");
-
-    ComplementResult result = PatternMatcher().complement(pattern, original, 1);
-    EXPECT_TRUE(result.success);
-
-    EXPECT_EQ(expected, result.complementedField);
-
-    CoreField cf(original);
-    ASSERT_TRUE(cf.dropPuyoList(result.complementedPuyoList));
-    EXPECT_EQ(expected, cf);
-}
-
 TEST(PatternMatcherTest, complementWithPlaceholder1)
 {
     const FieldPattern pattern(

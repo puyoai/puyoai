@@ -72,6 +72,37 @@ void testComplement(const char* book, const CoreField& original,
         EXPECT_TRUE(found[i]) << i;
 }
 
+void testComplementWithIgnitionBits(const char* book,
+                                    const CoreField& original,
+                                    const FieldBits& ignitionBits,
+                                    const CoreField expected[], size_t size,
+                                    bool allowsUnexpected)
+{
+    PatternBook patternBook;
+    ASSERT_TRUE(patternBook.loadFromString(book));
+
+    vector<bool> found(size);
+    auto callback = [&](CoreField&& cf, const ColumnPuyoList& /*cpl*/,
+                        int /*numFilledUnusedVariables*/, const FieldBits& /*matchedBits*/,
+                        const PatternBookField& /*patternBookField*/) {
+        bool expectedFound = false;
+        for (size_t i = 0; i < size; ++i) {
+            if (expected[i] == cf) {
+                found[i] = true;
+                expectedFound = true;
+            }
+        }
+
+        if (!allowsUnexpected) {
+            EXPECT_TRUE(expectedFound) << cf.toDebugString();
+        }
+    };
+    patternBook.complement(original, ignitionBits, 0, callback);
+
+    for (size_t i = 0; i < size; ++i)
+        EXPECT_TRUE(found[i]) << i;
+}
+
 } // namespace anonymous
 
 TEST(PatternBookTest, complement)
@@ -225,6 +256,36 @@ ignition = 1
     testComplement(BOOK, original, expected, ARRAY_SIZE(expected), false);
 }
 
+TEST(PatternBookTest, complementWithAllow1)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    ".ab...",
+    ".AB...",
+    "ABC...",
+    "ABC...",
+    "ABCC..",
+]
+ignition = 4
+)";
+
+    const CoreField original(
+        "YGB..."
+        "YGB..."
+        "YGB...");
+
+    const CoreField expected[] {
+        CoreField(
+            ".YG..."
+            "YGB..."
+            "YGB..."
+            "YGBB.."),
+    };
+
+    testComplement(BOOK, original, expected, ARRAY_SIZE(expected), false);
+}
+
 TEST(PatternBookTest, complementWithIgnitionBits)
 {
     static const char BOOK[] = R"(
@@ -259,34 +320,18 @@ name = "GTR"
         "R....."
         "RRB..."
         "BBYBB.");
+    FieldBits ignitionBits = original.bitField().bits(PuyoColor::RED);
 
-    CoreField expected(
-        "R....."
-        "RBY..."
-        "RRBYY."
-        "BBYBB.");
-
-    bool found = false;
-    bool foundUnexpected = false;
-
-    auto callback = [&](CoreField&& cf, const ColumnPuyoList& /*cpl*/,
-                        int /*numFilledUnusedVariables*/, const FieldBits& /*matchedBits*/,
-                        const PatternBookField& /*patternBookField*/) {
-
-        if (expected != cf) {
-            foundUnexpected = true;
-            return;
-        }
-
-        found = true;
+    CoreField expected[] {
+        CoreField(
+            "R....."
+            "RBY..."
+            "RRBYY."
+            "BBYBB."),
     };
 
-    patternBook.complement(original, original.bitField().bits(PuyoColor::RED), 0, callback);
-
-    EXPECT_TRUE(found);
-    EXPECT_FALSE(foundUnexpected);
+    testComplementWithIgnitionBits(BOOK, original, ignitionBits, expected, ARRAY_SIZE(expected), false);
 }
-
 
 TEST(PatternBookTest, unmatch1)
 {
@@ -382,7 +427,7 @@ ignition = 2
     testUnmatch(BOOK, original);
 }
 
-TEST(PatternMatcherTest, unmatch5)
+TEST(PatternBookTest, unmatch5)
 {
     static const char BOOK[] = R"(
 [[pattern]]
