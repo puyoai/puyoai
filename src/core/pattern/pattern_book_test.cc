@@ -45,7 +45,8 @@ void testUnmatch(const char* book, const CoreField& original)
 
 void testComplement(const char* book, const CoreField& original,
                     const CoreField expected[], size_t size,
-                    bool allowsUnexpected)
+                    int numAllowedUnusedVariables = 0,
+                    bool allowsUnexpected = false)
 {
     PatternBook patternBook;
     ASSERT_TRUE(patternBook.loadFromString(book));
@@ -66,7 +67,7 @@ void testComplement(const char* book, const CoreField& original,
             EXPECT_TRUE(expectedFound) << cf.toDebugString();
         }
     };
-    patternBook.complement(original, callback);
+    patternBook.complement(original, numAllowedUnusedVariables, callback);
 
     for (size_t i = 0; i < size; ++i)
         EXPECT_TRUE(found[i]) << i;
@@ -76,7 +77,7 @@ void testComplementWithIgnitionBits(const char* book,
                                     const CoreField& original,
                                     const FieldBits& ignitionBits,
                                     const CoreField expected[], size_t size,
-                                    bool allowsUnexpected)
+                                    bool allowsUnexpected = false)
 {
     PatternBook patternBook;
     ASSERT_TRUE(patternBook.loadFromString(book));
@@ -223,8 +224,8 @@ ignition = 1
             "BBBGGG")
     };
 
-    testComplement(BOOK, original1, expected, ARRAY_SIZE(expected), false);
-    testComplement(BOOK, original2, expected, ARRAY_SIZE(expected), false);
+    testComplement(BOOK, original1, expected, ARRAY_SIZE(expected));
+    testComplement(BOOK, original2, expected, ARRAY_SIZE(expected));
 }
 
 TEST(PatternBookTest, complement2)
@@ -253,7 +254,69 @@ ignition = 1
             "GGRYYY")
     };
 
-    testComplement(BOOK, original, expected, ARRAY_SIZE(expected), false);
+    testComplement(BOOK, original, expected, ARRAY_SIZE(expected));
+}
+
+TEST(PatternBookTest, complement3)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    "AAA...",
+])";
+
+    const CoreField expected[] {
+        CoreField("RRR...")
+    };
+
+    testUnmatch(BOOK, CoreField());
+    testComplement(BOOK, CoreField("RRR..."), expected, ARRAY_SIZE(expected));
+    testComplement(BOOK, CoreField("R....."), expected, ARRAY_SIZE(expected));
+    testComplement(BOOK, CoreField("R.R..."), expected, ARRAY_SIZE(expected));
+}
+
+TEST(PatternBookTest, complementWithStar)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    ".***CC",
+    ".AABBB",
+])";
+
+    CoreField f1(
+        ".YYYGG"
+        ".RRBBB");
+    CoreField expected1[] {
+        CoreField(
+            ".YYYGG"
+            ".RRBBB"),
+    };
+
+    CoreField f2(
+        ".B...."
+        ".BBYYY"
+        ".RRBBB");
+    CoreField expected2[] {
+        CoreField(
+            ".B...."
+            ".BBYYY"
+            ".RRBBB"),
+    };
+
+    CoreField f3(
+        ".GGGYY"
+        ".RRBBB");
+    CoreField expected3[] {
+        CoreField(
+            ".GGGYY"
+            ".RRBBB"),
+    };
+
+    testUnmatch(BOOK, CoreField());
+    testComplement(BOOK, f1, expected1, ARRAY_SIZE(expected1));
+    testComplement(BOOK, f2, expected2, ARRAY_SIZE(expected2));
+    testComplement(BOOK, f3, expected3, ARRAY_SIZE(expected3));
 }
 
 TEST(PatternBookTest, complementWithAllow1)
@@ -283,7 +346,57 @@ ignition = 4
             "YGBB.."),
     };
 
-    testComplement(BOOK, original, expected, ARRAY_SIZE(expected), false);
+    testComplement(BOOK, original, expected, ARRAY_SIZE(expected));
+}
+
+TEST(PatternBookTest, complementWithAllow2)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    "AA.BB.",
+    "AAaBB.",
+]
+)";
+
+    CoreField original(
+        "RRRBB.");
+
+    CoreField expected[] {
+        CoreField(
+            "RR.BB."
+            "RRRBB.")
+    };
+
+    testComplement(BOOK, original, expected, ARRAY_SIZE(expected));
+}
+
+TEST(PatternBookTest, complementWithUnusedVariable1)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AABCC.",
+    "BBC&&.",
+])";
+
+    const CoreField original(
+        "Y....."
+        "Y....."
+        "GG....");
+
+    // TODO(mayah): C is OK for either R, B, or Y.
+    const CoreField expected[] {
+        CoreField(
+            "Y....."
+            "YGR..."
+            "YYGRR."
+            "GGR&&.")
+    };
+
+    testComplement(BOOK, original, expected, ARRAY_SIZE(expected), 1);
 }
 
 TEST(PatternBookTest, complementWithIgnitionBits)
@@ -330,7 +443,7 @@ name = "GTR"
             "BBYBB."),
     };
 
-    testComplementWithIgnitionBits(BOOK, original, ignitionBits, expected, ARRAY_SIZE(expected), false);
+    testComplementWithIgnitionBits(BOOK, original, ignitionBits, expected, ARRAY_SIZE(expected));
 }
 
 TEST(PatternBookTest, unmatch1)
