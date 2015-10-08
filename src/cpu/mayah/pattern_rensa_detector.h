@@ -6,9 +6,8 @@
 
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
+#include "core/pattern/pattern_book.h"
 #include "core/rensa_tracker/rensa_existing_position_tracker.h"
-
-#include "pattern_book.h"
 
 class PatternRensaDetector {
 public:
