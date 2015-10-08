@@ -200,9 +200,9 @@ void PatternBook::complement(const CoreField& originalField,
 }
 
 void PatternBook::complement(const CoreField& originalField,
-                                const FieldBits& ignitionBits,
-                                int allowedNumUnusedVariables,
-                                const ComplementCallback& callback) const
+                             const FieldBits& ignitionBits,
+                             int allowedNumUnusedVariables,
+                             const ComplementCallback& callback) const
 {
     for (const auto& entry : root_->children_) {
         if (entry.first.varBits() != ignitionBits)
@@ -215,12 +215,12 @@ void PatternBook::complement(const CoreField& originalField,
 }
 
 void PatternBook::iterate(const PatternBook::PatternTree& tree,
-                             const CoreField& originalField,
-                             const BitField& currentField,
-                             const FieldBits& matchedBits,
-                             int allowedNumUnusedVariables,
-                             int numUnusedVariables,
-                             const ComplementCallback& callback) const
+                          const CoreField& originalField,
+                          const BitField& currentField,
+                          const FieldBits& matchedBits,
+                          int allowedNumUnusedVariables,
+                          int numUnusedVariables,
+                          const ComplementCallback& callback) const
 {
     if (tree.isLeaf()) {
         BitField bf(currentField);
