@@ -1,5 +1,5 @@
-#ifndef CPU_MAYAH_PATTERN_BOOK_H_
-#define CPU_MAYAH_PATTERN_BOOK_H_
+#ifndef CORE_PATTERN_PATTERN_BOOK_H_
+#define CORE_PATTERN_PATTERN_BOOK_H_
 
 #include <memory>
 #include <string>

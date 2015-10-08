@@ -4,8 +4,9 @@
 #include <map>
 #include <vector>
 
+#include "core/pattern/pattern_book.h"
+
 #include "evaluation_feature.h"
-#include "pattern_book.h"
 #include "score_collector.h"
 
 class ColumnPuyoList;

@@ -9,11 +9,11 @@
 #include "core/plan/plan.h"
 #include "core/client/ai/ai.h"
 #include "core/pattern/decision_book.h"
+#include "core/pattern/pattern_book.h"
 
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
-#include "pattern_book.h"
 
 class CoreField;
 class DropDecision;
