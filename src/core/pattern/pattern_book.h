@@ -15,7 +15,6 @@
 #include "core/core_field.h"
 #include "core/pattern/field_pattern.h"
 #include "core/pattern/pattern_bit.h"
-#include "core/pattern/pattern_matcher.h"
 #include "core/position.h"
 
 class PatternBookField {

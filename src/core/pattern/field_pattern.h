@@ -23,8 +23,6 @@ public:
     // 'A' - 'Z' is 1, the others are 0.
     FieldBits patternBits() const;
 
-    bool isMatchable(const CoreField&) const;
-
     int numVariables() const { return numVariables_; }
     void setMustVar(int x, int y) { mustPatternBits_.set(x, y); }
 
