@@ -111,7 +111,6 @@ void PatternRensaDetector::iteratePossibleRensasInternal(const CoreField& curren
                                                          bool addsPatternScore)
 {
     // With complement.
-    // TODO(mayah): making std::vector is too slow. call currentField.fillErasingPuyoPosition()?
     FieldBits ignitionPosition = currentField.ignitionPuyoBits();
 
     // because of PuyoColor::IRON, sometimes we might have valid erasing puyo.
