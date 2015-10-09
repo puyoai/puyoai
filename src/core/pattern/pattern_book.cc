@@ -34,7 +34,8 @@ public:
 
     // Returns a node.
     PatternTree* put(const PatternBit&);
-    bool setLeaf(const std::string& name, const FieldBits& ironPatternBits, int ignitionColumn, int numVariables, double score);
+    bool setLeaf(const std::string& name, const FieldBits& ironPatternBits, const FieldBits& mustBits,
+                 int ignitionColumn, int numVariables, double score);
 
 private:
     friend class PatternBook;
@@ -65,16 +66,17 @@ PatternBook::PatternTree* PatternBook::PatternTree::put(const PatternBit& patter
 }
 
 bool PatternBook::PatternTree::setLeaf(const std::string& name,
-                                          const FieldBits& ironBits,
-                                          int ignitionColumn,
-                                          int numVariables,
-                                          double score)
+                                       const FieldBits& ironBits,
+                                       const FieldBits& mustBits,
+                                       int ignitionColumn,
+                                       int numVariables,
+                                       double score)
 {
     CHECK(0 <= ignitionColumn && ignitionColumn <= 6);
     if (patternBookField_.get())
         return false;
 
-    patternBookField_.reset(new PatternBookField(name, ironBits, ignitionColumn, numVariables, score));
+    patternBookField_.reset(new PatternBookField(name, ironBits, mustBits, ignitionColumn, numVariables, score));
     return true;
 }
 
@@ -139,12 +141,12 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
                 CHECK(false);
         }
 
-        vector<Position> preconditions;
+        FieldBits mustBits;
         if (const toml::Value* p = v.find("precondition")) {
             for (const auto& cp : p->as<toml::Array>()) {
                 int x = cp.get<int>(0);
                 int y = cp.get<int>(1);
-                preconditions.push_back(Position(x, y));
+                mustBits.set(x, y);
             }
         }
 
@@ -179,8 +181,8 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
         }
 
         int mirrorIgnitionColumn = ignitionColumn == 0 ? 0 : 7 - ignitionColumn;
-        CHECK(tree->setLeaf(name, ironPatternBits, ignitionColumn, numVariables, score)) << fieldStr;
-        CHECK(mirrorTree->setLeaf(name, ironPatternBits.mirror(), mirrorIgnitionColumn, numVariables, score)) << fieldStr;
+        CHECK(tree->setLeaf(name, ironPatternBits, mustBits, ignitionColumn, numVariables, score)) << fieldStr;
+        CHECK(mirrorTree->setLeaf(name, ironPatternBits.mirror(), mustBits.mirror(), mirrorIgnitionColumn, numVariables, score)) << fieldStr;
     }
 
     return true;
@@ -223,11 +225,13 @@ void PatternBook::iterate(const PatternBook::PatternTree& tree,
                           const ComplementCallback& callback) const
 {
     if (tree.isLeaf()) {
-        BitField bf(currentField);
-        bf.setColorAllIfEmpty(tree.patternBookField().ironBits(), PuyoColor::IRON);
-        if (!bf.hasFloatingPuyo()) {
-            CoreField cf(bf);
-            callback(std::move(cf), diff(originalField, bf), numUnusedVariables, matchedBits, tree.patternBookField());
+        if ((tree.patternBookField().mustBits() & originalField.bitField().field13Bits()) == tree.patternBookField().mustBits()) {
+            BitField bf(currentField);
+            bf.setColorAllIfEmpty(tree.patternBookField().ironBits(), PuyoColor::IRON);
+            if (!bf.hasFloatingPuyo()) {
+                CoreField cf(bf);
+                callback(std::move(cf), diff(originalField, bf), numUnusedVariables, matchedBits, tree.patternBookField());
+            }
         }
     }
 
