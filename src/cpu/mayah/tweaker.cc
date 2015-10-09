@@ -294,25 +294,22 @@ int main(int argc, char* argv[])
         runAutoTweaker(executor.get(), paramMap, FLAGS_auto_count);
 #endif
     } else {
-        typedef tuple<double, double, double> ScoreMapKey;
+        typedef tuple<double, double> ScoreMapKey;
 
         map<ScoreMapKey, RunResult> scoreMap;
-        for (double x = 520; x <= 520; x += 30) {
-            for (double y = 320; y <= 320; y += 30) {
-                    for (double z = 60; z <= 160; z += 20) {
-                    cout << "current (x, y, z) = " << x << ' ' << y << ' ' << z << endl;
+        for (double x = 220; x <= 300; x += 10) {
+            for (double y = 13; y <= 20; y += 1) {
+              cout << "current (x, y) = " << x << ' ' << y << ' ' << endl;
 
-                    paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::INITIAL, PATTERN_BOOK_DIV_RENSA, x); // 520
-                    paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::EARLY, PATTERN_BOOK_DIV_RENSA, x); // 520
-                    paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::MIDDLE, PATTERN_BOOK_DIV_RENSA, y); // 320
-                    paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, PATTERN_BOOK_DIV_RENSA, z); // 80
+              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, NECESSARY_PUYOS_LINEAR, -x);
+              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, NECESSARY_PUYOS_SQUARE, -y);
 
-                    scoreMap[ScoreMapKey(x, y, z)] = run(executor.get(), paramMap);
-                }
+              scoreMap[ScoreMapKey(x, y)] = run(executor.get(), paramMap);
             }
         }
+
         for (const auto& m : scoreMap) {
-            cout << setw(5) << get<0>(m.first) << ' ' << get<1>(m.first) << ' ' << get<2>(m.first)
+            cout << setw(5) << get<0>(m.first) << ' ' << get<1>(m.first)
                  << " -> " << m.second.sumScore
                  << " / " << m.second.mainRensaCount
                  << " / " << m.second.aveMainRensaScore
