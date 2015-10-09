@@ -10,7 +10,6 @@
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"
 #include "core/field_checker.h"
-#include "core/pattern/pattern_matcher.h"
 #include "core/position.h"
 #include "core/puyo_color.h"
 
@@ -92,12 +91,6 @@ FieldPattern::FieldPattern(const string& field, const string& notPatternField)
     }
 
     numVariables_ = varCount;
-}
-
-bool FieldPattern::isMatchable(const CoreField& field) const
-{
-    PatternMatcher matcher;
-    return matcher.match(*this, field).matched;
 }
 
 bool FieldPattern::isBijectionMatchable() const
