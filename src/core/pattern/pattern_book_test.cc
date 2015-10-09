@@ -399,6 +399,20 @@ field = [
     testComplement(BOOK, original, expected, ARRAY_SIZE(expected), 1);
 }
 
+TEST(PatternBookTest, complementWithMust)
+{
+    static const char BOOK[] = R"(
+[[pattern]]
+field = [
+    "AAABBB",
+]
+precondition = [[1, 1], [6, 1]]
+)";
+
+    testMatch(BOOK, CoreField("RRRBBB"));
+    testUnmatch(BOOK, CoreField("RRRBB."));
+}
+
 TEST(PatternBookTest, complementWithIgnitionBits)
 {
     static const char BOOK[] = R"(

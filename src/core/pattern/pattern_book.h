@@ -20,12 +20,14 @@
 
 class PatternBookField {
 public:
-    PatternBookField(const std::string& name, const FieldBits& ironBits,
+    PatternBookField(const std::string& name, const FieldBits& ironBits, const FieldBits& mustBits,
                         int ignitionColumn, int numVariables, double score) :
-        name_(name), ironBits_(ironBits), ignitionColumn_(ignitionColumn), numVariables_(numVariables), score_(score) {}
+        name_(name), ironBits_(ironBits), mustBits_(mustBits),
+        ignitionColumn_(ignitionColumn), numVariables_(numVariables), score_(score) {}
 
     const std::string name() const { return name_; }
     const FieldBits& ironBits() const { return ironBits_; }
+    const FieldBits& mustBits() const { return mustBits_; }
     int ignitionColumn() const { return ignitionColumn_; }
     int numVariables() const { return numVariables_; }
     double score() const { return score_; }
@@ -33,6 +35,7 @@ public:
 private:
     std::string name_;
     FieldBits ironBits_;
+    FieldBits mustBits_;
     int ignitionColumn_;
     int numVariables_;
     double score_;
