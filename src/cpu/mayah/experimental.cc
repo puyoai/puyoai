@@ -72,6 +72,8 @@ private:
     DecisionBook decisionBook_;
     PatternBook patternBook_;
     unique_ptr<Executor> executor_;
+
+    mutable mutex mu_; // for cout
 };
 
 BeamMayahAI::BeamMayahAI(int argc, char* argv[]) :
@@ -268,10 +270,13 @@ SearchResult BeamMayahAI::run(const vector<State>& initialStates, KumipuyoSeq se
 
     double endTime = currentTime();
 
-    cout << "FIRED_CHAINS=" << maxOverallFiredChains
-         << " FIRED_SCORE=" << maxOverallFiredScore
-         << " DECISION=" << currentStates.front().firstDecision
-         << " TIME=" << (endTime - beginTime) << endl;
+    {
+        lock_guard<mutex> lock(mu_);
+        cout << "FIRED_CHAINS=" << maxOverallFiredChains
+             << " FIRED_SCORE=" << maxOverallFiredScore
+             << " DECISION=" << currentStates.front().firstDecision
+             << " TIME=" << (endTime - beginTime) << endl;
+    }
 
     result.maxChains = maxOverallFiredChains;
     result.firstDecisions.insert(currentStates.front().firstDecision);
