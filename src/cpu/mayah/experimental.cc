@@ -106,6 +106,13 @@ DropDecision BeamMayahAI::think(int /*frameId*/, const CoreField& field, const K
         }
     }
 
+    if (true) {
+        Decision d = decisionBook_.nextDecision(field, seq);
+        if (d.isValid()) {
+            return DropDecision(d);
+        }
+    }
+
     // Make initial states.
     vector<State> currentStates;
     Plan::iterateAvailablePlans(field, seq, 1, [&](const RefPlan& plan) {
@@ -126,7 +133,7 @@ DropDecision BeamMayahAI::think(int /*frameId*/, const CoreField& field, const K
     WaitGroup wg;
     mutex mu;
 
-    const int maxSearchTurns = min(FLAGS_beam_depth, std::max(seq.size(), (72 - field.countPuyos()) / 2));
+    const int maxSearchTurns = std::max(5, min(FLAGS_beam_depth, std::max(seq.size(), (72 - field.countPuyos()) / 2)));
     cout << "maxSearchTurns = " << maxSearchTurns << endl;
 
     for (int k = 0; k < FLAGS_beam_num; ++k) {
