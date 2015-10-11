@@ -280,10 +280,16 @@ SearchResult BeamMayahAI::run(const vector<State>& initialStates, KumipuyoSeq se
 
     {
         lock_guard<mutex> lock(mu_);
-        cout << "FIRED_CHAINS=" << maxOverallFiredChains
-             << " FIRED_SCORE=" << maxOverallFiredScore
-             << " DECISION=" << currentStates.front().firstDecision
-             << " TIME=" << (endTime - beginTime) << endl;
+        if (!currentStates.empty()) {
+            cout << "FIRED_CHAINS=" << maxOverallFiredChains
+                 << " FIRED_SCORE=" << maxOverallFiredScore
+                 << " DECISION=" << currentStates.front().firstDecision
+                 << " TIME=" << (endTime - beginTime) << endl;
+        } else {
+            cout << "EMPTY!" << endl;
+            result.maxChains = -1;
+            return result;
+        }
     }
 
     result.maxChains = maxOverallFiredChains;
@@ -442,15 +448,60 @@ int main(int argc, char* argv[])
     endless.setVerbose(true);
     //endless.setVerbose(FLAGS_show_field);
 
-    KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
-    EndlessResult result = endless.run(seq);
+    // KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
+    // EndlessResult result = endless.run(seq);
+    //
+    // cout << seq.toString() << endl;
+    // cout << makePuyopURL(seq, result.decisions) << endl;
+    // cout << "score = " << result.score << " rensa = " << result.maxRensa;
+    // if (result.zenkeshi)
+    //     cout << " / ZENKESHI";
+    // cout << endl;
 
-    cout << seq.toString() << endl;
-    cout << makePuyopURL(seq, result.decisions) << endl;
-    cout << "score = " << result.score << " rensa = " << result.maxRensa;
-    if (result.zenkeshi)
-        cout << " / ZENKESHI";
-    cout << endl;
+    vector<int> scores;
+    const int N = 100;
+    for (int i = 0; i < N; ++i) {
+        KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
+        EndlessResult result = endless.run(seq);
+
+        cout << seq.toString() << endl;
+        cout << makePuyopURL(seq, result.decisions) << endl;
+        cout << "score = " << result.score << " rensa = " << result.maxRensa;
+        if (result.zenkeshi)
+            cout << " / ZENKESHI";
+        cout << endl;
+        scores.push_back(result.score);
+    }
+
+    if (N > 1) {
+        int num8 = 0;
+        int num9 = 0;
+        int num10 = 0;
+        std::sort(scores.begin(), scores.end());
+        int sum = 0;
+        for (auto x : scores) {
+            sum += x;
+            if (x >= 80000)
+                ++num8;
+            if (x >= 90000)
+                ++num9;
+            if (x >= 100000)
+                ++num10;
+        }
+        int average = sum / N;
+
+        cout << "        N = " << N << endl;
+        cout << "      min = " << *min_element(scores.begin(), scores.end()) << endl;
+        cout << "      max = " << *max_element(scores.begin(), scores.end()) << endl;
+        cout << "  average = " << average << endl;
+
+        for (int i = 10; i <= 90; i += 10)
+            cout << "      " << i << "% = " << scores[i] << endl;
+        cout << "     num8 = " << num8 << endl;
+        cout << "     num9 = " << num9 << endl;
+        cout << "    num10 = " << num10 << endl;
+    }
+
 #endif
     return 0;
 }
