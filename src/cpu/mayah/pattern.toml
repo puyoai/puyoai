@@ -1272,6 +1272,7 @@ score = 7.0
 
 [[pattern]]
 field = [
+    ".....c",
     ".....C",
     "...B.C",
     "..AABB",
