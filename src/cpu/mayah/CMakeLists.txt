@@ -12,6 +12,7 @@ add_library(mayah_lib
             mayah_ai.cc
             move_evaluator.cc
             pattern_rensa_detector.cc
+            rensa_evaluator.cc
             rensa_hand_tree.cc
             shape_evaluator.cc)
 
