@@ -86,31 +86,6 @@ private:
 };
 
 template<typename ScoreCollector>
-class RensaEvaluator : public EvaluatorBase {
-public:
-    // Don't take ownership of |sc|.
-    RensaEvaluator(const PatternBook& patternBook, ScoreCollector* sc) :
-        EvaluatorBase(patternBook),
-        sc_(sc) {}
-
-    void evalPatternScore(const ColumnPuyoList& puyosToComplement, double patternScore, int chains);
-    void evalRensaScore(double score, double virtualScore);
-    void evalRensaChainFeature(const RensaResult&, const ColumnPuyoList&);
-    void evalRensaGarbage(const CoreField& fieldAfterRensa);
-    void evalFirePointTabooFeature(const CoreField&, const FieldBits& ignitionPuyoBits);
-    void evalRensaIgnitionHeightFeature(const CoreField&, const FieldBits& ignitionPuyoBits);
-    void evalRensaConnectionFeature(const CoreField& fieldAfterDrop);
-    void evalRensaRidgeHeight(const CoreField&);
-    void evalRensaValleyDepth(const CoreField&);
-    void evalRensaFieldUShape(const CoreField&);
-    void evalComplementationBias(const ColumnPuyoList&);
-    void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList&,
-                           int currentFrameId, const PlayerState& me, const PlayerState& enemy);
-private:
-    ScoreCollector* sc_;
-};
-
-template<typename ScoreCollector>
 class Evaluator : public EvaluatorBase {
 public:
     // Don't take ownership of |sc|.

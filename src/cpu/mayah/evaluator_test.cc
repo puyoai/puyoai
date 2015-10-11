@@ -7,7 +7,9 @@
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/probability/puyo_set_probability.h"
+
 #include "gazer.h"
+#include "rensa_evaluator.h"
 
 using namespace std;
 

@@ -24,6 +24,7 @@
 
 #include "evaluator.h"
 #include "pattern_rensa_detector.h"
+#include "rensa_evaluator.h"
 #include "score_collector.h"
 #include "shape_evaluator.h"
 
