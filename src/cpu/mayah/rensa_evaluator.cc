@@ -9,6 +9,30 @@
 #include "core/probability/puyo_set.h"
 
 template<typename ScoreCollector>
+void RensaEvaluator<ScoreCollector>::eval(const CoreField& complementedField,
+                                          const CoreField& fieldBeforeRensa,
+                                          const CoreField& fieldAfterRensa,
+                                          const RensaResult& rensaResult,
+                                          const ColumnPuyoList& puyosToComplement,
+                                          double patternScore,
+                                          double virtualRensaScore)
+{
+    FieldBits ignitionPuyoBits = complementedField.ignitionPuyoBits();
+
+    evalRensaRidgeHeight(complementedField);
+    evalRensaValleyDepth(complementedField);
+    evalRensaFieldUShape(complementedField);
+    evalRensaIgnitionHeightFeature(complementedField, ignitionPuyoBits);
+    evalRensaChainFeature(rensaResult, puyosToComplement);
+    evalRensaGarbage(fieldAfterRensa);
+    evalPatternScore(puyosToComplement, patternScore, rensaResult.chains);
+    evalFirePointTabooFeature(fieldBeforeRensa, ignitionPuyoBits); // fieldBeforeRensa is correct.
+    evalRensaConnectionFeature(fieldAfterRensa);
+    evalComplementationBias(puyosToComplement);
+    evalRensaScore(rensaResult.score, virtualRensaScore);
+}
+
+template<typename ScoreCollector>
 void RensaEvaluator<ScoreCollector>::evalRensaStrategy(const RefPlan& plan,
                                                        const RensaResult& rensaResult,
                                                        const ColumnPuyoList& cpl,

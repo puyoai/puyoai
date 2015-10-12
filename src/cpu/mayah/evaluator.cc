@@ -344,8 +344,6 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         if (!complementedField.dropPuyoList(puyosToComplement))
             return;
 
-        FieldBits ignitionPuyoBits = complementedField.ignitionPuyoBits();
-
         ++rensaCounts[rensaResult.chains];
 
         const PuyoSet necessaryPuyoSet(puyosToComplement);
@@ -355,18 +353,8 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
         RensaScoreCollector rensaScoreCollector(sc_->mainRensaParamSet(), sc_->sideRensaParamSet());
         RensaEvaluator<RensaScoreCollector> rensaEvaluator(patternBook(), &rensaScoreCollector);
-
-        rensaEvaluator.evalRensaRidgeHeight(complementedField);
-        rensaEvaluator.evalRensaValleyDepth(complementedField);
-        rensaEvaluator.evalRensaFieldUShape(complementedField);
-        rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, ignitionPuyoBits);
-        rensaEvaluator.evalRensaChainFeature(rensaResult, puyosToComplement);
-        rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
-        rensaEvaluator.evalPatternScore(puyosToComplement, patternScore, rensaResult.chains);
-        rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, ignitionPuyoBits); // fieldBeforeRensa is correct.
-        rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
-        rensaEvaluator.evalComplementationBias(puyosToComplement);
-        rensaEvaluator.evalRensaScore(rensaResult.score, virtualRensaScore);
+        rensaEvaluator.eval(complementedField, fieldBeforeRensa, fieldAfterRensa,
+                            rensaResult, puyosToComplement, patternScore, virtualRensaScore);
         rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
 
         // TODO(mayah): need to set a better mode here.

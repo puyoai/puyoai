@@ -20,6 +20,17 @@ public:
         patternBook_(patternBook),
         sc_(sc) {}
 
+    // Note eval() does not contain evalRensaStrategy().
+    void eval(const CoreField& complementedField,
+              const CoreField& fieldBeforeRensa,
+              const CoreField& fieldAfterRensa,
+              const RensaResult& rensaResult,
+              const ColumnPuyoList& puyosToComplement,
+              double patternScore,
+              double virtualRensaScore);
+    void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList&,
+                           int currentFrameId, const PlayerState& me, const PlayerState& enemy);
+
     void evalPatternScore(const ColumnPuyoList& puyosToComplement, double patternScore, int chains);
     void evalRensaScore(double score, double virtualScore);
     void evalRensaChainFeature(const RensaResult&, const ColumnPuyoList&);
@@ -31,8 +42,6 @@ public:
     void evalRensaValleyDepth(const CoreField&);
     void evalRensaFieldUShape(const CoreField&);
     void evalComplementationBias(const ColumnPuyoList&);
-    void evalRensaStrategy(const RefPlan&, const RensaResult&, const ColumnPuyoList&,
-                           int currentFrameId, const PlayerState& me, const PlayerState& enemy);
 private:
     const PatternBook& patternBook() const { return patternBook_; }
 
