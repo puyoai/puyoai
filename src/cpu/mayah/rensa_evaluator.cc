@@ -165,12 +165,13 @@ void RensaEvaluator<ScoreCollector>::evalRensaFieldUShape(const CoreField& field
         average += (field.height(x) + DIFF[x]);
     average /= 6;
 
+    double coef = FIELD_USHAPE_HEIGHT_COEF[static_cast<int>(average)];
+
     double linearValue = 0;
     double squareValue = 0;
 
     for (int x = 1; x <= FieldConstant::WIDTH; ++x) {
         int h = field.height(x) + DIFF[x];
-        double coef = FIELD_USHAPE_HEIGHT_COEF[field.height(x)];
         linearValue += std::abs(h - average) * coef;
         squareValue += (h - average) * (h - average) * coef;
     }
