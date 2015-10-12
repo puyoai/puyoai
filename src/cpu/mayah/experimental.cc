@@ -395,27 +395,14 @@ pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, int depth
         if (!complementedField.dropPuyoList(puyosToComplement))
             return;
 
-        FieldBits ignitionPuyoBits = complementedField.ignitionPuyoBits();
-
         const PuyoSet necessaryPuyoSet(puyosToComplement);
         const double possibility = PuyoSetProbability::instanceSlow()->possibility(necessaryPuyoSet, std::max(0, numReachableSpace));
         const double virtualRensaScore = rensaResult.score * possibility;
 
         SimpleRensaScoreCollector rensaScoreCollector(sc.mainRensaParamSet(), sc.sideRensaParamSet());
         RensaEvaluator<SimpleRensaScoreCollector> rensaEvaluator(patternBook_, &rensaScoreCollector);
-
-        rensaEvaluator.evalRensaRidgeHeight(complementedField);
-        rensaEvaluator.evalRensaValleyDepth(complementedField);
-        rensaEvaluator.evalRensaFieldUShape(complementedField);
-        rensaEvaluator.evalRensaIgnitionHeightFeature(complementedField, ignitionPuyoBits);
-        rensaEvaluator.evalRensaChainFeature(rensaResult, puyosToComplement);
-        rensaEvaluator.evalRensaGarbage(fieldAfterRensa);
-        rensaEvaluator.evalPatternScore(puyosToComplement, patternScore, rensaResult.chains);
-        rensaEvaluator.evalFirePointTabooFeature(fieldBeforeRensa, ignitionPuyoBits); // fieldBeforeRensa is correct.
-        rensaEvaluator.evalRensaConnectionFeature(fieldAfterRensa);
-        rensaEvaluator.evalComplementationBias(puyosToComplement);
-        rensaEvaluator.evalRensaScore(rensaResult.score, virtualRensaScore);
-        // rensaEvaluator.evalRensaStrategy(plan, rensaResult, puyosToComplement, currentFrameId, me, enemy);
+        rensaEvaluator.eval(complementedField, fieldBeforeRensa, fieldAfterRensa, rensaResult,
+                            puyosToComplement, patternScore, virtualRensaScore);
 
         const double rensaScore = rensaScoreCollector.mainRensaScore().score(EvaluationMode::MIDDLE);
 
