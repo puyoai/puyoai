@@ -31,7 +31,18 @@ field = [
     "BBC&..",
 ]
 name = "GTR"
-score = 8.0
+score = 7.5
+ignition = 1
+
+[[pattern]]
+field = [
+    "A.....",
+    "ABC...",
+    "AABC..",
+    "BBCC..",
+]
+name = "GTR"
+score = 7.5
 ignition = 1
 
 [[pattern]]
@@ -475,6 +486,36 @@ field = [
     "..BCC.",
     ".AA&&C",
     "AABBBC",
+]
+not_field = [
+    "A.....",
+    "......",
+    "......",
+]
+ignition = 2
+score = 6.0
+
+[[pattern]]
+field = [
+    "...C..",
+    "..B&CC",
+    ".AABC.",
+    "AABB..",
+]
+not_field = [
+    "A.....",
+    "......",
+    "......",
+]
+ignition = 2
+score = 6.0
+
+[[pattern]]
+field = [
+    "......",
+    "..BC..",
+    ".AABCC",
+    "AABBC.",
 ]
 not_field = [
     "A.....",
@@ -1515,6 +1556,7 @@ field = [
 name = "LR"
 ignition = 2
 score = 7.0
+precondition = [[1, 1], [1, 2], [2, 1], [2, 2]]
 
 [[pattern]]
 field = [
