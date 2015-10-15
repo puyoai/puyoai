@@ -12,6 +12,11 @@
 
 using namespace std;
 
+int index(int x, int y)
+{
+    return (12 - y) * 6 + (x - 1);
+}
+
 void add(const CoreField& original)
 {
     CoreField current(original);
@@ -21,23 +26,50 @@ void add(const CoreField& original)
         if (cf.simulateFast(&tracker) < 3)
             break;
 
-        // TODO(mayah): write this.
-        // string s(72, ' '); // right ?
-        // for (int x = 1; x <= 6; ++x) {
-        //     for (int y = 1; y <= 12; ++y) {
-        //         switch (tracker.result().erasedAt(x, y)) {
-        //             case 1:
-        //                 s[(]
-        //                 break;
-        //             case 2:
-        //                 break;
-        //             case 3:
-        //                 break;
-        //             default:
-        //                 break;
-        //         }
-        //     }
-        // }
+        FieldBits bits[3];
+
+        string s(72, '.'); // right ?
+        for (int x = 1; x <= 6; ++x) {
+            for (int y = 1; y <= 12; ++y) {
+                int r = tracker.result().erasedAt(x, y);
+                if (r < 1 || 3 < r)
+                    continue;
+                s[index(x, y)] = static_cast<char>('A' + (r - 1));
+                bits[r - 1].set(x, y);
+            }
+        }
+
+        bool ok = true;
+        for (int i = 0; i < 3; ++i) {
+            PuyoColor pc = PuyoColor::EMPTY;
+            if (!(current.bitField().bits(PuyoColor::OJAMA) & bits[i]).isEmpty()) {
+                ok = false;
+                break;
+            }
+
+            for (PuyoColor c : NORMAL_PUYO_COLORS) {
+                if (!(current.bitField().bits(c) & bits[i]).isEmpty()) {
+                    if (pc == PuyoColor::EMPTY) {
+                        pc = c;
+                    } else {
+                        ok = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (ok) {
+            cout << "######" << endl;
+            for (size_t i = 0; i < s.size(); ++i) {
+                cout << s[i];
+                if (i % 6 == 5)
+                    cout << endl;
+            }
+            cout << "######" << endl;
+        }
+
+        current.vanishDropFast();
     }
 }
 
