@@ -176,7 +176,10 @@ public:
     template<typename Tracker> RensaStepResult vanishDrop(Tracker*);
     template<typename Tracker> RensaStepResult vanishDrop(SimulationContext*, Tracker*);
 
+    // Vanishes the connected puyos, and drop the puyos in the air.
+    // Returns true if something is vanished.
     bool vanishDropFast();
+    bool vanishDropFast(SimulationContext*);
     template<typename Tracker> bool vanishDropFast(Tracker*);
     template<typename Tracker> bool vanishDropFast(SimulationContext*, Tracker*);
 
@@ -315,6 +318,13 @@ bool CoreField::vanishDropFast()
 {
     RensaNonTracker tracker;
     return vanishDropFast(&tracker);
+}
+
+inline
+bool CoreField::vanishDropFast(CoreField::SimulationContext* context)
+{
+    RensaNonTracker tracker;
+    return vanishDropFast(context, &tracker);
 }
 
 template<typename Tracker>
