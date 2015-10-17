@@ -305,7 +305,7 @@ score = 6.0
 [[pattern]]
 field = [
     ".B....",
-    ".AA...",
+    "aAA...",
     "CBA...",
     "BBA...",
     "C.....",
@@ -314,6 +314,18 @@ field = [
 ]
 ignition = 3
 score = 7.7
+
+[[pattern]]
+field = [
+    ".B....",
+    "BAA...",
+    "BBAA..",
+    "C.....",
+    "CC....",
+    "......",
+]
+ignition = 3
+score = 7.3
 
 # ----------------------------------------------------------------------
 # GTR-HEAD-3
@@ -1299,6 +1311,22 @@ ignition = 2
 score = 7.0
 
 # ----------------------------------------------------------------------
+# NEWGTR-HEAD-3
+
+[[pattern]]
+field = [
+    "CB....",
+    "BAA...",
+    "BBA...",
+    "C&A...",
+    "CC....",
+    "......",
+    "......",
+]
+ignition = 3
+score = 7.0
+
+# ----------------------------------------------------------------------
 # NEWGTR-TAIL-1
 
 [[pattern]]
@@ -1325,6 +1353,28 @@ score = 9.0
 [[pattern]]
 field = [
     ".....C",
+    ".....C",
+    "...B.B",
+    "..AABB",
+    "AAABCC",
+]
+ignition = 3
+score = 7.5
+
+[[pattern]]
+field = [
+    "......",
+    ".....C",
+    "...BCB",
+    "..AABB",
+    "AAABCC",
+]
+ignition = 3
+score = 7.5
+
+[[pattern]]
+field = [
+    ".....C",
     "...BCC",
     "..AABB",
     "AAABC&",
@@ -1341,6 +1391,16 @@ field = [
 ]
 ignition = 3
 score = 7.0
+
+[[pattern]]
+field = [
+    "....C.",
+    "...BCC",
+    "..AABB",
+    "AAACB.",
+]
+ignition = 3
+score = 6.8
 
 [[pattern]]
 field = [
