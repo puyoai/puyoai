@@ -361,6 +361,13 @@ ACDD = [4, 2]
 
 [[book]]
 field = [
+    "..B...",
+    "AAA.AA"
+]
+BCBD = [1, 0]
+
+[[book]]
+field = [
     ".BB...",
     ".AABB."
 ]
