@@ -4,7 +4,8 @@ add_library(puyoai_core_pattern
             bijection_matcher.cc
             decision_book.cc
             field_pattern.cc
-            pattern_book.cc)
+            pattern_book.cc
+            pattern_tree.cc)
 
 # ----------------------------------------------------------------------
 # test

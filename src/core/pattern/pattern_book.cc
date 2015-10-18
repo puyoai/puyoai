@@ -25,26 +25,6 @@ ColumnPuyoList diff(const CoreField& before, const BitField& after)
 
 } // namespace anonymous
 
-class PatternBook::PatternTree {
-public:
-    PatternTree() {}
-
-    bool isLeaf() const { return patternBookField_.get() != nullptr; }
-    const PatternBookField& patternBookField() const { return *patternBookField_; }
-
-    // Returns a node.
-    PatternTree* put(const PatternBit&);
-    bool setLeaf(const std::string& name, const FieldBits& ironPatternBits, const FieldBits& mustBits,
-                 int ignitionColumn, int numVariables, double score);
-
-private:
-    friend class PatternBook;
-
-    // If leaf, this is not empty.
-    unique_ptr<PatternBookField> patternBookField_;
-    std::vector<std::pair<PatternBit, unique_ptr<PatternTree>>> children_;
-};
-
 PatternBook::PatternBook() :
     root_(new PatternTree())
 {
@@ -52,32 +32,6 @@ PatternBook::PatternBook() :
 
 PatternBook::~PatternBook()
 {
-}
-
-PatternBook::PatternTree* PatternBook::PatternTree::put(const PatternBit& patternBit)
-{
-    for (auto& entry : children_) {
-        if (entry.first == patternBit)
-            return entry.second.get();
-    }
-
-    children_.emplace_back(patternBit, unique_ptr<PatternTree>(new PatternTree()));
-    return children_.back().second.get();
-}
-
-bool PatternBook::PatternTree::setLeaf(const std::string& name,
-                                       const FieldBits& ironBits,
-                                       const FieldBits& mustBits,
-                                       int ignitionColumn,
-                                       int numVariables,
-                                       double score)
-{
-    CHECK(0 <= ignitionColumn && ignitionColumn <= 6);
-    if (patternBookField_.get())
-        return false;
-
-    patternBookField_.reset(new PatternBookField(name, ironBits, mustBits, ignitionColumn, numVariables, score));
-    return true;
 }
 
 bool PatternBook::PatternBook::load(const string& filename)
@@ -216,7 +170,7 @@ void PatternBook::complement(const CoreField& originalField,
     }
 }
 
-void PatternBook::iterate(const PatternBook::PatternTree& tree,
+void PatternBook::iterate(const PatternTree& tree,
                           const CoreField& originalField,
                           const BitField& currentField,
                           const FieldBits& matchedBits,
