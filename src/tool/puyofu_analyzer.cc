@@ -8,6 +8,7 @@
 #include <json/json.h>
 
 #include "core/core_field.h"
+#include "core/pattern/pattern_book.h"
 #include "core/rensa_tracker/rensa_chain_tracker.h"
 
 using namespace std;
@@ -17,7 +18,7 @@ int index(int x, int y)
     return (12 - y) * 6 + (x - 1);
 }
 
-void add(const CoreField& original)
+void add(PatternBook* patternBook, const CoreField& original)
 {
     CoreField current(original);
     while (true) {
@@ -60,17 +61,47 @@ void add(const CoreField& original)
         }
 
         if (ok) {
-            cout << "######" << endl;
+            stringstream ss;
+            ss << "[[pattern]]" << endl;
+            ss << "field = [" << endl;
             for (size_t i = 0; i < s.size(); ++i) {
-                cout << s[i];
+                if (i % 6 == 0)
+                    ss << "    \"";
+                ss << s[i];
                 if (i % 6 == 5)
-                    cout << endl;
+                    ss << "\"," << endl;
             }
-            cout << "######" << endl;
+            ss << "]" << endl;
+
+            string s = ss.str();
+            cout << s << endl;
+            patternBook->loadFromString(s, true);
         }
 
         current.vanishDropFast();
     }
+}
+
+bool parseAndAdd(const char* filename, PatternBook* patternBook, unordered_set<CoreField>* visited)
+{
+    ifstream ifs(filename);
+    if (!ifs) {
+        PLOG(ERROR) << "failed to open " << filename;
+        return false;
+    }
+
+    Json::Value root;
+    ifs >> root;
+
+    for (unsigned int i = 0; i < root.size(); ++i) {
+        PlainField pf(root[i]["p1"].asString());
+        CoreField cf(CoreField::fromPlainFieldWithDrop(pf));
+        if (!visited->insert(cf).second || !cf.rensaWillOccur())
+            continue;
+
+        add(patternBook, cf);
+    }
+    return true;
 }
 
 int main(int argc, char* argv[])
@@ -83,26 +114,12 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    const char* filename = argv[1];
-    ifstream ifs(filename);
-    if (!ifs) {
-        PLOG(ERROR) << "failed to open " << filename;
-        return EXIT_FAILURE;
-    }
-
-    Json::Value root;
-    ifs >> root;
-
-    cout << root.size() << endl;
-
+    PatternBook patternBook;
     unordered_set<CoreField> visited;
-    for (unsigned int i = 0; i < root.size(); ++i) {
-        PlainField pf(root[i]["p1"].asString());
-        CoreField cf(CoreField::fromPlainFieldWithDrop(pf));
-        if (!visited.insert(cf).second || !cf.rensaWillOccur())
-            continue;
-
-        add(cf);
+    for (char** filename = argv + 1; *filename; ++filename) {
+        cout << *filename << endl;
+        if (!parseAndAdd(*filename, &patternBook, &visited)) {
+            cout << "failed to add: " << *filename;
+        }
     }
-    return EXIT_SUCCESS;
 }

@@ -30,8 +30,8 @@ public:
     ~PatternBook();
 
     bool load(const std::string& filename);
-    bool loadFromString(const std::string&);
-    bool loadFromValue(const toml::Value&);
+    bool loadFromString(const std::string&, bool ignoreDuplicate = false);
+    bool loadFromValue(const toml::Value&, bool ignoreDuplicate = false);
 
     void complement(const CoreField&, const ComplementCallback&) const;
     void complement(const CoreField&, int allowedNumUnusedVariables, const ComplementCallback&) const;

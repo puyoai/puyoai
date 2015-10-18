@@ -47,7 +47,7 @@ bool PatternBook::PatternBook::load(const string& filename)
     return loadFromValue(std::move(v));
 }
 
-bool PatternBook::loadFromString(const string& str)
+bool PatternBook::loadFromString(const string& str, bool ignoreDuplicate)
 {
     istringstream ss(str);
     toml::Parser parser(ss);
@@ -57,10 +57,10 @@ bool PatternBook::loadFromString(const string& str)
         return false;
     }
 
-    return loadFromValue(v);
+    return loadFromValue(v, ignoreDuplicate);
 }
 
-bool PatternBook::loadFromValue(const toml::Value& patterns)
+bool PatternBook::loadFromValue(const toml::Value& patterns, bool ignoreDuplicate)
 {
     const toml::Array& vs = patterns.find("pattern")->as<toml::Array>();
     for (const toml::Value& v : vs) {
@@ -135,8 +135,16 @@ bool PatternBook::loadFromValue(const toml::Value& patterns)
         }
 
         int mirrorIgnitionColumn = ignitionColumn == 0 ? 0 : 7 - ignitionColumn;
-        CHECK(tree->setLeaf(name, ironPatternBits, mustBits, ignitionColumn, numVariables, score)) << fieldStr;
-        CHECK(mirrorTree->setLeaf(name, ironPatternBits.mirror(), mustBits.mirror(), mirrorIgnitionColumn, numVariables, score)) << fieldStr;
+
+        if (ignoreDuplicate) {
+            if (!tree->isLeaf())
+                tree->setLeaf(name, ironPatternBits, mustBits, ignitionColumn, numVariables, score);
+            if (!mirrorTree->isLeaf())
+                mirrorTree->setLeaf(name, ironPatternBits.mirror(), mustBits.mirror(), mirrorIgnitionColumn, numVariables, score);
+        } else {
+            CHECK(tree->setLeaf(name, ironPatternBits, mustBits, ignitionColumn, numVariables, score)) << fieldStr;
+            CHECK(mirrorTree->setLeaf(name, ironPatternBits.mirror(), mustBits.mirror(), mirrorIgnitionColumn, numVariables, score)) << fieldStr;
+        }
     }
 
     return true;
