@@ -232,6 +232,32 @@ score = 8.0
 
 [[pattern]]
 field = [
+    "C.....",
+    "B.A...",
+    "AAA...",
+    "BBB...",
+    "C.....",
+    "CC....",
+    "......",
+]
+ignition = 3
+score = 8.0
+
+[[pattern]]
+field = [
+    "CA....",
+    "BA....",
+    "AA....",
+    "BBB...",
+    "C.....",
+    "CC....",
+    "......",
+]
+ignition = 2
+score = 7.0
+
+[[pattern]]
+field = [
     "......",
     "CBA...",
     "BAA...",
@@ -337,6 +363,20 @@ field = [
     "BAA...",
     "BCA...",
     "BCA...",
+    ".&&...",
+    "......",
+    "......",
+]
+ignition = 3
+score = 7.0
+
+[[pattern]]
+field = [
+    "c.....",
+    "CBA...",
+    "BAA...",
+    "BBA...",
+    "CCC...",
     ".&&...",
     "......",
     "......",
@@ -567,6 +607,20 @@ not_field = [
 ]
 ignition = 3
 score = 9.9
+
+[[pattern]]
+field = [
+    "....Bc",
+    "...CBC",
+    "..AAAB",
+    "..ACCB",
+]
+not_field = [
+    "A.....",
+    "A.....",
+]
+ignition = 3
+score = 8.0
 
 [[pattern]]
 field = [
