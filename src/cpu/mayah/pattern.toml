@@ -1295,6 +1295,7 @@ field = [
 ignition = 2
 score = 8.0
 
+[[pattern]]
 field = [
     "C.....",
     "B.....",
