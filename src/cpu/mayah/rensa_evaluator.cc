@@ -103,6 +103,18 @@ void RensaEvaluator<ScoreCollector>::evalRensaIgnitionHeightFeature(const CoreFi
     int height = ignition.highestHeight();
     if (height >= 0)
         sc_->addScore(IGNITION_HEIGHT, height, 1);
+
+    int higherPuyoLinear = 0;
+    int higherPuyoSquare = 0;
+    for (int x = 1; x <= 6; ++x) {
+        if (complementedField.height(x) > height) {
+            int d = complementedField.height(x) - height;
+            higherPuyoLinear += d;
+            higherPuyoSquare += d * d;
+        }
+    }
+    sc_->addScore(HIGHER_PUYO_THAN_IGNITION_LINEAR, higherPuyoLinear);
+    sc_->addScore(HIGHER_PUYO_THAN_IGNITION_SQUARE, higherPuyoSquare);
 }
 
 template<typename ScoreCollector>

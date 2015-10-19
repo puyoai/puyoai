@@ -297,12 +297,19 @@ int main(int argc, char* argv[])
         typedef tuple<double, double> ScoreMapKey;
 
         map<ScoreMapKey, RunResult> scoreMap;
-        for (double x = 220; x <= 300; x += 10) {
-            for (double y = 13; y <= 20; y += 1) {
+        for (double x = 0; x <= 10; x += 1) {
+            for (double y = 0; y <= 10; y += 1) {
               cout << "current (x, y) = " << x << ' ' << y << ' ' << endl;
 
-              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, NECESSARY_PUYOS_LINEAR, -x);
-              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, NECESSARY_PUYOS_SQUARE, -y);
+              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::INITIAL, HIGHER_PUYO_THAN_IGNITION_LINEAR, -x);
+              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::EARLY, HIGHER_PUYO_THAN_IGNITION_LINEAR, -x);
+              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::MIDDLE, HIGHER_PUYO_THAN_IGNITION_LINEAR, -x);
+              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, HIGHER_PUYO_THAN_IGNITION_LINEAR, -x);
+
+              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::INITIAL, HIGHER_PUYO_THAN_IGNITION_SQUARE, -y);
+              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::EARLY, HIGHER_PUYO_THAN_IGNITION_SQUARE, -y);
+              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::MIDDLE, HIGHER_PUYO_THAN_IGNITION_SQUARE, -y);
+              paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, HIGHER_PUYO_THAN_IGNITION_SQUARE, -y);
 
               scoreMap[ScoreMapKey(x, y)] = run(executor.get(), paramMap);
             }
