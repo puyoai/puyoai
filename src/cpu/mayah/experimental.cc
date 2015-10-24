@@ -27,10 +27,11 @@
 #include "rensa_evaluator.h"
 #include "score_collector.h"
 #include "shape_evaluator.h"
+#include "mayah_ai.h"
 
-DEFINE_string(feature, "feature.toml", "the path to feature parameter");
-DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
-DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
+DECLARE_string(feature);
+DECLARE_string(decision_book);
+DECLARE_string(pattern_book);
 
 DEFINE_int32(beam_width, 400, "beam width");
 DEFINE_int32(beam_depth, 40, "beam depth");
@@ -414,6 +415,40 @@ pair<double, int> BeamMayahAI::eval(const CoreField& fieldBeforeRensa, int depth
     return make_pair(maxScore, maxChains);
 }
 
+// ----------------------------------------------------------------------
+
+class MixedMayahAI : public AI {
+public:
+    MixedMayahAI(int argc, char* argv[]);
+
+    DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
+                       const PlayerState& me, const PlayerState& enemy, bool fast) const override;
+
+private:
+    DebuggableMayahAI ai_;
+    BeamMayahAI beamAi_;
+};
+
+MixedMayahAI::MixedMayahAI(int argc, char* argv[]) :
+    AI(argc, argv, "mixed"),
+    ai_(argc, argv),
+    beamAi_(argc, argv)
+{
+    ai_.setUsesRensaHandTree(false);
+    ai_.removeNontokopuyoParameter();
+}
+
+DropDecision MixedMayahAI::think(int frameId, const CoreField& field, const KumipuyoSeq& seq,
+                                 const PlayerState& me, const PlayerState& enemy, bool fast) const
+{
+    // if (field.countPuyos() <= 24)
+    //     return ai_.think(frameId, field, seq, me, enemy, fast);
+    // else
+        return beamAi_.think(frameId, field, seq, me, enemy, fast);
+}
+
+// ----------------------------------------------------------------------
+
 int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
@@ -423,7 +458,8 @@ int main(int argc, char* argv[])
     (void)PuyoSetProbability::instanceSlow();
     (void)ColumnPuyoListProbability::instanceSlow();
 
-    unique_ptr<BeamMayahAI> ai(new BeamMayahAI(argc, argv));
+    // unique_ptr<BeamMayahAI> ai(new BeamMayahAI(argc, argv));
+    unique_ptr<MixedMayahAI> ai(new MixedMayahAI(argc, argv));
 
 #if 0
     for (int i = 0; i < 50; ++i) {
