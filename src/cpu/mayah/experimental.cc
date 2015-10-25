@@ -482,6 +482,8 @@ int main(int argc, char* argv[])
     // cout << endl;
 
     vector<int> scores;
+    vector<int> rensas;
+
     const int N = 100;
     for (int i = 0; i < N; ++i) {
         KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
@@ -493,6 +495,8 @@ int main(int argc, char* argv[])
         if (result.zenkeshi)
             cout << " / ZENKESHI";
         cout << endl;
+
+        rensas.push_back(result.maxRensa);
         scores.push_back(result.score);
     }
 
@@ -523,6 +527,21 @@ int main(int argc, char* argv[])
         cout << "     num8 = " << num8 << endl;
         cout << "     num9 = " << num9 << endl;
         cout << "    num10 = " << num10 << endl;
+
+        int rensa14 = 0;
+        int rensa15 = 0;
+        int rensa16 = 0;
+        for (int r : rensas) {
+            if (r >= 14)
+                rensa14++;
+            if (r >= 15)
+                rensa15++;
+            if (r >= 16)
+                rensa16++;
+        }
+        cout << " rensa 14 = " << rensa14 << endl;
+        cout << " rensa 15 = " << rensa15 << endl;
+        cout << " rensa 16 = " << rensa16 << endl;
     }
 
 #endif
