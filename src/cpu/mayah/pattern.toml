@@ -1652,7 +1652,7 @@ field = [
     "......",
 ]
 ignition = 2
-score = 8.0
+score = 7.2
 
 [[pattern]]
 field = [
@@ -1660,6 +1660,19 @@ field = [
     "B.....",
     "A.....",
     "AA....",
+    "AB....",
+    "BC....",
+    "BCC...",
+    "......",
+]
+ignition = 2
+score = 7.8
+
+[[pattern]]
+field = [
+    "B.....",
+    "AA....",
+    "AC....",
     "AB....",
     "BC....",
     "BCC...",
@@ -2692,6 +2705,29 @@ field = [
 name = "DOUSHOKU"
 ignition = 2
 score = 8.9
+
+# ----------------------------------------------------------------------
+# L
+
+[[pattern]]
+field = [
+    "A..C..",
+    "AB.BCC",
+    "AABBC&"
+]
+name = "SUBMARINE"
+ignition = 1
+score = 8.0
+
+[[pattern]]
+field = [
+    "A..C..",
+    "ABCBC.",
+    "AABBC."
+]
+name = "SUBMARINE"
+ignition = 1
+score = 8.0
 
 # ----------------------------------------------------------------------
 # TAIL
