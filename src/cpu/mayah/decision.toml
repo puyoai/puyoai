@@ -57,6 +57,7 @@ ABAC = [3, 0] # [3, 0], [1, 1]
 ABBC = [3, 0] # [3, 0], [1, 1]
 ABCC = [3, 2]
 ABBB = [3, 0]
+BCBB = [3, 0]
 
 [[book]]
 field = [
@@ -604,3 +605,10 @@ field = [
 ]
 ABAC = [2, 3]  # For ZENKESHI
 DDAC = [5, 1]
+
+[[book]]
+field = [
+    "..CA..",
+    "AAABAA"
+]
+BCBD = [1, 2]
