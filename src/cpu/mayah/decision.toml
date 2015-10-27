@@ -281,6 +281,7 @@ field = [
 ABBB = [2, 0]
 ABCD = [2, 0]
 ABBC = [2, 0]
+ACAB = [2, 0]
 ACBD = [2, 0]
 ACCC = [2, 0]
 ACCD = [2, 0]
