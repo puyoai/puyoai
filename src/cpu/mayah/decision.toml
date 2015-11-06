@@ -58,6 +58,7 @@ ABBC = [3, 0] # [3, 0], [1, 1]
 ABCC = [3, 2]
 ABBB = [3, 0]
 BCBB = [3, 0]
+BCAB = [3, 1]
 
 [[book]]
 field = [
@@ -88,7 +89,7 @@ AABB = [2, 3]
 AAAC = [2, 3]
 AACC = [2, 3]
 ABAB = [2, 0]
-ACAA = [2, 3]  # [4, 2]?
+ACAA = [4, 2]  # [2, 3]? [4, 2]?
 ACAB = [1, 0]
 ACBB = [4, 2]  # [4, 2] looks bad... [1, 0]?
 ACBC = [2, 3]
