@@ -34,7 +34,7 @@ PatternBook::~PatternBook()
 {
 }
 
-bool PatternBook::PatternBook::load(const string& filename)
+bool PatternBook::load(const string& filename)
 {
     ifstream ifs(filename);
     toml::Parser parser(ifs);
