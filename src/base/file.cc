@@ -7,6 +7,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <fstream>
+
 using namespace std;
 
 namespace file {
@@ -62,6 +64,16 @@ bool listFiles(const string& path, vector<string>* files)
     if (closedir(dir) < 0)
         return false;
 
+    return true;
+}
+
+bool readFile(const std::string& filename, string* output)
+{
+    ifstream ifs(filename, ios::in | ios::binary);
+    if (!ifs)
+        return false;
+
+    output->assign((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
     return true;
 }
 

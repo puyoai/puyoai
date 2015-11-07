@@ -15,16 +15,6 @@
 
 using namespace std;
 
-static bool readContent(const string& filename, string* s)
-{
-    ifstream ifs(filename);
-    if (!ifs)
-        return false;
-
-    s->assign((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-    return true;
-}
-
 static int notFoundHandler(struct MHD_Connection* connection)
 {
     const char *page = "<html><head><title>404 NOT FOUND</title></head><body>404 NOT FOUND</body></html>";
@@ -38,7 +28,7 @@ static int notFoundHandler(struct MHD_Connection* connection)
 static int assetsHandler(struct MHD_Connection* connection, const std::string& filename)
 {
     string s;
-    if (!readContent(filename, &s)) {
+    if (!file::readFile(filename, &s)) {
         LOG(INFO) << "assetsHandler " << filename << " does not exist";
         return notFoundHandler(connection);
     }
@@ -59,6 +49,8 @@ static int handleHandler(struct MHD_Connection* connection, const HttpHandler& h
     struct MHD_Response* response = MHD_create_response_from_buffer(
         resp.contentSize(), resp.content(), MHD_RESPMEM_MUST_COPY);
     int ret = MHD_queue_response(connection, resp.status(), response);
+    for (const auto& header : resp.headers())
+        MHD_add_response_header(response, header.first.c_str(), header.second.c_str());
     MHD_destroy_response(response);
     return ret;
 }
@@ -134,5 +126,5 @@ void HttpServer::installHandler(const string& path, HttpHandler handler)
     DCHECK(handler);
     DCHECK(!handlers_[path]);
 
-    handlers_[path] = handler;
+    handlers_[path] = std::move(handler);
 }

@@ -18,6 +18,9 @@ bool isDirectory(const std::string& path);
 // true will be returned if suceeded, otherwise, false will be returned.
 bool listFiles(const std::string& path, std::vector<std::string>* files);
 
+// Reads file from |filename| and copy to |output|.
+bool readFile(const std::string& filename, std::string* output);
+
 } // namespace file
 
 #endif
