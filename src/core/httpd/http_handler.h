@@ -29,6 +29,6 @@ private:
     std::vector<std::pair<std::string, std::string>> header_;
 };
 
-typedef std::function<void (const HttpRequest*, HttpResponse*)> HttpHandler;
+typedef std::function<void (const HttpRequest&, HttpResponse*)> HttpHandler;
 
 #endif
