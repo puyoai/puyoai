@@ -64,9 +64,10 @@ public:
     GameStateHandler() {}
     virtual ~GameStateHandler() {}
 
-    void handle(const HttpRequest* req, HttpResponse* resp) {
-        lock_guard<mutex> lock(mu_);
+    void handle(const HttpRequest& req, HttpResponse* resp) {
         UNUSED_VARIABLE(req);
+
+        lock_guard<mutex> lock(mu_);
         if (!gameState_)
             return;
         resp->setContent(gameState_->toJson());
@@ -125,7 +126,7 @@ int main(int argc, char* argv[])
     if (FLAGS_httpd) {
         gameStateHandler.reset(new GameStateHandler);
         httpServer.reset(new HttpServer(FLAGS_port));
-        httpServer->installHandler("/data", [&](const HttpRequest* req, HttpResponse* res){
+        httpServer->installHandler("/data", [&](const HttpRequest& req, HttpResponse* res){
             gameStateHandler->handle(req, res);
         });
         httpServer->setAssetDirectory(file::joinPath(FLAGS_data_dir, "assets"));

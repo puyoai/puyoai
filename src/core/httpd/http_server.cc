@@ -44,7 +44,7 @@ static int handleHandler(struct MHD_Connection* connection, const HttpHandler& h
     HttpRequest req;
     HttpResponse resp;
 
-    handler(&req, &resp);
+    handler(req, &resp);
 
     struct MHD_Response* response = MHD_create_response_from_buffer(
         resp.contentSize(), resp.content(), MHD_RESPMEM_MUST_COPY);
