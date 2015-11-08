@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <microhttpd.h>
+
 #include "core/httpd/http_handler.h"
 
 class HttpServer {
@@ -16,6 +18,9 @@ public:
     void stop();
 
     void installHandler(const std::string& path, HttpHandler);
+    void installStaticFileHandler(const std::string& path,
+                                  const std::string& filepath,
+                                  const std::string& mime);
 
     // When no handler is matched, we get the content of this path.
     void setAssetDirectory(const std::string& path);
@@ -24,6 +29,8 @@ private:
     static int accessHandler(void* cls, struct MHD_Connection* connection,
                              const char* url, const char* method, const char* version,
                              const char* upload_data, size_t* upload_data_size, void** con_cls);
+    static void requestCompleted(void* cls, struct MHD_Connection* connection,
+                                 void** con_cls, MHD_RequestTerminationCode);
 
     int port_;
     struct MHD_Daemon* httpd_;
