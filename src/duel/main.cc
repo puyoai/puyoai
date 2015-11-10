@@ -11,7 +11,7 @@
 #include <glog/logging.h>
 
 #include "base/file.h"
-#include "core/httpd/http_server.h"
+#include "core/httpd/http_handler.h"
 #include "core/server/connector/human_connector.h"
 #include "core/server/connector/connector_manager_posix.h"
 #include "core/server/game_state.h"
@@ -19,6 +19,10 @@
 #include "duel/cui.h"
 #include "duel/duel_server.h"
 #include "duel/puyofu_recorder.h"
+
+#ifdef USE_HTTPD
+#include "core/httpd/http_server.h"
+#endif
 
 #ifdef USE_SDL2
 #include <SDL.h>
