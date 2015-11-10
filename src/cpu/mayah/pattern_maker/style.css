@@ -1,0 +1,44 @@
+body {
+    -webkit-user-select: none;
+}
+
+#field-area {
+    position: relative;
+    background: url(/static/bg.png) no-repeat;
+    width: 256px;
+    height: 448px;
+}
+
+/* ---------------------------------------------------------------------- */
+
+.puyo {
+    background: url(/static/puyo.png) no-repeat;
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background-position: -160px -192px;
+}
+.puyo.empty {
+    background-position: -160px -192px;
+}
+.puyo.erase {
+    background-position: -160px -160px;
+}
+.puyo.red {
+    background-position: 0px 0px;
+}
+.puyo.blue {
+    background-position: -32px 0px;
+}
+.puyo.yellow {
+    background-position: -64px 0px;
+}
+.puyo.green {
+    background-position: -96px 0px;
+}
+.puyo.purple {
+    background-position: -128px 0px;
+}
+.puyo.ojama {
+    background-position: -160px 0px;
+}

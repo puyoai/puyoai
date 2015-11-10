@@ -38,6 +38,10 @@ mayah_add_executable(tweaker tweaker.cc)
 
 mayah_add_executable(experimental experimental.cc)
 
+if(USE_HTTPD)
+    mayah_add_executable(pattern_maker pattern_maker.cc)
+endif()
+
 cpu_add_runner(run.sh)
 cpu_add_runner(run_v.sh)
 
