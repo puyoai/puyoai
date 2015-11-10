@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Pattern Maker</title>
+    <link rel="stylesheet" href="/static/style.css" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="/static/script.js"></script>
+</head>
+<body onload="init()">
+    <h1>Pattern Maker</h1>
+
+    <div id="field-area"></div>
+    <div>
+        <span class="puyo red" onclick="chooser.currentColor = RED;"></span>
+        <span class="puyo blue" onclick="chooser.currentColor = BLUE;"></span>
+        <span class="puyo yellow" onclick="chooser.currentColor = YELLOW;"></span>
+        <span class="puyo green" onclick="chooser.currentColor = GREEN;"></span>
+        <!-- <span class="puyo purple" onclick="chooser.currentColor = PURPLE;"></span> -->
+        <span class="puyo ojama" onclick="chooser.currentColor = OJAMA;"></span>
+        <span class="puyo erase" onclick="chooser.currentColor = EMPTY;"></span>
+    </div>
+
+    <div>
+        <button type="submit" onclick="field.submit();">Add</button>
+    </div>
+
+</body>
+</html>
