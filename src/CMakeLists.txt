@@ -82,14 +82,11 @@ if(${build_type} MATCHES release)
     puyoai_add_cxx_flags("-DNOINLINE_UNLESS_RELEASE=")
 endif()
 
+add_subdirectory(third_party)
+
 include_directories(.)
-
-add_subdirectory(third_party/googletest/googletest)
+include_directories(${CMAKE_BINARY_DIR}/gen/jsoncpp)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-
-add_subdirectory(third_party/jsoncpp)
-include_directories(third_party/jsoncpp)
-
 include_directories(third_party/tinytoml/include)
 include_directories(${GLOG_INCLUDE_DIRS})
 
