@@ -89,6 +89,8 @@ cygwin で一応 build できることが確認されています。詳しくは
     $ git submodule init
     $ git submodule update
 
+基本的に一度実行すればいいのですが、新しいsubmoduleを追加した時は、もう一度 `git submodule init` からやり直す必要がある場合があります。
+
 ビルドでは、cmake を用いて Makefile を生成し、make することを前提にしています。
 
 out ディレクトリを掘って、そこでビルドするようにしてください。ビルドの種類によって、ディレクトリを分けると楽です。
