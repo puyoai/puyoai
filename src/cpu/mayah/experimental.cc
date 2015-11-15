@@ -186,6 +186,8 @@ SearchResult BeamMayahAI::run(const vector<State>& initialStates, KumipuyoSeq se
     vector<State> nextStates;
     nextStates.reserve(100000);
 
+    vector<double> time(std::max(maxSearchTurns, 10));
+
     for (int turn = 3; turn < maxSearchTurns; ++turn) {
 
 #if 0
@@ -204,6 +206,8 @@ SearchResult BeamMayahAI::run(const vector<State>& initialStates, KumipuyoSeq se
         }
 
 #endif
+        time[turn] = currentTime();
+
         seq.dropFront();
 
         unordered_set<size_t> visited;
@@ -285,7 +289,11 @@ SearchResult BeamMayahAI::run(const vector<State>& initialStates, KumipuyoSeq se
             cout << "FIRED_CHAINS=" << maxOverallFiredChains
                  << " FIRED_SCORE=" << maxOverallFiredScore
                  << " DECISION=" << currentStates.front().firstDecision
-                 << " TIME=" << (endTime - beginTime) << endl;
+                 << " TIME=" << (endTime - beginTime)
+                 << " TURN4_TIME=" << (time[4] - beginTime)
+                 << " TURN5_TIME=" << (time[5] - beginTime)
+                 << " TURN6_TIME=" << (time[6] - beginTime) << endl;
+
         } else {
             cout << "EMPTY!" << endl;
             result.maxChains = -1;
