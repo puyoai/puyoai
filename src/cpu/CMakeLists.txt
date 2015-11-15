@@ -61,3 +61,4 @@ add_subdirectory(sample_suicide)
 add_subdirectory(control_tester)
 
 add_subdirectory(kantoku)
+add_subdirectory(colun)
