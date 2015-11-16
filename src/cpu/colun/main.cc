@@ -11,6 +11,7 @@
 #include "core/frame_request.h"
 #include "base/time.h"
 #include "core/kumipuyo_seq_generator.h"
+#include "core/puyo_controller.h"
 
 unsigned int myRandInt(unsigned int v) {
     static std::mt19937 rnd(1);
@@ -26,23 +27,33 @@ public:
                        const PlayerState& me, const PlayerState& enemy, bool fast) const override
     {
         long long start_time_ms = currentTimeInMillis();
-        int frame = 65536;
+        static const int maxFrame = 300;
+        int frame = maxFrame;
         if(enemy.isRensaOngoing()) {
-        	frame = enemy.rensaFinishingFrameId() - frameId;
-        	fprintf(stderr, "frame: %d\n", frame);
-        	if(frame<=0) {
-        		frame = 65536;
-        	}
+            frame = enemy.rensaFinishingFrameId() - frameId;
+            fprintf(stderr, "frame: %d\n", frame);
+            if(frame<=0) {
+                frame = maxFrame;
+            }
         }
         UNUSED_VARIABLE(me);
         UNUSED_VARIABLE(fast);
 
         LOG(INFO) << f.toDebugString() << seq.toString();
 
+        static const Decision DECISIONS[] = {
+            Decision(2, 3), Decision(3, 3), Decision(3, 1), Decision(4, 1),
+            Decision(5, 1), Decision(1, 2), Decision(2, 2), Decision(3, 2),
+            Decision(4, 2), Decision(5, 2), Decision(6, 2), Decision(1, 1),
+            Decision(2, 1), Decision(4, 3), Decision(5, 3), Decision(6, 3),
+            Decision(1, 0), Decision(2, 0), Decision(3, 0), Decision(4, 0),
+            Decision(5, 0), Decision(6, 0),
+        };
+
         int search_turns = 12;
         int time_limit_ms = 600;
         int simCount = 0;
-        int counts[32] = {0};
+        int counts[22] = {0};
         while(currentTimeInMillis() - start_time_ms < time_limit_ms) {
             ++simCount;
             KumipuyoSeq simSeq = seq;
@@ -52,63 +63,107 @@ public:
             {
                 //simulation
                 std::vector<int> bestGenom;
-                std::pair<int, int> bestSc(0, -1);
-                for(int tryCount=0; tryCount<100; ++tryCount) {
-                    std::vector<int> genom(bestGenom.begin(), bestGenom.begin() + myRandInt(bestGenom.size()));
+                std::pair<int, std::pair<int, int> > bestSc(-1, std::pair<int, int>(0, 0));
+                for(int tryCount=0; tryCount<200; ++tryCount) {
+                    std::vector<int> genom;//(bestGenom.begin(), bestGenom.begin() + myRandInt(bestGenom.size()));
                     CoreField f2 = f;
                     int sc = 0;
                     int maxChain = 0;
+                    int mSc = 0;
                     int ff = 0;
+                    bool dead = false;
                     for(int i=0; i<(int)genom.size(); ++i) {
-                        f2.dropKumipuyo(Decision(genom[i]>>2, genom[i]&3), simSeq.get(i));
+                        auto & de = DECISIONS[genom[i]];
+                        int dropFrames = f2.framesToDropNext(de);
+                        f2.dropKumipuyo(de, simSeq.get(i));
                         const auto & re = f2.simulate();
+                        if(!f2.isEmpty(3, 12)) {
+                            dead = true;
+                            break;
+                        }
                         sc += re.score;
-                        ff += re.frames;
+                        ff += dropFrames + re.frames;
                         maxChain = std::max(maxChain, re.chains);
+                        mSc = std::max(mSc, re.score);
+                    }
+                    if(dead) {
+                        continue;
                     }
                     while((int)genom.size()<simSeq.size() && ff<frame) {
-                        int cnt = 0;
-                        Decision select;
-                        Plan::iterateAvailablePlans(f2, simSeq.subsequence(genom.size(), 1), 1, [&cnt, &select](const RefPlan& plan) {
-                            ++cnt;
-                            if(myRandInt(cnt)==0) {
-                                select = plan.decisions().front();
+                        std::vector<int> candidates;
+                        auto & puyo = simSeq.get(genom.size());
+                        if(puyo.axis==puyo.child) {
+                            for(int v=0; v<11; ++v) {
+                                candidates.push_back(v);
                             }
-                        });
-                        f2.dropKumipuyo(select, simSeq.get(genom.size()));
-                        const auto & re = f2.simulate();
-                        sc += re.score;
-                        ff += re.frames;
-                        maxChain = std::max(maxChain, re.chains);
-                        assert(0<=select.r);
-                        assert(select.r<4);
-                        genom.push_back((select.x<<2) | (select.r));
+                        }
+                        else {
+                            for(int v=0; v<22; ++v) {
+                                candidates.push_back(v);
+                            }
+                        }
+                        while(true) {
+                            if(candidates.empty()) {
+                                dead = true;
+                                break;
+                            }
+                            int i = myRandInt(candidates.size());
+                            int v = candidates[i];
+                            candidates[i] = candidates.back();
+                            candidates.pop_back();
+                            auto & de = DECISIONS[v];
+                            if(!PuyoController::isReachable(f2, de)) {
+                                continue;
+                            }
+                            int dropFrames = f2.framesToDropNext(de);
+                            if(!f2.dropKumipuyo(de, simSeq.get(genom.size()))) {
+                                dead = true;
+                                break;
+                            }
+                            const auto & re = f2.simulate();
+                            if(!f2.isEmpty(3, 12)) {
+                                dead = true;
+                                break;
+                            }
+                            sc += re.score;
+                            ff += dropFrames + re.frames;
+                            maxChain = std::max(maxChain, re.chains);
+                            mSc = std::max(mSc, re.score);
+                            genom.push_back(v);
+                            break;
+                        }
+                        if(dead) {
+                            break;
+                        }
                     }
-                    std::pair<int, int> sc2(maxChain, sc);
+                    if(dead) {
+                        continue;
+                    }
+                    std::pair<int, std::pair<int, int> > sc2(maxChain, std::pair<int, int>(-mSc, -sc));
                     if(bestSc<sc2) {
-                    	bestSc = sc2;
-                    	bestGenom = genom;
+                        bestSc = sc2;
+                        bestGenom = genom;
                     }
                 }
                 if(!bestGenom.empty()) {
-                	++counts[bestGenom.front()];
+                    ++counts[bestGenom.front()];
                 }
             }
         }
-        fprintf(stderr, "simCount: %d\n", simCount);
+        //fprintf(stderr, "simCount: %d\n", simCount);
         int bestAns = -1;
         int bestCnt = 0;
-        for(int i=0; i<32; ++i) {
-        	if(1<=counts[i]) {
-        		//fprintf(stderr, "%d => %d\n", i, counts[i]);
-        	}
-        	if(bestCnt<counts[i]) {
-        		bestCnt = counts[i];
-        		bestAns = i;
-        	}
+        for(int i=0; i<22; ++i) {
+            if(1<=counts[i]) {
+                //fprintf(stderr, "%d => %d\n", i, counts[i]);
+            }
+            if(bestCnt<counts[i]) {
+                bestCnt = counts[i];
+                bestAns = i;
+            }
         }
         assert(bestAns!=-1);
-        return DropDecision(Decision(bestAns>>2, bestAns&3));
+        return DropDecision(DECISIONS[bestAns]);
     }
 };
 
