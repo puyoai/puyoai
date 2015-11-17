@@ -50,7 +50,7 @@ public:
             Decision(5, 0), Decision(6, 0),
         };
 
-        int search_turns = 12;
+        int search_turns = 20;
         int time_limit_ms = 600;
         int simCount = 0;
         int counts[22] = {0};
@@ -81,9 +81,10 @@ public:
                             dead = true;
                             break;
                         }
+                        bool zenkeshi = (f2.isZenkeshi() && i<seq.size());
                         sc += re.score;
                         ff += dropFrames + re.frames;
-                        maxChain = std::max(maxChain, re.chains);
+                        maxChain = std::max(maxChain, re.chains + (zenkeshi ? 3 : 0));
                         mSc = std::max(mSc, re.score);
                     }
                     if(dead) {
@@ -127,7 +128,8 @@ public:
                             }
                             sc += re.score;
                             ff += dropFrames + re.frames;
-                            maxChain = std::max(maxChain, re.chains);
+                            bool zenkeshi = (f2.isZenkeshi() && (int)genom.size()<seq.size());
+                            maxChain = std::max(maxChain, re.chains + (zenkeshi ? 3 : 0));
                             mSc = std::max(mSc, re.score);
                             genom.push_back(v);
                             break;
@@ -139,7 +141,7 @@ public:
                     if(dead) {
                         continue;
                     }
-                    std::pair<int, std::pair<int, int> > sc2(maxChain<3 ? -maxChain : maxChain, std::pair<int, int>(maxChain<6 ? -mSc : mSc, -sc));
+                    std::pair<int, std::pair<int, int> > sc2(maxChain<3 ? -10+maxChain : maxChain, std::pair<int, int>(mSc, -sc));
                     if(bestSc<sc2) {
                         bestSc = sc2;
                         bestGenom = genom;
