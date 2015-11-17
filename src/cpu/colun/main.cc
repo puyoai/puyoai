@@ -31,7 +31,7 @@ public:
         int frame = maxFrame;
         if(enemy.isRensaOngoing()) {
             frame = enemy.rensaFinishingFrameId() - frameId;
-            fprintf(stderr, "frame: %d\n", frame);
+            //fprintf(stderr, "frame: %d\n", frame);
             if(frame<=0) {
                 frame = maxFrame;
             }
@@ -63,7 +63,7 @@ public:
             {
                 //simulation
                 std::vector<int> bestGenom;
-                std::pair<int, std::pair<int, int> > bestSc(-1, std::pair<int, int>(0, 0));
+                std::pair<int, std::pair<int, int> > bestSc(-100, std::pair<int, int>(0, 0));
                 for(int tryCount=0; tryCount<200; ++tryCount) {
                     std::vector<int> genom;//(bestGenom.begin(), bestGenom.begin() + myRandInt(bestGenom.size()));
                     CoreField f2 = f;
@@ -139,7 +139,7 @@ public:
                     if(dead) {
                         continue;
                     }
-                    std::pair<int, std::pair<int, int> > sc2(maxChain, std::pair<int, int>(-mSc, -sc));
+                    std::pair<int, std::pair<int, int> > sc2(maxChain<3 ? -maxChain : maxChain, std::pair<int, int>(maxChain<6 ? -mSc : mSc, -sc));
                     if(bestSc<sc2) {
                         bestSc = sc2;
                         bestGenom = genom;
@@ -151,7 +151,7 @@ public:
             }
         }
         //fprintf(stderr, "simCount: %d\n", simCount);
-        int bestAns = -1;
+        int bestAns = 0;
         int bestCnt = 0;
         for(int i=0; i<22; ++i) {
             if(1<=counts[i]) {
@@ -162,7 +162,6 @@ public:
                 bestAns = i;
             }
         }
-        assert(bestAns!=-1);
         return DropDecision(DECISIONS[bestAns]);
     }
 };
