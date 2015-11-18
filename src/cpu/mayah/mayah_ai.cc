@@ -27,7 +27,7 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
     AI(argc, argv, "mayah"),
     executor_(executor)
 {
-    // setBehaviorRethinkAfterOpponentRensa(true);
+    setBehaviorRethinkAfterOpponentRensa(true);
 
     loadEvaluationParameter();
     CHECK(decisionBook_.load(FLAGS_decision_book));
