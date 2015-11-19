@@ -1,13 +1,24 @@
 #ifndef CORE_FRAME_H_
 #define CORE_FRAME_H_
 
+// frame.h contains various constants and functions about frames.
+
 #include <glog/logging.h>
 
+// 1 seconds = 60 frames.
 const int FPS = 60;
+
+// The number of frames for preparing puyo. This frame is for animation that
+// a puyo in NEXT is moving to a player field.
 const int FRAMES_PREPARING_NEXT = 12;
+
+// The number of frames for grounding animation of puyo.
 const int FRAMES_GROUNDING = 20;
+
+// The number of frames for vanishing animation of puyo.
 const int FRAMES_VANISH_ANIMATION = 50;
 
+// After this frames passed after the puyo is controllable, NEXT2 will be shown.
 const int FRAMES_NEXT2_DELAY = 16;
 const int FRAMES_FREE_FALL = 16;
 const int FRAMES_QUICKTURN = 20;
