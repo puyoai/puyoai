@@ -20,6 +20,7 @@
 DEFINE_string(feature, "feature.toml", "the path to feature parameter");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
+DEFINE_bool(from_wrapper, false, "Make this true in wrapper script.");
 
 using namespace std;
 
@@ -27,6 +28,11 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
     AI(argc, argv, "mayah"),
     executor_(executor)
 {
+    if (!FLAGS_from_wrapper) {
+        LOG(ERROR) << "mayah was not run with run.sh?" << endl
+                   << "Use run.sh instead of using mayah_cpu directly.";
+    }
+
     setBehaviorRethinkAfterOpponentRensa(true);
 
     loadEvaluationParameter();
