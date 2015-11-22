@@ -40,7 +40,7 @@ struct SearchState {
 };
 
 BeamFullAI::BeamFullAI() : BeamSearchAI("Full") {}
-  
+
 bool BeamFullAI::skipRensaPlan(const RensaResult&) const {
   return false;
 }
@@ -119,6 +119,26 @@ bool Beam2DubAI::shouldUpdateState(const SearchState& orig, const SearchState& r
   return false;
 }
 
+DropDecision Beam2DubAI::think(int frame_id, const CoreField& field, const KumipuyoSeq& seq,
+                                             const PlayerState& me, const PlayerState& enemy, bool fast) const {
+    Decision d;
+    int maxScore = 1000;
+    auto callback = [&d, &maxScore](const RefPlan& plan) {
+        if (plan.chains() == 2 && plan.score() > maxScore) {
+            d = plan.firstDecision();
+            maxScore = plan.score();
+        }
+    };
+    Plan::iterateAvailablePlans(field, seq, 2, callback);
+
+    if (d.isValid()) {
+        return DropDecision(d, "Fire!");
+    }
+
+    return BeamSearchAI::think(frame_id, field, seq, me, enemy, fast);
+}
+
+
 // ===================================================================
 
 DropDecision BeamSearchAI::think(
@@ -173,7 +193,7 @@ DropDecision BeamSearchAI::think(
     oss << "(" << dd.first.x << "-" << dd.first.r << ":" << dd.second << ")";
   }
   Decision best = (decisions.empty()) ? Decision(6, 0) : (decisions.begin()->first);
-  
+
   return DropDecision(best, oss.str());
 }
 
@@ -182,7 +202,7 @@ SearchState BeamSearchAI::search(
   CHECK_GE(vseq.size(), search_turns);
 
   std::vector<std::vector<SearchState>> q_states(search_turns + 1);
-  
+
   SearchState init_state;
   init_state.field = field;
   init_state.decision = Decision(0, 0);

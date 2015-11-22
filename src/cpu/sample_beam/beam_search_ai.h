@@ -50,7 +50,7 @@ class BeamSearchAI : public AI {
 class BeamFullAI final : public BeamSearchAI {
 public:
   BeamFullAI();
-  
+
 private:
   bool skipRensaPlan(const RensaResult&) const override;
   SearchState generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const override;
@@ -64,6 +64,9 @@ public:
   Beam2DubAI();
 
 private:
+  DropDecision think(int frame_id, const CoreField& field, const KumipuyoSeq& seq,
+                     const PlayerState&, const PlayerState&, bool) const override;
+
   bool skipRensaPlan(const RensaResult& result) const override;
   SearchState generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const override;
   SearchState generateNextNonRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan, int expect) const override;
