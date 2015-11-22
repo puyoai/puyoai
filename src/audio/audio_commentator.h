@@ -29,6 +29,7 @@ public:
     virtual void gameHasDone(GameResult) override;
 
     virtual void onCommentatorResultUpdate(const CommentatorResult&) override;
+
 private:
     AudioServer* audioServer_;
 
