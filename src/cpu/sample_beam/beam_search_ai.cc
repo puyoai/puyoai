@@ -121,19 +121,25 @@ bool Beam2DubAI::shouldUpdateState(const SearchState& orig, const SearchState& r
 
 DropDecision Beam2DubAI::think(int frame_id, const CoreField& field, const KumipuyoSeq& seq,
                                              const PlayerState& me, const PlayerState& enemy, bool fast) const {
-    Decision d;
-    int maxScore = 1000;
-    auto callback = [&d, &maxScore](const RefPlan& plan) {
-        if (plan.chains() == 2 && plan.score() > maxScore) {
-            d = plan.firstDecision();
-            maxScore = plan.score();
+    Decision d2, d3;
+    int maxScore2 = 1000, maxScore3 = 1000;
+    auto callback = [&](const RefPlan& plan) {
+        if (plan.chains() == 2 && plan.score() > maxScore2) {
+            d2 = plan.firstDecision();
+            maxScore2 = plan.score();
+        }
+
+        if (plan.chains() > 2 && plan.score() > maxScore3) {
+            d3 = plan.firstDecision();
+            maxScore3 = plan.score();
         }
     };
     Plan::iterateAvailablePlans(field, seq, 2, callback);
 
-    if (d.isValid()) {
-        return DropDecision(d, "Fire!");
-    }
+    if (d2.isValid())
+        return DropDecision(d2, "Fire 2DUB!");
+    if (d3.isValid())
+        return DropDecision(d3, "Fire!");
 
     return BeamSearchAI::think(frame_id, field, seq, me, enemy, fast);
 }
