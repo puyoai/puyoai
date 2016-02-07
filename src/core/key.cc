@@ -7,10 +7,10 @@ using namespace std;
 string toString(Key key)
 {
     switch (key) {
-    case Key::UP:          return "↑";
-    case Key::RIGHT:       return "→";
-    case Key::DOWN:        return "↓";
-    case Key::LEFT:        return "←";
+    case Key::UP:          return "\xE2\x86\x91";  // "↑"
+    case Key::RIGHT:       return "\xE2\x86\x92";  // "→"
+    case Key::DOWN:        return "\xE2\x86\x93";  // "↓"
+    case Key::LEFT:        return "\xE2\x86\x90";  // "←"
     case Key::RIGHT_TURN:  return "A";
     case Key::LEFT_TURN:   return "B";
     case Key::START:       return "Start";
