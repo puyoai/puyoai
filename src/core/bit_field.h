@@ -65,11 +65,11 @@ public:
     bool hasFloatingPuyo() const;
 
     RensaResult simulate(int initialChain = 1);
-    template<typename Tracker> RensaResult simulate(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
+    template<typename Tracker> NOINLINE_UNLESS_RELEASE RensaResult simulate(SimulationContext*, Tracker*);
     // Faster version of simulate(). Returns the number of chains.
     template<typename Tracker> int simulateFast(Tracker*);
     // Vanishes the connected puyos, and drop the puyos in the air. Score will be returned.
-    template<typename Tracker> RensaStepResult vanishDrop(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
+    template<typename Tracker> NOINLINE_UNLESS_RELEASE RensaStepResult vanishDrop(SimulationContext*, Tracker*);
     template<typename Tracker> bool vanishDropFast(SimulationContext*, Tracker*);
 
     // Caution: heights must be aligned to 16.
@@ -93,9 +93,9 @@ public:
 
 #if defined(__AVX2__) && defined(__BMI2__)
     // Faster version of simulate() that uses AVX2 instruction set.
-    template<typename Tracker> RensaResult simulateAVX2(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
+    template<typename Tracker> RensaResult NOINLINE_UNLESS_RELEASE simulateAVX2(SimulationContext*, Tracker*);
     template<typename Tracker> int simulateFastAVX2(Tracker*);
-    template<typename Tracker> RensaStepResult vanishDropAVX2(SimulationContext*, Tracker*) NOINLINE_UNLESS_RELEASE;
+    template<typename Tracker> RensaStepResult NOINLINE_UNLESS_RELEASE vanishDropAVX2(SimulationContext*, Tracker*);
     template<typename Tracker> bool vanishDropFastAVX2(SimulationContext*, Tracker*);
 #endif
 
