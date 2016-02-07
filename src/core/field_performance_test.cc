@@ -140,7 +140,7 @@ static void runSimulation(const CoreField& original)
     cout << "BitField (fast): " << endl;
     tscBitFieldFast.showStatistics();
 
-#ifdef __AVX2__
+#if defined(__AVX2__) and defined(__BMI2__)
     cout << "BitField AVX2: " << endl;
     tscBitFieldAVX2.showStatistics();
     cout << "BitField (fast) AVX2: " << endl;
@@ -231,7 +231,7 @@ static void runVanishDrop(const CoreField& original)
     cout << "BitField (fast): " << endl;
     tscBitFieldFast.showStatistics();
 
-#ifdef __AVX2__
+#if defined(__AVX2__) and defined(__BMI2__)
     cout << "BitField AVX2: " << endl;
     tscBitFieldAVX2.showStatistics();
     cout << "BitField (fast) AVX2: " << endl;
