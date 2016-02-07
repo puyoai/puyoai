@@ -1,6 +1,7 @@
 #include "core/rensa_tracker/rensa_chain_tracker.h"
 
 #include <iomanip>
+#include <sstream>
 
 using namespace std;
 
