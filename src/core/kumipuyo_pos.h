@@ -5,10 +5,12 @@
 
 class KumipuyoPos {
 public:
-    static constexpr KumipuyoPos initialPos() { return KumipuyoPos(3, 12, 0); }
-
     constexpr KumipuyoPos() : x(0), y(0), r(0) {}
     constexpr KumipuyoPos(int x, int y, int r) : x(x), y(y), r(r) {}
+
+    // NOTE(peria): Need constructor declaration prior to this static constexpr for MSVC 2015.
+    // https://blogs.msdn.microsoft.com/vcblog/2015/04/29/c11-constant-expressions-in-visual-studio-2015-rc/
+    static constexpr KumipuyoPos initialPos() { return KumipuyoPos(3, 12, 0); }
 
     constexpr int axisX() const { return x; }
     constexpr int axisY() const { return y; }
