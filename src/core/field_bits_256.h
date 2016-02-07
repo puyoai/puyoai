@@ -8,6 +8,7 @@
 #include <immintrin.h>
 
 #include "base/avx.h"
+#include "base/builtin.h"
 #include "core/field_bits.h"
 
 class FieldBits256 {
@@ -102,8 +103,8 @@ std::pair<int, int> FieldBits256::popcountHighLow() const
     avx::Decomposer256 d;
     d.m = m_;
 
-    int low = __builtin_popcountll(d.ui64[0]) + __builtin_popcountll(d.ui64[1]);
-    int high = __builtin_popcountll(d.ui64[2]) + __builtin_popcountll(d.ui64[3]);
+    int low = popCount64(d.ui64[0]) + popCount64(d.ui64[1]);
+    int high = popCount64(d.ui64[2]) + popCount64(d.ui64[3]);
 
     return std::make_pair(high, low);
 }

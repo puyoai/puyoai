@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "base/base.h"
+#include "base/builtin.h"
 #include "base/avx.h"
 #include "base/sse.h"
 #include "base/time.h"
@@ -195,8 +196,8 @@ int f6(FieldBits m_[3], FieldBits erased)
     for (int x = 1; x <= 6; ++x) {
         if (t.ui16[x] == 0)
             continue;
-        int h = 31 - __builtin_clz(t.ui16[x]);
-        int p = __builtin_popcount(t.ui16[x] ^ (((1 << h) - 1) << 1));
+        int h = 31 - countLeadingZeros32(t.ui16[x]);
+        int p = popCount32(t.ui16[x] ^ (((1 << h) - 1) << 1));
         cout << p << endl;
         maxDrops = std::max(p, maxDrops);
     }

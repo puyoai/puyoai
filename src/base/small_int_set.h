@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <glog/logging.h>
 
+#include "base/builtin.h"
+
 // SmallIntSet is an integer set that contains [0, 31].
 class SmallIntSet {
 public:
@@ -26,12 +28,12 @@ public:
     }
 
     bool isEmpty() const { return v_ == 0; }
-    int size() const { return __builtin_popcount(v_); }
+    int size() const { return popCount32(v_); }
 
     int smallest() const
     {
         DCHECK(!isEmpty());
-        return __builtin_ctz(v_);
+        return countTrailingZeros32(v_);
     }
 
     void removeSmallest()

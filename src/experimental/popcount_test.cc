@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "base/base.h"
+#include "base/builtin.h"
 #include "base/time.h"
 #include "base/time_stamp_counter.h"
 #include "core/field_bits.h"
@@ -61,7 +62,7 @@ __m128i f3(__m128i value)
     m = value;
 
     for (int x = 1; x <= 6; ++x) {
-        v[x] = __builtin_popcount(v[x]);
+        v[x] = popCount32(v[x]);
     }
 
     return m;
@@ -69,36 +70,36 @@ __m128i f3(__m128i value)
 
 __m128i f4(__m128i value)
 {
-    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 1)), 1);
-    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 2)), 2);
-    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 3)), 3);
-    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 4)), 4);
-    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 5)), 5);
-    value = _mm_insert_epi16(value, __builtin_popcount(_mm_extract_epi16(value, 6)), 6);
+    value = _mm_insert_epi16(value, popCount32(_mm_extract_epi16(value, 1)), 1);
+    value = _mm_insert_epi16(value, popCount32(_mm_extract_epi16(value, 2)), 2);
+    value = _mm_insert_epi16(value, popCount32(_mm_extract_epi16(value, 3)), 3);
+    value = _mm_insert_epi16(value, popCount32(_mm_extract_epi16(value, 4)), 4);
+    value = _mm_insert_epi16(value, popCount32(_mm_extract_epi16(value, 5)), 5);
+    value = _mm_insert_epi16(value, popCount32(_mm_extract_epi16(value, 6)), 6);
 
     return value;
 }
 
 __m128i f5(__m128i value)
 {
-    int v1 = __builtin_popcount(_mm_extract_epi16(value, 1));
-    int v2 = __builtin_popcount(_mm_extract_epi16(value, 2));
-    int v3 = __builtin_popcount(_mm_extract_epi16(value, 3));
-    int v4 = __builtin_popcount(_mm_extract_epi16(value, 4));
-    int v5 = __builtin_popcount(_mm_extract_epi16(value, 5));
-    int v6 = __builtin_popcount(_mm_extract_epi16(value, 6));
+    int v1 = popCount32(_mm_extract_epi16(value, 1));
+    int v2 = popCount32(_mm_extract_epi16(value, 2));
+    int v3 = popCount32(_mm_extract_epi16(value, 3));
+    int v4 = popCount32(_mm_extract_epi16(value, 4));
+    int v5 = popCount32(_mm_extract_epi16(value, 5));
+    int v6 = popCount32(_mm_extract_epi16(value, 6));
 
     return _mm_set_epi16(0, v6, v5, v4, v3, v2, v1, 0);
 }
 
 __m128i f6(__m128i value)
 {
-    int v1 = __builtin_popcount(_mm_extract_epi16(value, 1));
-    int v2 = __builtin_popcount(_mm_extract_epi16(value, 2));
-    int v3 = __builtin_popcount(_mm_extract_epi16(value, 3));
-    int v4 = __builtin_popcount(_mm_extract_epi16(value, 4));
-    int v5 = __builtin_popcount(_mm_extract_epi16(value, 5));
-    int v6 = __builtin_popcount(_mm_extract_epi16(value, 6));
+    int v1 = popCount32(_mm_extract_epi16(value, 1));
+    int v2 = popCount32(_mm_extract_epi16(value, 2));
+    int v3 = popCount32(_mm_extract_epi16(value, 3));
+    int v4 = popCount32(_mm_extract_epi16(value, 4));
+    int v5 = popCount32(_mm_extract_epi16(value, 5));
+    int v6 = popCount32(_mm_extract_epi16(value, 6));
 
     value = _mm_insert_epi16(value, v1, 1);
     value = _mm_insert_epi16(value, v2, 2);

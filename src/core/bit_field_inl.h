@@ -1,6 +1,8 @@
 #ifndef CORE_BIT_FIELD_INL_H_
 #define CORE_BIT_FIELD_INL_H_
 
+#include "base/builtin.h"
+
 template<typename Tracker>
 RensaResult BitField::simulate(SimulationContext* context, Tracker* tracker)
 {
@@ -190,8 +192,8 @@ int BitField::dropAfterVanish(FieldBits erased, Tracker* tracker)
         _mm_or_si128(m_[0].xmm(), _mm_or_si128(m_[1].xmm(), m_[2].xmm())));
 
     int wholeErased = erased.horizontalOr16();
-    int maxY = 31 - __builtin_clz(wholeErased);
-    int minY = __builtin_ctz(wholeErased);
+    int maxY = 31 - countLeadingZeros32(wholeErased);
+    int minY = countTrailingZeros32(wholeErased);
 
     DCHECK(1 <= minY && minY <= maxY && maxY <= 12)
         << "minY=" << minY << ' ' << "maxY=" << maxY << std::endl << erased.toString();
@@ -248,8 +250,8 @@ void BitField::dropAfterVanishFast(FieldBits erased, Tracker* tracker)
     const __m128i ones = _mm_cmpeq_epi8(zero, zero);
 
     int wholeErased = erased.horizontalOr16();
-    int maxY = 31 - __builtin_clz(wholeErased);
-    int minY = __builtin_ctz(wholeErased);
+    int maxY = 31 - countLeadingZeros32(wholeErased);
+    int minY = countTrailingZeros32(wholeErased);
 
     DCHECK(1 <= minY && minY <= maxY && maxY <= 12)
         << "minY=" << minY << ' ' << "maxY=" << maxY << std::endl << erased.toString();

@@ -8,6 +8,7 @@
 
 #include <glog/logging.h>
 
+#include "base/builtin.h"
 #include "core/field_constant.h"
 #include "core/position.h"
 #include "core/puyo_color.h"
@@ -148,7 +149,7 @@ int FieldBits::popcount() const
 {
     alignas(16) std::int64_t x[2];
     _mm_store_si128(reinterpret_cast<__m128i*>(x), m_);
-    return __builtin_popcountll(x[0]) + __builtin_popcountll(x[1]);
+    return popCount64(x[0]) + popCount64(x[1]);
 }
 
 inline
@@ -167,7 +168,7 @@ int FieldBits::highestHeight() const
     if (or16 == 0)
         return -1;
 
-    return 31 - __builtin_clz(or16);
+    return 31 - countLeadingZeros32(or16);
 }
 
 inline
@@ -361,7 +362,7 @@ void FieldBits::iterateBitPositions(Callback callback) const
     _mm_store_si128(reinterpret_cast<__m128i*>(vs), m_);
 
     while (vs[0]) {
-        int bit = __builtin_ctzll(vs[0]);
+        int bit = countTrailingZeros64(vs[0]);
         int x = bit >> 4;
         int y = bit & 0xF;
         callback(x, y);
@@ -369,7 +370,7 @@ void FieldBits::iterateBitPositions(Callback callback) const
     }
 
     while (vs[1]) {
-        int bit = __builtin_ctzll(vs[1]);
+        int bit = countTrailingZeros64(vs[1]);
         int x = 4 + (bit >> 4);
         int y = bit & 0xF;
         callback(x, y);
