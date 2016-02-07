@@ -15,7 +15,6 @@ enable_testing()
 # Check packages, libraries, etc.
 
 find_package(Threads)
-
 find_package(PkgConfig)
 
 # TODO(mayah): gflags does not provide pkg-config anymore?
@@ -56,26 +55,31 @@ endif()
 # Set include directories, c++ options, etc.
 
 function(puyoai_add_cxx_flags flags)
-    if(${CMAKE_GENERATOR} MATCHES "Visual Studio")
-    else()
-        set(CMAKE_CXX_FLAGS "${flags} ${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
-    endif()
+    set(CMAKE_CXX_FLAGS "${flags} ${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
 endfunction()
 
-if(CYGWIN AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
-    puyoai_add_cxx_flags("-Wall -Wextra -std=gnu++11")
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+    # Suppress some warnigs about implicit conversions.
+    puyoai_add_cxx_flags("/wd4244")  # from uint64 to int
+    puyoai_add_cxx_flags("/wd4267")  # from size_t to int
+    puyoai_add_cxx_flags("/wd4800")  # from int to bool
 else()
-    puyoai_add_cxx_flags("-Wall -Wextra -std=c++11")
+    if(CYGWIN AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
+        puyoai_add_cxx_flags("-Wall -Wextra -std=gnu++11")
+    else()
+        puyoai_add_cxx_flags("-Wall -Wextra -std=c++11")
+    endif()
+    puyoai_add_cxx_flags("-Wno-error=deprecated-declarations")
+    puyoai_add_cxx_flags("-Wno-error=missing-field-initializers")
+    puyoai_add_cxx_flags("-Wno-error=sign-compare")
+    puyoai_add_cxx_flags("-march=native")
 endif()
-puyoai_add_cxx_flags("-Wno-error=deprecated-declarations")
-puyoai_add_cxx_flags("-Wno-error=missing-field-initializers")
-puyoai_add_cxx_flags("-Wno-error=sign-compare")
-puyoai_add_cxx_flags("-march=native")
 
 puyoai_add_cxx_flags("-DSRC_DIR=\\\"${CMAKE_SOURCE_DIR}\\\"")
 puyoai_add_cxx_flags("-DTESTDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../test_resources\\\"")
 puyoai_add_cxx_flags("-DDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../data\\\"")
 puyoai_add_cxx_flags("-DRECOGNITION_DIR=\\\"${CMAKE_SOURCE_DIR}/../recognition\\\"")
+
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" build_type)
 if(${build_type} MATCHES release)
