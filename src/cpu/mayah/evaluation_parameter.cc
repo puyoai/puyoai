@@ -18,24 +18,21 @@ using namespace std;
 
 bool EvaluationParameterMap::load(const string& filename)
 {
-    toml::Value value;
-
     try {
         ifstream ifs(filename, ios::in);
         if (!ifs)
             return false;
-        toml::Parser parser(ifs);
-        value = parser.parse();
-        if (!value.valid()) {
-            LOG(ERROR) << parser.errorReason();
+        toml::ParseResult result = toml::parse(ifs);
+        if (!result.valid()) {
+            LOG(ERROR) << result.errorReason;
             return false;
         }
+
+        return loadValue(result.value);
     } catch (std::exception& e) {
         LOG(WARNING) << "EvaluationParameterMap::load failed: " << e.what();
         return false;
     }
-
-    return loadValue(value);
 }
 
 bool EvaluationParameterMap::save(const string& filename) const

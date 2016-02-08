@@ -92,27 +92,25 @@ DecisionBook::DecisionBook(const string& filename)
 bool DecisionBook::load(const string& filename)
 {
     ifstream ifs(filename);
-    toml::Parser parser(ifs);
-    toml::Value v = parser.parse();
-    if (!v.valid()) {
-        LOG(ERROR) << parser.errorReason();
+    toml::ParseResult result = toml::parse(ifs);
+    if (!result.valid()) {
+        LOG(ERROR) << result.errorReason;
         return false;
     }
 
-    return loadFromValue(std::move(v));
+    return loadFromValue(std::move(result.value));
 }
 
 bool DecisionBook::loadFromString(const string& str)
 {
     istringstream iss(str);
-    toml::Parser parser(iss);
-    toml::Value v = parser.parse();
-    if (!v.valid()) {
-        LOG(ERROR) << parser.errorReason();
+    toml::ParseResult result = toml::parse(iss);
+    if (!result.valid()) {
+        LOG(ERROR) << result.errorReason;
         return false;
     }
 
-    return loadFromValue(v);
+    return loadFromValue(result.value);
 }
 
 bool DecisionBook::loadFromValue(const toml::Value& book)

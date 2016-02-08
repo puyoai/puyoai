@@ -30,18 +30,14 @@ bool parsePlayerState(const toml::Value& value, PlayerState* state)
 
 Problem Problem::readProblem(const string& filename)
 {
-    toml::Value value;
-    try {
-        ifstream ifs(filename);
-        toml::Parser parser(ifs);
-        value = parser.parse();
-    } catch (std::exception& e) {
-        CHECK(false) << e.what();
+    ifstream ifs(filename);
+    toml::ParseResult result = toml::parse(ifs);
+    if (!result.valid()) {
+        CHECK(false) << result.errorReason;
         return Problem();
     }
 
-    CHECK(value.valid());
-    return parse(value);
+    return parse(result.value);
 }
 
 Problem Problem::parse(const toml::Value& value)

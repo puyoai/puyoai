@@ -37,27 +37,26 @@ PatternBook::~PatternBook()
 bool PatternBook::load(const string& filename)
 {
     ifstream ifs(filename);
-    toml::Parser parser(ifs);
-    toml::Value v = parser.parse();
-    if (!v.valid()) {
-        LOG(ERROR) << parser.errorReason();
+    toml::ParseResult result = toml::parse(ifs);
+
+    if (!result.valid()) {
+        LOG(ERROR) << result.errorReason;
         return false;
     }
-
-    return loadFromValue(std::move(v));
+    return loadFromValue(std::move(result.value));
 }
 
 bool PatternBook::loadFromString(const string& str, bool ignoreDuplicate)
 {
     istringstream ss(str);
-    toml::Parser parser(ss);
-    toml::Value v = parser.parse();
-    if (!v.valid()) {
-        LOG(ERROR) << parser.errorReason();
+    toml::ParseResult result = toml::parse(ss);
+
+    if (!result.valid()) {
+        LOG(ERROR) << result.errorReason;
         return false;
     }
 
-    return loadFromValue(v, ignoreDuplicate);
+    return loadFromValue(result.value, ignoreDuplicate);
 }
 
 bool PatternBook::loadFromValue(const toml::Value& patterns, bool ignoreDuplicate)
