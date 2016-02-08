@@ -8,7 +8,7 @@ declare -a cmake_opts
 cmake_opts+=("-GNinja")
 cmake_opts+=("-DCMAKE_C_COMPILER=clang")
 cmake_opts+=("-DCMAKE_CXX_COMPILER=clang++")
-cmake_opts+=("-DCMAKE_BUILD_TYPE=Debug")
+cmake_opts+=("-DCMAKE_BUILD_TYPE=Default")
 
 declare -a cmake_cxx_flags
 cmake_cxx_flags+=("-std=c++11" "-Werror" "-Wall" "-Wextra")
