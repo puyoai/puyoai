@@ -308,7 +308,7 @@ struct hash<BitField>
 
 #include "bit_field_inl.h"
 
-#if defined(__AVX2__) and defined(__BMI2__)
+#if defined(__AVX2__) && defined(__BMI2__)
 #include "bit_field_avx2_inl.h"
 #endif
 

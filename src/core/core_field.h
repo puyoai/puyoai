@@ -249,7 +249,7 @@ RensaResult CoreField::simulate(Tracker* tracker)
 template<typename Tracker>
 RensaResult CoreField::simulate(SimulationContext* context, Tracker* tracker)
 {
-#if defined(__AVX2__) and defined(__BMI2__)
+#if defined(__AVX2__) && defined(__BMI2__)
     RensaResult result = field_.simulateAVX2(context, tracker);
 #else
     RensaResult result = field_.simulate(context, tracker);
@@ -269,7 +269,7 @@ int CoreField::simulateFast()
 template<typename Tracker>
 int CoreField::simulateFast(Tracker* tracker)
 {
-#if defined(__AVX2__) and defined(__BMI2__)
+#if defined(__AVX2__) && defined(__BMI2__)
     int result = field_.simulateFastAVX2(tracker);
 #else
     int result = field_.simulateFast(tracker);
@@ -303,7 +303,7 @@ RensaStepResult CoreField::vanishDrop(Tracker* tracker)
 template<typename Tracker>
 RensaStepResult CoreField::vanishDrop(SimulationContext* context, Tracker* tracker)
 {
-#if defined(__AVX2__) and defined(__BMI2__)
+#if defined(__AVX2__) && defined(__BMI2__)
     RensaStepResult result = field_.vanishDropAVX2(context, tracker);
 #else
     RensaStepResult result = field_.vanishDrop(context, tracker);
@@ -337,7 +337,7 @@ bool CoreField::vanishDropFast(Tracker* tracker)
 template<typename Tracker>
 bool CoreField::vanishDropFast(SimulationContext* context, Tracker* tracker)
 {
-#if defined(__AVX2__) and defined(__BMI2__)
+#if defined(__AVX2__) && defined(__BMI2__)
     bool result = field_.vanishDropFastAVX2(context, tracker);
 #else
     bool result = field_.vanishDropFast(context, tracker);

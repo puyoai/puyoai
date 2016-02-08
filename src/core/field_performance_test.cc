@@ -111,7 +111,7 @@ static void runSimulation(const CoreField& original)
         EXPECT_EQ(expectedChain, bf.simulateFast(&tracker));
     }
 
-#if defined(__AVX2__) and defined(__BMI2__)
+#if defined(__AVX2__) && defined(__BMI2__)
     TimeStampCounterData tscBitFieldAVX2;
     TimeStampCounterData tscBitFieldFastAVX2;
 
@@ -140,7 +140,7 @@ static void runSimulation(const CoreField& original)
     cout << "BitField (fast): " << endl;
     tscBitFieldFast.showStatistics();
 
-#if defined(__AVX2__) and defined(__BMI2__)
+#if defined(__AVX2__) && defined(__BMI2__)
     cout << "BitField AVX2: " << endl;
     tscBitFieldAVX2.showStatistics();
     cout << "BitField (fast) AVX2: " << endl;
@@ -195,7 +195,7 @@ static void runVanishDrop(const CoreField& original)
         EXPECT_EQ(expectedChain, context.currentChain - 1);
     }
 
-#if defined(__AVX2__) and defined(__BMI2__)
+#if defined(__AVX2__) && defined(__BMI2__)
     TimeStampCounterData tscBitFieldAVX2;
     TimeStampCounterData tscBitFieldFastAVX2;
 
@@ -231,7 +231,7 @@ static void runVanishDrop(const CoreField& original)
     cout << "BitField (fast): " << endl;
     tscBitFieldFast.showStatistics();
 
-#if defined(__AVX2__) and defined(__BMI2__)
+#if defined(__AVX2__) && defined(__BMI2__)
     cout << "BitField AVX2: " << endl;
     tscBitFieldAVX2.showStatistics();
     cout << "BitField (fast) AVX2: " << endl;
