@@ -44,7 +44,7 @@ endif()
 # TODO(mayah): Why not use pkg_search_module?
 find_library(LIB_USB NAMES usb-1.0)
 if(LIB_USB AND USE_SDL2 AND FFMPEG_FOUND)
-  set(BUILD_CAPTURE 1)
+    set(BUILD_CAPTURE 1)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -54,36 +54,42 @@ endif()
 # ----------------------------------------------------------------------
 # Set include directories, c++ options, etc.
 
-function(puyoai_add_cxx_flags flags)
-    set(CMAKE_CXX_FLAGS "${flags} ${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
-endfunction()
-
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-    # Suppress some warnigs about implicit conversions.
-    puyoai_add_cxx_flags("/wd4244")  # from uint64 to int
-    puyoai_add_cxx_flags("/wd4267")  # from size_t to int
-    puyoai_add_cxx_flags("/wd4800")  # from int to bool
-else()
-    if(CYGWIN AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
-        puyoai_add_cxx_flags("-Wall -Wextra -std=gnu++11")
-    else()
-        puyoai_add_cxx_flags("-Wall -Wextra -std=c++11")
-    endif()
-    puyoai_add_cxx_flags("-Wno-error=deprecated-declarations")
-    puyoai_add_cxx_flags("-Wno-error=missing-field-initializers")
-    puyoai_add_cxx_flags("-Wno-error=sign-compare")
-    puyoai_add_cxx_flags("-march=native")
+if(${CMAKE_VERSION} VERSION_LESS 2.8.12)
+    # This is a workaround for TravisCI.
+    function(add_compile_options option)
+        add_definitions(${option} ${ARGN})
+    endfunction()
 endif()
 
-puyoai_add_cxx_flags("-DSRC_DIR=\\\"${CMAKE_SOURCE_DIR}\\\"")
-puyoai_add_cxx_flags("-DTESTDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../test_resources\\\"")
-puyoai_add_cxx_flags("-DDATA_DIR=\\\"${CMAKE_SOURCE_DIR}/../data\\\"")
-puyoai_add_cxx_flags("-DRECOGNITION_DIR=\\\"${CMAKE_SOURCE_DIR}/../recognition\\\"")
+if(MSVC)
+    add_compile_options("/MT$<$<CONFIG:Debug>:d>")
+    # Suppress some warnigs about implicit conversions.
+    add_compile_options("/wd4244")  # from uint64 to int
+    add_compile_options("/wd4267")  # from size_t to int
+    add_compile_options("/wd4800")  # from int to bool
+else()
+    if(CYGWIN AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11" CACHE STRING "" FORCE)
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" CACHE STRING "" FORCE)
+    endif()
+    add_compile_options("-march=native")
 
+    add_compile_options("-Wall")
+    add_compile_options("-Wextra")
+    if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        add_compile_options("-Werror")
+    endif()
+endif()
+
+add_definitions(-DSRC_DIR="${CMAKE_SOURCE_DIR}")
+add_definitions(-DTESTDATA_DIR="${CMAKE_SOURCE_DIR}/../test_resources")
+add_definitions(-DDATA_DIR="${CMAKE_SOURCE_DIR}/../data")
+add_definitions(-DRECOGNITION_DIR="${CMAKE_SOURCE_DIR}/../recognition")
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" build_type)
 if(${build_type} MATCHES release)
-    puyoai_add_cxx_flags("-DNOINLINE_UNLESS_RELEASE=")
+    add_definitions(-DNOINLINE_UNLESS_RELEASE=)
 endif()
 
 add_subdirectory(third_party)
@@ -99,20 +105,22 @@ if(USE_SDL2)
     include_directories(${SDL2_TTF_INCLUDE_DIRS})
     include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
     include_directories(${FFMPEG_INCLUDE_DIR})
-    puyoai_add_cxx_flags("-DUSE_SDL2")
+    add_definitions(-DUSE_SDL2)
 endif()
+
 if(USE_HTTPD)
-    puyoai_add_cxx_flags("-DUSE_HTTPD")
+    add_definitions(-DUSE_HTTPD)
 endif()
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/internal AND IS_DIRECTORY ${CMAKE_SOURCE_DIR}/internal)
     set(USE_INTERNAL 1)
-    puyoai_add_cxx_flags("-DUSE_INTERNAL=1")
+    add_definitions(-DUSE_INTERNAL=1)
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        set(USE_AUDIO_COMMENTATOR 1)
+        add_definitions(-DUSE_AUDIO_COMMENTATOR=1)
+    endif()
 endif()
-if(USE_INTERNAL AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(USE_AUDIO_COMMENTATOR 1)
-    puyoai_add_cxx_flags("-DUSE_AUDIO_COMMENTATOR=1")
-endif()
+
 
 # ----------------------------------------------------------------------
 # Add subdirectories
@@ -147,7 +155,7 @@ if(BUILD_CAPTURE)
 endif()
 
 # ----------------------------------------------------------------------
-# For testing
+# Display configurations
 
 function(puyoai_message msg)
     message(STATUS "puyoai: ${msg}")
