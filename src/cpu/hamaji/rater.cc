@@ -1,10 +1,12 @@
 #include "rater.h"
 
 #include <stdio.h>
-#include <unistd.h>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+
+#include <chrono>
+#include <thread>
 
 #include "field.h"
 #include "game.h"
@@ -54,8 +56,7 @@ void Rater::eval(RatingStats* all_stats) {
   }
 
   while (true) {
-    // 1msec
-    usleep(1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
     std::lock_guard<std::mutex> lock(mu_);
 

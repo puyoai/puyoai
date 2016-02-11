@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <iterator>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
