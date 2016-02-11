@@ -16,6 +16,7 @@
 
 #include <cstdio>
 
+#include <numeric>
 #include <unordered_set>
 #include <unordered_map>
 #include <future>
@@ -70,15 +71,15 @@ void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int
         if (rensa_result.chains > 0)
         {
             State next = State {
-                .field = field,
-                .score = (double)rensa_result.score,
-                .frames = frames,
-                .fired_chains = rensa_result.chains,
-                .pending_enemy_score = current_state.pending_enemy_score,
-                .dropped_frames = current_state.dropped_frames,
-                .decision = plan.decision(0),
-                .first_decision = current_state.prev_q_index == -1 ? plan.decision(0) : current_state.first_decision,
-                .prev_q_index = qi
+                field, //.field
+                (double)rensa_result.score, //
+                frames, // .frames
+                rensa_result.chains, // .fired_chains
+                current_state.pending_enemy_score, // .pending_enemy_score
+                current_state.dropped_frames, // .dropped_frames
+                plan.decision(0), // .decision
+                current_state.prev_q_index == -1 ? plan.decision(0) : current_state.first_decision, // .first_decision
+                qi // .prev_q_index
             };
             fired.push_back(next);
 
@@ -143,15 +144,15 @@ void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int
 
 
         State next = State {
-            .field = field,
-            .score = score,
-            .frames = frames,
-            .fired_chains = 0,
-            .pending_enemy_score = pending_enemy_score,
-            .dropped_frames = current_state.dropped_frames,
-            .decision = plan.decision(0),
-            .first_decision = current_state.prev_q_index == -1 ? plan.decision(0) : current_state.first_decision,
-            .prev_q_index = qi
+            field, // .field
+            score, // .score
+            frames, // .frames
+            0, // .fired_chains
+            pending_enemy_score, // .pending_enemy_score
+            current_state.dropped_frames, // .dropped_frames
+            plan.decision(0), // .decision
+            current_state.prev_q_index == -1 ? plan.decision(0) : current_state.first_decision, // .first_decision
+            qi // .prev_q_index
         };
         state_q.push_back(next);
     };
@@ -189,15 +190,15 @@ BeamSearchResult beamsearch(const CoreField& start_field, const KumipuyoSeq& seq
     };
 
     const State init_state = State {
-        .field = start_field,
-        .score = 0,
-        .frames= 0,
-        .fired_chains = 0,
-        .pending_enemy_score = enemy.isRensaOngoing() ? scoreForOjama(me.totalOjama(enemy)) : 0,
-        .dropped_frames = enemy.isRensaOngoing() ? enemy.rensaFinishingFrameId() - frame_id : 100000000,
-        .decision = Decision(0, 0),
-        .first_decision = Decision(0, 0),
-        .prev_q_index = -1
+        start_field, // .field
+        0, // .score
+        0, // .frames
+        0, // .fired_chains
+        enemy.isRensaOngoing() ? scoreForOjama(me.totalOjama(enemy)) : 0, // .pending_enemy_score
+        enemy.isRensaOngoing() ? enemy.rensaFinishingFrameId() - frame_id : 100000000, // .dropped_frames
+        Decision(0, 0), // .decision
+        Decision(0, 0), // .first_decision
+        -1 // .prev_q_index
     };
     state_q[0].push_back(init_state);
 
@@ -245,8 +246,8 @@ BeamSearchResult beamsearch(const CoreField& start_field, const KumipuyoSeq& seq
             if (state.fired_chains == max_chains)
             {
                 return BeamSearchResult {
-                    .decisions = make_decisions(state, turn),
-                    .chains = max_chains
+                    make_decisions(state, turn), // .decisions
+                    max_chains // .chains
                 };
             }
         }
@@ -265,8 +266,8 @@ BeamSearchResult beamsearch(const CoreField& start_field, const KumipuyoSeq& seq
 //     }
 
     return BeamSearchResult {
-        .decisions = {},
-        .chains = -1
+        {}, // .decisions
+        -1 // .chains
     };
 }
 

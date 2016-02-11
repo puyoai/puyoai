@@ -79,33 +79,34 @@ EndlessResult Endless::run(const KumipuyoSeq& originalSeq)
         maxRensa = std::max(maxRensa, rensaResult.chains);
         if (f.color(3, 12) != PuyoColor::EMPTY) {
             return EndlessResult {
-                .hand = i,
-                .score = -1,
-                .maxRensa = -1,
-                .zenkeshi = false,
-                .decisions = decisions,
-                .type = EndlessResult::Type::DEAD,
+                i,                         // .hand
+                -1,                        // .score
+                -1,                        // .maxRensa
+                false,                     // .zenkeshi
+                decisions,                 // .decisions
+                EndlessResult::Type::DEAD, // .type
             };
         }
         if (rensaResult.score > 10000) {
             // The main rensa must be fired.
             return EndlessResult {
-                .hand = i,
-                .score = rensaResult.score,
-                .maxRensa = rensaResult.chains,
-                .zenkeshi = f.isZenkeshi(),
-                .decisions = decisions,
-                .type = EndlessResult::Type::MAIN_CHAIN,
+                i,                               // .hand
+                rensaResult.score,               // .score
+                rensaResult.chains,              // .maxRensa
+                f.isZenkeshi(),                  // .zenkeshi
+                decisions,                       // .decisions
+                EndlessResult::Type::MAIN_CHAIN, // .type
             };
         }
         if (f.isZenkeshi()) {
             return EndlessResult {
-                .hand = i,
-                .score = rensaResult.score,
-                .maxRensa = rensaResult.chains,
-                .zenkeshi = true,
-                .decisions = decisions,
-                .type = EndlessResult::Type::ZENKESHI,
+                i,                             // .hand
+                rensaResult.score,             // .score
+                rensaResult.chains,            // .maxRensa
+                true,                          // .zenkeshi
+                decisions,                     // .decisions
+                EndlessResult::Type::ZENKESHI, // .type
+
             };
         }
 
@@ -118,12 +119,12 @@ EndlessResult Endless::run(const KumipuyoSeq& originalSeq)
     }
 
     return EndlessResult {
-        .hand = 50,
-        .score = maxRensaScore,
-        .maxRensa = maxRensa,
-        .zenkeshi = false,
-        .decisions = decisions,
-        .type = EndlessResult::Type::PUYOSEQ_RUNOUT,
+        50,                                  // .hand
+        maxRensaScore,                       // .score
+        maxRensa,                            // .maxRensa
+        false,                               // .zenkeshi
+        decisions,                           // .decisions
+        EndlessResult::Type::PUYOSEQ_RUNOUT, // .type
     };
 }
 
