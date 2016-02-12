@@ -1,7 +1,9 @@
 #include "core/server/game_state_recorder.h"
 
-#include <ctime>
+#include <chrono>
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 
 #include <glog/logging.h>
 
@@ -20,14 +22,23 @@ void GameStateRecorder::newGameWillStart()
     time_t now;
     time(&now);
 
+#if defined(_MSC_VER)
+    ostringstream oss;
+    oss << std::put_time(std::localtime(&now), "puyoai.gamestate.%Y%m%d-%H%M%S.json");
+
+    filename_ = oss.str();
+#else
+    // Clang currently does not support std::put_time.
+    // TODO: Remove this #else when clang supports it.
     struct tm ltm;
     localtime_r(&now, &ltm);
 
     char buf[1024];
     strftime(buf, 1024, "puyoai.gamestate.%Y%m%d-%H%M%S.json", &ltm);
 
-    recording_ = true;
     filename_ = buf;
+#endif
+    recording_ = true;
 
     LOG(INFO) << "will start game state logging to " << filename_;
 }

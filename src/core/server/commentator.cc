@@ -6,7 +6,6 @@
 #include <math.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <time.h>
 
 #include <algorithm>
 #include <map>

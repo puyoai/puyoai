@@ -1,17 +1,27 @@
 #include "base/time.h"
 
-#include <sys/time.h>
+#include <chrono>
+
+using namespace std::chrono;
+
+namespace {
+
+using Clock = high_resolution_clock;
+
+duration<std::int64_t> durationFromBase()
+{
+    static Clock::time_point s_clockBase = Clock::now();
+    return duration_cast<duration<std::int64_t>>(Clock::now() - s_clockBase);
+}
+
+}
 
 double currentTime()
 {
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    return tv.tv_sec + tv.tv_usec / 1000000.0;
+    return duration_cast<duration<double>>(durationFromBase()).count();
 }
 
 std::int64_t currentTimeInMillis()
 {
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-    return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    return duration_cast<milliseconds>(durationFromBase()).count();
 }

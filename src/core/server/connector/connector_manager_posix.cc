@@ -1,10 +1,10 @@
 #include "core/server/connector/connector_manager_posix.h"
 
 #include <poll.h>
-#include <sys/time.h>
 
 #include <algorithm>
 #include <cerrno>
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
@@ -25,14 +25,15 @@ DEFINE_bool(no_timeout, false, "if true, wait ai's thought without timeout");
 
 const int TIMEOUT_USEC = 1000000 / FPS;
 
-static int getUsecFromStart(const struct timeval& start)
+using Clock = chrono::high_resolution_clock;
+using TimePoint = Clock::time_point;
+
+static int getUsecFromStart(const TimePoint& start)
 {
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    return (now.tv_sec - start.tv_sec) * 1000000 + (now.tv_usec - start.tv_usec);
+    return chrono::duration_cast<chrono::microseconds>(Clock::now() - start).count();
 }
 
-static int getRemainingMilliSeconds(const struct timeval& start)
+static int getRemainingMilliSeconds(const TimePoint& start)
 {
     if (FLAGS_no_timeout)
         return numeric_limits<int>::max();
@@ -80,8 +81,7 @@ bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_P
     bool received_data_for_this_frame[NUM_PLAYERS] {};
     bool died = false;
 
-    struct timeval tv_start;
-    gettimeofday(&tv_start, NULL);
+    TimePoint startTimePoint = Clock::now();
 
     while (true) {
         int timeout_ms = 0;
@@ -89,7 +89,7 @@ bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_P
             // Check timeout.
             // The timeout delays for 50us in avarage (on pascal's machine)
             // Worst case is still in order of 100us, so it's OK to use gettimeofday.
-            timeout_ms = getRemainingMilliSeconds(tv_start);
+            timeout_ms = getRemainingMilliSeconds(startTimePoint);
             if (timeout_ms <= 0) {
                 break;
             }
@@ -140,7 +140,7 @@ bool ConnectorManagerPosix::receive(int frameId, vector<FrameResponse> cfr[NUM_P
         }
     }
 
-    int usec = getUsecFromStart(tv_start);
+    int usec = getUsecFromStart(startTimePoint);
     LOG(INFO) << "Frame " << frameId  << " took " << usec << " [us]";
 
     return !died;
