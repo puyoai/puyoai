@@ -62,7 +62,7 @@ if(${CMAKE_VERSION} VERSION_LESS 2.8.12)
 endif()
 
 if(MSVC)
-    add_compile_options("/MT$<$<CONFIG:Debug>:d>")
+    add_compile_options("/MD$<$<CONFIG:Debug>:d>")
     # Suppress some warnigs about implicit conversions.
     add_compile_options("/wd4244")  # from uint64 to int
     add_compile_options("/wd4267")  # from size_t to int
@@ -87,6 +87,10 @@ add_definitions(-DTESTDATA_DIR="${CMAKE_SOURCE_DIR}/../test_resources")
 add_definitions(-DDATA_DIR="${CMAKE_SOURCE_DIR}/../data")
 add_definitions(-DRECOGNITION_DIR="${CMAKE_SOURCE_DIR}/../recognition")
 
+if(MSVC)
+  add_definitions(-DGOOGLE_GLOG_DLL_DECL=)
+endif()
+
 string(TOLOWER "${CMAKE_BUILD_TYPE}" build_type)
 if(${build_type} MATCHES release)
     add_definitions(-DNOINLINE_UNLESS_RELEASE=)
@@ -98,7 +102,8 @@ include_directories(.)
 include_directories(${CMAKE_BINARY_DIR}/gen/jsoncpp)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 include_directories(third_party/tinytoml/include)
-include_directories(${GLOG_INCLUDE_DIRS})
+include_directories(${gflags_INCLUDE_DIR})
+include_directories(${glog_INCLUDE_DIRS})
 
 if(USE_SDL2)
     include_directories(${SDL2_INCLUDE_DIRS})
