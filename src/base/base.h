@@ -28,7 +28,11 @@ constexpr std::size_t ARRAY_SIZE(const T (&)[size]) { return size; }
 
 // NOINLINE_UNLESS_RELEASE is defined in Release build.
 #ifndef NOINLINE_UNLESS_RELEASE
-#define NOINLINE_UNLESS_RELEASE __attribute__ ((noinline))
+#if defined(_MSC_VER)
+#    define NOINLINE_UNLESS_RELEASE __declspec(noinline)
+#else
+#    define NOINLINE_UNLESS_RELEASE __attribute__ ((noinline))
+#endif
 #endif
 
 // CLANG_ALWAYS_INLINE sets __attribute__((always_inline)) only when clang is used.

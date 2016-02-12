@@ -2,14 +2,17 @@
 #define BASE_TIME_STAMP_COUNTER_H_
 
 #include <vector>
-#include <x86intrin.h>
 
 // Unfortunately, __rdtscp is not defined in /usr/lib/gcc/x86_64-linux-gnu/4.4/include/x86intrin.
 inline unsigned long long rdtscp(unsigned int* aux)
 {
+#if defined(_MSC_VER)
+    return __tdtscp(aux);
+#else
     unsigned long long rax,rdx;
     asm volatile ( "rdtscp\n" : "=a" (rax), "=d" (rdx), "=c" (aux) : : );
     return (rdx << 32) + rax;
+#endif
 }
 
 class TimeStampCounterData {
