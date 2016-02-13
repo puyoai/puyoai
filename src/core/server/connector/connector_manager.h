@@ -1,20 +1,33 @@
 #ifndef CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_H_
 #define CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_H_
 
-#include <string>
+#include <memory>
 #include <vector>
 
+#include "core/player.h"
+
 class Connector;
+class HumanConnector;
+class PipeConnector;
 struct FrameResponse;
 
 class ConnectorManager {
 public:
     // Receives decision and messages from clients.
     // Returns false when disconnected.
-    virtual bool receive(int frameId, std::vector<FrameResponse> data[2]) = 0;
+    ConnectorManager(std::unique_ptr<Connector> p1, std::unique_ptr<Connector> p2, bool timeout);
 
-    virtual Connector* connector(int i) = 0;
-    virtual void setWaitTimeout(bool) = 0;
+    bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS]);
+
+    Connector* connector(int i) { return connectors_[i].get(); }
+
+private:
+    std::unique_ptr<Connector> connectors_[NUM_PLAYERS];
+
+    std::vector<HumanConnector*> humanConnectors_;
+    std::vector<PipeConnector*> pipeConnectors_;
+
+    bool waitTimeout_;
 };
 
-#endif
+#endif // CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_H_

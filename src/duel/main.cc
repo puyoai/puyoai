@@ -12,8 +12,8 @@
 
 #include "base/file.h"
 #include "core/httpd/http_handler.h"
+#include "core/server/connector/connector_manager.h"
 #include "core/server/connector/human_connector.h"
-#include "core/server/connector/connector_manager_posix.h"
 #include "core/server/game_state.h"
 #include "core/server/game_state_observer.h"
 #include "duel/cui.h"
@@ -119,10 +119,10 @@ int main(int argc, char* argv[])
     }
 #endif
 
-    ConnectorManagerPosix manager {
+    ConnectorManager manager(
         Connector::create(0, string(argv[1])),
         Connector::create(1, string(argv[2])),
-    };
+        true);
 
 #ifdef USE_HTTPD
     unique_ptr<GameStateHandler> gameStateHandler;

@@ -14,7 +14,7 @@
 #include "core/puyo_color.h"
 #include "core/puyo_controller.h"
 #include "core/server/connector/connector.h"
-#include "core/server/connector/connector_manager_posix.h"
+#include "core/server/connector/connector_manager.h"
 #include "core/server/game_state.h"
 #include "core/server/game_state_observer.h"
 #include "gui/screen.h"
@@ -34,11 +34,10 @@ WiiConnectServer::WiiConnectServer(Source* source, Analyzer* analyzer,
     isAi_[0] = (p1Program != "-");
     isAi_[1] = (p2Program != "-");
 
-    connector_.reset(new ConnectorManagerPosix {
+    connector_.reset(new ConnectorManager(
         Connector::create(0, p1Program),
         Connector::create(1, p2Program),
-    });
-    connector_->setWaitTimeout(false);
+        false));
 }
 
 WiiConnectServer::~WiiConnectServer()
