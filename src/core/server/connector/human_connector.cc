@@ -9,12 +9,7 @@ using namespace std;
 
 void HumanConnector::send(const FrameRequest& req)
 {
-    writeString(req.toString());
-}
-
-void HumanConnector::writeString(const string& message)
-{
-    LOG(INFO) << message;
+    LOG(INFO) << req.toString();
 }
 
 bool HumanConnector::receive(FrameResponse* response)
@@ -24,17 +19,6 @@ bool HumanConnector::receive(FrameResponse* response)
     lock_guard<mutex> lock(mu_);
     response->keySet = currentKeySet_;
     return true;
-}
-
-void HumanConnector::setClosed(bool)
-{
-    CHECK(false) << "HumanConnector does not have closed flag.";
-}
-
-int HumanConnector::readerFd() const
-{
-    CHECK(false) << "HumanConnector does not have reader file descriptor.";
-    return -1;
 }
 
 void HumanConnector::setKeySet(const KeySet& keySet)
