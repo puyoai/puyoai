@@ -17,10 +17,18 @@ enable_testing()
 find_package(Threads)
 find_package(PkgConfig)
 
-# TODO(mayah): gflags does not provide pkg-config anymore?
-# pkg_search_module for libgflags doesn't work with Mac homebrew (2015-04-16).
-find_library(LIB_GFLAGS gflags)
-pkg_search_module(GLOG REQUIRED libglog)
+if(MSVC)
+    # TODO(peria): This configuration is not exptected to work for everyone.
+    set(glog_DIR "C:/Program Files/google-glog/lib/cmake/glog")
+    find_package(gflags REQUIRED)
+    find_package(glog REQUIRED)
+    set(LIB_GFLAGS ${gflags_LIBRARIES})
+else()
+    # TODO(mayah): gflags does not provide pkg-config anymore?
+    # pkg_search_module for libgflags doesn't work with Mac homebrew (2015-04-16).
+    find_library(LIB_GFLAGS gflags)
+    pkg_search_module(GLOG REQUIRED libglog)
+endif()
 
 pkg_search_module(SDL2 sdl2)
 pkg_search_module(SDL2_TTF SDL2_ttf)
@@ -63,6 +71,7 @@ endif()
 
 if(MSVC)
     add_compile_options("/MD$<$<CONFIG:Debug>:d>")
+    add_compile_options("/MP")  # Compile in parallel
     # Suppress some warnigs about implicit conversions.
     add_compile_options("/wd4244")  # from uint64 to int
     add_compile_options("/wd4267")  # from size_t to int

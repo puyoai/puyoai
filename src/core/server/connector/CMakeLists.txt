@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-if(MSCV)
+if(MSVC)
     set(pipe_connector_os_cc pipe_connector_win.cc)
 else()
     set(pipe_connector_os_cc pipe_connector_posix.cc)

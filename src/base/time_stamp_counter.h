@@ -7,7 +7,7 @@
 inline unsigned long long rdtscp(unsigned int* aux)
 {
 #if defined(_MSC_VER)
-    return __tdtscp(aux);
+    return __rdtscp(aux);
 #else
     unsigned long long rax,rdx;
     asm volatile ( "rdtscp\n" : "=a" (rax), "=d" (rdx), "=c" (aux) : : );
