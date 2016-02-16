@@ -237,7 +237,7 @@ FieldBits FieldBits::expandEdge() const
     __m128i m3 = _mm_slli_si128(m_, 2);
     __m128i m4 = _mm_srli_si128(m_, 2);
 
-    return (m1 | m2) | (m3 | m4);
+    return _mm_or_si128(_mm_or_si128(m1, m2), _mm_or_si128(m3, m4));
 }
 
 inline
@@ -256,10 +256,10 @@ bool FieldBits::findVanishingBits(FieldBits* vanishing) const
 
     DCHECK(vanishing) << "bits must not be nullptr";
 
-    FieldBits u = _mm_srli_epi16(m_, 1) & m_;
-    FieldBits d = _mm_slli_epi16(m_, 1) & m_;
-    FieldBits l = _mm_slli_si128(m_, 2) & m_;
-    FieldBits r = _mm_srli_si128(m_, 2) & m_;
+    FieldBits u = _mm_and_si128(_mm_srli_epi16(m_, 1), m_);
+    FieldBits d = _mm_and_si128(_mm_slli_epi16(m_, 1), m_);
+    FieldBits l = _mm_and_si128(_mm_slli_si128(m_, 2), m_);
+    FieldBits r = _mm_and_si128(_mm_srli_si128(m_, 2), m_);
 
     FieldBits ud_and = u & d;
     FieldBits lr_and = l & r;
@@ -286,10 +286,10 @@ bool FieldBits::findVanishingBits(FieldBits* vanishing) const
 inline
 bool FieldBits::hasVanishingBits() const
 {
-    FieldBits u = _mm_srli_epi16(m_, 1) & m_;
-    FieldBits d = _mm_slli_epi16(m_, 1) & m_;
-    FieldBits l = _mm_slli_si128(m_, 2) & m_;
-    FieldBits r = _mm_srli_si128(m_, 2) & m_;
+    FieldBits u = _mm_and_si128(_mm_srli_epi16(m_, 1), m_);
+    FieldBits d = _mm_and_si128(_mm_slli_epi16(m_, 1), m_);
+    FieldBits l = _mm_and_si128(_mm_slli_si128(m_, 2), m_);
+    FieldBits r = _mm_and_si128(_mm_srli_si128(m_, 2), m_);
 
     FieldBits ud_and = u & d;
     FieldBits lr_and = l & r;
