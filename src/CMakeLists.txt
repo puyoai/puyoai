@@ -23,6 +23,7 @@ if(MSVC)
     find_package(gflags REQUIRED)
     find_package(glog REQUIRED)
     set(LIB_GFLAGS ${gflags_LIBRARIES})
+    set(GLOG_LIBRARIES ${glog_LIBRARIES})
 else()
     # TODO(mayah): gflags does not provide pkg-config anymore?
     # pkg_search_module for libgflags doesn't work with Mac homebrew (2015-04-16).
