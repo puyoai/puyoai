@@ -16,7 +16,7 @@ add_library(puyoai_capture
             usb_device.cc)
 
 if(V4L2_LIBRARY)
-    puyoai_add_cxx_flags("-DUSE_V4L2")
+    add_compile_options("-DUSE_V4L2")
     add_library(puyoai_capture_viddev viddev_source.cc)
 endif()
 
