@@ -1,6 +1,7 @@
 #ifndef CORE_SERVER_CONNECTOR_PIPE_CONNECTOR_H_
 #define CORE_SERVER_CONNECTOR_PIPE_CONNECTOR_H_
 
+#include <chrono>
 #include <cstdio>
 #include <string>
 
@@ -11,7 +12,12 @@ struct FrameResponse;
 
 class PipeConnector : public Connector {
 public:
+    using Clock = std::chrono::high_resolution_clock;
+    using TimePoint = Clock::time_point;
+
     static std::unique_ptr<Connector> create(int playerId, const std::string& program);
+    static int getUsecFromStart(const TimePoint& start);
+    static int getRemainingMilliSeconds(const TimePoint& start);
 
     virtual ~PipeConnector() override {}
 

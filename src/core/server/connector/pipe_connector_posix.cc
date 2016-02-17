@@ -17,31 +17,7 @@
 
 using namespace std;
 
-DECLARE_bool(realtime);
-DECLARE_bool(no_timeout);
-
-namespace {
-
-using Clock = chrono::high_resolution_clock;
-using TimePoint = Clock::time_point;
-
-const int TIMEOUT_USEC = 1000000 / FPS;
-
-int getUsecFromStart(const TimePoint& start)
-{
-    return chrono::duration_cast<chrono::microseconds>(Clock::now() - start).count();
-}
-
-int getRemainingMilliSeconds(const TimePoint& start)
-{
-    if (FLAGS_no_timeout)
-        return numeric_limits<int>::max();
-
-    int usec = getUsecFromStart(start);
-    return (TIMEOUT_USEC - usec + 999) / 1000;
-}
-
-} // namespace
+DEFINE_bool(realtime, true, "use realtime");
 
 // static
 unique_ptr<Connector> PipeConnectorPosix::create(int playerId, const string& programName)

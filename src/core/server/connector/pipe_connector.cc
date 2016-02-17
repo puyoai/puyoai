@@ -17,6 +17,14 @@
 
 using namespace std;
 
+namespace {
+
+const int TIMEOUT_USEC = 1000000 / FPS;
+
+}
+
+DEFINE_bool(no_timeout, false, "if true, wait ai's thought without timeout");
+
 // static
 unique_ptr<Connector> PipeConnector::create(int playerId, const string& programName)
 {
@@ -25,6 +33,22 @@ unique_ptr<Connector> PipeConnector::create(int playerId, const string& programN
 #else
     return PipeConnectorPosix::create(playerId, programName);
 #endif
+}
+
+// static
+int PipeConnector::getUsecFromStart(const TimePoint& start)
+{
+    return chrono::duration_cast<chrono::microseconds>(Clock::now() - start).count();
+}
+
+// static
+int PipeConnector::getRemainingMilliSeconds(const TimePoint& start)
+{
+    if (FLAGS_no_timeout)
+        return numeric_limits<int>::max();
+
+    int usec = getUsecFromStart(start);
+    return (TIMEOUT_USEC - usec + 999) / 1000;
 }
 
 PipeConnector::PipeConnector(int player) :

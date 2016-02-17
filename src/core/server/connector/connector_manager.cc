@@ -18,9 +18,6 @@
 
 using namespace std;
 
-DEFINE_bool(realtime, true, "use realtime");
-DEFINE_bool(no_timeout, false, "if true, wait ai's thought without timeout");
-
 ConnectorManager::ConnectorManager(unique_ptr<Connector> p1, unique_ptr<Connector> p2, bool timeout) :
     connectors_{ move(p1), move(p2) },
     waitTimeout_(timeout)
