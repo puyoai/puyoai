@@ -1,10 +1,5 @@
 #include "mayah_ai.h"
 
-#if defined(_MSC_VER)
-#include <windows.h>
-#undef ERROR
-#endif
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -47,7 +42,11 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
 
     VLOG(1) << evaluationParameterMap_.toString();
 
+#if defined(_MSC_VER)
+    google::FlushLogFiles(google::GLOG_INFO);
+#else
     google::FlushLogFiles(INFO);
+#endif
 }
 
 MayahAI::~MayahAI()

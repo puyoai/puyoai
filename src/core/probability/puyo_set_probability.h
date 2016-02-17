@@ -4,10 +4,8 @@
 #include <glog/logging.h>
 
 #include <algorithm>
-#include <unordered_map>
 
 #include "base/noncopyable.h"
-#include "core/column_puyo_list.h"
 #include "core/probability/puyo_set.h"
 
 class KumipuyoSeq;

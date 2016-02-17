@@ -7,10 +7,13 @@
 
 #if defined(_MSC_VER)
 #include <windows.h>
+#undef ERROR
 #else
 #include <dirent.h>
 #include <unistd.h>
 #endif
+
+#include <glog/logging.h>
 
 #include <fstream>
 
@@ -44,19 +47,27 @@ string joinPath(const string& p1, const string& p2, const string& p3, const stri
     return joinPath(joinPath(p1, p2, p3), p4);
 }
 
-#if !defined(_MSC_VER)
-
 bool isDirectory(const string& path)
 {
+#if defined(_MSC_VER)
+    LOG(ERROR) << "TODO(peria): Implement here";
+    return false;
+#else
+
     struct stat sb;
     if (stat(path.c_str(), &sb) < 0)
         return false;
 
     return S_ISDIR(sb.st_mode);
+#endif
 }
 
 bool listFiles(const string& path, vector<string>* files)
 {
+#if defined(_MSC_VER)
+    LOG(ERROR) << "TODO(peria): Implement here";
+    return false;
+#else
     DIR* dir = opendir(path.c_str());
     if (!dir)
         return false;
@@ -72,9 +83,8 @@ bool listFiles(const string& path, vector<string>* files)
         return false;
 
     return true;
-}
-
 #endif
+}
 
 bool readFile(const std::string& filename, string* output)
 {
