@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#ifdef __BMI2__ && !defined(_MSC_VER)
+#if defined(__BMI2__) && !defined(_MSC_VER)
 #include <x86intrin.h>
 #endif
 

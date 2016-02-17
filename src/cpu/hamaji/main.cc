@@ -28,7 +28,7 @@ public:
 protected:
   FrameResponse playOneFrame(const FrameRequest&) override;
 private:
-  auto_ptr<Game> prev_game;
+  std::unique_ptr<Game> prev_game;
 };
 
 HamajiAI::HamajiAI() {
@@ -113,10 +113,10 @@ FrameResponse HamajiAI::playOneFrame(const FrameRequest& request) {
     return FrameResponse(request.frameId);
   }
 
-  auto_ptr<Game> game(new Game(*prev_game, request));
+  std::unique_ptr<Game> game(new Game(*prev_game, request));
 
   FrameResponse response = tick(game.get());
-  prev_game = game;
+  prev_game = std::move(game);
   return response;
 }
 
