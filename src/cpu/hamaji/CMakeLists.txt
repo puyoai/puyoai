@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("hamaji")
 
-add_compile_options("-Wno-deprecated-declarations")
-add_compile_options("-Wno-error=unused-variable")
-add_compile_options("-Wno-error=sign-compare")
-
 add_library(hamaji_lib
             core.cc db.cc eval_base.cc eval.cc eval2.cc
             field.cc game.cc
