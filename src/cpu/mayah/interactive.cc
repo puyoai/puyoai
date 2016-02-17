@@ -69,7 +69,9 @@ int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
+#if !defined(_MSC_VER)
     google::InstallFailureSignalHandler();
+#endif
 
     InteractiveAI ai(argc, argv);
     if (FLAGS_tokopuyo) {

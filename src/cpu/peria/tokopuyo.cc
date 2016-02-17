@@ -22,7 +22,9 @@ DECLARE_string(pattern);
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);
+#if !defined(_MSC_VER)
   google::InstallFailureSignalHandler();
+#endif
 
   if (!FLAGS_pattern.empty()) {
     std::ifstream pattern_file(FLAGS_pattern);

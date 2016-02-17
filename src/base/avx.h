@@ -1,7 +1,9 @@
 #ifndef BASE_AVX_H_
 #define BASE_AVX_H_
 
+#if !defined(_MSC_VER)
 #include <x86intrin.h>
+#endif
 
 #ifdef __AVX__
 

@@ -71,9 +71,3 @@ bool PipeConnectorWin::readString(char*)
     LOG(FATAL) << "TODO(peria): Implement here";
     return false;
 }
-
-bool PipeConnectorWin::waitAndReceive(bool, int, vector<FrameResponse>*)
-{
-    LOG(FATAL) << "TODO(peria): Implement here";
-    return false;
-}

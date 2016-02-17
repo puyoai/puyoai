@@ -1,11 +1,16 @@
 #include "base/file.h"
 
-#include <dirent.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#if defined(_MSC_VER)
+#include <windows.h>
+#else
+#include <dirent.h>
 #include <unistd.h>
+#endif
 
 #include <fstream>
 
@@ -39,6 +44,8 @@ string joinPath(const string& p1, const string& p2, const string& p3, const stri
     return joinPath(joinPath(p1, p2, p3), p4);
 }
 
+#if !defined(_MSC_VER)
+
 bool isDirectory(const string& path)
 {
     struct stat sb;
@@ -67,6 +74,8 @@ bool listFiles(const string& path, vector<string>* files)
     return true;
 }
 
+#endif
+
 bool readFile(const std::string& filename, string* output)
 {
     ifstream ifs(filename, ios::in | ios::binary);
@@ -78,3 +87,4 @@ bool readFile(const std::string& filename, string* output)
 }
 
 } // namespace file
+

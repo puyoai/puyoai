@@ -17,7 +17,9 @@ constexpr double NORMSINV = 1.959963986; // For 0.025 one-side.
 int main(int argc, char* argv[]) {
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
+#if !defined(_MSC_VER)
     google::InstallFailureSignalHandler();
+#endif
 
     Endless endless(std::move(std::unique_ptr<AI>(new munetoshi::AI(argc, argv))));
 

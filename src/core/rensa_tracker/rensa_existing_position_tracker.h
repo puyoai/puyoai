@@ -1,7 +1,9 @@
 #ifndef CORE_RENSA_TRACKER_RENSA_EXISTING_POSITION_TRACKER_H_
 #define CORE_RENSA_TRACKER_RENSA_EXISTING_POSITION_TRACKER_H_
 
+#if !defined(_MSC_VER)
 #include <x86intrin.h>
+#endif
 
 #include "core/rensa_tracker.h"
 

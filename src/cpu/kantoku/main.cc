@@ -123,7 +123,9 @@ int main(int argc, char* argv[])
 {
     google::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
+#if !defined(_MSC_VER)
     google::InstallFailureSignalHandler();
+#endif
 
     Kantoku kantoku;
     //kantoku.add("shinh", "../hamaji/lps-fast.sh");

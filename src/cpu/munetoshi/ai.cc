@@ -85,7 +85,11 @@ DropDecision munetoshi::AI::think_internal(
             best_chain_grade = chain_grade;
             best_chain_decision = plan.decisions().front();
             message = AI_NAME
+#if defined(_MSC_VER)  // TODO(peria): Remove this #if when VC++ supports UTF8 without BOM
+                    + (strategy == FIRE ? "punsuka" : "matari")
+#else
                     + (strategy == FIRE ? "ヽ(｀Д´#)ﾉ" : "ヽ(´ー｀)ノ" )
+#endif
                     + std::to_string(best_chain_grade);
         }
     };

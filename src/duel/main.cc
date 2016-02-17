@@ -6,7 +6,9 @@
 #include <vector>
 
 #include <signal.h>
+#if !defined(_MSC_VER)
 #include <libgen.h>
+#endif
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
@@ -87,6 +89,7 @@ private:
     unique_ptr<GameState> gameState_;
 };
 
+#if !defined(_MSC_VER)
 static void ignoreSIGPIPE()
 {
     struct sigaction act;
@@ -97,15 +100,20 @@ static void ignoreSIGPIPE()
 
     CHECK(sigaction(SIGPIPE, &act, 0) == 0);
 }
+#endif
 
 int main(int argc, char* argv[])
 {
     google::InitGoogleLogging(argv[0]);
     google::ParseCommandLineFlags(&argc, &argv, true);
+#if !defined(_MSC_VER)
     google::InstallFailureSignalHandler();
+#endif
 
+#if !defined(_MSC_VER)
     if (FLAGS_ignore_sigpipe)
         ignoreSIGPIPE();
+#endif
 
     if (argc != 3) {
         LOG(ERROR) << "There must be 2 arguments." << endl;

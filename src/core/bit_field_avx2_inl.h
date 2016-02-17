@@ -5,7 +5,9 @@
 # error "Needs AVX2 and BMI2 to use this header."
 #endif
 
+#if !defined(_MSC_VER)
 #include <x86intrin.h>
+#endif
 
 #include "base/avx.h"
 #include "base/bmi.h"
