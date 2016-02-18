@@ -4,8 +4,8 @@
 // build_config.h defines macro about the platform we're currnetly building on.
 //
 // Operating system:
-//   OS_WIN / OS_MACOSX / OS_LINUX
-//   OS_POSIX = MACOSX or LINUX
+//   OS_WIN / OS_MACOSX / OS_LINUX / OS_FREEBSD
+//   OS_POSIX = MACOSX or LINUX or OS_FREEBSD
 // Compiler:
 //   COMPILER_MSVC / COMPILER_GCC / COMPILER_CLANG
 //   COMPILER_GCC_COMPATIBLE = COMPILER_GCC or COMPILER_CLANG
@@ -36,6 +36,7 @@
 #  error "Please add support for your compiler base/build_config.h"
 #endif
 
+// TODO(mayah): What happens when clang-cl is used?
 #if defined(COMPILER_CLANG) || defined(COMPILER_GCC)
 #  define COMPILER_GCC_COMPATIBLE 1
 #endif
