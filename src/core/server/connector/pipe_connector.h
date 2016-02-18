@@ -26,13 +26,12 @@ public:
 
     virtual bool isHuman() const final { return false; }
     virtual bool isClosed() const final { return closed_; }
+    void setClosed(bool flag) { closed_ = flag; }
 
 protected:
     static const int kBufferSize = 1000;
 
     explicit PipeConnector(int player);
-
-    void setClosed(bool flag) { closed_ = flag; }
 
     virtual void writeString(const std::string&) = 0;
     virtual bool readString(char*) = 0;

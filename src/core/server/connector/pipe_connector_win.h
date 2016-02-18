@@ -1,6 +1,9 @@
 #ifndef CORE_SERVER_CONNECTOR_PIPE_CONNECTOR_WIN_H_
 #define CORE_SERVER_CONNECTOR_PIPE_CONNECTOR_WIN_H_
 
+#define NOMINMAX
+#include <windows.h>
+
 #include <cstdio>
 #include <string>
 
@@ -17,10 +20,13 @@ public:
     virtual ~PipeConnectorWin() override;
 
 private:
-    PipeConnectorWin(int player, int writerFd, int readerFd);
+    PipeConnectorWin(int player, HANDLE writer, HANDLE reader);
 
     virtual void writeString(const std::string&) final;
     virtual bool readString(char*) final;
+
+    HANDLE writer_;
+    HANDLE reader_;
 };
 
 #endif // CORE_SERVER_CONNECTOR_PIPE_CONNECTOR_WIN_H_
