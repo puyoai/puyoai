@@ -12,9 +12,11 @@
 #include "game.h"
 #include "ratingstats.h"
 #include "solo.h"
-#ifdef OS_LINUX
+
+// #define GOOGLE3
+#ifdef GOOGLE3
 #include "puyocloud.h"
-#endif  // OS_LINUX
+#endif  // GOOGLE3
 
 DEFINE_int32(eval_turns, 40, "");
 
@@ -30,21 +32,21 @@ Rater::Rater(int eval_threads, int eval_cnt, int base_seed)
       finished_games_(0),
       eval_cnt_(eval_cnt),
       base_seed_(base_seed) {
-#ifdef OS_LINUX
+#ifdef GOOGLE3
   puyo_cloud_ = NULL;
   if (FLAGS_puyo_cloud) {
     puyo_cloud_ = new PuyoCloudManager();
     puyo_cloud_->SetNumRequests(eval_cnt);
   }
-#endif  // OS_LINUX
+#endif  // GOOGLE3
 }
 
 Rater::~Rater() {
-#ifdef OS_LINUX
+#ifdef GOOGLE3
   if (puyo_cloud_ != NULL) {
     delete puyo_cloud_;
   }
-#endif  // OS_LINUX
+#endif  // GOOGLE3
 }
 void Rater::eval(RatingStats* all_stats) {
   for (size_t i = 0; i < threads_.size(); i++) {
@@ -79,11 +81,11 @@ void Rater::eval(RatingStats* all_stats) {
     if (threads_[i].joinable())
       threads_[i].join();
   }
-#ifdef OS_LINUX
+#ifdef GOOGLE3
   if (FLAGS_puyo_cloud) {
     puyo_cloud_->Wait();
   }
-#endif // OS_LINUX
+#endif // GOOGLE3
   std::lock_guard<std::mutex> lock(mu_);
   for (size_t i = 0; i < rating_stats_vec_.size(); ++i) {
     all_stats->merge(rating_stats_vec_[i]);
@@ -107,11 +109,11 @@ void Rater::runWorker(int tid) {
       evalOneGame(i, base_seed_ + i, &(states_[tid]), &rating_stats);
       GameDone(i, rating_stats);
     } else {
-#ifdef OS_LINUX
+#ifdef GOOGLE3
       puyo_cloud_->SendToPuyoCloud(i, this);
-#else  // OS_LINUX
+#else  // GOOGLE3
       LOG(FATAL) << "PuyoCloud is supported only in google3.";
-#endif  // OS_LINUX
+#endif  // GOOGLE3
     }
   }
 }
