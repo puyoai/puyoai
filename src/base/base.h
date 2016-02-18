@@ -2,6 +2,7 @@
 #define BASE_BASE_H_
 
 #include <cstddef>
+#include "base/build_config.h"
 
 #define UNUSED_VARIABLE(x) (void)(x)
 
@@ -28,7 +29,7 @@ constexpr std::size_t ARRAY_SIZE(const T (&)[size]) { return size; }
 
 // NOINLINE_UNLESS_RELEASE is defined in Release build.
 #ifndef NOINLINE_UNLESS_RELEASE
-#if defined(_MSC_VER)
+#ifdef OS_WIN
 #    define NOINLINE_UNLESS_RELEASE __declspec(noinline)
 #else
 #    define NOINLINE_UNLESS_RELEASE __attribute__ ((noinline))
@@ -36,7 +37,7 @@ constexpr std::size_t ARRAY_SIZE(const T (&)[size]) { return size; }
 #endif
 
 // CLANG_ALWAYS_INLINE sets __attribute__((always_inline)) only when clang is used.
-#ifdef __clang__
+#ifdef COMPILER_CLANG
 #define CLANG_ALWAYS_INLINE __attribute__((always_inline))
 #else
 #define CLANG_ALWAYS_INLINE
