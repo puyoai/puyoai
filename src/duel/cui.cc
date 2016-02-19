@@ -195,7 +195,7 @@ void Cui::printText(const string& location, const string& text)
         return;
 
     cout << location << text;
-    for (size_t i = prev.size(); i < text.size(); ++i)
+    for (size_t i = text.size(); i < prev.size(); ++i)
         cout << ' ';
     prev = text;
 }
