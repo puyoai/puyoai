@@ -1,10 +1,11 @@
+#include "duel/cui.h"
+
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
 
 #include "core/server/game_state.h"
-#include "duel/cui.h"
 
 using std::string;
 using std::cout;
@@ -18,73 +19,32 @@ const char C_BLUE[] = "\x1b[44m";
 const char C_GREEN[] = "\x1b[42m";
 const char C_YELLOW[] = "\x1b[43m";
 const char C_BLACK[] = "\x1b[49m";
-const char CLEAR_LINE[] = "\x1b[K";
-
-string locate(int x, int y)
-{
-    std::stringstream ss;
-    ss << "\x1b[" << y << ";" << x << "H";
-    return ss.str();
-}
-
-string locate(int playerId, int x, int y)
-{
-    int posX = 1 + 30 * playerId;
-    int posY = 1;
-    return locate(posX + x, posY + y);
-}
-
-string puyoText(PuyoColor color, int y = 0)
-{
-    string text;
-    if (color == PuyoColor::OJAMA) {
-        text = "@@";
-    } else if (color == PuyoColor::WALL) {
-        text = "##";
-    } else {
-        if (y == 13)
-            text = "__";
-        else
-            text = "  ";
-    }
-
-    string colorCode;
-    switch (color) {
-    case PuyoColor::RED:
-        colorCode = C_RED;
-        break;
-    case PuyoColor::BLUE:
-        colorCode = C_BLUE;
-        break;
-    case PuyoColor::GREEN:
-        colorCode = C_GREEN;
-        break;
-    case PuyoColor::YELLOW:
-        colorCode = C_YELLOW;
-        break;
-    default:
-        colorCode = C_BLACK;
-        break;
-    }
-
-    return colorCode + text + C_BLACK;
-}
 
 } // namespace
 
 void Cui::clear()
 {
-    cout << "\x1b[2J" << std::flush;
+    // Clear all characters on screen
+    cout << "\x1b[2J";
+    flush();
     printPuyoCache_.clear();
     printTextCache_.clear();
 }
 
+void Cui::flush()
+{
+    cout << std::flush;
+}
+
 void Cui::newGameWillStart()
 {
-    cout << locate(1, 1 + FieldConstant::MAP_HEIGHT + 3)
-         << "\x1B[0K"
-         << locate(1, 1 + FieldConstant::MAP_HEIGHT + 4)
-         << "\x1B[0K" << std::flush;
+    setCursor(1, 1 + FieldConstant::MAP_HEIGHT + 3);
+    // Clear all characters in the line.
+    cout << "\x1B[0K";
+    setCursor(1, 1 + FieldConstant::MAP_HEIGHT + 4);
+    // Clear all characters in the line.
+    cout << "\x1B[0K";
+    flush();
     printPuyoCache_.clear();
     printTextCache_.clear();
 }
@@ -93,7 +53,7 @@ void Cui::onUpdate(const GameState& gameState)
 {
     print(0, gameState.playerGameState(0));
     print(1, gameState.playerGameState(1));
-    std::cout << std::flush;
+    flush();
 }
 
 void Cui::printField(int playerId, const PlayerGameState& pgs)
@@ -138,17 +98,20 @@ void Cui::printMessage(int playerId, const std::string& message)
     if (message.empty())
         return;
 
-    int baseRow = 1 + FieldConstant::MAP_HEIGHT + 3;
+    int baseRow = 1 + FieldConstant::MAP_HEIGHT + 3 + playerId * kMaxMessageLines;
 
-    std::ostringstream ss;
-    // Clear |kMaxMessageLines| lines.
-    ss << locate(1, baseRow + playerId * kMaxMessageLines);
-    for (int i = 0; i < kMaxMessageLines; ++i) {
-        ss << CLEAR_LINE << "\n";
-    }
     // Reset location of the cursor.
-    ss << locate(1, baseRow + playerId * kMaxMessageLines);
-    printText(ss.str(), message);
+    int i = 0;
+    for (size_t from = 0; from < message.size(); ++i) {
+      size_t p = message.find(from, '\n');
+      if (p == string::npos || i == kMaxMessageLines - 1)
+        p = message.size();
+      printText(locate(1, baseRow + i), message.substr(from, p - from));
+      from = p + 1;
+    }
+    for (; i < kMaxMessageLines; ++i) {
+      printText(locate(1, baseRow + i), ColoredText(PuyoColor::EMPTY, ""));
+    }
 }
 
 void Cui::print(int playerId, const PlayerGameState& pgs)
@@ -159,8 +122,7 @@ void Cui::print(int playerId, const PlayerGameState& pgs)
     printMessage(playerId, pgs.message);
     printScore(playerId, pgs.score);
 
-    // Set cursor
-    cout << locate(0, FieldConstant::MAP_HEIGHT + 3);
+    setCursor(0, FieldConstant::MAP_HEIGHT + 3);
 }
 
 void Cui::printScore(int playerId, int score)
@@ -179,23 +141,90 @@ void Cui::printOjamaPuyo(int playerId, const PlayerGameState& pgs)
     printText(locate(playerId, 0, 0), ss.str());
 }
 
-void Cui::printPuyo(const string& location, const string& text)
+void Cui::printPuyo(const Location& location, const ColoredText& text)
 {
     auto& prev = printPuyoCache_[location];
     if (prev == text)
         return;
-    cout << location << text;
+    setCursor(location);
+    setColor(text.color);
+    cout << text.text;
+    setColor(PuyoColor::EMPTY);
     prev = text;
 }
 
-void Cui::printText(const string& location, const string& text)
+void Cui::printText(const Location& location, const ColoredText& text)
 {
     auto& prev = printTextCache_[location];
     if (prev == text)
         return;
 
-    cout << location << text;
-    for (size_t i = text.size(); i < prev.size(); ++i)
-        cout << ' ';
+    setCursor(location);
+    setColor(text.color);
+    cout << text.text;
+    if (text.text.size() < prev.text.size())
+      cout << string(prev.text.size() - text.text.size() + 2, ' ');
     prev = text;
+}
+
+void Cui::setCursor(const Location& location)
+{
+    setCursor(location.x, location.y);
+}
+
+void Cui::setCursor(int x, int y)
+{
+    cout << "\x1b[" << y << ";" << x << "H";
+}
+
+void Cui::setColor(PuyoColor color)
+{
+    string colorCode(C_BLACK);
+    switch (color) {
+    case PuyoColor::RED:
+        colorCode = C_RED;
+        break;
+    case PuyoColor::BLUE:
+        colorCode = C_BLUE;
+        break;
+    case PuyoColor::GREEN:
+        colorCode = C_GREEN;
+        break;
+    case PuyoColor::YELLOW:
+        colorCode = C_YELLOW;
+        break;
+    default:
+        // colorCode = C_BLACK;
+        break;
+    }
+    cout << colorCode;
+}
+
+Cui::Location Cui::locate(int x, int y)
+{
+    return Location(x, y);
+}
+
+Cui::Location Cui::locate(int playerId, int x, int y)
+{
+    int posX = 1 + 30 * playerId;
+    int posY = 1;
+    return Location(posX + x, posY + y);
+}
+
+Cui::ColoredText Cui::puyoText(PuyoColor color, int y)
+{
+    string text;
+    if (color == PuyoColor::OJAMA) {
+        text = "@@";
+    } else if (color == PuyoColor::WALL) {
+        text = "##";
+    } else {
+        if (y == 13)
+            text = "__";
+        else
+            text = "  ";
+    }
+
+    return ColoredText(color, text);
 }
