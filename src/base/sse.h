@@ -15,8 +15,7 @@ union Decomposer {
 };
 
 // Makes __m128i x s.t. mask = _mm_movemask_epi8(x).
-inline
-__m128i inverseMovemask(int mask)
+inline __m128i inverseMovemask(int mask)
 {
     // insert
     // 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
