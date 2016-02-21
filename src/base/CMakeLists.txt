@@ -17,6 +17,7 @@ function(puyoai_base_add_test target)
     puyoai_target_link_libraries(${target}_test)
 endfunction()
 
+puyoai_base_add_test(blocking_queue)
 puyoai_base_add_test(bmi)
 puyoai_base_add_test(file)
 puyoai_base_add_test(sse)
