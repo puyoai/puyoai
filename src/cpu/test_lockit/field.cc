@@ -12,11 +12,6 @@ namespace test_lockit {
 
 namespace {
 
-void saiki_3_right(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
-void saiki_3_left(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
-void saiki_3_up(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
-void saiki_3_down(const PuyoColor[][kHeight], int[][12], int, int, int*, PuyoColor);
-
 void syou_right(PuyoColor[][kHeight], int, int, PuyoColor, int[]);
 void syou_left(PuyoColor[][kHeight], int, int, PuyoColor, int[]);
 void syou_up(PuyoColor[][kHeight], int, int, PuyoColor, int[]);
@@ -27,72 +22,24 @@ void syou_left_num(PuyoColor[][kHeight], int, int, PuyoColor, int[], int*);
 void syou_up_num(PuyoColor[][kHeight], int, int, PuyoColor, int[], int*);
 void syou_down_num(PuyoColor[][kHeight], int, int, PuyoColor, int[], int*);
 
-void saiki_3_right(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
-{
-    point[x][y] = 1;
-    *num += 1;
-    if ((y != 11) && (incol == ba[x][y + 1]) && (point[x][y + 1] != 1))
-        saiki_3_up(ba, point, x, y + 1, num, incol);
-    if ((x != 5) && (incol == ba[x + 1][y]) && (point[x + 1][y] != 1))
-        saiki_3_right(ba, point, x + 1, y, num, incol);
-    if ((y != 0) && (incol == ba[x][y - 1]) && (point[x][y - 1] != 1))
-        saiki_3_down(ba, point, x, y - 1, num, incol);
-}
-
-void saiki_3_left(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
-{
-    point[x][y] = 1;
-    *num += 1;
-    if ((x != 0) && (incol == ba[x - 1][y]) && (point[x - 1][y] != 1))
-        saiki_3_left(ba, point, x - 1, y, num, incol);
-    if ((y != 11) && (incol == ba[x][y + 1]) && (point[x][y + 1] != 1))
-        saiki_3_up(ba, point, x, y + 1, num, incol);
-    if ((y != 0) && (incol == ba[x][y - 1]) && (point[x][y - 1] != 1))
-        saiki_3_down(ba, point, x, y - 1, num, incol);
-}
-
-void saiki_3_up(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
-{
-    point[x][y] = 1;
-    *num += 1;
-    if ((x != 0) && (incol == ba[x - 1][y]) && (point[x - 1][y] != 1))
-        saiki_3_left(ba, point, x - 1, y, num, incol);
-    if ((y != 11) && (incol == ba[x][y + 1]) && (point[x][y + 1] != 1))
-        saiki_3_up(ba, point, x, y + 1, num, incol);
-    if ((x != 5) && (incol == ba[x + 1][y]) && (point[x + 1][y] != 1))
-        saiki_3_right(ba, point, x + 1, y, num, incol);
-}
-
-void saiki_3_down(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
-{
-    point[x][y] = 1;
-    *num += 1;
-    if ((x != 0) && (incol == ba[x - 1][y]) && (point[x - 1][y] != 1))
-        saiki_3_left(ba, point, x - 1, y, num, incol);
-    if ((x != 5) && (incol == ba[x + 1][y]) && (point[x + 1][y] != 1))
-        saiki_3_right(ba, point, x + 1, y, num, incol);
-    if ((y != 0) && (incol == ba[x][y - 1]) && (point[x][y - 1] != 1))
-        saiki_3_down(ba, point, x, y - 1, num, incol);
-}
-
 void syou_right(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[])
 {
-    ba[x][y] = PuyoColor::EMPTY;
-    flg[x] = 1;
-    if ((y != 11) && (ba[x][y + 1] == incol))
-        syou_up(ba, x, y + 1, incol, flg);
-    if ((y != 11) && (ba[x][y + 1] == PuyoColor::OJAMA))
-        ba[x][y + 1] = PuyoColor::EMPTY;
-    if ((x != 5) && (ba[x + 1][y] == incol))
-        syou_right(ba, x + 1, y, incol, flg);
-    if ((x != 5) && (ba[x + 1][y] == PuyoColor::OJAMA)) {
-        ba[x + 1][y] = PuyoColor::EMPTY;
-        flg[x + 1] = 1;
-    }
-    if ((y != 0) && (ba[x][y - 1] == incol))
-        syou_down(ba, x, y - 1, incol, flg);
-    if ((y != 0) && (ba[x][y - 1] == PuyoColor::OJAMA))
-        ba[x][y - 1] = PuyoColor::EMPTY;
+  ba[x][y] = PuyoColor::EMPTY;
+  flg[x] = 1;
+  if ((y != 11) && (ba[x][y + 1] == incol))
+    syou_up(ba, x, y + 1, incol, flg);
+  if ((y != 11) && (ba[x][y + 1] == PuyoColor::OJAMA))
+    ba[x][y + 1] = PuyoColor::EMPTY;
+  if ((x != 5) && (ba[x + 1][y] == incol))
+    syou_right(ba, x + 1, y, incol, flg);
+  if ((x != 5) && (ba[x + 1][y] == PuyoColor::OJAMA)) {
+    ba[x + 1][y] = PuyoColor::EMPTY;
+    flg[x + 1] = 1;
+  }
+  if ((y != 0) && (ba[x][y - 1] == incol))
+    syou_down(ba, x, y - 1, incol, flg);
+  if ((y != 0) && (ba[x][y - 1] == PuyoColor::OJAMA))
+    ba[x][y - 1] = PuyoColor::EMPTY;
 }
 
 void syou_left(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[])
@@ -365,33 +312,16 @@ TLRensaResult simulate(PuyoColor field[][kHeight])
 
 void saiki(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
 {
-    DCHECK(isNormalColor(incol))
-            << "saiki(x=" << x << ", y=" << y << ", incol=" << incol << ")";
-
-    point[x][y] = 1;
-    *num += 1;
-    if ((x != 0) && (incol == ba[x - 1][y]) && (point[x - 1][y] == 0))
-        saiki(ba, point, x - 1, y, num, incol);
-    if ((y != 11) && (incol == ba[x][y + 1]) && (point[x][y + 1] == 0))
-        saiki(ba, point, x, y + 1, num, incol);
-    if ((x != 5) && (incol == ba[x + 1][y]) && (point[x + 1][y] == 0))
-        saiki(ba, point, x + 1, y, num, incol);
-    if ((y != 0) && (incol == ba[x][y - 1]) && (point[x][y - 1] == 0))
-        saiki(ba, point, x, y - 1, num, incol);
-}
-
-void saiki_3(const PuyoColor ba[][kHeight], int point[][12], int x, int y, int* num, PuyoColor incol)
-{
     point[x][y] = 1;
     *num += 1;
     if ((x != 0) && (incol == ba[x - 1][y]) && (point[x - 1][y] != 1))
-        saiki_3_left(ba, point, x - 1, y, num, incol);
+        saiki(ba, point, x - 1, y, num, incol);
     if ((y != 11) && (incol == ba[x][y + 1]) && (point[x][y + 1] != 1))
-        saiki_3_up(ba, point, x, y + 1, num, incol);
+        saiki(ba, point, x, y + 1, num, incol);
     if ((x != 5) && (incol == ba[x + 1][y]) && (point[x + 1][y] != 1))
-        saiki_3_right(ba, point, x + 1, y, num, incol);
+        saiki(ba, point, x + 1, y, num, incol);
     if ((y != 0) && (incol == ba[x][y - 1]) && (point[x][y - 1] != 1))
-        saiki_3_down(ba, point, x, y - 1, num, incol);
+        saiki(ba, point, x, y - 1, num, incol);
 }
 
 void saiki_4(PuyoColor ba[][kHeight], int x, int y, int* num, PuyoColor incol)

@@ -1652,7 +1652,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                             int poi2s = 0;
                             int chain = 0;
                             int tokus = point2[i2][j2];
-                            saiki_3(bass, point2, i2, j2, &num2, bass[i2][j2]);
+                            saiki(bass, point2, i2, j2, &num2, bass[i2][j2]);
                             if (num2 >= 3) {
                                 poi2s = j2 * config.takasa_point;
                                 if (j2 > 5)
