@@ -38,8 +38,9 @@ static string escapeMessage(const string& str)
 }
 
 // static
-FrameResponse FrameResponse::parse(const string& str)
+FrameResponse FrameResponse::parsePayload(const char* payload, size_t size)
 {
+    std::string str(payload, size);
     std::istringstream iss(str);
     std::string tmp;
 

@@ -4,6 +4,7 @@
 #include <poll.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include <chrono>
 #include <cstddef>
@@ -96,7 +97,7 @@ bool PipeConnectorPosix::pollAndReceive(bool waitTimeout, int frameId, const vec
         pollfds[i].fd = static_cast<PipeConnectorPosix*>(pipeConnectors[i])->readerFd_;
         pollfds[i].events = POLLIN;
     }
-    
+
     bool connection = true;
     bool received_data_for_this_frame[NUM_PLAYERS] {};
     while (true) {
@@ -164,28 +165,59 @@ PipeConnectorPosix::PipeConnectorPosix(int player, int writerFd, int readerFd) :
     writerFd_(writerFd),
     readerFd_(readerFd)
 {
-    writer_ = fdopen(writerFd_, "w");
-    reader_ = fdopen(readerFd_, "r");
-
-    CHECK(writer_);
-    CHECK(reader_);
 }
 
 PipeConnectorPosix::~PipeConnectorPosix()
 {
-    fclose(writer_);
-    fclose(reader_);
+    if (close(writerFd_) < 0) {
+        PLOG(ERROR) << "close";
+    }
+    if (close(readerFd_) < 0) {
+        PLOG(ERROR) << "close";
+    }
 }
 
-void PipeConnectorPosix::writeString(const string& message)
+bool PipeConnectorPosix::writeData(const void* data, size_t size)
 {
-    fprintf(writer_, "%s\n", message.c_str());
-    fflush(writer_);
-    LOG(INFO) << message;
+    while (size > 0) {
+        ssize_t n = ::write(writerFd_, data, size);
+        if (n < 0) {
+            if (errno == EAGAIN)
+                continue;
+            PLOG(ERROR) << "write";
+            return false;
+        }
+        if (n == 0) {
+            PLOG(ERROR) << "unexpected write failure";
+            return false;
+        }
+
+        size -= n;
+        data = reinterpret_cast<const void*>(reinterpret_cast<const char*>(data) + size);
+    }
+
+    return true;
 }
 
-bool PipeConnectorPosix::readString(char* buffer)
+bool PipeConnectorPosix::readData(void* data, size_t size)
 {
-    char* ptr = fgets(buffer, kBufferSize - 1, reader_);
-    return ptr != nullptr;
+    while (size > 0) {
+        ssize_t n = ::read(readerFd_, data, size);
+        if (n < 0) {
+            if (errno == EAGAIN)
+                continue;
+            PLOG(ERROR) << "read";
+            return false;
+        }
+
+        if (n == 0) {
+            LOG(ERROR) << "unexpected EOF";
+            return false;
+        }
+
+        size -= n;
+        data = reinterpret_cast<void*>(reinterpret_cast<char*>(data) + size);
+    }
+
+    return true;
 }

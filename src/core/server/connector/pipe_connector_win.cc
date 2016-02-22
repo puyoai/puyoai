@@ -24,7 +24,7 @@ unique_ptr<Connector> PipeConnectorWin::create(int playerId, const string& progr
     CHECK(0 <= playerId && playerId < 10) << playerId;
 
     // Skip "fifo:" check
-    
+
     SECURITY_ATTRIBUTES security;
     security.nLength = sizeof(security);
     security.bInheritHandle = true;
@@ -39,7 +39,7 @@ unique_ptr<Connector> PipeConnectorWin::create(int playerId, const string& progr
     if (!SetHandleInformation(hChildStdOutReader, HANDLE_FLAG_INHERIT, 0)) {
         LOG(ERROR) << "Stdout reader is inherited.";
     }
-    
+
     // Prepare a pipe from server to client.
     HANDLE hChildStdInReader = nullptr;
     HANDLE hChildStdInWriter = nullptr;
@@ -62,7 +62,7 @@ unique_ptr<Connector> PipeConnectorWin::create(int playerId, const string& progr
     string argument("Player_");
     argument[6] = '1' + playerId;
     string commandLine = programName + " " + argument;
-    
+
     PROCESS_INFORMATION processInfo;
     ZeroMemory(&processInfo, sizeof(processInfo));
     if (!CreateProcess(programName.c_str(), const_cast<char*>(commandLine.c_str()),
@@ -84,7 +84,7 @@ bool PipeConnectorWin::pollAndReceive(bool waitTimeout, int frameId, const vecto
     for (size_t i = 0; i < numHandles; ++i) {
         handles[i] = static_cast<PipeConnectorWin*>(pipeConnectors[i])->reader_;
     }
-    
+
     bool connection = true;
     bool receivedDataForThisFrame[NUM_PLAYERS] {};
     while (true) {
@@ -96,10 +96,10 @@ bool PipeConnectorWin::pollAndReceive(bool waitTimeout, int frameId, const vecto
                 break;
             }
         }
-        
+
         // Wait for user input.
         DWORD action = WaitForMultipleObjects(numHandles, handles, false, timeoutMs);
-        
+
         if (action == 0) {
             if (!waitTimeout) {
                 break;
@@ -127,7 +127,7 @@ bool PipeConnectorWin::pollAndReceive(bool waitTimeout, int frameId, const vecto
                 receivedDataForThisFrame[i] = true;
             }
         }
-        
+
         // If a realtime game flag is not set, do not wait for timeout, and
         // continue the game as soon as possible.
         if (!FLAGS_realtime) {
@@ -142,7 +142,7 @@ bool PipeConnectorWin::pollAndReceive(bool waitTimeout, int frameId, const vecto
             }
         }
     }
-    
+
 
     int usec = getUsecFromStart(startTimePoint);
     LOG(INFO) << "Frame " << frameId  << " took " << usec << " [us]";
@@ -163,16 +163,30 @@ PipeConnectorWin::~PipeConnectorWin()
     CloseHandle(reader_);
 }
 
-void PipeConnectorWin::writeString(const string& message)
+bool PipeConnectorWin::writeData(const void* data, size_t size)
 {
-    DWORD wroteSize;
-    WriteFile(writer_, message.c_str(), message.size(), &wroteSize, nullptr);
+    while (size > 0) {
+        DWORD wroteSize;
+        if (!WriteFile(writer_, data, size, &wroteSize, nullptr))
+            return false;
+        // TODO(mayah): data += wroteSize will do, but it's gnu extension.
+        data = reinterpret_cast<const void*>(reinterpret_cast<const char*>(data) + wroteSize);
+        size -= wroteSize;
+    }
+
     FlushFileBuffers(writer_);
-    LOG(INFO) << message;
 }
 
-bool PipeConnectorWin::readString(char* buffer)
+bool PipeConnectorWin::readData(void* data, size_t size)
 {
-    DWORD readSize;
-    return ReadFile(reader_, buffer, kBufferSize - 1, &readSize, nullptr);
+    while (size > 0) {
+        DWORD readSize;
+        if (!ReadFile(reader_, data, size, &readSize, nullptr))
+            return false;
+        // TODO(mayah): data += readSize will do, but it's gnu extension.
+        data = reinterpret_cast<void*>(reinterpret_cast<char*>(data) + readSize);
+        size -= readSize;
+    }
+
+    return true;
 }

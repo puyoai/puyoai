@@ -8,7 +8,8 @@ using namespace std;
 
 TEST(FrameResponseTest, parse)
 {
-    FrameResponse response = FrameResponse::parse("ID=1 X=3 R=0 MSG=hoge,fuga");
+    std::string line = "ID=1 X=3 R=0 MSG=hoge,fuga";
+    FrameResponse response = FrameResponse::parsePayload(line.data(), line.size());
 
     EXPECT_EQ(1, response.frameId);
     EXPECT_TRUE(response.decision.isValid());
@@ -26,7 +27,8 @@ TEST(FrameResponseTest, toStringAndParse)
     expected.decision = Decision(3, 0);
     expected.message = "message with space (1)\nmessage with space (2)";
 
-    FrameResponse actual = FrameResponse::parse(expected.toString());
+    std::string line = expected.toString();
+    FrameResponse actual = FrameResponse::parsePayload(line.data(), line.size());
 
     EXPECT_TRUE(actual.isValid());
     EXPECT_EQ(expected.frameId, actual.frameId);

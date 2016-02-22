@@ -6,8 +6,14 @@
 #include "core/decision.h"
 #include "core/key_set.h"
 
+struct FrameResponseHeader {
+    explicit FrameResponseHeader(uint32_t size = 0) : size(size) {}
+
+    uint32_t size;
+};
+
 struct FrameResponse {
-    static FrameResponse parse(const std::string&);
+    static FrameResponse parsePayload(const char* payload, size_t size);
 
     FrameResponse() {}
     explicit FrameResponse(int frameId,

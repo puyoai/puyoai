@@ -10,6 +10,12 @@
 #include "core/player.h"
 #include "core/user_event.h"
 
+struct FrameRequestHeader {
+    explicit FrameRequestHeader(uint32_t size = 0) : size(size) {}
+
+    uint32_t size;
+};
+
 struct PlayerFrameRequest {
     PlainField field;
     KumipuyoSeq kumipuyoSeq;
@@ -20,7 +26,7 @@ struct PlayerFrameRequest {
 };
 
 struct FrameRequest {
-    static FrameRequest parse(const std::string& line);
+    static FrameRequest parsePayload(const char* payload, size_t size);
 
     std::string toString() const;
     std::string toDebugString() const;

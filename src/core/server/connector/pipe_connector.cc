@@ -59,30 +59,42 @@ PipeConnector::PipeConnector(int player) :
 
 void PipeConnector::send(const FrameRequest& req)
 {
-    writeString(req.toString());
+    std::string s = req.toString();
+
+    // Send header first.
+    FrameRequestHeader header(s.size());
+    if (!writeData(reinterpret_cast<const void*>(&header), sizeof(header))) {
+        LOG(ERROR) << "failed to write message header";
+        return;
+    }
+
+    if (!writeData(reinterpret_cast<const void*>(s.data()), s.size())) {
+        LOG(ERROR) << "failed to write message payload";
+        return;
+    }
 }
 
 bool PipeConnector::receive(FrameResponse* response)
 {
-    // TODO(peria): Consider design of this routine.  Use std::string instead?
-    char buffer[kBufferSize];
-    if (!readString(buffer))
+    // Receives header.
+    FrameResponseHeader header;
+    if (!readData(reinterpret_cast<void*>(&header), sizeof(header))) {
+        LOG(ERROR) << "failed to read message header";
         return false;
-
-    size_t len = strlen(buffer);
-    if (len == 0)
-        return false;
-
-    if (buffer[len - 1] == '\n') {
-        buffer[--len] = '\0';
-    }
-    if (len == 0)
-        return false;
-    if (buffer[len - 1] == '\r') {
-        buffer[--len] = '\0';
     }
 
-    LOG(INFO) << buffer;
-    *response = FrameResponse::parse(buffer);
+    if (header.size > kBufferSize) {
+        LOG(ERROR) << "body is too large to read: size=" << header.size;
+        return false;
+    }
+
+    char payload[kBufferSize];
+    if (!readData(reinterpret_cast<void*>(payload), header.size)) {
+        LOG(ERROR) << "failed to read payload";
+        return false;
+    }
+
+    *response = FrameResponse::parsePayload(payload, header.size);
+    LOG(INFO) << "RECEIVED: " << response->toString();
     return true;
 }

@@ -81,8 +81,10 @@ static bool parseMatchEnd(const char* value)
 }
 
 // static
-FrameRequest FrameRequest::parse(const std::string& line)
+FrameRequest FrameRequest::parsePayload(const char* payload, size_t size)
 {
+    std::string line(payload, size);
+
     FrameRequest req;
 
     string term;

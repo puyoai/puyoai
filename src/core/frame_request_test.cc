@@ -6,7 +6,8 @@ using namespace std;
 
 TEST(FrameRequestTest, parse)
 {
-    FrameRequest request = FrameRequest::parse("ID=1");
+    std::string line = "ID=1";
+    FrameRequest request = FrameRequest::parsePayload(line.data(), line.size());
 
     EXPECT_EQ(1, request.frameId);
     EXPECT_EQ(GameResult::PLAYING, request.gameResult);
@@ -17,18 +18,24 @@ TEST(FrameRequestTest, parse)
 
 TEST(FrameRequestTest, parseMatchEnd_true)
 {
-    FrameRequest request = FrameRequest::parse("ID=1 MATCHEND=1");
+    std::string line = "ID=1 MATCHEND=1";
+    FrameRequest request = FrameRequest::parsePayload(line.data(), line.size());
+
     EXPECT_TRUE(request.matchEnd);
 }
 
 TEST(FrameRequestTest, parseMatchEnd_false1)
 {
-    FrameRequest request = FrameRequest::parse("ID=1");
+    std::string line = "ID=1";
+    FrameRequest request = FrameRequest::parsePayload(line.data(), line.size());
+
     EXPECT_FALSE(request.matchEnd);
 }
 
 TEST(FrameRequestTest, parseMatchEnd_false2)
 {
-    FrameRequest request = FrameRequest::parse("ID=1 MATCHEND=0");
+    std::string line = "ID=1 MATCHEND=0";
+    FrameRequest request = FrameRequest::parsePayload(line.data(), line.size());
+
     EXPECT_FALSE(request.matchEnd);
 }

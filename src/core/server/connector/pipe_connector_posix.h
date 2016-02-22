@@ -21,11 +21,13 @@ public:
 private:
     PipeConnectorPosix(int player, int writerFd, int readerFd);
 
-    virtual void writeString(const std::string&) final;
-    virtual bool readString(char*) final;
+    // Writes |size| bytes |data|.
+    // Returns true if succeeded. False otherwise.
+    bool writeData(const void* data, size_t size) override final;
 
-    FILE* writer_;
-    FILE* reader_;
+    // Reads |size| bytes |data|.
+    // Returns true if succeeded. False otherwise.
+    bool readData(void* data, size_t size) override final;
 
     int writerFd_;
     int readerFd_;

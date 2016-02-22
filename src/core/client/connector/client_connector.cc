@@ -10,30 +10,48 @@
 
 using namespace std;
 
+namespace {
+const int kBufferSize = 1024;
+} // namespace anonymous
+
 bool ClientConnector::receive(FrameRequest* frameRequest)
 {
     if (closed_)
         return false;
 
-    std::string line;
-    while (true) {
-        if (!std::getline(std::cin, line)) {
-            closed_ = true;
-            return false;
-        }
-
-        if (line != "")
-            break;
+    FrameRequestHeader header;
+    if (!cin.read(reinterpret_cast<char*>(&header), sizeof(header))) {
+        LOG(ERROR) << "unexpected eof when reading header";
+        return false;
     }
 
-    LOG(INFO) << "RECEIVED: " << line;
-    *frameRequest = FrameRequest::parse(line);
+    if (header.size > kBufferSize) {
+        LOG(ERROR) << "size too large: size=" << header.size;
+        return false;
+    }
+
+    char payload[kBufferSize + 1];
+    if (!cin.read(payload, header.size)) {
+        LOG(ERROR) << "unepxected eof when reading payload";
+        return false;
+    }
+
+    payload[header.size] = '\0';
+
+    LOG(INFO) << "RECEIVED: " << payload;
+    *frameRequest = FrameRequest::parsePayload(payload, header.size);
     return true;
 }
 
 void ClientConnector::send(const FrameResponse& resp)
 {
     string s = resp.toString();
-    cout << s << endl;
+
+    // Send size as header.
+    uint32_t buf = s.size();
+    cout.write(reinterpret_cast<char*>(&buf), sizeof(buf));
+    cout.write(s.data(), s.size());
+    cout.flush();
+
     LOG(INFO) << "SEND: " << s;
 }

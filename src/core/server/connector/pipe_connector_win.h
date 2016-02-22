@@ -22,8 +22,8 @@ public:
 private:
     PipeConnectorWin(int player, HANDLE writer, HANDLE reader);
 
-    virtual void writeString(const std::string&) final;
-    virtual bool readString(char*) final;
+    bool writeData(const void* data, size_t size) override final;
+    bool readData(void* data, size_t size) override final;
 
     HANDLE writer_;
     HANDLE reader_;

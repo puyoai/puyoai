@@ -29,12 +29,12 @@ public:
     void setClosed(bool flag) { closed_ = flag; }
 
 protected:
-    static const int kBufferSize = 1000;
+    static const int kBufferSize = 1024;
 
     explicit PipeConnector(int player);
 
-    virtual void writeString(const std::string&) = 0;
-    virtual bool readString(char*) = 0;
+    virtual bool writeData(const void*, size_t) = 0;
+    virtual bool readData(void*, size_t) = 0;
 
 private:
     bool closed_;
