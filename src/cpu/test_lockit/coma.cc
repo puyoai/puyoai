@@ -68,52 +68,55 @@ PuyoColor toValidPuyoColor(PuyoColor c)
     return c;
 }
 
-bool UpdateAccessibility(PuyoColor ba[6][kHeight], int i, int j, int point2[6][12])
+void UpdateAccessibility(PuyoColor ba[6][kHeight], int point2[6][12])
 {
-    point2[i][j] = 8;
-    if (!isNormalColor(ba[i][j]))
-        return true;
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 12; j++) {
+            point2[i][j] = 8;
+            if (!isNormalColor(ba[i][j]))
+                continue;
 
-    bool isAboveEmpty = (j != 11 && ba[i][j + 1] == PuyoColor::EMPTY);
-    bool isRightEmpty = (i != 5 && ba[i + 1][j] == PuyoColor::EMPTY);
-    bool isLeftEmpty = (i != 0 && ba[i - 1][j] == PuyoColor::EMPTY);
-    if (isAboveEmpty) {
-        if (isRightEmpty && (i != 4 || ba[3][11] == PuyoColor::EMPTY)) {
-            point2[i][j] = 2;
-            point2[i][j + 1] = 9;
-            return false;
-        }
-        if (isLeftEmpty && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
-            point2[i][j] = 3;
-            point2[i][j + 1] = 9;
-            return false;
-        }
-        if ((i != 0 || ba[1][11] == PuyoColor::EMPTY)
-            && (i != 4 || ba[3][11] == PuyoColor::EMPTY)
-            && (i != 5 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))) {
-            point2[i][j] = 4;
-            point2[i][j + 1] = 9;
-            return false;
-        }
-    } else {
-        if (isRightEmpty && isLeftEmpty && ba[i][11] == PuyoColor::EMPTY) {
-            point2[i][j] = 5;
-            return true;
-        }
-        if (isRightEmpty
-            && (i != 4 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))
-            && (i != 3 || ba[3][11] == PuyoColor::EMPTY)) {
-            point2[i][j] = 6;
-            return true;
-        }
-        if (isLeftEmpty
-            && (i != 1 || ba[1][11] == PuyoColor::EMPTY)
-            && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
-            point2[i][j] = 7;
-            return true;
+            bool isAboveEmpty = (j != 11 && ba[i][j + 1] == PuyoColor::EMPTY);
+            bool isRightEmpty = (i != 5 && ba[i + 1][j] == PuyoColor::EMPTY);
+            bool isLeftEmpty = (i != 0 && ba[i - 1][j] == PuyoColor::EMPTY);
+            if (isAboveEmpty) {
+                if (isRightEmpty && (i != 4 || ba[3][11] == PuyoColor::EMPTY)) {
+                    point2[i][j] = 2;
+                    point2[i][j + 1] = 9;
+                    break;
+                }
+                if (isLeftEmpty && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
+                    point2[i][j] = 3;
+                    point2[i][j + 1] = 9;
+                    break;
+                }
+                if ((i != 0 || ba[1][11] == PuyoColor::EMPTY)
+                    && (i != 4 || ba[3][11] == PuyoColor::EMPTY)
+                    && (i != 5 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))) {
+                    point2[i][j] = 4;
+                    point2[i][j + 1] = 9;
+                    break;
+                }
+            } else {
+                if (isRightEmpty && isLeftEmpty && ba[i][11] == PuyoColor::EMPTY) {
+                    point2[i][j] = 5;
+                    continue;
+                }
+                if (isRightEmpty
+                    && (i != 4 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))
+                    && (i != 3 || ba[3][11] == PuyoColor::EMPTY)) {
+                    point2[i][j] = 6;
+                    continue;
+                }
+                if (isLeftEmpty
+                    && (i != 1 || ba[1][11] == PuyoColor::EMPTY)
+                    && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
+                    point2[i][j] = 7;
+                    continue;
+                }
+            }
         }
     }
-    return true;
 }
 
 }  // namespace
@@ -1019,10 +1022,6 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
 {
     PuyoColor ba_a[6][kHeight] {};
     PuyoColor ba2[6][kHeight] {};
-    int point2[6][12] = {
-        {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}, {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-        {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}, {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
-        {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}, {8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}};
     int hym[22];
     int keschk = 0;
     int maxch = 0, maxach;
@@ -1632,12 +1631,12 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                         g_poihyo[aa][bb][dd][ee] = -2000;
                         continue;
                     }
-                    for (int i = 0; i < 6; i++) {
-                        for (int j = 0; j < 12; j++) {
-                            if (!UpdateAccessibility(ba, i, j, point2))
-                                break;
-                        }
-                    }
+
+                    int point2[6][12];
+                    for (int i = 0; i < 6; ++i)
+                        for (int j = 0; j < 12; ++j)
+                            point2[i][j] = 8;
+                    UpdateAccessibility(ba, point2);
 
                     PuyoColor bass[6][kHeight] {};
                     int num2 = 3;
