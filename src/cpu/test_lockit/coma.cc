@@ -68,6 +68,54 @@ PuyoColor toValidPuyoColor(PuyoColor c)
     return c;
 }
 
+bool UpdateAccessibility(PuyoColor ba[6][kHeight], int i, int j, int point2[6][12])
+{
+    point2[i][j] = 8;
+    if (!isNormalColor(ba[i][j]))
+        return true;
+
+    bool isAboveEmpty = (j != 11 && ba[i][j + 1] == PuyoColor::EMPTY);
+    bool isRightEmpty = (i != 5 && ba[i + 1][j] == PuyoColor::EMPTY);
+    bool isLeftEmpty = (i != 0 && ba[i - 1][j] == PuyoColor::EMPTY);
+    if (isAboveEmpty) {
+        if (isRightEmpty && (i != 4 || ba[3][11] == PuyoColor::EMPTY)) {
+            point2[i][j] = 2;
+            point2[i][j + 1] = 9;
+            return false;
+        }
+        if (isLeftEmpty && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
+            point2[i][j] = 3;
+            point2[i][j + 1] = 9;
+            return false;
+        }
+        if ((i != 0 || ba[1][11] == PuyoColor::EMPTY)
+            && (i != 4 || ba[3][11] == PuyoColor::EMPTY)
+            && (i != 5 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))) {
+            point2[i][j] = 4;
+            point2[i][j + 1] = 9;
+            return false;
+        }
+    } else {
+        if (isRightEmpty && isLeftEmpty && ba[i][11] == PuyoColor::EMPTY) {
+            point2[i][j] = 5;
+            return true;
+        }
+        if (isRightEmpty
+            && (i != 4 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))
+            && (i != 3 || ba[3][11] == PuyoColor::EMPTY)) {
+            point2[i][j] = 6;
+            return true;
+        }
+        if (isLeftEmpty
+            && (i != 1 || ba[1][11] == PuyoColor::EMPTY)
+            && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
+            point2[i][j] = 7;
+            return true;
+        }
+    }
+    return true;
+}
+
 }  // namespace
 
 COMAI_HI::COMAI_HI(const cpu::Configuration& config) :
@@ -1586,50 +1634,8 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                     }
                     for (int i = 0; i < 6; i++) {
                         for (int j = 0; j < 12; j++) {
-                            point2[i][j] = 8;
-                            if (isNormalColor(ba[i][j])) {
-                                if (i != 5 && ba[i][j + 1] == PuyoColor::EMPTY && ba[i + 1][j] == PuyoColor::EMPTY) {
-                                    if (j != 11 && (i != 4 || ba[3][11] == PuyoColor::EMPTY)) {
-                                        point2[i][j] = 2;
-                                        point2[i][j + 1] = 9;
-                                        break;
-                                    }
-                                }
-                                if (i != 0 && ba[i][j + 1] == PuyoColor::EMPTY && ba[i - 1][j] == PuyoColor::EMPTY) {
-                                    if (j != 11 && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
-                                        point2[i][j] = 3;
-                                        point2[i][j + 1] = 9;
-                                        break;
-                                    }
-                                }
-                                if (ba[i][j + 1] == PuyoColor::EMPTY) {
-                                    if (j != 11 &&  (i != 0 || ba[1][11] == PuyoColor::EMPTY) && (i != 4 || ba[3][11] == PuyoColor::EMPTY)
-                                        && (i != 5 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))) {
-                                        point2[i][j] = 4;
-                                        point2[i][j + 1] = 9;
-                                        break;
-                                    }
-                                }
-                                if ((i !=  5 && ba[i + 1][j] == PuyoColor::EMPTY) && (i != 0 && ba[i - 1][j] == PuyoColor::EMPTY)) {
-                                    if (ba[i][11] == PuyoColor::EMPTY) {
-                                        point2[i][j] = 5;
-                                        continue;
-                                    }
-                                }
-                                if (i != 5 && ba[i + 1][j] == PuyoColor::EMPTY) {
-                                    if (((i != 4) || ((ba[3][11] == PuyoColor::EMPTY) && (ba[4][11] == PuyoColor::EMPTY)))
-                                        && ((i != 3) || (ba[3][11] == PuyoColor::EMPTY))) {
-                                        point2[i][j] = 6;
-                                        continue;
-                                    }
-                                }
-                                if (i != 0 && ba[i - 1][j] == PuyoColor::EMPTY) {
-                                    if (((i != 1) || (ba[1][11] == PuyoColor::EMPTY)) && ((i != 5) || (ba[3][11] == PuyoColor::EMPTY))) {
-                                        point2[i][j] = 7;
-                                        continue;
-                                    }
-                                }
-                            }
+                            if (!UpdateAccessibility(ba, i, j, point2))
+                                break;
                         }
                     }
 
