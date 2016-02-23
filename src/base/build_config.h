@@ -5,10 +5,12 @@
 //
 // Operating system:
 //   OS_WIN / OS_MACOSX / OS_LINUX / OS_FREEBSD
-//   OS_POSIX = MACOSX or LINUX or OS_FREEBSD
+//   OS_POSIX = OS_MACOSX or OS_LINUX or OS_FREEBSD
+//
 // Compiler:
 //   COMPILER_MSVC / COMPILER_GCC / COMPILER_CLANG
 //   COMPILER_GCC_COMPATIBLE = COMPILER_GCC or COMPILER_CLANG
+//
 
 #if defined(__linux__)
 #  define OS_LINUX 1
