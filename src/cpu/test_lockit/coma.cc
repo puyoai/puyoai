@@ -12,11 +12,14 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
+#include "core/core_field.h"
 #include "core/puyo_color.h"
+#include "core/rensa_result.h"
 
 #include "field.h"
 #include "rensa_result.h"
 #include "template.h"
+#include "util.h"
 
 namespace test_lockit {
 
@@ -169,16 +172,14 @@ void COMAI_HI::ref()
     m_hakkatime = 0;
 }
 
-bool COMAI_HI::aite_attack_start(const PuyoColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata)
+bool COMAI_HI::aite_attack_start(CoreField field, int zenkesi_aite, int scos, int hakata)
 {
     int jamako_sabun;
     bool ret_keshi = false;
 
-    int kosuu_mae = countNormalColor13(ba3);
-    PuyoColor ba[6][kHeight] {};
-    copyField(ba3, ba);
+    int kosuu_mae = field.countColorPuyos();
 
-    TLRensaResult result = simulate(ba);
+    RensaResult result = field.simulate();
     int score = result.score;
     int quick = result.quick;
     m_aite_hakka_rensa = result.chains;
@@ -200,7 +201,7 @@ bool COMAI_HI::aite_attack_start(const PuyoColor ba3[6][kHeight], int zenkesi_ai
     }
     m_kougeki_edge = 0;
 
-    int kosuu_ato = countNormalColor13(ba);
+    int kosuu_ato = field.countColorPuyos();
 
     m_aite_hakka_kosuu = kosuu_mae - kosuu_ato;
     if (m_aite_hakka_kosuu * 2 > kosuu_mae)
@@ -229,7 +230,7 @@ int COMAI_HI::aite_rensa_end()
     return 0;
 }
 
-int COMAI_HI::aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[])
+int COMAI_HI::aite_hyouka(const CoreField& field, PuyoColor tsumo[])
 {
     m_aite_rensa_score = 0;
     m_aite_rensa_score_cc = 0;
@@ -239,8 +240,10 @@ int COMAI_HI::aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[])
     PuyoColor nx2 = toValidPuyoColor(tsumo[1]);
     PuyoColor nn1 = toValidPuyoColor(tsumo[2]);
     PuyoColor nn2 = toValidPuyoColor(tsumo[3]);
-    int irokosuu = countNormalColor13(ba3);
+    int irokosuu = field.countColorPuyos();
 
+    PuyoColor ba3[6][kHeight];
+    toTLField(field, ba3);
     int unused_values[4];
     for (int aa = 0; aa < 22; ++aa) {
         if (tobashi_hantei_a(ba3, aa, nx1, nx2))

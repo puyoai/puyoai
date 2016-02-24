@@ -154,9 +154,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
     if (r_player[1].set_puyo == 1) {
         r_player[1].set_puyo_once = 1;
         r_player[1].keep_score = r_player[1].score;
-        PuyoColor field[6][kHeight];
-        toTLField(r_player[1].field, field);
-        if (coma.aite_attack_start(field, r_player[1].zenkesi, coma.m_aite_hakkaji_score, r_player[0].id)) {
+        if (coma.aite_attack_start(r_player[1].field, r_player[1].zenkesi, coma.m_aite_hakkaji_score, r_player[0].id)) {
             r_player[1].zenkesi = 0;
         }
     }
@@ -170,9 +168,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
     if ((r_player[1].act_on == 1) && (r_player[1].set_puyo_once == 1)) {
         r_player[1].set_puyo_once = 0;
         coma.aite_rensa_end();
-        PuyoColor field[6][kHeight];
-        toTLField(r_player[1].field, field);
-        coma.aite_hyouka(field, r_player[1].tsumo);
+        coma.aite_hyouka(r_player[1].field, r_player[1].tsumo);
     }
     if (r_player[0].set_puyo == 1) {
         r_player[0].set_puyo_once = 1;
