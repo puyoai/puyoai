@@ -1,6 +1,7 @@
 #ifndef CPU_TEST_LOCKIT_READ_H_
 #define CPU_TEST_LOCKIT_READ_H_
 
+#include "core/core_field.h"
 #include "core/puyo_color.h"
 #include "lockit_constant.h"
 
@@ -18,8 +19,8 @@ public:
     void field_kioku();
     int field_hikaku();
 
-    PuyoColor field[6][kHeight];
-    PuyoColor yosou_field[6][kHeight];
+    CoreField field;
+    CoreField yosou_field;
     PuyoColor tsumo[6];
     int act_on;
     int nex_on;
@@ -34,10 +35,8 @@ public:
     int te_r;
 
 private:
-    int chousei_syoukyo();
-
     PuyoColor field12[6];
-    PuyoColor field_hoz[6][kHeight];
+    CoreField field_hoz;
     int act_on_1st;
     int rensa_end_once;
     int setti_basyo[4];
