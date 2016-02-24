@@ -68,11 +68,11 @@ PuyoColor toValidPuyoColor(PuyoColor c)
     return c;
 }
 
-void UpdateAccessibility(PuyoColor ba[6][kHeight], int point2[6][12])
+void UpdateAccessibility(PuyoColor ba[6][kHeight], Check point2[6][12])
 {
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 12; j++) {
-            point2[i][j] = 8;
+            point2[i][j] = Check::Unknown;
             if (!isNormalColor(ba[i][j]))
                 continue;
 
@@ -81,37 +81,37 @@ void UpdateAccessibility(PuyoColor ba[6][kHeight], int point2[6][12])
             bool isLeftEmpty = (i != 0 && ba[i - 1][j] == PuyoColor::EMPTY);
             if (isAboveEmpty) {
                 if (isRightEmpty && (i != 4 || ba[3][11] == PuyoColor::EMPTY)) {
-                    point2[i][j] = 2;
-                    point2[i][j + 1] = 9;
+                    point2[i][j] = Check::ColorWithEmptyUR;
+                    point2[i][j + 1] = Check::Empty;
                     break;
                 }
                 if (isLeftEmpty && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
-                    point2[i][j] = 3;
-                    point2[i][j + 1] = 9;
+                    point2[i][j] = Check::ColorWithEmptyUL;
+                    point2[i][j + 1] = Check::Empty;
                     break;
                 }
                 if ((i != 0 || ba[1][11] == PuyoColor::EMPTY)
                     && (i != 4 || ba[3][11] == PuyoColor::EMPTY)
                     && (i != 5 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))) {
-                    point2[i][j] = 4;
-                    point2[i][j + 1] = 9;
+                    point2[i][j] = Check::ColorWithEmptyU;
+                    point2[i][j + 1] = Check::Empty;
                     break;
                 }
             } else {
                 if (isRightEmpty && isLeftEmpty && ba[i][11] == PuyoColor::EMPTY) {
-                    point2[i][j] = 5;
+                    point2[i][j] = Check::ColorWithEmptyLR;
                     continue;
                 }
                 if (isRightEmpty
                     && (i != 4 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))
                     && (i != 3 || ba[3][11] == PuyoColor::EMPTY)) {
-                    point2[i][j] = 6;
+                    point2[i][j] = Check::ColorWithEmptyR;
                     continue;
                 }
                 if (isLeftEmpty
                     && (i != 1 || ba[1][11] == PuyoColor::EMPTY)
                     && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
-                    point2[i][j] = 7;
+                    point2[i][j] = Check::ColorWithEmptyL;
                     continue;
                 }
             }
@@ -935,12 +935,12 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
             }
 
             int num = 0;
-            int point[6][12] {};
+            Check point[6][12] {};
             for (int i = 0; i < 6; i++) {
                 for (int j = 0; j < 12; j++) {
                     if (ba[i][j] == PuyoColor::EMPTY)
                         break;
-                    if (point[i][j] != 1 && isNormalColor(ba[i][j])) {
+                    if (point[i][j] != Check::Checked && isNormalColor(ba[i][j])) {
                         saiki(ba, point, i, j, &num, ba[i][j]);
                         if (num != 0) {
                             if (num == 2)
@@ -1632,10 +1632,8 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                         continue;
                     }
 
-                    int point2[6][12];
-                    for (int i = 0; i < 6; ++i)
-                        for (int j = 0; j < 12; ++j)
-                            point2[i][j] = 8;
+                    Check point2[6][12];
+                    std::fill_n(&point2[0][0], 6 * 12, Check::Unknown);
                     UpdateAccessibility(ba, point2);
 
                     PuyoColor bass[6][kHeight] {};
@@ -1643,26 +1641,28 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                     for (int i2 = 0; i2 < 6; i2++) {
                         hakkatakasa = 0;
                         for (int j2 = 0; j2 < 12; j2++) {
-                            if (point2[i2][j2] == 9)
+                            if (point2[i2][j2] == Check::Empty)
                                 break;
-                            if (point2[i2][j2] == 8)
+                            if (point2[i2][j2] == Check::Unknown)
                                 continue;
                             if (hakkatakasa < 6)
                                 hakkatakasa++;
-                            if (point2[i2][j2] == 1)
+                            if (point2[i2][j2] == Check::Checked)
                                 continue;
                             if ((num2 > 2))
                                 copyField(ba, bass);
                             int num2 = 0;
                             int poi2s = 0;
                             int chain = 0;
-                            int tokus = point2[i2][j2];
+                            Check tokus = point2[i2][j2];
                             saiki(bass, point2, i2, j2, &num2, bass[i2][j2]);
                             if (num2 >= 3) {
                                 poi2s = j2 * config.takasa_point;
                                 if (j2 > 5)
                                     poi2s += config.takasa_point;
-                                if ((tokus > 1) && (tokus < 5))
+                                if (tokus == Check::ColorWithEmptyUR ||
+                                    tokus == Check::ColorWithEmptyUL ||
+                                    tokus == Check::ColorWithEmptyU)
                                     poi2s += 100 * config.t_t;
                                 if (zenkesi_aite == 1)
                                     poi2s = hakkatakasa * 300;
@@ -1680,13 +1680,13 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                             int pois = 0;
                             if (m_cchai <= chain) {
                                 m_cchai = chain;
-                                int point[6][12] {};
+                                Check point[6][12] {};
                                 num = 0;
                                 for (int i = 0; i < 6; i++) {
                                     for (int j = 0; j < 12; j++) {
                                         if (bass[i][j] == PuyoColor::EMPTY)
                                             break;
-                                        if (point[i][j] != 1 && isNormalColor(bass[i][j])) {
+                                        if (point[i][j] != Check::Checked && isNormalColor(bass[i][j])) {
                                             saiki(bass, point, i, j, &num, bass[i][j]);
                                             pois = pois + num * num * num;
                                             num = 0;

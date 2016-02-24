@@ -40,7 +40,7 @@ TEST(FieldTest, Saiki) {
 
     int expect_points = 0;
     // We can re-use |point| array.
-    int point[6][12] {};
+    Check point[6][12] {};
     for (const TestData& data : data_set) {
         int num = 0;
         saiki(field, point, data.x, data.y, &num, field[data.x][data.y]);
@@ -52,7 +52,7 @@ TEST(FieldTest, Saiki) {
     int count_point = 0;
     for (int x = 0; x < 6; ++x) {
         for (int y = 0; y < 12; ++y) {
-            if (point[x][y])
+            if (point[x][y] == Check::Checked)
                 ++count_point;
         }
     }

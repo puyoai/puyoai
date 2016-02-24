@@ -201,7 +201,7 @@ int READ_P::chousei_syoukyo()
     int num = 0;
     int numa = 0;
     int numb = 0;
-    int point[6][12] {};
+    Check point[6][12] {};
     int i, j;
     int syo = 1;
     int kiept[6] = { 0 };
@@ -213,12 +213,11 @@ int READ_P::chousei_syoukyo()
     b = setti_basyo[1];
     c = setti_basyo[2];
     d = setti_basyo[3];
-    //	memset(point, 0, sizeof(point));
     if ((b < 12) && (b >= 0)) {
         saiki(field, point, a, b, &numa, field[a][b]);
     }
     if ((d < 12) && (d >= 0)) {
-        if (point[c][d] == 0) {
+        if (point[c][d] != Check::Checked) {
             saiki(field, point, c, d, &numb, field[c][d]);
         }
     }
@@ -250,7 +249,7 @@ int READ_P::chousei_syoukyo()
 
     while (syo) {
         syo = 0;
-        memset(point, 0, sizeof(point));
+        std::fill_n(&point[0][0], 6 * 12, Check::Unchecked);
         rakkaflg[0] = 0;
         rakkaflg[1] = 0;
         rakkaflg[2] = 0;
@@ -261,7 +260,7 @@ int READ_P::chousei_syoukyo()
             for (j = kiept[i]; j < 12; j++) {
                 if (field[i][j] == PuyoColor::EMPTY)
                     continue;
-                if ((point[i][j] != 1) && (field[i][j] != PuyoColor::OJAMA)) {
+                if ((point[i][j] != Check::Unchecked) && (field[i][j] != PuyoColor::OJAMA)) {
                     saiki(field, point, i, j, &num, field[i][j]);
                     if (num > 3) {
                         syo = 1;
