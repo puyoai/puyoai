@@ -19,12 +19,8 @@ void READ_P::ref()
         tsumo[i] = PuyoColor::RED; // Why RED here?
         field12[i] = PuyoColor::EMPTY;
     }
-    act_on = 0;
     act_on_1st = 0;
-    nex_on = 0;
-    set_puyo = 0;
     set_puyo_once = 1;
-    rensa_end = 0;
     rensa_end_once = 0;
     score = 0;
     keep_score = 0;
@@ -42,12 +38,8 @@ READ_P::READ_P()
         tsumo[i] = PuyoColor::RED;
         field12[i] = PuyoColor::EMPTY;
     }
-    act_on = 0;
     act_on_1st = 0;
-    nex_on = 0;
-    set_puyo = 0;
     set_puyo_once = 1;
-    rensa_end = 0;
     rensa_end_once = 0;
     score = 0;
     keep_score = 0;

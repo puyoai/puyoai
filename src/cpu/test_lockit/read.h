@@ -22,11 +22,7 @@ public:
     CoreField field;
     CoreField yosou_field;
     PuyoColor tsumo[6];
-    int act_on;
-    int nex_on;
-    int set_puyo;
     int set_puyo_once;
-    int rensa_end;
     int score;
     int keep_score;
     int zenkesi;
