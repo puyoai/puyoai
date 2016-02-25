@@ -25,11 +25,11 @@ public:
     const __m256i& ymm() const { return m_; }
 
     bool get(HighLow highlow, int x, int y) const { return !_mm256_testz_si256(onebit(highlow, x, y), m_); }
-    void set(HighLow highlow, int x, int y) { m_ = m_ | onebit(highlow, x, y); }
-    void setHigh(int x, int y) { m_ = m_ | onebit(HighLow::HIGH, x, y); }
-    void setLow(int x, int y) { m_ = m_ | onebit(HighLow::LOW, x, y); }
+    void set(HighLow highlow, int x, int y) { m_ = _mm256_or_si256(m_, onebit(highlow, x, y)); }
+    void setHigh(int x, int y) { m_ = _mm256_or_si256(m_, onebit(HighLow::HIGH, x, y)); }
+    void setLow(int x, int y) { m_ = _mm256_or_si256(m_, onebit(HighLow::LOW, x, y)); }
 
-    void setAll(FieldBits256 m) { m_ = m_ | m; }
+    void setAll(FieldBits256 m) { m_ = _mm256_or_si256(m_, m); }
 
     std::pair<int, int> popcountHighLow() const;
 
@@ -120,23 +120,23 @@ inline bool FieldBits256::findVanishingBits(FieldBits256* vanishing) const
     __m256i l = _mm256_and_si256(_mm256_slli_si256(m_, 2), m_);
     __m256i r = _mm256_and_si256(_mm256_srli_si256(m_, 2), m_);
 
-    __m256i ud_and = u & d;
-    __m256i lr_and = l & r;
-    __m256i ud_or = u | d;
-    __m256i lr_or = l | r;
+    __m256i ud_and = _mm256_and_si256(u, d);
+    __m256i lr_and = _mm256_and_si256(l, r);
+    __m256i ud_or = _mm256_or_si256(u, d);
+    __m256i lr_or = _mm256_or_si256(l, r);
 
-    __m256i twos = lr_and | ud_and | (ud_or & lr_or);
-    __m256i two_d = _mm256_slli_epi16(twos, 1) & twos;
-    __m256i two_l = _mm256_slli_si256(twos, 2) & twos;
-    __m256i threes = (ud_and & lr_or) | (lr_and & ud_or);
-    *vanishing = two_d | two_l | threes;
+    __m256i twos = _mm256_or_si256(_mm256_or_si256(lr_and, ud_and), _mm256_and_si256(ud_or, lr_or));
+    __m256i two_d = _mm256_and_si256(_mm256_slli_epi16(twos, 1), twos);
+    __m256i two_l = _mm256_and_si256(_mm256_slli_si256(twos, 2), twos);
+    __m256i threes = _mm256_or_si256(_mm256_and_si256(ud_and, lr_or), _mm256_and_si256(lr_and, ud_or));
+    *vanishing = _mm256_or_si256(two_d, _mm256_or_si256(two_l, threes));
 
     if (vanishing->isEmpty())
         return false;
 
-    __m256i two_u = _mm256_srli_epi16(twos, 1) & twos;
-    __m256i two_r = _mm256_srli_si256(twos, 2) & twos;
-    *vanishing = (*vanishing | two_u | two_r).expand1(m_);
+    __m256i two_u = _mm256_and_si256(_mm256_srli_epi16(twos, 1), twos);
+    __m256i two_r = _mm256_and_si256(_mm256_srli_si256(twos, 2), twos);
+    *vanishing = FieldBits256(_mm256_or_si256(*vanishing, _mm256_or_si256(two_u, two_r))).expand1(m_);
     return true;
 }
 
