@@ -94,10 +94,10 @@ FrameResponse sendmes(READ_P* p1, COMAI_HI* coo)
 {
     stringstream ss;
     ss << "you="
-       << "x-r:" << p1->te_x << p1->te_r << " "
+       << "x-r:" << p1->decision.x << p1->decision.r << " "
        << "nok:" << coo->m_aite_hakka_nokori;
 
-    return FrameResponse(p1->id, Decision(p1->te_x, p1->te_r), ss.str());
+    return FrameResponse(p1->id, p1->decision, ss.str());
 }
 
 bool isTsumoValid(PuyoColor tsumo[6])
@@ -226,8 +226,6 @@ void TestLockitAI::onDecisionRequestedForMe(const FrameRequest&)
     }
 
     int tmp = 0;
-    r_player[0].te_x = 0;
-    r_player[0].te_r = 0;
     int saidaiten = coma.m_para[0];
 
     int coma2x_sc[22] {};
@@ -247,19 +245,15 @@ void TestLockitAI::onDecisionRequestedForMe(const FrameRequest&)
     }
 
     if (tmp < 6) {
-        r_player[0].te_x = tmp + 1;
-        r_player[0].te_r = 0;
+        r_player[0].decision = Decision(tmp + 1, 0);
     } else if (tmp < 12) {
-        r_player[0].te_x = tmp - 6 + 1;
-        r_player[0].te_r = 2;
+        r_player[0].decision = Decision(tmp - 6 + 1, 2);
     } else if (tmp < 17) {
-      // In case r=3, we use 2 <= x <= 6.
-        r_player[0].te_x = tmp - 12 + 2;
-        r_player[0].te_r = 3;
+        // In case r=3, we use 2 <= x <= 6.
+        r_player[0].decision = Decision(tmp - 12 + 2, 3);
     } else if (tmp < 22) {
-      // In case r=1, we use 1 <= x <= 5.
-        r_player[0].te_x = tmp - 17 + 1;
-        r_player[0].te_r = 1;
+        // In case r=1, we use 1 <= x <= 5.
+        r_player[0].decision = Decision(tmp - 17 + 1, 1);
     }
     if (r_player[0].setti_puyo()) {
         r_player[0].zenkesi = 0;

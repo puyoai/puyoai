@@ -26,8 +26,7 @@ void READ_P::ref()
     keep_score = 0;
     zenkesi = 0;
     id = 0;
-    te_x = 3;
-    te_r = 0;
+    decision = Decision(3, 0);
 }
 
 READ_P::READ_P()
@@ -45,8 +44,7 @@ READ_P::READ_P()
     keep_score = 0;
     zenkesi = 0;
     id = 0;
-    te_x = 3;
-    te_r = 0;
+    decision = Decision(3, 0);
 }
 
 READ_P::~READ_P()
@@ -83,7 +81,6 @@ int READ_P::setti_puyo()
 {
     PuyoColor nx1 = tsumo[0];
     PuyoColor nx2 = tsumo[1];
-    Decision decision(te_x, te_r);
     field.dropKumipuyo(decision, Kumipuyo(nx1, nx2));
     RensaResult result = field.simulate();
     yosou_field = field;

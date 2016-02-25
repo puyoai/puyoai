@@ -2,6 +2,7 @@
 #define CPU_TEST_LOCKIT_READ_H_
 
 #include "core/core_field.h"
+#include "core/decision.h"
 #include "core/puyo_color.h"
 #include "lockit_constant.h"
 
@@ -27,8 +28,7 @@ public:
     int keep_score;
     int zenkesi;
     int id;
-    int te_x;
-    int te_r;
+    Decision decision;
 
 private:
     PuyoColor field12[6];
