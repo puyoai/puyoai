@@ -13,6 +13,7 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
+#include "base/file.h"
 #include "gui/util.h"
 
 using namespace std;
@@ -35,7 +36,7 @@ void Screen::init()
         CHECK_EQ(TTF_Init(), 0) << TTF_GetError();
     }
 
-    string fontFilePath = string(DATA_DIR) + "/mikachan-p.ttf";
+    string fontFilePath = file::joinPath(DATA_DIR, "mikachan-p.ttf");
     if (access(fontFilePath.c_str(), R_OK) == 0) {
         font_ = TTF_OpenFont(fontFilePath.c_str(), 16);
     }
