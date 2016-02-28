@@ -99,6 +99,7 @@ add_definitions(-DRECOGNITION_DIR="${CMAKE_SOURCE_DIR}/../recognition")
 
 if(MSVC)
   add_definitions(-DGOOGLE_GLOG_DLL_DECL=)
+  add_definitions(-DNOMINMAX)
 endif()
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" build_type)

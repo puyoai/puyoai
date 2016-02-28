@@ -18,7 +18,7 @@ public:
     virtual ~Cui() {}
 
     virtual void clear();
-    virtual void flush();
+    void flush();
 
     virtual void newGameWillStart() override;
     virtual void onUpdate(const GameState&) override;
@@ -64,8 +64,6 @@ protected:
 
     std::unordered_map<Location, ColoredText, Location::Hash> printPuyoCache_;
     std::unordered_map<Location, std::string, Location::Hash> printTextCache_;
-
-private:
 };
 
 #endif  // DUEL_CUI_H_

@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 2.8)
 
+if(MSVC)
+    set(cui_cc cui.cc cui_win.cc)
+else()
+    set(cui_cc cui.cc)
+endif()
+
 add_library(puyoai_duel
-            cui.cc duel_server.cc field_realtime.cc frame_context.cc puyofu_recorder.cc)
+            ${cui_cc} duel_server.cc field_realtime.cc frame_context.cc puyofu_recorder.cc)
 
 add_executable(duel main.cc)
 

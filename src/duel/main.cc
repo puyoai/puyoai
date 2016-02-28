@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <signal.h>
-#if !defined(_MSC_VER)
+#if OS_POSIX
 #include <libgen.h>
 #endif
 #include <gflags/gflags.h>
@@ -19,6 +19,9 @@
 #include "core/server/game_state.h"
 #include "core/server/game_state_observer.h"
 #include "duel/cui.h"
+#if OS_WIN
+#include "duel/cui_win.h"
+#endif
 #include "duel/duel_server.h"
 #include "duel/puyofu_recorder.h"
 
@@ -147,7 +150,11 @@ int main(int argc, char* argv[])
 
     unique_ptr<Cui> cui;
     if (FLAGS_use_cui) {
+#if OS_WIN
+        cui.reset(new CuiWin);
+#else
         cui.reset(new Cui);
+#endif
         cui->clear();
     }
 
