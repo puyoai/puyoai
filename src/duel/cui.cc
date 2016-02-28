@@ -75,6 +75,7 @@ void Cui::printField(int playerId, const PlayerGameState& pgs)
                       puyoText(color, y));
         }
     }
+    setColor(PuyoColor::EMPTY);
 }
 
 void Cui::printNextPuyo(int playerId, const PlayerGameState& pgs)
@@ -91,6 +92,7 @@ void Cui::printNextPuyo(int playerId, const PlayerGameState& pgs)
         printPuyo(locate(playerId, 9 * 2, 3 + i + (i / 2)),
                   puyoText(pgs.kumipuyoSeq.color(npp[i])));
     }
+    setColor(PuyoColor::EMPTY);
 }
 
 void Cui::printMessage(int playerId, const std::string& message)
@@ -103,14 +105,14 @@ void Cui::printMessage(int playerId, const std::string& message)
     // Reset location of the cursor.
     int i = 0;
     for (size_t from = 0; from < message.size(); ++i) {
-      size_t p = message.find(from, '\n');
-      if (p == string::npos || i == kMaxMessageLines - 1)
-        p = message.size();
-      printText(locate(1, baseRow + i), message.substr(from, p - from));
-      from = p + 1;
+        size_t p = message.find(from, '\n');
+        if (p == string::npos || i == kMaxMessageLines - 1)
+            p = message.size();
+        printText(locate(1, baseRow + i), message.substr(from, p - from));
+        from = p + 1;
     }
     for (; i < kMaxMessageLines; ++i) {
-      printText(locate(1, baseRow + i), ColoredText(PuyoColor::EMPTY, ""));
+        printText(locate(1, baseRow + i), "");
     }
 }
 
@@ -149,22 +151,20 @@ void Cui::printPuyo(const Location& location, const ColoredText& text)
     setCursor(location);
     setColor(text.color);
     cout << text.text;
-    setColor(PuyoColor::EMPTY);
     prev = text;
 }
 
-void Cui::printText(const Location& location, const ColoredText& text)
+void Cui::printText(const Location& location, const string& text)
 {
     auto& prev = printTextCache_[location];
     if (prev == text)
         return;
 
     setCursor(location);
-    setColor(text.color);
-    cout << text.text;
-    if (text.text.size() < prev.text.size())
-      cout << string(prev.text.size() - text.text.size() + 2, ' ');
-    prev = text;
+    cout << text;
+    if (text.size() < prev.size())
+        cout << string(prev.size() - text.size(), ' ');
+    printTextCache_[location] = text;
 }
 
 void Cui::setCursor(const Location& location)
@@ -194,7 +194,6 @@ void Cui::setColor(PuyoColor color)
         colorCode = C_YELLOW;
         break;
     default:
-        // colorCode = C_BLACK;
         break;
     }
     cout << colorCode;

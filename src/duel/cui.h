@@ -53,7 +53,7 @@ protected:
     void printMessage(int playerId, const std::string& message);
 
     void printPuyo(const Location& location, const ColoredText& text);
-    void printText(const Location& location, const ColoredText& text);
+    void printText(const Location& location, const std::string& text);
 
     virtual void setCursor(const Location& location);
     virtual void setCursor(int x, int y);
@@ -63,7 +63,7 @@ protected:
     static ColoredText puyoText(PuyoColor color, int y = 0);
 
     std::unordered_map<Location, ColoredText, Location::Hash> printPuyoCache_;
-    std::unordered_map<Location, ColoredText, Location::Hash> printTextCache_;
+    std::unordered_map<Location, std::string, Location::Hash> printTextCache_;
 
 private:
 };
