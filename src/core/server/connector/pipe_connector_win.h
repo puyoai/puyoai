@@ -1,7 +1,6 @@
 #ifndef CORE_SERVER_CONNECTOR_PIPE_CONNECTOR_WIN_H_
 #define CORE_SERVER_CONNECTOR_PIPE_CONNECTOR_WIN_H_
 
-#define NOMINMAX
 #include <windows.h>
 
 #include <cstdio>

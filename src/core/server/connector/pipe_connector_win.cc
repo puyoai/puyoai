@@ -1,6 +1,5 @@
 #include "core/server/connector/pipe_connector_win.h"
 
-#define NOMINMAX
 #include <windows.h>
 #undef ERROR
 
@@ -175,6 +174,7 @@ bool PipeConnectorWin::writeData(const void* data, size_t size)
     }
 
     FlushFileBuffers(writer_);
+    return true;
 }
 
 bool PipeConnectorWin::readData(void* data, size_t size)
