@@ -24,6 +24,7 @@ public:
     virtual void onUpdate(const GameState&) override;
 
 protected:
+    // Figures where the cursor is. {x=1, y=1} figures the top-left corner.
     struct Location {
         int x, y;
         Location(int a, int b) : x(a), y(b) {}
@@ -35,6 +36,7 @@ protected:
             }
         };
     };
+    // TODO(peria): Remove this struct. We don't have to keep both color and text.
     struct ColoredText {
         PuyoColor color;
         std::string text;
