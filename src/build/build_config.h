@@ -1,5 +1,5 @@
-#ifndef BASE_BUILD_CONFIG_H_
-#define BASE_BUILD_CONFIG_H_
+#ifndef BUILD_BUILD_CONFIG_H_
+#define BUILD_BUILD_CONFIG_H_
 
 // build_config.h defines macro about the platform we're currnetly building on.
 //

@@ -148,6 +148,7 @@ function(puyoai_target_link_libraries target)
 endfunction()
 
 add_subdirectory(base)
+add_subdirectory(build)
 add_subdirectory(core)
 add_subdirectory(cpu)
 add_subdirectory(duel)

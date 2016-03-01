@@ -1,7 +1,7 @@
 #ifndef BASE_COMPILER_SPECIFIC_H_
 #define BASE_COMPILER_SPECIFIC_H_
 
-#include "base/build_config.h"
+#include "build/build_config.h"
 
 #ifndef __has_feature
 #  define __has_feature(x) 0
