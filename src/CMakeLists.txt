@@ -77,6 +77,10 @@ if(MSVC)
     add_compile_options("/wd4244")  # from uint64 to int
     add_compile_options("/wd4267")  # from size_t to int
     add_compile_options("/wd4800")  # from int to bool
+
+    # include build_config always.h
+    # TODO(mayah): Enable this if this works.
+    # add_compile_options("/FI" "${CMAKE_SOURCE_DIR}/build/build_config.h")
 else()
     if(CYGWIN AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11" CACHE STRING "" FORCE)
@@ -90,6 +94,9 @@ else()
     if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         add_compile_options("-Werror")
     endif()
+
+    # Always include build/build_config.h
+    add_compile_options("-include" "${CMAKE_SOURCE_DIR}/build/build_config.h")
 endif()
 
 add_definitions(-DSRC_DIR="${CMAKE_SOURCE_DIR}")
