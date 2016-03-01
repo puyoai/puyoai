@@ -124,7 +124,7 @@ void Cui::print(int playerId, const PlayerGameState& pgs)
     printMessage(playerId, pgs.message);
     printScore(playerId, pgs.score);
 
-    setCursor(0, FieldConstant::MAP_HEIGHT + 3);
+    setCursor(1, FieldConstant::MAP_HEIGHT + 3);
 }
 
 void Cui::printScore(int playerId, int score)
