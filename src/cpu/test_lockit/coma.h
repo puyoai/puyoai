@@ -5,6 +5,8 @@
 #include "cpu_configuration.h"
 #include "lockit_constant.h"
 
+class CoreField;
+
 namespace test_lockit {
 
 const int tubushiturn = 13;
@@ -17,10 +19,10 @@ public:
     explicit COMAI_HI(const cpu::Configuration& config);
     ~COMAI_HI();
 
-    int aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[]);
+    int aite_hyouka(const CoreField& field, PuyoColor tsumo[]);
     int pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight], int zenkesi_aite, int fast);
     int hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight], int zenkesi_aite);
-    bool aite_attack_start(const PuyoColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata);
+    bool aite_attack_start(CoreField field, int zenkesi_aite, int scos, int hakata);
     int aite_attack_nokori(const PuyoColor ba3[6][kHeight], int hakata);
     int aite_rensa_end();
     void ref();

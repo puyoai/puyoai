@@ -16,6 +16,22 @@ public:
 protected:
     FrameResponse playOneFrame(const FrameRequest&) override;
 
+    void onGameWillBegin(const FrameRequest&);
+    void onGameHasEnded(const FrameRequest&);
+
+    void onPreDecisionRequestedForMe(const FrameRequest&);
+    void onDecisionRequestedForMe(const FrameRequest&);
+    void onGroundedForMe(const FrameRequest&);
+    void onPuyoErasedForMe(const FrameRequest&);
+    void onOjamaDroppedForMe(const FrameRequest&);
+    void onNext2AppearedForMe(const FrameRequest&);
+
+    void onDecisionRequestedForEnemy(const FrameRequest&);
+    void onGroundedForEnemy(const FrameRequest&);
+    void onPuyoErasedForEnemy(const FrameRequest&);
+    void onOjamaDroppedForEnemy(const FrameRequest&);
+    void onNext2AppearedForEnemy(const FrameRequest&);
+
 private:
     const cpu::Configuration config;
     COMAI_HI coma;
