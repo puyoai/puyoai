@@ -43,9 +43,9 @@ private:
   int finished_games_;
   int eval_cnt_;
   int base_seed_;
-#ifdef OS_LINUX
+#ifdef GOOGLE3
   PuyoCloudManager* puyo_cloud_;
-#endif // OS_LINUX
+#endif // GOOGLE3
 };
 
 #endif  // HAMAJI_RATER_H_
