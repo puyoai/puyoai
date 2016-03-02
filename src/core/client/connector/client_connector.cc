@@ -48,8 +48,8 @@ void ClientConnector::send(const FrameResponse& resp)
     string s = resp.toString();
 
     // Send size as header.
-    uint32_t buf = s.size();
-    cout.write(reinterpret_cast<char*>(&buf), sizeof(buf));
+    uint32_t size = s.size();
+    cout.write(reinterpret_cast<char*>(&size), sizeof(size));
     cout.write(s.data(), s.size());
     cout.flush();
 

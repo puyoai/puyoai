@@ -24,6 +24,11 @@ unique_ptr<Connector> PipeConnectorWin::create(int playerId, const string& progr
 
     // Skip "fifo:" check
 
+    // Create two pipes between server (duel) and clients.
+    // Server  --(writer)====[[StdIn]]====(reader)--> Client
+    // Server <--(reader)===[[StdOut]]====(writer)--  Client
+    // Server uses StdInWriter and StdOutReader handles,
+    // and clients use StdInReader and StdOutWriter.
     SECURITY_ATTRIBUTES security;
     security.nLength = sizeof(security);
     security.bInheritHandle = true;
@@ -35,25 +40,26 @@ unique_ptr<Connector> PipeConnectorWin::create(int playerId, const string& progr
     if (!CreatePipe(&hChildStdOutReader, &hChildStdOutWriter, &security, 0)) {
         LOG(ERROR) << "Fail to creat pipe for stdout.";
     }
+    // Ensure the read handle to the pipe for STDOUT is not inherited.
     if (!SetHandleInformation(hChildStdOutReader, HANDLE_FLAG_INHERIT, 0)) {
-        LOG(ERROR) << "Stdout reader is inherited.";
+        LOG(ERROR) << "Fail to prohibit inheritance of stdout reader.";
     }
 
     // Prepare a pipe from server to client.
     HANDLE hChildStdInReader = nullptr;
     HANDLE hChildStdInWriter = nullptr;
-    if (!CreatePipe(&hChildStdInWriter, &hChildStdInReader, &security, 0)) {
+    if (!CreatePipe(&hChildStdInReader, &hChildStdInWriter, &security, 0)) {
         LOG(ERROR) << "Fail to creat pipe for stdin.";
     }
+    // Ensure the write handle to the pipe for STDIN is not inherited.
     if (!SetHandleInformation(hChildStdInWriter, HANDLE_FLAG_INHERIT, 0)) {
-        LOG(ERROR) << "Stdin writer is inherited.";
+        LOG(ERROR) << "Fail to prohibit inheritance of stdin writer.";
     }
 
     // Create child process
     STARTUPINFO startupInfo;
     ZeroMemory(&startupInfo, sizeof(startupInfo));
     startupInfo.cb = sizeof(startupInfo);
-    startupInfo.hStdError = hChildStdOutWriter;
     startupInfo.hStdOutput = hChildStdOutWriter;
     startupInfo.hStdInput = hChildStdInReader;
     startupInfo.dwFlags |= STARTF_USESTDHANDLES;
@@ -168,12 +174,11 @@ bool PipeConnectorWin::writeData(const void* data, size_t size)
         DWORD wroteSize;
         if (!WriteFile(writer_, data, size, &wroteSize, nullptr))
             return false;
-        // TODO(mayah): data += wroteSize will do, but it's gnu extension.
+
         data = reinterpret_cast<const void*>(reinterpret_cast<const char*>(data) + wroteSize);
         size -= wroteSize;
     }
 
-    FlushFileBuffers(writer_);
     return true;
 }
 
@@ -183,7 +188,7 @@ bool PipeConnectorWin::readData(void* data, size_t size)
         DWORD readSize;
         if (!ReadFile(reader_, data, size, &readSize, nullptr))
             return false;
-        // TODO(mayah): data += readSize will do, but it's gnu extension.
+
         data = reinterpret_cast<void*>(reinterpret_cast<char*>(data) + readSize);
         size -= readSize;
     }
