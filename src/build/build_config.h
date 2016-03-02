@@ -21,7 +21,7 @@
 #elif defined(__FreeBSD__)
 #  define OS_FREEBSD 1
 #else
-#  error "Please add support for your platform base/build_config.h"
+#  error "Please add support for your platform build/build_config.h"
 #endif
 
 #if defined(OS_LINUX) || defined(OS_MACOSX) || defined(OS_FREEBSD)
@@ -35,7 +35,7 @@
 #elif defined(_MSC_VER)
 #  define COMPILER_MSVC 1
 #else
-#  error "Please add support for your compiler base/build_config.h"
+#  error "Please add support for your compiler build/build_config.h"
 #endif
 
 // TODO(mayah): What happens when clang-cl is used?
@@ -43,4 +43,4 @@
 #  define COMPILER_GCC_COMPATIBLE 1
 #endif
 
-#endif // BASE_BUILD_CONFIG_H_
+#endif // BUILD_BUILD_CONFIG_H_
