@@ -52,7 +52,7 @@ DEFINE_string(record, "", "use Puyofu Recorder. 'transition' for transition log,
 DEFINE_bool(ignore_sigpipe, false, "true to ignore SIGPIPE");
 #ifdef USE_HTTPD
 DEFINE_bool(httpd, false, "use httpd");
-DEFINE_int32(port, 8000, "httpd port");
+DEFINE_int32(httpd_port, 8000, "httpd port");
 DECLARE_string(data_dir);
 #endif
 
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
     unique_ptr<HttpServer> httpServer;
     if (FLAGS_httpd) {
         gameStateHandler.reset(new GameStateHandler);
-        httpServer.reset(new HttpServer(FLAGS_port));
+        httpServer.reset(new HttpServer(FLAGS_httpd_port));
         httpServer->installHandler("/data", [&](const HttpRequest& req, HttpResponse* res){
             gameStateHandler->handle(req, res);
         });
