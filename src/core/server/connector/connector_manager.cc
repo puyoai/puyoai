@@ -18,18 +18,19 @@
 
 using namespace std;
 
-ConnectorManager::ConnectorManager(unique_ptr<Connector> p1, unique_ptr<Connector> p2, bool timeout) :
-    connectors_{ move(p1), move(p2) },
+ConnectorManager::ConnectorManager(bool timeout) :
     waitTimeout_(timeout)
 {
-    for (int i = 0; i < NUM_PLAYERS; ++i) {
-        Connector* ctr = connector(i);
-        if (ctr->isHuman()) {
-            humanConnectors_.push_back(static_cast<HumanConnector*>(ctr));
-        } else {
-            pipeConnectors_.push_back(static_cast<PipeConnector*>(ctr));
-        }
+}
+
+void ConnectorManager::setConnector(int playerId, std::unique_ptr<Connector> p)
+{
+    if (p->isHuman()) {
+        humanConnectors_.push_back(static_cast<HumanConnector*>(p.get()));
+    } else {
+        pipeConnectors_.push_back(static_cast<PipeConnector*>(p.get()));
     }
+    connectors_[playerId] = std::move(p);
 }
 
 bool ConnectorManager::receive(int frameId, vector<FrameResponse> cfr[NUM_PLAYERS])
@@ -49,4 +50,3 @@ bool ConnectorManager::receive(int frameId, vector<FrameResponse> cfr[NUM_PLAYER
     return PipeConnectorPosix::pollAndReceive(waitTimeout_, frameId, pipeConnectors_, cfr);
 #endif
 }
-

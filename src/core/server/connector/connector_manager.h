@@ -15,7 +15,9 @@ class ConnectorManager {
 public:
     // Receives decision and messages from clients.
     // Returns false when disconnected.
-    ConnectorManager(std::unique_ptr<Connector> p1, std::unique_ptr<Connector> p2, bool timeout);
+    explicit ConnectorManager(bool timeout);
+
+    void setConnector(int playerId, std::unique_ptr<Connector> p);
 
     bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS]);
 

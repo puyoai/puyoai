@@ -130,10 +130,9 @@ int main(int argc, char* argv[])
     }
 #endif
 
-    ConnectorManager manager(
-        Connector::create(0, string(argv[1])),
-        Connector::create(1, string(argv[2])),
-        true);
+    ConnectorManager manager(true);
+    manager.setConnector(0, Connector::create(0, string(argv[1])));
+    manager.setConnector(1, Connector::create(1, string(argv[2])));
 
 #ifdef USE_HTTPD
     unique_ptr<GameStateHandler> gameStateHandler;
