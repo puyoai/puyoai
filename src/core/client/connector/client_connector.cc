@@ -2,7 +2,6 @@
 
 #include <glog/logging.h>
 
-#include <iostream>
 #include <string>
 
 #include "core/frame_request.h"
@@ -14,13 +13,17 @@ namespace {
 const int kBufferSize = 1024;
 } // namespace anonymous
 
+ClientConnector::~ClientConnector()
+{
+}
+
 bool ClientConnector::receive(FrameRequest* frameRequest)
 {
     if (closed_)
         return false;
 
     FrameRequestHeader header;
-    if (!cin.read(reinterpret_cast<char*>(&header), sizeof(header))) {
+    if (!readExactly(reinterpret_cast<char*>(&header), sizeof(header))) {
         LOG(ERROR) << "unexpected eof when reading header";
         return false;
     }
@@ -31,7 +34,7 @@ bool ClientConnector::receive(FrameRequest* frameRequest)
     }
 
     char payload[kBufferSize + 1];
-    if (!cin.read(payload, header.size)) {
+    if (!readExactly(payload, header.size)) {
         LOG(ERROR) << "unepxected eof when reading payload";
         return false;
     }
@@ -49,9 +52,9 @@ void ClientConnector::send(const FrameResponse& resp)
 
     // Send size as header.
     uint32_t size = s.size();
-    cout.write(reinterpret_cast<char*>(&size), sizeof(size));
-    cout.write(s.data(), s.size());
-    cout.flush();
+    writeExactly(&size, sizeof(size));
+    writeExactly(s.data(), s.size());
+    flush();
 
     LOG(INFO) << "SEND: " << s;
 }

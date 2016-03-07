@@ -1,7 +1,7 @@
 #ifndef CORE_CLIENT_RAW_AI_H_
 #define CORE_CLIENT_RAW_AI_H_
 
-#include "core/client/connector/client_connector.h"
+#include "core/client/connector/stdio_client_connector.h"
 
 struct FrameRequest;
 struct FrameResponse;
@@ -16,7 +16,7 @@ protected:
     virtual FrameResponse playOneFrame(const FrameRequest&) = 0;
 
 private:
-    ClientConnector connector_;
+    StdioClientConnector connector_;
 };
 
 #endif

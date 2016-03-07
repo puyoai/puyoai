@@ -4,7 +4,7 @@
 #include <string>
 
 #include "core/client/ai/drop_decision.h"
-#include "core/client/connector/client_connector.h"
+#include "core/client/connector/stdio_client_connector.h"
 #include "core/kumipuyo_seq.h"
 #include "core/player_state.h"
 
@@ -128,7 +128,7 @@ private:
     KumipuyoSeq rememberedSequence(int indexFrom, const KumipuyoSeq& provided) const;
 
     std::string name_;
-    ClientConnector connector_;
+    StdioClientConnector connector_;
 
     bool desynced_;
 
