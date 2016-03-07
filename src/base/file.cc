@@ -96,5 +96,16 @@ bool readFile(const std::string& filename, string* output)
     return true;
 }
 
-} // namespace file
+bool remove(const std::string& filename)
+{
+#ifdef OS_WIN
+    // TODO(mayah): Windows version?
+    LOG(FATAL) << "file::remove() is not implemented yet";
+    return false;
+#else
+    int r = ::unlink(filename.c_str());
+    return r == 0;
+#endif
+}
 
+} // namespace file

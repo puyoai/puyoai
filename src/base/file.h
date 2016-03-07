@@ -21,6 +21,10 @@ bool listFiles(const std::string& path, std::vector<std::string>* files);
 // Reads file from |filename| and copy to |output|.
 bool readFile(const std::string& filename, std::string* output);
 
+// Removes a file.
+// Returns true if succeeded.
+bool remove(const std::string& filename);
+
 } // namespace file
 
 #endif
