@@ -52,7 +52,7 @@ TEST(FieldTest, Saiki) {
     int count_point = 0;
     for (int x = 0; x < 6; ++x) {
         for (int y = 0; y < 12; ++y) {
-            if (point[x][y] == Check::Checked)
+            if (point[x][y] != Check::Unchecked)
                 ++count_point;
         }
     }

@@ -598,7 +598,7 @@ int chousei_syoukyo_3(PuyoColor bass[][kHeight], int[], int* poi2s, int* score, 
         rakkaflg[5] = 0;
         for (i = 0; i < 6; i++) {
             for (j = kiept[i]; j < 12; j++) {
-                if (point[i][j] == Check::Checked)
+                if (point[i][j] != Check::Unchecked)
                     continue;
                 if (bass[i][j] == PuyoColor::EMPTY)
                     break;

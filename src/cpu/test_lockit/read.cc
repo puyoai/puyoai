@@ -217,7 +217,7 @@ int READ_P::chousei_syoukyo()
         saiki(field, point, a, b, &numa, field[a][b]);
     }
     if ((d < 12) && (d >= 0)) {
-        if (point[c][d] != Check::Checked) {
+        if (point[c][d] == Check::Unchecked) {
             saiki(field, point, c, d, &numb, field[c][d]);
         }
     }
@@ -260,7 +260,7 @@ int READ_P::chousei_syoukyo()
             for (j = kiept[i]; j < 12; j++) {
                 if (field[i][j] == PuyoColor::EMPTY)
                     continue;
-                if ((point[i][j] != Check::Unchecked) && (field[i][j] != PuyoColor::OJAMA)) {
+                if ((point[i][j] != Check::Checked) && (field[i][j] != PuyoColor::OJAMA)) {
                     saiki(field, point, i, j, &num, field[i][j]);
                     if (num > 3) {
                         syo = 1;

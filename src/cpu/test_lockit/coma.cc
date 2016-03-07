@@ -105,13 +105,13 @@ void UpdateAccessibility(PuyoColor ba[6][kHeight], Check point2[6][12])
                 if (isRightEmpty
                     && (i != 4 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))
                     && (i != 3 || ba[3][11] == PuyoColor::EMPTY)) {
-                    point2[i][j] = Check::ColorWithEmptyR;
+                    point2[i][j] = Check::ColorWithEmptyL;
                     continue;
                 }
                 if (isLeftEmpty
                     && (i != 1 || ba[1][11] == PuyoColor::EMPTY)
                     && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
-                    point2[i][j] = Check::ColorWithEmptyL;
+                    point2[i][j] = Check::ColorWithEmptyR;
                     continue;
                 }
             }
