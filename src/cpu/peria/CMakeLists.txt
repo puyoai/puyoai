@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("peria")
 
-add_library(peria_lib ai.cc pattern.cc evaluator.cc)
+add_library(peria_lib
+  pai.cc situation.cc
+  ai.cc evaluator.cc
+  pattern.cc)
 
 function(peria_add_executable exe)
   cpu_add_executable(${exe} ${ARGN})
@@ -23,6 +26,7 @@ peria_add_executable(tokopuyo tokopuyo.cc)
 
 cpu_add_runner(run.sh)
 cpu_add_runner(run.bat)
+cpu_add_runner(pai.sh)
 
 cpu_add_runner(book.txt)
 

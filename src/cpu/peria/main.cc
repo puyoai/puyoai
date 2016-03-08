@@ -3,9 +3,11 @@
 #include <fstream>
 
 #include "cpu/peria/ai.h"
+#include "cpu/peria/pai.h"
 #include "cpu/peria/pattern.h"
 
 DECLARE_string(pattern);
+DEFINE_int32(type, 0, "AI type");
 
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
@@ -23,7 +25,17 @@ int main(int argc, char* argv[]) {
     LOG(INFO) << "Failed in loading " << FLAGS_pattern;
   }
 
-  peria::Ai(argc, argv).runLoop();
+  std::unique_ptr<AI> ai;
+  switch (FLAGS_type) {
+  case 0:
+    ai.reset(new peria::Ai(argc, argv));
+    break;
+  case 1:
+    ai.reset(new peria::Pai(argc, argv));
+    break;
+  }
+  CHECK(ai);
+  ai->runLoop();
 
   return 0;
 }
