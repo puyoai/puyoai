@@ -2,15 +2,21 @@
 
 #include <glog/logging.h>
 
+#include "core/client/connector/stdio_client_connector.h"
 #include "core/frame_request.h"
 #include "core/frame_response.h"
+
+RawAI::RawAI() :
+    connector_(new StdioClientConnector)
+{
+}
 
 void RawAI::runLoop()
 {
     while (true) {
         FrameRequest frameRequest;
-        if (!connector_.receive(&frameRequest)) {
-            if (connector_.isClosed()) {
+        if (!connector_->receive(&frameRequest)) {
+            if (connector_->isClosed()) {
                 LOG(INFO) << "connection is closed";
                 break;
             }
@@ -21,6 +27,6 @@ void RawAI::runLoop()
         if (!frameRequest.isValid())
             continue;
 
-        connector_.send(playOneFrame(frameRequest));
+        connector_->send(playOneFrame(frameRequest));
     }
 }

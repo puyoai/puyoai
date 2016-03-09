@@ -1,10 +1,10 @@
 #include "core/client/ai/ai.h"
 
+#include <algorithm>
 #include <glog/logging.h>
 
-#include <algorithm>
-
 #include "base/base.h"
+#include "core/client/connector/stdio_client_connector.h"
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/field_pretty_printer.h"
@@ -44,6 +44,7 @@ AI::AI(int argc, char* argv[], const string& name) :
 
 AI::AI(const string& name) :
     name_(name),
+    connector_(new StdioClientConnector),
     desynced_(false),
     rethinkRequested_(false),
     enemyDecisionRequestFrameId_(0),
@@ -70,8 +71,8 @@ void AI::runLoop()
         google::FlushLogFiles(google::INFO);
 
         FrameRequest frameRequest;
-        if (!connector_.receive(&frameRequest)) {
-            if (connector_.isClosed()) {
+        if (!connector_->receive(&frameRequest)) {
+            if (connector_->isClosed()) {
                 LOG(INFO) << "connection is closed";
                 break;
             }
@@ -80,7 +81,7 @@ void AI::runLoop()
         }
 
         if (!frameRequest.isValid()) {
-            connector_.send(FrameResponse(frameRequest.frameId));
+            connector_->send(FrameResponse(frameRequest.frameId));
             continue;
         }
 
@@ -170,7 +171,7 @@ void AI::runLoop()
                                               myPlayerState(),
                                               enemyPlayerState(),
                                               true);
-            connector_.send(FrameResponse(frameRequest.frameId, dropDecision.decision(), dropDecision.message()));
+            connector_->send(FrameResponse(frameRequest.frameId, dropDecision.decision(), dropDecision.message()));
             continue;
         }
 
@@ -185,7 +186,7 @@ void AI::runLoop()
                 resp.preDecision = next1.dropDecision.decision();
             }
 
-            connector_.send(resp);
+            connector_->send(resp);
             continue;
         }
 
@@ -219,7 +220,7 @@ void AI::runLoop()
         }
 
         // Send
-        connector_.send(FrameResponse(frameRequest.frameId, next1.dropDecision.decision(), next1.dropDecision.message()));
+        connector_->send(FrameResponse(frameRequest.frameId, next1.dropDecision.decision(), next1.dropDecision.message()));
         nextThinkFrameId =
             frameRequest.frameId +
             next1.fieldBeforeThink.framesToDropNext(next1.dropDecision.decision()) +
