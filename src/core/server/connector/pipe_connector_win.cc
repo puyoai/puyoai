@@ -18,7 +18,7 @@ using namespace std;
 DEFINE_bool(realtime, true, "use realtime");
 
 // static
-unique_ptr<Connector> PipeConnectorWin::create(int playerId, const string& programName)
+unique_ptr<ServerConnector> PipeConnectorWin::create(int playerId, const string& programName)
 {
     CHECK(0 <= playerId && playerId < 10) << playerId;
 

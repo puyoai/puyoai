@@ -26,7 +26,7 @@ const int TIMEOUT_USEC = 1000000 / FPS;
 DEFINE_bool(no_timeout, false, "if true, wait ai's thought without timeout");
 
 // static
-unique_ptr<Connector> PipeConnector::create(int playerId, const string& programName)
+unique_ptr<ServerConnector> PipeConnector::create(int playerId, const string& programName)
 {
 #if defined(_MSC_VER)
     return PipeConnectorWin::create(playerId, programName);
@@ -52,7 +52,7 @@ int PipeConnector::getRemainingMilliSeconds(const TimePoint& start)
 }
 
 PipeConnector::PipeConnector(int player) :
-    Connector(player),
+    ServerConnector(player),
     closed_(false)
 {
 }

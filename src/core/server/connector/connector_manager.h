@@ -6,9 +6,9 @@
 
 #include "core/player.h"
 
-class Connector;
 class HumanConnector;
 class PipeConnector;
+class ServerConnector;
 struct FrameResponse;
 
 class ConnectorManager {
@@ -17,14 +17,14 @@ public:
     // Returns false when disconnected.
     explicit ConnectorManager(bool timeout);
 
-    void setConnector(int playerId, std::unique_ptr<Connector> p);
+    void setConnector(int playerId, std::unique_ptr<ServerConnector> p);
 
     bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS]);
 
-    Connector* connector(int i) { return connectors_[i].get(); }
+    ServerConnector* connector(int i) { return connectors_[i].get(); }
 
 private:
-    std::unique_ptr<Connector> connectors_[NUM_PLAYERS];
+    std::unique_ptr<ServerConnector> connectors_[NUM_PLAYERS];
 
     std::vector<HumanConnector*> humanConnectors_;
     std::vector<PipeConnector*> pipeConnectors_;

@@ -5,17 +5,17 @@
 #include <cstdio>
 #include <string>
 
-#include "core/server/connector/connector.h"
+#include "core/server/connector/server_connector.h"
 
 struct FrameRequest;
 struct FrameResponse;
 
-class PipeConnector : public Connector {
+class PipeConnector : public ServerConnector {
 public:
     using Clock = std::chrono::high_resolution_clock;
     using TimePoint = Clock::time_point;
 
-    static std::unique_ptr<Connector> create(int playerId, const std::string& program);
+    static std::unique_ptr<ServerConnector> create(int playerId, const std::string& program);
     static int getUsecFromStart(const TimePoint& start);
     static int getRemainingMilliSeconds(const TimePoint& start);
 

@@ -4,15 +4,15 @@
 #include <mutex>
 #include <string>
 
-#include "core/server/connector/connector.h"
+#include "core/server/connector/server_connector.h"
 #include "core/key_set.h"
 
 struct FrameRequest;
 struct FrameResponse;
 
-class HumanConnector : public Connector {
+class HumanConnector : public ServerConnector {
 public:
-    explicit HumanConnector(int player) : Connector(player) {}
+    explicit HumanConnector(int player) : ServerConnector(player) {}
     virtual ~HumanConnector() override {}
 
     virtual void send(const FrameRequest&) override;

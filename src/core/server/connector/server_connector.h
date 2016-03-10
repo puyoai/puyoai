@@ -1,5 +1,5 @@
-#ifndef CORE_SERVER_CONNECTOR_CONNECTOR_H_
-#define CORE_SERVER_CONNECTOR_CONNECTOR_H_
+#ifndef CORE_SERVER_CONNECTOR_SERVER_CONNECTOR_H_
+#define CORE_SERVER_CONNECTOR_SERVER_CONNECTOR_H_
 
 #include <memory>
 #include <string>
@@ -10,12 +10,12 @@
 struct FrameRequest;
 struct FrameResponse;
 
-class Connector : noncopyable {
+class ServerConnector : noncopyable {
 public:
-    static std::unique_ptr<Connector> create(int playerId, const std::string& program);
+    static std::unique_ptr<ServerConnector> create(int playerId, const std::string& program);
 
-    explicit Connector(int player) : playerId_(player) {}
-    virtual ~Connector() {}
+    explicit ServerConnector(int player) : playerId_(player) {}
+    virtual ~ServerConnector() {}
 
     virtual void send(const FrameRequest&) = 0;
     virtual bool receive(FrameResponse*) = 0;
@@ -29,4 +29,4 @@ protected:
     int playerId_;
 };
 
-#endif // CORE_SERVER_CONNECTOR_CONNECTOR_H_
+#endif // CORE_SERVER_CONNECTOR_SERVER_CONNECTOR_H_

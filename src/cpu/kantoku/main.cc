@@ -11,7 +11,7 @@
 #include "core/client/ai/raw_ai.h"
 #include "core/frame_request.h"
 #include "core/frame_response.h"
-#include "core/server/connector/connector.h"
+#include "core/server/connector/server_connector.h"
 
 DEFINE_bool(change_if_beated, true,
             "If true, AI will be changed when beated. If false, AI will be changed by one game");
@@ -25,15 +25,15 @@ public:
     ChildAI(const string& name, const string& program) :
         name_(name)
     {
-        connector_ = std::move(Connector::create(1, program));
+        connector_ = std::move(ServerConnector::create(1, program));
     }
 
     const std::string& name() const { return name_; }
-    Connector& connector() { return *connector_; }
+    ServerConnector& connector() { return *connector_; }
 
 private:
     string name_;
-    unique_ptr<Connector> connector_;
+    unique_ptr<ServerConnector> connector_;
 };
 
 class Kantoku : public RawAI {

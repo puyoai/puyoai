@@ -6,8 +6,8 @@
 #include <glog/logging.h>
 
 #include "core/frame_response.h"
-#include "core/server/connector/connector.h"
 #include "core/server/connector/human_connector.h"
+#include "core/server/connector/server_connector.h"
 #include "core/player.h"
 
 #if defined(_MSC_VER)
@@ -23,7 +23,7 @@ ConnectorManager::ConnectorManager(bool timeout) :
 {
 }
 
-void ConnectorManager::setConnector(int playerId, std::unique_ptr<Connector> p)
+void ConnectorManager::setConnector(int playerId, std::unique_ptr<ServerConnector> p)
 {
     if (p->isHuman()) {
         humanConnectors_.push_back(static_cast<HumanConnector*>(p.get()));

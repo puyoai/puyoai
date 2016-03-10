@@ -21,7 +21,7 @@ using namespace std;
 DEFINE_bool(realtime, true, "use realtime");
 
 // static
-unique_ptr<Connector> PipeConnectorPosix::create(int playerId, const string& programName)
+unique_ptr<ServerConnector> PipeConnectorPosix::create(int playerId, const string& programName)
 {
     CHECK(0 <= playerId && playerId < 10) << playerId;
 
@@ -38,7 +38,7 @@ unique_ptr<Connector> PipeConnectorPosix::create(int playerId, const string& pro
         int downlink_fd = open(downlink_fifo.c_str(), O_WRONLY);
         CHECK(downlink_fd >= 0);
 
-        unique_ptr<Connector> connector(new PipeConnectorPosix(playerId, downlink_fd, uplink_fd));
+        unique_ptr<ServerConnector> connector(new PipeConnectorPosix(playerId, downlink_fd, uplink_fd));
         return connector;
     }
 
@@ -59,7 +59,7 @@ unique_ptr<Connector> PipeConnectorPosix::create(int playerId, const string& pro
         // Server.
         LOG(INFO) << "Created a child process (pid = " << pid << ")";
 
-        unique_ptr<Connector> connector(new PipeConnectorPosix(playerId, fd_field_status[1], fd_command[0]));
+        unique_ptr<ServerConnector> connector(new PipeConnectorPosix(playerId, fd_field_status[1], fd_command[0]));
         close(fd_field_status[0]);
         close(fd_command[1]);
 
@@ -84,7 +84,7 @@ unique_ptr<Connector> PipeConnectorPosix::create(int playerId, const string& pro
         PLOG(FATAL) << "Failed to start a child process. ";
 
     LOG(FATAL) << "should not be reached.";
-    return unique_ptr<Connector>();
+    return unique_ptr<ServerConnector>();
 }
 
 // static

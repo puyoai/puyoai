@@ -1,4 +1,4 @@
-#include "core/server/connector/connector.h"
+#include "core/server/connector/server_connector.h"
 
 #include <string>
 
@@ -10,12 +10,12 @@
 using namespace std;
 
 // static
-unique_ptr<Connector> Connector::create(int playerId, const string& programName)
+unique_ptr<ServerConnector> ServerConnector::create(int playerId, const string& programName)
 {
     CHECK(0 <= playerId && playerId < 10) << playerId;
 
     if (programName == "-")
-        return unique_ptr<Connector>(new HumanConnector(playerId));
+        return unique_ptr<ServerConnector>(new HumanConnector(playerId));
 
     return PipeConnector::create(playerId, programName);
 }

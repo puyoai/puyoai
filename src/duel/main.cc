@@ -131,8 +131,8 @@ int main(int argc, char* argv[])
 #endif
 
     ConnectorManager manager(true);
-    manager.setConnector(0, Connector::create(0, string(argv[1])));
-    manager.setConnector(1, Connector::create(1, string(argv[2])));
+    manager.setConnector(0, ServerConnector::create(0, string(argv[1])));
+    manager.setConnector(1, ServerConnector::create(1, string(argv[2])));
 
 #ifdef USE_HTTPD
     unique_ptr<GameStateHandler> gameStateHandler;
@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
         mainWindow->addDrawer(userEventDrawer.get());
 
         for (int i = 0; i < 2; ++i) {
-            Connector* c = manager.connector(i);
+            ServerConnector* c = manager.connector(i);
             if (c->isHuman()) {
                 HumanConnector* hc = static_cast<HumanConnector*>(c);
                 unique_ptr<MainWindow::EventListener> listener(new HumanConnectorKeyListener(hc));
