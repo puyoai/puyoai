@@ -3,7 +3,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "base/file.h"
+#include "base/file/file.h"
 #include "base/wait_group.h"
 #include "core/httpd/http_server.h"
 #include "core/pattern/pattern_book.h"

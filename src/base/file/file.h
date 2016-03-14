@@ -1,5 +1,5 @@
-#ifndef BASE_PATH_H_
-#define BASE_PATH_H_
+#ifndef BASE_FILE_FILE_H_
+#define BASE_FILE_FILE_H_
 
 #include <string>
 #include <vector>
@@ -27,4 +27,4 @@ bool remove(const std::string& filename);
 
 } // namespace file
 
-#endif
+#endif // BASE_FILE_FILE_H_
