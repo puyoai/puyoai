@@ -1,8 +1,8 @@
-#include "base/file/file.h"
+#include "base/file/path.h"
 
 #include <gtest/gtest.h>
 
-TEST(FileTest, joinPath)
+TEST(PathTest, joinPath)
 {
     EXPECT_EQ("/", file::joinPath("/", "/"));
     EXPECT_EQ("/ab/cd", file::joinPath("/ab", "/cd"));

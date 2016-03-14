@@ -12,7 +12,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "base/file/file.h"
+#include "base/file/path.h"
 #include "core/httpd/http_handler.h"
 #include "core/server/connector/connector_manager.h"
 #include "core/server/connector/human_connector.h"

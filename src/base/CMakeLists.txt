@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 add_library(puyoai_base
             executor.cc
             file/file.cc
+            file/path.cc
             time.cc
             time_stamp_counter.cc
             strings.cc
@@ -30,4 +31,4 @@ puyoai_base_add_test(sse)
 puyoai_base_add_test(strings)
 puyoai_base_add_test(small_int_set)
 
-puyoai_base_add_test_with_dir(file file/file)
+puyoai_base_add_test_with_dir(path file/path)

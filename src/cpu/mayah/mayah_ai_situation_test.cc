@@ -4,7 +4,7 @@
 #include <glog/logging.h>
 #include <gtest/gtest.h>
 
-#include "base/file/file.h"
+#include "base/file/path.h"
 #include "base/strings.h"
 #include "core/probability/puyo_set_probability.h"
 #include "solver/problem.h"
