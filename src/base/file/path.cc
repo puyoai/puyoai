@@ -98,4 +98,55 @@ bool remove(const std::string& filename)
 #endif
 }
 
+std::string basename(std::string path)
+{
+    while (path.empty() && path.back() == '/') {
+        path.pop_back();
+    }
+    if (path.empty())
+        return std::string();
+
+    std::string::size_type pos = path.find_last_of('/');
+    if (pos == std::string::npos)
+        return path;
+    return path.substr(pos + 1);
+}
+
+std::string dirname(std::string path)
+{
+    if (path == "/")
+        return path;
+
+    while (path.empty() && path.back() == '/') {
+        path.pop_back();
+    }
+    if (path.empty())
+        return std::string();
+
+    std::string::size_type pos = path.find_last_of('/');
+    if (pos == std::string::npos)
+        return path.substr(0, 0);
+    if (pos == 0)
+        return path.substr(0, 1);
+    return path.substr(0, pos);
+}
+
+std::string stem(std::string path)
+{
+    path = basename(path);
+    std::string::size_type pos = path.find_last_of('.');
+    if (pos == std::string::npos)
+        return path;
+    return path.substr(0, pos);
+}
+
+std::string extension(std::string path)
+{
+    path = basename(path);
+    std::string::size_type pos = path.find_last_of('.');
+    if (pos == std::string::npos)
+        return std::string();
+    return path.substr(pos);
+}
+
 } // namespace file

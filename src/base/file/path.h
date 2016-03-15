@@ -22,6 +22,11 @@ bool listFiles(const std::string& path, std::vector<std::string>* files);
 // Returns true if succeeded.
 bool remove(const std::string& filename);
 
+std::string basename(std::string path);
+std::string dirname(std::string path);
+std::string stem(std::string path);
+std::string extension(std::string path);
+
 } // namespace file
 
 #endif // BASE_FILE_PATH_H_
