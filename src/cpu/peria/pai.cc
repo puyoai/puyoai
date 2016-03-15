@@ -4,8 +4,11 @@
 #include <glog/logging.h>
 
 #include <algorithm>
+#include <cstdint>
+#include <sstream>
 #include <vector>
 
+#include "base/time.h"
 #include "core/core_field.h"
 #include "core/kumipuyo_seq_generator.h"
 #include "core/plan/plan.h"
@@ -14,6 +17,8 @@
 DECLARE_int32(simulate_size);
 
 namespace peria {
+
+using int64 = std::int64_t;
 
 Pai::Pai(int argc, char* argv[]): ::AI(argc, argv, "peria") {}
 
@@ -28,6 +33,8 @@ DropDecision Pai::think(int frameId,
   UNUSED_VARIABLE(myState);
   UNUSED_VARIABLE(enemyState);
   UNUSED_VARIABLE(fast);
+
+  int64 startTime = currentTimeInMillis();
 
   // - Generate 22*22 states with iterating 2 known Kumipuyos
   //   - simulating enemy's firing chains not to die.
@@ -66,7 +73,7 @@ DropDecision Pai::think(int frameId,
        [&n](const Situation& a, const Situation& b){
          return a.ucb(n) > b.ucb(n);
        });
-  for (int i = 0; i < 20; ++i) {
+  for (int i = 0; i < 2; ++i) {
     KumipuyoSeq s(knownSeq);
     int simulateSteps = FLAGS_simulate_size - s.size();
     simulateSteps = std::max(simulateSteps, 2);
@@ -78,7 +85,11 @@ DropDecision Pai::think(int frameId,
          });
   }
 
-  return DropDecision(situations.front().decision());
+  int64 endTime = currentTimeInMillis();
+  std::ostringstream oss;
+  oss << "ThinkTime: " << (endTime - startTime) << "ms";
+
+  return DropDecision(situations.front().decision(), oss.str());
 }
 
 }  // namespace peria
