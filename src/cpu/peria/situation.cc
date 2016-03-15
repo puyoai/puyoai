@@ -36,11 +36,15 @@ Situation::Situation(const Decision& firstDecision, const CoreField& field,
     field_(field),
     score_(score),
     frameId_(frameId)
-{}
+{
+  UNUSED_VARIABLE(frameId_);
+}
 
 Situation::~Situation() {}
 
 void Situation::evaluate(const KumipuyoSeq& seq) {
+  UNUSED_VARIABLE(seq);
+
   int expectScore = 0;
   bool prohibits[FieldConstant::MAP_WIDTH] {};
   auto complementCallback = [&expectScore](CoreField&& field, const ColumnPuyoList&) {
