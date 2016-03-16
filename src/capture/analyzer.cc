@@ -49,6 +49,27 @@ string toString(CaptureGameState cgs)
     return string();
 }
 
+bool isGameFinishedState(CaptureGameState cgs)
+{
+    switch (cgs) {
+    case CaptureGameState::UNKNOWN:
+    case CaptureGameState::LEVEL_SELECT:
+    case CaptureGameState::PLAYING:
+        return false;
+    case CaptureGameState::GAME_FINISHED_WITH_1P_WIN:
+    case CaptureGameState::GAME_FINISHED_WITH_2P_WIN:
+    case CaptureGameState::GAME_FINISHED_WITH_DRAW:
+    case CaptureGameState::MATCH_FINISHED_WITH_1P_WIN:
+    case CaptureGameState::MATCH_FINISHED_WITH_2P_WIN:
+    case CaptureGameState::MATCH_FINISHED_WITH_DRAW:
+        return true;
+    }
+
+    CHECK(false) << "Unknown CaptureGameState: " << static_cast<int>(cgs);
+    return false;
+}
+
+
 string toString(NextPuyoState nps)
 {
     switch (nps) {

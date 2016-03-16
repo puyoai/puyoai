@@ -30,6 +30,7 @@ enum class CaptureGameState {
     MATCH_FINISHED_WITH_DRAW,
 };
 std::string toString(CaptureGameState);
+bool isGameFinishedState(CaptureGameState);
 
 enum class NextPuyoState {
     STABLE,

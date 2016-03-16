@@ -5,9 +5,13 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+#include <SDL.h>
+#include <SDL_image.h>
 
 #include "base/file/path.h"
 #include "base/strings.h"
+#include "capture/ac_analyzer.h"
+#include "gui/unique_sdl_surface.h"
 
 using namespace std;
 
@@ -54,8 +58,36 @@ int main(int argc, char* argv[])
     CHECK(listBMPsRecursively(argv[1], &files));
     std::sort(files.begin(), files.end());
 
-    for (const auto& f : files) {
-        cout << f << endl;
+    ACAnalyzer analyzer;
+
+    int match_no = 0;
+    bool game_end_detected = false;
+
+    for (size_t i = 0; i < files.size(); ++i) {
+        const auto& f = files[i];
+        UniqueSDLSurface surface = makeUniqueSDLSurface(IMG_Load(f.c_str()));
+
+        CaptureGameState state = analyzer.detectGameState(surface.get());
+        if (state == CaptureGameState::LEVEL_SELECT) {
+            // game start
+            if (game_end_detected) {
+                match_no += 1;
+                game_end_detected = false;
+            }
+        } else if (isGameFinishedState(state)) {
+            game_end_detected = true;
+        }
+
+#if 0
+        // Will enable this later.
+
+        // Copy image.
+        char dest_path[1024];
+        sprintf(dest_path, "out/%d/%s", match_no, file::basename(f).c_str());
+        CHECK(file::copyFile(f, dest_path))
+            << "src=" << f
+            << " dest=" << dest_path;
+#endif
     }
 
     CHECK(false) << "Not implemented yet";
