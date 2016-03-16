@@ -6,7 +6,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "base/file.h"
+#include "base/file/path.h"
 #include "base/strings.h"
 
 using namespace std;
