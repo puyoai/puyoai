@@ -15,27 +15,6 @@ class RefPlan;
 
 class Plan {
 public:
-    // Event which may happen during the iteration.
-    // Extend Type if you want to use more types of events.
-    struct Event {
-        enum class Type {
-            FALL_OJAMA_ROWS,
-        };
-
-        static Event fallOjamaRowsEvent(int frame, int rows)
-        {
-            return Event { Type::FALL_OJAMA_ROWS, frame, rows };
-        }
-
-        Type type;
-
-        // This figures when this event will happen. 0 figures the frameId when a API is called.
-        int frames;
-
-        // Meaning of this variable depends on which type of event.
-        int value;
-    };
-
     Plan() {}
     Plan(const CoreField& field, const std::vector<Decision>& decisions,
          const RensaResult& rensaResult, int numChigiri, int framesToIgnite, int lastDropFrames,
@@ -50,16 +29,10 @@ public:
     typedef std::function<void (const RefPlan&)> IterationCallback;
     // if |kumipuyos.size()| < |depth|, we will add extra kumipuyo.
     static void iterateAvailablePlans(const CoreField&, const KumipuyoSeq&, int depth, const IterationCallback&);
-    // We assume events are sorted in increasing order of frames.
-    static void iterateAvailablePlansWithEvents(const CoreField&, const KumipuyoSeq&, int depth,
-                                                const std::vector<Event>& events, const IterationCallback&);
 
     typedef std::function<void (const CoreField&, const std::vector<Decision>&,
                                 int numChigiri, int framesToIgnite, int lastDropFrames, bool shouldFire)> RensaIterationCallback;
     static void iterateAvailablePlansWithoutFiring(const CoreField&, const KumipuyoSeq&, int depth, const RensaIterationCallback&);
-    // We assume events are sorted in increasing order of frames.
-    static void iterateAvailablePlansWithoutFiringWithEvents(const CoreField&, const KumipuyoSeq&, int depth,
-                                                             const std::vector<Event>& events, const RensaIterationCallback&);
 
     const CoreField& field() const { return field_; }
 
