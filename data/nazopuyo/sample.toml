@@ -1,0 +1,28 @@
+[[nazo]]      # A problem starts with [[nazo]]
+field = [     # 'field' is a required element.
+  "R     ",   # you can use "RBYG" for colored puyos, "O" for ojama puyo,
+  "BB  Y ",   # and " " for empty cell.
+  "BGYRBY",   # We don't support 5th colored puyo, Kata puyo, iron puyo,
+  "RBGYRB",   # and irregular walls.
+  "RBGYRB",
+  "RBGYRB",
+]
+seq = ["BB"]  # Tsumo puyos. You can use 4-colored puyos.
+
+# Requirements to solve.
+chain = 7     # 7 rensa
+
+[[nazo]]      # You can put multiple quizes in a file.
+field = [
+  "R     ",
+  "BB    ",
+  "BGYRB ",
+  "RBGYRB",
+  "RBGYRB",
+  "RBGYRB",
+]
+seq = ["BB"]  # Tsumo puyos. You can use 4-colored puyos.
+
+# You have to fullfill all requirements at the same time.
+chain = 7     # 7 rensa
+clear = true  # zenkeshi

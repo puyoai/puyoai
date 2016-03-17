@@ -1,0 +1,117 @@
+# This problem set is same with http://sengiken.web.fc2.com/nazopuyo.html (Easy)
+# We may change color settings of problems, due to technical reasons.
+
+[[nazo]]
+# 1st question
+field = [   # we use 'B' to show purple puyos
+  "    R ",
+  "    BR",
+  "  R BB",
+  "  R YY",
+  "  B YB",
+]
+seq = ["BR", "YR"]
+clear = true
+
+[[nazo]]
+# 2nd question
+field = [
+  " YYY  ",
+  " BBBGG",
+  " GGGBB",
+  " RRRGG",
+]
+seq = ["RG", "GY"]
+clear = true
+
+[[nazo]]
+# 3rd question
+field = [
+  " BGY  ",
+  " BGY  ",
+  " BGY  ",
+  " RRR  ",
+  " BGY  ",
+  " BGY  ",
+  " BGY  ",
+  " RRR  ",
+]
+seq = ["YY", "BB", "RR"]
+clear = true
+
+[[nazo]]
+# 4th question
+field = [
+  "Y     ",
+  "YBGY  ",
+  "RBBG  ",
+  "RRGG  ",
+]
+seq = ["YR", "BY"]
+clear = true
+
+[[nazo]]
+# 5th question
+field = [
+  "GBGBG ",
+  "BGBGBG",
+  "BGBGBG",
+  "BGBGBG",
+]
+seq = ["GB", "GB", "GB"]
+clear = true
+
+[[nazo]]
+# 6th question
+field = [
+  "R R R ",
+  "R RBR ",
+  "YRBRB ",
+  "YBGBB ",
+  "BGGOO ",
+]
+seq = ["YY", "GR", "BB"]
+clear = true
+
+[[nazo]]
+# 7th question
+field = [
+  "R R R ",
+  "R R R ",
+  "ORORO ",
+]
+seq = ["RR", "RR", "RR"]
+chain = 2
+
+#[[nazo]]
+# 8th question (unsupported requirement)
+#field = [
+#  "Y     ",
+#  "RR  R ",
+#  "RO  R ",
+#  "YG  R ",
+#  "YYORY ",
+#  "OGRRY ",
+#  "OGGOOO",
+#  "OOOOOO",
+#  "OOOOOO",
+#  "OOOOOO",
+#  "OOOOOO",
+#  "OOOOOO",
+#]
+#seq = ["RR", "RR"]
+#clear = red
+
+[[nazo]]
+# 9th question
+field = [
+  " YO   ",
+  " BB   ",
+  "YYYB  ",
+  "GRGB  ",
+  "GGRGG ",
+  "RRBBB ",
+]
+seq = ["GB", "GB"]
+chain = 6
+
