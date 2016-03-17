@@ -50,23 +50,31 @@ class Nazopuyo {
       puyos_ = puyos->as<bool>();
   }
 
-  bool Solve() {
+  int Solve() {
+    int numSolution = 0;
+
     auto checkAnswer = [&](const RefPlan& plan) {
       if (!plan.isRensaPlan())
         return;
-      RensaResult result = plan.rensaResult();
-      if (result.chains < chain_)
-        return;
-      if (clear_ && !plan.hasZenkeshi())
-        return;
-      // TODO: add check of puyos
 
-      std::cerr << plan.decisionText() << "\n";
-      std::cerr << makePuyopURL(/*field_,*/ seq_, plan.decisions()) << "\n";
+      if (plan.chains() < chain_)
+        return;
+      if (clear_ && !plan.field().isZenkeshi())
+        return;
+      // TODO: add check of other requirements.
+
+      std::cerr << plan.decisionText() << "\n"
+                << makePuyopURL(field_, seq_, plan.decisions()) << "\n"
+                << "\n";
+      ++numSolution;
     };
+
     Plan::iterateAvailablePlans(field_, seq_, seq_.size(), checkAnswer);
-    return true;
+
+    return numSolution;
   }
+
+  CoreField& field() { return field_; }
 
  private:
   CoreField field_;
@@ -113,6 +121,9 @@ int main(int argc, char* argv[]) {
     Nazopuyo nazo(v);
     if (nazo.Solve()) {
       ++numSolved;
+    } else {
+      std::cerr << "Impossible:\n"
+                << nazo.field().toDebugString() << "\n";
     }
   }
   LOG(INFO) << numSolved << " / " << nazos->size() << " are solved.";
