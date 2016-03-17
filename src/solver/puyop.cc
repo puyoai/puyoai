@@ -14,8 +14,8 @@ string makePuyopURL(const KumipuyoSeq& seq, const vector<Decision>& decisions)
 
     ss << "http://www.puyop.com/s/_";
 
-    for (size_t i = 0; i < 50; ++i) {
-        const Kumipuyo& kp = seq.get(i);
+    for (size_t i = 0; i < decisions.size(); ++i) {
+        const Kumipuyo& kp = seq.get(i % seq.size());
         int d = 0;
         switch (kp.axis) {
         case PuyoColor::RED:
