@@ -5,11 +5,15 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "core/core_field.h"
+#include "core/decision.h"
 #include "core/kumipuyo_seq.h"
 #include "core/plan/plan.h"
 #include "solver/puyop.h"
+
+using Decisions = std::vector<Decision>;
 
 class Nazopuyo {
  public:
@@ -50,8 +54,8 @@ class Nazopuyo {
       puyos_ = puyos->as<bool>();
   }
 
-  int Solve() {
-    int numSolution = 0;
+  std::vector<Decisions> Solve() {
+    std::vector<Decisions> solutions;
 
     auto checkAnswer = [&](const RefPlan& plan) {
       if (!plan.isRensaPlan())
@@ -63,22 +67,25 @@ class Nazopuyo {
         return;
       // TODO: add check of other requirements.
 
-      std::cerr << plan.decisionText() << "\n"
-                << makePuyopURL(field_, seq_, plan.decisions()) << "\n"
-                << "\n";
-      ++numSolution;
+      // Solved
+      solutions.push_back(plan.decisions());
     };
 
+    // TODO: iterating one by one, so we can support vanishing in middle of the solution.
+    // TODO: Prune unnecessary tries.
+    // TODO: Parallelize iteration.
     Plan::iterateAvailablePlans(field_, seq_, seq_.size(), checkAnswer);
 
-    return numSolution;
+    return solutions;
   }
 
-  CoreField& field() { return field_; }
+  const CoreField& field() const { return field_; }
+  const KumipuyoSeq& seq() const { return seq_; }
 
  private:
   CoreField field_;
   KumipuyoSeq seq_;
+
   // Requirements to solve
   int chain_ = 0;  // rensa
   bool clear_ = false;  // zenkeshi
@@ -119,13 +126,25 @@ int main(int argc, char* argv[]) {
   int numSolved = 0;
   for (const auto& v : nazos->as<toml::Array>()) {
     Nazopuyo nazo(v);
-    if (nazo.Solve()) {
+    // TODO: measure time
+    std::vector<Decisions> solutions = nazo.Solve();
+
+    if (solutions.size()) {
+      std::cout << "Found " << solutions.size() << " solution(s).\n";
+      std::cout << "One solution is " << makePuyopURL(nazo.field(), nazo.seq(), solutions.front()) << "\n";
+
+      LOG(INFO) << "Found " << solutions.size() << " solution(s).";
+      for (auto& s : solutions) {
+        LOG(INFO) << makePuyopURL(nazo.field(), nazo.seq(), s);
+      }
+
       ++numSolved;
     } else {
-      std::cerr << "Impossible:\n"
-                << nazo.field().toDebugString() << "\n";
+      LOG(ERROR) << "No solution for:\n"
+                 << nazo.field().toDebugString();
     }
   }
+  std::cout << numSolved << " / " << nazos->size() << " are solved.\n";
   LOG(INFO) << numSolved << " / " << nazos->size() << " are solved.";
   
   return 0;
