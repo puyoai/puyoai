@@ -95,7 +95,13 @@ void WiiConnectServer::runLoop()
         if (!surface.get()) {
             ++noSurfaceCount;
             LOG(INFO) << "No surface?: count=" << noSurfaceCount << endl;
-            cout << "No surface? count=" << noSurfaceCount << endl;
+            cout << "No surface? count=" << noSurfaceCount
+                 << " done=" << source_->done() << endl;
+
+            if (source_->done()) {
+                break;
+            }
+
             // TODO(mayah): Why not sleep?
             if (noSurfaceCount > 100000) {
                 shouldStop_ = true;

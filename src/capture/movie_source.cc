@@ -115,8 +115,10 @@ UniqueSDLSurface MovieSource::getNextFrame()
 {
     int frame_finished;
     while (true) {
-        if (av_read_frame(format_, &packet_) < 0)
+        if (av_read_frame(format_, &packet_) < 0) {
+            done_ = true;
             return emptyUniqueSDLSurface();
+        }
 
         if (packet_.stream_index == video_index_) {
             avcodec_decode_video2(codec_, frame_, &frame_finished, &packet_);
