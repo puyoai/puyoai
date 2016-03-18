@@ -2,16 +2,18 @@
 #include <glog/logging.h>
 #include <toml/toml.h>
 
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 
+#include "base/time.h"
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/kumipuyo_seq.h"
 #include "core/plan/plan.h"
-#include "core/puyo_controller.h"
+#include "core/puyo_color.h"
 #include "solver/puyop.h"
 
 using Decisions = std::vector<Decision>;
@@ -27,6 +29,55 @@ const Decision DECISIONS[] = {
   Decision(5, 0), Decision(6, 0),
 };
 
+inline bool isDecisionAvailable(const CoreField& field, const Decision& decision) {
+#define E(x) (field.height(x) <= 11)
+#define F(x) (field.height(x) <= 12)
+  switch (decision.r) {
+  case 0:
+    switch (decision.x) {
+    case 1: return E(3) && F(2) && F(1);
+    case 2: return E(3) && F(2);
+    case 3: return E(3);
+    case 4: return E(3) && F(4);
+    case 5: return E(3) && F(4) && F(5);
+    case 6: return E(3) && F(4) && F(5) && F(6);
+    }
+
+  case 1:
+    switch (decision.x) {
+    case 1: return E(3) && F(2) && F(1);
+    case 2: return E(3) && F(2);
+    case 3: return E(3) && F(4);
+    case 4: return E(3) && F(4) && F(5);
+    case 5: return E(3) && F(4) && F(5) && F(6);
+    }
+
+  case 2:
+    switch (decision.x) {
+    case 1: return E(3) && F(2) && E(1);
+    case 2: return E(3) && E(2);
+    case 3: return E(3);
+    case 4: return E(3) && E(4);
+    case 5: return E(3) && F(4) && E(5);
+    case 6: return E(3) && F(4) && F(5) && E(6);
+    }
+
+  case 3:
+    switch (decision.x) {
+    case 2: return E(3) && F(2) && F(1);
+    case 3: return E(3) && F(2);
+    case 4: return E(3) && F(4);
+    case 5: return E(3) && F(4) && F(5);
+    case 6: return E(3) && F(4) && F(5) && F(6);
+    }
+  }
+#undef E
+#undef F
+
+  CHECK(false);
+  return false;
+}
+
 class Nazopuyo {
  public:
   Nazopuyo(const toml::Value& v);
@@ -39,8 +90,11 @@ class Nazopuyo {
 
  private:
   bool verifySolution(const CoreField&, const RensaResult&);
+  bool possibleToSolve(const CoreField&);
   bool iterate(const CoreField&);
   bool iterate(const CoreField&, Decisions&, int, int);
+
+  int remainPuyos(PuyoColor c) { return remainPuyos_[ordinal(c)]; }
   
   CoreField field_;
   KumipuyoSeq seq_;
@@ -53,6 +107,8 @@ class Nazopuyo {
   int colors_ = 0;  // # of colors to be vanished at the same time
   int puyos_ = 0; // # of puyos to be vanished at the same time
   bool unique_ = false; // set true if you need one solution.
+
+  int remainPuyos_[NUM_PUYO_COLORS] {};
 };
 
 Nazopuyo::Nazopuyo(const toml::Value& v) {
@@ -63,7 +119,7 @@ Nazopuyo::Nazopuyo(const toml::Value& v) {
     field_str += line.as<std::string>();
   }
   field_ = CoreField(field_str);
-  
+
   const toml::Value* seq = v.find("seq");
   CHECK(seq);
   std::string kumipuyo_str;
@@ -93,7 +149,15 @@ Nazopuyo::Nazopuyo(const toml::Value& v) {
 }
 
 bool Nazopuyo::Solve() {
-  // TODO: Prune unnecessary tries.
+  for (PuyoColor c : NORMAL_PUYO_COLORS) {
+    remainPuyos_[ordinal(c)] = field_.countColor(c);
+  }
+  for (int i = 0; i < seq_.size(); ++i) {
+    const Kumipuyo& kp = seq_.get(i);
+    remainPuyos_[ordinal(kp.axis)]++;
+    remainPuyos_[ordinal(kp.child)]++;
+  }
+
   // TODO: Parallelize iteration.
   iterate(field_);
   return solutions_.size();
@@ -110,6 +174,31 @@ bool Nazopuyo::verifySolution(const CoreField& field, const RensaResult& result)
   return true;
 }
 
+bool Nazopuyo::possibleToSolve(const CoreField& field) {
+  if (!field.isEmpty(3, 12))
+    return false;
+
+  if (chain_) {
+    int possibleChain = 0;
+    for (PuyoColor c : NORMAL_PUYO_COLORS) {
+      int puyos = field.countColor(c) + remainPuyos(c);
+      possibleChain += puyos / PUYO_ERASE_NUM;
+    }
+    if (possibleChain < chain_)
+      return false;
+  }
+
+  if (clear_) {
+    for (PuyoColor c : NORMAL_PUYO_COLORS) {
+      int puyos = field.countColor(c) + remainPuyos(c);
+      if (puyos < PUYO_ERASE_NUM)
+        return false;
+    }
+  }
+  
+  return true;
+}
+
 bool Nazopuyo::iterate(const CoreField& field) {
   solutions_.clear();
   Decisions decisions;
@@ -119,12 +208,15 @@ bool Nazopuyo::iterate(const CoreField& field) {
 bool Nazopuyo::iterate(const CoreField& field, Decisions& decisions,
                        int currentDepth, int maxDepth) {
   const Kumipuyo& kumipuyo = seq_.get(currentDepth);
+  remainPuyos_[ordinal(kumipuyo.axis)]--;
+  remainPuyos_[ordinal(kumipuyo.child)]--;
 
   bool found = false;
   const int num_decisions = (kumipuyo.axis == kumipuyo.child) ? 11 : 22;
   for (int j = 0; j < num_decisions; j++) {
     const Decision& decision = DECISIONS[j];
-    if (!PuyoController::isReachable(field, decision))
+
+    if (!isDecisionAvailable(field, decision))
       continue;
 
     CoreField nextField(field);
@@ -142,17 +234,16 @@ bool Nazopuyo::iterate(const CoreField& field, Decisions& decisions,
         }
         found = true;
       }
-    }
 
-    if (!nextField.isEmpty(3, 12)) {
-      decisions.pop_back();
-      continue;
+      if (!possibleToSolve(nextField)) {
+        decisions.pop_back();
+        continue;
+      }
     }
-
-    // TODO: continue if nextField and remained sequences cannot serve requirements.
 
     if (currentDepth + 1 < maxDepth) {
       bool f = iterate(nextField, decisions, currentDepth + 1, maxDepth);
+
       if (f && unique_) {
         return true;
       }
@@ -160,6 +251,9 @@ bool Nazopuyo::iterate(const CoreField& field, Decisions& decisions,
     }
     decisions.pop_back();
   }
+
+  remainPuyos_[ordinal(kumipuyo.axis)]++;
+  remainPuyos_[ordinal(kumipuyo.child)]++;
   return false;
 }
 
@@ -198,12 +292,14 @@ int main(int argc, char* argv[]) {
   int numSolved = 0;
   for (const auto& v : nazos->as<toml::Array>()) {
     Nazopuyo nazo(v);
-    // TODO: measure time
-    nazo.Solve();
-    std::vector<Decisions> solutions = nazo.solutions();
 
+    int64_t startTime = currentTimeInMillis();
+    nazo.Solve();
+    int64_t endTime = currentTimeInMillis();
+
+    std::vector<Decisions> solutions = nazo.solutions();
     if (solutions.size()) {
-      std::cout << "Found " << solutions.size() << " solution(s).\n"
+      std::cout << "Found " << solutions.size() << " solution(s) in " << (endTime - startTime) << "ms.\n"
                 << "One solution is " << makePuyopURL(nazo.field(), nazo.seq(), solutions.front()) << std::endl;
 
       LOG(INFO) << "Found " << solutions.size() << " solution(s).";
