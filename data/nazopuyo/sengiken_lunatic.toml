@@ -1,0 +1,55 @@
+# This problem set is same with http://sengiken.web.fc2.com/nazopuyo.html (Lunatic)
+# We may change color settings of problems, due to technical reasons.
+
+[[nazo]]
+# 1st question
+field = [
+  "O    O",
+  "R    Y",
+  "Y    R",
+  "RRRYYY",
+  "YGGGRR",
+  "YYBBBR",
+  "RRRYYY",
+  "YYGGGR",
+  "YBBBRR",
+  "RRRYYY",
+]
+seq = ["BG", "BY", "RG", "RY", "RY"]
+chain = 14
+
+[[nazo]]
+# 2nd question
+field = [
+  " R  R ",
+  " B  Y ",
+  "GRBYB ",
+  "RRBGGY",
+  "GBRGBR",
+  "GGRBGR",
+  "RBYYBR",
+  "BBYRBG",
+  "RYGBGG",
+  "RRYGRR",
+  "YYGGRG",
+]
+seq = ["YG", "GB", "BY", "GR", "GR", "YB"]
+chain = 17
+
+
+[[nazo]]
+# 3rd question
+field = [
+  "     R",
+  "  GR R",
+  "  BR B",
+  "B YB B",
+  "BBYB G",
+  "RYBR B",
+  "RGYBYB",
+  "GYBYRB",
+  "RGYBYR",
+  "RGYBYR",
+]
+seq = ["GB", "RB", "GG", "YG", "BG", "BB", "GR"]
+chain = 14
