@@ -73,10 +73,10 @@ unique_ptr<ServerConnector> PipeConnectorWin::create(int playerId, const string&
     if (!CreateProcess(programName.c_str(), const_cast<char*>(commandLine.c_str()),
                        nullptr, nullptr, true, CREATE_NO_WINDOW, nullptr, nullptr, &startupInfo, &processInfo)) {
         PLOG(FATAL) << "Failed to launch a subprocess: " << programName;
-        return unique_ptr<Connector>();
+        return unique_ptr<ServerConnector>();
     }
 
-    return unique_ptr<Connector>(new PipeConnectorWin(playerId, hChildStdInWriter, hChildStdOutReader));
+    return unique_ptr<ServerConnector>(new PipeConnectorWin(playerId, hChildStdInWriter, hChildStdOutReader));
 }
 
 // static

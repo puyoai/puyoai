@@ -7,6 +7,8 @@
 #include <glog/logging.h>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "base/file/path.h"
 #include "base/strings.h"
@@ -17,11 +19,16 @@ using namespace std;
 
 bool listBMPsRecursively(const std::string& root, std::vector<std::string>* files)
 {
+    cout << root << endl;
+
     vector<string> tmp_files;
     if (!file::listFiles(root, &tmp_files))
         return false;
 
     for (const auto& f : tmp_files) {
+        if (f == "." || f == "..")
+            continue;
+
         string p = file::joinPath(root, f);
 
         if (strings::hasSuffix(f, ".bmp")) {
@@ -33,7 +40,6 @@ bool listBMPsRecursively(const std::string& root, std::vector<std::string>* file
             LOG(INFO) << "Unknown file: " << p << endl;
             continue;
         }
-
 
         if (!listBMPsRecursively(p, files)) {
             return false;
@@ -58,6 +64,8 @@ int main(int argc, char* argv[])
     CHECK(listBMPsRecursively(argv[1], &files));
     std::sort(files.begin(), files.end());
 
+    cout << "file listed: size=" << files.size() << endl;
+
     ACAnalyzer analyzer;
 
     int match_no = 0;
@@ -73,23 +81,36 @@ int main(int argc, char* argv[])
             if (game_end_detected) {
                 match_no += 1;
                 game_end_detected = false;
+                cout << "match found: " << match_no << " file="  << f << endl;
+
+                char path[1024];
+                sprintf(path, "out/%d", match_no);
+                (void)mkdir(path, 0755);
             }
         } else if (isGameFinishedState(state)) {
-            game_end_detected = true;
+            if (!game_end_detected) {
+                cout << "match end: " << f << endl;
+                game_end_detected = true;
+            }
         }
 
-#if 0
+#if 1
         // Will enable this later.
-
         // Copy image.
         char dest_path[1024];
         sprintf(dest_path, "out/%d/%s", match_no, file::basename(f).c_str());
+        cout << dest_path << endl;
+
+        PCHECK(symlink(f.c_str(), dest_path) == 0)
+            << "target=" << f
+            << " dest_path=" << dest_path;
+#endif
+#if 0
         CHECK(file::copyFile(f, dest_path))
             << "src=" << f
             << " dest=" << dest_path;
 #endif
     }
 
-    CHECK(false) << "Not implemented yet";
     return 0;
 }
