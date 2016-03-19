@@ -261,7 +261,6 @@ TEST_F(ACAnalyzerTest, analyzeField5)
 TEST_F(ACAnalyzerTest, DISABLED_analyzeField6)
 {
     unique_ptr<AnalyzerResult> r = analyze("/images/field/field6.png");
-
     EXPECT_EQ(CaptureGameState::PLAYING, r->state());
 
     // TODO(mayah): Hard to distinguish ...
@@ -279,6 +278,20 @@ TEST_F(ACAnalyzerTest, DISABLED_analyzeField6)
     EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT1_CHILD));
     EXPECT_EQ(RealColor::RC_BLUE, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT2_AXIS));
     EXPECT_EQ(RealColor::RC_BLUE, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT2_CHILD));
+}
+
+// TODO(mayah): Now failing.
+TEST_F(ACAnalyzerTest, DISABLED_analyzeField7)
+{
+    // NEXT2 in Player2 is difficult.
+
+    unique_ptr<AnalyzerResult> r = analyze("/images/field/field7.png");
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    EXPECT_EQ(RealColor::RC_RED, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT1_AXIS));
+    EXPECT_EQ(RealColor::RC_BLUE, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT1_CHILD));
+    EXPECT_EQ(RealColor::RC_PURPLE, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT2_AXIS));
+    EXPECT_EQ(RealColor::RC_RED, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT2_CHILD));
 }
 
 TEST_F(ACAnalyzerTest, analyzeFieldOjama)

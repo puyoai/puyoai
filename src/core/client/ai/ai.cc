@@ -131,8 +131,11 @@ void AI::runLoop()
 
             KumipuyoSeq seq = rememberedSequence(me_.hand + 1, kumipuyoSeq.subsequence(1));
             CHECK_EQ(kumipuyoSeq.get(1), seq.get(0));
-            if (kumipuyoSeq.size() >= 3)
-                CHECK_EQ(kumipuyoSeq.get(2), seq.get(1));
+            if (kumipuyoSeq.size() >= 3) {
+                CHECK_EQ(kumipuyoSeq.get(2), seq.get(1))
+                    << " kumipuyoSeq=" << kumipuyoSeq.toString()
+                    << " seq=" << seq.toString();
+            }
 
             next1.fieldBeforeThink = me_.field;
             next1.dropDecision = think(nextThinkFrameId, me_.field, seq,
