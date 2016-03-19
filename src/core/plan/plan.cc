@@ -71,11 +71,9 @@ std::string RefPlan::decisionText() const
 }
 
 template<typename Callback>
-void iterateAvailablePlansInternal(CoreField field,
+void iterateAvailablePlansInternal(const CoreField& field,
                                    const KumipuyoSeq& kumipuyoSeq,
                                    std::vector<Decision>& decisions,
-                                   const std::vector<Plan::Event>& events,
-                                   size_t eventIndex,
                                    int currentDepth,
                                    int maxDepth,
                                    int currentNumChigiri,
@@ -93,26 +91,6 @@ void iterateAvailablePlansInternal(CoreField field,
     } else {
         ptr = ALL_KUMIPUYO_KINDS;
         n = 10;
-    }
-
-    {
-        // Multiple fall-ojama events are merged if they are unused and their frame's are past.
-        // TODO: At most 5 rows of Ojama fall at once.  Remained ojama will fall later.
-        int ojama_rows = 0;
-        for (; eventIndex < events.size() && events[eventIndex].frames < totalFrames; ++eventIndex) {
-            const Plan::Event& event = events[eventIndex];
-            switch (event.type) {
-            case Plan::Event::Type::FALL_OJAMA_ROWS:
-                ojama_rows += event.value;
-                break;
-            default:
-                CHECK(false) << "Unknown event type";
-            }
-        }
-        if (ojama_rows)
-            totalFrames += field.fallOjama(ojama_rows);
-        if (!field.isEmpty(3, 12))
-            return;
     }
 
     for (int j = 0; j < 22; j++) {
@@ -141,8 +119,8 @@ void iterateAvailablePlansInternal(CoreField field,
             if (currentDepth + 1 == maxDepth || shouldFire) {
                 callback(nextField, decisions, currentNumChigiri + isChigiri, totalFrames, dropFrames, shouldFire);
             } else {
-                iterateAvailablePlansInternal(nextField, kumipuyoSeq, decisions, events, eventIndex, currentDepth + 1,
-                                              maxDepth, currentNumChigiri + isChigiri, totalFrames + dropFrames, callback);
+                iterateAvailablePlansInternal(nextField, kumipuyoSeq, decisions, currentDepth + 1, maxDepth,
+                                              currentNumChigiri + isChigiri, totalFrames + dropFrames, callback);
             }
         }
         decisions.pop_back();
@@ -154,17 +132,6 @@ void Plan::iterateAvailablePlans(const CoreField& field,
                                  const KumipuyoSeq& kumipuyoSeq,
                                  int maxDepth,
                                  const Plan::IterationCallback& callback)
-{
-    std::vector<Event> events;
-    iterateAvailablePlansWithEvents(field, kumipuyoSeq, maxDepth, events, callback);
-}
-
-// static
-void Plan::iterateAvailablePlansWithEvents(const CoreField& field,
-                                           const KumipuyoSeq& kumipuyoSeq,
-                                           int maxDepth,
-                                           const std::vector<Event>& events,
-                                           const Plan::IterationCallback& callback)
 {
     std::vector<Decision> decisions;
     decisions.reserve(maxDepth);
@@ -189,7 +156,7 @@ void Plan::iterateAvailablePlansWithEvents(const CoreField& field,
         }
     };
 
-    iterateAvailablePlansInternal(field, kumipuyoSeq, decisions, events, 0, 0, maxDepth, 0, 0, f);
+    iterateAvailablePlansInternal(field, kumipuyoSeq, decisions, 0, maxDepth, 0, 0, f);
 }
 
 // static
@@ -198,18 +165,7 @@ void Plan::iterateAvailablePlansWithoutFiring(const CoreField& field,
                                               int maxDepth,
                                               const Plan::RensaIterationCallback& callback)
 {
-    std::vector<Event> events;
-    iterateAvailablePlansWithoutFiringWithEvents(field, kumipuyoSeq, maxDepth, events, callback);
-}
-
-// static
-void Plan::iterateAvailablePlansWithoutFiringWithEvents(const CoreField& field,
-                                                        const KumipuyoSeq& kumipuyoSeq,
-                                                        int maxDepth,
-                                                        const std::vector<Event>& events,
-                                                        const Plan::RensaIterationCallback& callback)
-{
     std::vector<Decision> decisions;
     decisions.reserve(maxDepth);
-    iterateAvailablePlansInternal(field, kumipuyoSeq, decisions, events, 0, 0, maxDepth, 0, 0, callback);
+    iterateAvailablePlansInternal(field, kumipuyoSeq, decisions, 0, maxDepth, 0, 0, callback);
 }
