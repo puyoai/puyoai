@@ -8,10 +8,10 @@ namespace {
 
 using Clock = high_resolution_clock;
 
-duration<std::int64_t> durationFromBase()
+Clock::duration durationFromBase()
 {
     static Clock::time_point s_clockBase = Clock::now();
-    return duration_cast<duration<std::int64_t>>(Clock::now() - s_clockBase);
+    return Clock::now() - s_clockBase;
 }
 
 }
