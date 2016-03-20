@@ -6,6 +6,9 @@
 
 #include "recognition/recognition_color.h"
 
+// Arow, Adaptive Regularization of Weight Vectors, is a linear classifier.
+// Based on this paper
+// http://papers.nips.cc/paper/3848-adaptive-regularization-of-weight-vectors.pdf
 class Arow {
 public:
     static const size_t SIZE = 16 * 16 * 3;
