@@ -26,9 +26,8 @@ public:
     void load(const std::string& filename);
 
 private:
-
-    std::vector<double> mean;
-    std::vector<double> cov;
+    std::vector<double> mean_;
+    std::vector<double> cov_;
 };
 
 #endif // CORE_CAPTURE_RECOGNITION_AROW_H_

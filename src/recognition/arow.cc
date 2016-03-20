@@ -7,16 +7,16 @@
 using namespace std;
 
 Arow::Arow()
-    : mean(SIZE), cov(SIZE)
+    : mean_(SIZE), cov_(SIZE)
 {
-    std::fill(cov.begin(), cov.end(), 1.0);
+    std::fill(cov_.begin(), cov_.end(), 1.0);
 }
 
 double Arow::margin(const vector<double>& features) const
 {
     double result = 0.0;
     for (size_t i = 0; i < SIZE; ++i) {
-        result += mean[i] * features[i];
+        result += mean_[i] * features[i];
     }
     return result;
 }
@@ -25,7 +25,7 @@ double Arow::margin(const double features[SIZE]) const
 {
     double result = 0.0;
     for (size_t i = 0; i < SIZE; ++i) {
-        result += mean[i] * features[i];
+        result += mean_[i] * features[i];
     }
     return result;
 }
@@ -34,7 +34,7 @@ double Arow::confidence(const vector<double>& features) const
 {
     double result = 0.0;
     for (size_t i = 0; i < SIZE; ++i) {
-        result += cov[i] * features[i] * features[i];
+        result += cov_[i] * features[i] * features[i];
     }
     return result;
 }
@@ -50,14 +50,14 @@ int Arow::update(const vector<double>& features, int label)
     double beta = 1.0 / (v + RATE);
     double alpha = (1.0 - label * m) * beta;
 
-    // update mean
+    // update mean_
     for (size_t i = 0; i < SIZE; ++i) {
-        mean[i] += alpha * label * cov[i] * features[i];
+        mean_[i] += alpha * label * cov_[i] * features[i];
     }
 
-    // update covariance
+    // update cov_ariance
     for (size_t i = 0; i < SIZE; ++i) {
-        cov[i] = 1.0 / ((1.0 / cov[i]) + features[i] * features[i] / RATE);
+        cov_[i] = 1.0 / ((1.0 / cov_[i]) + features[i] * features[i] / RATE);
     }
 
     return loss;
@@ -74,8 +74,8 @@ void Arow::save(const string& filename) const
     FILE* fp = fopen(filename.c_str(), "wb");
     PCHECK(fp);
 
-    CHECK_EQ(fwrite(&mean[0], sizeof(double), SIZE, fp), SIZE);
-    CHECK_EQ(fwrite(&cov[0], sizeof(double), SIZE, fp), SIZE);
+    CHECK_EQ(fwrite(&mean_[0], sizeof(double), SIZE, fp), SIZE);
+    CHECK_EQ(fwrite(&cov_[0], sizeof(double), SIZE, fp), SIZE);
 
     fclose(fp);
 }
@@ -85,8 +85,8 @@ void Arow::load(const string& filename)
     FILE* fp = fopen(filename.c_str(), "rb");
     PCHECK(fp);
 
-    CHECK_EQ(fread(&mean[0], sizeof(double), SIZE, fp), SIZE);
-    CHECK_EQ(fread(&cov[0], sizeof(double), SIZE, fp), SIZE);
+    CHECK_EQ(fread(&mean_[0], sizeof(double), SIZE, fp), SIZE);
+    CHECK_EQ(fread(&cov_[0], sizeof(double), SIZE, fp), SIZE);
 
     fclose(fp);
 }
