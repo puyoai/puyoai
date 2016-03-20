@@ -1,4 +1,4 @@
-#include "recognition/recognizer.h"
+#include "capture/recognition/recognizer.h"
 
 #include <algorithm>
 

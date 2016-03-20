@@ -1,8 +1,8 @@
-#ifndef RECOGNITION_RECOGNIZER_H_
-#define RECOGNITION_RECOGNIZER_H_
+#ifndef CAPTURE_RECOGNITION_RECOGNIZER_H_
+#define CAPTURE_RECOGNITION_RECOGNIZER_H_
 
+#include "capture/recognition/arow.h"
 #include "core/real_color.h"
-#include "recognition/arow.h"
 
 class Recognizer {
 public:
@@ -14,4 +14,4 @@ private:
     Arow arows[NUM_RECOGNITION];
 };
 
-#endif // RECOGNITION_RECOGNIZER_H_
+#endif // CAPTURE_RECOGNITION_RECOGNIZER_H_

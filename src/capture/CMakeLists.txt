@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_subdirectory(driver)
+add_subdirectory(recognition)
 
 add_library(puyoai_capture
             ac_analyzer.cc

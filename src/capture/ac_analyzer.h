@@ -3,8 +3,8 @@
 
 #include "base/base.h"
 #include "capture/analyzer.h"
+#include "capture/recognition/recognizer.h"
 #include "gui/bounding_box.h"  // TODO(mayah): Consider removing this
-#include "recognition/recognizer.h"
 
 struct Box;
 struct HSV;

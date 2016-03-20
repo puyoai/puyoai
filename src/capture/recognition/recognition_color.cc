@@ -1,4 +1,4 @@
-#include "recognition/recognition_color.h"
+#include "capture/recognition/recognition_color.h"
 
 #include <glog/logging.h>
 

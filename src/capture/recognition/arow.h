@@ -1,10 +1,10 @@
-#ifndef RECOGNITION_RECOGNITION_AROW_H_
-#define RECOGNITION_RECOGNITION_AROW_H_
+#ifndef CAPTURE_RECOGNITION_RECOGNITION_AROW_H_
+#define CAPTURE_RECOGNITION_RECOGNITION_AROW_H_
 
 #include <string>
 #include <vector>
 
-#include "recognition/recognition_color.h"
+#include "capture/recognition/recognition_color.h"
 
 // Arow, Adaptive Regularization of Weight Vectors, is a linear classifier.
 // Based on this paper
@@ -30,4 +30,4 @@ private:
     std::vector<double> cov_;
 };
 
-#endif // CORE_CAPTURE_RECOGNITION_AROW_H_
+#endif // CAPTURE_RECOGNITION_RECOGNITION_AROW_H_
