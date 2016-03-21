@@ -69,6 +69,18 @@ int Arow::predict(const vector<double>& features) const
     return m > 0 ? 1 : -1;
 }
 
+void Arow::setMean(vector<double> mean)
+{
+    CHECK_EQ(mean_.size(), SIZE);
+    mean_ = std::move(mean);
+}
+
+void Arow::setCov(vector<double> cov)
+{
+    CHECK_EQ(cov_.size(), SIZE);
+    cov_ = std::move(cov);
+}
+
 void Arow::save(const string& filename) const
 {
     FILE* fp = fopen(filename.c_str(), "wb");

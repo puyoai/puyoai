@@ -101,7 +101,6 @@ endif()
 add_definitions(-DSRC_DIR="${CMAKE_SOURCE_DIR}")
 add_definitions(-DTESTDATA_DIR="${CMAKE_SOURCE_DIR}/../test_resources")
 add_definitions(-DDATA_DIR="${CMAKE_SOURCE_DIR}/../data")
-add_definitions(-DRECOGNITION_DIR="${CMAKE_SOURCE_DIR}/../recognition")
 
 if(MSVC)
   add_definitions(-DGOOGLE_GLOG_DLL_DECL=)

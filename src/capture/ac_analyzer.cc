@@ -11,7 +11,6 @@
 
 using namespace std;
 
-DEFINE_string(recognition_dir, RECOGNITION_DIR, "the directory path to recognition dir.");
 DEFINE_bool(strict_ojama_recognition, true, "use strict ojama recognition.");
 
 namespace {
@@ -121,7 +120,7 @@ static RealColor estimateRealColorFromColorCount(int colorCount[NUM_REAL_COLORS]
 }
 
 ACAnalyzer::ACAnalyzer() :
-    recognizer_(FLAGS_recognition_dir)
+    recognizer_()
 {
 }
 

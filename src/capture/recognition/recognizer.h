@@ -6,7 +6,7 @@
 
 class Recognizer {
 public:
-    explicit Recognizer(const std::string& dir);
+    Recognizer();
 
     RealColor recognize(const double features[16 * 16 * 3]) const;
 

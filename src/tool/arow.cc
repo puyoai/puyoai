@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <fstream>
 #include <vector>
 
 #include <dirent.h>
@@ -8,6 +9,7 @@
 #include <gtest/gtest.h>
 #include <SDL_image.h>
 
+#include "base/base.h"
 #include "base/strings.h"
 #include "capture/color.h"
 #include "capture/recognition/arow.h"
@@ -22,6 +24,10 @@ using namespace std;
 // Before running this trainer, run
 // $ tar zxvf recognition.tgz
 // in testdata/images directory.
+
+const char* COLOR_NAMES[] = {
+    "RED", "BLUE", "YELLOW", "GREEN", "PURPLE", "EMPTY", "OJAMA", "ZENKESHI"
+};
 
 // ----------------------------------------------------------------------
 
@@ -137,14 +143,55 @@ int main()
     cout << "num = " << num << endl;
     cout << "fail = " << fail << endl;
 
-    arows[0].save("red.arow");
-    arows[1].save("blue.arow");
-    arows[2].save("yellow.arow");
-    arows[3].save("green.arow");
-    arows[4].save("purple.arow");
-    arows[5].save("empty.arow");
-    arows[6].save("ojama.arow");
-    arows[7].save("zenkeshi.arow");
+    // Save the data as C-array.
+    std::stringstream body;
+    {
+        body << "#include <cstddef>" << endl;
+        body << "#include <cstdint>" << endl;
+
+        for (size_t i = 0; i < ARRAY_SIZE(COLOR_NAMES); ++i) {
+            body << "const std::size_t " << COLOR_NAMES[i] << "_MEAN_SIZE = " << arows[i].mean().size() << ";" << endl;
+            body << "const std::size_t " << COLOR_NAMES[i] << "_COV_SIZE = " << arows[i].cov().size() << ";" << endl;
+        }
+
+        for (size_t i = 0; i < ARRAY_SIZE(COLOR_NAMES); ++i) {
+            body << endl;
+            body << "const double " << COLOR_NAMES[i] << "_MEAN[] = {" << endl;
+            for (size_t j = 0; j < arows[i].mean().size(); ++j) {
+                if (j % 4 == 0) {
+                    body << "    ";
+                } else {
+                    body << " ";
+                }
+                body << scientific << showpos << setprecision(16) << arows[i].mean()[j] << ",";
+                if (j % 4 == 3) {
+                    body << std::endl;
+                }
+            }
+            body << "};" << endl;
+        }
+
+        for (size_t i = 0; i < ARRAY_SIZE(COLOR_NAMES); ++i) {
+            body << endl;
+            body << "const double " << COLOR_NAMES[i] << "_COV[] = {" << endl;
+            for (size_t j = 0; j < arows[i].cov().size(); ++j) {
+                if (j % 4 == 0) {
+                    body << "    ";
+                } else {
+                    body << " ";
+                }
+                body << scientific << showpos << setprecision(16) << arows[i].cov()[j] << ",";
+                if (j % 4 == 3) {
+                    body << std::endl;
+                }
+            }
+            body << "};" << endl;
+        }
+    }
+
+    ofstream ofs("classifier_features.cc");
+    ofs << body.str();
+    ofs.close();
 
     return 0;
 }

@@ -22,6 +22,12 @@ public:
     int update(const std::vector<double>& features, int label);
     int predict(const std::vector<double>& features) const;
 
+    void setMean(std::vector<double>);
+    void setCov(std::vector<double>);
+
+    const std::vector<double>& mean() const { return mean_; }
+    const std::vector<double>& cov() const { return cov_; }
+
     void save(const std::string& filename) const;
     void load(const std::string& filename);
 
