@@ -28,9 +28,6 @@ public:
     const std::vector<double>& mean() const { return mean_; }
     const std::vector<double>& cov() const { return cov_; }
 
-    void save(const std::string& filename) const;
-    void load(const std::string& filename);
-
 private:
     std::vector<double> mean_;
     std::vector<double> cov_;

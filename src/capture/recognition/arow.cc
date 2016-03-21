@@ -80,25 +80,3 @@ void Arow::setCov(vector<double> cov)
     CHECK_EQ(cov_.size(), SIZE);
     cov_ = std::move(cov);
 }
-
-void Arow::save(const string& filename) const
-{
-    FILE* fp = fopen(filename.c_str(), "wb");
-    PCHECK(fp);
-
-    CHECK_EQ(fwrite(&mean_[0], sizeof(double), SIZE, fp), SIZE);
-    CHECK_EQ(fwrite(&cov_[0], sizeof(double), SIZE, fp), SIZE);
-
-    fclose(fp);
-}
-
-void Arow::load(const string& filename)
-{
-    FILE* fp = fopen(filename.c_str(), "rb");
-    PCHECK(fp);
-
-    CHECK_EQ(fread(&mean_[0], sizeof(double), SIZE, fp), SIZE);
-    CHECK_EQ(fread(&cov_[0], sizeof(double), SIZE, fp), SIZE);
-
-    fclose(fp);
-}
