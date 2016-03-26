@@ -25,20 +25,11 @@ const char* COLOR_NAMES[] = {
     "RED", "BLUE", "YELLOW", "GREEN", "PURPLE", "EMPTY", "OJAMA", "ZENKESHI"
 };
 
-// ----------------------------------------------------------------------
+const int IMAGE_WIDTH = 16;
+const int IMAGE_HEIGHT = 16;
 
-int main()
+bool readFeatures(vector<vector<double>> features[NUM_RECOGNITION])
 {
-    const int WIDTH = 16;
-    const int HEIGHT = 16;
-
-    unique_ptr<Arow> arows[NUM_RECOGNITION];
-    for (int i = 0; i < NUM_RECOGNITION; ++i) {
-        arows[i].reset(new Arow);
-    }
-
-    vector<vector<double>> features[NUM_RECOGNITION];
-
     const pair<string, RecognitionColor> training_testcases[] = {
         make_pair((FLAGS_testdata_dir + "/images/puyo/red.png"), RecognitionColor::RED),
         make_pair((FLAGS_testdata_dir + "/images/puyo/blue.png"), RecognitionColor::BLUE),
@@ -77,13 +68,13 @@ int main()
         UniqueSDLSurface surf(makeUniqueSDLSurface(IMG_Load(filename.c_str())));
         CHECK(surf.get());
 
-        for (int x = 0; (x + 1) * WIDTH <= surf->w; ++x) {
-            for (int y = 0; (y + 1) * HEIGHT <= surf->h; ++y) {
+        for (int x = 0; (x + 1) * IMAGE_WIDTH <= surf->w; ++x) {
+            for (int y = 0; (y + 1) * IMAGE_HEIGHT <= surf->h; ++y) {
                 int pos = 0;
-                vector<double> fs(WIDTH * HEIGHT * 3);
-                for (int yy = 0; yy < HEIGHT; ++yy) {
-                    for (int xx = 0; xx < WIDTH; ++xx) {
-                        std::uint32_t c = getpixel(surf.get(), x * WIDTH + xx, y * HEIGHT + yy);
+                vector<double> fs(IMAGE_WIDTH * IMAGE_HEIGHT * 3);
+                for (int yy = 0; yy < IMAGE_HEIGHT; ++yy) {
+                    for (int xx = 0; xx < IMAGE_WIDTH; ++xx) {
+                        std::uint32_t c = getpixel(surf.get(), x * IMAGE_WIDTH + xx, y * IMAGE_HEIGHT + yy);
                         std::uint8_t r, g, b;
                         SDL_GetRGB(c, surf->format, &r, &g, &b);
                         fs[pos++] = r;
@@ -92,15 +83,32 @@ int main()
                     }
                 }
 
-                CHECK(pos == WIDTH * HEIGHT * 3);
+                CHECK(pos == IMAGE_WIDTH * IMAGE_HEIGHT * 3);
                 features[static_cast<int>(color)].push_back(std::move(fs));
             }
         }
     }
 
-    for (const auto& f : features) {
+    for (int i = 0; i < NUM_RECOGNITION; ++i) {
+        const auto& f = features[i];
         cout << "SIZE = " << f.size() << endl;
     }
+
+    return true;
+}
+
+// ----------------------------------------------------------------------
+
+
+int main()
+{
+    unique_ptr<Arow> arows[NUM_RECOGNITION];
+    for (int i = 0; i < NUM_RECOGNITION; ++i) {
+        arows[i].reset(new Arow);
+    }
+
+    vector<vector<double>> features[NUM_RECOGNITION];
+    CHECK(readFeatures(features));
 
     // training
     for (int times = 0; times < 300; ++times) {
