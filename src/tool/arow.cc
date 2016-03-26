@@ -21,10 +21,6 @@ DECLARE_string(testdata_dir);
 
 using namespace std;
 
-// Before running this trainer, run
-// $ tar zxvf recognition.tgz
-// in testdata/images directory.
-
 const char* COLOR_NAMES[] = {
     "RED", "BLUE", "YELLOW", "GREEN", "PURPLE", "EMPTY", "OJAMA", "ZENKESHI"
 };
@@ -36,7 +32,11 @@ int main()
     const int WIDTH = 16;
     const int HEIGHT = 16;
 
-    Arow arows[NUM_RECOGNITION];
+    unique_ptr<Arow> arows[NUM_RECOGNITION];
+    for (int i = 0; i < NUM_RECOGNITION; ++i) {
+        arows[i].reset(new Arow);
+    }
+
     vector<vector<double>> features[NUM_RECOGNITION];
 
     const pair<string, RecognitionColor> training_testcases[] = {
@@ -110,7 +110,7 @@ int main()
                     continue;
 
                 for (int k = 0; k < NUM_RECOGNITION; ++k) {
-                    arows[k].update(features[i][j], i == k ? 1 : -1);
+                    arows[k]->update(features[i][j], i == k ? 1 : -1);
                 }
             }
         }
@@ -126,7 +126,7 @@ int main()
             ++num;
             double vs[NUM_RECOGNITION] {};
             for (int k = 0; k < NUM_RECOGNITION; ++k) {
-                vs[k] = arows[k].margin(features[i][j]);
+                vs[k] = arows[k]->margin(features[i][j]);
             }
 
             int result = std::max_element(vs, vs + NUM_RECOGNITION) - vs;
@@ -150,20 +150,20 @@ int main()
         body << "#include <cstdint>" << endl;
 
         for (size_t i = 0; i < ARRAY_SIZE(COLOR_NAMES); ++i) {
-            body << "const std::size_t " << COLOR_NAMES[i] << "_MEAN_SIZE = " << arows[i].mean().size() << ";" << endl;
-            body << "const std::size_t " << COLOR_NAMES[i] << "_COV_SIZE = " << arows[i].cov().size() << ";" << endl;
+            body << "const std::size_t " << COLOR_NAMES[i] << "_MEAN_SIZE = " << arows[i]->mean().size() << ";" << endl;
+            body << "const std::size_t " << COLOR_NAMES[i] << "_COV_SIZE = " << arows[i]->cov().size() << ";" << endl;
         }
 
         for (size_t i = 0; i < ARRAY_SIZE(COLOR_NAMES); ++i) {
             body << endl;
             body << "const double " << COLOR_NAMES[i] << "_MEAN[] = {" << endl;
-            for (size_t j = 0; j < arows[i].mean().size(); ++j) {
+            for (size_t j = 0; j < arows[i]->mean().size(); ++j) {
                 if (j % 4 == 0) {
                     body << "    ";
                 } else {
                     body << " ";
                 }
-                body << scientific << showpos << setprecision(16) << arows[i].mean()[j] << ",";
+                body << scientific << showpos << setprecision(16) << arows[i]->mean()[j] << ",";
                 if (j % 4 == 3) {
                     body << std::endl;
                 }
@@ -174,13 +174,13 @@ int main()
         for (size_t i = 0; i < ARRAY_SIZE(COLOR_NAMES); ++i) {
             body << endl;
             body << "const double " << COLOR_NAMES[i] << "_COV[] = {" << endl;
-            for (size_t j = 0; j < arows[i].cov().size(); ++j) {
+            for (size_t j = 0; j < arows[i]->cov().size(); ++j) {
                 if (j % 4 == 0) {
                     body << "    ";
                 } else {
                     body << " ";
                 }
-                body << scientific << showpos << setprecision(16) << arows[i].cov()[j] << ",";
+                body << scientific << showpos << setprecision(16) << arows[i]->cov()[j] << ",";
                 if (j % 4 == 3) {
                     body << std::endl;
                 }
