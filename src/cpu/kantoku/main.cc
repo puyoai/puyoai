@@ -25,7 +25,7 @@ public:
     ChildAI(const string& name, const string& program) :
         name_(name)
     {
-        connector_ = std::move(ServerConnector::create(1, program));
+        connector_ = ServerConnector::create(1, program);
     }
 
     const std::string& name() const { return name_; }
