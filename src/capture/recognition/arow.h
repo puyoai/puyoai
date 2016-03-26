@@ -13,6 +13,8 @@ class Arow {
 public:
     explicit Arow(size_t size = 16 * 16 * 3, double rate = 0.1);
 
+    void setRate(double r) { rate_ = r; }
+
     // The size of |features| must be |size_|.
     double margin(const double features[]) const;
     double margin(const std::vector<double>& features) const;
@@ -28,7 +30,7 @@ public:
 
 private:
     const size_t size_;
-    const double rate_;
+    double rate_;
 
     std::vector<double> mean_;
     std::vector<double> cov_;

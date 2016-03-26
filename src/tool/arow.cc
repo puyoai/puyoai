@@ -97,27 +97,66 @@ bool readFeatures(vector<vector<double>> features[NUM_RECOGNITION])
     return true;
 }
 
-// ----------------------------------------------------------------------
-
-
 int main()
 {
-    unique_ptr<Arow> arows[NUM_RECOGNITION];
-    for (int i = 0; i < NUM_RECOGNITION; ++i) {
-        arows[i].reset(new Arow);
-    }
-
     vector<vector<double>> features[NUM_RECOGNITION];
     CHECK(readFeatures(features));
 
+#if 0
+    const int LEARNING_X_BEGIN = 0;
+    const int LEARNING_X_END = 16;
+    const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
+    const int LEARNING_HEIGHT = IMAGE_HEIGHT;
+
+    const char COLOR_NAME_PREFIX[] = "";
+    const int RECOGNITION_SIZE = 8;
+#endif
+
+#if 1
+    const int LEARNING_X_BEGIN = 0;
+    const int LEARNING_X_END = 8;
+    const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
+    const int LEARNING_HEIGHT = IMAGE_HEIGHT;
+
+    const char COLOR_NAME_PREFIX[] = "LEFT_";
+    const int RECOGNITION_SIZE = 6;
+#endif
+
+#if 0
+    const int LEARNING_X_BEGIN = 8;
+    const int LEARNING_X_END = 16;
+    const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
+    const int LEARNING_HEIGHT = IMAGE_HEIGHT;
+
+    const char COLOR_NAME_PREFIX[] = "RIGHT_";
+    const int RECOGNITION_SIZE = 6;
+#endif
+
+    unique_ptr<Arow> arows[RECOGNITION_SIZE];
+    for (int i = 0; i < RECOGNITION_SIZE; ++i) {
+        arows[i].reset(new Arow(LEARNING_WIDTH * LEARNING_HEIGHT * 3));
+    }
+
     // training
     for (int times = 0; times < 300; ++times) {
-        for (int i = 0; i < NUM_RECOGNITION; ++i) {
+        if (times == 200) {
+            for (int i = 0; i < RECOGNITION_SIZE; ++i) {
+                arows[i]->setRate(0.02);
+            }
+        }
+
+        if (times == 250) {
+            for (int i = 0; i < RECOGNITION_SIZE; ++i) {
+                arows[i]->setRate(0.005);
+            }
+        }
+
+        for (int i = 0; i < RECOGNITION_SIZE; ++i) {
             for (int j = 0; j < static_cast<int>(features[i].size()); ++j) {
                 if ((j & 0xF) == 0)
                     continue;
 
-                for (int k = 0; k < NUM_RECOGNITION; ++k) {
+                for (int k = 0; k < RECOGNITION_SIZE; ++k) {
                     arows[k]->update(features[i][j], i == k ? 1 : -1);
                 }
             }
@@ -129,18 +168,18 @@ int main()
     // test by all
     int num = 0;
     int fail = 0;
-    for (int i = 0; i < NUM_RECOGNITION; ++i) {
+    for (int i = 0; i < RECOGNITION_SIZE; ++i) {
         for (int j = 0; j < static_cast<int>(features[i].size()); ++j) {
             ++num;
-            double vs[NUM_RECOGNITION] {};
-            for (int k = 0; k < NUM_RECOGNITION; ++k) {
+            double vs[RECOGNITION_SIZE] {};
+            for (int k = 0; k < RECOGNITION_SIZE; ++k) {
                 vs[k] = arows[k]->margin(features[i][j]);
             }
 
-            int result = std::max_element(vs, vs + NUM_RECOGNITION) - vs;
+            int result = std::max_element(vs, vs + RECOGNITION_SIZE) - vs;
             if (i != result) {
                 cout << "fail: " << i << " " << j << " -> " << result << endl;
-                for (int k = 0; k < NUM_RECOGNITION; ++k)
+                for (int k = 0; k < RECOGNITION_SIZE; ++k)
                     cout << vs[k] << ' ';
                 cout << endl;
                 ++fail;
@@ -157,14 +196,16 @@ int main()
         body << "#include <cstddef>" << endl;
         body << "#include <cstdint>" << endl;
 
-        for (size_t i = 0; i < ARRAY_SIZE(COLOR_NAMES); ++i) {
-            body << "const std::size_t " << COLOR_NAMES[i] << "_MEAN_SIZE = " << arows[i]->mean().size() << ";" << endl;
-            body << "const std::size_t " << COLOR_NAMES[i] << "_COV_SIZE = " << arows[i]->cov().size() << ";" << endl;
+        for (size_t i = 0; i < RECOGNITION_SIZE; ++i) {
+            body << "const std::size_t " << COLOR_NAME_PREFIX << COLOR_NAMES[i] << "_MEAN_SIZE = "
+                 << arows[i]->mean().size() << ";" << endl;
+            body << "const std::size_t " << COLOR_NAME_PREFIX << COLOR_NAMES[i] << "_COV_SIZE = "
+                 << arows[i]->cov().size() << ";" << endl;
         }
 
-        for (size_t i = 0; i < ARRAY_SIZE(COLOR_NAMES); ++i) {
+        for (size_t i = 0; i < RECOGNITION_SIZE; ++i) {
             body << endl;
-            body << "const double " << COLOR_NAMES[i] << "_MEAN[] = {" << endl;
+            body << "const double " << COLOR_NAME_PREFIX << COLOR_NAMES[i] << "_MEAN[] = {" << endl;
             for (size_t j = 0; j < arows[i]->mean().size(); ++j) {
                 if (j % 4 == 0) {
                     body << "    ";
@@ -179,9 +220,9 @@ int main()
             body << "};" << endl;
         }
 
-        for (size_t i = 0; i < ARRAY_SIZE(COLOR_NAMES); ++i) {
+        for (size_t i = 0; i < RECOGNITION_SIZE; ++i) {
             body << endl;
-            body << "const double " << COLOR_NAMES[i] << "_COV[] = {" << endl;
+            body << "const double " << COLOR_NAME_PREFIX << COLOR_NAMES[i] << "_COV[] = {" << endl;
             for (size_t j = 0; j < arows[i]->cov().size(); ++j) {
                 if (j % 4 == 0) {
                     body << "    ";
