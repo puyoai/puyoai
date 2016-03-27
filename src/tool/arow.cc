@@ -1,8 +1,7 @@
 #include <algorithm>
 #include <fstream>
+#include <random>
 #include <vector>
-
-#include <dirent.h>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -112,7 +111,7 @@ int main()
     const int RECOGNITION_SIZE = 8;
 #endif
 
-#if 1
+#if 0
     const int LEARNING_X_BEGIN = 0;
     const int LEARNING_X_END = 8;
     const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
@@ -122,7 +121,7 @@ int main()
     const int RECOGNITION_SIZE = 6;
 #endif
 
-#if 0
+#if 1
     const int LEARNING_X_BEGIN = 8;
     const int LEARNING_X_END = 16;
     const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
@@ -137,28 +136,28 @@ int main()
         arows[i].reset(new Arow(LEARNING_WIDTH * LEARNING_HEIGHT * 3));
     }
 
+    vector<pair<int, vector<double>>> training_features;
+    vector<pair<int, vector<double>>> testing_features;
+
+    for (int i = 0; i < RECOGNITION_SIZE; ++i) {
+        for (size_t j = 0; j < features[i].size(); ++j) {
+            if ((j & 0xF) == 0) {
+                testing_features.push_back(make_pair(i, features[i][j]));
+            } else {
+                training_features.push_back(make_pair(i, features[i][j]));
+            }
+        }
+    }
+
+    std::mt19937 random_generator((std::random_device()()));
+
     // training
-    for (int times = 0; times < 300; ++times) {
-        if (times == 200) {
+    for (int times = 0; times < 500; ++times) {
+        std::shuffle(training_features.begin(), training_features.end(), random_generator);
+
+        for (const auto& f : training_features) {
             for (int i = 0; i < RECOGNITION_SIZE; ++i) {
-                arows[i]->setRate(0.02);
-            }
-        }
-
-        if (times == 250) {
-            for (int i = 0; i < RECOGNITION_SIZE; ++i) {
-                arows[i]->setRate(0.005);
-            }
-        }
-
-        for (int i = 0; i < RECOGNITION_SIZE; ++i) {
-            for (int j = 0; j < static_cast<int>(features[i].size()); ++j) {
-                if ((j & 0xF) == 0)
-                    continue;
-
-                for (int k = 0; k < RECOGNITION_SIZE; ++k) {
-                    arows[k]->update(features[i][j], i == k ? 1 : -1);
-                }
+                arows[i]->update(f.second, i == f.first ? 1 : -1);
             }
         }
 
@@ -168,22 +167,20 @@ int main()
     // test by all
     int num = 0;
     int fail = 0;
-    for (int i = 0; i < RECOGNITION_SIZE; ++i) {
-        for (int j = 0; j < static_cast<int>(features[i].size()); ++j) {
-            ++num;
-            double vs[RECOGNITION_SIZE] {};
-            for (int k = 0; k < RECOGNITION_SIZE; ++k) {
-                vs[k] = arows[k]->margin(features[i][j]);
-            }
+    for (const auto& f : testing_features) {
+        ++num;
+        double vs[RECOGNITION_SIZE] {};
+        for (int i = 0; i < RECOGNITION_SIZE; ++i) {
+            vs[i] = arows[i]->margin(f.second);
+        }
 
-            int result = std::max_element(vs, vs + RECOGNITION_SIZE) - vs;
-            if (i != result) {
-                cout << "fail: " << i << " " << j << " -> " << result << endl;
-                for (int k = 0; k < RECOGNITION_SIZE; ++k)
-                    cout << vs[k] << ' ';
-                cout << endl;
-                ++fail;
-            }
+        int result = std::max_element(vs, vs + RECOGNITION_SIZE) - vs;
+        if (result != f.first) {
+            cout << "fail: expect=" << f.first << " actual=" << result << endl;
+            for (int i = 0; i < RECOGNITION_SIZE; ++i)
+                cout << vs[i] << ' ';
+            cout << endl;
+            ++fail;
         }
     }
 
