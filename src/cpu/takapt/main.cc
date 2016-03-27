@@ -434,9 +434,9 @@ struct RunResult
 };
 RunResult run(int seed)
 {
-    TakaptAI* ai = new TakaptAI({}, 0);
+    std::unique_ptr<AI> ai(new TakaptAI({}, 0));
 
-    Endless endless(std::move(std::unique_ptr<AI>(ai)));
+    Endless endless(std::move(ai));
 //     endless.setVerbose(FLAGS_show_field);
 
     KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2SequenceWithSeed(seed);
@@ -458,10 +458,10 @@ void run_loop(int num, const int start_seed, bool print_info)
     vector<promise<RunResult>> promise_results(num);
     for (int i = 0; i < num; ++i)
     {
-        executor->submit(std::move([i, start_seed, &promise_results]() {
+        executor->submit([i, start_seed, &promise_results]() {
                 promise_results[i].set_value(run(start_seed + i));
                 cout << "done: " << i << endl;
-        }));
+        });
     }
 
     vector<RunResult> results;
