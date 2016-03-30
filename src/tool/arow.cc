@@ -155,7 +155,8 @@ int main()
     learning::MultiLayerPerceptron mlp(LEARNING_WIDTH * LEARNING_HEIGHT * 3, 20, RECOGNITION_SIZE);
 
     // training
-    std::mt19937 random_generator((std::random_device()()));
+    std::random_device rd;
+    std::mt19937 random_generator(rd());
     for (int times = 0; times < 500; ++times) {
         float rate;
         if (times >= 400) {
