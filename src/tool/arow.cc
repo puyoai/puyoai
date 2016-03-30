@@ -108,7 +108,7 @@ int main()
     const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
     const int LEARNING_HEIGHT = IMAGE_HEIGHT;
 
-    const char COLOR_NAME_PREFIX[] = "";
+    // const char COLOR_NAME_PREFIX[] = "";
     const int RECOGNITION_SIZE = 8;
 #endif
 
