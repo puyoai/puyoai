@@ -13,7 +13,8 @@ public:
     ~MultiLayerPerceptron();
 
     // Train single data.
-    void train(int label, const float x[], float learning_rate = 0.1);
+    // Returns true if the prediction is correct.
+    bool train(int label, const float x[], float learning_rate = 0.1);
 
     // Returns the label.
     int predict(const float x[]);

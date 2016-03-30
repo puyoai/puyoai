@@ -15,6 +15,7 @@
 #include "core/real_color.h"
 #include "gui/unique_sdl_surface.h"
 #include "gui/util.h"
+#include "tool/multi_layer_perceptron.h"
 
 DECLARE_string(testdata_dir);
 
@@ -27,7 +28,7 @@ const char* COLOR_NAMES[] = {
 const int IMAGE_WIDTH = 16;
 const int IMAGE_HEIGHT = 16;
 
-bool readFeatures(vector<vector<double>> features[NUM_RECOGNITION])
+bool readFeatures(vector<vector<float>> features[NUM_RECOGNITION])
 {
     const pair<string, RecognitionColor> training_testcases[] = {
         make_pair((FLAGS_testdata_dir + "/images/puyo/red.png"), RecognitionColor::RED),
@@ -70,15 +71,15 @@ bool readFeatures(vector<vector<double>> features[NUM_RECOGNITION])
         for (int x = 0; (x + 1) * IMAGE_WIDTH <= surf->w; ++x) {
             for (int y = 0; (y + 1) * IMAGE_HEIGHT <= surf->h; ++y) {
                 int pos = 0;
-                vector<double> fs(IMAGE_WIDTH * IMAGE_HEIGHT * 3);
+                vector<float> fs(IMAGE_WIDTH * IMAGE_HEIGHT * 3);
                 for (int yy = 0; yy < IMAGE_HEIGHT; ++yy) {
                     for (int xx = 0; xx < IMAGE_WIDTH; ++xx) {
                         std::uint32_t c = getpixel(surf.get(), x * IMAGE_WIDTH + xx, y * IMAGE_HEIGHT + yy);
                         std::uint8_t r, g, b;
                         SDL_GetRGB(c, surf->format, &r, &g, &b);
-                        fs[pos++] = r;
-                        fs[pos++] = g;
-                        fs[pos++] = b;
+                        fs[pos++] = r / 255.0;
+                        fs[pos++] = g / 255.0;
+                        fs[pos++] = b / 255.0;
                     }
                 }
 
@@ -98,10 +99,10 @@ bool readFeatures(vector<vector<double>> features[NUM_RECOGNITION])
 
 int main()
 {
-    vector<vector<double>> features[NUM_RECOGNITION];
+    vector<vector<float>> features[NUM_RECOGNITION];
     CHECK(readFeatures(features));
 
-#if 0
+#if 1
     const int LEARNING_X_BEGIN = 0;
     const int LEARNING_X_END = 16;
     const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
@@ -121,7 +122,7 @@ int main()
     const int RECOGNITION_SIZE = 6;
 #endif
 
-#if 1
+#if 0
     const int LEARNING_X_BEGIN = 8;
     const int LEARNING_X_END = 16;
     const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
@@ -131,13 +132,15 @@ int main()
     const int RECOGNITION_SIZE = 6;
 #endif
 
+#if 0
     unique_ptr<Arow> arows[RECOGNITION_SIZE];
     for (int i = 0; i < RECOGNITION_SIZE; ++i) {
         arows[i].reset(new Arow(LEARNING_WIDTH * LEARNING_HEIGHT * 3));
     }
+#endif
 
-    vector<pair<int, vector<double>>> training_features;
-    vector<pair<int, vector<double>>> testing_features;
+    vector<pair<int, vector<float>>> training_features;
+    vector<pair<int, vector<float>>> testing_features;
 
     for (int i = 0; i < RECOGNITION_SIZE; ++i) {
         for (size_t j = 0; j < features[i].size(); ++j) {
@@ -149,19 +152,53 @@ int main()
         }
     }
 
-    std::mt19937 random_generator((std::random_device()()));
+    learning::MultiLayerPerceptron mlp(LEARNING_WIDTH * LEARNING_HEIGHT * 3, 20, RECOGNITION_SIZE);
 
     // training
+    std::mt19937 random_generator((std::random_device()()));
     for (int times = 0; times < 500; ++times) {
+        float rate;
+        if (times >= 400) {
+            rate = 0.001;
+        } else if (times >= 300) {
+            rate = 0.005;
+        } else {
+            rate = 0.01;
+        }
+
         std::shuffle(training_features.begin(), training_features.end(), random_generator);
 
+        int num_correct = 0;
         for (const auto& f : training_features) {
+#if 0
             for (int i = 0; i < RECOGNITION_SIZE; ++i) {
                 arows[i]->update(f.second, i == f.first ? 1 : -1);
             }
+#endif
+            if (mlp.train(f.first, f.second.data(), rate))
+                num_correct += 1;
         }
 
-        cout << "training " << times << ": done" << endl;
+        cout << "training " << times << ": done"
+             << " num = " << training_features.size()
+             << " correct = " << num_correct
+             << endl;
+
+        if (times % 20 == 0) {
+            // test by all
+            int num = 0;
+            int fail = 0;
+            for (const auto& f : testing_features) {
+                ++num;
+                int result = mlp.predict(f.second.data());
+                if (result != f.first) {
+                    ++fail;
+                }
+            }
+
+            cout << "num = " << num << endl;
+            cout << "fail = " << fail << endl;
+        }
     }
 
     // test by all
@@ -169,16 +206,22 @@ int main()
     int fail = 0;
     for (const auto& f : testing_features) {
         ++num;
+#if 0
         double vs[RECOGNITION_SIZE] {};
         for (int i = 0; i < RECOGNITION_SIZE; ++i) {
             vs[i] = arows[i]->margin(f.second);
         }
 
         int result = std::max_element(vs, vs + RECOGNITION_SIZE) - vs;
+#endif
+        int result = mlp.predict(f.second.data());
+
         if (result != f.first) {
             cout << "fail: expect=" << f.first << " actual=" << result << endl;
+#if 0
             for (int i = 0; i < RECOGNITION_SIZE; ++i)
                 cout << vs[i] << ' ';
+#endif
             cout << endl;
             ++fail;
         }
@@ -187,6 +230,7 @@ int main()
     cout << "num = " << num << endl;
     cout << "fail = " << fail << endl;
 
+#if 0
     // Save the data as C-array.
     std::stringstream body;
     {
@@ -238,6 +282,7 @@ int main()
     ofstream ofs("classifier_features.cc");
     ofs << body.str();
     ofs.close();
+#endif
 
     return 0;
 }
