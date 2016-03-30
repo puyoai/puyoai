@@ -14,7 +14,7 @@ public:
 
     // Train single data.
     // Returns true if the prediction is correct.
-    bool train(int label, const float x[], float learning_rate = 0.1);
+    bool train(int label, const float x[], float learning_rate = 0.1, float l2_normalization = 0.001);
 
     // Returns the label.
     int predict(const float x[]);

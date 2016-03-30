@@ -57,7 +57,8 @@ MultiLayerPerceptron::~MultiLayerPerceptron()
 {
 }
 
-bool MultiLayerPerceptron::train(int label, const float x[], float learning_rate)
+bool MultiLayerPerceptron::train(int label, const float x[],
+                                 float learning_rate, float l2_normalization)
 {
     forward(x);
     int correct_label = std::max_element(i3_.get(), i3_.get() + num_output_) - i3_.get();
@@ -88,6 +89,16 @@ bool MultiLayerPerceptron::train(int label, const float x[], float learning_rate
         for (int j = 0; j < num_hidden_; ++j) {
             w2_[i * num_hidden_ + j] -= learning_rate * o1_[i] * e2_[j];
         }
+    }
+
+    // L2-normalization
+    const int hidden_layer_weight_count = (num_input_ + 1) * num_hidden_;
+    for (int i = 0; i < hidden_layer_weight_count; ++i) {
+        w2_[i] -= learning_rate * l2_normalization * w2_[i];
+    }
+    const int output_layer_weight_count = (num_hidden_ + 1) * num_output_;
+    for (int i = 0; i < output_layer_weight_count; ++i) {
+        w3_[i] -= learning_rate * l2_normalization * w3_[i];
     }
 
     return label == correct_label;
