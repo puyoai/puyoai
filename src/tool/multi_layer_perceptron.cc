@@ -17,37 +17,38 @@ inline float activator(float x)
 
 inline float d_activator(float x)
 {
-    return 1 / cosh(x) / cosh(x);
+    double c = cosh(x);
+    return 1 / (c * c);
 }
 
 } // namespace
 
 namespace learning {
 
-MultiLayerPerceptron::MultiLayerPerceptron(int in, int hid, int out) :
-    num_input_(in),
-    num_hidden_(hid),
-    num_output_(out)
+MultiLayerPerceptron::MultiLayerPerceptron(int num_input, int num_hidden, int num_output) :
+    num_input_(num_input),
+    num_hidden_(num_hidden),
+    num_output_(num_output)
 {
-    o1_.reset(new float[in + 1]);
+    o1_.reset(new float[num_input + 1]);
 
-    i2_.reset(new float[hid]);
-    o2_.reset(new float[hid + 1]);
-    e2_.reset(new float[hid + 1]);
-    w2_.reset(new float[(in + 1) * hid]);
+    i2_.reset(new float[num_hidden]);
+    o2_.reset(new float[num_hidden + 1]);
+    e2_.reset(new float[num_hidden + 1]);
+    w2_.reset(new float[(num_input + 1) * num_hidden]);
 
-    i3_.reset(new float[out]);
-    e3_.reset(new float[out]);
-    w3_.reset(new float[(hid + 1) * out]);
+    i3_.reset(new float[num_output]);
+    e3_.reset(new float[num_output]);
+    w3_.reset(new float[(num_hidden + 1) * num_output]);
 
     std::random_device rd;
     std::mt19937 mt(rd());
     std::uniform_real_distribution<float> distribution(-1.0, 1.0);
 
-    for (int i = 0; i < (in + 1) * hid; ++i) {
+    for (int i = 0; i < (num_input + 1) * num_hidden; ++i) {
         w2_[i] = distribution(mt);
     }
-    for (int i = 0; i < (hid + 1) * out; ++i) {
+    for (int i = 0; i < (num_hidden + 1) * num_output; ++i) {
         w3_[i] = distribution(mt);
     }
 }

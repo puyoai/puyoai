@@ -9,7 +9,7 @@ namespace learning {
 // This is not thread-safe.
 class MultiLayerPerceptron {
 public:
-    MultiLayerPerceptron(int in, int hid, int out);
+    MultiLayerPerceptron(int num_input, int num_hidden, int num_output);
     ~MultiLayerPerceptron();
 
     // Train single data.
