@@ -11,10 +11,11 @@
 #include "base/base.h"
 #include "base/strings.h"
 #include "capture/color.h"
-#include "capture/recognition/arow.h"
+#include "capture/recognition/recognition_color.h"
 #include "core/real_color.h"
 #include "gui/unique_sdl_surface.h"
 #include "gui/util.h"
+#include "learning/arow.h"
 #include "tool/multi_layer_perceptron.h"
 
 DECLARE_string(testdata_dir);

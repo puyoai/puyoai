@@ -1,8 +1,7 @@
-#include "capture/recognition/arow.h"
-
-#include <stdio.h>
+#include "learning/arow.h"
 
 #include <glog/logging.h>
+#include <stdio.h>
 
 using namespace std;
 
