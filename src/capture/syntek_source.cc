@@ -95,7 +95,7 @@ UniqueSDLSurface SyntekSource::getNextFrame()
         FLAGS_capture_offset_x, FLAGS_capture_offset_y,
         FLAGS_capture_width, FLAGS_capture_height };
     SDL_BlitScaled(currentSurface_.get(), &srcRect, surf.get(), nullptr);
-    return std::move(surf);
+    return surf;
 }
 
 void SyntekSource::runLoop()

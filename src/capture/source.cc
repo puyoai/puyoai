@@ -50,5 +50,5 @@ UniqueSDLSurface Source::nextFrame()
         saveScreenShot(surface.get());
     }
 
-    return std::move(surface);
+    return surface;
 }

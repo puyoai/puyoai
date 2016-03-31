@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
     google::InstallFailureSignalHandler();
 #endif
 
-    Endless endless(std::move(std::unique_ptr<AI>(new munetoshi::AI(argc, argv))));
+    Endless endless(std::unique_ptr<AI>(new munetoshi::AI(argc, argv)));
 
     std::array<int, TEST_TIMES> score_array;
     std::array<int, TEST_TIMES> chain_array;

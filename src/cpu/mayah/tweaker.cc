@@ -133,7 +133,8 @@ void runOnce(const EvaluationParameterMap& paramMap)
     ai->setUsesRensaHandTree(false);
     ai->setEvaluationParameterMap(paramMap);
 
-    Endless endless(std::move(std::unique_ptr<AI>(ai)));
+    std::unique_ptr<AI> ai_ptr(ai);
+    Endless endless(std::move(ai_ptr));
     endless.setVerbose(FLAGS_show_field);
 
     KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
@@ -158,7 +159,9 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
             ai->setUsesRensaHandTree(false);
             ai->setEvaluationParameterMap(paramMap);
 
-            Endless endless(std::move(std::unique_ptr<AI>(ai)));
+            std::unique_ptr<AI> ai_ptr(ai);
+            Endless endless(std::move(ai_ptr));
+
             stringstream ss;
             KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2SequenceWithSeed(i + FLAGS_offset);
             EndlessResult result = endless.run(seq);
