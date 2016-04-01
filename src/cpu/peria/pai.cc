@@ -5,6 +5,8 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <map>
+#include <numeric>
 #include <sstream>
 #include <vector>
 
@@ -12,13 +14,51 @@
 #include "core/core_field.h"
 #include "core/kumipuyo_seq_generator.h"
 #include "core/plan/plan.h"
+#include "core/rensa/rensa_detector.h"
 #include "cpu/peria/situation.h"
 
 DECLARE_int32(simulate_size);
+DECLARE_int32(simulate_width);
 
 namespace peria {
 
 using int64 = std::int64_t;
+
+namespace {
+
+struct State {
+  Decision firstDecision;
+  CoreField field;
+  int score;
+  int expectChain;
+  int expectScore;
+  int frameId;
+};
+
+void GenerateNext(State state, const RefPlan& plan, std::vector<State>* nextStates) {
+  if (!state.firstDecision.isValid()) {
+    state.firstDecision = plan.firstDecision();
+  }
+  state.field = plan.field();
+  state.score += plan.score();
+  state.frameId = plan.totalFrames();
+
+  int expectScore = 0;
+  int expectChain = 0;
+  bool prohibits[FieldConstant::MAP_WIDTH] {};
+  auto complementCallback = [&expectScore, &expectChain](CoreField&& field, const ColumnPuyoList&) {
+      RensaResult result = field.simulate();
+      expectScore = std::max(expectScore, result.score);
+      expectChain = std::max(expectChain, result.chains);
+  };
+  RensaDetector::detectByDropStrategy(state.field, prohibits, PurposeForFindingRensa::FOR_FIRE, 2, 13, complementCallback);
+  state.expectScore = expectScore;
+  state.expectChain = expectChain;
+
+  nextStates->push_back(state);
+}
+
+}  // namespace
 
 Pai::Pai(int argc, char* argv[]): ::AI(argc, argv, "peria") {}
 
@@ -30,66 +70,115 @@ DropDecision Pai::think(int frameId,
                         const PlayerState& myState,
                         const PlayerState& enemyState,
                         bool fast) const {
-  UNUSED_VARIABLE(myState);
   UNUSED_VARIABLE(enemyState);
-  UNUSED_VARIABLE(fast);
+  std::ostringstream oss;
 
   int64 startTime = currentTimeInMillis();
+  int64 dueTime = startTime + (fast ? 25 : 250);
 
-  // - Generate 22*22 states with iterating 2 known Kumipuyos
-  //   - simulating enemy's firing chains not to die.
-  std::vector<Situation> situations;
-  auto iterateFirst = [&frameId, &seq, &situations](const RefPlan& firstPlan) {
-    auto iterateSecond = [&frameId, &seq, &firstPlan, &situations](const RefPlan& plan) {
-      Situation situation(firstPlan.firstDecision(), plan.field(),
-                          firstPlan.score() + plan.score(), 
-                          frameId + firstPlan.totalFrames() + plan.totalFrames());
-      situations.push_back(situation);
-    };
-    Plan::iterateAvailablePlans(firstPlan.field(), seq.subsequence(1), 1, iterateSecond);
-  };
-  Plan::iterateAvailablePlans(field, seq, 1, iterateFirst);
+  const int fullIterationDepth = 10;
+  const int detectIterationDepth = std::min(seq.size(), 2);
+  const int unknownIterationDepth = fullIterationDepth - detectIterationDepth;
+  std::vector<std::vector<State>> states(fullIterationDepth + 1);
 
-  if (!situations.size()) {
-    return DropDecision(Decision(3, 0), "Die");
+  Decision finalDecision;
+  int bestScore = 0;
+
+  State firstState;
+  // intentionally leave firstState.firstDecision unset
+  firstState.field = field;
+  firstState.score = myState.unusedScore;
+  firstState.expectChain = 0;
+  firstState.expectScore = 0;
+  firstState.frameId = frameId;
+
+  oss << "sizes: ";
+  states[0].push_back(firstState);
+  for (int i = 0; i < detectIterationDepth; ++i) {
+    auto& nextStates = states[i + 1];
+    for (const State& s : states[i]) {
+      auto generateNext = std::bind(GenerateNext, s, std::placeholders::_1, &nextStates);
+      Plan::iterateAvailablePlans(field, {seq.get(i)}, 1, generateNext);
+    }
+    std::sort(nextStates.begin(), nextStates.end(),
+              [](const State& a, const State& b) {
+                if (a.expectChain == b.expectChain) return a.expectScore > b.expectScore;
+                return a.expectChain > b.expectChain;
+              });
+    if (static_cast<int>(nextStates.size()) > FLAGS_simulate_width)
+      nextStates.resize(FLAGS_simulate_width);
+
+    oss << nextStates.size() << "/";
+    for (const State& s : nextStates) {
+      if (s.score > bestScore) {
+        finalDecision = s.firstDecision;
+        bestScore = s.score;
+      }
+    }
   }
 
-  KumipuyoSeq knownSeq = seq.subsequence(2);
-  // Evaluate once
-  for (auto& st : situations) {
-    KumipuyoSeq s(knownSeq);
-    int simulateSteps = FLAGS_simulate_size - s.size();
-    simulateSteps = std::max(simulateSteps, 2);
-    s.append(KumipuyoSeqGenerator::generateRandomSequence(simulateSteps));
-    st.evaluate(s);
+  oss << detectIterationDepth << "\n";
+  if (states[detectIterationDepth].size() == 0) {
+    oss << "Die";
+    return DropDecision(Decision(3, 0), oss.str());
   }
 
-  // - Run Monte Carlo search from each state
-  //   - Use a beam search with a narrow width (~20?)
-  //   - Choose start state whose UCB is the highest.
-  //   - UCB[i] = average(past_score_from(i)) + C * sqrt(log(total_n) / n[i])
-  int n = situations.size();
-  sort(situations.begin(), situations.end(),
-       [&n](const Situation& a, const Situation& b){
-         return a.ucb(n) > b.ucb(n);
-       });
-  for (int i = 0; i < 2; ++i) {
-    KumipuyoSeq s(knownSeq);
-    int simulateSteps = FLAGS_simulate_size - s.size();
-    simulateSteps = std::max(simulateSteps, 2);
-    s.append(KumipuyoSeqGenerator::generateRandomSequence(simulateSteps));
-    situations.front().evaluate(s);
-    sort(situations.begin(), situations.end(),
-         [&n](const Situation& a, const Situation& b){
-           return a.ucb(n) > b.ucb(n);
-         });
+#if 0
+  int64 detectTime = currentTimeInMillis();
+  oss << "Known: " << (detectTime - startTime) << "ms/ "
+      << states[detectIterationDepth].size() << " states/ "
+      << detectIterationDepth << "-th hands: "
+      << finalDecision << " with " << bestScore << " points\n";
+
+  int nTest = 0;
+  std::map<Decision, std::vector<int>> vote;
+  for (nTest = 0; currentTimeInMillis() < dueTime; ++nTest) {
+    Decision decision;
+    int score = 0;
+
+    KumipuyoSeq pseudoSeq = KumipuyoSeqGenerator::generateRandomSequence(unknownIterationDepth);
+    for (int i = detectIterationDepth, j = 0; i < fullIterationDepth; ++i, ++j) {
+      auto& nextStates = states[i + 1];
+      nextStates.clear();
+      for (const State& s : states[i]) {
+        auto generateNext = std::bind(GenerateNext, s, std::placeholders::_1, &nextStates);
+        Plan::iterateAvailablePlans(field, {seq.get(j)}, 1, generateNext);
+      }
+      std::sort(nextStates.begin(), nextStates.end(),
+                [](const State& a, const State& b) {
+                  if (a.expectChain == b.expectChain) return a.expectScore > b.expectScore;
+                  return a.expectChain > b.expectChain;
+                });
+      if (static_cast<int>(nextStates.size()) > FLAGS_simulate_width) {
+        nextStates.resize(FLAGS_simulate_width);
+      }
+
+      for (const State& s : nextStates) {
+        if (s.score > score) {
+          decision = s.firstDecision;
+          score = s.score;
+        }
+      }
+    }
+    vote[decision].push_back(score);
   }
 
-  int64 endTime = currentTimeInMillis();
-  std::ostringstream oss;
-  oss << "ThinkTime: " << (endTime - startTime) << "ms";
+  double bestAvgScore = bestScore;
+  for (auto& v : vote) {
+    double avg = std::accumulate(v.second.begin(), v.second.end(), 0);
+    avg /= v.second.size();
+    if (avg > bestAvgScore) {
+      bestAvgScore = avg;
+      finalDecision = v.first;
+    }
+  }
+#endif
 
-  return DropDecision(situations.front().decision(), oss.str());
+  // int64 endTime = currentTimeInMillis();
+  // oss << "simulation: " << (endTime - detectTime) << "ms (" << nTest << " times)\n";
+  // oss << "Final: " << finalDecision << " with " << bestAvgScore << " points\n";
+
+  return DropDecision(finalDecision, oss.str());
 }
 
 }  // namespace peria

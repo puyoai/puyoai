@@ -9,7 +9,7 @@
 #include "core/rensa/rensa_detector.h"
 
 DEFINE_int32(simulate_size, 10, "The number of Kumipuyos to append in simulations.");
-DEFINE_int32(simulate_width, 20, "Bandwidth in the beamseach");
+DEFINE_int32(simulate_width, 10, "Bandwidth in the beamseach");
 DEFINE_double(ucb_coef, 10.0, "Contant coefficient in getting UCB");
 
 namespace peria {
