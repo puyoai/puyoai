@@ -33,6 +33,8 @@ struct State {
   int expectChain;
   int expectScore;
   int frameId;
+
+  double value;
 };
 
 void GenerateNext(State state, const RefPlan& plan, std::vector<State>* nextStates) {
@@ -55,8 +57,14 @@ void GenerateNext(State state, const RefPlan& plan, std::vector<State>* nextStat
   state.expectScore = expectScore;
   state.expectChain = expectChain;
 
+  state.value = expectScore;
+
   nextStates->push_back(state);
 }
+
+bool CompValue(const State& a, const State& b) {
+  return a.value > b.value;
+};
 
 }  // namespace
 
@@ -76,10 +84,12 @@ DropDecision Pai::think(int frameId,
   int64 startTime = currentTimeInMillis();
   int64 dueTime = startTime + (fast ? 25 : 250);
 
-  const int fullIterationDepth = 10;
-  const int detectIterationDepth = std::min(seq.size(), 2);
+  const int fullIterationDepth = 20;
+  const int detectIterationDepth = std::min(seq.size(), 3);
   const int unknownIterationDepth = fullIterationDepth - detectIterationDepth;
   std::vector<std::vector<State>> states(fullIterationDepth + 1);
+  CHECK_GE(unknownIterationDepth, 0);
+  LOG(INFO) << detectIterationDepth << " / " << fullIterationDepth << " search";
 
   Decision finalDecision;
   int bestScore = 0;
@@ -100,22 +110,20 @@ DropDecision Pai::think(int frameId,
       auto generateNext = std::bind(GenerateNext, s, std::placeholders::_1, &nextStates);
       Plan::iterateAvailablePlans(field, {seq.get(i)}, 1, generateNext);
     }
-    std::sort(nextStates.begin(), nextStates.end(),
-              [](const State& a, const State& b) {
-                if (a.expectChain == b.expectChain) return a.expectScore > b.expectScore;
-                return a.expectChain > b.expectChain;
-              });
+    std::sort(nextStates.begin(), nextStates.end(), CompValue);
     if (static_cast<int>(nextStates.size()) > FLAGS_simulate_width)
       nextStates.resize(FLAGS_simulate_width);
 
     oss << nextStates.size() << "/";
     for (const State& s : nextStates) {
-      if (s.score > bestScore) {
+      if (s.expectScore > bestScore) {
         finalDecision = s.firstDecision;
-        bestScore = s.score;
+        bestScore = s.expectScore;
       }
     }
   }
+  LOG(INFO) << "<Detective> (" << finalDecision.axisX() << "," << finalDecision.rot() << ") "
+            << bestScore << " points";
 
   oss << detectIterationDepth << "\n";
   if (states[detectIterationDepth].size() == 0) {
@@ -127,13 +135,14 @@ DropDecision Pai::think(int frameId,
   oss << "Known: " << (detectTime - startTime) << "ms/ "
       << states[detectIterationDepth].size() << " states/ "
       << detectIterationDepth << "-th hands: "
-      << finalDecision << " with " << bestScore << " points\n";
+      << "(" << finalDecision.axisX() << "-" << finalDecision.rot() << ")"
+      << " with " << bestScore << " points\n";
 
   int nTest = 0;
-  std::map<Decision, std::vector<int>> vote;
+  std::map<Decision, std::vector<double>> vote;
   for (nTest = 0; currentTimeInMillis() < dueTime; ++nTest) {
     Decision decision;
-    int score = 0;
+    double score = 0;
 
     KumipuyoSeq pseudoSeq = KumipuyoSeqGenerator::generateRandomSequence(unknownIterationDepth);
     for (int i = detectIterationDepth, j = 0; i < fullIterationDepth; ++i, ++j) {
@@ -143,11 +152,7 @@ DropDecision Pai::think(int frameId,
         auto generateNext = std::bind(GenerateNext, s, std::placeholders::_1, &nextStates);
         Plan::iterateAvailablePlans(field, {seq.get(j)}, 1, generateNext);
       }
-      std::sort(nextStates.begin(), nextStates.end(),
-                [](const State& a, const State& b) {
-                  if (a.expectChain == b.expectChain) return a.expectScore > b.expectScore;
-                  return a.expectChain > b.expectChain;
-                });
+      std::sort(nextStates.begin(), nextStates.end(), CompValue);
       if (static_cast<int>(nextStates.size()) > FLAGS_simulate_width) {
         nextStates.resize(FLAGS_simulate_width);
       }
@@ -159,22 +164,31 @@ DropDecision Pai::think(int frameId,
         }
       }
     }
-    vote[decision].push_back(score);
-  }
-
-  double bestAvgScore = bestScore;
-  for (auto& v : vote) {
-    double avg = std::accumulate(v.second.begin(), v.second.end(), 0);
-    avg /= v.second.size();
-    if (avg > bestAvgScore) {
-      bestAvgScore = avg;
-      finalDecision = v.first;
+    if (decision.isValid()) {
+      LOG(INFO) << "vote: " << decision << " " << score;
+      vote[decision].push_back(score);
     }
   }
 
   int64 endTime = currentTimeInMillis();
   oss << "simulation: " << (endTime - detectTime) << "ms (" << nTest << " times)\n";
-  oss << "Final: " << finalDecision << " with " << bestAvgScore << " points\n";
+
+  if (vote.size()) {
+    double bestAvgScore = bestScore * .9;
+    for (auto& v : vote) {
+      double avg = std::accumulate(v.second.begin(), v.second.end(), 0.0);
+      avg /= v.second.size();
+      LOG(INFO) << v.first << " " << v.second.size() << " " << avg;
+      if (avg > bestAvgScore) {
+        bestAvgScore = avg;
+        finalDecision = v.first;
+      }
+    }
+    oss << "Final: (" << finalDecision.axisX() << "-" << finalDecision.rot() << ")"
+        << " with " << bestAvgScore << " points\n";
+  } else {
+    oss << "Final: no updates\n";
+  }
 
   return DropDecision(finalDecision, oss.str());
 }
