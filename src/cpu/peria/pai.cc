@@ -17,8 +17,8 @@
 #include "core/rensa/rensa_detector.h"
 #include "core/score.h"
 
-DEFINE_int32(simulate_size, 10, "The number of Kumipuyos to append in simulations.");
-DEFINE_int32(simulate_width, 40, "Bandwidth in the beamseach");
+DEFINE_int32(beam_length, 20, "The number of Kumipuyos to append in simulations.");
+DEFINE_int32(beam_width, 40, "Bandwidth in the beamseach");
 
 namespace peria {
 
@@ -92,7 +92,7 @@ DropDecision Pai::think(int frameId,
   int64 startTime = currentTimeInMillis();
   int64 dueTime = startTime + (fast ? 25 : 250);
 
-  const int fullIterationDepth = 20;
+  const int fullIterationDepth = FLAGS_beam_length;
   const int detectIterationDepth = std::min(seq.size(), 3);
   const int unknownIterationDepth = fullIterationDepth - detectIterationDepth;
   std::vector<std::vector<State>> states(fullIterationDepth + 1);
@@ -120,8 +120,8 @@ DropDecision Pai::think(int frameId,
       Plan::iterateAvailablePlans(field, {seq.get(i)}, 1, generateNext);
     }
     std::sort(nextStates.begin(), nextStates.end(), CompValue);
-    if (static_cast<int>(nextStates.size()) > FLAGS_simulate_width)
-      nextStates.resize(FLAGS_simulate_width);
+    if (static_cast<int>(nextStates.size()) > FLAGS_beam_width)
+      nextStates.resize(FLAGS_beam_width);
 
     oss << nextStates.size() << "/";
     for (const State& s : nextStates) {
@@ -162,8 +162,8 @@ DropDecision Pai::think(int frameId,
         Plan::iterateAvailablePlans(field, {seq.get(j)}, 1, generateNext);
       }
       std::sort(nextStates.begin(), nextStates.end(), CompValue);
-      if (static_cast<int>(nextStates.size()) > FLAGS_simulate_width) {
-        nextStates.resize(FLAGS_simulate_width);
+      if (static_cast<int>(nextStates.size()) > FLAGS_beam_width) {
+        nextStates.resize(FLAGS_beam_width);
       }
 
       for (const State& s : nextStates) {
