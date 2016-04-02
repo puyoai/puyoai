@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <numeric>
 #include <sstream>
@@ -17,15 +18,21 @@
 #include "core/rensa/rensa_detector.h"
 #include "core/score.h"
 
-DEFINE_int32(beam_length, 20, "The number of Kumipuyos to append in simulations.");
-DEFINE_int32(beam_width, 40, "Bandwidth in the beamseach");
+DEFINE_int32(beam_length, 30, "The number of Kumipuyos to append in simulations.");
+DEFINE_int32(beam_width_1, 400, "Bandwidth in the beamseach");
+DEFINE_int32(beam_width_2, 40, "Bandwidth in the beamseach");
+DEFINE_int32(known_length, 5, "Assume at most this number of Tsumos are known.");
 
 namespace peria {
 
-using int64 = std::int64_t;
-
 namespace {
 
+struct State;
+
+using int64 = std::int64_t;
+using EvaluateFunc = std::function<double(const State&)>;
+
+// TODO: Introduce part of enemy's state to handle their attacks.
 struct State {
   Decision firstDecision;
   CoreField field;
@@ -38,7 +45,7 @@ struct State {
   double value;  // to be used in beam-search sorting
 };
 
-void GenerateNext(State state, const PlayerState& enemy, const RefPlan& plan, std::vector<State>* nextStates) {
+void GenerateNext(State state, const PlayerState& enemy, const EvaluateFunc& evalFunc, const RefPlan& plan, std::vector<State>* nextStates) {
   if (!state.firstDecision.isValid()) {
     state.firstDecision = plan.firstDecision();
   }
@@ -73,10 +80,18 @@ void GenerateNext(State state, const PlayerState& enemy, const RefPlan& plan, st
   state.expectScore = expectScore;
   state.expectChain = expectChain;
 
-  // TODO: Make an argument function to compute |value|.
-  state.value = state.score + expectScore;
+  state.value = evalFunc(state);
 
   nextStates->push_back(state);
+}
+
+double knownEval(const State& s) {
+  // TODO: Introduce template matching here.
+  return s.score + s.expectScore;
+}
+
+double unknownEval(const State& s) {
+  return s.score + s.expectScore;
 }
 
 bool CompValue(const State& a, const State& b) {
@@ -101,7 +116,7 @@ DropDecision Pai::think(int frameId,
   int64 dueTime = startTime + (fast ? 25 : 250);
 
   const int fullIterationDepth = FLAGS_beam_length;
-  const int detectIterationDepth = std::min(seq.size(), 3);
+  const int detectIterationDepth = std::min(seq.size(), FLAGS_known_length);
   const int unknownIterationDepth = fullIterationDepth - detectIterationDepth;
   std::vector<std::vector<State>> states(fullIterationDepth + 1);
   CHECK_GE(unknownIterationDepth, 0);
@@ -119,19 +134,17 @@ DropDecision Pai::think(int frameId,
   firstState.expectScore = 0;
   firstState.frameId = frameId;
 
-  oss << "sizes: ";
   states[0].push_back(firstState);
   for (int i = 0; i < detectIterationDepth; ++i) {
     auto& nextStates = states[i + 1];
     for (const State& s : states[i]) {
-      auto generateNext = std::bind(GenerateNext, s, enemyState, std::placeholders::_1, &nextStates);
+      auto generateNext = std::bind(GenerateNext, s, enemyState, knownEval, std::placeholders::_1, &nextStates);
       Plan::iterateAvailablePlans(field, {seq.get(i)}, 1, generateNext);
     }
     std::sort(nextStates.begin(), nextStates.end(), CompValue);
-    if (static_cast<int>(nextStates.size()) > FLAGS_beam_width)
-      nextStates.resize(FLAGS_beam_width);
+    if (static_cast<int>(nextStates.size()) > FLAGS_beam_width_1)
+      nextStates.resize(FLAGS_beam_width_1);
 
-    oss << nextStates.size() << "/";
     for (const State& s : nextStates) {
       if (s.expectScore > bestScore) {
         finalDecision = s.firstDecision;
@@ -139,21 +152,19 @@ DropDecision Pai::think(int frameId,
       }
     }
   }
-  LOG(INFO) << "<Detective> (" << finalDecision.axisX() << "," << finalDecision.rot() << ") "
-            << bestScore << " points";
 
-  oss << detectIterationDepth << "\n";
   if (states[detectIterationDepth].size() == 0) {
     oss << "Die";
     return DropDecision(Decision(3, 0), oss.str());
   }
 
   int64 detectTime = currentTimeInMillis();
-  oss << "Known: " << (detectTime - startTime) << "ms/ "
-      << states[detectIterationDepth].size() << " states/ "
-      << detectIterationDepth << "-th hands: "
+  oss << "Known: "
+      << (detectTime - startTime) << " ms / "
+      << states[detectIterationDepth].size() << " states / "
+      << detectIterationDepth << " hands / "
       << "(" << finalDecision.axisX() << "-" << finalDecision.rot() << ")"
-      << " with " << bestScore << " points\n";
+      << " " << bestScore << " pts\n";
 
   int nTest = 0;
   std::map<Decision, std::vector<double>> vote;
@@ -166,12 +177,12 @@ DropDecision Pai::think(int frameId,
       auto& nextStates = states[i + 1];
       nextStates.clear();
       for (const State& s : states[i]) {
-        auto generateNext = std::bind(GenerateNext, s, enemyState, std::placeholders::_1, &nextStates);
+        auto generateNext = std::bind(GenerateNext, s, enemyState, unknownEval, std::placeholders::_1, &nextStates);
         Plan::iterateAvailablePlans(field, {seq.get(j)}, 1, generateNext);
       }
       std::sort(nextStates.begin(), nextStates.end(), CompValue);
-      if (static_cast<int>(nextStates.size()) > FLAGS_beam_width) {
-        nextStates.resize(FLAGS_beam_width);
+      if (static_cast<int>(nextStates.size()) > FLAGS_beam_width_2) {
+        nextStates.resize(FLAGS_beam_width_2);
       }
 
       for (const State& s : nextStates) {
@@ -188,7 +199,7 @@ DropDecision Pai::think(int frameId,
   }
 
   int64 endTime = currentTimeInMillis();
-  oss << "simulation: " << (endTime - detectTime) << "ms (" << nTest << " times)\n";
+  oss << "Unknown: " << (endTime - detectTime) << " ms / " << nTest << " tests\n";
 
   if (vote.size()) {
     double bestAvgScore = bestScore * .9;
@@ -202,7 +213,7 @@ DropDecision Pai::think(int frameId,
       }
     }
     oss << "Final: (" << finalDecision.axisX() << "-" << finalDecision.rot() << ")"
-        << " with " << bestAvgScore << " points\n";
+        << " " << bestAvgScore << " pts\n";
   } else {
     oss << "Final: no updates\n";
   }
