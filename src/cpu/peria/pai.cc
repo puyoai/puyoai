@@ -15,10 +15,10 @@
 #include "core/kumipuyo_seq_generator.h"
 #include "core/plan/plan.h"
 #include "core/rensa/rensa_detector.h"
-#include "cpu/peria/situation.h"
+#include "core/score.h"
 
-DECLARE_int32(simulate_size);
-DECLARE_int32(simulate_width);
+DEFINE_int32(simulate_size, 10, "The number of Kumipuyos to append in simulations.");
+DEFINE_int32(simulate_width, 40, "Bandwidth in the beamseach");
 
 namespace peria {
 
@@ -29,12 +29,13 @@ namespace {
 struct State {
   Decision firstDecision;
   CoreField field;
+  bool isZenkeshi;
   int score;
   int expectChain;
   int expectScore;
   int frameId;
 
-  double value;
+  double value;  // to be used in beam-search sorting
 };
 
 void GenerateNext(State state, const RefPlan& plan, std::vector<State>* nextStates) {
@@ -44,6 +45,12 @@ void GenerateNext(State state, const RefPlan& plan, std::vector<State>* nextStat
   state.field = plan.field();
   state.score += plan.score();
   state.frameId = plan.totalFrames();
+  if (plan.isRensaPlan()) {
+    if (state.isZenkeshi) {
+      state.score += ZENKESHI_BONUS;
+    }
+    state.isZenkeshi = plan.hasZenkeshi();
+  }
 
   int expectScore = 0;
   int expectChain = 0;
@@ -57,7 +64,8 @@ void GenerateNext(State state, const RefPlan& plan, std::vector<State>* nextStat
   state.expectScore = expectScore;
   state.expectChain = expectChain;
 
-  state.value = expectScore;
+  // TODO: Make an argument function to compute |value|.
+  state.value = state.score + expectScore;
 
   nextStates->push_back(state);
 }
@@ -97,6 +105,7 @@ DropDecision Pai::think(int frameId,
   State firstState;
   // intentionally leave firstState.firstDecision unset
   firstState.field = field;
+  firstState.isZenkeshi = myState.hasZenkeshi;
   firstState.score = myState.unusedScore;
   firstState.expectChain = 0;
   firstState.expectScore = 0;

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 cpu_setup("peria")
 
 add_library(peria_lib
-  pai.cc situation.cc
+  pai.cc
   ai.cc evaluator.cc
   pattern.cc)
 
