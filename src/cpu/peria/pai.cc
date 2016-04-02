@@ -123,7 +123,6 @@ DropDecision Pai::think(int frameId,
     return DropDecision(Decision(3, 0), oss.str());
   }
 
-#if 0
   int64 detectTime = currentTimeInMillis();
   oss << "Known: " << (detectTime - startTime) << "ms/ "
       << states[detectIterationDepth].size() << " states/ "
@@ -172,11 +171,10 @@ DropDecision Pai::think(int frameId,
       finalDecision = v.first;
     }
   }
-#endif
 
-  // int64 endTime = currentTimeInMillis();
-  // oss << "simulation: " << (endTime - detectTime) << "ms (" << nTest << " times)\n";
-  // oss << "Final: " << finalDecision << " with " << bestAvgScore << " points\n";
+  int64 endTime = currentTimeInMillis();
+  oss << "simulation: " << (endTime - detectTime) << "ms (" << nTest << " times)\n";
+  oss << "Final: " << finalDecision << " with " << bestAvgScore << " points\n";
 
   return DropDecision(finalDecision, oss.str());
 }
