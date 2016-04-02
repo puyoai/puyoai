@@ -38,19 +38,28 @@ struct State {
   double value;  // to be used in beam-search sorting
 };
 
-void GenerateNext(State state, const RefPlan& plan, std::vector<State>* nextStates) {
+void GenerateNext(State state, const PlayerState& enemy, const RefPlan& plan, std::vector<State>* nextStates) {
   if (!state.firstDecision.isValid()) {
     state.firstDecision = plan.firstDecision();
   }
   state.field = plan.field();
   state.score += plan.score();
-  state.frameId = plan.totalFrames();
   if (plan.isRensaPlan()) {
     if (state.isZenkeshi) {
       state.score += ZENKESHI_BONUS;
     }
     state.isZenkeshi = plan.hasZenkeshi();
   }
+
+  // Simulate enemy's attack
+  // TODO: Work for TAIOU
+  if (enemy.isRensaOngoing() && state.frameId < enemy.rensaFinishingFrameId()
+      && enemy.rensaFinishingFrameId() < state.frameId + plan.totalFrames()) {
+    int numOjama = enemy.currentRensaResult.score / SCORE_FOR_OJAMA;
+    numOjama = std::min(numOjama, 5 * 6);
+    state.field.fallOjama((numOjama + 3) / 6);
+  }
+  state.frameId += plan.totalFrames();
 
   int expectScore = 0;
   int expectChain = 0;
@@ -86,7 +95,6 @@ DropDecision Pai::think(int frameId,
                         const PlayerState& myState,
                         const PlayerState& enemyState,
                         bool fast) const {
-  UNUSED_VARIABLE(enemyState);
   std::ostringstream oss;
 
   int64 startTime = currentTimeInMillis();
@@ -116,7 +124,7 @@ DropDecision Pai::think(int frameId,
   for (int i = 0; i < detectIterationDepth; ++i) {
     auto& nextStates = states[i + 1];
     for (const State& s : states[i]) {
-      auto generateNext = std::bind(GenerateNext, s, std::placeholders::_1, &nextStates);
+      auto generateNext = std::bind(GenerateNext, s, enemyState, std::placeholders::_1, &nextStates);
       Plan::iterateAvailablePlans(field, {seq.get(i)}, 1, generateNext);
     }
     std::sort(nextStates.begin(), nextStates.end(), CompValue);
@@ -158,7 +166,7 @@ DropDecision Pai::think(int frameId,
       auto& nextStates = states[i + 1];
       nextStates.clear();
       for (const State& s : states[i]) {
-        auto generateNext = std::bind(GenerateNext, s, std::placeholders::_1, &nextStates);
+        auto generateNext = std::bind(GenerateNext, s, enemyState, std::placeholders::_1, &nextStates);
         Plan::iterateAvailablePlans(field, {seq.get(j)}, 1, generateNext);
       }
       std::sort(nextStates.begin(), nextStates.end(), CompValue);
