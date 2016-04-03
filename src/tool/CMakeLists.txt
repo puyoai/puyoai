@@ -22,5 +22,5 @@ tool_add_executable(exhaustive_test_generator exhaustive_test_generator.cc)
 tool_add_executable(puyofu_analyzer puyofu_analyzer.cc)
 
 if(BUILD_CAPTURE)
-    tool_add_executable(arow arow.cc multi_layer_perceptron.cc)
+    tool_add_executable(arow arow.cc)
 endif()

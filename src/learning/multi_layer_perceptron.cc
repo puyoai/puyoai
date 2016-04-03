@@ -70,9 +70,10 @@ int MultiLayerPerceptron::output_layer_weight_size() const
     return ((num_hidden_ + 1) * num_output_);
 }
 
-void MultiLayerPerceptron::train(int label, const float x[], float learning_rate)
+bool MultiLayerPerceptron::train(int label, const float x[], float learning_rate)
 {
     forward(x);
+    int correct_label = std::max_element(i3_.get(), i3_.get() + num_output_) - i3_.get();
 
     for (int i = 0; i < num_output_; ++i) {
         if (label == i) {
@@ -101,6 +102,8 @@ void MultiLayerPerceptron::train(int label, const float x[], float learning_rate
             w2_[i * num_hidden_ + j] -= learning_rate * o1_[i] * e2_[j];
         }
     }
+
+    return label == correct_label;
 }
 
 int MultiLayerPerceptron::predict(const float x[])

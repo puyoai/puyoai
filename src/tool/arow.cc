@@ -16,7 +16,7 @@
 #include "gui/unique_sdl_surface.h"
 #include "gui/util.h"
 #include "learning/arow.h"
-#include "tool/multi_layer_perceptron.h"
+#include "learning/multi_layer_perceptron.h"
 
 DECLARE_string(testdata_dir);
 
