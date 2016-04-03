@@ -20,6 +20,8 @@
 
 DECLARE_string(testdata_dir);
 
+DEFINE_bool(cross_validation, true, "use cross validation");
+
 using namespace std;
 
 const char* COLOR_NAMES[] = {
@@ -98,8 +100,11 @@ bool readFeatures(vector<vector<float>> features[NUM_RECOGNITION])
     return true;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+    google::ParseCommandLineFlags(&argc, &argv, true);
+    google::InitGoogleLogging(argv[0]);
+
     vector<vector<float>> features[NUM_RECOGNITION];
     CHECK(readFeatures(features));
 
@@ -119,7 +124,7 @@ int main()
     const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
     const int LEARNING_HEIGHT = IMAGE_HEIGHT;
 
-    const char COLOR_NAME_PREFIX[] = "LEFT_";
+    const char COLOR_NAME_PREFIX[] = "LEFT";
     const int RECOGNITION_SIZE = 6;
     const char PARAMETER_FILENAME[] = "left_parameter.cc";
 #endif
@@ -130,7 +135,7 @@ int main()
     const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
     const int LEARNING_HEIGHT = IMAGE_HEIGHT;
 
-    const char COLOR_NAME_PREFIX[] = "RIGHT_";
+    const char COLOR_NAME_PREFIX[] = "RIGHT";
     const int RECOGNITION_SIZE = 6;
     const char PARAMETER_FILENAME[] = "right_parameter.cc";
 #endif
@@ -145,11 +150,20 @@ int main()
     vector<pair<int, vector<float>>> training_features;
     vector<pair<int, vector<float>>> testing_features;
 
-    for (int i = 0; i < RECOGNITION_SIZE; ++i) {
-        for (size_t j = 0; j < features[i].size(); ++j) {
-            if ((j & 0xF) == 0) {
+    if (FLAGS_cross_validation) {
+        for (int i = 0; i < RECOGNITION_SIZE; ++i) {
+            for (size_t j = 0; j < features[i].size(); ++j) {
+                if ((j & 0xF) == 0) {
+                    testing_features.push_back(make_pair(i, features[i][j]));
+                } else {
+                    training_features.push_back(make_pair(i, features[i][j]));
+                }
+            }
+    }
+    } else {
+        for (int i = 0; i < RECOGNITION_SIZE; ++i) {
+            for (size_t j = 0; j < features[i].size(); ++j) {
                 testing_features.push_back(make_pair(i, features[i][j]));
-            } else {
                 training_features.push_back(make_pair(i, features[i][j]));
             }
         }
