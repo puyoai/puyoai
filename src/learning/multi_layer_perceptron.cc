@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -147,6 +148,16 @@ void MultiLayerPerceptron::forward(const float x[])
             i3_[i] += w3_[j * num_output_ + i] * o2_[j];
         }
     }
+}
+
+void MultiLayerPerceptron::setHiddenLayerParameter(const float values[])
+{
+    memcpy(w2_.get(), values, hidden_layer_weight_size());
+}
+
+void MultiLayerPerceptron::setOutputLayerParameter(const float values[])
+{
+    memcpy(w3_.get(), values, output_layer_weight_size());
 }
 
 bool MultiLayerPerceptron::saveParameterAsCSource(const char* path, const char* prefix) const

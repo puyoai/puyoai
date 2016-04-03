@@ -20,6 +20,9 @@ public:
     // |x| should have |num_input_| size.
     int predict(const float x[]);
 
+    void setHiddenLayerParameter(const float values[]);
+    void setOutputLayerParameter(const float values[]);
+
     bool saveParameterAsCSource(const char* path, const char* prefix) const;
 
 private:
