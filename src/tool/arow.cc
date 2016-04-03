@@ -103,17 +103,17 @@ int main()
     vector<vector<float>> features[NUM_RECOGNITION];
     CHECK(readFeatures(features));
 
-#if 1
+#if 0
     const int LEARNING_X_BEGIN = 0;
     const int LEARNING_X_END = 16;
     const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
     const int LEARNING_HEIGHT = IMAGE_HEIGHT;
 
-    // const char COLOR_NAME_PREFIX[] = "";
+    const char COLOR_NAME_PREFIX[] = "";
     const int RECOGNITION_SIZE = 8;
 #endif
 
-#if 0
+#if 1
     const int LEARNING_X_BEGIN = 0;
     const int LEARNING_X_END = 8;
     const int LEARNING_WIDTH = LEARNING_X_END - LEARNING_X_BEGIN;
@@ -121,6 +121,7 @@ int main()
 
     const char COLOR_NAME_PREFIX[] = "LEFT_";
     const int RECOGNITION_SIZE = 6;
+    const char PARAMETER_FILENAME[] = "left_parameter.cc";
 #endif
 
 #if 0
@@ -131,6 +132,7 @@ int main()
 
     const char COLOR_NAME_PREFIX[] = "RIGHT_";
     const int RECOGNITION_SIZE = 6;
+    const char PARAMETER_FILENAME[] = "right_parameter.cc";
 #endif
 
 #if 0
@@ -231,6 +233,8 @@ int main()
 
     cout << "num = " << num << endl;
     cout << "fail = " << fail << endl;
+
+    CHECK(mlp.saveParameterAsCSource(PARAMETER_FILENAME, COLOR_NAME_PREFIX));
 
 #if 0
     // Save the data as C-array.
