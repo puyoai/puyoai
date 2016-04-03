@@ -14,7 +14,7 @@ public:
 
     // Train single data.
     // |x| should have |num_input_| size.
-    bool train(int label, const float x[], float learning_rate = 0.1);
+    bool train(int label, const float x[], float learning_rate = 0.1, float l2_normalization = 0.001);
 
     // Returns the label.
     // |x| should have |num_input_| size.
