@@ -60,7 +60,7 @@ protected:
     }
 };
 
-TEST_F(ACAnalyzerTest, estimateRealColor)
+TEST_F(ACAnalyzerTest, estimatePixelRealColor)
 {
     // These RGB values are taken from the real example.
     struct Testcase {
@@ -107,9 +107,9 @@ TEST_F(ACAnalyzerTest, estimateRealColor)
     int size = ARRAY_SIZE(testcases);
 
     for (int i = 0; i < size; ++i) {
-        EXPECT_EQ(testcases[i].expected, ACAnalyzer::estimateRealColor(testcases[i].rgb.toHSV()))
+        EXPECT_EQ(testcases[i].expected, ACAnalyzer::estimatePixelRealColor(testcases[i].rgb.toHSV()))
             << " expected=" << toString(testcases[i].expected)
-            << " actual=" << toString(ACAnalyzer::estimateRealColor(testcases[i].rgb.toHSV()))
+            << " actual=" << toString(ACAnalyzer::estimatePixelRealColor(testcases[i].rgb.toHSV()))
             << " RGB=" << testcases[i].rgb.toString()
             << " HSV=" << testcases[i].rgb.toHSV().toString();
     }

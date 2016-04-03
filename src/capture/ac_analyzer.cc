@@ -509,7 +509,7 @@ void ACAnalyzer::drawBoxWithAnalysisResult(SDL_Surface* surface, const Box& box)
 }
 
 // static
-RealColor ACAnalyzer::estimateRealColor(const HSV& hsv)
+RealColor ACAnalyzer::estimatePixelRealColor(const HSV& hsv)
 {
     return toRealColor(hsv);
 }
