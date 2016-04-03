@@ -18,6 +18,8 @@
 #include "core/rensa/rensa_detector.h"
 #include "core/score.h"
 
+#include "pattern.h"
+
 DEFINE_int32(beam_length, 30, "The number of Kumipuyos to append in simulations.");
 DEFINE_int32(beam_width_1, 400, "Bandwidth in the beamseach");
 DEFINE_int32(beam_width_2, 40, "Bandwidth in the beamseach");
@@ -30,7 +32,7 @@ namespace {
 struct State;
 
 using int64 = std::int64_t;
-using EvaluateFunc = std::function<double(const State&)>;
+using EvaluateFunc = std::function<void(State*)>;
 
 // TODO: Introduce part of enemy's state to handle their attacks.
 struct State {
@@ -42,10 +44,12 @@ struct State {
   int expectScore;
   int frameId;
 
-  double value;  // to be used in beam-search sorting
+  double key;    // to be used in beam-search sorting
+  double value;  // to be used in picking up
 };
 
-void GenerateNext(State state, const PlayerState& enemy, const EvaluateFunc& evalFunc, const RefPlan& plan, std::vector<State>* nextStates) {
+void GenerateNext(State state, const PlayerState& enemy, const EvaluateFunc& evalFunc,
+                  const RefPlan& plan, std::vector<State>* nextStates) {
   if (!state.firstDecision.isValid()) {
     state.firstDecision = plan.firstDecision();
   }
@@ -80,22 +84,33 @@ void GenerateNext(State state, const PlayerState& enemy, const EvaluateFunc& eva
   state.expectScore = expectScore;
   state.expectChain = expectChain;
 
-  state.value = evalFunc(state);
+  evalFunc(&state);
 
   nextStates->push_back(state);
 }
 
-double knownEval(const State& s) {
-  // TODO: Introduce template matching here.
-  return s.score + s.expectScore;
+void evalScore(State* s) {
+  s->key = s->score + s->expectScore;
+  s->value = s->score;
 }
 
-double unknownEval(const State& s) {
-  return s.score + s.expectScore;
+void evalTemplate(State* s) {
+  const CoreField& field = s->field;
+
+  int best = 0;
+  for (const Pattern& pattern : Pattern::GetAllPattern()) {
+    int score = pattern.Match(field);
+    if (score > best) {
+      best = score;
+    }
+  }
+
+  s->key = best;
+  s->value = best;
 }
 
-bool CompValue(const State& a, const State& b) {
-  return a.value > b.value;
+bool CompKey(const State& a, const State& b) {
+  return a.key > b.key;
 };
 
 }  // namespace
@@ -115,7 +130,14 @@ DropDecision Pai::think(int frameId,
   int64 startTime = currentTimeInMillis();
   int64 dueTime = startTime + (fast ? 25 : 250);
 
-  const int fullIterationDepth = FLAGS_beam_length;
+  int fullIterationDepth = FLAGS_beam_length;
+  auto evaluator = evalScore;
+
+  if (!myState.hasZenkeshi && field.countPuyos() < 10) {
+    fullIterationDepth = FLAGS_beam_length / 2;
+    evaluator = evalTemplate;
+  }
+
   const int detectIterationDepth = std::min(seq.size(), FLAGS_known_length);
   const int unknownIterationDepth = fullIterationDepth - detectIterationDepth;
   std::vector<std::vector<State>> states(fullIterationDepth + 1);
@@ -123,8 +145,8 @@ DropDecision Pai::think(int frameId,
   LOG(INFO) << detectIterationDepth << " / " << fullIterationDepth << " search";
 
   Decision finalDecision;
-  int bestScore = 0;
-
+  double bestValue = 0;
+  
   State firstState;
   // intentionally leave firstState.firstDecision unset
   firstState.field = field;
@@ -138,17 +160,17 @@ DropDecision Pai::think(int frameId,
   for (int i = 0; i < detectIterationDepth; ++i) {
     auto& nextStates = states[i + 1];
     for (const State& s : states[i]) {
-      auto generateNext = std::bind(GenerateNext, s, enemyState, knownEval, std::placeholders::_1, &nextStates);
+      auto generateNext = std::bind(GenerateNext, s, enemyState, evaluator, std::placeholders::_1, &nextStates);
       Plan::iterateAvailablePlans(field, {seq.get(i)}, 1, generateNext);
     }
-    std::sort(nextStates.begin(), nextStates.end(), CompValue);
+    std::sort(nextStates.begin(), nextStates.end(), CompKey);
     if (static_cast<int>(nextStates.size()) > FLAGS_beam_width_1)
       nextStates.resize(FLAGS_beam_width_1);
 
     for (const State& s : nextStates) {
-      if (s.expectScore > bestScore) {
+      if (s.value > bestValue) {
         finalDecision = s.firstDecision;
-        bestScore = s.expectScore;
+        bestValue = s.value;
       }
     }
   }
@@ -164,37 +186,37 @@ DropDecision Pai::think(int frameId,
       << states[detectIterationDepth].size() << " states / "
       << detectIterationDepth << " hands / "
       << "(" << finalDecision.axisX() << "-" << finalDecision.rot() << ")"
-      << " " << bestScore << " pts\n";
+      << " " << bestValue << " pts\n";
 
   int nTest = 0;
   std::map<Decision, std::vector<double>> vote;
   for (nTest = 0; currentTimeInMillis() < dueTime; ++nTest) {
     Decision decision;
-    double score = 0;
+    double value = 0;
 
     KumipuyoSeq pseudoSeq = KumipuyoSeqGenerator::generateRandomSequence(unknownIterationDepth);
     for (int i = detectIterationDepth, j = 0; i < fullIterationDepth; ++i, ++j) {
       auto& nextStates = states[i + 1];
       nextStates.clear();
       for (const State& s : states[i]) {
-        auto generateNext = std::bind(GenerateNext, s, enemyState, unknownEval, std::placeholders::_1, &nextStates);
+        auto generateNext = std::bind(GenerateNext, s, enemyState, evaluator, std::placeholders::_1, &nextStates);
         Plan::iterateAvailablePlans(field, {seq.get(j)}, 1, generateNext);
       }
-      std::sort(nextStates.begin(), nextStates.end(), CompValue);
+      std::sort(nextStates.begin(), nextStates.end(), CompKey);
       if (static_cast<int>(nextStates.size()) > FLAGS_beam_width_2) {
         nextStates.resize(FLAGS_beam_width_2);
       }
 
       for (const State& s : nextStates) {
-        if (s.score > score) {
+        if (s.value > value) {
           decision = s.firstDecision;
-          score = s.score;
+          value = s.value;
         }
       }
     }
     if (decision.isValid()) {
-      LOG(INFO) << "vote: " << decision << " " << score;
-      vote[decision].push_back(score);
+      LOG(INFO) << "vote: " << decision << " " << value;
+      vote[decision].push_back(value);
     }
   }
 
@@ -202,18 +224,18 @@ DropDecision Pai::think(int frameId,
   oss << "Unknown: " << (endTime - detectTime) << " ms / " << nTest << " tests\n";
 
   if (vote.size()) {
-    double bestAvgScore = bestScore * .9;
+    double bestAvgValue = bestValue;
     for (auto& v : vote) {
       double avg = std::accumulate(v.second.begin(), v.second.end(), 0.0);
       avg /= v.second.size();
       LOG(INFO) << v.first << " " << v.second.size() << " " << avg;
-      if (avg > bestAvgScore) {
-        bestAvgScore = avg;
+      if (avg > bestAvgValue) {
+        bestAvgValue = avg;
         finalDecision = v.first;
       }
     }
     oss << "Final: (" << finalDecision.axisX() << "-" << finalDecision.rot() << ")"
-        << " " << bestAvgScore << " pts\n";
+        << " " << bestAvgValue << " pts\n";
   } else {
     oss << "Final: no updates\n";
   }
