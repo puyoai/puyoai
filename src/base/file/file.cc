@@ -7,13 +7,24 @@ using namespace std;
 
 namespace file {
 
-bool readFile(const std::string& filename, string* output)
+bool readFile(const std::string& filename, std::string* output)
 {
     ifstream ifs(filename, ios::in | ios::binary);
     if (!ifs)
         return false;
 
     output->assign((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+    return true;
+}
+
+bool writeFile(const std::string& filename, const std::string& output)
+{
+    ofstream ofs(filename, ios::out | ios::binary);
+    if (!ofs)
+        return false;
+
+    if (!ofs.write(output.data(), output.size()))
+        return false;
     return true;
 }
 
