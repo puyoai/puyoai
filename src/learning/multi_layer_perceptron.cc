@@ -84,12 +84,6 @@ bool MultiLayerPerceptron::train(int label, const float x[], float learning_rate
         }
     }
 
-    for (int i = 0; i < num_hidden_ + 1; ++i) {
-        for (int j = 0; j < num_output_; ++j) {
-            w3_[i * num_output_ + j] -= learning_rate * e3_[j] * o2_[i];
-        }
-    }
-
     for (int i = 0; i < num_hidden_; ++i) {
         float t = 0;
         for (int j = 0; j < num_output_; ++j) {
@@ -98,9 +92,16 @@ bool MultiLayerPerceptron::train(int label, const float x[], float learning_rate
         e2_[i] = t * d_activator(i2_[i]);
     }
 
+    // back propagation
     for (int i = 0; i < num_input_ + 1; ++i) {
         for (int j = 0; j < num_hidden_; ++j) {
             w2_[i * num_hidden_ + j] -= learning_rate * o1_[i] * e2_[j];
+        }
+    }
+
+    for (int i = 0; i < num_hidden_ + 1; ++i) {
+        for (int j = 0; j < num_output_; ++j) {
+            w3_[i * num_output_ + j] -= learning_rate * e3_[j] * o2_[i];
         }
     }
 
