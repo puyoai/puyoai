@@ -38,7 +38,7 @@ MultiLayerPerceptron::MultiLayerPerceptron(int in, int hid, int out) :
 
     i2_.reset(new float[hid]);
     o2_.reset(new float[hid + 1]);
-    e2_.reset(new float[hid + 1]);
+    e2_.reset(new float[hid]);
     w2_.reset(new float[(in + 1) * hid]);
 
     i3_.reset(new float[out]);
