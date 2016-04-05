@@ -41,7 +41,8 @@ bool ClientConnector::receive(FrameRequest* frameRequest)
 
     payload[header.size] = '\0';
 
-    LOG(INFO) << "RECEIVED: " << payload;
+    // TODO: Use LOG(INFO) for informative frames.
+    VLOG(1) << "RECEIVED: " << payload;
     *frameRequest = FrameRequest::parsePayload(payload, header.size);
     return true;
 }
@@ -56,5 +57,8 @@ void ClientConnector::send(const FrameResponse& resp)
     writeExactly(s.data(), s.size());
     flush();
 
-    LOG(INFO) << "SEND: " << s;
+    if (resp.isValid())
+      LOG(INFO) << "SEND: " << s;
+    else
+      VLOG(1) << "SEND: " << s;
 }
