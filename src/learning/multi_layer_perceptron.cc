@@ -34,15 +34,7 @@ MultiLayerPerceptron::MultiLayerPerceptron(int in, int hid, int out) :
     num_hidden_(hid),
     num_output_(out)
 {
-    o1_.reset(new float[in + 1]);
-
-    i2_.reset(new float[hid]);
-    o2_.reset(new float[hid + 1]);
-    e2_.reset(new float[hid]);
     w2_.reset(new float[(in + 1) * hid]);
-
-    i3_.reset(new float[out]);
-    e3_.reset(new float[out]);
     w3_.reset(new float[(hid + 1) * out]);
 
     std::random_device rd;
@@ -61,6 +53,24 @@ MultiLayerPerceptron::~MultiLayerPerceptron()
 {
 }
 
+MultiLayerPerceptron::ForwardingIntermediateStorage MultiLayerPerceptron::makeForwadingStorage() const
+{
+    ForwardingIntermediateStorage data;
+    data.o1.reset(new float[num_input_ + 1]);
+    data.i2.reset(new float[num_hidden_]);
+    data.o2.reset(new float[num_hidden_ + 1]);
+    data.i3.reset(new float[num_output_]);
+    return data;
+}
+
+MultiLayerPerceptron::BackPropagationIntermediateStorage MultiLayerPerceptron::makeBackpropagationStorage() const
+{
+    BackPropagationIntermediateStorage error_data;
+    error_data.e2.reset(new float[num_hidden_]);
+    error_data.e3.reset(new float[num_output_]);
+    return error_data;
+}
+
 int MultiLayerPerceptron::hidden_layer_weight_size() const
 {
     return ((num_input_ + 1) * num_hidden_);
@@ -71,37 +81,48 @@ int MultiLayerPerceptron::output_layer_weight_size() const
     return ((num_hidden_ + 1) * num_output_);
 }
 
-bool MultiLayerPerceptron::train(int label, const float x[], float learning_rate, float l2_normalization)
+int MultiLayerPerceptron::predict(const float x[], ForwardingIntermediateStorage* data) const
 {
-    forward(x);
-    int correct_label = std::max_element(i3_.get(), i3_.get() + num_output_) - i3_.get();
+    forward(x, data);
+    return std::max_element(data->i3.get(), data->i3.get() + num_output_) - data->i3.get();
+}
 
+bool MultiLayerPerceptron::train(int correct_label,
+                                 const float x[],
+                                 ForwardingIntermediateStorage* data,
+                                 BackPropagationIntermediateStorage* error_data,
+                                 float learning_rate,
+                                 float l2_normalization)
+{
+    int predicted_label = predict(x, data);
+
+    // calculate error.
     for (int i = 0; i < num_output_; ++i) {
-        if (label == i) {
-            e3_[i] = i3_[i] - 1;
+        if (correct_label == i) {
+            error_data->e3[i] = data->i3[i] - 1;
         } else {
-            e3_[i] = i3_[i];
+            error_data->e3[i] = data->i3[i];
         }
     }
 
     for (int i = 0; i < num_hidden_; ++i) {
         float t = 0;
         for (int j = 0; j < num_output_; ++j) {
-            t += w3_[i * num_output_ + j] * e3_[j];
+            t += w3_[i * num_output_ + j] * error_data->e3[j];
         }
-        e2_[i] = t * d_activator(i2_[i]);
+        error_data->e2[i] = t * d_activator(data->i2[i]);
     }
 
     // back propagation
-    for (int i = 0; i < num_input_ + 1; ++i) {
-        for (int j = 0; j < num_hidden_; ++j) {
-            w2_[i * num_hidden_ + j] -= learning_rate * o1_[i] * e2_[j];
+    for (int i = 0; i < num_hidden_ + 1; ++i) {
+        for (int j = 0; j < num_output_; ++j) {
+            w3_[i * num_output_ + j] -= learning_rate * error_data->e3[j] * data->o2[i];
         }
     }
 
-    for (int i = 0; i < num_hidden_ + 1; ++i) {
-        for (int j = 0; j < num_output_; ++j) {
-            w3_[i * num_output_ + j] -= learning_rate * e3_[j] * o2_[i];
+    for (int i = 0; i < num_input_ + 1; ++i) {
+        for (int j = 0; j < num_hidden_; ++j) {
+            w2_[i * num_hidden_ + j] -= learning_rate * data->o1[i] * error_data->e2[j];
         }
     }
 
@@ -115,38 +136,32 @@ bool MultiLayerPerceptron::train(int label, const float x[], float learning_rate
         }
     }
 
-    return label == correct_label;
+    return correct_label == predicted_label;
 }
 
-int MultiLayerPerceptron::predict(const float x[])
-{
-    forward(x);
-    return std::max_element(i3_.get(), i3_.get() + num_output_) - i3_.get();
-}
-
-void MultiLayerPerceptron::forward(const float x[])
+void MultiLayerPerceptron::forward(const float x[], ForwardingIntermediateStorage* data) const
 {
     for (int i = 0; i < num_input_; ++i) {
-        o1_[i] = x[i];
+        data->o1[i] = x[i];
     }
-    o1_[num_input_] = 1.0;
+    data->o1[num_input_] = 1.0;
 
-    std::fill(i2_.get(), i2_.get() + num_hidden_, 0.0);
+    std::fill(data->i2.get(), data->i2.get() + num_hidden_, 0.0);
     for (int j = 0; j < num_input_ + 1; ++j) {
         for (int i = 0; i < num_hidden_; ++i) {
-            i2_[i] += w2_[j * num_hidden_ + i] * o1_[j];
+            data->i2[i] += w2_[j * num_hidden_ + i] * data->o1[j];
         }
     }
 
     for (int i = 0; i < num_hidden_; ++i) {
-        o2_[i] = activator(i2_[i]);
+        data->o2[i] = activator(data->i2[i]);
     }
-    o2_[num_hidden_] = 1;
+    data->o2[num_hidden_] = 1;
 
-    std::fill(i3_.get(), i3_.get() + num_output_, 0.0);
+    std::fill(data->i3.get(), data->i3.get() + num_output_, 0.0);
     for (int j = 0; j < num_hidden_ + 1; ++j) {
         for (int i = 0; i < num_output_; ++i) {
-            i3_[i] += w3_[j * num_output_ + i] * o2_[j];
+            data->i3[i] += w3_[j * num_output_ + i] * data->o2[j];
         }
     }
 }

@@ -170,6 +170,8 @@ int main(int argc, char* argv[])
     }
 
     learning::MultiLayerPerceptron mlp(LEARNING_WIDTH * LEARNING_HEIGHT * 3, 20, RECOGNITION_SIZE);
+    auto data = mlp.makeForwadingStorage();
+    auto error_data = mlp.makeBackpropagationStorage();
 
     // training
     std::random_device rd;
@@ -193,7 +195,7 @@ int main(int argc, char* argv[])
                 arows[i]->update(f.second, i == f.first ? 1 : -1);
             }
 #endif
-            if (mlp.train(f.first, f.second.data(), rate))
+            if (mlp.train(f.first, f.second.data(), &data, &error_data, rate))
                 num_correct += 1;
         }
 
@@ -208,7 +210,7 @@ int main(int argc, char* argv[])
             int fail = 0;
             for (const auto& f : testing_features) {
                 ++num;
-                int result = mlp.predict(f.second.data());
+                int result = mlp.predict(f.second.data(), &data);
                 if (result != f.first) {
                     ++fail;
                 }
@@ -232,7 +234,7 @@ int main(int argc, char* argv[])
 
         int result = std::max_element(vs, vs + RECOGNITION_SIZE) - vs;
 #endif
-        int result = mlp.predict(f.second.data());
+        int result = mlp.predict(f.second.data(), &data);
 
         if (result != f.first) {
             cout << "fail: expect=" << f.first << " actual=" << result << endl;
