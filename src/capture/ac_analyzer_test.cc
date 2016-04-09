@@ -106,9 +106,8 @@ TEST_F(ACAnalyzerTest, estimatePixelRealColor)
         { RealColor::RC_PURPLE, RGB(135,  34, 142) },
         { RealColor::RC_PURPLE, RGB(121,  72, 142) },
     };
-    int size = ARRAY_SIZE(testcases);
 
-    for (int i = 0; i < size; ++i) {
+    for (size_t i = 0; i < ARRAY_SIZE(testcases); ++i) {
         EXPECT_EQ(testcases[i].expected, ACAnalyzer::estimatePixelRealColor(testcases[i].rgb))
             << " expected=" << toString(testcases[i].expected)
             << " actual=" << toString(ACAnalyzer::estimatePixelRealColor(testcases[i].rgb))
