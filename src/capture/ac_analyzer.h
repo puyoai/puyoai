@@ -36,7 +36,7 @@ public:
     CaptureGameState detectGameState(const SDL_Surface*) override;
 
     // For testing.
-    static RealColor estimatePixelRealColor(const HSV&);
+    static RealColor estimatePixelRealColor(const RGB&);
 
 private:
     std::unique_ptr<DetectedField> detectField(int pi,

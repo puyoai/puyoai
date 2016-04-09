@@ -110,5 +110,12 @@ int main(int argc, char* argv[])
     analyzer.drawWithAnalysisResult(surf.get());
     SDL_SaveBMP(surf.get(), "output.bmp");
 
+    {
+        UniqueSDLSurface sub_surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, b.w(), b.h(), 32, 0, 0, 0, 0)));
+        SDL_Rect src_rect = b.toSDLRect();
+        SDL_BlitSurface(surf.get(), &src_rect, sub_surf.get(), nullptr);
+        SDL_SaveBMP(sub_surf.get(), "output-sub.bmp");
+    }
+
     return 0;
 }

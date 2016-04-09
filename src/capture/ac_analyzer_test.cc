@@ -78,6 +78,8 @@ TEST_F(ACAnalyzerTest, estimatePixelRealColor)
         { RealColor::RC_RED,    RGB(220, 162, 172) },
         { RealColor::RC_RED,    RGB(119,  59,  69) },
         { RealColor::RC_RED,    RGB(105,  29,  53) },
+        { RealColor::RC_RED,    RGB(192, 103, 119) },
+        { RealColor::RC_RED,    RGB( 79,   0,  17) },
         { RealColor::RC_GREEN,  RGB(  0, 255,   0) },
         { RealColor::RC_GREEN,  RGB(161, 193, 122) },
         { RealColor::RC_GREEN,  RGB( 79, 200,  57) },
@@ -107,9 +109,9 @@ TEST_F(ACAnalyzerTest, estimatePixelRealColor)
     int size = ARRAY_SIZE(testcases);
 
     for (int i = 0; i < size; ++i) {
-        EXPECT_EQ(testcases[i].expected, ACAnalyzer::estimatePixelRealColor(testcases[i].rgb.toHSV()))
+        EXPECT_EQ(testcases[i].expected, ACAnalyzer::estimatePixelRealColor(testcases[i].rgb))
             << " expected=" << toString(testcases[i].expected)
-            << " actual=" << toString(ACAnalyzer::estimatePixelRealColor(testcases[i].rgb.toHSV()))
+            << " actual=" << toString(ACAnalyzer::estimatePixelRealColor(testcases[i].rgb))
             << " RGB=" << testcases[i].rgb.toString()
             << " HSV=" << testcases[i].rgb.toHSV().toString();
     }
@@ -280,8 +282,7 @@ TEST_F(ACAnalyzerTest, DISABLED_analyzeField6)
     EXPECT_EQ(RealColor::RC_BLUE, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT2_CHILD));
 }
 
-// TODO(mayah): Now failing.
-TEST_F(ACAnalyzerTest, DISABLED_analyzeField7)
+TEST_F(ACAnalyzerTest, analyzeField7)
 {
     // NEXT2 in Player2 is difficult.
 
