@@ -294,6 +294,19 @@ TEST_F(ACAnalyzerTest, analyzeField7)
     EXPECT_EQ(RealColor::RC_RED, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT2_CHILD));
 }
 
+TEST_F(ACAnalyzerTest, DISABLED_analyzeField8)
+{
+    // NEXT2 in Player2 is difficult.
+
+    unique_ptr<AnalyzerResult> r = analyze("/images/field/field8.png");
+    EXPECT_EQ(CaptureGameState::PLAYING, r->state());
+
+    EXPECT_EQ(RealColor::RC_YELLOW, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT1_AXIS));
+    EXPECT_EQ(RealColor::RC_GREEN, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT1_CHILD));
+    EXPECT_EQ(RealColor::RC_BLUE, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT2_AXIS));
+    EXPECT_EQ(RealColor::RC_GREEN, r->playerResult(1)->detectedField.realColor(NextPuyoPosition::NEXT2_CHILD));
+}
+
 TEST_F(ACAnalyzerTest, analyzeFieldOjama)
 {
     const RealColorField field(
