@@ -1,5 +1,6 @@
 #include "gui/frame_number_drawer.h"
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 
@@ -17,7 +18,13 @@ void FrameNumberDrawer::draw(Screen* screen)
     ++frameNumber_;
 
     stringstream ss;
-    ss << "Frame " << frameNumber_;
+    if (screen->surface()->userdata != 0) {
+        // When userdata exists, it should be frame id.
+        uintptr_t v = reinterpret_cast<uintptr_t>(screen->surface()->userdata);
+        ss << "Frame " << v;
+    } else {
+        ss << "Frame " << frameNumber_;
+    }
 
     SDL_Color c;
     c.r = c.g = c.b = 255;
