@@ -12,7 +12,7 @@ bool readFile(const std::string& filename, std::string* output);
 // Writes |content| to |filename|.
 bool writeFile(const std::string& filename, const std::string& content);
 
-// Copy files.
+// Copies files.
 bool copyFile(const std::string& src, const std::string& dest);
 
 } // namespace file
