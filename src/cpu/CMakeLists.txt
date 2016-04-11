@@ -14,7 +14,7 @@ function(cpu_target_link_common_libraries target)
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_client_connector)
 
   if(USE_HTTPD)
-    target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_httpd)
+    target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_net_httpd)
     target_link_libraries(${target}_${CPU_NAMESPACE} ${LIB_MICROHTTPD})
   endif()
   target_link_libraries(${target}_${CPU_NAMESPACE} puyoai_core_rensa_tracker)

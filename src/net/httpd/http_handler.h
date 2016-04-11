@@ -1,5 +1,5 @@
-#ifndef CORE_HTTPD_HTTP_HANDLER_H_
-#define CORE_HTTPD_HTTP_HANDLER_H_
+#ifndef NET_HTTPD_HTTP_HANDLER_H_
+#define NET_HTTPD_HTTP_HANDLER_H_
 
 #include <functional>
 #include <map>
@@ -43,4 +43,4 @@ private:
 
 typedef std::function<void (const HttpRequest&, HttpResponse*)> HttpHandler;
 
-#endif
+#endif // NET_HTTPD_HTTP_HANDLER_H_

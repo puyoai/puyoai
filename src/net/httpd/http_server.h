@@ -1,5 +1,5 @@
-#ifndef CORE_HTTPD_HTTP_SERVER_H_
-#define CORE_HTTPD_HTTP_SERVER_H_
+#ifndef NET_HTTPD_HTTP_SERVER_H_
+#define NET_HTTPD_HTTP_SERVER_H_
 
 #include <memory>
 #include <string>
@@ -7,7 +7,7 @@
 
 #include <microhttpd.h>
 
-#include "core/httpd/http_handler.h"
+#include "net/httpd/http_handler.h"
 
 class HttpServer {
 public:
@@ -38,4 +38,4 @@ private:
     std::string assetDirPath_;
 };
 
-#endif
+#endif // NET_HTTPD_HTTP_SERVER_H_

@@ -8,10 +8,6 @@ add_subdirectory(rensa)
 add_subdirectory(rensa_tracker)
 add_subdirectory(server)
 
-if(USE_HTTPD)
-    add_subdirectory(httpd)
-endif()
-
 # ----------------------------------------------------------------------
 # library
 
