@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-add_library(puyoai_net_socket STATIC
+add_library(puyoai_net_socket
             socket.cc
             socket_factory.cc
             tcp_client_socket.cc

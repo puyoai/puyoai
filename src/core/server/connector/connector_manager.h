@@ -17,6 +17,7 @@ public:
     // Returns false when disconnected.
     explicit ConnectorManager(bool timeout);
 
+    void invokePlayer(int playerId, const std::string& programName);
     void setConnector(int playerId, std::unique_ptr<ServerConnector> p);
 
     bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS]);

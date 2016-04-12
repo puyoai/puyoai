@@ -15,8 +15,8 @@ public:
     static SocketFactory* instance();
 
     // Returns TCP socket. If failed, socket will be invalid.
-    TCPClientSocket make_tcp_client_socket();
-    TCPServerSocket make_tcp_server_socket();
+    TCPClientSocket makeTCPClientSocket();
+    TCPServerSocket makeTCPServerSocket();
 
     // Returns UnixDomainSocket. If failed, socket will be invalid.
     UnixDomainClientSocket makeUnixDomainClientSocket();

@@ -12,7 +12,7 @@ SocketFactory* SocketFactory::instance()
     return &instance;
 }
 
-TCPClientSocket SocketFactory::make_tcp_client_socket()
+TCPClientSocket SocketFactory::makeTCPClientSocket()
 {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
@@ -23,7 +23,7 @@ TCPClientSocket SocketFactory::make_tcp_client_socket()
     return TCPClientSocket(sock);
 }
 
-TCPServerSocket SocketFactory::make_tcp_server_socket()
+TCPServerSocket SocketFactory::makeTCPServerSocket()
 {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
