@@ -3,15 +3,16 @@
 
 #include <memory>
 
+#include "core/client/ai/ai_base.h"
 #include "core/client/connector/client_connector.h"
 
 struct FrameRequest;
 struct FrameResponse;
 
-class RawAI {
+class RawAI : public AIBase {
 public:
     RawAI();
-    virtual ~RawAI() {}
+    virtual ~RawAI() override {}
 
     void runLoop();
 

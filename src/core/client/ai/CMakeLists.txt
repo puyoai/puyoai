@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_core_client_ai
+            ai_base.cc
             ai.cc
             raw_ai.cc)
 
@@ -11,6 +12,7 @@ function(puyoai_client_ai_add_test target)
     target_link_libraries(${target}_test puyoai_core_client_ai)
     target_link_libraries(${target}_test puyoai_core_client_connector)
     target_link_libraries(${target}_test puyoai_core)
+    target_link_libraries(${target}_test puyoai_net_socket)
     puyoai_target_link_libraries(${target}_test)
     add_test(check-${target}_test ${target}_test)
 endfunction()

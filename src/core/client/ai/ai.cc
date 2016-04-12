@@ -4,7 +4,7 @@
 #include <glog/logging.h>
 
 #include "base/base.h"
-#include "core/client/connector/stdio_client_connector.h"
+#include "core/client/connector/client_connector.h"
 #include "core/core_field.h"
 #include "core/decision.h"
 #include "core/field_pretty_printer.h"
@@ -44,7 +44,7 @@ AI::AI(int argc, char* argv[], const string& name) :
 
 AI::AI(const string& name) :
     name_(name),
-    connector_(new StdioClientConnector),
+    connector_(AIBase::makeConnector()),
     desynced_(false),
     rethinkRequested_(false),
     enemyDecisionRequestFrameId_(0),

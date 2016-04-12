@@ -1,9 +1,10 @@
-#ifndef CORE_CLIENT_AI_H_
-#define CORE_CLIENT_AI_H_
+#ifndef CORE_CLIENT_AI_AI_H_
+#define CORE_CLIENT_AI_AI_H_
 
 #include <memory>
 #include <string>
 
+#include "core/client/ai/ai_base.h"
 #include "core/client/ai/drop_decision.h"
 #include "core/client/connector/client_connector.h"
 #include "core/kumipuyo_seq.h"
@@ -15,9 +16,9 @@ struct FrameRequest;
 
 // AI is a utility class of AI.
 // You need to implement think() at least.
-class AI {
+class AI : public AIBase {
 public:
-    virtual ~AI();
+    virtual ~AI() override;
     const std::string& name() const { return name_; }
 
     void runLoop();
@@ -142,4 +143,4 @@ private:
     bool behaviorRethinkAfterOpponentRensa_;
 };
 
-#endif
+#endif // CORE_CLIENT_AI_AI_H_
