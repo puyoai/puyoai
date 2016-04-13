@@ -10,7 +10,7 @@ public:
     TCPSocket(TCPSocket&& socket);
     ~TCPSocket() override;
 
-    bool set_tcpnodelay();
+    bool setTCPNodelay();
 
 protected:
     explicit TCPSocket(SocketDescriptor sd) : Socket(sd) {}

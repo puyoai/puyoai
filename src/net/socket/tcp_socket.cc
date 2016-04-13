@@ -20,7 +20,7 @@ TCPSocket::~TCPSocket()
 {
 }
 
-bool TCPSocket::set_tcpnodelay()
+bool TCPSocket::setTCPNodelay()
 {
     int flag = 1;
     if (setsockopt(sd_, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag)) < 0) {
