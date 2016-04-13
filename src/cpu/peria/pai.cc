@@ -22,7 +22,7 @@
 
 DEFINE_int32(beam_length, 50, "The number of Kumipuyos to append in simulations.");
 DEFINE_int32(beam_width_1, 400, "Bandwidth in the beamseach");
-DEFINE_int32(beam_width_2, 40, "Bandwidth in the beamseach");
+DEFINE_int32(beam_width_2, 50, "Bandwidth in the beamseach");
 DEFINE_int32(known_length, 5, "Assume at most this number of Tsumos are known.");
 
 #define USE_TEMPLATE 0
@@ -97,7 +97,7 @@ void GenerateNext(State state, const EvaluateFunc& evalFunc,
 
 void evalScore(State* s) {
   s->key = s->expectScore;
-  s->value = s->score;
+  s->value = s->score > 100 ? s->score : 0;
 }
 
 #if USE_TEMPLATE
@@ -155,7 +155,7 @@ DropDecision Pai::think(int frameId,
   LOG(INFO) << detectIterationDepth << " / " << fullIterationDepth << " search";
 
   Decision finalDecision;
-  double bestValue = 0;
+  double bestValue = -1;
   
   State firstState;
   // intentionally leave firstState.firstDecision unset
