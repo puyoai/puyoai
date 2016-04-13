@@ -20,10 +20,12 @@
 
 #include "pattern.h"
 
-DEFINE_int32(beam_length, 30, "The number of Kumipuyos to append in simulations.");
+DEFINE_int32(beam_length, 50, "The number of Kumipuyos to append in simulations.");
 DEFINE_int32(beam_width_1, 400, "Bandwidth in the beamseach");
 DEFINE_int32(beam_width_2, 40, "Bandwidth in the beamseach");
 DEFINE_int32(known_length, 5, "Assume at most this number of Tsumos are known.");
+
+#define USE_TEMPLATE 0
 
 namespace peria {
 
@@ -44,11 +46,15 @@ struct State {
   int expectScore;
   int frameId;
 
+  // infomation about enemy's attack
+  int enemyPoint;
+  int enemyFrame;
+
   double key;    // to be used in beam-search sorting
   double value;  // to be used in picking up
 };
 
-void GenerateNext(State state, const PlayerState& enemy, const EvaluateFunc& evalFunc,
+void GenerateNext(State state, const EvaluateFunc& evalFunc,
                   const RefPlan& plan, std::vector<State>* nextStates) {
   if (!state.firstDecision.isValid()) {
     state.firstDecision = plan.firstDecision();
@@ -64,11 +70,11 @@ void GenerateNext(State state, const PlayerState& enemy, const EvaluateFunc& eva
 
   // Simulate enemy's attack
   // TODO: Work for TAIOU
-  if (enemy.isRensaOngoing() && state.frameId < enemy.rensaFinishingFrameId()
-      && enemy.rensaFinishingFrameId() < state.frameId + plan.totalFrames()) {
-    int numOjama = enemy.currentRensaResult.score / SCORE_FOR_OJAMA;
+  if (state.enemyFrame > 0 && state.enemyFrame < state.frameId + plan.totalFrames()) {
+    int numOjama = state.enemyPoint / SCORE_FOR_OJAMA;
     numOjama = std::min(numOjama, 5 * 6);
-    state.field.fallOjama((numOjama + 3) / 6);
+    state.frameId += state.field.fallOjama((numOjama + 3) / 6);
+    state.enemyPoint -= numOjama * SCORE_FOR_OJAMA;
   }
   state.frameId += plan.totalFrames();
 
@@ -90,10 +96,11 @@ void GenerateNext(State state, const PlayerState& enemy, const EvaluateFunc& eva
 }
 
 void evalScore(State* s) {
-  s->key = s->score + s->expectScore;
+  s->key = s->expectScore;
   s->value = s->score;
 }
 
+#if USE_TEMPLATE
 void evalTemplate(State* s) {
   const CoreField& field = s->field;
 
@@ -108,6 +115,7 @@ void evalTemplate(State* s) {
   s->key = best;
   s->value = best;
 }
+#endif
 
 bool CompKey(const State& a, const State& b) {
   return a.key > b.key;
@@ -133,12 +141,14 @@ DropDecision Pai::think(int frameId,
   int fullIterationDepth = FLAGS_beam_length;
   auto evaluator = evalScore;
 
+#if USE_TEMPLATE
   if (!myState.hasZenkeshi && field.countPuyos() < 10) {
     fullIterationDepth = FLAGS_beam_length / 2;
     evaluator = evalTemplate;
   }
+#endif
 
-  const int detectIterationDepth = std::min(seq.size(), FLAGS_known_length);
+  const int detectIterationDepth = std::min(seq.size(), fullIterationDepth);
   const int unknownIterationDepth = fullIterationDepth - detectIterationDepth;
   std::vector<std::vector<State>> states(fullIterationDepth + 1);
   CHECK_GE(unknownIterationDepth, 0);
@@ -155,18 +165,23 @@ DropDecision Pai::think(int frameId,
   firstState.expectChain = 0;
   firstState.expectScore = 0;
   firstState.frameId = frameId;
-
+  firstState.enemyPoint = enemyState.currentRensaResult.score;
+  firstState.enemyFrame = enemyState.isRensaOngoing() ? enemyState.rensaFinishingFrameId() : -1;
+  // TODO: If the enemy is not firing rensa, make some enemy status with
+  // probability based on something.
+    
   states[0].push_back(firstState);
   for (int i = 0; i < detectIterationDepth; ++i) {
     auto& nextStates = states[i + 1];
+    nextStates.reserve(FLAGS_beam_width_1);
+    int width = 0;
     for (const State& s : states[i]) {
-      auto generateNext = std::bind(GenerateNext, s, enemyState, evaluator, std::placeholders::_1, &nextStates);
+      auto generateNext = std::bind(GenerateNext, s, evaluator, std::placeholders::_1, &nextStates);
       Plan::iterateAvailablePlans(field, {seq.get(i)}, 1, generateNext);
+      if (++width >= FLAGS_beam_width_1)
+        break;
     }
     std::sort(nextStates.begin(), nextStates.end(), CompKey);
-    if (static_cast<int>(nextStates.size()) > FLAGS_beam_width_1)
-      nextStates.resize(FLAGS_beam_width_1);
-
     for (const State& s : nextStates) {
       if (s.value > bestValue) {
         finalDecision = s.firstDecision;
@@ -177,7 +192,7 @@ DropDecision Pai::think(int frameId,
 
   if (states[detectIterationDepth].size() == 0) {
     oss << "Die";
-    return DropDecision(Decision(3, 0), oss.str());
+    return DropDecision(Decision(3, 2), oss.str());
   }
 
   int64 detectTime = currentTimeInMillis();
@@ -190,7 +205,7 @@ DropDecision Pai::think(int frameId,
 
   int nTest = 0;
   std::map<Decision, std::vector<double>> vote;
-  for (nTest = 0; currentTimeInMillis() < dueTime; ++nTest) {
+  do {
     Decision decision;
     double value = 0;
 
@@ -198,15 +213,14 @@ DropDecision Pai::think(int frameId,
     for (int i = detectIterationDepth, j = 0; i < fullIterationDepth; ++i, ++j) {
       auto& nextStates = states[i + 1];
       nextStates.clear();
+      int width = 0;
       for (const State& s : states[i]) {
-        auto generateNext = std::bind(GenerateNext, s, enemyState, evaluator, std::placeholders::_1, &nextStates);
+        auto generateNext = std::bind(GenerateNext, s, evaluator, std::placeholders::_1, &nextStates);
         Plan::iterateAvailablePlans(field, {seq.get(j)}, 1, generateNext);
+        if (++width >= FLAGS_beam_width_2)
+          break;
       }
       std::sort(nextStates.begin(), nextStates.end(), CompKey);
-      if (static_cast<int>(nextStates.size()) > FLAGS_beam_width_2) {
-        nextStates.resize(FLAGS_beam_width_2);
-      }
-
       for (const State& s : nextStates) {
         if (s.value > value) {
           decision = s.firstDecision;
@@ -214,28 +228,37 @@ DropDecision Pai::think(int frameId,
         }
       }
     }
+
     if (decision.isValid()) {
       LOG(INFO) << "vote: " << decision << " " << value;
       vote[decision].push_back(value);
     }
-  }
+
+    ++nTest;
+    int64 guessTime = currentTimeInMillis();
+    int64 avgGuessTime = (guessTime - detectTime) / nTest;
+    if (guessTime + avgGuessTime >= dueTime)
+      break;
+  } while (true);
 
   int64 endTime = currentTimeInMillis();
   oss << "Unknown: " << (endTime - detectTime) << " ms / " << nTest << " tests\n";
 
   if (vote.size()) {
-    double bestAvgValue = bestValue;
     for (auto& v : vote) {
       double avg = std::accumulate(v.second.begin(), v.second.end(), 0.0);
       avg /= v.second.size();
       LOG(INFO) << v.first << " " << v.second.size() << " " << avg;
-      if (avg > bestAvgValue) {
-        bestAvgValue = avg;
+      if (avg > bestValue) {
+        bestValue = avg;
         finalDecision = v.first;
       }
     }
+  }
+  if (vote.size() && vote[finalDecision].size()) {
     oss << "Final: (" << finalDecision.axisX() << "-" << finalDecision.rot() << ")"
-        << " " << bestAvgValue << " pts\n";
+        << " " << bestValue << " pts with "
+        << vote[finalDecision].size() << " votes\n";
   } else {
     oss << "Final: no updates\n";
   }
