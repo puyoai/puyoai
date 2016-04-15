@@ -73,6 +73,7 @@ public:
     GameStateHandler() {}
     virtual ~GameStateHandler() {}
 
+#if USE_HTTPD
     void handle(const HttpRequest& req, HttpResponse* resp) {
         UNUSED_VARIABLE(req);
 
@@ -81,6 +82,7 @@ public:
             return;
         resp->setContent(gameState_->toJson());
     }
+#endif
 
     virtual void onUpdate(const GameState& gameState) override {
         lock_guard<mutex> lock(mu_);

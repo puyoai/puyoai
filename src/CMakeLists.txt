@@ -195,6 +195,8 @@ endif()
 
 if(USE_HTTPD)
     puyoai_message("HTTPD is enabled")
+else()
+    puyoai_message("HTTPD is NOT enabled")
 endif()
 
 if(BUILD_CAPTURE)
