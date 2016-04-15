@@ -8,6 +8,7 @@
 #include <functional>
 #include <map>
 #include <numeric>
+#include <random>
 #include <sstream>
 #include <vector>
 
@@ -156,6 +157,8 @@ DropDecision Pai::think(int frameId,
 
   Decision finalDecision;
   double bestValue = -1;
+  int numSameValue = 0;
+  std::mt19937 prg;
 
   State firstState;
   // intentionally leave firstState.firstDecision unset
@@ -183,9 +186,17 @@ DropDecision Pai::think(int frameId,
     }
     std::sort(nextStates.begin(), nextStates.end(), CompKey);
     for (const State& s : nextStates) {
+      if (s.value == bestValue) {
+        if (prg() % numSameValue == 0) {
+          finalDecision = s.firstDecision;
+          bestValue = s.value;
+        }
+        ++numSameValue;
+      }
       if (s.value > bestValue) {
         finalDecision = s.firstDecision;
         bestValue = s.value;
+        numSameValue = 1;
       }
     }
   }
