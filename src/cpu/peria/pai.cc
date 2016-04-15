@@ -156,7 +156,7 @@ DropDecision Pai::think(int frameId,
 
   Decision finalDecision;
   double bestValue = -1;
-  
+
   State firstState;
   // intentionally leave firstState.firstDecision unset
   firstState.field = field;
@@ -169,7 +169,7 @@ DropDecision Pai::think(int frameId,
   firstState.enemyFrame = enemyState.isRensaOngoing() ? enemyState.rensaFinishingFrameId() : -1;
   // TODO: If the enemy is not firing rensa, make some enemy status with
   // probability based on something.
-    
+
   states[0].push_back(firstState);
   for (int i = 0; i < detectIterationDepth; ++i) {
     auto& nextStates = states[i + 1];
@@ -216,7 +216,7 @@ DropDecision Pai::think(int frameId,
       int width = 0;
       for (const State& s : states[i]) {
         auto generateNext = std::bind(GenerateNext, s, evaluator, std::placeholders::_1, &nextStates);
-        Plan::iterateAvailablePlans(field, {seq.get(j)}, 1, generateNext);
+        Plan::iterateAvailablePlans(field, {pseudoSeq.get(j)}, 1, generateNext);
         if (++width >= FLAGS_beam_width_2)
           break;
       }
