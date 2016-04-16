@@ -22,7 +22,7 @@
 
 #include "pattern.h"
 
-DEFINE_int32(beam_length, 50, "The number of Kumipuyos to append in simulations.");
+DEFINE_int32(beam_length, 30, "The number of Kumipuyos to append in simulations.");
 DEFINE_int32(beam_width_1, 400, "Bandwidth in the beamseach");
 DEFINE_int32(beam_width_2, 100, "Bandwidth in the beamseach");
 DEFINE_int32(known_length, 5, "Assume at most this number of Tsumos are known.");
@@ -72,6 +72,10 @@ void GenerateNext(State state, int from, const EvaluateFunc& evalFunc,
       state.score += ZENKESHI_BONUS;
     }
     state.isZenkeshi = plan.hasZenkeshi();
+    state.enemyPoint -= plan.score();
+    if (state.enemyPoint <= 0) {
+      state.enemyFrame = -1;
+    }
   }
 
   // Simulate enemy's attack
