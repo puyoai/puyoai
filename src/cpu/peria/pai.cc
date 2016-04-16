@@ -24,7 +24,7 @@
 
 DEFINE_int32(beam_length, 50, "The number of Kumipuyos to append in simulations.");
 DEFINE_int32(beam_width_1, 400, "Bandwidth in the beamseach");
-DEFINE_int32(beam_width_2, 50, "Bandwidth in the beamseach");
+DEFINE_int32(beam_width_2, 100, "Bandwidth in the beamseach");
 DEFINE_int32(known_length, 5, "Assume at most this number of Tsumos are known.");
 
 #define USE_TEMPLATE 0
@@ -52,15 +52,19 @@ struct State {
   int enemyPoint;
   int enemyFrame;
 
+  // Debug info
+  int from;
+
   double key;    // to be used in beam-search sorting
   double value;  // to be used in picking up
 };
 
-void GenerateNext(State state, const EvaluateFunc& evalFunc,
+void GenerateNext(State state, int from, const EvaluateFunc& evalFunc,
                   const RefPlan& plan, std::vector<State>* nextStates) {
   if (!state.firstDecision.isValid()) {
     state.firstDecision = plan.firstDecision();
   }
+  state.from = from;
   state.field = plan.field();
   state.score += plan.score();
   if (plan.isRensaPlan()) {
@@ -178,11 +182,16 @@ DropDecision Pai::think(int frameId,
   for (int i = 0; i < detectIterationDepth; ++i) {
     auto& nextStates = states[i + 1];
     nextStates.reserve(FLAGS_beam_width_1);
-    int width = 0;
-    for (const State& s : states[i]) {
-      auto generateNext = std::bind(GenerateNext, s, evaluator, std::placeholders::_1, &nextStates);
+    std::vector<int> fromCount(FLAGS_beam_width_1, 0);
+    int used = 0;
+    for (int j = 0; j < static_cast<int>(states[i].size()); ++j) {
+      const State& s = states[i][j];
+      int f = s.from;
+      if (++fromCount[f] > 5)
+        continue;
+      auto generateNext = std::bind(GenerateNext, s, j, evaluator, std::placeholders::_1, &nextStates);
       Plan::iterateAvailablePlans(field, {seq.get(i)}, 1, generateNext);
-      if (++width >= FLAGS_beam_width_1)
+      if (++used > FLAGS_beam_width_1)
         break;
     }
     std::sort(nextStates.begin(), nextStates.end(), CompKey);
@@ -222,14 +231,18 @@ DropDecision Pai::think(int frameId,
     double value = 0;
 
     KumipuyoSeq pseudoSeq = KumipuyoSeqGenerator::generateRandomSequence(unknownIterationDepth);
-    for (int i = detectIterationDepth, j = 0; i < fullIterationDepth; ++i, ++j) {
+    for (int i = detectIterationDepth; i < fullIterationDepth; ++i) {
       auto& nextStates = states[i + 1];
       nextStates.clear();
-      int width = 0;
-      for (const State& s : states[i]) {
-        auto generateNext = std::bind(GenerateNext, s, evaluator, std::placeholders::_1, &nextStates);
-        Plan::iterateAvailablePlans(field, {pseudoSeq.get(j)}, 1, generateNext);
-        if (++width >= FLAGS_beam_width_2)
+      std::vector<int> fromCount(FLAGS_beam_width_1, 0);
+      int used = 0;
+      for (int j = 0; j < static_cast<int>(states[i].size()); ++j) {
+        const State& s = states[i][j];
+        if (++fromCount[j] > 3)
+          continue;
+        auto generateNext = std::bind(GenerateNext, s, j, evaluator, std::placeholders::_1, &nextStates);
+        Plan::iterateAvailablePlans(field, {pseudoSeq.get(i - detectIterationDepth)}, 1, generateNext);
+        if (++used > FLAGS_beam_width_2)
           break;
       }
       std::sort(nextStates.begin(), nextStates.end(), CompKey);
@@ -274,6 +287,18 @@ DropDecision Pai::think(int frameId,
   } else {
     oss << "Final: no updates\n";
   }
+
+#if 0
+  // Debug output
+  std::cerr << field.toDebugString() << "\n";
+  for (auto& ss : states) {
+    std::cerr << "> ";
+    for (auto& s : ss) {
+      std::cerr << s.from << " ";
+    }
+    std::cerr << "\n";
+  }
+#endif
 
   return DropDecision(finalDecision, oss.str());
 }
