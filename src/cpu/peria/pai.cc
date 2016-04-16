@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <numeric>
 #include <random>
@@ -137,7 +138,7 @@ DropDecision Pai::think(int frameId,
   std::ostringstream oss;
 
   int64 startTime = currentTimeInMillis();
-  int64 dueTime = startTime + (fast ? 25 : 250);
+  int64 dueTime = startTime + (fast ? 30 : 300);
 
   int fullIterationDepth = FLAGS_beam_length;
   auto evaluator = evalScore;
@@ -187,11 +188,11 @@ DropDecision Pai::think(int frameId,
     std::sort(nextStates.begin(), nextStates.end(), CompKey);
     for (const State& s : nextStates) {
       if (s.value == bestValue) {
+        ++numSameValue;
         if (prg() % numSameValue == 0) {
           finalDecision = s.firstDecision;
           bestValue = s.value;
         }
-        ++numSameValue;
       }
       if (s.value > bestValue) {
         finalDecision = s.firstDecision;
