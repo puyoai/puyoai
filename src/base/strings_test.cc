@@ -51,3 +51,14 @@ TEST(StringsTest, join)
 
     EXPECT_EQ("foo,bar,foobar", strings::join(ss, ","));
 }
+
+TEST(StringsTest, isAllDigits)
+{
+    EXPECT_TRUE(strings::isAllDigits(""));
+    EXPECT_TRUE(strings::isAllDigits("0"));
+    EXPECT_TRUE(strings::isAllDigits("0123456789"));
+
+    EXPECT_FALSE(strings::isAllDigits("abc"));
+    EXPECT_FALSE(strings::isAllDigits("+0"));
+    EXPECT_FALSE(strings::isAllDigits("-12"));
+}

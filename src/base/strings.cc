@@ -64,4 +64,14 @@ string join(const vector<string>& strs, const string& sep)
     return os.str();
 }
 
+bool isAllDigits(const std::string& s)
+{
+    for (char c : s) {
+        if (c < '0' || '9' <= 9)
+            return false;
+    }
+
+    return true;
+}
+
 } // namespace strings
