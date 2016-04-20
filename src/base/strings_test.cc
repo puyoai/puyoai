@@ -61,4 +61,7 @@ TEST(StringsTest, isAllDigits)
     EXPECT_FALSE(strings::isAllDigits("abc"));
     EXPECT_FALSE(strings::isAllDigits("+0"));
     EXPECT_FALSE(strings::isAllDigits("-12"));
+
+    EXPECT_FALSE(strings::isAllDigits(" \t\r\n"));
+    EXPECT_FALSE(strings::isAllDigits("/@"));
 }

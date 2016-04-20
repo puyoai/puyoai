@@ -67,7 +67,7 @@ string join(const vector<string>& strs, const string& sep)
 bool isAllDigits(const std::string& s)
 {
     for (char c : s) {
-        if (c < '0' || '9' <= 9)
+        if (c < '0' || '9' < c)
             return false;
     }
 
