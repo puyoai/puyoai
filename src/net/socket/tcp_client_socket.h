@@ -7,7 +7,7 @@ namespace net {
 
 class TCPClientSocket : public TCPSocket {
 public:
-    TCPClientSocket(TCPClientSocket&& socket);
+    TCPClientSocket(TCPClientSocket&& socket) noexcept;
     ~TCPClientSocket() override;
 
     bool connect(const char* host, int port);

@@ -11,7 +11,7 @@
 
 namespace net {
 
-Socket::Socket(Socket&& socket) :
+Socket::Socket(Socket&& socket) noexcept :
     sd_(socket.sd_)
 {
     socket.sd_ = INVALID_SOCKET;

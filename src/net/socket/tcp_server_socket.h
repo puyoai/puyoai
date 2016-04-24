@@ -7,7 +7,7 @@ namespace net {
 
 class TCPServerSocket : public TCPSocket {
 public:
-    TCPServerSocket(TCPServerSocket&& socket);
+    TCPServerSocket(TCPServerSocket&& socket) noexcept;
     ~TCPServerSocket() override;
 
     bool bindFromAny(int port);

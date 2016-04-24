@@ -11,7 +11,7 @@
 
 namespace net {
 
-TCPServerSocket::TCPServerSocket(TCPServerSocket&& socket) :
+TCPServerSocket::TCPServerSocket(TCPServerSocket&& socket) noexcept :
     TCPSocket(std::move(socket))
 {
 }

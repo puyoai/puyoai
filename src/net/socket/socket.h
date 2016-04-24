@@ -11,7 +11,7 @@ namespace net {
 // fd will be closed when Socket is destructed.
 class Socket {
 public:
-    Socket(Socket&& socket);
+    Socket(Socket&& socket) noexcept;
     virtual ~Socket();
 
     bool valid() const { return sd_ != INVALID_SOCKET; }

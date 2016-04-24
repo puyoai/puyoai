@@ -8,7 +8,7 @@ namespace net {
 
 class UnixDomainSocket : public Socket {
 public:
-    UnixDomainSocket(UnixDomainSocket&& socket);
+    UnixDomainSocket(UnixDomainSocket&& socket) noexcept;
     ~UnixDomainSocket() override;
 
 private:

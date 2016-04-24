@@ -7,7 +7,7 @@
 
 namespace net {
 
-UnixDomainClientSocket::UnixDomainClientSocket(UnixDomainClientSocket&& socket) :
+UnixDomainClientSocket::UnixDomainClientSocket(UnixDomainClientSocket&& socket) noexcept :
     Socket(std::move(socket))
 {
 }

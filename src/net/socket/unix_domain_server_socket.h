@@ -12,7 +12,7 @@ typedef UnixDomainServerSocket AcceptedUnixDomainServerSocket;
 
 class UnixDomainServerSocket : public Socket {
 public:
-    UnixDomainServerSocket(UnixDomainServerSocket&& socket);
+    UnixDomainServerSocket(UnixDomainServerSocket&& socket) noexcept;
     ~UnixDomainServerSocket() override;
 
     bool bind(const char* path);

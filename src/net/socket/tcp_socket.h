@@ -7,7 +7,7 @@ namespace net {
 
 class TCPSocket : public Socket {
 public:
-    TCPSocket(TCPSocket&& socket);
+    TCPSocket(TCPSocket&& socket) noexcept;
     ~TCPSocket() override;
 
     bool setTCPNodelay();
