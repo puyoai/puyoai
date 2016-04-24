@@ -18,6 +18,9 @@ public:
 
     bool valid() const { return sd_ != INVALID_SOCKET; }
 
+    // Returns the implementation defined socket descriptor.
+    SocketDescriptor get() const { return sd_; }
+
     // Reads to |buf|.
     ssize_t read(void* buf, size_t size);
     // Reads exactly |size| byte to |buf|. If error happens or
