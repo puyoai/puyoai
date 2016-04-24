@@ -1,5 +1,6 @@
 #include "base/strings.h"
 
+#include <cctype>
 #include <sstream>
 
 using namespace std;
@@ -67,7 +68,7 @@ string join(const vector<string>& strs, const string& sep)
 bool isAllDigits(const std::string& s)
 {
     for (char c : s) {
-        if (c < '0' || '9' < c)
+        if (!isdigit(c))
             return false;
     }
 
