@@ -22,6 +22,8 @@ Socket::~Socket()
     if (!valid())
         return;
 
+    LOG(INFO) << "socket " << sd_ << " is closing.";
+
     if (close(sd_) < 0) {
         PLOG(ERROR) << "failed to close socket";
     }
