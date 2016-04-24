@@ -10,6 +10,8 @@ public:
     TCPClientSocket(TCPClientSocket&& socket) noexcept;
     ~TCPClientSocket() override;
 
+    TCPClientSocket& operator=(TCPClientSocket&& socket) noexcept;
+
     bool connect(const char* host, int port);
 
 private:

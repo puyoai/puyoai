@@ -11,6 +11,8 @@ public:
     UnixDomainClientSocket(UnixDomainClientSocket&& socket) noexcept;
     ~UnixDomainClientSocket() override;
 
+    UnixDomainClientSocket& operator=(UnixDomainClientSocket&& socket) noexcept;
+
     bool connect(const char* path);
 
 private:

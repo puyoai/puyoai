@@ -10,6 +10,8 @@ public:
     TCPSocket(TCPSocket&& socket) noexcept;
     ~TCPSocket() override;
 
+    TCPSocket& operator=(TCPSocket&& socket) noexcept;
+
     bool setTCPNodelay();
 
 protected:

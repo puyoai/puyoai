@@ -14,6 +14,8 @@ public:
     Socket(Socket&& socket) noexcept;
     virtual ~Socket();
 
+    Socket& operator=(Socket&& socket) noexcept;
+
     bool valid() const { return sd_ != INVALID_SOCKET; }
 
     // Reads to |buf|.

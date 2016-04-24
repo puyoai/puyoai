@@ -11,6 +11,8 @@ public:
     UnixDomainSocket(UnixDomainSocket&& socket) noexcept;
     ~UnixDomainSocket() override;
 
+    UnixDomainSocket& operator=(UnixDomainSocket&& socket) noexcept;
+
 private:
     explicit UnixDomainSocket(SocketDescriptor sd) : Socket(sd) {}
 

@@ -16,6 +16,12 @@ UnixDomainClientSocket::~UnixDomainClientSocket()
 {
 }
 
+UnixDomainClientSocket& UnixDomainClientSocket::operator=(UnixDomainClientSocket&& socket) noexcept
+{
+    std::swap(sd_, socket.sd_);
+    return *this;
+}
+
 bool UnixDomainClientSocket::connect(const char* path)
 {
     if (strlen(path) >= 108) {

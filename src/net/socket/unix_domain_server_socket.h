@@ -15,6 +15,8 @@ public:
     UnixDomainServerSocket(UnixDomainServerSocket&& socket) noexcept;
     ~UnixDomainServerSocket() override;
 
+    UnixDomainServerSocket& operator=(UnixDomainServerSocket&& socket) noexcept;
+
     bool bind(const char* path);
     bool listen(int backlog);
 

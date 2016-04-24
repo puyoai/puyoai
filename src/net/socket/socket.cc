@@ -27,6 +27,12 @@ Socket::~Socket()
     }
 }
 
+Socket& Socket::operator=(Socket&& socket) noexcept
+{
+    std::swap(sd_, socket.sd_);
+    return *this;
+}
+
 ssize_t Socket::read(void* buf, size_t size)
 {
     return ::recv(sd_, buf, size, 0);

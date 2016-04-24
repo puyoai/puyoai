@@ -20,6 +20,12 @@ TCPSocket::~TCPSocket()
 {
 }
 
+TCPSocket& TCPSocket::operator=(TCPSocket&& socket) noexcept
+{
+    std::swap(sd_, socket.sd_);
+    return *this;
+}
+
 bool TCPSocket::setTCPNodelay()
 {
     int flag = 1;

@@ -10,6 +10,8 @@ public:
     TCPServerSocket(TCPServerSocket&& socket) noexcept;
     ~TCPServerSocket() override;
 
+    TCPServerSocket& operator=(TCPServerSocket&& socket) noexcept;
+
     bool bindFromAny(int port);
     bool listen(int backlog);
 

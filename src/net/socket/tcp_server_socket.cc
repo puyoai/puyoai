@@ -20,6 +20,12 @@ TCPServerSocket::~TCPServerSocket()
 {
 }
 
+TCPServerSocket& TCPServerSocket::operator=(TCPServerSocket&& socket) noexcept
+{
+    std::swap(sd_, socket.sd_);
+    return *this;
+}
+
 bool TCPServerSocket::bindFromAny(int port)
 {
     struct sockaddr_in reader_addr;

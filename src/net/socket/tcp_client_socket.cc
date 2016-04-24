@@ -20,6 +20,12 @@ TCPClientSocket::~TCPClientSocket()
 {
 }
 
+TCPClientSocket& TCPClientSocket::operator=(TCPClientSocket&& socket) noexcept
+{
+    std::swap(sd_, socket.sd_);
+    return *this;
+}
+
 bool TCPClientSocket::connect(const char* host, int port)
 {
     struct sockaddr_in client_addr;

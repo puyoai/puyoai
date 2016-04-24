@@ -16,6 +16,12 @@ UnixDomainServerSocket::~UnixDomainServerSocket()
 {
 }
 
+UnixDomainServerSocket& UnixDomainServerSocket::operator=(UnixDomainServerSocket&& socket) noexcept
+{
+    std::swap(sd_, socket.sd_);
+    return *this;
+}
+
 bool UnixDomainServerSocket::bind(const char* path)
 {
     DCHECK(valid());
