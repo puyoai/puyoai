@@ -1,14 +1,18 @@
 #ifndef CORE_CLIENT_CONNECTOR_CLIENT_CONNECTOR_H_
 #define CORE_CLIENT_CONNECTOR_CLIENT_CONNECTOR_H_
 
+#include <memory>
+
 #include "base/macros.h"
+#include "core/connector/connector_impl.h"
 
 struct FrameRequest;
 struct FrameResponse;
 
 class ClientConnector {
 public:
-    virtual ~ClientConnector();
+    explicit ClientConnector(std::unique_ptr<ConnectorImpl> impl) : impl_(std::move(impl)) {}
+    ~ClientConnector();
 
     // Returns true if receive suceeded.
     bool receive(FrameRequest* request);
@@ -17,13 +21,8 @@ public:
     bool isClosed() { return closed_; }
 
 protected:
-    ClientConnector() {}
-
-    virtual bool readExactly(void* buf, size_t size) = 0;
-    virtual bool writeExactly(const void* buf, size_t size) = 0;
-    virtual void flush() = 0;
-
     bool closed_ = false;
+    std::unique_ptr<ConnectorImpl> impl_;
 
     DISALLOW_COPY_AND_ASSIGN(ClientConnector);
 };

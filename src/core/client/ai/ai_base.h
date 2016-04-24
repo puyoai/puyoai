@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "core/client/connector/client_connector.h"
+#include "core/client/client_connector.h"
 
 class AIBase {
 public:

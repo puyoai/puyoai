@@ -2,12 +2,11 @@
 
 #include <glog/logging.h>
 
-#include "core/client/connector/stdio_client_connector.h"
 #include "core/frame_request.h"
 #include "core/frame_response.h"
 
 RawAI::RawAI() :
-    connector_(new StdioClientConnector)
+    connector_(AIBase::makeConnector())
 {
 }
 

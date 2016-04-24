@@ -6,7 +6,7 @@
 
 #include "core/client/ai/ai_base.h"
 #include "core/client/ai/drop_decision.h"
-#include "core/client/connector/client_connector.h"
+#include "core/client/client_connector.h"
 #include "core/kumipuyo_seq.h"
 #include "core/player_state.h"
 

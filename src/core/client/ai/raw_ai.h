@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "core/client/ai/ai_base.h"
-#include "core/client/connector/client_connector.h"
+#include "core/client/client_connector.h"
 
 struct FrameRequest;
 struct FrameResponse;

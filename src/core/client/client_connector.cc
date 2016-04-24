@@ -1,4 +1,4 @@
-#include "core/client/connector/client_connector.h"
+#include "core/client/client_connector.h"
 
 #include <glog/logging.h>
 
@@ -23,7 +23,7 @@ bool ClientConnector::receive(FrameRequest* frameRequest)
         return false;
 
     FrameRequestHeader header;
-    if (!readExactly(reinterpret_cast<char*>(&header), sizeof(header))) {
+    if (!impl_->readExactly(reinterpret_cast<char*>(&header), sizeof(header))) {
         LOG(ERROR) << "unexpected eof when reading header";
         return false;
     }
@@ -34,7 +34,7 @@ bool ClientConnector::receive(FrameRequest* frameRequest)
     }
 
     char payload[kBufferSize + 1];
-    if (!readExactly(payload, header.size)) {
+    if (!impl_->readExactly(payload, header.size)) {
         LOG(ERROR) << "unepxected eof when reading payload";
         return false;
     }
@@ -53,12 +53,19 @@ void ClientConnector::send(const FrameResponse& resp)
 
     // Send size as header.
     uint32_t size = s.size();
-    writeExactly(&size, sizeof(size));
-    writeExactly(s.data(), s.size());
-    flush();
+    if (!impl_->writeExactly(&size, sizeof(size))) {
+        LOG(ERROR) << "failed to write header";
+        return;
+    }
+    if (!impl_->writeExactly(s.data(), s.size())) {
+        LOG(ERROR) << "failed to write body";
+        return;
+    }
+    impl_->flush();
 
-    if (resp.isValid())
-      LOG(INFO) << "SEND: " << s;
-    else
-      VLOG(1) << "SEND: " << s;
+    if (resp.isValid()) {
+        LOG(INFO) << "SEND: " << s;
+    } else {
+        VLOG(1) << "SEND: " << s;
+    }
 }
