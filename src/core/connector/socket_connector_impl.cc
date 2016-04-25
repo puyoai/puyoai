@@ -7,6 +7,10 @@ SocketConnectorImpl::SocketConnectorImpl(net::Socket socket) :
 {
 }
 
+SocketConnectorImpl::~SocketConnectorImpl()
+{
+}
+
 bool SocketConnectorImpl::readExactly(void* buf, size_t size)
 {
     return socket_.readExactly(buf, size);

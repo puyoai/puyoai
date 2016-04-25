@@ -7,6 +7,7 @@
 class SocketConnectorImpl : public ConnectorImpl {
 public:
     explicit SocketConnectorImpl(net::Socket socket);
+    ~SocketConnectorImpl();
 
     bool readExactly(void* buf, size_t size) override;
     bool writeExactly(const void* buf, size_t size) override;
