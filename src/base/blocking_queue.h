@@ -1,6 +1,7 @@
 #ifndef BASE_BLOCKING_QUEUE_H_
 #define BASE_BLOCKING_QUEUE_H_
 
+#include <chrono>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
@@ -19,6 +20,10 @@ public:
 
     void push(const T& v);
     T take();
+
+    // Return true if succeeded, false if timeout.
+    bool takeWithTimeout(const std::chrono::system_clock::time_point& timeout, T* v);
+    bool takeWithTimeout(const std::chrono::seconds& d, T* v);
 
 private:
     mutable std::mutex mu_;
@@ -72,6 +77,27 @@ T BlockingQueue<T>::take()
     q_.pop();
     push_cond_var_.notify_one();
     return t;
+}
+
+template<typename T>
+bool BlockingQueue<T>::takeWithTimeout(const std::chrono::seconds& d, T* v)
+{
+    auto timeout = std::chrono::system_clock::now() + d;
+    return takeWithTimeout(timeout, v);
+}
+
+template<typename T>
+bool BlockingQueue<T>::takeWithTimeout(const std::chrono::system_clock::time_point& timeout, T* v)
+{
+    std::unique_lock<std::mutex> lock(mu_);
+    if (!take_cond_var_.wait_until(lock, timeout, [this]() { return !q_.empty(); })) {
+        return false;
+    }
+
+    *v = std::move(q_.front());
+    q_.pop();
+    push_cond_var_.notify_one();
+    return true;
 }
 
 } // namespace base
