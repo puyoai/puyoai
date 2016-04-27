@@ -34,6 +34,13 @@ private:
 };
 
 template<typename T>
+class InfiniteBlockingQueue : public BlockingQueue<T>
+{
+public:
+    InfiniteBlockingQueue() : BlockingQueue<T>(SIZE_MAX) {}
+};
+
+template<typename T>
 BlockingQueue<T>::BlockingQueue(size_t capacity) :
     capacity_(capacity)
 {
