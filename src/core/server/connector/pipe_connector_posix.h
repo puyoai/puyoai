@@ -14,7 +14,6 @@ struct FrameResponse;
 class PipeConnectorPosix : public PipeConnector {
 public:
     static std::unique_ptr<ServerConnector> create(int playerId, const std::string& program);
-    static bool pollAndReceive(bool waitTimeout, int frameId, const std::vector<PipeConnector*>& handles, std::vector<FrameResponse>* cfr);
 
     virtual ~PipeConnectorPosix() override;
 

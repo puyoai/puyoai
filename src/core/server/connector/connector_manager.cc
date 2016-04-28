@@ -1,5 +1,6 @@
 #include "core/server/connector/connector_manager.h"
 
+#include <chrono>
 #include <vector>
 
 #include <gflags/gflags.h>
@@ -7,6 +8,7 @@
 
 #include "base/file/file.h"
 #include "base/file/path.h"
+#include "core/frame.h"
 #include "core/frame_response.h"
 #include "core/server/connector/human_connector.h"
 #include "core/server/connector/server_connector.h"
@@ -22,11 +24,38 @@
 #include "net/socket/unix_domain_socket.h"
 #endif
 
+DEFINE_bool(realtime, true, "use realtime");
+DEFINE_bool(timeout, true, "if false, wait ai's thought without timeout");
+
 using namespace std;
 
-ConnectorManager::ConnectorManager(bool timeout) :
-    waitTimeout_(timeout)
+ConnectorManager::ConnectorManager(bool always_wait_timeout) :
+    always_wait_timeout_(always_wait_timeout)
 {
+}
+
+ConnectorManager::~ConnectorManager()
+{
+}
+
+void ConnectorManager::start()
+{
+    receiver_thread_[0] = std::thread(runReceiverThread, this, 0);
+    receiver_thread_[1] = std::thread(runReceiverThread, this, 1);
+}
+
+// static
+void ConnectorManager::runReceiverThread(ConnectorManager* manager, int player_id)
+{
+    while (true) {
+        FrameResponse resp;
+        if (!manager->connectors_[player_id]->receive(&resp)) {
+            LOG(INFO) << "failed to receive";
+            return;
+        }
+
+        manager->resp_queue_[player_id].push(resp);
+    }
 }
 
 void ConnectorManager::setConnector(int playerId, std::unique_ptr<ServerConnector> p)
@@ -50,9 +79,33 @@ bool ConnectorManager::receive(int frameId, vector<FrameResponse> cfr[NUM_PLAYER
         cfr[ctr->playerId()].push_back(response);
     }
 
-#if defined(_MSC_VER)
-    return PipeConnectorWin::pollAndReceive(waitTimeout_, frameId, pipeConnectors_, cfr);
-#else
-    return PipeConnectorPosix::pollAndReceive(waitTimeout_, frameId, pipeConnectors_, cfr);
-#endif
+    // We have 16 milliseconds margin.
+    auto real_timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(1000000 / FPS);
+    auto timeout = FLAGS_timeout ? real_timeout : std::chrono::steady_clock::time_point::max();
+
+    for (int i = 0; i < NUM_PLAYERS; ++i) {
+        std::vector<FrameResponse> resps;
+        FrameResponse resp;
+
+        while (resp_queue_[i].takeWithTimeout(timeout, &resp)) {
+            resps.push_back(resp);
+            if (resp.frameId == frameId)
+                break;
+        }
+
+        // timeout or desired frame response is retrieved.
+        cfr[i] = std::move(resps);
+    }
+
+    // All data is collected (or timeout) here.
+    if (FLAGS_realtime || always_wait_timeout_) {
+        // Needs to wait unilt real_timeout
+        auto now = std::chrono::steady_clock::now();
+        if (now < real_timeout) {
+            auto d = real_timeout - now;
+            std::this_thread::sleep_for(d);
+        }
+    }
+
+    return true;
 }

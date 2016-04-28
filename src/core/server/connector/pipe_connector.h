@@ -16,8 +16,6 @@ public:
     using TimePoint = Clock::time_point;
 
     static std::unique_ptr<ServerConnector> create(int playerId, const std::string& program);
-    static int getUsecFromStart(const TimePoint& start);
-    static int getRemainingMilliSeconds(const TimePoint& start);
 
     virtual ~PipeConnector() override {}
 

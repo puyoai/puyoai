@@ -2,8 +2,11 @@
 #define CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_H_
 
 #include <memory>
+#include <thread>
 #include <vector>
 
+#include "base/blocking_queue.h"
+#include "core/frame_response.h"
 #include "core/player.h"
 
 class HumanConnector;
@@ -13,23 +16,30 @@ struct FrameResponse;
 
 class ConnectorManager {
 public:
-    // Receives decision and messages from clients.
-    // Returns false when disconnected.
-    explicit ConnectorManager(bool timeout);
+    explicit ConnectorManager(bool always_wait_timeout);
+    ~ConnectorManager();
 
     void setConnector(int playerId, std::unique_ptr<ServerConnector> p);
+
+    // Starts receiver thread.
+    void start();
 
     bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS]);
 
     ServerConnector* connector(int i) { return connectors_[i].get(); }
 
 private:
+    static void runReceiverThread(ConnectorManager* manager, int player_id);
+
     std::unique_ptr<ServerConnector> connectors_[NUM_PLAYERS];
 
     std::vector<HumanConnector*> humanConnectors_;
     std::vector<PipeConnector*> pipeConnectors_;
 
-    bool waitTimeout_;
+    // If true, ConnectorManager always consume 16ms.
+    bool always_wait_timeout_;
+    base::InfiniteBlockingQueue<FrameResponse> resp_queue_[2];
+    std::thread receiver_thread_[2];
 };
 
 #endif // CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_H_

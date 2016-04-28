@@ -34,9 +34,10 @@ WiiConnectServer::WiiConnectServer(Source* source, Analyzer* analyzer,
     isAi_[0] = (p1Program != "-");
     isAi_[1] = (p2Program != "-");
 
-    connector_.reset(new ConnectorManager(false));
+    connector_.reset(new ConnectorManager(true));
     connector_->setConnector(0, ServerConnector::create(0, p1Program));
     connector_->setConnector(1, ServerConnector::create(1, p2Program));
+    connector_->start();
 }
 
 WiiConnectServer::~WiiConnectServer()
