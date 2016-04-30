@@ -1,6 +1,7 @@
 #ifndef CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_H_
 #define CORE_SERVER_CONNECTOR_CONNECTOR_MANAGER_H_
 
+#include <atomic>
 #include <memory>
 #include <thread>
 #include <vector>
