@@ -29,36 +29,6 @@ ConnectorManager::ConnectorManager(bool timeout) :
 {
 }
 
-void ConnectorManager::invokePlayer(int playerId, const string& programName)
-{
-    if (programName == "-") {
-        setConnector(playerId, unique_ptr<ServerConnector>(new HumanConnector(playerId)));
-        return;
-    }
-
-    // Invoke player program. Player program should connector to /tmp/puyoai.sock.
-    pid_t pid;
-    {
-        char* program_name = strdup(programName.c_str());
-        char player_name[] = "Player_";
-        player_name[6] = '1' + playerId;
-        char* argv[3] = { program_name, player_name, nullptr };
-        CHECK_EQ(posix_spawn(&pid, programName.c_str(), nullptr, nullptr, argv, nullptr), 0);
-
-        free(program_name);
-    }
-
-    // Make server socket
-    // TODO(mayah): Needs to unlink /tmp/puyoai.sock before binding.
-    net::UnixDomainServerSocket socket = net::SocketFactory::instance()->makeUnixDomainServerSocket();
-    file::remove("/tmp/puyoai.sock");
-    socket.bind("/tmp/puyoai.sock");
-    socket.listen(1);
-
-    net::UnixDomainSocket accepted = socket.accept();
-    setConnector(playerId, unique_ptr<ServerConnector>(new SocketConnector(playerId, std::move(accepted))));
-}
-
 void ConnectorManager::setConnector(int playerId, std::unique_ptr<ServerConnector> p)
 {
     if (p->isHuman()) {
