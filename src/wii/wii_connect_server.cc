@@ -42,6 +42,7 @@ WiiConnectServer::WiiConnectServer(Source* source, Analyzer* analyzer,
 
 WiiConnectServer::~WiiConnectServer()
 {
+    connector_->stop();
     if (th_.joinable())
         th_.join();
 }

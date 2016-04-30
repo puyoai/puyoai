@@ -277,6 +277,7 @@ int main(int argc, char* argv[])
     if (mainWindow.get()) {
         mainWindow->runMainLoop();
         duelServer.stop();
+        manager.stop();
     }
 
     if (commentator.get())
