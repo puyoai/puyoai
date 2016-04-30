@@ -30,6 +30,7 @@ DEFINE_bool(timeout, true, "if false, wait ai's thought without timeout");
 using namespace std;
 
 ConnectorManager::ConnectorManager(bool always_wait_timeout) :
+    should_stop_(false),
     always_wait_timeout_(always_wait_timeout)
 {
 }
@@ -40,21 +41,36 @@ ConnectorManager::~ConnectorManager()
 
 void ConnectorManager::start()
 {
-    receiver_thread_[0] = std::thread(runReceiverThread, this, 0);
-    receiver_thread_[1] = std::thread(runReceiverThread, this, 1);
+    receiver_thread_[0] = std::thread(receiverThreadDriver, this, 0);
+    receiver_thread_[1] = std::thread(receiverThreadDriver, this, 1);
+}
+
+void ConnectorManager::stop()
+{
+    should_stop_ = true;
+    for (int i = 0; i < 2; ++i) {
+        if (receiver_thread_[i].joinable()) {
+            receiver_thread_[i].join();
+        }
+    }
 }
 
 // static
-void ConnectorManager::runReceiverThread(ConnectorManager* manager, int player_id)
+void ConnectorManager::receiverThreadDriver(ConnectorManager* manager, int player_id)
 {
-    while (true) {
+    manager->runReceiverThreadLoop(player_id);
+}
+
+void ConnectorManager::runReceiverThreadLoop(int player_id)
+{
+    while (!should_stop_) {
         FrameResponse resp;
-        if (!manager->connectors_[player_id]->receive(&resp)) {
+        if (!connectors_[player_id]->receive(&resp)) {
             LOG(INFO) << "failed to receive";
             return;
         }
 
-        manager->resp_queue_[player_id].push(resp);
+        resp_queue_[player_id].push(resp);
     }
 }
 

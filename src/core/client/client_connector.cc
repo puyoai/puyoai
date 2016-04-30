@@ -33,6 +33,7 @@ bool ClientConnector::receive(FrameRequest* frameRequest)
         return false;
     }
 
+    // TODO(mayah): This might cause buffer overflow.
     char payload[kBufferSize + 1];
     if (!impl_->readExactly(payload, header.size)) {
         LOG(ERROR) << "unepxected eof when reading payload";

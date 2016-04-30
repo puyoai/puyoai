@@ -19,22 +19,27 @@ public:
     explicit ConnectorManager(bool always_wait_timeout);
     ~ConnectorManager();
 
+    bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS]);
+
     void setConnector(int playerId, std::unique_ptr<ServerConnector> p);
 
-    // Starts receiver thread.
+    // Starts receiver threads.
     void start();
-
-    bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS]);
+    // Stops receiver threads.
+    void stop();
 
     ServerConnector* connector(int i) { return connectors_[i].get(); }
 
 private:
-    static void runReceiverThread(ConnectorManager* manager, int player_id);
+    static void receiverThreadDriver(ConnectorManager* manager, int player_id);
+    void runReceiverThreadLoop(int player_id);
 
     std::unique_ptr<ServerConnector> connectors_[NUM_PLAYERS];
 
     std::vector<HumanConnector*> humanConnectors_;
     std::vector<PipeConnector*> pipeConnectors_;
+
+    std::atomic<bool> should_stop_;
 
     // If true, ConnectorManager always consume 16ms.
     bool always_wait_timeout_;
