@@ -1,6 +1,8 @@
 #ifndef BASE_MACROS_H_
 #define BASE_MACROS_H_
 
+// Do not include this file directly.  Use base/base.h instead.
+
 #include <cstddef>
 
 #define UNUSED_VARIABLE(x) (void)(x)

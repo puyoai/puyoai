@@ -1,6 +1,8 @@
 #ifndef BASE_COMPILER_SPECIFIC_H_
 #define BASE_COMPILER_SPECIFIC_H_
 
+// Do not include this file directly.  Use base/base.h instead.
+
 #include "build/build_config.h"
 
 #ifndef __has_feature
