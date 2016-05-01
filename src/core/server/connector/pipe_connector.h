@@ -15,8 +15,6 @@ public:
     using Clock = std::chrono::high_resolution_clock;
     using TimePoint = Clock::time_point;
 
-    static std::unique_ptr<ServerConnector> create(int playerId, const std::string& program);
-
     virtual ~PipeConnector() override {}
 
     virtual void send(const FrameRequest&) override;

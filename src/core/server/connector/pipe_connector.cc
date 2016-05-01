@@ -17,16 +17,6 @@
 
 using namespace std;
 
-// static
-unique_ptr<ServerConnector> PipeConnector::create(int playerId, const string& programName)
-{
-#if defined(_MSC_VER)
-    return PipeConnectorWin::create(playerId, programName);
-#else
-    return PipeConnectorPosix::create(playerId, programName);
-#endif
-}
-
 PipeConnector::PipeConnector(int player) :
     ServerConnector(player),
     closed_(false)
