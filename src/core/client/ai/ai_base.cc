@@ -17,19 +17,19 @@ DEFINE_int32(connector_port, 4321, "server port");
 // static
 std::unique_ptr<ClientConnector> AIBase::makeConnector()
 {
-    std::unique_ptr<ConnectorImpl> impl;
-
     if (FLAGS_connector == "stdio") {
-        impl.reset(new StdioConnectorImpl());
-#if defined(USE_TCP)
-    } else if (FLAGS_connector == "unix") {
-        net::UnixDomainClientSocket socket(net::SocketFactory::instance()->makeUnixDomainClientSocket());
-        CHECK(socket.connect(FLAGS_connector_socket_path.c_str()));
-        impl.reset(new SocketConnectorImpl(std::move(socket)));
-#endif
-    } else {
-        CHECK(false) << "Unknown connector: " << FLAGS_connector;
+        std::unique_ptr<ConnectorImpl> impl(new StdioConnectorImpl());
+        return std::unique_ptr<ClientConnector>(new ClientConnector(std::move(impl)));
     }
 
-    return std::unique_ptr<ClientConnector>(new ClientConnector(std::move(impl)));
+#if defined(USE_TCP) && defined(OS_POSIX)
+    if (FLAGS_connector == "unix") {
+        net::UnixDomainClientSocket socket(net::SocketFactory::instance()->makeUnixDomainClientSocket());
+        CHECK(socket.connect(FLAGS_connector_socket_path.c_str()));
+        std::unique_ptr<ConnectorImpl> impl(new SocketConnectorImpl(std::move(socket)));
+        return std::unique_ptr<ClientConnector>(new ClientConnector(std::move(impl)));
+    }
+#endif
+
+    CHECK(false) << "Unknown connector: " << FLAGS_connector;
 }
