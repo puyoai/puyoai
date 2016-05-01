@@ -8,6 +8,8 @@
 
 namespace net {
 
+using ssize_t = long long;
+    
 // fd will be closed when Socket is destructed.
 class Socket {
 public:

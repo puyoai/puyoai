@@ -6,6 +6,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "base/base.h"
 #include "base/file/file.h"
 #include "base/file/path.h"
 #include "core/frame.h"

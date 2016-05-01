@@ -60,6 +60,11 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     find_library(COCOA_LIBRARY Cocoa)
 endif()
 
+# TODO(peria): Enable to use TCP sockets with MSVC
+if(NOT MSVC)
+    set(USE_TCP 1)
+endif()
+
 # ----------------------------------------------------------------------
 # Set include directories, c++ options, etc.
 
@@ -142,6 +147,9 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/internal AND IS_DIRECTORY ${CMAKE_SOURCE_DIR}/inte
     endif()
 endif()
 
+if(USE_TCP)
+    add_definitions(-DUSE_TCP=1)
+endif()
 
 # ----------------------------------------------------------------------
 # Add subdirectories
