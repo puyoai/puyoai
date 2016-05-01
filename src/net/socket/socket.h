@@ -6,10 +6,13 @@
 #include "base/macros.h"
 #include "net/socket/socket_descriptor.h"
 
+// Windows does not have ssize_t.
+#ifdef OS_WIN
+using ssize_t = long long;
+#endif
+
 namespace net {
 
-using ssize_t = long long;
-    
 // fd will be closed when Socket is destructed.
 class Socket {
 public:
