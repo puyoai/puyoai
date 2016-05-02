@@ -133,8 +133,8 @@ int main(int argc, char* argv[])
 #endif
 
     ConnectorManager manager(false);
-    manager.setConnector(0, ServerConnector::create(0, string(argv[1])));
-    manager.setConnector(1, ServerConnector::create(1, string(argv[2])));
+    manager.setPlayer(0, argv[1]);
+    manager.setPlayer(1, argv[2]);
 
     manager.start();
 

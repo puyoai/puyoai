@@ -75,6 +75,11 @@ void ConnectorManager::runReceiverThreadLoop(int player_id)
     }
 }
 
+void ConnectorManager::setPlayer(int player_id, const std::string& program)
+{
+    setConnector(player_id, ServerConnector::create(player_id, program));
+}
+
 void ConnectorManager::setConnector(int playerId, std::unique_ptr<ServerConnector> p)
 {
     if (p->isHuman()) {

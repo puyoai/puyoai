@@ -22,7 +22,7 @@ public:
 
     bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS]);
 
-    void setConnector(int playerId, std::unique_ptr<ServerConnector> p);
+    void setPlayer(int player_id, const std::string& program);
 
     // Starts receiver threads.
     void start();
@@ -34,6 +34,8 @@ public:
 private:
     static void receiverThreadDriver(ConnectorManager* manager, int player_id);
     void runReceiverThreadLoop(int player_id);
+
+    void setConnector(int playerId, std::unique_ptr<ServerConnector> p);
 
     std::unique_ptr<ServerConnector> connectors_[NUM_PLAYERS];
 
