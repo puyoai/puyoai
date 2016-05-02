@@ -22,6 +22,8 @@ unique_ptr<ServerConnector> ServerConnector::create(int playerId, const string& 
     if (programName == "-")
         return unique_ptr<ServerConnector>(new HumanConnector(playerId));
 
+    // TODO(mayah): Add tcp connector.
+
 #ifdef OS_WIN
     return PipeConnectorWin::create(playerId, programName);
 #else
