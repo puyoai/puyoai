@@ -26,6 +26,12 @@ public:
     int playerId() const { return playerId_; }
 
 protected:
+    static std::unique_ptr<ServerConnector> createStdioConnector(int playerId, const std::string& program);
+
+#ifdef OS_POSIX
+    static std::unique_ptr<ServerConnector> createTCPSocketConnector(int playerId, const std::string& program);
+#endif
+
     int playerId_;
 };
 
