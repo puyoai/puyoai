@@ -84,7 +84,7 @@ if(MSVC)
     add_compile_options("/wd4800")  # from int to bool
 
     # include build_config always.h
-    add_compile_options("/FI" "${CMAKE_SOURCE_DIR}/build/build_config.h")
+    add_compile_options("/FI ${CMAKE_SOURCE_DIR}/build/build_config.h")
 else()
     if(CYGWIN AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11" CACHE STRING "" FORCE)
