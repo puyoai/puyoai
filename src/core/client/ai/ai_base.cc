@@ -6,8 +6,8 @@
 #include "base/strings.h"
 #include "core/connector/socket_connector_impl.h"
 #include "core/connector/stdio_connector_impl.h"
-#if defined(USE_TCP)
 #include "net/socket/socket_factory.h"
+#ifdef OS_POSIX
 #include "net/socket/unix_domain_client_socket.h"
 #endif
 
@@ -21,7 +21,7 @@ std::unique_ptr<ClientConnector> AIBase::makeConnector()
         return std::unique_ptr<ClientConnector>(new ClientConnector(std::move(impl)));
     }
 
-#if defined(USE_TCP) && defined(OS_POSIX)
+#if defined(OS_POSIX)
     if (strings::hasPrefix(FLAGS_connector, "unix:")) {
         net::UnixDomainClientSocket socket(net::SocketFactory::instance()->makeUnixDomainClientSocket());
 
@@ -32,7 +32,6 @@ std::unique_ptr<ClientConnector> AIBase::makeConnector()
     }
 #endif
 
-#if defined(USE_TCP) && defined(OS_POSIX)
     if (strings::hasPrefix(FLAGS_connector, "tcp:")) {
         std::string host_port = FLAGS_connector.substr(4);
         std::vector<std::string> parts = strings::split(host_port, ':');
@@ -52,7 +51,6 @@ std::unique_ptr<ClientConnector> AIBase::makeConnector()
         std::unique_ptr<ConnectorImpl> impl(new SocketConnectorImpl(std::move(socket)));
         return std::unique_ptr<ClientConnector>(new ClientConnector(std::move(impl)));
     }
-#endif
 
     CHECK(false) << "Unknown connector: " << FLAGS_connector;
 }

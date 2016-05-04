@@ -1,11 +1,18 @@
 #include "net/socket/socket.h"
 
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <sys/socket.h>
-#include <sys/types.h>
+#ifdef OS_POSIX
+# include <arpa/inet.h>
+# include <netdb.h>
+# include <netinet/in.h>
+# include <netinet/tcp.h>
+# include <sys/socket.h>
+# include <sys/types.h>
+#endif
+
+#ifdef OS_WIN
+# include <winsock2.h>
+# undef ERROR
+#endif
 
 #include "glog/logging.h"
 
@@ -24,9 +31,15 @@ Socket::~Socket()
 
     LOG(INFO) << "socket " << sd_ << " is closing.";
 
+#ifdef OS_WIN
+    if (closesocket(sd_) < 0) {
+        PLOG(ERROR) << "failed to close socket";
+    }
+#else
     if (close(sd_) < 0) {
         PLOG(ERROR) << "failed to close socket";
     }
+#endif
 }
 
 Socket& Socket::operator=(Socket&& socket) noexcept
@@ -37,7 +50,10 @@ Socket& Socket::operator=(Socket&& socket) noexcept
 
 ssize_t Socket::read(void* buf, size_t size)
 {
-    return ::recv(sd_, buf, size, 0);
+    // Windows uses char* for the second argument of recv(), so
+    // we explictily cast it.
+    // Other OSs cast char* back to void* implicitly, and it is OK.
+    return ::recv(sd_, reinterpret_cast<char*>(buf), size, 0);
 }
 
 bool Socket::readExactly(void* buf, size_t size)
@@ -65,7 +81,9 @@ bool Socket::readExactly(void* buf, size_t size)
 
 ssize_t Socket::write(const void* buf, size_t size)
 {
-    return ::send(sd_, buf, size, 0);
+    // Windows uses const char* for the second argument, so we cast it.
+    // Other OSs cast it back to const void* implicitly.
+    return ::send(sd_, reinterpret_cast<const char*>(buf), size, 0);
 }
 
 bool Socket::writeExactly(const void* buf, size_t size)
