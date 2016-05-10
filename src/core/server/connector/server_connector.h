@@ -30,6 +30,7 @@ protected:
 
 #ifdef OS_POSIX
     static std::unique_ptr<ServerConnector> createTCPSocketConnector(int playerId, const std::string& program);
+    static std::unique_ptr<ServerConnector> createTCPSocketConnectorFromPort(int playerId, int port);
 #endif
 
     int playerId_;

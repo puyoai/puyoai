@@ -5,6 +5,7 @@
 #include <glog/logging.h>
 
 #include "base/memory.h"
+#include "base/strings.h"
 #include "core/server/connector/human_connector.h"
 
 // TODO(mayah): These should not be POSIX only. Implement this for Win, and
@@ -30,8 +31,21 @@ unique_ptr<ServerConnector> ServerConnector::create(int playerId, const string& 
 {
     CHECK(0 <= playerId && playerId < 10) << playerId;
 
+    // When programName is special, we do special handling.
+    // Otherwise, we follow server_connector option.
+
     if (programName == "-")
         return unique_ptr<ServerConnector>(new HumanConnector(playerId));
+
+#ifdef OS_POSIX
+    if (strings::hasPrefix(programName, "tcp:")) {
+        std::string port_str = programName.substr(4);
+        CHECK(strings::isAllDigits(port_str)) << port_str;
+        int port = atoi(port_str.c_str());
+
+        return createTCPSocketConnectorFromPort(playerId, port);
+    }
+#endif
 
     if (FLAGS_server_connector == "stdio")
         return createStdioConnector(playerId, programName);
@@ -80,9 +94,14 @@ unique_ptr<ServerConnector> ServerConnector::createTCPSocketConnector(int player
         PLOG(FATAL) << "should not be reached here";
     }
 
+    return createTCPSocketConnectorFromPort(playerId, playerId == 0 ? 24241 : 24242);
+}
+
+unique_ptr<ServerConnector> ServerConnector::createTCPSocketConnectorFromPort(int playerId, int port)
+{
     // Make server socket.
     net::TCPServerSocket socket = net::SocketFactory::instance()->makeTCPServerSocket();
-    socket.bindFromAny(playerId == 0 ? 24241 : 24242);
+    socket.bindFromAny(port);
     socket.listen();
 
     net::TCPSocket accepted = socket.accept();
@@ -94,4 +113,5 @@ unique_ptr<ServerConnector> ServerConnector::createTCPSocketConnector(int player
 
     return unique_ptr<ServerConnector>(new SocketConnector(playerId, std::move(accepted)));
 }
+
 #endif
