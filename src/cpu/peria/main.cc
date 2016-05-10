@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "cpu/peria/ai.h"
+#include "cpu/peria/basic_ai.h"
 #include "cpu/peria/pai.h"
 #include "cpu/peria/pattern.h"
 
@@ -33,6 +34,8 @@ int main(int argc, char* argv[]) {
   case 1:
     ai.reset(new peria::Pai(argc, argv));
     break;
+  case 2:
+    ai.reset(new peria::BasicAi(argc, argv));
   }
   CHECK(ai);
   ai->runLoop();
