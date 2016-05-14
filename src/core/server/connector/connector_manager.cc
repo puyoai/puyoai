@@ -42,8 +42,10 @@ ConnectorManager::~ConnectorManager()
 
 void ConnectorManager::start()
 {
-    receiver_thread_[0] = std::thread(receiverThreadDriver, this, 0);
-    receiver_thread_[1] = std::thread(receiverThreadDriver, this, 1);
+    for (int i = 0; i < 2; ++i) {
+        if (!connectors_[i]->isHuman())
+            receiver_thread_[i] = std::thread(receiverThreadDriver, this, i);
+    }
 }
 
 void ConnectorManager::stop()
@@ -106,6 +108,9 @@ bool ConnectorManager::receive(int frameId, vector<FrameResponse> cfr[NUM_PLAYER
     auto timeout = FLAGS_timeout ? real_timeout : std::chrono::steady_clock::time_point::max();
 
     for (int i = 0; i < NUM_PLAYERS; ++i) {
+        if (connectors_[i]->isHuman())
+            continue;
+
         std::vector<FrameResponse> resps;
         FrameResponse resp;
 
