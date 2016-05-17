@@ -4,6 +4,11 @@
 
 using namespace std;
 
+// TODO: Remove this re-definition. It is a workaround for old libavutil.
+#ifndef PIX_FMT_RGB24
+#define PIX_FMT_RGB24 AV_PIX_FMT_RGB24
+#endif
+
 MovieSource::MovieSource(const char* filename) :
     filename_(filename),
     waitUntilTrue_(true),
