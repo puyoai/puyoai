@@ -16,20 +16,18 @@
 
 namespace peria {
 
-Evaluator::Evaluator(int id, const PlayerState& m, const PlayerState& e, const PlayerHands& eh, Control* c) : frame_id(id), me(m), enemy(e), enemy_hands(eh), control(c) {
-  UNUSED_VARIABLE(frame_id);
-}
+Evaluator::Evaluator(const PlayerState& m, const PlayerState& e, const PlayerHands& eh, Control* c) : me(m), enemy(e), enemy_hands(eh), control(c) {}
 
-void Evaluator::EvalPlan(const RefPlan& plan) {
+void Evaluator::EvalPlan(const CoreField& field, const RefPlan& plan) {
   Genre genres[] = {
     {"Field", 0, ""},
     {"Uke", 0, ""},
     {"Rensa", 0, ""},
     {"Time", 0, ""}};
 
-  genres[0].score = EvalField(plan.field(), &genres[0].message);
-  genres[1].score = EvalUke(plan.field(), &genres[1].message);
-  genres[2].score = EvalRensa(plan, &genres[2].message);
+  genres[0].score = EvalField(field, &genres[0].message);
+  genres[1].score = EvalUke(field, &genres[1].message);
+  genres[2].score = EvalRensa(field, plan, &genres[2].message);
   genres[3].score = EvalTime(plan, &genres[3].message);
 
   std::ostringstream oss;
@@ -101,7 +99,7 @@ int Evaluator::EvalUke(const CoreField& field, std::string* message) {
   return score;
 }
 
-int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
+int Evaluator::EvalRensa(const CoreField& field, const RefPlan& plan, std::string* message) {
   if (!plan.isRensaPlan())
     return 0;
 
@@ -120,13 +118,13 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
   }
 
   if (false) {  // Evaluate possible rensa.
-    int value = Future(plan.field()) / 100;
+    int value = Future(field) / 100;
     oss << "Future(" << value << ")_";
     score += value;
   }
 
   if (false) {  // penalty for using too many puyos
-    int remained_puyos = me.field.countPuyos() - plan.field().countPuyos();
+    int remained_puyos = me.field.countPuyos() - field.countPuyos();
     int wasted_puyos = std::max(remained_puyos - 4 * plan.chains() - 4, 0);
     int value = -5 * plan.chains() * wasted_puyos;
     if (value < 0) {
@@ -137,7 +135,7 @@ int Evaluator::EvalRensa(const RefPlan& plan, std::string* message) {
 
   if (false) {  // bonus to use many puyos, only for the main fire
     int value = 0;
-    if (me.field.countPuyos() > plan.field().countPuyos() * 2) {
+    if (me.field.countPuyos() > field.countPuyos() * 2) {
       value = plan.score() / 500;
     }
     if (value > 0) {

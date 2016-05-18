@@ -23,6 +23,13 @@
 
 namespace peria {
 
+namespace {
+struct Attack {
+  int ojama;
+  int end_frame;
+};
+};
+
 Ai::Ai(int argc, char* argv[]): ::AI(argc, argv, "peria") {}
 
 Ai::~Ai() {}
@@ -40,9 +47,37 @@ DropDecision Ai::think(int frame_id,
   std::int64_t start_ms = currentTimeInMillis();
   
   Control control;
-  Evaluator evaluator(frame_id, my_state, enemy_state, enemy_hands_, &control);
-  Plan::iterateAvailablePlans(field, seq, 2,
-                              [&evaluator](const RefPlan& plan) { evaluator.EvalPlan(plan); });
+  Evaluator evaluator(my_state, enemy_state, enemy_hands_, &control);
+  Attack attack = {
+    enemy_state.currentRensaResult.score / 70,
+    enemy_state.rensaFinishingFrameId()
+  };
+  KumipuyoSeq next = seq.subsequence(1);
+  auto simulateAndEval = [frame_id, attack, &next, &evaluator](const RefPlan& plan) {
+    CoreField field = plan.field();
+    int end_frame = frame_id + plan.totalFrames();
+    if (frame_id <= attack.end_frame && attack.end_frame < end_frame) {
+      int fall = attack.ojama - plan.score() / 70;
+      if (fall < 0)
+        fall = 0;
+      if (fall > 30)
+        fall = 30;
+      field.fallOjama(fall / 6);
+      int xs[] = {1,2,3,4,5,6};
+      std::random_shuffle(xs, xs + 6);
+      for (int i = 0; i < fall % 6; ++i) {
+        field.dropPuyoOn(xs[i], PuyoColor::OJAMA);
+      }
+    }
+    
+    evaluator.EvalPlan(field, plan);
+    if (!field.isEmpty(3, 12))
+      return;
+    auto callback = [&evaluator](const RefPlan& plan) { evaluator.EvalPlan(plan.field(), plan); };
+    Plan::iterateAvailablePlans(field, next, 1, callback);
+  };
+  Plan::iterateAvailablePlans(field, seq, 1, simulateAndEval);
+                              
 
   std::int64_t end_ms = currentTimeInMillis();
 

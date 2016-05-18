@@ -15,8 +15,8 @@ struct PlayerHands;
 // Evaluator evaluates something.
 class Evaluator {
  public:
-  Evaluator(int, const PlayerState&, const PlayerState&, const PlayerHands&, Control*);
-  void EvalPlan(const RefPlan& plan);
+  Evaluator(const PlayerState& me, const PlayerState& enemy, const PlayerHands&, Control*);
+  void EvalPlan(const CoreField&, const RefPlan& plan);
   
  private:
   struct Genre {
@@ -27,7 +27,7 @@ class Evaluator {
 
   int EvalField(const CoreField& field, std::string* message);
   int EvalUke(const CoreField& field, std::string* message);
-  int EvalRensa(const RefPlan& plan, std::string* message);
+  int EvalRensa(const CoreField& field, const RefPlan& plan, std::string* message);
   int EvalTime(const RefPlan& plan, std::string* message);
 
   // Field related eval functions
