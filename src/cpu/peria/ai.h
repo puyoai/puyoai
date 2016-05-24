@@ -9,6 +9,13 @@ class RefPlan;
 
 namespace peria {
 
+class Evaluator;
+
+struct Attack {
+  int ojama;
+  int end_frame;
+};
+
 class Ai : public ::AI {
  public:
   Ai(int argc, char* argv[]);
@@ -24,6 +31,8 @@ class Ai : public ::AI {
 
   virtual void onGroundedForEnemy(const FrameRequest& frame_request) override;
   
+  static void IterationCallback(int step, int start_frame, Attack attack, const KumipuyoSeq& next, Evaluator& evaluator, const RefPlan& plan);
+
   PlayerHands enemy_hands_;
 };
 

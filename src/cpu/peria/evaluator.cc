@@ -23,12 +23,13 @@ void Evaluator::EvalPlan(const CoreField& field, const RefPlan& plan) {
     {"Field", 0, ""},
     {"Uke", 0, ""},
     {"Rensa", 0, ""},
-    {"Time", 0, ""}};
+    //  {"Time", 0, ""},
+  };
 
   genres[0].score = EvalField(field, &genres[0].message);
   genres[1].score = EvalUke(field, &genres[1].message);
   genres[2].score = EvalRensa(field, plan, &genres[2].message);
-  genres[3].score = EvalTime(plan, &genres[3].message);
+  // genres[3].score = EvalTime(plan, &genres[3].message);
 
   std::ostringstream oss;
   int score = 0;

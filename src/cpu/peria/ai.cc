@@ -23,13 +23,6 @@
 
 namespace peria {
 
-namespace {
-struct Attack {
-  int ojama;
-  int end_frame;
-};
-};
-
 Ai::Ai(int argc, char* argv[]): ::AI(argc, argv, "peria") {}
 
 Ai::~Ai() {}
@@ -40,9 +33,7 @@ DropDecision Ai::think(int frame_id,
                        const PlayerState& my_state,
                        const PlayerState& enemy_state,
                        bool fast) const {
-  UNUSED_VARIABLE(frame_id);
   UNUSED_VARIABLE(fast);
-  using namespace std::placeholders;
 
   std::int64_t start_ms = currentTimeInMillis();
   
@@ -52,32 +43,10 @@ DropDecision Ai::think(int frame_id,
     enemy_state.currentRensaResult.score / 70,
     enemy_state.rensaFinishingFrameId()
   };
-  KumipuyoSeq next = seq.subsequence(1);
-  auto simulateAndEval = [frame_id, attack, &next, &evaluator](const RefPlan& plan) {
-    CoreField field = plan.field();
-    int end_frame = frame_id + plan.totalFrames();
-    if (frame_id <= attack.end_frame && attack.end_frame < end_frame) {
-      int fall = attack.ojama - plan.score() / 70;
-      if (fall < 0)
-        fall = 0;
-      if (fall > 30)
-        fall = 30;
-      field.fallOjama(fall / 6);
-      int xs[] = {1,2,3,4,5,6};
-      std::random_shuffle(xs, xs + 6);
-      for (int i = 0; i < fall % 6; ++i) {
-        field.dropPuyoOn(xs[i], PuyoColor::OJAMA);
-      }
-    }
-    
-    evaluator.EvalPlan(field, plan);
-    if (!field.isEmpty(3, 12))
-      return;
-    auto callback = [&evaluator](const RefPlan& plan) { evaluator.EvalPlan(plan.field(), plan); };
-    Plan::iterateAvailablePlans(field, next, 1, callback);
-  };
-  Plan::iterateAvailablePlans(field, seq, 1, simulateAndEval);
-                              
+
+  auto callback = std::bind(IterationCallback, 1, frame_id, attack, seq.subsequence(1),
+                            evaluator, std::placeholders::_1);
+  Plan::iterateAvailablePlans(field, seq, 1, callback);
 
   std::int64_t end_ms = currentTimeInMillis();
 
@@ -123,6 +92,49 @@ void Ai::onGroundedForEnemy(const FrameRequest& frame_request) {
         possible.push_back(rensa);
         return result;
       });
+}
+
+// static
+void Ai::IterationCallback(int step,
+                           int start_frame, Attack attack, const KumipuyoSeq& next,
+                           Evaluator& evaluator, const RefPlan& plan) {
+  CoreField field = plan.field();
+  int end_frame = start_frame + plan.totalFrames();
+  int sending_ojama = plan.score() / 70;
+  if (start_frame <= attack.end_frame && attack.end_frame < end_frame) {
+    int fall = attack.ojama - sending_ojama;
+    if (fall < 0) {
+      fall = 0;
+      sending_ojama -= attack.ojama;
+      attack.ojama = 0;
+    }
+    if (fall > 30) {
+      sending_ojama = 0;
+      fall = 30;
+    }
+    if (fall > 0) {
+      attack.ojama -= fall;
+      field.fallOjama(fall / 6);
+      int xs[] = {1,2,3,4,5,6};
+      std::random_shuffle(xs, xs + 6);
+      for (int i = 0; i < fall % 6; ++i) {
+        field.dropPuyoOn(xs[i], PuyoColor::OJAMA);
+      }
+    }
+  }
+  
+  if (!field.isEmpty(3, 12))
+    return;
+  // TODO: introduce sending_ojama as a score.
+  evaluator.EvalPlan(field, plan);
+
+  // more iteration
+  if (step > 1) {
+    auto callback = std::bind(IterationCallback,
+                              step - 1, end_frame, attack, next.subsequence(1), evaluator,
+                              std::placeholders::_1);
+    Plan::iterateAvailablePlans(field, next, 1, callback);
+  }
 }
 
 }  // namespace peria
