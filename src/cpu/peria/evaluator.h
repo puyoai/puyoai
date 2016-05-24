@@ -39,7 +39,6 @@ class Evaluator {
   int EvalTsubushi(const RefPlan& plan);
   int EvalEnemyPlan();
 
-  int frame_id;
   const PlayerState& me;
   const PlayerState& enemy;
   const PlayerHands& enemy_hands;
