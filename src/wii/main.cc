@@ -18,6 +18,7 @@
 #include "core/server/game_state_recorder.h"
 #include "gui/commentator_drawer.h"
 #include "gui/decision_drawer.h"
+#include "gui/fps_drawer.h"
 #include "gui/frame_number_drawer.h"
 #include "gui/main_window.h"
 #include "gui/user_event_drawer.h"
@@ -38,6 +39,7 @@ DEFINE_bool(save_screenshot, false, "save screenshot");
 DEFINE_bool(draw_result, true, "draw analyzer result");
 DEFINE_bool(draw_decision, true, "draw decision");
 DEFINE_bool(draw_user_event, true, "draw user event");
+DEFINE_bool(draw_fps, true, "draw FPS");
 DEFINE_bool(draw_frame_number, true, "draw frame number");
 DEFINE_string(source, "syntek",
               "set image source. 'syntek' when using syntek video capture."
@@ -147,6 +149,10 @@ int main(int argc, char* argv[])
     if (FLAGS_draw_frame_number)
         frameNumberDrawer.reset(new FrameNumberDrawer);
 
+    unique_ptr<FPSDrawer> fpsDrawer;
+    if (FLAGS_draw_fps)
+        fpsDrawer.reset(new FPSDrawer);
+
     unique_ptr<MovieSourceKeyListener> movieSourceKeyListener;
     // TODO(mayah): BAD! Don't check FLAGS_source here.
     if (FLAGS_fps == 0 && FLAGS_source != "syntek") {
@@ -183,6 +189,8 @@ int main(int argc, char* argv[])
         mainWindow->addDrawer(userEventDrawer.get());
     if (frameNumberDrawer.get())
         mainWindow->addDrawer(frameNumberDrawer.get());
+    if (fpsDrawer.get())
+        mainWindow->addDrawer(fpsDrawer.get());
 
 #if USE_AUDIO_COMMENTATOR
     unique_ptr<InternalSpeaker> internalSpeaker;
