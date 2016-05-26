@@ -209,6 +209,9 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
 
     GameResult gameResult = GameResult::GAME_HAS_STOPPED;
     while (!shouldStop_) {
+        auto curr_time = std::chrono::steady_clock::now();
+        auto timeout_time = curr_time + std::chrono::microseconds(1000000 / FPS);
+
         duelState.frameId += 1;
         int frameId = duelState.frameId;
 
@@ -222,7 +225,7 @@ GameResult DuelServer::runGame(ConnectorManager* manager)
         // --- Reads the response of the current frame information.
         // It takes up to 1/FPS [s] to finish this section.
         vector<FrameResponse> data[2];
-        if (!manager->receive(frameId, data)) {
+        if (!manager->receive(frameId, data, timeout_time)) {
             if (manager->connector(0)->isClosed()) {
                 gameResult = GameResult::P2_WIN_WITH_CONNECTION_ERROR;
                 break;

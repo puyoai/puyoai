@@ -92,7 +92,8 @@ void ConnectorManager::setConnector(int playerId, std::unique_ptr<ServerConnecto
     connectors_[playerId] = std::move(p);
 }
 
-bool ConnectorManager::receive(int frameId, vector<FrameResponse> cfr[NUM_PLAYERS])
+bool ConnectorManager::receive(int frameId, vector<FrameResponse> cfr[NUM_PLAYERS],
+                               const std::chrono::steady_clock::time_point& timeout_time)
 {
     for (int i = 0; i < NUM_PLAYERS; ++i)
         cfr[i].clear();
@@ -104,7 +105,7 @@ bool ConnectorManager::receive(int frameId, vector<FrameResponse> cfr[NUM_PLAYER
     }
 
     // We have 16 milliseconds margin.
-    auto real_timeout = std::chrono::steady_clock::now() + std::chrono::microseconds(1000000 / FPS);
+    auto real_timeout = timeout_time;
     auto timeout = FLAGS_timeout ? real_timeout : std::chrono::steady_clock::time_point::max();
 
     for (int i = 0; i < NUM_PLAYERS; ++i) {

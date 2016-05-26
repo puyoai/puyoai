@@ -92,8 +92,22 @@ void WiiConnectServer::runLoop()
     UniqueSDLSurface prev2Surface(emptyUniqueSDLSurface());
     UniqueSDLSurface prev3Surface(emptyUniqueSDLSurface());
 
+    auto start_time = std::chrono::steady_clock::now();
+    auto prev_time = start_time;
+
     while (!shouldStop_) {
         UniqueSDLSurface surface(source_->nextFrame());
+
+        auto curr_time = std::chrono::steady_clock::now();
+        auto timeout_time = curr_time + std::chrono::milliseconds(16);
+
+        LOG(INFO) << "TIME"
+                  << " id=" << frameId
+                  << " elapsed=" << std::chrono::duration_cast<std::chrono::milliseconds>(curr_time - start_time).count()
+                  << " from_prev=" << std::chrono::duration_cast<std::chrono::milliseconds>(curr_time - prev_time).count();
+
+        prev_time = curr_time;
+
         if (!surface.get()) {
             ++noSurfaceCount;
             LOG(INFO) << "No surface?: count=" << noSurfaceCount << endl;
@@ -147,11 +161,11 @@ void WiiConnectServer::runLoop()
                     gameStarted = true;
                 }
             }
-            if (!playForLevelSelect(frameId, *r))
+            if (!playForLevelSelect(frameId, *r, timeout_time))
                 shouldStop_ = true;
             break;
         case CaptureGameState::PLAYING: {
-            if (!playForPlaying(frameId, *r))
+            if (!playForPlaying(frameId, *r, timeout_time))
                 shouldStop_ = true;
             GameState gameState = toGameState(frameId, *r);
             for (auto observer : observers_)
@@ -165,7 +179,7 @@ void WiiConnectServer::runLoop()
         case CaptureGameState::GAME_FINISHED_WITH_1P_WIN:
         case CaptureGameState::GAME_FINISHED_WITH_2P_WIN:
             cout << "game finished detected: started?=" << gameStarted << endl;
-            if (!playForFinished(frameId, gameStarted, *r))
+            if (!playForFinished(frameId, gameStarted, *r, timeout_time))
                 shouldStop_ = true;
             if (gameStarted) {
                 GameResult gameResult = GameResult::DRAW;
@@ -211,7 +225,7 @@ bool WiiConnectServer::playForUnknown(int frameId)
     return true;
 }
 
-bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& analyzerResult)
+bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& analyzerResult, const std::chrono::steady_clock::time_point& timeout_time)
 {
     if (frameId % 10 == 0) {
         for (int pi = 0; pi < 2; ++pi) {
@@ -234,12 +248,13 @@ bool WiiConnectServer::playForLevelSelect(int frameId, const AnalyzerResult& ana
     }
 
     vector<FrameResponse> responses[2];
-    connector_->receive(frameId, responses);
+    connector_->receive(frameId, responses, timeout_time);
 
     return true;
 }
 
-bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyzerResult)
+bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyzerResult,
+                                      const std::chrono::steady_clock::time_point& timeout_time)
 {
     double beginTime = currentTime();
 
@@ -269,7 +284,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
     }
 
     vector<FrameResponse> responses[2];
-    connector_->receive(frameId, responses);
+    connector_->receive(frameId, responses, timeout_time);
 
     for (int pi = 0; pi < 2; pi++) {
         if (!isAi_[pi])
@@ -293,7 +308,7 @@ bool WiiConnectServer::playForPlaying(int frameId, const AnalyzerResult& analyze
     return true;
 }
 
-bool WiiConnectServer::playForFinished(int frameId, bool needsSendGameResult, const AnalyzerResult& analyzerResult)
+bool WiiConnectServer::playForFinished(int frameId, bool needsSendGameResult, const AnalyzerResult& analyzerResult, const std::chrono::steady_clock::time_point& timeout_time)
 {
     if (needsSendGameResult) {
         for (int pi = 0; pi < 2; ++pi) {
@@ -303,7 +318,7 @@ bool WiiConnectServer::playForFinished(int frameId, bool needsSendGameResult, co
         }
 
         vector<FrameResponse> responses[2];
-        connector_->receive(frameId, responses);
+        connector_->receive(frameId, responses, timeout_time);
     }
 
     if (frameId % 10 == 0) {

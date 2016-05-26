@@ -20,7 +20,8 @@ public:
     explicit ConnectorManager(bool always_wait_timeout);
     ~ConnectorManager();
 
-    bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS]);
+    bool receive(int frameId, std::vector<FrameResponse> cfr[NUM_PLAYERS],
+                 const std::chrono::steady_clock::time_point& timeout_time);
 
     void setPlayer(int player_id, const std::string& program);
 

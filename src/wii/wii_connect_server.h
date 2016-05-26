@@ -2,6 +2,7 @@
 #define WII_WII_CONNECTOR_SERVER_H_
 
 #include <array>
+#include <chrono>
 #include <deque>
 #include <map>
 #include <memory>
@@ -49,9 +50,9 @@ private:
     void runLoop();
 
     bool playForUnknown(int frameId);
-    bool playForLevelSelect(int frameId, const AnalyzerResult&);
-    bool playForPlaying(int frameId, const AnalyzerResult&);
-    bool playForFinished(int frameId, bool needsSendGameResult, const AnalyzerResult&);
+    bool playForLevelSelect(int frameId, const AnalyzerResult&, const std::chrono::steady_clock::time_point& timeout_time);
+    bool playForPlaying(int frameId, const AnalyzerResult&, const std::chrono::steady_clock::time_point& timeout_time);
+    bool playForFinished(int frameId, bool needsSendGameResult, const AnalyzerResult&, const std::chrono::steady_clock::time_point& timeout_time);
 
     FrameRequest makeFrameRequestFor(int playerId, int frameId, const AnalyzerResult&);
     void outputKeys(int playerId, const AnalyzerResult&, const std::vector<FrameResponse>&, double beginTime);
