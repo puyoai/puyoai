@@ -18,6 +18,7 @@ public:
     size_t available() const { return capacity_ - size(); }
     size_t capacity() const { return capacity_; }
 
+    void push(T&& v);
     void push(const T& v);
     T take();
 
@@ -58,6 +59,18 @@ size_t BlockingQueue<T>::size() const
 {
     std::unique_lock<std::mutex> lock(mu_);
     return q_.size();
+}
+
+template<typename T>
+void BlockingQueue<T>::push(T&& v)
+{
+    std::unique_lock<std::mutex> lock(mu_);
+    while (capacity_ <= q_.size()) {
+        push_cond_var_.wait(lock);
+    }
+
+    q_.push(std::move(v));
+    take_cond_var_.notify_one();
 }
 
 template<typename T>

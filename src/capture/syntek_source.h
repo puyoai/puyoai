@@ -9,6 +9,7 @@
 #include <libusb-1.0/libusb.h>
 
 #include "base/base.h"
+#include "base/blocking_queue.h"
 #include "capture/capture_source.h"
 #include "capture/source.h"
 #include "gui/unique_sdl_surface.h"
@@ -29,12 +30,12 @@ private:
 
     std::thread th_;
     std::mutex mu_;
-    std::condition_variable cond_;
+
+    base::InfiniteBlockingQueue<UniqueSDLSurface> surfaces_queue_;
 
     int discarded_;
 
     SyntekDriver* driver_;
-    UniqueSDLSurface currentSurface_;
 };
 
 #endif
