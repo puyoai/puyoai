@@ -10,6 +10,7 @@ add_library(mayah_lib
             evaluation_parameter.cc
             gazer.cc
             mayah_ai.cc
+            yukina_ai.cc
             move_evaluator.cc
             pattern_rensa_detector.cc
             rensa_evaluator.cc
@@ -31,6 +32,7 @@ function(mayah_add_test exe)
 endfunction()
 
 mayah_add_executable(mayah_cpu main.cc)
+mayah_add_executable(yukina_cpu yukina.cc)
 
 mayah_add_executable(interactive interactive.cc)
 mayah_add_executable(solver solver_main.cc)
@@ -45,6 +47,8 @@ endif()
 
 cpu_add_runner(run.sh)
 cpu_add_runner(run_v.sh)
+
+cpu_add_runner(yukina.sh)
 
 mayah_add_test(decision_planner_test)
 mayah_add_test(evaluator_test)
