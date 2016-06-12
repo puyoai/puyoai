@@ -233,14 +233,18 @@ SearchResult BeamMayahAI::run(const vector<State>& initialStates, KumipuyoSeq se
 
                 double maxScore;
                 int maxChains;
-                if (turn >= 6) {
-                    std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa);
+#if 0
+                if (turn >= 4) {
+                    // std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa);
+                    std::tie(maxScore, maxChains) = evalLight(fieldBeforeRensa);
                 } else if (turn >= 4) {
                     std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, 1);
                 } else {
                     std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, 2);
                 }
+#endif
 
+                std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa);
                 nextStates.emplace_back(plan.field(), s.firstDecision, maxScore, maxChains);
             });
         }
@@ -356,10 +360,32 @@ pair<double, int> BeamMayahAI::evalSuperLight(const CoreField& fieldBeforeRensa)
 
     double ushapeScore = 0;
     for (int x = 1; x <= 6; ++x) {
-        static const int DIFF[] = { 0, 2, 0, -2, -2, 0, 2, 0 };
+        static const int DIFF[] = { 0, 3, 0, -1, -1, 0, 3, 0 };
         ushapeScore -= std::abs((fieldBeforeRensa.height(x) - averageHeight) - DIFF[x]);
     }
     maxScore += 60 * ushapeScore;
+
+#if 1
+    // VALLEY
+    for (int x = 1; x <= 6; ++x) {
+        if (fieldBeforeRensa.valleyDepth(x) >= 4) {
+            maxScore -= 200;
+        }
+    }
+    // RIDGE
+    for (int x = 1; x <= 6; ++x) {
+        if (fieldBeforeRensa.ridgeHeight(x) >= 4) {
+            maxScore -= 200;
+        }
+    }
+
+#endif
+
+#if 0
+    int connect2 = 0, connect3 = 0;
+    fieldBeforeRensa.countConnection(&connect2, &connect3);
+    maxScore += connect2 * 2 + connect3 * 4;
+#endif
 
     return make_pair(maxScore, maxChains);
 }
@@ -449,9 +475,9 @@ MixedMayahAI::MixedMayahAI(int argc, char* argv[]) :
 DropDecision MixedMayahAI::think(int frameId, const CoreField& field, const KumipuyoSeq& seq,
                                  const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
-    // if (field.countPuyos() <= 24)
-    //     return ai_.think(frameId, field, seq, me, enemy, fast);
-    // else
+    if (field.countPuyos() <= 24 || field.countPuyos() >= 64)
+        return ai_.think(frameId, field, seq, me, enemy, fast);
+     else
         return beamAi_.think(frameId, field, seq, me, enemy, fast);
 }
 
@@ -491,8 +517,12 @@ int main(int argc, char* argv[])
     //     cout << " / ZENKESHI";
     // cout << endl;
 
+    int zenkeshi = 0;
     vector<int> scores;
     vector<int> rensas;
+
+    int main_rensa_count = 0;
+    int main_rensa_score_sum = 0;
 
     const int N = 100;
     for (int i = 0; i < N; ++i) {
@@ -505,6 +535,15 @@ int main(int argc, char* argv[])
         if (result.zenkeshi)
             cout << " / ZENKESHI";
         cout << endl;
+
+        if (result.zenkeshi && result.hand < 8) {
+            ++zenkeshi;
+        }
+
+        if (result.score > 10000) {
+            main_rensa_count++;
+            main_rensa_score_sum += result.score;
+        }
 
         rensas.push_back(result.maxRensa);
         scores.push_back(result.score);
@@ -525,18 +564,19 @@ int main(int argc, char* argv[])
             if (x >= 100000)
                 ++num10;
         }
-        int average = sum / N;
+        int average = sum / scores.size();
 
         cout << "        N = " << N << endl;
         cout << "      min = " << *min_element(scores.begin(), scores.end()) << endl;
         cout << "      max = " << *max_element(scores.begin(), scores.end()) << endl;
         cout << "  average = " << average << endl;
+        cout << " zenkeshi = " << zenkeshi << endl;
 
         for (int i = 10; i <= 90; i += 10)
             cout << "      " << i << "% = " << scores[i] << endl;
-        cout << "     num8 = " << num8 << endl;
-        cout << "     num9 = " << num9 << endl;
-        cout << "    num10 = " << num10 << endl;
+        cout << " over 80K = " << num8 << endl;
+        cout << " over 90K = " << num9 << endl;
+        cout << "over 100K = " << num10 << endl;
 
         int rensa14 = 0;
         int rensa15 = 0;
@@ -552,6 +592,11 @@ int main(int argc, char* argv[])
         cout << " rensa 14 = " << rensa14 << endl;
         cout << " rensa 15 = " << rensa15 << endl;
         cout << " rensa 16 = " << rensa16 << endl;
+
+        cout << endl;
+        cout << " main rensa count = " << main_rensa_count << endl;
+        cout << " main rensa ave   = " << (main_rensa_score_sum / main_rensa_count) << endl;
+
     }
 
 #endif

@@ -185,6 +185,9 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
     int over70000Count = 0;
     int over80000Count = 0;
     int over100000Count = 0;
+    int overRensa13Count = 0;
+    int overRensa14Count = 0;
+    int overRensa15Count = 0;
 
     vector<pair<int, int>> scores;
     for (int i = 0; i < N; ++i) {
@@ -206,6 +209,9 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
         if (score >= 70000) { over70000Count++; }
         if (score >= 80000) { over80000Count++; }
         if (score >= 100000) { over100000Count++; }
+        if (r.result.maxRensa >= 13) { overRensa13Count++; }
+        if (r.result.maxRensa >= 14) { overRensa14Count++; }
+        if (r.result.maxRensa >= 15) { overRensa15Count++; }
     }
 
     sort(scores.begin(), scores.end());
@@ -231,6 +237,9 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
     cout << "over  70000 = " << over70000Count << endl;
     cout << "over  80000 = " << over80000Count << endl;
     cout << "over 100000 = " << over100000Count << endl;
+    cout << "over 13 chn = " << overRensa13Count << endl;
+    cout << "over 14 chn = " << overRensa14Count << endl;
+    cout << "over 15 chn = " << overRensa15Count << endl;
     if (scores.size() >= 10) {
         for (int i = 0; i < 5; ++i) {
             cout << "  seed " << scores[i].second << " -> " << scores[i].first << endl;
