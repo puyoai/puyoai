@@ -8,6 +8,8 @@
 #include "core/probability/puyo_set_probability.h"
 #include "core/probability/column_puyo_list_probability.h"
 
+#include "mixed_ai.h"
+
 using namespace std;
 
 DECLARE_int32(num_threads);
@@ -26,6 +28,6 @@ int main(int argc, char* argv[])
 
     LOG(INFO) << "num_threads = " << FLAGS_num_threads;
 
-    YukinaAI(argc, argv).runLoop();
+    MixedAI(argc, argv).runLoop();
     return 0;
 }

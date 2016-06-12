@@ -28,43 +28,10 @@
 #include "score_collector.h"
 #include "shape_evaluator.h"
 #include "mayah_ai.h"
+#include "mixed_ai.h"
 #include "yukina_ai.h"
 
 using namespace std;
-
-// ----------------------------------------------------------------------
-
-class MixedAI : public AI {
-public:
-    MixedAI(int argc, char* argv[]);
-
-    DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
-                       const PlayerState& me, const PlayerState& enemy, bool fast) const override;
-
-private:
-    DebuggableMayahAI ai_;
-    YukinaAI yukinaAi_;
-};
-
-MixedAI::MixedAI(int argc, char* argv[]) :
-    AI(argc, argv, "mixed"),
-    ai_(argc, argv),
-    yukinaAi_(argc, argv)
-{
-    ai_.setUsesRensaHandTree(false);
-    ai_.removeNontokopuyoParameter();
-}
-
-DropDecision MixedAI::think(int frameId, const CoreField& field, const KumipuyoSeq& seq,
-                            const PlayerState& me, const PlayerState& enemy, bool fast) const
-{
-    if (field.countPuyos() <= 24 || field.countPuyos() >= 64)
-        return ai_.think(frameId, field, seq, me, enemy, fast);
-     else
-        return yukinaAi_.think(frameId, field, seq, me, enemy, fast);
-}
-
-// ----------------------------------------------------------------------
 
 int main(int argc, char* argv[])
 {
