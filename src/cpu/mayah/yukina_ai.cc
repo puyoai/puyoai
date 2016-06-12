@@ -76,7 +76,9 @@ DropDecision YukinaAI::think(int /*frameId*/, const CoreField& field, const Kumi
     mutex mu;
 
     const int maxSearchTurns = std::max(5, min(FLAGS_beam_depth, std::max(seq.size(), (72 - field.countPuyos()) / 2)));
+#if 0
     cout << "maxSearchTurns = " << maxSearchTurns << endl;
+#endif
 
     for (int k = 0; k < FLAGS_beam_num; ++k) {
         wg.add(1);
@@ -227,6 +229,7 @@ SearchResult YukinaAI::run(const vector<State>& initialStates, KumipuyoSeq seq, 
 
     double endTime = currentTime();
 
+#if 0
     {
         lock_guard<mutex> lock(mu_);
         if (!currentStates.empty()) {
@@ -244,6 +247,7 @@ SearchResult YukinaAI::run(const vector<State>& initialStates, KumipuyoSeq seq, 
             return result;
         }
     }
+#endif
 
     result.maxChains = maxOverallFiredChains;
     result.firstDecisions.insert(currentStates.front().firstDecision);
