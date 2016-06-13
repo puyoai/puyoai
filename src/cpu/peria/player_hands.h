@@ -7,6 +7,7 @@
 
 namespace peria {
 
+// TODO: Make this hands state to a tree.
 struct PlayerHands {
   // Rensa which needs key puyos to fill.
   std::vector<PossibleRensa> need_keys;
