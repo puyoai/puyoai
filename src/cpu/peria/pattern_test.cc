@@ -1,93 +1,91 @@
 #include "pattern.h"
 
 #include "core/core_field.h"
+#include "core/field_bits.h"
 #include "core/field_constant.h"
 #include "core/puyo_color.h"
 
 #include <sstream>
+#include <string>
 
 #include <gtest/gtest.h>
 
 namespace peria {
 
-class PatternForTest : public Pattern {
+class DynamicPatternBookForTest : public DynamicPatternBook {
  public:
-  using Pattern::AppendField;
-  using Pattern::GetScore;
-  using Pattern::ParseBook;
-  using Pattern::num_puyos_;
-  using Pattern::max_puyos_;
-  using Pattern::pattern_;
-  using Pattern::score_;
-  using Pattern::name_;
+  using DynamicPatternBook::book;
 };
 
-class PatternTest : public testing::Test {
+class DynamicPatternTest : public testing::Test {
  public:
-  virtual void SetUp() {
-    std::istringstream iss("");
-    Pattern::ReadBook(iss);
+  void SetUp() override {
+    DynamicPatternBook::clear();
+  }
+  void TearDown() override {
+    DynamicPatternBook::clear();
   }
 
-  virtual void TearDown() {
-    std::istringstream iss("");
-    Pattern::ReadBook(iss);
+  const DynamicPatternBook::Book& book() {
+    return DynamicPatternBookForTest::book();
   }
 };
 
-TEST_F(PatternTest, ParseBook) {
-  const std::string book_str("NAME: Test\n" "SCORE: 1000\n" "MAX: 8\n"
-                             ".AA...\n" ".BB...\n");
-  const std::string expect[] = {".BB...", ".AA..."};
+TEST_F(DynamicPatternTest, parsePattern) {
+  const std::string book_str("NAME: Test\n"
+                             "SCORE: 24\n"
+                             "AAAA..\n");
+  std::istringstream iss(book_str);
+  DynamicPattern pattern(iss);;
+
+  FieldBits expect("1111..");
+  EXPECT_EQ("Test", pattern.name);
+  EXPECT_EQ(24, pattern.score);
+  EXPECT_EQ(expect, pattern.bits);
+}
+
+TEST_F(DynamicPatternTest, readBook) {
+  const std::string book_str("NAME: Test\n"
+                             "AAAA..\n"
+                             "----\n"
+                             "NAME: Test2\n"
+                             "..A...\n"
+                             ".AAA..\n");
   std::istringstream iss(book_str);
 
-  PatternForTest pattern;
-  pattern.ParseBook(iss);
+  DynamicPatternBook::readBook(iss);
+  EXPECT_EQ(2U, book().size());
 
-  EXPECT_EQ("Test", pattern.name());
-  EXPECT_EQ(1000, pattern.score());
-  EXPECT_EQ(8, pattern.max_puyos_);
-  for (int x = 0; x < FieldConstant::WIDTH; ++x) {
-    for (int y = 0; y < 2; ++y) {
-      EXPECT_EQ(expect[y][x], pattern.pattern_[y][x]);
-    }
-  }
+  FieldBits no_entry("...1.."
+                     "..111.");
+  FieldBits entry1("1111..");
+  FieldBits entry2("..1..."
+                  ".111..");
+  EXPECT_EQ(book().end(), book().find(no_entry));
+  auto it = book().find(entry1);
+  EXPECT_NE(book().end(), it);
+  EXPECT_EQ("Test", it->second.name);
+  it = book().find(entry2);
+  EXPECT_NE(book().end(), it);
+  EXPECT_EQ("Test2", it->second.name);
 }
 
-TEST_F(PatternTest, ReadBook) {
-  const std::string book_str("NAME: Test\n" "SCORE: 1000\n" "MAX: 8\n"
-                             ".AA...\n" ".BB...\n----\n");
-  std::istringstream iss(book_str + book_str + book_str);
+TEST_F(DynamicPatternTest, iteratePatterns) {
+  const std::string book_str("NAME: Test\n"
+                             "AAAA..\n"
+                             "----\n"
+                             ".AAAA.\n");
+  std::istringstream iss(book_str);
+  DynamicPatternBook::readBook(iss);
+  ASSERT_EQ(2U, book().size());
 
-  Pattern::ReadBook(iss);
-  const std::vector<Pattern>& patterns = Pattern::GetAllPattern();
-  EXPECT_EQ(static_cast<size_t>(3), patterns.size());
-  for (auto pat : patterns) {
-    EXPECT_EQ("Test", pat.name());
-    EXPECT_EQ(1000, pat.score());
-  }
-}
-
-TEST_F(PatternTest, GetScore) {
-  PatternForTest pattern;
-  pattern.score_ = 1000;
-  pattern.num_puyos_ = 4;
-  Pattern::MatchingCounts counts;
-  counts['A'][PuyoColor::RED] = 2;
-  counts['B'][PuyoColor::BLUE] = 2;
-
-  EXPECT_EQ(1000, pattern.GetScore(counts));
-}
-
-TEST_F(PatternTest, Matching) {
-  PatternForTest pattern;
-  pattern.AppendField(".AA...");
-  pattern.AppendField(".BB...");
-  pattern.score_ = 1000;
-  pattern.num_puyos_ = 4;
-
-  CoreField field("0RR0000BB000");
-  EXPECT_EQ(1000, pattern.Match(field));
+  // Assume this field will be  vvvvvv and vanish in 2-chain.
+  CoreField field(".RRR.."   // .RRR..
+                  "RBBB.."); // RBBBB.
+  std::string name;
+  int score = DynamicPatternBook::iteratePatterns(field, &name);
+  EXPECT_EQ("Test", name);
+  EXPECT_EQ(DynamicPattern::kDefaultScore * 2, score);
 }
 
 }  // namespace peria

@@ -17,7 +17,7 @@ DEFINE_int32(loop, 5, "The number of playouts");
 DEFINE_int32(num_hands, 50, "The number of TSUMOs to play in one game.");
 DEFINE_bool(verbose, false, "Display all hands");
 
-DECLARE_string(pattern);
+DECLARE_string(dynamic_pattern);
 
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
@@ -26,14 +26,13 @@ int main(int argc, char* argv[]) {
   google::InstallFailureSignalHandler();
 #endif
 
-  if (!FLAGS_pattern.empty()) {
-    std::ifstream pattern_file(FLAGS_pattern);
-    if (pattern_file.is_open()) {
-      LOG(INFO) << "Leading " << FLAGS_pattern << " for pattern mathcing";
-      peria::Pattern::ReadBook(pattern_file);
-      peria::Pattern::BuildCombination();
+  if (!FLAGS_dynamic_pattern.empty()) {
+    std::ifstream dynamic_pattern_file(FLAGS_dynamic_pattern);
+    if (dynamic_pattern_file.is_open()) {
+      LOG(INFO) << "Leading " << FLAGS_dynamic_pattern << " for pattern mathcing";
+      peria::DynamicPatternBook::readBook(dynamic_pattern_file);
     } else {
-      LOG(INFO) << "Failed in loading " << FLAGS_pattern;
+      LOG(INFO) << "Failed in loading " << FLAGS_dynamic_pattern;
     }
   }
 

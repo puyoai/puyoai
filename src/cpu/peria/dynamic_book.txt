@@ -8,58 +8,49 @@
 # ......   大文字が評価対象ぷよ.
 # ......   '.' や小文字は任意. '_'は強制空白.
 
-NAME: Zenkeshi
-______
-----
-NAME: GTR-Ready
-.....A
-...B_A
-....BB
-----
 NAME: GTR
-....BA
-...BAA
+.....A
+.....A
+....AA
+......
+----
+...BB.
 ....BB
 ----
-NAME: GTR-Head
-.....A
-....DD
-...CBA
-.CCBAA
-...CBB
+.CCC..
+...C..
 ----
-NAME: GTR-Head2
-.....A
-.....D
-.....D
-...CBA
-.CCBAA
-...CBB
+CCCC..
+...C..
 ----
-NAME: GTR-Tail
-.A....
-ABA...
-A.....
-BBB...
+...C..
+.CCC..
 ----
-NAME: GTR-Tail2
-AA....
-ABA...
-......
-BBB...
+.D....
+DDD...
+----
+D.....
+DDD...
+----
+..D...
+DDD...
 ----
 NAME: Shin-GTR
-AC....
-CDD...
-CCB...
-AAAB..
+.A....
+AAA...
+......
+----
+..BB..
 BBB...
 ----
-NAME: Shin-GTR2
-DIFF: D A
-D.....
-CA....
-CCB...
-AAAB..
-BBB...
+...CCC
+...C..
 ----
+...C..
+...CCC
+----
+....D.
+...DDD
+----
+.....D
+...DDD

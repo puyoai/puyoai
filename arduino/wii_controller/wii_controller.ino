@@ -1,3 +1,7 @@
+#include <stdint.h>
+
+typedef uint8_t byte;
+
 #ifndef wm_crypto_h
 
 #include <avr/pgmspace.h>
@@ -618,7 +622,7 @@ byte *stream_callback(byte *buffer) {
 	return buffer;
 }
 
-void setup()
+void setup(void)
 {
 	// Set PushButton pins as input, turning pull-up on
 	pinMode(13, OUTPUT);
@@ -642,7 +646,7 @@ void setup()
 #define KEY_START        6
 #define KEY_WAIT         7
 
-void loop()
+void loop(void)
 {
     digitalWrite(13, LOW);
 

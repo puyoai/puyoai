@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "core/decision.h"
 
 class CoreField;
 class RefPlan;
@@ -16,7 +17,9 @@ struct PlayerHands;
 class Evaluator {
  public:
   Evaluator(const PlayerState& me, const PlayerState& enemy, const PlayerHands&, Control*);
-  void EvalPlan(const CoreField&, const RefPlan& plan);
+  void EvalPlan(const CoreField&, int sending_ojama, const RefPlan& plan);
+
+  void setDecision(const Decision& decision) { decision_ = decision; }
   
  private:
   struct Genre {
@@ -27,8 +30,7 @@ class Evaluator {
 
   int EvalField(const CoreField& field, std::string* message);
   int EvalUke(const CoreField& field, std::string* message);
-  int EvalRensa(const CoreField& field, const RefPlan& plan, std::string* message);
-  int EvalTime(const RefPlan& plan, std::string* message);
+  int EvalRensa(const CoreField& field, const RefPlan& plan, int sending_ojama, std::string* message);
 
   // Field related eval functions
   int PatternMatch(const CoreField& field, std::string* message);
@@ -42,6 +44,9 @@ class Evaluator {
   const PlayerState& me;
   const PlayerState& enemy;
   const PlayerHands& enemy_hands;
+  Decision decision_;
+
+  // output
   Control* control;
 };
 

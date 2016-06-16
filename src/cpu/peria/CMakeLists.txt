@@ -30,7 +30,7 @@ cpu_add_runner(run.bat)
 cpu_add_runner(pai.sh)
 cpu_add_runner(basic_ai.sh)
 
-cpu_add_runner(book.txt)
+cpu_add_runner(dynamic_book.txt)
 
 include_directories(${gtest_SOURCE_DIR}/include
                     ${gtest_SOURCE_DIR})

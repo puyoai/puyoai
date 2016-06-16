@@ -1,4 +1,4 @@
 #!/bin/bash
 cd "$(dirname "$0")"
-exec ./peria "$@" --pattern="book.txt" 2> peria.err
+exec ./peria "$@" --dynamic_pattern="dynamic_book.txt" 2> peria.err
 
