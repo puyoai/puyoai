@@ -11,6 +11,7 @@
 #include "core/pattern/decision_book.h"
 #include "core/pattern/pattern_book.h"
 
+#include "mayah_base_ai.h"
 #include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
@@ -35,7 +36,7 @@ struct ThoughtResult {
     std::string message;
 };
 
-class MayahAI : public AI {
+class MayahAI : public MayahBaseAI {
 public:
     static const int DEFAULT_DEPTH = 2;
     static const int DEFAULT_NUM_ITERATION = 3;

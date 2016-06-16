@@ -19,7 +19,7 @@ DEFINE_int32(beam_num, 16, "beam iteration number");
 using namespace std;
 
 YukinaAI::YukinaAI(int argc, char* argv[]) :
-    AI(argc, argv, "mayah-beam"),
+    MayahBaseAI(argc, argv, "yukina"),
     executor_(Executor::makeDefaultExecutor())
 {
     CHECK(decisionBook_.load(FLAGS_decision_book));

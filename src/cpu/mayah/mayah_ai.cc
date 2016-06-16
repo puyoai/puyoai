@@ -26,7 +26,7 @@ DEFINE_bool(from_wrapper, false, "Make this true in wrapper script.");
 using namespace std;
 
 MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
-    AI(argc, argv, "mayah"),
+    MayahBaseAI(argc, argv, "mayah"),
     executor_(executor)
 {
     if (!FLAGS_from_wrapper) {

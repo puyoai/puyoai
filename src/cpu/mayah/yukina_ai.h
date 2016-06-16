@@ -10,6 +10,7 @@
 #include "core/pattern/decision_book.h"
 #include "core/pattern/pattern_book.h"
 
+#include "mayah_base_ai.h"
 #include "evaluation_parameter.h"
 
 struct SearchResult {
@@ -30,7 +31,7 @@ struct State {
     int maxChains = 0;
 };
 
-class YukinaAI : public AI {
+class YukinaAI : public MayahBaseAI {
 public:
     YukinaAI(int argc, char* argv[]);
 
