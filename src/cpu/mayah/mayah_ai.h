@@ -56,23 +56,22 @@ public:
                             std::vector<Decision>* specifiedDecisions = nullptr) const;
 
 protected:
-    PreEvalResult preEval(const CoreField& currentField) const;
     MidEvalResult midEval(const RefPlan&, const CoreField& currentField,
                           const KumipuyoSeq& restSeq,
                           int currentFrameId, int maxIteration,
                           const PlayerState& me, const PlayerState& enemy,
-                          const PreEvalResult&, const GazeResult&) const;
+                          const GazeResult&) const;
     EvalResult eval(const RefPlan&, const KumipuyoSeq& restSeq, int currentFrameId, int maxIteration,
                     const PlayerState& me, const PlayerState& enemy,
-                    const PreEvalResult&, const MidEvalResult&, bool fast, const GazeResult&) const;
+                    const MidEvalResult&, bool fast, const GazeResult&) const;
     CollectedFeatureCoefScore evalWithCollectingFeature(
         const RefPlan&, const KumipuyoSeq& restSeq, int currentFrameId, int maxIteration,
         const PlayerState& me, const PlayerState& enemy,
-        const PreEvalResult&, const MidEvalResult&, bool fast, const GazeResult&) const;
+        const MidEvalResult&, bool fast, const GazeResult&) const;
 
     std::string makeMessageFrom(int frameId, const KumipuyoSeq&, int maxIteration,
                                 const PlayerState& me, const PlayerState& enemy,
-                                const PreEvalResult&, const MidEvalResult&, const GazeResult&,
+                                const MidEvalResult&, const GazeResult&,
                                 const Plan& plan, double rensaScore, double virutalRensaScore,
                                 bool saturated, bool fast,
                                 double thoughtTimeInSeconds) const;
@@ -90,7 +89,6 @@ public:
         MayahAI(argc, argv, std::move(executor)) {}
     virtual ~DebuggableMayahAI() {}
 
-    using MayahAI::preEval;
     using MayahAI::saveEvaluationParameter;
     using MayahAI::loadEvaluationParameter;
     using MayahAI::makeMessageFrom;

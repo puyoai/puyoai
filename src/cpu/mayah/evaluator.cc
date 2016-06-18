@@ -33,12 +33,6 @@ using namespace std;
 
 // ----------------------------------------------------------------------
 
-PreEvalResult PreEvaluator::preEval(const CoreField& /*currentField*/)
-{
-    PreEvalResult preEvalResult;
-    return preEvalResult;
-}
-
 MidEvalResult MidEvaluator::eval(const RefPlan& plan, const CoreField& currentField, double score)
 {
     UNUSED_VARIABLE(currentField);
@@ -291,7 +285,6 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
                                      int maxIteration,
                                      const PlayerState& me,
                                      const PlayerState& enemy,
-                                     const PreEvalResult& /*preEvalResult*/,
                                      const MidEvalResult& midEvalResult,
                                      bool fast,
                                      bool usesRensaHandTree,

@@ -110,9 +110,6 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
 
     const GazeResult& gazeResult = gazer_.gazeResult();
 
-    // Before evaling, check Book.
-    const PreEvalResult preEvalResult = preEval(field);
-
     Plan bestPlan;
     double bestScore = -100000000.0;
     MidEvalResult bestMidEvalResult;
@@ -130,7 +127,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     auto evalRefPlan = [&, this, frameId, maxIteration](const RefPlan& plan, const MidEvalResult& midEvalResult) {
         KumipuyoSeq restSeq(kumipuyoSeq.subsequence(plan.decisions().size()));
         // Here, we iterate enemy's possible rensa.
-        EvalResult evalResult = eval(plan, restSeq, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
+        EvalResult evalResult = eval(plan, restSeq, frameId, maxIteration, me, enemy, midEvalResult, fast, gazeResult);
         Plan evaledPlan = plan.toPlan();
 
         // Hmm, it looks weaker if we search this...
@@ -160,7 +157,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                 p.setLastDropFrames(p.lastDropFrames() + ojamaFrames);
 
                 // TODO(mayah): Instead of gazeResult, we need to use edge.tree().
-                EvalResult result = eval(RefPlan(p), restSeq, frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
+                EvalResult result = eval(RefPlan(p), restSeq, frameId, maxIteration, me, enemy, midEvalResult, fast, gazeResult);
                 if (result.score() < evalResult.score()) {
                     evalResult = result;
                     evaledPlan = p;
@@ -198,7 +195,7 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     };
     auto evalMidEval = [&](const RefPlan& plan) {
         return midEval(plan, field, kumipuyoSeq.subsequence(plan.decisions().size()),
-                       frameId, maxIteration, me, enemy, preEvalResult, gazeResult);
+                       frameId, maxIteration, me, enemy, gazeResult);
     };
 
     DecisionPlanner<MidEvalResult> planner(executor_.get(), evalMidEval, evalRefPlan);
@@ -210,24 +207,18 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
     if (!ojamaFallen && bestVirtualRensaScore < bestRensaScore) {
         std::string message = makeMessageFrom(frameId, kumipuyoSeq, maxIteration,
                                               me, enemy,
-                                              preEvalResult, bestRensaMidEvalResult, gazeResult,
+                                              bestRensaMidEvalResult, gazeResult,
                                               bestRensaPlan, bestRensaScore, bestVirtualRensaScore,
                                               true, fast, endTime - beginTime);
         return ThoughtResult(bestRensaPlan, bestRensaScore, bestVirtualRensaScore, bestRensaMidEvalResult, message);
     } else {
         std::string message = makeMessageFrom(frameId, kumipuyoSeq, maxIteration,
                                               me, enemy,
-                                              preEvalResult, bestMidEvalResult, gazeResult,
+                                              bestMidEvalResult, gazeResult,
                                               bestPlan, bestRensaScore, bestVirtualRensaScore,
                                               false, fast, endTime - beginTime);
         return ThoughtResult(bestPlan, bestRensaScore, bestVirtualRensaScore, bestMidEvalResult, message);
     }
-}
-
-PreEvalResult MayahAI::preEval(const CoreField& currentField) const
-{
-    PreEvaluator preEvaluator(patternBook_);
-    return preEvaluator.preEval(currentField);
 }
 
 MidEvalResult MayahAI::midEval(const RefPlan& plan,
@@ -236,7 +227,6 @@ MidEvalResult MayahAI::midEval(const RefPlan& plan,
                                int currentFrameId, int maxIteration,
                                const PlayerState& me,
                                const PlayerState& enemy,
-                               const PreEvalResult& preEvalResult,
                                const GazeResult& gazeResult) const
 
 {
@@ -244,7 +234,7 @@ MidEvalResult MayahAI::midEval(const RefPlan& plan,
     Evaluator<SimpleScoreCollector> evaluator(patternBook_, &sc);
 
     // MidEval always sets 'fast'.
-    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, MidEvalResult(), true, usesRensaHandTree_, gazeResult);
+    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, MidEvalResult(), true, usesRensaHandTree_, gazeResult);
 
     MidEvaluator midEvaluator(patternBook_);
     const CollectedSimpleScore& simpleScore = sc.collectedScore();
@@ -255,14 +245,13 @@ EvalResult MayahAI::eval(const RefPlan& plan,
                          const KumipuyoSeq& restSeq,
                          int currentFrameId, int maxIteration,
                          const PlayerState& me, const PlayerState& enemy,
-                         const PreEvalResult& preEvalResult,
                          const MidEvalResult& midEvalResult,
                          bool fast,
                          const GazeResult& gazeResult) const
 {
     SimpleScoreCollector sc(evaluationParameterMap_);
     Evaluator<SimpleScoreCollector> evaluator(patternBook_, &sc);
-    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, usesRensaHandTree_, gazeResult);
+    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, midEvalResult, fast, usesRensaHandTree_, gazeResult);
 
     const CollectedSimpleScore& simpleScore = sc.collectedScore();
     return EvalResult(simpleScore.score(sc.collectedCoef()), sc.estimatedRensaScore());
@@ -274,21 +263,20 @@ CollectedFeatureCoefScore MayahAI::evalWithCollectingFeature(const RefPlan& plan
                                                              int maxIteration,
                                                              const PlayerState& me,
                                                              const PlayerState& enemy,
-                                                             const PreEvalResult& preEvalResult,
                                                              const MidEvalResult& midEvalResult,
                                                              bool fast,
                                                              const GazeResult& gazeResult) const
 {
     FeatureScoreCollector sc(evaluationParameterMap_);
     Evaluator<FeatureScoreCollector> evaluator(patternBook_, &sc);
-    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, usesRensaHandTree_, gazeResult);
+    evaluator.eval(plan, restSeq, currentFrameId, maxIteration, me, enemy, midEvalResult, fast, usesRensaHandTree_, gazeResult);
 
     return CollectedFeatureCoefScore(sc.collectedCoef(), sc.collectedScore());
 }
 
 std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq, int maxIteration,
                                      const PlayerState& me, const PlayerState& enemy,
-                                     const PreEvalResult& preEvalResult, const MidEvalResult& midEvalResult,
+                                     const MidEvalResult& midEvalResult,
                                      const GazeResult& gazeResult,
                                      const Plan& plan, double rensaScore, double virtualRensaScore,
                                      bool saturated, bool fast, double thoughtTimeInSeconds) const
@@ -301,7 +289,7 @@ std::string MayahAI::makeMessageFrom(int frameId, const KumipuyoSeq& kumipuyoSeq
     RefPlan refPlan(plan);
     CollectedFeatureCoefScore cf =
         evalWithCollectingFeature(refPlan, kumipuyoSeq.subsequence(refPlan.decisions().size()),
-                                  frameId, maxIteration, me, enemy, preEvalResult, midEvalResult, fast, gazeResult);
+                                  frameId, maxIteration, me, enemy, midEvalResult, fast, gazeResult);
 
 
     stringstream ss;

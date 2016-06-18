@@ -95,7 +95,7 @@ public:
 
     void eval(const RefPlan&, const KumipuyoSeq&, int currentFrameId, int maxIteration,
               const PlayerState& me, const PlayerState& enemy,
-              const PreEvalResult&, const MidEvalResult&, bool fast, bool usesRensaHandTree, const GazeResult&);
+              const MidEvalResult&, bool fast, bool usesRensaHandTree, const GazeResult&);
 
     // ----------------------------------------------------------------------
 

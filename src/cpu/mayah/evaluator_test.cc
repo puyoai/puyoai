@@ -30,10 +30,9 @@ protected:
 
         RefPlan plan(f, decisions, rensaResult, 0, framesToIgnite, lastDropFrames, 0, 0, 0, 0, false);
 
-        PreEvalResult preEvalResult = PreEvaluator(patternBook).preEval(f);
         FeatureScoreCollector sc(evaluationParameterMap);
         Evaluator<FeatureScoreCollector> evaluator(patternBook, &sc);
-        evaluator.eval(plan, KumipuyoSeq(), 1, numIteration, PlayerState(), PlayerState(), preEvalResult, MidEvalResult(), false, false, gazer.gazeResult());
+        evaluator.eval(plan, KumipuyoSeq(), 1, numIteration, PlayerState(), PlayerState(), MidEvalResult(), false, false, gazer.gazeResult());
         return sc.collectedScore();
     }
 
