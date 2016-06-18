@@ -14,6 +14,9 @@ add_library(mayah_evaluator_lib
             rensa_hand_tree.cc
             shape_evaluator.cc)
 
+add_library(mayah_thinker_lib
+            beam_thinker.cc)
+
 add_library(mayah_lib
             gazer.cc
             mayah_ai.cc
@@ -24,6 +27,7 @@ add_library(mayah_lib
 function(mayah_add_executable exe)
     cpu_add_executable(${exe} ${ARGN})
     cpu_target_link_libraries(${exe} mayah_lib)
+    cpu_target_link_libraries(${exe} mayah_thinker_lib)
     cpu_target_link_libraries(${exe} mayah_evaluator_lib)
     cpu_target_link_common_libraries(${exe})
 endfunction()

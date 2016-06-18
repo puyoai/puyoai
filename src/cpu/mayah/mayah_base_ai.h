@@ -10,25 +10,8 @@
 #include "core/pattern/decision_book.h"
 #include "core/pattern/pattern_book.h"
 
+#include "beam_thinker.h"
 #include "evaluation_parameter.h"
-
-struct SearchResult {
-    std::set<Decision> firstDecisions;
-    int maxChains = 0;
-};
-
-struct State {
-    State(const CoreField& field, const Decision& firstDecision, double stateScore, int maxChains) :
-        field(field), firstDecision(firstDecision), stateScore(stateScore), maxChains(maxChains) {}
-
-    friend bool operator<(const State& lhs, const State& rhs) { return lhs.stateScore < rhs.stateScore; }
-    friend bool operator>(const State& lhs, const State& rhs) { return lhs.stateScore > rhs.stateScore; }
-
-    CoreField field;
-    Decision firstDecision;
-    double stateScore = 0;
-    int maxChains = 0;
-};
 
 class MayahBaseAI : public AI {
 public:
@@ -40,8 +23,6 @@ protected:
 
     DropDecision thinkByBeamSearch(int frameId, const CoreField&, const KumipuyoSeq&,
                                    const PlayerState& me, const PlayerState& enemy, bool fast) const;
-    SearchResult run(const std::vector<State>& initialStates, KumipuyoSeq, int maxSearchTurns) const;
-    std::pair<double, int> evalSuperLight(const CoreField& fieldBeforeRensa) const;
 
     EvaluationParameterMap evaluationParameterMap_;
     DecisionBook decisionBook_;
@@ -49,6 +30,7 @@ protected:
     std::unique_ptr<Executor> executor_;
 
 private:
+    BeamThinker beam_thinker_;
 };
 
 #endif // CPU_MAYAH_BASE_AI_H_
