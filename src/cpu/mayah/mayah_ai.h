@@ -5,14 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "base/executor.h"
 #include "core/plan/plan.h"
-#include "core/client/ai/ai.h"
-#include "core/pattern/decision_book.h"
-#include "core/pattern/pattern_book.h"
 
 #include "mayah_base_ai.h"
-#include "evaluation_parameter.h"
 #include "evaluator.h"
 #include "gazer.h"
 
@@ -43,7 +38,7 @@ public:
     static const int FAST_DEPTH = 2;
     static const int FAST_NUM_ITERATION = 2;
 
-    MayahAI(int argc, char* argv[], Executor* executor = nullptr);
+    MayahAI(int argc, char* argv[], std::unique_ptr<Executor> executor = std::unique_ptr<Executor>());
     ~MayahAI() override;
 
     DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
@@ -82,17 +77,8 @@ protected:
                                 bool saturated, bool fast,
                                 double thoughtTimeInSeconds) const;
 
-    bool saveEvaluationParameter() const;
-    bool loadEvaluationParameter();
-
-    EvaluationParameterMap evaluationParameterMap_;
-    DecisionBook decisionBook_;
-    PatternBook patternBook_;
-
     bool usesDecisionBook_ = true;
     bool usesRensaHandTree_ = true;
-
-    Executor* executor_;
 
     Gazer gazer_;
 };
@@ -100,7 +86,8 @@ protected:
 class DebuggableMayahAI : public MayahAI {
 public:
     DebuggableMayahAI() : MayahAI(0, nullptr) {}
-    DebuggableMayahAI(int argc, char* argv[], Executor* executor = nullptr) : MayahAI(argc, argv, executor) {}
+    DebuggableMayahAI(int argc, char* argv[], std::unique_ptr<Executor> executor = std::unique_ptr<Executor>()) :
+        MayahAI(argc, argv, std::move(executor)) {}
     virtual ~DebuggableMayahAI() {}
 
     using MayahAI::preEval;

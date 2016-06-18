@@ -27,8 +27,7 @@ int main(int argc, char* argv[])
     LOG(INFO) << "num_threads = " << FLAGS_num_threads;
 
     if (FLAGS_num_threads > 1) {
-        unique_ptr<Executor> executor = Executor::makeDefaultExecutor();
-        MayahAI(argc, argv, executor.get()).runLoop();
+        MayahAI(argc, argv, Executor::makeDefaultExecutor()).runLoop();
     } else {
         MayahAI(argc, argv).runLoop();
     }

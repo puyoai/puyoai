@@ -12,12 +12,12 @@
 
 using namespace std;
 
-static unique_ptr<DebuggableMayahAI> makeAI(Executor* executor = nullptr)
+static unique_ptr<DebuggableMayahAI> makeAI(std::unique_ptr<Executor> executor = std::unique_ptr<Executor>())
 {
     int argc = 1;
     char arg[] = "mayah";
     char* argv[] = {arg};
-    return unique_ptr<DebuggableMayahAI>(new DebuggableMayahAI(argc, argv, executor));
+    return unique_ptr<DebuggableMayahAI>(new DebuggableMayahAI(argc, argv, std::move(executor)));
 }
 
 static vector<std::string> listTestcases()

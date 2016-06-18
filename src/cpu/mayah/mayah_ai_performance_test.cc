@@ -14,13 +14,13 @@
 
 using namespace std;
 
-unique_ptr<MayahAI> makeAI(Executor* executor)
+unique_ptr<MayahAI> makeAI(std::unique_ptr<Executor> executor)
 {
     int argc = 1;
     char arg[] = "mayah";
     char* argv[] = {arg, nullptr};
 
-    MayahAI* ai = new MayahAI(argc, argv, executor);
+    MayahAI* ai = new MayahAI(argc, argv, std::move(executor));
 
     // TODO(mayah): should call gameWillBegin.
     FrameRequest req;
@@ -62,8 +62,7 @@ void runTest(int depth, int iteration, const CoreField& cf, const KumipuyoSeq& k
 {
     TimeStampCounterData tsc;
 
-    unique_ptr<Executor> executor(Executor::makeDefaultExecutor());
-    unique_ptr<MayahAI> ai(makeAI(executor.get()));
+    unique_ptr<MayahAI> ai(makeAI(Executor::makeDefaultExecutor()));
     int frameId = 1;
 
     for (int i = 0; i < 3; ++i) {

@@ -18,16 +18,12 @@
 #include "evaluator.h"
 #include "gazer.h"
 
-DEFINE_string(feature, "feature.toml", "the path to feature parameter");
-DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
-DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
 DEFINE_bool(from_wrapper, false, "Make this true in wrapper script.");
 
 using namespace std;
 
-MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
-    MayahBaseAI(argc, argv, "mayah"),
-    executor_(executor)
+MayahAI::MayahAI(int argc, char* argv[], std::unique_ptr<Executor> executor) :
+    MayahBaseAI(argc, argv, "mayah", std::move(executor))
 {
     if (!FLAGS_from_wrapper) {
         LOG(ERROR) << "mayah was not run with run.sh?" << endl
@@ -35,36 +31,10 @@ MayahAI::MayahAI(int argc, char* argv[], Executor* executor) :
     }
 
     setBehaviorRethinkAfterOpponentRensa(true);
-
-    loadEvaluationParameter();
-    CHECK(decisionBook_.load(FLAGS_decision_book));
-    CHECK(patternBook_.load(FLAGS_pattern_book));
-
-    VLOG(1) << evaluationParameterMap_.toString();
-
-    google::FlushLogFiles(google::GLOG_INFO);
 }
 
 MayahAI::~MayahAI()
 {
-}
-
-bool MayahAI::saveEvaluationParameter() const
-{
-    return evaluationParameterMap_.save(FLAGS_feature);
-}
-
-bool MayahAI::loadEvaluationParameter()
-{
-    if (evaluationParameterMap_.load(FLAGS_feature))
-        return true;
-
-    // When not found, we try to load from the source directory.
-    std::string filename = string(SRC_DIR) + "/cpu/mayah/" + FLAGS_feature;
-    if (evaluationParameterMap_.load(filename))
-        return true;
-
-    return false;
 }
 
 DropDecision MayahAI::think(int frameId, const CoreField& f, const KumipuyoSeq& kumipuyoSeq,
@@ -231,11 +201,10 @@ ThoughtResult MayahAI::thinkPlan(int frameId, const CoreField& field, const Kumi
                        frameId, maxIteration, me, enemy, preEvalResult, gazeResult);
     };
 
-    DecisionPlanner<MidEvalResult> planner(executor_, evalMidEval, evalRefPlan);
+    DecisionPlanner<MidEvalResult> planner(executor_.get(), evalMidEval, evalRefPlan);
     if (specifiedDecisions)
         planner.setSpecifiedDecisions(*specifiedDecisions);
     planner.iterate(frameId, field, kumipuyoSeq, me, enemy, depth);
-
 
     double endTime = currentTime();
     if (!ojamaFallen && bestVirtualRensaScore < bestRensaScore) {

@@ -19,19 +19,8 @@ DEFINE_int32(beam_num, 16, "beam iteration number");
 using namespace std;
 
 YukinaAI::YukinaAI(int argc, char* argv[]) :
-    MayahBaseAI(argc, argv, "yukina"),
-    executor_(Executor::makeDefaultExecutor())
+    MayahBaseAI(argc, argv, "yukina", Executor::makeDefaultExecutor())
 {
-    CHECK(decisionBook_.load(FLAGS_decision_book));
-    CHECK(patternBook_.load(FLAGS_pattern_book));
-
-    if (evaluationParameterMap_.load(FLAGS_feature))
-        return;
-
-    // When not found, we try to load from the source directory.
-    std::string filename = string(SRC_DIR) + "/cpu/mayah/" + FLAGS_feature;
-    if (evaluationParameterMap_.load(filename))
-        return;
 }
 
 DropDecision YukinaAI::think(int /*frameId*/, const CoreField& field, const KumipuyoSeq& seq,
@@ -116,7 +105,7 @@ DropDecision YukinaAI::think(int /*frameId*/, const CoreField& field, const Kumi
 
 SearchResult YukinaAI::run(const vector<State>& initialStates, KumipuyoSeq seq, int maxSearchTurns) const
 {
-    double beginTime = currentTime();
+    // double beginTime = currentTime();
 
     SearchResult result;
 
@@ -227,7 +216,7 @@ SearchResult YukinaAI::run(const vector<State>& initialStates, KumipuyoSeq seq, 
 
     }
 
-    double endTime = currentTime();
+    // double endTime = currentTime();
 
 #if 0
     {

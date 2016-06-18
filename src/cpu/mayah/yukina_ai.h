@@ -5,13 +5,7 @@
 #include <set>
 #include <vector>
 
-#include "base/executor.h"
-#include "core/client/ai/ai.h"
-#include "core/pattern/decision_book.h"
-#include "core/pattern/pattern_book.h"
-
 #include "mayah_base_ai.h"
-#include "evaluation_parameter.h"
 
 struct SearchResult {
     std::set<Decision> firstDecisions;
@@ -42,11 +36,6 @@ public:
 
 private:
     std::pair<double, int> evalSuperLight(const CoreField& fieldBeforeRensa) const;
-
-    EvaluationParameterMap evaluationParameterMap_;
-    DecisionBook decisionBook_;
-    PatternBook patternBook_;
-    std::unique_ptr<Executor> executor_;
 
     mutable std::mutex mu_; // for cout
 };

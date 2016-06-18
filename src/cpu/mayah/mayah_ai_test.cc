@@ -11,12 +11,12 @@
 
 using namespace std;
 
-static unique_ptr<DebuggableMayahAI> makeAI(Executor* executor = nullptr)
+static unique_ptr<DebuggableMayahAI> makeAI(std::unique_ptr<Executor> executor = std::unique_ptr<Executor>())
 {
     int argc = 1;
     char arg[] = "mayah";
     char* argv[] = {arg};
-    return unique_ptr<DebuggableMayahAI>(new DebuggableMayahAI(argc, argv, executor));
+    return unique_ptr<DebuggableMayahAI>(new DebuggableMayahAI(argc, argv, std::move(executor)));
 }
 
 // Parallel execution should return the same result as single thread execution.
@@ -27,11 +27,10 @@ TEST(MayahAITest, parallel)
         "YY BBB"
         "RRRGGG");
 
-    unique_ptr<Executor> executor(Executor::makeDefaultExecutor());
     KumipuyoSeq seq("GGRRBY");
 
     auto ai = makeAI();
-    auto parallelAi = makeAI(executor.get());
+    auto parallelAi = makeAI(Executor::makeDefaultExecutor());
 
     ThoughtResult thoughtResult = ai->thinkPlan(2, f, seq, PlayerState(), PlayerState(), 2, 3);
     ThoughtResult parallelThoughtResult = parallelAi->thinkPlan(2, f, seq, PlayerState(), PlayerState(), 2, 3);
