@@ -41,7 +41,6 @@ mayah_add_executable(solver solver_main.cc)
 mayah_add_executable(tweaker tweaker.cc)
 
 mayah_add_executable(experimental experimental.cc)
-mayah_add_executable(experimental2 experimental2.cc)
 
 if(USE_HTTPD)
     mayah_add_executable(pattern_maker pattern_maker.cc)
