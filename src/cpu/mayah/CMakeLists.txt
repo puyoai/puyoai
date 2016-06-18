@@ -2,26 +2,29 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("mayah")
 
-add_library(mayah_lib
+add_library(mayah_evaluator_lib
             collected_score.cc
             evaluator.cc
             evaluation_feature.cc
             evaluation_mode.cc
             evaluation_parameter.cc
-            gazer.cc
-            mayah_ai.cc
-            mayah_base_ai.cc
-            mixed_ai.cc
-            yukina_ai.cc
             move_evaluator.cc
             pattern_rensa_detector.cc
             rensa_evaluator.cc
             rensa_hand_tree.cc
             shape_evaluator.cc)
 
+add_library(mayah_lib
+            gazer.cc
+            mayah_ai.cc
+            mayah_base_ai.cc
+            mixed_ai.cc
+            yukina_ai.cc)
+
 function(mayah_add_executable exe)
     cpu_add_executable(${exe} ${ARGN})
     cpu_target_link_libraries(${exe} mayah_lib)
+    cpu_target_link_libraries(${exe} mayah_evaluator_lib)
     cpu_target_link_common_libraries(${exe})
 endfunction()
 
