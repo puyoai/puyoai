@@ -20,6 +20,7 @@
 #include "solver/problem.h"
 
 #include "evaluator.h"
+#include "pattern_thinker.h"
 #include "mayah_ai.h"
 
 DEFINE_string(problem, "", "use problem");
@@ -123,7 +124,7 @@ int main(int argc, char* argv[])
             double t1 = currentTime();
             ThoughtResult aiThoughtResult = ai.thinkPlan(frameId, currentField, seq.subsequence(0, 2),
                                                          ai.myPlayerState(), ai.enemyPlayerState(),
-                                                         MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+                                                         PatternThinker::DEFAULT_DEPTH, PatternThinker::DEFAULT_NUM_ITERATION);
             const Plan& aiPlan = aiThoughtResult.plan;
 
             double t2 = currentTime();
@@ -171,18 +172,18 @@ int main(int argc, char* argv[])
 
                 ThoughtResult myThoughtResult = ai.thinkPlan(frameId, currentField,  seq.subsequence(0, 2),
                                                              ai.myPlayerState(), ai.enemyPlayerState(),
-                                                             MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, false, &decisions);
+                                                             PatternThinker::DEFAULT_DEPTH, PatternThinker::DEFAULT_NUM_ITERATION, false, &decisions);
 
                 CollectedFeatureCoefScore mycf = ai.evalWithCollectingFeature(
                     RefPlan(myThoughtResult.plan),
                     seq.subsequence(0, 2).subsequence(myThoughtResult.plan.decisions().size()),
-                    frameId, MayahAI::DEFAULT_NUM_ITERATION,
+                    frameId, PatternThinker::DEFAULT_NUM_ITERATION,
                     ai.myPlayerState(), ai.enemyPlayerState(), myThoughtResult.midEvalResult, false,
                     ai.gazer().gazeResult());
                 CollectedFeatureCoefScore aicf = ai.evalWithCollectingFeature(
                     RefPlan(aiThoughtResult.plan),
                     seq.subsequence(0, 2).subsequence(aiThoughtResult.plan.decisions().size()),
-                    frameId, MayahAI::DEFAULT_NUM_ITERATION,
+                    frameId, PatternThinker::DEFAULT_NUM_ITERATION,
                     ai.myPlayerState(), ai.enemyPlayerState(), aiThoughtResult.midEvalResult, false,
                     ai.gazer().gazeResult());
 
@@ -208,7 +209,7 @@ int main(int argc, char* argv[])
                                                    req.playerFrameRequest[0].kumipuyoSeq.subsequence(0, 2),
                                                    ai.myPlayerState(),
                                                    ai.enemyPlayerState(),
-                                                   MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+                                                   PatternThinker::DEFAULT_DEPTH, PatternThinker::DEFAULT_NUM_ITERATION);
         {
             CoreField f(req.playerFrameRequest[0].field);
             f.dropKumipuyo(thoughtResult.plan.decisions().front(), req.playerFrameRequest[0].kumipuyoSeq.front());

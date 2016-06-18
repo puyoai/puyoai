@@ -11,6 +11,7 @@
 #include "core/probability/puyo_set_probability.h"
 
 #include "mayah_ai.h"
+#include "pattern_thinker.h"
 
 using namespace std;
 
@@ -199,7 +200,7 @@ TEST(MayahAIPerformanceTest, slow_pattern_from_real_4)
                 "BRRYRR");
     KumipuyoSeq seq("GBBYRB");
 
-    runTest(MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, f, seq);
+    runTest(PatternThinker::DEFAULT_DEPTH, PatternThinker::DEFAULT_NUM_ITERATION, f, seq);
 }
 
 TEST(MayahAIPerformanceTest, slow_pattern_from_real_5)
@@ -214,7 +215,7 @@ TEST(MayahAIPerformanceTest, slow_pattern_from_real_5)
                 "BBBRRR");
     KumipuyoSeq seq("GBGBRGBB");
 
-    runTest(MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, f, seq);
+    runTest(PatternThinker::DEFAULT_DEPTH, PatternThinker::DEFAULT_NUM_ITERATION, f, seq);
 }
 
 TEST(MayahAIPerformanceTest, slow_pattern_from_real_6)
@@ -232,7 +233,7 @@ TEST(MayahAIPerformanceTest, slow_pattern_from_real_6)
                  "RRRYRR");
 
     KumipuyoSeq seq("BRGY");
-    runTest(MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION, cf, seq);
+    runTest(PatternThinker::DEFAULT_DEPTH, PatternThinker::DEFAULT_NUM_ITERATION, cf, seq);
 }
 
 int main(int argc, char* argv[])

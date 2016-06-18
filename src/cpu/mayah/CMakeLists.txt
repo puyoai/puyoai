@@ -15,10 +15,11 @@ add_library(mayah_evaluator_lib
             shape_evaluator.cc)
 
 add_library(mayah_thinker_lib
-            beam_thinker.cc)
+            beam_thinker.cc
+            pattern_thinker.cc
+            gazer.cc)
 
 add_library(mayah_lib
-            gazer.cc
             mayah_ai.cc
             mayah_base_ai.cc
             mixed_ai.cc

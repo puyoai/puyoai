@@ -11,6 +11,7 @@
 #include "core/pattern/pattern_book.h"
 
 #include "beam_thinker.h"
+#include "pattern_thinker.h"
 #include "evaluation_parameter.h"
 
 class MayahBaseAI : public AI {
@@ -29,8 +30,8 @@ protected:
     PatternBook patternBook_;
     std::unique_ptr<Executor> executor_;
 
-private:
-    BeamThinker beam_thinker_;
+    std::unique_ptr<BeamThinker> beam_thinker_;
+    std::unique_ptr<PatternThinker> pattern_thinker_;
 };
 
 #endif // CPU_MAYAH_BASE_AI_H_

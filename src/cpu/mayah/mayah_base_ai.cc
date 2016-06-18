@@ -8,14 +8,19 @@ using namespace std;
 
 MayahBaseAI::MayahBaseAI(int argc, char* argv[], const char* name, std::unique_ptr<Executor> executor) :
     AI(argc, argv, name),
-    executor_(std::move(executor)),
-    beam_thinker_(executor_.get())
+    executor_(std::move(executor))
 {
     loadEvaluationParameter();
     CHECK(decisionBook_.load(FLAGS_decision_book));
     CHECK(patternBook_.load(FLAGS_pattern_book));
 
     VLOG(1) << evaluationParameterMap_.toString();
+
+    beam_thinker_.reset(new BeamThinker(executor_.get()));
+    pattern_thinker_.reset(new PatternThinker(evaluationParameterMap_,
+                                              decisionBook_,
+                                              patternBook_,
+                                              executor_.get()));
 
     google::FlushLogFiles(google::GLOG_INFO);
 }
@@ -41,5 +46,5 @@ bool MayahBaseAI::saveEvaluationParameter() const
 DropDecision MayahBaseAI::thinkByBeamSearch(int frame_id, const CoreField& field, const KumipuyoSeq& seq,
                                             const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
-    return beam_thinker_.think(frame_id, field, seq, me, enemy, fast);
+    return beam_thinker_->think(frame_id, field, seq, me, enemy, fast);
 }

@@ -87,7 +87,7 @@ TEST(MayahAITest, fromReal1)
     enemy.currentChainStartedFrameId = 1000;
     enemy.currentRensaResult = RensaResult(5, 10000, 346, false);
 
-    ThoughtResult thoughtResult = ai->thinkPlan(1328, myField, mySeq, me, enemy, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+    ThoughtResult thoughtResult = ai->thinkPlan(1328, myField, mySeq, me, enemy, PatternThinker::DEFAULT_DEPTH, PatternThinker::DEFAULT_NUM_ITERATION);
 
     EXPECT_TRUE(thoughtResult.plan.isRensaPlan());
 }
@@ -138,7 +138,7 @@ TEST(MayahAITest, fromReal2)
     enemy.currentChainStartedFrameId = 1000;
     enemy.currentRensaResult = RensaResult(5, 10000, 346, false);
 
-    ThoughtResult thoughtResult = ai->thinkPlan(1352, myField, mySeq, me, enemy, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+    ThoughtResult thoughtResult = ai->thinkPlan(1352, myField, mySeq, me, enemy, PatternThinker::DEFAULT_DEPTH, PatternThinker::DEFAULT_NUM_ITERATION);
 
     EXPECT_TRUE(thoughtResult.plan.isRensaPlan());
 }
@@ -162,7 +162,7 @@ TEST(MayahAITest, zenkeshi1)
     PlayerState me;
     PlayerState enemy;
 
-    ThoughtResult thoughtResult = ai->thinkPlan(10, myField, mySeq, me, enemy, MayahAI::DEFAULT_DEPTH, MayahAI::DEFAULT_NUM_ITERATION);
+    ThoughtResult thoughtResult = ai->thinkPlan(10, myField, mySeq, me, enemy, PatternThinker::DEFAULT_DEPTH, PatternThinker::DEFAULT_NUM_ITERATION);
 
     EXPECT_TRUE(thoughtResult.plan.firstDecision() == Decision(3, 0) || thoughtResult.plan.firstDecision() == Decision(3, 3));
 }
