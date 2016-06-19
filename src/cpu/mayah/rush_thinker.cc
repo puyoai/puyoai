@@ -78,7 +78,7 @@ bool RushThinker::shouldUpdateState(const SearchState& orig, const SearchState& 
 }
 
 DropDecision RushThinker::think(int frame_id, const CoreField& field, const KumipuyoSeq& seq,
-                                    const PlayerState& me, const PlayerState& enemy, bool fast) const {
+                                const PlayerState& /*me*/, const PlayerState& /*enemy*/, bool /*fast*/) const {
     Decision d2, d3;
     int maxScore2 = 1000, maxScore3 = 1000;
     auto callback = [&](const RefPlan& plan) {
@@ -99,17 +99,8 @@ DropDecision RushThinker::think(int frame_id, const CoreField& field, const Kumi
     if (d3.isValid())
         return DropDecision(d3, "Fire!");
 
-    return BeamSearchThinker::think(frame_id, field, seq, me, enemy, fast);
-}
-
-
-// ===================================================================
-
-DropDecision BeamSearchThinker::think(
-    int frame_id, const CoreField& field, const KumipuyoSeq& seq,
-    const PlayerState&, const PlayerState&, bool) const {
-    int64 start_time = currentTimeInMillis();
-    int64 now = start_time;
+    std::int64_t start_time = currentTimeInMillis();
+    std::int64_t now = start_time;
 
     std::vector<int> features[7][4];  // [1<=x<=6][0<=r<4]
 
@@ -149,7 +140,7 @@ DropDecision BeamSearchThinker::think(
                   return a.second > b.second;
               });
 
-    int64 end_time = currentTimeInMillis();
+    std::int64_t end_time = currentTimeInMillis();
 
     std::ostringstream oss;
     oss << "Time:" << (end_time - start_time) << "[ms]_/_" << "Simulates:" << num_simulate << ",";
@@ -161,7 +152,8 @@ DropDecision BeamSearchThinker::think(
     return DropDecision(best, oss.str());
 }
 
-SearchState BeamSearchThinker::search(
+
+SearchState RushThinker::search(
     const CoreField& field, const KumipuyoSeq& vseq, int search_turns) const {
     CHECK_GE(vseq.size(), search_turns);
 
@@ -176,7 +168,7 @@ SearchState BeamSearchThinker::search(
 
     q_states[0].push_back(init_state);
     for (int t = 0; t < search_turns; ++t) {
-        std::unordered_set<uint64> visited;
+        std::unordered_set<std::uint64_t> visited;
         const auto& que = q_states[t];
         std::vector<SearchState>& next_states = q_states[t + 1];
         for (size_t i = 0; i < que.size(); ++i)
@@ -239,15 +231,15 @@ SearchState BeamSearchThinker::search(
     return result;
 }
 
-void BeamSearchThinker::generateNextStates(
+void RushThinker::generateNextStates(
     const SearchState& state, int from, const Kumipuyo& kumi,
-    std::unordered_set<uint64>& visited, std::vector<SearchState>& states) const {
-    const BeamSearchThinker* th = this;
+    std::unordered_set<std::uint64_t>& visited, std::vector<SearchState>& states) const {
+    const RushThinker* th = this;
     auto callback = [&th, &state, &from, &visited, &states](const RefPlan& plan) {
         const CoreField field = plan.field();
         RensaResult result = plan.rensaResult();
 
-        uint64 h = field.hash();
+        std::uint64_t h = field.hash();
         if (!visited.insert(h).second)
             return;
 
