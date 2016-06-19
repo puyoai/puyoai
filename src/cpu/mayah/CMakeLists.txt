@@ -17,6 +17,7 @@ add_library(mayah_evaluator_lib
 add_library(mayah_thinker_lib
             beam_thinker.cc
             pattern_thinker.cc
+            rush_thinker.cc
             gazer.cc)
 
 add_library(mayah_lib

@@ -22,6 +22,12 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
 {
     const bool usesDecisionBook = true;
     const bool usesRensaHandTree = false;
+
+    // Turning the table mode
+    if (field.countColor(PuyoColor::OJAMA) >= 16) {
+        return rush_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, fast);
+    }
+
     if (field.countPuyos() <= 24 || field.countPuyos() >= 64) {
         return pattern_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, gazer_.gazeResult(), fast,
                                        usesDecisionBook, usesRensaHandTree);

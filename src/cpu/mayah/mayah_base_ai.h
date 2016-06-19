@@ -11,8 +11,9 @@
 #include "core/pattern/pattern_book.h"
 
 #include "beam_thinker.h"
-#include "pattern_thinker.h"
 #include "evaluation_parameter.h"
+#include "pattern_thinker.h"
+#include "rush_thinker.h"
 
 class MayahBaseAI : public AI {
 public:
@@ -37,6 +38,7 @@ protected:
 
     std::unique_ptr<BeamThinker> beam_thinker_;
     std::unique_ptr<PatternThinker> pattern_thinker_;
+    std::unique_ptr<RushThinker> rush_thinker_;
 
     Gazer gazer_;
 };
