@@ -18,6 +18,11 @@ class MayahBaseAI : public AI {
 public:
     MayahBaseAI(int argc, char* argv[], const char* name, std::unique_ptr<Executor> executor);
 
+    const Gazer& gazer() const { return gazer_; }
+
+    void onGameWillBegin(const FrameRequest&) override;
+    void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&) override;
+
 protected:
     bool loadEvaluationParameter();
     bool saveEvaluationParameter() const;
@@ -32,6 +37,8 @@ protected:
 
     std::unique_ptr<BeamThinker> beam_thinker_;
     std::unique_ptr<PatternThinker> pattern_thinker_;
+
+    Gazer gazer_;
 };
 
 #endif // CPU_MAYAH_BASE_AI_H_

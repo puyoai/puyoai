@@ -44,15 +44,8 @@ int main(int argc, char* argv[])
     (void)PuyoSetProbability::instanceSlow();
     (void)ColumnPuyoListProbability::instanceSlow();
 
-    // unique_ptr<BeamMayahAI> ai(new BeamMayahAI(argc, argv));
-    unique_ptr<MixedAI> ai(new MixedAI(argc, argv));
+    unique_ptr<YukinaAI> ai(new YukinaAI(argc, argv));
 
-#if 0
-    for (int i = 0; i < 50; ++i) {
-        KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
-        ai->run(CoreField(), seq);
-    }
-#else
     Endless endless(std::move(ai));
     endless.setVerbose(true);
     //endless.setVerbose(FLAGS_show_field);
@@ -149,6 +142,5 @@ int main(int argc, char* argv[])
 
     }
 
-#endif
     return 0;
 }

@@ -29,15 +29,9 @@ public:
         const PlayerState& me, const PlayerState& enemy,
         const MidEvalResult&, bool fast, const GazeResult& gazeResult) const;
 
-    void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq&) override;
-
-    void onGameWillBegin(const FrameRequest&) override;
-
 protected:
     bool usesDecisionBook_ = true;
     bool usesRensaHandTree_ = true;
-
-    Gazer gazer_;
 };
 
 class DebuggableMayahAI : public MayahAI {
@@ -61,8 +55,6 @@ public:
 
     using MayahAI::mutableMyPlayerState;
     using MayahAI::mutableEnemyPlayerState;
-
-    const Gazer& gazer() const { return gazer_; }
 
     void setUsesRensaHandTree(bool flag) { usesRensaHandTree_ = flag; }
 

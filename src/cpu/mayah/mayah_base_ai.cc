@@ -1,8 +1,12 @@
 #include "mayah_base_ai.h"
 
+#include "core/frame_request.h"
+
 DEFINE_string(feature, "feature.toml", "the path to feature parameter");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
+
+DEFINE_bool(from_wrapper, false, "Make this true in wrapper script.");
 
 using namespace std;
 
@@ -47,4 +51,14 @@ DropDecision MayahBaseAI::thinkByBeamSearch(int frame_id, const CoreField& field
                                             const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
     return beam_thinker_->think(frame_id, field, seq, me, enemy, fast);
+}
+
+void MayahBaseAI::onGameWillBegin(const FrameRequest& frameRequest)
+{
+    gazer_.initialize(frameRequest.frameId);
+}
+
+void MayahBaseAI::gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq& kumipuyoSeq)
+{
+    gazer_.gaze(frameId, enemyField, kumipuyoSeq);
 }

@@ -6,9 +6,12 @@
 
 #include "base/time.h"
 #include "base/wait_group.h"
+#include "core/field_pretty_printer.h"
 #include "core/kumipuyo_seq_generator.h"
 #include "core/plan/plan.h"
 #include "core/rensa/rensa_detector.h"
+
+#include <iostream>
 
 DEFINE_int32(beam_width, 400, "beam width");
 DEFINE_int32(beam_depth, 40, "beam depth");
@@ -75,16 +78,11 @@ std::pair<double, int> evalSuperLight(const CoreField& fieldBeforeRensa)
     }
 #endif
 
-#if 0
-    int connect2 = 0, connect3 = 0;
-    fieldBeforeRensa.countConnection(&connect2, &connect3);
-    maxScore += connect2 * 2 + connect3 * 4;
-#endif
-
     return std::make_pair(maxScore, maxChains);
 }
 
-SearchResult run(const std::vector<State>& initialStates, KumipuyoSeq seq, int maxSearchTurns)
+SearchResult run(const std::vector<State>& initialStates, KumipuyoSeq seq, int maxSearchTurns,
+                 std::mutex& mu)
 {
     SearchResult result;
 
@@ -98,24 +96,9 @@ SearchResult run(const std::vector<State>& initialStates, KumipuyoSeq seq, int m
 
     std::vector<double> time(std::max(maxSearchTurns, 10));
 
+    double beginTime = currentTime();
+
     for (int turn = 3; turn < maxSearchTurns; ++turn) {
-
-#if 0
-        {
-            bool found = false;
-            Decision fd = currentStates.front().firstDecision;
-            for (const auto& s : currentStates) {
-                if (s.firstDecision != fd) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-                break;
-        }
-
-#endif
         time[turn] = currentTime();
 
         seq.dropFront();
@@ -143,17 +126,6 @@ SearchResult run(const std::vector<State>& initialStates, KumipuyoSeq seq, int m
 
                 double maxScore;
                 int maxChains;
-#if 0
-                if (turn >= 4) {
-                    // std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa);
-                    std::tie(maxScore, maxChains) = evalLight(fieldBeforeRensa);
-                } else if (turn >= 4) {
-                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, 1);
-                } else {
-                    std::tie(maxScore, maxChains) = eval(fieldBeforeRensa, 2);
-                }
-#endif
-
                 std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa);
                 nextStates.emplace_back(plan.field(), s.firstDecision, maxScore, maxChains);
             });
@@ -172,34 +144,32 @@ SearchResult run(const std::vector<State>& initialStates, KumipuyoSeq seq, int m
         std::swap(currentStates, nextStates);
         nextStates.clear();
 
-#if 0
-        cout << "turn=" << turn
-             << " score=" << currentStates.front().stateScore
-             << " chains=" << currentStates.front().maxChains
-             << " first=" << currentStates.front().firstDecision
-             << " : fired_score=" << maxFiredScore
-             << " fired_rensa=" << maxFiredRensa
-             << endl;
+        if (false) {
+            cout << "turn=" << turn
+                 << " score=" << currentStates.front().stateScore
+                 << " chains=" << currentStates.front().maxChains
+                 << " first=" << currentStates.front().firstDecision
+                 << " : fired_score=" << maxFiredScore
+                 << " fired_rensa=" << maxFiredRensa
+                 << endl;
 
-        std::map<Decision, int> m;
-        for (const auto& s : currentStates) {
-            m[s.firstDecision] += 1;
+            std::map<Decision, int> m;
+            for (const auto& s : currentStates) {
+                m[s.firstDecision] += 1;
+            }
+            cout << "decision kind = " << m.size() << endl;
+            for (const auto& entry : m) {
+                cout << entry.first << " " << entry.second << endl;
+            }
+
+            FieldPrettyPrinter::print(currentStates.front().field.toPlainField(), KumipuyoSeq());
         }
-        cout << "decision kind = " << m.size() << endl;
-        for (const auto& entry : m) {
-            cout << entry.first << " " << entry.second << endl;
-        }
-
-        FieldPrettyPrinter::print(currentStates.front().field.toPlainField(), KumipuyoSeq());
-#endif
-
     }
 
-    // double endTime = currentTime();
+    double endTime = currentTime();
 
-#if 0
-    {
-        lock_guard<mutex> lock(mu_);
+    if (false) {
+        lock_guard<mutex> lock(mu);
         if (!currentStates.empty()) {
             cout << "FIRED_CHAINS=" << maxOverallFiredChains
                  << " FIRED_SCORE=" << maxOverallFiredScore
@@ -215,7 +185,6 @@ SearchResult run(const std::vector<State>& initialStates, KumipuyoSeq seq, int m
             return result;
         }
     }
-#endif
 
     result.maxChains = maxOverallFiredChains;
     result.firstDecisions.insert(currentStates.front().firstDecision);
@@ -237,15 +206,6 @@ DropDecision BeamThinker::think(int /*frameId*/, const CoreField& field, const K
             return DropDecision(tmpd);
         }
     }
-
-#if 0
-    if (true) {
-        Decision d = decisionBook_.nextDecision(field, seq);
-        if (d.isValid()) {
-            return DropDecision(d);
-        }
-    }
-#endif
 
     // Make initial states.
     std::vector<State> currentStates;
@@ -279,7 +239,7 @@ DropDecision BeamThinker::think(int /*frameId*/, const CoreField& field, const K
             KumipuyoSeq tmpSeq(seq.subsequence(2));
             tmpSeq.append(KumipuyoSeqGenerator::generateRandomSequence(40));
 
-            SearchResult searchResult = run(nextStates, tmpSeq, maxSearchTurns);
+            SearchResult searchResult = run(nextStates, tmpSeq, maxSearchTurns, mu_);
 
             {
                 lock_guard<mutex> lk(mu);

@@ -1,6 +1,8 @@
 #ifndef CPU_MAYAH_BEAM_THINKER_H_
 #define CPU_MAYAH_BEAM_THINKER_H_
 
+#include <mutex>
+
 #include "base/executor.h"
 #include "core/client/ai/drop_decision.h"
 #include "core/core_field.h"
@@ -16,6 +18,8 @@ public:
 
 private:
     Executor* executor_;
+
+    mutable std::mutex mu_;  // for cout
 };
 
 #endif // CPU_MAYAH_BEAM_THINKER_H_

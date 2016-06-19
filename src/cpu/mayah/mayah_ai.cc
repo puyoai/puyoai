@@ -17,7 +17,7 @@
 #include "evaluator.h"
 #include "gazer.h"
 
-DEFINE_bool(from_wrapper, false, "Make this true in wrapper script.");
+DECLARE_bool(from_wrapper);
 
 using namespace std;
 
@@ -60,17 +60,6 @@ CollectedFeatureCoefScore MayahAI::evalWithCollectingFeature(
     return pattern_thinker_->evalWithCollectingFeature(plan, restSeq, currentFrameId, maxIteration,
                                                        me, enemy, midEvalResult, fast,
                                                        usesRensaHandTree_, gazeResult);
-}
-
-
-void MayahAI::onGameWillBegin(const FrameRequest& frameRequest)
-{
-    gazer_.initialize(frameRequest.frameId);
-}
-
-void MayahAI::gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq& kumipuyoSeq)
-{
-    gazer_.gaze(frameId, enemyField, kumipuyoSeq);
 }
 
 void DebuggableMayahAI::setEvaluationParameterMap(const EvaluationParameterMap& map)
