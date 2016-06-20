@@ -14,6 +14,9 @@ public:
     DropDecision think(int frameId, const CoreField&, const KumipuyoSeq&,
                        const PlayerState& me, const PlayerState& enemy, bool fast) const override;
 
+    DropDecision thinkByThinker(int frameId, const CoreField&, const KumipuyoSeq&,
+                                const PlayerState& me, const PlayerState& enemy, bool fast) const;
+
 private:
     mutable std::mutex mu_; // for cout
 };

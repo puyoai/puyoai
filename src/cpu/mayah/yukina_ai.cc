@@ -20,6 +20,21 @@ YukinaAI::YukinaAI(int argc, char* argv[]) :
 DropDecision YukinaAI::think(int frame_id, const CoreField& field, const KumipuyoSeq& kumipuyo_seq,
                              const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
+    DropDecision dd = thinkByThinker(frame_id, field, kumipuyo_seq, me, enemy, fast);
+    if (dd.valid())
+        return dd;
+
+    // dd is invalid.
+    // Rethink by pattern_thinker_ with fast=true.
+    const bool usesDecisionBook = true;
+    const bool usesRensaHandTree = false;
+    return pattern_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, gazer_.gazeResult(), true,
+                                   usesDecisionBook, usesRensaHandTree);
+}
+
+DropDecision YukinaAI::thinkByThinker(int frame_id, const CoreField& field, const KumipuyoSeq& kumipuyo_seq,
+                                      const PlayerState& me, const PlayerState& enemy, bool fast) const
+{
     const bool usesDecisionBook = true;
     const bool usesRensaHandTree = false;
 
