@@ -129,6 +129,7 @@ void Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
         }
     }
 
+#if 0
     if (plan.totalOjama() >= 6) {
         if (plan.score() >= scoreForOjama(std::max(0, plan.totalOjama() - 3))) {
             sc_->addScore(STRATEGY_TAIOU, 0.9);
@@ -136,6 +137,7 @@ void Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
             return;
         }
     }
+#endif
 #endif
 
     if (plan.field().isZenkeshi()) {
@@ -201,7 +203,7 @@ void Evaluator<ScoreCollector>::evalStrategy(const RefPlan& plan,
             return;
         }
 
-        if (plan.chains() == 2 && plan.score() >= scoreForOjama(15) && rensaTreeValue >= -5) {
+        if (plan.chains() == 2 && plan.score() >= scoreForOjama(15) && rensaTreeValue >= 5) {
             sc_->addScore(STRATEGY_TSUBUSHI, 1);
             sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
             return;

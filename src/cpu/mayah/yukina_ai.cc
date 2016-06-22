@@ -36,7 +36,7 @@ DropDecision YukinaAI::thinkByThinker(int frame_id, const CoreField& field, cons
                                       const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
     const bool usesDecisionBook = true;
-    const bool usesRensaHandTree = false;
+    const bool usesRensaHandTree = !fast;
 
     if (enemy.isRensaOngoing()) {
         return pattern_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, gazer_.gazeResult(), fast,
