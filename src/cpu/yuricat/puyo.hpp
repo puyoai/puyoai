@@ -44,6 +44,7 @@
 // 浮動小数点が「ほぼ」同じ値を取っているかのチェック && FASSERT
 #define FEQUALS(f0, f1, o) { FASSERT(f0, o); FASSERT(f1, o); if(fabs(f0 - f1) > 0.00001){ cerr << (f0) << " <-> " << (f1) << endl; {o} } );
 
+/*
 // クロック計測関数(64ビットで値を返す)
 static uint64_t cputime(){
     unsigned int ax, dx;
@@ -66,7 +67,7 @@ static void tick()noexcept{
 static void tock(){
     uint64_t CLOCK_END = cputime();
     printf("clock=%lld\n", CLOCK_END - CLOCK_START - CLOCK_LATENCY);
-}
+}*/
 
 class ClockMS{
     // millisec単位
@@ -94,7 +95,7 @@ public:
         return t;
     }
     ClockMS(){}
-    ClockMS(int m){ start(); }
+    ClockMS(int m){ UNUSED_VARIABLE(m); start(); }
 };
 
 /*
@@ -244,7 +245,7 @@ namespace Yuricat{
     
     // 勝ち負け判定のための
     int framePuyoNumToMaxScore(){
-        
+        return 0;
     }
     
     template<class field_t>

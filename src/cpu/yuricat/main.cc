@@ -54,6 +54,7 @@ bool isEndlessMode(){ return g_endlessMode; }
 
 int64_t timeManage(const PlayerState& me, const PlayerState& enemy, bool fast){
     // 行動決定にかけていい時間を決める(ms単位)
+    UNUSED_VARIABLE(enemy);
     return fast ? 30 : (550 - 500 * me.field.countPuyos() / 78);
 }
 
@@ -64,9 +65,9 @@ Decision searchEscapeMove(const CoreField& f, const KumipuyoSeq& seq){
     Decision move;
     Plan::iterateAvailablePlans(f, seq, 2, [&](const RefPlan& plan) {
         if(plan.isRensaPlan()){
-            const RensaResult& rensa = plan.rensaResult();
-            const int chain = rensa.chains;
-            const int s = rensa.score;
+            //const RensaResult& rensa = plan.rensaResult();
+            //const int chain = rensa.chains;
+            //const int s = rensa.score;
             const int frame = plan.totalFrames();
             
             // 生き延びる(+嫌がらせ)のため最短で連鎖が起こるものを選ぶ
@@ -207,7 +208,7 @@ public:
         Decision after_zenkeshi_move;
         int after_zenkeshi_score = 999999;
         
-        int rensa_finish_frame = enemy.isRensaOngoing() ? enemy.rensaFinishingFrameId() : INT_MAX;
+        //int rensa_finish_frame = enemy.isRensaOngoing() ? enemy.rensaFinishingFrameId() : INT_MAX;
         
         Plan::iterateAvailablePlans(f, seq, 2, [&](const RefPlan& plan) {
             if(plan.isRensaPlan()){

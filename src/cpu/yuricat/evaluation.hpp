@@ -127,7 +127,7 @@ namespace Yuricat{
         
         return score;
     }
-    
+    /*
     template<class field_t>
     int evalateFields(const field_t& field0, const field_t& field1){
         return evaluateField(field0) - evaluateField(field1);
@@ -139,16 +139,16 @@ namespace Yuricat{
         
         return 0;
     }
-    
+    */
     template<class field_t, class plan_t>
     int evaluatePlan(const field_t& field, const plan_t& plan){
         // 行動価値関数(重めでもいい)
-        
+        UNUSED_VARIABLE(field);
         if (plan.isRensaPlan()) {
-            RensaResult rensa = plan.rensaResult();
-            int chain = rensa.chains; // 連鎖数
+            //RensaResult rensa = plan.rensaResult();
+            //int chain = rensa.chains; // 連鎖数
         }
-        int chigiri = plan.numChigiri(); // ちぎりの数
+        //int chigiri = plan.numChigiri(); // ちぎりの数
         
         const CoreField& after_field = plan.field(); // 後場
         

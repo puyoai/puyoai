@@ -36,7 +36,7 @@ namespace Yuricat{
                             mate_rate = min(mate_rate, (lines % 6) / 6.0);
                         }else{
                             // とりあえず死にはしない
-                            return 0.0;
+                            //return 0.0;
                         }
                         // 即死ではないがやばそうな場合は後で考える...
                         //after_field.dropOjama();

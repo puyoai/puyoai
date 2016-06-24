@@ -74,8 +74,9 @@ namespace Yuricat{
             cerr << "avg chain = " << avg_chain << endl;
             return best;
         }
-        void proceed(const Decision& Decision){
+        void proceed(const Decision& decision){
             // ターンを進める
+            UNUSED_VARIABLE(decision);
             mutex_.lock();
             result.clear();
             mutex_.unlock();
@@ -256,8 +257,11 @@ namespace Yuricat{
             -1
         });
         
-        const int search_turns = min(100000000,
-                                     org_turn + (10, min(50, ((6 * 13) - org_field.countPuyos()) / 2 + 4))); // 探索ターン数の上限を設定
+        //const int search_turns = min(100000000,
+        //                             org_turn + (10, min(50, ((6 * 13) - org_field.countPuyos()) / 2 + 4))); // 探索ターン数の上限を設定
+        
+        // 上のがバグなので、同じ挙動をするように変更
+        const int search_turns = min(100000000, org_turn + min(50, ((6 * 13) - org_field.countPuyos()) / 2 + 4)); // 探索ターン数の上限を設定
         
         int max_chain = 0;
         Decision first_decision;
@@ -366,7 +370,7 @@ namespace Yuricat{
             for(int i = 0; i < (int)firedResult[t].size(); ++i){
                 const auto& fired = firedResult[t][i];
                 if(fired.chain > max_chain){
-                    int first_decision_index = toDecisionIndex(fired.first_decision);
+                    //int first_decision_index = toDecisionIndex(fired.first_decision);
                     
                     max_chain = fired.chain;
                     fired_turn = turn;
@@ -438,11 +442,15 @@ namespace Yuricat{
                            int org_turn,
                            int org_frame){
         
+        UNUSED_VARIABLE(thread_id);
+        
         int chain_border = min(14, org_me.field.countColorPuyos() / 5 + 4);
         //cerr << ClockMS::now() << endl;
         while(player == 1 || (ClockMS::now() < g_limitTime && chain_border > 0)){
             //cerr << ClockMS::now() << endl;
             int ret = soloSimulate(player, org_me, org_enemy, org_seq, org_turn, org_frame, chain_border);
+            
+            ret += 1;
             
             if(player == 1 && g_enemySearchNum){ // 相手視点での思考ストップ
                 cerr << "stopped" << endl;
