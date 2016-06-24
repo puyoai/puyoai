@@ -51,7 +51,7 @@ struct State
     }
 };
 
-void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int good_chains, unordered_set<int64_t>& visited, int qi, vector<State>& state_q, vector<State>& fired)
+void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int good_chains, const int enough_score, unordered_set<int64_t>& visited, int qi, vector<State>& state_q, vector<State>& fired)
 {
     auto drop_callback = [&](const RefPlan& plan)
     {
@@ -83,7 +83,7 @@ void next_states(const State& current_state, const Kumipuyo& kumipuyo, const int
             };
             fired.push_back(next);
 
-            if (rensa_result.chains >= good_chains)
+            if (rensa_result.chains >= good_chains || rensa_result.score >= enough_score)
                 return;
         }
 
@@ -164,7 +164,7 @@ struct BeamSearchResult
     vector<Decision> decisions;
     int chains;
 };
-BeamSearchResult beamsearch(const CoreField& start_field, const KumipuyoSeq& seq, const int frame_id, const PlayerState& me, const PlayerState& enemy, const int turns, const int good_chains)
+BeamSearchResult beamsearch(const CoreField& start_field, const KumipuyoSeq& seq, const int frame_id, const PlayerState& me, const PlayerState& enemy, const int turns, const int good_chains, const int enough_score)
 {
     UNUSED_VARIABLE(me);
 
@@ -212,7 +212,7 @@ BeamSearchResult beamsearch(const CoreField& start_field, const KumipuyoSeq& seq
 
         for (int qi = 0; qi < (int)state_q[turn].size(); ++qi)
         {
-            next_states(state_q[turn][qi], seq.get(turn), good_chains, visited, qi, state_q[turn + 1], fired[turn + 1]);
+            next_states(state_q[turn][qi], seq.get(turn), good_chains, enough_score, visited, qi, state_q[turn + 1], fired[turn + 1]);
         }
 
         for (auto& state : fired[turn + 1])
@@ -243,7 +243,7 @@ BeamSearchResult beamsearch(const CoreField& start_field, const KumipuyoSeq& seq
         std::sort(fired[turn].begin(), fired[turn].end(), [](const State& a, const State& b){ return a.score > b.score; });
         for (const State& state : fired[turn])
         {
-            if (state.fired_chains == max_chains)
+            if (state.fired_chains == max_chains || state.score >= enough_score)
             {
                 return BeamSearchResult {
                     make_decisions(state, turn), // .decisions
@@ -292,6 +292,19 @@ int count_color_puyos_connected_from_start(const CoreField& field)
             if (visited[y][x] && field.isNormalColor(x, y))
                 ++c;
     return c;
+}
+
+int eval_enough_score(const PlayerState& me, const PlayerState& enemy, const int frame_id)
+{
+    if (enemy.isRensaOngoing())
+    {
+        const int score = scoreForOjama(me.totalOjama(enemy));
+        const int frames = enemy.rensaFinishingFrameId() - frame_id;
+        if (frames > 60 * 8 || score >= 50000)
+            return score + 6000;
+    }
+
+    return 1919810;
 }
 
 DEFINE_int32(seen, 1000, "max number of seen seq");
@@ -359,6 +372,9 @@ private:
             cerr << "fast" + string(20, '!') << endl;
         }
 
+        const int enough_score = eval_enough_score(me, enemy, frame_id);
+        cerr << "enough_score: " << enough_score << endl;
+
         int missed_search = 0;
         int good_chains = min(14, count_color_puyos_connected_from_start(f) / 5 + 4);
         vector<int> chains[7][4];
@@ -371,7 +387,7 @@ private:
             KumipuyoSeq seq = nexts;
             seq.append(KumipuyoSeqGenerator::generateRandomSequenceWithSeed(search_turns, frame_id + simu_i));
 
-            BeamSearchResult result = beamsearch(f, seq, frame_id, me, enemy, search_turns, good_chains);
+            BeamSearchResult result = beamsearch(f, seq, frame_id, me, enemy, search_turns, good_chains, enough_score);
             ++simu_i;
 
             if (result.chains == -1)
@@ -406,7 +422,6 @@ private:
                 {
                     int sum_chains = accumulate(chains[x][rot].begin(), chains[x][rot].end(), 0);
                     double score = (double)sum_chains;
-                    fprintf(stderr, "%d, %d: %d\n", x, rot, (int)chains[x][rot].size());
                     if (score > drop_score)
                     {
                         exp_chains = (double)accumulate(chains[x][rot].begin(), chains[x][rot].end(), 0) / chains[x][rot].size();
