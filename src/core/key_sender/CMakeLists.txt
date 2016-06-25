@@ -1,5 +1,0 @@
-cmake_minimum_required(VERSION 2.8)
-
-add_library(puyoai_core_key_sender
-            stdout_key_sender.cc
-            serial_key_sender.cc)

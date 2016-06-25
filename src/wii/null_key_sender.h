@@ -1,9 +1,9 @@
-#ifndef CORE_KEY_SENDER__NULL_KEY_SENDER_H_
-#define CORE_KEY_SENDER__NULL_KEY_SENDER_H_
+#ifndef WII_NULL_KEY_SENDER_H_
+#define WII_NULL_KEY_SENDER_H_
 
 #include "base/base.h"
 #include "core/key_set.h"
-#include "core/key_sender/key_sender.h"
+#include "wii/key_sender.h"
 
 class NullKeySender : public KeySender {
 public:
@@ -14,4 +14,4 @@ public:
     virtual void sendKeySetSeq(const KeySetSeq&) override {}
 };
 
-#endif // CORE_KEY_SENDER__NULL_KEY_SENDER_H_
+#endif

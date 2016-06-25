@@ -10,7 +10,6 @@
 #include "core/game_result.h"
 #include "core/frame_response.h"
 #include "core/game_result.h"
-#include "core/key_sender/key_sender.h"
 #include "core/player.h"
 #include "core/puyo_color.h"
 #include "core/puyo_controller.h"
@@ -19,6 +18,7 @@
 #include "core/server/game_state.h"
 #include "core/server/game_state_observer.h"
 #include "gui/screen.h"
+#include "wii/key_sender.h"
 
 using namespace std;
 

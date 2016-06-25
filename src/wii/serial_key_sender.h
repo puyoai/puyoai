@@ -1,11 +1,11 @@
-#ifndef CORE_KEY_SENDER_SERIAL_KEY_SENDER_H_
-#define CORE_KEY_SENDER_SERIAL_KEY_SENDER_H_
+#ifndef WII_SERIAL_KEY_SENDER_H_
+#define WII_SERIAL_KEY_SENDER_H_
 
 #include <termios.h>
 #include <string>
 
 #include "base/base.h"
-#include "core/key_sender/key_sender.h"
+#include "wii/key_sender.h"
 
 class SerialKeySender : public KeySender {
 public:
@@ -24,4 +24,4 @@ private:
     KeySet lastSent_;
 };
 
-#endif // CORE_KEY_SENDER_SERIAL_KEY_SENDER_H_
+#endif

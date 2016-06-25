@@ -1,9 +1,9 @@
-#ifndef CORE_KEY_SENDER_STDOUT_KEY_SENDER_H_
-#define CORE_KEY_SENDER_STDOUT_KEY_SENDER_H_
+#ifndef WII_STDOUT_KEY_SENDER_H_
+#define WII_STDOUT_KEY_SENDER_H_
 
 #include "base/base.h"
-#include "core/key_sender/key_sender.h"
 #include "core/key_set.h"
+#include "wii/key_sender.h"
 
 class StdoutKeySender : public KeySender {
 public:
@@ -14,4 +14,4 @@ public:
     virtual void sendKeySetSeq(const KeySetSeq&) override;
 };
 
-#endif // CORE_KEY_SENDER_STDOUT_KEY_SENDER_H_
+#endif

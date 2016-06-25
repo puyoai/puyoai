@@ -14,9 +14,6 @@
 #include "capture/syntek_source.h"
 #include "capture/movie_source.h"
 #include "capture/movie_source_key_listener.h"
-#include "core/key_sender/serial_key_sender.h"
-#include "core/key_sender/stdout_key_sender.h"
-#include "core/key_sender/null_key_sender.h"
 #include "core/server/commentator.h"
 #include "core/server/game_state_recorder.h"
 #include "gui/commentator_drawer.h"
@@ -25,6 +22,9 @@
 #include "gui/frame_number_drawer.h"
 #include "gui/main_window.h"
 #include "gui/user_event_drawer.h"
+#include "wii/serial_key_sender.h"
+#include "wii/stdout_key_sender.h"
+#include "wii/null_key_sender.h"
 #include "wii/wii_connect_server.h"
 
 #if USE_AUDIO_COMMENTATOR
