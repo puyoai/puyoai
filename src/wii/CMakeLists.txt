@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 
 add_library(puyoai_wii
-            wii_connect_server.cc
-            stdout_key_sender.cc
-            serial_key_sender.cc)
+            wii_connect_server.cc)
 
 function(puyoai_wii_add_executable exe)
     add_executable(${exe} ${ARGN})
     target_link_libraries(${exe} puyoai_wii)
+    target_link_libraries(${exe} puyoai_core_key_sender)
     if(LIB_USB)
         target_link_libraries(${exe} puyoai_capture_syntek)
         target_link_libraries(${exe} puyoai_capture_driver_syntek)
@@ -51,6 +50,7 @@ function(puyoai_wii_add_test target)
     target_link_libraries(${target}_test gtest gtest_main)
     target_link_libraries(${target}_test puyoai_wii)
     target_link_libraries(${target}_test puyoai_capture)
+    target_link_libraries(${target}_test puyoai_core_key_sender)
     target_link_libraries(${target}_test puyoai_core_server_connector)
     target_link_libraries(${target}_test puyoai_core_server)
     target_link_libraries(${target}_test puyoai_core_rensa)

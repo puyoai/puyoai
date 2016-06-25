@@ -1,5 +1,5 @@
-#ifndef WII_KEY_SENDER_H_
-#define WII_KEY_SENDER_H_
+#ifndef CORE_KEY_SENDER_KEY_SENDER_H_
+#define CORE_KEY_SENDER_KEY_SENDER_H_
 
 #include "core/key_set_seq.h"
 
@@ -12,4 +12,4 @@ public:
     virtual void sendKeySetSeq(const KeySetSeq& keySetSeq) = 0;
 };
 
-#endif
+#endif // CORE_KEY_SENDER_KEY_SENDER_H_

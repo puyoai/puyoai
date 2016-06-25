@@ -1,4 +1,4 @@
-#include "wii/stdout_key_sender.h"
+#include "core/key_sender/stdout_key_sender.h"
 
 #include <iostream>
 

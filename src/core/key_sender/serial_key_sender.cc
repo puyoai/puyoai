@@ -1,4 +1,4 @@
-#include "wii/serial_key_sender.h"
+#include "core/key_sender/serial_key_sender.h"
 
 #include <fcntl.h>
 #include <sys/types.h>
