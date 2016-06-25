@@ -524,7 +524,7 @@ void WiiConnectServer::outputKeys(int pi, const AnalyzerResult& analyzerResult,
             cout << duration << endl;
 
             // TODO(mayah): Maybe we need to wait using duration?
-            keySenders_[pi]->sendWait(20);
+            // keySenders_[pi]->sendWait(20);
         }
 
         keySenders_[pi]->sendKeySetSeq(keySetSeq);
