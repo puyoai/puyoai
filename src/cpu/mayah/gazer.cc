@@ -66,15 +66,41 @@ int GazeResult::estimateMaxScore(int frameId, const PlayerState& enemy) const
     return 0;
 }
 
+int GazeResult::estimateMaxFeasibleScore(int frameId, const PlayerState& enemy) const
+{
+    // TODO(mayah): How to handle this?
+    if (enemy.isRensaOngoing() && frameId <= enemy.rensaFinishingFrameId()) {
+        return enemy.currentRensaResult.score;
+    }
+
+    // We need to check this after checking enemy.isRensaOngoing().
+    // Since gaze frameId will be the time just after the rensa is finished.
+    CHECK_LE(frameIdToStartNextMove(), frameId)
+        << "Gazer is requested to check the past frame estimated score."
+        << " frameId=" << frameId
+        << " frameIdToStartNextMove=" << frameIdToStartNextMove();
+
+    int scoreByFeasibleRensas = estimateMaxScoreFromFeasibleRensas(frameId);
+    if (scoreByFeasibleRensas >= 0)
+        return scoreByFeasibleRensas;
+
+    return 0;
+}
+
 int GazeResult::estimateMaxScoreFromFeasibleRensas(int frameId) const
 {
     if (feasibleRensaHandTree_.nodes().empty())
-        return -1;
+        return 1;
 
     int maxScore = -1;
     const RensaHandNode& node = feasibleRensaHandTree_.node(0);
     for (const auto& edge : node.edges()) {
-        if (frameId <= frameIdToStartNextMove() + edge.rensaHand().framesToIgnite()) {
+        LOG(INFO) << "KOTORI: "
+                  << " frameId=" << frameId
+                  << " frameIdToStartNextMove=" << frameIdToStartNextMove()
+                  << " framesToIgnote=" << edge.rensaHand().framesToIgnite()
+                  << " score=" << edge.rensaHand().score();
+        if (frameIdToStartNextMove() + edge.rensaHand().framesToIgnite() <= frameId) {
             maxScore = std::max(maxScore, edge.rensaHand().score());
         }
     }
