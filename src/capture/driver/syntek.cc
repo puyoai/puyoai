@@ -18,6 +18,10 @@
 const int VENDOR = 0x05e1;
 const int PRODUCT = 0x0408;
 
+DEFINE_int32(capture_brightness, 0x5f,
+             "Capture brightness. 0x5f for usual case. "
+             "Use 0x6f when the video image is split.");
+
 enum {
     SAA711XAUTO0AutomaticChrominanceStandardDetection = 1 << 1,
     SAA711XCSTDPAL_BGDHI   = 0 << 4,
@@ -409,7 +413,7 @@ bool SyntekDriver::initChip()
     }
 
     // brightness
-    if (!writeSAA711XRegister(0x0a, 0x5f))
+    if (!writeSAA711XRegister(0x0a, FLAGS_capture_brightness))
         return false;
     // contrast
     if (!writeSAA711XRegister(0x0b, 0x40))
