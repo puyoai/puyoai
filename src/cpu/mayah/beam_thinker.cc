@@ -27,8 +27,15 @@ struct SearchResult {
 };
 
 struct State {
-    State(const CoreField& field, const Decision& firstDecision, double stateScore, int maxChains) :
-        field(field), firstDecision(firstDecision), stateScore(stateScore), maxChains(maxChains) {}
+    State(const CoreField& field, const Decision& firstDecision, double stateScore, int maxChains,
+          int total_frames) :
+        field(field),
+        firstDecision(firstDecision),
+        stateScore(stateScore),
+        maxChains(maxChains),
+        total_frames(total_frames)
+    {
+    }
 
     friend bool operator<(const State& lhs, const State& rhs) { return lhs.stateScore < rhs.stateScore; }
     friend bool operator>(const State& lhs, const State& rhs) { return lhs.stateScore > rhs.stateScore; }
@@ -37,6 +44,7 @@ struct State {
     Decision firstDecision;
     double stateScore = 0;
     int maxChains = 0;
+    int total_frames = 0;
 };
 
 std::pair<double, int> evalSuperLight(const CoreField& fieldBeforeRensa)
@@ -114,20 +122,24 @@ SearchResult run(const std::vector<State>& initialStates, KumipuyoSeq seq, int m
                 if (!visited.insert(fieldBeforeRensa.hash()).second)
                     return;
 
+                int total_frames = s.total_frames + plan.totalFrames() + FRAMES_PREPARING_NEXT;
+
                 if (plan.isRensaPlan()) {
                     maxOverallFiredScore = std::max(maxOverallFiredScore, plan.rensaResult().score);
                     maxOverallFiredChains = std::max(maxOverallFiredChains, plan.rensaResult().chains);
 
                     maxFiredScore = std::max(maxFiredScore, plan.rensaResult().score);
                     maxFiredRensa = std::max(maxFiredRensa, plan.rensaResult().chains);
-                    nextStates.emplace_back(fieldBeforeRensa, s.firstDecision, plan.rensaResult().chains, plan.rensaResult().chains);
+
+                    nextStates.emplace_back(fieldBeforeRensa, s.firstDecision, plan.rensaResult().chains,
+                                            plan.rensaResult().chains, total_frames);
                     return;
                 }
 
                 double maxScore;
                 int maxChains;
                 std::tie(maxScore, maxChains) = evalSuperLight(fieldBeforeRensa);
-                nextStates.emplace_back(plan.field(), s.firstDecision, maxScore, maxChains);
+                nextStates.emplace_back(plan.field(), s.firstDecision, maxScore, maxChains, total_frames);
             });
         }
 
@@ -196,6 +208,7 @@ SearchResult run(const std::vector<State>& initialStates, KumipuyoSeq seq, int m
 DropDecision BeamThinker::think(int /*frameId*/, const CoreField& field, const KumipuyoSeq& seq,
                                 const PlayerState& /*me*/, const PlayerState& /*enemy*/, bool /*fast*/) const
 {
+    // If large enough, fire.
     if (true) {
         Decision tmpd;
         Plan::iterateAvailablePlans(field, seq, 2, [&](const RefPlan& plan) {
@@ -210,14 +223,15 @@ DropDecision BeamThinker::think(int /*frameId*/, const CoreField& field, const K
     // Make initial states.
     std::vector<State> currentStates;
     Plan::iterateAvailablePlans(field, seq, 1, [&](const RefPlan& plan) {
-        currentStates.emplace_back(plan.field(), plan.firstDecision(), 0, 0);
+        currentStates.emplace_back(plan.field(), plan.firstDecision(), 0, 0, plan.totalFrames());
     });
 
     std::vector<State> nextStates;
     KumipuyoSeq subSeq = seq.subsequence(1);
     for (const auto& s : currentStates) {
         Plan::iterateAvailablePlans(s.field, subSeq, 1, [&](const RefPlan& plan) {
-            nextStates.emplace_back(plan.field(), s.firstDecision, 0, 0);
+            int total_frames = s.total_frames + plan.totalFrames() + FRAMES_PREPARING_NEXT;
+            nextStates.emplace_back(plan.field(), s.firstDecision, 0, 0, total_frames);
         });
     }
 
@@ -263,5 +277,5 @@ DropDecision BeamThinker::think(int /*frameId*/, const CoreField& field, const K
         }
     }
 
-    return DropDecision(d, "");
+    return DropDecision(d, "BY BEAM");
 }
