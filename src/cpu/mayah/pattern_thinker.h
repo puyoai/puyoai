@@ -73,8 +73,7 @@ private:
                                 const PlayerState& me, const PlayerState& enemy,
                                 const MidEvalResult&, const GazeResult&,
                                 const Plan& plan, double rensaScore, double virutalRensaScore,
-                                bool saturated, bool fast, bool usesRensaHandTree,
-                                double thoughtTimeInSeconds) const;
+                                bool saturated, bool fast, bool usesRensaHandTree) const;
 
     const EvaluationParameterMap& evaluationParameterMap_;
     const DecisionBook& decisionBook_;

@@ -53,8 +53,6 @@ ThoughtResult PatternThinker::thinkPlan(int frameId, const CoreField& field, con
     // CHECK(field, me.field);
     // CHECK(kumipuyoSeq, me.kumipuyoSeq);
 
-    double beginTime = currentTime();
-
     LOG(INFO) << "\n" << field.toDebugString() << "\n" << kumipuyoSeq.toString();
     if (VLOG_IS_ON(1)) {
         VLOG(1) << "\n"
@@ -187,20 +185,19 @@ ThoughtResult PatternThinker::thinkPlan(int frameId, const CoreField& field, con
         planner.setSpecifiedDecisions(*specifiedDecisions);
     planner.iterate(frameId, field, kumipuyoSeq, me, enemy, depth);
 
-    double endTime = currentTime();
     if (!ojamaFallen && bestVirtualRensaScore < bestRensaScore) {
         std::string message = makeMessageFrom(frameId, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               bestRensaMidEvalResult, gazeResult,
                                               bestRensaPlan, bestRensaScore, bestVirtualRensaScore,
-                                              true, fast, usesRensaHandTree, endTime - beginTime);
+                                              true, fast, usesRensaHandTree);
         return ThoughtResult(bestRensaPlan, bestRensaScore, bestVirtualRensaScore, bestRensaMidEvalResult, message);
     } else {
         std::string message = makeMessageFrom(frameId, kumipuyoSeq, maxIteration,
                                               me, enemy,
                                               bestMidEvalResult, gazeResult,
                                               bestPlan, bestRensaScore, bestVirtualRensaScore,
-                                              false, fast, usesRensaHandTree, endTime - beginTime);
+                                              false, fast, usesRensaHandTree);
         return ThoughtResult(bestPlan, bestRensaScore, bestVirtualRensaScore, bestMidEvalResult, message);
     }
 }
@@ -264,7 +261,7 @@ std::string PatternThinker::makeMessageFrom(int frameId, const KumipuyoSeq& kumi
                                             const MidEvalResult& midEvalResult,
                                             const GazeResult& gazeResult,
                                             const Plan& plan, double rensaScore, double virtualRensaScore,
-                                            bool saturated, bool fast, bool usesRensaHandTree, double thoughtTimeInSeconds) const
+                                            bool saturated, bool fast, bool usesRensaHandTree) const
 {
     UNUSED_VARIABLE(kumipuyoSeq);
 
@@ -361,27 +358,6 @@ std::string PatternThinker::makeMessageFrom(int frameId, const KumipuyoSeq& kumi
     ss << "HAND_TREE=" << cf.moveScore().feature(STRATEGY_RENSA_TREE);
 
     ss << "\n";
-
-    if (enemy.isRensaOngoing()) {
-        ss << "Gazed (ongoing) : " << enemy.currentRensaResult.score
-           << " in " << (enemy.rensaFinishingFrameId() - frameId) << " / ";
-    } else {
-        ss << "Gazed = "
-           << gazeResult.estimateMaxScore(frameId + refPlan.totalFrames(), enemy)
-           << " in " << refPlan.totalFrames() << " / "
-           << gazeResult.estimateMaxScore(frameId + refPlan.totalFrames() + 100, enemy)
-           << " in " << (refPlan.totalFrames() + 100) << " / "
-           << gazeResult.estimateMaxScore(frameId + refPlan.totalFrames() + 200, enemy)
-           << " in " << (refPlan.totalFrames() + 200) << " / ";
-    }
-
-    ss << "OJAMA: "
-       << "fixed=" << me.fixedOjama << " "
-       << "pending=" << me.pendingOjama << " "
-       << "total=" << me.totalOjama(enemy) << " "
-       << "frameId=" << me.rensaFinishingFrameId() << " / ";
-
-    ss << (thoughtTimeInSeconds * 1000) << " [ms]";
 
     return ss.str();
 }

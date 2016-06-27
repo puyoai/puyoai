@@ -44,7 +44,10 @@ struct State {
     Decision firstDecision;
     double stateScore = 0;
     int maxChains = 0;
+
     int total_frames = 0;
+    int pending_enemy_score = 0;
+    int pending_enemy_ojama_drop_frame = 0;
 };
 
 std::pair<double, int> evalSuperLight(const CoreField& fieldBeforeRensa)

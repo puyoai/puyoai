@@ -17,6 +17,8 @@ public:
     const Decision& decision() const { return decision_; }
     const std::string& message() const { return message_; }
 
+    void setMessage(const std::string& msg) { message_ = msg; }
+
     bool valid() const { return decision_.isValid(); }
 
 private:

@@ -20,9 +20,38 @@ YukinaAI::YukinaAI(int argc, char* argv[]) :
 DropDecision YukinaAI::think(int frame_id, const CoreField& field, const KumipuyoSeq& kumipuyo_seq,
                              const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
+    double beginTimeSec = currentTime();
     DropDecision dd = thinkByThinker(frame_id, field, kumipuyo_seq, me, enemy, fast);
-    if (dd.valid())
+    if (dd.valid()) {
+        double endTimeSec = currentTime();
+        double durationSec = endTimeSec - beginTimeSec;
+
+        const GazeResult& gazeResult = gazer_.gazeResult();
+
+        std::stringstream ss;
+        if (enemy.isRensaOngoing()) {
+            ss << "Gazed (ongoing) : " << enemy.currentRensaResult.score
+               << " in " << (enemy.rensaFinishingFrameId() - frame_id) << " / ";
+        } else {
+            ss << "Gazed = "
+               << gazeResult.estimateMaxFeasibleScore(frame_id + 100, enemy)
+               << " in " << 100 << " / "
+               << gazeResult.estimateMaxFeasibleScore(frame_id + 300, enemy)
+               << " in " << 300 << " / "
+               << gazeResult.estimateMaxFeasibleScore(frame_id + 500, enemy)
+               << " in " << 500 << " / ";
+        }
+
+        ss << "OJAMA: "
+           << "fixed=" << me.fixedOjama << " "
+           << "pending=" << me.pendingOjama << " "
+           << "total=" << me.totalOjama(enemy) << " "
+           << "frameId=" << me.rensaFinishingFrameId() << " / ";
+
+        ss << (durationSec * 1000) << " [ms]";
+        dd.setMessage(dd.message() + "\n" + ss.str());
         return dd;
+    }
 
     // dd is invalid.
     // Rethink by pattern_thinker_ with fast=true.
