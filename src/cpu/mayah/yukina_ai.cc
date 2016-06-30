@@ -72,6 +72,11 @@ DropDecision YukinaAI::thinkByThinker(int frame_id, const CoreField& field, cons
                                        usesDecisionBook, usesRensaHandTree);
     }
 
+    if (field.countPuyos() >= 64) {
+        return pattern_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, gazer_.gazeResult(), fast,
+                                       usesDecisionBook, usesRensaHandTree);
+    }
+
     // Turning the table mode
     if (field.countColor(PuyoColor::OJAMA) >= 16) {
         return rush_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, fast);
@@ -88,7 +93,7 @@ DropDecision YukinaAI::thinkByThinker(int frame_id, const CoreField& field, cons
         }
     }
 
-    if (field.countPuyos() <= 24 || field.countPuyos() >= 64) {
+    if (field.countPuyos() <= 24) {
         return pattern_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, gazer_.gazeResult(), fast,
                                        usesDecisionBook, usesRensaHandTree);
     }
