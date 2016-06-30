@@ -311,6 +311,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     int rensaCounts[20] {};
 
     int sideChainMaxScore = 0;
+    int fastChain4MaxScore = 0;
     int fastChain6MaxScore = 0;
     int fastChain10MaxScore = 0;
     int maxVirtualRensaResultScore = 0;
@@ -391,6 +392,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
         const ColumnPuyoListProbability* cplp = ColumnPuyoListProbability::instanceSlow();
         int necessaryKumipuyos = cplp->necessaryKumipuyos(puyosToComplement);
+        if (necessaryKumipuyos <= 2 && fastChain4MaxScore < rensaResult.score) {
+            fastChain4MaxScore = rensaResult.score;
+        }
         if (necessaryKumipuyos <= 3 && fastChain6MaxScore < rensaResult.score) {
             fastChain6MaxScore = rensaResult.score;
         }
@@ -510,6 +514,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
 #if 1
     // fast chain
+    if (fastChain4MaxScore >= scoreForOjama(18)) {
+        sc_->addScore(KEEP_FAST_4_CHAIN, 1);
+    }
     if (fastChain6MaxScore >= scoreForOjama(18)) {
         sc_->addScore(KEEP_FAST_6_CHAIN, 1);
     }

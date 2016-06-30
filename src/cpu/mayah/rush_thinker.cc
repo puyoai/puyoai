@@ -25,7 +25,6 @@
 DEFINE_int32(max_simulate, 5, "The maximum number to iterate simulations.");
 DEFINE_int32(search_turns, 20, "Maximum turns to search in a simulation");
 DEFINE_int64(time_limit, 150, "Time limit to think. [ms]");
-// DEFINE_int32(beam_width, 400, "Size of recorded states in beam search");
 
 DECLARE_int32(beam_width);
 
@@ -34,16 +33,11 @@ struct SearchState {
     Decision decision;
     int from;
     std::array<int, 3> features;
-    // Fill: [0: # of ojama, 1: expected score, 2: -frames]
     // 2Dub: [0: # of 2dub, 1: # of ojama, 2: expected score]
 };
 
 RushThinker::RushThinker()
 {
-}
-
-bool RushThinker::skipRensaPlan(const RensaResult& result) const {
-    return result.chains > 2 || result.score < 680;
 }
 
 SearchState RushThinker::generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const {
@@ -178,12 +172,7 @@ SearchState RushThinker::search(
             break;
         std::sort(next_states.begin(), next_states.end(),
                   [](const SearchState& a, const SearchState& b) {
-                      if (a.features[0] == b.features[0]) {
-                          if (a.features[1] == b.features[1])
-                              return a.features[2] > b.features[2];
-                          return a.features[1] > b.features[1];
-                      }
-                      return a.features[0] > b.features[0];
+                      return a.features > b.features;
                   });
         if (static_cast<int>(next_states.size()) >= FLAGS_beam_width)
             next_states.erase(next_states.begin() + FLAGS_beam_width, next_states.end());
@@ -196,37 +185,15 @@ SearchState RushThinker::search(
         }
     }
 
-#if RECORD_RANK_LOG
-    int bt = 0;
-    int bi = 0;
-#endif
     SearchState result = q_states[0][0];
     for (int t = 0; t < search_turns; ++t) {
         for (size_t i = 0; i < q_states[t].size(); ++i) {
             const auto& s = q_states[t][i];
             if (shouldUpdateState(result, s)) {
-#if RECORD_RANK_LOG
-                bt = t;
-                bi = i;
-#endif
                 result = s;
             }
         }
     }
-
-#if RECORD_RANK_LOG
-    // Record how the best hand's rank changed.
-    std::vector<int> ranks;
-    for (int t = bt; t > 0; --t) {
-        ranks.push_back(bi);
-        bi = q_states[t][bi].from;
-    }
-    std::reverse(ranks.begin(), ranks.end());
-    std::ostringstream oss;
-    for (int r : ranks)
-        oss << " " << r;
-    std::cerr << "[" << ranks.size() << "]" << oss.str() << "\n";
-#endif
 
     return result;
 }
@@ -244,7 +211,7 @@ void RushThinker::generateNextStates(
             return;
 
         if (plan.isRensaPlan()) {
-            if (th->skipRensaPlan(result))
+            if (result.chains > 2 || result.score < 600)
                 return;
 
             SearchState next = th->generateNextRensaState(field, from, state, plan);

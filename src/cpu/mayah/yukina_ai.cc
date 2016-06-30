@@ -64,6 +64,8 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
 DropDecision YukinaAI::thinkByThinker(int frame_id, const CoreField& field, const KumipuyoSeq& kumipuyo_seq,
                                       const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
+//    return side_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, fast);
+
     const bool usesDecisionBook = true;
     const bool usesRensaHandTree = !fast;
 

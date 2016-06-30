@@ -95,11 +95,13 @@ int GazeResult::estimateMaxScoreFromFeasibleRensas(int frameId) const
     int maxScore = -1;
     const RensaHandNode& node = feasibleRensaHandTree_.node(0);
     for (const auto& edge : node.edges()) {
+#if 0
         LOG(INFO) << "KOTORI: "
                   << " frameId=" << frameId
                   << " frameIdToStartNextMove=" << frameIdToStartNextMove()
                   << " framesToIgnote=" << edge.rensaHand().framesToIgnite()
                   << " score=" << edge.rensaHand().score();
+#endif
         if (frameIdToStartNextMove() + edge.rensaHand().framesToIgnite() <= frameId) {
             maxScore = std::max(maxScore, edge.rensaHand().score());
         }

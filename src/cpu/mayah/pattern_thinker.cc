@@ -18,7 +18,7 @@ PatternThinker::PatternThinker(const EvaluationParameterMap& evaluationParameter
 {
 }
 
-DropDecision PatternThinker::think(int frame_id, const CoreField& f, const KumipuyoSeq& kumipuyo_seq,
+DropDecision PatternThinker::think(int frame_id, const CoreField& field, const KumipuyoSeq& kumipuyo_seq,
                                    const PlayerState& me, const PlayerState& enemy,
                                    const GazeResult& gazeResult, bool fast,
                                    bool usesDecisionBook, bool usesRensaHandTree) const
@@ -33,7 +33,49 @@ DropDecision PatternThinker::think(int frame_id, const CoreField& f, const Kumip
         iteration = DEFAULT_NUM_ITERATION;
     }
 
-    ThoughtResult thoughtResult = thinkPlan(frame_id, f, kumipuyo_seq, me, enemy, depth, iteration, gazeResult, fast, usesDecisionBook, usesRensaHandTree);
+    // tsubushi
+    if (!enemy.isRensaOngoing() || me.totalOjama(enemy) <= 3) {
+        int score1 = gazeResult.estimateMaxScore(frame_id + 60, enemy);
+        int score2 = gazeResult.estimateMaxScore(frame_id + 120, enemy);
+        int score3 = gazeResult.estimateMaxScore(frame_id + 180, enemy);
+        int len = std::min(kumipuyo_seq.size(), 3);
+        Decision d1, d2, d3;
+        int s1 = 0, s2 = 0, s3 = 0;
+        Plan::iterateAvailablePlans(field, kumipuyo_seq, len, [&](const RefPlan& plan) {
+            if (!plan.isRensaPlan())
+                return;
+            if (plan.chains() <= 1 && plan.score() - score1 >= scoreForOjama(12)) {
+                d1 = plan.firstDecision();
+                s1 = plan.score() - score1;
+            }
+            if (plan.chains() <= 2 && plan.score() - score2 > 0 && plan.score() >= scoreForOjama(15)) {
+                d2 = plan.firstDecision();
+                s2 = plan.score() - score2;
+            }
+            if (plan.chains() <= 3 && plan.score() - score3 > 0 && plan.score() >= scoreForOjama(30)) {
+                d3 = plan.firstDecision();
+                s3 = plan.score() - score3;
+            }
+        });
+
+        LOG(INFO) << "KOTORI:"
+                  << " len=" << len
+                  << " s1=" << s1 << " score1=" << score1
+                  << " s2=" << s2 << " score2=" << score2
+                  << " s3=" << s3 << " score3=" << score3;
+
+        if (d1.isValid()) {
+            return DropDecision(d1, "TSUBUSHI (1)");
+        }
+        if (d2.isValid()) {
+            return DropDecision(d2, "TSUBUSHI (2)");
+        }
+        if (d3.isValid()) {
+            return DropDecision(d3, "TSUBUSHI (3)");
+        }
+    }
+
+    ThoughtResult thoughtResult = thinkPlan(frame_id, field, kumipuyo_seq, me, enemy, depth, iteration, gazeResult, fast, usesDecisionBook, usesRensaHandTree);
 
     const Plan& plan = thoughtResult.plan;
     if (plan.decisions().empty())

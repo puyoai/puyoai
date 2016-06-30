@@ -25,7 +25,6 @@ private:
                             std::unordered_set<std::uint64_t>& visited,
                             std::vector<SearchState>& states) const;
 
-    bool skipRensaPlan(const RensaResult& result) const;
     SearchState generateNextRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan) const;
     SearchState generateNextNonRensaState(const CoreField& field, int from, const SearchState& state, const RefPlan& plan, int expect) const;
     bool shouldUpdateState(const SearchState& orig, const SearchState& res) const;

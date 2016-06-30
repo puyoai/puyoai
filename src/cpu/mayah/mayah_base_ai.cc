@@ -26,6 +26,7 @@ MayahBaseAI::MayahBaseAI(int argc, char* argv[], const char* name, std::unique_p
                                               patternBook_,
                                               executor_.get()));
     rush_thinker_.reset(new RushThinker);
+    side_thinker_.reset(new SideThinker);
 
     google::FlushLogFiles(google::GLOG_INFO);
 }
