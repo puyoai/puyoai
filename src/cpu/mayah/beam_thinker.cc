@@ -15,7 +15,7 @@
 
 DEFINE_int32(beam_width, 400, "beam width");
 DEFINE_int32(beam_depth, 50, "beam depth");
-DEFINE_int32(beam_num, 28, "beam iteration number");
+DEFINE_int32(beam_num, 12, "beam iteration number");
 
 using namespace std;
 

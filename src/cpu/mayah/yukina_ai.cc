@@ -23,7 +23,7 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
     const GazeResult& gazeResult = gazer_.gazeResult();
 
     // tsubushi
-    if (!enemy.isRensaOngoing() || me.totalOjama(enemy) <= 3) {
+    if (!enemy.isRensaOngoing()) {
         int len = std::min(kumipuyo_seq.size(), 3);
         Decision d[3] {};
         int s[3] {};
@@ -42,8 +42,7 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
             if (plan.chains() <= 3 && plan.score() - enemy_score >= scoreForOjama(6) && plan.score() >= scoreForOjama(21)) {
                 update = true;
             }
-
-            if (plan.chains() <= 4 && !enemy.isRensaOngoing() && enemy.field.countColorPuyos() <= 18) {
+            if (plan.chains() <= 4 && enemy.field.countColorPuyos() <= 18) {
                 if (plan.score() - enemy_score >= scoreForOjama(60) && enemy_score <= scoreForOjama(60)) {
                     update = true;
                 }

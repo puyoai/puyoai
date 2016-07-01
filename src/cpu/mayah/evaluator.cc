@@ -501,7 +501,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     // max chain
     sc_->addScore(RENSA_KIND, rensaCounts[maxChain]);
 
-#if 0
+#if 1
     // side chain
     if (sideChainMaxScore >= scoreForOjama(21)) {
         sc_->addScore(HOLDING_SIDE_CHAIN_LARGE, 1);
@@ -514,6 +514,9 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
 
 #if 1
     // fast chain
+    if (fastChain6MaxScore >= gazeResult.estimateMaxScore(currentFrameId + NUM_FRAMES_OF_ONE_HAND * 3, enemy)) {
+        sc_->addScore(KEEP_FAST_LARGER_THEN_ENEMY, 1);
+    }
     if (fastChain4MaxScore >= scoreForOjama(18)) {
         sc_->addScore(KEEP_FAST_4_CHAIN, 1);
     }
@@ -521,6 +524,17 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
         sc_->addScore(KEEP_FAST_6_CHAIN, 1);
     }
     if (fastChain10MaxScore >= scoreForOjama(30)) {
+        sc_->addScore(KEEP_FAST_10_CHAIN, 1);
+    }
+#endif
+#if 0
+   if (fastChain4MaxScore >= gazeResult.estimateMaxScore(currentFrameId + NUM_FRAMES_OF_ONE_HAND * 2, enemy)) {
+        sc_->addScore(KEEP_FAST_4_CHAIN, 1);
+    }
+    if (fastChain6MaxScore >= gazeResult.estimateMaxScore(currentFrameId + NUM_FRAMES_OF_ONE_HAND * 3, enemy)) {
+        sc_->addScore(KEEP_FAST_6_CHAIN, 1);
+    }
+    if (fastChain10MaxScore >= gazeResult.estimateMaxScore(currentFrameId + NUM_FRAMES_OF_ONE_HAND * 5, enemy)) {
         sc_->addScore(KEEP_FAST_10_CHAIN, 1);
     }
 #endif

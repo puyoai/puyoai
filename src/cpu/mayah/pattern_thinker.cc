@@ -344,6 +344,16 @@ std::string PatternThinker::makeMessageFrom(int frameId, const KumipuyoSeq& kumi
     }
     ss << " / ";
 
+    if (cf.moveScore().feature(KEEP_FAST_LARGER_THEN_ENEMY) > 0) {
+        ss << "FAST_LARGE=OK / ";
+    } else {
+        ss << "FAST_LARGE=NG / ";
+    }
+    if (cf.moveScore().feature(KEEP_FAST_4_CHAIN) > 0) {
+        ss << "FAST4=OK / ";
+    } else {
+        ss << "FAST4=NG / ";
+    }
     if (cf.moveScore().feature(KEEP_FAST_6_CHAIN) > 0) {
         ss << "FAST6=OK / ";
     } else {
