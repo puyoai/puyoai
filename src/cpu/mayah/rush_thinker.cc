@@ -73,29 +73,21 @@ bool RushThinker::shouldUpdateState(const SearchState& orig, const SearchState& 
 
 DropDecision RushThinker::think(int frame_id, const CoreField& field, const KumipuyoSeq& seq,
                                 const PlayerState& /*me*/, const PlayerState& /*enemy*/, bool /*fast*/) const {
-    Decision d[4];
-    int maxScore2 = 1000, maxScore3 = 1000;
-    auto callback = [&](const RefPlan& plan) {
-        size_t d_size = plan.decisionSize();
-        if (d_size >= 3) {
-            d_size = 2;
-        }
 
-        if (plan.chains() == 2 && plan.score() > maxScore2) {
-            d[d_size] = plan.firstDecision();
-            maxScore2 = plan.score();
-        }
+    // Fire if possible.
+    if (true) {
+        Decision d;
+        int fastest_fire_frames = 1000;
+        auto callback = [&](const RefPlan& plan) {
+            if (plan.totalFrames() < fastest_fire_frames && plan.score() > 1000) {
+                d = plan.firstDecision();
+                fastest_fire_frames = plan.totalFrames();
+            }
+        };
+        Plan::iterateAvailablePlans(field, seq, std::min(3, seq.size()), callback);
 
-        if (plan.chains() > 2 && plan.score() > maxScore3) {
-            d[d_size] = plan.firstDecision();
-            maxScore3 = plan.score();
-        }
-    };
-    Plan::iterateAvailablePlans(field, seq, 2, callback);
-
-    for (size_t i = 0; i < 4; ++i) {
-        if (d[i].isValid()) {
-            return DropDecision(d[i], "FIRE!");
+        if (d.isValid()) {
+            return DropDecision(d, "FIRE!");
         }
     }
 

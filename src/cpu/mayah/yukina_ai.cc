@@ -43,7 +43,7 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
                 update = true;
             }
 
-            if (plan.chains() <= 4 && !enemy.isRensaOngoing()) {
+            if (plan.chains() <= 4 && !enemy.isRensaOngoing() && enemy.field.countColorPuyos() <= 18) {
                 if (plan.score() - enemy_score >= scoreForOjama(60) && enemy_score <= scoreForOjama(60)) {
                     update = true;
                 }
@@ -68,6 +68,25 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
             }
         }
     }
+
+    // TAIOU
+#if 0
+    if (true) {
+        int len = std::min(kumipuyo_seq.size(), 3);
+        Decision d[3] {};
+        int s[3] {};
+        Plan::iterateAvailablePlans(field, kumipuyo_seq, len, [&](const RefPlan& plan) {
+    if (enemy.isRensaOngogin() && me.totalOjama(enemy) >= 3) {
+        if (plan.score() >= scoreForOjama(std::max(0, me.totalOjama(enemy) - 3))) {
+
+            sc_->addScore(STRATEGY_TAIOU, 1.0);
+            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+            return;
+        }
+    }
+    }
+#endif
+
 
     double beginTimeSec = currentTime();
     DropDecision dd = thinkByThinker(frame_id, field, kumipuyo_seq, me, enemy, fast);
@@ -118,7 +137,9 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
 DropDecision YukinaAI::thinkByThinker(int frame_id, const CoreField& field, const KumipuyoSeq& kumipuyo_seq,
                                       const PlayerState& me, const PlayerState& enemy, bool fast) const
 {
-//    return side_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, fast);
+#if 0
+    return rush_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, fast);
+#endif
 
     const bool usesDecisionBook = true;
     const bool usesRensaHandTree = !fast;

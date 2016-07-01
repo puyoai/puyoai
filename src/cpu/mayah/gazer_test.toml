@@ -1,0 +1,26 @@
+name = "gazer test"
+
+[me]
+field = [
+    "..Y...",
+    "..Y...",
+    "RRBYY.",
+    "BBYGG.",
+]
+next = "RBYGGB"
+
+[enemy]
+field = [
+    "......",
+    "......",
+    "......",
+    "......",
+    "......",
+    "......",
+]
+next = "RRBBYY"
+
+[answer]
+answers = [
+    [1, 1]
+]

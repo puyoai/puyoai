@@ -14,7 +14,7 @@
 #include <iostream>
 
 DEFINE_int32(beam_width, 400, "beam width");
-DEFINE_int32(beam_depth, 40, "beam depth");
+DEFINE_int32(beam_depth, 50, "beam depth");
 DEFINE_int32(beam_num, 28, "beam iteration number");
 
 using namespace std;
@@ -244,7 +244,7 @@ DropDecision BeamThinker::think(int /*frameId*/, const CoreField& field, const K
     WaitGroup wg;
     std::mutex mu;
 
-    const int maxSearchTurns = std::max(5, min(FLAGS_beam_depth, std::max(seq.size(), (72 - field.countPuyos()) / 2)));
+    const int maxSearchTurns = std::min(FLAGS_beam_depth, (78 - field.countPuyos()) / 2 + 4);
 #if 0
     cout << "maxSearchTurns = " << maxSearchTurns << endl;
 #endif

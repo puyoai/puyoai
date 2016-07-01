@@ -76,7 +76,9 @@ RensaHandTree RensaHandTree::makeTree(int restIteration,
 
         RensaHandNodeMaker maker(restIteration, wholeKumipuyoSeq);
         auto callback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
-            return maker.add(std::move(cf), puyosToComplement, usedPuyoMoveFrames + dropFrames, usedPuyoSet);
+            int frames = usedPuyoMoveFrames + dropFrames;
+            // frames += static_cast<int>(ColumnPuyoListProbability::instanceSlow()->necessaryKumipuyos(puyosToComplement) * NUM_FRAMES_OF_ONE_HAND / 2);
+            return maker.add(std::move(cf), puyosToComplement, frames, usedPuyoSet);
         };
         RensaDetector::detectIteratively(field, RensaDetectorStrategy::defaultDropStrategy(), 3, callback);
         nodes[ojamaLines] = maker.makeNode();
