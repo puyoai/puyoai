@@ -73,25 +73,31 @@ bool RushThinker::shouldUpdateState(const SearchState& orig, const SearchState& 
 
 DropDecision RushThinker::think(int frame_id, const CoreField& field, const KumipuyoSeq& seq,
                                 const PlayerState& /*me*/, const PlayerState& /*enemy*/, bool /*fast*/) const {
-    Decision d2, d3;
+    Decision d[4];
     int maxScore2 = 1000, maxScore3 = 1000;
     auto callback = [&](const RefPlan& plan) {
+        size_t d_size = plan.decisionSize();
+        if (d_size >= 3) {
+            d_size = 2;
+        }
+
         if (plan.chains() == 2 && plan.score() > maxScore2) {
-            d2 = plan.firstDecision();
+            d[d_size] = plan.firstDecision();
             maxScore2 = plan.score();
         }
 
         if (plan.chains() > 2 && plan.score() > maxScore3) {
-            d3 = plan.firstDecision();
+            d[d_size] = plan.firstDecision();
             maxScore3 = plan.score();
         }
     };
     Plan::iterateAvailablePlans(field, seq, 2, callback);
 
-    if (d2.isValid())
-        return DropDecision(d2, "Fire 2DUB!");
-    if (d3.isValid())
-        return DropDecision(d3, "Fire!");
+    for (size_t i = 0; i < 4; ++i) {
+        if (d[i].isValid()) {
+            return DropDecision(d[i], "FIRE!");
+        }
+    }
 
     std::int64_t start_time = currentTimeInMillis();
     std::int64_t now = start_time;
