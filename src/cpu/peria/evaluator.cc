@@ -69,7 +69,7 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
     score += value;
   }
 
-  if (false) {  // Evaluate possible rensa.
+  if (true) {  // Evaluate possible rensa.
     int value = Future(field) / 10;
     oss << "Future(" << value << ")_";
     score += value;

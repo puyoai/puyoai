@@ -101,13 +101,13 @@ int DynamicPatternBook::iteratePatterns(const CoreField& field, std::string* bes
     RensaResult rensaResult = field.simulate(&tracker);
     const VanishingPositionTrackerResult& result = tracker.result();
     DCHECK_EQ(result.size(), rensaResult.chains);
-    
+
     std::string name;
     int score = 0;
     for (int i = 1; i <= rensaResult.chains; ++i) {
       FieldBits bits = result.getBasePuyosAt(i);
       DCHECK(!bits.isEmpty());
-      
+
       auto it = book().find(bits);
       if (it == book().end()) {
         return;
@@ -115,8 +115,7 @@ int DynamicPatternBook::iteratePatterns(const CoreField& field, std::string* bes
 
       const DynamicPattern& pattern = it->second;
       score += pattern.score;
-      if (!pattern.name.empty())
-        name = pattern.name;
+      name += pattern.name;
     }
 
     if (score > best_score) {
