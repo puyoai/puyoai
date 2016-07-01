@@ -64,7 +64,7 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
 
         for (size_t i = 0; i < 3; ++i) {
             if (d[i].isValid()) {
-                return DropDecision(d[i], "TSUBUSHI");
+                return DropDecision(d[i], "TSUBUSHI\n" + gazeMessage(frame_id, me, enemy, gazeResult));
             }
         }
     }
@@ -76,17 +76,17 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
         Decision d[3] {};
         int s[3] {};
         Plan::iterateAvailablePlans(field, kumipuyo_seq, len, [&](const RefPlan& plan) {
-    if (enemy.isRensaOngogin() && me.totalOjama(enemy) >= 3) {
-        if (plan.score() >= scoreForOjama(std::max(0, me.totalOjama(enemy) - 3))) {
+                if (enemy.isRensaOngogin() && me.totalOjama(enemy) >= 3) {
+                    if (plan.score() >= scoreForOjama(std::max(0, me.totalOjama(enemy) - 3))) {
 
-            sc_->addScore(STRATEGY_TAIOU, 1.0);
-            sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
-            return;
-        }
-    }
-    }
+                        sc_->addScore(STRATEGY_TAIOU, 1.0);
+                        sc_->addScore(STRATEGY_FRAMES, plan.totalFrames());
+                        return;
+                    }
+                }
+            }
+   }
 #endif
-
 
     double beginTimeSec = currentTime();
     DropDecision dd = thinkByThinker(frame_id, field, kumipuyo_seq, me, enemy, fast);
@@ -95,34 +95,8 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
         double durationSec = endTimeSec - beginTimeSec;
 
         std::stringstream ss;
-        if (enemy.isRensaOngoing()) {
-            ss << "Gazed (ongoing) : " << enemy.currentRensaResult.score
-               << " in " << (enemy.rensaFinishingFrameId() - frame_id) << " / ";
-        } else {
-            ss << "Gazed (feasible) = "
-               << gazeResult.estimateMaxFeasibleScore(frame_id + 100, enemy)
-               << " in " << 100 << " / "
-               << gazeResult.estimateMaxFeasibleScore(frame_id + 300, enemy)
-               << " in " << 300 << " / "
-               << gazeResult.estimateMaxFeasibleScore(frame_id + 500, enemy)
-               << " in " << 500 << endl;
-            ss << "Gazed (possible) = "
-               << gazeResult.estimateMaxScore(frame_id + 100, enemy)
-               << " in " << 100 << " / "
-               << gazeResult.estimateMaxScore(frame_id + 300, enemy)
-               << " in " << 300 << " / "
-               << gazeResult.estimateMaxScore(frame_id + 500, enemy)
-               << " in " << 500 << endl;
-        }
-
-        ss << "OJAMA: "
-           << "fixed=" << me.fixedOjama << " "
-           << "pending=" << me.pendingOjama << " "
-           << "total=" << me.totalOjama(enemy) << " "
-           << "frameId=" << me.rensaFinishingFrameId() << " / ";
-
         ss << (durationSec * 1000) << " [ms]";
-        dd.setMessage(dd.message() + "\n" + ss.str());
+        dd.setMessage(dd.message() + "\n" + gazeMessage(frame_id, me, enemy, gazeResult) + ss.str());
         return dd;
     }
 
@@ -145,9 +119,11 @@ DropDecision YukinaAI::thinkByThinker(int frame_id, const CoreField& field, cons
     const bool usesRensaHandTree = !fast;
 
     if (enemy.isRensaOngoing()) {
+#if 0
         if (enemy.rensaFinishingFrameId() - frame_id > 60 * 4 && field.countPuyos() < 64) {
             return beam_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, fast);
         }
+#endif
         return pattern_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, gazer_.gazeResult(), fast,
                                        usesDecisionBook, usesRensaHandTree);
     }
@@ -179,4 +155,36 @@ DropDecision YukinaAI::thinkByThinker(int frame_id, const CoreField& field, cons
     }
 
     return beam_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, fast);
+}
+
+std::string YukinaAI::gazeMessage(int frame_id, const PlayerState& me, const PlayerState& enemy, const GazeResult& gazeResult) const
+{
+    std::stringstream ss;
+    if (enemy.isRensaOngoing()) {
+        ss << "Gazed (ongoing) : " << enemy.currentRensaResult.score
+           << " in " << (enemy.rensaFinishingFrameId() - frame_id) << " / ";
+    } else {
+        ss << "Gazed (feasible) = "
+           << gazeResult.estimateMaxFeasibleScore(frame_id + 100, enemy)
+           << " in " << 100 << " / "
+           << gazeResult.estimateMaxFeasibleScore(frame_id + 300, enemy)
+           << " in " << 300 << " / "
+           << gazeResult.estimateMaxFeasibleScore(frame_id + 500, enemy)
+           << " in " << 500 << endl;
+        ss << "Gazed (possible) = "
+           << gazeResult.estimateMaxScore(frame_id + 100, enemy)
+           << " in " << 100 << " / "
+           << gazeResult.estimateMaxScore(frame_id + 300, enemy)
+           << " in " << 300 << " / "
+           << gazeResult.estimateMaxScore(frame_id + 500, enemy)
+           << " in " << 500 << endl;
+        }
+
+    ss << "OJAMA: "
+       << "fixed=" << me.fixedOjama << " "
+       << "pending=" << me.pendingOjama << " "
+       << "total=" << me.totalOjama(enemy) << " "
+       << "frameId=" << me.rensaFinishingFrameId() << " / ";
+
+    return ss.str();
 }

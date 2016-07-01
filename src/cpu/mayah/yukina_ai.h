@@ -18,6 +18,8 @@ public:
                                 const PlayerState& me, const PlayerState& enemy, bool fast) const;
 
 private:
+    std::string gazeMessage(int frame_id, const PlayerState& me, const PlayerState& enemy, const GazeResult& gazeResult) const;
+
     mutable std::mutex mu_; // for cout
 };
 

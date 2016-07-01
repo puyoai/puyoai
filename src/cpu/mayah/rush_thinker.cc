@@ -76,16 +76,26 @@ DropDecision RushThinker::think(int frame_id, const CoreField& field, const Kumi
 
     // Fire if possible.
     if (true) {
+        Decision zenkeshi_d;
+        int zenkeshi_frames = 100000;
         Decision d;
-        int fastest_fire_frames = 1000;
+        int fastest_fire_frames = 100000;
         auto callback = [&](const RefPlan& plan) {
             if (plan.totalFrames() < fastest_fire_frames && plan.score() > 1000) {
                 d = plan.firstDecision();
                 fastest_fire_frames = plan.totalFrames();
             }
+
+            if (plan.field().isZenkeshi() && plan.totalFrames() < zenkeshi_frames) {
+                zenkeshi_d = plan.firstDecision();
+                zenkeshi_frames = plan.totalFrames();
+            }
         };
         Plan::iterateAvailablePlans(field, seq, std::min(3, seq.size()), callback);
 
+        if (zenkeshi_d.isValid()) {
+            return DropDecision(zenkeshi_d, "ZENKESHI FIRE!");
+        }
         if (d.isValid()) {
             return DropDecision(d, "FIRE!");
         }
