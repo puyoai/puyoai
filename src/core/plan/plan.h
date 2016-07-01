@@ -39,6 +39,7 @@ public:
     const Decision& firstDecision() const { return decisions_[0]; }
     const Decision& decision(int nth) const { return decisions_[nth]; }
     const std::vector<Decision>& decisions() const { return decisions_; }
+    size_t decisionSize() const { return decisions_.size(); }
 
     const RensaResult& rensaResult() const { return rensaResult_; }
     int framesToIgnite() const { return framesToIgnite_; }
@@ -102,6 +103,7 @@ public:
     const std::vector<Decision>& decisions() const { return decisions_; }
     const Decision& decision(int nth) const { return decisions_[nth]; }
     const Decision& firstDecision() const { return decision(0); }
+    size_t decisionSize() const { return decisions_.size(); }
     const RensaResult& rensaResult() const { return rensaResult_; }
 
     int chains() const { return rensaResult_.chains; }

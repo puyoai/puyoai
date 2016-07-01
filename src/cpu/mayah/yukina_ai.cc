@@ -33,13 +33,20 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
             ss << "Gazed (ongoing) : " << enemy.currentRensaResult.score
                << " in " << (enemy.rensaFinishingFrameId() - frame_id) << " / ";
         } else {
-            ss << "Gazed = "
+            ss << "Gazed (feasible) = "
                << gazeResult.estimateMaxFeasibleScore(frame_id + 100, enemy)
                << " in " << 100 << " / "
                << gazeResult.estimateMaxFeasibleScore(frame_id + 300, enemy)
                << " in " << 300 << " / "
                << gazeResult.estimateMaxFeasibleScore(frame_id + 500, enemy)
-               << " in " << 500 << " / ";
+               << " in " << 500 << endl;
+            ss << "Gazed (possible) = "
+               << gazeResult.estimateMaxScore(frame_id + 100, enemy)
+               << " in " << 100 << " / "
+               << gazeResult.estimateMaxScore(frame_id + 300, enemy)
+               << " in " << 300 << " / "
+               << gazeResult.estimateMaxScore(frame_id + 500, enemy)
+               << " in " << 500 << endl;
         }
 
         ss << "OJAMA: "

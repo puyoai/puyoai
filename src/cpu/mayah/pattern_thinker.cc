@@ -35,43 +35,46 @@ DropDecision PatternThinker::think(int frame_id, const CoreField& field, const K
 
     // tsubushi
     if (!enemy.isRensaOngoing() || me.totalOjama(enemy) <= 3) {
-        int score1 = gazeResult.estimateMaxScore(frame_id + 60, enemy);
-        int score2 = gazeResult.estimateMaxScore(frame_id + 120, enemy);
-        int score3 = gazeResult.estimateMaxScore(frame_id + 180, enemy);
         int len = std::min(kumipuyo_seq.size(), 3);
-        Decision d1, d2, d3;
-        int s1 = 0, s2 = 0, s3 = 0;
+        Decision d[3] {};
+        int s[3] {};
         Plan::iterateAvailablePlans(field, kumipuyo_seq, len, [&](const RefPlan& plan) {
             if (!plan.isRensaPlan())
                 return;
-            if (plan.chains() <= 1 && plan.score() - score1 >= scoreForOjama(12)) {
-                d1 = plan.firstDecision();
-                s1 = plan.score() - score1;
+
+            int enemy_score = gazeResult.estimateMaxScore(frame_id + plan.totalFrames(), enemy);
+            bool update = false;
+            if (plan.chains() <= 1 && plan.score() - enemy_score >= scoreForOjama(12)) {
+                update = true;
             }
-            if (plan.chains() <= 2 && plan.score() - score2 > 0 && plan.score() >= scoreForOjama(15)) {
-                d2 = plan.firstDecision();
-                s2 = plan.score() - score2;
+            if (plan.chains() <= 2 && plan.score() - enemy_score >= 0 && plan.score() >= scoreForOjama(15)) {
+                update = true;
             }
-            if (plan.chains() <= 3 && plan.score() - score3 > 0 && plan.score() >= scoreForOjama(30)) {
-                d3 = plan.firstDecision();
-                s3 = plan.score() - score3;
+            if (plan.chains() <= 3 && plan.score() - enemy_score >= 0 && plan.score() >= scoreForOjama(30)) {
+                update = true;
+            }
+
+            if (plan.score() - enemy_score >= scoreForOjama(60) && enemy_score <= scoreForOjama(60)) {
+                update = true;
+            }
+
+            if (update) {
+                size_t size = plan.decisionSize();
+                if (size > 0) { size -= 1; }
+                if (size >= 3) { size = 2; }
+
+                int diff_score = plan.score() - enemy_score;
+                if (s[size] < diff_score) {
+                    s[size] = diff_score;
+                    d[size] = plan.firstDecision();
+                }
             }
         });
 
-        LOG(INFO) << "KOTORI:"
-                  << " len=" << len
-                  << " s1=" << s1 << " score1=" << score1
-                  << " s2=" << s2 << " score2=" << score2
-                  << " s3=" << s3 << " score3=" << score3;
-
-        if (d1.isValid()) {
-            return DropDecision(d1, "TSUBUSHI (1)");
-        }
-        if (d2.isValid()) {
-            return DropDecision(d2, "TSUBUSHI (2)");
-        }
-        if (d3.isValid()) {
-            return DropDecision(d3, "TSUBUSHI (3)");
+        for (size_t i = 0; i < 3; ++i) {
+            if (d[i].isValid()) {
+                return DropDecision(d[i], "TSUBUSHI");
+            }
         }
     }
 
