@@ -30,8 +30,8 @@ class Ai : public ::AI {
                              bool fast) const override;
 
   virtual void onGroundedForEnemy(const FrameRequest& frame_request) override;
-  
-  static void IterationCallback(int step, int start_frame, Attack attack, const KumipuyoSeq& next, Evaluator& evaluator, const RefPlan& plan);
+
+  static void IterationCallback(int step, int start_frame, PlayerState me, PlayerState enemy, const KumipuyoSeq& next, Evaluator& evaluator, const RefPlan& plan);
 
   PlayerHands enemy_hands_;
 };
