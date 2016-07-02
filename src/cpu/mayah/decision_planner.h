@@ -60,7 +60,7 @@ private:
 
      // callback: void (const CoreField&, const Decision&, bool isChigiri, int dropFrames);
     template<typename Callback>
-    void iterateKumipuyoDrop(int currentDepth, const CoreField& currentField, const Kumipuyo& kumipuyo, Callback callback);
+    void iterateKumipuyoDrop(int currentDepth, const CoreField& currentField, const Kumipuyo& kumipuyo, bool first, Callback callback);
 
     Executor* executor_;
     std::vector<Decision> decisions_;
@@ -119,6 +119,7 @@ template<typename Callback>
 void DecisionPlanner<MidEvaluationResult>::iterateKumipuyoDrop(int currentDepth,
                                                                const CoreField& currentField,
                                                                const Kumipuyo& kumipuyo,
+                                                               bool first,
                                                                Callback callback)
 {
     static const Decision DECISIONS[] = {
@@ -155,6 +156,9 @@ void DecisionPlanner<MidEvaluationResult>::iterateKumipuyoDrop(int currentDepth,
 
         bool isChigiri = currentField.isChigiriDecision(decision);
         int dropFrames = currentField.framesToDropNext(decision);
+        if (!first) {
+            dropFrames += FRAMES_PREPARING_NEXT;
+        }
 
         callback(std::move(nextField), decision, isChigiri, dropFrames);
     }
@@ -235,7 +239,7 @@ void DecisionPlanner<MidEvaluationResult>::iterateRest(int initialFrameId,
         }
     };
 
-    iterateKumipuyoDrop(currentDepth, currentField, kumipuyoSeq.get(currentDepth), f);
+    iterateKumipuyoDrop(currentDepth, currentField, kumipuyoSeq.get(currentDepth), false, f);
 }
 
 template <typename MidEvaluationResult>
@@ -313,7 +317,7 @@ void DecisionPlanner<MidEvaluationResult>::iterate(int initialFrameId,
 
     };
 
-    iterateKumipuyoDrop(0, originalField, kumipuyoSeq.get(0), f);
+    iterateKumipuyoDrop(0, originalField, kumipuyoSeq.get(0), true, f);
     wg.waitUntilDone();
 }
 

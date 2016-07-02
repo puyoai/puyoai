@@ -100,6 +100,9 @@ void iterateAvailablePlansInternal(const CoreField& field,
 
         bool isChigiri = field.isChigiriDecision(decision);
         int dropFrames = field.framesToDropNext(decision);
+        if (totalFrames != 0) { // is not first?
+            dropFrames += FRAMES_PREPARING_NEXT;
+        }
 
         decisions.push_back(decision);
         for (int i = 0; i < n; ++i) {

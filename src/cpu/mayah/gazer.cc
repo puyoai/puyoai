@@ -111,7 +111,7 @@ int GazeResult::estimateMaxScoreFromPossibleRensas(int frameId) const
     int maxScore = -1;
     const RensaHandNode& node = possibleRensaHandTree_.node(0);
     for (const auto& edge : node.edges()) {
-        int restFrames = frameId - frameIdToStartNextMove() + edge.rensaHand().framesToIgnite();
+        int restFrames = frameId - (frameIdToStartNextMove() + edge.rensaHand().framesToIgnite());
         if (restFrames < 0)
             continue;
 
@@ -170,7 +170,8 @@ void Gazer::initialize(int frameIdGameWillBegin)
 
 void Gazer::gaze(int frameId, const CoreField& originalField, const KumipuyoSeq& kumipuyoSeq)
 {
-    LOG(INFO) << "Gaze: \n" << originalField.toDebugString() << "\nSeq: " << kumipuyoSeq.toString();
+    LOG(INFO) << "Gaze: frame_id=" << frameId << "\n"
+              << originalField.toDebugString() << "\nSeq: " << kumipuyoSeq.toString();
 
     int numReachableSpaces = originalField.countConnectedPuyos(3, 12);
     gazeResult_.reset(frameId, numReachableSpaces);

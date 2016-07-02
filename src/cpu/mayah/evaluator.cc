@@ -501,7 +501,7 @@ void Evaluator<ScoreCollector>::eval(const RefPlan& plan,
     // max chain
     sc_->addScore(RENSA_KIND, rensaCounts[maxChain]);
 
-#if 1
+#if 0
     // side chain
     if (sideChainMaxScore >= scoreForOjama(21)) {
         sc_->addScore(HOLDING_SIDE_CHAIN_LARGE, 1);
