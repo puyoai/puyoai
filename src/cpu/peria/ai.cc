@@ -30,8 +30,8 @@ Ai::~Ai() {}
 DropDecision Ai::think(int frame_id,
                        const CoreField& field,
                        const KumipuyoSeq& seq,
-                       const PlayerState& my_state,
-                       const PlayerState& enemy_state,
+                       const PlayerState& me,
+                       const PlayerState& enemy,
                        bool fast) const {
   UNUSED_VARIABLE(fast);
 
@@ -40,10 +40,19 @@ DropDecision Ai::think(int frame_id,
   control.message = "No choice";
   control.score = 0;
 
-  Evaluator evaluator(my_state, enemy_state, enemy_hands_, &control);
+  Evaluator evaluator(me, enemy, enemy_hands_, &control);
 
+  // if enemy is firing a rensa, we use its after state.
+  PlayerState enemy2(enemy);
+  if (enemy2.isRensaOngoing()) {
+    if (enemy2.hasZenkeshi)
+      enemy2.unusedScore += ZENKESHI_BONUS;
+    enemy2.hasZenkeshi = enemy2.field.isZenkeshi();
+    enemy2.unusedScore += enemy2.currentRensaResult.score;
+    enemy2.currentRensaResult.score = 0;
+  }
   auto callback = std::bind(IterationCallback,
-                            0, frame_id, my_state, enemy_state, seq.subsequence(1),
+                            0, frame_id, me, enemy2, seq.subsequence(1),
                             evaluator, std::placeholders::_1);
 
   std::int64_t start_ms = currentTimeInMillis();
@@ -91,6 +100,21 @@ void Ai::onGroundedForEnemy(const FrameRequest& frame_request) {
       });
 }
 
+namespace {
+
+int simulateOjama(int score, CoreField& field) {
+  int ojama = std::min(score / 70, 5 * 6);
+  field.fallOjama(ojama / 6);
+  int x[] = {1,2,3,4,5,6};
+  std::random_shuffle(x, x + 6);
+  for (int i = 0; i < ojama % 6; ++i) {
+    field.dropPuyoOn(x[i], PuyoColor::OJAMA);
+  }
+  return score - ojama * 70;
+}
+
+}
+
 // static
 void Ai::IterationCallback(int step, int start_frame, PlayerState me, PlayerState enemy,
                            const KumipuyoSeq& next, Evaluator& evaluator, const RefPlan& plan) {
@@ -101,25 +125,20 @@ void Ai::IterationCallback(int step, int start_frame, PlayerState me, PlayerStat
       me.unusedScore += ZENKESHI_BONUS;
     me.hasZenkeshi = me.field.isZenkeshi();
     me.currentRensaResult = plan.rensaResult();
+    me.unusedScore += me.currentRensaResult.score;
+    me.currentRensaResult.score = 0;
   }
 
-  int sending_ojama = 0;
-  if (enemy.isRensaOngoing() &&
-      start_frame <= enemy.rensaFinishingFrameId() &&
-      enemy.rensaFinishingFrameId() < end_frame) {
-    sending_ojama = enemy.totalOjama(me) - me.totalOjama(enemy);
+  if (me.unusedScore - enemy.unusedScore) {
+    me.unusedScore -= enemy.unusedScore;
+    enemy.unusedScore = 0;
+    me.unusedScore -= simulateOjama(me.unusedScore, enemy.field);
   } else {
-    sending_ojama = enemy.totalOjama(me);
-  }
-
-  // TODO: Simulate ojama falls at most 5 lines at once.
-  if (sending_ojama < 0) {
-    int ojama = -sending_ojama;
-    me.field.fallOjama(ojama / 6);
-    int x[] = {1,2,3,4,5,6};
-    std::random_shuffle(x, x + 6);
-    for (int i = 0; i < ojama % 6; ++i)
-      me.field.dropPuyoOn(x[i], PuyoColor::OJAMA);
+    enemy.unusedScore = me.unusedScore;
+    me.unusedScore = 0;
+    if (enemy.rensaFinishingFrameId() < end_frame) {
+      enemy.unusedScore -= simulateOjama(enemy.unusedScore, me.field);
+    }
   }
 
   // If I die, it should not be evaluated.

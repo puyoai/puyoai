@@ -40,7 +40,7 @@ class Evaluator {
   int Future(const CoreField& field);
 
   // Eval functions for Rensa.
-  int EvalTsubushi(const PlayerState& enemy, const RefPlan& plan);
+  int EvalTsubushi(const PlayerState& me, const PlayerState& enemy);
   int EvalEnemyPlan();
 
   const PlayerState& me_from;

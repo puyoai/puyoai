@@ -53,7 +53,7 @@ Evaluator::Genre Evaluator::EvalField(const PlayerState& me, const PlayerState& 
   int score = 0;
   std::ostringstream oss;
 
-  {
+  if (true) {
     std::string name;
     int value = DynamicPatternBook::iteratePatterns(me.field, &name);
     if (value > 0) {
@@ -92,9 +92,17 @@ Evaluator::Genre Evaluator::EvalRensa(const PlayerState& me, const PlayerState& 
   std::ostringstream oss;
 
   if (true) {  // Basic rensa plan
-    int value = enemy.totalOjama(me);
+    int value = me.unusedScore;
     if (value > 0) {
       oss << "Rensa(" << value << ")_";
+      score += value;
+    }
+  }
+
+  if (true) {  // Zenkeshi
+    int value = me.hasZenkeshi ? ZENKESHI_BONUS : 0;
+    if (value > 0) {
+      oss << "Zenkeshi(" << value << ")_";
       score += value;
     }
   }
@@ -122,7 +130,7 @@ Evaluator::Genre Evaluator::EvalRensa(const PlayerState& me, const PlayerState& 
 
   // TODO: Tsubushij
   if (true) {  // TSUBUSHI : how quickly rensa ends. 2 or more lines.
-    int value = EvalTsubushi(enemy, plan);
+    int value = EvalTsubushi(me, enemy);
     if (value > 0) {
       oss << "Tsubushi(" << value << ")_";
       score += value;
@@ -145,19 +153,14 @@ Evaluator::Genre Evaluator::EvalRensa(const PlayerState& me, const PlayerState& 
   return result;
 }
 
-int Evaluator::EvalTsubushi(const PlayerState& enemy, const RefPlan& plan) {
+int Evaluator::EvalTsubushi(const PlayerState& me, const PlayerState& enemy) {
   int score = 0;
 
-  int lines = 2;
-  if (enemy.field.height(3) > 9)
-    lines = 13 - enemy.field.height(3);
-
+  int lines = std::min(13 - enemy.field.height(3), 2);
   if (enemy_hands.firables.size() == 0
-      && plan.score() >= lines * FieldConstant::WIDTH * SCORE_FOR_OJAMA
-      && plan.chains() <= 2) {
-    score += plan.score();
-    if (plan.decisions().size() == 1)
-      score *= 2;
+      && me.unusedScore >= lines * FieldConstant::WIDTH * SCORE_FOR_OJAMA
+      && me.currentRensaResult.chains <= 2) {
+    score = me.unusedScore;
   }
 
   return score;
