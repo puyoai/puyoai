@@ -40,6 +40,7 @@ TEST(DecisionPlannerTest, iterate)
         found = true;
         int expectedFrames = 0;
         expectedFrames += field.framesToDropNext(Decision(3, 1));
+        expectedFrames += FRAMES_PREPARING_NEXT;
         expectedFrames += field.framesToDropNext(Decision(2, 3));
         EXPECT_EQ(expectedFrames, plan.totalFrames());
 
