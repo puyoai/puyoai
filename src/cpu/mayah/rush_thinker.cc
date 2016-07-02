@@ -72,7 +72,7 @@ bool RushThinker::shouldUpdateState(const SearchState& orig, const SearchState& 
 }
 
 DropDecision RushThinker::think(int frame_id, const CoreField& field, const KumipuyoSeq& seq,
-                                const PlayerState& /*me*/, const PlayerState& /*enemy*/, bool /*fast*/) const {
+                                const PlayerState& me, const PlayerState& /*enemy*/, bool /*fast*/) const {
 
     // Fire if possible.
     if (true) {
@@ -98,6 +98,26 @@ DropDecision RushThinker::think(int frame_id, const CoreField& field, const Kumi
         }
         if (d.isValid()) {
             return DropDecision(d, "FIRE!");
+        }
+    }
+
+    if (me.hasZenkeshi) {
+        Decision d[4] {};
+        int score[4] {};
+        auto callback = [&](const RefPlan& plan) {
+            if (!plan.isRensaPlan()) {
+                return;
+            }
+            if (score[plan.decisionSize()] > plan.score()) {
+                d[plan.decisionSize()] = plan.firstDecision();
+                score[plan.decisionSize()] = plan.score();
+            }
+        };
+        Plan::iterateAvailablePlans(field, seq, 2, callback);
+        for (int i = 0; i < 4; ++i) {
+            if (d[i].isValid()) {
+                return DropDecision(d[i], "USE ZENKESHI");
+            }
         }
     }
 

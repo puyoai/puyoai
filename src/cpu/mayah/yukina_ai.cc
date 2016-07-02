@@ -39,9 +39,11 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
             if (plan.chains() <= 2 && plan.score() - enemy_score >= scoreForOjama(6) && plan.score() >= scoreForOjama(12)) {
                 update = true;
             }
+#if 1
             if (plan.chains() <= 3 && plan.score() - enemy_score >= scoreForOjama(6) && plan.score() >= scoreForOjama(21)) {
                 update = true;
             }
+#endif
 #if 0
             if (plan.chains() <= 4 && enemy.field.countColorPuyos() <= 18) {
                 if (plan.score() - enemy_score >= scoreForOjama(60) && enemy_score <= scoreForOjama(60)) {
