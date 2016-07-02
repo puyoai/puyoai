@@ -129,7 +129,7 @@ void Ai::IterationCallback(int step, int start_frame, PlayerState me, PlayerStat
   if (step == 0) {
     evaluator.setDecision(plan.decisions().front());
   }
-  evaluator.EvalPlan(me.field, sending_ojama, plan);
+  evaluator.EvalPlan(me, enemy, plan);
 
   // Iterate more.
   if (step < 1 && next.size()) {
