@@ -129,7 +129,7 @@ void Ai::IterationCallback(int step, int start_frame, PlayerState me, PlayerStat
     me.currentRensaResult.score = 0;
   }
 
-  if (me.unusedScore - enemy.unusedScore) {
+  if (me.unusedScore > enemy.unusedScore) {
     me.unusedScore -= enemy.unusedScore;
     enemy.unusedScore = 0;
     me.unusedScore -= simulateOjama(me.unusedScore, enemy.field);
@@ -152,7 +152,6 @@ void Ai::IterationCallback(int step, int start_frame, PlayerState me, PlayerStat
 
   // Iterate more.
   if (step < 1 && next.size()) {
-    // TODO: Count control frames into end_frame
     auto callback = std::bind(IterationCallback,
                               step + 1, end_frame, me, enemy, next.subsequence(1), evaluator,
                               std::placeholders::_1);
