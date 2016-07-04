@@ -37,8 +37,6 @@ DropDecision SideThinker::think(int frame_id, const CoreField& field, const Kumi
         RensaDetector::detectSideChain(field, RensaDetectorStrategy::defaultDropStrategy(), callback);
     });
 
-    LOG(INFO) << "KOTORI: SIDE THINKER: " << "BEST: " << best_fire << " " << best;
-
     if (best_fire.isValid())
         return DropDecision(best_fire);
     if (best.isValid())
