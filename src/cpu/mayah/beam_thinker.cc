@@ -37,7 +37,9 @@ struct State {
     {
     }
 
+#if 0
     friend bool operator<(const State& lhs, const State& rhs) { return lhs.stateScore < rhs.stateScore; }
+#endif
     friend bool operator>(const State& lhs, const State& rhs) { return lhs.stateScore > rhs.stateScore; }
 
     CoreField field;

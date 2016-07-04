@@ -7,8 +7,8 @@ SideThinker::SideThinker()
 {
 }
 
-DropDecision SideThinker::think(int frame_id, const CoreField& field, const KumipuyoSeq& seq,
-                                const PlayerState& me, const PlayerState& enemy, bool fast) const
+DropDecision SideThinker::think(int /*frame_id*/, const CoreField& field, const KumipuyoSeq& seq,
+                                const PlayerState& /*me*/, const PlayerState& /*enemy*/, bool /*fast*/) const
 {
     Decision best_fire;
     int best_fire_score = 0;
