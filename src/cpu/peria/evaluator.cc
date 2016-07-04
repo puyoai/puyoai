@@ -17,16 +17,13 @@
 namespace peria {
 
 Evaluator::Evaluator(const PlayerState& m, const PlayerState& e, const PlayerHands& eh, Control* c)
-    : me(m), enemy(e), enemy_hands(eh), control(c) {}
+    : me_from(m), enemy_from(e), enemy_hands(eh), control(c) {}
 
-void Evaluator::EvalPlan(const CoreField& field, int sending_ojama, const RefPlan& plan) {
+void Evaluator::EvalPlan(const PlayerState& me, const PlayerState& enemy, const RefPlan& plan) {
   Genre genres[] = {
-    {"Field", 0, ""},
-    {"Rensa", 0, ""},
+    EvalField(me, enemy, plan),
+    EvalRensa(me, enemy, plan)
   };
-
-  genres[0].score = EvalField(field, &genres[0].message);
-  genres[1].score = EvalRensa(field, plan, sending_ojama, &genres[1].message);
 
   std::ostringstream oss;
   int score = 0;
@@ -46,7 +43,9 @@ void Evaluator::EvalPlan(const CoreField& field, int sending_ojama, const RefPla
   }
 }
 
-int Evaluator::EvalField(const CoreField& field, std::string* message) {
+Evaluator::Genre Evaluator::EvalField(const PlayerState& me, const PlayerState& /*enemy*/, const RefPlan& /*plan*/) {
+  Genre result("Field");
+
   // Evaluate field
   // o pattern matching
   // o possible future rensa
@@ -54,9 +53,9 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
   int score = 0;
   std::ostringstream oss;
 
-  {
+  if (true) {
     std::string name;
-    int value = DynamicPatternBook::iteratePatterns(field, &name);
+    int value = DynamicPatternBook::iteratePatterns(me.field, &name);
     if (value > 0) {
       oss << "Pattern(" << name << ")_";
       score += value;
@@ -64,24 +63,27 @@ int Evaluator::EvalField(const CoreField& field, std::string* message) {
   }
 
   if (false) {
-    int value = Valley(field);
+    int value = Valley(me.field);
     oss << "Valley(" << value << ")_";
     score += value;
   }
 
   if (true) {  // Evaluate possible rensa.
-    int value = Future(field) / 10;
+    int value = Future(me.field) / 10;
     oss << "Future(" << value << ")_";
     score += value;
   }
 
-  *message += oss.str();
-  return score;
+  result.message = oss.str();
+  result.score = score;
+  return result;
 }
 
-int Evaluator::EvalRensa(const CoreField& field, const RefPlan& plan, int sending_ojama, std::string* message) {
-  if (sending_ojama < 0)
-    return 0;
+Evaluator::Genre Evaluator::EvalRensa(const PlayerState& me, const PlayerState& enemy, const RefPlan& plan) {
+  Genre result("Rensa");
+
+  if (!plan.isRensaPlan())
+    return result;
 
   // Evaluate rensa
   // o TSUBUSHI : how quickly rensa ends. 2 or more lines.
@@ -90,15 +92,23 @@ int Evaluator::EvalRensa(const CoreField& field, const RefPlan& plan, int sendin
   std::ostringstream oss;
 
   if (true) {  // Basic rensa plan
-    int value = sending_ojama;
+    int value = me.unusedScore;
     if (value > 0) {
       oss << "Rensa(" << value << ")_";
       score += value;
     }
   }
 
+  if (true) {  // Zenkeshi
+    int value = me.hasZenkeshi ? ZENKESHI_BONUS : 0;
+    if (value > 0) {
+      oss << "Zenkeshi(" << value << ")_";
+      score += value;
+    }
+  }
+
   if (false) {  // penalty for using too many puyos
-    int remained_puyos = me.field.countPuyos() - field.countPuyos();
+    int remained_puyos = me_from.field.countPuyos() - me.field.countPuyos();
     int wasted_puyos = std::max(remained_puyos - 4 * plan.chains() - 4, 0);
     int value = -5 * plan.chains() * wasted_puyos;
     if (value < 0) {
@@ -109,7 +119,7 @@ int Evaluator::EvalRensa(const CoreField& field, const RefPlan& plan, int sendin
 
   if (false) {  // bonus to use many puyos, only for the main fire
     int value = 0;
-    if (me.field.countPuyos() > field.countPuyos() * 2) {
+    if (me_from.field.countPuyos() > me.field.countPuyos() * 2) {
       value = plan.score() / 500;
     }
     if (value > 0) {
@@ -120,7 +130,7 @@ int Evaluator::EvalRensa(const CoreField& field, const RefPlan& plan, int sendin
 
   // TODO: Tsubushij
   if (true) {  // TSUBUSHI : how quickly rensa ends. 2 or more lines.
-    int value = EvalTsubushi(plan);
+    int value = EvalTsubushi(me, enemy);
     if (value > 0) {
       oss << "Tsubushi(" << value << ")_";
       score += value;
@@ -138,23 +148,19 @@ int Evaluator::EvalRensa(const CoreField& field, const RefPlan& plan, int sendin
     }
   }
 
-  *message = oss.str();
-  return score;
+  result.message = oss.str();
+  result.score = score;
+  return result;
 }
 
-int Evaluator::EvalTsubushi(const RefPlan& plan) {
+int Evaluator::EvalTsubushi(const PlayerState& me, const PlayerState& enemy) {
   int score = 0;
 
-  int lines = 2;
-  if (enemy.field.height(3) > 9)
-    lines = 13 - enemy.field.height(3);
-
+  int lines = std::min(13 - enemy.field.height(3), 2);
   if (enemy_hands.firables.size() == 0
-      && plan.score() >= lines * FieldConstant::WIDTH * SCORE_FOR_OJAMA
-      && plan.chains() <= 2) {
-    score += plan.score();
-    if (plan.decisions().size() == 1)
-      score *= 2;
+      && me.unusedScore >= lines * FieldConstant::WIDTH * SCORE_FOR_OJAMA
+      && me.currentRensaResult.chains <= 2) {
+    score = me.unusedScore;
   }
 
   return score;
