@@ -69,7 +69,7 @@ Evaluator::Genre Evaluator::EvalField(const PlayerState& me, const PlayerState& 
   }
 
   if (true) {  // Evaluate possible rensa.
-    int value = Future(me.field) / 10;
+    int value = Future(me.field);
     oss << "Future(" << value << ")_";
     score += value;
   }
@@ -219,7 +219,7 @@ int Evaluator::Future(const CoreField& field) {
             scores.push_back(plan.rensaResult().score);
         });
   }
-  return std::accumulate(scores.begin(), scores.end(), 0);
+  return std::accumulate(scores.begin(), scores.end(), 0) / 22;
 }
 
 }  // namespace peria
