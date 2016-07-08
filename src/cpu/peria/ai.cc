@@ -43,16 +43,20 @@ DropDecision Ai::think(int frame_id,
   Evaluator evaluator(me, enemy, enemy_hands_, &control);
 
   // if enemy is firing a rensa, we use its after state.
+  PlayerState me2(me);
   PlayerState enemy2(enemy);
   if (enemy2.isRensaOngoing()) {
     if (enemy2.hasZenkeshi)
-      enemy2.unusedScore += ZENKESHI_BONUS;
+      me2.pendingOjama += 6 * 5;
     enemy2.hasZenkeshi = enemy2.field.isZenkeshi();
-    enemy2.unusedScore += enemy2.currentRensaResult.score;
-    enemy2.currentRensaResult.score = 0;
+    int use_score = enemy2.unusedScore + enemy2.currentRensaResult.score;
+    me2.pendingOjama += use_score / 70;
+    enemy2.unusedScore = use_score % 70;
   }
+  enemy2.fixedOjama += enemy2.pendingOjama;
+  enemy2.pendingOjama = 0;
   auto callback = std::bind(IterationCallback,
-                            0, frame_id, me, enemy2, seq.subsequence(1),
+                            0, frame_id, me2, enemy2, seq.subsequence(1),
                             evaluator, std::placeholders::_1);
 
   std::int64_t start_ms = currentTimeInMillis();
@@ -102,15 +106,15 @@ void Ai::onGroundedForEnemy(const FrameRequest& frame_request) {
 
 namespace {
 
-int simulateOjama(int score, CoreField& field) {
-  int ojama = std::min(score / 70, 5 * 6);
-  field.fallOjama(ojama / 6);
+int simulateOjama(int ojama, CoreField& field) {
+  int fall_ojama = std::min(ojama, 5 * 6);
+  field.fallOjama(fall_ojama / 6);
   int x[] = {1,2,3,4,5,6};
   std::random_shuffle(x, x + 6);
-  for (int i = 0; i < ojama % 6; ++i) {
+  for (int i = 0; i < fall_ojama % 6; ++i) {
     field.dropPuyoOn(x[i], PuyoColor::OJAMA);
   }
-  return score - ojama * 70;
+  return ojama - fall_ojama;
 }
 
 }
@@ -122,24 +126,39 @@ void Ai::IterationCallback(int step, int start_frame, PlayerState me, PlayerStat
   me.field = plan.field();
   if (plan.isRensaPlan()) {
     if (me.hasZenkeshi)
-      me.unusedScore += ZENKESHI_BONUS;
+      enemy.fixedOjama += 5 * 6;
     me.hasZenkeshi = me.field.isZenkeshi();
     me.currentRensaResult = plan.rensaResult();
-    me.unusedScore += me.currentRensaResult.score;
-    me.currentRensaResult.score = 0;
+    int use_score = me.unusedScore + me.currentRensaResult.score;
+    enemy.fixedOjama += use_score / 70;
+    me.unusedScore = use_score % 70;
   }
 
-  if (me.unusedScore > enemy.unusedScore) {
-    me.unusedScore -= enemy.unusedScore;
-    enemy.unusedScore = 0;
-    me.unusedScore -= simulateOjama(me.unusedScore, enemy.field);
-  } else {
-    enemy.unusedScore = me.unusedScore;
-    me.unusedScore = 0;
-    if (enemy.rensaFinishingFrameId() < end_frame) {
-      enemy.unusedScore -= simulateOjama(enemy.unusedScore, me.field);
-    }
+  // Update ojama status
+  int sending_ojama = enemy.fixedOjama;
+  int receiving_ojama = me.pendingOjama + me.fixedOjama;
+  if (sending_ojama > receiving_ojama) {
+    me.pendingOjama = 0;
+    me.fixedOjama = 0;
+    enemy.fixedOjama = sending_ojama - receiving_ojama;
+  } else if (sending_ojama > me.fixedOjama) {
+    me.fixedOjama = 0;
+    me.pendingOjama = receiving_ojama - sending_ojama;
+    enemy.fixedOjama = 0;
+  } else { // sending_ojama < me.fixedOjama
+    me.fixedOjama -= sending_ojama;;
+    enemy.fixedOjama = 0;
   }
+
+  // If enemy's rensa finishes, my pending ojamas are fixed.
+  if (enemy.rensaFinishingFrameId() < end_frame) {
+    me.fixedOjama += me.pendingOjama;
+    me.pendingOjama = 0;
+  }
+
+  // Simulate ojama falls
+  me.fixedOjama = simulateOjama(me.fixedOjama, me.field);
+  enemy.fixedOjama = simulateOjama(enemy.fixedOjama, enemy.field);
 
   // If I die, it should not be evaluated.
   if (!me.field.isEmpty(3, 12))
@@ -148,7 +167,6 @@ void Ai::IterationCallback(int step, int start_frame, PlayerState me, PlayerStat
   if (step == 0) {
     evaluator.setDecision(plan.decisions().front());
   }
-  evaluator.EvalPlan(me, enemy, plan);
 
   // Iterate more.
   if (step < 1 && next.size()) {
@@ -156,6 +174,8 @@ void Ai::IterationCallback(int step, int start_frame, PlayerState me, PlayerStat
                               step + 1, end_frame, me, enemy, next.subsequence(1), evaluator,
                               std::placeholders::_1);
     Plan::iterateAvailablePlans(me.field, next, 1, callback);
+  } else {
+    evaluator.EvalPlan(me, enemy, plan);
   }
 }
 

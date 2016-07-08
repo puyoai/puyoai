@@ -62,7 +62,7 @@ Evaluator::Genre Evaluator::EvalField(const PlayerState& me, const PlayerState& 
     }
   }
 
-  if (false) {
+  if (true) {
     int value = Valley(me.field);
     oss << "Valley(" << value << ")_";
     score += value;
@@ -82,7 +82,7 @@ Evaluator::Genre Evaluator::EvalField(const PlayerState& me, const PlayerState& 
 Evaluator::Genre Evaluator::EvalRensa(const PlayerState& me, const PlayerState& enemy, const RefPlan& plan) {
   Genre result("Rensa");
 
-  if (!plan.isRensaPlan())
+  if (me.fixedOjama > 30)
     return result;
 
   // Evaluate rensa
@@ -92,7 +92,7 @@ Evaluator::Genre Evaluator::EvalRensa(const PlayerState& me, const PlayerState& 
   std::ostringstream oss;
 
   if (true) {  // Basic rensa plan
-    int value = me.unusedScore;
+    int value = enemy.fixedOjama * 70;
     if (value > 0) {
       oss << "Rensa(" << value << ")_";
       score += value;
@@ -100,7 +100,7 @@ Evaluator::Genre Evaluator::EvalRensa(const PlayerState& me, const PlayerState& 
   }
 
   if (true) {  // Zenkeshi
-    int value = me.hasZenkeshi ? ZENKESHI_BONUS : 0;
+    int value = me.hasZenkeshi ? (ZENKESHI_BONUS * 2) : 0;
     if (value > 0) {
       oss << "Zenkeshi(" << value << ")_";
       score += value;
@@ -158,9 +158,9 @@ int Evaluator::EvalTsubushi(const PlayerState& me, const PlayerState& enemy) {
 
   int lines = std::min(13 - enemy.field.height(3), 2);
   if (enemy_hands.firables.size() == 0
-      && me.unusedScore >= lines * FieldConstant::WIDTH * SCORE_FOR_OJAMA
+      && enemy.fixedOjama >= lines * FieldConstant::WIDTH
       && me.currentRensaResult.chains <= 2) {
-    score = me.unusedScore;
+    score = enemy.fixedOjama * 70;
   }
 
   return score;
