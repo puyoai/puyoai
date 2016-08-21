@@ -42,6 +42,7 @@ string GameState::toJson() const
     }
 
     Json::Value root;
+    root["result"] = toString(gameResult());
     root["p1"] = f[0].toString();
     root["s1"] = playerGameState_[0].score;
     root["o1"] = playerGameState_[0].ojama();

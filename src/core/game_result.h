@@ -1,6 +1,8 @@
 #ifndef CORE_GAME_RESULT_H_
 #define CORE_GAME_RESULT_H_
 
+#include <string>
+
 enum class GameResult {
     PLAYING,
     DRAW,
@@ -12,6 +14,7 @@ enum class GameResult {
 };
 
 GameResult toOppositeResult(GameResult);
+std::string toString(GameResult);
 
 inline GameResult fromRequestEnd(int end)
 {
