@@ -11,7 +11,9 @@
 
 using namespace std;
 
-GameStateRecorder::GameStateRecorder(const string& dirPath) :
+GameStateRecorder::GameStateRecorder(const string& dirPath,
+                                     bool record_only_p1_win) :
+    record_only_p1_win_(record_only_p1_win),
     recording_(false),
     dirPath_(dirPath)
 {
@@ -51,13 +53,20 @@ void GameStateRecorder::onUpdate(const GameState& gameState)
     gameStates_.push_back(gameState);
 }
 
-void GameStateRecorder::gameHasDone(GameResult)
+void GameStateRecorder::gameHasDone(GameResult gameResult)
 {
-    LOG(INFO) << "will emit game state to " << filename_;
-
     recording_ = false;
     vector<GameState> gs(std::move(gameStates_));
     gameStates_.clear();
+
+    if (record_only_p1_win_) {
+        if (gameResult != GameResult::P1_WIN) {
+            LOG(INFO) << "game state won't be emitted since P1 didn't win";
+            return;
+        }
+    }
+
+    LOG(INFO) << "will emit game state to " << filename_;
 
     // emits json here.
     const string path = file::joinPath(dirPath_, filename_);
