@@ -454,7 +454,8 @@ TEST_F(ACAnalyzerTest, ojamaDrop)
     // Around here, analyzer can detect ojama puyo is dropped.
     EXPECT_FALSE(rs[58]->playerResult(1)->playable);
     // Then, next puyo will disappear.
-    EXPECT_TRUE(rs[72]->playerResult(1)->playable);
+    // In wii, rs[72] is playable, however, in ac, rs[73] is playable.
+    EXPECT_TRUE(rs[72]->playerResult(1)->playable || rs[73]->playerResult(1)->playable);
 }
 
 TEST_F(ACAnalyzerTest, nextArrival)
@@ -549,8 +550,12 @@ TEST_F(ACAnalyzerTest, gameStart)
         // On frame 18-,
         // Player2: Green character is on NEXT2, however, analyzer should say NEXT2 is still PP.
         {   6,  44, "  BBPP", "  BBPP" },
+        // Frame 44 is intermediate state. For wii, it should be the same as frame 43.
+        // However, for ac, it could be the same as frame 45.
+        // So, let's mark this as dontcare.
+        {  44,  45, "------", "------" },
         // Because of fastDecision, we would be able to detect NEXT moving here.
-        {  44,  60, "BBPP  ", "BBPP  " },
+        {  45,  60, "BBPP  ", "BBPP  " },
         // Player 2, frame 60: Since some stars are located on NEXT2_AXIS,
         // analyzer might consider the axis color is YELLOW.
         {  60,  67, "BBPP--", "BBPP--" },
