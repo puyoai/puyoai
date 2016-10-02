@@ -18,7 +18,7 @@ int index(int x, int y)
     return (12 - y) * 6 + (x - 1);
 }
 
-void add(PatternBook* patternBook, const CoreField& original)
+void add(PatternBook* patternBook, const CoreField& original, std::unordered_set<std::string>* patterns)
 {
     CoreField current(original);
     while (true) {
@@ -74,7 +74,8 @@ void add(PatternBook* patternBook, const CoreField& original)
             ss << "]" << endl;
 
             string s = ss.str();
-            cout << s << endl;
+            patterns->insert(s);
+            // cout << s << endl;
             patternBook->loadFromString(s, true);
         }
 
@@ -82,7 +83,9 @@ void add(PatternBook* patternBook, const CoreField& original)
     }
 }
 
-bool parseAndAdd(const char* filename, PatternBook* patternBook, unordered_set<CoreField>* visited)
+bool parseAndAdd(const char* filename, PatternBook* patternBook,
+                 std::unordered_set<std::string>* patterns,
+                 std::unordered_set<CoreField>* visited)
 {
     ifstream ifs(filename);
     if (!ifs) {
@@ -99,7 +102,7 @@ bool parseAndAdd(const char* filename, PatternBook* patternBook, unordered_set<C
         if (!visited->insert(cf).second || !cf.rensaWillOccur())
             continue;
 
-        add(patternBook, cf);
+        add(patternBook, cf, patterns);
     }
     return true;
 }
@@ -110,16 +113,23 @@ int main(int argc, char* argv[])
     google::InitGoogleLogging(argv[0]);
 
     if (argc < 2) {
-        cerr << argv[0] << " <filename>" << endl;
+        cerr << argv[0] << " <filename> ..." << endl;
         return EXIT_FAILURE;
     }
 
     PatternBook patternBook;
     unordered_set<CoreField> visited;
+    std::unordered_set<std::string> patterns;
     for (char** filename = argv + 1; *filename; ++filename) {
-        cout << *filename << endl;
-        if (!parseAndAdd(*filename, &patternBook, &visited)) {
-            cout << "failed to add: " << *filename;
+        // cout << *filename << endl;
+        if (!parseAndAdd(*filename, &patternBook, &patterns, &visited)) {
+            cerr << "failed to add: " << *filename;
         }
     }
+
+    for (const auto& entry : patterns) {
+        cout << entry << endl;
+    }
+
+    return 0;
 }
