@@ -3,7 +3,7 @@
 #include "base/file/path.h"
 #include "core/frame_request.h"
 
-DEFINE_string(feature, "feature.toml", "the path to feature parameter");
+DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.toml", "the path to feature parameter");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
 
@@ -58,15 +58,14 @@ MayahBaseAI::MayahBaseAI(int argc, char* argv[], const char* name, std::unique_p
 
 bool MayahBaseAI::loadEvaluationParameter()
 {
-    if (evaluationParameterMap_.load(FLAGS_feature))
-        return true;
+    string feature_path;
+    if (file::exists(FLAGS_feature)) {
+        feature_path = FLAGS_feature;
+    } else if (!file::isAbsolutePath(FLAGS_feature) && file::exists(file::joinPath(SRC_DIR, FLAGS_feature))) {
+        feature_path = file::joinPath(SRC_DIR, FLAGS_feature);
+    }
 
-    // When not found, we try to load from the source directory.
-    std::string filename = std::string(SRC_DIR) + "/cpu/mayah/" + FLAGS_feature;
-    if (evaluationParameterMap_.load(filename))
-        return true;
-
-    return false;
+    return evaluationParameterMap_.load(feature_path);
 }
 
 bool MayahBaseAI::saveEvaluationParameter() const
