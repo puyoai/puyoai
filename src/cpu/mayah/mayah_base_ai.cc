@@ -1,5 +1,6 @@
 #include "mayah_base_ai.h"
 
+#include "base/file/path.h"
 #include "core/frame_request.h"
 
 DEFINE_string(feature, "feature.toml", "the path to feature parameter");
@@ -15,12 +16,35 @@ MayahBaseAI::MayahBaseAI(int argc, char* argv[], const char* name, std::unique_p
     executor_(std::move(executor))
 {
     loadEvaluationParameter();
-    CHECK(decisionBook_.load(FLAGS_decision_book));
-    CHECK(patternBook_.load(FLAGS_pattern_book));
+
+    string decision_book_path;
+    if (file::exists(FLAGS_decision_book)) {
+        decision_book_path = FLAGS_decision_book;
+    } else if (!file::isAbsolutePath(FLAGS_decision_book) && file::exists(file::joinPath(SRC_DIR, FLAGS_decision_book))) {
+        decision_book_path = file::joinPath(SRC_DIR, FLAGS_decision_book);
+    }
+
+    string pattern_book_path;
+    if (file::exists(FLAGS_pattern_book)) {
+        pattern_book_path = FLAGS_pattern_book;
+    } else if (!file::isAbsolutePath(FLAGS_pattern_book) && file::exists(file::joinPath(SRC_DIR, FLAGS_pattern_book))) {
+        pattern_book_path = file::joinPath(SRC_DIR, FLAGS_pattern_book);
+    }
+
+    LOG(INFO) << "decision_book_path=" << decision_book_path;
+    CHECK(!decision_book_path.empty()) << "decision_book_path should not be empty";
+    CHECK(decisionBook_.load(decision_book_path)) << "failed to load decision book";
+    LOG(INFO) << "decision_book load done";
+
+    LOG(INFO) << "pattern_book_path=" << pattern_book_path;
+    CHECK(!pattern_book_path.empty()) << "pattern_book_path should not be empty";
+    CHECK(patternBook_.load(pattern_book_path)) << "failed to load pattern book";
+    LOG(INFO) << "pattern_book load done";
 
     VLOG(1) << evaluationParameterMap_.toString();
 
     beam_thinker_.reset(new BeamThinker(executor_.get()));
+
     pattern_thinker_.reset(new PatternThinker(evaluationParameterMap_,
                                               decisionBook_,
                                               patternBook_,
@@ -28,6 +52,7 @@ MayahBaseAI::MayahBaseAI(int argc, char* argv[], const char* name, std::unique_p
     rush_thinker_.reset(new RushThinker);
     side_thinker_.reset(new SideThinker);
 
+    LOG(INFO) << "load done";
     google::FlushLogFiles(google::GLOG_INFO);
 }
 
