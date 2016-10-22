@@ -1,5 +1,6 @@
 #include "pattern.h"
 
+#include "core/pattern/decision_book.h"
 #include "core/core_field.h"
 #include "core/field_bits.h"
 #include "core/field_constant.h"
@@ -11,6 +12,11 @@
 #include <gtest/gtest.h>
 
 namespace peria {
+
+TEST(PatternTest, readJoseki) {
+  DecisionBook* joseki = Pattern::getJoseki();
+  EXPECT_NE(nullptr, joseki);
+}
 
 class DynamicPatternBookForTest : public DynamicPatternBook {
  public:

@@ -14,12 +14,14 @@
 #include "base/time.h"
 #include "core/plan/plan.h"
 #include "core/rensa/rensa_detector.h"
+#include "core/pattern/decision_book.h"
 #include "core/core_field.h"
 #include "core/frame_request.h"
 #include "core/player_state.h"
-#include "cpu/peria/control.h"
-#include "cpu/peria/evaluator.h"
-#include "cpu/peria/player_hands.h"
+#include "control.h"
+#include "evaluator.h"
+#include "player_hands.h"
+#include "pattern.h"
 
 namespace peria {
 
@@ -39,6 +41,11 @@ DropDecision Ai::think(int frame_id,
   control.decision= Decision(3, 2);
   control.message = "No choice";
   control.score = 0;
+
+  DropDecision joseki = checkJoseki(field, seq);
+  if (joseki.isValid()) {
+    return joseki;
+  }
 
   Evaluator evaluator(me, enemy, enemy_hands_, &control);
 
@@ -102,6 +109,12 @@ void Ai::onGroundedForEnemy(const FrameRequest& frame_request) {
         possible.push_back(rensa);
         return result;
       });
+}
+
+DropDecision Ai::checkJoseki(const CoreField& field, const KumipuyoSeq& seq) const {
+  DecisionBook* joseki = Pattern::getJoseki();
+  Decision decision = joseki->nextDecision(field, seq);
+  return DropDecision(decision, "By JOSEKI book");
 }
 
 namespace {

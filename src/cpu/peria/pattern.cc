@@ -14,10 +14,14 @@
 #include <gflags/gflags.h>
 
 #include "core/rensa/rensa_detector.h"
+#include "core/pattern/decision_book.h"
 
+#include "base.h"
 #include "rensa_vanishing_position_tracker.h"
 
-DEFINE_string(dynamic_pattern, "dynamic_book.txt", "Figures a template file name.");
+// TODO: Move the book to BOOK_DIR
+DEFINE_string(dynamic_pattern, PERIA_ROOT "/dynamic_book.txt", "Figures a template file name.");
+DEFINE_string(joseki_book, BOOK_DIR "/joseki.toml", "Figures a file name for Joseki.");
 
 namespace peria {
 
@@ -39,6 +43,28 @@ std::string Trim(std::string line) {
 }
 
 }  // namespace
+
+DecisionBook* Pattern::getJoseki() {
+  static DecisionBook* s_joseki = nullptr;
+  if (!s_joseki) {
+    s_joseki = new DecisionBook();
+    LOG(INFO) << "oad JOSEKI file: " << FLAGS_joseki_book;
+    if (!s_joseki->load(FLAGS_joseki_book)) {
+      LOG(INFO) << "Failed to load JOSEKI file: " << FLAGS_joseki_book;
+    }
+  }
+  return s_joseki;
+}
+
+DynamicPatternBook* Pattern::getDynamicPattern() {
+  NOTREACHED();
+  return nullptr;
+}
+
+StaticPatternBook* Pattern::getStaticPattern() {
+  NOTREACHED();
+  return nullptr;
+}
 
 const int DynamicPattern::kDefaultScore = 100;
 

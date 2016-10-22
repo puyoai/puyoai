@@ -9,7 +9,19 @@
 #include "core/core_field.h"
 #include "core/field_bits.h"
 
+class DecisionBook;
+
 namespace peria {
+
+class DynamicPatternBook;
+class StaticPatternBook;
+
+class Pattern {
+ public:
+  static DecisionBook* getJoseki();
+  static DynamicPatternBook* getDynamicPattern();
+  static StaticPatternBook* getStaticPattern();
+};
 
 // DynamicPattern class figures where puyos are being vanished
 class DynamicPattern {
