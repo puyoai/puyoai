@@ -19,7 +19,7 @@ public:
 
     void setMessage(const std::string& msg) { message_ = msg; }
 
-    bool valid() const { return decision_.isValid(); }
+    bool isValid() const { return decision_.isValid(); }
 
 private:
     Decision decision_;
