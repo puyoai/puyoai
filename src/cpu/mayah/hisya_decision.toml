@@ -17,6 +17,7 @@ field = [
     "A.....",
 ]
 ABBC = [1, 1]
+ABAC = [1, 1]
 
 [[book]]
 field = [
@@ -24,3 +25,5 @@ field = [
     "AB....",
 ]
 AABC = [1, 2]
+AAAC = [1, 2]
+BCCC = [1, 1]
