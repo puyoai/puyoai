@@ -93,7 +93,7 @@ DropDecision YukinaAI::think(int frame_id, const CoreField& field, const Kumipuy
 
     double beginTimeSec = currentTime();
     DropDecision dd = thinkByThinker(frame_id, field, kumipuyo_seq, me, enemy, fast);
-    if (dd.valid()) {
+    if (dd.isValid()) {
         double endTimeSec = currentTime();
         double durationSec = endTimeSec - beginTimeSec;
 
