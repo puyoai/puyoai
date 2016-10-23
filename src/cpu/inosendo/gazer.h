@@ -24,6 +24,7 @@ public:
 
     // Returns the (expecting) possible max score by this frame.
     int estimateMaxScore(int frameId, const PlayerState& enemy) const;
+    int estimateMaxFeasibleScore(int frameId, const PlayerState& enemy) const;
 
     void setFeasibleRensaHandTree(RensaHandTree tree) { feasibleRensaHandTree_ = std::move(tree); }
     void setPossibleRensaHandTree(RensaHandTree tree) { possibleRensaHandTree_ = std::move(tree); }
