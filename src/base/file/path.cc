@@ -62,6 +62,27 @@ bool isDirectory(const string& path)
 #endif
 }
 
+bool exists(const string& path)
+{
+#if defined(_MSC_VER)
+    LOG(ERROR) << "TODO(mayah): Implement this";
+    return false;
+#else
+    return access(path.c_str(), F_OK) != -1;
+#endif
+}
+
+bool isAbsolutePath(const string& path)
+{
+#if defined(_MSC_VER)
+    LOG(ERROR) << "TODO(mayah): Implement this";
+    return false;
+#else
+    return !path.empty() && path[0] == '/';
+#endif
+
+}
+
 bool listFiles(const string& path, vector<string>* files)
 {
 #if defined(_MSC_VER)

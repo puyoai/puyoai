@@ -1,0 +1,29 @@
+# TODO(mayah): Write hisya decision.
+
+[[book]]
+field = []
+AAAA = [3, 2]
+AAAB = [1, 2]
+AABB = [1, 2]
+AABC = [1, 2]
+ABAA = [1, 1]
+ABAB = [2, 3]
+ABAC = [2, 3]
+ABCC = [3, 3]
+
+[[book]]
+field = [
+    "A.....",
+    "A.....",
+]
+ABBC = [1, 1]
+ABAC = [1, 1]
+
+[[book]]
+field = [
+    "......",
+    "AB....",
+]
+AABC = [1, 2]
+AAAC = [1, 2]
+BCCC = [1, 1]

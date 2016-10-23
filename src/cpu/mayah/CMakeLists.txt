@@ -64,6 +64,8 @@ cpu_add_runner(run_v.sh)
 cpu_add_runner(yukina.sh)
 cpu_add_runner(yukina_v.sh)
 
+cpu_add_runner(hisya.sh)
+
 mayah_add_test(decision_planner_test)
 mayah_add_test(evaluator_test)
 mayah_add_test(evaluation_parameter_test)

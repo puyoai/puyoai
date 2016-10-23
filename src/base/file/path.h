@@ -13,6 +13,8 @@ std::string joinPath(const std::string& p1, const std::string& p2, const std::st
 std::string joinPath(const std::string& p1, const std::string& p2, const std::string& p3, const std::string& p4);
 
 bool isDirectory(const std::string& path);
+bool exists(const std::string& path);
+bool isAbsolutePath(const std::string& path);
 
 // Lists all files in path.
 // true will be returned if suceeded, otherwise, false will be returned.

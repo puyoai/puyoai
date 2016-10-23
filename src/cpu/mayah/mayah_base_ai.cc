@@ -1,8 +1,9 @@
 #include "mayah_base_ai.h"
 
+#include "base/file/path.h"
 #include "core/frame_request.h"
 
-DEFINE_string(feature, "feature.toml", "the path to feature parameter");
+DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.toml", "the path to feature parameter");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");
 
@@ -15,12 +16,35 @@ MayahBaseAI::MayahBaseAI(int argc, char* argv[], const char* name, std::unique_p
     executor_(std::move(executor))
 {
     loadEvaluationParameter();
-    CHECK(decisionBook_.load(FLAGS_decision_book));
-    CHECK(patternBook_.load(FLAGS_pattern_book));
+
+    string decision_book_path;
+    if (file::exists(FLAGS_decision_book)) {
+        decision_book_path = FLAGS_decision_book;
+    } else if (!file::isAbsolutePath(FLAGS_decision_book) && file::exists(file::joinPath(SRC_DIR, FLAGS_decision_book))) {
+        decision_book_path = file::joinPath(SRC_DIR, FLAGS_decision_book);
+    }
+
+    string pattern_book_path;
+    if (file::exists(FLAGS_pattern_book)) {
+        pattern_book_path = FLAGS_pattern_book;
+    } else if (!file::isAbsolutePath(FLAGS_pattern_book) && file::exists(file::joinPath(SRC_DIR, FLAGS_pattern_book))) {
+        pattern_book_path = file::joinPath(SRC_DIR, FLAGS_pattern_book);
+    }
+
+    LOG(INFO) << "decision_book_path=" << decision_book_path;
+    CHECK(!decision_book_path.empty()) << "decision_book_path should not be empty";
+    CHECK(decisionBook_.load(decision_book_path)) << "failed to load decision book";
+    LOG(INFO) << "decision_book load done";
+
+    LOG(INFO) << "pattern_book_path=" << pattern_book_path;
+    CHECK(!pattern_book_path.empty()) << "pattern_book_path should not be empty";
+    CHECK(patternBook_.load(pattern_book_path)) << "failed to load pattern book";
+    LOG(INFO) << "pattern_book load done";
 
     VLOG(1) << evaluationParameterMap_.toString();
 
     beam_thinker_.reset(new BeamThinker(executor_.get()));
+
     pattern_thinker_.reset(new PatternThinker(evaluationParameterMap_,
                                               decisionBook_,
                                               patternBook_,
@@ -28,20 +52,20 @@ MayahBaseAI::MayahBaseAI(int argc, char* argv[], const char* name, std::unique_p
     rush_thinker_.reset(new RushThinker);
     side_thinker_.reset(new SideThinker);
 
+    LOG(INFO) << "load done";
     google::FlushLogFiles(google::GLOG_INFO);
 }
 
 bool MayahBaseAI::loadEvaluationParameter()
 {
-    if (evaluationParameterMap_.load(FLAGS_feature))
-        return true;
+    string feature_path;
+    if (file::exists(FLAGS_feature)) {
+        feature_path = FLAGS_feature;
+    } else if (!file::isAbsolutePath(FLAGS_feature) && file::exists(file::joinPath(SRC_DIR, FLAGS_feature))) {
+        feature_path = file::joinPath(SRC_DIR, FLAGS_feature);
+    }
 
-    // When not found, we try to load from the source directory.
-    std::string filename = std::string(SRC_DIR) + "/cpu/mayah/" + FLAGS_feature;
-    if (evaluationParameterMap_.load(filename))
-        return true;
-
-    return false;
+    return evaluationParameterMap_.load(feature_path);
 }
 
 bool MayahBaseAI::saveEvaluationParameter() const

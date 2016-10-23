@@ -1,0 +1,269 @@
+# ----------------------------------------------------------------------
+# KAIDAN
+
+[[pattern]]
+field = [
+    "b.....",
+    "B.....",
+    "AC....",
+    "ABC...",
+    "ABC...",
+    "ABC...",
+]
+score = 10.0
+
+[[pattern]]
+field = [
+    ".bc...",
+    ".BC...",
+    ".ABC..",
+    ".ABC..",
+    "AABC..",
+]
+score = 10.0
+ignition = 1
+
+[[pattern]]
+field = [
+    "..bc..",
+    "..BC..",
+    "..ABC.",
+    "..ABC.",
+    ".AABC.",
+]
+score = 10.0
+ignition = 2
+
+[[pattern]]
+field = [
+    "...bc.",
+    "...BC.",
+    "...ABC",
+    "...ABC",
+    "..AABC",
+]
+score = 10.0
+ignition = 3
+
+# ----------------------------------------------------------------------
+# KAGI (upper)
+
+[[pattern]]
+field = [
+    ".bc...",
+    ".BC...",
+    "AABC..",
+    "ABC...",
+    "ABC...",
+]
+score = 10.0
+ignition = 1
+
+[[pattern]]
+field = [
+    "......",
+    "..BC..",
+    ".AABC.",
+    ".ABC..",
+    ".ABC..",
+]
+score = 10.0
+ignition = 2
+
+[[pattern]]
+field = [
+    "...bc.",
+    "...BC.",
+    "..AABC",
+    "..ABC.",
+    "..ABC.",
+]
+score = 10.0
+ignition = 3
+
+[[pattern]]
+field = [
+    ".....c",
+    "....bC",
+    "....BC",
+    "...AAB",
+    "...ABC",
+    "...ABC",
+]
+score = 10.0
+ignition = 4
+
+# ----------------------------------------------------------------------
+# KAGI (lower)
+
+[[pattern]]
+field = [
+    ".bc...",
+    ".BC...",
+    "ABC...",
+    "AABC..",
+    "ABC...",
+]
+score = 10.0
+ignition = 1
+
+[[pattern]]
+field = [
+    "..bc..",
+    "..BC..",
+    ".ABC..",
+    ".AABC.",
+    ".ABC..",
+]
+score = 10.0
+ignition = 2
+
+[[pattern]]
+field = [
+    "...bc.",
+    "...BC.",
+    "..ABC.",
+    "..AABC",
+    "..ABC.",
+]
+score = 10.0
+ignition = 3
+
+[[pattern]]
+field = [
+    ".....c",
+    "....bC",
+    "....BC",
+    "...ABC",
+    "...AAB",
+    "...ABC",
+]
+score = 10.0
+ignition = 4
+
+# ----------------------------------------------------------------------
+# KAGI (up-down)
+
+[[pattern]]
+field = [
+    ".bc...",
+    ".BC...",
+    "AAB...",
+    "ABCC..",
+    "ABC...",
+]
+score = 10.0
+ignition = 1
+
+[[pattern]]
+field = [
+    "......",
+    "..BC..",
+    ".AAB..",
+    ".ABCC.",
+    ".ABC..",
+]
+score = 10.0
+ignition = 2
+
+[[pattern]]
+field = [
+    "...bc.",
+    "...BC.",
+    "..AAB.",
+    "..ABCC",
+    "..ABC.",
+]
+score = 10.0
+ignition = 3
+
+[[pattern]]
+field = [
+    "....bC",
+    "....BC",
+    "...AAC",
+    "...ABB",
+    "...ABC",
+]
+score = 10.0
+ignition = 4
+
+# ----------------------------------------------------------------------
+# KAGI (down-up)
+
+[[pattern]]
+field = [
+    ".b....",
+    ".BC...",
+    "ABCC..",
+    "AAB...",
+    "ABC...",
+]
+score = 10.0
+ignition = 1
+
+[[pattern]]
+field = [
+    "..b...",
+    "..BC..",
+    ".ABCC.",
+    ".AAB..",
+    ".ABC..",
+]
+score = 10.0
+ignition = 2
+
+[[pattern]]
+field = [
+    "...b..",
+    "...BC.",
+    "..ABCC",
+    "..AAB.",
+    "..ABC.",
+]
+score = 10.0
+ignition = 3
+
+[[pattern]]
+field = [
+    ".....c",
+    "....bC",
+    "....BC",
+    "...ABB",
+    "...AAC",
+    "...ABC",
+]
+score = 10.0
+ignition = 4
+
+# ----------------------------------------------------------------------
+# KAIDAN (orikaeshi)
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "A.....",
+    "A.....",
+    "A.....",
+    "A.....",
+    "BC....",
+    "BC....",
+    "BC....",
+]
+score = 10.0
+
+[[pattern]]
+field = [
+    "C.....",
+    "B.....",
+    "BA....",
+    "AA....",
+    "BA....",
+    "B.....",
+    "C.....",
+    "C.....",
+    "C.....",
+]
+score = 10.0
+ignition = 2
