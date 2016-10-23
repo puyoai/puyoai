@@ -76,7 +76,9 @@ RensaHandTree RensaHandTree::makeTree(int restIteration,
 
         RensaHandNodeMaker maker(restIteration, wholeKumipuyoSeq);
         auto callback = [&](CoreField&& cf, const ColumnPuyoList& puyosToComplement) -> RensaResult {
-            return maker.add(std::move(cf), puyosToComplement, usedPuyoMoveFrames + dropFrames, usedPuyoSet);
+            int frames = usedPuyoMoveFrames + dropFrames;
+            // frames += static_cast<int>(ColumnPuyoListProbability::instanceSlow()->necessaryKumipuyos(puyosToComplement) * NUM_FRAMES_OF_ONE_HAND / 2);
+            return maker.add(std::move(cf), puyosToComplement, frames, usedPuyoSet);
         };
         RensaDetector::detectIteratively(field, RensaDetectorStrategy::defaultDropStrategy(), 3, callback);
         nodes[ojamaLines] = maker.makeNode();
@@ -346,8 +348,9 @@ RensaResult RensaHandNodeMaker::add(CoreField&& cf,
     wholeUsedPuyoSet.add(puyosToComplement);
 
     int necessaryKumipuyos = static_cast<int>(std::ceil(ColumnPuyoListProbability::instanceSlow()->necessaryKumipuyos(puyosToComplement)));
-    //int necessaryPuyos = PuyoSetProbability::necessaryPuyos(wholeUsedPuyoSet, kumipuyoSeq_, 0.5);
-    //int necessaryHands = (necessaryPuyos + 1) / 2;
+    // For margin? probability 0.5 is too optimistic.
+    if (necessaryKumipuyos > 0)
+        necessaryKumipuyos -= 1;
 
     // Estimate the number of frames to initiate this rensa.
     int wholeFramesToIgnite = NUM_FRAMES_OF_ONE_HAND * necessaryKumipuyos;
