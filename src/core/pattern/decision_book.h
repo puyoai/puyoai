@@ -19,15 +19,20 @@ class KumipuyoSeq;
 class DecisionBookField {
 public:
     DecisionBookField(const std::vector<std::string>& field,
-                      std::map<std::string, Decision>&& decisions);
+                      std::map<std::string, Decision>&& decisions1,
+                      std::map<std::string, Decision>&& decisions2);
 
     Decision nextDecision(const CoreField&, const KumipuyoSeq&) const;
 
 private:
+    bool matchNext(BijectionMatcher*, const std::string& nextPattern, const Kumipuyo& next1) const;
     bool matchNext(BijectionMatcher*, const std::string& nextPattern, const Kumipuyo& next1, const Kumipuyo& next2) const;
 
     FieldPattern pattern_;
-    std::map<std::string, Decision> decisions_;
+    // Decisions decided with 1 Tsumo.
+    std::map<std::string, Decision> decisions1_;
+    // Decisions decided with 2 Tsumos.
+    std::map<std::string, Decision> decisions2_;
 };
 
 // DecisionBook is a book to return a fixed Decision from the given field and kumipuyo sequence.
