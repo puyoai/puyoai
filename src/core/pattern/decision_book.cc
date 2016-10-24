@@ -26,9 +26,10 @@ Decision makeDecision(const toml::Value& v)
 
 } // namespace anonymous
 
-DecisionBookField::DecisionBookField(const vector<string>& field, map<string, Decision>&& decisions) :
+DecisionBookField::DecisionBookField(const vector<string>& field, map<string, Decision>&& decisions1, map<string, Decision>&& decisions2) :
     pattern_(strings::join(field, "")),
-    decisions_(move(decisions))
+    decisions1_(move(decisions1)),
+    decisions2_(move(decisions2))
 {
 }
 
@@ -38,25 +39,53 @@ Decision DecisionBookField::nextDecision(const CoreField& cf, const KumipuyoSeq&
     if (!matcher.match(pattern_, cf))
         return Decision();
 
-    const Kumipuyo& kp1 = seq.get(0);
-    const Kumipuyo& kp2 = seq.get(1);
+    // Now it is guaranteed that field is matched.
 
-    // Field matched. check next sequence.
-    for (const auto& entry : decisions_) {
+    // Check sequence with 1 Tsumo.
+    const Kumipuyo& kp1 = seq.get(0);
+    for (const auto& entry : decisions1_) {
+        if (matchNext(&matcher, entry.first, kp1))
+            return entry.second;
+        if (kp1.isRep())
+            continue;
+        if (matchNext(&matcher, entry.first, kp1.reverse()))
+            return entry.second.reverse();
+    }
+
+    // Check sequence with 2 Tsumos.
+    const Kumipuyo& kp2 = seq.get(1);
+    for (const auto& entry : decisions2_) {
         if (matchNext(&matcher, entry.first, kp1, kp2))
             return entry.second;
-
         if (!kp2.isRep() && matchNext(&matcher, entry.first, kp1, kp2.reverse()))
             return entry.second;
 
-        if (!kp1.isRep() && matchNext(&matcher, entry.first, kp1.reverse(), kp2))
-            return entry.second.reverse();
+        if (kp1.isRep())
+            continue;
 
-        if (!kp1.isRep() && !kp2.isRep() && matchNext(&matcher, entry.first, kp1.reverse(), kp2.reverse()))
+        if (matchNext(&matcher, entry.first, kp1.reverse(), kp2))
+            return entry.second.reverse();
+        if (!kp2.isRep() && matchNext(&matcher, entry.first, kp1.reverse(), kp2.reverse()))
             return entry.second.reverse();
     }
 
     return Decision();
+}
+
+bool DecisionBookField::matchNext(BijectionMatcher* matcher,
+                                  const string& nextPattern,
+                                  const Kumipuyo& next1) const
+{
+    DCHECK_EQ(nextPattern.size(), 2UL) << nextPattern;
+    BijectionMatcher bm(*matcher);
+
+    if (!bm.match(nextPattern[0], next1.axis))
+        return false;
+    if (!bm.match(nextPattern[1], next1.child))
+        return false;
+
+    *matcher = bm;
+    return true;
 }
 
 bool DecisionBookField::matchNext(BijectionMatcher* matcher,
@@ -124,14 +153,23 @@ bool DecisionBook::loadFromValue(const toml::Value& book)
         vector<string> f;
         for (const auto& s : v.get<toml::Array>("field"))
             f.push_back(s.as<string>());
-        map<string, Decision> m;
+        map<string, Decision> m1;
+        map<string, Decision> m2;
         for (const auto& e : v.as<toml::Table>()) {
             if (e.first == "field")
                 continue;
-            m[e.first] = makeDecision(e.second);
+            switch (e.first.size()) {
+            case 2:
+                m1[e.first] = makeDecision(e.second);
+                break;
+            case 4:
+                m2[e.first] = makeDecision(e.second);
+                break;
+            default:
+                CHECK(false) << "Invalid Tsumo assumption: " << e.first;
+            }
         }
-
-        fields_.emplace_back(f, std::move(m));
+        fields_.emplace_back(f, std::move(m1), std::move(m2));
     }
 
     return true;
