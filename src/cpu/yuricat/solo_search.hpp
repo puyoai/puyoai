@@ -18,7 +18,7 @@ namespace Yuricat{
     // 共有情報
     struct SoloSearchResult{
         KumipuyoSeq seq;
-        int turn, chain;
+        int turn, chain, score;
         Decision first;
         //float wp[24];
     };
@@ -41,25 +41,31 @@ namespace Yuricat{
             }
             mutex_.unlock();
         }
-        Decision bestFirst()const{
+        DropDecision bestFirst()const{
             //map<Decision, tuple<int, int>> m;
-            map<Decision, tuple<int, int>> m;
+            
+            map<Decision, tuple<double, double>> m;
+            // tupleは(回数, 評価和)
+            
             mutex_.lock();
             if(result.size() == 0){ // 結果が無かった
-                return Decision();
+                return DropDecision(Decision(), "No Result...");
             }
             int miss = 0;
             for(const auto& r : result){
                 if(r.chain > 0){
                     get<0>(m[r.first]) += 1;
-                    get<1>(m[r.first]) += r.chain; // 自動的に0に初期化されるのでOK
+                    //get<1>(m[r.first]) += r.chain; // 自動的に0に初期化されるのでOK
+                    //get<1>(m[r.first]) += kMinChainScore[r.chain];
+                    get<1>(m[r.first]) += r.score;
+                    //get<1>(m[r.first]) += scoreToWP(kMinChainScore[r.chain]);
                     //cerr << r.chain << endl;
                 }else if(r.chain == 0){
                     miss += 1;
                 } 
             }
             Decision best;
-            tuple<int , int> best_chain = make_tuple(0, 0);
+            tuple<int, double> best_chain = make_tuple(0, 0);
             
             for(const auto& ds : m){
                 if(get<1>(ds.second) > get<1>(best_chain)){
@@ -71,8 +77,11 @@ namespace Yuricat{
             cerr << "result size = " << result.size() << endl;
             
             double avg_chain = (get<0>(best_chain) + miss == 0) ? 0 : (get<1>(best_chain) / float(get<0>(best_chain) + miss));
-            cerr << "avg chain = " << avg_chain << endl;
-            return best;
+            //cerr << "avg chain = " << avg_chain << endl;
+            cerr << "avg score = " << avg_chain << endl;
+            std::ostringstream oss;
+            oss << "Avg Score = " << avg_chain << " ( " << get<0>(best_chain) << " / "<< result.size() << " ) " << "Death Rate = " << (miss / (double)result.size());
+            return DropDecision(best, oss.str());
         }
         void proceed(const Decision& decision){
             // ターンを進める
@@ -226,7 +235,7 @@ namespace Yuricat{
         Plan::iterateAvailablePlans(node.field, {dropped}, 1, drop_callback);
     }
     
-    tuple<Decision, int, int> soloSearch(const int player,
+    tuple<Decision, int, int, int> soloSearch(const int player,
                                          const CoreField org_field,
                                          const KumipuyoSeq& seq,
                                          const int ojamaDice[],
@@ -240,7 +249,8 @@ namespace Yuricat{
         
         //const int kBeamWidth = 200;
         
-        auto beamWidthFunc = [](int depth)->int{ return 250 + 180 * pow(0.95, depth - 1); }; // ビーム幅を減衰
+        //auto beamWidthFunc = [](int depth)->int{ return 50 + 250 * pow(0.965, depth - 1); }; // ビーム幅を減衰
+        auto beamWidthFunc = [](int depth)->int{ return 80 + min(150.0, 50 * log((depth + 1) * 0.7)); }; // ビーム幅を増幅
         
         vector<node_t> stateQueue[N_MAX_SOLO_SEARCH_TURNS + 1];
         vector<fired_result_t> firedResult[N_MAX_SOLO_SEARCH_TURNS + 1];
@@ -257,13 +267,10 @@ namespace Yuricat{
             -1
         });
         
-        //const int search_turns = min(100000000,
-        //                             org_turn + (10, min(50, ((6 * 13) - org_field.countPuyos()) / 2 + 4))); // 探索ターン数の上限を設定
-        
-        // 上のがバグなので、同じ挙動をするように変更
-        const int search_turns = min(100000000, org_turn + min(50, ((6 * 13) - org_field.countPuyos()) / 2 + 4)); // 探索ターン数の上限を設定
+        const int search_turns = min(100000000, org_turn + max(10, min(50, ((6 * 13) - org_field.countPuyos()) / 2 + 4))); // 探索ターン数の上限を設定
         
         int max_chain = 0;
+        int best_score = 0;
         Decision first_decision;
         
         for(int turn = org_turn; turn < search_turns; ++turn){
@@ -313,6 +320,7 @@ namespace Yuricat{
                 
                 if(n.chain > max_chain){
                     max_chain = n.chain;
+                    best_score = n.score;
                     first_decision = n.first_decision;
                 }
             }
@@ -320,10 +328,10 @@ namespace Yuricat{
             if(max_chain >= chain_border && firstMap.size() <= 1){
                 // もう探索しても同じ手しかない
                 CERR << "skipped in turn " << turn << endl;
-                return make_tuple((*firstMap.begin()).first, max_chain, 0);
+                return make_tuple((*firstMap.begin()).first, max_chain, best_score, 0);
             }
             if(player == 1 && g_enemySearchNum){ // 相手視点での思考ストップ
-                return make_tuple(first_decision, -1, 0);
+                return make_tuple(first_decision, -1, -1, 0);
             }
         }
         
@@ -331,6 +339,7 @@ namespace Yuricat{
         vector<Decision> best = {Decision()};
         max_chain = 0;
         int fired_turn = 0;
+        best_score = 0;
         /*vector<Decision> best[24];
          for(int i = 0; i < 24; ++i){
          best[i] = {Decision()};
@@ -369,10 +378,12 @@ namespace Yuricat{
             });
             for(int i = 0; i < (int)firedResult[t].size(); ++i){
                 const auto& fired = firedResult[t][i];
-                if(fired.chain > max_chain){
+                //if(fired.chain > max_chain){
+                if(fired.score > best_score){
                     //int first_decision_index = toDecisionIndex(fired.first_decision);
                     
                     max_chain = fired.chain;
+                    best_score = fired.score;
                     fired_turn = turn;
                     
                     best.clear();
@@ -394,8 +405,8 @@ namespace Yuricat{
             CERR << d << ',';
         }CERR << endl;
         
-        CERR << "decision " << best[0] << " chain = " << max_chain << " in turn " << fired_turn << endl;
-        return make_tuple(best[0], max_chain, fired_turn);
+        CERR << "decision " << best[0] << " chain = " << max_chain << "score = " << best_score << " in turn " << fired_turn << endl;
+        return make_tuple(best[0], max_chain, best_score, fired_turn);
     }
     
     int soloSimulate(const int player,
@@ -423,10 +434,11 @@ namespace Yuricat{
         auto result = soloSearch(player, org_me.field, seq, ojamaDice, org_turn, org_frame, org_pending_score, org_pending_frame, chain_border);
 
         g_soloSearchResults[player].pushResult(SoloSearchResult{
-            seq,
-            get<2>(result),
-            get<1>(result),
-            get<0>(result),
+            seq, // sequence
+            get<3>(result), // turn
+            get<1>(result), // chain
+            get<2>(result), // score
+            get<0>(result), // decision
         });
         if(get<1>(result) == 0){
             return -1;

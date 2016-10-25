@@ -236,6 +236,7 @@ namespace Yuricat{
         return FRAMES_TO_DROP[dropHeight] + framesGroundingOjama(cnt);
     }
     
+    // 得点から勝率に変換
     double scoreToWP(int score){
         return 1 / (1 + exp(-(score - 60000) / 3000));
     }
@@ -243,7 +244,7 @@ namespace Yuricat{
         return 1 / (1 + exp(-(score0 - score1) / 3000));
     }
     
-    // 勝ち負け判定のための
+    // 勝ち負け判定のための関数
     int framePuyoNumToMaxScore(){
         return 0;
     }

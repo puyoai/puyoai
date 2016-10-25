@@ -55,7 +55,13 @@ bool isEndlessMode(){ return g_endlessMode; }
 int64_t timeManage(const PlayerState& me, const PlayerState& enemy, bool fast){
     // 行動決定にかけていい時間を決める(ms単位)
     UNUSED_VARIABLE(enemy);
-    return fast ? 30 : (550 - 500 * me.field.countPuyos() / 78);
+    
+    int highest_y = -1;
+    for(int x = 1; x <= FieldConstant::WIDTH; ++x){
+        highest_y = max(highest_y, me.field.height(x) - abs(x - 3));
+    }
+    
+    return fast ? 30 : min(30 + 560 * sqrt(1 - me.field.countPuyos() / 78.0), 30 + sqrt(max(0.0001, (13.0 - highest_y) / 13)) * 560);
 }
 
 Decision searchEscapeMove(const CoreField& f, const KumipuyoSeq& seq){
@@ -187,6 +193,7 @@ public:
         // DCHECK(!fast);
         
         Decision best; // 自動で(0, 0)初期化
+        std::string bestMessage;
         
         //cerr << "sequence = " << sequence.toString() << endl;
         
@@ -235,8 +242,10 @@ public:
                 
                 // after_zenkeshi check
                 if(me.hasZenkeshi){
-                    after_zenkeshi_score = min(after_zenkeshi_score, s);
-                    after_zenkeshi_move = plan.decision(0);
+                    if(s < after_zenkeshi_score){
+                        after_zenkeshi_score = s;
+                        after_zenkeshi_move = plan.decision(0);
+                    }
                 }
             }
         });
@@ -244,17 +253,17 @@ public:
         
         if(mate_rate > 0){
             cerr << "mate_rate = " << mate_rate << endl;
-            return DropDecision(mate_move);
+            return DropDecision(mate_move, "Mate");
         }
         
         if(zenkeshi_score > 0){
             cerr << "zenkeshi score = " << zenkeshi_score << endl;
-            return DropDecision(zenkeshi_move);
+            return DropDecision(zenkeshi_move, "Zenkeshi");
         }
         
         if(after_zenkeshi_score < 1000){
             cerr  << "after zenkeshi score = " << after_zenkeshi_score << endl;
-            return DropDecision(after_zenkeshi_move);
+            return DropDecision(after_zenkeshi_move, "AfterZenkeshi");
         }
         
         if(evaluationMode){
@@ -286,25 +295,27 @@ public:
             for (auto& th : g_searchThread){
                 th.join();
             }
-            best = g_soloSearchResults[0].bestFirst();
+            
+            DropDecision bestDM = g_soloSearchResults[0].bestFirst();
+            best = bestDM.decision();
+            bestMessage = bestDM.message();
             g_soloSearchResults[0].proceed(best);
             
             // 相手視点での探索スタート
             g_searchThread.clear();
-            for (int i = 0; i < num_threads - 1; ++i){  // 1スレッド余らせる
+            /*for (int i = 0; i < num_threads - 1; ++i){  // 1スレッド余らせる
                 g_searchThread.emplace_back(&soloSimulateThread,
                                             i, 1, enemy, me, enemy.seq, turn[1], frameId);
             }
             for (auto& th : g_searchThread){
                 th.detach();
-            }
+            }*/
         }
         
         if(best == Decision()){
-            cerr << "GIVE UP" << endl;
-            return DropDecision(searchEscapeMove(f, seq));
+            return DropDecision(searchEscapeMove(f, seq), "Give Up");
         }
-        return DropDecision(best);
+        return DropDecision(best, bestMessage);
     }
         
     void gaze(int frameId, const CoreField& enemyField, const KumipuyoSeq& seq) override{
@@ -466,7 +477,7 @@ public:
     int games;
     //int rensa_finish_frame[2]; // 連鎖終了フレーム
     bool evaluationMode = false; // 評価関数1手読みモード
-    int num_threads = 4;
+    int num_threads = 3;
     //bool endless_mode = false; // 諸事情によりendless modeか知る必要がある
 };
         

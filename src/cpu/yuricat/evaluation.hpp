@@ -102,13 +102,13 @@ namespace Yuricat{
         }
         
         // 高低差がありすぎることの減点
-        /*int min_height = 9999;
+        int min_height = 9999;
         int max_height = 0;
         for(int x = 1; x <= FieldConstant::WIDTH; ++x){
             min_height = min(min_height, field.height(x));
             max_height = max(max_height, field.height(x));
         }
-        score -= (max_height - min_height) * 10;*/
+        score -= (max_height - min_height) * 2;
         
         // 谷の減点
         int max_valley = 0;
