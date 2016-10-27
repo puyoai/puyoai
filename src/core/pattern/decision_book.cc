@@ -40,20 +40,10 @@ Decision DecisionBookField::nextDecision(const CoreField& cf, const KumipuyoSeq&
         return Decision();
 
     // Now it is guaranteed that field is matched.
-
-    // Check sequence with 1 Tsumo.
     const Kumipuyo& kp1 = seq.get(0);
-    for (const auto& entry : decisions1_) {
-        if (matchNext(&matcher, entry.first, kp1))
-            return entry.second;
-        if (kp1.isRep())
-            continue;
-        if (matchNext(&matcher, entry.first, kp1.reverse()))
-            return entry.second.reverse();
-    }
+    const Kumipuyo& kp2 = seq.get(1);
 
     // Check sequence with 2 Tsumos.
-    const Kumipuyo& kp2 = seq.get(1);
     for (const auto& entry : decisions2_) {
         if (matchNext(&matcher, entry.first, kp1, kp2))
             return entry.second;
@@ -66,6 +56,16 @@ Decision DecisionBookField::nextDecision(const CoreField& cf, const KumipuyoSeq&
         if (matchNext(&matcher, entry.first, kp1.reverse(), kp2))
             return entry.second.reverse();
         if (!kp2.isRep() && matchNext(&matcher, entry.first, kp1.reverse(), kp2.reverse()))
+            return entry.second.reverse();
+    }
+
+    // Check sequence with 1 Tsumo.
+    for (const auto& entry : decisions1_) {
+        if (matchNext(&matcher, entry.first, kp1))
+            return entry.second;
+        if (kp1.isRep())
+            continue;
+        if (matchNext(&matcher, entry.first, kp1.reverse()))
             return entry.second.reverse();
     }
 

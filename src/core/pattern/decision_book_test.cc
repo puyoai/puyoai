@@ -24,11 +24,8 @@ const char TEST_BOOK[] =
     "    \"..A...\",\n"
     "    \"..A...\"\n"
     "]\n"
+    "AA = [3, 0]\n"
     "AAAA = [5, 2]\n"
-    "AAAB = [3, 0]\n"
-    "AAAC = [3, 0]\n"
-    "AABB = [3, 0]\n"
-    "AABC = [3, 0]\n"
     "\n"
     "[[book]]\n"
     "field = [\n"
@@ -41,13 +38,7 @@ const char TEST_BOOK[] =
     "    \".B....\",\n"
     "    \".A....\"\n"
     "]\n"
-    "ABAB = [3, 0]\n"
-    "\n"
-    "[[book]]\n"
-    "field = [\n"
-    "    \"AA..AA\"\n"
-    "]\n"
-    "AA = [3, 1]\n";
+    "ABAB = [3, 0]\n";
 }  // namespace
 
 class DecisionBookTest : public testing::Test {
@@ -73,10 +64,17 @@ TEST_F(DecisionBookTest, nextDecisionNotInBook)
 
 TEST_F(DecisionBookTest, nextDecisionWithOneTsumo)
 {
-    CoreField cf("RR..RR");
-    KumipuyoSeq seq("RR");
+    CoreField cf;
+    KumipuyoSeq seq("RRRRGG");
 
-    EXPECT_EQ(Decision(3, 1), book().nextDecision(cf, seq));
+    EXPECT_EQ(Decision(3, 2), book().nextDecision(cf, seq));
+    cf.dropKumipuyo(Decision(3, 2), seq.front());
+    seq.dropFront();
+
+    // We have no entry to match with "RRGG", so "RR" is used.
+    EXPECT_EQ(Decision(3, 0), book().nextDecision(cf, seq));
+    cf.dropKumipuyo(Decision(3, 0), seq.front());
+    seq.dropFront();
 }
 
 TEST_F(DecisionBookTest, nextDecision1)
@@ -88,6 +86,7 @@ TEST_F(DecisionBookTest, nextDecision1)
     cf.dropKumipuyo(Decision(3, 2), seq.front());
     seq.dropFront();
 
+    // 2 Tsumo's control is prioritized to 1 Tsumo's control.
     EXPECT_EQ(Decision(5, 2), book().nextDecision(cf, seq));
     cf.dropKumipuyo(Decision(5, 2), seq.front());
     seq.dropFront();
