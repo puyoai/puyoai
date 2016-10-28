@@ -113,6 +113,9 @@ void Ai::onGroundedForEnemy(const FrameRequest& frame_request) {
 
 DropDecision Ai::checkJoseki(const CoreField& field, const KumipuyoSeq& seq) const {
   DecisionBook* joseki = Pattern::getJoseki();
+  if (!joseki) {
+    return DropDecision(Decision());
+  }
   Decision decision = joseki->nextDecision(field, seq);
   return DropDecision(decision, "By JOSEKI book");
 }

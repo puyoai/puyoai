@@ -45,15 +45,12 @@ std::string Trim(std::string line) {
 }  // namespace
 
 DecisionBook* Pattern::getJoseki() {
-  static DecisionBook* s_joseki = nullptr;
-  if (!s_joseki) {
-    s_joseki = new DecisionBook();
-    LOG(INFO) << "oad JOSEKI file: " << FLAGS_joseki_book;
-    if (!s_joseki->load(FLAGS_joseki_book)) {
-      LOG(INFO) << "Failed to load JOSEKI file: " << FLAGS_joseki_book;
-    }
+  static std::unique_ptr<DecisionBook> s_joseki(new DecisionBook());
+  if (s_joseki && !s_joseki->load(FLAGS_joseki_book)) {
+    LOG(INFO) << "Failed to load JOSEKI file: " << FLAGS_joseki_book;
+    s_joseki.reset();
   }
-  return s_joseki;
+  return s_joseki.get();
 }
 
 DynamicPatternBook* Pattern::getDynamicPattern() {
@@ -140,7 +137,7 @@ int DynamicPatternBook::iteratePatterns(const CoreField& field, std::string* bes
       }
 
       const DynamicPattern& pattern = it->second;
-      score += pattern.score;
+      score += pattern.score * (i + 1) / 2;
       name += pattern.name;
     }
 

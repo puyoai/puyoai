@@ -13,11 +13,6 @@
 
 namespace peria {
 
-TEST(PatternTest, readJoseki) {
-  DecisionBook* joseki = Pattern::getJoseki();
-  EXPECT_NE(nullptr, joseki);
-}
-
 class DynamicPatternBookForTest : public DynamicPatternBook {
  public:
   using DynamicPatternBook::book;
