@@ -137,7 +137,7 @@ int DynamicPatternBook::iteratePatterns(const CoreField& field, std::string* bes
       }
 
       const DynamicPattern& pattern = it->second;
-      score += pattern.score * (i + 1) / 2;
+      score += pattern.score;
       name += pattern.name;
     }
 
