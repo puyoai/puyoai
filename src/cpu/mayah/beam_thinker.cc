@@ -225,12 +225,21 @@ DropDecision BeamThinker::think(int /*frameId*/, const CoreField& field, const K
         }
     }
 
-    // Make initial states.
+    // Decision -> max chains
+    std::map<Decision, int> score;
+
+    // Make initial states (the first move).
     std::vector<State> currentStates;
     Plan::iterateAvailablePlans(field, seq, 1, [&](const RefPlan& plan) {
         currentStates.emplace_back(plan.field(), plan.firstDecision(), 0, 0, plan.totalFrames());
+
+        // Don't put 11th if rensa is not too good.
+        if (plan.field().height(3) >= 11) {
+            score[plan.firstDecision()] -= 100;
+        }
     });
 
+    // The second move.
     std::vector<State> nextStates;
     KumipuyoSeq subSeq = seq.subsequence(1);
     for (const auto& s : currentStates) {
@@ -239,9 +248,6 @@ DropDecision BeamThinker::think(int /*frameId*/, const CoreField& field, const K
             nextStates.emplace_back(plan.field(), s.firstDecision, 0, 0, total_frames);
         });
     }
-
-    // Decision -> max chains
-    std::map<Decision, int> score;
 
     WaitGroup wg;
     std::mutex mu;
