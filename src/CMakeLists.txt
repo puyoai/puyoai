@@ -83,7 +83,7 @@ if(MSVC)
     add_compile_options("/wd4267")  # from size_t to int
     add_compile_options("/wd4800")  # from int to bool
 
-    # include build_config always.h
+    # Always include build_config.h
     add_compile_options("/FI ${CMAKE_SOURCE_DIR}/build/build_config.h")
 else()
     if(CYGWIN AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
