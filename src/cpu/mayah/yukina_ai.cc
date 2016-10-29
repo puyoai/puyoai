@@ -126,7 +126,7 @@ DropDecision YukinaAI::thinkByThinker(int frame_id, const CoreField& field, cons
                                        usesDecisionBook, usesRensaHandTree);
     }
 
-    if (enemy.isRensaOngoing()) {
+    if (enemy.isRensaOngoing() || me.totalOjama(enemy) > 2) {
 #if 0
         if (enemy.rensaFinishingFrameId() - frame_id > 60 * 4 && field.countPuyos() < 64) {
             return beam_thinker_->think(frame_id, field, kumipuyo_seq, me, enemy, fast);
