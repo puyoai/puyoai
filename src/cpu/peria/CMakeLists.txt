@@ -6,7 +6,7 @@ cpu_setup("peria")
 add_library(peria_lib
   basic_ai.cc
   pai.cc
-  ai.cc evaluator.cc beam_search.cc
+  ai.cc evaluator.cc search_without_risk.cc
   pattern.cc)
 
 function(peria_add_executable exe)

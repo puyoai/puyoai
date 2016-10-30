@@ -1,4 +1,4 @@
-#include "beam_search.h"
+#include "search_without_risk.h"
 
 #include <vector>
 #include <deque>
@@ -16,7 +16,7 @@
 
 namespace peria {
 
-bool BeamSearch::SearchState::compareTo(const SearchState& other) const {
+bool SearchWithoutRisk::SearchState::compareTo(const SearchState& other) const {
   if (expect == other.expect) {
     if (score == other.score) {
       return frame > other.frame;  // earlier is better
@@ -26,7 +26,7 @@ bool BeamSearch::SearchState::compareTo(const SearchState& other) const {
   return expect < other.expect;
 }
 
-bool BeamSearch::shouldHonki(const PlayerState& enemy) {
+bool SearchWithoutRisk::shouldRun(const PlayerState& enemy) {
   if (!enemy.isRensaOngoing())
     return false;
   CoreField field = enemy.fieldWhenGrounded;
@@ -38,9 +38,9 @@ bool BeamSearch::shouldHonki(const PlayerState& enemy) {
   return puyo_num_used * 2 > puyo_num_from;
 }
 
-BeamSearch::BeamSearch(const PlayerState& me, const KumipuyoSeq& seq, int frames) :
+SearchWithoutRisk::SearchWithoutRisk(const PlayerState& me, const KumipuyoSeq& seq, int frames) :
     best_score_(0),
-    beam_(kSearchDepth), visited_(kSearchDepth),
+    states_(kSearchDepth), visited_(kSearchDepth),
     time_limit_(currentTime() + 0.250) {
   // Register starting state.
   SearchState first_state;
@@ -53,24 +53,24 @@ BeamSearch::BeamSearch(const PlayerState& me, const KumipuyoSeq& seq, int frames
   // Expand 2 contorls with known Kumipuyos.
   seq_ = seq;
   expand(first_state, 0);
-  for (const SearchState& state : beam_[1]) {
+  for (const SearchState& state : states_[1]) {
     expand(state, 1);
   }
 }
 
-void BeamSearch::init() {
+void SearchWithoutRisk::init() {
   // in |sequence|, [0] and [1] are not used.
   seq_ = KumipuyoSeqGenerator::generateRandomSequence(kSearchDepth);
   for (int i = 3; i < kSearchDepth; ++i) {
-    beam_[i].clear();
+    states_[i].clear();
     visited_[i].clear();
   }
-  for (const SearchState& state : beam_[2]) {
+  for (const SearchState& state : states_[2]) {
     expand(state, 2);
   }
 }
 
-Decision BeamSearch::run(int* test_times) {
+Decision SearchWithoutRisk::run(int* test_times) {
   int t = 0;
   // Dynamic beam search from 3rd states.
   for (t = 0; currentTime() < time_limit_; ++t) {
@@ -80,7 +80,7 @@ Decision BeamSearch::run(int* test_times) {
     }
 
     for (int i = 3; i < kSearchDepth; ++i) {
-      std::deque<SearchState>& states = beam_[i];
+      std::deque<SearchState>& states = states_[i];
       if (states.empty()) {
         continue;
       }
@@ -99,8 +99,8 @@ Decision BeamSearch::run(int* test_times) {
   return best_decision_;
 }
 
-void BeamSearch::expand(const SearchState& from, const int index) {
-  BeamSearch* self = this;
+void SearchWithoutRisk::expand(const SearchState& from, const int index) {
+  SearchWithoutRisk* self = this;
   auto callback = [&self, &from, &index](const RefPlan& plan)
   {
     const CoreField field = plan.field();
@@ -139,7 +139,7 @@ void BeamSearch::expand(const SearchState& from, const int index) {
 
     next.expect = expect + (next.hasZenkeshi ? ZENKESHI_BONUS : 0);
     if (index < kSearchDepth - 1) {
-      self->beam_[index + 1].push_back(next);
+      self->states_[index + 1].push_back(next);
     }
   };
   Plan::iterateAvailablePlans(from.field, {seq_.get(index)}, 1, callback);

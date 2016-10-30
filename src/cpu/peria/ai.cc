@@ -19,7 +19,7 @@
 #include "core/frame_request.h"
 #include "core/player_state.h"
 
-#include "beam_search.h"
+#include "search_without_risk.h"
 #include "control.h"
 #include "evaluator.h"
 #include "player_hands.h"
@@ -51,10 +51,10 @@ DropDecision Ai::think(int frame_id,
   }
 
   // Check if the enemy is firing the main rensa (Honsen)
-  if (BeamSearch::shouldHonki(enemy)) {
-    BeamSearch beam(me, seq, enemy.rensaFinishingFrameId() - frame_id);
+  if (SearchWithoutRisk::shouldRun(enemy)) {
+    SearchWithoutRisk search(me, seq, enemy.rensaFinishingFrameId() - frame_id);
     int t;
-    Decision decision = beam.run(&t);
+    Decision decision = search.run(&t);
     std::ostringstream oss;
     if (decision.isValid()) {
       oss << "Honki mode\n";
