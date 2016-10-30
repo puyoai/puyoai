@@ -18,6 +18,8 @@
 #include "core/core_field.h"
 #include "core/frame_request.h"
 #include "core/player_state.h"
+
+#include "beam_search.h"
 #include "control.h"
 #include "evaluator.h"
 #include "player_hands.h"
@@ -42,9 +44,26 @@ DropDecision Ai::think(int frame_id,
   control.message = "No choice";
   control.score = 0;
 
+  // Check if it is in Joski template.
   DropDecision joseki = checkJoseki(field, seq);
   if (joseki.isValid()) {
     return joseki;
+  }
+
+  // Check if the enemy is firing the main rensa (Honsen)
+  if (BeamSearch::shouldHonki(enemy)) {
+    BeamSearch beam(me, seq, enemy.rensaFinishingFrameId() - frame_id);
+    int t;
+    Decision decision = beam.run(&t);
+    std::ostringstream oss;
+    if (decision.isValid()) {
+      oss << "Honki mode\n";
+    } else {
+      oss << "Honki muri\n";
+      decision = Decision(3, 2);
+    }
+    oss << "Beam run " << t << " times";
+    return DropDecision(decision, oss.str());
   }
 
   Evaluator evaluator(me, enemy, enemy_hands_, &control);

@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("peria")
 
+# TODO(peria): remove basic_ai.cc and pai.cc
 add_library(peria_lib
   basic_ai.cc
   pai.cc
-  ai.cc evaluator.cc
+  ai.cc evaluator.cc beam_search.cc
   pattern.cc)
 
 function(peria_add_executable exe)
