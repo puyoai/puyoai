@@ -2,10 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 cpu_setup("peria")
 
-# TODO(peria): remove basic_ai.cc and pai.cc
 add_library(peria_lib
-  basic_ai.cc
-  pai.cc
   ai.cc evaluator.cc search_without_risk.cc
   pattern.cc)
 
@@ -26,15 +23,12 @@ endfunction()
 peria_add_executable(peria main.cc)
 peria_add_executable(tokopuyo tokopuyo.cc)
 
-cpu_add_runner(run.sh)
-cpu_add_runner(run.bat)
-cpu_add_runner(pai.sh)
-cpu_add_runner(basic_ai.sh)
+if(MSVC)
+  cpu_add_runner(run.bat)
+else()
+  cpu_add_runner(run.sh)
+endif()
 
-cpu_add_runner(dynamic_book.txt)
-
-include_directories(${gtest_SOURCE_DIR}/include
-                    ${gtest_SOURCE_DIR})
 # TODO(peria): add tests if needed
 peria_add_test(pattern_test)
 #peria_add_test(field_test)

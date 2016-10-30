@@ -3,12 +3,9 @@
 #include <fstream>
 
 #include "cpu/peria/ai.h"
-#include "cpu/peria/basic_ai.h"
-#include "cpu/peria/pai.h"
 #include "cpu/peria/pattern.h"
 
 DECLARE_string(dynamic_pattern);
-DEFINE_int32(type, 0, "AI type");
 
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
@@ -25,18 +22,7 @@ int main(int argc, char* argv[]) {
     LOG(INFO) << "Failed in loading " << FLAGS_dynamic_pattern;
   }
 
-  std::unique_ptr<AI> ai;
-  switch (FLAGS_type) {
-  case 0:
-    ai.reset(new peria::Ai(argc, argv));
-    break;
-  case 1:
-    ai.reset(new peria::Pai(argc, argv));
-    break;
-  case 2:
-    ai.reset(new peria::BasicAi(argc, argv));
-  }
-  CHECK(ai);
+  std::unique_ptr<AI> ai(new peria::Ai(argc, argv));
   ai->runLoop();
 
   return 0;
