@@ -55,7 +55,7 @@ Evaluator::Genre Evaluator::EvalField(const PlayerState& me, const PlayerState& 
 
   if (true) {
     std::string name;
-    int value = DynamicPatternBook::iteratePatterns(me.field, &name);
+    int value = Pattern::getDynamicPattern()->iteratePatterns(me.field, &name);
     if (value > 0) {
       oss << "Pattern(" << name << ")_";
       score += value;

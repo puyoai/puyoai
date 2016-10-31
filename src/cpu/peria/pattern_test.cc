@@ -1,90 +1,100 @@
 #include "pattern.h"
 
+#include <sstream>
+#include <string>
+
+#include <gtest/gtest.h>
+
 #include "core/pattern/decision_book.h"
 #include "core/core_field.h"
 #include "core/field_bits.h"
 #include "core/field_constant.h"
 #include "core/puyo_color.h"
 
-#include <sstream>
-#include <string>
-
-#include <gtest/gtest.h>
-
 namespace peria {
 
-class DynamicPatternBookForTest : public DynamicPatternBook {
+class TestableDynamicPatternBook : public DynamicPatternBook {
  public:
-  using DynamicPatternBook::book;
+  TestableDynamicPatternBook(const std::string& str) {
+    ASSERT_TRUE(loadFromString(str));
+  }
+  size_t size() { return book_.size(); }
+  Book::iterator find(const FieldBits& key) { return book_.find(key); }
+  const Book::iterator end() { return book_.end(); }
 };
 
-class DynamicPatternTest : public testing::Test {
- public:
-  void SetUp() override {
-    DynamicPatternBook::clear();
-  }
-  void TearDown() override {
-    DynamicPatternBook::clear();
-  }
+TEST(DynamicPatternTest, parsePattern) {
+  const std::string book_str(
+      "[[pattern]]\n"
+      "name = \"Test\"\n"
+      "score = 24\n"
+      "field = [\n"
+      "    \"AAAA..\"\n"
+      "]\n");
+  TestableDynamicPatternBook book(book_str);
 
-  const DynamicPatternBook::Book& book() {
-    return DynamicPatternBookForTest::book();
-  }
-};
-
-TEST_F(DynamicPatternTest, parsePattern) {
-  const std::string book_str("NAME: Test\n"
-                             "SCORE: 24\n"
-                             "AAAA..\n");
-  std::istringstream iss(book_str);
-  DynamicPattern pattern(iss);;
-
+  EXPECT_EQ(1U, book.size());
   FieldBits expect("1111..");
+  auto it = book.find(expect);
+  ASSERT_NE(book.end(), it);
+  const DynamicPattern& pattern = it->second;
   EXPECT_EQ("Test", pattern.name);
   EXPECT_EQ(24, pattern.score);
   EXPECT_EQ(expect, pattern.bits);
 }
 
-TEST_F(DynamicPatternTest, readBook) {
-  const std::string book_str("NAME: Test\n"
-                             "AAAA..\n"
-                             "----\n"
-                             "NAME: Test2\n"
-                             "..A...\n"
-                             ".AAA..\n");
-  std::istringstream iss(book_str);
+TEST(DynamicPatternTest, readBook) {
+  const std::string book_str(
+      "[[pattern]]\n"
+      "name = \"Test\"\n"
+      "field = [\n"
+      "    \"AAAA..\"\n"
+      "]\n"
+      "\n"
+      "[[pattern]]\n"
+      "name = \"Test2\"\n"
+      "field = [\n"
+      "    \"..A...\",\n"
+      "    \".AAA..\"\n"
+      "]\n");
 
-  DynamicPatternBook::readBook(iss);
-  EXPECT_EQ(2U, book().size());
+  TestableDynamicPatternBook book(book_str);
+  EXPECT_EQ(2U, book.size());
 
   FieldBits no_entry("...1.."
                      "..111.");
   FieldBits entry1("1111..");
   FieldBits entry2("..1..."
                   ".111..");
-  EXPECT_EQ(book().end(), book().find(no_entry));
-  auto it = book().find(entry1);
-  EXPECT_NE(book().end(), it);
+  EXPECT_EQ(book.end(), book.find(no_entry));
+  auto it = book.find(entry1);
+  EXPECT_NE(book.end(), it);
   EXPECT_EQ("Test", it->second.name);
-  it = book().find(entry2);
-  EXPECT_NE(book().end(), it);
+  it = book.find(entry2);
+  EXPECT_NE(book.end(), it);
   EXPECT_EQ("Test2", it->second.name);
 }
 
-TEST_F(DynamicPatternTest, iteratePatterns) {
-  const std::string book_str("NAME: Test\n"
-                             "AAAA..\n"
-                             "----\n"
-                             ".AAAA.\n");
-  std::istringstream iss(book_str);
-  DynamicPatternBook::readBook(iss);
-  ASSERT_EQ(2U, book().size());
+TEST(DynamicPatternTest, iteratePatterns) {
+  const std::string book_str(
+      "[[pattern]]\n"
+      "name = \"Test\"\n"
+      "field = [\n"
+      "    \"AAAA..\"\n"
+      "]\n"
+      "\n"
+      "[[pattern]]\n"
+      "field = [\n"
+      "    \".AAAA.\"\n"
+      "]\n");
+  TestableDynamicPatternBook book(book_str);
+  ASSERT_EQ(2U, book.size());
 
   // Assume this field will be  vvvvvv and vanish in 2-chain.
   CoreField field(".RRR.."   // .RRR..
                   "RBBB.."); // RBBBB.
   std::string name;
-  int score = DynamicPatternBook::iteratePatterns(field, &name);
+  int score = book.iteratePatterns(field, &name);
   EXPECT_EQ("Test", name);
   EXPECT_EQ(DynamicPattern::kDefaultScore * 2, score);
 }

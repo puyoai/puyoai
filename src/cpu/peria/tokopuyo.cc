@@ -8,7 +8,6 @@
 
 #include "core/kumipuyo_seq.h"
 #include "core/kumipuyo_seq_generator.h"
-#include "cpu/peria/pattern.h"
 #include "solver/endless.h"
 #include "solver/puyop.h"
 
@@ -17,24 +16,12 @@ DEFINE_int32(loop, 5, "The number of playouts");
 DEFINE_int32(num_hands, 50, "The number of TSUMOs to play in one game.");
 DEFINE_bool(verbose, false, "Display all hands");
 
-DECLARE_string(dynamic_pattern);
-
 int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);
 #if !defined(_MSC_VER)
   google::InstallFailureSignalHandler();
 #endif
-
-  if (!FLAGS_dynamic_pattern.empty()) {
-    std::ifstream dynamic_pattern_file(FLAGS_dynamic_pattern);
-    if (dynamic_pattern_file.is_open()) {
-      LOG(INFO) << "Leading " << FLAGS_dynamic_pattern << " for pattern mathcing";
-      peria::DynamicPatternBook::readBook(dynamic_pattern_file);
-    } else {
-      LOG(INFO) << "Failed in loading " << FLAGS_dynamic_pattern;
-    }
-  }
 
   std::unique_ptr<AI> ai(new peria::Ai(argc, argv));
 

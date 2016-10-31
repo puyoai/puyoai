@@ -1,0 +1,110 @@
+# Dynamic template book
+# '#' 以降はコメント
+
+# Basic format:
+# NAME:  テンプレ名. テンプレ内の最初の行にすること.
+# SCORE: テンプレのスコア. 無い場合はデフォルトスコア
+# ......   ':' がない行がフィールド.
+# ......   大文字が評価対象ぷよ.
+# ......   '.' や小文字は任意. '_'は強制空白.
+
+[[pattern]]
+name = "GTR"
+field = [
+    ".....A",
+    ".....A",
+    "....AA",
+    "......"
+]
+
+[[pattern]]
+name = "GTR2"
+field = [
+    "...BB.",
+    "....BB"
+]
+
+[[pattern]]
+name = "GTR3a"
+field = [
+    ".CCC..",
+    "...C.."
+]
+
+[[pattern]]
+name = "GTR3b"
+field = [
+    "CCCC..",
+    "...C.."
+]
+
+[[pattern]]
+name = "GTR3c"
+field = [
+    "...C..",
+    ".CCC.."
+]
+
+[[pattern]]
+name = "GTR4a"
+field = [
+    ".D....",
+    "DDD..."
+]
+
+[[pattern]]
+name = "GTR4b"
+field = [
+    "D.....",
+    "DDD..."
+]
+
+[[pattern]]
+name = "GTR4c"
+field = [
+    "..D...",
+    "DDD..."
+]
+
+[[pattern]]
+name = "SGTR"
+field = [
+    ".A....",
+    "AAA...",
+    "......"
+]
+
+[[pattern]]
+name = "SGTR2"
+field = [
+    "..BB..",
+    "BBB..."
+]
+
+[[pattern]]
+name = "SGTR3a"
+field = [
+    "...CCC",
+    "...C.."
+]
+
+[[pattern]]
+name = "SGTR3b"
+field = [
+    "...C..",
+    "...CCC"
+]
+
+[[pattern]]
+name = "SGTR4a"
+field = [
+    "....D.",
+    "...DDD"
+]
+
+[[pattern]]
+name = "SGTR4c"
+field = [
+    ".....D",
+    "...DDD"
+]

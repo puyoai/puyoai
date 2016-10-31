@@ -6,6 +6,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <toml/toml.h>
+
 #include "core/core_field.h"
 #include "core/field_bits.h"
 
@@ -26,8 +28,7 @@ class Pattern {
 // DynamicPattern class figures where puyos are being vanished
 class DynamicPattern {
  public:
-  DynamicPattern();
-  explicit DynamicPattern(std::istream& is);
+  explicit DynamicPattern(const toml::Value&);
 
   // TODO: |bits| is a key in PatternBook, so we don't need to keep it here
   FieldBits bits;
@@ -39,25 +40,24 @@ class DynamicPattern {
 
 class DynamicPatternBook {
  public:
-  using Book = std::unordered_map<FieldBits, DynamicPattern>;
-
-  static void readBook(std::istream& is);
-  static void clear() { book_.clear(); }
+  bool load(const std::string& filename);
+  bool loadFromString(const std::string& str);
+  bool loadFromValue(const toml::Value& book);
 
   // Simulate possible rensas, and find matching patterns
-  static int iteratePatterns(const CoreField& field, std::string* name);
+  int iteratePatterns(const CoreField& field, std::string* name);
+
+  size_t size() { return book_.size(); }
 
  protected:
-  static const Book& book() { return book_; }
-
- private:
-  static Book book_;
+  using Book = std::unordered_map<FieldBits, DynamicPattern>;
+  Book book_;
 };
 
 // StaticPattern class figures where non-vanishing puyos are.
 class StaticPattern {
  public:
-  explicit StaticPattern(std::istream& is);
+  explicit StaticPattern(std::istream&);
 
   int match(const CoreField& field) const;
 
@@ -68,19 +68,14 @@ class StaticPattern {
 
 class StaticPatternBook {
  public:
-  using Book = std::vector<StaticPattern>;
-
-  static void readBook(std::istream& is);
-  static void clear() { book_.clear(); }
+  void readBook(std::istream& is);
 
   // Simulate possible rensas, and find matching patterns
-  static int iteratePatterns(const CoreField& field, std::string* name);
-
- protected:
-  static const Book& book() { return book_; }
+  int iteratePatterns(const CoreField& field, std::string* name);
 
  private:
-  static Book book_;
+  using Book = std::vector<StaticPattern>;
+  Book book_;
 };
 
 }  // namespace peria
