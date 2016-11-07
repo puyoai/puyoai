@@ -16,7 +16,7 @@ namespace peria {
 class TestableDynamicPatternBook : public DynamicPatternBook {
  public:
   TestableDynamicPatternBook(const std::string& str) {
-    ASSERT_TRUE(loadFromString(str));
+    EXPECT_TRUE(loadFromString(str));
   }
   size_t size() { return book_.size(); }
   Book::iterator find(const FieldBits& key) { return book_.find(key); }
