@@ -59,6 +59,16 @@ SearchWithoutRisk::SearchWithoutRisk(const PlayerState& me, const KumipuyoSeq& s
 }
 
 void SearchWithoutRisk::init() {
+  if (best_decision_.isValid()) {
+    int x = best_decision_.x;
+    int r = best_decision_.r;
+    total_score_[x][r] += best_score_;
+    ++total_score_count_[x][r];
+
+    best_score_ = 0;
+    best_decision_ = Decision();
+  }
+
   // in |sequence|, [0] and [1] are not used.
   seq_ = KumipuyoSeqGenerator::generateRandomSequence(kSearchDepth);
   for (int i = 3; i < kSearchDepth; ++i) {
@@ -72,6 +82,7 @@ void SearchWithoutRisk::init() {
 
 Decision SearchWithoutRisk::run(int* test_times) {
   int t = 0;
+
   // Dynamic beam search from 3rd states.
   for (t = 0; currentTime() < time_limit_; ++t) {
     // Reset every |kMaxSearchWidth| times.
@@ -96,7 +107,25 @@ Decision SearchWithoutRisk::run(int* test_times) {
   }
   if (test_times)
     *test_times = t;
-  return best_decision_;
+
+  return bestDecision();
+}
+
+Decision SearchWithoutRisk::bestDecision() const {
+  Decision decision;
+  double score = 0;
+  for (int x = 1; x <= 6; ++x) {
+    for (int r = 0; r < 4; ++r) {
+      if (total_score_count_[x][r] == 0)
+        continue;
+      double avg = total_score_[x][r] / total_score_count_[x][r];
+      if (avg > score) {
+        decision = Decision(x, r);
+        score = avg;
+      }
+    }
+  }
+  return decision;
 }
 
 void SearchWithoutRisk::expand(const SearchState& from, const int index) {

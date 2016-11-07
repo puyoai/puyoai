@@ -35,6 +35,7 @@ class SearchWithoutRisk {
   // |frames| figures frame dration by the enemy's rensa will finish.
   SearchWithoutRisk(const PlayerState& me, const KumipuyoSeq& seq, int frames);
   Decision run(int* t = nullptr);
+  Decision bestDecision() const;
 
  protected:
   void init();
@@ -45,6 +46,9 @@ class SearchWithoutRisk {
   std::vector<std::deque<SearchState>> states_;
   std::vector<std::unordered_set<std::uint64_t>> visited_;
   KumipuyoSeq seq_;
+
+  std::array<std::array<double, 4>, 7> total_score_;
+  std::array<std::array<int, 4>, 7> total_score_count_;
 
   const double time_limit_;
 };
