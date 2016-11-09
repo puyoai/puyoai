@@ -42,7 +42,7 @@ DropDecision Ai::think(int frame_id,
   Control control;
   control.decision= Decision(3, 2);
   control.message = "No choice";
-  control.score = 0;
+  control.score = -10000;
 
   // Check if it is in Joski template.
   DropDecision joseki = checkJoseki(field, seq);
@@ -53,8 +53,7 @@ DropDecision Ai::think(int frame_id,
   // Check if the enemy is firing the main rensa (Honsen)
   if (SearchWithoutRisk::shouldRun(enemy)) {
     SearchWithoutRisk search(me, seq, enemy.rensaFinishingFrameId() - frame_id);
-    int t;
-    Decision decision = search.run(&t);
+    Decision decision = search.run();
     std::ostringstream oss;
     if (decision.isValid()) {
       oss << "Honki mode\n";
@@ -62,7 +61,7 @@ DropDecision Ai::think(int frame_id,
       oss << "Honki muri\n";
       decision = Decision(3, 2);
     }
-    oss << "Beam run " << t << " times";
+    oss << "Beam run " << search.countBeam() << " times";
     return DropDecision(decision, oss.str());
   }
 
@@ -132,9 +131,7 @@ void Ai::onGroundedForEnemy(const FrameRequest& frame_request) {
 
 DropDecision Ai::checkJoseki(const CoreField& field, const KumipuyoSeq& seq) const {
   DecisionBook* joseki = Pattern::getJoseki();
-  if (!joseki) {
-    return DropDecision(Decision());
-  }
+  DCHECK(joseki);
   Decision decision = joseki->nextDecision(field, seq);
   return DropDecision(decision, "By JOSEKI book");
 }

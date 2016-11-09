@@ -80,11 +80,9 @@ void SearchWithoutRisk::init() {
   }
 }
 
-Decision SearchWithoutRisk::run(int* test_times) {
-  int t = 0;
-
+Decision SearchWithoutRisk::run() {
   // Dynamic beam search from 3rd states.
-  for (t = 0; currentTime() < time_limit_; ++t) {
+  for (int t = 0; currentTime() < time_limit_; ++t) {
     // Reset every |kMaxSearchWidth| times.
     if (t % kMaxSearchWidth == 0) {
       init();
@@ -105,8 +103,6 @@ Decision SearchWithoutRisk::run(int* test_times) {
       states.pop_front();
     }
   }
-  if (test_times)
-    *test_times = t;
 
   return bestDecision();
 }
@@ -126,6 +122,16 @@ Decision SearchWithoutRisk::bestDecision() const {
     }
   }
   return decision;
+}
+
+int SearchWithoutRisk::countBeam() const {
+  int sum = 0;
+  for (auto counts : total_score_count_) {
+    for (auto c : counts) {
+      sum += c;
+    }
+  }
+  return sum;
 }
 
 void SearchWithoutRisk::expand(const SearchState& from, const int index) {
