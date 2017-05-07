@@ -283,13 +283,7 @@ void wm_gentabs()
 #ifndef __WIIMOTE_H__
 #define __WIIMOTE_H__
 
-#if defined(ARDUINO) && ARDUINO >= 100
-  #include "Arduino.h"
-  #else
-  #include "WProgram.h"
-  #endif
 #include <Wire.h>
-
 
 // Identification sequence for Classic Controller
 static byte idbuf[] = { 0x00, 0x00, 0xa4, 0x20, 0x01, 0x01 };
