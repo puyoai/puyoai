@@ -1,5 +1,6 @@
 #include "rensa_hand_tree.h"
 
+#include <cmath>
 #include <iostream>
 #include <sstream>
 
