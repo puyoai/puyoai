@@ -132,6 +132,8 @@ private:
     std::string name_;
     std::unique_ptr<ClientConnector> connector_;
 
+    // True if tsumo sequences of Player 1 and Player2 differ.
+    // Probably color recognizer misunderstand the field.
     bool desynced_;
 
     bool rethinkRequested_;
