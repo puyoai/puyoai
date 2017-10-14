@@ -129,7 +129,10 @@ void AI::runLoop()
             VLOG(1) << '\n' << me_.field.toDebugString();
 
             KumipuyoSeq seq = rememberedSequence(me_.hand + 1, kumipuyoSeq.subsequence(1));
-            CHECK_EQ(kumipuyoSeq.get(1), seq.get(0));
+            if (kumipuyoSeq.get(1) != seq.get(0)) {
+                // desynced?
+                LOG(ERROR) << "desynced?";
+            }
             if (kumipuyoSeq.size() >= 3) {
                 LOG_IF(ERROR, kumipuyoSeq.get(2) != seq.get(1))
                     << "desynced? "
@@ -211,8 +214,12 @@ void AI::runLoop()
             const auto& kumipuyoSeq = frameRequest.myPlayerFrameRequest().kumipuyoSeq;
 
             KumipuyoSeq seq = rememberedSequence(me_.hand, kumipuyoSeq);
-            CHECK_EQ(kumipuyoSeq.get(0), seq.get(0));
-            CHECK_EQ(kumipuyoSeq.get(1), seq.get(1));
+            if (kumipuyoSeq.get(0) != seq.get(0) || kumipuyoSeq.get(1) != seq.get(1)) {
+                // desynced?
+                LOG(ERROR) << "desynced?"
+                           << " kumipuyoSeq=" << kumipuyoSeq.toString()
+                           << " seq=" << seq.toString();
+            }
 
             next1.dropDecision = think(frameRequest.frameId, me_.field, seq, myPlayerState(), enemyPlayerState(), true);
             next1.kumipuyo = kumipuyoSeq.get(0);
