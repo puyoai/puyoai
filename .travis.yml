@@ -1,17 +1,25 @@
+dist: trusty
+sudo: false
 language: cpp
-
 compiler:
   - clang
-
 cache: apt
 
-before_script:
-  - sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu/ trusty main universe"
-  - sudo apt-get update -qq
-  - sudo apt-get install -y clang cmake ninja-build libstdc++-4.8-dev
-  - sudo apt-get install -y libgoogle-glog-dev libgflags-dev libprotobuf-dev
-  - sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
-  - sudo apt-get install -y libmicrohttpd-dev libffms2-dev libusb-1.0-0-dev
+addons:
+  apt:
+    packages:
+    - cmake
+    - libffms2-dev
+    - libgflags-dev
+    - libgoogle-glog-dev
+    - libmicrohttpd-dev
+    - libprotobuf-dev
+    - libsdl2-dev
+    - libsdl2-image-dev
+    - libsdl2-ttf-dev
+    - libstdc++-4.8-dev
+    - libusb-1.0-0-dev
+    - ninja-build
 
 script:
   - ./build/travis.sh
