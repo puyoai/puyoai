@@ -50,9 +50,13 @@ MovieSource::MovieSource(const char* filename) :
         fprintf(stderr, "Codec not found\n");
         return;
     }
+
+#if defined(CODEC_CAP_TRUNCATED) && defined(CODEC_FLAG_TRUNCATED)
+    //recent libavcode does not support CODEC_CAP_TRUNCATED etc.
     if (c->capabilities & CODEC_CAP_TRUNCATED) {
         codec_->flags |= CODEC_FLAG_TRUNCATED;
     }
+#endif
 
     if (avcodec_open2(codec_, c, NULL) < 0) {
         fprintf(stderr, "Couldn't open codec\n");
