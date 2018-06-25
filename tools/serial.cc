@@ -102,9 +102,14 @@ void run(int fd)
     }
 }
 
-int main(void)
+int main(int argc, char* argv[])
 {
-    const string deviceName = "/dev/tty.usbmodem1411";
+    string deviceName = "/dev/tty.usbmodem1411";
+    if (argc >= 2) {
+        deviceName = argv[1];
+    }
+
+    cout << "derive " << deviceName << " is used." << endl;
     int fd_ = -1;
 
     struct termios tio;
