@@ -34,6 +34,7 @@ DEFINE_int32(offset, 0, "offset for random seed");
 using namespace std;
 
 struct Result {
+    KumipuyoSeq seq;
     EndlessResult result;
     string msg;
 };
@@ -171,7 +172,7 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
                 ss << " / ZENKESHI";
             ss << endl;
 
-            ps[i].set_value(Result{result, ss.str()});
+            ps[i].set_value(Result{seq, result, ss.str()});
         };
         executor->submit(f);
     }
