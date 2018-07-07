@@ -28,6 +28,7 @@ DEFINE_bool(once, false, "true if running only once.");
 DEFINE_int32(auto_count, 0, "run auto tweaker for this count.");
 #endif
 DEFINE_bool(show_field, false, "show field after each hand.");
+DEFINE_string(output_transition_file, "", "output filename of transition");
 DEFINE_int32(size, 100, "the number of case size.");
 DEFINE_int32(offset, 0, "offset for random seed");
 
@@ -149,8 +150,35 @@ void runOnce(const EvaluationParameterMap& paramMap)
     cout << endl;
 }
 
-RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
-{
+void output_transition_to_file(const Result& result, std::ofstream& out) {
+    CoreField cf;
+
+    for (size_t i = 0; i < result.result.decisions.size(); ++i) {
+        const Decision& d = result.result.decisions[i];
+        PlainField pf = cf.toPlainField();
+        out << pf.toString('.')
+            << ','
+            << result.seq.axis(i)
+            << result.seq.child(i)
+            << result.seq.axis(i + 1)
+            << result.seq.child(i + 1)
+            << ','
+            << (50 - i)
+            << ','
+            << d.x
+            << ','
+            << d.r
+            << ','
+            << result.result.maxRensa
+            << endl;
+
+        cf.dropKumipuyo(d, result.seq.get(i));
+        cf.simulateFast();
+    }
+}
+
+RunResult run(Executor* executor, const EvaluationParameterMap& paramMap,
+              const std::string& transition_file_name) {
     const int N = FLAGS_size;
     vector<promise<Result>> ps(N);
 
@@ -190,6 +218,12 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
     int overRensa14Count = 0;
     int overRensa15Count = 0;
 
+    std::unique_ptr<std::ofstream> output_file;
+    if (!transition_file_name.empty()) {
+        std::cout << "transition file: " << transition_file_name << std::endl;
+        output_file.reset(new std::ofstream(transition_file_name));
+    }
+
     vector<pair<int, int>> scores;
     for (int i = 0; i < N; ++i) {
         Result r = ps[i].get_future().get();
@@ -213,6 +247,10 @@ RunResult run(Executor* executor, const EvaluationParameterMap& paramMap)
         if (r.result.maxRensa >= 13) { overRensa13Count++; }
         if (r.result.maxRensa >= 14) { overRensa14Count++; }
         if (r.result.maxRensa >= 15) { overRensa15Count++; }
+
+        if (output_file) {
+            output_transition_to_file(r, *output_file);
+        }
     }
 
     sort(scores.begin(), scores.end());
@@ -303,7 +341,7 @@ int main(int argc, char* argv[])
     if (!FLAGS_seq.empty() || FLAGS_seed >= 0) {
         runOnce(paramMap);
     } else if (FLAGS_once) {
-        run(executor.get(), paramMap);
+        run(executor.get(), paramMap, FLAGS_output_transition_file);
 #if 0
     } else if (FLAGS_auto_count > 0) {
         runAutoTweaker(executor.get(), paramMap, FLAGS_auto_count);
@@ -326,7 +364,7 @@ int main(int argc, char* argv[])
               paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::MIDDLE, HIGHER_PUYO_THAN_IGNITION_SQUARE, -y);
               paramMap.mutableMainRensaParamSet()->setParam(EvaluationMode::LATE, HIGHER_PUYO_THAN_IGNITION_SQUARE, -y);
 
-              scoreMap[ScoreMapKey(x, y)] = run(executor.get(), paramMap);
+              scoreMap[ScoreMapKey(x, y)] = run(executor.get(), paramMap, FLAGS_output_transition_file);
             }
         }
 
