@@ -32,6 +32,13 @@ function(mayah_add_executable exe)
     cpu_target_link_libraries(${exe} mayah_lib)
     cpu_target_link_libraries(${exe} mayah_thinker_lib)
     cpu_target_link_libraries(${exe} mayah_evaluator_lib)
+
+    cpu_target_link_libraries(${exe} puyoai_third_party_jsoncpp)
+
+if(LIB_CURL)
+    cpu_target_link_libraries(${exe} ${LIB_CURL})
+endif()
+
     cpu_target_link_common_libraries(${exe})
 endfunction()
 

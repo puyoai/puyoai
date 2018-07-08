@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <tuple>
 
 #include <gflags/gflags.h>
@@ -23,10 +24,78 @@
 #include "pattern_thinker.h"
 #include "mayah_ai.h"
 
+#ifdef USE_LIBCURL
+# include <curl/curl.h>
+#endif
+#include <json/json.h>
+
 DEFINE_string(problem, "", "use problem");
 DEFINE_bool(tokopuyo, false, "Use tokopuyo parameter");
 
 using namespace std;
+
+#ifdef USE_LIBCURL
+
+size_t write_callback(void* dst, size_t size, size_t nmemb, void* userp) {
+    string* str = reinterpret_cast<string*>(userp);
+    str->append(reinterpret_cast<char*>(dst), size * nmemb);
+    return size * nmemb;
+}
+
+string askPuyoServer(const PlainField& field, const Kumipuyo& next1, const Kumipuyo& next2, int rest_hand) {
+    // convert to json.
+    // example: {"field":"....................................................................................",
+    //           "next1":"RR",
+    //           "next2":"BB",
+    //           "rest":50}
+
+    stringstream ss;
+    ss << "{"
+       << "\"field\":\"" << field.toString('.') << "\","
+       << "\"next1\":\"" << next1.axis << next1.child << "\","
+       << "\"next2\":\"" << next2.axis << next2.child << "\","
+       << "\"rest\":" << rest_hand
+       << "}";
+    string body = ss.str();
+    LOG(INFO) << body;
+
+    CURL* curl = curl_easy_init();
+    if (!curl) {
+        LOG(ERROR) << "failed to init curl";
+        return string();
+    }
+
+    string buffer;
+
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    headers = curl_slist_append(headers, "Accept: application/json");
+    curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:2424/eval");
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, body.size());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void*>(&buffer));
+    // curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    CURLcode res = curl_easy_perform(curl);
+
+    curl_slist_free_all(headers);
+
+    if (res != CURLE_OK) {
+        LOG(ERROR) << "failed to get data";
+        curl_easy_cleanup(curl);
+        return string();
+    }
+
+    // LOG(INFO) << buffer;
+
+    curl_easy_cleanup(curl);
+
+    return buffer;
+}
+#endif
 
 class InteractiveAI : public DebuggableMayahAI {
 public:
@@ -138,6 +207,31 @@ int main(int argc, char* argv[])
                 }
             }
             cout << " time = " << ((t2 - t1) * 1000) << " [ms]" << endl;
+
+#ifdef USE_LIBCURL
+            {
+                cout << "ask_puyo_server (2)" << endl;
+                string json_str = askPuyoServer(currentField.toPlainField(), seq.get(0), seq.get(1), 50 - i);
+                if (!json_str.empty()) {
+                    Json::Reader reader;
+                    Json::Value root;
+                    if (reader.parse(json_str, root)) {
+                        for (int x = 1; x <= 6; ++x) {
+                            for (int r = 0; r < 4; ++r) {
+                                double p = root["result"]["p"][x - 1][r].asDouble();
+                                char buf[1024];
+                                sprintf(buf, "(%d, %d)=%8.4f", x, r, p);
+                                cout << buf << "  ";
+                            }
+                            cout << endl;
+                        }
+                        cout << "q=" << root["result"]["q"] << endl;
+                    } else {
+                        cout << "failed to parse" << endl;
+                    }
+                }
+            }
+#endif
 
             string str;
             cout << "command? ";
