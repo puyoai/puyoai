@@ -61,6 +61,10 @@ mayah_add_executable(experimental experimental.cc)
 
 mayah_add_executable(gazer_example gazer_example.cc)
 
+if(USE_LIBCURL)
+    mayah_add_executable(neural neural.cc)
+endif()
+
 if(USE_HTTPD)
     mayah_add_executable(pattern_maker pattern_maker.cc)
 endif()
