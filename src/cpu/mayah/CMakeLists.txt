@@ -68,7 +68,7 @@ mayah_add_executable(gazer_example gazer_example.cc)
 
 if(USE_LIBCURL)
     mayah_add_executable(neural neural_main.cc)
-    # mayah_add_executable(make_train_data make_train_data.cc)
+    mayah_add_executable(make_train_data make_train_data.cc)
 endif()
 
 if(USE_HTTPD)
