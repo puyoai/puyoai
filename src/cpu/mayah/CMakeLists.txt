@@ -27,17 +27,22 @@ add_library(mayah_lib
             mixed_ai.cc
             yukina_ai.cc)
 
+if(LIB_CURL)
+    add_library(neural_lib neural.cc)
+endif()
+
 function(mayah_add_executable exe)
     cpu_add_executable(${exe} ${ARGN})
     cpu_target_link_libraries(${exe} mayah_lib)
     cpu_target_link_libraries(${exe} mayah_thinker_lib)
     cpu_target_link_libraries(${exe} mayah_evaluator_lib)
 
-    cpu_target_link_libraries(${exe} puyoai_third_party_jsoncpp)
-
 if(LIB_CURL)
     cpu_target_link_libraries(${exe} ${LIB_CURL})
+    cpu_target_link_libraries(${exe} neural_lib)
 endif()
+
+    cpu_target_link_libraries(${exe} puyoai_third_party_jsoncpp)
 
     cpu_target_link_common_libraries(${exe})
 endfunction()
@@ -62,7 +67,8 @@ mayah_add_executable(experimental experimental.cc)
 mayah_add_executable(gazer_example gazer_example.cc)
 
 if(USE_LIBCURL)
-    mayah_add_executable(neural neural.cc)
+    mayah_add_executable(neural neural_main.cc)
+    # mayah_add_executable(make_train_data make_train_data.cc)
 endif()
 
 if(USE_HTTPD)

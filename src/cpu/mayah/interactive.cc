@@ -57,6 +57,7 @@ string askPuyoServer(const PlainField& field, const Kumipuyo& next1, const Kumip
        << "\"rest\":" << rest_hand
        << "}";
     string body = ss.str();
+    cout << body << endl;
     LOG(INFO) << body;
 
     CURL* curl = curl_easy_init();
