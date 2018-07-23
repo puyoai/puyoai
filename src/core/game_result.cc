@@ -22,6 +22,7 @@ std::string toString(GameResult gameResult)
     }
 
     CHECK(false) << "Unknown GameResult: " << static_cast<int>(gameResult);
+    return std::string();
 }
 
 GameResult toOppositeResult(GameResult gameResult)
@@ -44,4 +45,5 @@ GameResult toOppositeResult(GameResult gameResult)
     }
 
     CHECK(false) << "Unknown GameResult: " << static_cast<int>(gameResult);
+    return GameResult::DRAW;
 }

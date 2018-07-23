@@ -29,7 +29,9 @@ Key toKey(char c)
     case 'A': return Key::RIGHT_TURN;
     case 'B': return Key::LEFT_TURN;
     case 'S': return Key::START;
-    default:
-        CHECK(false) << "Unknown key: " << c;
     }
+
+    CHECK(false) << "Unknown key: " << c;
+    // should not reach here.
+    return Key::UP;
 }

@@ -55,4 +55,5 @@ std::unique_ptr<ClientConnector> AIBase::makeConnector()
 #endif
 
     CHECK(false) << "Unknown connector: " << FLAGS_connector;
+    return nullptr;
 }

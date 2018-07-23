@@ -55,6 +55,8 @@ const char* toPuyoString(PuyoColor c, CellType cellType)
     default:
         CHECK(false) << "Unknown PuyoColor: " << toString(c) << endl;
     }
+
+    return nullptr;
 }
 
 template <typename Stream>

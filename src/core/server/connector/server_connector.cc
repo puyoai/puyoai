@@ -56,6 +56,7 @@ unique_ptr<ServerConnector> ServerConnector::create(int playerId, const string& 
 #endif
 
     CHECK(false) << "Unknown connector";
+    return nullptr;
 }
 
 unique_ptr<ServerConnector> ServerConnector::createStdioConnector(int playerId, const string& programName)
