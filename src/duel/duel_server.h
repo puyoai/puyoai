@@ -1,6 +1,7 @@
 #ifndef DUEL_DUEL_SERVER_H_
 #define DUEL_DUEL_SERVER_H_
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <thread>

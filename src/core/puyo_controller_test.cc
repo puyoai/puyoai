@@ -86,8 +86,6 @@ TEST(PuyoControllerTest, findKeyStrokeOnFilledField)
         "OOOOOO"
         "OOOOOO");
 
-    KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
-
     EXPECT_EQ(KeySetSeq("<,,<,v"), PuyoController::findKeyStroke(f, Decision(1, 0)).seq());
     EXPECT_EQ(KeySetSeq("<A,,<,v"), PuyoController::findKeyStroke(f, Decision(1, 1)).seq());
     EXPECT_EQ(KeySetSeq("<A,,<,A,v"), PuyoController::findKeyStroke(f, Decision(1, 2)).seq());
@@ -123,7 +121,7 @@ TEST(PuyoControllerTest, findKeyStrokeOnFilledField)
             if (!d.isValid())
                 continue;
             EXPECT_TRUE(PuyoController::isReachable(f, d));
-            KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
+            KumipuyoMovingState kms(KumipuyoPos::initialPos());
             KeySetSeq kss = PuyoController::findKeyStroke(f, d).seq();
             moveKumipuyo(&kms, kss, pf);
             EXPECT_EQ(x, kms.pos.x);
@@ -147,7 +145,6 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField1)
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
-    KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
 
     EXPECT_EQ(KeySetSeq("<,,<,v"), PuyoController::findKeyStroke(f, Decision(1, 0)).seq());
     EXPECT_EQ(KeySetSeq("<A,,<,v"), PuyoController::findKeyStroke(f, Decision(1, 1)).seq());
@@ -209,7 +206,6 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField2)
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
-    KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
 
     set<Decision> unreachable;
     unreachable.insert(Decision(1, 2));
@@ -280,7 +276,6 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField3)
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
-    KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
 
     set<Decision> unreachable;
     unreachable.insert(Decision(2, 2));
@@ -351,7 +346,6 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField4)
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
-    KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
 
     set<Decision> unreachable;
     unreachable.insert(Decision(4, 2));
@@ -421,7 +415,6 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField5)
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
-    KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
 
     set<Decision> unreachable;
     unreachable.insert(Decision(2, 2));
@@ -492,7 +485,6 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField6)
         " O O  "
         " O O  "
         " O O  ");
-    KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
 
     set<Decision> unreachable;
     unreachable.insert(Decision(2, 2));
@@ -564,7 +556,6 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField7)
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
-    KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
 
     set<Decision> reachable;
     reachable.insert(Decision(3, 0));
@@ -637,7 +628,6 @@ TEST(PuyoControllerTest, findKeyStrokeHigherField8)
         "OOOOOO"
         "OOOOOO"
         "OOOOOO");
-    KumipuyoMovingState kms(KumipuyoPos(3, 12, 0));
 
     set<Decision> reachable;
     reachable.insert(Decision(2, 0));

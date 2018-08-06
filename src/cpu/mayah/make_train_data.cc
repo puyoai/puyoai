@@ -131,7 +131,7 @@ int run_with_existing(DebuggableMayahAI* ai, int current_turn, CoreField current
         if (ai_plan.decisions().empty()) {
             break;
         }
-        
+
         current_field.dropKumipuyo(ai_plan.firstDecision(), current_seq.get(0));
         int chains = current_field.simulateFast();
         if (chains > max_chains) {
@@ -169,7 +169,7 @@ void run(DebuggableMayahAI* ai, KumipuyoSeq kumipuyo_seq) {
                 continue;
             }
 
-            // otherwise, 
+            // otherwise,
             int result_neural = run_with_neural(turn, cf, kumipuyo_seq);
             int result_existing = run_with_existing(ai, turn, cf, kumipuyo_seq);
             int result_chains = std::max(result_neural, result_existing);
@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
     ai->setUsesRensaHandTree(false);
     ai->setEvaluationParameterMap(paramMap);
 
-    for (size_t i = 0; i < FLAGS_size; ++i) {
+    for (int i = 0; i < FLAGS_size; ++i) {
         KumipuyoSeq seq = KumipuyoSeqGenerator::generateACPuyo2Sequence();
         run(ai.get(), seq);
     }

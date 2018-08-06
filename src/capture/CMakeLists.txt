@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 2.8)
 add_subdirectory(driver)
 add_subdirectory(recognition)
 
+# TODO(mayah): Update ac_analyzer.cc not to use deprecated APIs.
+add_compile_options("-Wno-deprecated-declarations")
+
 add_library(puyoai_capture
             ac_analyzer.cc
             analyzer.cc
