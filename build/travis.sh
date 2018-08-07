@@ -20,5 +20,5 @@ mkdir -p $outdir
 cd $outdir
 cmake "${cmake_opts[@]}" $srcdir
 
-ninja 
-ninja test
+ninja
+CTEST_OUTPUT_ON_FAILURE=1 ninja test
