@@ -21,4 +21,4 @@ cd $outdir
 cmake "${cmake_opts[@]}" $srcdir
 
 ninja
-CTEST_OUTPUT_ON_FAILURE=1 ninja test
+CTEST_OUTPUT_ON_FAILURE=1 LSAN_OPTIONS=verbosity=1 ninja test
