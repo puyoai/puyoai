@@ -7,7 +7,12 @@ jobs:
       - checkout
       - run:
           name: Build and test
+          # TODO: Set up a Dockerfile for this.
+          # TODO: Check in unit-test specific files in this repository
           command: |
+            git submodule init
+            git submodule update
+            git submodule foreach git pull origin master
             apt-get update
             apt-get install -y \
               git clang cmake ninja-build \
