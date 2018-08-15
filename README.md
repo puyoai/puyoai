@@ -1,7 +1,7 @@
 puyoai
 ======
 
-[![Build Status](https://travis-ci.org/puyoai/puyoai.svg?branch=master)](http://travis-ci.org/puyoai/puyoai)
+[![Build Status](https://circleci.com/gh/puyoai/puyoai.png?circle-token=:circle-token)](https://circleci.com/gh/puyoai)
 
 ぷよぷよ通のAIを書くためのフレームワークです。
 
@@ -130,7 +130,7 @@ out ディレクトリを掘って、そこでビルドするようにしてく�
 ### エラーがでた
 
 もしかしたら、master ブランチが壊れているかもしれません。この場合、気づいたメンバーによってすぐに修復されます。
-このドキュメントの先頭に貼ってあるTravis CIのバッジが、`build passing`になっていなければ、現状のコードは壊れています。
+このドキュメントの先頭に貼ってある[CircleCI](https://circleci.com/gh/puyoai)のバッジが `PASSED` になっていなければ、現状のコードは壊れています。
 
 SSE4.1がどーのこーの、というエラーが出た場合、`-mnative`フラグがきちんと効いてないかもしれません。再現条件がわかっていませんが、
 古いLinuxをVMWareのような仮想マシンの上で動かすと起きることがあります。その場合、自分のCPUがAVX命令が使えるならば、
