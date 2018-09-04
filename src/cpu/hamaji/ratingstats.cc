@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include <algorithm>
+#include <climits>
 #include <functional>
 #include <iterator>
 
@@ -121,7 +122,7 @@ void RatingStats::Print() {
 void Stat::showStat(const vector<float>& a) {
   float tot = 0;
   float mx = 0;
-  float mn = 1e99;
+  float mn = std::numeric_limits<float>::max();
   for (size_t i = 0; i < a.size(); i++) {
     float v = a[i];
     tot += v;

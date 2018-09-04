@@ -3,6 +3,10 @@
 
 #include <cstdint>
 
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
 // Returns the number of 1-bits in |x|.
 inline int popCount32(const std::uint32_t& x)
 {

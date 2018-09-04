@@ -18,12 +18,10 @@ find_package(Threads)
 find_package(PkgConfig)
 
 if(MSVC)
-    # TODO(peria): This configuration is not exptected to work for everyone.
-    set(glog_DIR "C:/Program Files/google-glog/lib/cmake/glog")
     find_package(gflags REQUIRED)
     find_package(glog REQUIRED)
-    set(LIB_GFLAGS ${gflags_LIBRARIES})
-    set(GLOG_LIBRARIES ${glog_LIBRARIES})
+    set(glog_INCLUDE_DIRS ${glog_DIR}/../../../include)
+    set(GLOG_LIBRARIES glog::glog)
 else()
     # TODO(mayah): gflags does not provide pkg-config anymore?
     # pkg_search_module for libgflags doesn't work with Mac homebrew (2015-04-16).
@@ -86,7 +84,10 @@ if(MSVC)
     # Suppress some warnigs about implicit conversions.
     add_compile_options("/wd4244")  # from uint64 to int
     add_compile_options("/wd4267")  # from size_t to int
+    add_compile_options("/wd4267")  # cut constant number
     add_compile_options("/wd4800")  # from int to bool
+    add_compile_options("/wd4819")  # using unknown character code
+    add_compile_options("/wd4996")  # non standard namespace usage
 
     # Always include build_config.h
     add_compile_options("/FI ${CMAKE_SOURCE_DIR}/build/build_config.h")

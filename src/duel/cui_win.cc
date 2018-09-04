@@ -42,7 +42,7 @@ void CuiWin::setCursor(const Location& location)
 
 void CuiWin::setCursor(int x, int y)
 {
-    COORD pos = {x - 1, y - 1};
+    COORD pos = {(SHORT)(x - 1), (SHORT)(y - 1)};
     SetConsoleCursorPosition(console, pos);
 }
 

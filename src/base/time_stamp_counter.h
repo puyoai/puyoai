@@ -3,14 +3,18 @@
 
 #include <vector>
 
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
 // Unfortunately, __rdtscp is not defined in /usr/lib/gcc/x86_64-linux-gnu/4.4/include/x86intrin.
 inline unsigned long long rdtscp(unsigned int* aux)
 {
 #if defined(_MSC_VER)
     return __rdtscp(aux);
 #else
-    unsigned long long rax,rdx;
-    asm volatile ( "rdtscp\n" : "=a" (rax), "=d" (rdx), "=c" (aux) : : );
+    unsigned long long rax, rdx;
+    asm volatile("rdtscp\n" : "=a"(rax), "=d"(rdx), "=c"(aux) : :);
     return (rdx << 32) + rax;
 #endif
 }
@@ -29,9 +33,9 @@ private:
 class ScopedTimeStampCounter {
 public:
     // Don't take the ownership of tsc
-    explicit ScopedTimeStampCounter(TimeStampCounterData* tsc) :
-        tsc_(tsc),
-        start_(rdtscp(&a_))
+    explicit ScopedTimeStampCounter(TimeStampCounterData* tsc)
+        : tsc_(tsc)
+        , start_(rdtscp(&a_))
     {
     }
 

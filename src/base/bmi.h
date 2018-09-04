@@ -25,7 +25,7 @@ std::uint64_t extractBits(std::uint64_t x, std::uint64_t mask)
 #else
     std::uint64_t res = 0;
     for (std::uint64_t bb = 1; mask != 0; bb <<= 1) {
-        if (x & mask & -mask)
+        if (x & mask & (~mask + 1))
             res |= bb;
         mask &= (mask - 1);
     }
@@ -46,7 +46,7 @@ std::uint64_t depositBits(std::uint64_t x, std::uint64_t mask)
     std::uint64_t res = 0;
     for (std::uint64_t bb = 1; mask != 0; bb <<= 1) {
         if (x & bb)
-            res |= mask & (-mask);
+            res |= mask & (~mask + 1);
             mask &= (mask - 1);
     }
     return res;

@@ -54,9 +54,9 @@ KumipuyoSeq defaultKumipuyoSeq(int n)
         return KumipuyoSeq("RRGGYY");
     case 4:
         return KumipuyoSeq("RRGGYYBB");
-    default:
-        CHECK(false) << n;
     }
+    CHECK(false) << n;
+    return KumipuyoSeq("");
 }
 
 void runTest(int depth, int iteration, const CoreField& cf, const KumipuyoSeq& kumipuyoSeq)

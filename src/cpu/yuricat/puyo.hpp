@@ -17,7 +17,7 @@
 #include <unordered_set>
 #include <algorithm>
 #include <thread>
-#include <sys/time.h>
+#include <chrono>
 #include <atomic>
 #include <mutex>
 
@@ -72,30 +72,36 @@ static void tock(){
 class ClockMS{
     // millisec単位
 private:
-    timeval t_start;
+    using Clock = std::chrono::system_clock;
+    Clock::time_point t_start;
 public:
-    void start()noexcept{ gettimeofday(&t_start, NULL); }
-    long stop()const noexcept{
-        timeval t_end;
-        gettimeofday(&t_end, NULL);
-        long t = (t_end.tv_sec - t_start.tv_sec) * 1000 + (t_end.tv_usec - t_start.tv_usec) / 1000;
-        return t;
+    void start() noexcept
+    {
+        t_start = Clock::now();
     }
-    long restart()noexcept{ // 結果を返し、0から再スタート
-        timeval t_end;
-        gettimeofday(&t_end, NULL);
-        long t = (t_end.tv_sec - t_start.tv_sec) * 1000 + (t_end.tv_usec - t_start.tv_usec) / 1000;
+
+    long stop() const noexcept
+    {
+        Clock::time_point t_end = Clock::now();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count();
+    }
+
+    // 結果を返し、0から再スタート
+    long restart() noexcept
+    {
+        Clock::time_point t_end = Clock::now();
+        long t = std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count();
         t_start = t_end;
         return t;
     }
+
     static long long now()noexcept{
-        timeval t_now;
-        gettimeofday(&t_now, NULL);
-        long long t = t_now.tv_sec * 1000 + t_now.tv_usec / 1000;
-        return t;
+        Clock::time_point t_now = Clock::now();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(t_now.time_since_epoch()).count();
     }
+
     ClockMS(){}
-    ClockMS(int m){ UNUSED_VARIABLE(m); start(); }
+    ClockMS(int){ start(); }
 };
 
 /*
