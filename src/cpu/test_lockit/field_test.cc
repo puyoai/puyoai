@@ -10,30 +10,27 @@
 
 namespace test_lockit {
 
-TEST(FieldTest, Saiki) {
-    CoreField cf(
-        "BBGGYY"    // 12 (invisible)
-        "BBGGYY"    // 11
-        "@@@@@@"
-        "@@@@@@"
-        "@@@@@@"
-        "@@@@@@"    // 7
-        "@@@@@@"
-        "GGRRRR"
-        "YRRGGR"
-        "RRBBBR"    // 3
-        "@RRRRR"
-        "@@@@@@"
-        "RBYG@@");  // 0 (y-index in TLField)
+TEST(FieldTest, Saiki)
+{
+    CoreField cf("BBGGYY" // 12 (invisible)
+                 "BBGGYY" // 11
+                 "@@@@@@"
+                 "@@@@@@"
+                 "@@@@@@"
+                 "@@@@@@" // 7
+                 "@@@@@@"
+                 "GGRRRR"
+                 "YRRGGR"
+                 "RRBBBR" // 3
+                 "@RRRRR"
+                 "@@@@@@"
+                 "RBYG@@"); // 0 (y-index in TLField)
     struct TestData {
         int x;
         int y;
         int expect_num;
-    } data_set[] = {
-        {0, 0, 1}, {1, 0, 1}, {2, 0, 1}, {3, 0, 1},
-        {1, 3, 15}, {2, 3, 3},
-        {1, 11, 2}, {2, 11, 2}
-    };
+    } data_set[]
+        = { { 0, 0, 1 }, { 1, 0, 1 }, { 2, 0, 1 }, { 3, 0, 1 }, { 1, 3, 15 }, { 2, 3, 3 }, { 1, 11, 2 }, { 2, 11, 2 } };
 
     PuyoColor field[6][kHeight];
     toTLField(cf, field);
@@ -61,22 +58,20 @@ TEST(FieldTest, Saiki) {
 
 TEST(FieldTest, countNormalColor13)
 {
-    CoreField cf(
-        "G....." // 14
-        "R....." // 13
-        "Y....." // 12
-        "B....."
-        "G....."
-        "R....."
-        "Y....." // 8
-        "B....."
-        "G....."
-        "R....."
-        "Y....." // 4
-        "B....."
-        "G....."
-        "R.OOO."
-    );
+    CoreField cf("G....." // 14
+                 "R....." // 13
+                 "Y....." // 12
+                 "B....."
+                 "G....."
+                 "R....."
+                 "Y....." // 8
+                 "B....."
+                 "G....."
+                 "R....."
+                 "Y....." // 4
+                 "B....."
+                 "G....."
+                 "R.OOO.");
 
     PuyoColor field[6][kHeight];
     toTLField(cf, field);
@@ -86,21 +81,19 @@ TEST(FieldTest, countNormalColor13)
 
 TEST(FieldTest, settiOjama)
 {
-    CoreField cf(
-        "O....." // 13
-        "OO...." // 12
-        "OOO..."
-        "OOOO.."
-        "OOOOO."
-        "OOOOOO" // 8
-        "OOOOOO"
-        "OOOOOO"
-        "OOOOOO"
-        "OOOOOO" // 4
-        "OOOOOO"
-        "OOOOOO"
-        "OOOOOO"
-    );
+    CoreField cf("O....." // 13
+                 "OO...." // 12
+                 "OOO..."
+                 "OOOO.."
+                 "OOOOO."
+                 "OOOOOO" // 8
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO" // 4
+                 "OOOOOO"
+                 "OOOOOO"
+                 "OOOOOO");
 
     PuyoColor field[6][kHeight];
     toTLField(cf, field);
@@ -138,10 +131,9 @@ TEST(FieldTest, simulate_basic)
 
 TEST(FieldTest, simulate_chain)
 {
-    CoreField cf(
-        "..B..."
-        "..BBYB"
-        "RRRRBB");
+    CoreField cf("..B..."
+                 "..BBYB"
+                 "RRRRBB");
     PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
@@ -156,9 +148,8 @@ TEST(FieldTest, simulate_chain)
 
 TEST(FieldTest, simulate_1_double)
 {
-    CoreField cf(
-        "..BBBB"
-        "RRRRRR");
+    CoreField cf("..BBBB"
+                 "RRRRRR");
     PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
@@ -172,9 +163,8 @@ TEST(FieldTest, simulate_1_double)
 
 TEST(FieldTest, simulate_double_cornercase)
 {
-    CoreField cf(
-        "BB..BB"
-        "BB..BB");
+    CoreField cf("BB..BB"
+                 "BB..BB");
     PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
@@ -188,11 +178,10 @@ TEST(FieldTest, simulate_double_cornercase)
 
 TEST(FieldTest, simulate_2_double)
 {
-    CoreField cf(
-        ".R...."
-        ".R...."
-        ".RYR.R"
-        "RYYYRR");
+    CoreField cf(".R...."
+                 ".R...."
+                 ".RYR.R"
+                 "RYYYRR");
     PuyoColor field[6][kHeight];
     toTLField(cf, field);
 
@@ -205,4 +194,4 @@ TEST(FieldTest, simulate_2_double)
     EXPECT_EQ(2, result.num_connections[1]);
 }
 
-}  // namespace test_lockit
+} // namespace test_lockit

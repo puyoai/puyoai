@@ -41,11 +41,12 @@ void syou_downx(PuyoColor ba[][kHeight], int x, int y, PuyoColor incol, int flg[
 bool setti_puyo(PuyoColor ba[][kHeight], int aa, PuyoColor nx1, PuyoColor nx2, int setti_basyo[]);
 int setti_puyo_1(PuyoColor ba[][kHeight], int eex, PuyoColor eecol);
 
-int chousei_syoukyo_3(PuyoColor bass[][kHeight], int[], int* poi2s, int* score, Check tokus, int i2, int j2, int ruiseki_point);
+int chousei_syoukyo_3(PuyoColor bass[][kHeight], int[], int* poi2s, int* score, Check tokus, int i2, int j2,
+                      int ruiseki_point);
 int chousei_syoukyo_sc(PuyoColor ba[][kHeight], int setti_basyo[], int* score);
 
 void setti_ojama(PuyoColor f[][kHeight], int numOjama);
 
-}  // namespace test_lockit
+} // namespace test_lockit
 
-#endif  // CPU_TEST_LOCKIT_FIELD_H_
+#endif // CPU_TEST_LOCKIT_FIELD_H_

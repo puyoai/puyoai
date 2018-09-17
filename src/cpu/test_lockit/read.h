@@ -43,6 +43,6 @@ private:
     int setti_basyo[4];
 };
 
-}  // namespace test_lockit
+} // namespace test_lockit
 
 #endif

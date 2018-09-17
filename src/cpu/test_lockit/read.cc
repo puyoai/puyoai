@@ -61,9 +61,7 @@ READ_P::READ_P()
     te_r = 0;
 }
 
-READ_P::~READ_P()
-{
-}
+READ_P::~READ_P() {}
 
 void READ_P::fall()
 {
@@ -290,4 +288,4 @@ int READ_P::chousei_syoukyo()
     return 1;
 }
 
-}  // namespace test_lockit
+} // namespace test_lockit

@@ -1,12 +1,12 @@
 #include "cpu.h"
 
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
-#include "core/puyo_color.h"
 #include "core/frame_request.h"
 #include "core/frame_response.h"
+#include "core/puyo_color.h"
 #include "field.h"
 #include "util.h"
 
@@ -14,10 +14,10 @@ using namespace std;
 
 namespace test_lockit {
 
-TestLockitAI::TestLockitAI(const cpu::Configuration& config) :
-    config(config),
-    coma(config),
-    coma2x(config)
+TestLockitAI::TestLockitAI(const cpu::Configuration& config)
+    : config(config)
+    , coma(config)
+    , coma2x(config)
 {
     r_player[0].ref();
     r_player[1].ref();
@@ -186,9 +186,11 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         r_player[0].set_puyo_once = 0;
         r_player[0].setti_12();
         if (coma.m_hukks == 0 || r_player[0].field_hikaku() > 0) { // 開幕のm_hukks==0では思考を短くする？
-            coma.pre_hyouka(r_player[0].field, r_player[0].tsumo, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi, 1);
+            coma.pre_hyouka(r_player[0].field, r_player[0].tsumo, r_player[0].zenkesi, r_player[1].field,
+                            r_player[1].zenkesi, 1);
         }
-        coma.aite_attack_nokori(r_player[1].field, r_player[0].id); // 情報が更新されないため、現構成ではうまく機能しない
+        coma.aite_attack_nokori(r_player[1].field,
+                                r_player[0].id); // 情報が更新されないため、現構成ではうまく機能しない
         coma.hyouka(r_player[0].field, r_player[0].tsumo, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi);
 
         // 2x hyouka
@@ -208,7 +210,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         PuyoColor field2x[6][kHeight] {};
         for (int i = 0; i < 6; ++i) {
             for (int j = 0; j < 14; ++j) {
-                field2x[i][j] = (j + 4 < kHeight) ? r_player[0].field[i][j+4] : PuyoColor::EMPTY;
+                field2x[i][j] = (j + 4 < kHeight) ? r_player[0].field[i][j + 4] : PuyoColor::EMPTY;
             }
         }
 
@@ -222,7 +224,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         saidaiten = coma.m_para[0];
 
         for (int i = 0; i < 22; i++) {
-            if ((field_kosuu>24) && (field_kosuu<56)){
+            if ((field_kosuu > 24) && (field_kosuu < 56)) {
                 coma2x_sc[i] = coma2x.m_para[i] + coma.m_para[i];
             } else {
                 coma2x_sc[i] = coma.m_para[i];
@@ -230,7 +232,7 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         }
         saidaiten = coma2x_sc[0];
         for (int i = 1; i < 22; i++) {
-            if (saidaiten<coma2x_sc[i]){
+            if (saidaiten < coma2x_sc[i]) {
                 tmp = i;
                 saidaiten = coma2x_sc[i];
             }
@@ -259,11 +261,12 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
 
     if (r_player[0].nex_on == 1) { // 事前手決めスタート
         if (coma.m_hukks != 0) {
-            coma.pre_hyouka(r_player[0].yosou_field, r_player[0].tsumo + 2, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi, 0);
+            coma.pre_hyouka(r_player[0].yosou_field, r_player[0].tsumo + 2, r_player[0].zenkesi, r_player[1].field,
+                            r_player[1].zenkesi, 0);
         }
     } // 開幕のm_hukks==0はこちらはひっかからない？
 
     return response;
 }
 
-}  // namespace test_lockit
+} // namespace test_lockit

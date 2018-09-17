@@ -18,8 +18,10 @@ public:
     ~COMAI_HI();
 
     int aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[]);
-    int pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight], int zenkesi_aite, int fast);
-    int hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight], int zenkesi_aite);
+    int pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight],
+                   int zenkesi_aite, int fast);
+    int hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight],
+               int zenkesi_aite);
     bool aite_attack_start(const PuyoColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata);
     int aite_attack_nokori(const PuyoColor ba3[6][kHeight], int hakata);
     int aite_rensa_end();
@@ -80,6 +82,6 @@ private:
     int m_hakkatime;
 };
 
-}  // namespace test_lockit
+} // namespace test_lockit
 
 #endif

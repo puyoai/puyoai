@@ -23,6 +23,6 @@ private:
     READ_P r_player[2];
 };
 
-}  // namespace test_lockit
+} // namespace test_lockit
 
 #endif

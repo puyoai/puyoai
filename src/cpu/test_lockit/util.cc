@@ -5,7 +5,8 @@
 
 namespace test_lockit {
 
-CoreField toCoreField(PuyoColor f[6][kHeight]) {
+CoreField toCoreField(PuyoColor f[6][kHeight])
+{
     CoreField cf;
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < kHeight; ++j) {
@@ -17,7 +18,8 @@ CoreField toCoreField(PuyoColor f[6][kHeight]) {
     return cf;
 }
 
-void toTLField(const CoreField& cf, PuyoColor f[6][kHeight]) {
+void toTLField(const CoreField& cf, PuyoColor f[6][kHeight])
+{
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < kHeight; ++j) {
             f[i][j] = cf.color(i + 1, j + 1);
@@ -25,4 +27,4 @@ void toTLField(const CoreField& cf, PuyoColor f[6][kHeight]) {
     }
 }
 
-}  // namespace test_lockit
+} // namespace test_lockit

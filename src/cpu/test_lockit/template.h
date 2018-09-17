@@ -8,6 +8,6 @@ namespace test_lockit {
 
 int gtr(const PuyoColor f[][kHeight]);
 
-}  // namespace test_lockit
+} // namespace test_lockit
 
-#endif  // CPU_TEST_LOCKIT_TEMPLATE_H_
+#endif // CPU_TEST_LOCKIT_TEMPLATE_H_
