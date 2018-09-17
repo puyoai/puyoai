@@ -1,6 +1,9 @@
 #ifndef TEST_LOCKIT_CPU_RUN_H_
 #define TEST_LOCKIT_CPU_RUN_H_
 
+#include <fstream>
+#include <string>
+
 #include "core/client/ai/raw_ai.h"
 
 #include "coma.h"
@@ -13,6 +16,9 @@ class TestLockitAI : public RawAI {
 public:
     explicit TestLockitAI(const cpu::Configuration& configuration);
 
+    // Run a end-to-end using the file.
+    void runTest(const std::string& filename);
+
 protected:
     FrameResponse playOneFrame(const FrameRequest&) override;
 
@@ -21,6 +27,8 @@ private:
     COMAI_HI coma;
     COMAI_HI coma2x;
     READ_P r_player[2];
+    std::ofstream play_log_;
+    std::string last_log_;
 };
 
 } // namespace test_lockit

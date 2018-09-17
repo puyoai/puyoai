@@ -22,96 +22,96 @@ namespace test_lockit {
 
 namespace {
 
-    int g_chainhyk[22][22][221][EE_SIZE] {};
-    int g_poihyo[22][22][221][EE_SIZE] {};
-    int g_score_hukasa[22][22][221] {};
+int g_chainhyk[22][22][221][EE_SIZE] {};
+int g_poihyo[22][22][221][EE_SIZE] {};
+int g_score_hukasa[22][22][221] {};
 
-    const PuyoColor kTsumoPatterns[][2] = {
-        { PuyoColor::RED, PuyoColor::RED },      { PuyoColor::RED, PuyoColor::BLUE },
-        { PuyoColor::RED, PuyoColor::YELLOW },   { PuyoColor::RED, PuyoColor::GREEN },
-        { PuyoColor::BLUE, PuyoColor::BLUE },    { PuyoColor::BLUE, PuyoColor::YELLOW },
-        { PuyoColor::BLUE, PuyoColor::GREEN },   { PuyoColor::YELLOW, PuyoColor::YELLOW },
-        { PuyoColor::YELLOW, PuyoColor::GREEN }, { PuyoColor::GREEN, PuyoColor::GREEN },
-    };
+const PuyoColor kTsumoPatterns[][2] = {
+    { PuyoColor::RED, PuyoColor::RED },      { PuyoColor::RED, PuyoColor::BLUE },
+    { PuyoColor::RED, PuyoColor::YELLOW },   { PuyoColor::RED, PuyoColor::GREEN },
+    { PuyoColor::BLUE, PuyoColor::BLUE },    { PuyoColor::BLUE, PuyoColor::YELLOW },
+    { PuyoColor::BLUE, PuyoColor::GREEN },   { PuyoColor::YELLOW, PuyoColor::YELLOW },
+    { PuyoColor::YELLOW, PuyoColor::GREEN }, { PuyoColor::GREEN, PuyoColor::GREEN },
+};
 
-    bool isMatchIndexAndColors(int id, PuyoColor color[])
-    {
-        // PuyoColor::IRON is used for a place holder.
-        if (color[0] == PuyoColor::IRON || color[1] == PuyoColor::IRON)
-            return true;
-        if (id == 220)
-            return true;
-        if (id >= 221 || id < 0)
-            return false;
+bool isMatchIndexAndColors(int id, PuyoColor color[])
+{
+    // PuyoColor::IRON is used for a place holder.
+    if (color[0] == PuyoColor::IRON || color[1] == PuyoColor::IRON)
+        return true;
+    if (id == 220)
+        return true;
+    if (id >= 221 || id < 0)
+        return false;
 
-        id /= 22;
-        return kTsumoPatterns[id][0] == color[0] && kTsumoPatterns[id][1] == color[1];
-    }
+    id /= 22;
+    return kTsumoPatterns[id][0] == color[0] && kTsumoPatterns[id][1] == color[1];
+}
 
-    int isChigiri(int cells[])
-    {
-        if (cells[0] != cells[2] && cells[1] != cells[3])
-            return 1;
-        else
-            return 0;
-    }
+int isChigiri(int cells[])
+{
+    if (cells[0] != cells[2] && cells[1] != cells[3])
+        return 1;
+    else
+        return 0;
+}
 
-    PuyoColor toValidPuyoColor(PuyoColor c)
-    {
-        // HACK(peria): Convert an unknown color to RED to avoid out-of-range.
-        // NOTE: We can use other colors insted, but use only RED to keep code simple.
-        if (c == PuyoColor::IRON)
-            return PuyoColor::RED;
-        return c;
-    }
+PuyoColor toValidPuyoColor(PuyoColor c)
+{
+    // HACK(peria): Convert an unknown color to RED to avoid out-of-range.
+    // NOTE: We can use other colors insted, but use only RED to keep code simple.
+    if (c == PuyoColor::IRON)
+        return PuyoColor::RED;
+    return c;
+}
 
-    void UpdateAccessibility(PuyoColor ba[6][kHeight], Check point2[6][12])
-    {
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 12; j++) {
-                point2[i][j] = Check::Unknown;
-                if (!isNormalColor(ba[i][j]))
+void UpdateAccessibility(PuyoColor ba[6][kHeight], Check point2[6][12])
+{
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 12; j++) {
+            point2[i][j] = Check::Unknown;
+            if (!isNormalColor(ba[i][j]))
+                continue;
+
+            bool isAboveEmpty = (j != 11 && ba[i][j + 1] == PuyoColor::EMPTY);
+            bool isRightEmpty = (i != 5 && ba[i + 1][j] == PuyoColor::EMPTY);
+            bool isLeftEmpty = (i != 0 && ba[i - 1][j] == PuyoColor::EMPTY);
+            if (isAboveEmpty) {
+                if (isRightEmpty && (i != 4 || ba[3][11] == PuyoColor::EMPTY)) {
+                    point2[i][j] = Check::ColorWithEmptyUR;
+                    point2[i][j + 1] = Check::Empty;
+                    break;
+                }
+                if (isLeftEmpty && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
+                    point2[i][j] = Check::ColorWithEmptyUL;
+                    point2[i][j + 1] = Check::Empty;
+                    break;
+                }
+                if ((i != 0 || ba[1][11] == PuyoColor::EMPTY) && (i != 4 || ba[3][11] == PuyoColor::EMPTY)
+                    && (i != 5 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))) {
+                    point2[i][j] = Check::ColorWithEmptyU;
+                    point2[i][j + 1] = Check::Empty;
+                    break;
+                }
+            } else {
+                if (isRightEmpty && isLeftEmpty && ba[i][11] == PuyoColor::EMPTY) {
+                    point2[i][j] = Check::ColorWithEmptyLR;
                     continue;
-
-                bool isAboveEmpty = (j != 11 && ba[i][j + 1] == PuyoColor::EMPTY);
-                bool isRightEmpty = (i != 5 && ba[i + 1][j] == PuyoColor::EMPTY);
-                bool isLeftEmpty = (i != 0 && ba[i - 1][j] == PuyoColor::EMPTY);
-                if (isAboveEmpty) {
-                    if (isRightEmpty && (i != 4 || ba[3][11] == PuyoColor::EMPTY)) {
-                        point2[i][j] = Check::ColorWithEmptyUR;
-                        point2[i][j + 1] = Check::Empty;
-                        break;
-                    }
-                    if (isLeftEmpty && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
-                        point2[i][j] = Check::ColorWithEmptyUL;
-                        point2[i][j + 1] = Check::Empty;
-                        break;
-                    }
-                    if ((i != 0 || ba[1][11] == PuyoColor::EMPTY) && (i != 4 || ba[3][11] == PuyoColor::EMPTY)
-                        && (i != 5 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))) {
-                        point2[i][j] = Check::ColorWithEmptyU;
-                        point2[i][j + 1] = Check::Empty;
-                        break;
-                    }
-                } else {
-                    if (isRightEmpty && isLeftEmpty && ba[i][11] == PuyoColor::EMPTY) {
-                        point2[i][j] = Check::ColorWithEmptyLR;
-                        continue;
-                    }
-                    if (isRightEmpty && (i != 4 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))
-                        && (i != 3 || ba[3][11] == PuyoColor::EMPTY)) {
-                        point2[i][j] = Check::ColorWithEmptyL;
-                        continue;
-                    }
-                    if (isLeftEmpty && (i != 1 || ba[1][11] == PuyoColor::EMPTY)
-                        && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
-                        point2[i][j] = Check::ColorWithEmptyR;
-                        continue;
-                    }
+                }
+                if (isRightEmpty && (i != 4 || (ba[3][11] == PuyoColor::EMPTY && ba[4][11] == PuyoColor::EMPTY))
+                    && (i != 3 || ba[3][11] == PuyoColor::EMPTY)) {
+                    point2[i][j] = Check::ColorWithEmptyL;
+                    continue;
+                }
+                if (isLeftEmpty && (i != 1 || ba[1][11] == PuyoColor::EMPTY)
+                    && (i != 5 || ba[3][11] == PuyoColor::EMPTY)) {
+                    point2[i][j] = Check::ColorWithEmptyR;
+                    continue;
                 }
             }
         }
     }
+}
 
 } // namespace
 

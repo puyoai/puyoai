@@ -4,6 +4,7 @@
 #include <glog/logging.h>
 
 DEFINE_string(type, "nidub", "Type of niina. nidub, rendaS9, rendaGS9, or rendaGS9a, is valid.");
+DEFINE_string(test_file, "", "Run an end-to-end test using the file.");
 
 test_lockit::cpu::Configuration makeRendaGS9Configuration()
 {
@@ -122,7 +123,14 @@ int main(int argc, char* argv[])
         CHECK(false) << "Unknown type: " << FLAGS_type;
     }
 
-    test_lockit::TestLockitAI(config).runLoop();
+    std::unique_ptr<test_lockit::TestLockitAI> ai(
+        new test_lockit::TestLockitAI(config));
+
+    if (!FLAGS_test_file.empty()) {
+      ai->runTest(FLAGS_test_file);
+    } else {
+      ai->runLoop();
+    }
 
     return 0;
 }

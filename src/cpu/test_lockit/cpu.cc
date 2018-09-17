@@ -1,5 +1,8 @@
 #include "cpu.h"
 
+#include <gflags/gflags.h>
+
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -9,6 +12,8 @@
 #include "core/puyo_color.h"
 #include "field.h"
 #include "util.h"
+
+DEFINE_string(io_log, "", "Specify prefix of I/O log if you want to take log.");
 
 using namespace std;
 
@@ -23,6 +28,10 @@ TestLockitAI::TestLockitAI(const cpu::Configuration& config)
     r_player[1].ref();
     coma.ref();
     coma2x.ref();
+    if (!FLAGS_io_log.empty()) {
+        // Existing logs are discarded.
+        play_log_.open(FLAGS_io_log, std::fstream::out | std::ofstream::trunc);
+    }
 }
 
 void parseRequest(const FrameRequest& request, READ_P* p1, READ_P* p2, COMAI_HI* coo)
@@ -266,7 +275,40 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
         }
     } // 開幕のm_hukks==0はこちらはひっかからない？
 
+    if (play_log_.is_open()) {
+        std::string request_str = request.toString();
+        if (request_str.substr(request_str.find(' ') + 1) != last_log_) {
+            play_log_ << request_str << "\n" << response.toString() << std::endl;
+            last_log_ = request_str.substr(request_str.find(' ') + 1);
+        }
+    }
+
     return response;
+}
+
+void TestLockitAI::runTest(const std::string& filename)
+{
+    DCHECK(!filename.empty());
+    std::ifstream ifs(filename);
+
+    std::string input, expect;
+    int count = 0;
+    while (std::getline(ifs, input)) {
+        std::getline(ifs, expect);
+
+        FrameResponse response = playOneFrame(FrameRequest::parsePayload(input.c_str(), input.size()));
+        std::string output = response.toString();
+        if (expect != output) {
+            std::cerr << "EXPECT: " << expect << "\n"
+                      << "ACTUAL: " << output << "\n"
+                      << "for :" << input << std::endl;
+            return;
+        }
+        if (++count % 1000 == 0) {
+            std::cerr << "Passed " << count << " cases\n";
+        }
+    }
+    std::cerr << "Passed all " << count << " cases.\n";
 }
 
 } // namespace test_lockit
