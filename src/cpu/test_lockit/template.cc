@@ -30,8 +30,8 @@ int gtr(const PuyoColor field[][kHeight])
         int x0, y0, x1, y1;
         int penalty;
     } expect_diff[] = {
-        { 0, 2, 0, 3, 2000 }, { 1, 2, 1, 3, 500 },  { 1, 2, 2, 2, 500 },
-        { 2, 1, 2, 2, 500 },  { 1, 0, 2, 0, 1000 }, { 2, 1, 2, 0, 1000 },
+        { 0, 2, 0, 3, 2000 }, { 1, 2, 1, 3, 500 }, { 1, 2, 2, 2, 500 },
+        { 2, 1, 2, 2, 500 }, { 1, 0, 2, 0, 1000 }, { 2, 1, 2, 0, 1000 },
     };
     for (const auto& diff : expect_diff) {
         PuyoColor c0 = field[diff.x0][diff.y0];
@@ -43,4 +43,4 @@ int gtr(const PuyoColor field[][kHeight])
     return score;
 }
 
-} // namespace test_lockit
+}  // namespace test_lockit

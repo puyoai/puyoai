@@ -14,6 +14,6 @@ const int TM_JAKKINPT = 10;
 const int TM_TANKINPT = 10;
 const int TM_OBJE = 10;
 
-} // namespace test_lockit
+}  // namespace test_lockit
 
 #endif

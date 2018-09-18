@@ -22,15 +22,15 @@ namespace test_lockit {
 
 namespace {
 
-int g_chainhyk[22][22][221][EE_SIZE] {};
-int g_poihyo[22][22][221][EE_SIZE] {};
-int g_score_hukasa[22][22][221] {};
+int g_chainhyk[22][22][221][EE_SIZE]{};
+int g_poihyo[22][22][221][EE_SIZE]{};
+int g_score_hukasa[22][22][221]{};
 
 const PuyoColor kTsumoPatterns[][2] = {
-    { PuyoColor::RED, PuyoColor::RED },      { PuyoColor::RED, PuyoColor::BLUE },
-    { PuyoColor::RED, PuyoColor::YELLOW },   { PuyoColor::RED, PuyoColor::GREEN },
-    { PuyoColor::BLUE, PuyoColor::BLUE },    { PuyoColor::BLUE, PuyoColor::YELLOW },
-    { PuyoColor::BLUE, PuyoColor::GREEN },   { PuyoColor::YELLOW, PuyoColor::YELLOW },
+    { PuyoColor::RED, PuyoColor::RED }, { PuyoColor::RED, PuyoColor::BLUE },
+    { PuyoColor::RED, PuyoColor::YELLOW }, { PuyoColor::RED, PuyoColor::GREEN },
+    { PuyoColor::BLUE, PuyoColor::BLUE }, { PuyoColor::BLUE, PuyoColor::YELLOW },
+    { PuyoColor::BLUE, PuyoColor::GREEN }, { PuyoColor::YELLOW, PuyoColor::YELLOW },
     { PuyoColor::YELLOW, PuyoColor::GREEN }, { PuyoColor::GREEN, PuyoColor::GREEN },
 };
 
@@ -113,7 +113,7 @@ void UpdateAccessibility(PuyoColor ba[6][kHeight], Check point2[6][12])
     }
 }
 
-} // namespace
+}  // namespace
 
 COMAI_HI::COMAI_HI(const cpu::Configuration& config)
     : config(config)
@@ -121,7 +121,9 @@ COMAI_HI::COMAI_HI(const cpu::Configuration& config)
     ref();
 }
 
-COMAI_HI::~COMAI_HI() {}
+COMAI_HI::~COMAI_HI()
+{
+}
 
 void COMAI_HI::ref()
 {
@@ -141,9 +143,9 @@ void COMAI_HI::ref()
     m_aite_hakka_nokori = 0;
     m_aite_hakka_zenkesi = 0;
     m_aite_hakka_kosuu = 0;
-    m_nocc_aite_rensa_score = 0;
+    m_aite_rensa_score_offence = 0;
     m_aite_rensa_score = 0;
-    m_aite_rensa_score_cc = 0;
+    m_aite_rensa_cc = 0;
     m_key_ee = 1;
     m_aite_hakkaji_score = 0;
     m_aite_hakka_jamako = 0;
@@ -167,7 +169,7 @@ bool COMAI_HI::aite_attack_start(const PuyoColor ba3[6][kHeight], int zenkesi_ai
     bool ret_keshi = false;
 
     int kosuu_mae = countNormalColor13(ba3);
-    PuyoColor ba[6][kHeight] {};
+    PuyoColor ba[6][kHeight]{};
     copyField(ba3, ba);
 
     TLRensaResult result = simulate(ba);
@@ -221,11 +223,11 @@ int COMAI_HI::aite_rensa_end()
     return 0;
 }
 
-int COMAI_HI::aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[])
+void COMAI_HI::estimateOpponent(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[])
 {
     m_aite_rensa_score = 0;
-    m_aite_rensa_score_cc = 0;
-    m_nocc_aite_rensa_score = 0;
+    m_aite_rensa_cc = 0;
+    m_aite_rensa_score_offence = 0;
 
     PuyoColor nx1 = toValidPuyoColor(tsumo[0]);
     PuyoColor nx2 = toValidPuyoColor(tsumo[1]);
@@ -237,7 +239,7 @@ int COMAI_HI::aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[])
     for (int aa = 0; aa < 22; ++aa) {
         if (tobashi_hantei_a(ba3, aa, nx1, nx2))
             continue;
-        PuyoColor ba_a[6][kHeight] {};
+        PuyoColor ba_a[6][kHeight]{};
         copyField(ba3, ba_a);
         setti_puyo(ba_a, aa, nx1, nx2, unused_values);
         TLRensaResult result_aa = simulate(ba_a);
@@ -246,7 +248,7 @@ int COMAI_HI::aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[])
         for (int bb = 0; bb < 22; ++bb) {
             if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
                 continue;
-            PuyoColor ba_b[6][kHeight] {};
+            PuyoColor ba_b[6][kHeight]{};
             copyField(ba_a, ba_b);
             setti_puyo(ba_b, bb, nn1, nn2, unused_values);
             TLRensaResult result_bb = simulate(ba_b);
@@ -257,7 +259,7 @@ int COMAI_HI::aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[])
                 for (int dd = 0; dd < 6; ++dd) {
                     if (tobashi_hantei_a(ba_b, dd, nk, nk))
                         continue;
-                    PuyoColor ba_d[6][kHeight] {};
+                    PuyoColor ba_d[6][kHeight]{};
                     copyField(ba_b, ba_d);
                     setti_puyo(ba_d, dd, nk, nk, unused_values);
                     TLRensaResult result_dd = simulate(ba_d);
@@ -278,66 +280,32 @@ int COMAI_HI::aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[])
                     if (m_aite_rensa_score < scores) {
                         m_aite_rensa_score = scores;
                     }
-                    if (keshikos * 2 < irokosuu && m_nocc_aite_rensa_score < scores) {
-                        m_nocc_aite_rensa_score = scores;
-                        m_moni_kesiko[0] = result_aa.num_vanished;
-                        m_moni_iroko[0] = result_aa.score;
-                        m_moni_kesiko[1] = result_bb.num_vanished;
-                        m_moni_iroko[1] = result_bb.score;
-                        m_moni_kesiko[2] = result_dd.num_vanished;
-                        m_moni_iroko[2] = result_dd.score;
+                    if (keshikos * 2 < irokosuu && m_aite_rensa_score_offence < scores) {
+                        m_aite_rensa_score_offence = scores;
+                    }
+                    if (m_aite_rensa_cc < result_dd.chains) {
+                        m_aite_rensa_cc = result_dd.chains;
                     }
                 }
             }
-
-            // Assume putting 2 same puyos vertically.
-            for (int x = 0; x < 6; ++x) {
-                for (PuyoColor color : NORMAL_PUYO_COLORS) {
-                    PuyoColor ba[6][kHeight] {};
-                    copyField(ba_b, ba);
-                    for (int j = 0; j < 13; j++) {
-                        if (ba[x][j] == PuyoColor::EMPTY) {
-                            ba[x][j] = color;
-                            ba[x][j + 1] = color;
-                            break;
-                        }
-                    }
-
-                    // Skip if the destination is unreachable.
-                    if (ba[1][11] != PuyoColor::EMPTY && x == 0)
-                        continue;
-                    if (ba[2][11] != PuyoColor::EMPTY && x != 2) // game over
-                        continue;
-                    if (ba[3][11] != PuyoColor::EMPTY && x > 3)
-                        continue;
-                    if (ba[4][11] != PuyoColor::EMPTY && x == 5)
-                        continue;
-
-                    TLRensaResult result = simulate(ba);
-                    if (m_aite_rensa_score_cc < result.chains) {
-                        m_aite_rensa_score_cc = result.chains;
-                    }
-                }
-            }
-        } // bb
-    } // aa
-    return 0;
+        }
+    }
 }
 
 int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight],
-                     int zenkesi_aite)
+    int zenkesi_aite)
 {
-    int hym[22] {};
+    int hym[22]{};
     int hyktmp;
     int keschk = 0;
     int maxch = 0, maxach = 0;
-    int zenke[22] {};
+    int zenke[22]{};
     int setti_basyo[4];
     int myf_kosuu_kesi = 0, myf_kosuu_iro = 0;
     int kurai_large, kurai_middle, kurai_small;
     int aite_kosuu_iro = 0, kes2;
     int syuusoku = 0;
-    int nidub_point_a[22] {};
+    int nidub_point_a[22]{};
     int maxscore = 0;
     int kuraichk = 0;
     int taiouchk = 0;
@@ -390,7 +358,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
     PuyoColor nx2 = toValidPuyoColor(tsumo[1]);
     PuyoColor nn1 = toValidPuyoColor(tsumo[2]);
     PuyoColor nn2 = toValidPuyoColor(tsumo[3]);
-    PuyoColor ba2[6][kHeight] {};
+    PuyoColor ba2[6][kHeight]{};
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 13; j++) {
             ba2[i][j] = ba3[i][j];
@@ -398,12 +366,12 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
     }
 
     // Check 2-double
-    int apos[22] {};
+    int apos[22]{};
     if (m_hukks < 255) {
         for (int aa = 0; aa < 22; aa++) {
             if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                 continue;
-            PuyoColor ba_a[6][kHeight] {};
+            PuyoColor ba_a[6][kHeight]{};
             copyField(ba2, ba_a);
             setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
             TLRensaResult result_aa = simulate(ba_a);
@@ -472,7 +440,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
     if (m_aite_hakka_rensa < 5) {
         if (m_myf_kosuu < 15) {
             for (int aa = 0; aa < 22; aa++) {
-                PuyoColor ba_a[6][kHeight] {};
+                PuyoColor ba_a[6][kHeight]{};
                 copyField(ba2, ba_a);
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
                 int chig_aa = isChigiri(setti_basyo);
@@ -502,9 +470,9 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
                             }
                         }
                     }
-                } // p<6
+                }  // p<6
             }
-        } // p<7
+        }  // p<7
     }
 
     if (zenchain > 2100)
@@ -514,7 +482,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
             continue;
 
-        PuyoColor ba[6][kHeight] {};
+        PuyoColor ba[6][kHeight]{};
         copyField(ba2, ba);
         setti_puyo(ba, aa, nx1, nx2, setti_basyo);
         TLRensaResult result_aa = simulate(ba);
@@ -540,7 +508,8 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
         // 1. 現在のターン数が tubushiturn を超え
         // 2. 相手の発火が4連鎖未満かつ、相手の色個数が12を超え
         // 3. 次の条件のうちいずれかを満たす。
-        //  3a. 自分の連鎖が2連鎖、相手の発火より260点を超えて上回り、スコアが690を超えている。
+        //  3a.
+        //  自分の連鎖が2連鎖、相手の発火より260点を超えて上回り、スコアが690を超えている。
         //  3b. 自分の連鎖が3連鎖、相手の連鎖が3連鎖未満 (?)
         if ((m_hukks > tubushiturn) && (m_aite_hakka_rensa < 4) && (aite_kosuu_iro > 12)) {
             if ((chain == 2) && (score > m_aite_rensa_score + 260) && (score > 690)) {
@@ -549,7 +518,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
                 m_kougeki_iryoku = score / 70;
                 m_kougeki_on = 1;
             }
-            if (chain == 3 && m_aite_rensa_score_cc < 3) {
+            if (chain == 3 && m_aite_rensa_cc < 3) {
                 hym[aa] += 72000 + score;
                 keschk = 1;
                 m_kougeki_iryoku = score / 70;
@@ -576,7 +545,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
         // さいそく
         if (shouldSaisoku) {
             if ((myf_kosuu_iro - myf_kosuu_kesi + 10 < myf_kosuu_kesi)
-                && (score > m_nocc_aite_rensa_score + 130 * chain) && (chain > 1) && (m_aite_hakka_rensa == 0)) {
+                && (score > m_aite_rensa_score_offence + 130 * chain) && (chain > 1) && (m_aite_hakka_rensa == 0)) {
                 hym[aa] += 73000;
                 keschk = 1;
                 m_kougeki_iryoku = score / 70;
@@ -592,15 +561,15 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
                 keschk = 1;
             }
         }
-        if (zenkesi_own == 1) { // aaaa0909
-            if ((chain == 1) && (m_aite_hakka_zenkesi == 1) && (m_aite_hakka_jamako < 36)) { // add121014
+        if (zenkesi_own == 1) {  // aaaa0909
+            if ((chain == 1) && (m_aite_hakka_zenkesi == 1) && (m_aite_hakka_jamako < 36)) {  // add121014
                 hym[aa] += 74000;
             }
             if ((chain > 0) && (zenkesi_aite != 1)) {
                 hym[aa] += 74000;
             }
         }
-    } // aa
+    }  // aa
     if (kes2 == 1) {
         if ((maxch > m_cchai) && (m_cchai > 1)) {
             hym[maxach] += 150000;
@@ -631,7 +600,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
             for (int aa = 0; aa < 22; aa++) {
                 if (tobashi_hantei_a(ba2, aa, nx1, nx2))
                     continue;
-                PuyoColor ba_a[6][kHeight] {};
+                PuyoColor ba_a[6][kHeight]{};
                 copyField(ba2, ba_a);
                 setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
                 TLRensaResult result_aa = simulate(ba_a);
@@ -660,7 +629,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
                     }
                     for (int cyy = 0; cyy < 2; cyy++) {
                         for (PuyoColor ccolor : NORMAL_PUYO_COLORS) {
-                            PuyoColor ba[6][kHeight] {};
+                            PuyoColor ba[6][kHeight]{};
                             copyField(ba_a, ba);
                             int coita = 0;
                             for (int j = 0; j < (12 - cyy); j++) {
@@ -686,12 +655,12 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
                                     nidub_point_a[aa] = 1200;
                             }
                         }
-                    } // cyy
-                } // cc
-            } // aa
+                    }  // cyy
+                }  // cc
+            }  // aa
         }
 
-    } // m_aite_hakka_honsen==0
+    }  // m_aite_hakka_honsen==0
 
     if (config.a_t == 0)
         shouldClearWariko = taiouchk;
@@ -701,13 +670,13 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
     for (int aa = 0; aa < 22; aa++) {
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
             continue;
-        PuyoColor ba_a[6][kHeight] {};
+        PuyoColor ba_a[6][kHeight]{};
         copyField(ba2, ba_a);
         setti_puyo(ba_a, aa, nx1, nx2, setti_basyo);
         TLRensaResult result_aa = simulate(ba_a);
         int keshiko_aa = result_aa.num_vanished;
         int score_tmp = result_aa.score;
-        int score_aonly = score_tmp; // only
+        int score_aonly = score_tmp;  // only
         int score_tmp2 = score_tmp;
         if ((ba_a[2][11] == PuyoColor::EMPTY) && (score_tmp > m_score_aa)) {
             m_score_aa = score_tmp;
@@ -734,7 +703,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
                 }
             }
             continue;
-        } // 110604
+        }  // 110604
 
         for (int bb = 0; bb < 22; bb++) {
             if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
@@ -747,11 +716,11 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
             int score_tmp = result_bb.score;
             int score_tmp2 = score_tmp;
             if ((kuraichk == 1) && (m_aite_hakka_nokori < 2) && (score_aonly > 0))
-                score_tmp = 0; // only
+                score_tmp = 0;  // only
             if ((kuraichk == 1)
                 && ((m_aite_hakka_nokori < 1)
-                    || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
-                score_tmp = 0; // 0225
+                       || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
+                score_tmp = 0;  // 0225
             if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp > m_score_aa)) {
                 m_score_aa = score_tmp;
                 m_aa_max_score = aa;
@@ -760,7 +729,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
             if (shouldClearWariko) {
                 if ((m_aite_hakka_nokori < 1) || (m_aite_hakka_nokori < 2 && score_aonly > 0)
                     || (m_aite_hakka_nokori < 2 && m_aite_puyo_uki == 0 && m_aite_hakka_quick == 1))
-                    score_tmp2 = 0; // 0225
+                    score_tmp2 = 0;  // 0225
             }
             if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
                 && (m_aite_hakka_jamako * 70 > score_tmp2 - 1400) && (score_tmp2 + 150 > m_aite_hakka_jamako * 70)) {
@@ -779,9 +748,9 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
                     }
                 }
                 continue;
-            } // 110604
-        } // bb
-    } // aa
+            }  // 110604
+        }  // bb
+    }  // aa
 
     for (int aa = 0; aa < 22; aa++) {
         for (int bb = 0; bb < 22; bb++) {
@@ -791,7 +760,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
                     continue;
                 for (int ee = 0; ee < EE_SIZE; ee++) {
                     if ((m_key_ee == 0) && (ee > 0))
-                        break; // t2
+                        break;  // t2
                     hyktmp = g_chainhyk[aa][bb][dd][ee] * 1000 + g_poihyo[aa][bb][dd][ee]
                         + (((m_myf_kosuu > 40) || syuusoku) * (ee == 0) * 300) + g_score_hukasa[aa][bb][dd];
                     if (hym[aa] < hyktmp) {
@@ -820,10 +789,9 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
         m_score_mon = m_score_aa;
     }
     if (config.u_t == 1) {
-        if (shouldClearWariko
-            && (((score_tai > 270)
-                 && ((m_myf_kosuu > 36) || (ba2[2][10] != PuyoColor::EMPTY) || (m_aite_hakka_zenkesi == 1)))
-                || (score_tai > 840))) {
+        if (shouldClearWariko && (((score_tai > 270) && ((m_myf_kosuu > 36) || (ba2[2][10] != PuyoColor::EMPTY)
+                                                            || (m_aite_hakka_zenkesi == 1)))
+                                     || (score_tai > 840))) {
             hym[tai_max_score] += 140000;
             m_score_mon = score_tai;
         }
@@ -884,7 +852,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
     if (((zenkesi_own == 1) && (zenkesi_aite != 1)) || ((m_aite_hakka_honsen == 0) && (config.w_t))
         || (zenkesi_aite == 1)) {
         for (int aa = 0; aa < 22; aa++) {
-            PuyoColor ba[6][kHeight] {};
+            PuyoColor ba[6][kHeight]{};
             copyField(ba2, ba);
             if (aa < 6) {
                 for (int j = 0; j < 13; j++) {
@@ -931,7 +899,7 @@ int COMAI_HI::hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zen
             }
 
             int num = 0;
-            Check point[6][12] {};
+            Check point[6][12]{};
             for (int i = 0; i < 6; i++) {
                 for (int j = 0; j < 12; j++) {
                     if (ba[i][j] == PuyoColor::EMPTY)
@@ -1014,15 +982,15 @@ int COMAI_HI::tobashi_hantei_b(const PuyoColor ba2[][kHeight], int aa)
 }
 
 int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own,
-                         PuyoColor aite_ba[6][kHeight], int zenkesi_aite, int fast)
+    PuyoColor aite_ba[6][kHeight], int zenkesi_aite, int fast)
 {
-    PuyoColor ba_a[6][kHeight] {};
-    PuyoColor ba2[6][kHeight] {};
+    PuyoColor ba_a[6][kHeight]{};
+    PuyoColor ba2[6][kHeight]{};
     int hym[22];
     int keschk = 0;
     int maxch = 0, maxach;
     int teimen[6];
-    int zenkes[22][22][22] {};
+    int zenkes[22][22][22]{};
     int zenke[22] = { 0 };
     int setti_basyo[4];
     int myf_kosuu_kesi = 0, myf_kosuu_iro = 0;
@@ -1177,9 +1145,9 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                             }
                         }
                     }
-                } // p<6
+                }  // p<6
             }
-        } // p<7
+        }  // p<7
     }
 
     int zenchk = 0;
@@ -1202,7 +1170,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
     for (int aa = 0; aa < 22; aa++) {
         if (tobashi_hantei_a(ba2, aa, nx1, nx2))
             continue;
-        PuyoColor ba[6][kHeight] {};
+        PuyoColor ba[6][kHeight]{};
         copyField(ba2, ba);
         setti_puyo(ba, aa, nx1, nx2, setti_basyo);
         TLRensaResult result = simulate(ba);
@@ -1226,7 +1194,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                 m_kougeki_iryoku = score / 70;
                 m_kougeki_on = 1;
             }
-            if (((chain == 3) || (chain == 4)) && (m_aite_rensa_score_cc < 3)) {
+            if (((chain == 3) || (chain == 4)) && (m_aite_rensa_cc < 3)) {
                 hym[aa] += 72000 + score;
                 keschk = 1;
                 m_kougeki_iryoku = score / 70;
@@ -1253,7 +1221,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
         // さいそく
         if (saisoku == 1) {
             if ((myf_kosuu_iro - myf_kosuu_kesi + 10 < myf_kosuu_kesi)
-                && (score > m_nocc_aite_rensa_score + 130 * chain) && (chain > 1) && (m_aite_hakka_rensa == 0)) {
+                && (score > m_aite_rensa_score_offence + 130 * chain) && (chain > 1) && (m_aite_hakka_rensa == 0)) {
                 hym[aa] += 73000;
                 keschk = 1;
                 m_kougeki_iryoku = score / 70;
@@ -1269,15 +1237,15 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                 keschk = 1;
             }
         }
-        if (zenkesi_own == 1) { // aaaa0909
-            if ((chain == 1) && (m_aite_hakka_zenkesi == 1) && (m_aite_hakka_jamako < 36)) { // add121014
+        if (zenkesi_own == 1) {  // aaaa0909
+            if ((chain == 1) && (m_aite_hakka_zenkesi == 1) && (m_aite_hakka_jamako < 36)) {  // add121014
                 hym[aa] += 74000;
             }
             if ((chain > 0) && (zenkesi_aite != 1)) {
                 hym[aa] += 74000;
             }
         }
-    } // aa
+    }  // aa
 
     if (kes2 == 1) {
         if ((maxch > m_cchai) && (m_cchai > 1)) {
@@ -1327,7 +1295,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
         if (dd < 22 * 10) {
             nk1 = kTsumoPatterns[color][0];
             nk2 = kTsumoPatterns[color][1];
-        } else { // dd == 220
+        } else {  // dd == 220
             nk1 = PuyoColor::EMPTY;
             nk2 = PuyoColor::EMPTY;
         }
@@ -1343,7 +1311,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
             TLRensaResult result_aa = simulate(ba_a);
             int keshiko_aa = result_aa.num_vanished;
             int score_tmp = result_aa.score;
-            int score_aonly = score_tmp; // only
+            int score_aonly = score_tmp;  // only
             int score_tmp2 = score_tmp;
             if ((ba_a[2][11] == PuyoColor::EMPTY) && (score_tmp > m_score_aa)) {
                 m_score_aa = score_tmp;
@@ -1366,7 +1334,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                     }
                 }
                 continue;
-            } // 110604
+            }  // 110604
 
             for (int bb = 0; bb < 22; bb++) {
                 if (tobashi_hantei_a(ba_a, bb, nn1, nn2))
@@ -1377,25 +1345,25 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                 TLRensaResult result_bb = simulate(ba_ee);
                 int keshiko_bb = result_bb.num_vanished;
                 int score_tmp = result_bb.score;
-                int score_bonly = score_tmp; // only
+                int score_bonly = score_tmp;  // only
                 int score_tmp2 = score_tmp;
                 if ((kuraichk == 1) && (m_aite_hakka_nokori < 2) && (score_aonly > 0))
-                    score_tmp = 0; // only
+                    score_tmp = 0;  // only
                 if ((kuraichk == 1)
                     && ((m_aite_hakka_nokori < 1)
-                        || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
-                    score_tmp = 0; // 0225
+                           || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
+                    score_tmp = 0;  // 0225
                 if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp > m_score_aa)) {
                     m_score_aa = score_tmp;
                     m_aa_max_score = aa;
                     m_tesuu_mon = 2;
                 }
                 if ((wariko_taiou == 1) && (m_aite_hakka_nokori < 2) && (score_aonly > 0))
-                    score_tmp2 = 0; // only
+                    score_tmp2 = 0;  // only
                 if ((wariko_taiou == 1)
                     && ((m_aite_hakka_nokori < 1)
-                        || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
-                    score_tmp2 = 0; // 0225
+                           || ((m_aite_hakka_nokori < 2) && ((m_aite_puyo_uki == 0) && (m_aite_hakka_quick == 1)))))
+                    score_tmp2 = 0;  // 0225
                 if ((ba_ee[2][11] == PuyoColor::EMPTY) && (score_tmp2 > score_tai) && (score_tmp2 > 270)
                     && (m_aite_hakka_jamako * 70 > score_tmp2 - 1400)
                     && (score_tmp2 + 150 > m_aite_hakka_jamako * 70)) {
@@ -1411,7 +1379,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                         g_poihyo[aa][bb][dd][ee] = -3000;
                     }
                     continue;
-                } // 110604
+                }  // 110604
 
                 // NOTE: In case dd==220, we assume the 3rd Tsumo is (EMPTY,EMPTY).
                 if (dd < 220) {
@@ -1422,7 +1390,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                     keshiko_dd = chousei_syoukyo_sc(ba_ee, setti_basyo, &score_tmp);
                     score_tmp2 = score_tmp;
                     if ((kuraichk == 1) && ((score_aonly > 0) || (score_bonly > 0)))
-                        score_tmp = 0; // only
+                        score_tmp = 0;  // only
                     if ((kuraichk == 1) && (m_aite_hakka_nokori < 3))
                         score_tmp = 0;
 
@@ -1459,8 +1427,8 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                             g_poihyo[aa][bb][dd][ee] = -3000;
                         }
                         continue;
-                    } // 110604
-                } // dd220
+                    }  // 110604
+                }  // dd220
 
                 // Penalty for CHIGIRI
                 if (m_aite_hakka_honsen == 0) {
@@ -1568,7 +1536,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                 // TODO(peria): what ee means?
                 for (int ee = 0; ee < EE_SIZE; ee++) {
                     if ((m_key_ee == 0) && (ee > 0))
-                        break; // t2
+                        break;  // t2
                     int eex = 0;
                     if (ee == 0) {
                         eex = 0;
@@ -1602,7 +1570,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                                 continue;
                         }
                     }
-                    PuyoColor ba[6][kHeight] {};
+                    PuyoColor ba[6][kHeight]{};
                     copyField(ba_ee, ba);
                     if (ee != 0) {
                         if (setti_puyo_1(ba, eex, eecol))
@@ -1637,7 +1605,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                     std::fill_n(&point2[0][0], 6 * 12, Check::Unknown);
                     UpdateAccessibility(ba, point2);
 
-                    PuyoColor bass[6][kHeight] {};
+                    PuyoColor bass[6][kHeight]{};
                     int num2 = 3;
                     for (int i2 = 0; i2 < 6; i2++) {
                         hakkatakasa = 0;
@@ -1668,7 +1636,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                                     poi2s = hakkatakasa * 300;
 
                                 chain = chousei_syoukyo_3(bass, setti_basyo, &poi2s, &score_mm, tokus, i2, j2,
-                                                          config.ruiseki_point);
+                                    config.ruiseki_point);
 
                                 if ((dd < 220) && (m_myf_kosuu > 63))
                                     score_mm = score_mm * 1 / 2;
@@ -1680,7 +1648,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                             int pois = 0;
                             if (m_cchai <= chain) {
                                 m_cchai = chain;
-                                Check point[6][12] {};
+                                Check point[6][12]{};
                                 num = 0;
                                 for (int i = 0; i < 6; i++) {
                                     for (int j = 0; j < 12; j++) {
@@ -1705,7 +1673,7 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                                                 pois += yokopoint;
                                         }
                                     }
-                                } // 12-2
+                                }  // 12-2
                             }
                             if (g_chainhyk[aa][bb][dd][ee] < chain) {
                                 g_chainhyk[aa][bb][dd][ee] = chain;
@@ -1723,11 +1691,11 @@ int COMAI_HI::pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int
                             }
                         }
                     }
-                } // ee
-            } // bb
-        } // aa
-    } // dd
+                }  // ee
+            }  // bb
+        }  // aa
+    }  // dd
     return 0;
 }
 
-} // namespace test_lockit
+}  // namespace test_lockit

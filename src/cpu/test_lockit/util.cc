@@ -27,4 +27,4 @@ void toTLField(const CoreField& cf, PuyoColor f[6][kHeight])
     }
 }
 
-} // namespace test_lockit
+}  // namespace test_lockit

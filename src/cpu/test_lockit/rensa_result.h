@@ -19,9 +19,9 @@ struct TLRensaResult {
 
     // the number of vanishing groups in each chain step.  The values of
     // num_connections[i] for i >= chains are not defined
-    int num_connections[MAX_RENSA] {};
+    int num_connections[MAX_RENSA]{};
 };
 
-} // namespace test_lockit
+}  // namespace test_lockit
 
-#endif // CPU_TEST_LOCKIT_RENSA_RESULT_H_
+#endif  // CPU_TEST_LOCKIT_RENSA_RESULT_H_

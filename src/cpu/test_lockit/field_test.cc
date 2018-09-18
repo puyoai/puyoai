@@ -12,19 +12,19 @@ namespace test_lockit {
 
 TEST(FieldTest, Saiki)
 {
-    CoreField cf("BBGGYY" // 12 (invisible)
-                 "BBGGYY" // 11
+    CoreField cf("BBGGYY"  // 12 (invisible)
+                 "BBGGYY"  // 11
                  "@@@@@@"
                  "@@@@@@"
                  "@@@@@@"
-                 "@@@@@@" // 7
+                 "@@@@@@"  // 7
                  "@@@@@@"
                  "GGRRRR"
                  "YRRGGR"
-                 "RRBBBR" // 3
+                 "RRBBBR"  // 3
                  "@RRRRR"
                  "@@@@@@"
-                 "RBYG@@"); // 0 (y-index in TLField)
+                 "RBYG@@");  // 0 (y-index in TLField)
     struct TestData {
         int x;
         int y;
@@ -37,7 +37,7 @@ TEST(FieldTest, Saiki)
 
     int expect_points = 0;
     // We can re-use |point| array.
-    Check point[6][12] {};
+    Check point[6][12]{};
     for (const TestData& data : data_set) {
         int num = 0;
         saiki(field, point, data.x, data.y, &num, field[data.x][data.y]);
@@ -58,17 +58,17 @@ TEST(FieldTest, Saiki)
 
 TEST(FieldTest, countNormalColor13)
 {
-    CoreField cf("G....." // 14
-                 "R....." // 13
-                 "Y....." // 12
+    CoreField cf("G....."  // 14
+                 "R....."  // 13
+                 "Y....."  // 12
                  "B....."
                  "G....."
                  "R....."
-                 "Y....." // 8
+                 "Y....."  // 8
                  "B....."
                  "G....."
                  "R....."
-                 "Y....." // 4
+                 "Y....."  // 4
                  "B....."
                  "G....."
                  "R.OOO.");
@@ -81,16 +81,16 @@ TEST(FieldTest, countNormalColor13)
 
 TEST(FieldTest, settiOjama)
 {
-    CoreField cf("O....." // 13
-                 "OO...." // 12
+    CoreField cf("O....."  // 13
+                 "OO...."  // 12
                  "OOO..."
                  "OOOO.."
                  "OOOOO."
-                 "OOOOOO" // 8
+                 "OOOOOO"  // 8
                  "OOOOOO"
                  "OOOOOO"
                  "OOOOOO"
-                 "OOOOOO" // 4
+                 "OOOOOO"  // 4
                  "OOOOOO"
                  "OOOOOO"
                  "OOOOOO");
@@ -194,4 +194,4 @@ TEST(FieldTest, simulate_2_double)
     EXPECT_EQ(2, result.num_connections[1]);
 }
 
-} // namespace test_lockit
+}  // namespace test_lockit

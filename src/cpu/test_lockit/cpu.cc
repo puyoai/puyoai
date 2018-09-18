@@ -149,7 +149,7 @@ bool isTsumoValid(PuyoColor tsumo[6])
 FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
 {
     int saidaiten, tmp;
-    int coma2x_sc[22] {};
+    int coma2x_sc[22]{};
 
     parseRequest(request, &r_player[0], &r_player[1], &coma);
 
@@ -178,28 +178,28 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
     if ((r_player[1].act_on == 1) && (r_player[1].set_puyo_once == 1)) {
         r_player[1].set_puyo_once = 0;
         coma.aite_rensa_end();
-        coma.aite_hyouka(r_player[1].field, r_player[1].tsumo);
+        coma.estimateOpponent(r_player[1].field, r_player[1].tsumo);
     }
     if (r_player[0].set_puyo == 1) {
         r_player[0].set_puyo_once = 1;
         r_player[0].keep_score = r_player[0].score;
     }
-    if (r_player[0].rensa_end == 1) { // 全消し,全消し消化判断
+    if (r_player[0].rensa_end == 1) {  // 全消し,全消し消化判断
         r_player[0].field_kioku();
         if (isTLFieldEmpty(r_player[0].field)) {
-            r_player[0].zenkesi = 1; // 得点系のため一旦out
+            r_player[0].zenkesi = 1;  // 得点系のため一旦out
         }
     }
 
     if (r_player[0].act_on == 1 && r_player[0].set_puyo_once == 1) {
         r_player[0].set_puyo_once = 0;
         r_player[0].setti_12();
-        if (coma.m_hukks == 0 || r_player[0].field_hikaku() > 0) { // 開幕のm_hukks==0では思考を短くする？
+        if (coma.m_hukks == 0 || r_player[0].field_hikaku() > 0) {  // 開幕のm_hukks==0では思考を短くする？
             coma.pre_hyouka(r_player[0].field, r_player[0].tsumo, r_player[0].zenkesi, r_player[1].field,
-                            r_player[1].zenkesi, 1);
+                r_player[1].zenkesi, 1);
         }
         coma.aite_attack_nokori(r_player[1].field,
-                                r_player[0].id); // 情報が更新されないため、現構成ではうまく機能しない
+            r_player[0].id);  // 情報が更新されないため、現構成ではうまく機能しない
         coma.hyouka(r_player[0].field, r_player[0].tsumo, r_player[0].zenkesi, r_player[1].field, r_player[1].zenkesi);
 
         // 2x hyouka
@@ -211,12 +211,13 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
                 }
             }
         }
-        // If we don't use 2x-hyouka, set field_kosuu to 0 so that 2x-hyouka is not used.
+        // If we don't use 2x-hyouka, set field_kosuu to 0 so that 2x-hyouka is not
+        // used.
         if (!config.uses_2x_hyouka) {
             field_kosuu = 0;
         }
 
-        PuyoColor field2x[6][kHeight] {};
+        PuyoColor field2x[6][kHeight]{};
         for (int i = 0; i < 6; ++i) {
             for (int j = 0; j < 14; ++j) {
                 field2x[i][j] = (j + 4 < kHeight) ? r_player[0].field[i][j + 4] : PuyoColor::EMPTY;
@@ -266,19 +267,20 @@ FrameResponse TestLockitAI::playOneFrame(const FrameRequest& request)
             r_player[0].zenkesi = 0;
         }
         response = sendmes(&r_player[0], &coma);
-    } // p1 act_once
+    }  // p1 act_once
 
-    if (r_player[0].nex_on == 1) { // 事前手決めスタート
+    if (r_player[0].nex_on == 1) {  // 事前手決めスタート
         if (coma.m_hukks != 0) {
             coma.pre_hyouka(r_player[0].yosou_field, r_player[0].tsumo + 2, r_player[0].zenkesi, r_player[1].field,
-                            r_player[1].zenkesi, 0);
+                r_player[1].zenkesi, 0);
         }
-    } // 開幕のm_hukks==0はこちらはひっかからない？
+    }  // 開幕のm_hukks==0はこちらはひっかからない？
 
     if (play_log_.is_open()) {
         std::string request_str = request.toString();
         if (request_str.substr(request_str.find(' ') + 1) != last_log_) {
-            play_log_ << request_str << "\n" << response.toString() << std::endl;
+            play_log_ << request_str << "\n"
+                      << response.toString() << std::endl;
             last_log_ = request_str.substr(request_str.find(' ') + 1);
         }
     }
@@ -311,4 +313,4 @@ void TestLockitAI::runTest(const std::string& filename)
     std::cerr << "Passed all " << count << " cases.\n";
 }
 
-} // namespace test_lockit
+}  // namespace test_lockit

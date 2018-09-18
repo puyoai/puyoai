@@ -17,7 +17,7 @@ void READ_P::ref()
             field[i][j] = PuyoColor::EMPTY;
             yosou_field[i][j] = PuyoColor::EMPTY;
         }
-        tsumo[i] = PuyoColor::RED; // Why RED here?
+        tsumo[i] = PuyoColor::RED;  // Why RED here?
         field12[i] = PuyoColor::EMPTY;
     }
     act_on = 0;
@@ -61,7 +61,9 @@ READ_P::READ_P()
     te_r = 0;
 }
 
-READ_P::~READ_P() {}
+READ_P::~READ_P()
+{
+}
 
 void READ_P::fall()
 {
@@ -199,7 +201,7 @@ int READ_P::chousei_syoukyo()
     int num = 0;
     int numa = 0;
     int numb = 0;
-    Check point[6][12] {};
+    Check point[6][12]{};
     int i, j;
     int syo = 1;
     int kiept[6] = { 0 };
@@ -288,4 +290,4 @@ int READ_P::chousei_syoukyo()
     return 1;
 }
 
-} // namespace test_lockit
+}  // namespace test_lockit

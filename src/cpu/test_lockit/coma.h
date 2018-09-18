@@ -17,11 +17,13 @@ public:
     explicit COMAI_HI(const cpu::Configuration& config);
     ~COMAI_HI();
 
-    int aite_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[]);
+    void estimateOpponent(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[]);
     int pre_hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight],
-                   int zenkesi_aite, int fast);
+        int zenkesi_aite, int fast);
     int hyouka(const PuyoColor ba3[6][kHeight], PuyoColor tsumo[], int zenkesi_own, PuyoColor aite_ba[6][kHeight],
-               int zenkesi_aite);
+        int zenkesi_aite);
+
+    // Called when the opponent set puyos. Returns true if it invokes chains.
     bool aite_attack_start(const PuyoColor ba3[6][kHeight], int zenkesi_aite, int scos, int hakata);
     int aite_attack_nokori(const PuyoColor ba3[6][kHeight], int hakata);
     int aite_rensa_end();
@@ -50,22 +52,22 @@ private:
     int m_conaa;
     int m_nexaa;
     int m_maxchais;
-    int m_aite_rensa_score; // aite
-    int m_aite_rensa_score_cc; // aite
+    // Opponent's maximum possible score in 2 tsumos + zoro.
+    int m_aite_rensa_score;  // all cases
+    int m_aite_rensa_score_offence;  // offensive case
+    // Opponent's maximum possible chains after 2 tsumos, using a zoro.
+    int m_aite_rensa_cc;
     int m_myf_kosuu;
     int m_saisoku_flag;
     int m_aite_hakka_rensa;
     int m_aite_hakka_zenkesi;
     int m_aite_hakka_kosuu;
-    int m_nocc_aite_rensa_score;
     int m_max_ee;
     int m_key_ee;
 
     int m_aite_hakka_jamako;
     int m_aite_hakka_honsen;
     int m_aite_hakka_quick;
-    int m_moni_kesiko[3];
-    int m_moni_iroko[3];
     int m_aite_puyo_uki;
     int m_kuraichk_mon;
     int m_score_mon;
@@ -82,6 +84,6 @@ private:
     int m_hakkatime;
 };
 
-} // namespace test_lockit
+}  // namespace test_lockit
 
 #endif

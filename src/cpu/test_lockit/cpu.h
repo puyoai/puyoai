@@ -31,6 +31,6 @@ private:
     std::string last_log_;
 };
 
-} // namespace test_lockit
+}  // namespace test_lockit
 
 #endif
