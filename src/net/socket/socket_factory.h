@@ -18,9 +18,11 @@ public:
     TCPClientSocket makeTCPClientSocket();
     TCPServerSocket makeTCPServerSocket();
 
+#ifdef OS_POSIX
     // Returns UnixDomainSocket. If failed, socket will be invalid.
     UnixDomainClientSocket makeUnixDomainClientSocket();
     UnixDomainServerSocket makeUnixDomainServerSocket();
+#endif
 
 private:
     SocketFactory() {}

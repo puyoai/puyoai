@@ -1,6 +1,8 @@
 #include "net/socket/socket_factory.h"
 
-#include <sys/socket.h>
+#ifdef OS_POSIX
+# include <sys/socket.h>
+#endif
 
 #include "glog/logging.h"
 
@@ -34,6 +36,7 @@ TCPServerSocket SocketFactory::makeTCPServerSocket()
     return TCPServerSocket(sock);
 }
 
+#ifdef OS_POSIX
 UnixDomainClientSocket SocketFactory::makeUnixDomainClientSocket()
 {
     int sock = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -55,5 +58,6 @@ UnixDomainServerSocket SocketFactory::makeUnixDomainServerSocket()
 
     return UnixDomainServerSocket(sock);
 }
+#endif
 
 } // namespace net

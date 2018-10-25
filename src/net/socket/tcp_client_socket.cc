@@ -1,11 +1,16 @@
 #include "net/socket/tcp_client_socket.h"
 
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <sys/socket.h>
-#include <sys/types.h>
+#ifdef OS_WIN
+# include <winsock2.h>
+# undef ERROR
+#else
+# include <arpa/inet.h>
+# include <netdb.h>
+# include <netinet/in.h>
+# include <netinet/tcp.h>
+# include <sys/socket.h>
+# include <sys/types.h>
+#endif
 
 #include "glog/logging.h"
 

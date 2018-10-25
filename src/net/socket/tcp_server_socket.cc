@@ -1,11 +1,16 @@
 #include "net/socket/tcp_server_socket.h"
 
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <sys/socket.h>
-#include <sys/types.h>
+#ifdef OS_WIN
+# include <winsock2.h>
+# undef ERROR
+#else
+# include <arpa/inet.h>
+# include <netdb.h>
+# include <netinet/in.h>
+# include <netinet/tcp.h>
+# include <sys/socket.h>
+# include <sys/types.h>
+#endif
 
 #include "glog/logging.h"
 
@@ -59,8 +64,12 @@ bool TCPServerSocket::listen(int backlog)
 TCPSocket TCPServerSocket::accept()
 {
     struct sockaddr_in addr;
+#ifdef OS_WIN
+    int len = sizeof(addr);
+#else
     socklen_t len = sizeof(addr);
-    int new_fd = ::accept(sd_, reinterpret_cast<struct sockaddr*>(&addr), &len);
+#endif
+    SocketDescriptor new_fd = ::accept(sd_, reinterpret_cast<struct sockaddr*>(&addr), &len);
     if (new_fd < 0) {
         PLOG(ERROR) << "accept" << " socket=" << sd_;
         return TCPSocket(INVALID_SOCKET);

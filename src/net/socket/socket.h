@@ -8,10 +8,11 @@
 
 namespace net {
 
-// fd will be closed when Socket is destructed.
 class Socket {
 public:
     Socket(Socket&& socket) noexcept;
+
+    // The descriptor will be closed when Socket is destructed.
     virtual ~Socket();
 
     Socket& operator=(Socket&& socket) noexcept;
