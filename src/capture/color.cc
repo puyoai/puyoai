@@ -30,7 +30,7 @@ HSV RGB::toHSV() const
     while (hsv.h >= 360)
         hsv.h -= 360;
 
-    hsv.s = mx == 0 ? 0 : (mx - mn);
+    hsv.s = mx == 0 ? 0 : (mx - mn) / mx;
     hsv.v = mx;
     return hsv;
 }
