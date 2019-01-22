@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-add_subdirectory(es)
-
-add_library(puyoai_recognition
+add_library(puyoai_es_recognition
             classifier_features.cc
             recognition_color.cc
             recognizer.cc)

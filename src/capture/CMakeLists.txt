@@ -8,6 +8,7 @@ add_compile_options("-Wno-deprecated-declarations")
 
 add_library(puyoai_capture
             ac_analyzer.cc
+            es_analyzer.cc
             analyzer.cc
             analyzer_result_drawer.cc
             capture.cc
@@ -41,6 +42,7 @@ function(capture_add_executable exe)
     endif()
     target_link_libraries(${exe} puyoai_capture)
     target_link_libraries(${exe} puyoai_recognition)
+    target_link_libraries(${exe} puyoai_es_recognition)
     target_link_libraries(${exe} puyoai_gui)
     target_link_libraries(${exe} puyoai_learning)
     target_link_libraries(${exe} puyoai_core)
@@ -70,6 +72,7 @@ capture_add_executable(parse_box)
 # Disabled.
 #capture_add_executable(parse_imgs)
 capture_add_executable(parse_movie)
+capture_add_executable(parse_movie_es)
 if(LIB_USB)
     capture_add_executable(parse_capture)
 endif()
