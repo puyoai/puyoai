@@ -8,6 +8,7 @@ const int MOVIE_SCALE = 2; // 入力の動画サイズとウィンドウサイ�
 
 const double W = 21.5;
 const double H = 20;
+// 解析フェーズでのぷよサイズは 43*40 になる
 
 const int RIGHT_FIELD_X = 92;
 const int RIGHT_FIELD_Y = 52;

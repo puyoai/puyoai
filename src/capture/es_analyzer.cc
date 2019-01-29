@@ -186,7 +186,7 @@ RealColor ESAnalyzer::analyzeBox(const SDL_Surface* surface, const Box& b,
 }
 
 int iii = 0;
-Uint32 getpixel(SDL_Surface *surface, int x, int y)
+Uint32 _getpixel(SDL_Surface *surface, int x, int y)
 {
     int bpp = surface->format->BytesPerPixel;
     /* Here p is the address to the pixel we want to retrieve */
@@ -261,35 +261,28 @@ void setpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 
 RealColor ESAnalyzer::analyzeBoxWithRecognizer(const SDL_Surface* surface, const Box& b) const
 {
-    double dx = (b.dx - b.sx) / 16.0;
-    double dy = (b.dy - b.sy) / 16.0;
+//    double dx = (b.dx - b.sx) / 43.0;
+//    double dy = (b.dy - b.sy) / 40.0;
 
     double rr = 0;
     double gg = 0;
     double bb = 0;
 
     int pos = 0;
-    double features[16 * 16 * 3];
-    UniqueSDLSurface surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, 16, 16, 32, 0, 0, 0, 0)));
+    double features[43 * 40 * 3];
 
-    for (int y = 0; y < 16; y += 1) {
-        for (int x = 0; x < 16; x += 1) {
-            int xx = (int)(b.sx + dx * x);
-            int yy = (int)(b.sy + dy * y);
+    for (int x = 0; x < 43; x += 1) {
+        for (int y = 0; y < 40; y += 1) {
+            int xx = (int)(b.sx + x);
+            int yy = (int)(b.sy + y);
 
-            Uint32 c = getpixel(surface, xx > 0 ? (xx < surface->w ? xx : 0) : 0, yy > 0 ? (yy < surface->h ? yy : 0) : 0);
+            //Uint32 c = getpixel(surface, xx > 0 ? (xx < surface->w ? xx : 0) : 0, yy > 0 ? (yy < surface->h ? yy : 0) : 0);
+            Uint32 c = getpixel(surface, xx, yy);
             Uint8 r, g, b;
             SDL_GetRGB(c, surface->format, &r, &g, &b);
-
-            Uint32 uu = getpixel(surface, xx, yy);
-            // std::cout << x << ", " << y << ", " <<(int) r << ", " << (int)g << ", " << (int)b << std::endl;
-            setpixel(surf.get(), x, y, uu);
-
-            HSV hsv = RGB(r, g, b).toHSV();
-
-            features[pos++] = hsv.h / 359.0;
-            features[pos++] = hsv.s;
-            features[pos++] = hsv.v / 255.0;
+            features[pos++] = b / (double) 255;
+            features[pos++] = g / (double) 255;
+            features[pos++] = r / (double) 255;
 
             rr += r ,gg += g, bb += b;
         }
@@ -301,13 +294,14 @@ RealColor ESAnalyzer::analyzeBoxWithRecognizer(const SDL_Surface* surface, const
 
     if (iii % 300 == 0) {
 //        std::cout << iii << ": " << rrr << std::endl;
-//        for (int j = 0; j < 16*16*3; j++) {
+//        for (int j = 0; j < 100; j++) {
 //            std::cout << features[j] << ", ";
 //        }
-        char filename[1020];
-        sprintf(filename, "out-fuga/%s-%d.bmp", toString(rrr).c_str(), iii);
-        SDL_SaveBMP(surf.get(), filename);
+//        char filename[1020];
+//        sprintf(filename, "out-fuga/%s-%d.bmp", toString(rrr).c_str(), iii);
+//        SDL_SaveBMP(surf.get(), filename);
     }
+//    if (iii == 600) assert(false);
     iii += 1;
 //
 //    if (iii == 41000)         assert(false);
@@ -448,6 +442,8 @@ unique_ptr<DetectedField> ESAnalyzer::detectField(int pi,
 
         result->setOjamaDropDetected(detected);
     }
+
+
 
     return result;
 }
