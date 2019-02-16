@@ -1,0 +1,10 @@
+config("tinytoml_config") {
+    include_dirs = [ "tinytoml/include" ]
+}
+
+source_set("tinytoml") {
+    sources = [
+        "tinytoml/toml/toml.h",
+    ]
+    public_configs = [":tinytoml_config"]
+}

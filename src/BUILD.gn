@@ -2,6 +2,7 @@ group("src") {
   deps = [
     "//src/base",
     "//src/core",
+    "//src/core/pattern",
     "//src/learning",
   ]
 }

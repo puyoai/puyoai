@@ -1,0 +1,70 @@
+static_library("pattern") {
+    sources = [
+        "bijection_matcher.cc",
+        "decision_book.cc",
+        "field_pattern.cc",
+        "pattern_book.cc",
+        "pattern_tree.cc",
+    ]
+
+    deps = [
+        "//src/base",
+        "//src/core",
+    ]
+
+    public_deps = [
+        "//third_party/glog",
+        "//third_party/tinytoml",
+    ]
+}
+
+executable("decision_book_test") {
+    testonly = true
+    sources = [
+        "decision_book_test.cc",
+    ]
+    deps = [
+        "//third_party/gtest:gtest",
+        "//third_party/gtest:gtest_main",
+        ":pattern",
+    ]
+}
+
+executable("field_pattern_test") {
+    testonly = true
+    sources = [
+        "field_pattern_test.cc",
+    ]
+    deps = [
+        "//third_party/gtest:gtest",
+        "//third_party/gtest:gtest_main",
+        ":pattern",
+    ]
+}
+
+executable("pattern_book_test") {
+    testonly = true
+    sources = [
+        "pattern_book_test.cc",
+    ]
+    deps = [
+        "//third_party/gtest:gtest",
+        "//third_party/gtest:gtest_main",
+        ":pattern",
+    ]
+}
+
+# ----------------------------------------------------------------------
+# test
+
+# function(puyoai_core_pattern_add_test target)
+#     add_executable(${target}_test ${target}_test.cc)
+#     target_link_libraries(${target}_test gtest gtest_main)
+#     target_link_libraries(${target}_test puyoai_core_pattern)
+#     target_link_libraries(${target}_test puyoai_core)
+#     target_link_libraries(${target}_test puyoai_base)
+#     puyoai_target_link_libraries(${target}_test)
+#     if(NOT ARGV1)
+#         add_test(check-${target}_test ${target}_test)
+#     endif()
+# endfunction()
