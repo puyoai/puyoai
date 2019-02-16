@@ -1,0 +1,49 @@
+declare_args() {
+  os = host_os
+
+  is_debug = true
+}
+
+# OS DEFINITIONS
+is_posix = os == "mac" || os == "linux"
+is_mac = os == "mac"
+is_linux = os == "linux"
+is_win = os == "win" || os == "winuwp"
+
+if (os == "linux") {
+  set_default_toolchain("//build/toolchain/linux:x64")
+}
+
+
+default_compiler_configs = [
+  "//build/config/compiler",
+]
+
+if (is_debug) {
+  default_compiler_configs += [
+    "//build/config:debug",
+    "//build/config/compiler:no_optimize",
+  ]
+} else {
+  default_compiler_configs += [
+   "//build/config:release",
+   "//build/config/compiler:optimize",
+  ]
+}
+
+set_defaults("executable") {
+  configs = default_compiler_configs
+}
+
+set_defaults("static_library") {
+  configs = default_compiler_configs
+}
+
+set_defaults("shared_library") {
+  configs = default_compiler_configs
+}
+
+set_defaults("source_set") {
+  configs = default_compiler_configs
+}
+

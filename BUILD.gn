@@ -1,0 +1,14 @@
+config("config") {
+  include_dirs = [ "src" ]
+}
+
+group("root") {
+  deps = [
+    "//src"
+  ]
+
+  public_configs = [
+    ":config"
+  ]
+}
+

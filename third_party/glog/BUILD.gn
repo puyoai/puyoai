@@ -1,0 +1,79 @@
+if (os != "win") {
+  config_h_dir = "config/$os"
+} else {
+  import("//build/config/win/visual_studio_version.gni")
+  config_h_dir = "glog/src/windows"
+}
+glog_sources = [
+  "glog/src/base/commandlineflags.h",
+  "glog/src/base/googleinit.h",
+  "glog/src/base/mutex.h",
+  "glog/src/demangle.cc",
+  "glog/src/demangle.h",
+  "glog/src/logging.cc",
+  "glog/src/raw_logging.cc",
+  "glog/src/signalhandler.cc",
+  "glog/src/stacktrace_generic-inl.h",
+  "glog/src/stacktrace.h",
+  "glog/src/stacktrace_libunwind-inl.h",
+  "glog/src/stacktrace_x86_64-inl.h",
+  "glog/src/symbolize.cc",
+  "glog/src/symbolize.h",
+  "glog/src/utilities.cc",
+  "glog/src/utilities.h",
+  "glog/src/vlog_is_on.cc",
+  "$config_h_dir/config.h",
+  "$config_h_dir/glog/logging.h",
+  "$config_h_dir/glog/log_severity.h",
+  "$config_h_dir/glog/raw_logging.h",
+  "$config_h_dir/glog/stl_logging.h",
+  "$config_h_dir/glog/vlog_is_on.h",
+]
+glog_include_dirs = [
+  "$config_h_dir",
+  "glog/src",
+]
+glog_defines = [ "HAVE_CONFIG_H" ]
+if (os == "win" &&
+    (visual_studio_version == "2015" || visual_studio_version == "2017")) {
+  glog_defines += [ "HAVE_SNPRINTF" ]
+}
+if (os != "win") {
+  glog_cflags_cc = [ "-Wno-sign-compare" ]
+} else {
+  glog_cflags_cc = [
+    "/wd4541",
+    # C4389: signed/unsigned mismatch
+    # Come from glog/src/windows/glog/logging.h
+    "/wd4389",
+    # destructor never returns, potential memory leak.
+    # Occurred in glog Fatal.
+    "/wd4722",
+  ]
+  glog_sources -= [
+    "glog/src/stacktrace_generic-inl.h",
+    "glog/src/stacktrace.h",
+    "glog/src/stacktrace_libunwind-inl.h",
+    "glog/src/stacktrace_x86_64-inl.h",
+  ]
+  glog_sources += [
+    "glog/src/windows/port.cc",
+    "glog/src/windows/port.h",
+  ]
+}
+config("glog_config") {
+  include_dirs = glog_include_dirs
+  if (is_posix) {
+    cflags = [
+      "-Wno-unused-local-typedef",  # For COMPILE_ASSERT macro.
+      "-Wno-sign-compare",  # glog/logging.h has sign compare code
+    ]
+  }
+}
+static_library("glog") {
+  sources = glog_sources
+  include_dirs = glog_include_dirs
+  defines = glog_defines
+  cflags_cc = glog_cflags_cc
+  public_configs = [ ":glog_config" ]
+}

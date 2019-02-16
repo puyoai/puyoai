@@ -1,0 +1,6 @@
+group("src") {
+  deps = [
+    "//src/base",
+  ]
+}
+

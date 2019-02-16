@@ -1,0 +1,69 @@
+config("gtest_config") {
+  include_dirs = [ "gtest/googletest/include" ]
+}
+
+static_library("gtest") {
+  testonly = true
+  sources = [
+    "gtest/googletest/include/gtest/gtest-death-test.h",
+    "gtest/googletest/include/gtest/gtest-message.h",
+    "gtest/googletest/include/gtest/gtest-param-test.h",
+    "gtest/googletest/include/gtest/gtest-printers.h",
+    "gtest/googletest/include/gtest/gtest-spi.h",
+    "gtest/googletest/include/gtest/gtest-test-part.h",
+    "gtest/googletest/include/gtest/gtest-typed-test.h",
+    "gtest/googletest/include/gtest/gtest.h",
+    "gtest/googletest/include/gtest/gtest_pred_impl.h",
+    "gtest/googletest/include/gtest/gtest_prod.h",
+    "gtest/googletest/include/gtest/internal/custom/gtest-port.h",
+    "gtest/googletest/include/gtest/internal/custom/gtest-printers.h",
+    "gtest/googletest/include/gtest/internal/custom/gtest.h",
+    "gtest/googletest/include/gtest/internal/gtest-death-test-internal.h",
+    "gtest/googletest/include/gtest/internal/gtest-filepath.h",
+    "gtest/googletest/include/gtest/internal/gtest-internal.h",
+    "gtest/googletest/include/gtest/internal/gtest-linked_ptr.h",
+    "gtest/googletest/include/gtest/internal/gtest-param-util-generated.h",
+    "gtest/googletest/include/gtest/internal/gtest-param-util.h",
+    "gtest/googletest/include/gtest/internal/gtest-port-arch.h",
+    "gtest/googletest/include/gtest/internal/gtest-port.h",
+    "gtest/googletest/include/gtest/internal/gtest-string.h",
+    "gtest/googletest/include/gtest/internal/gtest-tuple.h",
+    "gtest/googletest/include/gtest/internal/gtest-type-util.h",
+    "gtest/googletest/src/gtest-death-test.cc",
+    "gtest/googletest/src/gtest-filepath.cc",
+    "gtest/googletest/src/gtest-internal-inl.h",
+    "gtest/googletest/src/gtest-port.cc",
+    "gtest/googletest/src/gtest-printers.cc",
+    "gtest/googletest/src/gtest-test-part.cc",
+    "gtest/googletest/src/gtest-typed-test.cc",
+    "gtest/googletest/src/gtest.cc",
+  ]
+  include_dirs = [
+    "gtest/googletest",
+    "gtest/googletest/include",
+  ]
+  public_configs = [
+    ":gtest_config",
+  ]
+
+#  if (is_posix) {
+#    public_configs += [ ":has_rtti_config" ]
+#  }
+#  if (is_clang && os != "win") {
+#    public_configs += [ ":use_own_tr1_tuple_config" ]
+#  }
+#  if (os == "win") {
+#    # http://stackoverflow.com/questions/12558327/google-test-in-visual-studio-2012
+#    public_configs += [ ":variadix_max_config" ]
+#  }
+}
+
+static_library("gtest_main") {
+  testonly = true
+  deps = [
+    ":gtest",
+  ]
+  sources = [
+    "gtest/googletest/src/gtest_main.cc",
+  ]
+}

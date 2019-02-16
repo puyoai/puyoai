@@ -1,3 +1,5 @@
+/buildtools
+
 /out
 .DS_Store
 *.cmake
