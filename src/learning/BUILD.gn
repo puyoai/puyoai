@@ -1,0 +1,10 @@
+static_library("learning") {
+    sources = [
+        "arow.cc",
+        "multi_layer_perceptron.cc",
+    ]
+
+    deps = [
+        "//third_party/glog",
+    ]
+}
