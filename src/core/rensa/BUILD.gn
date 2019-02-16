@@ -1,0 +1,37 @@
+static_library("rensa") {
+    sources = [
+        "rensa_detector.cc",
+        "rensa_detector.h",
+    ]
+
+    public_deps = [
+        "//third_party/glog",
+        "//src/core",
+    ]
+}
+
+executable("rensa_detector_test") {
+    testonly = true
+    sources = [
+        "rensa_detector_test.cc",
+    ]
+    deps = [
+        ":rensa",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("rensa_detector_perftest") {
+    testonly = true
+    sources = [
+        "rensa_detector_performance_test.cc",
+    ]
+    deps = [
+        ":rensa",
+        "//src/base",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+

@@ -1,0 +1,100 @@
+static_library("rensa_tracker") {
+    sources = [
+        "rensa_chain_tracker.cc",
+        "rensa_chain_tracker.h",
+        "rensa_coef_tracker.cc",
+        "rensa_coef_tracker.h",
+        "rensa_vanishing_position_tracker.cc",
+        "rensa_vanishing_position_tracker.h",
+    ]
+
+    public_deps = [
+        "//third_party/glog",
+        "//src/core",
+    ]
+}
+
+executable("rensa_chain_tracker_test") {
+    testonly = true
+    sources = [
+        "rensa_chain_tracker_test.cc",
+    ]
+    deps = [
+        ":rensa_tracker",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("rensa_coef_tracker_test") {
+    testonly = true
+    sources = [
+        "rensa_coef_tracker_test.cc",
+    ]
+    deps = [
+        ":rensa_tracker",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("rensa_composite_tracker_test") {
+    testonly = true
+    sources = [
+        "rensa_composite_tracker_test.cc",
+    ]
+    deps = [
+        ":rensa_tracker",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("rensa_existing_position_tracker_test") {
+    testonly = true
+    sources = [
+        "rensa_existing_position_tracker_test.cc",
+    ]
+    deps = [
+        ":rensa_tracker",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("rensa_vanishing_position_tracker_test") {
+    testonly = true
+    sources = [
+        "rensa_vanishing_position_tracker_test.cc",
+    ]
+    deps = [
+        ":rensa_tracker",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("rensa_last_vanished_position_tracker_test") {
+    testonly = true
+    sources = [
+        "rensa_last_vanished_position_tracker_test.cc",
+    ]
+    deps = [
+        ":rensa_tracker",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("rensa_tracker_perftest") {
+    testonly = true
+    sources = [
+        "rensa_tracker_performance_test.cc",
+    ]
+    deps = [
+        ":rensa_tracker",
+        "//src/base",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
