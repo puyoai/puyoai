@@ -1,0 +1,15 @@
+group("net") {
+    deps = []
+
+    if (use_tcp) {
+        deps += [
+            "//src/net/socket",
+        ]
+    }
+
+    if (use_httpd) {
+        deps += [
+            "//src/net/httpd",
+        ]
+    }
+}

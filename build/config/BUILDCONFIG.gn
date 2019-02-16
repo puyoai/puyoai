@@ -2,6 +2,9 @@ declare_args() {
   os = host_os
 
   is_debug = true
+  
+  use_tcp = false
+  use_httpd = false
 }
 
 # OS DEFINITIONS

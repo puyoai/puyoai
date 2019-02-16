@@ -3,6 +3,7 @@ group("src") {
     "//src/base",
     "//src/core",
     "//src/core/pattern",
+    "//src/net",
     "//src/learning",
   ]
 }

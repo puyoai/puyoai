@@ -1,0 +1,5 @@
+static_library("httpd") {
+    sources = [
+        "http_server.cc",
+    ]
+}
