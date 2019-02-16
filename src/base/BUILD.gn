@@ -31,26 +31,62 @@ executable("blocking_queue_test") {
     ]
 }
 
-# ----------------------------------------------------------------------
+executable("bmi_test") {
+    testonly = true
+    sources = [
+        "bmi_test.cc",
+    ]
+    deps = [
+        ":base",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
 
-# function(puyoai_base_add_test target)
-#     add_executable(${target}_test ${target}_test.cc)
-#     target_link_libraries(${target}_test gtest gtest_main)
-#     target_link_libraries(${target}_test puyoai_base)
-#     puyoai_target_link_libraries(${target}_test)
-# endfunction()
-# 
-# function(puyoai_base_add_test_with_dir target target_file)
-#     add_executable(${target}_test ${target_file}_test.cc)
-#     target_link_libraries(${target}_test gtest gtest_main)
-#     target_link_libraries(${target}_test puyoai_base)
-#     puyoai_target_link_libraries(${target}_test)
-# endfunction()
-# 
-# puyoai_base_add_test(blocking_queue)
-# puyoai_base_add_test(bmi)
-# puyoai_base_add_test(sse)
-# puyoai_base_add_test(strings)
-# puyoai_base_add_test(small_int_set)
-# 
-# puyoai_base_add_test_with_dir(path file/path)
+executable("sse_test") {
+    testonly = true
+    sources = [
+        "sse_test.cc",
+    ]
+    deps = [
+        ":base",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("strings_test") {
+    testonly = true
+    sources = [
+        "strings_test.cc",
+    ]
+    deps = [
+        ":base",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("small_int_set_test") {
+    testonly = true
+    sources = [
+        "small_int_set_test.cc",
+    ]
+    deps = [
+        ":base",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("file_path_test") {
+    testonly = true
+    sources = [
+        "file/path_test.cc",
+    ]
+    deps = [
+        ":base",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}

@@ -2,12 +2,14 @@ config("compiler") {
   cflags = []
   ldflags = []
 
-  if (os == "linux") {
+  if (is_posix) {
     cflags += [
       "-pthread",
+      "-march=native",
     ]
     ldflags += [
       "-pthread",
+      "-march=native",
     ]
   }
 }
@@ -15,13 +17,13 @@ config("compiler") {
 # optimization
 
 config("optimize") {
-  if (os == "linux") {
+  if (is_posix) {
     cflags = [ "-O2" ]
   }
 }
 
 config("no_optimize") {
-  if (os == "linux") {
+  if (is_posix) {
     cflags = [ "-O0" ]
   }
 }
