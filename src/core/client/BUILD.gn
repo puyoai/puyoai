@@ -1,0 +1,10 @@
+static_library("core_client") {
+    sources = [
+        "client_connector.cc",
+    ]
+
+    deps = [
+        "//third_party/glog",
+        "//third_party/gflags",
+    ]
+}            

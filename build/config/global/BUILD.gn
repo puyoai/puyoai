@@ -1,0 +1,12 @@
+config("global") {
+  include_dirs = [
+    "//src"
+  ]
+
+  if (is_posix) {
+    # always include build/build_config.h
+    cflags = [
+      "-include", rebase_path("//src/build/build_config.h", root_build_dir),
+    ]
+  }
+}

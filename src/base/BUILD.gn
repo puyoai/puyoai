@@ -9,10 +9,6 @@ static_library("base") {
         "wait_group.cc",
     ]
 
-    public_configs = [
-        "//:config"
-    ]
-
     public_deps = [
         "//third_party/glog",
         "//third_party/gflags",

@@ -17,6 +17,7 @@ if (os == "linux") {
 
 default_compiler_configs = [
   "//build/config/compiler",
+  "//build/config/global",
 ]
 
 if (is_debug) {
