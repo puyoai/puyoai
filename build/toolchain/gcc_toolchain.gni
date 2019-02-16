@@ -54,7 +54,7 @@ toolchain(target_name) {
   tool("link") {
     outfile = "{{target_output_name}}{{output_extension}}"
     rspfile = "$outfile.rsp"
-    command = "$ld {{ldflags}} -o $outfile -Wl, @$rspfile {{solibs}} -Wl, {{libs}}"
+    command = "$ld {{ldflags}} -o $outfile -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}}"
     description = "LINK $outfile"
     rspfile_content = "{{inputs}}"
     outputs = [
