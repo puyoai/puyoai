@@ -354,6 +354,44 @@ executable("rensa_result_test") {
     ]
 }
 
-# puyoai_core_add_test(bit_field_performance 1)
-# puyoai_core_add_test(field_performance 1)
-# puyoai_core_add_test(puyo_controller_performance 1)
+executable("bit_field_perftest") {
+    testonly = true
+    sources = [
+        "bit_field_performance_test.cc",
+    ]
+    deps = [
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+        "//third_party/glog",
+        ":core",
+        "//src/base",
+    ]
+}
+
+executable("field_perftest") {
+    testonly = true
+    sources = [
+        "field_performance_test.cc",
+    ]
+    deps = [
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+        "//third_party/glog",
+        ":core",
+        "//src/base",
+    ]
+}
+
+executable("puyo_controller_perftest") {
+    testonly = true
+    sources = [
+        "puyo_controller_performance_test.cc",
+    ]
+    deps = [
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+        "//third_party/glog",
+        ":core",
+        "//src/base",
+    ]
+}
