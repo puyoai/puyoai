@@ -3,6 +3,9 @@ vars = {
 }
 
 deps = {
+    # test_resources
+    "puyoai/test_resources": "https://github.com/puyoai/test-resource.git@43d8bd89e0107185db41fb6589fbf14548d52d9e"
+
     # chromium's buildtools containing libc++, libc++abi, clang_format and gn.
     "puyoai/buildtools": "https://chromium.googlesource.com/chromium/buildtools@24ebce4578745db15274e180da1938ebc1358243",
 
