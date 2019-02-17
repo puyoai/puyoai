@@ -33,7 +33,12 @@ static_library("capture") {
 
     deps = [
         "//src/core",
+        "//src/gui",
         "//third_party/gflags",
+    ]
+
+    configs += [
+        "//build/config:with_sdl2",
     ]
 }
 

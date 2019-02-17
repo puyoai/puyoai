@@ -33,6 +33,7 @@ if (use_gui && use_capture) {
         ]
         deps = [
             "//src/core",
+            "//src/gui",
         ]
     }
 }

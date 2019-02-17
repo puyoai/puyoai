@@ -1,26 +1,48 @@
 static_library("gui") {
     sources = [
         "SDL_kanji.c",
+        "SDL_kanji.h",
         "SDL_prims.c",
+        "SDL_prims.h",
         "bounding_box.cc",
+        "bounding_box.h",
         "bounding_box_drawer.cc",
+        "bounding_box_drawer.h",
+        "box.h",
         "commentator_drawer.cc",
+        "commentator_drawer.h",
         "decision_drawer.cc",
+        "decision_drawer.h",
+        "drawer.h",
         "field_drawer.cc",
+        "field_drawer.h",
         "fps_drawer.cc",
+        "fps_drawer.h",
         "frame_number_drawer.cc",
+        "frame_number_drawer.h",
         "human_connector_key_listener.cc",
+        "human_connector_key_listener.h",
         "main_window.cc",
+        "main_window.h",
         "screen.cc",
+        "screen.h",
         "pixel_color.cc",
+        "pixel_color.h",
         "user_event_drawer.cc",
+        "user_event_drawer.h",
         "util.cc",
+        "util.h",
     ]
 
     deps = [
         "//third_party/glog",
         "//src/core",
         "//src/core/server",
+        "//src/core/server/connector",
+    ]
+
+    public_configs = [
+        "//build/config:with_sdl2",
     ]
 }
 
@@ -31,6 +53,7 @@ executable("box_test") {
     ]
 
     deps = [
+        ":gui",
         "//third_party/gtest",
         "//third_party/gtest:gtest_main",
         "//third_party/glog",

@@ -45,10 +45,14 @@ executable("duel") {
 
     deps = [
         ":duel_lib",
+        "//src/audio",
         "//src/core/server/connector",
         "//src/core/server",
-        "//src/audio",
     ]
+
+    if (use_gui) {
+        deps += [ "//src/gui" ]
+    }
 
     # if (use_audiocommentator) {
     #     deps += [

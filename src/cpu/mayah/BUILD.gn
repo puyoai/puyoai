@@ -99,7 +99,7 @@ static_library("neural_lib") {
     ]
 
     public_configs = [
-        "//third_party:with_curl",
+        "//build/config:with_curl",
     ]
 }
 

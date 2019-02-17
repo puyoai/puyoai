@@ -6,16 +6,23 @@ config("release") {
 }
 
 # TODO(mayah): Use pkg-config instead of writing the path directly.
-config("sdl2") {
-    defines = [
-        "USE_SDL2"
-    ]
-    include_dirs = [
-        "/usr/include/SDL2",
-    ]
-    ldflags = [
-        "-lSDL2",
-        "-lSDL2_ttf",
-        "-lSDL2_image",
-    ]
+if (use_gui) {
+    config("with_sdl2") {
+        defines = [
+            "USE_SDL2"
+        ]
+        include_dirs = [
+            "/usr/include/SDL2",
+        ]
+        ldflags = [
+            "-lSDL2",
+            "-lSDL2_ttf",
+            "-lSDL2_image",
+        ]
+    }
+}
+
+
+config("with_curl") {
+    ldflags = [ "-lcurl" ]
 }
