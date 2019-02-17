@@ -1,28 +1,29 @@
 group("src") {
-  deps = [
-    "//src/audio",
-    "//src/base",
-    "//src/core",
-    "//src/core/client",
-    "//src/core/client/ai",
-    "//src/core/pattern",
-    "//src/core/plan",
-    "//src/core/probability",
-    "//src/core/rensa",
-    "//src/core/rensa_tracker",
-    "//src/core/server",
-    "//src/core/server/connector",
-    "//src/experimental",
-    "//src/net",
-    "//src/learning",
-    "//src/solver",
-    "//src/duel",
-    "//src/cpu",
-  ]
-
-  if (use_gui) {
-    deps += [
-      "//src/gui",
+    deps = [
+        "//src/audio",
+        "//src/base",
+        "//src/core",
+        "//src/core/client",
+        "//src/core/client/ai",
+        "//src/core/pattern",
+        "//src/core/plan",
+        "//src/core/probability",
+        "//src/core/rensa",
+        "//src/core/rensa_tracker",
+        "//src/core/server",
+        "//src/core/server/connector",
+        "//src/experimental",
+        "//src/net",
+        "//src/learning",
+        "//src/solver",
+        "//src/duel",
+        "//src/cpu",
+        "//src/capture",
     ]
-  }
+
+    if (use_gui) {
+        deps += [
+            "//src/gui",
+        ]
+    }
 }

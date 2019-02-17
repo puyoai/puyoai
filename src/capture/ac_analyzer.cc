@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <gflags/gflags.h>
+
 #include "capture/color.h"
 #include "gui/pixel_color.h"
 #include "gui/util.h"
