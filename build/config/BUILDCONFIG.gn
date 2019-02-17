@@ -8,6 +8,7 @@ declare_args() {
   use_gui = false
   use_tcp = false
   use_httpd = false
+  use_libcurl = false
 }
 
 # OS DEFINITIONS
@@ -22,7 +23,7 @@ if (os == "linux") {
 
 default_compiler_configs = [
   "//build/config/compiler",
-  "//build/config/global",
+  "//build/config:global",
 ]
 
 if (is_debug) {
@@ -34,6 +35,24 @@ if (is_debug) {
   default_compiler_configs += [
    "//build/config:release",
    "//build/config/compiler:optimize",
+  ]
+}
+
+if (use_tcp) {
+  default_compiler_configs += [
+    "//build/config:use_tcp",
+  ]
+}
+
+if (use_httpd) {
+  default_compiler_configs += [
+    "//build/config:use_httpd",
+  ]
+}
+
+if (use_libcurl) {
+  default_compiler_configs += [
+    "//build/config:use_libcurl",
   ]
 }
 

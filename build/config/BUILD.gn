@@ -1,8 +1,78 @@
+# if(MSVC)
+#     add_compile_options("/MD$<$<CONFIG:Debug>:d>")
+#     add_compile_options("/MP")  # Compile in parallel
+#     # Suppress some warnigs about implicit conversions.
+#     add_compile_options("/wd4244")  # from uint64 to int
+#     add_compile_options("/wd4267")  # from size_t to int
+#     add_compile_options("/wd4267")  # cut constant number
+#     add_compile_options("/wd4800")  # from int to bool
+#     add_compile_options("/wd4819")  # using unknown character code
+#     add_compile_options("/wd4996")  # non standard namespace usage
+# else()
+#     if(CYGWIN AND (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU"))
+#         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11" CACHE STRING "" FORCE)
+#     else()
+#         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" CACHE STRING "" FORCE)
+#     endif()
+# 
+#     add_compile_options("-Wall")
+#     add_compile_options("-Wextra")
+#     if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+#         add_compile_options("-Werror")
+#     endif()
+# 
+# endif()
+# 
+# if(MSVC)
+#   add_definitions(-DGOOGLE_GLOG_DLL_DECL=)
+#   add_definitions(-DNOMINMAX)
+# endif()
+
+config("global") {
+    include_dirs = [
+        "//src"
+    ]
+
+     defines = [
+        "SRC_DIR=\"" + rebase_path("//src", root_build_dir) + "\"",
+        "DATA_DIR=\"" + rebase_path("//data", root_build_dir) + "\"",
+        "TESTDATA_DIR=\"" + rebase_path("//test_resources", root_build_dir) + "\"",
+    ]
+
+     if (is_posix) {
+        # always include build/build_config.h
+        cflags = [
+            "-include", rebase_path("//src/build/build_config.h", root_build_dir),
+        ]
+    }
+}
+
 config("debug") {
 }
 
 config("release") {
-    defines = [ "NDEBUG" ]
+    defines = [
+        "NDEBUG",
+        "NOINLINE_UNLESS_RELEASE="
+    ]
+}
+
+config("use_tcp") {
+    defines = [
+        "USE_TCP"
+    ]
+}
+
+config("use_httpd") {
+    defines = [
+        "USE_HTTPD"
+    ]
+}
+
+config("use_libcurl") {
+    defines = [
+        "USE_LIBCURL"
+    ]
 }
 
 # TODO(mayah): Use pkg-config instead of writing the path directly.
@@ -44,3 +114,8 @@ config("with_httpd") {
         "-lmicrohttpd"
     ]
 }
+
+
+
+
+
