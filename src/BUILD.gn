@@ -6,6 +6,7 @@ group("src") {
     "//src/core/pattern",
     "//src/core/rensa",
     "//src/core/rensa_tracker",
+    "//src/experimental",
     "//src/net",
     "//src/learning",
   ]

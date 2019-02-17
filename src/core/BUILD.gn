@@ -47,7 +47,7 @@ static_library("core") {
         "user_event.cc",
     ]
 
-    deps = [
+    public_deps = [
         "//third_party/glog",
         "//third_party/gflags",
     ]

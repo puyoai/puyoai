@@ -1,0 +1,30 @@
+group("experimental") {
+}
+
+executable("drop_test") {
+    testonly = true
+    sources = [
+        "drop_test.cc"
+    ]
+
+    deps = [
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+        "//src/core",
+        "//src/base",
+    ]
+}
+
+executable("popcount_test") {
+    testonly = true
+    sources = [
+        "popcount_test.cc"
+    ]
+
+    deps = [
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+        "//src/core",
+        "//src/base",
+    ]
+}
