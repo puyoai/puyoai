@@ -27,5 +27,14 @@ config("with_curl") {
 }
 
 config("with_usb") {
-    ldflags = [ "lusb-1.0" ]
+    ldflags = [ "-lusb-1.0" ]
+}
+
+config("with_ffmpeg") {
+    ldflags = [
+        "-lswscale",
+        "-lavformat",
+        "-lavcodec",
+        "-lavutil",
+    ]
 }

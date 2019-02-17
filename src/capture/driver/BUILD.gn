@@ -3,4 +3,10 @@ static_library("driver") {
         "syntek.cc",
         "syntek.h",
     ]
+
+    deps = [
+        "//src/capture:usb_device",
+        "//third_party/glog",
+        "//third_party/gflags",
+    ]
 }

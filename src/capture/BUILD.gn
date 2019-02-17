@@ -1,6 +1,15 @@
 # TODO(mayah): Update ac_analyzer.cc not to use deprecated APIs.
 # add_compile_options("-Wno-deprecated-declarations")
 
+if (use_usb) {
+    static_library("usb_device") {
+        sources = [
+            "usb_device.cc",
+            "usb_device.h",
+        ]
+    }
+}
+
 static_library("capture") {
     sources = [
         "ac_analyzer.cc",
@@ -23,8 +32,6 @@ static_library("capture") {
         "real_color_field.h",
         "source.cc",
         "source.h",
-        "usb_device.cc",
-        "usb_device.h",
     ]
 
     cflags = [
@@ -35,6 +42,7 @@ static_library("capture") {
         "//src/core",
         "//src/gui",
         "//third_party/gflags",
+        "//src/capture/recognition",
     ]
 
     configs += [
@@ -47,12 +55,13 @@ static_library("capture") {
             "syntek_source.h",
         ]
 
-        configs += [
-            "//build/config:with_usb",
+        deps += [
+            ":usb_device",
+            "//src/capture/driver",
         ]
 
-        deps += [
-            "//src/capture/driver",
+        configs += [
+            "//build/config:with_usb",
         ]
     }
 }

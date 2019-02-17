@@ -30,10 +30,16 @@ if (use_usb && use_capture) {
         deps = [
             ":wii",
             "//src/capture",
+            "//src/capture/driver",
             "//src/core",
             "//src/core/server",
             "//src/gui",
             "//src/audio",
+        ]
+
+        configs += [
+            "//build/config:with_usb",
+            "//build/config:with_ffmpeg",
         ]
     }
 }

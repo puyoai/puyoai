@@ -7,4 +7,9 @@ static_library("recognition") {
         "recognizer.cc",
         "recognizer.h",
     ]
+
+    deps = [
+        "//src/core",
+        "//src/learning",
+    ]
 }

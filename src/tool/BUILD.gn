@@ -22,6 +22,7 @@ if (use_gui && use_capture) {
             "//src/core",
             "//src/capture",
             "//src/learning",
+            "//src/capture/recognition",
             "//src/gui",
             "//third_party/gtest:prod",
         ]

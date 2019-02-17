@@ -11,6 +11,7 @@
 #include <sstream>
 
 #include <glog/logging.h>
+#include <gflags/gflags.h>
 
 #include "base/base.h"
 #include "capture/usb_device.h"
