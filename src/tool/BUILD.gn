@@ -1,0 +1,38 @@
+group("tool") {
+}
+
+executable("puyofu_analyzer") {
+    sources = [
+        "puyofu_analyzer.cc"
+    ]
+    deps = [
+        "//src/core",
+        "//src/core/pattern",
+        "//src/core/rensa_tracker",
+        "//third_party/jsoncpp",
+    ]
+}
+
+if (use_gui && use_capture) {
+    executable("arow") {
+        sources = [
+            "arow.cc",
+        ]
+        deps = [
+            "//src/core",
+            "//src/capture",
+            "//src/learning",
+            "//src/gui",
+            "//third_party/gtest:prod",
+        ]
+    }
+
+    executable("exhaustive_test_generator") {
+        sources = [
+            "exhaustive_test_generator.cc",
+        ]
+        deps = [
+            "//src/core",
+        ]
+    }
+}

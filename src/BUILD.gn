@@ -19,8 +19,14 @@ group("src") {
         "//src/duel",
         "//src/cpu",
         "//src/capture",
+        "//src/tool",
     ]
 
+    if (use_capture) {
+        deps += [
+            "//src/capture",
+        ]
+    }
     if (use_gui) {
         deps += [
             "//src/gui",

@@ -2,10 +2,11 @@
 #include <fstream>
 #include <random>
 #include <vector>
+#include <iostream>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <gtest/gtest.h>
+#include <gtest/gtest_prod.h>
 #include <SDL_image.h>
 
 #include "base/base.h"

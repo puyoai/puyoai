@@ -3,6 +3,7 @@ declare_args() {
 
   is_debug = true
   
+  use_capture = false
   use_gui = false
   use_tcp = false
   use_httpd = false

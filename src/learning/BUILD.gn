@@ -1,7 +1,9 @@
 static_library("learning") {
     sources = [
         "arow.cc",
+        "arow.h",
         "multi_layer_perceptron.cc",
+        "multi_layer_perceptron.h",
     ]
 
     deps = [
