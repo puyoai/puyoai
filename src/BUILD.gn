@@ -10,5 +10,11 @@ group("src") {
     "//src/net",
     "//src/learning",
   ]
+
+  if (use_gui) {
+    deps += [
+      "//src/gui",
+    ]
+  }
 }
 

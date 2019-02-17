@@ -1,0 +1,23 @@
+static_library("server") {
+    sources = [
+        "commentator.cc",
+        "commentator.h",
+        "game_state.cc",
+        "game_state.h",
+        "game_state_recorder.cc",
+        "game_state_recorder.h",
+    ]
+}
+
+executable("commentator") {
+    testonly = true
+    sources = [
+        "commentator_test.cc"
+    ]
+
+    deps = [
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+

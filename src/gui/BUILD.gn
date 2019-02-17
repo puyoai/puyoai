@@ -1,0 +1,37 @@
+static_library("gui") {
+    sources = [
+        "SDL_kanji.c",
+        "SDL_prims.c",
+        "bounding_box.cc",
+        "bounding_box_drawer.cc",
+        "commentator_drawer.cc",
+        "decision_drawer.cc",
+        "field_drawer.cc",
+        "fps_drawer.cc",
+        "frame_number_drawer.cc",
+        "human_connector_key_listener.cc",
+        "main_window.cc",
+        "screen.cc",
+        "pixel_color.cc",
+        "user_event_drawer.cc",
+        "util.cc",
+    ]
+
+    deps = [
+        "//third_party/glog",
+    ]
+}
+
+executable("box_test") {
+    testonly = true
+    sources = [
+        "box_test.cc",
+    ]
+
+    deps = [
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+        "//third_party/glog",
+        "//third_party/gflags",
+    ]
+}
