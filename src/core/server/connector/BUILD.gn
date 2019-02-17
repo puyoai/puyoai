@@ -1,0 +1,28 @@
+static_library("connector") {
+    sources = [
+        "connector_manager.cc",
+        "connector_manager.h",
+        "human_connector.cc",
+        "human_connector.h",
+        "pipe_connector.cc",
+        "pipe_connector.h",
+        "server_connector.cc",
+        "server_connector.h",
+        "socket_connector.cc",
+        "socket_connector.h",
+    ]
+    if (is_win) {
+        sources += [
+            "pipe_connector_win.cc",
+        ]
+    } else {
+        sources += [
+            "pipe_connector_posix.cc",
+        ]
+    }
+
+    deps = [
+        "//third_party/glog",
+        "//third_party/gflags",
+    ]
+}

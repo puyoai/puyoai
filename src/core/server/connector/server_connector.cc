@@ -3,6 +3,7 @@
 #include <string>
 
 #include <glog/logging.h>
+#include <gflags/gflags.h>
 
 #include "base/memory.h"
 #include "base/strings.h"

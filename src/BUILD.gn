@@ -10,6 +10,8 @@ group("src") {
     "//src/core/probability",
     "//src/core/rensa",
     "//src/core/rensa_tracker",
+    "//src/core/server",
+    "//src/core/server/connector",
     "//src/experimental",
     "//src/net",
     "//src/learning",
