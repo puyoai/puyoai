@@ -4,6 +4,8 @@
 #include <set>
 #include <unordered_set>
 
+#include <gflags/gflags.h>
+
 #include "base/time.h"
 #include "base/wait_group.h"
 #include "core/field_pretty_printer.h"

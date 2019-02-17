@@ -1,0 +1,3 @@
+config("with_curl") {
+    ldflags = [ "-lcurl" ]
+}

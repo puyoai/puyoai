@@ -1,10 +1,15 @@
 static_library("pattern") {
     sources = [
         "bijection_matcher.cc",
+        "bijection_matcher.h",
         "decision_book.cc",
+        "decision_book.h",
         "field_pattern.cc",
+        "field_pattern.h",
         "pattern_book.cc",
+        "pattern_book.h",
         "pattern_tree.cc",
+        "pattern_tree.h",
     ]
 
     deps = [
@@ -16,6 +21,7 @@ static_library("pattern") {
         "//third_party/glog",
         "//third_party/tinytoml",
         "//src/core",
+        "//src/core/rensa",
     ]
 }
 

@@ -64,6 +64,7 @@ static_library("core") {
     ]
 
     public_deps = [
+        "//src/base",
         "//third_party/glog",
         "//third_party/gflags",
     ]

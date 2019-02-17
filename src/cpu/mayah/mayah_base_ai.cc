@@ -3,6 +3,8 @@
 #include "base/file/path.h"
 #include "core/frame_request.h"
 
+#include <gflags/gflags.h>
+
 DEFINE_string(feature, SRC_DIR "/cpu/mayah/feature.toml", "the path to feature parameter");
 DEFINE_string(decision_book, SRC_DIR "/cpu/mayah/decision.toml", "the path to decision book");
 DEFINE_string(pattern_book, SRC_DIR "/cpu/mayah/pattern.toml", "the path to pattern book");

@@ -1,7 +1,8 @@
 group("cpu") {
-  deps = [
-    "//src/cpu/sample",
-  ]
+    deps = [
+        "//src/cpu/sample",
+        "//src/cpu/mayah",
+    ]
 }
 
 # cmake_minimum_required(VERSION 2.8)

@@ -1,0 +1,399 @@
+group("mayah") {
+    deps = [
+        ":mayah_cpu",
+        ":yukina_cpu",
+        ":copy_run_sh",
+        ":copy_run_v_sh",
+        ":copy_yukina_sh",
+        ":copy_yukina_v_sh",
+        ":copy_hisya_sh",
+    ]
+}
+
+static_library("evaluator_lib") {
+    sources = [
+        "collected_score.cc",
+        "collected_score.h",
+        "evaluator.cc",
+        "evaluator.h",
+        "evaluation_feature.cc",
+        "evaluation_feature.h",
+        "evaluation_mode.cc",
+        "evaluation_mode.h",
+        "evaluation_parameter.cc",
+        "evaluation_parameter.h",
+        "move_evaluator.cc",
+        "move_evaluator.h",
+        "pattern_rensa_detector.cc",
+        "pattern_rensa_detector.h",
+        "rensa_evaluator.cc",
+        "rensa_evaluator.h",
+        "rensa_hand_tree.cc",
+        "rensa_hand_tree.h",
+        "shape_evaluator.cc",
+        "shape_evaluator.h",
+        "beam_thinker.cc",
+        "beam_thinker.h",
+        "pattern_thinker.cc",
+        "pattern_thinker.h",
+        "rush_thinker.cc",
+        "rush_thinker.h",
+        "side_thinker.cc",
+        "side_thinker.h",
+        "gazer.cc",
+        "gazer.h",
+    ]
+
+    deps = [
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/probability",
+        "//src/core/rensa",
+        "//src/core/rensa_tracker",
+        "//src/core/client/ai",
+        "//third_party/gflags",
+    ]
+
+    public_deps = [
+        "//src/core/pattern",
+    ]
+}
+
+static_library("mayah_lib") {
+    sources = [
+        "mayah_ai.cc",
+        "mayah_ai.h",
+        "mayah_base_ai.cc",
+        "mayah_base_ai.h",
+        "mixed_ai.cc",
+        "mixed_ai.h",
+        "yukina_ai.cc",
+        "yukina_ai.h",
+    ]
+
+    deps = [
+        ":evaluator_lib",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/probability",
+        "//src/core/client/ai",
+        "//src/core/pattern",
+        "//third_party/gflags",
+    ]
+}
+
+static_library("neural_lib") {
+    sources = [
+        "neural.cc",
+        "neural.h",
+    ]
+    deps = [
+        ":evaluator_lib",
+        ":mayah_lib",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/rensa",
+        "//src/core/probability",
+        "//src/solver",
+        "//third_party/jsoncpp",
+    ]
+
+    public_configs = [
+        "//third_party:with_curl",
+    ]
+}
+
+executable("mayah_cpu") {
+    output_name = "cpu/mayah/mayah_cpu"
+    sources = [
+        "main.cc"
+    ]
+    deps = [
+        ":evaluator_lib",
+        ":mayah_lib",
+        "//src/core/probability",
+        "//src/core",
+    ]
+}
+
+executable("yukina_cpu") {
+    output_name = "cpu/mayah/yukina_cpu"
+    sources = [
+        "yukina.cc"
+    ]
+    deps = [
+        ":evaluator_lib",
+        ":mayah_lib",
+        "//src/core",
+        "//src/core/probability",
+    ]
+}
+
+executable("interactive") {
+    output_name = "cpu/mayah/interactive"
+    sources = [
+        "interactive.cc",
+    ]
+    deps = [
+        ":evaluator_lib",
+        ":mayah_lib",
+        "//src/core",
+        "//src/core/probability",
+        "//src/core/plan",
+        "//src/core/rensa",
+        "//src/solver",
+        "//third_party/jsoncpp",
+    ]
+}
+
+executable("solver") {
+    output_name = "cpu/mayah/solver"
+    sources = [
+        "solver_main.cc"
+    ]
+    deps = [
+        ":evaluator_lib",
+        ":mayah_lib",
+        "//src/core/probability",
+        "//src/solver",
+    ]
+}
+
+executable("experimental") {
+    output_name = "cpu/mayah/experimental"
+    sources = [
+        "experimental.cc"
+    ]
+    deps = [
+        ":evaluator_lib",
+        ":mayah_lib",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/rensa",
+        "//src/core/client/ai",
+        "//src/core/probability",
+        "//src/solver",
+        "//src/core/pattern",
+    ]
+}
+
+executable("gazer_example") {
+    output_name = "cpu/mayah/gazer_example"
+    sources = [
+        "gazer_example.cc"
+    ]
+    deps = [
+        ":evaluator_lib",
+        "//src/solver",
+    ]
+}
+
+executable("neural") {
+    output_name = "cpu/mayah/neural"
+    sources = [
+        "neural_main.cc",
+    ]
+    deps = [
+        ":neural_lib",
+        "//src/core",
+        "//src/core/plan",
+    ]
+}
+
+executable("make_train_data") {
+    output_name = "cpu/mayah/make_train_data"
+    sources = [
+        "make_train_data.cc"
+    ]
+    deps = [
+        ":evaluator_lib",
+        ":mayah_lib",
+        ":neural_lib",
+        "//src/core",
+        "//src/core/probability",
+        "//src/solver",
+    ]
+}
+
+if (use_httpd) {
+    executable("pattern_maker") {
+        output_name = "cpu/mayah/pattern_maker"
+        sources = [
+            "pattern_maker.cc"
+        ]
+    }
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/mayah/run.sh",
+    ]
+}
+
+copy("copy_run_v_sh") {
+    sources = [
+        "run_v.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/mayah/run_v.sh",
+    ]
+}
+
+copy("copy_yukina_sh") {
+    sources = [
+        "yukina.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/mayah/yukina.sh",
+    ]
+}
+
+copy("copy_yukina_v_sh") {
+    sources = [
+        "yukina_v.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/mayah/yukina_v.sh",
+    ]
+}
+
+copy("copy_hisya_sh") {
+    sources = [
+        "hisya.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/mayah/hisya.sh",
+    ]
+}
+
+template("executable_test") {
+    executable(target_name) {
+        testonly = true
+        output_name = "cpu/mayah/" + target_name
+        sources = invoker.sources
+
+        deps = [
+            "//src/core",
+            "//src/core/probability",
+            "//src/solver",
+            "//src/core/plan",
+            "//third_party/gtest",
+            "//third_party/gtest:gtest_main",
+            ":evaluator_lib",
+            ":mayah_lib",
+        ]
+    }
+}
+
+executable_test("decision_planner_test") {
+    sources = [ 
+        "decision_planner_test.cc"
+    ]
+}
+
+executable_test("evaluator_test") {
+    sources = [ 
+        "evaluator_test.cc"
+    ]
+}
+
+executable_test("evaluation_parameter_test") {
+    sources = [ 
+        "evaluation_parameter_test.cc"
+    ]
+}
+
+executable_test("gazer_test") {
+    sources = [ 
+        "gazer_test.cc"
+    ]
+}
+
+executable_test("mayah_ai_test") {
+    sources = [ 
+        "mayah_ai_test.cc"
+    ]
+}
+
+executable_test("mayah_ai_situation_test") {
+    sources = [ 
+        "mayah_ai_situation_test.cc"
+    ]
+}
+
+executable_test("pattern_rensa_detector_test") {
+    sources = [ 
+        "pattern_rensa_detector_test.cc"
+    ]
+}
+
+executable_test("rensa_hand_tree_test") {
+    sources = [ 
+        "rensa_hand_tree_test.cc"
+    ]
+}
+
+executable_test("score_collector_test") {
+    sources = [ 
+        "score_collector_test.cc"
+    ]
+}
+
+executable_test("shape_evaluator_test") {
+    sources = [ 
+        "shape_evaluator_test.cc"
+    ]
+}
+
+
+executable("mayah_ai_perftest") {
+    testonly = true
+    output_name = "cpu/mayah/mayah_ai_perftest"
+    sources = [
+        "mayah_ai_performance_test.cc",
+    ]
+    deps = [
+        ":mayah_lib",
+        ":evaluator_lib",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/probability",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("gazer_perftest") {
+    testonly = true
+    output_name = "cpu/mayah/gazer_perftest"
+    sources = [
+        "gazer_performance_test.cc"
+    ]
+    deps = [
+        ":evaluator_lib",
+        ":mayah_lib",
+        "//src/core/plan",
+        "//src/core",
+        "//src/core/probability",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("rensa_hand_tree_perftest") {
+    testonly = true
+    output_name = "cpu/mayah/rensa_hand_tree_perftest"
+    sources = [
+        "rensa_hand_tree_performance_test.cc"
+    ]
+    deps = [
+        ":evaluator_lib",
+        "//src/core",
+        "//src/core/probability",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}

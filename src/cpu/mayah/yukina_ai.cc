@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <gflags/gflags.h>
+
 DECLARE_bool(from_wrapper);
 
 using namespace std;

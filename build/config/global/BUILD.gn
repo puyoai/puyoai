@@ -1,17 +1,18 @@
 config("global") {
-  include_dirs = [
-    "//src"
-  ]
-
-  defines = [
-      "DATA_DIR=\"" + rebase_path("//data", root_build_dir) + "\"",
-      "TESTDATA_DIR=\"" + rebase_path("//test_resources", root_build_dir) + "\"",
-  ]
-
-  if (is_posix) {
-    # always include build/build_config.h
-    cflags = [
-      "-include", rebase_path("//src/build/build_config.h", root_build_dir),
+    include_dirs = [
+        "//src"
     ]
-  }
+
+     defines = [
+        "SRC_DIR=\"" + rebase_path("//src", root_build_dir) + "\"",
+        "DATA_DIR=\"" + rebase_path("//data", root_build_dir) + "\"",
+        "TESTDATA_DIR=\"" + rebase_path("//test_resources", root_build_dir) + "\"",
+    ]
+
+     if (is_posix) {
+        # always include build/build_config.h
+        cflags = [
+            "-include", rebase_path("//src/build/build_config.h", root_build_dir),
+        ]
+    }
 }

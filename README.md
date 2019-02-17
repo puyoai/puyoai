@@ -67,7 +67,7 @@ Debian 系 Linux の場合、apt を使うと楽です。
 次のコマンドで必要なものが入るとおもいます。
 
     $ sudo apt-get install git clang cmake ninja-build
-    $ sudo apt-get install libprotobuf-dev
+    $ sudo apt-get install libprotobuf-dev libcurl4-nss-dev
     $ sudo apt-get install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
     $ sudo apt-get install libmicrohttpd-dev libffms2-dev libusb-1.0-0-dev
 
