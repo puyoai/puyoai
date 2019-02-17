@@ -1,0 +1,34 @@
+static_library("ai") {
+    sources = [
+        "ai_base.cc",
+        "ai_base.h",
+        "ai.cc",
+        "ai.h",
+        "raw_ai.cc",
+        "raw_ai.h",
+    ]
+
+    public_deps = [
+        "//third_party/glog",
+        "//third_party/gflags",
+        "//src/core/connector",
+    ]
+}
+
+executable("ai_test") {
+    testonly = true
+
+    sources = [
+        "ai_test.cc",
+    ]
+
+    deps = [
+        ":ai",
+        "//src/core",
+        "//src/core/client",
+        "//src/core/connector",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+

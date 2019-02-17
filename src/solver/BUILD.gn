@@ -13,5 +13,6 @@ static_library("solver") {
     deps = [
         "//third_party/glog",
         "//third_party/tinytoml",
+        "//src/core/client/ai"
     ]
 }

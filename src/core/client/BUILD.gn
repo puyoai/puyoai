@@ -1,4 +1,4 @@
-static_library("core_client") {
+static_library("client") {
     sources = [
         "client_connector.cc",
     ]

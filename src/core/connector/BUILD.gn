@@ -1,0 +1,9 @@
+static_library("connector") {
+    sources = [
+        "socket_connector_impl.cc",
+        "socket_connector_impl.h",
+        "stdio_connector_impl.cc",
+        "stdio_connector_impl.h",
+        "connector_impl.h",
+    ]
+}
