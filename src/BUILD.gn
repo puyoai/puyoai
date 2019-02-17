@@ -18,8 +18,6 @@ group("src") {
         "//src/solver",
         "//src/duel",
         "//src/cpu",
-        "//src/capture",
-        "//src/tool",
     ]
 
     if (use_capture) {
@@ -30,6 +28,8 @@ group("src") {
     if (use_gui) {
         deps += [
             "//src/gui",
+            "//src/tool",
+            "//src/wii",
         ]
     }
 }

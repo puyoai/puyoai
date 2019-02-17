@@ -22,7 +22,10 @@ if (use_gui) {
     }
 }
 
-
 config("with_curl") {
     ldflags = [ "-lcurl" ]
+}
+
+config("with_usb") {
+    ldflags = [ "lusb-1.0" ]
 }

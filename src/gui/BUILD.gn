@@ -32,6 +32,7 @@ static_library("gui") {
         "user_event_drawer.h",
         "util.cc",
         "util.h",
+        "unique_sdl_surface.h"
     ]
 
     deps = [

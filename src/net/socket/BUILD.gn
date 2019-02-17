@@ -1,13 +1,22 @@
 static_library("socket") {
     sources = [
+        "socket_descriptor.h",
         "socket.cc",
+        "socket.h",
         "socket_factory.cc",
+        "socket_factory.h",
         "tcp_client_socket.cc",
+        "tcp_client_socket.h",
         "tcp_server_socket.cc",
+        "tcp_server_socket.h",
         "tcp_socket.cc",
+        "tcp_socket.h",
         "unix_domain_client_socket.cc",
+        "unix_domain_client_socket.h",
         "unix_domain_server_socket.cc",
+        "unix_domain_server_socket.h",
         "unix_domain_socket.cc",
+        "unix_domain_socket.h",
     ]
 
     deps = [

@@ -8,9 +8,8 @@ static_library("connector") {
         "pipe_connector.h",
         "server_connector.cc",
         "server_connector.h",
-        "socket_connector.cc",
-        "socket_connector.h",
     ]
+
     if (is_win) {
         sources += [
             "pipe_connector_win.cc",
@@ -26,4 +25,15 @@ static_library("connector") {
         "//third_party/gflags",
         "//src/core",
     ]
+
+    if (use_tcp) {
+        sources += [
+            "socket_connector.cc",
+            "socket_connector.h",
+        ]
+
+        deps += [
+            "//src/net/socket"
+        ]
+    }
 }

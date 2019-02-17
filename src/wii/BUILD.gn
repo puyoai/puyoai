@@ -1,0 +1,54 @@
+static_library("wii") {
+    sources = [
+        "wii_connect_server.cc",
+        "wii_connect_server.h",
+        "stdout_key_sender.cc",
+        "stdout_key_sender.h",
+        "serial_key_sender.cc",
+        "serial_key_sender.h",
+        "key_sender.h",
+        "null_key_sender.h",
+    ]
+
+    deps = [
+        "//src/core",
+        "//src/capture",
+        "//src/core/server/connector",
+        "//src/core/server",
+    ]
+
+    public_deps = [
+        "//src/gui",
+    ]
+}
+
+if (use_usb && use_capture) {
+    executable("connect_wii") {
+        sources = [
+            "main.cc"
+        ]
+        deps = [
+            ":wii",
+            "//src/capture",
+            "//src/core",
+            "//src/core/server",
+            "//src/gui",
+            "//src/audio",
+        ]
+    }
+}
+
+
+executable("wii_connect_server_test") {
+    testonly = true
+    sources = [
+        "wii_connect_server_test.cc",
+    ]
+
+    deps = [
+        ":wii",
+        "//src/core",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}

@@ -15,6 +15,12 @@ static_library("ai") {
         "//third_party/glog",
         "//third_party/gflags",
     ]
+
+    if (use_tcp) {
+        public_deps += [
+            "//src/net/socket",
+        ]
+    }
 }
 
 executable("ai_test") {
