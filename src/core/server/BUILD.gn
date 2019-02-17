@@ -7,15 +7,24 @@ static_library("server") {
         "game_state_recorder.cc",
         "game_state_recorder.h",
     ]
+
+    public_deps = [
+        "//src/core/rensa",
+        "//src/core/plan",
+        "//src/core/rensa_tracker",
+        "//third_party/gtest:prod",
+        "//third_party/jsoncpp",
+    ]
 }
 
-executable("commentator") {
+executable("commentator_test") {
     testonly = true
     sources = [
         "commentator_test.cc"
     ]
 
     deps = [
+        ":server",
         "//third_party/gtest",
         "//third_party/gtest:gtest_main",
     ]

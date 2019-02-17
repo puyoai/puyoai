@@ -3,6 +3,11 @@ config("global") {
     "//src"
   ]
 
+  defines = [
+      "DATA_DIR=\"" + rebase_path("//data", root_build_dir) + "\"",
+      "TESTDATA_DIR=\"" + rebase_path("//test_resources", root_build_dir) + "\"",
+  ]
+
   if (is_posix) {
     # always include build/build_config.h
     cflags = [

@@ -1,0 +1,51 @@
+static_library("probability") {
+    sources = [
+        "column_puyo_list_probability.cc",
+        "column_puyo_list_probability.h",
+        "puyo_set_probability.cc",
+        "puyo_set_probability.h",
+        "puyo_set.cc",
+        "puyo_set.h",
+    ]
+
+    public_deps = [
+        "//src/core",
+        "//third_party/glog",
+    ]
+}
+
+executable("column_puyo_list_probability_test") {
+    testonly = true
+    sources = [
+        "column_puyo_list_probability_test.cc",
+    ]
+    deps = [
+        ":probability",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("puyo_set_probability_test") {
+    testonly = true
+    sources = [
+        "puyo_set_probability_test.cc",
+    ]
+    deps = [
+        ":probability",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("puyo_set_test") {
+    testonly = true
+    sources = [
+        "puyo_set_test.cc",
+    ]
+    deps = [
+        ":probability",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}

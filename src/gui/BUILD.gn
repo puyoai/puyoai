@@ -19,6 +19,8 @@ static_library("gui") {
 
     deps = [
         "//third_party/glog",
+        "//src/core",
+        "//src/core/server",
     ]
 }
 

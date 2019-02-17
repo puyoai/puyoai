@@ -12,13 +12,6 @@
 # ----------------------------------------------------------------------
 # library
 
-config("core_config") {
-    defines = [
-        "DATA_DIR=\"" + rebase_path("//data", root_build_dir) + "\"",
-        "TESTDATA_DIR=\"" + rebase_path("//test_resources", root_build_dir) + "\"",
-    ]
-}
-
 static_library("core") {
     sources = [
         "bit_field.cc",
@@ -50,10 +43,6 @@ static_library("core") {
     public_deps = [
         "//third_party/glog",
         "//third_party/gflags",
-    ]
-
-    configs += [
-        ":core_config",
     ]
 }
 

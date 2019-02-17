@@ -4,7 +4,7 @@ vars = {
 
 deps = {
     # test_resources
-    "puyoai/test_resources": "https://github.com/puyoai/test-resource.git@43d8bd89e0107185db41fb6589fbf14548d52d9e"
+    "puyoai/test_resources": "https://github.com/puyoai/test-resource.git@43d8bd89e0107185db41fb6589fbf14548d52d9e",
 
     # chromium's buildtools containing libc++, libc++abi, clang_format and gn.
     "puyoai/buildtools": "https://chromium.googlesource.com/chromium/buildtools@24ebce4578745db15274e180da1938ebc1358243",
@@ -18,8 +18,8 @@ deps = {
     # googletest
     "puyoai/third_party/gtest/gtest": Var('chromium_git') + '/external/github.com/google/googletest.git' + '@' + '145d05750b15324899473340c8dd5af50d125d33',
 
-    # jsoncpp
-    # "puyoai/third_party/jsoncpp/source": Var("chromium_git") + '/external/github.com/open-source-parsers/jsoncpp.git@f572e8e42e22cfcf5ab0aea26574f408943edfa4', # from svn 248
+    # jsoncpp (# from svn 248)
+    "puyoai/third_party/jsoncpp/source": Var("chromium_git") + '/external/github.com/open-source-parsers/jsoncpp.git@f572e8e42e22cfcf5ab0aea26574f408943edfa4',
 
     # tinytoml
     "puyoai/third_party/tinytoml/tinytoml": "https://github.com/mayah/tinytoml.git@3ba7a885fa725f3c0ec7d3dfbe01ddb7e35d7fb6",

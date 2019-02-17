@@ -4,7 +4,7 @@ config("tinytoml_config") {
 
 source_set("tinytoml") {
     sources = [
-        "tinytoml/toml/toml.h",
+        "tinytoml/include/toml/toml.h",
     ]
     public_configs = [":tinytoml_config"]
 }

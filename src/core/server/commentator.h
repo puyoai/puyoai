@@ -8,7 +8,7 @@
 #include <thread>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <gtest/gtest_prod.h>
 
 #include "core/column_puyo_list.h"
 #include "core/core_field.h"

@@ -1,6 +1,15 @@
 static_library("plan") {
     sources = [
         "plan.cc",
+        "plan.h",
+    ]
+
+    deps = [
+        "//src/core",
+    ]
+
+    public_deps = [
+        "//third_party/glog",
     ]
 }
 
@@ -10,6 +19,8 @@ executable("plan_test") {
         "plan_test.cc",
     ]
     deps = [
+        ":plan",
+        "//src/base",
         "//third_party/gtest",
         "//third_party/gtest:gtest_main",
     ]
@@ -21,6 +32,8 @@ executable("plan_perftest") {
         "plan_performance_test.cc",
     ]
     deps = [
+        ":plan",
+        "//src/base",
         "//third_party/gtest",
         "//third_party/gtest:gtest_main",
     ]
