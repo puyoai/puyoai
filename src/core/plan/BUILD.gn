@@ -1,0 +1,27 @@
+static_library("plan") {
+    sources = [
+        "plan.cc",
+    ]
+}
+
+executable("plan_test") {
+    testonly = true
+    sources = [
+        "plan_test.cc",
+    ]
+    deps = [
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("plan_perftest") {
+    testonly = true
+    sources = [
+        "plan_performance_test.cc",
+    ]
+    deps = [
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
