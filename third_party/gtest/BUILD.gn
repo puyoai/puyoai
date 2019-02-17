@@ -67,3 +67,14 @@ static_library("gtest_main") {
     "gtest/googletest/src/gtest_main.cc",
   ]
 }
+
+# If you need to use gtest_prod.h, depend on "gtest_prod".
+config("gtest_prod_config") {
+  include_dirs = [ "gtest/googletest/include" ]
+}
+source_set("prod") {
+  sources = [
+    "gtest/googletest/include/gtest/gtest_prod.h",
+  ]
+  public_configs = [ ":gtest_prod_config" ]
+}
