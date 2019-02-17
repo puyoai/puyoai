@@ -1,0 +1,31 @@
+group("sample") {
+    deps = [
+      ":sample_cpu",
+      ":copy_run_sh",
+    ]
+}
+
+executable("sample_cpu") {
+    output_name = "cpu/sample/sample"
+
+    sources = [
+        "main.cc",
+    ]
+
+    deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/sample/run.sh",
+    ]
+}
