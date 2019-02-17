@@ -221,6 +221,11 @@ if (use_httpd) {
         sources = [
             "pattern_maker.cc"
         ]
+        deps = [
+            ":mayah_lib",
+            "//src/core/pattern",
+            "//src/net/httpd",
+        ]
     }
 }
 

@@ -54,6 +54,10 @@ executable("duel") {
         deps += [ "//src/gui" ]
     }
 
+    if (use_httpd) {
+        deps += [ "//src/net/httpd" ]
+    }
+
     # if (use_audiocommentator) {
     #     deps += [
     #         "//src/audio",

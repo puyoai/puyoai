@@ -38,3 +38,9 @@ config("with_ffmpeg") {
         "-lavutil",
     ]
 }
+
+config("with_httpd") {
+    ldflags = [
+        "-lmicrohttpd"
+    ]
+}
