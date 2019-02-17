@@ -4,3 +4,13 @@ config("debug") {
 config("release") {
   defines = [ "NDEBUG" ]
 }
+
+# TODO(mayah): Use pkg-config instead of writing the path directly.
+config("sdl2") {
+  defines = [
+    "USE_SDL2"
+  ]
+  include_dirs = [
+    "/usr/include/SDL2",
+  ]
+}

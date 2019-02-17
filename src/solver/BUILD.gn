@@ -1,0 +1,17 @@
+static_library("solver") {
+    sources = [
+        "endless.cc",
+        "endless.h",
+        "problem.cc",
+        "problem.h",
+        "puyop.cc",
+        "puyop.h",
+        "solver.cc",
+        "solver.h",
+    ]
+
+    deps = [
+        "//third_party/glog",
+        "//third_party/tinytoml",
+    ]
+}

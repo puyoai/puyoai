@@ -18,7 +18,6 @@ if (os == "linux") {
   set_default_toolchain("//build/toolchain/linux:x64")
 }
 
-
 default_compiler_configs = [
   "//build/config/compiler",
   "//build/config/global",
@@ -33,6 +32,12 @@ if (is_debug) {
   default_compiler_configs += [
    "//build/config:release",
    "//build/config/compiler:optimize",
+  ]
+}
+
+if (use_gui) {
+  default_compiler_configs += [
+    "//build/config:sdl2"
   ]
 }
 

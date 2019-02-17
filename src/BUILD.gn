@@ -9,6 +9,7 @@ group("src") {
     "//src/experimental",
     "//src/net",
     "//src/learning",
+    "//src/solver",
   ]
 
   if (use_gui) {
@@ -17,4 +18,3 @@ group("src") {
     ]
   }
 }
-
