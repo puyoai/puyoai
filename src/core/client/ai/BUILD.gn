@@ -12,6 +12,7 @@ static_library("ai") {
         "//third_party/glog",
         "//third_party/gflags",
         "//src/core/connector",
+        "//src/core",
     ]
 }
 

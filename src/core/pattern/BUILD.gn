@@ -15,6 +15,7 @@ static_library("pattern") {
     public_deps = [
         "//third_party/glog",
         "//third_party/tinytoml",
+        "//src/core",
     ]
 }
 

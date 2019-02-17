@@ -16,6 +16,7 @@ group("src") {
     "//src/net",
     "//src/learning",
     "//src/solver",
+    "//src/duel",
   ]
 
   if (use_gui) {

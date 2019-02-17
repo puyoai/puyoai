@@ -6,5 +6,6 @@ static_library("client") {
     deps = [
         "//third_party/glog",
         "//third_party/gflags",
+        "//src/core",
     ]
 }            

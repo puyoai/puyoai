@@ -1,0 +1,72 @@
+static_library("duel_lib") {
+    sources = [
+        "duel_server.cc",
+        "field_realtime.cc",
+        "frame_context.cc",
+        "puyofu_recorder.cc",
+        "cui.cc",
+    ]
+    if (is_win) {
+        sources += [
+            "cui_win.cc"
+        ]
+    }
+
+    deps = [
+        "//src/core/server",
+        "//src/core",
+        "//src/base",
+        "//src/core/server/connector",
+        "//src/core/rensa",
+        "//src/core/rensa_tracker",
+        "//src/core/plan",
+        "//third_party/jsoncpp",
+    ]
+
+    if (use_tcp) {
+        deps += [ "//src/net/socket" ]
+    }
+    if (use_gui) {
+        deps += [
+            "//src/gui",
+        ]
+    }
+    if (use_httpd) {
+        deps += [
+            "//src/net/httpd"
+        ]
+    }
+}
+
+executable("duel") {
+    sources = [
+        "main.cc"
+    ]
+
+    deps = [
+        ":duel_lib",
+        "//src/core/server/connector",
+        "//src/core/server",
+        "//src/audio",
+    ]
+
+    # if (use_audiocommentator) {
+    #     deps += [
+    #         "//src/audio",
+    #         "//src/internal/audio",
+    #     ]
+    # }
+}
+
+executable("field_realtime_test") {
+    testonly = true
+    sources = [
+        "field_realtime_test.cc",
+    ]
+    deps = [
+        ":duel_lib",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+        "//src/core",
+    ]
+}

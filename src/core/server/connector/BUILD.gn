@@ -24,5 +24,6 @@ static_library("connector") {
     deps = [
         "//third_party/glog",
         "//third_party/gflags",
+        "//src/core",
     ]
 }
