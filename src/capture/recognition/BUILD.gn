@@ -1,0 +1,10 @@
+static_library("recognition") {
+    sources = [
+        "classifier_features.cc",
+        "classifier_features.h",
+        "recognition_color.cc",
+        "recognition_color.h",
+        "recognizer.cc",
+        "recognizer.h",
+    ]
+}

@@ -1,0 +1,6 @@
+static_library("driver") {
+    sources = [
+        "syntek.cc",
+        "syntek.h",
+    ]
+}
