@@ -61,7 +61,7 @@ if (os != "win") {
     "glog/src/windows/port.h",
   ]
 }
-config("glog_config") {
+config("glog_public_config") {
   include_dirs = glog_include_dirs
   if (is_posix) {
     cflags = [
@@ -70,10 +70,19 @@ config("glog_config") {
     ]
   }
 }
+config("glog_config") {
+  if (is_posix) {
+    cflags = [
+      "-Wno-unused-function",
+      "-Wno-unused-parameter",
+    ]
+  }
+}
 static_library("glog") {
   sources = glog_sources
   include_dirs = glog_include_dirs
   defines = glog_defines
   cflags_cc = glog_cflags_cc
-  public_configs = [ ":glog_config" ]
+  configs += [ ":glog_config" ]
+  public_configs = [ ":glog_public_config" ]
 }

@@ -1,23 +1,26 @@
+# OS definitions
+
 declare_args() {
   os = host_os
-
-  is_debug = true
-  
-  use_capture = false
-  use_usb = false
-  use_gui = false
-  use_tcp = false
-  use_httpd = false
-  use_libcurl = false
 }
 
-# OS DEFINITIONS
 is_posix = os == "mac" || os == "linux"
 is_mac = os == "mac"
 is_linux = os == "linux"
 is_win = os == "win" || os == "winuwp"
 
-if (os == "linux") {
+declare_args() {
+  is_debug = true
+  
+  use_capture = false
+  use_usb = false
+  use_gui = false
+  use_httpd = false
+  use_libcurl = false
+  use_tcp = is_posix
+}
+
+if (is_linux) {
   set_default_toolchain("//build/toolchain/linux:x64")
 }
 
