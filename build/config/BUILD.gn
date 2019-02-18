@@ -15,8 +15,6 @@
 #         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" CACHE STRING "" FORCE)
 #     endif()
 # 
-#     add_compile_options("-Wall")
-#     add_compile_options("-Wextra")
 #     if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 #         add_compile_options("-Werror")
 #     endif()
@@ -39,10 +37,16 @@ config("global") {
         "TESTDATA_DIR=\"" + rebase_path("//test_resources", root_build_dir) + "\"",
     ]
 
-     if (is_posix) {
+    if (is_posix) {
         # always include build/build_config.h
         cflags = [
             "-include", rebase_path("//src/build/build_config.h", root_build_dir),
+            "-Wall",
+            "-Wextra",
+        ]
+
+        cflags_cc = [
+            "-std=gnu++11",
         ]
     }
 }

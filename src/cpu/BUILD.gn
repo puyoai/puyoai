@@ -2,6 +2,8 @@ group("cpu") {
     deps = [
         "//src/cpu/sample",
         "//src/cpu/mayah",
+        "//src/cpu/colun",
+        "//src/cpu/peria",
     ]
 }
 

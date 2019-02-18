@@ -1,0 +1,96 @@
+group("peria") {
+    deps = [
+      ":peria_cpu",
+      ":copy_run_sh",
+    ]
+}
+
+static_library("peria_lib") {
+    sources = [
+        "ai.cc",
+        "ai.h",
+        "evaluator.cc",
+        "evaluator.h",
+        "search_without_risk.cc",
+        "search_without_risk.h",
+        "pattern.cc",
+        "pattern.h",
+    ]
+
+    deps = [
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/rensa",
+        "//src/core/client/ai",
+        "//src/core/pattern",
+    ]
+}
+
+executable("peria_cpu") {
+    output_name = "cpu/peria/peria"
+
+    sources = [
+        "main.cc",
+    ]
+
+    deps = [
+        ":peria_lib",
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+executable("tokopuyo") {
+    output_name = "cpu/peria/tokopuyo"
+
+    sources = [
+        "tokopuyo.cc",
+    ]
+
+    deps = [
+        ":peria_lib",
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+        "//src/solver",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/peria/run.sh",
+    ]
+}
+
+copy("copy_run_bat") {
+    sources = [
+        "run.bat"
+    ]
+    outputs = [
+        "$root_out_dir/cpu/peria/run.bat",
+    ]
+}
+
+executable("pattern_test") {
+    testonly = true
+    output_name = "cpu/peria/pattern_test"
+
+    sources = [
+        "pattern_test.cc",
+    ]
+
+    deps = [
+        ":peria_lib",
+        "//src/core/pattern",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
