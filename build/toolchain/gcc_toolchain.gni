@@ -24,10 +24,15 @@ toolchain(target_name) {
     ]
   }
   tool("alink") {
-    rspfile = "{{output}}.rsp"
-    command = "rm -f {{output}} && $ar rcs {{output}} @$rspfile"
+    if (is_linux) {
+      rspfile = "{{output}}.rsp"
+      command = "rm -f {{output}} && $ar rcs {{output}} @$rspfile"
+      rspfile_content = "{{inputs}}"
+    } else {
+      # Mac's ar does not support rspfile. Put inputs directly.
+      command = "rm -f {{output}} && $ar rcs {{output}} {{inputs}}"
+    }
     description = "AR {{target_output_name}}{{output_extension}}"
-    rspfile_content = "{{inputs}}"
     outputs = [
       "{{target_out_dir}}/{{target_output_name}}{{output_extension}}",
     ]
@@ -54,7 +59,13 @@ toolchain(target_name) {
   tool("link") {
     outfile = "{{target_output_name}}{{output_extension}}"
     rspfile = "$outfile.rsp"
-    command = "$ld {{ldflags}} -o $outfile -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}}"
+    if (is_linux) {
+      command = "$ld {{ldflags}} -o $outfile -Wl,--start-group @$rspfile {{solibs}} -Wl,--end-group {{libs}}"
+    } else {
+      # --start-group and --end-group is not necessary on Mac OS X.
+      command = "$ld {{ldflags}} -o $outfile -Wl, @$rspfile {{solibs}} -Wl, {{libs}}"
+    }
+
     description = "LINK $outfile"
     rspfile_content = "{{inputs}}"
     outputs = [
