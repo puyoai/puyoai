@@ -24,6 +24,10 @@ if (is_linux) {
   set_default_toolchain("//build/toolchain/linux:x64")
 }
 
+if (is_mac) {
+  set_default_toolchain("//build/toolchain/mac:x64")
+}
+
 default_compiler_configs = [
   "//build/config/compiler",
   "//build/config:global",

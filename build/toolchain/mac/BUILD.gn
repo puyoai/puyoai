@@ -1,0 +1,9 @@
+import("//build/toolchain/gcc_toolchain.gni")
+
+gcc_toolchain("x64") {
+  cc = "gcc"
+  cxx = "g++"
+  ar = "ar"
+  ld = cxx
+}
+
