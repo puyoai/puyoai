@@ -57,9 +57,7 @@ template("msvc_toolchain") {
 
         command = "$env_setup $lib /nologo /ignore:4221 {{arflags}} /OUT:{{output}} @$rspfile"
         outputs = [
-        # Ignore {{output_extension}} and always use .lib, there's no reason to
-        # allow targets to override this extension on Windows.
-        "{{root_out_dir}}/{{target_output_name}}{{output_extension}}",
+            "{{target_out_dir}}/{{target_output_name}}{{output_extension}}",
         ]
         default_output_extension = ".lib"
         default_output_dir = "{{target_out_dir}}"
