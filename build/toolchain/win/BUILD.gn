@@ -1,7 +1,8 @@
 import("//build/toolchain/msvc_toolchain.gni")
 
 msvc_toolchain("x64") {
-  cl = "cl.exe"
-  link = "link.exe"
+  win_vc = "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC"
+  # cl = "cl.exe"
+  # link = "link.exe"
 }
 

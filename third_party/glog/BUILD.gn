@@ -1,7 +1,6 @@
 if (os != "win") {
   config_h_dir = "config/$os"
 } else {
-  import("//build/config/win/visual_studio_version.gni")
   config_h_dir = "glog/src/windows"
 }
 glog_sources = [
@@ -34,8 +33,7 @@ glog_include_dirs = [
   "glog/src",
 ]
 glog_defines = [ "HAVE_CONFIG_H" ]
-if (os == "win" &&
-    (visual_studio_version == "2015" || visual_studio_version == "2017")) {
+if (os == "win") {
   glog_defines += [ "HAVE_SNPRINTF" ]
 }
 if (os != "win") {
