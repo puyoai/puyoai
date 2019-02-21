@@ -1,0 +1,7 @@
+import("//build/toolchain/msvc_toolchain.gni")
+
+msvc_toolchain("x64") {
+  cl = "cl.exe"
+  link = "link.exe"
+}
+
