@@ -1,6 +1,5 @@
 template("msvc_toolchain") {
   toolchain(target_name) {
-    # win_vc = "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC"
     win_vc = invoker.win_vc
     win_toolchain_version = "14.16.27023"
     lib_dir_switch = "/LIBPATH:"
