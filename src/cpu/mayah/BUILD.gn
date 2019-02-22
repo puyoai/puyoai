@@ -82,26 +82,29 @@ static_library("mayah_lib") {
     ]
 }
 
-static_library("neural_lib") {
-    sources = [
-        "neural.cc",
-        "neural.h",
-    ]
-    deps = [
-        ":evaluator_lib",
-        ":mayah_lib",
-        "//src/core",
-        "//src/core/plan",
-        "//src/core/rensa",
-        "//src/core/probability",
-        "//src/solver",
-        "//third_party/jsoncpp",
-    ]
+if (use_curl) {
+    static_library("neural_lib") {
+        sources = [
+            "neural.cc",
+            "neural.h",
+        ]
+        deps = [
+            ":evaluator_lib",
+            ":mayah_lib",
+            "//src/core",
+            "//src/core/plan",
+            "//src/core/rensa",
+            "//src/core/probability",
+            "//src/solver",
+            "//third_party/jsoncpp",
+        ]
 
-    public_configs = [
-        "//build/config:with_curl",
-    ]
+        public_configs = [
+            "//build/config:with_curl",
+        ]
+    }
 }
+
 
 executable("mayah_cpu") {
     output_name = "cpu/mayah/mayah_cpu"
@@ -188,31 +191,33 @@ executable("gazer_example") {
     ]
 }
 
-executable("neural") {
-    output_name = "cpu/mayah/neural"
-    sources = [
-        "neural_main.cc",
-    ]
-    deps = [
-        ":neural_lib",
-        "//src/core",
-        "//src/core/plan",
-    ]
-}
+if (use_curl) {
+    executable("neural") {
+        output_name = "cpu/mayah/neural"
+        sources = [
+            "neural_main.cc",
+        ]
+        deps = [
+            ":neural_lib",
+            "//src/core",
+            "//src/core/plan",
+        ]
+    }
 
-executable("make_train_data") {
-    output_name = "cpu/mayah/make_train_data"
-    sources = [
-        "make_train_data.cc"
-    ]
-    deps = [
-        ":evaluator_lib",
-        ":mayah_lib",
-        ":neural_lib",
-        "//src/core",
-        "//src/core/probability",
-        "//src/solver",
-    ]
+    executable("make_train_data") {
+        output_name = "cpu/mayah/make_train_data"
+        sources = [
+            "make_train_data.cc"
+        ]
+        deps = [
+            ":evaluator_lib",
+            ":mayah_lib",
+            ":neural_lib",
+            "//src/core",
+            "//src/core/probability",
+            "//src/solver",
+        ]
+    }
 }
 
 if (use_httpd) {

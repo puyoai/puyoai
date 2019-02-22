@@ -18,6 +18,7 @@ declare_args() {
   use_httpd = false
   use_libcurl = false
   use_tcp = is_posix
+  use_curl = false
 }
 
 set_default_toolchain("//build/toolchain/$os:x64")
