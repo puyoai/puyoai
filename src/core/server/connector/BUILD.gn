@@ -13,10 +13,12 @@ static_library("connector") {
     if (is_win) {
         sources += [
             "pipe_connector_win.cc",
+            "pipe_connector_win.h",
         ]
     } else {
         sources += [
             "pipe_connector_posix.cc",
+            "pipe_connector_posix.h",
         ]
     }
 

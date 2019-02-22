@@ -12,6 +12,13 @@ config("compiler") {
       "-march=native",
     ]
   }
+
+  if (is_win) {
+    cflags += [
+      "/EHsc",
+      "/MP",  # Build With Multiple Processes
+    ]
+  }
 }
 
 # optimization

@@ -49,6 +49,21 @@ config("global") {
             "-std=gnu++11",
         ]
     }
+
+    if (is_win) {
+        cflags = [
+            "/FI", "build/build_config.h",
+        ]
+
+        ldflags = [
+            "/SUBSYSTEM:CONSOLE",
+        ]
+
+        defines += [
+            "NOMINMAX",
+            "WIN32_LEAN_AND_MEAN",
+        ]
+    }
 }
 
 config("debug") {
