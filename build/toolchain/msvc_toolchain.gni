@@ -120,7 +120,7 @@ template("msvc_toolchain") {
 
     tool("copy") {
         cp_py = rebase_path("../cp.py")
-        command = "python $cp_py {{source}} {{output}}"
+        command = "$python_path $cp_py {{source}} {{output}}"
         description = "copy {{source}} {{output}}"
     }
   }
