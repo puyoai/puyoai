@@ -41,8 +41,8 @@ inline int countTrailingZeros32(const std::uint32_t& x)
 {
 #if defined(_MSC_VER)
     unsigned long index;
-    if (int ret = _BitScanForward(&index, x)) {
-        return ret;
+    if (_BitScanForward(&index, x)) {
+        return index;
     }
     return 32;
 #else
@@ -61,10 +61,10 @@ inline int countTrailingZeros64(const std::uint64_t& x)
 {
 #if defined(_MSC_VER)
     unsigned long index;
-    if (int ret = _BitScanForward64(&index, x)) {
-        return ret;
+    if (_BitScanForward64(&index, x)) {
+        return index;
     }
-    return 32;
+    return 64;
 #else
     return __builtin_ctzll(x);
 #endif
