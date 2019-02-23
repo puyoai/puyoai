@@ -7,3 +7,9 @@ gcc_toolchain("x64") {
   ld = cxx
 }
 
+gcc_toolchain("clang_x64") {
+  cc = "clang"
+  cxx = "clang++"
+  ar = "ar"
+  ld = cxx
+}

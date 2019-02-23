@@ -10,18 +10,34 @@ is_linux = os == "linux"
 is_win = os == "win" || os == "winuwp"
 
 declare_args() {
+  # true if debug build.
   is_debug = true
-  
+  # true to enable ASan.
+  is_asan = false
+  # true to use clang instead of gcc.
+  is_clang = is_posix
+
+  # true to build capture.
   use_capture = false
+  # true to build usb device.
   use_usb = false
+  # true to build with gui (SDL2 is required)
   use_gui = false
+  # true to build with httpd (microhttpd is required)
   use_httpd = false
+  # true to build with curl (libcurl is required)
   use_libcurl = false
+  # true to build with tcp socket.
   use_tcp = is_posix
+  # true to build with curl (libcurl is required)
   use_curl = false
 }
 
-set_default_toolchain("//build/toolchain/$os:x64")
+if (is_clang) {
+  set_default_toolchain("//build/toolchain/$os:clang_x64")
+} else {
+  set_default_toolchain("//build/toolchain/$os:x64")
+}
 
 default_compiler_configs = [
   "//build/config/compiler",
@@ -37,6 +53,12 @@ if (is_debug) {
   default_compiler_configs += [
    "//build/config:release",
    "//build/config/compiler:optimize",
+  ]
+}
+
+if (is_asan) {
+  default_compiler_configs += [
+    "//build/config:asan",
   ]
 }
 

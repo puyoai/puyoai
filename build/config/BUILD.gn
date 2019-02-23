@@ -76,6 +76,13 @@ config("release") {
     ]
 }
 
+config("asan") {
+    if (is_posix) {
+        cflags = [ "-fsanitize=address" ]
+        ldflags = [ "-fsanitize=address" ]
+    }
+}
+
 config("use_tcp") {
     defines = [
         "USE_TCP"
