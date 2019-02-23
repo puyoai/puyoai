@@ -39,14 +39,13 @@ def TestNames(case_key):
                                       '--testonly=true',
                                       '--type=executable',
                                       '--as=output'])
-  return [test for test in output.split() if test != 'vstestrun.exe']
+
+  # Don't include perftest.
+  return [test for test in output.split() if 'perftest' not in test]
 
 
 class TestError(Exception):
   pass
-
-
-
 
 
 def RunTest(build_dir, case_opt, non_stop):
