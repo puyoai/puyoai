@@ -23,6 +23,9 @@ deps = {
 
     # tinytoml
     "puyoai/third_party/tinytoml/tinytoml": "https://github.com/mayah/tinytoml.git@3ba7a885fa725f3c0ec7d3dfbe01ddb7e35d7fb6",
+
+    # subprocess32 3.5.3
+    "puyoai/third_party/subprocess32": "https://github.com/google/python-subprocess32@0a814da4a033875880534fd488770e2d97febe2f",
 }
 
 hooks = [
