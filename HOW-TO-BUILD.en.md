@@ -2,15 +2,19 @@
 
 ## Prerequisite
 
-- Linux or Mac is recommended, however, it builds on Windows.
-- recent x86_64 CPU that has AVX instruction.
+- Linux or Mac is recommended, however, you can build on Windows, too.
+- recent x86_64 CPU that has AVX instruction is necessary.
 
 ## Install dependencies.
+
+### All platforms
 
 Install [depot_tools](https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up).
 Don't forget to set PATH.
 
 ### Linux
+
+Also install the following.
 
 ```shell
 $ sudo apt-get install git clang
@@ -21,6 +25,8 @@ $ sudo apt-get install libmicrohttpd-dev libffms2-dev libusb-1.0-0-dev
 
 ### Mac (with homebrew)
 
+Also install Xcode and the following.
+
 ```shell
 $ brew install pkg-config
 $ brew install sdl2 SDL2_ttf SDL2_image ffmpeg libusb protobuf
@@ -28,17 +34,32 @@ $ brew install sdl2 SDL2_ttf SDL2_image ffmpeg libusb protobuf
 
 ### Windows
 
-Install Visual Studio 2017.
+Install Install Visual Studio 2017. Community Edition works.
+
+TODO: How to install SDL2?
 
 ## Download repository
 
 This downloads puyoai repository and dependent repositories.
+We assume you made an empty directory `~/repos/puyoai` or `%HOME%\repos\puyoai`.
+
+On Linux or Mac:
 
 ```shell
-$ mkdir ~/repos/puyoai; cp ~/repos/puyoai
+$ cd ~/repos/puyoai
 $ gclient config --unmanaged https://github.com/puyoai/puyoai
 $ gclient sync
 ```
+
+On Windows
+
+```
+$ cd %HOME%\repos\puyoai
+$ gclient config --unmanaged https://github.com/puyoai/puyoai
+$ gclient sync
+```
+
+This command will take several minutes to download resources. 
 
 ## Build
 
