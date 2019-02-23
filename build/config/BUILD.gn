@@ -52,11 +52,11 @@ config("global") {
 
     if (is_win) {
         cflags = [
-            "/FI", "build/build_config.h",
+            "/FI", "build/build_config.h",  # always include build_config.h
         ]
 
         ldflags = [
-            "/SUBSYSTEM:CONSOLE",
+            "/SUBSYSTEM:CONSOLE",  # needs this if main function is main() instead of WinMain.
         ]
 
         defines += [
