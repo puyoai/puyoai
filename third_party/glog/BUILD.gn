@@ -67,6 +67,15 @@ config("glog_public_config") {
       "-Wno-sign-compare",  # glog/logging.h has sign compare code
     ]
   }
+
+  if (is_win) {
+    defines = [
+      "GOOGLE_GLOG_DLL_DECL=",
+      "GOOGLE_GLOG_IS_A_DLL=0",
+      "GOOGLE_GLOG_DLL_DECL_FOR_UNITTESTS=",
+      "GLOG_NO_ABBREVIATED_SEVERITIES",
+    ]
+  }
 }
 config("glog_config") {
   if (is_posix) {

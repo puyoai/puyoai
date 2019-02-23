@@ -67,7 +67,8 @@ void AI::runLoop()
     int nextThinkFrameId = 0;
 
     while (true) {
-        google::FlushLogFiles(google::INFO);
+        // On Windows, google::GLOG_INFO is required instaed of google::INFO.
+        google::FlushLogFiles(google::GLOG_INFO);
 
         FrameRequest frameRequest;
         if (!connector_->receive(&frameRequest)) {
