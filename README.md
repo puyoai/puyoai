@@ -1,5 +1,4 @@
-puyoai
-======
+# puyoai
 
 [![Build Status](https://circleci.com/gh/puyoai/puyoai.png?circle-token=:circle-token)](https://circleci.com/gh/puyoai)
 
@@ -31,7 +30,44 @@ clang-3.4 以降、と gcc-4.7 以降でのみテストしています。
 
 ## ビルド方法
 
-### 必要なライブラリ
+### 必要なライブラリのインストール
+
+#### 全プラットフォーム共通
+
+[depot_tools](https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up)
+  をインストールしてください。`PATH` を通すのを忘れないように。
+
+#### Linux
+
+```shell
+$ sudo apt-get install git clang
+$ sudo apt-get install libprotobuf-dev libcurl4-nss-dev
+$ sudo apt-get install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
+$ sudo apt-get install libmicrohttpd-dev libffms2-dev libusb-1.0-0-dev
+```
+
+#### Mac (homebrew 前提)
+
+Xcode、コマンドラインツール、homebrew をインストールしてください。
+デフォルトで `/usr/local/include` などを見ないようになっている可能性がありますが、`xcode-select --install` を叩いておくと解決するはずです。
+
+```shell
+$ brew install pkg-config
+$ brew install sdl2 SDL2_ttf SDL2_image ffmpeg libusb protobuf
+```
+
+#### Windows
+
+1. Install Visual Studio 2017.
+
+TBW
+
+### レポジトリのダウンロード
+
+1. ターミナル、もしくはコマンドプロンプトで、適当なディレクトリ (e.g. `~/repos/puyoai`) を作って移動し、そこで `gclient config --unmanaged https://github.com/puyoai/puyoai` コマンドを入力してください。`.gclient` ファイルがそのディレクトリに作られます。
+1. `gclient sync` コマンドを入力してください。必要なファイルなどがダウンロードされます。
+
+### 必要なライブラリの説明
 
 GUI を付与したい場合、さらに次のライブラリが必要です。
 
@@ -50,77 +86,55 @@ http サーバーを利用して、GUIを付与することもできます。こ
 その他、ライブラリではないですが、ビルドツールとして `cmake` `make` が必要です。
 また `ninja` を使えるとコンパイルが高速になります。
 
-#### Mac OSX の場合
+### ビルドのしかた Linux/Mac
 
-Mac の場合、homebrew を使うと楽です。
-Xcode、コマンドラインツール、homebrew をインストールしてください。
-デフォルトで `/usr/local/include` などを見ないようになっている可能性がありますが、`xcode-select --install` を叩いておくと解決するはずです。
+```shell
+$ cd ~/repos/puyoai/puyoai
+$ gn gen --args="is_debug=false" out/Release
+$ ninja -C out/Release
+```
 
-次のコマンドで必要なものが入るとおもいます。
+ただしこのままだと SDL が必要なものはビルドされません。
 
-    $ brew install pkg-config
-    $ brew install cmake sdl2 SDL2_ttf SDL2_image ffmpeg libusb protobuf
+```shell
+$ gn args out/Release
+```
 
-#### Linux (Ubuntu) の場合
+とするとエディタが立ち上がるので、
 
-Debian 系 Linux の場合、apt を使うと楽です。
-次のコマンドで必要なものが入るとおもいます。
+```
+is_debug = false
+use_capture = true
+use_usb = true
+use_gui = true
+use_httpd = true
+use_libcurl = true
+use_tcp = true
+use_curl = true
+```
 
-    $ sudo apt-get install git clang cmake ninja-build
-    $ sudo apt-get install libprotobuf-dev libcurl4-nss-dev
-    $ sudo apt-get install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
-    $ sudo apt-get install libmicrohttpd-dev libffms2-dev libusb-1.0-0-dev
+とすると、全部入りになります (2019-02-23 現在)。どのようなオプションがあるかは、[build/BUILDCONFIG.gn](build/BUILDCONFIG.gn) の declare_args 内（複数あります)を参照してください。
 
-#### Windows の場合
+is_debug を true にすると、デバッグビルドになります。
 
-cygwin で一応 build できることが確認されています。詳しくは、[cygwin でのビルド方法](doc/how-to-build-on-cygwin.md)を参照してください。
+### ビルドのしかた Windows
 
-### ビルドのしかた
+```
+> cd %HOME%\repos\puyoai\puyoai
+> gn gen --args="is_debug=false" out/Release
+> ninja -C out/Release
+```
 
-一部のライブラリはsubmoduleを用いて管理しています。そこで、レポジトリをcloneした後で、submodule のアップデートが必要となります。ビルド前にまず次のコマンドを実行してください。
+Linux/Mac で使えるコンフィグ option のうちいくつかは動きません。
 
-    $ git submodule init
-    $ git submodule update
+もし Visual Studio の solution file を生成したい場合、
 
-基本的に一度実行すればいいのですが、新しいsubmoduleを追加した時は、もう一度 `git submodule init` からやり直す必要がある場合があります。
+```
+> cd %HOME%\repos\puyoai\puyoai
+> gn gen --args="is_debug=false" --ide=vs out/Release
+```
 
-ビルドでは、cmake を用いて Makefile を生成し、make することを前提にしています。
-
-out ディレクトリを掘って、そこでビルドするようにしてください。ビルドの種類によって、ディレクトリを分けると楽です。
-
-デフォルトビルド (-O2, -g)
-
-    $ mkdir -p out/Default; cd out/Default
-    $ cmake ../../src
-    $ make -j8
-    $ make test
-
-デフォルトビルドは、実行が高速であり、クラッシュ時にシンボルが取れます。AIの開発中にオススメです。
-
-デバッグビルド (-g)
-
-    $ mkdir -p out/Debug; cd out/Debug
-    $ cmake -DCMAKE_BUILD_TYPE=Debug ../../src
-    $ make -j8
-    $ make test
-
-デバッグビルドでは、DCHECK が有効になり、より多くのチェックが実行時に行なわれます。
-なにか新しい機能を作ってテストしている最中などはデバッグビルドが最もオススメです。
-
-リリースビルド (-O3)
-
-    $ mkdir -p out/Release; cd out/Release
-    $ cmake -DCMAKE_BUILD_TYPE=Release ../../src
-    $ make -j8
-    $ make test
-
-最終的に実行したい場合は、リリースビルドでビルドしたものを使うと良いでしょう。最も高速ですが、速度はデフォルトビルドと比べて目に見えてわかるほどではありません。
-
-* `gflags` と `glog` が `cmake` に発見されなかった場合、`cmake` が成功しません。
-* SDL と SDL_ttf がない場合、`cmake` は成功しますが、GUIがつきません。
-* キャプチャ関連については、[capture/README.md](https://github.com/puyoai/puyoai/tree/master/src/capture) を参照してください。
-
-[build/](https://github.com/puyoai/puyoai/tree/master/build) 以下にいくつかビルド用のスクリプトが置かれていますが、`ninja` でビルドすることを前提にしています。`ninja`の方が`make`よりもビルドが若干高速です。
+とすると、`all.sln` ファイルが out/Release 以下に生成されます。
 
 ### エラーがでた
 
@@ -137,13 +151,17 @@ SSE4.1がどーのこーの、というエラーが出た場合、`-mnative`フ�
 
 ## 実行
 
-    $ cd out/Release
-    $ ./duel/duel ./cpu/sample/sample ./cpu/sample_rensa/sample_rensa
+```shell
+$ cd out/Release
+$ ./duel ./cpu/sample/sample ./cpu/sample_rensa/sample_rensa
+```
 
 `duel` は対戦サーバで、筐体のような役割を果たします。1 つ目の引数 `sample` は 1P 側を担当する AI、2 つ目の引数 `sample_rensa` は 2P 側を担当する AI です。
 `duel` にオプションを渡すことで対戦速度を上げたり、ぷよの色を指定できたり、といろんな機能を引き出すことができます。ドキュメント化されていないものもありますが、
 
-    $ ./duel/duel --help
+```shell
+$ ./duel --help
+```
 
 とすると実装されている機能と必要なオプションが全部出てきます。とりあえずはそちらを参照してください。
 
