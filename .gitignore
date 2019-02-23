@@ -7,5 +7,5 @@ Makefile
 *.a
 CMakeCache.txt
 CMakeFiles
-
+*.pyc
 
