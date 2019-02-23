@@ -95,11 +95,13 @@ config("use_libcurl") {
 }
 
 # TODO(mayah): Use pkg-config instead of writing the path directly.
+# TODO(mayah): Support SDL on Windows?
 if (use_gui) {
     config("with_sdl2") {
         defines = [
             "USE_SDL2"
         ]
+
         include_dirs = [
             "/usr/include/SDL2",
         ]
