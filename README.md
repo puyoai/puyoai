@@ -136,6 +136,15 @@ Linux/Mac で使えるコンフィグ option のうちいくつかは動きま�
 
 とすると、`all.sln` ファイルが out/Release 以下に生成されます。
 
+### How to run test
+
+After the build,
+
+```shell
+$ cd ~/repos/puyoai/puyoai
+$ python build/run_unittest.py --build-dir=out/Debug
+```
+
 ### エラーがでた
 
 もしかしたら、master ブランチが壊れているかもしれません。この場合、気づいたメンバーによってすぐに修復されます。
