@@ -1,24 +1,17 @@
 template("msvc_toolchain") {
   toolchain(target_name) {
-    win_vc = invoker.win_vc
-    win_toolchain_version = "14.16.27023"
-    lib_dir_switch = "/LIBPATH:"
-    bin = "$win_vc/Tools/MSVC/$win_toolchain_version/bin/Hostx64/$target_name"
+    cl = invoker.cl
+    lib = invoker.lib
+    link = invoker.link
+    ml = invoker.ml
 
     cc_wrapper = ""
     cl_m32_flag = ""
     env_setup = ""
-    cl = "\"$bin/cl.exe\""
-    lib = "\"$bin/lib.exe\""
-    link = "\"$bin/link.exe\""
     stamp = "cmd.exe /c echo >"
 
     tool("asm") {
-        _ml = "ml"
-        if (target_cpu == "x64") {
-        _ml += "64"
-        }
-        command = "$env_setup \"$bin/$_ml.exe\" {{asmflags}} /nologo /c /Fo {{output}} {{source}}"
+        command = "$env_setup $ml {{asmflags}} /nologo /c /Fo {{output}} {{source}}"
         outputs = [
         "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
         ]

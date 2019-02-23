@@ -97,7 +97,7 @@ See declare_args in [build/BUILDCONFIG.gn](build/BUILDCONFIG.gn) to understand w
 First, run vcvars64.bat.
 
 ```
-> C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat
+> "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
 ```
 
 and in the same command promot, run the following.
