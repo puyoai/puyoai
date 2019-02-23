@@ -25,12 +25,26 @@ config("compiler") {
 
 config("optimize") {
   if (is_posix) {
-    cflags = [ "-O2" ]
+    cflags = [
+      "-O2",
+    ]
+  }
+
+  if (is_win) {
+    cflags = [
+      "/O2",  # Creates fast code.
+    ]
   }
 }
 
 config("no_optimize") {
   if (is_posix) {
     cflags = [ "-O0" ]
+  }
+
+  if (is_win) {
+    cflags = [
+      "/Od",  # Disables optimization.
+    ]
   }
 }
