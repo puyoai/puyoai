@@ -90,7 +90,7 @@ use_tcp = true
 use_curl = true
 ```
 
-See declare_args in [build/BUILDCONFIG.gn](build/BUILDCONFIG.gn) to understand what options can be specified.
+See declare_args in [build/config/BUILDCONFIG.gn](build/config/BUILDCONFIG.gn) to understand what options can be specified.
 
 ### Windows
 
