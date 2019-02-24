@@ -1,0 +1,44 @@
+group("sample_beam") {
+    deps = [
+      ":sample_beam_cpu",
+      ":copy_run_full_sh",
+      ":copy_run_2dub_sh",
+    ]
+}
+
+executable("sample_beam_cpu") {
+    output_name = "cpu/sample_beam/sample_beam"
+
+    sources = [
+        "main.cc",
+        "beam_search_ai.cc",
+        "beam_search_ai.h",
+    ]
+
+    deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+        "//src/core/rensa",
+    ]
+}
+
+copy("copy_run_full_sh") {
+    sources = [
+        "run_full.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/sample_beam/run_full.sh",
+    ]
+}
+
+copy("copy_run_2dub_sh") {
+    sources = [
+        "run_2dub.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/sample_beam/run_2dub.sh",
+    ]
+}
