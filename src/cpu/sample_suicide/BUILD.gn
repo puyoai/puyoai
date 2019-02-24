@@ -1,0 +1,41 @@
+group("sample_suicide") {
+    deps = [
+      ":sample_suicide_cpu",
+      ":copy_run_sh",
+      ":copy_run_right_turn_sh",
+    ]
+}
+
+executable("sample_suicide_cpu") {
+    output_name = "cpu/sample_suicide/sample_suicide"
+
+    sources = [
+        "main.cc",
+    ]
+
+    deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/sample_suicide/run.sh",
+    ]
+}
+
+copy("copy_run_right_turn_sh") {
+    sources = [
+        "run_right_turn.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/sample_suicide/run_right_turn.sh",
+    ]
+}
