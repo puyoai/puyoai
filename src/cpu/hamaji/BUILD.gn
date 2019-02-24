@@ -1,0 +1,271 @@
+group("hamaji") {
+    deps = [
+        ":lps",
+        ":study",
+        ":matchstat",
+        ":one",
+        ":tokopuyo",
+        ":rater",
+        ":copy_run_sh",
+        ":copy_lps_sh",
+        ":copy_lps2_sh",
+        ":copy_lps_fast_sh",
+        ":copy_lps_gtr_sh",
+        ":copy_lps_gtr2_sh",
+    ]
+
+    if (is_posix) {
+        deps += [ "mkdb" ]
+    }
+}
+
+static_library("hamaji_lib") {
+    sources = [
+        "core.cc",
+        "db.cc",
+        "eval_base.cc",
+        "eval.cc",
+        "eval2.cc",
+        "field.cc",
+        "game.cc",
+        "rater.cc",
+        "ratingstats.cc",
+        "solo.cc",
+        "util.cc",
+    ]
+
+    public_deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/rensa",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+executable("lps") {
+    output_name = "cpu/hamaji/lps"
+
+    sources = [
+        "main.cc",
+    ]
+
+    deps = [
+        ":hamaji_lib",
+        ":copy_params_txt",
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+executable("study") {
+    output_name = "cpu/hamaji/study"
+
+    sources = [
+        "main.cc",
+    ]
+
+    deps = [
+        ":hamaji_lib",
+        ":copy_params_txt",
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+executable("matchstat") {
+    output_name = "cpu/hamaji/matchstat"
+
+    sources = [
+        "matchstat.cc",
+    ]
+
+    deps = [
+        ":hamaji_lib",
+        ":copy_params_txt",
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+executable("one") {
+    output_name = "cpu/hamaji/one"
+
+    sources = [
+        "one.cc",
+    ]
+
+    deps = [
+        ":hamaji_lib",
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+executable("tokopuyo") {
+    output_name = "cpu/hamaji/tokopuyo"
+
+    sources = [
+        "tokopuyo_main.cc",
+    ]
+
+    deps = [
+        ":hamaji_lib",
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+executable("rater") {
+    output_name = "cpu/hamaji/rater"
+
+    sources = [
+        "rater_main.cc",
+    ]
+
+    deps = [
+        ":hamaji_lib",
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+if (is_posix) {
+    executable("mkdb") {
+        output_name = "cpu/hamaji/mkdb"
+
+        sources = [
+            "mkdb.cc",
+        ]
+
+        deps = [
+            ":hamaji_lib",
+            "//src/base",
+            "//src/core",
+            "//src/core/plan",
+            "//src/core/client/ai",
+            "//src/core/client",
+        ]
+    }
+}
+
+executable("db_test") {
+    testonly = true
+    output_name = "cpu/hamaji/db_test"
+    sources = [
+        "db_test.cc"
+    ]
+    deps = [
+        ":hamaji_lib",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("field_test") {
+    testonly = true
+    output_name = "cpu/hamaji/field_test"
+    sources = [
+        "field_test.cc"
+    ]
+    deps = [
+        ":hamaji_lib",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("field_perftest") {
+    testonly = true
+    output_name = "cpu/hamaji/field_perftest"
+    sources = [
+        "field_perf_test.cc"
+    ]
+    deps = [
+        ":hamaji_lib",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/hamaji/run.sh",
+    ]
+}
+
+copy("copy_lps_sh") {
+    sources = [
+        "lps.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/hamaji/lps.sh",
+    ]
+}
+
+copy("copy_lps2_sh") {
+    sources = [
+        "lps2.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/hamaji/lps2.sh",
+    ]
+}
+
+copy("copy_lps_fast_sh") {
+    sources = [
+        "lps-fast.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/hamaji/lps-fast.sh",
+    ]
+}
+
+copy("copy_lps_gtr_sh") {
+    sources = [
+        "lps-gtr.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/hamaji/lps-gtr.sh",
+    ]
+}
+
+copy("copy_lps_gtr2_sh") {
+    sources = [
+        "lps-gtr2.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/hamaji/lps-gtr2.sh",
+    ]
+}
+
+copy("copy_params_txt") {
+    sources = [
+        "params.txt",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/hamaji/params.txt",
+    ]
+}
