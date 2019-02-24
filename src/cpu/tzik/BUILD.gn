@@ -1,0 +1,32 @@
+group("tzik") {
+    deps = [
+      ":tzik_cpu",
+      ":copy_run_sh",
+    ]
+}
+
+executable("tzik_cpu") {
+    output_name = "cpu/tzik/tzik"
+
+    sources = [
+        "main.cc",
+        "main.h",
+    ]
+
+    deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/tzik/run.sh",
+    ]
+}
