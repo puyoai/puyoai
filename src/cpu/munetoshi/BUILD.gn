@@ -1,0 +1,61 @@
+group("munetoshi") {
+    deps = [
+        ":minim",
+        ":minim_eval",
+        ":copy_run_sh",
+    ]
+}
+
+static_library("minim_lib") {
+    sources = [
+        "ai.cc",
+        "ai.h",
+        "utilities.cc",
+        "utilities.h",
+        "evaluator.cc",
+        "evaluator.h",
+        "constants.h",
+    ]
+
+    public_deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+        "//src/core/rensa_tracker",
+        "//src/core/rensa",
+    ]
+}
+
+executable("minim") {
+    output_name = "cpu/munetoshi/minim"
+
+    sources = [
+        "main.cc",
+    ]
+
+    deps = [
+        ":minim_lib",
+    ]
+}
+
+executable("minim_eval") {
+    sources = [
+        "eval.cc",
+    ]
+
+    deps = [
+        ":minim_lib",
+        "//src/solver",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/munetoshi/run.sh",
+    ]
+}
