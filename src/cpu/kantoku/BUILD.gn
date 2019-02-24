@@ -1,0 +1,42 @@
+group("kantoku") {
+    deps = [
+      ":kantoku_cpu",
+      ":copy_run_sh",
+      ":copy_run_by_game_sh",
+    ]
+}
+
+executable("kantoku_cpu") {
+    output_name = "cpu/kantoku/kantoku"
+
+    sources = [
+        "main.cc",
+    ]
+
+    deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+        "//src/core/server/connector",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/kantoku/run.sh",
+    ]
+}
+
+copy("copy_run_by_game_sh") {
+    sources = [
+        "run_by_game.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/kantoku/run_by_game.sh",
+    ]
+}
