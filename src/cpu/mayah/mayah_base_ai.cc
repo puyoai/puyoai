@@ -24,6 +24,10 @@ MayahBaseAI::MayahBaseAI(int argc, char* argv[], const char* name, std::unique_p
         decision_book_path = FLAGS_decision_book;
     } else if (!file::isAbsolutePath(FLAGS_decision_book) && file::exists(file::joinPath(SRC_DIR, FLAGS_decision_book))) {
         decision_book_path = file::joinPath(SRC_DIR, FLAGS_decision_book);
+    } else {
+        CHECK(false) << "failed to find decision_book:"
+                     << " SRC=" << SRC_DIR
+                     << " FLAGS_decision_book=" << FLAGS_decision_book;
     }
 
     string pattern_book_path;
@@ -31,6 +35,10 @@ MayahBaseAI::MayahBaseAI(int argc, char* argv[], const char* name, std::unique_p
         pattern_book_path = FLAGS_pattern_book;
     } else if (!file::isAbsolutePath(FLAGS_pattern_book) && file::exists(file::joinPath(SRC_DIR, FLAGS_pattern_book))) {
         pattern_book_path = file::joinPath(SRC_DIR, FLAGS_pattern_book);
+    } else {
+        CHECK(false) << "failed to find pattern_book:"
+                     << " SRC=" << SRC_DIR
+                     << " FLAGS_pattern_book=" << FLAGS_pattern_book;
     }
 
     LOG(INFO) << "decision_book_path=" << decision_book_path;
