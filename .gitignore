@@ -8,4 +8,5 @@ Makefile
 CMakeCache.txt
 CMakeFiles
 *.pyc
+/.vscode
 
