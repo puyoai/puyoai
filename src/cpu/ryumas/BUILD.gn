@@ -1,0 +1,31 @@
+group("ryumas") {
+    deps = [
+      ":ryumas_cpu",
+      ":copy_run_sh",
+    ]
+}
+
+executable("ryumas_cpu") {
+    output_name = "cpu/ryumas/ryumas"
+
+    sources = [
+        "rensa5.cc",
+    ]
+
+    deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/ryumas/run.sh",
+    ]
+}
