@@ -1,0 +1,37 @@
+group("yuricat") {
+    deps = [
+      ":yuricat_cpu",
+      ":copy_run_sh",
+    ]
+}
+
+executable("yuricat_cpu") {
+    output_name = "cpu/yuricat/yuricat"
+
+    sources = [
+        "main.cc",
+        "evaluation.hpp",
+        "mate.hpp",
+        "puyo.hpp",
+        "solo_search.hpp",
+    ]
+
+    deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+        "//src/core/rensa",
+        "//src/solver",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/yuricat/run.sh",
+    ]
+}
