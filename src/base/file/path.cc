@@ -7,6 +7,7 @@
 
 #if defined(_MSC_VER)
 #include <windows.h>
+#include <io.h>
 #undef ERROR
 #else
 #include <dirent.h>
@@ -50,10 +51,11 @@ string joinPath(const string& p1, const string& p2, const string& p3, const stri
 bool isDirectory(const string& path)
 {
 #if defined(_MSC_VER)
-    LOG(ERROR) << "TODO(peria): Implement here";
-    return false;
+    DWORD attr = GetFileAttributesA(path.c_str());
+    if (attr == INVALID_FILE_ATTRIBUTES)
+        return false;
+    return (attr & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
 #else
-
     struct stat sb;
     if (stat(path.c_str(), &sb) < 0)
         return false;
@@ -65,8 +67,13 @@ bool isDirectory(const string& path)
 bool exists(const string& path)
 {
 #if defined(_MSC_VER)
-    LOG(ERROR) << "TODO(mayah): Implement this";
-    return false;
+    // https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/access-waccess?view=vs-2017
+    const int F_OK = 0;
+    if (_access(path.c_str(), F_OK) < 0) {
+        return false;
+    }
+
+    return true;
 #else
     return access(path.c_str(), F_OK) != -1;
 #endif
@@ -75,8 +82,9 @@ bool exists(const string& path)
 bool isAbsolutePath(const string& path)
 {
 #if defined(_MSC_VER)
-    LOG(ERROR) << "TODO(mayah): Implement this";
-    return false;
+    return (!path.empty() && path[0] == '\\') ||
+        (!path.empty() && path[0] == '/') ||
+        (path.size() > 1 && path[1] == ':');
 #else
     return !path.empty() && path[0] == '/';
 #endif
@@ -86,8 +94,27 @@ bool isAbsolutePath(const string& path)
 bool listFiles(const string& path, vector<string>* files)
 {
 #if defined(_MSC_VER)
-    LOG(ERROR) << "TODO(peria): Implement here";
-    return false;
+    DWORD attr = GetFileAttributesA(path.c_str());
+    if (attr == INVALID_FILE_ATTRIBUTES)
+        return false;
+    if (!(attr & FILE_ATTRIBUTE_DIRECTORY))
+        return true;
+
+    const string pattern = path + "\\*";
+    WIN32_FIND_DATAA find_data = {};
+    HANDLE find_handle = FindFirstFileA(pattern.c_str(), &find_data);
+    if (find_handle == INVALID_HANDLE_VALUE)
+        return false;
+
+    BOOL reading = TRUE;
+    for (; reading == TRUE; reading = FindNextFileA(find_handle, &find_data)) {
+        bool is_dir = (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+        if (is_dir) {
+            files->push_back(find_data.cFileName);
+        }
+    }
+    FindClose(find_handle);
+    return true;
 #else
     DIR* dir = opendir(path.c_str());
     if (!dir)
