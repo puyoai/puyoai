@@ -1,0 +1,68 @@
+group("control_tester") {
+    deps = [
+      ":control_tester_cpu",
+      ":copy_run_sh",
+    ]
+}
+
+executable("control_tester_cpu") {
+    output_name = "cpu/control_tester/control_tester"
+
+    sources = [
+        "main.cc",
+    ]
+
+    deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/control_tester/run.sh",
+    ]
+}
+
+copy("copy_run_peak_sh") {
+    sources = [
+        "run_peak.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/control_tester/run_peak.sh",
+    ]
+}
+
+copy("copy_run_nohoho_sh") {
+    sources = [
+        "run_nohoho.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/control_tester/run_nohoho.sh",
+    ]
+}
+
+copy("copy_run_quickturn_sh") {
+    sources = [
+        "run_quickturn.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/control_tester/run_quickturn.sh",
+    ]
+}
+
+copy("copy_run_right_sh") {
+    sources = [
+        "run_right.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/control_tester/run_right.sh",
+    ]
+}
+

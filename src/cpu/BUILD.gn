@@ -4,6 +4,7 @@ group("cpu") {
         "//src/cpu/mayah",
         "//src/cpu/colun",
         "//src/cpu/peria",
+        "//src/cpu/control_tester",
     ]
 }
 
