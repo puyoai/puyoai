@@ -1,0 +1,38 @@
+group("inosendo") {
+    deps = [
+      ":inosendo_cpu",
+      ":copy_run_sh",
+    ]
+}
+
+executable("inosendo_cpu") {
+    output_name = "cpu/inosendo/inosendo"
+
+    sources = [
+        "main.cc",
+        "gazer.cc",
+        "gazer.h",
+        "rensa_hand_tree.cc",
+        "rensa_hand_tree.h",
+    ]
+
+    deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/probability",
+        "//src/core/rensa",
+        "//src/core/rensa_tracker",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+copy("copy_run_sh") {
+    sources = [
+        "run.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/inosendo/run.sh",
+    ]
+}
