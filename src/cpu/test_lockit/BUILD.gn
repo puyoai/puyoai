@@ -1,0 +1,101 @@
+group("test_lockit") {
+    deps = [
+        ":niina",
+        ":copy_nidub_sh",
+        ":copy_rendaS9_sh",
+        ":copy_rendaGS9_sh",
+        ":copy_rendaGS9a_sh",
+    ]
+}
+
+static_library("test_lockit_lib") {
+    sources = [
+        "coma.cc",
+        "cpu.cc",
+        "field.cc",
+        "read.cc",
+        "template.cc",
+        "util.cc",
+        "cpu_configuration.h"
+    ]
+
+    public_deps = [
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+executable("niina") {
+    output_name = "cpu/test_lockit/niina"
+
+    sources = [
+        "niina.cpp",
+    ]
+
+    deps = [
+        ":test_lockit_lib",
+        "//src/base",
+        "//src/core",
+        "//src/core/plan",
+        "//src/core/client/ai",
+        "//src/core/client",
+    ]
+}
+
+executable("field_test") {
+    testonly = true
+
+    sources = [
+        "field_test.cc",
+    ]
+
+    deps = [
+        ":test_lockit_lib",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+copy("copy_nidub_sh") {
+    sources = [
+        "nidub.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/test_lockit/nidub.sh",
+    ]
+}
+
+copy("copy_rendaS9_sh") {
+    sources = [
+        "rendaS9.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/test_lockit/rendaS9.sh",
+    ]
+}
+
+copy("copy_rendaGS9_sh") {
+    sources = [
+        "rendaGS9.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/test_lockit/rendaGS9.sh",
+    ]
+}
+
+copy("copy_rendaGS9a_sh") {
+    sources = [
+        "rendaGS9a.sh",
+    ]
+    outputs = [
+        "$root_out_dir/cpu/test_lockit/rendaGS9a.sh",
+    ]
+}
+
+
+
+
+
