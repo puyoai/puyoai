@@ -67,6 +67,12 @@ TBW
 1. ターミナル、もしくはコマンドプロンプトで、適当なディレクトリ (e.g. `~/repos/puyoai`) を作って移動し、そこで `gclient config --unmanaged https://github.com/puyoai/puyoai` コマンドを入力してください。`.gclient` ファイルがそのディレクトリに作られます。
 1. `gclient sync` コマンドを入力してください。必要なファイルなどがダウンロードされます。
 
+For contributors note: puyoai レポジトリに push できる権限がある場合、`gclient config` は、次のようにしてください。
+
+```shell
+$ gclient config --unmanaged git@github.com:puyoai/puyoai
+```
+
 ### 必要なライブラリの説明
 
 GUI を付与したい場合、さらに次のライブラリが必要です。
