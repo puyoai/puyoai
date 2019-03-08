@@ -46,13 +46,14 @@ config("global") {
         ]
 
         cflags_cc = [
-            "-std=gnu++11",
+            "-std=c++14",
         ]
     }
 
     if (is_win) {
         cflags = [
             "/FI", "build/build_config.h",  # always include build_config.h
+            "/std:c++14",
         ]
 
         ldflags = [
