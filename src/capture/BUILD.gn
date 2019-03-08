@@ -1,12 +1,32 @@
 # TODO(mayah): Update ac_analyzer.cc not to use deprecated APIs.
 # add_compile_options("-Wno-deprecated-declarations")
 
+import ("//src/capture/capture.gni")
+
 if (use_usb) {
     static_library("usb_device") {
         sources = [
             "usb_device.cc",
             "usb_device.h",
         ]
+    }
+
+    executable("parse_capture") {
+        sources = [ "parse_capture.cc" ]
+        deps = [
+            ":capture",
+            "//src/gui",
+        ]
+
+        configs += [ "//build/config:with_usb" ]
+
+        if (use_v4l2) {
+            sources += [
+                "viddev_source.cc",
+                "viddev_source.h",
+            ]
+            configs += [ ":use_v4l2_library" ]
+        }
     }
 }
 
@@ -66,22 +86,13 @@ static_library("capture") {
     }
 }
 
-executable("parse_capture") {
-    sources = [
-        "parse_capture.cc"
-    ]
-
-    deps = [
-        ":capture"
-    ]
-
-    configs += [
-        "//build/config:with_usb",
-    ]
-
-    if (use_gui) {
-        deps += [ "//src/gui" ]
-    }
+config("use_v4l2_library") {
+     defines = [
+         "USE_V4L2"
+     ]
+     ldflags = [
+         "-lv4l2"
+     ]
 }
 
 # if(V4L2_LIBRARY)

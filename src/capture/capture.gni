@@ -1,0 +1,4 @@
+declare_args() {
+  # Use V4L2 by default on Linux
+  use_v4l2 = is_linux && use_usb
+}
