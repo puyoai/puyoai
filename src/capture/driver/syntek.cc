@@ -136,7 +136,7 @@ enum {
 
 using namespace std;
 
-// TODO: move to somewhere.
+// TODO: move to somewhere. (C++17 supports this)
 template<typename T>
 T clamp(T left, T x, T right) { return std::min(std::max(left, x), right); }
 

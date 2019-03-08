@@ -66,6 +66,24 @@ static_library("capture") {
     }
 }
 
+executable("parse_capture") {
+    sources = [
+        "parse_capture.cc"
+    ]
+
+    deps = [
+        ":capture"
+    ]
+
+    configs += [
+        "//build/config:with_usb",
+    ]
+
+    if (use_gui) {
+        deps += [ "//src/gui" ]
+    }
+}
+
 # if(V4L2_LIBRARY)
 #     add_compile_options("-DUSE_V4L2")
 #     add_library(puyoai_capture_viddev viddev_source.cc)
