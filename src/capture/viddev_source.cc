@@ -1,14 +1,14 @@
 #include "viddev_source.h"
 
-#include <assert.h>
-#include <errno.h>
 #include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <cassert>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
 
 #include <libv4l2.h>
 #include <linux/videodev2.h>
@@ -56,15 +56,6 @@ void adjustStandard(int fd)
 {
     v4l2_std_id std_id;
     struct v4l2_standard standard;
-
-    if (v4l2_ioctl(fd, VIDIOC_G_STD, &std_id) < 0) {
-        /* Note when VIDIOC_ENUMSTD always returns EINVAL this
-           is no video device or it falls under the USB exception,
-           and VIDIOC_G_STD returning EINVAL is no error. */
-        perror("v4l2_ioctl VIDIOC_G_STD");
-        exit(EXIT_FAILURE);
-    }
-
     memset (&standard, 0, sizeof(standard));
     standard.index = 0;
 
@@ -84,26 +75,20 @@ void adjustStandard(int fd)
         perror("v4l2_ioctl VIDIOC_ENUMSTD");
         exit(EXIT_FAILURE);
     }
-
-    v4l2_std_id new_std_id = V4L2_STD_NTSC_M_JP;
-    if (v4l2_ioctl(fd, VIDIOC_S_STD, &new_std_id) < 0) {
-        perror("v4l2_ioctl VIDIOC_S_STD");
-        exit(EXIT_FAILURE);
-    }
 }
 
 void showCurrentAudio(int fd)
 {
     struct v4l2_audio audio;
     if (v4l2_ioctl(fd, VIDIOC_G_AUDIO, &audio) < 0) {
-        perror("v4l2_ioctl VIDIOC_G_AUDIO");
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "Failed to get audio info.\n");
+        return;
+
     }
 
     fprintf(stderr, "Current audio: %s @%u capability=%u mode=%u\n",
             audio.name, audio.index, audio.capability, audio.mode);
 }
-
 
 }  // anonymous namespace
 
@@ -203,7 +188,7 @@ void VidDevSource::initBuffers()
 
     buf_cnt_ = reqbuf.count;
     buffers_ = (Buffer*)calloc(reqbuf.count, sizeof(*buffers_));
-    assert(buffers_ != NULL);
+    assert(buffers_);
 
     fprintf(stderr, "mmap:");
     for (size_t i = 0; i < reqbuf.count; i++) {
@@ -218,7 +203,7 @@ void VidDevSource::initBuffers()
         }
 
         buffers_[i].length = buffer.length; /* remember for munmap() */
-        buffers_[i].start = (char*)mmap(NULL, buffer.length,
+        buffers_[i].start = (char*)mmap(nullptr, buffer.length,
                                         PROT_READ | PROT_WRITE, /* recommended */
                                         MAP_SHARED,             /* recommended */
                                         fd_, buffer.m.offset);
@@ -267,11 +252,9 @@ UniqueSDLSurface VidDevSource::getNextFrame()
         FD_ZERO(&fds);
         FD_SET(fd_, &fds);
         struct timeval tv;
-        //tv.tv_sec = 2;
-        //tv.tv_usec = 0;
         tv.tv_sec = 0;
         tv.tv_usec = 100000;
-        r = select(fd_ + 1, &fds, NULL, NULL, &tv);
+        r = select(fd_ + 1, &fds, nullptr, nullptr, &tv);
 
         if (r == 0) {
             perror("select timeout");
@@ -295,17 +278,16 @@ UniqueSDLSurface VidDevSource::getNextFrame()
         perror("VIDIOC_DQBUF");
         exit(EXIT_FAILURE);
     }
-
     const Buffer& buf = buffers_[buffer.index];
-#if 0
-    static int cnt = 0;
-    fprintf(stderr, "%d %d\n", cnt++, buffer.index);
-#endif
 
     if (v4l2_ioctl(fd_, VIDIOC_QBUF, &buffer) < 0) {
         perror("VIDIOC_QBUF");
         exit(EXIT_FAILURE);
     }
 
-    return makeUniqueSDLSurface(buf.surface);
+    UniqueSDLSurface surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, 640, 480, 32, 0, 0, 0, 0)));
+    // Convert 720x240 to 640x224.
+    const SDL_Rect srcRect {0, 0, width_, height_};
+    SDL_BlitScaled(buf.surface, &srcRect, surf.get(), nullptr);
+    return surf;
 }

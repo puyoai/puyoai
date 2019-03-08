@@ -32,6 +32,7 @@ private:
 
     const std::string dev_;
     int fd_;
+    // TODO(peria): Use C++ STL container to manage buffers.
     Buffer* buffers_;
     size_t buf_cnt_;
 };
