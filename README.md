@@ -10,17 +10,13 @@
 
 ### OS
 
-現状、Mac OS X(10.10 Yosemite) と Ubuntu Linux 14.04 でビルドできることを確認しています。
-
-古めの Linux (Ubuntu 12.04 など)では、gcc や clang が古いので、もしかしたらコンパイルが通らないかもしれません。
-
+現状、Mac OS X と Ubuntu、Windows でビルドできることを確認しています。
 また、32bit環境では全くテストしていません。
 
 ### コンパイラ
 
-clang-3.4 以降、と gcc-4.7 以降でのみテストしています。
-
-基本的に C++11 で書かれているため、C++11 の対応が悪いコンパイラではコンパイルできないかもしれません。
+C++14 がサポートされているコンパイラを使う必要があります。
+Mac OSX や Linux では clang もしくは gcc を、Windows では Visual C++ を使うことが想定されています。
 
 ### ハードウェア (CPU)
 
@@ -58,9 +54,13 @@ $ brew install sdl2 SDL2_ttf SDL2_image ffmpeg libusb protobuf
 
 #### Windows
 
-1. Install Visual Studio 2017.
+[Visual Studio 2017](https://visualstudio.microsoft.com/) をインストールしてください。
 
-TBW
+また、他プラットフォームと同様にビルドツールとして ninja を使いたい場合は VC 関係の設定を行うため以下の bat を各コマンドプロンプトで実行してください。
+
+```
+> %ProgramFiles%\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat
+```
 
 ### レポジトリのダウンロード
 
