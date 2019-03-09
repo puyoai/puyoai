@@ -13,6 +13,8 @@ jobs:
               git \
               clang \
               python \
+              curl \
+              wget \
               libprotobuf-dev \
               libcurl4-nss-dev \
               libsdl2-dev \
@@ -22,13 +24,10 @@ jobs:
               libffms2-dev \
               libusb-1.0-0-dev
             git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-            pwd
-            ls
-            echo $HOME
       - run:
           name: Checkout
           command: |
-            echo 'export PATH=/root/project/depot_tools:$PATH' >> $BASH_ENV
+            echo 'export PATH=$HOME/project/depot_tools:$PATH' >> $BASH_ENV
             source $BASH_ENV
             ls
             gclient config --spec 'solutions = [{ "url": "https://github.com/puyoai/puyoai.git", "managed": False, "name": "puyoai", "deps_file": "DEPS", "custom_deps": { "test_resources": None }}]'
