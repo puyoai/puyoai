@@ -22,6 +22,8 @@ jobs:
               libffms2-dev \
               libusb-1.0-0-dev
             git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+            pwd
+            ls
       - run:
           name: Checkout
           command: |
