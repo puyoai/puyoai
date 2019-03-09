@@ -5,7 +5,7 @@ jobs:
       - image: debian:stretch
     steps:
       - run:
-          name: Build and test
+          name: Setup environment
           # TODO: Set up a Dockerfile for this.
           command: |
             apt-get update
@@ -22,4 +22,29 @@ jobs:
               libffms2-dev \
               libusb-1.0-0-dev
             git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+      - run:
+          name: Checkout
+          command: |
+            export PATH=$(pwd)/depot_tools:$PATH
+            gclient config --spec '
+solutions = [
+  {
+    "url": "https://github.com/puyoai/puyoai.git",
+    "managed": False,
+    "name": "puyoai",
+    "deps_file": "DEPS",
+    "custom_deps": {
+      "test_resources": None,
+    },
+  },
+]
+'
+            gclient sync
+      - run:
+          name: Build
+          command: |
+            cd puyoai
             ./build/ci.sh
+      - run:
+          name: Run rests
+          command: ./build/run_unittest.py
