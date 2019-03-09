@@ -38,9 +38,10 @@ jobs:
             source $BASH_ENV
             gn gen out/Debug
             ninja -C out/Debug
-      - run:
-          name: Run rests
-          working_directory: ~/project/puyoai
-          command: |
-            source $BASH_ENV
-            ./build/run_unittest.py
+      # TODO: run_unittest.py does not work on CircleCI (https://circleci.com/gh/puyoai/puyoai/64)
+      # - run:
+      #     name: Run tests
+      #     working_directory: ~/project/puyoai
+      #     command: |
+      #       source $BASH_ENV
+      #       ./build/run_unittest.py
