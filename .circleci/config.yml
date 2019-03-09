@@ -25,26 +25,28 @@ jobs:
       - run:
           name: Checkout
           command: |
-            export PATH=$(pwd)/depot_tools:$PATH
-            gclient config --spec '
-solutions = [
-  {
-    "url": "https://github.com/puyoai/puyoai.git",
-    "managed": False,
-    "name": "puyoai",
-    "deps_file": "DEPS",
-    "custom_deps": {
-      "test_resources": None,
-    },
-  },
-]
+            echo 'export PATH=~/depot_tools:$PATH' >> $BASH_ENV
+            source $BASH_ENV
+            gclient config --spec ' \
+solutions = [ \
+  { \
+    "url": "https://github.com/puyoai/puyoai.git", \
+    "managed": False, \
+    "name": "puyoai", \
+    "deps_file": "DEPS", \
+    "custom_deps": { \
+      "test_resources": None, \
+    }, \
+  }, \
+] \
 '
             gclient sync
       - run:
           name: Build
+          working_directory: ~/puyoai
           command: |
-            cd puyoai
             ./build/ci.sh
       - run:
           name: Run rests
+          working_directory: ~/puyoai
           command: ./build/run_unittest.py
