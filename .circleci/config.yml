@@ -34,14 +34,14 @@ jobs:
             gclient sync
       - run:
           name: Build
-          working_directory: ~/puyoai
+          working_directory: ~/project/puyoai
           command: |
+            echo $PATH
             source $BASH_ENV
-            cat $BASH_ENV
             ./build/ci.sh
       - run:
           name: Run rests
-          working_directory: ~/puyoai
+          working_directory: ~/project/puyoai
           command: |
             source $BASH_ENV
             ./build/run_unittest.py
