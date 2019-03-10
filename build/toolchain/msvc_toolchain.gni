@@ -23,7 +23,7 @@ template("msvc_toolchain") {
         pdbname = "{{target_out_dir}}/{{label_name}}_c.pdb"
 
         # Label names may have spaces so pdbname must be quoted.
-        command = "$env_setup $cc_wrapper $cl /nologo /showIncludes /FC {{defines}} {{include_dirs}} {{cflags}} $cl_m32_flag {{cflags_c}} /c {{source}} /Fo{{output}} /Fd\"$pdbname\""
+        command = "$env_setup $cc_wrapper $cl /nologo /FC {{defines}} {{include_dirs}} {{cflags}} $cl_m32_flag {{cflags_c}} /c {{source}} /Fo{{output}} /Fd\"$pdbname\" /source-charset:utf-8"
         depsformat = "msvc"
         outputs = [
         "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
@@ -36,7 +36,7 @@ template("msvc_toolchain") {
         pdbname = "{{target_out_dir}}/{{label_name}}_c.pdb"
 
         # Label names may have spaces so pdbname must be quoted.
-        command = "$env_setup $cc_wrapper $cl /nologo /showIncludes /FC {{defines}} {{include_dirs}} {{cflags}} $cl_m32_flag {{cflags_cc}} /c {{source}} /Fo{{output}} /Fd\"$pdbname\""
+        command = "$env_setup $cc_wrapper $cl /nologo /FC {{defines}} {{include_dirs}} {{cflags}} $cl_m32_flag {{cflags_cc}} /c {{source}} /Fo{{output}} /Fd\"$pdbname\" /source-charset:utf-8"
         depsformat = "msvc"
         outputs = [
         "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.obj",
