@@ -70,7 +70,8 @@ namespace Yuricat{
             for(const auto& ds : m){
                 if(get<1>(ds.second) > get<1>(best_chain)){
                     best = ds.first;
-                    best_chain = ds.second;
+                    const auto& v = ds.second;
+                    best_chain = make_tuple(static_cast<int>(get<0>(v)), get<1>(v));
                 }
             }
             mutex_.unlock();

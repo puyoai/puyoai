@@ -146,7 +146,7 @@ void MultiLayerPerceptron::forward(const float x[], ForwardingIntermediateStorag
     }
     data->o1[num_input_] = 1.0;
 
-    std::fill(data->i2.get(), data->i2.get() + num_hidden_, 0.0);
+    std::fill(data->i2.get(), data->i2.get() + num_hidden_, 0.0f);
     for (int j = 0; j < num_input_ + 1; ++j) {
         for (int i = 0; i < num_hidden_; ++i) {
             data->i2[i] += w2_[j * num_hidden_ + i] * data->o1[j];
@@ -158,7 +158,7 @@ void MultiLayerPerceptron::forward(const float x[], ForwardingIntermediateStorag
     }
     data->o2[num_hidden_] = 1;
 
-    std::fill(data->i3.get(), data->i3.get() + num_output_, 0.0);
+    std::fill(data->i3.get(), data->i3.get() + num_output_, 0.0f);
     for (int j = 0; j < num_hidden_ + 1; ++j) {
         for (int i = 0; i < num_output_; ++i) {
             data->i3[i] += w3_[j * num_output_ + i] * data->o2[j];

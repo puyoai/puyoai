@@ -185,8 +185,8 @@ void Commentator::update(int pi, const CoreField& field, const KumipuyoSeq& kumi
             if (plan.score() < 920)
                 return;
 
-            pair<int, double> tsubushiScore = make_pair(plan.decisions().size(),
-                                                        -static_cast<double>(plan.score()) / plan.totalFrames());
+            pair<int, double> tsubushiScore(static_cast<int>(plan.decisions().size()),
+                                            -static_cast<double>(plan.score()) / plan.totalFrames());
             if (tsubushiScore < bestTsubushiScore) {
                 bestTsubushiScore = tsubushiScore;
                 ignitionRensaResult = IgnitionRensaResult(plan.rensaResult(),
