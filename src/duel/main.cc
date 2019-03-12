@@ -64,6 +64,7 @@ DEFINE_bool(use_cui, false, "use CUI version drawer");
 // When SDL2 is not defined, CUI should be enabled by default.
 DEFINE_bool(use_cui, true, "use CUI version drawer");
 #endif
+
 #if USE_AUDIO_COMMENTATOR
 DEFINE_bool(use_audio, false, "use audio commentator");
 #endif

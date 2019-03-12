@@ -28,8 +28,12 @@
 #define abs(N)		(((N) < 0) ? -(N) : (N))
 #define sgn(N)		(((N) < 0) ? -1 : ((N) > 0 ? 1 : 0))
 #define swap(T, A, B)	do { T tmp= A;  A= B;  B= tmp; } while (0)
+#ifndef min
 #define min(A, B)	(((A) < (B) ? (A) : (B)))
+#endif
+#ifndef max
 #define max(A, B)	(((A) > (B) ? (A) : (B)))
+#endif
 #define clamp(A, X, B)	min(max(A, X), B)
 
 #define CLIPX0(S)	((S)->clip_rect.x)
@@ -50,21 +54,26 @@
 /* DrawPixel							    */
 /* ---------------------------------------------------------------- */
 
+inline void* PixelBytePointer(SDL_Surface* s, int x, int y) {
+  Uint8* pixels = s->pixels;
+  return pixels + s->pitch * y + x;
+}
+
 static inline int DrawPixel8(SDL_Surface *s, int x, int y, Uint32 c)
 {
-  *((Uint8 *)(s->pixels + s->pitch * y + x))= (Uint8)c;
+  *((Uint8 *)PixelBytePointer(s, x, y))= (Uint8)c;
   return 0;
 }
 
 static inline int DrawPixel16(SDL_Surface *s, int x, int y, Uint32 c)
 {
-  *((Uint16 *)(s->pixels + s->pitch * y + 2 * x))= (Uint16)c;
+  *((Uint16 *)PixelBytePointer(s, 2 * x, y))= (Uint16)c;
   return 0;
 }
 
 static inline int DrawPixel32(SDL_Surface *s, int x, int y, Uint32 c)
 {
-  *((Uint32 *)(s->pixels + s->pitch * y + 4 * x))= (Uint32)c;
+  *((Uint32 *)PixelBytePointer(s, 4 * x, y))= (Uint32)c;
   return 0;
 }
 
@@ -161,7 +170,7 @@ static int clipLine(SDL_Surface *dst, int *x1, int *y1, int *x2, int *y2)
 #define DrawLine(N, M)									\
 static int DrawHLine##N(SDL_Surface *s, int x1, int y1, int x2, Uint32 colour)		\
 {											\
-  Uint8 *p= s->pixels + s->pitch * y1;							\
+  Uint8 *p= PixelBytePointer(s, 0, y1);							\
   Uint##M c= (Uint##M)colour;								\
   while (x1 <= x2)									\
     {											\
@@ -173,7 +182,7 @@ static int DrawHLine##N(SDL_Surface *s, int x1, int y1, int x2, Uint32 colour)		
 											\
 static int DrawVLine##N(SDL_Surface *s, int x1, int y1, int y2, Uint32 colour)		\
 {											\
-  Uint8 *p= s->pixels + ((M)>>3) * x1;							\
+  Uint8 *p= PixelBytePointer(s, ((M)>>3) * x1, 0);							\
   Uint##M c= (Uint##M)colour;								\
   while (y1 <= y2)									\
     {											\
@@ -194,7 +203,7 @@ static int DrawLine##N(SDL_Surface *s, int x1, int y1, int x2, int y2, Uint32 co
       double y= y1, dy= (double)(y2 - y1) / (double)ax;					\
       while (ax-- >= 0)									\
 	{										\
-	  *((Uint##M *)(s->pixels + s->pitch * (int)(y) + ((M)>>3) * x))= c;		\
+	  *((Uint##M *)PixelBytePointer(s, ((M)>>3) * x, (int)y))= c;		\
 	  x += dx;									\
 	  y += dy;									\
 	}										\
@@ -205,7 +214,7 @@ static int DrawLine##N(SDL_Surface *s, int x1, int y1, int x2, int y2, Uint32 co
       double x= x1, dx= (double)(x2 - x1) / (double)ay;					\
       while (ay-- >= 0)									\
 	{										\
-	  *((Uint##M *)(s->pixels + s->pitch * y + ((M)>>3) * (int)(x)))= c;		\
+	  *((Uint##M *)PixelBytePointer(s, ((M)>>3) * (int)x, y))= c;		\
 	  y += dy;									\
 	  x += dx;									\
 	}										\
@@ -338,7 +347,7 @@ int SDL_DrawRect(SDL_Surface *s, SDL_Rect *rect, Uint32 colour)
 static inline void xDrawPixel##N(SDL_Surface *s, int x, int y, Uint##M c)	\
 {										\
   if (INCLIP(s, x, y))								\
-    *((Uint##M *)(s->pixels + (s->pitch * y) + (((M) >> 3) * x)))= c;		\
+    *((Uint##M *)PixelBytePointer(s, ((M) >> 3) * x, y))= c;		\
 }										\
 										\
 int DrawCircle##N(SDL_Surface *s, int x0, int y0, int radius, Uint32 colour)	\
@@ -417,7 +426,7 @@ static void xDrawLine##N(SDL_Surface *s, int x0, int x1, int y, Uint##M c)		\
   if (!INCLIPY(s, y)) return;								\
   if (x0 < CLIPX0(s)) x0= CLIPX0(s);							\
   if (x1 >= CLIPX1(s)) x1= CLIPX1(s) - 1;						\
-  Uint##M *p= (Uint##M *)(s->pixels + s->pitch * y + ((M) >> 3) * x0);			\
+  Uint##M *p= (Uint##M *)PixelBytePointer(s, ((M) >> 3) * x0, y);			\
   x1 -= x0;										\
   while (x1-- >= 0)									\
     *p++= c;										\

@@ -1,10 +1,13 @@
 #include "screen.h"
 
 #include <assert.h>
-#include <libgen.h>
 #include <limits.h>
 #include <math.h>
+
+#if !OS_WIN
+#include <libgen.h>
 #include <unistd.h>
+#endif
 
 #include <iostream>
 #include <sstream>
@@ -37,9 +40,13 @@ void Screen::init()
     }
 
     string fontFilePath = file::joinPath(DATA_DIR, "mikachan-p.ttf");
+#if OS_WIN
+    font_ = TTF_OpenFont(fontFilePath.c_str(), 16);
+#else
     if (access(fontFilePath.c_str(), R_OK) == 0) {
         font_ = TTF_OpenFont(fontFilePath.c_str(), 16);
     }
+#endif
 
     if (!font_) {
         LOG(FATAL) << TTF_GetError();

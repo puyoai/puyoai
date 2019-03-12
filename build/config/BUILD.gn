@@ -113,11 +113,21 @@ if (use_gui) {
         include_dirs = [
             "/usr/include/SDL2",
         ]
-        ldflags = [
-            "-lSDL2",
-            "-lSDL2_ttf",
-            "-lSDL2_image",
-        ]
+
+        if (is_win) {
+            libs = [
+                "SDL2.lib",
+                "SDL2main.lib",
+                "SDL2_ttf.lib",
+                "SDL2_image.lib",
+            ]
+        } else {
+            ldflags = [
+                "-lSDL2",
+                "-lSDL2_ttf",
+                "-lSDL2_image",
+            ]
+        }
     }
 }
 
