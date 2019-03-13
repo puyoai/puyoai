@@ -77,9 +77,9 @@ $ gclient config --unmanaged git@github.com:puyoai/puyoai
 
 GUI を付与したい場合、さらに次のライブラリが必要です。
 
-* SDL 2.0
-* SDL_ttf (2.0)
-* SDL_image (2.0)
+* [SDL 2.0](https://www.libsdl.org/index.php)
+* [SDL_ttf (2.0)](https://www.libsdl.org/projects/SDL_ttf/)
+* [SDL_image (2.0)](https://www.libsdl.org/projects/SDL_image/)
 
 http サーバーを利用して、GUIを付与することもできます。この場合、次のライブラリが必要です。
 
@@ -88,9 +88,6 @@ http サーバーを利用して、GUIを付与することもできます。こ
 実機でAIを動かすなど、ビデオキャプチャーが必要な場合、さらに次のライブラリが必要です。
 
 * lib-usb1.0
-
-その他、ライブラリではないですが、ビルドツールとして `cmake` `make` が必要です。
-また `ninja` を使えるとコンパイルが高速になります。
 
 ### ビルドのしかた Linux/Mac
 
@@ -119,9 +116,9 @@ use_tcp = true
 use_curl = true
 ```
 
-とすると、全部入りになります (2019-02-23 現在)。どのようなオプションがあるかは、[build/BUILDCONFIG.gn](build/BUILDCONFIG.gn) の declare_args 内（複数あります)を参照してください。
+とすると、全部入りになります (2019-02-23 現在)。どのようなオプションがあるかは、[build/BUILDCONFIG.gn](build/BUILDCONFIG.gn) の `declare_args` 内（複数あります)を参照してください。
 
-is_debug を true にすると、デバッグビルドになります。
+`is_debug` を `true` にすると、デバッグビルドになります。
 
 ### ビルドのしかた Windows
 
@@ -140,29 +137,24 @@ Linux/Mac で使えるコンフィグ option のうちいくつかは動きま�
 > gn gen --args="is_debug=false" --ide=vs out/Release
 ```
 
-とすると、`all.sln` ファイルが out/Release 以下に生成されます。
+とすると、`all.sln` ファイルが `out/Release` 以下に生成されます。
 
 ### How to run test
 
-After the build,
+ビルドした後、
 
 ```shell
 $ cd ~/repos/puyoai/puyoai
 $ python build/run_unittest.py --build-dir=out/Debug
 ```
 
+で全テスト走ります。
+
 ### エラーがでた
 
 もしかしたら、master ブランチが壊れているかもしれません。この場合、気づいたメンバーによってすぐに修復されます。
 このドキュメントの先頭に貼ってある[CircleCI](https://circleci.com/gh/puyoai)のバッジが `PASSED` になっていなければ、現状のコードは壊れています。
-
-SSE4.1がどーのこーの、というエラーが出た場合、`-mnative`フラグがきちんと効いてないかもしれません。再現条件がわかっていませんが、
-古いLinuxをVMWareのような仮想マシンの上で動かすと起きることがあります。その場合、自分のCPUがAVX命令が使えるならば、
-`src/CMakeLists.txt`中の`-mnative`を`-mavx`に書き換えてみてください。自分のCPUにAVX命令が実装されていない場合、
-代わりに`-msse4.2`を試してください。`-msse4.1`でもコンパイルできますが、`popcnt`命令が使えないため、一部の処理が遅くなります。
-また、このレベルのCPUの場合、一部のAIが求めるCPU速度に達していませんので、そのようなAIはきちんとは動かないでしょう。
-
-それでも動かない場合、Issue Listに問題を登録してください。
+Issue List に問題を報告、もしくは Pull request を送ってください。
 
 ## 実行
 
