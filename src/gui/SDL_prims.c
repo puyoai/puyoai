@@ -54,7 +54,7 @@
 /* DrawPixel							    */
 /* ---------------------------------------------------------------- */
 
-inline void* PixelBytePointer(SDL_Surface* s, int x, int y) {
+static inline void* PixelBytePointer(SDL_Surface* s, int x, int y) {
   Uint8* pixels = s->pixels;
   return pixels + s->pitch * y + x;
 }
