@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
+#include <algorithm>
 
 #include "capture/monitor.h"
 
@@ -91,6 +92,9 @@ void showCurrentAudio(int fd)
             audio.name, audio.index, audio.capability, audio.mode);
 }
 
+template<typename T>
+T clamp(T left, T x, T right) { return std::min(std::max(left, x), right); }
+
 }  // anonymous namespace
 
 VidDevSource::VidDevSource(const string& dev) :
@@ -122,8 +126,7 @@ void VidDevSource::init()
     }
     showPixFormat(pix_fmt);
 
-    //format.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB24;
-    format.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB565;
+    format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
     if (v4l2_ioctl(fd_, VIDIOC_S_FMT, &format) < 0) {
         perror("v4l2_ioctl VIDIOC_S_FMT");
         exit(EXIT_FAILURE);
@@ -208,12 +211,9 @@ void VidDevSource::initBuffers()
                                         PROT_READ | PROT_WRITE, /* recommended */
                                         MAP_SHARED,             /* recommended */
                                         fd_, buffer.m.offset);
-        // This document says rmask and bmask should be swapped, but hmm?
-        // http://linuxtv.org/downloads/v4l-dvb-apis/packed-rgb.html
-        buffers_[i].surface = SDL_CreateRGBSurfaceFrom(buffers_[i].start,
-                                                       width_, height_, 16,
-                                                       width_ * 2,
-                                                       31 << 11, 63 << 5, 31, 0);
+        buffers_[i].surface = SDL_CreateRGBSurfaceFrom(
+            buffers_[i].start, width_, height_,
+            16, width_ * 2, 31 << 11, 63 << 5, 31, 0);
         assert(buffers_[i].surface);
 
         fprintf(stderr, " %lu:%p+%lu", i, buffers_[i].start, buffers_[i].length);
@@ -291,5 +291,33 @@ UniqueSDLSurface VidDevSource::getNextFrame()
     // Convert actual captured size (e.g. 720x240) to normalized size (e.g. 640x448).
     const SDL_Rect srcRect {0, 0, width_, height_};
     SDL_BlitScaled(buf.surface, &srcRect, surf.get(), nullptr);
-    return surf;
+
+    // Convert YUYV to RGB
+    UniqueSDLSurface rgbSurf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, 640, 480, 32,
+                                                                       255 << 24,
+                                                                       255 << 16,
+                                                                       255 << 8, 255)));
+    // http://klabgames.tech.blog.jp.klab.com/archives/1054828175.html
+    Uint8* src = reinterpret_cast<Uint8*>(surf->pixels);
+    Uint8* dst = reinterpret_cast<Uint8*>(rgbSurf->pixels);
+    for (int Y = 0; Y < 480; ++Y) {
+        for (int X = 0; X < 640; X += 2) {
+            int y0 = static_cast<int>(src[0]) - 16;
+            int y1 = static_cast<int>(src[2]) - 16;
+            int u = static_cast<int>(src[1]) - 128;
+            int v = static_cast<int>(src[3]) - 128;
+
+            dst[0] = 255;
+            dst[1] = clamp<int>(0, 1.164383 * y0 + 2.017232 * u, 255);
+            dst[2] = clamp<int>(0, 1.164383 * y0 - 0.391762 * u - 0.812968 * v, 255);
+            dst[3] = clamp<int>(0, 1.164383 * y0 + 1.596027 * v, 255);
+            dst[4] = 255;
+            dst[5] = clamp<int>(0, 1.164383 * y1 + 2.017232 * u, 255);
+            dst[6] = clamp<int>(0, 1.164383 * y1 - 0.391762 * u - 0.812968 * v, 255);
+            dst[7] = clamp<int>(0, 1.164383 * y1 + 1.596027 * v, 255);
+            src += 4;
+            dst += 8;
+        }
+    }
+    return rgbSurf;
 }
