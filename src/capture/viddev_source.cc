@@ -54,7 +54,7 @@ void showCurrentInput(int fd)
 
 void adjustStandard(int fd)
 {
-    v4l2_std_id std_id;
+    v4l2_std_id std_id = 0;
     struct v4l2_standard standard;
     memset (&standard, 0, sizeof(standard));
     standard.index = 0;
