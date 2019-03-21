@@ -8,13 +8,18 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-#include "capture/ac_analyzer.h"
 #include "capture/capture.h"
 #include "capture/color.h"
 #include "gui/bounding_box.h"
 #include "gui/main_window.h"
 #include "gui/unique_sdl_surface.h"
 #include "gui/SDL_prims.h"
+
+#if defined(PUYOPUYO_TSU)
+#include "capture/ac_analyzer.h"
+#elif defined(PUYOPUYO_ESPORTS)
+#include "capture/es_analyzer.h"
+#endif
 
 using namespace std;
 

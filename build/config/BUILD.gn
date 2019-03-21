@@ -31,11 +31,19 @@ config("global") {
         "//src"
     ]
 
-     defines = [
+    defines = [
         "SRC_DIR=\"" + rebase_path("//src", root_build_dir) + "\"",
         "DATA_DIR=\"" + rebase_path("//data", root_build_dir) + "\"",
         "TESTDATA_DIR=\"" + rebase_path("//test_resources", root_build_dir) + "\"",
     ]
+
+    if (puyopuyo == "tsu") {
+        defines += [ "PUYOPUYO_TSU" ]
+    } else if (puyopuyo == "tetris") {
+        defines += [ "PUYOPUYO_TETRIS" ]
+    } else if (puyopuyo == "esports") {
+        defines += [ "PUYOPUYO_ESPORTS" ]
+    }
 
     if (is_posix) {
         # always include build/build_config.h

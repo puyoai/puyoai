@@ -9,7 +9,6 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "capture/ac_analyzer.h"
 #include "capture/capture.h"
 #include "capture/syntek_source.h"
 #include "capture/movie_source.h"
@@ -26,6 +25,12 @@
 #include "wii/stdout_key_sender.h"
 #include "wii/null_key_sender.h"
 #include "wii/wii_connect_server.h"
+
+#if defined(PUYOPUYO_TSU)
+#include "capture/ac_analyzer.h"
+#elif defined(PUYOPUYO_ESPORTS)
+#include "capture/es_analyzer.h"
+#endif
 
 #if USE_AUDIO_COMMENTATOR
 #include "audio/audio_commentator.h"
@@ -69,7 +74,11 @@ static unique_ptr<Source> makeVideoSource()
 
 static unique_ptr<Analyzer> makeVideoAnalyzer()
 {
+#if defined(PUYOPUYO_TSU)
     return unique_ptr<Analyzer>(new ACAnalyzer);
+#elif defined(PUYOPUYO_ESPORTS)
+    return unique_ptr<Analyzer>(new ESAnalyzer);
+#endif
 }
 
 static void ignoreSIGPIPE()

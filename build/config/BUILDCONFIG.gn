@@ -31,7 +31,12 @@ declare_args() {
   use_tcp = is_posix
   # true to build with curl (libcurl is required)
   use_curl = false
+
+  # set game version. this accepts either of "tsu", "tetris", and "esports".
+  puyopuyo = "tsu"
 }
+assert(puyopuyo == "tsu" || puyopuyo == "tetris" || puyopuyo == "esports",
+       "Unsupported game version is given.")
 
 if (is_clang) {
   set_default_toolchain("//build/toolchain/$os:clang_x64")
@@ -95,4 +100,3 @@ set_defaults("shared_library") {
 set_defaults("source_set") {
   configs = default_compiler_configs
 }
-

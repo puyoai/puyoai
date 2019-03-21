@@ -5,8 +5,6 @@ import ("//src/capture/capture.gni")
 
 static_library("capture") {
     sources = [
-        "ac_analyzer.cc",
-        "ac_analyzer.h",
         "analyzer.cc",
         "analyzer.h",
         "analyzer_result_drawer.cc",
@@ -17,6 +15,7 @@ static_library("capture") {
         "color.h",
         "images_source.cc",
         "images_source.h",
+        "monitor.h",
         "movie_source.cc",
         "movie_source.h",
         "movie_source_key_listener.cc",
@@ -39,9 +38,22 @@ static_library("capture") {
     ]
 
     configs += [
+        ":game_monitor",
         "//build/config:with_ffmpeg",
         "//build/config:with_sdl2",
     ]
+
+    if (puyopuyo == "tsu") {
+        sources += [
+            "ac_analyzer.cc",
+            "ac_analyzer.h",
+        ]
+    } else if (puyopuyo == "esports") {
+        sources += [
+            "es_analyzer.cc",
+            "es_analyzer.h",
+        ]
+    }
 
     if (use_usb) {
         sources += [
@@ -75,7 +87,10 @@ if (use_usb) {
             "//src/gui",
         ]
 
-        configs += [ "//build/config:with_usb" ]
+        configs += [
+            ":game_monitor",
+            "//build/config:with_usb"
+        ]
 
         if (use_v4l2) {
             sources += [
@@ -95,12 +110,14 @@ executable("parse_bmp") {
     ]
 }
 
-executable("parse_box") {
-    sources = [ "parse_box.cc" ]
-    deps = [
-        ":capture",
-        "//src/gui",
-    ]
+if (puyopuyo == "tsu") {
+    executable("parse_box") {
+        sources = [ "parse_box.cc" ]
+        deps = [
+            ":capture",
+            "//src/gui",
+        ]
+    }
 }
 
 executable("parse_movie") {
@@ -114,15 +131,17 @@ executable("parse_movie") {
 
 # "capture/images.h" is not found for parse_imgs.cc
 
-executable("ac_analyzer_test") {
-    testonly = true
-    sources = [ "ac_analyzer_test.cc" ]
-    deps = [
-        ":capture",
-        "//third_party/gtest",
-        "//third_party/gtest:gtest_main",
-    ]
-    configs += [ "//build/config:with_sdl2" ]
+if (puyopuyo == "tsu") {
+    executable("ac_analyzer_test") {
+        testonly = true
+        sources = [ "ac_analyzer_test.cc" ]
+        deps = [
+            ":capture",
+            "//third_party/gtest",
+            "//third_party/gtest:gtest_main",
+        ]
+        configs += [ "//build/config:with_sdl2" ]
+    }
 }
 
 executable("color_test") {
@@ -152,4 +171,10 @@ config("use_v4l2_library") {
      ldflags = [
          "-lv4l2"
      ]
+}
+
+config("game_monitor") {
+    if (is_wide_monitor_game) {
+        defines = [ "WIDE_MONITOR_GAME" ]
+    }
 }

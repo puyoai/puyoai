@@ -1,4 +1,7 @@
 declare_args() {
   # Use V4L2 by default on Linux
   use_v4l2 = is_linux && use_usb
+
+  # True if the captured game monitor outputs in wide aspect.
+  is_wide_monitor_game = (puyopuyo == "tetris" || puyopuyo == "esports")
 }

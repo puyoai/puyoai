@@ -1,6 +1,8 @@
 #include "viddev_source.h"
 
 #include <fcntl.h>
+#include <libv4l2.h>
+#include <linux/videodev2.h>
 #include <sys/mman.h>
 #include <sys/select.h>
 #include <sys/stat.h>
@@ -10,8 +12,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <libv4l2.h>
-#include <linux/videodev2.h>
+#include "capture/monitor.h"
 
 using namespace std;
 
@@ -285,8 +286,9 @@ UniqueSDLSurface VidDevSource::getNextFrame()
         exit(EXIT_FAILURE);
     }
 
-    UniqueSDLSurface surf(makeUniqueSDLSurface(SDL_CreateRGBSurface(0, 640, 480, 32, 0, 0, 0, 0)));
-    // Convert 720x240 to 640x224.
+    UniqueSDLSurface surf(makeUniqueSDLSurface(
+        SDL_CreateRGBSurface(0, kMonitorWidth, kMonitorHeight, 32, 0, 0, 0, 0)));
+    // Convert actual captured size (e.g. 720x240) to normalized size (e.g. 640x448).
     const SDL_Rect srcRect {0, 0, width_, height_};
     SDL_BlitScaled(buf.surface, &srcRect, surf.get(), nullptr);
     return surf;

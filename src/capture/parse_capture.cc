@@ -3,14 +3,20 @@
 #include <glog/logging.h>
 
 #include "base/strings.h"
-#include "capture/ac_analyzer.h"
 #include "capture/capture.h"
+#include "capture/monitor.h"
 #include "capture/syntek_source.h"
 #include "gui/bounding_box_drawer.h"
 #include "gui/box.h"
 #include "gui/fps_drawer.h"
 #include "gui/main_window.h"
 #include "gui/screen.h"
+
+#if defined(PUYOPUYO_TSU)
+#include "capture/ac_analyzer.h"
+#elif defined(PUYOPUYO_ESPORTS)
+#include "capture/es_analyzer.h"
+#endif
 
 #ifdef USE_V4L2
 #include "capture/viddev_source.h"
@@ -52,7 +58,11 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+#if defined(PUYOPUYO_TSU)
     ACAnalyzer analyzer;
+#elif defined(PUYOPUYO_ESPORTS)
+    ESAnalyzer analyzer;
+#endif
     Capture capture(source.get(), &analyzer);
 
     unique_ptr<AnalyzerResultDrawer> analyzerResultDrawer;
@@ -64,7 +74,8 @@ int main(int argc, char* argv[])
 
     unique_ptr<FPSDrawer> fpsDrawer(new FPSDrawer);
 
-    MainWindow mainWindow(640, 448, Box(0, 0, 640, 448));
+    MainWindow mainWindow(kMonitorWidth, kMonitorHeight,
+                          Box(0, 0, kMonitorWidth, kMonitorHeight));
     mainWindow.addDrawer(&capture);
     if (analyzerResultDrawer.get())
         mainWindow.addDrawer(analyzerResultDrawer.get());

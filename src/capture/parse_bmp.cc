@@ -10,11 +10,16 @@
 
 #include "capture/capture.h"
 #include "capture/color.h"
-#include "capture/ac_analyzer.h"
 #include "gui/bounding_box.h"
 #include "gui/main_window.h"
 #include "gui/unique_sdl_surface.h"
 #include "gui/SDL_prims.h"
+
+#if defined(PUYOPUYO_TSU)
+#include "capture/ac_analyzer.h"
+#elif defined(PUYOPUYO_ESPORTS)
+#include "capture/es_analyzer.h"
+#endif
 
 using namespace std;
 
@@ -37,7 +42,11 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
+#if defined(PUYOPUYO_TSU)
     ACAnalyzer analyzer;
+#elif defined(PUYOPUYO_ESPORTS)
+    ESAnalyzer analyzer;
+#endif
     unique_ptr<AnalyzerResult> result(analyzer.analyze(surf.get(), nullptr, nullptr, nullptr, deque<unique_ptr<AnalyzerResult>>()));
 
     analyzer.drawWithAnalysisResult(surf.get());
