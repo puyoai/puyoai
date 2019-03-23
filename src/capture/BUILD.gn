@@ -3,33 +3,6 @@
 
 import ("//src/capture/capture.gni")
 
-if (use_usb) {
-    static_library("usb_device") {
-        sources = [
-            "usb_device.cc",
-            "usb_device.h",
-        ]
-    }
-
-    executable("parse_capture") {
-        sources = [ "parse_capture.cc" ]
-        deps = [
-            ":capture",
-            "//src/gui",
-        ]
-
-        configs += [ "//build/config:with_usb" ]
-
-        if (use_v4l2) {
-            sources += [
-                "viddev_source.cc",
-                "viddev_source.h",
-            ]
-            configs += [ ":use_v4l2_library" ]
-        }
-    }
-}
-
 static_library("capture") {
     sources = [
         "ac_analyzer.cc",
@@ -66,6 +39,7 @@ static_library("capture") {
     ]
 
     configs += [
+        "//build/config:with_ffmpeg",
         "//build/config:with_sdl2",
     ]
 
@@ -86,6 +60,91 @@ static_library("capture") {
     }
 }
 
+if (use_usb) {
+    static_library("usb_device") {
+        sources = [
+            "usb_device.cc",
+            "usb_device.h",
+        ]
+    }
+
+    executable("parse_capture") {
+        sources = [ "parse_capture.cc" ]
+        deps = [
+            ":capture",
+            "//src/gui",
+        ]
+
+        configs += [ "//build/config:with_usb" ]
+
+        if (use_v4l2) {
+            sources += [
+                "viddev_source.cc",
+                "viddev_source.h",
+            ]
+            configs += [ ":use_v4l2_library" ]
+        }
+    }
+}
+
+executable("parse_bmp") {
+    sources = [ "parse_bmp.cc" ]
+    deps = [
+        ":capture",
+        "//src/gui",
+    ]
+}
+
+executable("parse_box") {
+    sources = [ "parse_box.cc" ]
+    deps = [
+        ":capture",
+        "//src/gui",
+    ]
+}
+
+executable("parse_movie") {
+    sources = [ "parse_movie.cc" ]
+    deps = [
+        ":capture",
+        "//src/gui",
+    ]
+    configs += [ "//build/config:with_ffmpeg" ]
+}
+
+# "capture/images.h" is not found for parse_imgs.cc
+
+executable("ac_analyzer_test") {
+    testonly = true
+    sources = [ "ac_analyzer_test.cc" ]
+    deps = [
+        ":capture",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+    configs += [ "//build/config:with_sdl2" ]
+}
+
+executable("color_test") {
+    testonly = true
+    sources = [ "color_test.cc" ]
+    deps = [
+        ":capture",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
+executable("real_color_field_test") {
+    testonly = true
+    sources = [ "real_color_field_test.cc" ]
+    deps = [
+        ":capture",
+        "//third_party/gtest",
+        "//third_party/gtest:gtest_main",
+    ]
+}
+
 config("use_v4l2_library") {
      defines = [
          "USE_V4L2"
@@ -94,13 +153,3 @@ config("use_v4l2_library") {
          "-lv4l2"
      ]
 }
-
-# if(V4L2_LIBRARY)
-#     add_compile_options("-DUSE_V4L2")
-#     add_library(puyoai_capture_viddev viddev_source.cc)
-# endif()
-
-
-# capture_add_test(ac_analyzer_test)
-# capture_add_test(color_test)
-# capture_add_test(real_color_field_test)
